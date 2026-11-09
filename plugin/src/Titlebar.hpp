@@ -40,6 +40,9 @@ namespace lg {
         // a button release anywhere ends a title-bar drag we started
         void onButtonRelease();
         bool belongsTo(const PHLWINDOW& w) const { return m_window.lock() == w; }
+        // colour of the client's top rows, from CTitlebarProbe (damages the bar when it changes)
+        void onSampled(const SRgba& c);
+        bool wantsSample() const { return m_height > 0; }
 
       private:
         struct SGeometry {
@@ -71,11 +74,39 @@ namespace lg {
             float                          scale  = 0;
             int                            width  = 0;
             std::shared_ptr<const SParams> params; // font, size and colours
+            bool                           dark = false;
             SP<Render::ITexture>           tex;
         } m_title;
         std::array<SP<Render::ITexture>, 3> m_glyphs;
         float                               m_glyphScale = 0;
         std::shared_ptr<const SParams>      m_glyphParams;
+        std::optional<SRgba>                m_sampled;
+        bool                                m_titleDark = false; // title texture made for a dark bar
         unsigned                            m_recheck = 0;
+    };
+
+    // Runs after the window is drawn (decoration layer OVER, takes no space): reads the client's top
+    // rows back from the framebuffer, asynchronously, so the bar can take the client's own colour.
+    class CTitlebarProbe : public IHyprWindowDecoration {
+      public:
+        CTitlebarProbe(PHLWINDOW window, WP<CTitlebar> bar);
+        ~CTitlebarProbe() override;
+
+        SDecorationPositioningInfo getPositioningInfo() override;
+        void                       onPositioningReply(const SDecorationPositioningReply& reply) override;
+        void                       draw(Render::CRenderContext& ctx, PHLMONITOR, float const& a, const Render::SWindowRenderPresentation& presentation) override;
+        eDecorationType            getDecorationType() override;
+        void                       updateWindow(PHLWINDOW) override;
+        void                       damageEntire() override;
+        eDecorationLayer           getDecorationLayer() override;
+        uint64_t                   getDecorationFlags() override;
+        std::string                getDisplayName() override;
+
+        struct SReadback; // GL objects of one async read
+      private:
+        PHLWINDOWREF               m_window;
+        WP<CTitlebar>              m_bar;
+        std::shared_ptr<SReadback> m_read;
+        unsigned                   m_frames = 0;
     };
 }

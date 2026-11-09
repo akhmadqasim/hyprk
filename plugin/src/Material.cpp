@@ -9,6 +9,9 @@ namespace lg {
         // extra darkening layer on top of the key highlight, which is not decoded; a plain -0.3 made
         // the dark rim disappear (by eye vs reference/screens).
         constexpr SRgba WHITE12 = {1, 1, 1, 0.12f};
+        // reference/screens/macos27-control-center.png tiles average about (108, 93, 86) over a warm
+        // wallpaper; a little of that warm grey keeps CC from reading as a cold flat slab (JUDGE-r3)
+        constexpr SRgba WARM_GREY = {0.56f, 0.49f, 0.45f, 0.12f};
 
         // Clear-family edge bleed colour (SPEC 9.3)
         constexpr SYcc CLEAR_BLEED = {0.75f, 1.f, 1.2f};
@@ -62,8 +65,8 @@ namespace lg {
         // inner 0.225 D clamp 25 / -2.0 D clamp -80, outer 0.0357 D / 0.0714 D at 0.1525.
         constexpr SRecipe CONTROLCENTER = {
             .name                = "controlcenter",
-            .light               = {.ycc = {0.1f, 0.5f, 0.7f}, .fill = {}, .highlightBias = 0.5f, .bleed = CLEAR_BLEED, .lumaMin = 0.30f, .lumaMax = 0.42f},
-            .dark                = {.ycc = {0.1f, 0.5f, 0.7f}, .fill = {}, .highlightBias = 0.3f, .bleed = CLEAR_BLEED, .lumaMin = 0.22f, .lumaMax = 0.36f},
+            .light               = {.ycc = {0.1f, 0.5f, 0.85f}, .fill = WARM_GREY, .highlightBias = 1.2f, .bleed = CLEAR_BLEED, .lumaMin = 0.32f, .lumaMax = 0.46f},
+            .dark                = {.ycc = {0.1f, 0.5f, 0.85f}, .fill = WARM_GREY, .highlightBias = 0.9f, .bleed = CLEAR_BLEED, .lumaMin = 0.24f, .lumaMax = 0.38f},
             .refractionHeightN   = 0.225f,
             .refractionHeightMax = 25,
             .refractionAmountN   = -2.0f,
@@ -75,6 +78,17 @@ namespace lg {
             .blurDist0N = 0, .blurDist0Fixed = -100,
         };
 
+        // Spotlight's field: light translucent glass, not a grey capsule (JUDGE-r3). Regular's refraction
+        // and blur, a brighter face and fill; by eye vs reference/screens/macos27-spotlight.png.
+        constexpr SRecipe SPOTLIGHT = [] {
+            SRecipe r    = REGULAR;
+            r.name       = "spotlight";
+            r.light.ycc  = {0.45f, 1.0f, 1.05f};
+            r.light.fill = {1, 1, 1, 0.22f};
+            r.light.lift = 0.04f;
+            return r;
+        }();
+
         // Regular + the Mac glass window/menu active shadow (SPEC 9.5: 0.6 light, radius 24, y 10)
         constexpr SRecipe MENU = [] {
             SRecipe r         = REGULAR;
@@ -84,7 +98,7 @@ namespace lg {
             return r;
         }();
 
-        constexpr std::array RECIPES = {REGULAR, CLEAR, DOCK, CONTROLCENTER, MENU};
+        constexpr std::array RECIPES = {REGULAR, CLEAR, DOCK, CONTROLCENTER, MENU, SPOTLIGHT};
     }
 
     const SRecipe& recipeByName(std::string_view name) {

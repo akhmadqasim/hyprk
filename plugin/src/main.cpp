@@ -29,6 +29,7 @@ namespace {
     std::shared_ptr<const lg::SParams> g_params; // snapshot, refreshed each monitor frame
     std::vector<WP<lg::CGlassDecoration>> g_decorations;
     std::vector<WP<lg::CTitlebar>>        g_titlebars;
+    std::vector<WP<lg::CTitlebarProbe>>   g_probes;
     SP<IPC::Socket1::SCommand>            g_statsCommand;
 
     using renderLayerFn = void (*)(Render::IHyprRenderer*, Render::CRenderContext&, PHLLS, PHLMONITOR, const Time::steady_tp&, bool, bool, bool);
@@ -120,7 +121,10 @@ static void addWindowDecorations(PHLWINDOW window) {
     // the title bar reserves no space until it decides the window wants one
     auto bar = makeShared<lg::CTitlebar>(window, [] { return g_params; });
     g_titlebars.emplace_back(bar);
+    auto probe = makeShared<lg::CTitlebarProbe>(window, bar);
+    g_probes.emplace_back(probe);
     HyprlandAPI::addWindowDecoration(lg::handle(), window, std::move(bar));
+    HyprlandAPI::addWindowDecoration(lg::handle(), window, std::move(probe));
 }
 
 static void forEachTitlebar(const std::function<void(lg::CTitlebar&)>& fn) {
@@ -230,6 +234,10 @@ APICALL EXPORT void PLUGIN_EXIT() {
         if (const auto bar = t.lock())
             HyprlandAPI::removeWindowDecoration(lg::handle(), bar.get());
     g_titlebars.clear();
+    for (const auto& p : g_probes)
+        if (const auto probe = p.lock())
+            HyprlandAPI::removeWindowDecoration(lg::handle(), probe.get());
+    g_probes.clear();
     if (g_renderHook)
         HyprlandAPI::removeFunctionHook(lg::handle(), g_renderHook);
     g_renderHook = nullptr;

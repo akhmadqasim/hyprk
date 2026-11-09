@@ -58,6 +58,7 @@ namespace lg {
         SRgba                                        titlebarColor, titlebarColorInactive, titlebarText, titlebarTextInactive;
         std::string                                  titlebarFont = "SF Pro Text";
         bool                                         titlebarGlass = false; // light glass (Hyprland blur + translucent fill)
+        bool                                         titlebarAutoColor = true; // take the colour of the client's top rows
 
         // compiled once per snapshot from the regex strings above (nullopt: empty or invalid)
         std::optional<std::regex>                    windowRegex, titlebarClassesRegex, titlebarExcludeRegex;

@@ -12,6 +12,10 @@
 #include <hyprland/src/render/decorations/DecorationPositioner.hpp>
 #include <hyprland/src/render/pass/RectPassElement.hpp>
 #include <hyprland/src/render/pass/TexPassElement.hpp>
+#include <hyprland/src/render/OpenGL.hpp>
+#include <hyprland/src/render/gl/GLFramebuffer.hpp>
+
+#include <GLES3/gl32.h>
 
 // CXDGDecorationProtocol keeps its decoration objects private; the plugin only reads the map
 // to learn which toplevels asked for server-side decorations (same layout, no ABI change).
@@ -19,7 +23,9 @@
 #include <hyprland/src/protocols/XDGDecoration.hpp>
 #undef private
 
+#include <algorithm>
 #include <format>
+#include <vector>
 #include <regex>
 
 namespace lg {
@@ -57,7 +63,9 @@ namespace lg {
     static constexpr std::array<uint32_t, 3> LIGHTS   = {0xFF5F57FF, 0xFEBC2EFF, 0x28C840FF};
     static constexpr std::array<uint32_t, 3> GLYPHS   = {0x4D0000FF, 0x995700FF, 0x006500FF};
     static constexpr std::array<const char*, 3> SIGNS = {"×", "−", "+"};
-    static constexpr uint32_t                 GREYED  = 0xDDDCDBFF;
+    static constexpr uint32_t                 GREYED  = 0xDDDCDBFF, GREYED_DARK = 0x5A5A5CFF;
+    // title text on a dark bar (light bars use titlebar_text / titlebar_text_inactive)
+    static constexpr SRgba                    TEXT_ON_DARK{1, 1, 1, 0.85f}, TEXT_ON_DARK_INACTIVE{1, 1, 1, 0.4f};
 
     static CHyprColor rgba(const SRgba& c, float a = 1.f) {
         return CHyprColor{c.r, c.g, c.b, c.a * a};
@@ -114,10 +122,11 @@ namespace lg {
 
     SP<Render::ITexture> CTitlebar::titleTexture(const std::shared_ptr<const SParams>& params, const std::string& title, bool isActive, float scale, double maxWidth) {
         const int width = int(maxWidth * scale);
-        if (!m_title.tex || m_title.text != title || m_title.active != isActive || m_title.scale != scale || m_title.width != width || m_title.params != params) {
+        if (!m_title.tex || m_title.text != title || m_title.active != isActive || m_title.scale != scale || m_title.width != width || m_title.params != params ||
+            m_title.dark != m_titleDark) {
             const auto& p     = *params;
-            const auto  color = rgba(isActive ? p.titlebarText : p.titlebarTextInactive);
-            m_title           = {title, isActive, scale, width, params,
+            const auto  color = rgba(m_titleDark ? (isActive ? TEXT_ON_DARK : TEXT_ON_DARK_INACTIVE) : (isActive ? p.titlebarText : p.titlebarTextInactive));
+            m_title           = {title, isActive, scale, width, params, m_titleDark,
                                 g_pHyprRenderer->renderText(title, color, int(std::round(p.titlebarFontSize * scale)), false, p.titlebarFont, width, 600)};
         }
         return m_title.tex;
@@ -168,13 +177,19 @@ namespace lg {
         const bool  isActive = Desktop::focusState()->window() == window;
         const float radius   = window->presentation().rounding();
 
+        // colour: the client's own top rows (so a dark terminal gets a dark bar), else the config
+        const bool  sampled  = params->titlebarAutoColor && !params->titlebarGlass && m_sampled;
+        const SRgba base     = sampled ? *m_sampled : (isActive ? params->titlebarColor : params->titlebarColorInactive);
+        const bool  dark     = 0.2126f * base.r + 0.7152f * base.g + 0.0722f * base.b < 0.5f;
+        m_titleDark          = dark;
+
         // fill: rounded top corners only (the box runs on under the window and is clipped)
         CRectPassElement::SRectData fill;
         fill.box                   = CBox{barPx.x, barPx.y, barPx.w, barPx.h + radius * scale * 2}.round();
         fill.clipBox               = CBox{barPx.x, barPx.y, barPx.w, barPx.h + radius * scale}.round(); // also fills the window's rounded top corners
         fill.round                 = int(std::round(radius * scale));
         fill.roundingPower         = window->presentation().roundingPower();
-        fill.color                 = rgba(isActive ? params->titlebarColor : params->titlebarColorInactive, a * (params->titlebarGlass ? 0.55f : 1.f));
+        fill.color                 = rgba(SRgba{base.r, base.g, base.b, 1}, a * (params->titlebarGlass ? 0.55f : 1.f));
         fill.blur                  = params->titlebarGlass;
         fill.workspacePresentation = presentation;
         g_pHyprRenderer->addPassElement(ctx, makeUnique<CRectPassElement>(fill));
@@ -193,7 +208,7 @@ namespace lg {
             CRectPassElement::SRectData dot;
             dot.box   = b.copy().expand(-0.5 * scale);
             dot.round = int(dot.box.w / 2);
-            dot.color = (isActive || m_hover) ? rgba(rgbaFromHex(LIGHTS[i]), a) : rgba(rgbaFromHex(GREYED), a);
+            dot.color = (isActive || m_hover) ? rgba(rgbaFromHex(LIGHTS[i]), a) : rgba(rgbaFromHex(dark ? GREYED_DARK : GREYED), a);
             g_pHyprRenderer->addPassElement(ctx, makeUnique<CRectPassElement>(dot));
 
             if (m_hover) {
@@ -296,5 +311,154 @@ namespace lg {
 
     std::string CTitlebar::getDisplayName() {
         return "liquidglass-titlebar";
+    }
+
+    void CTitlebar::onSampled(const SRgba& c) {
+        const bool changed = !m_sampled || std::abs(m_sampled->r - c.r) + std::abs(m_sampled->g - c.g) + std::abs(m_sampled->b - c.b) > 0.02f;
+        m_sampled          = c;
+        if (changed)
+            damageEntire();
+    }
+
+    // ── probe ───────────────────────────────────────────────────────────────
+
+    struct CTitlebarProbe::SReadback {
+        GLuint pbo = 0;
+        GLsync fence = nullptr;
+        int    pixels = 0;
+        bool   isFloat = false;
+        ~SReadback() {
+            if (fence)
+                glDeleteSync(fence);
+            if (pbo)
+                glDeleteBuffers(1, &pbo);
+        }
+    };
+
+    namespace {
+        constexpr unsigned PROBE_INTERVAL = 15; // window draws between reads; client colours change rarely
+
+        // the read-back element: queued after the window's surfaces, so the framebuffer holds them
+        class CProbeElement : public IPassElement {
+          public:
+            CProbeElement(std::shared_ptr<CTitlebarProbe::SReadback> read, CBox strip) : m_read(std::move(read)), m_strip(strip) {}
+            std::vector<UP<IPassElement>> draw(Render::CRenderContext& ctx) override {
+                const auto src = dynamicPointerCast<Render::GL::CGLFramebuffer>(ctx.m_data.currentFB);
+                if (!src || m_read->fence)
+                    return {};
+                Render::GL::CFramebufferBindingGuard guard{g_pHyprRenderer->glBackend()};
+                Render::GL::g_pHyprOpenGL->bindFramebuffer(GL_READ_FRAMEBUFFER, src->getFBID());
+                GLint type = GL_UNSIGNED_NORMALIZED;
+                glGetFramebufferAttachmentParameteriv(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE, &type);
+                m_read->isFloat = type == GL_FLOAT;
+                m_read->pixels  = int(m_strip.w * m_strip.h);
+                if (!m_read->pbo)
+                    glGenBuffers(1, &m_read->pbo);
+                glBindBuffer(GL_PIXEL_PACK_BUFFER, m_read->pbo);
+                glBufferData(GL_PIXEL_PACK_BUFFER, m_read->pixels * (m_read->isFloat ? 16 : 4), nullptr, GL_STREAM_READ);
+                glReadPixels(m_strip.x, m_strip.y, m_strip.w, m_strip.h, GL_RGBA, m_read->isFloat ? GL_FLOAT : GL_UNSIGNED_BYTE, nullptr);
+                glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+                if (glGetError() == GL_NO_ERROR)
+                    m_read->fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+                return {};
+            }
+            bool             needsLiveBlur(Render::CRenderContext&) override { return false; }
+            bool             needsPrecomputeBlur(Render::CRenderContext&) override { return false; }
+            const char*      passName() override { return "CLiquidGlassTitlebarProbe"; }
+            ePassElementType type() override { return EK_CUSTOM; }
+            bool             undiscardable(Render::CRenderContext&) override { return true; }
+
+          private:
+            std::shared_ptr<CTitlebarProbe::SReadback> m_read;
+            CBox                                       m_strip;
+        };
+
+        // per-channel median of the strip: text and cursor pixels do not move it
+        std::optional<SRgba> collect(CTitlebarProbe::SReadback& r) {
+            if (!r.fence)
+                return std::nullopt;
+            const GLenum st = glClientWaitSync(r.fence, 0, 0);
+            if (st != GL_ALREADY_SIGNALED && st != GL_CONDITION_SATISFIED)
+                return std::nullopt;
+            glDeleteSync(r.fence);
+            r.fence = nullptr;
+
+            std::array<std::vector<float>, 3> ch;
+            glBindBuffer(GL_PIXEL_PACK_BUFFER, r.pbo);
+            if (const void* ptr = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, r.pixels * (r.isFloat ? 16 : 4), GL_MAP_READ_BIT)) {
+                for (int i = 0; i < r.pixels; ++i)
+                    for (int c = 0; c < 3; ++c)
+                        ch[c].push_back(r.isFloat ? static_cast<const float*>(ptr)[i * 4 + c] : static_cast<const uint8_t*>(ptr)[i * 4 + c] / 255.f);
+                glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
+            }
+            glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+            if (ch[0].empty())
+                return std::nullopt;
+            SRgba out{0, 0, 0, 1};
+            float* dst[3] = {&out.r, &out.g, &out.b};
+            for (int c = 0; c < 3; ++c) {
+                auto mid = ch[c].begin() + ch[c].size() / 2;
+                std::nth_element(ch[c].begin(), mid, ch[c].end());
+                *dst[c] = std::clamp(*mid, 0.f, 1.f);
+            }
+            return out;
+        }
+    }
+
+    CTitlebarProbe::CTitlebarProbe(PHLWINDOW window, WP<CTitlebar> bar) : IHyprWindowDecoration(window), m_window(window), m_bar(std::move(bar)), m_read(std::make_shared<SReadback>()) {}
+
+    CTitlebarProbe::~CTitlebarProbe() = default;
+
+    SDecorationPositioningInfo CTitlebarProbe::getPositioningInfo() {
+        SDecorationPositioningInfo info;
+        info.policy = DECORATION_POSITION_ABSOLUTE;
+        return info;
+    }
+
+    void CTitlebarProbe::onPositioningReply(const SDecorationPositioningReply&) {}
+
+    void CTitlebarProbe::draw(Render::CRenderContext& ctx, PHLMONITOR mon, float const&, const Render::SWindowRenderPresentation& presentation) {
+        const auto bar    = m_bar.lock();
+        const auto window = m_window.lock();
+        if (!bar || !window || !mon || !bar->wantsSample() || ctx.m_renderingSnapshot)
+            return;
+
+        if (const auto c = collect(*m_read))
+            bar->onSampled(*c);
+        // first read a few draws in (a fresh window's first frames can still be empty), then every
+        // PROBE_INTERVAL draws
+        if (m_read->fence || m_frames++ % PROBE_INTERVAL != 3)
+            return;
+
+        // the client's rows 1-2 below its top edge, inside the rounded corners
+        CBox box = window->getWindowMainSurfaceBox();
+        box.translate(presentation.workspaceOffset + presentation.floatingOffset - mon->m_position);
+        box.scale(mon->m_scale).round();
+        const double inset = window->presentation().rounding() * mon->m_scale + 2;
+        CBox         strip{box.x + inset, box.y + 1, box.w - 2 * inset, 2};
+        strip = strip.intersection(CBox{{}, mon->m_transformedSize}).round();
+        if (strip.w < 1 || strip.h < 1)
+            return;
+        g_pHyprRenderer->addPassElement(ctx, makeUnique<CProbeElement>(m_read, strip));
+    }
+
+    eDecorationType CTitlebarProbe::getDecorationType() {
+        return DECORATION_CUSTOM;
+    }
+
+    void CTitlebarProbe::updateWindow(PHLWINDOW) {}
+
+    void CTitlebarProbe::damageEntire() {}
+
+    eDecorationLayer CTitlebarProbe::getDecorationLayer() {
+        return DECORATION_LAYER_OVER;
+    }
+
+    uint64_t CTitlebarProbe::getDecorationFlags() {
+        return DECORATION_NON_SOLID;
+    }
+
+    std::string CTitlebarProbe::getDisplayName() {
+        return "liquidglass-titlebar-probe";
     }
 }

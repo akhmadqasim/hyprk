@@ -68,7 +68,7 @@ namespace lg {
         float ringOffsetY = 0, ringStroke = 0, ringRadius = 0, ringOpacity = 0;
     };
 
-    // "regular", "clear", "dock", "controlcenter", "menu"; unknown names give regular
+    // "regular", "clear", "dock", "controlcenter", "menu", "spotlight"; unknown names give regular
     const SRecipe& recipeByName(std::string_view name);
 
     struct SResolved { // pt unless noted
