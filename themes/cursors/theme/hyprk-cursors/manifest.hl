@@ -1,4 +1,0 @@
-name = hyprk-cursors
-description = macOS-style cursors for hyprk (rendered from the macOS vector cursors)
-version = 0.1
-cursors_directory = hyprcursors

@@ -1,0 +1,16 @@
+# Apple assets extracted from the user's own macOS 27.2 IPSW: local use only, regenerate via reference/ASSETS.md
+/themes/fonts/
+/themes/wallpapers/
+/themes/icons/apps/
+/themes/icons/apps-hires/
+/themes/icons/system/
+/themes/icons/*.log
+/themes/cursors/accessibility/
+/themes/cursors/hiservices/
+/themes/cursors/png/
+/themes/cursors/theme/hyprk-cursors/
+/sounds/oga/
+/sounds/wav/
+/sounds/originals/
+__pycache__/
+build/
