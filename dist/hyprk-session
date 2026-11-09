@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# hyprk login session wrapper. GDM runs it from /usr/share/wayland-sessions/hyprk.desktop
+# (installed by dist/install-session.sh). Sets the same theme/font/cursor env as dist/try-nested.sh,
+# then starts the prefix Hyprland 0.57.2 with the hyprk config (and the hyprk shell).
+#
+#   hyprk-session            start the session (exec, never returns)
+#   hyprk-session --print    show what it would do (env + command), start nothing
+#
+# Settings (optional env, or files in ~/.local/share/hyprk-session):
+#   HYPRK_SCALE  monitor scale (default 1.5, what GNOME uses on your 4K screens)
+#   file "theme" containing "dark" or "light" (default light): GTK/Qt theme
+# Log: ~/.local/share/hyprk-session/state/session.log
+HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+SESSION_HOME=${HYPRK_SESSION_HOME:-$HOME/.local/share/hyprk-session}
+# shellcheck disable=SC1091
+. "$HERE/lib/env.sh"
+
+THEME=$(cat "$SESSION_HOME/theme" 2>/dev/null); case $THEME in dark) ;; *) THEME=light ;; esac
+# farm: your real ~/.config entries stay visible (browsers, JetBrains...), only GTK/Qt/font/dconf are hyprk's own
+hyprk_env_setup "$SESSION_HOME" farm "$THEME"
+
+export XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=Hyprland XDG_SESSION_DESKTOP=hyprk
+export HYPRK_ALLOW_POWER=1                 # real session: Sleep / Restart / Shut Down / Lock work
+export HYPRK_SCALE=${HYPRK_SCALE:-1.5}
+export MOZ_ENABLE_WAYLAND=1 ELECTRON_OZONE_PLATFORM_HINT=auto
+unset HYPRLAND_INSTANCE_SIGNATURE
+
+if [ "${1:-}" = --print ]; then
+    echo "session home : $SESSION_HOME (theme $THEME)"
+    echo "command      : $HYPRK_ROOT/config/hypr/start.sh   (-> Hyprland --config $HYPRK_CONFIG)"
+    echo "Hyprland     : $(command -v Hyprland)"
+    [ -n "$HYPRK_QT_NOTE" ] && echo "note         : $HYPRK_QT_NOTE"
+    env | grep -E '^(XDG_(CONFIG|DATA|STATE|CURRENT_DESKTOP|SESSION_TYPE|SESSION_DESKTOP)|GTK_THEME|QT_QPA_PLATFORM(THEME)?|XCURSOR_(THEME|SIZE)|HYPRCURSOR_THEME|FONTCONFIG_FILE|HYPRK_[A-Z_]*)=' | sort | sed 's/^/env          : /'
+    exit 0
+fi
+
+mkdir -p "$XDG_STATE_HOME"
+exec "$HYPRK_ROOT/config/hypr/start.sh" >>"$XDG_STATE_HOME/session.log" 2>&1
