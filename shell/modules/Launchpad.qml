@@ -28,7 +28,8 @@ PanelWindow {
     readonly property var apps: query === ""
         ? Apps.entries.filter(e => !e.noDisplay).slice().sort((a, b) => a.name.localeCompare(b.name))
         : Search.rank(Apps.entries, query, 200)
-    readonly property int perPage: Theme.launchpad.columns * Theme.launchpad.rows
+    readonly property int rows: Math.max(1, Math.floor((panel.height - Theme.launchpad.headerHeight - 14 - 28) / Theme.launchpad.cellHeight))
+    readonly property int perPage: Theme.launchpad.columns * rows
     readonly property int pages: Math.max(1, Math.ceil(apps.length / perPage))
     property int page: 0
 

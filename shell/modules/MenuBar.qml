@@ -76,7 +76,9 @@ PanelWindow {
         // Battery: hidden on desktops (no system battery)
         StatusItem {
             visible: bar.laptop
+            contentWidth: batteryRow.implicitWidth
             Row {
+                id: batteryRow
                 anchors.centerIn: parent
                 spacing: 4
                 Text {
@@ -101,7 +103,6 @@ PanelWindow {
                     }
                 }
             }
-            contentWidth: childrenRect.width
         }
         // Wi-Fi: hidden without a NetworkManager wifi device
         StatusItem {

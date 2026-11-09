@@ -3,11 +3,15 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Io
 
 // Which transient surface is open. Only one at a time, like macOS.
 // Values: "" | "menu" | "cc" | "nc" | "spotlight" | "launchpad" | "switcher"
 Singleton {
     id: root
+
+    // screen for transient surfaces: $HYPRK_PRIMARY (output name) or the first screen
+    readonly property var screen: Quickshell.screens.find(s => s.name === Quickshell.env("HYPRK_PRIMARY")) || Quickshell.screens[0]
 
     property string open: ""
     property int menuIndex: -1          // index of the open menu bar title (0 = Apple)
@@ -32,5 +36,6 @@ Singleton {
         function toggle(name: string): void { root.toggle(name); }
         function close(): void { root.close(); }
         function current(): string { return root.open; }
+        function menu(index: int, x: int): void { root.openMenu(index, x); }
     }
 }

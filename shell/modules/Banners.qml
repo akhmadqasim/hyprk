@@ -37,11 +37,12 @@ PanelWindow {
                 id: card
                 required property var modelData
                 width: Theme.notif.width
-                nid: modelData.id
-                appName: modelData.appName || "Notification"
-                appIcon: modelData.appIcon || modelData.desktopEntry || ""
+                nid: modelData.nid
+                appName: modelData.appName
+                appIcon: modelData.appIcon
                 summary: modelData.summary
                 body: modelData.body
+                time: modelData.time
                 // banner window origin: right-aligned below the menu bar
                 sx: win.screen.width - win.width - (Theme.notif.marginRight - 24) + x + col.x
                 sy: Theme.menuBar.height + Theme.notif.marginTop + y + col.y
@@ -60,8 +61,8 @@ PanelWindow {
                     easing.type: Easing.OutCubic
                 }
                 Timer {
-                    interval: card.modelData.expireTimeout > 0 ? card.modelData.expireTimeout : Theme.notif.timeout
-                    running: !hoverCatcher.hovered && card.modelData.urgency !== 2
+                    interval: card.modelData.timeout > 0 ? card.modelData.timeout : Theme.notif.timeout
+                    running: !hoverCatcher.hovered && !card.modelData.critical
                     onTriggered: Notifs.hideBanner(card.nid)
                 }
                 HoverHandler { id: hoverCatcher }

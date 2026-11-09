@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.Notifications
 
 // Own org.freedesktop.Notifications server. Keeps a history for the
@@ -10,11 +11,9 @@ Singleton {
     id: root
 
     property bool dnd: false                  // Focus: Do Not Disturb (suppresses banners)
-    property var banners: []                  // live Notification objects shown as banners
+    property var banners: []                  // plain data of notifications shown as banners
     property ListModel history: ListModel {}  // plain data copies, newest first
     property var objects: ({})                // id -> Notification, while still tracked
-
-    signal bannerAdded(var n)
 
     function add(n) {
         n.tracked = true;
@@ -24,24 +23,29 @@ Singleton {
         // replace an existing history row for the same id (notification update)
         for (let i = 0; i < history.count; i++)
             if (history.get(i).nid === n.id) { history.remove(i); break; }
-        history.insert(0, {
+        n.closed.connect(() => root.forget(n.id));
+        push({
             nid: n.id,
             appName: n.appName || "Notification",
-            appIcon: n.appIcon || "",
-            desktopEntry: n.desktopEntry || "",
+            appIcon: n.appIcon || n.desktopEntry || "",
             image: n.image || "",
             summary: n.summary || "",
             body: n.body || "",
             time: Date.now(),
+            timeout: n.expireTimeout > 0 ? n.expireTimeout : 0,
+            critical: n.urgency === NotificationUrgency.Critical,
         });
-        n.closed.connect(() => root.forget(n.id));
+    }
+
+    // add plain notification data to history and banners
+    function push(d) {
+        history.insert(0, d);
         if (!dnd)
-            banners = [n].concat(banners.filter(b => b.id !== n.id)).slice(0, 3);
-        bannerAdded(n);
+            banners = [d].concat(banners.filter(b => b.nid !== d.nid)).slice(0, 3);
     }
 
     function hideBanner(id) {
-        banners = banners.filter(b => b.id !== id);
+        banners = banners.filter(b => b.nid !== id);
     }
 
     function forget(id) {
@@ -85,6 +89,18 @@ Singleton {
             map[h.appName].push(h);
         }
         return order.map(a => ({ appName: a, items: map[a] }));
+    }
+
+    // `qs ipc call notifs test "Title" "Body"`: local banner without D-Bus
+    // (useful when another notification daemon owns the bus, e.g. nested sessions)
+    property int testId: 1000000
+    IpcHandler {
+        target: "notifs"
+        function test(summary: string, body: string): void {
+            root.push({ nid: ++root.testId, appName: "Messages", appIcon: "", image: "", summary: summary,
+                        body: body, time: Date.now(), timeout: 0, critical: false });
+        }
+        function clear(): void { root.clearAll(); }
     }
 
     NotificationServer {

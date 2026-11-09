@@ -52,12 +52,13 @@ PanelWindow {
         width: bg.width
         y: dock.hovering ? bg.y - (Theme.dock.magnifiedSize - dock.base) : bg.y
         height: dock.height - y
+    }
 
-        HoverHandler {
-            // convert to the unmagnified dock coordinate space
-            onPointChanged: dock.mouseX = hovered ? point.position.x + hit.x - (dock.width - dock.baseWidth) / 2 : -1
-            onHoveredChanged: if (!hovered) dock.mouseX = -1
-        }
+    // on the window's root item so it sees hover above child MouseAreas
+    HoverHandler {
+        // convert window x to the unmagnified dock coordinate space
+        onPointChanged: dock.mouseX = hovered ? point.position.x - (dock.width - dock.baseWidth) / 2 : -1
+        onHoveredChanged: if (!hovered) dock.mouseX = -1
     }
 
     Glass {
@@ -95,7 +96,7 @@ PanelWindow {
                 readonly property bool bouncing: Apps.isLaunching(modelData.id) && !running
 
                 width: modelData.separator ? dock.sepCell : size
-                height: size
+                height: dock.base            // constant; the icon grows upward out of the cell
                 Behavior on width { enabled: !cell.modelData.separator; NumberAnimation { duration: Theme.anim.magnify } }
 
                 // separator
@@ -115,13 +116,11 @@ PanelWindow {
                     width: cell.size
                     height: cell.size
                     anchors.horizontalCenter: parent.horizontalCenter
-                    y: -bounceY
+                    y: parent.height - height - bounceY
                     property real bounceY: 0
                     source: Apps.iconUrl(cell.modelData.icon, cell.modelData.id)
                     asynchronous: true
                     mipmap: true
-                    // pressed: darken like macOS
-                    layer.enabled: ma.pressed
 
                     SequentialAnimation on bounceY {
                         running: cell.bouncing
@@ -132,7 +131,7 @@ PanelWindow {
                     }
                 }
                 Rectangle {
-                    anchors.fill: icon
+                    x: icon.x; y: icon.y; width: icon.width; height: icon.height
                     visible: ma.pressed && !cell.modelData.separator
                     color: Qt.rgba(0, 0, 0, 0.25)
                     radius: width * 0.22
@@ -153,7 +152,7 @@ PanelWindow {
                 Rectangle {
                     visible: ma.containsMouse && !cell.modelData.separator && !cell.bouncing
                     anchors.horizontalCenter: parent.horizontalCenter
-                    y: -height - Theme.dock.tooltipGap
+                    y: icon.y - height - Theme.dock.tooltipGap
                     width: tip.implicitWidth + Theme.dock.tooltipHPad * 2
                     height: Theme.dock.tooltipHeight
                     radius: Theme.dock.tooltipRadius
@@ -172,7 +171,7 @@ PanelWindow {
 
                 MouseArea {
                     id: ma
-                    anchors.fill: parent
+                    x: icon.x; y: icon.y; width: icon.width; height: icon.height
                     hoverEnabled: true
                     enabled: !cell.modelData.separator
                     onClicked: {

@@ -58,6 +58,7 @@ Singleton {
         function toggle(): void { theme.dark = !theme.dark; }
         function setDark(on: bool): void { theme.dark = on; }
         function toggleTransparency(): void { theme.reduceTransparency = !theme.reduceTransparency; }
+        function fonts(): string { return [theme.fontText, theme.fontDisplay, theme.fontRounded, theme.fontMono].join(" / "); }
     }
 
     readonly property QtObject font: QtObject {
@@ -144,7 +145,7 @@ Singleton {
         // Reduce-transparency solid materials (opaque grey-white / dark grey)
         readonly property color solid: theme.dark ? "#2A2A2C" : "#ECECEE"          // TODO verify
         readonly property color solidDock: theme.dark ? "#303032" : "#E4E4E7"      // TODO verify
-        readonly property color tintClear: theme.dark ? Qt.rgba(0.1, 0.1, 0.1, 0.22) : Qt.rgba(1, 1, 1, 0.20)         // dock ("clear" glass)
+        readonly property color tintClear: theme.dark ? Qt.rgba(0.1, 0.1, 0.1, 0.30) : Qt.rgba(1, 1, 1, 0.32)         // dock ("clear" glass)
         // 1px inner highlight stroke (top-lit rim)
         readonly property color rimTop: theme.dark ? Qt.rgba(1, 1, 1, 0.28) : Qt.rgba(1, 1, 1, 0.80)                  // TODO verify
         readonly property color rimBottom: theme.dark ? Qt.rgba(1, 1, 1, 0.06) : Qt.rgba(1, 1, 1, 0.25)                // TODO verify
@@ -302,10 +303,9 @@ Singleton {
         readonly property real widthFraction: 0.56       // of screen width, measured
         readonly property real heightFraction: 0.50      // of screen height, measured
         readonly property int radius: 26                 // TODO verify
-        readonly property int iconSize: 64               // TODO verify
+        readonly property int iconSize: 56               // TODO verify
         readonly property int columns: 7
-        readonly property int rows: 4
-        readonly property int cellHeight: 100            // TODO verify
+        readonly property int cellHeight: 86             // rows per page = what fits the panel, TODO verify
         readonly property int headerHeight: 52           // TODO verify
         readonly property int padding: 20                // TODO verify
     }

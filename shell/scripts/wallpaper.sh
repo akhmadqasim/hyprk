@@ -45,7 +45,7 @@ if [ ! -f "$wall" ]; then
 fi
 if [ ! -f "$blur" ]; then
     # downscale, blur, upscale: cheap large-radius gaussian; saturate like vibrancy
-    magick "$wall" -resize 25% -blur "0x$(( SIGMA / 4 + 1 ))" -modulate 100,170 -resize "${W}x${H}!" "$blur" 2>/dev/null || blur=""
+    magick "$wall" -resize 25% -blur "0x$(( SIGMA / 4 + 1 ))" -modulate 100,130 -resize "${W}x${H}!" "$blur" 2>/dev/null || blur=""
 fi
 echo "WALL=$wall"
 echo "BLUR=$blur"

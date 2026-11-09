@@ -6,6 +6,8 @@ local shell   = hyprk .. "/shell"
 local terminal = os.getenv("HYPRK_TERMINAL") or "ghostty"
 
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "1" })
+-- MacBook Air-like headless output for screenshots: `hyprctl output create headless MBA`
+hl.monitor({ output = "MBA", mode = "2560x1664@60", position = "auto", scale = "2" })
 
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
@@ -13,7 +15,9 @@ hl.env("QT_QPA_PLATFORM", "wayland")
 
 hl.on("hyprland.start", function()
     -- the shell: menu bar, dock, notifications, control center, spotlight
-    hl.exec_cmd("qs -p " .. shell)
+    -- (HYPRK_NO_SHELL=1 skips it, for running qs by hand while debugging)
+    if os.getenv("HYPRK_NO_SHELL") == "1" then return end
+    hl.exec_cmd("env FONTCONFIG_FILE=" .. hyprk .. "/config/fontconfig/fonts.conf qs -p " .. shell)
 end)
 
 ----------------------------------------------------------------- look ----
@@ -54,7 +58,9 @@ hl.config({
         force_default_wallpaper = 0,
         disable_hyprland_logo = true,
         disable_splash_rendering = true,
+        disable_hyprland_guiutils_check = true,
     },
+    ecosystem = { no_update_news = true, no_donation_nag = true },
     input = {
         kb_layout = "us",
         follow_mouse = 1,

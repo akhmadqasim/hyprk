@@ -7,6 +7,7 @@
 #   HYPRK_KEEP=1   leave the nested session running (prints its env)
 #   HYPRK_WAIT=N   seconds to wait for the shell (default 40)
 #   HYPRK_SETTLE=N seconds to wait after the shell is up (default 3)
+#   HYPRK_HEADLESS=1  add a 2560x1664@2x "MBA" output and shoot that (MacBook Air-like)
 set -u
 HYPRK_ROOT=${HYPRK_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}
 export HYPRK_ROOT
@@ -14,6 +15,7 @@ OUT=${1:-$HYPRK_ROOT/reference/ours/smoke-$(date +%Y%m%d-%H%M%S).png}
 shift || true
 [ "${1:-}" = "--" ] && shift
 EXTRA=("$@")
+SHOT_ARGS=()
 
 # shellcheck disable=SC1091
 source /mnt/code/hypr-dev/env.sh
@@ -25,18 +27,21 @@ LOGDIR=${XDG_CACHE_HOME:-$HOME/.cache}/hyprk/logs
 mkdir -p "$LOGDIR" "$(dirname "$OUT")"
 LOG=$LOGDIR/nested-$(date +%H%M%S).log
 
-Hyprland --config "$HYPRK_ROOT/config/hypr/hyprland.lua" >"$LOG" 2>&1 &
+[ "${HYPRK_HEADLESS:-0}" = 1 ] && export HYPRK_PRIMARY=MBA
+env -u HYPRLAND_INSTANCE_SIGNATURE Hyprland --config "$HYPRK_ROOT/config/hypr/hyprland.lua" >"$LOG" 2>&1 &
 HPID=$!
 echo "smoke: Hyprland pid $HPID, log $LOG"
 
 cleanup() {
+    # Hyprland 0.57 can leave a child behind after exit; remember ours to kill only those
+    local kids
+    kids=$(pgrep -P "$HPID" 2>/dev/null)
     if [ -n "${SIG:-}" ]; then
         HYPRLAND_INSTANCE_SIGNATURE=$SIG hyprctl dispatch 'hl.dsp.exit()' >/dev/null 2>&1
     fi
-    for _ in $(seq 1 50); do kill -0 "$HPID" 2>/dev/null || return 0; sleep 0.1; done
-    kill "$HPID" 2>/dev/null
-    sleep 1
+    for _ in $(seq 1 50); do kill -0 "$HPID" 2>/dev/null || break; sleep 0.1; done
     kill -9 "$HPID" 2>/dev/null
+    for k in $kids; do kill -9 "$k" 2>/dev/null; done
 }
 
 # find the instance signature and nested wayland socket from the lock file
@@ -56,6 +61,12 @@ done
 export HYPRLAND_INSTANCE_SIGNATURE=$SIG
 echo "smoke: instance $SIG on $NESTED"
 
+if [ "${HYPRK_HEADLESS:-0}" = 1 ]; then
+    timeout 10 bash -c 'until hyprctl version >/dev/null 2>&1; do sleep 0.2; done'
+    hyprctl output create headless MBA >/dev/null
+    SHOT_ARGS=(-o MBA)
+fi
+
 ok=0
 for _ in $(seq 1 $(( ${HYPRK_WAIT:-40} * 2 ))); do
     if hyprctl layers 2>/dev/null | grep -q "hyprk-menubar" && hyprctl layers 2>/dev/null | grep -q "hyprk-dock"; then ok=1; break; fi
@@ -64,7 +75,6 @@ done
 if [ $ok = 0 ]; then
     echo "smoke: shell layers did not appear"
     tail -n 40 "$LOG"
-    tail -n 60 "$(ls -t "${XDG_RUNTIME_DIR}"/quickshell/by-id/*/log.log 2>/dev/null | head -n1)" 2>/dev/null
     cleanup; exit 1
 fi
 sleep "${HYPRK_SETTLE:-3}"
@@ -74,7 +84,7 @@ if [ ${#EXTRA[@]} -gt 0 ]; then
     sleep 1
 fi
 
-WAYLAND_DISPLAY=$NESTED grim "$OUT" && echo "smoke: screenshot $OUT"
+WAYLAND_DISPLAY=$NESTED grim "${SHOT_ARGS[@]}" "$OUT" && echo "smoke: screenshot $OUT"
 rc=$?
 
 if [ "${HYPRK_KEEP:-0}" = 1 ]; then

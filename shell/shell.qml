@@ -2,6 +2,7 @@
 import QtQuick
 import Quickshell
 import qs.modules
+import qs.services
 
 // hyprk: macOS 27-style desktop shell for Hyprland.
 ShellRoot {
@@ -19,9 +20,9 @@ ShellRoot {
     }
 
     // transient surfaces live on the primary screen
-    Overlay { modelData: Quickshell.screens[0] }
-    Banners { modelData: Quickshell.screens[0] }
-    Spotlight { modelData: Quickshell.screens[0] }
-    Switcher { modelData: Quickshell.screens[0] }
-    Launchpad { modelData: Quickshell.screens[0] }
+    Overlay { modelData: Panels.screen }
+    Banners { modelData: Panels.screen }
+    Spotlight { modelData: Panels.screen }
+    Switcher { modelData: Panels.screen }
+    Launchpad { modelData: Panels.screen }
 }

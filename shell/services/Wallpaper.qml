@@ -13,8 +13,8 @@ Singleton {
 
     property string wallpaper: ""
     property string blurred: ""
-    property int width: Quickshell.screens.length > 0 ? Quickshell.screens[0].width : 1920
-    property int height: Quickshell.screens.length > 0 ? Quickshell.screens[0].height : 1080
+    property int width: Panels.screen ? Panels.screen.width : 1920
+    property int height: Panels.screen ? Panels.screen.height : 1080
 
     function refresh() {
         proc.running = false;

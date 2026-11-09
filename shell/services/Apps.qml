@@ -26,6 +26,8 @@ Singleton {
     readonly property var entries: DesktopEntries.applications.values
 
     readonly property var pinned: {
+        // depend on the entry list so the dock fills in once .desktop files are scanned
+        if (entries.length === 0) return [];
         const out = [];
         for (const ids of pinnedCandidates) {
             if (ids[0] === "hyprk-launchpad") {
@@ -54,7 +56,11 @@ Singleton {
     // dock items = pinned + running-but-not-pinned
     readonly property var dockItems: {
         const out = pinned.map(p => Object.assign({ windows: windowsFor(p.id, p.entry) }, p));
-        const seen = new Set(out.flatMap(p => [Search.normId(p.id), Search.normId(p.entry ? p.entry.startupClass : "")]));
+        const seen = new Set();
+        for (const p of out) {
+            seen.add(Search.normId(p.id));
+            if (p.entry && p.entry.startupClass) seen.add(Search.normId(p.entry.startupClass));
+        }
         for (const key in running) {
             const e = Search.matchEntry(entries, key);
             const k = e ? Search.normId(e.id) : key;
