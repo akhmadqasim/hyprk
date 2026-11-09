@@ -19,7 +19,7 @@ Singleton {
         ["org.gnome.Calendar"],
         ["org.gnome.TextEditor", "org.gnome.gedit"],
         ["org.gnome.Music", "rhythmbox", "org.gnome.Rhythmbox3"],
-        ["org.gnome.Settings", "gnome-control-center"],
+        ["hyprk-settings"],
         ["com.mitchellh.ghostty", "org.gnome.Terminal", "kitty", "org.gnome.Ptyxis"],
     ]
 
@@ -31,7 +31,12 @@ Singleton {
         const out = [];
         for (const ids of pinnedCandidates) {
             if (ids[0] === "hyprk-launchpad") {
-                out.push({ id: "hyprk-launchpad", name: "Apps", icon: "hyprk-launchpad", builtin: true });
+                out.push({ id: "hyprk-launchpad", name: "Apps", icon: "hyprk-launchpad", builtin: "launchpad" });
+                continue;
+            }
+            if (ids[0] === "hyprk-settings") {
+                // hyprk's own System Settings app (settings/), app id org.hyprk.Settings
+                out.push({ id: "org.hyprk.Settings", name: "System Settings", icon: "settings", builtin: "settings" });
                 continue;
             }
             for (const id of ids) {
@@ -144,7 +149,7 @@ Singleton {
     }
 
     function activate(item) {
-        if (item.builtin) {
+        if (item.builtin === "launchpad") {
             Panels.toggle("launchpad");
             return;
         }
@@ -154,16 +159,31 @@ Singleton {
             focusWindow(item.windows[(active + 1) % item.windows.length]);
             return;
         }
+        if (item.builtin === "settings") {
+            openSettings();
+            return;
+        }
         launch(item.entry, item.id);
+    }
+
+    // hyprk System Settings (settings/run.sh), GNOME Settings when it is missing
+    function openSettings() {
+        const run = Quickshell.shellDir + "/../settings/run.sh";
+        Quickshell.execDetached(["sh", "-c", `[ -x "${run}" ] && exec "${run}" || exec gnome-control-center`]);
+        markLaunching("org.hyprk.Settings");
+    }
+
+    function markLaunching(id) {
+        const l = Object.assign({}, launching);
+        l[id] = Date.now();
+        launching = l;
+        bounceTimer.restart();
     }
 
     function launch(entry, id) {
         if (!entry) return;
         entry.execute();
-        const l = Object.assign({}, launching);
-        l[id || entry.id] = Date.now();
-        launching = l;
-        bounceTimer.restart();
+        markLaunching(id || entry.id);
     }
 
     function isLaunching(id) { return launching[id] !== undefined; }

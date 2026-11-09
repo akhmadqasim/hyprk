@@ -295,6 +295,7 @@ Singleton {
         readonly property int padding: 18                // TODO verify
         readonly property int radius: 28                 // TODO verify
         readonly property int selectionRadius: 16        // TODO verify
+        readonly property int labelHeight: 22            // selected app name row, TODO verify
     }
 
     // ---------- launchpad / apps ----------

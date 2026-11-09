@@ -21,7 +21,7 @@ Item {
     function trigger(action) {
         Panels.close();
         switch (action) {
-        case "settings": Quickshell.execDetached(["gnome-control-center"]); break;
+        case "settings": Apps.openSettings(); break;
         case "forcequit": Hyprland.dispatch("hl.dsp.window.kill()"); break;
         case "close": Hyprland.dispatch("hl.dsp.window.close()"); break;
         case "fullscreen": Hyprland.dispatch("hl.dsp.window.fullscreen()"); break;

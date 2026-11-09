@@ -142,4 +142,9 @@ hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("brightnessctl set 6%-"), { lock
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 
 ------------------------------------------------------------ windows ----
+-- rules shipped by the other hyprk apps (optional)
+for _, f in ipairs({ hyprk .. "/settings/hyprland-rules.lua", hyprk .. "/finder/hyprland-rules.lua" }) do
+    local h = io.open(f, "r")
+    if h then h:close(); dofile(f) end
+end
 hl.window_rule({ name = "suppress-maximize", match = { class = ".*" }, suppress_event = "maximize" })

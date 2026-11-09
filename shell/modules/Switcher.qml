@@ -68,7 +68,7 @@ PanelWindow {
         id: panel
         readonly property real cell: Theme.switcher.iconSize + Theme.switcher.cellPadding * 2
         width: sw.apps.length * cell + Theme.switcher.padding * 2
-        height: cell + Theme.switcher.padding * 2
+        height: cell + Theme.switcher.labelHeight + Theme.switcher.padding * 2
         anchors.centerIn: parent
 
         Glass {
@@ -102,6 +102,19 @@ PanelWindow {
                         source: Apps.iconUrl(c.modelData.icon, c.modelData.id)
                         mipmap: true
                     }
+                    // macOS shows the name of the selected app under its icon
+                    Text {
+                        visible: c.index === sw.selected
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        y: parent.height + (Theme.switcher.labelHeight - height) / 2
+                        width: panel.cell * 1.6
+                        horizontalAlignment: Text.AlignHCenter
+                        elide: Text.ElideRight
+                        text: c.modelData.name
+                        font.family: Theme.fontText
+                        font.pixelSize: Theme.font.switcherLabel
+                        color: Theme.color.label
+                    }
                     MouseArea {
                         anchors.fill: parent
                         hoverEnabled: true
@@ -111,18 +124,5 @@ PanelWindow {
                 }
             }
         }
-    }
-
-    Text {
-        anchors.horizontalCenter: panel.horizontalCenter
-        anchors.top: panel.bottom
-        anchors.topMargin: 8
-        text: sw.apps[sw.selected] ? sw.apps[sw.selected].name : ""
-        font.family: Theme.fontText
-        font.pixelSize: Theme.font.switcherLabel
-        font.weight: Theme.font.medium
-        color: Theme.color.menuBarText
-        style: Text.Raised
-        styleColor: Theme.color.menuBarShadow
     }
 }
