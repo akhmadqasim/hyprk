@@ -93,10 +93,10 @@ int main() {
     {
         const auto& reg = recipeByName("regular");
         auto        r   = resolveMaterial(reg, 40);
-        CHECK(near(r.refractionHeight, 10, 1e-4) && near(r.refractionAmount, -20, 1e-4) && near(r.blurRadius, 0));
+        CHECK(near(r.refractionHeight, 10, 1e-4) && near(r.refractionAmount, -20, 1e-4) && near(r.blurRadius, 2)); // blur floor 2 (JUDGE-r2)
         r = resolveMaterial(reg, 200); // clamps: height 20, amount -60, blur 4
         CHECK(near(r.refractionHeight, 20, 1e-4) && near(r.refractionAmount, -60, 1e-4) && near(r.blurRadius, 4, 1e-4));
-        CHECK(near(resolveMaterial(reg, 112).blurRadius, 2, 1e-4));
+        CHECK(near(resolveMaterial(reg, 104).blurRadius, 3, 1e-4));
         CHECK(near(recipeByName("dock").light.ycc.white, 0.9, 1e-6));
         CHECK(near(resolveMaterial(recipeByName("controlcenter"), 60).refractionAmount, -80, 1e-4));
         CHECK(std::string{recipeByName("nope").name} == "regular");

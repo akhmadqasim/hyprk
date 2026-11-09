@@ -8,21 +8,26 @@ namespace lg {
         // Dark sides use a +0.3 rim bias. Apple's darkSpecular has colorBias -0.3, but that is an
         // extra darkening layer on top of the key highlight, which is not decoded; a plain -0.3 made
         // the dark rim disappear (by eye vs reference/screens).
-        constexpr SRgba WHITE20 = {1, 1, 1, 0.2f};
+        constexpr SRgba WHITE12 = {1, 1, 1, 0.12f};
 
         // Clear-family edge bleed colour (SPEC 9.3)
         constexpr SYcc CLEAR_BLEED = {0.75f, 1.f, 1.2f};
 
         // SPEC 9.2 RegularBase, V2. Used by menus, notifications, sidebars. Light saturation 1.2 -> 1.0
         // and dock 1.25 -> 1.1: the decoded values read too cyan over the Tahoe wallpapers (JUDGE.md).
+        // Regular over a white window read as opaque white (JUDGE-r2): white point 1.03 -> 0.92, fill
+        // 0.2 -> 0.12, blur-fill lighten 0.9 -> 0.4, at least 2 extra blur, and the variable blur keeps
+        // full strength until 1 pt from the edge (alpha 0.15 / 0.85 instead of 0.5 / 0.5).
         // Shadow for Regular was not traced (SPEC: "assume Clear's"), ring shadow V2 (8, 4, 5, 0.06).
         constexpr SRecipe REGULAR = {
             .name         = "regular",
-            .light        = {.ycc = {0.4f, 1.03f, 1.0f}, .fill = WHITE20, .highlightBias = 0.5f, .bleed = {0.9f, 1.f, 1.2f}, .blurFill = {0.9f, 0, 0.5f}, .lift = 0.05f},
+            .light        = {.ycc = {0.4f, 0.92f, 1.0f}, .fill = WHITE12, .highlightBias = 0.5f, .bleed = {0.9f, 1.f, 1.2f}, .blurFill = {0.4f, 0, 0.5f}},
             .dark         = {.ycc = {0.125f, 1.125f, 1.3f}, .fill = {}, .highlightBias = 0.3f, .bleed = {0.125f, 0.5f, 1.f}, .blurFill = {0, 0.9f, 0.5f}},
             .outerHeightN = 0.2f,
             .outerAmountN = 0.25f,
             .outerOpacity = 0.6f,
+            .blurD0 = 48, .blurD1 = 160, .blurLo = 2, .blurHi = 4,
+            .blurAlpha = {1, 0.15f, 0.85f},
             .ringOffsetY = 8, .ringStroke = 4, .ringRadius = 5, .ringOpacity = 0.06f,
         };
 

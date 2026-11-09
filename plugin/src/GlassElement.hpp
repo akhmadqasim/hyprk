@@ -30,7 +30,7 @@ namespace lg {
         void         destroy();
 
         struct SUniforms {
-            int tex, uvTopLeft, uvBottomRight, quadSize, glassBox, radius, roundingPower, alpha;
+            int tex, linearLight, uvTopLeft, uvBottomRight, quadSize, glassBox, radius, roundingPower, alpha;
             int blurLod, refraction, refractionHeight, aberration, faceYcc;
             int sharpTex, blurAlpha, blurDist, outerAmount, outerHeight, outerOpacity, outerThreshold;
             int blurFill, bleedOpacity, bleedHeight, bleedAmount, bleedLod, bleedYcc, faceFill;

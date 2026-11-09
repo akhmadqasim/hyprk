@@ -57,6 +57,9 @@ namespace lg {
         const SIntKey INTS[] = {
             {K("enabled"), 1, [](SParams& p, long long v) { p.enabled = v != 0; }},
             {K("full_damage"), 0, [](SParams& p, long long v) { p.fullDamage = v != 0; }},
+            {K("debug_copy_per_element"), 0, [](SParams& p, long long v) { p.copyPerElement = v != 0; }},
+            {K("linear"), 0, [](SParams& p, long long v) { p.linearLight = v != 0; }},
+            {K("stats"), 0, [](SParams& p, long long v) { p.stats = v != 0; }},
             {K("require_region"), 1, [](SParams& p, long long v) { p.requireRegion = v != 0; }},
         };
 

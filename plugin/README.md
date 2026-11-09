@@ -58,7 +58,7 @@ Apple's numbers from `/mnt/code/liquid-glass-re/SPEC.md` section 9 (glass versio
 
 | Recipe | Face YCC light (black, white, sat) | Fill / lift light | Inner refraction height / amount | Outer layer (h / amount / opacity) | Blur | Shadow | Used for (default) |
 |---|---|---|---|---|---|---|---|
-| `regular` | 0.4, 1.03, 1.0 (Apple 1.2) | white 20% / 0.05 | 0.25 D (max 20) / -0.5 D (min -60) | 0.2 D / 0.25 D / 0.6 | D 64→160 : 0→4, variable (full at D/2, half at 1 pt, 0 at edge) | D 64→160 : 0.25→0.75, r 24, y 8 | notifications, spotlight, switcher |
+| `regular` | 0.4, 0.92, 1.0 (Apple 1.03, 1.2) | white 12% (Apple 20%) | 0.25 D (max 20) / -0.5 D (min -60) | 0.2 D / 0.25 D / 0.6 | D 48→160 : 2→4 (Apple 64→160 : 0→4), variable: full until 1 pt from the edge (Apple: half at 1 pt) | D 64→160 : 0.25→0.75, r 24, y 8 | notifications, spotlight, switcher |
 | `menu` | as regular | as regular | as regular | as regular | as regular | 0.6, r 24, y 10 | `hyprk-overlay`, `hyprk-menubar` |
 | `clear` | 0.125, 1.08, 1.06 | none | 0.25 D / -0.8 D | none | D 48→120 : 3→8 | as regular | |
 | `dock` | 0.15, 0.9, 1.1 (Apple 1.25) | none / 0.05 | 0.08 D / -0.18 D | 0.13 D / 0.42 D / 0.2 | 1.5 | as regular | `hyprk-dock` |
@@ -112,6 +112,9 @@ how Apple's blur radius maps to extra mip levels (`blur_lod_scale`).
 | `shadow_scale` / `shadow_tint` | 1 / 0.35 | drop shadow opacity scale; 0 = black shadow, 1 = saturated backdrop colour |
 | `ring_scale` | 1 | ring shadow opacity scale |
 | `require_region` | 1 | only layers that set an ext-background-effect blur region get glass |
+| `linear` | 0 | 1 = shader works in linear light like QuartzCore. The recipes are tuned for 0; with 1 the CC labels drop to ~3:1, so it stays off until re-tuned |
+| `stats` | 0 | GPU timing, read with `hyprctl liquidglass` |
+| `debug_copy_per_element` | 0 | benchmark only: the old per-element backdrop copy |
 | `full_damage` | 0 | 1 = redraw the whole output while glass is visible (debug; see below) |
 | `shader_path` | "" | load this fragment shader instead of the built-in one |
 | `window_classes` | "" | regex: windows whose class matches get glass behind them |
@@ -131,6 +134,26 @@ A screenshot with `full_damage = 1` was pixel-identical to the default (test 202
 `test/qs/shell.qml` (wallpaper, dock, two cards with blur regions) and a foot window.
 `test/run.sh shot NAME` writes `/mnt/code/hyprk/reference/ours/plugin-NAME.png`, `reload` swaps in a new build,
 `stop` exits and kills only this instance. Set `LG_WALLPAPER=TahoeDark` before `start` for the dark wallpaper.
+
+## Performance
+
+The unblurred backdrop copy (variable blur, edge bleed) is made once per monitor frame, at the first
+glass element, and only for the damaged part of the glass boxes (nothing damaged under glass: no copy,
+no mip rebuild). `plugin:liquidglass:stats = 1` turns on GPU timestamp queries; `hyprctl liquidglass`
+prints the averages (`hyprctl liquidglass reset` clears them). `test/bench.sh` runs the real shell on a
+headless 3840x2160 @ 1.5 output (the user's 4K 150 %) with Dock, Control Center and a banner over a
+terminal that redraws every frame, and measures three configurations. Result on this PC (AMD RDNA2, the
+RX 6600 class GPU), 6 s each, 2026-11-10:
+
+| Configuration | Glass GPU time per element (avg / p95) | Whole frame GPU (avg / p95) |
+|---|---|---|
+| shared backdrop copy (current) | 0.56 / 0.78 ms | 11.1 / 16.3 ms |
+| per-element copy (iteration 3, `debug_copy_per_element = 1`) | 0.64 / 0.93 ms | 11.2 / 16.6 ms |
+| plugin disabled (Hyprland's own blur on the same regions) | - | 11.6 / 16.4 ms |
+
+"Whole frame" spans the pass from `RENDER_LAST_MOMENT` to `RENDER_POST` and is dominated by
+Hyprland's own work in the nested session (3 blur passes, two outputs), so its differences are within
+noise: the glass costs about 0.5 ms per element per redrawn frame at 4K.
 
 ## Windows
 

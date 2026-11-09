@@ -17,6 +17,7 @@ uniform vec4  glassBox;             // glass rect inside the quad, px (x, y, w, 
 uniform float radius;               // px
 uniform float roundingPower;        // 2 = circle
 uniform float alpha;                // layer fade
+uniform int   linearLight;          // 1: work in linear light like QuartzCore (sRGB decode/encode)
 
 uniform float blurLod;              // extra mip blur on the face
 uniform vec3  blurAlpha;            // variable blur: alpha0..2
@@ -84,14 +85,38 @@ float gEdge(float v) {
 
 float luma(vec3 c) { return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
 
-vec3 fetch(vec2 quadPx, float lod) {
-    vec4 s = textureLod(tex, mix(uvTopLeft, uvBottomRight, quadPx / quadSize), lod);
-    return s.rgb / max(s.a, 1e-4);
+vec3 decode(vec3 c) {
+    if (linearLight == 0)
+        return c;
+    c = clamp(c, 0.0, 1.0);
+    return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(vec3(0.04045), c));
 }
 
+vec3 encode(vec3 c) {
+    if (linearLight == 0)
+        return c;
+    c = clamp(c, 0.0, 1.0);
+    return mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(vec3(0.0031308), c));
+}
+
+vec3 fetch(vec2 quadPx, float lod) {
+    vec4 s = textureLod(tex, mix(uvTopLeft, uvBottomRight, quadPx / quadSize), lod);
+    return decode(s.rgb / max(s.a, 1e-4));
+}
+
+// Deep mips of the sharp copy are box filtered; a 4-tap tent over half a texel of the chosen
+// level smooths the blocky steps trilinear filtering leaves at lod > 1.
 vec3 fetchSharp(vec2 quadPx, float lod) {
-    vec4 s = textureLod(sharpTex, mix(uvTopLeft, uvBottomRight, quadPx / quadSize), lod);
-    return s.rgb / max(s.a, 1e-4);
+    vec2 uv = mix(uvTopLeft, uvBottomRight, quadPx / quadSize);
+    vec4 s;
+    if (lod < 1.0)
+        s = textureLod(sharpTex, uv, lod);
+    else {
+        vec2 o = 0.5 * exp2(lod) / vec2(textureSize(sharpTex, 0));
+        s = 0.25 * (textureLod(sharpTex, uv + vec2(o.x, o.y), lod) + textureLod(sharpTex, uv + vec2(-o.x, o.y), lod) +
+                    textureLod(sharpTex, uv + vec2(o.x, -o.y), lod) + textureLod(sharpTex, uv + vec2(-o.x, -o.y), lod));
+    }
+    return decode(s.rgb / max(s.a, 1e-4));
 }
 
 // Apple's YCC composite: Y' = black + (white - black) Y, chroma x saturation
@@ -137,7 +162,7 @@ void main() {
 
     vec4 shadow = vec4(0.0);
     if (sh > 0.0)
-        shadow = vec4(ycc(fetch(qp, blurLod + 2.0), vec3(0.0, 1.0, shadowSaturation)) * shadowTint * sh, sh);
+        shadow = vec4(encode(ycc(fetch(qp, blurLod + 2.0), vec3(0.0, 1.0, shadowSaturation)) * shadowTint) * sh, sh);
 
     vec4 face = vec4(0.0);
     if (cov > 0.0) {
@@ -219,7 +244,7 @@ void main() {
             col         = col * (1.0 + highlightBias * h * (3.0 - 2.0 * clamp(col, 0.0, 1.0)));
         }
 
-        face = vec4(clamp(col, 0.0, 1.0), 1.0);
+        face = vec4(encode(clamp(col, 0.0, 1.0)), 1.0);
     }
 
     vec4 c = mix(shadow, face, cov);

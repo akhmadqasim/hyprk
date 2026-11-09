@@ -4,6 +4,7 @@
 #include "Config.hpp"
 #include "GlassElement.hpp"
 #include "Log.hpp"
+#include "Stats.hpp"
 #include "WindowGlass.hpp"
 
 #include <hyprland/src/debug/log/Logger.hpp>
@@ -26,6 +27,7 @@ namespace {
     std::vector<CHyprSignalListener> g_listeners;
     std::shared_ptr<const lg::SParams> g_params; // snapshot, refreshed each monitor frame
     std::vector<WP<lg::CGlassDecoration>> g_decorations;
+    SP<IPC::Socket1::SCommand>            g_statsCommand;
 
     using renderLayerFn = void (*)(Render::IHyprRenderer*, Render::CRenderContext&, PHLLS, PHLMONITOR, const Time::steady_tp&, bool, bool, bool);
 }
@@ -133,9 +135,24 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     // checked once per monitor frame (hl.config() through hyprctl eval fires no reload
     // event); readConfig() returns the same snapshot unless a value changed
     g_listeners.push_back(Event::bus()->m_events.render.stage.listen([](Event::SRenderStageEvent e) {
-        if (e.stage == RENDER_BEGIN) {
-            g_params = lg::readConfig();
-            lg::onFrame();
+        switch (e.stage) {
+            case RENDER_BEGIN:
+                g_params = lg::readConfig();
+                lg::onFrame();
+                lg::stats::setEnabled(g_params->stats);
+                break;
+            // the pass (all GPU work of the frame) runs in endRender(), between these two stages
+            case RENDER_LAST_MOMENT:
+                lg::stats::poll();
+                lg::stats::begin(lg::stats::FRAME);
+                break;
+            case RENDER_POST:
+                if (lg::stats::enabled() && Render::GL::g_pHyprOpenGL) {
+                    Render::GL::g_pHyprOpenGL->makeEGLCurrent();
+                    lg::stats::end(lg::stats::FRAME);
+                }
+                break;
+            default: break;
         }
     }));
     g_listeners.push_back(Event::bus()->m_events.layer.closed.listen([](PHLLS ls) { lg::forgetOwner(reinterpret_cast<uintptr_t>(ls.get())); }));
@@ -151,6 +168,16 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     for (const auto& w : Desktop::viewState()->windows())
         if (w && w->mapped())
             addWindowGlass(w);
+
+    g_statsCommand = HyprlandAPI::registerHyprCtlCommand(handle, IPC::Socket1::SCommand{
+        .name    = "liquidglass",
+        .match   = IPC::Socket1::COMMAND_MATCH_PREFIX,
+        .handler = [](const IPC::Socket1::SRequest& req) -> IPC::Socket1::SResponse {
+            if (req.command.contains("reset"))
+                lg::stats::reset();
+            return lg::stats::report();
+        },
+    });
 
     if (void* addr = findRenderLayer()) {
         g_renderHook = HyprlandAPI::createFunctionHook(handle, addr, rc<void*>(&hkRenderLayer));
@@ -178,6 +205,10 @@ APICALL EXPORT void PLUGIN_EXIT() {
         g_pHyprRenderer->context().m_pass.removeAllOfType("CLiquidGlassElement");
     lg::glassProgram().destroy();
     lg::releaseGlState();
+    lg::stats::release();
+    if (g_statsCommand)
+        HyprlandAPI::unregisterHyprCtlCommand(lg::handle(), g_statsCommand);
+    g_statsCommand.reset();
     lg::unregisterConfig();
     g_params.reset();
 }
