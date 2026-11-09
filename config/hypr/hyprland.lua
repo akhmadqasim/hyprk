@@ -125,8 +125,8 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
         hl.config({ plugin = { liquidglass = {
             -- menubar too: only its pressed title/status pills send glass regions
             namespaces = "hyprk-menubar,hyprk-" .. table.concat(glassLayers, ",hyprk-"),
-            -- recipes per layer come from the plugin's `materials` default
-            -- (hyprk-dock:dock, hyprk-controlcenter:controlcenter, hyprk-overlay:menu, ...)
+            -- recipe per layer (plugin/README.md "Materials")
+            materials = "hyprk-dock:dock,hyprk-controlcenter:controlcenter,hyprk-spotlight:spotlight,hyprk-overlay:menu,hyprk-menubar:menu",
             blur_lod = 1.0,              -- extra frost: wallpaper reads as soft colour, not detail
         } } })
     end)
