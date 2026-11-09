@@ -49,13 +49,13 @@ hl.config({
         rounding_power = 2.8,            -- SPEC.md 7.1: continuous corner guess
         active_opacity = 1.0,
         inactive_opacity = 1.0,
-        shadow = {                       -- large soft macOS window shadow, offset down
+        shadow = {                       -- glass-defaults.json macWindowShadow: active r24 (0,10) a0.6, inactive r16 (0,4) a0.45
             enabled = true,
-            range = 50,
-            render_power = 2,
-            offset = "0 12",
-            color = 0x5c000000,          -- ~0.36 alpha active
-            color_inactive = 0x2e000000, -- ~0.18 alpha inactive
+            range = 40,                  -- Hyprland spread ~ 1.6x Apple's Gaussian radius 24
+            render_power = 3,            -- closer to a Gaussian falloff than 2
+            offset = "0 10",
+            color = 0x73000000,          -- 0.45: Apple's 0.6 is a Gaussian peak, Hyprland's ramp is fuller
+            color_inactive = 0x4d000000, -- 0.30 (inactive 0.45 scaled the same way)
         },
         blur = {
             enabled = true,
