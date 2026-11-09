@@ -135,7 +135,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         elide: Text.ElideRight
                         text: d.modelData.title
-                        font.family: Theme.fontText; font.pixelSize: Theme.font.body
+                        font.family: Theme.fontText; font.pixelSize: Theme.sidebar.fontSize
                         weight: d.selected ? Font.DemiBold : Font.Normal
                         color: d.selected ? Theme.sidebar.selectionText : Theme.label
                     }

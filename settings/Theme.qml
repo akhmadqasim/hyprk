@@ -72,11 +72,16 @@ QtObject {
     // ---------- sidebar ----------
     readonly property QtObject sidebar: QtObject {
         readonly property int width: 232             // ref (flush with the window's left edge)
-        readonly property int rowHeight: 32          // ref
+        // Appearance > Sidebar icon size. SPEC.md 7 (_NSSidebarMetrics_Solarium):
+        // row 24/32/40, font 11/13/15; icon measured 21 at medium (ref), others scaled.
+        property string size: "medium"
+        readonly property int _i: Math.max(0, ["small", "medium", "large"].indexOf(size))
+        readonly property int rowHeight: [24, 32, 40][_i]
+        readonly property int fontSize: [11, 13, 15][_i]
         readonly property int rowRadius: 10          // ref selection pill
         readonly property int rowMargin: 10          // ref pill inset from sidebar edges
         readonly property int iconLeft: 8            // ref icon inset inside the pill
-        readonly property int iconSize: 21           // ref
+        readonly property int iconSize: [16, 21, 26][_i]   // medium = ref, S/L TODO verify
         readonly property int iconLabelGap: 7        // ref
         readonly property int groupGap: 13          // ref
         readonly property int searchTop: 61          // ref
