@@ -101,8 +101,8 @@ Item {
                         x: 30
                         width: parent.width - x - 22
                         anchors.verticalCenter: parent.verticalCenter
-                        text: Files.styledName(row.modelData, Theme.color.tagColors)
-                        textFormat: Text.StyledText
+                        text: Files.hasTags(row.modelData) ? Files.styledName(row.modelData, Theme.color.tagColors) : row.modelData.name
+                        textFormat: Files.hasTags(row.modelData) ? Text.StyledText : Text.PlainText
                         elide: Text.ElideMiddle
                         color: row.selected && col.last ? "white" : Theme.color.label
                         font.family: Theme.fontText

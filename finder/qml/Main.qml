@@ -23,7 +23,7 @@ Window {
 
     Browser {
         id: fm
-        path: startup.path === "recents:" || startup.path === "applications:" || FileOps.isDir(startup.path) ? startup.path : FileOps.homePath()
+        path: /^(recents:|applications:|tag:)/.test(startup.path) || FileOps.isDir(startup.path) ? startup.path : FileOps.homePath()
         history: [path]
         onErrorRaised: message => alert.show(message)
         // the inline editor held focus; hand it back so shortcuts keep working

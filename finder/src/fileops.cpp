@@ -7,7 +7,6 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QMutexLocker>
-#include <QPointer>
 #include <QSaveFile>
 #include <QThreadPool>
 #include <QProcess>
@@ -23,6 +22,8 @@ FileOps::FileOps(QObject *parent) : QObject(parent)
 {
     connect(&m_watcher, &QFileSystemWatcher::directoryChanged, this, &FileOps::directoryChanged);
 }
+
+FileOps::~FileOps() { m_pool.waitForDone(); }
 
 QString FileOps::homePath() const { return QDir::homePath(); }
 
@@ -197,8 +198,13 @@ void FileOps::trash(const QStringList &paths)
         emit trashFinished(headline + QStringLiteral("\ngio is not installed."));
         p->deleteLater();
     });
-    connect(p, &QProcess::finished, this, [this, p, headline](int code, QProcess::ExitStatus status) {
+    connect(p, &QProcess::finished, this, [this, p, headline, paths](int code, QProcess::ExitStatus status) {
         QString err;
+        QStringList gone;   // drop index entries only for items that really left
+        for (const QString &path : paths)
+            if (!QFileInfo::exists(path))
+                gone.append(path);
+        moveTagKeys(gone, {});
         if (status != QProcess::NormalExit || code != 0) {
             // gio prints "gio: <uri>: <reason>" per failed file; keep the first reason only.
             const QString out = QString::fromUtf8(p->readAllStandardError()).trimmed().section(QLatin1Char('\n'), 0, 0);
@@ -221,11 +227,7 @@ QString FileOps::rename(const QString &path, const QString &newName) const
         return QStringLiteral("The name “%1” is already taken. Please choose a different name.").arg(newName);
     if (!QFile::rename(path, target))
         return QStringLiteral("The item “%1” couldn’t be renamed.").arg(fi.fileName());
-    QJsonObject index = tagIndex();
-    if (index.contains(path)) {
-        index.insert(target, index.take(path));
-        saveTagIndex(index);
-    }
+    moveTagKeys({path}, target);
     return {};
 }
 
@@ -248,21 +250,16 @@ QString FileOps::readText(const QString &path, int maxBytes) const
 
 void FileOps::listAsync(const QString &location, int token)
 {
-    QPointer<FileOps> self(this);
-    QThreadPool::globalInstance()->start([self, location, token] {
-        if (!self)
-            return;
+    // m_pool is drained in the destructor, so `this` outlives every task.
+    m_pool.start([this, location, token] {
         QVariantList out;
         if (location == QLatin1String("recents:"))
-            out = self->recents(200);
+            out = recents(200);
         else if (location == QLatin1String("applications:"))
-            out = self->applications();
+            out = applications();
         else if (location.startsWith(QLatin1String("tag:")))
-            out = self->tagged(location.mid(4));
-        QMetaObject::invokeMethod(self, [self, token, out] {
-            if (self)
-                emit self->listed(token, out);
-        }, Qt::QueuedConnection);
+            out = tagged(location.mid(4));
+        QMetaObject::invokeMethod(this, [this, token, out] { emit listed(token, out); }, Qt::QueuedConnection);
     });
 }
 
@@ -309,13 +306,32 @@ void FileOps::saveTagIndex(const QJsonObject &index) const
 QStringList FileOps::tags(const QString &path) const
 {
     const QByteArray p = QFile::encodeName(path);
-    char buf[1024];
-    const ssize_t n = getxattr(p.constData(), kTagAttr, buf, sizeof buf);
-    if (n > 0)
-        return QString::fromUtf8(buf, n).split(QLatin1Char(','), Qt::SkipEmptyParts);
-    if (n < 0 && errno == ENOTSUP)   // no xattr support here: the JSON index is the store
-        return tagIndex().value(path).toVariant().toStringList();
-    return {};
+    const ssize_t size = getxattr(p.constData(), kTagAttr, nullptr, 0);
+    if (size < 0)   // ENOTSUP: no xattrs on this filesystem, the JSON index is the store
+        return errno == ENOTSUP ? tagIndex().value(path).toVariant().toStringList() : QStringList();
+    QByteArray buf(size, Qt::Uninitialized);
+    const ssize_t n = getxattr(p.constData(), kTagAttr, buf.data(), buf.size());
+    return n > 0 ? QString::fromUtf8(buf.constData(), n).split(QLatin1Char(','), Qt::SkipEmptyParts) : QStringList();
+}
+
+// Re-keys index entries for `from` paths (and anything below them) to `to`; empty `to` drops them.
+void FileOps::moveTagKeys(const QStringList &from, const QString &to) const
+{
+    QJsonObject index = tagIndex();
+    bool changed = false;
+    for (const QString &key : index.keys()) {
+        for (const QString &f : from) {
+            if (key != f && !key.startsWith(f + QLatin1Char('/')))
+                continue;
+            const QJsonValue v = index.take(key);
+            if (!to.isEmpty())
+                index.insert(to + key.mid(f.size()), v);
+            changed = true;
+            break;
+        }
+    }
+    if (changed)
+        saveTagIndex(index);
 }
 
 QString FileOps::setTags(const QString &path, const QStringList &tags)

@@ -184,13 +184,16 @@ function escapeHtml(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-// Name as StyledText with Finder's colored tag dots in front ("● ● name").
+function hasTags(entry) { return !!entry.tags && entry.tags.length > 0; }
+
+// Name with Finder's colored tag dots in front ("● ● name") as StyledText. Use it only when
+// hasTags(entry); plain names stay PlainText. Runs of spaces are kept with &nbsp;.
 // colors: tag name -> CSS color; unknown tags use colors.Gray.
 function styledName(entry, colors) {
     let dots = "";
     for (const t of entry.tags || [])
         dots += '<font color="' + (colors[t] || colors.Gray) + '">\u25CF</font>';
-    return (dots ? dots + " " : "") + escapeHtml(entry.name);
+    return dots + " " + escapeHtml(entry.name).replace(/ (?= )/g, "&nbsp;");
 }
 
 // ---------- formatting ----------

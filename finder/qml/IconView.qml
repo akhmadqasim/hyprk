@@ -116,8 +116,8 @@ GridView {
             y: icon.y + icon.height + Theme.grid.labelGap
             width: Theme.grid.labelWidth
             horizontalAlignment: Text.AlignHCenter
-            text: Files.styledName(cell.modelData, Theme.color.tagColors)
-            textFormat: Text.StyledText
+            text: Files.hasTags(cell.modelData) ? Files.styledName(cell.modelData, Theme.color.tagColors) : cell.modelData.name
+            textFormat: Files.hasTags(cell.modelData) ? Text.StyledText : Text.PlainText
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             maximumLineCount: 2
             elide: Text.ElideRight

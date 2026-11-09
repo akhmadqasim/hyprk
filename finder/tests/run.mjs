@@ -104,7 +104,9 @@ test("rename validation", () => {
 
 // ---- tags ----
 test("styledName", () => {
-    assert.equal(F.styledName({ name: "a<b>.txt" }, {}), "a&lt;b&gt;.txt");
+    assert.equal(F.styledName({ name: "a<b>  c", tags: ["Red"] }, { Red: "#f00" }),
+                 '<font color="#f00">\u25CF</font> a&lt;b&gt;&nbsp; c');
+    assert.equal(F.hasTags({ name: "x" }), false);
     assert.equal(F.styledName({ name: "x", tags: ["Red", "Odd"] }, { Red: "#f00", Gray: "#888" }),
                  '<font color="#f00">\u25CF</font><font color="#888">\u25CF</font> x');
 });

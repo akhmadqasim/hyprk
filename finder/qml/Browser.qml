@@ -108,6 +108,7 @@ QtObject {
         selected = ({});
         cursorPath = "";
         anchorPath = "";
+        allEntries = [];   // don't show the previous folder while an async listing loads
         reload();
     }
     function isVirtualPath(p) { return p === "recents:" || p === "applications:" || p.indexOf("tag:") === 0; }

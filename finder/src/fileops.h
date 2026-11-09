@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QMimeDatabase>
 #include <QMutex>
+#include <QThreadPool>
 #include <QObject>
 #include <QVariantList>
 
@@ -14,6 +15,7 @@ class FileOps : public QObject {
     Q_OBJECT
 public:
     explicit FileOps(QObject *parent = nullptr);
+    ~FileOps() override;
 
     Q_INVOKABLE QString homePath() const;
     // key: desktop | documents | downloads | pictures | music | movies | trash
@@ -56,7 +58,9 @@ private:
     QVariantList applications() const;
     QVariantList tagged(const QString &tag) const;
     QJsonObject tagIndex() const;
+    void moveTagKeys(const QStringList &from, const QString &to) const;
     void saveTagIndex(const QJsonObject &index) const;
+    QThreadPool m_pool;   // listAsync workers, drained in ~FileOps
     QFileSystemWatcher m_watcher;
     mutable QMutex m_tagMutex;
     mutable QJsonObject m_tagIndex;

@@ -91,8 +91,8 @@ int main(int argc, char *argv[])
     engine.addImageProvider(QStringLiteral("icon"), new IconProvider);
     engine.addImageProvider(QStringLiteral("thumb"), new ThumbnailProvider);
     engine.rootContext()->setContextProperty(QStringLiteral("startup"), QVariantMap{
-        // "recents:" and "applications:" are virtual locations, not paths
-        {QStringLiteral("path"), dir.isEmpty() || dir.endsWith(QLatin1Char(':')) ? dir : QDir(dir).absolutePath()},
+        // "recents:", "applications:" and "tag:<Name>" are virtual locations, not paths
+        {QStringLiteral("path"), dir.isEmpty() || dir.endsWith(QLatin1Char(':')) || dir.startsWith(QLatin1String("tag:")) ? dir : QDir(dir).absolutePath()},
         {QStringLiteral("view"), cli.value(viewOpt)},
         {QStringLiteral("select"), cli.value(selectOpt)},
         {QStringLiteral("quicklook"), cli.isSet(qlOpt)},

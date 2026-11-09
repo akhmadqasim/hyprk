@@ -59,6 +59,20 @@ int main(int argc, char **argv)
     CHECK(ops.setTags(renamed, {}).isEmpty());
     CHECK(ops.tags(renamed).isEmpty());
 
+    // renaming a folder carries the tags of files inside it (index keys move with the prefix)
+    const QString folder = ops.makeFolder(work.path(), QStringLiteral("A"));
+    const QString inner = folder + QStringLiteral("/x.txt");
+    { QFile f(inner); f.open(QIODevice::WriteOnly); }
+    CHECK(ops.setTags(inner, {QStringLiteral("Green")}).isEmpty());
+    CHECK(ops.rename(folder, QStringLiteral("B")).isEmpty());
+    listed.clear();
+    QObject::connect(&ops, &FileOps::listed, &loop, [&](int token, const QVariantList &l) {
+        if (token == 8) { listed = l; loop.quit(); }
+    });
+    ops.listAsync(QStringLiteral("tag:Green"), 8);
+    loop.exec();
+    CHECK(listed.size() == 1 && listed.value(0).toMap().value(QStringLiteral("path")).toString() == work.filePath(QStringLiteral("B/x.txt")));
+
     // makeFolder picks the next free name
     CHECK(ops.makeFolder(work.path(), QStringLiteral("untitled folder")).endsWith(QStringLiteral("/untitled folder")));
     CHECK(ops.makeFolder(work.path(), QStringLiteral("untitled folder")).endsWith(QStringLiteral("/untitled folder 2")));

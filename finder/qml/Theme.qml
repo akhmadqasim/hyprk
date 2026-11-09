@@ -24,15 +24,14 @@ QtObject {
     // folders that get their own icon, by absolute path
     readonly property var folderIcons: {
         const m = {};
-        m[FileOps.homePath()] = "HomeFolderIcon";
-        m[FileOps.standardPath("desktop")] = "DesktopFolderIcon";
-        m[FileOps.standardPath("documents")] = "DocumentsFolderIcon";
-        m[FileOps.standardPath("downloads")] = "DownloadsFolder";
-        m[FileOps.standardPath("pictures")] = "PicturesFolderIcon";
-        m[FileOps.standardPath("music")] = "MusicFolderIcon";
-        m[FileOps.standardPath("movies")] = "MovieFolderIcon";
+        const special = [["desktop", "DesktopFolderIcon"], ["documents", "DocumentsFolderIcon"],
+                         ["downloads", "DownloadsFolder"], ["pictures", "PicturesFolderIcon"],
+                         ["music", "MusicFolderIcon"], ["movies", "MovieFolderIcon"]];
+        for (const [key, icon] of special) m[FileOps.standardPath(key)] = icon;
         m[FileOps.homePath() + "/Public"] = "PublicFolderIcon";
         m[FileOps.homePath() + "/Library"] = "LibraryFolderIcon";
+        // last, so an XDG dir disabled by pointing it at $HOME can't take the home icon
+        m[FileOps.homePath()] = "HomeFolderIcon";
         return m;
     }
 
