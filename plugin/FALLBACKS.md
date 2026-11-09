@@ -4,7 +4,7 @@ User rule: if the glass cannot run, log once and fall back to plain Hyprland blu
 
 | Case | Detection | What happens |
 |---|---|---|
-| Shader does not compile or link (driver, GLES < 3.0, broken `shader_path` file) | `CShader::createProgram(..., dynamic=true, silent=true)` returns false. The GL info log goes to `hyprland.log` (`CShader::logShaderError`). | One `ERR [liquidglass] glass disabled, using plain Hyprland blur: ...` line plus one desktop notification. Every glassed surface is then drawn with Hyprland's own blur (`renderRect` with `blur = true`) in the same rounded shape, tinted with `tint_light` (`tint_dark` when `appearance = "dark"`). Changing `shader_path` gives one new attempt. |
+| Shader does not compile or link (driver, GLES < 3.0, broken `shader_path` file) | `CShader::createProgram(..., dynamic=true, silent=true)` returns false. The GL info log goes to `hyprland.log` (`CShader::logShaderError`). | One `ERR [liquidglass] glass disabled, using plain Hyprland blur: ...` line plus one desktop notification. Every glassed surface is then drawn with Hyprland's own blur (`renderRect` with `blur = true`) in the same rounded shape, tinted with the recipe fill (or a white lift from its black point). Changing `shader_path` gives one new attempt. |
 | Custom shader lacks required uniforms (`tex`, `uvTopLeft`, `uvBottomRight`, `quadSize`, `glassBox`) | `glGetUniformLocation` < 0 | Same as above. |
 | Renderer is not OpenGL (future Vulkan renderer) | `g_pHyprRenderer->type() != RT_GL` | Same as above (the fallback uses the renderer-neutral blur call). |
 | Blur framebuffer missing for a frame | `blurMainFramebuffer()` returns null | That frame uses the plain-blur fallback. |
@@ -13,7 +13,9 @@ User rule: if the glass cannot run, log once and fall back to plain Hyprland blu
 | `enabled = 0` | config | Plugin does not touch layers: Hyprland's blur rules apply as without the plugin. |
 | Client sets no blur region | `m_blurRegion` empty | `require_region = 1` (default): the layer is left to Hyprland's normal blur rules. `0`: the whole layer box is the glass shape. |
 | Monitor with rotation/transform | not handled | Glass is drawn in untransformed monitor space. Not tested. |
-| GPU cost (`full_damage = 1` redraws the whole output when glass is on screen) | config | Set `full_damage = 0` to keep Hyprland's partial damage. Edges may then show seams while something moves behind the glass. |
+| Luminance readback not possible (FBO incomplete on a mip level, no PBO support) | `glCheckFramebufferStatus` | The glass stays on its light recipe (or the forced `appearance`). Nothing is logged per frame. |
+| Partial damage | — | The plugin damages the whole glass when part of it is damaged (`claimDamage`). `full_damage = 1` remains as a debug switch. |
 
-Not handled (documented gaps): Apple's hysteresis for light/dark switching (we use a smooth luminance band, no
-memory), HDR "holding tone", the foreground content lensing pass, the tinted (non-black) drop shadow.
+Not handled (documented gaps): HDR "holding tone", the foreground content lensing pass, the outer refraction
+layer, edge bleed, blur fill, Apple's exact YCC → 3x4 matrix (not decoded; we use a levels + saturation
+form), the variable blur by edge distance.

@@ -1,5 +1,6 @@
 // Unit tests for the pure logic (region clustering, SDF, parsing). No framework.
 #include "Config.hpp"
+#include "Material.hpp"
 #include "Shape.hpp"
 
 #include <cmath>
@@ -84,12 +85,36 @@ int main() {
         CHECK(m.size() == 3 && near(m["hyprk-dock"], 26) && near(m["q"], 1.5));
     }
     {
-        auto c = colorFromRGBA(0xFF800040);
-        CHECK(near(c.r, 1) && near(c.g, 128 / 255.0, 1e-6) && near(c.b, 0) && near(c.a, 64 / 255.0, 1e-6));
+        auto m = parseStringMap("hyprk-dock:dock, bad, :x, y: ");
+        CHECK(m.size() == 1 && m["hyprk-dock"] == "dock");
     }
+
+    // recipes: SPEC 9 values resolved against D (smallest extent, pt)
+    {
+        const auto& reg = recipeByName("regular");
+        auto        r   = resolveMaterial(reg, 40);
+        CHECK(near(r.refractionHeight, 10, 1e-4) && near(r.refractionAmount, -20, 1e-4) && near(r.blurRadius, 0));
+        r = resolveMaterial(reg, 200); // clamps: height 20, amount -60, blur 4
+        CHECK(near(r.refractionHeight, 20, 1e-4) && near(r.refractionAmount, -60, 1e-4) && near(r.blurRadius, 4, 1e-4));
+        CHECK(near(resolveMaterial(reg, 112).blurRadius, 2, 1e-4));
+        CHECK(near(recipeByName("dock").light.ycc.white, 0.9, 1e-6));
+        CHECK(near(resolveMaterial(recipeByName("controlcenter"), 60).refractionAmount, -80, 1e-4));
+        CHECK(std::string{recipeByName("nope").name} == "regular");
+        CHECK(near(recipeByName("menu").shadowOpacityHi, 0.6, 1e-6));
+    }
+    CHECK(near(clampedLinear(48, 48, 160, 0.25, 0.75), 0.25) && near(clampedLinear(104, 48, 160, 0.25, 0.75), 0.5) && near(clampedLinear(500, 48, 160, 0.25, 0.75), 0.75));
+
+    // hysteresis: dark below low, stays dark inside the band, light again above high
+    CHECK(!hysteresisDark(false, 0.2, 0.1, 0.3));
+    CHECK(hysteresisDark(false, 0.05, 0.1, 0.3));
+    CHECK(hysteresisDark(true, 0.2, 0.1, 0.3));
+    CHECK(!hysteresisDark(true, 0.35, 0.1, 0.3));
+
     CHECK(parseAppearance("dark") == 2 && parseAppearance("light") == 1 && parseAppearance("x") == 0);
 
     SParams p;
+    p.materials  = {{"hyprk-dock", "dock"}};
+    CHECK(materialFor(p, "hyprk-dock") == "dock" && materialFor(p, "x") == "regular");
     p.namespaces = {"hyprk-dock"};
     p.radii      = {{"hyprk-menubar", 0}};
     CHECK(namespaceMatches(p, "hyprk-dock") && !namespaceMatches(p, "other"));

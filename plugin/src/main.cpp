@@ -89,11 +89,15 @@ static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext
         original(thisptr, ctx, layer, mon, now, popups, lockscreen, workspaceScene);
         return;
     }
-    g_pHyprRenderer->currentPass(ctx).add(makeUnique<lg::CGlassElement>(lg::CGlassElement::SData{
-            .shapes = std::move(shapes),
-            .alpha  = layer->alpha()[Desktop::View::LS_ALPHA_FADE]->value(),
-            .params = params,
-        }));
+    lg::CGlassElement::SData data{
+        .shapes = std::move(shapes),
+        .alpha  = layer->alpha()[Desktop::View::LS_ALPHA_FADE]->value(),
+        .params = params,
+        .recipe = &lg::recipeByName(lg::materialFor(*params, layer->m_namespace)),
+        .owner  = reinterpret_cast<uintptr_t>(layer.get()),
+    };
+    lg::CGlassElement::claimDamage(ctx, data);
+    g_pHyprRenderer->currentPass(ctx).add(makeUnique<lg::CGlassElement>(std::move(data)));
 
     std::optional<SBlurSuppression> suppress;
     if (const auto surface = layer->wlSurface())
@@ -135,8 +139,10 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     // checked once per monitor frame (hl.config() through hyprctl eval fires no reload
     // event); readConfig() returns the same snapshot unless a value changed
     g_listeners.push_back(Event::bus()->m_events.render.stage.listen([](Event::SRenderStageEvent e) {
-        if (e.stage == RENDER_BEGIN)
+        if (e.stage == RENDER_BEGIN) {
             g_params = lg::readConfig();
+            lg::onFrame();
+        }
     }));
     g_listeners.push_back(Event::bus()->m_events.config.reloaded.listen([] {
         if (g_pHyprRenderer)
@@ -175,6 +181,7 @@ APICALL EXPORT void PLUGIN_EXIT() {
     if (g_pHyprRenderer)
         g_pHyprRenderer->context().m_pass.removeAllOfType("CLiquidGlassElement");
     lg::glassProgram().destroy();
+    lg::releaseGlState();
     lg::unregisterConfig();
     g_params.reset();
 }

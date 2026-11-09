@@ -101,25 +101,28 @@ namespace lg {
         return out;
     }
 
-    std::unordered_map<std::string, double> parseNumberMap(std::string_view s) {
-        std::unordered_map<std::string, double> out;
+    std::unordered_map<std::string, std::string> parseStringMap(std::string_view s) {
+        std::unordered_map<std::string, std::string> out;
         for (const auto& item : splitList(s)) {
             const auto colon = item.rfind(':');
             if (colon == std::string::npos)
                 continue;
-            const auto key = Hyprutils::String::trim(std::string_view{item}.substr(0, colon));
-            const auto num = Hyprutils::String::trim(std::string_view{item}.substr(colon + 1));
-            double     value = 0;
-            const auto [ptr, ec] = std::from_chars(num.data(), num.data() + num.size(), value);
-            if (key.empty() || ec != std::errc{} || ptr != num.data() + num.size())
-                continue;
-            out[std::string{key}] = value;
+            const auto key   = Hyprutils::String::trim(std::string_view{item}.substr(0, colon));
+            const auto value = Hyprutils::String::trim(std::string_view{item}.substr(colon + 1));
+            if (!key.empty() && !value.empty())
+                out[std::string{key}] = std::string{value};
         }
         return out;
     }
 
-    SColor colorFromRGBA(long long rgba) {
-        const auto c = static_cast<unsigned long long>(rgba) & 0xFFFFFFFFull;
-        return {((c >> 24) & 0xFF) / 255.f, ((c >> 16) & 0xFF) / 255.f, ((c >> 8) & 0xFF) / 255.f, (c & 0xFF) / 255.f};
+    std::unordered_map<std::string, double> parseNumberMap(std::string_view s) {
+        std::unordered_map<std::string, double> out;
+        for (const auto& [key, num] : parseStringMap(s)) {
+            double     value        = 0;
+            const auto [ptr, ec]    = std::from_chars(num.data(), num.data() + num.size(), value);
+            if (ec == std::errc{} && ptr == num.data() + num.size())
+                out[key] = value;
+        }
+        return out;
     }
 }

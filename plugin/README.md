@@ -51,39 +51,68 @@ Check a value: `hyprctl getoption plugin:liquidglass:refraction`.
 The backdrop is Hyprland's own blur (`decoration.blur.*`, so size/passes/vibrancy there set the base frost),
 mipmapped by the plugin for the extra per-pixel blur. Recommended base: `blur = { size = 10, passes = 3 }`.
 
+## Materials (recipes)
+
+Apple's numbers from `/mnt/code/liquid-glass-re/SPEC.md` section 9 (glass version v2) live in
+`src/Material.cpp`. Most are size-relative: `D` = smallest extent of the glass shape in pt.
+
+| Recipe | Face YCC light (black, white, sat) | Fill light | Refraction height / amount | Extra blur | Shadow | Used for (default) |
+|---|---|---|---|---|---|---|
+| `regular` | 0.4, 1.03, 1.2 | white 20% | 0.25 D (max 20) / -0.5 D (min -60) | D 64→160 : 0→4 | D 64→160 : 0.25→0.75, r 24, y 8 | notifications, spotlight, switcher |
+| `menu` | as regular | white 20% | as regular | as regular | 0.6, r 24, y 10 (Mac glass window shadow) | `hyprk-overlay`, `hyprk-menubar` |
+| `clear` | 0.125, 1.08, 1.06 | none | 0.25 D / -0.8 D | D 48→120 : 3→8 | as regular | |
+| `dock` | 0.15, 0.9, 1.25 | none | 0.08 D / -0.18 D | 1.5 | as regular | `hyprk-dock` |
+| `controlcenter` | 0.125, 0.8, 1.2 | none | 0.225 D (max 25) / -2.0 D (min -80) | 4 | as regular | `hyprk-controlcenter` |
+
+Dark sides: regular (0.125, 1.125, 1.3), dock (0.05, 0.92, 1.25), others as light. Regular also has
+Apple's V2 ring shadow (offset 8, stroke 4, radius 5, opacity 0.06). Face effect: luminance is mapped
+into [black, white] and chroma scaled by saturation, then the fill is mixed in.
+Light/dark: `appearance = "auto"` reads the backdrop luminance of each glass (1 pixel of a high mip,
+read back asynchronously) and switches with Apple's V2 hysteresis: dark below 0.1, light again above
+0.3 (`adapt_low` / `adapt_high`).
+
+Not from the RE (by eye): `lift` (extra white on light faces), the rim floor, the inner shadow, the
+dark-side rim bias (+0.3 instead of Apple's undecoded dark specular), the shadow tint amount, and
+how Apple's blur radius maps to extra mip levels (`blur_lod_scale`).
+
 ## Config keys (`plugin:liquidglass:<key>`; lengths in logical px)
 
 | Key | Default | Meaning |
 |---|---|---|
 | `enabled` | 1 | 0 = plugin inactive, Hyprland's normal blur rules apply |
-| `namespaces` | hyprk shell list above | comma list of layer namespaces, `*` = all |
-| `radii` | `hyprk-menubar:0` | `ns:radius` overrides |
+| `namespaces` | hyprk-menubar, dock, overlay, controlcenter, notifications, spotlight, switcher | comma list of layer namespaces, `*` = all |
+| `materials` | `hyprk-dock:dock,hyprk-controlcenter:controlcenter,hyprk-overlay:menu,hyprk-menubar:menu` | `ns:recipe` map |
+| `material` | `regular` | recipe for namespaces not in `materials` |
+| `window_material` | `regular` | recipe for window glass |
+| `radii` | "" | `ns:radius` overrides |
 | `default_radius` | -1 | radius for all shapes; < 0 = infer from the blur region |
-| `rounding_power` | 2.6 | superellipse corner (2 = circle, ~2.6 close to Apple's continuous corner) |
-| `blur_lod` | 0.5 | extra mip blur in the centre (0 = Hyprland's blur only, +1 = about 2x radius) |
-| `edge_blur_lod` | 0.0 | extra mip blur at the rim (variable blur) |
-| `blur_edge_distance` | 14 | px over which edge blur turns into centre blur |
-| `refraction` | 18 | px displacement at the edge (+ pulls in what is outside the edge, - pushes) |
-| `refraction_height` | 18 | px depth of the bevel |
+| `rounding_power` | 2.6 | superellipse corner (2 = circle) |
+| `appearance` | `auto` | `auto` (hysteresis on backdrop luminance), `light`, `dark` |
+| `adapt_low` / `adapt_high` | 0.1 / 0.3 | hysteresis band (SPEC 9.6, V2 light range) |
+| `lift` | 0.1 | extra white over light faces (0 = Apple's recipe as decoded) |
+| `blur_lod` / `blur_lod_scale` | 0 / 0.6 | extra mip blur = `blur_lod + scale * log2(1 + recipe blur radius)` |
+| `refraction_scale` | 1 | multiplies the recipe's refraction amount (0 = off) |
 | `aberration` | 1.5 | px R/B split at the edge (7 taps); 0 = off |
-| `saturation` | 1.4 | backdrop saturation boost |
-| `brightness_light` / `brightness_dark` | 1.04 / 0.9 | backdrop gain per appearance |
-| `tint_light` / `tint_dark` | `0xFFFFFF33` / `0x1C1C1E38` | 0xRRGGBBAA, AA = tint amount |
-| `appearance` | `auto` | `auto` adapts to backdrop luminance, or `light` / `dark` |
-| `adapt_threshold` / `adapt_softness` | 0.22 / 0.08 | luminance where auto turns dark, width of the blend band |
 | `light_angle` | -50 | degrees the light comes from (0 = right, -90 = top) |
-| `highlight` | 0.6 | rim highlight strength (Apple colour bias `rgb *= 1 + k(3-2rgb)`) |
-| `highlight_width` | 2.0 | px width of the rim band |
-| `highlight_spread` | 0.0 | 0..1, larger = narrower lobes |
-| `rim` | 0.3 | highlight floor all around the edge |
-| `inner_shadow` / `inner_shadow_size` | 0.10 / 8 | darkening along the inner rim |
-| `shadow_opacity` / `shadow_radius` / `shadow_offset_y` | 0.22 / 14 / 4 | Gaussian (erfc) drop shadow |
-| `ring_opacity` / `ring_width` | 0.10 / 0.8 | thin dark contour at the edge |
+| `highlight` | 1 | scales the recipe's rim colour bias (`rgb *= 1 + k(3-2rgb)`) |
+| `highlight_width` / `highlight_spread` / `highlight_curve` | 1.5 / 0.09 / 0.5 | rim band px, lobe threshold (cos 85°), Apple's tone curve amount |
+| `rim` | 0.5 | highlight floor all around the edge |
+| `inner_shadow` / `inner_shadow_size` | 0.06 / 8 | darkening along the inner rim |
+| `shadow_scale` / `shadow_tint` | 1 / 0.35 | drop shadow opacity scale; 0 = black shadow, 1 = saturated backdrop colour |
+| `ring_scale` | 1 | ring shadow opacity scale |
 | `require_region` | 1 | only layers that set an ext-background-effect blur region get glass |
-| `full_damage` | 1 | redraw the full output when glass is visible (no seams) |
+| `full_damage` | 0 | 1 = redraw the whole output while glass is visible (debug; see below) |
 | `shader_path` | "" | load this fragment shader instead of the built-in one |
 | `window_classes` | "" | regex: windows whose class matches get glass behind them |
-| `window_radius` | -1 | window glass radius; < 0 = `decoration.rounding` |
+| `window_radius` | -1 | window glass radius; < 0 = the window's rounding |
+
+Keys of the first iteration (`saturation`, `tint_light`, `tint_dark`, `brightness_*`, `refraction`, `shadow_opacity`, ...)
+are still accepted so old configs load, but do nothing.
+
+Damage: when any part of a glass is damaged, the plugin adds the whole glass box plus what its shader
+reads (refraction reach + aberration + 8 px) to the frame damage while the pass is built
+(`CGlassElement::claimDamage`), so a partial redraw never shows seams and idle frames cost nothing.
+A screenshot with `full_damage = 1` was pixel-identical to the default (test 2026-11-10).
 
 ## Test
 

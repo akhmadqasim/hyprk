@@ -1,10 +1,13 @@
 #pragma once
 
 #include "Config.hpp"
+#include "Material.hpp"
 #include "Shape.hpp"
 
 #include <hyprland/src/render/pass/PassElement.hpp>
 #include <hyprland/src/render/Shader.hpp>
+
+#include <cstdint>
 
 #include <memory>
 #include <optional>
@@ -28,10 +31,10 @@ namespace lg {
 
         struct SUniforms {
             int tex, uvTopLeft, uvBottomRight, quadSize, glassBox, radius, roundingPower, alpha;
-            int blurLod, edgeBlurLod, blurEdgeDistance, refraction, refractionHeight, aberration;
-            int saturation, tintLight, tintDark, brightnessLight, brightnessDark, appearance, adaptThreshold, adaptSoftness;
-            int lightDir, highlight, highlightWidth, highlightSpread, rim, innerShadow, innerShadowSize;
-            int shadowOpacity, shadowRadius, shadowOffset, ringOpacity, ringWidth;
+            int blurLod, refraction, refractionHeight, aberration, faceYcc, faceFill;
+            int lightDir, highlightBias, highlightWidth, highlightSpread, highlightCurve, rim, innerShadow, innerShadowSize;
+            int shadowOpacity, shadowRadius, shadowOffset, shadowTint, shadowSaturation;
+            int ringOpacity, ringOffset, ringStroke, ringRadius;
         } u{};
 
       private:
@@ -43,16 +46,23 @@ namespace lg {
 
     CGlassProgram& glassProgram();
 
+    // once per monitor frame: ages the per-surface light/dark state
+    void onFrame();
+    // frees the plugin's GL objects (PLUGIN_EXIT, GL context current)
+    void releaseGlState();
+
     // One pass element per glassed surface: draws the material for all its shapes
     // right before Hyprland draws the surface itself.
     class CGlassElement : public IPassElement {
       public:
         struct SData {
-            std::vector<SGlassShape> shapes; // monitor-local logical px
-            float                    alpha = 1.f;
+            std::vector<SGlassShape>       shapes; // monitor-local logical px
+            float                          alpha = 1.f;
             std::shared_ptr<const SParams> params;
-            bool                           shadow = true;        // windows draw their own
-            std::optional<float>           roundingPower;        // override params->roundingPower
+            const SRecipe*                 recipe = nullptr;
+            uintptr_t                      owner  = 0;    // layer/window identity, keys the light/dark state
+            bool                           shadow = true; // windows draw their own
+            std::optional<float>           roundingPower; // override params->roundingPower
         };
 
         explicit CGlassElement(SData data);
@@ -68,7 +78,12 @@ namespace lg {
         bool                          disableSimplification(Render::CRenderContext& ctx) override;
 
         // logical px the effect reaches outside the glass box (shadow)
-        static double margin(const SParams& p, bool shadow);
+        static double margin(const SData& data);
+
+        // Damage the whole glass (plus what it reads) when any part of it is damaged:
+        // refraction and the luminance probe read far from the damaged pixels. Call while
+        // the pass is built, before CRenderPass::render() consumes ctx.m_data.damage.
+        static void claimDamage(Render::CRenderContext& ctx, const SData& data);
 
       private:
         void  drawFallback(Render::CRenderContext& ctx);

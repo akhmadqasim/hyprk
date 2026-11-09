@@ -18,7 +18,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(HYPRUTILS REQUIRED IMPORTED_TARGET hyprutils)
 pkg_check_modules(HYPRLAND IMPORTED_TARGET hyprland pixman-1 libdrm)
 
-add_library(lgcore STATIC src/Shape.cpp src/Params.cpp)
+add_library(lgcore STATIC src/Shape.cpp src/Params.cpp src/Material.cpp)
 set_target_properties(lgcore PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(lgcore PUBLIC src)
 target_link_libraries(lgcore PUBLIC PkgConfig::HYPRUTILS)

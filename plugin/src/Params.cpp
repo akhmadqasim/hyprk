@@ -24,3 +24,10 @@ namespace lg {
         return std::ranges::any_of(p.namespaces, [&](const std::string& n) { return n == "*" || n == ns; });
     }
 }
+
+namespace lg {
+    const std::string& materialFor(const SParams& p, const std::string& ns) {
+        const auto it = p.materials.find(ns);
+        return it != p.materials.end() ? it->second : p.defaultMaterial;
+    }
+}

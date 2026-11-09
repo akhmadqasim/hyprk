@@ -39,9 +39,7 @@ namespace lg {
     // Items without a valid number are skipped.
     std::unordered_map<std::string, double> parseNumberMap(std::string_view s);
 
-    // 0xRRGGBBAA -> {r,g,b,a} in 0..1
-    struct SColor {
-        float r = 0, g = 0, b = 0, a = 0;
-    };
-    SColor colorFromRGBA(long long rgba);
+    // "hyprk-dock:dock, x:regular" -> {{"hyprk-dock","dock"},{"x","regular"}}
+    std::unordered_map<std::string, std::string> parseStringMap(std::string_view s);
+
 }

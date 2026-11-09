@@ -53,13 +53,17 @@ namespace lg {
         const double radius = params->windowRadius >= 0 ? params->windowRadius : window->presentation().rounding();
 
         // the window draws its own shadow and border: glass body only
-        g_pHyprRenderer->addPassElement(ctx, makeUnique<CGlassElement>(CGlassElement::SData{
+        CGlassElement::SData data{
             .shapes        = {{{box.x, box.y, box.w, box.h}, radius}},
             .alpha         = a,
             .params        = params,
+            .recipe        = &recipeByName(params->windowMaterial),
+            .owner         = reinterpret_cast<uintptr_t>(window.get()),
             .shadow        = false,
             .roundingPower = window->presentation().roundingPower(),
-        }));
+        };
+        CGlassElement::claimDamage(ctx, data);
+        g_pHyprRenderer->addPassElement(ctx, makeUnique<CGlassElement>(std::move(data)));
     }
 
     eDecorationType CGlassDecoration::getDecorationType() {

@@ -25,6 +25,7 @@ end
 hl.config({ plugin = { liquidglass = {
     namespaces = "lgtest-dock,lgtest-menubar,lgtest-card",
     radii      = "lgtest-menubar:0",
+    materials  = "lgtest-dock:dock,lgtest-card:controlcenter",
 } } })
 
 hl.window_rule({
