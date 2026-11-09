@@ -9,7 +9,7 @@ import qs.services
 
 // Cmd/Super+Tab app switcher: row of large icons on glass, one per running
 // app. Tab / Shift+Tab cycle while Super is held, releasing Super switches.
-PanelWindow {
+ShellWindow {
     id: sw
 
     required property var modelData
@@ -29,8 +29,7 @@ PanelWindow {
     visible: shown && apps.length > 0
     anchors { top: true; left: true; right: true; bottom: true }
     exclusionMode: ExclusionMode.Ignore
-    color: "transparent"
-    WlrLayershell.namespace: "hyprk-switcher"
+    namespace: "hyprk-switcher"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 

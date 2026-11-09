@@ -13,7 +13,7 @@ import "../lib/clock.js" as Clock
 import "../lib/state.js" as State
 
 // macOS 26+ menu bar: transparent, white text over the wallpaper.
-PanelWindow {
+ShellWindow {
     id: bar
 
     required property var modelData
@@ -22,7 +22,7 @@ PanelWindow {
     anchors { top: true; left: true; right: true }
     implicitHeight: Theme.menuBar.height
     color: Theme.color.menuBarBackground
-    WlrLayershell.namespace: "hyprk-menubar"
+    namespace: "hyprk-menubar"
     WlrLayershell.layer: WlrLayer.Top
 
     readonly property string appId: Apps.appIdOf(Hyprland.activeToplevel)

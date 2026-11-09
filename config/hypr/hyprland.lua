@@ -99,6 +99,26 @@ hl.animation({ leaf = "layersOut",   enabled = true, speed = 2,   bezier = "macE
 hl.animation({ leaf = "workspaces",  enabled = true, speed = 4,   bezier = "macOut",  style = "slide" })
 hl.animation({ leaf = "border",      enabled = false })
 
+------------------------------------------------------- liquid glass ----
+-- Own compositor plugin (plugin/, see plugin/README.md). When it loads, the shell
+-- sends its glass shapes as ext-background-effect regions (HYPRK_GLASS=plugin) and the
+-- plugin draws Liquid Glass behind them. Without it the shell's QML glass is used.
+-- Opt-in (HYPRK_LIQUIDGLASS=1) for now: in the shell's nested test on 2026-11-10 03:25 the
+-- plugin loaded but drew nothing (even with require_region = 0), which left the Dock bare.
+local glassSo = hyprk .. "/plugin/build/libliquidglass.so"
+local h = io.open(glassSo, "r")
+if h and os.getenv("HYPRK_LIQUIDGLASS") == "1" then
+    h:close()
+    local ok, err = pcall(function()
+        hl.plugin.load(glassSo)
+        hl.config({ plugin = { liquidglass = {
+            namespaces = "hyprk-menubar,hyprk-dock,hyprk-overlay,hyprk-notifications,hyprk-spotlight,hyprk-switcher,hyprk-launchpad",
+            radii = "hyprk-menubar:0",
+        } } })
+    end)
+    if ok then hl.env("HYPRK_GLASS", "plugin") else print("hyprk: liquidglass not loaded: " .. tostring(err)) end
+end
+
 ---------------------------------------------------------- layer rules ----
 -- Real compositor blur behind the shell's glass surfaces. The shell already
 -- draws a blurred-wallpaper material; this adds blur of the windows behind.

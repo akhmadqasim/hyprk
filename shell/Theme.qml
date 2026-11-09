@@ -21,6 +21,9 @@ Singleton {
     property bool reduceTransparency: false
     property bool blurAvailable: true
     readonly property bool solidMaterial: reduceTransparency || !blurAvailable
+    // liquidglass Hyprland plugin loaded (config/hypr/hyprland.lua exports HYPRK_GLASS=plugin);
+    // Reduce transparency still wins and uses the solid QML material
+    readonly property bool compositorGlass: Quickshell.env("HYPRK_GLASS") === "plugin" && !reduceTransparency
     readonly property string hyprkRoot: Quickshell.shellDir + "/.."
 
     // ---------- fonts ----------
@@ -53,6 +56,7 @@ Singleton {
         function setDark(on: bool): void { theme.dark = on; }
         function toggleTransparency(): void { theme.reduceTransparency = !theme.reduceTransparency; }
         function fonts(): string { return theme.fontText + " / " + theme.fontDisplay; }
+        function material(): string { return theme.compositorGlass ? "plugin" : theme.solidMaterial ? "solid" : "qml"; }
     }
 
     readonly property QtObject font: QtObject {

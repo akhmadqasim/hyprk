@@ -10,7 +10,7 @@ import "../lib/search.js" as Search
 
 // Spotlight (Super+Space): capsule search bar, results below in a second
 // glass panel. Apps from .desktop entries, inline calculator, files placeholder.
-PanelWindow {
+ShellWindow {
     id: sp
 
     required property var modelData
@@ -20,8 +20,7 @@ PanelWindow {
     visible: shown
     anchors { top: true; left: true; right: true; bottom: true }
     exclusionMode: ExclusionMode.Ignore
-    color: "transparent"
-    WlrLayershell.namespace: "hyprk-spotlight"
+    namespace: "hyprk-spotlight"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 

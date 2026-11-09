@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Effects
+import Quickshell
 import Quickshell.Widgets
 import qs
 import qs.services
@@ -18,9 +19,31 @@ Item {
     property color tint: Theme.glass.tint
     property color solidColor: Theme.glass.solid
     property bool shadow: true
+    // QML material only without the compositor plugin; with it the plugin
+    // draws tint, rim and shadow from this item's shape (see ShellWindow)
+    readonly property bool qmlMaterial: !Theme.compositorGlass
+
+    // shape for the plugin, registered with the enclosing ShellWindow
+    Region {
+        id: shape
+        item: root.visible && Theme.compositorGlass ? root : null
+        radius: root.radius
+    }
+    Component.onCompleted: {
+        const w = QsWindow.window;
+        if (w && w.glassRegions !== undefined) w.glassRegions.push(shape);
+    }
+    Component.onDestruction: {
+        const w = QsWindow.window;
+        if (!w || w.glassRegions === undefined) return;
+        const rest = [];
+        for (let i = 0; i < w.glassRegions.length; i++)
+            if (w.glassRegions[i] !== shape) rest.push(w.glassRegions[i]);
+        w.glassRegions = rest;
+    }
 
     RectangularShadow {
-        visible: root.shadow
+        visible: root.shadow && root.qmlMaterial
         anchors.fill: clip
         radius: root.radius
         blur: Theme.glass.shadowRadius
@@ -30,6 +53,7 @@ Item {
 
     ClippingRectangle {
         id: clip
+        visible: root.qmlMaterial
         anchors.fill: parent
         radius: root.radius
         color: "transparent"
@@ -56,6 +80,7 @@ Item {
 
     // inner rim: 1px border, brighter along the top like the lit edge of glass
     Rectangle {
+        visible: root.qmlMaterial
         anchors.fill: parent
         radius: root.radius
         color: "transparent"
@@ -65,7 +90,7 @@ Item {
     // brighter top border in two clipped steps (full, then half) so it fades
     // down the sides without an offscreen gradient mask
     Repeater {
-        model: [{ h: 1.0, o: 1.0 }, { h: 2.0, o: 0.5 }]
+        model: root.qmlMaterial ? [{ h: 1.0, o: 1.0 }, { h: 2.0, o: 0.5 }] : []
         Item {
             required property var modelData
             width: root.width
@@ -85,6 +110,7 @@ Item {
 
     // outer hairline that separates the material from bright backgrounds
     Rectangle {
+        visible: root.qmlMaterial
         anchors.fill: parent
         anchors.margins: -1
         radius: root.radius + 1

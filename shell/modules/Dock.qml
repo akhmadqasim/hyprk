@@ -8,7 +8,7 @@ import qs.services
 
 // Floating glass Dock: magnification, running dots, separator + Trash,
 // launch on click with bounce, app name tooltip.
-PanelWindow {
+ShellWindow {
     id: dock
 
     required property var modelData
@@ -24,8 +24,7 @@ PanelWindow {
     anchors { bottom: true; left: true; right: true }
     implicitHeight: Theme.dock.magnifiedSize + pad + Theme.dock.bottomMargin + tooltipRoom
     exclusiveZone: bgHeight + Theme.dock.bottomMargin
-    color: "transparent"
-    WlrLayershell.namespace: "hyprk-dock"
+    namespace: "hyprk-dock"
     WlrLayershell.layer: WlrLayer.Top
     mask: Region { item: hit }
 

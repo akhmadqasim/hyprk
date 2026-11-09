@@ -10,7 +10,7 @@ import qs.services
 // Mission Control (Super+Up): Spaces bar on top, live thumbnails of the
 // windows on the current Space laid out in a grid over the dimmed desktop.
 // Click a window to focus it, a Space to switch, empty space or Esc to close.
-PanelWindow {
+ShellWindow {
     id: mc
 
     required property var modelData
@@ -20,8 +20,7 @@ PanelWindow {
     visible: shown
     anchors { top: true; left: true; right: true; bottom: true }
     exclusionMode: ExclusionMode.Ignore
-    color: "transparent"
-    WlrLayershell.namespace: "hyprk-mission"
+    namespace: "hyprk-mission"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 

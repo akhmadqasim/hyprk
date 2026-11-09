@@ -9,7 +9,7 @@ import "../lib/search.js" as Search
 
 // "Apps" view (macOS 27 replacement for Launchpad): centered glass panel with
 // a search header and a paged icon grid. Type to filter, Esc or click outside closes.
-PanelWindow {
+ShellWindow {
     id: lp
 
     required property var modelData
@@ -19,8 +19,7 @@ PanelWindow {
     visible: shown
     anchors { top: true; left: true; right: true; bottom: true }
     exclusionMode: ExclusionMode.Ignore
-    color: "transparent"
-    WlrLayershell.namespace: "hyprk-launchpad"
+    namespace: "hyprk-launchpad"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 

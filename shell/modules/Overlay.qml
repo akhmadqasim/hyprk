@@ -9,7 +9,7 @@ import "../lib/menus.js" as Menus
 
 // Transparent click-catcher below the menu bar that hosts the pull-down
 // menus, Control Center and Notification Center. Clicking outside closes.
-PanelWindow {
+ShellWindow {
     id: ov
 
     required property var modelData
@@ -21,8 +21,7 @@ PanelWindow {
     anchors { top: true; left: true; right: true; bottom: true }
     margins.top: Theme.menuBar.height
     exclusionMode: ExclusionMode.Ignore
-    color: "transparent"
-    WlrLayershell.namespace: "hyprk-overlay"
+    namespace: "hyprk-overlay"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: active ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 

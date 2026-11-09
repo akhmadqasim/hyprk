@@ -7,7 +7,7 @@ import qs.services
 
 // Notification banners, top-right below the menu bar. They slide in from
 // the right and expire after Theme.notif.timeout unless hovered.
-PanelWindow {
+ShellWindow {
     id: win
 
     required property var modelData
@@ -21,8 +21,7 @@ PanelWindow {
     implicitHeight: Math.max(1, col.height + 40)
     exclusionMode: ExclusionMode.Normal
     exclusiveZone: 0
-    color: "transparent"
-    WlrLayershell.namespace: "hyprk-notifications"
+    namespace: "hyprk-notifications"
     WlrLayershell.layer: WlrLayer.Overlay
 
     Column {
