@@ -4,7 +4,7 @@
 L=$(cd "$(dirname "$0")/.." && pwd); source "$L/../themes/gtk/tools/hypr-env.sh"
 OUT=$1
 # install into a scratch dir so wallpaper/avatar paths are resolved from this checkout, not hard-coded
-TMPC=$(mktemp -d "$HK_DIR/lock.XXXX"); "$L/install.sh" --prefix "$TMPC" >/dev/null; CONF=${2:-$TMPC/hypr/hyprlock.conf}
+TMPC=$(mktemp -d "$HK_DIR/lock.XXXX"); XDG_CACHE_HOME=$HK_DIR/cache "$L/install.sh" --prefix "$TMPC" >/dev/null; CONF=${2:-$TMPC/hypr/hyprlock.conf}
 export WAYLAND_DISPLAY=$HK_WL FONTCONFIG_FILE=$HK_FONTCONF
 MON=$(hk_monitor) || exit 1
 HYPRK_LOCK_DEMO=1 setsid timeout ${LIFE:-25} hyprlock -c "$CONF" > "$HK_DIR/hyprlock.log" 2>&1 &

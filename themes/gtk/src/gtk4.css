@@ -363,11 +363,17 @@ scrolledwindow overshoot { background: none; }
 /* ---------------------------------------------------------------------------------------------
  * Tabs: Safari/Finder-style capsule segments
  * ------------------------------------------------------------------------------------------- */
+/* Safari/Finder style tabs: rounded pills, the selected one lifted like a toolbar button, hairline separators removed */
 tabbar, tabbar > revealer > box, tabbar .box { background-color: @mac_header_bg; box-shadow: none; border: none; }
-tabbar tab, tabbar .tab { border-radius: 999px; min-height: 28px; margin: 4px 2px; background: none; box-shadow: none; }
-tabbar tab:hover { background-color: @mac_fill; }
-tabbar tab:selected { background-color: @mac_ctl_bg; box-shadow: 0 0 0 1px @mac_ctl_ring, 0 1px 2px 0 @mac_ctl_shadow; }
+tabbar tab, tabbar .tab { border-radius: 12px; min-height: 28px; margin: 5px 3px; padding: 0 8px; background-color: @mac_fill; box-shadow: none; font-size: 12px; font-weight: 500; }
+tabbar tab:hover { background-color: @mac_fill_hover; }
+tabbar tab:selected { background-color: @mac_tab_sel; box-shadow: 0 0 0 1px @mac_ctl_ring, 0 1px 3px 0 @mac_ctl_shadow; font-weight: 600; }
 tabbar tab:selected:backdrop { background-color: @mac_fill; box-shadow: none; }
+tabbar tab button.image-button, tabbar tab .close-button { min-width: 18px; min-height: 18px; padding: 0; border-radius: 999px; box-shadow: none; background: none; }
+tabbar tab button.image-button:hover { background-color: @mac_fill_active; }
+tabbar tab indicator, tabbar tab .indicator { border-radius: 999px; }
+tabbar tabbox > separator { background: none; min-width: 0; }
+tabbar tabbox { padding: 0 8px; }
 notebook > header { background-color: @mac_header_bg; box-shadow: inset 0 -1px 0 0 @mac_sep; }
 notebook > header > tabs > tab { border-radius: 8px; margin: 3px; padding: 4px 12px; min-height: 24px; background: none; box-shadow: none; border: none; }
 notebook > header > tabs > tab:checked { background-color: @mac_ctl_bg; box-shadow: 0 0 0 1px @mac_ctl_ring, 0 1px 2px 0 @mac_ctl_shadow; }

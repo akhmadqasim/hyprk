@@ -43,11 +43,13 @@ snippet as a drop-in is `themes/fontconfig/60-hyprk-sf.conf.in`.
 
 ## 3. Ghostty (optional, private config)
 
-Ghostty switches libadwaita to dark when its terminal background is dark (`window-theme = auto`). To follow the session theme:
+Ghostty (libadwaita) switches to the dark scheme when its terminal background is dark. Keep `window-theme = auto` (Ghostty's default)
+so a dark terminal gets the dark MacOS27 title bar (#2B2B2B, close to a dark terminal background) like macOS Terminal; `system`
+would give a white bar over a dark terminal.
 
 ```
 # $XDG_CONFIG_HOME/ghostty/config
-window-theme = system
+window-theme = auto
 window-decoration = client
 gtk-titlebar = true
 ```

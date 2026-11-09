@@ -17,8 +17,9 @@ SRC = ROOT / 'src'
 
 def _gtk(s, **own):
     """GTK colour keys = shared tokens renamed + the GTK-only ones in `own`."""
+    own = {'header_bg': s['window'], 'header_backdrop': s['window'], **own}   # dark: title bar a step lighter than the content
     return dict(accent_bg=s['accent'], accent_text=s['accent_text'], window_bg=s['window'], view_bg=s['field'],
-                header_bg=s['window'], header_backdrop=s['window'], sidebar_bg=s['sidebar'], card_bg=s['card'],
+                sidebar_bg=s['sidebar'], card_bg=s['card'],
                 dialog_bg=s['dialog'], popover_bg=s['popover'],
                 tl_close=s['tl_close'], tl_min=s['tl_min'], tl_max=s['tl_max'], tl_off=s['tl_off'], accent_fg='#ffffff', **own)
 
@@ -32,18 +33,18 @@ PALETTES = {
         fill_active='rgba(0,0,0,0.16)', sel_grey='rgba(0,0,0,0.09)',
         ctl_bg='#FFFFFF', ctl_bg_hover='#F4F4F4', ctl_bg_active='#E4E4E4', ctl_ring='rgba(0,0,0,0.13)', ctl_shadow='rgba(0,0,0,0.16)',
         glass_bg='rgba(255,255,255,0.86)', glass_ring='rgba(0,0,0,0.06)', glass_shadow='rgba(0,0,0,0.07)',
-        field_bg='#FFFFFF', check_bg='#FFFFFF', check_ring='rgba(0,0,0,0.30)',
+        field_bg='#FFFFFF', check_bg='#FFFFFF', check_ring='rgba(0,0,0,0.30)', tab_sel='#FFFFFF',
         track='rgba(0,0,0,0.12)', knob='#FFFFFF', knob_shadow='rgba(0,0,0,0.30)', menu_ring='rgba(0,0,0,0.14)'),
     'dark': _gtk(
         SHARED['dark'],
         destructive='#FF453A', success='#30D158', warning='#FF9F0A', error='#FF453A', fg='rgba(255,255,255,0.85)',
-        sidebar_backdrop='#262626', thumb_bg='#2C2C2C',
+        sidebar_backdrop='#262626', thumb_bg='#2C2C2C', header_bg='#2B2B2B', header_backdrop='#262626',
         sep='rgba(255,255,255,0.10)', shade='rgba(0,0,0,0.35)', fill='rgba(255,255,255,0.08)', fill_hover='rgba(255,255,255,0.13)',
         fill_active='rgba(255,255,255,0.20)', sel_grey='rgba(255,255,255,0.12)',
         ctl_bg='rgba(255,255,255,0.14)', ctl_bg_hover='rgba(255,255,255,0.20)', ctl_bg_active='rgba(255,255,255,0.28)',
         ctl_ring='rgba(255,255,255,0.08)', ctl_shadow='rgba(0,0,0,0.30)',
         glass_bg='rgba(70,70,70,0.70)', glass_ring='rgba(255,255,255,0.12)', glass_shadow='rgba(0,0,0,0.40)',
-        field_bg='rgba(255,255,255,0.08)', check_bg='rgba(255,255,255,0.10)', check_ring='rgba(255,255,255,0.25)',
+        field_bg='rgba(255,255,255,0.08)', check_bg='rgba(255,255,255,0.10)', check_ring='rgba(255,255,255,0.25)', tab_sel='rgba(255,255,255,0.24)',
         track='rgba(255,255,255,0.16)', knob='#FFFFFF', knob_shadow='rgba(0,0,0,0.45)', menu_ring='rgba(255,255,255,0.14)'),
 }
 

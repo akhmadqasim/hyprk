@@ -3,7 +3,8 @@
 #   ./install.sh [--dark] [--prefix DIR] [--wallpaper FILE] [--avatar FILE]
 # Writes DIR/hypr/hyprlock.conf (default DIR = ${XDG_CONFIG_HOME:-~/.config}). An existing foreign file is saved once as hyprlock.conf.hyprk-backup.
 # Wallpaper: --wallpaper, else the path in hyprk's state/wallpaper.json (the desktop wallpaper), else TahoeLight (TahoeDark with --dark).
-# Avatar: --avatar, else ~/.face if present, else lockscreen/assets/avatar-default.png.
+# Avatar: --avatar, else ~/.face, else the AccountsService icon (/var/lib/AccountsService/icons/$USER), else a round initials avatar
+# drawn by scripts/initials-avatar.py (needs python3-pil), else lockscreen/assets/avatar-default.png.
 # The wallpaper is fixed at install time; use lockscreen/hyprk-lock.sh to lock with whatever the desktop wallpaper is right now.
 # Needs hyprlock >= 0.9 (apt hyprlock 0.9.2 reads this config; hyprk builds 0.9.7 into its dev prefix).
 set -e
@@ -11,7 +12,14 @@ HERE=$(cd "$(dirname "$0")" && pwd); . "$HERE/../themes/lib.sh"
 PREFIX=; WP=; AV=; DARK=0
 while [ $# -gt 0 ]; do case $1 in --prefix) PREFIX=$2; shift ;; --wallpaper) WP=$2; shift ;; --avatar) AV=$2; shift ;; --dark) DARK=1 ;; *) echo "unknown option $1" >&2; exit 2 ;; esac; shift; done
 ROOT=$(cd "$HERE/.." && pwd)
-[ -z "$AV" ] && { [ -f "$HOME/.face" ] && AV=$HOME/.face || AV=$HERE/assets/avatar-default.png; }
+if [ -z "$AV" ]; then
+  for c in "$HOME/.face" "/var/lib/AccountsService/icons/${USER:-$(id -un)}"; do [ -r "$c" ] && { AV=$c; break; }; done
+fi
+if [ -z "$AV" ]; then
+  AV=${XDG_CACHE_HOME:-$HOME/.cache}/hyprk/lock-avatar.png; mkdir -p "$(dirname "$AV")"
+  FULL=$(getent passwd "${USER:-$(id -un)}" | cut -d: -f5 | cut -d, -f1)
+  python3 "$HERE/scripts/initials-avatar.py" "${FULL:-$USER}" "$AV" 2>/dev/null || AV=$HERE/assets/avatar-default.png
+fi
 if [ -z "$WP" ]; then
   STATE=${HYPRK_STATE:-$ROOT/state}/wallpaper.json
   [ -f "$STATE" ] && WP=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1])).get("path",""))' "$STATE" 2>/dev/null)
