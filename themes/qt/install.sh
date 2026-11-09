@@ -13,20 +13,21 @@ BASE=$(hk_cfgbase "$PREFIX"); T=$BASE/qt6ct; N=MacOS27$([ $V = dark ] && echo Da
 mkdir -p "$T/colors" "$T/qss" "$T/macos27-assets"
 cp "$HERE/colors/macos27-$V.conf" "$T/colors/"
 cp "$HERE"/assets/*.svg "$T/macos27-assets/"
-sed "s|@ASSETS@|$T/macos27-assets|g" "$HERE/qss/macos27-$V.qss" > "$T/qss/macos27-$V.qss"
+sed "s|@ASSETS@|$(printf '%s' "$T/macos27-assets" | sed 's/[&|\\]/\\&/g')|g" "$HERE/qss/macos27-$V.qss" > "$T/qss/macos27-$V.qss"
 if [ $KVT = 1 ]; then
   mkdir -p "$BASE/Kvantum"; rm -rf "$BASE/Kvantum/$N"; cp -r "$HERE/kvantum/$N" "$BASE/Kvantum/"
   hk_backup "$BASE/Kvantum/kvantum.kvconfig"
-  printf '[General]\ntheme=%s\n' "$N" > "$BASE/Kvantum/kvantum.kvconfig"
+  printf '# hyprk-managed\n[General]\ntheme=%s\n' "$N" > "$BASE/Kvantum/kvantum.kvconfig"
 fi
 CONF=$T/qt6ct.conf
 if [ -f "$CONF" ] && [ $FORCE = 0 ]; then
-  echo "kept existing $CONF. In qt6ct pick: style Fusion, palette 'Custom' = $T/colors/macos27-$V.conf, stylesheet $T/qss/macos27-$V.qss (or rerun with --force)"
+  echo "kept existing $CONF (use --force to rewrite it). In qt6ct pick: palette 'Custom' = $T/colors/macos27-$V.conf and either style Fusion + stylesheet $T/qss/macos27-$V.qss, or (with --kvantum) style kvantum"
 else
   STYLE=Fusion; CUSTOMPAL=true; SHEET="stylesheets=$T/qss/macos27-$V.qss"
   [ $KVT = 1 ] && { STYLE=kvantum; CUSTOMPAL=false; SHEET=; }
   [ -f "$CONF" ] && cp -n "$CONF" "$CONF.hyprk-backup"
   cat > "$CONF" <<EOT
+# hyprk-managed
 [Appearance]
 color_scheme_path=$T/colors/macos27-$V.conf
 custom_palette=$CUSTOMPAL

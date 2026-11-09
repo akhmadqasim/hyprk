@@ -30,8 +30,9 @@ THEMES=$DATA/themes; GSV=$DATA/gtksourceview-5/styles
 
 if [ $UN = 1 ]; then
   rm -rf "$THEMES/MacOS27" "$THEMES/MacOS27-Dark" "$GSV"/macos27-light.xml "$GSV"/macos27-dark.xml
-  f=$CFG4/gtk.css
-  if grep -q "hyprk-managed" "$f" 2>/dev/null; then rm -f "$f"; [ -f "$f.hyprk-backup" ] && mv "$f.hyprk-backup" "$f"; fi
+  for f in "$CFG4/gtk.css" "$CFG4/settings.ini" "$CFG3/settings.ini"; do
+    if grep -q "hyprk-managed" "$f" 2>/dev/null; then rm -f "$f"; [ -f "$f.hyprk-backup" ] && mv "$f.hyprk-backup" "$f"; fi
+  done
   echo "removed"; exit 0
 fi
 
@@ -41,7 +42,7 @@ cp "$HERE"/gtksourceview/*.xml "$GSV/"   # Text Editor: gsettings set org.gnome.
 # GTK 4 / libadwaita apps ignore theme names; they read the user stylesheet (light + dark via prefers-color-scheme)
 hk_backup "$CFG4/gtk.css"; cp "$HERE/gtk-4.0/gtk.css" "$CFG4/gtk.css"
 for d in "$CFG3" "$CFG4"; do
-  if [ ! -f "$d/settings.ini" ]; then cp "$HERE/config/settings.ini" "$d/settings.ini"
+  if [ ! -f "$d/settings.ini" ] || grep -q hyprk-managed "$d/settings.ini"; then cp "$HERE/config/settings.ini" "$d/settings.ini"
   else echo "note: $d/settings.ini exists, merge $HERE/config/settings.ini by hand (gtk-decoration-layout=close,minimize,maximize:)"; fi
 done
 if [ $GS = 1 ] && [ -z "$PREFIX" ] && command -v gsettings >/dev/null; then

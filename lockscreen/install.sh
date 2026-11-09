@@ -12,6 +12,6 @@ while [ $# -gt 0 ]; do case $1 in --prefix) PREFIX=$2; shift ;; --wallpaper) WP=
 [ -z "$WP" ] && WP="$HERE/../themes/wallpapers/png/Sonoma Horizon.png"
 DST=$(hk_cfgbase "$PREFIX")/hypr/hyprlock.conf; mkdir -p "$(dirname "$DST")"
 hk_backup "$DST"
-# awk -v keeps '|', '&' and backslashes in the paths intact (sed would not)
-awk -v wp="$WP" -v av="$AV" '/^\$WALLPAPER = /{print "$WALLPAPER = " wp; next} /^\$AVATAR = /{print "$AVATAR = " av; next} {print}' "$HERE/hyprlock.conf" > "$DST"
+# ENVIRON (not awk -v) so backslashes, '|' and '&' in the paths stay literal; avoid '#' in paths, hyprlang reads it as a comment
+WP="$WP" AV="$AV" awk '/^\$WALLPAPER = /{print "$WALLPAPER = " ENVIRON["WP"]; next} /^\$AVATAR = /{print "$AVATAR = " ENVIRON["AV"]; next} {print}' "$HERE/hyprlock.conf" > "$DST"
 echo "wrote $DST"

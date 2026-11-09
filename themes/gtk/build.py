@@ -32,6 +32,7 @@ PALETTES = {
         fill_active='rgba(0,0,0,0.16)', sel_grey='rgba(0,0,0,0.09)',
         ctl_bg='#FFFFFF', ctl_bg_hover='#F4F4F4', ctl_bg_active='#E4E4E4', ctl_ring='rgba(0,0,0,0.13)', ctl_shadow='rgba(0,0,0,0.16)',
         glass_bg='rgba(255,255,255,0.86)', glass_ring='rgba(0,0,0,0.06)', glass_shadow='rgba(0,0,0,0.07)',
+        field_bg='#FFFFFF', check_bg='#FFFFFF', check_ring='rgba(0,0,0,0.30)',
         track='rgba(0,0,0,0.12)', knob='#FFFFFF', knob_shadow='rgba(0,0,0,0.30)', menu_ring='rgba(0,0,0,0.14)'),
     'dark': _gtk(
         SHARED['dark'],
@@ -42,6 +43,7 @@ PALETTES = {
         ctl_bg='rgba(255,255,255,0.14)', ctl_bg_hover='rgba(255,255,255,0.20)', ctl_bg_active='rgba(255,255,255,0.28)',
         ctl_ring='rgba(255,255,255,0.08)', ctl_shadow='rgba(0,0,0,0.30)',
         glass_bg='rgba(70,70,70,0.70)', glass_ring='rgba(255,255,255,0.12)', glass_shadow='rgba(0,0,0,0.40)',
+        field_bg='rgba(255,255,255,0.08)', check_bg='rgba(255,255,255,0.10)', check_ring='rgba(255,255,255,0.25)',
         track='rgba(255,255,255,0.16)', knob='#FFFFFF', knob_shadow='rgba(0,0,0,0.45)', menu_ring='rgba(255,255,255,0.14)'),
 }
 
