@@ -20,7 +20,7 @@
 .background:backdrop, window:backdrop { background-color: @mac_window_bg; color: alpha(@mac_fg, 0.6); }
 /* the compositor draws shadow and ring, so GTK draws none */
 window.csd, decoration, decoration:backdrop { border-radius: 16px; box-shadow: none; margin: 0; }
-window.csd.maximized, window.csd.fullscreen, window.csd.tiled, .maximized decoration, .fullscreen decoration, .tiled decoration { border-radius: 0; }
+window.ssd, window.solid-csd, window.ssd headerbar, window.csd.maximized, window.csd.fullscreen, window.csd.tiled, .maximized decoration, .fullscreen decoration, .tiled decoration { border-radius: 0; }
 .view, iconview, .view text, iconview text, textview text, textview { background-color: @mac_view_bg; color: @mac_fg; caret-color: @mac_accent_bg; }
 .view:backdrop, textview text:backdrop { background-color: @mac_view_bg; color: alpha(@mac_fg, 0.7); }
 .view:selected, .view:selected:focus, iconview:selected, textview text:selected, treeview.view:selected, row:selected, .view text:selected {

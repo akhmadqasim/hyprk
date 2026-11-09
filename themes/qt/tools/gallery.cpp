@@ -27,6 +27,7 @@
 #include <QScrollBar>
 #include <QTableWidget>
 #include <QHeaderView>
+#include <QDialogButtonBox>
 
 int main(int argc, char** argv) {
     QApplication a(argc, argv);
@@ -49,6 +50,7 @@ int main(int argc, char** argv) {
     auto* tree = new QTreeWidget; tree->setHeaderLabels({"Name", "Kind", "Size"}); for (auto n : {"Report.pdf","Budget.xlsx","Photos"}) { auto* it = new QTreeWidgetItem(tree, {n, "Document", "12 KB"}); } tree->setCurrentItem(tree->topLevelItem(1)); g->addWidget(tree);
     auto* te = new QTextEdit; te->setPlainText("Hello world\nQt text edit"); te->setMaximumHeight(60); g->addWidget(te);
     tabs->addTab(p, "General"); tabs->addTab(new QLabel("Second page"), "Advanced");
+    auto* bb = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Apply); g->addWidget(bb);
     w.statusBar()->showMessage("Ready");
     w.show();
     if (scene == "menu") QTimer::singleShot(1200, [&]{ fm->popup(w.mapToGlobal(QPoint(10, 30))); });

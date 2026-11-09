@@ -77,9 +77,9 @@ QMenu::indicator { width: 14px; height: 14px; }
 /* tabs */
 QTabWidget::pane { border: 1px solid #E3E3E3; border-radius: 10px; background-color: #FFFFFF; top: -1px; }
 QTabBar { background: transparent; qproperty-drawBase: 0; }
-QTabBar::tab { background-color: transparent; color: #262626; border-radius: 12px; padding: 3px 14px; margin: 3px 2px; min-height: 18px; }
-QTabBar::tab:selected { background-color: #FFFFFF; border: 1px solid #D2D2D2; }
-QTabBar::tab:hover:!selected { background-color: #F0F0F0; }
+QTabBar::tab { background-color: transparent; color: #808080; border: none; border-radius: 12px; padding: 3px 14px; margin: 3px 2px; min-height: 18px; }
+QTabBar::tab:selected { background-color: #E6E6E6; border: none; font-weight: 600; }
+QTabBar::tab:hover:!selected { background-color: #F0F0F0; color: #262626; }
 
 /* item views */
 QListView, QTreeView, QTableView, QListWidget, QTreeWidget, QTableWidget { background-color: #FFFFFF; alternate-background-color: #F7F7F7; border: 1px solid #E3E3E3; border-radius: 8px; outline: none; }
@@ -107,7 +107,8 @@ QGroupBox { background-color: #F5F5F5; border: none; border-radius: 12px; margin
 QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top left; left: 4px; color: #262626; font-weight: 600; background: transparent; }
 QStatusBar { background-color: #FFFFFF; color: #808080; }
 QSplitter::handle { background-color: #E3E3E3; width: 1px; height: 1px; }
-QDialogButtonBox QPushButton { min-width: 70px; }
+/* macOS dialogs have text-only buttons: hide the standard (emoji-like) button icons */
+QDialogButtonBox QPushButton { min-width: 70px; icon-size: 0px; qproperty-iconSize: 0px 0px; }
 QFrame[frameShape="4"], QFrame[frameShape="5"] { color: #E3E3E3; }
 QDockWidget { border: 1px solid #E3E3E3; }
 QCalendarWidget QToolButton { border-radius: 10px; }

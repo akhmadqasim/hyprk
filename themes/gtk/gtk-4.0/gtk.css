@@ -311,6 +311,9 @@ window.csd, window.csd.background {
   border-radius: 16px;
 }
 window.csd, window.csd:backdrop { box-shadow: none; }
+/* server-side decorated windows (the compositor / plugin draws the title bar and the outer rounding): the client must not
+ * round its own top corners under it, or title-bar coloured notches show at both corners */
+window.ssd, window.ssd.background, window.solid-csd, window.solid-csd.background, window.ssd headerbar, window.ssd > contents { border-radius: 0; box-shadow: none; }
 window.maximized, window.fullscreen, window.tiled, window.tiled-top, window.tiled-bottom, window.tiled-left, window.tiled-right {
   border-radius: 0; box-shadow: none;
 }
