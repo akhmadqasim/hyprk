@@ -1,7 +1,6 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
-import Quickshell.Widgets
 import qs
 import qs.components
 import qs.services

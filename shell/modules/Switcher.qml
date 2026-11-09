@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
-import Quickshell.Widgets
 import qs
 import qs.components
 import qs.services
@@ -95,7 +94,7 @@ ShellWindow {
                     Rectangle {
                         anchors.fill: parent
                         radius: Theme.switcher.selectionRadius
-                        color: Theme.color.switcherSelection
+                        color: Theme.switcher.selection
                         visible: c.index === sw.selected
                     }
                     AppIcon {

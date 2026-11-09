@@ -57,14 +57,14 @@ ShellWindow {
     Row {
         anchors.horizontalCenter: parent.horizontalCenter
         y: Theme.mission.spacesTop
-        spacing: Theme.mission.pillSpacing
+        spacing: Theme.mission.spaceSpacing
         Repeater {
             model: mc.spaces
             delegate: Column {
                 id: sp
                 required property var modelData
                 readonly property bool current: modelData === Hyprland.focusedWorkspace
-                spacing: 6
+                spacing: Theme.mission.spaceLabelGap
 
                 ClippingRectangle {
                     width: Theme.mission.spaceThumbWidth
@@ -77,8 +77,8 @@ ShellWindow {
                     Behavior on scale { NumberAnimation { duration: Theme.anim.fast } }
                     Image {
                         anchors.fill: parent
-                        source: Wallpaper.wallpaper ? "file://" + Wallpaper.wallpaper : ""
-                        sourceSize.width: Theme.mission.spaceThumbWidth * 2
+                        source: Wallpaper.url
+                        sourceSize.width: Wallpaper.thumbWidth
                         fillMode: Image.PreserveAspectCrop
                         asynchronous: true
                     }

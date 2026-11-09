@@ -28,7 +28,7 @@ ShellWindow {
     Image {
         z: -1
         anchors.fill: parent
-        source: Wallpaper.wallpaper ? "file://" + Wallpaper.wallpaper : ""
+        source: Wallpaper.url
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
         cache: false

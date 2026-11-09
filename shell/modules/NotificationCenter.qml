@@ -22,9 +22,9 @@ Item {
     property string photo: ""
     readonly property string photoTitle: photo ? photo.split("/").slice(-2, -1)[0] : "Featured Photo"
     Process {
-        // first picture in ~/Pictures (xdg dir), once per shell start
+        // first photo in ~/Pictures (xdg dir, screenshots skipped), once per shell start
         running: true
-        command: ["sh", "-c", 'd="$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures")"; find "$d" -maxdepth 2 -type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \\) 2>/dev/null | head -n1']
+        command: ["sh", "-c", 'd="$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures")"; find "$d" -maxdepth 2 -type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \\) -not -ipath "*screenshot*" 2>/dev/null | head -n1']
         stdout: StdioCollector { onStreamFinished: nc.photo = text.trim() }
     }
     property var groups: []
@@ -143,38 +143,42 @@ Item {
                 // month grid on the right half, today in a red circle (macOS medium Calendar widget)
                 Grid {
                     id: month
-                    readonly property date first: new Date(clock.date.getFullYear(), clock.date.getMonth(), 1)
-                    readonly property int lead: (first.getDay() + 6) % 7          // weeks start on Monday
-                    readonly property int days: new Date(clock.date.getFullYear(), clock.date.getMonth() + 1, 0).getDate()
+                    // ints change once a day/month, so the grid is not rebuilt by the seconds clock
+                    readonly property int year: clock.date.getFullYear()
+                    readonly property int mon: clock.date.getMonth()
+                    readonly property int today: clock.date.getDate()
+                    readonly property int lead: (new Date(year, mon, 1).getDay() + 6) % 7   // weeks start on Monday
+                    readonly property int days: new Date(year, mon + 1, 0).getDate()
+                    readonly property var dayNames: ["M", "T", "W", "T", "F", "S", "S"]
                     anchors.right: parent.right
                     anchors.rightMargin: Theme.nc.widgetPadding
                     anchors.verticalCenter: parent.verticalCenter
                     columns: 7
-                    columnSpacing: 2
-                    rowSpacing: 1
+                    columnSpacing: Theme.nc.monthGap
+                    rowSpacing: Theme.nc.monthGap / 2
                     Repeater {
-                        model: ["M", "T", "W", "T", "F", "S", "S"].concat(Array(month.lead).fill("")).concat(Array.from({ length: month.days }, (_, i) => String(i + 1)))
+                        model: 7 + month.lead + month.days
                         delegate: Item {
-                            required property var modelData
                             required property int index
-                            readonly property bool today: index >= 7 && modelData === String(clock.date.getDate())
+                            readonly property bool isHeader: index < 7
+                            readonly property int day: index - 7 - month.lead + 1
+                            readonly property bool isToday: day === month.today
                             width: Theme.nc.monthCell
                             height: Theme.nc.monthCell
                             Rectangle {
-                                anchors.centerIn: parent
-                                width: parent.width - 2
-                                height: width
+                                anchors.fill: parent
+                                anchors.margins: 1
                                 radius: width / 2
                                 color: Theme.color.red
-                                visible: parent.today
+                                visible: parent.isToday
                             }
                             Text {
                                 anchors.centerIn: parent
-                                text: parent.modelData
+                                text: parent.isHeader ? month.dayNames[parent.index] : parent.day > 0 ? parent.day : ""
                                 font.family: Theme.fontText
-                                font.pixelSize: Theme.font.widgetSmall - 1
-                                font.weight: parent.index < 7 ? Theme.font.semibold : Theme.font.regular
-                                color: parent.today ? "white" : parent.index < 7 ? Theme.color.secondaryLabel : Theme.color.label
+                                font.pixelSize: Theme.font.widgetMonth
+                                font.weight: parent.isHeader ? Theme.font.semibold : Theme.font.regular
+                                color: parent.isToday ? Theme.nc.onImage : parent.isHeader ? Theme.color.secondaryLabel : Theme.color.label
                             }
                         }
                     }
@@ -221,8 +225,8 @@ Item {
                     color: "transparent"
                     Image {
                         anchors.fill: parent
-                        source: nc.photo ? "file://" + nc.photo : (Wallpaper.wallpaper ? "file://" + Wallpaper.wallpaper : "")
-                        sourceSize.width: Theme.nc.width * 2
+                        source: nc.photo ? "file://" + nc.photo : Wallpaper.url
+                        sourceSize.width: Wallpaper.thumbWidth * 2
                         fillMode: Image.PreserveAspectCrop
                         asynchronous: true
                     }
@@ -230,7 +234,7 @@ Item {
                         anchors.fill: parent
                         gradient: Gradient {
                             GradientStop { position: 0.55; color: "transparent" }
-                            GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.45) }
+                            GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, Theme.nc.photoScrim) }
                         }
                     }
                 }
@@ -241,16 +245,16 @@ Item {
                     Text {
                         text: nc.photoTitle
                         font.family: Theme.fontDisplay
-                        font.pixelSize: Theme.font.widgetBig * 0.7
+                        font.pixelSize: Theme.font.widgetPhotoTitle
                         font.weight: Theme.font.bold
-                        color: "white"
+                        color: Theme.nc.onImage
                     }
                     Text {
                         text: Qt.formatDate(clock.date, "MMM d, yyyy").toUpperCase()
                         font.family: Theme.fontText
                         font.pixelSize: Theme.font.widgetSmall
                         font.weight: Theme.font.semibold
-                        color: Qt.rgba(1, 1, 1, 0.85)
+                        color: Theme.nc.onImageSecondary
                     }
                 }
             }

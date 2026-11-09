@@ -137,18 +137,21 @@ Singleton {
     readonly property string iconDir: Quickshell.shellDir + "/../themes/icons"
     readonly property string genericIcon: "file://" + iconDir + "/system/GenericApplicationIcon-512.png"
 
-    // Absolute icon url: macOS icon when mapped, else the icon theme, else the generic app icon.
-    // true when the icon is one of the extracted macOS icons (already a squircle)
-    function isMacIcon(name, appId) {
-        return [appId, name].some(k => !!macIcons[Search.normId(k).split(".").pop()]);
-    }
-
-    function iconUrl(name, appId) {
+    // mapped macOS icon name for an app, "" when there is none
+    function macIconFor(name, appId) {
         for (const k of [appId, name]) {
-            const key = Search.normId(k).split(".").pop();
-            const mac = macIcons[key];
-            if (mac) return "file://" + iconDir + (mac[0] === "@" ? "/system/" + mac.slice(1) : "/apps/" + mac) + "-512.png";
+            const mac = macIcons[Search.normId(k).split(".").pop()];
+            if (mac) return mac;
         }
+        return "";
+    }
+    // true when the icon is one of the extracted macOS icons (already a squircle)
+    function isMacIcon(name, appId) { return macIconFor(name, appId) !== ""; }
+
+    // Absolute icon url: macOS icon when mapped, else the icon theme, else the generic app icon.
+    function iconUrl(name, appId) {
+        const mac = macIconFor(name, appId);
+        if (mac) return "file://" + iconDir + (mac[0] === "@" ? "/system/" + mac.slice(1) : "/apps/" + mac) + "-512.png";
         if (!name) return genericIcon;
         if (name.startsWith("/")) return "file://" + name;
         const themed = Quickshell.iconPath(name, true);

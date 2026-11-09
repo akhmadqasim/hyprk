@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
-import Quickshell.Widgets
 import qs
 import qs.components
 import qs.services
@@ -171,13 +170,13 @@ ShellWindow {
                     readonly property bool sel: index === sp.selected
                     width: list.width
                     height: header ? Theme.spotlight.headerHeight
-                          : modelData.kind === "calc" ? Theme.spotlight.rowHeight * 1.3 : Theme.spotlight.rowHeight
+                          : modelData.kind === "calc" ? Theme.spotlight.rowHeight * Theme.spotlight.calcRowScale : Theme.spotlight.rowHeight
 
                     Text {
                         visible: r.header
                         x: Theme.spotlight.rowInset
                         anchors.bottom: parent.bottom
-                        anchors.bottomMargin: 3
+                        anchors.bottomMargin: Theme.spotlight.headerBaseline
                         text: r.modelData.title
                         font.family: Theme.fontText
                         font.pixelSize: Theme.font.spotlightHeader
@@ -190,7 +189,7 @@ ShellWindow {
                         visible: r.sel && !r.header
                         anchors.fill: parent
                         radius: Theme.spotlight.rowRadius
-                        color: Theme.color.spotlightSelection
+                        color: Theme.spotlight.selection
                     }
                     Item {
                         id: ic
@@ -208,18 +207,18 @@ ShellWindow {
                         }
                         Symbol {
                             anchors.centerIn: parent
-                            visible: r.modelData.kind === "calc" || r.modelData.kind === "files"
+                            visible: r.modelData.kind !== "app"
                             name: r.modelData.kind === "calc" ? "equal" : "folder"
-                            size: parent.width * 0.7
+                            size: parent.width * Theme.appIcon.inner
                             color: Theme.color.secondaryLabel
                         }
                     }
                     Column {
                         visible: !r.header
                         anchors.left: ic.right
-                        anchors.leftMargin: 12
+                        anchors.leftMargin: Theme.spotlight.textGap
                         anchors.right: parent.right
-                        anchors.rightMargin: 12
+                        anchors.rightMargin: Theme.spotlight.textGap
                         anchors.verticalCenter: parent.verticalCenter
                         Text {
                             width: parent.width

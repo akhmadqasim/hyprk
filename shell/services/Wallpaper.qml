@@ -14,6 +14,9 @@ Singleton {
     property string wallpaper: ""
     property string blurred: ""
     property real topLuma: 0.3                  // brightness behind the menu bar
+    readonly property string url: wallpaper ? "file://" + wallpaper : ""
+    readonly property string blurredUrl: blurred ? "file://" + blurred : ""
+    readonly property int thumbWidth: 320       // one decode size shared by all wallpaper thumbnails
     property int width: Panels.screen ? Panels.screen.width : 1920
     property int height: Panels.screen ? Panels.screen.height : 1080
 

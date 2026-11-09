@@ -81,6 +81,8 @@ Singleton {
         readonly property real dockTooltip: 13      // TODO verify
         readonly property real widgetBig: 34        // TODO verify
         readonly property real widgetSmall: 11      // TODO verify
+        readonly property real widgetMonth: 10      // mini month digits
+        readonly property real widgetPhotoTitle: 24 // Photos widget caption
 
         readonly property int regular: Font.Normal
         readonly property int medium: Font.Medium
@@ -113,8 +115,6 @@ Singleton {
 
         readonly property color dockDot: theme.dark ? Qt.rgba(1, 1, 1, 0.65) : Qt.rgba(0, 0, 0, 0.55)
         readonly property color tooltipBg: theme.dark ? Qt.rgba(0.16, 0.16, 0.17, 0.92) : Qt.rgba(0.95, 0.95, 0.96, 0.92)
-        readonly property color spotlightSelection: theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0.45, 0.45, 0.47, 0.22)
-        readonly property color switcherSelection: theme.dark ? Qt.rgba(1, 1, 1, 0.18) : Qt.rgba(0, 0, 0, 0.12)
         readonly property real disabledOpacity: 0.4      // unavailable CC tiles, TODO verify
     }
 
@@ -223,6 +223,10 @@ Singleton {
         readonly property int widgetSmall: (width - spacing) / 2
         readonly property int widgetPadding: 16
         readonly property int monthCell: 17              // mini month in the Calendar widget
+        readonly property int monthGap: 2
+        readonly property color onImage: "#FFFFFF"       // text over the Photos widget
+        readonly property color onImageSecondary: Qt.rgba(1, 1, 1, 0.85)
+        readonly property real photoScrim: 0.45          // bottom gradient behind the caption
         readonly property real photoAspect: 0.48         // Photos widget height / width, measured
         readonly property color calendarBg: theme.dark ? Qt.rgba(0.17, 0.17, 0.18, 0.92) : Qt.rgba(1, 1, 1, 0.94)
         readonly property color clockBg: "#1C1C1E"
@@ -282,6 +286,10 @@ Singleton {
         readonly property int rowInset: 10               // icon/header inset inside a row
         readonly property int headerHeight: 24           // section header row
         readonly property int maxApps: 5
+        readonly property color selection: theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0.45, 0.45, 0.47, 0.22)
+        readonly property real calcRowScale: 1.3         // calculator row height / rowHeight
+        readonly property int headerBaseline: 3
+        readonly property int textGap: 12
         readonly property int hPadding: 20               // SPEC.md 7: content inset 20
         readonly property int listInset: 8               // rows inset from panel edge, TODO verify
     }
@@ -296,6 +304,7 @@ Singleton {
         readonly property int selectionRadius: 24        // TODO verify
         readonly property int labelHeight: 24            // selected app name row, TODO verify
         readonly property real maxWidthFraction: 0.92    // of the screen
+        readonly property color selection: theme.dark ? Qt.rgba(1, 1, 1, 0.18) : Qt.rgba(0, 0, 0, 0.12)
     }
 
     // ---------- launchpad / apps ----------
@@ -311,6 +320,8 @@ Singleton {
         readonly property int padding: 18                // measured
         readonly property int headerGlyph: 18
         readonly property int gridTop: 12                // separator to first row
+        readonly property int gridBottom: 28             // room for the page dots
+        readonly property int headerGap: 10
     }
 
     // ---------- app icons ----------
@@ -349,7 +360,8 @@ Singleton {
         readonly property int gap: 40                    // between window thumbnails, TODO verify
         readonly property int thumbRadius: 10            // TODO verify
         readonly property real maxScale: 0.8             // windows only shrink in Mission Control, TODO verify
-        readonly property int pillSpacing: 18            // between Space thumbnails
+        readonly property int spaceSpacing: 18           // between Space thumbnails
+        readonly property int spaceLabelGap: 6
         readonly property int titleReserve: 28           // room under a thumbnail for its title chip
         readonly property int placeholderIcon: 64
         readonly property int hoverBorder: 3
