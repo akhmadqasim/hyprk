@@ -21,6 +21,8 @@ QImage fromFreedesktopCache(const QString &hash)
 {
     for (const char *size : {"x-large", "large", "normal"}) {
         const QString p = cacheRoot() + QStringLiteral("/thumbnails/") + QLatin1String(size) + QLatin1Char('/') + hash + QStringLiteral(".png");
+        if (!QFileInfo::exists(p))
+            continue;
         QImage img(p);
         if (!img.isNull())
             return img;
@@ -31,7 +33,8 @@ QImage fromFreedesktopCache(const QString &hash)
 QImage generate(const QString &path)
 {
     static const QMimeDatabase db;
-    const QString mime = db.mimeTypeForFile(path).name();
+    // by extension, the same way FileOps decides which files get a thumbnail
+    const QString mime = db.mimeTypeForFile(path, QMimeDatabase::MatchExtension).name();
     if (mime == QLatin1String("application/pdf")) {
         QTemporaryDir tmp;
         if (!tmp.isValid())
@@ -98,12 +101,11 @@ QImage ThumbnailProvider::thumbnail(const QString &path, int side)
 
     QImage img = fromFreedesktopCache(hash);
     if (img.isNull()) {
-        // own cache: invalidated by the file's mtime being part of the key
-        const QString key = QString::fromLatin1(QCryptographicHash::hash(uri + QByteArray::number(fi.lastModified().toMSecsSinceEpoch()),
-                                                                          QCryptographicHash::Md5).toHex());
+        // own cache; the mtime in the name invalidates it when the file changes
         const QString dir = cacheRoot() + QStringLiteral("/hyprk-finder/thumbnails");
-        const QString file = dir + QLatin1Char('/') + key + QStringLiteral(".png");
-        img = QImage(file);
+        const QString file = QStringLiteral("%1/%2-%3.png").arg(dir, hash).arg(fi.lastModified().toMSecsSinceEpoch());
+        if (QFileInfo::exists(file))
+            img = QImage(file);
         if (img.isNull()) {
             img = generate(fi.absoluteFilePath());
             if (!img.isNull() && QDir().mkpath(dir))

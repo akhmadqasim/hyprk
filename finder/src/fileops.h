@@ -3,6 +3,7 @@
 #include <QFileSystemWatcher>
 #include <QJsonObject>
 #include <QMimeDatabase>
+#include <QMutex>
 #include <QObject>
 #include <QVariantList>
 
@@ -57,5 +58,8 @@ private:
     QJsonObject tagIndex() const;
     void saveTagIndex(const QJsonObject &index) const;
     QFileSystemWatcher m_watcher;
+    mutable QMutex m_tagMutex;
+    mutable QJsonObject m_tagIndex;
+    mutable bool m_tagIndexLoaded = false;
     QMimeDatabase m_mime;
 };

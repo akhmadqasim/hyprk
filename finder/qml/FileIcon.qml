@@ -22,6 +22,9 @@ Item {
                                     : kind === "app" ? "GenericApplicationIcon"
                                     : "GenericDocumentIcon"
 
+    // decode at a power of two (>= 2x) so zoom steps reuse cached images and thumbnails
+    readonly property int px: Math.pow(2, Math.ceil(Math.log2(Math.max(16, size * 2))))
+
     width: size
     height: size
 
@@ -50,7 +53,7 @@ Item {
             fillMode: Image.PreserveAspectFit
             asynchronous: true
             source: root.showThumb ? "image://thumb/" + encodeURIComponent(root.entry.path) : ""
-            sourceSize: Qt.size(Math.ceil(root.size * 2), Math.ceil(root.size * 2))
+            sourceSize: Qt.size(root.px, root.px)
             onStatusChanged: if (status === Image.Error) root.thumbFailed = true
         }
         Rectangle {   // hairline frame
@@ -69,15 +72,15 @@ Item {
         anchors.margins: root.size * 0.06
         asynchronous: true
         source: root.kind === "app" && root.entry.icon ? "image://icon/" + root.entry.icon : ""
-        sourceSize: Qt.size(Math.ceil(root.size * 2), Math.ceil(root.size * 2))
+        sourceSize: Qt.size(root.px, root.px)
     }
 
     Image {
         id: plain
         visible: !thumbBox.visible && !appIcon.visible
         anchors.fill: parent
-        sourceSize: Qt.size(Math.ceil(root.size * 2), Math.ceil(root.size * 2))
-        source: Theme.sysIcon(root.sysName, root.size * 2)
+        sourceSize: Qt.size(root.px, root.px)
+        source: Theme.sysIcon(root.sysName, root.px)
              || (root.kind === "folder"
                  ? Icons.folder(Theme.color.folderBack.toString(), Theme.color.folderFront.toString(), Theme.color.folderTop.toString())
                  : Icons.document(Theme.dark))

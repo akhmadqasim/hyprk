@@ -248,7 +248,7 @@ Window {
         const items = entry ? [
             { text: "Open", action: () => fm.openSelection() },
             { separator: true },
-            { text: "Move to Trash", shortcut: "Del", enabled: n > 0 && fm.canTrash, action: () => fm.trashSelection() },
+            { text: "Move to Trash", shortcut: "Del", enabled: n > 0 && fm.userFiles, action: () => fm.trashSelection() },
             { separator: true },
             { tagRow: true, action: tag => fm.toggleTag(tag) },
             { separator: true },
@@ -278,7 +278,7 @@ Window {
     readonly property var moreMenu: [
         { text: "New Folder", shortcut: "⇧⌃N", enabled: !fm.isVirtual, action: () => fm.newFolder() },
         { text: "Rename", enabled: fm.selectedCount === 1 && !fm.isVirtual, action: () => win.startRename() },
-        { text: "Move to Trash", enabled: fm.selectedCount > 0 && fm.canTrash, action: () => fm.trashSelection() },
+        { text: "Move to Trash", enabled: fm.selectedCount > 0 && fm.userFiles, action: () => fm.trashSelection() },
         { separator: true },
         { text: win.showPathBar ? "Hide Path Bar" : "Show Path Bar", shortcut: "⌥⌃P", action: () => win.showPathBar = !win.showPathBar },
         { text: fm.showHidden ? "Hide Hidden Files" : "Show Hidden Files", shortcut: "⇧⌃.", action: () => fm.showHidden = !fm.showHidden },

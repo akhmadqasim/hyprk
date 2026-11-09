@@ -6,6 +6,7 @@
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QMutexLocker>
 #include <QPointer>
 #include <QSaveFile>
 #include <QThreadPool>
@@ -276,16 +277,27 @@ QString tagIndexPath()
 }
 } // namespace
 
+// The index is read once and then served from memory (QJsonObject copies are shared).
+// Locked because listAsync reads tags on worker threads.
 QJsonObject FileOps::tagIndex() const
 {
-    QFile f(tagIndexPath());
-    if (!f.open(QIODevice::ReadOnly))
-        return {};
-    return QJsonDocument::fromJson(f.readAll()).object();
+    QMutexLocker lock(&m_tagMutex);
+    if (!m_tagIndexLoaded) {
+        QFile f(tagIndexPath());
+        if (f.open(QIODevice::ReadOnly))
+            m_tagIndex = QJsonDocument::fromJson(f.readAll()).object();
+        m_tagIndexLoaded = true;
+    }
+    return m_tagIndex;
 }
 
 void FileOps::saveTagIndex(const QJsonObject &index) const
 {
+    {
+        QMutexLocker lock(&m_tagMutex);
+        m_tagIndex = index;
+        m_tagIndexLoaded = true;
+    }
     QDir().mkpath(QFileInfo(tagIndexPath()).path());
     QSaveFile f(tagIndexPath());
     if (f.open(QIODevice::WriteOnly)) {
@@ -320,8 +332,7 @@ QString FileOps::setTags(const QString &path, const QStringList &tags)
     else
         index.insert(path, QJsonArray::fromStringList(tags));
     saveTagIndex(index);
-    emit directoryChanged(QFileInfo(path).path());   // xattr changes don't trigger the watcher
-    return {};
+    return {};   // xattr changes don't fire the watcher; the caller reloads
 }
 
 QVariantList FileOps::tagged(const QString &tag) const

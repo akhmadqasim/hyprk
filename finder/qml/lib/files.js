@@ -185,11 +185,11 @@ function escapeHtml(s) {
 }
 
 // Name as StyledText with Finder's colored tag dots in front ("● ● name").
-// colors: tag name -> CSS color; unknown tags use gray.
+// colors: tag name -> CSS color; unknown tags use colors.Gray.
 function styledName(entry, colors) {
     let dots = "";
     for (const t of entry.tags || [])
-        dots += '<font color="' + (colors[t] || "#8E8E93") + '">\u25CF</font>';
+        dots += '<font color="' + (colors[t] || colors.Gray) + '">\u25CF</font>';
     return (dots ? dots + " " : "") + escapeHtml(entry.name);
 }
 

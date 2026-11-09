@@ -116,7 +116,7 @@ Item {
         ToolButton {
             id: tagButton
             icon: "tag"
-            enabled: root.browser.selectedCount > 0 && root.browser.canTrash
+            enabled: root.browser.selectedCount > 0 && root.browser.userFiles
             onClicked: root.tagRequested(tagButton)
         }
         ToolButton {
