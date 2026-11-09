@@ -140,7 +140,7 @@
   --shade-color: rgba(0,0,0,0.35);
   --scrollbar-outline-color: transparent;
   --border-opacity: 12%; --dim-opacity: 55%; --disabled-opacity: 40%;
-  --window-radius: 26px;
+  --window-radius: 16px;
 }
 
 /* ---------------------------------------------------------------------------------------------
@@ -158,23 +158,18 @@ headerbar .title, windowtitle .title { font-weight: 600; font-size: 13px; paddin
 headerbar .subtitle, windowtitle .subtitle { font-size: 11px; opacity: 0.55; }
 
 /* ---------------------------------------------------------------------------------------------
- * Windows: 26px continuous-corner look, big soft shadow, 1px hairline ring (macOS draws one)
+ * Windows: 16px corners, shadow left to the compositor
  * ------------------------------------------------------------------------------------------- */
+/* 16px = titled window radius from SPEC.md section 7 (and what Hyprland's decoration:rounding clips to), 26px for alerts.
+ * The shadow and 1px ring come from the compositor (decoration:shadow, general:border_size), so GTK draws none. */
 window.csd, window.csd.background {
-  border-radius: 26px;
+  border-radius: 16px;
 }
-window.csd {
-  box-shadow: 0 0 0 1px alpha(@mac_fg, 0.14), 0 14px 38px 2px alpha(black, 0.20), 0 4px 10px 0 alpha(black, 0.16);
-}
-window.csd:backdrop {
-  box-shadow: 0 0 0 1px alpha(@mac_fg, 0.10), 0 8px 24px 0 alpha(black, 0.12), 0 2px 6px 0 alpha(black, 0.10);
-}
+window.csd, window.csd:backdrop { box-shadow: none; }
 window.maximized, window.fullscreen, window.tiled, window.tiled-top, window.tiled-bottom, window.tiled-left, window.tiled-right {
   border-radius: 0; box-shadow: none;
 }
-window.dialog.message.csd, window.messagedialog.csd, dialog-host > dialog, window.dialog.csd {
-  border-radius: 26px;
-}
+window.dialog.message.csd, window.messagedialog.csd { border-radius: 26px; }
 .background { background-color: var(--window-bg-color); color: var(--window-fg-color); }
 
 /* ---------------------------------------------------------------------------------------------
@@ -188,7 +183,7 @@ headerbar {
 }
 headerbar:backdrop { background-color: @mac_header_backdrop; }
 headerbar:backdrop > windowhandle { filter: none; }
-headerbar > windowhandle > box { padding: 8px 14px 8px 14px; }
+headerbar > windowhandle > box { padding: 8px 16px 8px 16px; }
 headerbar > windowhandle > box > box.start, headerbar > windowhandle > box > box.end { border-spacing: 10px; }
 headerbar.default-decoration { min-height: 44px; }
 headerbar.default-decoration > windowhandle > box { padding: 4px 12px; }
@@ -206,7 +201,7 @@ toolbarview > .bottom-bar.raised { box-shadow: 0 -1px 0 0 @mac_sep; }
  * Traffic lights (left side; set gtk-decoration-layout=close,minimize,maximize: in settings.ini)
  * ------------------------------------------------------------------------------------------- */
 /* :not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card):not(.opaque):not(.pill):not(.sidebar-button) expands (build.py) to the :not() chain that out-ranks the generic capsule button rules below */
-windowcontrols { border-spacing: 8px; margin: 0 8px 0 0; }
+windowcontrols { border-spacing: 9px; margin: 0 9px 0 4px; }
 windowcontrols > button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card):not(.opaque):not(.pill):not(.sidebar-button) {
   min-width: 14px; min-height: 14px; padding: 0; margin: 0;
   background: none; box-shadow: none; border: none; outline: none;
@@ -414,7 +409,7 @@ popover > contents, popover.background > contents {
 }
 popover > arrow { background: none; box-shadow: none; border: none; min-width: 0; min-height: 0; }
 popover modelbutton, popover.menu modelbutton {
-  min-height: 26px; padding: 0 10px; border-radius: 8px; color: @mac_fg;
+  min-height: 24px; padding: 0 10px; border-radius: 8px; color: @mac_fg;
 }
 popover modelbutton:hover, popover modelbutton:focus, popover.menu modelbutton:hover, popover.menu modelbutton:active {
   background-color: @mac_accent_bg; color: @mac_accent_fg;
@@ -479,7 +474,7 @@ selection:focus-within, label > selection { background-color: alpha(@mac_accent_
 .sidebar-pane:backdrop, .sidebar-pane:backdrop > *, .navigation-sidebar:backdrop { background-color: @mac_sidebar_backdrop; }
 .navigation-sidebar, list.navigation-sidebar { padding: 4px 10px; }
 .navigation-sidebar > row, .navigation-sidebar > row.activatable, placessidebar row, list.sidebar row {
-  min-height: 28px; margin: 1px 0; padding: 0 8px; border-radius: 10px; color: @mac_fg;
+  min-height: 32px; margin: 1px 0; padding: 0 8px; border-radius: 10px; color: @mac_fg;
 }
 .navigation-sidebar > row image, placessidebar row image, list.sidebar row image { opacity: 1; color: @mac_accent_bg; }
 .navigation-sidebar > row:hover, placessidebar row:hover { background-color: alpha(@mac_fg, 0.05); }
@@ -531,7 +526,7 @@ toggle-group > toggle.checked, toggle-group toggle:checked { background-color: @
 /* ---------------------------------------------------------------------------------------------
  * Dialogs, alerts, toasts, banners, search bars, drop-downs
  * ------------------------------------------------------------------------------------------- */
-dialog-host > dialog.alert > sheet, dialog-host > dialog.floating > sheet, window.dialog.alert.csd, window.messagedialog {
+dialog-host > dialog.alert > sheet, dialog-host > dialog.floating > sheet, window.dialog.alert.csd, window.messagedialog.csd {
   background-color: @mac_dialog_bg; color: @mac_fg; border-radius: 26px;
   box-shadow: 0 0 0 1px @mac_menu_ring, 0 18px 48px 0 alpha(black, 0.30);
 }

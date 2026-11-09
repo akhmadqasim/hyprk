@@ -79,7 +79,7 @@ def palette(p, root=True):
         for k, v in adw.items():
             out.append(f'  --{k.replace("_", "-")}: {v};')
         out.append('  --border-opacity: 12%; --dim-opacity: 55%; --disabled-opacity: 40%;')
-        out.append('  --window-radius: 26px;')
+        out.append('  --window-radius: 16px;')
         out.append('}')
     return '\n'.join(out) + '\n'
 

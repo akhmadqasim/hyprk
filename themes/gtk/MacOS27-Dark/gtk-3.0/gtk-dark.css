@@ -112,10 +112,10 @@
 
 .background, window, dialog, messagedialog { background-color: @mac_window_bg; color: @mac_fg; }
 .background:backdrop, window:backdrop { background-color: @mac_window_bg; color: alpha(@mac_fg, 0.6); }
-window.csd { border-radius: 26px; box-shadow: 0 0 0 1px alpha(@mac_fg, 0.14), 0 14px 38px 2px alpha(black, 0.20), 0 4px 10px 0 alpha(black, 0.16); margin: 0; }
+window.csd { border-radius: 16px; box-shadow: none; margin: 0; }
 window.csd.maximized, window.csd.fullscreen, window.csd.tiled { border-radius: 0; box-shadow: none; }
-decoration { border-radius: 26px; box-shadow: 0 0 0 1px alpha(@mac_fg, 0.14), 0 14px 38px 2px alpha(black, 0.20), 0 4px 10px 0 alpha(black, 0.16); margin: 14px; }
-decoration:backdrop { box-shadow: 0 0 0 1px alpha(@mac_fg, 0.10), 0 8px 24px 0 alpha(black, 0.12); }
+decoration { border-radius: 16px; box-shadow: none; margin: 0; }
+decoration:backdrop { box-shadow: none; }
 .maximized decoration, .fullscreen decoration, .tiled decoration { border-radius: 0; box-shadow: none; margin: 0; }
 .view, iconview, .view text, iconview text, textview text, textview { background-color: @mac_view_bg; color: @mac_fg; caret-color: @mac_accent_bg; }
 .view:backdrop, textview text:backdrop { background-color: @mac_view_bg; color: alpha(@mac_fg, 0.7); }
@@ -127,14 +127,14 @@ separator, .sidebar separator { background-color: @mac_sep; min-height: 1px; min
 .dim-label { opacity: 0.55; }
 
 /* header bar / title bar: 52px, flush, traffic lights on the left (gtk-decoration-layout=close,minimize,maximize:) */
-headerbar, .titlebar { min-height: 52px; padding: 0 14px; background-color: @mac_header_bg; background-image: none; border: none; box-shadow: none; color: @mac_fg; border-radius: 26px 26px 0 0; }
+headerbar, .titlebar { min-height: 52px; padding: 0 14px; background-color: @mac_header_bg; background-image: none; border: none; box-shadow: none; color: @mac_fg; border-radius: 16px 16px 0 0; }
 headerbar:backdrop, .titlebar:backdrop { background-color: @mac_header_backdrop; color: alpha(@mac_fg, 0.6); }
 headerbar .title, .titlebar .title { font-weight: 600; font-size: 13px; }
 headerbar .subtitle { font-size: 11px; opacity: 0.55; }
 .maximized headerbar, .tiled headerbar, .fullscreen headerbar { border-radius: 0; }
 
 headerbar button.titlebutton:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar button.titlebutton:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):hover, headerbar button.titlebutton:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):active, headerbar button.titlebutton:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):backdrop {
-  min-width: 14px; min-height: 14px; padding: 0; margin: 0 0 0 8px; border: none; border-radius: 999px; box-shadow: inset 0 0 0 1px alpha(black, 0.18);
+  min-width: 14px; min-height: 14px; padding: 0; margin: 0 0 0 9px; border: none; border-radius: 999px; box-shadow: inset 0 0 0 1px alpha(black, 0.18);
   background-image: none; background-color: @mac_tl_off; color: transparent; -gtk-icon-source: none;
 }
 headerbar button.titlebutton:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):first-child { margin-left: 0; }
@@ -211,7 +211,7 @@ menu, .menu, .popup, .context-menu, popover.background, popover {
 }
 menu, .menu { padding: 6px; }
 popover { padding: 6px; margin: 8px; }
-menuitem, modelbutton { min-height: 26px; padding: 0 10px; border-radius: 8px; color: @mac_fg; }
+menuitem, modelbutton { min-height: 24px; padding: 0 10px; border-radius: 8px; color: @mac_fg; }
 menuitem:hover, modelbutton:hover, modelbutton:focus { background-color: @mac_accent_bg; color: @mac_accent_fg; }
 menuitem:disabled, modelbutton:disabled { opacity: 0.4; }
 menuitem:hover:disabled { background: none; color: @mac_fg; }
@@ -221,7 +221,7 @@ tooltip, tooltip.background { border-radius: 8px; background-color: @mac_popover
 /* sidebars and lists */
 .sidebar, placessidebar, placessidebar .sidebar, stacksidebar, .sidebar .view, placessidebar list { background-color: @mac_sidebar_bg; color: @mac_fg; border: none; }
 .sidebar:backdrop, placessidebar:backdrop { background-color: @mac_sidebar_backdrop; }
-.sidebar row, placessidebar row { min-height: 28px; margin: 1px 8px; padding: 0 8px; border-radius: 10px; }
+.sidebar row, placessidebar row { min-height: 32px; margin: 1px 8px; padding: 0 8px; border-radius: 10px; }
 .sidebar row:selected, placessidebar row:selected, stacksidebar row:selected { background-color: @mac_sel_grey; color: @mac_fg; }
 .sidebar row:selected:hover { background-color: @mac_sel_grey; }
 .sidebar row:hover:not(:selected) { background-color: alpha(@mac_fg, 0.05); }
