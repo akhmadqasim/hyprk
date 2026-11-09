@@ -1,0 +1,3 @@
+wlp2s0:wifi:connected:Home\:5G
+enp5s0:ethernet:unavailable:
+lo:loopback:connected (externally):lo

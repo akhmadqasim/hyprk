@@ -1,0 +1,4 @@
+enp5s0:ethernet:connected:netplan-enp5s0
+docker0:bridge:connected (externally):docker0
+lo:loopback:connected (externally):lo
+veth9a282f2:ethernet:unmanaged:

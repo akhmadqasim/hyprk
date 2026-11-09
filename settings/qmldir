@@ -1,0 +1,4 @@
+singleton Theme 1.0 Theme.qml
+singleton Backend 1.0 Backend.qml
+singleton AppState 1.0 AppState.qml
+SettingsApp 1.0 SettingsApp.qml

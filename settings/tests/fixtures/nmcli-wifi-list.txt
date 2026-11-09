@@ -1,0 +1,5 @@
+*:Home\:5G:82:WPA2
+ :Cafe Free:54:
+ :Office:40:WPA1 WPA2
+ :Home\:5G:30:WPA2
+ :::

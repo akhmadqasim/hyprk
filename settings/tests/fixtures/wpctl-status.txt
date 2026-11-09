@@ -1,0 +1,49 @@
+PipeWire 'pipewire-0' [1.6.2, akhmadqasim@gigabyte-h410m, cookie:2563927034]
+ └─ Clients:
+        33. WirePlumber                         [1.6.2, akhmadqasim@gigabyte-h410m, pid:4328]
+        36. pipewire                            [1.6.2, akhmadqasim@gigabyte-h410m, pid:4342]
+        40. WirePlumber [export]                [1.6.2, akhmadqasim@gigabyte-h410m, pid:4328]
+        64. GNOME Volume Control Media Keys     [1.6.2, akhmadqasim@gigabyte-h410m, pid:4964]
+        65. gnome-shell                         [1.6.2, akhmadqasim@gigabyte-h410m, pid:4769]
+        66. GNOME Shell Volume Control          [1.6.2, akhmadqasim@gigabyte-h410m, pid:4769]
+        67. xdg-desktop-portal                  [1.6.2, akhmadqasim@gigabyte-h410m, pid:5191]
+        68. Brave input                         [1.6.2, akhmadqasim@gigabyte-h410m, pid:87986]
+        70. wpctl                               [1.6.2, akhmadqasim@gigabyte-h410m, pid:524477]
+        75. WEBRTC VoiceEngine                  [1.6.2, akhmadqasim@gigabyte-h410m, pid:89253]
+        76. WEBRTC VoiceEngine                  [1.6.2, akhmadqasim@gigabyte-h410m, pid:89253]
+        77. discord_hardware_mute               [1.6.2, akhmadqasim@gigabyte-h410m, pid:89253]
+        78. discord                             [1.6.2, akhmadqasim@gigabyte-h410m, pid:89382]
+        79. Mutter                              [1.6.2, akhmadqasim@gigabyte-h410m, pid:4769]
+       102. discord_capture                     [1.6.2, akhmadqasim@gigabyte-h410m, pid:89253]
+
+Audio
+ ├─ Devices:
+ │      51. Navi 21/23 HDMI/DP Audio Controller [alsa]
+ │      52. Built-in Audio                      [alsa]
+ │  
+ ├─ Sinks:
+ │  *   37. Built-in Audio Analog Stereo        [vol: 0.48]
+ │      56. Navi 21/23 HDMI/DP Audio Controller Digital Stereo (HDMI 2) [vol: 0.40]
+ │  
+ ├─ Sources:
+ │  *   47. Built-in Audio Analog Stereo        [vol: 0.42]
+ │  
+ ├─ Filters:
+ │  
+ └─ Streams:
+
+Video
+ ├─ Devices:
+ │  
+ ├─ Sinks:
+ │  
+ ├─ Sources:
+ │  
+ ├─ Filters:
+ │  
+ └─ Streams:
+
+Settings
+ └─ Default Configured Devices:
+         0. Audio/Sink    bluez_output.68:3E:C0:CC:F5:04
+         1. Audio/Source  alsa_input.pci-0000_00_1f.3.analog-stereo

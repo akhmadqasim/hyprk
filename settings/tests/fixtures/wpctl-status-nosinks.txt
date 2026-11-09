@@ -1,0 +1,16 @@
+PipeWire 'pipewire-0' [1.6.2, user@host, cookie:1]
+ └─ Clients:
+        33. WirePlumber                         [1.6.2, user@host, pid:4328]
+
+Audio
+ ├─ Devices:
+ │  
+ ├─ Sinks:
+ │  
+ ├─ Sources:
+ │  
+ ├─ Filters:
+ │  
+ └─ Streams:
+
+Video
