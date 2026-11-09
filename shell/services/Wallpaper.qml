@@ -44,8 +44,8 @@ Singleton {
                     if (line.startsWith("WALL=")) root.wallpaper = line.slice(5);
                     else if (line.startsWith("BLUR=")) root.blurred = line.slice(5);
                     else if (line.startsWith("LUMA=")) root.topLuma = parseFloat(line.slice(5)) || 0.3;
-                Theme.menuBarOnLight = root.topLuma > Theme.menuBarLumaThreshold;
                 }
+                Theme.menuBarOnLight = root.topLuma > Theme.menuBarLumaThreshold;
                 Theme.blurAvailable = root.blurred !== "";
             }
         }

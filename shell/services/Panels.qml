@@ -44,9 +44,15 @@ Singleton {
         Sounds.play("alert");
     }
 
+    // open on scr; closes only when it is already open on that same screen
     function toggle(name, scr) {
-        if (open !== name) activeScreen = scr || screen;
-        open = open === name ? "" : name;
+        const target = scr || screen;
+        if (open === name && activeScreen === target) {
+            open = "";
+            return;
+        }
+        activeScreen = target;
+        open = name;
     }
     function close() { open = ""; menuIndex = -1; }
     function openMenu(index, x, scr) { activeScreen = scr || screen; menuIndex = index; menuX = x; open = "menu"; }

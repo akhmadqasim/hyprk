@@ -100,6 +100,7 @@ Singleton {
     function windowsFor(id, entry, alsoIds) {
         const keys = [Search.normId(id)].concat((alsoIds || []).map(Search.normId));
         if (entry && entry.startupClass) keys.push(Search.normId(entry.startupClass));
+        keys.splice(0, keys.length, ...new Set(keys));       // same window must not count twice
         const found = [].concat(...keys.filter(k => running[k]).map(k => running[k]));   // no flatMap in QV4
         if (found.length > 0) return found;
         // last-segment match (org.gnome.Nautilus <-> nautilus)
