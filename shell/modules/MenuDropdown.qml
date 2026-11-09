@@ -52,7 +52,7 @@ Item {
     readonly property real maxTextWidth: {
         let w = 0;
         for (const it of items)
-            if (!it.sep) w = Math.max(w, metrics.advanceWidth(it.label) + (it.shortcut ? metrics.advanceWidth(it.shortcut) + 30 : 0));
+            if (!it.sep) w = Math.max(w, metrics.advanceWidth(it.label) + (it.shortcut ? metrics.advanceWidth(it.shortcut) + Theme.menu.shortcutGap : 0));
         return w;
     }
 

@@ -53,6 +53,18 @@ Singleton {
         }
     }
 
+    // the glass plugin must use the same appearance as our labels, else dark-mode
+    // white text can land on light glass (its default "auto" follows the backdrop)
+    function syncPluginAppearance() {
+        if (!compositorGlass) return;
+        appearanceProc.command = ["hyprctl", "eval", `hl.config({ plugin = { liquidglass = { appearance = "${dark ? "dark" : "light"}" } } })`];
+        appearanceProc.running = true;
+    }
+    onDarkChanged: syncPluginAppearance()
+    onCompositorGlassChanged: syncPluginAppearance()
+    Component.onCompleted: syncPluginAppearance()
+    Process { id: appearanceProc }
+
     IpcHandler {
         target: "theme"
         function toggle(): void { theme.dark = !theme.dark; }
@@ -124,6 +136,7 @@ Singleton {
         readonly property real blurRadius: 40                 // px, magick gaussian sigma ~ radius/2, TODO verify
         // tint over the blurred wallpaper
         readonly property color tint: theme.dark ? Qt.rgba(0.11, 0.11, 0.12, 0.55) : Qt.rgba(0.98, 0.98, 0.99, 0.55)   // TODO verify
+        readonly property color darkVeil: Qt.rgba(0.10, 0.10, 0.11, 0.62)             // dark mode over plugin glass, TODO verify
         readonly property color tintStrong: theme.dark ? Qt.rgba(0.12, 0.12, 0.13, 0.72) : Qt.rgba(0.97, 0.97, 0.98, 0.74) // menus / spotlight
         // Reduce-transparency solid materials (opaque grey-white / dark grey)
         readonly property color solid: theme.dark ? "#2A2A2C" : "#ECECEE"          // TODO verify
@@ -157,12 +170,13 @@ Singleton {
 
     // ---------- pull-down menus ----------
     readonly property QtObject menu: QtObject {
-        readonly property int radius: 12                 // macOS 26 menus, TODO verify
+        readonly property int radius: 12                 // SPEC 9.9.2: context menu glass radius 12
         readonly property int padding: 5                 // SPEC.md 7: menu top/bottom padding 5
         readonly property int itemHeight: 24             // SPEC.md 7: glass menu line height 24
-        readonly property int itemHPadding: 12           // text inset inside highlight, TODO verify
-        readonly property int itemInset: 5               // highlight inset from menu edge, TODO verify
-        readonly property int itemRadius: 6              // highlight radius, TODO verify
+        readonly property int itemHPadding: 11           // SPEC 9.9.2: outer padding 16 minus the 5 inset
+        readonly property int itemInset: 5               // SPEC 9.9.2: selection x+5, width-10
+        readonly property int itemRadius: 7              // SPEC 9.9.2: glass menu selection radius 7
+        readonly property int shortcutGap: 22            // SPEC 9.9.2: gap before the key-equivalent column
         readonly property int separatorHeight: 11        // incl. spacing, TODO verify
         readonly property int minWidth: 220              // TODO verify
         readonly property int offsetY: 3                 // gap below menu bar, TODO verify
@@ -194,7 +208,7 @@ Singleton {
         readonly property int tooltipHPad: 10
         readonly property int tooltipHeight: 24
         // neutral white lift over the plugin glass (cancels the backdrop colour cast)
-        readonly property color pluginLift: theme.dark ? Qt.rgba(1, 1, 1, 0.05) : Qt.rgba(0.97, 0.97, 0.97, 0.32)   // TODO verify
+        readonly property color pluginLift: theme.dark ? Qt.rgba(0.10, 0.10, 0.11, 0.45) : Qt.rgba(0.97, 0.97, 0.97, 0.32)   // TODO verify
     }
 
     // ---------- notifications ----------
@@ -238,11 +252,12 @@ Singleton {
     // ---------- control center ----------
     readonly property QtObject cc: QtObject {
         // macOS 26/27 Control Center has no panel background: separate glass
-        // modules float over the desktop (reference/screens/macos27-control-center.png, ~2x).
-        readonly property int columnWidth: 135           // one module column, measured
-        readonly property int gap: 12                    // between modules, measured
-        readonly property int width: columnWidth * 2 + gap
-        readonly property int tileHeight: 60             // capsule module height, measured
+        // modules float over the desktop. SPEC.md 9.9.1 (ControlCenter.app bento grid):
+        // 76pt cell pitch, 12 gap, tiles 64 (1x1), 140x64 (2x1), 140x140 (2x2), 292x64 (4x1)
+        readonly property int columnWidth: 140           // SPEC 9.9.1: rect2x1 width
+        readonly property int gap: 12                    // SPEC 9.9.1
+        readonly property int width: columnWidth * 2 + gap   // 292 = rect4x1
+        readonly property int tileHeight: 64             // SPEC 9.9.1: 1x1 height
         readonly property int tileRadius: tileHeight / 2 // capsule
         readonly property int tilePadding: 12            // TODO verify
         readonly property int toggleSize: 38             // white circle inside a capsule, measured vs reference
@@ -254,8 +269,6 @@ Singleton {
         readonly property int artRadius: 8
         readonly property int marginTop: 10              // below menu bar, measured
         readonly property int marginRight: 12            // TODO verify
-        // with the compositor plugin: white lift drawn over the plugin glass so CC tiles read
-        // frosted (wallpaper as soft colour), like macOS 27
         // darkening veil over the plugin glass: white labels need ~5:1 like the reference
         readonly property color pluginLift: theme.dark ? Qt.rgba(0, 0, 0, 0.18) : Qt.rgba(0.20, 0.18, 0.17, 0.34)
         readonly property real disabledSliderOpacity: 0.6
@@ -373,8 +386,12 @@ Singleton {
 
     // ---------- animation ----------
     readonly property QtObject anim: QtObject {
+        // SPEC 9.9.4: SwiftUI Animation.default = spring(response 0.5, dampingFraction 1.0),
+        // critically damped. A 350 ms OutCubic is the closest QML ease for a settle at ~0.5 s.
+        // SPEC 9.9.5: window ScaleUpAndIn 0.5 s, ScaleDownAndOut 0.25 s (Solarium).
         readonly property int fast: 120                  // hover / press
-        readonly property int normal: 220                // panels open
+        readonly property int normal: 350                // panels open (spring 0.5 critically damped)
+        readonly property int close: 250                 // panels close (ScaleDownAndOut)
         readonly property int bannerIn: 380              // TODO verify
         readonly property int bounce: 340                // one dock bounce up+down, TODO verify
         readonly property int magnify: 90                // dock magnification follow, TODO verify

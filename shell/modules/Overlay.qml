@@ -86,7 +86,7 @@ ShellWindow {
         opacity: Panels.open === "nc" ? 1 : 0
         visible: opacity > 0
         transform: Translate { x: Panels.open === "nc" ? 0 : 40; Behavior on x { NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing } } }
-        Behavior on opacity { NumberAnimation { id: fadeOut; duration: Theme.anim.normal; easing.type: Theme.anim.easing } }
+        Behavior on opacity { NumberAnimation { id: fadeOut; duration: Panels.open === "nc" ? Theme.anim.normal : Theme.anim.close; easing.type: Theme.anim.easing } }
         MouseArea { anchors.fill: parent; z: -1 }
     }
 }

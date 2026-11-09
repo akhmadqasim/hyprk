@@ -86,19 +86,26 @@ hl.config({
     dwindle = { preserve_split = true },
 })
 
--- macOS-like motion: spring window open, quick fades, genie-less minimize
-hl.curve("macSpring", { type = "spring", mass = 1, stiffness = 300, damping = 30 })
+-- macOS motion (SPEC.md 9.9.4/9.9.5):
+--   SwiftUI Animation.default = spring(response 0.5, dampingFraction 1.0): k = (2pi/0.5)^2 = 158,
+--   c = 2*sqrt(k) = 25 (critically damped). CA's CASpringAnimation default (1, 100, 10) is bouncier
+--   and used for the Dock-like bounce. Windows: ScaleUpAndIn 0.5 s, ScaleDownAndOut 0.25 s.
+hl.curve("swiftui",   { type = "spring", mass = 1, stiffness = 158, damping = 25 })
+hl.curve("caSpring",  { type = "spring", mass = 1, stiffness = 100, damping = 10 })
 hl.curve("macEase",   { type = "bezier", points = { {0.25, 0.1}, {0.25, 1} } })
 hl.curve("macOut",    { type = "bezier", points = { {0.2, 0.9}, {0.3, 1} } })
+hl.curve("easeInOut", { type = "bezier", points = { {0.42, 0}, {0.58, 1} } })   -- SwiftUI legacy default
 
-hl.animation({ leaf = "global",      enabled = true, speed = 6,   bezier = "macEase" })
-hl.animation({ leaf = "windowsIn",   enabled = true, speed = 3.5, spring = "macSpring", style = "popin 90%" })
-hl.animation({ leaf = "windowsOut",  enabled = true, speed = 2.5, bezier = "macEase",   style = "popin 90%" })
-hl.animation({ leaf = "windowsMove", enabled = true, speed = 4,   spring = "macSpring" })
+hl.animation({ leaf = "global",      enabled = true, speed = 5,   bezier = "macEase" })
+hl.animation({ leaf = "windowsIn",   enabled = true, speed = 5,   spring = "swiftui", style = "popin 90%" })   -- scale 0.9 -> 1 + fade
+hl.animation({ leaf = "windowsOut",  enabled = true, speed = 2.5, bezier = "macEase",  style = "popin 90%" })  -- 0.25 s
+hl.animation({ leaf = "windowsMove", enabled = true, speed = 5,   spring = "swiftui" })
+hl.animation({ leaf = "fadeIn",      enabled = true, speed = 5,   bezier = "macOut" })
+hl.animation({ leaf = "fadeOut",     enabled = true, speed = 2.5, bezier = "macEase" })
 hl.animation({ leaf = "fade",        enabled = true, speed = 3,   bezier = "macEase" })
-hl.animation({ leaf = "layersIn",    enabled = true, speed = 2.5, bezier = "macOut", style = "fade" })
-hl.animation({ leaf = "layersOut",   enabled = true, speed = 2,   bezier = "macEase", style = "fade" })
-hl.animation({ leaf = "workspaces",  enabled = true, speed = 4,   bezier = "macOut",  style = "slide" })
+hl.animation({ leaf = "layersIn",    enabled = true, speed = 3.5, bezier = "macOut",  style = "fade" })
+hl.animation({ leaf = "layersOut",   enabled = true, speed = 2.5, bezier = "macEase", style = "fade" })
+hl.animation({ leaf = "workspaces",  enabled = true, speed = 5,   spring = "swiftui", style = "slide" })
 hl.animation({ leaf = "border",      enabled = false })
 
 ------------------------------------------------------- liquid glass ----

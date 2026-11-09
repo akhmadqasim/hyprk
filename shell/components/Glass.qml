@@ -22,7 +22,8 @@ Item {
     property color solidColor: Theme.glass.solid
     property bool shadow: true
     // tint drawn on top of the plugin's glass (the plugin owns blur, rim, shadow)
-    property color pluginLift: "transparent"
+    // default: in dark mode a dark veil, so the plugin glass stays dark over bright windows
+    property color pluginLift: Theme.dark ? Theme.glass.darkVeil : "transparent"
 
     Region {
         id: shape
