@@ -49,13 +49,13 @@ hl.config({
         rounding_power = 2.8,            -- SPEC.md 7.1: continuous corner guess
         active_opacity = 1.0,
         inactive_opacity = 1.0,
-        shadow = {                       -- glass-defaults.json macWindowShadow: active r24 (0,10) a0.6, inactive r16 (0,4) a0.45
-            enabled = true,
-            range = 40,                  -- Hyprland spread ~ 1.6x Apple's Gaussian radius 24
-            render_power = 3,            -- closer to a Gaussian falloff than 2
+        shadow = {                       -- SPEC 9 macWindowShadow: active r24 (0,10) a0.6 light / 0.7 dark,
+            enabled = true,              --   inactive r16 (0,4) a0.45
+            range = 24,
+            render_power = 3,
             offset = "0 10",
-            color = 0x73000000,          -- 0.45: Apple's 0.6 is a Gaussian peak, Hyprland's ramp is fuller
-            color_inactive = 0x4d000000, -- 0.30 (inactive 0.45 scaled the same way)
+            color = 0x99000000,          -- 0.6 active
+            color_inactive = 0x73000000, -- 0.45 inactive (Hyprland has no separate inactive range/offset)
         },
         blur = {
             enabled = true,
@@ -125,10 +125,8 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
         hl.config({ plugin = { liquidglass = {
             -- menubar too: only its pressed title/status pills send glass regions
             namespaces = "hyprk-menubar,hyprk-" .. table.concat(glassLayers, ",hyprk-"),
-            -- recipes per layer. Control Center uses "regular" plus a warm grey veil drawn
-            -- by the shell (Theme.cc.pluginLift): the plugin's controlcenter recipe renders
-            -- near-black over white windows in our tests.
-            materials = "hyprk-dock:dock,hyprk-controlcenter:regular,hyprk-overlay:menu,hyprk-menubar:menu",
+            -- recipes per layer come from the plugin's `materials` default
+            -- (hyprk-dock:dock, hyprk-controlcenter:controlcenter, hyprk-overlay:menu, ...)
             blur_lod = 1.0,              -- extra frost: wallpaper reads as soft colour, not detail
         } } })
     end)

@@ -29,11 +29,15 @@ ShellWindow {
     readonly property int pages: Math.max(1, Math.ceil(apps.length / perPage))
     property int page: 0
 
-    onShownChanged: {
+    // runs on creation too: the window is built on demand (shell.qml LazyLoader)
+    function opened() {
         search.text = "";
         page = 0;
         if (shown) search.forceActiveFocus();
     }
+    onShownChanged: opened()
+    Component.onCompleted: opened()
+
     onQueryChanged: page = 0
 
     function launch(e) {
@@ -127,7 +131,8 @@ ShellWindow {
             columns: Theme.launchpad.columns
             readonly property real cellWidth: (panel.width - Theme.launchpad.padding * 2) / Theme.launchpad.columns
             Repeater {
-                model: lp.apps.slice(lp.page * lp.perPage, (lp.page + 1) * lp.perPage)
+                // no delegates (and no icon textures) while the panel is closed
+                model: lp.shown ? lp.apps.slice(lp.page * lp.perPage, (lp.page + 1) * lp.perPage) : []
                 delegate: Item {
                     id: c
                     required property var modelData

@@ -74,8 +74,8 @@ Singleton {
     }
 
     readonly property QtObject font: QtObject {
-        readonly property real menuBar: 13          // TODO verify
-        readonly property real menu: 13             // TODO verify
+        readonly property real menuBar: 13          // SPEC 9.9.3: menuBarFontOfSize 13
+        readonly property real menu: 13             // SPEC 9.9.3: menu item font 13
         readonly property real clock: 13            // TODO verify
         readonly property real notifTitle: 13       // TODO verify
         readonly property real notifBody: 13        // TODO verify
@@ -89,7 +89,7 @@ Singleton {
         readonly property real switcherLabel: 13    // TODO verify
         readonly property real launchpadLabel: 11   // TODO verify
         readonly property real launchpadSearch: 20  // header text, TODO verify
-        readonly property real dockTooltip: 13      // TODO verify
+        readonly property real dockTooltip: 14      // SPEC 9.9.3: Dock app-name label, system 14
         readonly property real widgetBig: 34        // TODO verify
         readonly property real widgetSmall: 11      // TODO verify
         readonly property real widgetMonth: 10      // mini month digits
@@ -257,7 +257,7 @@ Singleton {
         // 76pt cell pitch, 12 gap, tiles 64 (1x1), 140x64 (2x1), 140x140 (2x2), 292x64 (4x1)
         readonly property int columnWidth: 140           // SPEC 9.9.1: rect2x1 width
         readonly property int gap: 12                    // SPEC 9.9.1
-        readonly property int width: columnWidth * 2 + gap   // 292 = rect4x1
+        readonly property int width: columnWidth * 2 + gap   // SPEC 9.9.1: 292 = rect4x1 tile span (304 grid incl. 6pt half-gaps)
         readonly property int tileHeight: 64             // SPEC 9.9.1: 1x1 height
         readonly property int tileRadius: tileHeight / 2 // capsule
         readonly property int tilePadding: 12            // TODO verify
@@ -271,8 +271,8 @@ Singleton {
         readonly property int marginTop: 10              // below menu bar, measured
         readonly property int marginRight: 12            // TODO verify
         // darkening veil over the plugin glass: white labels need ~5:1 like the reference
-        // over the plugin "regular" recipe: a warm grey veil gives the reference mid-grey frost
-        readonly property color pluginLift: theme.dark ? Qt.rgba(0.10, 0.10, 0.11, 0.72) : Qt.rgba(0.24, 0.22, 0.21, 0.70)
+        // the plugin's controlcenter recipe gives the reference grey frost itself; no extra veil
+        readonly property color pluginLift: "transparent"
         readonly property color rim: Qt.rgba(1, 1, 1, 0.38)            // top-lit rim drawn over plugin glass
         readonly property color tileTint: theme.dark ? Qt.rgba(0.12, 0.12, 0.13, 0.45) : Qt.rgba(0.30, 0.28, 0.27, 0.42)   // QML material: dark neutral frost
         readonly property color tileSolid: theme.dark ? "#3A3A3C" : "#8E8E93"

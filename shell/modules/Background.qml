@@ -29,6 +29,9 @@ ShellWindow {
         z: -1
         anchors.fill: parent
         source: Wallpaper.url
+        // decoded at the logical size: the wallpaper is soft, and at 4K/1.5 the full
+        // pixel size costs ~18 MB more for no visible gain (PERF.md)
+        sourceSize: Qt.size(width, height)
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
         cache: false

@@ -1,4 +1,3 @@
-//@ pragma UseQApplication
 import QtQuick
 import Quickshell
 import qs.modules
@@ -23,8 +22,23 @@ ShellRoot {
 
     // transient surfaces live on the primary screen
     Banners { modelData: Panels.screen }
-    Spotlight { modelData: Panels.screen }
-    Switcher { modelData: Panels.screen }
-    Launchpad { modelData: Panels.screen }
-    MissionControl { modelData: Panels.screen }
+
+    // Rarely used full-screen surfaces exist only while open, so their windows,
+    // delegates and textures cost nothing at idle (see PERF.md).
+    LazyLoader {
+        active: Panels.open === "spotlight"
+        Spotlight { modelData: Panels.screen }
+    }
+    LazyLoader {
+        active: Panels.open === "switcher"
+        Switcher { modelData: Panels.screen }
+    }
+    LazyLoader {
+        active: Panels.open === "launchpad"
+        Launchpad { modelData: Panels.screen }
+    }
+    LazyLoader {
+        active: Panels.open === "mission"
+        MissionControl { modelData: Panels.screen }
+    }
 }

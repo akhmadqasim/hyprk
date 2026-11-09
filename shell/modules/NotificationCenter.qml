@@ -229,7 +229,7 @@ Item {
                     color: "transparent"
                     Image {
                         anchors.fill: parent
-                        source: nc.photo ? "file://" + nc.photo : Wallpaper.url
+                        source: !nc.shown ? "" : nc.photo ? "file://" + nc.photo : Wallpaper.url
                         sourceSize.width: Wallpaper.thumbWidth * 2
                         fillMode: Image.PreserveAspectCrop
                         asynchronous: true

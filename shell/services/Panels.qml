@@ -15,6 +15,8 @@ Singleton {
     readonly property var screen: Quickshell.screens.find(s => s.name === Quickshell.env("HYPRK_PRIMARY")) || Quickshell.screens[0]
 
     property string open: ""
+    // query handed to Spotlight when it opens (IPC `spotlight search`)
+    property string spotlightQuery: ""
     // screen whose Overlay shows menus / context menus / CC / NC (menus open where they were clicked)
     property var activeScreen: screen
     property int menuIndex: -1          // index of the open menu bar title (0 = Apple)
@@ -76,5 +78,15 @@ Singleton {
         function menu(index: int, x: int): void { root.openMenu(index, x); }
         function desktopMenu(x: int, y: int): void { root.openContext(Menus.desktop(), x, y, false); }
         function confirmEmptyTrash(): void { Apps.confirmEmptyTrash(); }
+    }
+
+    // `qs ipc call spotlight search "2+2"`: open Spotlight with a query (scripted screenshots)
+    IpcHandler {
+        target: "spotlight"
+        function search(q: string): void {
+            root.spotlightQuery = q;
+            if (root.open === "spotlight") root.open = "";
+            root.open = "spotlight";
+        }
     }
 }

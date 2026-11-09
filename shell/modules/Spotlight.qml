@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import Quickshell.Wayland
 import qs
 import qs.components
@@ -53,12 +52,15 @@ ShellWindow {
         }
     }
 
-    onShownChanged: {
-        query = "";
-        input.text = "";
+    // created on demand (shell.qml LazyLoader), so start from Panels' pending query
+    function reset() {
+        input.text = Panels.spotlightQuery;
+        Panels.spotlightQuery = "";
         selected = 0;
         if (shown) input.forceActiveFocus();
     }
+    onShownChanged: reset()
+    Component.onCompleted: reset()
     onQueryChanged: { selected = 0; if (!selectable(0)) step(1); }
 
     function accept() {
@@ -72,14 +74,6 @@ ShellWindow {
     MouseArea { anchors.fill: parent; onPressed: Panels.close() }
 
     // `qs ipc call spotlight search "2+2"`: open with a query (scripted screenshots)
-    IpcHandler {
-        target: "spotlight"
-        function search(q: string): void {
-            Panels.open = "spotlight";
-            input.text = q;
-        }
-    }
-
     readonly property real panelX: (width - Theme.spotlight.width) / 2
     readonly property real panelY: height / Theme.spotlight.topFraction - Theme.spotlight.barHeight / 2
 
