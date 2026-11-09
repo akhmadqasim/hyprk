@@ -19,10 +19,13 @@ sources = [os.path.join(here, "../../themes/wallpapers/png/*"), "/usr/share/back
 walls = list(p for pattern in sources for p in glob.glob(pattern, recursive=True)
                if p.lower().endswith((".jpg", ".jpeg", ".png")))
 if not walls:
-    sys.exit("no images in " + " or ".join(os.path.dirname(s) for s in sources))
+    sys.exit("no images in " + " or ".join(s.split("*")[0] for s in sources))
 
 def brightness(path):
-    im = Image.open(path)
+    try:
+        im = Image.open(path)
+    except OSError:   # unreadable file: rank it last
+        return -1
     im.draft("L", (64, 64))   # JPEGs decode at reduced scale
     im.thumbnail((64, 64))
     return ImageStat.Stat(im.convert("L")).mean[0]
