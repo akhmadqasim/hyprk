@@ -27,16 +27,14 @@ Item {
             width: parent.width - 40
             spacing: 16
             // first line is the headline, the rest is detail (Finder alert layout)
-            Text {
+            TextLabel {
                 width: parent.width
                 text: root.message.split("\n")[0]
                 wrapMode: Text.Wrap
                 horizontalAlignment: Text.AlignHCenter
                 color: Theme.color.label
-                font.family: Theme.fontText
                 font.pixelSize: 13
-                font.weight: Font.DemiBold
-                font.variableAxes: ({ "wght": Font.DemiBold, "opsz": 17 })  // SF variable font: weight + text optical size
+                weight: Font.DemiBold
             }
             Text {
                 width: parent.width

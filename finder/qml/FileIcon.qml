@@ -15,7 +15,7 @@ Item {
     // Image files decode directly; other types use the thumbnail cache when GNOME made one.
     readonly property string thumbSource: {
         if (entry.isDir || kind === "app") return "";
-        if (Files.isImage(entry)) return "file://" + entry.path;
+        if (Files.isImage(entry)) return Files.fileUrl(entry.path);
         return FileOps.thumbnail(entry.path);
     }
     property bool thumbFailed: false
@@ -75,17 +75,15 @@ Item {
             source: visible ? Icons.zipper() : ""
             sourceSize: parent.sourceSize
         }
-        Text {
+        TextLabel {
             visible: root.kind !== "folder" && root.size >= 32
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.horizontalCenterOffset: -root.size * 0.02
             y: root.size * 0.70
             text: Files.badge(root.entry)
             color: "#8E8E93"
-            font.family: Theme.fontText
             font.pixelSize: Math.round(root.size * 0.135)
-            font.weight: Font.DemiBold
-            font.variableAxes: ({ "wght": Font.DemiBold, "opsz": 17 })  // SF variable font: weight + text optical size
+            weight: Font.DemiBold
         }
     }
 }

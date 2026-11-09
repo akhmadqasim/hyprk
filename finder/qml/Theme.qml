@@ -87,7 +87,6 @@ QtObject {
         readonly property color folderFront: "#80C4F2"
         readonly property color folderTop: "#A5D8F8"
 
-        readonly property color previewScrim: Qt.rgba(0, 0, 0, 0.0)
         readonly property color previewPanel: theme.dark ? Qt.rgba(0.15, 0.15, 0.16, 0.97) : Qt.rgba(0.97, 0.97, 0.97, 0.98)
         readonly property color alert: theme.dark ? "#2C2C2E" : "#F5F5F5"
         readonly property color fieldBg: theme.dark ? Qt.rgba(1, 1, 1, 0.08) : "#FFFFFF"
@@ -138,7 +137,6 @@ QtObject {
         readonly property int height: 64         // ref (capsules 10..53, content starts ~64)
         readonly property int capsuleHeight: 44  // ref
         readonly property int capsuleY: 10       // ref
-        readonly property int capsuleRadius: 22
         readonly property int buttonWidth: 44    // ref (back/forward halves of 88)
         readonly property int iconSize: 24
         readonly property int gap: 20            // between capsule groups, ref
@@ -167,7 +165,6 @@ QtObject {
         readonly property int iconSize: 18
         readonly property int sidePad: 10
         readonly property int rowRadius: 6
-        readonly property int nameWidth: 320
         readonly property int dateWidth: 190
         readonly property int sizeWidth: 90
         readonly property int kindWidth: 160
@@ -186,7 +183,6 @@ QtObject {
 
     readonly property QtObject anim: QtObject {
         readonly property int fast: 120
-        readonly property int normal: 220
         readonly property int easing: Easing.OutCubic
     }
 }

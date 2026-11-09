@@ -41,17 +41,15 @@ Item {
         }
     }
 
-    Text {
+    TextLabel {
         x: nav.x + nav.width + Theme.toolbar.titleGap
         width: Math.max(0, views.x - x - 12)
         anchors.verticalCenter: nav.verticalCenter
         text: root.browser.title
         elide: Text.ElideRight
         color: Theme.color.title
-        font.family: Theme.fontText
         font.pixelSize: Theme.font.title
-        font.weight: Font.DemiBold
-        font.variableAxes: ({ "wght": Font.DemiBold, "opsz": 17 })  // SF variable font: weight + text optical size
+        weight: Font.DemiBold
     }
 
     Capsule {

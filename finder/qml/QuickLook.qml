@@ -35,17 +35,15 @@ Rectangle {
             Symbol { anchors.centerIn: parent; name: "xmark"; size: 14; color: Theme.color.toolbarIcon }
             TapHandler { id: closeTap; onTapped: root.closeRequested() }
         }
-        Text {
+        TextLabel {
             anchors.centerIn: parent
             width: parent.width - 200
             horizontalAlignment: Text.AlignHCenter
             elide: Text.ElideMiddle
             text: root.open ? root.entry.name : ""
             color: Theme.color.label
-            font.family: Theme.fontText
             font.pixelSize: Theme.font.preview
-            font.weight: Font.DemiBold
-            font.variableAxes: ({ "wght": Font.DemiBold, "opsz": 17 })  // SF variable font: weight + text optical size
+            weight: Font.DemiBold
         }
         Rectangle {
             anchors.right: parent.right
@@ -76,7 +74,7 @@ Rectangle {
         Image {
             anchors.fill: parent
             visible: root.isImage
-            source: root.isImage ? "file://" + root.entry.path : ""
+            source: root.isImage ? Files.fileUrl(root.entry.path) : ""
             fillMode: Image.PreserveAspectFit
             asynchronous: true
             sourceSize: Qt.size(width * 2, height * 2)
@@ -106,14 +104,12 @@ Rectangle {
                 entry: root.entry || ({ name: "", isDir: false, mime: "" })
                 size: 160
             }
-            Text {
+            TextLabel {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: root.open ? root.entry.name : ""
                 color: Theme.color.label
-                font.family: Theme.fontText
                 font.pixelSize: 17
-                font.weight: Font.DemiBold
-                font.variableAxes: ({ "wght": Font.DemiBold, "opsz": 17 })  // SF variable font: weight + text optical size
+                weight: Font.DemiBold
             }
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter

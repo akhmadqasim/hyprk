@@ -12,7 +12,7 @@ QtObject {
     property int historyIndex: 0
     readonly property bool canGoBack: historyIndex > 0
     readonly property bool canGoForward: historyIndex < history.length - 1
-    readonly property bool isVirtual: path.indexOf(":") !== -1 && path[0] !== "/"
+    readonly property bool isVirtual: isVirtualPath(path)
 
     property string sortKey: "name"
     property bool ascending: true
@@ -21,19 +21,20 @@ QtObject {
     property string query: ""
 
     property var allEntries: []
-    readonly property var entries: Files.filterEntries(Files.sortEntries(allEntries, sortKey, ascending, foldersFirst), query)
+    // sorting is cached apart from the search filter, so typing a query does not re-sort
+    readonly property var sorted: Files.sortEntries(allEntries, sortKey, ascending, foldersFirst)
+    readonly property var entries: Files.filterEntries(sorted, query)
 
-    // selection: path -> true. selRev bumps on every change so bindings can depend on it.
+    // selection: path -> true. Always reassigned (never mutated) so bindings on it update.
     property var selected: ({})
-    property int selRev: 0
     property string renamingPath: ""  // item being renamed inline
     property int cursor: -1          // keyboard focus index into entries
     property int anchor: -1          // shift-click range start
-    readonly property int selectedCount: { selRev; return Object.keys(selected).length; }
+    readonly property int selectedCount: Object.keys(selected).length
 
     readonly property string title: path === "recents:" ? "Recents"
         : path === "applications:" ? "Applications"
-        : path === FileOps.homePath() ? FileOps.homePath().split("/").pop()
+        : path === FileOps.homePath() ? Files.baseName(path)
         : Files.title(path)
 
     signal errorRaised(string message)
@@ -48,7 +49,6 @@ QtObject {
         const keep = {};
         for (const e of list) if (selected[e.path]) keep[e.path] = true;
         selected = keep;
-        selRev++;
         FileOps.watch(isVirtual ? "" : path);
     }
 
@@ -84,12 +84,11 @@ QtObject {
     function isSelected(p) { return selected[p] === true; }
     function selectedPaths() { return Object.keys(selected); }
     function selectedEntries() { return entries.filter(e => selected[e.path]); }
-    function clearSelection() { selected = ({}); anchor = -1; selRev++; }
+    function clearSelection() { selected = ({}); anchor = -1; }
     function selectAll() {
         const s = {};
         for (const e of entries) s[e.path] = true;
         selected = s;
-        selRev++;
     }
     function selectPaths(paths) {
         const s = {};
@@ -98,7 +97,6 @@ QtObject {
         const i = entries.findIndex(e => s[e.path]);
         cursor = i;
         anchor = i;
-        selRev++;
     }
     // Click semantics: plain = only this, ctrl = toggle, shift = range from anchor.
     function click(index, modifiers) {
@@ -122,15 +120,13 @@ QtObject {
             anchor = index;
         }
         cursor = index;
-        selRev++;
     }
     function setSelection(indices, additive) {
         const s = additive ? Object.assign({}, selected) : {};
         for (const i of indices) s[entries[i].path] = true;
         selected = s;
-        selRev++;
     }
-    // Arrow keys: dx/dy in cells; cols = items per row (1 for lists).
+    // Arrow keys: delta in items (a grid row is `columns` items).
     function moveCursor(delta, extend) {
         if (entries.length === 0) return;
         const next = cursor < 0 ? 0 : Math.max(0, Math.min(entries.length - 1, cursor + delta));
@@ -177,6 +173,7 @@ QtObject {
         return "";
     }
 
+    // QtObject has no default property, so the Connections lives in a property
     property Connections _watch: Connections {
         target: FileOps
         function onDirectoryChanged(dir) { if (dir === b.path) b.reload(); }

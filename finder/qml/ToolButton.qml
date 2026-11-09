@@ -7,7 +7,6 @@ Item {
     property string icon
     property real iconSize: Theme.toolbar.iconSize
     property bool selected: false
-    property string tooltip
     signal clicked()
 
     implicitWidth: Theme.toolbar.buttonWidth

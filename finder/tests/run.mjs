@@ -38,6 +38,9 @@ test("segments", () => {
         { name: "HD", path: "/" }, { name: "home", path: "/home" }, { name: "u", path: "/home/u" }]);
     assert.deepEqual(F.segments("/", "HD"), [{ name: "HD", path: "/" }]);
 });
+test("fileUrl", () => {
+    assert.equal(F.fileUrl("/home/u/a b#1%.png"), "file:///home/u/a%20b%231%25.png");
+});
 test("title", () => {
     assert.equal(F.title("/"), "Macintosh HD");
     assert.equal(F.title("/home/u/Downloads/"), "Downloads");

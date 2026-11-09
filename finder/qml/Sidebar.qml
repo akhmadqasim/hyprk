@@ -1,5 +1,6 @@
 import QtQuick
 import Finder.Native
+import "lib/files.js" as Files
 
 // Floating sidebar: Recents, Favorites, Locations, Tags.
 // Glass (translucent) when the compositor blurs behind us, else the solid reference color.
@@ -12,7 +13,7 @@ Rectangle {
     color: Theme.blur ? Theme.color.sidebarGlass : Theme.color.sidebarSolid
 
     function refreshVolumes() {
-        const user = FileOps.homePath().split("/").pop();
+        const user = Files.baseName(FileOps.homePath());
         let out = [];
         for (const base of ["/media/" + user, "/run/media/" + user])
             if (FileOps.isDir(base))
@@ -28,7 +29,7 @@ Rectangle {
             { label: "Desktop", icon: "desktop", path: FileOps.standardPath("desktop") },
             { label: "Documents", icon: "doc", path: FileOps.standardPath("documents") },
             { label: "Downloads", icon: "download", path: FileOps.standardPath("downloads") },
-            { label: FileOps.homePath().split("/").pop(), icon: "house", path: FileOps.homePath() }
+            { label: Files.baseName(FileOps.homePath()), icon: "house", path: FileOps.homePath() }
         ] },
         { header: "Locations", items: [
             { label: "Macintosh HD", icon: "drive", path: "/" }
@@ -58,17 +59,15 @@ Rectangle {
                     width: column.width
                     topPadding: index > 0 ? Theme.sidebar.sectionGap : 0
 
-                    Text {
+                    TextLabel {
                         visible: section.modelData.header !== ""
                         x: Theme.sidebar.headerX
                         height: Theme.sidebar.headerHeight
                         verticalAlignment: Text.AlignVCenter
                         text: section.modelData.header
                         color: Theme.color.sidebarHeader
-                        font.family: Theme.fontText
                         font.pixelSize: Theme.font.sidebarHeader
-                        font.weight: Font.DemiBold
-                        font.variableAxes: ({ "wght": Font.DemiBold, "opsz": 17 })  // SF variable font: weight + text optical size
+                        weight: Font.DemiBold
                     }
 
                     Repeater {
@@ -106,17 +105,15 @@ Rectangle {
                                 radius: width / 2
                                 color: row.modelData.dot || "transparent"
                             }
-                            Text {
+                            TextLabel {
                                 x: Theme.sidebar.textX
                                 width: parent.width - x - Theme.sidebar.rowInset - 4
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: row.modelData.label
                                 elide: Text.ElideRight
                                 color: Theme.color.label
-                                font.family: Theme.fontText
                                 font.pixelSize: Theme.font.sidebarItem
-                                font.weight: row.current ? Font.DemiBold : Font.Normal
-                                font.variableAxes: ({ "wght": row.current ? Font.DemiBold : Font.Normal, "opsz": 17 })  // SF variable font: weight + text optical size
+                                weight: row.current ? Font.DemiBold : Font.Normal
                             }
                             TapHandler {
                                 id: tap

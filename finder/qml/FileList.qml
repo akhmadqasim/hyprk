@@ -37,7 +37,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     color: Theme.color.separator
                 }
-                Text {
+                TextLabel {
                     anchors.left: parent.left
                     anchors.leftMargin: h.index === 0 ? 28 : 8
                     anchors.right: parent.right
@@ -46,10 +46,8 @@ Item {
                     horizontalAlignment: h.modelData.right ? Text.AlignRight : Text.AlignLeft
                     text: h.modelData.title
                     color: Theme.color.secondaryLabel
-                    font.family: Theme.fontText
                     font.pixelSize: Theme.font.listHeader
-                    font.weight: root.browser.sortKey === h.modelData.key ? Font.DemiBold : Font.Medium
-                    font.variableAxes: ({ "wght": root.browser.sortKey === h.modelData.key ? Font.DemiBold : Font.Medium, "opsz": 17 })  // SF variable font: weight + text optical size
+                    weight: root.browser.sortKey === h.modelData.key ? Font.DemiBold : Font.Medium
                 }
                 Symbol {
                     visible: root.browser.sortKey === h.modelData.key
@@ -91,22 +89,18 @@ Item {
         ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
 
         // empty space below the rows
-        footer: MouseArea {
+        footer: EntryMouseArea {
             width: list.width
             height: Math.max(0, list.height - list.count * Theme.list.rowHeight)
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onPressed: mouse => {
-                root.forceActiveFocus();
-                root.browser.clearSelection();
-                if (mouse.button === Qt.RightButton) root.contextMenu(null, mapToItem(null, mouse.x, mouse.y));
-            }
+            browser: root.browser
+            onContextMenu: (e, pos) => root.contextMenu(e, pos)
         }
 
         delegate: Rectangle {
             id: row
             required property var modelData
             required property int index
-            readonly property bool selected: { root.browser.selRev; return root.browser.isSelected(modelData.path); }
+            readonly property bool selected: root.browser.isSelected(modelData.path)
             readonly property bool renaming: root.browser.renamingPath === modelData.path
             readonly property color textColor: selected ? "white" : Theme.color.label
             width: list.width
@@ -173,20 +167,13 @@ Item {
                 }
             }
 
-            MouseArea {
+            EntryMouseArea {
                 anchors.fill: parent
                 enabled: !row.renaming
-                acceptedButtons: Qt.LeftButton | Qt.RightButton
-                onPressed: mouse => {
-                    root.forceActiveFocus();
-                    if (mouse.button === Qt.RightButton) {
-                        if (!row.selected) root.browser.click(row.index, Qt.NoModifier);
-                        root.contextMenu(row.modelData, mapToItem(null, mouse.x, mouse.y));
-                        return;
-                    }
-                    root.browser.click(row.index, mouse.modifiers);
-                }
-                onDoubleClicked: mouse => { if (mouse.button === Qt.LeftButton) root.browser.activate(row.modelData); }
+                browser: root.browser
+                entry: row.modelData
+                index: row.index
+                onContextMenu: (e, pos) => root.contextMenu(e, pos)
             }
         }
     }

@@ -13,7 +13,6 @@ Item {
     function ensureVisible(i) { strip.positionViewAtIndex(i, ListView.Contain); }
 
     readonly property var focused: {
-        browser.selRev;
         const i = browser.cursor >= 0 ? browser.cursor : 0;
         return browser.entries.length > i ? browser.entries[i] : null;
     }
@@ -29,7 +28,7 @@ Item {
         Image {
             anchors.fill: parent
             visible: root.focused !== null && Files.isImage(root.focused)
-            source: visible ? "file://" + root.focused.path : ""
+            source: visible ? Files.fileUrl(root.focused.path) : ""
             fillMode: Image.PreserveAspectFit
             asynchronous: true
             sourceSize: Qt.size(width * 2, height * 2)
@@ -40,19 +39,16 @@ Item {
             entry: root.focused || ({ name: "", isDir: false, mime: "" })
             size: Math.min(parent.width, parent.height, 256)
         }
-        MouseArea {
+        EntryMouseArea {
             anchors.fill: parent
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onPressed: mouse => {
-                root.forceActiveFocus();
-                if (mouse.button === Qt.RightButton && root.focused)
-                    root.contextMenu(root.focused, mapToItem(null, mouse.x, mouse.y));
-            }
-            onDoubleClicked: root.browser.activate(root.focused)
+            browser: root.browser
+            entry: root.focused
+            index: Math.max(0, root.browser.cursor)
+            onContextMenu: (e, pos) => root.contextMenu(e, pos)
         }
     }
 
-    Text {
+    TextLabel {
         id: caption
         anchors.bottom: strip.top
         anchors.bottomMargin: 10
@@ -62,10 +58,8 @@ Item {
         elide: Text.ElideMiddle
         text: root.focused ? root.focused.name : ""
         color: Theme.color.label
-        font.family: Theme.fontText
         font.pixelSize: 15
-        font.weight: Font.DemiBold
-        font.variableAxes: ({ "wght": Font.DemiBold, "opsz": 17 })  // SF variable font: weight + text optical size
+        weight: Font.DemiBold
     }
 
     ListView {
@@ -88,7 +82,7 @@ Item {
             id: thumb
             required property var modelData
             required property int index
-            readonly property bool selected: { root.browser.selRev; return root.browser.isSelected(modelData.path); }
+            readonly property bool selected: root.browser.isSelected(modelData.path)
             width: 66
             height: 66
             radius: 8
@@ -100,16 +94,12 @@ Item {
                 entry: thumb.modelData
                 size: 52
             }
-            MouseArea {
+            EntryMouseArea {
                 anchors.fill: parent
-                acceptedButtons: Qt.LeftButton | Qt.RightButton
-                onPressed: mouse => {
-                    root.forceActiveFocus();
-                    root.browser.click(thumb.index, mouse.button === Qt.RightButton ? Qt.NoModifier : mouse.modifiers);
-                    if (mouse.button === Qt.RightButton)
-                        root.contextMenu(thumb.modelData, mapToItem(null, mouse.x, mouse.y));
-                }
-                onDoubleClicked: root.browser.activate(thumb.modelData)
+                browser: root.browser
+                entry: thumb.modelData
+                index: thumb.index
+                onContextMenu: (e, pos) => root.contextMenu(e, pos)
             }
         }
     }

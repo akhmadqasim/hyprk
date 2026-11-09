@@ -78,7 +78,7 @@ GridView {
         id: cell
         required property var modelData
         required property int index
-        readonly property bool selected: { grid.browser.selRev; return grid.browser.isSelected(modelData.path); }
+        readonly property bool selected: grid.browser.isSelected(modelData.path)
         readonly property bool renaming: grid.browser.renamingPath === modelData.path
         width: grid.cellWidth
         height: grid.cellHeight
@@ -135,22 +135,15 @@ GridView {
             }
         }
 
-        MouseArea {
+        EntryMouseArea {
             x: (parent.width - Theme.grid.labelWidth) / 2
             y: icon.y - 6
             width: Theme.grid.labelWidth
             height: label.y + label.contentHeight - y + 4
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onPressed: mouse => {
-                grid.forceActiveFocus();
-                if (mouse.button === Qt.RightButton) {
-                    if (!cell.selected) grid.browser.click(cell.index, Qt.NoModifier);
-                    grid.contextMenu(cell.modelData, mapToItem(null, mouse.x, mouse.y));
-                    return;
-                }
-                grid.browser.click(cell.index, mouse.modifiers);
-            }
-            onDoubleClicked: mouse => { if (mouse.button === Qt.LeftButton) grid.browser.activate(cell.modelData); }
+            browser: grid.browser
+            entry: cell.modelData
+            index: cell.index
+            onContextMenu: (e, pos) => grid.contextMenu(e, pos)
         }
     }
 }

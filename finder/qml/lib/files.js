@@ -30,6 +30,11 @@ function baseName(p) {
     return n === "/" ? "/" : n.slice(n.lastIndexOf("/") + 1);
 }
 
+// file:// URL with each segment percent-encoded ("#" or "%" in names would break a raw URL).
+function fileUrl(p) {
+    return "file://" + normalize(p).split("/").map(encodeURIComponent).join("/");
+}
+
 // Path bar segments from the root: [{name, path}, ...]. The root shows as rootName.
 function segments(p, rootName) {
     const n = normalize(p);

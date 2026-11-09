@@ -22,18 +22,9 @@ Item {
         const p = browser.path;
         if (browser.isVirtual) return [p];
         const base = p === home || p.indexOf(home + "/") === 0 ? home : "/";
-        const out = [base];
-        if (p !== base) {
-            let acc = base === "/" ? "" : base;
-            for (const part of p.slice(acc.length + 1).split("/")) {
-                acc += "/" + part;
-                out.push(acc);
-            }
-        }
-        return out;
+        return Files.segments(p).map(s => s.path).filter(d => base === "/" || d.length >= base.length);
     }
     readonly property var previewEntry: {
-        browser.selRev;
         const sel = browser.selectedEntries();
         return sel.length === 1 && !sel[0].isDir ? sel[0] : null;
     }
@@ -90,7 +81,6 @@ Item {
                     required property var modelData
                     required property int index
                     readonly property bool selected: {
-                        root.browser.selRev;
                         return col.last ? root.browser.isSelected(modelData.path) : modelData.path === col.chosen;
                     }
                     readonly property bool renaming: root.browser.renamingPath === modelData.path
@@ -145,19 +135,19 @@ Item {
                         onPressed: mouse => {
                             root.forceActiveFocus();
                             const e = row.modelData;
+                            const right = mouse.button === Qt.RightButton;
+                            const plain = !right && !(mouse.modifiers & (Qt.ControlModifier | Qt.ShiftModifier));
                             if (!col.last) {
                                 // earlier column: re-root the chain at this column
                                 root.browser.go(e.isDir ? e.path : col.dir);
                                 if (!e.isDir) root.browser.selectPaths([e.path]);
-                            } else if (e.isDir && mouse.button === Qt.LeftButton && !(mouse.modifiers & (Qt.ControlModifier | Qt.ShiftModifier))) {
+                            } else if (e.isDir && plain) {
                                 root.browser.go(e.path);
                                 return;
-                            } else {
-                                if (mouse.button !== Qt.RightButton || !row.selected)
-                                    root.browser.click(row.index, mouse.button === Qt.RightButton ? Qt.NoModifier : mouse.modifiers);
+                            } else if (!right || !row.selected) {
+                                root.browser.click(row.index, right ? Qt.NoModifier : mouse.modifiers);
                             }
-                            if (mouse.button === Qt.RightButton)
-                                root.contextMenu(e, mapToItem(null, mouse.x, mouse.y));
+                            if (right) root.contextMenu(e, mapToItem(null, mouse.x, mouse.y));
                         }
                         onDoubleClicked: mouse => { if (!row.modelData.isDir) root.browser.activate(row.modelData); }
                     }
@@ -182,17 +172,15 @@ Item {
                 entry: root.previewEntry
                 size: 180
             }
-            Text {
+            TextLabel {
                 width: (parent ? parent.width : 300) - 40
                 anchors.horizontalCenter: parent.horizontalCenter
                 horizontalAlignment: Text.AlignHCenter
                 elide: Text.ElideMiddle
                 text: root.previewEntry.name
                 color: Theme.color.label
-                font.family: Theme.fontText
                 font.pixelSize: 15
-                font.weight: Font.DemiBold
-                font.variableAxes: ({ "wght": Font.DemiBold, "opsz": 17 })  // SF variable font: weight + text optical size
+                weight: Font.DemiBold
             }
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
