@@ -62,7 +62,7 @@ Apple's numbers from `/mnt/code/liquid-glass-re/SPEC.md` section 9 (glass versio
 | `menu` | as regular | as regular | as regular | as regular | as regular | 0.6, r 24, y 10 | `hyprk-overlay`, `hyprk-menubar` |
 | `clear` | 0.125, 1.08, 1.06 | none | 0.25 D / -0.8 D | none | D 48→120 : 3→8 | as regular | |
 | `dock` | 0.15, 0.9, 1.1 (Apple 1.25) | none / 0.05 | 0.08 D / -0.18 D | 0.13 D / 0.42 D / 0.2 | 1.5 | as regular | `hyprk-dock` |
-| `controlcenter` | 0.1, 0.5, 0.7 (Apple 0.125, 0.8, 1.2) | none | 0.225 D (max 25) / -2.0 D (min -80) | 0.0357 D / 0.0714 D / 0.1525 | 4, variable from 100 pt in | as regular | `hyprk-controlcenter` |
+| `controlcenter` | 0.1, 0.5, 0.7 (Apple 0.125, 0.8, 1.2), face luma kept in 0.30-0.42 (dark 0.22-0.36) | none | 0.225 D (max 25) / -2.0 D (min -80) | 0.0357 D / 0.0714 D / 0.1525 | 4, variable from 100 pt in | as regular | `hyprk-controlcenter` |
 
 The face colour is Apple's YCC composite (SPEC 9.7): `Y' = black + (white - black) Y`, chroma x saturation,
 then the fill. The controlcenter face and the regular/dock saturation deviate from the decoded values:
@@ -138,8 +138,8 @@ A screenshot with `full_damage = 1` was pixel-identical to the default (test 202
 ## Performance
 
 The unblurred backdrop copy (variable blur, edge bleed) is made once per monitor frame, at the first
-glass element, and only for the damaged part of the glass boxes (nothing damaged under glass: no copy,
-no mip rebuild). `plugin:liquidglass:stats = 1` turns on GPU timestamp queries; `hyprctl liquidglass`
+glass element, for all glass boxes of the frame, and only on frames where something under the glass was
+damaged (otherwise no copy and no mip rebuild). `plugin:liquidglass:stats = 1` turns on GPU timestamp queries; `hyprctl liquidglass`
 prints the averages (`hyprctl liquidglass reset` clears them). `test/bench.sh` runs the real shell on a
 headless 3840x2160 @ 1.5 output (the user's 4K 150 %) with Dock, Control Center and a banner over a
 terminal that redraws every frame, and measures three configurations. Result on this PC (AMD RDNA2, the
@@ -154,6 +154,33 @@ RX 6600 class GPU), 6 s each, 2026-11-10:
 "Whole frame" spans the pass from `RENDER_LAST_MOMENT` to `RENDER_POST` and is dominated by
 Hyprland's own work in the nested session (3 blur passes, two outputs), so its differences are within
 noise: the glass costs about 0.5 ms per element per redrawn frame at 4K.
+
+## Title bars
+
+Windows that draw no title bar themselves get a macOS one (`src/Titlebar.cpp`): a 32 pt bar in the window's
+colour (or light glass with `titlebar_glass = 1`), traffic lights #FF5F57 / #FEBC2E / #28C840 (grey when the
+window is inactive, glyphs × − + while the pointer is over them), and the title centred in SF Pro Text 13
+semibold. Close sends the client a close request, minimise moves the window to `special:minimized`, zoom
+toggles maximised, dragging the rest of the bar moves the window.
+
+`titlebar = "auto"` (default) gives a bar to Wayland clients that bound xdg-decoration (Hyprland always
+answers server-side, so they draw none: foot, Qt apps); GTK apps with client-side decorations get none.
+`titlebar_classes` (regex) forces a bar, `titlebar_exclude` (regex, default the hyprk apps, which draw their
+own) prevents one, `titlebar = "classes"` only uses the regex, `"off"` disables it.
+
+| Key | Default |
+|---|---|
+| `titlebar` | `auto` |
+| `titlebar_classes` / `titlebar_exclude` | "" / `^(org\.hyprk\..*|hyprk-.*)$` |
+| `titlebar_height` / `titlebar_button` / `titlebar_gap` / `titlebar_inset` | 32 / 14 / 7 / 15 pt (SPEC: bar 32, buttons 14; gap and inset measured on the reference screenshot) |
+| `titlebar_font` / `titlebar_font_size` | `SF Pro Text` / 13 |
+| `titlebar_color` / `titlebar_color_inactive` | `0xF3F1EFFF` / `0xF6F5F4FF` |
+| `titlebar_text` / `titlebar_text_inactive` | `0x333333D9` / `0x33333359` |
+| `titlebar_glass` | 0 |
+
+Which clients asked for server-side decorations is read from Hyprland's private xdg-decoration map
+(`#define private public` around one header, read only). The bar's fill also covers the window's rounded
+top corners, so the two read as one shape.
 
 ## Windows
 

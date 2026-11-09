@@ -99,6 +99,7 @@ namespace lg {
             .bleedLod         = loc("bleedLod"),
             .bleedYcc         = loc("bleedYcc"),
             .faceFill         = loc("faceFill"),
+            .faceLuma         = loc("faceLuma"),
             .lightDir         = loc("lightDir"),
             .highlightBias    = loc("highlightBias"),
             .highlightWidth   = loc("highlightWidth"),
@@ -265,10 +266,9 @@ namespace lg {
         constexpr double SHARP_MARGIN = 128;
 
         // The unblurred backdrop for all glass of this monitor frame, refreshed once per frame at
-        // the first glass element: the damaged part of every claimed glass box (plus the mip
-        // footprint) is copied from what Hyprland blurs (the backdrop capture when a scope is open,
-        // else the framebuffer being rendered), then the mip chain is rebuilt. Nothing damaged
-        // under the glass: no copy, no mips. Glass drawn above other glass in the same frame sees
+        // the first glass element: every claimed glass box (plus the mip footprint) is copied from
+        // what Hyprland blurs (the backdrop capture when a scope is open, else the framebuffer being
+        // rendered), then the mip chain is rebuilt. Nothing damaged under the glass: no copy, no mips. Glass drawn above other glass in the same frame sees
         // the backdrop without the lower glass in its sharp samples (its blurred ones are exact).
         // Returns the texture, or null when a copy is not possible.
         SP<Render::ITexture> sharpBackdrop(Render::CRenderContext& ctx, const Vector2D& size, bool perElement) {
@@ -293,13 +293,15 @@ namespace lg {
                 return tex;
             sh.frame = g_frame;
 
+            // every claimed box, but only on frames where something under the glass was damaged
             CRegion copy;
-            for (const auto& [box, added] : g_claims)
+            bool    touched = fresh || perElement;
+            for (const auto& [box, added] : g_claims) {
                 copy.add(box.copy().expand(SHARP_MARGIN));
+                touched = touched || !CRegion{ctx.m_data.damage}.intersect(box).empty();
+            }
             copy.intersect(CBox{{}, size});
-            if (!fresh && !perElement)
-                copy.intersect(ctx.m_data.damage.copy().expand(SHARP_MARGIN));
-            if (copy.empty())
+            if (!touched || copy.empty())
                 return tex;
             {
                 CFramebufferBindingGuard guard{g_pHyprRenderer->glBackend()};
@@ -617,6 +619,7 @@ namespace lg {
             const SRgba base = face.fill.a > 0 ? face.fill : SRgba{1, 1, 1, 0};
             const SRgba fill = dark[q] ? face.fill : SRgba{base.r, base.g, base.b, 1 - (1 - base.a) * (1 - face.lift * p.lift)};
             glUniform4f(u.faceFill, fill.r, fill.g, fill.b, fill.a);
+            glUniform2f(u.faceLuma, face.lumaMin, face.lumaMax);
             glUniform1f(u.highlightBias, face.highlightBias * p.highlight);
             glUniform1f(u.shadowOpacity, m_data.shadow ? res.shadowOpacity * p.shadowScale : 0.f);
 

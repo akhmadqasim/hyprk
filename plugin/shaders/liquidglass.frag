@@ -38,6 +38,7 @@ uniform vec3  bleedYcc;
 
 uniform vec3  faceYcc;              // black, white, saturation
 uniform vec4  faceFill;             // rgb + amount ("normalFill")
+uniform vec2  faceLuma;             // allowed face luminance range (gamma)
 
 uniform vec2  lightDir;             // unit vector, screen space (y down)
 uniform float highlightBias;        // colour bias of the rim (negative darkens: dark specular)
@@ -218,6 +219,15 @@ void main() {
         // YCC face effect, then the fill (SPEC 9.7)
         col = ycc(col, faceYcc);
         col = mix(col, faceFill.rgb, faceFill.a);
+        // keep the tile tone inside its range over any backdrop: lift darks additively (keeps hue),
+        // scale brights down
+        {
+            float Lg = luma(encode(clamp(col, 0.0, 1.0)));
+            if (Lg < faceLuma.x)
+                col = decode(clamp(encode(clamp(col, 0.0, 1.0)) + (faceLuma.x - Lg), 0.0, 1.0));
+            else if (Lg > faceLuma.y)
+                col = decode(encode(clamp(col, 0.0, 1.0)) * (faceLuma.y / Lg));
+        }
 
         // edge bleed: outside colour pulled into the rim through its own colour effect (step 4.7)
         if (bleedOpacity > 0.0 && depth < bleedHeight) {

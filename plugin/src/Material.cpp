@@ -62,8 +62,8 @@ namespace lg {
         // inner 0.225 D clamp 25 / -2.0 D clamp -80, outer 0.0357 D / 0.0714 D at 0.1525.
         constexpr SRecipe CONTROLCENTER = {
             .name                = "controlcenter",
-            .light               = {.ycc = {0.1f, 0.5f, 0.7f}, .fill = {}, .highlightBias = 0.5f, .bleed = CLEAR_BLEED},
-            .dark                = {.ycc = {0.1f, 0.5f, 0.7f}, .fill = {}, .highlightBias = 0.3f, .bleed = CLEAR_BLEED},
+            .light               = {.ycc = {0.1f, 0.5f, 0.7f}, .fill = {}, .highlightBias = 0.5f, .bleed = CLEAR_BLEED, .lumaMin = 0.30f, .lumaMax = 0.42f},
+            .dark                = {.ycc = {0.1f, 0.5f, 0.7f}, .fill = {}, .highlightBias = 0.3f, .bleed = CLEAR_BLEED, .lumaMin = 0.22f, .lumaMax = 0.36f},
             .refractionHeightN   = 0.225f,
             .refractionHeightMax = 25,
             .refractionAmountN   = -2.0f,
