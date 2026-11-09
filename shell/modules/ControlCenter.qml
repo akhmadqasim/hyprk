@@ -180,7 +180,6 @@ Item {
             tint: Theme.cc.tileTint
             solidColor: Theme.cc.tileSolid
             pluginLift: Theme.cc.pluginLift
-            pluginRim: Theme.cc.rim
             shadow: false
         }
     }

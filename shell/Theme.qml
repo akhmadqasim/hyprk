@@ -275,7 +275,6 @@ Singleton {
         // darkening veil over the plugin glass: white labels need ~5:1 like the reference
         // the plugin's controlcenter recipe gives the reference grey frost itself; no extra veil
         readonly property color pluginLift: "transparent"
-        readonly property color rim: Qt.rgba(1, 1, 1, 0.38)            // top-lit rim drawn over plugin glass
         readonly property color tileTint: theme.dark ? Qt.rgba(0.12, 0.12, 0.13, 0.45) : Qt.rgba(0.30, 0.28, 0.27, 0.42)   // QML material: dark neutral frost
         readonly property color tileSolid: theme.dark ? "#3A3A3C" : "#8E8E93"
         readonly property color text: "#FFFFFF"
