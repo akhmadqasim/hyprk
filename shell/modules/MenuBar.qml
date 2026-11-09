@@ -198,7 +198,9 @@ ShellWindow {
         sourceComponent: Glass {
             radius: Theme.menuBar.titleRadius
             // the bar sits at the screen origin, so the scene position is the screen position
-            readonly property point pos: hp.mapToItem(null, 0, 0)
+            // re-evaluated when the title/status item moves inside its Row
+            readonly property point pos: hp.parent.x + hp.parent.y >= -1e9 ? hp.mapToItem(null, 0, 0) : Qt.point(0, 0)
+            onPosChanged: remeasure()
             sx: pos.x
             sy: pos.y
             tint: Theme.color.menuBarHighlight
