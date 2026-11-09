@@ -40,7 +40,7 @@ Item {
         title: "Wi-Fi"
         available: cc.wifiDev !== null
         on: available && Networking.wifiEnabled
-        subtitle: !available ? "Not Available" : !on ? "Off" : cc.wifiNet ? cc.wifiNet.name : "Not Connected"
+        subtitle: !on ? "Off" : cc.wifiNet ? cc.wifiNet.name : "Not Connected"
         onToggled: Networking.wifiEnabled = !Networking.wifiEnabled
     }
     Capsule {
@@ -49,7 +49,7 @@ Item {
         title: "Bluetooth"
         available: State.hasBluetooth(cc.btAdapter)
         on: available && cc.btAdapter.enabled
-        subtitle: !available ? "Not Available" : on ? "On" : "Off"
+        subtitle: on ? "On" : "Off"
         onToggled: cc.btAdapter.enabled = !cc.btAdapter.enabled
     }
     Capsule {
@@ -206,13 +206,13 @@ Item {
             width: Theme.cc.toggleSize
             height: width
             radius: width / 2
-            color: cap.on ? Theme.cc.toggleOnBg : Theme.cc.toggleOffBg
+            color: cap.on ? Theme.cc.toggleOnBg : Theme.cc.capsuleOffBg
             Behavior on color { ColorAnimation { duration: Theme.anim.fast } }
             Symbol {
                 anchors.centerIn: parent
                 name: cap.symbol
                 size: Theme.cc.toggleSize * Theme.cc.toggleGlyph
-                color: cap.on ? cap.onAccent : Theme.cc.toggleOffIcon
+                color: cap.on ? cap.onAccent : Theme.cc.capsuleOffIcon
             }
         }
         Column {

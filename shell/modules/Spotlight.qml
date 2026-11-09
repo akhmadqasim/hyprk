@@ -78,7 +78,7 @@ ShellWindow {
 
     // `qs ipc call spotlight search "2+2"`: open with a query (scripted screenshots)
     readonly property real panelX: (width - Theme.spotlight.width) / 2
-    readonly property real panelY: height / Theme.spotlight.topFraction - Theme.spotlight.barHeight / 2
+    readonly property real panelY: height * Theme.spotlight.top
 
     // one glass panel: search row on top, results below a hairline
     Item {

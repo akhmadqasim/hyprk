@@ -23,12 +23,13 @@ Item {
     // folder name as the caption, like a Photos memory; a loose file in ~/Pictures gets the generic title
     readonly property string photoTitle: {
         const folder = photo ? photo.split("/").slice(-2, -1)[0] : "";
-        return folder && folder !== "Pictures" ? folder : "Featured Photo";
+        return folder && folder !== "Pictures" && folder !== "png" ? folder : "Featured Photo";
     }
     Process {
         // first photo in ~/Pictures (xdg dir, screenshots skipped), once per shell start
         running: true
-        command: ["sh", "-c", 'd="$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures")"; find "$d" -maxdepth 2 -type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \\) -not -ipath "*screenshot*" 2>/dev/null | head -n1']
+        // a photo from ~/Pictures (no screenshots), else one of the macOS wallpapers
+        command: ["sh", "-c", 'd="$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures")"; p=$(find "$d" -maxdepth 2 -type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \\) -not -ipath "*screenshot*" 2>/dev/null | head -n1); [ -n "$p" ] || p=$(ls "$0"/*.png 2>/dev/null | grep -vi tahoe | head -n1); echo "$p"', Quickshell.shellDir + "/../themes/wallpapers/png"]
         stdout: StdioCollector { onStreamFinished: nc.photo = text.trim() }
     }
     property var groups: []
@@ -134,58 +135,17 @@ Item {
                         color: Theme.color.label
                     }
                 }
+                // macOS 26 "Up Next": date on the left, events (none here) on the right
                 Text {
-                    x: Theme.nc.widgetPadding
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: Theme.nc.widgetPadding
-                    text: "No events today"
+                    x: parent.width * Theme.nc.upNextSplit
+                    width: parent.width * (1 - Theme.nc.upNextSplit) - Theme.nc.widgetPadding
+                    anchors.verticalCenter: parent.verticalCenter
+                    wrapMode: Text.WordWrap
+                    text: "No more events today"
                     font.family: Theme.fontText
-                    font.pixelSize: Theme.font.widgetSmall + 1
+                    font.pixelSize: Theme.font.widgetSmall + 2
                     font.weight: Theme.font.medium
                     color: Theme.color.secondaryLabel
-                }
-                // month grid on the right half, today in a red circle (macOS medium Calendar widget)
-                Grid {
-                    id: month
-                    // ints change once a day/month, so the grid is not rebuilt by the seconds clock
-                    readonly property int year: clock.date.getFullYear()
-                    readonly property int mon: clock.date.getMonth()
-                    readonly property int today: clock.date.getDate()
-                    readonly property int lead: (new Date(year, mon, 1).getDay() + 6) % 7   // weeks start on Monday
-                    readonly property int days: new Date(year, mon + 1, 0).getDate()
-                    readonly property var dayNames: ["M", "T", "W", "T", "F", "S", "S"]
-                    anchors.right: parent.right
-                    anchors.rightMargin: Theme.nc.widgetPadding
-                    anchors.verticalCenter: parent.verticalCenter
-                    columns: 7
-                    columnSpacing: Theme.nc.monthGap
-                    rowSpacing: Theme.nc.monthGap / 2
-                    Repeater {
-                        model: 7 + month.lead + month.days
-                        delegate: Item {
-                            required property int index
-                            readonly property bool isHeader: index < 7
-                            readonly property int day: index - 7 - month.lead + 1
-                            readonly property bool isToday: day === month.today
-                            width: Theme.nc.monthCell
-                            height: Theme.nc.monthCell
-                            Rectangle {
-                                anchors.fill: parent
-                                anchors.margins: 1
-                                radius: width / 2
-                                color: Theme.color.red
-                                visible: parent.isToday
-                            }
-                            Text {
-                                anchors.centerIn: parent
-                                text: parent.isHeader ? month.dayNames[parent.index] : parent.day > 0 ? parent.day : ""
-                                font.family: Theme.fontText
-                                font.pixelSize: Theme.font.widgetMonth
-                                font.weight: parent.isHeader ? Theme.font.semibold : Theme.font.regular
-                                color: parent.isToday ? Theme.nc.onImage : parent.isHeader ? Theme.color.secondaryLabel : Theme.color.label
-                            }
-                        }
-                    }
                 }
             }
             Widget {

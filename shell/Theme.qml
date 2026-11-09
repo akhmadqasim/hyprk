@@ -92,7 +92,6 @@ Singleton {
         readonly property real dockTooltip: 14      // SPEC 9.9.3: Dock app-name label, system 14
         readonly property real widgetBig: 34        // TODO verify
         readonly property real widgetSmall: 11      // TODO verify
-        readonly property real widgetMonth: 10      // mini month digits
         readonly property real widgetPhotoTitle: 24 // Photos widget caption
 
         readonly property int regular: Font.Normal
@@ -236,8 +235,7 @@ Singleton {
         readonly property int widgetRadius: 22
         readonly property int widgetSmall: (width - spacing) / 2
         readonly property int widgetPadding: 16
-        readonly property int monthCell: 17              // mini month in the Calendar widget
-        readonly property int monthGap: 2
+        readonly property real upNextSplit: 0.45         // Calendar "Up Next": date left, events right
         readonly property color onImage: "#FFFFFF"       // text over the Photos widget
         readonly property color onImageSecondary: Qt.rgba(1, 1, 1, 0.85)
         readonly property real photoScrim: 0.45          // bottom gradient behind the caption
@@ -280,8 +278,11 @@ Singleton {
         readonly property color subtext: Qt.rgba(1, 1, 1, 0.78)
         readonly property color toggleOnBg: "#FFFFFF"
         readonly property color toggleOnIcon: theme.dark ? "#0A84FF" : "#007AFF"   // systemBlue (= color.accent)
-        readonly property color toggleOffBg: Qt.rgba(1, 1, 1, 0.18)
+        readonly property color toggleOffBg: Qt.rgba(1, 1, 1, 0.18)     // round buttons
         readonly property color toggleOffIcon: "#FFFFFF"
+        // capsule toggles when off (macOS Wi-Fi "Off"): white circle, grey glyph
+        readonly property color capsuleOffBg: Qt.rgba(1, 1, 1, 0.92)
+        readonly property color capsuleOffIcon: "#8E8E93"
         readonly property color sliderTrackColor: Qt.rgba(1, 1, 1, 0.28)
         readonly property color sliderFillColor: "#FFFFFF"
     }
@@ -293,7 +294,7 @@ Singleton {
         readonly property int barHeight: 56              // SPEC.md 7: heightCollapsed 56
         readonly property int radius: 28                 // SPEC.md 7: windowCornerRadius 28
         readonly property int resultsRadius: 28          // same window radius when expanded
-        readonly property int topFraction: 4             // panel top = screen height / topFraction, TODO verify
+        readonly property real top: 0.22                 // bar top at 22% of the screen height (reference/JUDGE-r3.md)
         readonly property int iconSize: 20               // magnifier, TODO verify
         readonly property int rowHeight: 48              // tall rows (macOS 26/27), TODO verify
         readonly property int rowIcon: 34                // TODO verify

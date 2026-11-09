@@ -29,15 +29,22 @@ Singleton {
         ["org.gnome.TextEditor", "org.gnome.gedit"],
         ["org.gnome.Music", "rhythmbox", "org.gnome.Rhythmbox3"],
         ["org.hyprk.Settings"],
-        ["com.mitchellh.ghostty", "org.gnome.Terminal", "kitty", "org.gnome.Ptyxis"],
+        ["com.mitchellh.ghostty", "org.gnome.Terminal", "kitty", "org.gnome.Ptyxis", "foot"],
     ]
 
     readonly property var entries: DesktopEntries.applications.values
     // visible apps sorted by name (Apps panel), rebuilt only when the entry list changes
     // helper launchers like "Foot Client" / "Foot Server" next to "Foot" (same icon,
     // name extends the main one) are hidden, like macOS shows one app
+    // terminal emulators: only the preferred one is listed (macOS has one Terminal)
+    readonly property var terminalIds: pinnedCandidates.find(g => g.indexOf("com.mitchellh.ghostty") !== -1)
+    function isTerminal(e) { return (e.categories || []).indexOf("TerminalEmulator") !== -1; }
+    readonly property var preferredTerminal: {
+        for (const id of terminalIds) { const e = DesktopEntries.byId(id); if (e) return e; }
+        return null;
+    }
     readonly property var sortedEntries: {
-        const vis = entries.filter(e => !e.noDisplay);
+        const vis = entries.filter(e => !e.noDisplay && (!isTerminal(e) || !preferredTerminal || e === preferredTerminal));
         const helper = e => !!e.icon && vis.some(m => m !== e && m.icon === e.icon && e.name.startsWith(m.name + " "));
         return vis.filter(e => !helper(e)).sort((a, b) => a.name.localeCompare(b.name));
     }
@@ -58,7 +65,8 @@ Singleton {
             }
             for (const id of ids) {
                 const e = DesktopEntries.byId(id);
-                if (e) { out.push({ id: e.id, name: e.name, icon: e.icon, entry: e }); break; }
+                // the other ids of the group count as this app (one Terminal in the Dock)
+                if (e) { out.push({ id: e.id, name: e.name, icon: e.icon, entry: e, alsoIds: ids.filter(i => i !== id) }); break; }
             }
         }
         return out;
@@ -129,7 +137,7 @@ Singleton {
         "calendar": "Calendar", "texteditor": "TextEdit", "gedit": "TextEdit",
         "music": "Music", "rhythmbox": "Music", "rhythmbox3": "Music",
         "settings": "System_Settings", "gnome-control-center": "System_Settings",
-        "ghostty": "Terminal", "terminal": "Terminal", "kitty": "Terminal", "ptyxis": "Terminal",
+        "ghostty": "Terminal", "terminal": "Terminal", "kitty": "Terminal", "ptyxis": "Terminal", "foot": "Terminal",
         "calculator": "Calculator", "gnome-calculator": "Calculator",
         "gnome-system-monitor": "Activity_Monitor", "systemmonitor": "Activity_Monitor",
         "loupe": "Preview", "eog": "Preview", "evince": "Preview", "papers": "Preview",
