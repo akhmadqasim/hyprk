@@ -12,7 +12,7 @@ Item {
     property real size: 64
 
     readonly property string kind: Files.iconClass(entry)
-    readonly property bool wantsThumb: (kind === "image" || kind === "pdf" || kind === "video") && entry.size > 0
+    readonly property bool wantsThumb: (kind === "image" || kind === "pdf" || kind === "video" || kind === "text") && entry.size > 0
     property bool thumbFailed: false
     onEntryChanged: thumbFailed = false
     readonly property bool showThumb: wantsThumb && !thumbFailed && size >= 16
@@ -36,18 +36,24 @@ Item {
         width: thumb.paintedWidth
         height: thumb.paintedHeight
 
-        Rectangle {   // shadow
-            anchors.fill: parent
-            anchors.margins: -1
-            anchors.topMargin: 0
-            anchors.bottomMargin: -2
-            radius: 3
-            color: Qt.rgba(0, 0, 0, 0.10)
+        // soft shadow: two offset rounded layers (no blur effects, they need a GPU layer)
+        Repeater {
+            model: [{ grow: 2, alpha: 0.05 }, { grow: 1, alpha: 0.08 }]
+            Rectangle {
+                required property var modelData
+                x: -modelData.grow
+                y: -modelData.grow + 1
+                width: thumbBox.width + 2 * modelData.grow
+                height: thumbBox.height + 2 * modelData.grow
+                radius: Math.max(thumbBox.width, thumbBox.height) * 0.06 + modelData.grow
+                color: Qt.rgba(0, 0, 0, modelData.alpha)
+            }
         }
         Image {
             id: thumb
-            width: root.size * 0.94
-            height: root.size * 0.94
+            // thumbnails stay inside the art area of the macOS icons (ref: 68 px in a 77 px icon)
+            width: root.size * 0.88
+            height: root.size * 0.88
             x: (thumbBox.width - width) / 2
             y: (thumbBox.height - height) / 2
             fillMode: Image.PreserveAspectFit
@@ -59,9 +65,9 @@ Item {
         Rectangle {   // hairline frame
             anchors.fill: parent
             color: "transparent"
-            radius: 2
-            border.width: 1
-            border.color: Qt.rgba(0, 0, 0, 0.14)
+            radius: Math.max(width, height) * 0.06
+            border.width: 0.5
+            border.color: Qt.rgba(0, 0, 0, 0.10)
         }
     }
 

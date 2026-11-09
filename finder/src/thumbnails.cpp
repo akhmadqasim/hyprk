@@ -2,9 +2,12 @@
 
 #include <QCryptographicHash>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QImageReader>
 #include <QMimeDatabase>
+#include <QPainter>
+#include <QPainterPath>
 #include <QMutex>
 #include <QSet>
 #include <QProcess>
@@ -58,6 +61,22 @@ QImage generate(const QString &path, const QString &mime, bool *cacheIt)
             return {};
         return QImage(out + QStringLiteral(".png"));
     }
+    if (mime.startsWith(QLatin1String("text/"))) {
+        // a page with the first lines, like Finder's text previews
+        QFile f(path);
+        if (!f.open(QIODevice::ReadOnly))
+            return {};
+        const QString text = QString::fromUtf8(f.read(4096));
+        QImage page(396, kCacheSide, QImage::Format_RGB32);
+        page.fill(Qt::white);
+        QPainter p(&page);
+        QFont font(QStringLiteral("Monospace"));
+        font.setPixelSize(15);
+        p.setFont(font);
+        p.setPen(QColor(40, 40, 40));
+        p.drawText(page.rect().adjusted(28, 28, -28, -28), Qt::TextWrapAnywhere | Qt::AlignLeft | Qt::AlignTop, text);
+        return page;
+    }
     if (mime.startsWith(QLatin1String("image/"))) {
         QImageReader reader(path);
         reader.setAutoTransform(true);
@@ -70,9 +89,25 @@ QImage generate(const QString &path, const QString &mime, bool *cacheIt)
     return {};
 }
 
+// Finder thumbnails have softly rounded corners (about 6% of the long side).
+QImage rounded(const QImage &src)
+{
+    QImage out(src.size(), QImage::Format_ARGB32_Premultiplied);
+    out.fill(Qt::transparent);
+    QPainter p(&out);
+    p.setRenderHint(QPainter::Antialiasing);
+    QPainterPath path;
+    const qreal r = std::max(src.width(), src.height()) * 0.06;
+    path.addRoundedRect(QRectF(src.rect()), r, r);
+    p.setClipPath(path);
+    p.drawImage(0, 0, src);
+    return out;
+}
+
 bool canGenerate(const QString &mime)
 {
-    return mime == QLatin1String("application/pdf") || mime.startsWith(QLatin1String("image/"));
+    return mime == QLatin1String("application/pdf") || mime.startsWith(QLatin1String("image/"))
+        || mime.startsWith(QLatin1String("text/"));
 }
 
 // Files that failed to render this session (key: own-cache file name), so scrolling
@@ -146,7 +181,9 @@ QImage ThumbnailProvider::thumbnail(const QString &path, int side)
             }
         }
     }
-    if (!img.isNull() && (img.width() > side || img.height() > side))
+    if (img.isNull())
+        return img;
+    if (img.width() > side || img.height() > side)
         img = img.scaled(side, side, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    return img;
+    return rounded(img);
 }

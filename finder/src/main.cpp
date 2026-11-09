@@ -5,6 +5,7 @@
 // --shot renders the window, saves a PNG and quits (works with QT_QPA_PLATFORM=offscreen).
 
 #include "fileops.h"
+#include "sysicons.h"
 #include "thumbnails.h"
 
 #include <QCommandLineParser>
@@ -90,6 +91,7 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     engine.addImageProvider(QStringLiteral("icon"), new IconProvider);
     engine.addImageProvider(QStringLiteral("thumb"), new ThumbnailProvider);
+    engine.addImageProvider(QStringLiteral("sysicon"), new SysIconProvider(QStringLiteral(FINDER_ICON_DIR)));
     engine.rootContext()->setContextProperty(QStringLiteral("startup"), QVariantMap{
         // "recents:", "applications:" and "tag:<Name>" are virtual locations, not paths
         {QStringLiteral("path"), dir.isEmpty() || dir.endsWith(QLatin1Char(':')) || dir.startsWith(QLatin1String("tag:")) ? dir : QDir(dir).absolutePath()},

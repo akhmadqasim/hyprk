@@ -6,7 +6,7 @@
 // image://thumb/<url-encoded absolute path>
 // Order: freedesktop cache (~/.cache/thumbnails/{x-large,large,normal}), then our own cache
 // (~/.cache/hyprk-finder/thumbnails/<md5 uri>-<mtime>.png), then generation:
-// images through QImageReader, PDFs through `pdftoppm` (first page). Runs on a thread pool,
+// images through QImageReader, PDFs through `pdftoppm` (first page), text as a rendered page. Runs on a thread pool,
 // so the UI never waits. Anything else fails, and QML falls back to the drawn icon.
 class ThumbnailProvider : public QQuickAsyncImageProvider {
 public:

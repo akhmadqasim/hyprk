@@ -23,7 +23,8 @@ Rectangle {
     Component.onCompleted: refreshVolumes()
 
     readonly property var sections: [
-        // Shared, iCloud Drive and AirDrop are visual placeholders (no Linux backend); AirDrop is dimmed
+        // macOS default sidebar (no Home or disk rows; reach them with Ctrl+Shift+H and the path bar).
+        // Shared, iCloud Drive and AirDrop are visual placeholders (no Linux backend).
         { header: "", items: [
             { label: "Recents", icon: "clock", path: "recents:" },
             { label: "Shared", icon: "shared", path: "" }
@@ -32,13 +33,11 @@ Rectangle {
             { label: "Applications", icon: "applications", path: "applications:" },
             { label: "Desktop", icon: "desktop", path: FileOps.standardPath("desktop") },
             { label: "Documents", icon: "doc", path: FileOps.standardPath("documents") },
-            { label: "Downloads", icon: "download", path: FileOps.standardPath("downloads") },
-            { label: Files.baseName(FileOps.homePath()), icon: "house", path: FileOps.homePath() }
+            { label: "Downloads", icon: "download", path: FileOps.standardPath("downloads") }
         ] },
         { header: "Locations", items: [
             { label: "iCloud Drive", icon: "icloud", path: "" },
-            { label: "AirDrop", icon: "airdrop", path: "", dim: true },
-            { label: "Macintosh HD", icon: "drive", path: "/" }
+            { label: "AirDrop", icon: "airdrop", path: "" }
         ].concat(volumes.map(v => ({ label: v.name, icon: "drive", path: v.path })))
          .concat([{ label: "Trash", icon: "trash", path: FileOps.standardPath("trash") }]) },
         { header: "Tags", items: Theme.color.tags.slice(0, 5).map(t => ({ label: t.name, dot: t.color, path: "tag:" + t.name })) }
@@ -85,7 +84,6 @@ Rectangle {
                             readonly property bool current: modelData.path !== "" && modelData.path === root.browser.path
                             width: column.width
                             height: Theme.sidebar.rowHeight
-                            opacity: modelData.dim ? 0.4 : 1
 
                             Rectangle {
                                 x: Theme.sidebar.rowInset

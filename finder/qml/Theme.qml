@@ -19,7 +19,7 @@ QtObject {
     // ---------- macOS file icons (themes/icons/system), "" = use the drawn fallbacks ----------
     property string iconDir: ""
     function sysIcon(name, px) {
-        return iconDir ? "file://" + iconDir + "/" + name + (px > 128 ? "-512.png" : "-128.png") : "";
+        return iconDir ? "image://sysicon/" + name + "@" + px : "";   // SysIconProvider re-tints folders
     }
     // folders that get their own icon, by absolute path
     readonly property var folderIcons: {
@@ -103,9 +103,9 @@ QtObject {
         readonly property color lightInactive: theme.dark ? "#4A4A4C" : "#D6D6D6"
 
         // folder icon (macOS blue folder)
-        readonly property color folderBack: "#5BAEEA"
-        readonly property color folderFront: "#80C4F2"
-        readonly property color folderTop: "#A5D8F8"
+        readonly property color folderBack: "#5FA9DA"    // ref (95,169,218)
+        readonly property color folderFront: "#71B9E4"   // ref (113,185,228)
+        readonly property color folderTop: "#81C6EE"     // ref (129,198,238)
 
         readonly property color previewPanel: theme.dark ? Qt.rgba(0.15, 0.15, 0.16, 0.97) : Qt.rgba(0.97, 0.97, 0.97, 0.98)
         readonly property color alert: theme.dark ? "#2C2C2E" : "#F5F5F5"
@@ -175,7 +175,7 @@ QtObject {
     readonly property QtObject grid: QtObject {
         readonly property int cellWidth: 154     // ref (column centers 154 apart)
         readonly property int cellHeight: 138    // ref
-        readonly property int iconSize: 72       // ref (folder ~72x60)
+        readonly property int iconSize: 77       // ref: folder art 72 px wide, the PNG has ~3 px padding
         readonly property int iconTop: 26        // ref (first icon top y ~90 = 64 + 26)
         readonly property int labelGap: 8
         readonly property int labelWidth: 132
