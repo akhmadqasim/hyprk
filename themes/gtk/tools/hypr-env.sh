@@ -4,14 +4,19 @@ export HYPR_DEV=${HYPR_DEV:-/mnt/code/hypr-dev}
 export HK_DIR=${HK_DIR:-${XDG_RUNTIME_DIR:-/tmp}/hyprk}
 mkdir -p "$HK_DIR"
 source "$HYPR_DEV/env.sh"
-export HK_SIG=$(cat "$HK_DIR/sig" 2>/dev/null); export HYPRLAND_INSTANCE_SIGNATURE=$HK_SIG
-export HK_WL=$(cat "$HK_DIR/wl" 2>/dev/null)
-# fonts: one fontconfig for every rig script, SF fonts by their real family names (SF Pro, SF Pro Rounded, SF Mono) from themes/fonts/named
-HK_THEMES=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
-sed "s|@FONTDIR@|$HK_THEMES/fonts/named|; s|@CACHEDIR@|$HK_DIR/fccache|" "$HK_THEMES/fontconfig/60-hyprk-sf.conf.in" > "$HK_DIR/60-hyprk-sf.conf"
-printf '<?xml version="1.0"?><!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd"><fontconfig><include ignore_missing="yes">/etc/fonts/fonts.conf</include><include>%s</include></fontconfig>\n' "$HK_DIR/60-hyprk-sf.conf" > "$HK_DIR/fonts.conf"
+read -r HK_SIG < "$HK_DIR/sig" 2>/dev/null; export HK_SIG HYPRLAND_INSTANCE_SIGNATURE=$HK_SIG
+read -r HK_WL < "$HK_DIR/wl" 2>/dev/null; export HK_WL
+# fonts: one fontconfig for every rig script (SF Pro, SF Pro Rounded, SF Mono by their family names from themes/fonts/named),
+# regenerated only when the template is newer
+_hk_themes=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+source "$_hk_themes/lib.sh"
+if [ ! -f "$HK_DIR/fonts.conf" ] || [ "$_hk_themes/fontconfig/60-hyprk-sf.conf.in" -nt "$HK_DIR/fonts.conf" ]; then
+  hk_fontconf "$_hk_themes/fontconfig/60-hyprk-sf.conf.in" "$_hk_themes/fonts/named" "$HK_DIR/fccache" > "$HK_DIR/60-hyprk-sf.conf"
+  printf '<?xml version="1.0"?><!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd"><fontconfig><include ignore_missing="yes">/etc/fonts/fonts.conf</include><include>%s</include></fontconfig>\n' "$HK_DIR/60-hyprk-sf.conf" > "$HK_DIR/fonts.conf"
+fi
 export HK_FONTCONF=$HK_DIR/fonts.conf
+unset _hk_themes
 # hk_monitor: name of the headless output (where test windows and the lock screen appear)
-hk_monitor() { hyprctl monitors -j | python3 -c "import sys,json;m=[x['name'] for x in json.load(sys.stdin) if x['name'].startswith('HEADLESS')];print(m[0]) if m else sys.exit('no HEADLESS output, run hypr-headless.sh')"; }
-# hk_wait_client SECONDS: wait until the headless Hyprland has at least one window, then let it paint
-hk_wait_client() { for _ in $(seq 1 $(( ${1:-15} * 4 ))); do [ "$(hyprctl clients -j | python3 -c 'import sys,json;print(len(json.load(sys.stdin)))')" -gt 0 ] && break; sleep 0.25; done; sleep ${2:-1.5}; }
+hk_monitor() { local m; m=$(hyprctl monitors | awk '/^Monitor HEADLESS/{print $2; exit}'); [ -n "$m" ] && echo "$m" || { echo "no HEADLESS output, run hypr-headless.sh" >&2; return 1; }; }
+# hk_wait_client SECONDS [SETTLE]: wait until the headless Hyprland has a window, then let it paint
+hk_wait_client() { local i; for ((i = 0; i < ${1:-15} * 4; i++)); do hyprctl clients | grep -q '^Window' && break; sleep 0.25; done; sleep ${2:-1.5}; }

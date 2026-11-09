@@ -32,6 +32,10 @@ The existing `settings.ini` block in env.sh can stay (it still carries `gtk-deco
 apps that ignore GSettings). Add ` glib-2.0 ` to `_HYPRK_CFG_SKIP` (it currently lists gtk-3.0 gtk-4.0 qt6ct Kvantum fontconfig dconf) so farm mode
 does not symlink the real `~/.config/glib-2.0` over our keyfile.
 
+Trade-offs: `GSETTINGS_BACKEND=keyfile` replaces dconf for apps started inside this session, so they do not read the real dconf database
+(and their own writes go to the keyfile). That is the intent for the private session, where there is no dconf database anyway.
+`ADW_DISABLE_PORTAL=1` hides all host portal settings from libadwaita (colour scheme, accent), not only the colour scheme.
+
 ## 2. Fonts (already right in `dist/lib/env.sh`)
 
 `themes/fonts/named` plus the `sans-serif -> SF Pro` alias is what GTK, Qt (qt6ct fonts `SF Pro` / `SF Mono`) and hyprlock use. The same

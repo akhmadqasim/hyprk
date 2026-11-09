@@ -19,14 +19,13 @@ def save(im, name):
     im.resize((S, S), Image.LANCZOS).save(OUT / f'{name}.png')
 
 
-def wifi(name, bars=3, off=False):
+def wifi(name, off=False):
     im, d = canvas()
     cx, cy = S * K / 2, S * K * 0.78
     for i in range(3):
         r = S * K * (0.16 + i * 0.17)
-        col = W if i < bars else (255, 255, 255, 70)
-        d.arc((cx - r, cy - r, cx + r, cy + r), 225, 315, fill=col, width=int(S * K * 0.075))
-    d.ellipse((cx - S * K * 0.055, cy - S * K * 0.055, cx + S * K * 0.055, cy + S * K * 0.055), fill=W if bars else (255, 255, 255, 70))
+        d.arc((cx - r, cy - r, cx + r, cy + r), 225, 315, fill=W, width=int(S * K * 0.075))
+    d.ellipse((cx - S * K * 0.055, cy - S * K * 0.055, cx + S * K * 0.055, cy + S * K * 0.055), fill=W)
     if off:
         d.line((S * K * .2, S * K * .2, S * K * .8, S * K * .8), fill=W, width=int(S * K * 0.07))
     save(im, name)
@@ -48,7 +47,7 @@ def battery(name, level=None, charging=False):
     save(im, name)
 
 
-wifi('wifi-3', 3); wifi('wifi-2', 2); wifi('wifi-1', 1); wifi('wifi-off', 0, off=True)
+wifi('wifi-3'); wifi('wifi-off', off=True)
 for lv in (100, 75, 50, 25, 10):
     battery(f'battery-{lv}', lv)
 battery('battery-charging', 80, charging=True)
