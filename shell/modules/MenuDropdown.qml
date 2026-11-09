@@ -14,12 +14,15 @@ Item {
     property real originX: 0       // screen position of this item, for the glass backdrop
     property real originY: 0
 
-    readonly property real contentWidth: Math.max(Theme.menu.minWidth, measure.maxWidth + Theme.menu.itemHPadding * 2 + Theme.menu.itemInset * 2 + 40)
+    readonly property real contentWidth: Math.max(Theme.menu.minWidth, maxTextWidth + Theme.menu.itemHPadding * 2 + Theme.menu.itemInset * 2 + 40)
     width: contentWidth
     height: list.height + Theme.menu.padding * 2
 
+    signal triggered()
+
     function trigger(action) {
         Panels.close();
+        triggered();
         switch (action) {
         case "settings": Apps.openSettings(); break;
         case "forcequit": Hyprland.dispatch("hl.dsp.window.kill()"); break;
@@ -33,21 +36,19 @@ Item {
         case "shutdown": Power.shutdown(); break;
         case "lock": Power.lock(); break;
         case "logout": Power.logout(); break;
+        case "trash-open": Quickshell.execDetached(["gio", "open", "trash:///"]); break;
+        case "trash-empty": Quickshell.execDetached(["sh", "-c", `gio trash --empty && "${Sounds.script}" trash-empty`]); break;
         }
     }
 
     // width of the widest label + shortcut
-    QtObject {
-        id: measure
-        property real maxWidth: {
-            let w = 0;
-            for (const it of root.items)
-                if (!it.sep) w = Math.max(w, metrics.advance(it.label) + (it.shortcut ? metrics.advance(it.shortcut) + 30 : 0));
-            return w;
-        }
+    FontMetrics { id: metrics; font.family: Theme.fontText; font.pixelSize: Theme.font.menu }
+    readonly property real maxTextWidth: {
+        let w = 0;
+        for (const it of items)
+            if (!it.sep) w = Math.max(w, metrics.advanceWidth(it.label) + (it.shortcut ? metrics.advanceWidth(it.shortcut) + 30 : 0));
+        return w;
     }
-    TextMetrics { id: metrics; font.family: Theme.fontText; font.pixelSize: Theme.font.menu
-        function advance(s) { text = s; return advanceWidth; } }
 
     Glass {
         anchors.fill: parent

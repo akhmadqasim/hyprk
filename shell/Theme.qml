@@ -162,7 +162,8 @@ Singleton {
     readonly property QtObject dock: QtObject {
         // iconSize is the icon cell; macOS icon art leaves ~10% transparent margin inside it.
         // SPEC.md 7 (Dock binary): tilesize 64 if the display is > 800 pt tall, else 52
-        readonly property int iconSize: Quickshell.screens.length > 0 && Quickshell.screens[0].height <= 800 ? 52 : 64
+        readonly property int iconSize: 64
+        readonly property int iconSizeShort: 52          // displays up to 800 pt tall
         readonly property int magnifiedSize: 128         // SPEC.md 7: largesize default 128
         readonly property real magnifyRange: 1.5         // SPEC.md 7: magnification width 3 x tilesize (1.5 each side)
         readonly property int iconSpacing: 2             // SPEC.md 7: tile inset 1 (each side)

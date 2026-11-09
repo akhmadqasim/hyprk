@@ -13,7 +13,7 @@ STATE=${HYPRK_STATE:-$ROOT/state}/sound.json
 
 alert="Tink"; vol=0.75; ui=true; fb=true
 if [ -r "$STATE" ] && command -v jq >/dev/null; then
-    read -r alert vol ui fb < <(jq -r '[(.alertSound // "Tink"), (.alertVolume // 0.75), (if .uiSounds == false then "false" else "true" end), (if .volumeFeedback == false then "false" else "true" end)] | @tsv' "$STATE" 2>/dev/null || echo "Tink 0.75 true true")
+    IFS=$'\t' read -r alert vol ui fb < <(jq -r '[(if (.alertSound | type) == "string" and .alertSound != "" then .alertSound else "Tink" end), (if (.alertVolume | type) == "number" then .alertVolume else 0.75 end), (if .uiSounds == false then "false" else "true" end), (if .volumeFeedback == false then "false" else "true" end)] | @tsv' "$STATE" 2>/dev/null || printf 'Tink\t0.75\ttrue\ttrue\n')
 fi
 
 case "${1:-}" in

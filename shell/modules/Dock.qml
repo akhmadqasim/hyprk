@@ -14,7 +14,8 @@ PanelWindow {
     required property var modelData
     screen: modelData
 
-    readonly property int base: Theme.dock.iconSize
+    // SPEC.md: tile 64 pt, 52 on displays up to 800 pt tall
+    readonly property int base: screen && screen.height <= 800 ? Theme.dock.iconSizeShort : Theme.dock.iconSize
     readonly property int pad: Theme.dock.padding
     readonly property int sidePad: Theme.dock.sidePadding
     readonly property int bgHeight: base + pad * 2
@@ -41,7 +42,7 @@ PanelWindow {
     readonly property bool hovering: mouseX >= 0
 
     function sizeFor(baseCenter) {
-        if (!hovering) return base;
+        if (!hovering || trashMenuX >= 0) return base;
         const d = Math.abs(mouseX - baseCenter) / (base * Theme.dock.magnifyRange);
         if (d >= 1) return base;
         return base + (Theme.dock.magnifiedSize - base) * (Math.cos(d * Math.PI) + 1) / 2;
@@ -50,8 +51,9 @@ PanelWindow {
     // hit area: background, plus the magnified band while hovering
     Item {
         id: hit
-        x: bg.x
-        width: bg.width
+        // full window while the Trash menu is open, so the menu is inside the input region
+        x: dock.trashMenuX >= 0 ? 0 : bg.x
+        width: dock.trashMenuX >= 0 ? dock.width : bg.width
         y: dock.trashMenuX >= 0 ? 0 : dock.hovering ? bg.y - (Theme.dock.magnifiedSize - dock.base) : bg.y
         height: dock.height - y
     }
@@ -152,7 +154,7 @@ PanelWindow {
 
                 // tooltip
                 Rectangle {
-                    visible: ma.containsMouse && !cell.modelData.separator && !cell.bouncing
+                    visible: ma.containsMouse && !cell.modelData.separator && !cell.bouncing && dock.trashMenuX < 0
                     anchors.horizontalCenter: parent.horizontalCenter
                     y: icon.y - height - Theme.dock.tooltipGap
                     width: tip.implicitWidth + Theme.dock.tooltipHPad * 2
@@ -192,57 +194,14 @@ PanelWindow {
     }
 
     // Trash context menu (right click): Open, Empty Trash (with the Finder sound)
-    Item {
+    MenuDropdown {
         id: trashMenu
         visible: dock.trashMenuX >= 0
-        width: Theme.menu.minWidth * 0.7
-        height: Theme.menu.itemHeight * 2 + Theme.menu.padding * 2
-        x: Math.min(dock.width - width - 4, dock.trashMenuX - width / 2)
+        items: [{ label: "Open", action: "trash-open" }, { sep: true }, { label: "Empty Trash", action: "trash-empty" }]
+        x: Math.max(4, Math.min(dock.width - width - 4, dock.trashMenuX - width / 2))
         y: bg.y - height - Theme.dock.tooltipGap
-
-        Glass {
-            anchors.fill: parent
-            radius: Theme.menu.radius
-            sx: trashMenu.x
-            sy: dock.screen.height - dock.height + trashMenu.y
-            tint: Theme.glass.tintStrong
-        }
-        Column {
-            y: Theme.menu.padding
-            width: parent.width
-            Repeater {
-                model: [
-                    { label: "Open", run: () => Quickshell.execDetached(["gio", "open", "trash:///"]) },
-                    { label: "Empty Trash", run: () => Quickshell.execDetached(["sh", "-c", `gio trash --empty && "${Sounds.script}" trash-empty`]) },
-                ]
-                delegate: Item {
-                    required property var modelData
-                    width: parent.width
-                    height: Theme.menu.itemHeight
-                    Rectangle {
-                        anchors.fill: parent
-                        anchors.leftMargin: Theme.menu.itemInset
-                        anchors.rightMargin: Theme.menu.itemInset
-                        radius: Theme.menu.itemRadius
-                        color: Theme.color.menuSelection
-                        visible: tma.containsMouse
-                    }
-                    Text {
-                        x: Theme.menu.itemInset + Theme.menu.itemHPadding
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: parent.modelData.label
-                        font.family: Theme.fontText
-                        font.pixelSize: Theme.font.menu
-                        color: tma.containsMouse ? Theme.color.menuSelectionText : Theme.color.label
-                    }
-                    MouseArea {
-                        id: tma
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onClicked: { dock.trashMenuX = -1; parent.modelData.run(); }
-                    }
-                }
-            }
-        }
+        originX: x
+        originY: dock.screen.height - dock.height + y
+        onTriggered: dock.trashMenuX = -1
     }
 }

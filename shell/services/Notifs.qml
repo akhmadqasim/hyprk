@@ -28,8 +28,9 @@ Singleton {
         o[n.id] = n;
         objects = o;
         // replace an existing history row for the same id (notification update)
+        let update = false;
         for (let i = 0; i < history.count; i++)
-            if (history.get(i).nid === n.id) { history.remove(i); break; }
+            if (history.get(i).nid === n.id) { history.remove(i); update = true; break; }
         n.closed.connect(() => root.forget(n.id));
         push({
             nid: n.id,
@@ -41,6 +42,8 @@ Singleton {
             time: Date.now(),
             timeout: n.expireTimeout > 0 ? n.expireTimeout : 0,
             critical: n.urgency === NotificationUrgency.Critical,
+            // updates (progress etc.) and apps that ask for silence don't chime
+            silent: update || n.hints["suppress-sound"] === true,
         });
     }
 
@@ -49,7 +52,7 @@ Singleton {
         history.insert(0, d);
         if (dnd) return;                       // Focus: no banner, no sound
         banners = [d].concat(banners.filter(b => b.nid !== d.nid)).slice(0, 3);
-        Sounds.play(d.critical ? "alert" : "notification");
+        if (!d.silent) Sounds.play(d.critical ? "alert" : "notification");
     }
 
     function hideBanner(id) {

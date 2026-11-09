@@ -44,6 +44,7 @@ Item {
             sourceSize: Qt.size(Wallpaper.width, Wallpaper.height)
             cache: true
             asynchronous: true
+            retainWhileLoading: true         // no transparent flash when the wallpaper changes
             smooth: false
         }
 
@@ -61,18 +62,24 @@ Item {
         border.width: Theme.glass.rimWidth
         border.color: Theme.glass.rimBottom
     }
-    Item {
-        // only the top part of a brighter border shows through the clip
-        width: parent.width
-        height: Math.min(parent.height, root.radius * 1.5)
-        clip: true
-        Rectangle {
-            width: parent.width
-            height: root.height
-            radius: root.radius
-            color: "transparent"
-            border.width: Theme.glass.rimWidth
-            border.color: Theme.glass.rimTop
+    // brighter top border in two clipped steps (full, then half) so it fades
+    // down the sides without an offscreen gradient mask
+    Repeater {
+        model: [{ h: 1.0, o: 1.0 }, { h: 2.0, o: 0.5 }]
+        Item {
+            required property var modelData
+            width: root.width
+            height: Math.min(root.height, root.radius * modelData.h)
+            clip: true
+            opacity: modelData.o
+            Rectangle {
+                width: parent.width
+                height: root.height
+                radius: root.radius
+                color: "transparent"
+                border.width: Theme.glass.rimWidth
+                border.color: Theme.glass.rimTop
+            }
         }
     }
 

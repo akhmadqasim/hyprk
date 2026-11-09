@@ -14,7 +14,9 @@ hl.monitor({ output = "MBA", mode = "2560x1664@60", position = "auto", scale = "
 -- so 24 renders at 48 px on the scale-2 MBA output.
 local cursors = hyprk .. "/themes/cursors/theme"
 -- start.sh already exports these for Hyprland itself; repeat them for apps it launches
-hl.env("XCURSOR_PATH", cursors .. ":" .. (os.getenv("XCURSOR_PATH") or "/usr/share/icons"))
+local xcp = os.getenv("XCURSOR_PATH") or "/usr/share/icons"
+if not xcp:find(cursors, 1, true) then xcp = cursors .. ":" .. xcp end   -- no growth on reload
+hl.env("XCURSOR_PATH", xcp)
 hl.env("XCURSOR_THEME", "hyprk-cursors")
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_THEME", "hyprk-cursors")
@@ -150,7 +152,8 @@ hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("brightnessctl set 6%+"), { lock
 hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("brightnessctl set 6%-"), { locked = true, repeating = true })
 
 -- screenshots like macOS: Cmd+Shift+3 full screen, Cmd+Shift+4 area (needs slurp), shutter sound
-local shotFile = '"${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshot $(date "+%Y-%m-%d at %H.%M.%S").png"'
+-- xdg-user-dir knows localized folders; mkdir so a fresh home works
+local shotFile = '"$(d=$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures"); mkdir -p "$d"; echo "$d")/Screenshot $(date "+%Y-%m-%d at %H.%M.%S").png"'
 hl.bind(cmd .. " + SHIFT + 3", hl.dsp.exec_cmd("grim " .. shotFile .. " && " .. sound .. " screenshot"))
 hl.bind(cmd .. " + SHIFT + 4", hl.dsp.exec_cmd("command -v slurp >/dev/null && grim -g \"$(slurp)\" " .. shotFile .. " && " .. sound .. " screenshot"))
 hl.bind("Print",               hl.dsp.exec_cmd("grim " .. shotFile .. " && " .. sound .. " screenshot"))
