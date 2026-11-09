@@ -18,8 +18,8 @@
 
 namespace {
 
-constexpr int kCacheSide = 512;
-constexpr qreal kCornerRatio = 0.06;   // corner radius / long side; FileIcon.qml draws its frame to match   // generated thumbnails are stored at this size
+constexpr int kCacheSide = 512;       // generated thumbnails are stored at this size
+constexpr qreal kCornerRatio = 0.06;  // corner radius / long side; FileIcon.qml draws its frame to match
 
 QString cacheRoot() { return QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation); }
 
@@ -63,11 +63,15 @@ QImage generate(const QString &path, const QString &mime, bool *cacheIt)
         return QImage(out + QStringLiteral(".png"));
     }
     if (mime.startsWith(QLatin1String("text/"))) {
-        // a page with the first lines, like Finder's text previews
+        // a page with the first lines, like Finder's text previews. Not kept on disk:
+        // re-rendering 4 KB costs about as much as decoding a cached PNG.
+        *cacheIt = false;
         QFile f(path);
         if (!f.open(QIODevice::ReadOnly))
             return {};
-        const QString text = QString::fromUtf8(f.read(4096));
+        // first 4 KB; tabs expanded, other control characters dropped (binary misnamed .txt)
+        QString text = QString::fromUtf8(f.read(4096)).replace(QLatin1Char('\t'), QStringLiteral("    "));
+        text.removeIf([](QChar c) { return c.category() == QChar::Other_Control && c != QLatin1Char('\n'); });
         QImage page(396, kCacheSide, QImage::Format_RGB32);
         page.fill(Qt::white);
         QPainter p(&page);

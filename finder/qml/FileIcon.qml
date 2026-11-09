@@ -12,9 +12,15 @@ Item {
     property real size: 64
 
     readonly property string kind: Files.iconClass(entry)
-    readonly property bool wantsThumb: (kind === "image" || kind === "pdf" || kind === "video" || kind === "text") && entry.size > 0
+    // text: only real text/* types, which is what thumbnails.cpp can render (not json, scripts...)
+    readonly property bool wantsThumb: entry.size > 0 && (kind === "image" || kind === "pdf" || kind === "video"
+                                                          || (entry.mime || "").indexOf("text/") === 0)
+    // share of the box a thumbnail fills; the icon grid passes less because its box includes
+    // the macOS PNGs' padding (ref: 68 px thumbnails in a 77 px icon)
+    property real thumbScale: 0.94
     property bool thumbFailed: false
-    onEntryChanged: thumbFailed = false
+    property bool sysFailed: false   // a PNG missing from themes/icons/system -> drawn icon
+    onEntryChanged: { thumbFailed = false; sysFailed = false; }
     readonly property bool showThumb: wantsThumb && !thumbFailed && size >= 16
 
     // macOS PNG for the non-thumbnail case
@@ -53,10 +59,8 @@ Item {
         }
         Image {
             id: thumb
-            // Theme.grid.iconSize includes the macOS PNGs' padding; thumbnails fill only the art
-            // area inside it (ref: 68 px in a 77 px icon)
-            width: root.size * 0.88
-            height: root.size * 0.88
+            width: root.size * root.thumbScale
+            height: root.size * root.thumbScale
             x: (thumbBox.width - width) / 2
             y: (thumbBox.height - height) / 2
             fillMode: Image.PreserveAspectFit
@@ -88,9 +92,11 @@ Item {
         id: plain
         visible: !thumbBox.visible && !appIcon.visible
         anchors.fill: parent
-        asynchronous: true
+        asynchronous: sysSource !== ""   // inline SVG fallbacks load synchronously, no blank frame
         sourceSize: Qt.size(root.px, root.px)
-        source: Theme.sysIcon(root.sysName, root.px, root.kind === "folder")
+        readonly property string sysSource: root.sysFailed ? "" : Theme.sysIcon(root.sysName, root.px, root.kind === "folder")
+        onStatusChanged: if (status === Image.Error && sysSource) root.sysFailed = true
+        source: sysSource
              || (root.kind === "folder"
                  ? Icons.folder(Theme.color.folderBack.toString(), Theme.color.folderFront.toString(), Theme.color.folderTop.toString())
                  : Icons.document(Theme.dark))

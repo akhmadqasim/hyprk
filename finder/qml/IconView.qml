@@ -96,6 +96,7 @@ GridView {
             id: icon
             entry: cell.modelData
             size: Theme.grid.iconSize
+            thumbScale: Theme.grid.thumbScale
             anchors.horizontalCenter: parent.horizontalCenter
             y: Theme.grid.iconTop
         }

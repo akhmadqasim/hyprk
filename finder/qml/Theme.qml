@@ -177,6 +177,7 @@ QtObject {
         readonly property int cellWidth: 154     // ref (column centers 154 apart)
         readonly property int cellHeight: 138    // ref
         readonly property int iconSize: 77       // ref: folder art 72 px wide, the PNG has ~3 px padding
+        readonly property real thumbScale: 0.88  // ref: 68 px thumbnails, the rest is PNG padding
         readonly property int iconTop: 26        // ref (first icon top y ~90 = 64 + 26)
         readonly property int labelGap: 8
         readonly property int labelWidth: 132
