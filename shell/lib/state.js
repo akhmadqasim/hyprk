@@ -46,3 +46,29 @@ function pickPlayer(players) {
     const list = (players || []).filter(p => p);
     return list.find(p => p.playbackState === 1) || list.find(p => p.canControl) || null;
 }
+
+// Per-app notification rule from state/notifications.json `apps` (keys are
+// desktop ids). Tries each candidate key (desktop entry, app name), lowercased
+// match too; unknown apps get the macOS defaults.
+function notifRule(prefs, keys) {
+    const apps = (prefs && prefs.apps && typeof prefs.apps === "object") ? prefs.apps : {};
+    const ids = Object.keys(apps);
+    for (const k of keys || []) {
+        if (!k) continue;
+        const key = String(k).replace(/\.desktop$/, "");
+        const id = ids.find(i => i === key) || ids.find(i => i.toLowerCase() === key.toLowerCase());
+        if (id) {
+            const a = apps[id] || {};
+            return { allow: a.allow !== false, sounds: a.sounds !== false,
+                     style: ["none", "banners", "alerts"].indexOf(a.style) === -1 ? "banners" : a.style };
+        }
+    }
+    return { allow: true, style: "banners", sounds: true };
+}
+
+// Lua for Hyprland keyboard repeat (Hyprland 0.57 has no `hyprctl keyword`; use `hyprctl eval`)
+function luaInput(input) {
+    const rate = Math.round(Math.min(100, Math.max(1, Number(input && input.repeatRate) || 25)));
+    const delay = Math.round(Math.min(2000, Math.max(100, Number(input && input.repeatDelay) || 600)));
+    return `hl.config({ input = { repeat_rate = ${rate}, repeat_delay = ${delay} } })`;
+}

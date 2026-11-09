@@ -21,6 +21,9 @@ Singleton {
     property bool reduceTransparency: false
     property bool blurAvailable: true
     readonly property bool solidMaterial: reduceTransparency || !blurAvailable
+    // set by services/Wallpaper from the luminance of the strip behind the menu bar
+    property bool menuBarOnLight: false
+    readonly property real menuBarLumaThreshold: 0.62   // TODO verify
     // liquidglass Hyprland plugin loaded (config/hypr/hyprland.lua exports HYPRK_GLASS=plugin);
     // Reduce transparency still wins and uses the solid QML material
     readonly property bool compositorGlass: Quickshell.env("HYPRK_GLASS") === "plugin" && !reduceTransparency
@@ -98,8 +101,9 @@ Singleton {
         readonly property color indigo: theme.dark ? "#5E5CE6" : "#5856D6"
 
         // Menu bar is transparent in macOS 26+; text is white over the wallpaper.
-        readonly property color menuBarText: "#FFFFFF"                               // TODO verify (adapts to wallpaper luma)
-        readonly property color menuBarHighlight: Qt.rgba(1, 1, 1, 0.22)              // pressed title pill, TODO verify
+        // macOS adapts menu bar text to the wallpaper behind it
+        readonly property color menuBarText: theme.menuBarOnLight ? Qt.rgba(0, 0, 0, 0.85) : "#FFFFFF"
+        readonly property color menuBarHighlight: theme.menuBarOnLight ? Qt.rgba(0, 0, 0, 0.10) : Qt.rgba(1, 1, 1, 0.22)   // pressed title pill, TODO verify
         readonly property color menuBarBackground: Qt.rgba(0, 0, 0, 0.0)              // "Show menu bar background" off
 
         // menu highlight

@@ -61,7 +61,8 @@ ShellWindow {
                 }
                 Timer {
                     interval: card.modelData.timeout > 0 ? card.modelData.timeout : Theme.notif.timeout
-                    running: !hoverCatcher.hovered && !card.modelData.critical
+                    // critical and "Alerts" style stay until dismissed, like macOS alerts
+                    running: !hoverCatcher.hovered && !card.modelData.critical && card.modelData.style !== "alerts"
                     onTriggered: Notifs.hideBanner(card.nid)
                 }
                 HoverHandler { id: hoverCatcher }

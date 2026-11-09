@@ -48,5 +48,8 @@ if [ ! -f "$blur" ]; then
     # desaturated so glass reads as near-neutral frost (macOS 27 Dock)
     magick "$wall" -resize 25% -blur "0x$(( SIGMA / 4 + 1 ))" -modulate 106,92 -resize "${W}x${H}!" "$blur" 2>/dev/null || blur=""
 fi
+# mean luminance (0..1) of the menu bar strip, so the shell can pick white or dark menu bar text
+luma=$(magick "$wall" -crop "${W}x$(( H / 30 + 1 ))+0+0" -colorspace Gray -resize 1x1\! -format "%[fx:mean]" info: 2>/dev/null || echo 0.3)
 echo "WALL=$wall"
 echo "BLUR=$blur"
+echo "LUMA=$luma"

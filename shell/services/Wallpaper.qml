@@ -13,6 +13,7 @@ Singleton {
 
     property string wallpaper: ""
     property string blurred: ""
+    property real topLuma: 0.3                  // brightness behind the menu bar
     property int width: Panels.screen ? Panels.screen.width : 1920
     property int height: Panels.screen ? Panels.screen.height : 1080
 
@@ -29,14 +30,21 @@ Singleton {
         function onDarkChanged() { root.refresh(); }
     }
 
+    // state/wallpaper.json path (Settings > Wallpaper) wins over the default pick
+    readonly property string chosen: Prefs.wallpaper.path || ""
+    onChosenChanged: refresh()
+
     Process {
         id: proc
+        environment: ({ HYPRK_WALLPAPER: root.chosen })
         command: [Quickshell.shellDir + "/scripts/wallpaper.sh", String(root.width), String(root.height), String(Theme.glass.blurRadius), Theme.dark ? "dark" : "light"]
         stdout: StdioCollector {
             onStreamFinished: {
                 for (const line of text.split("\n")) {
                     if (line.startsWith("WALL=")) root.wallpaper = line.slice(5);
                     else if (line.startsWith("BLUR=")) root.blurred = line.slice(5);
+                    else if (line.startsWith("LUMA=")) root.topLuma = parseFloat(line.slice(5)) || 0.3;
+                Theme.menuBarOnLight = root.topLuma > Theme.menuBarLumaThreshold;
                 }
                 Theme.blurAvailable = root.blurred !== "";
             }

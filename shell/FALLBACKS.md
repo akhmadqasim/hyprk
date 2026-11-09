@@ -26,3 +26,17 @@ Every surface has a designed state for missing features, so nothing looks broken
 | Apps with no window after launch | launch timer (6 s) | Dock bounce stops after 6 s. |
 | Power actions in a nested/test session | `HYPRK_ALLOW_POWER` unset | Sleep/Restart/Shut Down/Lock only log; Log Out exits Hyprland. |
 | No running apps for Cmd+Tab | empty list | Switcher does not open. |
+
+## Settings state files (`state/*.json`, written by the Settings app)
+
+Read by `services/Prefs.qml` (and `Theme.qml`, `scripts/sound.sh`). Missing or broken files keep the defaults
+from `settings/Parsers.js`. `HYPRK_STATE=<dir>` points the shell at another folder (tests).
+
+| File | Effect in the shell |
+|---|---|
+| `appearance.json` | dark mode, Reduce transparency |
+| `sound.json` | alert sound, volume, UI sounds, volume feedback (see SOUNDS.md) |
+| `notifications.json` | per app (`apps["<desktop id>"]`): `allow: false` drops the notification, `style: "none"` = Notification Center only, `"alerts"` = banner stays until dismissed, `sounds: false` = silent. `previews: "never"` hides bodies. |
+| `lock.json` | idle display off after `displayOffAfter` s (Hyprland DPMS); lock after `screenSaverAfter + requirePasswordAfter` s with hyprlock + `lockscreen/hyprlock.conf`, loginctl fallback, only when `HYPRK_ALLOW_POWER=1`. 0 = never. |
+| `input.json` | keyboard repeat applied with `hyprctl eval` at start and on change (0.57 has no `hyprctl keyword`) |
+| `wallpaper.json` | `path` replaces the default wallpaper; menu bar text turns dark over bright wallpaper tops |

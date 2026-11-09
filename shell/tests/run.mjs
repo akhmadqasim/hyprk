@@ -105,5 +105,18 @@ test("player none", () => assert.equal(ST.pickPlayer([]), null));
 test("player playing first", () => assert.equal(ST.pickPlayer([{ id: 1, canControl: true, playbackState: 2 }, { id: 2, playbackState: 1 }]).id, 2));
 test("player controllable", () => assert.equal(ST.pickPlayer([{ id: 1, canControl: false }, { id: 2, canControl: true }]).id, 2));
 
+// ---- notification rules, input lua ----
+const np = { apps: { "firefox": { allow: false }, "org.gnome.Nautilus": { style: "alerts", sounds: false }, "x": { style: "weird" } } };
+test("notif default", () => assert.deepEqual(ST.notifRule(np, ["unknown"]), { allow: true, style: "banners", sounds: true }));
+test("notif no prefs", () => assert.deepEqual(ST.notifRule(null, ["a"]), { allow: true, style: "banners", sounds: true }));
+test("notif blocked", () => assert.equal(ST.notifRule(np, ["firefox"]).allow, false));
+test("notif desktop suffix + case", () => assert.equal(ST.notifRule(np, ["org.gnome.nautilus.desktop"]).style, "alerts"));
+test("notif second key", () => assert.equal(ST.notifRule(np, ["", "Firefox"]).allow, false));
+test("notif sounds off", () => assert.equal(ST.notifRule(np, ["org.gnome.Nautilus"]).sounds, false));
+test("notif bad style", () => assert.equal(ST.notifRule(np, ["x"]).style, "banners"));
+test("lua input", () => assert.equal(ST.luaInput({ repeatRate: 30, repeatDelay: 250 }), "hl.config({ input = { repeat_rate = 30, repeat_delay = 250 } })"));
+test("lua input clamps", () => assert.equal(ST.luaInput({ repeatRate: 999, repeatDelay: 5 }), "hl.config({ input = { repeat_rate = 100, repeat_delay = 100 } })"));
+test("lua input defaults", () => assert.equal(ST.luaInput({}), "hl.config({ input = { repeat_rate = 25, repeat_delay = 600 } })"));
+
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

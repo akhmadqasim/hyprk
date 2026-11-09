@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Notifications
+import "../lib/state.js" as State
 
 // Own org.freedesktop.Notifications server. Keeps a history for the
 // Notification Center and a short list of live banners.
@@ -23,6 +24,12 @@ Singleton {
     property var objects: ({})                // id -> Notification, while still tracked
 
     function add(n) {
+        // per-app rule from state/notifications.json (Settings > Notifications)
+        const rule = State.notifRule(Prefs.notifications, [n.desktopEntry, n.appName]);
+        if (!rule.allow) {
+            n.dismiss();
+            return;
+        }
         n.tracked = true;
         const o = Object.assign({}, objects);
         o[n.id] = n;
@@ -42,16 +49,19 @@ Singleton {
             time: Date.now(),
             timeout: n.expireTimeout > 0 ? n.expireTimeout : 0,
             critical: n.urgency === NotificationUrgency.Critical,
+            style: rule.style,             // none: Notification Center only, alerts: stay until dismissed
             // updates (progress etc.) and apps that ask for silence don't chime
-            silent: update || n.hints["suppress-sound"] === true,
+            silent: update || !rule.sounds || n.hints["suppress-sound"] === true,
         });
     }
 
     // add plain notification data to history and banners
     function push(d) {
+        if (Prefs.notifications.previews === "never") d.body = "";   // Settings > Show previews: Never
         history.insert(0, d);
         if (dnd) return;                       // Focus: no banner, no sound
-        banners = [d].concat(banners.filter(b => b.nid !== d.nid)).slice(0, 3);
+        if (d.style !== "none")
+            banners = [d].concat(banners.filter(b => b.nid !== d.nid)).slice(0, 3);
         if (!d.silent) Sounds.play(d.critical ? "alert" : "notification");
     }
 
