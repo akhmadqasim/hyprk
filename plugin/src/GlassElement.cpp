@@ -5,6 +5,7 @@
 #include <hyprland/src/render/OpenGL.hpp>
 #include <hyprland/src/render/Renderer.hpp>
 #include <hyprland/src/render/Texture.hpp>
+#include <hyprland/src/render/gl/GLFramebuffer.hpp>
 
 #include <GLES3/gl32.h>
 
@@ -82,6 +83,20 @@ namespace lg {
             .refractionHeight = loc("refractionHeight"),
             .aberration       = loc("aberration"),
             .faceYcc          = loc("faceYcc"),
+            .sharpTex         = loc("sharpTex"),
+            .blurAlpha        = loc("blurAlpha"),
+            .blurDist         = loc("blurDist"),
+            .outerAmount      = loc("outerAmount"),
+            .outerHeight      = loc("outerHeight"),
+            .outerOpacity     = loc("outerOpacity"),
+            .outerThreshold   = loc("outerThreshold"),
+            .blurFill         = loc("blurFill"),
+            .blurFillLod      = loc("blurFillLod"),
+            .bleedOpacity     = loc("bleedOpacity"),
+            .bleedHeight      = loc("bleedHeight"),
+            .bleedAmount      = loc("bleedAmount"),
+            .bleedLod         = loc("bleedLod"),
+            .bleedYcc         = loc("bleedYcc"),
             .faceFill         = loc("faceFill"),
             .lightDir         = loc("lightDir"),
             .highlightBias    = loc("highlightBias"),
@@ -236,7 +251,42 @@ namespace lg {
         });
     }
 
+    // ── unblurred backdrop copy (variable blur, edge bleed) ──────────────────
+
+    namespace {
+        SP<Render::IFramebuffer> g_sharpFB;
+
+        // copies the framebuffer being rendered into g_sharpFB and builds its mip chain;
+        // returns its texture, or null when that is not possible
+        SP<Render::ITexture> copySharp(Render::CRenderContext& ctx, const Vector2D& size) {
+            const auto src = dynamicPointerCast<CGLFramebuffer>(ctx.m_data.currentFB);
+            if (!src)
+                return nullptr;
+            if (!g_sharpFB)
+                g_sharpFB = g_pHyprRenderer->createFB("liquidglass-sharp");
+            if (g_sharpFB->m_size != size && !g_sharpFB->alloc(size.x, size.y))
+                return nullptr;
+            const auto dst = dynamicPointerCast<CGLFramebuffer>(g_sharpFB);
+            const auto tex = g_sharpFB->getTexture();
+            if (!dst || !tex)
+                return nullptr;
+            {
+                CFramebufferBindingGuard guard{g_pHyprRenderer->glBackend()};
+                g_pHyprOpenGL->bindFramebuffer(GL_READ_FRAMEBUFFER, src->getFBID());
+                g_pHyprOpenGL->bindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->getFBID());
+                glBlitFramebuffer(0, 0, size.x, size.y, 0, 0, size.x, size.y, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+            }
+            g_pHyprOpenGL->setActiveTexture(GL_TEXTURE1);
+            tex->bind();
+            glGenerateMipmap(GL_TEXTURE_2D);
+            tex->setTexParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
+            return tex;
+        }
+    }
+
     void releaseGlState() {
+        g_sharpFB.reset();
         for (auto& [k, l] : g_luma)
             releaseLuma(l);
         g_luma.clear();
@@ -270,7 +320,8 @@ namespace lg {
     }
 
     static double reachOf(const SParams& p, const SResolved& res) {
-        return std::abs(res.refractionAmount * p.refractionScale) + p.aberration + 8.0;
+        const double shift = std::max({std::abs(res.refractionAmount), std::abs(res.outerAmount), res.bleedAmount}) * p.refractionScale;
+        return shift + p.aberration + 8.0;
     }
 
     static bool touches(CRegion& damage, const CBox& box) {
@@ -418,6 +469,11 @@ namespace lg {
         if (!shader)
             return false;
 
+        // without the copy, the blurred texture stands in: variable blur and bleed then stay blurred
+        auto sharp = copySharp(ctx, tex->m_size);
+        if (!sharp)
+            sharp = tex;
+
         g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
         tex->bind();
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -450,6 +506,11 @@ namespace lg {
         // per-element uniforms
         const double rad = p.lightAngle * M_PI / 180.0;
         glUniform1i(u.tex, 0);
+        glUniform1i(u.sharpTex, 1);
+        glUniform3f(u.blurAlpha, r.blurAlpha[0], r.blurAlpha[1], r.blurAlpha[2]);
+        glUniform1f(u.outerOpacity, r.outerOpacity);
+        // QuartzCore defaults for the rim band of the outer layer (SPEC 9.7: distances -11 / -3)
+        glUniform2f(u.outerThreshold, -11.f * scale, -3.f * scale);
         glUniform1f(u.roundingPower, m_data.roundingPower.value_or(p.roundingPower));
         glUniform1f(u.alpha, m_data.alpha);
         glUniform1f(u.aberration, p.aberration * scale);
@@ -472,6 +533,9 @@ namespace lg {
 
         g_pHyprOpenGL->blend(true);
         g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        g_pHyprOpenGL->setActiveTexture(GL_TEXTURE1);
+        sharp->bind();
+        g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
         glBindVertexArray(shader->getUniformLocation(SHADER_SHADER_VAO));
 
         for (size_t q = 0; q < quads.size(); ++q) {
@@ -488,10 +552,20 @@ namespace lg {
             glUniform1f(u.blurLod, p.blurLod + p.blurLodScale * std::log2(1.f + res.blurRadius));
             glUniform1f(u.refraction, res.refractionAmount * p.refractionScale * scale);
             glUniform1f(u.refractionHeight, res.refractionHeight * scale);
+            glUniform2f(u.blurDist, res.blurDist0 * scale, r.blurDist1 * scale);
+            glUniform1f(u.outerAmount, res.outerAmount * p.refractionScale * scale);
+            glUniform1f(u.outerHeight, res.outerHeight * scale);
+            glUniform3f(u.blurFill, face.blurFill.lighten, face.blurFill.darken, face.blurFill.normal);
+            glUniform1f(u.blurFillLod, p.blurLod + p.blurLodScale * std::log2(1.f + res.blurRadius) + 1.5f);
+            glUniform1f(u.bleedOpacity, res.bleedOpacity);
+            glUniform1f(u.bleedHeight, res.bleedHeight * scale);
+            glUniform1f(u.bleedAmount, res.bleedAmount * p.refractionScale * scale);
+            glUniform1f(u.bleedLod, std::log2(1.f + res.bleedBlur * scale));
+            glUniform3f(u.bleedYcc, face.bleed.black, face.bleed.white, face.bleed.saturation);
             glUniform3f(u.faceYcc, face.ycc.black, face.ycc.white, face.ycc.saturation);
             // fill and the light-side lift combine as two white-ish layers: a = 1 - (1-a1)(1-a2)
             const SRgba base = face.fill.a > 0 ? face.fill : SRgba{1, 1, 1, 0};
-            const SRgba fill = dark[q] ? face.fill : SRgba{base.r, base.g, base.b, 1 - (1 - base.a) * (1 - p.lift)};
+            const SRgba fill = dark[q] ? face.fill : SRgba{base.r, base.g, base.b, 1 - (1 - base.a) * (1 - face.lift * p.lift)};
             glUniform4f(u.faceFill, fill.r, fill.g, fill.b, fill.a);
             glUniform1f(u.highlightBias, face.highlightBias * p.highlight);
             glUniform1f(u.shadowOpacity, m_data.shadow ? res.shadowOpacity * p.shadowScale : 0.f);
@@ -504,6 +578,9 @@ namespace lg {
 
         glBindVertexArray(0);
         g_pHyprOpenGL->disableScissor();
+        g_pHyprOpenGL->setActiveTexture(GL_TEXTURE1);
+        sharp->unbind();
+        g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
         tex->setTexParameter(GL_TEXTURE_MIN_FILTER, tex->minFilter);
         tex->unbind();
         return true;

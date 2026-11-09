@@ -16,6 +16,9 @@ User rule: if the glass cannot run, log once and fall back to plain Hyprland blu
 | Luminance readback not possible (FBO incomplete on a mip level, no PBO support) | `glCheckFramebufferStatus` | The glass stays on its light recipe (or the forced `appearance`). Nothing is logged per frame. |
 | Partial damage | — | The plugin damages the whole glass when part of it is damaged (`claimDamage`). `full_damage = 1` remains as a debug switch. |
 
-Not handled (documented gaps): HDR "holding tone", the foreground content lensing pass, the outer refraction
-layer, edge bleed, blur fill, Apple's exact YCC → 3x4 matrix (not decoded; we use a levels + saturation
-form), the variable blur by edge distance.
+| Framebuffer copy for variable blur fails (current FB not a GL framebuffer, alloc fails) | `copySharp()` returns null | Hyprland's blurred texture stands in for the sharp one: the rim stays blurred, everything else works. |
+
+Not handled (documented gaps): HDR "holding tone", the foreground content lensing pass, Apple's
+luminance-weighted edge-bleed factor (`bleed_darken`, not recovered: we weight by depth only), and the
+dark specular layer (not decoded). The shader runs in gamma space, Apple's in linear: decoded colour values
+are applied as-is, which is why some recipes are tuned (README).

@@ -31,7 +31,9 @@ namespace lg {
 
         struct SUniforms {
             int tex, uvTopLeft, uvBottomRight, quadSize, glassBox, radius, roundingPower, alpha;
-            int blurLod, refraction, refractionHeight, aberration, faceYcc, faceFill;
+            int blurLod, refraction, refractionHeight, aberration, faceYcc;
+            int sharpTex, blurAlpha, blurDist, outerAmount, outerHeight, outerOpacity, outerThreshold;
+            int blurFill, blurFillLod, bleedOpacity, bleedHeight, bleedAmount, bleedLod, bleedYcc, faceFill;
             int lightDir, highlightBias, highlightWidth, highlightSpread, highlightCurve, rim, innerShadow, innerShadowSize;
             int shadowOpacity, shadowRadius, shadowOffset, shadowTint, shadowSaturation;
             int ringOpacity, ringOffset, ringStroke, ringRadius;

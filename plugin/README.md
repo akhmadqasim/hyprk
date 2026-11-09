@@ -56,22 +56,33 @@ mipmapped by the plugin for the extra per-pixel blur. Recommended base: `blur = 
 Apple's numbers from `/mnt/code/liquid-glass-re/SPEC.md` section 9 (glass version v2) live in
 `src/Material.cpp`. Most are size-relative: `D` = smallest extent of the glass shape in pt.
 
-| Recipe | Face YCC light (black, white, sat) | Fill light | Refraction height / amount | Extra blur | Shadow | Used for (default) |
+| Recipe | Face YCC light (black, white, sat) | Fill / lift light | Inner refraction height / amount | Outer layer (h / amount / opacity) | Blur | Used for (default) |
 |---|---|---|---|---|---|---|
-| `regular` | 0.4, 1.03, 1.2 | white 20% | 0.25 D (max 20) / -0.5 D (min -60) | D 64→160 : 0→4 | D 64→160 : 0.25→0.75, r 24, y 8 | notifications, spotlight, switcher |
-| `menu` | as regular | white 20% | as regular | as regular | 0.6, r 24, y 10 (Mac glass window shadow) | `hyprk-overlay`, `hyprk-menubar` |
-| `clear` | 0.125, 1.08, 1.06 | none | 0.25 D / -0.8 D | D 48→120 : 3→8 | as regular | |
-| `dock` | 0.15, 0.9, 1.25 | none | 0.08 D / -0.18 D | 1.5 | as regular | `hyprk-dock` |
-| `controlcenter` | 0.125, 0.8, 1.2 | none | 0.225 D (max 25) / -2.0 D (min -80) | 4 | as regular | `hyprk-controlcenter` |
+| `regular` | 0.4, 1.03, 1.0 (Apple 1.2) | white 20% / 0.05 | 0.25 D (max 20) / -0.5 D (min -60) | 0.2 D / 0.25 D / 0.6 | D 64→160 : 0→4, variable (full at D/2, half at 1 pt, 0 at edge) | notifications, spotlight, switcher |
+| `menu` | as regular | as regular | as regular | as regular | as regular | `hyprk-overlay`, `hyprk-menubar` (shadow 0.6, r 24, y 10) |
+| `clear` | 0.125, 1.08, 1.06 | none | 0.25 D / -0.8 D | none | D 48→120 : 3→8 | |
+| `dock` | 0.15, 0.9, 1.1 (Apple 1.25) | none / 0.05 | 0.08 D / -0.18 D | 0.13 D / 0.42 D / 0.2 | 1.5 | `hyprk-dock` |
+| `controlcenter` | 0.1, 0.5, 0.7 (Apple 0.125, 0.8, 1.2) | none | 0.225 D (max 25) / -2.0 D (min -80) | 0.0357 D / 0.0714 D / 0.1525 | 4, variable from 100 pt in | `hyprk-controlcenter` |
 
-Dark sides: regular (0.125, 1.125, 1.3), dock (0.05, 0.92, 1.25), others as light. Regular also has
-Apple's V2 ring shadow (offset 8, stroke 4, radius 5, opacity 0.06). Face effect: luminance is mapped
-into [black, white] and chroma scaled by saturation, then the fill is mixed in.
+The face colour is Apple's YCC composite (SPEC 9.7): `Y' = black + (white - black) Y`, chroma x saturation,
+then the fill. The controlcenter face and the regular/dock saturation deviate from the decoded values:
+in our gamma-space shader the decoded CC face measured ~1.4:1 against white tile labels (JUDGE.md);
+(0.1, 0.5, 0.7) gives >= 5:1 (measured 5.3-9.0 in `reference/ours/plugin-shell-cc.png`).
+
+Also per recipe (SPEC 9.2/9.3): edge bleed (opacity D 64→160 : 0→0.5, height/amount/blur 0.35 D, colour
+regular (0.9, 1, 1.2), clear family (0.75, 1, 1.2)), blur fill (regular light: lighten 0.9, normal 0.5;
+dark: darken 0.9, normal 0.5), drop shadow (D 64→160 : 0.25→0.75, r 24, y 8, saturated backdrop colour),
+regular ring shadow (offset 8, stroke 4, radius 5, opacity 0.06). Dark sides: regular (0.125, 1.125, 1.3),
+dock (0.05, 0.92, 1.25), others as light.
+
+Variable blur needs the unblurred backdrop: the plugin copies the framebuffer being rendered (one blit +
+mip chain per glass element) and mixes it with Hyprland's blur by Apple's per-pixel blur amount.
+
 Light/dark: `appearance = "auto"` reads the backdrop luminance of each glass (1 pixel of a high mip,
-read back asynchronously) and switches with Apple's V2 hysteresis: dark below 0.1, light again above
-0.3 (`adapt_low` / `adapt_high`).
+read back asynchronously every 6 frames) and switches with Apple's V2 hysteresis: dark below 0.1, light
+again above 0.3 (`adapt_low` / `adapt_high`).
 
-Not from the RE (by eye): `lift` (extra white on light faces), the rim floor, the inner shadow, the
+Not from the RE (by eye): the per-recipe `lift` (scaled by the `lift` key), the rim floor, the inner shadow, the
 dark-side rim bias (+0.3 instead of Apple's undecoded dark specular), the shadow tint amount, and
 how Apple's blur radius maps to extra mip levels (`blur_lod_scale`).
 
@@ -89,7 +100,7 @@ how Apple's blur radius maps to extra mip levels (`blur_lod_scale`).
 | `rounding_power` | 2.6 | superellipse corner (2 = circle) |
 | `appearance` | `auto` | `auto` (hysteresis on backdrop luminance), `light`, `dark` |
 | `adapt_low` / `adapt_high` | 0.1 / 0.3 | hysteresis band (SPEC 9.6, V2 light range) |
-| `lift` | 0.1 | extra white over light faces (0 = Apple's recipe as decoded) |
+| `lift` | 1 | scales each recipe's light-side lift (0 = none) |
 | `blur_lod` / `blur_lod_scale` | 0 / 0.6 | extra mip blur = `blur_lod + scale * log2(1 + recipe blur radius)` |
 | `refraction_scale` | 1 | multiplies the recipe's refraction amount (0 = off) |
 | `aberration` | 1.5 | px R/B split at the edge (7 taps); 0 = off |

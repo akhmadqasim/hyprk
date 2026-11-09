@@ -9,7 +9,8 @@ precision highp float;
 in vec2 v_texcoord;                 // 0..1 across the drawn quad (glass box + shadow margin)
 
 uniform sampler2D tex;              // Hyprland's blurred backdrop, mipmapped by the plugin
-uniform vec2  uvTopLeft;            // quad corners in tex uv
+uniform sampler2D sharpTex;         // unblurred backdrop copy, same size/uv as tex, mipmapped
+uniform vec2  uvTopLeft;            // quad corners in tex uv (both textures)
 uniform vec2  uvBottomRight;
 uniform vec2  quadSize;             // px
 uniform vec4  glassBox;             // glass rect inside the quad, px (x, y, w, h)
@@ -18,9 +19,22 @@ uniform float roundingPower;        // 2 = circle
 uniform float alpha;                // layer fade
 
 uniform float blurLod;              // extra mip blur on the face
+uniform vec3  blurAlpha;            // variable blur: alpha0..2
+uniform vec2  blurDist;             // variable blur: dist0, dist1 (px, < 0 inside); dist2 = 0
 uniform float refraction;           // px displacement at the very edge (- = sample inward, Apple's sign)
 uniform float refractionHeight;     // px depth of the bevel
+uniform float outerAmount;          // outer refraction layer (px, + = outward)
+uniform float outerHeight;
+uniform float outerOpacity;
+uniform vec2  outerThreshold;       // rim band (px of d) over which the outer layer fades in
 uniform float aberration;           // px R/B split at the edge
+uniform vec3  blurFill;             // lighten, darken, normal
+uniform float blurFillLod;
+uniform float bleedOpacity;         // edge bleed
+uniform float bleedHeight;          // px
+uniform float bleedAmount;          // px, + = outward
+uniform float bleedLod;
+uniform vec3  bleedYcc;
 
 uniform vec3  faceYcc;              // black, white, saturation
 uniform vec4  faceFill;             // rgb + amount ("normalFill")
@@ -78,6 +92,31 @@ vec3 fetch(vec2 quadPx, float lod) {
     return s.rgb / max(s.a, 1e-4);
 }
 
+vec3 fetchSharp(vec2 quadPx, float lod) {
+    vec4 s = textureLod(sharpTex, mix(uvTopLeft, uvBottomRight, quadPx / quadSize), lod);
+    return s.rgb / max(s.a, 1e-4);
+}
+
+// Apple's YCC composite: Y' = black + (white - black) Y, chroma x saturation
+vec3 ycc(vec3 c, vec3 k) {
+    float Y = luma(c);
+    return vec3(k.x + (k.y - k.x) * Y) + k.z * (c - vec3(Y));
+}
+
+// variable blur by edge distance: 1 = full blur, 0 = sharp backdrop (SPEC step 4.2)
+float blurAmount(float dEff) {
+    float r1 = sat((dEff - blurDist.x) / (blurDist.y - blurDist.x));
+    float r2 = sat((dEff - blurDist.y) / max(-blurDist.y, 1e-3));
+    return sat(blurAlpha.x - blurAlpha.y * r1 - blurAlpha.z * r2);
+}
+
+vec3 sampleFace(vec2 pos, float b) {
+    vec3 blurred = fetch(pos, blurLod);
+    if (b >= 0.999)
+        return blurred;
+    return mix(fetchSharp(pos, 3.0 * b), blurred, b);
+}
+
 void main() {
     vec2  qp     = v_texcoord * quadSize;
     vec2  centre = glassBox.xy + glassBox.zw * 0.5;
@@ -104,7 +143,7 @@ void main() {
         float depth = max(-d, 0.0);
         // the normal only matters on the bevel and the rim band
         vec2 n = vec2(0.0);
-        if (depth < max(refractionHeight, highlightWidth) + 1.0) {
+        if (depth < max(max(refractionHeight, outerHeight), max(highlightWidth, bleedHeight)) + 1.0) {
             const vec2 e = vec2(0.5, 0.0);
             n = vec2(sdShape(p + e.xy) - sdShape(p - e.xy), sdShape(p + e.yx) - sdShape(p - e.yx));
             n = n / max(length(n), 1e-5);
@@ -112,7 +151,9 @@ void main() {
 
         // refraction on the bevel (n points outward; Apple's amounts are negative = inward)
         float bev = bevel(depth, refractionHeight);
-        vec2  pR  = qp + n * refraction * bev;
+        float m   = refraction * bev;
+        vec2  pR  = qp + n * m;
+        float b   = blurAmount(d - abs(m)); // Apple: dEff = d + m with an inward (negative) m
 
         vec3 col;
         if (aberration * bev > 0.05) {
@@ -121,23 +162,44 @@ void main() {
             vec3 acc = vec3(0.0);
             for (int i = 0; i < 3; i++) {
                 float t = 1.0 - float(i) / 3.0;
-                vec3  s = fetch(pR + t * A, blurLod);
+                vec3  s = sampleFace(pR + t * A, b);
                 acc.r += t * s.r;
                 acc.g += (1.0 - t) * s.g;
             }
             for (int i = 0; i < 4; i++) {
                 float t = float(i) / 3.0;
-                vec3  s = fetch(pR - t * A, blurLod);
+                vec3  s = sampleFace(pR - t * A, b);
                 acc.g += (1.0 - t) * s.g;
                 acc.b += t * s.b;
             }
             col = acc * vec3(0.5, 1.0 / 3.0, 0.5);
         } else
-            col = fetch(pR, blurLod);
+            col = sampleFace(pR, b);
 
-        // YCC face effect: luminance into [black, white], chroma x saturation, then the fill
-        col = faceYcc.x + (faceYcc.y - faceYcc.x) * saturate3(col, faceYcc.z);
+        // blur fill: lighten/darken against a wider blur (SPEC step 4.4)
+        if (blurFill.z > 0.0 || blurFill.x > 0.0 || blurFill.y > 0.0) {
+            vec3 bf = fetch(qp, blurFillLod);
+            col     = mix(blurFill.y * min(col, bf) + blurFill.x * max(col, bf) + (1.0 - blurFill.x - blurFill.y) * col, bf, blurFill.z);
+        }
+
+        // outer refraction layer over the rim band (SPEC step 4.5)
+        if (outerOpacity > 0.0) {
+            float mo = outerAmount * bevel(depth, outerHeight);
+            vec3  so = sampleFace(qp + n * mo, blurAmount(d));
+            col      = mix(col, so, sat((d - outerThreshold.x) / (outerThreshold.y - outerThreshold.x)) * outerOpacity);
+        }
+
+        // YCC face effect, then the fill (SPEC 9.7)
+        col = ycc(col, faceYcc);
         col = mix(col, faceFill.rgb, faceFill.a);
+
+        // edge bleed: outside colour pulled into the rim through its own colour effect (step 4.7)
+        if (bleedOpacity > 0.0 && depth < bleedHeight) {
+            float mb = bleedAmount * bevel(depth, bleedHeight);
+            vec3  eb = ycc(fetchSharp(qp + n * mb, bleedLod), bleedYcc);
+            float w  = 1.0 - depth / max(bleedHeight, 1e-3);
+            col      = mix(col, eb, w * w * w * w * bleedOpacity);
+        }
 
         // subtle inner shadow along the rim
         if (innerShadow > 0.0) {
