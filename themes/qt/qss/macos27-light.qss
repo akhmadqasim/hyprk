@@ -78,7 +78,7 @@ QMenu::indicator { width: 14px; height: 14px; }
 QTabWidget::pane { border: 1px solid #E3E3E3; border-radius: 10px; background-color: #FFFFFF; top: -1px; }
 QTabBar { background: transparent; qproperty-drawBase: 0; }
 QTabBar::tab { background-color: transparent; color: #808080; border: none; border-radius: 12px; padding: 3px 14px; margin: 3px 2px; min-height: 18px; }
-QTabBar::tab:selected { background-color: #E6E6E6; border: none; font-weight: 600; }
+QTabBar::tab:selected { background-color: #E6E6E6; color: #262626; border: none; font-weight: 600; }
 QTabBar::tab:hover:!selected { background-color: #F0F0F0; color: #262626; }
 
 /* item views */

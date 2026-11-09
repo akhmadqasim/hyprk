@@ -69,8 +69,7 @@ def build(c):
     S.frame('button', 'focused', 11, c['ctl_hover'], c['ctl_ring'])
     S.frame('button', 'pressed', 11, c['ctl_active'], c['ctl_ring'])
     S.frame('button', 'toggled', 11, acc, accd)
-    for st in ('default',):   # Kvantum draws the default push button with button-default-*
-        S.frame('button', st, 11, acc, accd)
+    S.frame('button', 'default', 11, acc, accd)   # Kvantum draws the default push button with button-default-*
     # ---- line edits, generic frames, group boxes
     S.frame('lineedit', 'normal', 8, c['field'], c['ctl_ring'])
     S.frame('lineedit', 'focused', 8, c['field'], acc, sw=2)
@@ -225,7 +224,7 @@ blur_translucent=false
 transparent_menutitle=false
 respect_darkness=true
 disabled_icon_opacity=60
-iconless_menu=true
+iconless_menu=false
 iconless_pushbutton=true
 normal_default_pushbutton=false
 single_top_toolbar=true
