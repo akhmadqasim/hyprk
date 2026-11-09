@@ -20,24 +20,37 @@ QtObject {
     property bool hasBattery: false
     property string userName: "User"
 
-    // path -> text waiting to be written
-    property var _pending: ({})
+    // Unsaved local changes per file. External edits that arrive meanwhile are
+    // merged under them, so neither side is lost.
+    property var _patches: ({})
+    property var _wallpaperFile: ({})    // keep keys the shell may add
     property Timer _flush: Timer {
         interval: 250
         onTriggered: {
-            for (const path in app._pending) Backend.writeFile(path, app._pending[path]);
-            app._pending = {};
+            const files = { [app.appearancePath]: app.appearance, [app.dockPath]: app.dock,
+                            [app.soundPath]: app.sound, [app.wallpaperPath]: app._wallpaperFile };
+            for (const path in app._patches) Backend.writeFile(path, JSON.stringify(files[path], null, 2) + "\n");
+            app._patches = {};
         }
     }
-    function _save(path, obj) {
-        _pending[path] = JSON.stringify(obj, null, 2) + "\n";
+    function _patch(path, patch) {
+        _patches[path] = Object.assign(_patches[path] || {}, patch);
         _flush.restart();
     }
+    function _merged(path, text, normalize) {
+        let obj = {};
+        try { obj = JSON.parse(text); } catch (e) {}
+        return normalize(Object.assign({}, obj, _patches[path] || {}));
+    }
 
-    function setAppearance(patch) { appearance = P.normalizeAppearance(Object.assign({}, appearance, patch)); _save(appearancePath, appearance); }
-    function setDock(patch) { dock = P.normalizeDock(Object.assign({}, dock, patch)); _save(dockPath, dock); }
-    function setSound(patch) { sound = P.normalizeSound(Object.assign({}, sound, patch)); _save(soundPath, sound); }
-    function setWallpaper(path) { wallpaper = path; _save(wallpaperPath, { path: path }); }
+    function setAppearance(patch) { appearance = P.normalizeAppearance(Object.assign({}, appearance, patch)); _patch(appearancePath, patch); }
+    function setDock(patch) { dock = P.normalizeDock(Object.assign({}, dock, patch)); _patch(dockPath, patch); }
+    function setSound(patch) { sound = P.normalizeSound(Object.assign({}, sound, patch)); _patch(soundPath, patch); }
+    function setWallpaper(path) {
+        wallpaper = path;
+        _wallpaperFile = Object.assign({}, _wallpaperFile, { path: path });
+        _patch(wallpaperPath, { path: path });
+    }
 
     onAppearanceChanged: {
         Theme.dark = appearance.dark;
@@ -47,18 +60,16 @@ QtObject {
     }
 
     Component.onCompleted: {
-        // The shell (or `qs ipc`) may change these files too; follow it, except while
-        // our own write is pending (an older file version would undo the user's change).
-        const follow = fn => t => { if (!app._flush.running) fn(t); };
-        Backend.watch(appearancePath, follow(t => app.appearance = P.readState(t, P.normalizeAppearance)));
-        Backend.watch(dockPath, follow(t => app.dock = P.readState(t, P.normalizeDock)));
-        Backend.watch(soundPath, follow(t => app.sound = P.readState(t, P.normalizeSound)));
-        Backend.watch(wallpaperPath, follow(t => {
-            let w = "";
-            try { w = String(JSON.parse(t).path || ""); } catch (e) {}
-            app.wallpaper = w;
-        }));
-        Backend.run(["sh", "-c", "cat /sys/class/power_supply/*/type 2>/dev/null"], (c, out) => app.hasBattery = P.hasBattery(out));
+        // The shell (or `qs ipc`) may change these files too; follow it.
+        Backend.watch(appearancePath, t => app.appearance = app._merged(appearancePath, t, P.normalizeAppearance));
+        Backend.watch(dockPath, t => app.dock = app._merged(dockPath, t, P.normalizeDock));
+        Backend.watch(soundPath, t => app.sound = app._merged(soundPath, t, P.normalizeSound));
+        Backend.watch(wallpaperPath, t => {
+            app._wallpaperFile = app._merged(wallpaperPath, t, o => o);
+            app.wallpaper = String(app._wallpaperFile.path || "");
+        });
+        // Skip peripheral batteries (mouse, headset): their scope is "Device".
+        Backend.run(["sh", "-c", "for d in /sys/class/power_supply/*; do [ \"$(cat $d/scope 2>/dev/null)\" = Device ] || cat $d/type 2>/dev/null; done"], (c, out) => app.hasBattery = P.hasBattery(out));
         Backend.run(["sh", "-c", "n=$(getent passwd \"$(id -un)\" | cut -d: -f5 | cut -d, -f1); echo \"${n:-$(id -un)}\""],
                     (c, out) => { if (c === 0 && out.trim()) app.userName = out.trim(); });
     }

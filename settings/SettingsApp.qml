@@ -42,8 +42,10 @@ Item {
     Connections {
         target: AppState
         function onHasBatteryChanged() {
-            if (app.currentId === "energy" && AppState.hasBattery) app.currentId = "battery";
-            else if (app.currentId === "battery" && !AppState.hasBattery) app.currentId = "energy";
+            const from = AppState.hasBattery ? "energy" : "battery";
+            const to = AppState.hasBattery ? "battery" : "energy";
+            app.history = app.history.map(id => id === from ? to : id);
+            if (app.currentId === from) app.currentId = to;
         }
     }
 

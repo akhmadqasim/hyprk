@@ -33,13 +33,18 @@ QtObject {
 
     // freedesktop thumbnail spec: ~/.cache/thumbnails/large/<md5 of file URI>.png
     readonly property string thumbDir: decodeURIComponent(new URL(String(StandardPaths.writableLocation(StandardPaths.GenericCacheLocation))).pathname) + "/thumbnails/large"
+    // file:// URI escaped like GLib's g_filename_to_uri (keeps !$&'()*+,;=:@ and /).
+    function fileUri(path) {
+        return "file://" + path.split("/").map(seg => encodeURIComponent(seg)
+            .replace(/%(21|24|26|27|28|29|2A|2B|2C|3B|3D|3A|40)/g, m => decodeURIComponent(m))).join("/");
+    }
     function thumbFor(path) {
-        return thumbDir + "/" + Qt.md5("file://" + encodeURI(path)) + ".png";
+        return thumbDir + "/" + Qt.md5(fileUri(path)) + ".png";
     }
     // Create missing thumbnails in the background (needs Quickshell + magick).
     function makeThumbs(paths, done) {
         const args = [root + "/settings/scripts/thumbs.sh"];
-        for (const p of paths) args.push(p, thumbFor(p));
+        for (const p of paths) args.push(p, thumbFor(p), fileUri(p));
         run(args, done);
     }
 
@@ -66,7 +71,7 @@ QtObject {
     // Atomic write (tmp + mv) so the shell never reads half a file.
     function writeFile(path, text) {
         if (canRun) {
-            run(["sh", "-c", 'mkdir -p "$(dirname "$1")" && printf "%s" "$2" > "$1.tmp" && mv "$1.tmp" "$1"', "sh", path, text]);
+            run(["sh", "-c", 'mkdir -p "$(dirname "$1")" && t=$(mktemp "$1.XXXXXX") && printf "%s" "$2" > "$t" && mv "$t" "$1"', "sh", path, text]);
             return;
         }
         const x = new XMLHttpRequest();

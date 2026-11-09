@@ -17,7 +17,7 @@ Column {
     function apply(path) {
         note = "";
         AppState.setWallpaper(path);
-        Backend.run(["sh", "-c", Backend.root + "/settings/scripts/set-wallpaper.sh \"$1\"", "sh", path], (c, o) => {
+        Backend.run([Backend.root + "/settings/scripts/set-wallpaper.sh", path], (c, o) => {
             if (c === 3) note = "Saved. Install hyprpaper or swaybg to also change the desktop picture outside the hyprk shell.";
             else if (c !== 0 && c !== 127) note = "The wallpaper was saved but could not be applied right now.";
         });
@@ -88,7 +88,8 @@ Column {
                     RoundedImage {
                         anchors.fill: parent; anchors.margins: parent.border.width
                         radius: 8 - parent.border.width
-                        path: pane.thumbGen >= 0 ? parent.filePath : ""
+                        path: parent.filePath
+                        generation: pane.thumbGen
                     }
                     MouseArea { anchors.fill: parent; onClicked: pane.apply(parent.filePath) }
                 }

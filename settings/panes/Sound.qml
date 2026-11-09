@@ -23,8 +23,21 @@ Column {
         Backend.run(["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"], (c, o) => { if (!dragging) vol = P.parseWpctlVolume(o); });
     }
     property bool dragging: false
-    function setVolume(v) {
-        Backend.run(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", v.toFixed(2)], c => { if (c !== 0) note = "The volume could not be changed."; });
+    // One wpctl at a time, always with the latest value, so a fast drag can't
+    // end on a stale volume.
+    property real _wantVol: -1
+    property bool _volBusy: false
+    function setVolume(v) { _wantVol = v; _sendVolume(); }
+    function _sendVolume() {
+        if (_volBusy || _wantVol < 0) return;
+        const v = _wantVol;
+        _wantVol = -1;
+        _volBusy = true;
+        Backend.run(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", v.toFixed(2)], c => {
+            _volBusy = false;
+            if (c !== 0) note = "The volume could not be changed.";
+            _sendVolume();
+        });
     }
 
     readonly property string soundsDir: Backend.root + "/sounds/wav"

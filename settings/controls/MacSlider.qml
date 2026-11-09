@@ -16,7 +16,12 @@ Item {
     implicitHeight: Theme.control.sliderKnobH + 4
     opacity: enabled_ ? 1 : 0.4
 
-    readonly property real _frac: to > from ? Math.max(0, Math.min(1, (value - from) / (to - from))) : 0
+    // While dragging, show the drag position without assigning `value`
+    // (that would break the caller's binding to external state).
+    property bool _dragging: false
+    property real _dragValue: 0
+    readonly property real _shown: _dragging ? _dragValue : value
+    readonly property real _frac: to > from ? Math.max(0, Math.min(1, (_shown - from) / (to - from))) : 0
 
     Text {
         id: lg; visible: s.leftGlyph !== ""
@@ -61,12 +66,13 @@ Item {
             enabled: s.enabled_
             function upd(mx) {
                 const f = Math.max(0, Math.min(1, (mx - Theme.control.sliderKnobW / 2) / track.usable));
-                s.value = s.from + f * (s.to - s.from);
-                s.moved(s.value);
+                s._dragValue = s.from + f * (s.to - s.from);
+                s.moved(s._dragValue);
             }
-            onPressed: m => upd(m.x)
+            onPressed: m => { s._dragging = true; upd(m.x); }
             onPositionChanged: m => { if (pressed) upd(m.x); }
-            onReleased: s.released()
+            onReleased: { s._dragging = false; s.released(); }
+            onCanceled: s._dragging = false
         }
     }
 }

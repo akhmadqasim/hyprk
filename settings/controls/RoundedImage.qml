@@ -11,6 +11,9 @@ Item {
     readonly property string thumb: path ? Backend.thumbFor(path) : ""
     property real radius: 8
     property int decodeWidth: 300
+    // Bump after thumbnails were (re)generated to retry the thumbnail path.
+    property int generation: 0
+    onGenerationChanged: img.thumbFailed = false
     Image {
         id: img
         anchors.fill: parent
