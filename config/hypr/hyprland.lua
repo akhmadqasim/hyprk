@@ -97,9 +97,8 @@ hl.curve("macOut",    { type = "bezier", points = { {0.2, 0.9}, {0.3, 1} } })
 hl.curve("easeInOut", { type = "bezier", points = { {0.42, 0}, {0.58, 1} } })   -- SwiftUI legacy default
 
 hl.animation({ leaf = "global",      enabled = true, speed = 5,   bezier = "macEase" })
-hl.animation({ leaf = "windowsIn",   enabled = true, speed = 5,   spring = "swiftui", style = "popin 90%" })   -- scale 0.9 -> 1 + fade
-hl.animation({ leaf = "windowsOut",  enabled = true, speed = 2.5, bezier = "macEase",  style = "popin 90%" })  -- 0.25 s
-hl.animation({ leaf = "windowsMove", enabled = true, speed = 5,   spring = "swiftui" })
+hl.animation({ leaf = "windows",     enabled = true, speed = 5,   spring = "swiftui", style = "popin 90%" })   -- open: scale 0.9 -> 1 + fade
+hl.animation({ leaf = "windowsOut",  enabled = true, speed = 2.5, bezier = "macEase",  style = "popin 90%" })  -- close: 0.25 s
 hl.animation({ leaf = "fadeIn",      enabled = true, speed = 5,   bezier = "macOut" })
 hl.animation({ leaf = "fadeOut",     enabled = true, speed = 2.5, bezier = "macEase" })
 hl.animation({ leaf = "fade",        enabled = true, speed = 3,   bezier = "macEase" })

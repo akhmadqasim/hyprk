@@ -41,8 +41,9 @@ ShellWindow {
         opacity: ccw.shown ? 1 : 0
         scale: ccw.shown ? 1 : 0.96
         transformOrigin: Item.TopRight
-        Behavior on opacity { NumberAnimation { duration: ccw.shown ? Theme.anim.normal : Theme.anim.close; easing.type: Theme.anim.easing } }
-        Behavior on scale { NumberAnimation { duration: ccw.shown ? Theme.anim.normal : Theme.anim.close; easing.type: Theme.anim.easing } }
+        readonly property int dur: ccw.shown ? Theme.anim.normal : Theme.anim.close
+        Behavior on opacity { NumberAnimation { duration: cc.dur; easing.type: Theme.anim.easing } }
+        Behavior on scale { NumberAnimation { duration: cc.dur; easing.type: Theme.anim.easing } }
         MouseArea { anchors.fill: parent; z: -1 }   // swallow clicks so they don't close
     }
 }

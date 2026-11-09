@@ -57,13 +57,12 @@ Singleton {
     // white text can land on light glass (its default "auto" follows the backdrop)
     function syncPluginAppearance() {
         if (!compositorGlass) return;
-        appearanceProc.command = ["hyprctl", "eval", `hl.config({ plugin = { liquidglass = { appearance = "${dark ? "dark" : "light"}" } } })`];
-        appearanceProc.running = true;
+        // detached: a fast second toggle must not be dropped while the first still runs
+        Quickshell.execDetached(["hyprctl", "eval", `hl.config({ plugin = { liquidglass = { appearance = "${dark ? "dark" : "light"}" } } })`]);
     }
     onDarkChanged: syncPluginAppearance()
     onCompositorGlassChanged: syncPluginAppearance()
     Component.onCompleted: syncPluginAppearance()
-    Process { id: appearanceProc }
 
     IpcHandler {
         target: "theme"
@@ -208,7 +207,7 @@ Singleton {
         readonly property int tooltipHPad: 10
         readonly property int tooltipHeight: 24
         // neutral white lift over the plugin glass (cancels the backdrop colour cast)
-        readonly property color pluginLift: theme.dark ? Qt.rgba(0.10, 0.10, 0.11, 0.45) : Qt.rgba(0.97, 0.97, 0.97, 0.32)   // TODO verify
+        readonly property color pluginLift: theme.dark ? Qt.rgba(theme.glass.darkVeil.r, theme.glass.darkVeil.g, theme.glass.darkVeil.b, 0.45) : Qt.rgba(0.97, 0.97, 0.97, 0.32)   // TODO verify
     }
 
     // ---------- notifications ----------
