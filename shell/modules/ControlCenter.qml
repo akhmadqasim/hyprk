@@ -196,11 +196,12 @@ Item {
 
         width: cc.colW
         height: cc.rowH
-
         // unavailable: the tile stays, the white circle and text dim (macOS)
+        readonly property real contentOpacity: available ? 1 : Theme.color.disabledOpacity
+
         Rectangle {
             id: circle
-            opacity: cap.available ? 1 : Theme.color.disabledOpacity
+            opacity: cap.contentOpacity
             x: (cc.rowH - width) / 2
             anchors.verticalCenter: parent.verticalCenter
             width: Theme.cc.toggleSize
@@ -211,12 +212,12 @@ Item {
             Symbol {
                 anchors.centerIn: parent
                 name: cap.symbol
-                size: Theme.cc.toggleSize * 0.56
+                size: Theme.cc.toggleSize * Theme.cc.toggleGlyph
                 color: cap.on ? cap.onAccent : cap.available ? Theme.cc.toggleOffIcon : Theme.color.secondaryLabel
             }
         }
         Column {
-            opacity: cap.available ? 1 : Theme.color.disabledOpacity
+            opacity: cap.contentOpacity
             anchors.left: circle.right
             anchors.leftMargin: 8
             anchors.right: parent.right
@@ -266,7 +267,7 @@ Item {
             anchors.centerIn: parent
             name: rb.symbol
             opacity: rb.enabled ? 1 : Theme.color.disabledOpacity
-            size: 22
+            size: Theme.cc.buttonGlyph
             color: rb.on ? Theme.cc.toggleOnIcon : Theme.cc.toggleOffIcon
         }
         MouseArea { anchors.fill: parent; enabled: rb.enabled; onClicked: rb.activated() }

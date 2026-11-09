@@ -164,17 +164,7 @@ ShellWindow {
         width: contentWidth + Theme.menuBar.titleHPadding * 2
         height: Theme.menuBar.titleHeight
 
-        // pressed state: a small glass pill (macOS 26+)
-        Glass {
-            anchors.fill: parent
-            visible: mt.open
-            radius: Theme.menuBar.titleRadius
-            sx: visible ? mt.mapToItem(null, 0, 0).x : 0
-            sy: visible ? mt.mapToItem(null, 0, 0).y : 0
-            tint: Theme.color.menuBarHighlight
-            pluginLift: Theme.color.menuBarHighlight
-            shadow: false
-        }
+        HighlightPill { shown: mt.open }
         Text {
             id: label
             anchors.centerIn: parent
@@ -198,6 +188,25 @@ ShellWindow {
         }
     }
 
+    // pressed/open state of a title or status item: a small glass capsule (macOS 26+)
+    // built only while shown: one Glass (and Region) instead of one per title
+    component HighlightPill: Loader {
+        id: hp
+        property bool shown: false
+        anchors.fill: parent
+        active: shown
+        sourceComponent: Glass {
+            radius: Theme.menuBar.titleRadius
+            // the bar sits at the screen origin, so the scene position is the screen position
+            readonly property point pos: hp.mapToItem(null, 0, 0)
+            sx: pos.x
+            sy: pos.y
+            tint: Theme.color.menuBarHighlight
+            pluginLift: Theme.color.menuBarHighlight
+            shadow: false
+        }
+    }
+
     component StatusItem: Item {
         id: si
         property bool active: false
@@ -208,16 +217,7 @@ ShellWindow {
         width: contentWidth + Theme.menuBar.statusHPadding * 2
         height: Theme.menuBar.titleHeight
 
-        Glass {
-            anchors.fill: parent
-            visible: si.active || sma.pressed
-            radius: Theme.menuBar.titleRadius
-            sx: visible ? si.mapToItem(null, 0, 0).x : 0
-            sy: visible ? si.mapToItem(null, 0, 0).y : 0
-            tint: Theme.color.menuBarHighlight
-            pluginLift: Theme.color.menuBarHighlight
-            shadow: false
-        }
+        HighlightPill { shown: si.active || sma.pressed }
         Item { id: sholder; anchors.fill: parent }
         MouseArea { id: sma; anchors.fill: parent; onClicked: si.clicked() }
     }

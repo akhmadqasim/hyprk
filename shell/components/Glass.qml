@@ -51,7 +51,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        visible: Theme.compositorGlass
+        visible: Theme.compositorGlass && root.pluginLift.a > 0
         radius: root.radius
         color: root.pluginLift
     }
@@ -80,7 +80,8 @@ Item {
                 y: -root.sy
                 width: Wallpaper.width
                 height: Wallpaper.height
-                source: Wallpaper.blurred ? "file://" + Wallpaper.blurred : ""
+                // only load the backdrop when this material is the one shown
+                source: !Theme.compositorGlass && !Theme.solidMaterial && Wallpaper.blurred ? "file://" + Wallpaper.blurred : ""
                 sourceSize: Qt.size(Wallpaper.width, Wallpaper.height)
                 cache: true
                 asynchronous: true

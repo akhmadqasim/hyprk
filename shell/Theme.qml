@@ -147,7 +147,7 @@ Singleton {
         readonly property int appleLogoSize: 14          // TODO verify
         readonly property int titleHPadding: 9           // inner padding of a menu title pill, TODO verify
         readonly property int titleSpacing: 2            // gap between pills, TODO verify
-        readonly property int titleRadius: 12            // pressed glass pill = full capsule (reference CC icon), TODO verify
+        readonly property int titleRadius: titleHeight / 2   // pressed glass pill = capsule (reference CC icon)
         readonly property int titleHeight: 24            // pressed pill height, TODO verify
         readonly property int statusIconSize: 16         // TODO verify
         readonly property int statusSpacing: 4           // ~20pt icon pitch in reference, TODO verify
@@ -238,6 +238,8 @@ Singleton {
         readonly property int tilePadding: 12            // TODO verify
         readonly property int toggleSize: 38             // white circle inside a capsule, measured vs reference
         readonly property int sliderTrack: 6             // knobless white fill, measured vs reference
+        readonly property real toggleGlyph: 0.56         // glyph size / toggle circle
+        readonly property int buttonGlyph: 22            // round button glyph, TODO verify
         readonly property int sliderInset: 16            // TODO verify
         readonly property int artSize: 38                // Now Playing art placeholder, TODO verify
         readonly property int artRadius: 8
