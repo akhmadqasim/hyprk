@@ -171,3 +171,24 @@ combobox arrow { opacity: 0.7; }
 progressbar { min-height: 6px; }
 progressbar trough { min-height: 6px; }
 combobox button.combo, combobox button { border-radius: 999px; }
+
+/* round-ups found with the file chooser and combo gallery */
+combobox > box > button.comboHI, combobox:only-child > box > button.comboHI, combobox:first-child > box > button.comboHI, combobox:last-child > box > button.comboHI {
+  border-radius: 999px; border: none; background-image: none; background-color: @mac_ctl_bg; box-shadow: 0 0 0 1px @mac_ctl_ring, 0 1px 2px 0 @mac_ctl_shadow; min-height: 24px; padding: 2px 12px;
+}
+progressbar.horizontal trough, progressbar.horizontal progress { min-height: 6px; }
+progressbar.vertical trough, progressbar.vertical progress { min-width: 6px; }
+filechooser .path-bar.linked > buttonHI, .path-bar button, .path-bar button.text-button { border-radius: 999px; padding: 2px 10px; margin: 0 1px; box-shadow: none; background-color: transparent; }
+.path-bar button:hover { background-color: @mac_fill_hover; }
+.path-bar button:checked, .path-bar button:active { background-color: @mac_fill_active; }
+filechooser #pathbarbox { border: none; padding: 6px; }
+filechooser .dialog-action-box { border-top: 1px solid @mac_sep; }
+placessidebar row { margin: 1px 8px; border-radius: 10px; }
+placessidebar row:selected, placessidebar row:selected:hover { background-color: @mac_sel_grey; color: @mac_fg; }
+placessidebar row image { color: @mac_accent_bg; }
+placessidebar row button { min-height: 24px; min-width: 24px; padding: 0; box-shadow: none; background: none; }
+scrollbar.vertical slider { min-width: 6px; } scrollbar.horizontal slider { min-height: 6px; }
+scrollbar.overlay-indicator:not(.dragging):not(.hovering) { opacity: 0.8; }
+scrollbar.overlay-indicator.hovering trough { background-color: alpha(@mac_fg, 0.06); border-radius: 999px; }
+treeview.view header button { border-radius: 0; }
+treeview.view:selected, treeview.view:selected:focus { background-color: @mac_accent_bg; color: @mac_accent_fg; border-radius: 0; }

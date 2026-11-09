@@ -34,7 +34,14 @@ cb = Gtk.ComboBoxText(); [cb.append_text(x) for x in ('Name', 'Size')]; cb.set_a
 row(3, sc, pb, cb)
 nb = Gtk.Notebook(); nb.append_page(Gtk.Label(label='Page one'), Gtk.Label(label='General')); nb.append_page(Gtk.Label(label='Page two'), Gtk.Label(label='Advanced')); nb.set_size_request(480, 120)
 g.attach(nb, 0, 4, 1, 1)
-tv = Gtk.TextView(); tv.get_buffer().set_text('Hello world\nGTK3 text view'); tv.set_size_request(480, 60); g.attach(tv, 0, 5, 1, 1)
+tv = Gtk.TextView(); tv.get_buffer().set_text('\n'.join('Line %d of the GTK3 text view' % i for i in range(60)))
+sw = Gtk.ScrolledWindow(); sw.add(tv); sw.set_size_request(480, 110); sw.set_vexpand(True); g.attach(sw, 0, 5, 1, 1)
+GLib.timeout_add(900, lambda: (sw.get_vadjustment().set_value(40), False)[1])
 win.connect('destroy', Gtk.main_quit); win.show_all()
+if scene == 'chooser':
+    def ch():
+        d = Gtk.FileChooserDialog(title='Open', transient_for=win, action=Gtk.FileChooserAction.OPEN)
+        d.add_buttons('Cancel', Gtk.ResponseType.CANCEL, 'Open', Gtk.ResponseType.ACCEPT); d.set_current_folder('/tmp/claude-1000/demo/Documents'); d.show(); return False
+    GLib.timeout_add(1000, ch)
 if scene == 'menu': GLib.timeout_add(1200, lambda: (mb.clicked(), False)[1])
 Gtk.main()

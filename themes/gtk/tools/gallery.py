@@ -62,8 +62,9 @@ class App(Adw.Application):
                 tview.append(Gtk.Label(label=n)).set_title(n)
             tv.add_top_bar(tb); sp.set_content(content())
         elif scene == 'settings':
-            sp.set_content(Adw.PreferencesPage())
-            sp.set_content(content())
+            sp.set_content(settings_page()); stv.add_css_class('accent-sidebar')
+            se = Gtk.SearchEntry(placeholder_text='Search', margin_start=10, margin_end=10, margin_bottom=6); stv.add_top_bar(se)
+            lb = stv.get_content(); lb.select_row(lb.get_row_at_index(2))
         else:
             sp.set_content(content())
         tv.set_content(sp); win.set_content(tv); win.present()
@@ -81,6 +82,29 @@ class App(Adw.Application):
                     if isinstance(w, Gtk.DropDown): w.activate(); break
                 return False
             GLib.timeout_add(1200, d)
+
+def settings_page():
+    page = Adw.PreferencesPage()
+    g = Adw.PreferencesGroup()
+    r = Adw.ActionRow(title='Appearance')
+    for t in ('Light', 'Dark', 'Auto'):
+        r.add_suffix(Gtk.ToggleButton(label=t, active=(t == 'Light'), valign=Gtk.Align.CENTER))
+    g.add(r)
+    sr = Adw.ActionRow(title='Liquid Glass'); sc = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 0, 100, 1); sc.set_value(50); sc.set_size_request(260, -1); sc.set_valign(Gtk.Align.CENTER); sr.add_suffix(sc); g.add(sr)
+    page.add(g)
+    g2 = Adw.PreferencesGroup(title='Theme')
+    cr = Adw.ActionRow(title='Color')
+    for i in range(6):
+        b = Gtk.CheckButton(valign=Gtk.Align.CENTER, active=(i == 1)); b.set_group(None); cr.add_suffix(b)
+    g2.add(cr)
+    cb = Adw.ComboRow(title='Text highlight color', model=Gtk.StringList.new(['Automatic', 'Blue', 'Green'])); g2.add(cb)
+    sw = Adw.SwitchRow(title='Allow wallpaper tinting in windows', active=True); g2.add(sw)
+    page.add(g2)
+    g3 = Adw.PreferencesGroup(title='Icon & widget style')
+    e = Adw.EntryRow(title='Device name'); g3.add(e)
+    sp = Adw.SpinRow.new_with_range(0, 10, 1); sp.set_title('Sidebar icon size'); g3.add(sp)
+    page.add(g3)
+    return page
 
 def iter_widgets(w):
     yield w
