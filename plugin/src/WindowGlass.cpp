@@ -7,10 +7,10 @@
 #include <hyprland/src/render/WindowRenderPresentation.hpp>
 
 #include <regex>
+#include <string>
 
 namespace lg {
-    CGlassDecoration::CGlassDecoration(PHLWINDOW window, std::function<std::shared_ptr<SParams>()> params) :
-        IHyprWindowDecoration(window), m_window(window), m_params(std::move(params)) {}
+    CGlassDecoration::CGlassDecoration(PHLWINDOW window, std::shared_ptr<const SParams> (*params)()) : IHyprWindowDecoration(window), m_window(window), m_params(params) {}
 
     SDecorationPositioningInfo CGlassDecoration::getPositioningInfo() {
         SDecorationPositioningInfo info;
@@ -21,39 +21,36 @@ namespace lg {
 
     void CGlassDecoration::onPositioningReply(const SDecorationPositioningReply&) {}
 
-    static bool classMatches(const std::string& pattern, const std::string& cls) {
-        // compiled once per pattern change
-        static std::string                 cachedPattern;
-        static std::optional<std::regex>   cachedRegex;
-        if (pattern != cachedPattern) {
-            cachedPattern = pattern;
-            try {
-                cachedRegex = std::regex(pattern);
-            } catch (const std::regex_error&) { cachedRegex.reset(); }
-        }
-        return cachedRegex && std::regex_search(cls, *cachedRegex);
+    bool CGlassDecoration::matches(const SParams& p, const std::string& cls) {
+        if (m_matchPattern == p.windowClasses && m_matchClass == cls)
+            return m_match;
+        m_matchPattern = p.windowClasses;
+        m_matchClass   = cls;
+        try {
+            m_match = std::regex_search(cls, std::regex(p.windowClasses));
+        } catch (const std::regex_error&) { m_match = false; }
+        return m_match;
     }
 
     void CGlassDecoration::draw(Render::CRenderContext& ctx, PHLMONITOR mon, float const& a, const Render::SWindowRenderPresentation& presentation) {
         const auto window = m_window.lock();
-        auto       params = m_params();
+        const auto params = m_params();
         if (!window || !mon || !params || !params->enabled || params->windowClasses.empty() || ctx.m_renderingSnapshot ||
-            !classMatches(params->windowClasses, window->metadata().appID()))
+            !matches(*params, window->metadata().appID()))
             return;
 
         auto box = window->getWindowMainSurfaceBox();
         box.translate(presentation.workspaceOffset + presentation.floatingOffset - mon->m_position);
 
-        // the window draws its own shadow and border: glass body only
-        auto p           = std::make_shared<SParams>(*params);
-        p->shadowOpacity = 0;
-        const double radius = p->windowRadius >= 0 ? p->windowRadius : window->presentation().rounding();
-        p->roundingPower    = window->presentation().roundingPower();
+        const double radius = params->windowRadius >= 0 ? params->windowRadius : window->presentation().rounding();
 
+        // the window draws its own shadow and border: glass body only
         g_pHyprRenderer->addPassElement(ctx, makeUnique<CGlassElement>(CGlassElement::SData{
-            .shapes = {{{box.x, box.y, box.w, box.h}, radius}},
-            .alpha  = a,
-            .params = p,
+            .shapes        = {{{box.x, box.y, box.w, box.h}, radius}},
+            .alpha         = a,
+            .params        = params,
+            .shadow        = false,
+            .roundingPower = window->presentation().roundingPower(),
         }));
     }
 

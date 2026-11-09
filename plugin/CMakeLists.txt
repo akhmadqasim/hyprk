@@ -14,15 +14,17 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Shaders.hpp.in ${CMAKE_CURRENT_BI
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/liquidglass.frag)
 
 # pure logic, no Hyprland: shared by the plugin and the unit tests
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(HYPRUTILS REQUIRED IMPORTED_TARGET hyprutils)
+pkg_check_modules(HYPRLAND IMPORTED_TARGET hyprland pixman-1 libdrm)
+
 add_library(lgcore STATIC src/Shape.cpp src/Params.cpp)
 set_target_properties(lgcore PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(lgcore PUBLIC src)
-
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(HYPRLAND IMPORTED_TARGET hyprland pixman-1 libdrm)
+target_link_libraries(lgcore PUBLIC PkgConfig::HYPRUTILS)
 
 if(HYPRLAND_FOUND)
-  add_library(liquidglass SHARED src/main.cpp src/Config.cpp src/GlassElement.cpp src/WindowGlass.cpp)
+  add_library(liquidglass SHARED src/main.cpp src/Log.cpp src/Config.cpp src/GlassElement.cpp src/WindowGlass.cpp)
   target_include_directories(liquidglass PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/gen)
   target_link_libraries(liquidglass PRIVATE lgcore PkgConfig::HYPRLAND)
   target_compile_options(liquidglass PRIVATE -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers)

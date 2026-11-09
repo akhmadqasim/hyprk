@@ -24,35 +24,14 @@
 namespace {
     HANDLE         g_handle     = nullptr;
     CFunctionHook* g_renderHook = nullptr;
-    bool           g_noticeShown = false;
     std::vector<CHyprSignalListener> g_listeners;
-    std::shared_ptr<lg::SParams>     g_params; // re-read every monitor frame
+    std::shared_ptr<const lg::SParams> g_params; // snapshot, refreshed each monitor frame
     std::vector<WP<lg::CGlassDecoration>> g_decorations;
 
     using renderLayerFn = void (*)(Render::IHyprRenderer*, Render::CRenderContext&, PHLLS, PHLMONITOR, const Time::steady_tp&, bool, bool, bool);
 }
 
-namespace lg {
-    void setHandle(void* handle) {
-        g_handle = handle;
-    }
-    void logInfo(const std::string& msg) {
-        LOG(Log::INFO, "[liquidglass] {}", msg);
-    }
-    void logOnce(const std::string& msg) {
-        if (g_noticeShown)
-            return;
-        g_noticeShown = true;
-        LOG(Log::ERR, "[liquidglass] {}", msg);
-        if (g_handle)
-            HyprlandAPI::addNotification(g_handle, "[liquidglass] " + msg, CHyprColor{1.0, 0.6, 0.2, 1.0}, 6000);
-    }
-    void resetLogOnce() {
-        g_noticeShown = false;
-    }
-}
-
-// Makes CLayerSurface::shouldBlur() false for one renderLayer() call, so Hyprland's
+// Makes CLayerSurface::shouldBlur() (desktop/view/LayerSurface.cpp:519 in 0.57.2) false for one renderLayer() call, so Hyprland's
 // own blur does not paint over the glass. Restored before the pass runs.
 struct SBlurSuppression {
     SP<Desktop::View::CWLSurface> surface;
@@ -103,14 +82,11 @@ static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext
     const bool aboveLock = layer && layer->m_ruleApplicator->aboveLock().valueOrDefault();
     const bool lockSkip  = lockscreen ? !aboveLock : (aboveLock && g_pSessionLockManager && g_pSessionLockManager->isSessionLocked());
 
-    if (!params || !params->enabled || popups || ctx.m_renderingSnapshot || !layer || !mon || lockSkip || !layer->mapped() || !layer->alphaNonZero() ||
-        !lg::namespaceMatches(*params, layer->m_namespace)) {
-        original(thisptr, ctx, layer, mon, now, popups, lockscreen, workspaceScene);
-        return;
-    }
-
-    auto shapes = shapesFor(layer, mon, *params);
-    if (shapes.empty()) { // no region and require_region: leave the layer to Hyprland
+    const bool wanted = params && params->enabled && !popups && !ctx.m_renderingSnapshot && layer && mon && !lockSkip && layer->mapped() && layer->alphaNonZero() &&
+        lg::namespaceMatches(*params, layer->m_namespace);
+    // no shapes = no region with require_region: the layer is left to Hyprland
+    auto shapes = wanted ? shapesFor(layer, mon, *params) : std::vector<lg::SGlassShape>{};
+    if (shapes.empty()) {
         original(thisptr, ctx, layer, mon, now, popups, lockscreen, workspaceScene);
         return;
     }
@@ -147,6 +123,7 @@ APICALL EXPORT std::string PLUGIN_API_VERSION() {
 }
 
 APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
+    g_handle = handle;
     lg::setHandle(handle);
 
     const std::string clientHash = __hyprland_api_get_client_hash();
@@ -156,11 +133,12 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     }
 
     lg::registerConfig(handle);
-    g_params = std::make_shared<lg::SParams>(lg::readConfig());
-    // re-read once per monitor frame: hl.config() through hyprctl eval fires no reload event
+    g_params = lg::readConfig();
+    // checked once per monitor frame (hl.config() through hyprctl eval fires no reload
+    // event); readConfig() returns the same snapshot unless a value changed
     g_listeners.push_back(Event::bus()->m_events.render.stage.listen([](Event::SRenderStageEvent e) {
         if (e.stage == RENDER_BEGIN)
-            g_params = std::make_shared<lg::SParams>(lg::readConfig());
+            g_params = lg::readConfig();
     }));
     g_listeners.push_back(Event::bus()->m_events.config.reloaded.listen([] {
         if (g_pHyprRenderer)

@@ -23,11 +23,10 @@ namespace lg {
         return program;
     }
 
-    void CGlassProgram::fail(std::string why) {
-        m_state   = eState::FAILED;
-        m_failure = std::move(why);
+    void CGlassProgram::fail(const std::string& why) {
+        m_state = eState::FAILED;
         m_shader.reset();
-        logOnce(std::format("glass disabled, using plain Hyprland blur: {}", m_failure));
+        logOnce(std::format("glass disabled, using plain Hyprland blur: {}", why));
     }
 
     bool CGlassProgram::ensure(const std::string& overridePath) {
@@ -117,15 +116,14 @@ namespace lg {
     void CGlassProgram::destroy() {
         m_shader.reset();
         m_state = eState::UNTRIED;
-        m_failure.clear();
     }
 
     // ── element ─────────────────────────────────────────────────────────────
 
     CGlassElement::CGlassElement(SData data) : m_data(std::move(data)) {}
 
-    double CGlassElement::margin(const SParams& p) {
-        return std::max(0.0, 2.0 * p.shadowRadius + std::abs(p.shadowOffsetY)) + 2.0;
+    double CGlassElement::margin(const SParams& p, bool shadow) {
+        return (shadow ? std::max(0.0, 2.0 * p.shadowRadius + std::abs(p.shadowOffsetY)) : 0.0) + 2.0;
     }
 
     bool CGlassElement::needsLiveBlur(Render::CRenderContext&) {
@@ -157,7 +155,7 @@ namespace lg {
     std::optional<CBox> CGlassElement::boundingBox(Render::CRenderContext&) {
         if (m_data.shapes.empty())
             return std::nullopt;
-        const double m  = margin(*m_data.params);
+        const double m  = margin(*m_data.params, m_data.shadow);
         double       x1 = 1e9, y1 = 1e9, x2 = -1e9, y2 = -1e9;
         for (const auto& s : m_data.shapes) {
             x1 = std::min(x1, s.box.x - m);
@@ -190,7 +188,8 @@ namespace lg {
             if (box.w < 1 || box.h < 1)
                 continue;
             g_pHyprOpenGL->renderRect(ctx, box, CHyprColor{tint.r, tint.g, tint.b, tint.a * m_data.alpha},
-                                      {.round = sc<int>(std::round(s.radius * scale)), .roundingPower = p.roundingPower, .blur = true, .blurA = m_data.alpha});
+                                      {.round = sc<int>(std::round(s.radius * scale)), .roundingPower = m_data.roundingPower.value_or(p.roundingPower), .blur = true,
+                                       .blurA = m_data.alpha});
         }
     }
 
@@ -203,94 +202,95 @@ namespace lg {
         const auto&  p     = *m_data.params;
         const auto&  u     = prog.u;
         const float  scale = mon->m_scale;
-        const double m     = margin(p);
+        const double m     = margin(p, m_data.shadow);
 
+        // quads to draw (physical px) and the region the shader may read
+        std::vector<std::pair<const SGlassShape*, CBox>> quads;
+        CRegion                                          blurDamage;
+        const double                                     reach = (std::abs(p.refraction) + p.aberration + 8.0) * scale;
         for (const auto& s : m_data.shapes) {
             CBox quad = CBox{s.box.x - m, s.box.y - m, s.box.w + 2 * m, s.box.h + 2 * m}.scale(scale).round();
-            if (quad.w < 1 || quad.h < 1)
+            if (quad.w < 1 || quad.h < 1 || CRegion{ctx.m_data.damage}.intersect(quad).empty())
                 continue;
+            quads.emplace_back(&s, quad);
+            blurDamage.add(CBox{quad.x - reach, quad.y - reach, quad.w + 2 * reach, quad.h + 2 * reach});
+        }
+        if (quads.empty())
+            return true;
+        blurDamage.intersect(CBox{{}, mon->m_transformedSize});
 
-            CRegion drawDamage{ctx.m_data.damage};
-            drawDamage.intersect(quad);
-            if (drawDamage.empty())
-                continue;
+        // one blur + one mip chain (the blur pyramid the per-pixel LOD reads) for all shapes
+        const auto blurredFB = g_pHyprRenderer->blurMainFramebuffer(ctx, 1.f, blurDamage);
+        const auto tex       = blurredFB ? blurredFB->getTexture() : nullptr;
+        if (!tex || tex->m_size.x <= 0 || tex->m_size.y <= 0)
+            return false;
 
-            // blur everything the shader may read: the quad plus the refraction reach
-            const double reach = (std::abs(p.refraction) + p.aberration + 8.0) * scale;
-            CRegion      blurDamage{CBox{quad.x - reach, quad.y - reach, quad.w + 2 * reach, quad.h + 2 * reach}};
-            blurDamage.intersect(CBox{{}, mon->m_transformedSize});
+        const auto shader = g_pHyprOpenGL->useShader(prog.shader());
+        if (!shader)
+            return false;
 
-            const auto blurredFB = g_pHyprRenderer->blurMainFramebuffer(ctx, 1.f, blurDamage);
-            const auto tex       = blurredFB ? blurredFB->getTexture() : nullptr;
-            if (!tex || tex->m_size.x <= 0 || tex->m_size.y <= 0)
-                return false;
+        g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
+        tex->bind();
+        glGenerateMipmap(GL_TEXTURE_2D);
+        tex->setTexParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-            const auto shader = g_pHyprOpenGL->useShader(prog.shader());
-            if (!shader)
-                return false;
+        // per-element uniforms
+        const double rad = p.lightAngle * M_PI / 180.0;
+        glUniform1i(u.tex, 0);
+        glUniform1f(u.roundingPower, m_data.roundingPower.value_or(p.roundingPower));
+        glUniform1f(u.alpha, m_data.alpha);
+        glUniform1f(u.blurLod, p.blurLod);
+        glUniform1f(u.edgeBlurLod, p.edgeBlurLod);
+        glUniform1f(u.blurEdgeDistance, p.blurEdgeDistance * scale);
+        glUniform1f(u.refraction, p.refraction * scale);
+        glUniform1f(u.refractionHeight, p.refractionHeight * scale);
+        glUniform1f(u.aberration, p.aberration * scale);
+        glUniform1f(u.saturation, p.saturation);
+        glUniform4f(u.tintLight, p.tintLight.r, p.tintLight.g, p.tintLight.b, p.tintLight.a);
+        glUniform4f(u.tintDark, p.tintDark.r, p.tintDark.g, p.tintDark.b, p.tintDark.a);
+        glUniform1f(u.brightnessLight, p.brightnessLight);
+        glUniform1f(u.brightnessDark, p.brightnessDark);
+        glUniform1i(u.appearance, p.appearance);
+        glUniform1f(u.adaptThreshold, p.adaptThreshold);
+        glUniform1f(u.adaptSoftness, p.adaptSoftness);
+        // light comes from lightAngle (0 = from the right, -90 = from the top, y down)
+        glUniform2f(u.lightDir, -std::cos(rad), -std::sin(rad));
+        glUniform1f(u.highlight, p.highlight);
+        glUniform1f(u.highlightWidth, p.highlightWidth * scale);
+        glUniform1f(u.highlightSpread, p.highlightSpread);
+        glUniform1f(u.rim, p.rim);
+        glUniform1f(u.innerShadow, p.innerShadow);
+        glUniform1f(u.innerShadowSize, p.innerShadowSize * scale);
+        glUniform1f(u.shadowOpacity, m_data.shadow ? p.shadowOpacity : 0.f);
+        glUniform1f(u.shadowRadius, p.shadowRadius * scale);
+        glUniform2f(u.shadowOffset, 0.f, p.shadowOffsetY * scale);
+        glUniform1f(u.ringOpacity, p.ringOpacity);
+        glUniform1f(u.ringWidth, p.ringWidth * scale);
 
-            g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
-            tex->bind();
-            // mip chain = the blur pyramid the per-pixel LOD reads from
-            glGenerateMipmap(GL_TEXTURE_2D);
-            tex->setTexParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        g_pHyprOpenGL->blend(true);
+        g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        glBindVertexArray(shader->getUniformLocation(SHADER_SHADER_VAO));
 
-            const auto glMatrix = g_pHyprRenderer->projectBoxToTarget(ctx, quad);
-            shader->setUniformMatrix3fv(SHADER_PROJ, 1, GL_TRUE, glMatrix.getMatrix());
-
-            const float  boxX = (s.box.x * scale) - quad.x, boxY = (s.box.y * scale) - quad.y;
-            const double rad  = p.lightAngle * M_PI / 180.0;
-
-            glUniform1i(u.tex, 0);
+        for (const auto& [s, quad] : quads) {
+            shader->setUniformMatrix3fv(SHADER_PROJ, 1, GL_TRUE, g_pHyprRenderer->projectBoxToTarget(ctx, quad).getMatrix());
             glUniform2f(u.uvTopLeft, quad.x / tex->m_size.x, quad.y / tex->m_size.y);
             glUniform2f(u.uvBottomRight, (quad.x + quad.w) / tex->m_size.x, (quad.y + quad.h) / tex->m_size.y);
             glUniform2f(u.quadSize, quad.w, quad.h);
-            glUniform4f(u.glassBox, boxX, boxY, s.box.w * scale, s.box.h * scale);
-            glUniform1f(u.radius, s.radius * scale);
-            glUniform1f(u.roundingPower, p.roundingPower);
-            glUniform1f(u.alpha, m_data.alpha);
-            glUniform1f(u.blurLod, p.blurLod);
-            glUniform1f(u.edgeBlurLod, p.edgeBlurLod);
-            glUniform1f(u.blurEdgeDistance, p.blurEdgeDistance * scale);
-            glUniform1f(u.refraction, p.refraction * scale);
-            glUniform1f(u.refractionHeight, p.refractionHeight * scale);
-            glUniform1f(u.aberration, p.aberration * scale);
-            glUniform1f(u.saturation, p.saturation);
-            glUniform4f(u.tintLight, p.tintLight.r, p.tintLight.g, p.tintLight.b, p.tintLight.a);
-            glUniform4f(u.tintDark, p.tintDark.r, p.tintDark.g, p.tintDark.b, p.tintDark.a);
-            glUniform1f(u.brightnessLight, p.brightnessLight);
-            glUniform1f(u.brightnessDark, p.brightnessDark);
-            glUniform1i(u.appearance, p.appearance);
-            glUniform1f(u.adaptThreshold, p.adaptThreshold);
-            glUniform1f(u.adaptSoftness, p.adaptSoftness);
-            // light comes from lightAngle (0 = from the right, -90 = from the top, y down)
-            glUniform2f(u.lightDir, -std::cos(rad), -std::sin(rad));
-            glUniform1f(u.highlight, p.highlight);
-            glUniform1f(u.highlightWidth, p.highlightWidth * scale);
-            glUniform1f(u.highlightSpread, p.highlightSpread);
-            glUniform1f(u.rim, p.rim);
-            glUniform1f(u.innerShadow, p.innerShadow);
-            glUniform1f(u.innerShadowSize, p.innerShadowSize * scale);
-            glUniform1f(u.shadowOpacity, p.shadowOpacity);
-            glUniform1f(u.shadowRadius, p.shadowRadius * scale);
-            glUniform2f(u.shadowOffset, 0.f, p.shadowOffsetY * scale);
-            glUniform1f(u.ringOpacity, p.ringOpacity);
-            glUniform1f(u.ringWidth, p.ringWidth * scale);
+            glUniform4f(u.glassBox, s->box.x * scale - quad.x, s->box.y * scale - quad.y, s->box.w * scale, s->box.h * scale);
+            glUniform1f(u.radius, s->radius * scale);
 
-            g_pHyprOpenGL->blend(true);
-            g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-
-            glBindVertexArray(shader->getUniformLocation(SHADER_SHADER_VAO));
+            CRegion drawDamage{ctx.m_data.damage};
+            drawDamage.intersect(quad);
             drawDamage.forEachRect([&ctx](const auto& rect) {
                 g_pHyprOpenGL->scissor(ctx, &rect, ctx.m_data.transformDamage);
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
             });
-            glBindVertexArray(0);
-            g_pHyprOpenGL->disableScissor();
-
-            tex->setTexParameter(GL_TEXTURE_MIN_FILTER, tex->minFilter);
-            tex->unbind();
         }
+
+        glBindVertexArray(0);
+        g_pHyprOpenGL->disableScissor();
+        tex->setTexParameter(GL_TEXTURE_MIN_FILTER, tex->minFilter);
+        tex->unbind();
         return true;
     }
 }

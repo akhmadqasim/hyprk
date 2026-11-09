@@ -4,6 +4,7 @@
 #include <hyprland/src/config/values/ConfigValues.hpp>
 #include <hyprland/src/plugins/PluginAPI.hpp>
 
+#include <array>
 #include <cmath>
 #include <memory>
 
@@ -102,26 +103,46 @@ namespace lg {
         g_cache.reset();
     }
 
-    SParams readConfig() {
-        SParams p;
+    std::shared_ptr<const SParams> readConfig() {
+        static std::shared_ptr<const SParams> last = std::make_shared<SParams>();
         if (!g_cache)
-            return p;
-        for (size_t i = 0; i < std::size(FLOATS); ++i) {
-            const float v = *g_cache->floats[i];
-            if (std::isfinite(v))
-                p.*(FLOATS[i].member) = v;
-        }
-        p.enabled       = *g_cache->enabled != 0;
-        p.fullDamage    = *g_cache->fullDamage != 0;
-        p.requireRegion = *g_cache->requireRegion != 0;
-        p.tintLight     = colorFromRGBA(*g_cache->tintLight);
-        p.tintDark      = colorFromRGBA(*g_cache->tintDark);
-        p.namespaces    = splitList(*g_cache->namespaces);
-        p.radii         = parseNumberMap(*g_cache->radii);
-        p.appearance    = parseAppearance(*g_cache->appearance);
-        p.shaderPath    = *g_cache->shader;
-        p.windowClasses = *g_cache->windows;
-        p.roundingPower = std::max(p.roundingPower, 1.f);
-        return p;
+            return last;
+
+        // raw values first: cheap to compare, parsed only when something differs
+        struct SRaw {
+            std::vector<float>       floats;
+            std::array<long long, 5> ints;
+            std::array<std::string, 5> strings;
+            bool operator==(const SRaw&) const = default;
+        };
+        static SRaw lastRaw;
+        SRaw        raw;
+        raw.floats.reserve(std::size(FLOATS));
+        for (const auto& v : g_cache->floats)
+            raw.floats.push_back(*v);
+        raw.ints    = {*g_cache->enabled, *g_cache->fullDamage, *g_cache->requireRegion, *g_cache->tintLight, *g_cache->tintDark};
+        raw.strings = {*g_cache->namespaces, *g_cache->radii, *g_cache->appearance, *g_cache->shader, *g_cache->windows};
+        if (raw == lastRaw)
+            return last;
+
+        auto p = std::make_shared<SParams>();
+        for (size_t i = 0; i < std::size(FLOATS); ++i)
+            if (std::isfinite(raw.floats[i]))
+                (*p).*(FLOATS[i].member) = raw.floats[i];
+        p->enabled       = raw.ints[0] != 0;
+        p->fullDamage    = raw.ints[1] != 0;
+        p->requireRegion = raw.ints[2] != 0;
+        p->tintLight     = colorFromRGBA(raw.ints[3]);
+        p->tintDark      = colorFromRGBA(raw.ints[4]);
+        p->namespaces    = splitList(raw.strings[0]);
+        p->radii         = parseNumberMap(raw.strings[1]);
+        p->appearance    = parseAppearance(raw.strings[2]);
+        p->shaderPath    = raw.strings[3];
+        p->windowClasses = raw.strings[4];
+        p->roundingPower = std::max(p->roundingPower, 1.f);
+
+        lastRaw = std::move(raw);
+        last    = std::move(p);
+        return last;
     }
 }

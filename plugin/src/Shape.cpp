@@ -5,6 +5,9 @@
 #include <cmath>
 #include <numeric>
 
+#include <hyprutils/string/String.hpp>
+#include <hyprutils/string/VarList.hpp>
+
 namespace lg {
 
     static bool touches(const SRect& a, const SRect& b) {
@@ -50,9 +53,10 @@ namespace lg {
 
         // radius: first y at which the cluster reaches its left edge, minus the top
         for (size_t i = 0; i < n; ++i) {
-            if (rects[i].w <= 0 || rects[i].h <= 0 || slot[find(i)] < 0)
+            const size_t root = find(i);
+            if (rects[i].w <= 0 || rects[i].h <= 0 || slot[root] < 0)
                 continue;
-            auto& shape = out[slot[find(i)]];
+            auto& shape = out[slot[root]];
             if (rects[i].x <= shape.box.x) {
                 const double stair = rects[i].y - shape.box.y;
                 if (shape.radius < 0 || stair < shape.radius)
@@ -88,26 +92,9 @@ namespace lg {
         return 1.0 - std::clamp(std::sqrt(std::max((2.0 - t) * t, 0.0)), 0.0, 1.0);
     }
 
-    static std::string_view trim(std::string_view s) {
-        while (!s.empty() && std::isspace(static_cast<unsigned char>(s.front())))
-            s.remove_prefix(1);
-        while (!s.empty() && std::isspace(static_cast<unsigned char>(s.back())))
-            s.remove_suffix(1);
-        return s;
-    }
-
     std::vector<std::string> splitList(std::string_view s) {
-        std::vector<std::string> out;
-        while (!s.empty()) {
-            const auto comma = s.find(',');
-            const auto item  = trim(s.substr(0, comma));
-            if (!item.empty())
-                out.emplace_back(item);
-            if (comma == std::string_view::npos)
-                break;
-            s.remove_prefix(comma + 1);
-        }
-        return out;
+        Hyprutils::String::CVarList list{std::string{s}, 0, ',', true};
+        return {list.begin(), list.end()};
     }
 
     std::unordered_map<std::string, double> parseNumberMap(std::string_view s) {
@@ -116,8 +103,8 @@ namespace lg {
             const auto colon = item.rfind(':');
             if (colon == std::string::npos)
                 continue;
-            const auto key = trim(std::string_view{item}.substr(0, colon));
-            const auto num = trim(std::string_view{item}.substr(colon + 1));
+            const auto key = Hyprutils::String::trim(std::string_view{item}.substr(0, colon));
+            const auto num = Hyprutils::String::trim(std::string_view{item}.substr(colon + 1));
             double     value = 0;
             const auto [ptr, ec] = std::from_chars(num.data(), num.data() + num.size(), value);
             if (key.empty() || ec != std::errc{} || ptr != num.data() + num.size())

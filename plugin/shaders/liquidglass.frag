@@ -100,10 +100,14 @@ void main() {
 
     vec4 face = vec4(0.0);
     if (cov > 0.0) {
-        const vec2 e = vec2(0.5, 0.0);
-        vec2 n = vec2(sdShape(p + e.xy) - sdShape(p - e.xy), sdShape(p + e.yx) - sdShape(p - e.yx));
-        n = n / max(length(n), 1e-5);
         float depth = max(-d, 0.0);
+        // the normal only matters on the bevel and the rim band
+        vec2 n = vec2(0.0);
+        if (depth < max(refractionHeight, highlightWidth) + 1.0) {
+            const vec2 e = vec2(0.5, 0.0);
+            n = vec2(sdShape(p + e.xy) - sdShape(p - e.xy), sdShape(p + e.yx) - sdShape(p - e.yx));
+            n = n / max(length(n), 1e-5);
+        }
 
         // backdrop luminance of the whole glass, for light/dark adaptivity
         float dark;
@@ -125,14 +129,15 @@ void main() {
         }
 
         // refraction on the bevel
-        float m   = refraction * bevel(depth, refractionHeight);
+        float bev = bevel(depth, refractionHeight);
+        float m   = refraction * bev;
         vec2  pR  = qp + n * m;
         float lod = mix(edgeBlurLod, blurLod, sat(depth / max(blurEdgeDistance, 1e-3)));
 
         vec3 col;
-        if (aberration > 0.0) {
+        if (aberration * bev > 0.05) {
             // 7 taps: +A feeds R/G, -A feeds G/B (SPEC section 3, step 4.3)
-            vec2 A   = n * aberration * bevel(depth, refractionHeight);
+            vec2 A   = n * aberration * bev;
             vec3 acc = vec3(0.0);
             for (int i = 0; i < 3; i++) {
                 float t = 1.0 - float(i) / 3.0;

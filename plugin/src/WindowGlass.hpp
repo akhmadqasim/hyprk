@@ -5,13 +5,12 @@
 
 #include <hyprland/src/render/decorations/IHyprWindowDecoration.hpp>
 
-#include <functional>
 #include <memory>
 
 namespace lg {
     class CGlassDecoration : public IHyprWindowDecoration {
       public:
-        CGlassDecoration(PHLWINDOW window, std::function<std::shared_ptr<SParams>()> params);
+        CGlassDecoration(PHLWINDOW window, std::shared_ptr<const SParams> (*params)());
         ~CGlassDecoration() override = default;
 
         SDecorationPositioningInfo getPositioningInfo() override;
@@ -24,10 +23,16 @@ namespace lg {
         uint64_t                   getDecorationFlags() override;
         std::string                getDisplayName() override;
 
-        PHLWINDOW                  owner() const { return m_window.lock(); }
-
       private:
-        PHLWINDOWREF                               m_window;
-        std::function<std::shared_ptr<SParams>()> m_params;
+        using ParamsFn = std::shared_ptr<const SParams> (*)();
+
+        bool         matches(const SParams& p, const std::string& cls);
+
+        PHLWINDOWREF m_window;
+        ParamsFn     m_params;
+        // last regex verdict, keyed on the pattern and the window class
+        std::string    m_matchPattern;
+        std::string    m_matchClass;
+        bool           m_match = false;
     };
 }

@@ -7,6 +7,7 @@
 #include <hyprland/src/render/Shader.hpp>
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -23,7 +24,6 @@ namespace lg {
         bool         ensure(const std::string& overridePath);
         SP<CShader>  shader() const { return m_shader; }
         eState       state() const { return m_state; }
-        const char*  failure() const { return m_failure.c_str(); }
         void         destroy();
 
         struct SUniforms {
@@ -35,10 +35,9 @@ namespace lg {
         } u{};
 
       private:
-        void        fail(std::string why);
+        void        fail(const std::string& why);
         SP<CShader> m_shader;
         eState      m_state = eState::UNTRIED;
-        std::string m_failure;
         std::string m_loadedPath;
     };
 
@@ -51,7 +50,9 @@ namespace lg {
         struct SData {
             std::vector<SGlassShape> shapes; // monitor-local logical px
             float                    alpha = 1.f;
-            std::shared_ptr<SParams> params;
+            std::shared_ptr<const SParams> params;
+            bool                           shadow = true;        // windows draw their own
+            std::optional<float>           roundingPower;        // override params->roundingPower
         };
 
         explicit CGlassElement(SData data);
@@ -67,7 +68,7 @@ namespace lg {
         bool                          disableSimplification(Render::CRenderContext& ctx) override;
 
         // logical px the effect reaches outside the glass box (shadow)
-        static double margin(const SParams& p);
+        static double margin(const SParams& p, bool shadow);
 
       private:
         void  drawFallback(Render::CRenderContext& ctx);

@@ -4,6 +4,7 @@
 
 #include "Shape.hpp"
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -49,6 +50,7 @@ namespace lg {
 
     // Hyprland side (Config.cpp, needs the compositor)
     void    registerConfig(void* handle);
-    SParams readConfig();
+    // shared snapshot, rebuilt only when a config value changed
+    std::shared_ptr<const SParams> readConfig();
     void    unregisterConfig();
 }
