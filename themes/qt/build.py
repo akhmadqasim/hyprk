@@ -33,6 +33,9 @@ def main():
         col = ROOT / 'colors'; col.mkdir(exist_ok=True)
         # qt6ct: active, disabled, inactive
         (col / f'macos27-{name}.conf').write_text('[ColorScheme]\nactive_colors=%s\ndisabled_colors=%s\ninactive_colors=%s\n' % (', '.join(c['pal']), ', '.join(c['dis']), ', '.join(c['pal'])))
+    import build_kvantum
+    for n, v in (('MacOS27Light', 'light'), ('MacOS27Dark', 'dark')):
+        build_kvantum.write(n, V[v], ROOT / 'kvantum')
     print('built')
 
 if __name__ == '__main__':

@@ -12,12 +12,18 @@ custom_palette=true
 standard_dialogs=default
 style=Fusion
 [Fonts]
-fixed="SF Mono,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
-general="SF Pro Text,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+fixed="Monospace,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+general="System Font,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 [Interface]
 stylesheets=$O/qt6ct/macos27.qss
 EOT
 QR=${QTROOT:-/tmp/claude-1000/qtroot}
+if [ -n "$KV" ]; then   # Kvantum instead of qt6ct+QSS
+  mkdir -p $O/Kvantum; cp -r $Q/kvantum/MacOS27* $O/Kvantum/
+  printf '[General]\ntheme=MacOS27%s\n' "$([ $MODE = dark ] && echo Dark || echo Light)" > $O/Kvantum/kvantum.kvconfig
+  export QT_STYLE_OVERRIDE=kvantum
+  sed -i 's/^style=.*/style=kvantum/; /^stylesheets=/d' $O/qt6ct/qt6ct.conf; sed -i 's/^custom_palette=.*/custom_palette=false/' $O/qt6ct/qt6ct.conf
+fi
 export CFG_OVERLAY=$O QT_QPA_PLATFORMTHEME=qt6ct QT_QPA_PLATFORM=wayland QT_PLUGIN_PATH=$QR/usr/lib/x86_64-linux-gnu/qt6/plugins LD_LIBRARY_PATH=$QR/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 $G/hshot.sh "$OUT" $MODE ${SZ:-1000x680} ${GALLERY:-/tmp/claude-1000/qt-gallery} $SCENE
 rm -rf $O
