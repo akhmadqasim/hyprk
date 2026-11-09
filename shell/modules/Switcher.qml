@@ -65,7 +65,10 @@ ShellWindow {
 
     Item {
         id: panel
-        readonly property real cell: Theme.switcher.iconSize + Theme.switcher.cellPadding * 2
+        // 128pt icons unless the row would not fit the screen
+        readonly property real icon: Math.min(Theme.switcher.iconSize,
+            (sw.width * Theme.switcher.maxWidthFraction - Theme.switcher.padding * 2) / Math.max(1, sw.apps.length) - Theme.switcher.cellPadding * 2)
+        readonly property real cell: icon + Theme.switcher.cellPadding * 2
         width: sw.apps.length * cell + Theme.switcher.padding * 2
         height: cell + Theme.switcher.labelHeight + Theme.switcher.padding * 2
         anchors.centerIn: parent
@@ -95,11 +98,11 @@ ShellWindow {
                         color: Theme.color.switcherSelection
                         visible: c.index === sw.selected
                     }
-                    IconImage {
+                    AppIcon {
                         anchors.centerIn: parent
-                        implicitSize: Theme.switcher.iconSize
-                        source: Apps.iconUrl(c.modelData.icon, c.modelData.id)
-                        mipmap: true
+                        size: panel.icon
+                        icon: c.modelData.icon
+                        appId: c.modelData.id
                     }
                     // macOS shows the name of the selected app under its icon
                     Text {

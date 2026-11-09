@@ -112,17 +112,15 @@ ShellWindow {
                     color: Theme.color.separator
                 }
 
-                IconImage {
+                AppIcon {
                     id: icon
                     visible: !cell.modelData.separator
-                    width: cell.size
-                    height: cell.size
+                    size: cell.size
                     anchors.horizontalCenter: parent.horizontalCenter
                     y: parent.height - height - bounceY
                     property real bounceY: 0
-                    source: Apps.iconUrl(cell.modelData.icon, cell.modelData.id)
-                    asynchronous: true
-                    mipmap: true
+                    icon: cell.modelData.icon || ""
+                    appId: cell.modelData.id
 
                     SequentialAnimation on bounceY {
                         running: cell.bouncing

@@ -295,7 +295,8 @@ Item {
 
         width: cc.width
         height: cc.rowH
-        readonly property real contentOpacity: available ? 1 : Theme.color.disabledOpacity
+        // the fill stays readable when disabled (the value is still shown)
+        readonly property real contentOpacity: available ? 1 : Theme.cc.disabledSliderOpacity
 
         Text {
             opacity: sm.contentOpacity

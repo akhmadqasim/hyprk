@@ -74,6 +74,8 @@ hl.config({
         disable_hyprland_logo = true,
         disable_splash_rendering = true,
         disable_hyprland_guiutils_check = true,
+        disable_xdg_env_checks = true,   -- nested inside GNOME: XDG_CURRENT_DESKTOP is external
+        disable_watchdog_warning = true, -- smoke/nested runs start Hyprland directly
     },
     ecosystem = { no_update_news = true, no_donation_nag = true },
     input = {

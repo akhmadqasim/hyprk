@@ -32,15 +32,20 @@ Item {
     // cards peeking below a collapsed group
     Repeater {
         model: Math.min(card.stacked, 2)
-        Rectangle {
+        // same material as the card, narrower and lower, so the group reads as a stack
+        Glass {
             required property int index
-            x: (index + 1) * 8
-            width: card.width - (index + 1) * 16
-            y: card.height - Theme.notif.radius + (index + 1) * Theme.notif.stackPeek
-            height: Theme.notif.radius
+            readonly property real inset: (index + 1) * Theme.notif.stackInset
+            x: inset
+            width: card.width - inset * 2
+            y: card.height - height + (index + 1) * Theme.notif.stackPeek
+            height: card.height
+            z: -1 - index
             radius: Theme.notif.radius
-            color: Theme.solidMaterial ? Theme.glass.solid : Theme.glass.tint
-            opacity: 0.85 - index * 0.25
+            sx: card.sx + x
+            sy: card.sy + y
+            shadow: false
+            opacity: 1 - index * 0.3
         }
     }
 

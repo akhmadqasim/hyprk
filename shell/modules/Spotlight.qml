@@ -27,15 +27,31 @@ ShellWindow {
     property string query: ""
     property int selected: 0
     readonly property var calcValue: Search.calc(query)
-    readonly property var apps: shown && query.trim() !== "" ? Search.rank(Apps.entries, query, Theme.spotlight.maxRows) : []
+    readonly property var apps: shown && query.trim() !== "" ? Search.rank(Apps.entries, query, Theme.spotlight.maxApps) : []
     // rows: {kind: "calc"|"app"|"files", ...}
+    // macOS 26/27 layout: section headers, few tall rows, no per-row type column
     readonly property var rows: {
         if (query.trim() === "") return [];
         const r = [];
-        if (calcValue !== null) r.push({ kind: "calc", title: Search.formatNumber(calcValue), subtitle: query.trim() + " =" });
-        for (const a of apps) r.push({ kind: "app", title: a.name, subtitle: "Application", entry: a, icon: a.icon });
-        r.push({ kind: "files", title: "Search Files for “" + query.trim() + "”", subtitle: "Files (coming soon)" });
+        if (calcValue !== null) {
+            r.push({ kind: "header", title: "Calculator" });
+            r.push({ kind: "calc", title: Search.formatNumber(calcValue), subtitle: query.trim() + " =" });
+        }
+        if (apps.length > 0) {
+            r.push({ kind: "header", title: "Applications" });
+            for (const a of apps) r.push({ kind: "app", title: a.name, entry: a, icon: a.icon });
+        }
+        r.push({ kind: "header", title: "Files" });
+        r.push({ kind: "files", title: "Search Files for “" + query.trim() + "”" });
         return r;
+    }
+    function selectable(i) { return rows[i] && rows[i].kind !== "header"; }
+    // next selectable row in direction dir (wraps), skipping section headers
+    function step(dir) {
+        for (let i = 1; i <= rows.length; i++) {
+            const j = (selected + dir * i + rows.length) % rows.length;
+            if (selectable(j)) { selected = j; return; }
+        }
     }
 
     onShownChanged: {
@@ -44,7 +60,7 @@ ShellWindow {
         selected = 0;
         if (shown) input.forceActiveFocus();
     }
-    onQueryChanged: selected = 0
+    onQueryChanged: { selected = 0; if (!selectable(0)) step(1); }
 
     function accept() {
         const row = rows[selected];
@@ -115,9 +131,9 @@ ShellWindow {
                 Keys.onEscapePressed: Panels.close()
                 Keys.onReturnPressed: sp.accept()
                 Keys.onEnterPressed: sp.accept()
-                Keys.onDownPressed: sp.selected = Math.min(sp.rows.length - 1, sp.selected + 1)
-                Keys.onUpPressed: sp.selected = Math.max(0, sp.selected - 1)
-                Keys.onTabPressed: sp.selected = (sp.selected + 1) % Math.max(1, sp.rows.length)
+                Keys.onDownPressed: sp.step(1)
+                Keys.onUpPressed: sp.step(-1)
+                Keys.onTabPressed: sp.step(1)
 
                 Text {
                     visible: input.text === ""
@@ -151,38 +167,55 @@ ShellWindow {
                     id: r
                     required property var modelData
                     required property int index
+                    readonly property bool header: modelData.kind === "header"
                     readonly property bool sel: index === sp.selected
                     width: list.width
-                    height: modelData.kind === "calc" ? Theme.spotlight.rowHeight * 1.5 : Theme.spotlight.rowHeight
+                    height: header ? Theme.spotlight.headerHeight
+                          : modelData.kind === "calc" ? Theme.spotlight.rowHeight * 1.3 : Theme.spotlight.rowHeight
 
+                    Text {
+                        visible: r.header
+                        x: Theme.spotlight.rowInset
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 3
+                        text: r.modelData.title
+                        font.family: Theme.fontText
+                        font.pixelSize: Theme.font.spotlightHeader
+                        font.weight: Theme.font.semibold
+                        color: Theme.color.secondaryLabel
+                    }
+
+                    // neutral grey selection pill, inset like macOS
                     Rectangle {
+                        visible: r.sel && !r.header
                         anchors.fill: parent
                         radius: Theme.spotlight.rowRadius
-                        color: Theme.color.switcherSelection
-                        visible: r.sel
+                        color: Theme.color.spotlightSelection
                     }
                     Item {
                         id: ic
-                        x: 8
+                        visible: !r.header
+                        x: Theme.spotlight.rowInset
                         width: Theme.spotlight.rowIcon
                         height: width
                         anchors.verticalCenter: parent.verticalCenter
-                        IconImage {
+                        AppIcon {
                             anchors.fill: parent
                             visible: r.modelData.kind === "app"
-                            source: r.modelData.kind === "app" ? Apps.iconUrl(r.modelData.icon, r.modelData.entry.id) : ""
-                            asynchronous: true
-                            mipmap: true
+                            size: parent.width
+                            icon: r.modelData.icon || ""
+                            appId: r.modelData.entry ? r.modelData.entry.id : ""
                         }
                         Symbol {
                             anchors.centerIn: parent
-                            visible: r.modelData.kind !== "app"
+                            visible: r.modelData.kind === "calc" || r.modelData.kind === "files"
                             name: r.modelData.kind === "calc" ? "equal" : "folder"
                             size: parent.width * 0.7
                             color: Theme.color.secondaryLabel
                         }
                     }
                     Column {
+                        visible: !r.header
                         anchors.left: ic.right
                         anchors.leftMargin: 12
                         anchors.right: parent.right
@@ -199,24 +232,15 @@ ShellWindow {
                         Text {
                             width: parent.width
                             visible: r.modelData.kind === "calc"
-                            text: r.modelData.subtitle
+                            text: r.modelData.subtitle || ""
                             font.family: Theme.fontText
                             font.pixelSize: Theme.font.spotlightHeader
                             color: Theme.color.secondaryLabel
                         }
                     }
-                    Text {
-                        visible: r.modelData.kind !== "calc"
-                        anchors.right: parent.right
-                        anchors.rightMargin: 12
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: r.modelData.subtitle
-                        font.family: Theme.fontText
-                        font.pixelSize: Theme.font.spotlightHeader
-                        color: Theme.color.tertiaryLabel
-                    }
                     MouseArea {
                         anchors.fill: parent
+                        enabled: !r.header
                         hoverEnabled: true
                         onEntered: sp.selected = r.index
                         onClicked: { sp.selected = r.index; sp.accept(); }

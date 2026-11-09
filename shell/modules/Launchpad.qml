@@ -25,7 +25,7 @@ ShellWindow {
 
     property string query: ""
     readonly property var apps: query === "" ? Apps.sortedEntries : Search.rank(Apps.entries, query, 200)
-    readonly property int rows: Math.max(1, Math.floor((panel.height - Theme.launchpad.headerHeight - 14 - 28) / Theme.launchpad.cellHeight))
+    readonly property int rows: Math.max(1, Math.floor((panel.height - Theme.launchpad.headerHeight - Theme.launchpad.gridTop - 28) / Theme.launchpad.cellHeight))
     readonly property int perPage: Theme.launchpad.columns * rows
     readonly property int pages: Math.max(1, Math.ceil(apps.length / perPage))
     property int page: 0
@@ -74,16 +74,25 @@ ShellWindow {
                 id: mg
                 x: Theme.launchpad.padding
                 anchors.verticalCenter: parent.verticalCenter
-                name: "magnifyingglass"
-                size: 18
+                name: "appstore"
+                size: Theme.launchpad.headerGlyph
+                color: Theme.color.secondaryLabel
+            }
+            Symbol {
+                id: more
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.launchpad.padding
+                anchors.verticalCenter: parent.verticalCenter
+                name: "ellipsis"
+                size: Theme.launchpad.headerGlyph
                 color: Theme.color.secondaryLabel
             }
             TextInput {
                 id: search
                 anchors.left: mg.right
                 anchors.leftMargin: 10
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.launchpad.padding
+                anchors.right: more.left
+                anchors.rightMargin: 10
                 anchors.verticalCenter: parent.verticalCenter
                 font.family: Theme.fontDisplay
                 font.pixelSize: Theme.font.launchpadSearch
@@ -115,7 +124,7 @@ ShellWindow {
         Grid {
             id: grid
             x: Theme.launchpad.padding
-            y: header.height + 14
+            y: header.height + Theme.launchpad.gridTop
             columns: Theme.launchpad.columns
             readonly property real cellWidth: (panel.width - Theme.launchpad.padding * 2) / Theme.launchpad.columns
             Repeater {
@@ -125,13 +134,12 @@ ShellWindow {
                     required property var modelData
                     width: grid.cellWidth
                     height: Theme.launchpad.cellHeight
-                    IconImage {
+                    AppIcon {
                         id: ic
                         anchors.horizontalCenter: parent.horizontalCenter
-                        implicitSize: Theme.launchpad.iconSize
-                        source: Apps.iconUrl(c.modelData.icon, c.modelData.id)
-                        asynchronous: true
-                        mipmap: true
+                        size: Theme.launchpad.iconSize
+                        icon: c.modelData.icon
+                        appId: c.modelData.id
                         opacity: cma.pressed ? 0.6 : 1
                     }
                     Text {

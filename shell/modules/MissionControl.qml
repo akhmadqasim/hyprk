@@ -52,35 +52,50 @@ ShellWindow {
     Rectangle { anchors.fill: parent; color: Qt.rgba(0, 0, 0, Theme.mission.dim) }
     MouseArea { anchors.fill: parent; onClicked: Panels.close() }
 
-    // Spaces bar
+    // Spaces bar: a wallpaper thumbnail per Space with its name under it,
+    // the current one outlined (macOS shows these when the bar is expanded)
     Row {
         anchors.horizontalCenter: parent.horizontalCenter
-        y: (Theme.mission.spacesHeight - Theme.mission.pillHeight) / 2
+        y: Theme.mission.spacesTop
         spacing: Theme.mission.pillSpacing
         Repeater {
             model: mc.spaces
-            delegate: Rectangle {
+            delegate: Column {
                 id: sp
                 required property var modelData
                 readonly property bool current: modelData === Hyprland.focusedWorkspace
-                width: label.implicitWidth + Theme.mission.pillPadding * 2
-                height: Theme.mission.pillHeight
-                radius: height / 2
-                color: current ? Theme.mission.pillCurrent : spm.containsMouse ? Theme.mission.pillHover : Theme.mission.pillIdle
+                spacing: 6
+
+                ClippingRectangle {
+                    width: Theme.mission.spaceThumbWidth
+                    height: width * mc.height / Math.max(1, mc.width)
+                    radius: Theme.mission.spaceRadius
+                    color: Theme.glass.solid
+                    border.width: sp.current ? Theme.mission.hoverBorder : 0
+                    border.color: Theme.mission.text
+                    scale: spm.containsMouse ? Theme.mission.hoverScale : 1
+                    Behavior on scale { NumberAnimation { duration: Theme.anim.fast } }
+                    Image {
+                        anchors.fill: parent
+                        source: Wallpaper.wallpaper ? "file://" + Wallpaper.wallpaper : ""
+                        sourceSize.width: Theme.mission.spaceThumbWidth * 2
+                        fillMode: Image.PreserveAspectCrop
+                        asynchronous: true
+                    }
+                    MouseArea {
+                        id: spm
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: sp.modelData.activate()
+                    }
+                }
                 Text {
-                    id: label
-                    anchors.centerIn: parent
+                    anchors.horizontalCenter: parent.horizontalCenter
                     text: "Desktop " + sp.modelData.id
                     font.family: Theme.fontText
                     font.pixelSize: Theme.mission.labelSize
                     font.weight: sp.current ? Font.DemiBold : Font.Normal
                     color: Theme.mission.text
-                }
-                MouseArea {
-                    id: spm
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: sp.modelData.activate()
                 }
             }
         }

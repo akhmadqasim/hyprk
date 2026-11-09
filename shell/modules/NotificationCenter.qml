@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
+import Quickshell.Widgets
 import qs
 import qs.components
 import qs.services
@@ -17,6 +19,14 @@ Item {
     height: Math.min(maxHeight, flick.contentHeight)
 
     property var expanded: ({})       // appName -> bool
+    property string photo: ""
+    readonly property string photoTitle: photo ? photo.split("/").slice(-2, -1)[0] : "Featured Photo"
+    Process {
+        // first picture in ~/Pictures (xdg dir), once per shell start
+        running: true
+        command: ["sh", "-c", 'd="$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures")"; find "$d" -maxdepth 2 -type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \\) 2>/dev/null | head -n1']
+        stdout: StdioCollector { onStreamFinished: nc.photo = text.trim() }
+    }
     property var groups: []
     // regroup only while the panel is open (and when it opens)
     readonly property bool shown: Panels.open === "nc"
@@ -121,13 +131,53 @@ Item {
                     }
                 }
                 Text {
-                    x: parent.width / 2
-                    y: Theme.nc.widgetPadding
+                    x: Theme.nc.widgetPadding
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: Theme.nc.widgetPadding
                     text: "No events today"
                     font.family: Theme.fontText
                     font.pixelSize: Theme.font.widgetSmall + 1
                     font.weight: Theme.font.medium
                     color: Theme.color.secondaryLabel
+                }
+                // month grid on the right half, today in a red circle (macOS medium Calendar widget)
+                Grid {
+                    id: month
+                    readonly property date first: new Date(clock.date.getFullYear(), clock.date.getMonth(), 1)
+                    readonly property int lead: (first.getDay() + 6) % 7          // weeks start on Monday
+                    readonly property int days: new Date(clock.date.getFullYear(), clock.date.getMonth() + 1, 0).getDate()
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.nc.widgetPadding
+                    anchors.verticalCenter: parent.verticalCenter
+                    columns: 7
+                    columnSpacing: 2
+                    rowSpacing: 1
+                    Repeater {
+                        model: ["M", "T", "W", "T", "F", "S", "S"].concat(Array(month.lead).fill("")).concat(Array.from({ length: month.days }, (_, i) => String(i + 1)))
+                        delegate: Item {
+                            required property var modelData
+                            required property int index
+                            readonly property bool today: index >= 7 && modelData === String(clock.date.getDate())
+                            width: Theme.nc.monthCell
+                            height: Theme.nc.monthCell
+                            Rectangle {
+                                anchors.centerIn: parent
+                                width: parent.width - 2
+                                height: width
+                                radius: width / 2
+                                color: Theme.color.red
+                                visible: parent.today
+                            }
+                            Text {
+                                anchors.centerIn: parent
+                                text: parent.modelData
+                                font.family: Theme.fontText
+                                font.pixelSize: Theme.font.widgetSmall - 1
+                                font.weight: parent.index < 7 ? Theme.font.semibold : Theme.font.regular
+                                color: parent.today ? "white" : parent.index < 7 ? Theme.color.secondaryLabel : Theme.color.label
+                            }
+                        }
+                    }
                 }
             }
             Widget {
@@ -157,6 +207,51 @@ Item {
                     Hand { len: face.width * 0.40; thick: 4; angle: clock.minutes * 6; color: Theme.nc.clockHand }
                     Hand { len: face.width * 0.44; thick: 1.5; angle: clock.seconds * 6; color: Theme.nc.clockSecond }
                     Rectangle { anchors.centerIn: parent; width: 7; height: 7; radius: 3.5; color: Theme.nc.clockSecond }
+                }
+            }
+
+            // Photos widget: a picture from ~/Pictures, the wallpaper when there is none
+            Widget {
+                Layout.preferredWidth: Theme.nc.width
+                Layout.preferredHeight: Theme.nc.width * Theme.nc.photoAspect
+                color: Theme.glass.solid
+                ClippingRectangle {
+                    anchors.fill: parent
+                    radius: Theme.nc.widgetRadius
+                    color: "transparent"
+                    Image {
+                        anchors.fill: parent
+                        source: nc.photo ? "file://" + nc.photo : (Wallpaper.wallpaper ? "file://" + Wallpaper.wallpaper : "")
+                        sourceSize.width: Theme.nc.width * 2
+                        fillMode: Image.PreserveAspectCrop
+                        asynchronous: true
+                    }
+                    Rectangle {
+                        anchors.fill: parent
+                        gradient: Gradient {
+                            GradientStop { position: 0.55; color: "transparent" }
+                            GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.45) }
+                        }
+                    }
+                }
+                Column {
+                    x: Theme.nc.widgetPadding
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: Theme.nc.widgetPadding
+                    Text {
+                        text: nc.photoTitle
+                        font.family: Theme.fontDisplay
+                        font.pixelSize: Theme.font.widgetBig * 0.7
+                        font.weight: Theme.font.bold
+                        color: "white"
+                    }
+                    Text {
+                        text: Qt.formatDate(clock.date, "MMM d, yyyy").toUpperCase()
+                        font.family: Theme.fontText
+                        font.pixelSize: Theme.font.widgetSmall
+                        font.weight: Theme.font.semibold
+                        color: Qt.rgba(1, 1, 1, 0.85)
+                    }
                 }
             }
 

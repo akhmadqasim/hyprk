@@ -104,9 +104,8 @@ ShellWindow {
                 }
             }
         }
-        // Wi-Fi: hidden without a NetworkManager wifi device
+        // Wi-Fi: always shown like macOS; slashed and dimmed when off or absent
         StatusItem {
-            visible: bar.wifiDev !== null
             Symbol {
                 anchors.centerIn: parent
                 name: bar.wifiDev && bar.wifiDev.connected ? "wifi" : "wifi.slash"

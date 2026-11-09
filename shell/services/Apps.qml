@@ -138,6 +138,11 @@ Singleton {
     readonly property string genericIcon: "file://" + iconDir + "/system/GenericApplicationIcon-512.png"
 
     // Absolute icon url: macOS icon when mapped, else the icon theme, else the generic app icon.
+    // true when the icon is one of the extracted macOS icons (already a squircle)
+    function isMacIcon(name, appId) {
+        return [appId, name].some(k => !!macIcons[Search.normId(k).split(".").pop()]);
+    }
+
     function iconUrl(name, appId) {
         for (const k of [appId, name]) {
             const key = Search.normId(k).split(".").pop();
