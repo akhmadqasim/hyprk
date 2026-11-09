@@ -28,8 +28,8 @@ by Qt's font engines = 35 MB RSS for one 7.8 MB file). A bare one-window Quicksh
 - **On-demand surfaces** (`shell.qml` `LazyLoader`): Spotlight, Cmd+Tab switcher, Apps and Mission
   Control windows (and their delegates, icon textures and live window captures) exist only while open.
   Their open logic also runs on creation (`opened()`); Spotlight's IPC moved to `Panels`.
-- **Hidden content not built**: Apps grid and switcher models are empty while closed, the Photos
-  widget loads its picture only while Notification Center is open.
+- **Hidden content not built**: the Photos widget loads its picture only while Notification Center
+  is open (the Apps grid and switcher are freed with their LazyLoader windows).
 
 ## Already event-driven (checked, no change needed)
 

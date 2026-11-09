@@ -84,9 +84,8 @@ Singleton {
     IpcHandler {
         target: "spotlight"
         function search(q: string): void {
-            root.spotlightQuery = q;
-            if (root.open === "spotlight") root.open = "";
             root.open = "spotlight";
+            root.spotlightQuery = q;      // Spotlight picks it up on creation or live
         }
     }
 }

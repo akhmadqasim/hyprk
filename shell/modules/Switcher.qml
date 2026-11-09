@@ -18,7 +18,6 @@ ShellWindow {
     // one entry per running app, most recently focused first is not tracked by Hyprland IPC,
     // so keep the active app first and the rest in dock order
     readonly property var apps: {
-        if (!shown) return [];          // nothing built while closed
         const running = Apps.dockItems.filter(i => (i.windows || []).length > 0);
         const activeIdx = running.findIndex(i => i.windows.indexOf(Hyprland.activeToplevel) !== -1);
         if (activeIdx > 0) running.unshift(running.splice(activeIdx, 1)[0]);
@@ -33,15 +32,12 @@ ShellWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-    // runs on creation too: the window is built on demand (shell.qml LazyLoader)
-    function opened() {
-        if (!shown) return;
+    // the window exists only while open (shell.qml LazyLoader)
+    Component.onCompleted: {
         if (apps.length === 0) { Qt.callLater(Panels.close); return; }   // not during construction
         selected = apps.length > 1 ? 1 : 0;
         keys.forceActiveFocus();
     }
-    onShownChanged: opened()
-    Component.onCompleted: opened()
 
 
     function commit() {

@@ -27,9 +27,8 @@ ShellWindow {
     readonly property var windows: shown ? Hyprland.toplevels.values.filter(t => t.workspace && t.workspace === Hyprland.focusedWorkspace) : []
     readonly property var spaces: !shown ? [] : Hyprland.workspaces.values.filter(w => w.id > 0).sort((a, b) => a.id - b.id)
 
-    function opened() { if (shown) { Hyprland.refreshToplevels(); keys.forceActiveFocus(); } }
-    onShownChanged: opened()
-    Component.onCompleted: opened()   // built on demand (shell.qml LazyLoader)
+    // the window exists only while open (shell.qml LazyLoader)
+    Component.onCompleted: { Hyprland.refreshToplevels(); keys.forceActiveFocus(); }
 
     // grid geometry: as square as possible, cells share the area below the Spaces bar
     readonly property int cols: Math.max(1, Math.ceil(Math.sqrt(windows.length)))

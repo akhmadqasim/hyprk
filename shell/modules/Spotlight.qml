@@ -52,15 +52,18 @@ ShellWindow {
         }
     }
 
-    // created on demand (shell.qml LazyLoader), so start from Panels' pending query
-    function reset() {
+    // the window exists only while open (shell.qml LazyLoader); a query handed over
+    // by IPC is taken on creation and whenever a new one arrives
+    function takeQuery() {
+        if (Panels.spotlightQuery === "") return;
         input.text = Panels.spotlightQuery;
         Panels.spotlightQuery = "";
-        selected = 0;
-        if (shown) input.forceActiveFocus();
     }
-    onShownChanged: reset()
-    Component.onCompleted: reset()
+    Component.onCompleted: { takeQuery(); input.forceActiveFocus(); }
+    Connections {
+        target: Panels
+        function onSpotlightQueryChanged() { sp.takeQuery(); }
+    }
     onQueryChanged: { selected = 0; if (!selectable(0)) step(1); }
 
     function accept() {
