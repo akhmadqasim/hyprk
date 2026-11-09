@@ -41,10 +41,14 @@ namespace lg {
         void onButtonRelease();
 
       private:
+        struct SGeometry {
+            CBox            bar; // logical, global
+            STitlebarLayout layout;
+        };
         CBox                     barGlobal() const; // logical, global, without workspace/floating offsets
-        bool                     active() const;
+        SGeometry                geometry(const SParams& p, const Vector2D& offset) const;
         void                     act(int button);
-        SP<Render::ITexture>     titleTexture(const std::string& title, bool active, float scale);
+        SP<Render::ITexture>     titleTexture(const SParams& p, const std::string& title, bool active, float scale, double maxWidth);
         SP<Render::ITexture>     glyphTexture(int button, float scale);
 
         PHLWINDOWREF             m_window;
@@ -54,6 +58,11 @@ namespace lg {
         bool                     m_hover   = false;
         int                      m_pressed = -1;
         bool                     m_dragging = false;
+
+        // wantsTitlebar() verdict for this params snapshot and window class (held, so no ABA)
+        std::shared_ptr<const SParams> m_decidedFor;
+        std::string                    m_decidedClass;
+        bool                           m_decision = false;
 
         struct {
             std::string          text;

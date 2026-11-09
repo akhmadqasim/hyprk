@@ -167,6 +167,16 @@ namespace lg {
         for (size_t i = 0; i < std::size(STRINGS); ++i)
             STRINGS[i].apply(*p, raw.strings[i]);
         p->roundingPower = std::max(p->roundingPower, 1.f);
+        auto compile = [](const std::string& pattern) -> std::optional<std::regex> {
+            if (pattern.empty())
+                return std::nullopt;
+            try {
+                return std::regex(pattern);
+            } catch (const std::regex_error&) { return std::nullopt; }
+        };
+        p->windowRegex          = compile(p->windowClasses);
+        p->titlebarClassesRegex = compile(p->titlebarClasses);
+        p->titlebarExcludeRegex = compile(p->titlebarExclude);
         if (p->adaptLow > p->adaptHigh) // an inverted band would flip every readback
             std::swap(p->adaptLow, p->adaptHigh);
 

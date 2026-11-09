@@ -226,6 +226,11 @@ namespace lg {
         }
     }
 
+    static bool touches(CRegion& damage, const CBox& box) {
+        // cheap reject on the extents before the exact region test
+        return !box.intersection(damage.getExtents()).empty() && !CRegion{damage}.intersect(box).empty();
+    }
+
     namespace {
         // glass boxes claimed this frame; bool = already added to the damage
         std::vector<std::pair<CBox, bool>> g_claims;
@@ -298,7 +303,7 @@ namespace lg {
             bool    touched = fresh || perElement;
             for (const auto& [box, added] : g_claims) {
                 copy.add(box.copy().expand(SHARP_MARGIN));
-                touched = touched || !CRegion{ctx.m_data.damage}.intersect(box).empty();
+                touched = touched || touches(ctx.m_data.damage, box);
             }
             copy.intersect(CBox{{}, size});
             if (!touched || copy.empty())
@@ -370,11 +375,6 @@ namespace lg {
     static double reachOf(const SParams& p, const SResolved& res) {
         const double shift = std::max({std::abs(res.refractionAmount), std::abs(res.outerAmount), res.bleedAmount}) * std::abs(p.refractionScale);
         return shift + p.aberration + 8.0;
-    }
-
-    static bool touches(CRegion& damage, const CBox& box) {
-        // cheap reject on the extents before the exact region test
-        return !box.intersection(damage.getExtents()).empty() && !CRegion{damage}.intersect(box).empty();
     }
 
     void CGlassElement::claimDamage(Render::CRenderContext& ctx, SData& data) {

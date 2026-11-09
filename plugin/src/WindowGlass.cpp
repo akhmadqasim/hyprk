@@ -23,21 +23,13 @@ namespace lg {
 
     void CGlassDecoration::onPositioningReply(const SDecorationPositioningReply&) {}
 
-    bool CGlassDecoration::matches(const SParams& p, const std::string& cls) {
-        if (m_matchPattern == p.windowClasses && m_matchClass == cls)
-            return m_match;
-        m_matchPattern = p.windowClasses;
-        m_matchClass   = cls;
-        // one compiled regex for all windows, rebuilt when the pattern changes
-        static std::string               compiledPattern;
-        static std::optional<std::regex> compiled;
-        if (compiledPattern != p.windowClasses) {
-            compiledPattern = p.windowClasses;
-            try {
-                compiled = std::regex(p.windowClasses);
-            } catch (const std::regex_error&) { compiled.reset(); }
+    bool CGlassDecoration::matches(const std::shared_ptr<const SParams>& p, const std::string& cls) {
+        // verdict per params snapshot (held, so its address is not reused) and class
+        if (m_matchParams != p || m_matchClass != cls) {
+            m_matchParams = p;
+            m_matchClass  = cls;
+            m_match       = p->windowRegex && std::regex_search(cls, *p->windowRegex);
         }
-        m_match = compiled && std::regex_search(cls, *compiled);
         return m_match;
     }
 
@@ -45,7 +37,7 @@ namespace lg {
         const auto window = m_window.lock();
         const auto params = m_params();
         if (!window || !mon || !params || !params->enabled || params->windowClasses.empty() || ctx.m_renderingSnapshot ||
-            !matches(*params, window->metadata().appID()))
+            !matches(params, window->metadata().appID()))
             return;
 
         auto box = window->getWindowMainSurfaceBox();

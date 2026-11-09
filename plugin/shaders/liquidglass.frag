@@ -221,12 +221,13 @@ void main() {
         col = mix(col, faceFill.rgb, faceFill.a);
         // keep the tile tone inside its range over any backdrop: lift darks additively (keeps hue),
         // scale brights down
-        {
-            float Lg = luma(encode(clamp(col, 0.0, 1.0)));
+        if (faceLuma.x > 0.0 || faceLuma.y < 1.0) {
+            vec3  g  = encode(clamp(col, 0.0, 1.0));
+            float Lg = luma(g);
             if (Lg < faceLuma.x)
-                col = decode(clamp(encode(clamp(col, 0.0, 1.0)) + (faceLuma.x - Lg), 0.0, 1.0));
+                col = decode(clamp(g + (faceLuma.x - Lg), 0.0, 1.0));
             else if (Lg > faceLuma.y)
-                col = decode(encode(clamp(col, 0.0, 1.0)) * (faceLuma.y / Lg));
+                col = decode(g * (faceLuma.y / Lg));
         }
 
         // edge bleed: outside colour pulled into the rim through its own colour effect (step 4.7)

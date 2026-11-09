@@ -26,13 +26,13 @@ namespace lg {
       private:
         using ParamsFn = std::shared_ptr<const SParams> (*)();
 
-        bool         matches(const SParams& p, const std::string& cls);
+        bool         matches(const std::shared_ptr<const SParams>& p, const std::string& cls);
 
         PHLWINDOWREF m_window;
         ParamsFn     m_params;
-        // last regex verdict, keyed on the pattern and the window class
-        std::string    m_matchPattern;
-        std::string    m_matchClass;
+        // last regex verdict, keyed on the params snapshot and the window class
+        std::shared_ptr<const SParams> m_matchParams;
+        std::string                    m_matchClass;
         bool           m_match = false;
     };
 }

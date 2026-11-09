@@ -26,23 +26,6 @@ namespace lg {
 
     // ── which windows get a bar ─────────────────────────────────────────────
 
-    static bool regexMatch(const std::string& pattern, const std::string& s) {
-        if (pattern.empty())
-            return false;
-        static std::string                cachedPattern[2];
-        static std::optional<std::regex>  cached[2];
-        static int                        next = 0;
-        for (int i = 0; i < 2; ++i)
-            if (cachedPattern[i] == pattern)
-                return cached[i] && std::regex_search(s, *cached[i]);
-        const int i      = next++ % 2;
-        cachedPattern[i] = pattern;
-        try {
-            cached[i] = std::regex(pattern);
-        } catch (const std::regex_error&) { cached[i].reset(); }
-        return cached[i] && std::regex_search(s, *cached[i]);
-    }
-
     // the client bound xdg-decoration for this toplevel: Hyprland answers server-side, so the
     // client draws no title bar of its own
     static bool requestedServerSide(const PHLWINDOW& window) {
@@ -60,9 +43,9 @@ namespace lg {
         if (!window || p.titlebar == 0)
             return false;
         const auto cls = window->metadata().appID();
-        if (regexMatch(p.titlebarExclude, cls))
+        if (p.titlebarExcludeRegex && std::regex_search(cls, *p.titlebarExcludeRegex))
             return false;
-        if (regexMatch(p.titlebarClasses, cls))
+        if (p.titlebarClassesRegex && std::regex_search(cls, *p.titlebarClassesRegex))
             return true;
         return p.titlebar == 1 && requestedServerSide(window);
     }
@@ -75,10 +58,6 @@ namespace lg {
     static constexpr std::array<const char*, 3> SIGNS = {"×", "−", "+"};
     static constexpr uint32_t                 GREYED  = 0xDDDCDBFF;
 
-    static CHyprColor rgba(uint32_t c, float a = 1.f) {
-        return CHyprColor{((c >> 24) & 0xFF) / 255.f, ((c >> 16) & 0xFF) / 255.f, ((c >> 8) & 0xFF) / 255.f, (c & 0xFF) / 255.f * a};
-    }
-
     static CHyprColor rgba(const SRgba& c, float a = 1.f) {
         return CHyprColor{c.r, c.g, c.b, c.a * a};
     }
@@ -88,7 +67,7 @@ namespace lg {
     SDecorationPositioningInfo CTitlebar::getPositioningInfo() {
         const auto params = m_params();
         const auto window = m_window.lock();
-        m_height          = params && window && wantsTitlebar(*params, window) ? params->titlebarHeight : 0;
+        m_height          = params && window && (m_decidedFor == params ? m_decision : wantsTitlebar(*params, window)) ? params->titlebarHeight : 0;
 
         SDecorationPositioningInfo info;
         info.policy         = DECORATION_POSITION_STICKY;
@@ -120,29 +99,23 @@ namespace lg {
         return box;
     }
 
+    CTitlebar::SGeometry CTitlebar::geometry(const SParams& p, const Vector2D& offset) const {
+        const CBox bar = barGlobal().translate(offset);
+        return {bar, titlebarLayout(bar.w, bar.h, p.titlebarButton, p.titlebarGap, p.titlebarInset)};
+    }
+
     void CTitlebar::damageEntire() {
         const auto window = m_window.lock();
         if (!window || m_height <= 0)
             return;
-        CBox box = barGlobal();
-        box.translate(window->presentation().floatingOffset());
-        g_pHyprRenderer->damageBox(box.expand(2));
+        g_pHyprRenderer->damageBox(barGlobal().translate(window->presentation().floatingOffset()).expand(2));
     }
 
-    bool CTitlebar::active() const {
-        const auto window = m_window.lock();
-        return window && Desktop::focusState()->window() == window;
-    }
-
-    SP<Render::ITexture> CTitlebar::titleTexture(const std::string& title, bool isActive, float scale) {
+    SP<Render::ITexture> CTitlebar::titleTexture(const SParams& p, const std::string& title, bool isActive, float scale, double maxWidth) {
         if (!m_title.tex || m_title.text != title || m_title.active != isActive || m_title.scale != scale) {
-            const auto params = m_params();
-            const auto bar    = barGlobal();
-            const auto layout = titlebarLayout(bar.w, bar.h, params->titlebarButton, params->titlebarGap, params->titlebarInset);
-            const auto color  = rgba(isActive ? params->titlebarText : params->titlebarTextInactive);
-            m_title           = {title, isActive, scale,
-                                 g_pHyprRenderer->renderText(title, color, int(std::round(params->titlebarFontSize * scale)), false, params->titlebarFont,
-                                                             int(layout.title.w * scale), 600)};
+            const auto color = rgba(isActive ? p.titlebarText : p.titlebarTextInactive);
+            m_title          = {title, isActive, scale,
+                                g_pHyprRenderer->renderText(title, color, int(std::round(p.titlebarFontSize * scale)), false, p.titlebarFont, int(maxWidth * scale), 600)};
         }
         return m_title.tex;
     }
@@ -155,7 +128,7 @@ namespace lg {
         auto& tex = m_glyphs[button];
         if (!tex) {
             const auto params = m_params();
-            tex = g_pHyprRenderer->renderText(SIGNS[button], rgba(GLYPHS[button]), int(std::round(params->titlebarButton * 0.85 * scale)), false, params->titlebarFont, 0, 700);
+            tex = g_pHyprRenderer->renderText(SIGNS[button], rgba(rgbaFromHex(GLYPHS[button])), int(std::round(params->titlebarButton * 0.85 * scale)), false, params->titlebarFont, 0, 700);
         }
         return tex;
     }
@@ -166,8 +139,14 @@ namespace lg {
         if (!window || !params || !mon)
             return;
 
-        // the wanted height can change with the config or the client's decoration request
-        const double want = wantsTitlebar(*params, window) ? params->titlebarHeight : 0;
+        // the wanted height can change with the config or the window's class; decided once per change
+        const auto cls = window->metadata().appID();
+        if (m_decidedFor != params || m_decidedClass != cls) {
+            m_decidedFor   = params;
+            m_decidedClass = cls;
+            m_decision     = wantsTitlebar(*params, window);
+        }
+        const double want = m_decision ? params->titlebarHeight : 0;
         if (want != m_height) {
             g_pDecorationPositioner->repositionDeco(this);
             return;
@@ -182,7 +161,7 @@ namespace lg {
         if (barPx.empty())
             return;
 
-        const bool  isActive = active();
+        const bool  isActive = Desktop::focusState()->window() == window;
         const float radius   = window->presentation().rounding();
 
         // fill: rounded top corners only (the box runs on under the window and is clipped)
@@ -197,7 +176,7 @@ namespace lg {
         g_pHyprRenderer->addPassElement(ctx, makeUnique<CRectPassElement>(fill));
 
         // traffic lights: colour when active or hovered, grey otherwise; glyphs on hover
-        const auto layout = titlebarLayout(bar.w, bar.h, params->titlebarButton, params->titlebarGap, params->titlebarInset);
+        const auto layout = geometry(*params, {}).layout; // size only; positions come from `bar`
         for (int i = 0; i < 3; ++i) {
             const CBox b = layout.buttons[i].copy().translate(bar.pos()).scale(scale).round();
 
@@ -210,7 +189,7 @@ namespace lg {
             CRectPassElement::SRectData dot;
             dot.box   = b.copy().expand(-0.5 * scale);
             dot.round = int(dot.box.w / 2);
-            dot.color = (isActive || m_hover) ? rgba(LIGHTS[i], a) : rgba(GREYED, a);
+            dot.color = (isActive || m_hover) ? rgba(rgbaFromHex(LIGHTS[i]), a) : rgba(rgbaFromHex(GREYED), a);
             g_pHyprRenderer->addPassElement(ctx, makeUnique<CRectPassElement>(dot));
 
             if (m_hover) {
@@ -227,7 +206,7 @@ namespace lg {
         // centred title (SF Pro 13 semibold)
         const auto title = window->metadata().title();
         if (!title.empty() && layout.title.w > 8) {
-            if (const auto tex = titleTexture(title, isActive, scale); tex && tex->ok()) {
+            if (const auto tex = titleTexture(*params, title, isActive, scale, layout.title.w); tex && tex->ok()) {
                 CTexPassElement::SRenderData text;
                 text.tex = tex;
                 text.box = CBox{barPx.x + (barPx.w - tex->m_size.x) / 2, barPx.y + (barPx.h - tex->m_size.y) / 2, tex->m_size.x, tex->m_size.y}.round();
@@ -242,9 +221,8 @@ namespace lg {
         const auto params = m_params();
         if (!window || !params || m_height <= 0)
             return;
-        const CBox bar    = barGlobal().translate(window->presentation().floatingOffset());
-        const auto layout = titlebarLayout(bar.w, bar.h, params->titlebarButton, params->titlebarGap, params->titlebarInset);
-        const bool hover  = lightsArea(layout, params->titlebarGap).translate(bar.pos()).containsPoint(global);
+        const auto [bar, layout] = geometry(*params, window->presentation().floatingOffset());
+        const bool hover         = lightsArea(layout, params->titlebarGap).translate(bar.pos()).containsPoint(global);
         if (hover != m_hover) {
             m_hover = hover;
             damageEntire();
@@ -274,9 +252,8 @@ namespace lg {
         if (e.button != 272 /* BTN_LEFT */)
             return true;
 
-        const CBox bar    = barGlobal().translate(window->presentation().floatingOffset());
-        const auto layout = titlebarLayout(bar.w, bar.h, params->titlebarButton, params->titlebarGap, params->titlebarInset);
-        const int  hit    = buttonAt(layout, pos.x - bar.x, pos.y - bar.y, params->titlebarGap);
+        const auto [bar, layout] = geometry(*params, window->presentation().floatingOffset());
+        const int  hit           = buttonAt(layout, pos.x - bar.x, pos.y - bar.y, params->titlebarGap);
 
         if (e.state == WL_POINTER_BUTTON_STATE_PRESSED) {
             if (!Desktop::focusState()->isWindowActive(window))
@@ -290,9 +267,9 @@ namespace lg {
         }
 
         // release: a light acts only if the press started on it too
-        if (m_dragging)
-            onButtonRelease();
-        else if (hit >= 0 && hit == m_pressed)
+        const bool wasDragging = m_dragging;
+        onButtonRelease();
+        if (!wasDragging && hit >= 0 && hit == m_pressed)
             act(hit);
         m_pressed = -1;
         return true;

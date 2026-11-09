@@ -6,6 +6,8 @@
 #include "Shape.hpp"
 
 #include <memory>
+#include <optional>
+#include <regex>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -54,6 +56,9 @@ namespace lg {
         SRgba                                        titlebarText{0.2f, 0.2f, 0.2f, 0.85f}, titlebarTextInactive{0.2f, 0.2f, 0.2f, 0.35f};
         std::string                                  titlebarFont = "SF Pro Text";
         bool                                         titlebarGlass = false; // light glass (Hyprland blur + translucent fill)
+
+        // compiled once per snapshot from the regex strings above (nullopt: empty or invalid)
+        std::optional<std::regex>                    windowRegex, titlebarClassesRegex, titlebarExcludeRegex;
     };
 
     // 0xRRGGBBAA -> rgba 0..1
