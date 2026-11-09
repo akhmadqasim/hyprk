@@ -61,12 +61,12 @@ namespace lg {
         // Face: SPEC 9.5 gives (0.125, 0.8, 1.2), but in our gamma-space shader that measured ~1.4:1
         // against the white tile labels (JUDGE.md). (0.18, 0.55, 1.0) maps the backdrop into a mid
         // tone that keeps its shapes and colours (JUDGE-r4: no flat slab) while the luminance band
-        // caps it at 0.47 for >= 4.5:1 white labels, like reference/screens/macos27-control-center.png.
+        // caps it at 0.45 (about 4.7:1 against white labels), like reference/screens/macos27-control-center.png.
         // SPEC 9.5 Control Center, Mac, V2 on top of Clear: blur 4 with distances (-100, -1, 0, 0),
         // inner 0.225 D clamp 25 / -2.0 D clamp -80, outer 0.0357 D / 0.0714 D at 0.1525.
         constexpr SRecipe CONTROLCENTER = {
             .name                = "controlcenter",
-            .light               = {.ycc = {0.18f, 0.55f, 1.0f}, .fill = WARM_GREY, .highlightBias = 1.2f, .bleed = CLEAR_BLEED, .lumaMin = 0.15f, .lumaMax = 0.47f},
+            .light               = {.ycc = {0.18f, 0.55f, 1.0f}, .fill = WARM_GREY, .highlightBias = 1.2f, .bleed = CLEAR_BLEED, .lumaMin = 0.15f, .lumaMax = 0.45f},
             .dark                = {.ycc = {0.12f, 0.45f, 1.0f}, .fill = WARM_GREY, .highlightBias = 0.9f, .bleed = CLEAR_BLEED, .lumaMin = 0.10f, .lumaMax = 0.40f},
             .refractionHeightN   = 0.225f,
             .refractionHeightMax = 25,

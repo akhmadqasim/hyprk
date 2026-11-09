@@ -249,6 +249,7 @@ namespace lg {
             }
             g_pHyprOpenGL->setActiveTexture(GL_TEXTURE1);
             tex->bind();
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 7); // the shader reads up to lod ~7
             glGenerateMipmap(GL_TEXTURE_2D);
             tex->setTexParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
@@ -311,10 +312,10 @@ namespace lg {
             return;
         resolveShapes(data);
         const double m = margin(data);
+        if (data.params->fullDamage)
+            return; // everything is redrawn anyway
         for (size_t i = 0; i < data.shapes.size(); ++i)
             g_claims.emplace_back(readBox(data.shapes[i], m, reachOf(*data.params, data.resolved[i]), mon->m_scale), false);
-        if (data.params->fullDamage)
-            return; // the claims still size the shared backdrop copy
 
         // a box added now can touch glass claimed earlier this frame: repeat until stable
         for (bool grew = true; grew;) {
@@ -450,10 +451,7 @@ namespace lg {
             return false;
 
         // without the copy, the blurred texture stands in: variable blur and bleed then stay blurred
-        CRegion sharpRegion;
-        for (const auto& q : quads)
-            sharpRegion.add(readBox(m_data.shapes[q.index], m, reachOf(p, q.res), scale).expand(SHARP_MARGIN));
-        auto sharp = sharpBackdrop(ctx, tex->m_size, sharpRegion);
+        auto sharp = sharpBackdrop(ctx, tex->m_size, blurDamage.copy().expand(SHARP_MARGIN));
         if (!sharp)
             sharp = tex;
 
