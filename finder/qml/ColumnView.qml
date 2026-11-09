@@ -101,7 +101,8 @@ Item {
                         x: 30
                         width: parent.width - x - 22
                         anchors.verticalCenter: parent.verticalCenter
-                        text: row.modelData.name
+                        text: Files.styledName(row.modelData, Theme.color.tagColors)
+                        textFormat: Text.StyledText
                         elide: Text.ElideMiddle
                         color: row.selected && col.last ? "white" : Theme.color.label
                         font.family: Theme.fontText

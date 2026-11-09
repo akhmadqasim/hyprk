@@ -102,6 +102,13 @@ test("rename validation", () => {
     assert.equal(F.validateName("é".repeat(127), existing, "a.txt"), "");
 });
 
+// ---- tags ----
+test("styledName", () => {
+    assert.equal(F.styledName({ name: "a<b>.txt" }, {}), "a&lt;b&gt;.txt");
+    assert.equal(F.styledName({ name: "x", tags: ["Red", "Odd"] }, { Red: "#f00" }),
+                 '<font color="#f00">\u25CF</font><font color="#8E8E93">\u25CF</font> x');
+});
+
 // ---- icons / formatting ----
 test("iconClass", () => {
     assert.equal(F.iconClass({ isDir: true }), "folder");

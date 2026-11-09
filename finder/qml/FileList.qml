@@ -124,7 +124,8 @@ Item {
                         x: 28
                         width: parent.width - x - 8
                         anchors.verticalCenter: parent.verticalCenter
-                        text: row.modelData.name
+                        text: Files.styledName(row.modelData, Theme.color.tagColors)
+                        textFormat: Text.StyledText
                         elide: Text.ElideMiddle
                         color: row.textColor
                         font.family: Theme.fontText

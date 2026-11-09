@@ -178,6 +178,21 @@ function badge(entry) {
     return ext.length > 0 && ext.length <= 4 ? ext.toUpperCase() : "";
 }
 
+// ---------- tags ----------
+
+function escapeHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// Name as StyledText with Finder's colored tag dots in front ("● ● name").
+// colors: tag name -> CSS color; unknown tags use gray.
+function styledName(entry, colors) {
+    let dots = "";
+    for (const t of entry.tags || [])
+        dots += '<font color="' + (colors[t] || "#8E8E93") + '">\u25CF</font>';
+    return (dots ? dots + " " : "") + escapeHtml(entry.name);
+}
+
 // ---------- formatting ----------
 
 // Finder uses decimal units.

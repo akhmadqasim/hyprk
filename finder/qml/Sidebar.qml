@@ -23,7 +23,11 @@ Rectangle {
     Component.onCompleted: refreshVolumes()
 
     readonly property var sections: [
-        { header: "", items: [{ label: "Recents", icon: "clock", path: "recents:" }] },
+        // Shared, iCloud Drive and AirDrop are visual placeholders (no Linux backend); AirDrop is dimmed
+        { header: "", items: [
+            { label: "Recents", icon: "clock", path: "recents:" },
+            { label: "Shared", icon: "shared", path: "" }
+        ] },
         { header: "Favorites", items: [
             { label: "Applications", icon: "applications", path: "applications:" },
             { label: "Desktop", icon: "desktop", path: FileOps.standardPath("desktop") },
@@ -32,10 +36,12 @@ Rectangle {
             { label: Files.baseName(FileOps.homePath()), icon: "house", path: FileOps.homePath() }
         ] },
         { header: "Locations", items: [
+            { label: "iCloud Drive", icon: "icloud", path: "" },
+            { label: "AirDrop", icon: "airdrop", path: "", dim: true },
             { label: "Macintosh HD", icon: "drive", path: "/" }
         ].concat(volumes.map(v => ({ label: v.name, icon: "drive", path: v.path })))
          .concat([{ label: "Trash", icon: "trash", path: FileOps.standardPath("trash") }]) },
-        { header: "Tags", items: Theme.color.tags.slice(0, 5).map(t => ({ label: t.name, dot: t.color, path: "" })) }
+        { header: "Tags", items: Theme.color.tags.slice(0, 5).map(t => ({ label: t.name, dot: t.color, path: "tag:" + t.name })) }
     ]
 
     Flickable {
@@ -79,6 +85,7 @@ Rectangle {
                             readonly property bool current: modelData.path !== "" && modelData.path === root.browser.path
                             width: column.width
                             height: Theme.sidebar.rowHeight
+                            opacity: modelData.dim ? 0.4 : 1
 
                             Rectangle {
                                 x: Theme.sidebar.rowInset

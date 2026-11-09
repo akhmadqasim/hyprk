@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
+import "lib/files.js" as Files
 
 // Icon grid. Columns stretch to fill the width; rubber-band selection on empty space.
 GridView {
@@ -115,7 +116,8 @@ GridView {
             y: icon.y + icon.height + Theme.grid.labelGap
             width: Theme.grid.labelWidth
             horizontalAlignment: Text.AlignHCenter
-            text: cell.modelData.name
+            text: Files.styledName(cell.modelData, Theme.color.tagColors)
+            textFormat: Text.StyledText
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             maximumLineCount: 2
             elide: Text.ElideRight

@@ -33,6 +33,7 @@ Window {
     Component.onCompleted: {
         Theme.dark = startup.dark;
         Theme.blur = startup.blur;
+        Theme.iconDir = startup.iconDir;
         Qt.callLater(applyStartup);
         keys.forceActiveFocus();
     }
@@ -101,6 +102,7 @@ Window {
             onViewRequested: v => win.setView(v)
             onMoreRequested: anchor => win.popup(win.moreMenu, anchor)
             onGroupRequested: anchor => win.popup(win.sortItems(), anchor)
+            onTagRequested: anchor => win.popup([{ tagRow: true, action: tag => fm.toggleTag(tag) }], anchor)
         }
 
         Loader {
@@ -246,7 +248,9 @@ Window {
         const items = entry ? [
             { text: "Open", action: () => fm.openSelection() },
             { separator: true },
-            { text: "Move to Trash", shortcut: "Del", enabled: n > 0 && (writable || fm.path === "recents:"), action: () => fm.trashSelection() },
+            { text: "Move to Trash", shortcut: "Del", enabled: n > 0 && fm.canTrash, action: () => fm.trashSelection() },
+            { separator: true },
+            { tagRow: true, action: tag => fm.toggleTag(tag) },
             { separator: true },
             { text: "Quick Look", shortcut: "Space", action: () => win.quickLook() },
             { text: "Rename", shortcut: "↩", enabled: n === 1 && writable, action: () => win.startRename() },
@@ -274,7 +278,7 @@ Window {
     readonly property var moreMenu: [
         { text: "New Folder", shortcut: "⇧⌃N", enabled: !fm.isVirtual, action: () => fm.newFolder() },
         { text: "Rename", enabled: fm.selectedCount === 1 && !fm.isVirtual, action: () => win.startRename() },
-        { text: "Move to Trash", enabled: fm.selectedCount > 0 && !fm.isVirtual, action: () => fm.trashSelection() },
+        { text: "Move to Trash", enabled: fm.selectedCount > 0 && fm.canTrash, action: () => fm.trashSelection() },
         { separator: true },
         { text: win.showPathBar ? "Hide Path Bar" : "Show Path Bar", shortcut: "⌥⌃P", action: () => win.showPathBar = !win.showPathBar },
         { text: fm.showHidden ? "Hide Hidden Files" : "Show Hidden Files", shortcut: "⇧⌃.", action: () => fm.showHidden = !fm.showHidden },

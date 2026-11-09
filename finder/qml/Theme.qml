@@ -1,6 +1,7 @@
 pragma Singleton
 
 import QtQuick
+import Finder.Native
 
 // Every metric and color of the Finder window.
 // Metrics are measured in px from reference/screens/macos27-finder-window.png (1144x726, 1x),
@@ -14,6 +15,26 @@ QtObject {
     // No compositor blur behind the window (plain GNOME, offscreen) -> solid sidebar.
     // Set HYPRK_BLUR=1 (Hyprland with a blur windowrule) to get the translucent sidebar.
     property bool blur: false
+
+    // ---------- macOS file icons (themes/icons/system), "" = use the drawn fallbacks ----------
+    property string iconDir: ""
+    function sysIcon(name, px) {
+        return iconDir ? "file://" + iconDir + "/" + name + (px > 128 ? "-512.png" : "-128.png") : "";
+    }
+    // folders that get their own icon, by absolute path
+    readonly property var folderIcons: {
+        const m = {};
+        m[FileOps.homePath()] = "HomeFolderIcon";
+        m[FileOps.standardPath("desktop")] = "DesktopFolderIcon";
+        m[FileOps.standardPath("documents")] = "DocumentsFolderIcon";
+        m[FileOps.standardPath("downloads")] = "DownloadsFolder";
+        m[FileOps.standardPath("pictures")] = "PicturesFolderIcon";
+        m[FileOps.standardPath("music")] = "MusicFolderIcon";
+        m[FileOps.standardPath("movies")] = "MovieFolderIcon";
+        m[FileOps.homePath() + "/Public"] = "PublicFolderIcon";
+        m[FileOps.homePath() + "/Library"] = "LibraryFolderIcon";
+        return m;
+    }
 
     // ---------- fonts (fallback chain in FALLBACKS.md) ----------
     readonly property var _families: Qt.fontFamilies()
@@ -99,6 +120,11 @@ QtObject {
             { name: "Blue", color: "#007AFF" }, { name: "Purple", color: "#AF52DE" },
             { name: "Gray", color: "#8E8E93" }
         ]
+        readonly property var tagColors: {
+            const m = {};
+            for (const t of tags) m[t.name] = t.color;
+            return m;
+        }
     }
 
     // ---------- window ----------

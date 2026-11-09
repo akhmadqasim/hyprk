@@ -37,7 +37,7 @@ Item {
             visible: root.focused !== null && !Files.isImage(root.focused)
             anchors.centerIn: parent
             entry: root.focused || ({ name: "", isDir: false, mime: "" })
-            size: Math.min(parent.width, parent.height, 256)
+            size: Math.min(parent.width, parent.height, 420)
         }
         EntryMouseArea {
             anchors.fill: parent

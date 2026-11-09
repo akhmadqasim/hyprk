@@ -13,6 +13,8 @@ QtObject {
     readonly property bool canGoBack: historyIndex > 0
     readonly property bool canGoForward: historyIndex < history.length - 1
     readonly property bool isVirtual: isVirtualPath(path)
+    // virtual lists of real files (Recents, tags) can trash; Applications can't
+    readonly property bool canTrash: path !== "applications:"
 
     property string sortKey: "name"
     property bool ascending: true
@@ -41,24 +43,37 @@ QtObject {
     readonly property var selectedVisible: entries.filter(e => selected[e.path] === true)
     readonly property int selectedCount: selectedVisible.length
 
+    // Desktop and Documents carry Finder's " — Local" suffix (not synced to iCloud)
     readonly property string title: path === "recents:" ? "Recents"
         : path === "applications:" ? "Applications"
+        : path.indexOf("tag:") === 0 ? path.slice(4)
         : path === FileOps.homePath() ? Files.baseName(path)
+        : path === FileOps.standardPath("documents") || path === FileOps.standardPath("desktop") ? Files.title(path) + " \u2014 Local"
         : Files.title(path)
 
     signal errorRaised(string message)
 
+    // Folders list synchronously (callers select the result right away); virtual locations
+    // can be slow (xbel, every .desktop file, tag index) and load on a worker thread.
+    property int _token: 0
+    property bool loading: false
     function reload() {
-        let list;
-        if (path === "recents:") list = FileOps.recents(200);
-        else if (path === "applications:") list = FileOps.applications();
-        else list = FileOps.list(path, showHidden);
+        FileOps.watch(isVirtual ? "" : path);
+        if (isVirtual) {
+            loading = true;
+            FileOps.listAsync(path, ++_token);
+        } else {
+            _token++;   // drop any virtual listing still in flight
+            _setEntries(FileOps.list(path, showHidden));
+        }
+    }
+    function _setEntries(list) {
+        loading = false;
         allEntries = list;
         // keep only selections that still exist
         const keep = {};
         for (const e of list) if (selected[e.path]) keep[e.path] = true;
         selected = keep;
-        FileOps.watch(isVirtual ? "" : path);
     }
 
     function go(p) {
@@ -67,6 +82,19 @@ QtObject {
         history = history.slice(0, historyIndex + 1).concat([p]);
         historyIndex = history.length - 1;
         _enter(p);
+    }
+    // Tags: toggles `tag` on every selected item.
+    function toggleTag(tag) {
+        if (!canTrash) return;   // Applications entries are .desktop files, not user files
+        const sel = selectedVisible;
+        const all = sel.length > 0 && sel.every(e => (e.tags || []).indexOf(tag) !== -1);
+        for (const e of sel) {
+            const t = (e.tags || []).filter(x => x !== tag);
+            if (!all) t.push(tag);
+            const err = FileOps.setTags(e.path, t);
+            if (err) { errorRaised(err); break; }
+        }
+        reload();
     }
     function back() { if (canGoBack) { historyIndex--; _enter(history[historyIndex]); } }
     function forward() { if (canGoForward) { historyIndex++; _enter(history[historyIndex]); } }
@@ -85,7 +113,7 @@ QtObject {
         anchorPath = "";
         reload();
     }
-    function isVirtualPath(p) { return p === "recents:" || p === "applications:"; }
+    function isVirtualPath(p) { return p === "recents:" || p === "applications:" || p.indexOf("tag:") === 0; }
 
     // ---------- selection ----------
     function isSelected(p) { return selected[p] === true; }
@@ -152,7 +180,7 @@ QtObject {
     }
     function trashSelection() {
         const paths = selectedPaths();
-        if (paths.length === 0 || isVirtual && path !== "recents:") return;
+        if (paths.length === 0 || !canTrash) return;
         FileOps.trash(paths);   // async, see onTrashFinished
     }
     function newFolder() {
@@ -180,6 +208,7 @@ QtObject {
     property Connections _watch: Connections {
         target: FileOps
         function onDirectoryChanged(dir) { if (dir === b.path) b.reload(); }
+        function onListed(token, list) { if (token === b._token) b._setEntries(list); }
         function onTrashFinished(error) {
             if (error) b.errorRaised(error);
             b.reload();

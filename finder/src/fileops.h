@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QFileSystemWatcher>
+#include <QJsonObject>
 #include <QMimeDatabase>
 #include <QObject>
 #include <QVariantList>
@@ -22,10 +23,15 @@ public:
     // One map per entry: name, path, isDir, size, modified (ms), mime, kind, hidden, symlink.
     Q_INVOKABLE QVariantList list(const QString &dir, bool showHidden) const;
     Q_INVOKABLE QVariantMap info(const QString &path) const;
-    // Files from ~/.local/share/recently-used.xbel that still exist, newest first.
-    Q_INVOKABLE QVariantList recents(int max) const;
-    // Visible .desktop entries, as list() maps plus appId and icon.
-    Q_INVOKABLE QVariantList applications() const;
+    // Lists a virtual location on a worker thread and emits listed(token, entries):
+    // "recents:" (recently-used.xbel), "applications:" (.desktop files), "tag:<Name>".
+    Q_INVOKABLE void listAsync(const QString &location, int token);
+
+    // Finder tags, stored in the xattr user.xdg.tags (comma separated). Where xattrs are not
+    // supported they live in ~/.local/share/hyprk-finder/tags.json, which also indexes every
+    // tagged path so "tag:<Name>" can be listed without scanning the disk.
+    Q_INVOKABLE QStringList tags(const QString &path) const;
+    Q_INVOKABLE QString setTags(const QString &path, const QStringList &tags);
 
     Q_INVOKABLE void watch(const QString &dir);
 
@@ -37,15 +43,19 @@ public:
     // Creates "<baseName>", "<baseName> 2", ... in dir. Returns the new path or "" on failure.
     Q_INVOKABLE QString makeFolder(const QString &dir, const QString &baseName) const;
     Q_INVOKABLE QString readText(const QString &path, int maxBytes) const;
-    // freedesktop thumbnail cache lookup (large, then normal). Returns a file URL or "".
-    Q_INVOKABLE QString thumbnail(const QString &path) const;
 
 signals:
     void directoryChanged(const QString &dir);
     void trashFinished(const QString &error);   // empty on success
+    void listed(int token, const QVariantList &entries);
 
 private:
     QVariantMap entry(const class QFileInfo &fi) const;
+    QVariantList recents(int max) const;
+    QVariantList applications() const;
+    QVariantList tagged(const QString &tag) const;
+    QJsonObject tagIndex() const;
+    void saveTagIndex(const QJsonObject &index) const;
     QFileSystemWatcher m_watcher;
     QMimeDatabase m_mime;
 };

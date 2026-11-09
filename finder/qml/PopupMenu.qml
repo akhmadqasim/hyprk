@@ -2,7 +2,8 @@ import QtQuick
 import QtQuick.Controls.Basic
 
 // macOS 26 style menu: rounded translucent panel, blue rounded highlight.
-// items: [{ text, shortcut, checked, enabled, action }] or { separator: true }.
+// items: [{ text, shortcut, checked, enabled, action }], { separator: true }, or
+// { tagRow: true, action(tagName) } for Finder's row of tag color dots.
 Popup {
     id: root
 
@@ -30,10 +31,12 @@ Popup {
                 id: it
                 required property var modelData
                 readonly property bool sep: !!modelData.separator
+                readonly property bool tagRow: !!modelData.tagRow
+                readonly property bool plain: !sep && !tagRow
                 readonly property bool on: modelData.enabled !== false
                 width: root.width - 2 * root.padding
-                height: sep ? 11 : 24
-                implicitWidth: sep ? 0 : label.implicitWidth + shortcutText.implicitWidth + 64
+                height: sep ? 11 : tagRow ? 30 : 24
+                implicitWidth: !plain ? 0 : label.implicitWidth + shortcutText.implicitWidth + 64
 
                 Rectangle {
                     visible: it.sep
@@ -43,13 +46,13 @@ Popup {
                     color: Theme.color.separator
                 }
                 Rectangle {
-                    visible: !it.sep && it.on && hover.hovered
+                    visible: it.plain && it.on && hover.hovered
                     anchors.fill: parent
                     radius: 6
                     color: Theme.color.accent
                 }
                 Text {
-                    visible: !it.sep && !!it.modelData.checked
+                    visible: it.plain && !!it.modelData.checked
                     x: 8
                     anchors.verticalCenter: parent.verticalCenter
                     text: "✓"
@@ -59,7 +62,7 @@ Popup {
                 }
                 Text {
                     id: label
-                    visible: !it.sep
+                    visible: it.plain
                     x: 24
                     anchors.verticalCenter: parent.verticalCenter
                     text: it.modelData.text || ""
@@ -69,7 +72,7 @@ Popup {
                 }
                 Text {
                     id: shortcutText
-                    visible: !it.sep
+                    visible: it.plain
                     anchors.right: parent.right
                     anchors.rightMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
@@ -78,9 +81,31 @@ Popup {
                     font.family: Theme.fontText
                     font.pixelSize: 13
                 }
-                HoverHandler { id: hover; enabled: !it.sep }
+                HoverHandler { id: hover; enabled: it.plain }
+                Row {
+                    visible: it.tagRow
+                    x: 14
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 9
+                    Repeater {
+                        model: it.tagRow ? Theme.color.tags : []
+                        Rectangle {
+                            required property var modelData
+                            width: 15; height: 15; radius: 7.5
+                            color: modelData.color
+                            scale: dotHover.hovered ? 1.2 : 1
+                            HoverHandler { id: dotHover }
+                            TapHandler {
+                                onTapped: {
+                                    root.close();
+                                    it.modelData.action(parent.modelData.name);
+                                }
+                            }
+                        }
+                    }
+                }
                 TapHandler {
-                    enabled: !it.sep && it.on
+                    enabled: it.plain && it.on
                     onTapped: {
                         root.close();
                         if (it.modelData.action) it.modelData.action();

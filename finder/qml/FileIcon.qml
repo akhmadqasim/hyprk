@@ -1,10 +1,10 @@
 import QtQuick
-import Finder.Native
 import "lib/files.js" as Files
 import "lib/icons.js" as Icons
 
-// Icon for one entry: real thumbnail (image file or freedesktop cache), app icon,
-// drawn folder, or the generic document as the universal fallback.
+// Icon for one entry, best first: content thumbnail (images, PDFs, videos with a cached
+// thumbnail; generated off the UI thread by image://thumb), app icon, the macOS icon from
+// themes/icons/system, and the drawn SVG icon when those PNGs are missing.
 Item {
     id: root
 
@@ -12,40 +12,53 @@ Item {
     property real size: 64
 
     readonly property string kind: Files.iconClass(entry)
-    // Image files decode directly; other types use the thumbnail cache when GNOME made one.
-    readonly property string thumbSource: {
-        if (entry.isDir || kind === "app") return "";
-        if (Files.isImage(entry)) return Files.fileUrl(entry.path);
-        return FileOps.thumbnail(entry.path);
-    }
+    readonly property bool wantsThumb: (kind === "image" || kind === "pdf" || kind === "video") && entry.size > 0
     property bool thumbFailed: false
     onEntryChanged: thumbFailed = false
-    readonly property bool showThumb: thumbSource !== "" && !thumbFailed
+    readonly property bool showThumb: wantsThumb && !thumbFailed && size >= 16
+
+    // macOS PNG for the non-thumbnail case
+    readonly property string sysName: kind === "folder" ? (Theme.folderIcons[entry.path] || "GenericFolderIcon")
+                                    : kind === "app" ? "GenericApplicationIcon"
+                                    : "GenericDocumentIcon"
 
     width: size
     height: size
 
-    Image {
-        id: thumb
-        visible: root.showThumb && status === Image.Ready
-        anchors.fill: parent
-        anchors.margins: root.size * 0.04
-        fillMode: Image.PreserveAspectFit
-        asynchronous: true
-        cache: true
-        source: root.showThumb ? root.thumbSource : ""
-        sourceSize: Qt.size(Math.ceil(root.size * 2), Math.ceil(root.size * 2))
-        onStatusChanged: if (status === Image.Error) root.thumbFailed = true
+    // Thumbnail: fills the icon box, thin border and soft shadow like Finder.
+    Item {
+        id: thumbBox
+        visible: thumb.status === Image.Ready
+        anchors.centerIn: parent
+        width: thumb.paintedWidth
+        height: thumb.paintedHeight
 
-        Rectangle {
-            x: (parent.width - parent.paintedWidth) / 2 - 1
-            y: (parent.height - parent.paintedHeight) / 2 - 1
-            width: parent.paintedWidth + 2
-            height: parent.paintedHeight + 2
-            color: "transparent"
+        Rectangle {   // shadow
+            anchors.fill: parent
+            anchors.margins: -1
+            anchors.topMargin: 0
+            anchors.bottomMargin: -2
             radius: 3
+            color: Qt.rgba(0, 0, 0, 0.10)
+        }
+        Image {
+            id: thumb
+            width: root.size * 0.94
+            height: root.size * 0.94
+            x: (thumbBox.width - width) / 2
+            y: (thumbBox.height - height) / 2
+            fillMode: Image.PreserveAspectFit
+            asynchronous: true
+            source: root.showThumb ? "image://thumb/" + encodeURIComponent(root.entry.path) : ""
+            sourceSize: Qt.size(Math.ceil(root.size * 2), Math.ceil(root.size * 2))
+            onStatusChanged: if (status === Image.Error) root.thumbFailed = true
+        }
+        Rectangle {   // hairline frame
+            anchors.fill: parent
+            color: "transparent"
+            radius: 2
             border.width: 1
-            border.color: Qt.rgba(0, 0, 0, 0.12)
+            border.color: Qt.rgba(0, 0, 0, 0.14)
         }
     }
 
@@ -59,15 +72,15 @@ Item {
         sourceSize: Qt.size(Math.ceil(root.size * 2), Math.ceil(root.size * 2))
     }
 
-    // drawn fallback
     Image {
-        id: drawn
-        visible: !thumb.visible && !appIcon.visible
+        id: plain
+        visible: !thumbBox.visible && !appIcon.visible
         anchors.fill: parent
         sourceSize: Qt.size(Math.ceil(root.size * 2), Math.ceil(root.size * 2))
-        source: root.kind === "folder"
-            ? Icons.folder(Theme.color.folderBack.toString(), Theme.color.folderFront.toString(), Theme.color.folderTop.toString())
-            : Icons.document(Theme.dark)
+        source: Theme.sysIcon(root.sysName, root.size * 2)
+             || (root.kind === "folder"
+                 ? Icons.folder(Theme.color.folderBack.toString(), Theme.color.folderFront.toString(), Theme.color.folderTop.toString())
+                 : Icons.document(Theme.dark))
 
         Image {
             anchors.fill: parent
@@ -76,9 +89,8 @@ Item {
             sourceSize: parent.sourceSize
         }
         TextLabel {
-            visible: root.kind !== "folder" && root.size >= 32
+            visible: root.kind !== "folder" && root.kind !== "app" && root.size >= 32
             anchors.horizontalCenter: parent.horizontalCenter
-            anchors.horizontalCenterOffset: -root.size * 0.02
             y: root.size * 0.70
             text: Files.badge(root.entry)
             color: "#8E8E93"

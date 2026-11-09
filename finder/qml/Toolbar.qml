@@ -12,6 +12,7 @@ Item {
     signal viewRequested(string view)
     signal moreRequested(Item anchor)
     signal groupRequested(Item anchor)
+    signal tagRequested(Item anchor)
 
     height: Theme.toolbar.height
 
@@ -113,8 +114,10 @@ Item {
             onClicked: root.browser.openSelection()
         }
         ToolButton {
+            id: tagButton
             icon: "tag"
-            enabled: false
+            enabled: root.browser.selectedCount > 0 && root.browser.canTrash
+            onClicked: root.tagRequested(tagButton)
         }
         ToolButton {
             id: more

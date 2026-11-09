@@ -1,16 +1,22 @@
 #include "fileops.h"
 
-#include <QCryptographicHash>
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QPointer>
+#include <QSaveFile>
+#include <QThreadPool>
 #include <QProcess>
 #include <QSet>
 #include <QStandardPaths>
 #include <QUrl>
 #include <QXmlStreamReader>
 #include <algorithm>
+#include <cerrno>
+#include <sys/xattr.h>
 
 FileOps::FileOps(QObject *parent) : QObject(parent)
 {
@@ -52,6 +58,7 @@ QVariantMap FileOps::entry(const QFileInfo &fi) const
         {QStringLiteral("kind"), fi.isDir() ? QStringLiteral("Folder") : mt.comment()},
         {QStringLiteral("hidden"), fi.isHidden()},
         {QStringLiteral("symlink"), fi.isSymLink()},
+        {QStringLiteral("tags"), tags(fi.absoluteFilePath())},
     };
 }
 
@@ -213,6 +220,11 @@ QString FileOps::rename(const QString &path, const QString &newName) const
         return QStringLiteral("The name “%1” is already taken. Please choose a different name.").arg(newName);
     if (!QFile::rename(path, target))
         return QStringLiteral("The item “%1” couldn’t be renamed.").arg(fi.fileName());
+    QJsonObject index = tagIndex();
+    if (index.contains(path)) {
+        index.insert(target, index.take(path));
+        saveTagIndex(index);
+    }
     return {};
 }
 
@@ -233,15 +245,93 @@ QString FileOps::readText(const QString &path, int maxBytes) const
     return QString::fromUtf8(f.read(maxBytes));
 }
 
-QString FileOps::thumbnail(const QString &path) const
+void FileOps::listAsync(const QString &location, int token)
 {
-    const QByteArray uri = QUrl::fromLocalFile(path).toEncoded();
-    const QString hash = QString::fromLatin1(QCryptographicHash::hash(uri, QCryptographicHash::Md5).toHex());
-    const QString cache = QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation) + QStringLiteral("/thumbnails/");
-    for (const char *size : {"large", "normal"}) {
-        const QString p = cache + QLatin1String(size) + QLatin1Char('/') + hash + QStringLiteral(".png");
-        if (QFileInfo::exists(p))
-            return QUrl::fromLocalFile(p).toString();
+    QPointer<FileOps> self(this);
+    QThreadPool::globalInstance()->start([self, location, token] {
+        if (!self)
+            return;
+        QVariantList out;
+        if (location == QLatin1String("recents:"))
+            out = self->recents(200);
+        else if (location == QLatin1String("applications:"))
+            out = self->applications();
+        else if (location.startsWith(QLatin1String("tag:")))
+            out = self->tagged(location.mid(4));
+        QMetaObject::invokeMethod(self, [self, token, out] {
+            if (self)
+                emit self->listed(token, out);
+        }, Qt::QueuedConnection);
+    });
+}
+
+// ---------- tags ----------
+
+namespace {
+constexpr char kTagAttr[] = "user.xdg.tags";
+
+QString tagIndexPath()
+{
+    return QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QStringLiteral("/hyprk-finder/tags.json");
+}
+} // namespace
+
+QJsonObject FileOps::tagIndex() const
+{
+    QFile f(tagIndexPath());
+    if (!f.open(QIODevice::ReadOnly))
+        return {};
+    return QJsonDocument::fromJson(f.readAll()).object();
+}
+
+void FileOps::saveTagIndex(const QJsonObject &index) const
+{
+    QDir().mkpath(QFileInfo(tagIndexPath()).path());
+    QSaveFile f(tagIndexPath());
+    if (f.open(QIODevice::WriteOnly)) {
+        f.write(QJsonDocument(index).toJson(QJsonDocument::Compact));
+        f.commit();
     }
+}
+
+QStringList FileOps::tags(const QString &path) const
+{
+    const QByteArray p = QFile::encodeName(path);
+    char buf[1024];
+    const ssize_t n = getxattr(p.constData(), kTagAttr, buf, sizeof buf);
+    if (n > 0)
+        return QString::fromUtf8(buf, n).split(QLatin1Char(','), Qt::SkipEmptyParts);
+    if (n < 0 && errno == ENOTSUP)   // no xattr support here: the JSON index is the store
+        return tagIndex().value(path).toVariant().toStringList();
     return {};
+}
+
+QString FileOps::setTags(const QString &path, const QStringList &tags)
+{
+    const QByteArray p = QFile::encodeName(path);
+    const QByteArray value = tags.join(QLatin1Char(',')).toUtf8();
+    const int rc = tags.isEmpty() ? removexattr(p.constData(), kTagAttr)
+                                  : setxattr(p.constData(), kTagAttr, value.constData(), value.size(), 0);
+    if (rc != 0 && errno != ENOTSUP && !(tags.isEmpty() && errno == ENODATA))
+        return QStringLiteral("The tags of \u201C%1\u201D couldn\u2019t be changed.").arg(QFileInfo(path).fileName());
+    QJsonObject index = tagIndex();
+    if (tags.isEmpty())
+        index.remove(path);
+    else
+        index.insert(path, QJsonArray::fromStringList(tags));
+    saveTagIndex(index);
+    emit directoryChanged(QFileInfo(path).path());   // xattr changes don't trigger the watcher
+    return {};
+}
+
+QVariantList FileOps::tagged(const QString &tag) const
+{
+    QVariantList out;
+    const QJsonObject index = tagIndex();
+    for (auto it = index.begin(); it != index.end(); ++it) {
+        const QFileInfo fi(it.key());
+        if (fi.exists() && tags(it.key()).contains(tag))
+            out.append(entry(fi));
+    }
+    return out;
 }
