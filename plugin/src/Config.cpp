@@ -54,7 +54,7 @@ namespace lg {
 
         constexpr auto K_ENABLED = "plugin:liquidglass:enabled", K_NAMESPACES = "plugin:liquidglass:namespaces", K_RADII = "plugin:liquidglass:radii",
                        K_TINT_LIGHT = "plugin:liquidglass:tint_light", K_TINT_DARK = "plugin:liquidglass:tint_dark", K_APPEARANCE = "plugin:liquidglass:appearance",
-                       K_FULL_DAMAGE = "plugin:liquidglass:full_damage", K_SHADER = "plugin:liquidglass:shader_path", K_WINDOWS = "plugin:liquidglass:window_classes";
+                       K_FULL_DAMAGE = "plugin:liquidglass:full_damage", K_REQUIRE_REGION = "plugin:liquidglass:require_region", K_SHADER = "plugin:liquidglass:shader_path", K_WINDOWS = "plugin:liquidglass:window_classes";
 
         // shell namespaces (shell/modules/*.qml); launchpad and wallpaper stay plain
         constexpr auto DEF_NAMESPACES = "hyprk-menubar,hyprk-dock,hyprk-overlay,hyprk-notifications,hyprk-spotlight,hyprk-switcher";
@@ -63,7 +63,7 @@ namespace lg {
 
         struct SCache {
             std::vector<CConfigValue<Config::FLOAT>> floats;
-            CConfigValue<Config::INTEGER>            enabled, fullDamage, tintLight, tintDark;
+            CConfigValue<Config::INTEGER>            enabled, fullDamage, requireRegion, tintLight, tintDark;
             CConfigValue<Config::STRING>             namespaces, radii, appearance, shader, windows;
         };
         std::unique_ptr<SCache> g_cache;
@@ -74,6 +74,7 @@ namespace lg {
             HyprlandAPI::addConfigValueV2(handle, makeShared<CFloatValue>(f.name, "", f.def));
         HyprlandAPI::addConfigValueV2(handle, makeShared<CIntValue>(K_ENABLED, "draw liquid glass (0 = plain Hyprland blur)", 1));
         HyprlandAPI::addConfigValueV2(handle, makeShared<CIntValue>(K_FULL_DAMAGE, "redraw the whole output when glass is visible", 1));
+        HyprlandAPI::addConfigValueV2(handle, makeShared<CIntValue>(K_REQUIRE_REGION, "only glass layers that set a blur region", 1));
         HyprlandAPI::addConfigValueV2(handle, makeShared<CIntValue>(K_TINT_LIGHT, "0xRRGGBBAA light tint, AA = amount", DEF_TINT_LIGHT));
         HyprlandAPI::addConfigValueV2(handle, makeShared<CIntValue>(K_TINT_DARK, "0xRRGGBBAA dark tint, AA = amount", DEF_TINT_DARK));
         HyprlandAPI::addConfigValueV2(handle, makeShared<CStringValue>(K_NAMESPACES, "comma list of layer namespaces, * = all", Config::STRING{DEF_NAMESPACES}));
@@ -87,6 +88,7 @@ namespace lg {
             g_cache->floats.emplace_back(f.name);
         g_cache->enabled.bind(K_ENABLED);
         g_cache->fullDamage.bind(K_FULL_DAMAGE);
+        g_cache->requireRegion.bind(K_REQUIRE_REGION);
         g_cache->tintLight.bind(K_TINT_LIGHT);
         g_cache->tintDark.bind(K_TINT_DARK);
         g_cache->namespaces.bind(K_NAMESPACES);
@@ -111,6 +113,7 @@ namespace lg {
         }
         p.enabled       = *g_cache->enabled != 0;
         p.fullDamage    = *g_cache->fullDamage != 0;
+        p.requireRegion = *g_cache->requireRegion != 0;
         p.tintLight     = colorFromRGBA(*g_cache->tintLight);
         p.tintDark      = colorFromRGBA(*g_cache->tintDark);
         p.namespaces    = splitList(*g_cache->namespaces);

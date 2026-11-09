@@ -35,7 +35,7 @@ start)
     hc output create headless MBA >/dev/null
     sleep 1
     hc dispatch 'hl.dsp.focus({ monitor = "MBA" })' >/dev/null || true
-    hc dispatch 'hl.dsp.exec_cmd("foot -o colors.alpha=0.92 -o font=monospace:size=11 -- sh -c \"ls -la /mnt/code/hyprk; fastfetch 2>/dev/null; exec sh\"")' >/dev/null
+    hc dispatch 'hl.dsp.exec_cmd("foot -o colors.alpha=0.55 -o font=monospace:size=11 -- sh -c \"ls -la /mnt/code/hyprk; fastfetch 2>/dev/null; exec sh\"")' >/dev/null
     sleep 3
     echo "started pid=$PID sig=$SIG sock=$SOCK"
     hc plugin list || true

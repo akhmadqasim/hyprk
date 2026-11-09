@@ -22,7 +22,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(HYPRLAND IMPORTED_TARGET hyprland pixman-1 libdrm)
 
 if(HYPRLAND_FOUND)
-  add_library(liquidglass SHARED src/main.cpp src/Config.cpp src/GlassElement.cpp)
+  add_library(liquidglass SHARED src/main.cpp src/Config.cpp src/GlassElement.cpp src/WindowGlass.cpp)
   target_include_directories(liquidglass PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/gen)
   target_link_libraries(liquidglass PRIVATE lgcore PkgConfig::HYPRLAND)
   target_compile_options(liquidglass PRIVATE -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers)

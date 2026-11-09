@@ -1,0 +1,67 @@
+ok Safari 512x512 ARGB <- Applications/Safari.app :: AppIconUpdated256x256_NSAppearanceNameSystem_
+ok App_Store 512x512 ARGB <- Applications/App Store.app :: AppIcon256x256_NSAppearanceNameSystem_06C80F4
+ok Apps 512x512 ARGB <- Applications/Apps.app :: AppIcon256x256_NSAppearanceNameSystem_E9E3B5F
+ok Automator 512x512 ARGB <- Applications/Automator.app :: AppIcon256x256_NSAppearanceNameSystem_49DC6DE
+ok Books 1024x1024 ARGB <- Applications/Books.app :: AppIcon1024x1024_UIAppearanceAny_C8C79037-E5C
+ok Calculator 512x512 ARGB <- Applications/Calculator.app :: AppIcon256x256_NSAppearanceNameSystem_92E620D
+ok Calendar 512x512 ARGB <- Applications/Calendar.app :: AppIcon256x256_NSAppearanceNameSystem_A1EB003
+ok Chess 512x512 ARGB <- Applications/Chess.app :: AppIcon256x256_NSAppearanceNameSystem_C0B5541
+ok Clock 1024x1024 ARGB <- Applications/Clock.app :: AppIcon1024x1024_UIAppearanceAny_0F53AE8F-12D
+ok Contacts 512x512 ARGB <- Applications/Contacts.app :: Contacts256x256_NSAppearanceNameSystem_F80F97
+ok Dictionary 512x512 ARGB <- Applications/Dictionary.app :: AppIconLoc256x256_NSAppearanceNameSystem_ED9E
+ok FaceTime 1024x1024 ARGB <- Applications/FaceTime.app :: AppIcon1024x1024_UIAppearanceAny_D8F913AA-C77
+ok FindMy 1024x1024 ARGB <- Applications/FindMy.app :: AppIcon1024x1024_UIAppearanceAny_C8EC22C4-E3F
+ok Font_Book 512x512 ARGB <- Applications/Font Book.app :: fontbook256x256_NSAppearanceNameSystem_5BE8F0
+NOHIRES Freeform
+ok Games 512x512 ARGB <- Applications/Games.app :: AppIcon256x256_NSAppearanceNameSystem_849DC2A
+ok Home 1024x1024 ARGB <- Applications/Home.app :: AppIcon1024x1024_UIAppearanceAny_594FB383-4D3
+ok Image_Capture 512x512 ARGB <- Applications/Image Capture.app :: AppIcon256x256_NSAppearanceNameSystem_E0158CB
+ok Image_Playground 512x512 ARGB <- Applications/Image Playground.app :: AppIcon256x256_NSAppearanceNameSystem_97848F8
+ok Journal 1024x1024 ARGB <- Applications/Journal.app :: AppIcon1024x1024_UIAppearanceAny_64710482-F9F
+NOHIRES Mail
+ok Maps 1024x1024 ARGB <- Applications/Maps.app :: AppIcon1024x1024_UIAppearanceAny_C58DA98D-801
+ok Messages 1024x1024 ARGB <- Applications/Messages.app :: AppIcon1024x1024_UIAppearanceAny_E8B60002-A05
+ok Mission_Control 512x512 ARGB <- Applications/Mission Control.app :: AppIcon256x256_NSAppearanceNameSystem_F644226
+ok Music 512x512 ARGB <- Applications/Music.app :: AppIcon256x256_NSAppearanceNameSystem_9A2426A
+ok News 1024x1024 ARGB <- Applications/News.app :: AppIcon1024x1024_UIAppearanceAny_D5D836AA-0AF
+ok Notes 512x512 ARGB <- Applications/Notes.app :: AppIcon256x256_NSAppearanceNameSystem_46E86D5
+ok Passwords 512x512 ARGB <- Applications/Passwords.app :: AppIconUpdated256x256_NSAppearanceNameSystem_
+ok Phone 1024x1024 ARGB <- Applications/Phone.app :: AppIcon1024x1024_UIAppearanceAny_FE6F6EEB-56E
+ok Photo_Booth 512x512 ARGB <- Applications/Photo Booth.app :: AppIcon256x256_NSAppearanceNameSystem_1180102
+ok Photos 512x512 ARGB <- Applications/Photos.app :: AppIcon256x256_NSAppearanceNameSystem_EDD96A0
+ok Podcasts 1024x1024 ARGB <- Applications/Podcasts.app :: AppIcon1024x1024_UIAppearanceAny_4E88DDDE-346
+ok Preview 512x512 ARGB <- Applications/Preview.app :: AppIcon256x256_NSAppearanceNameSystem_A16519D
+ok QuickTime_Player 512x512 ARGB <- Applications/QuickTime Player.app :: AppIcon256x256_NSAppearanceNameSystem_9A6610E
+ok Reminders 512x512 ARGB <- Applications/Reminders.app :: AppIcon256x256_NSAppearanceNameSystem_4C524C5
+ok Shortcuts 512x512 ARGB <- Applications/Shortcuts.app :: AppIcon256x256_NSAppearanceNameSystem_CA8C0B5
+ok Siri_AI 512x512 ARGB <- Applications/Siri AI.app :: AppIcon256x256_NSAppearanceNameSystem_7CF4849
+ok Siri 512x512 ARGB <- Applications/Siri.app :: AppIcon256x256_NSAppearanceNameSystem_6340BA0
+ok Stickies 512x512 ARGB <- Applications/Stickies.app :: AppIcon256x256_NSAppearanceNameSystem_E951D0B
+ok Stocks 1024x1024 ARGB <- Applications/Stocks.app :: AppIcon1024x1024_UIAppearanceAny_381A1135-42D
+ok System_Settings 512x512 ARGB <- Applications/System Settings.app :: Settings256x256_NSAppearanceNameSystem_61D2C4
+ok TV 512x512 ARGB <- Applications/TV.app :: AppIcon256x256_NSAppearanceNameSystem_C2911AA
+ok TextEdit 512x512 ARGB <- Applications/TextEdit.app :: AppIcon256x256_NSAppearanceNameSystem_DC0545B
+ok Time_Machine 512x512 ARGB <- Applications/Time Machine.app :: AppIcon256x256_NSAppearanceNameSystem_9775529
+ok Tips 512x512 ARGB <- Applications/Tips.app :: AppIcon256x256_NSAppearanceNameSystem_BA2A91D
+ok Activity_Monitor 512x512 ARGB <- Applications/Utilities/Activity Monitor.app :: AppIcon256x256_NSAppearanceNameSystem_C985B59
+ok AirPort_Utility 512x512 ARGB <- Applications/Utilities/AirPort Utility.app :: AppIcon256x256_NSAppearanceNameSystem_4B79D15
+ok Audio_MIDI_Setup 512x512 ARGB <- Applications/Utilities/Audio MIDI Setup.app :: AppIcon256x256_NSAppearanceNameSystem_E93B78A
+ok Bluetooth_File_Exchange 512x512 ARGB <- Applications/Utilities/Bluetooth File Exchange.app :: AppIcon256x256_NSAppearanceNameSystem_5111FB4
+ok ColorSync_Utility 512x512 ARGB <- Applications/Utilities/ColorSync Utility.app :: AppIcon256x256_NSAppearanceNameSystem_03E5E4C
+ok Console 512x512 ARGB <- Applications/Utilities/Console.app :: AppIcon256x256_NSAppearanceNameSystem_E27EC10
+ok Digital_Color_Meter 512x512 ARGB <- Applications/Utilities/Digital Color Meter.app :: AppIcon256x256_NSAppearanceNameSystem_A71D265
+ok Disk_Utility 512x512 ARGB <- Applications/Utilities/Disk Utility.app :: AppIcon256x256_NSAppearanceNameSystem_B88AB1A
+ok Grapher 512x512 ARGB <- Applications/Utilities/Grapher.app :: Grapher256x256_NSAppearanceNameSystem_844FEC5
+ok Magnifier 512x512 ARGB <- Applications/Utilities/Magnifier.app :: AppIconMac256x256_NSAppearanceNameSystem_B8EB
+ok Migration_Assistant 512x512 GA8 <- Applications/Utilities/Migration Assistant.app :: AppIcon256x256_NSAppearanceNameSystem_19D6231
+ok Print_Center 512x512 ARGB <- Applications/Utilities/Print Center.app :: AppIcon256x256_NSAppearanceNameSystem_781841E
+ok Screen_Sharing 512x512 ARGB <- Applications/Utilities/Screen Sharing.app :: AppIcon256x256_NSAppearanceNameSystem_EA1EE06
+ok Screenshot 512x512 ARGB <- Applications/Utilities/Screenshot.app :: AppIcon256x256_NSAppearanceNameSystem_6900B94
+ok Script_Editor 512x512 ARGB <- Applications/Utilities/Script Editor.app :: AppIcon256x256_NSAppearanceNameSystem_86E7F1D
+ok System_Information 512x512 ARGB <- Applications/Utilities/System Information.app :: ASP256x256_NSAppearanceNameSystem_42FAD4FF-FB
+ok Terminal 512x512 GA8 <- Applications/Utilities/Terminal.app :: Terminal256x256_NSAppearanceNameSystem_9A546F
+ok VoiceOver_Utility 512x512 ARGB <- Applications/Utilities/VoiceOver Utility.app :: AppIcon256x256_NSAppearanceNameSystem_69002C6
+ok VoiceMemos 1024x1024 ARGB <- Applications/VoiceMemos.app :: VoiceMemosApp1024x1024_UIAppearanceAny_52D2D2
+ok Weather 1024x1024 ARGB <- Applications/Weather.app :: AppIcon1024x1024_UIAppearanceAny_FDE9BBE2-F59
+ok iPhone_Mirroring 512x512 ARGB <- Applications/iPhone Mirroring.app :: AppIcon256x256_NSAppearanceNameSystem_DEAF204
+ok Finder 512x512 ARGB <- Library/CoreServices/Finder.app :: Finder256x256_NSAppearanceNameSystem_39D8F84E

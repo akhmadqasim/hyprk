@@ -43,7 +43,8 @@ Check a value: `hyprctl getoption plugin:liquidglass:refraction`.
 2. Shape: if the client sets an ext-background-effect blur region (Quickshell:
    `BackgroundEffect.blurRegion: Region { item: bg; radius: 24 }`), each connected part of the region is one
    glass rounded rect. The corner radius is read back from the region's staircase, unless `radii` or
-   `default_radius` sets it. Without a region the whole layer box is the glass.
+   `default_radius` sets it. Without a region the layer is left to Hyprland (`require_region = 1`, default),
+   or the whole layer box becomes glass (`require_region = 0`).
 3. The surface itself should be transparent where the glass is (draw only content, or a light tint on top).
    Hyprland's own blur for that layer is switched off while the glass draws, so they never stack.
 
@@ -78,6 +79,7 @@ mipmapped by the plugin for the extra per-pixel blur. Recommended base: `blur = 
 | `inner_shadow` / `inner_shadow_size` | 0.10 / 8 | darkening along the inner rim |
 | `shadow_opacity` / `shadow_radius` / `shadow_offset_y` | 0.22 / 14 / 4 | Gaussian (erfc) drop shadow |
 | `ring_opacity` / `ring_width` | 0.10 / 0.8 | thin dark contour at the edge |
+| `require_region` | 1 | only layers that set an ext-background-effect blur region get glass |
 | `full_damage` | 1 | redraw the full output when glass is visible (no seams) |
 | `shader_path` | "" | load this fragment shader instead of the built-in one |
 | `window_classes` | "" | regex: windows whose class matches get glass behind them |
@@ -89,5 +91,11 @@ mipmapped by the plugin for the extra per-pixel blur. Recommended base: `blur = 
 `test/qs/shell.qml` (wallpaper, dock, two cards with blur regions) and a foot window.
 `test/run.sh shot NAME` writes `/mnt/code/hyprk/reference/ours/plugin-NAME.png`, `reload` swaps in a new build,
 `stop` exits and kills only this instance. Set `LG_WALLPAPER=TahoeDark` before `start` for the dark wallpaper.
+
+## Windows
+
+`window_classes = "^(foot|hyprk-finder)$"` puts glass (no drop shadow, the window keeps its own) behind matching
+windows, radius = `decoration.rounding` unless `window_radius` is set. The window must be translucent. Give it a
+`no_blur` rule, otherwise Hyprland also blurs behind it on top of the glass.
 
 Fallbacks: see `FALLBACKS.md`.

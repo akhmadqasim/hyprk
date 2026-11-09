@@ -33,6 +33,7 @@ namespace lg {
         float                                   ringOpacity = 0.10f, ringWidth = 0.8f;
 
         bool                                    fullDamage = true;
+        bool                                    requireRegion = true; // no blur region -> no glass
         std::string                             shaderPath;
         std::string                             windowClasses; // regex; empty = no window glass
         float                                   windowRadius = -1;  // < 0: decoration:rounding
