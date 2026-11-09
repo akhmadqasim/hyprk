@@ -22,7 +22,7 @@ ShellWindow {
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.RightButton
-        onClicked: m => Panels.openContext(Menus.desktop(), m.x, m.y, false)
+        onClicked: m => Panels.openContext(Menus.desktop(), m.x, m.y, false, screen)
     }
 
     Image {

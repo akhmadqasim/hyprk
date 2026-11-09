@@ -15,6 +15,8 @@ Singleton {
     readonly property var screen: Quickshell.screens.find(s => s.name === Quickshell.env("HYPRK_PRIMARY")) || Quickshell.screens[0]
 
     property string open: ""
+    // screen whose Overlay shows menus / context menus / CC / NC (menus open where they were clicked)
+    property var activeScreen: screen
     property int menuIndex: -1          // index of the open menu bar title (0 = Apple)
     property real menuX: 0              // screen x of the open menu title
 
@@ -24,7 +26,8 @@ Singleton {
     property real contextX: 0
     property real contextY: 0
     property bool contextAbove: false
-    function openContext(items, x, y, above) {
+    function openContext(items, x, y, above, scr) {
+        activeScreen = scr || screen;
         contextItems = items;
         contextX = x;
         contextY = y;
@@ -35,14 +38,18 @@ Singleton {
     // alert dialog: { icon, title, message, buttons: [{ label, action, isDefault, isCancel }] }
     property var alert: null
     function showAlert(a) {
+        activeScreen = screen;
         alert = a;
         open = "alert";
         Sounds.play("alert");
     }
 
-    function toggle(name) { open = open === name ? "" : name; }
+    function toggle(name, scr) {
+        if (open !== name) activeScreen = scr || screen;
+        open = open === name ? "" : name;
+    }
     function close() { open = ""; menuIndex = -1; }
-    function openMenu(index, x) { menuIndex = index; menuX = x; open = "menu"; }
+    function openMenu(index, x, scr) { activeScreen = scr || screen; menuIndex = index; menuX = x; open = "menu"; }
 
     onOpenChanged: if (open !== "menu") menuIndex = -1
 

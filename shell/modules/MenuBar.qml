@@ -114,25 +114,25 @@ ShellWindow {
                 color: bar.fg
                 opacity: bar.wifiDev && bar.wifiDev.connected ? 1 : 0.5
             }
-            onClicked: Panels.toggle("cc")
+            onClicked: Panels.toggle("cc", bar.screen)
         }
         // Focus: shown only while Do Not Disturb is on, like macOS
         StatusItem {
             visible: Notifs.dnd
             Symbol { anchors.centerIn: parent; name: "moon"; size: Theme.menuBar.statusIconSize - 1; color: bar.fg }
-            onClicked: Panels.toggle("cc")
+            onClicked: Panels.toggle("cc", bar.screen)
         }
         StatusItem {
             Symbol { anchors.centerIn: parent; name: "magnifyingglass"; size: Theme.menuBar.statusIconSize - 1; color: bar.fg }
             onClicked: Panels.toggle("spotlight")
         }
         StatusItem {
-            active: Panels.open === "cc"
+            active: Panels.open === "cc" && Panels.activeScreen === bar.screen
             Symbol { anchors.centerIn: parent; name: "controlcenter"; size: Theme.menuBar.statusIconSize; color: bar.fg }
-            onClicked: Panels.toggle("cc")
+            onClicked: Panels.toggle("cc", bar.screen)
         }
         StatusItem {
-            active: Panels.open === "nc"
+            active: Panels.open === "nc" && Panels.activeScreen === bar.screen
             contentWidth: clockText.implicitWidth
             Text {
                 id: clockText
@@ -142,7 +142,7 @@ ShellWindow {
                 font.family: Theme.fontText
                 font.pixelSize: Theme.font.clock
             }
-            onClicked: Panels.toggle("nc")
+            onClicked: Panels.toggle("nc", bar.screen)
         }
     }
 
@@ -159,7 +159,7 @@ ShellWindow {
         property bool bold: false
         property real contentWidth: label.implicitWidth
         default property alias content: holder.data
-        readonly property bool open: Panels.open === "menu" && Panels.menuIndex === menuIndex
+        readonly property bool open: Panels.open === "menu" && Panels.menuIndex === menuIndex && Panels.activeScreen === bar.screen
 
         width: contentWidth + Theme.menuBar.titleHPadding * 2
         height: Theme.menuBar.titleHeight
@@ -186,10 +186,10 @@ ShellWindow {
             hoverEnabled: true
             onPressed: {
                 if (mt.open) Panels.close();
-                else Panels.openMenu(mt.menuIndex, mt.mapToItem(null, 0, 0).x);
+                else Panels.openMenu(mt.menuIndex, mt.mapToItem(null, 0, 0).x, bar.screen);
             }
             // macOS: while any menu is open, hovering another title switches to it
-            onEntered: if (Panels.open === "menu" && !mt.open) Panels.openMenu(mt.menuIndex, mt.mapToItem(null, 0, 0).x)
+            onEntered: if (Panels.open === "menu" && !mt.open && Panels.activeScreen === bar.screen) Panels.openMenu(mt.menuIndex, mt.mapToItem(null, 0, 0).x, bar.screen)
         }
     }
 

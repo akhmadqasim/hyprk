@@ -33,6 +33,8 @@ Item {
         contentHeight: content.implicitHeight
         clip: true
         boundsBehavior: Flickable.StopAtBounds
+        // plugin glass shapes don't follow scrolling by themselves
+        onContentYChanged: { const w = QsWindow.window; if (w && w.settleGlass) w.settleGlass(); }
 
         ColumnLayout {
             id: content

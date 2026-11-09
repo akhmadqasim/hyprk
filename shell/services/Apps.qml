@@ -13,8 +13,11 @@ Singleton {
     // Dock order, macOS-like: Finder, Launchpad/Apps, browser, mail, ... (first id that exists wins)
     // hyprk's own apps (sibling dirs of shell/), with the stock app used when one is missing
     readonly property var hyprkApps: ({
-        "hyprk-finder": { id: "hyprk-finder", name: "Finder", icon: "hyprk-finder", run: "finder/run.sh", fallback: "nautilus" },
-        "org.hyprk.Settings": { id: "org.hyprk.Settings", name: "System Settings", icon: "settings", run: "settings/run.sh", fallback: "gnome-control-center" },
+        // fallbacks: first installed command runs; their windows count as this app's
+        "hyprk-finder": { id: "hyprk-finder", name: "Finder", icon: "hyprk-finder", run: "finder/run.sh",
+                          fallbacks: ["nautilus", "thunar", "dolphin"], alsoIds: ["org.gnome.Nautilus", "nautilus", "thunar", "org.kde.dolphin"] },
+        "org.hyprk.Settings": { id: "org.hyprk.Settings", name: "System Settings", icon: "settings", run: "settings/run.sh",
+                                fallbacks: ["gnome-control-center"], alsoIds: ["org.gnome.Settings", "gnome-control-center"] },
     })
 
     readonly property var pinnedCandidates: [
@@ -44,7 +47,7 @@ Singleton {
             }
             const own = hyprkApps[ids[0]];
             if (own) {
-                out.push({ id: own.id, name: own.name, icon: own.icon, action: () => root.runHyprkApp(own.id) });
+                out.push({ id: own.id, name: own.name, icon: own.icon, alsoIds: own.alsoIds, action: () => root.runHyprkApp(own.id) });
                 continue;
             }
             for (const id of ids) {
@@ -68,10 +71,11 @@ Singleton {
 
     // dock items = pinned + running-but-not-pinned
     readonly property var dockItems: {
-        const out = pinned.map(p => Object.assign({ windows: windowsFor(p.id, p.entry) }, p));
+        const out = pinned.map(p => Object.assign({ windows: windowsFor(p.id, p.entry, p.alsoIds) }, p));
         const seen = new Set();
         for (const p of out) {
             seen.add(Search.normId(p.id));
+            for (const a of p.alsoIds || []) seen.add(Search.normId(a));
             if (p.entry && p.entry.startupClass) seen.add(Search.normId(p.entry.startupClass));
         }
         for (const key in running) {
@@ -93,10 +97,11 @@ Singleton {
         return o && o["class"] ? o["class"] : "";
     }
 
-    function windowsFor(id, entry) {
-        const keys = [Search.normId(id)];
+    function windowsFor(id, entry, alsoIds) {
+        const keys = [Search.normId(id)].concat((alsoIds || []).map(Search.normId));
         if (entry && entry.startupClass) keys.push(Search.normId(entry.startupClass));
-        for (const k of keys) if (running[k]) return running[k];
+        const found = [].concat(...keys.filter(k => running[k]).map(k => running[k]));   // no flatMap in QV4
+        if (found.length > 0) return found;
         // last-segment match (org.gnome.Nautilus <-> nautilus)
         const seg = Search.normId(id).split(".").pop();
         for (const k in running) if (k.split(".").pop() === seg) return running[k];
@@ -177,7 +182,8 @@ Singleton {
     function runHyprkApp(id) {
         const app = hyprkApps[id];
         const run = Quickshell.shellDir + "/../" + app.run;
-        Quickshell.execDetached(["sh", "-c", `[ -x "${run}" ] && exec "${run}" || exec ${app.fallback}`]);
+        const alts = app.fallbacks.map(c => `command -v ${c} >/dev/null && exec ${c};`).join(" ");
+        Quickshell.execDetached(["sh", "-c", `[ -x "${run}" ] && exec "${run}"; ${alts} exit 1`]);
         markLaunching(id);
     }
     function openSettings() { runHyprkApp("org.hyprk.Settings"); }

@@ -15,12 +15,12 @@ ShellRoot {
                 Background { modelData: perScreen.modelData }
                 MenuBar { modelData: perScreen.modelData }
                 Dock { modelData: perScreen.modelData }
+                Overlay { modelData: perScreen.modelData }
             }
         }
     }
 
     // transient surfaces live on the primary screen
-    Overlay { modelData: Panels.screen }
     Banners { modelData: Panels.screen }
     Spotlight { modelData: Panels.screen }
     Switcher { modelData: Panels.screen }

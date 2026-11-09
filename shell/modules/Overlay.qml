@@ -16,6 +16,7 @@ ShellWindow {
     screen: modelData
 
     readonly property bool active: ["menu", "context", "alert", "cc", "nc"].indexOf(Panels.open) !== -1
+                                   && Panels.activeScreen === screen
     visible: active || fadeOut.running
 
     anchors { top: true; left: true; right: true; bottom: true }
@@ -23,7 +24,8 @@ ShellWindow {
     exclusionMode: ExclusionMode.Ignore
     namespace: "hyprk-overlay"
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: active ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+    // the alert must get Return/Escape even when opened without a click (IPC, Dock menu)
+    WlrLayershell.keyboardFocus: !active ? WlrKeyboardFocus.None : Panels.open === "alert" ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand
 
     MouseArea {
         anchors.fill: parent
@@ -42,7 +44,8 @@ ShellWindow {
         visible: Panels.open === "context"
         items: visible ? Panels.contextItems : []
         x: Math.max(Theme.menu.screenMargin, Math.min(ov.width - width - Theme.menu.screenMargin, Panels.contextAbove ? Panels.contextX - width / 2 : Panels.contextX))
-        y: Math.max(0, Panels.contextY - Theme.menuBar.height - (Panels.contextAbove ? height : 0))
+        y: Math.max(0, Math.min(ov.height - height - Theme.menu.screenMargin,
+                                Panels.contextY - Theme.menuBar.height - (Panels.contextAbove ? height : 0)))
         originX: x
         originY: y + Theme.menuBar.height
     }

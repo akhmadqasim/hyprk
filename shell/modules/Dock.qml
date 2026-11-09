@@ -178,9 +178,10 @@ ShellWindow {
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
                     onClicked: m => {
                         if (m.button === Qt.RightButton) {
-                            // menu above the icon, like the macOS Dock
-                            const p = icon.mapToItem(null, icon.width / 2, 0);
-                            Panels.openContext(Apps.dockMenu(cell.modelData), p.x, dock.screen.height - dock.height + p.y - Theme.dock.tooltipGap, true);
+                            // menu above the icon, like the macOS Dock. Anchored to the
+                            // unmagnified layout because icons shrink when the menu opens.
+                            const x = (dock.width - dock.baseWidth) / 2 + cell.baseCenter;
+                            Panels.openContext(Apps.dockMenu(cell.modelData), x, dock.screen.height - dock.height + bg.y - Theme.dock.tooltipGap, true, dock.screen);
                         } else if (cell.modelData.trash) Apps.openTrash();
                         else if (cell.modelData.folder) Apps.openFolder(cell.modelData);
                         else Apps.activate(cell.modelData);

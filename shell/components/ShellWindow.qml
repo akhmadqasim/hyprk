@@ -23,7 +23,7 @@ PanelWindow {
     // Glass items re-measure their shape on every glassMoved().
     signal glassMoved()
     function settleGlass() {
-        if (!Theme.compositorGlass) return;
+        if (!Theme.compositorGlass || !visible || glassRegions.length === 0) return;
         settle.ticks = Math.ceil(Theme.anim.bannerIn / settle.interval) + 2;
         settle.restart();
     }

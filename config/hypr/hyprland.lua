@@ -109,8 +109,9 @@ local glassLayers = { "dock", "overlay", "notifications", "spotlight", "switcher
 -- On by default; HYPRK_LIQUIDGLASS=0 forces the QML glass.
 local glassSo = hyprk .. "/plugin/build/libliquidglass.so"
 local h = io.open(glassSo, "r")
+if h then h:close() end
+hl.env("HYPRK_GLASS", "qml")     -- reset an inherited value; set to "plugin" only after a good load
 if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
-    h:close()
     local ok, err = pcall(function()
         hl.plugin.load(glassSo)
         hl.config({ plugin = { liquidglass = {
@@ -149,13 +150,12 @@ hl.layer_rule({
 local cmd = "SUPER"
 hl.bind(cmd .. " + space",   hl.dsp.global("hyprk:spotlight"))
 hl.bind(cmd .. " + Tab",     hl.dsp.global("hyprk:switcher"))
-hl.bind("F4",                hl.dsp.global("hyprk:launchpad"))
+hl.bind(cmd .. " + F4",      hl.dsp.global("hyprk:launchpad"))
 hl.bind(cmd .. " + A",       hl.dsp.global("hyprk:launchpad"))
 hl.bind(cmd .. " + N",       hl.dsp.global("hyprk:notificationcenter"))
 hl.bind(cmd .. " + SHIFT + C", hl.dsp.global("hyprk:controlcenter"))
 hl.bind(cmd .. " + Up",      hl.dsp.global("hyprk:missioncontrol"))   -- macOS: Ctrl+Up
-hl.bind("CTRL + Up",         hl.dsp.global("hyprk:missioncontrol"))
-hl.bind("F3",                hl.dsp.global("hyprk:missioncontrol"))
+hl.bind(cmd .. " + F3",      hl.dsp.global("hyprk:missioncontrol"))   -- plain F3/Ctrl+Up stay with apps
 hl.bind(cmd .. " + Q",       hl.dsp.window.close())
 hl.bind(cmd .. " + W",       hl.dsp.window.close())
 hl.bind(cmd .. " + M",       hl.dsp.window.float({ action = "toggle" }))
@@ -194,4 +194,4 @@ for _, f in ipairs({ hyprk .. "/settings/hyprland-rules.lua", hyprk .. "/finder/
 end
 hl.window_rule({ name = "suppress-maximize", match = { class = ".*" }, suppress_event = "maximize" })
 -- macOS has no tiling: every window floats, opens centered
-hl.window_rule({ name = "macos-float", match = { class = ".*" }, float = true, center = true })
+hl.window_rule({ name = "macos-float", match = { class = ".*" }, float = true })
