@@ -31,7 +31,10 @@ Column {
     Component.onCompleted: refresh()
     // BlueZ property changes (power, connect, pairing) arrive as D-Bus signals.
     EventSource {
-        command: ["dbus-monitor", "--system", "type='signal',interface='org.freedesktop.DBus.Properties',path_namespace='/org/bluez'"]
+        // property changes, plus devices appearing/disappearing (ObjectManager)
+        command: ["dbus-monitor", "--system",
+                  "type='signal',interface='org.freedesktop.DBus.Properties',path_namespace='/org/bluez'",
+                  "type='signal',sender='org.bluez',interface='org.freedesktop.DBus.ObjectManager'"]
         onChanged: pane.refresh()
     }
 

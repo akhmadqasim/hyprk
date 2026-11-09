@@ -3,8 +3,8 @@ import ".."
 import "../controls"
 import "../Parsers.js" as P
 
-// Functional: everything goes to state/notifications.json, which the shell's
-// notification server reads. Apps are those whose .desktop file declares
+// Saves everything to state/notifications.json for the shell's notification server
+// to read (not wired yet; see FALLBACKS.md). Apps are those whose .desktop file declares
 // X-GNOME-UsesNotifications=true (scripts/notify-apps.sh).
 Column {
     id: pane

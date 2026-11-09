@@ -2,25 +2,27 @@ import QtQuick
 import ".."
 import "../controls"
 
-// Functional: idle timeouts go to state/lock.json (seconds, 0 = never), which the
-// shell's idle/lock glue (hypridle + hyprlock) reads.
+// Saves idle timeouts to state/lock.json (seconds, 0 = never) for the session's
+// idle/lock glue (hypridle + hyprlock) to read. Nothing reads it yet; see FALLBACKS.md.
 Column {
     id: pane
     spacing: Theme.content.sectionGap
 
+    function duration(s) { return s % 3600 === 0 ? s / 3600 + " h" : s % 60 === 0 ? s / 60 + " min" : s + " s"; }
+    function forTime(s) { return "For " + duration(s); }
 
     Card {
         FormRow {
             label: "Start Screen Saver when inactive"
-            StatePopup { stateKey: "lock"; field: "screenSaverAfter"; choices: [["Never", 0], ["For 1 minute", 60], ["For 2 minutes", 120], ["For 5 minutes", 300], ["For 10 minutes", 600], ["For 20 minutes", 1200], ["For 30 minutes", 1800], ["For 1 hour", 3600]] }
+            StatePopup { stateKey: "lock"; field: "screenSaverAfter"; formatValue: pane.forTime; choices: [["Never", 0], ["For 1 minute", 60], ["For 2 minutes", 120], ["For 5 minutes", 300], ["For 10 minutes", 600], ["For 20 minutes", 1200], ["For 30 minutes", 1800], ["For 1 hour", 3600]] }
         }
         FormRow {
             label: "Turn display off when inactive"
-            StatePopup { stateKey: "lock"; field: "displayOffAfter"; choices: [["Never", 0], ["For 1 minute", 60], ["For 2 minutes", 120], ["For 5 minutes", 300], ["For 10 minutes", 600], ["For 20 minutes", 1200], ["For 30 minutes", 1800], ["For 1 hour", 3600], ["For 3 hours", 10800]] }
+            StatePopup { stateKey: "lock"; field: "displayOffAfter"; formatValue: pane.forTime; choices: [["Never", 0], ["For 1 minute", 60], ["For 2 minutes", 120], ["For 5 minutes", 300], ["For 10 minutes", 600], ["For 20 minutes", 1200], ["For 30 minutes", 1800], ["For 1 hour", 3600], ["For 3 hours", 10800]] }
         }
         FormRow {
             label: "Require password after screen saver begins or display is turned off"
-            StatePopup { stateKey: "lock"; field: "requirePasswordAfter"; choices: [["Immediately", 0], ["After 5 seconds", 5], ["After 1 minute", 60], ["After 5 minutes", 300], ["After 15 minutes", 900], ["After 1 hour", 3600], ["After 8 hours", 28800]] }
+            StatePopup { stateKey: "lock"; field: "requirePasswordAfter"; formatValue: v => "After " + pane.duration(v); choices: [["Immediately", 0], ["After 5 seconds", 5], ["After 1 minute", 60], ["After 5 minutes", 300], ["After 15 minutes", 900], ["After 1 hour", 3600], ["After 8 hours", 28800]] }
         }
         FormRow {
             label: "Show large clock"

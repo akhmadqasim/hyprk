@@ -26,10 +26,11 @@ or stops, the pane falls back to polling every 15 s.
 | Sound | no sinks | note "No output devices found." |
 | Sound | `pw-play` missing (alert preview) | choice is still saved to `state/sound.json`, note "Sound previews need pw-play (PipeWire tools)." |
 | Displays | not in a Hyprland session (`hyprctl` fails or returns no monitors) | placeholder display tile, popups disabled, note "Display details come from Hyprland…" |
-| Keyboard | not in Hyprland (`hyprctl eval` fails) | values are still saved to `state/input.json`, note "Saved. It takes effect the next time Hyprland starts." |
+| Keyboard | not in Hyprland (`hyprctl eval` fails) | values are saved to `state/input.json`, note "Saved to state/input.json, but Hyprland isn't reachable here, so the keyboard didn't change." |
 | Notifications | app list script fails | note from `Backend.statusNote`; the global switches still work |
 | Notifications | an app icon is not in the icon theme | gray tile with a generic glyph |
-| Lock Screen | no hypridle/hyprlock | settings are only saved to `state/lock.json`; the shell applies them |
+| Lock Screen | no hypridle/hyprlock | settings are only saved to `state/lock.json` |
+| Lock Screen | a stored timeout that is not in the menu | shown as an extra item, e.g. "For 15 min" |
 | Displays | Hyprland rejects a mode | note "Hyprland did not accept that display setting." |
 | Network | `nmcli` missing | row "Network services can't be listed" |
 | Battery / Energy | no `Battery` in `/sys/class/power_supply/*/type` | sidebar shows **Energy** instead of **Battery** (macOS desktop behavior); Energy pane says battery settings are hidden |
@@ -59,3 +60,11 @@ Reduce transparency turns both off and uses an opaque fill.
 | UI font | `themes/fonts/SFNS.ttf` loaded with FontLoader (weights through the `wght` axis) | Inter, then Cantarell, then Noto Sans (`Theme.pickFont`) |
 | Pane icons | `themes/icons/settings/<pane id>.png` | colored rounded tile + Material Icons glyph (`fonts-material-design-icons-iconfont`, already installed) |
 | Wallpaper thumbnails | freedesktop `~/.cache/thumbnails/large` (made by `scripts/thumbs.sh`) | the full image |
+
+## Files written for other parts of hyprk
+
+Settings writes these; the readers belong to the shell/config agents. As of this commit
+`appearance.json`, `dock.json`, `sound.json` and `wallpaper.json` have readers or are
+planned; **`notifications.json`, `lock.json` and `input.json` have no reader yet**, so those
+panes only store the choice until the shell (notification server, hypridle glue, login
+config) reads them.

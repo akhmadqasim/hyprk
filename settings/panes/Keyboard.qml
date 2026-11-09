@@ -3,8 +3,8 @@ import ".."
 import "../controls"
 import "../Parsers.js" as P
 
-// Key repeat is functional: applied with `hyprctl eval` and saved in state/input.json
-// (the shell config can re-apply it at login). The rest is visual.
+// Key repeat is functional: applied live with `hyprctl eval` and saved in
+// state/input.json (for the session config to re-apply at login). The rest is visual.
 Column {
     id: pane
     spacing: Theme.content.sectionGap
@@ -16,20 +16,28 @@ Column {
     function delayToPos(d) { return (1500 - d) / 1350; }
     function posToDelay(v) { return Math.round(1500 - v * 1350); }
 
+    // What the sliders show: state/input.json, replaced by Hyprland's live values
+    // once hyprctl answers (Hyprland is the source of truth when it runs).
+    property int rate: AppState.input.repeatRate
+    property int delay: AppState.input.repeatDelay
+
     function apply(patch) {
         AppState.set("input", patch);
-        Backend.hyprEval(P.luaInput(AppState.input.repeatRate, AppState.input.repeatDelay), st => {
-            note = st === "ok" ? "" : "Saved. It takes effect the next time Hyprland starts.";
+        if (patch.repeatRate !== undefined) rate = patch.repeatRate;
+        if (patch.repeatDelay !== undefined) delay = patch.repeatDelay;
+        Backend.hyprEval(P.luaInput(rate, delay), st => {
+            note = st === "ok" ? "" : "Saved to state/input.json, but Hyprland isn't reachable here, so the keyboard didn't change.";
         });
     }
-    // Hyprland is the source of truth when it runs (the config may set other values).
-    // Only the in-memory copy is updated here; state/input.json changes when the user does.
     Component.onCompleted: {
-        for (const [option, key] of [["input:repeat_rate", "repeatRate"], ["input:repeat_delay", "repeatDelay"]])
-            Backend.run(["hyprctl", "getoption", option, "-j"], (c, o) => {
-                const v = P.parseHyprOption(o);
-                if (c === 0 && v !== null) AppState.input = P.normalizeInput(Object.assign({}, AppState.input, { [key]: v }));
-            });
+        Backend.run(["hyprctl", "getoption", "input:repeat_rate", "-j"], (c, o) => {
+            const v = P.parseHyprOption(o);
+            if (c === 0 && v !== null) rate = v;
+        });
+        Backend.run(["hyprctl", "getoption", "input:repeat_delay", "-j"], (c, o) => {
+            const v = P.parseHyprOption(o);
+            if (c === 0 && v !== null) delay = v;
+        });
     }
 
     Card {
@@ -37,7 +45,7 @@ Column {
             label: "Key repeat rate"
             MacSlider {
                 width: 260; leftText: "Slow"; rightText: "Fast"
-                value: pane.rateToPos(AppState.input.repeatRate)
+                value: pane.rateToPos(pane.rate)
                 onReleased: pane.apply({ repeatRate: pane.posToRate(_dragValue) })
             }
         }
@@ -45,7 +53,7 @@ Column {
             label: "Delay until repeat"
             MacSlider {
                 width: 260; leftText: "Long"; rightText: "Short"
-                value: pane.delayToPos(AppState.input.repeatDelay)
+                value: pane.delayToPos(pane.delay)
                 onReleased: pane.apply({ repeatDelay: pane.posToDelay(_dragValue) })
             }
         }

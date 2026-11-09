@@ -52,6 +52,8 @@ Column {
     }
     Component.onCompleted: refresh()
     EventSource { command: ["nmcli", "monitor"]; onChanged: pane.refresh() }
+    // nmcli monitor doesn't report new access points; rescan the list slowly.
+    Timer { interval: 10000; running: pane.status === "ok" && pane.radioOn; repeat: true; onTriggered: pane.listNetworks() }
 
     readonly property var current: networks.find(n => n.inUse) || null
     readonly property var others: networks.filter(n => !n.inUse)
