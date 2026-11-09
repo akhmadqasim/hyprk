@@ -42,7 +42,7 @@ namespace lg {
         bool belongsTo(const PHLWINDOW& w) const { return m_window.lock() == w; }
         // colour of the client's top rows, from CTitlebarProbe (damages the bar when it changes)
         void onSampled(const SRgba& c);
-        bool wantsSample() const { return m_height > 0; }
+        bool wantsSample() const;
 
       private:
         struct SGeometry {
@@ -52,7 +52,7 @@ namespace lg {
         CBox                     barGlobal() const; // logical, global, without workspace/floating offsets
         SGeometry                geometry(const SParams& p, const Vector2D& offset) const;
         void                     act(int button);
-        SP<Render::ITexture>     titleTexture(const std::shared_ptr<const SParams>& params, const std::string& title, bool active, float scale, double maxWidth);
+        SP<Render::ITexture>     titleTexture(const std::shared_ptr<const SParams>& params, const std::string& title, bool active, bool dark, float scale, double maxWidth);
         SP<Render::ITexture>     glyphTexture(int button, float scale);
 
         PHLWINDOWREF             m_window;
@@ -81,7 +81,6 @@ namespace lg {
         float                               m_glyphScale = 0;
         std::shared_ptr<const SParams>      m_glyphParams;
         std::optional<SRgba>                m_sampled;
-        bool                                m_titleDark = false; // title texture made for a dark bar
         unsigned                            m_recheck = 0;
     };
 
@@ -102,11 +101,10 @@ namespace lg {
         uint64_t                   getDecorationFlags() override;
         std::string                getDisplayName() override;
 
-        struct SReadback; // GL objects of one async read
       private:
         PHLWINDOWREF               m_window;
         WP<CTitlebar>              m_bar;
-        std::shared_ptr<SReadback> m_read;
+        std::shared_ptr<class CAsyncReadback> m_read;
         unsigned                   m_frames = 0;
     };
 }

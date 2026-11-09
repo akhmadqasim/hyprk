@@ -1,5 +1,6 @@
 #include "GlassElement.hpp"
 #include "Log.hpp"
+#include "Readback.hpp"
 #include "Shaders.hpp"
 #include "Stats.hpp"
 
@@ -141,51 +142,22 @@ namespace lg {
 
     namespace {
         struct SLuma {
-            bool     valid = false, dark = false;
-            GLuint   pbo   = 0;
-            GLsync   fence = nullptr;
-            bool     isFloat = false, unsupported = false;
-            uint64_t seen    = 0, requested = 0;
-            double   w = 0, h = 0; // shape size the state belongs to
+            bool           valid = false, dark = false;
+            CAsyncReadback read;
+            uint64_t       seen = 0, requested = 0;
+            double         w = 0, h = 0; // shape size the state belongs to
         };
         constexpr uint64_t LUMA_INTERVAL = 6; // monitor frames between readbacks per shape
         std::map<std::pair<uintptr_t, size_t>, SLuma> g_luma;
         GLuint                                         g_readFbo = 0;
         uint64_t                                       g_frame   = 0;
 
-        void releaseLuma(SLuma& l) {
-            if (l.fence)
-                glDeleteSync(l.fence);
-            if (l.pbo)
-                glDeleteBuffers(1, &l.pbo);
-            l.fence = nullptr;
-            l.pbo   = 0;
-        }
-
         // collect a finished readback, if any
         void collectLuma(SLuma& l, const SParams& p) {
-            if (!l.fence)
+            const auto px = l.read.poll();
+            if (!px)
                 return;
-            const GLenum st = glClientWaitSync(l.fence, 0, 0);
-            if (st != GL_ALREADY_SIGNALED && st != GL_CONDITION_SATISFIED)
-                return;
-            glDeleteSync(l.fence);
-            l.fence = nullptr;
-
-            float rgba[4] = {0, 0, 0, 1};
-            glBindBuffer(GL_PIXEL_PACK_BUFFER, l.pbo);
-            if (const void* ptr = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, 16, GL_MAP_READ_BIT)) {
-                if (l.isFloat)
-                    std::memcpy(rgba, ptr, sizeof(rgba));
-                else
-                    for (int i = 0; i < 4; ++i)
-                        rgba[i] = static_cast<const uint8_t*>(ptr)[i] / 255.f;
-                glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
-            }
-            glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-
-            const float a = std::max(rgba[3], 1e-4f);
-            const float L = (0.2126f * rgba[0] + 0.7152f * rgba[1] + 0.0722f * rgba[2]) / a;
+            const float L = luma((*px)[0], (*px)[1], (*px)[2]) / std::max((*px)[3], 1e-4f);
             l.dark        = l.valid ? hysteresisDark(l.dark, L, p.adaptLow, p.adaptHigh) : L < (p.adaptLow + p.adaptHigh) / 2;
             l.valid       = true;
         }
@@ -193,7 +165,7 @@ namespace lg {
         // queue a 1-pixel read of `tex` at mip `level`, texel (x, y)
         void requestLuma(SLuma& l, GLuint tex, int level, int x, int y) {
             // previous read still in flight, or one taken recently: luminance changes slowly
-            if (l.unsupported || l.fence || (l.requested && g_frame - l.requested < LUMA_INTERVAL))
+            if (l.read.unsupported() || l.read.pending() || (l.requested && g_frame - l.requested < LUMA_INTERVAL))
                 return;
             if (!g_readFbo)
                 glGenFramebuffers(1, &g_readFbo);
@@ -201,26 +173,8 @@ namespace lg {
             CFramebufferBindingGuard guard{g_pHyprRenderer->glBackend()}; // restores the read binding
             g_pHyprOpenGL->bindFramebuffer(GL_READ_FRAMEBUFFER, g_readFbo);
             glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, level);
-
-            if (glCheckFramebufferStatus(GL_READ_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
-                GLint type = GL_UNSIGNED_NORMALIZED;
-                glGetFramebufferAttachmentParameteriv(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE, &type);
-                l.isFloat = type == GL_FLOAT;
-                if (!l.pbo) {
-                    glGenBuffers(1, &l.pbo);
-                    glBindBuffer(GL_PIXEL_PACK_BUFFER, l.pbo);
-                    glBufferData(GL_PIXEL_PACK_BUFFER, 16, nullptr, GL_STREAM_READ);
-                } else
-                    glBindBuffer(GL_PIXEL_PACK_BUFFER, l.pbo);
-                glReadPixels(x, y, 1, 1, GL_RGBA, l.isFloat ? GL_FLOAT : GL_UNSIGNED_BYTE, nullptr);
-                glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-                // e.g. a half-float buffer without EXT_color_buffer_float: stay on the light recipe
-                if (glGetError() != GL_NO_ERROR)
-                    l.unsupported = true;
-                else
-                    l.fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-            }
-
+            if (glCheckFramebufferStatus(GL_READ_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
+                l.read.request(x, y, 1, 1); // unsupported formats: stays on the light recipe
             glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
             l.requested = g_frame;
         }
@@ -241,21 +195,11 @@ namespace lg {
         if (++g_frame % 60)
             return;
         // forget surfaces not drawn for ~10 s at 60 Hz
-        std::erase_if(g_luma, [](auto& kv) {
-            if (g_frame - kv.second.seen < 600)
-                return false;
-            releaseLuma(kv.second);
-            return true;
-        });
+        std::erase_if(g_luma, [](const auto& kv) { return g_frame - kv.second.seen >= 600; });
     }
 
     void forgetOwner(uintptr_t owner) {
-        std::erase_if(g_luma, [owner](auto& kv) {
-            if (kv.first.first != owner)
-                return false;
-            releaseLuma(kv.second);
-            return true;
-        });
+        std::erase_if(g_luma, [owner](const auto& kv) { return kv.first.first == owner; });
     }
 
     // ── unblurred backdrop copy (variable blur, edge bleed) ──────────────────
@@ -333,8 +277,6 @@ namespace lg {
 
     void releaseGlState() {
         g_sharp.clear();
-        for (auto& [k, l] : g_luma)
-            releaseLuma(l);
         g_luma.clear();
         if (g_readFbo)
             glDeleteFramebuffers(1, &g_readFbo);

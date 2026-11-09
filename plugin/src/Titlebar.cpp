@@ -1,4 +1,5 @@
 #include "Titlebar.hpp"
+#include "Readback.hpp"
 
 #include <hyprland/src/desktop/state/FocusState.hpp>
 #include <hyprland/src/desktop/view/window/Window.hpp>
@@ -120,13 +121,13 @@ namespace lg {
         g_pHyprRenderer->damageBox(barGlobal().translate(window->presentation().floatingOffset()).expand(2));
     }
 
-    SP<Render::ITexture> CTitlebar::titleTexture(const std::shared_ptr<const SParams>& params, const std::string& title, bool isActive, float scale, double maxWidth) {
+    SP<Render::ITexture> CTitlebar::titleTexture(const std::shared_ptr<const SParams>& params, const std::string& title, bool isActive, bool dark, float scale, double maxWidth) {
         const int width = int(maxWidth * scale);
         if (!m_title.tex || m_title.text != title || m_title.active != isActive || m_title.scale != scale || m_title.width != width || m_title.params != params ||
-            m_title.dark != m_titleDark) {
+            m_title.dark != dark) {
             const auto& p     = *params;
-            const auto  color = rgba(m_titleDark ? (isActive ? TEXT_ON_DARK : TEXT_ON_DARK_INACTIVE) : (isActive ? p.titlebarText : p.titlebarTextInactive));
-            m_title           = {title, isActive, scale, width, params, m_titleDark,
+            const auto  color = rgba(dark ? (isActive ? TEXT_ON_DARK : TEXT_ON_DARK_INACTIVE) : (isActive ? p.titlebarText : p.titlebarTextInactive));
+            m_title           = {title, isActive, scale, width, params, dark,
                                 g_pHyprRenderer->renderText(title, color, int(std::round(p.titlebarFontSize * scale)), false, p.titlebarFont, width, 600)};
         }
         return m_title.tex;
@@ -178,10 +179,9 @@ namespace lg {
         const float radius   = window->presentation().rounding();
 
         // colour: the client's own top rows (so a dark terminal gets a dark bar), else the config
-        const bool  sampled  = params->titlebarAutoColor && !params->titlebarGlass && m_sampled;
+        const bool  sampled  = wantsSample() && m_sampled;
         const SRgba base     = sampled ? *m_sampled : (isActive ? params->titlebarColor : params->titlebarColorInactive);
-        const bool  dark     = 0.2126f * base.r + 0.7152f * base.g + 0.0722f * base.b < 0.5f;
-        m_titleDark          = dark;
+        const bool  dark     = luma(base.r, base.g, base.b) < 0.5f;
 
         // fill: rounded top corners only (the box runs on under the window and is clipped)
         CRectPassElement::SRectData fill;
@@ -225,7 +225,7 @@ namespace lg {
         // centred title (SF Pro 13 semibold)
         const auto title = window->metadata().title();
         if (!title.empty() && layout.title.w > 8) {
-            if (const auto tex = titleTexture(params, title, isActive, scale, layout.title.w); tex && tex->ok()) {
+            if (const auto tex = titleTexture(params, title, isActive, dark, scale, layout.title.w); tex && tex->ok()) {
                 CTexPassElement::SRenderData text;
                 text.tex = tex;
                 text.box = CBox{barPx.x + (barPx.w - tex->m_size.x) / 2, barPx.y + (barPx.h - tex->m_size.y) / 2, tex->m_size.x, tex->m_size.y}.round();
@@ -313,6 +313,11 @@ namespace lg {
         return "liquidglass-titlebar";
     }
 
+    bool CTitlebar::wantsSample() const {
+        const auto params = m_params();
+        return m_height > 0 && params && params->titlebarAutoColor && !params->titlebarGlass;
+    }
+
     void CTitlebar::onSampled(const SRgba& c) {
         const bool changed = !m_sampled || std::abs(m_sampled->r - c.r) + std::abs(m_sampled->g - c.g) + std::abs(m_sampled->b - c.b) > 0.02f;
         m_sampled          = c;
@@ -322,44 +327,21 @@ namespace lg {
 
     // ── probe ───────────────────────────────────────────────────────────────
 
-    struct CTitlebarProbe::SReadback {
-        GLuint pbo = 0;
-        GLsync fence = nullptr;
-        int    pixels = 0;
-        bool   isFloat = false;
-        ~SReadback() {
-            if (fence)
-                glDeleteSync(fence);
-            if (pbo)
-                glDeleteBuffers(1, &pbo);
-        }
-    };
-
     namespace {
         constexpr unsigned PROBE_INTERVAL = 15; // window draws between reads; client colours change rarely
+        constexpr int      PROBE_STRIDE   = 4;  // median over every 4th pixel of the strip
 
         // the read-back element: queued after the window's surfaces, so the framebuffer holds them
         class CProbeElement : public IPassElement {
           public:
-            CProbeElement(std::shared_ptr<CTitlebarProbe::SReadback> read, CBox strip) : m_read(std::move(read)), m_strip(strip) {}
+            CProbeElement(std::shared_ptr<CAsyncReadback> read, CBox strip) : m_read(std::move(read)), m_strip(strip) {}
             std::vector<UP<IPassElement>> draw(Render::CRenderContext& ctx) override {
                 const auto src = dynamicPointerCast<Render::GL::CGLFramebuffer>(ctx.m_data.currentFB);
-                if (!src || m_read->fence)
+                if (!src || m_read->pending())
                     return {};
                 Render::GL::CFramebufferBindingGuard guard{g_pHyprRenderer->glBackend()};
                 Render::GL::g_pHyprOpenGL->bindFramebuffer(GL_READ_FRAMEBUFFER, src->getFBID());
-                GLint type = GL_UNSIGNED_NORMALIZED;
-                glGetFramebufferAttachmentParameteriv(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE, &type);
-                m_read->isFloat = type == GL_FLOAT;
-                m_read->pixels  = int(m_strip.w * m_strip.h);
-                if (!m_read->pbo)
-                    glGenBuffers(1, &m_read->pbo);
-                glBindBuffer(GL_PIXEL_PACK_BUFFER, m_read->pbo);
-                glBufferData(GL_PIXEL_PACK_BUFFER, m_read->pixels * (m_read->isFloat ? 16 : 4), nullptr, GL_STREAM_READ);
-                glReadPixels(m_strip.x, m_strip.y, m_strip.w, m_strip.h, GL_RGBA, m_read->isFloat ? GL_FLOAT : GL_UNSIGNED_BYTE, nullptr);
-                glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-                if (glGetError() == GL_NO_ERROR)
-                    m_read->fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+                m_read->request(m_strip.x, m_strip.y, m_strip.w, m_strip.h);
                 return {};
             }
             bool             needsLiveBlur(Render::CRenderContext&) override { return false; }
@@ -369,43 +351,32 @@ namespace lg {
             bool             undiscardable(Render::CRenderContext&) override { return true; }
 
           private:
-            std::shared_ptr<CTitlebarProbe::SReadback> m_read;
-            CBox                                       m_strip;
+            std::shared_ptr<CAsyncReadback> m_read;
+            CBox                            m_strip;
         };
 
         // per-channel median of the strip: text and cursor pixels do not move it
-        std::optional<SRgba> collect(CTitlebarProbe::SReadback& r) {
-            if (!r.fence)
+        std::optional<SRgba> collect(CAsyncReadback& r) {
+            const auto px = r.poll();
+            if (!px)
                 return std::nullopt;
-            const GLenum st = glClientWaitSync(r.fence, 0, 0);
-            if (st != GL_ALREADY_SIGNALED && st != GL_CONDITION_SATISFIED)
-                return std::nullopt;
-            glDeleteSync(r.fence);
-            r.fence = nullptr;
-
             std::array<std::vector<float>, 3> ch;
-            glBindBuffer(GL_PIXEL_PACK_BUFFER, r.pbo);
-            if (const void* ptr = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, r.pixels * (r.isFloat ? 16 : 4), GL_MAP_READ_BIT)) {
-                for (int i = 0; i < r.pixels; ++i)
-                    for (int c = 0; c < 3; ++c)
-                        ch[c].push_back(r.isFloat ? static_cast<const float*>(ptr)[i * 4 + c] : static_cast<const uint8_t*>(ptr)[i * 4 + c] / 255.f);
-                glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
-            }
-            glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-            if (ch[0].empty())
-                return std::nullopt;
-            SRgba out{0, 0, 0, 1};
-            float* dst[3] = {&out.r, &out.g, &out.b};
+            for (auto& c : ch)
+                c.reserve(px->size() / 4 / PROBE_STRIDE + 1);
+            for (size_t i = 0; i + 3 < px->size(); i += 4 * PROBE_STRIDE)
+                for (int c = 0; c < 3; ++c)
+                    ch[c].push_back((*px)[i + c]);
+            float m[3];
             for (int c = 0; c < 3; ++c) {
                 auto mid = ch[c].begin() + ch[c].size() / 2;
                 std::nth_element(ch[c].begin(), mid, ch[c].end());
-                *dst[c] = std::clamp(*mid, 0.f, 1.f);
+                m[c] = std::clamp(*mid, 0.f, 1.f);
             }
-            return out;
+            return SRgba{m[0], m[1], m[2], 1};
         }
     }
 
-    CTitlebarProbe::CTitlebarProbe(PHLWINDOW window, WP<CTitlebar> bar) : IHyprWindowDecoration(window), m_window(window), m_bar(std::move(bar)), m_read(std::make_shared<SReadback>()) {}
+    CTitlebarProbe::CTitlebarProbe(PHLWINDOW window, WP<CTitlebar> bar) : IHyprWindowDecoration(window), m_window(window), m_bar(std::move(bar)), m_read(std::make_shared<CAsyncReadback>()) {}
 
     CTitlebarProbe::~CTitlebarProbe() = default;
 
@@ -427,15 +398,15 @@ namespace lg {
             bar->onSampled(*c);
         // first read a few draws in (a fresh window's first frames can still be empty), then every
         // PROBE_INTERVAL draws
-        if (m_read->fence || m_frames++ % PROBE_INTERVAL != 3)
+        if (m_read->pending() || m_frames++ % PROBE_INTERVAL != 3)
             return;
 
-        // the client's rows 1-2 below its top edge, inside the rounded corners
+        // the client's second row, inside the rounded corners
         CBox box = window->getWindowMainSurfaceBox();
         box.translate(presentation.workspaceOffset + presentation.floatingOffset - mon->m_position);
         box.scale(mon->m_scale).round();
         const double inset = window->presentation().rounding() * mon->m_scale + 2;
-        CBox         strip{box.x + inset, box.y + 1, box.w - 2 * inset, 2};
+        CBox         strip{box.x + inset, box.y + 1, box.w - 2 * inset, 1};
         strip = strip.intersection(CBox{{}, mon->m_transformedSize}).round();
         if (strip.w < 1 || strip.h < 1)
             return;

@@ -134,6 +134,14 @@ static void forEachTitlebar(const std::function<void(lg::CTitlebar&)>& fn) {
             fn(*bar);
 }
 
+template <typename T>
+static void removeAll(std::vector<WP<T>>& decorations) {
+    for (const auto& d : decorations)
+        if (const auto deco = d.lock())
+            HyprlandAPI::removeWindowDecoration(lg::handle(), deco.get());
+    decorations.clear();
+}
+
 APICALL EXPORT std::string PLUGIN_API_VERSION() {
     return HYPRLAND_API_VERSION;
 }
@@ -226,18 +234,9 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
 
 APICALL EXPORT void PLUGIN_EXIT() {
     g_listeners.clear();
-    for (const auto& deco : g_decorations)
-        if (const auto d = deco.lock())
-            HyprlandAPI::removeWindowDecoration(lg::handle(), d.get());
-    g_decorations.clear();
-    for (const auto& t : g_titlebars)
-        if (const auto bar = t.lock())
-            HyprlandAPI::removeWindowDecoration(lg::handle(), bar.get());
-    g_titlebars.clear();
-    for (const auto& p : g_probes)
-        if (const auto probe = p.lock())
-            HyprlandAPI::removeWindowDecoration(lg::handle(), probe.get());
-    g_probes.clear();
+    removeAll(g_decorations);
+    removeAll(g_titlebars);
+    removeAll(g_probes);
     if (g_renderHook)
         HyprlandAPI::removeFunctionHook(lg::handle(), g_renderHook);
     g_renderHook = nullptr;
