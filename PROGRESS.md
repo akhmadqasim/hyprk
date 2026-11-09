@@ -37,11 +37,14 @@ ini cuma project pribadi". Work autonomously until 07:00, then report.
 - [03:17] shell agent: /simplify + /code-review done and fixed (commits bcfaac4, 8f47182). Applied SPEC.md section 7 metrics (menu bar 30, menu item 24, Dock tile 64/128 magnified, Spotlight 640x56 r28, window radius 16). Added sounds (shell/scripts/sound.sh + state/sound.json, SOUNDS.md), cursor theme via config/hypr/start.sh, Focus menu bar item, dark mode + Reduce Transparency verified. Scores: menu bar 82, dock 78, CC 82, NC 72, banners 72, spotlight 75, apps panel 68, switcher 70. Note: 4 stray idle Hyprland children from my first runs (pids 573829 574275 576400 577560) could not be killed (classifier denied kill -9); harmless, ~13 MB each. Next: shared overlay window base, Glass self-positioning, Finder rules hookup.
 - [03:18] finder agent: /simplify + /code-review done and fixed (async gio trash, path-based cursor, search-safe selection, column view folder peek). 3 commits in finder/. Score icon view ~85, list ~80, columns ~75, Quick Look ~65 (in-window panel, not a separate window).
 
-- [done 03:25] themes agent: GTK4/libadwaita + GTK3 theme (themes/gtk, light+dark, traffic lights left), Qt qt6ct palette+QSS (themes/qt), hyprlock 0.9.7 built into hypr-dev prefix + macOS lock screen (lockscreen/). Screens in reference/ours/gtk-*, qt-*, lockscreen.png. Polish pass continuing.
+- [done 03:25] themes agent: GTK4/libadwaita + GTK3 theme (themes/gtk, light+dark, traffic lights left), Qt qt6ct palette+QSS (themes/qt), hyprlock 0.9.7 built into hypr-dev prefix + macOS lock screen (lockscreen/). Screens in reference/ours/gtk-*, qt-*, lockscreen.png. Polish pass done 03:50 (window radius 16 to match compositor, SPEC metrics, gtksourceview schemes, dialogs/menus verified). Self-scores (no pixel compare possible, different content): GTK4 apps ~72, GTK3 ~60, Qt ~65, lock screen ~80. Test rigs: themes/gtk/tools (hypr-headless.sh, hshot.sh), themes/qt/tools/qshot.sh, lockscreen/tools/shot.sh. Note: early hshot.sh runs used `pkill -x <app>` once (python3 gallery), later replaced by own-process-group kill; if a python3 process of another agent died around 03:00-03:10, that was me.
+
+- [03:19] plugin agent: liquidglass plugin builds + loads in nested 0.57.2; layer glass from ext-background-effect regions (shape+radius), bevel refraction, 7-tap aberration, sat/tint, two-lobe rim, inner/drop shadow, auto light/dark; fallback to rounded Hyprland blur tested (bad shader). Similarity ~65% (shots reference/ours/plugin-v5.png). Next: window glass by class, shell contract (BackgroundEffect.blurRegion), tune vs screens, /simplify + /code-review
 
 ## Scores (per surface, 0-100 vs macOS 27.2)
 settings-appearance 85 (03:20, orchestrator visual check)
 desktop (menu bar+dock) 75 (03:25, orchestrator)
+finder icon view 85 (03:30, orchestrator)
 
 ## What-ifs (user 03:20: "jangan lupa, what if? what if?")
 - Build of Hyprland 0.57.2 fails -> fall back to apt hyprland 0.53.3 for testing, keep code 0.57-compatible.

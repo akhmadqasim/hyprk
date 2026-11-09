@@ -5,11 +5,12 @@ D=$(cd "$(dirname "$0")/.." && pwd); source $D/tools/hypr-env.sh
 OUT=$1; MODE=$2; SZ=${3:-1000x680}; shift 3
 S=$(mktemp -d /tmp/claude-1000/hk/run.XXXX); C=$S/cfg; mkdir -p $C/gtk-4.0 $C/gtk-3.0 $C/glib-2.0/settings $S/data
 cp $D/gtk-4.0/gtk.css $C/gtk-4.0/gtk.css
+mkdir -p $S/data/gtksourceview-5/styles; cp $D/gtksourceview/*.xml $S/data/gtksourceview-5/styles/
 [ -n "$CFG_OVERLAY" ] && cp -r $CFG_OVERLAY/. $C/
 printf '[Settings]\ngtk-decoration-layout=close,minimize,maximize:\n%s\n' "${EXTRA_SETTINGS}" > $C/gtk-3.0/settings.ini; cp $C/gtk-3.0/settings.ini $C/gtk-4.0/settings.ini
 [ -n "$GTK3_THEME" ] && { echo "gtk-theme-name=$GTK3_THEME"; [ $MODE = dark ] && echo gtk-application-prefer-dark-theme=1; } >> $C/gtk-3.0/settings.ini
 { echo "[org/gnome/desktop/wm/preferences]"; echo "button-layout='close,minimize,maximize:'"; echo "[org/gnome/desktop/interface]";
-  echo "color-scheme='$([ $MODE = dark ] && echo prefer-dark || echo prefer-light)'"; echo "font-name='SF Pro Text 10'"; [ -n "$GTK3_THEME" ] && echo "gtk-theme='$GTK3_THEME'"; echo "monospace-font-name='SF Mono 10'"; } > $C/glib-2.0/settings/keyfile
+  echo "color-scheme='$([ $MODE = dark ] && echo prefer-dark || echo prefer-light)'"; echo "font-name='SF Pro Text 10'"; [ -n "$GTK3_THEME" ] && echo "gtk-theme='$GTK3_THEME'"; echo "monospace-font-name='SF Mono 10'"; echo "[org/gnome/TextEditor]"; echo "style-scheme='macos27-$([ $MODE = dark ] && echo dark || echo light)'"; echo "restore-session=false"; echo "show-line-numbers=true"; echo "highlight-current-line=true"; } > $C/glib-2.0/settings/keyfile
 cat > $S/fonts.conf <<EOT
 <?xml version="1.0"?><!DOCTYPE fontconfig SYSTEM "fonts.dtd"><fontconfig><include ignore_missing="yes">/etc/fonts/fonts.conf</include><dir>$D/../fonts</dir><cachedir>/tmp/claude-1000/hk/fccache</cachedir></fontconfig>
 EOT

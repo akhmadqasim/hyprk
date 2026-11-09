@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- MacOS27 Dark source style scheme for GtkSourceView 5 (GNOME Text Editor, Builder, gedit). Original work, Xcode-like palette. -->
+<style-scheme id="macos27-dark" name="MacOS27 Dark" version="1.0">
+  <author>hyprk</author>
+  <description>macOS 27 look: dark editor colours</description>
+  <metadata><property name="variant">dark</property></metadata>
+  <color name="bg" value="#1E1E1E"/>
+  <color name="fg" value="#DCDCDC"/>
+  <color name="sel" value="#1B4C80"/>
+  <color name="line" value="#262626"/>
+  <color name="margin" value="#6B7078"/>
+  <color name="comment" value="#7F8C98"/>
+  <color name="keyword" value="#FC5FA3"/>
+  <color name="string" value="#FC6A5D"/>
+  <color name="number" value="#D0BF69"/>
+  <color name="type" value="#5DD8FF"/>
+  <color name="func" value="#67B7A4"/>
+  <color name="preproc" value="#FD8F3F"/>
+  <color name="error" value="#FF453A"/>
+  <style name="text" foreground="fg" background="bg"/>
+  <style name="selection" background="sel"/>
+  <style name="selection-unfocused" background="line"/>
+  <style name="cursor" foreground="#007AFF"/>
+  <style name="current-line" background="line"/>
+  <style name="line-numbers" foreground="margin" background="bg"/>
+  <style name="current-line-number" foreground="fg" background="bg" bold="true"/>
+  <style name="draw-spaces" foreground="margin"/>
+  <style name="bracket-match" background="sel" bold="true"/>
+  <style name="bracket-mismatch" foreground="error" underline="true"/>
+  <style name="search-match" background="#5A4B00"/>
+  <style name="right-margin" foreground="margin"/>
+  <style name="def:comment" foreground="comment" italic="false"/>
+  <style name="def:shebang" foreground="comment" bold="true"/>
+  <style name="def:doc-comment-element" foreground="comment" bold="true"/>
+  <style name="def:constant" foreground="number"/>
+  <style name="def:special-constant" foreground="keyword"/>
+  <style name="def:special-char" foreground="string"/>
+  <style name="def:string" foreground="string"/>
+  <style name="def:number" foreground="number"/>
+  <style name="def:identifier" foreground="func"/>
+  <style name="def:statement" foreground="keyword" bold="true"/>
+  <style name="def:keyword" foreground="keyword" bold="true"/>
+  <style name="def:type" foreground="type"/>
+  <style name="def:function" foreground="func"/>
+  <style name="def:builtin" foreground="func"/>
+  <style name="def:preprocessor" foreground="preproc"/>
+  <style name="def:error" foreground="error" underline="true"/>
+  <style name="def:warning" underline="true"/>
+  <style name="def:note" foreground="comment" bold="true"/>
+  <style name="def:underlined" underline="true"/>
+  <style name="def:link-symbol" foreground="type"/>
+  <style name="def:link-destination" foreground="type" underline="true"/>
+</style-scheme>

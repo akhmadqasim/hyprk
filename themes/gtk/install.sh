@@ -38,6 +38,8 @@ fi
 backup() { [ -f "$1" ] && ! grep -q "MacOS27 theme" "$1" && cp -n "$1" "$1.hyprk-backup" || true; }
 mkdir -p "$THEMES" "$CFG3" "$CFG4"
 cp -r "$HERE/MacOS27" "$HERE/MacOS27-Dark" "$THEMES/"
+GSV=${PREFIX:+$PREFIX/share}; GSV=${GSV:-${XDG_DATA_HOME:-$HOME/.local/share}}/gtksourceview-5/styles
+mkdir -p "$GSV"; cp "$HERE"/gtksourceview/*.xml "$GSV/"   # Text Editor: gsettings set org.gnome.TextEditor style-scheme macos27-light
 # GTK 4 / libadwaita apps ignore theme names; they read the user stylesheet (light + dark via prefers-color-scheme)
 backup "$CFG4/gtk.css"; cp "$HERE/gtk-4.0/gtk.css" "$CFG4/gtk.css"
 # GTK 3 apps use the theme dir; the user css is only needed on top of another theme, so it is not installed
