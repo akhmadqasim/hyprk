@@ -8,7 +8,7 @@ Column {
     id: pane
     spacing: Theme.content.sectionGap
 
-    property string status: "loading"   // loading | unsupported | ok
+    property string status: "loading"   // loading | missing | failed | ok
     property var monitors: []
     property int sel: 0
     property string note: ""
@@ -18,13 +18,14 @@ Column {
     function refresh() {
         Backend.run(["hyprctl", "monitors", "-j"], (code, out) => {
             monitors = code === 0 ? P.parseHyprMonitors(out) : [];
-            status = monitors.length ? "ok" : "unsupported";
+            // hyprctl outside a Hyprland session exits non-zero; empty output is the same case
+            status = code === 0 && !monitors.length ? "failed" : Backend.status(code);
         });
     }
     function apply(m, mode, scale) {
         note = "";
-        Backend.run(["hyprctl", "keyword", "monitor", m.name + "," + mode + ",auto," + scale], (c, o) => {
-            if (c !== 0 || /error|invalid/i.test(o)) note = "Hyprland did not accept that display setting.";
+        Backend.hyprEval(P.luaMonitor(m.name, mode, scale), st => {
+            if (st !== "ok") note = "Hyprland did not accept that display setting.";
             refresh();
         });
     }
@@ -65,7 +66,7 @@ Column {
     }
 
     InlineNote {
-        text: pane.status === "unsupported" ? "Display details come from Hyprland. Open System Settings inside a Hyprland session to change resolution and scale." : pane.note
+        text: pane.status === "missing" || pane.status === "failed" ? "Display details come from Hyprland. Open System Settings inside a Hyprland session to change resolution and scale." : pane.note
     }
 
     Card {
@@ -84,7 +85,7 @@ Column {
                 enabled_: pane.status === "ok"
                 model: pane.scales.map(s => Math.round(s * 100) + "%")
                 currentIndex: pane.mon ? Math.max(0, pane.scales.indexOf(pane.mon.scale)) : 0
-                onActivated: i => pane.apply(pane.mon, "preferred", pane.scales[i])
+                onActivated: i => pane.apply(pane.mon, pane.mon.width + "x" + pane.mon.height + "@" + pane.mon.refreshRate, pane.scales[i])
             }
         }
         FormRow { label: "Refresh rate"; MacPopup { enabled_: false; model: [pane.mon ? pane.mon.refreshRate + " Hertz" : "—"] } }

@@ -7,6 +7,7 @@ Item {
     property string label
     property string sublabel
     property string glyph            // Material Icons ligature for a small tile
+    property string iconSource       // app icon image instead of the glyph tile
     property color tint: Theme.tile.blue
     property bool dim: false
     property string value            // gray trailing text, e.g. "Off"
@@ -26,8 +27,8 @@ Item {
     }
     PaneIcon {
         id: icon
-        visible: row.glyph !== ""
-        size: 22; glyph: row.glyph; tint: row.tint
+        visible: row.glyph !== "" || row.iconSource !== ""
+        size: 22; glyph: row.glyph; tint: row.tint; imageSource: row.iconSource
         x: Theme.content.rowPadding; anchors.verticalCenter: parent.verticalCenter
     }
     Column {

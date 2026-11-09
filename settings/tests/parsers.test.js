@@ -79,6 +79,15 @@ test("hyprctl monitors", () => {
     assert.deepEqual(P.parseHyprMonitors("{}"), []);
 });
 
+test("hyprctl getoption and eval snippets", () => {
+    assert.equal(P.parseHyprOption('{"option": "input:repeat_rate", "int": 25, "set": false }'), 25);
+    assert.equal(P.parseHyprOption("no such option"), null);
+    assert.equal(P.luaString('a"b\\c'), '"a\\"b\\\\c"');
+    assert.equal(P.luaMonitor("DP-1", "3840x2160@60", 1.5),
+        'hl.monitor({ output = "DP-1", mode = "3840x2160@60", position = "auto", scale = 1.5 })');
+    assert.equal(P.luaInput(30.4, 500), "hl.config({ input = { repeat_rate = 30, repeat_delay = 500 } })");
+});
+
 test("battery detection", () => {
     assert.equal(P.hasBattery("Mains\nBattery\n"), true);
     assert.equal(P.hasBattery("Mains\n"), false);
@@ -124,4 +133,22 @@ test("sound.json defaults and clamping", () => {
 test("prettyFileName", () => {
     assert.equal(P.prettyFileName("/w/png/Mac_Blue-dark.png"), "Mac Blue dark");
     assert.equal(P.prettyFileName(""), "");
+});
+
+test("lock.json, input.json, notifications.json defaults", () => {
+    assert.deepEqual(P.readState("", P.normalizeLock), P.lockDefaults);
+    assert.equal(P.readState('{"displayOffAfter": -5, "largeClock": "x"}', P.normalizeLock).displayOffAfter, 0);
+    assert.deepEqual(P.readState("", P.normalizeInput), P.inputDefaults);
+    assert.equal(P.readState('{"repeatRate": 999}', P.normalizeInput).repeatRate, 100);
+    assert.deepEqual(P.readState("", P.normalizeNotifications), P.notificationsDefaults);
+    const n = P.readState('{"apps": {"firefox.desktop": {"allow": false, "style": "weird"}}, "previews": "x"}', P.normalizeNotifications);
+    assert.deepEqual(n.apps["firefox.desktop"], { allow: false, style: "banners", sounds: true });
+    assert.equal(n.previews, "unlocked");
+});
+
+test("desktop apps list", () => {
+    const apps = P.parseDesktopApps(fx("notify-apps.txt"));
+    assert.deepEqual(apps.map(a => a.id), ["org.gnome.Calendar.desktop", "firefox_firefox.desktop", "org.gnome.Software.desktop"]);
+    assert.equal(apps[1].icon, "/snap/firefox/current/default256.png");
+    assert.deepEqual(P.parseDesktopApps(""), []);
 });

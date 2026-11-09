@@ -8,7 +8,7 @@ Column {
     id: pane
     spacing: Theme.content.sectionGap
 
-    property string status: "loading"    // loading | unsupported | nocontroller | ok
+    property string status: "loading"    // loading | missing | nocontroller | ok
     property var ctl: P.parseBluetoothShow("")
     property var devices: []
     property var connected: []
@@ -16,7 +16,7 @@ Column {
 
     function refresh() {
         Backend.run(["timeout", "4", "bluetoothctl", "show"], (code, out) => {
-            if (code === 127) { status = "unsupported"; return; }
+            if (Backend.status(code) === "missing") { status = "missing"; return; }
             ctl = P.parseBluetoothShow(out);
             if (!ctl.available) { status = "nocontroller"; return; }
             status = "ok";
@@ -29,13 +29,17 @@ Column {
         Backend.run(["timeout", "15"].concat(["bluetoothctl"], args), c => { if (c !== 0) note = failMsg; refresh(); });
     }
     Component.onCompleted: refresh()
-    Timer { interval: 5000; running: pane.status === "ok"; repeat: true; onTriggered: pane.refresh() }
+    // BlueZ property changes (power, connect, pairing) arrive as D-Bus signals.
+    EventSource {
+        command: ["dbus-monitor", "--system", "type='signal',interface='org.freedesktop.DBus.Properties',path_namespace='/org/bluez'"]
+        onChanged: pane.refresh()
+    }
 
     Unavailable {
-        visible: pane.status === "nocontroller" || pane.status === "unsupported"
+        visible: pane.status === "nocontroller" || pane.status === "missing"
         glyph: "bluetooth_disabled"
         title: "Bluetooth Unavailable"
-        text: pane.status === "unsupported" ? "BlueZ (bluetoothctl) is not installed." : "No Bluetooth controller was found. Connect a Bluetooth adapter to use wireless devices."
+        text: pane.status === "missing" ? "BlueZ (bluetoothctl) is not installed." : "No Bluetooth controller was found. Connect a Bluetooth adapter to use wireless devices."
     }
 
     Card {

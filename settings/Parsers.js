@@ -96,6 +96,27 @@ function parseHyprMonitors(text) {
     }));
 }
 
+// hyprctl getoption <name> -j -> {"option": ..., "int": 25, "set": false}
+function parseHyprOption(text) {
+    try {
+        const o = JSON.parse(text);
+        for (const k of ["int", "float", "str", "custom"]) if (o[k] !== undefined) return o[k];
+    } catch (e) {}
+    return null;
+}
+
+// Hyprland 0.57 has no `hyprctl keyword`; runtime changes go through `hyprctl eval <lua>`.
+function luaString(s) {
+    return '"' + String(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n") + '"';
+}
+function luaMonitor(name, mode, scale) {
+    return "hl.monitor({ output = " + luaString(name) + ", mode = " + luaString(mode)
+        + ", position = \"auto\", scale = " + Number(scale) + " })";
+}
+function luaInput(repeatRate, repeatDelay) {
+    return "hl.config({ input = { repeat_rate = " + Math.round(repeatRate) + ", repeat_delay = " + Math.round(repeatDelay) + " } })";
+}
+
 // cat /sys/class/power_supply/*/type
 function hasBattery(text) {
     return lines(text).some(l => l.trim() === "Battery");
@@ -154,6 +175,52 @@ function normalizeSound(obj) {
     return o;
 }
 
+// lock.json, read by the shell / hypridle glue. Seconds; 0 = never.
+const lockDefaults = { screenSaverAfter: 1200, displayOffAfter: 600, requirePasswordAfter: 0, largeClock: "lock" };
+function normalizeLock(obj) {
+    const o = Object.assign({}, lockDefaults, (obj && typeof obj === "object") ? obj : {});
+    for (const k of ["screenSaverAfter", "displayOffAfter", "requirePasswordAfter"])
+        o[k] = clamp(o[k], 0, 86400, lockDefaults[k]);
+    if (["screensaver", "lock", "never"].indexOf(o.largeClock) === -1) o.largeClock = lockDefaults.largeClock;
+    return o;
+}
+
+// input.json: keyboard repeat applied with `hyprctl eval` (see luaInput); the
+// shell config can re-apply it at startup.
+const inputDefaults = { repeatRate: 25, repeatDelay: 600 };
+function normalizeInput(obj) {
+    const o = Object.assign({}, inputDefaults, (obj && typeof obj === "object") ? obj : {});
+    o.repeatRate = clamp(o.repeatRate, 1, 100, inputDefaults.repeatRate);
+    o.repeatDelay = clamp(o.repeatDelay, 100, 2000, inputDefaults.repeatDelay);
+    return o;
+}
+
+// notifications.json, read by the shell. apps: { "<desktop id>": { allow, style, sounds } }
+const notifStyles = ["none", "banners", "alerts"];
+const notificationsDefaults = { previews: "unlocked", summarize: false, whenSleeping: false, whenLocked: true, whenMirroring: false, apps: {} };
+function normalizeNotifications(obj) {
+    const o = Object.assign({}, notificationsDefaults, (obj && typeof obj === "object") ? obj : {});
+    if (["always", "unlocked", "never"].indexOf(o.previews) === -1) o.previews = notificationsDefaults.previews;
+    for (const k of ["summarize", "whenSleeping", "whenLocked", "whenMirroring"]) o[k] = !!o[k];
+    const apps = {};
+    if (o.apps && typeof o.apps === "object")
+        for (const id in o.apps) {
+            const a = o.apps[id] || {};
+            apps[id] = { allow: a.allow !== false, style: notifStyles.indexOf(a.style) === -1 ? "banners" : a.style, sounds: a.sounds !== false };
+        }
+    o.apps = apps;
+    return o;
+}
+
+// scripts/notify-apps.sh: "<desktop id>\t<Name>\t<Icon>" per line
+function parseDesktopApps(text) {
+    const seen = {};
+    return lines(text).map(l => l.split("\t")).filter(f => f.length >= 2 && f[0] && f[1])
+        .filter(f => !seen[f[0]] && (seen[f[0]] = true))
+        .map(f => ({ id: f[0], name: f[1], icon: f[2] || "" }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+}
+
 // "/x/Mac_Blue-dark.png" -> "Mac Blue dark"
 function prettyFileName(path) {
     return String(path || "").split("/").pop().replace(/\.[^.]+$/, "").replace(/[-_]/g, " ");
@@ -173,5 +240,7 @@ function writeState(current, patch, normalize) {
 if (typeof module !== "undefined")
     module.exports = { splitTerse, parseNmcliDevices, wifiDevice, parseNmcliWifi, parseWpctlSinks, parseWpctlVolume,
         parseBluetoothShow, parseBluetoothDevices, parseHyprMonitors, hasBattery,
+        parseHyprOption, luaString, luaMonitor, luaInput,
         normalizeAppearance, normalizeDock, normalizeSound, readState, writeState, prettyFileName,
-        appearanceDefaults, dockDefaults, soundDefaults, alertSounds };
+        normalizeLock, normalizeInput, normalizeNotifications, parseDesktopApps,
+        appearanceDefaults, dockDefaults, soundDefaults, alertSounds, lockDefaults, inputDefaults, notificationsDefaults };

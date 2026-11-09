@@ -9,14 +9,15 @@ Column {
     id: pane
     spacing: Theme.content.sectionGap
 
-    property string status: "loading"     // loading | unsupported | nodevices | ok
+    property string status: "loading"     // loading | missing | failed | nodevices | ok
     property var sinks: []
     property var vol: P.parseWpctlVolume("")
     property string note: ""
 
     function refresh() {
         Backend.run(["wpctl", "status"], (code, out) => {
-            if (code !== 0) { status = "unsupported"; return; }
+            status = Backend.status(code);
+            if (status !== "ok") return;
             sinks = P.parseWpctlSinks(out);
             status = sinks.length ? "ok" : "nodevices";
         });
@@ -52,7 +53,8 @@ Column {
         Backend.run(["wpctl", "set-default", String(id)], c => { note = c === 0 ? "" : "That output device could not be selected."; refresh(); });
     }
     Component.onCompleted: refresh()
-    Timer { interval: 3000; running: pane.status !== "unsupported"; repeat: true; onTriggered: pane.refresh() }
+    // pw-mon prints whenever a PipeWire object (volume, default sink, devices) changes.
+    EventSource { command: ["pw-mon", "-N", "-o", "-a"]; filter: /^\s*(changed|added|removed):/; active: !pane.dragging; onChanged: pane.refresh() }
 
     Card {
         title: "Sound Effects"
@@ -62,7 +64,7 @@ Column {
                 model: P.alertSounds
                 currentIndex: P.alertSounds.indexOf(AppState.sound.alertSound)
                 onActivated: i => {
-                    AppState.setSound({ alertSound: P.alertSounds[i] });
+                    AppState.set("sound", { alertSound: P.alertSounds[i] });
                     pane.play(pane.soundsDir + "/Sounds/" + P.alertSounds[i] + ".wav", AppState.sound.alertVolume);
                 }
             }
@@ -73,14 +75,14 @@ Column {
                 width: 230
                 value: AppState.sound.alertVolume
                 leftGlyph: "volume_mute"; rightGlyph: "volume_up"
-                onMoved: v => AppState.setSound({ alertVolume: Math.round(v * 100) / 100 })
+                onMoved: v => AppState.set("sound", { alertVolume: Math.round(v * 100) / 100 })
                 // macOS plays the alert once you let go of the knob
                 onReleased: pane.play(pane.soundsDir + "/Sounds/" + AppState.sound.alertSound + ".wav", AppState.sound.alertVolume)
             }
         }
         FormRow { label: "Play sound on startup"; MacSwitch { checked: true } }
-        FormRow { label: "Play user interface sound effects"; MacSwitch { checked: AppState.sound.uiSounds; onToggled: on => AppState.setSound({ uiSounds: on }) } }
-        FormRow { label: "Play feedback when volume is changed"; MacSwitch { checked: AppState.sound.volumeFeedback; onToggled: on => AppState.setSound({ volumeFeedback: on }) } }
+        FormRow { label: "Play user interface sound effects"; MacSwitch { checked: AppState.sound.uiSounds; onToggled: on => AppState.set("sound", { uiSounds: on }) } }
+        FormRow { label: "Play feedback when volume is changed"; MacSwitch { checked: AppState.sound.volumeFeedback; onToggled: on => AppState.set("sound", { volumeFeedback: on }) } }
     }
 
     InlineNote { text: pane.effectsNote }
@@ -110,7 +112,7 @@ Column {
     }
 
     InlineNote {
-        text: pane.status === "unsupported" ? "PipeWire (wpctl) is not available, so sound devices can't be shown."
+        text: pane.status === "missing" || pane.status === "failed" ? Backend.statusNote(pane.status, "PipeWire (wpctl)", "sound devices")
             : pane.status === "nodevices" ? "No output devices found." : pane.note
     }
 

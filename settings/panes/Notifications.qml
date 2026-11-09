@@ -1,23 +1,72 @@
 import QtQuick
 import ".."
 import "../controls"
+import "../Parsers.js" as P
 
+// Functional: everything goes to state/notifications.json, which the shell's
+// notification server reads. Apps are those whose .desktop file declares
+// X-GNOME-UsesNotifications=true (scripts/notify-apps.sh).
 Column {
+    id: pane
     spacing: Theme.content.sectionGap
+    readonly property var n: AppState.notifications
+    property var apps: []
+    property string status: "loading"
+
+    function setApp(id, patch) {
+        const apps = Object.assign({}, n.apps);
+        apps[id] = Object.assign({ allow: true, style: "banners", sounds: true }, apps[id] || {}, patch);
+        AppState.set("notifications", { apps: apps });
+    }
+    function app(id) { return n.apps[id] || { allow: true, style: "banners", sounds: true }; }
+    Component.onCompleted: Backend.run([Backend.root + "/settings/scripts/notify-apps.sh"], (c, o) => {
+        status = Backend.status(c);
+        apps = P.parseDesktopApps(o);
+    })
+
     Card {
         title: "Notification Center"
-        FormRow { label: "Show previews"; MacPopup { model: ["Always", "When Unlocked", "Never"]; currentIndex: 1 } }
-        FormRow { label: "Summarize notifications"; MacSwitch {} }
-        FormRow { label: "Allow notifications when the display is sleeping"; MacSwitch {} }
-        FormRow { label: "Allow notifications when the screen is locked"; MacSwitch { checked: true } }
-        FormRow { label: "Allow notifications when mirroring or sharing the display"; MacSwitch {} }
+        FormRow {
+            label: "Show previews"
+            MacPopup {
+                readonly property var keys: ["always", "unlocked", "never"]
+                model: ["Always", "When Unlocked", "Never"]
+                currentIndex: Math.max(0, keys.indexOf(pane.n.previews))
+                onActivated: i => AppState.set("notifications", { previews: keys[i] })
+            }
+        }
+        FormRow { label: "Summarize notifications"; MacSwitch { checked: pane.n.summarize; onToggled: on => AppState.set("notifications", { summarize: on }) } }
+        FormRow { label: "Allow notifications when the display is sleeping"; MacSwitch { checked: pane.n.whenSleeping; onToggled: on => AppState.set("notifications", { whenSleeping: on }) } }
+        FormRow { label: "Allow notifications when the screen is locked"; MacSwitch { checked: pane.n.whenLocked; onToggled: on => AppState.set("notifications", { whenLocked: on }) } }
+        FormRow { label: "Allow notifications when mirroring or sharing the display"; MacSwitch { checked: pane.n.whenMirroring; onToggled: on => AppState.set("notifications", { whenMirroring: on }) } }
     }
+
     Card {
         title: "Application Notifications"
-        FormRow { glyph: "calendar_month"; tint: Theme.tile.red; label: "Calendar"; sublabel: "Banners, Sounds, Badges" }
-        FormRow { glyph: "photo_camera"; tint: Theme.tile.gray; label: "Screenshot"; sublabel: "Banners" }
-        FormRow { glyph: "update"; tint: Theme.tile.gray; label: "Software Update"; sublabel: "Alerts, Badges" }
-        FormRow { glyph: "terminal"; tint: Theme.tile.black; label: "Terminal"; sublabel: "Banners, Sounds" }
+        FormRow {
+            visible: pane.apps.length === 0
+            dim: true
+            label: pane.status === "loading" ? "Loading…" : "No apps have asked to send notifications"
+        }
+        Repeater {
+            model: pane.apps
+            FormRow {
+                id: appRow
+                required property var modelData
+                readonly property var cfg: pane.app(modelData.id)
+                iconSource: Backend.iconUrl(modelData.icon)
+                glyph: "apps"; tint: Theme.tile.gray          // shown when the icon can't be found
+                label: modelData.name
+                sublabel: !cfg.allow ? "Off" : (cfg.style === "alerts" ? "Alerts" : "Banners") + (cfg.sounds ? ", Sounds" : "")
+                MacPopup {
+                    readonly property var keys: ["off", "banners", "alerts"]
+                    model: ["Off", "Banners", "Alerts"]
+                    currentIndex: !appRow.cfg.allow ? 0 : Math.max(1, keys.indexOf(appRow.cfg.style))
+                    onActivated: i => pane.setApp(appRow.modelData.id, i === 0 ? { allow: false } : { allow: true, style: keys[i] })
+                }
+            }
+        }
     }
-    PaneFooter { }
+    InlineNote { text: Backend.statusNote(pane.status, "The app list", "per-app notifications") }
+    PaneFooter {}
 }

@@ -85,7 +85,7 @@ QtObject {
         readonly property int accountAvatar: 40      // TODO verify
         readonly property color fill: theme.reduceTransparency
             ? (theme.dark ? "#2A2A2C" : "#EEECEA")                                        // ref (light)
-            : (theme.dark ? Qt.rgba(0.17, 0.17, 0.18, 0.80) : Qt.rgba(0.93, 0.925, 0.92, 0.82)) // ref tint over wallpaper, TODO verify alpha
+            : (theme.dark ? Qt.rgba(0.15, 0.15, 0.16, 0.62) : Qt.rgba(0.96, 0.95, 0.94, 0.62)) // tint over blurred desktop, TODO verify alpha
         readonly property color stroke: theme.dark ? Qt.rgba(1, 1, 1, 0.08) : Qt.rgba(0, 0, 0, 0.05)
         readonly property color selection: theme.accent
         readonly property color selectionText: "#FFFFFF"

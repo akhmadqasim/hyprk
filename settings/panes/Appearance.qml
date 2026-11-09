@@ -68,7 +68,7 @@ Column {
                         required property var modelData
                         caption: modelData.t
                         selected: AppState.appearance.mode === modelData.m
-                        onPicked: AppState.setAppearance({ mode: modelData.m })
+                        onPicked: AppState.set("appearance", { mode: modelData.m })
                         MiniWindow { visible: modelData.m !== "auto"; darkWin: modelData.m === "dark" }
                         Item { // auto: light left half, dark right half
                             visible: modelData.m === "auto"; anchors.fill: parent
@@ -119,7 +119,7 @@ Column {
                     width: 268
                     value: AppState.appearance.glass
                     leftGlyph: "filter_none"; rightGlyph: "library_add"
-                    onMoved: v => AppState.setAppearance({ glass: Math.round(v * 100) / 100 })
+                    onMoved: v => AppState.set("appearance", { glass: Math.round(v * 100) / 100 })
                 }
             }
         }
@@ -152,7 +152,7 @@ Column {
                                 color: sw.modelData === "multicolor" ? "transparent" : Theme.tile[sw.modelData]
                                 gradient: sw.modelData === "multicolor" ? multi : null
                             }
-                            MouseArea { anchors.fill: parent; onClicked: AppState.setAppearance({ accent: sw.modelData }) }
+                            MouseArea { anchors.fill: parent; onClicked: AppState.set("appearance", { accent: sw.modelData }) }
                         }
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -185,7 +185,7 @@ Column {
                         w: 44; h: 44
                         caption: modelData.t
                         selected: AppState.appearance.iconStyle === modelData.t.toLowerCase()
-                        onPicked: AppState.setAppearance({ iconStyle: modelData.t.toLowerCase() })
+                        onPicked: AppState.set("appearance", { iconStyle: modelData.t.toLowerCase() })
                         Rectangle {
                             anchors.fill: parent; anchors.margins: 4; radius: 10
                             gradient: Gradient { GradientStop { position: 0; color: Qt.lighter(modelData.c, 1.25) } GradientStop { position: 1; color: modelData.c } }
@@ -203,7 +203,7 @@ Column {
             MacPopup {
                 model: ["Small", "Medium", "Large"]
                 currentIndex: Math.max(0, ["small", "medium", "large"].indexOf(AppState.appearance.sidebarIconSize))
-                onActivated: i => AppState.setAppearance({ sidebarIconSize: ["small", "medium", "large"][i] })
+                onActivated: i => AppState.set("appearance", { sidebarIconSize: ["small", "medium", "large"][i] })
             }
         }
         FormRow { label: "Allow wallpaper tinting in windows"; MacSwitch { checked: true } }

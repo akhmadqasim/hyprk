@@ -12,9 +12,13 @@ local function settingsRule(name, match)
         center      = true,
         size        = "745 640",
         min_size    = "680 420",
-        rounding    = 26,    -- Theme.window.radius; the app also draws it client-side
-        border_size = 0,     -- macOS windows have no colored border
-        -- blur and shadow stay on: the sidebar is translucent like macOS vibrancy
+        rounding       = 26,   -- Theme.window.radius; the app also draws it client-side
+        rounding_power = 2,    -- circular, to match the client-drawn corner exactly
+        -- macOS thin dark contour (SPEC.md 7.1: border_size 1, black 10-20 %)
+        border_size    = 1,
+        border_color   = "rgba(0000002e) rgba(0000001f)",   -- active, inactive
+        -- blur stays on: the translucent sidebar is the glass. The drop shadow is
+        -- decoration.shadow in config/hypr (range/colour can't be set per window).
     })
 end
 

@@ -1,0 +1,5 @@
+org.gnome.Software.desktop	Software	org.gnome.Software
+firefox_firefox.desktop	Firefox	/snap/firefox/current/default256.png
+org.gnome.Calendar.desktop	Calendar	org.gnome.Calendar
+org.gnome.Calendar.desktop	Calendar dup	x
+broken-line

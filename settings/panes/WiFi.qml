@@ -9,7 +9,7 @@ Column {
     id: pane
     spacing: Theme.content.sectionGap
 
-    property string status: "loading"    // loading | unsupported | nohw | ok
+    property string status: "loading"    // loading | missing | failed | nohw | ok
     property var device: null
     property bool radioOn: false
     property var networks: []
@@ -18,7 +18,8 @@ Column {
 
     function refresh() {
         Backend.run(["nmcli", "-t", "-f", "DEVICE,TYPE,STATE,CONNECTION", "device"], (code, out) => {
-            if (code !== 0) { status = "unsupported"; return; }
+            status = Backend.status(code);
+            if (status !== "ok") return;
             device = P.wifiDevice(P.parseNmcliDevices(out));
             if (!device) { status = "nohw"; return; }
             status = "ok";
@@ -50,7 +51,7 @@ Column {
         });
     }
     Component.onCompleted: refresh()
-    Timer { interval: 10000; running: pane.status === "ok" && pane.radioOn; repeat: true; onTriggered: pane.listNetworks() }
+    EventSource { command: ["nmcli", "monitor"]; onChanged: pane.refresh() }
 
     readonly property var current: networks.find(n => n.inUse) || null
     readonly property var others: networks.filter(n => !n.inUse)
@@ -60,7 +61,7 @@ Column {
             glyph: "wifi"; tint: Theme.tile.blue
             label: "Wi‑Fi"
             sublabel: pane.status === "nohw" ? "No hardware installed"
-                    : pane.status === "unsupported" ? "Not available on this system"
+                    : pane.status === "missing" || pane.status === "failed" ? "Not available on this system"
                     : pane.status === "ok" && pane.radioOn && pane.current ? "Connected" : ""
             MacSwitch {
                 enabled_: pane.status === "ok"
@@ -79,7 +80,7 @@ Column {
     }
 
     InlineNote {
-        text: pane.status === "unsupported" ? "NetworkManager (nmcli) is not available, so Wi‑Fi can't be managed here."
+        text: pane.status === "missing" || pane.status === "failed" ? Backend.statusNote(pane.status, "NetworkManager (nmcli)", "Wi‑Fi")
             : pane.status === "nohw" ? "This computer has no Wi‑Fi adapter. Wired connections are in Network."
             : pane.note
     }

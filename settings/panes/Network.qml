@@ -8,14 +8,19 @@ Column {
     id: pane
     spacing: Theme.content.sectionGap
     property var devices: []
-    property bool supported: true
-    Component.onCompleted: Backend.run(["nmcli", "-t", "-f", "DEVICE,TYPE,STATE,CONNECTION", "device"], (c, o) => {
-        supported = c === 0;
-        devices = P.parseNmcliDevices(o).filter(d => ["ethernet", "wifi", "vpn", "wireguard", "bt"].indexOf(d.type) !== -1);
-    })
+    property string status: "loading"
+    readonly property bool supported: status !== "missing" && status !== "failed"
+    function refresh() {
+        Backend.run(["nmcli", "-t", "-f", "DEVICE,TYPE,STATE,CONNECTION", "device"], (c, o) => {
+            status = Backend.status(c);
+            devices = P.parseNmcliDevices(o).filter(d => ["ethernet", "wifi", "vpn", "wireguard", "bt"].indexOf(d.type) !== -1);
+        });
+    }
+    Component.onCompleted: refresh()
+    EventSource { command: ["nmcli", "monitor"]; onChanged: pane.refresh() }
 
     Card {
-        FormRow { visible: !pane.supported || pane.devices.length === 0; label: pane.supported ? "No network services" : "Network services can't be listed"; sublabel: pane.supported ? "" : "NetworkManager (nmcli) is not available."; dim: true }
+        FormRow { visible: !pane.supported || pane.devices.length === 0; label: pane.supported ? "No network services" : "Network services can't be listed"; sublabel: Backend.statusNote(pane.status, "NetworkManager (nmcli)", "network services"); dim: true }
         Repeater {
             model: pane.devices
             FormRow {

@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import ".."
 
 // Colored rounded-square tile with a white glyph. Uses themes/icons/settings/<iconId>.png
@@ -8,6 +9,7 @@ Item {
     property int size: Theme.sidebar.iconSize
     property string glyph
     property string iconId
+    property string imageSource          // e.g. an app icon; wins over iconId
     property color tint: Theme.tile.blue
     width: size; height: size
 
@@ -15,9 +17,13 @@ Item {
         id: asset
         anchors.fill: parent
         visible: status === Image.Ready
-        source: pi.iconId !== "" ? Backend.root + "/themes/icons/settings/" + pi.iconId + ".png" : ""
+        source: pi.imageSource !== "" ? pi.imageSource
+              : pi.iconId !== "" ? "file://" + Backend.root + "/themes/icons/settings/" + pi.iconId + ".png" : ""
         sourceSize: Qt.size(pi.size * 2, pi.size * 2)
         smooth: true; mipmap: true
+        // "Clear" icon style shows images as monochrome glass, like macOS 26+
+        layer.enabled: pi.style === "clear"
+        layer.effect: MultiEffect { saturation: -1.0; brightness: 0.05 }
     }
     // Icon & widget style (Appearance pane): default = colored tile, dark = black tile with
     // a tinted glyph, clear = gray glass tile, tinted = accent-colored tile.

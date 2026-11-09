@@ -17,7 +17,7 @@ Column {
             MacSlider {
                 width: 230; from: 16; to: 128; value: pane.d.size
                 leftGlyph: "remove"; rightGlyph: "add"
-                onMoved: v => AppState.setDock({ size: Math.round(v) })
+                onMoved: v => AppState.set("dock", { size: Math.round(v) })
             }
         }
         FormRow {
@@ -26,16 +26,16 @@ Column {
                 width: 230; from: 16; to: 128; value: pane.d.magnifiedSize
                 enabled_: pane.d.magnification
                 leftGlyph: "remove"; rightGlyph: "add"
-                onMoved: v => AppState.setDock({ magnifiedSize: Math.round(v) })
+                onMoved: v => AppState.set("dock", { magnifiedSize: Math.round(v) })
             }
-            MacSwitch { checked: pane.d.magnification; onToggled: on => AppState.setDock({ magnification: on }) }
+            MacSwitch { checked: pane.d.magnification; onToggled: on => AppState.set("dock", { magnification: on }) }
         }
         FormRow {
             label: "Position on screen"
             MacPopup {
                 model: ["Left", "Bottom", "Right"]
                 currentIndex: pane.positions.indexOf(pane.d.position)
-                onActivated: i => AppState.setDock({ position: pane.positions[i] })
+                onActivated: i => AppState.set("dock", { position: pane.positions[i] })
             }
         }
         FormRow {
@@ -43,15 +43,15 @@ Column {
             MacPopup {
                 model: ["Genie Effect", "Scale Effect"]
                 currentIndex: Math.max(0, pane.effects.indexOf(pane.d.minimizeEffect))
-                onActivated: i => AppState.setDock({ minimizeEffect: pane.effects[i] })
+                onActivated: i => AppState.set("dock", { minimizeEffect: pane.effects[i] })
             }
         }
         FormRow { label: "Double-click a window's title bar to"; MacPopup { model: ["Zoom", "Minimize", "Do Nothing"] } }
         FormRow { label: "Minimize windows into application icon"; MacSwitch {} }
-        FormRow { label: "Automatically hide and show the Dock"; MacSwitch { checked: pane.d.autohide; onToggled: on => AppState.setDock({ autohide: on }) } }
+        FormRow { label: "Automatically hide and show the Dock"; MacSwitch { checked: pane.d.autohide; onToggled: on => AppState.set("dock", { autohide: on }) } }
         FormRow { label: "Animate opening applications"; MacSwitch { checked: true } }
         FormRow { label: "Show indicators for open applications"; MacSwitch { checked: true } }
-        FormRow { label: "Show suggested and recent apps in Dock"; MacSwitch { checked: pane.d.showRecents; onToggled: on => AppState.setDock({ showRecents: on }) } }
+        FormRow { label: "Show suggested and recent apps in Dock"; MacSwitch { checked: pane.d.showRecents; onToggled: on => AppState.set("dock", { showRecents: on }) } }
     }
 
     Card {

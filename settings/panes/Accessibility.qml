@@ -17,7 +17,7 @@ Column {
         FormRow {
             label: "Reduce transparency"
             sublabel: "Improves contrast by reducing transparency in windows, menus and the Dock."
-            MacSwitch { checked: AppState.appearance.reduceTransparency; onToggled: on => AppState.setAppearance({ reduceTransparency: on }) }
+            MacSwitch { checked: AppState.appearance.reduceTransparency; onToggled: on => AppState.set("appearance", { reduceTransparency: on }) }
         }
         FormRow { label: "Increase contrast"; MacSwitch {} }
         FormRow { label: "Reduce motion"; MacSwitch {} }
