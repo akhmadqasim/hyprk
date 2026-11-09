@@ -10,7 +10,7 @@ local function settingsRule(name, match)
         match       = match,
         float       = true,
         center      = true,
-        size        = "745 640",
+        size        = "745 630",
         min_size    = "680 420",
         rounding       = 26,   -- Theme.window.radius; the app also draws it client-side
         rounding_power = 2,    -- circular, to match the client-drawn corner exactly

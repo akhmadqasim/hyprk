@@ -48,10 +48,10 @@ Accessibility > Display > "Reduce transparency" writes `reduceTransparency` to
 
 ## Sidebar glass
 
-The sidebar area of the window is translucent. Under Hyprland the compositor blurs what is
-behind it (decoration.blur in config/hypr). Elsewhere (GNOME, plain `qml`) the sidebar
-paints the current wallpaper itself, blurred and desaturated (`controls/SidebarBackdrop.qml`).
-Reduce transparency turns both off and uses an opaque fill.
+Under Hyprland the sidebar is a light warm fill at 88 % alpha over the compositor blur
+(decoration.blur in config/hypr), so the desktop only softly shows through, like the
+reference (238,236,234). Elsewhere (GNOME, plain `qml`) and with Reduce transparency it
+is the same colour, opaque.
 
 ## Assets
 

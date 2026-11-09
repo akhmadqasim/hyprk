@@ -134,6 +134,7 @@ test("sound.json defaults and clamping", () => {
 test("prettyFileName", () => {
     assert.equal(P.prettyFileName("/w/png/Mac_Blue-dark.png"), "Mac Blue dark");
     assert.equal(P.prettyFileName(""), "");
+    assert.equal(P.prettyFileName("/w/DefaultAerial.png"), "Default Aerial");
 });
 
 test("lock.json, input.json, notifications.json defaults", () => {

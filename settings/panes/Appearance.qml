@@ -1,6 +1,7 @@
 import QtQuick
 import ".."
 import "../controls"
+import "../Parsers.js" as P
 
 // Functional: writes mode/dark/accent to state/appearance.json (read by the shell).
 Column {
@@ -93,8 +94,20 @@ Column {
                         GradientStop { position: 1; color: "#2F5A2E" }
                     }
                     RoundedImage {
+                        id: preview
                         anchors.fill: parent; radius: 14; decodeWidth: 540
                         path: AppState.wallpaperImage || Backend.root + "/themes/wallpapers/png/DefaultAerial.png"
+                    }
+                    Rectangle { // ref: a document title strip under the photo
+                        anchors.bottom: parent.bottom
+                        width: parent.width; height: 40
+                        bottomLeftRadius: 14; bottomRightRadius: 14
+                        color: Theme.dark ? "#2C2C2E" : "#ECEAE7"
+                        MacText {
+                            x: 16; anchors.verticalCenter: parent.verticalCenter
+                            text: P.prettyFileName(preview.path)
+                            font.pixelSize: Theme.font.title + 2; weight: Font.DemiBold
+                        }
                     }
                     Row {
                         x: 8; y: 8; spacing: 6
@@ -118,7 +131,7 @@ Column {
                 MacSlider {
                     width: 268
                     value: AppState.appearance.glass
-                    leftGlyph: "filter_none"; rightGlyph: "library_add"
+                    leftGlyph: "filter_none"; rightGlyph: "content_copy"
                     onMoved: v => AppState.set("appearance", { glass: Math.round(v * 100) / 100 })
                 }
             }
@@ -167,6 +180,15 @@ Column {
         }
         FormRow {
             label: "Text highlight color"
+            Rectangle { // ref: swatch of the current highlight colour before the pop-up
+                width: 16; height: 16; radius: 8
+                anchors.verticalCenter: parent ? parent.verticalCenter : undefined
+                gradient: Gradient {
+                    orientation: Gradient.Horizontal
+                    GradientStop { position: 0; color: Qt.lighter(Theme.accent, 1.6) }
+                    GradientStop { position: 1; color: "#E9A6C7" }
+                }
+            }
             MacPopup { model: ["Automatic", "Accent Color", "Blue", "Purple", "Pink", "Red", "Orange", "Yellow", "Green", "Graphite"] }
         }
     }

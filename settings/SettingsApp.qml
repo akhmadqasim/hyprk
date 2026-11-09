@@ -66,14 +66,6 @@ Item {
         topLeftRadius: Theme.window.radius
         bottomLeftRadius: Theme.window.radius
         color: Theme.sidebar.fill
-        // Without compositor blur (GNOME, plain qml), paint the blurred wallpaper ourselves
-        // so the sidebar still reads as glass. Hidden when Reduce transparency is on.
-        SidebarBackdrop {
-            z: -1
-            anchors.fill: parent
-            radius: Theme.window.radius
-            visible: !Theme.reduceTransparency && !Backend.compositorBlur
-        }
         Rectangle { anchors.right: parent.right; width: 1; height: parent.height; color: Theme.sidebar.stroke }
 
         MouseArea { // dragging the empty top of the sidebar moves the window
@@ -83,7 +75,7 @@ Item {
         TrafficLights {
             x: Theme.lights.left
             y: (Theme.window.toolbarHeight - Theme.lights.size) / 2
-            active: app.windowActive
+            active: app.windowActive || app.snapshotPath !== ""   // snapshots show the focused look
             onCloseClicked: app.closeRequested()
             onMinimizeClicked: app.minimizeRequested()
             onZoomClicked: app.zoomRequested()
@@ -102,11 +94,16 @@ Item {
             boundsBehavior: Flickable.StopAtBounds
             model: app.visiblePanes
             // keep the selected pane visible (deep links, back/forward)
+            // Scroll only when the row is (partly) out of view, so the list normally
+            // stays at the top like macOS.
             function reveal() {
                 const i = app.visiblePanes.findIndex(p => p.id === app.currentId);
-                if (i >= 0) positionViewAtIndex(i, ListView.Contain);
+                const row = i >= 0 ? itemAtIndex(i) : null;
+                if (i >= 0 && (!row || row.y < contentY || row.y + row.height > contentY + height))
+                    positionViewAtIndex(i, ListView.Contain);
             }
-            Component.onCompleted: Qt.callLater(reveal)
+            // after the first layout, when the delegates in view exist
+            Timer { interval: 100; running: true; onTriggered: list.reveal() }
             Connections { target: app; function onCurrentIdChanged() { list.reveal(); } }
             header: search.text === "" ? accountCard : null
             delegate: Item {

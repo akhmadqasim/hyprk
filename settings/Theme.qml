@@ -49,7 +49,7 @@ QtObject {
     // ---------- window ----------
     readonly property QtObject window: QtObject {
         readonly property int width: 745              // ref
-        readonly property int height: 640             // ref crop ends at 630, TODO verify
+        readonly property int height: 630             // ref (1260 px at 2x)
         readonly property int minWidth: 680          // TODO verify
         readonly property int minHeight: 420         // TODO verify
         readonly property int radius: 26             // macOS 26 toolbar window corner, TODO verify
@@ -90,7 +90,11 @@ QtObject {
         readonly property int accountAvatar: 40      // TODO verify
         readonly property color fill: theme.reduceTransparency
             ? (theme.dark ? "#2A2A2C" : "#EEECEA")                                        // ref (light)
-            : (theme.dark ? Qt.rgba(0.15, 0.15, 0.16, 0.62) : Qt.rgba(0.96, 0.95, 0.94, 0.62)) // tint over blurred desktop, TODO verify alpha
+            : Backend.compositorBlur
+                // ref (238,236,234): a light warm fill, blur only softly shows through
+                ? (theme.dark ? Qt.rgba(0.165, 0.165, 0.173, 0.88) : Qt.rgba(0.933, 0.925, 0.918, 0.88))
+                // no compositor blur: flat colour
+                : (theme.dark ? "#2A2A2C" : "#EEECEA")
         readonly property color stroke: theme.dark ? Qt.rgba(1, 1, 1, 0.08) : Qt.rgba(0, 0, 0, 0.05)
         readonly property color selection: theme.accent
         readonly property color selectionText: "#FFFFFF"

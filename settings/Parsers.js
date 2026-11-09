@@ -223,9 +223,9 @@ function parseDesktopApps(text) {
         .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-// "/x/Mac_Blue-dark.png" -> "Mac Blue dark"
+// "/x/Mac_Blue-dark.png" -> "Mac Blue dark", "DefaultAerial.png" -> "Default Aerial"
 function prettyFileName(path) {
-    return String(path || "").split("/").pop().replace(/\.[^.]+$/, "").replace(/[-_]/g, " ");
+    return String(path || "").split("/").pop().replace(/\.[^.]+$/, "").replace(/[-_]/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2");
 }
 
 // A state file's text with unsaved local changes on top; missing or corrupt files
