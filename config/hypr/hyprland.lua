@@ -4,13 +4,22 @@
 local hyprk   = os.getenv("HYPRK_ROOT") or "/mnt/code/hyprk"
 local shell   = hyprk .. "/shell"
 local terminal = os.getenv("HYPRK_TERMINAL") or "ghostty"
+local sound   = shell .. "/scripts/sound.sh"
 
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "1" })
 -- MacBook Air-like headless output for screenshots: `hyprctl output create headless MBA`
 hl.monitor({ output = "MBA", mode = "2560x1664@60", position = "auto", scale = "2" })
 
+-- macOS cursors (themes/cursors, Xcursor + hyprcursor). Size is in logical px,
+-- so 24 renders at 48 px on the scale-2 MBA output.
+local cursors = hyprk .. "/themes/cursors/theme"
+-- start.sh already exports these for Hyprland itself; repeat them for apps it launches
+hl.env("XCURSOR_PATH", cursors .. ":" .. (os.getenv("XCURSOR_PATH") or "/usr/share/icons"))
+hl.env("XCURSOR_THEME", "hyprk-cursors")
 hl.env("XCURSOR_SIZE", "24")
+hl.env("HYPRCURSOR_THEME", "hyprk-cursors")
 hl.env("HYPRCURSOR_SIZE", "24")
+
 hl.env("QT_QPA_PLATFORM", "wayland")
 
 hl.on("hyprland.start", function()
@@ -30,8 +39,8 @@ hl.config({
         layout = "dwindle",
     },
     decoration = {
-        rounding = 16,                   -- macOS 26+ window corner radius, TODO verify vs SPEC.md
-        rounding_power = 3,              -- squircle-ish (continuous corners)
+        rounding = 16,                   -- SPEC.md 7: titled window corner radius 16 pt
+        rounding_power = 2.8,            -- SPEC.md 7.1: continuous corner guess
         active_opacity = 1.0,
         inactive_opacity = 1.0,
         shadow = {
@@ -133,11 +142,18 @@ for i = 1, 9 do
 end
 hl.bind("CTRL + left",  hl.dsp.focus({ workspace = "e-1" }))
 hl.bind("CTRL + right", hl.dsp.focus({ workspace = "e+1" }))
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 6%+"), { locked = true, repeating = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 6%-"),      { locked = true, repeating = true })
+-- volume keys play the macOS volume pop (honors state/sound.json volumeFeedback)
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 6%+ && " .. sound .. " volume"), { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 6%- && " .. sound .. " volume"),      { locked = true, repeating = true })
 hl.bind("XF86AudioMute",        hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true })
 hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("brightnessctl set 6%+"), { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("brightnessctl set 6%-"), { locked = true, repeating = true })
+
+-- screenshots like macOS: Cmd+Shift+3 full screen, Cmd+Shift+4 area (needs slurp), shutter sound
+local shotFile = '"${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshot $(date "+%Y-%m-%d at %H.%M.%S").png"'
+hl.bind(cmd .. " + SHIFT + 3", hl.dsp.exec_cmd("grim " .. shotFile .. " && " .. sound .. " screenshot"))
+hl.bind(cmd .. " + SHIFT + 4", hl.dsp.exec_cmd("command -v slurp >/dev/null && grim -g \"$(slurp)\" " .. shotFile .. " && " .. sound .. " screenshot"))
+hl.bind("Print",               hl.dsp.exec_cmd("grim " .. shotFile .. " && " .. sound .. " screenshot"))
 
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 

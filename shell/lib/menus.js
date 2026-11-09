@@ -74,6 +74,24 @@ const apps = {
     "settings": { titles: ["Edit", "View", "Window", "Help"], extra: {} },
 };
 
+// the bold app-name menu
+function appMenu(name) {
+    return [
+        { label: "About " + name }, SEP,
+        { label: "Settings…", shortcut: "⌘," }, SEP,
+        { label: "Hide " + name, shortcut: "⌘H" }, { label: "Hide Others", shortcut: "⌥⌘H" }, SEP,
+        { label: "Quit " + name, shortcut: "⌘Q", action: "close" },
+    ];
+}
+
+// menu bar title index -> items: 0 Apple, 1 app name, 2.. app menus
+function forIndex(index, appId, appName, user) {
+    if (index === 0) return apple(user);
+    if (index === 1) return appMenu(appName);
+    const m = forApp(appId)[index - 2];
+    return m ? m.items : [];
+}
+
 function forApp(appId) {
     const key = String(appId || "").toLowerCase().split(".").pop();
     const spec = apps[key] || (appId ? { titles: ["File", "Edit", "View", "Window", "Help"], extra: { "File": fileMenu() } } : finder);

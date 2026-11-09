@@ -44,14 +44,8 @@ PanelWindow {
         y: Theme.menu.offsetY
         originX: x
         originY: y + Theme.menuBar.height
-        items: Panels.menuIndex === 0 ? Menus.apple(Quickshell.env("USER"))
-             : Panels.menuIndex === 1 ? [{ label: "About " + Apps.activeAppName() }, { sep: true },
-                                         { label: "Settings…", shortcut: "⌘," }, { sep: true },
-                                         { label: "Hide " + Apps.activeAppName(), shortcut: "⌘H" },
-                                         { label: "Hide Others", shortcut: "⌥⌘H" }, { sep: true },
-                                         { label: "Quit " + Apps.activeAppName(), shortcut: "⌘Q", action: "close" }]
-             : Panels.menuIndex >= 2 ? (Menus.forApp(Apps.appIdOf(Hyprland.activeToplevel))[Panels.menuIndex - 2] || { items: [] }).items
-             : []
+        items: Panels.menuIndex < 0 ? []
+             : Menus.forIndex(Panels.menuIndex, Apps.appIdOf(Hyprland.activeToplevel), Apps.activeAppName(), Quickshell.env("USER"))
     }
 
     // ---------- control center ----------

@@ -28,7 +28,7 @@ PanelWindow {
     property string query: ""
     property int selected: 0
     readonly property var calcValue: Search.calc(query)
-    readonly property var apps: Search.rank(Apps.entries, query, Theme.spotlight.maxRows)
+    readonly property var apps: shown && query.trim() !== "" ? Search.rank(Apps.entries, query, Theme.spotlight.maxRows) : []
     // rows: {kind: "calc"|"app"|"files", ...}
     readonly property var rows: {
         if (query.trim() === "") return [];
@@ -51,7 +51,7 @@ PanelWindow {
         const row = rows[selected];
         if (!row) return;
         if (row.kind === "app") Apps.launch(row.entry, row.entry.id);
-        else if (row.kind === "calc") Quickshell.execDetached(["wl-copy", row.title]);
+        else if (row.kind === "calc") Quickshell.clipboardText = row.title;
         Panels.close();
     }
 

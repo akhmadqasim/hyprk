@@ -31,7 +31,7 @@ Singleton {
 
     Process {
         id: proc
-        command: [Theme.root + "/scripts/wallpaper.sh", String(root.width), String(root.height), String(Theme.glass.blurRadius), Theme.dark ? "dark" : "light"]
+        command: [Quickshell.shellDir + "/scripts/wallpaper.sh", String(root.width), String(root.height), String(Theme.glass.blurRadius), Theme.dark ? "dark" : "light"]
         stdout: StdioCollector {
             onStreamFinished: {
                 for (const line of text.split("\n")) {

@@ -67,7 +67,7 @@ Item {
         x: cc.colX(1); y: cc.rowY(0)
         width: cc.colW
         height: cc.rowH * 2 + cc.gap
-        radius: Theme.cc.bigTileRadius
+        radius: Theme.cc.tileRadius
 
         ClippingRectangle {
             x: Theme.cc.tilePadding + 4

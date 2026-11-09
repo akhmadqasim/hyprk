@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "lib/state.js" as State
 
 // Single source of truth for every visual metric of the hyprk shell.
 // Units are logical pixels (1pt on macOS == 1 logical px here).
@@ -20,7 +21,6 @@ Singleton {
     property bool reduceTransparency: false
     property bool blurAvailable: true
     readonly property bool solidMaterial: reduceTransparency || !blurAvailable
-    readonly property string root: Quickshell.shellDir
     readonly property string hyprkRoot: Quickshell.shellDir + "/.."
 
     // ---------- fonts ----------
@@ -34,8 +34,6 @@ Singleton {
     }
     readonly property string fontText: pickFont(["SF Pro Text", "SF Pro", "System Font", ".SF NS", "Inter", "Cantarell", "Sans Serif"])
     readonly property string fontDisplay: pickFont(["SF Pro Display", "SF Pro", "System Font", ".SF NS", "Inter Display", "Inter", "Cantarell", "Sans Serif"])
-    readonly property string fontRounded: pickFont(["SF Pro Rounded", ".SF NS Rounded", "System Font", ".SF NS", "Inter", "Cantarell", "Sans Serif"])
-    readonly property string fontMono: pickFont(["SF Mono", ".SF NS Mono", "JetBrains Mono", "DejaVu Sans Mono", "Monospace"])
 
     FileView {
         path: theme.hyprkRoot + "/state/appearance.json"
@@ -43,13 +41,9 @@ Singleton {
         printErrors: false
         onFileChanged: reload()
         onLoaded: {
-            try {
-                const o = JSON.parse(text());
-                if (o.dark !== undefined) theme.dark = !!o.dark;
-                if (o.reduceTransparency !== undefined) theme.reduceTransparency = !!o.reduceTransparency;
-            } catch (e) {
-                console.warn("appearance.json: " + e);
-            }
+            const o = State.parse(text(), { dark: theme.dark, reduceTransparency: theme.reduceTransparency });
+            theme.dark = o.dark;
+            theme.reduceTransparency = o.reduceTransparency;
         }
     }
 
@@ -58,7 +52,7 @@ Singleton {
         function toggle(): void { theme.dark = !theme.dark; }
         function setDark(on: bool): void { theme.dark = on; }
         function toggleTransparency(): void { theme.reduceTransparency = !theme.reduceTransparency; }
-        function fonts(): string { return [theme.fontText, theme.fontDisplay, theme.fontRounded, theme.fontMono].join(" / "); }
+        function fonts(): string { return theme.fontText + " / " + theme.fontDisplay; }
     }
 
     readonly property QtObject font: QtObject {
@@ -71,7 +65,6 @@ Singleton {
         readonly property real notifApp: 11         // TODO verify
         readonly property real ccTitle: 13          // measured ~2x reference
         readonly property real ccSub: 11            // TODO verify
-        readonly property real ccSection: 13        // TODO verify
         readonly property real spotlightInput: 22   // TODO verify
         readonly property real spotlightRow: 14     // TODO verify
         readonly property real spotlightHeader: 11  // TODO verify
@@ -96,41 +89,22 @@ Singleton {
         readonly property color tertiaryLabel: theme.dark ? Qt.rgba(1, 1, 1, 0.25) : Qt.rgba(0, 0, 0, 0.26)
         readonly property color separator: theme.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.10)
         readonly property color accent: theme.dark ? "#0A84FF" : "#007AFF"           // systemBlue
-        readonly property color accentText: "#FFFFFF"
-        readonly property color green: theme.dark ? "#30D158" : "#34C759"
         readonly property color red: theme.dark ? "#FF453A" : "#FF3B30"
-        readonly property color orange: theme.dark ? "#FF9F0A" : "#FF9500"
-        readonly property color purple: theme.dark ? "#BF5AF2" : "#AF52DE"
         readonly property color indigo: theme.dark ? "#5E5CE6" : "#5856D6"
 
         // Menu bar is transparent in macOS 26+; text is white over the wallpaper.
         readonly property color menuBarText: "#FFFFFF"                               // TODO verify (adapts to wallpaper luma)
-        readonly property color menuBarShadow: Qt.rgba(0, 0, 0, 0.35)                 // TODO verify
         readonly property color menuBarHighlight: Qt.rgba(1, 1, 1, 0.22)              // pressed title pill, TODO verify
         readonly property color menuBarBackground: Qt.rgba(0, 0, 0, 0.0)              // "Show menu bar background" off
 
         // menu highlight
         readonly property color menuSelection: accent
         readonly property color menuSelectionText: "#FFFFFF"
-        readonly property color shortcutText: secondaryLabel
 
-        // control tiles
-        readonly property color toggleOn: accent
-        readonly property color toggleOff: theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0, 0, 0, 0.08)
-        readonly property color toggleOffIcon: label
-        readonly property color tile: theme.dark ? Qt.rgba(1, 1, 1, 0.08) : Qt.rgba(1, 1, 1, 0.45)  // TODO verify
-        readonly property color sliderTrack: theme.dark ? Qt.rgba(1, 1, 1, 0.16) : Qt.rgba(0, 0, 0, 0.10)
-        readonly property color sliderFill: theme.dark ? Qt.rgba(1, 1, 1, 0.92) : "#FFFFFF"
-        readonly property color sliderKnobShadow: Qt.rgba(0, 0, 0, 0.25)
-        readonly property color sliderIcon: Qt.rgba(0, 0, 0, 0.55)
 
         readonly property color dockDot: theme.dark ? Qt.rgba(1, 1, 1, 0.65) : Qt.rgba(0, 0, 0, 0.55)
         readonly property color tooltipBg: theme.dark ? Qt.rgba(0.16, 0.16, 0.17, 0.92) : Qt.rgba(0.95, 0.95, 0.96, 0.92)
-        readonly property color searchField: theme.dark ? Qt.rgba(1, 1, 1, 0.08) : Qt.rgba(0, 0, 0, 0.05)
-        readonly property color rowSelection: accent
         readonly property color switcherSelection: theme.dark ? Qt.rgba(1, 1, 1, 0.18) : Qt.rgba(0, 0, 0, 0.12)
-        readonly property color scrim: Qt.rgba(0, 0, 0, 0.25)
-        readonly property color disabled: tertiaryLabel
         readonly property real disabledOpacity: 0.4      // unavailable CC tiles, TODO verify
     }
 
@@ -138,7 +112,6 @@ Singleton {
     // QML stand-in for Liquid Glass until the compositor plugin lands.
     readonly property QtObject glass: QtObject {
         readonly property real blurRadius: 40                 // px, magick gaussian sigma ~ radius/2, TODO verify
-        readonly property real saturation: 1.8                // vibrancy boost, TODO verify
         // tint over the blurred wallpaper
         readonly property color tint: theme.dark ? Qt.rgba(0.11, 0.11, 0.12, 0.55) : Qt.rgba(0.98, 0.98, 0.99, 0.55)   // TODO verify
         readonly property color tintStrong: theme.dark ? Qt.rgba(0.12, 0.12, 0.13, 0.72) : Qt.rgba(0.97, 0.97, 0.98, 0.74) // menus / spotlight
@@ -154,50 +127,49 @@ Singleton {
         readonly property real rimWidth: 1
         // drop shadow
         readonly property color shadow: Qt.rgba(0, 0, 0, theme.dark ? 0.45 : 0.22)   // TODO verify
-        readonly property real shadowBlur: 1.0          // MultiEffect shadowBlur 0..1
         readonly property real shadowRadius: 24         // px of blurMax, TODO verify
         readonly property real shadowYOffset: 8         // TODO verify
     }
 
     // ---------- menu bar ----------
     readonly property QtObject menuBar: QtObject {
-        readonly property int height: 24                 // non-notch display, TODO verify
+        readonly property int height: 30                 // SPEC.md 7: Solarium menu bar 30 pt (legacy 24)
         readonly property int sidePadding: 14            // left edge to Apple logo / right edge to clock, TODO verify
         readonly property int appleLogoSize: 14          // TODO verify
         readonly property int titleHPadding: 9           // inner padding of a menu title pill, TODO verify
         readonly property int titleSpacing: 2            // gap between pills, TODO verify
         readonly property int titleRadius: 6             // pressed pill radius (macOS 26 rounded), TODO verify
-        readonly property int titleHeight: 20            // pressed pill height, TODO verify
+        readonly property int titleHeight: 24            // pressed pill height, TODO verify
         readonly property int statusIconSize: 16         // TODO verify
         readonly property int statusSpacing: 4           // ~20pt icon pitch in reference, TODO verify
         readonly property int statusHPadding: 8          // TODO verify
-        readonly property string clockFormat: "ddd d MMM  HH:mm"   // "Tue 10 Nov  02:55", two spaces like macOS
     }
 
     // ---------- pull-down menus ----------
     readonly property QtObject menu: QtObject {
         readonly property int radius: 12                 // macOS 26 menus, TODO verify
-        readonly property int padding: 5                 // vertical inset of the item list, TODO verify
-        readonly property int itemHeight: 22             // TODO verify
+        readonly property int padding: 5                 // SPEC.md 7: menu top/bottom padding 5
+        readonly property int itemHeight: 24             // SPEC.md 7: glass menu line height 24
         readonly property int itemHPadding: 12           // text inset inside highlight, TODO verify
         readonly property int itemInset: 5               // highlight inset from menu edge, TODO verify
         readonly property int itemRadius: 6              // highlight radius, TODO verify
         readonly property int separatorHeight: 11        // incl. spacing, TODO verify
         readonly property int minWidth: 220              // TODO verify
         readonly property int offsetY: 3                 // gap below menu bar, TODO verify
-        readonly property int checkColumn: 10            // left column for check marks, TODO verify
     }
 
     // ---------- dock ----------
     readonly property QtObject dock: QtObject {
         // iconSize is the icon cell; macOS icon art leaves ~10% transparent margin inside it.
-        readonly property int iconSize: 56               // reference/screens/macos27-dock-default.png, TODO verify
-        readonly property int magnifiedSize: 88          // TODO verify
-        readonly property int magnifyRange: 3            // icons affected each side, TODO verify
-        readonly property int iconSpacing: 3             // TODO verify
-        readonly property int padding: 6                 // inner padding around icons, TODO verify
-        readonly property int radius: 24                 // ~0.35 x dock height, measured from reference
-        readonly property int bottomMargin: 4            // floating gap to screen edge, TODO verify
+        // SPEC.md 7 (Dock binary): tilesize 64 if the display is > 800 pt tall, else 52
+        readonly property int iconSize: Quickshell.screens.length > 0 && Quickshell.screens[0].height <= 800 ? 52 : 64
+        readonly property int magnifiedSize: 128         // SPEC.md 7: largesize default 128
+        readonly property real magnifyRange: 1.5         // SPEC.md 7: magnification width 3 x tilesize (1.5 each side)
+        readonly property int iconSpacing: 2             // SPEC.md 7: tile inset 1 (each side)
+        readonly property int padding: 6                 // SPEC.md 7: distance top 6 (symmetric bottom assumed)
+        readonly property int sidePadding: 8             // SPEC.md 7: distance sides 8
+        readonly property int radius: 26                 // ~0.34 x dock height, measured from reference (no SPEC value)
+        readonly property int bottomMargin: 4            // SPEC.md 7: icons 10 pt above the edge minus padding 6
         readonly property int dotSize: 4                 // running indicator, TODO verify
         readonly property int dotOffset: 1               // dot distance below icon, TODO verify
         readonly property int separatorWidth: 1          // TODO verify
@@ -232,7 +204,7 @@ Singleton {
         readonly property int marginRight: 14            // TODO verify
         readonly property int spacing: 16                // between widgets
         readonly property int widgetRadius: 22
-        readonly property int widgetSmall: 156           // (width - spacing) / 2
+        readonly property int widgetSmall: (width - spacing) / 2
         readonly property int widgetPadding: 16
         readonly property color calendarBg: theme.dark ? Qt.rgba(0.17, 0.17, 0.18, 0.92) : Qt.rgba(1, 1, 1, 0.94)
         readonly property color clockBg: "#1C1C1E"
@@ -249,8 +221,7 @@ Singleton {
         readonly property int gap: 12                    // between modules, measured
         readonly property int width: columnWidth * 2 + gap
         readonly property int tileHeight: 60             // capsule module height, measured
-        readonly property int tileRadius: 30             // capsule = height / 2
-        readonly property int bigTileRadius: 30          // Now Playing 2x2 module, TODO verify
+        readonly property int tileRadius: tileHeight / 2 // capsule
         readonly property int tilePadding: 12            // TODO verify
         readonly property int toggleSize: 35             // white circle inside a capsule, measured
         readonly property int sliderTrack: 4             // thin track, measured
@@ -264,7 +235,7 @@ Singleton {
         readonly property color text: "#FFFFFF"
         readonly property color subtext: Qt.rgba(1, 1, 1, 0.78)
         readonly property color toggleOnBg: "#FFFFFF"
-        readonly property color toggleOnIcon: theme.dark ? "#0A84FF" : "#007AFF"
+        readonly property color toggleOnIcon: theme.dark ? "#0A84FF" : "#007AFF"   // systemBlue (= color.accent)
         readonly property color toggleOffBg: Qt.rgba(1, 1, 1, 0.18)
         readonly property color toggleOffIcon: "#FFFFFF"
         readonly property color sliderTrackColor: Qt.rgba(1, 1, 1, 0.28)
@@ -274,16 +245,16 @@ Singleton {
     // ---------- spotlight ----------
     readonly property QtObject spotlight: QtObject {
         // one glass panel: search row, hairline, results (reference/screens/macos27-spotlight.png)
-        readonly property int width: 680                 // TODO verify
-        readonly property int barHeight: 54              // TODO verify
-        readonly property int radius: 27                 // capsule while empty, TODO verify
-        readonly property int resultsRadius: 26          // expanded panel, TODO verify
+        readonly property int width: 640                 // SPEC.md 7: standardWindowWidth 640
+        readonly property int barHeight: 56              // SPEC.md 7: heightCollapsed 56
+        readonly property int radius: 28                 // SPEC.md 7: windowCornerRadius 28
+        readonly property int resultsRadius: 28          // same window radius when expanded
         readonly property int topFraction: 4             // panel top = screen height / topFraction, TODO verify
         readonly property int iconSize: 20               // magnifier, TODO verify
         readonly property int rowHeight: 38              // TODO verify
         readonly property int rowIcon: 30                // TODO verify
         readonly property int rowRadius: 12              // TODO verify
-        readonly property int hPadding: 18               // TODO verify
+        readonly property int hPadding: 20               // SPEC.md 7: content inset 20
         readonly property int listInset: 8               // rows inset from panel edge, TODO verify
         readonly property int maxRows: 8
     }
@@ -315,13 +286,9 @@ Singleton {
     readonly property QtObject anim: QtObject {
         readonly property int fast: 120                  // hover / press
         readonly property int normal: 220                // panels open
-        readonly property int slow: 350                  // launchpad zoom
-        readonly property int menuFadeOut: 150           // TODO verify
         readonly property int bannerIn: 380              // TODO verify
         readonly property int bounce: 340                // one dock bounce up+down, TODO verify
         readonly property int magnify: 90                // dock magnification follow, TODO verify
         readonly property int easing: Easing.OutCubic
-        readonly property int easingSpring: Easing.OutBack
-        readonly property real springOvershoot: 1.2
     }
 }

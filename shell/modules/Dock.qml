@@ -16,6 +16,7 @@ PanelWindow {
 
     readonly property int base: Theme.dock.iconSize
     readonly property int pad: Theme.dock.padding
+    readonly property int sidePad: Theme.dock.sidePadding
     readonly property int bgHeight: base + pad * 2
     readonly property int tooltipRoom: Theme.dock.tooltipHeight + Theme.dock.tooltipGap + 8
 
@@ -34,8 +35,9 @@ PanelWindow {
     // separator cell width; Row spacing on both sides is part of the visual gap
     readonly property real sepCell: Theme.dock.separatorHPad * 2 + Theme.dock.separatorWidth - Theme.dock.iconSpacing * 2
     // unmagnified width, used for hover math so magnification does not feed back into itself
-    readonly property real baseWidth: (items.length - 1) * base + sepCell + (items.length - 1) * Theme.dock.iconSpacing + pad * 2
+    readonly property real baseWidth: (items.length - 1) * base + sepCell + (items.length - 1) * Theme.dock.iconSpacing + sidePad * 2
     property real mouseX: -1
+    property real trashMenuX: -1         // >= 0 while the Trash context menu is open (window x of its center)
     readonly property bool hovering: mouseX >= 0
 
     function sizeFor(baseCenter) {
@@ -50,7 +52,7 @@ PanelWindow {
         id: hit
         x: bg.x
         width: bg.width
-        y: dock.hovering ? bg.y - (Theme.dock.magnifiedSize - dock.base) : bg.y
+        y: dock.trashMenuX >= 0 ? 0 : dock.hovering ? bg.y - (Theme.dock.magnifiedSize - dock.base) : bg.y
         height: dock.height - y
     }
 
@@ -58,12 +60,12 @@ PanelWindow {
     HoverHandler {
         // convert window x to the unmagnified dock coordinate space
         onPointChanged: dock.mouseX = hovered ? point.position.x - (dock.width - dock.baseWidth) / 2 : -1
-        onHoveredChanged: if (!hovered) dock.mouseX = -1
+        onHoveredChanged: if (!hovered) { dock.mouseX = -1; dock.trashMenuX = -1; }
     }
 
     Glass {
         id: bg
-        width: row.width + dock.pad * 2
+        width: row.width + dock.sidePad * 2
         height: dock.bgHeight
         x: (dock.width - width) / 2
         y: dock.height - height - Theme.dock.bottomMargin
@@ -78,7 +80,7 @@ PanelWindow {
         id: row
         anchors.bottom: bg.bottom
         anchors.bottomMargin: dock.pad
-        x: bg.x + dock.pad
+        x: bg.x + dock.sidePad
         spacing: Theme.dock.iconSpacing
 
         Repeater {
@@ -89,7 +91,7 @@ PanelWindow {
                 required property int index
 
                 // center of this cell in the unmagnified layout
-                readonly property real baseCenter: dock.pad + index * (dock.base + Theme.dock.iconSpacing) + dock.base / 2
+                readonly property real baseCenter: dock.sidePad + index * (dock.base + Theme.dock.iconSpacing) + dock.base / 2
                                                    + (index > dock.sepIndex ? dock.sepCell - dock.base : 0)
                 readonly property real size: modelData.separator ? dock.base : dock.sizeFor(baseCenter)
                 readonly property bool running: (modelData.windows || []).length > 0
@@ -174,10 +176,70 @@ PanelWindow {
                     x: icon.x; y: icon.y; width: icon.width; height: icon.height
                     hoverEnabled: true
                     enabled: !cell.modelData.separator
-                    onClicked: {
-                        if (cell.modelData.trash) Quickshell.execDetached(["gio", "open", "trash:///"]);
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    onClicked: m => {
+                        dock.trashMenuX = -1;
+                        if (cell.modelData.trash && m.button === Qt.RightButton)
+                            dock.trashMenuX = cell.mapToItem(null, cell.width / 2, 0).x;
+                        else if (m.button === Qt.RightButton) return;
+                        else if (cell.modelData.trash) Quickshell.execDetached(["gio", "open", "trash:///"]);
                         else if (cell.modelData.folder) Quickshell.execDetached(["xdg-open", Quickshell.env("HOME") + "/" + cell.modelData.folder]);
                         else Apps.activate(cell.modelData);
+                    }
+                }
+            }
+        }
+    }
+
+    // Trash context menu (right click): Open, Empty Trash (with the Finder sound)
+    Item {
+        id: trashMenu
+        visible: dock.trashMenuX >= 0
+        width: Theme.menu.minWidth * 0.7
+        height: Theme.menu.itemHeight * 2 + Theme.menu.padding * 2
+        x: Math.min(dock.width - width - 4, dock.trashMenuX - width / 2)
+        y: bg.y - height - Theme.dock.tooltipGap
+
+        Glass {
+            anchors.fill: parent
+            radius: Theme.menu.radius
+            sx: trashMenu.x
+            sy: dock.screen.height - dock.height + trashMenu.y
+            tint: Theme.glass.tintStrong
+        }
+        Column {
+            y: Theme.menu.padding
+            width: parent.width
+            Repeater {
+                model: [
+                    { label: "Open", run: () => Quickshell.execDetached(["gio", "open", "trash:///"]) },
+                    { label: "Empty Trash", run: () => Quickshell.execDetached(["sh", "-c", `gio trash --empty && "${Sounds.script}" trash-empty`]) },
+                ]
+                delegate: Item {
+                    required property var modelData
+                    width: parent.width
+                    height: Theme.menu.itemHeight
+                    Rectangle {
+                        anchors.fill: parent
+                        anchors.leftMargin: Theme.menu.itemInset
+                        anchors.rightMargin: Theme.menu.itemInset
+                        radius: Theme.menu.itemRadius
+                        color: Theme.color.menuSelection
+                        visible: tma.containsMouse
+                    }
+                    Text {
+                        x: Theme.menu.itemInset + Theme.menu.itemHPadding
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: parent.modelData.label
+                        font.family: Theme.fontText
+                        font.pixelSize: Theme.font.menu
+                        color: tma.containsMouse ? Theme.color.menuSelectionText : Theme.color.label
+                    }
+                    MouseArea {
+                        id: tma
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: { dock.trashMenuX = -1; parent.modelData.run(); }
                     }
                 }
             }

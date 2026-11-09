@@ -18,7 +18,6 @@ Item {
     property color tint: Theme.glass.tint
     property color solidColor: Theme.glass.solid
     property bool shadow: true
-    property bool rim: true
 
     RectangularShadow {
         visible: root.shadow
@@ -44,7 +43,7 @@ Item {
             source: Wallpaper.blurred ? "file://" + Wallpaper.blurred : ""
             sourceSize: Qt.size(Wallpaper.width, Wallpaper.height)
             cache: true
-            asynchronous: false
+            asynchronous: true
             smooth: false
         }
 
@@ -54,40 +53,26 @@ Item {
         }
     }
 
-    // inner rim highlight, brighter on top like the lit edge of glass
+    // inner rim: 1px border, brighter along the top like the lit edge of glass
     Rectangle {
-        visible: root.rim
         anchors.fill: parent
         radius: root.radius
         color: "transparent"
         border.width: Theme.glass.rimWidth
         border.color: Theme.glass.rimBottom
     }
-    Rectangle {
-        visible: root.rim
-        anchors.fill: parent
-        radius: root.radius
-        color: "transparent"
-        border.width: Theme.glass.rimWidth
-        border.color: Theme.glass.rimTop
-        layer.enabled: true
-        layer.effect: MultiEffect {
-            maskEnabled: true
-            maskSource: rimMask
-        }
-    }
     Item {
-        id: rimMask
-        anchors.fill: parent
-        visible: false
-        layer.enabled: true
+        // only the top part of a brighter border shows through the clip
+        width: parent.width
+        height: Math.min(parent.height, root.radius * 1.5)
+        clip: true
         Rectangle {
             width: parent.width
-            height: Math.min(parent.height, root.radius * 1.5)
-            gradient: Gradient {
-                GradientStop { position: 0; color: "white" }
-                GradientStop { position: 1; color: "transparent" }
-            }
+            height: root.height
+            radius: root.radius
+            color: "transparent"
+            border.width: Theme.glass.rimWidth
+            border.color: Theme.glass.rimTop
         }
     }
 

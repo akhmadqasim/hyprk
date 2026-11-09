@@ -24,6 +24,8 @@ Singleton {
     ]
 
     readonly property var entries: DesktopEntries.applications.values
+    // visible apps sorted by name (Apps panel), rebuilt only when the entry list changes
+    readonly property var sortedEntries: entries.filter(e => !e.noDisplay).sort((a, b) => a.name.localeCompare(b.name))
 
     readonly property var pinned: {
         // depend on the entry list so the dock fills in once .desktop files are scanned
@@ -31,12 +33,12 @@ Singleton {
         const out = [];
         for (const ids of pinnedCandidates) {
             if (ids[0] === "hyprk-launchpad") {
-                out.push({ id: "hyprk-launchpad", name: "Apps", icon: "hyprk-launchpad", builtin: "launchpad" });
+                out.push({ id: "hyprk-launchpad", name: "Apps", icon: "hyprk-launchpad", action: () => Panels.toggle("launchpad") });
                 continue;
             }
             if (ids[0] === "hyprk-settings") {
                 // hyprk's own System Settings app (settings/), app id org.hyprk.Settings
-                out.push({ id: "org.hyprk.Settings", name: "System Settings", icon: "settings", builtin: "settings" });
+                out.push({ id: "org.hyprk.Settings", name: "System Settings", icon: "settings", action: root.openSettings });
                 continue;
             }
             for (const id of ids) {
@@ -149,21 +151,15 @@ Singleton {
     }
 
     function activate(item) {
-        if (item.builtin === "launchpad") {
-            Panels.toggle("launchpad");
-            return;
-        }
         if (item.windows && item.windows.length > 0) {
             // cycle through windows of the app, like clicking an active Dock icon
             const active = item.windows.findIndex(w => w === Hyprland.activeToplevel);
             focusWindow(item.windows[(active + 1) % item.windows.length]);
             return;
         }
-        if (item.builtin === "settings") {
-            openSettings();
-            return;
-        }
-        launch(item.entry, item.id);
+        // items without a .desktop entry carry their own action (Apps panel, hyprk Settings)
+        if (item.action) item.action();
+        else launch(item.entry, item.id);
     }
 
     // hyprk System Settings (settings/run.sh), GNOME Settings when it is missing

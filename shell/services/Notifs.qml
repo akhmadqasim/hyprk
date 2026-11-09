@@ -11,6 +11,13 @@ Singleton {
     id: root
 
     property bool dnd: false                  // Focus: Do Not Disturb (suppresses banners)
+    // one minute clock for every "5m ago" label, running only while cards are visible
+    readonly property double now: clock.date.getTime()
+    SystemClock {
+        id: clock
+        precision: SystemClock.Minutes
+        enabled: root.banners.length > 0 || Panels.open === "nc"
+    }
     property var banners: []                  // plain data of notifications shown as banners
     property ListModel history: ListModel {}  // plain data copies, newest first
     property var objects: ({})                // id -> Notification, while still tracked
@@ -40,8 +47,9 @@ Singleton {
     // add plain notification data to history and banners
     function push(d) {
         history.insert(0, d);
-        if (!dnd)
-            banners = [d].concat(banners.filter(b => b.nid !== d.nid)).slice(0, 3);
+        if (dnd) return;                       // Focus: no banner, no sound
+        banners = [d].concat(banners.filter(b => b.nid !== d.nid)).slice(0, 3);
+        Sounds.play(d.critical ? "alert" : "notification");
     }
 
     function hideBanner(id) {

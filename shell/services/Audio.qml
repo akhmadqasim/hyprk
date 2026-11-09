@@ -19,8 +19,8 @@ Singleton {
         if (!available) return;
         sink.audio.muted = false;
         sink.audio.volume = Math.max(0, Math.min(1, v));
+        Sounds.volumeChanged();
     }
-    function toggleMute() { if (available) sink.audio.muted = !sink.audio.muted; }
 
     PwObjectTracker { objects: root.sink ? [root.sink] : [] }
 }

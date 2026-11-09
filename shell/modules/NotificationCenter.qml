@@ -18,8 +18,10 @@ Item {
 
     property var expanded: ({})       // appName -> bool
     property var groups: []
-    function refresh() { groups = Notifs.groups(); }
-    Component.onCompleted: refresh()
+    // regroup only while the panel is open (and when it opens)
+    readonly property bool shown: Panels.open === "nc"
+    function refresh() { if (shown) groups = Notifs.groups(); }
+    onShownChanged: refresh()
     Connections {
         target: Notifs.history
         function onCountChanged() { nc.refresh(); }
@@ -165,7 +167,7 @@ Item {
         }
     }
 
-    SystemClock { id: clock; precision: SystemClock.Seconds; enabled: nc.visible }
+    SystemClock { id: clock; precision: SystemClock.Seconds; enabled: Panels.open === "nc" }
 
     component Widget: Rectangle {
         Layout.preferredWidth: Theme.nc.widgetSmall

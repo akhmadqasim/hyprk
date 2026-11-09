@@ -87,7 +87,7 @@ Item {
                 color: Theme.color.label
             }
             Text {
-                text: Clock.relative(card.time, nowClock.date.getTime())
+                text: Clock.relative(card.time, Notifs.now)
                 font.family: Theme.fontText
                 font.pixelSize: Theme.font.notifTime
                 color: Theme.color.secondaryLabel
@@ -106,8 +106,6 @@ Item {
             color: Theme.color.label
         }
     }
-
-    SystemClock { id: nowClock; precision: SystemClock.Minutes }
 
     MouseArea {
         id: hover

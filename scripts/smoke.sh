@@ -7,6 +7,7 @@
 #   HYPRK_KEEP=1   leave the nested session running (prints its env)
 #   HYPRK_WAIT=N   seconds to wait for the shell (default 40)
 #   HYPRK_SETTLE=N seconds to wait after the shell is up (default 3)
+#   HYPRK_MUTE=0   let the shell play sounds (muted by default)
 #   HYPRK_HEADLESS=1  add a 2560x1664@2x "MBA" output and shoot that (MacBook Air-like)
 set -u
 HYPRK_ROOT=${HYPRK_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}
@@ -28,7 +29,8 @@ mkdir -p "$LOGDIR" "$(dirname "$OUT")"
 LOG=$LOGDIR/nested-$(date +%H%M%S).log
 
 [ "${HYPRK_HEADLESS:-0}" = 1 ] && export HYPRK_PRIMARY=MBA
-env -u HYPRLAND_INSTANCE_SIGNATURE Hyprland --config "$HYPRK_ROOT/config/hypr/hyprland.lua" >"$LOG" 2>&1 &
+export HYPRK_MUTE=${HYPRK_MUTE:-1}     # no sounds from test sessions unless HYPRK_MUTE=0
+"$HYPRK_ROOT/config/hypr/start.sh" >"$LOG" 2>&1 &
 HPID=$!
 echo "smoke: Hyprland pid $HPID, log $LOG"
 
