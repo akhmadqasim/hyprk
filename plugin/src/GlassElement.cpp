@@ -205,14 +205,23 @@ namespace lg {
         const double m     = margin(p, m_data.shadow);
 
         // quads to draw (physical px) and the region the shader may read
-        std::vector<std::pair<const SGlassShape*, CBox>> quads;
+        struct SQuad {
+            const SGlassShape* shape;
+            CBox               box;
+            CRegion            damage;
+        };
+        std::vector<SQuad> quads;
         CRegion                                          blurDamage;
         const double                                     reach = (std::abs(p.refraction) + p.aberration + 8.0) * scale;
         for (const auto& s : m_data.shapes) {
             CBox quad = CBox{s.box.x - m, s.box.y - m, s.box.w + 2 * m, s.box.h + 2 * m}.scale(scale).round();
-            if (quad.w < 1 || quad.h < 1 || CRegion{ctx.m_data.damage}.intersect(quad).empty())
+            if (quad.w < 1 || quad.h < 1)
                 continue;
-            quads.emplace_back(&s, quad);
+            CRegion damage{ctx.m_data.damage};
+            damage.intersect(quad);
+            if (damage.empty())
+                continue;
+            quads.push_back({&s, quad, std::move(damage)});
             blurDamage.add(CBox{quad.x - reach, quad.y - reach, quad.w + 2 * reach, quad.h + 2 * reach});
         }
         if (quads.empty())
@@ -271,7 +280,7 @@ namespace lg {
         g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         glBindVertexArray(shader->getUniformLocation(SHADER_SHADER_VAO));
 
-        for (const auto& [s, quad] : quads) {
+        for (const auto& [s, quad, damage] : quads) {
             shader->setUniformMatrix3fv(SHADER_PROJ, 1, GL_TRUE, g_pHyprRenderer->projectBoxToTarget(ctx, quad).getMatrix());
             glUniform2f(u.uvTopLeft, quad.x / tex->m_size.x, quad.y / tex->m_size.y);
             glUniform2f(u.uvBottomRight, (quad.x + quad.w) / tex->m_size.x, (quad.y + quad.h) / tex->m_size.y);
@@ -279,9 +288,7 @@ namespace lg {
             glUniform4f(u.glassBox, s->box.x * scale - quad.x, s->box.y * scale - quad.y, s->box.w * scale, s->box.h * scale);
             glUniform1f(u.radius, s->radius * scale);
 
-            CRegion drawDamage{ctx.m_data.damage};
-            drawDamage.intersect(quad);
-            drawDamage.forEachRect([&ctx](const auto& rect) {
+            damage.forEachRect([&ctx](const auto& rect) {
                 g_pHyprOpenGL->scissor(ctx, &rect, ctx.m_data.transformDamage);
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
             });

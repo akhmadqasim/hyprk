@@ -93,8 +93,12 @@ namespace lg {
     }
 
     std::vector<std::string> splitList(std::string_view s) {
-        Hyprutils::String::CVarList list{std::string{s}, 0, ',', true};
-        return {list.begin(), list.end()};
+        std::vector<std::string> out;
+        for (const auto& item : Hyprutils::String::CVarList{std::string{s}, 0, ','}) {
+            if (auto t = Hyprutils::String::trim(item); !t.empty())
+                out.push_back(std::move(t));
+        }
+        return out;
     }
 
     std::unordered_map<std::string, double> parseNumberMap(std::string_view s) {

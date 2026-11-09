@@ -6,6 +6,7 @@
 #include <hyprland/src/render/Renderer.hpp>
 #include <hyprland/src/render/WindowRenderPresentation.hpp>
 
+#include <optional>
 #include <regex>
 #include <string>
 
@@ -26,9 +27,16 @@ namespace lg {
             return m_match;
         m_matchPattern = p.windowClasses;
         m_matchClass   = cls;
-        try {
-            m_match = std::regex_search(cls, std::regex(p.windowClasses));
-        } catch (const std::regex_error&) { m_match = false; }
+        // one compiled regex for all windows, rebuilt when the pattern changes
+        static std::string               compiledPattern;
+        static std::optional<std::regex> compiled;
+        if (compiledPattern != p.windowClasses) {
+            compiledPattern = p.windowClasses;
+            try {
+                compiled = std::regex(p.windowClasses);
+            } catch (const std::regex_error&) { compiled.reset(); }
+        }
+        m_match = compiled && std::regex_search(cls, *compiled);
         return m_match;
     }
 

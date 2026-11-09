@@ -78,6 +78,7 @@ int main() {
 
     // parsing
     CHECK((splitList(" a, b ,,c ") == std::vector<std::string>{"a", "b", "c"}));
+    CHECK((splitList("a, ,b, ") == std::vector<std::string>{"a", "b"}));
     {
         auto m = parseNumberMap("hyprk-dock:26, hyprk-menubar:0, bad, x:y, q:1.5");
         CHECK(m.size() == 3 && near(m["hyprk-dock"], 26) && near(m["q"], 1.5));

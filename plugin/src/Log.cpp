@@ -12,6 +12,10 @@ namespace lg {
         s_handle = handle;
     }
 
+    void* handle() {
+        return s_handle;
+    }
+
     void logInfo(const std::string& msg) {
         LOG(Log::INFO, "[liquidglass] {}", msg);
     }

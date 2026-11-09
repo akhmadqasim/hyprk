@@ -110,25 +110,25 @@ namespace lg {
 
         // raw values first: cheap to compare, parsed only when something differs
         struct SRaw {
-            std::vector<float>       floats;
+            std::array<float, std::size(FLOATS)> floats;
             std::array<long long, 5> ints;
             std::array<std::string, 5> strings;
             bool operator==(const SRaw&) const = default;
         };
         static SRaw lastRaw;
         SRaw        raw;
-        raw.floats.reserve(std::size(FLOATS));
-        for (const auto& v : g_cache->floats)
-            raw.floats.push_back(*v);
+        for (size_t i = 0; i < raw.floats.size(); ++i) {
+            const float v = *g_cache->floats[i];
+            raw.floats[i] = std::isfinite(v) ? v : FLOATS[i].def; // NaN would never compare equal
+        }
         raw.ints    = {*g_cache->enabled, *g_cache->fullDamage, *g_cache->requireRegion, *g_cache->tintLight, *g_cache->tintDark};
         raw.strings = {*g_cache->namespaces, *g_cache->radii, *g_cache->appearance, *g_cache->shader, *g_cache->windows};
         if (raw == lastRaw)
             return last;
 
         auto p = std::make_shared<SParams>();
-        for (size_t i = 0; i < std::size(FLOATS); ++i)
-            if (std::isfinite(raw.floats[i]))
-                (*p).*(FLOATS[i].member) = raw.floats[i];
+        for (size_t i = 0; i < raw.floats.size(); ++i)
+            (*p).*(FLOATS[i].member) = raw.floats[i];
         p->enabled       = raw.ints[0] != 0;
         p->fullDamage    = raw.ints[1] != 0;
         p->requireRegion = raw.ints[2] != 0;

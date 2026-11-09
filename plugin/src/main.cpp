@@ -22,7 +22,6 @@
 #include <optional>
 
 namespace {
-    HANDLE         g_handle     = nullptr;
     CFunctionHook* g_renderHook = nullptr;
     std::vector<CHyprSignalListener> g_listeners;
     std::shared_ptr<const lg::SParams> g_params; // snapshot, refreshed each monitor frame
@@ -103,7 +102,7 @@ static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext
 }
 
 static void* findRenderLayer() {
-    for (const auto& match : HyprlandAPI::findFunctionsByName(g_handle, "renderLayer")) {
+    for (const auto& match : HyprlandAPI::findFunctionsByName(lg::handle(), "renderLayer")) {
         if (match.demangled.contains("IHyprRenderer::renderLayer") && match.demangled.contains("CRenderContext"))
             return match.address;
     }
@@ -115,7 +114,7 @@ static void addWindowGlass(PHLWINDOW window) {
         return;
     auto deco = makeShared<lg::CGlassDecoration>(window, [] { return g_params; });
     g_decorations.emplace_back(deco);
-    HyprlandAPI::addWindowDecoration(g_handle, window, std::move(deco));
+    HyprlandAPI::addWindowDecoration(lg::handle(), window, std::move(deco));
 }
 
 APICALL EXPORT std::string PLUGIN_API_VERSION() {
@@ -123,7 +122,6 @@ APICALL EXPORT std::string PLUGIN_API_VERSION() {
 }
 
 APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
-    g_handle = handle;
     lg::setHandle(handle);
 
     const std::string clientHash = __hyprland_api_get_client_hash();
@@ -169,10 +167,10 @@ APICALL EXPORT void PLUGIN_EXIT() {
     g_listeners.clear();
     for (const auto& deco : g_decorations)
         if (const auto d = deco.lock())
-            HyprlandAPI::removeWindowDecoration(g_handle, d.get());
+            HyprlandAPI::removeWindowDecoration(lg::handle(), d.get());
     g_decorations.clear();
     if (g_renderHook)
-        HyprlandAPI::removeFunctionHook(g_handle, g_renderHook);
+        HyprlandAPI::removeFunctionHook(lg::handle(), g_renderHook);
     g_renderHook = nullptr;
     if (g_pHyprRenderer)
         g_pHyprRenderer->context().m_pass.removeAllOfType("CLiquidGlassElement");

@@ -13,7 +13,7 @@ file(READ ${CMAKE_CURRENT_SOURCE_DIR}/shaders/liquidglass.frag LG_FRAG)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Shaders.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/gen/Shaders.hpp @ONLY)
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/liquidglass.frag)
 
-# pure logic, no Hyprland: shared by the plugin and the unit tests
+# pure logic (hyprutils only, no compositor): shared by the plugin and the unit tests
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(HYPRUTILS REQUIRED IMPORTED_TARGET hyprutils)
 pkg_check_modules(HYPRLAND IMPORTED_TARGET hyprland pixman-1 libdrm)
@@ -29,7 +29,7 @@ if(HYPRLAND_FOUND)
   target_link_libraries(liquidglass PRIVATE lgcore PkgConfig::HYPRLAND)
   target_compile_options(liquidglass PRIVATE -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers)
 else()
-  message(WARNING "hyprland.pc not found: only building the unit tests (source /mnt/code/hypr-dev/env.sh)")
+  message(WARNING "hyprland.pc not found: only building the unit tests (hyprutils is still needed: source /mnt/code/hypr-dev/env.sh)")
 endif()
 
 enable_testing()
