@@ -62,7 +62,7 @@ Apple's numbers from `/mnt/code/liquid-glass-re/SPEC.md` section 9 (glass versio
 | `menu` | as regular | as regular | as regular | as regular | as regular | 0.6, r 24, y 10 | `hyprk-overlay`, `hyprk-menubar` |
 | `clear` | 0.125, 1.08, 1.06 | none | 0.25 D / -0.8 D | none | D 48→120 : 3→8 | as regular | |
 | `dock` | 0.15, 0.9, 1.1 (Apple 1.25) | none / 0.05 | 0.08 D / -0.18 D | 0.13 D / 0.42 D / 0.2 | 1.5 | as regular | `hyprk-dock` |
-| `controlcenter` | 0.18, 0.55, 1.0 (Apple 0.125, 0.8, 1.2), 6 % warm grey, face luma kept in 0.15-0.45 (dark 0.10-0.40) | none | 0.225 D (max 25) / -2.0 D (min -80) | 0.0357 D / 0.0714 D / 0.1525 | none (Apple 4: too much on top of Hyprland's blur), variable from 100 pt in | as regular | `hyprk-controlcenter` |
+| `controlcenter` | 0.18, 0.55, 1.0 (Apple 0.125, 0.8, 1.2), 6 % warm grey, face tone kept in 0.15-0.45 (max as relative luminance: white labels >= 4.7:1; dark 0.10-0.40) | none | 0.225 D (max 25) / -2.0 D (min -80) | 0.0357 D / 0.0714 D / 0.1525 | none (Apple 4: too much on top of Hyprland's blur), variable from 100 pt in | as regular | `hyprk-controlcenter` |
 
 The face colour is Apple's YCC composite (SPEC 9.7): `Y' = black + (white - black) Y`, chroma x saturation,
 then the fill. The controlcenter face and the regular/dock saturation deviate from the decoded values:
@@ -148,9 +148,10 @@ frame. Result on this PC (AMD RDNA2, the RX 6600 class GPU), 6 s each, 2026-11-1
 
 | Configuration | Glass GPU time per element (avg / p95) | Whole frame GPU (avg / p95) |
 |---|---|---|
-| per-element copy (current) | 0.64 / 0.93 ms | 11.2 / 16.6 ms |
-| shared copy (iteration 4, dropped) | 0.56 / 0.78 ms | 11.1 / 16.3 ms |
-| plugin disabled (Hyprland's own blur on the same regions) | - | 11.6 / 16.4 ms |
+| per-element copy (current code, run 04:58) | 0.64 / 1.08 ms | 14.4 / 22.7 ms |
+| plugin disabled, same run | - | 15.8 / 22.3 ms |
+| shared copy (iteration 4, dropped; earlier, quieter run) | 0.56 / 0.78 ms | 11.1 / 16.3 ms |
+| old per-element copy of all glass boxes (iteration 3; earlier run) | 0.64 / 0.93 ms | 11.2 / 16.6 ms |
 
 "Whole frame" spans the pass from `RENDER_LAST_MOMENT` to `RENDER_POST` and is dominated by
 Hyprland's own work in the nested session (3 blur passes, two outputs), so its differences are within

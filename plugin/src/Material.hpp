@@ -33,7 +33,8 @@ namespace lg {
         SYcc      bleed;             // edge bleed colour effect
         SBlurFill blurFill;
         float     lift = 0; // extra white mixed over the face (by eye, not from the RE)
-        // face luminance kept inside [lumaMin, lumaMax] (gamma), so tiles keep their tone and label
+        // face tone kept inside [lumaMin, lumaMax]: min as gamma luma, max as the relative luminance of
+        // that grey (so >= 4.7:1 white labels at 0.45 holds for saturated faces too); tiles keep their tone and label
         // contrast over any backdrop (by eye: Control Center over white windows went near black/white)
         float     lumaMin = 0, lumaMax = 1;
     };

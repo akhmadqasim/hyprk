@@ -38,7 +38,7 @@ uniform vec3  bleedYcc;
 
 uniform vec3  faceYcc;              // black, white, saturation
 uniform vec4  faceFill;             // rgb + amount ("normalFill")
-uniform vec2  faceLuma;             // allowed face luminance range (gamma)
+uniform vec2  faceLuma;             // face tone range: min (gamma luma), max (as the luminance of that grey)
 
 uniform vec2  lightDir;             // unit vector, screen space (y down)
 uniform float highlightBias;        // colour bias of the rim (negative darkens: dark specular)
@@ -86,19 +86,19 @@ float gEdge(float v) {
 
 float luma(vec3 c) { return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
 
-vec3 decode(vec3 c) {
-    if (linearLight == 0)
-        return c;
+vec3 srgbToLinear(vec3 c) {
     c = clamp(c, 0.0, 1.0);
     return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(vec3(0.04045), c));
 }
 
-vec3 encode(vec3 c) {
-    if (linearLight == 0)
-        return c;
+vec3 linearToSrgb(vec3 c) {
     c = clamp(c, 0.0, 1.0);
     return mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(vec3(0.0031308), c));
 }
+
+vec3 decode(vec3 c) { return linearLight == 0 ? c : srgbToLinear(c); }
+
+vec3 encode(vec3 c) { return linearLight == 0 ? c : linearToSrgb(c); }
 
 vec3 fetch(vec2 quadPx, float lod) {
     vec4 s = textureLod(tex, mix(uvTopLeft, uvBottomRight, quadPx / quadSize), lod);
@@ -219,23 +219,27 @@ void main() {
         // YCC face effect, then the fill (SPEC 9.7)
         col = ycc(col, faceYcc);
         col = mix(col, faceFill.rgb, faceFill.a);
-        // keep the tile tone inside its range over any backdrop: lift darks additively (keeps hue),
-        // scale brights down
-        if (faceLuma.x > 0.0 || faceLuma.y < 1.0) {
-            vec3  g  = encode(clamp(col, 0.0, 1.0));
-            float Lg = luma(g);
-            if (Lg < faceLuma.x)
-                col = decode(clamp(g + (faceLuma.x - Lg), 0.0, 1.0));
-            else if (Lg > faceLuma.y)
-                col = decode(g * (faceLuma.y / Lg));
-        }
-
         // edge bleed: outside colour pulled into the rim through its own colour effect (step 4.7)
         if (bleedOpacity > 0.0 && depth < bleedHeight) {
             float mb = bleedAmount * bevel(depth, bleedHeight);
             vec3  eb = ycc(fetchSharp(qp + n * mb, bleedLod), bleedYcc);
             float w  = 1.0 - depth / max(bleedHeight, 1e-3);
             col      = mix(col, eb, w * w * w * w * bleedOpacity);
+        }
+
+        // keep the tile tone inside its range over any backdrop (after the bleed, before the rim
+        // light): lift darks additively in gamma (keeps hue); cap brights by real relative luminance
+        // (linear), so a saturated warm face cannot pass the cap and still fail label contrast
+        if (faceLuma.x > 0.0 || faceLuma.y < 1.0) {
+            vec3  g  = encode(clamp(col, 0.0, 1.0));
+            float Lg = luma(g);
+            if (Lg < faceLuma.x)
+                col = decode(clamp(g + (faceLuma.x - Lg), 0.0, 1.0));
+            vec3  lin    = srgbToLinear(encode(clamp(col, 0.0, 1.0)));
+            float Ylin   = luma(lin);
+            float capLin = srgbToLinear(vec3(faceLuma.y)).x;
+            if (Ylin > capLin)
+                col = decode(linearToSrgb(lin * (capLin / Ylin)));
         }
 
         // subtle inner shadow along the rim
