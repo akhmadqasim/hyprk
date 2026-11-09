@@ -4,8 +4,8 @@ export HYPR_DEV=${HYPR_DEV:-/mnt/code/hypr-dev}
 export HK_DIR=${HK_DIR:-${XDG_RUNTIME_DIR:-/tmp}/hyprk}
 mkdir -p "$HK_DIR"
 source "$HYPR_DEV/env.sh"
-read -r HK_SIG < "$HK_DIR/sig" 2>/dev/null; export HK_SIG HYPRLAND_INSTANCE_SIGNATURE=$HK_SIG
-read -r HK_WL < "$HK_DIR/wl" 2>/dev/null; export HK_WL
+{ read -r HK_SIG < "$HK_DIR/sig"; } 2>/dev/null || :; export HK_SIG HYPRLAND_INSTANCE_SIGNATURE=$HK_SIG
+{ read -r HK_WL < "$HK_DIR/wl"; } 2>/dev/null || :; export HK_WL
 # fonts: one fontconfig for every rig script (SF Pro, SF Pro Rounded, SF Mono by their family names from themes/fonts/named),
 # regenerated only when the template is newer
 _hk_themes=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)

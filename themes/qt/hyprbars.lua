@@ -1,5 +1,5 @@
 -- hyprk-managed
--- PROPOSAL, NOT TESTED: macOS style title bar with traffic lights for windows WITHOUT client-side decorations (Qt, X11, foot...).
+-- PROPOSAL, NOT TESTED and not loaded by any install.sh or session script: macOS style title bar with traffic lights for windows WITHOUT client-side decorations (Qt, X11, foot...).
 -- Needs the hyprbars plugin from hyprwm/hyprland-plugins, tag v0.57.0 (matches Hyprland 0.57.x). It is NOT built in
 -- /mnt/code/hypr-dev yet (building third-party plugin code needs your OK). Build and load it like the glass plugin:
 --     hl.plugin.load("/path/to/hyprbars.so")
@@ -36,4 +36,5 @@ hl.config({
 -- (in Lua configs the button list is registered with the plugin's own call, see its README; the three lines above are the values to use)
 
 -- no bar for apps that already draw their own header bar (GTK 4 / libadwaita, GTK 3 with CSD, the hyprk Finder and Settings):
-hl.window_rule({ match = { class = "^(org\\.gnome\\..*|com\\.mitchellh\\.ghostty|dev\\.hyprk\\..*)$" }, plugin_hyprbars_nobar = true })
+-- extend the list with every GTK 4 app you run; only these classes are known to draw their own traffic lights
+hl.window_rule({ match = { class = "^(org\\.gnome\\.(Nautilus|TextEditor|Calculator|Settings)|com\\.mitchellh\\.ghostty|dev\\.hyprk\\..*)$" }, plugin_hyprbars_nobar = true })

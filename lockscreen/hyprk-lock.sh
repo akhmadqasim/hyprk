@@ -5,6 +5,8 @@ pgrep -u "$(id -u)" -x hyprlock >/dev/null 2>&1 && exit 0     # already locked
 HERE=$(cd "$(dirname "$0")" && pwd)
 RT=${XDG_RUNTIME_DIR:-/tmp}
 T=$(mktemp -d "$RT/hyprk-lock.XXXXXX") || exit 1
-"$HERE/install.sh" --prefix "$T" "$@" >/dev/null && mv "$T/hypr/hyprlock.conf" "$RT/hyprk-hyprlock.conf"
+CONF=$RT/hyprk-hyprlock.conf
+"$HERE/install.sh" --prefix "$T" "$@" >/dev/null && mv "$T/hypr/hyprlock.conf" "$CONF" || {
+  echo "hyprk-lock: could not generate the config, locking with the in-tree one" >&2; CONF=$HERE/hyprlock.conf; }
 rm -rf "$T"
-exec hyprlock -c "$RT/hyprk-hyprlock.conf"
+exec hyprlock -c "$CONF"

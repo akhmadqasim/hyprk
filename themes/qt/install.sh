@@ -3,12 +3,13 @@
 #   ./install.sh [--dark] [--kvantum] [--force] [--prefix DIR]
 #   default target: ${XDG_CONFIG_HOME:-~/.config}/qt6ct ; --prefix DIR writes DIR/qt6ct (and DIR/Kvantum) instead.
 #   --kvantum: also install the Kvantum theme (rounded translucent menus) and make qt6ct use style=kvantum. Needs qt6-style-kvantum.
+#   --fonts: also install a fontconfig drop-in (fontconfig/conf.d/60-hyprk-sf.conf) so SF Pro/SF Mono resolve system-wide for this user
 #   --force: overwrite an existing qt6ct.conf (original kept once as qt6ct.conf.hyprk-backup); without it only a hint is printed.
 # Needs the `qt6ct` package (apt install qt6ct) and QT_QPA_PLATFORMTHEME=qt6ct in the session environment.
 set -e
 HERE=$(cd "$(dirname "$0")" && pwd); . "$HERE/../lib.sh"
-V=light; PREFIX=; FORCE=0; KVT=0
-while [ $# -gt 0 ]; do case $1 in --dark) V=dark ;; --prefix) PREFIX=$2; shift ;; --force) FORCE=1 ;; --kvantum) KVT=1 ;; *) echo "unknown option $1" >&2; exit 2 ;; esac; shift; done
+V=light; PREFIX=; FORCE=0; KVT=0; FONTS=0
+while [ $# -gt 0 ]; do case $1 in --dark) V=dark ;; --prefix) PREFIX=$2; shift ;; --force) FORCE=1 ;; --kvantum) KVT=1 ;; --fonts) FONTS=1 ;; *) echo "unknown option $1" >&2; exit 2 ;; esac; shift; done
 BASE=$(hk_cfgbase "$PREFIX"); T=$BASE/qt6ct; N=MacOS27$([ $V = dark ] && echo Dark || echo Light)
 mkdir -p "$T/colors" "$T/qss" "$T/macos27-assets"
 cp "$HERE/colors/macos27-$V.conf" "$T/colors/"
@@ -41,7 +42,9 @@ $SHEET
 EOT
   echo "wrote $CONF ($V, style $STYLE)"
 fi
-# SF fonts by family name: drop-in fontconfig snippet (same file the test rigs use), dir = themes/fonts/named
-FC=$BASE/fontconfig/conf.d; mkdir -p "$FC"
-hk_fontconf "$HERE/../fontconfig/60-hyprk-sf.conf.in" "$HERE/../fonts/named" "${XDG_CACHE_HOME:-$HOME/.cache}/hyprk-fontconfig" > "$FC/60-hyprk-sf.conf"
-echo "Set QT_QPA_PLATFORMTHEME=qt6ct (and QT_STYLE_OVERRIDE unset) for Qt apps. Fonts: SF Pro / SF Mono via $FC/60-hyprk-sf.conf (fallback Inter, Cantarell; themes/gtk/FALLBACKS.md)."
+# SF fonts by family name (opt-in: it changes the preferred sans-serif/monospace for every app of this user)
+if [ $FONTS = 1 ]; then
+  FC=$BASE/fontconfig/conf.d; mkdir -p "$FC"
+  hk_fontconf "$HERE/../fontconfig/60-hyprk-sf.conf.in" "$HERE/../fonts/named" "${XDG_CACHE_HOME:-$HOME/.cache}/hyprk-fontconfig" > "$FC/60-hyprk-sf.conf" && echo "wrote $FC/60-hyprk-sf.conf"
+fi
+echo "Set QT_QPA_PLATFORMTHEME=qt6ct (and QT_STYLE_OVERRIDE unset) for Qt apps. Fonts: qt6ct asks for SF Pro / SF Mono; make them resolvable with --fonts or a FONTCONFIG_FILE that includes themes/fontconfig (fallback Inter, Cantarell; themes/gtk/FALLBACKS.md)."

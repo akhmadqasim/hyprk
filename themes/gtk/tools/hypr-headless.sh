@@ -14,7 +14,7 @@ unset HYPRLAND_INSTANCE_SIGNATURE
 XDG_CURRENT_DESKTOP=Hyprland Hyprland -c $H/hl.lua > $H/hl.log 2>&1 &
 echo $! > $H/pid
 for _ in $(seq 1 40); do PIDS=$(pgrep -f "Hyprland -c $H/hl.lua" | tr '
-' ' '); [ -n "$PIDS" ] && for p in $PIDS; do hyprctl instances 2>/dev/null | grep -q "pid: $p" && break 2; done; sleep 0.25; done
+' ' '); [ -n "$PIDS" ] && for p in $PIDS; do hyprctl instances 2>/dev/null | grep -qE "pid: $p$" && break 2; done; sleep 0.25; done
 # find OUR instance: the one whose pid belongs to a process started with our config path
 read SIG WL < <(hyprctl instances | awk -v pids="$PIDS" 'BEGIN{n=split(pids,a," ");for(i=1;i<=n;i++)m[a[i]]=1} /^instance/{s=$2;sub(":","",s)} /pid:/{p=$2} /wl socket/{if(p in m)print s, $3}' | tail -1)
 [ -z "$SIG" ] && { echo "could not find our Hyprland instance, see $H/hl.log" >&2; exit 1; }

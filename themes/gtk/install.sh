@@ -35,8 +35,7 @@ THEMES=$DATA/themes; GSV=$DATA/gtksourceview-5/styles
 
 if [ $UN = 1 ]; then
   rm -rf "$THEMES/MacOS27" "$THEMES/MacOS27-Dark" "$GSV"/macos27-light.xml "$GSV"/macos27-dark.xml
-  f=$(hk_cfgbase "$PREFIX")/glib-2.0/settings/keyfile; grep -q hyprk-managed "$f" 2>/dev/null && rm -f "$f"
-  for f in "$CFG4/gtk.css" "$CFG4/settings.ini" "$CFG3/settings.ini"; do
+  for f in "$CFG4/gtk.css" "$CFG4/settings.ini" "$CFG3/settings.ini" "$(hk_cfgbase "$PREFIX")/glib-2.0/settings/keyfile"; do
     if grep -q "hyprk-managed" "$f" 2>/dev/null; then rm -f "$f"; [ -f "$f.hyprk-backup" ] && mv "$f.hyprk-backup" "$f"; fi
   done
   echo "removed"; exit 0

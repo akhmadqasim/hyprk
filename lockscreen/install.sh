@@ -15,6 +15,8 @@ ROOT=$(cd "$HERE/.." && pwd)
 if [ -z "$WP" ]; then
   STATE=${HYPRK_STATE:-$ROOT/state}/wallpaper.json
   [ -f "$STATE" ] && WP=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1])).get("path",""))' "$STATE" 2>/dev/null)
+  # only formats hyprlock can load (the Settings pane may have picked a .heic)
+  case $WP in *.png|*.PNG|*.jpg|*.JPG|*.jpeg|*.JPEG|*.webp) ;; *) WP= ;; esac
   [ -f "$WP" ] || WP=$ROOT/themes/wallpapers/png/Tahoe$([ $DARK = 1 ] && echo Dark || echo Light).png
 fi
 DST=$(hk_cfgbase "$PREFIX")/hypr/hyprlock.conf; mkdir -p "$(dirname "$DST")"

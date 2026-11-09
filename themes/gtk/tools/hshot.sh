@@ -16,7 +16,7 @@ printf '[Settings]\ngtk-decoration-layout=close,minimize,maximize:\n' > "$C/gtk-
 cp "$C/gtk-3.0/settings.ini" "$C/gtk-4.0/settings.ini"
 [ -n "$GTK3_THEME" ] && { echo "gtk-theme-name=$GTK3_THEME"; [ $DARK = 1 ] && echo gtk-application-prefer-dark-theme=1; } >> "$C/gtk-3.0/settings.ini"
 # GTK reads gsettings before settings.ini on Wayland: the installer's keyfile carries the same keys the session uses
-"$D/install.sh" --prefix "$C" --keyfile $([ $DARK = 1 ] && echo --dark) >/dev/null 2>&1
+"$D/install.sh" --prefix "$C" --keyfile $([ $DARK = 1 ] && echo --dark) >/dev/null || exit 1
 {
   [ -n "$GTK3_THEME" ] && echo "[org/gnome/desktop/interface]" && echo "gtk-theme='$GTK3_THEME'"
   echo "[org/gnome/TextEditor]"; echo "style-scheme='macos27-$([ $DARK = 1 ] && echo dark || echo light)'"

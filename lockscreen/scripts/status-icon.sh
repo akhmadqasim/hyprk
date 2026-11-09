@@ -22,7 +22,7 @@ case $1 in
     for b in /sys/class/power_supply/BAT*; do [ -d "$b" ] && break; done
     [ -d "$b" ] || { echo "$D/none.png"; exit 0; }
     st=; cap=; read -r st < "$b/status" 2>/dev/null; read -r cap < "$b/capacity" 2>/dev/null
-    : "${cap:=100}"
+    case $cap in ''|*[!0-9]*) cap=100 ;; esac
     if   [ "$st" = Charging ]; then echo "$D/battery-charging.png"
     elif [ "$cap" -ge 88 ]; then echo "$D/battery-100.png"
     elif [ "$cap" -ge 63 ]; then echo "$D/battery-75.png"
