@@ -16,11 +16,13 @@ function score(entry, query) {
     // initials: "vsc" matches "Visual Studio Code"
     const initials = words.map(w => w[0] || "").join("");
     if (q.length > 1 && initials.startsWith(q)) return 500;
-    if (name.includes(q)) return 400 - name.indexOf(q);
+    // what the app is (GenericName, Keywords), like macOS finding apps by description:
+    // below any match in the app's own name, above a mid-word substring of another name
     const generic = (entry.genericName || "").toLowerCase();
-    if (generic.startsWith(q)) return 300;
     const keywords = (entry.keywords || []).map(k => String(k).toLowerCase());
-    if (keywords.some(k => k.startsWith(q))) return 250;
+    if (generic.split(/[\s\-_.]+/).some(w => w.startsWith(q))) return 460;
+    if (keywords.some(k => k.startsWith(q))) return 450;
+    if (name.includes(q)) return 400 - name.indexOf(q);
     if (generic.includes(q)) return 200;
     const id = (entry.id || "").toLowerCase();
     if (id.includes(q)) return 100;

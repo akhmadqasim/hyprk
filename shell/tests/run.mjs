@@ -35,6 +35,19 @@ test("initials", () => assert.equal(S.rank(apps, "vsc")[0].id, "code"));
 test("name prefix beats generic", () => assert.equal(S.rank(apps, "text")[0].id, "org.gnome.TextEditor"));
 test("keyword", () => assert.equal(S.rank(apps, "finder")[0].id, "org.gnome.Nautilus"));
 test("generic", () => assert.equal(S.rank(apps, "terminal")[0].id, "com.mitchellh.ghostty"));
+// Ghostty-like entry: no GenericName, Keywords=terminal
+const apps2 = apps.concat([{ id: "app.center", name: "App Center" }, { id: "epson", name: "Epson Printer Utility" },
+                           { id: "x.ghostty", name: "Ghostty", keywords: ["terminal", "tty", "pty"] }]);
+test("keyword finds terminal app", () => assert.ok(S.rank(apps2, "terminal").some(e => e.id === "x.ghostty")));
+test("keyword ranks above mid-name substring", () => {
+    const r = S.rank(apps2, "te").map(e => e.id);
+    assert.ok(r.indexOf("x.ghostty") !== -1 && r.indexOf("x.ghostty") < r.indexOf("epson"));
+});
+test("own name prefix ranks above keyword", () => {
+    const r = S.rank(apps2, "te").map(e => e.id);
+    assert.ok(r.indexOf("org.gnome.TextEditor") < r.indexOf("x.ghostty"));
+});
+test("generic word prefix", () => assert.equal(S.rank([{ id: "a", name: "Zed", genericName: "Code Editor" }], "edi")[0].id, "a"));
 test("empty query", () => assert.equal(S.rank(apps, "  ").length, 0));
 test("no match", () => assert.equal(S.rank(apps, "zzzz").length, 0));
 test("limit", () => assert.equal(S.rank(apps, "e", 2).length, 2));
