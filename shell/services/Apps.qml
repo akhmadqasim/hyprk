@@ -34,7 +34,13 @@ Singleton {
 
     readonly property var entries: DesktopEntries.applications.values
     // visible apps sorted by name (Apps panel), rebuilt only when the entry list changes
-    readonly property var sortedEntries: entries.filter(e => !e.noDisplay).sort((a, b) => a.name.localeCompare(b.name))
+    // helper launchers like "Foot Client" / "Foot Server" next to "Foot" (same icon,
+    // name extends the main one) are hidden, like macOS shows one app
+    readonly property var sortedEntries: {
+        const vis = entries.filter(e => !e.noDisplay);
+        const helper = e => vis.some(m => m !== e && m.icon === e.icon && e.name.startsWith(m.name + " "));
+        return vis.filter(e => !helper(e)).sort((a, b) => a.name.localeCompare(b.name));
+    }
 
     readonly property var pinned: {
         // depend on the entry list so the dock fills in once .desktop files are scanned
@@ -130,7 +136,8 @@ Singleton {
         "clocks": "Clock", "weather": "Weather", "maps": "Maps", "contacts": "Contacts",
         "photos": "Photos", "shotwell": "Photos", "totem": "QuickTime_Player", "showtime": "QuickTime_Player",
         "baobab": "Disk_Utility", "diskutility": "Disk_Utility", "font-viewer": "Font_Book", "fontviewer": "Font_Book",
-        "screenshot": "Screenshot", "notes": "Notes", "gnome-software": "App_Store", "snap-store": "App_Store",
+        "screenshot": "Screenshot", "notes": "Notes", "messages": "Messages", "mail": "Mail",
+        "photos": "Photos", "facetime": "FaceTime", "reminders": "Reminders", "music": "Music", "gnome-software": "App_Store", "snap-store": "App_Store",
         "snap-store_snap-store": "App_Store", "characters": "Font_Book", "simple-scan": "Image_Capture",
         "user-trash": "@TrashIcon", "user-trash-full": "@FullTrashIcon", "folder-download": "@DownloadsFolder",
     })

@@ -185,11 +185,12 @@ Singleton {
     // ---------- dock ----------
     readonly property QtObject dock: QtObject {
         // iconSize is the icon cell; macOS icon art leaves ~10% transparent margin inside it.
-        // SPEC.md 7 (Dock binary): tilesize 64 / 52 by display height. The reference
-        // screenshots measure ~54 relative to the screen (reference/JUDGE.md), so we use that.
-        readonly property int iconSize: 54
-        readonly property int iconSizeShort: 52          // displays up to 800 pt tall
-        readonly property int magnifiedSize: 128         // SPEC.md 7: largesize default 128
+        // Tile size follows the screen width: the reference icon art is ~2.7% of the
+        // screen width (reference/JUDGE-r2.md), the art is ~0.8 of the tile, so the tile is
+        // ~3.4% of the width. SPEC's 64/52 tile is for a larger display; magnified keeps
+        // SPEC's largesize/tilesize ratio (128/64).
+        readonly property real tileFraction: 0.034
+        readonly property real magnifyRatio: 2.0
         readonly property real magnifyRange: 1.5         // SPEC.md 7: magnification width 3 x tilesize (1.5 each side)
         readonly property int iconSpacing: 2             // SPEC.md 7: tile inset 1 (each side)
         readonly property int padding: 6                 // SPEC.md 7: distance top 6 (symmetric bottom assumed)
@@ -241,7 +242,8 @@ Singleton {
         readonly property color onImageSecondary: Qt.rgba(1, 1, 1, 0.85)
         readonly property real photoScrim: 0.45          // bottom gradient behind the caption
         readonly property real photoAspect: 0.48         // Photos widget height / width, measured
-        readonly property color calendarBg: theme.dark ? Qt.rgba(0.17, 0.17, 0.18, 0.92) : Qt.rgba(1, 1, 1, 0.94)
+        readonly property color calendarBg: theme.dark ? "#1C1C1E" : "#FFFFFF"   // opaque like macOS widgets
+        readonly property color pillLift: theme.dark ? Qt.rgba(1, 1, 1, 0.16) : Qt.rgba(0.45, 0.45, 0.47, 0.22)
         readonly property color clockBg: "#1C1C1E"
         readonly property color clockFace: "#F5F5F5"
         readonly property color clockHand: "#1C1C1E"
@@ -269,8 +271,10 @@ Singleton {
         readonly property int marginTop: 10              // below menu bar, measured
         readonly property int marginRight: 12            // TODO verify
         // darkening veil over the plugin glass: white labels need ~5:1 like the reference
-        readonly property color pluginLift: theme.dark ? Qt.rgba(0, 0, 0, 0.18) : Qt.rgba(0.20, 0.18, 0.17, 0.34)
-        readonly property real disabledSliderOpacity: 0.6
+        // over the plugin "regular" recipe: a warm grey veil gives the reference mid-grey frost
+        readonly property color pluginLift: theme.dark ? Qt.rgba(0.10, 0.10, 0.11, 0.72) : Qt.rgba(0.24, 0.22, 0.21, 0.70)
+        readonly property color rim: Qt.rgba(1, 1, 1, 0.38)            // top-lit rim drawn over plugin glass
+        readonly property real disabledSliderOpacity: 1.0               // slider still shows its value (non-interactive)
         readonly property color tileTint: theme.dark ? Qt.rgba(0.12, 0.12, 0.13, 0.45) : Qt.rgba(0.30, 0.28, 0.27, 0.42)   // QML material: dark neutral frost
         readonly property color tileSolid: theme.dark ? "#3A3A3C" : "#8E8E93"
         readonly property color text: "#FFFFFF"

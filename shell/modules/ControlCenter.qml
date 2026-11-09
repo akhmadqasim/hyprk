@@ -180,6 +180,7 @@ Item {
             tint: Theme.cc.tileTint
             solidColor: Theme.cc.tileSolid
             pluginLift: Theme.cc.pluginLift
+            pluginRim: Theme.cc.rim
             shadow: false
         }
     }
@@ -196,8 +197,8 @@ Item {
 
         width: cc.colW
         height: cc.rowH
-        // unavailable: the tile stays, the white circle and text dim (macOS)
-        readonly property real contentOpacity: available ? 1 : Theme.color.disabledOpacity
+        // unavailable looks like "off" (macOS shows Wi-Fi off, not a dead tile); taps do nothing
+        readonly property real contentOpacity: 1
 
         Rectangle {
             id: circle
@@ -207,13 +208,13 @@ Item {
             width: Theme.cc.toggleSize
             height: width
             radius: width / 2
-            color: cap.on || !cap.available ? Theme.cc.toggleOnBg : Theme.cc.toggleOffBg
+            color: cap.on ? Theme.cc.toggleOnBg : Theme.cc.toggleOffBg
             Behavior on color { ColorAnimation { duration: Theme.anim.fast } }
             Symbol {
                 anchors.centerIn: parent
                 name: cap.symbol
                 size: Theme.cc.toggleSize * Theme.cc.toggleGlyph
-                color: cap.on ? cap.onAccent : cap.available ? Theme.cc.toggleOffIcon : Theme.color.secondaryLabel
+                color: cap.on ? cap.onAccent : Theme.cc.toggleOffIcon
             }
         }
         Column {

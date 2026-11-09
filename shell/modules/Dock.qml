@@ -14,14 +14,15 @@ ShellWindow {
     screen: modelData
 
     // SPEC.md: tile 64 pt, 52 on displays up to 800 pt tall
-    readonly property int base: screen && screen.height <= 800 ? Theme.dock.iconSizeShort : Theme.dock.iconSize
+    readonly property int base: Math.round((screen ? screen.width : 1440) * Theme.dock.tileFraction)
+    readonly property int magnified: Math.round(base * Theme.dock.magnifyRatio)
     readonly property int pad: Theme.dock.padding
     readonly property int sidePad: Theme.dock.sidePadding
     readonly property int bgHeight: base + pad * 2
     readonly property int tooltipRoom: Theme.dock.tooltipHeight + Theme.dock.tooltipGap + 8
 
     anchors { bottom: true; left: true; right: true }
-    implicitHeight: Theme.dock.magnifiedSize + pad + Theme.dock.bottomMargin + tooltipRoom
+    implicitHeight: dock.magnified + pad + Theme.dock.bottomMargin + tooltipRoom
     exclusiveZone: bgHeight + Theme.dock.bottomMargin
     namespace: "hyprk-dock"
     WlrLayershell.layer: WlrLayer.Top
@@ -42,7 +43,7 @@ ShellWindow {
         if (!hovering || Panels.open === "context") return base;
         const d = Math.abs(mouseX - baseCenter) / (base * Theme.dock.magnifyRange);
         if (d >= 1) return base;
-        return base + (Theme.dock.magnifiedSize - base) * (Math.cos(d * Math.PI) + 1) / 2;
+        return base + (dock.magnified - base) * (Math.cos(d * Math.PI) + 1) / 2;
     }
 
     // hit area: background, plus the magnified band while hovering
@@ -50,7 +51,7 @@ ShellWindow {
         id: hit
         x: bg.x
         width: bg.width
-        y: dock.hovering ? bg.y - (Theme.dock.magnifiedSize - dock.base) : bg.y
+        y: dock.hovering ? bg.y - (dock.magnified - dock.base) : bg.y
         height: dock.height - y
     }
 

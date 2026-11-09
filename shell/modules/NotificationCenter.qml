@@ -294,14 +294,20 @@ Item {
         transform: Rotation { origin.x: hand.thick / 2; origin.y: hand.len; angle: hand.angle }
     }
 
-    component Pill: Rectangle {
+    // glass capsule with a grey lift so it stays visible over white windows
+    component Pill: Glass {
         id: pill
         property string text
         signal activated()
         implicitWidth: pt.implicitWidth + 16
         implicitHeight: 22
         radius: 11
-        color: Theme.solidMaterial ? Theme.glass.solid : Theme.glass.tint
+        tint: Theme.nc.pillLift
+        pluginLift: Theme.nc.pillLift
+        shadow: false
+        readonly property point pos: mapToItem(null, 0, 0)
+        sx: nc.originX + pos.x
+        sy: nc.originY + pos.y
         Text {
             id: pt
             anchors.centerIn: parent

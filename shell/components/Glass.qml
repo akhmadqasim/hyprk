@@ -24,6 +24,8 @@ Item {
     // tint drawn on top of the plugin's glass (the plugin owns blur, rim, shadow)
     // default: in dark mode a dark veil, so the plugin glass stays dark over bright windows
     property color pluginLift: Theme.dark ? Theme.glass.darkVeil : "transparent"
+    // optional 1px rim drawn over plugin glass (the plugin's own rim is subtle)
+    property color pluginRim: "transparent"
 
     Region {
         id: shape
@@ -52,9 +54,11 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        visible: Theme.compositorGlass && root.pluginLift.a > 0
+        visible: Theme.compositorGlass && (root.pluginLift.a > 0 || root.pluginRim.a > 0)
         radius: root.radius
         color: root.pluginLift
+        border.width: root.pluginRim.a > 0 ? 1 : 0
+        border.color: root.pluginRim
     }
 
     Item {
