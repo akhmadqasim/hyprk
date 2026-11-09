@@ -239,6 +239,7 @@ Singleton {
         readonly property real upNextSplit: 0.56         // Calendar: month grid left, Up Next right
         readonly property int monthCell: 17              // mini month cell
         readonly property int monthGap: 2
+        readonly property int upNextGap: 6               // date to the event list
         readonly property color onImage: "#FFFFFF"       // text over the Photos widget
         readonly property color onImageSecondary: Qt.rgba(1, 1, 1, 0.85)
         readonly property real photoScrim: 0.45          // bottom gradient behind the caption

@@ -189,9 +189,9 @@ Item {
                         font.pixelSize: Theme.font.widgetBig
                         color: Theme.color.label
                     }
-                    Item { width: 1; height: Theme.nc.monthGap * 3 }
                     Text {
                         width: parent.width
+                        topPadding: Theme.nc.upNextGap
                         wrapMode: Text.WordWrap
                         text: "No more events today"
                         font.family: Theme.fontText

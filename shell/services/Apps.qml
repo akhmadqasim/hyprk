@@ -62,7 +62,10 @@ Singleton {
     readonly property var visibleEntries: {
         const vis = entries.filter(e => !e.noDisplay && !e.runInTerminal && !isHelper(e)
             && (!isTerminal(e) || !preferredTerminal || e === preferredTerminal));
-        const helper = e => !!e.icon && vis.some(m => m !== e && m.icon === e.icon && e.name.startsWith(m.name + " "));
+        // names per icon once, then each entry only checks apps with the same icon
+        const byIcon = {};
+        for (const e of vis) if (e.icon) (byIcon[e.icon] = byIcon[e.icon] || []).push(e.name);
+        const helper = e => !!e.icon && byIcon[e.icon].some(n => n !== e.name && e.name.startsWith(n + " "));
         return vis.filter(e => !helper(e));
     }
     readonly property var sortedEntries: visibleEntries.slice().sort((a, b) => a.name.localeCompare(b.name))
