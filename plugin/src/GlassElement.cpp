@@ -128,8 +128,9 @@ namespace lg {
             GLuint   pbo   = 0;
             GLsync   fence = nullptr;
             bool     isFloat = false;
-            uint64_t seen    = 0;
+            uint64_t seen    = 0, requested = 0;
         };
+        constexpr uint64_t LUMA_INTERVAL = 6; // monitor frames between readbacks per shape
         std::map<std::pair<uintptr_t, size_t>, SLuma> g_luma;
         GLuint                                         g_readFbo = 0;
         uint64_t                                       g_frame   = 0;
@@ -173,13 +174,13 @@ namespace lg {
 
         // queue a 1-pixel read of `tex` at mip `level`, texel (x, y)
         void requestLuma(SLuma& l, GLuint tex, int level, int x, int y) {
-            if (l.fence)
-                return; // previous read still in flight
+            // previous read still in flight, or one taken recently: luminance changes slowly
+            if (l.fence || (l.requested && g_frame - l.requested < LUMA_INTERVAL))
+                return;
             if (!g_readFbo)
                 glGenFramebuffers(1, &g_readFbo);
 
-            GLint prevRead = 0;
-            glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &prevRead);
+            CFramebufferBindingGuard guard{g_pHyprRenderer->glBackend()}; // restores the read binding
             g_pHyprOpenGL->bindFramebuffer(GL_READ_FRAMEBUFFER, g_readFbo);
             glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, level);
 
@@ -199,12 +200,13 @@ namespace lg {
             }
 
             glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
-            g_pHyprOpenGL->bindFramebuffer(GL_READ_FRAMEBUFFER, prevRead);
+            l.requested = g_frame;
         }
     }
 
     void onFrame() {
-        ++g_frame;
+        if (++g_frame % 60)
+            return;
         // forget surfaces not drawn for ~10 s at 60 Hz
         std::erase_if(g_luma, [](auto& kv) {
             if (g_frame - kv.second.seen < 600)
@@ -225,13 +227,10 @@ namespace lg {
 
     // ── element ─────────────────────────────────────────────────────────────
 
-    CGlassElement::CGlassElement(SData data) : m_data(std::move(data)) {
-        if (!m_data.recipe)
-            m_data.recipe = &recipeByName("regular");
-    }
+    CGlassElement::CGlassElement(SData data) : m_data(std::move(data)) {}
 
     double CGlassElement::margin(const SData& data) {
-        const auto& r = data.recipe ? *data.recipe : recipeByName("regular");
+        const auto& r = *data.recipe;
         return (data.shadow ? 2.0 * r.shadowRadius + std::abs(r.shadowOffsetY) : 0.0) + 2.0;
     }
 
@@ -249,10 +248,12 @@ namespace lg {
         const auto mon = ctx.m_data.pMonitor.lock();
         if (!mon || !data.params || data.params->fullDamage)
             return;
-        const double m = margin(data);
+        const double m       = margin(data);
+        const auto   extents = ctx.m_data.damage.getExtents();
         for (const auto& s : data.shapes) {
             const CBox box = readBox(s, m, reachOf(*data.params, *data.recipe, s), mon->m_scale);
-            if (!CRegion{ctx.m_data.damage}.intersect(box).empty())
+            // cheap reject on the extents before the exact region test
+            if (!box.intersection(extents).empty() && !CRegion{ctx.m_data.damage}.intersect(box).empty())
                 ctx.m_data.damage.add(box);
         }
     }
@@ -313,7 +314,7 @@ namespace lg {
         const float scale = mon ? mon->m_scale : 1.f;
         const auto& p     = *m_data.params;
         const auto& face  = p.appearance == 2 ? m_data.recipe->dark : m_data.recipe->light;
-        // the face's black point as a translucent lift (or the fill when it has one)
+        // rough stand-in for the face effect: the recipe fill, or half its black point as a white lift
         const auto tint = face.fill.a > 0 ? face.fill : SRgba{1, 1, 1, face.ycc.black * 0.5f};
         for (const auto& s : m_data.shapes) {
             CBox box = CBox{s.box.x, s.box.y, s.box.w, s.box.h}.scale(scale).round();
@@ -348,7 +349,7 @@ namespace lg {
         CRegion            blurDamage;
         for (size_t i = 0; i < m_data.shapes.size(); ++i) {
             const auto& s    = m_data.shapes[i];
-            CBox        quad = CBox{s.box.x - m, s.box.y - m, s.box.w + 2 * m, s.box.h + 2 * m}.scale(scale).round();
+            const CBox  quad = readBox(s, m, 0, scale);
             if (quad.w < 1 || quad.h < 1)
                 continue;
             CRegion damage{ctx.m_data.damage};

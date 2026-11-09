@@ -37,7 +37,7 @@ namespace lg {
             .dark              = {.ycc = {0.05f, 0.92f, 1.25f}, .fill = {}, .highlightBias = 0.3f},
             .refractionHeightN = 0.08f,
             .refractionAmountN = -0.18f,
-            .blurD0 = 0, .blurD1 = 1, .blurLo = 1.5f, .blurHi = 1.5f,
+            .blurLo = 1.5f, .blurHi = 1.5f, // constant
         };
 
         // SPEC 9.5 Control Center, Mac, V2 on top of Clear: blur 4, inner 0.225 D clamp 25,
@@ -50,7 +50,7 @@ namespace lg {
             .refractionHeightMax = 25,
             .refractionAmountN   = -2.0f,
             .refractionAmountMin = -80,
-            .blurD0 = 0, .blurD1 = 1, .blurLo = 4, .blurHi = 4,
+            .blurLo = 4, .blurHi = 4, // constant
         };
 
         // Regular + the Mac glass window/menu active shadow (SPEC 9.5: 0.6 light, radius 24, y 10)

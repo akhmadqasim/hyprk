@@ -59,7 +59,7 @@ namespace lg {
             std::vector<SGlassShape>       shapes; // monitor-local logical px
             float                          alpha = 1.f;
             std::shared_ptr<const SParams> params;
-            const SRecipe*                 recipe = nullptr;
+            const SRecipe*                 recipe = &recipeByName("regular");
             uintptr_t                      owner  = 0;    // layer/window identity, keys the light/dark state
             bool                           shadow = true; // windows draw their own
             std::optional<float>           roundingPower; // override params->roundingPower

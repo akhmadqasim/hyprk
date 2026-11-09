@@ -107,7 +107,7 @@ how Apple's blur radius maps to extra mip levels (`blur_lod_scale`).
 | `window_radius` | -1 | window glass radius; < 0 = the window's rounding |
 
 Keys of the first iteration (`saturation`, `tint_light`, `tint_dark`, `brightness_*`, `refraction`, `shadow_opacity`, ...)
-are still accepted so old configs load, but do nothing.
+are still accepted so old configs load, but do nothing. They will be removed once config/hypr/hyprland.lua no longer sets them.
 
 Damage: when any part of a glass is damaged, the plugin adds the whole glass box plus what its shader
 reads (refraction reach + aberration + 8 px) to the frame damage while the pass is built
