@@ -28,8 +28,7 @@ uniform float outerHeight;
 uniform float outerOpacity;
 uniform vec2  outerThreshold;       // rim band (px of d) over which the outer layer fades in
 uniform float aberration;           // px R/B split at the edge
-uniform vec3  blurFill;             // lighten, darken, normal
-uniform float blurFillLod;
+uniform vec3  blurFill;             // lighten, darken, normal (wider blur: blurLod + 1.5)
 uniform float bleedOpacity;         // edge bleed
 uniform float bleedHeight;          // px
 uniform float bleedAmount;          // px, + = outward
@@ -85,8 +84,6 @@ float gEdge(float v) {
 
 float luma(vec3 c) { return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
 
-vec3 saturate3(vec3 c, float s) { return mix(vec3(luma(c)), c, s); }
-
 vec3 fetch(vec2 quadPx, float lod) {
     vec4 s = textureLod(tex, mix(uvTopLeft, uvBottomRight, quadPx / quadSize), lod);
     return s.rgb / max(s.a, 1e-4);
@@ -110,11 +107,15 @@ float blurAmount(float dEff) {
     return sat(blurAlpha.x - blurAlpha.y * r1 - blurAlpha.z * r2);
 }
 
+// Approximation of a per-pixel blur radius: deeper mips of the sharp copy as b grows (no ghosting),
+// handing over to Hyprland's smoother blur over the last fifth
 vec3 sampleFace(vec2 pos, float b) {
-    vec3 blurred = fetch(pos, blurLod);
     if (b >= 0.999)
-        return blurred;
-    return mix(fetchSharp(pos, 3.0 * b), blurred, b);
+        return fetch(pos, blurLod);
+    vec3 sharp = fetchSharp(pos, 6.0 * b);
+    if (b <= 0.8)
+        return sharp;
+    return mix(sharp, fetch(pos, blurLod), (b - 0.8) * 5.0);
 }
 
 void main() {
@@ -136,7 +137,7 @@ void main() {
 
     vec4 shadow = vec4(0.0);
     if (sh > 0.0)
-        shadow = vec4(saturate3(fetch(qp, blurLod + 2.0), shadowSaturation) * shadowTint * sh, sh);
+        shadow = vec4(ycc(fetch(qp, blurLod + 2.0), vec3(0.0, 1.0, shadowSaturation)) * shadowTint * sh, sh);
 
     vec4 face = vec4(0.0);
     if (cov > 0.0) {
@@ -177,13 +178,13 @@ void main() {
             col = sampleFace(pR, b);
 
         // blur fill: lighten/darken against a wider blur (SPEC step 4.4)
-        if (blurFill.z > 0.0 || blurFill.x > 0.0 || blurFill.y > 0.0) {
-            vec3 bf = fetch(qp, blurFillLod);
+        if (dot(blurFill, vec3(1.0)) > 0.0) {
+            vec3 bf = fetch(qp, blurLod + 1.5);
             col     = mix(blurFill.y * min(col, bf) + blurFill.x * max(col, bf) + (1.0 - blurFill.x - blurFill.y) * col, bf, blurFill.z);
         }
 
         // outer refraction layer over the rim band (SPEC step 4.5)
-        if (outerOpacity > 0.0) {
+        if (outerOpacity > 0.0 && d > outerThreshold.x) {
             float mo = outerAmount * bevel(depth, outerHeight);
             vec3  so = sampleFace(qp + n * mo, blurAmount(d));
             col      = mix(col, so, sat((d - outerThreshold.x) / (outerThreshold.y - outerThreshold.x)) * outerOpacity);

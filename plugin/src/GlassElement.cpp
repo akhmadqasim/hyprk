@@ -91,7 +91,6 @@ namespace lg {
             .outerOpacity     = loc("outerOpacity"),
             .outerThreshold   = loc("outerThreshold"),
             .blurFill         = loc("blurFill"),
-            .blurFillLod      = loc("blurFillLod"),
             .bleedOpacity     = loc("bleedOpacity"),
             .bleedHeight      = loc("bleedHeight"),
             .bleedAmount      = loc("bleedAmount"),
@@ -258,7 +257,7 @@ namespace lg {
 
         // copies the framebuffer being rendered into g_sharpFB and builds its mip chain;
         // returns its texture, or null when that is not possible
-        SP<Render::ITexture> copySharp(Render::CRenderContext& ctx, const Vector2D& size) {
+        SP<Render::ITexture> copySharp(Render::CRenderContext& ctx, const Vector2D& size, const CBox& region) {
             const auto src = dynamicPointerCast<CGLFramebuffer>(ctx.m_data.currentFB);
             if (!src)
                 return nullptr;
@@ -274,7 +273,9 @@ namespace lg {
                 CFramebufferBindingGuard guard{g_pHyprRenderer->glBackend()};
                 g_pHyprOpenGL->bindFramebuffer(GL_READ_FRAMEBUFFER, src->getFBID());
                 g_pHyprOpenGL->bindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->getFBID());
-                glBlitFramebuffer(0, 0, size.x, size.y, 0, 0, size.x, size.y, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+                // only what the shader reads; texel rows follow the same top-down box space as the uvs
+                const int x0 = region.x, y0 = region.y, x1 = region.x + region.w, y1 = region.y + region.h;
+                glBlitFramebuffer(x0, y0, x1, y1, x0, y0, x1, y1, GL_COLOR_BUFFER_BIT, GL_NEAREST);
             }
             g_pHyprOpenGL->setActiveTexture(GL_TEXTURE1);
             tex->bind();
@@ -482,7 +483,7 @@ namespace lg {
             return false;
 
         // without the copy, the blurred texture stands in: variable blur and bleed then stay blurred
-        auto sharp = copySharp(ctx, tex->m_size);
+        auto sharp = copySharp(ctx, tex->m_size, blurDamage.getExtents());
         if (!sharp)
             sharp = tex;
 
@@ -561,14 +562,13 @@ namespace lg {
             glUniform2f(u.quadSize, quad.w, quad.h);
             glUniform4f(u.glassBox, s.box.x * scale - quad.x, s.box.y * scale - quad.y, s.box.w * scale, s.box.h * scale);
             glUniform1f(u.radius, s.radius * scale);
-            glUniform1f(u.blurLod, p.blurLod + p.blurLodScale * std::log2(1.f + res.blurRadius));
+            glUniform1f(u.blurLod, p.blurLod + p.blurLodScale * std::log2(1.f + res.blurRadius)); // mip levels over Hyprland's blur
             glUniform1f(u.refraction, res.refractionAmount * p.refractionScale * scale);
             glUniform1f(u.refractionHeight, res.refractionHeight * scale);
             glUniform2f(u.blurDist, res.blurDist0 * scale, r.blurDist1 * scale);
             glUniform1f(u.outerAmount, res.outerAmount * p.refractionScale * scale);
             glUniform1f(u.outerHeight, res.outerHeight * scale);
             glUniform3f(u.blurFill, face.blurFill.lighten, face.blurFill.darken, face.blurFill.normal);
-            glUniform1f(u.blurFillLod, p.blurLod + p.blurLodScale * std::log2(1.f + res.blurRadius) + 1.5f);
             glUniform1f(u.bleedOpacity, res.bleedOpacity);
             glUniform1f(u.bleedHeight, res.bleedHeight * scale);
             glUniform1f(u.bleedAmount, res.bleedAmount * p.refractionScale * scale);
