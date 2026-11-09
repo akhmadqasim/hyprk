@@ -62,7 +62,6 @@ namespace lg {
             .recipe        = &recipeByName(params->windowMaterial),
             .owner         = reinterpret_cast<uintptr_t>(window.get()),
             .shadow        = false,
-            .isWindow      = true,
             .roundingPower = window->presentation().roundingPower(),
         };
         CGlassElement::claimDamage(ctx, data);

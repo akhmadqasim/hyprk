@@ -69,7 +69,6 @@ namespace lg {
             const SRecipe*                 recipe = &recipeByName("regular");
             uintptr_t                      owner  = 0;    // layer/window identity, keys the light/dark state
             bool                           shadow = true; // windows draw their own
-            bool                           isWindow = false;
             std::optional<float>           roundingPower; // override params->roundingPower
             std::vector<SResolved>         resolved;      // per shape, filled by claimDamage()/the ctor
         };

@@ -186,7 +186,7 @@ namespace lg {
     }
 
     namespace {
-        // glass boxes claimed this frame; bool = already added to the damage
+        // glass boxes claimed this frame; bool = damaged (added to the frame damage) while building
         std::vector<std::pair<CBox, bool>> g_claims;
     }
 
@@ -205,54 +205,37 @@ namespace lg {
     // ── unblurred backdrop copy (variable blur, edge bleed) ──────────────────
 
     namespace {
-        struct SSharp {
-            SP<Render::IFramebuffer> fb;
-            uint64_t                 frame = 0; // g_frame of the last refresh
-        };
-        std::map<MONITORID, SSharp> g_sharp; // per monitor: sizes may differ
+        std::map<MONITORID, SP<Render::IFramebuffer>> g_sharp; // per monitor: sizes may differ
 
         // mip footprint of the deepest level the shader reads (lod ~6): copy this much more
         constexpr double SHARP_MARGIN = 128;
 
-        // The unblurred backdrop for all glass of this monitor frame, refreshed once per frame at
-        // the first glass element: every claimed glass box (plus the mip footprint) is copied from
-        // what Hyprland blurs (the backdrop capture when a scope is open, else the framebuffer being
-        // rendered), then the mip chain is rebuilt. Nothing damaged under the glass: no copy, no mips.
-        // Layer glass drawn above other layer glass in the same frame sees the backdrop without the
-        // lower glass in its sharp samples (blurred ones are exact); window glass always refreshes
-        // the copy (perElement).
+        // The unblurred backdrop of one glass element: its boxes (plus the mip footprint) are copied
+        // from what Hyprland blurs (the backdrop capture when a scope is open, else the framebuffer
+        // being rendered), then the mip chain is rebuilt. Per element, at its own turn in the pass:
+        // a copy shared across the frame showed stale pixels in the real shell (the framebuffer
+        // under a later layer is not final at an earlier element's turn), see README Performance.
         // Returns the texture, or null when a copy is not possible.
-        SP<Render::ITexture> sharpBackdrop(Render::CRenderContext& ctx, const Vector2D& size, bool perElement) {
+        SP<Render::ITexture> sharpBackdrop(Render::CRenderContext& ctx, const Vector2D& size, CRegion copy) {
             const auto  mon      = ctx.m_data.pMonitor.lock();
             const auto& captures = ctx.m_backdropCaptures;
             const auto  source   = !captures.empty() && captures.back().framebuffer ? captures.back().framebuffer : ctx.m_data.currentFB;
             const auto  src      = dynamicPointerCast<CGLFramebuffer>(source);
             if (!mon || !src)
                 return nullptr;
-            auto& sh = g_sharp[mon->m_id];
-            if (!sh.fb)
-                sh.fb = g_pHyprRenderer->createFB("liquidglass-sharp");
+            auto& fb = g_sharp[mon->m_id];
+            if (!fb)
+                fb = g_pHyprRenderer->createFB("liquidglass-sharp");
             // same format as the source: a blit between float and unorm buffers is invalid
-            const bool fresh = sh.fb->m_size != size || sh.fb->m_drmFormat != src->m_drmFormat || !sh.fb->isAllocated();
-            if (fresh && !sh.fb->alloc(size.x, size.y, src->m_drmFormat))
+            if ((fb->m_size != size || fb->m_drmFormat != src->m_drmFormat || !fb->isAllocated()) && !fb->alloc(size.x, size.y, src->m_drmFormat))
                 return nullptr;
-            const auto dst = dynamicPointerCast<CGLFramebuffer>(sh.fb);
-            const auto tex = sh.fb->getTexture();
+            const auto dst = dynamicPointerCast<CGLFramebuffer>(fb);
+            const auto tex = fb->getTexture();
             if (!dst || !tex)
                 return nullptr;
-            if (sh.frame == g_frame && !fresh && !perElement)
-                return tex;
-            // the glass boxes redrawn this frame (outside the damage the buffer may hold an older
-            // frame); nothing damaged under any glass: no copy
-            CRegion copy;
-            for (const auto& [box, added] : g_claims)
-                if (fresh || perElement || touches(ctx.m_data.damage, box))
-                    copy.add(box.copy().expand(SHARP_MARGIN));
             copy.intersect(CBox{{}, size});
-            if (copy.empty()) {
-                sh.frame = g_frame;
+            if (copy.empty())
                 return tex;
-            }
             {
                 CFramebufferBindingGuard guard{g_pHyprRenderer->glBackend()};
                 g_pHyprOpenGL->bindFramebuffer(GL_READ_FRAMEBUFFER, src->getFBID());
@@ -260,11 +243,10 @@ namespace lg {
                 // texel rows follow the top-down box space of the uvs
                 copy.forEachRect([](const auto& r) { glBlitFramebuffer(r.x1, r.y1, r.x2, r.y2, r.x1, r.y1, r.x2, r.y2, GL_COLOR_BUFFER_BIT, GL_NEAREST); });
                 if (glGetError() != GL_NO_ERROR) {
-                    sh.fb.reset(); // reallocate next time; later glass this frame falls back too
+                    fb.reset(); // reallocate next time
                     return nullptr;
                 }
             }
-            sh.frame = g_frame;
             g_pHyprOpenGL->setActiveTexture(GL_TEXTURE1);
             tex->bind();
             glGenerateMipmap(GL_TEXTURE_2D);
@@ -468,9 +450,10 @@ namespace lg {
             return false;
 
         // without the copy, the blurred texture stands in: variable blur and bleed then stay blurred
-        // layer glass (top/overlay) is drawn after all windows and can share one copy; window glass is
-        // interleaved with other windows, so it refreshes the copy for itself
-        auto sharp = sharpBackdrop(ctx, tex->m_size, p.copyPerElement || m_data.isWindow);
+        CRegion sharpRegion;
+        for (const auto& q : quads)
+            sharpRegion.add(readBox(m_data.shapes[q.index], m, reachOf(p, q.res), scale).expand(SHARP_MARGIN));
+        auto sharp = sharpBackdrop(ctx, tex->m_size, sharpRegion);
         if (!sharp)
             sharp = tex;
 

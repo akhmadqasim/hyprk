@@ -2,8 +2,7 @@
 # GPU frame-time benchmark of the liquidglass plugin with the real hyprk shell.
 # Headless 3840x2160 @ 1.5 output, Dock + Control Center + a notification banner open over a
 # terminal that redraws constantly, so every frame repaints the glass.
-# Prints `hyprctl liquidglass` for: shared backdrop copy (default), the old per-element copy,
-# and the plugin disabled (plain Hyprland blur).   Usage: plugin/test/bench.sh [seconds per run]
+# Prints `hyprctl liquidglass` for the glass and with the plugin disabled (plain Hyprland blur).   Usage: plugin/test/bench.sh [seconds per run]
 set -u
 SECS=${1:-8}
 ROOT=/mnt/code/hyprk
@@ -32,7 +31,6 @@ run() {
     echo "== $2"
     hc liquidglass
 }
-run "enabled = 1, debug_copy_per_element = 0" "shared backdrop copy (default)"
-run "enabled = 1, debug_copy_per_element = 1" "per-element copy (iteration 3)"
-run "enabled = 0, debug_copy_per_element = 0" "plugin disabled (plain Hyprland blur)"
+run "enabled = 1" "liquid glass (default)"
+run "enabled = 0" "plugin disabled (plain Hyprland blur)"
 WAYLAND_DISPLAY=$WAYLAND_DISPLAY grim -o MBA "$ROOT/reference/ours/plugin-bench.png" 2>/dev/null

@@ -41,7 +41,6 @@ namespace lg {
         float                                        shadowScale = 1, shadowTint = 0.35f, ringScale = 1;
 
         bool                                         fullDamage    = false; // true: redraw the whole output while glass is visible
-        bool                                         copyPerElement = false; // benchmark: the iteration-3 backdrop copy (every element, whole region)
         bool                                         stats         = false; // GPU timestamp queries, `hyprctl liquidglass`
         bool                                         linearLight   = false; // 1: shader in linear light (recipes are tuned for 0, see README)
         bool                                         requireRegion = true;  // no blur region -> no glass

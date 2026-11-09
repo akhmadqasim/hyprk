@@ -62,7 +62,7 @@ Apple's numbers from `/mnt/code/liquid-glass-re/SPEC.md` section 9 (glass versio
 | `menu` | as regular | as regular | as regular | as regular | as regular | 0.6, r 24, y 10 | `hyprk-overlay`, `hyprk-menubar` |
 | `clear` | 0.125, 1.08, 1.06 | none | 0.25 D / -0.8 D | none | D 48→120 : 3→8 | as regular | |
 | `dock` | 0.15, 0.9, 1.1 (Apple 1.25) | none / 0.05 | 0.08 D / -0.18 D | 0.13 D / 0.42 D / 0.2 | 1.5 | as regular | `hyprk-dock` |
-| `controlcenter` | 0.1, 0.5, 0.7 (Apple 0.125, 0.8, 1.2), face luma kept in 0.30-0.42 (dark 0.22-0.36) | none | 0.225 D (max 25) / -2.0 D (min -80) | 0.0357 D / 0.0714 D / 0.1525 | 4, variable from 100 pt in | as regular | `hyprk-controlcenter` |
+| `controlcenter` | 0.18, 0.55, 1.0 (Apple 0.125, 0.8, 1.2), 6 % warm grey, face luma kept in 0.15-0.47 (dark 0.10-0.40) | none | 0.225 D (max 25) / -2.0 D (min -80) | 0.0357 D / 0.0714 D / 0.1525 | none (Apple 4: too much on top of Hyprland's blur), variable from 100 pt in | as regular | `hyprk-controlcenter` |
 
 The face colour is Apple's YCC composite (SPEC 9.7): `Y' = black + (white - black) Y`, chroma x saturation,
 then the fill. The controlcenter face and the regular/dock saturation deviate from the decoded values:
@@ -114,7 +114,6 @@ how Apple's blur radius maps to extra mip levels (`blur_lod_scale`).
 | `require_region` | 1 | only layers that set an ext-background-effect blur region get glass |
 | `linear` | 0 | 1 = shader works in linear light like QuartzCore. The recipes are tuned for 0; with 1 the CC labels drop to ~3:1, so it stays off until re-tuned |
 | `stats` | 0 | GPU timing, read with `hyprctl liquidglass` |
-| `debug_copy_per_element` | 0 | benchmark only: the old per-element backdrop copy |
 | `full_damage` | 0 | 1 = redraw the whole output while glass is visible (debug; see below) |
 | `shader_path` | "" | load this fragment shader instead of the built-in one |
 | `window_classes` | "" | regex: windows whose class matches get glass behind them |
@@ -137,23 +136,25 @@ A screenshot with `full_damage = 1` was pixel-identical to the default (test 202
 
 ## Performance
 
-The unblurred backdrop copy (variable blur, edge bleed) is made once per monitor frame, at the first
-glass element, for all glass boxes of the frame, and only on frames where something under the glass was
-damaged (otherwise no copy and no mip rebuild). `plugin:liquidglass:stats = 1` turns on GPU timestamp queries; `hyprctl liquidglass`
-prints the averages (`hyprctl liquidglass reset` clears them). `test/bench.sh` runs the real shell on a
-headless 3840x2160 @ 1.5 output (the user's 4K 150 %) with Dock, Control Center and a banner over a
-terminal that redraws every frame, and measures three configurations. Result on this PC (AMD RDNA2, the
-RX 6600 class GPU), 6 s each, 2026-11-10:
+Each glass element copies the unblurred backdrop under its own boxes (plus the mip footprint) at its
+turn in the pass and rebuilds that copy's mip chain; an element is only drawn when something under it was
+damaged. A copy shared by all glass of a frame (taken once, at the first element) was tried in iteration 4:
+it was ~13 % cheaper but showed stale pixels in the real shell's Control Center, because the framebuffer
+under a later layer is not final at an earlier element's turn, so it was dropped.
+`plugin:liquidglass:stats = 1` turns on GPU timestamp queries; `hyprctl liquidglass` prints the averages
+(`hyprctl liquidglass reset` clears them). `test/bench.sh` runs the real shell on a headless 3840x2160 @ 1.5
+output (the user's 4K 150 %) with Dock, Control Center and a banner over a terminal that redraws every
+frame. Result on this PC (AMD RDNA2, the RX 6600 class GPU), 6 s each, 2026-11-10:
 
 | Configuration | Glass GPU time per element (avg / p95) | Whole frame GPU (avg / p95) |
 |---|---|---|
-| shared backdrop copy (current) | 0.56 / 0.78 ms | 11.1 / 16.3 ms |
-| per-element copy (iteration 3, `debug_copy_per_element = 1`) | 0.64 / 0.93 ms | 11.2 / 16.6 ms |
+| per-element copy (current) | 0.64 / 0.93 ms | 11.2 / 16.6 ms |
+| shared copy (iteration 4, dropped) | 0.56 / 0.78 ms | 11.1 / 16.3 ms |
 | plugin disabled (Hyprland's own blur on the same regions) | - | 11.6 / 16.4 ms |
 
 "Whole frame" spans the pass from `RENDER_LAST_MOMENT` to `RENDER_POST` and is dominated by
 Hyprland's own work in the nested session (3 blur passes, two outputs), so its differences are within
-noise: the glass costs about 0.5 ms per element per redrawn frame at 4K.
+noise: the glass costs well under 1 ms per element per redrawn frame at 4K.
 
 ## Title bars
 

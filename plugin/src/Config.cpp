@@ -62,7 +62,6 @@ namespace lg {
         const SIntKey INTS[] = {
             {K("enabled"), 1, [](SParams& p, long long v) { p.enabled = v != 0; }},
             {K("full_damage"), 0, [](SParams& p, long long v) { p.fullDamage = v != 0; }},
-            {K("debug_copy_per_element"), 0, [](SParams& p, long long v) { p.copyPerElement = v != 0; }},
             {K("linear"), 0, [](SParams& p, long long v) { p.linearLight = v != 0; }},
             {K("titlebar_auto_color"), 1, [](SParams& p, long long v) { p.titlebarAutoColor = v != 0; }},
             {K("titlebar_glass"), 0, [](SParams& p, long long v) { p.titlebarGlass = v != 0; }},
@@ -97,7 +96,7 @@ namespace lg {
         const char* const LEGACY_FLOATS[] = {K("saturation"), K("brightness_light"), K("brightness_dark"), K("blur_edge_distance"), K("edge_blur_lod"),
                                              K("refraction"), K("refraction_height"), K("adapt_threshold"), K("adapt_softness"), K("shadow_opacity"),
                                              K("shadow_radius"), K("shadow_offset_y"), K("ring_opacity"), K("ring_width")};
-        const char* const LEGACY_INTS[]   = {K("tint_light"), K("tint_dark")};
+        const char* const LEGACY_INTS[]   = {K("tint_light"), K("tint_dark"), K("debug_copy_per_element")};
 #undef K
 
         struct SCache {
