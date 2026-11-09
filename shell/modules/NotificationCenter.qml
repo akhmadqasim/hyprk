@@ -20,7 +20,11 @@ Item {
 
     property var expanded: ({})       // appName -> bool
     property string photo: ""
-    readonly property string photoTitle: photo ? photo.split("/").slice(-2, -1)[0] : "Featured Photo"
+    // folder name as the caption, like a Photos memory; a loose file in ~/Pictures gets the generic title
+    readonly property string photoTitle: {
+        const folder = photo ? photo.split("/").slice(-2, -1)[0] : "";
+        return folder && folder !== "Pictures" ? folder : "Featured Photo";
+    }
     Process {
         // first photo in ~/Pictures (xdg dir, screenshots skipped), once per shell start
         running: true

@@ -65,8 +65,8 @@ ShellWindow {
     Item {
         id: panel
         // 128pt icons unless the row would not fit the screen
-        readonly property real icon: Math.min(Theme.switcher.iconSize,
-            (sw.width * Theme.switcher.maxWidthFraction - Theme.switcher.padding * 2) / Math.max(1, sw.apps.length) - Theme.switcher.cellPadding * 2)
+        readonly property real icon: Math.max(Theme.switcher.minIconSize, Math.min(Theme.switcher.iconSize,
+            (sw.width * Theme.switcher.maxWidthFraction - Theme.switcher.padding * 2) / Math.max(1, sw.apps.length) - Theme.switcher.cellPadding * 2))
         readonly property real cell: icon + Theme.switcher.cellPadding * 2
         width: sw.apps.length * cell + Theme.switcher.padding * 2
         height: cell + Theme.switcher.labelHeight + Theme.switcher.padding * 2

@@ -304,6 +304,7 @@ Singleton {
         readonly property int selectionRadius: 24        // TODO verify
         readonly property int labelHeight: 24            // selected app name row, TODO verify
         readonly property real maxWidthFraction: 0.92    // of the screen
+        readonly property int minIconSize: 32            // floor when many apps are open
         readonly property color selection: theme.dark ? Qt.rgba(1, 1, 1, 0.18) : Qt.rgba(0, 0, 0, 0.12)
     }
 
