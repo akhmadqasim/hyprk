@@ -11,15 +11,21 @@ Singleton {
     id: root
 
     // Dock order, macOS-like: Finder, Launchpad/Apps, browser, mail, ... (first id that exists wins)
+    // hyprk's own apps (sibling dirs of shell/), with the stock app used when one is missing
+    readonly property var hyprkApps: ({
+        "hyprk-finder": { id: "hyprk-finder", name: "Finder", icon: "hyprk-finder", run: "finder/run.sh", fallback: "nautilus" },
+        "org.hyprk.Settings": { id: "org.hyprk.Settings", name: "System Settings", icon: "settings", run: "settings/run.sh", fallback: "gnome-control-center" },
+    })
+
     readonly property var pinnedCandidates: [
-        ["org.gnome.Nautilus", "nautilus", "thunar", "org.kde.dolphin"],
+        ["hyprk-finder"],
         ["hyprk-launchpad"],
         ["firefox", "firefox_firefox", "org.mozilla.firefox", "google-chrome", "chromium"],
         ["org.gnome.Evolution", "thunderbird", "org.mozilla.Thunderbird"],
         ["org.gnome.Calendar"],
         ["org.gnome.TextEditor", "org.gnome.gedit"],
         ["org.gnome.Music", "rhythmbox", "org.gnome.Rhythmbox3"],
-        ["hyprk-settings"],
+        ["org.hyprk.Settings"],
         ["com.mitchellh.ghostty", "org.gnome.Terminal", "kitty", "org.gnome.Ptyxis"],
     ]
 
@@ -36,9 +42,9 @@ Singleton {
                 out.push({ id: "hyprk-launchpad", name: "Apps", icon: "hyprk-launchpad", action: () => Panels.toggle("launchpad") });
                 continue;
             }
-            if (ids[0] === "hyprk-settings") {
-                // hyprk's own System Settings app (settings/), app id org.hyprk.Settings
-                out.push({ id: "org.hyprk.Settings", name: "System Settings", icon: "settings", action: root.openSettings });
+            const own = hyprkApps[ids[0]];
+            if (own) {
+                out.push({ id: own.id, name: own.name, icon: own.icon, action: () => root.runHyprkApp(own.id) });
                 continue;
             }
             for (const id of ids) {
@@ -104,7 +110,7 @@ Singleton {
     // Linux app id / icon name -> macOS icon (themes/icons/apps, extracted by the assets agent).
     // Keys are the lowercased last id segment.
     readonly property var macIcons: ({
-        "nautilus": "Finder", "thunar": "Finder", "dolphin": "Finder",
+        "hyprk-finder": "Finder", "nautilus": "Finder", "thunar": "Finder", "dolphin": "Finder",
         "hyprk-launchpad": "Apps", "view-app-grid-symbolic": "Apps",
         "firefox": "Safari", "firefox_firefox": "Safari", "google-chrome": "Safari", "chromium": "Safari",
         "evolution": "Mail", "thunderbird": "Mail", "geary": "Mail",
@@ -141,14 +147,19 @@ Singleton {
     function activeAppName() {
         const t = Hyprland.activeToplevel;
         if (!t || !appIdOf(t)) return "Finder";
-        const e = entryFor(appIdOf(t));
-        return e ? e.name : appIdOf(t);
+        const id = appIdOf(t);
+        if (hyprkApps[id]) return hyprkApps[id].name;
+        const e = entryFor(id);
+        return e ? e.name : id;
     }
 
-    function focusWindow(t) {
+    // Hyprland window selector for a HyprlandToplevel
+    function windowSelector(t) {
         const addr = String(t.address);
-        Hyprland.dispatch(`hl.dsp.focus({ window = "address:${addr.startsWith("0x") ? addr : "0x" + addr}" })`);
+        return `{ window = "address:${addr.startsWith("0x") ? addr : "0x" + addr}" }`;
     }
+    function focusWindow(t) { Hyprland.dispatch(`hl.dsp.focus(${windowSelector(t)})`); }
+    function closeWindow(t) { Hyprland.dispatch(`hl.dsp.window.close(${windowSelector(t)})`); }
 
     function activate(item) {
         if (item.windows && item.windows.length > 0) {
@@ -163,10 +174,46 @@ Singleton {
     }
 
     // hyprk System Settings (settings/run.sh), GNOME Settings when it is missing
-    function openSettings() {
-        const run = Quickshell.shellDir + "/../settings/run.sh";
-        Quickshell.execDetached(["sh", "-c", `[ -x "${run}" ] && exec "${run}" || exec gnome-control-center`]);
-        markLaunching("org.hyprk.Settings");
+    function runHyprkApp(id) {
+        const app = hyprkApps[id];
+        const run = Quickshell.shellDir + "/../" + app.run;
+        Quickshell.execDetached(["sh", "-c", `[ -x "${run}" ] && exec "${run}" || exec ${app.fallback}`]);
+        markLaunching(id);
+    }
+    function openSettings() { runHyprkApp("org.hyprk.Settings"); }
+
+    // Dock right-click menu, macOS layout: windows, Options, Show in Finder, Open/Quit
+    function dockMenu(item) {
+        if (item.trash)
+            return [{ label: "Open", action: () => Quickshell.execDetached(["gio", "open", "trash:///"]) },
+                    { sep: true }, { label: "Empty Trash", action: root.confirmEmptyTrash }];
+        if (item.folder)
+            return [{ label: "Open “" + item.name + "”", action: () => Quickshell.execDetached(["xdg-open", Quickshell.env("HOME") + "/" + item.folder]) }];
+        const wins = item.windows || [];
+        const out = wins.map(w => ({ label: w.title || item.name, action: () => root.focusWindow(w) }));
+        if (out.length > 0) out.push({ sep: true });
+        out.push({ label: "Options", submenu: true, disabled: true });
+        out.push({ label: "Show in Finder", disabled: true });
+        out.push({ sep: true });
+        if (wins.length > 0)
+            out.push({ label: "Quit", action: () => wins.forEach(root.closeWindow) });
+        else
+            out.push({ label: "Open", action: () => root.activate(item) });
+        return out;
+    }
+
+    function emptyTrash() {
+        Quickshell.execDetached(["sh", "-c", `gio trash --empty && "${Sounds.script}" trash-empty`]);
+    }
+
+    // Finder-style confirmation before erasing
+    function confirmEmptyTrash() {
+        Panels.showAlert({
+            icon: "user-trash-full",
+            title: "Are you sure you want to permanently erase the items in the Trash?",
+            message: "You can’t undo this action.",
+            buttons: [{ label: "Cancel", isCancel: true }, { label: "Empty Trash", isDefault: true, action: root.emptyTrash }],
+        });
     }
 
     function markLaunching(id) {

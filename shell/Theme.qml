@@ -118,12 +118,12 @@ Singleton {
         // Reduce-transparency solid materials (opaque grey-white / dark grey)
         readonly property color solid: theme.dark ? "#2A2A2C" : "#ECECEE"          // TODO verify
         readonly property color solidDock: theme.dark ? "#303032" : "#E4E4E7"      // TODO verify
-        readonly property color tintClear: theme.dark ? Qt.rgba(0.1, 0.1, 0.1, 0.30) : Qt.rgba(1, 1, 1, 0.32)         // dock ("clear" glass)
+        readonly property color tintClear: theme.dark ? Qt.rgba(0.16, 0.16, 0.17, 0.30) : Qt.rgba(1, 1, 1, 0.26)         // Dock: light near-neutral clear glass, TODO glass-defaults.json
         // 1px inner highlight stroke (top-lit rim)
-        readonly property color rimTop: theme.dark ? Qt.rgba(1, 1, 1, 0.28) : Qt.rgba(1, 1, 1, 0.80)                  // TODO verify
-        readonly property color rimBottom: theme.dark ? Qt.rgba(1, 1, 1, 0.06) : Qt.rgba(1, 1, 1, 0.25)                // TODO verify
+        readonly property color rimTop: theme.dark ? Qt.rgba(1, 1, 1, 0.22) : Qt.rgba(1, 1, 1, 0.55)                  // specular hairline, top-lit, TODO verify
+        readonly property color rimBottom: theme.dark ? Qt.rgba(1, 1, 1, 0.05) : Qt.rgba(1, 1, 1, 0.12)                // TODO verify
         // 0.5px outer hairline that separates glass from light backgrounds
-        readonly property color hairline: theme.dark ? Qt.rgba(0, 0, 0, 0.50) : Qt.rgba(0, 0, 0, 0.12)                // TODO verify
+        readonly property color hairline: theme.dark ? Qt.rgba(0, 0, 0, 0.35) : Qt.rgba(0, 0, 0, 0.07)                // TODO verify
         readonly property real rimWidth: 1
         // drop shadow
         readonly property color shadow: Qt.rgba(0, 0, 0, theme.dark ? 0.45 : 0.22)   // TODO verify
@@ -281,6 +281,33 @@ Singleton {
         readonly property int cellHeight: 86             // rows per page = what fits the panel, TODO verify
         readonly property int headerHeight: 52           // TODO verify
         readonly property int padding: 20                // TODO verify
+    }
+
+    // ---------- alert dialog ----------
+    readonly property QtObject alert: QtObject {
+        readonly property int width: 260                 // TODO verify
+        readonly property int radius: 26                 // SPEC.md 7: alert window corner radius 26
+        readonly property int padding: 20                // TODO verify
+        readonly property int iconSize: 64               // TODO verify
+        readonly property int spacing: 10                // TODO verify
+        readonly property int buttonHeight: 28           // capsule buttons, TODO verify
+        readonly property int buttonGap: 8               // TODO verify
+        readonly property real titleSize: 13
+        readonly property real messageSize: 11
+        readonly property color buttonBg: theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0, 0, 0, 0.06)
+    }
+
+    // ---------- mission control ----------
+    readonly property QtObject mission: QtObject {
+        readonly property real dim: 0.35                 // backdrop darkening, TODO verify
+        readonly property int spacesHeight: 64           // Spaces bar at the top, TODO verify
+        readonly property int spaceThumbWidth: 160       // TODO verify
+        readonly property int spaceRadius: 8
+        readonly property int margin: 60                 // around the window grid, TODO verify
+        readonly property int gap: 40                    // between window thumbnails, TODO verify
+        readonly property int thumbRadius: 10            // TODO verify
+        readonly property real maxScale: 0.8             // windows only shrink in Mission Control, TODO verify
+        readonly property real labelSize: 13
     }
 
     // ---------- animation ----------

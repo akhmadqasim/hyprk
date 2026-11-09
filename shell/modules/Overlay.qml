@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs
+import qs.components
 import qs.services
 import "../lib/menus.js" as Menus
 
@@ -14,7 +15,7 @@ PanelWindow {
     required property var modelData
     screen: modelData
 
-    readonly property bool active: Panels.open === "menu" || Panels.open === "cc" || Panels.open === "nc"
+    readonly property bool active: ["menu", "context", "alert", "cc", "nc"].indexOf(Panels.open) !== -1
     visible: active || fadeOut.running
 
     anchors { top: true; left: true; right: true; bottom: true }
@@ -33,7 +34,31 @@ PanelWindow {
     Item {
         anchors.fill: parent
         focus: true
-        Keys.onEscapePressed: Panels.close()
+        Keys.onEscapePressed: Panels.open === "alert" ? alert.pressCancel() : Panels.close()
+        Keys.onReturnPressed: if (Panels.open === "alert") alert.pressDefault()
+        Keys.onEnterPressed: if (Panels.open === "alert") alert.pressDefault()
+    }
+
+    // ---------- context menu (desktop, Dock) ----------
+    MenuDropdown {
+        id: context
+        visible: Panels.open === "context"
+        items: visible ? Panels.contextItems : []
+        x: Math.max(4, Math.min(ov.width - width - 4, Panels.contextAbove ? Panels.contextX - width / 2 : Panels.contextX))
+        y: Math.max(0, Panels.contextY - Theme.menuBar.height - (Panels.contextAbove ? height : 0))
+        originX: x
+        originY: y + Theme.menuBar.height
+    }
+
+    // ---------- alert ----------
+    AlertDialog {
+        id: alert
+        visible: Panels.open === "alert"
+        model: Panels.alert
+        x: (ov.width - width) / 2
+        y: (ov.height - height) / 3
+        originX: x
+        originY: y + Theme.menuBar.height
     }
 
     // ---------- menu ----------

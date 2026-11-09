@@ -23,6 +23,10 @@ Item {
     function trigger(action) {
         Panels.close();
         triggered();
+        if (typeof action === "function") {
+            action();
+            return;
+        }
         switch (action) {
         case "settings": Apps.openSettings(); break;
         case "forcequit": Hyprland.dispatch("hl.dsp.window.kill()"); break;
@@ -36,8 +40,10 @@ Item {
         case "shutdown": Power.shutdown(); break;
         case "lock": Power.lock(); break;
         case "logout": Power.logout(); break;
-        case "trash-open": Quickshell.execDetached(["gio", "open", "trash:///"]); break;
-        case "trash-empty": Quickshell.execDetached(["sh", "-c", `gio trash --empty && "${Sounds.script}" trash-empty`]); break;
+        case "widgets": Panels.open = "nc"; break;
+        case "desktop-new-folder":
+            Quickshell.execDetached(["sh", "-c", 'd="$(xdg-user-dir DESKTOP 2>/dev/null || echo "$HOME/Desktop")"; n="$d/untitled folder"; i=2; while [ -e "$n" ]; do n="$d/untitled folder $i"; i=$((i+1)); done; mkdir -p "$n"']);
+            break;
         }
     }
 

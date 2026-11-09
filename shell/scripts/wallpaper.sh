@@ -44,8 +44,9 @@ if [ ! -f "$wall" ]; then
     magick "$src" -resize "${W}x${H}^" -gravity center -extent "${W}x${H}" "$wall" 2>/dev/null || wall=$src
 fi
 if [ ! -f "$blur" ]; then
-    # downscale, blur, upscale: cheap large-radius gaussian; saturate like vibrancy
-    magick "$wall" -resize 25% -blur "0x$(( SIGMA / 4 + 1 ))" -modulate 100,130 -resize "${W}x${H}!" "$blur" 2>/dev/null || blur=""
+    # downscale, blur, upscale: cheap large-radius gaussian; slightly brighter and
+    # desaturated so glass reads as near-neutral frost (macOS 27 Dock)
+    magick "$wall" -resize 25% -blur "0x$(( SIGMA / 4 + 1 ))" -modulate 106,92 -resize "${W}x${H}!" "$blur" 2>/dev/null || blur=""
 fi
 echo "WALL=$wall"
 echo "BLUR=$blur"

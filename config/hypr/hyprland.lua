@@ -36,7 +36,11 @@ hl.config({
     general = {
         gaps_in = 6,
         gaps_out = 10,
-        border_size = 0,                 -- macOS windows have no colored border
+        border_size = 1,                 -- macOS: thin dark contour (SPEC.md 7.1 ring shadow), not a colored border
+        col = {
+            active_border   = "rgba(0000001f)",
+            inactive_border = "rgba(00000017)",
+        },
         resize_on_border = true,
         layout = "dwindle",
     },
@@ -45,13 +49,13 @@ hl.config({
         rounding_power = 2.8,            -- SPEC.md 7.1: continuous corner guess
         active_opacity = 1.0,
         inactive_opacity = 1.0,
-        shadow = {
+        shadow = {                       -- large soft macOS window shadow, offset down
             enabled = true,
-            range = 40,
+            range = 50,
             render_power = 2,
             offset = "0 12",
-            color = 0x55000000,
-            color_inactive = 0x30000000,
+            color = 0x5c000000,          -- ~0.36 alpha active
+            color_inactive = 0x2e000000, -- ~0.18 alpha inactive
         },
         blur = {
             enabled = true,
@@ -117,7 +121,7 @@ hl.layer_rule({
 hl.layer_rule({
     -- the shell animates these itself
     name = "hyprk-no-anim",
-    match = { namespace = "^hyprk-(overlay|spotlight|switcher|launchpad|notifications|dock|menubar|wallpaper)$" },
+    match = { namespace = "^hyprk-(overlay|spotlight|switcher|launchpad|mission|notifications|dock|menubar|wallpaper)$" },
     no_anim = true,
 })
 
@@ -130,6 +134,9 @@ hl.bind("F4",                hl.dsp.global("hyprk:launchpad"))
 hl.bind(cmd .. " + A",       hl.dsp.global("hyprk:launchpad"))
 hl.bind(cmd .. " + N",       hl.dsp.global("hyprk:notificationcenter"))
 hl.bind(cmd .. " + SHIFT + C", hl.dsp.global("hyprk:controlcenter"))
+hl.bind(cmd .. " + Up",      hl.dsp.global("hyprk:missioncontrol"))   -- macOS: Ctrl+Up
+hl.bind("CTRL + Up",         hl.dsp.global("hyprk:missioncontrol"))
+hl.bind("F3",                hl.dsp.global("hyprk:missioncontrol"))
 hl.bind(cmd .. " + Q",       hl.dsp.window.close())
 hl.bind(cmd .. " + W",       hl.dsp.window.close())
 hl.bind(cmd .. " + M",       hl.dsp.window.float({ action = "toggle" }))
@@ -167,3 +174,5 @@ for _, f in ipairs({ hyprk .. "/settings/hyprland-rules.lua", hyprk .. "/finder/
     if h then h:close(); dofile(f) end
 end
 hl.window_rule({ name = "suppress-maximize", match = { class = ".*" }, suppress_event = "maximize" })
+-- macOS has no tiling: every window floats, opens centered
+hl.window_rule({ name = "macos-float", match = { class = ".*" }, float = true, center = true })

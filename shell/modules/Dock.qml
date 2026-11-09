@@ -38,11 +38,10 @@ PanelWindow {
     // unmagnified width, used for hover math so magnification does not feed back into itself
     readonly property real baseWidth: (items.length - 1) * base + sepCell + (items.length - 1) * Theme.dock.iconSpacing + sidePad * 2
     property real mouseX: -1
-    property real trashMenuX: -1         // >= 0 while the Trash context menu is open (window x of its center)
     readonly property bool hovering: mouseX >= 0
 
     function sizeFor(baseCenter) {
-        if (!hovering || trashMenuX >= 0) return base;
+        if (!hovering || Panels.open === "context") return base;
         const d = Math.abs(mouseX - baseCenter) / (base * Theme.dock.magnifyRange);
         if (d >= 1) return base;
         return base + (Theme.dock.magnifiedSize - base) * (Math.cos(d * Math.PI) + 1) / 2;
@@ -51,10 +50,9 @@ PanelWindow {
     // hit area: background, plus the magnified band while hovering
     Item {
         id: hit
-        // full window while the Trash menu is open, so the menu is inside the input region
-        x: dock.trashMenuX >= 0 ? 0 : bg.x
-        width: dock.trashMenuX >= 0 ? dock.width : bg.width
-        y: dock.trashMenuX >= 0 ? 0 : dock.hovering ? bg.y - (Theme.dock.magnifiedSize - dock.base) : bg.y
+        x: bg.x
+        width: bg.width
+        y: dock.hovering ? bg.y - (Theme.dock.magnifiedSize - dock.base) : bg.y
         height: dock.height - y
     }
 
@@ -62,7 +60,7 @@ PanelWindow {
     HoverHandler {
         // convert window x to the unmagnified dock coordinate space
         onPointChanged: dock.mouseX = hovered ? point.position.x - (dock.width - dock.baseWidth) / 2 : -1
-        onHoveredChanged: if (!hovered) { dock.mouseX = -1; dock.trashMenuX = -1; }
+        onHoveredChanged: if (!hovered) dock.mouseX = -1
     }
 
     Glass {
@@ -154,7 +152,7 @@ PanelWindow {
 
                 // tooltip
                 Rectangle {
-                    visible: ma.containsMouse && !cell.modelData.separator && !cell.bouncing && dock.trashMenuX < 0
+                    visible: ma.containsMouse && !cell.modelData.separator && !cell.bouncing && Panels.open !== "context"
                     anchors.horizontalCenter: parent.horizontalCenter
                     y: icon.y - height - Theme.dock.tooltipGap
                     width: tip.implicitWidth + Theme.dock.tooltipHPad * 2
@@ -180,28 +178,16 @@ PanelWindow {
                     enabled: !cell.modelData.separator
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
                     onClicked: m => {
-                        dock.trashMenuX = -1;
-                        if (cell.modelData.trash && m.button === Qt.RightButton)
-                            dock.trashMenuX = cell.mapToItem(null, cell.width / 2, 0).x;
-                        else if (m.button === Qt.RightButton) return;
-                        else if (cell.modelData.trash) Quickshell.execDetached(["gio", "open", "trash:///"]);
+                        if (m.button === Qt.RightButton) {
+                            // menu above the icon, like the macOS Dock
+                            const p = icon.mapToItem(null, icon.width / 2, 0);
+                            Panels.openContext(Apps.dockMenu(cell.modelData), p.x, dock.screen.height - dock.height + p.y - Theme.dock.tooltipGap, true);
+                        } else if (cell.modelData.trash) Quickshell.execDetached(["gio", "open", "trash:///"]);
                         else if (cell.modelData.folder) Quickshell.execDetached(["xdg-open", Quickshell.env("HOME") + "/" + cell.modelData.folder]);
                         else Apps.activate(cell.modelData);
                     }
                 }
             }
         }
-    }
-
-    // Trash context menu (right click): Open, Empty Trash (with the Finder sound)
-    MenuDropdown {
-        id: trashMenu
-        visible: dock.trashMenuX >= 0
-        items: [{ label: "Open", action: "trash-open" }, { sep: true }, { label: "Empty Trash", action: "trash-empty" }]
-        x: Math.max(4, Math.min(dock.width - width - 4, dock.trashMenuX - width / 2))
-        y: bg.y - height - Theme.dock.tooltipGap
-        originX: x
-        originY: dock.screen.height - dock.height + y
-        onTriggered: dock.trashMenuX = -1
     }
 }

@@ -25,4 +25,5 @@ ShellRoot {
     Spotlight { modelData: Panels.screen }
     Switcher { modelData: Panels.screen }
     Launchpad { modelData: Panels.screen }
+    MissionControl { modelData: Panels.screen }
 }

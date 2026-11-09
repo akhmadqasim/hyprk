@@ -74,6 +74,21 @@ const apps = {
     "settings": { titles: ["Edit", "View", "Window", "Help"], extra: {} },
 };
 
+// Finder desktop right-click menu. Actions are names handled by MenuDropdown.
+function desktop() {
+    return [
+        { label: "New Folder", action: "desktop-new-folder" }, SEP,
+        { label: "Get Info", disabled: true }, SEP,
+        { label: "Change Wallpaper…", action: "settings" },
+        { label: "Edit Widgets…", action: "widgets" }, SEP,
+        { label: "Use Stacks", disabled: true },
+        { label: "Sort By", submenu: true, disabled: true },
+        { label: "Clean Up", disabled: true },
+        { label: "Clean Up By", submenu: true, disabled: true },
+        { label: "Show View Options", disabled: true },
+    ];
+}
+
 // the bold app-name menu
 function appMenu(name) {
     return [
