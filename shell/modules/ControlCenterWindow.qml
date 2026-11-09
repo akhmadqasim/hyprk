@@ -24,7 +24,11 @@ ShellWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
-    MouseArea { anchors.fill: parent; onPressed: Panels.close() }
+    // while fading out the layer takes no input, so it never eats the click
+    // that opened the next panel
+    mask: shown ? null : noInput
+    Region { id: noInput }
+    MouseArea { anchors.fill: parent; enabled: ccw.shown; onPressed: Panels.close() }
     Item { anchors.fill: parent; focus: true; Keys.onEscapePressed: Panels.close() }
 
     ControlCenter {
