@@ -1,29 +1,13 @@
 #!/bin/bash
-# usage: qshot.sh OUT.png light|dark [scene]   runs tools/gallery (build it first, see gallery.cpp) under qt6ct with this theme
-# in the private headless Hyprland (themes/gtk/tools/hypr-headless.sh). qt6ct/kvantum plugins come from QTROOT (extracted debs) if the system lacks them.
-Q=$(cd "$(dirname "$0")/.." && pwd); G=$Q/../gtk/tools
+# usage: qshot.sh OUT.png light|dark [scene]   (env KV=1: Kvantum theme instead of qt6ct+QSS; GALLERY=path to the built gallery.cpp binary)
+# Installs the theme into a scratch config with install.sh --prefix and runs the gallery in the private headless Hyprland
+# (themes/gtk/tools/hypr-headless.sh). qt6ct/Kvantum plugins come from QTROOT (extracted debs) when the system lacks them.
+Q=$(cd "$(dirname "$0")/.." && pwd); G=$Q/../gtk/tools; source "$G/hypr-env.sh"
 OUT=$1; MODE=$2; SCENE=${3:-main}
-O=$(mktemp -d /tmp/claude-1000/hk/qcfg.XXXX); mkdir -p $O/qt6ct
-sed "s|@ASSETS@|$Q/assets|g" $Q/qss/macos27-$MODE.qss > $O/qt6ct/macos27.qss
-cat > $O/qt6ct/qt6ct.conf <<EOT
-[Appearance]
-color_scheme_path=$Q/colors/macos27-$MODE.conf
-custom_palette=true
-standard_dialogs=default
-style=Fusion
-[Fonts]
-fixed="Monospace,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
-general="System Font,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
-[Interface]
-stylesheets=$O/qt6ct/macos27.qss
-EOT
-QR=${QTROOT:-/tmp/claude-1000/qtroot}
-if [ -n "$KV" ]; then   # Kvantum instead of qt6ct+QSS
-  mkdir -p $O/Kvantum; cp -r $Q/kvantum/MacOS27* $O/Kvantum/
-  printf '[General]\ntheme=MacOS27%s\n' "$([ $MODE = dark ] && echo Dark || echo Light)" > $O/Kvantum/kvantum.kvconfig
-  export QT_STYLE_OVERRIDE=kvantum
-  sed -i 's/^style=.*/style=kvantum/; /^stylesheets=/d' $O/qt6ct/qt6ct.conf; sed -i 's/^custom_palette=.*/custom_palette=false/' $O/qt6ct/qt6ct.conf
-fi
+O=$(mktemp -d "$HK_DIR/qcfg.XXXX")
+"$Q/install.sh" --prefix "$O" $([ $MODE = dark ] && echo --dark) $([ -n "$KV" ] && echo --kvantum) >/dev/null
+QR=${QTROOT:-$HK_DIR/qtroot}
+[ -n "$KV" ] && export QT_STYLE_OVERRIDE=kvantum
 export CFG_OVERLAY=$O QT_QPA_PLATFORMTHEME=qt6ct QT_QPA_PLATFORM=wayland QT_PLUGIN_PATH=$QR/usr/lib/x86_64-linux-gnu/qt6/plugins LD_LIBRARY_PATH=$QR/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
-$G/hshot.sh "$OUT" $MODE ${SZ:-1000x680} ${GALLERY:-/tmp/claude-1000/qt-gallery} $SCENE
-rm -rf $O
+"$G/hshot.sh" "$OUT" $MODE "${GALLERY:-$HK_DIR/qt-gallery}" $SCENE
+rm -rf "$O"

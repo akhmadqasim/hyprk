@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """GTK3 widget gallery for theme screenshots. Usage: gallery3.py [main|menu]"""
-import sys, gi
+import os, sys, gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
 scene = sys.argv[1] if len(sys.argv) > 1 else 'main'
@@ -41,7 +41,7 @@ win.connect('destroy', Gtk.main_quit); win.show_all()
 if scene == 'chooser':
     def ch():
         d = Gtk.FileChooserDialog(title='Open', transient_for=win, action=Gtk.FileChooserAction.OPEN)
-        d.add_buttons('Cancel', Gtk.ResponseType.CANCEL, 'Open', Gtk.ResponseType.ACCEPT); d.set_current_folder('/tmp/claude-1000/demo/Documents'); d.show(); return False
+        d.add_buttons('Cancel', Gtk.ResponseType.CANCEL, 'Open', Gtk.ResponseType.ACCEPT); d.set_current_folder(os.environ.get('GALLERY_DIR', os.path.expanduser('~'))); d.show(); return False
     GLib.timeout_add(1000, ch)
 if scene == 'menu': GLib.timeout_add(1200, lambda: (mb.clicked(), False)[1])
 Gtk.main()

@@ -1,48 +1,45 @@
 #!/bin/sh
 # Install the MacOS27 GTK theme. Runs ONLY when you call it; nothing is touched otherwise.
 #
-#   ./install.sh                 install into $HOME  (~/.themes, ~/.config/gtk-4.0, ~/.config/gtk-3.0)
+#   ./install.sh                 install into $HOME  (~/.local/share/themes, ~/.config/gtk-4.0, ~/.config/gtk-3.0)
 #   ./install.sh --prefix DIR    install into DIR/share/themes (+ DIR/etc-xdg/gtk-{3,4}.0 for the user css); touches nothing else
-#   ./install.sh --gsettings     also set gtk-theme / button-layout / color-scheme via gsettings (HOME install only)
-#   ./install.sh --uninstall     remove what a HOME install put there (backups, if any, stay in ~/.config/*/gtk.css.hyprk-backup)
+#   ./install.sh --gsettings     also set gtk-theme / button-layout via gsettings (HOME install only)
+#   ./install.sh --uninstall     remove what a HOME install put there (originals saved as *.hyprk-backup are restored)
 #
-# Existing ~/.config/gtk-{3,4}.0/gtk.css and settings.ini are copied to <name>.hyprk-backup first.
+# Existing ~/.config/gtk-4.0/gtk.css is copied to gtk.css.hyprk-backup first (once).
 set -e
-HERE=$(cd "$(dirname "$0")" && pwd)
+HERE=$(cd "$(dirname "$0")" && pwd); . "$HERE/../lib.sh"
 PREFIX=; GS=0; UN=0
 while [ $# -gt 0 ]; do
   case $1 in
     --prefix) PREFIX=$2; shift ;;
     --gsettings) GS=1 ;;
     --uninstall) UN=1 ;;
-    -h|--help) sed -n 2,10p "$0"; exit 0 ;;
+    -h|--help) sed -n 2,9p "$0"; exit 0 ;;
     *) echo "unknown option $1" >&2; exit 2 ;;
   esac
   shift
 done
 
 if [ -n "$PREFIX" ]; then
-  THEMES=$PREFIX/share/themes; CFG3=$PREFIX/etc-xdg/gtk-3.0; CFG4=$PREFIX/etc-xdg/gtk-4.0
+  DATA=$PREFIX/share; CFG3=$PREFIX/etc-xdg/gtk-3.0; CFG4=$PREFIX/etc-xdg/gtk-4.0
 else
-  THEMES=${XDG_DATA_HOME:-$HOME/.local/share}/themes; CFG3=${XDG_CONFIG_HOME:-$HOME/.config}/gtk-3.0; CFG4=${XDG_CONFIG_HOME:-$HOME/.config}/gtk-4.0
+  DATA=${XDG_DATA_HOME:-$HOME/.local/share}; CFG3=$(hk_cfgbase)/gtk-3.0; CFG4=$(hk_cfgbase)/gtk-4.0
 fi
+THEMES=$DATA/themes; GSV=$DATA/gtksourceview-5/styles
 
 if [ $UN = 1 ]; then
-  rm -rf "$THEMES/MacOS27" "$THEMES/MacOS27-Dark"
-  for f in "$CFG4/gtk.css" "$CFG3/gtk.css"; do
-    if grep -q "MacOS27 theme" "$f" 2>/dev/null; then rm -f "$f"; [ -f "$f.hyprk-backup" ] && mv "$f.hyprk-backup" "$f"; fi
-  done
+  rm -rf "$THEMES/MacOS27" "$THEMES/MacOS27-Dark" "$GSV"/macos27-light.xml "$GSV"/macos27-dark.xml
+  f=$CFG4/gtk.css
+  if grep -q "hyprk-managed" "$f" 2>/dev/null; then rm -f "$f"; [ -f "$f.hyprk-backup" ] && mv "$f.hyprk-backup" "$f"; fi
   echo "removed"; exit 0
 fi
 
-backup() { [ -f "$1" ] && ! grep -q "MacOS27 theme" "$1" && cp -n "$1" "$1.hyprk-backup" || true; }
-mkdir -p "$THEMES" "$CFG3" "$CFG4"
-cp -r "$HERE/MacOS27" "$HERE/MacOS27-Dark" "$THEMES/"
-GSV=${PREFIX:+$PREFIX/share}; GSV=${GSV:-${XDG_DATA_HOME:-$HOME/.local/share}}/gtksourceview-5/styles
-mkdir -p "$GSV"; cp "$HERE"/gtksourceview/*.xml "$GSV/"   # Text Editor: gsettings set org.gnome.TextEditor style-scheme macos27-light
+mkdir -p "$THEMES" "$CFG3" "$CFG4" "$GSV"
+for t in MacOS27 MacOS27-Dark; do rm -rf "$THEMES/$t"; cp -r "$HERE/$t" "$THEMES/$t"; done
+cp "$HERE"/gtksourceview/*.xml "$GSV/"   # Text Editor: gsettings set org.gnome.TextEditor style-scheme macos27-light
 # GTK 4 / libadwaita apps ignore theme names; they read the user stylesheet (light + dark via prefers-color-scheme)
-backup "$CFG4/gtk.css"; cp "$HERE/gtk-4.0/gtk.css" "$CFG4/gtk.css"
-# GTK 3 apps use the theme dir; the user css is only needed on top of another theme, so it is not installed
+hk_backup "$CFG4/gtk.css"; cp "$HERE/gtk-4.0/gtk.css" "$CFG4/gtk.css"
 for d in "$CFG3" "$CFG4"; do
   if [ ! -f "$d/settings.ini" ]; then cp "$HERE/config/settings.ini" "$d/settings.ini"
   else echo "note: $d/settings.ini exists, merge $HERE/config/settings.ini by hand (gtk-decoration-layout=close,minimize,maximize:)"; fi

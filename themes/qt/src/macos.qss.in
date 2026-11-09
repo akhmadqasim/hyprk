@@ -1,5 +1,5 @@
-/* MacOS27 Qt stylesheet (original work). GENERATED from src/macos.qss.in by build.py, @tokens@ are filled per variant.
- * Used through qt6ct (Fusion style + custom palette). @ASSETS@ is replaced by install.sh. */
+/* MacOS27 Qt stylesheet (original work). GENERATED from src/macos.qss.in by build.py, placeholders are filled per variant.
+ * Used through qt6ct (Fusion style + custom palette). the assets path is filled in by install.sh. */
 * { font-family: "SF Pro Text", "SF Pro", "System Font", ".SF NS", "Inter", "Cantarell", sans-serif; }
 QWidget { color: @fg@; selection-background-color: @accent_sel@; selection-color: @fg@; }
 QMainWindow, QDialog, QWidget#centralwidget { background-color: @window@; }

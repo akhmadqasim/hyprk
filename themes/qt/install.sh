@@ -1,21 +1,23 @@
 #!/bin/sh
 # Install the MacOS27 Qt theme for qt6ct (Fusion style + custom palette + QSS). Runs only when you call it.
-#   ./install.sh [--dark] [--kvantum] [--prefix DIR]   default target: ${XDG_CONFIG_HOME:-~/.config}/qt6ct ; --prefix DIR writes DIR/qt6ct (and DIR/Kvantum) instead
-#   --kvantum: also install the Kvantum themes (rounded translucent menus) and make qt6ct use style=kvantum. Needs qt6-style-kvantum. Without it the QSS+Fusion theme is used.
+#   ./install.sh [--dark] [--kvantum] [--force] [--prefix DIR]
+#   default target: ${XDG_CONFIG_HOME:-~/.config}/qt6ct ; --prefix DIR writes DIR/qt6ct (and DIR/Kvantum) instead.
+#   --kvantum: also install the Kvantum theme (rounded translucent menus) and make qt6ct use style=kvantum. Needs qt6-style-kvantum.
+#   --force: overwrite an existing qt6ct.conf (original kept once as qt6ct.conf.hyprk-backup); without it only a hint is printed.
 # Needs the `qt6ct` package (apt install qt6ct) and QT_QPA_PLATFORMTHEME=qt6ct in the session environment.
-# An existing qt6ct.conf is kept (saved copy: qt6ct.conf.hyprk-backup) and only the macOS keys are written when --force is given.
 set -e
-HERE=$(cd "$(dirname "$0")" && pwd)
-V=light; BASE=${XDG_CONFIG_HOME:-$HOME/.config}; FORCE=0; KVT=0
-while [ $# -gt 0 ]; do case $1 in --dark) V=dark ;; --prefix) BASE=$2; shift ;; --force) FORCE=1 ;; --kvantum) KVT=1 ;; *) echo "unknown option $1" >&2; exit 2 ;; esac; shift; done
-T=$BASE/qt6ct; mkdir -p "$T/colors" "$T/qss" "$T/macos27-assets"
-cp "$HERE"/colors/macos27-*.conf "$T/colors/"
+HERE=$(cd "$(dirname "$0")" && pwd); . "$HERE/../lib.sh"
+V=light; PREFIX=; FORCE=0; KVT=0
+while [ $# -gt 0 ]; do case $1 in --dark) V=dark ;; --prefix) PREFIX=$2; shift ;; --force) FORCE=1 ;; --kvantum) KVT=1 ;; *) echo "unknown option $1" >&2; exit 2 ;; esac; shift; done
+BASE=$(hk_cfgbase "$PREFIX"); T=$BASE/qt6ct; N=MacOS27$([ $V = dark ] && echo Dark || echo Light)
+mkdir -p "$T/colors" "$T/qss" "$T/macos27-assets"
+cp "$HERE/colors/macos27-$V.conf" "$T/colors/"
 cp "$HERE"/assets/*.svg "$T/macos27-assets/"
-for v in light dark; do sed "s|@ASSETS@|$T/macos27-assets|g" "$HERE/qss/macos27-$v.qss" > "$T/qss/macos27-$v.qss"; done
+sed "s|@ASSETS@|$T/macos27-assets|g" "$HERE/qss/macos27-$V.qss" > "$T/qss/macos27-$V.qss"
 if [ $KVT = 1 ]; then
-  mkdir -p "$BASE/Kvantum"; cp -r "$HERE"/kvantum/MacOS27* "$BASE/Kvantum/"
-  [ -f "$BASE/Kvantum/kvantum.kvconfig" ] && cp -n "$BASE/Kvantum/kvantum.kvconfig" "$BASE/Kvantum/kvantum.kvconfig.hyprk-backup"
-  printf '[General]\ntheme=MacOS27%s\n' "$([ $V = dark ] && echo Dark || echo Light)" > "$BASE/Kvantum/kvantum.kvconfig"
+  mkdir -p "$BASE/Kvantum"; rm -rf "$BASE/Kvantum/$N"; cp -r "$HERE/kvantum/$N" "$BASE/Kvantum/"
+  hk_backup "$BASE/Kvantum/kvantum.kvconfig"
+  printf '[General]\ntheme=%s\n' "$N" > "$BASE/Kvantum/kvantum.kvconfig"
 fi
 CONF=$T/qt6ct.conf
 if [ -f "$CONF" ] && [ $FORCE = 0 ]; then
@@ -23,7 +25,7 @@ if [ -f "$CONF" ] && [ $FORCE = 0 ]; then
 else
   STYLE=Fusion; CUSTOMPAL=true; SHEET="stylesheets=$T/qss/macos27-$V.qss"
   [ $KVT = 1 ] && { STYLE=kvantum; CUSTOMPAL=false; SHEET=; }
-  [ -f "$CONF" ] && cp "$CONF" "$CONF.hyprk-backup"
+  [ -f "$CONF" ] && cp -n "$CONF" "$CONF.hyprk-backup"
   cat > "$CONF" <<EOT
 [Appearance]
 color_scheme_path=$T/colors/macos27-$V.conf
@@ -36,6 +38,6 @@ general="System Font,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 [Interface]
 $SHEET
 EOT
-  echo "wrote $CONF ($V)"
+  echo "wrote $CONF ($V, style $STYLE)"
 fi
-echo "Set QT_QPA_PLATFORMTHEME=qt6ct (and QT_STYLE_OVERRIDE unset) for Qt apps. Fonts: SF Pro, fallback Inter/Cantarell (themes/gtk/FALLBACKS.md)."
+echo "Set QT_QPA_PLATFORMTHEME=qt6ct (and QT_STYLE_OVERRIDE unset) for Qt apps. Fonts: SF via 'System Font', fallback to the default sans (themes/gtk/FALLBACKS.md)."

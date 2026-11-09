@@ -1,4 +1,4 @@
-// Qt6 widget gallery for theme screenshots. build: g++ -fPIC gallery.cpp -o /tmp/qt-gallery $(pkg-config --cflags --libs Qt6Widgets)
+// Qt6 widget gallery for theme screenshots. build: g++ -fPIC gallery.cpp -o $HK_DIR/qt-gallery $(pkg-config --cflags --libs Qt6Widgets)
 #include <QApplication>
 #include <QMainWindow>
 #include <QMenuBar>

@@ -1,4 +1,4 @@
-"""Generate the MacOS27 Kvantum themes (kvconfig + SVG sprite sheet) from the colours in build.py.
+"""Generate the MacOS27 Kvantum themes (kvconfig + SVG sprite sheet) from the colour sets in build.py (V).
 Kvantum draws a widget part by rendering one SVG element by id into a rectangle, so every element below is a
 self-contained <g> with an invisible rect pinning its bounds. Frames are 3x3 pieces (corners r x r, edges stretched)."""
 import pathlib
@@ -6,7 +6,17 @@ import pathlib
 ROOT = pathlib.Path(__file__).resolve().parent
 
 
+CORNERS = {'tl': 'topleft', 'tr': 'topright', 'bl': 'bottomleft', 'br': 'bottomright'}
+# 12x12 arrow glyphs (stroke paths); "arrow-<dir>-<state>" is what Kvantum asks for with indicator.element=arrow
+ARROWS = {
+    'down': 'M3,4.5 L6,7.5 L9,4.5', 'up': 'M3,7.5 L6,4.5 L9,7.5', 'left': 'M7.5,3 L4.5,6 L7.5,9', 'right': 'M4.5,3 L7.5,6 L4.5,9',
+    'plus': 'M3,6 H9 M6,3 V9', 'minus': 'M3,6 H9',
+}
+
+
 class Sheet:
+    """Vertical strip of named elements; each is a <g> whose invisible rect pins its bounds."""
+
     def __init__(self):
         self.parts = []
         self.y = 4
@@ -17,123 +27,91 @@ class Sheet:
         self.y += h + 4
         self.maxw = max(self.maxw, w + 8)
 
-    def frame(self, name, state, r, fill, ring=None, ring_bottom=None, sw=1, interior=True, fop=1):
-        """3x3 rounded frame. Everything is filled geometry (no strokes) so the element bounds are exact."""
-        ring_bottom = ring_bottom or ring
+    def frame(self, name, state, r, fill, ring=None, sw=1, interior=True, fop=1):
+        """3x3 rounded frame with radius r. Everything is filled geometry (no strokes) so the element bounds are exact."""
         e = f'{name}-{state}'
-        R = r
 
         def quad(corner, rad):
             if corner == 'tl':
-                return f'M{R-rad},{R} A{rad},{rad} 0 0 1 {R},{R-rad} L{R},{R} Z'
+                return f'M{r-rad},{r} A{rad},{rad} 0 0 1 {r},{r-rad} L{r},{r} Z'
             if corner == 'tr':
-                return f'M0,{R-rad} A{rad},{rad} 0 0 1 {rad},{R} L0,{R} Z'
+                return f'M0,{r-rad} A{rad},{rad} 0 0 1 {rad},{r} L0,{r} Z'
             if corner == 'bl':
-                return f'M{R-rad},0 L{R},0 L{R},{rad} A{rad},{rad} 0 0 1 {R-rad},0 Z'
+                return f'M{r-rad},0 L{r},0 L{r},{rad} A{rad},{rad} 0 0 1 {r-rad},0 Z'
             return f'M{rad},0 L0,0 L0,{rad} A{rad},{rad} 0 0 0 {rad},0 Z'
 
-        def corner(corner, col):
-            body = f'<path d="{quad(corner, R)}" fill="{fill}" fill-opacity="{fop}"/>'
-            if col:
-                body += f'<path d="{quad(corner, R)} {quad(corner, R - sw)}" fill="{col}" fill-rule="evenodd"/>'
-            self.add(f'{e}-{ {"tl":"topleft","tr":"topright","bl":"bottomleft","br":"bottomright"}[corner] }', R, R, body)
-
-        def edge(side, col):
-            w, h = (8, R) if side in ('top', 'bottom') else (R, 8)
-            body = f'<rect width="{w}" height="{h}" fill="{fill}" fill-opacity="{fop}"/>'
-            if col:
-                rect = {'top': f'<rect width="8" height="{sw}"/>', 'bottom': f'<rect y="{R-sw}" width="8" height="{sw}"/>',
-                        'left': f'<rect width="{sw}" height="8"/>', 'right': f'<rect x="{R-sw}" width="{sw}" height="8"/>'}[side]
-                body += rect.replace('/>', f' fill="{col}"/>')
+        shape = f'fill="{fill}" fill-opacity="{fop}"'
+        for k, piece in CORNERS.items():
+            body = f'<path d="{quad(k, r)}" {shape}/>'
+            if ring:   # ring = outer quarter disc minus the inner one (even-odd), thickness sw
+                body += f'<path d="{quad(k, r)} {quad(k, r - sw)}" fill="{ring}" fill-rule="evenodd"/>'
+            self.add(f'{e}-{piece}', r, r, body)
+        edges = {'top': (8, r, f'<rect width="8" height="{sw}"/>'), 'bottom': (8, r, f'<rect y="{r-sw}" width="8" height="{sw}"/>'),
+                 'left': (r, 8, f'<rect width="{sw}" height="8"/>'), 'right': (r, 8, f'<rect x="{r-sw}" width="{sw}" height="8"/>')}
+        for side, (w, h, strip) in edges.items():
+            body = f'<rect width="{w}" height="{h}" {shape}/>'
+            if ring:
+                body += strip.replace('/>', f' fill="{ring}"/>')
             self.add(f'{e}-{side}', w, h, body)
-
-        corner('tl', ring); corner('tr', ring); corner('bl', ring_bottom); corner('br', ring_bottom)
-        edge('top', ring); edge('bottom', ring_bottom); edge('left', ring); edge('right', ring)
         if interior:
-            self.add(e, 8, 8, f'<rect width="8" height="8" fill="{fill}" fill-opacity="{fop}"/>')
-
-    def solid(self, eid, w, h, body):
-        self.add(eid, w, h, body)
+            self.add(e, 8, 8, f'<rect width="8" height="8" {shape}/>')
 
     def svg(self):
-        return ('<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d">\n' % (self.maxw + 8, self.y + 4) + '\n'.join(self.parts) + '\n</svg>\n')
+        return ('<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d">\n' % (self.maxw + 8, self.y + 4)
+                + '\n'.join(self.parts) + '\n</svg>\n')
 
 
-def arrow(sheet, base, color, size=12, sw=1.6):
-    s = size; m = s / 2
-    d = {
-        'down': f'M{m-3},{m-1.5} L{m},{m+1.5} L{m+3},{m-1.5}',
-        'up': f'M{m-3},{m+1.5} L{m},{m-1.5} L{m+3},{m+1.5}',
-        'left': f'M{m+1.5},{m-3} L{m-1.5},{m} L{m+1.5},{m+3}',
-        'right': f'M{m-1.5},{m-3} L{m+1.5},{m} L{m-1.5},{m+3}',
-        'plus': f'M{m-3},{m} H{m+3} M{m},{m-3} V{m+3}',
-        'minus': f'M{m-3},{m} H{m+3}',
-    }
-    return d
-
-
-def build(name, c):
+def build(c):
     S = Sheet()
     acc, accd = c['accent'], c['accent_edge']
-    r = 11
-    # ---- push buttons (capsule)
-    S.frame('button', 'normal', r, c['ctl'], c['ctl_ring'], c['ctl_ring'])
-    S.frame('button', 'focused', r, c['ctl_hover'], c['ctl_ring'], c['ctl_ring'])
-    S.frame('button', 'pressed', r, c['ctl_active'], c['ctl_ring'], c['ctl_ring'])
-    S.frame('button', 'toggled', r, acc, accd, accd)
-    S.solid('button-default-indicator', 8, 8, '')
-    # ---- line edits
-    S.frame('lineedit', 'normal', 8, c['field'], c['ctl_ring'], c['ctl_ring'])
-    S.frame('lineedit', 'focused', 8, c['field'], acc, acc, sw=2)
-    # ---- generic frames and group boxes
-    S.frame('common', 'normal', 8, 'none', c['sep'], c['sep'], interior=False)
-    S.frame('common', 'focused', 8, 'none', acc, acc, interior=False)
-    S.frame('group', 'normal', 10, c['card'], None, None, interior=False)
-    # ---- popup menus: rounded, translucent
-    S.frame('menu', 'normal', 12, c['popover'], c['menu_ring'], c['menu_ring'], fop=c.get('menu_alpha', 0.97))
-    S.frame('menuitem', 'normal', 6, acc, None, None)
-    S.solid('menuitem-left-normal', 4, 4, ''); S.solid('menuitem-right-normal', 4, 4, '')
-    S.frame('menubar', 'normal', 1, 'none', None, None)
-    S.solid('menu-separator', 8, 5, f'<rect y="2" width="8" height="1" fill="{c["sep"]}"/>')
-    S.solid('header-separator', 2, 12, f'<rect x="0" y="2" width="1" height="8" fill="{c["sep"]}"/>')
-    # ---- toolbars (flat) and tabs
-    S.frame('toolbar', 'normal', 1, 'none', None, None)
-    S.solid('toolbar-handle', 8, 8, '')
-    S.frame('tab', 'normal', 11, 'none', None, None)
-    S.frame('tab', 'focused', 11, c['fill'], None, None)
-    S.frame('tab', 'toggled', 11, c['ctl'], c['ctl_ring'], c['ctl_ring'])
-    S.frame('tabframe', 'normal', 8, c['field'], c['sep'], c['sep'], interior=False)
+    # ---- push buttons (capsule, r=11 = half of the 22px min height)
+    S.frame('button', 'normal', 11, c['ctl'], c['ctl_ring'])
+    S.frame('button', 'focused', 11, c['ctl_hover'], c['ctl_ring'])
+    S.frame('button', 'pressed', 11, c['ctl_active'], c['ctl_ring'])
+    S.frame('button', 'toggled', 11, acc, accd)
+    # ---- line edits, generic frames, group boxes
+    S.frame('lineedit', 'normal', 8, c['field'], c['ctl_ring'])
+    S.frame('lineedit', 'focused', 8, c['field'], acc, sw=2)
+    S.frame('common', 'normal', 8, 'none', c['sep'], interior=False)
+    S.frame('common', 'focused', 8, 'none', acc, interior=False)
+    S.frame('group', 'normal', 10, c['card'], interior=False)
+    # ---- popup menus: rounded, translucent; a menu item is only drawn while highlighted
+    S.frame('menu', 'normal', 12, c['popover'], c['menu_ring'], fop=0.97)
+    S.frame('menuitem', 'normal', 6, acc)
+    S.add('menu-separator', 8, 5, f'<rect y="2" width="8" height="1" fill="{c["sep"]}"/>')
+    S.add('header-separator', 2, 12, f'<rect y="2" width="1" height="8" fill="{c["sep"]}"/>')
+    # ---- tabs and tab frame
+    S.frame('tab', 'normal', 11, 'none')
+    S.frame('tab', 'focused', 11, c['fill'])
+    S.frame('tab', 'toggled', 11, c['ctl'], c['ctl_ring'])
+    S.frame('tabframe', 'normal', 8, c['field'], c['sep'], interior=False)
     # ---- item views (row highlight)
     for st, fill in (('normal', 'none'), ('focused', c['fill']), ('pressed', acc), ('toggled', acc)):
-        S.frame('itemview', st, 4, fill, None, None)
-    # ---- sliders
-    S.frame('slider', 'normal', 2, c['track'], None, None)
-    S.frame('slider', 'toggled', 2, acc, None, None)
-    for st, ring in (('normal', c['handle_ring']), ('focused', c['handle_ring']), ('pressed', c['handle_ring']), ('disabled', c['handle_ring'])):
+        S.frame('itemview', st, 4, fill)
+    # ---- sliders: groove, filled part, and the pill handle (same look in every state)
+    S.frame('slider', 'normal', 2, c['track'])
+    S.frame('slider', 'toggled', 2, acc)
+    handle = f'<rect x="0.5" y="0.5" width="23" height="17" rx="8.5" fill="#ffffff" stroke="{c["handle_ring"]}"/>'
+    for st in ('normal', 'focused', 'pressed', 'disabled'):
         for t in ('', '-tickless'):
-            S.solid(f'slidercursor{t}-{st}', 24, 18, f'<rect x="0.5" y="0.5" width="23" height="17" rx="8.5" fill="#ffffff" stroke="{ring}"/>')
-    # ---- progress bar
-    S.frame('progress', 'normal', 3, c['track'], None, None)
-    S.frame('progress-pattern', 'normal', 3, acc, None, None)
-    S.frame('progress-pattern', 'disabled', 3, c['ctl_active'], None, None)
-    # ---- scrollbars
-    S.frame('scrollbarslider', 'normal', 4, c['scroll'], None, None)
-    S.frame('scrollbarslider', 'focused', 4, c['scroll_hover'], None, None)
-    S.frame('scrollbarslider', 'pressed', 4, c['scroll_hover'], None, None)
-    # ---- check boxes and radio buttons
-    def box(eid, shape, bg, ring, mark=None, size=16):
-        s = size
+            S.add(f'slidercursor{t}-{st}', 24, 18, handle)
+    # ---- progress bar and scrollbars
+    S.frame('progress', 'normal', 3, c['track'])
+    S.frame('progress-pattern', 'normal', 3, acc)
+    S.frame('progress-pattern', 'disabled', 3, c['ctl_active'])
+    S.frame('scrollbarslider', 'normal', 4, c['scroll'])
+    S.frame('scrollbarslider', 'focused', 4, c['scroll_hover'])
+    S.frame('scrollbarslider', 'pressed', 4, c['scroll_hover'])
+    # ---- check boxes and radio buttons (also the smaller menu- variants)
+    def box(eid, shape, bg, ring, mark=None):
         if shape == 'check':
-            body = f'<rect x="0.5" y="0.5" width="{s-1}" height="{s-1}" rx="5" fill="{bg}" stroke="{ring}"/>'
+            body = f'<rect x="0.5" y="0.5" width="15" height="15" rx="5" fill="{bg}" stroke="{ring}"/>'
         else:
-            body = f'<circle cx="{s/2}" cy="{s/2}" r="{s/2-0.5}" fill="{bg}" stroke="{ring}"/>'
-        if mark == 'check':
-            body += f'<path d="M4.3,8.3 L6.9,10.9 L11.8,5.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>'
-        elif mark == 'dash':
-            body += '<path d="M4.5,8 H11.5" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round"/>'
-        elif mark == 'dot':
-            body += f'<circle cx="{s/2}" cy="{s/2}" r="3" fill="#fff"/>'
-        S.solid(eid, size, size, body)
+            body = f'<circle cx="8" cy="8" r="7.5" fill="{bg}" stroke="{ring}"/>'
+        body += {'check': '<path d="M4.3,8.3 L6.9,10.9 L11.8,5.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>',
+                 'dash': '<path d="M4.5,8 H11.5" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round"/>',
+                 'dot': '<circle cx="8" cy="8" r="3" fill="#fff"/>'}.get(mark, '')
+        S.add(eid, 16, 16, body)
     for pre in ('', 'menu-'):
         for st in ('normal', 'focused'):
             ring = c['check_ring'] if st == 'normal' else acc
@@ -142,21 +120,24 @@ def build(name, c):
             box(f'{pre}checkbox-tristate-{st}', 'check', acc, accd, 'dash')
             box(f'{pre}radio-{st}', 'radio', c['ctl'], ring)
             box(f'{pre}radio-checked-{st}', 'radio', acc, accd, 'dot')
-    # ---- arrows (text colour per state)
+    # ---- arrows and tab close glyphs
+    def glyph(path, col, op=0.8, sw=1.6):
+        return f'<path d="{path}" fill="none" stroke="{col}" stroke-opacity="{op}" stroke-width="{sw}" stroke-linecap="round" stroke-linejoin="round"/>'
     cols = {'normal': c['fg'], 'focused': c['fg'], 'pressed': c['fg'], 'disabled': c['fg_dis']}
-    for pre in ('', 'b-', 'flat-s-', 's-'):
-        for d, path in arrow(S, '', '').items():
-            for st, col in cols.items():
-                nm = f'{pre}arrow-{d}-{st}' if not pre.endswith('s-') else f'{pre}arrow-{d}-{st}'
-                S.solid(nm, 12, 12, f'<path d="{path}" fill="none" stroke="{col}" stroke-opacity="0.8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>')
-        for st, col in cols.items():
-            S.solid(f'{pre}arrow-{st}', 12, 12, f'<path d="{arrow(S,"","")["down"]}" fill="none" stroke="{col}" stroke-opacity="0.8" stroke-width="1.6" stroke-linecap="round"/>')
-    S.solid('splitter-grip-normal', 12, 12, ''); S.solid('splitter-grip-focused', 12, 12, ''); S.solid('splitter-grip-pressed', 12, 12, '')
-    S.solid('focus', 8, 8, '')
-    S.solid('tab-close-normal', 12, 12, f'<path d="M3.5,3.5 L8.5,8.5 M8.5,3.5 L3.5,8.5" stroke="{c["fg"]}" stroke-opacity="0.6" stroke-width="1.4" stroke-linecap="round"/>')
-    S.solid('tab-close-focused', 12, 12, f'<path d="M3.5,3.5 L8.5,8.5 M8.5,3.5 L3.5,8.5" stroke="{c["fg"]}" stroke-width="1.4" stroke-linecap="round"/>')
-    S.solid('tab-close-pressed', 12, 12, f'<path d="M3.5,3.5 L8.5,8.5 M8.5,3.5 L3.5,8.5" stroke="{c["accent"]}" stroke-width="1.4" stroke-linecap="round"/>')
-    S.solid('tab-close-disabled', 12, 12, f'<path d="M3.5,3.5 L8.5,8.5 M8.5,3.5 L3.5,8.5" stroke="{c["fg_dis"]}" stroke-width="1.4" stroke-linecap="round"/>')
+    for st, col in cols.items():
+        for d, path in ARROWS.items():
+            S.add(f'arrow-{d}-{st}', 12, 12, glyph(path, col))
+        S.add(f'arrow-{st}', 12, 12, glyph(ARROWS['down'], col))
+    cross = 'M3.5,3.5 L8.5,8.5 M8.5,3.5 L3.5,8.5'
+    for st, col, op in (('normal', c['fg'], 0.6), ('focused', c['fg'], 1), ('pressed', c['accent'], 1), ('disabled', c['fg_dis'], 1)):
+        S.add(f'tab-close-{st}', 12, 12, glyph(cross, col, op, 1.4))
+    # ---- elements that must exist but draw nothing (otherwise Kvantum falls back to its built-in drawing)
+    for eid in ('button-default-indicator', 'menuitem-left-normal', 'menuitem-right-normal', 'toolbar-handle', 'focus',
+                'splitter-grip-normal', 'splitter-grip-focused', 'splitter-grip-pressed'):
+        S.add(eid, 8, 8, '')
+    # ---- window background (Window/Dialog interior)
+    for eid in ('window', 'window-normal'):
+        S.add(eid, 8, 8, f'<rect width="8" height="8" fill="{c["window"]}"/>')
     return S.svg()
 
 
@@ -629,10 +610,6 @@ def write(name, c, out):
     d = out / name
     d.mkdir(parents=True, exist_ok=True)
     w = c['window']
-    ctx = dict(c, light=mix(w, '#ffffff', 0.5), midlight=mix(w, '#ffffff', 0.25), dark=mix(w, '#000000', 0.25), mid=mix(w, '#000000', 0.12),
-               link='#0064D9' if name.endswith('Light') else '#4FA3FF', linkv='#7A4EBD' if name.endswith('Light') else '#B58AFF')
+    ctx = dict(c, light=mix(w, '#ffffff', 0.5), midlight=mix(w, '#ffffff', 0.25), dark=mix(w, '#000000', 0.25), mid=mix(w, '#000000', 0.12))
     (d / f'{name}.kvconfig').write_text(KV.format(**ctx))
-    svg = build(name, c)
-    # window interior element
-    svg = svg.replace('</svg>', f'<g id="window-normal" transform="translate(4,2)"><rect width="8" height="8" fill="{w}"/></g>\n<g id="window" transform="translate(4,2)"><rect width="8" height="8" fill="{w}"/></g>\n</svg>')
-    (d / f'{name}.svg').write_text(svg)
+    (d / f'{name}.svg').write_text(build(c))

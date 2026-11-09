@@ -57,11 +57,11 @@ toolbarview > .bottom-bar.raised { box-shadow: 0 -1px 0 0 @mac_sep; }
  * ------------------------------------------------------------------------------------------- */
 /* WCB expands (build.py) to the :not() chain that out-ranks the generic capsule button rules below */
 windowcontrols { border-spacing: 9px; margin: 0 9px 0 4px; }
-windowcontrols > buttonWCB {
+windowcontrols > button@WCB@ {
   min-width: 14px; min-height: 14px; padding: 0; margin: 0;
   background: none; box-shadow: none; border: none; outline: none;
 }
-windowcontrols > buttonWCB > image {
+windowcontrols > button@WCB@ > image {
   min-width: 14px; min-height: 14px; padding: 0; margin: 0; border-radius: 100%;
   -gtk-icon-size: 14px;
   color: transparent;
@@ -70,23 +70,23 @@ windowcontrols > buttonWCB > image {
   box-shadow: inset 0 0 0 0.5px alpha(black, 0.18);
   transition: none;
 }
-windowcontrols > button.closeWCB > image { background-color: @mac_tl_close; }
-windowcontrols > button.minimizeWCB > image { background-color: @mac_tl_min; }
-windowcontrols > button.maximizeWCB > image { background-color: @mac_tl_max; }
-windowcontrols > buttonWCB:active > image { filter: brightness(0.82); }
+windowcontrols > button.close@WCB@ > image { background-color: @mac_tl_close; }
+windowcontrols > button.minimize@WCB@ > image { background-color: @mac_tl_min; }
+windowcontrols > button.maximize@WCB@ > image { background-color: @mac_tl_max; }
+windowcontrols > button@WCB@:active > image { filter: brightness(0.82); }
 /* grey when the window is not focused */
-window:backdrop windowcontrols > buttonWCB > image { background-color: @mac_tl_off; }
+window:backdrop windowcontrols > button@WCB@ > image { background-color: @mac_tl_off; }
 /* glyphs show while the pointer is over the group, like macOS */
-windowcontrols:hover > button.closeWCB > image {
+windowcontrols:hover > button.close@WCB@ > image {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14'><path d='M4.6 4.6l4.8 4.8M9.4 4.6l-4.8 4.8' stroke='rgba(76,0,0,0.75)' stroke-width='1.3' stroke-linecap='round'/></svg>");
 }
-windowcontrols:hover > button.minimizeWCB > image {
+windowcontrols:hover > button.minimize@WCB@ > image {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14'><path d='M3.9 7h6.2' stroke='rgba(110,70,0,0.75)' stroke-width='1.3' stroke-linecap='round'/></svg>");
 }
-windowcontrols:hover > button.maximizeWCB > image {
+windowcontrols:hover > button.maximize@WCB@ > image {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14'><path d='M4.4 9.6V5.6M4.4 9.6h4M9.6 4.4v4M9.6 4.4h-4' stroke='rgba(0,70,0,0.75)' stroke-width='1.3' stroke-linecap='round'/></svg>");
 }
-window:backdrop windowcontrols:hover > buttonWCB > image { background-image: none; }
+window:backdrop windowcontrols:hover > button@WCB@ > image { background-image: none; }
 
 /* ---------------------------------------------------------------------------------------------
  * Buttons: capsule, white (light) / translucent (dark) with a hairline ring + soft shadow
@@ -426,9 +426,9 @@ statusbar { padding: 2px 8px; }
  * Nautilus (Files): path bar as one glass capsule, flat segments inside (specificity boost token, see build.py)
  * ------------------------------------------------------------------------------------------- */
 .nautilus-pathbar { background-color: @mac_glass_bg; border-radius: 999px; box-shadow: 0 0 0 1px @mac_glass_ring, 0 3px 12px 0 @mac_glass_shadow; min-height: 34px; }
-.nautilus-pathbar button.nautilus-path-buttonHI { background: none; box-shadow: none; border-radius: 999px; margin: 3px 2px; min-height: 26px; min-width: 8px; padding: 0 10px; }
-.nautilus-pathbar button.nautilus-path-buttonHI:hover { background-color: @mac_fill_hover; }
-.nautilus-pathbar button.nautilus-path-buttonHI.current-dir { font-weight: 600; }
+.nautilus-pathbar button.nautilus-path-button@HI@ { background: none; box-shadow: none; border-radius: 999px; margin: 3px 2px; min-height: 26px; min-width: 8px; padding: 0 10px; }
+.nautilus-pathbar button.nautilus-path-button@HI@:hover { background-color: @mac_fill_hover; }
+.nautilus-pathbar button.nautilus-path-button@HI@.current-dir { font-weight: 600; }
 .nautilus-pathbar > menubutton > button { min-height: 28px; min-width: 28px; padding: 0 6px; box-shadow: none; background: none; }
 .nautilus-pathbar > menubutton > button:hover { background-color: @mac_fill_hover; }
 .nautilus-query-editor { border-radius: 999px; }
