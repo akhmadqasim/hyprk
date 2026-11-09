@@ -5,8 +5,8 @@
 Usage: scripts/make-demo.py <out-dir>   then   HOME=<out-dir> run.sh <out-dir>/Documents
 Needs Pillow. Images come from themes/wallpapers/png and /usr/share/backgrounds; PDFs are drawn posters."""
 import glob, os, random, sys, warnings, zipfile
-warnings.simplefilter("ignore")   # Pillow palette-transparency notices
-from PIL import Image, ImageDraw, ImageFont
+warnings.filterwarnings("ignore", message="Palette images with Transparency")
+from PIL import Image, ImageDraw, ImageFont, ImageStat
 
 out = os.path.abspath(sys.argv[1])
 docs = os.path.join(out, "Documents")
@@ -16,15 +16,16 @@ for d in ("Desktop", "Downloads", "Pictures", "Documents/Documents", "Documents/
 rng = random.Random(27)
 here = os.path.dirname(os.path.abspath(__file__))
 sources = [os.path.join(here, "../../themes/wallpapers/png/*"), "/usr/share/backgrounds/**/*"]
-walls = sorted(p for pattern in sources for p in glob.glob(pattern, recursive=True)
+walls = list(p for pattern in sources for p in glob.glob(pattern, recursive=True)
                if p.lower().endswith((".jpg", ".jpeg", ".png")))
 if not walls:
-    sys.exit("no images in themes/wallpapers/png or /usr/share/backgrounds")
+    sys.exit("no images in " + " or ".join(os.path.dirname(s) for s in sources))
 
 def brightness(path):
-    im = Image.open(path).convert("L")
+    im = Image.open(path)
+    im.draft("L", (64, 64))   # JPEGs decode at reduced scale
     im.thumbnail((64, 64))
-    return sum(im.getdata()) / (im.width * im.height)
+    return ImageStat.Stat(im.convert("L")).mean[0]
 
 # The reference photos are bright; many wallpapers are dark variants. Use the brightest ones
 # so thumbnails are judged on rendering, not on dark source pictures.
