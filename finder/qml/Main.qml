@@ -50,6 +50,7 @@ Window {
         const sel = fm.selectedEntries();
         if (sel.length > 0) quickLookEntry = sel[0];
     }
+    function focusContent() { keys.forceActiveFocus(); }
     function setView(v) {
         view = v;
         keys.forceActiveFocus();
@@ -167,7 +168,10 @@ Window {
             if (alt) fm.forward();
             else if (view === "columns") {
                 const sel = fm.selectedEntries();
-                if (sel.length === 1 && sel[0].isDir) fm.go(sel[0].path);
+                if (sel.length === 1 && sel[0].isDir) {
+                    fm.go(sel[0].path);
+                    fm.click(0, Qt.NoModifier);
+                }
             } else move(1);
             break;
         case Qt.Key_Up:

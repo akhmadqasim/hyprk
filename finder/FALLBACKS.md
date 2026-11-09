@@ -11,5 +11,5 @@ What the Finder does when a macOS-like resource is missing.
 | Window shadow | None drawn by the app (an in-window shadow would need a margin and break tiling). The compositor draws it. | `qml/Main.qml` |
 | Rounded corners | The frame, sidebar and content corners are drawn with a 22 px radius on a transparent window. If the compositor does not support alpha, the corners show its background. Maximized windows drop the radius and border. | `qml/Main.qml` |
 | SF Symbols | Original 24x24 glyphs drawn as SVG paths (rendered by Qt SVG, so they also work with the software backend). | `qml/lib/symbols.js` |
-| Trash | `gio trash`. When it fails (for example tmpfs or a mount without trash support) the item stays and an alert shows the reason. | `FileOps::trash` |
+| Trash | `gio trash`, run asynchronously so the UI never blocks. When it fails (for example tmpfs or a mount without trash support) the item stays and an alert shows the reason. | `FileOps::trash` |
 | Share sheet, Tags | No Linux equivalent wired yet: Share opens the selection, the Tag button is disabled, sidebar tags are display only. | `qml/Toolbar.qml`, `qml/Sidebar.qml` |

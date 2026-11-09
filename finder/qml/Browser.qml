@@ -22,15 +22,24 @@ QtObject {
 
     property var allEntries: []
     // sorting is cached apart from the search filter, so typing a query does not re-sort
-    readonly property var sorted: Files.sortEntries(allEntries, sortKey, ascending, foldersFirst)
+    // Recents is always newest first (like Finder) without touching the user's folder sort.
+    readonly property bool recents: path === "recents:"
+    readonly property var sorted: Files.sortEntries(allEntries, recents ? "modified" : sortKey,
+                                                    recents ? false : ascending, foldersFirst)
     readonly property var entries: Files.filterEntries(sorted, query)
 
     // selection: path -> true. Always reassigned (never mutated) so bindings on it update.
     property var selected: ({})
     property string renamingPath: ""  // item being renamed inline
-    property int cursor: -1          // keyboard focus index into entries
-    property int anchor: -1          // shift-click range start
-    readonly property int selectedCount: Object.keys(selected).length
+    // Cursor and anchor are kept as paths so re-sorting, filtering or reloading can't
+    // make them point at another item; the indices are derived.
+    property string cursorPath: ""   // keyboard focus
+    property string anchorPath: ""   // shift-click range start
+    readonly property int cursor: cursorPath ? entries.findIndex(e => e.path === cursorPath) : -1
+    readonly property int anchor: anchorPath ? entries.findIndex(e => e.path === anchorPath) : -1
+    // Only visible (not filtered out by search) items count as selected for actions.
+    readonly property var selectedVisible: entries.filter(e => selected[e.path] === true)
+    readonly property int selectedCount: selectedVisible.length
 
     readonly property string title: path === "recents:" ? "Recents"
         : path === "applications:" ? "Applications"
@@ -70,21 +79,19 @@ QtObject {
     function _enter(p) {
         path = p;
         renamingPath = "";
-        // Recents lists newest first, like Finder
-        if (p === "recents:") { sortKey = "modified"; ascending = false; }
         query = "";
         selected = ({});
-        cursor = -1;
-        anchor = -1;
+        cursorPath = "";
+        anchorPath = "";
         reload();
     }
     function isVirtualPath(p) { return p === "recents:" || p === "applications:"; }
 
     // ---------- selection ----------
     function isSelected(p) { return selected[p] === true; }
-    function selectedPaths() { return Object.keys(selected); }
-    function selectedEntries() { return entries.filter(e => selected[e.path]); }
-    function clearSelection() { selected = ({}); anchor = -1; }
+    function selectedPaths() { return selectedVisible.map(e => e.path); }
+    function selectedEntries() { return selectedVisible; }
+    function clearSelection() { selected = ({}); anchorPath = ""; }
     function selectAll() {
         const s = {};
         for (const e of entries) s[e.path] = true;
@@ -94,9 +101,9 @@ QtObject {
         const s = {};
         for (const p of paths) s[p] = true;
         selected = s;
-        const i = entries.findIndex(e => s[e.path]);
-        cursor = i;
-        anchor = i;
+        const first = entries.find(e => s[e.path]);
+        cursorPath = first ? first.path : "";
+        anchorPath = cursorPath;
     }
     // Click semantics: plain = only this, ctrl = toggle, shift = range from anchor.
     function click(index, modifiers) {
@@ -111,18 +118,16 @@ QtObject {
             const s = Object.assign({}, selected);
             if (s[p]) delete s[p]; else s[p] = true;
             selected = s;
-            anchor = index;
+            anchorPath = p;
         } else {
-            // keep a multi-selection when pressing on an already selected item (drag start)
-            if (!selected[p] || selectedCount <= 1) {
-                selected = { [p]: true };
-            }
-            anchor = index;
+            selected = { [p]: true };
+            anchorPath = p;
         }
-        cursor = index;
+        cursorPath = p;
     }
-    function setSelection(indices, additive) {
-        const s = additive ? Object.assign({}, selected) : {};
+    // base: selection to extend (e.g. the one from before a rubber-band drag started)
+    function setSelection(indices, base) {
+        const s = Object.assign({}, base || {});
         for (const i of indices) s[entries[i].path] = true;
         selected = s;
     }
@@ -148,9 +153,7 @@ QtObject {
     function trashSelection() {
         const paths = selectedPaths();
         if (paths.length === 0 || isVirtual && path !== "recents:") return;
-        const err = FileOps.trash(paths);
-        if (err) errorRaised(err);
-        reload();
+        FileOps.trash(paths);   // async, see onTrashFinished
     }
     function newFolder() {
         if (isVirtual) return;
@@ -177,6 +180,10 @@ QtObject {
     property Connections _watch: Connections {
         target: FileOps
         function onDirectoryChanged(dir) { if (dir === b.path) b.reload(); }
+        function onTrashFinished(error) {
+            if (error) b.errorRaised(error);
+            b.reload();
+        }
     }
     onShowHiddenChanged: reload()
     Component.onCompleted: reload()

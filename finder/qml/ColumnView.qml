@@ -4,7 +4,8 @@ import Finder.Native
 import "lib/files.js" as Files
 
 // Column (Miller) view derived from the current path: one column per folder from the
-// root (home, or "/" outside home) down to the current folder, plus a preview column.
+// root (home, or "/" outside home) down to the current folder. A selected folder adds a
+// column with its contents, a selected file adds a preview column.
 Item {
     id: root
 
@@ -13,8 +14,8 @@ Item {
     readonly property int columns: 1
 
     function ensureVisible(i) {
-        const last = strip.itemAtIndex(strip.count - 1);
-        if (last && last.list) last.list.positionViewAtIndex(i, ListView.Contain);
+        const current = strip.itemAtIndex(root.dirs.length - 1);
+        if (current && current.list) current.list.positionViewAtIndex(i, ListView.Contain);
     }
 
     readonly property string home: FileOps.homePath()
@@ -24,10 +25,9 @@ Item {
         const base = p === home || p.indexOf(home + "/") === 0 ? home : "/";
         return Files.segments(p).map(s => s.path).filter(d => base === "/" || d.length >= base.length);
     }
-    readonly property var previewEntry: {
-        const sel = browser.selectedEntries();
-        return sel.length === 1 && !sel[0].isDir ? sel[0] : null;
-    }
+    readonly property var single: browser.selectedCount === 1 ? browser.selectedVisible[0] : null
+    readonly property var columnDirs: single && single.isDir ? dirs.concat([single.path]) : dirs
+    readonly property var previewEntry: single && !single.isDir ? single : null
 
     ListView {
         id: strip
@@ -35,14 +35,14 @@ Item {
         orientation: ListView.Horizontal
         boundsBehavior: Flickable.StopAtBounds
         clip: true
-        model: root.dirs.length + (root.previewEntry ? 1 : 0)
+        model: root.columnDirs.length + (root.previewEntry ? 1 : 0)
         onCountChanged: Qt.callLater(() => positionViewAtEnd())
         ScrollBar.horizontal: ScrollBar { policy: ScrollBar.AsNeeded }
 
         delegate: Loader {
             id: slot
             required property int index
-            readonly property bool isPreview: index >= root.dirs.length
+            readonly property bool isPreview: index >= root.columnDirs.length
             property var list: item && item.list ? item.list : null
             width: isPreview ? Math.max(Theme.columns.width + 40, root.width - root.dirs.length * Theme.columns.width) : Theme.columns.width
             height: strip.height
@@ -55,9 +55,10 @@ Item {
         Item {
             id: col
             readonly property int colIndex: parent ? parent.index : 0   // parent is the Loader slot
+            // "last" is the current folder's column, the only one that holds the selection
             readonly property bool last: colIndex === root.dirs.length - 1
-            readonly property string dir: root.dirs[colIndex]
-            readonly property string chosen: last ? "" : root.dirs[colIndex + 1]
+            readonly property string dir: root.columnDirs[colIndex] || ""
+            readonly property string chosen: colIndex < root.dirs.length - 1 ? root.dirs[colIndex + 1] : ""
             readonly property var entries: last ? root.browser.entries
                 : Files.sortEntries(FileOps.list(dir, root.browser.showHidden), root.browser.sortKey, root.browser.ascending, false)
             property alias list: list
@@ -136,20 +137,16 @@ Item {
                             root.forceActiveFocus();
                             const e = row.modelData;
                             const right = mouse.button === Qt.RightButton;
-                            const plain = !right && !(mouse.modifiers & (Qt.ControlModifier | Qt.ShiftModifier));
                             if (!col.last) {
-                                // earlier column: re-root the chain at this column
-                                root.browser.go(e.isDir ? e.path : col.dir);
-                                if (!e.isDir) root.browser.selectPaths([e.path]);
-                            } else if (e.isDir && plain) {
-                                root.browser.go(e.path);
-                                return;
+                                // other column: make it the current folder with this item selected
+                                root.browser.go(col.dir);
+                                root.browser.selectPaths([e.path]);
                             } else if (!right || !row.selected) {
                                 root.browser.click(row.index, right ? Qt.NoModifier : mouse.modifiers);
                             }
                             if (right) root.contextMenu(e, mapToItem(null, mouse.x, mouse.y));
                         }
-                        onDoubleClicked: mouse => { if (!row.modelData.isDir) root.browser.activate(row.modelData); }
+                        onDoubleClicked: mouse => { if (mouse.button === Qt.LeftButton) root.browser.activate(row.modelData); }
                     }
                 }
             }

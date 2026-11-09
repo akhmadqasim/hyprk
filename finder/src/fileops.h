@@ -31,7 +31,8 @@ public:
 
     Q_INVOKABLE bool open(const QString &path) const;
     Q_INVOKABLE bool launchApp(const QString &desktopFile) const;
-    Q_INVOKABLE QString trash(const QStringList &paths) const;
+    // Runs `gio trash` without blocking the UI; trashFinished reports the outcome.
+    Q_INVOKABLE void trash(const QStringList &paths);
     Q_INVOKABLE QString rename(const QString &path, const QString &newName) const;
     // Creates "<baseName>", "<baseName> 2", ... in dir. Returns the new path or "" on failure.
     Q_INVOKABLE QString makeFolder(const QString &dir, const QString &baseName) const;
@@ -41,6 +42,7 @@ public:
 
 signals:
     void directoryChanged(const QString &dir);
+    void trashFinished(const QString &error);   // empty on success
 
 private:
     QVariantMap entry(const class QFileInfo &fi) const;

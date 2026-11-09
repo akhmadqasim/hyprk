@@ -175,22 +175,31 @@ bool FileOps::launchApp(const QString &desktopFile) const
     return QProcess::startDetached(QStringLiteral("gio"), {QStringLiteral("launch"), desktopFile});
 }
 
-QString FileOps::trash(const QStringList &paths) const
+void FileOps::trash(const QStringList &paths)
 {
     if (paths.isEmpty())
-        return {};
-    QProcess p;
-    p.start(QStringLiteral("gio"), QStringList{QStringLiteral("trash"), QStringLiteral("--")} + paths);
-    if (!p.waitForFinished(15000))
-        return QStringLiteral("gio trash did not finish");
-    if (p.exitStatus() != QProcess::NormalExit || p.exitCode() != 0) {
-        // gio prints "gio: <uri>: <reason>" per failed file; keep the first reason only.
-        const QString err = QString::fromUtf8(p.readAllStandardError()).trimmed().section(QLatin1Char('\n'), 0, 0);
-        const QString what = paths.size() == 1 ? QStringLiteral("\u201C%1\u201D").arg(QFileInfo(paths.first()).fileName())
-                                               : QStringLiteral("Some items");
-        return QStringLiteral("%1 can\u2019t be moved to the Trash.\n%2").arg(what, err.section(QStringLiteral(": "), -1));
-    }
-    return {};
+        return;
+    auto *p = new QProcess(this);
+    const QString what = paths.size() == 1 ? QStringLiteral("\u201C%1\u201D").arg(QFileInfo(paths.first()).fileName())
+                                           : QStringLiteral("Some items");
+    const QString headline = QStringLiteral("%1 can\u2019t be moved to the Trash.").arg(what);
+    connect(p, &QProcess::errorOccurred, this, [this, p, headline](QProcess::ProcessError e) {
+        if (e != QProcess::FailedToStart)
+            return;   // other errors also end in finished()
+        emit trashFinished(headline + QStringLiteral("\ngio is not installed."));
+        p->deleteLater();
+    });
+    connect(p, &QProcess::finished, this, [this, p, headline](int code, QProcess::ExitStatus status) {
+        QString err;
+        if (status != QProcess::NormalExit || code != 0) {
+            // gio prints "gio: <uri>: <reason>" per failed file; keep the first reason only.
+            const QString out = QString::fromUtf8(p->readAllStandardError()).trimmed().section(QLatin1Char('\n'), 0, 0);
+            err = headline + QLatin1Char('\n') + out.section(QStringLiteral(": "), -1);
+        }
+        emit trashFinished(err);
+        p->deleteLater();
+    });
+    p->start(QStringLiteral("gio"), QStringList{QStringLiteral("trash"), QStringLiteral("--")} + paths);
 }
 
 QString FileOps::rename(const QString &path, const QString &newName) const

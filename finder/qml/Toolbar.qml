@@ -153,6 +153,11 @@ Item {
                 font.pixelSize: Theme.font.list + 1
                 text: root.browser.query
                 onTextEdited: root.browser.query = text
+                // Return/arrows must not reach the window's key handler (rename, cursor moves)
+                Keys.onReturnPressed: root.window.focusContent()
+                Keys.onEnterPressed: root.window.focusContent()
+                Keys.onUpPressed: {}
+                Keys.onDownPressed: {}
                 Keys.onEscapePressed: {
                     root.browser.query = "";
                     root.searching = false;

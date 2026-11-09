@@ -33,7 +33,7 @@ GridView {
         height: Math.max(grid.contentHeight, grid.height)
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         property point start
-        property bool additive
+        property var base: ({})   // selection before the drag; Ctrl/Shift drags add to it
         property rect area: Qt.rect(0, 0, 0, 0)
         onPressed: mouse => {
             grid.forceActiveFocus();
@@ -42,8 +42,8 @@ GridView {
                 grid.contextMenu(null, mapToItem(null, mouse.x, mouse.y));
                 return;
             }
-            additive = (mouse.modifiers & (Qt.ControlModifier | Qt.ShiftModifier)) !== 0;
-            if (!additive) grid.browser.clearSelection();
+            if (!(mouse.modifiers & (Qt.ControlModifier | Qt.ShiftModifier))) grid.browser.clearSelection();
+            base = grid.browser.selected;
             start = Qt.point(mouse.x, mouse.y);
             area = Qt.rect(mouse.x, mouse.y, 0, 0);
         }
@@ -58,7 +58,7 @@ GridView {
                     && cy < area.y + area.height && cy + grid.cellHeight - 12 > area.y)
                     hits.push(i);
             }
-            grid.browser.setSelection(hits, additive);
+            grid.browser.setSelection(hits, base);
         }
         onReleased: area = Qt.rect(0, 0, 0, 0)
 
