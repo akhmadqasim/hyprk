@@ -150,6 +150,8 @@ namespace lg {
         for (size_t i = 0; i < std::size(STRINGS); ++i)
             STRINGS[i].apply(*p, raw.strings[i]);
         p->roundingPower = std::max(p->roundingPower, 1.f);
+        if (p->adaptLow > p->adaptHigh) // an inverted band would flip every readback
+            std::swap(p->adaptLow, p->adaptHigh);
 
         lastRaw = std::move(raw);
         last    = std::move(p);

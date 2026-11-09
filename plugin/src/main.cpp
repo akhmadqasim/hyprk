@@ -144,6 +144,8 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
             lg::onFrame();
         }
     }));
+    g_listeners.push_back(Event::bus()->m_events.layer.closed.listen([](PHLLS ls) { lg::forgetOwner(reinterpret_cast<uintptr_t>(ls.get())); }));
+    g_listeners.push_back(Event::bus()->m_events.window.close.listen([](PHLWINDOW w) { lg::forgetOwner(reinterpret_cast<uintptr_t>(w.get())); }));
     g_listeners.push_back(Event::bus()->m_events.config.reloaded.listen([] {
         if (g_pHyprRenderer)
             for (const auto& m : State::monitorState()->monitors())

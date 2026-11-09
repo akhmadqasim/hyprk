@@ -127,8 +127,9 @@ namespace lg {
             bool     valid = false, dark = false;
             GLuint   pbo   = 0;
             GLsync   fence = nullptr;
-            bool     isFloat = false;
+            bool     isFloat = false, unsupported = false;
             uint64_t seen    = 0, requested = 0;
+            double   w = 0, h = 0; // shape size the state belongs to
         };
         constexpr uint64_t LUMA_INTERVAL = 6; // monitor frames between readbacks per shape
         std::map<std::pair<uintptr_t, size_t>, SLuma> g_luma;
@@ -175,7 +176,7 @@ namespace lg {
         // queue a 1-pixel read of `tex` at mip `level`, texel (x, y)
         void requestLuma(SLuma& l, GLuint tex, int level, int x, int y) {
             // previous read still in flight, or one taken recently: luminance changes slowly
-            if (l.fence || (l.requested && g_frame - l.requested < LUMA_INTERVAL))
+            if (l.unsupported || l.fence || (l.requested && g_frame - l.requested < LUMA_INTERVAL))
                 return;
             if (!g_readFbo)
                 glGenFramebuffers(1, &g_readFbo);
@@ -196,7 +197,11 @@ namespace lg {
                     glBindBuffer(GL_PIXEL_PACK_BUFFER, l.pbo);
                 glReadPixels(x, y, 1, 1, GL_RGBA, l.isFloat ? GL_FLOAT : GL_UNSIGNED_BYTE, nullptr);
                 glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-                l.fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+                // e.g. a half-float buffer without EXT_color_buffer_float: stay on the light recipe
+                if (glGetError() != GL_NO_ERROR)
+                    l.unsupported = true;
+                else
+                    l.fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
             }
 
             glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
@@ -204,12 +209,27 @@ namespace lg {
         }
     }
 
+    namespace {
+        // glass boxes claimed this frame; bool = already added to the damage
+        std::vector<std::pair<CBox, bool>> g_claims;
+    }
+
     void onFrame() {
+        g_claims.clear();
         if (++g_frame % 60)
             return;
         // forget surfaces not drawn for ~10 s at 60 Hz
         std::erase_if(g_luma, [](auto& kv) {
             if (g_frame - kv.second.seen < 600)
+                return false;
+            releaseLuma(kv.second);
+            return true;
+        });
+    }
+
+    void forgetOwner(uintptr_t owner) {
+        std::erase_if(g_luma, [owner](auto& kv) {
+            if (kv.first.first != owner)
                 return false;
             releaseLuma(kv.second);
             return true;
@@ -227,7 +247,17 @@ namespace lg {
 
     // ── element ─────────────────────────────────────────────────────────────
 
-    CGlassElement::CGlassElement(SData data) : m_data(std::move(data)) {}
+    static void resolveShapes(CGlassElement::SData& data) {
+        if (data.resolved.size() == data.shapes.size())
+            return;
+        data.resolved.clear();
+        for (const auto& s : data.shapes)
+            data.resolved.push_back(resolveMaterial(*data.recipe, std::min(s.box.w, s.box.h)));
+    }
+
+    CGlassElement::CGlassElement(SData data) : m_data(std::move(data)) {
+        resolveShapes(m_data);
+    }
 
     double CGlassElement::margin(const SData& data) {
         const auto& r = *data.recipe;
@@ -239,22 +269,33 @@ namespace lg {
         return CBox{s.box.x - margin - reach, s.box.y - margin - reach, s.box.w + 2 * (margin + reach), s.box.h + 2 * (margin + reach)}.scale(scale).round();
     }
 
-    static double reachOf(const SParams& p, const SRecipe& r, const SGlassShape& s) {
-        const auto res = resolveMaterial(r, std::min(s.box.w, s.box.h));
+    static double reachOf(const SParams& p, const SResolved& res) {
         return std::abs(res.refractionAmount * p.refractionScale) + p.aberration + 8.0;
     }
 
-    void CGlassElement::claimDamage(Render::CRenderContext& ctx, const SData& data) {
+    static bool touches(CRegion& damage, const CBox& box) {
+        // cheap reject on the extents before the exact region test
+        return !box.intersection(damage.getExtents()).empty() && !CRegion{damage}.intersect(box).empty();
+    }
+
+    void CGlassElement::claimDamage(Render::CRenderContext& ctx, SData& data) {
         const auto mon = ctx.m_data.pMonitor.lock();
         if (!mon || !data.params || data.params->fullDamage)
             return;
-        const double m       = margin(data);
-        const auto   extents = ctx.m_data.damage.getExtents();
-        for (const auto& s : data.shapes) {
-            const CBox box = readBox(s, m, reachOf(*data.params, *data.recipe, s), mon->m_scale);
-            // cheap reject on the extents before the exact region test
-            if (!box.intersection(extents).empty() && !CRegion{ctx.m_data.damage}.intersect(box).empty())
+        resolveShapes(data);
+        const double m = margin(data);
+        for (size_t i = 0; i < data.shapes.size(); ++i)
+            g_claims.emplace_back(readBox(data.shapes[i], m, reachOf(*data.params, data.resolved[i]), mon->m_scale), false);
+
+        // a box added now can touch glass claimed earlier this frame: repeat until stable
+        for (bool grew = true; grew;) {
+            grew = false;
+            for (auto& [box, added] : g_claims) {
+                if (added || !touches(ctx.m_data.damage, box))
+                    continue;
                 ctx.m_data.damage.add(box);
+                added = grew = true;
+            }
         }
     }
 
@@ -313,10 +354,13 @@ namespace lg {
         const auto  mon   = ctx.m_data.pMonitor.lock();
         const float scale = mon ? mon->m_scale : 1.f;
         const auto& p     = *m_data.params;
-        const auto& face  = p.appearance == 2 ? m_data.recipe->dark : m_data.recipe->light;
-        // rough stand-in for the face effect: the recipe fill, or half its black point as a white lift
-        const auto tint = face.fill.a > 0 ? face.fill : SRgba{1, 1, 1, face.ycc.black * 0.5f};
-        for (const auto& s : m_data.shapes) {
+        for (size_t i = 0; i < m_data.shapes.size(); ++i) {
+            const auto& s    = m_data.shapes[i];
+            const auto  it   = g_luma.find({m_data.owner, i});
+            const bool  dark = p.appearance == 2 || (p.appearance == 0 && it != g_luma.end() && it->second.dark);
+            const auto& face = dark ? m_data.recipe->dark : m_data.recipe->light;
+            // rough stand-in for the face effect: the recipe fill, or half its black point as a white lift
+            const auto tint = face.fill.a > 0 ? face.fill : SRgba{1, 1, 1, face.ycc.black * 0.5f};
             CBox box = CBox{s.box.x, s.box.y, s.box.w, s.box.h}.scale(scale).round();
             if (box.w < 1 || box.h < 1)
                 continue;
@@ -356,8 +400,8 @@ namespace lg {
             damage.intersect(quad);
             if (damage.empty())
                 continue;
-            quads.push_back({i, quad, std::move(damage), resolveMaterial(r, std::min(s.box.w, s.box.h))});
-            blurDamage.add(readBox(s, m, reachOf(p, r, s), scale));
+            quads.push_back({i, quad, std::move(damage), m_data.resolved[i]});
+            blurDamage.add(readBox(s, m, reachOf(p, m_data.resolved[i]), scale));
         }
         if (quads.empty())
             return true;
@@ -369,6 +413,11 @@ namespace lg {
         if (!tex || tex->m_size.x <= 0 || tex->m_size.y <= 0)
             return false;
 
+        // before touching the texture state, so a failure leaves it as Hyprland set it
+        const auto shader = g_pHyprOpenGL->useShader(prog.shader());
+        if (!shader)
+            return false;
+
         g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
         tex->bind();
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -378,20 +427,23 @@ namespace lg {
         std::vector<bool> dark(quads.size(), p.appearance == 2);
         if (p.appearance == 0) {
             for (size_t q = 0; q < quads.size(); ++q) {
-                auto& l = g_luma[{m_data.owner, quads[q].index}];
-                l.seen  = g_frame;
+                auto&       l = g_luma[{m_data.owner, quads[q].index}];
+                const auto& s = m_data.shapes[quads[q].index];
+                // a shape index taken over by a differently sized shape starts fresh
+                if (std::abs(l.w - s.box.w) > 2 || std::abs(l.h - s.box.h) > 2) {
+                    l.valid = false;
+                    l.w     = s.box.w;
+                    l.h     = s.box.h;
+                }
+                l.seen = g_frame;
                 collectLuma(l, p);
                 const auto& box   = quads[q].box;
                 const int   level = std::clamp(int(std::floor(std::log2(std::max(1.0, std::min(box.w, box.h) * 0.5)))), 0, 12);
-                const auto& s     = m_data.shapes[quads[q].index];
                 requestLuma(l, tex->m_texID, level, int((s.box.x + s.box.w / 2) * scale) >> level, int((s.box.y + s.box.h / 2) * scale) >> level);
                 dark[q] = l.dark;
             }
         }
 
-        const auto shader = g_pHyprOpenGL->useShader(prog.shader());
-        if (!shader)
-            return false;
         g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
         tex->bind();
 
@@ -438,7 +490,8 @@ namespace lg {
             glUniform1f(u.refractionHeight, res.refractionHeight * scale);
             glUniform3f(u.faceYcc, face.ycc.black, face.ycc.white, face.ycc.saturation);
             // fill and the light-side lift combine as two white-ish layers: a = 1 - (1-a1)(1-a2)
-            const SRgba fill = dark[q] ? face.fill : SRgba{1, 1, 1, 1 - (1 - face.fill.a) * (1 - p.lift)};
+            const SRgba base = face.fill.a > 0 ? face.fill : SRgba{1, 1, 1, 0};
+            const SRgba fill = dark[q] ? face.fill : SRgba{base.r, base.g, base.b, 1 - (1 - base.a) * (1 - p.lift)};
             glUniform4f(u.faceFill, fill.r, fill.g, fill.b, fill.a);
             glUniform1f(u.highlightBias, face.highlightBias * p.highlight);
             glUniform1f(u.shadowOpacity, m_data.shadow ? res.shadowOpacity * p.shadowScale : 0.f);

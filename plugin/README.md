@@ -34,8 +34,8 @@ hl.config({ plugin = { liquidglass = {
 } } })
 ```
 
-Live change: `hyprctl eval 'hl.config({ plugin = { liquidglass = { refraction = 24 } } })'` (read every frame).
-Check a value: `hyprctl getoption plugin:liquidglass:refraction`.
+Live change: `hyprctl eval 'hl.config({ plugin = { liquidglass = { refraction_scale = 0.5 } } })'` (read every frame).
+Check a value: `hyprctl getoption plugin:liquidglass:refraction_scale`.
 
 ## How a surface gets glass
 

@@ -48,6 +48,8 @@ namespace lg {
 
     // once per monitor frame: ages the per-surface light/dark state
     void onFrame();
+    // a layer or window went away: drop its light/dark state (its address may be reused)
+    void forgetOwner(uintptr_t owner);
     // frees the plugin's GL objects (PLUGIN_EXIT, GL context current)
     void releaseGlState();
 
@@ -63,6 +65,7 @@ namespace lg {
             uintptr_t                      owner  = 0;    // layer/window identity, keys the light/dark state
             bool                           shadow = true; // windows draw their own
             std::optional<float>           roundingPower; // override params->roundingPower
+            std::vector<SResolved>         resolved;      // per shape, filled by claimDamage()/the ctor
         };
 
         explicit CGlassElement(SData data);
@@ -83,7 +86,7 @@ namespace lg {
         // Damage the whole glass (plus what it reads) when any part of it is damaged:
         // refraction and the luminance probe read far from the damaged pixels. Call while
         // the pass is built, before CRenderPass::render() consumes ctx.m_data.damage.
-        static void claimDamage(Render::CRenderContext& ctx, const SData& data);
+        static void claimDamage(Render::CRenderContext& ctx, SData& data);
 
       private:
         void  drawFallback(Render::CRenderContext& ctx);
