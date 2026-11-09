@@ -85,7 +85,7 @@ Column {
                 enabled_: pane.status === "ok"
                 model: pane.scales.map(s => Math.round(s * 100) + "%")
                 currentIndex: pane.mon ? Math.max(0, pane.scales.indexOf(pane.mon.scale)) : 0
-                onActivated: i => pane.apply(pane.mon, pane.mon.width + "x" + pane.mon.height + "@" + pane.mon.refreshRate, pane.scales[i])
+                onActivated: i => pane.apply(pane.mon, P.monitorMode(pane.mon), pane.scales[i])
             }
         }
         FormRow { label: "Refresh rate"; MacPopup { enabled_: false; model: [pane.mon ? pane.mon.refreshRate + " Hertz" : "—"] } }

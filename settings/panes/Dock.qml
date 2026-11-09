@@ -7,8 +7,6 @@ Column {
     id: pane
     spacing: Theme.content.sectionGap
     readonly property var d: AppState.dock
-    readonly property var positions: ["left", "bottom", "right"]
-    readonly property var effects: ["genie", "scale"]
 
     Card {
         title: "Dock"
@@ -32,19 +30,11 @@ Column {
         }
         FormRow {
             label: "Position on screen"
-            MacPopup {
-                model: ["Left", "Bottom", "Right"]
-                currentIndex: pane.positions.indexOf(pane.d.position)
-                onActivated: i => AppState.set("dock", { position: pane.positions[i] })
-            }
+            StatePopup { stateKey: "dock"; field: "position"; choices: [["Left", "left"], ["Bottom", "bottom"], ["Right", "right"]] }
         }
         FormRow {
             label: "Minimize windows using"
-            MacPopup {
-                model: ["Genie Effect", "Scale Effect"]
-                currentIndex: Math.max(0, pane.effects.indexOf(pane.d.minimizeEffect))
-                onActivated: i => AppState.set("dock", { minimizeEffect: pane.effects[i] })
-            }
+            StatePopup { stateKey: "dock"; field: "minimizeEffect"; choices: [["Genie Effect", "genie"], ["Scale Effect", "scale"]] }
         }
         FormRow { label: "Double-click a window's title bar to"; MacPopup { model: ["Zoom", "Minimize", "Do Nothing"] } }
         FormRow { label: "Minimize windows into application icon"; MacSwitch {} }

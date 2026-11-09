@@ -15,10 +15,10 @@ Column {
 
     function setApp(id, patch) {
         const apps = Object.assign({}, n.apps);
-        apps[id] = Object.assign({ allow: true, style: "banners", sounds: true }, apps[id] || {}, patch);
+        apps[id] = Object.assign({}, P.notifAppDefaults, apps[id] || {}, patch);
         AppState.set("notifications", { apps: apps });
     }
-    function app(id) { return n.apps[id] || { allow: true, style: "banners", sounds: true }; }
+    function app(id) { return n.apps[id] || P.notifAppDefaults; }
     Component.onCompleted: Backend.run([Backend.root + "/settings/scripts/notify-apps.sh"], (c, o) => {
         status = Backend.status(c);
         apps = P.parseDesktopApps(o);
@@ -28,12 +28,7 @@ Column {
         title: "Notification Center"
         FormRow {
             label: "Show previews"
-            MacPopup {
-                readonly property var keys: ["always", "unlocked", "never"]
-                model: ["Always", "When Unlocked", "Never"]
-                currentIndex: Math.max(0, keys.indexOf(pane.n.previews))
-                onActivated: i => AppState.set("notifications", { previews: keys[i] })
-            }
+            StatePopup { stateKey: "notifications"; field: "previews"; choices: [["Always", "always"], ["When Unlocked", "unlocked"], ["Never", "never"]] }
         }
         FormRow { label: "Summarize notifications"; MacSwitch { checked: pane.n.summarize; onToggled: on => AppState.set("notifications", { summarize: on }) } }
         FormRow { label: "Allow notifications when the display is sleeping"; MacSwitch { checked: pane.n.whenSleeping; onToggled: on => AppState.set("notifications", { whenSleeping: on }) } }

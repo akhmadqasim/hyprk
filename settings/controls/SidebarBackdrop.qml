@@ -14,7 +14,7 @@ Item {
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
         sourceSize.width: 256      // tiny decode: it is blurred anyway
-        property string path: AppState.wallpaper || Backend.root + "/themes/wallpapers/png/DefaultAerial.png"
+        property string path: AppState.wallpaperImage || Backend.root + "/themes/wallpapers/png/DefaultAerial.png"
         property bool thumbFailed: false
         source: "file://" + (thumbFailed ? path : Backend.thumbFor(path))
         onStatusChanged: if (status === Image.Error && !thumbFailed) thumbFailed = true

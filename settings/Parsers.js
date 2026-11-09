@@ -197,6 +197,7 @@ function normalizeInput(obj) {
 
 // notifications.json, read by the shell. apps: { "<desktop id>": { allow, style, sounds } }
 const notifStyles = ["none", "banners", "alerts"];
+const notifAppDefaults = { allow: true, style: "banners", sounds: true };
 const notificationsDefaults = { previews: "unlocked", summarize: false, whenSleeping: false, whenLocked: true, whenMirroring: false, apps: {} };
 function normalizeNotifications(obj) {
     const o = Object.assign({}, notificationsDefaults, (obj && typeof obj === "object") ? obj : {});
@@ -206,7 +207,8 @@ function normalizeNotifications(obj) {
     if (o.apps && typeof o.apps === "object")
         for (const id in o.apps) {
             const a = o.apps[id] || {};
-            apps[id] = { allow: a.allow !== false, style: notifStyles.indexOf(a.style) === -1 ? "banners" : a.style, sounds: a.sounds !== false };
+            apps[id] = { allow: a.allow !== false, sounds: a.sounds !== false,
+                         style: notifStyles.indexOf(a.style) === -1 ? notifAppDefaults.style : a.style };
         }
     o.apps = apps;
     return o;
@@ -226,21 +228,24 @@ function prettyFileName(path) {
     return String(path || "").split("/").pop().replace(/\.[^.]+$/, "").replace(/[-_]/g, " ");
 }
 
-// Parse a state file's text; missing or corrupt files give defaults.
-function readState(text, normalize) {
+// A state file's text with unsaved local changes on top; missing or corrupt files
+// give defaults. Unknown keys in the file are kept.
+function mergeState(text, patch, normalize) {
     let obj = {};
     try { obj = JSON.parse(text); } catch (e) { obj = {}; }
-    return normalize(obj);
+    if (!obj || typeof obj !== "object") obj = {};
+    return normalize(Object.assign({}, obj, patch || {}));
 }
 
-function writeState(current, patch, normalize) {
-    return JSON.stringify(normalize(Object.assign({}, current, patch)), null, 2) + "\n";
+// "WxH@R" for hl.monitor from a parseHyprMonitors entry
+function monitorMode(m) {
+    return m.width + "x" + m.height + "@" + m.refreshRate;
 }
 
 if (typeof module !== "undefined")
     module.exports = { splitTerse, parseNmcliDevices, wifiDevice, parseNmcliWifi, parseWpctlSinks, parseWpctlVolume,
         parseBluetoothShow, parseBluetoothDevices, parseHyprMonitors, hasBattery,
         parseHyprOption, luaString, luaMonitor, luaInput,
-        normalizeAppearance, normalizeDock, normalizeSound, readState, writeState, prettyFileName,
+        normalizeAppearance, normalizeDock, normalizeSound, mergeState, monitorMode, prettyFileName,
         normalizeLock, normalizeInput, normalizeNotifications, parseDesktopApps,
-        appearanceDefaults, dockDefaults, soundDefaults, alertSounds, lockDefaults, inputDefaults, notificationsDefaults };
+        appearanceDefaults, dockDefaults, soundDefaults, alertSounds, lockDefaults, inputDefaults, notificationsDefaults, notifAppDefaults };

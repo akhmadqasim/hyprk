@@ -11,7 +11,7 @@ Column {
     spacing: Theme.content.sectionGap
 
     readonly property string dir: Backend.root + "/themes/wallpapers"
-    readonly property string current: AppState.wallpaper
+    readonly property string current: AppState.wallpaperImage
     property string note: ""
 
     function apply(path) {

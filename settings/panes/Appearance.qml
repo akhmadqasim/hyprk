@@ -94,7 +94,7 @@ Column {
                     }
                     RoundedImage {
                         anchors.fill: parent; radius: 14; decodeWidth: 540
-                        path: AppState.wallpaper || Backend.root + "/themes/wallpapers/png/DefaultAerial.png"
+                        path: AppState.wallpaperImage || Backend.root + "/themes/wallpapers/png/DefaultAerial.png"
                     }
                     Row {
                         x: 8; y: 8; spacing: 6
@@ -200,11 +200,7 @@ Column {
     Card {
         FormRow {
             label: "Sidebar icon size"
-            MacPopup {
-                model: ["Small", "Medium", "Large"]
-                currentIndex: Math.max(0, ["small", "medium", "large"].indexOf(AppState.appearance.sidebarIconSize))
-                onActivated: i => AppState.set("appearance", { sidebarIconSize: ["small", "medium", "large"][i] })
-            }
+            StatePopup { stateKey: "appearance"; field: "sidebarIconSize"; choices: [["Small", "small"], ["Medium", "medium"], ["Large", "large"]] }
         }
         FormRow { label: "Allow wallpaper tinting in windows"; MacSwitch { checked: true } }
     }

@@ -15,15 +15,15 @@ QtObject {
     property var lock: P.normalizeLock({})
     property var input: P.normalizeInput({})
     property var notifications: P.normalizeNotifications({})
-    property var wallpaperFile: ({})                              // {path, ...}
-    readonly property string wallpaper: String(wallpaperFile.path || "")
+    property var wallpaper: ({})                                  // {path, ...}
+    readonly property string wallpaperImage: String(wallpaper.path || "")
 
     readonly property var _normalize: ({
         appearance: P.normalizeAppearance, dock: P.normalizeDock, sound: P.normalizeSound,
         lock: P.normalizeLock, input: P.normalizeInput, notifications: P.normalizeNotifications,
-        wallpaperFile: o => o
+        wallpaper: o => o
     })
-    function path(key) { return Backend.stateDir + "/" + (key === "wallpaperFile" ? "wallpaper" : key) + ".json"; }
+    function path(key) { return Backend.stateDir + "/" + key + ".json"; }
 
     property bool hasBattery: false
     property string userName: "User"
@@ -33,7 +33,7 @@ QtObject {
         _patches[key] = Object.assign(_patches[key] || {}, patch);
         _flush.restart();
     }
-    function setWallpaper(p) { set("wallpaperFile", { path: p }); }
+    function setWallpaper(p) { set("wallpaper", { path: p }); }
 
     // Unsaved local changes per key. External edits that arrive meanwhile are
     // merged under them, so neither side is lost.
@@ -57,11 +57,7 @@ QtObject {
         // The shell (or `qs ipc`) may change these files too; follow it.
         for (const key in _normalize) {
             const k = key;
-            Backend.watch(path(k), text => {
-                let obj = {};
-                try { obj = JSON.parse(text); } catch (e) {}
-                app[k] = app._normalize[k](Object.assign({}, obj, app._patches[k] || {}));
-            });
+            Backend.watch(path(k), text => app[k] = P.mergeState(text, app._patches[k], app._normalize[k]));
         }
         // Skip peripheral batteries (mouse, headset): their scope is "Device".
         Backend.run(["sh", "-c", "for d in /sys/class/power_supply/*; do [ \"$(cat $d/scope 2>/dev/null)\" = Device ] || cat $d/type 2>/dev/null; done"],

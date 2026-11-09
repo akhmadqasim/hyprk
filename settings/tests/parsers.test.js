@@ -80,6 +80,7 @@ test("hyprctl monitors", () => {
 });
 
 test("hyprctl getoption and eval snippets", () => {
+    assert.equal(P.monitorMode({ width: 1920, height: 1080, refreshRate: 60 }), "1920x1080@60");
     assert.equal(P.parseHyprOption('{"option": "input:repeat_rate", "int": 25, "set": false }'), 25);
     assert.equal(P.parseHyprOption("no such option"), null);
     assert.equal(P.luaString('a"b\\c'), '"a\\"b\\\\c"');
@@ -95,39 +96,39 @@ test("battery detection", () => {
 });
 
 test("appearance.json defaults and round trip", () => {
-    assert.deepEqual(P.readState("", P.normalizeAppearance), P.appearanceDefaults);
-    assert.deepEqual(P.readState("{broken", P.normalizeAppearance), P.appearanceDefaults);
+    assert.deepEqual(P.mergeState("", {}, P.normalizeAppearance), P.appearanceDefaults);
+    assert.deepEqual(P.mergeState("{broken", {}, P.normalizeAppearance), P.appearanceDefaults);
     // file written by the shell with only {dark}
-    const a = P.readState('{"dark": true}', P.normalizeAppearance);
+    const a = P.mergeState('{"dark": true}', {}, P.normalizeAppearance);
     assert.equal(a.mode, "dark");
     assert.equal(a.dark, true);
-    const written = JSON.parse(P.writeState(a, { mode: "light", reduceTransparency: 1 }, P.normalizeAppearance));
+    const written = P.mergeState(JSON.stringify(a), { mode: "light", reduceTransparency: 1 }, P.normalizeAppearance);
     assert.equal(written.dark, false);
     assert.equal(written.reduceTransparency, true);
-    assert.equal(P.readState('{"glass": 7}', P.normalizeAppearance).glass, 1);
-    assert.equal(P.readState('{"iconStyle": "neon"}', P.normalizeAppearance).iconStyle, "default");
-    assert.equal(P.readState('{"iconStyle": "clear"}', P.normalizeAppearance).iconStyle, "clear");
-    assert.equal(P.readState('{"glass": "x"}', P.normalizeAppearance).glass, 0.5);
+    assert.equal(P.mergeState('{"glass": 7}', {}, P.normalizeAppearance).glass, 1);
+    assert.equal(P.mergeState('{"iconStyle": "neon"}', {}, P.normalizeAppearance).iconStyle, "default");
+    assert.equal(P.mergeState('{"iconStyle": "clear"}', {}, P.normalizeAppearance).iconStyle, "clear");
+    assert.equal(P.mergeState('{"glass": "x"}', {}, P.normalizeAppearance).glass, 0.5);
     // unknown keys from the shell survive
-    assert.equal(JSON.parse(P.writeState({ extra: 5 }, {}, P.normalizeAppearance)).extra, 5);
+    assert.equal(P.mergeState(JSON.stringify({ extra: 5 }), {}, P.normalizeAppearance).extra, 5);
 });
 
 test("dock.json defaults and clamping", () => {
-    assert.deepEqual(P.readState("", P.normalizeDock), P.dockDefaults);
-    const d = P.readState('{"size": 500, "magnifiedSize": 10, "position": "top"}', P.normalizeDock);
+    assert.deepEqual(P.mergeState("", {}, P.normalizeDock), P.dockDefaults);
+    const d = P.mergeState('{"size": 500, "magnifiedSize": 10, "position": "top"}', {}, P.normalizeDock);
     assert.equal(d.size, 128);
     assert.equal(d.magnifiedSize, 128);
     assert.equal(d.position, "bottom");
-    assert.equal(JSON.parse(P.writeState(d, { size: "abc" }, P.normalizeDock)).size, 48);
+    assert.equal(P.mergeState(JSON.stringify(d), { size: "abc" }, P.normalizeDock).size, 48);
 });
 
 test("sound.json defaults and clamping", () => {
-    assert.deepEqual(P.readState("", P.normalizeSound), P.soundDefaults);
-    const s = P.readState('{"alertSound": "Nope", "alertVolume": 3, "uiSounds": 0}', P.normalizeSound);
+    assert.deepEqual(P.mergeState("", {}, P.normalizeSound), P.soundDefaults);
+    const s = P.mergeState('{"alertSound": "Nope", "alertVolume": 3, "uiSounds": 0}', {}, P.normalizeSound);
     assert.equal(s.alertSound, "Tink");
     assert.equal(s.alertVolume, 1);
     assert.equal(s.uiSounds, false);
-    assert.equal(JSON.parse(P.writeState(s, { alertSound: "Funk" }, P.normalizeSound)).alertSound, "Funk");
+    assert.equal(P.mergeState(JSON.stringify(s), { alertSound: "Funk" }, P.normalizeSound).alertSound, "Funk");
 });
 
 test("prettyFileName", () => {
@@ -136,13 +137,13 @@ test("prettyFileName", () => {
 });
 
 test("lock.json, input.json, notifications.json defaults", () => {
-    assert.deepEqual(P.readState("", P.normalizeLock), P.lockDefaults);
-    assert.equal(P.readState('{"displayOffAfter": -5, "largeClock": "x"}', P.normalizeLock).displayOffAfter, 0);
-    assert.deepEqual(P.readState("", P.normalizeInput), P.inputDefaults);
-    assert.equal(P.readState('{"repeatRate": 999}', P.normalizeInput).repeatRate, 100);
-    assert.deepEqual(P.readState("", P.normalizeNotifications), P.notificationsDefaults);
-    const n = P.readState('{"apps": {"firefox.desktop": {"allow": false, "style": "weird"}}, "previews": "x"}', P.normalizeNotifications);
-    assert.deepEqual(n.apps["firefox.desktop"], { allow: false, style: "banners", sounds: true });
+    assert.deepEqual(P.mergeState("", {}, P.normalizeLock), P.lockDefaults);
+    assert.equal(P.mergeState('{"displayOffAfter": -5, "largeClock": "x"}', {}, P.normalizeLock).displayOffAfter, 0);
+    assert.deepEqual(P.mergeState("", {}, P.normalizeInput), P.inputDefaults);
+    assert.equal(P.mergeState('{"repeatRate": 999}', {}, P.normalizeInput).repeatRate, 100);
+    assert.deepEqual(P.mergeState("", {}, P.normalizeNotifications), P.notificationsDefaults);
+    const n = P.mergeState('{"apps": {"firefox.desktop": {"allow": false, "style": "weird"}}, "previews": "x"}', {}, P.normalizeNotifications);
+    assert.deepEqual(n.apps["firefox.desktop"], { allow: false, sounds: true, style: "banners" });
     assert.equal(n.previews, "unlocked");
 });
 

@@ -10,6 +10,8 @@ Item {
     property bool enabled_: true
     property string leftGlyph: ""
     property string rightGlyph: ""
+    property string leftText: ""      // small end labels ("Slow" / "Fast") instead of glyphs
+    property string rightText: ""
     signal moved(real value)
     signal released()
     implicitWidth: 220
@@ -24,14 +26,20 @@ Item {
     readonly property real _frac: to > from ? Math.max(0, Math.min(1, (_shown - from) / (to - from))) : 0
 
     Text {
-        id: lg; visible: s.leftGlyph !== ""
+        id: lg; visible: text !== ""
         anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter
-        text: s.leftGlyph; font.family: Theme.fontGlyph; font.pixelSize: 15; color: Theme.secondaryLabel
+        text: s.leftGlyph || s.leftText
+        font.family: s.leftGlyph ? Theme.fontGlyph : Theme.fontText
+        font.pixelSize: s.leftGlyph ? 15 : Theme.font.small
+        color: Theme.secondaryLabel
     }
     Text {
-        id: rg; visible: s.rightGlyph !== ""
+        id: rg; visible: text !== ""
         anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
-        text: s.rightGlyph; font.family: Theme.fontGlyph; font.pixelSize: 18; color: Theme.secondaryLabel
+        text: s.rightGlyph || s.rightText
+        font.family: s.rightGlyph ? Theme.fontGlyph : Theme.fontText
+        font.pixelSize: s.rightGlyph ? 18 : Theme.font.small
+        color: Theme.secondaryLabel
     }
     Item {
         id: track

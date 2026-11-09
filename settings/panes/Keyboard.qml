@@ -23,42 +23,30 @@ Column {
         });
     }
     // Hyprland is the source of truth when it runs (the config may set other values).
+    // Only the in-memory copy is updated here; state/input.json changes when the user does.
     Component.onCompleted: {
-        Backend.run(["hyprctl", "getoption", "input:repeat_rate", "-j"], (c, o) => {
-            const v = P.parseHyprOption(o);
-            if (c === 0 && v !== null) AppState.input = P.normalizeInput(Object.assign({}, AppState.input, { repeatRate: v }));
-        });
-        Backend.run(["hyprctl", "getoption", "input:repeat_delay", "-j"], (c, o) => {
-            const v = P.parseHyprOption(o);
-            if (c === 0 && v !== null) AppState.input = P.normalizeInput(Object.assign({}, AppState.input, { repeatDelay: v }));
-        });
+        for (const [option, key] of [["input:repeat_rate", "repeatRate"], ["input:repeat_delay", "repeatDelay"]])
+            Backend.run(["hyprctl", "getoption", option, "-j"], (c, o) => {
+                const v = P.parseHyprOption(o);
+                if (c === 0 && v !== null) AppState.input = P.normalizeInput(Object.assign({}, AppState.input, { [key]: v }));
+            });
     }
 
     Card {
         FormRow {
             label: "Key repeat rate"
-            Row {
-                spacing: 8
-                MacText { width: 30; horizontalAlignment: Text.AlignRight; text: "Slow"; color: Theme.secondaryLabel; font.pixelSize: Theme.font.small; anchors.verticalCenter: parent.verticalCenter }
-                MacSlider {
-                    width: 180
-                    value: pane.rateToPos(AppState.input.repeatRate)
-                    onReleased: pane.apply({ repeatRate: pane.posToRate(_dragValue) })
-                }
-                MacText { width: 34; text: "Fast"; color: Theme.secondaryLabel; font.pixelSize: Theme.font.small; anchors.verticalCenter: parent.verticalCenter }
+            MacSlider {
+                width: 260; leftText: "Slow"; rightText: "Fast"
+                value: pane.rateToPos(AppState.input.repeatRate)
+                onReleased: pane.apply({ repeatRate: pane.posToRate(_dragValue) })
             }
         }
         FormRow {
             label: "Delay until repeat"
-            Row {
-                spacing: 8
-                MacText { width: 30; horizontalAlignment: Text.AlignRight; text: "Long"; color: Theme.secondaryLabel; font.pixelSize: Theme.font.small; anchors.verticalCenter: parent.verticalCenter }
-                MacSlider {
-                    width: 180
-                    value: pane.delayToPos(AppState.input.repeatDelay)
-                    onReleased: pane.apply({ repeatDelay: pane.posToDelay(_dragValue) })
-                }
-                MacText { width: 34; text: "Short"; color: Theme.secondaryLabel; font.pixelSize: Theme.font.small; anchors.verticalCenter: parent.verticalCenter }
+            MacSlider {
+                width: 260; leftText: "Long"; rightText: "Short"
+                value: pane.delayToPos(AppState.input.repeatDelay)
+                onReleased: pane.apply({ repeatDelay: pane.posToDelay(_dragValue) })
             }
         }
         FormRow { label: "Adjust keyboard brightness in low light"; MacSwitch { checked: true } }

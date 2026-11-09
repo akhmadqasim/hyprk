@@ -7,38 +7,24 @@ import "../controls"
 Column {
     id: pane
     spacing: Theme.content.sectionGap
-    readonly property var l: AppState.lock
 
-    // A pop-up bound to one lock.json key with [label, seconds] choices.
-    component TimePopup: MacPopup {
-        property string key
-        property var choices: []
-        model: choices.map(c => c[0])
-        currentIndex: Math.max(0, choices.findIndex(c => c[1] === pane.l[key]))
-        onActivated: i => AppState.set("lock", { [key]: choices[i][1] })
-    }
 
     Card {
         FormRow {
             label: "Start Screen Saver when inactive"
-            TimePopup { key: "screenSaverAfter"; choices: [["Never", 0], ["For 1 minute", 60], ["For 2 minutes", 120], ["For 5 minutes", 300], ["For 10 minutes", 600], ["For 20 minutes", 1200], ["For 30 minutes", 1800], ["For 1 hour", 3600]] }
+            StatePopup { stateKey: "lock"; field: "screenSaverAfter"; choices: [["Never", 0], ["For 1 minute", 60], ["For 2 minutes", 120], ["For 5 minutes", 300], ["For 10 minutes", 600], ["For 20 minutes", 1200], ["For 30 minutes", 1800], ["For 1 hour", 3600]] }
         }
         FormRow {
             label: "Turn display off when inactive"
-            TimePopup { key: "displayOffAfter"; choices: [["Never", 0], ["For 1 minute", 60], ["For 2 minutes", 120], ["For 5 minutes", 300], ["For 10 minutes", 600], ["For 20 minutes", 1200], ["For 30 minutes", 1800], ["For 1 hour", 3600], ["For 3 hours", 10800]] }
+            StatePopup { stateKey: "lock"; field: "displayOffAfter"; choices: [["Never", 0], ["For 1 minute", 60], ["For 2 minutes", 120], ["For 5 minutes", 300], ["For 10 minutes", 600], ["For 20 minutes", 1200], ["For 30 minutes", 1800], ["For 1 hour", 3600], ["For 3 hours", 10800]] }
         }
         FormRow {
             label: "Require password after screen saver begins or display is turned off"
-            TimePopup { key: "requirePasswordAfter"; choices: [["Immediately", 0], ["After 5 seconds", 5], ["After 1 minute", 60], ["After 5 minutes", 300], ["After 15 minutes", 900], ["After 1 hour", 3600], ["After 8 hours", 28800]] }
+            StatePopup { stateKey: "lock"; field: "requirePasswordAfter"; choices: [["Immediately", 0], ["After 5 seconds", 5], ["After 1 minute", 60], ["After 5 minutes", 300], ["After 15 minutes", 900], ["After 1 hour", 3600], ["After 8 hours", 28800]] }
         }
         FormRow {
             label: "Show large clock"
-            MacPopup {
-                readonly property var keys: ["screensaver", "lock", "never"]
-                model: ["On Screen Saver and Lock Screen", "On Lock Screen", "Never"]
-                currentIndex: Math.max(0, keys.indexOf(pane.l.largeClock))
-                onActivated: i => AppState.set("lock", { largeClock: keys[i] })
-            }
+            StatePopup { stateKey: "lock"; field: "largeClock"; choices: [["On Screen Saver and Lock Screen", "screensaver"], ["On Lock Screen", "lock"], ["Never", "never"]] }
         }
     }
     Card {
