@@ -223,6 +223,15 @@ function parseDesktopApps(text) {
         .sort((a, b) => a.name.localeCompare(b.name));
 }
 
+// Display name from /etc/passwd: the GECOS full name, else the username.
+function gecosName(passwd, user) {
+    for (const l of lines(passwd)) {
+        const f = l.split(":");
+        if (f[0] === user) return (f[4] || "").split(",")[0].trim() || user;
+    }
+    return user;
+}
+
 // "/x/Mac_Blue-dark.png" -> "Mac Blue dark", "DefaultAerial.png" -> "Default Aerial"
 function prettyFileName(path) {
     return String(path || "").split("/").pop().replace(/\.[^.]+$/, "").replace(/[-_]/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2");
@@ -247,5 +256,5 @@ if (typeof module !== "undefined")
         parseBluetoothShow, parseBluetoothDevices, parseHyprMonitors, hasBattery,
         parseHyprOption, luaString, luaMonitor, luaInput,
         normalizeAppearance, normalizeDock, normalizeSound, mergeState, monitorMode, prettyFileName,
-        normalizeLock, normalizeInput, normalizeNotifications, parseDesktopApps,
+        gecosName, normalizeLock, normalizeInput, normalizeNotifications, parseDesktopApps,
         appearanceDefaults, dockDefaults, soundDefaults, alertSounds, lockDefaults, inputDefaults, notificationsDefaults, notifAppDefaults };

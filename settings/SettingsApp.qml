@@ -174,7 +174,7 @@ Item {
                     color: Theme.label
                 }
                 Text {
-                    text: "Linux Account"
+                    text: "Local Account"
                     font.family: Theme.fontText; font.pixelSize: Theme.font.small
                     color: Theme.secondaryLabel
                 }

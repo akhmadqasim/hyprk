@@ -92,6 +92,14 @@ QtObject {
         run(args, done);
     }
 
+    readonly property string home: decodeURIComponent(new URL(String(StandardPaths.writableLocation(StandardPaths.HomeLocation))).pathname)
+
+    // One-off read of a small text file ("" when unreadable).
+    function readText(path, cb) {
+        if (canRun) run(["cat", path], (c, out) => cb(c === 0 ? out : ""));
+        else _xhrRead(path, cb);
+    }
+
     function _xhrRead(path, cb) {
         const x = new XMLHttpRequest();
         x.onreadystatechange = () => { if (x.readyState === XMLHttpRequest.DONE) cb(x.responseText || ""); };

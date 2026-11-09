@@ -100,13 +100,13 @@ Column {
                     }
                     Rectangle { // ref: a document title strip under the photo
                         anchors.bottom: parent.bottom
-                        width: parent.width; height: 40
+                        width: parent.width; height: 30   // ref: a slim strip
                         bottomLeftRadius: 14; bottomRightRadius: 14
                         color: Theme.previewStrip
                         MacText {
-                            x: 16; anchors.verticalCenter: parent.verticalCenter
+                            x: 14; anchors.verticalCenter: parent.verticalCenter
                             text: P.prettyFileName(preview.path)
-                            font.pixelSize: Theme.font.title + 2; weight: Font.DemiBold
+                            font.pixelSize: Theme.font.body; weight: Font.DemiBold
                         }
                     }
                     Row {

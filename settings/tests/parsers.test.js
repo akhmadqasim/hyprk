@@ -131,6 +131,13 @@ test("sound.json defaults and clamping", () => {
     assert.equal(P.mergeState(JSON.stringify(s), { alertSound: "Funk" }, P.normalizeSound).alertSound, "Funk");
 });
 
+test("gecosName", () => {
+    const pw = "root:x:0:0:root:/root:/bin/bash\nann:x:1000:1000:Ann Lee,,,:/home/ann:/bin/bash\nbob:x:1001:1001::/home/bob:/bin/sh\n";
+    assert.equal(P.gecosName(pw, "ann"), "Ann Lee");
+    assert.equal(P.gecosName(pw, "bob"), "bob");
+    assert.equal(P.gecosName("", "zed"), "zed");
+});
+
 test("prettyFileName", () => {
     assert.equal(P.prettyFileName("/w/png/Mac_Blue-dark.png"), "Mac Blue dark");
     assert.equal(P.prettyFileName(""), "");
