@@ -305,7 +305,8 @@ Item {
         tint: Theme.nc.pillLift
         pluginLift: Theme.nc.pillLift
         shadow: false
-        readonly property point pos: mapToItem(null, 0, 0)
+        // re-measured when the pill or the list moves
+        readonly property point pos: x + y + flick.contentY >= -1e9 ? mapToItem(null, 0, 0) : Qt.point(0, 0)
         sx: nc.originX + pos.x
         sy: nc.originY + pos.y
         Text {

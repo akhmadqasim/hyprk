@@ -13,7 +13,7 @@ ShellWindow {
     required property var modelData
     screen: modelData
 
-    // SPEC.md: tile 64 pt, 52 on displays up to 800 pt tall
+    // tile from the screen width (see Theme.dock.tileFraction)
     readonly property int base: Math.round((screen ? screen.width : 1440) * Theme.dock.tileFraction)
     readonly property int magnified: Math.round(base * Theme.dock.magnifyRatio)
     readonly property int pad: Theme.dock.padding

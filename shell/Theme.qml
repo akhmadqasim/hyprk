@@ -274,7 +274,6 @@ Singleton {
         // over the plugin "regular" recipe: a warm grey veil gives the reference mid-grey frost
         readonly property color pluginLift: theme.dark ? Qt.rgba(0.10, 0.10, 0.11, 0.72) : Qt.rgba(0.24, 0.22, 0.21, 0.70)
         readonly property color rim: Qt.rgba(1, 1, 1, 0.38)            // top-lit rim drawn over plugin glass
-        readonly property real disabledSliderOpacity: 1.0               // slider still shows its value (non-interactive)
         readonly property color tileTint: theme.dark ? Qt.rgba(0.12, 0.12, 0.13, 0.45) : Qt.rgba(0.30, 0.28, 0.27, 0.42)   // QML material: dark neutral frost
         readonly property color tileSolid: theme.dark ? "#3A3A3C" : "#8E8E93"
         readonly property color text: "#FFFFFF"

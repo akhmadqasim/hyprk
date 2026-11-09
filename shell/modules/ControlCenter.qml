@@ -198,11 +198,9 @@ Item {
         width: cc.colW
         height: cc.rowH
         // unavailable looks like "off" (macOS shows Wi-Fi off, not a dead tile); taps do nothing
-        readonly property real contentOpacity: 1
 
         Rectangle {
             id: circle
-            opacity: cap.contentOpacity
             x: (cc.rowH - width) / 2
             anchors.verticalCenter: parent.verticalCenter
             width: Theme.cc.toggleSize
@@ -218,7 +216,6 @@ Item {
             }
         }
         Column {
-            opacity: cap.contentOpacity
             anchors.left: circle.right
             anchors.leftMargin: 8
             anchors.right: parent.right
@@ -297,10 +294,8 @@ Item {
         width: cc.width
         height: cc.rowH
         // the fill stays readable when disabled (the value is still shown)
-        readonly property real contentOpacity: available ? 1 : Theme.cc.disabledSliderOpacity
 
         Text {
-            opacity: sm.contentOpacity
             x: Theme.cc.sliderInset
             y: 9
             text: sm.title
@@ -311,7 +306,6 @@ Item {
         }
         Symbol {
             id: ls
-            opacity: sm.contentOpacity
             x: Theme.cc.sliderInset
             anchors.verticalCenter: track.verticalCenter
             name: sm.leftSymbol
@@ -320,7 +314,6 @@ Item {
         }
         Symbol {
             id: rs
-            opacity: sm.contentOpacity
             anchors.right: parent.right
             anchors.rightMargin: Theme.cc.sliderInset
             anchors.verticalCenter: track.verticalCenter
@@ -330,7 +323,6 @@ Item {
         }
         Item {
             id: track
-            opacity: sm.contentOpacity
             anchors.left: ls.right
             anchors.leftMargin: 8
             anchors.right: rs.left
