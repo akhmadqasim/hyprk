@@ -96,6 +96,8 @@ test("appearance.json defaults and round trip", () => {
     assert.equal(written.dark, false);
     assert.equal(written.reduceTransparency, true);
     assert.equal(P.readState('{"glass": 7}', P.normalizeAppearance).glass, 1);
+    assert.equal(P.readState('{"iconStyle": "neon"}', P.normalizeAppearance).iconStyle, "default");
+    assert.equal(P.readState('{"iconStyle": "clear"}', P.normalizeAppearance).iconStyle, "clear");
     assert.equal(P.readState('{"glass": "x"}', P.normalizeAppearance).glass, 0.5);
     // unknown keys from the shell survive
     assert.equal(JSON.parse(P.writeState({ extra: 5 }, {}, P.normalizeAppearance)).extra, 5);

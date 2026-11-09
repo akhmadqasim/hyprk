@@ -92,25 +92,24 @@ Column {
                         GradientStop { position: 0.55; color: "#5C9A55" }
                         GradientStop { position: 1; color: "#2F5A2E" }
                     }
-                    Image {
-                        anchors.fill: parent; fillMode: Image.PreserveAspectCrop; asynchronous: true
-                        source: AppState.wallpaper ? "file://" + AppState.wallpaper : ""
-                        sourceSize.width: 540
+                    RoundedImage {
+                        anchors.fill: parent; radius: 14; decodeWidth: 540
+                        path: AppState.wallpaper || Backend.root + "/themes/wallpapers/png/DefaultAerial.png"
                     }
                     Row {
                         x: 8; y: 8; spacing: 6
                         Repeater {
-                            model: [{ w: 72, g: "ios_share  more_horiz" }, { w: 36, g: "filter_none" }, { w: 136, g: "search" }]
+                            model: [{ w: 72, g: "ios_share  more_horiz", t: "" }, { w: 36, g: "filter_none", t: "" }, { w: 136, g: "search", t: "Search" }]
                             Rectangle {
                                 required property var modelData
                                 width: modelData.w; height: 36; radius: 18
                                 // 0 = clear glass, 1 = frosted/tinted
                                 color: Qt.rgba(1, 1, 1, 0.18 + 0.6 * AppState.appearance.glass)
                                 border.color: Qt.rgba(1, 1, 1, 0.7)
-                                Text {
-                                    x: 12; anchors.verticalCenter: parent.verticalCenter
-                                    text: modelData.g; font.family: Theme.fontGlyph; font.pixelSize: 18
-                                    color: "#1C1C1E"
+                                Row {
+                                    x: 10; anchors.verticalCenter: parent.verticalCenter; spacing: 5
+                                    Text { text: modelData.g; font.family: Theme.fontGlyph; font.pixelSize: 18; color: "#1C1C1E" }
+                                    Text { text: modelData.t; font.family: Theme.fontText; font.pixelSize: Theme.font.body; color: "#3A3A3C"; anchors.verticalCenter: parent.verticalCenter }
                                 }
                             }
                         }
@@ -185,7 +184,8 @@ Column {
                         required property var modelData
                         w: 44; h: 44
                         caption: modelData.t
-                        selected: modelData.t === "Default"
+                        selected: AppState.appearance.iconStyle === modelData.t.toLowerCase()
+                        onPicked: AppState.setAppearance({ iconStyle: modelData.t.toLowerCase() })
                         Rectangle {
                             anchors.fill: parent; anchors.margins: 4; radius: 10
                             gradient: Gradient { GradientStop { position: 0; color: Qt.lighter(modelData.c, 1.25) } GradientStop { position: 1; color: modelData.c } }

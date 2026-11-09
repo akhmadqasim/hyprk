@@ -104,8 +104,10 @@ function hasBattery(text) {
 // ---------- state files ----------
 // appearance.json is shared with the shell, which reads {dark, reduceTransparency}.
 // glass: macOS 27 "Liquid Glass" slider, 0 = clear, 1 = tinted.
-const appearanceDefaults = { mode: "light", dark: false, reduceTransparency: false, accent: "multicolor", sidebarIconSize: "medium", glass: 0.5 };
+// iconStyle: macOS 26+ "Icon & widget style" (default | dark | clear | tinted).
+const appearanceDefaults = { mode: "light", dark: false, reduceTransparency: false, accent: "multicolor", sidebarIconSize: "medium", glass: 0.5, iconStyle: "default" };
 const appearanceModes = ["light", "dark", "auto"];
+const iconStyles = ["default", "dark", "clear", "tinted"];
 
 function normalizeAppearance(obj) {
     const src = (obj && typeof obj === "object") ? obj : {};
@@ -114,6 +116,7 @@ function normalizeAppearance(obj) {
     if (appearanceModes.indexOf(src.mode) === -1) o.mode = src.dark ? "dark" : "light";
     o.dark = o.mode === "dark";   // "auto" follows light until a sun clock exists
     o.reduceTransparency = !!o.reduceTransparency;
+    if (iconStyles.indexOf(o.iconStyle) === -1) o.iconStyle = appearanceDefaults.iconStyle;
     o.glass = isFinite(Number(o.glass)) ? Math.min(1, Math.max(0, Number(o.glass))) : appearanceDefaults.glass;
     return o;
 }

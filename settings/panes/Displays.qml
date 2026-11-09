@@ -71,7 +71,6 @@ Column {
     Card {
         FormRow {
             label: "Resolution"
-            sublabel: pane.mon ? pane.mon.width + " × " + pane.mon.height : ""
             MacPopup {
                 enabled_: pane.status === "ok"
                 model: pane.mon && pane.mon.modes.length ? pane.mon.modes.map(s => s.replace(/@.*/, "").replace("x", " × ")) : ["Default for display"]
