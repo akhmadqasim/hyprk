@@ -8,6 +8,7 @@
 #include <array>
 #include <deque>
 #include <format>
+#include <string_view>
 #include <vector>
 
 namespace lg::stats {
@@ -31,8 +32,12 @@ namespace lg::stats {
         bool load() {
             if (!g_tried) {
                 g_tried       = true;
-                pQueryCounter = reinterpret_cast<PFNGLQUERYCOUNTEREXTPROC>(eglGetProcAddress("glQueryCounterEXT"));
-                pGetU64       = reinterpret_cast<PFNGLGETQUERYOBJECTUI64VEXTPROC>(eglGetProcAddress("glGetQueryObjectui64vEXT"));
+                // eglGetProcAddress may hand out pointers for missing extensions: check the string
+                const auto* ext = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+                if (ext && std::string_view{ext}.contains("GL_EXT_disjoint_timer_query")) {
+                    pQueryCounter = reinterpret_cast<PFNGLQUERYCOUNTEREXTPROC>(eglGetProcAddress("glQueryCounterEXT"));
+                    pGetU64       = reinterpret_cast<PFNGLGETQUERYOBJECTUI64VEXTPROC>(eglGetProcAddress("glGetQueryObjectui64vEXT"));
+                }
             }
             return pQueryCounter && pGetU64;
         }
@@ -77,7 +82,10 @@ namespace lg::stats {
     void poll() {
         if (!g_on || g_open[FRAME] || g_open[GLASS])
             return; // indices into g_pending must stay valid while an interval is open
-        std::erase_if(g_pending, [](SInterval& iv) {
+        // a disjoint event (clock change) makes every pending result meaningless
+        GLint disjoint = 0;
+        glGetIntegerv(GL_GPU_DISJOINT_EXT, &disjoint);
+        std::erase_if(g_pending, [disjoint](SInterval& iv) {
             if (!iv.closed)
                 return false;
             GLuint ready = 0;
@@ -87,10 +95,12 @@ namespace lg::stats {
             GLuint64 t0 = 0, t1 = 0;
             pGetU64(iv.a, GL_QUERY_RESULT, &t0);
             pGetU64(iv.b, GL_QUERY_RESULT, &t1);
-            auto& d = g_ms[iv.kind];
-            d.push_back((t1 - t0) / 1e6);
-            if (d.size() > WINDOW)
-                d.pop_front();
+            if (!disjoint && t1 >= t0) {
+                auto& d = g_ms[iv.kind];
+                d.push_back((t1 - t0) / 1e6);
+                if (d.size() > WINDOW)
+                    d.pop_front();
+            }
             g_free.push_back(iv.a);
             g_free.push_back(iv.b);
             return true;

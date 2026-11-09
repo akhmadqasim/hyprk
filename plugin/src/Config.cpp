@@ -87,7 +87,7 @@ namespace lg {
             {K("shader_path"), "", [](SParams& p, const std::string& v) { p.shaderPath = v; }},
             {K("titlebar"), "auto", [](SParams& p, const std::string& v) { p.titlebar = parseTitlebarMode(v); }},
             {K("titlebar_classes"), "", [](SParams& p, const std::string& v) { p.titlebarClasses = v; }},
-            {K("titlebar_exclude"), R"(^(org\.hyprk\..*|hyprk-.*)$)", [](SParams& p, const std::string& v) { p.titlebarExclude = v; }},
+            {K("titlebar_exclude"), TITLEBAR_EXCLUDE, [](SParams& p, const std::string& v) { p.titlebarExclude = v; }},
             {K("titlebar_font"), "SF Pro Text", [](SParams& p, const std::string& v) { p.titlebarFont = v; }},
             {K("window_classes"), "", [](SParams& p, const std::string& v) { p.windowClasses = v; }},
         };

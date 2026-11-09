@@ -14,6 +14,8 @@
 
 namespace lg {
 
+    inline constexpr const char* TITLEBAR_EXCLUDE = R"(^(org\.hyprk\..*|hyprk-.*)$)"; // the hyprk apps draw their own
+
     // Snapshot of all values. Lengths are logical px (pt).
     // Material numbers (face YCC, refraction, blur, shadow, ring) come from the recipes in
     // Material.hpp; the keys here pick a recipe per namespace and scale the result.
@@ -40,8 +42,8 @@ namespace lg {
 
         bool                                         fullDamage    = false; // true: redraw the whole output while glass is visible
         bool                                         copyPerElement = false; // benchmark: the iteration-3 backdrop copy (every element, whole region)
-        bool                                         stats         = false;
-        bool                                         linearLight   = false; // 1: shader in linear light (recipes are tuned for 0, see README) // GPU timestamp queries, `hyprctl liquidglass`
+        bool                                         stats         = false; // GPU timestamp queries, `hyprctl liquidglass`
+        bool                                         linearLight   = false; // 1: shader in linear light (recipes are tuned for 0, see README)
         bool                                         requireRegion = true;  // no blur region -> no glass
         std::string                                  shaderPath;
         std::string                                  windowClasses;     // regex; empty = no window glass
@@ -50,10 +52,10 @@ namespace lg {
         // macOS title bar for windows without their own (Titlebar.cpp)
         int                                          titlebar = 1; // 0 off, 1 auto (client asked for server-side decorations), 2 classes only
         std::string                                  titlebarClasses;  // regex: always get a bar
-        std::string                                  titlebarExclude = R"(^(org\.hyprk\..*|hyprk-.*)$)"; // regex: never (they draw their own)
+        std::string                                  titlebarExclude = TITLEBAR_EXCLUDE; // regex: never (they draw their own)
         float                                        titlebarHeight = 32, titlebarButton = 14, titlebarGap = 7, titlebarInset = 15, titlebarFontSize = 13;
-        SRgba                                        titlebarColor{0.953f, 0.945f, 0.937f, 1}, titlebarColorInactive{0.965f, 0.961f, 0.957f, 1};
-        SRgba                                        titlebarText{0.2f, 0.2f, 0.2f, 0.85f}, titlebarTextInactive{0.2f, 0.2f, 0.2f, 0.35f};
+        // colours are set from the hex defaults in Config.cpp's key table
+        SRgba                                        titlebarColor, titlebarColorInactive, titlebarText, titlebarTextInactive;
         std::string                                  titlebarFont = "SF Pro Text";
         bool                                         titlebarGlass = false; // light glass (Hyprland blur + translucent fill)
 

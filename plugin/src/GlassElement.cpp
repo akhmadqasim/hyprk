@@ -273,8 +273,10 @@ namespace lg {
         // The unblurred backdrop for all glass of this monitor frame, refreshed once per frame at
         // the first glass element: every claimed glass box (plus the mip footprint) is copied from
         // what Hyprland blurs (the backdrop capture when a scope is open, else the framebuffer being
-        // rendered), then the mip chain is rebuilt. Nothing damaged under the glass: no copy, no mips. Glass drawn above other glass in the same frame sees
-        // the backdrop without the lower glass in its sharp samples (its blurred ones are exact).
+        // rendered), then the mip chain is rebuilt. Nothing damaged under the glass: no copy, no mips.
+        // Layer glass drawn above other layer glass in the same frame sees the backdrop without the
+        // lower glass in its sharp samples (blurred ones are exact); window glass always refreshes
+        // the copy (perElement).
         // Returns the texture, or null when a copy is not possible.
         SP<Render::ITexture> sharpBackdrop(Render::CRenderContext& ctx, const Vector2D& size, bool perElement) {
             const auto  mon      = ctx.m_data.pMonitor.lock();
@@ -296,8 +298,6 @@ namespace lg {
                 return nullptr;
             if (sh.frame == g_frame && !fresh && !perElement)
                 return tex;
-            sh.frame = g_frame;
-
             // every claimed box, but only on frames where something under the glass was damaged
             CRegion copy;
             bool    touched = fresh || perElement;
@@ -306,17 +306,22 @@ namespace lg {
                 touched = touched || touches(ctx.m_data.damage, box);
             }
             copy.intersect(CBox{{}, size});
-            if (!touched || copy.empty())
+            if (!touched || copy.empty()) {
+                sh.frame = g_frame;
                 return tex;
+            }
             {
                 CFramebufferBindingGuard guard{g_pHyprRenderer->glBackend()};
                 g_pHyprOpenGL->bindFramebuffer(GL_READ_FRAMEBUFFER, src->getFBID());
                 g_pHyprOpenGL->bindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->getFBID());
                 // texel rows follow the top-down box space of the uvs
                 copy.forEachRect([](const auto& r) { glBlitFramebuffer(r.x1, r.y1, r.x2, r.y2, r.x1, r.y1, r.x2, r.y2, GL_COLOR_BUFFER_BIT, GL_NEAREST); });
-                if (glGetError() != GL_NO_ERROR)
+                if (glGetError() != GL_NO_ERROR) {
+                    sh.fb.reset(); // reallocate next time; later glass this frame falls back too
                     return nullptr;
+                }
             }
+            sh.frame = g_frame;
             g_pHyprOpenGL->setActiveTexture(GL_TEXTURE1);
             tex->bind();
             glGenerateMipmap(GL_TEXTURE_2D);
@@ -522,7 +527,9 @@ namespace lg {
             return false;
 
         // without the copy, the blurred texture stands in: variable blur and bleed then stay blurred
-        auto sharp = sharpBackdrop(ctx, tex->m_size, p.copyPerElement);
+        // layer glass (top/overlay) is drawn after all windows and can share one copy; window glass is
+        // interleaved with other windows, so it refreshes the copy for itself
+        auto sharp = sharpBackdrop(ctx, tex->m_size, p.copyPerElement || m_data.isWindow);
         if (!sharp)
             sharp = tex;
 

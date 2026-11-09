@@ -33,14 +33,15 @@ namespace lg {
             return false;
         for (const auto& [toplevel, deco] : PROTO::xdgDecoration->m_decorations) {
             const auto tl = CXDGToplevelResource::fromResource(toplevel);
+            // a client that explicitly asked for client-side decorations keeps its own
             if (tl && tl->m_window.lock() == window)
-                return true;
+                return deco && deco->mostRecentlyRequested != ZXDG_TOPLEVEL_DECORATION_V1_MODE_CLIENT_SIDE;
         }
         return false;
     }
 
     bool wantsTitlebar(const SParams& p, PHLWINDOW window) {
-        if (!window || p.titlebar == 0)
+        if (!window || p.titlebar == 0 || !window->m_ruleApplicator->decorate().valueOrDefault())
             return false;
         const auto cls = window->metadata().appID();
         if (p.titlebarExcludeRegex && std::regex_search(cls, *p.titlebarExcludeRegex))
@@ -111,25 +112,27 @@ namespace lg {
         g_pHyprRenderer->damageBox(barGlobal().translate(window->presentation().floatingOffset()).expand(2));
     }
 
-    SP<Render::ITexture> CTitlebar::titleTexture(const SParams& p, const std::string& title, bool isActive, float scale, double maxWidth) {
-        if (!m_title.tex || m_title.text != title || m_title.active != isActive || m_title.scale != scale) {
-            const auto color = rgba(isActive ? p.titlebarText : p.titlebarTextInactive);
-            m_title          = {title, isActive, scale,
-                                g_pHyprRenderer->renderText(title, color, int(std::round(p.titlebarFontSize * scale)), false, p.titlebarFont, int(maxWidth * scale), 600)};
+    SP<Render::ITexture> CTitlebar::titleTexture(const std::shared_ptr<const SParams>& params, const std::string& title, bool isActive, float scale, double maxWidth) {
+        const int width = int(maxWidth * scale);
+        if (!m_title.tex || m_title.text != title || m_title.active != isActive || m_title.scale != scale || m_title.width != width || m_title.params != params) {
+            const auto& p     = *params;
+            const auto  color = rgba(isActive ? p.titlebarText : p.titlebarTextInactive);
+            m_title           = {title, isActive, scale, width, params,
+                                g_pHyprRenderer->renderText(title, color, int(std::round(p.titlebarFontSize * scale)), false, p.titlebarFont, width, 600)};
         }
         return m_title.tex;
     }
 
     SP<Render::ITexture> CTitlebar::glyphTexture(int button, float scale) {
-        if (m_glyphScale != scale) {
-            m_glyphs     = {};
-            m_glyphScale = scale;
+        const auto params = m_params();
+        if (m_glyphScale != scale || m_glyphParams != params) { // size and font follow the config
+            m_glyphs      = {};
+            m_glyphScale  = scale;
+            m_glyphParams = params;
         }
         auto& tex = m_glyphs[button];
-        if (!tex) {
-            const auto params = m_params();
+        if (!tex)
             tex = g_pHyprRenderer->renderText(SIGNS[button], rgba(rgbaFromHex(GLYPHS[button])), int(std::round(params->titlebarButton * 0.85 * scale)), false, params->titlebarFont, 0, 700);
-        }
         return tex;
     }
 
@@ -141,7 +144,8 @@ namespace lg {
 
         // the wanted height can change with the config or the window's class; decided once per change
         const auto cls = window->metadata().appID();
-        if (m_decidedFor != params || m_decidedClass != cls) {
+        // no bar yet: look again now and then, the client may bind xdg-decoration late
+        if (m_decidedFor != params || m_decidedClass != cls || (!m_decision && ++m_recheck % 120 == 0)) {
             m_decidedFor   = params;
             m_decidedClass = cls;
             m_decision     = wantsTitlebar(*params, window);
@@ -206,7 +210,7 @@ namespace lg {
         // centred title (SF Pro 13 semibold)
         const auto title = window->metadata().title();
         if (!title.empty() && layout.title.w > 8) {
-            if (const auto tex = titleTexture(*params, title, isActive, scale, layout.title.w); tex && tex->ok()) {
+            if (const auto tex = titleTexture(params, title, isActive, scale, layout.title.w); tex && tex->ok()) {
                 CTexPassElement::SRenderData text;
                 text.tex = tex;
                 text.box = CBox{barPx.x + (barPx.w - tex->m_size.x) / 2, barPx.y + (barPx.h - tex->m_size.y) / 2, tex->m_size.x, tex->m_size.y}.round();

@@ -178,6 +178,12 @@ own) prevents one, `titlebar = "classes"` only uses the regex, `"off"` disables 
 | `titlebar_text` / `titlebar_text_inactive` | `0x333333D9` / `0x33333359` |
 | `titlebar_glass` | 0 |
 
+Ghostty: set `window-decoration = server`; if a build does not bind xdg-decoration, add its class
+(`com.mitchellh.ghostty`) to `titlebar_classes`. Clients that bind xdg-decoration but explicitly request
+client-side mode keep their own header. A `decorate = false` window rule removes the bar. The bar is
+re-evaluated when the config or the window class changes, and every 120 frames while a window has none
+(late xdg-decoration binds).
+
 Which clients asked for server-side decorations is read from Hyprland's private xdg-decoration map
 (`#define private public` around one header, read only). The bar's fill also covers the window's rounded
 top corners, so the two read as one shape.

@@ -39,6 +39,7 @@ namespace lg {
         void onPointerMove(const Vector2D& global);
         // a button release anywhere ends a title-bar drag we started
         void onButtonRelease();
+        bool belongsTo(const PHLWINDOW& w) const { return m_window.lock() == w; }
 
       private:
         struct SGeometry {
@@ -48,7 +49,7 @@ namespace lg {
         CBox                     barGlobal() const; // logical, global, without workspace/floating offsets
         SGeometry                geometry(const SParams& p, const Vector2D& offset) const;
         void                     act(int button);
-        SP<Render::ITexture>     titleTexture(const SParams& p, const std::string& title, bool active, float scale, double maxWidth);
+        SP<Render::ITexture>     titleTexture(const std::shared_ptr<const SParams>& params, const std::string& title, bool active, float scale, double maxWidth);
         SP<Render::ITexture>     glyphTexture(int button, float scale);
 
         PHLWINDOWREF             m_window;
@@ -67,10 +68,14 @@ namespace lg {
         struct {
             std::string          text;
             bool                 active = false;
-            float                scale  = 0;
-            SP<Render::ITexture> tex;
+            float                          scale  = 0;
+            int                            width  = 0;
+            std::shared_ptr<const SParams> params; // font, size and colours
+            SP<Render::ITexture>           tex;
         } m_title;
         std::array<SP<Render::ITexture>, 3> m_glyphs;
         float                               m_glyphScale = 0;
+        std::shared_ptr<const SParams>      m_glyphParams;
+        unsigned                            m_recheck = 0;
     };
 }

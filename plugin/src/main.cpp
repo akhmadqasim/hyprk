@@ -180,6 +180,12 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     g_listeners.push_back(Event::bus()->m_events.input.mouse.move.listen([](Vector2D pos, Event::SCallbackInfo&) {
         forEachTitlebar([&pos](lg::CTitlebar& bar) { bar.onPointerMove(pos); });
     }));
+    g_listeners.push_back(Event::bus()->m_events.window.title.listen([](PHLWINDOW w) {
+        forEachTitlebar([&w](lg::CTitlebar& bar) {
+            if (bar.belongsTo(w))
+                bar.damageEntire(); // Hyprland does not damage decorations on a title change
+        });
+    }));
     g_listeners.push_back(Event::bus()->m_events.input.mouse.button.listen([](IPointer::SButtonEvent e, Event::SCallbackInfo&) {
         if (e.state == WL_POINTER_BUTTON_STATE_RELEASED)
             forEachTitlebar([](lg::CTitlebar& bar) { bar.onButtonRelease(); });
