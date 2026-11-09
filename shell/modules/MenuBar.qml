@@ -28,6 +28,8 @@ ShellWindow {
     readonly property string appId: Apps.appIdOf(Hyprland.activeToplevel)
     readonly property var appMenus: Menus.forApp(appId)
     readonly property color fg: Theme.color.menuBarText
+    // 12/24h and date order follow the time locale like macOS (LC_ALL > LC_TIME > LANG)
+    readonly property var clockStyle: Clock.styleFor(Quickshell.env("LC_ALL") || Quickshell.env("LC_TIME") || Quickshell.env("LANG"))
 
     // ---------- left: Apple + app name + menus ----------
     Row {
@@ -136,7 +138,7 @@ ShellWindow {
             Text {
                 id: clockText
                 anchors.centerIn: parent
-                text: Clock.format(clock.date)
+                text: Clock.format(clock.date, bar.clockStyle)
                 color: bar.fg
                 font.family: Theme.fontText
                 font.pixelSize: Theme.font.clock

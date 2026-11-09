@@ -43,15 +43,29 @@ Singleton {
     function isTerminal(e) { return (e.categories || []).indexOf("TerminalEmulator") !== -1; }
     readonly property var preferredTerminal: firstEntry(terminalIds)
     // first desktop entry of ids that exists (pinned groups, preferred terminal)
+    // looks ids up in `entries` (not DesktopEntries.byId) so bindings re-run after the scan
     function firstEntry(ids) {
-        for (const id of ids) { const e = DesktopEntries.byId(id); if (e) return e; }
+        for (const id of ids) { const e = entries.find(x => x.id === id); if (e) return e; }
         return null;
     }
-    readonly property var sortedEntries: {
-        const vis = entries.filter(e => !e.noDisplay && (!isTerminal(e) || !preferredTerminal || e === preferredTerminal));
-        const helper = e => !!e.icon && vis.some(m => m !== e && m.icon === e.icon && e.name.startsWith(m.name + " "));
-        return vis.filter(e => !helper(e)).sort((a, b) => a.name.localeCompare(b.name));
+    // categories of entries that are not apps on macOS terms (screensaver hacks, settings panels)
+    readonly property var helperCategories: ["Screensaver", "X-GNOME-Settings-Panel", "X-XFCE-SettingsDialog", "X-KDE-settings-hardware"]
+    // helper: a helper category, or "Settings" as the only real category (small settings tools)
+    function isHelper(e) {
+        const cats = Array.from(e.categories || []);
+        if (cats.some(c => helperCategories.indexOf(c) !== -1)) return true;
+        const real = cats.filter(c => !c.startsWith("X-"));
+        return real.length === 1 && real[0] === "Settings";
     }
+    // what the Apps view and Spotlight list: no NoDisplay entries, no terminal-only tools,
+    // no helper categories, one terminal emulator, no "<App> Client/Server" style helpers
+    readonly property var visibleEntries: {
+        const vis = entries.filter(e => !e.noDisplay && !e.runInTerminal && !isHelper(e)
+            && (!isTerminal(e) || !preferredTerminal || e === preferredTerminal));
+        const helper = e => !!e.icon && vis.some(m => m !== e && m.icon === e.icon && e.name.startsWith(m.name + " "));
+        return vis.filter(e => !helper(e));
+    }
+    readonly property var sortedEntries: visibleEntries.slice().sort((a, b) => a.name.localeCompare(b.name))
 
     readonly property var pinned: {
         // depend on the entry list so the dock fills in once .desktop files are scanned

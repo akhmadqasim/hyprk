@@ -25,7 +25,7 @@ ShellWindow {
     property string query: ""
     property int selected: 0
     readonly property var calcValue: Search.calc(query)
-    readonly property var apps: shown && query.trim() !== "" ? Search.rank(Apps.entries, query, Theme.spotlight.maxApps) : []
+    readonly property var apps: shown && query.trim() !== "" ? Search.rank(Apps.visibleEntries, query, Theme.spotlight.maxApps) : []
     // rows: {kind: "calc"|"app"|"files", ...}
     // macOS 26/27 layout: section headers, few tall rows, no per-row type column
     readonly property var rows: {
@@ -103,6 +103,13 @@ ShellWindow {
             id: bar
             width: parent.width
             height: Theme.spotlight.barHeight
+            // the query sits in a capsule field (macOS 26/27 Spotlight)
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: Theme.spotlight.fieldInset
+                radius: height / 2
+                color: Theme.spotlight.field
+            }
             Symbol {
                 id: mag
                 x: Theme.spotlight.hPadding

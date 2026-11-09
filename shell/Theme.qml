@@ -93,6 +93,7 @@ Singleton {
         readonly property real widgetBig: 34        // TODO verify
         readonly property real widgetSmall: 11      // TODO verify
         readonly property real widgetPhotoTitle: 24 // Photos widget caption
+        readonly property real widgetMonth: 10      // mini month digits
 
         readonly property int regular: Font.Normal
         readonly property int medium: Font.Medium
@@ -235,7 +236,9 @@ Singleton {
         readonly property int widgetRadius: 22
         readonly property int widgetSmall: (width - spacing) / 2
         readonly property int widgetPadding: 16
-        readonly property real upNextSplit: 0.45         // Calendar "Up Next": date left, events right
+        readonly property real upNextSplit: 0.56         // Calendar: month grid left, Up Next right
+        readonly property int monthCell: 17              // mini month cell
+        readonly property int monthGap: 2
         readonly property color onImage: "#FFFFFF"       // text over the Photos widget
         readonly property color onImageSecondary: Qt.rgba(1, 1, 1, 0.85)
         readonly property real photoScrim: 0.45          // bottom gradient behind the caption
@@ -302,6 +305,8 @@ Singleton {
         readonly property int rowInset: 10               // icon/header inset inside a row
         readonly property int headerHeight: 24           // section header row
         readonly property int maxApps: 5
+        readonly property int fieldInset: 8              // capsule query field inside the bar, TODO verify
+        readonly property color field: theme.dark ? Qt.rgba(1, 1, 1, 0.08) : Qt.rgba(0.45, 0.45, 0.47, 0.12)
         readonly property color selection: theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0.45, 0.45, 0.47, 0.22)
         readonly property real calcRowScale: 1.3         // calculator row height / rowHeight
         readonly property int headerBaseline: 3

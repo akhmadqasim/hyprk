@@ -115,12 +115,66 @@ Item {
                 }
             }
 
-            // widgets: medium Calendar, small analog Clock (macOS defaults)
+            // widgets: medium Calendar (month grid left, Up Next right), small analog Clock
             Widget {
                 Layout.preferredWidth: Theme.nc.width
                 color: Theme.nc.calendarBg
+                // left half: month name and grid, today in a red circle
                 Column {
                     x: Theme.nc.widgetPadding
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.nc.monthGap * 2
+                    Text {
+                        text: Qt.formatDate(clock.date, "MMMM").toUpperCase()
+                        font.family: Theme.fontText
+                        font.pixelSize: Theme.font.widgetSmall
+                        font.weight: Theme.font.semibold
+                        color: Theme.color.red
+                    }
+                    Grid {
+                        id: month
+                        // ints change once a day/month, so the seconds clock does not rebuild it
+                        readonly property int year: clock.date.getFullYear()
+                        readonly property int mon: clock.date.getMonth()
+                        readonly property int today: clock.date.getDate()
+                        readonly property int lead: (new Date(year, mon, 1).getDay() + 6) % 7   // weeks start on Monday
+                        readonly property int days: new Date(year, mon + 1, 0).getDate()
+                        readonly property var dayNames: ["M", "T", "W", "T", "F", "S", "S"]
+                        columns: 7
+                        columnSpacing: Theme.nc.monthGap
+                        rowSpacing: Theme.nc.monthGap / 2
+                        Repeater {
+                            model: 7 + month.lead + month.days
+                            delegate: Item {
+                                required property int index
+                                readonly property bool isHeader: index < 7
+                                readonly property int day: index - 7 - month.lead + 1
+                                readonly property bool isToday: day === month.today
+                                width: Theme.nc.monthCell
+                                height: Theme.nc.monthCell
+                                Rectangle {
+                                    anchors.fill: parent
+                                    anchors.margins: 1
+                                    radius: width / 2
+                                    color: Theme.color.red
+                                    visible: parent.isToday
+                                }
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: parent.isHeader ? month.dayNames[parent.index] : parent.day > 0 ? parent.day : ""
+                                    font.family: Theme.fontText
+                                    font.pixelSize: Theme.font.widgetMonth
+                                    font.weight: parent.isHeader ? Theme.font.semibold : Theme.font.regular
+                                    color: parent.isToday ? Theme.nc.onImage : parent.isHeader ? Theme.color.secondaryLabel : Theme.color.label
+                                }
+                            }
+                        }
+                    }
+                }
+                // right half: Up Next with today's date (no calendar source, so no events)
+                Column {
+                    x: parent.width * Theme.nc.upNextSplit
+                    width: parent.width * (1 - Theme.nc.upNextSplit) - Theme.nc.widgetPadding
                     y: Theme.nc.widgetPadding - 2
                     Text {
                         text: Qt.formatDate(clock.date, "dddd").toUpperCase()
@@ -135,18 +189,16 @@ Item {
                         font.pixelSize: Theme.font.widgetBig
                         color: Theme.color.label
                     }
-                }
-                // macOS 26 "Up Next": date on the left, events (none here) on the right
-                Text {
-                    x: parent.width * Theme.nc.upNextSplit
-                    width: parent.width * (1 - Theme.nc.upNextSplit) - Theme.nc.widgetPadding
-                    anchors.verticalCenter: parent.verticalCenter
-                    wrapMode: Text.WordWrap
-                    text: "No more events today"
-                    font.family: Theme.fontText
-                    font.pixelSize: Theme.font.widgetSmall + 2
-                    font.weight: Theme.font.medium
-                    color: Theme.color.secondaryLabel
+                    Item { width: 1; height: Theme.nc.monthGap * 3 }
+                    Text {
+                        width: parent.width
+                        wrapMode: Text.WordWrap
+                        text: "No more events today"
+                        font.family: Theme.fontText
+                        font.pixelSize: Theme.font.widgetSmall + 1
+                        font.weight: Theme.font.medium
+                        color: Theme.color.secondaryLabel
+                    }
                 }
             }
             Widget {
