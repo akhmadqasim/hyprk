@@ -16,6 +16,7 @@ ShellRoot {
                 MenuBar { modelData: perScreen.modelData }
                 Dock { modelData: perScreen.modelData }
                 Overlay { modelData: perScreen.modelData }
+                ControlCenterWindow { modelData: perScreen.modelData }
             }
         }
     }

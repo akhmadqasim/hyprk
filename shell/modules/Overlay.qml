@@ -8,14 +8,15 @@ import qs.services
 import "../lib/menus.js" as Menus
 
 // Transparent click-catcher below the menu bar that hosts the pull-down
-// menus, Control Center and Notification Center. Clicking outside closes.
+// menus, context menus, alerts and Notification Center. Clicking outside
+// closes. Control Center has its own layer (ControlCenterWindow.qml).
 ShellWindow {
     id: ov
 
     required property var modelData
     screen: modelData
 
-    readonly property bool active: ["menu", "context", "alert", "cc", "nc"].indexOf(Panels.open) !== -1
+    readonly property bool active: ["menu", "context", "alert", "nc"].indexOf(Panels.open) !== -1
                                    && Panels.activeScreen === screen
     visible: active || fadeOut.running
 
@@ -71,23 +72,6 @@ ShellWindow {
         originY: y + Theme.menuBar.height
         items: Panels.menuIndex < 0 ? []
              : Menus.forIndex(Panels.menuIndex, Apps.appIdOf(Hyprland.activeToplevel), Apps.activeAppName(), Quickshell.env("USER"))
-    }
-
-    // ---------- control center ----------
-    ControlCenter {
-        id: cc
-        anchors.right: parent.right
-        anchors.rightMargin: Theme.cc.marginRight
-        y: Theme.cc.marginTop
-        originX: ov.width - width - Theme.cc.marginRight
-        originY: y + Theme.menuBar.height
-        opacity: Panels.open === "cc" ? 1 : 0
-        visible: opacity > 0
-        scale: Panels.open === "cc" ? 1 : 0.96
-        transformOrigin: Item.TopRight
-        Behavior on opacity { NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing } }
-        Behavior on scale { NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing } }
-        MouseArea { anchors.fill: parent; z: -1 }   // swallow clicks so they don't close
     }
 
     // ---------- notification center ----------

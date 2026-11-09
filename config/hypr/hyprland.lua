@@ -102,7 +102,7 @@ hl.animation({ leaf = "border",      enabled = false })
 ------------------------------------------------------- liquid glass ----
 -- shell layers that carry glass (namespaces hyprk-<name>), shared by the plugin and the blur rule
 -- (no menubar: the macOS 26+ menu bar is transparent; its menus live in hyprk-overlay)
-local glassLayers = { "dock", "overlay", "notifications", "spotlight", "switcher", "launchpad" }
+local glassLayers = { "dock", "overlay", "controlcenter", "notifications", "spotlight", "switcher", "launchpad" }
 -- Own compositor plugin (plugin/, see plugin/README.md). When it loads, the shell
 -- sends its glass shapes as ext-background-effect regions (HYPRK_GLASS=plugin) and the
 -- plugin draws Liquid Glass behind them. Without it the shell's QML glass is used.
@@ -117,13 +117,9 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
         hl.config({ plugin = { liquidglass = {
             -- menubar too: only its pressed title/status pills send glass regions
             namespaces = "hyprk-menubar,hyprk-" .. table.concat(glassLayers, ",hyprk-"),
-            -- macOS 27 Dock/CC look: light near-neutral frost (by eye vs reference/screens)
-            tint_light = 0xFFFFFF26,     -- 0.15; per-surface lifts are drawn by the shell (Theme *.pluginLift)
-            saturation = 1.0,            -- neutral: no blue/purple cast from the backdrop
-            ring_opacity = 0.05,         -- lighter outline than the default 0.10
-            rim = 0.2,
+            -- recipes per layer come from the plugin's `materials` default
+            -- (hyprk-dock:dock, hyprk-controlcenter:controlcenter, hyprk-overlay:menu, ...)
             blur_lod = 1.0,              -- extra frost: wallpaper reads as soft colour, not detail
-            brightness_light = 1.0,
         } } })
     end)
     if ok then hl.env("HYPRK_GLASS", "plugin") else print("hyprk: liquidglass not loaded: " .. tostring(err)) end
@@ -134,7 +130,7 @@ end
 -- draws a blurred-wallpaper material; this adds blur of the windows behind.
 -- ignore_alpha keeps fully transparent parts (shadows, click catchers) unblurred.
 -- Namespaces (set in shell/modules/*.qml via WlrLayershell.namespace):
---   hyprk-menubar hyprk-dock hyprk-overlay hyprk-notifications
+--   hyprk-menubar hyprk-dock hyprk-overlay hyprk-controlcenter hyprk-notifications
 --   hyprk-spotlight hyprk-switcher hyprk-launchpad hyprk-wallpaper
 hl.layer_rule({
     name = "hyprk-glass-blur",
@@ -145,7 +141,7 @@ hl.layer_rule({
 hl.layer_rule({
     -- the shell animates these itself
     name = "hyprk-no-anim",
-    match = { namespace = "^hyprk-(overlay|spotlight|switcher|launchpad|mission|notifications|dock|menubar|wallpaper)$" },
+    match = { namespace = "^hyprk-(overlay|controlcenter|spotlight|switcher|launchpad|mission|notifications|dock|menubar|wallpaper)$" },
     no_anim = true,
 })
 
@@ -198,4 +194,6 @@ for _, f in ipairs({ hyprk .. "/settings/hyprland-rules.lua", hyprk .. "/finder/
 end
 hl.window_rule({ name = "suppress-maximize", match = { class = ".*" }, suppress_event = "maximize" })
 -- macOS has no tiling: every window floats, opens centered
-hl.window_rule({ name = "macos-float", match = { class = ".*" }, float = true })
+-- max_size keeps big windows inside the work area (below the 30pt menu bar, above the
+-- ~84pt Dock zone); new_float_force_onscreen = 2 (default) then fits them fully.
+hl.window_rule({ name = "macos-float", match = { class = ".*" }, float = true, max_size = "monitor_w-40 monitor_h-130" })
