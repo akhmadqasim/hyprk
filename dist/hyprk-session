@@ -20,6 +20,7 @@ THEME=$(cat "$SESSION_HOME/theme" 2>/dev/null); case $THEME in dark) ;; *) THEME
 hyprk_env_setup "$SESSION_HOME" farm "$THEME"
 
 export XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=Hyprland XDG_SESSION_DESKTOP=hyprk
+export HYPRK_THEME=$THEME PATH="$HYPRK_DIST/bin:$PATH"   # bin/hyprlock: Lock menu -> lockscreen/hyprk-lock.sh
 export HYPRK_ALLOW_POWER=1                 # real session: Sleep / Restart / Shut Down / Lock work
 export HYPRK_SCALE=${HYPRK_SCALE:-1.5}
 export MOZ_ENABLE_WAYLAND=1 ELECTRON_OZONE_PLATFORM_HINT=auto

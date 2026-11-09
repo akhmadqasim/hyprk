@@ -17,9 +17,17 @@
    config/hypr (e.g. read HYPRK_SCALE there) so there is one place.
 5. config/fontconfig/fonts.conf has the absolute path /mnt/code/hyprk/themes/fonts (fine here, breaks if the
    repo moves). dist/lib/env.sh generates its own fontconfig file instead.
-6. qt6ct is not installed on the host, so the Qt theme (themes/qt) cannot be shown nested; try-nested.sh prints a hint
-   and skips it. Not verified: Kvantum/qt6ct look inside the nested session.
-7. Not verified (no input device available to the agent): Super and Ctrl+Alt key delivery from a real keyboard to the
+6. themes/gtk/DIST-NOTES.md: `GTK_USE_PORTAL=0` does NOT stop GTK 4 from reading button-layout/theme from the host
+   portal (verified: Gtk.Settings still returned the host values). `GDK_DEBUG=no-portals` does; dist/lib/env.sh sets it.
+   Add it to DIST-NOTES.md. With it, a plain libadwaita window shows traffic lights on the left (reference/ours/dist-try-adw.png).
+7. Ghostty 1.3-dev still draws its window buttons on the RIGHT (min, max, close) even with keyfile button-layout,
+   window-theme=system and window-decoration=client (reference/ours/dist-try-ghostty.png). It seems to hard-code them;
+   no config key for the layout exists. Fix needs a Ghostty option/patch, or a CSS trick in themes/gtk.
+   Also: qt6ct is installed now but Kvantum is not; try-nested.sh uses plain qt6ct+QSS. Qt look is not verified nested.
+8. Not verified (no input device available to the agent): Super and Ctrl+Alt key delivery from a real keyboard to the
    nested window, clicking in the Dock, Apple menu > Log Out in nested, multi-monitor behaviour (DP-1 + DP-2) of the
    shell, and the whole login session (install-session.sh and hyprk-session were never run, only --dry-run / --print).
-8. PROGRESS.md says 4 stray Hyprland pids (573829 574275 576400 577560) are still running; user must kill them.
+9. PROGRESS.md says 4 stray Hyprland pids (573829 574275 576400 577560) are still running; user must kill them.
+10. Lock in the login session: shell/services/Power.qml calls `hyprlock -c <repo>/lockscreen/hyprlock.conf` directly.
+   dist/bin/hyprlock is a PATH shim (session only) that turns that call into lockscreen/hyprk-lock.sh. Cleaner: let
+   Power.qml call hyprk-lock.sh itself, then the shim can go. Shim tested with a fake hyprlock only, not a real lock.

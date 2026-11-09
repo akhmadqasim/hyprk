@@ -1,0 +1,13 @@
+#!/bin/sh
+# PATH shim used by the hyprk login session. The shell's Lock menu runs `hyprlock -c <repo>/lockscreen/hyprlock.conf`;
+# this turns that call into lockscreen/hyprk-lock.sh (config rebuilt with the current wallpaper), every other call
+# goes to the real hyprlock. HYPRK_LOCK_SHIM guards against a loop if hyprk-lock.sh falls back to the in-tree config.
+SELF=$(cd "$(dirname "$0")" && pwd)
+ROOT=${HYPRK_ROOT:-$(cd "$SELF/../.." && pwd)}
+REAL=$(PATH=$(printf %s "$PATH" | tr ':' '\n' | grep -vxF "$SELF" | paste -sd:) command -v hyprlock)
+[ -n "$REAL" ] || { echo "hyprlock shim: real hyprlock not found" >&2; exit 127; }
+if [ -z "${HYPRK_LOCK_SHIM:-}" ] && [ "$1" = -c ] && [ "$2" = "$ROOT/shell/../lockscreen/hyprlock.conf" -o "$2" = "$ROOT/lockscreen/hyprlock.conf" ]; then
+    export HYPRK_LOCK_SHIM=1 PATH="$(dirname "$REAL"):$PATH"
+    exec "$ROOT/lockscreen/hyprk-lock.sh" $([ "${HYPRK_THEME:-light}" = dark ] && echo --dark)
+fi
+exec "$REAL" "$@"

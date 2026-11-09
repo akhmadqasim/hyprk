@@ -17,6 +17,7 @@ Buka terminal di GNOME, lalu:
   (app bisa lihat `~/.config` asli kamu, default tidak).
 - Keluar: `Ctrl+Alt+Q`, atau menu Apple > Log Out, atau `Ctrl+C` di terminal tadi.
   Script otomatis mematikan semua proses miliknya sendiri (termasuk sisa proses Hyprland).
+- Nested memakai D-Bus milik GNOME, tapi pengaturan GTK dibaca dari file keyfile pribadi (bukan dconf/portal GNOME). Jadi tema dan tombol kiri hanya berlaku di dalam jendela.
 - Semua pengaturan tema, font, kursor, dan config ada di `~/.local/share/hyprk-try`.
   Ingin mulai bersih? Hapus folder itu. `~/.config` dan setting GNOME kamu tidak disentuh.
 
@@ -66,7 +67,7 @@ Lalu log out. Di layar login klik namamu, lalu ikon roda gigi di kanan bawah, pi
 Mau kembali ke GNOME: log out, pilih `Ubuntu` di ikon roda gigi.
 
 Di session asli, config app kamu tetap kelihatan (browser, JetBrains, dan lain-lain). Hanya GTK, Qt,
-font, dan kursor yang dibuat khusus hyprk di `~/.local/share/hyprk-session`. Skala layar 1.5 (sama dengan
+Ghostty, font, dan kursor yang dibuat khusus hyprk di `~/.local/share/hyprk-session`. Skala layar 1.5 (sama dengan
 GNOME sekarang). Mau tema gelap? `echo dark > ~/.local/share/hyprk-session/theme`. Log: `~/.local/share/hyprk-session/state/session.log`.
 
 Kalau layar hitam atau balik ke login: tekan Ctrl+Alt+F3, login, baca log di atas.
@@ -86,8 +87,7 @@ rm -rf ~/.local/share/hyprk-try ~/.local/share/hyprk-session   # data pribadi hy
    `kill -9 573829 574275 576400 577560`.
 2. Di PROGRESS.md ada catatan: tes awal (sekitar 03:00 sampai 03:10) pernah menjalankan `pkill -x python3`.
    Kalau ada proses python3 milikmu yang tiba-tiba mati di jam itu, itu penyebabnya.
-3. Opsional, untuk tampilan Qt yang benar: `sudo apt install qt6ct qt6-style-kvantum`. Tanpa itu app Qt tetap jalan
-   dengan tampilan bawaan.
+3. Opsional: `sudo apt install qt6-style-kvantum` untuk menu Qt yang membulat (qt6ct sudah terpasang, tema Qt sudah aktif).
 
 ## Batas yang sudah diketahui
 
@@ -95,8 +95,9 @@ rm -rf ~/.local/share/hyprk-try ~/.local/share/hyprk-session   # data pribadi hy
 - Login session belum pernah dicoba (script-nya tidak dijalankan). Nested sudah dites beberapa kali (start, screenshot, keluar).
 - Hyprland 0.57.2 crash (segfault) saat keluar. Tidak berbahaya, script tetap membersihkan. Lihat `ISSUES.md`.
 - Tampilan kira-kira 65 sampai 85 persen mirip macOS per bagian (glass material sekitar 68 persen).
-- Tema Qt butuh `qt6ct`. Tema GTK3 masih kurang rapi dibanding GTK4.
-- Lock memakai hyprlock buatan hyprk (sudah ada di prefix, tidak perlu dipasang).
+- Tema GTK3 masih kurang rapi dibanding GTK4. App Qt tidak punya title bar macOS (butuh plugin hyprbars, belum ada).
+- Ghostty menaruh tombol jendela di kanan (urutan kuning, hijau, merah) walau tema minta kiri. App libadwaita lain (tes `reference/ours/dist-try-adw.png`) sudah di kiri.
+- Lock memakai hyprlock buatan hyprk (sudah ada di prefix). Di login session menu Lock lewat `lockscreen/hyprk-lock.sh` (wallpaper terbaru).
 - Sleep, Restart, Shut Down, dan Lock hanya bekerja di login session. Di nested hanya dicatat di log.
 - Belum ada: share layar (tanpa xdg-desktop-portal-hyprland), drag and drop di Finder, Quick Look di jendela sendiri.
 - Wi-Fi, Bluetooth, dan baterai disembunyikan atau diredupkan kalau komputer tidak punya. Itu memang disengaja.
