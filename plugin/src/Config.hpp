@@ -35,7 +35,7 @@ namespace lg {
         int                                          appearance = 0;                   // 0 auto, 1 light, 2 dark
         float                                        adaptLow = 0.1f, adaptHigh = 0.3f; // V2 light range (SPEC 9.6)
 
-        float                                        lightAngle = -50, highlight = 1, highlightWidth = 1.5f, highlightSpread = 0.09f, highlightCurve = 0.5f, rim = 0.5f;
+        float                                        lightAngle = -50, highlight = 1, highlightWidth = 0.75f, highlightSpread = 0.09f, highlightCurve = 0.5f, rim = 0.5f;
         float                                        lift = 1; // scales each recipe's light-side lift (0 = none)
         float                                        innerShadow = 0.06f, innerShadowSize = 8;
         float                                        shadowScale = 1, shadowTint = 0.35f, ringScale = 1;

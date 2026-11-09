@@ -105,9 +105,9 @@ how Apple's blur radius maps to extra mip levels (`blur_lod_scale`).
 | `refraction_scale` | 1 | multiplies the recipe's refraction amount (0 = off) |
 | `aberration` | 1.5 | px R/B split at the edge (7 taps); 0 = off |
 | `light_angle` | -50 | degrees the light comes from (0 = right, -90 = top) |
-| `highlight` | 1 | scales the recipe's rim colour bias (`rgb *= 1 + k(3-2rgb)`) |
-| `highlight_width` / `highlight_spread` / `highlight_curve` | 1.5 / 0.09 / 0.5 | rim band px, lobe threshold (cos 85°), Apple's tone curve amount |
-| `rim` | 0.5 | highlight floor all around the edge |
+| `highlight` | 1 | scales the recipe's rim strength (the rim desaturates, then lifts toward white: a near-white hairline; Apple's colour bias read as a thick cyan rim, JUDGE-r5) |
+| `highlight_width` / `highlight_spread` / `highlight_curve` | 0.75 / 0.09 / 0.5 | rim band px, lobe threshold (cos 85°), Apple's tone curve amount |
+| `rim` | 0.5 | hairline floor all around the edge (lobes top-left / bottom-right are brighter) |
 | `inner_shadow` / `inner_shadow_size` | 0.06 / 8 | darkening along the inner rim |
 | `shadow_scale` / `shadow_tint` | 1 / 0.35 | drop shadow opacity scale; 0 = black shadow, 1 = saturated backdrop colour |
 | `ring_scale` | 1 | ring shadow opacity scale |
