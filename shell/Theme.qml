@@ -147,7 +147,7 @@ Singleton {
         readonly property int appleLogoSize: 14          // TODO verify
         readonly property int titleHPadding: 9           // inner padding of a menu title pill, TODO verify
         readonly property int titleSpacing: 2            // gap between pills, TODO verify
-        readonly property int titleRadius: 6             // pressed pill radius (macOS 26 rounded), TODO verify
+        readonly property int titleRadius: 12            // pressed glass pill = full capsule (reference CC icon), TODO verify
         readonly property int titleHeight: 24            // pressed pill height, TODO verify
         readonly property int statusIconSize: 16         // TODO verify
         readonly property int statusSpacing: 4           // ~20pt icon pitch in reference, TODO verify
@@ -191,6 +191,8 @@ Singleton {
         readonly property int tooltipRadius: 8
         readonly property int tooltipHPad: 10
         readonly property int tooltipHeight: 24
+        // neutral white lift over the plugin glass (cancels the backdrop colour cast)
+        readonly property color pluginLift: theme.dark ? Qt.rgba(1, 1, 1, 0.05) : Qt.rgba(0.97, 0.97, 0.97, 0.32)   // TODO verify
     }
 
     // ---------- notifications ----------
@@ -234,13 +236,16 @@ Singleton {
         readonly property int tileHeight: 60             // capsule module height, measured
         readonly property int tileRadius: tileHeight / 2 // capsule
         readonly property int tilePadding: 12            // TODO verify
-        readonly property int toggleSize: 35             // white circle inside a capsule, measured
-        readonly property int sliderTrack: 4             // thin track, measured
+        readonly property int toggleSize: 38             // white circle inside a capsule, measured vs reference
+        readonly property int sliderTrack: 6             // knobless white fill, measured vs reference
         readonly property int sliderInset: 16            // TODO verify
         readonly property int artSize: 38                // Now Playing art placeholder, TODO verify
         readonly property int artRadius: 8
         readonly property int marginTop: 10              // below menu bar, measured
         readonly property int marginRight: 12            // TODO verify
+        // with the compositor plugin: white lift drawn over the plugin glass so CC tiles read
+        // frosted (wallpaper as soft colour), like macOS 27
+        readonly property color pluginLift: theme.dark ? Qt.rgba(1, 1, 1, 0.03) : Qt.rgba(1, 1, 1, 0.05)   // TODO verify
         readonly property color tileTint: Qt.rgba(1, 1, 1, theme.dark ? 0.10 : 0.16)       // clear glass, TODO verify
         readonly property color tileSolid: theme.dark ? "#3A3A3C" : "#8E8E93"
         readonly property color text: "#FFFFFF"

@@ -73,6 +73,7 @@ ShellWindow {
         sy: dock.screen.height - dock.height + y
         tint: Theme.glass.tintClear
         solidColor: Theme.glass.solidDock
+        pluginLift: Theme.dock.pluginLift
     }
 
     Row {

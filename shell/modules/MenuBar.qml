@@ -164,11 +164,16 @@ ShellWindow {
         width: contentWidth + Theme.menuBar.titleHPadding * 2
         height: Theme.menuBar.titleHeight
 
-        Rectangle {
+        // pressed state: a small glass pill (macOS 26+)
+        Glass {
             anchors.fill: parent
+            visible: mt.open
             radius: Theme.menuBar.titleRadius
-            color: Theme.color.menuBarHighlight
-            opacity: mt.open ? 1 : 0
+            sx: visible ? mt.mapToItem(null, 0, 0).x : 0
+            sy: visible ? mt.mapToItem(null, 0, 0).y : 0
+            tint: Theme.color.menuBarHighlight
+            pluginLift: Theme.color.menuBarHighlight
+            shadow: false
         }
         Text {
             id: label
@@ -203,11 +208,15 @@ ShellWindow {
         width: contentWidth + Theme.menuBar.statusHPadding * 2
         height: Theme.menuBar.titleHeight
 
-        Rectangle {
+        Glass {
             anchors.fill: parent
+            visible: si.active || sma.pressed
             radius: Theme.menuBar.titleRadius
-            color: Theme.color.menuBarHighlight
-            opacity: si.active || sma.pressed ? 1 : 0
+            sx: visible ? si.mapToItem(null, 0, 0).x : 0
+            sy: visible ? si.mapToItem(null, 0, 0).y : 0
+            tint: Theme.color.menuBarHighlight
+            pluginLift: Theme.color.menuBarHighlight
+            shadow: false
         }
         Item { id: sholder; anchors.fill: parent }
         MouseArea { id: sma; anchors.fill: parent; onClicked: si.clicked() }

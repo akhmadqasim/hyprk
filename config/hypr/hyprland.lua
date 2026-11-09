@@ -115,11 +115,15 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
     local ok, err = pcall(function()
         hl.plugin.load(glassSo)
         hl.config({ plugin = { liquidglass = {
-            namespaces = "hyprk-" .. table.concat(glassLayers, ",hyprk-"),
+            -- menubar too: only its pressed title/status pills send glass regions
+            namespaces = "hyprk-menubar,hyprk-" .. table.concat(glassLayers, ",hyprk-"),
             -- macOS 27 Dock/CC look: light near-neutral frost (by eye vs reference/screens)
-            tint_light = 0xFFFFFF4D,
-            saturation = 1.15,
-            brightness_light = 1.08,
+            tint_light = 0xFFFFFF26,     -- 0.15; per-surface lifts are drawn by the shell (Theme *.pluginLift)
+            saturation = 1.0,            -- neutral: no blue/purple cast from the backdrop
+            ring_opacity = 0.05,         -- lighter outline than the default 0.10
+            rim = 0.2,
+            blur_lod = 1.0,              -- extra frost: wallpaper reads as soft colour, not detail
+            brightness_light = 1.0,
         } } })
     end)
     if ok then hl.env("HYPRK_GLASS", "plugin") else print("hyprk: liquidglass not loaded: " .. tostring(err)) end

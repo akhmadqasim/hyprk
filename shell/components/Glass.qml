@@ -21,6 +21,8 @@ Item {
     property color tint: Theme.glass.tint
     property color solidColor: Theme.glass.solid
     property bool shadow: true
+    // tint drawn on top of the plugin's glass (the plugin owns blur, rim, shadow)
+    property color pluginLift: "transparent"
 
     Region {
         id: shape
@@ -46,6 +48,13 @@ Item {
     onHostWindowChanged: register(hostWindow)
     Component.onCompleted: register(hostWindow)
     Component.onDestruction: register(null)
+
+    Rectangle {
+        anchors.fill: parent
+        visible: Theme.compositorGlass
+        radius: root.radius
+        color: root.pluginLift
+    }
 
     Item {
         anchors.fill: parent

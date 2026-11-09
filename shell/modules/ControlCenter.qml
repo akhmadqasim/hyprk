@@ -179,6 +179,7 @@ Item {
             sy: cc.originY + m.y
             tint: Theme.cc.tileTint
             solidColor: Theme.cc.tileSolid
+            pluginLift: Theme.cc.pluginLift
             shadow: false
         }
     }
@@ -195,25 +196,27 @@ Item {
 
         width: cc.colW
         height: cc.rowH
-        opacity: available ? 1 : Theme.color.disabledOpacity
 
+        // unavailable: the tile stays, the white circle and text dim (macOS)
         Rectangle {
             id: circle
+            opacity: cap.available ? 1 : Theme.color.disabledOpacity
             x: (cc.rowH - width) / 2
             anchors.verticalCenter: parent.verticalCenter
             width: Theme.cc.toggleSize
             height: width
             radius: width / 2
-            color: cap.on ? Theme.cc.toggleOnBg : Theme.cc.toggleOffBg
+            color: cap.on || !cap.available ? Theme.cc.toggleOnBg : Theme.cc.toggleOffBg
             Behavior on color { ColorAnimation { duration: Theme.anim.fast } }
             Symbol {
                 anchors.centerIn: parent
                 name: cap.symbol
                 size: Theme.cc.toggleSize * 0.56
-                color: cap.on ? cap.onAccent : Theme.cc.toggleOffIcon
+                color: cap.on ? cap.onAccent : cap.available ? Theme.cc.toggleOffIcon : Theme.color.secondaryLabel
             }
         }
         Column {
+            opacity: cap.available ? 1 : Theme.color.disabledOpacity
             anchors.left: circle.right
             anchors.leftMargin: 8
             anchors.right: parent.right
@@ -253,7 +256,6 @@ Item {
         width: cc.rowH
         height: cc.rowH
         radius: cc.rowH / 2
-        opacity: enabled ? 1 : Theme.color.disabledOpacity
         Rectangle {
             anchors.fill: parent
             radius: width / 2
@@ -263,6 +265,7 @@ Item {
         Symbol {
             anchors.centerIn: parent
             name: rb.symbol
+            opacity: rb.enabled ? 1 : Theme.color.disabledOpacity
             size: 22
             color: rb.on ? Theme.cc.toggleOnIcon : Theme.cc.toggleOffIcon
         }
@@ -291,9 +294,10 @@ Item {
 
         width: cc.width
         height: cc.rowH
-        opacity: available ? 1 : Theme.color.disabledOpacity
+        readonly property real contentOpacity: available ? 1 : Theme.color.disabledOpacity
 
         Text {
+            opacity: sm.contentOpacity
             x: Theme.cc.sliderInset
             y: 9
             text: sm.title
@@ -304,6 +308,7 @@ Item {
         }
         Symbol {
             id: ls
+            opacity: sm.contentOpacity
             x: Theme.cc.sliderInset
             anchors.verticalCenter: track.verticalCenter
             name: sm.leftSymbol
@@ -312,6 +317,7 @@ Item {
         }
         Symbol {
             id: rs
+            opacity: sm.contentOpacity
             anchors.right: parent.right
             anchors.rightMargin: Theme.cc.sliderInset
             anchors.verticalCenter: track.verticalCenter
@@ -321,6 +327,7 @@ Item {
         }
         Item {
             id: track
+            opacity: sm.contentOpacity
             anchors.left: ls.right
             anchors.leftMargin: 8
             anchors.right: rs.left
