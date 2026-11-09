@@ -95,8 +95,8 @@ rm -rf ~/.local/share/hyprk-try ~/.local/share/hyprk-session   # data pribadi hy
 - Login session belum pernah dicoba (script-nya tidak dijalankan). Nested sudah dites beberapa kali (start, screenshot, keluar).
 - Hyprland 0.57.2 crash (segfault) saat keluar. Tidak berbahaya, script tetap membersihkan. Lihat `ISSUES.md`.
 - Tampilan kira-kira 65 sampai 85 persen mirip macOS per bagian (glass material sekitar 68 persen).
-- Tema GTK3 masih kurang rapi dibanding GTK4. App Qt tidak punya title bar macOS (butuh plugin hyprbars, belum ada).
-- Ghostty menaruh tombol jendela di kanan (urutan kuning, hijau, merah) walau tema minta kiri. App libadwaita lain (tes `reference/ours/dist-try-adw.png`) sudah di kiri.
+- Tema GTK3 masih kurang rapi dibanding GTK4. 
+- Ghostty, foot, dan app Qt tidak punya title bar sendiri. Title bar macOS (tombol merah kuning hijau di kiri) digambar plugin liquidglass. Ghostty perlu daftar class khusus (sudah diatur di `hyprk-dist.lua`).
 - Lock memakai hyprlock buatan hyprk (sudah ada di prefix). Di login session menu Lock lewat `lockscreen/hyprk-lock.sh` (wallpaper terbaru).
 - Sleep, Restart, Shut Down, dan Lock hanya bekerja di login session. Di nested hanya dicatat di log.
 - Belum ada: share layar (tanpa xdg-desktop-portal-hyprland), drag and drop di Finder, Quick Look di jendela sendiri.

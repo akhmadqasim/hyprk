@@ -20,9 +20,11 @@
 6. themes/gtk/DIST-NOTES.md: `GTK_USE_PORTAL=0` does NOT stop GTK 4 from reading button-layout/theme from the host
    portal (verified: Gtk.Settings still returned the host values). `GDK_DEBUG=no-portals` does; dist/lib/env.sh sets it.
    Add it to DIST-NOTES.md. With it, a plain libadwaita window shows traffic lights on the left (reference/ours/dist-try-adw.png).
-7. Ghostty 1.3-dev still draws its window buttons on the RIGHT (min, max, close) even with keyfile button-layout,
-   window-theme=system and window-decoration=client (reference/ours/dist-try-ghostty.png). It seems to hard-code them;
-   no config key for the layout exists. Fix needs a Ghostty option/patch, or a CSS trick in themes/gtk.
+7. Ghostty 1.3-dev hard-codes its CSD buttons on the right. Fixed by `window-decoration = server` plus the plugin title bar,
+   but Ghostty does not bind xdg-decoration in this build, so `titlebar = "auto"` gave it no bar; dist/hyprk-dist.lua adds
+   its class to `titlebar_classes`. Works (reference/ours/dist-try-ghostty.png, foot and qt6ct also checked,
+   dist-try-qt.png). Cosmetic: under the bar the terminal's own rounded top corners are still visible (Ghostty keeps its
+   rounded content); the bar could cover or the plugin could square the client's top edge.
    Also: qt6ct is installed now but Kvantum is not; try-nested.sh uses plain qt6ct+QSS. Qt look is not verified nested.
 8. Not verified (no input device available to the agent): Super and Ctrl+Alt key delivery from a real keyboard to the
    nested window, clicking in the Dock, Apple menu > Log Out in nested, multi-monitor behaviour (DP-1 + DP-2) of the

@@ -12,6 +12,10 @@ hl.monitor({
 })
 -- we start Hyprland through config/hypr/start.sh, not start-hyprland: hide that warning
 hl.config({ misc = { disable_watchdog_warning = true } })
+-- macOS title bar (traffic lights on the left) from the liquidglass plugin for windows that draw no bar themselves:
+-- "auto" = clients that bound xdg-decoration (Ghostty with window-decoration=server, foot, Qt apps).
+-- Ghostty's class is listed too, in case a Ghostty build does not bind xdg-decoration.
+hl.config({ plugin = { liquidglass = { titlebar = "auto", titlebar_classes = "^com\\.mitchellh\\.ghostty$" } } })
 
 -- Nested only: GNOME keeps the Super key for itself, so the Super binds may never reach the nested window.
 -- Same actions on Ctrl+Alt (GNOME does not use these). Nothing changes in the login session.

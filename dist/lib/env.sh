@@ -92,13 +92,13 @@ hyprk_env_setup() {
     fi
     export QT_QPA_PLATFORM=wayland
 
-    # --- Ghostty: follow the session theme (it would otherwise pick light/dark from its terminal background) ---
+    # --- Ghostty: server-side decoration, so the plugin draws the traffic lights on the left ---
     mkdir -p "$cfg/ghostty"
     {
         # farm mode: keep the user's own Ghostty settings, then override the window theme below
         [ "$mode" = farm ] && [ -f "$real_cfg/ghostty/config" ] && echo "config-file = ?$real_cfg/ghostty/config"
-        echo "window-theme = system"
-        echo "window-decoration = client"
+        echo "window-theme = auto"      # dark terminal -> dark title bar, like macOS Terminal
+        echo "window-decoration = server"   # asks for SSD; the liquidglass plugin draws the macOS title bar
         echo "gtk-titlebar = true"
         echo "gtk-single-instance = false"   # else a Ghostty already running on the host would take the new window
     } > "$cfg/ghostty/config"
