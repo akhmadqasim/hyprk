@@ -52,6 +52,11 @@ namespace lg {
             {K("shadow_tint"), &SParams::shadowTint},
             {K("ring_scale"), &SParams::ringScale},
             {K("window_radius"), &SParams::windowRadius},
+            {K("titlebar_height"), &SParams::titlebarHeight},
+            {K("titlebar_button"), &SParams::titlebarButton},
+            {K("titlebar_gap"), &SParams::titlebarGap},
+            {K("titlebar_inset"), &SParams::titlebarInset},
+            {K("titlebar_font_size"), &SParams::titlebarFontSize},
         };
 
         const SIntKey INTS[] = {
@@ -59,6 +64,11 @@ namespace lg {
             {K("full_damage"), 0, [](SParams& p, long long v) { p.fullDamage = v != 0; }},
             {K("debug_copy_per_element"), 0, [](SParams& p, long long v) { p.copyPerElement = v != 0; }},
             {K("linear"), 0, [](SParams& p, long long v) { p.linearLight = v != 0; }},
+            {K("titlebar_glass"), 0, [](SParams& p, long long v) { p.titlebarGlass = v != 0; }},
+            {K("titlebar_color"), 0xF3F1EFFF, [](SParams& p, long long v) { p.titlebarColor = rgbaFromHex(v); }},
+            {K("titlebar_color_inactive"), 0xF6F5F4FF, [](SParams& p, long long v) { p.titlebarColorInactive = rgbaFromHex(v); }},
+            {K("titlebar_text"), 0x333333D9, [](SParams& p, long long v) { p.titlebarText = rgbaFromHex(v); }},
+            {K("titlebar_text_inactive"), 0x33333359, [](SParams& p, long long v) { p.titlebarTextInactive = rgbaFromHex(v); }},
             {K("stats"), 0, [](SParams& p, long long v) { p.stats = v != 0; }},
             {K("require_region"), 1, [](SParams& p, long long v) { p.requireRegion = v != 0; }},
         };
@@ -75,6 +85,10 @@ namespace lg {
             {K("window_material"), "regular", [](SParams& p, const std::string& v) { p.windowMaterial = v; }},
             {K("appearance"), "auto", [](SParams& p, const std::string& v) { p.appearance = parseAppearance(v); }},
             {K("shader_path"), "", [](SParams& p, const std::string& v) { p.shaderPath = v; }},
+            {K("titlebar"), "auto", [](SParams& p, const std::string& v) { p.titlebar = parseTitlebarMode(v); }},
+            {K("titlebar_classes"), "", [](SParams& p, const std::string& v) { p.titlebarClasses = v; }},
+            {K("titlebar_exclude"), R"(^(org\.hyprk\..*|hyprk-.*)$)", [](SParams& p, const std::string& v) { p.titlebarExclude = v; }},
+            {K("titlebar_font"), "SF Pro Text", [](SParams& p, const std::string& v) { p.titlebarFont = v; }},
             {K("window_classes"), "", [](SParams& p, const std::string& v) { p.windowClasses = v; }},
         };
         // keys of the first iteration, still accepted so existing configs load; they do nothing now

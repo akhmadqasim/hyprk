@@ -2,6 +2,7 @@
 // Plugin config: every key lives under plugin:liquidglass:<name>
 // (Lua: hl.config({ plugin = { liquidglass = { ... } } })).
 
+#include "Material.hpp"
 #include "Shape.hpp"
 
 #include <memory>
@@ -43,7 +44,22 @@ namespace lg {
         std::string                                  shaderPath;
         std::string                                  windowClasses;     // regex; empty = no window glass
         float                                        windowRadius = -1; // < 0: the window's rounding
+
+        // macOS title bar for windows without their own (Titlebar.cpp)
+        int                                          titlebar = 1; // 0 off, 1 auto (client asked for server-side decorations), 2 classes only
+        std::string                                  titlebarClasses;  // regex: always get a bar
+        std::string                                  titlebarExclude = R"(^(org\.hyprk\..*|hyprk-.*)$)"; // regex: never (they draw their own)
+        float                                        titlebarHeight = 32, titlebarButton = 14, titlebarGap = 7, titlebarInset = 15, titlebarFontSize = 13;
+        SRgba                                        titlebarColor{0.953f, 0.945f, 0.937f, 1}, titlebarColorInactive{0.965f, 0.961f, 0.957f, 1};
+        SRgba                                        titlebarText{0.2f, 0.2f, 0.2f, 0.85f}, titlebarTextInactive{0.2f, 0.2f, 0.2f, 0.35f};
+        std::string                                  titlebarFont = "SF Pro Text";
+        bool                                         titlebarGlass = false; // light glass (Hyprland blur + translucent fill)
     };
+
+    // 0xRRGGBBAA -> rgba 0..1
+    SRgba rgbaFromHex(long long rgba);
+    int   parseTitlebarMode(const std::string& s); // "off" | "auto" | "classes"
+
 
     // "auto" / "light" / "dark" -> 0/1/2, unknown -> 0
     int parseAppearance(const std::string& s);

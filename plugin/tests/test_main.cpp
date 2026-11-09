@@ -2,6 +2,7 @@
 #include "Config.hpp"
 #include "Material.hpp"
 #include "Shape.hpp"
+#include "TitlebarLayout.hpp"
 
 #include <cmath>
 #include <cstdio>
@@ -124,6 +125,17 @@ int main() {
     CHECK(near(radiusFor(p, "hyprk-dock", 12), 12));
     p.defaultRadius = 8;
     CHECK(near(radiusFor(p, "hyprk-dock", 12), 8));
+
+    // title bar layout: three 14 pt lights, 7 pt apart, 15 pt in, centred vertically in 32 pt
+    {
+        auto l = titlebarLayout(600, 32, 14, 7, 15);
+        CHECK(near(l.buttons[0].x, 15) && near(l.buttons[1].x, 36) && near(l.buttons[2].x, 57) && near(l.buttons[0].y, 9));
+        CHECK(near(l.title.x, 85) && near(l.title.w, 600 - 170)); // symmetric around the centre
+        CHECK(buttonAt(l, 22, 16, 7) == 0 && buttonAt(l, 64, 16, 7) == 2 && buttonAt(l, 300, 16, 7) == -1);
+        CHECK(lightsArea(l, 7).containsPoint({40, 16}) && !lightsArea(l, 7).containsPoint({200, 16}));
+        CHECK(near(titlebarLayout(100, 32, 14, 7, 15).title.w, 0)); // narrow window: no room for a title
+    }
+    CHECK(near(rgbaFromHex(0xFF800040).g, 128 / 255.0, 1e-6) && parseTitlebarMode("off") == 0 && parseTitlebarMode("classes") == 2 && parseTitlebarMode("x") == 1);
 
     std::printf(g_fail ? "%d failures\n" : "all tests passed\n", g_fail);
     return g_fail ? 1 : 0;

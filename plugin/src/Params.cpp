@@ -26,6 +26,19 @@ namespace lg {
 }
 
 namespace lg {
+    SRgba rgbaFromHex(long long rgba) {
+        const auto c = static_cast<unsigned long long>(rgba) & 0xFFFFFFFFull;
+        return {((c >> 24) & 0xFF) / 255.f, ((c >> 16) & 0xFF) / 255.f, ((c >> 8) & 0xFF) / 255.f, (c & 0xFF) / 255.f};
+    }
+
+    int parseTitlebarMode(const std::string& s) {
+        if (s == "off")
+            return 0;
+        if (s == "classes")
+            return 2;
+        return 1;
+    }
+
     const std::string& materialFor(const SParams& p, const std::string& ns) {
         const auto it = p.materials.find(ns);
         return it != p.materials.end() ? it->second : p.defaultMaterial;

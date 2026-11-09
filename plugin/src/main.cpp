@@ -5,6 +5,7 @@
 #include "GlassElement.hpp"
 #include "Log.hpp"
 #include "Stats.hpp"
+#include "Titlebar.hpp"
 #include "WindowGlass.hpp"
 
 #include <hyprland/src/debug/log/Logger.hpp>
@@ -27,6 +28,7 @@ namespace {
     std::vector<CHyprSignalListener> g_listeners;
     std::shared_ptr<const lg::SParams> g_params; // snapshot, refreshed each monitor frame
     std::vector<WP<lg::CGlassDecoration>> g_decorations;
+    std::vector<WP<lg::CTitlebar>>        g_titlebars;
     SP<IPC::Socket1::SCommand>            g_statsCommand;
 
     using renderLayerFn = void (*)(Render::IHyprRenderer*, Render::CRenderContext&, PHLLS, PHLMONITOR, const Time::steady_tp&, bool, bool, bool);
@@ -109,12 +111,23 @@ static void* findRenderLayer() {
     return nullptr;
 }
 
-static void addWindowGlass(PHLWINDOW window) {
+static void addWindowDecorations(PHLWINDOW window) {
     if (!window)
         return;
-    auto deco = makeShared<lg::CGlassDecoration>(window, [] { return g_params; });
-    g_decorations.emplace_back(deco);
-    HyprlandAPI::addWindowDecoration(lg::handle(), window, std::move(deco));
+    auto glass = makeShared<lg::CGlassDecoration>(window, [] { return g_params; });
+    g_decorations.emplace_back(glass);
+    HyprlandAPI::addWindowDecoration(lg::handle(), window, std::move(glass));
+    // the title bar reserves no space until it decides the window wants one
+    auto bar = makeShared<lg::CTitlebar>(window, [] { return g_params; });
+    g_titlebars.emplace_back(bar);
+    HyprlandAPI::addWindowDecoration(lg::handle(), window, std::move(bar));
+}
+
+static void forEachTitlebar(const std::function<void(lg::CTitlebar&)>& fn) {
+    std::erase_if(g_titlebars, [](const auto& t) { return t.expired(); });
+    for (const auto& t : g_titlebars)
+        if (const auto bar = t.lock())
+            fn(*bar);
 }
 
 APICALL EXPORT std::string PLUGIN_API_VERSION() {
@@ -163,11 +176,20 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
                 g_pHyprRenderer->damageMonitor(m);
     }));
 
+    // title bars: hover state of the traffic lights, and the end of a title-bar drag
+    g_listeners.push_back(Event::bus()->m_events.input.mouse.move.listen([](Vector2D pos, Event::SCallbackInfo&) {
+        forEachTitlebar([&pos](lg::CTitlebar& bar) { bar.onPointerMove(pos); });
+    }));
+    g_listeners.push_back(Event::bus()->m_events.input.mouse.button.listen([](IPointer::SButtonEvent e, Event::SCallbackInfo&) {
+        if (e.state == WL_POINTER_BUTTON_STATE_RELEASED)
+            forEachTitlebar([](lg::CTitlebar& bar) { bar.onButtonRelease(); });
+    }));
+
     // window glass: a bottom decoration on every window, active only for window_classes
-    g_listeners.push_back(Event::bus()->m_events.window.open.listen([](PHLWINDOW w) { addWindowGlass(w); }));
+    g_listeners.push_back(Event::bus()->m_events.window.open.listen([](PHLWINDOW w) { addWindowDecorations(w); }));
     for (const auto& w : Desktop::viewState()->windows())
         if (w && w->mapped())
-            addWindowGlass(w);
+            addWindowDecorations(w);
 
     g_statsCommand = HyprlandAPI::registerHyprCtlCommand(handle, IPC::Socket1::SCommand{
         .name    = "liquidglass",
@@ -198,6 +220,10 @@ APICALL EXPORT void PLUGIN_EXIT() {
         if (const auto d = deco.lock())
             HyprlandAPI::removeWindowDecoration(lg::handle(), d.get());
     g_decorations.clear();
+    for (const auto& t : g_titlebars)
+        if (const auto bar = t.lock())
+            HyprlandAPI::removeWindowDecoration(lg::handle(), bar.get());
+    g_titlebars.clear();
     if (g_renderHook)
         HyprlandAPI::removeFunctionHook(lg::handle(), g_renderHook);
     g_renderHook = nullptr;
