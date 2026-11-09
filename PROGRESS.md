@@ -126,3 +126,9 @@ glass material 65 (03:35, orchestrator; too cyan)
 - [04:47] plugin iter6: CC translucent (per-element backdrop copy again; shared copy was stale), contrast >=4.7:1 capped, 0.64ms/elem at 4K. Stray nested Hyprland pids (kill denied): 834457 837966 839281 840661 841688 (+ maybe 843909+) -> USER ACTION. dist safety: no writes through symlinks (fixing).
 - [04:52] dist: no writes through symlinks (_hyprk_write temp+mv, _hyprk_verify aborts on escape); private mode no longer symlinks user data dirs. shell: blur_lod removed, materials default, CC contrast 4.8/5.7:1. JUDGE r5 (final) started.
 - [05:05] plugin final: 0.75pt near-white rim, CC over white 4.75:1. Shell: drop QML CC rim (double outline).
+
+## FINAL (05:00, 2026-11-10)
+- Goal met: JUDGE r5 (independent, strict) = 83.7/100 (target 80). History 71.8 → 77.9 → 80.4 → 81.5 → 83.7.
+- Per surface r5: desktop 85, CC 82, NC 82, spotlight 81, settings 86, finder 87, windows/app theme 78, lock 83. Post-r5 polish: thin white glass rim, single CC outline, GTK headerbar capsules, Qt icon-only toolbars.
+- Try it: `/mnt/code/hyprk/dist/try-nested.sh` (see dist/README.md, Indonesian). Login session installer: dist/install-session.sh (NOT run).
+- Open for user: stray pids (USER ACTION above); .git history 1.5G from 8a5d3e8 (rewrite?); hyprbars denied; refs from MacBook for alert/MC/Cmd-Tab/lock; ~/Downloads/macos/work (~17G decrypted images) deletable.
