@@ -4,7 +4,6 @@
 Outputs (all committed, edit src/ and rerun this script):
   gtk-4.0/gtk.css           user stylesheet for ~/.config/gtk-4.0 (libadwaita + plain GTK4, light+dark via
                             @media prefers-color-scheme)
-  gtk-3.0/gtk.css, gtk-dark.css   user stylesheet for ~/.config/gtk-3.0 (needs the theme dir below as base)
   MacOS27/, MacOS27-Dark/   full theme dirs for GTK_THEME=MacOS27 (gtk-3.0 + gtk-4.0 + index.theme)
 """
 import pathlib, shutil
@@ -46,7 +45,7 @@ DARK = dict(
     tl_close='#FF5F57', tl_min='#FEBC2E', tl_max='#28C840', tl_off='#4B4B4B', tl_glyph='rgba(0,0,0,0.55)',
 )
 
-def palette(p):
+def palette(p, root=True):
     """CSS that defines the shared mac_* colours, the libadwaita named colours and the :root variables."""
     out = []
     for k, v in p.items():
@@ -75,12 +74,13 @@ def palette(p):
     for k, v in adw.items():
         out.append(f'@define-color {k} {v};')
     # libadwaita >= 1.6 also reads these through CSS variables; the Yaru patch sets them explicitly too
-    out.append(':root {')
-    for k, v in adw.items():
-        out.append(f'  --{k.replace("_", "-")}: {v};')
-    out.append('  --border-opacity: 12%; --dim-opacity: 55%; --disabled-opacity: 40%;')
-    out.append('  --window-radius: 26px;')
-    out.append('}')
+    if root:
+        out.append(':root {')
+        for k, v in adw.items():
+            out.append(f'  --{k.replace("_", "-")}: {v};')
+        out.append('  --border-opacity: 12%; --dim-opacity: 55%; --disabled-opacity: 40%;')
+        out.append('  --window-radius: 26px;')
+        out.append('}')
     return '\n'.join(out) + '\n'
 
 def indent(s, n=2):
@@ -113,9 +113,9 @@ def gtk4_theme(dark):
 
 def gtk3_theme(dark):
     base = 'gtk-contained-dark.css' if dark else 'gtk-contained.css'
-    body = (SRC / 'gtk3.css').read_text()
+    body = (SRC / 'gtk3.css').read_text().replace('HI', HI)
     return (HEADER + f'@import url("resource:///org/gtk/libgtk/theme/Adwaita/{base}");\n'
-            + palette(DARK if dark else LIGHT) + '\n' + body)
+            + palette(DARK if dark else LIGHT, root=False) + '\n' + body)
 
 INDEX = '''[Desktop Entry]
 Type=X-GNOME-Metatheme
@@ -130,8 +130,6 @@ MetacityTheme={name}
 
 def main():
     write('gtk-4.0/gtk.css', gtk4_user())
-    write('gtk-3.0/gtk.css', gtk3_theme(False))
-    write('gtk-3.0/gtk-dark.css', gtk3_theme(True))
     for name, dark in (('MacOS27', False), ('MacOS27-Dark', True)):
         write(f'{name}/index.theme', INDEX.format(name=name))
         write(f'{name}/gtk-4.0/gtk.css', gtk4_theme(dark))

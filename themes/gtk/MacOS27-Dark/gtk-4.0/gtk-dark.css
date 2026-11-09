@@ -537,7 +537,6 @@ dialog-host > dialog.alert > sheet, dialog-host > dialog.floating > sheet, windo
 }
 dialog-host > dialog.alert sheet, dialog.alert.floating sheet { border-radius: 26px; }
 window.dialog, window.messagedialog, dialog-host > dialog > sheet { background-color: @mac_dialog_bg; }
-.message-area, window.messagedialog .message-area { padding: 6px; }
 .alert .response-area > button, window.messagedialog .response-area > button { min-height: 28px; border-radius: 999px; }
 .alert .heading, .alert .title { font-weight: 700; font-size: 13px; }
 toast, .app-notification {
@@ -550,8 +549,9 @@ searchbar, searchbar > revealer > box { background-color: @mac_header_bg; box-sh
 dropdown > button, combobox > button.combo { padding: 2px 12px; }
 dropdown arrow, combobox arrow { opacity: 0.7; }
 popover.menu listview > row, dropdown popover listview > row { min-height: 26px; border-radius: 8px; padding: 0 8px; }
-dropdown popover listview > row:selected, dropdown popover listview > row:hover { background-color: @mac_accent_bg; color: @mac_accent_fg; }
-dropdown popover listview > row:selected image { color: @mac_accent_fg; }
+dropdown popover listview > row:selected { background: none; color: @mac_fg; }
+dropdown popover listview > row:hover, dropdown popover listview > row:selected:hover { background-color: @mac_accent_bg; color: @mac_accent_fg; }
+dropdown popover listview > row:hover image, dropdown popover listview > row:hover label { color: @mac_accent_fg; }
 .osd { background-color: alpha(#262626, 0.92); color: #ffffff; border-radius: 18px; }
 avatar { border-radius: 999px; }
 expander-widget > box > title > expander { opacity: 0.6; }

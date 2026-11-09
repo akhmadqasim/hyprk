@@ -91,55 +91,177 @@
 @define-color thumbnail_fg_color rgba(0,0,0,0.85);
 @define-color shade_color rgba(0,0,0,0.08);
 @define-color scrollbar_outline_color transparent;
-:root {
-  --accent-bg-color: #007AFF;
-  --accent-fg-color: #ffffff;
-  --accent-color: #0064D9;
-  --destructive-bg-color: #FF3B30;
-  --destructive-fg-color: #ffffff;
-  --destructive-color: #FF3B30;
-  --success-bg-color: #34C759;
-  --success-fg-color: #ffffff;
-  --success-color: #34C759;
-  --warning-bg-color: #FF9500;
-  --warning-fg-color: rgba(0,0,0,0.8);
-  --warning-color: #FF9500;
-  --error-bg-color: #FF3B30;
-  --error-fg-color: #ffffff;
-  --error-color: #FF3B30;
-  --window-bg-color: #FFFFFF;
-  --window-fg-color: rgba(0,0,0,0.85);
-  --view-bg-color: #FFFFFF;
-  --view-fg-color: rgba(0,0,0,0.85);
-  --headerbar-bg-color: #FFFFFF;
-  --headerbar-fg-color: rgba(0,0,0,0.85);
-  --headerbar-backdrop-color: #FFFFFF;
-  --headerbar-border-color: rgba(0,0,0,0.85);
-  --headerbar-shade-color: transparent;
-  --headerbar-darker-shade-color: transparent;
-  --sidebar-bg-color: #EDEDED;
-  --sidebar-fg-color: rgba(0,0,0,0.85);
-  --sidebar-backdrop-color: #F2F2F2;
-  --sidebar-shade-color: transparent;
-  --sidebar-border-color: rgba(0,0,0,0.10);
-  --secondary-sidebar-bg-color: #EDEDED;
-  --secondary-sidebar-fg-color: rgba(0,0,0,0.85);
-  --secondary-sidebar-backdrop-color: #F2F2F2;
-  --secondary-sidebar-shade-color: transparent;
-  --secondary-sidebar-border-color: rgba(0,0,0,0.10);
-  --card-bg-color: #F5F5F5;
-  --card-fg-color: rgba(0,0,0,0.85);
-  --card-shade-color: rgba(0,0,0,0.08);
-  --dialog-bg-color: #F6F6F6;
-  --dialog-fg-color: rgba(0,0,0,0.85);
-  --popover-bg-color: #FAFAFA;
-  --popover-fg-color: rgba(0,0,0,0.85);
-  --popover-shade-color: rgba(0,0,0,0.08);
-  --thumbnail-bg-color: #FFFFFF;
-  --thumbnail-fg-color: rgba(0,0,0,0.85);
-  --shade-color: rgba(0,0,0,0.08);
-  --scrollbar-outline-color: transparent;
-  --border-opacity: 12%; --dim-opacity: 55%; --disabled-opacity: 40%;
-  --window-radius: 26px;
-}
 
+/* GTK 3 overlay on top of the built-in Adwaita (imported above). GTK 3 has no CSS variables or color-mix,
+ * so everything uses the @mac_* named colours from the palette. */
+@define-color theme_bg_color @mac_window_bg;
+@define-color theme_fg_color @mac_fg;
+@define-color theme_base_color @mac_view_bg;
+@define-color theme_text_color @mac_fg;
+@define-color theme_selected_bg_color @mac_accent_bg;
+@define-color theme_selected_fg_color @mac_accent_fg;
+@define-color insensitive_bg_color @mac_window_bg;
+@define-color insensitive_fg_color alpha(@mac_fg, 0.4);
+@define-color borders @mac_sep;
+@define-color warning_color @mac_warning;
+@define-color error_color @mac_error;
+@define-color success_color @mac_success;
+
+* { font-family: "SF Pro Text", "SF Pro", "System Font", ".SF NS", "Inter", "Cantarell", sans-serif; text-shadow: none; -gtk-icon-shadow: none; }
+.monospace, textview.monospace { font-family: "SF Mono", "SFNS Mono", ".SF NS Mono", "JetBrains Mono", "DejaVu Sans Mono", monospace; }
+
+.background, window, dialog, messagedialog { background-color: @mac_window_bg; color: @mac_fg; }
+.background:backdrop, window:backdrop { background-color: @mac_window_bg; color: alpha(@mac_fg, 0.6); }
+window.csd { border-radius: 26px; box-shadow: 0 0 0 1px alpha(@mac_fg, 0.14), 0 14px 38px 2px alpha(black, 0.20), 0 4px 10px 0 alpha(black, 0.16); margin: 0; }
+window.csd.maximized, window.csd.fullscreen, window.csd.tiled { border-radius: 0; box-shadow: none; }
+decoration { border-radius: 26px; box-shadow: 0 0 0 1px alpha(@mac_fg, 0.14), 0 14px 38px 2px alpha(black, 0.20), 0 4px 10px 0 alpha(black, 0.16); margin: 14px; }
+decoration:backdrop { box-shadow: 0 0 0 1px alpha(@mac_fg, 0.10), 0 8px 24px 0 alpha(black, 0.12); }
+.maximized decoration, .fullscreen decoration, .tiled decoration { border-radius: 0; box-shadow: none; margin: 0; }
+.view, iconview, .view text, iconview text, textview text, textview { background-color: @mac_view_bg; color: @mac_fg; caret-color: @mac_accent_bg; }
+.view:backdrop, textview text:backdrop { background-color: @mac_view_bg; color: alpha(@mac_fg, 0.7); }
+.view:selected, .view:selected:focus, iconview:selected, textview text:selected, treeview.view:selected, row:selected, .view text:selected {
+  background-color: @mac_accent_bg; color: @mac_accent_fg;
+}
+selection, text selection, entry selection { background-color: alpha(@mac_accent_bg, 0.30); color: @mac_fg; }
+separator, .sidebar separator { background-color: @mac_sep; min-height: 1px; min-width: 1px; }
+.dim-label { opacity: 0.55; }
+
+/* header bar / title bar: 52px, flush, traffic lights on the left (gtk-decoration-layout=close,minimize,maximize:) */
+headerbar, .titlebar { min-height: 52px; padding: 0 14px; background-color: @mac_header_bg; background-image: none; border: none; box-shadow: none; color: @mac_fg; border-radius: 26px 26px 0 0; }
+headerbar:backdrop, .titlebar:backdrop { background-color: @mac_header_backdrop; color: alpha(@mac_fg, 0.6); }
+headerbar .title, .titlebar .title { font-weight: 600; font-size: 13px; }
+headerbar .subtitle { font-size: 11px; opacity: 0.55; }
+.maximized headerbar, .tiled headerbar, .fullscreen headerbar { border-radius: 0; }
+
+headerbar button.titlebutton:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar button.titlebutton:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):hover, headerbar button.titlebutton:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):active, headerbar button.titlebutton:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):backdrop {
+  min-width: 14px; min-height: 14px; padding: 0; margin: 0 0 0 8px; border: none; border-radius: 999px; box-shadow: inset 0 0 0 1px alpha(black, 0.18);
+  background-image: none; background-color: @mac_tl_off; color: transparent; -gtk-icon-source: none;
+}
+headerbar button.titlebutton:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):first-child { margin-left: 0; }
+headerbar button.titlebutton.close:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar button.titlebutton.close:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):backdrop { background-color: @mac_tl_close; }
+headerbar button.titlebutton.minimize:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar button.titlebutton.minimize:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):backdrop { background-color: @mac_tl_min; }
+headerbar button.titlebutton.maximize:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar button.titlebutton.maximize:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):backdrop { background-color: @mac_tl_max; }
+headerbar:backdrop button.titlebutton.close:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar:backdrop button.titlebutton.minimize:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar:backdrop button.titlebutton.maximize:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7) { background-color: @mac_tl_off; }
+headerbar button.titlebutton:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):active { opacity: 0.8; }
+headerbar button.titlebutton:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7) image { opacity: 0; min-width: 0; min-height: 0; -gtk-icon-source: none; margin: 0; padding: 0; }
+
+/* buttons: capsule */
+button, notebook > header > tabs > arrow {
+  min-height: 24px; min-width: 16px; padding: 2px 14px; border: none; border-radius: 999px;
+  background-image: none; background-color: @mac_ctl_bg; color: @mac_fg;
+  box-shadow: 0 0 0 1px @mac_ctl_ring, 0 1px 2px 0 @mac_ctl_shadow; text-shadow: none; -gtk-icon-shadow: none; outline-color: alpha(@mac_accent_bg, 0.45);
+}
+button:hover { background-image: none; background-color: @mac_ctl_bg_hover; color: @mac_fg; box-shadow: 0 0 0 1px @mac_ctl_ring, 0 1px 2px 0 @mac_ctl_shadow; }
+button:active, button:checked { background-image: none; background-color: @mac_ctl_bg_active; color: @mac_fg; box-shadow: 0 0 0 1px @mac_ctl_ring; }
+button:disabled { background-image: none; background-color: @mac_ctl_bg; color: alpha(@mac_fg, 0.4); box-shadow: 0 0 0 1px @mac_ctl_ring; }
+button:backdrop { background-image: none; background-color: @mac_ctl_bg; color: alpha(@mac_fg, 0.6); }
+button.image-button, button.circular { min-width: 24px; padding: 2px 6px; }
+button.circular { padding: 2px; }
+button.flat, button.sidebar-button, toolbar button, .toolbar button.flat { background-image: none; background-color: transparent; box-shadow: none; }
+button.flat:hover, toolbar button:hover { background-color: @mac_fill_hover; box-shadow: none; }
+button.flat:active, button.flat:checked { background-color: @mac_fill_active; box-shadow: none; }
+button.suggested-action, button.suggested-action:backdrop { background-image: none; background-color: @mac_accent_bg; color: @mac_accent_fg; box-shadow: 0 0 0 1px alpha(black, 0.10), 0 1px 2px 0 alpha(@mac_accent_bg, 0.45); }
+button.suggested-action:hover { background-image: none; background-color: shade(@mac_accent_bg, 1.1); color: @mac_accent_fg; }
+button.suggested-action:active { background-image: none; background-color: shade(@mac_accent_bg, 0.85); }
+button.destructive-action, button.destructive-action:backdrop { background-image: none; background-color: @mac_destructive; color: white; box-shadow: 0 0 0 1px alpha(black, 0.10), 0 1px 2px 0 alpha(@mac_destructive, 0.45); }
+button.destructive-action:hover { background-image: none; background-color: shade(@mac_destructive, 1.1); }
+button.destructive-action:active { background-image: none; background-color: shade(@mac_destructive, 0.85); }
+headerbar button:not(.titlebutton) { min-height: 34px; min-width: 34px; padding: 0 12px; background-color: @mac_glass_bg; box-shadow: 0 0 0 1px @mac_glass_ring, 0 2px 6px 0 @mac_glass_shadow; }
+headerbar button.suggested-action { background-color: @mac_accent_bg; }
+headerbar button:not(.titlebutton):not(.suggested-action):not(.destructive-action):hover { background-color: @mac_ctl_bg_hover; }
+.linked:not(.vertical) > button:not(:first-child):not(:last-child) { border-radius: 0; }
+.linked:not(.vertical) > button:first-child:not(:last-child) { border-radius: 999px 0 0 999px; }
+.linked:not(.vertical) > button:last-child:not(:first-child) { border-radius: 0 999px 999px 0; }
+.linked:not(.vertical) > button + button { margin-left: 0; box-shadow: 0 0 0 1px @mac_ctl_ring, inset 1px 0 0 0 @mac_sep; }
+
+/* entries */
+entry, spinbutton:not(.vertical) {
+  min-height: 28px; padding: 0 10px; border: none; border-radius: 8px; background-image: none; background-color: @mac_view_bg; color: @mac_fg;
+  box-shadow: 0 0 0 1px @mac_ctl_ring, 0 1px 1px 0 alpha(@mac_ctl_shadow, 0.35); caret-color: @mac_accent_bg;
+}
+entry:focus, spinbutton:focus { box-shadow: 0 0 0 1px @mac_accent_bg, 0 0 0 4px alpha(@mac_accent_bg, 0.40); outline: none; }
+entry:disabled { opacity: 0.5; }
+entry.search, entry:backdrop { border-radius: 8px; }
+entry image { opacity: 0.6; }
+spinbutton button { border-radius: 6px; min-width: 22px; box-shadow: none; background: none; margin: 2px; }
+
+/* switch / check / radio / scale / progress */
+switch { min-width: 40px; min-height: 24px; border: none; border-radius: 999px; background-image: none; background-color: @mac_track; color: transparent; box-shadow: none; }
+switch:checked { background-color: @mac_accent_bg; }
+switch slider { min-width: 26px; min-height: 20px; margin: 2px; border: none; border-radius: 999px; background-image: none; background-color: @mac_knob; box-shadow: 0 0 0 1px alpha(black, 0.08), 0 2px 4px 0 @mac_knob_shadow; }
+switch label { color: transparent; }
+check, radio {
+  min-width: 16px; min-height: 16px; margin: 2px; border: none; background-image: none; background-color: @mac_ctl_bg; color: @mac_accent_fg;
+  box-shadow: 0 0 0 1px alpha(@mac_fg, 0.30); -gtk-icon-shadow: none;
+}
+check { border-radius: 5px; } radio { border-radius: 999px; }
+check:checked, check:indeterminate, radio:checked, radio:indeterminate { background-image: none; background-color: @mac_accent_bg; box-shadow: 0 0 0 1px alpha(black, 0.08); color: @mac_accent_fg; }
+check:disabled, radio:disabled { opacity: 0.4; }
+scale trough { min-height: 4px; min-width: 4px; border: none; border-radius: 999px; background-image: none; background-color: @mac_track; }
+scale highlight, scale fill { border: none; border-radius: 999px; background-image: none; background-color: @mac_accent_bg; }
+scale slider { min-width: 26px; min-height: 18px; margin: -7px; border: none; border-radius: 999px; background-image: none; background-color: @mac_knob; box-shadow: 0 0 0 1px alpha(black, 0.10), 0 2px 5px 0 @mac_knob_shadow; }
+scale.vertical slider { min-width: 18px; min-height: 26px; }
+progressbar trough, levelbar trough { min-height: 6px; border: none; border-radius: 999px; background-image: none; background-color: @mac_track; }
+progressbar progress, levelbar block.filled { min-height: 6px; border: none; border-radius: 999px; background-image: none; background-color: @mac_accent_bg; }
+
+/* menus and popovers */
+menu, .menu, .popup, .context-menu, popover.background, popover {
+  background-color: @mac_popover_bg; color: @mac_fg; border-radius: 14px; border: none;
+  box-shadow: 0 0 0 1px @mac_menu_ring, 0 10px 30px 0 alpha(black, 0.22);
+}
+menu, .menu { padding: 6px; }
+popover { padding: 6px; margin: 8px; }
+menuitem, modelbutton { min-height: 26px; padding: 0 10px; border-radius: 8px; color: @mac_fg; }
+menuitem:hover, modelbutton:hover, modelbutton:focus { background-color: @mac_accent_bg; color: @mac_accent_fg; }
+menuitem:disabled, modelbutton:disabled { opacity: 0.4; }
+menuitem:hover:disabled { background: none; color: @mac_fg; }
+menu separator, popover separator { margin: 5px 8px; }
+tooltip, tooltip.background { border-radius: 8px; background-color: @mac_popover_bg; color: @mac_fg; box-shadow: 0 0 0 1px @mac_menu_ring, 0 4px 14px alpha(black, 0.18); }
+
+/* sidebars and lists */
+.sidebar, placessidebar, placessidebar .sidebar, stacksidebar, .sidebar .view, placessidebar list { background-color: @mac_sidebar_bg; color: @mac_fg; border: none; }
+.sidebar:backdrop, placessidebar:backdrop { background-color: @mac_sidebar_backdrop; }
+.sidebar row, placessidebar row { min-height: 28px; margin: 1px 8px; padding: 0 8px; border-radius: 10px; }
+.sidebar row:selected, placessidebar row:selected, stacksidebar row:selected { background-color: @mac_sel_grey; color: @mac_fg; }
+.sidebar row:selected:hover { background-color: @mac_sel_grey; }
+.sidebar row:hover:not(:selected) { background-color: alpha(@mac_fg, 0.05); }
+placessidebar row image, .sidebar row image { color: @mac_accent_bg; }
+list, listbox { background-color: @mac_view_bg; color: @mac_fg; }
+list row, row { min-height: 26px; }
+row:hover { background-color: alpha(@mac_fg, 0.04); }
+treeview.view { border-color: @mac_sep; }
+treeview.view:selected { background-color: @mac_accent_bg; color: @mac_accent_fg; }
+treeview.view header button { border-radius: 0; box-shadow: inset 0 -1px 0 0 @mac_sep; background: none; min-height: 26px; font-weight: 500; }
+frame > border, .frame { border: 1px solid @mac_sep; border-radius: 10px; }
+
+/* tabs */
+notebook > header { background-color: @mac_header_bg; box-shadow: inset 0 -1px 0 0 @mac_sep; border: none; }
+notebook > header > tabs > tab { border: none; border-radius: 8px; margin: 3px; padding: 4px 12px; min-height: 24px; background: none; box-shadow: none; }
+notebook > header > tabs > tab:checked { background-color: @mac_ctl_bg; box-shadow: 0 0 0 1px @mac_ctl_ring, 0 1px 2px 0 @mac_ctl_shadow; }
+notebook > header > tabs > tab:hover:not(:checked) { background-color: @mac_fill; }
+notebook > stack { background-color: @mac_view_bg; }
+
+/* scrollbars */
+scrollbar { background: none; border: none; }
+scrollbar trough { background: none; border: none; }
+scrollbar slider { min-width: 6px; min-height: 6px; margin: 1px; border: none; border-radius: 999px; background-color: alpha(@mac_fg, 0.30); }
+scrollbar slider:hover { background-color: alpha(@mac_fg, 0.45); }
+scrollbar.overlay-indicator:not(.hovering) slider { min-width: 4px; min-height: 4px; }
+scrolledwindow undershoot, scrolledwindow overshoot { background: none; }
+
+/* dialogs and misc */
+messagedialog.background, .message-dialog { background-color: @mac_dialog_bg; border-radius: 26px; }
+messagedialog .dialog-action-area button { border-radius: 999px; }
+infobar, infobar.info, infobar.warning, infobar.error, infobar.question { border-radius: 12px; border: none; background-color: alpha(@mac_accent_bg, 0.15); color: @mac_fg; }
+.osd { background-color: alpha(#262626, 0.92); color: white; border-radius: 18px; }
+actionbar > revealer > box { background-color: @mac_header_bg; box-shadow: inset 0 1px 0 0 @mac_sep; }
+toolbar, .toolbar { background-color: @mac_header_bg; padding: 4px; }
+statusbar { padding: 2px 8px; }
+calendar { border-radius: 12px; }
+calendar:selected { background-color: @mac_accent_bg; color: @mac_accent_fg; border-radius: 999px; }
+
+combobox button.combo, combobox box button { padding: 2px 12px; }
+combobox arrow { opacity: 0.7; }
+progressbar { min-height: 6px; }
+progressbar trough { min-height: 6px; }
+combobox button.combo, combobox button { border-radius: 999px; }
