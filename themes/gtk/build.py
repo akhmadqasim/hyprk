@@ -23,7 +23,7 @@ LIGHT = dict(
     fill_active='rgba(0,0,0,0.16)', sel_grey='rgba(0,0,0,0.09)',
     ctl_bg='#FFFFFF', ctl_bg_hover='#F4F4F4', ctl_bg_active='#E4E4E4',
     ctl_ring='rgba(0,0,0,0.13)', ctl_shadow='rgba(0,0,0,0.16)',
-    glass_bg='rgba(255,255,255,0.78)', glass_ring='rgba(0,0,0,0.09)', glass_shadow='rgba(0,0,0,0.12)',
+    glass_bg='rgba(255,255,255,0.86)', glass_ring='rgba(0,0,0,0.06)', glass_shadow='rgba(0,0,0,0.07)',
     track='rgba(0,0,0,0.12)', knob='#FFFFFF', knob_shadow='rgba(0,0,0,0.30)',
     menu_ring='rgba(0,0,0,0.14)', win_shadow='rgba(0,0,0,0.30)',
     tl_close='#FF5F57', tl_min='#FEBC2E', tl_max='#28C840', tl_off='#D4D4D4', tl_glyph='rgba(0,0,0,0.55)',

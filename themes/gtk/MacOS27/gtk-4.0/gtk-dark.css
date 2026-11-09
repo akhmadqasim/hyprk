@@ -154,7 +154,7 @@ window, popover, tooltip, .background {
 .title-1, .title-2, .title-3, .title-4, .heading, headerbar .title, windowtitle .title {
   font-family: "SF Pro Display", "SF Pro", "SF Pro Text", "System Font", ".SF NS", "Inter", "Cantarell", sans-serif;
 }
-headerbar .title, windowtitle .title { font-weight: 600; font-size: 13px; padding: 0 12px; }
+headerbar .title, windowtitle .title { font-weight: 700; font-size: 14px; padding: 0 12px; }
 headerbar .subtitle, windowtitle .subtitle { font-size: 11px; opacity: 0.55; }
 
 /* ---------------------------------------------------------------------------------------------
@@ -298,7 +298,7 @@ headerbar box > menubutton:not(.flat):not(.suggested-action) > button:not(.flat)
 headerbar box > button.flat:not(.model), headerbar box > menubutton.flat > button {
   min-height: 36px; min-width: 36px; padding: 0 10px; border-radius: 999px;
   background-color: @mac_glass_bg; background-image: none; color: @mac_fg;
-  box-shadow: 0 0 0 1px @mac_glass_ring, 0 2px 6px 0 @mac_glass_shadow;
+  box-shadow: 0 0 0 1px @mac_glass_ring, 0 3px 12px 0 @mac_glass_shadow;
 }
 headerbar box > button.flat:not(.model):hover, headerbar box > menubutton.flat > button:hover,
 headerbar box > button:not(.flat):not(.suggested-action):not(.destructive-action):not(.text-button):not(.model):hover,
@@ -312,7 +312,7 @@ headerbar .linked > button:not(:first-child):not(:last-child) { border-radius: 0
 headerbar .linked > button { min-width: 30px; }
 headerbar .linked > button:first-child:not(:last-child) { padding-right: 8px; }
 headerbar .linked > button:last-child:not(:first-child) { padding-left: 8px; }
-headerbar .linked > button:not(:first-child) { box-shadow: 0 0 0 1px @mac_glass_ring, 0 2px 6px 0 @mac_glass_shadow, inset 1px 0 0 0 @mac_sep; }
+headerbar .linked > button:not(:first-child) { box-shadow: 0 0 0 1px @mac_glass_ring, 0 3px 12px 0 @mac_glass_shadow, inset 1px 0 0 0 alpha(@mac_fg, 0.08); }
 headerbar searchentry, headerbar entry.search { min-height: 36px; border-radius: 999px; }
 
 /* ---------------------------------------------------------------------------------------------
@@ -472,11 +472,11 @@ selection:focus-within, label > selection { background-color: alpha(@mac_accent_
  * ------------------------------------------------------------------------------------------- */
 .navigation-sidebar, .sidebar, placessidebar, list.sidebar, .sidebar-pane, .sidebar-pane > * { background-color: @mac_sidebar_bg; color: @mac_fg; }
 .sidebar-pane:backdrop, .sidebar-pane:backdrop > *, .navigation-sidebar:backdrop { background-color: @mac_sidebar_backdrop; }
-.navigation-sidebar, list.navigation-sidebar { padding: 4px 10px; }
+.navigation-sidebar, list.navigation-sidebar { padding: 4px 8px; }
 .navigation-sidebar > row, .navigation-sidebar > row.activatable, placessidebar row, list.sidebar row {
-  min-height: 32px; margin: 1px 0; padding: 0 8px; border-radius: 10px; color: @mac_fg;
+  min-height: 32px; margin: 1px 0; padding: 0 6px; border-radius: 10px; color: @mac_fg;
 }
-.navigation-sidebar > row image, placessidebar row image, list.sidebar row image { opacity: 1; color: @mac_accent_bg; }
+.navigation-sidebar > row image, placessidebar row image, list.sidebar row image { opacity: 1; color: @mac_accent_bg; -gtk-icon-size: 18px; }
 .navigation-sidebar > row:hover, placessidebar row:hover { background-color: alpha(@mac_fg, 0.05); }
 list.navigation-sidebar > row.activatable:selected, list.navigation-sidebar > row.activatable:selected:hover, list.navigation-sidebar > row:selected:focus,
 .navigation-sidebar > row:selected, placessidebar row:selected, placessidebar row:selected:hover, list.sidebar row:selected {
@@ -570,7 +570,7 @@ statusbar { padding: 2px 8px; }
 /* ---------------------------------------------------------------------------------------------
  * Nautilus (Files): path bar as one glass capsule, flat segments inside (specificity boost token, see build.py)
  * ------------------------------------------------------------------------------------------- */
-.nautilus-pathbar { background-color: @mac_glass_bg; border-radius: 999px; box-shadow: 0 0 0 1px @mac_glass_ring, 0 2px 6px 0 @mac_glass_shadow; min-height: 34px; }
+.nautilus-pathbar { background-color: @mac_glass_bg; border-radius: 999px; box-shadow: 0 0 0 1px @mac_glass_ring, 0 3px 12px 0 @mac_glass_shadow; min-height: 34px; }
 .nautilus-pathbar button.nautilus-path-button:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7) { background: none; box-shadow: none; border-radius: 999px; margin: 3px 2px; min-height: 26px; min-width: 8px; padding: 0 10px; }
 .nautilus-pathbar button.nautilus-path-button:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):hover { background-color: @mac_fill_hover; }
 .nautilus-pathbar button.nautilus-path-button:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7).current-dir { font-weight: 600; }
