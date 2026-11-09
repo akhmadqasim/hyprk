@@ -20,6 +20,9 @@ Singleton {
                                 fallbacks: ["gnome-control-center"], alsoIds: ["org.gnome.Settings", "gnome-control-center"] },
     })
 
+    // terminal emulators in order of preference (the user's default first)
+    readonly property var terminalIds: ["com.mitchellh.ghostty", "org.gnome.Terminal", "kitty", "org.gnome.Ptyxis", "foot"]
+
     readonly property var pinnedCandidates: [
         ["hyprk-finder"],
         ["hyprk-launchpad"],
@@ -29,7 +32,7 @@ Singleton {
         ["org.gnome.TextEditor", "org.gnome.gedit"],
         ["org.gnome.Music", "rhythmbox", "org.gnome.Rhythmbox3"],
         ["org.hyprk.Settings"],
-        ["com.mitchellh.ghostty", "org.gnome.Terminal", "kitty", "org.gnome.Ptyxis", "foot"],
+        terminalIds,
     ]
 
     readonly property var entries: DesktopEntries.applications.values
@@ -37,10 +40,11 @@ Singleton {
     // helper launchers like "Foot Client" / "Foot Server" next to "Foot" (same icon,
     // name extends the main one) are hidden, like macOS shows one app
     // terminal emulators: only the preferred one is listed (macOS has one Terminal)
-    readonly property var terminalIds: pinnedCandidates.find(g => g.indexOf("com.mitchellh.ghostty") !== -1)
     function isTerminal(e) { return (e.categories || []).indexOf("TerminalEmulator") !== -1; }
-    readonly property var preferredTerminal: {
-        for (const id of terminalIds) { const e = DesktopEntries.byId(id); if (e) return e; }
+    readonly property var preferredTerminal: firstEntry(terminalIds)
+    // first desktop entry of ids that exists (pinned groups, preferred terminal)
+    function firstEntry(ids) {
+        for (const id of ids) { const e = DesktopEntries.byId(id); if (e) return e; }
         return null;
     }
     readonly property var sortedEntries: {
@@ -63,11 +67,9 @@ Singleton {
                 out.push({ id: own.id, name: own.name, icon: own.icon, alsoIds: own.alsoIds, action: () => root.runHyprkApp(own.id) });
                 continue;
             }
-            for (const id of ids) {
-                const e = DesktopEntries.byId(id);
-                // the other ids of the group count as this app (one Terminal in the Dock)
-                if (e) { out.push({ id: e.id, name: e.name, icon: e.icon, entry: e, alsoIds: ids.filter(i => i !== id) }); break; }
-            }
+            const e = firstEntry(ids);
+            // the other ids of the group count as this app (one Terminal in the Dock)
+            if (e) out.push({ id: e.id, name: e.name, icon: e.icon, entry: e, alsoIds: ids.filter(i => i !== e.id) });
         }
         return out;
     }

@@ -20,16 +20,17 @@ Item {
 
     property var expanded: ({})       // appName -> bool
     property string photo: ""
+    readonly property string wallpaperDir: Quickshell.shellDir + "/../themes/wallpapers/png"
     // folder name as the caption, like a Photos memory; a loose file in ~/Pictures gets the generic title
     readonly property string photoTitle: {
         const folder = photo ? photo.split("/").slice(-2, -1)[0] : "";
-        return folder && folder !== "Pictures" && folder !== "png" ? folder : "Featured Photo";
+        return photo && !photo.startsWith(nc.wallpaperDir) && folder !== "Pictures" ? folder : "Featured Photo";
     }
     Process {
         // first photo in ~/Pictures (xdg dir, screenshots skipped), once per shell start
         running: true
         // a photo from ~/Pictures (no screenshots), else one of the macOS wallpapers
-        command: ["sh", "-c", 'd="$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures")"; p=$(find "$d" -maxdepth 2 -type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \\) -not -ipath "*screenshot*" 2>/dev/null | head -n1); [ -n "$p" ] || p=$(ls "$0"/*.png 2>/dev/null | grep -vi tahoe | head -n1); echo "$p"', Quickshell.shellDir + "/../themes/wallpapers/png"]
+        command: ["sh", "-c", 'd="$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures")"; p=$(find "$d" -maxdepth 2 -type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \\) -not -ipath "*screenshot*" 2>/dev/null | head -n1); [ -n "$p" ] || p=$(ls "$0"/*.png 2>/dev/null | grep -vi tahoe | head -n1); echo "$p"', nc.wallpaperDir]
         stdout: StdioCollector { onStreamFinished: nc.photo = text.trim() }
     }
     property var groups: []
