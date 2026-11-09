@@ -10,7 +10,7 @@ Column {
         FormRow { glyph: "person"; tint: Theme.tile.purple; label: "Personal"; sublabel: "Set Up" }
         FormRow { glyph: "work"; tint: Theme.tile.blue; label: "Work"; sublabel: "Set Up" }
     }
-    Row { anchors.right: parent.right; MacButton { text: "Add Focus…" } }
+    PaneFooter { help: false; MacButton { text: "Add Focus…" } }
     Card {
         FormRow { label: "Share across devices"; MacSwitch { checked: true } }
         FormRow { label: "Focus status"; MacButton { text: "On" } }

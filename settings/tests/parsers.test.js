@@ -111,3 +111,17 @@ test("dock.json defaults and clamping", () => {
     assert.equal(d.position, "bottom");
     assert.equal(JSON.parse(P.writeState(d, { size: "abc" }, P.normalizeDock)).size, 48);
 });
+
+test("sound.json defaults and clamping", () => {
+    assert.deepEqual(P.readState("", P.normalizeSound), P.soundDefaults);
+    const s = P.readState('{"alertSound": "Nope", "alertVolume": 3, "uiSounds": 0}', P.normalizeSound);
+    assert.equal(s.alertSound, "Tink");
+    assert.equal(s.alertVolume, 1);
+    assert.equal(s.uiSounds, false);
+    assert.equal(JSON.parse(P.writeState(s, { alertSound: "Funk" }, P.normalizeSound)).alertSound, "Funk");
+});
+
+test("prettyFileName", () => {
+    assert.equal(P.prettyFileName("/w/png/Mac_Blue-dark.png"), "Mac Blue dark");
+    assert.equal(P.prettyFileName(""), "");
+});

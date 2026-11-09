@@ -8,6 +8,8 @@ Item {
     id: app
     property bool windowActive: true
     property string currentId: "appearance"
+    // Non-empty: render once, save a PNG here and quit (reference comparisons).
+    property string snapshotPath: ""
     signal closeRequested()
     signal minimizeRequested()
     signal zoomRequested()
@@ -31,6 +33,10 @@ Item {
         currentId = history[n];
     }
     Component.onCompleted: { history = [currentId]; historyPos = 0; }
+    Timer {
+        running: app.snapshotPath !== ""; interval: 4000
+        onTriggered: app.grabToImage(r => { r.saveToFile(app.snapshotPath); Qt.quit(); })
+    }
 
     // Battery and Energy swap: keep selection valid when hasBattery resolves.
     Connections {
@@ -103,14 +109,14 @@ Item {
                         glyph: d.modelData.glyph; iconId: d.modelData.id
                         tint: Theme.tile[d.modelData.tint]
                     }
-                    Text {
+                    MacText {
                         anchors.left: ic.right; anchors.leftMargin: Theme.sidebar.iconLabelGap
                         anchors.right: parent.right; anchors.rightMargin: 6
                         anchors.verticalCenter: parent.verticalCenter
                         elide: Text.ElideRight
                         text: d.modelData.title
                         font.family: Theme.fontText; font.pixelSize: Theme.font.body
-                        font.weight: Theme.fw(d.selected ? Font.DemiBold : Font.Normal); font.variableAxes: Theme.axes(d.selected ? Font.DemiBold : Font.Normal)
+                        weight: d.selected ? Font.DemiBold : Font.Normal
                         color: d.selected ? Theme.sidebar.selectionText : Theme.label
                     }
                     MouseArea { id: rowMa; anchors.fill: parent; hoverEnabled: true; onClicked: app.open(d.modelData.id) }
@@ -140,9 +146,9 @@ Item {
             Column {
                 anchors.left: avatar.right; anchors.leftMargin: 9; anchors.verticalCenter: parent.verticalCenter
                 spacing: 1
-                Text {
+                MacText {
                     text: AppState.userName
-                    font.family: Theme.fontText; font.pixelSize: Theme.font.body; font.weight: Theme.fw(Font.DemiBold); font.variableAxes: Theme.axes(Font.DemiBold)
+                    font.family: Theme.fontText; font.pixelSize: Theme.font.body; weight: Font.DemiBold
                     color: Theme.label
                 }
                 Text {
@@ -185,10 +191,10 @@ Item {
                 }
             }
         }
-        Text {
+        MacText {
             anchors.left: nav.right; anchors.leftMargin: 13; anchors.verticalCenter: parent.verticalCenter
             text: app.current.title
-            font.family: Theme.fontDisplay; font.pixelSize: Theme.font.title; font.weight: Theme.fw(Font.Bold); font.variableAxes: Theme.axes(Font.Bold)
+            font.family: Theme.fontDisplay; font.pixelSize: Theme.font.title; weight: Font.Bold
             color: Theme.label
         }
     }

@@ -20,5 +20,5 @@ Column {
         FormRow { label: "Automatically hide and show the menu bar"; MacPopup { model: ["Always", "On Desktop Only", "In Full Screen Only", "Never"]; currentIndex: 2 } }
         FormRow { label: "Recent documents, applications and servers"; MacPopup { model: ["None", "5", "10", "15", "20"]; currentIndex: 2 } }
     }
-    Row { anchors.right: parent.right; HelpButton {} }
+    PaneFooter { }
 }

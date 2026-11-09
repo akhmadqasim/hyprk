@@ -10,14 +10,7 @@ Column {
     width: parent ? parent.width : 0
     spacing: Theme.content.headerGap
 
-    Text {
-        visible: card.title !== ""
-        leftPadding: Theme.content.rowPadding
-        topPadding: Theme.content.headerTop
-        text: card.title
-        font.family: Theme.fontText; font.pixelSize: Theme.font.sectionHeader; font.weight: Theme.fw(Font.Bold); font.variableAxes: Theme.axes(Font.Bold)
-        color: Theme.label
-    }
+    SectionHeader { visible: card.title !== ""; text: card.title }
     Rectangle {
         width: card.width
         height: body.implicitHeight

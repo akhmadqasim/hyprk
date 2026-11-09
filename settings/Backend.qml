@@ -3,22 +3,26 @@ pragma Singleton
 import QtQuick
 import QtCore
 
-// Runs commands and reads/writes state files.
-// Commands need Quickshell (QsProcess.qml). Files fall back to XMLHttpRequest
-// under the plain `qml` tool (run.sh sets QML_XHR_ALLOW_FILE_READ/WRITE).
+// Runs commands and reads/writes/watches state files.
+// Under Quickshell: processes (QsProcess.qml) and inotify (QsWatch.qml).
+// Under the plain `qml` tool: no processes; files go through XMLHttpRequest
+// (run.sh sets QML_XHR_ALLOW_FILE_READ/WRITE) and watching is a 2 s poll.
 QtObject {
     id: backend
 
-    // hyprk checkout root. Under Quickshell, resolvedUrl gives qs:// URLs, so ask Quickshell.
-    property Component _info: Qt.createComponent("QsInfo.qml")
-    readonly property string root: (_info.status === Component.Ready
-            ? _info.createObject(backend).shellDir + "/.."
-            : Qt.resolvedUrl("..").toString().replace(/^file:\/\//, ""))
-        .replace(/\/[^\/]+\/\.\.\/?$/, "").replace(/\/$/, "")
-    readonly property string stateDir: root + "/state"
-
     property Component _proc: Qt.createComponent("QsProcess.qml")
+    property Component _watch: Qt.createComponent("QsWatch.qml")
     readonly property bool canRun: _proc.status === Component.Ready
+
+    // hyprk checkout root (parent of settings/). Quickshell serves files from qs://
+    // URLs, so ask it for the real directory; otherwise the file:// URL is real.
+    readonly property string root: {
+        const info = Qt.createComponent("QsInfo.qml");
+        const dir = info.status === Component.Ready ? info.createObject(null).shellDir
+                                                     : decodeURIComponent(new URL(String(Qt.resolvedUrl("."))).pathname);
+        return dir.replace(/\/$/, "").replace(/\/[^\/]+$/, "");
+    }
+    readonly property string stateDir: root + "/state"
 
     // cb(code, stdout). code 127 = not supported / not installed.
     function run(argv, cb) {
@@ -28,7 +32,7 @@ QtObject {
     }
 
     // freedesktop thumbnail spec: ~/.cache/thumbnails/large/<md5 of file URI>.png
-    readonly property string thumbDir: String(StandardPaths.writableLocation(StandardPaths.GenericCacheLocation)).replace(/^file:\/\//, "") + "/thumbnails/large"
+    readonly property string thumbDir: decodeURIComponent(new URL(String(StandardPaths.writableLocation(StandardPaths.GenericCacheLocation))).pathname) + "/thumbnails/large"
     function thumbFor(path) {
         return thumbDir + "/" + Qt.md5("file://" + encodeURI(path)) + ".png";
     }
@@ -39,12 +43,24 @@ QtObject {
         run(args, done);
     }
 
-    function readFile(path, cb) {
-        if (canRun) { run(["cat", path], (code, out) => cb(code === 0 ? out : "")); return; }
+    function _xhrRead(path, cb) {
         const x = new XMLHttpRequest();
         x.onreadystatechange = () => { if (x.readyState === XMLHttpRequest.DONE) cb(x.responseText || ""); };
         x.open("GET", "file://" + path);
         x.send();
+    }
+
+    // cb(text) now and whenever the file changes ("" when missing).
+    function watch(path, cb) {
+        if (_watch.status === Component.Ready) {
+            _watch.createObject(backend, { path: path }).changed.connect(cb);
+            return;
+        }
+        let last = null;
+        const poll = () => _xhrRead(path, t => { if (t !== last) { last = t; cb(t); } });
+        const t = Qt.createQmlObject('import QtQuick; Timer { interval: 2000; repeat: true; running: true }', backend);
+        t.triggered.connect(poll);
+        poll();
     }
 
     // Atomic write (tmp + mv) so the shell never reads half a file.

@@ -18,10 +18,10 @@ Item {
             text: u.glyph; font.family: Theme.fontGlyph; font.pixelSize: 54
             color: Theme.tertiaryLabel
         }
-        Text {
+        MacText {
             anchors.horizontalCenter: parent.horizontalCenter
             text: u.title
-            font.family: Theme.fontDisplay; font.pixelSize: Theme.font.title; font.weight: Theme.fw(Font.DemiBold); font.variableAxes: Theme.axes(Font.DemiBold)
+            font.family: Theme.fontDisplay; font.pixelSize: Theme.font.title; weight: Font.DemiBold
             color: Theme.secondaryLabel
         }
         Text {

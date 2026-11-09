@@ -13,9 +13,10 @@ Window {
     color: "transparent"
 
     SettingsApp {
-        id: ui
         anchors.fill: parent
+        // --pane=<id>, --snapshot=<file.png>
         currentId: Qt.application.arguments.find(a => a.startsWith("--pane="))?.slice(7) ?? "appearance"
+        snapshotPath: Qt.application.arguments.find(a => a.startsWith("--snapshot="))?.slice(11) ?? ""
         windowActive: win.active
         onCloseRequested: Qt.quit()
         onMinimizeRequested: win.showMinimized()
@@ -23,10 +24,4 @@ Window {
         onMoveRequested: win.startSystemMove()
     }
 
-    // --snapshot=<file.png>: render, save, quit (used for reference comparisons).
-    readonly property string snapshot: Qt.application.arguments.find(a => a.startsWith("--snapshot="))?.slice(11) ?? ""
-    Timer {
-        running: win.snapshot !== ""; interval: 4000
-        onTriggered: ui.grabToImage(r => { r.saveToFile(win.snapshot); Qt.quit(); })
-    }
 }

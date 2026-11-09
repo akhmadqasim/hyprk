@@ -31,33 +31,33 @@ Column {
     Component.onCompleted: refresh()
 
     // Arrangement strip
-    Rectangle {
-        width: parent.width; height: 150
-        radius: Theme.content.cardRadius
-        color: Theme.cardFill; border.color: Theme.cardStroke
-        Row {
-            anchors.centerIn: parent
-            spacing: 16
-            Repeater {
-                model: pane.status === "ok" ? pane.monitors : [{ name: "", description: "Display", width: 16, height: 10 }]
-                Column {
-                    required property var modelData
-                    required property int index
-                    spacing: 6
-                    Rectangle {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        height: 74; width: Math.round(height * modelData.width / Math.max(1, modelData.height))
-                        radius: 6
-                        border.width: index === pane.sel && pane.status === "ok" ? 3 : 1
-                        border.color: index === pane.sel && pane.status === "ok" ? Theme.accent : Theme.separator
-                        gradient: Gradient { GradientStop { position: 0; color: "#3B7BD6" } GradientStop { position: 1; color: "#7A5BC9" } }
-                        opacity: pane.status === "ok" ? 1 : 0.35
-                        MouseArea { anchors.fill: parent; onClicked: pane.sel = index }
-                    }
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: modelData.model || modelData.description
-                        font.family: Theme.fontText; font.pixelSize: Theme.font.small; color: Theme.label
+    Card {
+        Item {
+            width: parent.width; height: 150
+            Row {
+                anchors.centerIn: parent
+                spacing: 16
+                Repeater {
+                    model: pane.status === "ok" ? pane.monitors : [{ name: "", description: "Display", width: 16, height: 10 }]
+                    Column {
+                        required property var modelData
+                        required property int index
+                        spacing: 6
+                        Rectangle {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            height: 74; width: Math.round(height * modelData.width / Math.max(1, modelData.height))
+                            radius: 6
+                            border.width: index === pane.sel && pane.status === "ok" ? 3 : 1
+                            border.color: index === pane.sel && pane.status === "ok" ? Theme.accent : Theme.separator
+                            gradient: Gradient { GradientStop { position: 0; color: "#3B7BD6" } GradientStop { position: 1; color: "#7A5BC9" } }
+                            opacity: pane.status === "ok" ? 1 : 0.35
+                            MouseArea { anchors.fill: parent; onClicked: pane.sel = index }
+                        }
+                        Text {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: modelData.model || modelData.description
+                            font.family: Theme.fontText; font.pixelSize: Theme.font.small; color: Theme.label
+                        }
                     }
                 }
             }
@@ -92,5 +92,5 @@ Column {
         FormRow { label: "True Tone"; sublabel: "Automatically adapt display to make colors appear consistent in different ambient lighting."; MacSwitch { enabled_: false } }
     }
 
-    Row { anchors.right: parent.right; spacing: 8; MacButton { text: "Advanced…" } MacButton { text: "Night Shift…" } HelpButton {} }
+    PaneFooter { MacButton { text: "Advanced…" } MacButton { text: "Night Shift…" } }
 }

@@ -19,6 +19,7 @@ missing, or the app runs under the plain `qml` tool, which has no process suppor
 | Bluetooth | connect / power fails | note "Couldn't reach …" / "Bluetooth could not be turned on." |
 | Sound | `wpctl` missing or PipeWire down | slider and mute disabled, note "PipeWire (wpctl) is not available…" |
 | Sound | no sinks | note "No output devices found." |
+| Sound | `pw-play` missing (alert preview) | choice is still saved to `state/sound.json`, note "Sound previews need pw-play (PipeWire tools)." |
 | Displays | not in a Hyprland session (`hyprctl` fails or returns no monitors) | placeholder display tile, popups disabled, note "Display details come from Hyprland…" |
 | Displays | Hyprland rejects a mode | note "Hyprland did not accept that display setting." |
 | Network | `nmcli` missing | row "Network services can't be listed" |
@@ -26,8 +27,8 @@ missing, or the app runs under the plain `qml` tool, which has no process suppor
 | Wallpaper | `themes/wallpapers` empty | note "No wallpapers found yet…" |
 | Wallpaper | no hyprpaper or swaybg | choice is still saved to `state/wallpaper.json` for the shell, note says how to apply it elsewhere |
 | Wallpaper | thumbnail missing or `magick` missing | full image is decoded instead (slower, same look) |
-| Appearance, Dock | state file missing or corrupt | defaults from `Parsers.js` (`appearanceDefaults`, `dockDefaults`); next change rewrites a clean file |
-| Appearance, Dock | running under `qml` (no processes) | files go through XMLHttpRequest; `run.sh` exports `QML_XHR_ALLOW_FILE_READ/WRITE=1` |
+| Appearance, Dock, Sound | state file missing or corrupt | defaults from `Parsers.js` (`appearanceDefaults`, `dockDefaults`, `soundDefaults`); next change rewrites a clean file |
+| Appearance, Dock, Sound | running under `qml` (no processes) | files go through XMLHttpRequest and are polled every 2 s instead of inotify; `run.sh` exports `QML_XHR_ALLOW_FILE_READ/WRITE=1` |
 
 ## Reduce transparency
 

@@ -28,8 +28,9 @@ QtObject {
     // SFNS.ttf (variable "System Font") from themes/fonts, loaded directly so no font install is needed.
     property FontLoader _sf: FontLoader { source: "file://" + Backend.root + "/themes/fonts/SFNS.ttf" }
     readonly property string _sfName: _sf.status === FontLoader.Ready ? _sf.name : ""
-    readonly property string fontText: _sfName || pickFont(["SF Pro Text", "SF Pro", "Inter", "Cantarell", "Noto Sans", "Sans Serif"])
-    readonly property string fontDisplay: _sfName || pickFont(["SF Pro Display", "SF Pro", "Inter Display", "Inter", "Cantarell", "Noto Sans", "Sans Serif"])
+    // One family for text and display: SFNS has optical sizes built in.
+    readonly property string fontText: _sfName || pickFont(["SF Pro", "Inter", "Cantarell", "Noto Sans", "Sans Serif"])
+    readonly property string fontDisplay: fontText
     // Weights: SFNS is a variable font, and Qt fakes bold unless the wght axis is set.
     // Use both on every weighted Text:  font.weight: Theme.fw(W); font.variableAxes: Theme.axes(W)
     function fw(w) { return _sfName ? Font.Normal : w; }
@@ -42,7 +43,6 @@ QtObject {
         readonly property real body: 13         // NSFont.systemFontSize, TODO verify
         readonly property real small: 11        // footnotes, account subtitle, TODO verify
         readonly property real title: 16        // ref toolbar title (bold)
-        readonly property real paneHeader: 22   // large pane header in hero cards, TODO verify
         readonly property real sectionHeader: 13 // bold group header above a card, TODO verify
     }
 
@@ -54,7 +54,6 @@ QtObject {
         readonly property int minHeight: 420         // TODO verify
         readonly property int radius: 26             // macOS 26 toolbar window corner, TODO verify
         readonly property int toolbarHeight: 52      // ref: lights/nav centered at 26
-        readonly property int shadowRadius: 40       // TODO verify
     }
 
     // ---------- traffic lights ----------
@@ -78,7 +77,6 @@ QtObject {
         readonly property int rowMargin: 10          // ref pill inset from sidebar edges
         readonly property int iconLeft: 8            // ref icon inset inside the pill
         readonly property int iconSize: 21           // ref
-        readonly property int iconRadius: 6          // TODO verify
         readonly property int iconLabelGap: 7        // ref
         readonly property int groupGap: 13          // ref
         readonly property int searchTop: 61          // ref
@@ -115,7 +113,6 @@ QtObject {
         readonly property int switchHeight: 22       // TODO verify
         readonly property int popupHeight: 22         // ref
         readonly property int popupChevron: 20        // ref round chevron button
-        readonly property int popupRadius: 7         // TODO verify
         readonly property int sliderTrack: 4         // TODO verify
         readonly property int sliderKnobW: 24        // macOS 26 capsule knob, TODO verify
         readonly property int sliderKnobH: 16        // TODO verify

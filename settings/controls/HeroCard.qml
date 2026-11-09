@@ -20,10 +20,10 @@ Rectangle {
         width: parent.width - 60
         spacing: 6
         PaneIcon { anchors.horizontalCenter: parent.horizontalCenter; size: Theme.content.heroIcon; glyph: h.glyph; iconId: h.iconId; tint: h.tint }
-        Text {
+        MacText {
             anchors.horizontalCenter: parent.horizontalCenter
             text: h.title
-            font.family: Theme.fontDisplay; font.pixelSize: Theme.font.title + 2; font.weight: Theme.fw(Font.Bold); font.variableAxes: Theme.axes(Font.Bold)
+            font.family: Theme.fontDisplay; font.pixelSize: Theme.font.title + 2; weight: Font.Bold
             color: Theme.label
         }
         Text {

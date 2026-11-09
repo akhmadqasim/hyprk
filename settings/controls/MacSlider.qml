@@ -11,6 +11,7 @@ Item {
     property string leftGlyph: ""
     property string rightGlyph: ""
     signal moved(real value)
+    signal released()
     implicitWidth: 220
     implicitHeight: Theme.control.sliderKnobH + 4
     opacity: enabled_ ? 1 : 0.4
@@ -65,6 +66,7 @@ Item {
             }
             onPressed: m => upd(m.x)
             onPositionChanged: m => { if (pressed) upd(m.x); }
+            onReleased: s.released()
         }
     }
 }

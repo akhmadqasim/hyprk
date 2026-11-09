@@ -140,6 +140,25 @@ function normalizeDock(obj) {
     return o;
 }
 
+// sound.json, shared with the shell: alertSound is a name in sounds/wav/Sounds/<name>.wav.
+const alertSounds = ["Basso", "Blow", "Bottle", "Frog", "Funk", "Glass", "Hero", "Morse", "Ping", "Pop", "Purr", "Sosumi", "Submarine", "Tink"];
+const soundDefaults = { alertSound: "Tink", alertVolume: 0.75, uiSounds: true, volumeFeedback: false };
+
+function normalizeSound(obj) {
+    const o = Object.assign({}, soundDefaults, (obj && typeof obj === "object") ? obj : {});
+    if (alertSounds.indexOf(o.alertSound) === -1) o.alertSound = soundDefaults.alertSound;
+    const v = Number(o.alertVolume);
+    o.alertVolume = isFinite(v) ? Math.min(1, Math.max(0, v)) : soundDefaults.alertVolume;
+    o.uiSounds = !!o.uiSounds;
+    o.volumeFeedback = !!o.volumeFeedback;
+    return o;
+}
+
+// "/x/Mac_Blue-dark.png" -> "Mac Blue dark"
+function prettyFileName(path) {
+    return String(path || "").split("/").pop().replace(/\.[^.]+$/, "").replace(/[-_]/g, " ");
+}
+
 // Parse a state file's text; missing or corrupt files give defaults.
 function readState(text, normalize) {
     let obj = {};
@@ -154,4 +173,5 @@ function writeState(current, patch, normalize) {
 if (typeof module !== "undefined")
     module.exports = { splitTerse, parseNmcliDevices, wifiDevice, parseNmcliWifi, parseWpctlSinks, parseWpctlVolume,
         parseBluetoothShow, parseBluetoothDevices, parseHyprMonitors, hasBattery,
-        normalizeAppearance, normalizeDock, readState, writeState, appearanceDefaults, dockDefaults };
+        normalizeAppearance, normalizeDock, normalizeSound, readState, writeState, prettyFileName,
+        appearanceDefaults, dockDefaults, soundDefaults, alertSounds };

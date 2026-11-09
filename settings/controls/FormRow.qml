@@ -9,6 +9,7 @@ Item {
     property string glyph            // Material Icons ligature for a small tile
     property color tint: Theme.tile.blue
     property bool dim: false
+    property string value            // gray trailing text, e.g. "Off"
     property bool alignTop: false    // tall rows (pickers) keep the label at the top, like macOS
     signal clicked()
     default property alias trailing: trail.data
@@ -55,6 +56,12 @@ Item {
         anchors.right: parent.right; anchors.rightMargin: Theme.content.rowPadding
         y: row.alignTop ? 11 : (row.height - height) / 2
         spacing: 8
-        layoutDirection: Qt.LeftToRight
+        Text {
+            visible: row.value !== ""
+            anchors.verticalCenter: parent.verticalCenter
+            text: row.value
+            font.family: Theme.fontText; font.pixelSize: Theme.font.body
+            color: Theme.secondaryLabel
+        }
     }
 }

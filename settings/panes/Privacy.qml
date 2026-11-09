@@ -19,8 +19,8 @@ Column {
     Card {
         title: "Security"
         FormRow { label: "Allow applications from"; MacPopup { model: ["App Store", "App Store & Known Developers"]; currentIndex: 1 } }
-        FormRow { label: "FileVault"; sublabel: "Disk encryption is managed by your Linux installer."; Text { text: "Off"; font.family: Theme.fontText; font.pixelSize: Theme.font.body; color: Theme.secondaryLabel } }
+        FormRow { label: "FileVault"; sublabel: "Disk encryption is managed by your Linux installer."; value: "Off"; }
         FormRow { label: "Lockdown Mode"; MacButton { text: "Turn On…" } }
     }
-    Row { anchors.right: parent.right; HelpButton {} }
+    PaneFooter { }
 }

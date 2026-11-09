@@ -70,5 +70,5 @@ Column {
         FormRow { label: "Tiled windows have margins"; MacSwitch {} }
     }
 
-    Row { anchors.right: parent.right; spacing: 8; MacButton { text: "Hot Corners…" } HelpButton {} }
+    PaneFooter { MacButton { text: "Hot Corners…" } }
 }

@@ -14,21 +14,14 @@ ShellRoot {
         color: "transparent"
 
         SettingsApp {
-            id: ui
             anchors.fill: parent
             currentId: Quickshell.env("HYPRK_SETTINGS_PANE") || "appearance"
+            snapshotPath: Quickshell.env("HYPRK_SNAPSHOT") || ""
             onCloseRequested: Qt.quit()
             onMinimizeRequested: win.minimized = true
             onZoomRequested: win.maximized = !win.maximized
             // Hyprland moves floating windows with SUPER+drag; FloatingWindow
             // does not expose xdg move requests.
-        }
-
-        Timer {
-            readonly property string out: String(Quickshell.env("HYPRK_SNAPSHOT") ?? "")
-            running: out !== ""
-            interval: 4000
-            onTriggered: ui.grabToImage(r => { r.saveToFile(out); Qt.quit(); })
         }
     }
 }

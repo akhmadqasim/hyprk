@@ -16,5 +16,5 @@ Column {
         FormRow { label: "Show the Sleep, Restart and Shut Down buttons"; MacSwitch { checked: true } }
         FormRow { label: "Show password hints"; MacSwitch {} }
     }
-    Row { anchors.right: parent.right; HelpButton {} }
+    PaneFooter { }
 }

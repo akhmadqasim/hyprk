@@ -25,8 +25,8 @@ Column {
     }
     Card {
         title: "Vision"
-        FormRow { glyph: "zoom_in"; tint: Theme.tile.blue; label: "Zoom"; Text { text: "Off"; font.family: Theme.fontText; font.pixelSize: Theme.font.body; color: Theme.secondaryLabel } }
-        FormRow { glyph: "record_voice_over"; tint: Theme.tile.black; label: "VoiceOver"; Text { text: "Off"; font.family: Theme.fontText; font.pixelSize: Theme.font.body; color: Theme.secondaryLabel } }
+        FormRow { glyph: "zoom_in"; tint: Theme.tile.blue; label: "Zoom"; value: "Off"; }
+        FormRow { glyph: "record_voice_over"; tint: Theme.tile.black; label: "VoiceOver"; value: "Off"; }
         FormRow { glyph: "subtitles"; tint: Theme.tile.gray; label: "Spoken Content" }
     }
 }

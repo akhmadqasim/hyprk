@@ -78,5 +78,5 @@ Column {
         FormRow { label: "Searching…"; dim: true }
     }
 
-    Row { anchors.right: parent.right; spacing: 8; MacButton { text: "Advanced…"; enabled_: pane.status === "ok" } HelpButton {} }
+    PaneFooter { MacButton { text: "Advanced…"; enabled_: pane.status === "ok" } }
 }

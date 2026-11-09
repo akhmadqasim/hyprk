@@ -3,7 +3,8 @@ import ".."
 import "../controls"
 import "../Parsers.js" as P
 
-// Functional via wpctl (PipeWire): output device and volume.
+// Functional: output device and volume via wpctl (PipeWire); sound effects are
+// stored in state/sound.json (the shell plays them) and previewed with pw-play.
 Column {
     id: pane
     spacing: Theme.content.sectionGap
@@ -18,12 +19,21 @@ Column {
             if (code !== 0) { status = "unsupported"; return; }
             sinks = P.parseWpctlSinks(out);
             status = sinks.length ? "ok" : "nodevices";
-            Backend.run(["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"], (c, o) => { if (!dragging) vol = P.parseWpctlVolume(o); });
         });
+        Backend.run(["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"], (c, o) => { if (!dragging) vol = P.parseWpctlVolume(o); });
     }
     property bool dragging: false
     function setVolume(v) {
         Backend.run(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", v.toFixed(2)], c => { if (c !== 0) note = "The volume could not be changed."; });
+    }
+
+    readonly property string soundsDir: Backend.root + "/sounds/wav"
+    property string effectsNote: ""
+    function play(file, volume) {
+        Backend.run(["pw-play", "--volume", volume.toFixed(2), file], c => {
+            effectsNote = c === 127 ? "Sound previews need pw-play (PipeWire tools)."
+                        : c !== 0 ? "That sound could not be played." : "";
+        });
     }
     function setDefault(id) {
         Backend.run(["wpctl", "set-default", String(id)], c => { note = c === 0 ? "" : "That output device could not be selected."; refresh(); });
@@ -32,11 +42,35 @@ Column {
     Timer { interval: 3000; running: pane.status !== "unsupported"; repeat: true; onTriggered: pane.refresh() }
 
     Card {
-        FormRow { label: "Alert sound"; MacPopup { model: ["Boop", "Breeze", "Bubble", "Crystal", "Funky", "Heroine", "Jump", "Mezzo", "Pebble", "Pluck", "Pong", "Sonar", "Sonumi", "Submerge"]; currentIndex: 1 } }
+        title: "Sound Effects"
+        FormRow {
+            label: "Alert sound"
+            MacPopup {
+                model: P.alertSounds
+                currentIndex: P.alertSounds.indexOf(AppState.sound.alertSound)
+                onActivated: i => {
+                    AppState.setSound({ alertSound: P.alertSounds[i] });
+                    pane.play(pane.soundsDir + "/Sounds/" + P.alertSounds[i] + ".wav", AppState.sound.alertVolume);
+                }
+            }
+        }
+        FormRow {
+            label: "Alert volume"
+            MacSlider {
+                width: 230
+                value: AppState.sound.alertVolume
+                leftGlyph: "volume_mute"; rightGlyph: "volume_up"
+                onMoved: v => AppState.setSound({ alertVolume: Math.round(v * 100) / 100 })
+                // macOS plays the alert once you let go of the knob
+                onReleased: pane.play(pane.soundsDir + "/Sounds/" + AppState.sound.alertSound + ".wav", AppState.sound.alertVolume)
+            }
+        }
         FormRow { label: "Play sound on startup"; MacSwitch { checked: true } }
-        FormRow { label: "Play user interface sound effects"; MacSwitch { checked: true } }
-        FormRow { label: "Play feedback when volume is changed"; MacSwitch { checked: false } }
+        FormRow { label: "Play user interface sound effects"; MacSwitch { checked: AppState.sound.uiSounds; onToggled: on => AppState.setSound({ uiSounds: on }) } }
+        FormRow { label: "Play feedback when volume is changed"; MacSwitch { checked: AppState.sound.volumeFeedback; onToggled: on => AppState.setSound({ volumeFeedback: on }) } }
     }
+
+    InlineNote { text: pane.effectsNote }
 
     Card {
         title: "Output & Input"
@@ -48,6 +82,7 @@ Column {
                 enabled_: pane.status === "ok"
                 leftGlyph: "volume_mute"; rightGlyph: "volume_up"
                 onMoved: v => { pane.dragging = true; pane.setVolume(v); dragRelease.restart(); }
+                onReleased: if (AppState.sound.volumeFeedback) pane.play(pane.soundsDir + "/misc/BezelServices-volume.wav", 1)
                 Timer { id: dragRelease; interval: 600; onTriggered: pane.dragging = false }
             }
         }
@@ -82,5 +117,5 @@ Column {
         }
     }
 
-    Row { anchors.right: parent.right; HelpButton {} }
+    PaneFooter { }
 }

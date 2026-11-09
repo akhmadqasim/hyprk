@@ -19,5 +19,5 @@ Column {
         FormRow { glyph: "update"; tint: Theme.tile.gray; label: "Software Update"; sublabel: "Alerts, Badges" }
         FormRow { glyph: "terminal"; tint: Theme.tile.black; label: "Terminal"; sublabel: "Banners, Sounds" }
     }
-    Row { anchors.right: parent.right; HelpButton {} }
+    PaneFooter { }
 }

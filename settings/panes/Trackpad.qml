@@ -20,5 +20,5 @@ Column {
         FormRow { label: "Smart zoom"; MacSwitch { checked: true } }
         FormRow { label: "Rotate"; MacSwitch { checked: true } }
     }
-    Row { anchors.right: parent.right; spacing: 8; MacButton { text: "Set Up Bluetooth Trackpad…" } HelpButton {} }
+    PaneFooter { MacButton { text: "Set Up Bluetooth Trackpad…" } }
 }

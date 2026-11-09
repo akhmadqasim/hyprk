@@ -31,11 +31,11 @@ Column {
         }
     }
     Card {
-        FormRow { glyph: "local_fire_department"; tint: Theme.tile.gray; label: "Firewall"; Text { text: "Inactive"; font.family: Theme.fontText; font.pixelSize: Theme.font.body; color: Theme.secondaryLabel } }
+        FormRow { glyph: "local_fire_department"; tint: Theme.tile.gray; label: "Firewall"; value: "Inactive"; }
     }
     Card {
         title: "Other Services"
         FormRow { glyph: "vpn_lock"; tint: Theme.tile.blue; label: "VPN"; sublabel: "Not Configured" }
     }
-    Row { anchors.right: parent.right; spacing: 8; MacButton { text: "…" } HelpButton {} }
+    PaneFooter { MacButton { text: "…" } }
 }

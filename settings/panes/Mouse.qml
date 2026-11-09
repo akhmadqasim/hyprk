@@ -11,5 +11,5 @@ Column {
         FormRow { label: "Double-click speed"; MacSlider { width: 200; value: 0.6 } }
         FormRow { label: "Scrolling speed"; MacSlider { width: 200; value: 0.4 } }
     }
-    Row { anchors.right: parent.right; spacing: 8; MacButton { text: "Advanced…" } HelpButton {} }
+    PaneFooter { MacButton { text: "Advanced…" } }
 }

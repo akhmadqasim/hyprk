@@ -25,11 +25,11 @@ Column {
             color: "transparent"
             MouseArea { anchors.fill: parent; z: 10; onClicked: ch.picked() }
         }
-        Text {
+        MacText {
             anchors.horizontalCenter: parent.horizontalCenter
             text: ch.caption
             font.family: Theme.fontText; font.pixelSize: Theme.font.body
-            font.weight: Theme.fw(ch.selected ? Font.DemiBold : Font.Normal); font.variableAxes: Theme.axes(ch.selected ? Font.DemiBold : Font.Normal)
+            weight: ch.selected ? Font.DemiBold : Font.Normal
             color: ch.selected ? Theme.label : Theme.secondaryLabel
         }
     }
@@ -179,7 +179,7 @@ Column {
             Row {
                 spacing: 14
                 Repeater {
-                    model: [{ t: "Default", c: "#3D9BF5" }, { t: "Dark", c: "#1C1C1E" }, { t: "Clear", c: "#A9A9AE" }, { t: "Tinted", c: "#2FA7F7" }]
+                    model: [{ t: "Default", c: "#3D9BF5" }, { t: "Dark", c: "#1C1C1E" }, { t: "Clear", c: "#7E7E7E" }, { t: "Tinted", c: "#2FA7F7" }]
                     Choice {
                         required property var modelData
                         w: 44; h: 44

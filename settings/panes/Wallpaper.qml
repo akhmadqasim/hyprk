@@ -2,6 +2,7 @@ import QtQuick
 import Qt.labs.folderlistmodel
 import ".."
 import "../controls"
+import "../Parsers.js" as P
 
 // Functional: picks from themes/wallpapers, records state/wallpaper.json
 // (the shell reads it) and applies with hyprpaper or swaybg when present.
@@ -30,7 +31,7 @@ Column {
         for (const m of [w0, w1])
             for (let i = 0; i < m.count; i++) out.push(String(m.get(i, "filePath")));
         files = out;
-        if (out.length) thumbTimer.restart();
+        if (out.length) thumbTimer.restart();  // debounces both folder models
     }
     property int thumbGen: 0     // bumps when thumbnails were created, to reload the grid
     Timer { id: thumbTimer; interval: 300; onTriggered: Backend.makeThumbs(pane.files, c => { if (c === 0) pane.thumbGen++; }) }
@@ -38,8 +39,7 @@ Column {
         nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
         showDirs: false
         sortField: FolderListModel.Name
-        onStatusChanged: if (status === FolderListModel.Ready) { pane.ready++; pane.collect(); }
-        onCountChanged: pane.collect()
+        onStatusChanged: if (status === FolderListModel.Ready) { pane.ready++; Qt.callLater(pane.collect); }
     }
     Walls { id: w0; folder: "file://" + pane.dir }
     Walls { id: w1; folder: "file://" + pane.dir + "/png" }
@@ -48,7 +48,7 @@ Column {
     Card {
         FormRow {
             implicitHeight: 96
-            label: pane.current ? pane.current.split("/").pop().replace(/\.[^.]+$/, "").replace(/[-_]/g, " ") : "No wallpaper selected"
+            label: pane.current ? P.prettyFileName(pane.current) : "No wallpaper selected"
             sublabel: "Show on all Spaces"
             Rectangle {
                 width: 128; height: 72; radius: 8; clip: true
@@ -69,7 +69,7 @@ Column {
         width: parent.width
         spacing: Theme.content.headerGap
         visible: pane.files.length > 0
-        Text { text: "Wallpapers"; font.family: Theme.fontText; font.pixelSize: Theme.font.sectionHeader; font.weight: Theme.fw(Font.Bold); font.variableAxes: Theme.axes(Font.Bold); color: Theme.label }
+        SectionHeader { text: "Wallpapers"; topPadding: 0 }
         Grid {
             id: grid
             width: parent.width
@@ -96,5 +96,5 @@ Column {
         }
     }
 
-    Row { anchors.right: parent.right; spacing: 8; MacButton { text: "Add Folder…" } HelpButton {} }
+    PaneFooter { MacButton { text: "Add Folder…" } }
 }

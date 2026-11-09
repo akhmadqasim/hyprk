@@ -30,7 +30,7 @@ Column {
     }
     function listNetworks() {
         scanning = true;
-        Backend.run(["nmcli", "-t", "-f", "IN-USE,SSID,SIGNAL,SECURITY", "dev", "wifi", "list"], (c, o) => {
+        Backend.run(["nmcli", "-t", "-f", "IN-USE,SSID,SIGNAL,SECURITY", "dev", "wifi", "list", "--rescan", "no"], (c, o) => {
             scanning = false;
             networks = c === 0 ? P.parseNmcliWifi(o) : [];
         });
@@ -112,10 +112,5 @@ Column {
         FormRow { label: "Ask to join hotspots"; MacPopup { model: ["Never", "Ask to Join", "Automatic"]; currentIndex: 1; enabled_: pane.status === "ok" } }
     }
 
-    Row {
-        anchors.right: parent.right
-        spacing: 8
-        MacButton { text: "Advanced…"; enabled_: pane.status === "ok" }
-        HelpButton {}
-    }
+    PaneFooter { MacButton { text: "Advanced…"; enabled_: pane.status === "ok" } }
 }
