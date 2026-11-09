@@ -62,6 +62,6 @@ Singleton {
         function current(): string { return root.open; }
         function menu(index: int, x: int): void { root.openMenu(index, x); }
         function desktopMenu(x: int, y: int): void { root.openContext(Menus.desktop(), x, y, false); }
-        function emptyTrash(): void { Apps.confirmEmptyTrash(); }
+        function confirmEmptyTrash(): void { Apps.confirmEmptyTrash(); }
     }
 }

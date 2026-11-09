@@ -93,6 +93,7 @@ Singleton {
         readonly property color tertiaryLabel: theme.dark ? Qt.rgba(1, 1, 1, 0.25) : Qt.rgba(0, 0, 0, 0.26)
         readonly property color separator: theme.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.10)
         readonly property color accent: theme.dark ? "#0A84FF" : "#007AFF"           // systemBlue
+        readonly property color textOnAccent: "#FFFFFF"
         readonly property color red: theme.dark ? "#FF453A" : "#FF3B30"
         readonly property color indigo: theme.dark ? "#5E5CE6" : "#5856D6"
 
@@ -160,6 +161,7 @@ Singleton {
         readonly property int separatorHeight: 11        // incl. spacing, TODO verify
         readonly property int minWidth: 220              // TODO verify
         readonly property int offsetY: 3                 // gap below menu bar, TODO verify
+        readonly property int screenMargin: 4            // menus keep this distance from screen edges
     }
 
     // ---------- dock ----------
@@ -299,19 +301,30 @@ Singleton {
         readonly property real titleSize: 13
         readonly property real messageSize: 11
         readonly property color buttonBg: theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0, 0, 0, 0.06)
+        readonly property real pressedOpacity: 0.75
+        readonly property real verticalBias: 1 / 3       // centre of the alert sits at 1/3 of the height
     }
 
     // ---------- mission control ----------
     readonly property QtObject mission: QtObject {
         readonly property real dim: 0.35                 // backdrop darkening, TODO verify
         readonly property int spacesHeight: 64           // Spaces bar at the top, TODO verify
-        readonly property int spaceThumbWidth: 160       // TODO verify
-        readonly property int spaceRadius: 8
         readonly property int margin: 60                 // around the window grid, TODO verify
         readonly property int gap: 40                    // between window thumbnails, TODO verify
         readonly property int thumbRadius: 10            // TODO verify
         readonly property real maxScale: 0.8             // windows only shrink in Mission Control, TODO verify
-        readonly property real labelSize: 13
+        readonly property int pillHeight: 24             // Spaces bar pills, TODO verify
+        readonly property int pillPadding: 12
+        readonly property int pillSpacing: 12
+        readonly property int titleReserve: 28           // room under a thumbnail for its title chip
+        readonly property int placeholderIcon: 64
+        readonly property int hoverBorder: 3
+        readonly property real hoverScale: 1.03
+        readonly property color pillCurrent: Qt.rgba(1, 1, 1, 0.30)
+        readonly property color pillHover: Qt.rgba(1, 1, 1, 0.18)
+        readonly property color pillIdle: Qt.rgba(1, 1, 1, 0.10)
+        readonly property color text: "#FFFFFF"
+        readonly property real labelSize: 12
     }
 
     // ---------- animation ----------

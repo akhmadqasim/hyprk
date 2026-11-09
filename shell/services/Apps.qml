@@ -182,13 +182,16 @@ Singleton {
     }
     function openSettings() { runHyprkApp("org.hyprk.Settings"); }
 
+    function openTrash() { Quickshell.execDetached(["gio", "open", "trash:///"]); }
+    function openFolder(item) { Quickshell.execDetached(["xdg-open", Quickshell.env("HOME") + "/" + item.folder]); }
+
     // Dock right-click menu, macOS layout: windows, Options, Show in Finder, Open/Quit
     function dockMenu(item) {
         if (item.trash)
-            return [{ label: "Open", action: () => Quickshell.execDetached(["gio", "open", "trash:///"]) },
+            return [{ label: "Open", action: root.openTrash },
                     { sep: true }, { label: "Empty Trash", action: root.confirmEmptyTrash }];
         if (item.folder)
-            return [{ label: "Open “" + item.name + "”", action: () => Quickshell.execDetached(["xdg-open", Quickshell.env("HOME") + "/" + item.folder]) }];
+            return [{ label: "Open “" + item.name + "”", action: () => root.openFolder(item) }];
         const wins = item.windows || [];
         const out = wins.map(w => ({ label: w.title || item.name, action: () => root.focusWindow(w) }));
         if (out.length > 0) out.push({ sep: true });

@@ -181,8 +181,8 @@ ShellWindow {
                             // menu above the icon, like the macOS Dock
                             const p = icon.mapToItem(null, icon.width / 2, 0);
                             Panels.openContext(Apps.dockMenu(cell.modelData), p.x, dock.screen.height - dock.height + p.y - Theme.dock.tooltipGap, true);
-                        } else if (cell.modelData.trash) Quickshell.execDetached(["gio", "open", "trash:///"]);
-                        else if (cell.modelData.folder) Quickshell.execDetached(["xdg-open", Quickshell.env("HOME") + "/" + cell.modelData.folder]);
+                        } else if (cell.modelData.trash) Apps.openTrash();
+                        else if (cell.modelData.folder) Apps.openFolder(cell.modelData);
                         else Apps.activate(cell.modelData);
                     }
                 }

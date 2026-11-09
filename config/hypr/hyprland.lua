@@ -100,20 +100,25 @@ hl.animation({ leaf = "workspaces",  enabled = true, speed = 4,   bezier = "macO
 hl.animation({ leaf = "border",      enabled = false })
 
 ------------------------------------------------------- liquid glass ----
+-- shell layers that carry glass (namespaces hyprk-<name>), shared by the plugin and the blur rule
+-- (no menubar: the macOS 26+ menu bar is transparent; its menus live in hyprk-overlay)
+local glassLayers = { "dock", "overlay", "notifications", "spotlight", "switcher", "launchpad" }
 -- Own compositor plugin (plugin/, see plugin/README.md). When it loads, the shell
 -- sends its glass shapes as ext-background-effect regions (HYPRK_GLASS=plugin) and the
 -- plugin draws Liquid Glass behind them. Without it the shell's QML glass is used.
--- Opt-in (HYPRK_LIQUIDGLASS=1) for now: in the shell's nested test on 2026-11-10 03:25 the
--- plugin loaded but drew nothing (even with require_region = 0), which left the Dock bare.
+-- On by default; HYPRK_LIQUIDGLASS=0 forces the QML glass.
 local glassSo = hyprk .. "/plugin/build/libliquidglass.so"
 local h = io.open(glassSo, "r")
-if h and os.getenv("HYPRK_LIQUIDGLASS") == "1" then
+if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
     h:close()
     local ok, err = pcall(function()
         hl.plugin.load(glassSo)
         hl.config({ plugin = { liquidglass = {
-            namespaces = "hyprk-menubar,hyprk-dock,hyprk-overlay,hyprk-notifications,hyprk-spotlight,hyprk-switcher,hyprk-launchpad",
-            radii = "hyprk-menubar:0",
+            namespaces = "hyprk-" .. table.concat(glassLayers, ",hyprk-"),
+            -- macOS 27 Dock/CC look: light near-neutral frost (by eye vs reference/screens)
+            tint_light = 0xFFFFFF4D,
+            saturation = 1.15,
+            brightness_light = 1.08,
         } } })
     end)
     if ok then hl.env("HYPRK_GLASS", "plugin") else print("hyprk: liquidglass not loaded: " .. tostring(err)) end
@@ -128,15 +133,9 @@ end
 --   hyprk-spotlight hyprk-switcher hyprk-launchpad hyprk-wallpaper
 hl.layer_rule({
     name = "hyprk-glass-blur",
-    match = { namespace = "^hyprk-(dock|overlay|notifications|spotlight|switcher)$" },
+    match = { namespace = "^hyprk-(" .. table.concat(glassLayers, "|") .. ")$" },
     blur = true,
     ignore_alpha = 0.35,
-})
-hl.layer_rule({
-    name = "hyprk-menubar-blur",
-    match = { namespace = "^hyprk-menubar$" },
-    blur = true,
-    ignore_alpha = 0.01,
 })
 hl.layer_rule({
     -- the shell animates these itself

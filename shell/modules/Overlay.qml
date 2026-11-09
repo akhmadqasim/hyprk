@@ -33,9 +33,7 @@ ShellWindow {
     Item {
         anchors.fill: parent
         focus: true
-        Keys.onEscapePressed: Panels.open === "alert" ? alert.pressCancel() : Panels.close()
-        Keys.onReturnPressed: if (Panels.open === "alert") alert.pressDefault()
-        Keys.onEnterPressed: if (Panels.open === "alert") alert.pressDefault()
+        Keys.onEscapePressed: Panels.close()
     }
 
     // ---------- context menu (desktop, Dock) ----------
@@ -43,7 +41,7 @@ ShellWindow {
         id: context
         visible: Panels.open === "context"
         items: visible ? Panels.contextItems : []
-        x: Math.max(4, Math.min(ov.width - width - 4, Panels.contextAbove ? Panels.contextX - width / 2 : Panels.contextX))
+        x: Math.max(Theme.menu.screenMargin, Math.min(ov.width - width - Theme.menu.screenMargin, Panels.contextAbove ? Panels.contextX - width / 2 : Panels.contextX))
         y: Math.max(0, Panels.contextY - Theme.menuBar.height - (Panels.contextAbove ? height : 0))
         originX: x
         originY: y + Theme.menuBar.height
@@ -55,7 +53,7 @@ ShellWindow {
         visible: Panels.open === "alert"
         model: Panels.alert
         x: (ov.width - width) / 2
-        y: (ov.height - height) / 3
+        y: (ov.height - height) * Theme.alert.verticalBias
         originX: x
         originY: y + Theme.menuBar.height
     }

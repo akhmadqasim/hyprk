@@ -7,4 +7,4 @@ export XDG_DATA_DIRS="$HYPRK_ROOT/config:${XDG_DATA_DIRS:-/usr/local/share:/usr/
 export XCURSOR_PATH="$HYPRK_ROOT/themes/cursors/theme:${XCURSOR_PATH:-/usr/share/icons}"
 export XCURSOR_THEME=hyprk-cursors HYPRCURSOR_THEME=hyprk-cursors XCURSOR_SIZE=24 HYPRCURSOR_SIZE=24
 [ -f /mnt/code/hypr-dev/env.sh ] && source /mnt/code/hypr-dev/env.sh
-exec env -u HYPRLAND_INSTANCE_SIGNATURE Hyprland --config "$HYPRK_ROOT/config/hypr/hyprland.lua" "$@"
+exec env -u HYPRLAND_INSTANCE_SIGNATURE Hyprland --config "${HYPRK_CONFIG:-$HYPRK_ROOT/config/hypr/hyprland.lua}" "$@"

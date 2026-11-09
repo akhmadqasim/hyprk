@@ -25,7 +25,7 @@ ShellWindow {
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     readonly property var windows: shown ? Hyprland.toplevels.values.filter(t => t.workspace && t.workspace === Hyprland.focusedWorkspace) : []
-    readonly property var spaces: Hyprland.workspaces.values.filter(w => w.id > 0).sort((a, b) => a.id - b.id)
+    readonly property var spaces: !shown ? [] : Hyprland.workspaces.values.filter(w => w.id > 0).sort((a, b) => a.id - b.id)
 
     onShownChanged: if (shown) { Hyprland.refreshToplevels(); keys.forceActiveFocus(); }
 
@@ -45,7 +45,8 @@ ShellWindow {
     // backdrop: blurred wallpaper, dimmed
     Image {
         anchors.fill: parent
-        source: Wallpaper.blurred ? "file://" + Wallpaper.blurred : (Wallpaper.wallpaper ? "file://" + Wallpaper.wallpaper : "")
+        readonly property string path: Wallpaper.blurred || Wallpaper.wallpaper
+        source: path ? "file://" + path : ""
         asynchronous: true
     }
     Rectangle { anchors.fill: parent; color: Qt.rgba(0, 0, 0, Theme.mission.dim) }
@@ -54,32 +55,32 @@ ShellWindow {
     // Spaces bar
     Row {
         anchors.horizontalCenter: parent.horizontalCenter
-        y: (Theme.mission.spacesHeight - 24) / 2
-        spacing: 12
+        y: (Theme.mission.spacesHeight - Theme.mission.pillHeight) / 2
+        spacing: Theme.mission.pillSpacing
         Repeater {
             model: mc.spaces
             delegate: Rectangle {
                 id: sp
                 required property var modelData
                 readonly property bool current: modelData === Hyprland.focusedWorkspace
-                width: label.implicitWidth + 24
-                height: 24
-                radius: 12
-                color: current ? Qt.rgba(1, 1, 1, 0.30) : spm.containsMouse ? Qt.rgba(1, 1, 1, 0.18) : Qt.rgba(1, 1, 1, 0.10)
+                width: label.implicitWidth + Theme.mission.pillPadding * 2
+                height: Theme.mission.pillHeight
+                radius: height / 2
+                color: current ? Theme.mission.pillCurrent : spm.containsMouse ? Theme.mission.pillHover : Theme.mission.pillIdle
                 Text {
                     id: label
                     anchors.centerIn: parent
                     text: "Desktop " + sp.modelData.id
                     font.family: Theme.fontText
-                    font.pixelSize: Theme.mission.labelSize - 1
+                    font.pixelSize: Theme.mission.labelSize
                     font.weight: sp.current ? Font.DemiBold : Font.Normal
-                    color: "white"
+                    color: Theme.mission.text
                 }
                 MouseArea {
                     id: spm
                     anchors.fill: parent
                     hoverEnabled: true
-                    onClicked: Hyprland.dispatch(`hl.dsp.focus({ workspace = ${sp.modelData.id} })`)
+                    onClicked: sp.modelData.activate()
                 }
             }
         }
@@ -108,7 +109,7 @@ ShellWindow {
                 height: view.height
                 radius: Theme.mission.thumbRadius
                 color: "transparent"
-                scale: wma.containsMouse ? 1.03 : 1
+                scale: wma.containsMouse ? Theme.mission.hoverScale : 1
                 Behavior on scale { NumberAnimation { duration: Theme.anim.fast } }
                 ScreencopyView {
                     id: view
@@ -116,8 +117,10 @@ ShellWindow {
                     live: mc.shown
                     // fit the cell but never grow past Theme.mission.maxScale of the real window
                     readonly property real dpr: mc.screen ? mc.screen.devicePixelRatio : 1
-                    constraintSize: Qt.size(Math.min(cell.width, sourceSize.width / dpr * Theme.mission.maxScale || cell.width),
-                                            Math.min(cell.height - 28, sourceSize.height / dpr * Theme.mission.maxScale || cell.height - 28))
+                    readonly property real maxW: cell.width
+                    readonly property real maxH: cell.height - Theme.mission.titleReserve
+                    constraintSize: Qt.size(Math.min(maxW, sourceSize.width / dpr * Theme.mission.maxScale || maxW),
+                                            Math.min(maxH, sourceSize.height / dpr * Theme.mission.maxScale || maxH))
                 }
                 // fallback while no frame is available: app icon on a plain card
                 Rectangle {
@@ -126,7 +129,7 @@ ShellWindow {
                     color: Theme.glass.solid
                     IconImage {
                         anchors.centerIn: parent
-                        implicitSize: 64
+                        implicitSize: Theme.mission.placeholderIcon
                         source: Apps.iconUrl(Apps.appIdOf(cell.modelData), Apps.appIdOf(cell.modelData))
                     }
                 }
@@ -134,28 +137,30 @@ ShellWindow {
                     anchors.fill: parent
                     radius: parent.radius
                     color: "transparent"
-                    border.width: wma.containsMouse ? 3 : 0
+                    border.width: wma.containsMouse ? Theme.mission.hoverBorder : 0
                     border.color: Theme.color.accent
                 }
             }
-            // title pill under the hovered window, like macOS
+            // title under the hovered window, styled like the Dock tooltip
             Rectangle {
                 visible: wma.containsMouse
                 anchors.horizontalCenter: parent.horizontalCenter
-                y: thumb.y + thumb.height + 8
-                width: Math.min(cell.width, title.implicitWidth + 20)
-                height: 22
-                radius: 11
-                color: Qt.rgba(0, 0, 0, 0.45)
+                y: thumb.y + thumb.height + Theme.dock.tooltipGap
+                width: Math.min(cell.width, title.implicitWidth + Theme.dock.tooltipHPad * 2)
+                height: Theme.dock.tooltipHeight
+                radius: Theme.dock.tooltipRadius
+                color: Theme.color.tooltipBg
+                border.width: 1
+                border.color: Theme.glass.hairline
                 Text {
                     id: title
                     anchors.centerIn: parent
-                    width: Math.min(implicitWidth, cell.width - 20)
+                    width: Math.min(implicitWidth, cell.width - Theme.dock.tooltipHPad * 2)
                     elide: Text.ElideRight
                     text: cell.modelData.title
                     font.family: Theme.fontText
-                    font.pixelSize: Theme.mission.labelSize - 1
-                    color: "white"
+                    font.pixelSize: Theme.font.dockTooltip
+                    color: Theme.color.label
                 }
             }
             MouseArea {

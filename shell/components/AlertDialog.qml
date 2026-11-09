@@ -3,7 +3,7 @@ import Quickshell.Widgets
 import qs
 import qs.services
 
-// macOS-style alert: glass card (radius 26), app icon, bold title, message,
+// macOS-style alert: glass card (Theme.alert.radius), app icon, bold title, message,
 // capsule buttons. Model: { icon, title, message, buttons: [{ label, action, isDefault, isCancel }] }.
 // Enter runs the default button, Escape the cancel button.
 Item {
@@ -23,6 +23,13 @@ Item {
     }
     function pressDefault() { press(buttons.find(b => b.isDefault) || buttons[buttons.length - 1]); }
     function pressCancel() { press(buttons.find(b => b.isCancel) || null); }
+
+    // keyboard: Return/Enter = default button, Escape = cancel
+    focus: visible
+    onVisibleChanged: if (visible) forceActiveFocus()
+    Keys.onEscapePressed: pressCancel()
+    Keys.onReturnPressed: pressDefault()
+    Keys.onEnterPressed: pressDefault()
 
     Glass {
         anchors.fill: parent
@@ -66,7 +73,6 @@ Item {
             font.pixelSize: Theme.alert.messageSize
             color: Theme.color.label
         }
-        Item { width: 1; height: 2 }
         Row {
             width: parent.width
             spacing: Theme.alert.buttonGap
@@ -79,14 +85,14 @@ Item {
                     height: Theme.alert.buttonHeight
                     radius: height / 2
                     color: modelData.isDefault ? Theme.color.accent : Theme.alert.buttonBg
-                    opacity: bma.pressed ? 0.75 : 1
+                    opacity: bma.pressed ? Theme.alert.pressedOpacity : 1
                     Text {
                         anchors.centerIn: parent
                         text: btn.modelData.label
                         font.family: Theme.fontText
                         font.pixelSize: Theme.font.menu
                         font.weight: Font.Medium
-                        color: btn.modelData.isDefault ? "#FFFFFF" : Theme.color.label
+                        color: btn.modelData.isDefault ? Theme.color.textOnAccent : Theme.color.label
                     }
                     MouseArea { id: bma; anchors.fill: parent; onClicked: root.press(btn.modelData) }
                 }
