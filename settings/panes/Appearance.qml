@@ -102,7 +102,7 @@ Column {
                         anchors.bottom: parent.bottom
                         width: parent.width; height: 40
                         bottomLeftRadius: 14; bottomRightRadius: 14
-                        color: Theme.dark ? "#2C2C2E" : "#ECEAE7"
+                        color: Theme.previewStrip
                         MacText {
                             x: 16; anchors.verticalCenter: parent.verticalCenter
                             text: P.prettyFileName(preview.path)
@@ -183,13 +183,18 @@ Column {
             Rectangle { // ref: swatch of the current highlight colour before the pop-up
                 width: 16; height: 16; radius: 8
                 anchors.verticalCenter: parent ? parent.verticalCenter : undefined
-                gradient: Gradient {
+                readonly property var names: ["", "accent", "blue", "purple", "pink", "red", "orange", "yellow", "green", "graphite"]
+                readonly property string name: names[hl.currentIndex]
+                color: name === "accent" ? Theme.accent : name ? Theme.tile[name] : "transparent"
+                gradient: name ? null : auto   // Automatic: accent fading to pink, as in the reference
+                Gradient {
+                    id: auto
                     orientation: Gradient.Horizontal
                     GradientStop { position: 0; color: Qt.lighter(Theme.accent, 1.6) }
                     GradientStop { position: 1; color: "#E9A6C7" }
                 }
             }
-            MacPopup { model: ["Automatic", "Accent Color", "Blue", "Purple", "Pink", "Red", "Orange", "Yellow", "Green", "Graphite"] }
+            MacPopup { id: hl; model: ["Automatic", "Accent Color", "Blue", "Purple", "Pink", "Red", "Orange", "Yellow", "Green", "Graphite"] }
         }
     }
 

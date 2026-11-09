@@ -13,6 +13,8 @@ QtObject {
     // ---------- appearance (driven by AppState from state/appearance.json) ----------
     property bool dark: false
     property bool reduceTransparency: false
+    property bool compositorBlur: false        // set by AppState from Backend
+    readonly property bool translucent: compositorBlur && !reduceTransparency
     // "transparent" = multicolor/blue default (systemBlue)
     property color accentOverride: "transparent"
     readonly property color accent: accentOverride.a > 0 ? accentOverride : (dark ? "#0A84FF" : "#0071F5") // ref (light)
@@ -88,13 +90,11 @@ QtObject {
         readonly property int searchHeight: 28       // ref
         readonly property int searchRadius: 14       // ref capsule
         readonly property int accountAvatar: 40      // TODO verify
-        readonly property color fill: theme.reduceTransparency
-            ? (theme.dark ? "#2A2A2C" : "#EEECEA")                                        // ref (light)
-            : Backend.compositorBlur
-                // ref (238,236,234): a light warm fill, blur only softly shows through
-                ? (theme.dark ? Qt.rgba(0.165, 0.165, 0.173, 0.88) : Qt.rgba(0.933, 0.925, 0.918, 0.88))
-                // no compositor blur: flat colour
-                : (theme.dark ? "#2A2A2C" : "#EEECEA")
+        // ref (238,236,234). Over compositor blur it is 88 % opaque so the desktop only
+        // softly shows through; otherwise (no blur, Reduce transparency) it is flat.
+        readonly property color fill: theme.translucent
+            ? (theme.dark ? Qt.rgba(0.165, 0.165, 0.173, 0.88) : Qt.rgba(0.933, 0.925, 0.918, 0.88))
+            : (theme.dark ? "#2A2A2C" : "#EEECEA")
         readonly property color stroke: theme.dark ? Qt.rgba(1, 1, 1, 0.08) : Qt.rgba(0, 0, 0, 0.05)
         readonly property color selection: theme.accent
         readonly property color selectionText: "#FFFFFF"
@@ -143,6 +143,7 @@ QtObject {
     readonly property color switchOff: theme.dark ? Qt.rgba(1, 1, 1, 0.16) : Qt.rgba(0, 0, 0, 0.09)
     readonly property color knob: "#FFFFFF"
     readonly property color menuFill: theme.dark ? "#2C2C2E" : "#F6F6F6"            // popup menu, TODO verify
+    readonly property color previewStrip: theme.dark ? "#2C2C2E" : "#ECEAE7"        // Liquid Glass preview title, ref
     readonly property color shadow: Qt.rgba(0, 0, 0, theme.dark ? 0.55 : 0.28)
 
     // Pane icon tile colors (System Settings palette), TODO verify all

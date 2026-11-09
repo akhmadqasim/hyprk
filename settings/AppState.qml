@@ -55,6 +55,7 @@ QtObject {
     }
 
     Component.onCompleted: {
+        Theme.compositorBlur = Backend.compositorBlur;
         // The shell (or `qs ipc`) may change these files too; follow it.
         for (const key in _normalize) {
             const k = key;

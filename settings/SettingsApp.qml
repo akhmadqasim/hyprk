@@ -6,7 +6,9 @@ import "Panes.js" as Panes
 // Quickshell) give it a window and handle the window signals.
 Item {
     id: app
-    property bool windowActive: true
+    readonly property int accountHeight: Theme.sidebar.accountAvatar + 18
+    property bool windowActive: true     // hosts bind this; forced on for snapshots
+    onSnapshotPathChanged: if (snapshotPath !== "") windowActive = true
     property string currentId: "appearance"
     // Non-empty: render once, save a PNG here and quit (reference comparisons).
     property string snapshotPath: ""
@@ -75,7 +77,7 @@ Item {
         TrafficLights {
             x: Theme.lights.left
             y: (Theme.window.toolbarHeight - Theme.lights.size) / 2
-            active: app.windowActive || app.snapshotPath !== ""   // snapshots show the focused look
+            active: app.windowActive
             onCloseClicked: app.closeRequested()
             onMinimizeClicked: app.minimizeRequested()
             onZoomClicked: app.zoomRequested()
@@ -93,17 +95,20 @@ Item {
             clip: true
             boundsBehavior: Flickable.StopAtBounds
             model: app.visiblePanes
-            // keep the selected pane visible (deep links, back/forward)
-            // Scroll only when the row is (partly) out of view, so the list normally
-            // stays at the top like macOS.
+            // Keep the selected pane visible (deep links, back/forward). Rows have fixed
+            // heights, so the row's y is computed instead of waiting for delegates; the
+            // list only scrolls when the row is out of view and normally stays at the top.
             function reveal() {
-                const i = app.visiblePanes.findIndex(p => p.id === app.currentId);
-                const row = i >= 0 ? itemAtIndex(i) : null;
-                if (i >= 0 && (!row || row.y < contentY || row.y + row.height > contentY + height))
-                    positionViewAtIndex(i, ListView.Contain);
+                const panes = app.visiblePanes;
+                const i = panes.findIndex(p => p.id === app.currentId);
+                if (i < 0) return;
+                let y = search.text === "" ? app.accountHeight : 0;   // header
+                for (let k = 0; k <= i; k++)
+                    y += Theme.sidebar.rowHeight + (k > 0 && panes[k - 1].group !== panes[k].group ? Theme.sidebar.groupGap : 0);
+                const top = y - Theme.sidebar.rowHeight - originY;
+                if (top < contentY || y - originY > contentY + height) positionViewAtIndex(i, ListView.Contain);
             }
-            // after the first layout, when the delegates in view exist
-            Timer { interval: 100; running: true; onTriggered: list.reveal() }
+            Component.onCompleted: reveal()
             Connections { target: app; function onCurrentIdChanged() { list.reveal(); } }
             header: search.text === "" ? accountCard : null
             delegate: Item {
@@ -145,7 +150,7 @@ Item {
     Component {
         id: accountCard
         Item {
-            width: list.width; height: Theme.sidebar.accountAvatar + 18
+            width: list.width; height: app.accountHeight
             Rectangle {
                 id: avatar
                 x: 4; anchors.verticalCenter: parent.verticalCenter
