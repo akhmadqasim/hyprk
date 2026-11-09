@@ -34,11 +34,14 @@ custom_palette=$CUSTOMPAL
 standard_dialogs=default
 style=$STYLE
 [Fonts]
-fixed="Monospace,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
-general="System Font,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+fixed="SF Mono,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+general="SF Pro,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 [Interface]
 $SHEET
 EOT
   echo "wrote $CONF ($V, style $STYLE)"
 fi
-echo "Set QT_QPA_PLATFORMTHEME=qt6ct (and QT_STYLE_OVERRIDE unset) for Qt apps. Fonts: SF via 'System Font', fallback to the default sans (themes/gtk/FALLBACKS.md)."
+# SF fonts by family name: drop-in fontconfig snippet (same file the test rigs use), dir = themes/fonts/named
+FC=$BASE/fontconfig/conf.d; mkdir -p "$FC"
+sed "s|@FONTDIR@|$HERE/../fonts/named|; s|@CACHEDIR@|${XDG_CACHE_HOME:-$HOME/.cache}/hyprk-fontconfig|" "$HERE/../fontconfig/60-hyprk-sf.conf.in" > "$FC/60-hyprk-sf.conf"
+echo "Set QT_QPA_PLATFORMTHEME=qt6ct (and QT_STYLE_OVERRIDE unset) for Qt apps. Fonts: SF Pro / SF Mono via $FC/60-hyprk-sf.conf (fallback Inter, Cantarell; themes/gtk/FALLBACKS.md)."

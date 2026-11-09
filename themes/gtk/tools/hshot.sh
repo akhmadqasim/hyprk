@@ -25,7 +25,7 @@ cp "$C/gtk-3.0/settings.ini" "$C/gtk-4.0/settings.ini"
   echo "restore-session=false"; echo "show-line-numbers=true"; echo "highlight-current-line=true"
 } > "$C/glib-2.0/settings/keyfile"
 ln -s "$D" "$S/xdg/themes"
-export WAYLAND_DISPLAY=$HK_WL XDG_CONFIG_HOME=$C XDG_DATA_HOME=$S/data GSETTINGS_BACKEND=keyfile GTK_USE_PORTAL=0 \
+export WAYLAND_DISPLAY=$HK_WL XDG_CONFIG_HOME=$C XDG_DATA_HOME=$S/data GSETTINGS_BACKEND=keyfile GTK_USE_PORTAL=0 ADW_DISABLE_PORTAL=1 \
        FONTCONFIG_FILE=$HK_FONTCONF XDG_CURRENT_DESKTOP=Hyprland GDK_BACKEND=wayland NO_AT_BRIDGE=1 \
        XDG_DATA_DIRS="$S/xdg:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
 unset XDG_SESSION_TYPE DISPLAY

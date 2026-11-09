@@ -592,3 +592,4 @@ row.entry, row.spin { background-color: transparent; }
 row entry, row.entry text { background: none; box-shadow: none; }
 row.entry > box.header > .editable-area { padding: 0; }
 button listview, button list, button row, dropdown > button > box > stack > listview, dropdown > button > box > stack > row { background: none; }
+tabbar tabbox > separator { background: none; }

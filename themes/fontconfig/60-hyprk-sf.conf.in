@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+<!-- hyprk-managed: SF fonts for GTK, Qt and hyprlock. the font dir and cache dir below are filled in by themes/*/install.sh (the two @-placeholders).
+     Real family names: "SF Pro", "SF Pro Rounded", "SF Compact", "SF Mono", "New York". Fallback order when SF is missing:
+     Inter, then Cantarell, then whatever fontconfig picks. -->
+<fontconfig>
+  <dir>@FONTDIR@</dir>
+  <cachedir>@CACHEDIR@</cachedir>
+  <alias binding="same"><family>sans-serif</family><prefer><family>SF Pro</family><family>Inter</family><family>Cantarell</family></prefer></alias>
+  <alias binding="same"><family>monospace</family><prefer><family>SF Mono</family></prefer></alias>
+  <alias binding="same"><family>System Font</family><prefer><family>SF Pro</family></prefer></alias>
+</fontconfig>

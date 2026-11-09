@@ -40,34 +40,37 @@ def content():
 class App(Adw.Application):
     def __init__(self):
         super().__init__(application_id='dev.hyprk.Gallery', flags=Gio.ApplicationFlags.NON_UNIQUE)
+
     def do_activate(self):
-        for n in ('x','nope'):
-            a = Gio.SimpleAction.new(n, None); self.add_action(a)
+        for n in ('x', 'nope'):
+            self.add_action(Gio.SimpleAction.new(n, None))
         self.lookup_action('nope').set_enabled(False)
         win = Adw.ApplicationWindow(application=self, default_width=960, default_height=640)
-        tv = Adw.ToolbarView(); hb = Adw.HeaderBar(); hb.set_title_widget(Adw.WindowTitle(title='Documents', subtitle=''))
+        # split view: each pane has its own toolbar view; only the sidebar (start) header carries the traffic lights
+        sidebar_hb = Adw.HeaderBar(show_title=False, show_end_title_buttons=False)
+        stv = Adw.ToolbarView(); stv.add_top_bar(sidebar_hb); stv.set_content(sidebar()); stv.add_css_class('sidebar-pane')
+        hb = Adw.HeaderBar(show_start_title_buttons=False)
+        hb.set_title_widget(Adw.WindowTitle(title='Documents', subtitle=''))
         hb.pack_start(Gtk.Button(icon_name='go-previous-symbolic')); hb.pack_start(Gtk.Button(icon_name='go-next-symbolic'))
         menu = Gio.Menu(); menu.append('New Window', 'app.x'); menu.append('Preferences', 'app.x'); menu.append('Disabled item', 'app.nope')
         sec = Gio.Menu(); sec.append('Keyboard Shortcuts', 'app.x'); sec.append('About', 'app.x'); menu.append_section(None, sec)
         mb = Gtk.MenuButton(icon_name='open-menu-symbolic', menu_model=menu); hb.pack_end(mb)
         hb.pack_end(Gtk.ToggleButton(icon_name='system-search-symbolic')); hb.pack_end(Gtk.Button(label='Save', css_classes=['suggested-action']))
-        tv.add_top_bar(hb)
-        sp = Adw.OverlaySplitView(show_sidebar=True, sidebar_width_fraction=0.22, min_sidebar_width=210)
-        stv = Adw.ToolbarView(); stv.add_top_bar(Adw.HeaderBar(show_title=False)); stv.set_content(sidebar()); stv.add_css_class('sidebar-pane')
-        sp.set_sidebar(stv)
-        dd = None
+        ctv = Adw.ToolbarView(); ctv.add_top_bar(hb)
         if scene == 'tabs':
             tb = Adw.TabBar(); tview = Adw.TabView(); tb.set_view(tview)
             for n in ['config.ghostty', 'notes.txt', 'Untitled']:
                 tview.append(Gtk.Label(label=n)).set_title(n)
-            tv.add_top_bar(tb); sp.set_content(content())
-        elif scene == 'settings':
-            sp.set_content(settings_page()); stv.add_css_class('accent-sidebar')
-            se = Gtk.SearchEntry(placeholder_text='Search', margin_start=10, margin_end=10, margin_bottom=6); stv.add_top_bar(se)
+            ctv.add_top_bar(tb)
+        if scene == 'settings':
+            ctv.set_content(settings_page()); stv.add_css_class('accent-sidebar')
+            stv.add_top_bar(Gtk.SearchEntry(placeholder_text='Search', margin_start=10, margin_end=10, margin_bottom=6))
             lb = stv.get_content(); lb.select_row(lb.get_row_at_index(2))
         else:
-            sp.set_content(content())
-        tv.set_content(sp); win.set_content(tv); win.present()
+            ctv.set_content(content())
+        sp = Adw.OverlaySplitView(show_sidebar=True, sidebar_width_fraction=0.22, min_sidebar_width=210)
+        sp.set_sidebar(stv); sp.set_content(ctv)
+        win.set_content(sp); win.present()
         if scene == 'menu':
             GLib.timeout_add(1200, lambda: (mb.popup(), False)[1])
         elif scene == 'dialog':
@@ -82,6 +85,7 @@ class App(Adw.Application):
                     if isinstance(w, Gtk.DropDown): w.activate(); break
                 return False
             GLib.timeout_add(1200, d)
+
 
 def settings_page():
     page = Adw.PreferencesPage()
