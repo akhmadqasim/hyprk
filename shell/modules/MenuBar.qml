@@ -116,6 +116,12 @@ PanelWindow {
             }
             onClicked: Panels.toggle("cc")
         }
+        // Focus: shown only while Do Not Disturb is on, like macOS
+        StatusItem {
+            visible: Notifs.dnd
+            Symbol { anchors.centerIn: parent; name: "moon"; size: Theme.menuBar.statusIconSize - 1; color: bar.fg }
+            onClicked: Panels.toggle("cc")
+        }
         StatusItem {
             Symbol { anchors.centerIn: parent; name: "magnifyingglass"; size: Theme.menuBar.statusIconSize - 1; color: bar.fg }
             onClicked: Panels.toggle("spotlight")
