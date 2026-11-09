@@ -136,6 +136,8 @@ A screenshot with `full_damage = 1` was pixel-identical to the default (test 202
 
 `window_classes = "^(foot|hyprk-finder)$"` puts glass (no drop shadow, the window keeps its own) behind matching
 windows, radius = `decoration.rounding` unless `window_radius` is set. The window must be translucent. Give it a
-`no_blur` rule, otherwise Hyprland also blurs behind it on top of the glass.
+`no_blur` rule, otherwise Hyprland also blurs behind it on top of the glass. A window that sets an
+ext-background-effect region (e.g. a glass sidebar: Quickshell `BackgroundEffect.blurRegion`) gets glass only in
+that region, with the region's corner radius; Hyprland would blur that region too, so `no_blur` matters there.
 
 Fallbacks: see `FALLBACKS.md`.

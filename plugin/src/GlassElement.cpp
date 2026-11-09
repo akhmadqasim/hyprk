@@ -253,29 +253,41 @@ namespace lg {
     // ── unblurred backdrop copy (variable blur, edge bleed) ──────────────────
 
     namespace {
-        SP<Render::IFramebuffer> g_sharpFB;
+        std::map<MONITORID, SP<Render::IFramebuffer>> g_sharpFB; // per monitor: sizes may differ
 
-        // copies the framebuffer being rendered into g_sharpFB and builds its mip chain;
+        // mip footprint of the deepest level the shader reads (lod ~6): copy this much more
+        constexpr double SHARP_MARGIN = 128;
+
+        // copies the backdrop Hyprland blurs (the backdrop capture when a scope is open, else the
+        // framebuffer being rendered) into this monitor's copy and builds its mip chain;
         // returns its texture, or null when that is not possible
         SP<Render::ITexture> copySharp(Render::CRenderContext& ctx, const Vector2D& size, const CBox& region) {
-            const auto src = dynamicPointerCast<CGLFramebuffer>(ctx.m_data.currentFB);
-            if (!src)
+            const auto mon        = ctx.m_data.pMonitor.lock();
+            const auto& captures  = ctx.m_backdropCaptures;
+            const auto source     = !captures.empty() && captures.back().framebuffer ? captures.back().framebuffer : ctx.m_data.currentFB;
+            const auto src        = dynamicPointerCast<CGLFramebuffer>(source);
+            if (!mon || !src)
                 return nullptr;
-            if (!g_sharpFB)
-                g_sharpFB = g_pHyprRenderer->createFB("liquidglass-sharp");
-            if (g_sharpFB->m_size != size && !g_sharpFB->alloc(size.x, size.y))
+            auto& fb = g_sharpFB[mon->m_id];
+            if (!fb)
+                fb = g_pHyprRenderer->createFB("liquidglass-sharp");
+            // same format as the source: a blit between float and unorm buffers is invalid
+            if ((fb->m_size != size || fb->m_drmFormat != src->m_drmFormat || !fb->isAllocated()) && !fb->alloc(size.x, size.y, src->m_drmFormat))
                 return nullptr;
-            const auto dst = dynamicPointerCast<CGLFramebuffer>(g_sharpFB);
-            const auto tex = g_sharpFB->getTexture();
+            const auto dst = dynamicPointerCast<CGLFramebuffer>(fb);
+            const auto tex = fb->getTexture();
             if (!dst || !tex)
                 return nullptr;
             {
                 CFramebufferBindingGuard guard{g_pHyprRenderer->glBackend()};
                 g_pHyprOpenGL->bindFramebuffer(GL_READ_FRAMEBUFFER, src->getFBID());
                 g_pHyprOpenGL->bindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->getFBID());
-                // only what the shader reads; texel rows follow the same top-down box space as the uvs
-                const int x0 = region.x, y0 = region.y, x1 = region.x + region.w, y1 = region.y + region.h;
+                // what the shader reads plus the mip footprint; texel rows follow the top-down box space of the uvs
+                CBox r = region.copy().expand(SHARP_MARGIN).intersection(CBox{{}, size});
+                const int x0 = r.x, y0 = r.y, x1 = r.x + r.w, y1 = r.y + r.h;
                 glBlitFramebuffer(x0, y0, x1, y1, x0, y0, x1, y1, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+                if (glGetError() != GL_NO_ERROR)
+                    return nullptr;
             }
             g_pHyprOpenGL->setActiveTexture(GL_TEXTURE1);
             tex->bind();
@@ -287,7 +299,7 @@ namespace lg {
     }
 
     void releaseGlState() {
-        g_sharpFB.reset();
+        g_sharpFB.clear();
         for (auto& [k, l] : g_luma)
             releaseLuma(l);
         g_luma.clear();
@@ -333,7 +345,7 @@ namespace lg {
     }
 
     static double reachOf(const SParams& p, const SResolved& res) {
-        const double shift = std::max({std::abs(res.refractionAmount), std::abs(res.outerAmount), res.bleedAmount}) * p.refractionScale;
+        const double shift = std::max({std::abs(res.refractionAmount), std::abs(res.outerAmount), res.bleedAmount}) * std::abs(p.refractionScale);
         return shift + p.aberration + 8.0;
     }
 
