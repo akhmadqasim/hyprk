@@ -5,6 +5,7 @@ D=$(cd "$(dirname "$0")/.." && pwd); source $D/tools/hypr-env.sh
 OUT=$1; MODE=$2; SZ=${3:-1000x680}; shift 3
 S=$(mktemp -d /tmp/claude-1000/hk/run.XXXX); C=$S/cfg; mkdir -p $C/gtk-4.0 $C/gtk-3.0 $C/glib-2.0/settings $S/data
 cp $D/gtk-4.0/gtk.css $C/gtk-4.0/gtk.css
+[ -n "$CFG_OVERLAY" ] && cp -r $CFG_OVERLAY/. $C/
 printf '[Settings]\ngtk-decoration-layout=close,minimize,maximize:\n%s\n' "${EXTRA_SETTINGS}" > $C/gtk-3.0/settings.ini; cp $C/gtk-3.0/settings.ini $C/gtk-4.0/settings.ini
 [ -n "$GTK3_THEME" ] && { echo "gtk-theme-name=$GTK3_THEME"; [ $MODE = dark ] && echo gtk-application-prefer-dark-theme=1; } >> $C/gtk-3.0/settings.ini
 { echo "[org/gnome/desktop/wm/preferences]"; echo "button-layout='close,minimize,maximize:'"; echo "[org/gnome/desktop/interface]";
@@ -15,13 +16,15 @@ EOT
 export WAYLAND_DISPLAY=$HK_WL XDG_CONFIG_HOME=$C XDG_DATA_HOME=$S/data GSETTINGS_BACKEND=keyfile GTK_USE_PORTAL=0 FONTCONFIG_FILE=$S/fonts.conf XDG_CURRENT_DESKTOP=Hyprland GDK_BACKEND=wayland NO_AT_BRIDGE=1
 unset XDG_SESSION_TYPE DISPLAY
 mkdir -p $S/xdg; ln -s $D $S/xdg/themes; export XDG_DATA_DIRS="$S/xdg:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+MON=$(hyprctl monitors -j | python3 -c "import sys,json;print([m[\"name\"] for m in json.load(sys.stdin) if m[\"name\"].startswith(\"HEADLESS\")][0])"); hyprctl dispatch focusmonitor $MON >/dev/null 2>&1
 setsid timeout ${LIFE:-30} dbus-run-session -- "$@" > $S/app.log 2>&1 &
 APP=$!
 sleep ${WAIT:-6}
 W=${SZ%x*}; H=${SZ#*x}
 hyprctl dispatch togglefloating >/dev/null 2>&1; hyprctl dispatch resizeactive exact $W $H >/dev/null 2>&1; hyprctl dispatch centerwindow >/dev/null 2>&1; sleep 1.5
 ${ACTION:+eval "$ACTION"}
-grim -o "$(hyprctl monitors -j | python3 -c "import sys,json;print(json.load(sys.stdin)[0][\"name\"])")" "$OUT"
+[ -n "$DEBUG" ] && hyprctl clients | grep -E "class|monitor|at:|size:"
+grim -o "$MON" "$OUT"
 kill -- -$APP 2>/dev/null; sleep 1   # only our own process group (setsid), never pkill by name
 grep -i -E "theme parser|gtk-warning.*css" $S/app.log | sort | uniq -c | head
 rm -rf $S
