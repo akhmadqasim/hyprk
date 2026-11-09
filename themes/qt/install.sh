@@ -38,6 +38,7 @@ style=$STYLE
 fixed="SF Mono,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 general="SF Pro,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 [Interface]
+toolbutton_style=0
 $SHEET
 EOT
   echo "wrote $CONF ($V, style $STYLE)"

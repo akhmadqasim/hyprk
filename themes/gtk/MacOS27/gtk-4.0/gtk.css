@@ -296,27 +296,35 @@ button.card { border-radius: 14px; }
 .linked:not(.vertical) > button:last-child:not(:first-child) { border-top-left-radius: 0; border-bottom-left-radius: 0; }
 .linked:not(.vertical) > button:not(:first-child) { margin-left: 0; box-shadow: 0 0 0 1px @mac_ctl_ring, 0 1px 2px 0 @mac_ctl_shadow, inset 1px 0 0 0 @mac_sep; }
 
-/* toolbar buttons are glass capsules: taller, translucent look (no blur in GTK: opaque fallback) */
-headerbar box > button:not(.flat):not(.suggested-action):not(.destructive-action):not(.text-button):not(.model),
-headerbar box > menubutton:not(.flat):not(.suggested-action) > button:not(.flat),
-headerbar box > button.flat:not(.model), headerbar box > menubutton.flat > button {
-  min-height: 36px; min-width: 36px; padding: 0 10px; border-radius: 999px;
+/* macOS 26 toolbar. End box (view switcher, search, menu ...): ONE glass capsule, borderless glyph buttons inside with a hover /
+ * selected fill only. Start box (back/forward): its children are not reliably countable (the traffic lights are a child only
+ * when this header carries them), so each button is its own small glass pill there; a .linked pair becomes one capsule.
+ * (:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7) out-ranks the generic capsule button rules.) */
+headerbar > windowhandle > box > box.end, headerbar > windowhandle > box > widget > box.end {
+  background-color: @mac_glass_bg; border-radius: 999px; border-spacing: 0; padding: 0 2px;
+  box-shadow: 0 0 0 1px @mac_glass_ring, 0 3px 12px 0 @mac_glass_shadow;
+}
+headerbar box.end > button:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar box.end > menubutton > button:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar box.end > .linked > button:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7) {
+  min-height: 32px; min-width: 32px; margin: 2px 0; padding: 0 9px; border-radius: 999px;
+  background: none; box-shadow: none; color: @mac_fg;
+}
+headerbar box.end > .linked { border-spacing: 0; }
+headerbar box.end > button:hover:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar box.end > menubutton > button:hover:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar box.end > .linked > button:hover:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7) { background-color: @mac_fill; }
+headerbar box.end > button:checked:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar box.end > menubutton > button:checked:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar box.end > .linked > button:checked:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7),
+headerbar box.end > button:active:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7) { background-color: @mac_fill_hover; }
+headerbar box.end > button.suggested-action:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar box.end > button.destructive-action:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7) { padding: 0 16px; margin: 2px 0; }
+headerbar box.end > button.suggested-action:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7) { background-color: @mac_accent_bg; color: @mac_accent_fg; }
+headerbar box.end > button.destructive-action:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7) { background-color: @mac_destructive; color: white; }
+headerbar box.start > button:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar box.start > menubutton > button:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar box.start > widget > button:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7) {
+  min-height: 34px; min-width: 34px; padding: 0 9px; border-radius: 999px; margin: 1px 0;
   background-color: @mac_glass_bg; background-image: none; color: @mac_fg;
   box-shadow: 0 0 0 1px @mac_glass_ring, 0 3px 12px 0 @mac_glass_shadow;
 }
-headerbar box > button.flat:not(.model):hover, headerbar box > menubutton.flat > button:hover,
-headerbar box > button:not(.flat):not(.suggested-action):not(.destructive-action):not(.text-button):not(.model):hover,
-headerbar box > menubutton:not(.flat):not(.suggested-action) > button:not(.flat):hover { background-color: color-mix(in srgb, @mac_glass_bg 70%, @mac_fill_hover); }
-headerbar box > button.flat:not(.model):active, headerbar box > button.flat:not(.model):checked, headerbar box > menubutton.flat > button:checked,
-headerbar box > button:not(.flat):not(.suggested-action):not(.destructive-action):not(.text-button):not(.model):active,
-headerbar box > button:not(.flat):not(.suggested-action):not(.destructive-action):not(.text-button):not(.model):checked { background-color: color-mix(in srgb, @mac_glass_bg 60%, @mac_fill_active); }
-headerbar box > button.text-button:not(.suggested-action):not(.destructive-action) { padding: 0 16px; }
-headerbar box > button.suggested-action, headerbar box > button.destructive-action { min-height: 36px; border-radius: 999px; padding: 0 18px; }
-headerbar .linked > button:not(:first-child):not(:last-child) { border-radius: 0; }
-headerbar .linked > button { min-width: 30px; }
-headerbar .linked > button:first-child:not(:last-child) { padding-right: 8px; }
-headerbar .linked > button:last-child:not(:first-child) { padding-left: 8px; }
-headerbar .linked > button:not(:first-child) { box-shadow: 0 0 0 1px @mac_glass_ring, 0 3px 12px 0 @mac_glass_shadow, inset 1px 0 0 0 alpha(@mac_fg, 0.08); }
+headerbar box.start > button:hover:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar box.start > menubutton > button:hover:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar box.start > widget > button:hover:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7) { background-color: color-mix(in srgb, @mac_glass_bg 70%, @mac_fill_hover); }
+headerbar box.start > button.suggested-action:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar box.start > button.destructive-action:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7) { padding: 0 16px; }
+headerbar .linked > button:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(:first-child):not(:last-child) { border-radius: 0; }
+headerbar .linked > button:first-child:not(:last-child):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7) { border-radius: 999px 0 0 999px; }
+headerbar .linked > button:last-child:not(:first-child):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7) { border-radius: 0 999px 999px 0; }
 headerbar searchentry, headerbar entry.search { min-height: 36px; border-radius: 999px; }
 
 /* ---------------------------------------------------------------------------------------------
