@@ -16,7 +16,7 @@ HYPRK_ROOT=${HYPRK_ROOT:-$(cd "$HYPRK_DIST/.." && pwd)}
 HYPRK_DEV=${HYPRK_DEV:-/mnt/code/hypr-dev}
 
 # entries that must NOT leak from the real dirs into the hyprk dirs (we write our own theme there)
-_HYPRK_CFG_SKIP=" gtk-3.0 gtk-4.0 glib-2.0 qt6ct Kvantum fontconfig dconf ghostty "
+_HYPRK_CFG_SKIP=" gtk-3.0 gtk-4.0 glib-2.0 qt6ct Kvantum fontconfig dconf ghostty foot "
 _HYPRK_DATA_SKIP=" themes gtksourceview-5 fonts hyprk-try hyprk-session "
 
 _hyprk_farm() { # _hyprk_farm SRC DST SKIPLIST  (symlink every entry of SRC into DST, never overwrite)
@@ -100,8 +100,19 @@ hyprk_env_setup() {
         echo "window-theme = auto"      # dark terminal -> dark title bar, like macOS Terminal
         echo "window-decoration = server"   # asks for SSD; the liquidglass plugin draws the macOS title bar
         echo "gtk-titlebar = true"
+        echo "window-padding-x = 10"       # macOS Terminal-like inset (text was ~2px from the edge)
+        echo "window-padding-y = 6"
+        echo "window-padding-balance = true"
         echo "gtk-single-instance = false"   # else a Ghostty already running on the host would take the new window
     } > "$cfg/ghostty/config"
+
+    # --- foot: same padding as Ghostty (farm mode keeps the user's own foot.ini via include) ---
+    mkdir -p "$cfg/foot"
+    {
+        [ "$mode" = farm ] && [ -f "$real_cfg/foot/foot.ini" ] && echo "include=$real_cfg/foot/foot.ini"
+        echo "[main]"
+        echo "pad=10x6 center"
+    } > "$cfg/foot/foot.ini"
 
     # --- fonts: system fontconfig + SF fonts + your own ~/.local/share/fonts, private cache ---
     mkdir -p "$cfg/fontconfig" "$dir/cache/fontconfig"
