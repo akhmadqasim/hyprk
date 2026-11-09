@@ -3,8 +3,9 @@
 (same names, real image/PDF/text content) for comparable screenshots.
 
 Usage: scripts/make-demo.py <out-dir>   then   HOME=<out-dir> run.sh <out-dir>/Documents
-Needs Pillow. Images come from /usr/share/backgrounds; PDFs are drawn posters."""
-import glob, os, random, sys, zipfile
+Needs Pillow. Images come from themes/wallpapers/png and /usr/share/backgrounds; PDFs are drawn posters."""
+import glob, os, random, sys, warnings, zipfile
+warnings.simplefilter("ignore")   # Pillow palette-transparency notices
 from PIL import Image, ImageDraw, ImageFont
 
 out = os.path.abspath(sys.argv[1])
@@ -13,10 +14,21 @@ for d in ("Desktop", "Downloads", "Pictures", "Documents/Documents", "Documents/
     os.makedirs(os.path.join(out, d), exist_ok=True)
 
 rng = random.Random(27)
-walls = sorted(p for p in glob.glob("/usr/share/backgrounds/**/*", recursive=True)
+here = os.path.dirname(os.path.abspath(__file__))
+sources = [os.path.join(here, "../../themes/wallpapers/png/*"), "/usr/share/backgrounds/**/*"]
+walls = sorted(p for pattern in sources for p in glob.glob(pattern, recursive=True)
                if p.lower().endswith((".jpg", ".jpeg", ".png")))
 if not walls:
-    sys.exit("no images in /usr/share/backgrounds")
+    sys.exit("no images in themes/wallpapers/png or /usr/share/backgrounds")
+
+def brightness(path):
+    im = Image.open(path).convert("L")
+    im.thumbnail((64, 64))
+    return sum(im.getdata()) / (im.width * im.height)
+
+# The reference photos are bright; many wallpapers are dark variants. Use the brightest ones
+# so thumbnails are judged on rendering, not on dark source pictures.
+walls = sorted(walls, key=brightness, reverse=True)[:8]
 
 def font(size):
     for f in ("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
