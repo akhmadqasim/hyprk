@@ -18,7 +18,8 @@
 
 namespace {
 
-constexpr int kCacheSide = 512;   // generated thumbnails are stored at this size
+constexpr int kCacheSide = 512;
+constexpr qreal kCornerRatio = 0.06;   // corner radius / long side; FileIcon.qml draws its frame to match   // generated thumbnails are stored at this size
 
 QString cacheRoot() { return QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation); }
 
@@ -89,7 +90,7 @@ QImage generate(const QString &path, const QString &mime, bool *cacheIt)
     return {};
 }
 
-// Finder thumbnails have softly rounded corners (about 6% of the long side).
+// Finder thumbnails have softly rounded corners.
 QImage rounded(const QImage &src)
 {
     QImage out(src.size(), QImage::Format_ARGB32_Premultiplied);
@@ -97,7 +98,7 @@ QImage rounded(const QImage &src)
     QPainter p(&out);
     p.setRenderHint(QPainter::Antialiasing);
     QPainterPath path;
-    const qreal r = std::max(src.width(), src.height()) * 0.06;
+    const qreal r = std::max(src.width(), src.height()) * kCornerRatio;
     path.addRoundedRect(QRectF(src.rect()), r, r);
     p.setClipPath(path);
     p.drawImage(0, 0, src);

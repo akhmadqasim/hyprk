@@ -101,9 +101,8 @@ int main(int argc, char *argv[])
         {QStringLiteral("dark"), cli.isSet(darkOpt)},
         // Set by the hyprk session when Hyprland blurs behind this window.
         {QStringLiteral("blur"), qgetenv("HYPRK_BLUR") == "1"},
-        // macOS document/folder icons extracted into themes/icons/system ("" when absent)
-        {QStringLiteral("iconDir"), QDir(QStringLiteral(FINDER_ICON_DIR)).exists(QStringLiteral("GenericDocumentIcon-512.png"))
-                                        ? QStringLiteral(FINDER_ICON_DIR) : QString()},
+        // macOS document/folder icons extracted into themes/icons/system
+        {QStringLiteral("hasSysIcons"), QDir(QStringLiteral(FINDER_ICON_DIR)).exists(QStringLiteral("GenericDocumentIcon-512.png"))},
     });
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreationFailed, &app,
                      [] { QCoreApplication::exit(1); }, Qt::QueuedConnection);

@@ -36,22 +36,25 @@ Item {
         width: thumb.paintedWidth
         height: thumb.paintedHeight
 
+        // matches the corner rounding baked in by thumbnails.cpp (kCornerRatio)
+        readonly property real radius: Math.max(width, height) * 0.06
         // soft shadow: two offset rounded layers (no blur effects, they need a GPU layer)
-        Repeater {
-            model: [{ grow: 2, alpha: 0.05 }, { grow: 1, alpha: 0.08 }]
-            Rectangle {
-                required property var modelData
-                x: -modelData.grow
-                y: -modelData.grow + 1
-                width: thumbBox.width + 2 * modelData.grow
-                height: thumbBox.height + 2 * modelData.grow
-                radius: Math.max(thumbBox.width, thumbBox.height) * 0.06 + modelData.grow
-                color: Qt.rgba(0, 0, 0, modelData.alpha)
-            }
+        Rectangle {
+            x: -2; y: -1
+            width: parent.width + 4; height: parent.height + 4
+            radius: parent.radius + 2
+            color: Qt.rgba(0, 0, 0, 0.05)
+        }
+        Rectangle {
+            x: -1; y: 0
+            width: parent.width + 2; height: parent.height + 2
+            radius: parent.radius + 1
+            color: Qt.rgba(0, 0, 0, 0.08)
         }
         Image {
             id: thumb
-            // thumbnails stay inside the art area of the macOS icons (ref: 68 px in a 77 px icon)
+            // Theme.grid.iconSize includes the macOS PNGs' padding; thumbnails fill only the art
+            // area inside it (ref: 68 px in a 77 px icon)
             width: root.size * 0.88
             height: root.size * 0.88
             x: (thumbBox.width - width) / 2
@@ -65,7 +68,7 @@ Item {
         Rectangle {   // hairline frame
             anchors.fill: parent
             color: "transparent"
-            radius: Math.max(width, height) * 0.06
+            radius: thumbBox.radius
             border.width: 0.5
             border.color: Qt.rgba(0, 0, 0, 0.10)
         }
@@ -85,8 +88,9 @@ Item {
         id: plain
         visible: !thumbBox.visible && !appIcon.visible
         anchors.fill: parent
+        asynchronous: true
         sourceSize: Qt.size(root.px, root.px)
-        source: Theme.sysIcon(root.sysName, root.px)
+        source: Theme.sysIcon(root.sysName, root.px, root.kind === "folder")
              || (root.kind === "folder"
                  ? Icons.folder(Theme.color.folderBack.toString(), Theme.color.folderFront.toString(), Theme.color.folderTop.toString())
                  : Icons.document(Theme.dark))

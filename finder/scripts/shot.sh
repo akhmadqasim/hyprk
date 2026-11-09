@@ -8,8 +8,7 @@ out="$here/../reference/ours"
 demo="$(mktemp -d)"
 trap 'rm -rf "$demo"' EXIT
 python3 -I "$here/scripts/make-demo.py" "$demo" >/dev/null 2>&1
-[[ -f "$here/build/build.ninja" ]] || cmake -S "$here" -B "$here/build" -G Ninja >/dev/null
-cmake --build "$here/build" >/dev/null
+"$here/run.sh" --build-only
 views=("$@")
 [[ ${#views[@]} -gt 0 ]] || views=(icons list columns gallery)
 for v in "${views[@]}"; do

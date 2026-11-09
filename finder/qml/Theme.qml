@@ -17,9 +17,9 @@ QtObject {
     property bool blur: false
 
     // ---------- macOS file icons (themes/icons/system), "" = use the drawn fallbacks ----------
-    property string iconDir: ""
-    function sysIcon(name, px) {
-        return iconDir ? "image://sysicon/" + name + "@" + px : "";   // SysIconProvider re-tints folders
+    property bool hasSysIcons: false
+    function sysIcon(name, px, tint) {
+        return hasSysIcons ? "image://sysicon/" + (tint ? "tint/" : "") + name + "@" + px : "";
     }
     // folders that get their own icon, by absolute path
     readonly property var folderIcons: {
@@ -103,6 +103,7 @@ QtObject {
         readonly property color lightInactive: theme.dark ? "#4A4A4C" : "#D6D6D6"
 
         // folder icon (macOS blue folder)
+        // drawn-fallback folder; SysIconProvider tints the PNG folders to the same ref colours
         readonly property color folderBack: "#5FA9DA"    // ref (95,169,218)
         readonly property color folderFront: "#71B9E4"   // ref (113,185,228)
         readonly property color folderTop: "#81C6EE"     // ref (129,198,238)

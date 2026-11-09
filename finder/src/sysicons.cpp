@@ -2,27 +2,9 @@
 
 #include <algorithm>
 
-SysIconProvider::SysIconProvider(QString dir)
-    : QQuickImageProvider(QQuickImageProvider::Image), m_dir(std::move(dir))
-{
-}
+namespace {
 
-QImage SysIconProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
-{
-    const qsizetype at = id.lastIndexOf(QLatin1Char('@'));
-    const QString name = id.left(at);
-    const int px = at < 0 ? 128 : id.mid(at + 1).toInt();
-    QImage img(QStringLiteral("%1/%2-%3.png").arg(m_dir, name).arg(px > 128 ? 512 : 128));
-    if (!img.isNull() && name.contains(QLatin1String("Folder")))
-        tintFolder(img);
-    if (!img.isNull() && requestedSize.isValid())
-        img = img.scaled(requestedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    if (size)
-        *size = img.size();
-    return img;
-}
-
-void SysIconProvider::tintFolder(QImage &img)
+void tintFolder(QImage &img)
 {
     img = img.convertToFormat(QImage::Format_ARGB32);
     // per-channel gain, top -> bottom, measured as ref colour / PNG colour (122,211,251)
@@ -44,4 +26,38 @@ void SysIconProvider::tintFolder(QImage &img)
                             std::min(255, int(qBlue(p) * gain[2])), qAlpha(p));
         }
     }
+}
+
+} // namespace
+
+SysIconProvider::SysIconProvider(QString dir)
+    : QQuickImageProvider(QQuickImageProvider::Image, QQmlImageProviderBase::ForceAsynchronousImageLoading),
+      m_dir(std::move(dir))
+{
+}
+
+QImage SysIconProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
+{
+    const QString key = id + QLatin1Char('#') + QString::number(requestedSize.width());
+    QImage img;
+    {
+        QMutexLocker lock(&m_lock);
+        img = m_cache.value(key);
+    }
+    if (img.isNull()) {
+        const bool tint = id.startsWith(QLatin1String("tint/"));
+        const QString spec = tint ? id.mid(5) : id;
+        const qsizetype at = spec.lastIndexOf(QLatin1Char('@'));
+        const int px = at < 0 ? 128 : spec.mid(at + 1).toInt();
+        img = QImage(QStringLiteral("%1/%2-%3.png").arg(m_dir, spec.left(at)).arg(px > 128 ? 512 : 128));
+        if (!img.isNull() && requestedSize.isValid())   // scale first so the tint loop runs on fewer pixels
+            img = img.scaled(requestedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        if (!img.isNull() && tint)
+            tintFolder(img);
+        QMutexLocker lock(&m_lock);
+        m_cache.insert(key, img);
+    }
+    if (size)
+        *size = img.size();
+    return img;
 }

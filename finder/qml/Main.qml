@@ -33,7 +33,7 @@ Window {
     Component.onCompleted: {
         Theme.dark = startup.dark;
         Theme.blur = startup.blur;
-        Theme.iconDir = startup.iconDir;
+        Theme.hasSysIcons = startup.hasSysIcons;
         Qt.callLater(applyStartup);
         keys.forceActiveFocus();
     }
