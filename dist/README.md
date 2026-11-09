@@ -18,7 +18,7 @@ Buka terminal di GNOME, lalu:
 - Keluar: `Ctrl+Alt+Q`, atau menu Apple > Log Out, atau `Ctrl+C` di terminal tadi.
   Script otomatis mematikan semua proses miliknya sendiri (termasuk sisa proses Hyprland).
 - Nested memakai D-Bus milik GNOME, tapi pengaturan GTK dibaca dari file keyfile pribadi (bukan dconf/portal GNOME). Jadi tema dan tombol kiri hanya berlaku di dalam jendela.
-- Semua pengaturan tema, font, kursor, dan config ada di `~/.local/share/hyprk-try`.
+- Semua pengaturan tema, font, kursor, dan config ada di `~/.local/share/hyprk-try`. Script hanya menulis file asli di folder itu, tidak pernah lewat symlink ke `~/.config` atau `~/.local/share` kamu. App tetap melihat daftar app dan icon kamu (hanya baca).
   Ingin mulai bersih? Hapus folder itu. `~/.config` dan setting GNOME kamu tidak disentuh.
 
 ### Tombol (di jendela nested)

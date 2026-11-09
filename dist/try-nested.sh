@@ -36,7 +36,7 @@ HOST_WAYLAND=$WAYLAND_DISPLAY
 
 # shellcheck disable=SC1091
 . "$HERE/lib/env.sh"
-hyprk_env_setup "${HYPRK_TRY_HOME:-$HOME/.local/share/hyprk-try}" "$MODE" "$THEME"
+hyprk_env_setup "${HYPRK_TRY_HOME:-$HOME/.local/share/hyprk-try}" "$MODE" "$THEME" || exit 1
 command -v Hyprland >/dev/null || { echo "try-nested: Hyprland not found in $HYPRK_DEV/prefix" >&2; exit 2; }
 [ -n "$HYPRK_QT_NOTE" ] && echo "try-nested: note: $HYPRK_QT_NOTE"
 

@@ -30,6 +30,34 @@ _hyprk_farm() { # _hyprk_farm SRC DST SKIPLIST  (symlink every entry of SRC into
     done
 }
 
+# --- write safety: everything hyprk writes goes to REAL files inside DIR, never through a symlink into your real dirs ---
+_hyprk_own_dir() {   # _hyprk_own_dir PATH...: PATH becomes a real directory (a stale symlink is removed, its target untouched)
+    local d
+    for d in "$@"; do [ -L "$d" ] && rm -f "$d"; mkdir -p "$d"; done
+}
+_hyprk_write() {     # _hyprk_write FILE < content: temp file next to FILE + mv, so a symlink at FILE is replaced, not followed
+    local f=$1 t
+    [ -L "$f" ] && rm -f "$f"
+    t=$(mktemp "$f.XXXXXX") || return 1
+    if cat > "$t" && chmod 644 "$t" && mv -f "$t" "$f"; then return 0; fi
+    rm -f "$t"; return 1
+}
+_hyprk_sweep() {     # _hyprk_sweep DIR...: delete symlinks (the links only) at and below the dirs hyprk writes to
+    local d
+    for d in "$@"; do [ -L "$d" ] && rm -f "$d"; [ -d "$d" ] && find "$d" -type l -delete; done
+    return 0
+}
+_hyprk_verify() {    # _hyprk_verify HOME DIR...: no symlink below the dirs, and every dir really lives inside HOME
+    local home d real
+    home=$(realpath "$1"); shift
+    for d in "$@"; do
+        [ -e "$d" ] || continue
+        real=$(realpath "$d")
+        case $real in "$home"/*) ;; *) echo "hyprk: refusing to continue, $d resolves to $real (outside $home)" >&2; return 1 ;; esac
+        if [ -n "$(find "$d" -type l -print -quit)" ]; then echo "hyprk: refusing to continue, symlink inside $d" >&2; return 1; fi
+    done
+}
+
 hyprk_env_setup() {
     local dir=$1 mode=${2:-private} theme=${3:-light}
     local real_cfg=${XDG_CONFIG_HOME:-$HOME/.config} real_data=${XDG_DATA_HOME:-$HOME/.local/share}
@@ -45,25 +73,29 @@ hyprk_env_setup() {
     local cfg=$dir/config data=$dir/data
     export XDG_CONFIG_HOME=$cfg XDG_DATA_HOME=$data XDG_STATE_HOME=$dir/state
 
-    # --- what the apps may still see of the real dirs (read-only symlinks) ---
-    mkdir -p "$data"
+    # dirs hyprk writes into (installers and generated files); they must be real dirs inside $dir
+    local owned=("$cfg/gtk-3.0" "$cfg/gtk-4.0" "$cfg/glib-2.0" "$cfg/qt6ct" "$cfg/Kvantum" "$cfg/fontconfig" "$cfg/ghostty" "$cfg/foot"
+                 "$data/themes" "$data/gtksourceview-5")
+    _hyprk_sweep "${owned[@]}"          # old --share-config runs may have left links here
+    _hyprk_own_dir "${owned[@]}"
     local n
     if [ "$mode" = farm ]; then
+        # login session: apps keep their settings. Symlinks are made only for entries hyprk does not own.
         _hyprk_farm "$real_cfg" "$cfg" "$_HYPRK_CFG_SKIP"
         _hyprk_farm "$real_data" "$data" "$_HYPRK_DATA_SKIP"
     else
-        # drop links left by an earlier --share-config run, then link only what is needed to launch apps
+        # nested try: NO symlinks into your real dirs. Remove links left by an earlier --share-config run,
+        # and let apps READ your real data dir (applications, icons, flatpak exports) through XDG_DATA_DIRS instead.
         find "$cfg" "$data" -maxdepth 1 -type l -delete
-        for n in applications icons flatpak; do
-            [ -e "$real_data/$n" ] && [ ! -e "$data/$n" ] && [ ! -L "$data/$n" ] && ln -s "$real_data/$n" "$data/$n"
-        done
+        export XDG_DATA_DIRS="$XDG_DATA_DIRS:$real_data"
+        [ -d "$real_data/flatpak/exports/share" ] && XDG_DATA_DIRS="$XDG_DATA_DIRS:$real_data/flatpak/exports/share"
+        [ -d "$real_data/flatpak" ] && export FLATPAK_USER_DIR=$real_data/flatpak   # flatpak apps still find their install
     fi
     # a real ~/.local/share/icons would hide nothing: hyprk cursors come through XCURSOR_PATH (start.sh)
 
     # --- GTK 3/4: theme dirs + gtk.css into the private dirs (install.sh honours XDG_*_HOME) ---
     local gtkname=MacOS27 dark=false
     [ "$theme" = dark ] && { gtkname=MacOS27-Dark; dark=true; }
-    mkdir -p "$cfg/gtk-3.0" "$cfg/gtk-4.0"
     sh "$HYPRK_ROOT/themes/gtk/install.sh" --keyfile $([ "$theme" = dark ] && echo --dark) >/dev/null
     # GTK on Wayland reads button-layout / colour scheme from GSettings first; the private session has no dconf,
     # so use a keyfile (traffic lights on the left, theme, fonts) and keep libadwaita off the host portal
@@ -74,7 +106,7 @@ hyprk_env_setup() {
           echo "gtk-theme-name=$gtkname"
           echo "gtk-cursor-theme-name=hyprk-cursors"
           echo "gtk-application-prefer-dark-theme=$dark"
-        } | sed '1i [Settings]' > "$cfg/$n/settings.ini"
+        } | sed '1i [Settings]' | _hyprk_write "$cfg/$n/settings.ini"
     done
     export GTK_THEME=$gtkname
 
@@ -93,7 +125,6 @@ hyprk_env_setup() {
     export QT_QPA_PLATFORM=wayland
 
     # --- Ghostty: server-side decoration, so the plugin draws the traffic lights on the left ---
-    mkdir -p "$cfg/ghostty"
     {
         # farm mode: keep the user's own Ghostty settings, then override the window theme below
         [ "$mode" = farm ] && [ -f "$real_cfg/ghostty/config" ] && echo "config-file = ?$real_cfg/ghostty/config"
@@ -104,19 +135,18 @@ hyprk_env_setup() {
         echo "window-padding-y = 6"
         echo "window-padding-balance = true"
         echo "gtk-single-instance = false"   # else a Ghostty already running on the host would take the new window
-    } > "$cfg/ghostty/config"
+    } | _hyprk_write "$cfg/ghostty/config"
 
     # --- foot: same padding as Ghostty (farm mode keeps the user's own foot.ini via include) ---
-    mkdir -p "$cfg/foot"
     {
         [ "$mode" = farm ] && [ -f "$real_cfg/foot/foot.ini" ] && echo "include=$real_cfg/foot/foot.ini"
         echo "[main]"
         echo "pad=10x6 center"
-    } > "$cfg/foot/foot.ini"
+    } | _hyprk_write "$cfg/foot/foot.ini"
 
     # --- fonts: system fontconfig + SF fonts + your own ~/.local/share/fonts, private cache ---
-    mkdir -p "$cfg/fontconfig" "$dir/cache/fontconfig"
-    cat > "$cfg/fontconfig/fonts.conf" <<FC
+    mkdir -p "$dir/cache/fontconfig"
+    _hyprk_write "$cfg/fontconfig/fonts.conf" <<FC
 <?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
 <!-- generated by hyprk dist: nothing is installed system-wide -->
@@ -141,6 +171,9 @@ FC
     # --- cursors (same values as config/hypr/start.sh, which also exports them for Hyprland itself) ---
     export XCURSOR_PATH="$HYPRK_ROOT/themes/cursors/theme:${XCURSOR_PATH:-/usr/share/icons}"
     export XCURSOR_THEME=hyprk-cursors HYPRCURSOR_THEME=hyprk-cursors XCURSOR_SIZE=24 HYPRCURSOR_SIZE=24
+
+    # last check: nothing hyprk wrote can lead into your real dirs
+    _hyprk_verify "$dir" "${owned[@]}" "$dir/state" "$dir/cache" || return 1
 
     export HYPRK_ROOT HYPRK_DEV
     export HYPRK_CONFIG=$HYPRK_DIST/hyprk-dist.lua     # config/hypr/hyprland.lua + monitor override
