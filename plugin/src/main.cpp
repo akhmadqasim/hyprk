@@ -129,6 +129,8 @@ static void addWindowDecorations(PHLWINDOW window) {
 
 static void forEachTitlebar(const std::function<void(lg::CTitlebar&)>& fn) {
     std::erase_if(g_titlebars, [](const auto& t) { return t.expired(); });
+    std::erase_if(g_probes, [](const auto& t) { return t.expired(); });
+    std::erase_if(g_decorations, [](const auto& t) { return t.expired(); });
     for (const auto& t : g_titlebars)
         if (const auto bar = t.lock())
             fn(*bar);

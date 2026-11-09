@@ -81,6 +81,7 @@ namespace lg {
         float                               m_glyphScale = 0;
         std::shared_ptr<const SParams>      m_glyphParams;
         std::optional<SRgba>                m_sampled;
+        bool                                m_dark = false; // bar colour is dark (hysteresis)
         unsigned                            m_recheck = 0;
     };
 

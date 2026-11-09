@@ -157,8 +157,14 @@ noise: the glass costs about 0.5 ms per element per redrawn frame at 4K.
 
 ## Title bars
 
-Windows that draw no title bar themselves get a macOS one (`src/Titlebar.cpp`): a 32 pt bar in the window's
-colour (or light glass with `titlebar_glass = 1`), traffic lights #FF5F57 / #FEBC2E / #28C840 (grey when the
+Windows that draw no title bar themselves get a macOS one (`src/Titlebar.cpp`): a 32 pt bar in the client's
+own colour (`titlebar_auto_color = 1`: one row of the client just below its rounded corners is read back
+from the framebuffer every 15 draws, median of every 4th pixel; inactive windows get it slightly
+desaturated; on a dark colour the title turns white and the inactive lights dark grey), or the fixed
+`titlebar_color` / `titlebar_color_inactive`, or light glass with `titlebar_glass = 1`. The client's own
+rounded top corners sit on the bar's colour, so no notch shows. Hyprland 0.57.2 rounds a whole surface with
+one radius (no per-corner control), which is why the corners are filled rather than squared. Colour sampling
+is skipped on rotated outputs. Then traffic lights #FF5F57 / #FEBC2E / #28C840 (grey when the
 window is inactive, glyphs × − + while the pointer is over them), and the title centred in SF Pro Text 13
 semibold. Close sends the client a close request, minimise moves the window to `special:minimized`, zoom
 toggles maximised, dragging the rest of the bar moves the window.
@@ -176,6 +182,7 @@ own) prevents one, `titlebar = "classes"` only uses the regex, `"off"` disables 
 | `titlebar_font` / `titlebar_font_size` | `SF Pro Text` / 13 |
 | `titlebar_color` / `titlebar_color_inactive` | `0xF3F1EFFF` / `0xF6F5F4FF` |
 | `titlebar_text` / `titlebar_text_inactive` | `0x333333D9` / `0x33333359` |
+| `titlebar_auto_color` | 1 |
 | `titlebar_glass` | 0 |
 
 Ghostty: set `window-decoration = server`; if a build does not bind xdg-decoration, add its class

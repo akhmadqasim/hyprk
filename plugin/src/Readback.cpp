@@ -27,6 +27,8 @@ namespace lg {
         m_bytes   = bytes;
         m_pixels  = pixels;
         m_isFloat = isFloat;
+        while (glGetError() != GL_NO_ERROR) // an error left by someone else is not ours
+            ;
         glReadPixels(x, y, w, h, GL_RGBA, isFloat ? GL_FLOAT : GL_UNSIGNED_BYTE, nullptr);
         glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
         // e.g. a half-float buffer without EXT_color_buffer_float: stop trying

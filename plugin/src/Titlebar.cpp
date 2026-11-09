@@ -179,9 +179,20 @@ namespace lg {
         const float radius   = window->presentation().rounding();
 
         // colour: the client's own top rows (so a dark terminal gets a dark bar), else the config
-        const bool  sampled  = wantsSample() && m_sampled;
-        const SRgba base     = sampled ? *m_sampled : (isActive ? params->titlebarColor : params->titlebarColorInactive);
-        const bool  dark     = luma(base.r, base.g, base.b) < 0.5f;
+        const bool sampled = wantsSample() && m_sampled;
+        SRgba      base    = isActive ? params->titlebarColor : params->titlebarColorInactive;
+        if (sampled) {
+            base = *m_sampled;
+            if (!isActive) { // inactive: a little flatter, like macOS
+                const float y = luma(base.r, base.g, base.b);
+                base          = {base.r + (y - base.r) * 0.3f, base.g + (y - base.g) * 0.3f, base.b + (y - base.b) * 0.3f, 1};
+            }
+        }
+        // light/dark with a dead band, so a mid-grey client does not flip the text colour back and forth
+        const float y = luma(base.r, base.g, base.b);
+        m_dark        = m_dark ? y < 0.55f : y < 0.45f;
+        // the configured text colours apply unless the bar took a dark colour from the client
+        const bool dark = sampled && m_dark;
 
         // fill: rounded top corners only (the box runs on under the window and is clipped)
         CRectPassElement::SRectData fill;
@@ -189,7 +200,7 @@ namespace lg {
         fill.clipBox               = CBox{barPx.x, barPx.y, barPx.w, barPx.h + radius * scale}.round(); // also fills the window's rounded top corners
         fill.round                 = int(std::round(radius * scale));
         fill.roundingPower         = window->presentation().roundingPower();
-        fill.color                 = rgba(SRgba{base.r, base.g, base.b, 1}, a * (params->titlebarGlass ? 0.55f : 1.f));
+        fill.color                 = rgba(base, a * (params->titlebarGlass ? 0.55f : 1.f));
         fill.blur                  = params->titlebarGlass;
         fill.workspacePresentation = presentation;
         g_pHyprRenderer->addPassElement(ctx, makeUnique<CRectPassElement>(fill));
@@ -208,7 +219,7 @@ namespace lg {
             CRectPassElement::SRectData dot;
             dot.box   = b.copy().expand(-0.5 * scale);
             dot.round = int(dot.box.w / 2);
-            dot.color = (isActive || m_hover) ? rgba(rgbaFromHex(LIGHTS[i]), a) : rgba(rgbaFromHex(dark ? GREYED_DARK : GREYED), a);
+            dot.color = (isActive || m_hover) ? rgba(rgbaFromHex(LIGHTS[i]), a) : rgba(rgbaFromHex(m_dark ? GREYED_DARK : GREYED), a);
             g_pHyprRenderer->addPassElement(ctx, makeUnique<CRectPassElement>(dot));
 
             if (m_hover) {
@@ -315,14 +326,15 @@ namespace lg {
 
     bool CTitlebar::wantsSample() const {
         const auto params = m_params();
-        return m_height > 0 && params && params->titlebarAutoColor && !params->titlebarGlass;
+        const auto window = m_window.lock();
+        return m_height > 0 && params && params->titlebarAutoColor && !params->titlebarGlass && window && window->m_ruleApplicator->decorate().valueOrDefault();
     }
 
     void CTitlebar::onSampled(const SRgba& c) {
-        const bool changed = !m_sampled || std::abs(m_sampled->r - c.r) + std::abs(m_sampled->g - c.g) + std::abs(m_sampled->b - c.b) > 0.02f;
-        m_sampled          = c;
-        if (changed)
-            damageEntire();
+        if (m_sampled && std::abs(m_sampled->r - c.r) + std::abs(m_sampled->g - c.g) + std::abs(m_sampled->b - c.b) <= 0.02f)
+            return; // keep the colour steady
+        m_sampled = c;
+        damageEntire();
     }
 
     // ── probe ───────────────────────────────────────────────────────────────
@@ -338,6 +350,11 @@ namespace lg {
             std::vector<UP<IPassElement>> draw(Render::CRenderContext& ctx) override {
                 const auto src = dynamicPointerCast<Render::GL::CGLFramebuffer>(ctx.m_data.currentFB);
                 if (!src || m_read->pending())
+                    return {};
+                // only pixels redrawn this frame: outside the damage the buffer may hold an older frame
+                CRegion stale{m_strip};
+                stale.subtract(ctx.m_data.damage);
+                if (!stale.empty())
                     return {};
                 Render::GL::CFramebufferBindingGuard guard{g_pHyprRenderer->glBackend()};
                 Render::GL::g_pHyprOpenGL->bindFramebuffer(GL_READ_FRAMEBUFFER, src->getFBID());
@@ -391,7 +408,8 @@ namespace lg {
     void CTitlebarProbe::draw(Render::CRenderContext& ctx, PHLMONITOR mon, float const&, const Render::SWindowRenderPresentation& presentation) {
         const auto bar    = m_bar.lock();
         const auto window = m_window.lock();
-        if (!bar || !window || !mon || !bar->wantsSample() || ctx.m_renderingSnapshot)
+        // a rotated output's framebuffer is laid out before the transform: not handled, no sampling
+        if (!bar || !window || !mon || !bar->wantsSample() || ctx.m_renderingSnapshot || mon->m_transform != WL_OUTPUT_TRANSFORM_NORMAL)
             return;
 
         if (const auto c = collect(*m_read))
@@ -401,12 +419,13 @@ namespace lg {
         if (m_read->pending() || m_frames++ % PROBE_INTERVAL != 3)
             return;
 
-        // the client's second row, inside the rounded corners
+        // one client row just below the rounded corners: the bar's fill reaches that far under the
+        // window, so higher rows of a translucent client would sample the bar itself
         CBox box = window->getWindowMainSurfaceBox();
         box.translate(presentation.workspaceOffset + presentation.floatingOffset - mon->m_position);
         box.scale(mon->m_scale).round();
-        const double inset = window->presentation().rounding() * mon->m_scale + 2;
-        CBox         strip{box.x + inset, box.y + 1, box.w - 2 * inset, 1};
+        const double radius = window->presentation().rounding() * mon->m_scale;
+        CBox         strip{box.x + radius + 2, box.y + radius + 2, box.w - 2 * radius - 4, 1};
         strip = strip.intersection(CBox{{}, mon->m_transformedSize}).round();
         if (strip.w < 1 || strip.h < 1)
             return;

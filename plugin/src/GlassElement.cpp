@@ -242,15 +242,14 @@ namespace lg {
                 return nullptr;
             if (sh.frame == g_frame && !fresh && !perElement)
                 return tex;
-            // every claimed box, but only on frames where something under the glass was damaged
+            // the glass boxes redrawn this frame (outside the damage the buffer may hold an older
+            // frame); nothing damaged under any glass: no copy
             CRegion copy;
-            bool    touched = fresh || perElement;
-            for (const auto& [box, added] : g_claims) {
-                copy.add(box.copy().expand(SHARP_MARGIN));
-                touched = touched || touches(ctx.m_data.damage, box);
-            }
+            for (const auto& [box, added] : g_claims)
+                if (fresh || perElement || touches(ctx.m_data.damage, box))
+                    copy.add(box.copy().expand(SHARP_MARGIN));
             copy.intersect(CBox{{}, size});
-            if (!touched || copy.empty()) {
+            if (copy.empty()) {
                 sh.frame = g_frame;
                 return tex;
             }
