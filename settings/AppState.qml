@@ -64,9 +64,8 @@ QtObject {
         // Skip peripheral batteries (mouse, headset): their scope is "Device".
         Backend.run(["sh", "-c", "for d in /sys/class/power_supply/*; do [ \"$(cat $d/scope 2>/dev/null)\" = Device ] || cat $d/type 2>/dev/null; done"],
                     (c, out) => app.hasBattery = P.hasBattery(out));
-        // Full name from /etc/passwd (works under both runtimes; LDAP users fall back to the login name).
-        const user = Backend.home.split("/").pop();
-        app.userName = user;
-        Backend.readText("/etc/passwd", t => app.userName = P.gecosName(t, user));
+        // Full name from /etc/passwd, found by home dir (works under both runtimes;
+        // users not in /etc/passwd, e.g. LDAP, show their home folder's name).
+        Backend.readText("/etc/passwd", t => app.userName = P.gecosName(t, Backend.home));
     }
 }

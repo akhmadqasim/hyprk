@@ -76,7 +76,11 @@ QtObject {
     }
 
     // freedesktop thumbnail spec: ~/.cache/thumbnails/large/<md5 of file URI>.png
-    readonly property string thumbDir: decodeURIComponent(new URL(String(StandardPaths.writableLocation(StandardPaths.GenericCacheLocation))).pathname) + "/thumbnails/large"
+    function _stdPath(location) {
+        return decodeURIComponent(new URL(String(StandardPaths.writableLocation(location))).pathname);
+    }
+    readonly property string home: _stdPath(StandardPaths.HomeLocation)
+    readonly property string thumbDir: _stdPath(StandardPaths.GenericCacheLocation) + "/thumbnails/large"
     // file:// URI escaped like GLib's g_filename_to_uri (keeps !$&'()*+,;=:@ and /).
     function fileUri(path) {
         return "file://" + path.split("/").map(seg => encodeURIComponent(seg)
@@ -91,8 +95,6 @@ QtObject {
         for (const p of paths) args.push(p, thumbFor(p), fileUri(p));
         run(args, done);
     }
-
-    readonly property string home: decodeURIComponent(new URL(String(StandardPaths.writableLocation(StandardPaths.HomeLocation))).pathname)
 
     // One-off read of a small text file ("" when unreadable).
     function readText(path, cb) {

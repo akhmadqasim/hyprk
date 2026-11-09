@@ -223,13 +223,14 @@ function parseDesktopApps(text) {
         .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-// Display name from /etc/passwd: the GECOS full name, else the username.
-function gecosName(passwd, user) {
+// Display name from /etc/passwd for the account whose home dir is `home`: the GECOS
+// full name, else the login name, else the home folder's name.
+function gecosName(passwd, home) {
     for (const l of lines(passwd)) {
         const f = l.split(":");
-        if (f[0] === user) return (f[4] || "").split(",")[0].trim() || user;
+        if (f.length >= 6 && f[5] === home) return (f[4] || "").split(",")[0].trim() || f[0];
     }
-    return user;
+    return String(home).split("/").pop();
 }
 
 // "/x/Mac_Blue-dark.png" -> "Mac Blue dark", "DefaultAerial.png" -> "Default Aerial"
