@@ -13,19 +13,13 @@ PREFIX=; WP=; AV=; DARK=0
 while [ $# -gt 0 ]; do case $1 in --prefix) PREFIX=$2; shift ;; --wallpaper) WP=$2; shift ;; --avatar) AV=$2; shift ;; --dark) DARK=1 ;; *) echo "unknown option $1" >&2; exit 2 ;; esac; shift; done
 ROOT=$(cd "$HERE/.." && pwd)
 if [ -z "$AV" ]; then
-  for c in "$HOME/.face" "/var/lib/AccountsService/icons/${USER:-$(id -un)}"; do [ -r "$c" ] && { AV=$c; break; }; done
+  for c in "$HOME/.face" "/var/lib/AccountsService/icons/${USER:-$(id -un)}"; do [ -s "$c" ] && [ -r "$c" ] && { AV=$c; break; }; done
 fi
 if [ -z "$AV" ]; then
-  AV=${XDG_CACHE_HOME:-$HOME/.cache}/hyprk/lock-avatar.png; mkdir -p "$(dirname "$AV")"
-  FULL=$(getent passwd "${USER:-$(id -un)}" | cut -d: -f5 | cut -d, -f1)
-  python3 "$HERE/scripts/initials-avatar.py" "${FULL:-$USER}" "$AV" 2>/dev/null || AV=$HERE/assets/avatar-default.png
-fi
-if [ -z "$WP" ]; then
-  STATE=${HYPRK_STATE:-$ROOT/state}/wallpaper.json
-  [ -f "$STATE" ] && WP=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1])).get("path",""))' "$STATE" 2>/dev/null)
-  # only formats hyprlock can load (the Settings pane may have picked a .heic)
-  case $WP in *.png|*.PNG|*.jpg|*.JPG|*.jpeg|*.JPEG|*.webp) ;; *) WP= ;; esac
-  [ -f "$WP" ] || WP=$ROOT/themes/wallpapers/png/Tahoe$([ $DARK = 1 ] && echo Dark || echo Light).png
+  FULL=$(getent passwd "${USER:-$(id -un)}" | cut -d: -f5 | cut -d, -f1); FULL=${FULL:-$USER}
+  # cached per name: the lock script runs this on every lock and must stay fast
+  KEY=$(printf '%s' "$FULL" | md5sum | cut -c1-8); AV=${XDG_CACHE_HOME:-$HOME/.cache}/hyprk/lock-avatar-$KEY.png
+  [ -s "$AV" ] || { mkdir -p "$(dirname "$AV")" 2>/dev/null && python3 "$HERE/scripts/initials-avatar.py" "$FULL" "$AV" 2>/dev/null; } || AV=$HERE/assets/avatar-default.png
 fi
 DST=$(hk_cfgbase "$PREFIX")/hypr/hyprlock.conf; mkdir -p "$(dirname "$DST")"
 hk_backup "$DST"

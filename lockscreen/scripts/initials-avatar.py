@@ -9,6 +9,8 @@ except ImportError:
 name, out = sys.argv[1], sys.argv[2]
 words = [w for w in name.replace('.', ' ').split() if w[:1].isalpha()]
 initials = ((words[0][0] + (words[-1][0] if len(words) > 1 else '')) if words else '?').upper()
+if not initials.isascii():
+    sys.exit(1)   # SF/DejaVu have no glyphs for other scripts: let the caller use the default avatar
 S = 512
 disc = Image.new('RGB', (S, S))
 d = ImageDraw.Draw(disc)
