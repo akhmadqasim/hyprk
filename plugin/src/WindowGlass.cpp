@@ -1,6 +1,7 @@
 #include "WindowGlass.hpp"
 #include "GlassElement.hpp"
 
+#include <hyprland/src/desktop/view/WLSurface.hpp>
 #include <hyprland/src/desktop/view/window/Window.hpp>
 #include <hyprland/src/desktop/view/window/WindowPresentation.hpp>
 #include <hyprland/src/render/Renderer.hpp>
@@ -52,9 +53,18 @@ namespace lg {
 
         const double radius = params->windowRadius >= 0 ? params->windowRadius : window->presentation().rounding();
 
+        // a window that sets an ext-background-effect region (e.g. a glass sidebar) gets glass only
+        // there, with the region's own corner radius; otherwise the whole window is glass
+        std::vector<SGlassShape> shapes;
+        const auto               surface = window->wlSurface();
+        if (surface && surface->m_hasBackgroundEffect && !surface->m_blurRegion.empty())
+            shapes = shapesFromRegion(surface->m_blurRegion, box.x, box.y);
+        else
+            shapes.push_back({{box.x, box.y, box.w, box.h}, radius});
+
         // the window draws its own shadow and border: glass body only
         CGlassElement::SData data{
-            .shapes        = {{{box.x, box.y, box.w, box.h}, radius}},
+            .shapes        = std::move(shapes),
             .alpha         = a,
             .params        = params,
             .recipe        = &recipeByName(params->windowMaterial),

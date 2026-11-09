@@ -48,6 +48,9 @@ namespace lg {
 
     CGlassProgram& glassProgram();
 
+    // glass shapes of a client's ext-background-effect region (surface-local), moved by (ox, oy)
+    std::vector<SGlassShape> shapesFromRegion(const CRegion& region, double ox, double oy);
+
     // once per monitor frame: ages the per-surface light/dark state
     void onFrame();
     // a layer or window went away: drop its light/dark state (its address may be reused)

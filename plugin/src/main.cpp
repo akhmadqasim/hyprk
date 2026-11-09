@@ -56,20 +56,14 @@ static std::vector<lg::SGlassShape> shapesFor(const PHLLS& layer, const PHLMONIT
 
     std::vector<lg::SGlassShape> shapes;
     const auto                   surface = layer->wlSurface();
-    if (surface && surface->m_hasBackgroundEffect && !surface->m_blurRegion.empty()) {
+    if (surface && surface->m_hasBackgroundEffect && !surface->m_blurRegion.empty())
         // the client's ext-background-effect region (Quickshell BackgroundEffect.blurRegion)
-        std::vector<lg::SRect> rects;
-        for (const auto& r : surface->m_blurRegion.getRects())
-            rects.push_back({double(r.x1), double(r.y1), double(r.x2 - r.x1), double(r.y2 - r.y1)});
-        shapes = lg::clusterRegion(rects);
-    } else if (!p.requireRegion)
-        shapes.push_back({{0, 0, size.x, size.y}, 0});
+        shapes = lg::shapesFromRegion(surface->m_blurRegion, off.x, off.y);
+    else if (!p.requireRegion)
+        shapes.push_back({{off.x, off.y, size.x, size.y}, 0});
 
-    for (auto& s : shapes) {
-        s.box.x += off.x;
-        s.box.y += off.y;
+    for (auto& s : shapes)
         s.radius = lg::radiusFor(p, layer->m_namespace, s.radius);
-    }
     return shapes;
 }
 
