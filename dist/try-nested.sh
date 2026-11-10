@@ -56,6 +56,7 @@ print(next((lm[2] for lm in r[2] if lm[4]), r[2][0][2]))' 2>/dev/null
 }
 export HYPRK_SCALE=${HYPRK_SCALE:-$(host_scale)}
 export HYPRK_SCALE=${HYPRK_SCALE:-1}
+export HYPRK_SCALE_POLICY=off   # nested: match the host window, not the physical monitor
 
 LOG=$XDG_STATE_HOME/nested-$(date +%H%M%S).log
 # own session (setsid): everything started from here shares session id = $HPID, so we can clean up exactly it

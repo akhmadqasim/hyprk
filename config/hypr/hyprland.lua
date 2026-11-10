@@ -1,7 +1,13 @@
 -- hyprk: Hyprland 0.57 (Lua config) tuned to look and behave like macOS 27.
 -- Start nested:  /mnt/code/hyprk/scripts/smoke.sh   (or Hyprland --config this file)
 
-local hyprk   = os.getenv("HYPRK_ROOT") or "/mnt/code/hyprk"
+-- repo root: $HYPRK_ROOT, else two levels above this file (config/hypr/hyprland.lua)
+local function here()
+    local ok, info = pcall(debug.getinfo, 1, "S")
+    local src = ok and info and info.source or ""
+    return src:match("^@(.*)/config/hypr/[^/]+$")
+end
+local hyprk   = os.getenv("HYPRK_ROOT") or here() or ((os.getenv("HOME") or "") .. "/.local/share/hyprk")
 local shell   = hyprk .. "/shell"
 local terminal = os.getenv("HYPRK_TERMINAL") or "ghostty"
 local sound   = shell .. "/scripts/sound.sh"
@@ -9,6 +15,12 @@ local sound   = shell .. "/scripts/sound.sh"
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "1" })
 -- MacBook Air-like headless output for screenshots: `hyprctl output create headless MBA`
 hl.monitor({ output = "MBA", mode = "2560x1664@60", position = "auto", scale = "2" })
+-- macOS default scale per display (SPEC.md 14): 4K and up -> 2x, below -> 1x; HYPRK_SCALE_POLICY=off skips it,
+-- HYPRK_LOOKS_LIKE=2560x1440 picks a "looks like" size (see config/hypr/scale-policy.lua)
+if os.getenv("HYPRK_SCALE_POLICY") ~= "off" then
+    local ok, err = pcall(function() dofile(hyprk .. "/config/hypr/scale-policy.lua").install() end)
+    if not ok then print("hyprk: scale policy not applied: " .. tostring(err)) end
+end
 
 -- macOS cursors (themes/cursors, Xcursor + hyprcursor). Size is in logical px,
 -- so 24 renders at 48 px on the scale-2 MBA output.
@@ -23,6 +35,8 @@ hl.env("HYPRCURSOR_THEME", "hyprk-cursors")
 hl.env("HYPRCURSOR_SIZE", "24")
 
 hl.env("QT_QPA_PLATFORM", "wayland")
+-- Qt Quick text: grayscale AA like macOS (default is RGB subpixel, SPEC.md 14)
+hl.env("QSG_DISTANCEFIELD_ANTIALIASING", "gray")
 
 hl.on("hyprland.start", function()
     -- the shell: menu bar, dock, notifications, control center, spotlight
@@ -33,6 +47,7 @@ end)
 
 ----------------------------------------------------------------- look ----
 hl.config({
+    xwayland = { force_zero_scaling = true },   -- X11 apps render at native pixels instead of being upscaled
     general = {
         gaps_in = 6,
         gaps_out = 10,
@@ -235,7 +250,8 @@ hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 
 ------------------------------------------------------------ windows ----
 -- rules shipped by the other hyprk apps (optional)
-for _, f in ipairs({ hyprk .. "/settings/hyprland-rules.lua", hyprk .. "/finder/hyprland-rules.lua" }) do
+for _, f in ipairs({ hyprk .. "/settings/hyprland-rules.lua", hyprk .. "/finder/hyprland-rules.lua",
+                     hyprk .. "/state/accessibility.lua" }) do   -- Settings > Accessibility choices, also without the shell
     local h = io.open(f, "r")
     if h then h:close(); dofile(f) end
 end

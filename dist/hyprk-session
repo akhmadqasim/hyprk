@@ -7,7 +7,7 @@
 #   hyprk-session --print    show what it would do (env + command), start nothing
 #
 # Settings (optional env, or files in ~/.local/share/hyprk-session):
-#   HYPRK_SCALE  monitor scale (default 1.5, what GNOME uses on your 4K screens)
+#   HYPRK_SCALE  monitor scale (default: the macOS policy, 2x on 4K and up, 1x below)
 #   file "theme" containing "dark" or "light" (default light): GTK/Qt theme
 # Log: ~/.local/share/hyprk-session/state/session.log
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -22,7 +22,7 @@ hyprk_env_setup "$SESSION_HOME" farm "$THEME" || exit 1
 export XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=Hyprland XDG_SESSION_DESKTOP=hyprk
 export HYPRK_THEME=$THEME PATH="$HYPRK_DIST/bin:$PATH"   # bin/hyprlock: Lock menu -> lockscreen/hyprk-lock.sh
 export HYPRK_ALLOW_POWER=1                 # real session: Sleep / Restart / Shut Down / Lock work
-export HYPRK_SCALE=${HYPRK_SCALE:-1.5}
+# HYPRK_SCALE unset: the macOS scale policy (config/hypr/scale-policy.lua) picks 2x on 4K, 1x below
 export MOZ_ENABLE_WAYLAND=1 ELECTRON_OZONE_PLATFORM_HINT=auto
 unset HYPRLAND_INSTANCE_SIGNATURE
 

@@ -2,14 +2,17 @@
 --   HYPRK_OUTPUT  output to configure ("" = all)
 --   HYPRK_MODE    "preferred" or e.g. "3840x2160@60"
 --   HYPRK_SCALE   nested: the GNOME monitor scale (try-nested.sh; patched aquamarine renders at it), login: hyprk-session
-local root = os.getenv("HYPRK_ROOT") or "/mnt/code/hyprk"
+local root = os.getenv("HYPRK_ROOT") or (debug.getinfo(1, "S").source:match("^@(.*)/dist/[^/]+$"))
 dofile(root .. "/config/hypr/hyprland.lua")
-hl.monitor({
-    output   = os.getenv("HYPRK_OUTPUT") or "",
-    mode     = os.getenv("HYPRK_MODE") or "preferred",
-    position = "auto",
-    scale    = os.getenv("HYPRK_SCALE") or "1",
-})
+-- an explicit HYPRK_SCALE (nested: the GNOME scale) wins; without it the macOS scale policy in hyprland.lua decides
+if os.getenv("HYPRK_SCALE") then
+    hl.monitor({
+        output   = os.getenv("HYPRK_OUTPUT") or "",
+        mode     = os.getenv("HYPRK_MODE") or "preferred",
+        position = "auto",
+        scale    = os.getenv("HYPRK_SCALE"),
+    })
+end
 -- we start Hyprland through config/hypr/start.sh, not start-hyprland: hide that warning
 hl.config({ misc = { disable_watchdog_warning = true } })
 -- macOS title bar (traffic lights on the left) from the liquidglass plugin for windows that draw no bar themselves:

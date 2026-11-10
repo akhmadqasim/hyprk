@@ -119,6 +119,10 @@ end
 
 function M.apply(mon)
     if mon.name == "FALLBACK" then return nil end   -- Hyprland's internal placeholder output
+    -- virtual outputs have no EDID size and keep their own rules (MBA screenshot output, nested windows),
+    -- unless a test sets HYPRK_NATIVE_<OUTPUT> for them
+    local virtual = mon.name == "MBA" or mon.name:match("^HEADLESS") or mon.name:match("^WAYLAND%-") or mon.name:match("^X11%-")
+    if virtual and not os.getenv("HYPRK_NATIVE_" .. env_key(mon.name)) then return nil end
     local d = M.for_monitor(mon)
     if applied[mon.name] == d.scale and math.abs((mon.scale or 0) - d.scale) < 0.001 then return d end
     applied[mon.name] = d.scale
