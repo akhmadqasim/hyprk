@@ -2,13 +2,15 @@ import QtQuick
 import Finder.Native
 import HyprK
 import "lib/files.js" as Files
+import "../../ui/HyprK/panels.js" as Panels
 
 // Finder window: frameless, client-side traffic lights, flush full-height sidebar, unified toolbar.
 Window {
     id: win
 
-    width: Theme.win.width
-    height: Theme.win.height
+    readonly property var startSize: /^\d+x\d+$/.test(startup.size) ? startup.size.split("x").map(Number) : [Theme.win.width, Theme.win.height]
+    width: startSize[0]
+    height: startSize[1]
     minimumWidth: Theme.win.minWidth
     minimumHeight: Theme.win.minHeight
     visible: true
@@ -17,7 +19,7 @@ Window {
     flags: Qt.Window | Qt.FramelessWindowHint
 
     property string view: ["icons", "list", "columns", "gallery"].indexOf(startup.view) !== -1 ? startup.view : "icons"
-    property bool showPathBar: false
+    property bool showPathBar: startup.pathBar
     property var quickLookEntry: null
     // a zoomed (maximized) window keeps its corners and rims on macOS; only full screen drops them. (Hyprland
     // also reports a floating window as maximized to Qt.)
@@ -28,7 +30,7 @@ Window {
         id: fm
         path: /^(recents:|applications:|tag:)/.test(startup.path) || FileOps.isDir(startup.path) ? startup.path : FileOps.homePath()
         history: [path]
-        onErrorRaised: message => alert.show(message)
+        onErrorRaised: message => alert.ask(message.split("\n")[0], message.split("\n").slice(1).join("\n"), [{ text: "OK" }])
         // the inline editor held focus; hand it back so shortcuts keep working
         onRenamingPathChanged: if (!renamingPath) keys.forceActiveFocus()
         dragSession: dnd
@@ -38,6 +40,7 @@ Window {
         Theme.dark = startup.dark;
         Theme.blur = startup.blur;
         Theme.hasSysIcons = startup.hasSysIcons;
+        Theme.active = Qt.binding(() => win.active && !startup.inactive);
         Qt.callLater(applyStartup);
         keys.forceActiveFocus();
     }
@@ -48,6 +51,21 @@ Window {
             if (hit) fm.selectPaths([hit.path]);
         }
         if (startup.quicklook) quickLook();
+        if (startup.panel) panelTimer.start();
+    }
+    Timer { id: panelTimer; interval: 300; onTriggered: win.openPanel(startup.panel) }   // after the first layout
+    // --panel: open a panel for reference screenshots (alert2 / alert3 are sample texts and do nothing)
+    function openPanel(name) {
+        if (name === "alert2")
+            alert.ask("Are you sure you want to delete \u201COld Letter.rtf\u201D?",
+                      "This item will be deleted immediately. You can\u2019t undo this action.",
+                      [{ text: "Delete", destructive: true }, { text: "Cancel", cancel: true }]);
+        else if (name === "alert3")
+            alert.ask("Do you want to keep this new document \u201CUntitled\u201D?",
+                      "You can choose to save your changes, or delete this document immediately. You can\u2019t undo this action.",
+                      [{ text: "Save\u2026" }, { text: "Cancel", cancel: true }, { text: "Delete", destructive: true }]);
+        else if (name === "sheet") renameSheet.open(fm.selectedEntries());
+        else if (name === "popover") toolbar.tagRequested(toolbar.tagAnchor);
     }
 
     function quickLook() {
@@ -79,12 +97,22 @@ Window {
     TrafficLights {
         x: Theme.lights.x
         y: Theme.lights.y
-        active: win.active
+        active: Theme.active
         fullScreenButton: true   // green = full screen, Option-click = zoom (MAC-ANSWERS.md Q-windows-19)
         onCloseClicked: win.close()
         onMinimizeClicked: win.showMinimized()
         onZoomClicked: win.visibility === Window.Maximized ? win.showNormal() : win.showMaximized()
         onFullScreenClicked: win.visibility === Window.FullScreen ? win.showNormal() : win.showFullScreen()
+    }
+
+    // dark list view: the header's solid bar continues under the toolbar (hard pocket, Q-finder-17)
+    Rectangle {
+        visible: win.view === "list" && Theme.dark
+        x: Theme.sidebar.width
+        width: parent.width - x
+        height: Theme.toolbar.height
+        topRightRadius: win.radius
+        color: Theme.color.listHeaderFill
     }
 
     // ---------- content ----------
@@ -104,14 +132,14 @@ Window {
             onViewRequested: v => win.setView(v)
             onMoreRequested: anchor => win.popup(win.moreMenu, anchor)
             onGroupRequested: anchor => win.popup(win.sortItems(), anchor)
-            onTagRequested: anchor => win.popup([{ tagRow: true, action: tag => fm.toggleTag(tag) }], anchor)
+            onTagRequested: anchor => tagPopover.show(anchor)
         }
 
         Loader {
             id: viewLoader
             anchors.top: toolbar.bottom
             anchors.bottom: pathBar.visible ? pathBar.top : parent.bottom
-            anchors.bottomMargin: pathBar.visible ? 0 : win.radius / 2
+            anchors.bottomMargin: 0
             width: parent.width
             sourceComponent: ({ icons: iconView, list: listView, columns: columnView, gallery: galleryView })[win.view]
         }
@@ -120,19 +148,11 @@ Window {
         Component { id: columnView; ColumnView { browser: fm; onContextMenu: (e, p) => win.contextMenu(e, p) } }
         Component { id: galleryView; GalleryView { browser: fm; onContextMenu: (e, p) => win.contextMenu(e, p) } }
 
-        Text {
-            visible: fm.entries.length === 0 && fm.query !== ""
-            anchors.centerIn: viewLoader
-            text: "No Results"
-            color: Theme.color.tertiaryLabel
-            font: Typography.font(15)
-        }
 
         PathBar {
             id: pathBar
             visible: win.showPathBar
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: win.radius / 2
             width: parent.width
             browser: fm
         }
@@ -147,7 +167,7 @@ Window {
         radius: win.radius
         color: "transparent"
         border.width: Tokens.frame.rimWidth
-        border.color: Tokens.frame.rim(win.active)
+        border.color: Tokens.frame.rim(Theme.active)
     }
 
     function handleKey(event) {
@@ -250,28 +270,32 @@ Window {
         menu.y = Math.min(y, win.height - menu.implicitHeight - 8);
         menu.open();
     }
+    // one item: inline; several: the Rename Finder Items sheet
     function startRename() {
-        if (fm.selectedCount === 1 && !fm.isVirtual) fm.renamingPath = fm.selectedPaths()[0];
+        if (fm.isVirtual) return;
+        if (fm.selectedCount === 1) fm.renamingPath = fm.selectedPaths()[0];
+        else if (fm.selectedCount > 1) renameSheet.open(fm.selectedEntries());
     }
+    // Finder's order (Q-finder-23); Finder shows no shortcuts in context menus. Items without a Linux
+    // counterpart (Ask Siri, Open With, Get Info, Compress, Duplicate, Make Alias, Copy, Share, Quick Actions,
+    // Services) are left out.
     function contextMenu(entry, pos) {
         const n = fm.selectedCount;
         const writable = !fm.isVirtual;
         const items = entry ? [
             { text: "Open", action: () => fm.openSelection() },
             { separator: true },
-            { text: "Move to Trash", shortcut: "Del", enabled: n > 0 && fm.userFiles, action: () => fm.trashSelection() },
+            { text: "Move to Trash", enabled: n > 0 && fm.userFiles, action: () => fm.trashSelection() },
             { separator: true },
-            { tagRow: true, action: tag => fm.toggleTag(tag) },
+            { text: n > 1 ? "Rename\u2026" : "Rename", enabled: n > 0 && writable, action: () => win.startRename() },
+            { text: "Quick Look", action: () => win.quickLook() },
             { separator: true },
-            { text: "Quick Look", shortcut: "Space", action: () => win.quickLook() },
-            { text: "Rename", shortcut: "↩", enabled: n === 1 && writable, action: () => win.startRename() },
-            { separator: true },
-            { text: "Show in Enclosing Folder", enabled: fm.isVirtual, action: () => {
+            { tagRow: true, action: tag => fm.toggleTag(tag) }
+        ].concat(fm.isVirtual ? [{ separator: true }, { text: "Show in Enclosing Folder", action: () => {
                 fm.go(Files.parentPath(entry.path));
                 fm.selectPaths([entry.path]);
-            } }
-        ] : [
-            { text: "New Folder", shortcut: "⇧⌃N", enabled: writable, action: () => fm.newFolder() },
+            } }] : []) : [
+            { text: "New Folder", enabled: writable, action: () => fm.newFolder() },
             { separator: true }
         ].concat(sortItems());
         showMenu(items, pos.x, pos.y);
@@ -288,7 +312,7 @@ Window {
     }
     readonly property var moreMenu: [
         { text: "New Folder", shortcut: "⇧⌃N", enabled: !fm.isVirtual, action: () => fm.newFolder() },
-        { text: "Rename", enabled: fm.selectedCount === 1 && !fm.isVirtual, action: () => win.startRename() },
+        { text: fm.selectedCount > 1 ? "Rename\u2026" : "Rename", enabled: fm.selectedCount > 0 && !fm.isVirtual, action: () => win.startRename() },
         { text: "Move to Trash", enabled: fm.selectedCount > 0 && fm.userFiles, action: () => fm.trashSelection() },
         { separator: true },
         { text: win.showPathBar ? "Hide Path Bar" : "Show Path Bar", shortcut: "⌥⌃P", action: () => win.showPathBar = !win.showPathBar },
@@ -305,10 +329,48 @@ Window {
         onCloseRequested: win.quickLookEntry = null
     }
 
-    Alert {
+    // app-modal alert: no dim, centred, its top at 0.26 of the window minus a quarter of its height (Q-panels-33)
+    AlertPanel {
         id: alert
+        x: (win.width - width) / 2
+        y: Panels.alertTop(win.height, height)
+        icon: startup.hasAppIcons ? Files.fileUrl(startup.iconRoot + "/apps/Finder-512.png") : ""
+        property var actions: []
+        function ask(title, message, buttons) {
+            alert.title = title;
+            alert.message = message;
+            alert.buttons = buttons;
+            alert.shown = true;
+        }
+        onActivated: index => {
+            shown = false;
+            keys.forceActiveFocus();
+            const b = buttons[index];
+            if (b && b.action) b.action();
+        }
+        MouseArea {   // the window takes no clicks while the alert is up
+            parent: win.contentItem
+            z: 1
+            anchors.fill: parent
+            visible: alert.shown
+        }
+        z: 2
+    }
+
+    RenameSheet {
+        id: renameSheet
         anchors.fill: parent
-        onMessageChanged: if (message === "") keys.forceActiveFocus()
+        z: 3
+        browser: fm
+        onShownChanged: if (!shown) keys.forceActiveFocus()
+    }
+
+    TagPopover {
+        id: tagPopover
+        anchors.fill: parent
+        z: 4
+        browser: fm
+        onClosed: keys.forceActiveFocus()
     }
 
     ResizeEdges {
