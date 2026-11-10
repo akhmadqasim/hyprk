@@ -4,12 +4,14 @@
 .pragma library
 
 // ---------- modes ----------
-// symbol: shell/components/symbols.js glyph; placeholder: field text while the mode is active
+// symbol: the glyph in the mode list and at the left of the field; placeholder: the field text while the mode is
+// active, the mode's name (27.2.1, MAC-ANSWERS.md Q-panels-22, -24). Glyphs on the Mac: the App Store "A", folder,
+// layered squares (no SVG here: bolt) and doc.on.clipboard (no SVG here: clipboard).
 const MODES = [
-    { id: "apps", title: "Applications", placeholder: "Search Apps", symbol: "square.grid" },
-    { id: "files", title: "Files", placeholder: "Search Files", symbol: "doc" },
-    { id: "actions", title: "Actions", placeholder: "Search Actions", symbol: "bolt" },
-    { id: "clipboard", title: "Clipboard", placeholder: "Search Clipboard", symbol: "clipboard" },
+    { id: "apps", title: "Applications", placeholder: "Applications", symbol: "appstore" },
+    { id: "files", title: "Files", placeholder: "Files", symbol: "folder" },
+    { id: "actions", title: "Actions", placeholder: "Actions", symbol: "bolt" },
+    { id: "clipboard", title: "Clipboard", placeholder: "Clipboard", symbol: "clipboard" },
 ];
 function modes() { return MODES; }
 function modeInfo(id) { return MODES.find(m => m.id === id) || null; }
@@ -20,36 +22,6 @@ function modeForKey(key, meta, ctrl, alt) {
     if (!(meta || ctrl || alt)) return "";
     const i = key - 0x31;
     return i >= 0 && i < MODES.length ? MODES[i].id : "";
-}
-// Right/Left arrow on an empty field cycles the modes like macOS ("" = all results)
-function cycleMode(current, dir) {
-    const ids = [""].concat(MODES.map(m => m.id));
-    const i = ids.indexOf(current);
-    return ids[(i + dir + ids.length) % ids.length];
-}
-
-// ---------- apps browse view ----------
-// macOS-like filter chips from freedesktop main categories (first match wins)
-const APP_CATEGORIES = [
-    ["Developer Tools", ["Development", "IDE"]],
-    ["Productivity", ["Office", "TextEditor", "WordProcessor", "Spreadsheet", "Presentation"]],
-    ["Creativity", ["Graphics", "Photography", "2DGraphics", "3DGraphics"]],
-    ["Entertainment", ["AudioVideo", "Audio", "Video", "Player", "Music"]],
-    ["Games", ["Game"]],
-    ["Social", ["Chat", "InstantMessaging", "Email", "Network", "WebBrowser"]],
-    ["Education", ["Education", "Science"]],
-    ["Utilities", ["Utility", "System", "Settings", "Accessories", "FileManager", "TerminalEmulator"]],
-];
-function appCategory(categories) {
-    const cats = Array.from(categories || []);
-    for (const [name, keys] of APP_CATEGORIES)
-        if (cats.some(c => keys.indexOf(c) !== -1)) return name;
-    return "Other";
-}
-// chips in APP_CATEGORIES order, only those with at least one app
-function appCategoryChips(entries) {
-    const present = new Set(entries.map(e => appCategory(e.categories)));
-    return APP_CATEGORIES.map(c => c[0]).concat(["Other"]).filter(n => present.has(n));
 }
 
 // ---------- files ----------

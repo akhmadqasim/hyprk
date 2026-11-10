@@ -6,15 +6,15 @@ import qs.modules.lock
 import qs.services
 
 // hyprk: macOS 27-style desktop shell for Hyprland.
-// AppId: the class of the shell's own windows (the Applications window), so the liquidglass plugin's
-// default titlebar_exclude (^org\.hyprk\.) leaves its client-drawn toolbar alone and the Dock maps it
-// to the Apps item (AppsView.appId).
+// AppId: the class of any window the shell opens, so the liquidglass plugin's default titlebar_exclude
+// (^org\.hyprk\.) leaves it alone. The shell has none today (Apps is a Spotlight mode, AppsView).
 ShellRoot {
     // Singletons are created on first use; these must exist from the start:
     // SpotlightState registers hyprk:spotlight-<mode> shortcuts, Clipboard runs the
     // history watcher (only created while history is on, the default is off).
     readonly property bool clipboardHistory: SpotlightState.clipboardHistory !== "off" && Clipboard.enabled
     readonly property QtObject lockScreen: Lock   // lock screen (modules/lock): IPC target `lock`, Power.lock
+    readonly property QtObject appsView: AppsView // registers hyprk:apps (Cmd+F4) and the `apps` IPC target
     // A11y (re-applies state/accessibility.lua, syncs the plugin's reduce_motion) starts with the
     // Dock, whose Materializer reads A11y.reduceMotion
 
@@ -46,11 +46,6 @@ ShellRoot {
     LazyLoader {
         active: Panels.loaded.switcher === true
         Switcher { modelData: Panels.screen }
-    }
-    // Applications: an ordinary window, created on open and destroyed on close (AppsView)
-    LazyLoader {
-        active: AppsView.open
-        ApplicationsWindow {}
     }
     LazyLoader {
         active: Panels.loaded.mission === true

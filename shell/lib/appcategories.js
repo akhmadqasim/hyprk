@@ -1,16 +1,19 @@
 .pragma library
 
-// Groups of the Applications window's category bar, from the .desktop Categories.
-// Names: the categories of the macOS 26 Apps view ("Productivity & Finance" is in
-// reference/screens/macos27-apps-view.png, with Mail, Calendar, Notes, Terminal, Script Editor and
-// Time Machine in it); the rest are from memory of macOS 26, not checked on 27.2.1 (Q-dock-26).
-// The first group with a matching category wins, so specific categories come before broad ones
-// (a TextEditor that is also a Utility is Productivity, like TextEdit on the Mac).
+// Category chips of the Apps panel (Spotlight Applications), from the .desktop Categories.
+// Names and chip order: macOS 27.2.1 (live/dock/apps-window.json): Utilities, Developer Tools, Social, Productivity &
+// Finance, Entertainment, Creativity, Information & Reading, Travel, Other ("the list depends on the installed
+// apps"). Games has no measured place: after Information & Reading. Travel has no freedesktop category: not used.
+// Which .desktop category lands in which chip is ours. The first group with a matching category wins, so specific
+// categories come before broad ones (a TextEditor that is also a Utility is Productivity, like TextEdit on the Mac).
+const ORDER = ["Utilities", "Developer Tools", "Social", "Productivity & Finance", "Entertainment", "Creativity",
+               "Information & Reading", "Games"];
 const GROUPS = [
+    ["Developer Tools", ["Development", "IDE", "Debugger", "RevisionControl", "GUIDesigner", "Profiling"]],
     ["Games", ["Game", "ActionGame", "AdventureGame", "ArcadeGame", "BoardGame", "BlocksGame", "CardGame", "LogicGame", "Simulation", "SportsGame", "StrategyGame"]],
     ["Social", ["InstantMessaging", "Chat", "IRCClient", "VideoConference", "Telephony"]],
     ["Productivity & Finance", ["Office", "Finance", "Email", "Calendar", "ContactManagement", "ProjectManagement",
-                                "WordProcessor", "Spreadsheet", "Presentation", "TextEditor", "Development", "IDE",
+                                "WordProcessor", "Spreadsheet", "Presentation", "TextEditor",
                                 "TerminalEmulator", "Database"]],
     ["Creativity", ["Graphics", "2DGraphics", "3DGraphics", "VectorGraphics", "RasterGraphics", "Photography",
                     "AudioVideoEditing", "Recorder", "Midi", "Mixer", "Sequencer", "Publishing"]],
@@ -22,9 +25,9 @@ const GROUPS = [
 ];
 const OTHER = "Other";
 
-// group names in bar order
+// group names in chip order
 function names() {
-    return GROUPS.map(g => g[0]).concat([OTHER]);
+    return ORDER.concat([OTHER]);
 }
 
 // group of one app from its Categories list

@@ -78,7 +78,7 @@ Singleton {
         const out = [];
         for (const ids of pinnedCandidates) {
             if (ids[0] === "hyprk-launchpad") {
-                out.push({ id: "hyprk-launchpad", name: "Apps", icon: "hyprk-launchpad", alsoIds: [AppsView.appId], action: () => AppsView.toggle() });
+                out.push({ id: "hyprk-launchpad", name: "Apps", icon: "hyprk-launchpad", alsoIds: [], action: () => AppsView.toggle() });
                 continue;
             }
             const own = hyprkApps[ids[0]];
@@ -203,7 +203,6 @@ Singleton {
         if (!t || !appIdOf(t)) return "Finder";
         const id = appIdOf(t);
         if (hyprkApps[id]) return hyprkApps[id].name;
-        if (id === AppsView.appId) return "Apps";       // the Applications window
         const e = entryFor(id);
         return e ? e.name : id;
     }

@@ -128,9 +128,6 @@ Singleton {
         readonly property real switcherLabel: 13    // TODO verify
         readonly property real ccTileTitle: 12      // CC toggle and slider titles: SF 12 semibold (Q-panels-06)
         readonly property real ccTileSub: 11        // CC toggle subtitle: SF 11 regular (Q-panels-06)
-        readonly property real spotlightInput: 26   // query text dominates (reference/JUDGE.md)
-        readonly property real spotlightRow: 15     // TODO verify
-        readonly property real spotlightHeader: 11  // TODO verify
         readonly property real dockLabel: 14        // Dock app-name label: system 14 (27.2.1 DOCKLabelLayer, Q-dock-08)
         readonly property real missionTitle: 13     // Mission Control window title: SF 13 bold (Q-dock-29)
         readonly property real widgetBig: 34        // TODO verify
@@ -415,27 +412,90 @@ Singleton {
 
     // ---------- spotlight ----------
     readonly property QtObject spotlight: QtObject {
-        // one glass panel: search row, hairline, results (reference/screens/macos27-spotlight.png)
-        readonly property int width: 640                 // SPEC.md 7: standardWindowWidth 640
-        readonly property int barHeight: 56              // SPEC.md 7: heightCollapsed 56
-        readonly property int radius: 28                 // SPEC.md 7: windowCornerRadius 28
-        readonly property int resultsRadius: 37          // results glass: RoundedRectangle(cornerRadius: 37) (REA 27.2.1, SpotlightUIInternal)
-        readonly property real top: 0.22                 // bar top at 22% of the screen height (reference/JUDGE-r3.md)
-        readonly property int iconSize: 20               // magnifier, TODO verify
-        readonly property int rowHeight: 48              // tall rows (macOS 26/27), TODO verify
-        readonly property int rowIcon: 34                // TODO verify
-        readonly property int rowRadius: 14              // inset selection pill, TODO verify
-        readonly property int rowInset: 10               // icon/header inset inside a row
-        readonly property int headerHeight: 24           // section header row
-        readonly property int maxApps: 5
-        readonly property int fieldInset: 8              // capsule query field inside the bar, TODO verify
-        readonly property color field: theme.dark ? Qt.rgba(1, 1, 1, 0.08) : Qt.rgba(0.45, 0.45, 0.47, 0.12)
-        readonly property color selection: theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0.45, 0.45, 0.47, 0.22)
-        readonly property real calcRowScale: 1.3         // calculator row height / rowHeight
-        readonly property int headerBaseline: 3
-        readonly property int textGap: 12
-        readonly property int hPadding: 20               // SPEC.md 7: content inset 20
-        readonly property int listInset: 8               // rows inset from panel edge, TODO verify
+        readonly property int maxApps: 5                 // app rows among the results
+
+        // ---- 27.2.1 (MAC-ANSWERS.md Q-panels-14..-26, Q-dock-23..25), pt ----
+        // Two glass shapes: the search capsule and, 10 below it, a results / mode list / mode panel. Drawn the
+        // same in light and dark (the Mac's account, icon style Dark, showed the dark capsule and white text in
+        // both; other icon styles not measured).
+        readonly property int barW: 520
+        readonly property int barH: 87
+        readonly property real barRadius: 43.5
+        readonly property real barTop: 0.227             // bar top at 22.7 % of the screen height
+        readonly property int gap: 10
+        readonly property real inputSize: 22             // query and placeholder: SF 22 regular
+        readonly property real textX: 39                 // text start without a mode
+        readonly property real modeTextX: 75             // text start after a mode glyph (cmd1/cmd3 shots)
+        readonly property real modeGlyphX: 33            // mode glyph left (App Store "A" 26.5 x 23.5 at 32.5)
+        readonly property real modeGlyph: 26
+        readonly property real trailingRight: 39         // mic ink 14.5 x 21 ends 39 from the right
+        readonly property real micSize: 21
+        readonly property real ellipsisRight: 37.5       // "..." in Applications, 17.5 wide
+        // the capsule's dark vertical gradient over the glass: over white 8 / 65 / 127, grey 6 / 36 / 64, black
+        // 1 / 6 / 17 at top / middle / bottom. Over the plugin's spotlight glass (0.89 in + 26 here) that is a veil
+        // of a .97 / .742 / .517 with k 0 / 0 / 4.4 (ours after: white 8 / 65 / 127 within 2)
+        readonly property color barTopTint: Qt.rgba(0, 0, 0, 0.97)
+        readonly property color barMidTint: Qt.rgba(0, 0, 0, 0.742)
+        readonly property color barBottomTint: Qt.rgba(0.033, 0.033, 0.033, 0.517)
+        // results / mode list panel: darker than the glass alone, slightly lighter at the bottom (over grey 127:
+        // 71 -> 83; over white about 164 mid-height; over a dark 31 about 35): a black veil .45 at the top, .38 at
+        // the bottom over the plugin glass
+        readonly property color panelTopVeil: Qt.rgba(0, 0, 0, 0.45)
+        readonly property color panelBottomVeil: Qt.rgba(0, 0, 0, 0.38)
+        // completion token (a category in Applications): grey pill behind the text, 25 tall, r 8
+        readonly property int tokenH: 25
+        readonly property int tokenRadius: 8
+        readonly property int tokenPad: 9
+        readonly property color tokenFill: Qt.rgba(1, 1, 1, 0.2)
+        // results and list panels: 520 wide, r 37; results at most 410 tall, Actions / Clipboard 490
+        readonly property real panelRadius: 37
+        readonly property real appsRadius: 38            // Apps panel: circle-equivalent 38 (continuous, extent 54.5)
+        readonly property int resultsMax: 410
+        readonly property int listPanelH: 490
+        readonly property int pillInset: 12              // selection pill x 12 .. width - 13
+        readonly property int pillRightInset: 13
+        readonly property int pillRadius: 22
+        readonly property int rowH: 62
+        readonly property int rowIconSize: 36            // icon at x 25 from the panel edge (13 in the pill)
+        readonly property int rowIconX: 13
+        readonly property int rowTextX: 68               // title at x 80 from the panel edge
+        readonly property real rowTitle: 17
+        readonly property real rowSub: 15
+        // list header (Actions "Suggestions", Files "Recents"): SF 12 semibold at x 20, centre y 30, a 1 pt
+        // separator at y 43.5 (x 20 .. width - 20), rows from 44.5
+        readonly property real headerX: 20
+        readonly property real headerCY: 30
+        readonly property real headerSepY: 43.5
+        readonly property real listTop: 44.5
+        readonly property real headerSize: 12
+        // mode list: 520 x 214, rows pitch 48 from y 11, glyph centred at x 44, label x 81, shortcut 14 regular
+        // right-aligned 38 from the edge; unfolds down in about 0.18 s, ease-in-out (60 fps video)
+        readonly property int modeListH: 214
+        readonly property int modeListPad: 11
+        readonly property int modeRow: 48
+        readonly property real modeListGlyphCX: 44
+        readonly property real modeListGlyph: 22
+        readonly property real modeListLabelX: 81
+        readonly property real shortcutRight: 38
+        readonly property real shortcutSize: 14
+        readonly property int unfoldMs: 180
+        // colours over the panels (white over the dark glass; alpha fitted to the grey readings on a ~79 panel /
+        // ~25 bar): secondary 153, placeholder and mic 165, shortcut 143, selection pill +11
+        readonly property color text: "#FFFFFF"
+        readonly property color secondary: Qt.rgba(1, 1, 1, 0.42)
+        readonly property color placeholder: Qt.rgba(1, 1, 1, 0.6)
+        readonly property color shortcut: Qt.rgba(1, 1, 1, 0.36)
+        readonly property color pill: Qt.rgba(1, 1, 1, 0.0625)
+        // Apps panel chips: +9 over the panel, text grey ~210 (SF 15 regular), 26 tall r 13, padding 10;
+        // separator under the suggestions +35 (plus-lighter)
+        readonly property real chipLift: 9 / 255
+        readonly property color chipText: Qt.rgba(1, 1, 1, 0.73)
+        readonly property real chipSize: 15
+        readonly property int chipPad: 10
+        readonly property real separatorLift: 35 / 255
+        // keyboard focus in the Apps grid: accent ring 69 pt, about 3.5 thick; the first search hit: a grey 68 pt
+        // plate (fill not measured)
+        readonly property color plate: Qt.rgba(1, 1, 1, 0.12)
     }
 
     // ---------- app switcher ----------

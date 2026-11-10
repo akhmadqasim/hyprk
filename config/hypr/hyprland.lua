@@ -250,7 +250,7 @@ hl.layer_rule({
 local cmd = "SUPER"
 hl.bind(cmd .. " + space",   hl.dsp.global("hyprk:spotlight"))
 hl.bind(cmd .. " + Tab",     hl.dsp.global("hyprk:switcher"))
-hl.bind(cmd .. " + F4",      hl.dsp.global("hyprk:apps"))   -- Applications window (shell/services/AppsView.qml)
+hl.bind(cmd .. " + F4",      hl.dsp.global("hyprk:apps"))   -- Apps: Spotlight's Applications mode (shell/services/AppsView.qml)
 hl.bind(cmd .. " + A",       hl.dsp.global("hyprk:apps"))
 hl.bind(cmd .. " + N",       hl.dsp.global("hyprk:notificationcenter"))
 hl.bind(cmd .. " + SHIFT + C", hl.dsp.global("hyprk:controlcenter"))
@@ -314,7 +314,3 @@ hl.window_rule({ name = "suppress-maximize", match = { class = ".*" }, suppress_
 -- max_size keeps big windows inside the work area (below the 30pt menu bar, above the
 -- ~84pt Dock zone); new_float_force_onscreen = 2 (default) then fits them fully.
 hl.window_rule({ name = "macos-float", match = { class = ".*" }, float = true, max_size = "monitor_w-40 monitor_h-130" })
--- The Applications window (class org.hyprk.Shell, shell/modules/ApplicationsWindow.qml) closes in one frame on
--- macOS 27.2.1 (Esc: gone in 1 frame, measured), unlike the ~0.1 s fade of other windows (windowsOut above):
--- no_anim takes it out of every window animation, so no close snapshot or fade.
-hl.window_rule({ name = "hyprk-shell-window-instant", match = { class = "^(org\\.hyprk\\.Shell)$" }, no_anim = true })
