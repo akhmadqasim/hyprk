@@ -540,5 +540,33 @@ test("mode buttons start inside the field, end in place", () => {
         AC.present([{ categories: ["Utility"] }, { categories: ["Game"] }, { categories: [] }]), ["Games", "Utilities", "Other"]));
 }
 
+// ---- Notification Center slide curve (modules/NotificationCenter.qml slideCurve vs the SwiftUI spring) ----
+test("notification center slide curve: two-segment BezierSpline within 0.01 of the 0.3 s / 1.25 spring", () => {
+    const src = readFileSync(join(here, "..", "modules", "NotificationCenter.qml"), "utf8");
+    const c = /slideCurve: \[([^\]]+)\]/.exec(src)[1].split(",").map(Number);
+    assert.equal(c.length, 12);
+    const P = [[0, 0], [c[0], c[1]], [c[2], c[3]], [c[4], c[5]], [c[6], c[7]], [c[8], c[9]], [c[10], c[11]]];
+    const bez = (a, b, cc, d, u) => [0, 1].map(i => (1 - u) ** 3 * a[i] + 3 * (1 - u) ** 2 * u * b[i] + 3 * (1 - u) * u * u * cc[i] + u ** 3 * d[i]);
+    const pts = [];
+    for (let u = 0; u <= 1; u += 0.002) pts.push(bez(P[0], P[1], P[2], P[3], u));
+    for (let u = 0; u <= 1; u += 0.002) pts.push(bez(P[3], P[4], P[5], P[6], u));
+    // spring: response 0.3, ratio 1.25 -> r1 = -41.89, r2 = -10.47 per second; the animation lasts 0.7 s
+    const w = 2 * Math.PI / 0.3, z = 1.25, s = Math.sqrt(z * z - 1), r1 = -w * (z + s), r2 = -w * (z - s);
+    const x = t => 1 - (r2 * Math.exp(r1 * t) - r1 * Math.exp(r2 * t)) / (r2 - r1);
+    assert.ok(Math.abs(r1 + 41.89) < 0.01 && Math.abs(r2 + 10.47) < 0.01);
+    let worst = 0;
+    for (let t = 0; t <= 0.7; t += 0.01) {
+        const f = t / 0.7;
+        let j = pts.findIndex(p => p[0] >= f);
+        if (j < 1) j = 1;
+        const [a, b] = [pts[j - 1], pts[j]];
+        const y = a[1] + (b[1] - a[1]) * (f - a[0]) / Math.max(b[0] - a[0], 1e-9);
+        worst = Math.max(worst, Math.abs(y - x(t)));
+    }
+    assert.ok(worst < 0.01, `worst ${worst}`);
+    assert.ok(pts.every((p, i) => i === 0 || p[0] >= pts[i - 1][0] - 1e-9), "time never goes back");
+    assert.ok(pts.every(p => p[1] >= -1e-9 && p[1] <= 1 + 1e-9), "no overshoot");
+});
+
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

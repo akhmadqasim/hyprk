@@ -10,7 +10,7 @@ import qs.HyprK
 
 // Notification Center (macOS 27): grouped notifications on top, widgets below.
 // Motion: the whole column slides in from the right screen edge and back out on close (springs fitted
-// to MAC-ANSWERS.md R2 (27.2.1), see openSpring).
+// to MAC-ANSWERS.md REA 27.2.1 Notification Center panel, see slideAnim).
 // Groups: one card per app with the edges of up to two more peeking below; a click
 // unfolds the stack (cards glide down from behind the first, header with the app
 // name, Show Less and a clear button fades in), Show Less folds it back. Hover shows
@@ -68,25 +68,34 @@ Item {
     // false on the Overlays of the other screens, so they do not slide a copy in and out
     property bool onThisScreen: true
     readonly property bool shown: Panels.open === "nc" && onThisScreen
-    readonly property bool animating: openSpring.moving
-    readonly property real progress: openSpring.value   // 0 off-screen .. 1 open (Overlay: glass materialize)
-    // value = share of the panel on screen (0 = its left edge at the screen edge). Reduce motion: fades
-    readonly property real slideX: Theme.travel((1 - openSpring.value) * (nc.width + Theme.nc.marginRight))
-    // MAC-ANSWERS.md R2 (27.2.1), share on screen per 17 ms frame:
-    //   open  0.11 0.14 0.29 0.43 0.54 0.64 0.71 0.78 0.83 0.87 0.90 0.92 0.94 ... 0.99 (~0.3 s, ease-out,
-    //         no overshoot): spring response 0.30, damping 1.0 fits within 0.012 RMS (OutCubic 330 ms: 0.025)
-    //   close 0.92 0.80 0.66 0.50 0.41 0.28 0.20 0.14 0.11 then gone (~0.15 s): spring response 0.295,
-    //         damping 0.85 fits within 0.011 RMS; the spring would take another ~0.1 s to creep the
-    //         last 10 % off screen, so like the Mac the panel is gone once less than 0.1 shows
-    // The panel only slides: its glass is at full material all the way (Overlay.qml).
-    Spring {
-        id: openSpring
-        onStarted: nc.settle()
-        onValueChanged: {
-            if (!moving) return;
-            if (!nc.shown && target === 0 && value < 0.1) snap();
-            else nc.settle();
-        }
+    readonly property bool animating: slideAnim.running
+    readonly property real progress: slide   // 0 off-screen .. 1 open (Overlay: glass materialize)
+    // share of the panel on screen (0 = its left edge at the screen edge). Reduce motion: fades
+    property real slide: 0
+    readonly property real slideX: Theme.travel((1 - slide) * (nc.width + Theme.nc.marginRight))
+    // MAC-ANSWERS.md "REA 27.2.1: Notification Center panel": a click open and a click close use ONE curve, SwiftUI
+    // Spring(duration 0.3, bounce -0.2) = interpolatingSpring(mass 1, stiffness 438.65, damping 52.36): response 0.3 s,
+    // damping ratio 1.25, overdamped (no overshoot; 90 % at 0.25 s, 99 % at 0.47 s). Only the x offset animates
+    // (one panel width W -> 0 and back): no fade, scale, blur or stagger. Close: the window is unmapped once the
+    // panel is fully off screen (below 1 % shown) instead of waiting for the spring to settle.
+    // SpringAnimation cannot express the SwiftUI parameters, so this is one NumberAnimation on a two-segment
+    // BezierSpline fitted to the closed form x(t) = 1 - (r2 e^(r1 t) - r1 e^(r2 t)) / (r2 - r1), r1 = -41.89,
+    // r2 = -10.47 per second, over 0.7 s (x = 0.9991 there): max error 0.006 of the panel width (see tests).
+    // The same curve runs both ways (close goes 1 -> 0 along 1 - x(t)). No per-frame script but the glass settle.
+    readonly property var slideCurve: [0.0368, 0.0025, 0.1226, 0.6103, 0.2325, 0.757, 0.3321, 0.8898, 0.2976, 0.9964, 1, 1]
+    NumberAnimation {
+        id: slideAnim
+        target: nc
+        property: "slide"
+        duration: Theme.ms(700)
+        easing.type: Easing.BezierSpline
+        easing.bezierCurve: nc.slideCurve
+        onRunningChanged: if (running) nc.settle()
+    }
+    onSlideChanged: {
+        if (!slideAnim.running) return;
+        if (!shown && slideAnim.to === 0 && slide < 0.01) { slideAnim.stop(); slide = 0; }
+        else settle();
     }
     // The Overlay window is unmapped while nothing shows, so opening maps a new layer surface and the compositor
     // takes a few frames to present it. A spring started with `shown` ran those frames unseen (the first 2 to 3 steps
@@ -107,9 +116,9 @@ Item {
     function startOpen() {
         openPending = false;
         if (!shown) return;
-        openSpring.response = 0.30;
-        openSpring.damping = 1.0;
-        openSpring.target = 1;
+        slideAnim.stop();
+        slideAnim.to = 1;
+        slideAnim.start();
     }
     onShownChanged: {
         if (shown) {
@@ -118,9 +127,9 @@ Item {
             refresh();
         } else {
             openPending = false;
-            openSpring.response = 0.295;
-            openSpring.damping = 0.85;
-            openSpring.target = 0;
+            slideAnim.stop();
+            slideAnim.to = 0;
+            slideAnim.start();
             expanded = ({});         // macOS reopens with every stack collapsed
         }
     }
@@ -160,7 +169,7 @@ Item {
         width: nc.width
         height: nc.height
         transform: Translate { x: nc.slideX }
-        opacity: Theme.reduceMotion ? Math.max(0, Math.min(1, openSpring.value)) : 1
+        opacity: Theme.reduceMotion ? Math.max(0, Math.min(1, nc.slide)) : 1
 
         Flickable {
             id: flick
