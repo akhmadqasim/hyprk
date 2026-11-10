@@ -17,13 +17,14 @@ QtObject {
     property var input: P.normalizeInput({})
     property var notifications: P.normalizeNotifications({})
     property var accessibility: A11y.normalize({})              // panes/accessibility/A11y.js
+    property var displays: P.normalizeDisplays({})                // looks-like size per output (Displays pane)
     property var wallpaper: ({})                                  // {path, ...}
     readonly property string wallpaperImage: String(wallpaper.path || "")
 
     readonly property var _normalize: ({
         appearance: P.normalizeAppearance, dock: P.normalizeDock, sound: P.normalizeSound,
         lock: P.normalizeLock, input: P.normalizeInput, notifications: P.normalizeNotifications,
-        accessibility: A11y.normalize,
+        accessibility: A11y.normalize, displays: P.normalizeDisplays,
         wallpaper: o => o
     })
     function path(key) { return Backend.stateDir + "/" + key + ".json"; }

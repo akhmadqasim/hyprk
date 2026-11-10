@@ -240,6 +240,93 @@ function prettyFileName(path) {
     return String(path || "").split("/").pop().replace(/\.[^.]+$/, "").replace(/[-_]/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2");
 }
 
+// ---------- Displays: "Looks like" picker ----------
+// displays.json, read by config/hypr/scale-policy.lua at Hyprland start and on hotplug:
+// { looksLike: { "<output>": "WxH" } }. An output without an entry uses the macOS default.
+const displaysDefaults = { looksLike: {} };
+function normalizeDisplays(obj) {
+    const o = Object.assign({}, displaysDefaults, (obj && typeof obj === "object") ? obj : {});
+    const map = {};
+    if (o.looksLike && typeof o.looksLike === "object")
+        for (const k in o.looksLike) {
+            const v = o.looksLike[k];
+            if (k && !/["\\]/.test(k) && typeof v === "string" && /^\d+x\d+$/.test(v)) map[k] = v;
+        }
+    o.looksLike = map;
+    return o;
+}
+
+// scale-policy.lua report() JSON -> { policy: "on"|"off", outputs: [...] }; anything else -> null.
+function parseScaleReport(text) {
+    let r;
+    try { r = JSON.parse(text); } catch (e) { return null; }
+    if (!r || typeof r !== "object" || !Array.isArray(r.outputs)) return null;
+    const pair = a => Array.isArray(a) && a.length === 2 ? [a[0] | 0, a[1] | 0] : [0, 0];
+    return {
+        policy: r.policy === "off" ? "off" : "on",
+        outputs: r.outputs.filter(o => o && typeof o.name === "string").map(o => ({
+            name: o.name, virtual: !!o.virtual, hidpi: !!o.hidpi, scale: +o.scale || 1,
+            native: pair(o.native), looks: pair(o.looks), def: pair(o.default),
+            source: ["saved", "env"].indexOf(o.source) === -1 ? "default" : o.source,
+            env: typeof o.env === "string" ? o.env : "",
+            choices: (Array.isArray(o.choices) ? o.choices : [])
+                .filter(c => c && c.w > 0 && c.h > 0)
+                .map(c => ({ w: c.w | 0, h: c.h | 0, scale: +c.scale || 1, isDefault: !!c.default }))
+        }))
+    };
+}
+
+// "1920 × 1080", the way System Settings writes sizes
+function sizeText(w, h) { return w + " \u00d7 " + h; }
+function sizeKey(c) { return c.w + "x" + c.h; }
+
+// The row of 5 scaled choices macOS shows for a HiDPI display, "Larger Text" (smallest looks-like size,
+// biggest text) to "More Space". MonitorPanel bucketizeDisplayModes picks them, but its rule is not decoded
+// (SPEC 14.5), so this is guessed: keep the smallest, the Default and the largest, then fill the widest gap
+// with its middle choice until there are 5. choices are sorted by width (scale-policy.lua M.choices).
+function looksLikeChiclets(choices) {
+    const n = choices.length;
+    if (!n) return [];
+    let d = choices.findIndex(c => c.isDefault);
+    const idx = [0, n - 1];
+    if (d > 0 && d < n - 1) idx.push(d);
+    idx.sort((a, b) => a - b);
+    while (idx.length < Math.min(5, n)) {
+        let gi = 0;
+        for (let i = 1; i < idx.length - 1; i++) if (idx[i + 1] - idx[i] > idx[gi + 1] - idx[gi]) gi = i;
+        if (idx[gi + 1] - idx[gi] < 2) break;
+        idx.splice(gi + 1, 0, Math.round((idx[gi] + idx[gi + 1]) / 2));
+    }
+    return idx.filter((v, i) => idx.indexOf(v) === i).map((i, k, all) => Object.assign({}, choices[i], {
+        label: choices[i].isDefault ? "Default" : k === 0 ? "Larger Text" : k === all.length - 1 ? "More Space" : ""
+    }));
+}
+
+// Why the picker can't be used for this output ("" = it can). report = parseScaleReport result.
+function looksLikeBlock(report, out) {
+    if (!report) return "Display sizes come from hyprk's scale policy, which Hyprland could not run here.";
+    if (report.policy === "off") return "Display scaling is turned off for this session (HYPRK_SCALE_POLICY=off).";
+    if (!out) return "This display is not known to Hyprland yet.";
+    if (out.virtual) return "This is a virtual display. Its size is set by its own rule.";
+    if (out.source === "env") return "Set by " + out.env + " for this session.";
+    if (!out.choices.length) return "No other sizes are available for this display.";
+    return "";
+}
+
+// The selected looks-like key: the saved choice when it is one of the choices, else what Hyprland runs.
+function looksLikeSelected(out, saved) {
+    if (!out) return "";
+    if (out.source !== "env" && saved && out.choices.some(c => sizeKey(c) === saved)) return saved;
+    return out.looks[0] + "x" + out.looks[1];
+}
+
+// hyprctl eval snippets for config/hypr/scale-policy.lua
+function luaScalePolicy(root) { return "dofile(" + luaString(root + "/config/hypr/scale-policy.lua") + ")"; }
+function luaScaleSet(root, output, size) {
+    return luaScalePolicy(root) + ".set(" + luaString(output) + ", " + luaString(size || "") + ")";
+}
+function luaScaleReport(root, path) { return luaScalePolicy(root) + ".report(" + luaString(path) + ")"; }
+
 // A state file's text with unsaved local changes on top; missing or corrupt files
 // give defaults. Unknown keys in the file are kept.
 function mergeState(text, patch, normalize) {
@@ -260,4 +347,6 @@ if (typeof module !== "undefined")
         parseHyprOption, luaString, luaMonitor, luaInput,
         normalizeAppearance, normalizeDock, normalizeSound, mergeState, monitorMode, prettyFileName,
         gecosName, normalizeLock, normalizeInput, normalizeNotifications, parseDesktopApps,
-        appearanceDefaults, dockDefaults, soundDefaults, alertSounds, lockDefaults, inputDefaults, notificationsDefaults, notifAppDefaults };
+        appearanceDefaults, dockDefaults, soundDefaults, alertSounds,
+        displaysDefaults, normalizeDisplays, parseScaleReport, sizeText, sizeKey, looksLikeChiclets, looksLikeBlock,
+        looksLikeSelected, luaScalePolicy, luaScaleSet, luaScaleReport, lockDefaults, inputDefaults, notificationsDefaults, notifAppDefaults };

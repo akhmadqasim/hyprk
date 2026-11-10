@@ -32,6 +32,11 @@ or stops, the pane falls back to polling every 15 s.
 | Lock Screen | no hypridle/hyprlock | settings are only saved to `state/lock.json` |
 | Lock Screen | a stored timeout that is not in the menu | shown as an extra item, e.g. "For 15 min" |
 | Displays | Hyprland rejects a mode | note "Hyprland did not accept that display setting." |
+| Displays (Looks like) | `HYPRK_SCALE_POLICY=off` in the Hyprland session | sizes shown dimmed and disabled, selection = what Hyprland runs, note "Display scaling is turned off for this session (HYPRK_SCALE_POLICY=off)." |
+| Displays (Looks like) | virtual output (MBA, HEADLESS*, WAYLAND-*, X11-*) without `HYPRK_NATIVE_<OUT>` | no size list, disabled Resolution row with the current size, note "This is a virtual display. Its size is set by its own rule." |
+| Displays (Looks like) | `HYPRK_LOOKS_LIKE` / `HYPRK_LOOKS_LIKE_<OUT>` set (env wins over the saved choice) | sizes disabled, selection = the env size, note "Set by HYPRK_LOOKS_LIKE_<OUT> for this session." |
+| Displays (Looks like) | `config/hypr/scale-policy.lua` report fails (`hyprctl eval` error, file missing) | disabled Resolution row, note "Display sizes come from hyprk's scale policy, which Hyprland could not run here." |
+| Displays (Looks like) | a saved size in `state/displays.json` that has no clean Hyprland scale | scale-policy.lua ignores it (logged), Default is used and shown |
 | Network | `nmcli` missing | row "Network services can't be listed" |
 | Battery / Energy | no `Battery` in `/sys/class/power_supply/*/type` | sidebar shows **Energy** instead of **Battery** (macOS desktop behavior); Energy pane says battery settings are hidden |
 | Wallpaper | `themes/wallpapers` empty | note "No wallpapers found yet…" |
@@ -84,6 +89,6 @@ is the same colour, opaque.
 
 Settings writes these; the readers belong to the shell/config agents. As of this commit
 `appearance.json`, `dock.json`, `sound.json` and `wallpaper.json` have readers or are
-planned; **`notifications.json`, `lock.json` and `input.json` have no reader yet**, so those
+planned; `displays.json` is read by `config/hypr/scale-policy.lua` (Hyprland start and hotplug); **`notifications.json`, `lock.json` and `input.json` have no reader yet**, so those
 panes only store the choice until the shell (notification server, hypridle glue, login
 config) reads them.
