@@ -41,9 +41,9 @@ ShellWindow {
         cache: false
     }
 
-    // Top-of-screen dimming of bright wallpaper pixels behind the menu bar (MAC-ANSWERS.md Q9.1,
-    // shaders/topdim.frag). Static: the strip is re-rendered only when the wallpaper image changes.
-    // Cost: one offscreen texture of screen width x 100 pt.
+    // Top-of-screen dimming of bright wallpaper pixels behind the menu bar (MENUBAR-REA-27.2.1.md
+    // "underbelly", shaders/topdim.frag). Static: the strip is re-rendered only when the wallpaper image
+    // changes. Cost: one offscreen texture of screen width x 8.5 % of its height.
     ShaderEffectSource {
         id: topStrip
         sourceItem: wallImage
@@ -55,15 +55,9 @@ ShellWindow {
         id: topDim
         z: -1
         width: parent.width
-        height: 100                    // measured: white is undimmed from about 100 pt down
+        height: Math.floor(parent.height * (1 - 0.915))   // underbelly_gradient_lo 0.915 (MENUBAR-REA-27.2.1.md)
         visible: wallImage.status === Image.Ready
         property var src: topStrip
-        property rect srcRect: Qt.rect(0, 0, 1, 1)
-        property size sizePt: Qt.size(width, height)
-        property real topPt: 0
-        property real radius: 0
-        property real saturation: 1
-        property real gain: 1
         fragmentShader: Qt.resolvedUrl("../shaders/topdim.frag.qsb")
     }
 }
