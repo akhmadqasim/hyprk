@@ -1,0 +1,74 @@
+# Name<TAB>app bundle path<TAB>icon name in Assets.car (= the .icns stem)<TAB>volume (os | appos)
+# macOS 27.2 (26B123) IPSW, see reference/ASSETS.md. Read by tools/build-apps.py.
+App_Store	/System/Applications/App Store.app	AppIcon	os
+Apps	/System/Applications/Apps.app	AppIcon	os
+Automator	/System/Applications/Automator.app	AppIcon	os
+Books	/System/Applications/Books.app	AppIcon	os
+Calculator	/System/Applications/Calculator.app	AppIcon	os
+Calendar	/System/Applications/Calendar.app	AppIcon	os
+Chess	/System/Applications/Chess.app	AppIcon	os
+Clock	/System/Applications/Clock.app	AppIcon	os
+Contacts	/System/Applications/Contacts.app	Contacts	os
+Dictionary	/System/Applications/Dictionary.app	AppIconLoc	os
+FaceTime	/System/Applications/FaceTime.app	AppIcon	os
+FindMy	/System/Applications/FindMy.app	AppIcon	os
+Font_Book	/System/Applications/Font Book.app	fontbook	os
+Freeform	/System/Applications/Freeform.app	AppIcon	os
+Games	/System/Applications/Games.app	AppIcon	os
+Home	/System/Applications/Home.app	AppIcon	os
+Image_Capture	/System/Applications/Image Capture.app	AppIcon	os
+Image_Playground	/System/Applications/Image Playground.app	AppIcon	os
+Journal	/System/Applications/Journal.app	AppIcon	os
+Mail	/System/Applications/Mail.app	ApplicationIcon	os
+Maps	/System/Applications/Maps.app	AppIcon	os
+Messages	/System/Applications/Messages.app	AppIcon	os
+Mission_Control	/System/Applications/Mission Control.app	AppIcon	os
+Music	/System/Applications/Music.app	AppIcon	os
+News	/System/Applications/News.app	AppIcon	os
+Notes	/System/Applications/Notes.app	AppIcon	os
+Passwords	/System/Applications/Passwords.app	AppIconUpdated	os
+Phone	/System/Applications/Phone.app	AppIcon	os
+Photo_Booth	/System/Applications/Photo Booth.app	AppIcon	os
+Photos	/System/Applications/Photos.app	AppIcon	os
+Podcasts	/System/Applications/Podcasts.app	AppIcon	os
+Preview	/System/Applications/Preview.app	AppIcon	os
+QuickTime_Player	/System/Applications/QuickTime Player.app	AppIcon	os
+Reminders	/System/Applications/Reminders.app	AppIcon	os
+Shortcuts	/System/Applications/Shortcuts.app	AppIcon	os
+Siri_AI	/System/Applications/Siri AI.app	AppIcon	os
+Siri	/System/Applications/Siri.app	AppIcon	os
+Stickies	/System/Applications/Stickies.app	AppIcon	os
+Stocks	/System/Applications/Stocks.app	AppIcon	os
+System_Settings	/System/Applications/System Settings.app	Settings	os
+TV	/System/Applications/TV.app	AppIcon	os
+TextEdit	/System/Applications/TextEdit.app	AppIcon	os
+Time_Machine	/System/Applications/Time Machine.app	AppIcon	os
+Tips	/System/Applications/Tips.app	AppIcon	os
+VoiceMemos	/System/Applications/VoiceMemos.app	VoiceMemosApp	os
+Weather	/System/Applications/Weather.app	AppIcon	os
+iPhone_Mirroring	/System/Applications/iPhone Mirroring.app	AppIcon	os
+Activity_Monitor	/System/Applications/Utilities/Activity Monitor.app	AppIcon	os
+AirPort_Utility	/System/Applications/Utilities/AirPort Utility.app	AppIcon	os
+Audio_MIDI_Setup	/System/Applications/Utilities/Audio MIDI Setup.app	AppIcon	os
+Bluetooth_File_Exchange	/System/Applications/Utilities/Bluetooth File Exchange.app	AppIcon	os
+ColorSync_Utility	/System/Applications/Utilities/ColorSync Utility.app	AppIcon	os
+Console	/System/Applications/Utilities/Console.app	AppIcon	os
+Digital_Color_Meter	/System/Applications/Utilities/Digital Color Meter.app	AppIcon	os
+Disk_Utility	/System/Applications/Utilities/Disk Utility.app	AppIcon	os
+Grapher	/System/Applications/Utilities/Grapher.app	Grapher	os
+Magnifier	/System/Applications/Utilities/Magnifier.app	AppIconMac	os
+Migration_Assistant	/System/Applications/Utilities/Migration Assistant.app	AppIcon	os
+Print_Center	/System/Applications/Utilities/Print Center.app	AppIcon	os
+Screen_Sharing	/System/Applications/Utilities/Screen Sharing.app	AppIcon	os
+Screenshot	/System/Applications/Utilities/Screenshot.app	AppIcon	os
+Script_Editor	/System/Applications/Utilities/Script Editor.app	AppIcon	os
+System_Information	/System/Applications/Utilities/System Information.app	ASP	os
+Terminal	/System/Applications/Utilities/Terminal.app	Terminal	os
+VoiceOver_Utility	/System/Applications/Utilities/VoiceOver Utility.app	AppIcon	os
+Safari	/System/Applications/Safari.app	AppIconUpdated	appos
+Finder	/System/Library/CoreServices/Finder.app	Finder	os
+Dock	/System/Library/CoreServices/Dock.app	AppIcon	os
+Spotlight	/System/Library/CoreServices/Spotlight.app	AppIcon	os
+ControlCenter	/System/Library/CoreServices/ControlCenter.app	AppIcon	os
+Install_Command_Line_Developer_Tools	/System/Library/CoreServices/Install Command Line Developer Tools.app	CommandLineTools	os
+Archive_Utility	/System/Library/CoreServices/Applications/Archive Utility.app	ArchiveUtility	os
