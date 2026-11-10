@@ -9,9 +9,10 @@ precision highp float;
 in vec2 v_texcoord;                 // 0..1 across the drawn quad (glass box + shadow margin)
 
 uniform sampler2D tex;              // Hyprland's blurred backdrop, mipmapped by the plugin
-uniform sampler2D sharpTex;         // unblurred backdrop copy, same size/uv as tex, mipmapped
-uniform vec2  uvTopLeft;            // quad corners in tex uv (both textures)
+uniform sampler2D sharpTex;         // unblurred backdrop copy, mipmapped (its own part of the output)
+uniform vec2  uvTopLeft;            // quad corners in tex uv
 uniform vec2  uvBottomRight;
+uniform vec4  sharpUv;              // quad corners in sharpTex uv: top-left xy, bottom-right zw
 uniform vec2  quadSize;             // px
 // Glass shapes of this quad, drawn as one smooth-union SDF (GlassEffectContainer-like merging).
 // A single shape is the plain case (smoothK has no effect then).
@@ -145,7 +146,7 @@ vec3 fetch(vec2 quadPx, float lod) {
 // Deep mips of the sharp copy are box filtered; a 4-tap tent over half a texel of the chosen
 // level smooths the blocky steps trilinear filtering leaves at lod > 1.
 vec3 fetchSharp(vec2 quadPx, float lod) {
-    vec2 uv = mix(uvTopLeft, uvBottomRight, quadPx / quadSize);
+    vec2 uv = mix(sharpUv.xy, sharpUv.zw, quadPx / quadSize);
     vec4 s;
     if (lod < 1.0)
         s = textureLod(sharpTex, uv, lod);

@@ -92,6 +92,7 @@ namespace lg {
             .aberration       = loc("aberration"),
             .faceYcc          = loc("faceYcc"),
             .sharpTex         = loc("sharpTex"),
+            .sharpUv          = loc("sharpUv"),
             .blurAlpha        = loc("blurAlpha"),
             .blurDist         = loc("blurDist"),
             .outerAmount      = loc("outerAmount"),
@@ -123,8 +124,9 @@ namespace lg {
             .pointerLight     = loc("pointerLight"),
         };
         // the sampler and the quad mapping are the minimum a custom shader must keep
-        if (u.tex < 0 || u.uvTopLeft < 0 || u.uvBottomRight < 0 || u.quadSize < 0 || u.shapeCount < 0 || u.shapeBox < 0) {
-            fail("shader lacks the required uniforms tex/uvTopLeft/uvBottomRight/quadSize/shapeCount/shapeBox");
+        // (sharpUv too when the shader reads sharpTex: the two textures hold different parts of the output)
+        if (u.tex < 0 || u.uvTopLeft < 0 || u.uvBottomRight < 0 || u.quadSize < 0 || u.shapeCount < 0 || u.shapeBox < 0 || (u.sharpTex >= 0 && u.sharpUv < 0)) {
+            fail("shader lacks the required uniforms tex/uvTopLeft/uvBottomRight/quadSize/shapeCount/shapeBox (and sharpUv with sharpTex)");
             return false;
         }
 
@@ -154,6 +156,15 @@ namespace lg {
         std::map<std::pair<uintptr_t, size_t>, SLuma> g_luma;
         GLuint                                         g_readFbo = 0;
         uint64_t                                       g_frame   = 0;
+
+        // Box-sized backdrop copies per element (owner, monitor) and role, so the mip chain covers the glass
+        // and its footprint instead of the whole output (README Performance)
+        enum eRole { SHARP, BLUR };
+        struct SBoxFB {
+            SP<Render::IFramebuffer> fb;
+            uint64_t                 frame = 0;
+        };
+        std::map<std::tuple<uintptr_t, MONITORID, int>, SBoxFB> g_boxes;
 
         // collect a finished readback, if any
         void collectLuma(SLuma& l, const SParams& p) {
@@ -268,18 +279,18 @@ namespace lg {
         // forget surfaces not drawn for ~10 s at 60 Hz
         std::erase_if(g_lit, [](const auto& kv) { return g_frame - kv.second.frame > 600; });
         std::erase_if(g_luma, [](const auto& kv) { return g_frame - kv.second.seen >= 600; });
+        std::erase_if(g_boxes, [](const auto& kv) { return g_frame - kv.second.frame >= 600; });
     }
 
     void forgetOwner(uintptr_t owner) {
         g_lit.erase(owner);
         std::erase_if(g_luma, [owner](const auto& kv) { return kv.first.first == owner; });
+        std::erase_if(g_boxes, [owner](const auto& kv) { return std::get<0>(kv.first) == owner; });
     }
 
     // ── unblurred backdrop copy (variable blur, edge bleed) ──────────────────
 
     namespace {
-        std::map<MONITORID, SP<Render::IFramebuffer>> g_sharp; // per monitor: sizes may differ
-
         constexpr int SHARP_LEVELS = 7; // the shader reads the sharp copy up to lod 7 (bleed)
 
         // the area to refresh so that reads in `read` up to mip `level` see no texel of an older frame
@@ -292,32 +303,33 @@ namespace lg {
             return out;
         }
 
-        // The unblurred backdrop of one glass element: its boxes (whole level-7 texels around them) are copied
-        // from what Hyprland blurs (the backdrop capture when a scope is open, else the framebuffer
-        // being rendered), then the mip chain is rebuilt. Per element, at its own turn in the pass:
-        // a copy shared across the frame showed stale pixels in the real shell (the framebuffer
-        // under a later layer is not final at an earlier element's turn), see README Performance.
-        // Returns the texture, or null when a copy is not possible.
-        SP<Render::ITexture> sharpBackdrop(Render::CRenderContext& ctx, const Vector2D& size, const CRegion& read) {
-            const auto  mon      = ctx.m_data.pMonitor.lock();
-            const auto& captures = ctx.m_backdropCaptures;
-            const auto  source   = !captures.empty() && captures.back().framebuffer ? captures.back().framebuffer : ctx.m_data.currentFB;
-            const auto  src      = dynamicPointerCast<CGLFramebuffer>(source);
-            if (!mon || !src)
-                return nullptr;
-            auto& fb = g_sharp[mon->m_id];
-            if (!fb)
-                fb = g_pHyprRenderer->createFB("liquidglass-sharp");
+        // A texture holding part of a monitor-sized buffer: `box` is where it sits on the monitor (physical px)
+        struct STexView {
+            SP<Render::ITexture> tex;
+            CBox                 box;
+        };
+
+
+        // Copies the rects of `copy` (whole level-`levels` texels, see footprintOf) from `src` into a texture the
+        // size of their extents, at the same offsets, and rebuilds its mips 0..levels. The extents start on the
+        // level grid, so every texel equals the one a mip chain of the whole output would hold.
+        // Texels between the rects are never read. Null `tex` when the copy is not possible.
+        STexView copyBox(uintptr_t owner, MONITORID mon, eRole role, const SP<CGLFramebuffer>& src, const CRegion& copy, int levels) {
+            const CBox box = CRegion{copy}.getExtents();
+            if (!src || box.w < 1 || box.h < 1)
+                return {};
+            auto& slot = g_boxes[{owner, mon, role}];
+            slot.frame = g_frame;
+            if (!slot.fb)
+                slot.fb = g_pHyprRenderer->createFB(role == SHARP ? "liquidglass-sharp" : "liquidglass-blur");
+            auto& fb = slot.fb;
             // same format as the source: a blit between float and unorm buffers is invalid
-            if ((fb->m_size != size || fb->m_drmFormat != src->m_drmFormat || !fb->isAllocated()) && !fb->alloc(size.x, size.y, src->m_drmFormat))
-                return nullptr;
+            if ((fb->m_size != box.size() || fb->m_drmFormat != src->m_drmFormat || !fb->isAllocated()) && !fb->alloc(box.w, box.h, src->m_drmFormat))
+                return {};
             const auto dst = dynamicPointerCast<CGLFramebuffer>(fb);
             const auto tex = fb->getTexture();
             if (!dst || !tex)
-                return nullptr;
-            const CRegion copy = footprintOf(read, SHARP_LEVELS, size);
-            if (copy.empty())
-                return tex;
+                return {};
             {
                 CFramebufferBindingGuard guard{g_pHyprRenderer->glBackend()};
                 // a blit is clipped by the scissor test: whatever rect the last draw left would be all
@@ -325,25 +337,42 @@ namespace lg {
                 g_pHyprOpenGL->disableScissor();
                 g_pHyprOpenGL->bindFramebuffer(GL_READ_FRAMEBUFFER, src->getFBID());
                 g_pHyprOpenGL->bindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->getFBID());
+                const int ox = box.x, oy = box.y;
                 // texel rows follow the top-down box space of the uvs
-                copy.forEachRect([](const auto& r) { glBlitFramebuffer(r.x1, r.y1, r.x2, r.y2, r.x1, r.y1, r.x2, r.y2, GL_COLOR_BUFFER_BIT, GL_NEAREST); });
+                CRegion{copy}.forEachRect([ox, oy](const auto& r) {
+                    glBlitFramebuffer(r.x1, r.y1, r.x2, r.y2, r.x1 - ox, r.y1 - oy, r.x2 - ox, r.y2 - oy, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+                });
                 if (glGetError() != GL_NO_ERROR) {
                     fb.reset(); // reallocate next time
-                    return nullptr;
+                    return {};
                 }
             }
             g_pHyprOpenGL->setActiveTexture(GL_TEXTURE1);
             tex->bind();
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 7); // the shader reads up to lod ~7
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, levels);
             glGenerateMipmap(GL_TEXTURE_2D);
             tex->setTexParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            tex->unbind();
             g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
-            return tex;
+            return {tex, box};
+        }
+
+        // The unblurred backdrop of one glass element, copied from what Hyprland blurs (the backdrop capture
+        // when a scope is open, else the framebuffer being rendered). Per element, at its own turn in the
+        // pass: a copy shared across the frame showed stale pixels in the real shell (the framebuffer
+        // under a later layer is not final at an earlier element's turn), see README Performance.
+        STexView sharpBackdrop(Render::CRenderContext& ctx, uintptr_t owner, const Vector2D& size, const CRegion& read) {
+            const auto  mon      = ctx.m_data.pMonitor.lock();
+            const auto& captures = ctx.m_backdropCaptures;
+            const auto  source   = !captures.empty() && captures.back().framebuffer ? captures.back().framebuffer : ctx.m_data.currentFB;
+            if (!mon)
+                return {};
+            return copyBox(owner, mon->m_id, SHARP, dynamicPointerCast<CGLFramebuffer>(source), footprintOf(read, SHARP_LEVELS, size), SHARP_LEVELS);
         }
     }
 
     void releaseGlState() {
-        g_sharp.clear();
+        g_boxes.clear();
         g_luma.clear();
         if (g_readFbo)
             glDeleteFramebuffers(1, &g_readFbo);
@@ -542,10 +571,18 @@ namespace lg {
 
         // one blur + one mip chain (the blur pyramid the per-pixel LOD reads) for all shapes. Hyprland
         // refreshes only the region it is given, so it gets every texel the deepest read touches
-        const auto blurredFB = g_pHyprRenderer->blurMainFramebuffer(ctx, 1.f, footprintOf(blurDamage, std::clamp(int(std::ceil(maxLod)), 0, 12), mon->m_transformedSize));
-        const auto tex       = blurredFB ? blurredFB->getTexture() : nullptr;
-        if (!tex || tex->m_size.x <= 0 || tex->m_size.y <= 0)
+        const int     blurLevels = std::clamp(int(std::ceil(maxLod)), 0, 12);
+        const CRegion blurRead   = footprintOf(blurDamage, blurLevels, mon->m_transformedSize);
+        const auto    blurredFB  = g_pHyprRenderer->blurMainFramebuffer(ctx, 1.f, blurRead);
+        const auto    fullTex    = blurredFB ? blurredFB->getTexture() : nullptr;
+        if (!fullTex || fullTex->m_size.x <= 0 || fullTex->m_size.y <= 0)
             return false;
+        // the blurred region into a box-sized texture: its mips cost the glass, not the output
+        auto blur = copyBox(m_data.owner, mon->m_id, BLUR, dynamicPointerCast<CGLFramebuffer>(blurredFB), blurRead, blurLevels);
+        const bool boxed = blur.tex != nullptr;
+        if (!boxed) // the whole blurred output then, mipmapped below
+            blur = {fullTex, CBox{{}, fullTex->m_size}};
+        const auto& tex = blur.tex;
 
         // before touching the texture state, so a failure leaves it as Hyprland set it
         const auto shader = g_pHyprOpenGL->useShader(prog.shader());
@@ -553,13 +590,14 @@ namespace lg {
             return false;
 
         // without the copy, the blurred texture stands in: variable blur and bleed then stay blurred
-        auto sharp = sharpBackdrop(ctx, tex->m_size, blurDamage);
-        if (!sharp)
-            sharp = tex;
+        auto sharp = sharpBackdrop(ctx, m_data.owner, mon->m_transformedSize, blurDamage);
+        if (!sharp.tex)
+            sharp = blur;
 
         g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
         tex->bind();
-        glGenerateMipmap(GL_TEXTURE_2D);
+        if (!boxed)
+            glGenerateMipmap(GL_TEXTURE_2D);
         tex->setTexParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
         // light/dark per shape: forced, or the hysteresis state from earlier readbacks
@@ -577,8 +615,9 @@ namespace lg {
                 l.seen = g_frame;
                 collectLuma(l, p);
                 const auto& box   = quads[q].box;
-                const int   level = std::clamp(int(std::floor(std::log2(std::max(1.0, std::min(box.w, box.h) * 0.5)))), 0, 12);
-                requestLuma(l, tex->m_texID, level, int((s.box.x + s.box.w / 2) * scale) >> level, int((s.box.y + s.box.h / 2) * scale) >> level);
+                // a box copy has fresh mips up to blurLevels only
+                const int   level = std::clamp(int(std::floor(std::log2(std::max(1.0, std::min(box.w, box.h) * 0.5)))), 0, boxed ? blurLevels : 12);
+                requestLuma(l, tex->m_texID, level, int((s.box.x + s.box.w / 2) * scale - blur.box.x) >> level, int((s.box.y + s.box.h / 2) * scale - blur.box.y) >> level);
                 dark[q] = l.dark;
             }
         }
@@ -614,7 +653,7 @@ namespace lg {
         g_pHyprOpenGL->blend(true);
         g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         g_pHyprOpenGL->setActiveTexture(GL_TEXTURE1);
-        sharp->bind();
+        sharp.tex->bind();
         g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
         glBindVertexArray(shader->getUniformLocation(SHADER_SHADER_VAO));
 
@@ -624,8 +663,11 @@ namespace lg {
             const auto& face                       = dark[q] ? r.dark : r.light;
 
             shader->setUniformMatrix3fv(SHADER_PROJ, 1, GL_TRUE, g_pHyprRenderer->projectBoxToTarget(ctx, quad).getMatrix());
-            glUniform2f(u.uvTopLeft, quad.x / tex->m_size.x, quad.y / tex->m_size.y);
-            glUniform2f(u.uvBottomRight, (quad.x + quad.w) / tex->m_size.x, (quad.y + quad.h) / tex->m_size.y);
+            // quad corners in each texture's uv (the textures hold different parts of the output)
+            glUniform2f(u.uvTopLeft, (quad.x - blur.box.x) / blur.box.w, (quad.y - blur.box.y) / blur.box.h);
+            glUniform2f(u.uvBottomRight, (quad.x + quad.w - blur.box.x) / blur.box.w, (quad.y + quad.h - blur.box.y) / blur.box.h);
+            glUniform4f(u.sharpUv, (quad.x - sharp.box.x) / sharp.box.w, (quad.y - sharp.box.y) / sharp.box.h, (quad.x + quad.w - sharp.box.x) / sharp.box.w,
+                        (quad.y + quad.h - sharp.box.y) / sharp.box.h);
             glUniform2f(u.quadSize, quad.w, quad.h);
             std::array<float, 4 * MAX_GROUP> boxes{};
             std::array<float, 2 * MAX_GROUP> info{};
@@ -674,7 +716,7 @@ namespace lg {
         glBindVertexArray(0);
         g_pHyprOpenGL->disableScissor();
         g_pHyprOpenGL->setActiveTexture(GL_TEXTURE1);
-        sharp->unbind();
+        sharp.tex->unbind();
         g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
         tex->setTexParameter(GL_TEXTURE_MIN_FILTER, tex->minFilter);
         tex->unbind();
