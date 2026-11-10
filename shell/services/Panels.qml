@@ -22,37 +22,25 @@ Singleton {
     property int menuIndex: -1          // index of the open menu bar title (0 = Apple)
     property real menuX: 0              // screen x of the open menu title
 
-    // The title pill (MenuBar) and the dropdown (Overlay) are two layer surfaces that commit
-    // separately, so a hover switch could put the new pill on screen one frame before the new
-    // dropdown, or the new dropdown under the old pill. They now change in order, each step
-    // waiting until the previous surface has presented its frame (components/FramePresented.qml):
-    // the old pill goes, then the Overlay shows the new menu, then the pill comes. Never a pill
-    // over the wrong menu or with none; the cost is a frame or two with no pill while switching.
+    // Moving across the menu bar titles with a menu open (MAC-ANSWERS.md R2, 60 fps recording of the
+    // 27.2.1 Finder): the title pill jumps to the new title in one frame, and the open menu is swapped
+    // in one frame 3 to 4 frames (50 to 67 ms) later, with no crossfade. So the pill (MenuBar) follows
+    // menuIndex at once and the dropdown (Overlay) draws menuShown, which follows menuIndex after
+    // menuSwapDelay. A move while a swap is pending does not push it back, so the dropdown is never
+    // more than that delay behind the pill. The first open shows both at once (one frame on the Mac).
     property int menuShown: -1          // menu the Overlay draws
     property real menuShownX: 0
-    property int menuPill: -1           // title whose pill the menu bar draws
-    property string menuWait: ""        // "bar" | "overlay": waiting for that surface's frame
-    signal menuFrameWanted(string surface)
+    readonly property int menuSwapDelay: 58   // 3.5 frames at 60 Hz (measured 3 to 4)
+    function showMenuNow() {
+        menuShown = menuIndex;
+        menuShownX = menuX;
+    }
     function stepMenu() {
-        if (open !== "menu" || menuIndex < 0 || menuWait !== "") return;
-        if (menuShown !== menuIndex) {
-            if (menuPill >= 0) { menuPill = -1; waitMenuFrame("bar"); return; }
-            menuShown = menuIndex;
-            menuShownX = menuX;
-            waitMenuFrame("overlay");
-            return;
-        }
-        menuPill = menuShown;
+        if (open !== "menu" || menuIndex < 0) return;
+        if (menuShown < 0) showMenuNow();
+        else if (menuShown !== menuIndex && !menuSwap.running) menuSwap.start();
     }
-    function waitMenuFrame(surface) { menuWait = surface; menuWaitTimeout.restart(); menuFrameWanted(surface); }
-    function menuPresented(surface) {
-        if (surface !== menuWait) return;
-        menuWait = "";
-        menuWaitTimeout.stop();
-        stepMenu();
-    }
-    // a surface that never presents (unmapped, render loop without the signals) cannot stall a menu
-    Timer { id: menuWaitTimeout; interval: 100; onTriggered: { root.menuWait = ""; root.stepMenu(); } }
+    Timer { id: menuSwap; interval: root.menuSwapDelay; onTriggered: if (root.open === "menu" && root.menuIndex >= 0) root.showMenuNow() }
     onMenuIndexChanged: stepMenu()
 
     // context menu (desktop, Dock): items as in lib/menus.js, action may be a function.
@@ -117,9 +105,7 @@ Singleton {
         if (open !== "menu") {
             menuIndex = -1;
             menuShown = -1;
-            menuPill = -1;
-            menuWait = "";
-            menuWaitTimeout.stop();
+            menuSwap.stop();
         } else stepMenu();
         if (previous !== open && lazySurfaces.indexOf(previous) !== -1) {
             held = Object.assign({}, held, { [previous]: true });

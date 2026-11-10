@@ -77,13 +77,8 @@ ShellWindow {
     }
 
     // ---------- menu ----------
-    // shows Panels.menuShown, not menuIndex: switching menus goes in order with the menu bar's
-    // title pill (Panels.stepMenu), which waits for this surface's frame
-    FramePresented { id: framePresented; onPresented: Panels.menuPresented("overlay") }
-    Connections {
-        target: Panels
-        function onMenuFrameWanted(surface) { if (surface === "overlay" && Panels.activeScreen === ov.modelData) framePresented.arm(); }
-    }
+    // shows Panels.menuShown, not menuIndex: while switching by hover the menu follows the title
+    // pill a few frames later (Panels.stepMenu)
     MenuDropdown {
         id: menu
         shown: Panels.open === "menu" && Panels.activeScreen === ov.modelData
