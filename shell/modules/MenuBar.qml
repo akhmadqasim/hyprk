@@ -174,7 +174,10 @@ ShellWindow {
             color: bar.fg
             font.family: Theme.fontText
             font.pixelSize: Theme.font.menuBar
-            font.weight: mt.bold ? Theme.font.bold : Theme.font.regular
+            // bold app name: DemiBold + wght 700, not Font.Bold (Qt fakes bold on top of SF Pro's variable
+            // Bold instance, see AlertDialog.qml)
+            font.weight: mt.bold ? Theme.font.semibold : Theme.font.regular
+            font.variableAxes: mt.bold ? ({ "wght": 700 }) : ({})
         }
         Item { id: holder; anchors.fill: parent }
         MouseArea {

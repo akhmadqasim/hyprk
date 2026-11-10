@@ -105,7 +105,12 @@ Item {
             text: root.model ? root.model.title : ""
             font.family: Theme.fontText
             font.pixelSize: Theme.alert.titleSize
-            font.weight: Font.Bold
+            // Bold 13 (LIVE-27.2.1.md alert metrics). Not Font.Bold: SF Pro is a variable font, and Qt 6.10
+            // fakes bold (FreeType emboldening) on top of its Bold named instance for any weight >= Bold,
+            // which drew the title double-struck. DemiBold plus the wght axis at 700 gives the real Bold
+            // outlines; fonts without the axis fall back to their semibold face.
+            font.weight: Font.DemiBold
+            font.variableAxes: ({ "wght": 700 })
             color: Theme.color.label
         }
         Text {
