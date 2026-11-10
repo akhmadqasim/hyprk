@@ -3,6 +3,7 @@
 //   t <text>      type ASCII text (letters, digits, space, a few symbols; Shift for capitals)
 //   k <key>       tap one key: Return Escape BackSpace Caps_Lock Tab space
 //   c <key>       Ctrl + key (key as above or a letter)
+//   C <key>       Ctrl + Super + key (Ctrl+Cmd, e.g. C q = Lock Screen)
 //   s <ms>        sleep
 // Never point it at your real session: it types wherever the focus is.
 #define _GNU_SOURCE
@@ -98,13 +99,15 @@ int main(void) {
                 tap(code);
                 if (sh) setmods(mods & ~1u);
             }
-        } else if ((line[0] == 'k' || line[0] == 'c') && line[1] == ' ') {
+        } else if ((line[0] == 'k' || line[0] == 'c' || line[0] == 'C') && line[1] == ' ') {
             int code = lookup(line + 2), sh;
             if (code < 0) code = ascii(line[2], &sh);
             if (code < 0) { fprintf(stderr, "vkbd: unknown key %s\n", line + 2); continue; }
-            if (line[0] == 'c') { key(KEY_LEFTCTRL, 1); setmods(mods | 4); }
+            if (line[0] != 'k') { key(KEY_LEFTCTRL, 1); setmods(mods | 4); }
+            if (line[0] == 'C') { key(KEY_LEFTMETA, 1); setmods(mods | 64); }   // Mod4
             tap(code);
-            if (line[0] == 'c') { key(KEY_LEFTCTRL, 0); setmods(mods & ~4u); }
+            if (line[0] == 'C') { key(KEY_LEFTMETA, 0); setmods(mods & ~64u); }
+            if (line[0] != 'k') { key(KEY_LEFTCTRL, 0); setmods(mods & ~4u); }
             // Caps Lock toggles the Lock modifier; the compositor keeps its own xkb state as well
             if (code == KEY_CAPSLOCK) setmods(mods ^ 2u);
         } else if (line[0] == 's' && line[1] == ' ') {
