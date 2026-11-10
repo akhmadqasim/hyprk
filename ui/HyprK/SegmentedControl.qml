@@ -63,9 +63,12 @@ Item {
         for (let b = 1; b < count; b++) if (_drawn(b)) n++;
         return n;
     }
-    readonly property var _wl: {   // laid-out width of each segment: the natural widths scaled to the control's width
-        const n = _sum(_ws), k = n > 0 ? (width - _nSep * separatorSpacing) / n : 0;
-        return _ws.map(w => w * k);
+    // laid-out width of each segment: at its natural width each segment fits its content; stretched to another
+    // width the segments share it equally (Settings' Output / Input picker: 224 + 224 in a 448 control)
+    readonly property var _wl: {
+        const avail = width - _nSep * separatorSpacing;
+        if (Math.abs(avail - _sum(_ws)) < 0.5) return _ws;
+        return _ws.map(() => count > 0 ? avail / count : 0);
     }
     readonly property var _xs: {   // left edge of each segment
         const a = [];

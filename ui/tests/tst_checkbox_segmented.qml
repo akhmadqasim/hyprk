@@ -213,6 +213,9 @@ Item {
             verify(seg._ws[2] > seg._ws[0]);               // "Three" with a glyph is wider than "One"
             compare(seg.implicitWidth, seg._ws[0] + seg._ws[1] + seg._ws[2]);
             compare(seg._xs[1], seg._wl[0]);
+            seg.width = 300;                               // stretched: equal shares (fillEqually)
+            compare(seg._wl, [100, 100, 100]);
+            seg.width = Qt.binding(() => seg.implicitWidth);
         }
         function test_segmented_pill_jumps() {               // Q-settings-22: no slide, one frame
             const pill = findChild(seg, "pill");
