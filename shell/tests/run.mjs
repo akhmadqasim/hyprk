@@ -107,7 +107,8 @@ test("state empty", () => assert.deepEqual(ST.parse("", defs), defs));
 test("state wrong type", () => assert.equal(ST.parse('{"dark":"yes"}', defs).dark, false));
 test("state null", () => assert.equal(ST.parse('{"dark":null}', defs).dark, false));
 
-// ---- Dock defaults (lib/state.js) ----
+// ---- Dock (lib/dock.js, dock defaults in lib/state.js) ----
+const DK = load("dock.js");
 test("dock magnification off by default", () => assert.equal(ST.dockDefaults().magnification, false));
 test("dock magnified ratio from the sliders", () => {
     assert.equal(ST.magnifyRatio(ST.dockDefaults()), 2);
@@ -119,6 +120,42 @@ test("dock.json without the key keeps magnification off", () => {
     assert.equal(ST.parse('{"autohide": true}', ST.dockDefaults()).magnification, false);
     assert.equal(ST.parse('{"magnification": true}', ST.dockDefaults()).magnification, true);
 });
+{
+    const widths = [44, 44, 44, -13, 44];
+    const o = (amount, focus) => ({ base: 44, big: 88, amount, focus, range: 66, spacing: 2, sidePad: 8, dpr: 2 });
+    const rest = DK.layout(widths, o(0, 0));
+    test("dock rest layout", () => {
+        assert.deepEqual(rest.w, [44, 44, 44, 13, 44]);
+        assert.deepEqual(rest.x, [8, 54, 100, 146, 161]);
+        assert.equal(rest.width, 213);
+        assert.equal(rest.baseWidth, 213);
+    });
+    test("dock off: pointer moves nothing", () => {
+        for (const f of [0, 30, 77, 150, 260]) assert.deepEqual(DK.layout(widths, o(0, f)), rest);
+    });
+    test("dock magnified under the pointer, separator fixed", () => {
+        const l = DK.layout(widths, o(1, rest.center[1]));
+        assert.equal(l.w[1], 88);
+        assert.equal(l.w[3], 13);
+        assert.ok(l.w[0] > 44 && l.w[0] < 88 && l.w[0] === l.w[2]);
+        assert.equal(l.baseWidth, rest.baseWidth);
+    });
+    test("dock end tile stays full size past its centre", () => {
+        const at = DK.layout(widths, o(1, rest.center[0])), past = DK.layout(widths, o(1, -20));
+        assert.equal(at.w[0], 88);
+        assert.deepEqual(past, at);
+    });
+    test("dock sizes continuous and device-pixel snapped", () => {
+        let prev = DK.layout(widths, o(1, 0));
+        for (let f = 0.5; f < 213; f += 0.5) {
+            const l = DK.layout(widths, o(1, f));
+            l.w.forEach((w, i) => { assert.equal(w * 2, Math.round(w * 2)); assert.ok(Math.abs(w - prev.w[i]) <= 1.5, `size jump at ${f}`); });
+            l.x.forEach((x, i) => assert.ok(Math.abs(x - prev.x[i]) <= 3, `x jump at ${f}`));
+            assert.equal(l.width, Math.round(l.width));
+            prev = l;
+        }
+    });
+}
 test("state array", () => assert.deepEqual(ST.parse("[1]", defs), defs));
 test("state unknown key", () => assert.ok(!("x" in ST.parse('{"x":1}', defs))));
 test("state no mutation", () => { ST.parse('{"dark":true}', defs); assert.equal(defs.dark, false); });

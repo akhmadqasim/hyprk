@@ -6,10 +6,11 @@ import qs
 import qs.components
 import qs.services
 import qs.HyprK
+import "../lib/dock.js" as DockLayout
 import "../lib/state.js" as State
 
-// Floating glass Dock: magnification (when switched on), running dots, separator + Trash,
-// launch on click with bounce, app name tooltip, press lift on icons.
+// Floating glass Dock: running dots, separator, Downloads + Trash, app name label on hover,
+// launch on click with bounce, press lift on icons, magnification when switched on.
 // Hidden while a window is full screen on this output, and with "Automatically hide and show the
 // Dock" (state/dock.json) until the pointer rests on the bottom edge for the autohide delay.
 // Liquid Glass: it slides down while dematerializing and comes back materializing (also when the
@@ -29,13 +30,15 @@ ShellWindow {
     readonly property int sidePad: Theme.dock.sidePadding
     readonly property int bgHeight: base + pad * 2
     readonly property int tooltipRoom: Theme.dock.tooltipHeight + Theme.dock.tooltipGap + 8
+    readonly property real dpr: screen && screen.devicePixelRatio > 0 ? screen.devicePixelRatio : 1
 
     // Magnification is off by default, like macOS (state/dock.json `magnification`, Settings >
     // Desktop & Dock > Magnification). Off: hovering only shows the app name, nothing moves.
     readonly property bool magnification: Prefs.dock.magnification === true
 
+    readonly property int iconRoom: (magnification ? magnified : base) + Math.max(tooltipRoom, Theme.dock.bounceHeight)
     anchors { bottom: true; left: true; right: true }
-    implicitHeight: (magnification ? magnified : base) + Math.max(tooltipRoom, Theme.dock.bounceHeight) + pad + Theme.dock.bottomMargin
+    implicitHeight: iconRoom + pad + Theme.dock.bottomMargin
     exclusiveZone: autohide ? 0 : bgHeight + Theme.dock.bottomMargin
     namespace: "hyprk-dock"
     WlrLayershell.layer: WlrLayer.Top
@@ -85,30 +88,27 @@ ShellWindow {
                                                         { id: "hyprk-downloads", name: "Downloads", icon: "folder-download", folder: "Downloads" },
                                                         { id: "hyprk-trash", name: "Trash", icon: "user-trash", trash: true }])
     readonly property int sepIndex: items.length - 3
-    // separator cell width; Row spacing on both sides is part of the visual gap
+    // separator cell width; the icon spacing on both sides is part of the visual gap
     readonly property real sepCell: Theme.dock.separatorHPad * 2 + Theme.dock.separatorWidth - Theme.dock.iconSpacing * 2
-    // unmagnified width, used for hover math so magnification does not feed back into itself
-    readonly property real baseWidth: (items.length - 1) * base + sepCell + (items.length - 1) * Theme.dock.iconSpacing + sidePad * 2
-    property real mouseX: -1
-    readonly property bool hovering: mouseX >= 0
-    // last cursor x over the Dock: icons shrink back around it after the cursor leaves
-    property real focusX: 0
-    onMouseXChanged: if (mouseX >= 0) focusX = mouseX
+    // unmagnified cell widths, the separator fixed (negative, see lib/dock.js)
+    readonly property var cellWidths: items.map(it => it.separator ? -sepCell : base)
 
-    // Like macOS: icon sizes follow the cursor directly every frame; only entering and
-    // leaving the Dock ramp the magnification in and out. (A Behavior on each icon's
-    // size chased the cursor and lagged behind it, so icons overlapped and jittered.)
-    property real magnify: magnification && hovering && Panels.open !== "context" ? 1 : 0
+    // ---------- hover and magnification ----------
+    // The pointer is mapped into the unmagnified layout, so magnification never feeds back into
+    // itself. The sizes follow the pointer directly every frame; only entering and leaving the Dock
+    // ramp the curve in and out (`magnify`), around the last pointer position.
+    property real focusX: 0
+    readonly property real baseWidth: geom.baseWidth
+    property real magnify: magnification && pointerIn && shown && Panels.open !== "context" ? 1 : 0
     Behavior on magnify { NumberAnimation { duration: Theme.anim.magnify; easing.type: Theme.anim.easing } }
 
-    function sizeFor(baseCenter) {
-        if (magnify <= 0) return base;
-        const d = Math.abs(focusX - baseCenter) / (base * Theme.dock.magnifyRange);
-        if (d >= 1) return base;
-        return base + (dock.magnified - base) * magnify * (Math.cos(d * Math.PI) + 1) / 2;
-    }
+    readonly property var geom: DockLayout.layout(cellWidths, {
+        base: base, big: magnified, amount: magnify, focus: focusX,
+        range: base * Theme.dock.magnifyRange,     // SPEC.md 7: magnification width 3 x tilesize
+        spacing: Theme.dock.iconSpacing, sidePad: sidePad, dpr: dpr
+    })
 
-    // hit area: background, plus the magnified band while hovering; hidden by autohide only
+    // hit area: the background, plus the magnified band while magnified; hidden by autohide only
     // the bottom edge below it (reveals it), hidden by a full-screen window nothing
     Item {
         id: hit
@@ -120,12 +120,8 @@ ShellWindow {
 
     // on the window's root item so it sees hover above child MouseAreas
     HoverHandler {
-        // convert window x to the unmagnified dock coordinate space
-        onPointChanged: dock.mouseX = hovered ? point.position.x - (dock.width - dock.baseWidth) / 2 : -1
-        onHoveredChanged: {
-            dock.pointerIn = hovered;
-            if (!hovered) dock.mouseX = -1;
-        }
+        onPointChanged: if (hovered) dock.focusX = point.position.x - (dock.width - dock.baseWidth) / 2
+        onHoveredChanged: dock.pointerIn = hovered
     }
 
     Item {
@@ -143,11 +139,12 @@ ShellWindow {
             Translate { y: dock.hideY }
         ]
 
+        // whole logical px, like the compositor glass region, so tint and glass edges line up
         Glass {
             id: bg
-            width: row.width + dock.sidePad * 2
+            width: dock.geom.width
             height: dock.bgHeight
-            x: (dock.width - width) / 2
+            x: Math.round((dock.width - width) / 2)
             y: dock.height - height - Theme.dock.bottomMargin
             radius: Theme.dock.radius
             sx: x
@@ -158,120 +155,115 @@ ShellWindow {
             materialize: mat.progress
         }
 
-        Row {
-            id: row
-            anchors.bottom: bg.bottom
-            anchors.bottomMargin: dock.pad
-            x: bg.x + dock.sidePad
-            spacing: Theme.dock.iconSpacing
-            opacity: mat.progress
+        Repeater {
+            model: dock.items
+            delegate: Item {
+                id: cell
+                required property var modelData
+                required property int index
 
-            Repeater {
-                model: dock.items
-                delegate: Item {
-                    id: cell
-                    required property var modelData
-                    required property int index
+                // center of this cell in the unmagnified layout
+                readonly property real baseCenter: dock.geom.center[index] || 0
+                readonly property real size: modelData.separator ? dock.base : dock.geom.w[index] || dock.base
+                readonly property bool running: (modelData.windows || []).length > 0
+                readonly property bool bouncing: Apps.isLaunching(modelData.id) && !running
 
-                    // center of this cell in the unmagnified layout
-                    readonly property real baseCenter: dock.sidePad + index * (dock.base + Theme.dock.iconSpacing) + dock.base / 2
-                                                       + (index > dock.sepIndex ? dock.sepCell - dock.base : 0)
-                    readonly property real size: modelData.separator ? dock.base : dock.sizeFor(baseCenter)
-                    readonly property bool running: (modelData.windows || []).length > 0
-                    readonly property bool bouncing: Apps.isLaunching(modelData.id) && !running
+                x: bg.x + (dock.geom.x[index] || 0)
+                y: bg.y + dock.pad
+                width: dock.geom.w[index] || 0
+                height: dock.base            // constant; the icon grows upward out of the cell
+                opacity: mat.progress
 
-                    width: modelData.separator ? dock.sepCell : size
-                    height: dock.base            // constant; the icon grows upward out of the cell
+                // separator
+                Rectangle {
+                    visible: cell.modelData.separator === true
+                    x: Math.round((parent.width - width) / 2 * dock.dpr) / dock.dpr
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: Theme.dock.separatorInset - dock.pad
+                    width: Theme.dock.separatorWidth
+                    height: dock.base - (Theme.dock.separatorInset - dock.pad) * 2
+                    color: Theme.dock.separator
+                }
 
-                    // separator
-                    Rectangle {
-                        visible: cell.modelData.separator === true
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.bottom: parent.bottom
-                        anchors.bottomMargin: Theme.dock.separatorInset - dock.pad
-                        width: Theme.dock.separatorWidth
-                        height: dock.base - (Theme.dock.separatorInset - dock.pad) * 2
-                        color: Theme.dock.separator
+                // interactive press: the icon lifts (FlexInteraction ultraSmall) and darkens
+                PressSpring { id: press; pressed: ma.containsPress; w: icon.width; h: icon.height; settlesGlass: false }
+                AppIcon {
+                    id: icon
+                    transform: Scale { origin.x: icon.width / 2; origin.y: icon.height / 2; xScale: press.scale; yScale: press.scale }
+                    visible: !cell.modelData.separator
+                    size: cell.size
+                    loadSize: dock.magnified     // load once at full size, then only scale
+                    x: 0
+                    y: cell.height - height - bounceY
+                    property real bounceY: 0
+                    icon: cell.modelData.icon || ""
+                    appId: cell.modelData.id
+
+                    SequentialAnimation on bounceY {
+                        running: cell.bouncing
+                        loops: Animation.Infinite
+                        alwaysRunToEnd: true
+                        NumberAnimation { to: Theme.dock.bounceHeight; duration: Theme.anim.bounce / 2; easing.type: Easing.OutQuad }
+                        NumberAnimation { to: 0; duration: Theme.anim.bounce / 2; easing.type: Easing.InQuad }
                     }
+                }
+                Rectangle {
+                    x: icon.x; y: icon.y; width: icon.width; height: icon.height
+                    transform: Scale { origin.x: icon.width / 2; origin.y: icon.height / 2; xScale: press.scale; yScale: press.scale }
+                    visible: ma.containsPress && !cell.modelData.separator
+                    color: Qt.rgba(0, 0, 0, 0.25)
+                    radius: width * 0.22
+                }
 
-                    // interactive press: the icon lifts (FlexInteraction ultraSmall) and darkens
-                    PressSpring { id: press; pressed: ma.containsPress; w: icon.width; h: icon.height; settlesGlass: false }
-                    AppIcon {
-                        id: icon
-                        transform: Scale { origin.x: icon.width / 2; origin.y: icon.height / 2; xScale: press.scale; yScale: press.scale }
-                        visible: !cell.modelData.separator
-                        size: cell.size
-                        loadSize: dock.magnified     // load once at full size, then only scale
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        y: parent.height - height - bounceY
-                        property real bounceY: 0
-                        icon: cell.modelData.icon || ""
-                        appId: cell.modelData.id
+                // running indicator
+                Rectangle {
+                    visible: cell.running
+                    width: Theme.dock.dotSize
+                    height: width
+                    radius: width / 2
+                    x: Math.round((cell.width - width) / 2 * dock.dpr) / dock.dpr
+                    y: cell.height + Theme.dock.dotOffset
+                    color: Theme.color.dockDot
+                }
 
-                        SequentialAnimation on bounceY {
-                            running: cell.bouncing
-                            loops: Animation.Infinite
-                            alwaysRunToEnd: true
-                            NumberAnimation { to: Theme.dock.bounceHeight; duration: Theme.anim.bounce / 2; easing.type: Easing.OutQuad }
-                            NumberAnimation { to: 0; duration: Theme.anim.bounce / 2; easing.type: Easing.InQuad }
-                        }
+                // app name label above the icon
+                Rectangle {
+                    visible: ma.containsMouse && !cell.modelData.separator && !cell.bouncing && Panels.open !== "context"
+                    x: Math.round((cell.width - width) / 2)
+                    y: icon.y - height - Theme.dock.tooltipGap
+                    width: tip.implicitWidth + Theme.dock.tooltipHPad * 2
+                    height: Theme.dock.tooltipHeight
+                    radius: Theme.dock.tooltipRadius
+                    color: Theme.color.tooltipBg
+                    border.width: 1
+                    border.color: Theme.glass.hairline
+                    Text {
+                        id: tip
+                        anchors.centerIn: parent
+                        text: cell.modelData.name || ""
+                        font.family: Theme.fontText
+                        font.pixelSize: Theme.font.dockTooltip
+                        color: Theme.color.label
                     }
-                    Rectangle {
-                        x: icon.x; y: icon.y; width: icon.width; height: icon.height
-                        transform: Scale { origin.x: icon.width / 2; origin.y: icon.height / 2; xScale: press.scale; yScale: press.scale }
-                        visible: ma.containsPress && !cell.modelData.separator
-                        color: Qt.rgba(0, 0, 0, 0.25)
-                        radius: width * 0.22
-                    }
+                }
 
-                    // running indicator
-                    Rectangle {
-                        visible: cell.running
-                        width: Theme.dock.dotSize
-                        height: width
-                        radius: width / 2
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        y: parent.height + Theme.dock.dotOffset
-                        color: Theme.color.dockDot
-                    }
-
-                    // tooltip
-                    Rectangle {
-                        visible: ma.containsMouse && !cell.modelData.separator && !cell.bouncing && Panels.open !== "context"
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        y: icon.y - height - Theme.dock.tooltipGap
-                        width: tip.implicitWidth + Theme.dock.tooltipHPad * 2
-                        height: Theme.dock.tooltipHeight
-                        radius: Theme.dock.tooltipRadius
-                        color: Theme.color.tooltipBg
-                        border.width: 1
-                        border.color: Theme.glass.hairline
-                        Text {
-                            id: tip
-                            anchors.centerIn: parent
-                            text: cell.modelData.name || ""
-                            font.family: Theme.fontText
-                            font.pixelSize: Theme.font.dockTooltip
-                            color: Theme.color.label
-                        }
-                    }
-
-                    MouseArea {
-                        id: ma
-                        x: icon.x; y: icon.y; width: icon.width; height: icon.height
-                        hoverEnabled: true
-                        enabled: !cell.modelData.separator
-                        acceptedButtons: Qt.LeftButton | Qt.RightButton
-                        onClicked: m => {
-                            if (m.button === Qt.RightButton) {
-                                // menu above the icon, like the macOS Dock. Anchored to the
-                                // unmagnified layout because icons shrink when the menu opens.
-                                const x = (dock.width - dock.baseWidth) / 2 + cell.baseCenter;
-                                Panels.openContext(Apps.dockMenu(cell.modelData), x, dock.screen.height - dock.height + bg.y - Theme.dock.tooltipGap, true, dock.screen);
-                            } else if (cell.modelData.trash) Apps.openTrash();
-                            else if (cell.modelData.folder) Apps.openFolder(cell.modelData);
-                            else Apps.activate(cell.modelData);
-                        }
+                // the whole cell column (icon and the band above it), so the label does not flicker in the
+                // gap while an icon bounces or the sizes change
+                MouseArea {
+                    id: ma
+                    x: 0; y: icon.y; width: cell.width; height: cell.height - icon.y + dock.pad
+                    hoverEnabled: true
+                    enabled: !cell.modelData.separator
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    onClicked: m => {
+                        if (m.button === Qt.RightButton) {
+                            // menu above the icon, like the macOS Dock. Anchored to the
+                            // unmagnified layout because icons shrink when the menu opens.
+                            const x = (dock.width - dock.baseWidth) / 2 + cell.baseCenter;
+                            Panels.openContext(Apps.dockMenu(cell.modelData), x, dock.screen.height - dock.height + bg.y - Theme.dock.tooltipGap, true, dock.screen);
+                        } else if (cell.modelData.trash) Apps.openTrash();
+                        else if (cell.modelData.folder) Apps.openFolder(cell.modelData);
+                        else Apps.activate(cell.modelData);
                     }
                 }
             }
