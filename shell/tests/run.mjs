@@ -502,6 +502,14 @@ test("mode buttons start inside the field, end in place", () => {
         assert.equal(H.volumeSymbol(0.5, true), "speaker.slash.fill");
         assert.equal(H.volumeSymbol(0, false), "speaker.slash.fill");
     });
+    test("hud: volume symbol thresholds 0.001 / 0.333 / 0.667 (SystemBannerUI)", () => {
+        assert.equal(H.volumeSymbol(0.0009, false), "speaker.slash.fill");
+        assert.equal(H.volumeSymbol(0.001, false), "speaker.wave.1.fill");
+        assert.equal(H.volumeSymbol(0.3329, false), "speaker.wave.1.fill");
+        assert.equal(H.volumeSymbol(0.333, false), "speaker.wave.2.fill");
+        assert.equal(H.volumeSymbol(0.6669, false), "speaker.wave.2.fill");
+        assert.equal(H.volumeSymbol(0.667, false), "speaker.wave.3.fill");
+    });
     test("hud: clamp", () => { assert.equal(H.clamp01(1.4), 1); assert.equal(H.clamp01(-1), 0); assert.equal(H.clamp01("x"), 0); });
     test("hud: 16 dashes over 214 pt, first one a gap longer", () => {
         const d = H.dashes(214, 16, 1);

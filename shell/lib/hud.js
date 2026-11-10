@@ -6,13 +6,13 @@ function clamp01(v) {
     return Math.max(0, Math.min(1, Number(v) || 0));
 }
 
-// SF Symbol for a volume level (MAC-ANSWERS.md HUD (27.2.1)): speaker.slash.fill when muted,
-// speaker.wave.1.fill at 3/16 and speaker.wave.2.fill at 7/16 (measured). The thresholds are
-// guessed from those two points (thirds); 0 and the top third were not measured.
+// SF Symbol for a volume level (SystemBannerUI 27.2.1, MAC-ANSWERS.md "REA 27.2.1" section 1):
+// "speaker." + slash below 0.001, wave.1 below 0.333, wave.2 below 0.667, else wave.3 (symbolVariant fill).
+// Muted shows the slash too (the level is 0 then).
 function volumeSymbol(level, muted) {
-    if (muted || level <= 0) return "speaker.slash.fill";
-    if (level < 1 / 3) return "speaker.wave.1.fill";
-    if (level < 2 / 3) return "speaker.wave.2.fill";
+    if (muted || level < 0.001) return "speaker.slash.fill";
+    if (level < 0.333) return "speaker.wave.1.fill";
+    if (level < 0.667) return "speaker.wave.2.fill";
     return "speaker.wave.3.fill";
 }
 

@@ -9,19 +9,24 @@ import qs.services
 import qs.HyprK
 import "../lib/hud.js" as HudLib
 
-// Volume / brightness HUD (macOS 27.2.1, MAC-ANSWERS.md HUD (27.2.1)): a clear glass capsule at the
-// top right below the menu bar (layer hyprk-hud: the plugin's "clear" recipe) with an SF Symbol and
-// a bar of 16 dashes. Fades and grows in 50 ms after the change, hides 1.05 s after the last one;
-// further changes only move the bar fill, and volume <-> brightness crossfades inside the capsule.
+// Volume / brightness HUD (macOS 27.2.1, MAC-ANSWERS.md "REA 27.2.1" section 1, SystemBannerUI): a glass
+// capsule at the top right, 10 pt below the menu bar, on the Control Center recipe (layer hyprk-hud), with an
+// SF Symbol and a bar of 16 dashes.
+// Motion (exact springs, lib/spring.js via components/SpringCurve.qml): one progress `shownness` drives scale
+// 0.9 -> 1 and opacity 0 -> 1 (BannerContentController: _scaleFactor 0.9, _opacity 0).
+// - appear: interpolatingSpring(mass 2, stiffness 300, damping 50) (response 0.513 s, ratio 1.021), also when a
+//   press brings back a HUD that is hiding;
+// - hide: spring(response 0.48669, dampingFraction 1) to 0, and the window goes at 0.48669 s (the dismissal
+//   completion's asyncAfter), where the spring stands at 0.986;
+// - the content (bar fill, volume <-> brightness crossfade) moves on spring(response 0.2, dampingFraction 0.85).
+// The glass fades by mixing towards identity by 1 - opacity under an .opacity(opacity) view, so it is drawn at
+// opacity^2 (the recording's alpha fits opacity^2, RMS 0.017; the reason is an inference) and the content at opacity.
 // Tokens and state: services/Hud.qml. The window is unmapped while hidden and nothing animates then.
 ShellWindow {
     id: win
 
     readonly property QtObject m: Hud.metrics
     readonly property QtObject mo: Hud.motion
-    // Reduce motion: fades only, no scale (Theme.travel), durations capped (Theme.ms)
-    readonly property real startScale: 1 - Theme.travel(1 - mo.appearScale)
-    readonly property real endScale: 1 - Theme.travel(1 - mo.hideScale)
 
     screen: Hud.screen
     namespace: "hyprk-hud"
@@ -35,26 +40,23 @@ ShellWindow {
     implicitHeight: Math.ceil(m.height)
     acceptsInput: false                 // never takes clicks
 
-    // alpha of glass and content together (the plugin glass follows through glassOpacity)
-    property real alpha: 0
+    // 0 hidden .. 1 shown: opacity of the content; scale 0.9 + 0.1 x (Reduce motion: no scale, Theme.travel)
+    property real shownness: 0
+    readonly property real glassAlpha: shownness * shownness
     property bool mapped: false
     visible: mapped
-    glassOpacity: alpha
+    glassOpacity: glassAlpha
 
     Connections {
         target: Hud
         function onShownChanged() { Hud.shown ? win.appear() : win.disappear(); }
     }
     function appear() {
-        fadeOut.stop();
-        shrink.stop();
         if (!mapped) {
-            // fresh: everything starts where it should be, then waits for the 50 ms delay
+            // fresh: everything starts where it should be, then waits for the 3 frame hosting delay
             volumeLayer.snap();
             brightnessLayer.snap();
-            grow.target = startScale;
-            grow.snap();
-            alpha = 0;
+            motion.snap(0);
             mapped = true;
             delay.start();
         } else {
@@ -62,42 +64,26 @@ ShellWindow {
         }
     }
     function begin() {
-        fadeIn.from = alpha;
-        fadeIn.restart();
-        grow.target = 1;
+        motion.spring = mo.appear;
+        motion.cutAt = 0;
+        motion.go(1);
+        settleGlass(motion.duration + 50);
     }
     function disappear() {
         delay.stop();
-        fadeIn.stop();
-        if (alpha <= 0) { mapped = false; return; }
-        fadeOut.from = alpha;
-        fadeOut.restart();
-        shrink.from = grow.value;
-        shrink.restart();
-        settleGlass(fadeOut.duration + 50);
+        if (shownness <= 0) { motion.stop(); mapped = false; return; }
+        motion.spring = mo.hide;
+        motion.cutAt = mo.hideSeconds;
+        motion.go(0);
+        settleGlass(motion.duration + 50);
     }
 
     Timer { id: delay; interval: win.mo.showDelay; onTriggered: win.begin() }
-    NumberAnimation {
-        id: fadeIn
-        target: win; property: "alpha"; to: 1
-        duration: Theme.ms(win.mo.appearDuration)
-        easing.type: Easing.BezierSpline; easing.bezierCurve: win.mo.appearCurve
-    }
-    NumberAnimation {
-        id: fadeOut
-        target: win; property: "alpha"; to: 0
-        duration: Theme.ms(win.mo.hideDuration)
-        easing.type: Easing.BezierSpline; easing.bezierCurve: win.mo.hideCurve
+    SpringCurve {
+        id: motion
+        target: win
+        property: "shownness"
         onFinished: if (!Hud.shown) win.mapped = false
-    }
-    // grows in on a spring; shrinks out on the fade's curve
-    Spring { id: grow; target: 1; response: win.mo.appearResponse; damping: 1; epsilon: 0.0005; settlesGlass: true }
-    NumberAnimation {
-        id: shrink
-        target: grow; property: "value"; to: win.endScale
-        duration: Theme.ms(win.mo.hideDuration)
-        easing.type: Easing.BezierSpline; easing.bezierCurve: win.mo.hideCurve
     }
 
     Item {
@@ -105,7 +91,7 @@ ShellWindow {
         x: win.width - width            // the capsule ends exactly `gap` from the screen edge
         width: win.m.width
         height: win.m.height
-        scale: grow.value
+        scale: 1 - Theme.travel(1 - win.mo.appearScale) * (1 - win.shownness)
 
         Glass {
             anchors.fill: parent
@@ -113,15 +99,17 @@ ShellWindow {
             // QML fallback: sample the blurred wallpaper where the capsule sits
             sx: (win.screen ? win.screen.width : 0) - win.m.gap - win.m.width
             sy: Theme.menuBar.height + win.m.gap
-            tint: Theme.glass.tintClear
-            shadow: false               // the clear recipe has no drop shadow
-            pluginLift: "transparent"   // white content on clear glass in light and dark alike (measured)
-            opacity: Theme.compositorGlass ? 1 : win.alpha
+            // the Control Center recipe, like a Control Center module (no drop shadow)
+            tint: Theme.cc.tileTint
+            solidColor: Theme.cc.tileSolid
+            pluginLift: Theme.cc.pluginLift
+            shadow: false
+            opacity: Theme.compositorGlass ? 1 : win.glassAlpha
         }
 
         Item {
             anchors.fill: parent
-            opacity: win.alpha
+            opacity: win.shownness
             Layer {
                 id: volumeLayer
                 active: Hud.kind === "volume"
@@ -179,23 +167,15 @@ ShellWindow {
         property string symbol
         property real level
         anchors.fill: parent
-        opacity: active ? 1 : 0
+        opacity: 0
         visible: opacity > 0
         // crossfade only while the HUD is on screen; a fresh HUD starts with the right layer
-        Behavior on opacity {
-            enabled: win.alpha > 0
-            NumberAnimation { duration: Theme.ms(win.mo.crossfade) }
-        }
-        function snap() { fill.snap(); }
-        // jumps while the window is unmapped (a change while the Control Center is open animates nothing)
-        Spring {
-            id: fill
-            target: layer.level * win.m.barLength
-            response: win.mo.fillResponse
-            damping: 1
-            epsilon: 0.05
-            instant: !win.mapped
-        }
+        onActiveChanged: if (win.shownness > 0) crossfade.go(active ? 1 : 0); else crossfade.snap(active ? 1 : 0)
+        onLevelChanged: if (win.mapped) fill.go(level * win.m.barLength); else fill.snap(level * win.m.barLength)
+        function snap() { crossfade.snap(active ? 1 : 0); fill.snap(level * win.m.barLength); }
+        property real fillLength: 0
+        SpringCurve { id: crossfade; target: layer; property: "opacity"; spring: win.mo.content }
+        SpringCurve { id: fill; target: layer; property: "fillLength"; spring: win.mo.content }
 
         Item {
             readonly property var g: win.glyphs[layer.symbol]
@@ -223,7 +203,7 @@ ShellWindow {
         // filled part: the same dashes clipped at the level, so it can stop inside a dash
         Item {
             x: win.m.barX
-            width: Math.max(0, fill.value)
+            width: Math.max(0, layer.fillLength)
             height: parent.height
             clip: true
             Bar { x: 0; color: win.m.fill; width: win.m.barLength }

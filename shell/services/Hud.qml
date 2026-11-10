@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 import "../lib/hud.js" as HudLib
+import "../lib/spring.js" as SpringLib
 
 // Volume and brightness HUD state (macOS 27.2.1: drawn by MenuBarAgent from the Control Center
 // menu bar item, MAC-ANSWERS.md HUD (27.2.1)). Follows the real output volume and mute (PipeWire,
@@ -16,41 +17,35 @@ import "../lib/hud.js" as HudLib
 Singleton {
     id: root
 
-    // ---------- tokens: MAC-ANSWERS.md HUD (27.2.1), 60 fps recordings and 2x stills ----------
+    // ---------- tokens: MAC-ANSWERS.md "REA 27.2.1" section 1 (SystemBannerUI code), else 2x stills ----------
     readonly property QtObject metrics: QtObject {
-        readonly property real width: 307.5             // capsule 1392.5..1700 pt
-        readonly property real height: 65.5             // capsule 44..109.5 pt, radius = height / 2
-        readonly property real gap: 10                  // from the screen's right edge and below the menu bar
+        readonly property real width: 307               // frame(width: 307, height: 66) (stills: 307.5 x 65.5)
+        readonly property real height: 66               // radius = height / 2 (Capsule)
+        readonly property real gap: 10                  // below the menu bar (_topMargin 10); from the screen's right edge (stills, not in the code)
         readonly property real glyphSize: 26            // SF Symbol point size: speaker.wave.2.fill 27.5 x 21.5 pt (fitted, regular weight)
         readonly property real glyphBaseline: 42.4      // glyph baseline from the capsule top (fitted from 3 symbols in the stills)
-        readonly property real glyphLeft: 16.4          // symbol canvas left edge, speaker symbols (stills)
+        readonly property real glyphLeft: 16.4          // symbol canvas left edge, speaker symbols (stills; code: leading padding 16)
         readonly property real glyphLeftSun: 20.1       // sun.max.fill sits 3.7 pt further right (stills)
-        readonly property int dashes: 16                // one key press = 1/16
-        readonly property real barX: 62.6               // bar start from the capsule's left edge (stills: 62.57; text: 63)
-        readonly property real barLength: 214
-        readonly property real dashHeight: 4
-        readonly property real barY: 31                 // dashes at y 31..35 pt in the capsule, on whole pixels (stills)
-        readonly property real dashGap: 1               // 1.95 px at 2x in the stills; the first dash is one gap longer
+        readonly property int dashes: 16                // TickedTrackMask(tickCount: 16, tickWidth: 1)
+        readonly property real barX: 62.6               // bar start from the capsule's left edge (stills: 62.57; the glyph frame width is not read)
+        readonly property real barLength: width - 31 - barX   // ends at the trailing padding 31
+        readonly property real dashHeight: 4            // track frame height 4, leading corner radius 2
+        readonly property real barY: 31                 // dashes at y 31..35 pt: centred in 66 (stills)
+        readonly property real dashGap: 1               // tickWidth 1; the first dash is one gap longer (stills)
         readonly property color fill: "#FFFFFF"         // filled dashes and glyph, light and dark alike
         readonly property color empty: Qt.rgba(1, 1, 1, 0.16)   // empty dash over the glass: (68,85,232) -> (96,113,255)
     }
     readonly property QtObject motion: QtObject {
-        readonly property int showDelay: 50             // HUD starts 3 frames after the key (menu bar highlight first)
-        readonly property int hideAfter: 1050           // hides 1.05 s after the last change; restarts on every change
-        // fade in: 30 alpha samples 0.01..0.98, fitted cubic bezier over 0.57 s (rmse 0.007)
-        readonly property int appearDuration: 570
-        readonly property var appearCurve: [0.303, 0.027, 0.366, 1.0, 1, 1]
-        // grow: width 0.82 -> 0.92 in the first 0.1 s, at 1.0 by 0.4 s: critically damped spring, response 0.37
-        readonly property real appearScale: 0.82
-        readonly property real appearResponse: 0.37
-        // fade out: 16 alpha samples 0.96..0.03 (about x0.8 per frame), fitted bezier over 0.35 s (rmse 0.004)
-        readonly property int hideDuration: 350
-        readonly property var hideCurve: [0.212, 0.118, 0.077, 1.0, 1, 1]
-        readonly property real hideScale: 0.92          // scales back towards 0.92 while it fades
-        // repeated presses: the fill moves continuously and comes to rest 0.15..0.2 s after the last one
-        // (critically damped, 99 % at 0.18 s)
-        readonly property real fillResponse: 0.17
-        readonly property int crossfade: 50             // volume <-> brightness: glyph and bar crossfade in about 3 frames
+        readonly property int showDelay: 50             // about 3 frames of hosting latency (recorded; not in the code)
+        readonly property int hideAfter: 1050           // SystemBannerTimeoutMode.short 1.0 s + the same 3 frames; restarts on every change
+        readonly property real appearScale: 0.9         // _scaleFactor 0.9 when hidden
+        // appear: interpolatingSpring(mass: 2, stiffness: 300, damping: 50)
+        readonly property var appear: SpringLib.fromPhysics(2, 300, 50)
+        // hide: spring(response: 0.48669, dampingFraction: 1); dismissal completes asyncAfter(0.48669)
+        readonly property var hide: SpringLib.fromResponse(0.48669, 1)
+        readonly property real hideSeconds: 0.48669
+        // new content while showing (bar fill, volume <-> brightness): spring(response: 0.2, dampingFraction: 0.85)
+        readonly property var content: SpringLib.fromResponse(0.2, 0.85)
     }
 
     // ---------- state ----------
