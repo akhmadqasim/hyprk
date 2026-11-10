@@ -420,12 +420,18 @@ Singleton {
         // hidden glass is scaled up per axis around its own centre: min((dim + 16) / dim, 1.2)
         // (AppearanceSettings.materialize: scale 1.2, maxPointScale 16; GlassAppearanceScaleEffect)
         function hiddenScale(dim) { return Math.min((dim + 16) / Math.max(dim, 1), 1.2); }
-        // interactive press (FlexInteraction cursor presets, small 80 pt / large 160 pt, lerped by the
-        // smaller side): lift 2.25 / 2 pt -> scale (min + lift) / min, spring 0.25 s, damping 0.375 / 0.6
-        function pressT(w, h) { return Math.max(0, Math.min(1, (Math.min(w, h) - 80) / 80)); }
-        function pressScale(w, h) { const m = Math.max(Math.min(w, h), 1); return (m + 2.25 - 0.25 * pressT(w, h)) / m; }
-        function pressDamping(w, h) { return 0.375 + 0.225 * pressT(w, h); }
+        // interactive press (FlexInteraction cursor presets, SPEC 10): smaller side < 120 pt is
+        // ultraSmall (lift 2.5 pt, damping 0.629), from 120 small -> large over 40 pt (lift 2.25 -> 2,
+        // damping 0.375 -> 0.6); scale (min + lift) / min, spring response 0.25 s
+        function pressT(w, h) { return Math.max(0, Math.min(1, (Math.min(w, h) - 120) / 40)); }
+        function pressScale(w, h) {
+            const m = Math.max(Math.min(w, h), 1);
+            return (m + (m < 120 ? 2.5 : 2.25 - 0.25 * pressT(w, h))) / m;
+        }
+        function pressDamping(w, h) { return Math.min(w, h) < 120 ? 0.629 : 0.375 + 0.225 * pressT(w, h); }
         readonly property real pressResponse: 0.25
+        // a click on a slider track springs the shown value to the click point, then drags follow 1:1
+        readonly property real sliderJumpResponse: 0.3
         readonly property real pressSquish: 0.06         // drag past a slider end stretches x, squeezes y (by eye)
     }
 }

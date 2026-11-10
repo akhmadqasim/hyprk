@@ -263,10 +263,12 @@ Item {
                 color: Theme.cc.subtext
             }
         }
+        // the press look clears while the pointer is outside, like macOS
+        pressed: capMa.containsPress
         MouseArea {
+            id: capMa
             anchors.fill: parent
             enabled: cap.available
-            onPressedChanged: cap.pressed = pressed
             onClicked: cap.toggled()
         }
     }
@@ -292,7 +294,8 @@ Item {
             size: Theme.cc.buttonGlyph
             color: rb.on ? Theme.cc.toggleOnIcon : Theme.cc.toggleOffIcon
         }
-        MouseArea { anchors.fill: parent; enabled: rb.enabled; onPressedChanged: rb.pressed = pressed; onClicked: rb.activated() }
+        pressed: rbMa.containsPress
+        MouseArea { id: rbMa; anchors.fill: parent; enabled: rb.enabled; onClicked: rb.activated() }
     }
 
     component MediaButton: Item {
@@ -314,6 +317,10 @@ Item {
         property string rightSymbol
         property real value: 0
         signal moved(real v)
+        // shown fill: springs to a clicked point, follows 1:1 while dragging (Reduce motion: instant)
+        property bool dragging: false
+        NcSpring { id: shownValue; target: sm.value; response: Theme.anim.sliderJumpResponse }
+        readonly property real shown: dragging || A11y.reduceMotion ? sm.value : shownValue.value
 
         width: cc.width
         height: cc.rowH
@@ -359,7 +366,7 @@ Item {
                 color: Theme.cc.sliderTrackColor
             }
             Rectangle {
-                width: parent.width * Math.max(0, Math.min(1, sm.value))
+                width: parent.width * Math.max(0, Math.min(1, sm.shown))
                 height: parent.height
                 radius: height / 2
                 color: Theme.cc.sliderFillColor
@@ -375,9 +382,16 @@ Item {
                     sm.stretch = Math.max(-1, Math.min(1, (v - c) * 2));
                     sm.moved(c);
                 }
-                onPressedChanged: { sm.pressed = pressed; if (!pressed) sm.stretch = 0; }
+                onPressedChanged: {
+                    sm.pressed = pressed;
+                    if (!pressed) {
+                        sm.stretch = 0;
+                        if (sm.dragging) shownValue.snap();   // a click keeps springing to its point
+                        sm.dragging = false;
+                    }
+                }
                 onPressed: m => update(m.x)
-                onPositionChanged: m => { if (pressed) update(m.x); }
+                onPositionChanged: m => { if (pressed) { sm.dragging = true; update(m.x); } }
             }
         }
     }
