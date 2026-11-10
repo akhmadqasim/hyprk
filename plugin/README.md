@@ -4,7 +4,7 @@ Own plugin (C++ + GLSL ES 3.00). It draws the Liquid Glass material behind chose
 (the hyprk shell: menu bar menus (not the bar: it has no glass on 27.2.1), dock, Control Center, notifications, Spotlight, Cmd+Tab).
 Math follows the macOS 27.2 QuartzCore `glass_background_*` shader recovered in
 `/mnt/code/liquid-glass-re/SPEC.md`: Apple's quarter-circle bevel for refraction, 7-tap chromatic aberration,
-erfc-shaped drop shadow, two-lobe rim highlight applied as a colour bias, mip-LOD variable blur.
+erfc-shaped drop shadow, the 27.2.1 rim (dark specular + key/fill highlight), mip-LOD variable blur.
 Per-material numbers are not recovered (SPEC section 4), so every number is a config key with a
 by-eye default.
 
@@ -60,7 +60,7 @@ transition spring (response 0.5, damping 0.7) (`/mnt/code/liquid-glass-re/notes/
 animates the scale; the plugin takes a materialize progress `m` (0..1) per shape, softens the edge by
 10 pt x (1 - m) and ramps every effect from identity to the full material in the shader: refraction, aberration, outer layer, edge bleed,
 blur (the variable-blur amount, so the backdrop goes from sharp to frosted), blur fill, face YCC (from
-(0, 1, 1) = untouched), fill, tone range, inner shadow, rim, drop and ring shadow. At `m = 0` the glass draws
+(0, 1, 1) = untouched), fill, rim, drop and ring shadow. At `m = 0` the glass draws
 the backdrop unchanged; layer alpha stays 1. The shell drives `m` with its open/close springs.
 
 Channel: a 1x1 **hole** in the shape's own region, in its middle row (y = top + floor(h / 2)), at
@@ -107,14 +107,19 @@ Apple's numbers from `/mnt/code/liquid-glass-re/SPEC.md` section 9 (glass versio
 | `regular` | 0.4, 0.92, 1.0 (Apple 1.03, 1.2) | white 12% (Apple 20%) | 0.25 D (max 20) / -0.5 D (min -60) | 0.2 D / 0.25 D / 0.6 | D 48→160 : 2→4 (Apple 64→160 : 0→4), variable: full until 1 pt from the edge (Apple: half at 1 pt) | D 64→160 : 0.25→0.75, r 24, y 8 | notifications, switcher |
 | `menu` | as regular | as regular | as regular | as regular | as regular | 0.6, r 24, y 10 | `hyprk-overlay` |
 | `spotlight` | 0.1, 1.0, 1.25 (SiriRecipe branch A, reference/re/NOTES.md; light and dark) | none | 0.4 D / -0.72 D (no caps) | 0.4 D / 0.4 D / 1.0 | 6 (Apple 8 x opacity 0.75), variable: full from 60 pt in to 1 pt from the edge; blur fill darken 0.75, normal 0.5 | none, no edge bleed, no ring | `hyprk-spotlight` |
-| `clear` | 0.125, 1.08, 1.06 | none | 0.25 D / -0.8 D | none | D 48→120 : 3→8 | as regular | |
-| `dock` | 0.15, 0.9, 0.5 (Apple 1.25; less chroma, rim bias 1.0, matched to the reference dock) | none / 0.05 | 0.08 D / -0.18 D | 0.13 D / 0.42 D / 0.2 | 1.5 | as regular | `hyprk-dock` |
-| `controlcenter` | 0.18, 0.55, 1.0 (Apple 0.125, 0.8, 1.2), 6 % warm grey, face tone kept in 0.15-0.45 (max as relative luminance: white labels >= 4.7:1; dark 0.10-0.40) | none | 0.225 D (max 25) / -2.0 D (min -80) | 0.0357 D / 0.0714 D / 0.1525 | none (Apple 4: too much on top of Hyprland's blur), variable from 100 pt in | as regular | `hyprk-controlcenter` |
+| `clear` | 0.125, 1.08, 1.06 (27.2.1 probe) | none | 0.36 D (max 20) / -0.65 D (min -60) | none | 0.75 | none, no edge bleed | |
+| `dock` | 0.15, 0.9, 1.25 (dark 0.05, 0.92, 1.25 + black 2 %; 27.2.1 probe, light matches the real Dock) | none | 0.08 D / -0.18 D | 0 / 0 / 0.2 | 1.5 | none, no edge bleed | `hyprk-dock` |
+| `controlcenter` | 0.125, 0.8, 1.2, light and dark (SPEC 9.5 = 27.2.1 probe; over (69, 83, 206) it gives the Mac HUD's (68, 85, 232)) | none | 0.225 D (max 25) / -2.0 D (min -80) | 0.0357 D / 0.0714 D / 0.1525 | none (Apple 4: too much on top of Hyprland's blur), variable from 100 pt in, opacities 1 / 0.1 / 0.5 | none, no edge bleed | `hyprk-controlcenter`, `hyprk-hud` |
 
 The face colour is Apple's YCC composite (SPEC 9.7): `Y' = black + (white - black) Y`, chroma x saturation,
-then the fill. The controlcenter face and the regular/dock saturation deviate from the decoded values:
-in our gamma-space shader the decoded CC face measured ~1.4:1 against white tile labels (JUDGE.md);
-(0.1, 0.5, 0.7) gives >= 5:1 (measured 5.3-9.0 in `reference/ours/plugin-shell-cc.png`).
+then the fill, all in gamma space: that reproduces the Mac's pixels (HUD and Dock over flat colours).
+Regular keeps its by-eye light face (see Material.cpp); the others use Apple's numbers.
+
+Rim (every recipe, `reference/re/27.2.1/live/glass-params-*.json` + the HUD screenshots): the glass filter's
+key highlight with a negative colour bias (-0.25, Control Center -0.3) keyed sideways, 0.5 pt at the edge
+(spread 96 / 75 / 120 deg for regular light / dark and CC / Dock), and a key/fill highlight layer top and
+bottom: a mix toward the layer's vibrantColorMatrix (as YCC per recipe) by a mask of a 1 pt key band and an
+8 pt diffuse band, clamped to 1.5. The mask shape was fitted to the HUD over flat blue (light and dark agree).
 
 Also per recipe (SPEC 9.2/9.3): edge bleed (opacity D 64→160 : 0→0.5, height/amount/blur 0.35 D, colour
 regular (0.9, 1, 1.2), clear family (0.75, 1, 1.2)), blur fill (regular light: lighten 0.9, normal 0.5;
@@ -129,9 +134,8 @@ Light/dark: `appearance = "auto"` reads the backdrop luminance of each glass (1 
 read back asynchronously every 6 frames) and switches with Apple's V2 hysteresis: dark below 0.1, light
 again above 0.3 (`adapt_low` / `adapt_high`).
 
-Not from the RE (by eye): the per-recipe `lift` (scaled by the `lift` key), the rim floor, the inner shadow, the
-dark-side rim bias (+0.3 instead of Apple's undecoded dark specular), the shadow tint amount, and
-how Apple's blur radius maps to extra mip levels (`blur_lod_scale`).
+Not from the RE (by eye): Regular's light face, fill, blur fill and blur alphas (JUDGE-r2), the shadow tint
+amount, and how Apple's blur radius maps to extra mip levels (`blur_lod_scale`).
 
 ## Config keys (`plugin:liquidglass:<key>`; lengths in logical px)
 
@@ -147,26 +151,21 @@ how Apple's blur radius maps to extra mip levels (`blur_lod_scale`).
 | `rounding_power` | 2.6 | superellipse corner (2 = circle) |
 | `appearance` | `auto` | `auto` (hysteresis on backdrop luminance), `light`, `dark` |
 | `adapt_low` / `adapt_high` | 0.1 / 0.3 | hysteresis band (SPEC 9.6, V2 light range) |
-| `lift` | 1 | scales each recipe's light-side lift (0 = none) |
 | `blur_lod` / `blur_lod_scale` | 0 / 0.6 | extra mip blur = `blur_lod + scale * log2(1 + recipe blur radius)` |
 | `refraction_scale` | 1 | multiplies the recipe's refraction amount (0 = off) |
 | `aberration` | 1.5 | px R/B split at the edge (7 taps); 0 = off |
-| `light_angle` | -50 | degrees the light comes from (0 = right, -90 = top) |
-| `highlight` | 1 | scales the recipe's rim strength (the rim desaturates, then lifts toward white: a near-white hairline; Apple's colour bias read as a thick cyan rim, JUDGE-r5) |
-| `highlight_width` / `highlight_spread` / `highlight_curve` | 0.75 / 0.09 / 0.5 | rim band px, lobe threshold (cos 85°), Apple's tone curve amount |
-| `rim` | 0.5 | hairline floor all around the edge (lobes top-left / bottom-right are brighter) |
-| `inner_shadow` / `inner_shadow_size` | 0.06 / 8 | darkening along the inner rim |
+| `highlight` | 1 | scales the key/fill highlight mask (1 = Apple) |
 | `shadow_scale` / `shadow_tint` | 1 / 0.35 | drop shadow opacity scale; 0 = black shadow, 1 = saturated backdrop colour |
 | `ring_scale` | 1 | ring shadow opacity scale |
 | `require_region` | 1 | only layers that set an ext-background-effect blur region get glass |
-| `linear` | 0 | 1 = shader works in linear light like QuartzCore. The recipes are tuned for 0; with 1 the CC labels drop to ~3:1, so it stays off until re-tuned |
+| `linear` | 0 | 1 = shader works in linear light. Keep 0: Apple's face and rim numbers reproduce the Mac's pixels in gamma space (HUD, Dock) |
 | `stats` | 0 | GPU timing, read with `hyprctl liquidglass` |
 | `full_damage` | 0 | 1 = redraw the whole output while glass is visible (debug; see below) |
 | `shader_path` | "" | load this fragment shader instead of the built-in one |
 | `window_classes` | "" | regex: windows whose class matches get glass behind them |
 | `window_radius` | -1 | window glass radius; < 0 = the window's rounding |
 
-Keys of the first iteration (`saturation`, `tint_light`, `tint_dark`, `brightness_*`, `refraction`, `shadow_opacity`, ...)
+Keys of earlier iterations (`saturation`, `tint_light`, `tint_dark`, `brightness_*`, `refraction`, `shadow_opacity`, `light_angle`, `rim`, `lift`, `inner_shadow`, ...)
 are still accepted so old configs load, but do nothing. They will be removed once config/hypr/hyprland.lua no longer sets them.
 
 Damage: when any part of a glass is damaged, the plugin adds the whole glass box plus what its shader

@@ -29,15 +29,15 @@ namespace lg {
     // one side (light or dark) of a recipe
     struct SFace {
         SYcc      ycc;
-        SRgba     fill;              // "normalFill"
-        float     highlightBias = 0; // key highlight colour bias
-        SYcc      bleed;             // edge bleed colour effect
+        SRgba     fill;  // "normalFill"
+        SYcc      bleed; // edge bleed colour effect
         SBlurFill blurFill;
-        float     lift = 0; // extra white mixed over the face (by eye, not from the RE)
-        // face tone kept inside [lumaMin, lumaMax]: min as gamma luma, max as the relative luminance of
-        // that grey (so >= 4.7:1 white labels at 0.45 holds for saturated faces too); tiles keep their tone and label
-        // contrast over any backdrop (by eye: Control Center over white windows went near black/white)
-        float     lumaMin = 0, lumaMax = 1;
+        // rim, both from the 27.2.1 probe (reference/re/27.2.1/live/glass-params-*.json):
+        // key/fill highlight layer target = its vibrantColorMatrix as YCC (the matrix is
+        // a*I - k*luma plus an offset: black = offset, white = offset + a - k, saturation = a)
+        SYcc  keyYcc = {0.1471f, 1.0588f, 1.1765f};
+        float darkBias   = -0.25f; // glass filter key highlight colourBias ("dark specular")
+        float darkSpread = 96;     // its spread, degrees
     };
 
     struct SRecipe {
@@ -83,6 +83,7 @@ namespace lg {
         float bleedOpacity = 0, bleedHeight = 0, bleedAmount = 0, bleedBlur = 0;
         float shadowOpacity = 0, shadowOpacityDark = 0; // light side, dark side
         float shadowRadius  = 0;
+        float keySpread     = 80; // degrees, key/fill highlight lobe (SPEC 9.4: D 96 -> 192 : 80 -> 90)
     };
 
     // false when the recipe never draws a drop shadow (Clear, Dock, Control Center)

@@ -46,16 +46,13 @@ uniform vec3  bleedYcc;
 
 uniform vec3  faceYcc;              // black, white, saturation
 uniform vec4  faceFill;             // rgb + amount ("normalFill")
-uniform vec2  faceLuma;             // face tone range: min (gamma luma), max (as the luminance of that grey)
 
-uniform vec2  lightDir;             // unit vector, screen space (y down)
-uniform float highlightBias;        // colour bias of the rim (negative darkens: dark specular)
-uniform float highlightWidth;       // px
-uniform float highlightSpread;      // dot-product threshold of the lobes
-uniform float highlightCurve;       // Apple's tone curve amount
-uniform float rim;                  // highlight floor all around the edge
-uniform float innerShadow;          // 0..1 darkening at the rim
-uniform float innerShadowSize;      // px
+// rim (27.2.1 probe + HUD pixels, see the rim block in main)
+uniform float pxPerPt;              // output scale
+uniform vec3  keyYcc;               // key/fill highlight target (the highlight layer's vibrantColorMatrix)
+uniform vec2  keySpread;            // cos of the key and diffuse lobe spreads
+uniform float highlight;            // scale of the key/fill highlight (1 = Apple)
+uniform vec2  darkSpec;             // colourBias of the dark specular, cos of its spread
 
 uniform float shadowOpacity;
 uniform float shadowRadius;         // px
@@ -70,6 +67,7 @@ uniform float ringRadius;           // px
 out vec4 fragColor;
 
 float sat(float x) { return clamp(x, 0.0, 1.0); }
+vec2  sat2(vec2 x) { return clamp(x, 0.0, 1.0); }
 
 // distance to a rounded box with Lp (superellipse) corners and its outward normal (x: distance, yz: normal)
 vec3 sdBoxN(vec2 p, vec2 half_, float radius) {
@@ -265,31 +263,6 @@ void main() {
             col      = mix(col, eb, w * w * w * w * bleedOpacity * mat);
         }
 
-        // keep the tile tone inside its range over any backdrop (after the bleed, before the rim
-        // light): lift darks additively in gamma (keeps hue); cap brights by real relative luminance
-        // (linear), so a saturated warm face cannot pass the cap and still fail label contrast
-        vec2 fl = mix(vec2(0.0, 1.0), faceLuma, mat);
-        if (fl.x > 0.0 || fl.y < 1.0) {
-            vec3  g  = encode(clamp(col, 0.0, 1.0));
-            float Lg = luma(g);
-            if (Lg < fl.x)
-                col = decode(clamp(g + (fl.x - Lg), 0.0, 1.0));
-            vec3  lin    = srgbToLinear(encode(clamp(col, 0.0, 1.0)));
-            float Ylin   = luma(lin);
-            float capLin = srgbToLinear(vec3(fl.y)).x;
-            if (Ylin > capLin)
-                col = decode(linearToSrgb(lin * (capLin / Ylin)));
-        }
-
-        // subtle inner shadow along the rim
-        if (innerShadow > 0.0) {
-            float k = 1.0 - sat(depth / max(innerShadowSize, 1e-3));
-            col *= 1.0 - innerShadow * k * k * mat;
-        }
-
-        // two-lobe rim highlight (light side and the opposite side). Apple applies it as a colour
-        // bias, which over a blue backdrop came out as a thick cyan rim (JUDGE-r5); macOS shows a
-        // thin near-white hairline, so the rim desaturates first and then lifts toward white
         // pointer light (interactive glass): the rim lights up near the pointer, wider and brighter
         // while a button is held, and the face glows faintly around the touch point; light falls
         // off with distance, so neighbouring glass catches some of it
@@ -304,16 +277,30 @@ void main() {
         if (pf > 0.0)
             col = mix(col, vec3(1.0), pf * mat);
 
-        if (highlightBias != 0.0 && highlightWidth > 0.0) {
-            float k     = 1.0 - sat(depth / (highlightWidth * (1.0 + pl)));
-            float band  = (0.25 * step(0.001, k) + 0.75 * k) * cov;
-            float ndl   = dot(-lightDir, n);
-            vec2  lobes = clamp((vec2(ndl, -ndl) - highlightSpread) / max(1.0 - highlightSpread, 1e-3), 0.0, 1.0);
-            lobes       = lobes / (highlightCurve * (1.0 - lobes) + 1.0);
-            float h     = (max(lobes.x + lobes.y, rim) + pl) * band;
-            float w     = clamp(highlightBias * h, 0.0, 1.0) * mat;
-            col         = mix(col, vec3(luma(col)), w);           // no tint on the edge
-            col         = mix(col, vec3(1.0), w * 0.95);          // near-white hairline
+        // Rim, two parts (SPEC section 3 step 1 for the lobes: two of them, on the key axis and opposite;
+        // spread as a cos threshold, Apple's tone curve x / (amount (1 - x) + 1)).
+        // 1. Dark specular: the glass filter's key highlight with a negative colourBias, keyed sideways
+        //    (angle 90 deg), height 0.5 pt at the very edge: rgb *= 1 + bias h (3 - 2 rgb), tone amount 0.4.
+        //    The Mac HUD shows it as a 1 px dark line at both round ends.
+        // 2. Key/fill highlight layer (CASDFKeyFillHighlightEffect, key angle 0 = top, fill = bottom, under a
+        //    vibrantColorMatrix): mix toward keyYcc(col) by a mask m, clamped to 1.5 (CASDFOutputEffect max).
+        //    Mask fitted to the HUD over flat blue (top and bottom rows agree, light = dark):
+        //    key band 1 pt, 1.23 (0.25 + 0.75 k); diffuse 0.49 (1 - depth / 8 pt)^3 with 0.65 x the spread
+        //    (Apple's diffuse height and spread scales 8 and 0.65); curvature 0.75.
+        {
+            float ax   = abs(n.x), ay = abs(n.y);
+            float dLob = sat((ax - darkSpec.y) / max(1.0 - darkSpec.y, 1e-3));
+            dLob       = dLob / (0.4 * (1.0 - dLob) + 1.0);
+            float dBand = sat((0.5 * pxPerPt - depth) + 0.5); // 0.5 pt, anti-aliased over 1 px
+            col *= 1.0 + (darkSpec.x * dLob * dBand * mat) * (3.0 - 2.0 * clamp(col, 0.0, 1.0));
+
+            vec2  lob = sat2((vec2(ay) - keySpread) / max(1.0 - keySpread, vec2(1e-3)));
+            lob       = lob / (0.75 * (1.0 - lob) + 1.0);
+            float kk  = 1.0 - sat(depth / (pxPerPt * (1.0 + pl)));
+            float dk  = 1.0 - sat(depth / (8.0 * pxPerPt));
+            float hm  = 1.23 * (0.25 * step(0.001, kk) + 0.75 * kk) * (lob.x + pl) + 0.49 * dk * dk * dk * lob.y;
+            hm        = min(hm * highlight, 1.5) * mat;
+            col       = mix(col, clamp(ycc(col, keyYcc), 0.0, 1.0), hm);
         }
 
         face = vec4(encode(clamp(col, 0.0, 1.0)), 1.0);

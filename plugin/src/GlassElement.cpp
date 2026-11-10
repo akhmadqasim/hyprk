@@ -105,15 +105,11 @@ namespace lg {
             .bleedLod         = loc("bleedLod"),
             .bleedYcc         = loc("bleedYcc"),
             .faceFill         = loc("faceFill"),
-            .faceLuma         = loc("faceLuma"),
-            .lightDir         = loc("lightDir"),
-            .highlightBias    = loc("highlightBias"),
-            .highlightWidth   = loc("highlightWidth"),
-            .highlightSpread  = loc("highlightSpread"),
-            .highlightCurve   = loc("highlightCurve"),
-            .rim              = loc("rim"),
-            .innerShadow      = loc("innerShadow"),
-            .innerShadowSize  = loc("innerShadowSize"),
+            .pxPerPt          = loc("pxPerPt"),
+            .keyYcc           = loc("keyYcc"),
+            .keySpread        = loc("keySpread"),
+            .highlight        = loc("highlight"),
+            .darkSpec         = loc("darkSpec"),
             .shadowOpacity    = loc("shadowOpacity"),
             .shadowRadius     = loc("shadowRadius"),
             .shadowOffset     = loc("shadowOffset"),
@@ -571,7 +567,6 @@ namespace lg {
         tex->bind();
 
         // per-element uniforms
-        const double rad = p.lightAngle * M_PI / 180.0;
         glUniform1i(u.tex, 0);
         glUniform1i(u.sharpTex, 1);
         glUniform1i(u.linearLight, p.linearLight ? 1 : 0);
@@ -582,14 +577,8 @@ namespace lg {
         glUniform1f(u.roundingPower, m_data.roundingPower.value_or(p.roundingPower));
         glUniform1f(u.alpha, m_data.alpha);
         glUniform1f(u.aberration, p.aberration * scale);
-        // light comes from lightAngle (0 = from the right, -90 = from the top, y down)
-        glUniform2f(u.lightDir, -std::cos(rad), -std::sin(rad));
-        glUniform1f(u.highlightWidth, p.highlightWidth * scale);
-        glUniform1f(u.highlightSpread, p.highlightSpread);
-        glUniform1f(u.highlightCurve, p.highlightCurve);
-        glUniform1f(u.rim, p.rim);
-        glUniform1f(u.innerShadow, p.innerShadow);
-        glUniform1f(u.innerShadowSize, p.innerShadowSize * scale);
+        glUniform1f(u.pxPerPt, scale);
+        glUniform1f(u.highlight, p.highlight);
         glUniform2f(u.shadowOffset, 0.f, r.shadowOffsetY * scale);
         glUniform1f(u.shadowTint, p.shadowTint);
         glUniform1f(u.shadowSaturation, r.shadowSaturation);
@@ -648,12 +637,11 @@ namespace lg {
             glUniform1f(u.bleedLod, std::log2(1.f + res.bleedBlur * scale));
             glUniform3f(u.bleedYcc, face.bleed.black, face.bleed.white, face.bleed.saturation);
             glUniform3f(u.faceYcc, face.ycc.black, face.ycc.white, face.ycc.saturation);
-            // fill and the light-side lift combine as two white-ish layers: a = 1 - (1-a1)(1-a2)
-            const SRgba base = face.fill.a > 0 ? face.fill : SRgba{1, 1, 1, 0};
-            const SRgba fill = dark[q] ? face.fill : SRgba{base.r, base.g, base.b, 1 - (1 - base.a) * (1 - face.lift * p.lift)};
-            glUniform4f(u.faceFill, fill.r, fill.g, fill.b, fill.a);
-            glUniform2f(u.faceLuma, face.lumaMin, face.lumaMax);
-            glUniform1f(u.highlightBias, face.highlightBias * p.highlight);
+            glUniform4f(u.faceFill, face.fill.r, face.fill.g, face.fill.b, face.fill.a);
+            glUniform3f(u.keyYcc, face.keyYcc.black, face.keyYcc.white, face.keyYcc.saturation);
+            const float keyRad = res.keySpread * float(M_PI / 180.0);
+            glUniform2f(u.keySpread, std::cos(keyRad), std::cos(0.65f * keyRad)); // diffuse: 0.65 x the spread
+            glUniform2f(u.darkSpec, face.darkBias, std::cos(face.darkSpread * float(M_PI / 180.0)));
             glUniform1f(u.shadowOpacity, m_data.shadow ? (dark[q] ? res.shadowOpacityDark : res.shadowOpacity) * p.shadowScale : 0.f);
             glUniform1f(u.shadowRadius, res.shadowRadius * scale);
 

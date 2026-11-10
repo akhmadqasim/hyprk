@@ -101,6 +101,18 @@ int main() {
         CHECK(near(recipeByName("dock").light.ycc.white, 0.9, 1e-6));
         CHECK(near(resolveMaterial(recipeByName("controlcenter"), 60).refractionAmount, -80, 1e-4));
         CHECK(std::string{recipeByName("nope").name} == "regular");
+        // 27.2.1 probe (reference/re/27.2.1/live/glass-params-*.json): Control Center (also the HUD) is the
+        // same face light and dark, no bleed; Clear and Dock as resolved there; key spread 80 -> 90 over D 96 -> 192
+        const auto& cc = recipeByName("controlcenter");
+        for (const auto* f : {&cc.light, &cc.dark})
+            CHECK(near(f->ycc.black, 0.125, 1e-6) && near(f->ycc.white, 0.8, 1e-6) && near(f->ycc.saturation, 1.2, 1e-6) && near(f->fill.a, 0) &&
+                  near(f->darkBias, -0.3, 1e-6) && near(f->darkSpread, 75) && near(f->keyYcc.white, 1.4666, 1e-4));
+        CHECK(near(cc.blurAlpha[1], 0.1, 1e-6) && near(resolveMaterial(cc, 96).bleedOpacity, 0) && near(resolveMaterial(cc, 160).keySpread, 86.6667, 1e-3));
+        r = resolveMaterial(recipeByName("clear"), 64);
+        CHECK(near(r.refractionHeight, 20, 1e-4) && near(r.refractionAmount, -41.6, 1e-4) && near(r.blurRadius, 0.75, 1e-6) && near(r.bleedOpacity, 0));
+        r = resolveMaterial(recipeByName("dock"), 64);
+        CHECK(near(r.refractionHeight, 5.12, 1e-4) && near(r.refractionAmount, -11.52, 1e-4) && near(r.outerAmount, 0) && near(r.bleedOpacity, 0));
+        CHECK(near(recipeByName("dock").light.ycc.saturation, 1.25, 1e-6) && near(recipeByName("dock").dark.fill.a, 0.02, 1e-6));
         // drop shadows as measured on macOS 27.2.1 (reference/re/LIVE-27.2.1.md)
         r = resolveMaterial(reg, 24);
         CHECK(near(r.shadowOpacity, 0.04, 1e-6) && near(r.shadowOpacityDark, 0.04, 1e-6) && near(r.shadowRadius, 4, 1e-5));

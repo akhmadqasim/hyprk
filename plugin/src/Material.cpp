@@ -5,28 +5,31 @@
 namespace lg {
 
     namespace {
-        // Dark sides use a +0.3 rim bias. Apple's darkSpecular has colorBias -0.3, but that is an
-        // extra darkening layer on top of the key highlight, which is not decoded; a plain -0.3 made
-        // the dark rim disappear (by eye vs reference/screens).
+        // Rim (every recipe), from the 27.2.1 probe (reference/re/27.2.1/live/glass-params-*.json) and the HUD
+        // pixels (reference/screens/27.2.1/hud-*.png): a thin dark line where the edge faces sideways (the glass
+        // filter's key highlight with a negative colourBias, keyed horizontally) and a bright key/fill highlight
+        // top and bottom (a CASDFKeyFillHighlightEffect layer under a vibrantColorMatrix). SFace holds the
+        // per-recipe numbers; the shape of the bands is in shaders/liquidglass.frag.
         constexpr SRgba WHITE12 = {1, 1, 1, 0.12f};
-        // reference/screens/macos27-control-center.png tiles average about (108, 93, 86) over a warm
-        // wallpaper; a little of that warm grey keeps CC from reading as a cold flat slab (JUDGE-r3)
-        constexpr SRgba WARM_GREY = {0.56f, 0.49f, 0.45f, 0.06f};
 
         // Clear-family edge bleed colour (SPEC 9.3)
         constexpr SYcc CLEAR_BLEED = {0.75f, 1.f, 1.2f};
+        // key/fill highlight target of Clear and Control Center: matrix rows (1.3192, -0.0478, -0.0047 | 0.2)
+        constexpr SYcc CLEAR_KEY = {0.2f, 1.4666f, 1.3334f};
 
-        // SPEC 9.2 RegularBase, V2. Used by menus, notifications, sidebars. Light saturation 1.2 -> 1.0
-        // and dock 1.25 -> 1.1: the decoded values read too cyan over the Tahoe wallpapers (JUDGE.md).
+        // SPEC 9.2 RegularBase, V2. Used by menus, notifications, sidebars. Light saturation 1.2 -> 1.0:
+        // the decoded value read too cyan over the Tahoe wallpapers (JUDGE.md).
         // Regular over a white window read as opaque white (JUDGE-r2): white point 1.03 -> 0.92, fill
         // 0.2 -> 0.12, blur-fill lighten 0.9 -> 0.4, at least 2 extra blur, and the variable blur keeps
         // full strength until 1 pt from the edge (alpha 0.15 / 0.85 instead of 0.5 / 0.5).
         // Drop shadow = the SRecipe defaults, measured on macOS 27.2.1 (LIVE-27.2.1.md): opacity 0.04 -> 0.4
         // (dark 0.6) and radius 4 -> 24 over D 64 -> 160, y 8. Ring shadow V2 (8, 4, 5, 0.06).
+        // Rim (probe): dark specular -0.25, spread 96 deg light / 75 deg dark; highlight target from the matrix
+        // rows (1.1202, -0.1894, -0.019 | 0.1471), the SFace default.
         constexpr SRecipe REGULAR = {
             .name         = "regular",
-            .light        = {.ycc = {0.4f, 0.92f, 1.0f}, .fill = WHITE12, .highlightBias = 0.5f, .bleed = {0.9f, 1.f, 1.2f}, .blurFill = {0.4f, 0, 0.5f}},
-            .dark         = {.ycc = {0.125f, 1.125f, 1.3f}, .fill = {}, .highlightBias = 0.3f, .bleed = {0.125f, 0.5f, 1.f}, .blurFill = {0, 0.9f, 0.5f}},
+            .light        = {.ycc = {0.4f, 0.92f, 1.0f}, .fill = WHITE12, .bleed = {0.9f, 1.f, 1.2f}, .blurFill = {0.4f, 0, 0.5f}},
+            .dark         = {.ycc = {0.125f, 1.125f, 1.3f}, .fill = {}, .bleed = {0.125f, 0.5f, 1.f}, .blurFill = {0, 0.9f, 0.5f}, .darkSpread = 75},
             .outerHeightN = 0.2f,
             .outerAmountN = 0.25f,
             .outerOpacity = 0.6f,
@@ -35,48 +38,52 @@ namespace lg {
             .ringOffsetY = 8, .ringStroke = 4, .ringRadius = 5, .ringOpacity = 0.06f,
         };
 
-        // no drop shadow: measured 0 for Clear, Dock and Control Center on macOS 27.2.1 (LIVE-27.2.1.md)
-#define LG_NO_SHADOW .shadowOpacityLo = 0, .shadowOpacityHi = 0, .shadowOpacityHiDark = 0
+        // no drop shadow and no edge bleed: both measured 0 for Clear, Dock and Control Center on macOS 27.2.1
+        // (LIVE-27.2.1.md; inputBleedOpacity 0 at every D in glass-params-*.json)
+#define LG_NO_SHADOW .bleedOpacityLo = 0, .bleedOpacityHi = 0, .shadowOpacityLo = 0, .shadowOpacityHi = 0, .shadowOpacityHiDark = 0
 
-        // SPEC 9.3 Clear (base + ClearSpec.Modifier, V2): no fill, refraction -0.8 D, no outer layer,
-        // blur D 48->120 : 3->8.
+        // Clear as resolved on 27.2.1 (probe `clear`; SPEC 9.3's base + the ClearSpec.Modifier branch whose
+        // condition was not identified): face (0.125, 1.08, 1.06), no fill, blur 0.75, inner refraction
+        // 0.36 D max 20 / -0.65 D min -60, no outer layer, rim -0.25 at 75 deg.
         constexpr SRecipe CLEAR = {
             .name              = "clear",
-            .light             = {.ycc = {0.125f, 1.08f, 1.06f}, .fill = {}, .highlightBias = 0.5f, .bleed = CLEAR_BLEED},
-            .dark              = {.ycc = {0.125f, 1.08f, 1.06f}, .fill = {}, .highlightBias = 0.3f, .bleed = CLEAR_BLEED},
-            .refractionAmountN = -0.8f,
-            .blurD0 = 48, .blurD1 = 120, .blurLo = 3, .blurHi = 8,
+            .light             = {.ycc = {0.125f, 1.08f, 1.06f}, .fill = {}, .bleed = CLEAR_BLEED, .keyYcc = CLEAR_KEY, .darkSpread = 75},
+            .dark              = {.ycc = {0.125f, 1.08f, 1.06f}, .fill = {}, .bleed = CLEAR_BLEED, .keyYcc = CLEAR_KEY, .darkSpread = 75},
+            .refractionHeightN = 0.36f,
+            .refractionAmountN = -0.65f,
+            .blurLo = 0.75f, .blurHi = 0.75f, // constant
             LG_NO_SHADOW,
         };
 
-        // SPEC 9.5 DockRecipe.Other V2 on top of Clear: blur 1.5, inner 0.08 D / -0.18 D,
-        // outer 0.13 D / 0.42 D at 0.2. Light face saturation 1.1 -> 0.5 and rim bias 0.5 -> 1.0: over a
-        // saturated blue wallpaper the dock read as tinted lavender with a weak rim, while
-        // reference/screens/macos27-dock-default.png keeps about half the backdrop chroma and a rim
-        // +45..70 above the body (measured; ours now +42..44).
+        // Dock as resolved on 27.2.1 (probe `dock`, = SPEC 9.5 DockRecipe.Other V2): face light (0.15, 0.9, 1.25),
+        // dark (0.05, 0.92, 1.25) + black 2 %; blur 1.5; inner 0.08 D / -0.18 D; outer layer opacity 0.2 with no
+        // displacement (outer height and amount 0); rim -0.25 at 120 deg, highlight target light (0.2, 1.2, 1.333),
+        // dark (0.25, 0.95, 1.2). The light face matches the real Dock (MAC-ANSWERS Q-dock-01: white 229, black 38,
+        // grey 127 -> 134).
         constexpr SRecipe DOCK = {
             .name              = "dock",
-            .light             = {.ycc = {0.15f, 0.9f, 0.5f}, .fill = {}, .highlightBias = 1.0f, .bleed = CLEAR_BLEED, .lift = 0.05f},
-            .dark              = {.ycc = {0.05f, 0.92f, 1.25f}, .fill = {}, .highlightBias = 0.3f, .bleed = CLEAR_BLEED},
+            .light             = {.ycc = {0.15f, 0.9f, 1.25f}, .fill = {}, .bleed = CLEAR_BLEED, .keyYcc = {0.2f, 1.2f, 1.3334f}, .darkSpread = 120},
+            .dark              = {.ycc = {0.05f, 0.92f, 1.25f}, .fill = {0, 0, 0, 0.02f}, .bleed = CLEAR_BLEED, .keyYcc = {0.25f, 0.95f, 1.2f}, .darkSpread = 120},
             .refractionHeightN = 0.08f,
             .refractionAmountN = -0.18f,
-            .outerHeightN      = 0.13f,
-            .outerAmountN      = 0.42f,
             .outerOpacity      = 0.2f,
             .blurLo = 1.5f, .blurHi = 1.5f, // constant
             LG_NO_SHADOW,
         };
 
-        // Face: SPEC 9.5 gives (0.125, 0.8, 1.2), but in our gamma-space shader that measured ~1.4:1
-        // against the white tile labels (JUDGE.md). (0.18, 0.55, 1.0) maps the backdrop into a mid
-        // tone that keeps its shapes and colours (JUDGE-r4: no flat slab) while the luminance band
-        // caps it at 0.45 (about 4.7:1 against white labels), like reference/screens/macos27-control-center.png.
-        // SPEC 9.5 Control Center, Mac, V2 on top of Clear: blur 4 with distances (-100, -1, 0, 0),
-        // inner 0.225 D clamp 25 / -2.0 D clamp -80, outer 0.0357 D / 0.0714 D at 0.1525.
+        // SPEC 9.5 Control Center, Mac, V2 = the 27.2.1 probe `controlCenter`, light and dark alike: face
+        // (0.125, 0.8, 1.2), no fill; blur distances (-100, -1, 0, 0) with opacities (1, 0.1, 0.5, 1);
+        // inner 0.225 D max 25 / -2.0 D min -80; outer 0.0357 D / 0.0714 D at 0.1525; rim -0.3 at 75 deg.
+        // Also the volume/brightness HUD (SystemBannerUI _Glass.controlCenter): over the Electric Blue
+        // wallpaper (69, 83, 206) this face gives (68, 85, 232), the Mac's reading (MAC-ANSWERS "HUD").
+        // Apple's blur 4 rides on Hyprland's already strong blur here and wiped out the wallpaper
+        // shapes the reference shows through the tiles (JUDGE-r4): no extra blur, the variable
+        // blur (from 100 pt inside the edge) still softens the middle
+        constexpr SFace CONTROLCENTER_FACE = {.ycc = {0.125f, 0.8f, 1.2f}, .fill = {}, .bleed = CLEAR_BLEED, .keyYcc = CLEAR_KEY, .darkBias = -0.3f, .darkSpread = 75};
         constexpr SRecipe CONTROLCENTER = {
             .name                = "controlcenter",
-            .light               = {.ycc = {0.18f, 0.55f, 1.0f}, .fill = WARM_GREY, .highlightBias = 1.2f, .bleed = CLEAR_BLEED, .lumaMin = 0.15f, .lumaMax = 0.45f},
-            .dark                = {.ycc = {0.12f, 0.45f, 1.0f}, .fill = WARM_GREY, .highlightBias = 0.9f, .bleed = CLEAR_BLEED, .lumaMin = 0.10f, .lumaMax = 0.40f},
+            .light               = CONTROLCENTER_FACE,
+            .dark                = CONTROLCENTER_FACE,
             .refractionHeightN   = 0.225f,
             .refractionHeightMax = 25,
             .refractionAmountN   = -2.0f,
@@ -84,39 +91,15 @@ namespace lg {
             .outerHeightN        = 0.0357f,
             .outerAmountN        = 0.0714f,
             .outerOpacity        = 0.1525f,
-            // Apple's blur 4 rides on Hyprland's already strong blur here and wiped out the wallpaper
-            // shapes the reference shows through the tiles (JUDGE-r4): no extra blur, the variable
-            // blur (from 100 pt inside the edge) still softens the middle
             .blurLo = 0, .blurHi = 0,
             .blurDist0N = 0, .blurDist0Fixed = -100,
+            .blurAlpha      = {1, 0.1f, 0.5f},
             LG_NO_SHADOW,
         };
-        // Spotlight's field and results: SiriRecipe.SiriModifier, branch A (reference/re/NOTES.md, macOS 27.2.1
-        // DesignLibrary 0x195f30b54). The branch is `subvariant == .listening || contentEffect == .lense`;
-        // spotlightField / searchResults are not .listening, so this is "branch A unless Spotlight asks for the
-        // lense content effect", which is not traced (set in SpotlightUI* / SearchUI). Mapped like the others:
-        // - face YCC black 0.1, white 1.0, saturation 1.25, no fills (both appearances: SiriModifier does
-        //   not branch on appearance)
-        // - refraction inner 0.4 D / -0.72 D, outer 0.4 D / 0.4 D at opacity 1.0; no clamps are written,
-        //   so the regular caps (20 / -60) are lifted
-        // - blur: radius 8 x opacities (0.75, 0, 0.75, 1.0) over distances (-60, -1, 0, 0). Our blurAlpha
-        //   is relative (1 = Hyprland's full blur), so 0.75 moves into the radius: 8 x 0.75 = 6 with
-        //   alphas (1, 0, 1), the same per-pixel radius. The plugin's blur is tuned by eye on top of
-        //   Hyprland's blur (Regular 5 -> 2..4, Control Center 4 -> 0). Here 3 and 6 were compared
-        //   by eye in the headless session (reference/ours/plugin-spotlight-*.png) against
-        //   reference/screens/macos27-spotlight.png: barely different, 6 is closer to the reference's smooth
-        //   backdrop and loses no shapes it shows, so Apple's 6 stays
-        // - blurFill darken 0.75, normal 0.5. lighten is not written by SiriModifier, so it stays the base
-        //   value: Regular's (0.4 light by eye, 0 dark), assuming a Regular base (not traced)
-        // - edge bleed opacity 0, drop shadow opacity 0, ring shadow 0
-        // - darkSpecular amount 0.4, spread 75 deg, colorBias -0.3 / -0.25: the plugin has no per-recipe
-        //   spread or amount and does not decode colorBias (see the note at the top), so the rim keeps
-        //   Regular's highlightBias, as Control Center does with the same colorBias
-        // - backdropScale 0.5: not modelled by the plugin (Regular uses 0.5 below D 160 as well)
         constexpr SRecipe SPOTLIGHT = {
             .name                = "spotlight",
-            .light               = {.ycc = {0.1f, 1.0f, 1.25f}, .fill = {}, .highlightBias = 0.5f, .bleed = {0.9f, 1.f, 1.2f}, .blurFill = {0.4f, 0.75f, 0.5f}},
-            .dark                = {.ycc = {0.1f, 1.0f, 1.25f}, .fill = {}, .highlightBias = 0.3f, .bleed = {0.125f, 0.5f, 1.f}, .blurFill = {0, 0.75f, 0.5f}},
+            .light               = {.ycc = {0.1f, 1.0f, 1.25f}, .fill = {}, .bleed = {0.9f, 1.f, 1.2f}, .blurFill = {0.4f, 0.75f, 0.5f}, .darkSpread = 75},
+            .dark                = {.ycc = {0.1f, 1.0f, 1.25f}, .fill = {}, .bleed = {0.125f, 0.5f, 1.f}, .blurFill = {0, 0.75f, 0.5f}, .darkSpread = 75},
             .refractionHeightN   = 0.4f,
             .refractionHeightMax = 1e6f,
             .refractionAmountN   = -0.72f,
@@ -127,7 +110,6 @@ namespace lg {
             .blurLo = 6, .blurHi = 6, // constant: Apple 8 x 0.75 (see above)
             .blurDist0N = 0, .blurDist0Fixed = -60, .blurDist1 = -1,
             .blurAlpha      = {1, 0, 1},
-            .bleedOpacityLo = 0, .bleedOpacityHi = 0,
             LG_NO_SHADOW,
         };
 #undef LG_NO_SHADOW
@@ -179,6 +161,7 @@ namespace lg {
             .shadowOpacity     = float(clampedLinear(D, r.shadowD0, r.shadowD1, r.shadowOpacityLo, r.shadowOpacityHi)),
             .shadowOpacityDark = float(clampedLinear(D, r.shadowD0, r.shadowD1, r.shadowOpacityLo, r.shadowOpacityHiDark)),
             .shadowRadius      = float(clampedLinear(D, r.shadowD0, r.shadowD1, r.shadowRadiusLo, r.shadowRadius)),
+            .keySpread         = float(clampedLinear(D, 96, 192, 80, 90)),
         };
     }
 

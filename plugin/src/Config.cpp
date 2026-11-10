@@ -39,15 +39,7 @@ namespace lg {
             {K("aberration"), &SParams::aberration},
             {K("adapt_low"), &SParams::adaptLow},
             {K("adapt_high"), &SParams::adaptHigh},
-            {K("light_angle"), &SParams::lightAngle},
             {K("highlight"), &SParams::highlight},
-            {K("highlight_width"), &SParams::highlightWidth},
-            {K("highlight_spread"), &SParams::highlightSpread},
-            {K("highlight_curve"), &SParams::highlightCurve},
-            {K("rim"), &SParams::rim},
-            {K("lift"), &SParams::lift},
-            {K("inner_shadow"), &SParams::innerShadow},
-            {K("inner_shadow_size"), &SParams::innerShadowSize},
             {K("shadow_scale"), &SParams::shadowScale},
             {K("shadow_tint"), &SParams::shadowTint},
             {K("ring_scale"), &SParams::ringScale},
@@ -106,7 +98,10 @@ namespace lg {
         // (the recipes in Material.cpp set face colour, tint and saturation)
         const char* const LEGACY_FLOATS[] = {K("saturation"), K("brightness_light"), K("brightness_dark"), K("blur_edge_distance"), K("edge_blur_lod"),
                                              K("refraction"), K("refraction_height"), K("adapt_threshold"), K("adapt_softness"), K("shadow_opacity"),
-                                             K("shadow_radius"), K("shadow_offset_y"), K("ring_opacity"), K("ring_width")};
+                                             K("shadow_radius"), K("shadow_offset_y"), K("ring_opacity"), K("ring_width"),
+                                             // by-eye rim of the second iteration, replaced by the 27.2.1 rim (Material.cpp)
+                                             K("light_angle"), K("highlight_width"), K("highlight_spread"), K("highlight_curve"), K("rim"),
+                                             K("lift"), K("inner_shadow"), K("inner_shadow_size")};
         const char* const LEGACY_INTS[]   = {K("tint_light"), K("tint_dark"), K("debug_copy_per_element")};
 #undef K
 
