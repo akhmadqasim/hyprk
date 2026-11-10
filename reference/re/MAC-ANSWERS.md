@@ -1700,3 +1700,89 @@ Measured on the user's account (Dark, Multicolour accent = blue, NSGlassTintAmou
   - Increase Contrast (Reduce Transparency stays off): bar still shows the wallpaper, text colour rule unchanged; pill = solid grey 117,117,117 in both appearances. Menu stays glass but denser: dark 72 over white / 33 over black (base 120 / 33), light 253 / 191 (base 252 / 137). Label opaque (dark 255, light 0); disabled/shortcuts stronger: dark 163 (white bg) / 145 (black bg), light 112 / 85; separator dark 129 on 75 (≈white a.3), light 89 on 255 (≈black a.65). Selection darker accent: light 0,64,221, dark 24,116,218. Hairline dark 11, light 159. (pixels)
 - Q-menubar-33: yes (this account: "Automatically hide and show the menu bar" = In Full Screen Only, AppleMenuBarVisibleInFullscreen 0). On the notched Air a full-screen window sits BELOW the bar strip (window 0,34,1710,1073); the top 34 pt stays solid black and the titles/status items are hidden. Pointer to the top edge: titles and status items FADE in place (no slide, ink y 11..23.5 constant) over ≈0.15 s (9–10 frames, roughly linear: title-region mean 3,9,13,19,25,32,…,46,56 = final), on the black strip (no material); the window's titlebar (0,34,…,32 tall) appears in one frame ≈0.12 s after the fade starts. Leaving: titles fade out in ≈0.17 s (10 frames), titlebar goes in ≈0.1 s. No dwell delay detectable (reveal and hide both started within a frame of the pointer crossing). Non-notch displays (bar overlapping content) not measured. (probe window toggleFullScreen, 60 fps clip)
 - Q-menubar-34: no. Over a 2 pt black/white stripe wallpaper the stripes stay sharp and identical (0/176, std 88–95) in the empty bar, between Battery/Wi-Fi/CC/Clock, right of the clock and between titles at y 3, 17 and 31 → no capsule, blur or glass behind the right-side items or the bar. Only pills on open items (Q-04, Q-11). Measured at this account's Liquid Glass setting (NSGlassTintAmount 0.507); other Clear/Tinted values not tried (global user setting). (stripe wallpaper, pixels)
+
+## Glass checks (#53)
+
+Setup: user account (Multicolour, icon style Dark, NSGlassTintAmount 0.5071146, tile 33). The backdrops were solid
+3420x2214 PNG wallpapers (255 / 127 / 0) set with System Events. Desktop icons sit under the CC panel, so a borderless
+window of the same grey was placed just above the desktop-icon level to hide them (the screen reads exactly 255/127/0
+there). All values are display RGB from `screencapture`, read at 2x px. Crops are in
+`reference/screens/27.2.1/glass53/` (720 KB). Remaining disk: **40 GiB free** (Data volume 163 of 228 GiB used).
+
+### 1. Control Center over a plain backdrop
+
+**Light and dark appearance give identical pixels** (every tile, label and the gap). The only change is the Dark Mode
+toggle tile, which is on in dark. The Liquid Glass slider does not change CC either: at tint 1 it is still 186 / 229 / 255.
+
+| Backdrop | Gap between tiles | Off tile interior | Off icon circle (Focus) | Toggle title ("Bluetooth", "Focus") | Subtitle ("On") | Slider title ("Display"), glyphs | Slider track / fill |
+|---|---|---|---|---|---|---|---|
+| white 255 | 229 | **186** | 203 | 245 | 255 | 255 | 206 / 255 |
+| grey 127 | 114 | **109** | 146 | 233 | 249 | 255 | 129 / 255 |
+| black 0 | 0 | **32** | 88 | 221 | 172 | 255 | 52 / 255 |
+
+- Off tile = **32 + 0.604·in**, linear in display values (all 3 points within ±1).
+- On state = solid 255 (white):
+  - Wi-Fi / Bluetooth / AirDrop icon circles are 255 with an accent glyph (52,120,246).
+  - The Dark Mode tile when on is a 255 disc with a black (0) glyph.
+  - The HomeKit accessory tile when on is 255 with dark text.
+- Gap between tiles = **0.898·in** (a 10 % black dim). There is no hard panel edge. The dim feathers out over about
+  100 pt to the left of the tiles and below "Edit Controls" (236 over white at 12 pt left of the tiles).
+- How the labels and parts relate to the tile colour T:
+  - Off icon circle = T + 0.25·(255−T): white at 25 %.
+  - Toggle title = T + 0.85·(255−T): white at 85 %.
+  - Subtitle = T + 140 (plus-lighter, clamps at 255).
+  - Slider track = T + 20.
+  - Slider-module titles and all glyphs are pure 255.
+- **Labels stay white over white:** yes. 255 (or 245) on a 186 tile, about 1.9:1 (1.8:1 for 245). Nothing darkens them
+  for a light backdrop.
+- **The tile over white is 186, not 203.** 203 is the off icon circle (white at 25 % over the tile).
+- Crops: `cc-{light,dark}-white.png`, `cc-{light,dark}-grey127.png`, `cc-dark-black.png`. The Wi-Fi SSID and accessory
+  rows are cropped out.
+
+### 2. Dock in dark appearance
+
+Readings at a spot between icons (the item boundary), 2x px rows going inward from the edge.
+
+| Backdrop | Body | Top edge, px 1,2,3,5,9 → body | Bottom edge (mirror) |
+|---|---|---|---|
+| white 255 | **176** | 193, 186, 179, 178, 177 → 176 (about 6 pt) | identical |
+| grey 127 | **107** | 155, 135, 117, 112, 109 → 107 | identical |
+| black 0 | **12** | 104, 65, 30, 22, 16 → 12 (about 7 pt) | identical |
+| light mode, white | 229 | 237, 235, 233, 232, 230 | identical |
+| light mode, black | 38 | 116, 83, 54, 47, 41 | identical |
+
+- **Rim, top vs bottom:** they are the same, pixel for pixel, in every case. The old "104 top / 65 bottom" (and
+  116/83 in light) were the outer and the second pixel of the same 1 pt rim, not top and bottom.
+- The rim depends on angle:
+  - full at the top and bottom edges;
+  - about 46–50 at the 45° corners (over black);
+  - none at the vertical sides.
+- At mid-height on the sides, the outermost 1 px is instead darker than both the backdrop and the body: 104 over white,
+  49 over grey, which is about 0.4·backdrop.
+- **The ~230 the probe predicts over white is the light-mode Dock (229).** The dark Dock over white is 176, which
+  confirms 176/108/12 (grey now 107).
+- What changes the dark Dock body, all over white:
+
+| Change | Body / rim |
+|---|---|
+| Icon style Dark (user) | 176 / 193 |
+| Icon style Default (key removed) | 176 / 193 |
+| Icon style Clear (ClearLight) | 176 / 193 |
+| Icon style Tinted (TintedLight) | 176 / 193 |
+| Liquid Glass slider 0 | 176 / 193 |
+| Liquid Glass slider 0.5 | 176 / 193 |
+| Liquid Glass slider 1 | 176 / 192–194 |
+
+  **None of them changes the Dock body.** The whole Dock capture differs by at most 2 levels between slider 0 and 1.
+  Only the icon art changes with the style.
+- The slider is live elsewhere: the Settings preview buttons darken a lot, but the desktop context menu over white only
+  moves 55 → 53 and CC does not change.
+- Crops: `dock-dark-{white,grey127,black}.png`, `dock-light-{white,black}.png`,
+  `dock-dark-black-leftedge-x4.png` (rim around the corner), `dock-dark-white-iconstyles-dark-default-clear-tinted.png`.
+
+Restored and verified:
+- Dark mode, Electric Blue wallpaper.
+- AppleIconAppearanceTheme RegularDark ("Always"), NSGlassTintAmount 0.5071146 (float), set through the slider's AX
+  value.
+- System Settings hidden again, CC closed, the patch window quit.
+- The two Finder windows were minimised during the test and are back at their original bounds.
