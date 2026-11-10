@@ -91,24 +91,46 @@ namespace lg {
             .blurDist0N = 0, .blurDist0Fixed = -100,
             LG_NO_SHADOW,
         };
+        // Spotlight's field and results: SiriRecipe.SiriModifier, branch A (reference/re/NOTES.md, macOS 27.2.1
+        // DesignLibrary 0x195f30b54). The branch is `subvariant == .listening || contentEffect == .lense`;
+        // spotlightField / searchResults are not .listening, so this is "branch A unless Spotlight asks for the
+        // lense content effect", which is not traced (set in SpotlightUI* / SearchUI). Mapped like the others:
+        // - face YCC black 0.1, white 1.0, saturation 1.25, no fills (both appearances: SiriModifier does
+        //   not branch on appearance)
+        // - refraction inner 0.4 D / -0.72 D, outer 0.4 D / 0.4 D at opacity 1.0; no clamps are written,
+        //   so the regular caps (20 / -60) are lifted
+        // - blur: radius 8 x opacities (0.75, 0, 0.75, 1.0) over distances (-60, -1, 0, 0). Our blurAlpha
+        //   is relative (1 = Hyprland's full blur), so 0.75 moves into the radius: 8 x 0.75 = 6 with
+        //   alphas (1, 0, 1), the same per-pixel radius. The plugin's blur is tuned by eye on top of
+        //   Hyprland's blur (Regular 5 -> 2..4, Control Center 4 -> 0). Here 3 and 6 were compared
+        //   by eye in the headless session (reference/ours/plugin-spotlight-*.png) against
+        //   reference/screens/macos27-spotlight.png: barely different, 6 is closer to the reference's smooth
+        //   backdrop and loses no shapes it shows, so Apple's 6 stays
+        // - blurFill darken 0.75, normal 0.5. lighten is not written by SiriModifier, so it stays the base
+        //   value: Regular's (0.4 light by eye, 0 dark), assuming a Regular base (not traced)
+        // - edge bleed opacity 0, drop shadow opacity 0, ring shadow 0
+        // - darkSpecular amount 0.4, spread 75 deg, colorBias -0.3 / -0.25: the plugin has no per-recipe
+        //   spread or amount and does not decode colorBias (see the note at the top), so the rim keeps
+        //   Regular's highlightBias, as Control Center does with the same colorBias
+        // - backdropScale 0.5: not modelled by the plugin (Regular uses 0.5 below D 160 as well)
+        constexpr SRecipe SPOTLIGHT = {
+            .name                = "spotlight",
+            .light               = {.ycc = {0.1f, 1.0f, 1.25f}, .fill = {}, .highlightBias = 0.5f, .bleed = {0.9f, 1.f, 1.2f}, .blurFill = {0.4f, 0.75f, 0.5f}},
+            .dark                = {.ycc = {0.1f, 1.0f, 1.25f}, .fill = {}, .highlightBias = 0.3f, .bleed = {0.125f, 0.5f, 1.f}, .blurFill = {0, 0.75f, 0.5f}},
+            .refractionHeightN   = 0.4f,
+            .refractionHeightMax = 1e6f,
+            .refractionAmountN   = -0.72f,
+            .refractionAmountMin = -1e6f,
+            .outerHeightN        = 0.4f,
+            .outerAmountN        = 0.4f,
+            .outerOpacity        = 1.0f,
+            .blurLo = 6, .blurHi = 6, // constant: Apple 8 x 0.75 (see above)
+            .blurDist0N = 0, .blurDist0Fixed = -60, .blurDist1 = -1,
+            .blurAlpha      = {1, 0, 1},
+            .bleedOpacityLo = 0, .bleedOpacityHi = 0,
+            LG_NO_SHADOW,
+        };
 #undef LG_NO_SHADOW
-
-        // Spotlight's field: light translucent glass, not a grey capsule (JUDGE-r3). Regular's refraction
-        // and blur, a brighter face and fill; by eye vs reference/screens/macos27-spotlight.png.
-        constexpr SRecipe SPOTLIGHT = [] {
-            SRecipe r    = REGULAR;
-            r.name       = "spotlight";
-            r.light.ycc  = {0.45f, 1.0f, 1.05f};
-            r.light.fill = {1, 1, 1, 0.22f};
-            r.light.lift = 0.04f;
-            // Spotlight is a SiriRecipe variant that AppKit does not expose, so its shadow could not be
-            // measured (reference/re/NOTES.md): keeps the earlier by-eye one
-            r.shadowOpacityLo = 0.25f;
-            r.shadowOpacityHi = r.shadowOpacityHiDark = 0.75f;
-            r.shadowRadiusLo   = 24;
-            r.shadowSaturation = 1.2f;
-            return r;
-        }();
 
         // Regular + the Mac glass menu shadow, the same at every size. Measured on macOS 27.2.1
         // (LIVE-27.2.1.md): 0.7 light, 0.8 dark, radius 24, y 10. A real alert has 0.6 / 0.7 (SPEC 9.5), but

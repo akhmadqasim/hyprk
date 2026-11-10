@@ -113,7 +113,21 @@ int main() {
         CHECK(near(recipeByName("menu").shadowOffsetY, 10, 1e-6));
         for (const char* n : {"clear", "dock", "controlcenter"})
             CHECK(!hasShadow(recipeByName(n)) && near(resolveMaterial(recipeByName(n), 200).shadowOpacityDark, 0, 1e-6));
-        CHECK(hasShadow(reg) && hasShadow(recipeByName("spotlight")));
+        CHECK(hasShadow(reg));
+        // Spotlight = SiriRecipe.SiriModifier branch A (reference/re/NOTES.md): no shadow, no edge bleed, no ring,
+        // unclamped refraction 0.4 D / -0.72 D, outer 0.4 D / 0.4 D at 1.0, blur from 60 pt inside the edge
+        const auto& sp = recipeByName("spotlight");
+        CHECK(std::string{sp.name} == "spotlight" && !hasShadow(sp) && near(sp.ringOpacity, 0));
+        r = resolveMaterial(sp, 60);
+        CHECK(near(r.refractionHeight, 24, 1e-4) && near(r.refractionAmount, -43.2, 1e-4));
+        CHECK(near(r.outerHeight, 24, 1e-4) && near(r.outerAmount, 24, 1e-4) && near(sp.outerOpacity, 1));
+        CHECK(near(r.bleedOpacity, 0) && near(r.shadowOpacity, 0) && near(r.shadowOpacityDark, 0));
+        CHECK(near(r.blurDist0, -60, 1e-4) && near(sp.blurDist1, -1) && near(sp.blurAlpha[0], 1) && near(sp.blurAlpha[1], 0) && near(sp.blurAlpha[2], 1));
+        r = resolveMaterial(sp, 400); // no regular caps, constant blur
+        CHECK(near(r.refractionHeight, 160, 1e-3) && near(r.refractionAmount, -288, 1e-3) && near(r.blurRadius, resolveMaterial(sp, 30).blurRadius));
+        for (const auto* f : {&sp.light, &sp.dark})
+            CHECK(near(f->ycc.black, 0.1, 1e-6) && near(f->ycc.white, 1) && near(f->ycc.saturation, 1.25, 1e-6) && near(f->fill.a, 0) &&
+                  near(f->blurFill.darken, 0.75, 1e-6) && near(f->blurFill.normal, 0.5, 1e-6));
     }
     CHECK(near(clampedLinear(48, 48, 160, 0.25, 0.75), 0.25) && near(clampedLinear(104, 48, 160, 0.25, 0.75), 0.5) && near(clampedLinear(500, 48, 160, 0.25, 0.75), 0.75));
 
