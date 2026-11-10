@@ -1,0 +1,15 @@
+Hyprland 0.57.2 (11cbc6c): show the arrow, not the closed hand, during Wayland drag and drop (macOS look).
+Not applied or built. Apply in /mnt/code/hypr-dev/src/Hyprland with: patch -p1 < this file
+
+--- a/src/protocols/core/DataDevice.cpp
++++ b/src/protocols/core/DataDevice.cpp
+@@ -561,7 +561,8 @@
+         abortDrag();
+     }
+ 
+-    Pointer::Cursor::overrideController->setOverride("grabbing", Pointer::Cursor::CURSOR_OVERRIDE_DND);
++    // macOS keeps the arrow while dragging (the drag image shows what moves); "grabbing" is the closed hand
++    Pointer::Cursor::overrideController->setOverride("default", Pointer::Cursor::CURSOR_OVERRIDE_DND);
+     m_dnd.overriddenCursor = true;
+ 
+     // For touch-initiated drags, anchor the drag icon to the touch point

@@ -1,76 +1,67 @@
-# hyprk-cursors mapping
+# hyprk-cursors
 
-Source: `themes/cursors/` (macOS HIServices + AccessibilityFoundation resources). Build: `python3 build.py`
-(needs pdftocairo, xcursorgen, hyprcursor-util, Pillow). Output `hyprk-cursors/` holds both formats:
-`cursors/` (Xcursor), `hyprcursors/` + `manifest.hl` (hyprcursor), `index.theme`.
+macOS 27.2 cursor theme for hyprk, as hyprcursor (SVG where the source is vector) and Xcursor in one directory.
+Evidence for every number below: /mnt/code/liquid-glass-re/SPEC.md, section "Cursors".
 
-## How it is built
+## Build
 
-- Sizes 24, 32, 48, 64, 96. Scale is 1 macOS point = 1 px at size 24 (arrow 17x23 px at 24, 4x that at 96).
-- PDFs are rendered at 10 px/pt with transparency, then a drop shadow is added (info.plist: blur 2, offset 1 down, alpha 0.45),
-  then downscaled with Lanczos. All images are square (hyprcursor requires 1:1); the hyprcursor `nominal_size` keeps the same scale.
-- Hotspots come from `info.plist` (`hotx/hoty`, in points). Arrow hotspot = tip of the black fill. I-beam hotspot = centre.
-- Animations: `progress` (15 frames, 33 ms) and `wait` (same frames, spinner only).
-- Hyprcursor load was checked with libhyprcursor (shape lookup by alias, sizes, hotspots, frames). Not run inside Hyprland itself.
+```
+python3 extract_cursorasset.py <macOS root>/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/CursorAsset
+python3 build.py            # hyprk-cursors/ (Apple sources where present, free lookalikes otherwise)
+python3 build.py --free     # free lookalikes only, no Apple artwork
+./install.sh                # optional copy to ~/.local/share/icons
+```
 
-## Mapping (primary name -> macOS cursor)
+Needs rsvg-convert, pdftocairo, xcursorgen, hyprcursor-util, Pillow. The session finds the theme through
+`config/icons/hyprk-cursors` (symlink) and `XCURSOR_PATH`; apply live with `hyprctl setcursor hyprk-cursors 24`.
 
-| Primary | macOS source | Notes |
+Apple files stay local (`.gitignore`): `cursorasset/` (extracted rasters), `hiservices/`, `accessibility/`, `png/`
+and the built `hyprk-cursors/`. Without them every shape comes from `free_cursors.py` (own SVG drawings).
+
+## Size and scale
+
+- 1 macOS point = 1 px at cursor size 24. Keep `HYPRCURSOR_SIZE`/`XCURSOR_SIZE` at 24: Hyprland multiplies it by the
+  monitor scale (`CCursorManager::prepareHyprcursor`, size * scale), so the cursor keeps its point size like macOS.
+- Xcursor sizes 24, 30, 36, 48, 60, 72, 96 (scale 1 to 4). CursorAsset rasters use Apple's 1x/2x pixels unchanged
+  at 24/48 and are downscaled from the next larger Apple rep otherwise (5x, 10x).
+- Every image is square (hyprcursor rule) and trimmed to the drawn pixels plus shadow, so most shapes fit a 64 px
+  hardware cursor at 2x. Exceptions at 2x: copy, not-allowed, poof, progress (70 px), context-menu (64 px).
+- HIServices vector cursors get WindowServer's shadow (info.plist: blur 2, 1 pt down, black 45 %) as an SVG filter.
+
+## Mapping (primary name -> source)
+
+| Primary | Apple source | Also answers to |
 |---|---|---|
-| default | `accessibility/default-pointer-3.png` (10x arrow, shadow baked in) | arrow at normal size is not in HIServices |
-| pointer | `hiservices/macos27/pointinghand` | |
-| text | `accessibility/default-iBeam-3.png` (10x I-beam) | HIServices `ibeamvertical` is a stretched variant, not used |
-| vertical-text | `hiservices/ibeamhorizontal` | macOS names are swapped: this is the beam for vertical text |
-| wait | spinner cut out of `hiservices/busybutclickable` | closest: macOS has no beach ball in these assets; hotspot = spinner centre |
-| progress | `hiservices/busybutclickable` | arrow + spinner |
-| crosshair | `hiservices/cross` | |
-| cell | `hiservices/cell` | |
-| move | `hiservices/move` | also all-scroll (closest) |
-| grab | `hiservices/macos27/openhand` | |
-| grabbing | `hiservices/macos27/closedhand` | |
-| not-allowed | `hiservices/notallowed` | also no-drop |
-| help | `hiservices/help` | |
-| context-menu | `hiservices/contextualmenu` | |
-| copy | `hiservices/copy` | |
-| alias | `hiservices/makealias` | |
-| zoom-in / zoom-out | `hiservices/zoomin` / `zoomout` | |
-| col-resize | `hiservices/resizeleftright` | arrows with centre bar |
-| row-resize | `hiservices/resizeupdown` | arrows with centre bar |
-| ew-resize | `hiservices/resizeeastwest` | |
-| ns-resize | `hiservices/resizenorthsouth` | |
-| nesw-resize | `hiservices/resizenortheastsouthwest` | |
-| nwse-resize | `hiservices/resizenorthwestsoutheast` | |
-| n/s/e/w-resize | `hiservices/resizenorth` / `south` / `east` / `west` | one active arrow, other greyed |
-| ne/nw/se/sw-resize | `hiservices/resizenortheast` / `northwest` / `southeast` / `southwest` | |
+| default | CursorAsset id 100 (macOS 27 arrow, 28x40 pt canvas, hot 5,5) | left_ptr, arrow, top_left_arrow, dnd-move, dnd-none, right_ptr, draft, pencil |
+| text | CursorAsset id 101 (macOS 27 I-beam, hot 12,11) | xterm, ibeam |
+| wait | CursorAsset id 7: beach ball, 30 frames, 1/60 s each | watch |
+| progress | HIServices busybutclickable: arrow + blue spinner, 15 frames, 33 ms | left_ptr_watch, half-busy, hashes |
+| pointer | HIServices macos27/pointinghand | hand2, hand, pointing_hand, hashes |
+| grab / grabbing | HIServices macos27/openhand / closedhand | hand1, openhand / closedhand |
+| copy | HIServices copy (`+[NSCursor dragCopyCursor]`) | dnd-copy, hashes |
+| alias | HIServices makealias (`dragLinkCursor`) | link, dnd-link, hashes |
+| not-allowed | HIServices notallowed (`operationNotAllowedCursor`) | no-drop, dnd-no-drop, forbidden, crossed_circle, circle, pirate |
+| context-menu | HIServices contextualmenu | dnd-ask, context_menu |
+| poof | HIServices poof (`disappearingItemCursor`) | disappearing-item |
+| help, cell, crosshair, move | help, cell, cross, move | question_arrow ..., plus, cross ..., all-scroll, all-resize, fleur |
+| vertical-text | HIServices ibeamhorizontal (Apple's names are swapped) | |
+| zoom-in / zoom-out | zoomin / zoomout | zoom_in / zoom_out |
+| col-resize / row-resize | resizeleftright / resizeupdown | split_h / split_v |
+| ew-resize | resizeeastwest | e-resize, w-resize, left_side, right_side, sb_h_double_arrow, ... |
+| ns-resize | resizenorthsouth | n-resize, s-resize, top_side, bottom_side, sb_v_double_arrow, ... |
+| nesw-resize | resizenortheastsouthwest | ne-resize, sw-resize, corners, fd_double_arrow, ... |
+| nwse-resize | resizenorthwestsoutheast | nw-resize, se-resize, corners, bd_double_arrow, ... |
 
-## Legacy aliases (symlinks in `cursors/`, `define_override` in hyprcursor)
+Window edges: macOS shows the two-headed frame cursors (`+[NSCursor frameResizeCursorFromPosition:inDirections:]`);
+the one-headed HIServices variants only appear when a window is at its size limit, which Wayland cannot express.
+So the one-sided wayland names (Hyprland's border drag asks for n-resize, se-resize, ...) map to two heads.
 
-- default: left_ptr, arrow, top_left_arrow, dnd-move
-- pointer: hand2, hand, pointing_hand, 9d800788..., e29285e6...
-- text: xterm, ibeam
-- wait: watch
-- progress: left_ptr_watch, half-busy, 08e8e1c9..., 3ecb610c..., 00000000000000020006000e7e9ffc3f
-- crosshair: cross, tcross, cross_reverse, diamond_cross, color-picker, X_cursor (closest)
-- cell: plus, dotbox
-- move: all-scroll, fleur, size_all, 4498f0e0..., 9081237..., fcf21c00...
-- grab: hand1, openhand. grabbing: closedhand, dnd-none
-- not-allowed: no-drop, dnd-no-drop, forbidden, crossed_circle, circle, 03b6e0fc...
-- help: question_arrow, whats_this, left_ptr_help, 5c6cd98b..., d9ce0ab6...
-- context-menu: dnd-ask, context_menu
-- copy: dnd-copy, 1081e372..., 6407b0e9...
-- alias: link, dnd-link, 3085a0e2..., 640fb0e7..., a2a266d0...
-- zoom-in: zoom_in. zoom-out: zoom_out
-- col-resize: split_h. row-resize: split_v
-- ew-resize: sb_h_double_arrow, h_double_arrow, size_hor, size-hor, 14fef782..., 028006030...
-- ns-resize: sb_v_double_arrow, v_double_arrow, double_arrow, size_ver, size-ver, 2870a090..., 00008160...
-- nesw-resize: fd_double_arrow, size_bdiag, size-bdiag, fcf1c3c7... ; nwse-resize: bd_double_arrow, size_fdiag, size-fdiag, c7088f0f...
-- n: top_side. s: bottom_side. e: right_side. w: left_side
-- ne: top_right_corner, ur_angle. nw: top_left_corner, ul_angle. se: bottom_right_corner, lr_angle. sw: bottom_left_corner, ll_angle
+Hash names are the GTK/Qt/Chromium legacy ids. `index.theme` inherits Adwaita for rare X11 names not listed here.
 
-Hash names are the GTK/Qt/Chromium legacy ids, copied from the Yaru and DMZ themes installed on this machine.
+Not used: CursorAsset ids 0/1 (pre-27 arrow and I-beam), 2-6/8 (8x8 and 4x4 stubs); HIServices counting*hand,
+screenshot*, the one-headed resize cursors, accessibility/ (large-size layers).
 
-## Not mapped
+## Free fallback
 
-- Unused macOS cursors: poof, screenshotselection, screenshotwindow, counting*hand, resizeleft/right/up/down (limit variants), all `rotate*` and `objectResize*` accessibility layers.
-- Not provided (fall back to the default theme): pencil/draft, right_ptr, sb_*_arrow, *_tee, pirate, target, and similar rare X11 names.
-- No beach ball: it is not in the extracted assets, `wait` uses the blue busy spinner instead.
+`free_cursors.py` draws every primary shape as SVG (arrow, I-beam, hands, pinwheel beach ball with 30 frames at
+17 ms, arrow + spinner, badges, resize arrows, magnifiers). Same names, sizes, hotspots and frame rates.
