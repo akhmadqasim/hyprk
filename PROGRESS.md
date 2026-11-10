@@ -142,3 +142,16 @@ glass material 65 (03:35, orchestrator; too cyan)
 - [Mac] Field-offset maps for Spec and Parameters rebuilt from Swift field metadata (reference/re/tools/layout.py), so SPEC.md is no longer needed for that. SiriRecipe.SiriModifier (Spotlight family) decoded: values in reference/re/NOTES.md. plugin/src/Material.cpp NOT changed yet (which branch is spotlightField is open; needs a nested-Hyprland test on the PC).
 - [Mac, live] Ground truth measured on macOS 27.2.1 with a probe app: reference/re/LIVE-27.2.1.md (read this first) and reference/re/27.2.1/live/. Resolved glassBackground filter inputs for every variant at 9 sizes, light/dark, active/inactive; menu, alert, popover metrics; transition timings from a 60 fps recording.
 - [NEXT, on the PC] Apply LIVE-27.2.1.md to plugin/src/Material.cpp and the shell (not done, untested on Mac): Regular drop shadow 0.04..0.4 (dark 0.6) r 4..24 y 8; blur radius 5 with opacity ramp; inactive-window variant; menu shadow 0.7/0.8 (plugin has 0.6); menu close fade 0.2 s and no open animation; popover/alert pop with overshoot; plain windows open instantly (config uses 0.5 s scale). Spotlight values: reference/re/NOTES.md (SiriRecipe), branch still open.
+- [Mac, 2026-11-10, branch `mac-live-values`, NOT yet run in Hyprland] Applied the measured values:
+  plugin: Regular drop shadow 0.04..0.4 (dark 0.6), radius 4..24 over D 64..160, y 8, saturation 1 (was 0.25..0.75, r 24);
+  menu shadow 0.7 light / 0.8 dark at every size, r 24, y 10; Clear, Dock and Control Center have no drop shadow
+  (measured 0); Spotlight keeps its by-eye shadow. New SResolved.shadowOpacityDark / shadowRadius, hasShadow().
+  shell: menus open at once and fade out in 0.2 s OutQuad (no materialize scale); alert pops 0.04 -> 1.15 -> 1
+  (0.2 s + 0.17 s) and fades out in 0.1 s; alert message font 13 (was 11).
+  Checked on the Mac: Material.cpp + the new test cases compile and pass with clang; the QML parses (qmllint).
+  NOT checked: GlassElement.cpp (needs Hyprland headers), lgtests as a whole, and the look.
+- [NEXT, on the PC] `git checkout mac-live-values`, build the plugin, run lgtests, then `dist/try-nested.sh`:
+  look at the dock and CC without shadow, a menu (shadow, close fade), an alert (pop), small glass (faint shadow).
+  Merge into master if it looks right. Left out on purpose: blur radius 5 with the opacity ramp and the
+  inactive-window variant (the plugin's blur is tuned by eye on top of Hyprland's blur), popover pop
+  (spring 0.25 / 0.9 from 12.5 %, see LIVE-27.2.1.md), Spotlight recipe (branch still open).

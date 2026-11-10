@@ -21,7 +21,8 @@ namespace lg {
         // Regular over a white window read as opaque white (JUDGE-r2): white point 1.03 -> 0.92, fill
         // 0.2 -> 0.12, blur-fill lighten 0.9 -> 0.4, at least 2 extra blur, and the variable blur keeps
         // full strength until 1 pt from the edge (alpha 0.15 / 0.85 instead of 0.5 / 0.5).
-        // Shadow for Regular was not traced (SPEC: "assume Clear's"), ring shadow V2 (8, 4, 5, 0.06).
+        // Drop shadow = the SRecipe defaults, measured on macOS 27.2.1 (LIVE-27.2.1.md): opacity 0.04 -> 0.4
+        // (dark 0.6) and radius 4 -> 24 over D 64 -> 160, y 8. Ring shadow V2 (8, 4, 5, 0.06).
         constexpr SRecipe REGULAR = {
             .name         = "regular",
             .light        = {.ycc = {0.4f, 0.92f, 1.0f}, .fill = WHITE12, .highlightBias = 0.5f, .bleed = {0.9f, 1.f, 1.2f}, .blurFill = {0.4f, 0, 0.5f}},
@@ -34,14 +35,18 @@ namespace lg {
             .ringOffsetY = 8, .ringStroke = 4, .ringRadius = 5, .ringOpacity = 0.06f,
         };
 
+        // no drop shadow: measured 0 for Clear, Dock and Control Center on macOS 27.2.1 (LIVE-27.2.1.md)
+#define LG_NO_SHADOW .shadowOpacityLo = 0, .shadowOpacityHi = 0, .shadowOpacityHiDark = 0
+
         // SPEC 9.3 Clear (base + ClearSpec.Modifier, V2): no fill, refraction -0.8 D, no outer layer,
-        // blur D 48->120 : 3->8, Clear shadow.
+        // blur D 48->120 : 3->8.
         constexpr SRecipe CLEAR = {
             .name              = "clear",
             .light             = {.ycc = {0.125f, 1.08f, 1.06f}, .fill = {}, .highlightBias = 0.5f, .bleed = CLEAR_BLEED},
             .dark              = {.ycc = {0.125f, 1.08f, 1.06f}, .fill = {}, .highlightBias = 0.3f, .bleed = CLEAR_BLEED},
             .refractionAmountN = -0.8f,
             .blurD0 = 48, .blurD1 = 120, .blurLo = 3, .blurHi = 8,
+            LG_NO_SHADOW,
         };
 
         // SPEC 9.5 DockRecipe.Other V2 on top of Clear: blur 1.5, inner 0.08 D / -0.18 D,
@@ -59,6 +64,7 @@ namespace lg {
             .outerAmountN      = 0.42f,
             .outerOpacity      = 0.2f,
             .blurLo = 1.5f, .blurHi = 1.5f, // constant
+            LG_NO_SHADOW,
         };
 
         // Face: SPEC 9.5 gives (0.125, 0.8, 1.2), but in our gamma-space shader that measured ~1.4:1
@@ -83,7 +89,9 @@ namespace lg {
             // blur (from 100 pt inside the edge) still softens the middle
             .blurLo = 0, .blurHi = 0,
             .blurDist0N = 0, .blurDist0Fixed = -100,
+            LG_NO_SHADOW,
         };
+#undef LG_NO_SHADOW
 
         // Spotlight's field: light translucent glass, not a grey capsule (JUDGE-r3). Regular's refraction
         // and blur, a brighter face and fill; by eye vs reference/screens/macos27-spotlight.png.
@@ -93,15 +101,25 @@ namespace lg {
             r.light.ycc  = {0.45f, 1.0f, 1.05f};
             r.light.fill = {1, 1, 1, 0.22f};
             r.light.lift = 0.04f;
+            // Spotlight is a SiriRecipe variant that AppKit does not expose, so its shadow could not be
+            // measured (reference/re/NOTES.md): keeps the earlier by-eye one
+            r.shadowOpacityLo = 0.25f;
+            r.shadowOpacityHi = r.shadowOpacityHiDark = 0.75f;
+            r.shadowRadiusLo   = 24;
+            r.shadowSaturation = 1.2f;
             return r;
         }();
 
-        // Regular + the Mac glass window/menu active shadow (SPEC 9.5: 0.6 light, radius 24, y 10)
+        // Regular + the Mac glass menu shadow, the same at every size. Measured on macOS 27.2.1
+        // (LIVE-27.2.1.md): 0.7 light, 0.8 dark, radius 24, y 10 (SPEC 9.5 had 0.6 / 0.7: alerts use that)
         constexpr SRecipe MENU = [] {
-            SRecipe r         = REGULAR;
-            r.name            = "menu";
-            r.shadowOpacityLo = r.shadowOpacityHi = 0.6f;
-            r.shadowOffsetY   = 10;
+            SRecipe r   = REGULAR;
+            r.name      = "menu";
+            r.shadowD0  = r.shadowD1 = 0;
+            r.shadowOpacityLo = r.shadowOpacityHi = 0.7f;
+            r.shadowOpacityHiDark                 = 0.8f;
+            r.shadowRadiusLo                      = r.shadowRadius;
+            r.shadowOffsetY                       = 10;
             return r;
         }();
 
@@ -135,8 +153,14 @@ namespace lg {
             .bleedHeight   = float(r.bleedHeightN * D),
             .bleedAmount   = float(r.bleedAmountN * D),
             .bleedBlur     = float(std::min(r.bleedBlurN * D, 160.0)),
-            .shadowOpacity = float(clampedLinear(D, r.shadowD0, r.shadowD1, r.shadowOpacityLo, r.shadowOpacityHi)),
+            .shadowOpacity     = float(clampedLinear(D, r.shadowD0, r.shadowD1, r.shadowOpacityLo, r.shadowOpacityHi)),
+            .shadowOpacityDark = float(clampedLinear(D, r.shadowD0, r.shadowD1, r.shadowOpacityLo, r.shadowOpacityHiDark)),
+            .shadowRadius      = float(clampedLinear(D, r.shadowD0, r.shadowD1, r.shadowRadiusLo, r.shadowRadius)),
         };
+    }
+
+    bool hasShadow(const SRecipe& r) {
+        return r.shadowOpacityLo > 0 || r.shadowOpacityHi > 0 || r.shadowOpacityHiDark > 0;
     }
 
     bool hysteresisDark(bool wasDark, double luminance, double low, double high) {

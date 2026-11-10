@@ -7,20 +7,32 @@ import qs.HyprK
 // macOS-style alert: glass card (Theme.alert.radius), app icon, bold title, message,
 // capsule buttons. Model: { icon, title, message, buttons: [{ label, action, isDefault, isCancel }] }.
 // Enter runs the default button, Escape the cancel button.
-// Liquid Glass: materializes in around its centre while `shown`, out after (Reduce motion: dissolve).
+// Motion as measured on macOS 27.2.1 (reference/re/LIVE-27.2.1.md, live/video-motion-2.json): the alert
+// grows from its centre from about 4 %, easing in to an overshoot at 0.2 s, and settles by 0.37 s;
+// dismissing is a 0.1 s fade without scale. Reduce motion: dissolve in and out, no scale.
 Item {
     id: root
 
     property bool shown: false
-    visible: mat.active
-    Materializer { id: mat; shown: root.shown }
-    transform: MaterializeScale {
-        mat: mat
+    property real fade: 0   // glass materialize and content opacity
+    property real pop: 1    // scale around the centre
+    visible: shown || fade > 0
+    transform: Scale {
         origin.x: root.width / 2
         origin.y: root.height / 2
-        w: root.width
-        h: root.height
+        xScale: root.pop
+        yScale: root.pop
     }
+    // the glass region does not follow transforms: re-measure it while the alert scales
+    onPopChanged: Tokens.glassStepped(root)
+    SequentialAnimation {
+        id: popIn
+        NumberAnimation { target: root; property: "pop"; from: Theme.alert.popFrom; to: Theme.alert.popPeak; duration: Theme.alert.popRise; easing.type: Easing.InQuad }
+        NumberAnimation { target: root; property: "pop"; to: 1; duration: Theme.alert.popSettle; easing.type: Easing.OutQuad }
+    }
+    NumberAnimation { id: fadeIn; target: root; property: "fade"; to: 1; duration: 150 }   // Reduce motion dissolve
+    NumberAnimation { id: fadeOut; target: root; property: "fade"; to: 0; duration: Theme.alert.fadeOut; easing.type: Easing.OutQuad }
+    Component.onCompleted: if (shown) fade = 1
 
     property var model: null
     property real originX: 0
@@ -39,7 +51,24 @@ Item {
 
     // keyboard: Return/Enter = default button, Escape = cancel
     focus: shown
-    onShownChanged: if (shown) Qt.callLater(forceActiveFocus)   // after `visible` follows
+    onShownChanged: {
+        if (shown) {
+            fadeOut.stop();
+            if (A11y.reduceMotion) {
+                pop = 1;
+                fadeIn.restart();
+            } else {
+                fade = 1;
+                popIn.restart();
+            }
+            Qt.callLater(forceActiveFocus);   // after `visible` follows
+        } else {
+            fadeIn.stop();
+            popIn.stop();
+            pop = 1;
+            fadeOut.start();
+        }
+    }
     Keys.onEscapePressed: pressCancel()
     Keys.onReturnPressed: pressDefault()
     Keys.onEnterPressed: pressDefault()
@@ -50,13 +79,13 @@ Item {
         sx: root.originX
         sy: root.originY
         tint: Theme.glass.tintStrong
-        materialize: mat.progress
+        materialize: root.fade
     }
     MouseArea { anchors.fill: parent }
 
     Column {
         id: col
-        opacity: mat.progress
+        opacity: root.fade
         enabled: root.shown
         x: Theme.alert.padding
         y: Theme.alert.padding

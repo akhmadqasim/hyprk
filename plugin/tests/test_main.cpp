@@ -101,7 +101,19 @@ int main() {
         CHECK(near(recipeByName("dock").light.ycc.white, 0.9, 1e-6));
         CHECK(near(resolveMaterial(recipeByName("controlcenter"), 60).refractionAmount, -80, 1e-4));
         CHECK(std::string{recipeByName("nope").name} == "regular");
-        CHECK(near(recipeByName("menu").shadowOpacityHi, 0.6, 1e-6));
+        // drop shadows as measured on macOS 27.2.1 (reference/re/LIVE-27.2.1.md)
+        r = resolveMaterial(reg, 24);
+        CHECK(near(r.shadowOpacity, 0.04, 1e-6) && near(r.shadowOpacityDark, 0.04, 1e-6) && near(r.shadowRadius, 4, 1e-5));
+        r = resolveMaterial(reg, 96);
+        CHECK(near(r.shadowOpacity, 0.16, 1e-5) && near(r.shadowOpacityDark, 0.22667, 1e-5) && near(r.shadowRadius, 10.66667, 1e-4));
+        r = resolveMaterial(reg, 400);
+        CHECK(near(r.shadowOpacity, 0.4, 1e-6) && near(r.shadowOpacityDark, 0.6, 1e-6) && near(r.shadowRadius, 24, 1e-5));
+        r = resolveMaterial(recipeByName("menu"), 24);
+        CHECK(near(r.shadowOpacity, 0.7, 1e-6) && near(r.shadowOpacityDark, 0.8, 1e-6) && near(r.shadowRadius, 24, 1e-5));
+        CHECK(near(recipeByName("menu").shadowOffsetY, 10, 1e-6));
+        for (const char* n : {"clear", "dock", "controlcenter"})
+            CHECK(!hasShadow(recipeByName(n)) && near(resolveMaterial(recipeByName(n), 200).shadowOpacityDark, 0, 1e-6));
+        CHECK(hasShadow(reg) && hasShadow(recipeByName("spotlight")));
     }
     CHECK(near(clampedLinear(48, 48, 160, 0.25, 0.75), 0.25) && near(clampedLinear(104, 48, 160, 0.25, 0.75), 0.5) && near(clampedLinear(500, 48, 160, 0.25, 0.75), 0.75));
 

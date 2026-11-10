@@ -384,15 +384,22 @@ Singleton {
 
     // ---------- alert dialog ----------
     readonly property QtObject alert: QtObject {
-        readonly property int width: 260                 // TODO verify
+        readonly property int width: 260                 // measured on macOS 27.2.1 (reference/re/LIVE-27.2.1.md)
         readonly property int radius: 26                 // SPEC.md 7: alert window corner radius 26
-        readonly property int padding: 20                // TODO verify
+        readonly property int padding: 20                // measured
         readonly property int iconSize: 64               // TODO verify
-        readonly property int spacing: 10                // TODO verify
-        readonly property int buttonHeight: 28           // capsule buttons, TODO verify
-        readonly property int buttonGap: 8               // TODO verify
-        readonly property real titleSize: 13
-        readonly property real messageSize: 11
+        readonly property int spacing: 10                // measured (title to message)
+        readonly property int buttonHeight: 28           // capsule buttons, measured
+        readonly property int buttonGap: 8               // measured
+        readonly property real titleSize: 13             // measured: SF bold 13
+        readonly property real messageSize: 13           // measured: SF regular 13 (was 11)
+        // pop on show (measured from a 60 fps recording): scale popFrom -> popPeak in popRise ms
+        // (ease-in), back to 1 in popSettle ms; the peak is read from the moving outline, so about
+        readonly property real popFrom: 0.04
+        readonly property real popPeak: 1.15
+        readonly property int popRise: 200
+        readonly property int popSettle: 170
+        readonly property int fadeOut: theme.ms(100)     // dismiss: fade only
         readonly property color buttonBg: theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0, 0, 0, 0.06)
         readonly property real pressedOpacity: 0.75
         readonly property real verticalBias: 1 / 3       // centre of the alert sits at 1/3 of the height
@@ -442,6 +449,8 @@ Singleton {
         // 0.5 belongs to its scale, and a bouncing highlight read as wobbly: by eye). The menu preset
         // has no lift.
         readonly property real menuTrackResponse: 0.15
+        // a menu opens at once and fades out in about 0.2 s, ease-out (measured on macOS 27.2.1)
+        readonly property int menuFadeOut: theme.ms(200)
         readonly property real menuTrackDamping: 1.0
         // Mission Control (WindowManager ExposeSpringResponse / DampingRatio, SPEC 11.4)
         readonly property real exposeResponse: 0.25

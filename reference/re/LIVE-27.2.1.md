@@ -82,5 +82,14 @@ default look through this route, so Spotlight's real values are still only known
 | alertPanel-behaviour window open | about 0.42 s pop |
 | Minimise | window part about 0.27 s, whole effect about 0.65 s; restore about 0.58 s |
 
+Curve fits (scale = outline width / final width, from `video-motion-*.json`):
+- Popover show: a spring from 12.5 % with response 0.25 s, damping 0.9 (max error 1.7 %).
+- Alert show is not a plain spring: ease-in (close to InQuad) from 4 % to a peak at 0.2 s, then ease-out back
+  to 1 by 0.37 s. The outline peaks at 1.17 x; it includes the shadow, so the real scale peak is a bit lower
+  (the shell uses 1.15).
+- Menu close alpha matches OutQuad over 0.2 s within 0.03.
+- A 0.98 -> 1 window open (config/hypr/hyprland.lua, from the binaries) is consistent with "95 % in the first
+  frame"; the recording cannot tell them apart.
+
 Not measured: Mission Control, Cmd-Tab, Spaces, Dock magnification, Control Center and Spotlight open/close (other
 processes; would need synthetic key events and Accessibility permission), menu selection highlight, tooltips.

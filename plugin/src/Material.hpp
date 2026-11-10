@@ -1,6 +1,7 @@
 #pragma once
 // macOS 27.2 glass material recipes (DesignLibrary GlassRecipes, glass version v2), recovered in
-// /mnt/code/liquid-glass-re/SPEC.md section 9 and glass-defaults.json. Pure code, unit tested.
+// /mnt/code/liquid-glass-re/SPEC.md section 9 and glass-defaults.json; drop shadows from the resolved
+// filter inputs measured on a real Mac (reference/re/LIVE-27.2.1.md). Pure code, unit tested.
 //
 // Apple's numbers are size-relative: most lengths are "normalized x D" where D is the smallest
 // extent of the glass shape in points. resolveMaterial() turns a recipe + D into concrete values.
@@ -61,9 +62,11 @@ namespace lg {
         float bleedD0 = 64, bleedD1 = 160, bleedOpacityLo = 0, bleedOpacityHi = 0.5f;
         float bleedHeightN = 0.35f, bleedAmountN = 0.35f, bleedBlurN = 0.35f;
 
-        // drop shadow: opacity lerp over D, Gaussian radius, offset, backdrop saturation (tint)
-        float shadowD0 = 64, shadowD1 = 160, shadowOpacityLo = 0.25f, shadowOpacityHi = 0.75f;
-        float shadowRadius = 24, shadowOffsetY = 8, shadowSaturation = 1.2f;
+        // drop shadow: opacity and Gaussian radius lerp over D (shadowD0 == shadowD1: always the high
+        // end), the dark side has its own top opacity, offset, backdrop saturation (tint).
+        // Defaults = Regular measured on macOS 27.2.1 (reference/re/LIVE-27.2.1.md).
+        float shadowD0 = 64, shadowD1 = 160, shadowOpacityLo = 0.04f, shadowOpacityHi = 0.4f, shadowOpacityHiDark = 0.6f;
+        float shadowRadiusLo = 4, shadowRadius = 24, shadowOffsetY = 8, shadowSaturation = 1.f;
 
         // ring shadow: offset y, stroke, blur radius, opacity (0 = off)
         float ringOffsetY = 0, ringStroke = 0, ringRadius = 0, ringOpacity = 0;
@@ -78,8 +81,12 @@ namespace lg {
         float blurRadius   = 0; // Apple units (backdrop texels at 1/4 scale)
         float blurDist0    = 0;
         float bleedOpacity = 0, bleedHeight = 0, bleedAmount = 0, bleedBlur = 0;
-        float shadowOpacity = 0;
+        float shadowOpacity = 0, shadowOpacityDark = 0; // light side, dark side
+        float shadowRadius  = 0;
     };
+
+    // false when the recipe never draws a drop shadow (Clear, Dock, Control Center)
+    bool hasShadow(const SRecipe& r);
 
     SResolved resolveMaterial(const SRecipe& r, double D);
 

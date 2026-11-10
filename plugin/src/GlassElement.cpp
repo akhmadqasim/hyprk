@@ -375,7 +375,7 @@ namespace lg {
 
     double CGlassElement::margin(const SData& data) {
         const auto& r = *data.recipe;
-        return (data.shadow ? 2.0 * r.shadowRadius + std::abs(r.shadowOffsetY) : 0.0) + 2.0;
+        return (data.shadow && hasShadow(r) ? 2.0 * r.shadowRadius + std::abs(r.shadowOffsetY) : 0.0) + 2.0;
     }
 
     // physical-px box the glass draws into plus what its shader reads
@@ -590,7 +590,6 @@ namespace lg {
         glUniform1f(u.rim, p.rim);
         glUniform1f(u.innerShadow, p.innerShadow);
         glUniform1f(u.innerShadowSize, p.innerShadowSize * scale);
-        glUniform1f(u.shadowRadius, r.shadowRadius * scale);
         glUniform2f(u.shadowOffset, 0.f, r.shadowOffsetY * scale);
         glUniform1f(u.shadowTint, p.shadowTint);
         glUniform1f(u.shadowSaturation, r.shadowSaturation);
@@ -655,7 +654,8 @@ namespace lg {
             glUniform4f(u.faceFill, fill.r, fill.g, fill.b, fill.a);
             glUniform2f(u.faceLuma, face.lumaMin, face.lumaMax);
             glUniform1f(u.highlightBias, face.highlightBias * p.highlight);
-            glUniform1f(u.shadowOpacity, m_data.shadow ? res.shadowOpacity * p.shadowScale : 0.f);
+            glUniform1f(u.shadowOpacity, m_data.shadow ? (dark[q] ? res.shadowOpacityDark : res.shadowOpacity) * p.shadowScale : 0.f);
+            glUniform1f(u.shadowRadius, res.shadowRadius * scale);
 
             damage.forEachRect([&ctx](const auto& rect) {
                 g_pHyprOpenGL->scissor(ctx, &rect, ctx.m_data.transformDamage);

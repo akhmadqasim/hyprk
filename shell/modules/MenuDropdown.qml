@@ -8,9 +8,9 @@ import qs.HyprK
 
 // Pull-down menu of the menu bar, macOS 26 style: rounded glass, inset
 // rounded selection, shortcut column on the right.
-// Liquid Glass: the menu materializes in while `shown` (from its hidden scale toward the anchor:
-// the menu bar title, the click point) and dematerializes out with the last items it showed; the
-// selection glides from row to row instead of jumping. Reduce motion: dissolve, no glide.
+// Motion as measured on macOS 27.2.1 (reference/re/LIVE-27.2.1.md): an AppKit menu appears at once,
+// without scale or fade, and fades out in about 0.2 s (ease-out) with the last items it showed. The
+// selection glides from row to row instead of jumping (Reduce motion: no glide).
 Item {
     id: root
 
@@ -18,21 +18,17 @@ Item {
     property bool shown: false
     property real originX: 0       // screen position of this item, for the glass backdrop
     property real originY: 0
-    property real anchorX: 0       // materialize anchor, local
+    property real anchorX: 0       // the menu bar title or click point, local (menus do not scale: unused)
     property real anchorY: 0
 
-    // the items stay while the menu dematerializes (the caller may clear them on close)
+    // the items stay while the menu fades out (the caller may clear them on close)
     property var shownItems: []
     Binding on shownItems { value: root.items; when: root.shown; restoreMode: Binding.RestoreNone }
-    visible: mat.active
-    Materializer { id: mat; shown: root.shown }
-    transform: MaterializeScale {
-        mat: mat
-        origin.x: root.anchorX
-        origin.y: root.anchorY
-        w: root.width
-        h: root.height
-    }
+    // 1 while shown, then down to 0 on close: glass materialize and content opacity
+    property real fade: 0
+    visible: shown || fade > 0
+    NumberAnimation { id: fadeOut; target: root; property: "fade"; to: 0; duration: Theme.anim.menuFadeOut; easing.type: Easing.OutQuad }
+    Component.onCompleted: if (shown) fade = 1
 
     readonly property real contentWidth: Math.max(Theme.menu.minWidth, maxTextWidth + Theme.menu.itemHPadding * 2 + Theme.menu.itemInset * 2 + 40)
     width: contentWidth
@@ -88,7 +84,7 @@ Item {
         sx: root.originX
         sy: root.originY
         tint: Theme.glass.tintStrong
-        materialize: mat.progress
+        materialize: root.fade
     }
 
     // selection: one inset pill that glides to the hovered row; it appears in place when the
@@ -104,10 +100,18 @@ Item {
         if (fresh || A11y.reduceMotion) selY.snap();
     }
     // leaving a row and entering the next arrive in one pointer event: clear only if none took over
-    // (a closing menu keeps its selection while it dematerializes)
+    // (a closing menu keeps its selection while it fades out)
     function leaveRow(i) { Qt.callLater(() => { if (root.shown && root.hover === i) root.hover = -1; }); }
     onShownItemsChanged: hover = -1
-    onShownChanged: if (shown) hover = -1
+    onShownChanged: {
+        if (shown) {
+            hover = -1;
+            fadeOut.stop();
+            fade = 1;
+        } else {
+            fadeOut.start();
+        }
+    }
     Spring { id: selY; target: root.hoverY; response: Theme.anim.menuTrackResponse; damping: Theme.anim.menuTrackDamping; epsilon: 0.3 }
     Rectangle {
         visible: root.hover >= 0
@@ -117,14 +121,14 @@ Item {
         height: root.hoverH
         radius: Theme.menu.itemRadius
         color: Theme.color.menuSelection
-        opacity: mat.progress
+        opacity: root.fade
     }
 
     Column {
         id: list
         y: Theme.menu.padding
         width: parent.width
-        opacity: mat.progress
+        opacity: root.fade
 
         Repeater {
             model: root.shownItems
