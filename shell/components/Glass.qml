@@ -71,6 +71,10 @@ Item {
         if (registeredWith && registeredWith.unregisterGlass) registeredWith.unregisterGlass(shape);
         registeredWith = w && w.registerGlass ? w : null;
         if (registeredWith) registeredWith.registerGlass(shape);
+        // the shape's first commit must already carry its materialize hole: without one the plugin
+        // takes materialize = 1, so a surface created on open (Launchpad) showed one frame of
+        // full, empty glass before it started to materialize
+        placeHole();
     }
     onHostWindowChanged: register(hostWindow)
     Component.onCompleted: register(hostWindow)
