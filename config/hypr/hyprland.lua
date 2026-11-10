@@ -203,9 +203,10 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
             namespaces = "hyprk-" .. table.concat(glassLayers, ",hyprk-"),
             -- recipes per layer: the plugin's own `materials` default (plugin/src/Config.cpp) plus the
             -- volume/brightness HUD on the Control Center recipe (SystemBannerUI _Glass.controlCenter, no subvariant:
-            -- MAC-ANSWERS.md "REA 27.2.1" section 1); keep the rest in sync with Config.cpp
+            -- MAC-ANSWERS.md "REA 27.2.1" section 1) and Cmd-Tab on the Dock's (pixel-identical on 27.2.1,
+            -- MAC-ANSWERS.md Q-dock-19); keep the rest in sync with Config.cpp
             materials = "hyprk-dock:dock,hyprk-controlcenter:controlcenter,hyprk-overlay:menu,"
-                     .. "hyprk-spotlight:spotlight,hyprk-hud:controlcenter",
+                     .. "hyprk-spotlight:spotlight,hyprk-hud:controlcenter,hyprk-switcher:dock",
         } } })
     end)
     if ok then hl.env("HYPRK_GLASS", "plugin") else print("hyprk: liquidglass not loaded: " .. tostring(err)) end
