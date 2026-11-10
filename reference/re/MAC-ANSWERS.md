@@ -3227,3 +3227,102 @@ Done by a separate static agent: NotificationCenter arm64e plus the DesignLibrar
 ### Not resolved
 - The ×0.71 / ×0.78 darkening between cards is not in the backdrop layer. It is probably overlapping card and list
   shadows (radius 30, opacity 0.2 each).
+
+
+## NC panel spring: why code 1.25 runs as critically damped
+
+# NC panel spring: code says ratio 1.25, screen shows 1.0 (macOS 27.2.1, 26B131, arm64e)
+
+Tools: REA (Ghidra 12.1.4 provider) on the NotificationCenter arm64e slice and on raw dumps of SwiftUICore code from
+the dyld shared cache; `dyld_info -disassemble` for asm. SwiftUICore addresses are unslid cache addresses
+(0x190404000 + export offset). Excerpts: `~/hyprk/reference/re/27.2.1/decomp/NotificationCenter-spring.c`.
+
+**Answer: hypothesis 1 is right. The 1.25 is real in NotificationCenter, but SwiftUI's `interpolatingSpring` solver
+treats every damping ratio >= 1 as critically damped. Effective panel curve: ratio 1.0, response 0.30 s.**
+
+1. **Call site (unchanged from the earlier RE, now confirmed with REA).**
+   - `FUN_1001910a4` (swift_once init of `DAT_1003c1388`) calls `FUN_1001910d8(0.3 @0x1002dbd50, -0.2 @0x1002dbd58, 0)`.
+   - `FUN_1001910d8` is the inlined `Spring(duration:bounce:)` conversion and tail-calls
+     `SwiftUI.Animation.interpolatingSpring(mass:stiffness:damping:initialVelocity:)` (stub 0x1002be604):
+     - stiffness k = (2π/0.3)² = 438.649, ratio = 1/(1+bounce) = 1.25, damping c = 2·√k·1.25 = 52.360, mass 1, v0 0.
+   - Check: c / (2·√(m·k)) = 52.36 / 41.89 = 1.25. So the earlier decoding was correct, not a unit mix-up.
+   - Open and close both use it: `FUN_1001e19c4` = `withAnimation(DAT_1003c1388, completionCriteria: .logicallyComplete)`.
+
+2. **Where 1.25 becomes 1.0: SwiftUICore `SpringAnimation.animate(value:time:context:)` 0x190d236ec**
+   (Double path 0x190d234ac and AnimatablePair path 0x190d23240 build the same model).
+   ```
+   w0   = sqrt(stiffness/mass)                 // 20.944 rad/s
+   zeta = damping / (2*sqrt(mass*stiffness))   // 1.25
+   if (1.0 <= zeta) { B = w0 - v0; wd = 0 }    // critical form for ALL zeta >= 1
+   else             { wd = w0*sqrt(1-zeta^2); B = (w0*zeta - v0)/wd }
+   A = 1
+   ```
+   `SpringModel.sample(at:)` 0x190d23e28:
+   ```
+   zeta >= 1:  x(t) = 1 - (A + B*t) * exp(-w0*t)          // zeta is not used at all
+   zeta <  1:  x(t) = 1 - exp(-zeta*w0*t) * (A*cos(wd*t) + B*sin(wd*t))
+   ```
+   - There is no overdamped (two-exponential) branch. The damping value above critical is simply dropped.
+   - Panel: x(t) = 1 − (1 + 20.944·t)·e^(−20.944·t), i.e. **response 0.30 s, ratio 1.0**. Offset = W·(1 − x) on open,
+     W·x on close.
+   - End of animation: `SpringModel.duration(epsilon:)` 0x190d23bf0 scans t in 0.1 s steps for |1 − x| < 0.001
+     (epsilon 0.001 when no timing curve) -> **0.5 s**; after that the value snaps to the target (0.12 pt left).
+   - `.logicallyComplete` flag: set when `time >= 2π/sqrt(stiffness)` = **0.300 s** (context+0x19 = 1).
+
+3. **Why banners and list reflow do keep 1.25: a different SwiftUI API.**
+   - `DAT_1003c13b8` (init at 0x100190fe0): `Animation.spring(response: 0.3, dampingFraction: 1.25, blendDuration: 0)`
+     (stub 0x1002be624). Only this initialiser was re-checked; the other springs listed in the earlier notes
+     (0.35/1.25, 0.2/1) were not re-traced to their API.
+   - SwiftUICore 0x190edef7c boxes a `FluidSpringAnimation {response, dampingFraction, blendDuration}`.
+   - `FluidSpringAnimation.animate` (Double specialisation 0x190c23768) integrates numerically, no clamp:
+     ```
+     k = (2π/response)^2 (max 45000);  c = 2*sqrt(k)*dampingFraction
+     h = 1/300 s:  v += a*h/2;  x += v*h;  a = -c*v + k*(target - x);  v += a*h/2
+     ```
+     So ratio 1.25 stays overdamped there. This matches the live fits (banner dismiss, stack expand, clear group).
+   - Rule for the theme: `interpolatingSpring(mass:stiffness:damping:)` -> ratio = min(ratio, 1), response from
+     stiffness; `spring(response:dampingFraction:)` -> ratio as written.
+
+4. **Hypothesis 2 (another animation on the click path): not supported.** The only curve reaching the click open/close
+   closures is `DAT_1003c1388`. `FluidSpringAnimator` (60 Hz, own integrator) is only started from the gesture-release
+   paths `FUN_1001781b4` / `FUN_1001773d0(animated: true)`. A Reduce Motion branch inside `OpenSlideModifier` was not
+   traced (not determined), but it is not needed to explain the data.
+
+5. **Hypothesis 3 (cannot tell 1.25 from 1.0 at 60 fps): rejected.** Fit to `click-open-close-track.jsonl`
+   (testTitle x, rest 1352.5, duplicate frame i=81 dropped; t0 and W free unless noted):
+
+   | segment | model | response | W | RMS pt | max pt |
+   |---|---|---|---|---|---|
+   | open (41 fr) | ratio 1.0, response free | 0.296 | 374.7 | 0.68 | 4.0 |
+   | open | ratio 1.0, response 0.30 fixed (= SwiftUI curve) | 0.30 | 381.9 | 0.75 | 4.4 |
+   | open | ratio 1.25, response free | 0.211 | 340.0 | 1.89 | 7.2 |
+   | open | ratio 1.25, response 0.30 fixed | 0.30 | 520 (bound) | 11.9 | 26.2 |
+   | open | ratio free, response free | 0.298 | 376.0 | 0.68 | 3.9 (ratio 0.997) |
+   | close (16 fr) | ratio 1.0, response free | 0.299 | 375.9 | 0.51 | 1.2 |
+   | close | ratio 1.0, response 0.30 fixed | 0.30 | 376.2 | 0.52 | 1.2 |
+   | close | ratio 1.25, response free | 0.257 | 395.2 | 2.09 | 4.6 |
+   | close | ratio 1.25, response 0.30 fixed | 0.30 | 418.1 | 4.63 | 9.5 |
+   | close | ratio free, response free | 0.302 | 374.6 | 0.50 | 1.3 (ratio 0.987) |
+
+   - The two curves (response 0.3, W 386) differ by up to 37.7 pt (at t = 0.15 s) and by more than 5 pt from 0.033 s
+     to 0.43 s. At 60 fps with 0.5 pt resolution that is easy to tell apart.
+   - With the ratio left free the data gives 0.99–1.00. The best W is 375–382 pt, slightly under the 386 in motion.json.
+   - calLeft gives the same numbers (ratio 1.0: response 0.295, RMS 0.66; ratio 1.25 at 0.30: RMS 12.0).
+
+6. **0.24 s between click and window on screen: not determined.** What the code shows:
+   - `MainController` open `FUN_100176de0`: prepare model (`FUN_1001d3768`: isAnimating = 1, signpost begin) ->
+     `makeKeyAndOrderFront:` -> `DispatchQueue.main.async` (`FUN_1001d39d8` -> `FUN_1001fbb08` -> `FUN_1001e18b0`) ->
+     `withAnimation`. Only a plain `async` hop; no `asyncAfter`, no timer, no wait for widget snapshots in this path.
+   - NotificationCenter has three `asyncAfter` sites (0x1001926a0: 0.2 s in the widget-configuration function
+     0x1001911fc; 0x1001956a4; 0x10029fea0 in a generic helper 0x10029fbe4). None is called from the open path.
+   - So the delay comes from before "Center open requested" reaches NotificationCenter (the menu bar clock's click
+     handling and the request to NC) and/or from first-frame rendering. Neither was traced.
+
+7. **Close timing.**
+   - 0.08 s click -> motion: same situation as (6); the close path `FUN_100178444(0)` -> `FUN_1001d3ebc` has no delay.
+   - Window gone 0.375 s after motion start: the completion uses `.logicallyComplete`, which this spring raises at
+     t >= 0.300 s (item 2), not at the 0.5 s end. The remaining ~0.07 s (frame alignment, completion dispatch,
+     order-out, capture) was not traced: not determined.
+
+**For hyprk:** NC panel open/close = critically damped spring, ω0 = 2π/0.3 = 20.944 rad/s (mass 1, stiffness 438.65,
+damping 41.89), x(t) = 1 − (1 + ω0·t)·e^(−ω0·t), x only; close hides the window about 0.30–0.375 s after start.
