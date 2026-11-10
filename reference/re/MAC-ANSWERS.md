@@ -522,3 +522,61 @@ These colours are the same for every accent:
 - `reference/screens/27.2.1/multicolor-swatch.png` is AppKit's `NSMulticolorAccent` image, 32×32 px, an opaque square that the pane clips to a circle. It is identical in light and dark.
 - `multicolor-highlight-swatch.png` is `NSMulticolorHighlight`, 48×24 px.
 - Both come from AppKit's Assets.car. The Appearance.appex asset catalog has no Multicolor swatch.
+
+## Sounds (27.2.1)
+
+Host: macOS 27.2.1 (26B131). Repo index: 27.2 (26B123). Full list: `~/hyprk/reference/re/27.2.1/live/sounds-27.2.1.json` (path, size, sha256, duration/channels/rate/format, status, usage map).
+
+### Counts
+- Scanned: all of /System/Library, /System/Applications, /System/Cryptexes/App and /OS (superset of the requested roots). /Library/Sounds and /System/Library/Audio/UISounds do not exist.
+- 4850 unique sound files (Versions/Current aliases collapsed), 520,058,753 bytes. m4a 3325, caf 1147, aiff 150, m4r 128, wav 57, aif 41, mp3 2.
+- 3325 m4a are mostly MobileAsset (Music app 2475, TTS 501) and Siri/VoiceOver speech, not UI sounds.
+- afinfo failed only for MediaPlaybackCore `empty.m4a` (258 bytes, empty).
+
+### Comparison with ~/hyprk/sounds/originals (288 files)
+| result | count |
+|---|---|
+| same (name and sha256) | 288 (all repo files; 295 live files share these hashes because of duplicates) |
+| changed in 27.2.1 | 0 |
+| missing in 27.2.1 | 0 |
+| new in 27.2.1 inside the folders the repo imports (Sounds, SystemSounds, AlertTones, VoiceOverSounds, Telephony) | 0 |
+
+Hence nothing needs to be re-copied from 27.2.1. Note: the repo's misc/ files live under different live names (e.g. misc/Mail-New_Mail.aiff = Mail.app `New Mail.aiff`, misc/BezelServices-volume.aiff = `volume.aiff`); matched by sha256.
+
+Not in the repo (never imported, not "new in 27.2.1"; no 27.2 baseline to compare): 4555 files, 475,421,402 bytes. Bulk part: 4361 files, 385,083,322 bytes (Music MobileAssets, TTS models, SiriTTSService, SpeechObjects, VoiceOver training, Photos resources, ToneLibrary Ringtones folder). Remaining 194 files, 90,338,080 bytes, are listed per path in the JSON (status `not_in_repo`, `bulk` false) and in `.../scratchpad/snd/not_in_repo_paths.txt`. Largest non-bulk groups:
+
+| location | files | bytes | examples |
+|---|---|---|---|
+| Slideshows.framework | 8 | 22.4M | Content/Audio/*.m4a (music beds) |
+| AssistantServices.framework | 14 | 6.9M | siri-begin-improved.caf, dt-begin/cancel/confirm.caf, jbl_*_sae.caf, announce-messages-tone.wav |
+| SiriUI + SpeakerRecognition | 12 | 23.1M | Siri+ Buddy / VoiceTriggerTraining caf (duplicates) |
+| HearingUtilities.framework | 16 | 4.7M | background sounds (Rain, Ocean, ...) |
+| AudioPasscode, HeadGestures, AccessibilitySharedSupport, AXMediaUtilities | 41 | 9.6M | accessibility/detection tones |
+| Messages iMessageEffects | 10 | 1.4M | *SoundEffect.m4r |
+| Game Center / Screen Sharing / Dwell / Assistive Control / Music / TV / Books / MIDI | ~15 | ~1.1M | GKInvite, SessionStarted, Invitation Accepted, Ringer.aiff, SoundActivateItem.aiff |
+| Navigation.framework | 3 | 0.3M | Approach.caf, TurnLeft.caf, TurnRight.caf |
+
+### Usage mapping (file used by the system)
+Evidence: strings of on-disk binaries, plus strings of the dyld shared cache (CoreAudio's SystemSounds name table at cache offset ~95011706, listing Grab.aif, Screen Capture.aif, Volume Mount/Unmount, Media Keys, burn complete/failed, accessibility keys, finder/dock/ink/telephony/facetime/system names). Nothing was played; no code was decompiled beyond one call-site in screencapture.
+
+| event | file | confidence | basis |
+|---|---|---|---|
+| volume change feedback ("pop") | `/System/Library/LoginPlugins/BezelServices.loginPlugin/Contents/Resources/volume.aiff` (repo misc/BezelServices-volume.aiff) | high | BezelServices: playVolumeKeyFeedback, pref com.apple.sound.beep.feedback, "volume"+"aiff" strings; full path also in dyld cache. Not Sounds/Pop.aiff (different sha). On this Mac the pref reads 0 (feedback off; setting untouched). |
+| screenshot shutter | `SystemSounds/system/Screen Capture.aif` or `Grab.aif` (Grab.aif and Shutter.aif are byte-identical) | low | `/usr/sbin/screencapture` plays system sound ID 1393 (0x571) via AudioServicesPlaySystemSound; ID-to-file table not decoded. Name table lists Grab.aif and Screen Capture.aif, not Shutter.aif. `screencapture -x` = silent. |
+| empty Trash | `SystemSounds/finder/empty trash.aif` | medium-high | name + CoreAudio table; Finder has no .aif strings (uses system sound IDs), caller not traced |
+| move to Trash | `SystemSounds/finder/move to trash.aif` | medium-high | same. Dock: `dock/drag to trash.aif`, `dock/poof item off dock.aif` |
+| alert sounds (Settings > Sound) | the 14 files in `/System/Library/Sounds`: Basso Blow Bottle Frog Funk Glass Hero Morse Ping Pop Purr Sosumi Submarine Tink | medium-high | Sound.appex has AlertSounds/alertSoundPath/playBeepSound, fallback `/System/Library/Sounds/Purr.aiff`. Selected now: Blow (`com.apple.sound.beep.sound`). Folder enumeration not traced; ~/Library/Sounds not checked. |
+| Mail new mail | `/System/Applications/Mail.app/Contents/Resources/New Mail.aiff` | high | Mail binary strings "New Mail", "Mail Sent", "Mail Scheduled"; also Mail Fetch Error.aiff |
+| AirDrop | `Sharing.framework/.../Resources/airdrop_invite.caf` | medium | name and cache string only |
+| lock/unlock | no screen lock/unlock sound on disk. SecurityInterface `lock.aif`, `unlock.aif`, `lockClosing.aif`, `lockOpening.aif` = padlock control | medium | iOS-style LockScreen*.aiff names exist only as strings in the cache, files absent |
+| device connect/disconnect | `SystemSounds/system/Volume Mount.aif` / `Volume Unmount.aif` | medium | names + table (disk mount/eject). No USB/Bluetooth connect sound found |
+| Siri | `SystemSounds/siri/jbl_begin.caf`, `jbl_begin_short.caf`, `jbl_cancel.caf`, `jbl_confirm.caf` | medium-high | full paths referenced in the cache; which event uses which not traced |
+| Apple Pay | `SystemSounds/system/payment_success.aif`, `payment_failure.aif` | medium | names + table |
+| power connected | `/System/Library/CoreServices/PowerChime.app/Contents/Resources/connect_power.aif` | high | PowerChime: "connect_power", NSSound play, "PLAYING CHIME SOUND", chimeOnAttach; only audio file in the app |
+| low battery | none found | n/a | PowerChime has no other audio resource |
+
+### Not determined / not checked
+- Exact screenshot file (ID 1393 not mapped).
+- Callers of the finder/dock/payment/Volume Mount/AirDrop/Siri sounds (names only).
+- Whether Settings > Sound enumerates ~/Library/Sounds (not checked); mic/media/head-gesture/facetime SystemSounds users not traced.
+- /Applications, user Library and sounds outside the scanned roots: not checked.
