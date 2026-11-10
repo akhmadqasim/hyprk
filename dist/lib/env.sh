@@ -13,7 +13,7 @@
 
 HYPRK_DIST=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 HYPRK_ROOT=${HYPRK_ROOT:-$(cd "$HYPRK_DIST/.." && pwd)}
-HYPRK_DEV=${HYPRK_DEV:-/mnt/code/hypr-dev}
+HYPRK_DEV=${HYPRK_DEV:-$HYPRK_ROOT/../hypr-dev}   # optional source-built prefix; distro packages work without it
 
 # entries that must NOT leak from the real dirs into the hyprk dirs (we write our own theme there)
 _HYPRK_CFG_SKIP=" gtk-3.0 gtk-4.0 glib-2.0 qt6ct Kvantum fontconfig dconf ghostty foot "
@@ -67,7 +67,7 @@ hyprk_env_setup() {
 
     # dev prefix: Hyprland 0.57.2, Quickshell, hyprlock (PATH, LD_LIBRARY_PATH, XDG_DATA_DIRS ...)
     # shellcheck disable=SC1091
-    . "$HYPRK_DEV/env.sh"
+    [ -f "$HYPRK_DEV/env.sh" ] && . "$HYPRK_DEV/env.sh"
 
     mkdir -p "$dir"/{config,data,state,cache}; chmod 700 "$dir"
     local cfg=$dir/config data=$dir/data
@@ -113,14 +113,17 @@ hyprk_env_setup() {
     # --- Qt: qt6ct platform theme, only when the plugin exists (apt install qt6ct) ---
     HYPRK_QT_NOTE=
     local p kv=
-    p=$(ls /usr/lib/*/qt6/plugins/platformthemes/libqt6ct.so 2>/dev/null | head -n1)
+    # Debian/Ubuntu: /usr/lib/<triplet>/qt6, Arch: /usr/lib/qt6, Fedora/openSUSE: /usr/lib64/qt6
+    p=$(ls /usr/lib/*/qt6/plugins/platformthemes/libqt6ct.so /usr/lib/qt6/plugins/platformthemes/libqt6ct.so \
+           /usr/lib64/qt6/plugins/platformthemes/libqt6ct.so 2>/dev/null | head -n1)
     if [ -n "$p" ]; then
-        ls /usr/lib/*/qt6/plugins/styles/libkvantum.so >/dev/null 2>&1 && kv=--kvantum
+        ls /usr/lib/*/qt6/plugins/styles/libkvantum.so /usr/lib/qt6/plugins/styles/libkvantum.so \
+           /usr/lib64/qt6/plugins/styles/libkvantum.so >/dev/null 2>&1 && kv=--kvantum
         XDG_CACHE_HOME="$dir/cache" sh "$HYPRK_ROOT/themes/qt/install.sh" $kv --fonts --force $([ "$theme" = dark ] && echo --dark) >/dev/null
         export QT_QPA_PLATFORMTHEME=qt6ct
         unset QT_STYLE_OVERRIDE
     else
-        HYPRK_QT_NOTE="qt6ct is not installed: Qt apps keep their default look (sudo apt install qt6ct qt6-style-kvantum)"
+        HYPRK_QT_NOTE="qt6ct is not installed: Qt apps keep their default look (install qt6ct and Kvantum from your distro, see packaging/DEPENDENCIES.md)"
     fi
     export QT_QPA_PLATFORM=wayland
 
@@ -159,11 +162,11 @@ hyprk_env_setup() {
   <include ignore_missing="yes">$HYPRK_ROOT/config/fontconfig/macos-text.conf</include>
   <match target="pattern">
     <test qual="any" name="family"><string>sans-serif</string></test>
-    <edit name="family" mode="prepend" binding="same"><string>SF Pro</string></edit>
+    <edit name="family" mode="prepend" binding="same"><string>SF Pro</string><string>Inter</string></edit>
   </match>
   <match target="pattern">
     <test qual="any" name="family"><string>system-ui</string></test>
-    <edit name="family" mode="prepend" binding="same"><string>SF Pro</string></edit>
+    <edit name="family" mode="prepend" binding="same"><string>SF Pro</string><string>Inter</string></edit>
   </match>
   <match target="pattern">
     <test qual="any" name="family"><string>serif</string></test>

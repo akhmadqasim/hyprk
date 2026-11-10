@@ -17,5 +17,6 @@ export XDG_DATA_DIRS="$HYPRK_ROOT/themes:$HYPRK_DATA:$XDG_DATA_DIRS"   # themes/
 export XCURSOR_PATH="$HYPRK_ROOT/themes/cursors/theme:${XCURSOR_PATH:-/usr/share/icons}"
 unset HYPRK_GLASS        # decided by hyprland.lua after loading the glass plugin
 export XCURSOR_THEME=hyprk-cursors HYPRCURSOR_THEME=hyprk-cursors XCURSOR_SIZE=24 HYPRCURSOR_SIZE=24
-[ -f /mnt/code/hypr-dev/env.sh ] && source /mnt/code/hypr-dev/env.sh
+HYPRK_DEV=${HYPRK_DEV:-$HYPRK_ROOT/../hypr-dev}   # optional source-built prefix
+[ -f "$HYPRK_DEV/env.sh" ] && source "$HYPRK_DEV/env.sh"
 exec env -u HYPRLAND_INSTANCE_SIGNATURE Hyprland --config "${HYPRK_CONFIG:-$HYPRK_ROOT/config/hypr/hyprland.lua}" "$@"
