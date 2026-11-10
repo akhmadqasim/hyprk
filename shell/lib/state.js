@@ -20,11 +20,12 @@ function parse(text, defaults) {
 
 // state/dock.json defaults, like a clean macOS account (`defaults read com.apple.dock magnification` = 0):
 // magnification is off until the user turns it on in Desktop & Dock. Same values as settings/Parsers.js
-// dockDefaults (magnifiedSize in pt; the shell uses its ratio to the size, see magnifyRatio). No `size`: an absent
-// key is the Mac's built-in tilesize 64 (dockTile). The recent apps section is on by default, like macOS
-// (`show-recents` absent = 1, MAC-ANSWERS.md Q-dock-14).
+// dockDefaults (size and magnifiedSize in pt; the magnified size is used as a ratio to the size, see magnifyRatio,
+// 2 by default as before). `size` absent = the Mac's built-in tilesize 64 (MAC-ANSWERS.md Q-dock-02); parse() keeps
+// only keys that have a default. The recent apps section is on by default, like macOS (`show-recents` absent = 1,
+// Q-dock-14).
 function dockDefaults() {
-    return { autohide: false, magnification: false, magnifiedSize: 96, showRecents: true };
+    return { autohide: false, magnification: false, size: 64, magnifiedSize: 128, showRecents: true };
 }
 
 // Dock tile size in pt from dock.json `size`. Settings' Size slider writes the Mac's `tilesize` itself (16..128,

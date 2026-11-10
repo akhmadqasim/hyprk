@@ -115,6 +115,8 @@ test("dock tile: absent size is 64 (Q-dock-02)", () => {
     assert.equal(ST.dockTile({}), 64);
     assert.equal(ST.dockTile(null), 64);
     assert.equal(ST.dockTile({ size: "x" }), 64);
+    assert.equal(ST.dockTile(ST.parse('{"autohide": true}', ST.dockDefaults())), 64);
+    assert.equal(ST.dockTile(ST.parse('{"size": 33}', ST.dockDefaults())), 33);
 });
 test("dock tile: slider value is the tile in pt, clamped 16..128", () => {
     assert.deepEqual([16, 33, 48, 64, 128].map(s => ST.dockTile({ size: s })), [16, 33, 48, 64, 128]);
@@ -366,14 +368,8 @@ test("mode key ctrl+4", () => assert.equal(SL.modeForKey(0x34, false, true, fals
 test("mode key alt+1", () => assert.equal(SL.modeForKey(0x31, false, false, true), "apps"));
 test("mode key plain digit", () => assert.equal(SL.modeForKey(0x31, false, false, false), ""));
 test("mode key 5", () => assert.equal(SL.modeForKey(0x35, true, false, false), ""));
-test("cycle right from all", () => assert.equal(SL.cycleMode("", 1), "apps"));
-test("cycle left from all wraps", () => assert.equal(SL.cycleMode("", -1), "clipboard"));
-test("cycle right from clipboard", () => assert.equal(SL.cycleMode("clipboard", 1), ""));
-test("modeInfo placeholder", () => assert.equal(SL.modeInfo("files").placeholder, "Search Files"));
+test("modeInfo placeholder is the mode name (Q-panels-24)", () => assert.equal(SL.modeInfo("files").placeholder, "Files"));
 test("modeInfo none", () => assert.equal(SL.modeInfo(""), null));
-test("app category dev", () => assert.equal(SL.appCategory(["Development", "IDE"]), "Developer Tools"));
-test("app category other", () => assert.equal(SL.appCategory([]), "Other"));
-test("app chips present only", () => assert.deepEqual(SL.appCategoryChips([{ categories: ["Game"] }, { categories: ["Utility"] }]), ["Games", "Utilities"]));
 const xbel = `<?xml version="1.0"?><xbel>
 <bookmark href="file:///home/u/Docs/a%20b.pdf" added="2026-01-01T00:00:00Z" modified="2026-01-02T00:00:00Z" visited="2026-01-02T00:00:00Z"><info><metadata><mime:mime-type type="application/pdf"/></metadata></info></bookmark>
 <bookmark href="file:///home/u/new.txt" modified="2026-03-01T00:00:00Z"><info><metadata><mime:mime-type type="text/plain"/></metadata></info></bookmark>
@@ -641,8 +637,41 @@ test("mode buttons start inside the field, end in place", () => {
     test("browser is information", () => assert.equal(AC.groupOf(["Network", "WebBrowser"]), "Information & Reading"));
     test("game", () => assert.equal(AC.groupOf(["Game", "BoardGame"]), "Games"));
     test("no categories is other", () => assert.equal(AC.groupOf(undefined), "Other"));
-    test("bar lists only groups in use, in order", () => assert.deepEqual(
-        AC.present([{ categories: ["Utility"] }, { categories: ["Game"] }, { categories: [] }]), ["Games", "Utilities", "Other"]));
+    test("chips list only groups in use, in the Mac's order", () => assert.deepEqual(
+        AC.present([{ categories: ["Game"] }, { categories: ["Utility"] }, { categories: [] }, { categories: ["Development", "Utility"] }]),
+        ["Utilities", "Developer Tools", "Games", "Other"]));
+    test("IDE is developer tools", () => assert.equal(AC.groupOf(["Development", "IDE"]), "Developer Tools"));
+}
+
+// ---- Apps panel grid (lib/appsgrid.js, Q-dock-23..26) ----
+{
+    const AG = load("appsgrid.js");
+    const m = AG.metrics();
+    test("apps grid: 7 columns of 115 fill the 844 panel, first centre 77", () => {
+        near(AG.cellX(0) + m.pitch / 2, 77);
+        near(AG.cellX(6) + m.pitch / 2, 77 + 6 * 115);
+        assert.ok(AG.cellX(0) > 0 && AG.cellX(6) + m.pitch < m.width);
+    });
+    test("apps grid: A-Z from 187 when browsing, 20 for a category", () => {
+        assert.equal(AG.gridTop(true), 187);
+        assert.equal(AG.gridTop(false), 20);
+    });
+    test("apps grid: first screen = suggestions + visible rows", () => {
+        assert.equal(AG.visibleRows(true), 4);          // 187, 289, 391, 493 (cut by the 520 panel)
+        assert.equal(AG.firstScreen(), 35);
+    });
+    test("apps grid: keyboard moves clamp to the items", () => {
+        assert.equal(AG.move(-1, 1, 0, 10), 0);
+        assert.equal(AG.move(0, 0, 1, 10), 7);
+        assert.equal(AG.move(7, 0, 1, 10), 9);
+        assert.equal(AG.move(3, -1, -1, 10), 0);
+        assert.equal(AG.move(0, 1, 0, 0), -1);
+    });
+    test("apps suggestions: distinct, entries or wrappers, capped", () => {
+        const a = { id: "a" }, b = { id: "b" }, c = { id: "c" }, h = { id: "h", noDisplay: true };
+        assert.deepEqual(AG.suggestions([[{ entry: b }, h], [a, b, { action: 1 }], [c]], 2).map(e => e.id), ["b", "a"]);
+        assert.deepEqual(AG.suggestions([[], null, [c]], 7).map(e => e.id), ["c"]);
+    });
 }
 
 // ---- exact springs as BezierSpline curves (lib/spring.js, components/SpringCurve.qml) ----
