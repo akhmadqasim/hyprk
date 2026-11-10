@@ -9,6 +9,8 @@ import qs.HyprK
 
 // Cmd/Super+Tab app switcher: row of large icons on glass, one per running
 // app. Tab / Shift+Tab cycle while Super is held, releasing Super switches.
+// Motion (MAC-ANSWERS.md R2, 27.2.1 at 60 fps): it appears complete in one frame (no fade, no scale,
+// no glass materialize) and on releasing Cmd disappears in about 0.1 s (6 frames), a plain fade.
 ShellWindow {
     id: sw
 
@@ -34,11 +36,18 @@ ShellWindow {
     PointerGate { id: hoverGate }
     function notePointer(item, mx, my) { return hoverGate.note(item, mx, my); }
 
-    // Liquid Glass: materializes from creation, dematerializes after closing (then unloaded)
-    Materializer { id: mat; shown: sw.shown && sw.liveApps.length > 0; initial: 0 }
-    visible: mat.active
+    // 1 = shown. Jumps to 1 on open, fades to 0 in fadeOutMs on close (then the window is unloaded).
+    readonly property int fadeOutMs: 100        // measured: about 0.1 s (6 frames at 60 Hz)
+    property real fade: shown && liveApps.length > 0 ? 1 : 0
+    Behavior on fade {
+        enabled: sw.fade > 0                     // fading in is a jump
+        NumberAnimation { duration: sw.fadeOutMs; easing.type: Easing.OutQuad }
+    }
+    // the compositor glass fades with the content (ShellWindow.glassOpacity)
+    glassOpacity: fade
+    visible: fade > 0
     lingerAs: "switcher"
-    lingering: !shown && mat.moving
+    lingering: !shown && fade > 0
     acceptsInput: shown               // no input while dematerializing
     anchors { top: true; left: true; right: true; bottom: true }
     exclusionMode: ExclusionMode.Ignore
@@ -88,13 +97,7 @@ ShellWindow {
         width: sw.apps.length * cell + Theme.switcher.padding * 2
         height: cell + Theme.switcher.labelHeight + Theme.switcher.padding * 2
         anchors.centerIn: parent
-        transform: MaterializeScale {
-            mat: mat
-            origin.x: panel.width / 2
-            origin.y: panel.height / 2
-            w: panel.width
-            h: panel.height
-        }
+        opacity: sw.fade
 
         Glass {
             anchors.fill: parent
@@ -102,11 +105,10 @@ ShellWindow {
             sx: panel.x
             sy: panel.y
             tint: Theme.glass.tintStrong
-            materialize: mat.progress
+            materialize: 1
         }
 
         Row {
-            opacity: mat.progress
             x: Theme.switcher.padding
             y: Theme.switcher.padding
             Repeater {
