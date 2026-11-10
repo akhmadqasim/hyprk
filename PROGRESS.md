@@ -196,3 +196,20 @@ glass material 65 (03:35, orchestrator; too cyan)
     Notification Center, Spotlight, Cmd-Tab, Mission Control, Launchpad, Dock tooltips); status items open Control Center.
   - Mission Control glass: no source. No Mission Control reference screenshot, SPEC 11.4 has only WindowManager motion
     defaults, the DesignLibrary variants have no Spaces or Mission Control entry. Left without glass.
+- [PC, 2026-11-10] Transition sweep in a headless nested session (2560x1664 at 2x, plugin glass), frames from repeated grim
+  shots 16 to 35 ms apart, pointer driven by scripts/vptr (real motion; `hl.dsp.cursor.move` sends no hover).
+  Fixed: menu bar title pill switched on the 0.5 s materialize spring, so moving across open menus showed two pills (the old
+  one growing while fading) for about 0.3 s; it now switches in the same frame as the menu and fades with it (0.2 s) only on
+  the final close (the fade-with-menu part is guessed). Control Center tiles merged into one hard rectangle for 2 to 3 frames
+  of the close (scaled regions overlapped, the plugin clusters touching rects). Notification Center blinked out for one
+  frame at the start of its close (stale `animating` read, layer unmapped and remapped) and slid on every screen's Overlay;
+  its photo card opened black for 50 to 80 ms. Spotlight mode buttons and the Cmd-Tab selection reacted to a resting pointer
+  (enter events while the surface maps or scales); Cmd-Tab flipped between two apps every frame. Lazy surfaces flashed one
+  frame of full glass when torn down (Spotlight field about 0.6 s after close) and Launchpad opened with one frame of bright
+  empty glass (shape committed before its materialize hole).
+  Clean: menu open (instant) and close, context menu, alert pop and dismiss, CC open, NC open, Spotlight open and mode
+  switch, Launchpad close, Mission Control enter and exit, window open, close, minimise and restore (genie).
+  Left: the menu title pill can land one frame before the new dropdown (two layer surfaces); Spotlight mode buttons emerging
+  from the field overlap and fuse as one box for 2 frames (same plugin clustering); a resting pointer still selects in the
+  Spotlight Apps grid; window close fades about 0.1 s with blur while LIVE-27.2.1.md measured close as instant (probe
+  windows; MAC-REQUESTS R2 asks); Launchpad icons load in over the first frames (icon code, not touched).
