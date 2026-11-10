@@ -31,8 +31,10 @@ after editing it run `node themes/icons/tools/gen-map.mjs && themes/icons/build-
 
 Files: `apps/<Name>-{1024,512,128}.png` (all 72 are real renditions from `Assets.car`, 1024 px only
 where Apple ships one, 15 apps), `system/` (folders, Trash, file types), `settings/` (real System
-Settings pane icons, see `panes.json`), `sf-symbols/` (SF Symbols metadata, not yet used),
-`tools/` (`car.py` Assets.car reader, `build-apps.py`, `gen-map.mjs`).
+Settings pane icons, `<pane>@<64|128>-<light|dark>.png`, see `panes.json`), `sf-symbols/` (SF Symbols
+rendered on macOS 27.2.1: `svg/`, `names.json`; `sf.js` is generated from them by `tools/gen-sf.mjs` and
+used by the shell and Finder through symlinks), `tools/` (`car.py` Assets.car reader, `build-apps.py`,
+`gen-map.mjs`, `gen-sf.mjs`).
 3. **Styles** (Settings > Appearance > Icon & widget style, `iconStyle` in
    `state/appearance.json`): `default` (light tile), `dark` (dark tile), `clear` (translucent
    tile, monochrome art), `tinted` (accent tile, monochrome art).

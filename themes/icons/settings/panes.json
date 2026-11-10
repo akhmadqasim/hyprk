@@ -1,5 +1,5 @@
 {
- "_comment": "macOS 27.2 System Settings sidebar icons are not bitmaps: IconServices draws an enclosure tile of ISEnclosureColor with the SF Symbol ISSymbolName in ISSymbolColor at run time (ISGraphicIconConfiguration in the pane extension's Info.plist, or in the com.apple.graphic-icon.* UTI in CoreTypes.bundle Info.plist). Siri and Spotlight have no such config and show a real bitmap: siri.png and spotlight.png here. Keyed by hyprk pane id (settings/Panes.js). See reference/ASSETS.md.",
+ "_comment": "macOS 27.2 System Settings sidebar icons are not bitmaps: IconServices draws an enclosure tile of ISEnclosureColor with the SF Symbol ISSymbolName in ISSymbolColor at run time (ISGraphicIconConfiguration in the pane extension's Info.plist, or in the com.apple.graphic-icon.* UTI in CoreTypes.bundle Info.plist). Siri and Spotlight have no such config and show their app icons. The rendered icons of all 23 panes are <id>@<64|128>-<light|dark>.png here (IconServices on 27.2.1, reference/re/MAC-ANSWERS.md R3b). Keyed by hyprk pane id (settings/Panes.js). See reference/ASSETS.md.",
  "panes": {
   "wifi": {
    "bundle": "com.apple.wifi-settings-extension",
