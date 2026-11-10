@@ -43,9 +43,6 @@ namespace lg {
     // shape alone) into one group each, at most MAX_GROUP shapes per group.
     std::vector<SGlassGroup> groupShapes(const std::vector<SGlassShape>& shapes, double smoothK);
 
-    // Polynomial smooth minimum (iq), as smin() in the shader: equals min(a, b) when |a - b| >= k.
-    double smoothMin(double a, double b, double k);
-
     // Glass opacity marker (hyprk ShellWindow.glassOpacity): a 1x1 rect in the bottom row
     // edge of the surface, opacity = x / (surfaceW - 1). It lets the shell fade the compositor glass with
     // its content, in the same commit. Removes the marker from rects; returns 1 when there is none.

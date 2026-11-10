@@ -185,7 +185,6 @@ int main() {
         std::vector<SGlassShape> many(10, SGlassShape{{0, 0, 10, 10}, 2});
         CHECK(groupShapes(many, 5).size() == 2);      // capped at MAX_GROUP
     }
-    CHECK(near(smoothMin(1, 5, 2), 1) && near(smoothMin(3, 3, 4), 2) && near(smoothMin(3, 3, 0), 3));
 
     std::printf(g_fail ? "%d failures\n" : "all tests passed\n", g_fail);
     return g_fail ? 1 : 0;

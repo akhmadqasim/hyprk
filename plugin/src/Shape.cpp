@@ -17,20 +17,39 @@ namespace lg {
             !((a.right() == b.x || b.right() == a.x) && (a.bottom() == b.y || b.bottom() == a.y));
     }
 
-    std::vector<SGlassShape> clusterRegion(const std::vector<SRect>& rects) {
-        const size_t        n = rects.size();
-        std::vector<size_t> parent(n);
-        std::iota(parent.begin(), parent.end(), 0);
-        auto find = [&](size_t i) {
-            while (parent[i] != i)
-                i = parent[i] = parent[parent[i]];
-            return i;
+    namespace {
+        // union-find with path halving
+        struct SDisjointSet {
+            std::vector<size_t> parent;
+            explicit SDisjointSet(size_t n) : parent(n) {
+                std::iota(parent.begin(), parent.end(), 0);
+            }
+            size_t find(size_t i) {
+                while (parent[i] != i)
+                    i = parent[i] = parent[parent[i]];
+                return i;
+            }
         };
+
+        // grows `a` to also cover `b`
+        void unite(SRect& a, const SRect& b) {
+            const double x2 = std::max(a.right(), b.right()), y2 = std::max(a.bottom(), b.bottom());
+            a.x             = std::min(a.x, b.x);
+            a.y             = std::min(a.y, b.y);
+            a.w             = x2 - a.x;
+            a.h             = y2 - a.y;
+        }
+    }
+
+    std::vector<SGlassShape> clusterRegion(const std::vector<SRect>& rects) {
+        const size_t n = rects.size();
+        SDisjointSet set(n);
+        auto         find = [&](size_t i) { return set.find(i); };
 
         for (size_t i = 0; i < n; ++i)
             for (size_t j = i + 1; j < n; ++j)
                 if (touches(rects[i], rects[j]))
-                    parent[find(i)] = find(j);
+                    set.parent[find(i)] = find(j);
 
         std::vector<SGlassShape> out;
         std::vector<long>        slot(n, -1);
@@ -43,12 +62,7 @@ namespace lg {
                 out.push_back({rects[i], -1});
                 continue;
             }
-            auto&        b  = out[slot[root]].box;
-            const double x2 = std::max(b.right(), rects[i].right()), y2 = std::max(b.bottom(), rects[i].bottom());
-            b.x             = std::min(b.x, rects[i].x);
-            b.y             = std::min(b.y, rects[i].y);
-            b.w             = x2 - b.x;
-            b.h             = y2 - b.y;
+            unite(out[slot[root]].box, rects[i]);
         }
 
         // radius: first y at which the cluster reaches its left edge, minus the top
@@ -93,13 +107,8 @@ namespace lg {
 
     std::vector<SGlassGroup> groupShapes(const std::vector<SGlassShape>& shapes, double smoothK) {
         const size_t        n = shapes.size();
-        std::vector<size_t> parent(n);
-        std::iota(parent.begin(), parent.end(), 0);
-        auto find = [&](size_t i) {
-            while (parent[i] != i)
-                i = parent[i] = parent[parent[i]];
-            return i;
-        };
+        SDisjointSet        set(n);
+        auto                find = [&](size_t i) { return set.find(i); };
         std::vector<size_t> count(n, 1);
         if (smoothK > 0) {
             for (size_t i = 0; i < n; ++i)
@@ -112,7 +121,7 @@ namespace lg {
                     const size_t ri = find(i), rj = find(j);
                     if (ri == rj || std::hypot(dx, dy) >= smoothK || count[ri] + count[rj] > MAX_GROUP)
                         continue;
-                    parent[ri] = rj;
+                    set.parent[ri] = rj;
                     count[rj] += count[ri];
                 }
         }
@@ -129,23 +138,12 @@ namespace lg {
             }
             auto& g = out[slot[root]];
             g.members.push_back(i);
-            const double x2 = std::max(g.box.right(), b.right()), y2 = std::max(g.box.bottom(), b.bottom());
-            g.box.x         = std::min(g.box.x, b.x);
-            g.box.y         = std::min(g.box.y, b.y);
-            g.box.w         = x2 - g.box.x;
-            g.box.h         = y2 - g.box.y;
+            unite(g.box, b);
             const auto& lead = shapes[g.lead].box;
             if (b.w * b.h > lead.w * lead.h)
                 g.lead = i;
         }
         return out;
-    }
-
-    double smoothMin(double a, double b, double k) {
-        if (k <= 0)
-            return std::min(a, b);
-        const double h = std::clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
-        return b + (a - b) * h - k * h * (1.0 - h);
     }
 
     double takeOpacityMarker(std::vector<SRect>& rects, double surfaceW, double surfaceH) {

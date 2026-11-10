@@ -236,7 +236,6 @@ namespace lg {
     static void damageLit(std::initializer_list<Vector2D> points) {
         if (!g_pHyprRenderer)
             return;
-        std::erase_if(g_lit, [](const auto& kv) { return g_frame - kv.second.frame > 600; });
         for (const auto& [owner, lit] : g_lit)
             for (const auto& box : lit.boxes)
                 for (const auto& pt : points)
@@ -268,6 +267,7 @@ namespace lg {
         if (++g_frame % 60)
             return;
         // forget surfaces not drawn for ~10 s at 60 Hz
+        std::erase_if(g_lit, [](const auto& kv) { return g_frame - kv.second.frame > 600; });
         std::erase_if(g_luma, [](const auto& kv) { return g_frame - kv.second.seen >= 600; });
     }
 
@@ -467,23 +467,22 @@ namespace lg {
         const auto  mon   = ctx.m_data.pMonitor.lock();
         const float scale = mon ? mon->m_scale : 1.f;
         const auto& p     = *m_data.params;
-        for (size_t i = 0; i < m_data.shapes.size(); ++i) {
-            const auto& s    = m_data.shapes[i];
-            // light/dark state is kept per group
-            const auto group = std::ranges::find_if(m_data.groups, [i](const SGlassGroup& g) { return std::ranges::contains(g.members, i); });
-            const auto it    = g_luma.find({m_data.owner, size_t(group - m_data.groups.begin())});
-            const bool  dark = p.appearance == 2 || (p.appearance == 0 && it != g_luma.end() && it->second.dark);
-            const auto& face = dark ? m_data.recipe->dark : m_data.recipe->light;
-            // rough stand-in for the face effect: the recipe fill, or half its black point as a white lift
-            const auto tint = face.fill.a > 0 ? face.fill : SRgba{1, 1, 1, face.ycc.black * 0.5f};
-            CBox box = CBox{s.box.x, s.box.y, s.box.w, s.box.h}.scale(scale).round();
-            const float a = m_data.alpha * float(s.materialize);
-            if (box.w < 1 || box.h < 1 || a <= 0.001f)
-                continue;
-            g_pHyprOpenGL->renderRect(ctx, box, CHyprColor{tint.r, tint.g, tint.b, tint.a * a},
-                                      {.round = sc<int>(std::round(s.radius * scale)), .roundingPower = m_data.roundingPower.value_or(p.roundingPower), .blur = true,
-                                       .blurA = a});
-        }
+        for (size_t gi = 0; gi < m_data.groups.size(); ++gi)
+            for (const size_t i : m_data.groups[gi].members) {
+                const auto& s    = m_data.shapes[i];
+                const auto  it   = g_luma.find({m_data.owner, gi}); // light/dark state is kept per group
+                const bool  dark = p.appearance == 2 || (p.appearance == 0 && it != g_luma.end() && it->second.dark);
+                const auto& face = dark ? m_data.recipe->dark : m_data.recipe->light;
+                // rough stand-in for the face effect: the recipe fill, or half its black point as a white lift
+                const auto tint = face.fill.a > 0 ? face.fill : SRgba{1, 1, 1, face.ycc.black * 0.5f};
+                CBox box = CBox{s.box.x, s.box.y, s.box.w, s.box.h}.scale(scale).round();
+                const float a = m_data.alpha * float(s.materialize);
+                if (box.w < 1 || box.h < 1 || a <= 0.001f)
+                    continue;
+                g_pHyprOpenGL->renderRect(ctx, box, CHyprColor{tint.r, tint.g, tint.b, tint.a * a},
+                                          {.round = sc<int>(std::round(s.radius * scale)), .roundingPower = m_data.roundingPower.value_or(p.roundingPower), .blur = true,
+                                           .blurA = a});
+            }
     }
 
     bool CGlassElement::drawGlass(Render::CRenderContext& ctx) {
@@ -630,8 +629,8 @@ namespace lg {
                 info[2 * k + 1]  = s.materialize;
             }
             glUniform1i(u.shapeCount, int(g.members.size()));
-            glUniform4fv(u.shapeBox, MAX_GROUP, boxes.data());
-            glUniform2fv(u.shapeInfo, MAX_GROUP, info.data());
+            glUniform4fv(u.shapeBox, GLsizei(g.members.size()), boxes.data());
+            glUniform2fv(u.shapeInfo, GLsizei(g.members.size()), info.data());
             glUniform2f(u.pointer, ptr.x - quad.x, ptr.y - quad.y);
             glUniform3f(u.pointerLight, m_data.pointerLight ? p.pointerLight : 0.f, p.pointerLightRadius * scale, press);
             glUniform1f(u.blurLod, p.blurLod + p.blurLodScale * std::log2(1.f + res.blurRadius)); // mip levels over Hyprland's blur

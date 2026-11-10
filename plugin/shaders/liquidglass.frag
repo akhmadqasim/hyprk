@@ -71,26 +71,23 @@ out vec4 fragColor;
 
 float sat(float x) { return clamp(x, 0.0, 1.0); }
 
-float sdBox(vec2 p, vec2 half_, float radius) {
-    float r = clamp(radius, 0.0, min(half_.x, half_.y));
-    vec2  q = abs(p) - half_ + r;
-    vec2  m = max(q, 0.0);
-    float c = (m.x > 0.0 || m.y > 0.0) ? pow(pow(m.x, roundingPower) + pow(m.y, roundingPower), 1.0 / roundingPower) : 0.0;
-    return c + min(max(q.x, q.y), 0.0) - r;
-}
-
-// sdBox plus its outward normal (x: distance, yz: normal)
+// distance to a rounded box with Lp (superellipse) corners and its outward normal (x: distance, yz: normal)
 vec3 sdBoxN(vec2 p, vec2 half_, float radius) {
     float r = clamp(radius, 0.0, min(half_.x, half_.y));
     vec2  q = abs(p) - half_ + r;
     vec2  m = max(q, 0.0);
     vec2  s = vec2(p.x < 0.0 ? -1.0 : 1.0, p.y < 0.0 ? -1.0 : 1.0);
     if (m.x > 0.0 || m.y > 0.0) {
-        vec2  g = pow(m, vec2(roundingPower - 1.0)); // gradient of the Lp corner
-        float c = pow(pow(m.x, roundingPower) + pow(m.y, roundingPower), 1.0 / roundingPower);
+        vec2  g = pow(m, vec2(roundingPower - 1.0)); // gradient of the corner; m^p = m * g
+        float c = pow(dot(m, g), 1.0 / roundingPower);
         return vec3(c + min(max(q.x, q.y), 0.0) - r, s * g / max(length(g), 1e-6));
     }
     return vec3(max(q.x, q.y) - r, q.x > q.y ? vec2(s.x, 0.0) : vec2(0.0, s.y));
+}
+
+// blend weight of the polynomial smooth min: d = mix(a, b, h) - k h (1 - h) (k <= 0: hard min)
+float sminH(float a, float b, float k) {
+    return k > 1e-4 ? sat(0.5 + 0.5 * (a - b) / k) : step(b, a);
 }
 
 // Union of the shapes: QuartzCore's normal-aware polynomial smooth min (sdf_union in the CA uber
@@ -106,16 +103,9 @@ SScene scene(vec2 qp) {
             break;
         vec3  b  = sdBoxN(qp - shapeBox[i].xy, shapeBox[i].zw, shapeInfo[i].x);
         float mi = shapeInfo[i].y;
-        if (i == 0) {
-            res = SScene(b.x, b.yz, mi);
-            continue;
-        }
         float k = smoothK * sat(0.5 - 0.5 * dot(res.n, b.yz));
-        if (k > 1e-4) {
-            float h = sat(0.5 + 0.5 * (res.d - b.x) / k);
-            res     = SScene(mix(res.d, b.x, h) - k * h * (1.0 - h), mix(res.n, b.yz, h), mix(res.m, mi, h));
-        } else if (b.x < res.d)
-            res = SScene(b.x, b.yz, mi);
+        float h = sminH(res.d, b.x, k);
+        res     = SScene(mix(res.d, b.x, h) - k * h * (1.0 - h), mix(res.n, b.yz, h), mix(res.m, mi, h));
     }
     return res;
 }
@@ -126,8 +116,8 @@ float sdShape(vec2 qp) {
     for (int i = 0; i < MAX_SHAPES; i++) {
         if (i >= shapeCount)
             break;
-        float di = sdBox(qp - shapeBox[i].xy, shapeBox[i].zw, shapeInfo[i].x);
-        float h  = smoothK > 0.0 ? sat(0.5 + 0.5 * (d - di) / smoothK) : step(di, d);
+        float di = sdBoxN(qp - shapeBox[i].xy, shapeBox[i].zw, shapeInfo[i].x).x;
+        float h  = sminH(d, di, smoothK);
         d        = mix(d, di, h) - smoothK * h * (1.0 - h);
     }
     return d;
@@ -344,7 +334,7 @@ void main() {
     vec4 c = mix(shadow, face, cov);
 
     // ring shadow: soft contour of the shape sampled at an offset, inside the glass only
-    if (ringOpacity > 0.0 && cov > 0.0) {
+    if (ringOpacity > 0.0 && cov > 0.0 && -d < length(ringOffset) + ringStroke + 3.0 * ringRadius) {
         float dr   = sdShape(qp + ringOffset);
         float rr   = max(ringRadius, 1e-3);
         float ring = sat(gEdge(0.7071 * dr / rr) - gEdge(0.7071 * (dr + ringStroke) / rr)) * ringOpacity * cov * mat;
