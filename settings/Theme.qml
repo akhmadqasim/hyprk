@@ -21,9 +21,15 @@ QtObject {
     property bool compositorBlur: false        // set by AppState from Backend
     property bool reduceMotion: false          // set by AppState (Accessibility > Motion)
     readonly property bool translucent: compositorBlur && !reduceTransparency && !increaseContrast
-    // "transparent" = multicolor/blue default (systemBlue)
-    property color accentOverride: "transparent"
-    readonly property color accent: accentOverride.a > 0 ? accentOverride : (dark ? Tokens.systemBlue : "#0071F5") // ref (light)
+    // Appearance > Accent color (state/appearance.json "accent"), set by AppState.
+    // Colours: SPEC 15 controlAccent<Name>Color, one table shared with the shell (HyprK Tokens.accentSwatches).
+    // Multicolor lets each app pick; System Settings itself then uses blue, so it maps to the blue swatch.
+    property string accentName: "multicolor"
+    readonly property color accent: Tokens.accentSwatches[accentName] ?? Tokens.accentSwatches.blue
+    // NSMulticolorAccent conic wheel, sampled every 30 deg counter-clockwise from 3 o'clock (SPEC 15).
+    // Not in Tokens yet (only Settings draws it); move it there when the shell needs it.
+    readonly property var multicolorStops: ["#AD3C4F", "#BD5886", "#A1579C", "#8A57A9", "#7161AD", "#5D6BB1",
+                                            "#538AB3", "#4BA5B5", "#6DA485", "#95A150", "#C9A54E", "#BA7240"]
 
     Component.onCompleted: {
         Tokens.dark = Qt.binding(() => theme.dark);

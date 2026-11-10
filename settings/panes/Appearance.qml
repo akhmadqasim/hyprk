@@ -185,20 +185,20 @@ Column {
                                     strokeWidth: -1
                                     fillGradient: ConicalGradient {
                                         centerX: 12; centerY: 12; angle: 0
-                                        // sampled every 30 deg counter-clockwise from 3 o'clock (NSMulticolorAccent@2x)
-                                        GradientStop { position: 0 / 12; color: "#AD3C4F" }
-                                        GradientStop { position: 1 / 12; color: "#BD5886" }
-                                        GradientStop { position: 2 / 12; color: "#A1579C" }
-                                        GradientStop { position: 3 / 12; color: "#8A57A9" }
-                                        GradientStop { position: 4 / 12; color: "#7161AD" }
-                                        GradientStop { position: 5 / 12; color: "#5D6BB1" }
-                                        GradientStop { position: 6 / 12; color: "#538AB3" }
-                                        GradientStop { position: 7 / 12; color: "#4BA5B5" }
-                                        GradientStop { position: 8 / 12; color: "#6DA485" }
-                                        GradientStop { position: 9 / 12; color: "#95A150" }
-                                        GradientStop { position: 10 / 12; color: "#C9A54E" }
-                                        GradientStop { position: 11 / 12; color: "#BA7240" }
-                                        GradientStop { position: 12 / 12; color: "#AD3C4F" }
+                                        // NSMulticolorAccent@2x stops (SPEC 15), kept in Theme.multicolorStops
+                                        GradientStop { position: 0 / 12; color: Theme.multicolorStops[0] }
+                                        GradientStop { position: 1 / 12; color: Theme.multicolorStops[1] }
+                                        GradientStop { position: 2 / 12; color: Theme.multicolorStops[2] }
+                                        GradientStop { position: 3 / 12; color: Theme.multicolorStops[3] }
+                                        GradientStop { position: 4 / 12; color: Theme.multicolorStops[4] }
+                                        GradientStop { position: 5 / 12; color: Theme.multicolorStops[5] }
+                                        GradientStop { position: 6 / 12; color: Theme.multicolorStops[6] }
+                                        GradientStop { position: 7 / 12; color: Theme.multicolorStops[7] }
+                                        GradientStop { position: 8 / 12; color: Theme.multicolorStops[8] }
+                                        GradientStop { position: 9 / 12; color: Theme.multicolorStops[9] }
+                                        GradientStop { position: 10 / 12; color: Theme.multicolorStops[10] }
+                                        GradientStop { position: 11 / 12; color: Theme.multicolorStops[11] }
+                                        GradientStop { position: 12 / 12; color: Theme.multicolorStops[0] }
                                     }
                                     PathAngleArc { centerX: 12; centerY: 12; radiusX: 12; radiusY: 12; startAngle: 0; sweepAngle: 360 }
                                 }
@@ -229,7 +229,8 @@ Column {
                 anchors.verticalCenter: parent ? parent.verticalCenter : undefined
                 readonly property var names: ["", "accent", "blue", "purple", "pink", "red", "orange", "yellow", "green", "graphite"]
                 readonly property string name: names[hl.currentIndex]
-                color: name === "accent" ? Theme.accent : name ? Theme.tile[name] : "transparent"
+                // SPEC 15 accent colours (Tokens.accentSwatches), same table as the accent swatches above
+                color: name === "accent" ? Theme.accent : name ? Tokens.accentSwatches[name] : "transparent"
                 gradient: name ? null : auto   // Automatic: accent fading to pink, as in the reference
                 Gradient {
                     id: auto
