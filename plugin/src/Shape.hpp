@@ -39,8 +39,8 @@ namespace lg {
     // SGlassShape::materialize = m; shapes without one stay at 1.
     std::vector<SGlassShape> clusterRegion(const std::vector<SRect>& rects);
 
-    // Groups shapes whose boxes are closer than `smoothK` (smooth-union reach, px; 0 = every shape
-    // alone) into one group each, at most MAX_GROUP shapes per group.
+    // Groups shapes whose boxes are closer than `smoothK` (the smooth union's reach, px; 0 = every
+    // shape alone) into one group each, at most MAX_GROUP shapes per group.
     std::vector<SGlassGroup> groupShapes(const std::vector<SGlassShape>& shapes, double smoothK);
 
     // Polynomial smooth minimum (iq), as smin() in the shader: equals min(a, b) when |a - b| >= k.

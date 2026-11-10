@@ -40,9 +40,10 @@ namespace lg {
         float                                        innerShadow = 0.06f, innerShadowSize = 8;
         float                                        shadowScale = 1, shadowTint = 0.35f, ringScale = 1;
 
-        // Liquid Glass motion. spacing: ns -> px; shapes of one layer closer than this merge into one
-        // smooth-union glass (GlassEffectContainer(spacing:)), between 1x and 2x it they bulge toward
-        // each other. pointer light: namespaces whose glass lights up around the pointer.
+        // Liquid Glass motion. spacing: ns -> pt, the smoothness k of the union of a layer's shapes
+        // (SwiftUI passes GlassEffectContainer(spacing:) straight to CASDFLayer.smoothness, default 8):
+        // shapes fuse when the gap is below k / 2 and reach toward each other below k.
+        // pointer light: namespaces whose glass lights up around the pointer.
         std::unordered_map<std::string, double>      spacing;
         std::vector<std::string>                     pointerLightNamespaces;
         float                                        pointerLight = 1, pointerLightRadius = 60;
@@ -86,7 +87,7 @@ namespace lg {
 
     const std::string& materialFor(const SParams& p, const std::string& ns);
 
-    // smooth-union reach (px, logical) for a namespace: 2 x spacing, 0 with reduce_motion
+    // smooth-union smoothness k (logical px) for a namespace: its spacing, 0 with reduce_motion
     double smoothKFor(const SParams& p, const std::string& ns);
     bool   pointerLightFor(const SParams& p, const std::string& ns);
 

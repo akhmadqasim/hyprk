@@ -83,6 +83,7 @@ namespace lg {
             .shapeBox         = loc("shapeBox"),
             .shapeInfo        = loc("shapeInfo"),
             .smoothK          = loc("smoothK"),
+            .appearBlur       = loc("appearBlur"),
             .roundingPower    = loc("roundingPower"),
             .alpha            = loc("alpha"),
             .blurLod          = loc("blurLod"),
@@ -597,6 +598,7 @@ namespace lg {
         glUniform1f(u.ringRadius, r.ringRadius * scale);
 
         glUniform1f(u.smoothK, m_data.smoothK * scale);
+        glUniform1f(u.appearBlur, 10.f * scale); // SwiftUI materialize AppearanceSettings.blurRadius
         const Vector2D ptr   = (g_pointer.pos - m_data.monitorPos) * scale; // monitor-local physical px
         const float    press = float(pressLevel());
 

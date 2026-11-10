@@ -84,8 +84,8 @@ namespace lg {
             {K("radii"), "", [](SParams& p, const std::string& v) { p.radii = parseNumberMap(v); }},
             {K("materials"), "hyprk-dock:dock,hyprk-controlcenter:controlcenter,hyprk-overlay:menu,hyprk-menubar:menu,hyprk-spotlight:spotlight",
              [](SParams& p, const std::string& v) { p.materials = parseStringMap(v); }},
-            // CC tiles sit 12 apart: spacing 6 keeps them separate at rest (a press scale-up makes them reach)
-            {K("spacing"), "hyprk-controlcenter:6,hyprk-dock:12,hyprk-menubar:6,hyprk-overlay:8",
+            // SwiftUI's default spacing 8 (Spacing.defaultValue): CC tiles 12 apart stay separate at rest
+            {K("spacing"), "hyprk-controlcenter:8,hyprk-dock:8,hyprk-menubar:8,hyprk-overlay:8",
              [](SParams& p, const std::string& v) { p.spacing = parseNumberMap(v); }},
             {K("pointer_light_namespaces"), "hyprk-controlcenter,hyprk-dock,hyprk-menubar",
              [](SParams& p, const std::string& v) { p.pointerLightNamespaces = splitList(v); }},

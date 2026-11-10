@@ -41,7 +41,7 @@ namespace lg {
 
     double smoothKFor(const SParams& p, const std::string& ns) {
         const auto it = p.spacing.find(ns);
-        return p.reduceMotion || it == p.spacing.end() ? 0.0 : 2.0 * std::max(it->second, 0.0);
+        return p.reduceMotion || it == p.spacing.end() ? 0.0 : std::max(it->second, 0.0);
     }
 
     bool pointerLightFor(const SParams& p, const std::string& ns) {

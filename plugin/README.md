@@ -54,8 +54,11 @@ mipmapped by the plugin for the extra per-pixel blur. Recommended base: `blur = 
 ## Motion (materialize, merging, interactive light)
 
 Liquid Glass does not fade: it *materializes* (WWDC25 "Meet Liquid Glass": it appears by modulating its
-light bending and lensing). The plugin takes a materialize progress `m` (0..1) per shape and ramps every
-effect from identity to the full material in the shader: refraction, aberration, outer layer, edge bleed,
+light bending and lensing). In SwiftUICore 27.2 the materialize transition animates each glass entry's
+scale (hidden: x min((dim + 16) / dim, 1.2) per axis around its centre), opacity and a 10 pt blur on the
+transition spring (response 0.5, damping 0.7) (`/mnt/code/liquid-glass-re/notes/round3`). Here the shell
+animates the scale; the plugin takes a materialize progress `m` (0..1) per shape, softens the edge by
+10 pt x (1 - m) and ramps every effect from identity to the full material in the shader: refraction, aberration, outer layer, edge bleed,
 blur (the variable-blur amount, so the backdrop goes from sharp to frosted), blur fill, face YCC (from
 (0, 1, 1) = untouched), fill, tone range, inner shadow, rim, drop and ring shadow. At `m = 0` the glass draws
 the backdrop unchanged; layer alpha stays 1. The shell drives `m` with its open/close springs.
@@ -65,9 +68,13 @@ x = left + 1 + round(m (w - 3)) (shell/components/Glass.qml `materialize`). Shap
 The older window-wide opacity marker (1x1 rect in the surface's bottom row, x = opacity x (W - 1)) is still
 read and still fades the whole layer.
 
-Merging: shapes of one layer whose boxes are closer than `2 x spacing` are drawn as one group (max 8) with a
-polynomial smooth-min SDF (`k = 2 x spacing`, GlassEffectContainer-like). Shapes closer than `spacing` fuse,
-between 1x and 2x they reach toward each other; farther apart they are pixel-identical to separate glass.
+Merging: SwiftUI passes `GlassEffectContainer(spacing:)` (default 8 pt) straight to `CASDFLayer.smoothness`,
+and QuartzCore unions the element SDFs with a normal-aware polynomial smooth min: `k' = k (0.5 - 0.5 nA.nB)`,
+`h = sat(0.5 + 0.5 (dB - dA) / k')`, `d = mix(dB, dA, h) - k' h (1 - h)`, `n = mix(nB, nA, h)` (facing edges
+across a gap blend over the full k, parallel edges stay sharp). The plugin does the same with `k = spacing`
+for shapes of one layer closer than k (drawn as one group, max 8): gaps below k / 2 fuse, below k they reach
+toward each other, farther apart the glass is pixel-identical to separate shapes. The shader also takes the
+normal for refraction and the rim from this union (no finite differences).
 A group uses the recipe values of its largest shape (Apple's `minimumDistanceOfLargestArea`), and per-pixel
 materialize blends across the smooth zone like the distance. This makes a pressed, swelling Control Center
 module bridge to its neighbour and lets shapes moving together morph into one.
@@ -82,7 +89,7 @@ the pointer light; the shell then crossfades panels instead of materializing the
 
 | Key | Default | Meaning |
 |---|---|---|
-| `spacing` | `hyprk-controlcenter:6,hyprk-dock:12,hyprk-menubar:6,hyprk-overlay:8` | `ns:px` merge spacing (CC tiles are 12 apart: 6 keeps them separate at rest) |
+| `spacing` | `hyprk-controlcenter:8,hyprk-dock:8,hyprk-menubar:8,hyprk-overlay:8` | `ns:pt` smoothness k of the union (SwiftUI default 8; CC tiles 12 apart stay separate at rest) |
 | `pointer_light_namespaces` | `hyprk-controlcenter,hyprk-dock,hyprk-menubar` | glass that lights up around the pointer |
 | `pointer_light` / `pointer_light_radius` | 1 / 60 | strength (0 = off), Gaussian radius in px |
 | `reduce_motion` | 0 | 1 = no merging, no pointer light |

@@ -125,7 +125,7 @@ int main() {
     CHECK(near(radiusFor(p, "hyprk-dock", 12), 12));
     p.spacing = {{"hyprk-dock", 12}};
     p.pointerLightNamespaces = {"hyprk-dock"};
-    CHECK(near(smoothKFor(p, "hyprk-dock"), 24) && near(smoothKFor(p, "x"), 0) && pointerLightFor(p, "hyprk-dock") && !pointerLightFor(p, "x"));
+    CHECK(near(smoothKFor(p, "hyprk-dock"), 12) && near(smoothKFor(p, "x"), 0) && pointerLightFor(p, "hyprk-dock") && !pointerLightFor(p, "x"));
     p.reduceMotion = true;
     CHECK(near(smoothKFor(p, "hyprk-dock"), 0) && !pointerLightFor(p, "hyprk-dock"));
     p.reduceMotion = false;

@@ -19,7 +19,8 @@ uniform vec2  quadSize;             // px
 uniform int   shapeCount;
 uniform vec4  shapeBox[MAX_SHAPES]; // centre x, y (quad px), half w, h
 uniform vec2  shapeInfo[MAX_SHAPES];// corner radius px, materialize 0..1
-uniform float smoothK;              // px reach of the smooth union (polynomial smin), 0 = plain min
+uniform float smoothK;              // px, smoothness of the union (= GlassEffectContainer spacing), 0 = plain min
+uniform float appearBlur;           // px edge softness of fully hidden glass (materialize 0)
 uniform float roundingPower;        // 2 = circle
 uniform vec2  pointer;              // quad px
 uniform vec3  pointerLight;         // amount (0 = off), radius px, press 0..1
@@ -78,24 +79,59 @@ float sdBox(vec2 p, vec2 half_, float radius) {
     return c + min(max(q.x, q.y), 0.0) - r;
 }
 
-// distance to the union of the shapes (x) and the materialize progress there (y), blended
-// across the smooth zone like the distance
-vec2 scene(vec2 qp) {
-    vec2 res = vec2(1e5, 1.0);
+// sdBox plus its outward normal (x: distance, yz: normal)
+vec3 sdBoxN(vec2 p, vec2 half_, float radius) {
+    float r = clamp(radius, 0.0, min(half_.x, half_.y));
+    vec2  q = abs(p) - half_ + r;
+    vec2  m = max(q, 0.0);
+    vec2  s = vec2(p.x < 0.0 ? -1.0 : 1.0, p.y < 0.0 ? -1.0 : 1.0);
+    if (m.x > 0.0 || m.y > 0.0) {
+        vec2  g = pow(m, vec2(roundingPower - 1.0)); // gradient of the Lp corner
+        float c = pow(pow(m.x, roundingPower) + pow(m.y, roundingPower), 1.0 / roundingPower);
+        return vec3(c + min(max(q.x, q.y), 0.0) - r, s * g / max(length(g), 1e-6));
+    }
+    return vec3(max(q.x, q.y) - r, q.x > q.y ? vec2(s.x, 0.0) : vec2(0.0, s.y));
+}
+
+// Union of the shapes: QuartzCore's normal-aware polynomial smooth min (sdf_union in the CA uber
+// shader, SPEC round 3): k' = k (0.5 - 0.5 nA.nB), so facing edges (a gap) blend over the full k
+// and parallel edges stay sharp. Returns distance, normal (blended, not renormalised) and the
+// materialize progress blended like them.
+struct SScene { float d; vec2 n; float m; };
+
+SScene scene(vec2 qp) {
+    SScene res = SScene(1e4, vec2(0.0), 1.0);
     for (int i = 0; i < MAX_SHAPES; i++) {
         if (i >= shapeCount)
             break;
-        float di = sdBox(qp - shapeBox[i].xy, shapeBox[i].zw, shapeInfo[i].x);
-        if (smoothK > 0.0) {
-            float h = clamp(0.5 + 0.5 * (res.x - di) / smoothK, 0.0, 1.0);
-            res     = vec2(mix(res.x, di, h) - smoothK * h * (1.0 - h), mix(res.y, shapeInfo[i].y, h));
-        } else if (di < res.x)
-            res = vec2(di, shapeInfo[i].y);
+        vec3  b  = sdBoxN(qp - shapeBox[i].xy, shapeBox[i].zw, shapeInfo[i].x);
+        float mi = shapeInfo[i].y;
+        if (i == 0) {
+            res = SScene(b.x, b.yz, mi);
+            continue;
+        }
+        float k = smoothK * sat(0.5 - 0.5 * dot(res.n, b.yz));
+        if (k > 1e-4) {
+            float h = sat(0.5 + 0.5 * (res.d - b.x) / k);
+            res     = SScene(mix(res.d, b.x, h) - k * h * (1.0 - h), mix(res.n, b.yz, h), mix(res.m, mi, h));
+        } else if (b.x < res.d)
+            res = SScene(b.x, b.yz, mi);
     }
     return res;
 }
 
-float sdShape(vec2 qp) { return scene(qp).x; }
+// distance only (shadow, ring): plain smooth min, the blur hides the difference
+float sdShape(vec2 qp) {
+    float d = 1e4;
+    for (int i = 0; i < MAX_SHAPES; i++) {
+        if (i >= shapeCount)
+            break;
+        float di = sdBox(qp - shapeBox[i].xy, shapeBox[i].zw, shapeInfo[i].x);
+        float h  = smoothK > 0.0 ? sat(0.5 + 0.5 * (d - di) / smoothK) : step(di, d);
+        d        = mix(d, di, h) - smoothK * h * (1.0 - h);
+    }
+    return d;
+}
 
 // 1 - sqrt(1 - (1-t)^2): Apple's quarter-circle bevel
 float bevel(float depth, float h) {
@@ -171,14 +207,15 @@ vec3 sampleFace(vec2 pos, float b) {
 
 void main() {
     vec2  qp  = v_texcoord * quadSize;
-    vec2  sc  = scene(qp);
-    float d   = sc.x;
+    SScene sc = scene(qp);
+    float d   = sc.d;
     // materialize: every effect ramps from identity (the untouched backdrop) to the full
     // material, instead of fading the glass with alpha (Liquid Glass "materializes" by
     // modulating its lensing)
-    float mat = sat(sc.y);
+    float mat = sat(sc.m);
 
-    float fw  = max(fwidth(d), 1e-3);
+    // hidden glass also has a soft edge (SwiftUI materialize: blur 10 pt at the hidden end)
+    float fw  = max(fwidth(d), 1e-3) + (1.0 - mat) * appearBlur;
     float cov = sat(0.5 - d / fw);
 
     // drop shadow: erfc-blurred shape, coloured by the saturated backdrop (Apple's shadow_cm)
@@ -196,13 +233,7 @@ void main() {
     vec4 face = vec4(0.0);
     if (cov > 0.0) {
         float depth = max(-d, 0.0);
-        // the normal only matters on the bevel and the rim band
-        vec2 n = vec2(0.0);
-        if (depth < max(max(refractionHeight, outerHeight), max(highlightWidth, bleedHeight)) + 1.0) {
-            const vec2 e = vec2(0.5, 0.0);
-            n = vec2(sdShape(qp + e.xy) - sdShape(qp - e.xy), sdShape(qp + e.yx) - sdShape(qp - e.yx));
-            n = n / max(length(n), 1e-5);
-        }
+        vec2 n = sc.n / max(length(sc.n), 1e-5);
 
         // refraction on the bevel (n points outward; Apple's amounts are negative = inward)
         float bev = bevel(depth, refractionHeight);
