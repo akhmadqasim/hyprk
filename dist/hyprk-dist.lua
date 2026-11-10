@@ -28,6 +28,9 @@ if os.getenv("HYPRK_NESTED") == "1" then
     hl.bind(m .. " + N",      hl.dsp.global("hyprk:notificationcenter"))
     hl.bind(m .. " + C",      hl.dsp.global("hyprk:controlcenter"))
     hl.bind(m .. " + M",      hl.dsp.global("hyprk:missioncontrol"))
+    for i, mode in ipairs({ "apps", "files", "actions", "clipboard" }) do   -- Spotlight browse modes (Cmd+1..4)
+        hl.bind(m .. " + " .. i, hl.dsp.global("hyprk:spotlight-" .. mode))
+    end
     hl.bind(m .. " + Return", hl.dsp.exec_cmd(terminal))
     hl.bind(m .. " + Q",      hl.dsp.exit())
 end
