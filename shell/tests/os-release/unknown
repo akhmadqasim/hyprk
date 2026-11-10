@@ -1,0 +1,5 @@
+# a distro nobody has an icon for, no LOGO=
+NAME="Zorblax OS"
+ID=zorblax
+ID_LIKE="made-up"
+PRETTY_NAME="Zorblax OS 1.0 \"Quirk\""

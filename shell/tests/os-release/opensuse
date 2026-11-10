@@ -1,0 +1,5 @@
+NAME="openSUSE Tumbleweed"
+ID="opensuse-tumbleweed"
+ID_LIKE="opensuse suse"
+PRETTY_NAME="openSUSE Tumbleweed"
+LOGO="distributor-logo-Tumbleweed"
