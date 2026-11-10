@@ -1,0 +1,58 @@
+{
+ "source": "switchanim probe (tools/probe/switchanim.swift), NSSwitch regular, performClick, knob layer x sampled at 240 Hz; one value per 60 Hz display frame",
+ "travel_pt": 18,
+ "progress_per_frame": [
+  0.01861,
+  0.07489,
+  0.15611,
+  0.25178,
+  0.35372,
+  0.45583,
+  0.55356,
+  0.64389,
+  0.72483,
+  0.79556,
+  0.85572,
+  0.90556,
+  0.94583,
+  0.97739,
+  1.00122,
+  1.01844,
+  1.03011,
+  1.03728,
+  1.04083,
+  1.04161,
+  1.04039,
+  1.03772,
+  1.03417,
+  1.03006,
+  1.02578,
+  1.02156,
+  1.01756
+ ],
+ "moving_frames": 27,
+ "snap": "frame after the last one jumps from 1.0176 to 1.0 (about 0.465 s after the animation starts)",
+ "fits": {
+  "code: spring(response 0.47, dampingFraction 0.7), SwiftUI FluidSpringAnimation integrator h=1/300": {
+   "rms_pt": 0.0019,
+   "first_frame_offset_frames": 0.9,
+   "model_peak": 1.0416
+  },
+  "claim: response 0.46, ratio 0.72 (analytic)": {
+   "rms_pt": 0.0428,
+   "first_frame_offset_frames": 0.904,
+   "model_peak": 1.0384
+  },
+  "analytic equivalent: response 0.4624, ratio 0.7113": {
+   "rms_pt": 0.0008,
+   "first_frame_offset_frames": 0.898,
+   "model_peak": 1.0416
+  },
+  "DesignLibrary other site: spring(0.46, 0.75) fluid": {
+   "rms_pt": 0.2559,
+   "first_frame_offset_frames": 0.986,
+   "model_peak": 1.0245
+  }
+ },
+ "measured_peak": 1.04161
+}

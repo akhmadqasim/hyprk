@@ -1,0 +1,43 @@
+{
+ "mode": "dark",
+ "pattern": "cols:128,128,128",
+ "origin": [
+  40,
+  60
+ ],
+ "size": [
+  700,
+  160
+ ],
+ "secs": 8.5,
+ "dump": "$SCRATCH/vb/cap/lens-cols.json",
+ "views": [],
+ "dumpAt": [
+  3.0,
+  5.5
+ ],
+ "controls": [
+  {
+   "kind": "switch",
+   "frame": [
+    100,
+    60,
+    54,
+    24
+   ],
+   "on": false,
+   "isolateLens": false
+  },
+  {
+   "kind": "slider",
+   "frame": [
+    300,
+    60,
+    300,
+    24
+   ],
+   "value": 0.5,
+   "isolateLens": false
+  }
+ ]
+}

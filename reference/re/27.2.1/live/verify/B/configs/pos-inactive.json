@@ -1,0 +1,88 @@
+{
+ "mode": "dark",
+ "pattern": "cols:0,0,0:64,64,64:128,128,128:255,255,255:200,60,40:40,90,220",
+ "origin": [
+  40,
+  60
+ ],
+ "size": [
+  1040,
+  280
+ ],
+ "secs": 3.2,
+ "dump": "$SCRATCH/vb/cap/pos-inactive.json",
+ "views": [
+  {
+   "frame": [
+    20,
+    30,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0
+  },
+  {
+   "frame": [
+    193,
+    30,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0
+  },
+  {
+   "frame": [
+    366,
+    30,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0
+  },
+  {
+   "frame": [
+    539,
+    30,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0
+  },
+  {
+   "frame": [
+    712,
+    30,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0
+  },
+  {
+   "frame": [
+    885,
+    30,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0
+  },
+  {
+   "frame": [
+    40,
+    180,
+    960,
+    60
+   ],
+   "radius": 22,
+   "variant": 3
+  }
+ ],
+ "policy": "accessory",
+ "activate": false
+}

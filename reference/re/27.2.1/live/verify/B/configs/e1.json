@@ -1,0 +1,232 @@
+{
+ "mode": "dark",
+ "pattern": "grad",
+ "origin": [
+  40,
+  60
+ ],
+ "size": [
+  1040,
+  640
+ ],
+ "secs": 3.2,
+ "dump": "$SCRATCH/vb/cap/e1.json",
+ "views": [
+  {
+   "frame": [
+    30,
+    30,
+    300,
+    200
+   ],
+   "radius": 40,
+   "variant": 0,
+   "hideHighlight": true,
+   "override": {
+    "inputBlurRadius": 0,
+    "inputBlurOpacity0": 0,
+    "inputBlurOpacity1": 0,
+    "inputBlurOpacity2": 0,
+    "inputBlurOpacity3": 0,
+    "inputFaceOpacity": 0,
+    "inputBleedOpacity": 0,
+    "inputRefractionOpacity": 0,
+    "inputKeyFillHighlightHeight": 0,
+    "inputShadowOpacity": 0,
+    "inputRingShadowOpacity": 0,
+    "inputBlurFillLightenOpacity": 0,
+    "inputBlurFillDarkenOpacity": 0,
+    "inputBlurFillNormalOpacity": 0,
+    "inputInnerRefractionAmount": -60,
+    "inputOuterRefractionAmount": 0,
+    "inputSDRShadowOpacity": 0,
+    "inputInnerRefractionHeight": 20
+   }
+  },
+  {
+   "frame": [
+    360,
+    30,
+    300,
+    200
+   ],
+   "radius": 40,
+   "variant": 0,
+   "hideHighlight": true,
+   "override": {
+    "inputBlurRadius": 0,
+    "inputBlurOpacity0": 0,
+    "inputBlurOpacity1": 0,
+    "inputBlurOpacity2": 0,
+    "inputBlurOpacity3": 0,
+    "inputFaceOpacity": 0,
+    "inputBleedOpacity": 0,
+    "inputRefractionOpacity": 0,
+    "inputKeyFillHighlightHeight": 0,
+    "inputShadowOpacity": 0,
+    "inputRingShadowOpacity": 0,
+    "inputBlurFillLightenOpacity": 0,
+    "inputBlurFillDarkenOpacity": 0,
+    "inputBlurFillNormalOpacity": 0,
+    "inputInnerRefractionAmount": -30,
+    "inputOuterRefractionAmount": 0,
+    "inputSDRShadowOpacity": 0,
+    "inputInnerRefractionHeight": 40
+   }
+  },
+  {
+   "frame": [
+    690,
+    30,
+    300,
+    200
+   ],
+   "radius": 40,
+   "variant": 0,
+   "hideHighlight": true,
+   "override": {
+    "inputBlurRadius": 0,
+    "inputBlurOpacity0": 0,
+    "inputBlurOpacity1": 0,
+    "inputBlurOpacity2": 0,
+    "inputBlurOpacity3": 0,
+    "inputFaceOpacity": 0,
+    "inputBleedOpacity": 0,
+    "inputRefractionOpacity": 0,
+    "inputKeyFillHighlightHeight": 0,
+    "inputShadowOpacity": 0,
+    "inputRingShadowOpacity": 0,
+    "inputBlurFillLightenOpacity": 0,
+    "inputBlurFillDarkenOpacity": 0,
+    "inputBlurFillNormalOpacity": 0,
+    "inputInnerRefractionAmount": 40,
+    "inputOuterRefractionAmount": 0,
+    "inputSDRShadowOpacity": 0,
+    "inputInnerRefractionHeight": 20
+   }
+  },
+  {
+   "frame": [
+    30,
+    260,
+    200,
+    60
+   ],
+   "radius": 30,
+   "variant": 0,
+   "hideHighlight": true,
+   "override": {
+    "inputBlurRadius": 0,
+    "inputBlurOpacity0": 0,
+    "inputBlurOpacity1": 0,
+    "inputBlurOpacity2": 0,
+    "inputBlurOpacity3": 0,
+    "inputFaceOpacity": 0,
+    "inputBleedOpacity": 0,
+    "inputRefractionOpacity": 0,
+    "inputKeyFillHighlightHeight": 0,
+    "inputShadowOpacity": 0,
+    "inputRingShadowOpacity": 0,
+    "inputBlurFillLightenOpacity": 0,
+    "inputBlurFillDarkenOpacity": 0,
+    "inputBlurFillNormalOpacity": 0,
+    "inputInnerRefractionAmount": -30,
+    "inputOuterRefractionAmount": 0,
+    "inputSDRShadowOpacity": 0,
+    "inputInnerRefractionHeight": 15
+   }
+  },
+  {
+   "frame": [
+    260,
+    260,
+    240,
+    240
+   ],
+   "radius": 120,
+   "variant": 0,
+   "hideHighlight": true,
+   "override": {
+    "inputBlurRadius": 0,
+    "inputBlurOpacity0": 0,
+    "inputBlurOpacity1": 0,
+    "inputBlurOpacity2": 0,
+    "inputBlurOpacity3": 0,
+    "inputFaceOpacity": 0,
+    "inputBleedOpacity": 0,
+    "inputRefractionOpacity": 0,
+    "inputKeyFillHighlightHeight": 0,
+    "inputShadowOpacity": 0,
+    "inputRingShadowOpacity": 0,
+    "inputBlurFillLightenOpacity": 0,
+    "inputBlurFillDarkenOpacity": 0,
+    "inputBlurFillNormalOpacity": 0,
+    "inputInnerRefractionAmount": -50,
+    "inputOuterRefractionAmount": 0,
+    "inputSDRShadowOpacity": 0,
+    "inputInnerRefractionHeight": 30
+   }
+  },
+  {
+   "frame": [
+    530,
+    260,
+    300,
+    200
+   ],
+   "radius": 0,
+   "variant": 0,
+   "hideHighlight": true,
+   "override": {
+    "inputBlurRadius": 0,
+    "inputBlurOpacity0": 0,
+    "inputBlurOpacity1": 0,
+    "inputBlurOpacity2": 0,
+    "inputBlurOpacity3": 0,
+    "inputFaceOpacity": 0,
+    "inputBleedOpacity": 0,
+    "inputRefractionOpacity": 0,
+    "inputKeyFillHighlightHeight": 0,
+    "inputShadowOpacity": 0,
+    "inputRingShadowOpacity": 0,
+    "inputBlurFillLightenOpacity": 0,
+    "inputBlurFillDarkenOpacity": 0,
+    "inputBlurFillNormalOpacity": 0,
+    "inputInnerRefractionAmount": -60,
+    "inputOuterRefractionAmount": 0,
+    "inputSDRShadowOpacity": 0,
+    "inputInnerRefractionHeight": 20
+   }
+  },
+  {
+   "frame": [
+    30,
+    350,
+    200,
+    120
+   ],
+   "radius": 20,
+   "variant": 0,
+   "hideHighlight": true,
+   "override": {
+    "inputBlurRadius": 0,
+    "inputBlurOpacity0": 0,
+    "inputBlurOpacity1": 0,
+    "inputBlurOpacity2": 0,
+    "inputBlurOpacity3": 0,
+    "inputFaceOpacity": 0,
+    "inputBleedOpacity": 0,
+    "inputRefractionOpacity": 0,
+    "inputKeyFillHighlightHeight": 0,
+    "inputShadowOpacity": 0,
+    "inputRingShadowOpacity": 0,
+    "inputBlurFillLightenOpacity": 0,
+    "inputBlurFillDarkenOpacity": 0,
+    "inputBlurFillNormalOpacity": 0,
+    "inputInnerRefractionAmount": 0,
+    "inputOuterRefractionAmount": 0,
+    "inputSDRShadowOpacity": 0
+   }
+  }
+ ]
+}

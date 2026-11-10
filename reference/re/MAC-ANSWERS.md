@@ -3326,3 +3326,129 @@ treats every damping ratio >= 1 as critically damped. Effective panel curve: rat
 
 **For hyprk:** NC panel open/close = critically damped spring, ω0 = 2π/0.3 = 20.944 rad/s (mass 1, stiffness 438.65,
 damping 41.89), x(t) = 1 − (1 + ω0·t)·e^(−ω0·t), x only; close hides the window about 0.30–0.375 s after start.
+
+
+## Verification of motion and glass claims (PC #67)
+
+### A. Bounce and springs
+
+# Verify A (motion formulas), macOS 27.2.1 (26B131)
+
+1. Dock launch bounce — TERKONFIRMASI (height formula corrected) — pure parabola `h = H·4u(1−u)`, u = t/700 ms, drawn rounded to whole points; `H = (R−8)·0.2+6` where R is the tile RECT (35 at tilesize 33, 68 at tilesize 64 = AX tile width ≈ tilesize·17/16), not the tilesize: H = 11.4 (shows max 11) and 18.0 — code: Dock `-[Tile updateBouncing]` 0x10002d9f4 (period 350.0 = 0x43af0000 set at 0x10008e134, `1 − x²/P²` at 0x10002dbf8), `-[Tile updateRect]` 0x100012088 (6.0, 8.0, 0.2f @0x1002580c0); measured 60 fps, BounceProbe (7 bounces each): period 0.699–0.700 s; tile 33: best H 11.25–11.5, RMS 0.39 pt with R=35 (0.47 with R=33); tile 64: best H 17.85–18.2, RMS 0.47 pt with R=68 (0.78 with R=64).
+2. Dock attention bounce — TERKONFIRMASI — 2.000 s cycle; parabolic hops 500 / 326 / 212 ms at 1 / 0.5 / 0.25 × (R+1), then rest to 2 s; R = tile rect, so 36/18/9 pt at tilesize 33 and 69/34/17 at 64 (whole points) — code: same function, constants 500.0/326.0/212.0 (0x43fa0000, 0x43a30000, 0x43540000 at 0x10002dc70..dca8; 4th hop 138 ms zeroed), period 2000.0 at 0x100091524, amplitude `rectH + 1` in updateRect; measured with DockProbe `requestUserAttention(.criticalRequest)` in background, 4 full cycles each: cycle 2.000 s, peaks exactly 36/18/9 and 69/34/17, ground at 0.50 and 1.03–1.05 s; RMS 0.84 pt (tile 33) and 0.63 pt (tile 64) vs code (1.2 / 1.75 pt if tilesize+1 were used).
+3. Switch knob — TERKONFIRMASI, values corrected — API is SwiftUI, not Core Animation: `.animation(.spring(response: 0.47, dampingFraction: 0.7), value:)` (FluidSpringAnimation). Its 1/300 s integrator makes it behave like an exact spring with response 0.4624 s, ratio 0.7113; overshoot 4.16 % (0.75 pt of 18). The animation is cut after 27 frames (≈0.46 s): the knob snaps from 1.0176 to 1.0 — code: NSSwitch hosts `_NSCoreHostingView<AppKitSwitch>` (AppKit) → DesignLibrary Mac switch body fn 0x195E349C4, call at 0x195E34E78 (d0 = 0.47, d1 = 0.7; stub → SwiftUICore 0x190ee11b8); knob layer set per frame by SwiftUI DisplayList (stack trace), no CAAnimation on any layer; measured in-process at 240 Hz (27 frames, identical for on and off): RMS 0.0019 pt vs code curve, 0.043 pt vs the claimed 0.46/0.72. The old JSON series is the same curve (peak 36.75 of 18→36).
+4. Spotlight open — TERKONFIRMASI, labels corrected — `CASpringAnimation(perceptualDuration: 0.28, bounce: b)`; 0.41 and 0.32 are BOUNCE, not damping: damping ratio 0.59 and 0.68, response 0.28 s (mass 1, stiffness 503.55, damping 26.48 / 30.52). Normal open of the empty bar uses the flag-off path: scale.x AND scale.y both 1.12 → 1 with bounce 0.32 (ratio 0.68). Flag-on path (not seen live): x 1.12 → 1 bounce 0.41, y 0.95 → 1 bounce 0.32 — code: SpotlightUIInternal FUN_2adea2ff0 (fcsel at 0x2ADEA305C, y-from select at 0x2ADEA3184..94), caller 0x2ADE99894 (d0 1.12, d1 0.95, d2 0, w0 = Bool from vtable +0x460, not identified); measured 3 opens at 60 fps (bar width via edges): free fit response 0.289–0.291 s, bounce 0.315–0.317; RMS 0.22–0.30 pt (of 487) vs code 0.28/0.32, 1.44–1.54 pt vs 0.28/0.41; undershoot to 0.994; height fits 1.12 start (RMS 0.31–0.38 pt) not 0.95 (1.4–2.3 pt).
+5. HUD appear — TERKONFIRMASI — `Animation.interpolatingSpring(mass: 2, stiffness: 300, damping: 50)`; SwiftUI clamps ratio 1.0206 → 1.0, so effective: critically damped, ω = √150 = 12.247 rad/s, response 0.513 s; `p = 1 − (1+ωt)e^(−ωt)`, scale 0.9 + 0.1p, opacity p — code: SystemBannerUI 0x2AED436A4 (d0 2.0, d1 [0x2aed89048] = 300.0, d2 50.0; stub 0x2b00a1c10 → SwiftUICore 0x190d2440c interpolatingSpring), clamp `fcmp zeta, 1.0; b.pl` at SwiftUICore 0x190D23500; measured 4 appears (volume keys, 60 fps, capsule height): free-fit ω 12.27 / 12.88 / 12.29 / 13.26 (response 0.47–0.51 s), RMS 0.08–0.15 pt (of 66) with code ω; glyph alpha follows p (RMS 0.020–0.025).
+
+Notes
+- Dock: the offset is applied in whole points, which is the "flat top" seen earlier (11.4 → 11 for about 0.19 s). Launch ends at the next ground touch (7 whole bounces seen). Theme: use R = tile rect (tile·17/16), round to integer px of the logical scale.
+- Switch: other DesignLibrary spring site 0x195DF57F0 `spring(response: flag ? 0.23 : 0.46, dampingFraction: 0.75)` is a different view (Binding<Bool>), it does not fit the knob (RMS 0.26 pt). Same body also has `.animation(.easeInOut(duration: 0.2), value: InteractionState)` (press state). Ratio 0.72/response 0.46 in the claim was a fit of this curve; use 0.47/0.7 with the SwiftUI integrator, or 0.4624/0.7113 analytic, plus the cut at 0.46 s.
+- Spotlight: the window alpha fades in at the same time (first visible frame is already at about 1.06–1.09×). Which state sets the flag is not traced.
+- HUD: ratio 1.0 vs 1.0206 differ by at most 0.009 in p (0.06 pt): not measurable, the code decides. Hide and content-swap springs were not re-measured.
+- lldb cannot attach here; API attribution used stub resolution in memory + in-process swizzled stack traces.
+- Restored: Dock tilesize 33 (export/import), volume 31, hidden apps shown again, Dark mode on, test apps quit, videos and disassembly dumps deleted.
+
+Files
+- Data: ~/hyprk/reference/re/27.2.1/live/verify/A/ (dock-launch-t33/t64.json, dock-attention-t33/t64.json, switch-fit.json, switch-knob-240hz.jsonl, spotlight-open-fit.json, spotlight-open-track.json, hud-appear-fit.json, scripts/)
+- Asm: ~/hyprk/reference/re/27.2.1/decomp/DesignLibrary-switch-spring.asm, SpotlightUIInternal-open-springs.asm, SystemBannerUI-hud-spring.asm
+- Probe: ~/hyprk/reference/re/tools/probe/switchanim.swift
+- PNG: ~/hyprk/reference/screens/27.2.1/verify/A/spotlight-open-dark.png
+
+
+### B. Glass reflection and refraction
+
+# Verify B (Liquid Glass reflection / refraction), macOS 27.2.1 (26B131), 2x SDR display
+
+1. Rim model — TERKONFIRMASI, layout corrected — two separate effects, both in display-encoded values. (a) Dark specular = the glassBackground filter's KeyFillHighlight inputs: a 0.5 pt (1 px) line just OUTSIDE the edge, on the LEFT and RIGHT (angle π/2 → dir = (sin a, −cos a)), tone curve `c' = c·(1 + bias·hl·(3 − 2c))`, bias −0.25 (CC −0.3), `hl = Σ±dir schlick(saturate((cosθ − cos s)/(1 − cos s)), 0.4)`, `schlick(v,a) = v/((1/a − 2)(1 − v) + 1)`. It darkens (white 255 → 192, grey 128 → 65), black stays black. (b) Key/fill highlight = CASDFKeyFillHighlightEffect layer: key at TOP (angle 0), fill at BOTTOM (π), `dst' = dst + m·(M·dst + b − dst)` with the layer's vibrantColorMatrix (regular: R row 1.1202 −0.1894 −0.019 | +0.1471; dock dark 1.094 −0.358 −0.036 | +0.25; clear/CC 1.319 −0.048 −0.005 | +0.2), `m = spec + diffuse`: spec height 1 pt with falloff `1 − 0.75·depth/1`, diffuse band 8 pt linear, spread ×0.65, amount 0.5×0.15 = 0.075; m reaches 1.53 in the first pixel. Spreads: dark specular 75° dark, light uses SpreadSDR 106° on SDR (96° only with HDR headroom), Dock 75° on SDR (120° HDR), inactive window 120°; key/fill spread 80° up to D 96 → 90° from D 191. — code: metallib `glass_background_sdf_all_lpf` (highlight block, uniforms 0x108–0x120), uber shader `sdf_diffuse_kf_highlight` / `vibrant_color_matrix_sover`; CPU `CA::OGL::GlassBackgroundFilter::render` 0x18debc054 (sincos 0x18debca60, `cosf(SDR + (Spread − SDR)·edr)` 0x18debca94–caa0, `1/amount` and −2.0 at 0x18debcd84–90). Measured: isolated dark specular pixel-exact (5 13 21 29 37 44 … = model; 133 140 149 … on white); real rim 65/192/179 = model 64/191/178.5; light top 235 vs 233.6 (106°) / 246.4 (96°); highlight on black 56 33 11 8 6 5 4 vs model 57 33 11.4 8.4 6.5 5.0 4.0; real Dock 50 / 156 136 118 vs model 50 / 156 135.5 117.
+2. Edge refraction — TERKONFIRMASI, labels corrected — "0.36 D max 20 / −0.65 D min −60" are the CLEAR recipe's inner refraction HEIGHT and AMOUNT (not inner/outer). D = min(width, height) of the shape in pt; height and amount are pt. Profile `m = 1 − sqrt(1 − (1 − depth/H)²)`; inner: `src = p + n·A·m` (A < 0 = sample further inside, full A at the edge, 0 from depth H); outer: second sample `p + n·Ao·m(depth, Ho)` taken OUTSIDE the shape, mixed with `opacity·saturate((d + 1)/1)` → only the outermost 1 pt. Regular: H min(0.25D, 20), A max(−0.5D, −60), Ho max(0.2D, 16), Ao max(0.25D, 16), opacity 0.6, backdrop margin 0.35D. Clear: 0.36D≤20 / −0.65D≥−60, no outer. Dock variant: 0.08D / −0.18D, outer opacity 0.2 with amount 0. CC: min(0.225D, 25) / max(−2D, −80), outer 0.0357D / 0.0714D at 0.1525. — code: same shader (uniforms 0x10–0x24, 0xe0), amounts passed unscaled. Measured on a position-coded ramp (R = x, G = y): isolated inner, 240 pt circle, 98 960 px: median error 0.00 px, MAD 0.45 px, tangential 0.00; straight edges RMS 0.6 px; isolated outer exact to 1 px; real active recipes (11 shapes, colour terms off): median |error| 0.43 px.
+3. Content lensing / chromatic aberration — TERKONFIRMASI for backdrops, SEBAGIAN for Spotlight content — no chromatic aberration in regular, clear, dock, CC, NC glass: no recipe sets inputAberration*, and |R − B| ≤ 2 levels over 6 px black/white stripes and 8 px checker across the whole glass including the rim. Spotlight field over 6 px stripes: no fringe (only the coloured caret). Aberration exists only in `glassForeground` (7 taps, R at +0.78·ab, B at −0.78·ab), used by `control` (switch knob) and `focusPlatter`. Not measured: the field's content lens on text (text sits > 28 pt from the edge; another process, layers not dumpable).
+4. Light direction — TERKONFIRMASI — fixed in layer space: key top, fill bottom, dark lines left/right; no gyro, no pointer, no window-position term (the shader has only `key_fill_highlight_dir`). Measured: window at (40,60) vs (640,700): 0 px differ by > 1 level; pointer on rim/centre of plain glass and dock-variant glass: max diff 0; real Dock hover: only the label changes; Control Center hover: identical. Only interactive glass reacts: glass button hover = uniform +20 levels; press = grows ~1.5 pt per side plus a soft glow centred on the pointer (Gaussian σ ≈ 26 pt on a 140×32 button, peak ≈ +12 levels) that follows the drag. hyprk's pointer light on CC / Dock / menu bar has no counterpart on the Mac.
+5. Switch / slider knob lens — switch TERKONFIRMASI, slider SEBAGIAN — switch held: lens 50×31 pt (knob 32×20, ×1.56), D = 31; stack dumped in-process: backdrop displacementMap +7.75 (0.25D) with profile height 31 (D), glassBackground inner 3.1 / −4.65 (0.1D / −0.15D), no blur, identity face, dark specular height 1 offset −1 bias −0.3, ring shadow 0.1; glassForeground aberration 1.632 pt at −15°. Measured field (track hidden, ramps): outward `7.75·m(depth, 31) − 4.65·m(depth, 3.1)`, RMS 0.26 pt (free fit 7.75 / 31.8, RMS 0.15 pt), tangential 0.02 pt: 4.5 pt at depth 2.5 → 1.1 pt at the axis, i.e. it MINIFIES to about 0.79× (wide-angle look), with fringes only at the rim (interior R = G = B). Slider held: 25×20 (×1.25), inner 3.6 / −6 (0.18D / −0.3D), displacement amount 5 with height 0, aberration 0, ring shadow 0.4; its measured interior (ramp slope 0.70 plus an offset) is not explained by the dumped stack.
+
+Notes
+- Inactive window (not key): different recipe: no outer refraction, no shadow, key/fill highlight off, dark specular all around (spread 120°, bias −0.1875), backdrop margin 0.5. A borderless probe window that cannot become key shows this by mistake.
+- Real Dock (Dock process, not dumpable): rim and body colours match the dock matrix exactly, but its end-cap refraction fits regular geometry 0.25D / −0.5D (RMS 1.4–1.9 levels) and not the dock variant 0.08D / −0.18D (6.7–7.2). The top-edge refraction could not be separated from the highlight band.
+- Backdrop is sampled from a reduced texture: scale 0.25 for regular at D ≥ ~128, 0.5 otherwise, 1 for the knob lens.
+- A glass with every amount 0 is skipped entirely (identity); KeyFillHighlightAmount 0 disables the dark specular.
+- Menu hover and CC top-rim numbers were not obtained (synthetic pointer did not highlight the probe's popup; sampled columns hit content).
+- hyprk shader: `light_angle −50` and the white rim are wrong; use the two effects above. `aberration 1.5` should be 0 except on the pressed switch knob rim.
+- Restored: Dark mode on, Dock untouched, Spotlight and Control Center closed, probe apps exited. One Spotlight capture that showed the terminal behind was deleted, nothing personal is in the repo.
+
+Files
+- Data: ~/hyprk/reference/re/27.2.1/live/verify/B/ (glass-model-fit.json, configs/, dumps/, scripts/)
+- Code: ~/hyprk/reference/re/27.2.1/decomp/QuartzCore-glass-shaders.c (pseudo-code), QuartzCore-metallib-*.ll (raw IR), QuartzCore-GlassBackgroundFilter-render-excerpts.asm
+- Tools: ~/hyprk/reference/re/tools/probe/glassfit.swift, tools/metallib_list.py, metallib_dis.py, air_pp.py
+- PNG: ~/hyprk/reference/screens/27.2.1/verify/B/
+
+
+### C. Liquid Glass slider and thickness
+
+# Verify C: adjustable glass "thickness" (Liquid Glass slider), macOS 27.2.1 (26B131)
+
+1. Slider → who reads it, which parameters, linear? — **TERKONFIRMASI** — `NSGlassTintAmount` (Float, unset = 0.5) is read by AppKit (`NSGlassEffectView.Legibility`, 0x18b3176b0) and passed to SwiftUI as `EnvironmentValues.glassDiffusion = .amount(a)` (0x18b328f44); Dock reads it itself (`-[DockGlassMaterialEnvironment tintAmount]` 0x100177F10); DesignLibrary turns it into recipe changes. It is piecewise linear in a with the knee at 0.5 (0.5 = unchanged recipe). It changes only: blur-fill opacities, face fill colour, dark maxLuma (a < 0.5, size > 64 pt), and for Clear-type glass the blur radius. Rim, refraction, saturation, face black/white, shadow do not change. — code `RegularDiffusionAmount` 0x195f22ea0, `ClearDiffusionAmount` 0x195efeb9c, `SidebarDiffusionAmount` 0x195f2cbac; live filter inputs at a = 0, 0.25, 0.5, 0.75, 1 equal the code formulas exactly (all digits), dark and light.
+2. Per material — **TERKONFIRMASI** (Control Center real panel: SEBAGIAN) — Regular, Menu, Notification Center: same response (RegularDiffusionAmount). Sidebar: own variant. Clear, Dock, Control Center: blur only (ClearDiffusionAmount), so nothing changes over a flat colour. — recipe type strings 0x195fd4cf4 / 5602 / 5690 / 5b3c / 41b4 / 4ade / 493a; probe variants pixel + filter dump; real Dock relaunched at 0 / 0.507 / 1 over 4 pt stripes: stripe contrast 72 / 31 / 0.6, flat colours identical (177 / 109 / 17). **Correction of #53:** "the slider does not change the Dock / CC" was only true for flat backdrops. Real CC panel not re-measured over stripes (same recipe in the probe).
+3. Measured fit — **TERKONFIRMASI** for elements ≤ 64 pt; **SEBAGIAN** for panels > 64 pt and for light-mode Regular highlights — face model below fits greys within 0.6 level (dark Regular, all 5 values), colours rms 2.0 (max 7); Clear / Dock / CC rms 0.5–1.4. Panels of 200 pt: rms 4 (edge-bleed layer not modelled). Light Regular: rms 2.5, max 7 (soft shoulder near white not modelled). — 17 backdrops × 5 values, `live/verify/C/ramp-transfer.json`, `ramp-fit-errors.json`.
+4. Size dependence — **TERKONFIRMASI** — the recipe depends on the shortest side D only. Corner radius and width change nothing (160x64 r12 = r28 = 64x64 r32; 200x200 r28 = r100, all 60+ filter inputs identical). — code RegularBase.Base 0x195f20248 (ranges 64→104, 64→160, 4→24, cap −60); filter dumps at 24, 36, 64, 200, 500 pt plus the earlier 24…400 table.
+
+Restored: `defaults read -g NSGlassTintAmount` = 0.5071146 (float), `defaults read -g` identical to before, Dock prefs identical, Dock relaunched at that value.
+
+## How the value travels
+- Settings calls `NSGlassEffectView.Legibility.setSystemLegibility` (0x18b31ee4c): writes the global default, then `SLSPostCoordinatedDistributedNotificationFenced(cid, 12, fence, block, 0.5 s)`. Apps listen for `kSLSCoordinatedGlassAppearanceSettingsChangeNotificationName` (0x18b4c4d48) and re-post `NSGlassEffectDiffusionDidChangeNotification`.
+- **`defaults write` alone does not reach running apps** (probe held 15 s: no change). A newly launched app reads it. I measured by relaunching the probe (and the Dock) per value.
+- Legacy key `NSGlassDiffusionSetting` 0 / 1 = `.standard` / `.increased`; the slider removes it. Not set on this Mac.
+
+## Formulas (a = slider 0…1; u = clamp(2a), t = clamp(2a − 1))
+**Regular, Menu, Notification Center** (base at a = 0.5: blur fill radius 8, normal N₀ = 0.5, darken 0.9 dark / lighten 0.9 light; fill dark (0,0,0,0), light (1,1,1,0.2)):
+
+| | a < 0.5 | a ≥ 0.5 |
+|---|---|---|
+| blur-fill normal opacity N | 0.5·u | 0.5 + 0.5·t |
+| blur-fill darken (dark) / lighten (light) | 0.9·(0.75 + 0.25·u) | 0.9 |
+| face fill, dark | none (alpha 0) | grey k = 0.125·t, alpha 0.5·t |
+| face fill, light | white, alpha 0.2·u | white, alpha 0.2 + 0.3·t |
+| maxLuma, dark | M₀(D)·u + lerp(0.6, 0.45, s)·(1 − u) | M₀(D) |
+
+  with s = clamp((D − 64)/40), M₀(D) = lerp(0.6, 0.35, s). Light maxLuma is 1 always.
+  Measured only (not found in code): backdrop scale drops to 0.125 at a = 1 (0.5 / 0.25 otherwise).
+
+**Sidebar:** as Regular, but N = 0.25 + 0.25·u below 0.5; above 0.5 fill = black (dark) / white (light) to alpha 0.5·t (light 0.2 + 0.3·t), and dark face black 0.125 → 0.15.
+
+**Clear, Dock, Control Center** (base blur radius r₀ = 0.75 / 1.5 / 4):
+- a < 0.5: blur radius = r₀·2a (0 at a = 0: perfectly sharp).
+- a > 0.5: adds a blur fill, radius 8 (spec 16 × 0.5 backdrop scale), normal opacity 2a − 1, no darken/lighten. At 1 the backdrop is fully frosted.
+- No colour change at all.
+
+**Interior colour over a blurred backdrop c (sRGB-encoded 0…1), all materials:**
+```
+Y  = 0.2126 R + 0.7152 G + 0.0722 B
+Yl = Y − (1 − M)·Y²                       // maxLuma M
+out = black + (white − black)·Yl + sat·(Yl/Y)·(c − Y)
+out = out·(1 − fillA) + fillRGB·fillA     // before clamping
+out = clamp(out, 0, 1)
+```
+Dark Regular: black 0.125, white 1.125, sat 1.3, M 0.6 (≤ 64 pt). Check: white → 185, grey 127 → 134, black → 32 at a ≤ 0.5; 143 / 104 / 28 at 0.75; 108 / 83 / 32 at 1.
+Light Regular: black 0.4, white 1.03, sat 1.2, M 1: black backdrop → 102 / 117 / 133 / 156 / 179 for a = 0…1.
+Clear 0.125 / 1.08 / 1.06 / M 1; Dock dark 0.05 / 0.92 / 1.25 / M 0.75 + fill black 2 %; CC 0.125 / 0.8 / 1.2 / M 1.
+
+**Blur seen through the glass** (4 pt stripes, contrast relative to a = 0): Regular ≤ 64 pt 1 / 0.68 / 0.40 / 0.14 / 0; Clear 1 / 0.80 / 0.56 / 0.28 / 0; Dock 1 / 0.52 / 0.21 / 0.10 / 0; CC 1 / 0.53 / 0.21 / 0.11 / 0. Model: blurred = mix(S − darken·max(S − B, 0), B, N), B = blur 8, S = the sharp layer. Regular glass ≤ 64 pt has no centre blur of its own (BlurOpacity0/1 = 0), so the slider is its whole frost. Panels ≥ 160 pt are fully blurred at every value.
+
+## Size (D = shortest side, pt), Regular dark at a = 0.5
+| | formula | 24 | 36 | 64 | 200 | 500 |
+|---|---|---|---|---|---|---|
+| inner refraction amount / height | −min(D/2, 60) / min(D/4, 20) | −12 / 6 | −18 / 9 | −32 / 16 | −60 / 20 | −60 / 20 |
+| outer refraction amount / height | max(16, D/4) / max(16, D/5) | 16 / 16 | 16 / 16 | 16 / 16 | 50 / 40 | 125 / 100 |
+| edge bleed amount = height | 0.35·D | 8.4 | 12.6 | 22.4 | 70 | 175 |
+| bleed opacity = centre blur opacity | 0.8·clamp((D − 64)/96) | 0 | 0 | 0 | 0.8 | 0.8 |
+| maxLuma | lerp(0.6, 0.35, clamp((D − 64)/40)) | 0.6 | 0.6 | 0.6 | 0.35 | 0.35 |
+| shadow opacity / radius | 0.04 + 0.56·q / 4 + 20·q, q = clamp((D − 64)/96) | 0.04 / 4 | 0.04 / 4 | 0.04 / 4 | 0.6 / 24 | 0.6 / 24 |
+| backdrop scale / margin | 0.5 below ~160, then 0.25 / max(16, 0.35·D) | 0.5 / 16 | 0.5 / 16 | 0.5 / 16 | 0.25 / 70 | 0.25 / 175 |
+| centre over white / grey / black | measured | 182 / 131 / 31 | 184 / 133 / 32 | 185 / 134 / 32 | 122 / 115 / 32 | 122 / 115 / 32 |
+
+Constant at every size: blur radius 5, blur-fill radius 8, rim (key highlight height 0.5, amount 0.4, spread 75°), ring shadow (0.06, stroke 4, blur 5, offset 8), face black / white / saturation.
+Clear: inner refraction −min(0.65·D, 60) / min(0.36·D, 20), outer 0.2·D / 0.125·D, no bleed, no shadow; interior identical at all sizes (255 / 153 / 32).
+
+## Files
+- Code excerpt: `reference/re/27.2.1/decomp/DesignLibrary-diffusion-amount.c`
+- Probe: `reference/re/tools/probe/thick.swift`
+- Data: `reference/re/27.2.1/live/verify/C/` (filter inputs per variant / size / value, pixels, ramp, fit errors, real Dock)
+- Pictures: `reference/screens/27.2.1/verify/C/` (variants at 0 / 0.5 / 1 dark and light; sizes over white and stripes)

@@ -1,0 +1,295 @@
+{
+ "machine": "MacBook Air M2, macOS 27.2.1 (26B131), 2x, SDR; Dark, NSGlassTintAmount 0.507",
+ "lens_profile": "m(depth,h) = 1 - sqrt(1 - (1 - clamp(depth/h,0,1))^2)",
+ "inner_refraction": {
+  "formula": "src = p + n*A*m(depth,H), A<0 samples inward",
+  "isolated_fit": {
+   "straight_edge_rms_px": 0.6,
+   "circle_240pt_n": 98960,
+   "circle_median_err_px": 0.0,
+   "circle_MAD_px": 0.45,
+   "tangential_median_px": 0.0
+  },
+  "real_active_recipes_fit": {
+   "median_abs_err_px": 0.43,
+   "n": 424,
+   "note": "colour terms off, refraction inputs untouched (rg-dark)"
+  }
+ },
+ "outer_refraction": {
+  "formula": "c = mix(c_inner, sample(p + n*Ao*m(depth,Ho)), opacity*saturate((d - d0)/(d1 - d0))), d=-depth, recipes d0=-1 d1=0",
+  "isolated_fit": "pixel exact (<=1 px) over a 10 pt band and in the 1 pt recipe band (-48,-15 px predicted and measured)"
+ },
+ "recipes_active_dark": {
+  "regular": {
+   "innerH": "min(0.25D,20)",
+   "innerA": "max(-0.5D,-60)",
+   "outerH": "max(0.2D,16)",
+   "outerA": "max(0.25D,16)",
+   "outerOpacity": 0.6,
+   "margin": "max(0.35D,16)"
+  },
+  "clear": {
+   "innerH": "min(0.36D,20)",
+   "innerA": "max(-0.65D,-60)",
+   "outerOpacity": 0
+  },
+  "dock": {
+   "innerH": "0.08D",
+   "innerA": "-0.18D",
+   "outerOpacity": 0.2,
+   "outerA": 0
+  },
+  "controlCenter": {
+   "innerH": "min(0.225D,25)",
+   "innerA": "max(-2D,-80)",
+   "outerH": "0.0357D",
+   "outerA": "0.0714D",
+   "outerOpacity": 0.1525
+  },
+  "D": "min(width,height) of the glass shape, points"
+ },
+ "inactive_window": {
+  "outerRefractionOpacity": 0,
+  "shadow": 0,
+  "darkSpecular": {
+   "spread_deg": 120,
+   "colorBias": -0.1875,
+   "amount": 0.5
+  },
+  "keyFillHighlight": "colour alpha 0 (off)",
+  "backdropMargin": 0.5
+ },
+ "dark_specular": {
+  "formula": "c' = c*(1 + bias*hl*(3-2c)); hl = sum over +-dir of schlick(lobe*mask, amount); schlick(v,a)=v/((1/a-2)(1-v)+1); lobe=saturate((cos t - cos s)/(1-cos s))",
+  "dir": "(sin angle, -cos angle), angle pi/2 -> left and right edges",
+  "mask": "1 px (0.5 pt) line just outside the edge (offset -0.5, height 0.5)",
+  "bias": {
+   "regular": -0.25,
+   "dock": -0.25,
+   "controlCenter": -0.3
+  },
+  "amount": 0.4,
+  "spread_effective_SDR_deg": {
+   "regular_dark": 75,
+   "regular_light": 106,
+   "dock": 75,
+   "controlCenter": 75,
+   "clear": 75
+  },
+  "spread_HDR_deg": {
+   "regular_dark": 75,
+   "regular_light": 96,
+   "dock": 120
+  },
+  "measured": {
+   "grey128_line": 65,
+   "white_line": 192,
+   "cc_white_line": 179,
+   "wide_test_profile": "pixel exact (5 13 21 29 37 44 ... vs model)",
+   "light_regular_top_white": 235,
+   "model_106deg": 233.6,
+   "model_96deg": 246.4
+  }
+ },
+ "key_fill_highlight": {
+  "formula": "dst' = dst + m*(M*dst + b - dst), m = schlick(spec,0.5)+schlick(diffuse,0.075) per lobe",
+  "key": "angle 0 (top)",
+  "fill": "angle pi (bottom)",
+  "height_pt": 1,
+  "curvature": 0.75,
+  "diffuse": {
+   "heightScale": 8,
+   "spreadScale": 0.65,
+   "amountScale": 0.15
+  },
+  "spread_rad": "clamp(1.396 + 0.001844*(D-96), 1.396, 1.5708)  (80 deg up to D 96, 90 deg from D 191)",
+  "matrix_row_r_bias": {
+   "regular_dark_and_light": [
+    1.1202,
+    -0.1894,
+    -0.019,
+    0.1471
+   ],
+   "clear_cc": [
+    1.319,
+    -0.048,
+    -0.005,
+    0.2
+   ],
+   "dock_dark": [
+    1.094,
+    -0.358,
+    -0.036,
+    0.25
+   ],
+   "dock_light": [
+    1.262,
+    -0.238,
+    -0.024,
+    0.2
+   ]
+  },
+  "measured_top_profile_on_black_px": [
+   56,
+   33,
+   11,
+   8,
+   6,
+   5,
+   4,
+   3,
+   3,
+   2,
+   2,
+   1,
+   1,
+   1,
+   0
+  ],
+  "model": [
+   57,
+   33,
+   11.4,
+   8.4,
+   6.5,
+   5.0,
+   4.0
+  ]
+ },
+ "chromatic_aberration": {
+  "regular_clear_dock_cc_nc": "none: |R-B| <= 2 levels over 6 px black/white stripes and 8 px checker, whole glass incl. rim",
+  "spotlight_field": "none over 6 px stripes (only the coloured caret)",
+  "switch_knob_held": "rim only; interior R=G=B source positions"
+ },
+ "light_direction": {
+  "window_position": "bit identical at (40,60) and (640,700): 0 px differ by >1 level",
+  "pointer_over_plain_glass": "bit identical (max diff 0) at rim top, centre, rim left, dock-variant glass",
+  "dock_hover": "only the label changes",
+  "control_center_hover": "bit identical",
+  "glass_button": {
+   "hover": "uniform +20 levels",
+   "press": "grows ~1.5 pt per side, soft glow centred on the pointer, gaussian sigma ~26 pt on a 140x32 button, peak ~+12 levels, follows drag"
+  }
+ },
+ "switch_knob_held": {
+  "lens_size_pt": [
+   50,
+   31
+  ],
+  "rest_knob_pt": [
+   32,
+   20
+  ],
+  "stack": {
+   "backdrop_displacementMap": {
+    "amount": 7.75,
+    "effect_height": 31,
+    "note": "0.25D outward, height D"
+   },
+   "glassBackground": {
+    "innerH": 3.1,
+    "innerA": -4.65,
+    "darkSpecular": {
+     "height": 1,
+     "offset": -1,
+     "bias": -0.3,
+     "amount": 0.5,
+     "spreadSDR_deg": 120
+    },
+    "ringShadowOpacity": 0.1
+   },
+   "content_displacementMap": {
+    "amount": -6.2,
+    "effect_height": 4.96
+   },
+   "glassForeground": {
+    "aberrationAmount": 1.632,
+    "aberrationAngle": -0.262,
+    "aberrationOffset": 17.222,
+    "edgeStart": -6.2,
+    "edgeEnd": 0
+   }
+  },
+  "measured_outward_disp_pt_by_depth": {
+   "1.5": 4.11,
+   "2.5": 4.5,
+   "3.5": 4.24,
+   "4.5": 3.81,
+   "5.5": 3.5,
+   "6.5": 3.0,
+   "7.5": 2.82,
+   "8.5": 2.5,
+   "9.5": 2.06,
+   "10.5": 2.0,
+   "12.5": 1.5,
+   "14.5": 1.11
+  },
+  "fit": "7.75*m(depth,31) - 4.65*m(depth,3.1): rms 0.26 pt (free fit A1 7.75 H1 31.8, rms 0.15 pt)",
+  "magnification": "about 0.79x across the lens (source = r + disp, d disp/dr ~ +0.27)"
+ },
+ "slider_knob_held": {
+  "lens_size_pt": [
+   25,
+   20
+  ],
+  "stack": {
+   "backdrop_displacementMap": {
+    "amount": 5,
+    "effect_height": 0
+   },
+   "glassBackground": {
+    "innerH": 3.6,
+    "innerA": -6,
+    "ringShadowOpacity": 0.4
+   },
+   "aberrationAmount": 0
+  },
+  "measured": "interior ramp slope 0.70 with an offset; not explained by the stack"
+ },
+ "dock_real": {
+  "platter_pt": [
+   538.5,
+   1054.5,
+   632.5,
+   47.5
+  ],
+  "over_grey128": {
+   "body": 108,
+   "left_right_line": 50,
+   "top_bottom": [
+    156,
+    136,
+    118,
+    115,
+    113
+   ]
+  },
+  "over_white": {
+   "body": 176,
+   "line": 104,
+   "top": [
+    193,
+    186,
+    179
+   ]
+  },
+  "model_dock_matrix": {
+   "line_grey": 50,
+   "top": [
+    156,
+    135.5,
+    117
+   ],
+   "line_white": 104.7,
+   "top_white": [
+    193,
+    185.6
+   ]
+  },
+  "end_refraction_fit_rms_levels": {
+   "regular 0.25D/-0.5D": 1.4,
+   "dock 0.08D/-0.18D": 6.7
+  }
+ }
+}

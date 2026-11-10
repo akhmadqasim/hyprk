@@ -1,0 +1,268 @@
+{
+ "mode": "dark",
+ "pattern": "cols:0,0,0:64,64,64:128,128,128:255,255,255:200,60,40:40,90,220",
+ "origin": [
+  40,
+  60
+ ],
+ "size": [
+  1040,
+  640
+ ],
+ "secs": 3.2,
+ "dump": "$SCRATCH/vb/cap/a-cols-dark.json",
+ "views": [
+  {
+   "frame": [
+    20,
+    30,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0
+  },
+  {
+   "frame": [
+    20,
+    180,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0,
+   "clear": true
+  },
+  {
+   "frame": [
+    20,
+    330,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 3
+  },
+  {
+   "frame": [
+    20,
+    480,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0,
+   "subvariant": "menu"
+  },
+  {
+   "frame": [
+    193,
+    30,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0
+  },
+  {
+   "frame": [
+    193,
+    180,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0,
+   "clear": true
+  },
+  {
+   "frame": [
+    193,
+    330,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 3
+  },
+  {
+   "frame": [
+    193,
+    480,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0,
+   "subvariant": "menu"
+  },
+  {
+   "frame": [
+    366,
+    30,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0
+  },
+  {
+   "frame": [
+    366,
+    180,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0,
+   "clear": true
+  },
+  {
+   "frame": [
+    366,
+    330,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 3
+  },
+  {
+   "frame": [
+    366,
+    480,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0,
+   "subvariant": "menu"
+  },
+  {
+   "frame": [
+    539,
+    30,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0
+  },
+  {
+   "frame": [
+    539,
+    180,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0,
+   "clear": true
+  },
+  {
+   "frame": [
+    539,
+    330,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 3
+  },
+  {
+   "frame": [
+    539,
+    480,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0,
+   "subvariant": "menu"
+  },
+  {
+   "frame": [
+    712,
+    30,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0
+  },
+  {
+   "frame": [
+    712,
+    180,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0,
+   "clear": true
+  },
+  {
+   "frame": [
+    712,
+    330,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 3
+  },
+  {
+   "frame": [
+    712,
+    480,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0,
+   "subvariant": "menu"
+  },
+  {
+   "frame": [
+    885,
+    30,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0
+  },
+  {
+   "frame": [
+    885,
+    180,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0,
+   "clear": true
+  },
+  {
+   "frame": [
+    885,
+    330,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 3
+  },
+  {
+   "frame": [
+    885,
+    480,
+    133,
+    110
+   ],
+   "radius": 30,
+   "variant": 0,
+   "subvariant": "menu"
+  }
+ ]
+}
