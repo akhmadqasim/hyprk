@@ -66,7 +66,14 @@ Item {
             readonly property var modes: ["icons", "list", "columns", "gallery"]
             readonly property string iconHex: Qt.rgba(Theme.color.toolbarIcon.r, Theme.color.toolbarIcon.g, Theme.color.toolbarIcon.b, 1).toString()
             segmentWidth: Theme.toolbar.segment
+            width: implicitWidth                   // as before: four 46px buttons and two 1px separators
             height: Theme.toolbar.capsuleHeight
+            iconSize: Theme.toolbar.iconSize
+            iconOpacity: Theme.color.toolbarIcon.a
+            separatorBoundaries: [2, 3]            // before columns and before gallery
+            separatorColor: Theme.color.separator
+            separatorSpacing: 1
+            separatorFade: false
             selectionInset: 4
             trackColor: "transparent"
             selectionColor: Theme.color.capsuleSelected
