@@ -1,0 +1,89 @@
+{
+ "note": "AX of the Dock menus (right click). Personal entries (recent documents, recent folders, window names) replaced by placeholders. Opt-alternates from AX (cmdMods 10).",
+ "running_app_with_windows (TextEdit)": [
+  "<recent documents, up to 10>",
+  "---",
+  "<open windows>",
+  "---",
+  "New Document (app dock menu)",
+  "---",
+  "Options >",
+  "---",
+  "Show All Windows",
+  "Hide  [Opt: Hide Others]",
+  "Quit  [Opt: Force Quit]"
+ ],
+ "running_hidden_app (Calculator)": [
+  "Options >",
+  "---",
+  "Show All Windows",
+  "Show",
+  "Quit  [Opt: Force Quit]"
+ ],
+ "options_submenu_running_unpinned": [
+  "Keep in Dock",
+  "Open at Login",
+  "Show in Finder"
+ ],
+ "not_running_pinned (Notes)": [
+  "Options >",
+  "---",
+  "Open"
+ ],
+ "options_submenu_pinned": [
+  "Remove from Dock",
+  "Open at Login",
+  "Show in Finder"
+ ],
+ "Finder": [
+  "<open Finder windows>",
+  "---",
+  "New Finder Window",
+  "New Smart Folder",
+  "Find\u2026",
+  "---",
+  "Go to Folder\u2026",
+  "Connect to Server\u2026",
+  "---",
+  "<recent folders>",
+  "---",
+  "Show All Windows",
+  "Show/Hide"
+ ],
+ "Downloads stack": [
+  "Sort by",
+  "Name",
+  "Date Added",
+  "Date Modified",
+  "Date Created",
+  "Kind",
+  "---",
+  "Display as",
+  "Folder",
+  "Stack",
+  "---",
+  "View content as",
+  "Fan",
+  "Grid",
+  "List",
+  "Automatic",
+  "---",
+  "Options > (Remove from Dock, Show in Finder)",
+  "---",
+  "Open \u201cDownloads\u201d"
+ ],
+ "Trash (Bin)": [
+  "Open",
+  "---",
+  "Empty Bin"
+ ],
+ "geometry": {
+  "menu_window_x": "icon centre - 40",
+  "menu_window_bottom": "Dock bg top",
+  "body_inset": 13,
+  "row": 24,
+  "separator": 11,
+  "width": "auto (Calculator 174, TextEdit 245, Notes 111, Bin 94 item width)"
+ },
+ "assign_to": "no \"Assign To\" section: the account has one Desktop"
+}

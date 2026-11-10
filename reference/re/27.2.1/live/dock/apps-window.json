@@ -1,0 +1,90 @@
+{
+ "method": "open -a Apps; window owned by the Siri process (layer 23, not in AX); screencapture -l -o for shapes (alpha) and pixels; window-local pt unless noted",
+ "window": {
+  "frame_global": [
+   433,
+   251,
+   844,
+   617
+  ],
+  "h_centre": "screen centre",
+  "search_bar": {
+   "frame": [
+    162,
+    0,
+    520,
+    87
+   ],
+   "shape": "capsule r 43.5",
+   "fill": "dark (6,6,6 raw) in light and dark mode",
+   "placeholder": "\"Applications\", SF about 22 pt regular, grey",
+   "glyph": "App Store (A) 26.5x23.5 at x 194.5 (32.5 from the bar left)",
+   "ellipsis": "17.5 wide at x 627 (37.5 from the bar right)"
+  },
+  "gap_bar_to_panel": 10,
+  "panel": {
+   "frame": [
+    0,
+    97,
+    844,
+    520
+   ],
+   "radius": "circle-equivalent 38; continuous corner extent 54.5 (superellipse n 3.2)",
+   "material": "glass over the desktop (raw window fill 16,16,16)"
+  },
+  "backdrop_dim": "none"
+ },
+ "chips": {
+  "order": [
+   "Utilities",
+   "Developer Tools",
+   "Social",
+   "Productivity & Finance",
+   "Entertainment",
+   "Creativity",
+   "Information & Reading",
+   "Travel",
+   "Other"
+  ],
+  "note": "list depends on the installed apps; scrolls horizontally",
+  "y": "117..143 (20 below the panel top), h 26, r 13",
+  "x0": 20,
+  "gap": 8,
+  "widths": {
+   "Utilities": 71.5,
+   "Developer Tools": 130,
+   "Social": 61.5,
+   "Productivity & Finance": 174,
+   "Entertainment": 116.5,
+   "Creativity": 85.5
+  },
+  "fill": "+9 over the panel, grey text"
+ },
+ "grid": {
+  "columns": 7,
+  "col_pitch": 115,
+  "first_col_centre": 77,
+  "icon": 60,
+  "row_pitch": 102,
+  "top_row": "7 suggested/recent apps (icons y 167..227), then a 1 pt separator at y 265 (x 20..824, +35 lighter), then all apps A-Z from y 284",
+  "label": "SF 13 pt regular, white, centred, cap top 11.5 pt below the icon, truncated with \"\u2026\"",
+  "hover": "no change",
+  "keyboard": "arrows move an accent focus ring: 69 pt squircle around the 60 pt icon, about 3.5 pt thick"
+ },
+ "search": {
+  "typing": "\"cal\" -> field shows \"cal \u2014 Open\" (completion chip), grid filters in place (same 7 columns), panel keeps its size, first result on a grey 68 pt plate",
+  "return": "launches the first result"
+ },
+ "category": {
+  "click": "category becomes a token in the field (\"Utilities\"), chips row disappears, grid of that category starts at the panel top; includes iPhone apps (small phone badge); order not alphabetical",
+  "back": "Delete removes the token"
+ },
+ "ellipsis_menu": [
+  "View content as (header)",
+  "Grid (checked)",
+  "List"
+ ],
+ "launch": "clicking an app or Return launches it and the panel closes",
+ "escape": "1st Esc: the Apps panel goes away in one frame and the plain Spotlight bar (\"Search or Ask\" + mic) stays; 2nd Esc closes it. Reopening soon after keeps the last query.",
+ "scroll": "vertical list, no pages/folders/edit mode seen; synthetic wheel events did not scroll it (not verified)"
+}

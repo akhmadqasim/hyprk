@@ -1,0 +1,314 @@
+{
+ "method": "open -a \"Mission Control\"; window frames from CGWindowList during MC (WindowManager draws MC in 27.2.1: ExposeShieldWindow layer 19, \"Spaces Bar\" layer 14, \"Window Highlight Overlay\" on hover); expose-group-apps 0; solid Electric Blue and Tahoe wallpapers",
+ "layouts": {
+  "1": {
+   "before": [
+    [
+     250,
+     140,
+     600,
+     400
+    ]
+   ],
+   "mc": [
+    [
+     250,
+     140,
+     600,
+     400
+    ]
+   ],
+   "note": "no move, no scale"
+  },
+  "2_overlapping": {
+   "before": [
+    [
+     350,
+     200,
+     400,
+     300
+    ],
+    [
+     250,
+     140,
+     600,
+     400
+    ]
+   ],
+   "mc": [
+    [
+     383,
+     524,
+     400,
+     300
+    ],
+    [
+     216,
+     111,
+     600,
+     400
+    ]
+   ],
+   "note": "pushed apart vertically, scale 1.0, gap 13 pt"
+  },
+  "4_stacked": {
+   "before": [
+    [
+     550,
+     300,
+     400,
+     300
+    ],
+    [
+     700,
+     260,
+     230,
+     408
+    ],
+    [
+     520,
+     280,
+     708,
+     328
+    ],
+    [
+     500,
+     250,
+     600,
+     400
+    ]
+   ],
+   "mc": [
+    [
+     181,
+     519,
+     400,
+     300
+    ],
+    [
+     702,
+     519,
+     230,
+     408
+    ],
+    [
+     986,
+     263,
+     707,
+     328
+    ],
+    [
+     375,
+     108,
+     600,
+     400
+    ]
+   ],
+   "note": "scale 1.0, min gap about 11 pt"
+  },
+  "5_spread": {
+   "before": [
+    [
+     1250,
+     120,
+     400,
+     300
+    ],
+    [
+     250,
+     140,
+     600,
+     400
+    ],
+    [
+     720,
+     330,
+     708,
+     328
+    ],
+    [
+     90,
+     600,
+     760,
+     532
+    ],
+    [
+     1380,
+     560,
+     230,
+     408
+    ]
+   ],
+   "mc": [
+    [
+     1305,
+     112,
+     387,
+     290
+    ],
+    [
+     144,
+     115,
+     579,
+     386
+    ],
+    [
+     762,
+     415,
+     683,
+     317
+    ],
+    [
+     18,
+     528,
+     733,
+     513
+    ],
+    [
+     1459,
+     612,
+     223,
+     394
+    ]
+   ],
+   "note": "uniform scale 0.965, spatial layout kept"
+  },
+  "7_stacked": {
+   "before": [
+    [
+     600,
+     298,
+     450,
+     332
+    ],
+    [
+     560,
+     268,
+     500,
+     382
+    ],
+    [
+     550,
+     300,
+     400,
+     300
+    ],
+    [
+     480,
+     240,
+     760,
+     532
+    ],
+    [
+     700,
+     260,
+     230,
+     408
+    ],
+    [
+     520,
+     280,
+     708,
+     328
+    ],
+    [
+     500,
+     250,
+     600,
+     400
+    ]
+   ],
+   "mc": [
+    [
+     602,
+     463,
+     401,
+     296
+    ],
+    [
+     600,
+     111,
+     445,
+     341
+    ],
+    [
+     17,
+     480,
+     357,
+     268
+    ],
+    [
+     1015,
+     567,
+     677,
+     474
+    ],
+    [
+     385,
+     680,
+     206,
+     363
+    ],
+    [
+     1060,
+     122,
+     631,
+     292
+    ],
+    [
+     51,
+     111,
+     534,
+     357
+    ]
+   ],
+   "note": "uniform scale 0.89; usable area about x 17..1692, y 108..1043; gaps 11-15 pt"
+  }
+ },
+ "rules": [
+  "one uniform scale for all windows, as large as fits (max 1.0)",
+  "packing keeps the windows near their real positions (not a grid)",
+  "min gap between scaled frames about 11 pt",
+  "top limit about 108-111 (under the collapsed bar band 0..74), bottom about 1043 (Dock stays visible), sides about 17"
+ ],
+ "backdrop": {
+  "wallpaper": "unchanged: MC = desktop (fit 0.995*x+3.5, same detail) on Tahoe light and on solid blue; no dim, no blur",
+  "dock": "stays visible and usable",
+  "menu_bar": "replaced by the Spaces bar band",
+  "widgets_and_desktop_icons": "faded out / hidden"
+ },
+ "spaces_bar": {
+  "collapsed_band": "y 0..74 (covers the menu bar zone); dark/solid blue: x0.8 darker (53,66,169 over 69,83,206); light/Tahoe: lighter (about 1.18x) and blurred (std 24 -> 6); 1 pt darker line at the bottom then a shadow 0.74 -> 0.94 over about 20 pt",
+  "pill": {
+   "frame": [
+    818,
+    41.5,
+    75,
+    24
+   ],
+   "radius": 12,
+   "fill": "plus-lighter +35 over the band",
+   "text": "\"Desktop\", SF 13 pt, white",
+   "centre_y": "53.5 (middle of 34..74)"
+  },
+  "plus": {
+   "glyph": "20x20 pt at x 1674..1694, centre y 37, colour 229 grey",
+   "expanded": "same x, larger hit area"
+  },
+  "expanded_on_hover": {
+   "band": "y 0..166",
+   "thumbnail": "147x98 incl. a 3 pt accent ring with 1 pt gap (ring 86,151,245 over blue), radius about 6-8",
+   "label": "\"Desktop\" 13 pt white, centred under the thumbnail (y about 144..156)",
+   "trigger": "pointer at the top of the screen"
+  },
+  "full_screen_app": "its own tile next to Desktop, labelled with the app name (\"TextEdit\"); while a full-screen Space exists the bar opened already expanded",
+  "glass": "band is a blur+tint material (not glass rim), pill is a flat additive fill"
+ },
+ "hover": {
+  "outline": "accent ring 4.5 pt wide, 1-1.5 pt outside the window frame, colour (86,151,245) over blue; overlay window = window frame +7 left, +6 top, +6 right, +7 bottom",
+  "title_chip": "centred on the window (not below it), capsule 30 pt tall, text + 2*14.5 pt, SF 13 pt bold black text, fill (106,106,106) over dark window content; shown on hover only",
+  "scale": "no hover scale seen",
+  "close_button": "none seen on hover"
+ },
+ "timings": "see MAC-ANSWERS R2 (enter 0.38 s, exit 0.33 s)"
+}

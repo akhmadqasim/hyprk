@@ -1212,3 +1212,450 @@ itself. The frameworks it uses only supply the curve (SwiftUI `Animation`) and t
   velocity-driven, probably the notification swipe dismissal (guess).
 - `easeInOut` 0.1, 0.15, 0.25, 0.35 and 0.5 s; `spring(0.5, 0.85)` ×7; an `NSAnimationContext` group of 0.15 s
   linear (`FUN_10017b76c`).
+
+## REA 27.2.1: HUD, Control Center, Notification Center, Spotlight, symbol effects
+
+macOS 27.2.1 (26B131), MacBook Air M2. Apps are read as their arm64e slice (`lipo -thin arm64e`, image base
+0x100000000). Frameworks come from the dyld shared cache and are listed at their cache addresses. Tools: `dyld_info
+-disassemble`, a stub resolver (call targets inside the cache resolved with `dladdr` in a live process), Ghidra 12.1.4 headless.
+Swift names come from reflection metadata; the RenderBox C++ names come from the extracted image's symbols.
+Pseudocode excerpts (about 170 KB) are in `~/hyprk/reference/re/27.2.1/decomp/`: `SystemBannerUI-hud.c`,
+`MenuBarAgent-banner.c`, `ControlCenter-panel.c`, `NotificationCenter-panel.c`, `SpotlightUIInternal-window.c`,
+`RenderBox-symbol-animation.c`.
+
+**Spring notation.** "Spring(d, b)" is SwiftUI `Spring(duration:bounce:)` or CoreAnimation
+`CASpringAnimation(perceptualDuration:bounce:)`. Both use stiffness = (2π/d)²; the damping ratio is 1 − b for b ≥ 0 and
+1/(1 + b) for b < 0. The apps inline this conversion before calling `interpolatingSpring(mass: 1, …)`.
+
+### 1. Volume and brightness HUD
+**Who draws what.**
+- The window belongs to MenuBarAgent. Its system-banner scene hosts content made in the ControlCenter process.
+- ControlCenter's `SystemBannerService` (`showVolume:max:isEnabled:` at ControlCenter 0x10041238c) builds a
+  `VolumeSystemBannerContent` (ControlCenter `FUN_10040f684`).
+- That content is rendered by **SystemBannerUI.framework**, which does the capsule, glass, glyph, slider and the
+  appear/hide animation.
+
+**Size.** SystemBannerUI `FUN_2aed61dd8`: `frame(width: 307, height: 66)`, `HStack(spacing: 7)`, padding leading 16,
+trailing 31, vertical 18. The window content rect is 367 wide (`FUN_2aed4ea84`, `initWithContentRect` width 367).
+- Agrees: recorded 307.5 × 65.5 (within the 0.5 pt edge anti-aliasing) and window 367 wide.
+- Trailing padding 31 agrees with the recorded 30.5. Bar start: 16 + glyph frame + 7 against the recorded 63; the
+  glyph frame width was not read.
+
+**Position.**
+- `BannerContentController` init (`FUN_2aed44e40`): `_scaleFactor` 0.9, `_opacity` 0, `_topMargin` 10. So 10 pt
+  under the menu bar agrees.
+- The 10 pt right margin was not found as a constant. The window (367 wide) is centred on the capsule with 30 pt
+  around it; MenuBarAgent places it. Not confirmed.
+
+**Appear.** `FUN_2aed4c4c0`. For the first show, `withAnimation(Animation.interpolatingSpring(mass: 2, stiffness: 300,
+damping: 50))` runs (static `DAT_2e1bf6780`, set in `FUN_2aed436a4`). It animates scale 0.9 → 1 and opacity 0 → 1.
+- That spring has ω0 12.25 rad/s and damping ratio 1.02 (just overdamped). Content values: 0.34 at 0.1 s,
+  0.69 at 0.2 s, 0.87 at 0.3 s, 0.95 at 0.4 s, 0.98 at 0.5 s.
+- **Agrees** with the recorded about 0.55 s. The recorded alpha fits *opacity²* almost exactly (RMS 0.017 with no
+  time shift). A reason it could be squared (inference, not verified): the view uses `.opacity(o)` and the glass is
+  `_Glass.controlCenter.mix(with: .identity, by: 1 − o)` (see Glass below), so it fades twice.
+- The recorded width 0.82 → 0.92 at the start is the scale 0.9 → 1 seen through that fade. Agrees.
+
+**Content swap (volume ↔ brightness, repeated presses).** When content is already showing, the same function uses
+`spring(response: 0.2, dampingFraction: 0.85)` (static `DAT_2e1bf6788`, `FUN_2aed436dc`) for the new content. It then
+runs the interpolating spring again through `FUN_2aed49f8c`.
+- Agrees: crossfade in about 3 frames.
+- The bar fill is `TickedSliderTrack` / `TickedTrackMask` (fill width = value × width, so it moves continuously). It
+  changes inside that 0.2/0.85 spring, which settles in about 0.2 s. Agrees with the recorded continuous fill that
+  eases out in 0.15–0.2 s.
+
+**Hide.** `FUN_2aed49520` / `FUN_2aed49a34`: `withAnimation(spring(response: 0.48669, dampingFraction: 1))` (static
+`DAT_2e1bf6778`, `FUN_2aed43744`). The end values are scale 0.9 and opacity 0 (`FUN_2aed44be4`). The dismissal
+completion runs on `DispatchQueue.main.asyncAfter(now + 0.48669)`.
+- Agrees: recorded alpha ≈ (1 − x)² with RMS 0.017.
+- The glyph and bar "linger to about 0.5 s" matches the 0.48669 s completion delay.
+- The recorded ~0.3 s is the time to 5 % of the squared value.
+
+**Idle timeout.** MenuBarAgent `FUN_10031d44c` maps `SystemBannerTimeoutMode` to seconds: custom(t) → t, short → 1.0,
+standard → 4.0, long → 20.0, keepAlive → assert.
+- The timer restarts from `lastClientUpdateTime` on every press
+  (`extendSystemBannerAssertionLifetimeWithID:lastClientUpdateTime:timeoutMode:…`).
+- The recorded 1.05 s fits `short` (1.0 s) plus about 3 frames of hosting latency. Guess: the volume banner uses
+  `.short`; the mode ControlCenter passes was not traced.
+
+**Steps.**
+- `TickedTrackMask(tickCount: 16, tickWidth: 1.0, tickProgress: 0|1)` (`FUN_2aed661ec`). The track frame height is 4;
+  the leading corners have radius 2, and the trailing corners too when value == 1. Agrees with 16 dashes and 4 pt
+  height.
+- The key step of 1/16 and 1/64 with Option+Shift is **not found** in MenuBarAgent, ControlCenter or SystemBannerUI;
+  the key handling lives elsewhere.
+
+**Glyph.** SystemBannerUI `FUN_2aed5ab20`, used when ControlCenter gives no device image: `Image(systemName: "speaker." + x)`
+with `.symbolVariant(.fill)`. x is:
+- `slash` when value < 0.001;
+- `wave.1` when value < 0.333;
+- `wave.2` when value < 0.667;
+- `wave.3` otherwise.
+
+Agrees: wave.1 at 3/16, wave.2 at 7/16, slash when muted.
+- No symbol effect is applied to the HUD glyph; SystemBannerUI imports no SymbolEffect API.
+- The Control Center Sound module and the menu bar extra use a different rule (ControlCenter `FUN_1005542f8`):
+  `speaker.wave.3.fill` with `variableValue` 0.01 / 0.34 / 1.0 at the same 0.333 / 0.667 thresholds,
+  `speaker.slash.fill` under `muteVolumeEpsilon`, and `headphones` / `headphones.slash` for headphones.
+
+**Glass.** `_glassEffect(_Glass.controlCenter.mix(with: _Glass.identity, by: 1 − opacity), in: Capsule())`.
+- `_Glass.controlCenter` is static `DAT_2e1bf6760`, set by `FUN_2aed43774`. SwiftCore encodes it as tag 0x48, which is
+  index 9 = `InternalConfiguration.Base.controlCenter`, so DesignLibrary's **ControlCenterRecipe** applies (IdiomModifier
+  0x195f0a2bc, MacICExtra 0x195f0a2c4, RTExtra 0x195f0a2c0; decoded in `recipes-annotated.c`).
+- No subvariant is set. The glass fades by mixing towards identity, not through its alpha.
+
+### 2. Control Center panel (bento box)
+**Open and close.** Both run in ControlCenter. Open is `FUN_1002dc74c`, close is `FUN_1002dce40` (completion log "bento
+box dismiss animation did complete"). Both call `withAnimation(DAT_10095bf80, completionCriteria: .logicallyComplete)`.
+- `DAT_10095bf80` is set by `FUN_10027f1f8` → `FUN_10027f228`: `Spring(duration: 0.25, bounce: -0.027)`, which
+  becomes `interpolatingSpring(mass 1, stiffness 631.65, damping 51.66)`. That is **response 0.25 s, damping ratio
+  1.028**.
+- It animates a transition progress p. `FUN_1002db3fc` maps it to the view state:
+  - appearing: `bentoBoxOpacity` = p, `bentoBoxScale` = 1.01 − 0.01·p (@0x1006f2bf8 = 1.01, @0x1006f2c00 = −0.01);
+  - dismissing: opacity = 1 − p, scale = 1.0 → 1.01;
+  - hidden: opacity 0, scale 1.01.
+
+**Agreement.**
+- Open: agrees. The model gives 0.13, 0.28, 0.43, 0.56 … 0.96 at 12 frames; recorded 0.16, 0.29, 0.40, 0.51 …
+  0.94 (about half a frame offset). This is the "ease-out mostly done in 0.15 s".
+- Close: agrees. 95 % is reached at 0.19 s; recorded 0.17–0.2 s.
+- Scale: differs. There is a 1 % scale (1.01 → 1.0 on open, 1.0 → 1.01 on close) that the recording reported as "no
+  scale". It is 3–4 pt on a 350 pt panel and probably below what the recording could resolve.
+
+Module tile sizes: not done.
+
+### 3. Notification Center panel
+Sent earlier as `REA-B-NC.md`; full detail there and in `NotificationCenter-panel.c`. Summary:
+
+**Click open and close.** Both use one SwiftUI `Spring(duration: 0.3, bounce: -0.2)`: response 0.3 s, damping ratio
+1.25 (`FUN_1001910a4` → `FUN_1001910d8`, static `DAT_1003c1388`).
+- It is used through `FUN_1001e19c4` (`withAnimation(…, .logicallyComplete)`). Open sets x offset 0 and
+  openProgress 1 (`FUN_1001e195c`); close sets x offset W and openProgress 0 (`FUN_1001e1b58`).
+- It moves x only: no fade, scale or blur, and no `Animation.delay` (no stagger).
+
+**Agreement: differs.** The recording fits a critically damped spring better: response 0.3 s for open (RMS 0.015
+against 0.055) and 0.25 s for close.
+
+**Trackpad swipe.** WindowManager's `NotificationCenterSystemGesture` supplies the progress; the panel follows it 1:1.
+- Above 1 it rubber-bands as 1 + 0.25(p−1)/((p−1)/0.75 + 1) (`FUN_1001c6ca8`).
+- Release (`FUN_1001c70b4`): WindowManager decides close or open and supplies the velocity. Completion runs
+  `FluidSpringAnimator` at 60 Hz (`FUN_100211574`):
+  `v = 0.695v + 2(1−p); p += v/60; v = 0.85v − 0.8(p−1)`, stopping when |v| < 0.01.
+
+### 4. Spotlight (SpotlightUIInternal.framework; Spotlight.app holds no UI code)
+**Search field glass.** The glass elements are drawn by the `GlassEffect` / `GlassElementModifier` path,
+`FUN_2adf11f2c`:
+
+    materialEffect(Material._glass(_GlassVariant.regular.size(.large).adaptive(false).excludingShadow()
+                   .interactionState(.disabled).contentLensing(true)), in: _ShapeSet(shapes, smoothness))
+
+- So in 27.2.1 the field uses the **Regular** recipe at size large, with content lensing ("lens") switched on. It does
+  **not** use SiriRecipe or a `spotlightField` subvariant; that string does not occur in SpotlightUIInternal, SearchUI,
+  SpotlightUIShared or SpotlightUIServices. The SiriRecipe branch-A/lens question therefore does not apply to the field.
+- Guess, not traced into DesignLibrary: `contentLensing(true)` resolves to `ResolvedContentEffect.lense` on that
+  recipe.
+
+**Results panel glass.** `FUN_2ade6f690`:
+`_glassEffect(_Glass.siri.subvariant("searchResults").adaptive(false).excludingShadow(true), in: RoundedRectangle(cornerRadius: 37))`.
+- Base `siri` with subvariant `searchResults` takes SiriRecipe **branch A** (not `.listening`) unless contentEffect
+  resolves to `.lense`. The call sets no contentEffect, so it gets the default, which was not traced.
+- Branch A values: face YCC 0.1 / 1.0 / 1.25, blur 8, no ring shadow.
+- A second path, `FUN_2ade65b28`, uses public `Glass.regular` with `glassEffect` plus a window drag gesture. It is
+  probably the compact or drag state (guess).
+
+**Open (invocation).** `FUN_2ade99418` → `FUN_2adea2ff0` adds three `CASpringAnimation`s on the content layer:
+- `transform.scale.x` 1.12 → 1: Spring(0.28, bounce 0.41), or 0.32 under a flag;
+- `transform.scale.y` 0.95 → 1: Spring(0.28, 0.32);
+- `transform.translation.y` → 0: Spring(0.28, 0.32).
+
+The window also gets `alphaValue` with Spring(0.28, 0.41) in `FUN_2ade9ef14`. `WindowAnimationCoordinator.
+InvocationAnimationState` = {xScale 1.12, yScale 0.95, opacity 0, blurRadius 25}, from `FUN_2ade9a5ec` and
+`FUN_2ade9bff0`.
+
+Agreement: partly.
+- The code starts at 1.12× width, not the recorded 1.05×. Model x at frames 1–5: 1.113, 1.096, 1.074, 1.052, 1.031,
+  1.003 at frame 7, then a slight undershoot (0.995 at frame 8, 0.99 at frame 9). With the alpha fade, the first clearly visible frame is around
+  frame 3–4, at about 1.05–1.07×. So it agrees if the first visible frame is about 3 frames in.
+- The code fades alpha in over about 0.1 s and squashes y 0.95 → 1; the recording saw "no fade-in". Differs slightly.
+
+**Close (dismissal).** `FUN_2ade9c2dc` → `FUN_2adea36c8`:
+- layer `transform.scale.x` 1 → 1.12, `scale.y` 1 → 0.95 and `translation.y` → 0, each Spring(0.45, bounce 0.05);
+- window `alphaValue` Spring(0.28, 0.41) and `contentBlurRadius` 0 → 25 with Spring(0.51, 0.05) (`FUN_2ade9ef14`, flag 0).
+
+Agrees qualitatively: fade + blur + slight growth. The recorded 0.05 s is shorter than these springs; the window
+probably orders out once the alpha is about 0.5 (guess).
+
+**Other springs.** `WindowAnimationCoordinator.Animations` statics (`FUN_2ade84974` ff.):
+- Spring(0.49, 0.15).delay(0.17);
+- Spring(0.71, 0.01) and Spring(0.39, 0.39);
+- size-dependent set A: (0.35, 0.43), (0.45, 0.39), (0.55, 0.35), (0.6, 0.31);
+- size-dependent set B: (0.41, 0.394), (0.55, 0.35), (0.65, 0.32);
+- Spring(0.41, 0.12) and Spring(0.2, 0.05).
+
+These are used for resize, morph and jump-to-app; the mapping was not traced.
+
+### 5. SF Symbol effects
+**Where the system UI applies them.**
+- ControlCenter is the only one of the four apps that uses them, through SwiftUI. The contexts below come from nearby
+  strings and are marked as guesses:
+  - `variableColor` `.sequential.reversing` as an indefinite `_SymbolEffectModifier`: `FUN_10031ec60`, the Wi-Fi
+    module (WiFiContentView), so most likely Wi-Fi searching;
+  - variableColor sequential reversing plus `pulse`: `FUN_100425e18` (ListeningMode / MusicRecognition area);
+  - indefinite `Pulse`: `FUN_1005315c0`, Screen Mirroring;
+  - `Appear.up` transition: `FUN_10055d874`;
+  - `DrawOn` transition: `FUN_1005dedd8`;
+  - `Bounce`, `Replace`, and `Rotate` with `SymbolEffectOptions.speed(2)`: `FUN_100266fc8`
+    (Bluetooth / app status items);
+  - `ContentTransition.symbolReplace(.default)` at 10 sites, among them the Sound module (`FUN_10055494c`), Bluetooth
+    (`FUN_10023f8c8`, `FUN_100240188`) and the menu-extra symbol (`FUN_10036fba8`,
+    `SystemBannerAwareMenuExtraSymbolView`).
+- MenuBarAgent, NotificationCenter, SystemBannerUI (the HUD speaker) and SpotlightUIInternal import no symbol-effect
+  API. So the NC bell and the HUD speaker have no effect in 27.2.1.
+- AirDrop was not found in these four.
+
+**Implementation.**
+- The Symbols framework holds the public API. `-[NSSymbolEffect _rbAnimation]` maps effects to RBSymbolAnimation ids
+  (table @0x196a61330): variableColor 1, pulse 2, bounce 3, scale 4, appear 5, disappear 9, wiggle 10, rotate 11,
+  breathe 12, drawOn 13, drawOff 14. Replace uses 6–8; not mapped.
+- The engine is **RenderBox.framework, `RB::Symbol::Animation`**.
+
+**Durations** at speed 1, from `local_duration` 0x196b15570, `intro_duration` 0x196b15904 and `outro_duration`
+0x196b15b9c:
+
+| Effect | Duration |
+|---|---|
+| Bounce | 0.70 s; in split intro/outro mode 0.4333 intro + 0.2667 outro |
+| Wiggle | 0.935 s; split mode 0.3333 + 0.41667 |
+| Rotate | 2.0 s; split mode 2.5 intro and 2.5 outro |
+| Pulse | 2.0 s (1.0 s with flag bit 31) |
+| Breathe | 3.0 s |
+| Scale, Appear | 0.25 s |
+| Disappear | 0.1667 s |
+| Variable color | 1/3 + 1/3·clamp(layers, 1, 3), with other forms for more layers |
+| Replace | 0.667, 0.7, 1.0, or 0.25/0.5 depending on style |
+| DrawOn / DrawOff | `draw_duration` with a base of 0.25 / 0.1667 per layer |
+| Default | 1/3 s |
+
+**Per-layer delay** (`layer_delay` 0x196b15dc0).
+- Bounce and wiggle: 0.05 s per layer; with more than 4 layers, 0.15/(n−1). Down bounces run the layers in reverse
+  order.
+- Variable color: the layer index times 1/9 · (1/3 + n/12 + (2n−8)/60)⁻¹ … for more than 3 layers. The exact form is
+  in the excerpt.
+- `frame_delay`: 0.05 s for the variable-color and pulse types.
+
+**Keyframe tables** (`bounce_keyframes` 0x196b18c14 etc.).
+- Bounce peak 1.109 (up) / 0.909 (down); whole-symbol values 0.95 / 1.05 and 1.059 / 0.95.
+- Bounce segment times 0.21667, 0.21667 and 0.15 (minus the layer offset); outro 0.26667.
+- Pulse goes 1 → 0 → 1 in two equal halves of 1.0 s (0.5 s with the flag).
+- Wiggle angle 0.08727 rad = 5°. In the Symbols framework the direction angles are ±90°, 180° and 360°.
+
+The exact meaning of each pushed value (scale or curve parameter) and the curve ids 1/3/4/5 were not decoded. The
+wiggle and breathe keyframe functions failed to decompile. Treat the keyframe values as raw.
+
+### Not found / not done
+- Volume step size (1/16 and 1/64): not found in these images.
+- The HUD's 10 pt right margin: not found as a constant.
+- Timeout mode for the volume banner: `.short` is a guess.
+- Control Center module tile sizes: not done.
+- NC panel width W: probably 424 (guess).
+- The view-side use of NC's `OpenSlideModifier`: not traced.
+- Spotlight: the mapping of the Animations statics, and the results panel's contentEffect default: not traced.
+- RenderBox keyframe curve semantics: not decoded.
+
+## Answers from system files (no GUI)
+
+- Q-dock-11 Default Dock items on a clean 27.2.1 account (Dock.app/Contents/Resources/default.plist, persistent-apps
+  in order): Apps, Safari, Messages, Mail, Maps, Photos, FaceTime, Phone, Calendar, Contacts, Reminders, Notes, TV,
+  Music, Keynote Creator Studio, Numbers Creator Studio, Pages Creator Studio, Games, App Store, iPhone Mirroring,
+  System Settings (the three Creator Studio apps only appear if installed). persistent-others: the Downloads folder
+  (showas 1 = Fan, arrangement 2 = Date Added; the usual Dock key meanings, 0 automatic, 2 grid, 3 list). Finder is not in the list because the Dock always puts it
+  first; Trash is always last. So: Finder, Apps (the Launchpad replacement), ... System Settings | Downloads, Trash.
+  Recent apps section: `show-recents` defaults to on (separator before the recent apps).
+- Q-settings-08 Sidebar order (System Settings.app/Contents/Resources/Sidebar124.plist): groups separated by a gap:
+  1 Apple Account, Family | 2 follow-up suggestions (only when there are any) | 3 Wi-Fi, Bluetooth, Network, VPN,
+  Battery (Battery only on Macs with one; desktops show Energy) | 4 ClassKit / Classroom (only when managed) |
+  5 General, then alphabetically sorted: Wallpaper, Accessibility, Appearance, Menu Bar (ControlCenter-Settings
+  extension, titled "Menu Bar" on 27), Desktop & Dock, Displays, Siri, Spotlight -> shown sorted by localised name
+  (en: Accessibility, Appearance, Desktop & Dock, Displays, Menu Bar, Siri, Spotlight, Wallpaper) | 6 Notifications,
+  Sound, Focus, Screen Time | 7 Lock Screen, Privacy & Security, Touch ID & Password, Users & Groups |
+  8 Internet Accounts, Game Center, iCloud, Wallet & Apple Pay | 9 Headphones (when paired), Keyboard, Mouse,
+  Trackpad, Game Controllers, CDs & DVDs, Printers & Scanners | 10 "Others" catch-all (third-party panes).
+  Passwords is no longer a pane (it is an app).
+
+## Q-dock (27.2.1)
+
+How it was measured: user account (Dark icon style, Multicolour accent, tilesize 33, magnification off), 1710x1107 pt at 2x. Solid Electric Blue wallpaper (69,83,206) or solid colour windows placed behind the surface. Dock prefs were exported first, changed only for a test, and restored with import + `killall Dock`.
+- Pictures: `reference/screens/27.2.1/dock/` (see INDEX.md).
+- Data: `reference/re/27.2.1/live/dock/`: `dock-geometry.json`, `dock-live.json`, `dock-menus.json`, `mission-control.json`, `apps-window.json`, `reconciliation-42.json`.
+- Another process's layer tree cannot be dumped, so "glass" answers below come from pixels.
+
+- Q-dock-01: Material, from pixels only (no layer dump; the RE agents may have the recipe).
+  - Dock background over solid colours, dark mode: white 176, black 12, grey 127 → 108, red → (248,38,20), green → (59,197,16), Electric Blue → (59,75,216). Fit on greys: 12 + 164·(in/255)^0.77, plus a saturation boost.
+  - Light mode: white 229, black 38, grey 127 → 134, red → (255,58,38). Fit: 38 + 0.75·in, plus the same saturation boost.
+  - Blur is small (σ about 1–2 pt): 8 pt bars stay fully resolved. Lens refraction within about 6 pt of the edges.
+  - 1 pt bright rim. Over black: 104 top / 65 bottom in dark, 116 / 83 in light. An inner glow fades to the fill over about 5 pt.
+  - No outer shadow (the white row right above the Dock stays 255).
+  - The Cmd-Tab panel is pixel-identical (same material). (solid-colour windows behind the Dock)
+- Q-dock-02: Default tile size and Dock size.
+  - With the `tilesize` key absent the built-in default is 64 (AX identical to tilesize 64). A fresh account could not be checked.
+  - Item pitch = tile+2 at 32/33 and tile+4 at 48/64. Dock height = tile+14 at 32/33 (46, 47) and tile+20 at 48/64 (68, 84).
+  - Icon art ≈ 0.79·tile: 25.5 at 33, about 38.5 at 48, 50.5 at 64.
+  - Width = 2m + n·pitch + s·(0.478·tile), where n = items, s = separators, m = 2.7 (32/33), 7.6 (48), 8.4 (64).
+  - 10 items with no separator: 696.8 x 84 at 64, 355.6 x 47 at 33. Add 30.6 / 15.8 per separator.
+  - Second display: not measured (MBA only). (AX + pixels at 32/33/48/64)
+- Q-dock-03: Padding (tile 33).
+  - Background top to art top: 10.5. Art bottom to background bottom: 11 (the dot sits there). Background left to first art: 8. Background bottom to screen edge: 5.
+  - Tile 48: 15.5 / 15 / 15. Tile 64: 17 / 16.5 / 16.5.
+  - The 5 pt bottom gap is the same at every size. (AX + pixels)
+- Q-dock-04: Corner radius (circle fit): 14 at 32/33, 21 at 48, 27.6 at 64. At 64 a continuous-corner fit is better (31).
+  - So about 0.43·tile, or 0.30–0.33·height. Not fixed. (corner fit on 2x crops)
+- Q-dock-05: Icon spacing. AX item frames touch (0 gap).
+  - Art-to-art gap: 9.5 at 33 (pitch 35, art 25.5) and 17.5 at 64. (AX + pixels)
+- Q-dock-06: Separator.
+  - Item 0.478·tile wide (15.8 at 33, 30.6 at 64). Line 1 pt wide, from background top+6 to bottom−6 (35 pt at 33), square ends.
+  - Colour: vibrant blend, plus-lighter +65/255 in dark and plus-darker −57/255 in light. Same value over black, grey and white.
+  - Art to art across it: 25.3 at 33. (pixels over 3 greys)
+- Q-dock-07: Running dot.
+  - Diameter 4.1, centred on the tile. Centre 5 pt below the art bottom (y 1096 at 33), 6 pt above the background bottom.
+  - Colour: dark plus-lighter +125/255 (12 → 137, red background → (255,164,145)); light plus-darker −128/255.
+  - Same single dot for a hidden app and for an app with 2 windows. (pixels)
+- Q-dock-08: Hover label: yes, it is glass (a checker shows through, refracted, with a light rim).
+  - Capsule 26 pt tall (r 13), width = text + 2·14 ("Finder" 67.5).
+  - A tail at the bottom centre, about 16 wide x 6.5 tall, rounded tip, pointing at the icon. Tip 2.5 pt above the Dock background (13 pt above the art at tile 33).
+  - Text: SF 14 regular, white in dark (244), near-black in light (37).
+  - Fill over black / white: dark 31 / 180, light 131 / 249. Shadow very faint (≤3 levels).
+  - Dock on the left: capsule to the right of the icon, 5.5 pt gap, no tail. (pixels over solids and patterns)
+- Q-dock-09: Press state: art × 0.475 on all channels (rms 0.4), no scale.
+  - On in 1 frame at mouse-down, off in 1 frame at mouse-up: no animation.
+  - Holding opens the context menu in under 0.8 s. (stills + 60 fps)
+- Q-dock-10: Context menu (Option alternates read from AX). Full lists are in `dock-menus.json`.
+  - Running app: [recent documents] — [windows] — app items (e.g. New Document) — Options ▸ — Show All Windows, Hide/Show (Opt: Hide Others), Quit (Opt: Force Quit).
+  - Options ▸ for a running unpinned app: Keep in Dock, Open at Login, Show in Finder.
+  - Not running, pinned: Options ▸ (Remove from Dock, Open at Login, Show in Finder) — Open.
+  - Finder: [windows] — New Finder Window, New Smart Folder, Find… — Go to Folder…, Connect to Server… — [recent folders] — Show All Windows, Show/Hide. No Quit.
+  - Downloads: Sort by (Name, Date Added, Date Modified, Date Created, Kind) — Display as (Folder, Stack) — View content as (Fan, Grid, List, Automatic) — Options ▸ (Remove from Dock, Show in Finder) — Open "Downloads".
+  - Trash: Open — Empty Bin.
+  - Shape: not the standard menu. It is a glass bubble with a tail at the icon centre, like the label, radius about 14 (visual). The submenu is a normal glass menu.
+  - Placement: menu window x = icon centre − 40, so the body extends to the right of the icon. Window bottom = Dock top. Body inset 13 pt. Rows 24, separators 11, accent highlight pill. (AX + pictures)
+- Q-dock-11: See nongui-answers.md: Finder, Apps, Safari, … System Settings | Downloads, Trash. Apps (the Launchpad replacement) is present and Finder is always first. Recents are on by default (Q-14).
+- Q-dock-12: Stack, measured on my own test folder with 11 items.
+  - Tile: "Stack" mode shows the newest file's icon; "Folder" mode shows the folder icon. While a stack is open its tile shows a chevron.
+  - Fan: an arc rising to the right. Items grow from 65.5 to 78.3 pt bottom to top, step 64.6 pt. Glass capsule labels on the left. Top item "Open in Finder".
+  - Grid: glass bubble with a tail, 546x438 for 11 items. Folder name title at the top. 4 columns, 128 pt cells. Last cell "Open in Finder". Radius about 28 (visual), so the SPEC's 16/24 is low.
+  - List: the context-menu bubble (24 pt rows, small icons), then Options ▸ and Open in Finder. (AX + pictures)
+- Q-dock-13: Minimised windows (minimize-to-application 0).
+  - Own tile right of the separator, after the stacks, before Trash. Same tile size as apps.
+  - Art: the window thumbnail fitted about 31 pt wide at 33 (1300x900 → 31x21.5), with the app icon about 10 pt at the bottom-right.
+  - Genie: 0.5 s ease-in-out in both directions, 0.40–0.48 s visible; see Reconciliation (#42).
+  - Built-in default mineffect = genie. minimize-to-application is off unless set (the user has 1). (AX + pixels)
+- Q-dock-14: Yes. `show-recents` defaults to on: a second separator, then up to 3 recent non-running apps plus every running unpinned app (6 running apps gave 6 tiles).
+  - Tiles look the same as the others. Setting: "Show suggested and recent apps in Dock". (AX)
+- Q-dock-15: Badge (own test app, tile 33).
+  - 13 pt tall. A circle for 1–2 digits; grows to the left (999 → 16, 12345 → 22). From about 34 pt it is middle-truncated ("New…sage").
+  - Top 4 pt above the art top, right edge 3.75 pt outside the art. Red (228,84,69), white text about 9–10 pt.
+  - Attention, critical: jump 36 pt (≈1.09·tile; a launch bounce is 11), then rebounds of 18 and 9 pt. Arcs 0.50 + 0.31 + 0.22 s, then about 1 s rest; repeats every 2.0 s until the app is activated.
+  - Attention, informational: one group (36/18/9) only. (60 fps tracking)
+- Q-dock-16: Autohide: pure slide, no fade, no visible sliver (0 px).
+  - Trigger: bottom 2 pt (y ≥ 1105) anywhere along the bottom edge.
+  - Show: starts about 0.23 s after reaching the edge, 0.17 s ease-out. Top edge per frame: 1105 1100 1094 1087 1083 1077 1070 1065 1060 1057 1055.
+  - Hide: starts about 0.05 s after leaving, 0.17 s ease-in. (60 fps, autohide on temporarily)
+- Q-dock-17: Drag out (own test app): the dragged icon keeps the Dock art size (no lift scale).
+  - A "Remove" bubble (label style, with tail) shows above it once it is outside the Dock.
+  - On release, icon and label fade out linearly in 0.25 s. No poof cloud seen.
+  - Reorder gap: not measured. (stills + 60 fps)
+- Q-dock-18: Left works.
+  - Background x 4.5..52.5 (5 pt from the edge). AX list [10,202,47,738], items 47x35.
+  - Label to the right, 5.5 pt gap. Dot on the left of the icon.
+  - Settings still has the Left/Bottom/Right strings (DesktopSettings.appex); the pane itself was not opened. (orientation set temporarily)
+- Q-dock-19: Cmd-Tab: same material as the Dock (identical fill, 59,75,216 over blue, and the same rim). No layer dump.
+  - Corner about 58 pt circle-equivalent. The straight edge starts 56 pt from the corner, i.e. concentric: selection 34 + padding 24.
+  - No separate shadow seen. (pixels)
+- Q-dock-20: Cmd-Tab size.
+  - 8 apps: panel 1114x176 at (298,466), exactly at the screen centre. Icon 128, pitch 134 (gap 6), padding 24 on all sides. The label sits inside the bottom padding.
+  - 11 apps: 1516 wide.
+  - 16 apps: icons shrink to 94 (pitch 100), panel [34,483,1642,142]. Still one row, 34 pt from the screen sides. (AX)
+- Q-dock-21: Selection: a squircle 120x120 centred on the icon (button frame inset 4).
+  - Corner like an icon: superellipse n≈3, extent 46 pt, circle-equivalent 34.
+  - Fill: vibrant plus-lighter +65 in dark, plus-darker −57 in light. Flat, no blur.
+  - Name only under the selected app: SF 13 bold. White in dark, dark in light. Top 2.5 pt below the 128 frame.
+  - Hovering the pointer moves the selection; there is no separate hover state. (pixels + AX)
+- Q-dock-22: Cmd-Tab behaviour.
+  - Order is MRU (active app first, the previous one selected).
+  - The panel shows about 0.19 s after Tab. A quick tap (release within about 30 ms) switches without showing it.
+  - Keys: Tab, `, Shift-Tab and Left/Right move and wrap at both ends. Home/End jump.
+  - Q quits the selected app; the panel stays open and the icon is removed.
+  - H toggles hide/show of the selected app (no effect seen on the current app).
+  - Hidden apps are listed. Release commits, Esc cancels. (AX + pixels)
+- Q-dock-23: Dock "Apps" = `open -a Apps` (com.apple.apps.launcher, LSUIElement). The F4 key was not tested.
+  - It opens a Spotlight-style UI drawn by the Siri process (layer 23, not in AX). It is not a normal app window, and there is no backdrop dim.
+  - Window 844x617 at (433,251), centred horizontally.
+  - Search capsule 520x87 (r 43.5, dark in both modes), a 10 pt gap, then a glass panel 844x520 (radius about 38 circle-equivalent, continuous corner extent 54.5).
+  - R2 called it "an ordinary window"; that is wrong. (screencapture -l alpha)
+- Q-dock-24: Grid.
+  - 7 columns, pitch 115, first column centre 77 from the panel edge. Icon 60. Row pitch 102.
+  - Label: SF 13 regular, white, cap top 11.5 below the icon, truncated with "…".
+  - Order: a row of 7 suggested/recent apps, a 1 pt separator (x 20..824), then all apps A–Z.
+  - Hover: no change. Keyboard: an accent focus ring, a 69 pt squircle. (pixels)
+- Q-dock-25: Header = the separate capsule above the panel.
+  - Placeholder "Applications", about 22 pt, grey. App Store glyph 26.5x23.5 at 32.5 from the left. "…" 17.5 wide at 37.5 from the right.
+  - The "…" menu: View content as: Grid ✓ / List.
+  - Chip row inside the panel: y +20, height 26, gap 8, inset 20.
+  - Search filters the same grid in place. The field shows "cal — Open". The first result sits on a grey 68 pt plate. (pixels)
+- Q-dock-26: No folders, no pages or dots, no wiggle/edit mode seen.
+  - Categories are chips; clicking one puts a token in the field and filters the grid (iPhone apps included, with a phone badge).
+  - It is a vertical list; a synthetic wheel did not scroll it (not verified).
+- Q-dock-27: Mission Control backdrop: the wallpaper is not dimmed and not blurred (MC = desktop within 0.5% on Tahoe Light and on solid blue).
+  - Only the Spaces bar band is a blur+tint material: ×0.8 on dark solid blue; lighter (×1.18) and blurred on Tahoe Light. A shadow below it over about 20 pt.
+  - The menu bar is replaced by the bar. The Dock stays visible (R2 said it goes away; wrong). Widgets and desktop icons are hidden.
+- Q-dock-28: MC window layout (frames in `mission-control.json`).
+  - One uniform scale for all windows, as large as fits (max 1.0). The layout is spatial, kept near the real positions, not a grid.
+  - 1 window: unchanged.
+  - 2 overlapping: pushed apart vertically, scale 1, gap 13.
+  - 4 stacked: scale 1, minimum gap about 11.
+  - 5 spread: 0.965.
+  - 7 stacked: 0.89, in the area x 17..1692, y 108..1043.
+  - Windows keep their own shadow and radius.
+  - Multi-display: not measured.
+- Q-dock-29: Title on hover only, centred ON the window (not under it).
+  - Capsule 30 pt tall, padding 14.5, SF 13 bold, black text, grey fill (106 over dark content).
+  - No app icon seen (expose-group-apps 0). (pixels)
+- Q-dock-30: Hover outline: an accent ring 4.5 pt wide, 1–1.5 pt outside the window frame (86,151,245 over blue).
+  - It is a separate "Window Highlight Overlay" window = frame +6/7 pt.
+  - No scale, no close button, arrow cursor. Drag to a Space: not tested.
+- Q-dock-31: Spaces bar.
+  - Band y 0..74 collapsed (covers the menu bar zone) and 0..166 when the pointer is at the top.
+  - Collapsed: name pills ("Desktop" 75x24, r 12, additive +35 fill, SF 13 white, y 41.5). "+" is a 20 pt glyph at x 1674..1694, centre y 37.
+  - Expanded: thumbnail 147x98 including a 3 pt accent ring (1 pt gap), name below in 13 pt.
+  - A full-screen app gets its own tile with the app name. With a full-screen Space the bar opened already expanded.
+  - The band is blur+tint material, not glass with a rim. (pixels + window list)
+
+### Extra (#37)
+- Mission Control with 3–5 windows: Q-27..31. Pictures: `mc-{light,dark}.png` (5 windows), `mc-bar-expanded-*`, `mc-hover-*`.
+- Cmd-Tab with 5+ apps: Q-19..22. Pictures: `cmdtab-{light,dark}.png` (11 apps).
+- Applications window: 844x617 (search capsule 520x87 + panel 844x520), centred.
+  - Category list in order: Utilities, Developer Tools, Social, Productivity & Finance, Entertainment, Creativity, Information & Reading, Travel, Other. It depends on the installed apps and scrolls sideways.
+  - Grid: icon 60, pitch 115 x 102, 7 columns, labels 13 pt.
+  - Launching an app (click or Return) closes the panel.
+  - Esc: the 1st Esc removes the Apps panel in one frame but leaves the plain Spotlight bar ("Search or Ask"); the 2nd Esc closes it. Reopening soon keeps the last query.
+  - Pictures: `apps-{light,dark}.png`, `apps-category-{light,dark}.png` (Utilities). Numbers: `apps-window.json`.
+
+### Reconciliation (#42)
+
+Method: 60 fps full-screen recordings (real frame timestamps), solid Electric Blue wallpaper, cursor not captured. Genie: per frame, the area that still differs from the final frame (menu bar, desktop widgets, text caret excluded), normalised to the window's area = "remaining". Fades: least-squares alpha `frame = after + a * (before - after)` over the panel / label rect, then easing fits. Data: `reference/re/27.2.1/live/dock/reconciliation-42.json`.
+
+- (a) Minimise genie. The code's 0.5 s holds; the earlier 0.22 s came from a cut-off tail (the old metric was "share of total pixel change", which the big window body dominates; the thin genie neck sliding into the icon has few pixels and was lost under the threshold).
+  - Last unchanged frame to first frame equal to the final frame:
+    - TextEdit 300x200 near (700,400): minimise 0.43 s, restore 0.40 s.
+    - TextEdit 300x200 far (1150,60): minimise 0.48 s, restore 0.42 s.
+    - TextEdit 1300x900: minimise 0.45 s, restore 0.42 s.
+    - The same window with minimize-to-application 0 (into its own tile): minimise 0.45 s, restore 0.48 s.
+    - Finder 780x500: about 0.40 s of genie, then the other Finder window turns active 0.15 s later.
+  - Remaining per frame, TextEdit 1300x900, minimise: 1.00 .98 .95 .91 .86 .81 .76 .71 .66 .62 .57 .53 .48 .43 .38 .32 .26 .20 .15 .10 .07 .04 .02 .01 .01 0. Restore (1 - shown): 1.00 .99 .98 .97 .94 .91 .87 .82 .76 .71 .65 .60 .55 .51 .46 .41 .37 .32 .28 .22 .16 .12 .08 .05 .01 0.
+  - Fits on that series: ease-in-out (.42,0,.58,1) T = 0.50 s (minimise 0.496, restore 0.504), starting about 2 to 3 frames before the first visible change (the slow start is invisible). The small window gives T 0.36 to 0.45 s with a visible part of 0.40 to 0.48 s.
+  - The duration does not depend on window size, distance or minimize-to-application (all within 0.40 to 0.48 s visible). Minimise and restore take the same time. The last 5 % (the neck going into the icon) takes about 0.08 s.
+- (b) Cmd-Tab hide on releasing Cmd: alpha per frame (17 ms): 1.0, .94, .94 (a duplicated capture frame), .80, .70, .59, .48, .36, .25, .17, .09, .05, .015, .003 (0). Truly 0 at 0.217 s after the last full frame.
+  - Fit: ease-in-out (.42,0,.58,1) T = 0.236 s, rms 0.014 (cosine 0.224 s). Two recordings gave the same result.
+  - So the code's 0.25 s ease-in-out is right. The earlier 0.1 s was only the steep middle (0.8 to 0.1) above a changed-pixel threshold.
+- (c) Dock hover label fade-out after the pointer leaves the Dock: alpha .997, .985, .94, .90, .87, .79, .70, .62, .53, .48, .38, .28, .19, .125, .07, .05, .009, 0 (17 ms steps). Truly 0 at 0.283 s.
+  - Fit: cosine T = 0.292 s, rms 0.012 (ease-in-out 0.31 s). So the code's 300 ms cosine is right.
+  - The earlier 0.23 s missed the last 0.05 s, where alpha is below 0.07.

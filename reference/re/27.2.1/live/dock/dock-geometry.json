@@ -1,0 +1,955 @@
+{
+ "method": "AX frames of the Dock (axd com.apple.dock) + 2x screenshots on solid Electric Blue (69,83,206); tilesize set with defaults + killall Dock, then restored. 17 items + 2 separators on this account; item titles removed.",
+ "screen": [
+  1710,
+  1107
+ ],
+ "per_tilesize": {
+  "32": {
+   "ax_list": [
+    548,
+    1051,
+    614,
+    46
+   ],
+   "item_w": 34,
+   "item_h": 46,
+   "separator_w": 15.3,
+   "separator_value": "0.1428571",
+   "items": [
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      550.7,
+      1056,
+      34,
+      46
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      584.7,
+      1056,
+      34,
+      46
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      618.7,
+      1056,
+      34,
+      46
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      652.7,
+      1056,
+      34,
+      46
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      686.7,
+      1056,
+      34,
+      46
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      720.7,
+      1056,
+      34,
+      46
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      754.7,
+      1056,
+      34,
+      46
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      788.7,
+      1056,
+      34,
+      46
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      822.7,
+      1056,
+      34,
+      46
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      856.7,
+      1056,
+      34,
+      46
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      890.7,
+      1056,
+      34,
+      46
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      924.7,
+      1056,
+      34,
+      46
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXSeparatorDockItem",
+     "frame": [
+      958.7,
+      1056,
+      15.3,
+      46
+     ],
+     "value": "0.1428571"
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      974,
+      1056,
+      34,
+      46
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      1008,
+      1056,
+      34,
+      46
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      1042,
+      1056,
+      34,
+      46
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXSeparatorDockItem",
+     "frame": [
+      1076,
+      1056,
+      15.3,
+      46
+     ],
+     "value": "0.1428571"
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXFolderDockItem",
+     "frame": [
+      1091.3,
+      1056,
+      34,
+      46
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXTrashDockItem",
+     "frame": [
+      1125.3,
+      1056,
+      34,
+      46
+     ],
+     "value": null
+    }
+   ],
+   "bg": [
+    547.5,
+    1056,
+    615,
+    46
+   ],
+   "radius_circle": 14.0,
+   "art": 25.0,
+   "pad_top": 10.5,
+   "pad_bottom": 10.5,
+   "bg_left_to_art": 8.0
+  },
+  "33": {
+   "ax_list": [
+    539,
+    1050,
+    632,
+    47
+   ],
+   "item_w": 35,
+   "item_h": 47,
+   "separator_w": 15.8,
+   "separator_value": "0.1517857",
+   "items": [
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      541.8,
+      1055,
+      35,
+      47
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      576.8,
+      1055,
+      35,
+      47
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      611.8,
+      1055,
+      35,
+      47
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      646.8,
+      1055,
+      35,
+      47
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      681.8,
+      1055,
+      35,
+      47
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      716.8,
+      1055,
+      35,
+      47
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      751.8,
+      1055,
+      35,
+      47
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      786.8,
+      1055,
+      35,
+      47
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      821.8,
+      1055,
+      35,
+      47
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      856.8,
+      1055,
+      35,
+      47
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      891.8,
+      1055,
+      35,
+      47
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      926.8,
+      1055,
+      35,
+      47
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXSeparatorDockItem",
+     "frame": [
+      961.8,
+      1055,
+      15.8,
+      47
+     ],
+     "value": "0.1517857"
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      977.5,
+      1055,
+      35,
+      47
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      1012.5,
+      1055,
+      35,
+      47
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      1047.5,
+      1055,
+      35,
+      47
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXSeparatorDockItem",
+     "frame": [
+      1082.5,
+      1055,
+      15.8,
+      47
+     ],
+     "value": "0.1517857"
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXFolderDockItem",
+     "frame": [
+      1098.3,
+      1055,
+      35,
+      47
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXTrashDockItem",
+     "frame": [
+      1133.3,
+      1055,
+      35,
+      47
+     ],
+     "value": null
+    }
+   ],
+   "bg": [
+    538.5,
+    1055,
+    633,
+    47
+   ],
+   "radius_circle": 14.0,
+   "art": 25.5,
+   "pad_top": 10.5,
+   "pad_bottom": 11.0,
+   "bg_left_to_art": 8.0
+  },
+  "48": {
+   "ax_list": [
+    382,
+    1029,
+    946,
+    68
+   ],
+   "item_w": 52,
+   "item_h": 68,
+   "separator_w": 23.4,
+   "separator_value": "0.2857143",
+   "items": [
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      389.6,
+      1034,
+      52,
+      68
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      441.6,
+      1034,
+      52,
+      68
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      493.6,
+      1034,
+      52,
+      68
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      545.6,
+      1034,
+      52,
+      68
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      597.6,
+      1034,
+      52,
+      68
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      649.6,
+      1034,
+      52,
+      68
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      701.6,
+      1034,
+      52,
+      68
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      753.6,
+      1034,
+      52,
+      68
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      805.6,
+      1034,
+      52,
+      68
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      857.6,
+      1034,
+      52,
+      68
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      909.6,
+      1034,
+      52,
+      68
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      961.6,
+      1034,
+      52,
+      68
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXSeparatorDockItem",
+     "frame": [
+      1013.6,
+      1034,
+      23.4,
+      68
+     ],
+     "value": "0.2857143"
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      1037,
+      1034,
+      52,
+      68
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      1089,
+      1034,
+      52,
+      68
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      1141,
+      1034,
+      52,
+      68
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXSeparatorDockItem",
+     "frame": [
+      1193,
+      1034,
+      23.4,
+      68
+     ],
+     "value": "0.2857143"
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXFolderDockItem",
+     "frame": [
+      1216.4,
+      1034,
+      52,
+      68
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXTrashDockItem",
+     "frame": [
+      1268.4,
+      1034,
+      52,
+      68
+     ],
+     "value": null
+    }
+   ],
+   "bg": [
+    381.5,
+    1034,
+    947,
+    68
+   ],
+   "radius_circle": 21.1,
+   "art": 38.5,
+   "pad_top": 15.5,
+   "pad_bottom": 15.0,
+   "bg_left_to_art": 15.0
+  },
+  "64": {
+   "ax_list": [
+    238,
+    1013,
+    1234,
+    84
+   ],
+   "item_w": 68,
+   "item_h": 84,
+   "separator_w": 30.6,
+   "separator_value": "0.4285714",
+   "items": [
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      246.4,
+      1018,
+      68,
+      84
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      314.4,
+      1018,
+      68,
+      84
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      382.4,
+      1018,
+      68,
+      84
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      450.4,
+      1018,
+      68,
+      84
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      518.4,
+      1018,
+      68,
+      84
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      586.4,
+      1018,
+      68,
+      84
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      654.4,
+      1018,
+      68,
+      84
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      722.4,
+      1018,
+      68,
+      84
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      790.4,
+      1018,
+      68,
+      84
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      858.4,
+      1018,
+      68,
+      84
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      926.4,
+      1018,
+      68,
+      84
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      994.4,
+      1018,
+      68,
+      84
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXSeparatorDockItem",
+     "frame": [
+      1062.4,
+      1018,
+      30.6,
+      84
+     ],
+     "value": "0.4285714"
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      1093,
+      1018,
+      68,
+      84
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      1161,
+      1018,
+      68,
+      84
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXApplicationDockItem",
+     "frame": [
+      1229,
+      1018,
+      68,
+      84
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXSeparatorDockItem",
+     "frame": [
+      1297,
+      1018,
+      30.6,
+      84
+     ],
+     "value": "0.4285714"
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXFolderDockItem",
+     "frame": [
+      1327.6,
+      1018,
+      68,
+      84
+     ],
+     "value": null
+    },
+    {
+     "role": "AXDockItem",
+     "sub": "AXTrashDockItem",
+     "frame": [
+      1395.6,
+      1018,
+      68,
+      84
+     ],
+     "value": null
+    }
+   ],
+   "bg": [
+    237.5,
+    1018,
+    1235,
+    84
+   ],
+   "radius_circle": 27.6,
+   "radius_continuous_fit": 31.1,
+   "art": 50.5,
+   "pad_top": 17.0,
+   "pad_bottom": 16.5,
+   "bg_left_to_art": 16.5
+  }
+ },
+ "default_tilesize_when_key_absent": 64,
+ "notes": [
+  "bg bottom = 1102 at every size: 5 pt gap to the screen bottom",
+  "item frames abut (no gap); item w = tile+2 (32,33) / tile+4 (48,64); separator item w = 0.478*tile",
+  "list frame width = 2*margin + sum(items); margin 2.7 (32/33), 7.6 (48), 8.4 (64)",
+  "corner radius about 0.44*tile (circle fit), continuous-looking at 64",
+  "separator line: 1 pt wide, from bg top+6 to bg bottom-6 (35 pt at tile 33), square ends",
+  "running dot: 4.1 pt diameter, centre 5 pt below the art bottom (y 1096 at tile 33), centred on the tile"
+ ]
+}
