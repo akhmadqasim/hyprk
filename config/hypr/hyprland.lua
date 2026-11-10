@@ -86,26 +86,54 @@ hl.config({
     dwindle = { preserve_split = true },
 })
 
--- macOS motion (SPEC.md 9.9.4/9.9.5):
---   SwiftUI Animation.default = spring(response 0.5, dampingFraction 1.0): k = (2pi/0.5)^2 = 158,
---   c = 2*sqrt(k) = 25 (critically damped). CA's CASpringAnimation default (1, 100, 10) is bouncier
---   and used for the Dock-like bounce. Windows: ScaleUpAndIn 0.5 s, ScaleDownAndOut 0.25 s.
-hl.curve("swiftui",   { type = "spring", mass = 1, stiffness = 158, damping = 25 })
+-- macOS motion. Values from the binaries: liquid-glass-re/SPEC.md 9.9.4 (SwiftUI) and 11 (windows).
+--   Window open = AppKit ScaleUpAndIn (Solarium): 0.5 s, scale 0.98 -> 1 on a CASpringAnimation
+--     (perceptual 0.3, bounce ~0.27, initialVelocity 11.5), NO fade. Hyprland springs start at rest,
+--     so the curve is a bezier fitted to the sampled spring (max error 0.013, overshoot 1.046 at 40%).
+--   Window close = ScaleDownAndOut: 0.25 s, scale 1 -> 0.98, alpha 1 -> 0 on a critically damped
+--     spring (perceptual 0.1812, v0 13) = strong ease-out (bezier fit, max error 0.013).
+--   Zoom / frame changes: NSWindow animationResizeTime caps at 0.35 s; NSAnimation default easeInOut.
+--   Spaces: Dock's spring was not recovered (SPEC 11.6); SwiftUI default spring (0.5, 1.0) stays.
+--   Reduce Motion: no window open/close animation at all, Spaces cross-fade (SPEC 11.2).
+-- Hyprland speed unit is 100 ms (speed 5 = 0.5 s); springs run in real time and ignore speed.
+hl.curve("swiftui",   { type = "spring", mass = 1, stiffness = 158, damping = 25 })   -- (2pi/0.5)^2, 4pi/0.5
 hl.curve("caSpring",  { type = "spring", mass = 1, stiffness = 100, damping = 10 })
 hl.curve("macEase",   { type = "bezier", points = { {0.25, 0.1}, {0.25, 1} } })
 hl.curve("macOut",    { type = "bezier", points = { {0.2, 0.9}, {0.3, 1} } })
-hl.curve("easeInOut", { type = "bezier", points = { {0.42, 0}, {0.58, 1} } })   -- SwiftUI legacy default
+hl.curve("easeInOut", { type = "bezier", points = { {0.42, 0}, {0.58, 1} } })   -- SwiftUI legacy / NSAnimation default
+hl.curve("winOpen",   { type = "bezier", points = { {0.275, 1.475}, {0.225, 0.95} } })  -- ScaleUpAndIn spring
+hl.curve("winClose",  { type = "bezier", points = { {0.312, 1.25}, {0.5, 0.912} } })    -- ScaleDownAndOut spring
 
 hl.animation({ leaf = "global",      enabled = true, speed = 5,   bezier = "macEase" })
-hl.animation({ leaf = "windows",     enabled = true, speed = 5,   spring = "swiftui", style = "popin 90%" })   -- open: scale 0.9 -> 1 + fade
-hl.animation({ leaf = "windowsOut",  enabled = true, speed = 2.5, bezier = "macEase",  style = "popin 90%" })  -- close: 0.25 s
-hl.animation({ leaf = "fadeIn",      enabled = true, speed = 5,   bezier = "macOut" })
-hl.animation({ leaf = "fadeOut",     enabled = true, speed = 2.5, bezier = "macEase" })
 hl.animation({ leaf = "fade",        enabled = true, speed = 3,   bezier = "macEase" })
 hl.animation({ leaf = "layersIn",    enabled = true, speed = 3.5, bezier = "macOut",  style = "fade" })
 hl.animation({ leaf = "layersOut",   enabled = true, speed = 2.5, bezier = "macEase", style = "fade" })
-hl.animation({ leaf = "workspaces",  enabled = true, speed = 5,   spring = "swiftui", style = "slide" })
 hl.animation({ leaf = "border",      enabled = false })
+
+-- Global so Settings > Accessibility (state/accessibility.lua via `hyprctl eval`, same Lua state)
+-- can switch it: hyprk_motion(true) = Reduce Motion.
+function hyprk_motion(reduce)
+    if reduce then
+        hl.animation({ leaf = "windowsIn",   enabled = false })
+        hl.animation({ leaf = "windowsOut",  enabled = false })
+        hl.animation({ leaf = "fadeIn",      enabled = false })
+        hl.animation({ leaf = "fadeOut",     enabled = false })
+        hl.animation({ leaf = "workspaces",  enabled = true, speed = 4, bezier = "easeInOut", style = "fade" })
+    else
+        hl.animation({ leaf = "windowsIn",   enabled = true, speed = 5,   bezier = "winOpen",  style = "popin 98%" })
+        hl.animation({ leaf = "windowsOut",  enabled = true, speed = 2.5, bezier = "winClose", style = "popin 98%" })
+        hl.animation({ leaf = "fadeIn",      enabled = false })   -- macOS windows appear at full alpha
+        hl.animation({ leaf = "fadeOut",     enabled = true, speed = 2.5, bezier = "winClose" })
+        hl.animation({ leaf = "workspaces",  enabled = true, speed = 5, spring = "swiftui", style = "slide" })
+    end
+    hl.animation({ leaf = "windowsMove", enabled = not reduce, speed = 3.5, bezier = "easeInOut" })   -- zoom cap 0.35 s
+end
+do  -- start from the saved setting so the first frame is already right
+    local f = io.open(hyprk .. "/state/appearance.json", "r")
+    local txt = f and f:read("a") or ""
+    if f then f:close() end
+    hyprk_motion(txt:match('"reduceMotion"%s*:%s*true') ~= nil)
+end
 
 ------------------------------------------------------- liquid glass ----
 -- shell layers that carry glass (namespaces hyprk-<name>), shared by the plugin and the blur rule
@@ -130,6 +158,15 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
         } } })
     end)
     if ok then hl.env("HYPRK_GLASS", "plugin") else print("hyprk: liquidglass not loaded: " .. tostring(err)) end
+end
+-- Window motion Hyprland cannot express (plugin-motion/): the Dock genie on minimize/restore.
+-- Minimize stays "move to special:minimized"; the plugin plays the genie first.
+local motionSo = hyprk .. "/plugin-motion/build/libhyprkmotion.so"
+local hm = io.open(motionSo, "r")
+if hm then
+    hm:close()
+    local ok, err = pcall(hl.plugin.load, motionSo)
+    if not ok then print("hyprk: hyprkmotion not loaded: " .. tostring(err)) end
 end
 
 ---------------------------------------------------------- layer rules ----
