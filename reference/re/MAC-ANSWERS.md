@@ -609,3 +609,139 @@ What 27.2.1 shows on this Mac (things to diff against the PC's 27.2 references; 
 - Volume / brightness HUD: a glass capsule at the top right under the menu bar (MenuBarAgent), see the HUD section.
 - Menu bar: 34 pt on this notched display, no background, top-of-screen highlight dimming over bright wallpapers.
 - Toolbars: item groups on 36 pt glass capsules, flat titlebar, full-height flush sidebar (see Q9).
+
+### R3b-2 Menu bar, Control Center and Notification Center glyphs
+
+Same pipeline and rules as R3b: no git, no GUI, no defaults writes. Nothing existing was overwritten. `names.json` was extended, and some notes in `symbols` were corrected (listed at the end).
+
+**Files added**
+- `themes/icons/sf-symbols/svg/`
+  - 450 SF Symbol SVGs at their surface size, named `<symbol>.<weight>.<pt>pt[.hierarchical|.var-N|.tint-<colour>].svg`
+  - 46 vector assets, `asset.<source>.<name>.svg`
+  - 22 battery composites, `menubar-battery-level-<0..100>-<light|dark>.svg`
+- `themes/icons/sf-symbols/png/`: 34 system battery bitmaps, `menubar-battery-<state>@2x-<light|dark>.png` (52×28 px)
+- `names.json` has new keys: `menubar` (52 entries), `controlcenter` (44), `notificationcenter` (11), `focusModes` (10). Each entry has element, symbol, size, size basis, weights, rendering, confidence, evidence and files. Per-file metrics are in `files`, in the same schema as R3b.
+
+**How the names were found**
+- **Strings in the binaries:**
+  - C strings and Swift string literals in ControlCenter.app, SystemUIServer, NotificationCenter.app, MenuBarAgent, TimeMachine.menu, and the frameworks ControlCenter links (MenuBarClient, DoNotDisturb, SystemStatus, LoginUIKit, HearingUtilities).
+  - Short Swift literals are not stored as strings, so I decoded them from the instructions that build them (e.g. `switch.2`, `speaker.fill`, `sun.min.fill`, `play.fill`).
+- **Focus modes** come from `DNDSystemImageNameForModeSemanticType()` and `DNDSystemColorNameForModeSemanticType()` called at run time:
+
+  | Focus | Symbol | Colour |
+  |---|---|---|
+  | Do Not Disturb | moon.fill | indigo |
+  | Sleep | bed.double.fill | indigo |
+  | Driving | car.fill | indigo |
+  | Fitness | figure.run | green |
+  | Work | person.lanyardcard.fill | teal |
+  | Personal | person.fill | purple |
+  | Reading | book.closed.fill | orange |
+  | Gaming | rocket.fill | blue |
+  | Mindfulness | apple.mindfulness | mint |
+  | Reduce Interruptions | `_gm` (private, Apple Intelligence-like) | purple/teal |
+
+  These are sure; light and dark sRGB values are in `focusModes`.
+- **Sizes:** the binaries do not reveal sizes. I measured glyphs in Apple's 27 screenshots (`reference/screens/macos27-control-center.png`, `macos27-notification-center.png`), calibrated by the 13 pt menu bar text cap height. Accuracy is about ±1 pt. Weight cannot be told from those images, so regular and medium are rendered (NC also semibold).
+
+  | Surface | Measured size | Rendered |
+  |---|---|---|
+  | Menu bar | wifi ~15.5, switch.2 ~15, siri ~13.4 | 13/14/15 pt |
+  | CC toggle tiles (Wi-Fi/Bluetooth/AirDrop/Focus) | ~18 | 18 pt |
+  | CC round buttons (Dark Mode, Screen Mirroring, Stage Manager, the menubar.dock.rectangle button) and Now Playing play | ~23–25 | 24 pt |
+  | Now Playing previous/next | ~17 | 17 pt |
+  | Slider glyphs | ~16 | 16 pt |
+  | Sound output (airplayaudio) | ~13 | 13 pt |
+  | NC xmark | ~12–13 | 13 pt |
+
+**Main mappings** (full list in names.json)
+
+Menu bar:
+
+| Item | Glyph | Confidence |
+|---|---|---|
+| Wi-Fi | wifi, levels as variable value `.var-0/20/50` | sure |
+| Wi-Fi off / no internet / hotspot / scanning | wifi.slash, wifi.exclamationmark, personalhotspot; scanning = ControlCenter assets `wifi.menu.scanning.1-3` | likely |
+| Bluetooth | bluetooth (private) | likely |
+| Control Center | switch.2 | sure |
+| Spotlight | magnifyingglass | likely |
+| Siri | siri (new circle-and-wave glyph) | sure |
+| Sound | speaker.wave.3.fill with variable levels, speaker.slash.fill (muted), speaker.fill | likely |
+| AirDrop | airdrop / airdrop.slash (private) | likely |
+| Screen Mirroring | rectangle.on.rectangle | likely |
+| Accessibility Shortcuts | accessibility | likely |
+| Hearing | ear | likely |
+| Fast User Switching | person.crop.circle | likely |
+| Time Machine | clock.arrow.circlepath (idle); custom glyph `time_machine_backingup` from TimeMachine.menu (backing up) | likely / sure |
+| VPN | network.badge.shield.half.filled (CC module); legacy `VPN.menu` frames `asset.vpnmenu.VPN0-4` | likely / sure |
+| Privacy indicators | mic.fill, video.fill, location.fill | likely |
+| Timer, Music Recognition, Voice Control | timer, shazam.logo.fill, voice.control | likely |
+| Now Playing | play.fill / pause.fill | guess |
+| Display | display | guess |
+| Keyboard Brightness | light.max | guess |
+| Clock | text only, no glyph | sure |
+
+Control Center:
+
+| Element | Glyph | Confidence |
+|---|---|---|
+| Wi-Fi / Bluetooth / AirDrop tiles | blue glyph on white when on (`.tint-systemBlue`) | sure |
+| Focus | moon.fill, plus each mode's glyph tinted in its colour | sure |
+| Stage Manager | sidebar.squares.leading, hierarchical (found by visual match only; the name is in no binary) | likely |
+| Screen Mirroring | rectangle.on.rectangle | sure |
+| Dark Mode | appearance.darkmode (private) | likely |
+| Unidentified button | menubar.dock.rectangle, hierarchical (which module it belongs to is unknown) | likely |
+| Display slider | sun.min.fill / sun.max.fill | sure |
+| Sound slider | speaker.fill / speaker.wave.3.fill | sure |
+| Sound output button | airplayaudio | sure |
+| Now Playing | backward.fill, play.fill, forward.fill (sure); pause.fill (likely) | sure / likely |
+| Night Shift, True Tone | nightshift, truetone (private) | likely |
+| Hearing | ear, hearingdevice.ear | likely |
+| Keyboard Brightness | light.min / light.max | guess |
+| Users | person.crop.circle | likely |
+
+Notification Center:
+
+| Element | Glyph | Confidence |
+|---|---|---|
+| Clear / close | xmark | sure |
+| Clear (filled) | xmark.circle.fill | likely |
+| Group expand / Show less | chevron.down / chevron.up | likely |
+| Open | chevron.forward | likely |
+| Options | ellipsis | likely |
+| Summary | text.line.2.summary, apple.intelligence, hand.thumbsup/down | likely |
+| Edit Widgets | text-only pill, no glyph | sure |
+
+**Battery (menu bar).**
+- It is not an SF Symbol. BatteryUIKit `-[BUIImage _modernBatteryImageForLevel:charging:pluggedIn:…]` draws a 26×14 pt image and returns a 2x bitmap.
+- I captured its drawing into a PDF to get the geometry:
+  - body: rounded rect (0,1,23,12) with radius 4
+  - fill width: `max(2, round(level×23))` pt
+  - opacities: fill 0.847, track 0.498 (light) / 0.549 (dark), cap 0.6
+  - cap: the `battery-cap` nub at x=24
+- The level SVGs are rebuilt from that geometry. They match the system bitmap with mean alpha difference under 0.8/255; edge pixels differ by up to 43/255.
+- Charging, plugged, low-power (yellow), low (red), percent, no-battery and needs-replacement exist only as the 34 system PNGs, plus the vector parts (`asset.batteryuikit.battery-bolt/-plug/-cap/-alert/-missing` and their masks).
+
+**Checks**
+- All 450 symbol SVGs are paths only. 446 match AppKit's own 2x rendering, as in R3b. The 4 exceptions:
+  - The two `person.lanyardcard.fill …tint` files differ only because AppKit's single-colour palette fills the knocked-out person. The SVGs keep the knockout, as the monochrome glyph does.
+  - `airdrop.slash.regular.13pt` and `rectangle.on.rectangle.slash.regular.13pt` differ by a ≤0.25 pt horizontal pixel-snapping offset.
+- 28 of the asset SVGs were flattened to plain paths and checked against the original PDFs. These 18 keep `<clipPath>`/`<mask>` exactly as pdftocairo exported them; they render only with an SVG renderer that supports masks:
+  - `asset.controlcenter.wifi.menu.*`
+  - `asset.vpnmenu.VPN0-3`
+  - the 4 `asset.controlcenter.*-large` files
+  - `asset.controlcenter.battery-small-cap`
+  - `asset.batteryuikit.BatteryEmpty/None/DeadCropped`
+
+**Not done:**
+- Input-source icons: they are flag/letter images from the keyboard-layout bundles, not symbols.
+- The CC "Edit Controls" glyph: not identified.
+- The menu bar point size and weight could not be read from the binaries, so those are measured estimates.
+- Vector versions of the charging/plugged battery: PNG plus parts only.
+
+**Corrections to R3b `symbols`**
+- `battery`: the menu bar uses the BatteryUIKit image above, not battery.100percent.
+- `speaker`: the CC slider uses speaker.fill (left) and speaker.wave.3.fill (right).
+- `sun`: the CC slider uses sun.min.fill / sun.max.fill.
+- `square.grid`: Stage Manager is sidebar.squares.leading.
+- Raised to sure: switch.2, screen.mirror, Now Playing, moon, airdrop.
