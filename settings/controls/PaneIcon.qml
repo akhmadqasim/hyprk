@@ -31,7 +31,10 @@ Item {
     // Measured on 27.2.1: style Default shows the coloured light tiles also in Dark Mode (the -default-dark files are
     // byte-identical to -default-light); dark tiles only with style Dark (the same in both appearances); Clear and
     // Tinted differ between light and dark. Tinted is rendered with the default (blue) accent, it does not follow ours.
-    readonly property bool darkArt: pi.style !== "default" && Theme.dark
+    // Clear and Tinted follow their own Light / Dark / Auto choice (Q-settings-27, #35); Dark is dark in both
+    // appearances; Auto follows the window mode
+    readonly property string variant: AppState.appearance.iconStyleVariant || "auto"
+    readonly property bool darkArt: pi.style !== "default" && (pi.style === "dark" || variant === "auto" ? Theme.dark : variant === "dark")
     Image {
         id: asset
         anchors.centerIn: parent

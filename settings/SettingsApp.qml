@@ -7,8 +7,11 @@ import "Panes.js" as Panes
 // Quickshell) give it a window and handle the window signals.
 Item {
     id: app
-    readonly property int accountHeight: Theme.sidebar.accountAvatar + 18
+    // the account row plus the group break after it (Family, the second row of that group, is not drawn)
+    readonly property int accountHeight: Theme.sidebar.accountHeight + Theme.sidebar.groupGap
     property bool windowActive: Window.active   // forced on for snapshots
+    Binding { target: Theme; property: "windowActive"; value: app.windowActive }
+    Binding { target: Tokens; property: "windowActive"; value: app.windowActive }
     onSnapshotPathChanged: if (snapshotPath !== "") windowActive = true
     property string currentId: "appearance"
     // Non-empty: render once, save a PNG here and quit (reference comparisons).
@@ -69,7 +72,7 @@ Item {
         topLeftRadius: Theme.window.radius
         bottomLeftRadius: Theme.window.radius
         color: Theme.sidebar.fill
-        Rectangle { anchors.right: parent.right; width: 1; height: parent.height; color: Theme.sidebar.stroke }
+        Rectangle { anchors.right: parent.right; width: Theme.sidebar.strokeWidth; height: parent.height; color: Theme.sidebar.stroke }
 
         MouseArea { // dragging the empty top of the sidebar moves the window
             width: parent.width; height: Theme.window.toolbarHeight
@@ -90,7 +93,7 @@ Item {
         }
         ListView {
             id: list
-            anchors.top: search.bottom; anchors.topMargin: 4
+            anchors.top: parent.top; anchors.topMargin: Theme.sidebar.listTop
             anchors.bottom: parent.bottom; anchors.bottomMargin: 8
             x: Theme.sidebar.rowMargin; width: parent.width - 2 * Theme.sidebar.rowMargin
             clip: true
@@ -103,13 +106,15 @@ Item {
                 const panes = app.visiblePanes;
                 const i = panes.findIndex(p => p.id === app.currentId);
                 if (i < 0) return;
-                let y = search.text === "" ? app.accountHeight : 0;   // header
+                // content coordinates: rows start at 0, the header (account) sits above at originY
+                let y = 0;
                 for (let k = 0; k <= i; k++)
                     y += Theme.sidebar.rowHeight + (k > 0 && panes[k - 1].group !== panes[k].group ? Theme.sidebar.groupGap : 0);
-                const top = y - Theme.sidebar.rowHeight - originY;
-                if (top < contentY || y - originY > contentY + height) positionViewAtIndex(i, ListView.Contain);
+                if (y - Theme.sidebar.rowHeight < contentY || y > contentY + height) positionViewAtIndex(i, ListView.Contain);
             }
-            Component.onCompleted: reveal()
+            // once laid out: a 0-height list would scroll on its own
+            property bool _revealed: false
+            onHeightChanged: if (!_revealed && height > 0) { _revealed = true; reveal(); }
             Connections { target: app; function onCurrentIdChanged() { list.reveal(); } }
             header: search.text === "" ? accountCard : null
             delegate: Item {
@@ -118,31 +123,33 @@ Item {
                 required property int index
                 readonly property bool newGroup: index > 0 && app.visiblePanes[index - 1].group !== modelData.group
                 readonly property bool selected: app.currentId === modelData.id
+                // the accent pill only while the window is key and the list (not the search field) has focus
+                readonly property bool emphasized: app.windowActive && !search.inputFocus
                 width: list.width
                 height: Theme.sidebar.rowHeight + (newGroup ? Theme.sidebar.groupGap : 0)
                 Rectangle {
                     anchors.bottom: parent.bottom
                     width: parent.width; height: Theme.sidebar.rowHeight
                     radius: Theme.sidebar.rowRadius
-                    color: d.selected ? Theme.sidebar.selection
-                         : (rowMa.containsMouse ? Theme.controlFill : "transparent")
+                    color: !d.selected ? "transparent" : d.emphasized ? Theme.sidebar.selection : Theme.sidebar.selectionInactive
                     PaneIcon {
                         id: ic
-                        x: Theme.sidebar.iconLeft; anchors.verticalCenter: parent.verticalCenter
+                        size: Theme.sidebar.iconSize
+                        x: Theme.sidebar.iconCenter - width / 2; anchors.verticalCenter: parent.verticalCenter
                         glyph: d.modelData.glyph; iconId: d.modelData.id
                         tint: Theme.tile[d.modelData.tint]
                     }
                     MacText {
-                        anchors.left: ic.right; anchors.leftMargin: Theme.sidebar.iconLabelGap
-                        anchors.right: parent.right; anchors.rightMargin: 6
+                        x: Theme.sidebar.labelLeft; width: parent.width - x - 6
                         anchors.verticalCenter: parent.verticalCenter
                         elide: Text.ElideRight
                         text: d.modelData.title
                         size: Theme.sidebar.fontSize
                         weight: d.selected ? Typography.semibold : Typography.regular
-                        color: d.selected ? Theme.sidebar.selectionText : Theme.label
+                        color: d.selected && d.emphasized ? Theme.sidebar.selectionText
+                             : app.windowActive ? Theme.label : Theme.sidebar.labelInactive
                     }
-                    MouseArea { id: rowMa; anchors.fill: parent; hoverEnabled: true; onClicked: app.open(d.modelData.id) }
+                    MouseArea { anchors.fill: parent; onClicked: app.open(d.modelData.id) }
                 }
             }
         }
@@ -154,7 +161,7 @@ Item {
             width: list.width; height: app.accountHeight
             Rectangle {
                 id: avatar
-                x: 4; anchors.verticalCenter: parent.verticalCenter
+                x: 6; y: (Theme.sidebar.accountHeight - height) / 2   // the account button starts at window x 16
                 width: Theme.sidebar.accountAvatar; height: width; radius: width / 2
                 gradient: Gradient {
                     GradientStop { position: 0; color: "#A8A8AE" }
@@ -167,7 +174,7 @@ Item {
                 }
             }
             Column {
-                anchors.left: avatar.right; anchors.leftMargin: 9; anchors.verticalCenter: parent.verticalCenter
+                anchors.left: avatar.right; anchors.leftMargin: 9; anchors.verticalCenter: avatar.verticalCenter
                 spacing: 1
                 MacText {
                     text: AppState.userName
@@ -217,7 +224,7 @@ Item {
             anchors.left: nav.right; anchors.leftMargin: 13; anchors.verticalCenter: parent.verticalCenter
             text: app.current.title
             font: Typography.toolbarTitle   // 15 Semibold, measured on 27.2.1 (was 16 Bold)
-            color: Theme.label
+            color: Theme.toolbarTitle
         }
     }
 
@@ -228,16 +235,23 @@ Item {
         anchors.top: toolbar.bottom; anchors.bottom: parent.bottom
         anchors.bottomMargin: 8
         clip: true
-        contentHeight: pane.height + 2 * Theme.content.padding
+        contentHeight: pane.y + pane.height + Theme.content.padding
         boundsBehavior: Flickable.StopAtBounds
         Loader {
             id: pane
             x: Math.max(Theme.content.padding, (flick.width - width) / 2)
-            y: 4
+            y: Theme.content.top
             width: Math.min(Theme.content.maxWidth, flick.width - 2 * Theme.content.padding)
             source: "panes/" + app.current.file + ".qml"
             onSourceChanged: flick.contentY = 0
         }
+    }
+
+    Rectangle { // scroll edge: a 0.5 pt hairline at y 52 from the first scrolled frame, no fade-in (Q-settings-04)
+        visible: flick.contentY > 0
+        x: flick.x; width: flick.width; y: toolbar.height
+        height: 0.5
+        color: Theme.scrollEdge
     }
 
     // inner white rim over everything; the compositor draws the outer black one (Tokens.frame)

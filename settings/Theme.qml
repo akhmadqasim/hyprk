@@ -37,6 +37,7 @@ QtObject {
         Tokens.fontGlyph = Qt.binding(() => theme.fontGlyph);
         // measured on the reference Settings window (below), so the controls match the panes
         Tokens.label = Qt.binding(() => theme.label);
+        Tokens.switchSize = "mini";   // Settings' form rows use mini switches, 36 x 16 (MAC-ANSWERS.md Q-settings-16)
         Tokens.secondaryLabel = Qt.binding(() => theme.secondaryLabel);
     }
 
@@ -69,10 +70,12 @@ QtObject {
 
     // ---------- window ----------
     readonly property QtObject window: QtObject {
-        readonly property int width: 745              // ref
-        readonly property int height: 630             // ref (1260 px at 2x)
-        readonly property int minWidth: 680          // TODO verify
-        readonly property int minHeight: 420         // TODO verify
+        // MAC-ANSWERS.md Q-settings-03: 740 x 625; the width is fixed (it follows the sidebar), only the height
+        // resizes, min 470
+        readonly property int width: 508 + sidebar.width
+        readonly property int height: 625
+        readonly property int minWidth: width
+        readonly property int minHeight: 470
         // 27.2.1: same corner as Finder (identical alpha profile in settings-toolbar-light.png and
         // finder-toolbar-light.png), 16 pt (MAC-ANSWERS.md Q-windows-02, Tokens.frame)
         readonly property int radius: Tokens.frame.radius
@@ -89,62 +92,79 @@ QtObject {
 
     // ---------- sidebar ----------
     readonly property QtObject sidebar: QtObject {
-        readonly property int width: 232             // ref (flush with the window's left edge)
-        // Appearance > Sidebar icon size. SPEC.md 7 (_NSSidebarMetrics_Solarium):
-        // row 24/32/40, font 11/13/15; icon measured 21 at medium (ref), others scaled.
+        // Appearance > Sidebar icon size (MAC-ANSWERS.md Q-settings-01, -05, -07; AX of the 27.2.1 window)
         property string size: "medium"
         readonly property int _i: Math.max(0, ["small", "medium", "large"].indexOf(size))
+        readonly property int width: [228, 232, 246][_i]   // flush with the window's left edge, no radius of its own
         readonly property int rowHeight: [24, 32, 40][_i]
         readonly property int fontSize: [11, 13, 15][_i]
-        readonly property int rowRadius: 10          // ref selection pill
-        readonly property int rowMargin: 10          // ref pill inset from sidebar edges
-        readonly property int iconLeft: 8            // ref icon inset inside the pill
-        readonly property int iconSize: [16, 21, 26][_i]   // medium = ref, S/L TODO verify
-        readonly property int iconLabelGap: 7        // ref
-        readonly property int groupGap: 13          // ref
-        readonly property int searchTop: 61          // ref
-        readonly property int accountAvatar: 40      // TODO verify
+        readonly property real rowRadius: 8.5        // selection pill
+        readonly property int rowMargin: 10          // pill (cell) x 10 .. width - 10
+        readonly property real iconSize: [14, 20, 26][_i]   // tile; small "about 13-14"
+        readonly property real iconCenter: 19        // tile centre in the cell (medium tile at window x 19..39)
+        readonly property real labelLeft: [32.5, 36, 38.5][_i]   // label x in the cell (window 42.5 / 46 / 48.5)
+        readonly property int groupGap: 13           // 0-height spacer rows
+        readonly property int searchTop: 61          // search field 212 x 28 at (10, 61)
+        readonly property int listTop: 98            // the list starts at y 98
+        readonly property int accountHeight: 46      // Apple Account row (the button 141.5 x 38 at x 16)
+        readonly property int accountAvatar: 38
         // 27.2.1 System Settings sidebar over a plain desktop: (37,38,38) dark, (237,237,237) light
         // (reference/screens/27.2.1/settings-toolbar-{dark,light}.png; Finder's reads 38 / 237). Over compositor
         // blur it is 88 % opaque so the desktop only softly shows through; otherwise (no blur, Reduce
         // transparency) it is flat.
-        readonly property color fill: theme.translucent
-            ? (theme.dark ? Qt.rgba(37 / 255, 38 / 255, 38 / 255, 0.88) : Qt.rgba(237 / 255, 237 / 255, 237 / 255, 0.88))
-            : (theme.dark ? "#252626" : "#EDEDED")
+        // 27.2.1 sampled over Tahoe: #ECEDEE light, #232634 dark (Q-settings-01); window not key: flat #F2F2F2 / #24262B
+        readonly property color _rgb: !theme.windowActive ? (theme.dark ? "#24262B" : "#F2F2F2") : (theme.dark ? "#232634" : "#ECEDEE")
+        readonly property color fill: theme.translucent && theme.windowActive ? Qt.alpha(_rgb, 0.88) : _rgb
+        // 0.5 pt divider on the right: #D3D4D5 / #3F424D
+        readonly property real strokeWidth: 0.5
         readonly property color stroke: theme.increaseContrast ? (theme.dark ? Qt.rgba(1, 1, 1, 0.4) : Qt.rgba(0, 0, 0, 0.4))
-            : theme.dark ? Qt.rgba(1, 1, 1, 0.08) : Qt.rgba(0, 0, 0, 0.05)
-        readonly property color selection: theme.accent
+            : theme.dark ? "#3F424D" : "#D3D4D5"
+        // selected row: the flat accent pill with white Semibold text; grey with label text while the window is not
+        // key or the list is not first responder (Q-settings-05). No hover fill.
+        readonly property color selection: Tokens.control.accentOn
+        readonly property color selectionInactive: theme.dark ? "#323439" : "#E7E7E7"
         readonly property color selectionText: "#FFFFFF"
+        readonly property color labelInactive: theme.dark ? "#717378" : "#8C8C8C"   // labels of a window that is not key
     }
 
     // ---------- content (grouped inset form) ----------
     readonly property QtObject content: QtObject {
-        readonly property int padding: 21            // ref
-        readonly property int maxWidth: 520           // ref card width is 466 at 745 window
-        readonly property int sectionGap: 12          // ref card to card
-        readonly property int headerGap: 8            // ref header to card
-        readonly property int headerTop: 18           // ref extra space above a section header
-        readonly property int cardRadius: 12          // ref ~11-12
-        readonly property int rowHeight: 37           // ref
-        readonly property int rowPadding: 10          // ref
-        readonly property int separatorInset: 10      // ref
+        // MAC-ANSWERS.md Q-settings-11, -12: cards 468 wide at x 252 (20 pt margins in the 508 pt content area)
+        readonly property int padding: 20
+        readonly property int maxWidth: 468
+        readonly property int top: 12                 // first heading (or card) 12 below the toolbar
+        readonly property int sectionGap: 10          // card to card
+        readonly property int headerGap: 10           // heading (16 tall) to card
+        readonly property int headerTop: 20           // card to the next heading 30 = sectionGap + headerTop
+        readonly property int cardRadius: 13          // about 13, continuous
+        readonly property int rowHeight: 38           // 1-line row with a pop-up 38, with a switch 37.5
+        readonly property int rowPadding: 10
+        readonly property int separatorInset: 10
         readonly property int heroIcon: 56           // pane header icon, TODO verify
     }
 
     // controls and their motion: Tokens.control, Tokens.motion (HyprK Switch, Slider, Popup, Button)
 
     // ---------- colors ----------
-    readonly property color windowBg: Tokens.windowBackground
-    readonly property color cardFill: Tokens.groupFill
+    // the window is key (SettingsApp sets it; snapshots force it on)
+    property bool windowActive: true
+    // window background: #FFFFFF / #1E1F24 (dark is wallpaper-tinted on the Mac; #202127 in the probe) (Q-settings-11)
+    readonly property color windowBg: theme.dark ? "#1E1F24" : "#FFFFFF"
+    // cards: solid, no stroke, no shadow: #F7F7F7 / #25262B
+    readonly property color cardFill: theme.dark ? "#25262B" : "#F7F7F7"
     readonly property color cardStroke: theme.increaseContrast ? (theme.dark ? Qt.rgba(1, 1, 1, 0.45) : Qt.rgba(0, 0, 0, 0.45))
-        : theme.dark ? Qt.rgba(1, 1, 1, 0.04) : Qt.rgba(0, 0, 0, 0.0) // ref: no visible stroke
+        : "transparent"
+    // row separator: #EBEBEB on #F7F7F7, #2F3035 on #25262B (2 px at 2x in desktop-dock-*.png)
     readonly property color separator: theme.increaseContrast ? (theme.dark ? Qt.rgba(1, 1, 1, 0.35) : Qt.rgba(0, 0, 0, 0.3))
-        : theme.dark ? Qt.rgba(1, 1, 1, 0.09) : Qt.rgba(0, 0, 0, 0.055) // ref #EBEBEB on card
-    readonly property color label: theme.dark ? Qt.rgba(1, 1, 1, 0.88) : Qt.rgba(0, 0, 0, 0.85)
+        : theme.dark ? Qt.rgba(1, 1, 1, 0.046) : Qt.rgba(0, 0, 0, 0.05)
+    // toolbar title #4C4C4C / #E8E8E9 (Q-settings-13); scroll-edge hairline at y 52 #DEDEDE / #34353A (Q-settings-04)
+    readonly property color toolbarTitle: theme.dark ? "#E8E8E9" : "#4C4C4C"
+    readonly property color scrollEdge: theme.dark ? "#34353A" : "#DEDEDE"
+    readonly property color label: theme.dark ? Qt.rgba(1, 1, 1, 0.85) : Qt.rgba(0, 0, 0, 0.85)
     readonly property color secondaryLabel: theme.increaseContrast ? (theme.dark ? Qt.rgba(1, 1, 1, 0.75) : Qt.rgba(0, 0, 0, 0.7))
         : theme.dark ? Qt.rgba(1, 1, 1, 0.55) : Qt.rgba(0, 0, 0, 0.51) // ref #7D7C7B
     readonly property color tertiaryLabel: Tokens.tertiaryLabel
-    readonly property color controlFill: Tokens.control.fill
+    readonly property color controlFill: Tokens.control.pushFill
     readonly property color previewStrip: theme.dark ? "#2C2C2E" : "#ECEAE7"        // Liquid Glass preview title, ref
     readonly property color shadow: Qt.rgba(0, 0, 0, theme.dark ? 0.55 : 0.28)
 

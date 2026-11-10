@@ -108,6 +108,9 @@ test("appearance.json defaults and round trip", () => {
     assert.equal(P.mergeState('{"glass": 7}', {}, P.normalizeAppearance).glass, 1);
     assert.equal(P.mergeState('{"iconStyle": "neon"}', {}, P.normalizeAppearance).iconStyle, "default");
     assert.equal(P.mergeState('{"iconStyle": "clear"}', {}, P.normalizeAppearance).iconStyle, "clear");
+    assert.equal(P.mergeState('{}', {}, P.normalizeAppearance).iconStyleVariant, "auto");
+    assert.equal(P.mergeState('{"iconStyleVariant": "dark"}', {}, P.normalizeAppearance).iconStyleVariant, "dark");
+    assert.equal(P.mergeState('{"iconStyleVariant": "dim"}', {}, P.normalizeAppearance).iconStyleVariant, "auto");
     assert.equal(P.mergeState('{"glass": "x"}', {}, P.normalizeAppearance).glass, 0.5);
     // unknown keys from the shell survive
     assert.equal(P.mergeState(JSON.stringify({ extra: 5 }), {}, P.normalizeAppearance).extra, 5);

@@ -11,7 +11,8 @@ Column {
     width: parent ? parent.width : 0
     spacing: Theme.content.headerGap
 
-    SectionHeader { visible: card.title !== ""; text: card.title }
+    // the pane's first heading sits right at the content top (12 below the toolbar); later ones 30 below a card
+    SectionHeader { visible: card.title !== ""; text: card.title; topPadding: card.Positioner.index > 0 ? Theme.content.headerTop : 0 }
     Rectangle {
         width: card.width
         height: body.implicitHeight

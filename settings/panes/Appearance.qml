@@ -10,28 +10,37 @@ Column {
     id: pane
     spacing: Theme.content.sectionGap
 
-    // Mini window thumbnail used by the Appearance and widget-style pickers.
+    // Picker tile used by the Appearance mode and icon style rows (MAC-ANSWERS.md Q-settings-26, -27): the
+    // content (w x h, radius r), a 3 pt accent ring `gap` outside it when selected, caption 11 pt, bold when selected.
     component Choice: Column {
         id: ch
         property string caption
         property bool selected
-        property int w: 68
-        property int h: 46
-        default property alias inner: frame.data
+        property real w: 67
+        property real h: 44
+        property real r: 6
+        property real gap: 0.5
+        default property alias inner: content.data
         signal picked()
-        spacing: 5
+        spacing: 2
         Rectangle {
             id: frame
-            width: ch.w; height: ch.h; radius: 8; clip: true
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: ch.w + 2 * (3 + ch.gap); height: ch.h + 2 * (3 + ch.gap); radius: ch.r + 3 + ch.gap
             border.width: ch.selected ? 3 : 0
-            border.color: Theme.accent
+            border.color: Tokens.control.accentOn
             color: "transparent"
+            Item {
+                id: content
+                anchors.fill: parent; anchors.margins: 3 + ch.gap
+            }
             MouseArea { anchors.fill: parent; z: 10; onClicked: ch.picked() }
         }
         MacText {
             anchors.horizontalCenter: parent.horizontalCenter
             text: ch.caption
-            weight: ch.selected ? Typography.semibold : Typography.regular
+            size: 11
+            weight: ch.selected ? Typography.bold : Typography.regular
             color: ch.selected ? Theme.label : Theme.secondaryLabel
         }
     }
@@ -39,7 +48,7 @@ Column {
         property bool darkWin
         anchors.fill: parent
         Rectangle { // wallpaper
-            anchors.fill: parent; anchors.margins: 3; radius: 6
+            anchors.fill: parent; radius: 6
             gradient: Gradient {
                 orientation: Gradient.Horizontal
                 GradientStop { position: 0; color: darkWin ? "#1B2A6B" : "#8DB6F2" }
@@ -63,7 +72,7 @@ Column {
             alignTop: true
             implicitHeight: 86
             Row {
-                spacing: 14
+                spacing: 8   // AX 74 x 66 each, pitch 82
                 Repeater {
                     model: [{ m: "light", t: "Light" }, { m: "dark", t: "Dark" }, { m: "auto", t: "Auto" }]
                     Choice {
@@ -74,8 +83,8 @@ Column {
                         MiniWindow { visible: modelData.m !== "auto"; darkWin: modelData.m === "dark" }
                         Item { // auto: light left half, dark right half
                             visible: modelData.m === "auto"; anchors.fill: parent
-                            Item { width: parent.width / 2; height: parent.height; clip: true; MiniWindow { width: 68; height: 46; anchors.fill: undefined } }
-                            Item { x: parent.width / 2; width: parent.width / 2; height: parent.height; clip: true; MiniWindow { x: -34; width: 68; height: 46; anchors.fill: undefined; darkWin: true } }
+                            Item { width: parent.width / 2; height: parent.height; clip: true; MiniWindow { width: 67; height: 44; anchors.fill: undefined } }
+                            Item { x: parent.width / 2; width: parent.width / 2; height: parent.height; clip: true; MiniWindow { x: -33.5; width: 67; height: 44; anchors.fill: undefined; darkWin: true } }
                         }
                     }
                 }
@@ -84,7 +93,7 @@ Column {
         FormRow {
             label: "Liquid Glass"
             alignTop: true
-            implicitHeight: 248
+            implicitHeight: 233   // the card ends 22 below the slider (appearance-light.png)
             Column {
                 spacing: 10
                 Rectangle { // preview: wallpaper with glass controls on top
@@ -132,7 +141,8 @@ Column {
                 Slider {
                     width: 268
                     value: AppState.appearance.glass
-                    leftGlyph: "filter_none"; rightGlyph: "content_copy"
+                    leftGlyph: "filter_none"; rightGlyph: "content_copy"   // end buttons: Clear (0) and Tinted (1)
+                    tickMarks: 5
                     onMoved: v => AppState.set("appearance", { glass: Math.round(v * 100) / 100 })
                 }
             }
@@ -153,7 +163,7 @@ Column {
                         id: sw
                         required property string modelData
                         readonly property bool sel: AppState.appearance.accent === modelData
-                        spacing: 8 // clears the selection ring, which overhangs the swatch by 4pt
+                        spacing: 4 // the ring overhangs the swatch by 4 pt; the name sits right under it (Q-settings-25)
                         // ref (RE, macOS 27.2 Appearance.appex AccentCircle): a 24pt image clipped to a
                         // circle, a 1pt quinaryLabel inner edge (plus-darker, so light mode only), and when
                         // selected a 3pt accent-colour ring whose outer edge is 32pt. Multicolor's image
@@ -240,43 +250,103 @@ Column {
         }
     }
 
+    // 27.2.1 order below the theme card (appearance-scrolled-light.png, appearance-iconstyle-tinted-light.png)
     Card {
         FormRow {
+            id: styleRow
             label: "Icon & widget style"
             alignTop: true
-            implicitHeight: 86
-            Row {
+            readonly property string style: AppState.appearance.iconStyle
+            // Dark offers Always / Auto, Clear and Tinted Light / Dark / Auto (Q-settings-27)
+            readonly property var variants: style === "dark" ? [["Always", "dark"], ["Auto", "auto"]]
+                : style === "clear" || style === "tinted" ? [["Light", "light"], ["Dark", "dark"], ["Auto", "auto"]] : []
+            implicitHeight: variants.length ? 104 : 88
+            Column {
                 spacing: 14
-                Repeater {
-                    model: [{ t: "Default", c: "#3D9BF5" }, { t: "Dark", c: "#1C1C1E" }, { t: "Clear", c: "#7E7E7E" }, { t: "Tinted", c: "#2FA7F7" }]
-                    Choice {
-                        required property var modelData
-                        w: 44; h: 44
-                        caption: modelData.t
-                        selected: AppState.appearance.iconStyle === modelData.t.toLowerCase()
-                        onPicked: AppState.set("appearance", { iconStyle: modelData.t.toLowerCase() })
-                        Rectangle {
-                            anchors.fill: parent; anchors.margins: 4; radius: 10
-                            gradient: Gradient { GradientStop { position: 0; color: Qt.lighter(modelData.c, 1.25) } GradientStop { position: 1; color: modelData.c } }
-                            Text { anchors.centerIn: parent; text: "cloud"; font.family: Theme.fontGlyph; font.pixelSize: 22; color: "white" }
+                Row {
+                    anchors.right: parent.right
+                    spacing: 13
+                    Repeater {
+                        model: [{ t: "Default", c: "#3C88F5" }, { t: "Dark", c: "#171717" }, { t: "Clear", c: "#7D7D7D" }, { t: "Tinted", c: "#3478F1" }]
+                        Choice {
+                            required property var modelData
+                            w: 29; h: 29; r: 7; gap: 1.5   // AX 38 x 52 with the caption; tile 29, ring gap 1.5
+                            caption: modelData.t
+                            selected: AppState.appearance.iconStyle === modelData.t.toLowerCase()
+                            // Default removes the key on the Mac; the variant resets to Auto with each style
+                            onPicked: AppState.set("appearance", { iconStyle: modelData.t.toLowerCase(), iconStyleVariant: "auto" })
+                            Rectangle {   // Wi-Fi tile body per style (#35)
+                                anchors.fill: parent; radius: 7
+                                color: modelData.c
+                                Text {
+                                    anchors.centerIn: parent; text: "cloud"; font.family: Theme.fontGlyph; font.pixelSize: 17
+                                    color: modelData.t === "Dark" ? "#3C88F5" : "white"
+                                }
+                            }
+                        }
+                    }
+                }
+                Row {
+                    anchors.right: parent.right
+                    visible: styleRow.variants.length > 0
+                    spacing: 16
+                    Repeater {
+                        model: styleRow.variants
+                        Checkbox {
+                            required property var modelData
+                            radio: true
+                            text: modelData[0]
+                            checked: AppState.appearance.iconStyleVariant === modelData[1]
+                            onToggled: AppState.set("appearance", { iconStyleVariant: modelData[1] })
                         }
                     }
                 }
             }
         }
+        FormRow {
+            label: AppState.appearance.iconStyle === "tinted" ? "Icon, widget & folder color" : "Folder color"
+            Rectangle { width: 16; height: 16; radius: 8; color: Accent.swatch("blue"); anchors.verticalCenter: parent ? parent.verticalCenter : undefined }
+            LocalPopup { model: ["Automatic", "Blue", "Purple", "Pink", "Red", "Orange", "Yellow", "Green", "Graphite"] }
+        }
     }
 
     Card {
+        title: "Windows"
         FormRow {
             label: "Sidebar icon size"
             StatePopup { stateKey: "appearance"; field: "sidebarIconSize"; choices: [["Small", "small"], ["Medium", "medium"], ["Large", "large"]] }
         }
-        FormRow { label: "Allow wallpaper tinting in windows"; LocalSwitch { checked: true } }
+        FormRow { label: "Tint window background with wallpaper color"; LocalSwitch { checked: true } }
     }
 
+    // radio groups under their label, one per row (held locally until a backend exists)
+    component RadioGroup: Column {
+        id: rg
+        property string label
+        property var options: []
+        property int current: 0
+        width: parent ? parent.width : 0
+        topPadding: 10; bottomPadding: 10
+        leftPadding: Theme.content.rowPadding
+        spacing: 6
+        MacText { text: rg.label; bottomPadding: 2 }
+        Repeater {
+            model: rg.options
+            Checkbox {
+                required property string modelData
+                required property int index
+                radio: true
+                text: modelData
+                checked: rg.current === index
+                onToggled: rg.current = index
+            }
+        }
+    }
     Card {
-        FormRow { label: "Show scroll bars"; LocalPopup { model: ["Automatically based on mouse or trackpad", "When scrolling", "Always"] } }
-        FormRow { label: "Click in the scroll bar to"; LocalPopup { model: ["Jump to the next page", "Jump to the spot that's clicked"] } }
+        RadioGroup { label: "Show scroll bars"; options: ["Automatically based on mouse or trackpad", "When scrolling", "Always"] }
+        Rectangle { x: Theme.content.separatorInset; width: parent.width - 2 * x; height: 1; color: Theme.separator }
+        RadioGroup { label: "Click in the scroll bar to"; options: ["Jump to the next page", "Jump to the spot that's clicked"] }
     }
 
+    PaneFooter { Button { text: "More in Accessibility Settings…" } }
 }

@@ -125,8 +125,11 @@ function hasBattery(text) {
 // ---------- state files ----------
 // appearance.json is shared with the shell, which reads {dark, reduceTransparency}.
 // glass: macOS 27 "Liquid Glass" slider, 0 = clear, 1 = tinted.
-// iconStyle: macOS 26+ "Icon & widget style" (default | dark | clear | tinted).
-const appearanceDefaults = { mode: "light", dark: false, reduceTransparency: false, increaseContrast: false, reduceMotion: false, accent: "multicolor", sidebarIconSize: "medium", glass: 0.5, iconStyle: "default" };
+// iconStyle: macOS 26+ "Icon & widget style" (default | dark | clear | tinted). iconStyleVariant: the style's own
+// Light / Dark / Auto choice (Clear and Tinted; Dark offers Always = "dark" / Auto), Settings only
+// (MAC-ANSWERS.md Q-settings-27, #35: the tiles follow it, not the window mode, unless Auto).
+const appearanceDefaults = { mode: "light", dark: false, reduceTransparency: false, increaseContrast: false, reduceMotion: false, accent: "multicolor", sidebarIconSize: "medium", glass: 0.5, iconStyle: "default", iconStyleVariant: "auto" };
+const iconStyleVariants = ["light", "dark", "auto"];
 const appearanceModes = ["light", "dark", "auto"];
 const iconStyles = ["default", "dark", "clear", "tinted"];
 
@@ -140,6 +143,7 @@ function normalizeAppearance(obj) {
     o.increaseContrast = !!o.increaseContrast;   // Accessibility > Display
     o.reduceMotion = !!o.reduceMotion;           // Accessibility > Motion
     if (iconStyles.indexOf(o.iconStyle) === -1) o.iconStyle = appearanceDefaults.iconStyle;
+    if (iconStyleVariants.indexOf(o.iconStyleVariant) === -1) o.iconStyleVariant = appearanceDefaults.iconStyleVariant;
     o.glass = isFinite(Number(o.glass)) ? Math.min(1, Math.max(0, Number(o.glass))) : appearanceDefaults.glass;
     return o;
 }
