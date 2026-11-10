@@ -38,9 +38,10 @@ namespace lg {
         SYcc  keyYcc = {0.1471f, 1.0588f, 1.1765f};
         float darkBias   = -0.25f; // glass filter key highlight colourBias ("dark specular")
         float darkSpread = 96;     // its spread, degrees
-        // inputFaceColorMatrixMaxLuma: the face's luma is bent so white lands here (1 = off). The probe gives
-        // the parameter; the curve Y - (1 - m) Y^2 is fitted to the dark Dock (MAC-ANSWERS "Glass checks (#53)")
-        float maxLuma = 1;
+        // inputFaceColorMatrixMaxLuma at D <= 64, 96 and >= 128 (the probe's sizes, linear in between; 1 = off):
+        // the backdrop luma is bent so white lands here before the face, Y - (1 - m) Y^2. Parameter from the probe;
+        // curve and its place fitted to the dark Dock (MAC-ANSWERS "Glass checks (#53)") and the dark menu (Q-menubar-13)
+        std::array<float, 3> maxLuma = {1, 1, 1};
     };
 
     struct SRecipe {
@@ -60,6 +61,8 @@ namespace lg {
         // d < 0 inside. dist0 = dist0N * D + dist0Fixed (Apple's "inset 0.5" read as half of D, a guess)
         float                blurDist0N = -0.5f, blurDist0Fixed = 0, blurDist1 = -1;
         std::array<float, 3> blurAlpha  = {1, 0.5f, 0.5f};
+        // alpha0 and alpha1 x lerp(0, 1) over D in [blurAlphaD0, blurAlphaD1] (equal: always full)
+        float blurAlphaD0 = 0, blurAlphaD1 = 0;
 
         // edge bleed: opacity lerp over D, height/amount/blur x D (blur max 160)
         float bleedD0 = 64, bleedD1 = 160, bleedOpacityLo = 0, bleedOpacityHi = 0.5f;
@@ -87,6 +90,8 @@ namespace lg {
         float shadowOpacity = 0, shadowOpacityDark = 0; // light side, dark side
         float shadowRadius  = 0;
         float keySpread     = 80; // degrees, key/fill highlight lobe (SPEC 9.4: D 96 -> 192 : 80 -> 90)
+        std::array<float, 3> blurAlpha = {1, 0.5f, 0.5f};
+        float maxLumaLight = 1, maxLumaDark = 1; // SFace::maxLuma at this D
     };
 
     // false when the recipe never draws a drop shadow (Clear, Dock, Control Center)

@@ -570,7 +570,6 @@ namespace lg {
         glUniform1i(u.tex, 0);
         glUniform1i(u.sharpTex, 1);
         glUniform1i(u.linearLight, p.linearLight ? 1 : 0);
-        glUniform3f(u.blurAlpha, r.blurAlpha[0], r.blurAlpha[1], r.blurAlpha[2]);
         glUniform1f(u.outerOpacity, r.outerOpacity);
         // QuartzCore defaults for the rim band of the outer layer (SPEC 9.7: distances -11 / -3)
         glUniform2f(u.outerThreshold, -11.f * scale, -3.f * scale);
@@ -636,7 +635,8 @@ namespace lg {
             glUniform1f(u.bleedAmount, res.bleedAmount * p.refractionScale * scale);
             glUniform1f(u.bleedLod, std::log2(1.f + res.bleedBlur * scale));
             glUniform3f(u.bleedYcc, face.bleed.black, face.bleed.white, face.bleed.saturation);
-            glUniform4f(u.faceYcc, face.ycc.black, face.ycc.white, face.ycc.saturation, face.maxLuma);
+            glUniform4f(u.faceYcc, face.ycc.black, face.ycc.white, face.ycc.saturation, dark[q] ? res.maxLumaDark : res.maxLumaLight);
+            glUniform3f(u.blurAlpha, res.blurAlpha[0], res.blurAlpha[1], res.blurAlpha[2]);
             glUniform4f(u.faceFill, face.fill.r, face.fill.g, face.fill.b, face.fill.a);
             glUniform3f(u.keyYcc, face.keyYcc.black, face.keyYcc.white, face.keyYcc.saturation);
             const float keyRad = res.keySpread * float(M_PI / 180.0);

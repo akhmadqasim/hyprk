@@ -252,11 +252,11 @@ void main() {
             col      = mix(col, so, sat((d - outerThreshold.x) / (outerThreshold.y - outerThreshold.x)) * outerOpacity * mat);
         }
 
-        // YCC face effect, then the fill (SPEC 9.7)
+        // max luma (inputFaceColorMatrixMaxLuma < 1) on the backdrop: Y -> Y - (1 - m) Y^2, so white enters the
+        // face as m (fits the dark Dock and the dark menu, Material.hpp), then the YCC face and the fill (SPEC 9.7)
+        float Yb = luma(col);
+        col -= vec3((1.0 - mix(1.0, faceYcc.w, mat)) * Yb * Yb);
         col = ycc(col, mix(vec3(0.0, 1.0, 1.0), faceYcc.xyz, mat)); // (0, 1, 1) = identity
-        // max luma (inputFaceColorMatrixMaxLuma < 1): Y' -> Y' - (1 - m) Y'^2, so white lands on m
-        float Yf = luma(col);
-        col -= vec3((1.0 - mix(1.0, faceYcc.w, mat)) * Yf * Yf);
         col = mix(col, faceFill.rgb, faceFill.a * mat);
         // edge bleed: outside colour pulled into the rim through its own colour effect (step 4.7)
         if (bleedOpacity > 0.0 && depth < bleedHeight) {

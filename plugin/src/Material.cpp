@@ -10,31 +10,31 @@ namespace lg {
         // filter's key highlight with a negative colourBias, keyed horizontally) and a bright key/fill highlight
         // top and bottom (a CASDFKeyFillHighlightEffect layer under a vibrantColorMatrix). SFace holds the
         // per-recipe numbers; the shape of the bands is in shaders/liquidglass.frag.
-        constexpr SRgba WHITE12 = {1, 1, 1, 0.12f};
-
         // Clear-family edge bleed colour (SPEC 9.3)
         constexpr SYcc CLEAR_BLEED = {0.75f, 1.f, 1.2f};
         // key/fill highlight target of Clear and Control Center: matrix rows (1.3192, -0.0478, -0.0047 | 0.2)
         constexpr SYcc CLEAR_KEY = {0.2f, 1.4666f, 1.3334f};
 
-        // SPEC 9.2 RegularBase, V2. Used by menus, notifications, sidebars. Light saturation 1.2 -> 1.0:
-        // the decoded value read too cyan over the Tahoe wallpapers (JUDGE.md).
-        // Regular over a white window read as opaque white (JUDGE-r2): white point 1.03 -> 0.92, fill
-        // 0.2 -> 0.12, blur-fill lighten 0.9 -> 0.4, at least 2 extra blur, and the variable blur keeps
-        // full strength until 1 pt from the edge (alpha 0.15 / 0.85 instead of 0.5 / 0.5).
+        // Regular as resolved on 27.2.1 (probe `regular` = `regular.menu`, reference/re/27.2.1/live/glass-params-*.json):
+        // light face (0.4, 1.03, 1.2) + white 0.2, blur fill lighten 0.9 / normal 0.5; dark face (0.125, 1.125, 1.3),
+        // no fill, darken 0.9 / normal 0.5, max luma 0.6 / 0.4 / 0.35 at D 64 / 96 / 128; blur opacities 0.8 / 0.4 / 0.5
+        // with the first two from 0 at D 64 to full at D 160 (0.27 / 0.13 at 96). Menu body over white / black
+        // (MAC-ANSWERS Q-menubar-13): light 251 / 137, dark 120 / 33.
         // Drop shadow = the SRecipe defaults, measured on macOS 27.2.1 (LIVE-27.2.1.md): opacity 0.04 -> 0.4
         // (dark 0.6) and radius 4 -> 24 over D 64 -> 160, y 8. Ring shadow V2 (8, 4, 5, 0.06).
         // Rim (probe): dark specular -0.25, spread 96 deg light / 75 deg dark; highlight target from the matrix
         // rows (1.1202, -0.1894, -0.019 | 0.1471), the SFace default.
         constexpr SRecipe REGULAR = {
             .name         = "regular",
-            .light        = {.ycc = {0.4f, 0.92f, 1.0f}, .fill = WHITE12, .bleed = {0.9f, 1.f, 1.2f}, .blurFill = {0.4f, 0, 0.5f}},
-            .dark         = {.ycc = {0.125f, 1.125f, 1.3f}, .fill = {}, .bleed = {0.125f, 0.5f, 1.f}, .blurFill = {0, 0.9f, 0.5f}, .darkSpread = 75},
+            .light        = {.ycc = {0.4f, 1.03f, 1.2f}, .fill = {1, 1, 1, 0.2f}, .bleed = {0.9f, 1.f, 1.2f}, .blurFill = {0.9f, 0, 0.5f}},
+            .dark         = {.ycc = {0.125f, 1.125f, 1.3f}, .fill = {}, .bleed = {0.125f, 0.5f, 1.f}, .blurFill = {0, 0.9f, 0.5f}, .darkSpread = 75,
+                             .maxLuma = {0.6f, 0.4f, 0.35f}},
             .outerHeightN = 0.2f,
             .outerAmountN = 0.25f,
             .outerOpacity = 0.6f,
             .blurD0 = 48, .blurD1 = 160, .blurLo = 2, .blurHi = 4,
-            .blurAlpha = {1, 0.15f, 0.85f},
+            .blurAlpha = {0.8f, 0.4f, 0.5f},
+            .blurAlphaD0 = 64, .blurAlphaD1 = 160,
             .ringOffsetY = 8, .ringStroke = 4, .ringRadius = 5, .ringOpacity = 0.06f,
         };
 
@@ -64,7 +64,7 @@ namespace lg {
         constexpr SRecipe DOCK = {
             .name              = "dock",
             .light             = {.ycc = {0.15f, 0.9f, 1.25f}, .fill = {}, .bleed = CLEAR_BLEED, .keyYcc = {0.2f, 1.2f, 1.3334f}, .darkSpread = 120},
-            .dark              = {.ycc = {0.05f, 0.92f, 1.25f}, .fill = {0, 0, 0, 0.02f}, .bleed = CLEAR_BLEED, .keyYcc = {0.25f, 0.95f, 1.2f}, .darkSpread = 120, .maxLuma = 0.75f},
+            .dark              = {.ycc = {0.05f, 0.92f, 1.25f}, .fill = {0, 0, 0, 0.02f}, .bleed = CLEAR_BLEED, .keyYcc = {0.25f, 0.95f, 1.2f}, .darkSpread = 120, .maxLuma = {0.75f, 0.75f, 0.75f}},
             .refractionHeightN = 0.08f,
             .refractionAmountN = -0.18f,
             .outerOpacity      = 0.2f,
@@ -146,7 +146,12 @@ namespace lg {
         return out0 + (out1 - out0) * t;
     }
 
+    float maxLumaAt(const SFace& f, double D) {
+        return float(D <= 96 ? clampedLinear(D, 64, 96, f.maxLuma[0], f.maxLuma[1]) : clampedLinear(D, 96, 128, f.maxLuma[1], f.maxLuma[2]));
+    }
+
     SResolved resolveMaterial(const SRecipe& r, double D) {
+        const float ramp = float(clampedLinear(D, r.blurAlphaD0, r.blurAlphaD1, 0, 1));
         return {
             .refractionHeight = float(std::clamp(r.refractionHeightN * D, 0.0, double(r.refractionHeightMax))),
             .refractionAmount = float(std::max(r.refractionAmountN * D, double(r.refractionAmountMin))),
@@ -163,6 +168,9 @@ namespace lg {
             .shadowOpacityDark = float(clampedLinear(D, r.shadowD0, r.shadowD1, r.shadowOpacityLo, r.shadowOpacityHiDark)),
             .shadowRadius      = float(clampedLinear(D, r.shadowD0, r.shadowD1, r.shadowRadiusLo, r.shadowRadius)),
             .keySpread         = float(clampedLinear(D, 96, 192, 80, 90)),
+            .blurAlpha         = {r.blurAlpha[0] * ramp, r.blurAlpha[1] * ramp, r.blurAlpha[2]},
+            .maxLumaLight      = maxLumaAt(r.light, D),
+            .maxLumaDark       = maxLumaAt(r.dark, D),
         };
     }
 
