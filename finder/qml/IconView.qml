@@ -90,7 +90,7 @@ GridView {
             height: Theme.grid.iconSize + 12
             radius: Theme.grid.selectionRadius
             color: Theme.color.iconSelection
-            visible: cell.selected
+            visible: cell.selected || drop.hovered
         }
         FileIcon {
             id: icon
@@ -147,6 +147,16 @@ GridView {
             entry: cell.modelData
             index: cell.index
             onContextMenu: (e, pos) => grid.contextMenu(e, pos)
+        }
+        FolderDrop {
+            id: drop
+            x: (parent.width - Theme.grid.labelWidth) / 2
+            y: icon.y - 6
+            width: Theme.grid.labelWidth
+            height: icon.height + 12
+            enabled: cell.modelData.isDir === true
+            browser: grid.browser
+            path: cell.modelData.path
         }
     }
 }

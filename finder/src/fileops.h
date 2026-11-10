@@ -43,6 +43,11 @@ public:
     // Runs `gio trash` without blocking the UI; trashFinished reports the outcome.
     Q_INVOKABLE void trash(const QStringList &paths);
     Q_INVOKABLE QString rename(const QString &path, const QString &newName) const;
+    // Drag and drop into a folder: op "move" | "copy" | "link" (symlink, Finder's alias).
+    // Never overwrites; runs mv/cp/ln without blocking the UI, transferFinished reports the outcome.
+    Q_INVOKABLE void transfer(const QStringList &paths, const QString &destDir, const QString &op);
+    // Same filesystem (Finder copies instead of moving across volumes).
+    Q_INVOKABLE bool sameDevice(const QString &a, const QString &b) const;
     // Creates "<baseName>", "<baseName> 2", ... in dir. Returns the new path or "" on failure.
     Q_INVOKABLE QString makeFolder(const QString &dir, const QString &baseName) const;
     Q_INVOKABLE QString readText(const QString &path, int maxBytes) const;
@@ -50,6 +55,7 @@ public:
 signals:
     void directoryChanged(const QString &dir);
     void trashFinished(const QString &error);   // empty on success
+    void transferFinished(const QString &error);   // empty on success
     void listed(int token, const QVariantList &entries);
 
 private:
@@ -59,6 +65,7 @@ private:
     QVariantList tagged(const QString &tag) const;
     QJsonObject tagIndex() const;
     void moveTagKeys(const QStringList &from, const QString &to) const;
+    void moveTagKeysInto(const QStringList &from, const QString &destDir) const;
     void saveTagIndex(const QJsonObject &index) const;
     QThreadPool m_pool;   // listAsync workers, drained in ~FileOps
     QFileSystemWatcher m_watcher;

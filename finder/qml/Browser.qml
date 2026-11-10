@@ -15,6 +15,9 @@ QtObject {
     readonly property bool isVirtual: isVirtualPath(path)
     // whether entries are the user's files (trash, tag); Applications lists .desktop files
     readonly property bool userFiles: path !== "applications:"
+    // items can be dragged out (not from Applications, nor from the Trash: a plain mv would orphan .trashinfo)
+    readonly property string trashPath: FileOps.standardPath("trash")
+    readonly property bool canDrag: userFiles && path !== trashPath && path.indexOf(trashPath + "/") !== 0
 
     property string sortKey: "name"
     property bool ascending: true
@@ -52,6 +55,9 @@ QtObject {
         : Files.title(path)
 
     signal errorRaised(string message)
+
+    // in-window drag and drop (DragSession in Main.qml); views read it for drop highlights and cursors
+    property var dragSession: null
 
     // Folders list synchronously (callers select the result right away); virtual locations
     // can be slow (xbel, every .desktop file, tag index) and load on a worker thread.
@@ -181,6 +187,12 @@ QtObject {
         if (paths.length === 0 || !userFiles) return;
         FileOps.trash(paths);   // async, see onTrashFinished
     }
+    // Drop of `paths` on folder `dest`: op "move" | "copy" | "link" | "trash" (async, see onTransferFinished)
+    function drop(paths, dest, op) {
+        if (paths.length === 0) return;
+        if (op === "trash") FileOps.trash(paths);
+        else FileOps.transfer(paths, dest, op);
+    }
     function newFolder() {
         if (isVirtual) return;
         const created = FileOps.makeFolder(path, "untitled folder");
@@ -210,6 +222,10 @@ QtObject {
         function onTrashFinished(error) {
             if (error) b.errorRaised(error);
             b.reload();
+        }
+        function onTransferFinished(error) {
+            if (error) b.errorRaised(error);
+            b.reload();   // virtual lists (Recents, tags) hold the old paths too
         }
     }
     onShowHiddenChanged: reload()

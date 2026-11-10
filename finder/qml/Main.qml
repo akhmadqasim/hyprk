@@ -28,6 +28,7 @@ Window {
         onErrorRaised: message => alert.show(message)
         // the inline editor held focus; hand it back so shortcuts keep working
         onRenamingPathChanged: if (!renamingPath) keys.forceActiveFocus()
+        dragSession: dnd
     }
 
     Component.onCompleted: {
@@ -303,5 +304,12 @@ Window {
     ResizeEdges {
         anchors.fill: parent
         window: win
+    }
+
+    DragSession {
+        id: dnd
+        anchors.fill: parent
+        browser: fm
+        iconSize: win.view === "icons" ? Theme.grid.iconSize : 32
     }
 }

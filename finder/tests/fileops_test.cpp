@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QEventLoop>
 #include <QFile>
+#include <QFileInfo>
 #include <QTemporaryDir>
 #include <QTimer>
 #include <cstdio>
@@ -76,6 +77,50 @@ int main(int argc, char **argv)
     // makeFolder picks the next free name
     CHECK(ops.makeFolder(work.path(), QStringLiteral("untitled folder")).endsWith(QStringLiteral("/untitled folder")));
     CHECK(ops.makeFolder(work.path(), QStringLiteral("untitled folder")).endsWith(QStringLiteral("/untitled folder 2")));
+
+    // drag and drop transfers: copy, move, symlink; never into itself, never overwriting
+    {
+        const QString src = ops.makeFolder(work.path(), QStringLiteral("dnd-src"));
+        const QString dst = ops.makeFolder(work.path(), QStringLiteral("dnd-dst"));
+        const QString a = src + QStringLiteral("/a.txt"), b = src + QStringLiteral("/b.txt");
+        { QFile f(a); f.open(QIODevice::WriteOnly); f.write("a"); }
+        { QFile f(b); f.open(QIODevice::WriteOnly); f.write("b"); }
+        QString err = QStringLiteral("unset");
+        auto run = [&](const QStringList &paths, const QString &dest, const QString &op) {
+            err = QStringLiteral("unset");
+            QEventLoop l;
+            auto c = QObject::connect(&ops, &FileOps::transferFinished, &l, [&](const QString &e) { err = e; l.quit(); });
+            QTimer::singleShot(5000, &l, &QEventLoop::quit);
+            ops.transfer(paths, dest, op);
+            if (err == QLatin1String("unset")) l.exec();
+            QObject::disconnect(c);
+        };
+        run({a}, dst, QStringLiteral("copy"));
+        CHECK(err.isEmpty() && QFile::exists(a) && QFile::exists(dst + QStringLiteral("/a.txt")));
+        run({a}, dst, QStringLiteral("move"));    // name clash: nothing moves, the error says why
+        CHECK(err.contains(QStringLiteral("already exists")) && QFile::exists(a));
+        run({b}, dst, QStringLiteral("move"));
+        CHECK(err.isEmpty() && !QFile::exists(b) && QFile::exists(dst + QStringLiteral("/b.txt")));
+        // a moved tagged file is still listed under its tag, at the new path
+        const QString c = src + QStringLiteral("/c.txt");
+        { QFile f(c); f.open(QIODevice::WriteOnly); }
+        CHECK(ops.setTags(c, {QStringLiteral("Purple")}).isEmpty());
+        run({c}, dst, QStringLiteral("move"));
+        QVariantList tagged;
+        QEventLoop tl;
+        QObject::connect(&ops, &FileOps::listed, &tl, [&](int token, const QVariantList &l) { if (token == 9) { tagged = l; tl.quit(); } });
+        QTimer::singleShot(5000, &tl, &QEventLoop::quit);
+        ops.listAsync(QStringLiteral("tag:Purple"), 9);
+        tl.exec();
+        CHECK(tagged.size() == 1 && tagged.value(0).toMap().value(QStringLiteral("path")).toString() == dst + QStringLiteral("/c.txt"));
+        run({a}, work.path(), QStringLiteral("link"));
+        CHECK(err.isEmpty() && QFileInfo(work.filePath(QStringLiteral("a.txt"))).isSymLink());
+        CHECK(ops.sameDevice(src, dst) && !ops.sameDevice(src, QStringLiteral("/nonexistent")));
+        run({src}, src, QStringLiteral("move"));   // a folder into itself is skipped, still reported as done
+        CHECK(err.isEmpty() && QFileInfo(src).isDir());
+        run({a}, work.filePath(QStringLiteral("missing")), QStringLiteral("copy"));
+        CHECK(!err.isEmpty() && err != QLatin1String("unset"));
+    }
 
     std::printf("%s\n", failures ? "FAILED" : "fileops tests passed");
     return failures ? 1 : 0;

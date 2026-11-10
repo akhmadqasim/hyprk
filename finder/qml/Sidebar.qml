@@ -39,7 +39,7 @@ Rectangle {
             { label: "iCloud Drive", icon: "icloud", path: "" },
             { label: "AirDrop", icon: "airdrop", path: "" }
         ].concat(volumes.map(v => ({ label: v.name, icon: "drive", path: v.path })))
-         .concat([{ label: "Trash", icon: "trash", path: FileOps.standardPath("trash") }]) },
+         .concat([{ label: "Trash", icon: "trash", path: FileOps.standardPath("trash"), drop: "trash:" }]) },
         { header: "Tags", items: Theme.color.tags.slice(0, 5).map(t => ({ label: t.name, dot: t.color, path: "tag:" + t.name })) }
     ]
 
@@ -91,7 +91,7 @@ Rectangle {
                                 height: parent.height
                                 radius: Theme.sidebar.rowRadius
                                 color: Theme.color.sidebarSelection
-                                visible: row.current || tap.pressed
+                                visible: row.current || tap.pressed || drop.hovered
                             }
                             Symbol {
                                 visible: !row.modelData.dot
@@ -123,6 +123,13 @@ Rectangle {
                             TapHandler {
                                 id: tap
                                 onTapped: if (row.modelData.path) root.browser.go(row.modelData.path)
+                            }
+                            FolderDrop {   // real folders and the Trash take drops; virtual rows do not
+                                id: drop
+                                anchors.fill: parent
+                                enabled: row.modelData.path !== "" && !root.browser.isVirtualPath(row.modelData.path)
+                                browser: root.browser
+                                path: row.modelData.drop || row.modelData.path   // the Trash row drops via gio trash
                             }
                         }
                     }

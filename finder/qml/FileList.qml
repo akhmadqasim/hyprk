@@ -107,6 +107,8 @@ Item {
             height: Theme.list.rowHeight
             radius: Theme.list.rowRadius
             color: selected ? Theme.color.listSelection : index % 2 ? Theme.color.listAlternate : "transparent"
+            border.width: drop.hovered ? 2 : 0   // Finder outlines the folder row under a drag
+            border.color: Theme.color.accent
 
             Row {
                 anchors.fill: parent
@@ -175,6 +177,13 @@ Item {
                 entry: row.modelData
                 index: row.index
                 onContextMenu: (e, pos) => root.contextMenu(e, pos)
+            }
+            FolderDrop {
+                id: drop
+                anchors.fill: parent
+                enabled: row.modelData.isDir === true
+                browser: root.browser
+                path: row.modelData.path
             }
         }
     }

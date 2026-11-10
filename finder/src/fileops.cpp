@@ -16,6 +16,7 @@
 #include <QXmlStreamReader>
 #include <algorithm>
 #include <cerrno>
+#include <sys/stat.h>
 #include <sys/xattr.h>
 
 FileOps::FileOps(QObject *parent) : QObject(parent)
@@ -216,6 +217,66 @@ void FileOps::trash(const QStringList &paths)
     p->start(QStringLiteral("gio"), QStringList{QStringLiteral("trash"), QStringLiteral("--")} + paths);
 }
 
+bool FileOps::sameDevice(const QString &a, const QString &b) const
+{
+    struct stat sa, sb;
+    return stat(QFile::encodeName(a).constData(), &sa) == 0 && stat(QFile::encodeName(b).constData(), &sb) == 0
+        && sa.st_dev == sb.st_dev;
+}
+
+void FileOps::transfer(const QStringList &paths, const QString &destDir, const QString &op)
+{
+    // every call ends in transferFinished, so the view always reloads and reports
+    if (!QFileInfo(destDir).isDir()) {
+        emit transferFinished(QStringLiteral("The destination folder can\u2019t be found."));
+        return;
+    }
+    QStringList items, clashes;   // never drop a folder into itself or where it already is, never overwrite
+    for (const QString &p : paths) {
+        const QString name = QFileInfo(p).fileName();
+        if (p == destDir || destDir.startsWith(p + QLatin1Char('/')) || QFileInfo(p).absolutePath() == destDir)
+            continue;
+        const QFileInfo target(destDir + QLatin1Char('/') + name);
+        (target.exists() || target.isSymLink() ? clashes : items).append(p);
+    }
+    struct Op { QString prog; QStringList flags; QString verb; };
+    const Op how = op == QLatin1String("copy") ? Op{QStringLiteral("cp"), {QStringLiteral("-a"), QStringLiteral("-n")}, QStringLiteral("copied")}
+                 : op == QLatin1String("link") ? Op{QStringLiteral("ln"), {QStringLiteral("-s")}, QStringLiteral("linked")}
+                                               : Op{QStringLiteral("mv"), {QStringLiteral("-n")}, QStringLiteral("moved")};
+    QString clashMsg;
+    if (!clashes.isEmpty())
+        clashMsg = QStringLiteral("An item named “%1” already exists in this location.").arg(QFileInfo(clashes.first()).fileName());
+    if (items.isEmpty()) {
+        emit transferFinished(clashMsg);
+        return;
+    }
+    auto *p = new QProcess(this);
+    connect(p, &QProcess::errorOccurred, this, [this, p, how](QProcess::ProcessError e) {
+        if (e != QProcess::FailedToStart)
+            return;   // other errors also end in finished()
+        emit transferFinished(QStringLiteral("Some items can\u2019t be %1.\n%2 could not be started.").arg(how.verb, how.prog));
+        p->deleteLater();
+    });
+    const bool move = how.prog == QLatin1String("mv");
+    connect(p, &QProcess::finished, this, [this, p, items, destDir, move, verb = how.verb, clashMsg](int code, QProcess::ExitStatus status) {
+        if (move) {
+            QStringList gone;   // items that really left; their tags follow them (one index rewrite)
+            for (const QString &from : items)
+                if (!QFileInfo::exists(from))
+                    gone.append(from);
+            moveTagKeysInto(gone, destDir);
+        }
+        QString err = clashMsg;
+        if (status != QProcess::NormalExit || code != 0) {
+            const QString out = QString::fromUtf8(p->readAllStandardError()).trimmed().section(QLatin1Char('\n'), 0, 0);
+            err = QStringLiteral("Some items can’t be %1.").arg(verb) + (out.isEmpty() ? QString() : QLatin1Char('\n') + out);
+        }
+        emit transferFinished(err);
+        p->deleteLater();
+    });
+    p->start(how.prog, how.flags + QStringList{QStringLiteral("-t"), destDir, QStringLiteral("--")} + items);
+}
+
 QString FileOps::rename(const QString &path, const QString &newName) const
 {
     const QFileInfo fi(path);
@@ -312,6 +373,27 @@ QStringList FileOps::tags(const QString &path) const
     QByteArray buf(size, Qt::Uninitialized);
     const ssize_t n = getxattr(p.constData(), kTagAttr, buf.data(), buf.size());
     return n > 0 ? QString::fromUtf8(buf.constData(), n).split(QLatin1Char(','), Qt::SkipEmptyParts) : QStringList();
+}
+
+// Re-keys index entries for each of `from` (and anything below it) to destDir/<its name>.
+void FileOps::moveTagKeysInto(const QStringList &from, const QString &destDir) const
+{
+    if (from.isEmpty())
+        return;
+    QJsonObject index = tagIndex();
+    bool changed = false;
+    for (const QString &key : index.keys()) {
+        for (const QString &f : from) {
+            if (key != f && !key.startsWith(f + QLatin1Char('/')))
+                continue;
+            const QJsonValue v = index.take(key);
+            index.insert(destDir + QLatin1Char('/') + QFileInfo(f).fileName() + key.mid(f.size()), v);
+            changed = true;
+            break;
+        }
+    }
+    if (changed)
+        saveTagIndex(index);
 }
 
 // Re-keys index entries for `from` paths (and anything below them) to `to`; empty `to` drops them.
