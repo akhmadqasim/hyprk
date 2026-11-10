@@ -56,15 +56,23 @@ ShellWindow {
     inputMask: Region { item: hit }
 
     // ---------- genie target (plugin-motion) ----------
-    // Where the next minimized window's tile would go: like macOS, the right section just left of
-    // Downloads/Trash (the Downloads slot, unmagnified layout), in global logical px. Sent only when it
-    // changes, from the primary screen's Dock; errors (plugin-motion not loaded) are ignored.
+    // Where minimized windows go, global logical px, unmagnified layout (plugin-motion pickTarget):
+    // each window into its app's Dock icon, like macOS's default minimize-to-application = 1
+    // (MAC-ANSWERS.md R2 (27.2.1): minimise goes into the app's icon) as "<address> x y w h", and
+    // for any other window the slot a minimized tile takes with that setting off, just left of
+    // Downloads/Trash. Sent only when it changes, from the primary screen's Dock; errors
+    // (plugin-motion not loaded) are ignored.
     readonly property bool primaryDock: screen === Panels.screen
     readonly property string genieTarget: {
         if (!primaryDock || !screen) return "";
-        const left = (dock.width - dock.baseWidth) / 2 + dock.sidePad + (sepIndex + 1) * (base + Theme.dock.iconSpacing) + sepCell - base;
-        const top = dock.height - Theme.dock.bottomMargin - pad - base;
-        return [screen.x + left, screen.y + screen.height - dock.height + top, base, base].map(Math.round).join(" ");
+        const x0 = screen.x + (dock.width - dock.baseWidth) / 2;
+        const top = screen.y + screen.height - Theme.dock.bottomMargin - pad - base;
+        const rect = left => [left, top, base, base].map(Math.round).join(" ");
+        const out = [rect(x0 + dock.sidePad + (sepIndex + 1) * (base + Theme.dock.iconSpacing) + sepCell - base)];
+        items.forEach((it, i) => (it.windows || []).forEach(w => {
+            if (w && w.address) out.push(String(w.address) + " " + rect(x0 + geom.center[i] - base / 2));
+        }));
+        return out.join(";");
     }
     function sendGenie(t) {
         Quickshell.execDetached(["hyprctl", "eval", `hl.config({ plugin = { hyprkmotion = { genie_target = "${t}" } } })`]);
