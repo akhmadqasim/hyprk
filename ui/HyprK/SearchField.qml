@@ -6,6 +6,7 @@ import QtQuick
 Rectangle {
     id: sf
     property alias text: input.text
+    readonly property bool inputFocus: input.activeFocus
     implicitHeight: Tokens.control.searchHeight
     radius: Tokens.control.searchRadius
     color: Tokens.control.searchFill
@@ -14,14 +15,14 @@ Rectangle {
     FocusRing { visible: input.activeFocus }
     Text {
         id: mag
-        x: 25 / 2 - width / 2 + 2; anchors.verticalCenter: parent.verticalCenter
+        x: 15 - width / 2; anchors.verticalCenter: parent.verticalCenter
         text: "search"; font.family: Tokens.fontGlyph; font.pixelSize: 16
         color: Tokens.secondaryLabel
     }
     TextInput {
         id: input
         MouseArea { anchors.fill: parent; acceptedButtons: Qt.NoButton; cursorShape: Qt.IBeamCursor }   // TextInput sets no I-beam itself
-        anchors.left: parent.left; anchors.leftMargin: 26
+        anchors.left: parent.left; anchors.leftMargin: 28.5
         anchors.right: parent.right; anchors.rightMargin: 10
         anchors.verticalCenter: parent.verticalCenter
         font: Typography.control
