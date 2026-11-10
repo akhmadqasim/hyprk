@@ -41,17 +41,10 @@ ShellWindow {
     readonly property string mode: SpotlightState.mode
     readonly property var modeInfo: SL.modeInfo(mode)
     // the mode buttons show once the pointer moves over Spotlight, or while a mode is active
-    property bool pointerMoved: false
-    // a surface mapped under a resting pointer gets an enter and a motion event at that point, so
-    // only a real move (from where the pointer was first seen) counts: before, the buttons always
-    // emerged on open when the pointer happened to rest over the Spotlight layer
-    property point firstPointer: Qt.point(NaN, NaN)
-    function notePointer(item, mx, my) {
-        if (pointerMoved) return;
-        const p = item.mapToItem(null, mx, my);
-        if (isNaN(firstPointer.x)) firstPointer = p;
-        else if (Math.abs(p.x - firstPointer.x) + Math.abs(p.y - firstPointer.y) > 2) pointerMoved = true;
-    }
+    // (a real move only: the layer maps under a resting pointer, components/PointerGate.qml)
+    PointerGate { id: hoverGate }
+    readonly property bool pointerMoved: hoverGate.moved
+    function notePointer(item, mx, my) { hoverGate.note(item, mx, my); }
     readonly property var actions: mode === "" && query.trim() !== "" ? SpotlightActions.rank(query, 2) : []
     readonly property bool quickKeyHit: SL.quickKeyAction(SpotlightState.quickKeys, query) !== ""
     readonly property var files: mode === "" ? FileSearch.results.slice(0, 3) : []
@@ -84,7 +77,7 @@ ShellWindow {
     }
     function setMode(m) {
         SpotlightState.mode = m;
-        pointerMoved = true;
+        hoverGate.moved = true;
         input.forceActiveFocus();
     }
     // query field keys without a dedicated handler: Super/Ctrl/Alt+1..4 pick a mode,

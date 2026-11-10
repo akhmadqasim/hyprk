@@ -51,7 +51,10 @@ Item {
         return "";
     }
 
-    onModeChanged: { selected = 0; category = ""; editingKey = ""; prepare(); }
+    // the grid appears under a resting pointer: hover selects only after a real move since the
+    // view opened or the keyboard last moved the selection (components/PointerGate.qml)
+    PointerGate { id: hoverGate }
+    onModeChanged: { selected = 0; category = ""; editingKey = ""; hoverGate.reset(); prepare(); }
     onQueryChanged: selected = 0
     onItemsChanged: if (selected >= items.length) selected = Math.max(0, items.length - 1)
     Component.onCompleted: prepare()
@@ -70,6 +73,7 @@ Item {
         if (items.length === 0) return;
         const step = isGrid ? dx + dy * gridColumns : dy;
         selected = Math.max(0, Math.min(items.length - 1, selected + step));
+        hoverGate.reset();   // scrolling to the selection slides cells under the pointer
     }
     function accept() {
         const it = items[selected];
@@ -265,7 +269,8 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
-                    onEntered: view.selected = cell.index
+                    onEntered: if (hoverGate.note(this, mouseX, mouseY)) view.selected = cell.index
+                    onPositionChanged: mouse => { if (hoverGate.note(this, mouse.x, mouse.y)) view.selected = cell.index; }
                     onClicked: { view.selected = cell.index; view.accept(); }
                 }
             }
