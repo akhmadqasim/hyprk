@@ -1,7 +1,7 @@
 # liquidglass: macOS 27 Liquid Glass for Hyprland 0.57.2
 
 Own plugin (C++ + GLSL ES 3.00). It draws the Liquid Glass material behind chosen layer-shell surfaces
-(the hyprk shell: menu bar menus, dock, Control Center, notifications, Spotlight, Cmd+Tab).
+(the hyprk shell: menu bar menus (not the bar: it has no glass on 27.2.1), dock, Control Center, notifications, Spotlight, Cmd+Tab).
 Math follows the macOS 27.2 QuartzCore `glass_background_*` shader recovered in
 `/mnt/code/liquid-glass-re/SPEC.md`: Apple's quarter-circle bevel for refraction, 7-tap chromatic aberration,
 erfc-shaped drop shadow, two-lobe rim highlight applied as a colour bias, mip-LOD variable blur.
@@ -29,8 +29,8 @@ or in `hyprland.lua`, before the config block:
 ```lua
 hl.plugin.load("/mnt/code/hyprk/plugin/build/libliquidglass.so")
 hl.config({ plugin = { liquidglass = {
-    namespaces = "hyprk-menubar,hyprk-dock,hyprk-overlay,hyprk-notifications,hyprk-spotlight,hyprk-switcher",
-    radii      = "hyprk-menubar:0",
+    namespaces = "hyprk-dock,hyprk-overlay,hyprk-notifications,hyprk-spotlight,hyprk-switcher",
+    radii      = "hyprk-dock:26",
 } } })
 ```
 
@@ -89,8 +89,8 @@ the pointer light; the shell then crossfades panels instead of materializing the
 
 | Key | Default | Meaning |
 |---|---|---|
-| `spacing` | `hyprk-controlcenter:8,hyprk-dock:8,hyprk-menubar:8,hyprk-overlay:8,hyprk-spotlight:8` | `ns:pt` smoothness k of the union (SwiftUI default 8; CC tiles 12 apart stay separate at rest; Spotlight's mode buttons, 12 from the field, fuse with it only while they emerge) |
-| `pointer_light_namespaces` | `hyprk-controlcenter,hyprk-dock,hyprk-menubar` | glass that lights up around the pointer |
+| `spacing` | `hyprk-controlcenter:8,hyprk-dock:8,hyprk-overlay:8,hyprk-spotlight:8` | `ns:pt` smoothness k of the union (SwiftUI default 8; CC tiles 12 apart stay separate at rest; Spotlight's mode buttons, 12 from the field, fuse with it only while they emerge) |
+| `pointer_light_namespaces` | `hyprk-controlcenter,hyprk-dock` | glass that lights up around the pointer |
 | `pointer_light` / `pointer_light_radius` | 1 / 60 | strength (0 = off), Gaussian radius in px |
 | `reduce_motion` | 0 | 1 = no merging, no pointer light |
 
@@ -105,7 +105,7 @@ Apple's numbers from `/mnt/code/liquid-glass-re/SPEC.md` section 9 (glass versio
 | Recipe | Face YCC light (black, white, sat) | Fill / lift light | Inner refraction height / amount | Outer layer (h / amount / opacity) | Blur | Shadow | Used for (default) |
 |---|---|---|---|---|---|---|---|
 | `regular` | 0.4, 0.92, 1.0 (Apple 1.03, 1.2) | white 12% (Apple 20%) | 0.25 D (max 20) / -0.5 D (min -60) | 0.2 D / 0.25 D / 0.6 | D 48→160 : 2→4 (Apple 64→160 : 0→4), variable: full until 1 pt from the edge (Apple: half at 1 pt) | D 64→160 : 0.25→0.75, r 24, y 8 | notifications, switcher |
-| `menu` | as regular | as regular | as regular | as regular | as regular | 0.6, r 24, y 10 | `hyprk-overlay`, `hyprk-menubar` |
+| `menu` | as regular | as regular | as regular | as regular | as regular | 0.6, r 24, y 10 | `hyprk-overlay` |
 | `spotlight` | 0.1, 1.0, 1.25 (SiriRecipe branch A, reference/re/NOTES.md; light and dark) | none | 0.4 D / -0.72 D (no caps) | 0.4 D / 0.4 D / 1.0 | 6 (Apple 8 x opacity 0.75), variable: full from 60 pt in to 1 pt from the edge; blur fill darken 0.75, normal 0.5 | none, no edge bleed, no ring | `hyprk-spotlight` |
 | `clear` | 0.125, 1.08, 1.06 | none | 0.25 D / -0.8 D | none | D 48→120 : 3→8 | as regular | |
 | `dock` | 0.15, 0.9, 0.5 (Apple 1.25; less chroma, rim bias 1.0, matched to the reference dock) | none / 0.05 | 0.08 D / -0.18 D | 0.13 D / 0.42 D / 0.2 | 1.5 | as regular | `hyprk-dock` |
@@ -138,8 +138,8 @@ how Apple's blur radius maps to extra mip levels (`blur_lod_scale`).
 | Key | Default | Meaning |
 |---|---|---|
 | `enabled` | 1 | 0 = plugin inactive, Hyprland's normal blur rules apply |
-| `namespaces` | hyprk-menubar, dock, overlay, controlcenter, notifications, spotlight, switcher | comma list of layer namespaces, `*` = all |
-| `materials` | `hyprk-dock:dock,hyprk-controlcenter:controlcenter,hyprk-overlay:menu,hyprk-menubar:menu` | `ns:recipe` map |
+| `namespaces` | hyprk-dock, overlay, controlcenter, notifications, spotlight, switcher | comma list of layer namespaces, `*` = all |
+| `materials` | `hyprk-dock:dock,hyprk-controlcenter:controlcenter,hyprk-overlay:menu` | `ns:recipe` map |
 | `material` | `regular` | recipe for namespaces not in `materials` |
 | `window_material` | `regular` | recipe for window glass |
 | `radii` | "" | `ns:radius` overrides |
