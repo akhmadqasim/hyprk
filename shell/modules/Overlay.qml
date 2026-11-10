@@ -25,11 +25,11 @@ ShellWindow {
     // mapped again (one empty frame at the start of the close); the spring value only moves later
     visible: active || nc.progress > 0 || nc.animating || menu.visible || context.visible || alert.visible
     acceptsInput: active
-    // NotificationCenter slides itself in and out on its spring; its glass materializes along
-    // (menus and alerts materialize on their own; not while one already shows during the NC slide-out)
+    // NotificationCenter slides itself in and out on its spring with its glass at full material
+    // (MAC-ANSWERS.md R2 (27.2.1): a slide, nothing fades); menus and alerts materialize on their own.
+    // Reduce motion: no slide, a crossfade (not while a menu already shows during the NC slide-out)
     readonly property bool ncDrives: nc.animating && (Panels.open === "nc" || !active)
-    glassMaterialize: ncDrives && !A11y.reduceMotion ? Math.min(1, nc.progress) : 1
-    glassOpacity: ncDrives && A11y.reduceMotion ? Math.max(0, Math.min(1, nc.progress)) : 1   // Reduce motion: crossfade
+    glassOpacity: ncDrives && A11y.reduceMotion ? Math.max(0, Math.min(1, nc.progress)) : 1
 
     anchors { top: true; left: true; right: true; bottom: true }
     margins.top: Theme.menuBar.height

@@ -9,8 +9,8 @@ import qs.services
 import qs.HyprK
 
 // Notification Center (macOS 27): grouped notifications on top, widgets below.
-// Motion: the whole column slides in from the right screen edge on the SwiftUI
-// default spring (response 0.5 s, critically damped, SPEC 9.9.4) and back out on close.
+// Motion: the whole column slides in from the right screen edge and back out on close (springs fitted
+// to MAC-ANSWERS.md R2 (27.2.1), see openSpring).
 // Groups: one card per app with the edges of up to two more peeking below; a click
 // unfolds the stack (cards glide down from behind the first, header with the app
 // name, Show Less and a clear button fades in), Show Less folds it back. Hover shows
@@ -70,14 +70,27 @@ Item {
     readonly property bool shown: Panels.open === "nc" && onThisScreen
     readonly property bool animating: openSpring.moving
     readonly property real progress: openSpring.value   // 0 off-screen .. 1 open (Overlay: glass materialize)
-    readonly property real slideX: Theme.travel((1 - openSpring.value) * (nc.width + Theme.nc.marginRight + 30))   // Reduce motion: fades
+    // value = share of the panel on screen (0 = its left edge at the screen edge). Reduce motion: fades
+    readonly property real slideX: Theme.travel((1 - openSpring.value) * (nc.width + Theme.nc.marginRight))
+    // MAC-ANSWERS.md R2 (27.2.1), share on screen per 17 ms frame:
+    //   open  0.11 0.14 0.29 0.43 0.54 0.64 0.71 0.78 0.83 0.87 0.90 0.92 0.94 ... 0.99 (~0.3 s, ease-out,
+    //         no overshoot): spring response 0.30, damping 1.0 fits within 0.012 RMS (OutCubic 330 ms: 0.025)
+    //   close 0.92 0.80 0.66 0.50 0.41 0.28 0.20 0.14 0.11 then gone (~0.15 s): spring response 0.295,
+    //         damping 0.85 fits within 0.011 RMS; the spring would take another ~0.1 s to creep the
+    //         last 10 % off screen, so like the Mac the panel is gone once less than 0.1 shows
+    // The panel only slides: its glass is at full material all the way (Overlay.qml).
     Spring {
         id: openSpring
         onStarted: nc.settle()
-        onValueChanged: if (moving) nc.settle()
+        onValueChanged: {
+            if (!moving) return;
+            if (!nc.shown && target === 0 && value < 0.1) snap();
+            else nc.settle();
+        }
     }
     onShownChanged: {
-        openSpring.response = shown ? 0.5 : 0.4;
+        openSpring.response = shown ? 0.30 : 0.295;
+        openSpring.damping = shown ? 1.0 : 0.85;
         openSpring.target = shown ? 1 : 0;
         if (shown) refresh();
         else expanded = ({});         // macOS reopens with every stack collapsed
