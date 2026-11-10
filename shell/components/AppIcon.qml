@@ -9,7 +9,8 @@ AppIconTile {
     property string appId
 
     source: Apps.iconUrl(icon, appId)
-    trusted: Apps.isMacIcon(icon, appId)
+    // macOS icons, and Dock folders/Trash (macOS never puts those on a tile)
+    trusted: Apps.isMacIcon(icon, appId) || /^(user-trash|folder)/.test(icon)
     style: Theme.iconStyle
     tint: Theme.color.accent
     body: Theme.appIcon.body

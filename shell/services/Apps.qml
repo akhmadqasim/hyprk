@@ -187,14 +187,23 @@ Singleton {
     // true when the icon is one of the extracted macOS icons (already a squircle)
     function isMacIcon(name, appId) { return macIconFor(name, appId) !== ""; }
 
+    // freedesktop names for hyprk's own items, used when the macOS icons are not there
+    readonly property var themeAliases: ({
+        "hyprk-finder": ["system-file-manager", "org.gnome.Nautilus"],
+        "hyprk-launchpad": ["view-app-grid", "appgrid", "view-app-grid-symbolic"],
+        "settings": ["preferences-system", "org.gnome.Settings"],
+    })
     // Absolute icon url: macOS icon when mapped, else the icon theme, else the generic app icon.
     function iconUrl(name, appId) {
         const mac = macIconFor(name, appId);
         if (mac) return "file://" + iconDir + (mac[0] === "@" ? "/system/" + mac.slice(1) : "/apps/" + mac) + "-512.png";
         if (!name) return genericIcon;
         if (name.startsWith("/")) return "file://" + name;
-        const themed = Quickshell.iconPath(name, true);
-        return themed ? themed : genericIcon;
+        for (const n of [name].concat(themeAliases[name] || [])) {
+            const themed = Quickshell.iconPath(n, true);
+            if (themed) return themed;
+        }
+        return genericIcon;
     }
 
     function activeAppName() {

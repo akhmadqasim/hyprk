@@ -4,6 +4,16 @@
 HYPRK_ROOT=${HYPRK_ROOT:-$(cd "$(dirname "$0")/../.." && pwd)}
 export HYPRK_ROOT
 export XDG_DATA_DIRS="$HYPRK_ROOT/config:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"   # config/icons/hyprk-cursors
+# App icons: the local hyprk-apple layer (user-extracted macOS icons, themes/icons/build-apple-theme.sh),
+# else WhiteSur (themes/icons/install.sh, in the hyprk data prefix), else the system theme.
+# Either way the shell puts non-squircle icons on a macOS 26 tile (shell/components/AppIconTile.qml).
+HYPRK_DATA=${HYPRK_DATA:-${XDG_DATA_HOME:-$HOME/.local/share}/hyprk}
+if [ -z "${QS_ICON_THEME:-}" ]; then
+    if [ -f "$HYPRK_ROOT/themes/icons/hyprk-apple/index.theme" ]; then export QS_ICON_THEME=hyprk-apple
+    elif [ -f "$HYPRK_DATA/icons/WhiteSur/index.theme" ]; then export QS_ICON_THEME=WhiteSur
+    fi
+fi
+export XDG_DATA_DIRS="$HYPRK_ROOT/themes:$HYPRK_DATA:$XDG_DATA_DIRS"   # themes/icons/hyprk-apple, <data>/icons/WhiteSur
 export XCURSOR_PATH="$HYPRK_ROOT/themes/cursors/theme:${XCURSOR_PATH:-/usr/share/icons}"
 unset HYPRK_GLASS        # decided by hyprland.lua after loading the glass plugin
 export XCURSOR_THEME=hyprk-cursors HYPRCURSOR_THEME=hyprk-cursors XCURSOR_SIZE=24 HYPRCURSOR_SIZE=24
