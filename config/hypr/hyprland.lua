@@ -222,10 +222,10 @@ hl.bind(cmd .. " + M",       hl.dsp.window.float({ action = "toggle" }))
 hl.bind(cmd .. " + CTRL + F", hl.dsp.window.fullscreen())
 hl.bind(cmd .. " + Return",  hl.dsp.exec_cmd(terminal))
 hl.bind(cmd .. " + SHIFT + Escape", hl.dsp.exit())
--- Lock Screen like macOS (Ctrl+Cmd+Q). Appearance from state/appearance.json.
-hl.bind("CTRL + " .. cmd .. " + Q", hl.dsp.exec_cmd(
-    "d=$(jq -r 'if .dark then \"--dark\" else \"\" end' " .. state .. "/appearance.json 2>/dev/null); " ..
-    hyprk .. "/lockscreen/hyprk-lock.sh $d"))
+-- Lock Screen like macOS (Ctrl+Cmd+Q): the shell's lock screen, hyprlock when the shell is not running
+-- (lockscreen/lock.sh, lockscreen/FALLBACKS.md). Its fade layers animate themselves.
+hl.bind("CTRL + " .. cmd .. " + Q", hl.dsp.exec_cmd(hyprk .. "/lockscreen/lock.sh"))
+hl.layer_rule({ name = "hyprk-lock", match = { namespace = "^hyprk-lock$" }, no_anim = true })
 hl.bind(cmd .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
 hl.bind(cmd .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 for i = 1, 9 do
