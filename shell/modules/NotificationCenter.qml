@@ -88,12 +88,41 @@ Item {
             else nc.settle();
         }
     }
+    // The Overlay window is unmapped while nothing shows, so opening maps a new layer surface and the compositor
+    // takes a few frames to present it. A spring started with `shown` ran those frames unseen (the first 2 to 3 steps
+    // of the slide were lost). So the slide starts on the window's first presented frame (frameSwapped, like
+    // Spotlight), which shows the panel still off screen; the next frame is step 1. If the window is already mapped
+    // (a menu was open) it starts at once.
+    property bool windowLive: false
+    property bool openPending: false
+    Connections {
+        target: nc.Window.window   // the QQuickWindow (QsWindow.window is Quickshell's proxy, which has no frameSwapped)
+        function onVisibleChanged() { if (!nc.Window.window.visible) nc.windowLive = false; }
+        function onFrameSwapped() {
+            if (!nc.Window.window.visible) return;     // frames of an unmapped window do not count
+            nc.windowLive = true;
+            if (nc.openPending) nc.startOpen();
+        }
+    }
+    function startOpen() {
+        openPending = false;
+        if (!shown) return;
+        openSpring.response = 0.30;
+        openSpring.damping = 1.0;
+        openSpring.target = 1;
+    }
     onShownChanged: {
-        openSpring.response = shown ? 0.30 : 0.295;
-        openSpring.damping = shown ? 1.0 : 0.85;
-        openSpring.target = shown ? 1 : 0;
-        if (shown) refresh();
-        else expanded = ({});         // macOS reopens with every stack collapsed
+        if (shown) {
+            if (windowLive) startOpen();
+            else openPending = true;
+            refresh();
+        } else {
+            openPending = false;
+            openSpring.response = 0.295;
+            openSpring.damping = 0.85;
+            openSpring.target = 0;
+            expanded = ({});         // macOS reopens with every stack collapsed
+        }
     }
 
     // ---------- groups: one stable row per app, so stacks animate instead of being rebuilt ----------
