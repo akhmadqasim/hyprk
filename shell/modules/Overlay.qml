@@ -55,14 +55,16 @@ ShellWindow {
         id: context
         shown: Panels.open === "context" && Panels.activeScreen === ov.modelData
         items: Panels.contextItems
-        x: Math.max(Theme.menu.screenMargin, Math.min(ov.width - width - Theme.menu.screenMargin, Panels.contextAbove ? Panels.contextX - width / 2 : Panels.contextX))
+        // AppKit popUp at a point (MAC-ANSWERS.md Q-menubar-27): x = point, top = point - 5 so the first row
+        // starts at the pointer; at the right edge it flips to the left of the point, at the bottom it is
+        // shifted up to 6 pt above the edge. Above the Dock it is centred on the point and ends there.
+        readonly property real px: Panels.contextAbove ? Panels.contextX - width / 2
+                                 : Panels.contextX + width > ov.width - Theme.menu.screenMargin ? Panels.contextX - width : Panels.contextX
+        x: Math.max(Theme.menu.screenMargin, Math.min(ov.width - width - Theme.menu.screenMargin, px))
         y: Math.max(0, Math.min(ov.height - height - Theme.menu.screenMargin,
-                                Panels.contextY - Theme.menuBar.height - (Panels.contextAbove ? height : 0)))
+                                Panels.contextY - Theme.menuBar.height - (Panels.contextAbove ? height : Theme.menu.padding)))
         originX: x
         originY: y + Theme.menuBar.height
-        // from the click point: above the Dock it ends at the point, else it starts there
-        anchorX: Panels.contextAbove ? width / 2 : 0
-        anchorY: Panels.contextAbove ? height : 0
     }
 
     // ---------- alert ----------
@@ -82,13 +84,11 @@ ShellWindow {
     MenuDropdown {
         id: menu
         shown: Panels.open === "menu" && Panels.activeScreen === ov.modelData
-        x: Math.min(Panels.menuShownX, ov.width - width - 4)
+        // at the title frame x - 5, 1 pt below the bar, kept 6 pt off the right edge (Q-menubar-14)
+        x: Math.max(0, Math.min(Panels.menuShownX + Theme.menu.offsetX, ov.width - width - Theme.menu.screenMargin))
         y: Theme.menu.offsetY
         originX: x
         originY: y + Theme.menuBar.height
-        // from the menu bar title
-        anchorX: Panels.menuShownX - x
-        anchorY: -Theme.menu.offsetY
         items: Panels.menuShown < 0 ? []
              : Menus.forIndex(Panels.menuShown, Apps.appIdOf(Hyprland.activeToplevel), Apps.activeAppName(), Quickshell.env("USER"))
     }

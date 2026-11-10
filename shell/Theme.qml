@@ -41,7 +41,11 @@ Singleton {
     readonly property bool solidMaterial: reduceTransparency || increaseContrast || !blurAvailable
     // set by services/Wallpaper from the luminance of the strip behind the menu bar
     property bool menuBarOnLight: false
-    readonly property real menuBarLumaThreshold: 0.62   // TODO verify
+    // one text colour for the whole bar from the mean gamma-encoded luma of the wallpaper behind it: uniform grey
+    // <= 163 white, >= 166 black, so the switch is at 164.5/255 (MAC-ANSWERS.md Q-menubar-03)
+    readonly property real menuBarLumaThreshold: 0.645
+    // Reduce Transparency: the bar is opaque and ignores the wallpaper, dark text on the light bar (Q-menubar-32)
+    readonly property bool menuBarLight: reduceTransparency ? !dark : menuBarOnLight
     // liquidglass Hyprland plugin loaded (config/hypr/hyprland.lua exports HYPRK_GLASS=plugin);
     // Reduce transparency still wins and uses the solid QML material
     readonly property bool compositorGlass: Quickshell.env("HYPRK_GLASS") === "plugin" && !reduceTransparency && !increaseContrast
@@ -156,10 +160,20 @@ Singleton {
 
         // Menu bar: no background (MAC-ANSWERS.md Q9.1: bar pixels = desktop pixels over a solid wallpaper).
         // Text follows the wallpaper behind the bar, not the appearance (white over a checker in light and
-        // dark mode, measured); the luma switch itself is guessed (menuBarLumaThreshold).
-        readonly property color menuBarText: theme.menuBarOnLight ? Qt.rgba(0, 0, 0, 0.85) : "#FFFFFF"
+        // dark mode, measured); the switch is at menuBarLumaThreshold (Q-menubar-03).
+        readonly property color menuBarText: theme.menuBarLight ? "#000000" : "#FFFFFF"   // titles opaque 0 / 255 (Q-menubar-03)
+        // status glyphs and the clock are slightly translucent: black ~38 on 255, white ~230 on 0 (Q-menubar-03)
+        readonly property color menuBarStatusText: theme.menuBarLight ? Qt.rgba(0, 0, 0, 0.85) : Qt.rgba(1, 1, 1, 0.9)
+        // Reduce Transparency: opaque bar grey 32 dark / 218 light, pill solid 57 / 190; Increase Contrast: pill
+        // solid 117 in both (Q-menubar-32)
+        readonly property color menuBarFill: !theme.reduceTransparency ? "transparent" : theme.dark ? "#202020" : "#DADADA"
+        readonly property color menuBarPillSolid: theme.reduceTransparency ? (theme.dark ? "#393939" : "#BEBEBE")
+                                                : theme.increaseContrast ? "#757575" : theme.glass.solid
+        // menu separator: black a.10 light, white a.14 dark (Q-menubar-20)
+        readonly property color menuSeparator: theme.dark ? theme.stroke(1, 1, 1, 0.14) : theme.stroke(0, 0, 0, 0.10)
+        // Reduce Transparency menu: opaque 20 dark, light 255 over white / 250 over black (Q-menubar-32)
+        readonly property color menuSolid: theme.dark ? "#141414" : Qt.rgba(1, 1, 1, 0.98)
         readonly property color menuBarPillShadow: Qt.rgba(0, 0, 0, 0.05)   // 206 -> 196 just below the pill (measured), shape guessed
-        readonly property color menuBarBackground: Qt.rgba(0, 0, 0, 0.0)              // no bar background (measured)
 
         // menu highlight
         readonly property color menuSelection: accent
@@ -199,31 +213,62 @@ Singleton {
         // Q9.1), but that is a notched MacBook Air, where the bar matches the notch; a display without a notch
         // was not measured, so this stays 30 until it is.
         readonly property int height: 30
-        readonly property int sidePadding: 14            // left edge to the logo / right edge to clock, TODO verify
+        // 27.2.1 AX title frames (Q-menubar-05, -07): Apple item 10..44 around its 13 pt glyph, every title = text
+        // + ~10.5 a side, neighbours overlap 1 pt; the clock ends 20 pt from the right edge (Q-menubar-09)
+        readonly property real leftMargin: 10
+        readonly property real rightMargin: 20
+        readonly property real appleWidth: 13           // content width of the logo item (Apple glyph ink 13)
         readonly property int logoSize: 16               // distro logo box; the Apple glyph was 14 + 2
-        readonly property int titleHPadding: 9           // inner padding of a menu title pill, TODO verify
-        readonly property int titleSpacing: 2            // gap between pills, TODO verify
+        readonly property real titleHPadding: 10.5
+        readonly property real titleSpacing: -1
+        // open title pill: capsule 4 pt outside the title frame, y 5.25..28.75 (Q-menubar-05)
+        readonly property real titlePillOutset: 4
+        readonly property real titlePillHeight: 23.5
+        // open status item pill: 10 pt outside the item frame, y 5..29 (Q-menubar-11)
+        readonly property real statusPillOutset: 10
+        readonly property real statusPillHeight: 24
         // selection pill corner radius 12, continuous (MENUBAR-REA-27.2.1.md); on the 23 pt pill it is a capsule
         readonly property real titleRadius: 12
-        readonly property int titleHeight: 23            // open title pill y 6..29 pt (MAC-ANSWERS.md Q9.1), centred here
         readonly property int statusIconSize: 16         // TODO verify
-        readonly property int statusSpacing: 4           // ~20pt icon pitch in reference, TODO verify
-        readonly property int statusHPadding: 8          // TODO verify
+        // system items 16 pt apart (Q-menubar-09); item frame = glyph + pads (Wi-Fi 16.5 in 22, CC 13.5 in 26,
+        // battery and clock 0)
+        readonly property real statusSpacing: 16
+        readonly property real statusHPadding: 3
     }
 
-    // ---------- pull-down menus ----------
+    // ---------- menus (pull-downs and context menus, MenuDropdown.qml) ----------
     readonly property QtObject menu: QtObject {
         readonly property int radius: 12                 // SPEC 9.9.2: context menu glass radius 12
         readonly property int padding: 5                 // SPEC.md 7: menu top/bottom padding 5
         readonly property int itemHeight: 24             // SPEC.md 7: glass menu line height 24
-        readonly property int itemHPadding: 11           // SPEC 9.9.2: outer padding 16 minus the 5 inset
         readonly property int itemInset: 5               // SPEC 9.9.2: selection x+5, width-10
         readonly property int itemRadius: 7              // SPEC 9.9.2: glass menu selection radius 7
         readonly property int shortcutGap: 22            // SPEC 9.9.2: gap before the key-equivalent column
-        readonly property int separatorHeight: 11        // incl. spacing, TODO verify
-        readonly property int minWidth: 220              // TODO verify
-        readonly property int offsetY: 3                 // gap below menu bar, TODO verify
-        readonly property int screenMargin: 4            // menus keep this distance from screen edges
+        readonly property int separatorHeight: 11        // separator row 11, line at y 5..6 (Q-menubar-20)
+        // a pull-down opens at title x - 5, 1 pt below the bar (Q-menubar-14)
+        readonly property real offsetX: -5
+        readonly property real offsetY: 1
+        readonly property real screenMargin: 6           // right clamp 6 pt, bottom = visible bottom - 6 (Q-menubar-14, -27)
+        // row content x from the menu's left edge (Q-menubar-15..18, -23): text 16, or 30 when some row has a
+        // state; rows with an icon: icon centred at 24 / 36, text at 40 / 51; check glyph centred at 18.25
+        readonly property real textX: 16
+        readonly property real stateTextX: 30
+        readonly property real iconX: 24
+        readonly property real iconTextX: 40
+        readonly property real stateIconX: 36
+        readonly property real stateIconTextX: 51
+        readonly property real checkX: 18.25
+        // key column right edge W - 18.5, modifiers end 3 pt left of it; chevron centred at W - 23.25 in a
+        // 32 pt trailing field; a plain row ends ~17 pt before the edge (single "A" menu 41 wide)
+        readonly property real keyRight: 18.5
+        readonly property real modifierGap: 3
+        readonly property real chevronX: 23.25
+        readonly property real chevronField: 32
+        readonly property real trailing: 17
+        readonly property real separatorInset: 16        // line x 16..W-16, at row y 5..6 (Q-menubar-20)
+        // activation: highlight off 4 frames, on 3, then the menu fades (Q-menubar-24)
+        readonly property int blinkOff: 67
+        readonly property int blinkOn: 50
     }
 
     // ---------- dock ----------

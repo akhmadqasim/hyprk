@@ -16,7 +16,8 @@ import "../lib/state.js" as State
 
 // macOS 27 menu bar: no background and no glass of its own. It always shows the desktop picture (windows
 // stay below it), with text coloured for the wallpaper behind it, not for the appearance
-// (reference/re/MAC-ANSWERS.md Q9.1). The top dimming of bright wallpapers is drawn by Background.qml.
+// (reference/re/MAC-ANSWERS.md Q-menubar-02, -03). The contrast gradient behind it is drawn by Background.qml.
+// Geometry from the 27.2.1 AX frames (Q-menubar-05, -09): titles = text + 10.5 a side, overlapping 1 pt.
 ShellWindow {
     id: bar
 
@@ -25,13 +26,14 @@ ShellWindow {
 
     anchors { top: true; left: true; right: true }
     implicitHeight: Theme.menuBar.height
-    color: Theme.color.menuBarBackground
+    color: Theme.color.menuBarFill   // opaque only under Reduce Transparency
     namespace: "hyprk-menubar"
     WlrLayershell.layer: WlrLayer.Top
 
     readonly property string appId: Apps.appIdOf(Hyprland.activeToplevel)
     readonly property var appMenus: Menus.forApp(appId)
-    readonly property color fg: Theme.color.menuBarText
+    readonly property color fg: Theme.color.menuBarText          // titles
+    readonly property color statusFg: Theme.color.menuBarStatusText   // status glyphs and the clock
     // 12/24h and date order follow the time locale like macOS (LC_ALL > LC_TIME > LANG)
     readonly property var clockStyle: Clock.styleFor(Quickshell.env("LC_ALL") || Quickshell.env("LC_TIME") || Quickshell.env("LANG"))
 
@@ -39,7 +41,7 @@ ShellWindow {
     Row {
         id: left
         anchors.left: parent.left
-        anchors.leftMargin: Theme.menuBar.sidePadding - Theme.menuBar.titleHPadding
+        anchors.leftMargin: Theme.menuBar.leftMargin
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.menuBar.titleSpacing
 
@@ -50,7 +52,7 @@ ShellWindow {
                 size: Theme.menuBar.logoSize
                 color: bar.fg
             }
-            contentWidth: Theme.menuBar.logoSize
+            contentWidth: Theme.menuBar.appleWidth
         }
         MenuTitle {
             menuIndex: 1
@@ -75,13 +77,14 @@ ShellWindow {
 
     Row {
         anchors.right: parent.right
-        anchors.rightMargin: Theme.menuBar.sidePadding - Theme.menuBar.statusHPadding
+        anchors.rightMargin: Theme.menuBar.rightMargin
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.menuBar.statusSpacing
 
         // Battery: hidden on desktops (no system battery)
         StatusItem {
             visible: bar.laptop
+            hPad: 0   // the battery glyph fills its item (Q-menubar-09)
             contentWidth: batteryRow.implicitWidth
             Row {
                 id: batteryRow
@@ -90,14 +93,14 @@ ShellWindow {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     text: Math.round(UPower.displayDevice.percentage * 100) + "%"
-                    color: bar.fg
+                    color: bar.statusFg
                     font: Typography.font(12)   // battery percentage, 12 by eye (not measured)
                 }
                 BatteryIcon {
                     anchors.verticalCenter: parent.verticalCenter
                     level: UPower.displayDevice.percentage
                     charging: UPower.displayDevice.state === UPowerDeviceState.Charging
-                    color: bar.fg
+                    color: bar.statusFg
                 }
             }
         }
@@ -109,7 +112,7 @@ ShellWindow {
                 surface: "menubar"
                 size: Theme.menuBar.statusIconSize
                 variableValue: bar.wifiNet ? bar.wifiNet.signalStrength : -1   // 0..1 -> bars lit (sf.js pick)
-                color: bar.fg
+                color: bar.statusFg
                 opacity: bar.wifiDev && bar.wifiDev.connected ? 1 : 0.5
             }
             onClicked: Panels.toggle("cc", bar.screen)
@@ -117,27 +120,29 @@ ShellWindow {
         // Focus: shown only while Do Not Disturb is on, like macOS
         StatusItem {
             visible: Notifs.dnd
-            Symbol { anchors.centerIn: parent; name: "moon"; surface: "menubar"; size: Theme.menuBar.statusIconSize - 1; color: bar.fg }
+            Symbol { anchors.centerIn: parent; name: "moon"; surface: "menubar"; size: Theme.menuBar.statusIconSize - 1; color: bar.statusFg }
             onClicked: Panels.toggle("cc", bar.screen)
         }
         StatusItem {
-            Symbol { anchors.centerIn: parent; name: "magnifyingglass"; surface: "menubar"; size: Theme.menuBar.statusIconSize - 1; color: bar.fg }
+            Symbol { anchors.centerIn: parent; name: "magnifyingglass"; surface: "menubar"; size: Theme.menuBar.statusIconSize - 1; color: bar.statusFg }
             onClicked: Panels.toggle("spotlight")
         }
         StatusItem {
             // lit while Control Center is open and while the volume/brightness HUD shows (it hangs under this item)
             active: (Panels.open === "cc" && Panels.activeScreen === bar.screen) || (Hud.shown && Hud.screen === bar.modelData)
-            Symbol { anchors.centerIn: parent; name: "controlcenter"; surface: "menubar"; size: Theme.menuBar.statusIconSize; color: bar.fg }
+            hPad: 5   // CC item 26 around a 13.5 glyph (Q-menubar-09)
+            Symbol { anchors.centerIn: parent; name: "controlcenter"; surface: "menubar"; size: Theme.menuBar.statusIconSize; color: bar.statusFg }
             onClicked: Panels.toggle("cc", bar.screen)
         }
         StatusItem {
             active: Panels.open === "nc" && Panels.activeScreen === bar.screen
+            hPad: 0   // clock ink fills its item (Q-menubar-09)
             contentWidth: clockText.implicitWidth
             Text {
                 id: clockText
                 anchors.centerIn: parent
                 text: Clock.format(clock.date, bar.clockStyle)
-                color: bar.fg
+                color: bar.statusFg
                 font: Typography.menuBar
             }
             onClicked: Panels.toggle("nc", bar.screen)
@@ -160,10 +165,10 @@ ShellWindow {
         readonly property bool open: Panels.open === "menu" && Panels.menuIndex === menuIndex && Panels.activeScreen === bar.screen
 
         width: contentWidth + Theme.menuBar.titleHPadding * 2
-        height: Theme.menuBar.titleHeight
+        height: bar.height
 
         // the pill jumps at once (MAC-ANSWERS.md R2); the dropdown follows a few frames later (Panels.stepMenu)
-        HighlightPill { shown: mt.open }
+        HighlightPill { shown: mt.open; outset: Theme.menuBar.titlePillOutset; pillHeight: Theme.menuBar.titlePillHeight }
         Text {
             id: label
             anchors.centerIn: parent
@@ -196,7 +201,12 @@ ShellWindow {
     component HighlightPill: Item {
         id: hp
         property bool shown: false
-        anchors.fill: parent
+        property real outset: 0        // beyond the item frame on each side
+        property real pillHeight: 0    // centred on the bar
+        x: -outset
+        y: (parent.height - pillHeight) / 2
+        width: parent.width + outset * 2
+        height: pillHeight
         Loader {
             anchors.fill: parent
             active: hp.shown
@@ -214,7 +224,7 @@ ShellWindow {
                     anchors.fill: parent
                     visible: Theme.solidMaterial
                     radius: Math.min(Theme.menuBar.titleRadius, height / 2)
-                    color: Theme.glass.solid
+                    color: Theme.color.menuBarPillSolid
                 }
                 // the pre-blurred wallpaper under the pill, colour-matrixed and cut to the capsule in one pass
                 Image {
@@ -229,15 +239,15 @@ ShellWindow {
                     visible: !Theme.solidMaterial && pillBackdrop.status === Image.Ready
                     // the bar sits at the screen origin, so the scene position is the screen position;
                     // re-evaluated when the title/status item moves inside its Row
-                    readonly property point pos: hp.parent.x + hp.parent.y >= -1e9 ? hp.parent.mapToItem(null, 0, 0) : Qt.point(0, 0)
+                    readonly property point pos: hp.parent.x + hp.parent.y >= -1e9 ? mapToItem(null, 0, 0) : Qt.point(0, 0)
                     property var src: pillBackdrop
                     // the blurred wallpaper covers the whole screen: map by this bar's screen size
                     readonly property size screenSize: Qt.size(bar.width, bar.screen ? bar.screen.height : Wallpaper.height)
                     property rect srcRect: Qt.rect(pos.x / screenSize.width, pos.y / screenSize.height,
                                                    width / screenSize.width, height / screenSize.height)
                     property size sizePt: Qt.size(width, height)
-                    property real radius: Theme.menuBar.titleRadius
-                    property real lightText: Theme.menuBarOnLight ? 0 : 1
+                    property real radius: Math.min(Theme.menuBar.titleRadius, height / 2)
+                    property real lightText: Theme.menuBarLight ? 0 : 1
                     fragmentShader: Qt.resolvedUrl("../shaders/menupill.frag.qsb")
                 }
             }
@@ -248,14 +258,15 @@ ShellWindow {
         id: si
         property bool active: false
         property real contentWidth: Theme.menuBar.statusIconSize
+        property real hPad: Theme.menuBar.statusHPadding
         default property alias content: sholder.data
         signal clicked()
 
-        width: contentWidth + Theme.menuBar.statusHPadding * 2
-        height: Theme.menuBar.titleHeight
+        width: contentWidth + hPad * 2
+        height: bar.height
 
         // pressed or open only: hovering a status item shows no pill (27.2.1, relay #52)
-        HighlightPill { shown: si.active || sma.pressed }
+        HighlightPill { shown: si.active || sma.pressed; outset: Theme.menuBar.statusPillOutset; pillHeight: Theme.menuBar.statusPillHeight }
         Item { id: sholder; anchors.fill: parent }
         MouseArea { id: sma; anchors.fill: parent; onClicked: si.clicked() }
     }
