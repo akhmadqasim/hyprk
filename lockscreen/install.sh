@@ -27,6 +27,8 @@ if [ -z "$WP" ]; then
   # only formats hyprlock can load (the Settings pane may have picked a .heic)
   case $(printf '%s' "$WP" | tr 'A-Z' 'a-z') in *.png|*.jpg|*.jpeg|*.webp) ;; *) WP= ;; esac
   [ -f "$WP" ] || WP=$ROOT/themes/wallpapers/png/Tahoe$([ $DARK = 1 ] && echo Dark || echo Light).png
+  # no macOS wallpapers (packaging/ default): any png matching the mode, e.g. the generated hyprk-gradient-light.png
+  if [ ! -f "$WP" ]; then M=light; [ $DARK = 1 ] && M=dark; WP=$(ls "$ROOT"/themes/wallpapers/png/*"$M"*.png 2>/dev/null | head -n1); fi
 fi
 DST=$(hk_cfgbase "$PREFIX")/hypr/hyprlock.conf; mkdir -p "$(dirname "$DST")"
 hk_backup "$DST"

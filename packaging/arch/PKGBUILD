@@ -1,0 +1,62 @@
+# DRAFT, UNTESTED (never run through makepkg). hyprk for Arch / Manjaro / EndeavourOS.
+# Blocker before this is usable: hyprk still writes state into its own tree ($HYPRK_ROOT/state), and /usr/share/hyprk
+# is read-only. See packaging/README.md "System packages" for the four places that need HYPRK_STATE / XDG_STATE_HOME.
+# The liquidglass plugin is ABI-locked to the exact Hyprland build: rebuild this package on every hyprland update
+# (the pinned dependency below makes pacman refuse a mismatched pair instead of crashing the session).
+pkgname=hyprk-git
+pkgver=r0
+pkgrel=1
+pkgdesc='macOS 27-look desktop on Hyprland: Quickshell shell, Liquid Glass plugin, Finder, System Settings (no Apple assets)'
+arch=('x86_64' 'aarch64')
+url='https://example.invalid/hyprk'   # no public repo yet
+license=('custom')                     # not chosen yet
+depends=('hyprland>=0.57' 'quickshell>=0.3.2' 'hyprlock>=0.9' 'hypridle'
+         'qt6-base' 'qt6-declarative' 'qt6-wayland' 'qt6-svg'
+         'imagemagick' 'jq' 'pipewire' 'wireplumber' 'brightnessctl' 'networkmanager' 'bluez-utils' 'upower'
+         'grim' 'slurp' 'swaybg' 'python' 'python-pillow' 'poppler' 'glib2' 'xdg-user-dirs' 'fontconfig'
+         'inter-font' 'ttf-dejavu' 'adwaita-icon-theme' 'xorg-xwayland')
+makedepends=('git' 'cmake' 'ninja' 'pkgconf' 'pixman' 'libdrm')
+optdepends=('foot: default terminal' 'ghostty: terminal hyprk is tuned for' 'qt6ct: macOS look for Qt apps'
+            'kvantum: rounded Qt menus' 'nodejs: run the QML logic tests')
+source=("hyprk::git+file:///mnt/code/hyprk")   # replace with the public git URL
+sha256sums=('SKIP')
+
+pkgver() {
+    cd hyprk
+    printf 'r%s.%s' "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+build() {
+    cd hyprk
+    cmake -S finder -B build-finder -G Ninja -DCMAKE_BUILD_TYPE=Release
+    cmake --build build-finder
+    cmake -S plugin -B build-plugin -G Ninja -DCMAKE_BUILD_TYPE=Release
+    cmake --build build-plugin --target liquidglass
+}
+
+package() {
+    cd hyprk
+    local root="$pkgdir/usr/share/hyprk"
+    install -d "$root"
+    git ls-files -z | grep -zvE '^(reference|packaging)/' | tar --null -T - -cf - | tar -C "$root" -xf -
+    install -Dm755 build-finder/hyprk-finder "$root/finder/build/hyprk-finder"
+    install -Dm755 build-plugin/libliquidglass.so "$root/plugin/build/libliquidglass.so"
+    # hyprlock has no relative paths
+    sed -i -e "s|/mnt/code/hyprk|/usr/share/hyprk|g" "$root/lockscreen/hyprlock.conf"
+    install -Dm755 /dev/stdin "$pkgdir/usr/bin/hyprk-session" <<'SH'
+#!/bin/sh
+export HYPRK_ROOT=/usr/share/hyprk HYPRK_DEV=/usr/share/hyprk/dev HYPRK_APPLE_ICONS=0
+export HYPRK_STATE="${XDG_STATE_HOME:-$HOME/.local/state}/hyprk"; mkdir -p "$HYPRK_STATE"
+exec /usr/share/hyprk/dist/hyprk-session "$@"
+SH
+    install -d "$root/dev"; echo ': # distro Hyprland' > "$root/dev/env.sh"
+    install -Dm644 /dev/stdin "$pkgdir/usr/share/wayland-sessions/hyprk.desktop" <<'DESK'
+[Desktop Entry]
+Name=hyprk
+Comment=Hyprland that looks like macOS
+Exec=/usr/bin/hyprk-session
+TryExec=/usr/bin/hyprk-session
+Type=Application
+DesktopNames=Hyprland
+DESK
+}
