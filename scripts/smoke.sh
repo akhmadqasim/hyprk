@@ -8,7 +8,8 @@
 #   HYPRK_WAIT=N   seconds to wait for the shell (default 40)
 #   HYPRK_SETTLE=N seconds to wait after the shell is up (default 3)
 #   HYPRK_MUTE=0   let the shell play sounds (muted by default)
-#   HYPRK_HEADLESS=1  add a 2560x1664@2x "MBA" output and shoot that (MacBook Air-like)
+#   HYPRK_HEADLESS=1  add a 2560x1664@2x "MBA" output and shoot that (MacBook Air-like); opens NO window on the
+#                     host desktop (headless backend only) unless HYPRK_HOST_WINDOW=1
 set -u
 HYPRK_ROOT=${HYPRK_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}
 export HYPRK_ROOT
@@ -29,7 +30,11 @@ LOGDIR=${XDG_CACHE_HOME:-$HOME/.cache}/hyprk/logs
 mkdir -p "$LOGDIR" "$(dirname "$OUT")"
 LOG=$LOGDIR/nested-$(date +%H%M%S).log
 
-[ "${HYPRK_HEADLESS:-0}" = 1 ] && export HYPRK_PRIMARY=MBA
+if [ "${HYPRK_HEADLESS:-0}" = 1 ]; then
+    export HYPRK_PRIMARY=MBA
+    # no window on the host desktop: Hyprland runs on its headless backend only (HYPRK_HOST_WINDOW=1 to see it)
+    [ "${HYPRK_HOST_WINDOW:-0}" = 1 ] || export HYPRLAND_HEADLESS_ONLY=1
+fi
 export HYPRK_MUTE=${HYPRK_MUTE:-1}     # no sounds from test sessions unless HYPRK_MUTE=0
 "$HYPRK_ROOT/config/hypr/start.sh" >"$LOG" 2>&1 &
 HPID=$!
