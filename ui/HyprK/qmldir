@@ -13,6 +13,8 @@ MaterializeScale 1.0 MaterializeScale.qml
 Button 1.0 Button.qml
 GlassButton 1.0 GlassButton.qml
 Switch 1.0 Switch.qml
+Checkbox 1.0 Checkbox.qml
+SegmentedControl 1.0 SegmentedControl.qml
 Slider 1.0 Slider.qml
 GlassKnob 1.0 GlassKnob.qml
 Popup 1.0 Popup.qml

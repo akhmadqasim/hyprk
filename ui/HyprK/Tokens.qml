@@ -62,6 +62,28 @@ QtObject {
         readonly property color searchStroke: t.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(1, 1, 1, 0.85) // Settings ref light rim
         readonly property int searchHeight: 28       // Settings ref
         readonly property int searchRadius: 14       // Settings ref capsule
+
+        // Checkbox. No macOS 27 source for these yet (SPEC 10.8 lists the checkbox as not found): guessed,
+        // from the classic AppKit regular-size checkbox.
+        readonly property int checkboxSize: 14       // guessed
+        readonly property real checkboxRadius: 4     // guessed
+        readonly property real checkStroke: 2        // tick and dash line width, guessed
+        readonly property int checkboxGap: 6         // box to label, guessed
+        readonly property color checkboxOff: t.dark ? Qt.rgba(1, 1, 1, 0.12) : "#FFFFFF"   // guessed
+        readonly property color checkboxOffPressed: t.dark ? Qt.rgba(1, 1, 1, 0.20) : "#E6E6E6" // guessed
+        readonly property color checkboxBorder: t.increaseContrast ? (t.dark ? Qt.rgba(1, 1, 1, 0.6) : Qt.rgba(0, 0, 0, 0.6))
+                                                                   : (t.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.22))   // guessed
+        readonly property color checkMark: "#FFFFFF" // tick on the accent fill (selectedMenuItemText, LIVE-27.2.1 metrics)
+
+        // Segmented control
+        readonly property int segmentedHeight: 24    // guessed (same as buttonHeight)
+        readonly property real segmentInset: 2       // selection pill inset in the track, guessed
+        readonly property int segmentPadding: 10     // label side padding, guessed
+        readonly property color segmentTrack: fill   // track = control fill, guessed
+        readonly property color segmentSelected: t.dark ? Qt.rgba(1, 1, 1, 0.24) : "#FFFFFF"   // guessed
+        readonly property color separator: t.dark ? Qt.rgba(1, 1, 1, 0.12) : Qt.rgba(0, 0, 0, 0.10)   // separatorColor, LIVE-27.2.1 metrics-{light,dark}
+        readonly property real focusRingOpacity: 0.5 // _NSAutomaticFocusRing maxOpacity, SPEC 10.6
+        readonly property real focusRingWidth: 3     // guessed
     }
 
     // ---------- traffic lights (SPEC 13; the plugin title bar has the same numbers in
@@ -104,5 +126,12 @@ QtObject {
         readonly property real crossfade: 0.15            // Reduce motion: FadeIn/FadeOut 0.15 s (SPEC 9.9.5)
         readonly property real pressResponse: 0.25        // FlexInteraction press lift (SPEC 10.3)
         readonly property real pressSquish: 0.06          // drag past a slider end stretches x, squeezes y (by eye)
+        // Segmented selection slide: SPEC 10.8 found no literal spring in DesignLibrary's segment code and
+        // reads it as SwiftUI's default Animation, which SPEC 9.9.4 gives as FluidSpring(0.5, 1.0).
+        readonly property real segmentResponse: 0.5
+        readonly property real segmentDamping: 1.0
+        // Checkbox tick reveal and fill change: no source (SPEC 10.8, checkbox motion not found), guessed.
+        readonly property real checkResponse: 0.2
+        readonly property real checkDamping: 1.0
     }
 }
