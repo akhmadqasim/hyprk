@@ -1,0 +1,8 @@
+{"note": "NSCursor.currentSystem captured while the pointer sat on real windows (2x PNG, size/hotspot in pt)",
+ "cur-28cf697a.png": {"where": "arrow (desktop, titlebar, Finder move-drag, over menu bar while dragging)", "size": [28, 40], "hot": [5, 5]},
+ "cur-580f2adc.png": {"where": "I-beam in TextEdit text", "size": [23, 22], "hot": [12, 11]},
+ "cur-99a17428.png": {"where": "left/right window edge", "size": [24, 18], "hot": [12, 9]},
+ "cur-a0c3f971.png": {"where": "top/bottom window edge", "size": [18, 28], "hot": [9, 14]},
+ "cur-9ac0b0e9.png": {"where": "window corner (16 pt along each edge)", "size": [22, 22], "hot": [11, 11]},
+ "cur-05468402.png": {"where": "Finder drag with Option (copy badge)", "size": [28, 40], "hot": [5, 5]},
+ "cur-66513293.png": {"where": "Finder drag with Cmd-Option (alias)", "size": [16, 21], "hot": [11, 3]}}
