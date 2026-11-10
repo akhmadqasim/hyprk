@@ -580,3 +580,32 @@ Evidence: strings of on-disk binaries, plus strings of the dyld shared cache (Co
 - Callers of the finder/dock/payment/Volume Mount/AirDrop/Siri sounds (names only).
 - Whether Settings > Sound enumerates ~/Library/Sounds (not checked); mic/media/head-gesture/facetime SystemSounds users not traced.
 - /Applications, user Library and sounds outside the scanned roots: not checked.
+
+## R6 27.2.1 against 27.2
+
+Which binaries hold the UI (all on this Mac as plain files outside the dyld cache; frameworks are inside the cache):
+- Dock, Mission Control, Launchpad remnants: `/System/Library/CoreServices/Dock.app/Contents/MacOS/Dock` (7.8 MB).
+- Menu bar extras, volume/brightness HUD: `/System/Library/CoreServices/MenuBarAgent.app` (11.2 MB, new owner of
+  the HUD window) and `/System/Library/CoreServices/ControlCenter.app` (20.5 MB; Control Center panel and modules).
+  The bar itself is a WindowServer window (SkyLight framework, in the cache).
+- Notification Center and widgets: `/System/Library/CoreServices/NotificationCenter.app` (8.7 MB).
+- Stage Manager / window management: `/System/Library/CoreServices/WindowManager.app` (13.9 MB).
+- Spotlight: `/System/Library/CoreServices/Spotlight.app` (0.27 MB; UI in SpotlightUIInternal / SearchUI frameworks
+  in the cache). Apps: `/System/Applications/Apps.app` (0.13 MB, UI in frameworks).
+- System Settings: `/System/Applications/System Settings.app` (4.9 MB) plus the panes as 289 ExtensionKit
+  extensions in `/System/Library/ExtensionKit/Extensions` (285 MB).
+- Shared: AppKit, SwiftUI, QuartzCore, CoreMaterial, DesignLibrary, SkyLight, IconServices (cache).
+The 27.2.1 cache here is 2.4 GB in 84 files. Since the PC is fetching the 27.2.1 IPSW, extracting from it is simpler
+than copying the cache; nothing was copied from the Mac.
+
+What 27.2.1 shows on this Mac (things to diff against the PC's 27.2 references; I have no 27.2 Mac to compare):
+- Appearance pane: Appearance (Light / Dark / Auto), a "Liquid Glass" slider with a live preview (stored as
+  `NSGlassTintAmount`, 0.5 here), a "Theme" group with Colour (Multicolour + 8) and Text highlight colour
+  (Automatic), and "Icon & widget style" (Default / Dark / Clear / Tinted; `AppleIconAppearanceTheme`).
+- System Settings sidebar icons follow the icon style (with Dark: dark tiles with coloured glyphs).
+- Spotlight: a "Search or Ask" capsule with a mic glyph; with no query it can list the modes Applications, Files,
+  Actions, Clipboard under the bar.
+- Apps opens as a normal window ("Applications"), not a full-screen Launchpad.
+- Volume / brightness HUD: a glass capsule at the top right under the menu bar (MenuBarAgent), see the HUD section.
+- Menu bar: 34 pt on this notched display, no background, top-of-screen highlight dimming over bright wallpapers.
+- Toolbars: item groups on 36 pt glass capsules, flat titlebar, full-height flush sidebar (see Q9).
