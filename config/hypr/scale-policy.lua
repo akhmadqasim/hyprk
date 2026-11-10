@@ -41,7 +41,8 @@ local function root()
     local src = ok and info and info.source or ""
     return src:match("^@(.*)/config/hypr/[^/]+$") or ((os.getenv("HOME") or "") .. "/.local/share/hyprk")
 end
-M.state_path = root() .. "/state/displays.json"
+-- state folder: $HYPRK_STATE (start.sh sets it, config/hypr/state-dir.sh), else <root>/state
+M.state_path = (os.getenv("HYPRK_STATE") or (root() .. "/state")) .. "/displays.json"
 
 -- Pure decision. w, h = native pixels; mmw, mmh = physical size in mm (0 or nil = unknown).
 -- Returns { hidpi = bool, scale = number, looks_w, looks_h, ppi, reason }.

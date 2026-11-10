@@ -33,7 +33,7 @@ Every surface has a designed state for missing features, so nothing looks broken
 ## Settings state files (`state/*.json`, written by the Settings app)
 
 Read by `services/Prefs.qml` (and `Theme.qml`, `scripts/sound.sh`). Missing or broken files keep the defaults
-from `settings/Parsers.js`. `HYPRK_STATE=<dir>` points the shell at another folder (tests).
+from `settings/Parsers.js`. The folder is `$HYPRK_STATE`, set once by `config/hypr/start.sh` (`state-dir.sh`): `<root>/state` if writable, else `~/.local/state/hyprk`.
 
 | File | Effect in the shell |
 |---|---|

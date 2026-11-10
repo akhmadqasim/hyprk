@@ -11,6 +11,8 @@ local hyprk   = os.getenv("HYPRK_ROOT") or here() or ((os.getenv("HOME") or "") 
 local shell   = hyprk .. "/shell"
 local terminal = os.getenv("HYPRK_TERMINAL") or "ghostty"
 local sound   = shell .. "/scripts/sound.sh"
+-- runtime state folder: start.sh decides and exports it (config/hypr/state-dir.sh); this default only covers a bare `Hyprland --config`
+local state   = os.getenv("HYPRK_STATE") or (hyprk .. "/state")
 
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "1" })
 -- MacBook Air-like headless output for screenshots: `hyprctl output create headless MBA`
@@ -143,7 +145,7 @@ function hyprk_motion(reduce)
     hl.animation({ leaf = "windowsMove", enabled = not reduce, speed = 3.5, bezier = "easeInOut" })   -- zoom cap 0.35 s
 end
 do  -- start from the saved setting so the first frame is already right
-    local f = io.open(hyprk .. "/state/appearance.json", "r")
+    local f = io.open(state .. "/appearance.json", "r")
     local txt = f and f:read("a") or ""
     if f then f:close() end
     hyprk_motion(txt:match('"reduceMotion"%s*:%s*true') ~= nil)
@@ -222,7 +224,7 @@ hl.bind(cmd .. " + Return",  hl.dsp.exec_cmd(terminal))
 hl.bind(cmd .. " + SHIFT + Escape", hl.dsp.exit())
 -- Lock Screen like macOS (Ctrl+Cmd+Q). Appearance from state/appearance.json.
 hl.bind("CTRL + " .. cmd .. " + Q", hl.dsp.exec_cmd(
-    "d=$(jq -r 'if .dark then \"--dark\" else \"\" end' " .. hyprk .. "/state/appearance.json 2>/dev/null); " ..
+    "d=$(jq -r 'if .dark then \"--dark\" else \"\" end' " .. state .. "/appearance.json 2>/dev/null); " ..
     hyprk .. "/lockscreen/hyprk-lock.sh $d"))
 hl.bind(cmd .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
 hl.bind(cmd .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
@@ -251,7 +253,7 @@ hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 ------------------------------------------------------------ windows ----
 -- rules shipped by the other hyprk apps (optional)
 for _, f in ipairs({ hyprk .. "/settings/hyprland-rules.lua", hyprk .. "/finder/hyprland-rules.lua",
-                     hyprk .. "/state/accessibility.lua" }) do   -- Settings > Accessibility choices, also without the shell
+                     state .. "/accessibility.lua" }) do   -- Settings > Accessibility choices, also without the shell
     local h = io.open(f, "r")
     if h then h:close(); dofile(f) end
 end

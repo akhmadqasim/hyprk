@@ -3,6 +3,7 @@
 # starts (hyprcursor reads XDG_DATA_DIRS once at load) is set here.
 HYPRK_ROOT=${HYPRK_ROOT:-$(cd "$(dirname "$0")/../.." && pwd)}
 export HYPRK_ROOT
+. "$HYPRK_ROOT/config/hypr/state-dir.sh"   # exports HYPRK_STATE: the one state folder (shell, Settings, Lua config)
 export XDG_DATA_DIRS="$HYPRK_ROOT/config:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"   # config/icons/hyprk-cursors
 # App icons: the local hyprk-apple layer (user-extracted macOS icons, themes/icons/build-apple-theme.sh),
 # else WhiteSur (themes/icons/install.sh, in the hyprk data prefix), else the system theme.
