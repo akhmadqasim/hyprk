@@ -243,10 +243,9 @@ Singleton {
         // light a 0.382, k 108/255 (rms 1.0); dark a 0.083, k 23.5/255 (rms 5)
         readonly property vector4d labelFill: theme.dark ? Qt.vector4d(23.5 / 255, 23.5 / 255, 23.5 / 255, 0.083) : Qt.vector4d(108 / 255, 108 / 255, 108 / 255, 0.382)
         readonly property color labelText: theme.dark ? Qt.rgba(244 / 255, 244 / 255, 244 / 255, 1) : Qt.rgba(37 / 255, 37 / 255, 37 / 255, 1)   // Q-dock-08
-        // tint over the plugin glass: none in light (the plugin's dock recipe alone matched the Mac over white, grey
-        // and black: 228/132/37 against 229/134/38); a dark veil in dark, TODO verify (the Mac's dark reading
-        // 176/108/12 is not explained yet)
-        readonly property color pluginLift: theme.dark ? Qt.rgba(theme.glass.darkVeil.r, theme.glass.darkVeil.g, theme.glass.darkVeil.b, 0.45) : "transparent"
+        // tint over the plugin glass: none. The plugin's dock recipe alone gives the Mac's body over white, grey and
+        // black in both modes (light 229/134/38, dark 176/107/12 with the probe's max luma 0.75, MAC-ANSWERS #53)
+        readonly property color pluginLift: "transparent"
     }
 
     // ---------- notifications ----------
@@ -313,6 +312,11 @@ Singleton {
         // darkening veil over the plugin glass: white labels need ~5:1 like the reference
         // the plugin's controlcenter recipe gives the reference grey frost itself; no extra veil
         readonly property color pluginLift: "transparent"
+        // the panel's dim under the tiles (MAC-ANSWERS "Glass checks (#53)"): the gap reads 0.898 x backdrop and
+        // the tiles' glass samples it, so a tile is the controlcenter face over the dimmed backdrop (white 186,
+        // grey 109, black 32). Feathers out over about 100 pt. Light and dark alike.
+        readonly property color dim: Qt.rgba(0, 0, 0, 0.102)
+        readonly property real dimFeather: 100
         readonly property color tileTint: theme.dark ? Qt.rgba(0.12, 0.12, 0.13, 0.45) : Qt.rgba(0.30, 0.28, 0.27, 0.42)   // QML material: dark neutral frost
         readonly property color tileSolid: theme.dark ? "#3A3A3C" : "#8E8E93"
         readonly property color text: "#FFFFFF"
@@ -321,9 +325,10 @@ Singleton {
         readonly property color toggleOnIcon: Tokens.accent   // follows the accent (Blue under Multicolor), not measured
         readonly property color toggleOffBg: Qt.rgba(1, 1, 1, 0.18)     // round buttons
         readonly property color toggleOffIcon: "#FFFFFF"
-        // capsule toggles when off (macOS Wi-Fi "Off"): white circle, grey glyph
-        readonly property color capsuleOffBg: Qt.rgba(1, 1, 1, 0.92)
-        readonly property color capsuleOffIcon: "#8E8E93"
+        // capsule toggles when off: white at 25 % over the tile, white glyph (MAC-ANSWERS #53: 203 / 146 / 88
+        // over a 186 / 109 / 32 tile, all glyphs 255)
+        readonly property color capsuleOffBg: Qt.rgba(1, 1, 1, 0.25)
+        readonly property color capsuleOffIcon: "#FFFFFF"
         readonly property color sliderTrackColor: Qt.rgba(1, 1, 1, 0.28)
         readonly property color sliderFillColor: "#FFFFFF"
     }

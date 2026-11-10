@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import qs
@@ -60,6 +61,32 @@ ShellWindow {
         opacity: ccw.fade
         scale: 1 + Theme.travel(0.01) * (1 - ccw.fade)
         MouseArea { anchors.fill: parent; z: -1 }   // swallow clicks so they don't close
+    }
+
+    // The panel's dim (Theme.cc.dim) on the layer below, so the tiles' glass samples it as on the Mac. Same
+    // namespace (no layer animation, the fade is ours), no glass region, no input.
+    PanelWindow {
+        screen: ccw.modelData
+        visible: ccw.visible
+        anchors { top: true; right: true }
+        margins.top: Theme.menuBar.height
+        implicitWidth: cc.width + Theme.cc.marginRight + Theme.cc.dimFeather * 1.5
+        implicitHeight: cc.y + cc.height + Theme.cc.dimFeather * 1.5
+        exclusionMode: ExclusionMode.Ignore
+        WlrLayershell.namespace: "hyprk-controlcenter"
+        WlrLayershell.layer: WlrLayer.Top
+        color: "transparent"
+        mask: Region {}
+        // full inside the tiles' box (and past the screen and menu bar edges), about 75 % at 12 pt outside
+        RectangularShadow {
+            x: parent.width - cc.width - Theme.cc.marginRight - 30
+            y: -Theme.cc.dimFeather
+            width: cc.width + Theme.cc.marginRight + 30 + Theme.cc.dimFeather
+            height: cc.y + cc.height + 30 + Theme.cc.dimFeather
+            blur: Theme.cc.dimFeather * 0.6
+            color: Theme.cc.dim
+            opacity: ccw.fade
+        }
     }
 
 }
