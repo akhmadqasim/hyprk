@@ -418,7 +418,9 @@ Item {
                         color: "transparent"
                         Image {
                             anchors.fill: parent
-                            source: !nc.shown ? "" : nc.photo ? "file://" + nc.photo : Wallpaper.url
+                            // decoded once and kept (about 1 MB): loading it on open left the card
+                            // black for the first 3 to 5 frames of the slide-in (PERF.md)
+                            source: nc.photo ? "file://" + nc.photo : Wallpaper.url
                             sourceSize.width: Wallpaper.thumbWidth * 2
                             fillMode: Image.PreserveAspectCrop
                             asynchronous: true
