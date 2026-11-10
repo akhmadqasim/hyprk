@@ -265,10 +265,12 @@ namespace lg {
         g_readFbo = 0;
     }
 
-    std::vector<SGlassShape> shapesFromRegion(const CRegion& region, double ox, double oy) {
+    std::vector<SGlassShape> shapesFromRegion(const CRegion& region, double ox, double oy, double* opacity, const Vector2D& size) {
         std::vector<SRect> rects;
         for (const auto& r : region.getRects())
             rects.push_back({double(r.x1), double(r.y1), double(r.x2 - r.x1), double(r.y2 - r.y1)});
+        if (opacity)
+            *opacity = takeOpacityMarker(rects, size.x, size.y);
         auto shapes = clusterRegion(rects);
         for (auto& s : shapes) {
             s.box.x += ox;

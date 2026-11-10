@@ -24,6 +24,11 @@ namespace lg {
     // height of the staircase at the left edge.
     std::vector<SGlassShape> clusterRegion(const std::vector<SRect>& rects);
 
+    // Glass opacity marker (hyprk ShellWindow.glassOpacity): a tiny rect (<= 3x3) touching the bottom
+    // edge of the surface, opacity = x / (surfaceW - 1). It lets the shell fade the compositor glass with
+    // its content, in the same commit. Removes the marker from rects; returns 1 when there is none.
+    double takeOpacityMarker(std::vector<SRect>& rects, double surfaceW, double surfaceH);
+
     // Signed distance to a rounded rect whose corners are Lp superellipses
     // (power 2 = circle). p is relative to the box centre, half = half size.
     // Negative inside. Mirrors sdShape() in shaders/liquidglass.frag.

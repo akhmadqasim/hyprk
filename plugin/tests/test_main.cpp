@@ -137,6 +137,22 @@ int main() {
     }
     CHECK(near(rgbaFromHex(0xFF800040).g, 128 / 255.0, 1e-6) && parseTitlebarMode("off") == 0 && parseTitlebarMode("classes") == 2 && parseTitlebarMode("x") == 1);
 
+    // opacity marker: 1x1 in the bottom row, x / (W - 1); removed, other rects kept
+    {
+        std::vector<SRect> rects = roundedRows(10, 10, 100, 60, 12);
+        const size_t       n     = rects.size();
+        rects.push_back({639, 719, 1, 1}); // W 1279+1 = 1280 -> x 639 = 0.5
+        CHECK(near(takeOpacityMarker(rects, 1280, 720), 639.0 / 1279.0));
+        CHECK(rects.size() == n);
+        CHECK(near(takeOpacityMarker(rects, 1280, 720), 1)); // none left
+        CHECK(rects.size() == n);
+        std::vector<SRect> zero = {{0, 719, 1, 1}};
+        CHECK(near(takeOpacityMarker(zero, 1280, 720), 0) && zero.empty());
+        // a glass shape touching the bottom edge is not a marker
+        std::vector<SRect> wide = {{0, 700, 200, 20}};
+        CHECK(near(takeOpacityMarker(wide, 1280, 720), 1) && wide.size() == 1);
+    }
+
     std::printf(g_fail ? "%d failures\n" : "all tests passed\n", g_fail);
     return g_fail ? 1 : 0;
 }

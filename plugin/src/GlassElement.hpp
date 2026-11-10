@@ -48,8 +48,9 @@ namespace lg {
 
     CGlassProgram& glassProgram();
 
-    // glass shapes of a client's ext-background-effect region (surface-local), moved by (ox, oy)
-    std::vector<SGlassShape> shapesFromRegion(const CRegion& region, double ox, double oy);
+    // glass shapes of a client's ext-background-effect region (surface-local), moved by (ox, oy).
+    // With `opacity`, the opacity marker (takeOpacityMarker) of a surface of `size` is read into it.
+    std::vector<SGlassShape> shapesFromRegion(const CRegion& region, double ox, double oy, double* opacity = nullptr, const Vector2D& size = {});
 
     // once per monitor frame: ages the per-surface light/dark state
     void onFrame();

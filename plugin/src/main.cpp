@@ -54,7 +54,8 @@ struct SBlurSuppression {
     }
 };
 
-static std::vector<lg::SGlassShape> shapesFor(const PHLLS& layer, const PHLMONITOR& mon, const lg::SParams& p) {
+// opacity: the shell's glass opacity marker (1 without one)
+static std::vector<lg::SGlassShape> shapesFor(const PHLLS& layer, const PHLMONITOR& mon, const lg::SParams& p, double& opacity) {
     const auto pos  = layer->position(Desktop::View::IGeometric::GEOMETRIC_CURRENT);
     const auto size = layer->size(Desktop::View::IGeometric::GEOMETRIC_CURRENT);
     const auto off  = pos - mon->m_position;
@@ -63,7 +64,7 @@ static std::vector<lg::SGlassShape> shapesFor(const PHLLS& layer, const PHLMONIT
     const auto                   surface = layer->wlSurface();
     if (surface && surface->m_hasBackgroundEffect && !surface->m_blurRegion.empty())
         // the client's ext-background-effect region (Quickshell BackgroundEffect.blurRegion)
-        shapes = lg::shapesFromRegion(surface->m_blurRegion, off.x, off.y);
+        shapes = lg::shapesFromRegion(surface->m_blurRegion, off.x, off.y, &opacity, size);
     else if (!p.requireRegion)
         shapes.push_back({{off.x, off.y, size.x, size.y}, 0});
 
@@ -83,14 +84,15 @@ static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext
     const bool wanted = params && params->enabled && !popups && !ctx.m_renderingSnapshot && layer && mon && !lockSkip && layer->mapped() && layer->alphaNonZero() &&
         lg::namespaceMatches(*params, layer->m_namespace);
     // no shapes = no region with require_region: the layer is left to Hyprland
-    auto shapes = wanted ? shapesFor(layer, mon, *params) : std::vector<lg::SGlassShape>{};
+    double opacity = 1;
+    auto   shapes  = wanted ? shapesFor(layer, mon, *params, opacity) : std::vector<lg::SGlassShape>{};
     if (shapes.empty()) {
         original(thisptr, ctx, layer, mon, now, popups, lockscreen, workspaceScene);
         return;
     }
     lg::CGlassElement::SData data{
         .shapes = std::move(shapes),
-        .alpha  = layer->alpha()[Desktop::View::LS_ALPHA_FADE]->value(),
+        .alpha  = float(layer->alpha()[Desktop::View::LS_ALPHA_FADE]->value() * opacity),
         .params = params,
         .recipe = &lg::recipeByName(lg::materialFor(*params, layer->m_namespace)),
         .owner  = reinterpret_cast<uintptr_t>(layer.get()),
