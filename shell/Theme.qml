@@ -125,7 +125,8 @@ Singleton {
         readonly property int regular: Font.Normal
         readonly property int medium: Font.Medium
         readonly property int semibold: Font.DemiBold
-        readonly property int bold: Font.Bold
+        // no `bold`: SF Pro is a variable font and Qt 6.10 fakes bold on top of Font.Bold. Real bold =
+        // semibold + font.variableAxes: ({ "wght": 700 }) (see MenuBar.qml, AlertDialog.qml)
     }
 
     // ---------- colors ----------
