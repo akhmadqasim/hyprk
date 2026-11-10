@@ -199,7 +199,10 @@ local hm = io.open(motionSo, "r")
 if hm then
     hm:close()
     local ok, err = pcall(hl.plugin.load, motionSo)
-    if not ok then print("hyprk: hyprkmotion not loaded: " .. tostring(err)) end
+    if not ok then print("hyprk: hyprkmotion not loaded: " .. tostring(err))
+    -- MAC-ANSWERS.md R2 (27.2.1): minimise into the app's Dock icon and restore both take about 0.22 s.
+    -- The genie's shape is done at about 2/3 of genie_duration (0.5 s showed 0.33 s), so 0.33 s shows 0.22 s.
+    else hl.config({ plugin = { hyprkmotion = { genie_duration = 0.33 } } }) end
 end
 
 ---------------------------------------------------------- layer rules ----
