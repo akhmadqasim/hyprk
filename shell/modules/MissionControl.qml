@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
@@ -8,13 +9,17 @@ import qs.components
 import qs.services
 import qs.HyprK
 
-// Mission Control (Super+Up): Spaces bar on top, live thumbnails of the
-// windows on the current Space laid out in a grid over the dimmed desktop.
-// Click a window to focus it, a Space to switch, empty space or Esc to close.
-// Motion: on the Exposé spring (WindowManager ExposeSpringResponse 0.25, damping 1.0, SPEC 11.4)
-// the windows fly from where they are on screen into the grid and back on close, the backdrop
-// darkens and the Spaces bar slides down (on close it leaves in 0.125 s, SPEC 11.4).
-// Reduce motion: a crossfade.
+// Mission Control (Super+Up): live thumbnails of the windows on the current Space laid out
+// without overlap, the Spaces bar at the top. Click a window to focus it, a Space to switch,
+// empty space or Esc to close.
+// macOS 27.2.1 (MAC-ANSWERS.md R2, 60 fps recording): the windows move and scale from where they
+// are into the layout and back, the wallpaper is NOT dimmed or blurred, the menu bar, the Dock and
+// the desktop widgets go away, and the Spaces bar shows the Desktops as small labelled pills with
+// "+" at the right. Enter about 0.38 s, exit about 0.33 s, both ease-out (curves fitted below).
+// How: this layer draws the plain wallpaper over everything at opacity `e`, so the real windows,
+// the menu bar (with its top dimming) and the Dock fade out under it while the thumbnails, which
+// start exactly over the real windows, fly to their places: no cross-fade of the windows.
+// Reduce motion: a 0.15 s dissolve, no flight.
 ShellWindow {
     id: mc
 
@@ -22,26 +27,60 @@ ShellWindow {
     screen: modelData
 
     readonly property bool shown: Panels.open === "mission"
-    Spring {
-        id: expose
-        initial: 0
-        target: mc.shown ? 1 : 0
-        response: A11y.reduceMotion ? Tokens.motion.crossfade : Theme.anim.exposeResponse
-        damping: A11y.reduceMotion ? 1 : Theme.anim.exposeDamping
+
+    // Numbers that are ours (no Theme.qml tokens yet; Q-dock-27..31 will answer the guessed ones)
+    readonly property QtObject m: QtObject {
+        // progress per 17 ms frame of the 27.2.1 recording, fitted with a cubic bezier (RMS 0.008 enter,
+        // 0.007 exit, frame n at n x 16.7 ms as Qt animations draw it; the tails are below one pixel, so
+        // the visible motion ends at 0.38 / 0.33 s as measured)
+        readonly property int enterMs: 420
+        readonly property var enterCurve: [0.15, 0.1, 0.15, 1.0, 1, 1]
+        readonly property int exitMs: 360
+        readonly property var exitCurve: [0.15, 0.7, 0.35, 1.0, 1, 1]
+        readonly property int barExitMs: Theme.anim.spacesBarExit   // SPEC 11.4: the Spaces bar leaves in 0.125 s
+        // collapsed Spaces bar: labelled pills, guessed (no 27.2.1 screenshot of it yet, Q-dock-31)
+        readonly property int barHeight: 44
+        readonly property int pillHeight: 26
+        readonly property int pillPadding: 12
+        readonly property int pillSpacing: 6
+        readonly property real labelSize: 13
+        readonly property color pill: Qt.rgba(1, 1, 1, 0.24)
+        readonly property color pillHover: Qt.rgba(1, 1, 1, 0.14)
+        readonly property int plusSize: 28
+        readonly property int plusInset: 16          // from the right screen edge
+        readonly property int expandMs: 250          // bar grows into thumbnails on hover, guessed
+        readonly property int gateMs: 150            // longest wait for the first window captures
+        // window layout below the bar, guessed (Q-dock-28)
+        readonly property int gridTop: barHeight + Theme.mission.margin / 2
+        // wallpaper layer colour when no image is set (Background.qml)
+        readonly property color empty: Theme.dark ? "#1c1c1e" : "#3a6fb0"
     }
-    readonly property real e: Math.max(0, Math.min(1, expose.value))   // 0 = windows in place
+
+    // 0 = everything in place, 1 = Mission Control. Not a Behavior: enter and exit have their own curve.
+    property real e: 0
+    NumberAnimation { id: anim; target: mc; property: "e" }
+    // Spaces bar: in with the windows, out in 0.125 s
+    property real bar: 0
+    NumberAnimation { id: barAnim; target: mc; property: "bar"; easing.type: Easing.BezierSpline; easing.bezierCurve: mc.m.enterCurve }
+    function go() {
+        const enter = shown;
+        anim.stop();
+        anim.to = enter ? 1 : 0;
+        anim.duration = Theme.ms(enter ? m.enterMs : m.exitMs);
+        anim.easing.type = A11y.reduceMotion ? Easing.Linear : Easing.BezierSpline;
+        anim.easing.bezierCurve = enter ? m.enterCurve : m.exitCurve;
+        anim.start();
+        barAnim.stop();
+        barAnim.to = enter ? 1 : 0;
+        barAnim.duration = Theme.ms(enter ? m.enterMs : m.barExitMs);
+        barAnim.start();
+    }
     readonly property real travel: A11y.reduceMotion ? 0 : 1 - e         // 1 = at the real window rect
-    // Spaces bar: in with the Exposé spring, out in 0.125 s
-    Spring {
-        id: barSpring
-        initial: 0
-        target: mc.shown ? 1 : 0
-        response: mc.shown ? Theme.anim.exposeResponse : Theme.anim.spacesBarExit / 1000
-    }
-    readonly property real bar: Math.max(0, Math.min(1, barSpring.value))
-    visible: shown || expose.moving
+    // by value, not anim.running: the window must not blink off between `shown` turning false and the
+    // exit animation starting
+    visible: shown || e > 0
     lingerAs: "mission"
-    lingering: !shown && expose.moving
+    lingering: !shown && e > 0
     acceptsInput: shown               // no input while closing
     anchors { top: true; left: true; right: true; bottom: true }
     exclusionMode: ExclusionMode.Ignore
@@ -49,23 +88,60 @@ ShellWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-    // frozen while closing, so the windows fly back to where they were
+    // frozen while closing, so the windows fly back to where they were. Ordered top to bottom, then
+    // left to right by where they are, so each fills the nearest cell (short flights).
     property var windows: []
-    Binding on windows { value: Hyprland.toplevels.values.filter(t => t.workspace && t.workspace === Hyprland.focusedWorkspace); when: mc.shown; restoreMode: Binding.RestoreNone }
+    Binding on windows { value: mc.byPosition(Hyprland.toplevels.values.filter(t => t.workspace && t.workspace === Hyprland.focusedWorkspace)); when: mc.shown; restoreMode: Binding.RestoreNone }
     property var spaces: []
     Binding on spaces { value: Hyprland.workspaces.values.filter(w => w.id > 0).sort((a, b) => a.id - b.id); when: mc.shown; restoreMode: Binding.RestoreNone }
 
+    function centreOf(t) {
+        const o = t.lastIpcObject;
+        return o && o.at && o.size ? { x: o.at[0] + o.size[0] / 2, y: o.at[1] + o.size[1] / 2 } : { x: 0, y: 0 };
+    }
+    // rows of `cols` by centre y, each row by centre x
+    function byPosition(list) {
+        const n = list.length, cols = Math.max(1, Math.ceil(Math.sqrt(n)));
+        const sorted = list.slice().sort((a, b) => centreOf(a).y - centreOf(b).y);
+        const out = [];
+        for (let i = 0; i < n; i += cols)
+            out.push(...sorted.slice(i, i + cols).sort((a, b) => centreOf(a).x - centreOf(b).x));
+        return out;
+    }
+
     // the window exists only while open (shell.qml LazyLoader)
-    function present() { Hyprland.refreshToplevels(); keys.forceActiveFocus(); }
-    Component.onCompleted: present()
-    onShownChanged: if (shown) present()
+    // The motion starts once every thumbnail has its first frame (at most m.gateMs): until then the
+    // thumbnails sit, invisible, exactly over their windows. Started earlier, a capture that comes
+    // in late would pop up away from its window while the window already fades out.
+    property bool pending: false
+    function present() {
+        Hyprland.refreshToplevels();
+        keys.forceActiveFocus();
+        pending = true;
+        gate.restart();
+        maybeGo();
+    }
+    function maybeGo() {
+        if (!pending || thumbs.count < windows.length) return;
+        for (let i = 0; i < thumbs.count; i++) {
+            const c = thumbs.itemAt(i);
+            if (c && !c.ready) return;
+        }
+        pending = false;
+        gate.stop();
+        go();
+    }
+    Timer { id: gate; interval: mc.m.gateMs; onTriggered: { mc.pending = false; mc.go(); } }
+    // onShownChanged also fires while the bindings are set up on creation: present() once, when complete
+    property bool completed: false
+    Component.onCompleted: { completed = true; present(); }
+    onShownChanged: if (completed) shown ? present() : go()
 
     // grid geometry: as square as possible, cells share the area below the Spaces bar
     readonly property int cols: Math.max(1, Math.ceil(Math.sqrt(windows.length)))
     readonly property int rows: Math.max(1, Math.ceil(windows.length / cols))
-    readonly property real gridTop: Theme.mission.spacesHeight + Theme.mission.margin / 2
     readonly property real cellW: (width - Theme.mission.margin * 2 - Theme.mission.gap * (cols - 1)) / cols
-    readonly property real cellH: (height - gridTop - Theme.mission.margin * 1.5 - Theme.mission.gap * (rows - 1)) / rows
+    readonly property real cellH: (height - m.gridTop - Theme.mission.margin * 1.5 - Theme.mission.gap * (rows - 1)) / rows
 
     Item {
         id: keys
@@ -73,69 +149,149 @@ ShellWindow {
         Keys.onEscapePressed: Panels.close()
     }
 
-    // backdrop: blurred wallpaper, dimmed
-    Image {
+    // the plain wallpaper, as the wallpaper layer draws it (Background.qml), over everything below
+    Rectangle {
         anchors.fill: parent
+        color: mc.m.empty
         opacity: mc.e
-        readonly property string path: Wallpaper.blurred || Wallpaper.wallpaper
-        source: path ? "file://" + path : ""
-        asynchronous: true
+        Image {
+            anchors.fill: parent
+            source: Wallpaper.url
+            sourceSize: Qt.size(mc.screen ? mc.screen.width : 1920, mc.screen ? mc.screen.height : 1080)
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+            cache: false
+        }
     }
-    Rectangle { anchors.fill: parent; color: Qt.rgba(0, 0, 0, Theme.mission.dim); opacity: mc.e }
     MouseArea { anchors.fill: parent; onClicked: Panels.close() }
 
-    // Spaces bar: a wallpaper thumbnail per Space with its name under it,
-    // the current one outlined (macOS shows these when the bar is expanded)
-    Row {
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: Theme.mission.spacesTop - (A11y.reduceMotion ? 0 : 1 - mc.bar) * (height + Theme.mission.spacesTop)
+    // Spaces bar. Collapsed (27.2.1): a labelled pill per Desktop, the current one filled, "+" at the
+    // right. Pointing at it expands it to wallpaper thumbnails with the names under them (macOS
+    // behaviour; the expanded look is the earlier hyprk one, not checked against 27.2.1).
+    Item {
+        id: spacesBar
+        width: parent.width
+        height: expanded ? Theme.mission.spacesTop + expandedRow.height + Theme.mission.spaceLabelGap : mc.m.barHeight
+        y: -(A11y.reduceMotion ? 0 : 1 - mc.bar) * mc.m.barHeight
         opacity: mc.bar
-        spacing: Theme.mission.spaceSpacing
-        Repeater {
-            model: mc.spaces
-            delegate: Column {
-                id: sp
-                required property var modelData
-                readonly property bool current: modelData === Hyprland.focusedWorkspace
-                spacing: Theme.mission.spaceLabelGap
+        readonly property bool expanded: barHover.hovered && mc.shown
+        property real grow: expanded ? 1 : 0
+        Behavior on grow { NumberAnimation { duration: Theme.ms(mc.m.expandMs); easing.type: Easing.OutCubic } }
+        HoverHandler { id: barHover }
 
-                ClippingRectangle {
-                    width: Theme.mission.spaceThumbWidth
-                    height: width * mc.height / Math.max(1, mc.width)
-                    radius: Theme.mission.spaceRadius
-                    color: Theme.glass.solid
-                    border.width: sp.current ? Theme.mission.hoverBorder : 0
-                    border.color: Theme.mission.text
-                    scale: spm.containsMouse ? Theme.mission.hoverScale : 1
-                    Behavior on scale { NumberAnimation { duration: Theme.anim.fast } }
-                    Image {
-                        anchors.fill: parent
-                        source: Wallpaper.url
-                        sourceSize.width: Wallpaper.thumbWidth
-                        fillMode: Image.PreserveAspectCrop
-                        asynchronous: true
+        Row {
+            id: pills
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: (mc.m.barHeight - mc.m.pillHeight) / 2
+            spacing: mc.m.pillSpacing
+            opacity: 1 - spacesBar.grow
+            visible: opacity > 0
+            Repeater {
+                model: mc.spaces
+                delegate: Rectangle {
+                    id: pill
+                    required property var modelData
+                    readonly property bool current: modelData === Hyprland.focusedWorkspace
+                    width: label.implicitWidth + mc.m.pillPadding * 2
+                    height: mc.m.pillHeight
+                    radius: height / 2
+                    color: current ? mc.m.pill : pm.containsMouse ? mc.m.pillHover : "transparent"
+                    Text {
+                        id: label
+                        anchors.centerIn: parent
+                        text: "Desktop " + pill.modelData.id
+                        font.family: Theme.fontText
+                        font.pixelSize: mc.m.labelSize
+                        font.weight: pill.current ? Font.DemiBold : Font.Medium
+                        color: Theme.mission.text
                     }
                     MouseArea {
-                        id: spm
+                        id: pm
                         anchors.fill: parent
                         hoverEnabled: true
-                        onClicked: sp.modelData.activate()
+                        onClicked: mc.openSpace(pill.modelData)
                     }
-                }
-                Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: "Desktop " + sp.modelData.id
-                    font.family: Theme.fontText
-                    font.pixelSize: Theme.mission.labelSize
-                    font.weight: sp.current ? Font.DemiBold : Font.Normal
-                    color: Theme.mission.text
                 }
             }
         }
+
+        Row {
+            id: expandedRow
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: Theme.mission.spacesTop
+            spacing: Theme.mission.spaceSpacing
+            opacity: spacesBar.grow
+            visible: opacity > 0
+            Repeater {
+                model: spacesBar.expanded || spacesBar.grow > 0 ? mc.spaces : []
+                delegate: Column {
+                    id: sp
+                    required property var modelData
+                    readonly property bool current: modelData === Hyprland.focusedWorkspace
+                    spacing: Theme.mission.spaceLabelGap
+
+                    ClippingRectangle {
+                        width: Theme.mission.spaceThumbWidth
+                        height: width * mc.height / Math.max(1, mc.width)
+                        radius: Theme.mission.spaceRadius
+                        color: Theme.glass.solid
+                        border.width: sp.current ? Theme.mission.hoverBorder : 0
+                        border.color: Theme.mission.text
+                        scale: spm.containsMouse ? Theme.mission.hoverScale : 1
+                        Behavior on scale { NumberAnimation { duration: Theme.anim.fast } }
+                        Image {
+                            anchors.fill: parent
+                            source: Wallpaper.url
+                            sourceSize.width: Wallpaper.thumbWidth
+                            fillMode: Image.PreserveAspectCrop
+                            asynchronous: true
+                        }
+                        MouseArea {
+                            id: spm
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: mc.openSpace(sp.modelData)
+                        }
+                    }
+                    Text {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: "Desktop " + sp.modelData.id
+                        font.family: Theme.fontText
+                        font.pixelSize: Theme.mission.labelSize
+                        font.weight: sp.current ? Font.DemiBold : Font.Normal
+                        color: Theme.mission.text
+                    }
+                }
+            }
+        }
+
+        // "+": a new empty Desktop (Hyprland makes it current; macOS adds it without switching)
+        Rectangle {
+            anchors.right: parent.right
+            anchors.rightMargin: mc.m.plusInset
+            y: (mc.m.barHeight - height) / 2
+            width: mc.m.plusSize
+            height: width
+            radius: width / 2
+            color: plus.containsMouse ? mc.m.pill : mc.m.pillHover
+            Rectangle { anchors.centerIn: parent; width: 12; height: 1.5; radius: 0.75; color: Theme.mission.text }
+            Rectangle { anchors.centerIn: parent; width: 1.5; height: 12; radius: 0.75; color: Theme.mission.text }
+            MouseArea {
+                id: plus
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: Hyprland.dispatch('hl.dsp.focus({ workspace = "emptynm" })')
+            }
+        }
+    }
+    function openSpace(ws) {
+        Panels.close();
+        ws.activate();
     }
 
     // windows
     Repeater {
+        id: thumbs
         model: mc.windows
         delegate: Item {
             id: cell
@@ -146,7 +302,7 @@ ShellWindow {
             readonly property int inRow: Math.min(mc.cols, mc.windows.length - row * mc.cols)
             x: Theme.mission.margin + (mc.cols - inRow) * (mc.cellW + Theme.mission.gap) / 2
                + (index % mc.cols) * (mc.cellW + Theme.mission.gap)
-            y: mc.gridTop + row * (mc.cellH + Theme.mission.gap)
+            y: mc.m.gridTop + row * (mc.cellH + Theme.mission.gap)
             width: mc.cellW
             height: mc.cellH
 
@@ -161,9 +317,12 @@ ShellWindow {
             property var real: null
             function takeRect() { if (mc.e < 0.05) real = ipcRect; }
             onIpcRectChanged: takeRect()
-            Component.onCompleted: takeRect()
             readonly property real fly: real && thumb.width > 0 ? mc.travel : 0
-            ClippingRectangle {
+            // its capture is in (or there is nothing to fly from)
+            readonly property bool ready: view.hasContent || !real
+            onReadyChanged: mc.maybeGo()
+            Component.onCompleted: { takeRect(); mc.maybeGo(); }
+            Item {
                 id: thumb
                 anchors.centerIn: parent
                 opacity: cell.real && !A11y.reduceMotion ? 1 : mc.e
@@ -179,30 +338,43 @@ ShellWindow {
                 ]
                 width: view.width
                 height: view.height
-                radius: Theme.mission.thumbRadius
-                color: "transparent"
                 scale: wma.containsMouse ? Theme.mission.hoverScale : 1
                 Behavior on scale { NumberAnimation { duration: Theme.anim.fast } }
-                ScreencopyView {
-                    id: view
-                    captureSource: cell.modelData.wayland
-                    live: mc.shown
-                    // fit the cell but never grow past Theme.mission.maxScale of the real window
-                    readonly property real dpr: mc.screen ? mc.screen.devicePixelRatio : 1
-                    readonly property real maxW: cell.width
-                    readonly property real maxH: cell.height - Theme.mission.titleReserve
-                    constraintSize: Qt.size(Math.min(maxW, sourceSize.width / dpr * Theme.mission.maxScale || maxW),
-                                            Math.min(maxH, sourceSize.height / dpr * Theme.mission.maxScale || maxH))
-                }
-                // fallback while no frame is available: app icon on a plain card
-                Rectangle {
+                // window shadow, comes in with the layout (the real window's own shadow fades out
+                // under the wallpaper); radius and offset as the glass shadow, guessed for here
+                RectangularShadow {
                     anchors.fill: parent
-                    visible: !view.hasContent
-                    color: Theme.glass.solid
-                    IconImage {
-                        anchors.centerIn: parent
-                        implicitSize: Theme.mission.placeholderIcon
-                        source: Apps.iconUrl(Apps.appIdOf(cell.modelData), Apps.appIdOf(cell.modelData))
+                    radius: Theme.mission.thumbRadius
+                    blur: Theme.glass.shadowRadius
+                    offset.y: Theme.glass.shadowYOffset
+                    color: Theme.glass.shadow
+                    opacity: mc.e
+                }
+                ClippingRectangle {
+                    anchors.fill: parent
+                    radius: Theme.mission.thumbRadius
+                    color: "transparent"
+                    ScreencopyView {
+                        id: view
+                        captureSource: cell.modelData.wayland
+                        live: mc.shown
+                        // fit the cell but never grow past Theme.mission.maxScale of the real window
+                        readonly property real dpr: mc.screen ? mc.screen.devicePixelRatio : 1
+                        readonly property real maxW: cell.width
+                        readonly property real maxH: cell.height - Theme.mission.titleReserve
+                        constraintSize: Qt.size(Math.min(maxW, sourceSize.width / dpr * Theme.mission.maxScale || maxW),
+                                                Math.min(maxH, sourceSize.height / dpr * Theme.mission.maxScale || maxH))
+                    }
+                    // fallback while no frame is available: app icon on a plain card
+                    Rectangle {
+                        anchors.fill: parent
+                        visible: !view.hasContent
+                        color: Theme.glass.solid
+                        IconImage {
+                            anchors.centerIn: parent
+                            implicitSize: Theme.mission.placeholderIcon
+                            source: Apps.iconUrl(Apps.appIdOf(cell.modelData), Apps.appIdOf(cell.modelData))
+                        }
                     }
                 }
                 Rectangle {
