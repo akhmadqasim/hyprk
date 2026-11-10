@@ -40,11 +40,30 @@ or stops, the pane falls back to polling every 15 s.
 | Appearance, Dock, Sound | state file missing or corrupt | defaults from `Parsers.js` (`appearanceDefaults`, `dockDefaults`, `soundDefaults`); next change rewrites a clean file |
 | Appearance, Dock, Sound | running under `qml` (no processes) | files go through XMLHttpRequest and are polled every 2 s instead of inotify; `run.sh` exports `QML_XHR_ALLOW_FILE_READ/WRITE=1` |
 
-## Reduce transparency
+## Accessibility
 
-Accessibility > Display > "Reduce transparency" writes `reduceTransparency` to
-`state/appearance.json` (the shell reads the same key). Settings honors it itself:
-`Theme.sidebar.fill` switches from the translucent tint to an opaque color.
+Overview and sub-pages follow macOS 27 (support.apple.com mchlp1400). Display flags live in
+`state/appearance.json` (`reduceTransparency`, `increaseContrast`, `reduceMotion`), the rest
+in `state/accessibility.json` (`panes/accessibility/A11y.js`). Each change also writes
+`state/accessibility.lua` (+ `state/a11y-screen.frag`) and runs it with `hyprctl eval`;
+`shell/services/A11y.qml` runs the same file at login and after every Hyprland reload.
+
+| Feature | Linux backend | Fallback |
+|---|---|---|
+| Reduce transparency | Settings + shell themes (opaque fills) | — |
+| Increase contrast | Settings theme (strokes, separators, secondary text, no transparency), Hyprland window borders; shell via `A11y.increaseContrast` | — |
+| Reduce motion | Settings controls, Hyprland: no window zoom, Spaces cross-fade; shell via `A11y.ms()` | — |
+| Invert colors (Smart/Classic), Display contrast, Color filters (Grayscale, Protanopia, Deuteranopia, Tritanopia, Tint) | Hyprland `decoration:screen_shader` = `config/hypr/shaders/a11y-filter.frag` with #defines | screencopy (grim, screen sharing) skips screen shaders, so screenshots show the unfiltered screen |
+| Pointer size | `hyprctl setcursor` + `XCURSOR_SIZE`/`HYPRCURSOR_SIZE` for new apps | — |
+| Pointer colors, Shake to locate, Text size | none | rows dimmed with a one-line reason |
+| Zoom shortcuts ⌥⌘8 / ⌥⌘= / ⌥⌘−, scroll + modifier | Hyprland `cursor:zoom_factor` (`scripts/a11y-zoom.sh`) | Split Screen / Picture-in-Picture fall back to Full Screen with a note; no trackpad pinch |
+| VoiceOver (⌘F5) | Orca (`scripts/a11y-orca.sh`, stops only the Orca it started) | no `orca`: switch disabled, "Install the Orca screen reader" |
+| Read & Speak: Speak selection (⌥Esc), rate, Play Sample; Live Speech | speech-dispatcher `spd-say` (`scripts/a11y-speak.sh`), primary selection via `wl-paste -p` | no `spd-say`: rows disabled, "Speech needs speech-dispatcher" |
+| Prefer non-blinking cursor | `gsettings org.gnome.desktop.interface cursor-blink` (written only when toggled: it is shared with the host desktop) | no gsettings: disabled with a note |
+| Sticky Keys, Slow Keys, Full Keyboard Access, Accessibility Keyboard, Pointer Control methods | none in Hyprland/xkbcommon | disabled rows + note |
+| Flash screen on alert, Mono audio, Speak announcements, Auto-play animated images, Captions SDH, Differentiate without color | saved only | note "Saved for …" |
+| Hover Text, Audio Descriptions, Hearing Devices, Live Captions, Name Recognition, Voice Control, Switch Control, Personal Voice, Vocal Shortcuts, Siri, Shortcut | none | "<Feature> Unavailable" empty state (`accessibility/Unsupported.qml`) |
+| Hyprland not reachable | — | values are saved; note "Saved, but Hyprland isn't reachable here…" |
 
 ## Sidebar glass
 

@@ -13,8 +13,11 @@ QtObject {
     // ---------- appearance (driven by AppState from state/appearance.json) ----------
     property bool dark: false
     property bool reduceTransparency: false
+    // Accessibility > Display > Increase contrast: darker borders and separators,
+    // stronger secondary text, and no transparency (macOS turns that on with it)
+    property bool increaseContrast: false
     property bool compositorBlur: false        // set by AppState from Backend
-    readonly property bool translucent: compositorBlur && !reduceTransparency
+    readonly property bool translucent: compositorBlur && !reduceTransparency && !increaseContrast
     // "transparent" = multicolor/blue default (systemBlue)
     property color accentOverride: "transparent"
     readonly property color accent: accentOverride.a > 0 ? accentOverride : (dark ? "#0A84FF" : "#0071F5") // ref (light)
@@ -95,7 +98,8 @@ QtObject {
         readonly property color fill: theme.translucent
             ? (theme.dark ? Qt.rgba(0.165, 0.165, 0.173, 0.88) : Qt.rgba(0.933, 0.925, 0.918, 0.88))
             : (theme.dark ? "#2A2A2C" : "#EEECEA")
-        readonly property color stroke: theme.dark ? Qt.rgba(1, 1, 1, 0.08) : Qt.rgba(0, 0, 0, 0.05)
+        readonly property color stroke: theme.increaseContrast ? (theme.dark ? Qt.rgba(1, 1, 1, 0.4) : Qt.rgba(0, 0, 0, 0.4))
+            : theme.dark ? Qt.rgba(1, 1, 1, 0.08) : Qt.rgba(0, 0, 0, 0.05)
         readonly property color selection: theme.accent
         readonly property color selectionText: "#FFFFFF"
         readonly property color searchFill: theme.dark ? Qt.rgba(1, 1, 1, 0.07) : Qt.rgba(0, 0, 0, 0.04)    // ref #EAE9E7 over sidebar
@@ -133,10 +137,13 @@ QtObject {
     // ---------- colors ----------
     readonly property color windowBg: theme.dark ? "#1E1E1E" : "#FFFFFF"          // TODO verify
     readonly property color cardFill: theme.dark ? Qt.rgba(1, 1, 1, 0.05) : Qt.rgba(0, 0, 0, 0.03) // ref #F7F7F7 on white
-    readonly property color cardStroke: theme.dark ? Qt.rgba(1, 1, 1, 0.04) : Qt.rgba(0, 0, 0, 0.0) // ref: no visible stroke
-    readonly property color separator: theme.dark ? Qt.rgba(1, 1, 1, 0.09) : Qt.rgba(0, 0, 0, 0.055) // ref #EBEBEB on card
+    readonly property color cardStroke: theme.increaseContrast ? (theme.dark ? Qt.rgba(1, 1, 1, 0.45) : Qt.rgba(0, 0, 0, 0.45))
+        : theme.dark ? Qt.rgba(1, 1, 1, 0.04) : Qt.rgba(0, 0, 0, 0.0) // ref: no visible stroke
+    readonly property color separator: theme.increaseContrast ? (theme.dark ? Qt.rgba(1, 1, 1, 0.35) : Qt.rgba(0, 0, 0, 0.3))
+        : theme.dark ? Qt.rgba(1, 1, 1, 0.09) : Qt.rgba(0, 0, 0, 0.055) // ref #EBEBEB on card
     readonly property color label: theme.dark ? Qt.rgba(1, 1, 1, 0.88) : Qt.rgba(0, 0, 0, 0.85)
-    readonly property color secondaryLabel: theme.dark ? Qt.rgba(1, 1, 1, 0.55) : Qt.rgba(0, 0, 0, 0.51) // ref #7D7C7B
+    readonly property color secondaryLabel: theme.increaseContrast ? (theme.dark ? Qt.rgba(1, 1, 1, 0.75) : Qt.rgba(0, 0, 0, 0.7))
+        : theme.dark ? Qt.rgba(1, 1, 1, 0.55) : Qt.rgba(0, 0, 0, 0.51) // ref #7D7C7B
     readonly property color tertiaryLabel: theme.dark ? Qt.rgba(1, 1, 1, 0.25) : Qt.rgba(0, 0, 0, 0.26)
     readonly property color controlFill: theme.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.08) // ref popup circle #E4E4E5
     readonly property color controlFillPressed: theme.dark ? Qt.rgba(1, 1, 1, 0.18) : Qt.rgba(0, 0, 0, 0.12)

@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import "Parsers.js" as P
+import "panes/accessibility/A11y.js" as A11y
 
 // Shared state files state/<key>.json, also read by the shell. Each key below is a
 // property holding the normalized object; change it with AppState.set(key, patch).
@@ -15,12 +16,14 @@ QtObject {
     property var lock: P.normalizeLock({})
     property var input: P.normalizeInput({})
     property var notifications: P.normalizeNotifications({})
+    property var accessibility: A11y.normalize({})              // panes/accessibility/A11y.js
     property var wallpaper: ({})                                  // {path, ...}
     readonly property string wallpaperImage: String(wallpaper.path || "")
 
     readonly property var _normalize: ({
         appearance: P.normalizeAppearance, dock: P.normalizeDock, sound: P.normalizeSound,
         lock: P.normalizeLock, input: P.normalizeInput, notifications: P.normalizeNotifications,
+        accessibility: A11y.normalize,
         wallpaper: o => o
     })
     function path(key) { return Backend.stateDir + "/" + key + ".json"; }
@@ -49,6 +52,7 @@ QtObject {
     onAppearanceChanged: {
         Theme.dark = appearance.dark;
         Theme.reduceTransparency = appearance.reduceTransparency;
+        Theme.increaseContrast = appearance.increaseContrast;
         Theme.sidebar.size = appearance.sidebarIconSize;
         const t = Theme.tile[appearance.accent];
         Theme.accentOverride = t !== undefined && appearance.accent !== "blue" ? t : "transparent";
