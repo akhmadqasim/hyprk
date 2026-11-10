@@ -1,6 +1,7 @@
 // Original monochrome glyphs drawn on a 24x24 grid, SF-Symbols-like weight.
 // Each symbol is a list of parts: { d: svg path, fill: bool, sw: stroke width }.
-// Replace with extracted SF Symbols outlines (themes/icons) when available.
+// Symbol.qml draws the real SF Symbols (sf.js) and uses these only for names without an SVG
+// (distro, and the names in handDrawn below).
 .pragma library
 
 function rr(x, y, w, h, r) {
@@ -71,6 +72,14 @@ const symbols = {
     "photo": [S(rr(3, 4.5, 18, 15, 2.5), 1.6), F("M5.5 17L10 11.5L13.2 15L15.2 13L18.5 17Z"), F(circle(15.5, 8.5, 1.6))],
     "gear": [S(circle(12, 12, 3.2), 1.8), S("M12 2.8V5.2M12 18.8V21.2M2.8 12H5.2M18.8 12H21.2M5.5 5.5L7.2 7.2M16.8 16.8L18.5 18.5M5.5 18.5L7.2 16.8M16.8 7.2L18.5 5.5", 2.0)],
 };
+
+// Names that keep the hand-drawn glyph although an SVG exists:
+// battery: MenuBar.qml lays its level bar on this outline (x 4/24, y 9/24); the real empty outline is
+// battery.0percent, whose inside differs.
+const handDrawn = ["battery"];
+function handDrawnOnly(name) {
+    return handDrawn.indexOf(name) !== -1;
+}
 
 function get(name) {
     return symbols[name] || [];
