@@ -84,8 +84,9 @@ namespace lg {
             {K("radii"), "", [](SParams& p, const std::string& v) { p.radii = parseNumberMap(v); }},
             {K("materials"), "hyprk-dock:dock,hyprk-controlcenter:controlcenter,hyprk-overlay:menu,hyprk-menubar:menu,hyprk-spotlight:spotlight",
              [](SParams& p, const std::string& v) { p.materials = parseStringMap(v); }},
-            // SwiftUI's default spacing 8 (Spacing.defaultValue): CC tiles 12 apart stay separate at rest
-            {K("spacing"), "hyprk-controlcenter:8,hyprk-dock:8,hyprk-menubar:8,hyprk-overlay:8",
+            // SwiftUI's default spacing 8 (Spacing.defaultValue): CC tiles 12 apart stay separate at rest,
+            // Spotlight's mode buttons fuse with the field only while they emerge from it
+            {K("spacing"), "hyprk-controlcenter:8,hyprk-dock:8,hyprk-menubar:8,hyprk-overlay:8,hyprk-spotlight:8",
              [](SParams& p, const std::string& v) { p.spacing = parseNumberMap(v); }},
             {K("pointer_light_namespaces"), "hyprk-controlcenter,hyprk-dock,hyprk-menubar",
              [](SParams& p, const std::string& v) { p.pointerLightNamespaces = splitList(v); }},

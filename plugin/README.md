@@ -89,7 +89,7 @@ the pointer light; the shell then crossfades panels instead of materializing the
 
 | Key | Default | Meaning |
 |---|---|---|
-| `spacing` | `hyprk-controlcenter:8,hyprk-dock:8,hyprk-menubar:8,hyprk-overlay:8` | `ns:pt` smoothness k of the union (SwiftUI default 8; CC tiles 12 apart stay separate at rest) |
+| `spacing` | `hyprk-controlcenter:8,hyprk-dock:8,hyprk-menubar:8,hyprk-overlay:8,hyprk-spotlight:8` | `ns:pt` smoothness k of the union (SwiftUI default 8; CC tiles 12 apart stay separate at rest; Spotlight's mode buttons, 12 from the field, fuse with it only while they emerge) |
 | `pointer_light_namespaces` | `hyprk-controlcenter,hyprk-dock,hyprk-menubar` | glass that lights up around the pointer |
 | `pointer_light` / `pointer_light_radius` | 1 / 60 | strength (0 = off), Gaussian radius in px |
 | `reduce_motion` | 0 | 1 = no merging, no pointer light |
