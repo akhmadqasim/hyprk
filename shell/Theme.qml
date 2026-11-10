@@ -615,7 +615,6 @@ Singleton {
         readonly property int normal: theme.ms(600)                // panels open (spring 0.5 critically damped)
         readonly property var spring: [0.25, 0.248, 0.1, 1.0, 1, 1]
         readonly property int close: theme.ms(250)                 // panels close (ScaleDownAndOut)
-        readonly property int bannerIn: normal           // banner slide-in, same spring as panels
         readonly property int easing: Easing.OutCubic
 
         // Liquid Glass motion (materialize, press, Reduce motion crossfade): Tokens.motion
