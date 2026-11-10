@@ -27,14 +27,17 @@ run() { # print every action; execute unless dry run
 }
 
 if [ $UNINSTALL = 1 ]; then
-    if [ -e "$TARGET" ]; then run sudo rm -f "$TARGET"; else echo "nothing to remove: $TARGET does not exist"; fi
+    if [ ! -e "$TARGET" ]; then echo "nothing to remove: $TARGET does not exist"
+    elif grep -qF "Exec=$WRAPPER" "$TARGET"; then run sudo rm -f "$TARGET"
+    else echo "keeping $TARGET: it does not point at $WRAPPER (a package, or packaging/install.sh --uninstall, owns it)"; fi
     echo "Done. Your private hyprk data (~/.local/share/hyprk-session, ~/.local/share/hyprk-try) is kept; delete it by hand if you want."
     exit 0
 fi
 
 [ -x "$WRAPPER" ] || { echo "install-session: $WRAPPER is missing or not executable" >&2; [ $DRY = 1 ] || exit 1; }
 [ -d /usr/share/wayland-sessions ] || { echo "install-session: /usr/share/wayland-sessions does not exist (is this GDM?)" >&2; [ $DRY = 1 ] || exit 1; }
-[ -x "${HYPRK_DEV:-/mnt/code/hypr-dev}/prefix/bin/Hyprland" ] || echo "warning: prefix Hyprland not found in ${HYPRK_DEV:-/mnt/code/hypr-dev}/prefix"
+[ -x "${HYPRK_DEV:-$HERE/../../hypr-dev}/prefix/bin/Hyprland" ] || command -v Hyprland >/dev/null 2>&1 ||
+    echo "warning: no Hyprland found (neither in the HYPRK_DEV prefix nor on PATH): the session will not start. See packaging/DEPENDENCIES.md"
 
 TMP=$(mktemp)
 trap 'rm -f "$TMP"' EXIT
