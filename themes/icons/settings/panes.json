@@ -1,0 +1,162 @@
+{
+ "_comment": "macOS 27.2 System Settings sidebar icons are not bitmaps: IconServices draws an enclosure tile of ISEnclosureColor with the SF Symbol ISSymbolName in ISSymbolColor at run time (ISGraphicIconConfiguration in the pane extension's Info.plist, or in the com.apple.graphic-icon.* UTI in CoreTypes.bundle Info.plist). Siri and Spotlight have no such config and show a real bitmap: siri.png and spotlight.png here. Keyed by hyprk pane id (settings/Panes.js). See reference/ASSETS.md.",
+ "panes": {
+  "wifi": {
+   "bundle": "com.apple.wifi-settings-extension",
+   "source": "extension",
+   "symbol": "wifi",
+   "enclosure": "blue",
+   "symbolColor": "white"
+  },
+  "bluetooth": {
+   "bundle": "com.apple.BluetoothSettings",
+   "source": "com.apple.graphic-icon.bluetooth",
+   "symbol": "bluetooth",
+   "enclosure": "blue",
+   "symbolColor": "white"
+  },
+  "network": {
+   "bundle": "com.apple.Network-Settings.extension",
+   "source": "extension",
+   "symbol": "network",
+   "enclosure": "blue",
+   "symbolColor": "white"
+  },
+  "vpn": {
+   "bundle": "com.apple.NetworkExtensionSettingsUI.NESettingsUIExtension",
+   "source": "extension",
+   "symbol": "network.badge.shield.half.filled",
+   "enclosure": "blue",
+   "symbolColor": "white"
+  },
+  "battery": {
+   "bundle": "com.apple.Battery-Settings.extension",
+   "source": "com.apple.graphic-icon.energy (PowerPreferences UTI)",
+   "symbol": "bolt.fill",
+   "enclosure": "green",
+   "symbolColor": "white"
+  },
+  "general": {
+   "bundle": "com.apple.systempreferences.GeneralSettings",
+   "source": "extension",
+   "symbol": "gear",
+   "enclosure": "gray",
+   "symbolColor": "white"
+  },
+  "accessibility": {
+   "bundle": "com.apple.Accessibility-Settings.extension",
+   "source": "com.apple.graphic-icon.accessibility",
+   "symbol": "accessibility",
+   "enclosure": "blue",
+   "symbolColor": "white"
+  },
+  "appearance": {
+   "bundle": "com.apple.Appearance-Settings.extension",
+   "source": "extension",
+   "symbol": "appearance",
+   "enclosure": "black",
+   "symbolColor": "white"
+  },
+  "controlcenter": {
+   "bundle": "com.apple.ControlCenter-Settings.extension",
+   "source": "extension",
+   "symbol": "switch.2",
+   "enclosure": "gray",
+   "symbolColor": "white"
+  },
+  "dock": {
+   "bundle": "com.apple.Desktop-Settings.extension",
+   "source": "com.apple.graphic-icon.desktop",
+   "symbol": "menubar.dock.rectangle",
+   "enclosure": "black",
+   "symbolColor": "white"
+  },
+  "displays": {
+   "bundle": "com.apple.Displays-Settings.extension",
+   "source": "com.apple.graphic-icon.display",
+   "symbol": "sun.max.fill",
+   "enclosure": "blue",
+   "symbolColor": "white"
+  },
+  "siri": {
+   "bundle": "com.apple.Siri-Settings.extension",
+   "source": "extension",
+   "bitmap": "siri.png"
+  },
+  "spotlight": {
+   "bundle": "com.apple.Spotlight-Settings.extension",
+   "source": "extension",
+   "bitmap": "spotlight.png"
+  },
+  "wallpaper": {
+   "bundle": "com.apple.Wallpaper-Settings.extension",
+   "source": "extension",
+   "symbol": "photos",
+   "enclosure": "cyan",
+   "symbolColor": "white"
+  },
+  "notifications": {
+   "bundle": "com.apple.Notifications-Settings.extension",
+   "source": "com.apple.graphic-icon.notifications",
+   "symbol": "bell.badge.fill",
+   "enclosure": "red",
+   "symbolColor": "white"
+  },
+  "sound": {
+   "bundle": "com.apple.Sound-Settings.extension",
+   "source": "com.apple.graphic-icon.sound",
+   "symbol": "speaker.wave.3.fill",
+   "enclosure": "pink",
+   "symbolColor": "white"
+  },
+  "focus": {
+   "bundle": "com.apple.Focus-Settings.extension",
+   "source": "com.apple.graphic-icon.focus",
+   "symbol": "moon.fill",
+   "enclosure": "indigo",
+   "symbolColor": "white"
+  },
+  "lockscreen": {
+   "bundle": "com.apple.Lock-Screen-Settings.extension",
+   "source": "extension",
+   "symbol": "dots.below.lock.fill",
+   "enclosure": "black",
+   "symbolColor": "white"
+  },
+  "privacy": {
+   "bundle": "com.apple.settings.PrivacySecurity.extension",
+   "source": "com.apple.graphic-icon.privacy",
+   "symbol": "hand.raised.fill",
+   "enclosure": "blue",
+   "symbolColor": "white"
+  },
+  "keyboard": {
+   "bundle": "com.apple.Keyboard-Settings.extension",
+   "source": "com.apple.graphic-icon.keyboard",
+   "symbol": "keyboard.fill",
+   "enclosure": "gray",
+   "symbolColor": "white"
+  },
+  "mouse": {
+   "bundle": "com.apple.Mouse-Settings.extension",
+   "source": "extension",
+   "symbol": "magicmouse.fill",
+   "enclosure": "gray",
+   "symbolColor": "white"
+  },
+  "trackpad": {
+   "bundle": "com.apple.Trackpad-Settings.extension",
+   "source": "extension",
+   "symbol": "trackpad.fill",
+   "enclosure": "gray",
+   "symbolColor": "white"
+  },
+  "energy": {
+   "bundle": "com.apple.Battery-Settings.extension",
+   "source": "com.apple.graphic-icon.energy (CoreTypes UTI; hyprk's Energy pane is the desktop twin of Battery)",
+   "symbol": "bolt.fill",
+   "enclosure": "green",
+   "symbolColor": "white"
+  }
+ }
+}
