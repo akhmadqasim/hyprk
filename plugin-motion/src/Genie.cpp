@@ -1,6 +1,8 @@
 #include "Genie.hpp"
 
 #include <algorithm>
+#include <cstdio>
+#include <string>
 #include <cmath>
 #include <numbers>
 
@@ -67,5 +69,23 @@ namespace motion {
         const double x0 = std::min(a.x, b.x), y0 = std::min(a.y, b.y);
         const double x1 = std::max(a.x + a.w, b.x + b.w), y1 = std::max(a.y + a.h, b.y + b.h);
         return {x0, y0, x1 - x0, y1 - y0};
+    }
+
+    std::optional<Rect> pickTarget(std::string_view spec, uint64_t address) {
+        std::optional<Rect> plain, own;
+        size_t              start = 0;
+        while (start <= spec.size()) {
+            const size_t      end = std::min(spec.find(';', start), spec.size());
+            const std::string e{spec.substr(start, end - start)};
+            start = end + 1;
+            double             x = 0, y = 0, w = 0, h = 0;
+            unsigned long long a = 0;
+            if (std::sscanf(e.c_str(), " %llx %lf %lf %lf %lf", &a, &x, &y, &w, &h) == 5) {
+                if (a == address && w > 0 && h > 0)
+                    own = Rect{x, y, w, h};
+            } else if (std::sscanf(e.c_str(), " %lf %lf %lf %lf", &x, &y, &w, &h) == 4 && w > 0 && h > 0 && !plain)
+                plain = Rect{x, y, w, h};
+        }
+        return own ? own : plain;
     }
 }

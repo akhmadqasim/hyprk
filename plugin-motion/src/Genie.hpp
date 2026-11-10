@@ -2,6 +2,9 @@
 // macOS Dock "genie" minimize, recovered from Dock.app (macOS 27.2):
 // WAGenieAnimation::perform 0x10006933c (see liquid-glass-re/SPEC.md 11.3).
 // Pure math: no compositor types, so it can be unit tested.
+#include <cstdint>
+#include <optional>
+#include <string_view>
 #include <vector>
 
 namespace motion {
@@ -30,4 +33,10 @@ namespace motion {
 
     // Union of window and target: everything the genie can touch.
     Rect genieExtents(const Rect& window, const Rect& target);
+
+    // The Dock target for one window from plugin:hyprkmotion:genie_target, entries split by ';':
+    //   "x y w h"            the slot a window without an entry goes to
+    //   "<address> x y w h"  that window's app icon (hex, 0x optional; macOS minimize-to-application)
+    // Returns the window's entry, else the plain one, else nothing (bad or empty spec).
+    std::optional<Rect> pickTarget(std::string_view spec, uint64_t address);
 }

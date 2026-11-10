@@ -50,6 +50,17 @@ int main() {
     auto e = genieExtents(win, icon);
     CHECK(e.x == 290 && e.y == 120 && std::abs(e.x + e.w - 990) < 1e-9 && std::abs(e.y + e.h - 818) < 1e-9);
 
+    // genie_target: a window's own entry (its app icon), else the plain slot
+    const char* spec = "900 770 48 48;0x5ec42dcc8360 600 770 48 48;abc 1 2 3 4";
+    auto own = pickTarget(spec, 0x5ec42dcc8360);
+    CHECK(own && own->x == 600 && own->w == 48);
+    auto other = pickTarget(spec, 0x1234);
+    CHECK(other && other->x == 900);
+    CHECK(pickTarget(spec, 0xabc) && pickTarget(spec, 0xabc)->x == 1);
+    CHECK(pickTarget("900 770 48 48", 0x1) && pickTarget("900 770 48 48", 0x1)->y == 770);
+    CHECK(!pickTarget("", 0x1));
+    CHECK(!pickTarget("0x12 1 2 3 4", 0x1));
+
     std::printf("%s\n", fails ? "FAILED" : "ok");
     return fails ? 1 : 0;
 }

@@ -50,22 +50,23 @@ namespace {
         return ws && ws->addressableName() == MINIMIZED;
     }
 
-    // Dock target, monitor-local logical.
-    // 1. plugin:hyprkmotion:genie_target = "x y w h" (global logical px): the shell publishes the
-    //    Dock slot where the next minimized window's tile appears (hyprctl eval).
+    // Dock target of a window, monitor-local logical.
+    // 1. plugin:hyprkmotion:genie_target (global logical px, motion::pickTarget): the shell publishes
+    //    each window's app icon (macOS minimize-to-application = 1, the default; MAC-ANSWERS.md R2
+    //    (27.2.1): minimise goes into the app's Dock icon) and a plain slot for the rest (hyprctl eval).
     // 2. Otherwise the middle of the hyprk-dock layer: a 48 pt icon (64 pt tile inset by the
     //    Dock's 4 pt, 0x100053ca0) 12 pt above its bottom.
-    std::optional<CBox> publishedTarget() {
+    std::optional<CBox> publishedTarget(const PHLWINDOW& w) {
         static auto P = CConfigValue<Config::STRING>("plugin:hyprkmotion:genie_target");
-        double      x = 0, y = 0, w = 0, h = 0;
-        if (std::sscanf(std::string{*P}.c_str(), "%lf %lf %lf %lf", &x, &y, &w, &h) != 4 || w <= 0 || h <= 0)
+        const auto  t = motion::pickTarget(std::string{*P}, rc<uintptr_t>(w.get()));
+        if (!t)
             return std::nullopt;
-        return CBox{x, y, w, h};
+        return CBox{t->x, t->y, t->w, t->h};
     }
 
-    motion::Rect dockTarget(const PHLMONITOR& mon) {
+    motion::Rect dockTarget(const PHLMONITOR& mon, const PHLWINDOW& w) {
         const CBox m = mon->logicalBox();
-        if (const auto t = publishedTarget(); t && m.containsPoint(t->middle()))
+        if (const auto t = publishedTarget(w); t && m.containsPoint(t->middle()))
             return {t->x - m.x, t->y - m.y, t->w, t->h};
 
         CBox dock{m.x, m.y + m.h - 84, m.w, 84};
@@ -141,7 +142,7 @@ namespace {
                 onDone();
             return;
         }
-        w->effects().transformers()->emplace<motion::CGenieTransformer>(w, dockTarget(mon), reverse, genieSeconds());
+        w->effects().transformers()->emplace<motion::CGenieTransformer>(w, dockTarget(mon, w), reverse, genieSeconds());
         g_anims.push_back(SAnim{.window = PHLWINDOWREF{w}, .onDone = std::move(onDone)});
         if (Animation::mgr())
             Animation::mgr()->requestTick();
@@ -220,7 +221,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
 
     HyprlandAPI::addConfigValueV2(handle, makeShared<CIntValue>("plugin:hyprkmotion:genie", "Dock genie on minimize and restore", 1));
     HyprlandAPI::addConfigValueV2(handle, makeShared<CFloatValue>("plugin:hyprkmotion:genie_duration", "seconds (Dock genie-speed default 0.5)", 0.5F));
-    HyprlandAPI::addConfigValueV2(handle, makeShared<CStringValue>("plugin:hyprkmotion:genie_target", "Dock tile of the next minimized window, \"x y w h\" global logical px; empty = Dock middle", Config::STRING{""}));
+    HyprlandAPI::addConfigValueV2(handle, makeShared<CStringValue>("plugin:hyprkmotion:genie_target", "Dock targets, global logical px, split by ;: \"x y w h\" for any window, \"<address> x y w h\" for one window (its app icon); empty = Dock middle", Config::STRING{""}));
 
     if (void* addr = findMoveToWorkspace()) {
         g_moveHook = HyprlandAPI::createFunctionHook(handle, addr, rc<void*>(&hkMoveToWorkspace));
