@@ -65,3 +65,72 @@ Other processes (Finder, WindowServer menu bar) cannot be dumped, so for them th
 
 ## Questions for the PC
 - None yet.
+
+## R2 Motion (60 fps screen recordings, analysed per frame; 1 frame = 16.7 ms)
+
+Recorded with `ffmpeg -f avfoundation -framerate 60` (about 58 fps effective, real frame timestamps used), analysed with
+crop-and-diff scripts. Raw videos were deleted after measuring (they showed personal notifications); numbers only.
+
+### Dock
+- `defaults read com.apple.dock` on this account: magnification 0, largesize 16, tilesize 33, mineffect genie,
+  launchanim 1, minimize-to-application 1, show-recents 1, show-process-indicators 1, autohide 0. Not a clean account.
+  The Dock's factory `default.plist` (Dock.app/Contents/Resources) only sets persistent-apps / persistent-others /
+  version, so every other key is the built-in default when absent; magnification absent = off (the PC report
+  "magnification animated by default" is wrong for macOS).
+- Launch bounce (slow-launching test app, `BounceProbe`):
+  - period 0.70 s per bounce (both tile sizes), constant for the whole launch;
+  - height 11 pt at tilesize 33 (icon art 25.5 pt), 18 pt at tilesize 64 (icon art 50.5 pt);
+  - shape per bounce (phase 0..1, height as a fraction of the max): 0.02 0.09 | 0.07 0.30 | 0.12 0.43 | 0.17 0.60 |
+    0.21 0.69 | 0.26 0.81 | 0.31 0.90 | 0.36 0.95 | 0.40..0.60 1.00 (holds at the top about 0.14 s) | 0.64 0.95 |
+    0.69 0.87 | 0.74 0.77 | 0.79 0.70 | 0.83 0.57 | 0.88 0.43 | 0.93 0.26 | 0.98 0.12. Rise and fall are mirror images;
+    the icon touches the ground for one frame only. Best simple fit: h = H * (sin(pi u))^0.7 (RMS 0.6 pt), a plain
+    parabola 4u(1-u) gives 0.5 pt RMS but no flat top.
+  - it keeps bouncing while the app launches; when launching ends it finishes the bounce in progress and stays
+    down (no extra settle). Bounce count = launch time / 0.7 s.
+  - a new (not pinned) app tile is inserted already in the air: its slot grows from 0 to full width in about
+    0.25 s while the first bounce runs. On quit the tile shrinks out in about 0.15 s.
+- Hover label (magnification off, tile 64): appears in the frame after the pointer reaches the icon (no delay, no
+  fade-in); moving to the next icon swaps it in one frame; on leaving the Dock it fades out in about 0.23 s
+  (ease-in-out).
+- Magnification (switched on for the test: tilesize 64, largesize 128, then restored): from the AX frames of every
+  tile at 81 pointer positions. Size against the distance d between the pointer and the tile's *unmagnified*
+  centre: 128 at d 0, 127.6 at 15, 125.7 at 35, 122.3 at 55, 117.7 at 75, 111.6 at 95, 104.5 at 115, 96.5 at 135,
+  87.6 at 155, 78.3 at 175, 70.8 at 195, 66.0 at 215, 64.1 at 235, 64 beyond. Fit:
+  size = base + (large - base) * (1 - (d / 222)^2)^1.5 for d < 222 pt (RMS 0.4 pt). Only measured for 64 -> 128.
+  Entering / leaving the Dock: the magnification grows in about 0.12 s (7 frames, ease-in-out) and collapses in
+  about 0.12 s the same way; the Dock widens from the centre.
+
+### Menu bar, moving across titles with a menu open (Finder)
+- The highlight pill jumps to the new title in one frame as soon as the pointer crosses into the title's frame:
+  no slide. The pill spans the title's AX frame (File: x 104..146, 42 pt; Edit: 145..190).
+- The open menu is swapped 3 to 4 frames (50 to 67 ms) after the pill moves, in one frame: the old menu disappears and
+  the new one appears complete. No crossfade, no fade-out of the old menu.
+- First open: complete in one frame. Close with Escape: fades out in about 0.2 s (as measured earlier).
+- Fast sweep across Go, Window, Help: every title switches the same way; no intermediate states.
+
+### Control Center, Notification Center, Spotlight
+- Control Center open (click on its menu bar icon): fades in, no scale and no slide (tiles are in their final place
+  from the first frame). Progress (share of the final change): 0.16, 0.29, 0.40, 0.51, 0.61, 0.71, 0.76, 0.81, 0.86,
+  0.89, 0.91, 0.94 at 17 ms steps, 1.0 at about 0.3 s: an ease-out with most of it in the first 0.15 s. The tile
+  glass (and the white Sensibo tile) fills in during the same fade.
+- Control Center close: fades out in about 0.17 to 0.2 s.
+- Notification Center open (click on the clock): slides in from the right screen edge. Covered share per frame:
+  0.11, 0.14, 0.29, 0.43, 0.54, 0.64, 0.71, 0.78, 0.83, 0.87, 0.90, 0.92, 0.94, 0.95, 0.96, 0.98, 0.99 (17 ms steps):
+  about 0.3 s to 99 %, ease-out (spring-like, no visible overshoot).
+- Notification Center close: slides out to the right in about 0.15 s, accelerating (0.92, 0.80, 0.66, 0.50, 0.41,
+  0.28, 0.20, 0.14, 0.11).
+- Spotlight (Cmd-Space) open: the bar appears complete in one frame at about 1.05 x its final width, then shrinks
+  to 1.0 within 5 frames (about 0.08 s). No fade-in. 27.2.1 bar: dark capsule with "Search or Ask" and a mic
+  glyph, also in light mode (measured with icon style Dark; see note at the top).
+- Spotlight close (Escape): fades out with a blur and a slight growth in 3 frames (about 0.05 s).
+
+### Windows (opening with Cmd-N / open, closing with Cmd-W)
+- Open: Finder, TextEdit, Safari, Terminal: the window is complete in one frame (no scale, no fade).
+- Close: Finder, TextEdit, Terminal fade out in about 0.1 s; alpha per frame 1, 0.71, 0.44, 0.27, 0.16, 0.09, 0.05,
+  0.03 (TextEdit; Terminal 0.59, 0.35, 0.20, 0.11, 0.06, 0.04; Finder 0.81, 0.31, 0.18, -, 0.06). That is about
+  x0.6 per frame (exponential, time constant about 33 ms). A slight blur is visible on Finder; any scale is too
+  small to resolve. Safari: gone in one frame (instant).
+- So the PC's "fade+blur 0.1 s" is right for most document windows; Safari is instant.
+
+### Not measured yet
+Mission Control, Cmd-Tab, Apps, app launch window, minimise/zoom/full screen, control press states.
