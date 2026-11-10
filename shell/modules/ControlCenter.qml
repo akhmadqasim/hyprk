@@ -179,7 +179,13 @@ Item {
     component Module: GlassButton {
         id: m
         property real radius: Theme.cc.tileRadius
-        materialize: glass.materialize
+        // the hidden scale (motion.js hiddenScale: + min(8, 0.1 dim) per side) and the spring's
+        // undershoot below 0 on close grew neighbours into each other: overlapping glass regions
+        // arrive at the plugin as one cluster, so for a few frames the tiles turned into one hard
+        // rectangle. The scale stops 1 pt short of the half gap, so neighbours still fuse through
+        // the plugin's smooth union but their regions never touch.
+        readonly property real growMax: Math.max(Math.min(8, 0.1 * width), Math.min(8, 0.1 * height))
+        materialize: growMax > 0 ? Math.max(glass.materialize, 1 - (cc.gap / 2 - 1) / growMax) : glass.materialize
         Glass {
             id: glass
             anchors.fill: parent
