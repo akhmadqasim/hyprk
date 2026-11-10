@@ -1,8 +1,10 @@
 pragma Singleton
 
 import QtQuick
+import "HyprK"
 
-// Every metric and color of the Settings app lives here.
+// Every metric and color of the Settings app lives here, as a layer over the shared HyprK Tokens
+// (ui/HyprK): it feeds Tokens this app's appearance and keeps only what is Settings' own.
 // Units are logical pixels (1 pt on macOS == 1 px here).
 // Sources, in order: /mnt/code/liquid-glass-re/SPEC.md "Layout metrics" (empty so far),
 // "ref" = measured from reference/screens/macos27-system-settings-appearance.webp (2x),
@@ -17,10 +19,24 @@ QtObject {
     // stronger secondary text, and no transparency (macOS turns that on with it)
     property bool increaseContrast: false
     property bool compositorBlur: false        // set by AppState from Backend
+    property bool reduceMotion: false          // set by AppState (Accessibility > Motion)
     readonly property bool translucent: compositorBlur && !reduceTransparency && !increaseContrast
     // "transparent" = multicolor/blue default (systemBlue)
     property color accentOverride: "transparent"
-    readonly property color accent: accentOverride.a > 0 ? accentOverride : (dark ? "#0A84FF" : "#0071F5") // ref (light)
+    readonly property color accent: accentOverride.a > 0 ? accentOverride : (dark ? Tokens.systemBlue : "#0071F5") // ref (light)
+
+    Component.onCompleted: {
+        Tokens.dark = Qt.binding(() => theme.dark);
+        Tokens.reduceMotion = Qt.binding(() => theme.reduceMotion);
+        Tokens.reduceTransparency = Qt.binding(() => theme.reduceTransparency);
+        Tokens.increaseContrast = Qt.binding(() => theme.increaseContrast);
+        Tokens.accent = Qt.binding(() => theme.accent);
+        Tokens.fontText = Qt.binding(() => theme.fontText);
+        Tokens.fontGlyph = Qt.binding(() => theme.fontGlyph);
+        // measured on the reference Settings window (below), so the controls match the panes
+        Tokens.label = Qt.binding(() => theme.label);
+        Tokens.secondaryLabel = Qt.binding(() => theme.secondaryLabel);
+    }
 
     // ---------- fonts (SF Pro if installed, else Inter, Cantarell, Noto Sans) ----------
     readonly property var _families: Qt.fontFamilies()
@@ -61,26 +77,12 @@ QtObject {
         readonly property int toolbarHeight: 52      // ref: lights/nav centered at 26
     }
 
-    // ---------- traffic lights (SPEC 13; same values in finder/qml/Theme.qml and the plugin title bar) ----------
+    // ---------- traffic lights (SPEC 13, Tokens.lights) ----------
     readonly property QtObject lights: QtObject {
-        readonly property int size: 14               // NSThemeFrame sizeOfTitlebarButtons, Solarium regular
-        readonly property int spacing: 9             // _windowTitlebarButtonSpacingWidth, Solarium
         readonly property int left: 19               // ref: 2x System Settings shot, 18.75 pt from the window edge (top 19 = centred in the 52 pt toolbar)
-        readonly property real rimWidth: 0.75        // DesignLibrary StrokeStyle(lineWidth: 0.75)
-        // gradient top, bottom (WindowControlColors), pressed (CoreUI art), glyph (CoreUI hover art)
-        readonly property var closeSet: theme.dark ? ["#FA6A61", "#EF6962", "#FF8D85", "#730100"]
-                                                   : ["#FF6D63", Qt.rgba(0.961, 0.447, 0.412, 0.80), "#C04741", "#730000"]
-        readonly property var minimizeSet: theme.dark ? ["#FAB51A", "#FECF34", "#FFEA5C", "#985600"]
-                                                      : [Qt.rgba(0.984, 0.702, 0.086, 0.92), Qt.rgba(1, 0.820, 0.204, 0.92), "#BF8E22", "#985600"]
-        readonly property var zoomSet: theme.dark ? ["#56C83A", "#52C43D", "#56F66E", "#006200"]
-                                                  : ["#5ACF1F", Qt.rgba(0.475, 0.827, 0.298, 0.73), "#1E9730", "#006200"]
-        readonly property var inactive: theme.dark ? [Qt.rgba(0.980, 0.980, 0.980, 0.20), Qt.rgba(0.937, 0.937, 0.937, 0.16)]
-                                                   : [Qt.rgba(0.894, 0.894, 0.937, 0.30), Qt.rgba(0.878, 0.878, 0.922, 0.30)]
-        readonly property color rim: Qt.rgba(0, 0, 0, theme.dark ? 0.12 : 0.2)
-        readonly property color inactiveRim: theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0, 0, 0, 0.14)
-        readonly property color close: closeSet[0]   // swatches (Appearance pane)
-        readonly property color minimize: minimizeSet[0]
-        readonly property color zoom: zoomSet[0]
+        readonly property color close: Tokens.lights.closeSet[0]   // swatches (Appearance pane)
+        readonly property color minimize: Tokens.lights.minimizeSet[0]
+        readonly property color zoom: Tokens.lights.zoomSet[0]
     }
 
     // ---------- sidebar ----------
@@ -99,8 +101,6 @@ QtObject {
         readonly property int iconLabelGap: 7        // ref
         readonly property int groupGap: 13          // ref
         readonly property int searchTop: 61          // ref
-        readonly property int searchHeight: 28       // ref
-        readonly property int searchRadius: 14       // ref capsule
         readonly property int accountAvatar: 40      // TODO verify
         // ref (238,236,234). Over compositor blur it is 88 % opaque so the desktop only
         // softly shows through; otherwise (no blur, Reduce transparency) it is flat.
@@ -111,8 +111,6 @@ QtObject {
             : theme.dark ? Qt.rgba(1, 1, 1, 0.08) : Qt.rgba(0, 0, 0, 0.05)
         readonly property color selection: theme.accent
         readonly property color selectionText: "#FFFFFF"
-        readonly property color searchFill: theme.dark ? Qt.rgba(1, 1, 1, 0.07) : Qt.rgba(0, 0, 0, 0.04)    // ref #EAE9E7 over sidebar
-        readonly property color searchStroke: theme.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(1, 1, 1, 0.85) // ref light rim
     }
 
     // ---------- content (grouped inset form) ----------
@@ -129,37 +127,11 @@ QtObject {
         readonly property int heroIcon: 56           // pane header icon, TODO verify
     }
 
-    // ---------- controls ----------
-    readonly property QtObject control: QtObject {
-        readonly property int switchWidth: 38        // TODO verify
-        readonly property int switchHeight: 22       // TODO verify
-        readonly property int popupHeight: 22         // ref
-        readonly property int popupChevron: 20        // ref round chevron button
-        readonly property int sliderTrack: 4         // TODO verify
-        readonly property int sliderKnobW: 24        // macOS 26 capsule knob, TODO verify
-        readonly property int sliderKnobH: 16        // TODO verify
-        readonly property int buttonHeight: 24       // TODO verify
-        readonly property int buttonRadius: 12       // capsule push button (macOS 26), TODO verify
-        readonly property int animMs: 180            // TODO verify
-    }
-    // ---------- control motion (SPEC 10 "Controls motion"; springs = response s, dampingFraction) ----------
-    readonly property QtObject motion: QtObject {
-        readonly property real switchResponse: 0.47   // knob slide, DesignLibrary switch spring(0.47, 0.7)
-        readonly property real switchDamping: 0.7
-        readonly property real switchLift: 1.55       // knob w and h x1.55 while pressed (lens)
-        readonly property real lensResponse: 0.444    // liquidLens scale spring (small knob)
-        readonly property real lensDamping: 0.56
-        readonly property real sliderLift: 1.25       // slider knob x1.25 while pressed
-        readonly property real sliderLiftResponse: 0.25 // spring(0.25, 0.75)
-        readonly property real sliderLiftDamping: 0.75
-        readonly property real sliderJumpResponse: 0.25 // track click: NSSliderCell 0.25 s ease-in-out value animation
-        readonly property real reducedResponse: 0.2   // Reduce Motion: easeInOut(0.2)-like, no growth (lens stays)
-        readonly property int dragThreshold: 3        // px before a switch press becomes a drag
-    }
+    // controls and their motion: Tokens.control, Tokens.motion (HyprK Switch, Slider, Popup, Button)
 
     // ---------- colors ----------
-    readonly property color windowBg: theme.dark ? "#1E1E1E" : "#FFFFFF"          // TODO verify
-    readonly property color cardFill: theme.dark ? Qt.rgba(1, 1, 1, 0.05) : Qt.rgba(0, 0, 0, 0.03) // ref #F7F7F7 on white
+    readonly property color windowBg: Tokens.windowBackground
+    readonly property color cardFill: Tokens.groupFill
     readonly property color cardStroke: theme.increaseContrast ? (theme.dark ? Qt.rgba(1, 1, 1, 0.45) : Qt.rgba(0, 0, 0, 0.45))
         : theme.dark ? Qt.rgba(1, 1, 1, 0.04) : Qt.rgba(0, 0, 0, 0.0) // ref: no visible stroke
     readonly property color separator: theme.increaseContrast ? (theme.dark ? Qt.rgba(1, 1, 1, 0.35) : Qt.rgba(0, 0, 0, 0.3))
@@ -167,12 +139,8 @@ QtObject {
     readonly property color label: theme.dark ? Qt.rgba(1, 1, 1, 0.88) : Qt.rgba(0, 0, 0, 0.85)
     readonly property color secondaryLabel: theme.increaseContrast ? (theme.dark ? Qt.rgba(1, 1, 1, 0.75) : Qt.rgba(0, 0, 0, 0.7))
         : theme.dark ? Qt.rgba(1, 1, 1, 0.55) : Qt.rgba(0, 0, 0, 0.51) // ref #7D7C7B
-    readonly property color tertiaryLabel: theme.dark ? Qt.rgba(1, 1, 1, 0.25) : Qt.rgba(0, 0, 0, 0.26)
-    readonly property color controlFill: theme.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.08) // ref popup circle #E4E4E5
-    readonly property color controlFillPressed: theme.dark ? Qt.rgba(1, 1, 1, 0.18) : Qt.rgba(0, 0, 0, 0.12)
-    readonly property color switchOff: theme.dark ? Qt.rgba(1, 1, 1, 0.16) : Qt.rgba(0, 0, 0, 0.09)
-    readonly property color knob: "#FFFFFF"
-    readonly property color menuFill: theme.dark ? "#2C2C2E" : "#F6F6F6"            // popup menu, TODO verify
+    readonly property color tertiaryLabel: Tokens.tertiaryLabel
+    readonly property color controlFill: Tokens.control.fill
     readonly property color previewStrip: theme.dark ? "#2C2C2E" : "#ECEAE7"        // Liquid Glass preview title, ref
     readonly property color shadow: Qt.rgba(0, 0, 0, theme.dark ? 0.55 : 0.28)
 

@@ -1,7 +1,7 @@
 import QtQuick
 import "lib/files.js" as Files
 import "lib/icons.js" as Icons
-import "../../shell/components" as Shell
+import HyprK
 
 // Icon for one entry, best first: content thumbnail (images, PDFs, videos with a cached
 // thumbnail; generated off the UI thread by image://thumb), app icon, the macOS icon from
@@ -79,9 +79,9 @@ Item {
         }
     }
 
-    // .desktop app icon on the macOS 26 tile (shell/components/AppIconTile.qml); its body
+    // .desktop app icon on the macOS 26 tile (HyprK AppIconTile); its body
     // matches the padding of the macOS PNGs used for the other icons
-    Shell.AppIconTile {
+    AppIconTile {
         id: appIcon
         visible: root.kind === "app" && status === Image.Ready
         anchors.centerIn: parent

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Shapes
 import ".."
 import "../controls"
+import "../HyprK"
 import "../Parsers.js" as P
 
 // Functional: writes mode/dark/accent to state/appearance.json (read by the shell).
@@ -9,10 +10,8 @@ Column {
     id: pane
     spacing: Theme.content.sectionGap
 
-    // Accent swatch fills: controlAccent<Name>Color from SystemAppearance Aqua.car / DarkAqua.car (macOS 27.2).
-    readonly property var accentSwatch: Theme.dark
-        ? ({ blue: "#007AFF", purple: "#A550A7", pink: "#F74F9E", red: "#FF5257", orange: "#F7821B", yellow: "#FFC600", green: "#62BA46", graphite: "#8C8C8C" })
-        : ({ blue: "#007AFF", purple: "#953D96", pink: "#F74F9E", red: "#E0383E", orange: "#F7821B", yellow: "#FFC726", green: "#62BA46", graphite: "#989898" })
+    // Accent swatch fills: SPEC 15 controlAccent<Name>Color (Tokens.accentSwatches)
+    readonly property var accentSwatch: Tokens.accentSwatches
 
     // Mini window thumbnail used by the Appearance and widget-style pickers.
     component Choice: Column {
@@ -134,7 +133,7 @@ Column {
                         }
                     }
                 }
-                MacSlider {
+                Slider {
                     width: 268
                     value: AppState.appearance.glass
                     leftGlyph: "filter_none"; rightGlyph: "content_copy"
@@ -239,7 +238,7 @@ Column {
                     GradientStop { position: 1; color: "#E9A6C7" }
                 }
             }
-            MacPopup { id: hl; model: ["Automatic", "Accent Color", "Blue", "Purple", "Pink", "Red", "Orange", "Yellow", "Green", "Graphite"] }
+            LocalPopup { id: hl; model: ["Automatic", "Accent Color", "Blue", "Purple", "Pink", "Red", "Orange", "Yellow", "Green", "Graphite"] }
         }
     }
 
@@ -274,12 +273,12 @@ Column {
             label: "Sidebar icon size"
             StatePopup { stateKey: "appearance"; field: "sidebarIconSize"; choices: [["Small", "small"], ["Medium", "medium"], ["Large", "large"]] }
         }
-        FormRow { label: "Allow wallpaper tinting in windows"; MacSwitch { checked: true } }
+        FormRow { label: "Allow wallpaper tinting in windows"; LocalSwitch { checked: true } }
     }
 
     Card {
-        FormRow { label: "Show scroll bars"; MacPopup { model: ["Automatically based on mouse or trackpad", "When scrolling", "Always"] } }
-        FormRow { label: "Click in the scroll bar to"; MacPopup { model: ["Jump to the next page", "Jump to the spot that's clicked"] } }
+        FormRow { label: "Show scroll bars"; LocalPopup { model: ["Automatically based on mouse or trackpad", "When scrolling", "Always"] } }
+        FormRow { label: "Click in the scroll bar to"; LocalPopup { model: ["Jump to the next page", "Jump to the spot that's clicked"] } }
     }
 
 }

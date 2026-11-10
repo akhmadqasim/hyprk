@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.HyprK
 import "lib/state.js" as State
 
 // Single source of truth for every visual metric of the hyprk shell.
@@ -19,7 +20,7 @@ Singleton {
     // macOS "Reduce transparency": solid tinted material instead of blurred glass.
     // Also forced on when the blurred wallpaper could not be produced (no magick).
     property bool reduceTransparency: false
-    // Appearance > Icon & widget style (default | dark | clear | tinted), see components/AppIconTile
+    // Appearance > Icon & widget style (default | dark | clear | tinted), see HyprK AppIconTile
     property string iconStyle: "default"
     property bool blurAvailable: true
     // Accessibility (same file; services/A11y.qml holds the Hyprland side). Theme cannot import
@@ -80,7 +81,15 @@ Singleton {
     }
     onDarkChanged: syncPluginAppearance()
     onCompositorGlassChanged: syncPluginAppearance()
-    Component.onCompleted: syncPluginAppearance()
+    Component.onCompleted: {
+        syncPluginAppearance();
+        // the shared HyprK controls and motion helpers follow this appearance
+        Tokens.dark = Qt.binding(() => theme.dark);
+        Tokens.reduceMotion = Qt.binding(() => theme.reduceMotion);
+        Tokens.reduceTransparency = Qt.binding(() => theme.reduceTransparency);
+        Tokens.increaseContrast = Qt.binding(() => theme.increaseContrast);
+        Tokens.fontText = Qt.binding(() => theme.fontText);
+    }
 
     IpcHandler {
         target: "theme"
@@ -122,11 +131,11 @@ Singleton {
     // ---------- colors ----------
     // Label colors follow the AppKit label hierarchy (labelColor, secondaryLabelColor, ...).
     readonly property QtObject color: QtObject {
-        readonly property color label: theme.dark ? Qt.rgba(1, 1, 1, 0.85) : Qt.rgba(0, 0, 0, 0.85)
-        readonly property color secondaryLabel: theme.dark ? Qt.rgba(1, 1, 1, 0.55) : Qt.rgba(0, 0, 0, 0.50)
-        readonly property color tertiaryLabel: theme.dark ? Qt.rgba(1, 1, 1, 0.25) : Qt.rgba(0, 0, 0, 0.26)
+        readonly property color label: Tokens.label
+        readonly property color secondaryLabel: Tokens.secondaryLabel
+        readonly property color tertiaryLabel: Tokens.tertiaryLabel
         readonly property color separator: theme.dark ? theme.stroke(1, 1, 1, 0.10) : theme.stroke(0, 0, 0, 0.10)
-        readonly property color accent: theme.dark ? "#0A84FF" : "#007AFF"           // systemBlue
+        readonly property color accent: Tokens.accent
         readonly property color textOnAccent: "#FFFFFF"
         readonly property color red: theme.dark ? "#FF453A" : "#FF3B30"
         readonly property color indigo: theme.dark ? "#5E5CE6" : "#5856D6"
@@ -301,7 +310,7 @@ Singleton {
         readonly property color text: "#FFFFFF"
         readonly property color subtext: Qt.rgba(1, 1, 1, 0.78)
         readonly property color toggleOnBg: "#FFFFFF"
-        readonly property color toggleOnIcon: theme.dark ? "#0A84FF" : "#007AFF"   // systemBlue (= color.accent)
+        readonly property color toggleOnIcon: Tokens.systemBlue
         readonly property color toggleOffBg: Qt.rgba(1, 1, 1, 0.18)     // round buttons
         readonly property color toggleOffIcon: "#FFFFFF"
         // capsule toggles when off (macOS Wi-Fi "Off"): white circle, grey glyph
@@ -427,13 +436,7 @@ Singleton {
         readonly property int magnify: theme.ms(150)               // dock magnification ramp on enter/leave (by eye; the cursor follow is not animated)
         readonly property int easing: Easing.OutCubic
 
-        // Liquid Glass motion, from SwiftUICore 27.2 (liquid-glass-re notes/round3, for components/NcSpring)
-        // materialize: GlassContainer TransitionSettings.default = Spring(duration 0.5, bounce 0.3)
-        readonly property real materializeResponse: 0.5
-        readonly property real materializeDamping: 0.7
-        readonly property real crossfade: 0.15           // Reduce motion: FadeIn/FadeOut 0.15 s (SPEC 9.9.5)
-        // hidden scale and press lift math: lib/motion.js
-        readonly property real pressResponse: 0.25
+        // Liquid Glass motion (materialize, press, Reduce motion crossfade): Tokens.motion
         // menu selection glides between rows with the response of FlexInteraction.Settings.menu's
         // cursor tracking spring (round3 flex-presets +0x110: 0.15 s), critically damped (that preset's
         // 0.5 belongs to its scale, and a bouncing highlight read as wobbly: by eye). The menu preset
@@ -449,7 +452,6 @@ Singleton {
         readonly property real resizeDamping: 0.85
         readonly property int dockAutohideDelay: 150     // SPEC 7: Dock autohide-delay 0.15 s
         // a click on a slider track springs the shown value to the click point, then drags follow 1:1
-        readonly property real sliderJumpResponse: 0.3
-        readonly property real pressSquish: 0.06         // drag past a slider end stretches x, squeezes y (by eye)
+        readonly property real sliderJumpResponse: 0.3   // CC's knobless slider; Settings' NSSlider uses Tokens.motion.sliderJumpResponse 0.25
     }
 }

@@ -1,7 +1,7 @@
 .pragma library
 
 // Liquid Glass motion math (SwiftUICore 27.2, /mnt/code/liquid-glass-re SPEC 10 and notes/round3).
-// Theme.anim forwards these; tests in tests/run.mjs.
+// Values in Tokens.motion; tests in shell/tests/run.mjs.
 
 // Materialize: hidden glass is scaled up per axis around its anchor, min((dim + 16) / dim, 1.2)
 // (AppearanceSettings.materialize: scale 1.2, maxPointScale 16; GlassAppearanceScaleEffect).

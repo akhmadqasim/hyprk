@@ -1,6 +1,7 @@
 import QtQuick
 import ".."
 import "../controls"
+import "../HyprK"
 import "../Parsers.js" as P
 
 // Functional via bluetoothctl. No controller -> "Bluetooth Unavailable" like macOS.
@@ -51,7 +52,7 @@ Column {
             glyph: "bluetooth"; tint: Theme.tile.blue
             label: "Bluetooth"
             sublabel: pane.ctl.powered ? "Now discoverable as “" + pane.ctl.name + "”." : ""
-            MacSwitch { checked: pane.ctl.powered; enabled_: pane.status === "ok"; onToggled: on => pane.cmd(["power", on ? "on" : "off"], "Bluetooth could not be turned " + (on ? "on." : "off.")) }
+            Switch { checked: pane.ctl.powered; enabled: pane.status === "ok"; onToggled: on => { pane.ctl = Object.assign({}, pane.ctl, { powered: on }); pane.cmd(["power", on ? "on" : "off"], "Bluetooth could not be turned " + (on ? "on." : "off.")); } }
         }
     }
 
@@ -71,7 +72,7 @@ Column {
                 tint: Theme.tile.gray
                 label: modelData.name
                 sublabel: isOn ? "Connected" : "Not Connected"
-                MacButton {
+                Button {
                     text: dev.isOn ? "Disconnect" : "Connect"
                     onClicked: pane.cmd([dev.isOn ? "disconnect" : "connect", modelData.mac], "Couldn't reach “" + modelData.name + "”. Make sure it's turned on and nearby.")
                 }
@@ -85,5 +86,5 @@ Column {
         FormRow { label: "Searching…"; dim: true }
     }
 
-    PaneFooter { MacButton { text: "Advanced…"; enabled_: pane.status === "ok" } }
+    PaneFooter { Button { text: "Advanced…"; enabled: pane.status === "ok" } }
 }

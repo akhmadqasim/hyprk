@@ -1,6 +1,7 @@
 import QtQuick
 import ".."
 import "../controls"
+import "../HyprK"
 import "../Parsers.js" as P
 
 // Read-only list of NetworkManager devices.
@@ -42,5 +43,5 @@ Column {
         title: "Other Services"
         FormRow { glyph: "vpn_lock"; tint: Theme.tile.blue; label: "VPN"; sublabel: "Not Configured" }
     }
-    PaneFooter { MacButton { text: "…" } }
+    PaneFooter { Button { text: "…" } }
 }

@@ -31,9 +31,9 @@ Column {
     }
     Card {
         title: "When Switching User"
-        FormRow { label: "Login window shows"; MacPopup { model: ["List of users", "Name and password"] } }
-        FormRow { label: "Show the Sleep, Restart and Shut Down buttons"; MacSwitch { checked: true } }
-        FormRow { label: "Show password hints"; MacSwitch {} }
+        FormRow { label: "Login window shows"; LocalPopup { model: ["List of users", "Name and password"] } }
+        FormRow { label: "Show the Sleep, Restart and Shut Down buttons"; LocalSwitch { checked: true } }
+        FormRow { label: "Show password hints"; LocalSwitch {} }
     }
     PaneFooter {}
 }

@@ -1,6 +1,7 @@
 import QtQuick
 import ".."
 import "../controls"
+import "../HyprK"
 import "../Parsers.js" as P
 
 // Functional: output device and volume via wpctl (PipeWire); sound effects are
@@ -60,7 +61,7 @@ Column {
         title: "Sound Effects"
         FormRow {
             label: "Alert sound"
-            MacPopup {
+            Popup {
                 model: P.alertSounds
                 currentIndex: P.alertSounds.indexOf(AppState.sound.alertSound)
                 onActivated: i => {
@@ -71,7 +72,7 @@ Column {
         }
         FormRow {
             label: "Alert volume"
-            MacSlider {
+            Slider {
                 width: 230
                 value: AppState.sound.alertVolume
                 leftGlyph: "volume_mute"; rightGlyph: "volume_up"
@@ -80,9 +81,9 @@ Column {
                 onReleased: pane.play(pane.soundsDir + "/Sounds/" + AppState.sound.alertSound + ".wav", AppState.sound.alertVolume)
             }
         }
-        FormRow { label: "Play sound on startup"; MacSwitch { checked: true } }
-        FormRow { label: "Play user interface sound effects"; MacSwitch { checked: AppState.sound.uiSounds; onToggled: on => AppState.set("sound", { uiSounds: on }) } }
-        FormRow { label: "Play feedback when volume is changed"; MacSwitch { checked: AppState.sound.volumeFeedback; onToggled: on => AppState.set("sound", { volumeFeedback: on }) } }
+        FormRow { label: "Play sound on startup"; LocalSwitch { checked: true } }
+        FormRow { label: "Play user interface sound effects"; Switch { checked: AppState.sound.uiSounds; onToggled: on => AppState.set("sound", { uiSounds: on }) } }
+        FormRow { label: "Play feedback when volume is changed"; Switch { checked: AppState.sound.volumeFeedback; onToggled: on => AppState.set("sound", { volumeFeedback: on }) } }
     }
 
     InlineNote { text: pane.effectsNote }
@@ -91,10 +92,10 @@ Column {
         title: "Output & Input"
         FormRow {
             label: "Output volume"
-            MacSlider {
+            Slider {
                 width: 230
                 value: pane.vol.volume
-                enabled_: pane.status === "ok"
+                enabled: pane.status === "ok"
                 leftGlyph: "volume_mute"; rightGlyph: "volume_up"
                 onMoved: v => { pane.dragging = true; pane.setVolume(v); dragRelease.restart(); }
                 onReleased: if (AppState.sound.volumeFeedback) pane.play(pane.soundsDir + "/misc/BezelServices-volume.wav", 1)
@@ -103,10 +104,13 @@ Column {
         }
         FormRow {
             label: "Mute"
-            MacSwitch {
+            Switch {
                 checked: pane.vol.muted
-                enabled_: pane.status === "ok"
-                onToggled: on => Backend.run(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", on ? "1" : "0"], () => pane.refresh())
+                enabled: pane.status === "ok"
+                onToggled: on => {
+                    pane.vol = Object.assign({}, pane.vol, { muted: on });   // shown at once, refresh() corrects it
+                    Backend.run(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", on ? "1" : "0"], () => pane.refresh());
+                }
             }
         }
     }

@@ -2,8 +2,8 @@ import QtQuick
 import qs
 import qs.components
 import qs.services
+import qs.HyprK
 import "../../lib/spotlight.js" as SL
-import "../../lib/motion.js" as Motion
 
 // The four mode buttons to the right of the Spotlight bar (macOS 26/27: they appear when
 // the pointer moves over Spotlight or a mode is active; Cmd+1..4 select them).
@@ -34,7 +34,7 @@ Item {
 
     Repeater {
         model: SL.modes()
-        delegate: Item {
+        delegate: GlassButton {
             id: b
             required property var modelData
             required property int index
@@ -42,14 +42,9 @@ Item {
             x: index * (buttons.diameter + buttons.spacing) - buttons.offset(index)
             width: buttons.diameter
             height: width
-
-            PressSpring { id: press; pressed: hover.containsPress; w: b.width; h: b.height }
-            transform: Scale {
-                origin.x: b.width / 2
-                origin.y: b.height / 2
-                xScale: press.scale
-                yScale: press.scale
-            }
+            interactive: buttons.shown
+            hoverable: true
+            onClicked: buttons.picked(b.on ? "" : b.modelData.id)
 
             Glass {
                 anchors.fill: parent
@@ -66,7 +61,7 @@ Item {
                     anchors.fill: parent
                     anchors.margins: 6
                     radius: width / 2
-                    visible: b.on || hover.containsMouse
+                    visible: b.on || b.hovered
                     color: b.on ? Theme.color.accent : Theme.spotlight.selection
                 }
                 Symbol {
@@ -75,13 +70,6 @@ Item {
                     size: Theme.spotlight.iconSize
                     color: b.on ? Theme.color.textOnAccent : Theme.color.label
                 }
-            }
-            MouseArea {
-                id: hover
-                anchors.fill: parent
-                hoverEnabled: true
-                enabled: buttons.shown
-                onClicked: buttons.picked(b.on ? "" : b.modelData.id)
             }
         }
     }

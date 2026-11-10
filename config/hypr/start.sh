@@ -6,7 +6,7 @@ export HYPRK_ROOT
 export XDG_DATA_DIRS="$HYPRK_ROOT/config:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"   # config/icons/hyprk-cursors
 # App icons: the local hyprk-apple layer (user-extracted macOS icons, themes/icons/build-apple-theme.sh),
 # else WhiteSur (themes/icons/install.sh, in the hyprk data prefix), else the system theme.
-# Either way the shell puts non-squircle icons on a macOS 26 tile (shell/components/AppIconTile.qml).
+# Either way the shell puts non-squircle icons on a macOS 26 tile (ui/HyprK/AppIconTile.qml).
 HYPRK_DATA=${HYPRK_DATA:-${XDG_DATA_HOME:-$HOME/.local/share}/hyprk}
 if [ -z "${QS_ICON_THEME:-}" ]; then
     if [ -f "$HYPRK_ROOT/themes/icons/hyprk-apple/index.theme" ]; then export QS_ICON_THEME=hyprk-apple

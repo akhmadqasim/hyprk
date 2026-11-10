@@ -1,1 +1,0 @@
-../../shell/lib/iconshape.js

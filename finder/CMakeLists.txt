@@ -12,6 +12,7 @@ target_link_libraries(hyprk-finder PRIVATE Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quic
 # QML is loaded from the source tree so UI changes need no rebuild.
 target_compile_definitions(hyprk-finder PRIVATE
     FINDER_QML_DIR="${CMAKE_CURRENT_SOURCE_DIR}/qml"
+    FINDER_UI_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../ui"   # shared QML module HyprK
     FINDER_FONT_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../themes/fonts"
     FINDER_ICON_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../themes/icons/system")
 

@@ -1,6 +1,7 @@
 import QtQuick
 import ".."
 import "../controls"
+import "../HyprK"
 
 Column {
     spacing: Theme.content.sectionGap
@@ -8,11 +9,11 @@ Column {
         title: "Search results"
         Repeater {
             model: ["Applications", "Calculator", "Contacts", "Conversion", "Definition", "Documents", "Folders", "Images", "System Settings", "Tips", "Websites"]
-            FormRow { required property string modelData; label: modelData; MacSwitch { checked: true } }
+            FormRow { required property string modelData; label: modelData; LocalSwitch { checked: true } }
         }
     }
     Card {
-        FormRow { label: "Help Apple improve Search"; MacSwitch {} }
+        FormRow { label: "Help Apple improve Search"; LocalSwitch {} }
     }
-    PaneFooter { MacButton { text: "Search Privacy…" } }
+    PaneFooter { Button { text: "Search Privacy…" } }
 }

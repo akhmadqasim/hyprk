@@ -5,6 +5,7 @@ import Quickshell.Hyprland
 import qs
 import qs.components
 import qs.services
+import qs.HyprK
 
 // Cmd/Super+Tab app switcher: row of large icons on glass, one per running
 // app. Tab / Shift+Tab cycle while Super is held, releasing Super switches.

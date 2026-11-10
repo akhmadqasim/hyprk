@@ -2,16 +2,23 @@ pragma Singleton
 
 import QtQuick
 import Finder.Native
+import HyprK
 
 // Every metric and color of the Finder window.
 // Metrics are measured in px from reference/screens/macos27-finder-window.png (1144x726, 1x),
 // so a default-size window can be diffed against the reference pixel for pixel.
 // /mnt/code/liquid-glass-re/SPEC.md "Layout metrics" did not exist yet (2026-11-10 03:00);
-// values marked "ref" come from the screenshot. Shared values mirror shell/Theme.qml.
+// values marked "ref" come from the screenshot. Shared values come from the HyprK Tokens (ui/HyprK),
+// which this Theme feeds with the Finder's appearance.
 QtObject {
     id: theme
 
     property bool dark: false
+    // the Finder has no Reduce motion / transparency / contrast settings of its own yet
+    Component.onCompleted: {
+        Tokens.dark = Qt.binding(() => theme.dark);
+        Tokens.fontText = Qt.binding(() => theme.fontText);
+    }
     // No compositor blur behind the window (plain GNOME, offscreen) -> solid sidebar.
     // Set HYPRK_BLUR=1 (Hyprland with a blur windowrule) to get the translucent sidebar.
     property bool blur: false
@@ -60,15 +67,15 @@ QtObject {
 
     // ---------- colors ----------
     readonly property QtObject color: QtObject {
-        // AppKit label hierarchy, same as shell/Theme.qml
-        readonly property color label: theme.dark ? Qt.rgba(1, 1, 1, 0.85) : Qt.rgba(0, 0, 0, 0.85)
-        readonly property color secondaryLabel: theme.dark ? Qt.rgba(1, 1, 1, 0.55) : Qt.rgba(0, 0, 0, 0.50)
-        readonly property color tertiaryLabel: theme.dark ? Qt.rgba(1, 1, 1, 0.25) : Qt.rgba(0, 0, 0, 0.26)
+        // AppKit label hierarchy (Tokens)
+        readonly property color label: Tokens.label
+        readonly property color secondaryLabel: Tokens.secondaryLabel
+        readonly property color tertiaryLabel: Tokens.tertiaryLabel
         readonly property color separator: theme.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.10)
-        readonly property color accent: theme.dark ? "#0A84FF" : "#007AFF"
+        readonly property color accent: Tokens.accent
         readonly property color sidebarIcon: theme.dark ? "#3D9BFF" : "#0C72EF"   // ref (12,114,239)
 
-        readonly property color window: theme.dark ? "#1E1E1E" : "#FFFFFF"
+        readonly property color window: Tokens.windowBackground
         readonly property color windowBorder: theme.dark ? Qt.rgba(1, 1, 1, 0.14) : "#BEBEBE"  // ref 1px
         // solid fallback sidebar is what the reference shows: #EDEDED
         readonly property color sidebarSolid: theme.dark ? "#2B2B2D" : "#EDEDED"
@@ -130,25 +137,11 @@ QtObject {
         readonly property int resizeMargin: 6
     }
 
-    // Traffic lights: SPEC "13. Traffic lights", the same values as settings/Theme.qml and the
-    // plugin title bar. (The reference shot is ~1.14x: its 16 px discs are 14 pt.)
+    // Traffic lights: SPEC 13 (Tokens.lights), placed like the reference. (The reference shot is
+    // ~1.14x: its 16 px discs are 14 pt.)
     readonly property QtObject lights: QtObject {
-        readonly property int size: 14               // NSThemeFrame sizeOfTitlebarButtons, Solarium regular
-        readonly property int spacing: 9             // _windowTitlebarButtonSpacingWidth, Solarium
         readonly property int x: 19                  // left edge of the red disc from the window edge
-        readonly property int y: (theme.toolbar.height - size) / 2   // centred in the toolbar
-        readonly property real rimWidth: 0.75        // DesignLibrary StrokeStyle(lineWidth: 0.75)
-        // gradient top, bottom (WindowControlColors), pressed (CoreUI art), glyph (CoreUI hover art)
-        readonly property var closeSet: theme.dark ? ["#FA6A61", "#EF6962", "#FF8D85", "#730100"]
-                                                   : ["#FF6D63", Qt.rgba(0.961, 0.447, 0.412, 0.80), "#C04741", "#730000"]
-        readonly property var minimizeSet: theme.dark ? ["#FAB51A", "#FECF34", "#FFEA5C", "#985600"]
-                                                      : [Qt.rgba(0.984, 0.702, 0.086, 0.92), Qt.rgba(1, 0.820, 0.204, 0.92), "#BF8E22", "#985600"]
-        readonly property var zoomSet: theme.dark ? ["#56C83A", "#52C43D", "#56F66E", "#006200"]
-                                                  : ["#5ACF1F", Qt.rgba(0.475, 0.827, 0.298, 0.73), "#1E9730", "#006200"]
-        readonly property var inactive: theme.dark ? [Qt.rgba(0.980, 0.980, 0.980, 0.20), Qt.rgba(0.937, 0.937, 0.937, 0.16)]
-                                                   : [Qt.rgba(0.894, 0.894, 0.937, 0.30), Qt.rgba(0.878, 0.878, 0.922, 0.30)]
-        readonly property color rim: Qt.rgba(0, 0, 0, theme.dark ? 0.12 : 0.2)
-        readonly property color inactiveRim: theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0, 0, 0, 0.14)
+        readonly property int y: (theme.toolbar.height - Tokens.lights.size) / 2   // centred in the toolbar
     }
 
     readonly property QtObject sidebar: QtObject {

@@ -1,7 +1,6 @@
 import QtQuick
-import ".."
 
-// Knob shared by MacSwitch and MacSlider (macOS 26/27 Liquid Glass controls).
+// Knob shared by Switch and Slider (macOS 26/27 Liquid Glass controls).
 // At rest: solid white capsule with a soft shadow. While held (glass -> 1) it swells and
 // turns into a clear lens that refracts `source` (the control's track layer, a sibling
 // in the same parent) through shaders/glassknob.frag.
@@ -19,11 +18,11 @@ Item {
     property real glass: 0            // drives size; may overshoot (springs)
     property real squash: 0           // >0 flattens the body when it lands against an end
     property real mag: 1.35           // track magnification in the lens centre
-    property bool reduceTransparency: Theme.reduceTransparency
+    property bool reduceTransparency: Tokens.reduceTransparency
     property bool reduceMotion: false
     // Colour behind the track (the card row). The lens is opaque: it shows the refracted
     // track over this colour instead of the unrefracted pixels under it.
-    property color backdrop: Qt.tint(Theme.windowBg, Theme.cardFill)
+    property color backdrop: Qt.tint(Tokens.windowBackground, Tokens.groupFill)
 
     readonly property real lens: Math.max(0, Math.min(1, glass))
     readonly property real _g: reduceMotion ? 0 : glass   // Reduce Motion: no swelling
@@ -62,7 +61,7 @@ Item {
         property real shadowAlpha: 0.2 - 0.1 * k.lens
         property real shadowRadius: 1.2 + 2.5 * k.lens
         property real shadowY: 0.8 + 1.2 * k.lens
-        property real dark: Theme.dark ? 1 : 0
+        property real dark: Tokens.dark ? 1 : 0
         fragmentShader: Qt.resolvedUrl("shaders/glassknob.frag.qsb")
     }
     // Fallback when shaders can't run (software renderer, load error): the solid knob.
@@ -71,7 +70,7 @@ Item {
         visible: k._fallback
         anchors.centerIn: parent
         width: k.bodyW; height: k.bodyH; radius: height / 2
-        color: Theme.knob
+        color: Tokens.control.knob
         border.color: Qt.rgba(0, 0, 0, 0.08)
     }
 }

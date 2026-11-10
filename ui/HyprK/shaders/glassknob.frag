@@ -4,7 +4,7 @@
 // track under it. Math from /mnt/code/liquid-glass-re/SPEC.md section 3:
 // bevel profile 1 - sqrt(1 - (1-t)^2), inward refraction at the edge, 7-tap chromatic
 // aberration, two-lobe rim highlight, erfc-polynomial edge for the shadow.
-// Build: settings/controls/shaders/build.sh (qsb, Qt 6).
+// Build: ui/HyprK/shaders/build.sh (qsb, Qt 6).
 
 layout(location = 0) in vec2 qt_TexCoord0;
 layout(location = 0) out vec4 fragColor;

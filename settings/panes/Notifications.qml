@@ -1,6 +1,7 @@
 import QtQuick
 import ".."
 import "../controls"
+import "../HyprK"
 import "../Parsers.js" as P
 
 // Saves everything to state/notifications.json for the shell's notification server
@@ -30,10 +31,10 @@ Column {
             label: "Show previews"
             StatePopup { stateKey: "notifications"; field: "previews"; choices: [["Always", "always"], ["When Unlocked", "unlocked"], ["Never", "never"]] }
         }
-        FormRow { label: "Summarize notifications"; MacSwitch { checked: pane.n.summarize; onToggled: on => AppState.set("notifications", { summarize: on }) } }
-        FormRow { label: "Allow notifications when the display is sleeping"; MacSwitch { checked: pane.n.whenSleeping; onToggled: on => AppState.set("notifications", { whenSleeping: on }) } }
-        FormRow { label: "Allow notifications when the screen is locked"; MacSwitch { checked: pane.n.whenLocked; onToggled: on => AppState.set("notifications", { whenLocked: on }) } }
-        FormRow { label: "Allow notifications when mirroring or sharing the display"; MacSwitch { checked: pane.n.whenMirroring; onToggled: on => AppState.set("notifications", { whenMirroring: on }) } }
+        FormRow { label: "Summarize notifications"; Switch { checked: pane.n.summarize; onToggled: on => AppState.set("notifications", { summarize: on }) } }
+        FormRow { label: "Allow notifications when the display is sleeping"; Switch { checked: pane.n.whenSleeping; onToggled: on => AppState.set("notifications", { whenSleeping: on }) } }
+        FormRow { label: "Allow notifications when the screen is locked"; Switch { checked: pane.n.whenLocked; onToggled: on => AppState.set("notifications", { whenLocked: on }) } }
+        FormRow { label: "Allow notifications when mirroring or sharing the display"; Switch { checked: pane.n.whenMirroring; onToggled: on => AppState.set("notifications", { whenMirroring: on }) } }
     }
 
     Card {
@@ -53,7 +54,7 @@ Column {
                 glyph: "apps"; tint: Theme.tile.gray          // shown when the icon can't be found
                 label: modelData.name
                 sublabel: !cfg.allow ? "Off" : (cfg.style === "alerts" ? "Alerts" : "Banners") + (cfg.sounds ? ", Sounds" : "")
-                MacPopup {
+                Popup {
                     readonly property var keys: ["off", "banners", "alerts"]
                     model: ["Off", "Banners", "Alerts"]
                     currentIndex: !appRow.cfg.allow ? 0 : Math.max(1, keys.indexOf(appRow.cfg.style))

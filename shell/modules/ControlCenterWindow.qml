@@ -4,6 +4,7 @@ import Quickshell.Wayland
 import qs
 import qs.components
 import qs.services
+import qs.HyprK
 
 // Control Center on its own layer namespace (hyprk-controlcenter) so the
 // liquidglass plugin gives its tiles the controlcenter recipe, not the menu one.
@@ -49,10 +50,10 @@ ShellWindow {
     }
 
     // retargets from wherever it is (Glass items re-measure themselves as materialize changes)
-    NcSpring {
+    Spring {
         id: appear
         target: ccw.shown ? 1 : 0
-        response: A11y.reduceMotion ? Theme.anim.crossfade : Theme.anim.materializeResponse
-        damping: A11y.reduceMotion ? 1 : Theme.anim.materializeDamping
+        response: A11y.reduceMotion ? Tokens.motion.crossfade : Tokens.motion.materializeResponse
+        damping: A11y.reduceMotion ? 1 : Tokens.motion.materializeDamping
     }
 }

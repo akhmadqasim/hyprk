@@ -4,6 +4,7 @@ import Quickshell.Wayland
 import qs
 import qs.components
 import qs.services
+import qs.HyprK
 
 // Notification banners, top-right below the menu bar (macOS 27):
 // - one banner per app; more from the same app stack behind it (edges peek below)
@@ -98,7 +99,7 @@ ShellWindow {
                 PauseAnimation { duration: list.count > 1 ? 150 : 0 }
                 ParallelAnimation {
                     NumberAnimation { property: "x"; to: 0; duration: Theme.anim.bannerIn; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
-                    NumberAnimation { property: "fade"; to: 1; duration: Theme.anim.crossfade * 1000 }
+                    NumberAnimation { property: "fade"; to: 1; duration: Tokens.motion.crossfade * 1000 }
                 }
             }
         }
@@ -141,7 +142,7 @@ ShellWindow {
                 id: leave
                 ParallelAnimation {
                     NumberAnimation { target: out; property: "x"; to: A11y.reduceMotion ? 0 : win.slideOut; duration: 380; easing.type: Easing.InOutCubic }
-                    NumberAnimation { target: row; property: "fade"; to: A11y.reduceMotion ? 0 : 1; duration: Theme.anim.crossfade * 1000 }
+                    NumberAnimation { target: row; property: "fade"; to: A11y.reduceMotion ? 0 : 1; duration: Tokens.motion.crossfade * 1000 }
                 }
                 ScriptAction { script: { stacks.remove(row.index); win.settleGlass(); } }
             }

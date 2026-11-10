@@ -98,6 +98,7 @@ int main(int argc, char *argv[])
     const QString dir = cli.positionalArguments().value(0);
     const QString iconDir = resourceDir("themes/icons/system", FINDER_ICON_DIR);
     QQmlApplicationEngine engine;
+    engine.addImportPath(resourceDir("ui", FINDER_UI_DIR));   // shared controls and tokens: import HyprK
     engine.addImageProvider(QStringLiteral("icon"), new IconProvider);
     engine.addImageProvider(QStringLiteral("thumb"), new ThumbnailProvider);
     engine.addImageProvider(QStringLiteral("sysicon"), new SysIconProvider(iconDir));

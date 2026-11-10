@@ -7,8 +7,8 @@ import Quickshell.Services.Mpris
 import qs
 import qs.components
 import qs.services
+import qs.HyprK
 import "../lib/state.js" as State
-import "../lib/motion.js" as Motion
 
 // Control Center, macOS 26/27 layout: no panel, separate clear-glass modules
 // on a 2-column grid. Missing hardware or services dim the module and show
@@ -69,6 +69,7 @@ Item {
         width: cc.colW
         height: cc.rowH * 2 + cc.gap
         radius: Theme.cc.tileRadius
+        interactive: false                       // only its media buttons take clicks
 
         ClippingRectangle {
             x: Theme.cc.tilePadding + 4
@@ -175,20 +176,10 @@ Item {
     // Interactive glass: pressing lifts it by a couple of points on a bouncy spring, a drag past a
     // slider end stretches it (squish); the plugin lights the glass around the pointer.
     // Reduce motion: none of it.
-    component Module: Item {
+    component Module: GlassButton {
         id: m
         property real radius: Theme.cc.tileRadius
-        property bool pressed: false
-        property real stretch: 0                 // -1..1 along x while dragging (sliders)
-        PressSpring { id: press; pressed: m.pressed; w: m.width; h: m.height }
-        transform: Scale {
-            origin.x: m.width / 2
-            origin.y: m.height / 2
-            readonly property real lift: press.scale - 1
-            readonly property real squish: Theme.anim.pressSquish * Math.abs(m.stretch) * press.value
-            xScale: Motion.materializeScale(m.width, glass.materialize, false) * (1 + lift + squish)
-            yScale: Motion.materializeScale(m.height, glass.materialize, false) * (1 + lift - squish / 2)
-        }
+        materialize: glass.materialize
         Glass {
             id: glass
             anchors.fill: parent
@@ -257,14 +248,8 @@ Item {
                 color: Theme.cc.subtext
             }
         }
-        // the press look clears while the pointer is outside, like macOS
-        pressed: capMa.containsPress
-        MouseArea {
-            id: capMa
-            anchors.fill: parent
-            enabled: cap.available
-            onClicked: cap.toggled()
-        }
+        interactive: available
+        onClicked: toggled()
     }
 
     component Round: Module {
@@ -288,8 +273,7 @@ Item {
             size: Theme.cc.buttonGlyph
             color: rb.on ? Theme.cc.toggleOnIcon : Theme.cc.toggleOffIcon
         }
-        pressed: rbMa.containsPress
-        MouseArea { id: rbMa; anchors.fill: parent; enabled: rb.enabled; onClicked: rb.activated() }
+        onClicked: activated()
     }
 
     component MediaButton: Item {
@@ -313,11 +297,13 @@ Item {
         signal moved(real v)
         // shown fill: springs to a clicked point, follows 1:1 while dragging (Reduce motion: instant)
         property bool dragging: false
-        NcSpring { id: shownValue; target: sm.value; response: Theme.anim.sliderJumpResponse }
+        Spring { id: shownValue; target: sm.value; response: Theme.anim.sliderJumpResponse }
         readonly property real shown: dragging || A11y.reduceMotion ? sm.value : shownValue.value
 
         width: cc.width
         height: cc.rowH
+        interactive: false                       // the track below takes the input
+        pressed: trackMa.pressed
         // the fill stays readable when disabled (the value is still shown)
 
         Text {
@@ -366,6 +352,7 @@ Item {
                 color: Theme.cc.sliderFillColor
             }
             MouseArea {
+                id: trackMa
                 anchors.fill: parent
                 anchors.topMargin: -10
                 anchors.bottomMargin: -10
@@ -377,7 +364,6 @@ Item {
                     sm.moved(c);
                 }
                 onPressedChanged: {
-                    sm.pressed = pressed;
                     if (!pressed) {
                         sm.stretch = 0;
                         if (sm.dragging) shownValue.snap();   // a click keeps springing to its point

@@ -1,10 +1,11 @@
 import QtQuick
 import ".."
+import "../HyprK"
 
 // Pop-up bound to one field of a state file: AppState[stateKey][field].
 // choices: [[label, value], ...]. A stored value that isn't a choice (edited by
 // hand or by the shell) is shown as an extra item labelled by formatValue.
-MacPopup {
+Popup {
     property string stateKey
     property string field
     property var choices: []

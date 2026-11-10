@@ -1,6 +1,7 @@
 import QtQuick
 import "../.."
 import "../../controls"
+import "../../HyprK"
 import "A11y.js" as A
 
 // Accessibility > Display (macOS 27: Display, Text, Pointer, Color Filters).
@@ -24,34 +25,34 @@ Column {
         FormRow {
             label: "Invert colors"
             sublabel: "Smart inverts lightness but keeps colors; Classic inverts every color."
-            MacPopup {
+            Popup {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: page.a.invertColors
                 model: ["Smart", "Classic"]
                 currentIndex: page.a.invertMode === "classic" ? 1 : 0
                 onActivated: i => page.ctl.set({ invertMode: i === 1 ? "classic" : "smart" })
             }
-            MacSwitch { checked: page.a.invertColors; onToggled: on => page.ctl.set({ invertColors: on }) }
+            Switch { checked: page.a.invertColors; onToggled: on => page.ctl.set({ invertColors: on }) }
         }
         FormRow {
             label: "Increase contrast"
             sublabel: "Make borders, separators and secondary text darker, and turn off transparency."
-            MacSwitch { checked: page.ap.increaseContrast; onToggled: on => page.ctl.setAppearance({ increaseContrast: on }) }
+            Switch { checked: page.ap.increaseContrast; onToggled: on => page.ctl.setAppearance({ increaseContrast: on }) }
         }
         FormRow {
             label: "Reduce transparency"
             sublabel: "Improves contrast by reducing transparency in windows, menus and the Dock."
-            MacSwitch { checked: page.ap.reduceTransparency || page.ap.increaseContrast; enabled_: !page.ap.increaseContrast
+            Switch { checked: page.ap.reduceTransparency || page.ap.increaseContrast; enabled: !page.ap.increaseContrast
                         onToggled: on => page.ctl.setAppearance({ reduceTransparency: on }) }
         }
         FormRow {
             label: "Differentiate without color"
             sublabel: "Use shapes in addition to or instead of color to convey status."
-            MacSwitch { checked: page.a.differentiateWithoutColor; onToggled: on => page.ctl.set({ differentiateWithoutColor: on }) }
+            Switch { checked: page.a.differentiateWithoutColor; onToggled: on => page.ctl.set({ differentiateWithoutColor: on }) }
         }
         FormRow {
             label: "Display contrast"
-            MacSlider {
+            Slider {
                 width: 220; leftText: "Normal"; rightText: "Maximum"
                 value: page.a.displayContrast
                 onReleased: page.ctl.set({ displayContrast: Math.round(_dragValue * 100) / 100 })
@@ -64,7 +65,7 @@ Column {
         FormRow {
             label: "Text size"; dim: true
             sublabel: "Apps choose their own text size on Linux."
-            MacButton { text: "Edit…"; enabled_: false }
+            Button { text: "Edit…"; enabled: false }
         }
     }
 
@@ -73,11 +74,11 @@ Column {
         FormRow {
             label: "Shake mouse pointer to locate"; dim: true
             sublabel: "Hyprland can't enlarge the pointer on shake yet."
-            MacSwitch { enabled_: false }
+            Switch { enabled: false }
         }
         FormRow {
             label: "Pointer size"
-            MacSlider {
+            Slider {
                 width: 220; leftText: "Normal"; rightText: "Large"
                 value: (page.a.pointerSize - 1) / 3
                 onReleased: page.ctl.set({ pointerSize: Math.round((1 + _dragValue * 3) * 4) / 4 })
@@ -93,19 +94,19 @@ Column {
             Rectangle { width: 38; height: 22; radius: 6; color: "#000000"; border.color: Theme.separator; opacity: 0.5 }
         }
     }
-    PaneFooter { help: false; MacButton { text: "Reset Colors"; enabled_: false } }
+    PaneFooter { help: false; Button { text: "Reset Colors"; enabled: false } }
 
     Card {
         title: "Color Filters"
         FormRow {
             label: "Color filters"
             sublabel: "Filters change how the whole screen looks, for color blindness or easier reading."
-            MacSwitch { checked: page.a.colorFilters; onToggled: on => page.ctl.set({ colorFilters: on }) }
+            Switch { checked: page.a.colorFilters; onToggled: on => page.ctl.set({ colorFilters: on }) }
         }
         FormRow {
             label: "Filter type"; dim: !page.a.colorFilters
-            MacPopup {
-                enabled_: page.a.colorFilters
+            Popup {
+                enabled: page.a.colorFilters
                 model: page.filterNames
                 currentIndex: Math.max(0, A.filterTypes.indexOf(page.a.filterType))
                 onActivated: i => page.ctl.set({ filterType: A.filterTypes[i] })
@@ -113,8 +114,8 @@ Column {
         }
         FormRow {
             label: "Intensity"; dim: !page.a.colorFilters
-            MacSlider {
-                width: 220; enabled_: page.a.colorFilters
+            Slider {
+                width: 220; enabled: page.a.colorFilters
                 value: page.a.filterIntensity
                 onReleased: page.ctl.set({ filterIntensity: Math.round(_dragValue * 100) / 100 })
             }
@@ -126,8 +127,8 @@ Column {
                 anchors.verticalCenter: parent.verticalCenter
                 width: 38; height: 22; radius: 6; color: page.a.tintColor; border.color: Theme.separator
             }
-            MacPopup {
-                enabled_: page.a.colorFilters
+            Popup {
+                enabled: page.a.colorFilters
                 model: page.tints.map(t => t[0])
                 currentIndex: Math.max(0, page.tints.findIndex(t => t[1].toLowerCase() === String(page.a.tintColor).toLowerCase()))
                 onActivated: i => page.ctl.set({ tintColor: page.tints[i][1] })

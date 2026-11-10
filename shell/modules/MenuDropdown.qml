@@ -4,6 +4,7 @@ import Quickshell.Hyprland
 import qs
 import qs.components
 import qs.services
+import qs.HyprK
 
 // Pull-down menu of the menu bar, macOS 26 style: rounded glass, inset
 // rounded selection, shortcut column on the right.
@@ -107,7 +108,7 @@ Item {
     function leaveRow(i) { Qt.callLater(() => { if (root.shown && root.hover === i) root.hover = -1; }); }
     onShownItemsChanged: hover = -1
     onShownChanged: if (shown) hover = -1
-    NcSpring { id: selY; target: root.hoverY; response: Theme.anim.menuTrackResponse; damping: Theme.anim.menuTrackDamping; epsilon: 0.3 }
+    Spring { id: selY; target: root.hoverY; response: Theme.anim.menuTrackResponse; damping: Theme.anim.menuTrackDamping; epsilon: 0.3 }
     Rectangle {
         visible: root.hover >= 0
         x: Theme.menu.itemInset

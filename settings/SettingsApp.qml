@@ -1,5 +1,6 @@
 import QtQuick
 import "controls"
+import "HyprK"
 import "Panes.js" as Panes
 
 // The whole System Settings UI. Hosts (main.qml for `qml`, shell.qml for
@@ -76,7 +77,7 @@ Item {
         }
         TrafficLights {
             x: Theme.lights.left
-            y: (Theme.window.toolbarHeight - Theme.lights.size) / 2
+            y: (Theme.window.toolbarHeight - Tokens.lights.size) / 2
             active: app.windowActive
             onCloseClicked: app.closeRequested()
             onMinimizeClicked: app.minimizeRequested()

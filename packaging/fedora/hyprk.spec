@@ -39,7 +39,7 @@ cmake --build build-plugin --target liquidglass
 
 %install
 mkdir -p %{buildroot}%{_datadir}/hyprk
-cp -a config dist finder lockscreen scripts settings shell themes sounds %{buildroot}%{_datadir}/hyprk/
+cp -a config dist finder lockscreen scripts settings shell themes sounds ui %{buildroot}%{_datadir}/hyprk/
 install -Dm755 build-finder/hyprk-finder %{buildroot}%{_datadir}/hyprk/finder/build/hyprk-finder
 install -Dm755 build-plugin/libliquidglass.so %{buildroot}%{_datadir}/hyprk/plugin/build/libliquidglass.so
 sed -i 's|/mnt/code/hyprk|%{_datadir}/hyprk|g' %{buildroot}%{_datadir}/hyprk/lockscreen/hyprlock.conf

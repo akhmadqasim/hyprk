@@ -6,6 +6,7 @@ import Quickshell.Widgets
 import qs
 import qs.components
 import qs.services
+import qs.HyprK
 
 // Mission Control (Super+Up): Spaces bar on top, live thumbnails of the
 // windows on the current Space laid out in a grid over the dimmed desktop.
@@ -21,17 +22,17 @@ ShellWindow {
     screen: modelData
 
     readonly property bool shown: Panels.open === "mission"
-    NcSpring {
+    Spring {
         id: expose
         initial: 0
         target: mc.shown ? 1 : 0
-        response: A11y.reduceMotion ? Theme.anim.crossfade : Theme.anim.exposeResponse
+        response: A11y.reduceMotion ? Tokens.motion.crossfade : Theme.anim.exposeResponse
         damping: A11y.reduceMotion ? 1 : Theme.anim.exposeDamping
     }
     readonly property real e: Math.max(0, Math.min(1, expose.value))   // 0 = windows in place
     readonly property real travel: A11y.reduceMotion ? 0 : 1 - e         // 1 = at the real window rect
     // Spaces bar: in with the Exposé spring, out in 0.125 s
-    NcSpring {
+    Spring {
         id: barSpring
         initial: 0
         target: mc.shown ? 1 : 0

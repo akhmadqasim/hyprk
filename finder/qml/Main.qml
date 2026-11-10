@@ -1,5 +1,6 @@
 import QtQuick
 import Finder.Native
+import HyprK
 import "lib/files.js" as Files
 
 // Finder window: frameless, client-side traffic lights, floating sidebar, unified toolbar.
@@ -81,8 +82,10 @@ Window {
     TrafficLights {
         x: Theme.lights.x
         y: Theme.lights.y
-        window: win
         active: win.active
+        onCloseClicked: win.close()
+        onMinimizeClicked: win.showMinimized()
+        onZoomClicked: win.visibility === Window.Maximized ? win.showNormal() : win.showMaximized()
     }
 
     // ---------- content ----------

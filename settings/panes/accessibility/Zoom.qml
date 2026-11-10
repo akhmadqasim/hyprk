@@ -1,6 +1,7 @@
 import QtQuick
 import "../.."
 import "../../controls"
+import "../../HyprK"
 
 // Accessibility > Zoom. Works: keyboard shortcuts (Option-Command-8 / = / -) and the
 // scroll gesture with a modifier, both through Hyprland's cursor zoom
@@ -17,30 +18,30 @@ Column {
         FormRow {
             label: "Use keyboard shortcuts to zoom"
             sublabel: "Toggle zoom: ⌥⌘8   Zoom in: ⌥⌘=   Zoom out: ⌥⌘−"
-            MacSwitch { checked: page.a.zoomKeys; onToggled: on => page.ctl.set({ zoomKeys: on }) }
+            Switch { checked: page.a.zoomKeys; onToggled: on => page.ctl.set({ zoomKeys: on }) }
         }
         FormRow {
             label: "Use trackpad gesture to zoom"; dim: true
             sublabel: "Hyprland has no pinch-to-zoom for the whole screen."
-            MacSwitch { enabled_: false }
+            Switch { enabled: false }
         }
         FormRow {
             label: "Use scroll gesture with modifier keys to zoom"
-            MacPopup {
+            Popup {
                 anchors.verticalCenter: parent.verticalCenter
-                enabled_: page.a.zoomScroll
+                enabled: page.a.zoomScroll
                 model: ["^ Control", "⌥ Option", "⌘ Command"]
                 currentIndex: Math.max(0, page.mods.indexOf(page.a.zoomModifier))
                 onActivated: i => page.ctl.set({ zoomModifier: page.mods[i] })
             }
-            MacSwitch { checked: page.a.zoomScroll; onToggled: on => page.ctl.set({ zoomScroll: on }) }
+            Switch { checked: page.a.zoomScroll; onToggled: on => page.ctl.set({ zoomScroll: on }) }
         }
     }
     Card {
         FormRow {
             label: "Zoom style"
             sublabel: page.a.zoomStyle === "fullscreen" ? "" : "Split Screen and Picture-in-Picture need a zoom window Hyprland doesn't have; Full Screen is used."
-            MacPopup {
+            Popup {
                 model: ["Full Screen", "Split Screen", "Picture-in-Picture"]
                 currentIndex: Math.max(0, ["fullscreen", "split", "pip"].indexOf(page.a.zoomStyle))
                 onActivated: i => page.ctl.set({ zoomStyle: ["fullscreen", "split", "pip"][i] })
@@ -49,10 +50,10 @@ Column {
         FormRow {
             label: "Zoom now"
             sublabel: "The screen follows the pointer while zoomed in."
-            MacButton { text: "Zoom Out"; onClicked: Backend.run([page.ctl.scripts + "a11y-zoom.sh", "off"]) }
-            MacButton { text: "Zoom In"; onClicked: Backend.run([page.ctl.scripts + "a11y-zoom.sh", "in"]) }
+            Button { text: "Zoom Out"; onClicked: Backend.run([page.ctl.scripts + "a11y-zoom.sh", "off"]) }
+            Button { text: "Zoom In"; onClicked: Backend.run([page.ctl.scripts + "a11y-zoom.sh", "in"]) }
         }
     }
     InlineNote { text: page.ctl.hyprNote }
-    PaneFooter { MacButton { text: "Advanced…"; enabled_: false } }
+    PaneFooter { Button { text: "Advanced…"; enabled: false } }
 }

@@ -50,6 +50,7 @@ QtObject {
     // VoiceOver = Orca, started/stopped by scripts/a11y-orca.sh (only its own instance)
     function setVoiceOver(on) {
         set({ voiceOver: on });
+        orcaRunning = on;            // shown at once; refreshOrca() corrects it if Orca did not start/stop
         Backend.run([scripts + "a11y-orca.sh", on ? "start" : "stop"], () => refreshOrca());
     }
     function refreshOrca() {

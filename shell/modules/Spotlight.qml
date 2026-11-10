@@ -4,6 +4,7 @@ import Quickshell.Wayland
 import qs
 import qs.components
 import qs.services
+import qs.HyprK
 import "../lib/search.js" as Search
 import "../lib/spotlight.js" as SL
 import "spotlight"
@@ -164,7 +165,7 @@ ShellWindow {
         readonly property real contentHeight: sp.mode !== "" ? modeView.height : sp.rows.length > 0 ? list.height : -1
         readonly property real targetHeight: Theme.spotlight.barHeight + (contentHeight >= 0 ? contentHeight + Theme.spotlight.listInset * 2 + 1 : 0)
         // results grow and shrink the glass on a spring (Reduce motion: at once)
-        NcSpring { id: grow; target: panel.targetHeight; response: Theme.anim.resizeResponse; damping: Theme.anim.resizeDamping; epsilon: 0.3 }
+        Spring { id: grow; target: panel.targetHeight; response: Theme.anim.resizeResponse; damping: Theme.anim.resizeDamping; epsilon: 0.3 }
         height: A11y.reduceMotion ? targetHeight : grow.value
         // materializes around the search field's centre
         transform: MaterializeScale {

@@ -14,7 +14,7 @@ macOS 26/27 draws every app icon as the same squircle. hyprk does the same on an
      installs it into the hyprk data prefix `${XDG_DATA_HOME:-~/.local/share}/hyprk/icons`
      (about 100 MB, so it is not in the repo). `install.sh --remove` removes it.
    - otherwise the system icon theme.
-2. **Squircle tiles** (`shell/components/AppIconTile.qml`, `shell/lib/iconshape.js`): an icon
+2. **Squircle tiles** (`ui/HyprK/AppIconTile.qml`, `ui/HyprK/iconshape.js`): an icon
    that is not already a squircle tile (round, square, free-form logos) is put on a standard
    macOS 26 tile: continuous corner (superellipse n=5), light gradient, rim highlight, soft
    contact shadow, art body at 70% of the tile. Icons that already are squircles are scaled so
@@ -27,8 +27,7 @@ macOS 26/27 draws every app icon as the same squircle. hyprk does the same on an
    tile, monochrome art), `tinted` (accent tile, monochrome art).
 
 Used by the Dock, Apps (Launchpad), Cmd+Tab, Spotlight (`AppIcon.qml`), Finder's Applications
-view and Settings' app lists (`AppIconTile.qml`, reached from `settings/` through a symlink
-because Quickshell only loads files inside its config root).
+view and Settings' app lists (`AppIconTile.qml` in the shared HyprK module, `ui/HyprK`).
 
 Installer hook for `dist/` / packaging: run `themes/icons/install.sh` (optional, needs curl),
 then `themes/icons/build-apple-theme.sh` (no-op without Apple icons), and export the same

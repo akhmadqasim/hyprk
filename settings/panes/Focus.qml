@@ -1,6 +1,7 @@
 import QtQuick
 import ".."
 import "../controls"
+import "../HyprK"
 
 Column {
     spacing: Theme.content.sectionGap
@@ -10,9 +11,9 @@ Column {
         FormRow { glyph: "person"; tint: Theme.tile.purple; label: "Personal"; sublabel: "Set Up" }
         FormRow { glyph: "work"; tint: Theme.tile.blue; label: "Work"; sublabel: "Set Up" }
     }
-    PaneFooter { help: false; MacButton { text: "Add Focus…" } }
+    PaneFooter { help: false; Button { text: "Add Focus…" } }
     Card {
-        FormRow { label: "Share across devices"; MacSwitch { checked: true } }
-        FormRow { label: "Focus status"; MacButton { text: "On" } }
+        FormRow { label: "Share across devices"; LocalSwitch { checked: true } }
+        FormRow { label: "Focus status"; Button { text: "On" } }
     }
 }

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Effects
 import ".."
+import "../HyprK"
 
 // Colored rounded-square tile with a white glyph. Uses themes/icons/settings/<iconId>.png
 // when the assets agent provides it, else a Material Icons glyph (generic fallback).
@@ -13,7 +14,7 @@ Item {
     property color tint: Theme.tile.blue
     width: size; height: size
 
-    // app icons: the shell's macOS 26 tile (symlink to shell/components/AppIconTile.qml)
+    // app icons: the shared macOS 26 tile (HyprK AppIconTile)
     AppIconTile {
         visible: pi.imageSource !== ""
         anchors.centerIn: parent

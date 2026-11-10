@@ -7,7 +7,7 @@
 #   DIR defaults to ${XDG_DATA_HOME:-~/.local/share}/hyprk; themes land in DIR/icons/.
 # config/hypr/start.sh puts DIR on XDG_DATA_DIRS and sets QS_ICON_THEME when the theme is there.
 # Without it hyprk uses the system icon theme; icons that are not squircles get the macOS 26
-# tile either way (shell/components/AppIconTile.qml).
+# tile either way (ui/HyprK/AppIconTile.qml).
 set -euo pipefail
 
 TAG=2026-09-10

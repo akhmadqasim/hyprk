@@ -1,6 +1,7 @@
 import QtQuick
 import "../.."
 import "../../controls"
+import "../../HyprK"
 
 // Accessibility > Captions: the style list is a preview; Prefer closed captions is saved.
 Column {
@@ -27,12 +28,12 @@ Column {
             }
         }
     }
-    PaneFooter { help: false; MacButton { text: "+"; enabled_: false } MacButton { text: "−"; enabled_: false } }
+    PaneFooter { help: false; Button { text: "+"; enabled: false } Button { text: "−"; enabled: false } }
     Card {
         FormRow {
             label: "Prefer closed captions and SDH"
             sublabel: "Use closed captions or SDH subtitles instead of standard subtitles when available."
-            MacSwitch { checked: page.ctl.a.preferSdh; onToggled: on => page.ctl.set({ preferSdh: on }) }
+            Switch { checked: page.ctl.a.preferSdh; onToggled: on => page.ctl.set({ preferSdh: on }) }
         }
     }
     PaneFooter {}

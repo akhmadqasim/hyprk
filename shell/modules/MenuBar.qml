@@ -8,6 +8,7 @@ import Quickshell.Networking
 import qs
 import qs.components
 import qs.services
+import qs.HyprK
 import "../lib/menus.js" as Menus
 import "../lib/clock.js" as Clock
 import "../lib/state.js" as State

@@ -1,6 +1,7 @@
 import QtQuick
 import ".."
 import "../controls"
+import "../HyprK"
 
 // macOS 27 Accessibility: overview grouped Vision / Hearing / Motor / Speech / General
 // (rows from support.apple.com mchlp1400, macOS 27); each row opens a sub-page from

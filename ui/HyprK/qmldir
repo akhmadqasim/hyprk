@@ -1,0 +1,22 @@
+# HyprK: controls, motion helpers and design tokens shared by shell/, settings/ and finder/.
+# shell/ and settings/ are Quickshell configs, which only resolve imports inside their root, so each
+# has a symlink HyprK -> ../ui/HyprK (shell: import qs.HyprK, settings: import "HyprK" relatively,
+# which also works under the plain qml tool). finder/ adds ui/ to its QML import path (import HyprK).
+# No Quickshell imports in here. Controls are controlled: they show checked/currentIndex/value and
+# emit toggled/activated/moved; the caller owns the state.
+module HyprK
+singleton Tokens 1.0 Tokens.qml
+Spring 1.0 Spring.qml
+PressSpring 1.0 PressSpring.qml
+Materializer 1.0 Materializer.qml
+MaterializeScale 1.0 MaterializeScale.qml
+Button 1.0 Button.qml
+GlassButton 1.0 GlassButton.qml
+Switch 1.0 Switch.qml
+Slider 1.0 Slider.qml
+GlassKnob 1.0 GlassKnob.qml
+Popup 1.0 Popup.qml
+SearchField 1.0 SearchField.qml
+TrafficLights 1.0 TrafficLights.qml
+AppIconTile 1.0 AppIconTile.qml
+Motion 1.0 motion.js

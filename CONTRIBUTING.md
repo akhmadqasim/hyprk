@@ -19,6 +19,7 @@ Run these before you open a pull request:
 
     node shell/tests/run.mjs
     node --test settings/tests/*.test.js
+    QT_QPA_PLATFORM=offscreen qmltestrunner -import ui -input ui/tests   # shared HyprK controls
     ctest --test-dir plugin/build
 
 If you change something visual, add a before/after screenshot to the pull request.

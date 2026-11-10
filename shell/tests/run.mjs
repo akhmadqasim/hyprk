@@ -1,13 +1,15 @@
-// Plain node test runner for shell/lib/*.js (QML ".pragma library" files).
+// Plain node test runner for shell/lib/*.js and ui/HyprK/*.js (QML ".pragma library" files),
+// plus checks on the shared HyprK module.
 // Usage: node shell/tests/run.mjs
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 
 const here = dirname(fileURLToPath(import.meta.url));
-function load(name) {
-    const src = readFileSync(join(here, "..", "lib", name), "utf8").replace(/^\.pragma library\s*$/m, "");
+const hyprk = join(here, "..", "..", "ui", "HyprK");
+function load(name, dir = join(here, "..", "lib")) {
+    const src = readFileSync(join(dir, name), "utf8").replace(/^\.pragma library\s*$/m, "");
     const names = [...src.matchAll(/^function (\w+)/gm)].map(m => m[1]);
     return new Function(src + "\nreturn {" + names.join(",") + "};")();
 }
@@ -140,7 +142,7 @@ test("lua input defaults", () => assert.equal(ST.luaInput({}), "hl.config({ inpu
 
 
 // ---- icon shape (macOS 26 squircle tile) ----
-const IS = load("iconshape.js");
+const IS = load("iconshape.js", hyprk);
 function mask(n, inside) {   // n*n alpha array (stride 1)
     const a = new Uint8Array(n * n);
     for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) a[y * n + x] = inside((x + 0.5) / n, (y + 0.5) / n) ? 255 : 0;
@@ -290,8 +292,8 @@ test("relTime", () => assert.deepEqual([30e3, 300e3, 7200e3, 100000e3, 400000e3]
     rmSync(dir, { recursive: true, force: true });
 }
 
-// ---- Liquid Glass motion (lib/motion.js) ----
-const M = load("motion.js");
+// ---- Liquid Glass motion (ui/HyprK/motion.js) ----
+const M = load("motion.js", hyprk);
 const near = (a, b, e = 1e-6) => assert.ok(Math.abs(a - b) < e, `${a} != ${b}`);
 test("hidden scale caps at 1.2 for small glass", () => near(M.hiddenScale(40), 1.2));
 test("hidden scale is +16 pt for large glass", () => near(M.hiddenScale(640), 656 / 640));
@@ -326,6 +328,58 @@ test("mode buttons start inside the field, end in place", () => {
     // at 0 every button is shifted to the same x as button 0 minus the travel
     near(0 * 66 - M.emergeOffset(0, 0, 68, 66), 3 * 66 - M.emergeOffset(3, 0, 68, 66));
 });
+
+// ---- shared HyprK module (ui/HyprK) ----
+{
+    const qml = n => readFileSync(join(hyprk, n), "utf8");
+    const qmldir = qml("qmldir");
+    test("HyprK qmldir lists every QML file", () => {
+        const listed = new Set([...qmldir.matchAll(/^(?:singleton )?\w+ \d+\.\d+ (\S+)$/gm)].map(m => m[1]));
+        for (const f of readdirSync(hyprk).filter(f => f.endsWith(".qml")))
+            assert.ok(listed.has(f), f + " missing from qmldir");
+    });
+    // controlled controls: they report, the caller owns the state (a write breaks the caller's binding)
+    test("Switch never writes checked", () => assert.ok(!/\bsw\.checked\s*=[^=]/.test(qml("Switch.qml"))));
+    test("Popup never writes currentIndex", () => assert.ok(!/currentIndex\s*=[^=]/.test(qml("Popup.qml"))));
+    test("Slider never writes value", () => assert.ok(!/\bs\.value\s*=[^=]/.test(qml("Slider.qml"))));
+    // the plugin title bar draws the same traffic lights (plugin/src/Titlebar.cpp)
+    test("traffic lights: plugin colours match Tokens.lights", () => {
+        const cpp = readFileSync(join(here, "..", "..", "plugin", "src", "Titlebar.cpp"), "utf8");
+        const tokens = qml("Tokens.qml");
+        const hex = c => c.toLowerCase();
+        const toHex = (r, g, b) => [r, g, b].map(x => Math.round(x * 255).toString(16).padStart(2, "0")).join("");
+        // QML colour -> [rrggbb, alpha]
+        const parse = c => {
+            c = c.trim();
+            let m = c.match(/^"#([0-9A-Fa-f]{6})"$/);
+            if (m) return [hex(m[1]), 1];
+            m = c.match(/^Qt\.rgba\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)$/);
+            return [toHex(+m[1], +m[2], +m[3]), +m[4]];
+        };
+        const sets = {};
+        for (const k of ["close", "minimize", "zoom"]) {
+            const m = tokens.match(new RegExp(k + "Set: t\\.dark \\? \\[(.*)\\]\\s*:\\s*\\[(.*)\\]"));
+            const split = s => s.match(/"#[0-9A-Fa-f]{6}"|Qt\.rgba\([^)]*\)/g).map(parse);
+            sets[k] = { dark: split(m[1]), light: split(m[2]) };
+        }
+        const grad = [...cpp.match(/LIGHT_GRADIENT\[2\]\[3\]\[2\] = \{([\s\S]*?)\};/)[1].matchAll(/\{0x([0-9A-F]{6}), ([\d.]+)f?\}/g)]
+            .map(m => [hex(m[1]), +m[2]]);
+        const pressed = [...cpp.match(/LIGHT_PRESSED\[2\]\[3\] = \{([^;]*)\};/)[1].matchAll(/0x([0-9A-F]{6})/g)].map(m => hex(m[1]));
+        const glyph = [...cpp.match(/GLYPH_RGB\[3\]\s*= \{([^;]*)\};/)[1].matchAll(/0x([0-9A-F]{6})/g)].map(m => hex(m[1]));
+        ["light", "dark"].forEach((mode, d) => ["close", "minimize", "zoom"].forEach((k, b) => {
+            const t = sets[k][mode];
+            for (const stop of [0, 1]) {
+                const [rgb, a] = grad[(d * 3 + b) * 2 + stop];
+                assert.equal(rgb, t[stop][0], `${mode} ${k} stop ${stop}`);
+                near(a, t[stop][1], 0.006);
+            }
+            assert.equal(pressed[d * 3 + b], t[2][0], `${mode} ${k} pressed`);
+            if (mode === "light") assert.equal(glyph[b], t[3][0], `${k} glyph`);
+        }));
+        assert.match(cpp, /GLYPH_SPRING\s*= 0\.3;/);
+        assert.match(tokens, /glyphResponse: 0\.3\b/);
+    });
+}
 
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

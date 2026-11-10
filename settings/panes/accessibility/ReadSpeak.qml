@@ -1,6 +1,7 @@
 import QtQuick
 import "../.."
 import "../../controls"
+import "../../HyprK"
 
 // Accessibility > Read & Speak through speech-dispatcher (scripts/a11y-speak.sh).
 // Works: Speak selection (⌥Esc speaks the selected text, again stops), speaking
@@ -17,21 +18,21 @@ Column {
         FormRow {
             label: "Accessibility Reader"; dim: true
             sublabel: "A reading view for any app isn't available on Linux."
-            MacSwitch { enabled_: false }
+            Switch { enabled: false }
         }
         FormRow {
             label: "Speak selection"; dim: !page.can
             sublabel: "Press ⌥Esc to hear the selected text; press it again to stop."
-            MacSwitch { enabled_: page.can; checked: page.a.speakSelection; onToggled: on => page.ctl.set({ speakSelection: on }) }
+            Switch { enabled: page.can; checked: page.a.speakSelection; onToggled: on => page.ctl.set({ speakSelection: on }) }
         }
         FormRow {
             label: "Speak item under the pointer"; dim: true
-            MacSwitch { enabled_: false }
+            Switch { enabled: false }
         }
         FormRow {
             label: "Speak announcements"; dim: !page.can
             sublabel: "Saved for notifications; the shell doesn't speak them yet."
-            MacSwitch { enabled_: page.can; checked: page.a.speakAnnouncements; onToggled: on => page.ctl.set({ speakAnnouncements: on }) }
+            Switch { enabled: page.can; checked: page.a.speakAnnouncements; onToggled: on => page.ctl.set({ speakAnnouncements: on }) }
         }
     }
     Card {
@@ -41,8 +42,8 @@ Column {
         }
         FormRow {
             label: "Speaking rate"; dim: !page.can
-            MacSlider {
-                width: 220; enabled_: page.can
+            Slider {
+                width: 220; enabled: page.can
                 leftGlyph: "directions_walk"; rightGlyph: "directions_run"
                 value: page.a.speechRate
                 onReleased: page.ctl.set({ speechRate: Math.round(_dragValue * 100) / 100 })
@@ -51,7 +52,7 @@ Column {
     }
     InlineNote { text: page.can ? page.ctl.hyprNote : "Speech needs speech-dispatcher (spd-say)." }
     PaneFooter {
-        MacButton { text: "Play Sample"; enabled_: page.can
+        Button { text: "Play Sample"; enabled: page.can
                     onClicked: page.ctl.speak("Hello, this is how your system voice sounds.") }
     }
 }

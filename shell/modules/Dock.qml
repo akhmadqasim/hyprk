@@ -5,6 +5,7 @@ import Quickshell.Hyprland
 import qs
 import qs.components
 import qs.services
+import qs.HyprK
 
 // Floating glass Dock: magnification, running dots, separator + Trash,
 // launch on click with bounce, app name tooltip, press lift on icons.

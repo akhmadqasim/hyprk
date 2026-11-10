@@ -4,6 +4,7 @@ import Quickshell.Wayland
 import qs
 import qs.components
 import qs.services
+import qs.HyprK
 import "../lib/search.js" as Search
 
 // "Apps" view (macOS 27 replacement for Launchpad): centered glass panel with

@@ -1,6 +1,7 @@
 import QtQuick
 import "../.."
 import "../../controls"
+import "../../HyprK"
 
 // Accessibility features with no Linux backend: the macOS description and a calm
 // empty state instead of controls that do nothing.
@@ -15,7 +16,7 @@ Column {
             glyph: page.info.glyph; tint: Theme.tile.blue; dim: true
             label: page.info.title
             sublabel: page.info.about || ""
-            MacSwitch { enabled_: false }
+            Switch { enabled: false }
         }
     }
     Unavailable {

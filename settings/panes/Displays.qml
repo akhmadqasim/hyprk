@@ -1,6 +1,7 @@
 import QtQuick
 import ".."
 import "../controls"
+import "../HyprK"
 import "../Parsers.js" as P
 
 // Functional (read + scale) via `hyprctl monitors -j`.
@@ -72,8 +73,8 @@ Column {
     Card {
         FormRow {
             label: "Resolution"
-            MacPopup {
-                enabled_: pane.status === "ok"
+            Popup {
+                enabled: pane.status === "ok"
                 model: pane.mon && pane.mon.modes.length ? pane.mon.modes.map(s => s.replace(/@.*/, "").replace("x", " × ")) : ["Default for display"]
                 currentIndex: pane.mon ? Math.max(0, pane.mon.modes.findIndex(s => s.startsWith(pane.mon.width + "x" + pane.mon.height))) : 0
                 onActivated: i => pane.apply(pane.mon, pane.mon.modes[i].replace(/Hz$/, ""), pane.mon.scale)
@@ -81,17 +82,17 @@ Column {
         }
         FormRow {
             label: "Scale"
-            MacPopup {
-                enabled_: pane.status === "ok"
+            Popup {
+                enabled: pane.status === "ok"
                 model: pane.scales.map(s => Math.round(s * 100) + "%")
                 currentIndex: pane.mon ? Math.max(0, pane.scales.indexOf(pane.mon.scale)) : 0
                 onActivated: i => pane.apply(pane.mon, P.monitorMode(pane.mon), pane.scales[i])
             }
         }
-        FormRow { label: "Refresh rate"; MacPopup { enabled_: false; model: [pane.mon ? pane.mon.refreshRate + " Hertz" : "—"] } }
-        FormRow { label: "Automatically adjust brightness"; MacSwitch { enabled_: false } }
-        FormRow { label: "True Tone"; sublabel: "Automatically adapt display to make colors appear consistent in different ambient lighting."; MacSwitch { enabled_: false } }
+        FormRow { label: "Refresh rate"; Popup { enabled: false; model: [pane.mon ? pane.mon.refreshRate + " Hertz" : "—"] } }
+        FormRow { label: "Automatically adjust brightness"; Switch { enabled: false } }
+        FormRow { label: "True Tone"; sublabel: "Automatically adapt display to make colors appear consistent in different ambient lighting."; Switch { enabled: false } }
     }
 
-    PaneFooter { MacButton { text: "Advanced…" } MacButton { text: "Night Shift…" } }
+    PaneFooter { Button { text: "Advanced…" } Button { text: "Night Shift…" } }
 }

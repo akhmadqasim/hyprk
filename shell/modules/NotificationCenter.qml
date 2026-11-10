@@ -6,6 +6,7 @@ import Quickshell.Widgets
 import qs
 import qs.components
 import qs.services
+import qs.HyprK
 
 // Notification Center (macOS 27): grouped notifications on top, widgets below.
 // Motion: the whole column slides in from the right screen edge on the SwiftUI
@@ -68,7 +69,7 @@ Item {
     readonly property bool animating: openSpring.moving
     readonly property real progress: openSpring.value   // 0 off-screen .. 1 open (Overlay: glass materialize)
     readonly property real slideX: Theme.travel((1 - openSpring.value) * (nc.width + Theme.nc.marginRight + 30))   // Reduce motion: fades
-    NcSpring {
+    Spring {
         id: openSpring
         onStarted: nc.settle()
         onValueChanged: if (moving) nc.settle()
@@ -177,14 +178,14 @@ Item {
                         readonly property real closedHeight: h(0) + Math.min(n - 1, 2) * Theme.notif.stackPeek
                         readonly property real openHeight: n > 1 ? openY(n - 1) + h(n - 1) : h(0)
                         // one spring drives the whole fold: 0 stacked, 1 unfolded
-                        NcSpring {
+                        Spring {
                             id: fold
                             target: grp.open ? 1 : 0
                             onStarted: nc.settle()
                         }
                         readonly property real ex: fold.value
                         // shrinks the stack while it is cleared (idle otherwise)
-                        NcSpring {
+                        Spring {
                             id: size
                             epsilon: 0.3
                             onStarted: nc.settle()

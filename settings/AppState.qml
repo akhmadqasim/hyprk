@@ -53,6 +53,7 @@ QtObject {
         Theme.dark = appearance.dark;
         Theme.reduceTransparency = appearance.reduceTransparency;
         Theme.increaseContrast = appearance.increaseContrast;
+        Theme.reduceMotion = appearance.reduceMotion === true;
         Theme.sidebar.size = appearance.sidebarIconSize;
         const t = Theme.tile[appearance.accent];
         Theme.accentOverride = t !== undefined && appearance.accent !== "blue" ? t : "transparent";

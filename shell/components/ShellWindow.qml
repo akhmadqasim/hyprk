@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs
 import qs.services
+import qs.HyprK
 
 // Base for every shell layer surface. Glass items inside register their
 // shapes here; with the liquidglass compositor plugin active the union is
@@ -66,6 +67,16 @@ PanelWindow {
     Connections {
         target: Notifs
         function onBannersChanged() { win.settleGlass(); }
+    }
+    // a glass-moving Spring (settlesGlass) stepped somewhere: if it is in this window, keep the glass
+    // re-measuring for two frames past its last step
+    Connections {
+        target: Tokens
+        function onGlassStepped(spring) {
+            if (!win.visible || !Theme.compositorGlass || win.glassRegions.length === 0) return;
+            for (let p = spring; p; p = p.parent)
+                if (p === win.contentItem) { win.settleGlass(50); return; }
+        }
     }
 
     color: "transparent"

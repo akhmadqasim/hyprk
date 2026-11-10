@@ -26,7 +26,7 @@
         '';
         installPhase = ''
           mkdir -p $out/share/hyprk
-          cp -r config dist finder lockscreen scripts settings shell themes sounds $out/share/hyprk/
+          cp -r config dist finder lockscreen scripts settings shell themes sounds ui $out/share/hyprk/
           install -Dm755 build-finder/hyprk-finder $out/share/hyprk/finder/build/hyprk-finder
           install -Dm755 build-plugin/libliquidglass.so $out/share/hyprk/plugin/build/libliquidglass.so
           substituteInPlace $out/share/hyprk/lockscreen/hyprlock.conf --replace-fail /mnt/code/hyprk $out/share/hyprk

@@ -1,11 +1,10 @@
 import QtQuick
-import ".."
 
 // Close / minimize / zoom, macOS 27 (SPEC "13. Traffic lights"): 14 pt discs 9 pt apart,
 // top-to-bottom gradient, 0.75 pt rim. Hovering the group reveals all three glyphs
 // (spring 0.3); a press darkens only that button at once and acts on release inside it.
 // An inactive window shows pale grey discs, back in colour while the group is hovered.
-// The same constants and drawing are in finder/qml/TrafficLights.qml and the plugin title bar.
+// Used by Settings and Finder; the plugin title bar draws the same (Tokens.lights).
 Row {
     id: tl
     property bool active: true
@@ -14,10 +13,10 @@ Row {
     signal closeClicked()
     signal minimizeClicked()
     signal zoomClicked()
-    spacing: Theme.lights.spacing
+    spacing: Tokens.lights.spacing
 
     HoverHandler { id: hover }
-    Spring { id: reveal; target: hover.hovered ? 1 : 0; response: 0.3; instant: AppState.appearance.reduceMotion === true }
+    Spring { id: reveal; target: hover.hovered ? 1 : 0; response: Tokens.lights.glyphResponse; epsilon: 0.001; instant: Tokens.reduceMotion }
 
     Repeater {
         model: [
@@ -28,26 +27,26 @@ Row {
         Item {
             id: light
             required property var modelData
-            readonly property var c: Theme.lights[modelData.k + "Set"]   // [top, bottom, pressed, glyph]
+            readonly property var c: Tokens.lights[modelData.k + "Set"]   // [top, bottom, pressed, glyph]
             readonly property bool enabled_: modelData.k !== "zoom" || tl.zoomEnabled
             readonly property bool lit: enabled_ && (tl.active || hover.hovered)
             readonly property bool down: ma.pressed && ma.containsMouse
-            width: Theme.lights.size; height: width
+            width: Tokens.lights.size; height: width
 
             Rectangle {
                 anchors.fill: parent
                 radius: width / 2
                 gradient: Gradient {
-                    GradientStop { position: 0; color: light.down ? light.c[2] : light.lit ? light.c[0] : Theme.lights.inactive[0] }
-                    GradientStop { position: 1; color: light.down ? light.c[2] : light.lit ? light.c[1] : Theme.lights.inactive[1] }
+                    GradientStop { position: 0; color: light.down ? light.c[2] : light.lit ? light.c[0] : Tokens.lights.inactive[0] }
+                    GradientStop { position: 1; color: light.down ? light.c[2] : light.lit ? light.c[1] : Tokens.lights.inactive[1] }
                 }
             }
             Rectangle { // rim over the fill (a Rectangle's own border would replace the fill under it)
                 anchors.fill: parent
                 radius: width / 2
                 color: "transparent"
-                border.width: Theme.lights.rimWidth
-                border.color: light.lit ? Theme.lights.rim : Theme.lights.inactiveRim
+                border.width: Tokens.lights.rimWidth
+                border.color: light.lit ? Tokens.lights.rim : Tokens.lights.inactiveRim
             }
             Canvas {
                 id: glyph

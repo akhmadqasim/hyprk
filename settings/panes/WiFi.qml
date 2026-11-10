@@ -1,6 +1,7 @@
 import QtQuick
 import ".."
 import "../controls"
+import "../HyprK"
 import "../Parsers.js" as P
 
 // Functional via nmcli. States: nmcli missing / NM not running, no Wi-Fi
@@ -36,8 +37,10 @@ Column {
             networks = c === 0 ? P.parseNmcliWifi(o) : [];
         });
     }
+    // the switch shows the new state at once (like macOS); refresh() puts it back if nmcli fails
     function setRadio(on) {
         note = "";
+        radioOn = on;
         Backend.run(["nmcli", "radio", "wifi", on ? "on" : "off"], c => {
             if (c !== 0) note = "Wi‑Fi could not be turned " + (on ? "on" : "off") + ". You may need permission from NetworkManager.";
             refresh();
@@ -65,8 +68,8 @@ Column {
             sublabel: pane.status === "nohw" ? "No hardware installed"
                     : pane.status === "missing" || pane.status === "failed" ? "Not available on this system"
                     : pane.status === "ok" && pane.radioOn && pane.current ? "Connected" : ""
-            MacSwitch {
-                enabled_: pane.status === "ok"
+            Switch {
+                enabled: pane.status === "ok"
                 checked: pane.status === "ok" && pane.radioOn
                 onToggled: on => pane.setRadio(on)
             }
@@ -77,7 +80,7 @@ Column {
             sublabel: "Connected"
             Text { text: pane.current && pane.current.secure ? "lock" : ""; font.family: Theme.fontGlyph; font.pixelSize: 14; color: Theme.secondaryLabel }
             Text { text: "wifi"; font.family: Theme.fontGlyph; font.pixelSize: 16; color: Theme.label }
-            MacButton { text: "Details…" }
+            Button { text: "Details…" }
         }
     }
 
@@ -111,9 +114,9 @@ Column {
     }
 
     Card {
-        FormRow { label: "Ask to join networks"; sublabel: "Known networks will be joined automatically."; MacPopup { model: ["Off", "Notify", "Ask"]; currentIndex: 1; enabled_: pane.status === "ok" } }
-        FormRow { label: "Ask to join hotspots"; MacPopup { model: ["Never", "Ask to Join", "Automatic"]; currentIndex: 1; enabled_: pane.status === "ok" } }
+        FormRow { label: "Ask to join networks"; sublabel: "Known networks will be joined automatically."; LocalPopup { model: ["Off", "Notify", "Ask"]; currentIndex: 1; enabled: pane.status === "ok" } }
+        FormRow { label: "Ask to join hotspots"; LocalPopup { model: ["Never", "Ask to Join", "Automatic"]; currentIndex: 1; enabled: pane.status === "ok" } }
     }
 
-    PaneFooter { MacButton { text: "Advanced…"; enabled_: pane.status === "ok" } }
+    PaneFooter { Button { text: "Advanced…"; enabled: pane.status === "ok" } }
 }

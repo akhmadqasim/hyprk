@@ -1,6 +1,7 @@
 import QtQuick
 import "../.."
 import "../../controls"
+import "../../HyprK"
 
 // Accessibility > Live Speech: type a phrase and have it spoken (spd-say).
 Column {
@@ -33,5 +34,5 @@ Column {
             }
         }
     }
-    PaneFooter { MacButton { text: "Speak"; enabled_: page.can; onClicked: if (phrase.text !== "") page.ctl.speak(phrase.text) } }
+    PaneFooter { Button { text: "Speak"; enabled: page.can; onClicked: if (phrase.text !== "") page.ctl.speak(phrase.text) } }
 }

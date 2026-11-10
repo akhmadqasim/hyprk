@@ -1,6 +1,7 @@
 import QtQuick
 import ".."
 import "../controls"
+import "../HyprK"
 import "../Parsers.js" as P
 
 // Key repeat is functional: applied live with `hyprctl eval` and saved in
@@ -43,7 +44,7 @@ Column {
     Card {
         FormRow {
             label: "Key repeat rate"
-            MacSlider {
+            Slider {
                 width: 260; leftText: "Slow"; rightText: "Fast"
                 value: pane.rateToPos(pane.rate)
                 onReleased: pane.apply({ repeatRate: pane.posToRate(_dragValue) })
@@ -51,25 +52,25 @@ Column {
         }
         FormRow {
             label: "Delay until repeat"
-            MacSlider {
+            Slider {
                 width: 260; leftText: "Long"; rightText: "Short"
                 value: pane.delayToPos(pane.delay)
                 onReleased: pane.apply({ repeatDelay: pane.posToDelay(_dragValue) })
             }
         }
-        FormRow { label: "Adjust keyboard brightness in low light"; MacSwitch { checked: true } }
-        FormRow { label: "Press 🌐 key to"; MacPopup { model: ["Change Input Source", "Show Emoji & Symbols", "Start Dictation", "Do Nothing"]; currentIndex: 1 } }
-        FormRow { label: "Keyboard navigation"; sublabel: "Use keyboard navigation to move focus between controls."; MacSwitch {} }
+        FormRow { label: "Adjust keyboard brightness in low light"; LocalSwitch { checked: true } }
+        FormRow { label: "Press 🌐 key to"; LocalPopup { model: ["Change Input Source", "Show Emoji & Symbols", "Start Dictation", "Do Nothing"]; currentIndex: 1 } }
+        FormRow { label: "Keyboard navigation"; sublabel: "Use keyboard navigation to move focus between controls."; LocalSwitch {} }
     }
     InlineNote { text: pane.note }
-    PaneFooter { help: false; MacButton { text: "Keyboard Shortcuts…" } }
+    PaneFooter { help: false; Button { text: "Keyboard Shortcuts…" } }
     Card {
         title: "Text Input"
-        FormRow { label: "Input Sources"; value: "U.S."; MacButton { text: "Edit…" } }
+        FormRow { label: "Input Sources"; value: "U.S."; Button { text: "Edit…" } }
     }
     Card {
         title: "Dictation"
-        FormRow { label: "Dictation"; sublabel: "Use Dictation wherever you can type text."; MacSwitch {} }
+        FormRow { label: "Dictation"; sublabel: "Use Dictation wherever you can type text."; LocalSwitch {} }
     }
-    PaneFooter { MacButton { text: "Set Up Keyboard…" } }
+    PaneFooter { Button { text: "Set Up Keyboard…" } }
 }

@@ -1,6 +1,7 @@
 import QtQuick
 import "../.."
 import "../../controls"
+import "../../HyprK"
 
 // Accessibility > VoiceOver = the Orca screen reader (scripts/a11y-orca.sh).
 // ⌘F5 toggles it anywhere (bound by state/accessibility.lua). Without Orca the
@@ -17,8 +18,8 @@ Column {
             sublabel: page.ctl.hasOrca
                 ? "Speaks what's on the screen, using the Orca screen reader. Toggle it with ⌘F5."
                 : "Install the Orca screen reader (package orca) to use VoiceOver here."
-            MacSwitch {
-                enabled_: page.ctl.hasOrca
+            Switch {
+                enabled: page.ctl.hasOrca
                 checked: page.ctl.orcaRunning
                 onToggled: on => page.ctl.setVoiceOver(on)
             }
@@ -26,8 +27,8 @@ Column {
     }
     PaneFooter {
         help: false
-        MacButton { text: "Open VoiceOver Tutorial…"; enabled_: false }
-        MacButton { text: "Open VoiceOver Utility…"; enabled_: page.ctl.hasOrca
+        Button { text: "Open VoiceOver Tutorial…"; enabled: false }
+        Button { text: "Open VoiceOver Utility…"; enabled: page.ctl.hasOrca
                     onClicked: Backend.run(["sh", "-c", "setsid orca -s >/dev/null 2>&1 &"]) }
     }
     InlineNote { text: page.ctl.hasOrca ? "Orca reads apps that expose AT-SPI (GTK, Qt, Firefox, Chromium). The shell's own panels are not read yet." : "" }

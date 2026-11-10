@@ -2,6 +2,7 @@ import QtQuick
 import Qt.labs.folderlistmodel
 import ".."
 import "../controls"
+import "../HyprK"
 import "../Parsers.js" as P
 
 // Functional: picks from themes/wallpapers, records state/wallpaper.json
@@ -56,7 +57,7 @@ Column {
                 RoundedImage { anchors.fill: parent; radius: 8; decodeWidth: 256; path: pane.current }
             }
         }
-        FormRow { label: "Show as screen saver"; MacSwitch { checked: true } }
+        FormRow { label: "Show as screen saver"; LocalSwitch { checked: true } }
     }
 
     InlineNote {
@@ -97,5 +98,5 @@ Column {
         }
     }
 
-    PaneFooter { MacButton { text: "Add Folder…" } }
+    PaneFooter { Button { text: "Add Folder…" } }
 }

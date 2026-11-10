@@ -1,1 +1,0 @@
-../../shell/components/AppIconTile.qml

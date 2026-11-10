@@ -1,5 +1,5 @@
 .pragma library
-// App icon shape analysis for the macOS 26 icon tile (components/AppIconTile.qml).
+// App icon shape analysis for the macOS 26 icon tile (AppIconTile.qml).
 //
 // macOS 26 draws every app icon as the same squircle. Icons that are not in that shape
 // (round, square, free-form Linux icons) are put inside a standard squircle tile. Here we

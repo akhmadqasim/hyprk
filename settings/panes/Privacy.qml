@@ -1,6 +1,7 @@
 import QtQuick
 import ".."
 import "../controls"
+import "../HyprK"
 
 Column {
     spacing: Theme.content.sectionGap
@@ -18,9 +19,9 @@ Column {
     }
     Card {
         title: "Security"
-        FormRow { label: "Allow applications from"; MacPopup { model: ["App Store", "App Store & Known Developers"]; currentIndex: 1 } }
+        FormRow { label: "Allow applications from"; LocalPopup { model: ["App Store", "App Store & Known Developers"]; currentIndex: 1 } }
         FormRow { label: "FileVault"; sublabel: "Disk encryption is managed by your Linux installer."; value: "Off"; }
-        FormRow { label: "Lockdown Mode"; MacButton { text: "Turn On…" } }
+        FormRow { label: "Lockdown Mode"; Button { text: "Turn On…" } }
     }
     PaneFooter { }
 }

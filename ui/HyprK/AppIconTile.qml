@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Shapes
 import QtQuick.Effects
-import "../lib/iconshape.js" as IconShape
+import "iconshape.js" as IconShape
 
 // One app icon, drawn the macOS 26 way. Plain QtQuick (no Quickshell imports) so the
 // Finder and Settings apps can use it too.
@@ -11,7 +11,7 @@ import "../lib/iconshape.js" as IconShape
 //   icon body (all tiles the same size);
 // - everything else (round, square, free-form) is put on a standard squircle tile:
 //   Apple continuous corner, system light/dark chiclet gradient, rim highlight, art at ~70%.
-// The shape check (lib/iconshape.js) runs once per icon file per process on a 48 px
+// The shape check (iconshape.js) runs once per icon file per process on a 48 px
 // offscreen canvas and is cached; nothing is analysed per frame.
 Item {
     id: root
