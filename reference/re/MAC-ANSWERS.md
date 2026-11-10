@@ -1786,3 +1786,968 @@ Restored and verified:
   value.
 - System Settings hidden again, CC closed, the patch window quit.
 - The two Finder windows were minimised during the test and are back at their original bounds.
+
+## Q-settings (27.2.1)
+
+Measured on the live System Settings (macOS 27.2.1, 2x, 740x625 pt window at 484,232) plus the control gallery probe
+`reference/re/tools/probe/controls.swift`, which was extended in place. It adds every size and state, focus rings
+(full keyboard access is forced on inside the probe process only), an inactive capture, and a 120 Hz layer sampler for
+presses. Pictures are in `screens/27.2.1/settings/` and `screens/27.2.1/controls/`. Data (AX dumps, control JSON,
+press series) is in `re/27.2.1/live/settings/` and `re/27.2.1/live/controls/`. Colours are sRGB from 2x captures. Window
+x/y is measured from the window's top-left. Wallpapers were TahoeLight / TahoeDark. "Tint window background with
+wallpaper colour" is on (the default), so the dark window background is bluish.
+
+- Q-settings-01: The sidebar is Liquid Glass: `NSGlassEffectView` `_variant` 18. This is not an NSVisualEffectView
+  (Q9; the probe was rebuilt the same way, because another process's layers cannot be dumped).
+  - It is flush with the window's left, top and bottom edges and sits under the titlebar. It has no inset and no radius
+    of its own.
+  - Width is 232 pt at Medium icon size (228 at Small, 246 at Large).
+  - A 0.5 pt divider runs on the right: #D3D4D5 light, #3F424D dark.
+  - Sampled fill over Tahoe: light #ECEDEE, dark #232634, uniform from x 6 to 200.
+  - Inactive: light #F2F2F2, dark #24262B (flat).
+  - (pixels + AX + Q9)
+- Q-settings-02: The back/forward control is Liquid Glass: a regular-glass toolbar platter (Q9: `_variant` 0, 36 pt
+  tall, radius 18). Not a flat fill.
+  - AX group 73x36 at window (240,8): Back 36x36, Forward 37x36.
+  - A 1 pt divider sits at the middle, about 20 pt tall: dark #717177.
+  - Chevrons: glyph 8x14.5 pt. Likely the 13 pt .large .medium symbol config (same as Finder, R3b-3).
+  - Colours (dark): active white on a capsule face of #3D3D42 over the #1F1F24 bar. Disabled Forward is #707076
+    (about tertiary).
+  - Hover: a 36 pt circular highlight appears behind the hovered half and the divider hides. Pressed: the same circle,
+    brighter.
+  - Light colours: see Q9 / `settings-toolbar-light.png`.
+  - (AX + `toolbar-backforward-rest-hover-press-dark.png`)
+- Q-settings-03: Window.
+  - Size is 740x625 pt on this account (default not reset).
+  - Width is fixed at 740 (it follows the sidebar: 736 Small, 754 Large). Only the height resizes: min 470, max = the
+    visible screen height (821 here). Tested with System Events, then restored.
+  - Toolbar is 52 pt (AXToolbar). Traffic lights at (18,18) pitch 23.
+  - Corners: fit to the alpha of the -o capture gives superellipse R 35.75 pt, n 5 (rms 0.15 pt), circle-equivalent
+    about 17 pt. That is the same family as Finder (continuous about 16 pt).
+  - Shadow and rims as in Q-windows.
+  - Content scrolls under the toolbar: yes (Q-04).
+- Q-settings-04: Scroll edge (Keyboard pane, 60 fps clip).
+  - It is a fade and blur, not glass. Content under the 52 pt toolbar strip is washed almost to the window background:
+    light card #F7F7F7 reads #FEFEFE in the strip, and text is barely visible.
+  - A 0.5 pt hairline sits at y 52: light #DEDEDE on #F7F7F7 (black about a.10), dark #34353A on #25262B (white about
+    a.05).
+  - The hairline appears in the first frame the content offset is above 0, with no fade-in. It also shows
+    permanently while the window is inactive (#E5E5E5 / #2D2E30).
+  - Blur radius: not separable from pixels; the layer recipe is NSScrollPocket with variableBlur + colorMatrix (Q9).
+  - (`scroll-edge-keyboard-{light,dark}.png`)
+- Q-settings-05: Selected sidebar row.
+  - Flat accent pill (not glass): #2F6EED light, #3478F6 dark.
+  - Geometry: x 10..222 (inset 10 on both sides), 32 tall = the row height, radius about 8.5 pt.
+  - Text is white and bolder: "Appearance" is 63 px wide selected vs 57 px unselected, so Semibold/Bold. The icon is
+    unchanged.
+  - Hover fill: none (`sidebar-hover-none-dark.png`).
+  - When the sidebar is not first responder (search field focused), or the window is inactive: grey pill #E7E7E7 /
+    #323439 with label-coloured text.
+- Q-settings-06: Inactive and disabled.
+  - Inactive window (`desktop-dock-inactive-*.png`):
+    - Lights grey, title #BDBDBD / #5C5D5E.
+    - Sidebar labels dim to #8C8C8C / #717378. The tiles keep their colour.
+    - Selection #E7E7E7 / #323439.
+    - Switch-on track #D3D3D3 / #414244 with white knob. Slider fill grey.
+    - Checkbox-on #C1C1C1 / #535456 with dark tick.
+    - Accent is gone everywhere. Content labels are unchanged.
+  - Probe inactive: switch-on #DADADA / #3F4045, slider fill #C5C5C5 / #535357, segmented pill #CFCFCF / #4A4B50,
+    default button becomes a plain grey button.
+  - Disabled (probe, AppKit/SwiftUI layers): the control's background layers get opacity 0.5. The tick becomes black
+    a.26 / white a.25, and the slider loses its accent fill (grey). Pixels:
+    - Push light #F5F5F5 vs #ECECEC; dark #28292F vs #303137.
+    - Switch-on light #6D9BF1 vs #3374EF; dark #3462B8 vs #397AF6.
+    - Checkbox-on disabled light #ECECEC; dark #303137.
+    - Slider disabled #DBDBDB / #404146.
+    - Popup same as push.
+    - Disabled label = disabledControlTextColor.
+- Q-settings-07: Sidebar metrics (AX, window coordinates, Medium).
+  - Search field 212x28 at (10,61). The list starts at y 98.
+  - Account row 46 tall (button 141.5x38 at x 16): avatar about 38, name 13 pt bold-ish, "Apple Account" 11 pt
+    secondary. Family row 32. Pictures of this block are withheld (privacy).
+  - Group break = 13 pt of empty space (0-height spacer rows).
+  - Rows 32, cell x 10..222. Tile 20x20 at x 19. Label at x 46 (gap 7). Label 13 pt.
+  - Small: rows 24, Family 29, tile about 13–14, label x 42.5, 11 pt.
+  - Large: rows 40, Family 40, tile 26, label x 48.5, 15 pt.
+  - `NSTableViewDefaultSizeMode` 1/2/3. Changed in the pane, then restored to 2.
+  - (`ax-sidebar-iconsize-*.jsonl`, `sidebar-iconsize-*-light.png`)
+- Q-settings-08: Live 27.2.1 order, confirming the plist answer. Group breaks shown as |.
+  - Apple Account, Family | Wi-Fi, Bluetooth, Network, VPN, Battery
+  - | General, Accessibility, Appearance, Desktop & Dock, Displays, Menu Bar, Siri, Spotlight, Wallpaper
+  - | Notifications, Sound, Focus, Screen Time | Lock Screen, Privacy & Security, Touch ID & Password, Users & Groups
+  - | Game Center, iCloud, Internet Accounts, Wallet & Apple Pay | Keyboard, Trackpad, Printers & Scanners
+  - | third-party (GPG Suite here).
+  - Groups are sorted by localised name. Mouse, Game Controllers and CDs & DVDs appear only when that hardware is
+    present. Battery would be Energy on a desktop. No Passwords pane.
+  - (AX)
+- Q-settings-09: Tile.
+  - The tile is part of the IconServices icon art (R3b). There is no separate enclosure.
+  - Drawn at 20x20 pt in a 32 pt row (40 px at 2x). Light-style tile fill, e.g. Wi-Fi #3C88F5 with a white glyph.
+  - Dark style: a black tile (#171717) with the glyph in the tile colour.
+  - Shape, radius, gloss and glyph per style: see the R3b PNGs (byte-identical renders).
+- Q-settings-10: Search field.
+  - Not glass in the sidebar (a flat translucent capsule). 212x28, full capsule (r 14).
+  - Magnifier button 25x28 at the left. Placeholder "Search" 13 pt secondary.
+  - Focus: a 3 pt accent focus ring around the capsule, plus a "Suggestions" popover under it.
+  - Clear (cancel) button 28x28 at the right, shown only with text.
+  - It does search inside panes: the sidebar is replaced by a result list, one row per setting ("Dock position on
+    screen" / "Desktop & Dock"). Rows are 36.8 pt (1-line title), 52.8 (2-line) or 68.8 (3-line), each with the pane
+    icon.
+  - (`search-*.png`, `ax-search-dock.jsonl`)
+- Q-settings-11: Content and card.
+  - Window background is solid: light #FFFFFF; dark #1E1F24 (wallpaper-tinted; #202127 in the probe).
+  - Cards (SwiftUI Form sections) are a solid fill, no stroke, no shadow, no glass: light #F7F7F7, dark #25262B.
+  - Card radius about 13 pt (corner profile; a continuous curve).
+  - Cards are 468 wide at x 252 (20 pt margins in the 508 pt content area).
+- Q-settings-12: Rows.
+  - Heights: 1-line row with a switch about 37.5. 1-line row with a popup 38. Row with a 2-line 11 pt sublabel 66–67.
+    Icon + chevron navigation row (Accessibility) 42 + 1 separator.
+  - Padding 10 pt left/right inside the card.
+  - Separator: inset 10 on both sides, 0.5 pt. Light #EBEBEB on #F7F7F7 (black about a.05); dark #2F3035 on #25262B (white about a.04).
+  - Gaps: card to card 10. Heading to card 10 (heading 16 tall). Card to the next section heading 30. First heading
+    12 below the toolbar.
+- Q-settings-13: Text styles. Pixel cap heights; colours composited.
+  - Toolbar title: about 15 pt Bold, #E8E8E9 / #4C4C4C active.
+  - Section heading: 13 Bold, label a.85.
+  - Row label: 13 Regular, labelColor a.85 (#DEDEDF on the dark card, #262626 light).
+  - Sublabel: 11 Regular, secondary (white a.55 → #9D9D9F dark).
+  - Slider end labels ("Small/Large"): 11.
+  - Sidebar: 13 Regular. Selected row: white Semibold/Bold.
+  - Buttons and popups: 13 Regular (probe: `.AppleSystemUIFont 13`).
+  - Tracking and opsz as R4. Emoji size: not measured.
+- Q-settings-14: Hero.
+  - Accessibility has a hero card as the first card (468x65.5): icon 26x26 at window (263,76) (12 pt inside the card), title 13 pt at x 300,
+    description 11 pt secondary in 2 lines (28 tall) with an inline "Learn more…" link.
+  - Displays uses a hero area, not a card: a 158 pt strip (bg #29292E vs #1E1F24) with a 304x157 MacBook picture and
+    "Built-in Display" bold, then a 0.5 pt divider (#343539).
+  - Appearance, Desktop & Dock, Sound and Keyboard have no hero.
+  - Other panes: not surveyed (several show personal data).
+- Q-settings-15: Push button. Flat, not glass (glass only with `.bezelStyle = .glass`, which draws a glassBackground
+  SDF).
+  - Sizes: regular 24 tall r6, pad 12, label 13 pt. Small 20 r5, pad 10. Mini 16 r4, pad 8. Large 28 r14 (capsule),
+    pad 14. Alert buttons are the large size.
+  - Fill: two layers, black a.047 + a.03 (light #ECECEC) / white a.047 + a.03 (dark #303137).
+  - Default: accent #007AFF plus an accent a.75 layer, white text.
+  - Pressed: an extra black a.098 layer, instant (no animation).
+  - Disabled: opacity 0.5 on the fill.
+  - Min width: none beyond the padding ("OK" is 42.5).
+  - Help "?" button: 24x24 circle with the same fill; glyph 7.5x12.5.
+  - (`controls-*.json`)
+- Q-settings-16: Switch.
+  - Regular: track 54x24 r12, knob 32x20 r10 (a capsule knob, 2 pt inset).
+  - Small: 44x20, knob 26x16.
+  - Mini: 36x16, knob 21x13 r6.5. Settings itself uses mini switches (AX 36x16).
+  - Off track: black a.098 (#E4E4E4) / white a.098 (#36373C).
+  - On track: accent + black a.098 + accent a.75 (#3374EF / #397AF6; Settings #3374EE / #397AF5).
+  - Knob: white, two shadows: black a.10 r12 y3 and black a.10 r2 y1.
+  - The knob is not glass at rest. While pressed it turns into a clear glass lens (next item).
+- Q-settings-17: Press (120 Hz layer samples + 60 fps video).
+  - Switch press: the knob grows from 32x20 to 50x31 (x1.56, centred). It reaches the peak 0.23 s after mouse-down
+    with a smooth S-curve and no overshoot. It cross-fades from white to glass in proportion to the growth (opacity
+    0.5/0.5 at 41 pt).
+  - The glass lens: no blur, inner refraction height 0.1D, amount -0.15D, plus a displacementMap.
+  - A quick click releases before the peak: peak x1.27 at 0.16 s.
+  - Release: shrinks back in about 0.3 s while travelling.
+  - Travel 2→20 pt: 95 % at 0.2 s, overshoot 0.7 pt (4 %), settled by 0.45 s.
+  - Track colour cross-fades over about 0.25 s; on→off overshoots slightly (clamped).
+  - Slider knob press: 20x16 → 25x20 (x1.25), fully glass in 0.17 s, back in 0.15 s.
+  - Slider click on the track: the knob animates to the click point, ease-out, no overshoot: 50 % at 0.06 s, 90 % at
+    0.16 s, done at about 0.4 s.
+  - (`controls-press-light.json`, `switch-press/release-strip-light.png`)
+- Q-settings-18: Slider.
+  - Regular: track 6 pt r3, black/white a.098. Fill: accent layers as the switch.
+  - Knob 20x16 r8, white, with the switch's two shadows. Row 16 tall.
+  - Small: track 4, row 14. Mini: track 4, row 12.
+  - Ticks: 2x2 dots r1 at y 14 (below the track), black a.26 / white a.25.
+  - Settings end icons: about 16x13 and 17x13.5 at a 6 pt gap (Liquid Glass row). Brightness 16.5 / 18 pt sun
+    buttons, 5 pt gap.
+  - Desktop & Dock uses text end labels (11 pt) under the track. The row with labels is 69 tall.
+- Q-settings-19: Pop-up button. Every pop-up has the same look.
+  - Push-button fill, r6, 24 tall (small 20, mini 16). Label 13 at x 12.
+  - Chevron: `chevron.up.chevron.down` image 7.5x10.5 at right (pad 10). Pull-down uses `chevron.down` 7.5x4.5.
+  - Settings shows the double chevron inside a 24 pt circle.
+  - Pressed and disabled: as the push button.
+- Q-settings-20: Pop-up menu.
+  - Glass menu in its own window (LIVE: regular glass, r12).
+  - Rows 24, menu padding 5. Width = the button width (96 / 95).
+  - The checked item is placed exactly over the button (y equal to the button's y).
+  - Highlight (under the pointer): accent pill #3478F6 (dark sample; light looks the same), inset 5 pt, about 23–24 tall, radius about 6, white text.
+  - Checkmark column at the left (about 12 pt).
+  - Open is instant; close is a fade of about 0.2 s (LIVE).
+  - (`popup-menu-open-*.png`)
+- Q-settings-21: Checkbox and radio. Flat, not glass.
+  - Checkbox: regular 16 r5.5, small 14 r4.5, mini 12 r3.5, large 18 r6.5.
+  - Off: black/white a.098.
+  - On: accent stack (as the switch) with a white tick shape (10x9.5 in 16; small 9x8.5; mini 7.5x7.5).
+  - Mixed: white bar 6.5x2 r1.
+  - Disabled: opacity 0.5, tick black a.26.
+  - Pressed: an extra a.098 layer.
+  - Label gap 6 (text at x 22).
+  - Radio: 16 circle (14 / 12), the same fills. Dot 5 r2.5 (small 5, mini 4).
+- Q-settings-22: Segmented. Not glass.
+  - Track: push fill, regular 24 r6, small 20 r5, mini 16 r4, large 28 r14.
+  - Selected pill: full-height accent segment, white text.
+  - Separators: 1x14 black a.098 between unselected segments.
+  - Pressed: a black a.098 overlay.
+  - The pill does not slide: the selection jumps in one frame, both in the AppKit probe and in Settings' SwiftUI
+    Output/Input picker (448x24, 60 fps).
+- Q-settings-23: Text field and stepper.
+  - NSTextField (rounded and square bezel are the same in 27): 24 tall (small 22), r6.
+  - Fill: white a.85 / #161616 a.85 (#171819). Border 1 pt outside: black a.078 / white a.047, r7.
+  - Text 13 pt, inset 4. Focus: 3 pt accent ring outside.
+  - Search field: r12 capsule, same fills.
+  - NSStepper: 20x24 regular, 17x20 small, 13x16 mini. Drawn by the cell (no layers): up/down chevrons, no glass.
+    Pressed not measured.
+- Q-settings-24: Focus ring.
+  - 3 pt wide, directly outside the control (gap 0), following its shape (radius + 3).
+  - Colour: light #95B3F6 on white, dark #38658F on #202127. This is keyboardFocusIndicatorColor a.5
+    (#0067F4 / #1AA9FF).
+  - Segmented: around the focused segment only. Slider: around the knob. Switch, checkbox and radio: around the
+    control body only, not the label.
+  - It appears without animation.
+  - (`focus-rings-*.png`, `focus-*.json`)
+- Q-settings-25: Accent row.
+  - 9 AX buttons 32x32, pitch 36, x 394..718 (window), row 32.
+  - Visible swatch: 24 pt disc. Selected: 3 pt accent ring with a 1 pt gap (outer 32).
+  - Name label "Multicolour": 11 pt secondary, centred under the selected swatch, directly below it (gap about 0).
+  - The card is 100 tall: colour row plus a 37 pt highlight row.
+  - Hover/press animation: not measured.
+- Q-settings-26: Mode and Liquid Glass.
+  - Light/Dark/Auto: AX 74x66 each, pitch 82. Thumbnail 67x44, radius about 6 (visual estimate). Selected ring 3 pt with a 0.5 pt gap.
+    Caption 11 pt, bold when selected.
+  - The Liquid Glass preview is a scroll view 268x180 (an Apple Park article under glass toolbar capsules), r about 14 (visual estimate).
+  - Slider 221.5 wide with 5 ticks (2 marked dots), between end buttons 16x13 (clear-glass capsule) and 17x13.5
+    (tinted).
+  - Preview at 0/50/100: not recorded (it would change the user's value).
+- Q-settings-27: Highlight and icon style.
+  - Text highlight colour is a pop-up (133x24) with a 16 pt colour dot (multicolour for Automatic).
+  - Icon & widget style tiles: AX 38x52 incl. the caption. The tile is 29 pt. Selected ring 3 pt, gap 1.5. Caption
+    11 pt, bold when selected.
+  - Dark shows an Always/Auto radio row. Clear and Tinted show Light/Dark/Auto.
+  - With Tinted, "Folder colour" becomes "Icon, widget & folder colour".
+  - Written values: Default = key removed; Dark+Always = RegularDark; ClearLight, ClearDark, TintedLight, TintedDark.
+  - Sidebar effect: see #35.
+- Q-settings-28: Displays (built-in only; no external display was attached).
+  - Hero strip 158 tall (above).
+  - 5 resolution tiles as 50x50 AX buttons, pitch about 91. Drawn 45x45 window thumbnails with lights and text; the
+    selected one has a 2 pt accent ring (49).
+  - Labels "Larger Text"/"More Space" under the ends, a "Default" bold caption under the selected, and a thin line
+    joining the middle tiles. Card 108 tall.
+  - Then the Brightness card (slider with sun buttons, auto-brightness, True Tone), Colour profile, TV, and
+    Advanced/Night Shift/? buttons.
+- Q-settings-29: Desktop & Dock (27.2.1 order).
+  - Dock: Size and Magnification sliders side by side (200 / 220 wide, text end labels "Small/Large",
+    "Off Small … Large", tick dots), card 69.
+  - Card: Position / Minimise animation / Double-click action pop-ups, then Minimise into app icon.
+  - Card: Auto-hide, Animate, Indicators, Suggested apps.
+  - Desktop & Stage Manager (Show items checkboxes, Click wallpaper pop-up + sublabel, Stage Manager + sublabel,
+    Recent apps, Show windows pop-up).
+  - Widgets.
+  - Default web browser.
+  - Windows (2 cards). Mission Control (description, 202 card). Shortcuts…, Hot Corners…, ?.
+  - Magnification here is off (value 0).
+- Q-settings-30: Accessibility.
+  - Hero card, then sections:
+    - Vision: VoiceOver, Zoom, Hover Text, Display, Motion, Read & Speak, Audio Descriptions.
+    - Physical and Motor: Voice Control, Keyboard, Pointer Control, Switch Control.
+    - Hearing: Hearing Devices, Audio, RTT, Subtitles and Captioning, Live Captions, Name Recognition.
+    - Speech: Live Speech, Personal Voice, Vocal Shortcuts.
+    - …
+  - Rows 42 tall + separator. Tile 20 pt at x 21 (per-row colours: black VoiceOver/Zoom/Read & Speak, blue, green
+    Motion).
+  - Chevron 5.5x9 pt at right (x 704), tertiary colour.
+  - Sub-page title/back: not opened.
+- Q-settings-31: Wallpaper.
+  - Preview 160x100 at (248,68), radius about 8 (visual estimate).
+  - Card 306x75 with a name + "Fill Screen" pop-up and a "Show on all Spaces" switch. Below it, "Screen Saver…" and
+    "Clock Appearance…" buttons.
+  - Divider, then category rows (title 13 bold + "Show All (n)" link right) with a horizontal scroller:
+    - Tiles 108.5x72 thumbnails plus an 11 pt caption (100 tall), pitch 117.5 (gap 9).
+    - Dynamic tiles carry an appearance badge and a download badge.
+  - Selected: 2 pt grey ring (#464646 dark) with a 0.5 pt dark gap.
+  - "Your Photos" starts with an "Add Photo…" tile.
+
+### Icon styles (#35)
+
+Sidebar crops (below the account block), 2x: `screens/27.2.1/settings/sidebar-iconstyle-<appearance>-<style>.png`
+(12 files) plus `sidebar-iconstyles-sheet.png`.
+- Shot pairs: light/dark × default and dark, plus clearlight, cleardark, tintedlight and tinteddark in both
+  appearances.
+- Pixel check of the Wi-Fi tile body:
+  - Default: #3C88F5 in Light AND in Dark appearance (identical), with a white glyph. **Confirmed: Default in Dark
+    appearance shows the coloured light-style tiles.**
+  - Dark (RegularDark): #171717 tile in both appearances, with a blue glyph.
+  - Clear Light: #7D7D7D grey translucent. Clear Dark: #2B2B2B.
+  - Tinted Light: #3478F1 tile with a white glyph. Tinted Dark: #1B222A tile with a blue glyph.
+  - Clear and Tinted look the same in both window appearances: the tile follows the style's own Light/Dark radio, not
+    the window mode (Auto follows the mode).
+- User values restored and verified with `defaults read -g`: Dark, RegularDark, accent absent (Multicolour),
+  NSGlassTintAmount 0.5071146, NSTableViewDefaultSizeMode 2.
+
+## Q-finder (27.2.1)
+
+Measured live on Finder, macOS 27.2.1 (26B131), 2x. Window 920 x 560 pt on a test folder (on a mounted test disk image, not Documents: the user's Documents may not be captured). Points are window-relative (0,0 = window top-left). Colours are sRGB from 2x window captures. Light = light appearance, dark = dark; a = key window, i = inactive. Account: Multicolour accent (blue), icon style Dark, glass tint 0.5. Data: `reference/re/27.2.1/live/finder/` (`finder-measurements.json`, `crops/`, `ax/`, `icons-*`); pictures: `reference/screens/27.2.1/finder/` (+ INDEX.md; the private sidebar rows are blanked).
+
+- Q-finder-01: Yes, all five are glass: back/forward, view switcher, Group, Share/Tags/Action and Search are each an NSToolbar item-group platter = NSGlassEffectView `_variant` 0 (regular), 36 pt, full capsule. All platters right of the sidebar share one NSGlassContainerView (one `glassBackground` backdrop, shapes merged). Recipe at 36 pt, from MAC-ANSWERS Q9 + LIVE:
+  - light: face black .4, white 1.03, saturation 1.2, fill white a.2;
+  - dark: black .125, white 1.125, saturation 1.3, no fill;
+  - both: blur r5 with opacities 0, 0, .5, 1; inner refraction 9 / -18; outer refraction 16 / 16 at opacity .6; ring shadow .06; drop shadow .04, r4, y 8; clamp 1.07 light / 1.31 dark.
+  - Live pixels: light capsule 252 on the 255 strip; dark (61,62,70) on (32,33,39), or (67,69,77) while the pointer is in the toolbar. Inactive: light 240, dark (58,60,67).
+  (Q9 probe dump + live pixels)
+- Q-finder-02: Toolbar height 52 (AXToolbar). Every capsule spans y 8–44 (36 tall).
+  - Back/forward x 170.5–244.5 (74; AX segments 36 + 37). It starts 7.5 pt after the 163 pt sidebar.
+  - Title ink starts at x 256.
+  - View switcher x 533.5–694.5 (161; 4 segments of 40.5).
+  - Group x 702–749.5 (47.5).
+  - Share / Tags / Action x 756.5–868.5 (112; buttons 36 / 38 / 37).
+  - Search circle x 875.5–912.5 (36).
+  - Gaps between capsules 7–7.5. Right inset 7.5. No other left inset (traffic lights at 18,18; pitch 23).
+  - Glyphs are 13 pt `.large` `.medium` symbols (R3b-3). Ink: chevron 8x14, grid 15.5, list 16.5x12, columns 19.5x15, gallery 19x14.5, search 16x16.5, ellipsis 15x3.
+  - At this width the view switcher shows 4 segments. At 800 pt (the user's windows), or when search is open, it collapses into one 51x38 popup.
+  (AX frames + pixel edges)
+- Q-finder-03: Glass `_variant` 18. It is edge to edge, not a floating inset panel: flush with the left, top and bottom edges, running under the toolbar from y 0, with no radius of its own (the window corner clips it). See MAC-ANSWERS Q9 §3 for the recipe and D, and Q-windows-15.
+  - Width 163; 0.5 pt divider at x 162.5.
+  - Live fill: light (237,237,238) a / (242,242,243) i. Dark over Electric Blue (36,38,55) a / (36,38,54) i (flat when inactive).
+  (Q9 + AX + pixels)
+- Q-finder-04: Sidebar layout.
+  - Width 163. Rows 32. Section header rows 19.
+  - First row (Recents) at y 52, directly under the toolbar.
+  - Selection cell x 10–153 (inset 10, 143 wide), radius about 8.
+  - Icon centre x 29 (ink 16–18 pt, e.g. clock 17x17, person.2 23x15.5). Text x 45 (AX), ink 46.5. Header text x 15 (ink 16.5).
+  - Gap between sections: 13 pt of empty space before each header row, so 32 pt from the last row of one section to the first row of the next.
+  (AX + pixels)
+- Q-finder-05: See Q-windows-01/02/03; the same values hold for this Finder window.
+  - Radius 16, continuous corner (spans about 24 pt).
+  - Outer rim 0.5 pt black: a.21 light / a.93 dark (active).
+  - Inner rim 1 pt white a.10.
+  - Shadow: blur 20, y 18, density .40 light / .70 dark when active; 8 / 7 and .22 / .45 when inactive. Alpha profiles are in Q-windows-01.
+- Q-finder-06: Title text.
+  - SF **15 Semibold**: ink 88.5 pt for "finder-demo" equals SF 15 Semibold. This corrects Q-windows-12's "bold 13".
+  - Only the folder name; no " — Local" and no subtitle.
+  - Left-aligned at ink x 256, 11.5 pt after the back/forward capsule. The AX field fills the free space (248–530); the text truncates when it runs out.
+  - Vertically centred in the 52 pt bar (ascender 19.5 to baseline 32).
+  - Colours: light #4C4C4C a / #BFBDBD i; dark #E9E9E9 a / #5F5F64 i.
+  (ink fit against AppKit renders)
+- Q-finder-07: Sidebar text.
+  - Items: SF 13 Regular. The selected row is 13 **Semibold** (ink 78.5 = 13 Semibold, against 74 for Regular).
+  - Item colour: light black (0 at glyph cores, vibrant), dark 255. Inactive: light 113, dark (146,147,155).
+  - Headers: SF 11 Semibold. Light 135 (about black a.43), dark (113,115,132) (about white a.35). Inactive 166 / (87,89,105).
+  - Hovering a header shows a `chevron.down` at the right (ink 9.5x5.5 at x 136.5–146, centred on the header row, dark (160,162,177)). The header gets no fill.
+  (ink fits + hover capture)
+- Q-finder-08: Sidebar icons. They are monochrome 13 pt `.large` `.medium` symbols (R3b-3), not all tinted.
+  - Recents (clock), Shared (person.2) and all Favourites use the accent: light (0,107,239), dark (30,152,255).
+  - Locations (iCloud Drive, home, AirDrop, Bin) are not tinted: grey, light (123,123,128), dark (181,181,195).
+  - All turn grey when inactive: light 127, dark (143,144,155). On a selected row the icon keeps its colour.
+  - AirDrop = the `airdrop` glyph (ink 18x17).
+  - Tag dots in the sidebar: not measured (the Tags section is off on this account).
+  (pixels per row)
+- Q-finder-09: Sidebar selection is a grey pill, not the accent.
+  - Light (215,215,216) a / (231,231,232) i, on (237,237,238) / (242,242,243).
+  - Dark (65,67,84) a / (50,52,67) i, on (36,38,55).
+  - Geometry: x 10–153, 32 tall, radius about 8.
+  - Hover: none. Pressed: none (the row selects on mouse-up, with no pressed fill).
+  - A drag over a row shows an accent pill (47,110,237) with white text (drop target).
+  (captures; press with drv3)
+- Q-finder-10: Toolbar button states.
+  - Hover: an inner capsule 28 tall (y 12–40), 30 wide on back/forward and Action, 35.5 on view segments; on Search the whole 36 circle lightens. The back/forward divider hides on hover.
+  - Hover colours: light 242 on 252 (Search 236); dark (87,89,96) on (67,69,77).
+  - Pressed looks the same as hover at 80 ms. Holding back/forward about 0.3 s opens the history menu.
+  - Disabled: no hover; glyph tertiary (light 173; dark (113,114,122)).
+  - The pill is a flat fill inside the glass capsule; the capsule is the glass.
+  - Dark only: the whole toolbar strip lightens (32,33,39 → 39,41,47) while the pointer is anywhere in the toolbar, and also when the window is inactive.
+  (still captures; recording)
+- Q-finder-11: View switcher.
+  - Selected segment: inner capsule 35.5x28, radius 14, inset 4 from the capsule top and bottom. Fill: light 231 on 252; dark (81,82,90) on (61,62,70).
+  - Separators: 1 pt, about 20 tall, only between two unselected segments (hidden next to the selected or hovered one). Light 200, dark (113,114,122).
+  - Icons: square.grid.2x2, list.bullet, rectangle.split.3x1, squares.below.rectangle (R3b-3).
+  - Switching: the pill jumps in 1 frame (no slide), the same frame as the content change.
+  (pixels + 60 fps)
+- Q-finder-12: Icon grid.
+  - Icon 64 (View Options: icon-size slider 24, grid spacing 54, text 12, labels at the bottom).
+  - Cell 112 x 112 (icon pitch 112 in both directions). The grid starts at (173,62) = content + 10, toolbar + 10.
+  - First icon at (197,66): centred in the cell, 4 pt from the cell top.
+  - Label cap top 10 pt below the icon. Label max width about 104 (ink).
+  (AX)
+- Q-finder-13: Icon view selection.
+  - Plate: 72x72, radius 7, icon inset 4. Light 230, dark (54,55,60). Unchanged when inactive.
+  - Label: pill 17 tall for 1 line (2 pt below the plate), radius 5, about 5 pt side padding, white text. Fill: light (42,99,217) a / 220 i (text 33); dark (37,88,201) a / 70 i (text 228).
+  - Hover: none.
+  - Drop target: a grey plate (226), radius about 8.
+  (rr fit)
+- Q-finder-14: Icon label text.
+  - SF 12 Regular, colour light 38 (label a.85), dark 221.
+  - Line pitch 16 pt. At most 2 lines, centred; a long name wraps, then middle-truncates the last line with "…" ("from the…mber.txt").
+  - Tag dots: 10 pt circles inside the label, left of the name. Each extra tag sits 5 pt to the right, behind the previous, with a 0.5 pt white ring. The text starts about 3 pt after the dots.
+  - A tagged folder icon takes the tag colour (Projects with the orange tag is an orange folder).
+  (ink fits)
+- Q-finder-15: List view.
+  - Header y 52–80 (28). Rows 20; first row at y 85.
+  - Rows inset 10 pt both sides (x 173–910).
+  - Disclosure triangle AX 15x22 at x 174. Icon 16 at x 189. Name x 209.
+  - Default columns: Name 338, Date Modified 181, Size 97 (right-aligned, 7 pt pad), Kind 121.
+  - Text: SF 13 Regular. Name = label colour (39 light); other columns secondary (128).
+  - Header: SF 11.
+  (AX + ink fits)
+- Q-finder-16: List stripes and selection.
+  - Stripes on the 2nd, 4th, … rows: light (244,245,245), dark (42,43,49). Full 20 pt, x 173–910, radius about 8.
+  - Selection: same rect. Light (42,98,217), dark (36,87,201). Text white; secondary columns (191,208,244).
+  - Inactive selection: light 220 (text 33 / 109); dark 70 (text 227 / 172).
+  - Disclosure chevron: ink 5x8.5, secondary (dark 155).
+  (pixels)
+- Q-finder-17: List header.
+  - Light: no own fill (white, like the content). Dark: a solid (40,40,46) bar that also covers the toolbar strip (hard pocket), over the (32,33,39) content.
+  - Column separators: 1 pt x 16 (y 58–74). Light 229, dark (76,76,82).
+  - Bottom line: 1 pt at y 79. Light 229, dark (66,66,72).
+  - Sorted column: SF 11 Semibold in label colour (76 / 255), with a 7.5x5 chevron 6.5 pt left of the column edge. Other headers: 11 Regular, secondary 127.
+  - Hover: none. Pressed: the cell fills 242 (light), square.
+  - Resize cursor 30x24, hotspot (15,12), within about 1 pt of a boundary.
+  (pixels + curmon)
+- Q-finder-18: Exact strings on this account (en_GB, region Indonesia, 24 h; "." time and "," decimal come from the region).
+  - Dates: "Today at 00.15", "Yesterday at 14.30", "9 Nov 2026 at 11.20" (this year, also within the week), "14 Jun 2023 at 16.05" (older). The year is shown in all cases.
+  - Preview / inspector: "5 March 2026 at 09.12", "Yesterday, 14.30".
+  - Sizes: "--" for folders, "43 bytes", "8 KB" (8000 B), "12 KB" (12134 B), "12,3 MB" (12345678 B). Decimal (1000) units, 1 decimal from MB up, none for KB.
+  - 12 h strings: not measured (would mean changing the user's clock format).
+  (AX values)
+- Q-finder-19: Column view.
+  - Columns 245 wide, with a 1 pt divider (light 229, dark 57). No grip; the resize cursor shows over the divider.
+  - Rows 24. Icon 18. Text at column x + 38. Folder chevrons at the right.
+  - Selection: inset 10 left / 11 right, 24 tall, radius about 8. Active column accent (light (41,98,217), dark (36,87,202)); parent columns grey (220 / 70); all grey when inactive.
+  - Preview column (about 240): preview 219x259, name 13 bold, kind 11, "Information" rows (Created / Modified / Last opened) 23 pt pitch, Tags editor, Markup / More… buttons.
+  - When opened on a volume, the first column lists Demo, Macintosh HD and Network.
+  (AX + pixels)
+- Q-finder-20: Gallery view.
+  - Preview 443x357 at (195,84).
+  - Strip: 48x48 thumbnails, pitch 59 (gap 11), at y 476.
+  - Selected thumbnail: plate 54x54, radius 7 (light 189, dark (87,88,92)), unchanged when inactive.
+  - Right pane, about 240–250 wide: same material as the sidebar (light 237, dark (36,38,55)), with a 0.5 pt edge. It holds:
+    - a 50 pt icon;
+    - the name, 15 Semibold;
+    - "PNG image - 8 KB", 13 Regular tertiary;
+    - "Information" (13 Semibold) with "Show More" (11, accent);
+    - rows Created / Modified / Last opened: 11, label secondary, value Medium;
+    - "Tags" with a tag editor;
+    - Rotate Left / Markup / More… buttons at the bottom.
+  (AX + ink)
+- Q-finder-21: Yes, there is a status bar, hidden by default here (ShowStatusBar 0). It was toggled on, measured and turned off again.
+  - Height 28, below the path bar; the window grows by 28.
+  - No own fill (content background), 0.5 pt line above.
+  - Centred text "9 items, 112,1 MB available" / "1 of 9 selected, …", about 11 pt, secondary (128).
+  - In icon view: an icon-size slider 82x16 at the right.
+  (AX + pixels)
+- Q-finder-22: Path bar (on by default here).
+  - At the bottom: 1 pt top line at y 531.5 (light 221–229, dark (66,67,73)), then 28 pt, with no fill and no glass.
+  - Items: 16 pt icons + SF 11 Regular secondary (127). Chevron separators 4x6 secondary. Item x starts about 6 pt in from the content edge (AX 169).
+  - Hover: none.
+  - Drag target: the item gets an accent capsule behind its label (seen through the drag image).
+  (AX + pixels)
+- Q-finder-23: Finder context menus, in order (Finder's menu is not in AX; read from captures). Separators are shown as |.
+  - File: Ask Siri | Open, Open With ▸ | Move to Bin | Get Info, Rename, Compress "Notes.txt", Duplicate, Make Alias, Quick Look, Copy | Share… | Quick Actions ▸ | Services ▸
+  - Folder: Ask Siri | Open in New Tab, Paste Item* | Move to Bin | Get Info, Rename, Compress "Photos", Duplicate, Make Alias, Quick Look, Copy | Share… | Customise Folder… | Quick Actions ▸ | Services ▸
+  - Multi-select: Ask Siri | New Folder with Selection (2 Items), Open, Open With ▸ | Move to Bin | Get Info, Rename…, Compress, Duplicate, Make Alias, Quick Look, Copy | Share… | Quick Actions ▸ | Services ▸
+  - Background (icon view): Ask Siri | New Folder, Paste Item* | Get Info | View ▸, Use Groups, Sort By ▸, Clean Up, Clean Up By ▸, Show View Options
+  - * only when something is on the clipboard.
+  - No shortcuts are shown. Leading icons on Move to Bin, Share, Customise Folder, Quick Actions and Services; their text is at x 39, plain rows at 16.
+  - No tag row, because this account has no favourite tags (FavoriteTagNames = ('')).
+  - Files in `crops/context-menu-*.png`.
+- Q-finder-24: See Q-menubar-12/22/24; context menus behave the same.
+  - Hover: solid accent (0,122,255), rect inset 5 pt left/right, full 24 pt row, radius about 7, label / shortcut / chevron white.
+  - Disabled: tertiary (a.25), no highlight on hover.
+  - No animation: the highlight moves within 1 frame; activation blinks off 67 ms, on 50 ms, then a 0.2 s fade.
+  - Text x 16 (28–30 with a state column, 39 with icons).
+- Q-finder-25: not measured: the tag dots row only lists favourite tags, and this account has none (FavoriteTagNames is empty and syncs via iCloud, so it was not changed). What is visible instead:
+  - Toolbar Edit Tags popover: a glass popover with an arrow, 252x99 pt, title "Assign tags to "<name>"" (11–12 pt secondary), a tag token field 218x27 (token = a tinted capsule with the tag name, e.g. "Red"), and an empty suggestion table. Picture: `popover-*.png`.
+  - Icon labels: tag dots are 10 pt (Q-14).
+  - List view: AX tag image 26x14 at the right end of the Name column.
+- Q-finder-26: Quick Look.
+  - A separate floating window (layer 3, AXWindow subrole "Quick Look"), not a sheet or an in-window panel. 1463x951 for a 1600x1000 px image (fits the screen), centred on screen.
+  - Radius about 20 pt.
+  - Title bar 38 with:
+    - close and full-screen 14 pt discs (dark glyph discs) at (11,12) and (31,12);
+    - the file name in 13 bold;
+    - Markup, Rotate and Share buttons 34x26;
+    - an "Open with Preview" capsule 139x26.
+  - Content inset 5 on the left, right and bottom.
+  - Frame grey 134–137 in light (over blue; looks opaque and neutral); the material could not be dumped.
+  - Open: appears at about 0.79 scale, centred, and grows to 1 in about 0.25 s, ease-out (per frame .79 .85 .90 .93 .95 .97 .98 .98 .99 → 1), no fade seen.
+  - Close: shrinks and moves into the file's icon in about 0.18 s.
+  - Shadow: standard window shadow (not measured separately).
+  (60 fps, AX)
+- Q-finder-27: Rename field.
+  - Fill: white text field. The base name is selected (#BAD6FB, 186,214,251); the extension is not.
+  - Ring: 3 pt focus ring outside the field, accent at about a.5 (light (149,179,246)), with a 0.5 pt darker inner edge (114,158,244). Outer radius about 5; field corners almost square.
+  - Icon view: the field is the label size (74x14 for "Old Letter.rtf"), text 12.
+  - List view: the field is 16 tall in the 20 pt row and the ring spills over the row; the row keeps its accent selection.
+  (pixels, light)
+- Q-finder-28: Drag feedback.
+  - Drag image: icon + accent label at about 0.90 opacity (label (62,113,221) vs (41,98,218)).
+  - Multi-item: only the first item's image, plus a red count badge 19 pt (231,74,64) with a white bold number, at the icon's bottom-right.
+  - Icon-view folder target: a grey plate 226, radius about 8, behind the folder.
+  - Sidebar target: accent pill (47,110,237) with white text.
+  - Path bar target: accent capsule.
+  - List-view folder row: no highlight seen within 0.7 s.
+  - Spring-load: the hovered folder opens in place within 1.9 s; Esc returns to the original folder and cancels.
+  - Snap-back: Q-windows-27 (0.25 s, ease-out, no fade).
+  - Cursor: Q-windows-27.
+  (captures with drv3)
+- Q-finder-29: Inactive window; values given as active → inactive.
+  - Traffic lights grey.
+  - Title: light #4C4C4C → #BFBDBD; dark #E9E9E9 → #5F5F64.
+  - Toolbar capsules: light 252 → 240, glyphs 0 → 164; dark (61,62,70) → (58,60,67), glyphs dim. The dark strip lightens to (39,41,47).
+  - Sidebar: flat (light 237 → 242). Text: light 0 → 113; dark 255 → 146. Icons grey: light 127; dark (143,144,155).
+  - Sidebar selection: light 215 → 231; dark (65,67,84) → (50,52,67).
+  - Icon / list / column selection: accent → grey (light 220, dark 70) with label-coloured text.
+  - Unchanged: icon plates and gallery plates, stripes, content background, icons and labels.
+  (a/i capture pairs)
+- Q-finder-30: Motion, from 60 fps recordings.
+  - View switch (Cmd-1..4): content and pill change in 1 frame.
+  - Folder enter (Cmd-↓) and back: 1 frame, no slide.
+  - Selection change: 1 frame.
+  - Sidebar hover: none.
+  - Search expand (click): the circle widens into a capsule (about 241 wide) in about 0.15–0.17 s, ease-out (left edge progress .19, .85, .86, .95, .99, 1). The view switcher collapses into its popup in 1 frame at the start. The focus ring appears after the expand, without a fade.
+  - Search collapse (Esc twice): about 0.17 s.
+  - Quick Look open and close: see Q-26.
+- Q-finder-31: Rendered icons are in `icons-rendered/` (NSWorkspace icons: generic folder, Documents folder, Applications folder, PDF, txt, png, zip at 16 / 18 / 32 / 48 / 64 / 77 pt, 2x, light and dark). Live crops are in `icons-live/` (64 pt icon view, 16 pt list).
+  - Light and dark renders are byte-identical, and the live Finder icons are pixel-identical in light and dark: no tint change in dark (this account's "Dark" icon style does not touch Finder's file icons).
+  - Live folder blue (123,192,235) / (101,173,219).
+  - In icon view, documents show Quick Look thumbnails (txt / pdf pages, the png image), not type icons.
+  - A tagged folder is drawn in the tag colour.
+  - The 64 pt live folder is about 9/255 mean different from the NSWorkspace render; the 16 pt one about 7.
+- Q-finder-32: Tab bar (2 tabs; the second was opened with Open in New Tab on a test folder, then closed).
+  - A 28 pt capsule track directly under the toolbar (y 52–80, x 167–879.5, radius 14). Light 232 with a 220 rim; dark (56,56,63) with a (72,72,78) rim.
+  - Tabs share the width (AX 369 / 339).
+  - Selected tab: an inner capsule 24 tall (2 pt inset), radius 12. Light 253 (text 75); dark (61,61,69) (text 235).
+  - Unselected: no fill, text light 181 / dark 132.
+  - Hover on an unselected tab: its segment darkens (light 220, dark (66,66,73)) and a × close glyph shows at its left (AX 18x18 at tab x + 4).
+  - Text SF 11 Regular, centred.
+  - New-tab "+" button: about 30 pt circle at x 883.5–912 (light fill 249, rim 191).
+  - Inactive: everything dims (selected tab light 240, dark (51,51,60)).
+  - When the tab bar shows, the toolbar keeps its 52 pt and the content moves down 28.
+  (AX + pixels, `crops/tabbar-*.png`)
+
+## Q-panels (27.2.1)
+
+Setup: MacBook Air M2, 27.2.1, user account (not clean: Multicolour, icon style Dark, Liquid Glass 0.5, custom CC). CC
+numbers are global pt (screen 1710 x 1107, menu bar 34). Backdrops for pixel work: a borderless window of solid white /
+grey 127 / black / 4 pt stripes placed just under CC (level 3). Values are display RGB from `screencapture` at 2x.
+Raw numbers: `reference/re/27.2.1/live/panels/`. Pictures: `reference/screens/27.2.1/panels/`.
+
+### Control Center
+- Q-panels-01: Other-process layers can't be dumped (no layer API into ControlCenter), so this is from pixels. Over a 4 pt
+  black/white stripe backdrop, every 2x1 tile, round button, 2x2 Now Playing tile and slider module bends the stripes at
+  its own rim and shows them blurred inside. So each module is its **own glass shape**; there is no shared panel glass.
+  - Toggle circle **on** = opaque white disc (255), no backdrop. Toggle circle **off** = flat white 25 % over the tile
+    glass (T + 0.25·(255−T)); no rim or refraction of its own. Same for the Now Playing art placeholder (white ~14 %
+    over the tile) and the slider track (T+20).
+  - Dark Mode **on** = the whole 64 pt disc is opaque white with a black glyph. The Home accessory tile when on = opaque
+    white.
+  - Variant: not readable. The closest AppKit match is `_variant` 9 (controlCenter). Over 255/127/0 it gives
+    207/115/25 (dark) and 244/157/71 (light); the real tiles give 186/109/32 in both appearances. The real tiles sit on
+    a 10 % black dim (gap = 0.898·in). Variant 9 composited over that dim comes out at about 188/106/25, within ±7. The HUD
+    uses `_Glass.controlCenter` (REA section 1), so CC tiles likely do too; not traced. (stripe/white/grey/black
+    captures + `tools/probe/ccglass.swift`)
+- Q-panels-02:
+  - **On** (Wi-Fi, Bluetooth, AirDrop): circle 255 white, glyph accent blue (52,120,246) = Multicolour systemBlue.
+  - **Off** (Focus off; Wi-Fi/Bluetooth off use the same style): circle = white 25 % over the tile, i.e. 203/146/88 over
+    white/grey/black backdrops. Glyph pure white 255.
+  - **Focus on** (Do Not Disturb, toggled on and back off): circle 255 white with the moon in **indigo** (119,131,254
+    at the most saturated pixel, i.e. the DND mode colour, not the accent). The title becomes "Do Not Disturb" (wraps to
+    2 lines) with subtitle "On", and a chevron ">" (6 × 10.5, 193 over the grey backdrop) sits at the right.
+  - Wi-Fi and Bluetooth were not switched off on this Mac (the network and input devices were in use). (pixels)
+- Q-panels-03: Off tile, slider module and Now Playing tile all read the same.
+
+  | Backdrop | Centre | 2 pt from left/right edge | 2 pt from top | 2 pt from bottom | Gap between tiles |
+  |---|---|---|---|---|---|
+  | white | 186 | 186–187 | 198 | 201 | 229 |
+  | grey 127 | 109 | 109–110 | 123 | 127 | 114 |
+  | black | 32 | 32 | 42 | 45 | 0 |
+
+  - Centre = 32 + 0.604·in (as in #53).
+  - The rim brightens only the top and bottom 2 pt: +12 at the top, +15 at the bottom. The sides are not lit.
+  - The outermost 1 px at the vertical sides is dark (about 40 over grey).
+  - Light and dark appearance are identical (#53). (pixels)
+- Q-panels-04: AX order (window "Control Centre", AXSystemDialog). Grid = 4 columns × 64 pt, pitch 76 (gap 12).
+  - Wi-Fi 2x1 (col 0–1, row 0)
+  - Bluetooth 2x1 (row 1)
+  - Now Playing 2x2 (col 2–3, rows 0–1)
+  - AirDrop 2x1 (row 2)
+  - Stage Manager 1x1 (col 2, row 2)
+  - Screen Mirroring 1x1 (col 3, row 2)
+  - Dark Mode 1x1 (col 0, row 3)
+  - Capture Screen 1x1 (col 1, row 3)
+  - Focus 2x1 (col 2–3, row 3)
+  - Display slider 4x1 (row 4)
+  - Sound slider 4x1 (row 5), with an AirPlay-audio button inside
+  - row 6: empty cell, Background Sounds 1x1 (col 1), Home accessory 2x1 (col 2–3)
+  - "Edit Controls" capsule 93.5 × 24, centred, 16 below the last row.
+
+  This account is customised (the user added Stage Manager, Screen Mirroring, Dark Mode, Capture Screen, Background
+  Sounds and Home), so the stock list can't be read here.
+  - A Dark Mode button exists (when added). Reduce Transparency is not shown here.
+  - **Extra row:** a privacy "recently used" pill (e.g. "<App> recently" with a purple screen-recording glyph) sometimes
+    shows above the grid:
+    - 137.5 × 24, centred on the grid, top y 44 (10 below the menu bar);
+    - it pushes the whole grid down **28 pt** (first row y 74 instead of 46);
+    - it is a glass capsule too. hyprk lacks it.
+
+  (AX + pixels)
+- Q-panels-05: **Window:** the AX window is 656 × 968 at x 1230 (it runs off the right screen edge); only the module
+  frames matter.
+  - **Grid:** x 1404..1696 → **width 292, right margin 14**, top **46 (12 below the menu bar)**.
+  - **Tiles:** 2x1 140 × 64, 1x1 64 × 64, 2x2 140 × 140, slider 292 × 64; gap 12.
+
+  Radii (shape fits on a window capture with the shape over black; rms ≤ 0.4 px):
+
+  | Shape | Radius |
+  |---|---|
+  | 2x1 | capsule, r 32 (continuous fit 31.5) |
+  | 1x1 | circle, d 64 |
+  | 2x2 | continuous rounded rect, r 32 (fit 31.6) |
+  | slider | continuous, **r 24** (fit 23.5) |
+  | Edit Controls | capsule, r 12 |
+  | sub-panels (Q-12) | continuous, **r 16** |
+
+  **Panel behind:** none. Only a 10 % black dim under the module area that feathers out over about 100 pt; it is visible
+  in the window capture's alpha as a soft rectangle about 0.09 opaque. (AX + `screencapture -l` alpha + fits)
+- Q-panels-06: Matched against ink widths of the rendered system font.
+  - **Toggle title:** SF **12 semibold**. Widths agree within 0.5 pt: Wi-Fi 30.0, Bluetooth 55.5, Focus 33.5, Not Playing
+    65.5.
+  - **Slider-module titles** (Display 42.0, Sound 36.0): also 12 semibold.
+  - **Subtitle:** SF **11 regular** ("Contacts" 46.0, "On" 14.0). The Wi-Fi subtitle is the network name.
+  - **Colours (#53):** title = white at 85 % over the tile (245/233/221 over white/grey/black backdrops). Subtitle =
+    plus-lighter T+140 (255/249/172). Slider titles and all glyphs = 255.
+  - **Over a light wallpaper:** no change; labels stay white.
+  - "Edit Controls" = SF 12 regular (ink 71.5). (ink-width match, `ink.swift`)
+- Q-panels-07: 140 × 64 tile, positions relative to the tile.
+  - **Circle:** 36 at x 14, centred (y 14).
+  - **Text:** ink starts at x 56.5 (≈ 6.5 after the circle); right pad ≥ 10.
+  - **One title + subtitle:** title cap top y 19 (baseline ≈ 27.5), subtitle cap top y 36 (baseline ≈ 44).
+  - **AirDrop (3 lines):** cap tops 13 / 28 / 42 (pitch 15 then 14); the block is centred vertically.
+  - **Glyph ink in the circle:** Wi-Fi 19.5 × 14, Bluetooth 11 × 18.5, AirDrop 19 × 18, Focus moon 16.5 × 16. That fits
+    ≈ 18 pt symbols (glyph ≈ 0.5 of the circle).
+  - **Round 64 buttons, glyph ink:** Stage Manager 28 × 19, Screen Mirroring 27.5 × 23, Capture Screen 25.5 × 20,
+    Background Sounds 25.5 × 22, Dark Mode 22.5 × 22.5. So ≈ 24 pt symbols, not 22.
+  - **Hover chevron:** hovering a 2x1 tile adds a ">" at the right, 6 × 10.5 at x ≈ 119. (pixels)
+- Q-panels-08: Slider module 292 × 64, r 24.
+  - **Title:** "Display"/"Sound" 12 semibold, ink x 17, cap top y 13.5.
+  - **Track:** 4 pt tall, centre y 42 (bottom 20 from the module bottom), capsule ends. The AX slider frame is 14 tall,
+    centred on the track.
+    - Display track x 36.5..254 (217.5).
+    - Sound track x 34..214 (180), because the AirPlay-audio button (AX 26 × 26 at x 252, y 29; circle white ~25 %,
+      glyph airplayaudio 13 × 13) takes the right end.
+  - **Glyphs:**
+    - sun.min.fill 15 × 15 at x 15.5, and sun.max.fill 16.5 × 16.5 ending 16 from the right;
+    - speaker.fill 9 × 13.5 at x 16.5, and speaker.wave.3.fill 20.5 × 15 at x 220.5;
+    - all white 255.
+  - **Fill:** white 255. **Track:** T+20 (206/129/52 over white/grey/black).
+  - **Thumb:**
+    - none at rest;
+    - on hover, a **white 18 × 14 rounded knob** appears at the fill end, and a chevron ">" appears at the top right of
+      the module (it opens the sub-panel);
+    - while pressed or dragged, the knob turns into a **clear glass lens about 24 × 20**, with a dark 1 pt rim, a soft
+      drop shadow, and the track magnified through it. (AX + pixels + 60 fps video)
+- Q-panels-09: Sound slider, 60 fps without cursor; the volume was restored to 38.
+  - **Click:** the fill animates to the new value; no jump.
+    - Progress per frame: 0.11, 0.19, 0.38, 0.56, 0.71, 0.83, 0.90, 0.95, 0.97, 0.99, 1.0 → **about 0.2 s**, ease-out
+      spring, no overshoot.
+  - **Drag:** follows the pointer 1:1. The fill end stays about 9 pt ahead of the pointer hotspot (half the knob) with no
+    visible lag at 200 pt/s.
+  - **Pressed look:** the knob turns into the glass lens within about 3 frames.
+  - **Past the end:**
+    - the track end and fill stretch **3.5–5 pt beyond** the end (1618 → 1621.5–1623) while the pointer is held 87 pt
+      past it (rubber band, heavily damped);
+    - on release it springs back over about 8 frames (0.13 s), 1621.5 → 1618;
+    - the module itself does not move. (video)
+- Q-panels-10: Over grey 127 (tile at rest = 109).
+  - **2x1 tile:**
+    - hover = **+7** (white ≈ 5 % overlay), ramping in over about **0.25 s**, plus the chevron;
+    - press = **+37** (white ≈ 25 %), instant (1 frame), brighter near the pointer (pointer light), and the tile grows by
+      about 1 pt (≈ ×1.01);
+    - release falls back in about 3 frames (0.05 s), then the sub-panel opens.
+  - **Round 64 button:** hover +7; press **+54** (white ≈ 37 %, slight gradient) and it grows ×1.04–1.05 (64 → about
+    67).
+  - **Toggle circle:**
+    - hover = the whole tile hovers (+7 on tile and circle; no separate circle hover);
+    - press = circle 146 → **206** (white ≈ 55 % over the off circle), tile 129;
+    - the circle does not grow. (stills + video)
+- Q-panels-11: **Idle:**
+  - art placeholder 40 × 40 at (14, 14), continuous r 10, flat white ~14 % (129 over grey);
+  - "Not Playing" 12 semibold at (14, 72);
+  - three buttons 30 × 30 at y 96, x 15 / 55 / 95 (pitch 40);
+  - prev/next disabled (glyph 160 over grey, ink 22 × 12.5); play enabled (186, ink 17.5 × 19).
+
+  **Playing** (QuickTime, own silent test track):
+  - the art is the app's placeholder (white 244, r 10, grey music note), still 40 × 40; it does not fill the tile;
+  - title 12 semibold, wraps to 2 lines (pitch 15) with no artist line;
+  - pause.fill replaces play.fill; prev/next stay disabled for a single file.
+
+  (AX + pixels; crops `cc-nowplaying-*.png`)
+- Q-panels-12: Clicking a tile body (not its circle) or a module chevron replaces the whole grid with **one glass panel
+  of the same family**:
+  - x 1394..1702 (**308 wide**, 8 pt right margin), **top 40**, continuous **r 16**;
+  - fill = same as the tiles (109 over grey);
+  - rows 280 × 32 at x 1408 (14 inset); hovered row = capsule fill +21 (130 over grey);
+  - section header SF 13 bold at (1408, 53);
+  - separators 1 pt; a "… Settings…" row at the bottom.
+
+  | Panel | Height | Contents |
+  |---|---|---|
+  | Wi-Fi | 175 | header + switch 54 × 24 at the top right, "Known Network" heading, network rows, "Other Networks" disclosure, "Wi-Fi Settings…" |
+  | Bluetooth | 280 | header + switch, device rows 32 (scrolls) |
+  | Focus | 280 | header, 6 mode rows with 28 pt circle icons, "Focus Settings…" |
+  | Display | 189 | slider 233.5 with a white knob 20 × 16 that is always visible here; three 87.5 × 69 round toggles (Dark Mode / Night Shift / True Tone) with labels; "Display Settings…" |
+  | Sound | 258 | slider 230 with knob, "Output" heading, device rows 298 × 32, "Sound Settings…" |
+
+  - **Screen Mirroring:** clicking its round button showed nothing (no receivers).
+  - **Way back:** Esc returns to the grid (a 2nd Esc closes CC); clicking outside closes CC.
+  - The grid-to-panel change is a morph of about 0.35 s. (AX + pixels; names of networks/devices not recorded)
+- Q-panels-13: Already known.
+  - R2 Motion: a fade, ease-out, about 0.3 s in and 0.17–0.2 s out.
+  - REA section 2: **the whole panel** animates with Spring(0.25, bounce −0.027) (response 0.25 s, ratio 1.03).
+    Opacity goes 0 → 1 and scale **1.01 → 1.0** on open, the reverse on close. Anchor not traced (centre assumed).
+  - Not per tile: every tile is in place from the first frame, no stagger, no overshoot.
+
+### Spotlight
+The window belongs to the Siri process (layer 23) and its content is not in AX, so these are pixels. Dark appearance, over
+grey 127 unless noted.
+- Q-panels-14: No layer dump (other process). REA already gives the field = Regular glass, size large, content lensing,
+  and the results = `siri`/`searchResults`, r 37.
+  - **Field and results are two separate glass shapes**, with a 10 pt gap of plain backdrop between them.
+  - **Field in pixels:**
+    - over 4 pt stripes it refracts at the rim and shows heavily darkened, blurred stripes inside;
+    - it is very dark with a **vertical gradient**: over white 8 at the top → 65 at mid → 127 at the bottom; over grey
+      6 → 36 → 64; over black 1 → 6 → 17;
+    - mid-height ≈ 6 + 0.23·in, so a strong dark tint (this account uses icon style Dark; see R2 note).
+  - **Results panel:** lighter. 71 → 83 top to bottom over grey, with a bright 1 px rim top and bottom.
+  - A wide soft shadow sits under the bar (grey 127 → 96 right at the edge, ~30 pt falloff). (pixels)
+- Q-panels-15: **No inner field shape.** The empty bar is one dark capsule with the gradient, with no inset capsule.
+  - The only inner fill is the completion pill behind "— Open" / "= 4" (fill 63 on the 25 bar at that height,
+    ≈ white 15 %, radius ≈ 6). (pixels)
+- Q-panels-16: **Query text:** SF **22 regular**, white 255 ("calculator" ink 91.5 = 22 regular).
+  - **Placeholder:** "**Search or Ask**", 22 regular, grey ≈ 165 on the bar (white ~60 %).
+  - **Inline completion:** "— Open" (apps), "— Run" (actions), "= 4" (calculator), grey ≈ 203 on a pill.
+  - **Caret:** white, 2 × 26 pt (y 281..307), with a soft multicolour glow halo ~6 pt (bluish top, warm bottom).
+  - **Text start:** x 634 (39 from the bar's left edge).
+  - **Selection colour:** not measured. (pixels + ink match)
+- Q-panels-17: Screen 1710 × 1107.
+  - **Empty bar:** x 595..1115, y 251..338 → **520 × 87**, capsule (r 43.5), centred horizontally; top at 22.7 % of
+    the screen height.
+  - **With results:** the bar stays the same size and position.
+  - **Calculator answer:** the bar itself grows to 520 × 172.5 (see Q-21).
+  - **Magnifier:** **none** in 27.2.1. The left side is empty; in a mode the mode glyph sits there. The right side holds
+    a **mic** glyph (ink 14.5 × 21 at x 1061.5, grey ≈ 166), or the top hit's app icon (≈ 28 pt) once text is typed.
+  - The Siri window is 520 × 137 empty (shadow room) and grows with the content. (pixels + window list)
+- Q-panels-18: **Two glass shapes.**
+  - Results panel: x 595..1115 (520, same as the bar), top **348** (gap **10** below the bar), height 410 for a long
+    list, r 37 (REA).
+  - **No divider** between field and results; a 1 pt separator only in Apps/Files grids.
+  - It scrolls with a 5 pt overlay scrollbar (x 1106..1111, white ~25 %).
+  - Visible: chips row + 5½ rows of 62, so the max height ≈ 410 (not exceeded with long lists). (pixels)
+- Q-panels-19: **Row:** **62 tall** (pitch 62, no gap).
+  - Icon 32–36 (app icon 36.5, file icon 32 × 33.5) at x 620 (25 from the panel edge).
+  - Title SF **17 regular** white at x 675 (80 from the edge).
+  - Second line SF **15 regular** grey ≈ 153 (≈ white 55 %): "Kind · size · date · folder-glyph folder".
+  - **Selection pill:** x 607..1102 (12 inset left, 13 right), 62 tall, r ≈ 22 (continuous), fill +11 over the panel
+    (90 on 79 ≈ white 6 %).
+  - **Keyboard:** Down/Up move the pill; the list scrolls with the chips row pinned at the top.
+  - **Hover:** a synthetic pointer move over another row showed **no hover fill** and did not move the selection.
+  - **Top hit row:** trailing text "Search <App>" SF 10 regular grey ≈ 158, plus a "tab" key badge (27.5 × 18, white
+    ~30 % fill, dark text).
+  - **Chips row** above the rows: recent-app chips, text SF 15 regular ≈ 210, height 26, top 20 below the panel top.
+    (pixels + ink match)
+- Q-panels-20: For "safari", "calculator" and a file name the layout is the same: chips row, then the **top hit** (app,
+  with "Search <App>" + tab), then file rows.
+  - **No section headers**, no "Top Hit" label, no "Show More", no kind column, **no preview pane**.
+  - Right-side text appears only on the top hit; file rows carry the kind in their second line.
+  - "2+2" has no list at all (see Q-21).
+  - Headers do exist inside the modes: "Suggestions" (Actions) and "Recents" (Files). (pixels)
+- Q-panels-21: **"2+2":** the answer is inline in the field ("2+2" + grey pill "= 4"). The **bar grows** to
+  520 × 172.5 (y 251..423.5) and contains a **result card**:
+  - card x 614..1096 (19 inset), y 338..398 (60 tall), capsule, glass with a light rim;
+  - line 1 "2+2 =" SF 12 regular grey;
+  - line 2 "4" SF **16 semibold** white;
+  - a 30 pt round copy button at the right;
+  - the calculator icon at the top right of the bar.
+
+  Under the bar (gap 10), a separate glass capsule "**Show Results**": 148 × 44, SF 13 regular, with a calculator + Finder
+  icon pair.
+
+  **Unit conversion** ("100 cm in inches") uses the identical layout ("= 39,37 inches"; the locale decimal comma). There
+  is no 1.3× row. (pixels + ink match)
+- Q-panels-22: **There are no round mode buttons** in 27.2.1 (the hyprk 4 × 56 glass circles are wrong).
+  - **Hovering the empty bar** drops a **mode list** panel under it: one glass panel 520 × 214 at y 348 (gap 10), same
+    look as the results panel.
+  - It has 4 rows, pitch 48:
+    - glyph ~20–22 pt (ink 22 × 20 etc.) centred at x 44 from the panel edge;
+    - label SF **17 regular** white at x 81;
+    - shortcut "⌘1".."⌘4" SF 14 regular grey ≈ 143, right-aligned 39 from the edge.
+  - Glyphs:
+    - Applications = App Store "A" (`app.store`-like);
+    - Files = `folder`;
+    - Actions = `square.stack.3d.up`-like layers;
+    - Clipboard = `doc.on.clipboard`-like.
+  - Shown only while the field is empty and the pointer has entered the bar; it stays after the pointer leaves.
+    (pixels)
+- Q-panels-23: Mode rows: no active state was seen (they are shortcuts, not toggles). No hover fill and no tooltip were
+  seen with synthetic moves. Glyphs and labels are white 255, shortcuts grey. (pixels)
+- Q-panels-24: **Modes:** Applications ⌘1, Files ⌘2, Actions ⌘3, Clipboard ⌘4.
+  - In a mode, the field shows the **mode glyph at the left** (≈ 22 pt, x ≈ 618) and the **placeholder = mode name**
+    ("Applications", "Files", "Actions", "Clipboard"). There is no token pill.
+  - A "…" menu sits at the right in Applications, Files and Clipboard (none in Actions).
+  - **Left/Right** do not cycle modes (no change seen).
+  - **Tab** in Actions puts the first suggestion into the field ("Send Message — Run").
+  - **Esc:** 1st leaves the mode (or clears a query) back to "Search or Ask"; 2nd closes. (pixels)
+- Q-panels-25: Windows (Siri, global pt):
+  - **Applications** = the Apps view, documented in Q-dock-23..26: window 844 × 617 at (433, 251), capsule 520 × 87 +
+    panel 844 × 520, 7 columns, icon 60, chips 26.
+  - **Files** = the same 844 × 617 grid: filter chips by app (Preview, PDF, Microsoft Word, …), a first row of recent
+    documents, a "Recents" header, then a 7-column icon grid with 2-line names.
+  - **Actions** = a 520-wide list panel (y 348..838, 490 tall):
+    - "Suggestions" header SF 12 semibold/bold grey at x 23, with a 1 pt separator under it;
+    - rows pitch 62: app icon ~36, title 17 regular, app name 15 regular grey;
+    - a trailing "Add quick keys" grey capsule (≈ 10 pt text) or a key badge.
+  - **Clipboard** = the same 520-wide list (window 520 × 587):
+    - rows pitch 62: kind icon, item text 17 regular (1 line, truncated), second line "Text · Copied yesterday"
+      15 regular grey;
+    - a round copy-type badge at the right.
+  - **Empty or first-use texts:** not seen; every mode had content on this account.
+  - Contents of Files and Clipboard are the user's and were not saved. (pixels)
+- Q-panels-26: Open and close are in R2 + REA section 4: bar x 1.12 → 1, y 0.95 → 1, spring 0.28; close with blur 25 and
+  a fade.
+  - **Results:** the panel is a separate shape (it does not grow out of the bar).
+  - **Mode list on hover:** it **unfolds downward from the bar** in about **0.17 s**. Share per frame: 0.04, 0.11, 0.22,
+    0.36, 0.51, 0.66, 0.78, 0.87, 0.94, 0.98, 1.0 (ease-in-out). It starts within 1–2 frames of the pointer entering.
+    (60 fps video)
+
+### Banners (own test notifications from `osascript display notification`, shown as "Script Editor")
+- Q-panels-27: AX `AXNotificationCenterBanner` in the NotificationCenter process; the window is a full-screen
+  "Notification Center" at layer 23.
+  - **Frame:** x 1350..1694 (**344 wide**, **right margin 16**), **top 44 (10 below the menu bar)**.
+  - **Heights:**
+
+    | Content | Height |
+    |---|---|
+    | title + 1-line body | 58 |
+    | title + subtitle + body | 75 |
+    | 3-line body | 90 |
+    | title + **4-line body** (max; then "…") | 105.5 |
+
+  - **Shape:** continuous **r 20** (fit on black, rms 0.08 px).
+  - **Glass:** yes. Over the stripes/menu bar it refracts (it picks up the blue menu bar at its top edge).
+    - Fill 33 over black, 114 over grey 127.
+    - Rim +35 at the top edge, +20 at the bottom.
+  - Variant: not readable (other process). (AX + pixels)
+- Q-panels-28: **Fonts:**
+  - title SF **13 semibold** (ink "hyprk test" 62.5);
+  - subtitle also 13 semibold;
+  - body SF **13 regular** (93.5);
+  - all ≈ 233 (white ~90 %) on the 114 card; line pitch 17.
+  - **Text frame:** x 1408 (58 from the card edge), first line 12 below the card top.
+  - **No app-name line and no time in the banner.** In NC the card adds a right-aligned time ("now", "1h", SF ~12, grey,
+    14 from the right edge).
+  - **Icon:** the app icon ≈ 32 × 32 at 13 from the left, centred vertically.
+  - Sender photo and badge: not tested (needs Messages). (AX + pixels + ink match)
+- Q-panels-29: **On hover** the AX frame grows to (1344, 40, 350, 109.5) for the hit area, and these appear:
+  - a **Close** button (xmark, 28 × 28 frame, a small glass circle) centred on the **top-left corner** (1340, 36);
+  - a **chevron ">" "Show Details"** 16 × 20 at the top right (1666, 50);
+  - the notification's **action** as a grey glass capsule "**Show**" 64 × 22 at the bottom right (1620, 117.5); the body
+    text fades out under it.
+  - There is no "Options" pill for this app.
+  - Expanded banner and reply field: not available from osascript notifications.
+  - A mouse **drag to the right** (140 pt) **dismisses** it. (AX + pixels)
+- Q-panels-30: **In:** slides in **from the right screen edge** (x 1710 → 1350) **with a fade**; the size looks
+  slightly blurred or larger in the first frames. Burst captures at ~30 Hz:
+  - left edge at 0.43 s: 0.45 of the travel; 0.48: 0.81; 0.54: 0.89; 0.57: 0.94; 0.61: 0.96; 0.64: 0.98; 0.67: 0.99;
+    settled ≈ 0.77;
+  - so about **0.35 s ease-out** (spring-like, no visible overshoot), starting about 0.4 s after posting.
+  - **On screen ≈ 4.7 s**, then **out**: slides right with a fade, accelerating, gone in ≈ 0.15 s.
+  - **Hover pauses** the timer (it stayed 10 s while hovered) and it leaves ≈ 1 s after the pointer leaves.
+  - **Same app twice:** the 2nd banner replaces the 1st in the same slot; no visible stack while showing. In NC they
+    become one stack.
+  - Banners are **suppressed while the screen is being recorded** (avfoundation/ffmpeg): "show notifications while
+    sharing" is off. So 60 fps video was impossible; these are `screencapture` bursts. (pixel bursts)
+
+### Notification Center (numbers only; the user's notifications were not captured)
+- Q-panels-31: The window is full screen (1710 × 1107, layer 23). Scroll area x 958..1710 (752 wide).
+  - **Column:** x **1350..1694 = 344 wide, right margin 16, top 44** (10 below the menu bar).
+  - **Cards:** 344 wide, gap **6**; heights 58 / 75 / 90 / 106.5 by content (as banners); continuous r 20.
+    - Fill **32 over black, 128 over white** (≈ 32 + 0.38·in). That is darker and more opaque than CC tiles
+      (32 + 0.60·in) and the banner over grey.
+    - Glass rim at the top/bottom.
+    - Variant not readable (other process). The CC/HUD style `_variant` 9/10 in AppKit doesn't match these values.
+  - **No scrim:** the backdrop is unchanged away from the column. Only a soft shadow/dim feathers ~50 pt around the
+    cards (255 → 200 right next to them, over white).
+  - **Widgets** (this account: Calendar small + Batteries small; not the stock set):
+    - grid 344 wide, **164 × 164**, gap 16, 16 below the last notification element;
+    - with icon & widget style "Dark", the **Calendar widget is opaque** (same 37 → 14 vertical gradient over white and
+      black);
+    - the Batteries widget is translucent (14 over black, 64 over white).
+  - **"Edit Widgets"** capsule 87 × 24 at the bottom (y 1010), centred on the column.
+  - **"N more notifications"** capsule 117.5–124.5 × 24, centred, glass (fill 31 over black, 166 over white). (AX + pixels)
+- Q-panels-32: **Groups:**
+  - section heading "Notification Centre" (159 × 21, ≈ SF 17 bold, white with a soft shadow) at x 1351, with a **"Clear
+    All"** 28 pt glass circle (xmark) at the right edge (x 1670).
+  - **Collapsed app stack:** the front card plus **2 plates peeking 8 pt each** below it (plate 1 fill ≈ 15, plate 2 ≈ 12
+    over black; narrower than the card).
+  - **Expanded group:**
+    - header = app name (SF ≈ 15 bold, 94.5 × 19) at x 1351;
+    - a "**Show less**" glass capsule 80.5 × 28 and a 28 pt "Clear" circle at the right;
+    - first card 3 below the header, cards gap 6;
+    - clicking the group's x morphs it into a "**Clear**" confirm capsule (56 × 28), while "Show less" shrinks to a
+      28 pt circle; a 2nd click clears the group.
+  - **Open and close:** slide in/out horizontally from the right edge, x only, no fade (REA: Spring(0.3, −0.2),
+    ratio 1.25). The recording (R2) shows ~0.3 s ease-out in and ~0.15 s accelerating out. No stagger. (AX + pixels)
+
+### Alerts and sheets (own probe `tools/probe/panels.swift`; layer dumps in `27.2.1/live/panels/`)
+- Q-panels-33: App-modal NSAlert, dark mode (light has the same geometry).
+  - **Size:** **260 wide**. Heights: 234 (2-line title + 1-line text), 274 (with text field + checkbox), 334 (3 buttons).
+  - **Icon:** **66 × 66 at (19, 19), left-aligned**, not centred. The critical style uses a caution triangle with the
+    app-icon badge.
+  - **Text:** title SF 13 bold at x 21, 14 below the icon; message SF 13 regular, 8 below the title; text width 218.
+  - **Position:** centred horizontally. Vertically the alert's top = 289.5 − h/4 (so the point h/4 down from its top
+    sits at 26 % of the screen height); this held for all three heights.
+  - **Dim scrim: none** for app-modal alerts. The desktop and the parent window are unchanged; the parent only goes
+    inactive.
+  - **2 buttons:** side by side. AX 112 × 30 (visible 110 × 28 capsules, r 14) at x 15 and 133, bottom 15 from the
+    edge. Default (first) on the **right**, Cancel on the left.
+  - **3 buttons: stacked vertically, full width** 230 × 30 (visible 228 × 28), pitch 34. Order top → bottom: default
+    (Save…), 3rd (Delete), Cancel.
+  - **Fills:**
+    - default = accent **(52, 120, 246)** with white text;
+    - other buttons = white ~4.7 % + 3 % layers (71, 72, 79 on the 55, 56, 63 dark alert body);
+    - text 13 regular (default 13 regular white).
+  - **Pressed:** the plain button gets lighter, 71 → 89 (+18). No size change seen. No hover state.
+  - **Destructive** (`hasDestructiveAction`): **red text (≈ 220, 57, 41)** on the grey capsule. It is not blue even when
+    it is the first button.
+  - **Glass:** regular glass, radius 26, in its own `_NSGlassEffectWindow` (as LIVE-27.2.1).
+  - **Accessories:**
+    - text field 222 × 26 at x 19, 14 below the message, with an accent focus ring and selection;
+    - suppression **checkbox** "Don’t ask again" (118 × 18) at x 21 under the field, 14 above the buttons.
+
+  (own probe: AX + pixels + layer dump)
+- Q-panels-34: **Sheets in 27.2.1 are centred on the parent window**, not hung from the titlebar:
+  - a 440 × 220 sheet on an 800 × 552 window sat at the exact centre (x and y);
+  - an NSAlert sheet (260 × 154) did the same.
+
+  **Custom sheet** (`beginSheet`):
+  - **solid** `windowBackgroundColor` (34, 35, 47 in dark), **continuous r 16** (fit ≈ 17.9), window shadow;
+  - **no glass**, no titlebar.
+
+  **Alert sheet:**
+  - **regular glass r 26** in an `_NSGlassEffectWindow`, the same recipe as the app-modal alert (only size-scaled inputs
+    differ: bleed 53.9 vs 91, outer refraction 38.5 vs 65, shadow 0.7 vs 0.8);
+  - **no icon** in the sheet form; buttons side by side as in Q-33.
+
+  **Parent dim:** with any sheet the **whole parent window, titlebar included, is dimmed ≈ 20 %** (content 32 → 26,
+  titlebar 40 → 29 in dark).
+
+  Timing: LIVE-27.2.1 (in 0.27 s, out 0.25 s).
+
+  **TextEdit Save sheet** (new untitled test doc, Cmd-S) agrees:
+  - 390 × 218, centred on the 586 × 488 parent;
+  - solid fill (35, 33, 46) in dark, continuous r ≈ 16–18;
+  - parent dimmed;
+  - rows Save As / Tags / File Format / Where: labels right-aligned at x 39, fields 232 × 26 at x 118.5;
+  - Cancel / Save capsules 81 × 26 at the bottom right, gap 6;
+  - the close-with-changes variant is 390 × 318, with "Delete" at the bottom left.
+
+  **Text field / checkbox alert:** see Q-33 (field 222 × 26, checkbox under it). (own probe: AX + pixels + layer dump)

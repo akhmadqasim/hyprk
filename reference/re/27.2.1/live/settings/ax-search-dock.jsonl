@@ -1,0 +1,253 @@
+{"d": 0, "role": "AXApplication", "title": "System Settings"}
+{"d": 1, "frame": [484, 232, 740, 625], "id": "Main", "role": "AXWindow", "sub": "AXStandardWindow", "title": "Desktop & Dock"}
+{"d": 2, "frame": [484, 232, 740, 625], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 3, "frame": [484, 232, 740, 625], "id": "Main, SidebarNavigationSplitView", "role": "AXSplitGroup"}
+{"d": 4, "frame": [484, 232, 232, 625], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 5, "enabled": "1", "frame": [600, 593.5, 0, 0], "role": "AXUnknown"}
+{"d": 5, "frame": [484, 330, 232, 527], "role": "AXScrollArea"}
+{"d": 6, "desc": "Sidebar", "enabled": "1", "frame": [484, 330, 232, 527], "id": "com.apple.settings.applicationSearch.collectionView", "role": "AXOutline"}
+{"d": 7, "frame": [484, 330, 232, 0], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 330, 212, 0], "role": "AXCell"}
+{"d": 9, "frame": [498, 330, 216, 0], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 7, "frame": [484, 330, 232, 45], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 330, 212, 45], "role": "AXCell"}
+{"d": 9, "desc": "Dock settings, Desktop & Dock", "enabled": "1", "frame": [501, 334, 127, 36.8], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.dockSettings", "role": "AXButton"}
+{"d": 7, "frame": [484, 375, 232, 45], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 375, 212, 45], "role": "AXCell"}
+{"d": 9, "desc": "Dock position on screen, Desktop & Dock", "enabled": "1", "frame": [501, 379, 175.5, 36.8], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.positionOnSc", "role": "AXButton"}
+{"d": 7, "frame": [484, 420, 232, 45], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 420, 212, 45], "role": "AXCell"}
+{"d": 9, "desc": "Desktop & Dock Settings, Desktop & Dock", "enabled": "1", "frame": [501, 424, 181, 36.8], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.root", "role": "AXButton"}
+{"d": 7, "frame": [484, 465, 232, 61], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 465, 212, 61], "role": "AXCell"}
+{"d": 9, "desc": "Automatically hide and show the Dock, Desktop & Dock", "enabled": "1", "frame": [501, 469, 170.5, 52.8], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.automaticall", "role": "AXButton"}
+{"d": 7, "frame": [484, 526, 232, 61], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 526, 212, 61], "role": "AXCell"}
+{"d": 9, "desc": "Show suggested and recent apps in Dock, Desktop & Dock", "enabled": "1", "frame": [501, 530, 159.5, 52.8], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.showSuggeste", "role": "AXButton"}
+{"d": 7, "frame": [484, 587, 232, 61], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 587, 212, 61], "role": "AXCell"}
+{"d": 9, "desc": "Show Widgets In Stage Manager, Desktop & Dock", "enabled": "1", "frame": [501, 591, 134, 52.8], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.showWidgetsI", "role": "AXButton"}
+{"d": 7, "frame": [484, 648, 232, 61], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 648, 212, 61], "role": "AXCell"}
+{"d": 9, "desc": "Visible Items In Stage Manager, Desktop & Dock", "enabled": "1", "frame": [501, 652, 127, 52.8], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.showItemsInS", "role": "AXButton"}
+{"d": 7, "frame": [484, 709, 232, 77], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 709, 212, 77], "role": "AXCell"}
+{"d": 9, "desc": "Drag windows to top of screen to enter Mission Control, Desktop & Dock", "enabled": "1", "frame": [501, 713, 174, 68.8], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.enterMission", "role": "AXButton"}
+{"d": 7, "frame": [484, 786, 232, 45], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 786, 212, 45], "role": "AXCell"}
+{"d": 9, "desc": "Window Tiling, Desktop & Dock", "enabled": "1", "frame": [501, 790, 127, 36.8], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.windowTiling", "role": "AXButton"}
+{"d": 7, "frame": [484, 831, 232, 45], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 831, 212, 45], "role": "AXCell"}
+{"d": 9, "desc": "Stage Manager, Desktop & Dock", "enabled": "1", "frame": [501, 835, 127, 36.8], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.stageManager", "role": "AXButton"}
+{"d": 7, "frame": [484, 876, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 876, 212, 45], "role": "AXCell"}
+{"d": 9, "desc": "Hot Corner Shortcuts, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.hotCornerSho", "role": "AXButton"}
+{"d": 7, "frame": [484, 908, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 908, 212, 61], "role": "AXCell"}
+{"d": 9, "desc": "Ask to keep changes when closing documents, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.askToKeepCha", "role": "AXButton"}
+{"d": 7, "frame": [484, 969, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 969, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Drag windows to menu bar to fill screen, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.dragToTopScr", "role": "AXButton"}
+{"d": 7, "frame": [484, 1001, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 972, 212, 45], "role": "AXCell"}
+{"d": 9, "desc": "Desktop, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.desktop", "role": "AXButton"}
+{"d": 7, "frame": [484, 1017, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1017, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Set up Spaces, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.setUpSpaces", "role": "AXButton"}
+{"d": 7, "frame": [484, 1049, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1049, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Show recent apps in Stage Manager, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.showRecentAp", "role": "AXButton"}
+{"d": 7, "frame": [484, 1081, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1068, 212, 61], "role": "AXCell"}
+{"d": 9, "desc": "Tiled windows have margins, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.marginsEnabl", "role": "AXButton"}
+{"d": 7, "frame": [484, 1129, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1129, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Hold ⌥ key while dragging windows to tile, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.optionDrag", "role": "AXButton"}
+{"d": 7, "frame": [484, 1161, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1161, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Automatically rearrange Spaces based on most recent use, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.automaticall", "role": "AXButton"}
+{"d": 7, "frame": [484, 1193, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1193, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Click wallpaper to show desktop, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.clickWallpap", "role": "AXButton"}
+{"d": 7, "frame": [484, 1225, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1225, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Dim widgets on desktop, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.widgetAppear", "role": "AXButton"}
+{"d": 7, "frame": [484, 1257, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1257, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Default web browser, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.defaultWebBr", "role": "AXButton"}
+{"d": 7, "frame": [484, 1289, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1289, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Displays have separate Spaces, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.displaysHave", "role": "AXButton"}
+{"d": 7, "frame": [484, 1321, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1321, 212, 93], "role": "AXCell"}
+{"d": 9, "desc": "When switching to an application, switch to a Space with open windows for the ap", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.whenSwitchin", "role": "AXButton"}
+{"d": 7, "frame": [484, 1414, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1414, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Widget settings, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.widgetSettin", "role": "AXButton"}
+{"d": 7, "frame": [484, 1446, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1446, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Visible Items On Desktop, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.showItemsOnD", "role": "AXButton"}
+{"d": 7, "frame": [484, 1478, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1417, 212, 61], "role": "AXCell"}
+{"d": 9, "desc": "Close windows when quitting an application, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.closeWindows", "role": "AXButton"}
+{"d": 7, "frame": [484, 1478, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1478, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Window title bar double-click action, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.doubleClickA", "role": "AXButton"}
+{"d": 7, "frame": [484, 1510, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1510, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Show Widgets On Desktop, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.showWidgetsO", "role": "AXButton"}
+{"d": 7, "frame": [484, 1542, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1542, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Drag windows to left or right edge of screen to tile, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.dragToScreen", "role": "AXButton"}
+{"d": 7, "frame": [484, 1545, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1545, 212, 61], "role": "AXCell"}
+{"d": 9, "desc": "Keyboard and Mouse Shortcuts, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.keyboardAndM", "role": "AXButton"}
+{"d": 7, "frame": [484, 1606, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1606, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Stage Manager settings, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.stageManager", "role": "AXButton"}
+{"d": 7, "frame": [484, 1638, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1638, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Close and restore windows, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.closeAndRest", "role": "AXButton"}
+{"d": 7, "frame": [484, 1641, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1641, 212, 61], "role": "AXCell"}
+{"d": 9, "desc": "Prefer tabs when opening documents, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.preferTabsWh", "role": "AXButton"}
+{"d": 7, "frame": [484, 1702, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1702, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Show windows from an application, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.showWindowsF", "role": "AXButton"}
+{"d": 7, "frame": [484, 1734, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1734, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Group windows by application, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.groupWindows", "role": "AXButton"}
+{"d": 7, "frame": [484, 1766, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1737, 212, 61], "role": "AXCell"}
+{"d": 9, "desc": "Minimised window animation, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.minimizeWind", "role": "AXButton"}
+{"d": 7, "frame": [484, 1798, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1798, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Magnification, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.magnificatio", "role": "AXButton"}
+{"d": 7, "frame": [484, 1830, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1830, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Size, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.size", "role": "AXButton"}
+{"d": 7, "frame": [484, 1862, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1862, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Minimise windows into application icon, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.minimizeWind", "role": "AXButton"}
+{"d": 7, "frame": [484, 1865, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1865, 212, 45], "role": "AXCell"}
+{"d": 9, "desc": "Keyboard shortcuts, Keyboard", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenKeyboardSettingsSettingsDeepLink.KeyboardSettingsSettingsDeepLink.keyboardSh", "role": "AXButton"}
+{"d": 7, "frame": [484, 1910, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1910, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Show indicators for open applications, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.showIndicato", "role": "AXButton"}
+{"d": 7, "frame": [484, 1942, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1942, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Animate opening applications, Desktop & Dock", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "OpenDesktopSettingsSettingsDeepLink.DesktopSettingsSettingsDeepLink.animateOpeni", "role": "AXButton"}
+{"d": 7, "frame": [494, 330, 212, 1641], "id": "ListColumn", "role": "AXColumn"}
+{"d": 6, "enabled": "1", "frame": [698, 329, 19, 529], "role": "AXScrollBar", "value": "0"}
+{"d": 7, "frame": [707, 333, 6, 187], "role": "AXValueIndicator", "value": "0"}
+{"d": 7, "frame": [699, 330, 0, 0], "role": "AXButton", "sub": "AXIncrementArrow"}
+{"d": 7, "frame": [699, 330, 0, 0], "role": "AXButton", "sub": "AXDecrementArrow"}
+{"d": 7, "frame": [707, 520.5, 6, 333.5], "role": "AXButton", "sub": "AXIncrementPage"}
+{"d": 7, "frame": [707, 333, 6, 0], "role": "AXButton", "sub": "AXDecrementPage"}
+{"d": 4, "frame": [494, 293, 212, 28], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 5, "enabled": "1", "frame": [494, 293, 212, 28], "role": "AXTextField", "sub": "AXSearchField", "value": "dock"}
+{"d": 6, "desc": "Search", "enabled": "1", "frame": [497, 293.5, 25, 28], "role": "AXButton"}
+{"d": 6, "desc": "cancel", "enabled": "1", "frame": [678, 293.5, 28, 28], "role": "AXButton"}
+{"d": 4, "enabled": "0", "frame": [715.5, 284, 0.5, 573], "role": "AXSplitter", "value": "231.5"}
+{"d": 4, "frame": [484, 232, 740, 625], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 5, "frame": [484, 232, 740, 625], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 6, "frame": [716, 284, 508, 573], "role": "AXScrollArea"}
+{"d": 7, "desc": "Dock", "enabled": "1", "frame": [746, 296, 32.5, 16], "role": "AXHeading"}
+{"d": 7, "enabled": "1", "frame": [736, 322, 468, 69], "role": "AXGroup"}
+{"d": 8, "desc": "Dock Size", "enabled": "1", "frame": [746, 332, 200, 34], "role": "AXSlider", "value": "0.1517857164144516"}
+{"d": 8, "desc": "Dock Magnification Size", "enabled": "1", "frame": [974, 332, 220, 34], "role": "AXSlider", "value": "0"}
+{"d": 7, "enabled": "1", "frame": [736, 401, 468, 151], "role": "AXGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 411, 146.5, 16], "role": "AXStaticText", "value": "Dock position on screen"}
+{"d": 8, "enabled": "1", "frame": [1102, 407, 92, 24], "id": "position", "role": "AXPopUpButton", "value": "Bottom"}
+{"d": 8, "enabled": "1", "frame": [746, 449.2, 173.5, 16], "role": "AXStaticText", "value": "Minimised window animation"}
+{"d": 8, "enabled": "1", "frame": [1071.5, 445.5, 122.5, 24], "id": "minimize-windows", "role": "AXPopUpButton", "value": "Genie Effect"}
+{"d": 8, "enabled": "1", "frame": [746, 487.5, 218.5, 16], "role": "AXStaticText", "value": "Window title bar double-click action"}
+{"d": 8, "enabled": "1", "frame": [1111.5, 483.5, 82.5, 24], "id": "double-click", "role": "AXPopUpButton", "value": "Zoom"}
+{"d": 8, "enabled": "1", "frame": [746, 525.7, 235, 16], "role": "AXStaticText", "value": "Minimise windows into application icon"}
+{"d": 8, "enabled": "1", "frame": [1158, 526, 36, 16], "id": "minimize-into-app", "role": "AXCheckBox", "sub": "AXSwitch", "value": "1"}
+{"d": 7, "enabled": "1", "frame": [736, 562, 468, 149], "role": "AXGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 572.2, 231, 16], "role": "AXStaticText", "value": "Automatically hide and show the Dock"}
+{"d": 8, "enabled": "1", "frame": [1158, 572.5, 36, 16], "id": "auto-hide-dock", "role": "AXCheckBox", "sub": "AXSwitch", "value": "0"}
+{"d": 8, "enabled": "1", "frame": [746, 609.7, 179, 16], "role": "AXStaticText", "value": "Animate opening applications"}
+{"d": 8, "enabled": "1", "frame": [1158, 610, 36, 16], "id": "animate-app-opening", "role": "AXCheckBox", "sub": "AXSwitch", "value": "1"}
+{"d": 8, "enabled": "1", "frame": [746, 647.2, 227.5, 16], "role": "AXStaticText", "value": "Show indicators for open applications"}
+{"d": 8, "enabled": "1", "frame": [1158, 647.5, 36, 16], "id": "show-indicators", "role": "AXCheckBox", "sub": "AXSwitch", "value": "1"}
+{"d": 8, "enabled": "1", "frame": [746, 684.7, 251, 16], "role": "AXStaticText", "value": "Show suggested and recent apps in Dock"}
+{"d": 8, "enabled": "1", "frame": [1158, 685, 36, 16], "id": "show-recents", "role": "AXCheckBox", "sub": "AXSwitch", "value": "1"}
+{"d": 7, "desc": "Desktop & Stage Manager", "enabled": "1", "frame": [746, 741.2, 164.5, 16], "role": "AXHeading"}
+{"d": 7, "enabled": "1", "frame": [736, 767, 468, 103.5], "role": "AXGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 777.2, 70, 16], "role": "AXStaticText", "value": "Show items"}
+{"d": 8, "desc": "On Desktop", "enabled": "1", "frame": [958, 777.2, 92.5, 16.3], "id": "show-items-on-desktop", "role": "AXCheckBox", "value": "1"}
+{"d": 8, "desc": "In Stage Manager", "enabled": "1", "frame": [1066.5, 777.2, 127.5, 16.3], "id": "show-items-in-stage-manager", "role": "AXCheckBox", "value": "0"}
+{"d": 8, "enabled": "1", "frame": [746, 814.6, 195.5, 16], "role": "AXStaticText", "value": "Click wallpaper to show desktop"}
+{"d": 8, "enabled": "1", "frame": [746, 832.6, 333.5, 28], "role": "AXStaticText", "value": "Click wallpaper to move windows out of the way, revealing your desktop items and"}
+{"d": 8, "enabled": "1", "frame": [1104, 811, 90, 24], "id": "click-wallpaper-to-reveal-desktop", "role": "AXPopUpButton", "value": "Always"}
+{"d": 7, "enabled": "1", "frame": [736, 880.5, 468, 142], "role": "AXGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 890.6, 92, 16], "role": "AXStaticText", "value": "Stage Manager"}
+{"d": 8, "enabled": "1", "frame": [746, 908.6, 401, 28], "role": "AXStaticText", "value": "Stage Manager arranges your recent windows into a single strip for reduced clutt"}
+{"d": 8, "enabled": "1", "frame": [1158, 891, 36, 16], "id": "stage-manager-on", "role": "AXCheckBox", "sub": "AXSwitch", "value": "0"}
+{"d": 8, "enabled": "1", "frame": [746, 957.6, 218.5, 16], "role": "AXStaticText", "value": "Show recent apps in Stage Manager"}
+{"d": 8, "enabled": "1", "frame": [1158, 958, 36, 16], "id": "recent-applications", "role": "AXCheckBox", "sub": "AXSwitch", "value": "1"}
+{"d": 8, "enabled": "1", "frame": [746, 995.1, 209, 16], "role": "AXStaticText", "value": "Show windows from an application"}
+{"d": 8, "enabled": "1", "frame": [1080, 991.5, 114, 24], "id": "show-windows-from-application", "role": "AXPopUpButton", "value": "All at Once"}
+{"d": 7, "desc": "Widgets", "enabled": "1", "frame": [746, 1052.4, 52.5, 16], "role": "AXHeading"}
+{"d": 7, "enabled": "1", "frame": [736, 1078.5, 468, 74.5], "role": "AXGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 1088.4, 87, 16], "role": "AXStaticText", "value": "Show Widgets"}
+{"d": 8, "desc": "On Desktop", "enabled": "1", "frame": [958, 1088.4, 92.5, 16.6], "id": "show-desktop-widgets", "role": "AXCheckBox", "value": "1"}
+{"d": 8, "desc": "In Stage Manager", "enabled": "1", "frame": [1066.5, 1088.4, 127.5, 16.6], "id": "show-stage-manager-widgets", "role": "AXCheckBox", "value": "1"}
+{"d": 8, "enabled": "1", "frame": [746, 1125.8, 146.5, 16], "role": "AXStaticText", "value": "Dim widgets on desktop"}
+{"d": 8, "enabled": "1", "frame": [1064.5, 1122, 129.5, 24], "id": "widget-style", "role": "AXPopUpButton", "value": "Automatically"}
+{"d": 7, "enabled": "1", "frame": [736, 1163, 468, 37.5], "role": "AXGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 1173, 124.5, 16], "role": "AXStaticText", "value": "Default web browser"}
+{"d": 8, "enabled": "1", "frame": [1087.5, 1169.5, 106.5, 24], "id": "default-web-browser", "role": "AXPopUpButton", "value": "Safari"}
+{"d": 7, "desc": "Windows", "enabled": "1", "frame": [746, 1230.3, 57.5, 16], "role": "AXHeading"}
+{"d": 7, "enabled": "1", "frame": [736, 1256.5, 468, 141.5], "role": "AXGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 1266.3, 226.5, 16], "role": "AXStaticText", "value": "Prefer tabs when opening documents"}
+{"d": 8, "enabled": "1", "frame": [1064.5, 1262.5, 129.5, 24], "id": "prefer-tabs", "role": "AXPopUpButton", "value": "In Full Screen"}
+{"d": 8, "enabled": "1", "frame": [746, 1304.5, 280, 16], "role": "AXStaticText", "value": "Ask to keep changes when closing documents"}
+{"d": 8, "enabled": "1", "frame": [1158, 1305, 36, 16], "id": "ask-to-save-changes", "role": "AXCheckBox", "sub": "AXSwitch", "value": "0"}
+{"d": 8, "enabled": "1", "frame": [746, 1342, 264.5, 16], "role": "AXStaticText", "value": "Close windows when quitting an application"}
+{"d": 8, "enabled": "1", "frame": [746, 1360, 400.5, 28], "role": "AXStaticText", "value": "When enabled, open documents and windows will not be restored when you reopen an"}
+{"d": 8, "enabled": "1", "frame": [1158, 1342.5, 36, 16], "id": "restore-Windows", "role": "AXCheckBox", "sub": "AXSwitch", "value": "1"}
+{"d": 7, "enabled": "1", "frame": [736, 1408, 468, 149], "role": "AXGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 1418, 304, 16], "role": "AXStaticText", "value": "Drag windows to left or right edge of screen to tile"}
+{"d": 8, "enabled": "1", "frame": [1158, 1418.5, 36, 16], "id": "tile-on-edge-drag", "role": "AXCheckBox", "sub": "AXSwitch", "value": "1"}
+{"d": 8, "enabled": "1", "frame": [746, 1455.5, 239.5, 16], "role": "AXStaticText", "value": "Drag windows to menu bar to fill screen"}
+{"d": 8, "enabled": "1", "frame": [1158, 1456, 36, 16], "id": "tile-on-top-edge-drag", "role": "AXCheckBox", "sub": "AXSwitch", "value": "1"}
+{"d": 8, "enabled": "1", "frame": [746, 1493, 255.5, 16], "role": "AXStaticText", "value": "Hold ⌥ key while dragging windows to tile"}
+{"d": 8, "enabled": "1", "frame": [1158, 1493.5, 36, 16], "id": "tile-option-accelerator", "role": "AXCheckBox", "sub": "AXSwitch", "value": "1"}
+{"d": 8, "enabled": "1", "frame": [746, 1530.5, 170, 16], "role": "AXStaticText", "value": "Tiled windows have margins"}
+{"d": 8, "enabled": "1", "frame": [1158, 1531, 36, 16], "id": "tile-margins", "role": "AXCheckBox", "sub": "AXSwitch", "value": "0"}
+{"d": 7, "desc": "Mission Control", "enabled": "1", "frame": [746, 1587, 98.5, 16], "role": "AXHeading"}
+{"d": 7, "enabled": "1", "frame": [746, 1604.5, 423, 28], "role": "AXStaticText", "value": "Mission Control shows an overview of your open windows and thumbnails of full-sc"}
+{"d": 7, "enabled": "1", "frame": [736, 1642.5, 468, 202], "role": "AXGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 1652.5, 353, 16], "role": "AXStaticText", "value": "Automatically rearrange Spaces based on most recent use"}
+{"d": 8, "enabled": "1", "frame": [1158, 1653, 36, 16], "id": "auto-reorder-spaces", "role": "AXCheckBox", "sub": "AXSwitch", "value": "1"}
+{"d": 8, "enabled": "1", "frame": [746, 1690, 380.5, 32], "role": "AXStaticText", "value": "When switching to an application, switch to a Space with open windows for the ap"}
+{"d": 8, "enabled": "1", "frame": [1158, 1690.5, 36, 16], "id": "switch-space-on-active", "role": "AXCheckBox", "sub": "AXSwitch", "value": "0"}
+{"d": 8, "enabled": "1", "frame": [746, 1743, 181.5, 16], "role": "AXStaticText", "value": "Group windows by application"}
+{"d": 8, "enabled": "1", "frame": [1158, 1743.5, 36, 16], "id": "group-windows-by-application", "role": "AXCheckBox", "sub": "AXSwitch", "value": "0"}
+{"d": 8, "enabled": "1", "frame": [746, 1780.5, 187.5, 16], "role": "AXStaticText", "value": "Displays have separate Spaces"}
+{"d": 8, "enabled": "1", "frame": [1158, 1781, 36, 16], "id": "displays-have-separate-spaces", "role": "AXCheckBox", "sub": "AXSwitch", "value": "1"}
+{"d": 8, "enabled": "1", "frame": [746, 1818, 333.5, 16], "role": "AXStaticText", "value": "Drag windows to top of screen to enter Mission Control"}
+{"d": 8, "enabled": "1", "frame": [1158, 1818.5, 36, 16], "id": "enter-mission-control-by-top-window-drag", "role": "AXCheckBox", "sub": "AXSwitch", "value": "1"}
+{"d": 7, "desc": "Shortcuts…", "enabled": "1", "frame": [962.5, 1864.5, 93.5, 24], "role": "AXButton"}
+{"d": 7, "desc": "Hot Corners…", "enabled": "1", "frame": [1064, 1864.5, 108, 24], "role": "AXButton"}
+{"d": 7, "desc": "Help", "enabled": "1", "frame": [1180, 1864.5, 24, 24], "role": "AXButton"}
+{"d": 7, "enabled": "1", "frame": [1206, 283, 19, 575], "role": "AXScrollBar", "value": "0"}
+{"d": 8, "frame": [1215, 287, 6, 211], "role": "AXValueIndicator", "value": "0"}
+{"d": 8, "frame": [1207, 284, 0, 0], "role": "AXButton", "sub": "AXIncrementArrow"}
+{"d": 8, "frame": [1207, 284, 0, 0], "role": "AXButton", "sub": "AXDecrementArrow"}
+{"d": 8, "frame": [1215, 498.5, 6, 355.5], "role": "AXButton", "sub": "AXIncrementPage"}
+{"d": 8, "frame": [1215, 287, 6, 0], "role": "AXButton", "sub": "AXDecrementPage"}
+{"d": 2, "frame": [484, 232, 740, 52], "role": "AXToolbar"}
+{"d": 3, "frame": [720, 232, 81, 52], "role": "AXGroup"}
+{"d": 4, "enabled": "1", "frame": [724, 240, 73, 36], "role": "AXGroup"}
+{"d": 5, "desc": "Go Back", "enabled": "1", "frame": [724, 240, 36, 36], "help": "Go Back", "id": "chevron.backward", "role": "AXButton", "sub": "AXSegment"}
+{"d": 5, "desc": "Go Forward", "enabled": "0", "frame": [760, 240, 37, 36], "help": "Go Forward", "id": "chevron.forward", "role": "AXMenuButton", "sub": "AXSegment"}
+{"d": 2, "enabled": "1", "frame": [502, 250, 16, 16], "role": "AXButton", "sub": "AXCloseButton"}
+{"d": 2, "enabled": "1", "frame": [548, 250, 16, 16], "role": "AXButton", "sub": "AXZoomButton"}
+{"d": 3, "frame": [549, 251, 14, 14], "role": "AXGroup"}
+{"d": 2, "enabled": "1", "frame": [525, 250, 16, 16], "role": "AXButton", "sub": "AXMinimizeButton"}
+{"d": 2, "enabled": "1", "frame": [801, 232, 411, 52], "role": "AXStaticText", "value": "Desktop & Dock"}

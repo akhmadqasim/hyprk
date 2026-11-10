@@ -1,0 +1,330 @@
+{
+  "focus" : [
+    {
+      "firstResponder" : "NSButton",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        66,
+        24
+      ],
+      "frameInWindow" : [
+        460,
+        516,
+        66,
+        24
+      ],
+      "name" : "push"
+    },
+    {
+      "firstResponder" : "NSButton",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        42.5,
+        24
+      ],
+      "frameInWindow" : [
+        560,
+        516,
+        42.5,
+        24
+      ],
+      "name" : "push-default"
+    },
+    {
+      "firstResponder" : "NSButton",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        49,
+        20
+      ],
+      "frameInWindow" : [
+        580,
+        436,
+        49,
+        20
+      ],
+      "name" : "push-small"
+    },
+    {
+      "firstResponder" : "NSButton",
+      "focusRingMaskBounds" : [
+        -0.5,
+        -0.5,
+        58.5,
+        25
+      ],
+      "frameInWindow" : [
+        20,
+        126,
+        57.5,
+        24
+      ],
+      "name" : "push-glass"
+    },
+    {
+      "firstResponder" : "NSButton",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        24,
+        24
+      ],
+      "frameInWindow" : [
+        460,
+        386,
+        24,
+        24
+      ],
+      "name" : "help"
+    },
+    {
+      "firstResponder" : "NSSwitch",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        0,
+        0
+      ],
+      "frameInWindow" : [
+        200,
+        436,
+        54,
+        24
+      ],
+      "name" : "switch-on"
+    },
+    {
+      "firstResponder" : "NSSwitch",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        0,
+        0
+      ],
+      "frameInWindow" : [
+        270,
+        436,
+        54,
+        24
+      ],
+      "name" : "switch-off"
+    },
+    {
+      "firstResponder" : "NSButton",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        39.5,
+        16
+      ],
+      "frameInWindow" : [
+        20,
+        496,
+        39.5,
+        16
+      ],
+      "name" : "checkbox-on"
+    },
+    {
+      "firstResponder" : "NSButton",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        41.5,
+        16
+      ],
+      "frameInWindow" : [
+        20,
+        524,
+        41.5,
+        16
+      ],
+      "name" : "checkbox-off"
+    },
+    {
+      "firstResponder" : "NSButton",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        75,
+        16
+      ],
+      "frameInWindow" : [
+        20,
+        374,
+        75,
+        16
+      ],
+      "name" : "radio-on"
+    },
+    {
+      "firstResponder" : "NSPopUpButton",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        109,
+        24
+      ],
+      "frameInWindow" : [
+        200,
+        306,
+        109,
+        24
+      ],
+      "name" : "popup"
+    },
+    {
+      "firstResponder" : "NSPopUpButton",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        108.5,
+        24
+      ],
+      "frameInWindow" : [
+        680,
+        214,
+        108.5,
+        24
+      ],
+      "name" : "pulldown"
+    },
+    {
+      "firstResponder" : "NSSegmentedControl",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        157.5,
+        24
+      ],
+      "frameInWindow" : [
+        200,
+        516,
+        157.5,
+        24
+      ],
+      "name" : "segmented"
+    },
+    {
+      "firstResponder" : "NSSlider",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        0,
+        0
+      ],
+      "frameInWindow" : [
+        200,
+        394,
+        220,
+        16
+      ],
+      "name" : "slider"
+    },
+    {
+      "firstResponder" : "NSTextView",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        200,
+        24
+      ],
+      "frameInWindow" : [
+        200,
+        266,
+        200,
+        24
+      ],
+      "name" : "textfield"
+    },
+    {
+      "firstResponder" : "NSTextView",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        200,
+        24
+      ],
+      "frameInWindow" : [
+        460,
+        136,
+        200,
+        24
+      ],
+      "name" : "textfield-rounded"
+    },
+    {
+      "firstResponder" : "NSTextView",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        200,
+        24
+      ],
+      "frameInWindow" : [
+        200,
+        196,
+        200,
+        24
+      ],
+      "name" : "searchfield"
+    },
+    {
+      "firstResponder" : "NSStepper",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        20,
+        24
+      ],
+      "frameInWindow" : [
+        420,
+        266,
+        20,
+        24
+      ],
+      "name" : "stepper"
+    },
+    {
+      "firstResponder" : "NSColorWell",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        48,
+        24
+      ],
+      "frameInWindow" : [
+        540,
+        296,
+        48,
+        24
+      ],
+      "name" : "colorwell"
+    },
+    {
+      "firstResponder" : "NSTextView",
+      "focusRingMaskBounds" : [
+        0,
+        0,
+        150,
+        24
+      ],
+      "frameInWindow" : [
+        680,
+        36,
+        150,
+        24
+      ],
+      "name" : "combobox"
+    }
+  ],
+  "windowFrame" : [
+    120,
+    120,
+    900,
+    592
+  ]
+}

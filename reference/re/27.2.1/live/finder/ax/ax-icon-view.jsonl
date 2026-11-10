@@ -1,0 +1,101 @@
+{"d": 1, "frame": [300, 150, 920, 560], "id": "FinderWindow", "role": "AXWindow", "sub": "AXStandardWindow", "title": "finder-demo"}
+{"d": 2, "frame": [300, 150, 920, 560], "role": "AXSplitGroup"}
+{"d": 3, "frame": [300, 202, 163, 508], "id": "_NS:61", "role": "AXScrollArea"}
+{"d": 4, "desc": "sidebar", "enabled": "1", "frame": [299, 201, 165, 510], "id": "_NS:8", "role": "AXOutline"}
+{"d": 5, "frame": [300, 202, 163, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 6, "enabled": "1", "frame": [310, 202, 143, 32], "role": "AXCell"}
+{"d": 7, "enabled": "1", "frame": [345, 209, 101, 18], "role": "AXStaticText", "value": "Recents"}
+{"d": 5, "frame": [300, 234, 163, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 6, "enabled": "1", "frame": [310, 234, 143, 32], "role": "AXCell"}
+{"d": 7, "enabled": "1", "frame": [345, 241, 101, 18], "role": "AXStaticText", "value": "Shared"}
+{"d": 5, "frame": [300, 279, 163, 19], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 6, "enabled": "1", "frame": [310, 279, 143, 19], "role": "AXCell"}
+{"d": 7, "enabled": "1", "frame": [315, 278, 145, 21], "id": "xSidebarHeader", "role": "AXStaticText", "value": "Favourites"}
+{"d": 5, "frame": [300, 298, 163, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 6, "enabled": "1", "frame": [310, 298, 143, 32], "role": "AXCell"}
+{"d": 7, "enabled": "1", "frame": [345, 305, 101, 18], "role": "AXStaticText", "value": "Applications"}
+{"d": 5, "frame": [300, 330, 163, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 6, "enabled": "1", "frame": [310, 330, 143, 32], "role": "AXCell"}
+{"d": 7, "enabled": "1", "frame": [345, 337, 101, 18], "role": "AXStaticText", "value": "Downloads"}
+{"d": 5, "frame": [300, 362, 163, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 6, "enabled": "1", "frame": [310, 362, 143, 32], "role": "AXCell"}
+{"d": 7, "enabled": "1", "frame": [345, 369, 101, 18], "role": "AXStaticText", "value": "(redacted)"}
+{"d": 5, "frame": [300, 394, 163, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 6, "enabled": "1", "frame": [310, 394, 143, 32], "role": "AXCell"}
+{"d": 7, "enabled": "1", "frame": [345, 401, 101, 18], "role": "AXStaticText", "value": "(redacted)"}
+{"d": 5, "frame": [300, 426, 163, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 6, "enabled": "1", "frame": [310, 426, 143, 32], "role": "AXCell"}
+{"d": 7, "enabled": "1", "frame": [345, 433, 82, 18], "role": "AXStaticText", "value": "(redacted)"}
+{"d": 7, "enabled": "1", "frame": [427, 432, 20, 20], "role": "AXButton"}
+{"d": 5, "frame": [300, 458, 163, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 6, "enabled": "1", "frame": [310, 458, 143, 32], "role": "AXCell"}
+{"d": 7, "enabled": "1", "frame": [345, 465, 82, 18], "role": "AXStaticText", "value": "(redacted)"}
+{"d": 7, "enabled": "1", "frame": [427, 464, 20, 20], "role": "AXButton"}
+{"d": 5, "frame": [300, 503, 163, 19], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 6, "enabled": "1", "frame": [310, 503, 143, 19], "role": "AXCell"}
+{"d": 7, "enabled": "1", "frame": [315, 502, 145, 21], "id": "xSidebarHeader", "role": "AXStaticText", "value": "Locations"}
+{"d": 5, "frame": [300, 522, 163, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 6, "enabled": "1", "frame": [310, 522, 143, 32], "role": "AXCell"}
+{"d": 7, "enabled": "1", "frame": [345, 529, 101, 18], "role": "AXStaticText", "value": "(redacted)"}
+{"d": 5, "frame": [300, 554, 163, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 6, "enabled": "1", "frame": [310, 554, 143, 32], "role": "AXCell"}
+{"d": 7, "enabled": "1", "frame": [345, 561, 101, 18], "role": "AXStaticText", "value": "(redacted)"}
+{"d": 5, "frame": [300, 586, 163, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 6, "enabled": "1", "frame": [310, 586, 143, 32], "role": "AXCell"}
+{"d": 7, "enabled": "1", "frame": [345, 593, 101, 18], "role": "AXStaticText", "value": "AirDrop"}
+{"d": 5, "frame": [300, 618, 163, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 6, "enabled": "1", "frame": [310, 618, 143, 32], "role": "AXCell"}
+{"d": 7, "enabled": "1", "frame": [345, 625, 101, 18], "role": "AXStaticText", "value": "Bin"}
+{"d": 5, "frame": [310, 202, 143, 508], "id": "AutomaticTableColumnIdentifier.0", "role": "AXColumn"}
+{"d": 3, "enabled": "0", "frame": [462.5, 202, 0.5, 508], "role": "AXSplitter", "value": "162.5"}
+{"d": 3, "frame": [300, 150, 920, 560], "role": "AXSplitGroup"}
+{"d": 4, "frame": [463, 202, 757, 480], "id": "_NS:23", "role": "AXScrollArea"}
+{"d": 5, "desc": "icon view", "enabled": "1", "frame": [463, 202, 757, 480], "id": "IconView", "role": "AXList", "sub": "AXCollectionList"}
+{"d": 6, "enabled": "0", "frame": [473, 212, 672, 224], "role": "AXList", "sub": "AXSectionList"}
+{"d": 7, "enabled": "0", "frame": [473, 212, 672, 224], "role": "AXGroup"}
+{"d": 7, "enabled": "0", "frame": [497, 216, 64, 64], "id": "Archive", "role": "AXGroup"}
+{"d": 8, "desc": "Archive", "enabled": "1", "frame": [497, 216, 64, 64], "id": "Archive", "role": "AXImage", "title": "Archive"}
+{"d": 7, "enabled": "0", "frame": [609, 216, 64, 64], "id": "Backup.zip", "role": "AXGroup"}
+{"d": 8, "desc": "Backup.zip", "enabled": "1", "frame": [609, 216, 64, 64], "id": "Backup.zip", "role": "AXImage", "title": "Backup.zip"}
+{"d": 7, "enabled": "0", "frame": [721, 216, 64, 64], "id": "Meeting notes from the planning session in November.txt", "role": "AXGroup"}
+{"d": 8, "desc": "Meeting notes from the planning session in November.txt", "enabled": "1", "frame": [721, 216, 64, 64], "id": "Meeting notes from the planning session in November.txt", "role": "AXImage", "title": "Meeting notes from the planning session in November.txt"}
+{"d": 7, "enabled": "0", "frame": [833, 216, 64, 64], "id": "Notes.txt", "role": "AXGroup"}
+{"d": 8, "desc": "Notes.txt", "enabled": "1", "frame": [833, 216, 64, 64], "id": "Notes.txt", "role": "AXImage", "title": "Notes.txt"}
+{"d": 7, "enabled": "0", "frame": [945, 216, 64, 64], "id": "Old Letter.rtf", "role": "AXGroup"}
+{"d": 8, "desc": "Old Letter.rtf", "enabled": "1", "frame": [945, 216, 64, 64], "id": "Old Letter.rtf", "role": "AXImage", "title": "Old Letter.rtf"}
+{"d": 7, "enabled": "0", "frame": [1057, 216, 64, 64], "id": "Photos", "role": "AXGroup"}
+{"d": 8, "desc": "Photos", "enabled": "1", "frame": [1057, 216, 64, 64], "id": "Photos", "role": "AXImage", "title": "Photos"}
+{"d": 7, "enabled": "0", "frame": [497, 328, 64, 64], "id": "Projects", "role": "AXGroup"}
+{"d": 8, "desc": "Projects", "enabled": "1", "frame": [497, 328, 64, 64], "id": "Projects", "role": "AXImage", "title": "Projects"}
+{"d": 7, "enabled": "0", "frame": [609, 328, 64, 64], "id": "Report.pdf", "role": "AXGroup"}
+{"d": 8, "desc": "Report.pdf", "enabled": "1", "frame": [609, 328, 64, 64], "id": "Report.pdf", "role": "AXImage", "title": "Report.pdf"}
+{"d": 7, "enabled": "0", "frame": [721, 328, 64, 64], "id": "Sunset.png", "role": "AXGroup"}
+{"d": 8, "desc": "Sunset.png", "enabled": "1", "frame": [721, 328, 64, 64], "id": "Sunset.png", "role": "AXImage", "title": "Sunset.png"}
+{"d": 7, "enabled": "0", "frame": [473, 212, 672, 224], "role": "AXGroup"}
+{"d": 4, "frame": [463, 710, 757, 28], "id": "statusBar", "role": "AXUnknown"}
+{"d": 5, "enabled": "1", "frame": [758, 716, 156, 16], "id": "statusBarText", "role": "AXStaticText", "value": "9 items, 112,1 MB available"}
+{"d": 5, "desc": "resize icon", "enabled": "1", "frame": [1123, 716, 82, 16], "id": "_NS:86", "role": "AXSlider", "value": "24"}
+{"d": 6, "frame": [1137.5, 717, 18, 14], "role": "AXValueIndicator", "value": "24"}
+{"d": 4, "desc": "path", "enabled": "1", "frame": [468, 681, 743, 30], "role": "AXList"}
+{"d": 5, "enabled": "1", "frame": [469, 682, 64, 28], "role": "AXStaticText", "value": "Demo"}
+{"d": 5, "enabled": "1", "frame": [533, 682, 93, 28], "role": "AXStaticText", "value": "finder-demo"}
+{"d": 2, "frame": [300, 150, 920, 52], "role": "AXToolbar"}
+{"d": 3, "frame": [467, 150, 81, 52], "help": "See folders you viewed previously", "role": "AXGroup"}
+{"d": 4, "desc": "Back/Forward", "enabled": "1", "frame": [470, 157, 75, 38], "id": "_NS:51", "role": "AXGroup"}
+{"d": 5, "desc": "back", "enabled": "0", "frame": [472, 159, 36, 36], "role": "AXButton", "sub": "AXSegment"}
+{"d": 5, "desc": "forward", "enabled": "0", "frame": [508, 159, 37, 36], "role": "AXButton", "sub": "AXSegment"}
+{"d": 3, "frame": [830, 150, 164, 52], "help": "Show items as icons, in a list, in columns or in a gallery", "role": "AXGroup"}
+{"d": 4, "enabled": "1", "frame": [833, 157, 162, 38], "role": "AXRadioGroup", "value": "<AXUIElement 0x7a2ac18450> {pid=1244}"}
+{"d": 5, "desc": "icon view", "enabled": "1", "frame": [834, 159, 40.5, 36], "role": "AXRadioButton", "sub": "AXSegment", "value": "1"}
+{"d": 5, "desc": "list view", "enabled": "1", "frame": [874.5, 159, 40.5, 36], "role": "AXRadioButton", "sub": "AXSegment", "value": "0"}
+{"d": 5, "desc": "column view", "enabled": "1", "frame": [915, 159, 40.5, 36], "role": "AXRadioButton", "sub": "AXSegment", "value": "0"}
+{"d": 5, "desc": "gallery view", "enabled": "1", "frame": [955.5, 159, 40.5, 36], "role": "AXRadioButton", "sub": "AXSegment", "value": "0"}
+{"d": 3, "desc": "Share", "enabled": "0", "frame": [1057, 150, 36, 52], "help": "Share the selected items", "role": "AXButton"}
+{"d": 3, "desc": "Edit Tags", "enabled": "0", "frame": [1093, 150, 38, 52], "help": "Edit Tags", "role": "AXButton"}
+{"d": 3, "frame": [1176, 150, 40, 52], "role": "AXGroup"}
+{"d": 4, "desc": "Search", "enabled": "1", "frame": [1175, 157, 38, 38], "role": "AXButton", "sub": "AXSearchField"}
+{"d": 2, "enabled": "1", "frame": [318, 168, 16, 16], "role": "AXButton", "sub": "AXCloseButton"}
+{"d": 2, "enabled": "1", "frame": [364, 168, 16, 16], "help": "this button also has an action to zoom the window", "role": "AXButton", "sub": "AXFullScreenButton"}
+{"d": 3, "frame": [365, 169, 14, 14], "role": "AXGroup"}
+{"d": 2, "enabled": "1", "frame": [341, 168, 16, 16], "role": "AXButton", "sub": "AXMinimizeButton"}
+{"d": 2, "enabled": "1", "frame": [548, 150, 282, 52], "role": "AXStaticText", "value": "finder-demo"}

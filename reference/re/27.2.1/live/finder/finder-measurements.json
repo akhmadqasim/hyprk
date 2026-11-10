@@ -1,0 +1,61 @@
+{
+  "_about": "Finder 27.2.1 (26B131) measured live on a 920x560 pt test window (test folder on a mounted test disk image). Points, window-relative (0,0 = window top-left). Colours sRGB from 2x window captures (-o). Wallpaper Electric Blue unless noted. a = active/key, i = inactive.",
+  "window": {"size": [920, 560], "toolbarHeight": 52, "sidebarWidth": 163, "sidebarDividerX": 162.5, "trafficLights": "AX 16x16 at (18,18),(41,18),(64,18)"},
+  "toolbar": {
+    "capsuleY": [8, 44], "capsuleHeight": 36,
+    "backForward": {"x": [170.5, 244.5], "segments": "back 36 + forward 37 (AX)", "divider": "1pt at x 207, ~20pt tall, light #C8C8C8 / dark #71727A"},
+    "title": {"inkX": 256, "font": "SF 15 Semibold (ink fit: 88.5 pt for 'finder-demo')", "colour": {"light_a": "#4C4C4C", "light_i": "#BFBDBD", "dark_a": "#E9E9E9", "dark_i": "#5F5F64"}, "axField": [248, 530]},
+    "viewSwitcher": {"x": [533.5, 694.5], "segments": "4 x 40.5 (AX)", "selectedPill": "35.5x28 r14, inset 4 from capsule top", "separators": "1pt, between unselected segments only"},
+    "group": {"x": [702, 749.5]},
+    "shareTagsAction": {"x": [756.5, 868.5], "buttons": "Share 36, Edit Tags 38, Action 37 (AX)"},
+    "search": {"x": [875.5, 912.5], "shape": "36pt circle", "expanded": "~241x36 capsule, view switcher collapses to a 51pt popup"},
+    "gaps": 7.5, "rightInset": 7.5, "leftOfBackForward": "7.5 pt from the sidebar edge",
+    "glyphs": "13 pt .large .medium SF Symbols (R3b-3); ink: chevron 8x14, grid 15.5, list 16.5x12, columns 19.5x15, gallery 19x14.5, search 16x16.5, ellipsis 15x3",
+    "colours": {
+      "light": {"strip": 255, "capsule": 252, "selectedPill": 231, "hoverPill": 242, "searchHover": 236, "divider": 200, "glyph": "0 (enabled), 173 disabled", "inactiveCapsule": 240, "inactiveGlyph": 164},
+      "dark": {"strip": "32,33,39 (39,41,47 while the pointer is in the toolbar or the window is inactive)", "capsule": "61,62,70 (67,69,77 pointer in toolbar)", "selectedPill": "81,82,90 / 87,89,96", "hoverPill": "87,89,96", "divider": "113,114,122", "glyph": "255 enabled, 113,114,122 disabled", "inactiveCapsule": "58,60,67"}
+    },
+    "hover": "inner capsule 28 tall (y 12..40), 30 wide on back/forward/action, 35.5 on view segments, whole circle on search; divider hides; disabled buttons: none",
+    "pressed": "same as hover at 80 ms; holding back/forward ~0.3 s opens the history menu"
+  },
+  "sidebar": {
+    "rows": 32, "headerRow": 19, "firstRowY": 52, "cellX": [10, 153], "gapBeforeHeader": 13,
+    "iconCentreX": 29, "iconInk": {"clock": [17, 17], "person.2": [23, 15.5], "Applications": [17.5, 15.5], "Downloads": [17, 17], "AirDrop": [18, 17], "Bin": [16, 18.5]},
+    "textX": "AX 45, ink 46-47", "itemFont": "SF 13 Regular; selected row 13 Semibold", "headerFont": "SF 11 Semibold, x 15 (ink 16.5)", "headerHover": "chevron.down ink 9.5x5.5 at x 136.5..146, centred on the header row, dark 160,162,177 (secondary); no row fill",
+    "colours": {
+      "light": {"bg_a": "237,237,238", "bg_i": "242,242,243", "text_a": "0 at glyph cores", "text_i": "113", "header_a": "135", "header_i": "166", "iconFavourites_a": "0,107,239 (accent)", "iconLocations_a": "123,123,128", "icon_i": "127", "selection_a": "215,215,216", "selection_i": "231,231,232", "dropTarget": "47,110,237 (accent pill, white text)"},
+      "dark":  {"bg_a": "36,38,55 (over Electric Blue)", "bg_i": "36,38,54", "text_a": "255", "text_i": "146,147,155", "header_a": "113,115,132", "header_i": "87,89,105", "iconFavourites_a": "30,152,255", "iconLocations_a": "181,181,195", "icon_i": "143,144,155", "selection_a": "65,67,84", "selection_i": "50,52,67"}
+    },
+    "selection": "x 10..153, 32 tall, r 8 (circle fit 8.1)", "hover": "none", "pressed": "none (row selects on mouse-up)"
+  },
+  "iconView": {
+    "iconSize": 64, "cell": [112, 112], "firstIcon": [197, 66], "gridOrigin": [173, 62], "viewOptions": "icon size slider 24 (=64 pt), grid spacing 54, text size 12, labels Bottom",
+    "label": {"font": "SF 12 Regular", "linePitch": 16, "maxLines": 2, "truncation": "middle ellipsis on the last line", "maxInkWidth": 104, "colour": {"light": 38, "dark": 221}, "gapIconToTextCap": 10},
+    "selection": {"plate": "72x72 r7, icon inset 4", "plateFill": {"light": 230, "dark": "54,55,60"}, "plateFillInactive": "unchanged",
+                   "label": "pill 17 tall (1 line), r5, padding ~5 left", "labelFill": {"light_a": "42,99,217", "light_i": 220, "dark_a": "37,88,201", "dark_i": 70}, "labelText": {"a": 255, "light_i": 33, "dark_i": 228}, "gapPlateToLabel": 2},
+    "tagDots": "10 pt circles left of the name inside the label, each extra tag offset +5 pt behind the previous, 0.5 pt white separator ring, ~3 pt to text",
+    "hover": "none"
+  },
+  "listView": {
+    "header": {"y": [52, 80], "height": 28, "font": "SF 11; sorted column Semibold label colour (76 light / 255 dark), others Regular secondary (127)", "separators": "1pt x 16pt (y 58..74) light 229 / dark 76,76,82", "bottomLine": "1pt at y 79, light 229 / dark 66,66,72", "fill": "light 255 (same as content), dark 40,40,46 bar incl. the toolbar strip", "sortChevron": "7.5x5 at 6.5 pt left of the column edge", "pressed": "cell fill 242 (light), no radius", "hover": "none", "resizeCursor": "30x24 hot (15,12) within ~1 pt of the boundary"},
+    "rows": 20, "firstRowY": 85, "sideInset": 10, "icon": 16, "iconX": 189, "nameX": 209, "disclosure": "AX 15x22 at x 174, chevron ink 5x8.5",
+    "columns": {"Name": 338, "Date Modified": 181, "Size": 97, "Kind": 121}, "font": "SF 13 Regular; name label, other columns secondary (128)",
+    "stripes": {"light": "244,245,245", "dark": "42,43,49", "shape": "x 173..910, full 20 pt, r ~8", "which": "2nd, 4th... rows"},
+    "selection": {"rect": "x 173..910, 20 tall, r ~8", "light_a": "42,98,217", "dark_a": "36,87,201", "light_i": 220, "dark_i": 70, "text_a": "255 / secondary 191,208,244", "text_i_light": "33 / 109", "text_i_dark": "227 / 172"},
+    "contentBg": {"light": 255, "dark": "32,33,39"}
+  },
+  "columnView": {"columnWidth": 245, "row": 24, "icon": 18, "textX": "+38 from column", "divider": "1 pt, light 229 / dark 57", "selection": "inset 10 left / 11 right, 24 tall, r ~8", "activeColumn": {"light": "41,98,217", "dark": "36,87,202"}, "parentColumns": {"light": 220, "dark": 70}, "inactive": "all grey (light 220 / dark 70)", "grip": "none; resize cursor over the divider", "preview": "~240 pt column: QL preview 219x259, name 13 bold, kind 11, Information + Created/Modified/Last opened rows 23 pt, Tags editor, Markup/More buttons"},
+  "galleryView": {"preview": "443x357 at (195,84)", "strip": "48x48 thumbs, pitch 59 (gap 11), y 476", "selectedThumb": "plate 54x54 r7, light 189 / dark 87,88,92, unchanged when inactive", "pane": "~240-250 pt, same material as the sidebar (light 237 / dark 36,38,55), icon 50, name 15 Semibold, kind 13 Regular tertiary, headings 13 Semibold, meta rows 11 (label secondary, value Medium), 'Show More' 11 accent, Rotate/Markup/More buttons at the bottom"},
+  "pathBar": {"y": [531.5, 560], "height": "28 + 1 pt top line", "line": "1 pt at y 531.5, light 221-229 / dark 66,67,73", "fill": "none (content bg)", "font": "SF 11 Regular secondary (127)", "icons": 16, "chevron": "4x6 secondary", "hover": "none", "dropTarget": "accent capsule behind the item"},
+  "statusBar": {"present": true, "defaultHidden": "ShowStatusBar 0 on this account", "height": 28, "position": "below the path bar (window grows by 28)", "text": "centred, '9 items, 112,1 MB' / '1 of 9 selected, ...', ~11 pt secondary (128)", "extra": "icon-size slider 82x16 at the right in icon view", "fill": "content bg, 0.5 pt line above"},
+  "tabs": {"track": "y 52..80 (28), x 167..879.5, capsule r14, light 232 rim 220 / dark 56,56,63 rim 72,72,78", "selectedTab": "24 tall (2 pt inset), r12, light 253 / dark 61,61,69", "font": "SF 11 Regular; selected light 75 / dark 235, unselected light 181 / dark 132", "hover": "unselected tab darkens (light 220 / dark 66,66,73) and shows an x close glyph at its left (AX 18x18 at tab x+4)", "newTab": "+ circle ~30 pt at x 883.5..912, light fill 249 rim 191", "inactive": "selected tab light 240 / dark 51,51,60 on the same track, text dim"},
+  "renameField": {"icon": "field 74x14 at the label, white, text 12, 3 pt focus ring accent a~0.5 (light 149,179,246) with a 0.5 pt darker inner edge (114,158,244), outer radius ~5", "list": "field 16 tall inside the selected row, same ring (spills over the row)", "selection": "186,214,251 (#BAD6FB) on the base name only"},
+  "drag": {"image": "icon + accent label at ~0.9 opacity", "multiBadge": "19 pt red circle (231,74,64), white bold count, at the icon's bottom-right", "iconTarget": "grey plate 226 r~8 (like the selection plate)", "sidebarTarget": "accent pill 47,110,237 (selection geometry), white text", "pathBarTarget": "accent capsule", "listTarget": "no row highlight seen within 0.7 s", "springLoad": "folder opens in place <1.9 s; Esc reverts", "snapBack": "Q-windows-27 (0.25 s ease-out)"},
+  "quickLook": {"window": "separate floating panel (layer 3) 1463x951 for a 1600x1000 image, centred", "corner": "~20 pt", "titleBar": 38, "inset": 5, "frame": "grey 134-137 (light, over blue)", "controls": "close + full-screen 14 pt discs at (11,12),(31,12); title 13 bold; Markup/Rotate/Share 34x26; 'Open with Preview' capsule 139x26", "open": "appears at ~0.79 scale centred, grows to 1.0 in ~0.25 s ease-out, no fade seen", "close": "shrinks/moves into the file's icon in ~0.18 s"},
+  "contextMenus": {"file": ["Ask Siri", "-", "Open", "Open With >", "-", "Move to Bin", "-", "Get Info", "Rename", "Compress \"<name>\"", "Duplicate", "Make Alias", "Quick Look", "Copy", "-", "Share...", "-", "Quick Actions >", "-", "Services >"],
+                    "folder": ["Ask Siri", "-", "Open in New Tab", "Paste Item*", "-", "Move to Bin", "-", "Get Info", "Rename", "Compress \"<name>\"", "Duplicate", "Make Alias", "Quick Look", "Copy", "-", "Share...", "-", "Customise Folder...", "-", "Quick Actions >", "-", "Services >"],
+                    "multi": ["Ask Siri", "-", "New Folder with Selection (2 Items)", "Open", "Open With >", "-", "Move to Bin", "-", "Get Info", "Rename...", "Compress", "Duplicate", "Make Alias", "Quick Look", "Copy", "-", "Share...", "-", "Quick Actions >", "-", "Services >"],
+                    "background": ["Ask Siri", "-", "New Folder", "Paste Item*", "-", "Get Info", "-", "View >", "Use Groups", "Sort By >", "Clean Up", "Clean Up By >", "Show View Options"],
+                    "notes": "* only with something on the clipboard. No tag row: this account has no favourite tags (FavoriteTagNames = ('')). Icons on Move to Bin, Share, Customise Folder, Quick Actions, Services."},
+  "motion": {"viewSwitch": "content and selected pill change in 1 frame (no slide)", "folderEnterBack": "1 frame", "selection": "1 frame", "sidebarHover": "none", "searchExpand": "~0.15-0.17 s ease-out width change; view switcher collapses to a popup in 1 frame; focus ring appears at the end", "searchCollapse": "~0.17 s", "toolbarStripReveal": "dark: strip lightens while the pointer is in the toolbar"}
+}

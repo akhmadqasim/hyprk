@@ -1,0 +1,1251 @@
+{
+"grid": [
+{
+"d": 0,
+"role": "AXApplication",
+"title": "Control Centre"
+},
+{
+"d": 1,
+"frame": [
+1230,
+0,
+656,
+968
+],
+"role": "AXWindow",
+"sub": "AXSystemDialog",
+"title": "Control Centre"
+},
+{
+"d": 2,
+"frame": [
+1230,
+0,
+656,
+968
+],
+"role": "AXGroup",
+"sub": "AXHostingView"
+},
+{
+"d": 3,
+"enabled": "1",
+"frame": [
+1404,
+46,
+140,
+64
+],
+"id": "module-WiFi",
+"role": "AXGroup"
+},
+{
+"d": 4,
+"desc": "Wi\u2011Fi: <ssid>",
+"enabled": "1",
+"frame": [
+1404,
+46,
+140,
+64
+],
+"id": "controlcenter-wifi",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "1"
+},
+{
+"d": 3,
+"enabled": "1",
+"frame": [
+1404,
+122,
+140,
+64
+],
+"id": "module-Bluetooth",
+"role": "AXGroup"
+},
+{
+"d": 4,
+"desc": "Bluetooth: On",
+"enabled": "1",
+"frame": [
+1404,
+122,
+140,
+64
+],
+"id": "controlcenter-bluetooth",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "1"
+},
+{
+"d": 3,
+"enabled": "1",
+"frame": [
+1556,
+46,
+140,
+140
+],
+"id": "module-NowPlaying",
+"role": "AXGroup"
+},
+{
+"d": 4,
+"enabled": "1",
+"frame": [
+1570,
+118,
+67.5,
+15
+],
+"role": "AXStaticText",
+"value": "Not Playing"
+},
+{
+"d": 4,
+"desc": "previous",
+"enabled": "0",
+"frame": [
+1571,
+142,
+30,
+30
+],
+"id": "backward.fill",
+"role": "AXButton"
+},
+{
+"d": 4,
+"desc": "play",
+"enabled": "1",
+"frame": [
+1611,
+142,
+30,
+30
+],
+"id": "play.fill",
+"role": "AXButton"
+},
+{
+"d": 4,
+"desc": "next",
+"enabled": "0",
+"frame": [
+1651,
+142,
+30,
+30
+],
+"id": "forward.fill",
+"role": "AXButton"
+},
+{
+"d": 4,
+"desc": "Not Playing",
+"enabled": "1",
+"frame": [
+1570,
+60,
+40,
+40
+],
+"role": "AXUnknown"
+},
+{
+"d": 3,
+"enabled": "1",
+"frame": [
+1404,
+198,
+140,
+64
+],
+"id": "module-AirDrop",
+"role": "AXGroup"
+},
+{
+"d": 4,
+"desc": "AirDrop: Contacts Only",
+"enabled": "1",
+"frame": [
+1404,
+198,
+140,
+64
+],
+"id": "controlcenter-airdrop",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "1"
+},
+{
+"d": 3,
+"desc": "Stage Manager",
+"enabled": "1",
+"frame": [
+1556,
+198,
+64,
+64
+],
+"id": ":com.apple.WindowManager:com.apple.WindowManager.controls:com.apple.windowmanage",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 3,
+"enabled": "1",
+"frame": [
+1632,
+198,
+64,
+64
+],
+"id": "module-ScreenMirroring",
+"role": "AXGroup"
+},
+{
+"d": 4,
+"desc": "Screen\nMirroring",
+"enabled": "1",
+"frame": [
+1632,
+198,
+64,
+64
+],
+"id": "controlcenter-screen-mirroring",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 3,
+"desc": "Dark Mode",
+"enabled": "1",
+"frame": [
+1404,
+274,
+64,
+64
+],
+"id": ":com.apple.controlcenter:com.apple.controls.display:com.apple.controls.display.d",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "1"
+},
+{
+"d": 3,
+"desc": "Capture Screen",
+"enabled": "1",
+"frame": [
+1480,
+274,
+64,
+64
+],
+"id": ":com.apple.screenshot.launcher:com.apple.controls.screenshot:com.apple.controls.",
+"role": "AXButton"
+},
+{
+"d": 3,
+"enabled": "1",
+"frame": [
+1556,
+274,
+140,
+64
+],
+"id": "module-FocusModes",
+"role": "AXGroup"
+},
+{
+"d": 4,
+"desc": "Focus",
+"enabled": "1",
+"frame": [
+1556,
+274,
+140,
+64
+],
+"id": "controlcenter-focus-modes-compact-2",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 3,
+"enabled": "1",
+"frame": [
+1404,
+350,
+292,
+64
+],
+"id": "module-Display",
+"role": "AXGroup"
+},
+{
+"d": 4,
+"enabled": "1",
+"frame": [
+1404,
+350,
+292,
+64
+],
+"role": "AXGroup"
+},
+{
+"d": 5,
+"desc": "Brightness Lower",
+"enabled": "1",
+"frame": [
+1419.5,
+384.5,
+15.5,
+15.5
+],
+"role": "AXButton"
+},
+{
+"d": 5,
+"desc": "display brightness",
+"enabled": "1",
+"frame": [
+1440.5,
+385,
+217.5,
+14
+],
+"id": "controlcenter-display-brightness-slider",
+"role": "AXSlider",
+"value": "0.4960905909538269"
+},
+{
+"d": 5,
+"desc": "Brightness Higher",
+"enabled": "1",
+"frame": [
+1663.5,
+383.5,
+17,
+17
+],
+"role": "AXButton"
+},
+{
+"d": 3,
+"enabled": "1",
+"frame": [
+1404,
+426,
+292,
+64
+],
+"id": "module-Sound",
+"role": "AXGroup"
+},
+{
+"d": 4,
+"enabled": "1",
+"frame": [
+1438,
+461,
+180,
+14
+],
+"role": "AXGroup"
+},
+{
+"d": 5,
+"desc": "Volume Lower",
+"enabled": "1",
+"frame": [
+1420.5,
+461.5,
+9.5,
+13.5
+],
+"role": "AXButton"
+},
+{
+"d": 5,
+"desc": "sound volume",
+"enabled": "1",
+"frame": [
+1438,
+461,
+180,
+14
+],
+"id": "controlcenter-volume-slider",
+"role": "AXSlider",
+"value": "0.379999965429306"
+},
+{
+"d": 5,
+"desc": "Volume Higher",
+"enabled": "1",
+"frame": [
+1624.5,
+460.5,
+21,
+15.5
+],
+"role": "AXButton"
+},
+{
+"d": 4,
+"desc": "Airplay Audio",
+"enabled": "1",
+"frame": [
+1656,
+455,
+26,
+26
+],
+"id": "controlcenter-airplay",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 3,
+"desc": "Enable Background Sounds",
+"enabled": "1",
+"frame": [
+1480,
+502,
+64,
+64
+],
+"id": ":com.apple.systempreferences:com.apple.AccessibilitySettingsWidgetExtension:com.",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 3,
+"desc": "Scene or Accessory",
+"enabled": "1",
+"frame": [
+1556,
+502,
+140,
+64
+],
+"id": ":com.apple.Home:com.apple.Home.HomeWidget.Interactive:com.apple.Home.TileControl",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "1"
+},
+{
+"d": 3,
+"desc": "Edit Controls",
+"enabled": "1",
+"frame": [
+1503.5,
+582,
+93.5,
+24
+],
+"role": "AXButton"
+}
+],
+"focus": [
+{
+"d": 0,
+"role": "AXApplication",
+"title": "Control Centre"
+},
+{
+"d": 1,
+"frame": [
+1230,
+0,
+656,
+968
+],
+"role": "AXWindow",
+"sub": "AXSystemDialog",
+"title": "Control Centre"
+},
+{
+"d": 2,
+"frame": [
+1230,
+0,
+656,
+968
+],
+"role": "AXGroup",
+"sub": "AXHostingView"
+},
+{
+"d": 3,
+"enabled": "1",
+"frame": [
+1408,
+53,
+38,
+16
+],
+"id": "focus-modes-header",
+"role": "AXStaticText",
+"value": "Focus"
+},
+{
+"d": 3,
+"desc": "Do Not Disturb",
+"enabled": "1",
+"frame": [
+1408,
+88,
+280,
+32
+],
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 3,
+"desc": "Work",
+"enabled": "1",
+"frame": [
+1408,
+120,
+280,
+32
+],
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 3,
+"desc": "Sleep",
+"enabled": "1",
+"frame": [
+1408,
+152,
+280,
+32
+],
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 3,
+"desc": "Mindfulness",
+"enabled": "1",
+"frame": [
+1408,
+184,
+280,
+32
+],
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 3,
+"desc": "Reduce Interruptions",
+"enabled": "1",
+"frame": [
+1408,
+216,
+280,
+32
+],
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 3,
+"desc": "Driving",
+"enabled": "1",
+"frame": [
+1408,
+248,
+280,
+32
+],
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 3,
+"desc": "Focus Settings\u2026",
+"enabled": "1",
+"frame": [
+1401,
+291,
+294,
+22
+],
+"role": "AXButton"
+}
+],
+"wifi": [
+{
+"d": 0,
+"role": "AXApplication",
+"title": "Control Centre"
+},
+{
+"d": 1,
+"frame": [
+1230,
+0,
+656,
+968
+],
+"role": "AXWindow",
+"sub": "AXSystemDialog",
+"title": "Control Centre"
+},
+{
+"d": 2,
+"frame": [
+1230,
+0,
+656,
+968
+],
+"role": "AXGroup",
+"sub": "AXHostingView"
+},
+{
+"d": 3,
+"enabled": "1",
+"frame": [
+1408,
+53,
+34,
+16
+],
+"id": "wifi-header",
+"role": "AXStaticText",
+"value": "Wi\u2011Fi"
+},
+{
+"d": 3,
+"desc": "Wi\u2011Fi",
+"enabled": "1",
+"frame": [
+1634,
+49,
+54,
+24
+],
+"id": "wifi-header",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "1"
+},
+{
+"d": 3,
+"frame": [
+1394,
+88,
+308,
+87
+],
+"role": "AXScrollArea"
+},
+{
+"d": 4,
+"desc": "Known Network",
+"enabled": "1",
+"frame": [
+1408,
+91.5,
+93,
+15
+],
+"role": "AXHeading"
+},
+{
+"d": 4,
+"desc": "<ssid>, secure network, 3 bars",
+"enabled": "1",
+"frame": [
+1408,
+110,
+280,
+32
+],
+"id": "wifi-network-<ssid>",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "1"
+},
+{
+"d": 4,
+"desc": "Other Networks",
+"enabled": "1",
+"frame": [
+1408,
+153,
+280,
+22
+],
+"role": "AXDisclosureTriangle",
+"value": "0"
+},
+{
+"d": 3,
+"desc": "Wi\u2011Fi Settings\u2026",
+"enabled": "1",
+"frame": [
+1408,
+186,
+280,
+22
+],
+"role": "AXButton"
+}
+],
+"bluetooth": [
+{
+"d": 0,
+"role": "AXApplication",
+"title": "Control Centre"
+},
+{
+"d": 1,
+"frame": [
+1230,
+0,
+656,
+968
+],
+"role": "AXWindow",
+"sub": "AXSystemDialog",
+"title": "Control Centre"
+},
+{
+"d": 2,
+"frame": [
+1230,
+0,
+656,
+968
+],
+"role": "AXGroup",
+"sub": "AXHostingView"
+},
+{
+"d": 3,
+"enabled": "1",
+"frame": [
+1408,
+53,
+61.5,
+16
+],
+"id": "bluetooth-header",
+"role": "AXStaticText",
+"value": "Bluetooth"
+},
+{
+"d": 3,
+"desc": "Bluetooth",
+"enabled": "1",
+"frame": [
+1634,
+49,
+54,
+24
+],
+"id": "bluetooth-header",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "1"
+},
+{
+"d": 3,
+"frame": [
+1394,
+88,
+308,
+192
+],
+"role": "AXScrollArea"
+},
+{
+"d": 4,
+"desc": "<device>",
+"enabled": "1",
+"frame": [
+1408,
+88,
+280,
+32
+],
+"id": "bluetooth-device-<addr>",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 4,
+"desc": "<device>",
+"enabled": "1",
+"frame": [
+1408,
+120,
+280,
+32
+],
+"id": "bluetooth-device-<addr>",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 4,
+"desc": "<device>",
+"enabled": "1",
+"frame": [
+1401,
+152,
+294,
+32
+],
+"id": "bluetooth-device-<addr>",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 4,
+"desc": "<device>",
+"enabled": "0",
+"frame": [
+1408,
+187,
+137.5,
+26
+],
+"id": "bluetooth-device-<addr>",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 4,
+"desc": "<device>",
+"enabled": "0",
+"frame": [
+1408,
+219,
+119.5,
+26
+],
+"id": "bluetooth-device-<addr>",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 4,
+"desc": "<device>",
+"enabled": "1",
+"frame": [
+1408,
+248,
+280,
+32
+],
+"id": "bluetooth-device-<addr>",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 3,
+"desc": "Bluetooth Settings\u2026",
+"enabled": "1",
+"frame": [
+1394,
+40,
+308,
+280
+],
+"role": "AXButton"
+}
+],
+"display": [
+{
+"d": 0,
+"role": "AXApplication",
+"title": "Control Centre"
+},
+{
+"d": 1,
+"frame": [
+1230,
+0,
+656,
+968
+],
+"role": "AXWindow",
+"sub": "AXSystemDialog",
+"title": "Control Centre"
+},
+{
+"d": 2,
+"frame": [
+1230,
+0,
+656,
+968
+],
+"role": "AXGroup",
+"sub": "AXHostingView"
+},
+{
+"d": 3,
+"enabled": "1",
+"frame": [
+1408,
+55.5,
+46.5,
+16
+],
+"id": "controlcenter-display-Built-in Liquid Retina Display",
+"role": "AXGroup"
+},
+{
+"d": 4,
+"enabled": "1",
+"frame": [
+1408,
+55.5,
+46.5,
+16
+],
+"role": "AXStaticText",
+"value": "Display"
+},
+{
+"d": 3,
+"desc": "Display Settings\u2026",
+"enabled": "1",
+"frame": [
+1394,
+40,
+308,
+211
+],
+"role": "AXButton"
+},
+{
+"d": 3,
+"enabled": "1",
+"frame": [
+1430.5,
+83,
+233.5,
+16
+],
+"id": "controlcenter-display-Built-in Liquid Retina Display",
+"role": "AXGroup"
+},
+{
+"d": 4,
+"desc": "Brightness Lower",
+"enabled": "1",
+"frame": [
+1409.5,
+83.5,
+15.5,
+15.5
+],
+"role": "AXButton"
+},
+{
+"d": 4,
+"desc": "display brightness",
+"enabled": "1",
+"frame": [
+1430.5,
+83,
+233.5,
+16
+],
+"id": "controlcenter-display-brightness-slider-1",
+"role": "AXSlider",
+"value": "0.4960905909538269"
+},
+{
+"d": 5,
+"enabled": "1",
+"frame": [
+1536.5,
+83,
+20,
+16
+],
+"role": "AXValueIndicator"
+},
+{
+"d": 4,
+"desc": "Brightness Higher",
+"enabled": "1",
+"frame": [
+1669.5,
+82.5,
+17,
+17
+],
+"role": "AXButton"
+},
+{
+"d": 3,
+"desc": "Dark Mode, On",
+"enabled": "1",
+"frame": [
+1403,
+114,
+87.5,
+69
+],
+"id": "display-setting-dark-mode",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "1"
+},
+{
+"d": 3,
+"desc": "Night Shift, Off",
+"enabled": "1",
+"frame": [
+1504.5,
+114,
+87,
+69
+],
+"id": "display-setting-night-shift",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 3,
+"desc": "True Tone, Off",
+"enabled": "1",
+"frame": [
+1605.5,
+114,
+87.5,
+69
+],
+"id": "display-setting-true-tone",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+}
+],
+"sound": [
+{
+"d": 0,
+"role": "AXApplication",
+"title": "Control Centre"
+},
+{
+"d": 1,
+"frame": [
+1230,
+0,
+656,
+968
+],
+"role": "AXWindow",
+"sub": "AXSystemDialog",
+"title": "Control Centre"
+},
+{
+"d": 2,
+"frame": [
+1230,
+0,
+656,
+968
+],
+"role": "AXGroup",
+"sub": "AXHostingView"
+},
+{
+"d": 3,
+"enabled": "1",
+"frame": [
+1408,
+53,
+40.5,
+16
+],
+"id": "controlcenter-volume",
+"role": "AXStaticText",
+"value": "Sound"
+},
+{
+"d": 3,
+"desc": "Volume Lower",
+"enabled": "1",
+"frame": [
+1410.5,
+79.5,
+9.5,
+13.5
+],
+"role": "AXButton"
+},
+{
+"d": 3,
+"desc": "sound volume",
+"enabled": "1",
+"frame": [
+1428,
+78.5,
+230,
+16
+],
+"id": "controlcenter-volume-slider",
+"role": "AXSlider",
+"value": "0.379999965429306"
+},
+{
+"d": 4,
+"enabled": "1",
+"frame": [
+1508,
+78.5,
+20,
+16
+],
+"role": "AXValueIndicator"
+},
+{
+"d": 3,
+"desc": "Volume Higher",
+"enabled": "1",
+"frame": [
+1664.5,
+78.5,
+21,
+15.5
+],
+"role": "AXButton"
+},
+{
+"d": 3,
+"frame": [
+1394,
+110.5,
+308,
+155
+],
+"role": "AXScrollArea"
+},
+{
+"d": 4,
+"desc": "Output",
+"enabled": "1",
+"frame": [
+1408,
+114,
+41.5,
+15
+],
+"role": "AXHeading"
+},
+{
+"d": 4,
+"desc": "MacBook Air Speakers",
+"enabled": "1",
+"frame": [
+1399,
+132.5,
+298,
+32
+],
+"id": "sound-device-MacBook Air Speakers",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "1"
+},
+{
+"d": 4,
+"desc": "<device>",
+"enabled": "1",
+"frame": [
+1399,
+164.5,
+298,
+32
+],
+"id": "sound-device-<device>",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 4,
+"desc": "<device>",
+"enabled": "1",
+"frame": [
+1399,
+196.5,
+298,
+32
+],
+"id": "sound-device-<device>",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 4,
+"desc": "<device>",
+"enabled": "1",
+"frame": [
+1399,
+228.5,
+298,
+32
+],
+"id": "sound-device-<device>",
+"role": "AXCheckBox",
+"sub": "AXToggle",
+"value": "0"
+},
+{
+"d": 3,
+"desc": "Sound Settings\u2026",
+"enabled": "1",
+"frame": [
+1399,
+274.5,
+121,
+16
+],
+"role": "AXButton"
+}
+]
+}

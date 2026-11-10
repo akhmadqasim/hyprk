@@ -1,0 +1,1053 @@
+{
+"alert2": [
+{
+"d": 1,
+"role": "AXWindow",
+"sub": "AXDialog",
+"frame": [
+725,
+231,
+260,
+234
+],
+"desc": "alert"
+},
+{
+"d": 2,
+"role": "AXImage",
+"frame": [
+744,
+250,
+66,
+66
+],
+"desc": "panels alert"
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+746,
+330,
+218,
+50
+],
+"value": "Are you sure you want to permanently erase the items in the Trash?"
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+746,
+388,
+218,
+18
+],
+"value": "You can\u2019t undo this action."
+},
+{
+"d": 2,
+"role": "AXButton",
+"frame": [
+740,
+420,
+112,
+30
+],
+"title": "Cancel"
+},
+{
+"d": 2,
+"role": "AXButton",
+"frame": [
+858,
+420,
+112,
+30
+],
+"title": "Empty Trash"
+},
+{
+"d": 1,
+"role": "AXWindow",
+"sub": "AXStandardWindow",
+"frame": [
+455,
+208,
+800,
+552
+],
+"title": "hyprk panels probe"
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+480,
+269,
+298,
+22
+],
+"value": "hyprk test document"
+},
+{
+"d": 2,
+"role": "AXButton",
+"frame": [
+804,
+429,
+102,
+32
+],
+"title": "Anchor"
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXCloseButton",
+"frame": [
+463,
+216,
+16,
+16
+]
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXFullScreenButton",
+"frame": [
+509,
+216,
+16,
+16
+]
+},
+{
+"d": 3,
+"role": "AXGroup",
+"frame": [
+510,
+217,
+14,
+14
+]
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXMinimizeButton",
+"frame": [
+486,
+216,
+16,
+16
+]
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+537,
+216,
+129,
+16
+],
+"value": "hyprk panels probe"
+}
+],
+"alert3": [
+{
+"d": 1,
+"role": "AXWindow",
+"sub": "AXDialog",
+"frame": [
+725,
+206,
+260,
+334
+],
+"desc": "alert"
+},
+{
+"d": 2,
+"role": "AXImage",
+"frame": [
+744,
+225,
+66,
+66
+],
+"desc": "panels alert"
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+746,
+305,
+218,
+34
+],
+"value": "Do you want to keep this new document \u201chyprk test\u201d?"
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+746,
+347,
+218,
+66
+],
+"value": "You can choose to save your changes, or delete this document immediately. You ca"
+},
+{
+"d": 2,
+"role": "AXButton",
+"frame": [
+740,
+427,
+230,
+30
+],
+"title": "Save\u2026"
+},
+{
+"d": 2,
+"role": "AXButton",
+"frame": [
+740,
+461,
+230,
+30
+],
+"title": "Delete"
+},
+{
+"d": 2,
+"role": "AXButton",
+"frame": [
+740,
+495,
+230,
+30
+],
+"title": "Cancel"
+},
+{
+"d": 1,
+"role": "AXWindow",
+"sub": "AXStandardWindow",
+"frame": [
+455,
+208,
+800,
+552
+],
+"title": "hyprk panels probe"
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+480,
+269,
+298,
+22
+],
+"value": "hyprk test document"
+},
+{
+"d": 2,
+"role": "AXButton",
+"frame": [
+804,
+429,
+102,
+32
+],
+"title": "Anchor"
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXCloseButton",
+"frame": [
+463,
+216,
+16,
+16
+]
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXFullScreenButton",
+"frame": [
+509,
+216,
+16,
+16
+]
+},
+{
+"d": 3,
+"role": "AXGroup",
+"frame": [
+510,
+217,
+14,
+14
+]
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXMinimizeButton",
+"frame": [
+486,
+216,
+16,
+16
+]
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+537,
+216,
+129,
+16
+],
+"value": "hyprk panels probe"
+}
+],
+"alertcheck": [
+{
+"d": 1,
+"role": "AXWindow",
+"sub": "AXDialog",
+"frame": [
+725,
+221,
+260,
+274
+],
+"desc": "alert"
+},
+{
+"d": 2,
+"role": "AXImage",
+"frame": [
+744,
+240,
+66,
+66
+],
+"desc": "panels alert"
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+746,
+320,
+218,
+18
+],
+"value": "Rename the hyprk test item?"
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+746,
+346,
+218,
+18
+],
+"value": "Type a new name for the item."
+},
+{
+"d": 2,
+"role": "AXCheckBox",
+"frame": [
+746,
+418,
+118,
+18
+],
+"title": "Don\u2019t ask again",
+"value": "0"
+},
+{
+"d": 2,
+"role": "AXTextField",
+"frame": [
+744,
+378,
+222,
+26
+],
+"value": "hyprk test"
+},
+{
+"d": 2,
+"role": "AXButton",
+"frame": [
+740,
+450,
+112,
+30
+],
+"title": "Cancel"
+},
+{
+"d": 2,
+"role": "AXButton",
+"frame": [
+858,
+450,
+112,
+30
+],
+"title": "Rename"
+},
+{
+"d": 1,
+"role": "AXWindow",
+"sub": "AXStandardWindow",
+"frame": [
+455,
+208,
+800,
+552
+],
+"title": "hyprk panels probe"
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+480,
+269,
+298,
+22
+],
+"value": "hyprk test document"
+},
+{
+"d": 2,
+"role": "AXButton",
+"frame": [
+804,
+429,
+102,
+32
+],
+"title": "Anchor"
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXCloseButton",
+"frame": [
+463,
+216,
+16,
+16
+]
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXFullScreenButton",
+"frame": [
+509,
+216,
+16,
+16
+]
+},
+{
+"d": 3,
+"role": "AXGroup",
+"frame": [
+510,
+217,
+14,
+14
+]
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXMinimizeButton",
+"frame": [
+486,
+216,
+16,
+16
+]
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+537,
+216,
+129,
+16
+],
+"value": "hyprk panels probe"
+}
+],
+"alertdestructive": [
+{
+"d": 1,
+"role": "AXWindow",
+"sub": "AXDialog",
+"frame": [
+725,
+231,
+260,
+234
+],
+"desc": "alert"
+},
+{
+"d": 2,
+"role": "AXImage",
+"frame": [
+744,
+250,
+66,
+66
+],
+"desc": "panels critical alert"
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+746,
+330,
+218,
+18
+],
+"value": "Delete \u201chyprk test\u201d?"
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+746,
+356,
+218,
+50
+],
+"value": "This item will be deleted immediately. You can\u2019t undo this action."
+},
+{
+"d": 2,
+"role": "AXButton",
+"frame": [
+740,
+420,
+112,
+30
+],
+"title": "Cancel"
+},
+{
+"d": 2,
+"role": "AXButton",
+"frame": [
+858,
+420,
+112,
+30
+],
+"title": "Delete"
+},
+{
+"d": 1,
+"role": "AXWindow",
+"sub": "AXStandardWindow",
+"frame": [
+455,
+208,
+800,
+552
+],
+"title": "hyprk panels probe"
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+480,
+269,
+298,
+22
+],
+"value": "hyprk test document"
+},
+{
+"d": 2,
+"role": "AXButton",
+"frame": [
+804,
+429,
+102,
+32
+],
+"title": "Anchor"
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXCloseButton",
+"frame": [
+463,
+216,
+16,
+16
+]
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXFullScreenButton",
+"frame": [
+509,
+216,
+16,
+16
+]
+},
+{
+"d": 3,
+"role": "AXGroup",
+"frame": [
+510,
+217,
+14,
+14
+]
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXMinimizeButton",
+"frame": [
+486,
+216,
+16,
+16
+]
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+537,
+216,
+129,
+16
+],
+"value": "hyprk panels probe"
+}
+],
+"sheet": [
+{
+"d": 1,
+"role": "AXWindow",
+"sub": "AXStandardWindow",
+"frame": [
+455,
+208,
+800,
+552
+],
+"title": "hyprk panels probe"
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+480,
+269,
+298,
+22
+],
+"value": "hyprk test document"
+},
+{
+"d": 2,
+"role": "AXButton",
+"frame": [
+804,
+429,
+102,
+32
+],
+"title": "Anchor"
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXCloseButton",
+"frame": [
+463,
+216,
+16,
+16
+]
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXZoomButton",
+"frame": [
+509,
+216,
+16,
+16
+]
+},
+{
+"d": 3,
+"role": "AXGroup",
+"frame": [
+510,
+217,
+14,
+14
+]
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXMinimizeButton",
+"frame": [
+486,
+216,
+16,
+16
+]
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+537,
+216,
+129,
+16
+],
+"value": "hyprk panels probe"
+},
+{
+"d": 2,
+"role": "AXSheet",
+"frame": [
+635,
+374,
+440,
+220
+]
+},
+{
+"d": 3,
+"role": "AXStaticText",
+"frame": [
+656,
+403,
+298,
+22
+],
+"value": "hyprk test sheet"
+},
+{
+"d": 3,
+"role": "AXButton",
+"frame": [
+964,
+549,
+92,
+30
+],
+"title": "OK"
+},
+{
+"d": 3,
+"role": "AXButton",
+"frame": [
+866,
+549,
+92,
+30
+],
+"title": "Cancel"
+}
+],
+"sheetalert": [
+{
+"d": 1,
+"role": "AXWindow",
+"sub": "AXStandardWindow",
+"frame": [
+455,
+208,
+800,
+552
+],
+"title": "hyprk panels probe"
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+480,
+269,
+298,
+22
+],
+"value": "hyprk test document"
+},
+{
+"d": 2,
+"role": "AXButton",
+"frame": [
+804,
+429,
+102,
+32
+],
+"title": "Anchor"
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXCloseButton",
+"frame": [
+463,
+216,
+16,
+16
+]
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXZoomButton",
+"frame": [
+509,
+216,
+16,
+16
+]
+},
+{
+"d": 3,
+"role": "AXGroup",
+"frame": [
+510,
+217,
+14,
+14
+]
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXMinimizeButton",
+"frame": [
+486,
+216,
+16,
+16
+]
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+537,
+216,
+129,
+16
+],
+"value": "hyprk panels probe"
+},
+{
+"d": 2,
+"role": "AXSheet",
+"frame": [
+725,
+407,
+260,
+154
+],
+"desc": "alert"
+},
+{
+"d": 3,
+"role": "AXStaticText",
+"frame": [
+746,
+426,
+218,
+50
+],
+"value": "Are you sure you want to permanently erase the items in the Trash?"
+},
+{
+"d": 3,
+"role": "AXStaticText",
+"frame": [
+746,
+484,
+218,
+18
+],
+"value": "You can\u2019t undo this action."
+},
+{
+"d": 3,
+"role": "AXButton",
+"frame": [
+740,
+516,
+112,
+30
+],
+"title": "Cancel"
+},
+{
+"d": 3,
+"role": "AXButton",
+"frame": [
+858,
+516,
+112,
+30
+],
+"title": "Empty Trash"
+}
+],
+"popover": [
+{
+"d": 1,
+"role": "AXWindow",
+"sub": "AXStandardWindow",
+"frame": [
+455,
+208,
+800,
+552
+],
+"title": "hyprk panels probe"
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+480,
+269,
+298,
+22
+],
+"value": "hyprk test document"
+},
+{
+"d": 2,
+"role": "AXButton",
+"frame": [
+804,
+429,
+102,
+32
+],
+"title": "Anchor"
+},
+{
+"d": 3,
+"role": "AXPopover",
+"frame": [
+712,
+264,
+286,
+166
+]
+},
+{
+"d": 4,
+"role": "AXStaticText",
+"frame": [
+746,
+336,
+218,
+22
+],
+"value": "hyprk test popover"
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXCloseButton",
+"frame": [
+463,
+216,
+16,
+16
+]
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXFullScreenButton",
+"frame": [
+509,
+216,
+16,
+16
+]
+},
+{
+"d": 3,
+"role": "AXGroup",
+"frame": [
+510,
+217,
+14,
+14
+]
+},
+{
+"d": 2,
+"role": "AXButton",
+"sub": "AXMinimizeButton",
+"frame": [
+486,
+216,
+16,
+16
+]
+},
+{
+"d": 2,
+"role": "AXStaticText",
+"frame": [
+537,
+216,
+129,
+16
+],
+"value": "hyprk panels probe"
+}
+]
+}
