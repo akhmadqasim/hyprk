@@ -67,16 +67,32 @@ function fit(info, target, maxScale) {
     return { scale: s, dx: (0.5 - info.cx) * s, dy: (0.5 - info.cy) * s };
 }
 
-// Continuous-corner squircle outline (superellipse |x|^5 + |y|^5 = 1, close to Apple's icon
-// mask, ~22% corner) as points in a size x size box.
+// Apple continuous-corner rounded rect ("squircle") outline as points in a size x size box.
+// Corner radius 0.225 of the side (macOS icon template: 185.4 on the 824 body) and the
+// continuous-corner curve that spans 1.528665 r (SPEC.md "App icons"; the same constant as
+// CoreAnimation's continuous corners), sampled from its three cubic segments per corner.
+var CORNER = 0.225;
 function squirclePoints(size, steps) {
-    steps = steps || 24;
-    var r = size / 2, pts = [], e = 2 / 5;
-    for (var q = 0; q < 4 * steps; q++) {
-        var t = q / (4 * steps) * 2 * Math.PI;
-        var ct = Math.cos(t), st = Math.sin(t);
-        pts.push([r + r * (ct < 0 ? -1 : 1) * Math.pow(Math.abs(ct), e),
-                  r + r * (st < 0 ? -1 : 1) * Math.pow(Math.abs(st), e)]);
-    }
+    steps = steps || 8;
+    var r = size * CORNER, w = size, pts = [];
+    // one corner (top-right), in coordinates relative to the corner: [dx from right edge, dy from top]
+    var segs = [
+        [[1.52866483, 0], [1.08849296, 0], [0.86840694, 0], [0.63149399, 0.07491100]],
+        [[0.63149399, 0.07491100], [0.37282383, 0.16905956], [0.16905956, 0.37282383], [0.07491100, 0.63149399]],
+        [[0.07491100, 0.63149399], [0, 0.86840694], [0, 1.08849296], [0, 1.52866483]]
+    ];
+    var corner = [];
+    for (var k = 0; k < 3; k++)
+        for (var i = (k === 0 ? 0 : 1); i <= steps; i++) {
+            var t = i / steps, u = 1 - t, c = segs[k];
+            var bx = u*u*u*c[0][0] + 3*u*u*t*c[1][0] + 3*u*t*t*c[2][0] + t*t*t*c[3][0];
+            var by = u*u*u*c[0][1] + 3*u*u*t*c[1][1] + 3*u*t*t*c[2][1] + t*t*t*c[3][1];
+            corner.push([bx * r, by * r]);
+        }
+    // clockwise from the top edge: top-right, bottom-right, bottom-left, top-left
+    var maps = [function (p) { return [w - p[0], p[1]]; }, function (p) { return [w - p[1], w - p[0]]; },
+                function (p) { return [p[0], w - p[1]]; }, function (p) { return [p[1], p[0]]; }];
+    for (var m = 0; m < 4; m++)
+        for (var j = 0; j < corner.length; j++) pts.push(maps[m](corner[j]));
     return pts;
 }

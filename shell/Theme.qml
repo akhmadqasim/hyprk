@@ -354,7 +354,7 @@ Singleton {
 
     // ---------- app icons ----------
     readonly property QtObject appIcon: QtObject {
-        readonly property real body: 0.82               // icon body inside its tile (macOS template)
+        readonly property real body: 0.8047             // icon body: 824 of 1024 (legacy inset 100/1024, SPEC.md App icons)
         readonly property real inner: 0.70              // non-squircle art body inside its tile
     }
 

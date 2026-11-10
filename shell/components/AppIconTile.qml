@@ -10,7 +10,7 @@ import "../lib/iconshape.js" as IconShape
 // - icons that already are squircle tiles are scaled so their body matches the macOS
 //   icon body (all tiles the same size);
 // - everything else (round, square, free-form) is put on a standard squircle tile:
-//   continuous corner, light gradient, rim highlight, art at ~70% of the tile.
+//   Apple continuous corner, system light/dark chiclet gradient, rim highlight, art at ~70%.
 // The shape check (lib/iconshape.js) runs once per icon file per process on a 48 px
 // offscreen canvas and is cached; nothing is analysed per frame.
 Item {
@@ -23,7 +23,7 @@ Item {
     property bool dark: false             // dark tile (Icon & widget style "Dark")
     property string style: dark ? "dark" : "default"   // default | dark | clear | tinted
     property color tint: "#007AFF"        // tinted style colour
-    property real body: 0.82              // icon body inside its square (macOS template)
+    property real body: 0.8047            // icon body: 824 of 1024 (100/1024 inset per side, SPEC.md)
     property real inner: 0.70             // art body inside a tile
 
     readonly property var info: _info
@@ -38,7 +38,10 @@ Item {
     property bool _probe: false
     function _lookup() {
         _info = trusted || _key === "" ? null : (IconShape.cached(_key) || null);
-        _probe = !trusted && _key !== "" && _info === null;
+        // recreate the probe for a new source (delegates are reused with other icons)
+        _probe = false;
+        if (!trusted && _key !== "" && _info === null)
+            Qt.callLater(() => { if (_info === null && !trusted && _key !== "") _probe = true; });
     }
     function _done(url, info) {
         if (url !== _key) return;
@@ -107,20 +110,21 @@ Item {
                 fillRule: ShapePath.OddEvenFill
                 PathMultiline { paths: [root._inset(0.7), root._inset(1.8)] }
             }
-            // body: light top-to-bottom gradient
+            // body: the system chiclet gradient (IconRendering Fills.systemLight/DarkGradient,
+            // placed from 10% to 90% of the height; SPEC.md "App icons")
             ShapePath {
                 strokeColor: "transparent"
                 fillGradient: LinearGradient {
-                    x1: 0; y1: 0; x2: 0; y2: 100
+                    x1: 0; y1: 10; x2: 0; y2: 90
                     GradientStop {
                         position: 0
-                        color: root._dark ? "#4A4A4F" : root._clear ? Qt.rgba(1, 1, 1, 0.34)
-                             : root._tinted ? Qt.lighter(root.tint, 1.25) : "#FDFDFE"
+                        color: root._dark ? "#1F1F1F" : root._clear ? Qt.rgba(1, 1, 1, 0.34)
+                             : root._tinted ? Qt.lighter(root.tint, 1.25) : "#FFFFFF"
                     }
                     GradientStop {
                         position: 1
-                        color: root._dark ? "#1F1F22" : root._clear ? Qt.rgba(1, 1, 1, 0.16)
-                             : root._tinted ? root.tint : "#E5E5EA"
+                        color: root._dark ? "#0F0F0F" : root._clear ? Qt.rgba(1, 1, 1, 0.16)
+                             : root._tinted ? root.tint : "#F5F5F5"
                     }
                 }
                 PathPolyline { path: root._inset(1.8) }
@@ -166,7 +170,7 @@ Item {
         active: root._probe
         sourceComponent: Canvas {
             id: probe
-            readonly property string url: root._key
+            property string url              // fixed at creation, not bound to the source
             width: IconShape.SAMPLE
             height: IconShape.SAMPLE
             opacity: 0
@@ -175,6 +179,7 @@ Item {
             renderStrategy: Canvas.Immediate
             function done(info) { root._done(url, info); }
             Component.onCompleted: {
+                url = root._key;
                 const hit = IconShape.cached(url);
                 if (hit) done(hit);
                 else if (isImageLoaded(url)) requestPaint();
