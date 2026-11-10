@@ -150,9 +150,9 @@ glass material 65 (03:35, orchestrator; too cyan)
   (0.2 s + 0.17 s) and fades out in 0.1 s; alert message font 13 (was 11).
   Checked on the Mac: Material.cpp + the new test cases compile and pass with clang; the QML parses (qmllint).
   NOT checked: GlassElement.cpp (needs Hyprland headers), lgtests as a whole, and the look.
-- [NEXT, on the PC] `git checkout mac-live-values`, build the plugin, run lgtests, then `dist/try-nested.sh`:
+- [NEXT, on the PC] (the branch was merged into master on 2026-11-10 at the user's request, still not run in Hyprland) `git pull`, build the plugin, run lgtests, then `dist/try-nested.sh`:
   look at the dock and CC without shadow, a menu (shadow, close fade), an alert (pop), small glass (faint shadow).
-  Merge into master if it looks right. Left out on purpose: blur radius 5 with the opacity ramp and the
+  If something looks wrong, the commits to revert are 8f972fa and c3c838c. Left out on purpose: blur radius 5 with the opacity ramp and the
   inactive-window variant (the plugin's blur is tuned by eye on top of Hyprland's blur), popover pop
   (spring 0.25 / 0.9 from 12.5 %, see LIVE-27.2.1.md), Spotlight recipe (branch still open).
 - [Mac] QML syntax check on the Mac: /opt/homebrew/opt/qtdeclarative/bin/qmllint (brew qtdeclarative; it cannot resolve Quickshell imports, parse errors only).
