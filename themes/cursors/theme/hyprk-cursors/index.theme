@@ -1,0 +1,4 @@
+[Icon Theme]
+Name=hyprk-cursors
+Comment=macOS-style cursors for hyprk (Xcursor + hyprcursor)
+Inherits=Adwaita

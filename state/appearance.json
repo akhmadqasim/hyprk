@@ -1,0 +1,11 @@
+{
+  "mode": "dark",
+  "dark": true,
+  "reduceTransparency": false,
+  "increaseContrast": false,
+  "reduceMotion": false,
+  "accent": "multicolor",
+  "sidebarIconSize": "medium",
+  "glass": 1,
+  "iconStyle": "default"
+}

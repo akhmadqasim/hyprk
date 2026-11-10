@@ -1,0 +1,99 @@
+{
+ "source": "/tmp/claude-1000/-home-akhmadqasim/613d3708-ff5f-4f0f-8732-43a198a43d37/scratchpad/cur-re/CursorAsset",
+ "cursors": {
+  "arrow-classic": {
+   "id": 0,
+   "size_pt": [
+    17.0,
+    23.0
+   ],
+   "hotspot_pt": [
+    4.0,
+    4.0
+   ],
+   "frames": 1,
+   "frame_delay_s": 0.0,
+   "scales": [
+    1,
+    2,
+    5,
+    10
+   ]
+  },
+  "ibeam-classic": {
+   "id": 1,
+   "size_pt": [
+    9.0,
+    18.0
+   ],
+   "hotspot_pt": [
+    4.0,
+    9.0
+   ],
+   "frames": 1,
+   "frame_delay_s": 0.0,
+   "scales": [
+    1,
+    2,
+    5,
+    10
+   ]
+  },
+  "wait": {
+   "id": 7,
+   "size_pt": [
+    24.0,
+    24.0
+   ],
+   "hotspot_pt": [
+    12.0,
+    11.0
+   ],
+   "frames": 30,
+   "frame_delay_s": 0.016667,
+   "scales": [
+    1,
+    2,
+    10
+   ]
+  },
+  "arrow": {
+   "id": 100,
+   "size_pt": [
+    28.0,
+    40.0
+   ],
+   "hotspot_pt": [
+    5.0,
+    5.0
+   ],
+   "frames": 1,
+   "frame_delay_s": 0.0,
+   "scales": [
+    1,
+    2,
+    5,
+    10
+   ]
+  },
+  "ibeam": {
+   "id": 101,
+   "size_pt": [
+    23.0,
+    22.0
+   ],
+   "hotspot_pt": [
+    12.0,
+    11.0
+   ],
+   "frames": 1,
+   "frame_delay_s": 0.0,
+   "scales": [
+    1,
+    2,
+    5,
+    10
+   ]
+  }
+ }
+}

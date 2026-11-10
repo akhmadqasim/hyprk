@@ -1,18 +1,4 @@
-# Apple assets extracted from the user's own macOS 27.2 IPSW: local use only, regenerate via reference/ASSETS.md
-/themes/fonts/
-/themes/wallpapers/
-/themes/icons/apps/
-/themes/icons/apps-hires/
-/themes/icons/system/
-/themes/icons/hyprk-apple/
-/themes/icons/*.log
-/themes/cursors/accessibility/
-/themes/cursors/hiservices/
-/themes/cursors/png/
-/themes/cursors/theme/hyprk-cursors/
-/sounds/oga/
-/sounds/wav/
-/sounds/originals/
+# Apple assets (fonts, icons, cursors, wallpapers, sounds) are tracked on purpose:
+# this repo is private. Never make it public with them; see reference/ASSETS.md.
 __pycache__/
 build/
-/themes/cursors/cursorasset/
