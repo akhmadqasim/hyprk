@@ -20,8 +20,7 @@ ShellRoot {
             onCloseRequested: Qt.quit()
             onMinimizeRequested: win.minimized = true
             onZoomRequested: win.maximized = !win.maximized
-            // Hyprland moves floating windows with SUPER+drag; FloatingWindow
-            // does not expose xdg move requests.
+            onMoveRequested: win.startSystemMove()   // xdg_toplevel.move, title bar drag like macOS
         }
     }
 }
