@@ -21,14 +21,16 @@ Item {
     property real anchorX: 0       // the menu bar title or click point, local (menus do not scale: unused)
     property real anchorY: 0
 
-    // the items stay while the menu fades out (the caller may clear them on close)
+    // the items stay while the menu fades out. The menu bar clears them on close, and that arrives
+    // while `shown` is still true (Panels resets menuIndex first), so an empty list is never taken
     property var shownItems: []
-    Binding on shownItems { value: root.items; when: root.shown; restoreMode: Binding.RestoreNone }
+    function latchItems() { if (shown && items.length > 0) shownItems = items; }
+    onItemsChanged: latchItems()
     // 1 while shown, then down to 0 on close: glass materialize and content opacity
     property real fade: 0
     visible: shown || fade > 0
     NumberAnimation { id: fadeOut; target: root; property: "fade"; to: 0; duration: Theme.anim.menuFadeOut; easing.type: Easing.OutQuad }
-    Component.onCompleted: if (shown) fade = 1
+    Component.onCompleted: { latchItems(); if (shown) fade = 1; }
 
     readonly property real contentWidth: Math.max(Theme.menu.minWidth, maxTextWidth + Theme.menu.itemHPadding * 2 + Theme.menu.itemInset * 2 + 40)
     width: contentWidth
@@ -105,6 +107,7 @@ Item {
     onShownItemsChanged: hover = -1
     onShownChanged: {
         if (shown) {
+            latchItems();
             hover = -1;
             fadeOut.stop();
             fade = 1;
