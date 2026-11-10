@@ -20,7 +20,7 @@ Column {
             MacSwitch { checked: AppState.appearance.reduceTransparency; onToggled: on => AppState.set("appearance", { reduceTransparency: on }) }
         }
         FormRow { label: "Increase contrast"; MacSwitch {} }
-        FormRow { label: "Reduce motion"; MacSwitch {} }
+        FormRow { label: "Reduce motion"; MacSwitch { checked: AppState.appearance.reduceMotion === true; onToggled: on => AppState.set("appearance", { reduceMotion: on }) } }
         FormRow { label: "Differentiate without color"; MacSwitch {} }
     }
     Card {
