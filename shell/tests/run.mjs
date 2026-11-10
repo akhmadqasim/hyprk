@@ -453,5 +453,34 @@ test("mode buttons start inside the field, end in place", () => {
     });
 }
 
+// ---- lock screen (shell/modules/lock/lock.js) ----
+{
+    const LK = load("lock.js", join(here, "..", "modules", "lock"));
+    const d = new Date(2026, 10, 10, 16, 5);
+    test("lock clock 12h has no AM/PM", () => assert.equal(LK.time(d, false), "4:05"));
+    test("lock clock 24h", () => assert.equal(LK.time(d, true), "16:05"));
+    test("lock clock midnight 12h", () => assert.equal(LK.time(new Date(2026, 10, 10, 0, 7), false), "12:07"));
+    test("lock date month first", () => assert.equal(LK.date(d, true), "Tuesday, November 10"));
+    test("lock date day first", () => assert.equal(LK.date(d, false), "Tuesday 10 November"));
+    test("full name from GECOS", () => assert.equal(LK.fullName("aq:x:1000:1000:Akhmad Qasim,,,:/home/aq:/bin/bash\n", "aq"), "Akhmad Qasim"));
+    test("full name falls back to login", () => assert.equal(LK.fullName("aq:x:1000:1000::/home/aq:/bin/bash", "aq"), "aq"));
+    test("initials", () => { assert.equal(LK.initials("Akhmad Qasim"), "AQ"); assert.equal(LK.initials("alto"), "A"); assert.equal(LK.initials("A B C"), "AC"); assert.equal(LK.initials(""), ""); });
+    const rows = [{ nid: 3, time: 300, summary: "s3", body: "b3" }, { nid: 2, time: 200, summary: "s2", body: "b2" }, { nid: 1, time: 100, summary: "s1", body: "b1" }];
+    test("lock notifs since the lock, newest first", () => assert.deepEqual(LK.lockNotifs(rows, 150, 3, { previews: "always" }).map(r => r.nid), [3, 2]));
+    test("lock notifs capped", () => assert.equal(LK.lockNotifs(rows, 0, 2, {}).length, 2));
+    test("lock notifs hide previews when unlocked-only", () => { const r = LK.lockNotifs(rows, 0, 3, { previews: "unlocked" })[0]; assert.equal(r.body, ""); assert.equal(r.summary, ""); assert.equal(rows[0].body, "b3"); });
+    test("lock notifs off when whenLocked is false", () => assert.equal(LK.lockNotifs(rows, 0, 3, { whenLocked: false }).length, 0));
+    const devs = JSON.stringify({ keyboards: [{ name: "virt", layout: "us", main: false }, { name: "kb", layout: "us,de(neo)", active_layout_index: 1, active_keymap: "German (Neo 2)", capsLock: true, main: true }] });
+    test("keyboard: main one, layouts, caps", () => { const k = LK.keyboard(devs); assert.deepEqual(k.layouts, ["us", "de(neo)"]); assert.equal(k.index, 1); assert.equal(k.capsLock, true); });
+    test("keyboard: layout label", () => assert.equal(LK.layoutLabel(LK.keyboard(devs)), "DE"));
+    test("keyboard: bad json", () => assert.equal(LK.keyboard("{"), null));
+    test("shake starts and ends at rest", () => { assert.equal(LK.shake(0, 14, 3, 1.6), 0); assert.equal(LK.shake(1, 14, 3, 1.6), 0); });
+    test("shake stays within amplitude and decays", () => {
+        let peak = 0, late = 0;
+        for (let t = 0; t <= 1; t += 0.01) { const v = Math.abs(LK.shake(t, 14, 3, 1.6)); peak = Math.max(peak, v); if (t > 0.7) late = Math.max(late, v); }
+        assert.ok(peak <= 14 && peak > 8, "peak " + peak); assert.ok(late < peak / 3, "late " + late);
+    });
+}
+
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
