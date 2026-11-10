@@ -33,10 +33,11 @@ Item {
     // at loadSize and scaled; set loadSize to the largest size the icon is drawn at.
     Image {
         readonly property real k: root.plated ? Theme.appIcon.body * Theme.appIcon.inner : 1
+        readonly property int loadPx: Math.ceil(root.loadSize * k)
         anchors.centerIn: parent
         width: root.size * k
         height: width
-        sourceSize: Qt.size(Math.ceil(root.loadSize * k), Math.ceil(root.loadSize * k))
+        sourceSize: Qt.size(loadPx, loadPx)
         fillMode: Image.PreserveAspectFit
         source: Apps.iconUrl(root.icon, root.appId)
         asynchronous: true

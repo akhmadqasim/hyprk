@@ -17,10 +17,7 @@ ShellWindow {
     readonly property bool shown: Panels.open === "launchpad"
     visible: shown
 
-    // the window is created on open (shell.qml LazyLoader), so a Behavior never ran: fade and
-    // scale in from creation on the SwiftUI spring, glass included
-    property real appear: 0
-    NumberAnimation on appear { to: 1; duration: Theme.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
+    fadeIn: true                 // created on open: fade and scale in from creation, glass included
     glassOpacity: appear
     anchors { top: true; left: true; right: true; bottom: true }
     exclusionMode: ExclusionMode.Ignore

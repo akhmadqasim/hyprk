@@ -404,7 +404,7 @@ Singleton {
         readonly property int normal: 600                // panels open (spring 0.5 critically damped)
         readonly property var spring: [0.25, 0.248, 0.1, 1.0, 1, 1]
         readonly property int close: 250                 // panels close (ScaleDownAndOut)
-        readonly property int bannerIn: 600              // banner slide-in, same spring as panels
+        readonly property int bannerIn: normal           // banner slide-in, same spring as panels
         readonly property int bounce: 340                // one dock bounce up+down, TODO verify
         readonly property int magnify: 150               // dock magnification ramp on enter/leave (by eye; the cursor follow is not animated)
         readonly property int easing: Easing.OutCubic

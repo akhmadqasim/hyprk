@@ -46,7 +46,7 @@ ShellWindow {
     // leaving the Dock ramp the magnification in and out. (A Behavior on each icon's
     // size chased the cursor and lagged behind it, so icons overlapped and jittered.)
     property real magnify: hovering && Panels.open !== "context" ? 1 : 0
-    Behavior on magnify { NumberAnimation { duration: Theme.anim.magnify; easing.type: Easing.OutCubic } }
+    Behavior on magnify { NumberAnimation { duration: Theme.anim.magnify; easing.type: Theme.anim.easing } }
 
     function sizeFor(baseCenter) {
         if (magnify <= 0) return base;
