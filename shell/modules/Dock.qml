@@ -117,7 +117,7 @@ ShellWindow {
                     anchors.bottomMargin: Theme.dock.separatorInset - dock.pad
                     width: Theme.dock.separatorWidth
                     height: dock.base - (Theme.dock.separatorInset - dock.pad) * 2
-                    color: Theme.color.separator
+                    color: Theme.dock.separator
                 }
 
                 AppIcon {

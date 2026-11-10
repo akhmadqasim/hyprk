@@ -197,18 +197,21 @@ Singleton {
         readonly property int sidePadding: 8             // SPEC.md 7: distance sides 8
         readonly property int radius: 26                 // ~0.34 x dock height, measured from reference (no SPEC value)
         readonly property int bottomMargin: 4            // SPEC.md 7: icons 10 pt above the edge minus padding 6
-        readonly property int dotSize: 4                 // running indicator, TODO verify
+        readonly property int dotSize: 3                 // running indicator: ~0.065 x icon pitch (reference/screens/macos27-dock-default.png)
         readonly property int dotOffset: 1               // dot distance below icon, TODO verify
         readonly property int separatorWidth: 1          // TODO verify
-        readonly property int separatorHPad: 6           // TODO verify
-        readonly property int separatorInset: 10         // vertical inset of separator, TODO verify
+        // reference dock: icon art to art across the separator ~0.58 x pitch, separator ~0.92 x pitch
+        // tall, a near-black 1 pt line (reference/screens/macos27-dock-default.png)
+        readonly property int separatorHPad: 8
+        readonly property int separatorInset: 7          // vertical inset of separator
+        readonly property color separator: theme.dark ? Qt.rgba(1, 1, 1, 0.30) : Qt.rgba(0, 0, 0, 0.55)
         readonly property int bounceHeight: 28           // launch bounce, TODO verify
         readonly property int tooltipGap: 6
         readonly property int tooltipRadius: 8
         readonly property int tooltipHPad: 10
         readonly property int tooltipHeight: 24
         // neutral white lift over the plugin glass (cancels the backdrop colour cast)
-        readonly property color pluginLift: theme.dark ? Qt.rgba(theme.glass.darkVeil.r, theme.glass.darkVeil.g, theme.glass.darkVeil.b, 0.45) : Qt.rgba(0.97, 0.97, 0.97, 0.32)   // TODO verify
+        readonly property color pluginLift: theme.dark ? Qt.rgba(theme.glass.darkVeil.r, theme.glass.darkVeil.g, theme.glass.darkVeil.b, 0.45) : Qt.rgba(0.97, 0.97, 0.97, 0.20)   // TODO verify
     }
 
     // ---------- notifications ----------

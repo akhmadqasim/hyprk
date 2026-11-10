@@ -45,10 +45,13 @@ namespace lg {
         };
 
         // SPEC 9.5 DockRecipe.Other V2 on top of Clear: blur 1.5, inner 0.08 D / -0.18 D,
-        // outer 0.13 D / 0.42 D at 0.2.
+        // outer 0.13 D / 0.42 D at 0.2. Light face saturation 1.1 -> 0.5 and rim bias 0.5 -> 1.0: over a
+        // saturated blue wallpaper the dock read as tinted lavender with a weak rim, while
+        // reference/screens/macos27-dock-default.png keeps about half the backdrop chroma and a rim
+        // +45..70 above the body (measured; ours now +42..44).
         constexpr SRecipe DOCK = {
             .name              = "dock",
-            .light             = {.ycc = {0.15f, 0.9f, 1.1f}, .fill = {}, .highlightBias = 0.5f, .bleed = CLEAR_BLEED, .lift = 0.05f},
+            .light             = {.ycc = {0.15f, 0.9f, 0.5f}, .fill = {}, .highlightBias = 1.0f, .bleed = CLEAR_BLEED, .lift = 0.05f},
             .dark              = {.ycc = {0.05f, 0.92f, 1.25f}, .fill = {}, .highlightBias = 0.3f, .bleed = CLEAR_BLEED},
             .refractionHeightN = 0.08f,
             .refractionAmountN = -0.18f,
