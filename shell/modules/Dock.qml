@@ -39,13 +39,19 @@ ShellWindow {
     readonly property bool magnification: Prefs.dock.magnification === true
 
     // ---------- launch bounce ----------
-    // MAC-ANSWERS.md R2 (27.2.1): 0.70 s per bounce at every tile size, rise, a 0.14 s hold at the top,
-    // a mirrored fall, one frame on the ground (curve in lib/dock.js bounceOffset), repeated while the app
-    // launches (until it has a window; Apps stops it after 6 s); when launching ends the bounce in
-    // progress finishes and the icon stays down. Height 11 pt at tile 33, 18 pt at tile 64, linear in
-    // the tile size. No squash, never below the rest position, the Dock does not resize.
+    // From Dock.app's own code (27.2.1 -[Tile updateBouncing], MAC-ANSWERS.md "REA 27.2.1: Dock", lib/dock.js):
+    // 0.70 s per bounce at every tile size, a plain parabola (no hold at the top, no squash), on the ground for
+    // one frame, height (tile - 8) * 0.2 + 6 pt. It repeats while the app launches (until it has a window; Apps
+    // stops it after 6 s); then the bounce in progress finishes and the icon lands and stays down (Apps keeps the
+    // start and end times, so a rebuilt delegate cannot cut it short). The height is read from the wall clock
+    // every frame, not from per-hop animations, so there is no hitch between hops. The Dock does not resize.
     readonly property real bounceHeight: DockLayout.bounceHeight(base)
-    readonly property int bouncePeriod: 700
+    property real now: Date.now()
+    FrameAnimation {
+        running: !A11y.reduceMotion && Apps.anyBouncing(dock.now)
+        onRunningChanged: if (running) dock.now = Date.now()
+        onTriggered: dock.now = Date.now()
+    }
 
     readonly property int iconRoom: (magnification ? magnified : base) + Math.max(tooltipRoom, bounceHeight)
     anchors { bottom: true; left: true; right: true }
@@ -236,7 +242,10 @@ ShellWindow {
                 readonly property real size: modelData.separator ? dock.base : dock.geom.w[index] || dock.base
                 readonly property bool running: (modelData.windows || []).length > 0
                 readonly property bool launching: Apps.isLaunching(modelData.id) && !running
-                readonly property bool bouncing: launching && !A11y.reduceMotion
+                // a window appeared: launching is over, the bounce in progress still lands (Apps.stopLaunching)
+                readonly property bool launchDone: running && Apps.isLaunching(modelData.id)
+                onLaunchDoneChanged: if (launchDone) Apps.stopLaunching(modelData.id)
+                Component.onCompleted: if (launchDone) Apps.stopLaunching(modelData.id)
 
                 x: bg.x + (dock.geom.x[index] || 0)
                 y: bg.y + dock.pad
@@ -255,16 +264,9 @@ ShellWindow {
                     color: Theme.dock.separator
                 }
 
-                // one bounce, 0..1, linear in time (the shape is in lib/dock.js bounceOffset)
-                property real hop: 1
-                NumberAnimation on hop {
-                    running: cell.bouncing
-                    from: 0; to: 1
-                    duration: dock.bouncePeriod
-                    loops: Animation.Infinite
-                    alwaysRunToEnd: true         // a hop in the air lands before it stops
-                }
-                readonly property real bounceY: Math.round(DockLayout.bounceOffset(hop, dock.bounceHeight) * dock.dpr) / dock.dpr
+                // height above the rest position from the time since the bounce started (lib/dock.js bounceOffset)
+                readonly property real bounceT: A11y.reduceMotion ? -1 : Apps.bounceTime(modelData.id, dock.now)
+                readonly property real bounceY: bounceT < 0 ? 0 : Math.round(DockLayout.bounceOffset(bounceT, dock.bounceHeight) * dock.dpr) / dock.dpr
 
                 // interactive press: the icon lifts (FlexInteraction ultraSmall) and darkens
                 PressSpring { id: press; pressed: ma.containsPress; w: icon.width; h: icon.height; settlesGlass: false }
@@ -299,7 +301,7 @@ ShellWindow {
                 }
 
                 // app name label above the icon (timing: dock.tipShow / tipHide)
-                readonly property bool tipWanted: ma.containsMouse && !cell.modelData.separator && !cell.bouncing && Panels.open !== "context"
+                readonly property bool tipWanted: ma.containsMouse && !cell.modelData.separator && cell.bounceT < 0 && Panels.open !== "context"
                 onTipWantedChanged: tipWanted ? dock.tipShow(index) : dock.tipHide(index)
                 Rectangle {
                     visible: dock.tipCell === cell.index && dock.tipAlpha > 0

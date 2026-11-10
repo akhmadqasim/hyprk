@@ -162,20 +162,30 @@ test("dock.json without the key keeps magnification off", () => {
         for (const [d, s] of m) assert.ok(Math.abs(DK.magnifiedSize(64, 128, 1, d, 0, DK.magnifyRange(64)) - s) < 1.2, `d ${d}`);
         assert.equal(DK.magnifyRange(64), 222);
     });
-    test("dock bounce height from the tile size", () => {
-        assert.equal(DK.bounceHeight(33), 11);
-        assert.equal(DK.bounceHeight(64), 18);
-        assert.ok(DK.bounceHeight(48) > 11 && DK.bounceHeight(48) < 18);
+    test("dock bounce height from the tile size (Dock.app: (tile - 8) * 0.2 + 6)", () => {
+        assert.ok(Math.abs(DK.bounceHeight(33) - 11) < 1e-9);
+        assert.ok(Math.abs(DK.bounceHeight(64) - 17.2) < 1e-9);
+        assert.ok(DK.bounceHeight(48) > 11 && DK.bounceHeight(48) < 17.2);
     });
-    test("dock bounce: rise, hold, mirrored fall, above the rest position", () => {
+    test("dock bounce: a pure parabola of 700 ms, on the ground only at the hop boundary", () => {
         assert.equal(DK.bounceOffset(0, 22), 0);
-        assert.equal(DK.bounceOffset(1, 22), 0);
-        for (const p of [0.4, 0.45, 0.5, 0.55, 0.6]) assert.equal(DK.bounceOffset(p, 22), 22);
-        for (let p = 0; p <= 1; p += 0.05) assert.ok(DK.bounceOffset(p, 22) >= 0);
-        for (const p of [0.07, 0.17, 0.31]) assert.ok(Math.abs(DK.bounceOffset(p, 1) - DK.bounceOffset(1 - p, 1)) < 1e-9);
-        // measured shape (fraction of the height), within 0.06
-        const m = [[0.02, 0.09], [0.07, 0.30], [0.12, 0.43], [0.17, 0.60], [0.21, 0.69], [0.26, 0.81], [0.31, 0.90], [0.36, 0.95]];
-        for (const [p, h] of m) assert.ok(Math.abs(DK.bounceOffset(p, 1) - h) < 0.06, `phase ${p}`);
+        assert.equal(DK.bounceOffset(700, 22), 0);
+        assert.equal(DK.bounceOffset(350, 22), 22);
+        assert.equal(DK.bounceOffset(350 + 1400, 22), 22);
+        for (let t = 1; t < 700; t += 7) assert.ok(DK.bounceOffset(t, 22) > 0, `t ${t}`);
+        // mirror image about the top, 4u(1-u)
+        for (const t of [10, 100, 250]) assert.ok(Math.abs(DK.bounceOffset(t, 1) - DK.bounceOffset(700 - t, 1)) < 1e-9);
+        assert.ok(Math.abs(DK.bounceOffset(175, 1) - 0.75) < 1e-9);
+        // no hold: 0.4 of the period is below the top (0.96)
+        assert.ok(Math.abs(DK.bounceOffset(280, 1) - 0.96) < 1e-9);
+    });
+    test("dock bounce end: the bounce in progress finishes, at the next multiple of 700 ms", () => {
+        assert.equal(DK.bounceEnd(0), 700);
+        assert.equal(DK.bounceEnd(1), 700);
+        assert.equal(DK.bounceEnd(699), 700);
+        assert.equal(DK.bounceEnd(700), 1400);
+        assert.equal(DK.bounceEnd(6000), 6300);
+        assert.equal(DK.bounceOffset(DK.bounceEnd(1234), 22), 0);   // lands on the ground
     });
 }
 test("state array", () => assert.deepEqual(ST.parse("[1]", defs), defs));

@@ -52,19 +52,27 @@ function layout(widths, o) {
     return out;
 }
 
-// Launch bounce height in pt for a tile size: 11 pt at tilesize 33, 18 pt at 64 (MAC-ANSWERS.md R2
-// (27.2.1)), linear between and beyond the two measured points.
+// Launch bounce, from the Dock's own code (macOS 27.2.1 Dock.app -[Tile updateBouncing] 0x10002d9f4 and
+// -[Tile updateRect] 0x100012088; MAC-ANSWERS.md "REA 27.2.1: Dock", reference/re/27.2.1/decomp/dock-bounce.c).
+// Half period 350 ms: one bounce lasts 700 ms at every tile size, a plain parabola h = H * 4u(1 - u),
+// u = (t mod 700) / 700, on the ground only at u = 0 (one frame), no hold at the top, no squash.
+const bounceMs = 700;
+
+// Height in pt: (tile - 8) * 0.2 + 6 (the code's float 0x1002580c0 = 0.2): 11.0 at tile 33, 17.2 at tile 64.
+// (The recording measured 18 at tile 64; the code is the source.)
 function bounceHeight(tile) {
-    return Math.max(0, 11 + (tile - 33) * 7 / 31);
+    return Math.max(0, (tile - 8) * 0.2 + 6);
 }
 
-// Launch bounce: height above the rest position at `phase` 0..1 of one bounce (0.70 s).
-// MAC-ANSWERS.md R2 (27.2.1) shape: rises for 0.4 of the period, holds at the top from 0.40 to 0.60
-// (0.14 s), falls as the mirror image of the rise, and touches the ground only at the phase wrap (one
-// frame). Rise = 1 - (1 - p / 0.4)^1.55, least-squares fit to the 19 measured points (RMS 0.22 pt at
-// 11 pt; the plain parabola was 0.31 pt and has no hold). Never below 0, no squash.
-function bounceOffset(phase, height) {
-    const p = Math.min(1, Math.max(0, phase));
-    const u = Math.min(p, 1 - p);
-    return u >= 0.4 ? height : height * (1 - Math.pow(1 - u / 0.4, 1.55));
+// Height above the rest position `t` ms after the bounce started (any t >= 0; it repeats every 700 ms).
+function bounceOffset(t, height) {
+    const u = (((t % bounceMs) + bounceMs) % bounceMs) / bounceMs;
+    return height * 4 * u * (1 - u);
+}
+
+// When the bounce stops: launching ends (the app has a window, or the 6 s cap) `stopMs` after it started;
+// the bounce in progress is finished, so it ends at the next multiple of 700 ms (the code rounds _bounceDur up
+// to (floor(t / 700) + 1) * 700). The icon lands at the end of its arc and never snaps down mid-air.
+function bounceEnd(stopMs) {
+    return (Math.floor(Math.max(0, stopMs) / bounceMs) + 1) * bounceMs;
 }

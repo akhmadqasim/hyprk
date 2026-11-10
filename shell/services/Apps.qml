@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Hyprland
 import "../lib/search.js" as Search
 import "../lib/macicons.js" as MacIcons
+import "../lib/dock.js" as DockLayout
 
 // Dock model and app helpers: pinned apps, running windows (Hyprland IPC),
 // icon lookup with a generic fallback, launching with a bounce state.
@@ -122,7 +123,10 @@ Singleton {
         return out;
     }
 
-    property var launching: ({})    // id -> start time (ms)
+    // Launch bounce state, kept here (not in the Dock's delegates, which are rebuilt when the model changes) so a
+    // bounce is never cut short: id -> { start (ms), end }. end is 0 while the app is launching; stopLaunching()
+    // sets it to the end of the bounce in progress (lib/dock.js bounceEnd) and the Dock lets the icon land there.
+    property var launching: ({})
 
     function appIdOf(t) {
         if (!t) return "";
@@ -261,10 +265,24 @@ Singleton {
     }
 
     function markLaunching(id) {
+        const b = launching[id];
         const l = Object.assign({}, launching);
-        l[id] = Date.now();
+        if (!b || b.end !== 0) {        // a launch already bouncing keeps its phase (no jump)
+            const now = Date.now();
+            // a bounce still finishing from before carries on and a new one starts at its end
+            l[id] = { start: b && b.end > now ? b.end : now, end: 0 };
+        }
         launching = l;
         bounceTimer.restart();
+    }
+
+    // Launching is over (window mapped, or the cap): the bounce in progress finishes, the icon stays down.
+    function stopLaunching(id) {
+        const b = launching[id];
+        if (!b || b.end !== 0) return;
+        const l = Object.assign({}, launching);
+        l[id] = { start: b.start, end: b.start + DockLayout.bounceEnd(Date.now() - b.start) };
+        launching = l;
     }
 
     function launch(entry, id) {
@@ -273,11 +291,25 @@ Singleton {
         markLaunching(id || entry.id);
     }
 
-    function isLaunching(id) { return launching[id] !== undefined; }
+    function isLaunching(id) { const b = launching[id]; return b !== undefined && b.end === 0; }
+
+    // ms since the bounce of `id` started at wall time `now`, or -1 when it is not bouncing (not launching and
+    // the last bounce has landed)
+    function bounceTime(id, now) {
+        const b = launching[id];
+        if (!b || (b.end !== 0 && now >= b.end)) return -1;
+        return Math.max(0, now - b.start);
+    }
+
+    // true while any icon bounces at wall time `now` (the Dock's frame clock runs only then)
+    function anyBouncing(now) {
+        for (const id in launching) if (bounceTime(id, now) >= 0) return true;
+        return false;
+    }
 
     Timer {
         id: bounceTimer
         interval: 6000    // stop bouncing even if no window maps (CLI apps, failed launch)
-        onTriggered: root.launching = ({})
+        onTriggered: { for (const id in root.launching) root.stopLaunching(id); }
     }
 }
