@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import "../lib/search.js" as Search
+import "../lib/macicons.js" as MacIcons
 
 // Dock model and app helpers: pinned apps, running windows (Hyprland IPC),
 // icon lookup with a generic fallback, launching with a bounce state.
@@ -146,28 +147,6 @@ Singleton {
         return Search.matchEntry(entries, appId);
     }
 
-    // Linux app id / icon name -> macOS icon (themes/icons/apps, extracted by the assets agent).
-    // Keys are the lowercased last id segment.
-    readonly property var macIcons: ({
-        "hyprk-finder": "Finder", "nautilus": "Finder", "thunar": "Finder", "dolphin": "Finder",
-        "hyprk-launchpad": "Apps", "view-app-grid-symbolic": "Apps",
-        "firefox": "Safari", "firefox_firefox": "Safari", "google-chrome": "Safari", "chromium": "Safari",
-        "evolution": "Mail", "thunderbird": "Mail", "geary": "Mail",
-        "calendar": "Calendar", "texteditor": "TextEdit", "gedit": "TextEdit",
-        "music": "Music", "rhythmbox": "Music", "rhythmbox3": "Music",
-        "settings": "System_Settings", "gnome-control-center": "System_Settings",
-        "ghostty": "Terminal", "terminal": "Terminal", "kitty": "Terminal", "ptyxis": "Terminal", "foot": "Terminal",
-        "calculator": "Calculator", "gnome-calculator": "Calculator",
-        "gnome-system-monitor": "Activity_Monitor", "systemmonitor": "Activity_Monitor",
-        "loupe": "Preview", "eog": "Preview", "evince": "Preview", "papers": "Preview",
-        "clocks": "Clock", "weather": "Weather", "maps": "Maps", "contacts": "Contacts",
-        "photos": "Photos", "shotwell": "Photos", "totem": "QuickTime_Player", "showtime": "QuickTime_Player",
-        "baobab": "Disk_Utility", "diskutility": "Disk_Utility", "font-viewer": "Font_Book", "fontviewer": "Font_Book",
-        "screenshot": "Screenshot", "notes": "Notes", "messages": "Messages", "mail": "Mail",
-        "facetime": "FaceTime", "reminders": "Reminders", "gnome-software": "App_Store", "snap-store": "App_Store",
-        "snap-store_snap-store": "App_Store", "characters": "Font_Book", "simple-scan": "Image_Capture",
-        "user-trash": "@TrashIcon", "user-trash-full": "@FullTrashIcon", "folder-download": "@DownloadsFolder",
-    })
     readonly property string iconDir: Quickshell.shellDir + "/../themes/icons"
     // The macOS icons are user-provided (never shipped). HYPRK_APPLE_ICONS=0 (set by packaging/ when
     // themes/icons/apps is missing) maps nothing and uses the icon theme instead.
@@ -175,14 +154,10 @@ Singleton {
     readonly property string genericIcon: appleIcons ? "file://" + iconDir + "/system/GenericApplicationIcon-512.png"
                                                      : Quickshell.iconPath("application-x-executable", true)
 
-    // mapped macOS icon name for an app, "" when there is none
+    // mapped macOS icon name for an app, "" when there is none. The table is themes/icons/apple-map.txt
+    // (shell/lib/macicons.js is generated from it by themes/icons/tools/gen-map.mjs; the Finder uses the same).
     function macIconFor(name, appId) {
-        if (!appleIcons) return "";
-        for (const k of [appId, name]) {
-            const mac = macIcons[Search.normId(k).split(".").pop()];
-            if (mac) return mac;
-        }
-        return "";
+        return appleIcons ? MacIcons.lookup([appId, name]) : "";
     }
     // true when the icon is one of the extracted macOS icons (already a squircle)
     function isMacIcon(name, appId) { return macIconFor(name, appId) !== ""; }
@@ -196,7 +171,7 @@ Singleton {
     // Absolute icon url: macOS icon when mapped, else the icon theme, else the generic app icon.
     function iconUrl(name, appId) {
         const mac = macIconFor(name, appId);
-        if (mac) return "file://" + iconDir + (mac[0] === "@" ? "/system/" + mac.slice(1) : "/apps/" + mac) + "-512.png";
+        if (mac) return "file://" + iconDir + "/" + MacIcons.file(mac);
         if (!name) return genericIcon;
         if (name.startsWith("/")) return "file://" + name;
         for (const n of [name].concat(themeAliases[name] || [])) {
