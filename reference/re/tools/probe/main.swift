@@ -1,6 +1,6 @@
 // hyprk live probe: shows real AppKit glass, menus, popovers and alerts and dumps their layer trees,
 // filters, view metrics and running animations as JSON. macOS only.
-// Build: swiftc -swift-version 5 -O -o probe main.swift    Run: ./probe <outdir> [light|dark] [ui|variants]
+// Build: swiftc -swift-version 5 -O -o probe main.swift    Run: ./probe <outdir> [light|dark] [ui|variants|variants2|motion|motion2]
 import AppKit
 import QuartzCore
 import ObjectiveC
@@ -302,7 +302,7 @@ final class Probe: NSObject, NSApplicationDelegate {
         bg.addSubview(button)
         win.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
-        if scenario == "motion" { after(2.5) { self.stepMotion() } } else if scenario == "motion2" { after(2.5) { self.stepMotion2() } } else if scenario == "variants" { after(1.0) { self.stepVariants() } } else { after(1.5) { self.stepGlass() } }
+        if scenario == "motion" { after(2.5) { self.stepMotion() } } else if scenario == "motion2" { after(2.5) { self.stepMotion2() } } else if scenario.hasPrefix("variants") { after(1.0) { self.stepVariants() } } else { after(1.5) { self.stepGlass() } }
     }
 
     // every GlassMaterialProvider.Variant (private _variant) and known subvariant at three sizes
@@ -336,8 +336,20 @@ final class Probe: NSObject, NSApplicationDelegate {
         configs.append(("regular+inactiveApp", 0, nil, ["inactive": 1]))
         configs.append(("regular.menu+inactiveApp", 0, "menu", ["inactive": 1]))
         configs.append(("regular.window+inactiveApp", 0, "window", ["inactive": 1]))
+        // variants2: raw _variant values past the public Variant list, alone and with the Spotlight subvariant
+        // (DesignLibrary's internal Base also has menu, siriSnippet, siri, carplayUltra, vibrantFill)
+        if scenario == "variants2" {
+            configs = []
+            let lo = Int(ProcessInfo.processInfo.environment["RAW_LO"] ?? "24") ?? 24
+            let hi = Int(ProcessInfo.processInfo.environment["RAW_HI"] ?? "40") ?? 40
+            for v in lo...hi {
+                configs.append(("raw\(v)", v, nil, [:]))
+                for sv in ["spotlightField", "searchResults", "listening"] { configs.append(("raw\(v).\(sv)", v, sv, [:])) }
+            }
+        }
         // D = shortest side; Apple's recipes scale with it (ramps over 48/64 to 120/160 pt)
-        let sizes: [(NSRect, CGFloat)] = [24, 32, 44, 64, 96, 128, 160, 240, 400].map { d in
+        let ds: [Int] = scenario == "variants2" ? [56, 160] : [24, 32, 44, 64, 96, 128, 160, 240, 400]
+        let sizes: [(NSRect, CGFloat)] = ds.map { d in
             let dd = CGFloat(d)
             return (NSRect(x: 20, y: 60, width: min(max(dd * 1.6, 120), 700), height: dd), min(dd / 2, 28))
         }
@@ -547,5 +559,5 @@ app.setActivationPolicy(.regular)
 let probe = Probe()
 app.delegate = probe
 // hard stop so a stuck modal never leaves the app running
-Timer.scheduledTimer(withTimeInterval: scenario == "variants" ? 120 : 25, repeats: false) { _ in print("timeout"); exit(2) }
+Timer.scheduledTimer(withTimeInterval: scenario.hasPrefix("variants") ? 120 : 25, repeats: false) { _ in print("timeout"); exit(2) }
 app.run()

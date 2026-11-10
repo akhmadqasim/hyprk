@@ -161,3 +161,9 @@ glass material 65 (03:35, orchestrator; too cyan)
   hyprk-menubar both map to the `menu` recipe, so alerts and everything else in the overlay get the menu shadow
   0.7 / 0.8 (a real alert has 0.6 / 0.7, Notification Center cards the Regular by-size shadow); splitting that needs
   separate layer namespaces in the shell.
+- [Mac, 2026-11-10] Spotlight recipe traced (reference/re/NOTES.md): the branch condition of SiriRecipe.SiriModifier is
+  `subvariant == .listening || contentEffect == .lense`. spotlightField and searchResults take branch A (refraction
+  0.4 D / -0.72 D, blur 8, face YCC 0.1 / 1.0 / 1.25, no fill, blurFill darken 0.75 normal 0.5, no ring shadow) unless
+  Spotlight asks for the `lense` content effect, which is still unknown (set in SpotlightUI* / SearchUI, not traced).
+  It cannot be measured live: AppKit does not reach base `siri`. plugin SPOTLIGHT is unchanged (by eye, score 81);
+  trying branch A there is an optional experiment for the PC, compare with reference/screens/macos27-spotlight.png.
