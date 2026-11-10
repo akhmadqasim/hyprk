@@ -146,7 +146,7 @@ Item {
                         anchors.centerIn: parent
                         visible: photo.status !== Image.Ready
                         text: L.initials(Lock.userName)
-                        font: Typography.font(avatar.width * 0.4, Typography.semibold)
+                        font: Typography.font(Math.max(1, avatar.width * 0.4), Typography.semibold)
                         color: "white"
                     }
                     Image {
