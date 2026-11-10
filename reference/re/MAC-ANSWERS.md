@@ -346,3 +346,38 @@ All values are in points at `pointSize` 32 and in SVG coordinates (y down). The 
   - `panes` for Settings entries.
 
 Tools: the scratch scripts `sfrender.swift`, `gen.py` and `paneicons.swift` live on the Mac only, not in the repo. They can be added if the PC wants to re-run.
+
+## HUD volume and brightness (relay #18, #19)
+
+Measured with synthetic media keys (NX system-defined events) and 60 fps recordings of the top-right corner;
+pictures `screens/27.2.1/hud-{vol,mute,bright}-{light,dark}.png` (2x, over a solid Electric Blue wallpaper; the
+blurred photo at the right end is a desktop widget seen through the glass).
+
+- Drawn by **MenuBarAgent** (`/System/Library/CoreServices/MenuBarAgent.app`), window level 101, window frame
+  1363,34 367 x 155 pt (includes room for the shadow). Not OSDUIHelper. While the HUD is up, the Control Center menu
+  bar icon shows its highlight pill: the HUD is presented from the Control Center item.
+- Shape: one capsule, x 1392.5..1700 pt (307.5 wide, 10 pt from the screen's right edge), y 44..109.5 (65.5 tall,
+  10 pt below the 34 pt menu bar), radius = half height. Material: clear-looking glass with strong edge refraction
+  (the widget behind is bent around the right end), light rim, interior slightly saturated (69,83,206 -> 68,85,232).
+  Light and dark look the same over the same wallpaper (white content in both).
+- Content: glyph centred about 34 pt from the left edge, 27.5 x 21.5 pt for speaker.wave.2.fill. Glyph per state:
+  speaker.wave.1.fill at low level (3/16), speaker.wave.2.fill at 7/16, speaker.slash.fill when muted, sun.max.fill
+  for brightness (max volume not tried: it would blast the speakers). Level bar: 16 dashes, each 12 x 4 pt with a
+  2 pt gap (pitch 13.5 pt), bar 214 pt long starting 63 pt from the capsule's left edge (30.5 pt right padding),
+  vertically centred. Filled part white; empty dashes white at low alpha; muted = all dashes empty.
+- Steps: one key press = 1/16 (volume 38 -> 44 %). Option+Shift = quarter steps (bar moves 1/64).
+- Appear: the menu bar highlight comes first, the HUD starts 3 frames (50 ms) after the key, then scales from about
+  0.9 to 1.0 while fading in. Alpha per frame: 0.01, 0.02, 0.03, 0.06, 0.09, 0.13, 0.19, 0.24, 0.30, 0.35, 0.40,
+  0.45, 0.50, 0.56, 0.61, 0.66, 0.71, 0.75, 0.78, 0.82, 0.85, 0.87, 0.89, 0.91, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98:
+  about 0.55 s, slow start then ease-out (spring-like). Width 0.82 -> 0.92 -> 1.0 of the final over the first 0.1 s
+  then easing out to 1.0 by about 0.4 s.
+- Stays up until about 1.05 s after the last key press, then hides: scales back towards 0.92 and fades. Alpha
+  0.96, 0.85, 0.71, 0.56, 0.45, 0.36, 0.29, 0.23, 0.18, 0.14, 0.11, 0.09, 0.07, 0.05, 0.04, 0.03: about 0.3 s to 5 %
+  (about x0.8 per frame); the glass rim goes first, glyph and bar linger faintly to about 0.5 s.
+- Repeated presses (5 at 120 ms) and simulated key repeat (10 at 70 ms): the HUD does not re-animate; the filled part
+  of the bar moves continuously (not dash by dash, it can stop inside a dash) and eases out about 0.15 to 0.2 s after
+  the last press. The 1.05 s hide timer restarts on every press.
+- Volume then brightness then volume within 0.5 s: same capsule, the glyph and bar crossfade in about 3 frames
+  (both glyphs visible in the middle frame); no hide/show between them.
+- Not measured: changing from the Control Center slider, full screen, a second display, real hardware key repeat,
+  maximum level, keyboard backlight.
