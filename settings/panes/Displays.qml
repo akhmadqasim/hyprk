@@ -57,34 +57,104 @@ Column {
     }
     Component.onCompleted: refresh()
 
-    // Arrangement strip
+    // Arrangement strip. Centred when it fits. When it does not, the thumbnails shrink step by step down to
+    // `minThumb` high and then the row scrolls sideways inside the card (clipped to it). macOS shows the display
+    // thumbnails centred in a row, but there is no reference shot of this pane in reference/, so everything about
+    // the overflow behaviour (minimum size, scrolling instead of a scaled row, gaps, padding) is guessed.
     Card {
         Item {
+            id: strip
             width: parent.width; height: 150
-            Row {
-                anchors.centerIn: parent
-                spacing: 16
-                scale: Math.min(1, (parent.width - 24) / Math.max(1, width))   // many displays: shrink to fit
-                Repeater {
-                    model: pane.status === "ok" ? pane.monitors : [{ name: "", description: "Display", width: 16, height: 10 }]
-                    Column {
-                        required property var modelData
-                        required property int index
-                        spacing: 6
-                        Rectangle {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            height: 74; width: Math.round(height * modelData.width / Math.max(1, modelData.height))
-                            radius: 6
-                            border.width: index === pane.sel && pane.status === "ok" ? 3 : 1
-                            border.color: index === pane.sel && pane.status === "ok" ? Theme.accent : Theme.separator
-                            gradient: Gradient { GradientStop { position: 0; color: "#3B7BD6" } GradientStop { position: 1; color: "#7A5BC9" } }
-                            opacity: pane.status === "ok" ? 1 : 0.35
-                            MouseArea { anchors.fill: parent; onClicked: pane.sel = index }
-                        }
-                        Text {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            text: modelData.model || modelData.description
-                            font.family: Theme.fontText; font.pixelSize: Theme.font.small; color: Theme.label
+
+            readonly property var items: pane.status === "ok" ? pane.monitors : [{ name: "", description: "Display", width: 16, height: 10 }]
+            readonly property int pad: 16                // keeps the selection ring away from the card edge
+            readonly property int gap: 16
+            readonly property int minSlot: 72            // a label column is never narrower, so short names stay readable
+            readonly property int maxThumb: 74
+            readonly property int minThumb: 44
+            // width of the whole row for thumbnails `h` high
+            function rowWidth(h) {
+                let w = Math.max(0, items.length - 1) * gap;
+                for (const m of items) w += Math.max(minSlot, Math.round(h * m.width / Math.max(1, m.height)));
+                return w;
+            }
+            // tallest thumbnail height (maxThumb .. minThumb) whose row fits the card; minThumb when none does
+            readonly property int thumbH: {
+                for (let h = maxThumb; h > minThumb; h -= 2)
+                    if (rowWidth(h) <= width - 2 * pad) return h;
+                return minThumb;
+            }
+
+            Flickable {
+                id: flick
+                anchors.fill: parent
+                clip: true                               // nothing is drawn outside the card's rectangle
+                contentWidth: Math.max(width, row.width + 2 * strip.pad)
+                contentHeight: height
+                flickableDirection: Flickable.HorizontalFlick
+                boundsBehavior: Flickable.StopAtBounds
+
+                // keep the selected display in view when it changes (arrow keys, a new first selection)
+                function reveal() {
+                    const it = row.children[pane.sel];
+                    if (!it || !it.width) return;
+                    const left = row.x + it.x - strip.pad, right = row.x + it.x + it.width + strip.pad;
+                    if (left < contentX) contentX = Math.max(0, left);
+                    else if (right > contentX + width) contentX = Math.min(contentWidth - width, right - width);
+                }
+                Connections { target: pane; function onSelChanged() { Qt.callLater(flick.reveal) } }
+                onWidthChanged: Qt.callLater(reveal)
+                onContentWidthChanged: Qt.callLater(reveal)   // the displays were listed after the first draw
+
+                WheelHandler {                            // wheel / trackpad scroll sideways, only while the row overflows
+                    enabled: flick.contentWidth > flick.width
+                    orientation: Qt.Vertical | Qt.Horizontal
+                    onWheel: event => {
+                        const d = event.angleDelta.x !== 0 ? event.angleDelta.x : event.angleDelta.y;
+                        flick.contentX = Math.max(0, Math.min(flick.contentWidth - flick.width, flick.contentX - d));
+                    }
+                }
+
+                // position bar, only while there is more to scroll to (guessed: macOS shows overlay scroll bars)
+                Rectangle {
+                    visible: flick.contentWidth > flick.width + 1
+                    parent: strip                             // stays put while the content moves
+                    y: strip.height - 8; height: 3; radius: 1.5
+                    width: Math.max(20, strip.width * flick.width / flick.contentWidth)
+                    x: (strip.width - width) * flick.contentX / Math.max(1, flick.contentWidth - flick.width)
+                    color: Theme.secondaryLabel; opacity: 0.5
+                }
+
+                Row {
+                    id: row
+                    x: Math.max(strip.pad, (flick.width - width) / 2)
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: strip.gap
+                    Repeater {
+                        model: strip.items
+                        Column {
+                            required property var modelData
+                            required property int index
+                            spacing: 6
+                            readonly property int thumbW: Math.round(strip.thumbH * modelData.width / Math.max(1, modelData.height))
+                            width: Math.max(strip.minSlot, thumbW)
+                            Rectangle {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                height: strip.thumbH; width: parent.thumbW
+                                radius: 6
+                                border.width: index === pane.sel && pane.status === "ok" ? 3 : 1
+                                border.color: index === pane.sel && pane.status === "ok" ? Theme.accent : Theme.separator
+                                gradient: Gradient { GradientStop { position: 0; color: "#3B7BD6" } GradientStop { position: 1; color: "#7A5BC9" } }
+                                opacity: pane.status === "ok" ? 1 : 0.35
+                                MouseArea { anchors.fill: parent; onClicked: pane.sel = index }
+                            }
+                            Text {
+                                width: parent.width
+                                horizontalAlignment: Text.AlignHCenter
+                                elide: Text.ElideRight
+                                text: modelData.model || modelData.description
+                                font.family: Theme.fontText; font.pixelSize: Theme.font.small; color: Theme.label
+                            }
                         }
                     }
                 }
