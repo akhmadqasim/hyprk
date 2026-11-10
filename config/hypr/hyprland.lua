@@ -230,8 +230,8 @@ hl.layer_rule({
 local cmd = "SUPER"
 hl.bind(cmd .. " + space",   hl.dsp.global("hyprk:spotlight"))
 hl.bind(cmd .. " + Tab",     hl.dsp.global("hyprk:switcher"))
-hl.bind(cmd .. " + F4",      hl.dsp.global("hyprk:launchpad"))
-hl.bind(cmd .. " + A",       hl.dsp.global("hyprk:launchpad"))
+hl.bind(cmd .. " + F4",      hl.dsp.global("hyprk:apps"))   -- Applications window (shell/services/AppsView.qml)
+hl.bind(cmd .. " + A",       hl.dsp.global("hyprk:apps"))
 hl.bind(cmd .. " + N",       hl.dsp.global("hyprk:notificationcenter"))
 hl.bind(cmd .. " + SHIFT + C", hl.dsp.global("hyprk:controlcenter"))
 hl.bind(cmd .. " + Up",      hl.dsp.global("hyprk:missioncontrol"))   -- macOS: Ctrl+Up

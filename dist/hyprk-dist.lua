@@ -27,7 +27,7 @@ if os.getenv("HYPRK_NESTED") == "1" then
     local terminal = os.getenv("HYPRK_TERMINAL") or "ghostty"
     hl.bind(m .. " + S",      hl.dsp.global("hyprk:spotlight"))
     hl.bind(m .. " + W",      hl.dsp.global("hyprk:switcher"))
-    hl.bind(m .. " + A",      hl.dsp.global("hyprk:launchpad"))
+    hl.bind(m .. " + A",      hl.dsp.global("hyprk:apps"))
     hl.bind(m .. " + N",      hl.dsp.global("hyprk:notificationcenter"))
     hl.bind(m .. " + C",      hl.dsp.global("hyprk:controlcenter"))
     hl.bind(m .. " + M",      hl.dsp.global("hyprk:missioncontrol"))
