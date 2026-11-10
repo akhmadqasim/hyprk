@@ -7,7 +7,7 @@ import "../lib/spotlight.js" as SL
 
 // File results for Spotlight: recent files (~/.local/share/recently-used.xbel) first,
 // then a search of $HOME with the fastest tool found: plocate, locate, fd/fdfind, find.
-// Searches are debounced and stream their results; a new query kills the old search.
+// Searches are debounced, a new query kills the old search, hits are published in batches.
 Singleton {
     id: root
 
@@ -15,7 +15,7 @@ Singleton {
     property string query: ""
     property string tool: ""            // detected search tool ("" until detection finishes)
     property var recents: []            // [{path, name, dir, isDir, mime}] (existing files only)
-    property var hits: []               // rows from the running / last search
+    property var hits: []               // rows of the current search
     property bool searching: search.running
     readonly property int limit: 40
     readonly property var results: SL.mergeFiles(recents, hits, query, limit)
@@ -27,59 +27,67 @@ Singleton {
     }
 
     // ---------- recents ----------
-    // read when Spotlight shows files; xbel paths that no longer exist are dropped
-    function loadRecents() { xbel.reload(); }
+    // the xbel is parsed when it changes; existence is checked when Spotlight shows files
+    property var xbelRows: []           // parsed, newest first
     FileView {
-        id: xbel
         path: (Quickshell.env("XDG_DATA_HOME") || root.home + "/.local/share") + "/recently-used.xbel"
         printErrors: false
-        blockLoading: false
-        onLoaded: {
-            const list = SL.parseXbel(text(), 60);
-            const mimes = {};
-            for (const r of list) mimes[r.path] = r.mime;
-            root.pendingMime = mimes;
-            exists.exec(["sh", "-c", 'for p; do [ -e "$p" ] && { [ -d "$p" ] && echo "$p/" || echo "$p"; }; done', "sh"].concat(list.map(r => r.path)));
-        }
+        watchChanges: true
+        onFileChanged: reload()
+        onLoaded: root.xbelRows = SL.parseXbel(text(), 60)
     }
-    property var pendingMime: ({})
+    function loadRecents() {
+        exists.exec(["sh", "-c", 'for p; do [ -e "$p" ] && echo "$p"; done', "sh"].concat(xbelRows.map(r => r.path)));
+    }
     Process {
         id: exists
         stdout: StdioCollector {
-            onStreamFinished: root.recents = text.split("\n").filter(l => l !== "").slice(0, 20).map(l => {
-                const r = SL.fileRow(l, root.home);
-                r.mime = root.pendingMime[r.path] || "";
-                return r;
-            })
+            onStreamFinished: {
+                const ok = new Set(text.split("\n"));
+                root.recents = root.xbelRows.filter(r => ok.has(r.path)).slice(0, 20).map(r =>
+                    Object.assign(SL.fileRow(r.path + (r.mime === "inode/directory" ? "/" : ""), root.home), { mime: r.mime }));
+            }
         }
     }
 
     // ---------- search ----------
     onQueryChanged: {
+        search.running = false;
+        pending = [];
         hits = [];
-        if (query.trim().length < 2) { search.running = false; debounce.stop(); return; }
+        if (query.trim().length < 2) { debounce.stop(); return; }
         debounce.restart();
     }
     Timer {
         id: debounce
         interval: 180
-        onTriggered: if (root.tool) search.exec(SL.searchCommand(root.tool, root.query, root.home, root.limit))
+        onTriggered: if (root.tool) { search.forQuery = root.query; search.exec(SL.searchCommand(root.tool, root.query, root.home, root.limit)); }
     }
     onToolChanged: if (query.trim().length >= 2) debounce.restart()
+    property var pending: []            // streamed rows not yet published
     Process {
         id: search
+        property string forQuery: ""
         stdout: SplitParser {
             onRead: line => {
-                // lines of a killed search can still arrive: keep only what matches now
-                if (!SL.matchesQuery(line, root.query) || root.hits.length >= root.limit) return;
-                root.hits = root.hits.concat([SL.fileRow(line, root.home)]);
+                // lines of a killed search can still arrive: keep only those of the current query
+                if (search.forQuery !== root.query || !SL.matchesQuery(line, root.query)) return;
+                root.pending.push(SL.fileRow(line, root.home));
+                if (!publish.running) publish.start();
             }
+        }
+        onExited: publish.triggered()
+    }
+    // one model update per batch instead of one per line
+    Timer {
+        id: publish
+        interval: 30
+        onTriggered: {
+            if (root.pending.length === 0) return;
+            root.hits = root.hits.concat(root.pending).slice(0, root.limit);
+            root.pending = [];
         }
     }
 
     function open(row) { Quickshell.execDetached(["xdg-open", row.path]); }
-    function reveal(row) {
-        // Finder-like: open the parent folder (hyprk Finder takes a dir argument)
-        Quickshell.execDetached(["xdg-open", row.isDir ? row.path : row.path.slice(0, row.path.lastIndexOf("/")) || "/"]);
-    }
 }

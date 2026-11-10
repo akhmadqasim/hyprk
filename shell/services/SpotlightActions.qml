@@ -37,8 +37,12 @@ Singleton {
         const grim = area ? `g=$(slurp) && grim -g "$g" ${file}` : `grim ${file}`;
         Quickshell.execDetached(["sh", "-c", `sleep 0.4; ${grim} && ${sound}`]);
     }
+    // hyprk System Settings on a pane, GNOME Settings when it is missing (like Apps.openSettings)
     function openPane(id) {
-        Quickshell.execDetached(["env", "HYPRK_SETTINGS_PANE=" + id, hyprk + "/settings/run.sh"]);
+        const app = Apps.hyprkApps["org.hyprk.Settings"];
+        const alts = app.fallbacks.map(c => `command -v ${c} >/dev/null && exec ${c};`).join(" ");
+        Quickshell.execDetached(["sh", "-c", `[ -x "$2" ] && HYPRK_SETTINGS_PANE="$1" exec "$2"; ${alts} exit 1`, "sh", id, hyprk + "/" + app.run]);
+        Apps.markLaunching(app.id);
     }
 
     readonly property var system: {
@@ -96,7 +100,6 @@ Singleton {
     readonly property var all: system.concat(appActions)
 
     function rank(query, limit) { return SL.rankActions(all, query, SpotlightState.quickKeys, Search.score, limit); }
-    function byId(id) { return all.find(a => a.id === id) || null; }
 
     function run(action) {
         Panels.close();

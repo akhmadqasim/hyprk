@@ -9,31 +9,32 @@ import "../lib/spotlight.js" as SL
 // (SpotlightState.clipboardHistory), like macOS 26. Backend: cliphist when installed,
 // else scripts/clipboard.sh (files in $XDG_STATE_HOME/hyprk/clipboard, 200 items,
 // expired by the retention setting). Both need wl-paste/wl-copy (wl-clipboard).
+// Created by shell.qml only while history is on, or when Spotlight's Clipboard view opens.
 Singleton {
     id: root
 
     readonly property string retention: SpotlightState.clipboardHistory
-    readonly property bool enabled: retention !== "off"
+    readonly property int retentionMs: SL.retentionMs(retention)
+    readonly property bool enabled: retentionMs > 0
     readonly property int cap: 200
-    // tools, detected once: "wl" = wl-clipboard present, "cliphist" = use cliphist
-    property bool hasWlClipboard: false
-    property bool cliphist: false
+    // tools, probed once on first use
     property bool detected: false
-    readonly property bool available: hasWlClipboard
-    readonly property bool watching: watcher.running
+    property bool available: false       // wl-paste and wl-copy
+    property bool cliphist: false
+    readonly property bool shouldWatch: detected && enabled && available
 
     property var items: []       // [{id, file, mime, ts, text}] newest first
     readonly property string script: Quickshell.shellDir + "/scripts/clipboard.sh"
-    readonly property int maxAgeMin: Math.round(SL.retentionMs(retention) / 60000)
 
     Process {
-        running: true
+        running: !root.detected
         command: ["sh", "-c", "command -v wl-paste >/dev/null && command -v wl-copy >/dev/null && echo wl; command -v cliphist >/dev/null && echo cliphist"]
         stdout: StdioCollector {
             onStreamFinished: {
-                root.hasWlClipboard = text.indexOf("wl") !== -1;
+                root.available = text.indexOf("wl") !== -1;
                 root.cliphist = text.indexOf("cliphist") !== -1;
                 root.detected = true;
+                root.reload();
             }
         }
     }
@@ -41,24 +42,24 @@ Singleton {
     // the watcher runs while history is on; restarts if wl-paste dies (compositor restart)
     Process {
         id: watcher
-        running: root.detected && root.enabled && root.available
+        running: root.shouldWatch
         command: root.cliphist
             ? ["sh", "-c", "wl-paste --watch cliphist store & wl-paste --type image --watch cliphist store & wait"]
-            : [root.script, "watch", String(root.cap), "0"]
+            : [root.script, "watch", String(root.cap)]
         stdout: SplitParser {
             onRead: line => {
                 const it = SL.parseClipLine(line, false);
-                if (it) root.items = SL.addClip(root.items, it, root.cap);
+                if (it) root.setItems(SL.addClip(root.items, it, root.cap));
             }
         }
-        onExited: if (root.enabled) restart.start()
+        onExited: if (root.shouldWatch) restart.start()
     }
-    Timer { id: restart; interval: 3000; onTriggered: watcher.running = root.detected && root.enabled && root.available }
+    Timer { id: restart; interval: 3000; onTriggered: watcher.running = root.shouldWatch }
 
-    // full list (newest first); called when the Clipboard view opens and every few minutes
+    // full list from disk (expired files are deleted there); when the Clipboard view opens
     function reload() {
         if (!enabled || !available) { items = []; return; }
-        lister.exec(cliphist ? ["cliphist", "list"] : [script, "list", String(maxAgeMin)]);
+        lister.exec(cliphist ? ["cliphist", "list"] : [script, "list", String(Math.round(retentionMs / 60000))]);
     }
     Process {
         id: lister
@@ -66,12 +67,20 @@ Singleton {
             onStreamFinished: {
                 const out = [];
                 for (const l of text.split("\n")) { const it = SL.parseClipLine(l, root.cliphist); if (it) out.push(it); }
-                root.items = SL.pruneClips(out, Date.now(), SL.retentionMs(root.retention)).slice(0, root.cap);
+                root.setItems(out.slice(0, root.cap));
             }
         }
     }
-    // expire old items while the shell runs
-    Timer { running: root.enabled; interval: 300000; repeat: true; onTriggered: root.reload() }
+
+    // expiry in memory: drop expired items and wake up again at the next expiry (no idle polling)
+    function setItems(list) {
+        items = SL.pruneClips(list, Date.now(), retentionMs);
+        const next = SL.nextExpiry(items, retentionMs);
+        if (next > 0) { expiry.interval = Math.max(1000, next - Date.now()); expiry.restart(); }
+        else expiry.stop();
+    }
+    Timer { id: expiry; onTriggered: root.setItems(root.items) }
+
     // turning history off deletes it (nothing copied is kept on disk without consent)
     onEnabledChanged: if (enabled) reload(); else if (detected && available) clear()
     onRetentionChanged: reload()
@@ -83,5 +92,6 @@ Singleton {
     function clear() {
         Quickshell.execDetached(cliphist ? ["cliphist", "wipe"] : [script, "clear"]);
         items = [];
+        expiry.stop();
     }
 }

@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 import "../lib/spotlight.js" as SL
+import "../lib/state.js" as State
 
 // Spotlight browse mode and preferences (state/spotlight.json, shared with Settings):
 //   clipboardHistory: "off" | "30m" | "8h" | "7d"   (off until the user turns it on, like macOS)
@@ -40,14 +41,7 @@ Singleton {
         watchChanges: true
         printErrors: false
         onFileChanged: reload()
-        onLoaded: {
-            let o = {};
-            try { o = JSON.parse(text()) || {}; } catch (e) { return; }
-            const p = Object.assign({}, root.defaults);
-            if (typeof o.clipboardHistory === "string") p.clipboardHistory = o.clipboardHistory;
-            if (o.quickKeys && typeof o.quickKeys === "object" && !Array.isArray(o.quickKeys)) p.quickKeys = o.quickKeys;
-            root.prefs = p;
-        }
+        onLoaded: root.prefs = State.parse(text(), root.defaults)
         // a deleted file means defaults again (clipboard history off)
         onLoadFailed: root.prefs = root.defaults
     }
@@ -58,10 +52,17 @@ Singleton {
     function setClipboardHistory(r) { save({ clipboardHistory: SL.retentionMs(r) > 0 ? r : "off" }); }
     function setQuickKey(actionId, key) { save({ quickKeys: SL.setQuickKey(quickKeys, actionId, key) }); }
 
-    GlobalShortcut { appid: "hyprk"; name: "spotlight-apps"; description: "Spotlight: Applications"; onPressed: root.openIn("apps") }
-    GlobalShortcut { appid: "hyprk"; name: "spotlight-files"; description: "Spotlight: Files"; onPressed: root.openIn("files") }
-    GlobalShortcut { appid: "hyprk"; name: "spotlight-actions"; description: "Spotlight: Actions"; onPressed: root.openIn("actions") }
-    GlobalShortcut { appid: "hyprk"; name: "spotlight-clipboard"; description: "Spotlight: Clipboard"; onPressed: root.openIn("clipboard") }
+    // hyprk:spotlight-apps, -files, -actions, -clipboard
+    Variants {
+        model: SL.modes()
+        GlobalShortcut {
+            required property var modelData
+            appid: "hyprk"
+            name: "spotlight-" + modelData.id
+            description: "Spotlight: " + modelData.title
+            onPressed: root.openIn(modelData.id)
+        }
+    }
 
     // `qs -p shell ipc call spotlightmode open files` (scripted screenshots, no keyboard needed)
     IpcHandler {

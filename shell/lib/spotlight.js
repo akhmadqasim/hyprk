@@ -124,8 +124,8 @@ function searchCommand(tool, query, home, limit) {
     const n = String(limit || 40);
     const skip = ["node_modules", ".cache", ".git", "target", "snap"];
     if (tool === "plocate" || tool === "locate")
-        // whole-system database: keep $HOME, drop hidden paths, stop after limit
-        return ["sh", "-c", `${tool} -i -l 2000 -- "$1" | grep -F -- "$2/" | grep -v '/\\.' | head -n "$3"`, "sh", q, home, n];
+        // whole-system database, file names only (-b): keep $HOME, drop hidden paths, stop after limit
+        return ["sh", "-c", `${tool} -b -i -l 2000 -- "$1" | grep -F -- "$2/" | grep -v '/\\.' | head -n "$3"`, "sh", q, home, n];
     if (tool === "fd" || tool === "fdfind")
         return [tool, "--ignore-case", "--fixed-strings", "--max-results", n, "--color", "never"]
             .concat(...skip.map(s => ["--exclude", s])).concat(["--", q, home]);
@@ -172,6 +172,11 @@ function quickKeyAction(quickKeys, query) {
     for (const id in quickKeys || {}) if (q && quickKeys[id] === q) return id;
     return "";
 }
+// badge text for an action row: its key in capitals, "Add Quick Keys" offered on the selected row
+function quickKeyLabel(quickKeys, id, selected) {
+    const k = (quickKeys || {})[id];
+    return k ? k.toUpperCase() : selected ? "Add Quick Keys" : "";
+}
 // set / clear a key; a key moves away from any other action that had it
 function setQuickKey(quickKeys, id, key) {
     const k = normQuickKey(key);
@@ -183,11 +188,13 @@ function setQuickKey(quickKeys, id, key) {
 
 // ---------- clipboard history ----------
 // macOS 26.1 retention choices; "off" = history disabled (the default until the user turns it on)
-const RETENTION = { "30m": 30 * 60e3, "8h": 8 * 3600e3, "7d": 7 * 86400e3 };
-function retentionMs(r) { return RETENTION[r] || 0; }
-function retentionLabel(r) {
-    return { "30m": "30 Minutes", "8h": "8 Hours", "7d": "7 Days" }[r] || "Off";
-}
+const RETENTION = {
+    "30m": { ms: 30 * 60e3, label: "30 Minutes" },
+    "8h": { ms: 8 * 3600e3, label: "8 Hours" },
+    "7d": { ms: 7 * 86400e3, label: "7 Days" },
+};
+function retentionMs(r) { return RETENTION[r] ? RETENTION[r].ms : 0; }
+function retentionLabel(r) { return RETENTION[r] ? RETENTION[r].label : "Off"; }
 // a line from scripts/clipboard.sh: "<path>\t<mime>\t<preview>"; file name is <ms>_<hash>.<ext>
 // cliphist: "<id>\t<preview>"
 function parseClipLine(line, cliphist) {
@@ -214,6 +221,12 @@ function addClip(items, item, cap) {
 function pruneClips(items, now, ms) {
     if (!ms) return items;
     return items.filter(i => !i.ts || now - i.ts <= ms);
+}
+// when the oldest dated item expires (ms epoch), 0 = nothing to expire
+function nextExpiry(items, ms) {
+    let oldest = 0;
+    for (const i of items) if (i.ts && (!oldest || i.ts < oldest)) oldest = i.ts;
+    return ms && oldest ? oldest + ms : 0;
 }
 function filterClips(items, query) {
     const q = String(query || "").trim().toLowerCase();

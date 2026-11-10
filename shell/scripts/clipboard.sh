@@ -3,39 +3,32 @@
 # Items live in $XDG_STATE_HOME/hyprk/clipboard (or $HYPRK_CLIP_DIR) as <ms>_<sha1>.<txt|png|...>.
 # Output lines (store, list): "<file>\t<mime>\t<preview>" (preview: first 300 chars, one line).
 #
-#   clipboard.sh watch <cap> <maxAgeMin>   run wl-paste --watch, store each new clipboard (stdout: new items)
-#   clipboard.sh store <cap> <maxAgeMin>   store stdin (called by wl-paste --watch)
-#   clipboard.sh list <maxAgeMin>          all items, newest first (prunes expired ones)
-#   clipboard.sh copy <file>               put an item back on the clipboard
-#   clipboard.sh clear                     delete the history
+#   clipboard.sh watch <cap>          run wl-paste --watch, store each new clipboard (stdout: new items)
+#   clipboard.sh store <cap>          store stdin (called by wl-paste --watch), keep the newest <cap>
+#   clipboard.sh list <maxAgeMin>     all items, newest first; deletes items older than maxAgeMin (0 = keep)
+#   clipboard.sh copy <file>          put an item back on the clipboard
+#   clipboard.sh clear                delete the history
 #
 # Skipped: empty data, password-manager copies (wl-paste sets CLIPBOARD_STATE=sensitive),
 # non-image binary data, items over 20 MB.
 set -u
+shopt -s nullglob
 DIR=${HYPRK_CLIP_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/hyprk/clipboard}
 MAX_BYTES=$((20 * 1024 * 1024))
 
-emit() {   # file
-    local f=$1 mime preview=""
-    case "$f" in
-        *.txt) mime=text/plain; preview=$(head -c 300 "$f" | tr '\t\n\r' '   ') ;;
-        *) mime="image/${f##*.}" ;;
-    esac
-    printf '%s\t%s\t%s\n' "$f" "$mime" "$preview"
+mimeof() {   # file -> mime from the extension
+    case "$1" in *.txt) echo text/plain ;; *) echo "image/${1##*.}" ;; esac
 }
-
-prune() {   # maxAgeMin cap
-    [ "${1:-0}" -gt 0 ] && find "$DIR" -maxdepth 1 -type f -mmin +"$1" -delete 2>/dev/null
-    if [ -n "${2:-}" ]; then
-        ls -1 "$DIR" 2>/dev/null | sort -r | tail -n +"$(( $2 + 1 ))" | while read -r f; do rm -f "$DIR/$f"; done
-    fi
-    return 0
+emit() {   # file (bash builtins only: list runs this for up to 200 items)
+    local f=$1 p=""
+    [[ $f == *.txt ]] && { IFS= read -r -d '' -n 300 p <"$f"; p=${p//[$'\t\n\r']/ }; }
+    printf '%s\t%s\t%s\n' "$f" "$(mimeof "$f")" "$p"
 }
 
 case "${1:-}" in
 watch)
     mkdir -p "$DIR" && chmod 700 "$DIR"
-    exec wl-paste --watch "$0" store "${2:-200}" "${3:-0}"
+    exec wl-paste --watch "$0" store "${2:-200}"
     ;;
 store)
     case "${CLIPBOARD_STATE:-data}" in sensitive|clear|nil) cat >/dev/null; exit 0 ;; esac
@@ -48,31 +41,34 @@ store)
     elif LC_ALL=C grep -qI . "$tmp"; then mime=text/plain
     else mime=application/octet-stream; fi
     case "$mime" in
-        text/*|application/json|application/xml|inode/x-empty) ext=txt ;;
+        text/*|application/json|application/xml) ext=txt ;;
         image/png|image/jpeg|image/gif|image/webp|image/bmp) ext=${mime#image/} ;;
         *) rm -f "$tmp"; exit 0 ;;
     esac
-    hash=$(sha1sum "$tmp" | cut -c1-16)
-    rm -f "$DIR"/*_"$hash".* 2>/dev/null     # same content copied again moves to the top
-    # millisecond names sort newest first; keep them increasing even within one ms
+    hash=$(sha1sum "$tmp"); hash=${hash:0:16}
+    rm -f "$DIR"/*_"$hash".*                 # same content copied again moves to the top
+    items=("$DIR"/[0-9]*_*)                  # oldest first (equal-length ms names)
+    # millisecond names sort newest last; keep them increasing even within one ms
     now=$(date +%s%3N)
-    last=$(ls -1 "$DIR" 2>/dev/null | sort -r | head -n 1); last=${last%%_*}
-    [ -n "$last" ] && [ "$last" -ge "$now" ] 2>/dev/null && now=$((last + 1))
+    if [ ${#items[@]} -gt 0 ]; then last=${items[-1]##*/}; last=${last%%_*}; [ "$last" -ge "$now" ] && now=$((last + 1)); fi
     f="$DIR/${now}_$hash.$ext"
     mv "$tmp" "$f" && chmod 600 "$f"
-    prune "${3:-0}" "${2:-200}"
+    # keep the newest <cap> (the new item is one more than the listing above)
+    drop=$(( ${#items[@]} + 1 - ${2:-200} ))
+    [ "$drop" -gt 0 ] && rm -f "${items[@]:0:drop}"
     emit "$f"
     ;;
 list)
-    prune "${2:-0}"
-    ls -1 "$DIR" 2>/dev/null | sort -r | while read -r f; do emit "$DIR/$f"; done
+    [ "${2:-0}" -gt 0 ] && find "$DIR" -maxdepth 1 -type f -name '[0-9]*_*' -mmin +"$2" -delete 2>/dev/null
+    items=("$DIR"/[0-9]*_*)
+    for (( i = ${#items[@]} - 1; i >= 0; i-- )); do emit "${items[i]}"; done
     ;;
 copy)
     f=${2:?file}
-    case "$f" in *.txt) exec wl-copy --type text/plain <"$f" ;; *) exec wl-copy --type "image/${f##*.}" <"$f" ;; esac
+    exec wl-copy --type "$(mimeof "$f")" <"$f"
     ;;
 clear)
-    rm -f "$DIR"/[0-9]*_* 2>/dev/null
+    rm -f "$DIR"/[0-9]*_*
     ;;
 *) echo "usage: $0 watch|store|list|copy|clear" >&2; exit 2 ;;
 esac

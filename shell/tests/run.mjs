@@ -242,6 +242,13 @@ test("setQuickKey moves key", () => assert.deepEqual(SL.setQuickKey({ a: "x", b:
 test("setQuickKey clear", () => assert.deepEqual(SL.setQuickKey({ a: "x" }, "a", ""), {}));
 test("retention", () => assert.equal(SL.retentionMs("8h"), 8 * 3600e3));
 test("retention off", () => assert.equal(SL.retentionMs("off"), 0));
+test("retention label", () => assert.equal(SL.retentionLabel("7d"), "7 Days"));
+test("nextExpiry oldest", () => assert.equal(SL.nextExpiry([{ ts: 500 }, { ts: 200 }, { ts: 0 }], 100), 300));
+test("nextExpiry none", () => assert.equal(SL.nextExpiry([{ ts: 0 }], 100), 0));
+test("quickKeyLabel key", () => assert.equal(SL.quickKeyLabel({ a: "sm" }, "a", false), "SM"));
+test("quickKeyLabel offer", () => assert.equal(SL.quickKeyLabel({}, "a", true), "Add Quick Keys"));
+test("quickKeyLabel none", () => assert.equal(SL.quickKeyLabel({}, "a", false), ""));
+test("search cmd plocate basename", () => assert.ok(SL.searchCommand("plocate", "x", "/h", 5)[2].includes("plocate -b")));
 test("clip line builtin", () => {
     const it = SL.parseClipLine("/s/clipboard/1700000000000_abcdef0123.txt\ttext/plain\thello world");
     assert.deepEqual(it, { id: "abcdef0123", file: "/s/clipboard/1700000000000_abcdef0123.txt", mime: "text/plain", ts: 1700000000000, text: "hello world" });

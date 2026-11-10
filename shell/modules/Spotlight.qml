@@ -115,8 +115,18 @@ ShellWindow {
     }
     function selectFirst() { selected = 0; if (!selectable(0)) step(1); }
     onQueryChanged: selectFirst()
-    // rows can fill in after the query changed (window creation, streamed files): keep a row selected
-    onRowsChanged: if (!selectable(selected)) selectFirst()
+    // rows fill in after the query changed (streamed files, late actions): the selection
+    // follows its row by key, so Return never opens a row that slid under the index
+    function rowKey(r) {
+        if (!r) return "";
+        return r.kind + ":" + (r.entry ? r.entry.id : r.action ? r.action.id : r.file ? r.file.path : r.title);
+    }
+    property string selectedKey: ""
+    onSelectedChanged: selectedKey = rowKey(rows[selected])
+    onRowsChanged: {
+        const i = selectedKey ? rows.findIndex(r => rowKey(r) === selectedKey) : -1;
+        if (i >= 0) selected = i; else selectFirst();
+    }
 
     function accept() {
         const row = rows[selected];
@@ -146,8 +156,8 @@ ShellWindow {
         y: sp.panelY
         width: Theme.spotlight.width
         readonly property bool expanded: sp.mode !== "" || sp.rows.length > 0
-        height: Theme.spotlight.barHeight + (sp.mode !== "" ? modeView.height + Theme.spotlight.listInset * 2 + 1
-                                            : sp.rows.length > 0 ? list.height + Theme.spotlight.listInset * 2 + 1 : 0)
+        readonly property real contentHeight: sp.mode !== "" ? modeView.height : sp.rows.length > 0 ? list.height : -1
+        height: Theme.spotlight.barHeight + (contentHeight >= 0 ? contentHeight + Theme.spotlight.listInset * 2 + 1 : 0)
         opacity: sp.appear
         scale: 0.97 + 0.03 * sp.appear
 
@@ -320,14 +330,15 @@ ShellWindow {
                     ResultRow {
                         anchors.fill: parent
                         visible: r.rich
-                        readonly property var d: r.modelData.kind === "action" ? r.modelData.action : r.modelData.file
+                        readonly property bool isAction: r.modelData.kind === "action"
+                        readonly property var d: isAction ? r.modelData.action : r.modelData.file
                         title: r.modelData.title
                         subtitle: r.modelData.subtitle || ""
-                        symbol: r.rich && r.modelData.kind === "action" ? (d.symbol || "bolt") : "doc"
-                        appIcon: r.modelData.kind === "action" ? (d.appIcon || "") : ""
-                        appId: r.modelData.kind === "action" ? (d.appId || "") : ""
+                        symbol: isAction ? (d.symbol || "bolt") : "doc"
+                        appIcon: isAction ? (d.appIcon || "") : ""
+                        appId: isAction ? (d.appId || "") : ""
                         themeIcon: r.modelData.kind === "file" ? SL.fileIcon(d.path, d.isDir, d.mime) : ""
-                        accessory: r.modelData.kind === "action" && SpotlightState.quickKeys[d.id] ? SpotlightState.quickKeys[d.id].toUpperCase() : ""
+                        accessory: isAction ? SL.quickKeyLabel(SpotlightState.quickKeys, d.id, false) : ""
                         badge: accessory !== ""
                     }
                     MouseArea {

@@ -16,6 +16,7 @@ Item {
     required property string mode
     property string query: ""
     signal done()                           // an item was opened: close Spotlight
+    signal editFinished()                   // quick key editor closed: host gives the query field its focus back
 
     // layout (macOS 26/27 Spotlight browse views; no reference shot of these, TODO verify)
     readonly property int gridColumns: 6
@@ -59,6 +60,12 @@ Item {
         if (mode === "clipboard") Clipboard.reload();
     }
 
+    // id "" = cancel
+    function finishEdit(id, key) {
+        if (id) SpotlightState.setQuickKey(id, key);
+        editingKey = "";
+        editFinished();
+    }
     function move(dx, dy) {
         if (items.length === 0) return;
         const step = isGrid ? dx + dy * gridColumns : dy;
@@ -291,8 +298,7 @@ Item {
                 appId: view.mode === "actions" ? (d.appId || "") : ""
                 badge: view.mode === "actions"
                 accessory: view.mode === "clipboard" ? SL.relTime(d.ts, Date.now())
-                    : view.mode === "actions" ? (SpotlightState.quickKeys[d.id] ? SpotlightState.quickKeys[d.id].toUpperCase() : rr.selected ? "Add Quick Keys" : "")
-                    : ""
+                    : view.mode === "actions" ? SL.quickKeyLabel(SpotlightState.quickKeys, d.id, rr.selected) : ""
                 onHovered: view.selected = index
                 onClicked: { view.selected = index; view.accept(); }
                 onAccessoryClicked: { view.selected = index; view.editingKey = d.id; }
@@ -329,13 +335,12 @@ Item {
                             color: Theme.color.tertiaryLabel
                         }
                         onVisibleChanged: if (visible) { text = SpotlightState.quickKeys[rr.d.id] || ""; forceActiveFocus(); selectAll(); }
-                        Keys.onReturnPressed: { SpotlightState.setQuickKey(rr.d.id, text); view.editingKey = ""; view.editFinished(); }
-                        Keys.onEnterPressed: { SpotlightState.setQuickKey(rr.d.id, text); view.editingKey = ""; view.editFinished(); }
-                        Keys.onEscapePressed: { view.editingKey = ""; view.editFinished(); }
+                        Keys.onReturnPressed: view.finishEdit(rr.d.id, text)
+                        Keys.onEnterPressed: view.finishEdit(rr.d.id, text)
+                        Keys.onEscapePressed: view.finishEdit("", "")
                     }
                 }
             }
         }
     }
-    signal editFinished()                   // host gives the query field its focus back
 }
