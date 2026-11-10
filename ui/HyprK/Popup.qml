@@ -17,7 +17,7 @@ Item {
         id: label
         anchors.right: chev.left; anchors.rightMargin: 7; anchors.verticalCenter: parent.verticalCenter
         text: pop.model.length > pop.currentIndex && pop.currentIndex >= 0 ? pop.model[pop.currentIndex] : ""
-        font.family: Tokens.fontText; font.pixelSize: Tokens.control.fontSize
+        font: Typography.control
         color: Tokens.label
     }
     Rectangle { // ref: round chevron button
@@ -87,7 +87,7 @@ Item {
                     Text {
                         id: t
                         x: 26; anchors.verticalCenter: parent.verticalCenter
-                        text: modelData; font.family: Tokens.fontText; font.pixelSize: Tokens.control.fontSize
+                        text: modelData; font: Typography.menu
                         color: parent.hot ? "white" : Tokens.label
                     }
                     MouseArea {

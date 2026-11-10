@@ -54,16 +54,14 @@ Item {
         id: lg; visible: text !== ""
         anchors.left: parent.left; anchors.verticalCenter: track.verticalCenter
         text: s.leftGlyph || s.leftText
-        font.family: s.leftGlyph ? Tokens.fontGlyph : Tokens.fontText
-        font.pixelSize: s.leftGlyph ? 15 : Tokens.control.smallFontSize
+        font: s.leftGlyph ? Qt.font({ family: Tokens.fontGlyph, pixelSize: 15 }) : Typography.controlSmall
         color: Tokens.secondaryLabel
     }
     Text {
         id: rg; visible: text !== ""
         anchors.right: parent.right; anchors.verticalCenter: track.verticalCenter
         text: s.rightGlyph || s.rightText
-        font.family: s.rightGlyph ? Tokens.fontGlyph : Tokens.fontText
-        font.pixelSize: s.rightGlyph ? 18 : Tokens.control.smallFontSize
+        font: s.rightGlyph ? Qt.font({ family: Tokens.fontGlyph, pixelSize: 18 }) : Typography.controlSmall
         color: Tokens.secondaryLabel
     }
     Item {

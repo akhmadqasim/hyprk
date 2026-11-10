@@ -182,8 +182,7 @@ Item {
                 Text {
                     visible: text !== ""
                     text: seg.entry.text || ""
-                    font.family: Tokens.fontText
-                    font.pixelSize: Tokens.control.fontSize
+                    font: Typography.control
                     color: Tokens.label
                     anchors.verticalCenter: parent.verticalCenter
                 }

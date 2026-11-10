@@ -19,7 +19,7 @@ Rectangle {
         id: label
         anchors.centerIn: parent
         text: b.text
-        font.family: Tokens.fontText; font.pixelSize: Tokens.control.fontSize
+        font: Typography.control
         color: b.primary ? "white" : Tokens.label
     }
     MouseArea { id: ma; anchors.fill: parent; onClicked: b.clicked() }

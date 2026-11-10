@@ -97,8 +97,7 @@ Item {
         anchors.leftMargin: Tokens.control.checkboxGap
         anchors.verticalCenter: parent.verticalCenter
         text: cb.text
-        font.family: Tokens.fontText
-        font.pixelSize: Tokens.control.fontSize
+        font: Typography.control
         color: Tokens.label
     }
     MouseArea {

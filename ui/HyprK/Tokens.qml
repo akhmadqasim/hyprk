@@ -14,14 +14,16 @@ QtObject {
     property bool reduceMotion: false
     property bool reduceTransparency: false
     property bool increaseContrast: false
-    property color accent: systemBlue
+    // controlAccentColor of the user's accent (Accent.qml; each app's Theme sets Accent.name)
+    property color accent: Accent.color
     property string fontText: "Sans Serif"
     property string fontGlyph: "Material Icons"   // Settings' glyph font (popup chevron, checkmark, search)
     // a Spring with settlesGlass stepped: the shell re-measures that window's glass (ShellWindow)
     signal glassStepped(Item spring)
 
     // ---------- colours ----------
-    readonly property color systemBlue: dark ? "#0A84FF" : "#007AFF"
+    // 27 system palette (accent-colors.json multicolor.catalogSystemColorNote), not the accent Blue #007AFF
+    readonly property color systemBlue: Accent.systemBlue
     // AppKit label hierarchy (labelColor, secondaryLabelColor, tertiaryLabelColor).
     // Writable: Settings binds its reference-measured values (settings/Theme.qml).
     property color label: dark ? Qt.rgba(1, 1, 1, 0.85) : Qt.rgba(0, 0, 0, 0.85)
@@ -30,7 +32,8 @@ QtObject {
     readonly property color windowBackground: dark ? "#1E1E1E" : "#FFFFFF"   // Settings + Finder window, TODO verify
     readonly property color groupFill: dark ? Qt.rgba(1, 1, 1, 0.05) : Qt.rgba(0, 0, 0, 0.03)   // grouped form card, Settings ref #F7F7F7 on white
 
-    // SPEC 15: controlAccent<Name>Color from SystemAppearance Aqua.car / DarkAqua.car (macOS 27.2)
+    // accent colours per choice, light and dark: Accent.qml (measured on 27.2.1)
+    // old name of Accent.swatch(); goes once Settings uses Accent
     readonly property var accentSwatches: dark
         ? ({ blue: "#007AFF", purple: "#A550A7", pink: "#F74F9E", red: "#FF5257", orange: "#F7821B", yellow: "#FFC600", green: "#62BA46", graphite: "#8C8C8C" })
         : ({ blue: "#007AFF", purple: "#953D96", pink: "#F74F9E", red: "#E0383E", orange: "#F7821B", yellow: "#FFC726", green: "#62BA46", graphite: "#989898" })
@@ -49,8 +52,10 @@ QtObject {
         readonly property int buttonHeight: 24       // TODO verify
         readonly property int buttonRadius: 12       // capsule push button (macOS 26), TODO verify
         readonly property real disabledOpacity: 0.4
-        readonly property real fontSize: 13          // NSFont.systemFontSize
-        readonly property real smallFontSize: 11
+        // control fonts: whole fonts are Typography.control (13), controlSmall (11), controlMini (9); these two
+        // sizes are for Texts that still set font.pixelSize
+        readonly property real fontSize: Typography.controlSize.regular   // NSFont.systemFontSize 13
+        readonly property real smallFontSize: Typography.controlSize.small // 11
 
         readonly property color fill: t.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.08)   // Settings ref popup circle #E4E4E5
         readonly property color fillPressed: t.dark ? Qt.rgba(1, 1, 1, 0.18) : Qt.rgba(0, 0, 0, 0.12)

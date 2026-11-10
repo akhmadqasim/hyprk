@@ -20,9 +20,10 @@ Rectangle {
         anchors.left: mag.right; anchors.leftMargin: 4
         anchors.right: parent.right; anchors.rightMargin: 10
         anchors.verticalCenter: parent.verticalCenter
-        font.family: Tokens.fontText; font.pixelSize: Tokens.control.fontSize
+        font: Typography.control
         color: Tokens.label
-        selectionColor: Qt.alpha(Tokens.accent, 0.35)
+        selectionColor: Accent.selectedText   // selectedTextBackgroundColor
+        selectedTextColor: Tokens.label
         clip: true
         Text {
             visible: !input.text && !input.preeditText

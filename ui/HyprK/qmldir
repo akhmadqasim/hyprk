@@ -6,6 +6,8 @@
 # emit toggled/activated/moved; the caller owns the state.
 module HyprK
 singleton Tokens 1.0 Tokens.qml
+singleton Typography 1.0 Typography.qml
+singleton Accent 1.0 Accent.qml
 Spring 1.0 Spring.qml
 PressSpring 1.0 PressSpring.qml
 Materializer 1.0 Materializer.qml
