@@ -184,18 +184,17 @@ Item {
     }
 
     // ---------- toolbar ----------
+    // no fill and no glass: only the back/forward capsule is drawn (macOS 27.2.1, MAC-ANSWERS.md Q9.2)
     Item {
         id: toolbar
         anchors.left: sidebar.right; anchors.right: parent.right
         height: Theme.window.toolbarHeight
         MouseArea { anchors.fill: parent; onPressed: app.moveRequested(); onDoubleClicked: app.zoomRequested() }
-        Rectangle { // glass capsule with back / forward
+        ToolbarPlatter { // back / forward share one 74 x 36 capsule with a 1 x 20 divider (27.2.1)
             id: nav
-            x: 8; anchors.verticalCenter: parent.verticalCenter
-            width: 72; height: 36; radius: 18
-            color: Theme.dark ? Qt.rgba(1, 1, 1, 0.08) : Qt.rgba(0, 0, 0, 0.03)
-            border.color: Theme.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.07)
-            Rectangle { anchors.centerIn: parent; width: 1; height: 20; color: Theme.separator }
+            x: 8; anchors.verticalCenter: parent.verticalCenter   // 8 pt after the sidebar (27.2.1 Settings shot)
+            width: Tokens.toolbar.navWidth; height: Tokens.toolbar.platterHeight
+            Rectangle { anchors.centerIn: parent; width: 1; height: Tokens.toolbar.dividerHeight; color: Tokens.toolbar.separator }
             Row {
                 anchors.fill: parent
                 Repeater {
@@ -203,7 +202,7 @@ Item {
                     Item {
                         required property var modelData
                         readonly property bool can: modelData.d < 0 ? app.historyPos > 0 : app.historyPos < app.history.length - 1
-                        width: 36; height: 36
+                        width: nav.width / 2; height: nav.height
                         Text {
                             anchors.centerIn: parent
                             text: modelData.g; font.family: Theme.fontGlyph; font.pixelSize: 26
