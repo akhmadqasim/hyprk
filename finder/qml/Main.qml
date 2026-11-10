@@ -19,8 +19,10 @@ Window {
     property string view: ["icons", "list", "columns", "gallery"].indexOf(startup.view) !== -1 ? startup.view : "icons"
     property bool showPathBar: false
     property var quickLookEntry: null
-    readonly property bool maximized: visibility === Window.Maximized || visibility === Window.FullScreen
-    readonly property int radius: maximized ? 0 : Theme.win.radius
+    // a zoomed (maximized) window keeps its corners and rims on macOS; only full screen drops them. (Hyprland
+    // also reports a floating window as maximized to Qt.)
+    readonly property bool fullScreen: visibility === Window.FullScreen
+    readonly property int radius: fullScreen ? 0 : Theme.win.radius
 
     Browser {
         id: fm
@@ -61,19 +63,14 @@ Window {
 
     // ---------- window frame ----------
     Rectangle {
-        id: frame
         anchors.fill: parent
         radius: win.radius
         color: Theme.color.window
-        border.width: win.maximized ? 0 : 1
-        border.color: Theme.color.windowBorder
     }
 
     Sidebar {
-        x: frame.border.width
-        y: frame.border.width
-        width: Theme.sidebar.width - x
-        height: parent.height - 2 * y
+        width: Theme.sidebar.width
+        height: parent.height
         topLeftRadius: win.radius
         bottomLeftRadius: win.radius
         browser: fm
@@ -83,23 +80,23 @@ Window {
         x: Theme.lights.x
         y: Theme.lights.y
         active: win.active
+        fullScreenButton: true   // green = full screen, Option-click = zoom (MAC-ANSWERS.md Q-windows-19)
         onCloseClicked: win.close()
         onMinimizeClicked: win.showMinimized()
         onZoomClicked: win.visibility === Window.Maximized ? win.showNormal() : win.showMaximized()
+        onFullScreenClicked: win.visibility === Window.FullScreen ? win.showNormal() : win.showFullScreen()
     }
 
     // ---------- content ----------
     Item {
         id: keys
         x: Theme.sidebar.width
-        y: frame.border.width
-        width: parent.width - x - frame.border.width
-        height: parent.height - 2 * y
+        width: parent.width - x
+        height: parent.height
         focus: true
 
         Toolbar {
             id: toolbar
-            y: -keys.y   // measured from the window's top edge, not inside the 1 px frame
             width: parent.width
             browser: fm
             window: win
@@ -141,6 +138,16 @@ Window {
         }
 
         Keys.onPressed: event => win.handleKey(event)
+    }
+
+    // inner white rim over the sidebar and content; the compositor draws the outer black one (Tokens.frame)
+    Rectangle {
+        anchors.fill: parent
+        visible: !win.fullScreen
+        radius: win.radius
+        color: "transparent"
+        border.width: Tokens.frame.rimWidth
+        border.color: Tokens.frame.rim(win.active)
     }
 
     function handleKey(event) {

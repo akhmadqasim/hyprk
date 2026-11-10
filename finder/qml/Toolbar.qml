@@ -53,7 +53,7 @@ Item {
         anchors.verticalCenter: nav.verticalCenter
         text: root.browser.title
         elide: Text.ElideRight
-        color: Theme.color.title
+        color: root.window.active ? Theme.color.title : Theme.color.titleInactive
         font: Typography.toolbarTitle   // 15 Semibold (27.2.1)
     }
 

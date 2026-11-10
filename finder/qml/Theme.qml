@@ -79,7 +79,6 @@ QtObject {
         readonly property color sidebarIcon: theme.dark ? "#3D9BFF" : "#0C72EF"   // ref (12,114,239)
 
         readonly property color window: Tokens.windowBackground
-        readonly property color windowBorder: theme.dark ? Qt.rgba(1, 1, 1, 0.14) : "#BEBEBE"  // ref 1px
         // solid sidebar: 27.2.1 Finder sidebar reads (38,38,38) dark, (237,237,237) light (finder-toolbar-*.png)
         readonly property color sidebarSolid: theme.dark ? "#262626" : "#EDEDED"
         // over compositor blur: the sidebar glass fill colour (LIVE-27.2.1.md Sidebar, glass-table-dark.txt)
@@ -95,7 +94,10 @@ QtObject {
         readonly property color toolbarSeparator: Tokens.toolbar.separator
         readonly property color toolbarIcon: theme.dark ? Qt.rgba(1, 1, 1, 0.85) : "#1C1C1C"
         readonly property color toolbarIconDisabled: theme.dark ? Qt.rgba(1, 1, 1, 0.30) : Qt.rgba(0, 0, 0, 0.28)
-        readonly property color title: theme.dark ? Qt.rgba(1, 1, 1, 0.80) : "#4D4D4D"     // ref (77)
+        // toolbar title, MAC-ANSWERS.md Q-windows-12 / -25: (58,59,57) light, (236,236,235) dark; inactive
+        // (129,132,128) / (117,115,103)
+        readonly property color title: theme.dark ? "#ECECEB" : "#3A3B39"
+        readonly property color titleInactive: theme.dark ? "#757367" : "#818480"
 
         // content selection
         readonly property color iconSelection: theme.dark ? Qt.rgba(1, 1, 1, 0.12) : Qt.rgba(0, 0, 0, 0.08)
@@ -138,8 +140,8 @@ QtObject {
         readonly property int width: 936         // ref / 1.22 (1144 px)
         readonly property int height: 594        // ref / 1.22 (726 px)
         // the 27.2.1 Finder and System Settings windows have the same corner (identical alpha profile in
-        // finder-toolbar-light.png and settings-toolbar-light.png), so the same radius as Settings
-        readonly property int radius: 26
+        // finder-toolbar-light.png and settings-toolbar-light.png): 16 pt (MAC-ANSWERS.md Q-windows-02, Tokens.frame)
+        readonly property int radius: Tokens.frame.radius
         readonly property int minWidth: 460
         readonly property int minHeight: 280
         readonly property int resizeMargin: 6
