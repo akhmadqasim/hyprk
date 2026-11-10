@@ -46,6 +46,7 @@ fi
 if [ ! -f "$blur" ]; then
     # downscale, blur, upscale: cheap large-radius gaussian; slightly brighter and
     # desaturated so glass reads as near-neutral frost (macOS 27 Dock)
+    # (shaders/menupill.frag undoes this -modulate: keep the two in step)
     magick "$wall" -resize 25% -blur "0x$(( SIGMA / 4 + 1 ))" -modulate 106,92 -resize "${W}x${H}!" "$blur" 2>/dev/null || blur=""
 fi
 # mean luminance (0..1) of the menu bar strip, so the shell can pick white or dark menu bar text

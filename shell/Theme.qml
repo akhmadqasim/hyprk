@@ -199,13 +199,8 @@ Singleton {
         readonly property int logoSize: 16               // distro logo box; the Apple glyph was 14 + 2
         readonly property int titleHPadding: 9           // inner padding of a menu title pill, TODO verify
         readonly property int titleSpacing: 2            // gap between pills, TODO verify
-        readonly property real titleRadius: titleHeight / 2  // capsule (MAC-ANSWERS.md Q9.1)
-        // open title pill = the blurred desktop picture, re-saturated and brightened. Fitted to the Mac pill over
-        // solid blue, (69,83,206) -> (90,105,230) (MAC-ANSWERS.md Q9.1, same in light and dark), from what
-        // our pre-blurred wallpaper makes of that blue, (87,99,204) (scripts/wallpaper.sh brightens and
-        // desaturates it): saturation 1.13, brightness x1.06. One colour fitted, so other hues are approximate.
-        readonly property real pillSaturation: 1.13
-        readonly property real pillGain: 1.06
+        // selection pill corner radius 12, continuous (MENUBAR-REA-27.2.1.md); on the 23 pt pill it is a capsule
+        readonly property real titleRadius: 12
         readonly property int titleHeight: 23            // open title pill y 6..29 pt (MAC-ANSWERS.md Q9.1), centred here
         readonly property int statusIconSize: 16         // TODO verify
         readonly property int statusSpacing: 4           // ~20pt icon pitch in reference, TODO verify

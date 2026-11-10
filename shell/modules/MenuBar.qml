@@ -162,11 +162,10 @@ ShellWindow {
         width: contentWidth + Theme.menuBar.titleHPadding * 2
         height: Theme.menuBar.titleHeight
 
-        // the pill moves at once; the dropdown follows a few frames later (Panels.stepMenu)
+        // the pill jumps at once (MAC-ANSWERS.md R2); the dropdown follows a few frames later (Panels.stepMenu)
         HighlightPill {
             shown: mt.open
-            pressed: titleMa.containsPress
-            instant: true
+            fadesWithMenu: true
         }
         Text {
             id: label
@@ -179,7 +178,6 @@ ShellWindow {
         }
         Item { id: holder; anchors.fill: parent }
         MouseArea {
-            id: titleMa
             anchors.fill: parent
             hoverEnabled: true
             onPressed: {
@@ -191,53 +189,39 @@ ShellWindow {
         }
     }
 
-    // open/hovered state of a title or status item: a capsule of blurred, brightened desktop picture
-    // with a faint shadow, the same in light and dark (MAC-ANSWERS.md Q9.1, measured over a checker and
-    // over solid blue). It materializes in and out and lifts while pressed (interactive glass, ultraSmall
-    // preset). Nothing but the wallpaper is ever under the bar, so the pre-blurred wallpaper that the
-    // QML glass samples is the exact backdrop: no compositor glass region, and no per-frame work while
-    // it stands still. The pill exists only while shown or animating, not one per title.
-    // `instant` (menu titles): the highlight follows the open menu at once like the menu itself
-    // (LIVE-27.2.1.md: a menu opens without animation), so moving across the titles never shows
-    // two pills or a pill still materializing; it goes away with no fade when another title takes
-    // over, and fades with the menu (0.2 s OutQuad, Theme.anim.menuFadeOut) on the final close.
-    // That the title fades along with its menu is guessed (MAC-REQUESTS.md R2 asks).
+    // open/hovered state of a title or status item. No glass (MENUBAR-REA-27.2.1.md): a capsule of the
+    // blurred desktop picture through a colour matrix (shaders/menupill.frag), with a faint shadow
+    // (MAC-ANSWERS.md Q9.1). Nothing but the wallpaper is ever under the bar, so the pre-blurred wallpaper
+    // is the exact backdrop: no compositor blur and no per-frame work while it stands still. The pill
+    // exists only while shown or fading, not one per title.
+    // It appears in full at once and jumps between titles in one frame (MAC-ANSWERS.md R2); the per-frame
+    // alpha of open and close was not measured. `fadesWithMenu` (menu titles): it goes away with no fade
+    // when another title takes over, and fades with the menu (0.2 s OutQuad, Theme.anim.menuFadeOut,
+    // measured for the menu on Esc) on the final close; that the title fades along is guessed.
     component HighlightPill: Item {
         id: hp
         property bool shown: false
-        property bool pressed: false
-        property bool instant: false
+        property bool fadesWithMenu: false
         anchors.fill: parent
-        Materializer { id: pm; shown: hp.shown && !hp.instant }
-        // instant mode: 1 while shown, cut to 0 when another menu took over, else fades out
-        property real fade: 0
+        // 1 while shown; on hide cut to 0, or fade out with the closing menu
+        property real fade: shown ? 1 : 0
         NumberAnimation { id: pillFade; target: hp; property: "fade"; to: 0; duration: Theme.anim.menuFadeOut; easing.type: Easing.OutQuad }
         onShownChanged: {
-            if (!instant) return;
             pillFade.stop();
             if (shown) fade = 1;
-            else if (Panels.open === "menu") fade = 0;
-            else pillFade.start();
-        }
-        Component.onCompleted: if (instant && shown) fade = 1
-        readonly property real progress: instant ? fade : pm.progress
-        PressSpring { id: pp; pressed: hp.pressed && hp.shown; w: hp.width; h: hp.height }
-        transform: Scale {
-            origin.x: hp.width / 2
-            origin.y: hp.height / 2
-            xScale: (hp.instant ? 1 : pm.scaleFor(hp.width)) * pp.scale
-            yScale: (hp.instant ? 1 : pm.scaleFor(hp.height)) * pp.scale
+            else if (fadesWithMenu && Panels.open !== "menu") pillFade.start();
+            else fade = 0;
         }
         Loader {
             anchors.fill: parent
-            active: hp.instant ? hp.shown || hp.fade > 0 : pm.active
+            active: hp.shown || hp.fade > 0
             sourceComponent: Item {
-                opacity: Math.max(0, hp.progress)
+                opacity: hp.fade
                 // faint shadow under the pill: 206 -> 196 just below it over solid blue (measured);
                 // offset and blur guessed
                 RectangularShadow {
                     anchors.fill: parent
-                    radius: Theme.menuBar.titleRadius
+                    radius: Math.min(Theme.menuBar.titleRadius, height / 2)
                     offset.y: 1
                     blur: 2
                     color: Theme.color.menuBarPillShadow
@@ -245,11 +229,10 @@ ShellWindow {
                 Rectangle {   // Reduce transparency / no blurred wallpaper
                     anchors.fill: parent
                     visible: Theme.solidMaterial
-                    radius: Theme.menuBar.titleRadius
+                    radius: Math.min(Theme.menuBar.titleRadius, height / 2)
                     color: Theme.glass.solid
                 }
-                // the pre-blurred wallpaper under the pill, with the same top dimming as the desktop
-                // (shaders/topdim.frag), brightened and cut to the capsule in one pass
+                // the pre-blurred wallpaper under the pill, colour-matrixed and cut to the capsule in one pass
                 Image {
                     id: pillBackdrop
                     visible: false
@@ -262,18 +245,16 @@ ShellWindow {
                     visible: !Theme.solidMaterial && pillBackdrop.status === Image.Ready
                     // the bar sits at the screen origin, so the scene position is the screen position;
                     // re-evaluated when the title/status item moves inside its Row
-                    readonly property point pos: hp.parent.x + hp.parent.y >= -1e9 ? hp.parent.mapToItem(null, 0, 0) : Qt.point(0, 0)   // parent: no materialize/press scale
+                    readonly property point pos: hp.parent.x + hp.parent.y >= -1e9 ? hp.parent.mapToItem(null, 0, 0) : Qt.point(0, 0)
                     property var src: pillBackdrop
                     // the blurred wallpaper covers the whole screen: map by this bar's screen size
                     readonly property size screenSize: Qt.size(bar.width, bar.screen ? bar.screen.height : Wallpaper.height)
                     property rect srcRect: Qt.rect(pos.x / screenSize.width, pos.y / screenSize.height,
                                                    width / screenSize.width, height / screenSize.height)
                     property size sizePt: Qt.size(width, height)
-                    property real topPt: pos.y
                     property real radius: Theme.menuBar.titleRadius
-                    property real saturation: Theme.menuBar.pillSaturation
-                    property real gain: Theme.menuBar.pillGain
-                    fragmentShader: Qt.resolvedUrl("../shaders/topdim.frag.qsb")
+                    property real lightText: Theme.menuBarOnLight ? 0 : 1
+                    fragmentShader: Qt.resolvedUrl("../shaders/menupill.frag.qsb")
                 }
             }
         }
@@ -290,7 +271,7 @@ ShellWindow {
         height: Theme.menuBar.titleHeight
 
         // macOS 27 status items: the pill shows on hover too
-        HighlightPill { shown: si.active || sma.containsMouse || sma.pressed; pressed: sma.containsPress }
+        HighlightPill { shown: si.active || sma.containsMouse || sma.pressed }
         Item { id: sholder; anchors.fill: parent }
         MouseArea { id: sma; anchors.fill: parent; hoverEnabled: true; onClicked: si.clicked() }
     }
