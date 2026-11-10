@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Shapes
 import qs
+import qs.HyprK
 import "lock.js" as L
 
 // Glass capsule with placeholder, typed dots, caret, Caps Lock glyph and return arrow.
@@ -61,8 +62,7 @@ Item {
             anchors.centerIn: parent
             visible: f.shown === 0
             text: LockTheme.placeholder
-            font.family: Theme.fontText
-            font.pixelSize: LockTheme.placeholderSize
+            font: Typography.font(LockTheme.placeholderSize)
             color: LockTheme.placeholderColor
         }
 
@@ -102,8 +102,7 @@ Item {
             anchors.right: arrow.left
             anchors.rightMargin: 4
             text: "⇪"
-            font.family: Theme.fontText
-            font.pixelSize: LockTheme.capsSize
+            font: Typography.font(LockTheme.capsSize)
             color: LockTheme.placeholderColor
         }
 

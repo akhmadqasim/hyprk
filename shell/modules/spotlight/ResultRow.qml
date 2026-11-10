@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import qs
+import qs.HyprK
 import qs.components
 
 // One Spotlight result row for the browse modes: icon, title, optional subtitle,
@@ -82,8 +83,7 @@ Item {
             text: row.title
             elide: Text.ElideRight
             maximumLineCount: 1
-            font.family: Theme.fontText
-            font.pixelSize: Theme.font.spotlightRow
+            font: Typography.font(Theme.font.spotlightRow)
             color: Theme.color.label
         }
         Text {
@@ -91,8 +91,7 @@ Item {
             visible: row.subtitle !== ""
             text: row.subtitle
             elide: Text.ElideMiddle
-            font.family: Theme.fontText
-            font.pixelSize: Theme.font.spotlightHeader
+            font: Typography.font(Theme.font.spotlightHeader)
             color: Theme.color.secondaryLabel
         }
     }
@@ -117,9 +116,7 @@ Item {
             id: accText
             anchors.centerIn: parent
             text: row.accessory
-            font.family: Theme.fontText
-            font.pixelSize: Theme.font.spotlightHeader
-            font.weight: row.badge ? Theme.font.medium : Theme.font.regular
+            font: Typography.font(Theme.font.spotlightHeader, row.badge ? Typography.medium : Typography.regular)
             color: Theme.color.secondaryLabel
         }
         MouseArea {

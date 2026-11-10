@@ -246,9 +246,7 @@ Item {
                                 Layout.leftMargin: 4
                                 text: grp.app
                                 elide: Text.ElideRight
-                                font.family: Theme.fontText
-                                font.pixelSize: 15
-                                font.weight: Theme.font.semibold
+                                font: Typography.font(15, Typography.semibold)
                                 color: Theme.color.label
                             }
                             // no glass until the front card has slid below the header (overlapping
@@ -317,9 +315,7 @@ Item {
                         spacing: Theme.nc.monthGap * 2
                         Text {
                             text: Qt.formatDate(clock.date, "MMMM").toUpperCase()
-                            font.family: Theme.fontText
-                            font.pixelSize: Theme.font.widgetSmall
-                            font.weight: Theme.font.semibold
+                            font: Typography.font(Theme.font.widgetSmall, Typography.semibold)
                             color: Theme.color.red
                         }
                         Grid {
@@ -353,9 +349,7 @@ Item {
                                     Text {
                                         anchors.centerIn: parent
                                         text: parent.isHeader ? month.dayNames[parent.index] : parent.day > 0 ? parent.day : ""
-                                        font.family: Theme.fontText
-                                        font.pixelSize: Theme.font.widgetMonth
-                                        font.weight: parent.isHeader ? Theme.font.semibold : Theme.font.regular
+                                        font: Typography.font(Theme.font.widgetMonth, parent.isHeader ? Typography.semibold : Typography.regular)
                                         color: parent.isToday ? Theme.nc.onImage : parent.isHeader ? Theme.color.secondaryLabel : Theme.color.label
                                     }
                                 }
@@ -369,15 +363,12 @@ Item {
                         y: Theme.nc.widgetPadding - 2
                         Text {
                             text: Qt.formatDate(clock.date, "dddd").toUpperCase()
-                            font.family: Theme.fontText
-                            font.pixelSize: Theme.font.widgetSmall
-                            font.weight: Theme.font.semibold
+                            font: Typography.font(Theme.font.widgetSmall, Typography.semibold)
                             color: Theme.color.red
                         }
                         Text {
                             text: clock.date.getDate()
-                            font.family: Theme.fontDisplay
-                            font.pixelSize: Theme.font.widgetBig
+                            font: Typography.font(Theme.font.widgetBig)
                             color: Theme.color.label
                         }
                         Text {
@@ -385,9 +376,7 @@ Item {
                             topPadding: Theme.nc.upNextGap
                             wrapMode: Text.WordWrap
                             text: "No more events today"
-                            font.family: Theme.fontText
-                            font.pixelSize: Theme.font.widgetSmall + 1
-                            font.weight: Theme.font.medium
+                            font: Typography.font(Theme.font.widgetSmall + 1, Typography.medium)
                             color: Theme.color.secondaryLabel
                         }
                     }
@@ -454,17 +443,13 @@ Item {
                         anchors.bottomMargin: Theme.nc.widgetPadding
                         Text {
                             text: nc.photoTitle
-                            font.family: Theme.fontDisplay
-                            font.pixelSize: Theme.font.widgetPhotoTitle
                             // SF Pro here is a variable font: Bold is synthesised (smeared outline), Semibold is a real instance
-                            font.weight: Theme.font.semibold
+                            font: Typography.font(Theme.font.widgetPhotoTitle, Typography.semibold)
                             color: Theme.nc.onImage
                         }
                         Text {
                             text: Qt.formatDate(clock.date, "MMM d, yyyy").toUpperCase()
-                            font.family: Theme.fontText
-                            font.pixelSize: Theme.font.widgetSmall
-                            font.weight: Theme.font.semibold
+                            font: Typography.font(Theme.font.widgetSmall, Typography.semibold)
                             color: Theme.nc.onImageSecondary
                         }
                     }
@@ -529,9 +514,7 @@ Item {
             visible: !pill.symbol
             anchors.centerIn: parent
             text: pill.text
-            font.family: Theme.fontText
-            font.pixelSize: 12
-            font.weight: Theme.font.medium
+            font: Typography.font(12, Typography.medium)
             color: Theme.color.label
         }
         Symbol { visible: !!pill.symbol; anchors.centerIn: parent; name: pill.symbol || "xmark"; size: 12; color: Theme.color.label }

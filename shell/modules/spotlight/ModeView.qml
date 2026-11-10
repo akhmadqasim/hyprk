@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import qs
+import qs.HyprK
 import qs.components
 import qs.services
 import "../../lib/search.js" as Search
@@ -105,9 +106,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: Theme.spotlight.headerBaseline + 2
             text: view.heading
-            font.family: Theme.fontText
-            font.pixelSize: Theme.font.spotlightHeader
-            font.weight: Theme.font.semibold
+            font: Typography.font(Theme.font.spotlightHeader, Typography.semibold)
             color: Theme.color.secondaryLabel
         }
         Text {
@@ -117,8 +116,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: Theme.spotlight.headerBaseline + 2
             text: "Clear History"
-            font.family: Theme.fontText
-            font.pixelSize: Theme.font.spotlightHeader
+            font: Typography.font(Theme.font.spotlightHeader)
             color: Theme.color.accent
             MouseArea { anchors.fill: parent; anchors.margins: -4; onClicked: Clipboard.clear() }
         }
@@ -143,9 +141,7 @@ Item {
                     id: chipText
                     anchors.centerIn: parent
                     text: parent.modelData || "All"
-                    font.family: Theme.fontText
-                    font.pixelSize: Theme.font.spotlightHeader + 1
-                    font.weight: Theme.font.medium
+                    font: Typography.font(Theme.font.spotlightHeader + 1, Typography.medium)
                     color: parent.on ? Theme.color.textOnAccent : Theme.color.label
                 }
                 MouseArea { anchors.fill: parent; onClicked: { view.category = parent.modelData; view.selected = 0; } }
@@ -167,8 +163,7 @@ Item {
             text: view.mode === "clipboard" ? (Clipboard.available ? "Nothing copied yet" : "Clipboard history needs wl-clipboard")
                 : view.mode === "files" && !view.query.trim() ? "No Recent Files"
                 : view.mode === "files" && FileSearch.searching ? "Searching…" : "No Results"
-            font.family: Theme.fontText
-            font.pixelSize: Theme.font.spotlightRow
+            font: Typography.font(Theme.font.spotlightRow)
             color: Theme.color.secondaryLabel
         }
 
@@ -183,9 +178,7 @@ Item {
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
                 text: "Clipboard History"
-                font.family: Theme.fontText
-                font.pixelSize: Theme.font.spotlightRow
-                font.weight: Theme.font.semibold
+                font: Typography.font(Theme.font.spotlightRow, Typography.semibold)
                 color: Theme.color.label
             }
             Text {
@@ -195,8 +188,7 @@ Item {
                 text: Clipboard.available
                     ? "Spotlight can keep the text and images you copy, so you can find them again. Items are stored on this computer and deleted after 8 hours."
                     : "Clipboard history needs wl-clipboard (wl-paste and wl-copy)."
-                font.family: Theme.fontText
-                font.pixelSize: Theme.font.spotlightHeader + 1
+                font: Typography.font(Theme.font.spotlightHeader + 1)
                 color: Theme.color.secondaryLabel
             }
             Rectangle {
@@ -210,9 +202,7 @@ Item {
                     id: turnOn
                     anchors.centerIn: parent
                     text: "Turn On"
-                    font.family: Theme.fontText
-                    font.pixelSize: Theme.font.spotlightHeader + 2
-                    font.weight: Theme.font.medium
+                    font: Typography.font(Theme.font.spotlightHeader + 2, Typography.medium)
                     color: Theme.color.textOnAccent
                 }
                 MouseArea { anchors.fill: parent; onClicked: SpotlightState.setClipboardHistory("8h") }
@@ -262,8 +252,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     elide: Text.ElideRight
                     text: cell.modelData.name
-                    font.family: Theme.fontText
-                    font.pixelSize: Theme.font.launchpadLabel
+                    font: Typography.font(Theme.font.launchpadLabel)
                     color: Theme.color.label
                 }
                 MouseArea {
@@ -328,8 +317,7 @@ Item {
                         anchors.leftMargin: 10
                         anchors.rightMargin: 10
                         verticalAlignment: TextInput.AlignVCenter
-                        font.family: Theme.fontText
-                        font.pixelSize: Theme.font.spotlightHeader + 1
+                        font: Typography.font(Theme.font.spotlightHeader + 1)
                         color: Theme.color.label
                         maximumLength: 6
                         validator: RegularExpressionValidator { regularExpression: /[A-Za-z0-9]*/ }

@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Widgets
 import Quickshell.Services.Mpris
 import qs
+import qs.HyprK
 import qs.components
 import qs.services
 import "../../lib/state.js" as State
@@ -74,9 +75,7 @@ Column {
                     width: parent.width
                     text: np.p ? (np.p.trackTitle || np.p.identity) : ""
                     elide: Text.ElideRight
-                    font.family: Theme.fontText
-                    font.pixelSize: Theme.font.notifTitle
-                    font.weight: Theme.font.semibold
+                    font: Typography.font(Theme.font.notifTitle, Typography.semibold)
                     color: Theme.color.label
                 }
                 Text {
@@ -84,8 +83,7 @@ Column {
                     visible: text !== ""
                     text: np.p ? np.p.trackArtist : ""
                     elide: Text.ElideRight
-                    font.family: Theme.fontText
-                    font.pixelSize: Theme.font.notifBody
+                    font: Typography.body
                     color: Theme.color.secondaryLabel
                 }
             }

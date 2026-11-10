@@ -235,8 +235,7 @@ ShellWindow {
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.spotlight.hPadding
                 anchors.verticalCenter: parent.verticalCenter
-                font.family: Theme.fontDisplay
-                font.pixelSize: Theme.font.spotlightInput
+                font: Typography.font(Theme.font.spotlightInput)
                 color: Theme.color.label
                 selectionColor: Theme.color.accent
                 clip: true
@@ -314,9 +313,7 @@ ShellWindow {
                             anchors.bottom: parent.bottom
                             anchors.bottomMargin: Theme.spotlight.headerBaseline
                             text: r.modelData.title
-                            font.family: Theme.fontText
-                            font.pixelSize: Theme.font.spotlightHeader
-                            font.weight: Theme.font.semibold
+                            font: Typography.font(Theme.font.spotlightHeader, Typography.semibold)
                             color: Theme.color.secondaryLabel
                         }
 
@@ -360,16 +357,14 @@ ShellWindow {
                                 width: parent.width
                                 text: r.modelData.title
                                 elide: Text.ElideRight
-                                font.family: r.modelData.kind === "calc" ? Theme.fontDisplay : Theme.fontText
-                                font.pixelSize: r.modelData.kind === "calc" ? Theme.font.spotlightInput : Theme.font.spotlightRow
+                                font: Typography.font(r.modelData.kind === "calc" ? Theme.font.spotlightInput : Theme.font.spotlightRow)
                                 color: Theme.color.label
                             }
                             Text {
                                 width: parent.width
                                 visible: r.modelData.kind === "calc"
                                 text: r.modelData.subtitle || ""
-                                font.family: Theme.fontText
-                                font.pixelSize: Theme.font.spotlightHeader
+                                font: Typography.font(Theme.font.spotlightHeader)
                                 color: Theme.color.secondaryLabel
                             }
                         }

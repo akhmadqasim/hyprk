@@ -94,9 +94,7 @@ Item {
                 width: parent.width
                 text: cc.player ? (cc.player.trackTitle || cc.player.identity) : "Not Playing"
                 elide: Text.ElideRight
-                font.family: Theme.fontText
-                font.pixelSize: Theme.font.ccTitle
-                font.weight: Theme.font.semibold
+                font: Typography.font(Theme.font.ccTitle, Typography.semibold)
                 color: Theme.cc.text
             }
             Text {
@@ -104,8 +102,7 @@ Item {
                 visible: text !== ""
                 text: cc.player ? cc.player.trackArtist : ""
                 elide: Text.ElideRight
-                font.family: Theme.fontText
-                font.pixelSize: Theme.font.ccSub
+                font: Typography.subheadline
                 color: Theme.cc.subtext
             }
         }
@@ -233,9 +230,7 @@ Item {
                 width: parent.width
                 text: cap.title
                 elide: Text.ElideRight
-                font.family: Theme.fontText
-                font.pixelSize: Theme.font.ccTitle
-                font.weight: Theme.font.semibold
+                font: Typography.font(Theme.font.ccTitle, Typography.semibold)
                 color: Theme.cc.text
             }
             Text {
@@ -243,8 +238,7 @@ Item {
                 visible: text !== ""
                 text: cap.subtitle
                 elide: Text.ElideRight
-                font.family: Theme.fontText
-                font.pixelSize: Theme.font.ccSub
+                font: Typography.subheadline
                 color: Theme.cc.subtext
             }
         }
@@ -310,9 +304,7 @@ Item {
             x: Theme.cc.sliderInset
             y: 9
             text: sm.title
-            font.family: Theme.fontText
-            font.pixelSize: Theme.font.ccTitle
-            font.weight: Theme.font.semibold
+            font: Typography.font(Theme.font.ccTitle, Typography.semibold)
             color: Theme.cc.text
         }
         Symbol {

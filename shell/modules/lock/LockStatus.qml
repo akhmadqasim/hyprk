@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell.Services.UPower
 import Quickshell.Networking
 import qs
+import qs.HyprK
 import qs.components
 import "../../lib/state.js" as State
 
@@ -64,9 +65,7 @@ Row {
             id: label
             anchors.centerIn: parent
             text: Lock.layoutLabel
-            font.family: Theme.fontText
-            font.pixelSize: LockTheme.layoutTextSize
-            font.weight: Font.DemiBold
+            font: Typography.font(LockTheme.layoutTextSize, Typography.semibold)
             color: LockTheme.statusColor
         }
         MouseArea { anchors.fill: parent; enabled: s.interactive; onClicked: Lock.nextLayout() }

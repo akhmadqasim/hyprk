@@ -3,6 +3,7 @@ import QtQuick.Effects
 import Quickshell
 import Quickshell.Widgets
 import qs
+import qs.HyprK
 import qs.services
 import "lock.js" as L
 import "../../lib/clock.js" as Clock
@@ -67,9 +68,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             y: LockTheme.dateTop
             text: L.date(clock.date, c.clockStyle.monthFirst)
-            font.family: Theme.fontText
-            font.pixelSize: LockTheme.dateSize
-            font.weight: LockTheme.dateWeight
+            font: Typography.font(LockTheme.dateSize, Typography.medium)
             color: LockTheme.dateColor
         }
         Text {
@@ -147,9 +146,7 @@ Item {
                         anchors.centerIn: parent
                         visible: photo.status !== Image.Ready
                         text: L.initials(Lock.userName)
-                        font.family: Theme.fontDisplay
-                        font.pixelSize: avatar.width * 0.4
-                        font.weight: Font.DemiBold
+                        font: Typography.font(avatar.width * 0.4, Typography.semibold)
                         color: "white"
                     }
                     Image {
@@ -167,8 +164,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: parent.height - LockTheme.nameBottom - height
                 text: Lock.userName
-                font.family: Theme.fontText
-                font.pixelSize: LockTheme.nameSize
+                font: Typography.font(LockTheme.nameSize)
                 color: LockTheme.nameColor
             }
 
@@ -184,8 +180,7 @@ Item {
                 y: field.y + field.height + LockTheme.hintGap
                 visible: text !== ""
                 text: Lock.message
-                font.family: Theme.fontText
-                font.pixelSize: LockTheme.hintSize
+                font: Typography.font(LockTheme.hintSize)
                 color: LockTheme.hintColor
             }
         }

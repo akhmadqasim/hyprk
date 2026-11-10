@@ -316,8 +316,7 @@ ShellWindow {
                         id: tip
                         anchors.centerIn: parent
                         text: cell.modelData.name || ""
-                        font.family: Theme.fontText
-                        font.pixelSize: Theme.font.dockTooltip
+                        font: Typography.font(Theme.font.dockTooltip)
                         color: Theme.color.label
                     }
                 }

@@ -200,9 +200,7 @@ ShellWindow {
                         id: label
                         anchors.centerIn: parent
                         text: "Desktop " + pill.modelData.id
-                        font.family: Theme.fontText
-                        font.pixelSize: mc.m.labelSize
-                        font.weight: pill.current ? Font.DemiBold : Font.Medium
+                        font: Typography.font(mc.m.labelSize, pill.current ? Typography.semibold : Typography.medium)
                         color: Theme.mission.text
                     }
                     MouseArea {
@@ -256,9 +254,7 @@ ShellWindow {
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "Desktop " + sp.modelData.id
-                        font.family: Theme.fontText
-                        font.pixelSize: Theme.mission.labelSize
-                        font.weight: sp.current ? Font.DemiBold : Font.Normal
+                        font: Typography.font(Theme.mission.labelSize, sp.current ? Typography.semibold : Typography.regular)
                         color: Theme.mission.text
                     }
                 }
@@ -402,8 +398,7 @@ ShellWindow {
                     width: Math.min(implicitWidth, cell.width - Theme.dock.tooltipHPad * 2)
                     elide: Text.ElideRight
                     text: cell.modelData.title
-                    font.family: Theme.fontText
-                    font.pixelSize: Theme.font.dockTooltip
+                    font: Typography.font(Theme.font.dockTooltip)
                     color: Theme.color.label
                 }
             }

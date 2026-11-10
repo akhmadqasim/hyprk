@@ -64,9 +64,7 @@ FloatingWindow {
                 anchors.verticalCenter: parent.verticalCenter
                 text: win.title
                 elide: Text.ElideRight
-                font.family: Theme.fontText
-                font.pixelSize: win.m.titleSize
-                font.weight: Font.DemiBold
+                font: Typography.font(win.m.titleSize, Typography.semibold)
                 color: Tokens.label
             }
             ToolbarPlatter {
@@ -92,8 +90,7 @@ FloatingWindow {
                     anchors.right: parent.right
                     anchors.rightMargin: 12
                     anchors.verticalCenter: parent.verticalCenter
-                    font.family: Theme.fontText
-                    font.pixelSize: Tokens.control.fontSize
+                    font: Typography.control
                     color: Tokens.label
                     selectionColor: Qt.alpha(Tokens.accent, 0.35)
                     clip: true
@@ -141,9 +138,7 @@ FloatingWindow {
                             id: label
                             anchors.centerIn: parent
                             text: pill.modelData === "" ? "All" : pill.modelData
-                            font.family: Theme.fontText
-                            font.pixelSize: win.m.pillText
-                            font.weight: pill.selected ? Font.DemiBold : Font.Normal
+                            font: Typography.font(win.m.pillText, pill.selected ? Typography.semibold : Typography.regular)
                             color: pill.selected ? Tokens.label : Tokens.secondaryLabel
                         }
                         MouseArea {
@@ -192,8 +187,7 @@ FloatingWindow {
                     horizontalAlignment: Text.AlignHCenter
                     text: c.modelData.name
                     elide: Text.ElideRight
-                    font.family: Theme.fontText
-                    font.pixelSize: win.m.labelSize
+                    font: Typography.font(win.m.labelSize)
                     color: Tokens.label
                 }
                 MouseArea {
@@ -207,8 +201,7 @@ FloatingWindow {
             visible: win.apps.length === 0
             anchors.centerIn: grid
             text: "No Results"
-            font.family: Theme.fontText
-            font.pixelSize: 15
+            font: Typography.font(15)
             color: Tokens.secondaryLabel
         }
     }
