@@ -540,33 +540,96 @@ test("mode buttons start inside the field, end in place", () => {
         AC.present([{ categories: ["Utility"] }, { categories: ["Game"] }, { categories: [] }]), ["Games", "Utilities", "Other"]));
 }
 
-// ---- Notification Center slide curve (modules/NotificationCenter.qml slideCurve vs the SwiftUI spring) ----
-test("notification center slide curve: two-segment BezierSpline within 0.01 of the 0.3 s / 1.25 spring", () => {
-    const src = readFileSync(join(here, "..", "modules", "NotificationCenter.qml"), "utf8");
-    const c = /slideCurve: \[([^\]]+)\]/.exec(src)[1].split(",").map(Number);
-    assert.equal(c.length, 12);
-    const P = [[0, 0], [c[0], c[1]], [c[2], c[3]], [c[4], c[5]], [c[6], c[7]], [c[8], c[9]], [c[10], c[11]]];
-    const bez = (a, b, cc, d, u) => [0, 1].map(i => (1 - u) ** 3 * a[i] + 3 * (1 - u) ** 2 * u * b[i] + 3 * (1 - u) * u * u * cc[i] + u ** 3 * d[i]);
-    const pts = [];
-    for (let u = 0; u <= 1; u += 0.002) pts.push(bez(P[0], P[1], P[2], P[3], u));
-    for (let u = 0; u <= 1; u += 0.002) pts.push(bez(P[3], P[4], P[5], P[6], u));
-    // spring: response 0.3, ratio 1.25 -> r1 = -41.89, r2 = -10.47 per second; the animation lasts 0.7 s
-    const w = 2 * Math.PI / 0.3, z = 1.25, s = Math.sqrt(z * z - 1), r1 = -w * (z + s), r2 = -w * (z - s);
-    const x = t => 1 - (r2 * Math.exp(r1 * t) - r1 * Math.exp(r2 * t)) / (r2 - r1);
-    assert.ok(Math.abs(r1 + 41.89) < 0.01 && Math.abs(r2 + 10.47) < 0.01);
-    let worst = 0;
-    for (let t = 0; t <= 0.7; t += 0.01) {
-        const f = t / 0.7;
-        let j = pts.findIndex(p => p[0] >= f);
-        if (j < 1) j = 1;
-        const [a, b] = [pts[j - 1], pts[j]];
-        const y = a[1] + (b[1] - a[1]) * (f - a[0]) / Math.max(b[0] - a[0], 1e-9);
-        worst = Math.max(worst, Math.abs(y - x(t)));
-    }
-    assert.ok(worst < 0.01, `worst ${worst}`);
-    assert.ok(pts.every((p, i) => i === 0 || p[0] >= pts[i - 1][0] - 1e-9), "time never goes back");
-    assert.ok(pts.every(p => p[1] >= -1e-9 && p[1] <= 1 + 1e-9), "no overshoot");
-});
+// ---- exact springs as BezierSpline curves (lib/spring.js, components/SpringCurve.qml) ----
+{
+    const SP = load("spring.js");
+    const src = n => readFileSync(join(here, "..", n), "utf8");
+    // evaluate a BezierSpline list at time fraction f, as Qt does (find the segment, solve x for the parameter)
+    const evalSpline = (c, f) => {
+        let p0 = [0, 0];
+        for (let i = 0; i < c.length; i += 6) {
+            const p1 = [c[i], c[i + 1]], p2 = [c[i + 2], c[i + 3]], p3 = [c[i + 4], c[i + 5]];
+            if (f <= p3[0] + 1e-12) {
+                const bz = (u, k) => (1 - u) ** 3 * p0[k] + 3 * (1 - u) ** 2 * u * p1[k] + 3 * (1 - u) * u * u * p2[k] + u ** 3 * p3[k];
+                let lo = 0, hi = 1;
+                for (let j = 0; j < 60; j++) { const m = (lo + hi) / 2; if (bz(m, 0) < f) lo = m; else hi = m; }
+                return bz(lo, 1);
+            }
+            p0 = p3;
+        }
+        return 1;
+    };
+    // closed form x(t), independent of the library: the ODE x'' = -w^2 (x - 1) - 2 z w x' integrated finely (RK4)
+    const reference = (s, v0, T) => {
+        const w = 2 * Math.PI / s.response, z = s.ratio, h = 1e-5, out = [];
+        let x = 0, v = v0;
+        const f = (x, v) => [v, -w * w * (x - 1) - 2 * z * w * v];
+        for (let t = 0; t <= T + h / 2; t += h) {
+            out.push(x);
+            const k1 = f(x, v), k2 = f(x + h / 2 * k1[0], v + h / 2 * k1[1]);
+            const k3 = f(x + h / 2 * k2[0], v + h / 2 * k2[1]), k4 = f(x + h * k3[0], v + h * k3[1]);
+            x += h / 6 * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]);
+            v += h / 6 * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]);
+        }
+        return t => out[Math.round(t / h)];
+    };
+    // a plan (0 -> 1, cut or settled) against the reference: the value the animation shows at every ms
+    const worstError = (s, v0, cut) => {
+        const p = SP.plan(s, 0, 1, v0, cut), ref = reference(s, v0, p.seconds);
+        let worst = 0;
+        for (let t = 0; t <= p.seconds; t += 0.001) worst = Math.max(worst, Math.abs(p.to * evalSpline(p.curve, t / p.seconds) - ref(t)));
+        return { p, worst };
+    };
+    const springs = {
+        "Notification Center Spring(0.3, -0.2)": [SP.fromBounce(0.3, -0.2)],
+        "HUD appear interpolatingSpring(2, 300, 50)": [SP.fromPhysics(2, 300, 50)],
+        "HUD hide spring(0.48669, 1), cut at 0.48669 s": [SP.fromResponse(0.48669, 1), 0.48669],
+        "HUD content spring(0.2, 0.85)": [SP.fromResponse(0.2, 0.85)],
+        "Control Center Spring(0.25, -0.027)": [SP.fromBounce(0.25, -0.027)],
+        "Spotlight open x / alpha Spring(0.28, 0.41)": [SP.fromBounce(0.28, 0.41)],
+        "Spotlight open y Spring(0.28, 0.32)": [SP.fromBounce(0.28, 0.32)],
+        "Spotlight close Spring(0.45, 0.05)": [SP.fromBounce(0.45, 0.05)],
+    };
+    for (const [name, [s, cut]] of Object.entries(springs))
+        test(`spring curve: ${name} within 0.0025 of the closed form`, () => {
+            const { p, worst } = worstError(s, 0, cut);
+            assert.ok(worst < 0.0025, `worst ${worst}`);
+            assert.ok(p.curve.length % 6 === 0 && p.curve.at(-2) === 1 && p.curve.at(-1) === 1, "ends at (1, 1)");
+            assert.ok(p.curve.every((c, i) => i % 2 || i < 2 || c >= p.curve[i - 2] - 1e-12), "time never goes back");
+        });
+    test("spring curve: retargeting with velocity stays exact", () => {
+        for (const v0 of [-20, -3, 4, 30]) {
+            const { worst } = worstError(SP.fromResponse(0.2, 0.85), v0);
+            assert.ok(worst < 0.0025, `v0 ${v0}: worst ${worst}`);
+        }
+    });
+    test("spring curve: Apple notations", () => {
+        const b = SP.fromBounce(0.25, -0.027), k = (2 * Math.PI / 0.25) ** 2;
+        assert.ok(Math.abs(k - 631.65) < 0.01 && Math.abs(2 * b.ratio * Math.sqrt(k) - 51.66) < 0.01, "CC: stiffness 631.65, damping 51.66");
+        const n = SP.fromBounce(0.3, -0.2);
+        assert.ok(Math.abs(n.ratio - 1.25) < 1e-12 && Math.abs((2 * Math.PI / 0.3) ** 2 - 438.65) < 0.01);
+        const h = SP.fromPhysics(2, 300, 50);
+        assert.ok(Math.abs(2 * Math.PI / h.response - 12.247) < 1e-3 && Math.abs(h.ratio - 1.0206) < 1e-4, "HUD: w0 12.25, ratio 1.02");
+        assert.ok(Math.abs(SP.fromBounce(0.45, 0.05).ratio - 0.95) < 1e-12);
+    });
+    test("spring curve: HUD appear values (MAC-ANSWERS: 0.34, 0.69, 0.87, 0.95, 0.98 at 0.1..0.5 s)", () => {
+        const h = SP.fromPhysics(2, 300, 50);
+        [0.34, 0.69, 0.87, 0.95, 0.98].forEach((x, i) => assert.ok(Math.abs(SP.value(h, 0, (i + 1) / 10) - x) < 0.01, `${(i + 1) / 10} s`));
+    });
+    test("spring curve: HUD hide stops at 0.986 at 0.48669 s", () => {
+        const p = SP.plan(SP.fromResponse(0.48669, 1), 1, 0, 0, 0.48669);
+        assert.equal(p.duration, 487);
+        assert.ok(Math.abs(p.to - 0.0136) < 0.001, `to ${p.to}`);
+    });
+    test("spring curve: CC close 95 % at 0.19 s (MAC-ANSWERS)", () => {
+        const c = SP.fromBounce(0.25, -0.027);
+        assert.ok(SP.value(c, 0, 0.18) < 0.95 && SP.value(c, 0, 0.2) > 0.95);
+    });
+    test("spring curve: Spotlight alpha first reaches 0 at 0.12 s on close", () => {
+        const t = SP.firstCrossing(SP.fromBounce(0.28, 0.41), 0, 0.001);
+        assert.ok(t > 0.115 && t < 0.13, `t ${t}`);
+    });
+}
 
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

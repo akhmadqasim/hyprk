@@ -7,6 +7,7 @@ import qs
 import qs.components
 import qs.services
 import qs.HyprK
+import "../lib/spring.js" as SpringLib
 
 // Notification Center (macOS 27): grouped notifications on top, widgets below.
 // Motion: the whole column slides in from the right screen edge and back out on close (springs fitted
@@ -78,23 +79,18 @@ Item {
     // damping ratio 1.25, overdamped (no overshoot; 90 % at 0.25 s, 99 % at 0.47 s). Only the x offset animates
     // (one panel width W -> 0 and back): no fade, scale, blur or stagger. Close: the window is unmapped once the
     // panel is fully off screen (below 1 % shown) instead of waiting for the spring to settle.
-    // SpringAnimation cannot express the SwiftUI parameters, so this is one NumberAnimation on a two-segment
-    // BezierSpline fitted to the closed form x(t) = 1 - (r2 e^(r1 t) - r1 e^(r2 t)) / (r2 - r1), r1 = -41.89,
-    // r2 = -10.47 per second, over 0.7 s (x = 0.9991 there): max error 0.006 of the panel width (see tests).
-    // The same curve runs both ways (close goes 1 -> 0 along 1 - x(t)). No per-frame script but the glass settle.
-    readonly property var slideCurve: [0.0368, 0.0025, 0.1226, 0.6103, 0.2325, 0.757, 0.3321, 0.8898, 0.2976, 0.9964, 1, 1]
-    NumberAnimation {
+    // Exact spring on one NumberAnimation (components/SpringCurve.qml, lib/spring.js): runs until within 0.001
+    // of the distance (0.69 s). No per-frame script but the glass settle.
+    SpringCurve {
         id: slideAnim
         target: nc
         property: "slide"
-        duration: Theme.ms(700)
-        easing.type: Easing.BezierSpline
-        easing.bezierCurve: nc.slideCurve
+        spring: SpringLib.fromBounce(0.3, -0.2)
         onRunningChanged: if (running) nc.settle()
     }
     onSlideChanged: {
         if (!slideAnim.running) return;
-        if (!shown && slideAnim.to === 0 && slide < 0.01) { slideAnim.stop(); slide = 0; }
+        if (!shown && slideAnim.goal === 0 && slide < 0.01) slideAnim.snap(0);
         else settle();
     }
     // The Overlay window is unmapped while nothing shows, so opening maps a new layer surface and the compositor
@@ -116,9 +112,7 @@ Item {
     function startOpen() {
         openPending = false;
         if (!shown) return;
-        slideAnim.stop();
-        slideAnim.to = 1;
-        slideAnim.start();
+        slideAnim.go(1);
     }
     onShownChanged: {
         if (shown) {
@@ -127,9 +121,7 @@ Item {
             refresh();
         } else {
             openPending = false;
-            slideAnim.stop();
-            slideAnim.to = 0;
-            slideAnim.start();
+            slideAnim.go(0);
             expanded = ({});         // macOS reopens with every stack collapsed
         }
     }
