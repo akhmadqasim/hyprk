@@ -105,7 +105,8 @@ Item {
         anchors.fill: parent
         asynchronous: sysSource !== ""   // inline SVG fallbacks load synchronously, no blank frame
         sourceSize: Qt.size(root.px, root.px)
-        readonly property string sysSource: root.sysFailed ? "" : Theme.sysIcon(root.sysName, root.px, root.kind === "folder")
+        readonly property string sysSource: root.sysFailed ? "" : Theme.sysIcon(root.sysName, root.px, root.kind === "folder",
+                                                                                     root.kind === "folder" && Files.hasTags(root.entry) ? Theme.color.tagColors[root.entry.tags[0]] : "")
         onStatusChanged: if (status === Image.Error && sysSource) root.sysFailed = true
         source: sysSource
              || (root.kind === "folder"

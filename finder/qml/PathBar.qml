@@ -2,30 +2,35 @@ import QtQuick
 import HyprK
 import "lib/files.js" as Files
 
-// Path bar (View > Show Path Bar): every ancestor of the current folder, clickable.
-Rectangle {
+// Path bar (View > Show Path Bar; Q-finder-22): a 1 pt top line, then 28 pt with no fill and no glass. Items
+// from x 6: 16 pt icon + 11 pt Regular secondary text, 4 x 6 chevrons between; no hover. Every item is clickable.
+Item {
     id: root
 
     required property var browser
 
-    height: Theme.pathBar.height
-    color: Theme.color.window
+    height: Theme.pathBar.height + 1
 
-    Rectangle { width: parent.width; height: 1; color: Theme.color.separator }
+    Rectangle { width: parent.width; height: 1; color: Theme.color.pathBarLine }
 
     Flickable {
-        anchors.fill: parent
-        anchors.leftMargin: 10
+        y: 1
+        width: parent.width
+        height: Theme.pathBar.height
+        leftMargin: Theme.pathBar.x
         contentWidth: row.width
         clip: true
         flickableDirection: Flickable.HorizontalFlick
         Row {
             id: row
-            height: root.height
-            spacing: 2
+            height: Theme.pathBar.height
+            spacing: 4
             Repeater {
-                model: root.browser.isVirtual ? [{ name: root.browser.title, path: root.browser.path }]
-                                              : Files.segments(root.browser.path, "Macintosh HD")
+                // the folder's ancestors, then the selected item (Demo > finder-demo > Sunset.png)
+                model: (root.browser.isVirtual ? [{ name: root.browser.title, path: root.browser.path }]
+                                               : Files.segments(root.browser.path, "Macintosh HD"))
+                       .concat(root.browser.selectedCount === 1
+                               ? [{ name: root.browser.selectedVisible[0].name, path: "", entry: root.browser.selectedVisible[0] }] : [])
                 Row {
                     required property var modelData
                     required property int index
@@ -35,20 +40,21 @@ Rectangle {
                         visible: index > 0
                         anchors.verticalCenter: parent.verticalCenter
                         name: "chevron.small.right"
-                        size: 12
-                        color: Theme.color.tertiaryLabel
+                        size: 9
+                        weight: "semibold"
+                        color: Theme.color.secondaryLabel
                     }
                     Symbol {
                         anchors.verticalCenter: parent.verticalCenter
                         visible: modelData.path === "/"
                         name: "drive"
                         size: Theme.pathBar.iconSize
-                        color: Theme.color.sidebarIcon
+                        color: Theme.color.sidebarIconGrey
                     }
                     FileIcon {
                         visible: modelData.path !== "/"
                         anchors.verticalCenter: parent.verticalCenter
-                        entry: ({ name: modelData.name, path: modelData.path, isDir: true, mime: "inode/directory" })
+                        entry: modelData.entry || ({ name: modelData.name, path: modelData.path, isDir: true, mime: "inode/directory" })
                         size: Theme.pathBar.iconSize
                     }
                     Text {
@@ -56,7 +62,7 @@ Rectangle {
                         text: modelData.name
                         color: Theme.color.secondaryLabel
                         font: Typography.font(Theme.font.pathBar)
-                        TapHandler { onTapped: root.browser.go(modelData.path) }
+                        TapHandler { onTapped: if (modelData.path) root.browser.go(modelData.path) }
                     }
                 }
             }

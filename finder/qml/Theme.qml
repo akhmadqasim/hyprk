@@ -14,10 +14,13 @@ QtObject {
     id: theme
 
     property bool dark: false
+    // the window is key (set by Main: Window.active, or --inactive for screenshots); inactive colours follow
+    property bool active: true
     // the Finder has no Reduce motion / transparency / contrast settings of its own yet
     Component.onCompleted: {
         Tokens.dark = Qt.binding(() => theme.dark);
         Tokens.fontText = Qt.binding(() => theme.fontText);
+        Tokens.windowActive = Qt.binding(() => theme.active);
     }
     // No compositor blur behind the window (plain GNOME, offscreen) -> solid sidebar.
     // Set HYPRK_BLUR=1 (Hyprland with a blur windowrule) to get the translucent sidebar.
@@ -25,8 +28,9 @@ QtObject {
 
     // ---------- macOS file icons (themes/icons/system), "" = use the drawn fallbacks ----------
     property bool hasSysIcons: false
-    function sysIcon(name, px, tint) {
-        return hasSysIcons ? "image://sysicon/" + (tint ? "tint/" : "") + name + "@" + px : "";
+    // tint: the folder blue; tag: a tag colour ("#RRGGBB") for a tagged folder
+    function sysIcon(name, px, tint, tag) {
+        return !hasSysIcons ? "" : "image://sysicon/" + (tag ? "tag/" + tag.slice(1, 7) + "/" : tint ? "tint/" : "") + name + "@" + px;
     }
     // folders that get their own icon, by absolute path
     readonly property var folderIcons: {
@@ -55,19 +59,22 @@ QtObject {
 
     // Text sizes in pt; the fonts themselves come from HyprK Typography (TextLabel, or font: Typography.font(pt)).
     readonly property QtObject font: QtObject {
-        readonly property real title: 15           // toolbar title: Typography.toolbarTitle, 15 Semibold (27.2.1)
-        readonly property real sidebarItem: 13     // 27.2.1 ("Recents", "Shared" match 13 Regular at 2x)
-        readonly property real sidebarHeader: 11   // ref / 1.22 (13.5 px)
-        readonly property real label: 12          // icon grid label: ref / 1.22 (14.3 px), Finder's default text size 12
-        readonly property real list: 13            // 27.2.1 column view ("App Store", "Apps" match 13 Regular)
-        readonly property real listHeader: 12
-        readonly property real pathBar: 12
-        readonly property real status: 12
+        readonly property real title: 15           // toolbar title: Typography.toolbarTitle, 15 Semibold (Q-finder-06)
+        readonly property real sidebarItem: 13     // Q-finder-07: 13 Regular, the selected row 13 Semibold
+        readonly property real sidebarHeader: 11   // Q-finder-07: 11 Semibold
+        readonly property real label: 12           // icon label: 12 Regular, line pitch 16 (Q-finder-14)
+        readonly property real list: 13            // list and column rows: 13 Regular (Q-finder-15)
+        readonly property real listHeader: 11      // Q-finder-17: sorted 11 Semibold, others 11 Regular
+        readonly property real pathBar: 11         // Q-finder-22: 11 Regular
         readonly property real preview: 13
+        readonly property real small: 11           // gallery / preview info rows (Q-finder-19/20)
     }
 
     // ---------- colors ----------
+    // Q-finder-NN = reference/re/MAC-ANSWERS.md, measured on 27.2.1 (2x captures, Multicolour accent). The dark
+    // sidebar and content were captured over the Electric Blue wallpaper; the sidebar glass takes its tint.
     readonly property QtObject color: QtObject {
+        readonly property bool blueAccent: Accent.name === "multicolor" || Accent.name === "blue"
         // AppKit label hierarchy (Tokens)
         readonly property color label: Tokens.label
         readonly property color secondaryLabel: Tokens.secondaryLabel
@@ -75,40 +82,64 @@ QtObject {
         readonly property color separator: theme.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.10)
         // Finder has no accent of its own: Blue #007AFF under Multicolor (accent-colors.json), the user's accent otherwise
         readonly property color accent: Tokens.accent
-        readonly property color textSelection: Accent.selectedText   // selectedTextBackgroundColor
-        readonly property color sidebarIcon: theme.dark ? "#3D9BFF" : "#0C72EF"   // ref (12,114,239)
+        // rename field: the selected base name (186,214,251) (Q-finder-27)
+        readonly property color textSelection: blueAccent && !theme.dark ? "#BAD6FB" : Accent.selectedText
 
         readonly property color window: Tokens.windowBackground
-        // solid sidebar: 27.2.1 Finder sidebar reads (38,38,38) dark, (237,237,237) light (finder-toolbar-*.png)
-        readonly property color sidebarSolid: theme.dark ? "#262626" : "#EDEDED"
+        // sidebar (Q-finder-03/07/08/09): fill, text, headers, icons; a = key window, i = inactive
+        readonly property color sidebarSolid: theme.dark ? "#242637" : theme.active ? "#EDEDEE" : "#F2F2F3"
         // over compositor blur: the sidebar glass fill colour (LIVE-27.2.1.md Sidebar, glass-table-dark.txt)
         readonly property color sidebarGlass: theme.dark ? Qt.rgba(0.15, 0.15, 0.15, 0.75) : Qt.rgba(0.87, 0.88, 0.91, 0.7)
-        readonly property color sidebarSelection: theme.dark ? Qt.rgba(1, 1, 1, 0.12) : "#E2E2E2"  // ref (226)
-        readonly property color sidebarHeader: theme.dark ? Qt.rgba(1, 1, 1, 0.40) : Qt.rgba(0, 0, 0, 0.45)
+        readonly property color sidebarSelection: theme.dark ? (theme.active ? "#414354" : "#323443")
+                                                             : (theme.active ? "#D7D7D8" : "#E7E7E8")
+        readonly property color sidebarDrop: "#2F6EED"          // drop target pill, white text (Q-finder-09)
+        readonly property color sidebarText: theme.dark ? (theme.active ? "#FFFFFF" : "#92939B") : (theme.active ? "#000000" : "#717171")
+        readonly property color sidebarHeader: theme.dark ? Qt.rgba(1, 1, 1, theme.active ? 0.35 : 0.23)
+                                                          : Qt.rgba(0, 0, 0, theme.active ? 0.43 : 0.30)
+        // Recents, Shared and Favourites: accent; Locations: grey; all grey while inactive
+        readonly property color sidebarIconAccent: !theme.active ? sidebarIconInactive : blueAccent ? (theme.dark ? "#1E98FF" : "#006BEF") : accent
+        readonly property color sidebarIconGrey: !theme.active ? sidebarIconInactive : theme.dark ? "#B5B5C3" : "#7B7B80"
+        readonly property color sidebarIconInactive: theme.dark ? "#8F909B" : "#7F7F7F"
 
         // toolbar capsules: HyprK ToolbarPlatter (Tokens.toolbar, measured on 27.2.1)
         readonly property color capsuleSelected: Tokens.toolbar.selection
+        // inactive window: the capsule darkens 252 -> 240 | (61,62,70) -> (58,60,67) (Q-finder-29)
+        readonly property color capsuleInactive: Qt.rgba(0, 0, 0, theme.dark ? 0.05 : 0.048)
+        // hover / pressed inner capsule: 242 on 252 (Search 236) | (87,89,96) on (67,69,77) (Q-finder-10)
+        readonly property color toolbarHover: theme.dark ? Qt.rgba(1, 1, 1, 0.106) : Qt.rgba(0, 0, 0, 0.04)
+        readonly property color searchHover: theme.dark ? Qt.rgba(1, 1, 1, 0.106) : Qt.rgba(0, 0, 0, 0.064)
         // Quick Look's Open button (not a toolbar platter)
         readonly property color capsule: theme.dark ? Qt.rgba(1, 1, 1, 0.08) : "#FAFAFA"
         readonly property color capsuleBorder: theme.dark ? Qt.rgba(1, 1, 1, 0.12) : Qt.rgba(0, 0, 0, 0.07)
         readonly property color toolbarSeparator: Tokens.toolbar.separator
-        readonly property color toolbarIcon: theme.dark ? Qt.rgba(1, 1, 1, 0.85) : "#1C1C1C"
-        readonly property color toolbarIconDisabled: theme.dark ? Qt.rgba(1, 1, 1, 0.30) : Qt.rgba(0, 0, 0, 0.28)
-        // toolbar title, MAC-ANSWERS.md Q-windows-12 / -25: (58,59,57) light, (236,236,235) dark; inactive
-        // (129,132,128) / (117,115,103)
-        readonly property color title: theme.dark ? "#ECECEB" : "#3A3B39"
-        readonly property color titleInactive: theme.dark ? "#757367" : "#818480"
+        // glyphs: light 0, inactive 164 (Q-finder-29); dark not measured
+        readonly property color toolbarIcon: theme.dark ? Qt.rgba(1, 1, 1, 0.85) : theme.active ? "#000000" : "#A4A4A4"
+        // disabled: light 173 on 252, dark (113,114,122) on (61,62,70) (Q-finder-10)
+        readonly property color toolbarIconDisabled: theme.dark ? Qt.rgba(1, 1, 1, 0.27) : Qt.rgba(0, 0, 0, 0.31)
+        // title (Q-finder-06): light #4C4C4C a / #BFBDBD i, dark #E9E9E9 a / #5F5F64 i
+        readonly property color title: theme.dark ? (theme.active ? "#E9E9E9" : "#5F5F64") : (theme.active ? "#4C4C4C" : "#BFBDBD")
 
-        // content selection
-        readonly property color iconSelection: theme.dark ? Qt.rgba(1, 1, 1, 0.12) : Qt.rgba(0, 0, 0, 0.08)
-        // selectedContentBackgroundColor / unemphasized (27.2.1, per accent: Accent)
-        readonly property color labelSelection: Accent.selectedContent
-        readonly property color listSelection: Accent.selectedContent
-        readonly property color listSelectionInactive: Accent.unemphasizedSelectedContent
-        readonly property color listAlternate: theme.dark ? Qt.rgba(1, 1, 1, 0.03) : "#F4F5F5"
+        // content selection (Q-finder-13/16/19/29): accent while key, grey with label-coloured text while not
+        readonly property color iconPlate: theme.dark ? "#36373C" : "#E6E6E6"         // icon plate, unchanged inactive
+        readonly property color labelSelection: !theme.active ? Accent.unemphasizedSelectedContent
+                                              : blueAccent ? (theme.dark ? "#2558C9" : "#2A63D9") : Accent.selectedContent
+        readonly property color listSelection: !theme.active ? Accent.unemphasizedSelectedContent
+                                             : blueAccent ? (theme.dark ? "#2457C9" : "#2A62D9") : Accent.selectedContent
+        readonly property color listSelectionInactive: Accent.unemphasizedSelectedContent   // parent columns
+        readonly property color selectedText: theme.active ? "#FFFFFF" : theme.dark ? "#E3E3E3" : "#212121"
+        readonly property color selectedSecondaryText: theme.active ? "#BFD0F4" : theme.dark ? "#ACACAC" : "#6D6D6D"
+        readonly property color listAlternate: theme.dark ? "#2A2B31" : "#F4F5F5"
+        // list header (Q-finder-17): dark = a solid bar (hard pocket) under the toolbar too; light no fill
+        readonly property color listHeaderFill: theme.dark ? "#28282E" : "transparent"
+        readonly property color listHeaderSeparator: theme.dark ? "#4C4C52" : "#E5E5E5"
+        readonly property color listHeaderLine: theme.dark ? "#424248" : "#E5E5E5"
+        readonly property color listHeaderSorted: theme.dark ? "#FFFFFF" : "#4C4C4C"
+        readonly property color columnDivider: theme.dark ? "#393939" : "#E5E5E5"       // Q-finder-19
+        readonly property color galleryPlate: theme.dark ? "#57585C" : "#BDBDBD"        // Q-finder-20
+        readonly property color pathBarLine: theme.dark ? "#424349" : "#E1E1E1"         // Q-finder-22
+        // drag selection rectangle: not measured
         readonly property color rubberBand: theme.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.08)
         readonly property color rubberBandBorder: theme.dark ? Qt.rgba(1, 1, 1, 0.35) : Qt.rgba(0, 0, 0, 0.25)
-
 
         // folder icon (macOS blue folder)
         // drawn-fallback folder; SysIconProvider tints the PNG folders to the same ref colours
@@ -117,9 +148,10 @@ QtObject {
         readonly property color folderTop: "#81C6EE"     // ref (129,198,238)
 
         readonly property color previewPanel: theme.dark ? Qt.rgba(0.15, 0.15, 0.16, 0.97) : Qt.rgba(0.97, 0.97, 0.97, 0.98)
-        readonly property color alert: theme.dark ? "#2C2C2E" : "#F5F5F5"
         readonly property color fieldBg: theme.dark ? Qt.rgba(1, 1, 1, 0.08) : "#FFFFFF"
-        readonly property color focusRing: theme.dark ? Qt.rgba(0.04, 0.52, 1, 0.55) : Qt.rgba(0, 0.48, 1, 0.45)
+        // rename field ring: 3 pt accent a.5 outside, 0.5 pt darker inner edge (114,158,244) (Q-finder-27)
+        readonly property color focusRing: Accent.focusRing
+        readonly property color focusEdge: blueAccent && !theme.dark ? "#729EF4" : Accent.color
 
         // Finder tag colors (system palette)
         readonly property var tags: [
@@ -155,81 +187,120 @@ QtObject {
     }
 
     readonly property QtObject sidebar: QtObject {
-        readonly property int width: 163         // 27.2.1: sidebar edge at x 325..326 px (2x)
-        readonly property int top: 52            // 27.2.1: first row (Recents) right below the 52 pt toolbar, centred at 68.5
-        readonly property int rowHeight: 32      // 27.2.1: Recents to Shared 32 pt (medium sidebar, SPEC 7 row 24/32/40)
-        readonly property int rowInset: 10       // same as System Settings' sidebar pill (pt ref), ref / 1.22 was 11.5
-        readonly property int rowRadius: 10      // same as System Settings, ref / 1.22 was 8
-        readonly property int iconSize: 20       // 27.2.1: Recents clock ink 16.5 pt wide (an 18 box drew 15)
-        readonly property real iconX: 18.5       // 27.2.1: icon ink 20.5..36.5 pt
-        readonly property int textX: 45          // 27.2.1: "Recents" ink starts at 47 pt (R's side bearing)
-        readonly property int headerHeight: 24   // ref / 1.22 (30 px)
-        readonly property int headerX: 16        // ref / 1.22 (20 px)
-        readonly property int sectionGap: 8      // ref / 1.22 (10 px)
-        readonly property int tagDot: 11         // ref / 1.22 (14 px)
+        // AX says 163 (divider at 162.5), but every 27.2.1 window picture draws the divider at 158.5..159 and
+        // everything right of it (toolbar capsules, title, grid) 4 pt left of the AX frames: the drawn width is 159
+        readonly property int width: 159
+        readonly property int top: 52            // Q-finder-04: first row (Recents) at y 52, right under the toolbar
+        readonly property int rowHeight: 32      // Q-finder-04
+        readonly property int rowInset: 10       // selection x 10..153 (143 wide)
+        readonly property int rowRadius: 8       // about 8
+        readonly property int iconSize: 20       // 13 pt .large symbols, ink 16..18
+        readonly property real iconX: 19         // icon centre x 29
+        readonly property int textX: 45          // AX text x 45 (ink 46.5)
+        readonly property int headerHeight: 19   // Q-finder-04: header rows 19
+        readonly property int headerX: 15        // header text x 15 (ink 16.5)
+        readonly property int sectionGap: 13     // 13 pt empty before each header row
+        readonly property int tagDot: 11         // not measured (Tags section off on the Mac)
     }
 
     // Toolbar: the strip has no fill and no glass, only the item-group capsules (MAC-ANSWERS.md Q9.2).
-    // Capsule extents on the 27.2.1 Finder shot (2x): back/forward 170.75..244.25, view switcher 593.75..753.75
-    // (incl. rim), group 762.25..808.75, actions 816.75..927.75, search 935.75..971.75 pt in a 980 pt window.
+    // Q-finder-02 (920 pt window): back/forward 170.5..244.5, title ink 256, views 533.5..694.5 (4 x 40.25),
+    // group 702..749.5, share/tags/action 756.5..868.5, search 875.5..912.5, gaps 7..7.5, right inset 7.5.
     readonly property QtObject toolbar: QtObject {
-        readonly property int height: 52         // 27.2.1 (capsules at 8, 36 tall, 8 below)
-        readonly property int capsuleHeight: 36  // 27.2.1
-        readonly property int capsuleY: 8        // 27.2.1
-        readonly property int buttonWidth: 36    // a lone button is a 36 pt circle (27.2.1)
-        readonly property int navWidth: 74       // back/forward: one 74 x 36 capsule (27.2.1)
-        readonly property int dividerHeight: 20  // its 1 x 20 divider (27.2.1)
+        readonly property int height: 52         // AXToolbar 52, capsules y 8..44
+        readonly property int capsuleHeight: 36
+        readonly property int capsuleY: 8
+        readonly property int buttonWidth: 36    // a lone button is a 36 pt circle
+        readonly property int navWidth: 74       // back/forward: one 74 x 36 capsule
+        readonly property int dividerHeight: 20  // its 1 x 20 divider, hidden on hover
         readonly property real iconSize: 19.6    // ref / 1.22 (24 px)
-        readonly property int gap: 8             // between capsule groups (27.2.1 toolbar probe dump)
-        readonly property int leftPad: 8        // sidebar edge to the back/forward capsule (27.2.1)
-        readonly property int rightPad: 8        // last capsule to the window edge (27.2.1 probe dump)
-        readonly property real titleGap: 11.5    // 27.2.1 Finder shot: capsule ends at 244.25, title ink starts at 256.5
-        readonly property int viewsWidth: 158    // view switcher: one 158 x 36 capsule (27.2.1)
-        readonly property real segmentInsetX: 3  // selected segment 33.5 x 28 in a 39.5 segment (27.2.1)
+        readonly property real gap: 7            // between capsule groups (7..7.5)
+        readonly property real leftPad: 7.5      // sidebar edge to the back/forward capsule
+        readonly property real rightPad: 7.5     // last capsule to the window edge
+        readonly property real titleGap: 11.5    // capsule ends at 244.5, title ink starts at 256
+        readonly property int viewsWidth: 161    // view switcher: 4 segments of 40.25
+        readonly property real segmentInsetX: 2.4  // selected segment 35.5 x 28, r 14 (Q-finder-11)
         readonly property real segmentInsetY: 4
-        readonly property int segmentSeparator: 24   // 1 x ~24 (27.2.1 Finder shot)
-        readonly property int actionsWidth: 112  // share, tag, action: one 112 capsule (27.2.1)
-        readonly property int groupWidth: 46     // group button + chevron (27.2.1: 762.25..808.75)
-        readonly property int searchWidth: 180   // expanded search field, ref / 1.22 (220 px)
+        readonly property int segmentSeparator: 20   // 1 x ~20, only between two unselected segments
+        readonly property int actionsWidth: 112  // share 36, tags 38, action 37 (AX)
+        readonly property real groupWidth: 47.5 // group button + chevron
+        readonly property int hoverHeight: 28    // hover / pressed inner capsule 28 tall (y 12..40) (Q-finder-10)
+        readonly property int hoverWidth: 30     // 30 on back/forward and Action, 35.5 on view segments
+        readonly property int searchWidth: 241   // expanded search capsule (Q-finder-30)
+        readonly property int searchDuration: 160    // 0.15..0.17 s, ease-out
     }
 
+    // Icon view (Q-finder-12/13/14): 64 pt icons in 112 x 112 cells, grid 10 pt under the toolbar and 10 pt into
+    // the content (icon centre at content x 66).
     readonly property QtObject grid: QtObject {
-        readonly property int cellWidth: 126     // ref / 1.22 (column centres 154 px apart)
-        readonly property int cellHeight: 113    // ref / 1.22 (138 px)
-        readonly property int iconSize: 64       // ref / 1.22 (77 px = 63); Finder's default icon size is 64
+        readonly property int cellWidth: 112
+        readonly property int cellHeight: 112
+        readonly property int iconSize: 64
         readonly property real thumbScale: 0.88  // ref: 68 px thumbnails, the rest is PNG padding
-        readonly property int iconTop: 21        // ref / 1.22 (26 px)
-        readonly property int labelGap: 7        // ref / 1.22 (8 px)
-        readonly property int labelWidth: 108    // ref / 1.22 (132 px)
-        readonly property int sidePad: 11        // ref / 1.22 (13 px)
-        readonly property real selectionRadius: 6.5   // ref / 1.22 (8 px)
-        readonly property int labelRadius: 4     // ref / 1.22 (5 px)
-    }
-
-    readonly property QtObject list: QtObject {
-        readonly property int rowHeight: 24
-        readonly property int headerHeight: 28
-        readonly property int iconSize: 18
+        readonly property int top: 10            // grid origin y = toolbar + 10
         readonly property int sidePad: 10
-        readonly property int rowRadius: 6
-        readonly property int dateWidth: 190
-        readonly property int sizeWidth: 90
-        readonly property int kindWidth: 160
+        readonly property int iconTop: 4         // icon 4 pt from the cell top
+        readonly property int plate: 72          // selection plate 72 x 72, r 7, icon inset 4
+        readonly property int plateRadius: 7
+        readonly property real labelGap: 7.5     // label pill 2 pt under the plate; text ink 140 for icons at 66 (pictures)
+        readonly property int labelWidth: 104    // max label ink width
+        readonly property int lineHeight: 16     // line pitch 16, at most 2 lines
+        readonly property int labelRadius: 5     // pill r 5, about 5 pt side padding, 17 tall for one line
+        readonly property int labelPad: 5
     }
 
+    // List view (Q-finder-15/16/17): header 52..80, rows 20 from y 85, inset 10 pt both sides.
+    readonly property QtObject list: QtObject {
+        readonly property int rowHeight: 20
+        readonly property int headerHeight: 28
+        readonly property int firstRowGap: 5     // header bottom 80, first row 85
+        readonly property int iconSize: 16
+        readonly property int iconX: 16          // icon x 189 = row x 173 + 16 (disclosure triangle at +1)
+        readonly property int nameX: 36          // name x 209
+        readonly property int sidePad: 10
+        readonly property int rowRadius: 8
+        readonly property int nameWidth: 338     // default columns
+        readonly property int dateWidth: 181
+        readonly property int sizeWidth: 97      // right-aligned, 7 pt pad
+        readonly property int kindWidth: 121
+        readonly property int cellPad: 7
+        readonly property int headerSeparator: 16    // 1 x 16 (y 58..74)
+        readonly property real sortChevronRight: 6.5 // 7.5 x 5 chevron, 6.5 pt left of the column edge
+    }
+
+    // Column view (Q-finder-19): 245 pt columns, 1 pt divider, rows 24, icon 18, text at column x + 38.
     readonly property QtObject columns: QtObject {
-        readonly property int width: 245         // 27.2.1: column divider at x 815 px (2x), sidebar edge at 326
+        readonly property int width: 245
         readonly property int rowHeight: 24
         readonly property int iconSize: 18
+        readonly property int iconX: 15          // icon centre at 24 (ink 17..)
+        readonly property int textX: 38
+        readonly property int insetLeft: 10      // selection inset 10 left / 11 right, r 8
+        readonly property int insetRight: 11
+        readonly property int top: 10            // first row 10 pt under the toolbar
+        readonly property int previewWidth: 240  // preview column about 240
+        readonly property int previewImage: 219  // preview 219 x 259
     }
 
+    // Gallery view (Q-finder-20): preview 443 x 357 at content (32, 32), strip of 48 pt thumbnails at pitch 59,
+    // selected plate 54 r 7, info pane about 240 wide on the right in the sidebar material.
+    readonly property QtObject gallery: QtObject {
+        readonly property int pad: 32
+        readonly property int thumb: 48
+        readonly property int pitch: 59
+        readonly property int plate: 54
+        readonly property int plateRadius: 7
+        readonly property real stripBottom: 7.5  // strip bottom 7.5 pt above the path bar line
+        readonly property int stageGap: 35       // preview box bottom (84 + 357) to the strip (476)
+        readonly property int paneWidth: 240
+        readonly property int paneIcon: 50
+        readonly property int infoPitch: 23      // Created / Modified / Last opened rows
+    }
+
+    // Path bar (Q-finder-22): 1 pt top line, 28 tall, no fill; 16 pt icons, 11 pt text, items from x 6.
     readonly property QtObject pathBar: QtObject {
-        readonly property int height: 26
-        readonly property int iconSize: 14
-    }
-
-    readonly property QtObject anim: QtObject {
-        readonly property int fast: 120
-        readonly property int easing: Easing.OutCubic
+        readonly property int height: 28
+        readonly property int iconSize: 16
+        readonly property int x: 6
     }
 }

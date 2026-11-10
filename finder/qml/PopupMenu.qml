@@ -2,7 +2,9 @@ import QtQuick
 import HyprK
 import QtQuick.Controls.Basic
 
-// macOS 26 style menu: rounded translucent panel, blue rounded highlight.
+// Finder menu (context menus, Group and Action pull-downs): rows 24, padding 5, r 12, the accent highlight inset
+// 5 with r 7 and white text, moving in one frame; text at x 16, or 28 when an item has a checkmark; closes with a
+// 0.2 s fade (MAC-ANSWERS.md Q-finder-24, Q-menubar-12/22/24). Drawn flat with the shared menu fill.
 // items: [{ text, shortcut, checked, enabled, action }], { separator: true }, or
 // { tagRow: true, action(tagName) } for Finder's row of tag color dots.
 Popup {
@@ -16,12 +18,15 @@ Popup {
     modal: false
     focus: true
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+    readonly property bool hasChecks: items.some(i => i.checked !== undefined)
+    enter: Transition { NumberAnimation { property: "opacity"; to: 1; duration: 0 } }
+    exit: Transition { NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 200; easing.type: Easing.OutQuad } }
 
     background: Rectangle {
-        radius: 12
-        color: Theme.dark ? Qt.rgba(0.16, 0.16, 0.17, 0.98) : Qt.rgba(0.97, 0.97, 0.97, 0.98)
+        radius: Tokens.control.menuRadius
+        color: Tokens.control.menuFill
         border.width: 1
-        border.color: Theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0, 0, 0, 0.12)
+        border.color: Tokens.control.menuStroke
     }
 
     contentItem: Column {
@@ -49,7 +54,7 @@ Popup {
                 Rectangle {
                     visible: it.plain && it.on && hover.hovered
                     anchors.fill: parent
-                    radius: 6
+                    radius: 7
                     color: Theme.color.accent
                 }
                 Text {
@@ -63,7 +68,7 @@ Popup {
                 Text {
                     id: label
                     visible: it.plain
-                    x: 24
+                    x: root.hasChecks ? 23 : 11
                     anchors.verticalCenter: parent.verticalCenter
                     text: it.modelData.text || ""
                     color: !it.on ? Theme.color.tertiaryLabel : hover.hovered ? "white" : Theme.color.label

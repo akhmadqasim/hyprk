@@ -104,11 +104,39 @@ test("rename validation", () => {
 
 // ---- tags ----
 test("styledName", () => {
-    assert.equal(F.styledName({ name: "a<b>  c", tags: ["Red"] }, { Red: "#f00" }),
-                 '<font color="#f00">\u25CF</font> a&lt;b&gt;&nbsp; c');
+    const html = F.styledName({ name: "a<b>  c", tags: ["Red"] }, { Red: "#f00" });
+    assert.match(html, /^<img src="data:image\/svg\+xml;utf8,[^"]+" width="13" height="10" align="middle">a&lt;b&gt;&nbsp; c$/);
     assert.equal(F.hasTags({ name: "x" }), false);
-    assert.equal(F.styledName({ name: "x", tags: ["Red", "Odd"] }, { Red: "#f00", Gray: "#888" }),
-                 '<font color="#f00">\u25CF</font><font color="#888">\u25CF</font> x');
+});
+test("tag dots", () => {
+    // 10 pt dots, each extra one 5 pt further (Q-finder-14)
+    assert.equal(F.tagDotsWidth(0), 0);
+    assert.equal(F.tagDotsWidth(1), 10);
+    assert.equal(F.tagDotsWidth(3, 3), 23);
+    const svg = decodeURIComponent(F.tagDotsUrl(["Red", "Odd"], { Red: "#f00", Gray: "#888" }, "white", 0).split(",")[1]);
+    // the second dot is drawn first (behind), unknown tags are grey
+    assert.ok(svg.indexOf('cx="10" cy="5" r="4.75" fill="#888"') < svg.indexOf('cx="5" cy="5" r="4.75" fill="#f00"'));
+    assert.match(svg, /width="15" height="10"/);
+});
+
+// ---- layout ----
+test("gridColumns", () => {
+    // 920 pt window: 757 pt content, 6 columns of 112 (Q-finder-12)
+    assert.equal(F.gridColumns(757, 112, 6), 6);
+    assert.equal(F.gridColumns(50, 112, 6), 1);
+});
+test("gridHits", () => {
+    // 3 columns, cells 112 from x 6; hit box 104 wide from y 4 to 100
+    const hits = F.gridHits({ x: 0, y: 0, width: 130, height: 120 }, 7, 3, 112, 6, 104, 4, 100);
+    assert.deepEqual(hits, [0, 1, 3, 4]);
+    assert.deepEqual(F.gridHits({ x: 300, y: 300, width: 5, height: 5 }, 7, 3, 112, 6, 104, 4, 100), []);
+    assert.deepEqual(F.gridHits({ x: 240, y: 230, width: 10, height: 10 }, 7, 3, 112, 6, 104, 4, 100), []);   // cell 8 is empty
+    assert.deepEqual(F.gridHits({ x: 20, y: 230, width: 10, height: 10 }, 7, 3, 112, 6, 104, 4, 100), [6]);
+});
+test("listColumns", () => {
+    // 757 pt content: Name 338, Date Modified 181, Size 97, Kind 121 (Q-finder-15)
+    assert.deepEqual(F.listColumns(757, 10, 181, 97, 121), [338, 181, 97, 121]);
+    assert.equal(F.listColumns(300, 10, 181, 97, 121)[0], 160);
 });
 
 // ---- icons / formatting ----
@@ -131,7 +159,10 @@ test("formatSize", () => {
     assert.equal(F.formatSize(1), "1 byte");
     assert.equal(F.formatSize(999), "999 bytes");
     assert.equal(F.formatSize(1000), "1 KB");
-    assert.equal(F.formatSize(1500), "1.5 KB");
+    assert.equal(F.formatSize(1500), "2 KB");
+    assert.equal(F.formatSize(8000), "8 KB");
+    assert.equal(F.formatSize(12134), "12 KB");
+    assert.equal(F.formatSize(12345678), "12.3 MB");
     assert.equal(F.formatSize(17234), "17 KB");
     assert.equal(F.formatSize(999999), "1 MB");
     assert.equal(F.formatSize(2.3e9), "2.3 GB");
@@ -142,6 +173,12 @@ test("formatDate", () => {
     assert.equal(F.formatDate(new Date(2026, 10, 10, 9, 5).getTime(), now), "Today at 09:05");
     assert.equal(F.formatDate(new Date(2026, 10, 9, 23, 59).getTime(), now), "Yesterday at 23:59");
     assert.equal(F.formatDate(new Date(2026, 2, 3, 18, 0).getTime(), now), "3 Mar 2026 at 18:00");
+});
+
+test("formatDateLong", () => {
+    const now = new Date(2026, 10, 10, 15, 0).getTime();
+    assert.equal(F.formatDateLong(new Date(2026, 10, 9, 14, 30).getTime(), now), "Yesterday, 14:30");
+    assert.equal(F.formatDateLong(new Date(2026, 2, 5, 9, 12).getTime(), now), "5 March 2026 at 09:12");
 });
 
 console.log(`${pass} passed, ${fail} failed`);

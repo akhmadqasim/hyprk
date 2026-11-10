@@ -14,6 +14,7 @@ Rectangle {
     property var volumes: []
 
     color: Theme.blur ? Theme.color.sidebarGlass : Theme.color.sidebarSolid
+    property var collapsed: ({})   // header -> true: the section's rows are hidden (click the header)
 
     function refreshVolumes() {
         const user = Files.baseName(FileOps.homePath());
@@ -38,17 +39,19 @@ Rectangle {
             { label: "Documents", icon: "doc", path: FileOps.standardPath("documents") },
             { label: "Downloads", icon: "download", path: FileOps.standardPath("downloads") }
         ] },
+        // Locations icons are grey, not the accent (Q-finder-08)
         { header: "Locations", items: [
-            { label: "iCloud Drive", icon: "icloud", path: "" },
-            { label: "AirDrop", icon: "airdrop", path: "" }
-        ].concat(volumes.map(v => ({ label: v.name, icon: "drive", path: v.path })))
-         .concat([{ label: "Trash", icon: "trash", path: FileOps.standardPath("trash"), drop: "trash:" }]) },
+            { label: "iCloud Drive", icon: "icloud", path: "", grey: true },
+            { label: "AirDrop", icon: "airdrop", path: "", grey: true }
+        ].concat(volumes.map(v => ({ label: v.name, icon: "drive", path: v.path, grey: true })))
+         .concat([{ label: "Trash", icon: "trash", path: FileOps.standardPath("trash"), drop: "trash:", grey: true }]) },
         { header: "Tags", items: Theme.color.tags.slice(0, 5).map(t => ({ label: t.name, dot: t.color, path: "tag:" + t.name })) }
     ]
 
     Flickable {
         anchors.fill: parent
         anchors.topMargin: Theme.sidebar.top
+        id: flick
         contentHeight: column.height + 16
         clip: true
         boundsBehavior: Flickable.StopAtBounds
@@ -67,34 +70,59 @@ Rectangle {
                     width: column.width
                     topPadding: index > 0 ? Theme.sidebar.sectionGap : 0
 
-                    TextLabel {
+                    // 19 pt header row; hovering shows a chevron at the right, a click folds the section (Q-finder-07)
+                    Item {
                         visible: section.modelData.header !== ""
-                        x: Theme.sidebar.headerX
+                        width: column.width
                         height: Theme.sidebar.headerHeight
-                        verticalAlignment: Text.AlignVCenter
-                        text: section.modelData.header
-                        color: Theme.color.sidebarHeader
-                        size: Theme.font.sidebarHeader
-                        weight: Typography.semibold
+                        TextLabel {
+                            x: Theme.sidebar.headerX
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.verticalCenterOffset: 1.5   // ink 135.5..144 in the 129..148 row (pictures)
+                            text: section.modelData.header
+                            color: Theme.color.sidebarHeader
+                            size: Theme.font.sidebarHeader
+                            weight: Typography.semibold
+                        }
+                        Symbol {
+                            visible: headerHover.hovered
+                            x: 136.5 - (width - 9.5) / 2
+                            anchors.verticalCenter: parent.verticalCenter
+                            name: "chevron.down"
+                            size: 11
+                            weight: "semibold"
+                            rotation: root.collapsed[section.modelData.header] ? -90 : 0
+                            color: Theme.color.sidebarHeader
+                        }
+                        HoverHandler { id: headerHover }
+                        TapHandler {
+                            onTapped: {
+                                const c = Object.assign({}, root.collapsed);
+                                c[section.modelData.header] = !c[section.modelData.header];
+                                root.collapsed = c;
+                            }
+                        }
                     }
 
                     Repeater {
-                        model: section.modelData.items
+                        model: root.collapsed[section.modelData.header] ? [] : section.modelData.items
 
                         Item {
                             id: row
                             required property var modelData
                             readonly property bool current: modelData.path !== "" && modelData.path === root.browser.path
+                            readonly property bool dropping: drop.hovered
                             width: column.width
                             height: Theme.sidebar.rowHeight
 
+                            // grey pill, no hover or pressed state; an accent pill with white text under a drop
                             Rectangle {
                                 x: Theme.sidebar.rowInset
-                                width: parent.width - 2 * Theme.sidebar.rowInset + 2
+                                width: parent.width - 2 * Theme.sidebar.rowInset
                                 height: parent.height
                                 radius: Theme.sidebar.rowRadius
-                                color: Theme.color.sidebarSelection
-                                visible: row.current || tap.pressed || drop.hovered
+                                color: row.dropping ? Theme.color.sidebarDrop : Theme.color.sidebarSelection
+                                visible: row.current || row.dropping
                             }
                             Symbol {
                                 visible: !row.modelData.dot
@@ -105,7 +133,7 @@ Rectangle {
                                 pointSize: 13          // 27.2.1 (names.json finder.sidebarGlyph, sure): 13 pt, .large, medium
                                 weight: "medium"
                                 scale: "large"
-                                color: Theme.color.sidebarIcon
+                                color: row.dropping ? "white" : row.modelData.grey ? Theme.color.sidebarIconGrey : Theme.color.sidebarIconAccent
                             }
                             Rectangle {
                                 visible: !!row.modelData.dot
@@ -122,12 +150,11 @@ Rectangle {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: row.modelData.label
                                 elide: Text.ElideRight
-                                color: Theme.color.label
+                                color: row.dropping ? "white" : Theme.color.sidebarText
                                 size: Theme.font.sidebarItem
                                 weight: row.current ? Typography.semibold : Typography.regular
                             }
                             TapHandler {
-                                id: tap
                                 onTapped: if (row.modelData.path) root.browser.go(row.modelData.path)
                             }
                             FolderDrop {   // real folders and the Trash take drops; virtual rows do not
@@ -144,12 +171,18 @@ Rectangle {
         }
     }
 
+    OverlayScrollbar {
+        flickable: flick
+        x: parent.width - width - Tokens.scroller.inset
+        y: Theme.sidebar.top + Tokens.scroller.inset
+        height: parent.height - y - Tokens.scroller.inset
+    }
+
     // soft edge between sidebar and content (27.2.1: one 0.5 pt step at x 325 px, 211 between 237 and 255)
     Rectangle {
         anchors.right: parent.right
-        width: 1
+        width: 0.5
         height: parent.height
         color: Theme.color.separator
-        opacity: 0.5
     }
 }

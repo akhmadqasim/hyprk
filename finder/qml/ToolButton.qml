@@ -1,6 +1,7 @@
 import QtQuick
 
-// Icon button inside a Capsule. The inner pill shows while pressed.
+// Icon button inside a Capsule. Hover and press show the same flat inner capsule, 28 tall and 30 wide (35.5 on
+// view segments, the whole circle on Search), no animation; a disabled button gets neither (Q-finder-10).
 Item {
     id: root
 
@@ -9,19 +10,24 @@ Item {
     property string iconWeight: "regular"
     property string iconScale: ""
     property real iconPointSize: 0           // 0 = the default for the size
+    property real hoverWidth: Theme.toolbar.hoverWidth
+    property real hoverHeight: Theme.toolbar.hoverHeight
+    property color hoverColor: Theme.color.toolbarHover
+    readonly property bool lit: enabled && (hover.hovered || tap.pressed)
     signal clicked()
 
     implicitWidth: Theme.toolbar.buttonWidth
     implicitHeight: Theme.toolbar.capsuleHeight
-    opacity: enabled ? 1 : 0.9
 
     Rectangle {
-        anchors.fill: parent
-        anchors.margins: 4
+        anchors.centerIn: parent
+        width: Math.min(root.hoverWidth, root.width)
+        height: root.hoverHeight
         radius: height / 2
-        color: Theme.color.capsuleSelected
-        visible: tap.pressed
+        color: root.hoverColor
+        visible: root.lit
     }
+    HoverHandler { id: hover; enabled: root.enabled }
     Symbol {
         id: glyph
         anchors.centerIn: parent

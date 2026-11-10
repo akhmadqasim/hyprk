@@ -1,9 +1,11 @@
 import QtQuick
 import HyprK
-import QtQuick.Controls.Basic
 import "lib/files.js" as Files
 
-// List view: sortable columns Name, Date Modified, Size, Kind with alternating rows.
+// List view (Q-finder-15/16/17): a 28 pt header (dark: a solid bar, Main extends it under the toolbar), rows
+// 20 pt from 5 pt under it, inset 10 pt both sides, stripes on every second row, accent selection (grey while
+// the window is inactive). Columns Name / Date Modified / Size / Kind; the sorted header is 11 Semibold with a
+// chevron. Not here: the disclosure triangles of the Mac (folders do not expand in place); the name keeps its x.
 Item {
     id: root
 
@@ -13,13 +15,19 @@ Item {
 
     function ensureVisible(i) { list.positionViewAtIndex(i, ListView.Contain); }
 
+    readonly property var widths: Files.listColumns(width, Theme.list.sidePad, Theme.list.dateWidth, Theme.list.sizeWidth, Theme.list.kindWidth)
     readonly property var cols: [
-        { key: "name", title: "Name", width: Math.max(160, width - Theme.list.dateWidth - Theme.list.sizeWidth - Theme.list.kindWidth - 2 * Theme.list.sidePad) },
-        { key: "modified", title: "Date Modified", width: Theme.list.dateWidth },
-        { key: "size", title: "Size", width: Theme.list.sizeWidth, right: true },
-        { key: "kind", title: "Kind", width: Theme.list.kindWidth }
+        { key: "name", title: "Name" },
+        { key: "modified", title: "Date Modified" },
+        { key: "size", title: "Size", right: true },
+        { key: "kind", title: "Kind" }
     ]
 
+    Rectangle {
+        width: parent.width
+        height: Theme.list.headerHeight
+        color: Theme.color.listHeaderFill
+    }
     Row {
         id: header
         x: Theme.list.sidePad
@@ -30,71 +38,88 @@ Item {
                 id: h
                 required property var modelData
                 required property int index
-                width: modelData.width
+                readonly property bool sorted: root.browser.sortKey === modelData.key
+                width: root.widths[index]
                 height: header.height
-                Rectangle {
+                Rectangle {   // 1 x 16 separator at the column's left edge
                     visible: h.index > 0
-                    width: 1; height: 14
+                    x: -1
+                    width: 1; height: Theme.list.headerSeparator
                     anchors.verticalCenter: parent.verticalCenter
-                    color: Theme.color.separator
+                    color: Theme.color.listHeaderSeparator
                 }
                 TextLabel {
                     anchors.left: parent.left
-                    anchors.leftMargin: h.index === 0 ? 28 : 8
+                    anchors.leftMargin: h.index === 0 ? Theme.list.nameX + 5 : 5   // header text x 214 / column + 5
                     anchors.right: parent.right
-                    anchors.rightMargin: 8
+                    anchors.rightMargin: Theme.list.cellPad
                     anchors.verticalCenter: parent.verticalCenter
-                    horizontalAlignment: h.modelData.right ? Text.AlignRight : Text.AlignLeft
+                    horizontalAlignment: Text.AlignLeft
+                    elide: Text.ElideRight
                     text: h.modelData.title
-                    color: Theme.color.secondaryLabel
+                    color: h.sorted ? Theme.color.listHeaderSorted : Theme.color.secondaryLabel
                     size: Theme.font.listHeader
-                    weight: root.browser.sortKey === h.modelData.key ? Typography.semibold : Typography.medium
+                    weight: h.sorted ? Typography.semibold : Typography.regular
                 }
                 Symbol {
-                    visible: root.browser.sortKey === h.modelData.key
+                    visible: h.sorted
                     anchors.right: parent.right
-                    anchors.rightMargin: h.modelData.right ? -12 : 8
+                    anchors.rightMargin: Theme.list.sortChevronRight - (width - 7.5) / 2
                     anchors.verticalCenter: parent.verticalCenter
                     name: "chevron.down"
-                    size: 11
-                    color: Theme.color.secondaryLabel
+                    size: 9
+                    weight: "semibold"
+                    color: Theme.color.listHeaderSorted
                     rotation: root.browser.ascending ? 180 : 0
                 }
                 TapHandler {
                     onTapped: {
-                        if (root.browser.sortKey === h.modelData.key) root.browser.ascending = !root.browser.ascending;
+                        if (h.sorted) root.browser.ascending = !root.browser.ascending;
                         else { root.browser.sortKey = h.modelData.key; root.browser.ascending = h.modelData.key === "name"; }
                     }
                 }
             }
         }
     }
-    Rectangle {
-        anchors.top: header.bottom
+    Rectangle {   // 1 pt bottom line at y 79
+        y: Theme.list.headerHeight - 1
         width: parent.width
         height: 1
-        color: Theme.color.separator
+        color: Theme.color.listHeaderLine
     }
 
     ListView {
         id: list
         anchors.fill: parent
-        anchors.topMargin: header.height + 1
+        anchors.topMargin: header.height
         anchors.leftMargin: Theme.list.sidePad
         anchors.rightMargin: Theme.list.sidePad
+        topMargin: Theme.list.firstRowGap
         clip: true
         model: root.browser.entries
         boundsBehavior: Flickable.StopAtBounds
         currentIndex: root.browser.cursor
         highlightFollowsCurrentItem: false
-        ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
 
         // empty space below the rows
         footer: EntryMouseArea {
             width: list.width
-            height: Math.max(0, list.height - list.count * Theme.list.rowHeight)
+            height: Math.max(0, list.height - list.topMargin - list.count * Theme.list.rowHeight)
             browser: root.browser
             onContextMenu: (e, pos) => root.contextMenu(e, pos)
+            // the stripes go on below the last row
+            Repeater {
+                model: Math.ceil(parent.height / Theme.list.rowHeight)
+                Rectangle {
+                    required property int index
+                    visible: (list.count + index) % 2 === 1
+                    y: index * Theme.list.rowHeight
+                    width: list.width
+                    height: Theme.list.rowHeight
+                    radius: Theme.list.rowRadius
+                    color: Theme.color.listAlternate
+                }
+            }
         }
 
         delegate: Rectangle {
@@ -103,69 +128,70 @@ Item {
             required property int index
             readonly property bool selected: root.browser.isSelected(modelData.path)
             readonly property bool renaming: root.browser.renamingPath === modelData.path
-            readonly property color textColor: selected ? "white" : Theme.color.label
             width: list.width
             height: Theme.list.rowHeight
             radius: Theme.list.rowRadius
             color: selected ? Theme.color.listSelection : index % 2 ? Theme.color.listAlternate : "transparent"
-            border.width: drop.hovered ? 2 : 0   // Finder outlines the folder row under a drag
-            border.color: Theme.color.accent
 
-            Row {
-                anchors.fill: parent
-                Item {
-                    width: root.cols[0].width
-                    height: parent.height
-                    FileIcon {
-                        x: 6
-                        anchors.verticalCenter: parent.verticalCenter
+            Item {
+                width: root.widths[0]
+                height: parent.height
+                FileIcon {
+                    x: Theme.list.iconX
+                    anchors.verticalCenter: parent.verticalCenter
+                    entry: row.modelData
+                    size: Theme.list.iconSize
+                }
+                Text {
+                    visible: !row.renaming
+                    x: Theme.list.nameX
+                    width: parent.width - x - Theme.list.cellPad - (dots.visible ? dots.width + 6 : 0)
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: row.modelData.name
+                    elide: Text.ElideMiddle
+                    color: row.selected ? Theme.color.selectedText : Theme.color.label
+                    font: Typography.body
+                }
+                TagDots {   // at the right end of the Name column
+                    id: dots
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.list.cellPad
+                    anchors.verticalCenter: parent.verticalCenter
+                    tags: row.modelData.tags || []
+                }
+                Loader {
+                    active: row.renaming
+                    x: Theme.list.nameX - 2
+                    width: parent.width - x - Theme.list.cellPad
+                    anchors.verticalCenter: parent.verticalCenter
+                    sourceComponent: RenameField {
+                        browser: root.browser
                         entry: row.modelData
-                        size: Theme.list.iconSize
-                    }
-                    Text {
-                        visible: !row.renaming
-                        x: 28
-                        width: parent.width - x - 8
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: Files.hasTags(row.modelData) ? Files.styledName(row.modelData, Theme.color.tagColors) : row.modelData.name
-                        textFormat: Files.hasTags(row.modelData) ? Text.StyledText : Text.PlainText
-                        elide: Text.ElideMiddle
-                        color: row.textColor
-                        font: Typography.body
-                    }
-                    Loader {
-                        active: row.renaming
-                        x: 26
-                        width: parent.width - x - 8
-                        anchors.verticalCenter: parent.verticalCenter
-                        sourceComponent: RenameField {
-                            browser: root.browser
-                            entry: row.modelData
-                            horizontalAlignment: TextInput.AlignLeft
-                            fontSize: Theme.font.list
-                            multiLine: false
-                        }
+                        horizontalAlignment: TextInput.AlignLeft
+                        fontSize: Theme.font.list
+                        multiLine: false
                     }
                 }
-                Repeater {
-                    model: [
-                        Files.formatDate(row.modelData.modified),
-                        Files.formatSize(row.modelData.size, row.modelData.isDir),
-                        row.modelData.kind
-                    ]
-                    Text {
-                        required property var modelData
-                        required property int index
-                        width: root.cols[index + 1].width
-                        anchors.verticalCenter: parent.verticalCenter
-                        leftPadding: 8
-                        rightPadding: 8
-                        horizontalAlignment: index === 1 ? Text.AlignRight : Text.AlignLeft
-                        text: modelData
-                        elide: Text.ElideRight
-                        color: row.selected ? "white" : Theme.color.secondaryLabel
-                        font: Typography.body
-                    }
+            }
+            Repeater {
+                model: [
+                    Files.formatDate(row.modelData.modified),
+                    Files.formatSize(row.modelData.size, row.modelData.isDir),
+                    row.modelData.kind
+                ]
+                Text {
+                    required property var modelData
+                    required property int index
+                    x: root.widths.slice(0, index + 1).reduce((a, b) => a + b, 0)
+                    width: root.widths[index + 1]
+                    anchors.verticalCenter: parent.verticalCenter
+                    leftPadding: Theme.list.cellPad
+                    rightPadding: Theme.list.cellPad
+                    horizontalAlignment: index === 1 ? Text.AlignRight : Text.AlignLeft
+                    text: modelData
+                    elide: Text.ElideRight
+                    color: row.selected ? Theme.color.selectedSecondaryText : Theme.color.secondaryLabel
+                    font: Typography.body
                 }
             }
 
@@ -177,13 +203,18 @@ Item {
                 index: row.index
                 onContextMenu: (e, pos) => root.contextMenu(e, pos)
             }
-            FolderDrop {
-                id: drop
+            FolderDrop {   // no highlight on a list row under a drag (Q-finder-28)
                 anchors.fill: parent
                 enabled: row.modelData.isDir === true
                 browser: root.browser
                 path: row.modelData.path
             }
         }
+    }
+    OverlayScrollbar {
+        flickable: list
+        x: root.width - width - Tokens.scroller.inset
+        y: list.y + Tokens.scroller.inset
+        height: list.height - 2 * Tokens.scroller.inset
     }
 }

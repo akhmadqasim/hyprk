@@ -1,38 +1,48 @@
 import QtQuick
 import HyprK
-import QtQuick.Controls.Basic
 import "lib/files.js" as Files
 
-// Icon grid. Columns stretch to fill the width; rubber-band selection on empty space.
+// Icon grid (Q-finder-12/13/14): 64 pt icons in fixed 112 x 112 cells from 10 pt under the toolbar; the
+// selection is a grey 72 pt plate behind the icon and an accent pill behind the label (grey with label text
+// while the window is inactive); no hover. Rubber-band selection on empty space.
 GridView {
     id: grid
 
     required property var browser
     signal contextMenu(var entry, point pos)
 
-    readonly property int columns: Math.max(1, Math.floor((width - 2 * Theme.grid.sidePad) / Theme.grid.cellWidth))
+    readonly property int columns: Files.gridColumns(width, Theme.grid.cellWidth, Theme.grid.sidePad)
 
     model: browser.entries
     leftMargin: Theme.grid.sidePad
     rightMargin: Theme.grid.sidePad
-    cellWidth: Math.floor((width - 2 * Theme.grid.sidePad) / columns)
+    topMargin: Theme.grid.top
+    cellWidth: Theme.grid.cellWidth
     cellHeight: Theme.grid.cellHeight
     interactive: false     // wheel still scrolls; drags make a rubber band instead of flicking
     boundsBehavior: Flickable.StopAtBounds
     clip: true
     currentIndex: browser.cursor
     highlightFollowsCurrentItem: false
-    ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
 
     function ensureVisible(i) { positionViewAtIndex(i, GridView.Contain); }
+
+    OverlayScrollbar {
+        parent: grid
+        flickable: grid
+        x: grid.width - width - Tokens.scroller.inset
+        y: Tokens.scroller.inset
+        height: grid.height - 2 * Tokens.scroller.inset
+    }
 
     // empty space: click clears, drag selects with a rubber band
     MouseArea {
         id: band
         z: -1
         x: -grid.leftMargin   // content x of cell i is leftMargin + col * cellWidth in these coords
+        y: -grid.topMargin
         width: grid.width
-        height: Math.max(grid.contentHeight, grid.height)
+        height: Math.max(grid.contentHeight + grid.topMargin, grid.height)
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         property point start
         property var base: ({})   // selection before the drag; Ctrl/Shift drags add to it
@@ -52,19 +62,14 @@ GridView {
         onPositionChanged: mouse => {
             area = Qt.rect(Math.min(start.x, mouse.x), Math.min(start.y, mouse.y),
                            Math.abs(mouse.x - start.x), Math.abs(mouse.y - start.y));
-            const hits = [];
-            for (let i = 0; i < grid.count; i++) {
-                const cx = grid.leftMargin + (i % grid.columns) * grid.cellWidth + (grid.cellWidth - Theme.grid.labelWidth) / 2;
-                const cy = Math.floor(i / grid.columns) * grid.cellHeight + Theme.grid.iconTop - 8;
-                if (cx < area.x + area.width && cx + Theme.grid.labelWidth > area.x
-                    && cy < area.y + area.height && cy + grid.cellHeight - 12 > area.y)
-                    hits.push(i);
-            }
-            grid.browser.setSelection(hits, base);
+            const g = Theme.grid;
+            const r = Qt.rect(area.x, area.y - grid.topMargin, area.width, area.height);
+            grid.browser.setSelection(Files.gridHits(r, grid.count, grid.columns, g.cellWidth, g.sidePad, g.labelWidth,
+                                                     g.iconTop, g.cellHeight - 8), base);
         }
         onReleased: area = Qt.rect(0, 0, 0, 0)
 
-        Rectangle {
+        Rectangle {   // not measured on 27.2.1
             visible: band.pressed && band.area.width > 2
             x: band.area.x
             y: band.area.y
@@ -85,12 +90,12 @@ GridView {
         width: grid.cellWidth
         height: grid.cellHeight
 
-        Rectangle {   // icon selection plate
+        Rectangle {   // selection plate 72 x 72, r 7; also the folder drop target (Q-finder-13, -28)
             anchors.centerIn: icon
-            width: Theme.grid.iconSize + 12
-            height: Theme.grid.iconSize + 12
-            radius: Theme.grid.selectionRadius
-            color: Theme.color.iconSelection
+            width: Theme.grid.plate
+            height: Theme.grid.plate
+            radius: Theme.grid.plateRadius
+            color: Theme.color.iconPlate
             visible: cell.selected || drop.hovered
         }
         FileIcon {
@@ -102,12 +107,12 @@ GridView {
             y: Theme.grid.iconTop
         }
 
-        Rectangle {   // label highlight hugs the wrapped text
+        Rectangle {   // label pill hugs the wrapped text: 17 tall for one line, r 5, about 5 pt side padding
             visible: cell.selected && !cell.renaming
             anchors.horizontalCenter: label.horizontalCenter
-            y: label.y - 1
-            width: label.contentWidth + 10
-            height: label.contentHeight + 2
+            y: label.y - 0.5
+            width: label.contentWidth + 2 * Theme.grid.labelPad
+            height: label.contentHeight + 1
             radius: Theme.grid.labelRadius
             color: Theme.color.labelSelection
         }
@@ -123,15 +128,16 @@ GridView {
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             maximumLineCount: 2
             elide: Text.ElideRight
-            lineHeight: 1.12
-            color: cell.selected ? "white" : Theme.color.label
+            lineHeightMode: Text.FixedHeight
+            lineHeight: Theme.grid.lineHeight
+            color: cell.selected ? Theme.color.selectedText : Theme.color.label
             font: Typography.font(Theme.font.label)
         }
         Loader {
             active: cell.renaming
             anchors.horizontalCenter: parent.horizontalCenter
-            y: label.y - 2
-            width: Theme.grid.labelWidth + 8
+            y: label.y - 1
+            width: Theme.grid.labelWidth
             sourceComponent: RenameField {
                 browser: grid.browser
                 entry: cell.modelData
@@ -140,9 +146,9 @@ GridView {
 
         EntryMouseArea {
             x: (parent.width - Theme.grid.labelWidth) / 2
-            y: icon.y - 6
+            y: icon.y - 4
             width: Theme.grid.labelWidth
-            height: label.y + label.contentHeight - y + 4
+            height: label.y + label.contentHeight - y + 2
             browser: grid.browser
             entry: cell.modelData
             index: cell.index
@@ -150,10 +156,10 @@ GridView {
         }
         FolderDrop {
             id: drop
-            x: (parent.width - Theme.grid.labelWidth) / 2
-            y: icon.y - 6
-            width: Theme.grid.labelWidth
-            height: icon.height + 12
+            x: (parent.width - Theme.grid.plate) / 2
+            y: icon.y - 4
+            width: Theme.grid.plate
+            height: Theme.grid.plate
             enabled: cell.modelData.isDir === true
             browser: grid.browser
             path: cell.modelData.path

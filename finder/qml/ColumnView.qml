@@ -1,12 +1,14 @@
 import QtQuick
 import HyprK
-import QtQuick.Controls.Basic
 import Finder.Native
 import "lib/files.js" as Files
 
 // Column (Miller) view derived from the current path: one column per folder from the
 // root (home, or "/" outside home) down to the current folder. A selected folder adds a
 // column with its contents, a selected file adds a preview column.
+// 27.2.1 (Q-finder-19): 245 pt columns with a 1 pt divider, rows 24, icon 18, text at x 38, folder chevrons at
+// the right; the selection is inset 10 / 11 with r 8, accent in the active column, grey in parent columns and
+// everywhere while the window is inactive. Preview column about 240 wide.
 Item {
     id: root
 
@@ -38,14 +40,13 @@ Item {
         clip: true
         model: root.columnDirs.length + (root.previewEntry ? 1 : 0)
         onCountChanged: Qt.callLater(() => positionViewAtEnd())
-        ScrollBar.horizontal: ScrollBar { policy: ScrollBar.AsNeeded }
 
         delegate: Loader {
             id: slot
             required property int index
             readonly property bool isPreview: index >= root.columnDirs.length
             property var list: item && item.list ? item.list : null
-            width: isPreview ? Math.max(Theme.columns.width + 40, root.width - root.dirs.length * Theme.columns.width) : Theme.columns.width
+            width: isPreview ? Math.max(Theme.columns.previewWidth, root.width - root.columnDirs.length * Theme.columns.width) : Theme.columns.width
             height: strip.height
             sourceComponent: isPreview ? previewColumn : dirColumn
         }
@@ -67,51 +68,61 @@ Item {
             ListView {
                 id: list
                 anchors.fill: parent
-                anchors.margins: 6
+                anchors.rightMargin: 1
+                topMargin: Theme.columns.top
                 clip: true
                 model: col.entries
                 boundsBehavior: Flickable.StopAtBounds
-                ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
                 footer: MouseArea {
                     width: list.width
-                    height: Math.max(0, list.height - list.count * Theme.columns.rowHeight)
+                    height: Math.max(0, list.height - list.topMargin - list.count * Theme.columns.rowHeight)
                     onPressed: if (col.last) root.browser.clearSelection(); else root.browser.go(col.dir)
                 }
 
-                delegate: Rectangle {
+                delegate: Item {
                     id: row
                     required property var modelData
                     required property int index
-                    readonly property bool selected: {
-                        return col.last ? root.browser.isSelected(modelData.path) : modelData.path === col.chosen;
-                    }
+                    readonly property bool selected: col.last ? root.browser.isSelected(modelData.path) : modelData.path === col.chosen
+                    readonly property bool accent: selected && col.last
                     readonly property bool renaming: root.browser.renamingPath === modelData.path
                     width: list.width
                     height: Theme.columns.rowHeight
-                    radius: Theme.list.rowRadius
-                    color: !selected ? "transparent" : col.last ? Theme.color.listSelection : Theme.color.listSelectionInactive
 
-                    // 27.2.1 column view: icon ink at 17 pt, name at 39.5 pt from the column's left edge
+                    Rectangle {
+                        visible: row.selected
+                        x: Theme.columns.insetLeft
+                        width: parent.width - Theme.columns.insetLeft - Theme.columns.insetRight
+                        height: parent.height
+                        radius: Theme.list.rowRadius
+                        color: row.accent ? Theme.color.listSelection : Theme.color.listSelectionInactive
+                    }
                     FileIcon {
-                        x: 8.5
+                        x: Theme.columns.iconX
                         anchors.verticalCenter: parent.verticalCenter
                         entry: row.modelData
                         size: Theme.columns.iconSize
                     }
                     Text {
                         visible: !row.renaming
-                        x: 33.5
-                        width: parent.width - x - 22
+                        x: Theme.columns.textX
+                        width: parent.width - x - 22 - (dots.visible ? dots.width + 6 : 0)
                         anchors.verticalCenter: parent.verticalCenter
-                        text: Files.hasTags(row.modelData) ? Files.styledName(row.modelData, Theme.color.tagColors) : row.modelData.name
-                        textFormat: Files.hasTags(row.modelData) ? Text.StyledText : Text.PlainText
+                        text: row.modelData.name
                         elide: Text.ElideMiddle
-                        color: row.selected && col.last ? "white" : Theme.color.label
+                        color: row.accent ? Theme.color.selectedText : Theme.color.label
                         font: Typography.body
+                    }
+                    TagDots {   // left of the chevron
+                        id: dots
+                        anchors.right: parent.right
+                        anchors.rightMargin: 28
+                        anchors.verticalCenter: parent.verticalCenter
+                        tags: row.modelData.tags || []
                     }
                     Loader {
                         active: row.renaming
-                        x: 31.5
+                        x: Theme.columns.textX - 2
                         width: parent.width - x - 20
                         anchors.verticalCenter: parent.verticalCenter
                         sourceComponent: RenameField {
@@ -125,11 +136,11 @@ Item {
                     Symbol {
                         visible: row.modelData.isDir
                         anchors.right: parent.right
-                        anchors.rightMargin: 6
+                        anchors.rightMargin: 12
                         anchors.verticalCenter: parent.verticalCenter
                         name: "chevron.small.right"
                         size: 14
-                        color: row.selected && col.last ? "white" : Theme.color.secondaryLabel
+                        color: row.accent ? Theme.color.selectedText : Theme.color.secondaryLabel
                     }
                     MouseArea {
                         anchors.fill: parent
@@ -152,46 +163,52 @@ Item {
                     }
                 }
             }
-            Rectangle {
+            OverlayScrollbar {
+                flickable: list
+                x: list.width - width - Tokens.scroller.inset
+                y: Tokens.scroller.inset
+                height: col.height - 2 * Tokens.scroller.inset
+            }
+            Rectangle {   // 1 pt divider, no grip
                 anchors.right: parent.right
                 width: 1
                 height: parent.height
-                color: Theme.color.separator
+                color: Theme.color.columnDivider
             }
         }
     }
 
+    // preview column: the preview (219 wide), name, kind and size, Information rows
     Component {
         id: previewColumn
         Column {
-            topPadding: 30
+            readonly property var entry: root.previewEntry
+            leftPadding: 10
+            rightPadding: 10
+            topPadding: Theme.columns.top
             spacing: 8
             FileIcon {
-                anchors.horizontalCenter: parent.horizontalCenter
-                entry: root.previewEntry
-                size: 180
+                entry: parent.entry
+                size: Theme.columns.previewImage
             }
+            Item { width: 1; height: 20 }
             TextLabel {
-                width: (parent ? parent.width : 300) - 40
-                anchors.horizontalCenter: parent.horizontalCenter
-                horizontalAlignment: Text.AlignHCenter
+                width: Theme.columns.previewImage
                 elide: Text.ElideMiddle
-                text: root.previewEntry.name
-                color: Theme.color.label
+                text: parent.entry ? parent.entry.name : ""
                 size: 15
                 weight: Typography.semibold
             }
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: root.previewEntry.kind + " – " + Files.formatSize(root.previewEntry.size, false)
+            TextLabel {
+                width: Theme.columns.previewImage
+                elide: Text.ElideRight
+                text: parent.entry ? parent.entry.kind + " - " + Files.formatSize(parent.entry.size, false) : ""
                 color: Theme.color.secondaryLabel
-                font: Typography.body
+                size: Theme.font.preview
             }
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: "Modified " + Files.formatDate(root.previewEntry.modified)
-                color: Theme.color.secondaryLabel
-                font: Typography.body
+            InfoRows {
+                width: Theme.columns.previewImage
+                entry: parent.entry
             }
         }
     }

@@ -13,6 +13,12 @@ Item {
     implicitHeight: Theme.toolbar.capsuleHeight
 
     ToolbarPlatter { anchors.fill: parent }
+    Rectangle {   // inactive window: the platter darkens (Q-finder-29)
+        anchors.fill: parent
+        radius: height / 2
+        visible: !Theme.active
+        color: Theme.color.capsuleInactive
+    }
     Row {
         id: row
         x: root.padding

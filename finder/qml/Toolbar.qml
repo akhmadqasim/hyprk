@@ -16,6 +16,7 @@ Item {
     signal moreRequested(Item anchor)
     signal groupRequested(Item anchor)
     signal tagRequested(Item anchor)
+    readonly property Item tagAnchor: tagButton
 
     height: Theme.toolbar.height
 
@@ -33,13 +34,20 @@ Item {
         x: Theme.toolbar.leftPad
         y: Theme.toolbar.capsuleY
         ToolButton {
+            id: backButton
             implicitWidth: (Theme.toolbar.navWidth - 1) / 2
             icon: "chevron.left"
             enabled: root.browser.canGoBack
             onClicked: root.browser.back()
         }
-        Rectangle { width: 1; height: Theme.toolbar.dividerHeight; anchors.verticalCenter: parent.verticalCenter; color: Theme.color.toolbarSeparator }
+        // the divider hides while either half is hovered (Q-finder-10)
+        Rectangle {
+            width: 1; height: Theme.toolbar.dividerHeight; anchors.verticalCenter: parent.verticalCenter
+            color: Theme.color.toolbarSeparator
+            opacity: backButton.lit || forwardButton.lit ? 0 : 1
+        }
         ToolButton {
+            id: forwardButton
             implicitWidth: (Theme.toolbar.navWidth - 1) / 2
             icon: "chevron.right"
             enabled: root.browser.canGoForward
@@ -53,7 +61,7 @@ Item {
         anchors.verticalCenter: nav.verticalCenter
         text: root.browser.title
         elide: Text.ElideRight
-        color: root.window.active ? Theme.color.title : Theme.color.titleInactive
+        color: Theme.color.title
         font: Typography.toolbarTitle   // 15 Semibold (27.2.1)
     }
 
@@ -100,6 +108,7 @@ Item {
         ToolButton {
             id: groupButton
             implicitWidth: 28
+            hoverWidth: 28
             icon: "group"
             onClicked: root.groupRequested(groupButton)
         }
@@ -119,22 +128,23 @@ Item {
         anchors.rightMargin: Theme.toolbar.gap
         y: Theme.toolbar.capsuleY
         visible: root.width > 458
+        // AX widths 36 / 38 / 37 in the 112 pt capsule (Q-finder-02)
         ToolButton {
-            implicitWidth: Theme.toolbar.actionsWidth / 3
+            implicitWidth: 36.5
             icon: "share"
             enabled: root.browser.selectedCount > 0
             onClicked: root.browser.openSelection()
         }
         ToolButton {
             id: tagButton
-            implicitWidth: Theme.toolbar.actionsWidth / 3
+            implicitWidth: 38
             icon: "tag"
             enabled: root.browser.selectedCount > 0 && root.browser.userFiles
             onClicked: root.tagRequested(tagButton)
         }
         ToolButton {
             id: more
-            implicitWidth: Theme.toolbar.actionsWidth / 3
+            implicitWidth: Theme.toolbar.actionsWidth - 36.5 - 38
             icon: "ellipsis"
             onClicked: root.moreRequested(more)
         }
@@ -146,9 +156,13 @@ Item {
         anchors.rightMargin: Theme.toolbar.rightPad
         y: Theme.toolbar.capsuleY
         width: root.searching ? Theme.toolbar.searchWidth : Theme.toolbar.capsuleHeight
-        Behavior on width { NumberAnimation { duration: Theme.anim.fast; easing.type: Theme.anim.easing } }
+        // the circle widens into a capsule in about 0.16 s, ease-out (Q-finder-30)
+        Behavior on width { NumberAnimation { duration: Theme.toolbar.searchDuration; easing.type: Easing.OutCubic } }
 
         ToolButton {
+            hoverWidth: Theme.toolbar.buttonWidth      // the whole circle lightens on hover
+            hoverHeight: Theme.toolbar.capsuleHeight
+            hoverColor: Theme.color.searchHover
             icon: "magnifyingglass"
             iconWeight: "medium"       // 13 pt, .large, medium (names.json finder.toolbarGlyph, likely)
             iconScale: "large"

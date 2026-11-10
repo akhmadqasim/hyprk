@@ -186,14 +186,50 @@ function escapeHtml(s) {
 
 function hasTags(entry) { return !!entry.tags && entry.tags.length > 0; }
 
-// Name with Finder's colored tag dots in front ("● ● name") as StyledText. Use it only when
-// hasTags(entry); plain names stay PlainText. Runs of spaces are kept with &nbsp;.
-// colors: tag name -> CSS color; unknown tags use colors.Gray.
-function styledName(entry, colors) {
-    let dots = "";
-    for (const t of entry.tags || [])
-        dots += '<font color="' + (colors[t] || colors.Gray) + '">\u25CF</font>';
-    return dots + " " + escapeHtml(entry.name).replace(/ (?= )/g, "&nbsp;");
+// Finder's tag dots (Q-finder-14): 10 pt circles, each extra tag 5 pt to the right and behind the previous one,
+// with a 0.5 pt ring in `ring`; `gap` pt of space after them. An SVG data URL `width` x 10 pt.
+function tagDotsWidth(n, gap) { return n > 0 ? 10 + 5 * (n - 1) + (gap || 0) : 0; }
+function tagDotsUrl(tags, colors, ring, gap) {
+    const n = tags.length, w = tagDotsWidth(n, gap);
+    let c = "";
+    for (let i = n - 1; i >= 0; i--)
+        c += '<circle cx="' + (5 + 5 * i) + '" cy="5" r="4.75" fill="' + (colors[tags[i]] || colors.Gray)
+           + '" stroke="' + ring + '" stroke-width="0.5"/>';
+    return "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="' + w
+           + '" height="10" viewBox="0 0 ' + w + ' 10">' + c + "</svg>");
+}
+
+// Name with the tag dots in front, 3 pt before the text, as StyledText. Use it only when hasTags(entry); plain
+// names stay PlainText. Runs of spaces are kept with &nbsp;. colors: tag name -> CSS color (unknown: Gray).
+function styledName(entry, colors, ring) {
+    const tags = entry.tags || [];
+    return '<img src="' + tagDotsUrl(tags, colors, ring || "white", 3) + '" width="' + tagDotsWidth(tags.length, 3)
+         + '" height="10" align="middle">' + escapeHtml(entry.name).replace(/ (?= )/g, "&nbsp;");
+}
+
+// ---------- layout ----------
+
+// Icon view columns: fixed cells (no stretching), at least one (Q-finder-12).
+function gridColumns(width, cell, pad) { return Math.max(1, Math.floor((width - 2 * pad) / cell)); }
+
+// Indices whose hit box meets the rubber band `r` ({x, y, width, height}, content coords). Cells are `cell`
+// square from (pad, 0); the hit box is `boxW` wide, centred, from `boxTop` to `boxBottom` in the cell.
+function gridHits(r, count, columns, cell, pad, boxW, boxTop, boxBottom) {
+    const hits = [];
+    const first = Math.max(0, Math.floor((r.y - boxBottom) / cell) * columns);
+    const last = Math.min(count, (Math.floor((r.y + r.height - boxTop) / cell) + 1) * columns);
+    for (let i = first; i < last; i++) {
+        const x = pad + (i % columns) * cell + (cell - boxW) / 2;
+        const y = Math.floor(i / columns) * cell;
+        if (x < r.x + r.width && x + boxW > r.x && y + boxTop < r.y + r.height && y + boxBottom > r.y)
+            hits.push(i);
+    }
+    return hits;
+}
+
+// List view column widths: Name takes what Date Modified, Size and Kind leave (default 338 in a 737 row).
+function listColumns(width, pad, date, size, kind) {
+    return [Math.max(160, width - 2 * pad - date - size - kind), date, size, kind];
 }
 
 // ---------- formatting ----------
@@ -206,7 +242,8 @@ function formatSize(bytes, isDir) {
     const units = ["KB", "MB", "GB", "TB"];
     let v = bytes, u = -1;
     do { v /= 1000; u++; } while (v >= 999.5 && u < units.length - 1);
-    const s = v < 10 ? (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, "") : String(Math.round(v));
+    // KB without decimals ("8 KB", "12 KB"), one decimal from MB up ("12.3 MB") (Q-finder-18)
+    const s = u === 0 ? String(Math.round(v)) : (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, "");
     return s + " " + units[u];
 }
 
@@ -215,6 +252,19 @@ const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 function pad2(n) { return n < 10 ? "0" + n : String(n); }
 
 // "Today at 14:03", "Yesterday at 09:12", "3 Nov 2026 at 18:00".
+// Preview / inspector form (Q-finder-18): "5 March 2026 at 09:12", "Yesterday, 14:30", "Today, 09:05".
+const monthsLong = ["January", "February", "March", "April", "May", "June", "July", "August", "September",
+                    "October", "November", "December"];
+function formatDateLong(ms, nowMs) {
+    const d = new Date(ms), now = new Date(nowMs === undefined ? Date.now() : nowMs);
+    const time = pad2(d.getHours()) + ":" + pad2(d.getMinutes());
+    const day0 = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+    const diff = Math.round((day0(now) - day0(d)) / 86400000);
+    if (diff === 0) return "Today, " + time;
+    if (diff === 1) return "Yesterday, " + time;
+    return d.getDate() + " " + monthsLong[d.getMonth()] + " " + d.getFullYear() + " at " + time;
+}
+
 function formatDate(ms, nowMs) {
     const d = new Date(ms), now = new Date(nowMs === undefined ? Date.now() : nowMs);
     const time = pad2(d.getHours()) + ":" + pad2(d.getMinutes());
