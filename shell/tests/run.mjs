@@ -121,46 +121,131 @@ test("dock.json without the key keeps magnification off", () => {
     assert.equal(ST.parse('{"magnification": true}', ST.dockDefaults()).magnification, true);
 });
 {
-    const widths = [44, 44, 44, -13, 44];
-    const o = (amount, focus) => ({ base: 44, big: 88, amount, focus, range: 66, spacing: 2, sidePad: 8, dpr: 2 });
-    const rest = DK.layout(widths, o(0, 0));
-    test("dock rest layout", () => {
-        assert.deepEqual(rest.w, [44, 44, 44, 13, 44]);
-        assert.deepEqual(rest.x, [8, 54, 100, 146, 161]);
-        assert.equal(rest.width, 213);
-        assert.equal(rest.baseWidth, 213);
+    // 27.2.1 AX frames (reference/re/27.2.1/live/dock/dock-geometry.json): 17 apps and 2 separators
+    const cells = Array(17).fill("tile");
+    cells.splice(12, 0, "separator");
+    cells.splice(16, 0, "separator");
+    const lay = (tile, fish, focus, large) => DK.layout(cells, { tile, large: large || 2 * tile, fish, focus, dpr: 2 });
+    test("dock geometry at the measured tile sizes (Q-dock-02..04)", () => {
+        // tile: background width x height, item, separator, circle radius
+        const mac = { 32: [615, 46, 34, 15.3, 14], 33: [633, 47, 35, 15.8, 14], 48: [947, 68, 52, 23.4, 21.1], 64: [1235, 84, 68, 30.6, 27.6] };
+        for (const t in mac) {
+            const [w, h, item, sep, r] = mac[t], g = DK.metrics(+t), l = lay(+t, 0, 0);
+            assert.ok(Math.abs(l.baseWidth - w) <= 1, `width at ${t}: ${l.baseWidth}`);
+            assert.equal(l.width, l.baseWidth);
+            assert.equal(g.height, h);
+            assert.equal(g.item, item);
+            assert.ok(Math.abs(g.separator - sep) < 1e-9);
+            assert.ok(Math.abs(g.radiusCircle - r) < 1e-9);
+            assert.equal(g.bottomGap, 5);
+        }
+        assert.ok(Math.abs(DK.metrics(64).radius - 31.1) < 1e-9);   // continuous-corner fit at 64
+        // the items abut: each starts where the last one ended
+        const l = lay(64, 0, 0);
+        for (let i = 1; i < l.x.length; i++) assert.ok(Math.abs(l.x[i] - (l.x[i - 1] + l.w[i - 1])) <= 0.5);
+        assert.ok(Math.abs(l.x[0] - 8.9) <= 0.5);
+    });
+    test("dock tile size shrinks to fit the screen", () => {
+        assert.equal(DK.fitTile(64, 17, 2, 1710), 64);
+        const t = DK.fitTile(64, 17, 2, 1000);
+        assert.ok(t < 64 && lay(t, 0, 0).baseWidth <= 1000 && lay(t + 1, 0, 0).baseWidth > 1000);
     });
     test("dock off: pointer moves nothing", () => {
-        for (const f of [0, 30, 77, 150, 260]) assert.deepEqual(DK.layout(widths, o(0, f)), rest);
+        const rest = lay(64, 0, 0);
+        for (const f of [0, 30, 300, 900]) assert.deepEqual(lay(64, 0, f), rest);
     });
-    test("dock magnified under the pointer, separator fixed", () => {
-        const l = DK.layout(widths, o(1, rest.center[1]));
-        assert.equal(l.w[1], 88);
-        assert.equal(l.w[3], 13);
-        assert.ok(l.w[0] > 44 && l.w[0] < 88 && l.w[0] === l.w[2]);
-        assert.equal(l.baseWidth, rest.baseWidth);
+    test("dock fisheye: Dock.app closed form T + (L - T) cos(pi d / 6T), nothing past 3.5 T", () => {
+        for (let d = 0; d <= 160; d += 5) {
+            const want = 64 + 64 * Math.cos(Math.PI * d / 384);
+            assert.ok(Math.abs(DK.magnifiedSize(64, 128, 1, d, 0) - want) < 1e-9, `d ${d}`);
+        }
+        assert.equal(DK.magnifiedSize(64, 128, 1, 224, 0), 64);
+        assert.equal(DK.magnifiedSize(64, 128, 1, 500, 0), 64);
+        assert.ok(DK.magnifiedSize(64, 128, 1, 220, 0) > 64);
+        // the ramp scales the whole curve: half way, half the growth under the pointer
+        assert.ok(Math.abs(DK.magnifiedSize(64, 128, 0.5, 0, 0) - 96) < 1e-9);
+        // against the 81-position recording (R2): the code's curve is within 4.6 pt (MAC-ANSWERS.md: up to 4.5)
+        const m = [[0, 128], [35, 125.7], [75, 117.7], [115, 104.5], [155, 87.6], [195, 70.8], [235, 64]];
+        for (const [d, s] of m) assert.ok(Math.abs(DK.magnifiedSize(64, 128, 1, d, 0) - s) < 4.6, `d ${d}`);
     });
-    test("dock end tile stays full size past its centre", () => {
-        const at = DK.layout(widths, o(1, rest.center[0])), past = DK.layout(widths, o(1, -20));
-        assert.equal(at.w[0], 88);
-        assert.deepEqual(past, at);
+    test("dock fisheye at five pointer positions: largest tile under the pointer, Dock widens by 2 Rs", () => {
+        const rest = lay(64, 0, 0), rs = DK.fishShift(64, 128, 1);
+        assert.ok(Math.abs(rs - 32 / Math.sin(Math.PI / 12)) < 1e-9);
+        for (const i of [0, 4, 9, 14, 18]) {
+            if (cells[i] === "separator") continue;
+            const l = lay(64, 1, rest.center[i]);
+            assert.ok(Math.abs(l.size[i] - 128) <= 0.5, `tile ${i}: ${l.size[i]}`);
+            assert.ok(l.size.every((s, j) => cells[j] === "separator" || s <= l.size[i]));
+            const inner = i > 0 && i < 18;
+            if (inner) assert.ok(Math.abs(l.width - (rest.baseWidth + 2 * rs)) <= 1, `width ${l.width}`);
+            assert.equal(l.baseWidth, rest.baseWidth);
+        }
     });
-    test("dock sizes continuous and device-pixel snapped", () => {
-        let prev = DK.layout(widths, o(1, 0));
-        for (let f = 0.5; f < 213; f += 0.5) {
-            const l = DK.layout(widths, o(1, f));
+    test("dock fisheye: continuous, device-pixel snapped, no feedback past the ends", () => {
+        let prev = lay(64, 1, -50);
+        assert.deepEqual(prev, lay(64, 1, 0));            // the pointer is clamped to the bar
+        for (let f = 0.5; f < 1235; f += 0.5) {
+            const l = lay(64, 1, f);
             l.w.forEach((w, i) => { assert.equal(w * 2, Math.round(w * 2)); assert.ok(Math.abs(w - prev.w[i]) <= 1.5, `size jump at ${f}`); });
             l.x.forEach((x, i) => assert.ok(Math.abs(x - prev.x[i]) <= 3, `x jump at ${f}`));
             assert.equal(l.width, Math.round(l.width));
             prev = l;
         }
     });
-    test("dock magnification curve (MAC-ANSWERS.md R2, 64 -> 128)", () => {
-        // measured size against the distance to the unmagnified centre, within 1.2 pt (fit RMS 0.4 pt)
-        const m = [[0, 128], [15, 127.6], [35, 125.7], [55, 122.3], [75, 117.7], [95, 111.6], [115, 104.5],
-                   [135, 96.5], [155, 87.6], [175, 78.3], [195, 70.8], [215, 66.0], [235, 64]];
-        for (const [d, s] of m) assert.ok(Math.abs(DK.magnifiedSize(64, 128, 1, d, 0, DK.magnifyRange(64)) - s) < 1.2, `d ${d}`);
-        assert.equal(DK.magnifyRange(64), 222);
+    test("dock magnification ramp: 147 ms for 64 -> 128 either way (fishSpeed 42)", () => {
+        assert.equal(DK.fishDuration(64), 147);
+        assert.equal(DK.fishDuration(-64), 147);
+        assert.equal(DK.fishDuration(0), 1);
+    });
+    test("dock attention bounce: 2 s cycle, hops 500 / 326 / 212 ms at 1 / 0.5 / 0.25 of tile + 1", () => {
+        const H = DK.attentionHeight(64);
+        assert.equal(H, 65);
+        assert.ok(Math.abs(DK.attentionOffset(250, H, -1) - 65) < 1e-9);
+        assert.ok(Math.abs(DK.attentionOffset(663, H, -1) - 32.5) < 1e-9);
+        assert.ok(Math.abs(DK.attentionOffset(932, H, -1) - 16.25) < 1e-9);
+        for (const t of [0, 500, 826, 1038, 1500, 1999]) assert.equal(DK.attentionOffset(t, H, -1), 0);
+        assert.ok(Math.abs(DK.attentionOffset(2250, H, -1) - 65) < 1e-9);
+        // 60 s, then 3 s bursts every 60 s: quiet at 61 s, bouncing at 120.25 s, quiet again at 124.25 s
+        assert.equal(DK.attentionOffset(61250, H, -1), 0);
+        assert.ok(DK.attentionOffset(120250, H, -1) > 0);
+        assert.equal(DK.attentionOffset(124250, H, -1), 0);
+        assert.equal(DK.nextAttentionStart(61000), 120000);
+        assert.equal(DK.nextAttentionStart(125000), 180000);
+        // answered at 300 ms: the cycle in progress lands at its rest point (1038 ms), then nothing
+        assert.equal(DK.attentionEnd(300), 1038);
+        assert.ok(DK.attentionOffset(600, H, 300) > 0);
+        assert.equal(DK.attentionOffset(1100, H, 300), 0);
+        assert.equal(DK.attentionOffset(2250, H, 300), 0);
+        assert.equal(DK.attentionPlaying(1100, 300), false);
+        assert.equal(DK.attentionPlaying(1100, -1), true);
+    });
+    test("dock sections: recents after their own separator, at most 3, off puts running apps after pinned", () => {
+        const p = [{ id: "a" }], run = [{ id: "r" }], rec = [{ id: "x" }, { id: "r" }, { id: "y" }, { id: "z" }, { id: "w" }];
+        const o = [{ id: "dl" }, { id: "tr" }];
+        const ids = l => l.map(i => i.separator ? "|" : i.id).join(" ");
+        assert.equal(ids(DK.sections(p, run, rec, true, o)), "a | r x y z | dl tr");
+        assert.equal(ids(DK.sections(p, [], [], true, o)), "a | dl tr");
+        assert.equal(ids(DK.sections(p, run, rec, false, o)), "a r | dl tr");
+        assert.equal(ids(DK.pushRecent([{ id: "x" }, { id: "y" }, { id: "z" }], { id: "y" }, 3).map(i => ({ id: i.id }))), "y x z");
+        assert.equal(DK.pushRecent([{ id: "x" }, { id: "y" }, { id: "z" }], { id: "n" }, 3).length, 3);
+    });
+    test("dock label: text + 2 x 14, at least 41 (DOCKLabelLayer, Q-dock-08)", () => {
+        assert.equal(DK.labelWidth(39.5), 67.5);   // "Finder"
+        assert.equal(DK.labelWidth(5), 41);
+        assert.equal(DK.labelWidth(900), 628);
+    });
+    test("dock label fade and autohide slide: cosine in-out fits of the Mac's per-frame data", () => {
+        const cos = x => 0.5 - 0.5 * Math.cos(Math.PI * Math.min(1, Math.max(0, x)));
+        // reconciliation-42.json: label alpha after leaving the Dock, 17 ms steps, from the last full frame; 300 ms
+        const alpha = [.997, .985, .94, .90, .87, .79, .70, .62, .53, .48, .38, .28, .19, .125, .07, .05, .009, 0];
+        let e = 0;
+        alpha.forEach((a, i) => { e += (1 - cos((i * 1000 / 60 + 8) / 300) - a) ** 2; });
+        assert.ok(Math.sqrt(e / alpha.length) < 0.03, `label rms ${Math.sqrt(e / alpha.length)}`);
+        // dock-live.json autohide: top edge per frame while showing (tile 33, 52 pt of travel), 210 ms
+        const show = [1105, 1100, 1094, 1087, 1083, 1077, 1070, 1065, 1060, 1057, 1055].map(y => (1107 - y) / 52);
+        e = 0;
+        show.forEach((p, i) => { e += (cos((i * 1000 / 60 + 34) / 210) - p) ** 2; });
+        assert.ok(Math.sqrt(e / show.length) < 0.025, `slide rms ${Math.sqrt(e / show.length)}`);
     });
     test("dock bounce height from the tile size (Dock.app: (tile - 8) * 0.2 + 6)", () => {
         assert.ok(Math.abs(DK.bounceHeight(33) - 11) < 1e-9);

@@ -127,7 +127,8 @@ Singleton {
         readonly property real spotlightInput: 26   // query text dominates (reference/JUDGE.md)
         readonly property real spotlightRow: 15     // TODO verify
         readonly property real spotlightHeader: 11  // TODO verify
-        readonly property real dockTooltip: 14      // SPEC 9.9.3: Dock app-name label, system 14
+        readonly property real dockLabel: 14        // Dock app-name label: system 14 (27.2.1 DOCKLabelLayer, Q-dock-08)
+        readonly property real missionTitle: 13     // Mission Control window title: SF 13 bold (Q-dock-29)
         readonly property real widgetBig: 34        // TODO verify
         readonly property real widgetSmall: 11      // TODO verify
         readonly property real widgetPhotoTitle: 24 // Photos widget caption
@@ -165,8 +166,6 @@ Singleton {
         readonly property color menuSelectionText: "#FFFFFF"
 
 
-        readonly property color dockDot: theme.dark ? Qt.rgba(1, 1, 1, 0.65) : Qt.rgba(0, 0, 0, 0.55)
-        readonly property color tooltipBg: theme.dark ? Qt.rgba(0.16, 0.16, 0.17, 0.92) : Qt.rgba(0.95, 0.95, 0.96, 0.92)
         readonly property real disabledOpacity: 0.4      // unavailable CC tiles, TODO verify
     }
 
@@ -228,35 +227,26 @@ Singleton {
     }
 
     // ---------- dock ----------
+    // Geometry per tile size: lib/dock.js metrics() (27.2.1 AX frames, Q-dock-02..07). Colours here.
     readonly property QtObject dock: QtObject {
-        // iconSize is the icon cell; macOS icon art leaves ~10% transparent margin inside it.
-        // Tile size follows the screen width: the reference icon art is ~2.7% of the
-        // screen width (reference/JUDGE-r2.md), the art is ~0.8 of the tile, so the tile is
-        // ~3.4% of the width. SPEC's 64/52 tile is for a larger display; magnified keeps
-        // SPEC's largesize/tilesize ratio (128/64).
-        readonly property real tileFraction: 0.034
-        readonly property real magnifyRatio: 2.0
-        readonly property real magnifyRange: 1.5         // SPEC.md 7: magnification width 3 x tilesize (1.5 each side)
-        readonly property int iconSpacing: 2             // SPEC.md 7: tile inset 1 (each side)
-        readonly property int padding: 6                 // SPEC.md 7: distance top 6 (symmetric bottom assumed)
-        readonly property int sidePadding: 8             // SPEC.md 7: distance sides 8
-        readonly property int radius: 26                 // ~0.34 x dock height, measured from reference (no SPEC value)
-        readonly property int bottomMargin: 4            // SPEC.md 7: icons 10 pt above the edge minus padding 6
-        readonly property int dotSize: 3                 // running indicator: ~0.065 x icon pitch (reference/screens/macos27-dock-default.png)
-        readonly property int dotOffset: 1               // dot distance below icon, TODO verify
-        readonly property int separatorWidth: 1          // TODO verify
-        // reference dock: icon art to art across the separator ~0.58 x pitch, separator ~0.92 x pitch
-        // tall, a near-black 1 pt line (reference/screens/macos27-dock-default.png)
-        readonly property int separatorHPad: 8
-        readonly property int separatorInset: 7          // vertical inset of separator
-        readonly property color separator: theme.dark ? theme.stroke(1, 1, 1, 0.30) : theme.stroke(0, 0, 0, 0.55)
-        readonly property int bounceHeight: theme.travel(28)           // launch bounce, TODO verify
-        readonly property int tooltipGap: 6
-        readonly property int tooltipRadius: 8
-        readonly property int tooltipHPad: 10
-        readonly property int tooltipHeight: 24
-        // neutral white lift over the plugin glass (cancels the backdrop colour cast)
-        readonly property color pluginLift: theme.dark ? Qt.rgba(theme.glass.darkVeil.r, theme.glass.darkVeil.g, theme.glass.darkVeil.b, 0.45) : Qt.rgba(0.97, 0.97, 0.97, 0.20)   // TODO verify
+        // the built-in tilesize when the key is absent (Q-dock-02); shrunk to fit the screen width
+        readonly property int tile: 64
+        // separator and running dot: vibrant plus-lighter +65/255 and +125/255 in dark (Q-dock-06, Q-dock-07),
+        // drawn additively (shaders/plusfill.frag). Light is plus-darker -57/255 and -128/255, which an
+        // over-blend cannot do: there it stays a black line / dot at these alphas (by eye, TODO verify)
+        // (premultiplied rgba for shaders/plusfill.frag: rgb is added, alpha covers)
+        readonly property vector4d separator: theme.dark ? Qt.vector4d(65 / 255, 65 / 255, 65 / 255, 0) : Qt.vector4d(0, 0, 0, theme.strokeAlpha(0.55))
+        readonly property vector4d dot: theme.dark ? Qt.vector4d(125 / 255, 125 / 255, 125 / 255, 0) : Qt.vector4d(0, 0, 0, 0.55)
+        // the app name label's fill over its glass, premultiplied (rgb may exceed alpha: shaders/plusfill.frag):
+        // least squares of dst * (1 - a) + k against the Mac's label over the Dock material on black, grey 127 and
+        // white (Q-dock-08 fills light 131/192/249, dark 31/131/180 against the Dock's 38/134/229, 12/108/176):
+        // light a 0.382, k 108/255 (rms 1.0); dark a 0.083, k 23.5/255 (rms 5)
+        readonly property vector4d labelFill: theme.dark ? Qt.vector4d(23.5 / 255, 23.5 / 255, 23.5 / 255, 0.083) : Qt.vector4d(108 / 255, 108 / 255, 108 / 255, 0.382)
+        readonly property color labelText: theme.dark ? Qt.rgba(244 / 255, 244 / 255, 244 / 255, 1) : Qt.rgba(37 / 255, 37 / 255, 37 / 255, 1)   // Q-dock-08
+        // tint over the plugin glass: none in light (the plugin's dock recipe alone matched the Mac over white, grey
+        // and black: 228/132/37 against 229/134/38); a dark veil in dark, TODO verify (the Mac's dark reading
+        // 176/108/12 is not explained yet)
+        readonly property color pluginLift: theme.dark ? Qt.rgba(theme.glass.darkVeil.r, theme.glass.darkVeil.g, theme.glass.darkVeil.b, 0.45) : "transparent"
     }
 
     // ---------- notifications ----------
@@ -418,12 +408,16 @@ Singleton {
         readonly property real maxScale: 0.8             // windows only shrink in Mission Control, TODO verify
         readonly property int spaceSpacing: 18           // between Space thumbnails
         readonly property int spaceLabelGap: 6
-        readonly property int titleReserve: 28           // room under a thumbnail for its title chip
         readonly property int placeholderIcon: 64
         readonly property int hoverBorder: 3
         readonly property real hoverScale: 1.03
         readonly property color text: "#FFFFFF"
         readonly property real labelSize: 12
+        // window title on hover, centred on the window (Q-dock-29): capsule 30 pt, padding 14.5, black on grey 106
+        readonly property real titleHeight: 30
+        readonly property real titlePadding: 14.5
+        readonly property color titleFill: Qt.rgba(106 / 255, 106 / 255, 106 / 255, 1)   // read over dark content: its opacity is not known
+        readonly property color titleText: "#000000"
     }
 
     // ---------- animation ----------
@@ -439,8 +433,6 @@ Singleton {
         readonly property var spring: [0.25, 0.248, 0.1, 1.0, 1, 1]
         readonly property int close: theme.ms(250)                 // panels close (ScaleDownAndOut)
         readonly property int bannerIn: normal           // banner slide-in, same spring as panels
-        readonly property int bounce: 340                // one dock bounce up+down, TODO verify
-        readonly property int magnify: theme.ms(150)               // dock magnification ramp on enter/leave (by eye; the cursor follow is not animated)
         readonly property int easing: Easing.OutCubic
 
         // Liquid Glass motion (materialize, press, Reduce motion crossfade): Tokens.motion
@@ -452,11 +444,15 @@ Singleton {
         // a menu opens at once and fades out in about 0.2 s, ease-out (measured on macOS 27.2.1)
         readonly property int menuFadeOut: theme.ms(200)
         readonly property real menuTrackDamping: 1.0
-        readonly property int spacesBarExit: 125         // SPEC 11.4: the Spaces bar leaves in 0.125 s
         // a growing or shrinking glass (Spotlight results): SwiftUI .snappy, bounce 0.15 (by eye)
         readonly property real resizeResponse: 0.5
         readonly property real resizeDamping: 0.85
-        readonly property int dockAutohideDelay: 150     // SPEC 7: Dock autohide-delay 0.15 s
+        // Dock autohide (Q-dock-16, 60 fps): a pure slide on the Dock's cosine ease in-out (DockFloatAnimatedProperty,
+        // REA 27.2.1 side notes), fitted to the per-frame top edge: 210 ms (rms 0.016 show, 0.022 hide), starting
+        // 200 ms after the pointer reaches the bottom edge and 30 ms after it leaves the Dock
+        readonly property int dockSlide: 210
+        readonly property int dockRevealDelay: 200
+        readonly property int dockHideDelay: 30
         // a click on a slider track springs the shown value to the click point, then drags follow 1:1
         readonly property real sliderJumpResponse: 0.3   // CC's knobless slider; Settings' NSSlider uses Tokens.motion.sliderJumpResponse 0.25
     }

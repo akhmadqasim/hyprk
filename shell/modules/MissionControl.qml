@@ -8,18 +8,21 @@ import qs
 import qs.components
 import qs.services
 import qs.HyprK
+import "../lib/spring.js" as SpringLib
 
 // Mission Control (Super+Up): live thumbnails of the windows on the current Space laid out
 // without overlap, the Spaces bar at the top. Click a window to focus it, a Space to switch,
 // empty space or Esc to close.
-// macOS 27.2.1 (MAC-ANSWERS.md R2, 60 fps recording): the windows move and scale from where they
-// are into the layout and back, the wallpaper is NOT dimmed or blurred, the menu bar, the Dock and
-// the desktop widgets go away, and the Spaces bar shows the Desktops as small labelled pills with
-// "+" at the right. Enter about 0.38 s, exit about 0.33 s, both ease-out (curves fitted below).
-// How: this layer draws the plain wallpaper over everything at opacity `e`, so the real windows,
-// the menu bar (with its top dimming) and the Dock fade out under it while the thumbnails, which
-// start exactly over the real windows, fly to their places: no cross-fade of the windows.
-// Reduce motion: a 0.15 s dissolve, no flight.
+// macOS 27.2.1 (MAC-ANSWERS.md R2 and Q-dock-27): the windows move and scale from where they are into the
+// layout and back, the wallpaper is NOT dimmed or blurred, the menu bar and the desktop widgets go away, the
+// Dock stays visible, and the Spaces bar shows the Desktops as small labelled pills with "+" at the right.
+// Motion (WindowManager.framework preferences, "REA 27.2.1" section 5): one critically damped spring, response
+// 0.25 s, for enter and exit (ExposeSpring*); the Spaces bar leaves on its own one, response 0.125 s
+// (SpacesBarExitSpringResponse). Each is one exact NumberAnimation (components/SpringCurve.qml).
+// How: this layer draws the plain wallpaper over everything but the Dock's band (Panels.dockZones) at opacity
+// `e`, so the real windows and the menu bar (with its top dimming) fade out under it while the thumbnails,
+// which start exactly over the real windows, fly to their places: no cross-fade of the windows.
+// Reduce motion: the same springs within 0.15 s as a dissolve, no flight.
 ShellWindow {
     id: mc
 
@@ -30,14 +33,8 @@ ShellWindow {
 
     // Numbers that are ours (no Theme.qml tokens yet; Q-dock-27..31 will answer the guessed ones)
     readonly property QtObject m: QtObject {
-        // progress per 17 ms frame of the 27.2.1 recording, fitted with a cubic bezier (RMS 0.008 enter,
-        // 0.007 exit, frame n at n x 16.7 ms as Qt animations draw it; the tails are below one pixel, so
-        // the visible motion ends at 0.38 / 0.33 s as measured)
-        readonly property int enterMs: 420
-        readonly property var enterCurve: [0.15, 0.1, 0.15, 1.0, 1, 1]
-        readonly property int exitMs: 360
-        readonly property var exitCurve: [0.15, 0.7, 0.35, 1.0, 1, 1]
-        readonly property int barExitMs: Theme.anim.spacesBarExit   // SPEC 11.4: the Spaces bar leaves in 0.125 s
+        readonly property var expose: SpringLib.fromResponse(0.25, 1)      // ExposeSpringResponse / DampingRatio
+        readonly property var barExit: SpringLib.fromResponse(0.125, 1)    // SpacesBarExitSpringResponse
         // collapsed Spaces bar: labelled pills, guessed (no 27.2.1 screenshot of it yet, Q-dock-31)
         readonly property int barHeight: 44
         readonly property int pillHeight: 26
@@ -56,24 +53,16 @@ ShellWindow {
         readonly property color empty: Theme.dark ? "#1c1c1e" : "#3a6fb0"
     }
 
-    // 0 = everything in place, 1 = Mission Control. Not a Behavior: enter and exit have their own curve.
+    // 0 = everything in place, 1 = Mission Control
     property real e: 0
-    NumberAnimation { id: anim; target: mc; property: "e" }
-    // Spaces bar: in with the windows, out in 0.125 s
+    SpringCurve { id: anim; target: mc; property: "e"; spring: mc.m.expose }
+    // Spaces bar: in with the windows, out on its own spring
     property real bar: 0
-    NumberAnimation { id: barAnim; target: mc; property: "bar"; easing.type: Easing.BezierSpline; easing.bezierCurve: mc.m.enterCurve }
+    SpringCurve { id: barAnim; target: mc; property: "bar"; spring: mc.m.expose }
     function go() {
-        const enter = shown;
-        anim.stop();
-        anim.to = enter ? 1 : 0;
-        anim.duration = Theme.ms(enter ? m.enterMs : m.exitMs);
-        anim.easing.type = A11y.reduceMotion ? Easing.Linear : Easing.BezierSpline;
-        anim.easing.bezierCurve = enter ? m.enterCurve : m.exitCurve;
-        anim.start();
-        barAnim.stop();
-        barAnim.to = enter ? 1 : 0;
-        barAnim.duration = Theme.ms(enter ? m.enterMs : m.barExitMs);
-        barAnim.start();
+        anim.go(shown ? 1 : 0);
+        barAnim.spring = shown ? m.expose : m.barExit;
+        barAnim.go(shown ? 1 : 0);
     }
     readonly property real travel: A11y.reduceMotion ? 0 : 1 - e         // 1 = at the real window rect
     // by value, not anim.running: the window must not blink off between `shown` turning false and the
@@ -84,6 +73,9 @@ ShellWindow {
     acceptsInput: shown               // no input while closing
     anchors { top: true; left: true; right: true; bottom: true }
     exclusionMode: ExclusionMode.Ignore
+    // the Dock's band stays uncovered and clickable
+    readonly property int dockZone: (screen && Panels.dockZones[screen.name]) || 0
+    inputMask: Region { x: 0; y: 0; width: mc.width; height: mc.height - mc.dockZone }
     namespace: "hyprk-mission"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
@@ -141,7 +133,7 @@ ShellWindow {
     readonly property int cols: Math.max(1, Math.ceil(Math.sqrt(windows.length)))
     readonly property int rows: Math.max(1, Math.ceil(windows.length / cols))
     readonly property real cellW: (width - Theme.mission.margin * 2 - Theme.mission.gap * (cols - 1)) / cols
-    readonly property real cellH: (height - m.gridTop - Theme.mission.margin * 1.5 - Theme.mission.gap * (rows - 1)) / rows
+    readonly property real cellH: (height - dockZone - m.gridTop - Theme.mission.margin * 1.5 - Theme.mission.gap * (rows - 1)) / rows
 
     Item {
         id: keys
@@ -149,13 +141,16 @@ ShellWindow {
         Keys.onEscapePressed: Panels.close()
     }
 
-    // the plain wallpaper, as the wallpaper layer draws it (Background.qml), over everything below
+    // the plain wallpaper, as the wallpaper layer draws it (Background.qml), over everything below but the Dock
     Rectangle {
-        anchors.fill: parent
+        width: parent.width
+        height: parent.height - mc.dockZone
+        clip: true
         color: mc.m.empty
         opacity: mc.e
         Image {
-            anchors.fill: parent
+            width: mc.width
+            height: mc.height
             source: Wallpaper.url
             sourceSize: Qt.size(mc.screen ? mc.screen.width : 1920, mc.screen ? mc.screen.height : 1080)
             fillMode: Image.PreserveAspectCrop
@@ -163,7 +158,7 @@ ShellWindow {
             cache: false
         }
     }
-    MouseArea { anchors.fill: parent; onClicked: Panels.close() }
+    MouseArea { width: parent.width; height: parent.height - mc.dockZone; onClicked: Panels.close() }
 
     // Spaces bar. Collapsed (27.2.1): a labelled pill per Desktop, the current one filled, "+" at the
     // right. Pointing at it expands it to wallpaper thumbnails with the names under them (macOS
@@ -357,7 +352,7 @@ ShellWindow {
                         // fit the cell but never grow past Theme.mission.maxScale of the real window
                         readonly property real dpr: mc.screen ? mc.screen.devicePixelRatio : 1
                         readonly property real maxW: cell.width
-                        readonly property real maxH: cell.height - Theme.mission.titleReserve
+                        readonly property real maxH: cell.height
                         constraintSize: Qt.size(Math.min(maxW, sourceSize.width / dpr * Theme.mission.maxScale || maxW),
                                                 Math.min(maxH, sourceSize.height / dpr * Theme.mission.maxScale || maxH))
                     }
@@ -381,25 +376,22 @@ ShellWindow {
                     border.color: Theme.color.accent
                 }
             }
-            // title under the hovered window, styled like the Dock tooltip
+            // title on hover, centred on the window (Q-dock-29)
             Rectangle {
                 visible: wma.containsMouse && mc.shown
-                anchors.horizontalCenter: parent.horizontalCenter
-                y: thumb.y + thumb.height + Theme.dock.tooltipGap
-                width: Math.min(cell.width, title.implicitWidth + Theme.dock.tooltipHPad * 2)
-                height: Theme.dock.tooltipHeight
-                radius: Theme.dock.tooltipRadius
-                color: Theme.color.tooltipBg
-                border.width: 1
-                border.color: Theme.glass.hairline
+                anchors.centerIn: parent
+                width: Math.min(cell.width, title.implicitWidth + Theme.mission.titlePadding * 2)
+                height: Theme.mission.titleHeight
+                radius: height / 2
+                color: Theme.mission.titleFill
                 Text {
                     id: title
                     anchors.centerIn: parent
-                    width: Math.min(implicitWidth, cell.width - Theme.dock.tooltipHPad * 2)
+                    width: Math.min(implicitWidth, cell.width - Theme.mission.titlePadding * 2)
                     elide: Text.ElideRight
                     text: cell.modelData.title
-                    font: Typography.font(Theme.font.dockTooltip)
-                    color: Theme.color.label
+                    font: Typography.font(Theme.font.missionTitle, Typography.bold)
+                    color: Theme.mission.titleText
                 }
             }
             MouseArea {

@@ -43,6 +43,16 @@ Singleton {
     Timer { id: menuSwap; interval: root.menuSwapDelay; onTriggered: if (root.open === "menu" && root.menuIndex >= 0) root.showMenuNow() }
     onMenuIndexChanged: stepMenu()
 
+    // Height of the band at the bottom of each screen (by name) that the Dock keeps visible, 0 when it hides:
+    // Mission Control leaves it uncovered (the Dock stays visible there, MAC-ANSWERS.md Q-dock-27)
+    property var dockZones: ({})
+    function setDockZone(name, h) {
+        if (dockZones[name] === h) return;
+        const z = Object.assign({}, dockZones);
+        z[name] = h;
+        dockZones = z;
+    }
+
     // context menu (desktop, Dock): items as in lib/menus.js, action may be a function.
     // (contextX, contextY) is the screen point; with contextAbove the menu ends there (Dock).
     property var contextItems: []

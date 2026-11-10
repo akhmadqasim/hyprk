@@ -20,9 +20,10 @@ function parse(text, defaults) {
 
 // state/dock.json defaults, like a clean macOS account (`defaults read com.apple.dock magnification` = 0):
 // magnification is off until the user turns it on in Desktop & Dock. Same values as settings/Parsers.js
-// dockDefaults (size and magnifiedSize in pt; the shell uses only their ratio, see magnifyRatio).
+// dockDefaults (size and magnifiedSize in pt; the shell uses only their ratio, see magnifyRatio). The recent
+// apps section is on by default, like macOS (`show-recents` absent = 1, MAC-ANSWERS.md Q-dock-14).
 function dockDefaults() {
-    return { autohide: false, magnification: false, size: 48, magnifiedSize: 96 };
+    return { autohide: false, magnification: false, size: 48, magnifiedSize: 96, showRecents: true };
 }
 
 // Magnified size / tile size from dock.json, 1..8 (Settings clamps both to 16..128 pt).

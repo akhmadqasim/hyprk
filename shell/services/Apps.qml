@@ -104,11 +104,12 @@ Singleton {
         return map;
     }
 
-    // dock items = pinned + running-but-not-pinned
-    readonly property var dockItems: {
-        const out = pinned.map(p => Object.assign({ windows: windowsFor(p.id, p.entry, p.alsoIds) }, p));
+    // pinned apps with their windows, then the running apps that are not pinned
+    readonly property var pinnedItems: pinned.map(p => Object.assign({ windows: windowsFor(p.id, p.entry, p.alsoIds) }, p))
+    readonly property var runningUnpinned: {
+        const out = [];
         const seen = new Set();
-        for (const p of out) {
+        for (const p of pinnedItems) {
             seen.add(Search.normId(p.id));
             for (const a of p.alsoIds || []) seen.add(Search.normId(a));
             if (p.entry && p.entry.startupClass) seen.add(Search.normId(p.entry.startupClass));
@@ -121,6 +122,18 @@ Singleton {
             out.push({ id: e ? e.id : key, name: e ? e.name : key, icon: e ? e.icon : key, entry: e, windows: running[key] });
         }
         return out;
+    }
+    readonly property var dockItems: pinnedItems.concat(runningUnpinned)
+
+    // Recent apps for the Dock's recent section (macOS 27.2.1 show-recents, on by default; MAC-ANSWERS.md
+    // Q-dock-14): unpinned apps that stopped running, most recent first, at most 3. Kept for this session only.
+    property var recent: []
+    property var _unpinnedBefore: []
+    onRunningUnpinnedChanged: {
+        const now = runningUnpinned.map(a => a.id);
+        for (const a of _unpinnedBefore)
+            if (now.indexOf(a.id) === -1) recent = DockLayout.pushRecent(recent, { id: a.id, name: a.name, icon: a.icon, entry: a.entry, windows: [] }, 3);
+        _unpinnedBefore = runningUnpinned;
     }
 
     // Launch bounce state, kept here (not in the Dock's delegates, which are rebuilt when the model changes) so a
@@ -304,7 +317,45 @@ Singleton {
     // true while any icon bounces at wall time `now` (the Dock's frame clock runs only then)
     function anyBouncing(now) {
         for (const id in launching) if (bounceTime(id, now) >= 0) return true;
+        for (const id in attention) if (attentionTime(id, now) >= 0) return true;
         return false;
+    }
+
+    // Attention bounce (lib/dock.js attentionOffset): id -> { start (ms), stop } while one of the app's windows
+    // is urgent (Hyprland's `urgent` event; Quickshell clears it when the window is focused). stop is -1 while
+    // it is urgent, then the ms after start when it was answered: the cycle in progress lands at its rest point.
+    property var attention: ({})
+    function markAttention(id, on) {
+        const a = attention[id], now = Date.now();
+        const live = a && (a.stop < 0 || now - a.start < DockLayout.attentionEnd(a.stop));
+        if (on === (a !== undefined && a.stop < 0)) return;
+        const m = Object.assign({}, attention);
+        if (on) m[id] = { start: live ? a.start : now, stop: -1 };
+        else m[id] = { start: a.start, stop: now - a.start };
+        attention = m;
+    }
+    // ms since the attention bounce of `id` started, or -1 while it does not move (no request, landed, or the
+    // pause between the 60 s of bouncing and each 3 s burst)
+    function attentionTime(id, now) {
+        const a = attention[id];
+        if (!a) return -1;
+        const t = Math.max(0, now - a.start);
+        return DockLayout.attentionPlaying(t, a.stop) ? t : -1;
+    }
+    function attentionOffset(id, now, height) {
+        const t = attentionTime(id, now);
+        return t < 0 ? 0 : DockLayout.attentionOffset(t, height, attention[id].stop);
+    }
+    // wall time of the next attention burst while none plays (the Dock's frame clock is off until then), 0: none
+    function nextAttention(now) {
+        let next = 0;
+        for (const id in attention) {
+            const a = attention[id];
+            if (a.stop >= 0) continue;
+            const t = a.start + DockLayout.nextAttentionStart(now - a.start);
+            if (t > now && (next === 0 || t < next)) next = t;
+        }
+        return next;
     }
 
     Timer {
