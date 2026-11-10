@@ -117,17 +117,32 @@ QtObject {
         readonly property int spacing: 9             // _windowTitlebarButtonSpacingWidth, Solarium
         readonly property real rimWidth: 0.75        // DesignLibrary StrokeStyle(lineWidth: 0.75)
         readonly property real glyphResponse: 0.3    // hover glyph reveal, spring(0.3, 1)
-        // gradient top, bottom (WindowControlColors), pressed (CoreUI art), glyph (CoreUI hover art)
-        readonly property var closeSet: t.dark ? ["#FA6A61", "#EF6962", "#FF8D85", "#730100"]
-                                               : ["#FF6D63", Qt.rgba(0.961, 0.447, 0.412, 0.80), "#C04741", "#730000"]
-        readonly property var minimizeSet: t.dark ? ["#FAB51A", "#FECF34", "#FFEA5C", "#985600"]
-                                                  : [Qt.rgba(0.984, 0.702, 0.086, 0.92), Qt.rgba(1, 0.820, 0.204, 0.92), "#BF8E22", "#985600"]
-        readonly property var zoomSet: t.dark ? ["#56C83A", "#52C43D", "#56F66E", "#006200"]
-                                              : ["#5ACF1F", Qt.rgba(0.475, 0.827, 0.298, 0.73), "#1E9730", "#006200"]
+        // MAC-ANSWERS.md Q-windows-10: glyph strokes about 1.9 pt (x 7 x 7, minus 7.5 wide, + 8 x 8, full screen 6 x 6)
+        readonly property real glyphStroke: 1.9
+        // Q-windows-08: a pressed disc grows to 16..17 pt (32 px of 28 at 2x) and gets brighter
+        readonly property real pressedScale: 1.15
+        // gradient top, bottom (WindowControlColors), pressed (27.2.1 fill beside the glyph, Q-windows-08 and
+        // lights-press-*.png; dark zoom did not change in its crop, so it keeps the CoreUI #56F66E), glyph (Q-windows-10)
+        readonly property var closeSet: t.dark ? ["#FA6A61", "#EF6962", "#FF7C68", "#850000"]
+                                               : ["#FF6D63", Qt.rgba(0.961, 0.447, 0.412, 0.80), "#FFAC9E", "#9E0000"]
+        readonly property var minimizeSet: t.dark ? ["#FAB51A", "#FECF34", "#FFFF58", "#AA3600"]
+                                                  : [Qt.rgba(0.984, 0.702, 0.086, 0.92), Qt.rgba(1, 0.820, 0.204, 0.92), "#FFFF70", "#BE4900"]
+        readonly property var zoomSet: t.dark ? ["#56C83A", "#52C43D", "#56F66E", "#005500"]
+                                              : ["#5ACF1F", Qt.rgba(0.475, 0.827, 0.298, 0.73), "#C6FF8F", "#097900"]
         readonly property var inactive: t.dark ? [Qt.rgba(0.980, 0.980, 0.980, 0.20), Qt.rgba(0.937, 0.937, 0.937, 0.16)]
                                                : [Qt.rgba(0.894, 0.894, 0.937, 0.30), Qt.rgba(0.878, 0.878, 0.922, 0.30)]
         readonly property color rim: Qt.rgba(0, 0, 0, t.dark ? 0.12 : 0.2)
         readonly property color inactiveRim: t.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0, 0, 0, 0.14)
+    }
+
+    // ---------- window frame (MAC-ANSWERS.md Q-windows-02, -03) ----------
+    // Clients that draw their own frame (Finder, Settings) round it to a 16 pt circle, which stays inside the
+    // compositor's corner (config/hypr/hyprland.lua decoration.rounding). The compositor draws the outer black rim;
+    // the client draws the inner 1 pt white rim: alpha .10, .08 in an inactive dark window.
+    readonly property QtObject frame: QtObject {
+        readonly property int radius: 16
+        readonly property real rimWidth: 1
+        function rim(active) { return Qt.rgba(1, 1, 1, t.dark && !active ? 0.08 : 0.10); }
     }
 
     // ---------- motion (springs: response s, dampingFraction) ----------

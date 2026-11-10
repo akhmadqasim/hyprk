@@ -72,8 +72,8 @@ namespace lg {
         {{{0xFF6D63, 1}, {0xF57269, 0.8f}}, {{0xFBB316, 0.92f}, {0xFFD134, 0.92f}}, {{0x5ACF1F, 1}, {0x79D34C, 0.73f}}},
         {{{0xFA6A61, 1}, {0xEF6962, 1}}, {{0xFAB51A, 1}, {0xFECF34, 1}}, {{0x56C83A, 1}, {0x52C43D, 1}}},
     };
-    static constexpr uint32_t LIGHT_PRESSED[2][3] = {{0xC04741, 0xBF8E22, 0x1E9730}, {0xFF8D85, 0xFFEA5C, 0x56F66E}};
-    static constexpr uint32_t GLYPH_RGB[3]        = {0x730000, 0x985600, 0x006200};
+    static constexpr uint32_t LIGHT_PRESSED[2][3] = {{0xFFAC9E, 0xFFFF70, 0xC6FF8F}, {0xFF7C68, 0xFFFF58, 0x56F66E}}; // 27.2.1, Q-windows-08
+    static constexpr uint32_t GLYPH_RGB[3]        = {0x9E0000, 0xBE4900, 0x097900}; // light, Q-windows-10
     static constexpr double   GLYPH_SPRING        = 0.3; // s, critically damped
     // title text on a dark bar (light bars use titlebar_text / titlebar_text_inactive)
     static constexpr SRgba                    TEXT_ON_DARK{1, 1, 1, 0.85f}, TEXT_ON_DARK_INACTIVE{1, 1, 1, 0.4f};
@@ -172,7 +172,7 @@ namespace lg {
         cachedParams = params;
     }
 
-    // 1.2 pt round-cap strokes on a 14 pt artboard: x, minus, plus
+    // 1.9 pt round-cap strokes on a 14 pt artboard (MAC-ANSWERS.md Q-windows-10): x 7 x 7, minus 7.5, plus 8 x 8
     SP<Render::ITexture> CTitlebar::glyphTexture(int button, float scale) {
         const auto params = m_params();
         resetOnScale(m_glyphScale, m_glyphParams, params, scale, m_glyphs, m_lights);
@@ -185,12 +185,12 @@ namespace lg {
                     cairo_line_to(cr, c + (x2 - 7) * k, c + (y2 - 7) * k);
                 };
                 switch (button) {
-                    case 0: line(4.6, 4.6, 9.4, 9.4); line(9.4, 4.6, 4.6, 9.4); break;
-                    case 1: line(3.8, 7, 10.2, 7); break;
-                    default: line(3.8, 7, 10.2, 7); line(7, 3.8, 7, 10.2); break;
+                    case 0: line(4.45, 4.45, 9.55, 9.55); line(9.55, 4.45, 4.45, 9.55); break;
+                    case 1: line(4.2, 7, 9.8, 7); break;
+                    default: line(3.95, 7, 10.05, 7); line(7, 3.95, 7, 10.05); break;
                 }
                 setSource(cr, GLYPH_RGB[button], 1);
-                cairo_set_line_width(cr, 1.2 * k);
+                cairo_set_line_width(cr, 1.9 * k);
                 cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
                 cairo_stroke(cr);
             });
