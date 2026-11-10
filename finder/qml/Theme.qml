@@ -259,8 +259,7 @@ QtObject {
         readonly property int nameX: 36          // name x 209
         readonly property int sidePad: 10
         readonly property int rowRadius: 8
-        readonly property int nameWidth: 338     // default columns
-        readonly property int dateWidth: 181
+        readonly property int dateWidth: 181     // Name takes the rest: 338 in a 920 pt window
         readonly property int sizeWidth: 97      // right-aligned, 7 pt pad
         readonly property int kindWidth: 121
         readonly property int cellPad: 7
