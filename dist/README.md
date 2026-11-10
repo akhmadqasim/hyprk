@@ -91,7 +91,7 @@ rm -rf ~/.local/share/hyprk-try ~/.local/share/hyprk-session   # data pribadi hy
 
 ## Batas yang sudah diketahui
 
-- Nested di layar 4K skala 150% terlihat agak buram karena GNOME memperbesar gambarnya. Login session tajam.
+- Nested di layar 4K (skala 150% atau 200%) sekarang tajam: aquamarine di hypr-dev sudah di-patch (fractional scale), dan skala Hyprland ikut skala monitor utama GNOME. Ganti dengan `HYPRK_SCALE=1.5 dist/try-nested.sh` kalau perlu.
 - Login session belum pernah dicoba (script-nya tidak dijalankan). Nested sudah dites beberapa kali (start, screenshot, keluar).
 - Hyprland 0.57.2 crash (segfault) saat keluar. Tidak berbahaya, script tetap membersihkan. Lihat `ISSUES.md`.
 - Tampilan kira-kira 65 sampai 85 persen mirip macOS per bagian (glass material sekitar 68 persen).

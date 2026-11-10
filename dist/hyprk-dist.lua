@@ -1,7 +1,7 @@
 -- hyprk dist: the normal hyprk config plus a monitor override that depends on how it is started.
 --   HYPRK_OUTPUT  output to configure ("" = all)
 --   HYPRK_MODE    "preferred" or e.g. "3840x2160@60"
---   HYPRK_SCALE   "1" (nested: aquamarine has no fractional scale) or "1.5" (login session on a 4K screen)
+--   HYPRK_SCALE   nested: the GNOME monitor scale (try-nested.sh; patched aquamarine renders at it), login: hyprk-session
 local root = os.getenv("HYPRK_ROOT") or "/mnt/code/hyprk"
 dofile(root .. "/config/hypr/hyprland.lua")
 hl.monitor({

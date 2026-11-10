@@ -5,10 +5,14 @@
    resolves to `IPC::Socket2::CSocket2::postEvent(SEvent&&)` (null deref, probably an event posted during shutdown).
    Upstream bug, harmless for nested (dist/try-nested.sh cleans up), but in the login session it means "Log Out"
    ends with a crash. Check `journalctl -k | grep segfault`.
-2. aquamarine's Wayland backend (nested) ignores the monitor mode/size from the Hyprland config: the window size
-   is whatever GNOME gives (1280x720 or about 1920x1050). `hl.monitor{mode=...}` only changes what Hyprland thinks.
-   It also has no fractional-scale or keyboard-shortcuts-inhibit support, so on a 150% host screen the nested picture
-   is upscaled (soft), and the Super key stays with GNOME. dist/hyprk-dist.lua adds Ctrl+Alt fallbacks (nested only).
+2. aquamarine's Wayland backend (nested) ignores the monitor mode/size from the Hyprland config: GNOME lets the
+   client pick, so the window opens at 1280x720 logical; resize it with the mouse. Fixed 2026-11-10: upstream
+   aquamarine 0.16.0 rendered that 1280x720 at buffer scale 1, so GNOME upscaled it 1.5-2x (soft text).
+   hypr-dev/patches/aquamarine-0.16.0-wayland-hidpi.patch adds wp_fractional_scale_v1 + wp_viewporter (and
+   wl_surface.preferred_buffer_scale): the buffer is logical size x host scale (2560x1440 at 200%), the cursor too,
+   and try-nested.sh sets HYPRK_SCALE to the GNOME primary monitor scale. Crops: reference/ours/nested-hidpi-*.png
+   (top: before, simulated 2x bilinear upscale of the old buffer; bottom: after). No keyboard-shortcuts-inhibit
+   yet, so the Super key stays with GNOME. dist/hyprk-dist.lua adds Ctrl+Alt fallbacks (nested only).
 3. At 1280x720 the Finder window (finder/run.sh, no height limit) is taller than the screen and overlaps the menu
    bar (reference/ours: grim of a nested session after `finder/run.sh /mnt/code/hyprk`). Needs a max size from the
    output size, or a windowrule that keeps windows inside the reserved area.
