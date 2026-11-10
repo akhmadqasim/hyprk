@@ -31,6 +31,7 @@ ShellRoot {
 
     // transient surfaces live on the primary screen
     Banners { modelData: Panels.screen }
+    HudWindow {}   // volume / brightness HUD on the focused screen (services/Hud.qml)
 
     // Rarely used full-screen surfaces exist only while open (and while they dematerialize after
     // closing, Panels.loaded), so their windows, delegates and textures cost nothing at idle (PERF.md).

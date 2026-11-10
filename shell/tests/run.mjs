@@ -482,5 +482,39 @@ test("mode buttons start inside the field, end in place", () => {
     });
 }
 
+// ---- volume / brightness HUD (lib/hud.js) ----
+{
+    const H = load("hud.js");
+    test("hud: volume symbols", () => {
+        assert.equal(H.volumeSymbol(3 / 16, false), "speaker.wave.1.fill");   // measured
+        assert.equal(H.volumeSymbol(7 / 16, false), "speaker.wave.2.fill");   // measured
+        assert.equal(H.volumeSymbol(0.9, false), "speaker.wave.3.fill");
+        assert.equal(H.volumeSymbol(0.5, true), "speaker.slash.fill");
+        assert.equal(H.volumeSymbol(0, false), "speaker.slash.fill");
+    });
+    test("hud: clamp", () => { assert.equal(H.clamp01(1.4), 1); assert.equal(H.clamp01(-1), 0); assert.equal(H.clamp01("x"), 0); });
+    test("hud: 16 dashes over 214 pt, first one a gap longer", () => {
+        const d = H.dashes(214, 16, 1);
+        assert.equal(d.length, 16);
+        assert.equal(d[0].x, 0);
+        assert.ok(Math.abs(d[15].x + d[15].w - 214) < 1e-9);
+        assert.ok(Math.abs(d[0].w - d[1].w - 1) < 1e-9);
+        assert.ok(Math.abs(d[2].x - d[1].x - 214 / 16) < 1e-9);
+    });
+    const svg = '<svg><path fill-rule="nonzero" fill="rgb(0%, 0%, 0%)" fill-opacity="1" d="M 34.9 27.9 L 39.8 17.2 Z"/>' +
+                '<path fill-opacity="0.3" d="M 29.1 23.8 L 32.7 17.2 Z"/><path d="M 21.8 31 L 5 14.3 Z"/></svg>';
+    test("hud: svg paths", () => {
+        const p = H.svgPaths(svg);
+        assert.equal(p.length, 3);
+        assert.equal(p[1].opacity, 0.3);
+        assert.equal(p[0].maxX, 39.8);
+    });
+    test("hud: wave.1 drops the outer wave", () => {
+        const p = H.withoutOuterWave(H.svgPaths(svg));
+        assert.equal(p.length, 2);
+        assert.ok(p.every(x => x.maxX < 34));
+    });
+}
+
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

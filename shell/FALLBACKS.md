@@ -18,6 +18,7 @@ Every surface has a designed state for missing features, so nothing looks broken
 | Bluetooth adapter | `Bluetooth.defaultAdapter` is null | CC Bluetooth module dimmed, "Not Available", not clickable. |
 | PipeWire / no sink | `State.hasAudio(Pipewire.ready, sink)` | CC Sound module dimmed, slider not draggable. |
 | Backlight (external monitor) | `brightnessctl -c backlight info` fails | CC Display module dimmed, slider shown full and not draggable. |
+| Volume / brightness HUD | `services/Hud.qml`: `Audio.available`; a readable `/sys/class/backlight/*/max_brightness` | No sink: no volume HUD. No backlight: no brightness HUD (the keys do nothing either). Without the plugin the capsule is the QML material (blurred wallpaper, `Theme.glass.tintClear`, no shadow); Reduce transparency: solid. Reduce motion: fades only, no scale, at most 150 ms. Values read at startup or from a new default sink are not shown. |
 | MPRIS player | `State.pickPlayer(Mpris.players)` returns null | Now Playing shows "Not Playing", empty art tile, controls at reduced opacity (macOS behavior). |
 | AirDrop, Stage Manager, Screen Mirroring | no backend | AirDrop toggles a local state only; Stage Manager and Mirroring buttons dimmed. |
 | Fonts | `Theme.pickFont()` checks `Qt.fontFamilies()` | SF Pro (or extracted "System Font"/.SF NS via `config/fontconfig/fonts.conf`), then Inter, Cantarell, Sans Serif. |
