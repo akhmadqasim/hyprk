@@ -16,8 +16,9 @@ ShellWindow {
     required property var modelData
     screen: modelData
 
+    // modelData, not screen: mapping the window re-emits screenChanged (binding loop)
     readonly property bool active: ["menu", "context", "alert", "nc"].indexOf(Panels.open) !== -1
-                                   && Panels.activeScreen === screen
+                                   && Panels.activeScreen === modelData
     visible: active || fadeOut.running
 
     anchors { top: true; left: true; right: true; bottom: true }

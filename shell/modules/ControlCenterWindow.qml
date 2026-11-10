@@ -14,7 +14,9 @@ ShellWindow {
     required property var modelData
     screen: modelData
 
-    readonly property bool shown: Panels.open === "cc" && Panels.activeScreen === screen
+    // modelData, not screen: mapping the window re-emits screenChanged, which made
+    // this binding loop on every open
+    readonly property bool shown: Panels.open === "cc" && Panels.activeScreen === modelData
     visible: shown || cc.opacity > 0
 
     anchors { top: true; left: true; right: true; bottom: true }
