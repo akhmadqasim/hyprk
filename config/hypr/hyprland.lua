@@ -169,7 +169,7 @@ end
 ------------------------------------------------------- liquid glass ----
 -- shell layers that carry glass (namespaces hyprk-<name>), shared by the plugin and the blur rule
 -- (no menubar: the macOS 26+ menu bar is transparent; its menus live in hyprk-overlay)
-local glassLayers = { "dock", "overlay", "controlcenter", "notifications", "spotlight", "switcher", "launchpad" }
+local glassLayers = { "dock", "overlay", "controlcenter", "notifications", "spotlight", "switcher", "launchpad", "hud" }
 -- Own compositor plugin (plugin/, see plugin/README.md). When it loads, the shell
 -- sends its glass shapes as ext-background-effect regions (HYPRK_GLASS=plugin) and the
 -- plugin draws Liquid Glass behind them. Without it the shell's QML glass is used.
@@ -184,8 +184,10 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
         hl.config({ plugin = { liquidglass = {
             -- menubar too: only its pressed title/status pills send glass regions
             namespaces = "hyprk-menubar,hyprk-" .. table.concat(glassLayers, ",hyprk-"),
-            -- recipes per layer: the plugin's own `materials` default (plugin/src/Config.cpp)
-            -- already maps dock, controlcenter, spotlight, overlay (menu) and menubar (menu)
+            -- recipes per layer: the plugin's own `materials` default (plugin/src/Config.cpp) plus the
+            -- volume/brightness HUD on clear glass (MAC-ANSWERS.md HUD); keep the rest in sync with Config.cpp
+            materials = "hyprk-dock:dock,hyprk-controlcenter:controlcenter,hyprk-overlay:menu,hyprk-menubar:menu,"
+                     .. "hyprk-spotlight:spotlight,hyprk-hud:clear",
         } } })
     end)
     if ok then hl.env("HYPRK_GLASS", "plugin") else print("hyprk: liquidglass not loaded: " .. tostring(err)) end
@@ -216,7 +218,7 @@ hl.layer_rule({
 hl.layer_rule({
     -- the shell animates these itself
     name = "hyprk-no-anim",
-    match = { namespace = "^hyprk-(overlay|controlcenter|spotlight|switcher|launchpad|mission|notifications|dock|menubar|wallpaper)$" },
+    match = { namespace = "^hyprk-(overlay|controlcenter|spotlight|switcher|launchpad|mission|notifications|dock|menubar|wallpaper|hud)$" },
     no_anim = true,
 })
 
@@ -249,12 +251,24 @@ for i = 1, 9 do
 end
 hl.bind("CTRL + left",  hl.dsp.focus({ workspace = "e-1" }))
 hl.bind("CTRL + right", hl.dsp.focus({ workspace = "e+1" }))
--- volume keys play the macOS volume pop (honors state/sound.json volumeFeedback)
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 6%+ && " .. sound .. " volume"), { locked = true, repeating = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 6%- && " .. sound .. " volume"),      { locked = true, repeating = true })
-hl.bind("XF86AudioMute",        hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true })
-hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("brightnessctl set 6%+"), { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("brightnessctl set 6%-"), { locked = true, repeating = true })
+-- volume and brightness keys as on macOS 27.2.1 (reference/re/MAC-ANSWERS.md HUD): one press = 1/16,
+-- Option+Shift (here Alt+Shift) = 1/64, clamped to 0..100 %. The shell's HUD follows the change
+-- (shell/services/Hud.qml). Volume keys unmute and play the macOS volume pop (state/sound.json volumeFeedback).
+-- brightnessctl takes whole percents only, so brightness steps in raw units of max/16 (max/64);
+-- -n1 keeps the backlight on at the bottom.
+local function volumeKey(dir, n)
+    return hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ 0; wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ " .. 1 / n .. dir .. " && " .. sound .. " volume")
+end
+local function brightnessKey(dir, n)
+    return hl.dsp.exec_cmd("brightnessctl -q -n1 set $(( ($(brightnessctl max) + " .. math.floor(n / 2) .. ") / " .. n .. " ))" .. dir)
+end
+for _, k in ipairs({ { "", 16 }, { "ALT + SHIFT + ", 64 } }) do
+    hl.bind(k[1] .. "XF86AudioRaiseVolume",  volumeKey("+", k[2]),     { locked = true, repeating = true })
+    hl.bind(k[1] .. "XF86AudioLowerVolume",  volumeKey("-", k[2]),     { locked = true, repeating = true })
+    hl.bind(k[1] .. "XF86MonBrightnessUp",   brightnessKey("+", k[2]), { locked = true, repeating = true })
+    hl.bind(k[1] .. "XF86MonBrightnessDown", brightnessKey("-", k[2]), { locked = true, repeating = true })
+end
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })
 
 -- screenshots like macOS: Cmd+Shift+3 full screen, Cmd+Shift+4 area (needs slurp), shutter sound
 -- xdg-user-dir knows localized folders; mkdir so a fresh home works
