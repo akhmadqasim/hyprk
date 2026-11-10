@@ -8,8 +8,10 @@
 #   HYPRK_WAIT=N   seconds to wait for the shell (default 40)
 #   HYPRK_SETTLE=N seconds to wait after the shell is up (default 3)
 #   HYPRK_MUTE=0   let the shell play sounds (muted by default)
-#   HYPRK_HEADLESS=1  add a 2560x1664@2x "MBA" output and shoot that (MacBook Air-like); its host window is
-#                     closed right after start (a short flash) unless HYPRK_HOST_WINDOW=1
+#   HYPRK_HEADLESS=1  add a 2560x1664@2x "MBA" output and shoot that (MacBook Air-like). No host window is
+#                     opened: AQ_WAYLAND_NO_OUTPUT=1 (hypr-dev aquamarine patch) keeps the Wayland backend
+#                     connected for the GPU allocator but creates no WAYLAND-1. HYPRK_HOST_WINDOW=1 keeps the
+#                     window; with an unpatched aquamarine it is removed right after start (a short flash)
 set -u
 HYPRK_ROOT=${HYPRK_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}
 export HYPRK_ROOT
@@ -32,6 +34,8 @@ LOG=$LOGDIR/nested-$(date +%H%M%S).log
 
 if [ "${HYPRK_HEADLESS:-0}" = 1 ]; then
     export HYPRK_PRIMARY=MBA
+    # no WAYLAND-1 host window at all (needs aquamarine-0.16.0-wayland-no-output.patch, see hypr-dev README)
+    [ "${HYPRK_HOST_WINDOW:-0}" = 1 ] || export AQ_WAYLAND_NO_OUTPUT=1
 fi
 export HYPRK_MUTE=${HYPRK_MUTE:-1}     # no sounds from test sessions unless HYPRK_MUTE=0
 "$HYPRK_ROOT/config/hypr/start.sh" >"$LOG" 2>&1 &
@@ -70,9 +74,11 @@ echo "smoke: instance $SIG on $NESTED"
 if [ "${HYPRK_HEADLESS:-0}" = 1 ]; then
     timeout 10 bash -c 'until hyprctl version >/dev/null 2>&1; do sleep 0.2; done'
     hyprctl output create headless MBA >/dev/null
-    # close the host window at once (this Hyprland cannot start without the Wayland backend: it supplies the GPU
-    # allocator), so tests do not sit on the user's desktop; HYPRK_HOST_WINDOW=1 keeps it
-    [ "${HYPRK_HOST_WINDOW:-0}" = 1 ] || hyprctl output remove WAYLAND-1 >/dev/null
+    # fallback for an aquamarine without the no-output patch: close the host window at once. With the patch
+    # WAYLAND-1 does not exist and this is a harmless no-op (errors ignored)
+    if [ "${HYPRK_HOST_WINDOW:-0}" != 1 ] && hyprctl monitors all 2>/dev/null | grep -q '^Monitor WAYLAND-1 '; then
+        hyprctl output remove WAYLAND-1 >/dev/null 2>&1 || true
+    fi
     SHOT_ARGS=(-o MBA)
 fi
 
