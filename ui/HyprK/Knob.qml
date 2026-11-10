@@ -14,15 +14,14 @@ Item {
     property real restH: 16
     property real grow: Tokens.motion.switchLift
     property real lift: 0
-    property real squash: 0                // > 0 flattens the knob while it lands against an end
     property bool reduceMotion: Tokens.reduceMotion
     property real cx: 0
     property real cy: 0
 
     readonly property real _s: 1 + (grow - 1) * (reduceMotion ? 0 : lift)
-    readonly property real _fill: Tokens.reduceTransparency ? 1 : 1 - lift
-    width: restW * _s * (1 + 0.25 * squash)
-    height: restH * _s * (1 - 0.15 * squash)
+    readonly property real _fill: Tokens.reduceTransparency ? 1 : Math.min(1, 1 - lift)
+    width: restW * _s
+    height: restH * _s
     x: cx - width / 2
     y: cy - height / 2
 
@@ -43,7 +42,7 @@ Item {
         radius: height / 2
         color: Qt.alpha(Tokens.control.knob, k._fill)
         // the lens edge: 0.5 pt grey outline (195 on 240 in the strip) and a white band inside it
-        border.width: k.lift > 0 ? 0.5 : 0
+        border.width: k.lift > 0 ? 0.5 : 0   // lift < 0: the switch's release spring dipping past rest
         border.color: Qt.rgba(0, 0, 0, 0.2 * k.lift)
         Rectangle {
             visible: k.lift > 0 && k._fill < 1

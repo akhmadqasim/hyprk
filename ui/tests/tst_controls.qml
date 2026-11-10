@@ -75,8 +75,9 @@ Item {
             compare(k.width, 21); compare(k.height, 13);
             compare(k.x, 1.5);                       // off: 1.5 pt inset
         }
-        // Q-settings-17: the knob grows x1.56 by 0.23 s after mouse-down, no overshoot, then shrinks on release.
-        // Sampled every 10 ms (the test clock is coarse: a sample can land a frame late).
+        // PC #60 section 4: the knob grows x1.56 from the mouse-down frame, easeInEaseOut 0.20 s (half at 0.10 s),
+        // no overshoot, then shrinks on release. Sampled every 10 ms (the test clock is coarse: a sample can land a
+        // frame late).
         function test_switch_press_lens() {
             const k = knobOf(refusing);
             mousePress(refusing);
@@ -90,6 +91,18 @@ Item {
             fuzzyCompare(peak, 32 * 1.56, 0.05);     // no overshoot past 49.9
             mouseRelease(refusing);
             tryCompare(k, "width", 32, 1000);
+        }
+        // the knob runs 4 % past the end before it settles (+0.75 pt on 18), it is not squashed
+        function test_switch_overshoot() {
+            const k = knobOf(sw);
+            backend.on = false;
+            tryCompare(k, "x", 2, 1000);
+            backend.on = true;
+            let maxX = 0;
+            for (let t = 0; t < 600; t += 10) { wait(10); maxX = Math.max(maxX, k.x); }
+            verify(maxX > 20.4 && maxX < 21, "max knob x " + maxX);
+            compare(k.width, 32);
+            fuzzyCompare(k.x, 20, 0.05);
         }
         function test_slider_press_lens() {
             let tr = null; for (let i = 0; i < sl.children.length; i++) if (sl.children[i].usable !== undefined) tr = sl.children[i];

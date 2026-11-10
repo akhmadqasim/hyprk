@@ -45,6 +45,14 @@ Item {
         if (settlesGlass && was !== target) Tokens.glassStepped(s);   // the glass moved with this jump too
     }
 
+    // start from v at rest and run to the target (a value handed over from another animation)
+    function from(v) {
+        fa.stop();
+        velocity = 0;
+        value = v;
+        if (_ready && Math.abs(target - v) > epsilon) _kick();
+    }
+
     function _kick() {
         if (fa.running) return;
         fa.start();

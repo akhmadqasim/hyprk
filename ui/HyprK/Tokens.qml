@@ -152,15 +152,19 @@ QtObject {
     // ---------- motion (springs: response s, dampingFraction) ----------
     readonly property QtObject motion: QtObject {
         // Controls (MAC-ANSWERS.md Q-settings-17, 120 Hz layer samples in controls-press-light.json)
-        // switch knob travel: 95 % at 0.2 s, overshoot 0.7 of 18 pt (4 %), settled by 0.45 s
-        readonly property real switchResponse: 0.43
-        readonly property real switchDamping: 0.72
-        // pressed knob: grows x1.56 (32 x 20 -> 50 x 31) into a clear lens; it starts 45 ms after mouse-down and peaks
-        // at 0.23 s on an ease-in-out sine, no overshoot (fits the quick-click series within 0.01); release: 0.3 s
+        // switch knob travel, 27.2.1 knob series (MAC-ANSWERS.md PC #60 section 4, probe-switch-knob-series-dark.json):
+        // an underdamped spring from rest, response 0.457 (omega 13.75): 50 % at 0.10 s, at the end 0.233 s, +4.2 % at
+        // 0.33 s; regular and mini alike, both directions. The knob really moves past the end (+0.75 pt regular).
+        readonly property real switchTravelResponse: 0.457
+        readonly property real switchTravelDamping: 0.71   // best fit over the 8 series (rms 0.003); 0.72 peaks low
+        // press: the knob grows x1.56 into the lens from the mouse-down frame, easeInEaseOut (0.42, 0, 0.58, 1) 0.20 s,
+        // no delay (rms 0.0002); release: it shrinks with the travel spring above (width tracks x in the series)
+        readonly property int switchLensIn: 200
+        readonly property var switchLensCurve: [0.42, 0, 0.58, 1, 1, 1]
+        // track colour cross-fade from release: about 0.25 s on to off, 0.23 s off to on, ease-out
+        readonly property int switchTrackFade: 240
+        // pressed knob: grows x1.56 (32 x 20 -> 50 x 31, mini 21 x 13 -> 33 x 20) into a clear lens
         readonly property real switchLift: 1.56
-        readonly property int lensDelay: 45
-        readonly property int lensDuration: 185
-        readonly property int lensRelease: 300
         // slider knob: 20 x 16 -> 25 x 20 (x1.25), glass in 0.17 s (0.02 s delay + 0.15 s), back in 0.15 s
         readonly property real sliderLift: 1.25
         readonly property int sliderLiftDelay: 20

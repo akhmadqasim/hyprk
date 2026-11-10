@@ -1,10 +1,12 @@
 import QtQuick
 import "controls.js" as G
 
-// macOS 27.2.1 switch (MAC-ANSWERS.md Q-settings-16, -17): accent track when on, white capsule knob (Knob).
-// Not glass at rest. On mouse-down the knob grows x1.56 into a clear lens (45 ms delay, 185 ms ease-in-out, no
-// overshoot) and shrinks back in 0.3 s on release. Click toggles on release; the knob can also be dragged across
-// and lands on the nearer end. Space toggles when it has keyboard focus.
+// macOS 27.2.1 switch (MAC-ANSWERS.md Q-settings-16, -17 and PC #60 section 4): accent track when on, white
+// capsule knob (Knob). Not glass at rest. On mouse-down the knob grows x1.56 into a clear lens (easeInEaseOut
+// 0.20 s from that frame); on release it shrinks back with the travel spring while it slides. The knob travels on
+// a spring (response 0.457, damping 0.72) that carries it 4 % past the end; the track colour cross-fades in
+// 0.24 s from the release. Click toggles on release; the knob can also be dragged across and lands on the nearer
+// end. Space toggles when it has keyboard focus.
 // Sizes: controlSize "regular" 54 x 24, "small" 44 x 20, "mini" 36 x 16 (Settings; default Tokens.switchSize).
 // Controlled: it shows `checked` and emits toggled(value); the caller owns the state, so
 // `checked: backend.on; onToggled: on => backend.set(on)` keeps its binding.
@@ -20,52 +22,55 @@ Item {
     implicitHeight: _m.height
     activeFocusOnTab: true
 
-    // knob position, 0 off .. 1 on (overshoots a little while it lands)
+    // knob position, 0 off .. 1 on (passes the end a little while it lands)
     Spring {
         id: along
         target: sw.checked ? 1 : 0
-        response: sw.reduceMotion ? Tokens.motion.reducedResponse : Tokens.motion.switchResponse
-        damping: sw.reduceMotion ? 1 : Tokens.motion.switchDamping
+        response: sw.reduceMotion ? Tokens.motion.reducedResponse : Tokens.motion.switchTravelResponse
+        damping: sw.reduceMotion ? 1 : Tokens.motion.switchTravelDamping
         epsilon: 0.001
         instant: ma.dragging
     }
-    readonly property real _a: Math.max(0, Math.min(1, along.value))
+    // track colour 0 off .. 1 on: a cross-fade from the release, not tied to the knob
+    property real _on: checked ? 1 : 0
+    Behavior on _on { NumberAnimation { duration: Tokens.motion.switchTrackFade; easing.type: Easing.OutCubic } }
 
-    // lens amount 0 .. 1: runs only between mouse-down and the end of the release
-    property real _lift: 0
-    SequentialAnimation {
-        id: liftIn
-        PauseAnimation { duration: Tokens.motion.lensDelay }
-        NumberAnimation {
-            target: sw; property: "_lift"; to: 1
-            duration: Tokens.motion.lensDuration; easing.type: Easing.InOutSine
-        }
-    }
+    // lens amount: grows while held (bezier), shrinks on the travel spring after the release (may dip below 0
+    // for a frame or two, as the Mac knob does: 31.5 of 32 wide)
+    property bool _held: false
+    property real _grow: 0
+    readonly property real _lift: _held ? _grow : shrink.value
     NumberAnimation {
-        id: liftOut
-        target: sw; property: "_lift"; to: 0
-        duration: Tokens.motion.lensRelease * sw._lift; easing.type: Easing.InOutSine
+        id: liftIn
+        target: sw; property: "_grow"; from: 0; to: 1
+        duration: Tokens.motion.switchLensIn
+        easing.type: Easing.BezierSpline; easing.bezierCurve: Tokens.motion.switchLensCurve
     }
-    function _press() { liftOut.stop(); liftIn.start(); }
-    function _release() { liftIn.stop(); if (_lift > 0) liftOut.start(); }
+    Spring {
+        id: shrink
+        target: 0
+        response: Tokens.motion.switchTravelResponse
+        damping: Tokens.motion.switchTravelDamping
+        epsilon: 0.002
+    }
+    function _press() { shrink.snap(); _grow = 0; _held = true; liftIn.restart(); }
+    function _release() { liftIn.stop(); _held = false; shrink.from(_grow); }
 
     Rectangle { // track; disabled: the background layers at opacity 0.5 (the knob stays white)
         anchors.fill: parent
         radius: height / 2
         readonly property color on: Tokens.control.switchOn
         readonly property color off: Tokens.control.trackOff
-        color: Qt.rgba(off.r + (on.r - off.r) * sw._a, off.g + (on.g - off.g) * sw._a, off.b + (on.b - off.b) * sw._a,
-                       (off.a + (on.a - off.a) * sw._a) * (sw.enabled ? 1 : Tokens.control.disabledOpacity))
+        color: Qt.rgba(off.r + (on.r - off.r) * sw._on, off.g + (on.g - off.g) * sw._on, off.b + (on.b - off.b) * sw._on,
+                       (off.a + (on.a - off.a) * sw._on) * (sw.enabled ? 1 : Tokens.control.disabledOpacity))
         FocusRing { visible: sw.activeFocus }
     }
     Knob {
         restW: sw._m.knobWidth; restH: sw._m.knobHeight
         grow: Tokens.motion.switchLift
         lift: sw._lift
-        // overshoot past an end flattens the knob against it instead of moving it
-        squash: Math.max(0, along.value - 1, -along.value) * 2
         reduceMotion: sw.reduceMotion
-        cx: G.switchKnobX(sw._m, sw._a) + sw._m.knobWidth / 2
+        cx: G.switchKnobX(sw._m, along.value) + sw._m.knobWidth / 2
         cy: sw.height / 2
     }
     MouseArea {
@@ -81,7 +86,7 @@ Item {
         function land() { along.target = Qt.binding(() => sw.checked ? 1 : 0); }
         onPressed: m => {
             pressX = m.x;
-            grabOffset = m.x - 4 - knobCx(sw._a);
+            grabOffset = m.x - 4 - knobCx(Math.max(0, Math.min(1, along.value)));
             dragging = false;
             sw._press();
         }
