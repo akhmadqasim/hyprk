@@ -74,11 +74,16 @@ namespace lg {
         float shadowD0 = 64, shadowD1 = 160, shadowOpacityLo = 0.04f, shadowOpacityHi = 0.4f, shadowOpacityHiDark = 0.6f;
         float shadowRadiusLo = 4, shadowRadius = 24, shadowOffsetY = 8, shadowSaturation = 1.f;
 
+        // rim: amount of the key/fill highlight's diffuse band, (1 - depth / 8 pt)^3 under the 1 pt key band
+        // (shaders/liquidglass.frag). 0.49 fitted to the Mac HUD (Control Center glass); the Notification Center
+        // card's rim fits the key band alone (MAC-ANSWERS PC #62 1a), so that recipe has 0
+        float diffuse = 0.49f;
+
         // ring shadow: offset y, stroke, blur radius, opacity (0 = off)
         float ringOffsetY = 0, ringStroke = 0, ringRadius = 0, ringOpacity = 0;
     };
 
-    // "regular", "clear", "dock", "controlcenter", "menu", "spotlight"; unknown names give regular
+    // "regular", "clear", "dock", "controlcenter", "menu", "spotlight", "notificationcenter"; unknown names give regular
     const SRecipe& recipeByName(std::string_view name);
 
     struct SResolved { // pt unless noted

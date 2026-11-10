@@ -51,7 +51,7 @@ uniform vec4  faceFill;             // rgb + amount ("normalFill")
 uniform float pxPerPt;              // output scale
 uniform vec3  keyYcc;               // key/fill highlight target (the highlight layer's vibrantColorMatrix)
 uniform vec2  keySpread;            // cos of the key and diffuse lobe spreads
-uniform float highlight;            // scale of the key/fill highlight (1 = Apple)
+uniform vec2  highlight;            // scale of the key/fill highlight (1 = Apple), diffuse band amount (SRecipe::diffuse)
 uniform vec2  darkSpec;             // colourBias of the dark specular, cos of its spread
 
 uniform float shadowOpacity;
@@ -288,7 +288,7 @@ void main() {
         // 2. Key/fill highlight layer (CASDFKeyFillHighlightEffect, key angle 0 = top, fill = bottom, under a
         //    vibrantColorMatrix): mix toward keyYcc(col) by a mask m, clamped to 1.5 (CASDFOutputEffect max).
         //    Mask fitted to the HUD over flat blue (top and bottom rows agree, light = dark):
-        //    key band 1 pt, 1.23 (0.25 + 0.75 k); diffuse 0.49 (1 - depth / 8 pt)^3 with 0.65 x the spread
+        //    key band 1 pt, 1.23 (0.25 + 0.75 k); diffuse 0.49 (1 - depth / 8 pt)^3 with 0.65 x the spread (0.49 = SRecipe::diffuse)
         //    (Apple's diffuse height and spread scales 8 and 0.65); curvature 0.75.
         {
             float ax   = abs(n.x), ay = abs(n.y);
@@ -301,8 +301,8 @@ void main() {
             lob       = lob / (0.75 * (1.0 - lob) + 1.0);
             float kk  = 1.0 - sat(depth / (pxPerPt * (1.0 + pl)));
             float dk  = 1.0 - sat(depth / (8.0 * pxPerPt));
-            float hm  = 1.23 * (0.25 * step(0.001, kk) + 0.75 * kk) * (lob.x + pl) + 0.49 * dk * dk * dk * lob.y;
-            hm        = min(hm * highlight, 1.5) * mat;
+            float hm  = 1.23 * (0.25 * step(0.001, kk) + 0.75 * kk) * (lob.x + pl) + highlight.y * dk * dk * dk * lob.y;
+            hm        = min(hm * highlight.x, 1.5) * mat;
             col       = mix(col, clamp(ycc(col, keyYcc), 0.0, 1.0), hm);
         }
 

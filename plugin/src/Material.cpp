@@ -129,7 +129,27 @@ namespace lg {
             return r;
         }();
 
-        constexpr std::array RECIPES = {REGULAR, CLEAR, DOCK, CONTROLCENTER, MENU, SPOTLIGHT};
+        // Notification Center cards and banners: _Glass.notificationCenter (NotificationBackgroundModifier,
+        // reference/re/27.2.1/decomp/NotificationCenter-glass.c) = Regular without the inactive branch; the probe's
+        // `notificationCenter` equals `regular` at every size but for shadow.vibrancyContribution (not modelled).
+        // The modifier ends in .surfaceSize(.medium), so the face does not follow the card's own 75 pt: the dark
+        // body over flat backdrops (MAC-ANSWERS "Notification Center glass and transitions (PC #62)": banner 33 /
+        // 114 over black / grey 127, NC card 128 / 104 / 32 over the column's x0.71 shadow) only fits with the
+        // probe's max luma at D >= 128 (0.35); at 75 pt (0.53) the banner over grey would read 129. Which D
+        // "medium" stands for is not decoded, so only the max luma is held there.
+        // Rim: the Mac's top / bottom line (outer px -> inner px -> body, dark: 68 -> 53 -> 35 over black, 132 -> 120
+        // -> 105 over grey, 154 -> 143 -> 129 over white; light 161 -> 151 -> 137 over black) is the 1 pt key band
+        // alone (mask 1.0 and 0.54 at the two px, within 1 of all eight); the HUD's diffuse band would add 0.45 / 0.31
+        // / 0.25 (83 -> 64 -> 44 over black, dark). The probe's highlight inputs equal Regular's.
+        constexpr SRecipe NOTIFICATIONCENTER = [] {
+            SRecipe r      = REGULAR;
+            r.name         = "notificationcenter";
+            r.dark.maxLuma = {0.35f, 0.35f, 0.35f};
+            r.diffuse      = 0;
+            return r;
+        }();
+
+        constexpr std::array RECIPES = {REGULAR, CLEAR, DOCK, CONTROLCENTER, MENU, SPOTLIGHT, NOTIFICATIONCENTER};
     }
 
     const SRecipe& recipeByName(std::string_view name) {

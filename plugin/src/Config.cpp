@@ -71,12 +71,15 @@ namespace lg {
         // shell namespaces (shell/modules/*.qml); launchpad, mission control and wallpaper stay plain.
         // No hyprk-menubar: the 27.2.1 menu bar has no glass (SkyLight SolariumMenuBarContext, title and
         // status pills are a blurred, colour-matrixed backdrop; reference/re/MENUBAR-REA-27.2.1.md).
-        // hyprk-controlcenter is reserved for the shell splitting Control Center out of hyprk-overlay.
+        // hyprk-controlcenter is reserved for the shell splitting Control Center out of hyprk-overlay,
+        // hyprk-notificationcenter for Notification Center leaving hyprk-overlay (its cards are not menu glass).
         const SStringKey STRINGS[] = {
-            {K("namespaces"), "hyprk-dock,hyprk-overlay,hyprk-controlcenter,hyprk-notifications,hyprk-spotlight,hyprk-switcher",
+            {K("namespaces"), "hyprk-dock,hyprk-overlay,hyprk-controlcenter,hyprk-notifications,hyprk-notificationcenter,hyprk-spotlight,hyprk-switcher",
              [](SParams& p, const std::string& v) { p.namespaces = splitList(v); }},
             {K("radii"), "", [](SParams& p, const std::string& v) { p.radii = parseNumberMap(v); }},
-            {K("materials"), "hyprk-dock:dock,hyprk-controlcenter:controlcenter,hyprk-overlay:menu,hyprk-spotlight:spotlight",
+            {K("materials"),
+             "hyprk-dock:dock,hyprk-controlcenter:controlcenter,hyprk-overlay:menu,hyprk-spotlight:spotlight,"
+             "hyprk-notifications:notificationcenter,hyprk-notificationcenter:notificationcenter",
              [](SParams& p, const std::string& v) { p.materials = parseStringMap(v); }},
             // SwiftUI's default spacing 8 (Spacing.defaultValue): CC tiles 12 apart stay separate at rest,
             // Spotlight's mode buttons fuse with the field only while they emerge from it

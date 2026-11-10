@@ -114,6 +114,15 @@ int main() {
         }
         CHECK(near(resolveMaterial(recipeByName("controlcenter"), 60).refractionAmount, -80, 1e-4));
         CHECK(std::string{recipeByName("nope").name} == "regular");
+        {
+            // Notification Center: Regular with the dark max luma held at the D >= 128 value (surfaceSize .medium)
+            const auto& nc = recipeByName("notificationcenter");
+            CHECK(std::string{nc.name} == "notificationcenter" && hasShadow(nc) && near(nc.dark.ycc.white, 1.125, 1e-6) && near(nc.diffuse, 0) &&
+                  near(reg.diffuse, 0.49, 1e-6));
+            CHECK(near(resolveMaterial(nc, 75).maxLumaDark, 0.35, 1e-6) && near(resolveMaterial(nc, 24).maxLumaDark, 0.35, 1e-6) &&
+                  near(resolveMaterial(nc, 75).maxLumaLight, 1));
+            CHECK(near(resolveMaterial(nc, 75).shadowOpacityDark, resolveMaterial(reg, 75).shadowOpacityDark, 1e-6));
+        }
         // 27.2.1 probe (reference/re/27.2.1/live/glass-params-*.json): Control Center (also the HUD) is the
         // same face light and dark, no bleed; Clear and Dock as resolved there; key spread 80 -> 90 over D 96 -> 192
         const auto& cc = recipeByName("controlcenter");

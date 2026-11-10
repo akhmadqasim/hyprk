@@ -577,7 +577,7 @@ namespace lg {
         glUniform1f(u.alpha, m_data.alpha);
         glUniform1f(u.aberration, p.aberration * scale);
         glUniform1f(u.pxPerPt, scale);
-        glUniform1f(u.highlight, p.highlight);
+        glUniform2f(u.highlight, p.highlight, r.diffuse);
         glUniform2f(u.shadowOffset, 0.f, r.shadowOffsetY * scale);
         glUniform1f(u.shadowTint, p.shadowTint);
         glUniform1f(u.shadowSaturation, r.shadowSaturation);

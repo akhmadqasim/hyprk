@@ -187,7 +187,7 @@ end
 -- shell layers that carry glass (namespaces hyprk-<name>), shared by the plugin and the blur rule
 -- (no menubar: the 27.2.1 bar has no glass or blur of its own, see reference/re/MENUBAR-REA-27.2.1.md;
 -- its menus are glass in hyprk-overlay)
-local glassLayers = { "dock", "overlay", "controlcenter", "notifications", "spotlight", "switcher", "hud" }
+local glassLayers = { "dock", "overlay", "controlcenter", "notifications", "notificationcenter", "spotlight", "switcher", "hud" }
 -- Own compositor plugin (plugin/, see plugin/README.md). When it loads, the shell
 -- sends its glass shapes as ext-background-effect regions (HYPRK_GLASS=plugin) and the
 -- plugin draws Liquid Glass behind them. Without it the shell's QML glass is used.
@@ -206,7 +206,9 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
             -- MAC-ANSWERS.md "REA 27.2.1" section 1) and Cmd-Tab on the Dock's (pixel-identical on 27.2.1,
             -- MAC-ANSWERS.md Q-dock-19); keep the rest in sync with Config.cpp
             materials = "hyprk-dock:dock,hyprk-controlcenter:controlcenter,hyprk-overlay:menu,"
-                     .. "hyprk-spotlight:spotlight,hyprk-hud:controlcenter,hyprk-switcher:dock",
+                     .. "hyprk-spotlight:spotlight,hyprk-hud:controlcenter,hyprk-switcher:dock,"
+                     -- banners and Notification Center cards: _Glass.notificationCenter (MAC-ANSWERS PC #62)
+                     .. "hyprk-notifications:notificationcenter,hyprk-notificationcenter:notificationcenter",
         } } })
     end)
     if ok then hl.env("HYPRK_GLASS", "plugin") else print("hyprk: liquidglass not loaded: " .. tostring(err)) end
@@ -230,7 +232,7 @@ end
 -- draws a blurred-wallpaper material; this adds blur of the windows behind.
 -- ignore_alpha keeps fully transparent parts (shadows, click catchers) unblurred.
 -- Namespaces (set in shell/modules/*.qml via WlrLayershell.namespace):
---   hyprk-menubar hyprk-dock hyprk-overlay hyprk-controlcenter hyprk-notifications
+--   hyprk-menubar hyprk-dock hyprk-overlay hyprk-controlcenter hyprk-notifications hyprk-notificationcenter
 --   hyprk-spotlight hyprk-switcher hyprk-mission hyprk-hud hyprk-wallpaper
 hl.layer_rule({
     name = "hyprk-glass-blur",
@@ -241,7 +243,7 @@ hl.layer_rule({
 hl.layer_rule({
     -- the shell animates these itself
     name = "hyprk-no-anim",
-    match = { namespace = "^hyprk-(overlay|controlcenter|spotlight|switcher|mission|notifications|dock|menubar|wallpaper|hud)$" },
+    match = { namespace = "^hyprk-(overlay|controlcenter|spotlight|switcher|mission|notifications|notificationcenter|dock|menubar|wallpaper|hud)$" },
     no_anim = true,
 })
 
