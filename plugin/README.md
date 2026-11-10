@@ -212,9 +212,12 @@ desaturated; on a dark colour the title turns white and the inactive lights dark
 `titlebar_color` / `titlebar_color_inactive`, or light glass with `titlebar_glass = 1`. The client's own
 rounded top corners sit on the bar's colour, so no notch shows. Hyprland 0.57.2 rounds a whole surface with
 one radius (no per-corner control), which is why the corners are filled rather than squared. Colour sampling
-is skipped on rotated outputs. Then traffic lights #FF5F57 / #FEBC2E / #28C840 (grey when the
-window is inactive, glyphs × − + while the pointer is over them), and the title centred in SF Pro Text 13
-semibold. Close sends the client a close request, minimise moves the window to `special:minimized`, zoom
+is skipped on rotated outputs. Then the traffic lights (liquid-glass-re SPEC 13, drawn with cairo): two-stop
+vertical gradients (close #FF6D63 -> #F57269 a0.8, minimise #FBB316 -> #FFD134 a0.92, zoom #5ACF1F -> #79D34C
+a0.73; dark bars their dark stops), a 0.75 pt rim over the fill (black 0.20 / 0.12 dark), a flat translucent
+inactive fill with a 0.14 rim, flat pressed colours while the pointer stays on the pressed light, and
+1.2 pt round-cap glyphs (× − +) that fade in on hover on a 0.3 s critically damped spring. The title is
+centred in SF Pro Text 13 semibold. Close sends the client a close request, minimise moves the window to `special:minimized`, zoom
 toggles maximised, dragging the rest of the bar moves the window.
 
 `titlebar = "auto"` (default) gives a bar to Wayland clients that bound xdg-decoration (Hyprland always
@@ -226,7 +229,7 @@ own) prevents one, `titlebar = "classes"` only uses the regex, `"off"` disables 
 |---|---|
 | `titlebar` | `auto` |
 | `titlebar_classes` / `titlebar_exclude` | "" / `^(org\.hyprk\..*|hyprk-.*)$` |
-| `titlebar_height` / `titlebar_button` / `titlebar_gap` / `titlebar_inset` | 32 / 14 / 7 / 15 pt (SPEC: bar 32, buttons 14; gap and inset measured on the reference screenshot) |
+| `titlebar_height` / `titlebar_button` / `titlebar_gap` / `titlebar_inset` | 32 / 14 / 9 / 15 pt (SPEC: bar 32, buttons 14, gap 9; inset measured on the reference screenshot, toolbar windows use 19) |
 | `titlebar_font` / `titlebar_font_size` | `SF Pro Text` / 13 |
 | `titlebar_color` / `titlebar_color_inactive` | `0xF3F1EFFF` / `0xF6F5F4FF` |
 | `titlebar_text` / `titlebar_text_inactive` | `0x333333D9` / `0x33333359` |

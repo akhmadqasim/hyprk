@@ -1,4 +1,6 @@
 #pragma once
+
+#include <chrono>
 // macOS title bar (traffic lights + centred title) as a window decoration for windows that do not
 // draw one themselves (server-side decorations), e.g. foot and Qt apps.
 
@@ -54,13 +56,19 @@ namespace lg {
         void                     act(int button);
         SP<Render::ITexture>     titleTexture(const std::shared_ptr<const SParams>& params, const std::string& title, bool active, bool dark, float scale, double maxWidth);
         SP<Render::ITexture>     glyphTexture(int button, float scale);
+        // one light (fill, rim) for a state: 0 active, 1 inactive, 2 pressed
+        SP<Render::ITexture>     lightTexture(int button, int state, bool dark, float scale);
+        float                    glyphAlpha(); // hover glyphs fade on a 0.3 s critically damped spring
 
         PHLWINDOWREF             m_window;
         ParamsFn                 m_params;
         CBox                     m_assigned;
         double                   m_height  = 0; // height currently reserved
         bool                     m_hover   = false;
+        int                      m_hoverButton = -1; // light under the pointer
         int                      m_pressed = -1;
+        float                    m_glyphFrom = 0; // glyph alpha when the hover last changed
+        std::chrono::steady_clock::time_point m_hoverSince{};
         bool                     m_dragging = false;
 
         // wantsTitlebar() verdict for this params snapshot and window class (held, so no ABA)
@@ -78,6 +86,7 @@ namespace lg {
             SP<Render::ITexture>           tex;
         } m_title;
         std::array<SP<Render::ITexture>, 3> m_glyphs;
+        std::array<SP<Render::ITexture>, 18> m_lights; // [state][dark][button]
         float                               m_glyphScale = 0;
         std::shared_ptr<const SParams>      m_glyphParams;
         std::optional<SRgba>                m_sampled;

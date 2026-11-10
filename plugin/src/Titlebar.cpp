@@ -24,6 +24,7 @@
 #include <hyprland/src/protocols/XDGDecoration.hpp>
 #undef private
 
+#include <cairo/cairo.h>
 #include <algorithm>
 #include <format>
 #include <vector>
@@ -60,11 +61,19 @@ namespace lg {
 
     // ── decoration ──────────────────────────────────────────────────────────
 
-    // macOS 27 traffic lights
-    static constexpr std::array<uint32_t, 3> LIGHTS   = {0xFF5F57FF, 0xFEBC2EFF, 0x28C840FF};
-    static constexpr std::array<uint32_t, 3> GLYPHS   = {0x4D0000FF, 0x995700FF, 0x006500FF};
-    static constexpr std::array<const char*, 3> SIGNS = {"×", "−", "+"};
-    static constexpr uint32_t                 GREYED  = 0xDDDCDBFF, GREYED_DARK = 0x5A5A5CFF;
+    // macOS 27 traffic lights (liquid-glass-re SPEC 13): two-stop vertical gradients top -> bottom,
+    // [dark][button][stop] as 0xRRGGBB + alpha
+    struct SStop {
+        uint32_t rgb;
+        float    a;
+    };
+    static constexpr SStop    LIGHT_GRADIENT[2][3][2] = {
+        {{{0xFF6D63, 1}, {0xF57269, 0.8f}}, {{0xFBB316, 1}, {0xFFD134, 0.92f}}, {{0x5ACF1F, 1}, {0x79D34C, 0.73f}}},
+        {{{0xFA6A61, 1}, {0xEF6962, 1}}, {{0xFAB51A, 1}, {0xFECF34, 1}}, {{0x56C83A, 1}, {0x52C43D, 1}}},
+    };
+    static constexpr uint32_t LIGHT_PRESSED[2][3] = {{0xC04741, 0xBF8E22, 0x1E9730}, {0xFF8D85, 0xFFEA5C, 0x56F66E}};
+    static constexpr uint32_t GLYPH_RGB[3]        = {0x730000, 0x985600, 0x006200};
+    static constexpr double   GLYPH_SPRING        = 0.3; // s, critically damped
     // title text on a dark bar (light bars use titlebar_text / titlebar_text_inactive)
     static constexpr SRgba                    TEXT_ON_DARK{1, 1, 1, 0.85f}, TEXT_ON_DARK_INACTIVE{1, 1, 1, 0.4f};
 
@@ -133,17 +142,102 @@ namespace lg {
         return m_title.tex;
     }
 
+    static void setSource(cairo_t* cr, uint32_t rgb, double a) {
+        cairo_set_source_rgba(cr, ((rgb >> 16) & 0xFF) / 255.0, ((rgb >> 8) & 0xFF) / 255.0, (rgb & 0xFF) / 255.0, a);
+    }
+
+    // draws into a fresh square ARGB surface of the light's size and turns it into a texture
+    template <typename F>
+    static SP<Render::ITexture> paintLight(double size, F&& paint) {
+        const int        px = std::max(1, int(std::ceil(size)));
+        cairo_surface_t* s  = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, px, px);
+        cairo_t*         cr = cairo_create(s);
+        paint(cr, px / 2.0, size / 2.0);
+        cairo_destroy(cr);
+        cairo_surface_flush(s);
+        auto tex = g_pHyprRenderer->createTexture(s);
+        cairo_surface_destroy(s);
+        return tex;
+    }
+
+    // the button's size and scale changed: drop the cached textures
+    static void resetOnScale(float& cachedScale, std::shared_ptr<const SParams>& cachedParams, const std::shared_ptr<const SParams>& params, float scale,
+                             std::array<SP<Render::ITexture>, 3>& glyphs, std::array<SP<Render::ITexture>, 18>& lights) {
+        if (cachedScale == scale && cachedParams == params)
+            return;
+        glyphs       = {};
+        lights       = {};
+        cachedScale  = scale;
+        cachedParams = params;
+    }
+
+    // 1.2 pt round-cap strokes on a 14 pt artboard: x, minus, plus
     SP<Render::ITexture> CTitlebar::glyphTexture(int button, float scale) {
         const auto params = m_params();
-        if (m_glyphScale != scale || m_glyphParams != params) { // size and font follow the config
-            m_glyphs      = {};
-            m_glyphScale  = scale;
-            m_glyphParams = params;
-        }
+        resetOnScale(m_glyphScale, m_glyphParams, params, scale, m_glyphs, m_lights);
         auto& tex = m_glyphs[button];
         if (!tex)
-            tex = g_pHyprRenderer->renderText(SIGNS[button], rgba(rgbaFromHex(GLYPHS[button])), int(std::round(params->titlebarButton * 0.85 * scale)), false, params->titlebarFont, 0, 700);
+            tex = paintLight(params->titlebarButton * scale, [&](cairo_t* cr, double c, double r) {
+                const double k = 2 * r / 14.0; // artboard pt -> px
+                auto line = [&](double x1, double y1, double x2, double y2) {
+                    cairo_move_to(cr, c + (x1 - 7) * k, c + (y1 - 7) * k);
+                    cairo_line_to(cr, c + (x2 - 7) * k, c + (y2 - 7) * k);
+                };
+                switch (button) {
+                    case 0: line(4.6, 4.6, 9.4, 9.4); line(9.4, 4.6, 4.6, 9.4); break;
+                    case 1: line(3.8, 7, 10.2, 7); break;
+                    default: line(3.8, 7, 10.2, 7); line(7, 3.8, 7, 10.2); break;
+                }
+                setSource(cr, GLYPH_RGB[button], 1);
+                cairo_set_line_width(cr, 1.2 * k);
+                cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
+                cairo_stroke(cr);
+            });
         return tex;
+    }
+
+    // fill (gradient when active, flat when inactive or pressed) and a 0.75 pt rim over it
+    SP<Render::ITexture> CTitlebar::lightTexture(int button, int state, bool dark, float scale) {
+        const auto params = m_params();
+        resetOnScale(m_glyphScale, m_glyphParams, params, scale, m_glyphs, m_lights);
+        auto& tex = m_lights[(state * 2 + (dark ? 1 : 0)) * 3 + button];
+        if (!tex)
+            tex = paintLight(params->titlebarButton * scale, [&](cairo_t* cr, double c, double r) {
+                cairo_arc(cr, c, c, r, 0, 2 * M_PI);
+                if (state == 0) {
+                    const auto&      g   = LIGHT_GRADIENT[dark][button];
+                    cairo_pattern_t* pat = cairo_pattern_create_linear(0, c - r, 0, c + r);
+                    for (int i = 0; i < 2; ++i)
+                        cairo_pattern_add_color_stop_rgba(pat, i, ((g[i].rgb >> 16) & 0xFF) / 255.0, ((g[i].rgb >> 8) & 0xFF) / 255.0, (g[i].rgb & 0xFF) / 255.0, g[i].a);
+                    cairo_set_source(cr, pat);
+                    cairo_fill(cr);
+                    cairo_pattern_destroy(pat);
+                } else if (state == 2) {
+                    setSource(cr, LIGHT_PRESSED[dark][button], 1);
+                    cairo_fill(cr);
+                } else {
+                    if (dark)
+                        cairo_set_source_rgba(cr, 0.96, 0.96, 0.96, 0.18);
+                    else
+                        cairo_set_source_rgba(cr, 0.886, 0.886, 0.93, 0.30);
+                    cairo_fill(cr);
+                }
+                const double w = 0.75 * r / 7.0; // 0.75 pt
+                cairo_arc(cr, c, c, r - w / 2, 0, 2 * M_PI);
+                if (state == 1)
+                    cairo_set_source_rgba(cr, dark ? 1 : 0, dark ? 1 : 0, dark ? 1 : 0, 0.14);
+                else
+                    cairo_set_source_rgba(cr, 0, 0, 0, dark ? 0.12 : 0.20);
+                cairo_set_line_width(cr, w);
+                cairo_stroke(cr);
+            });
+        return tex;
+    }
+
+    float CTitlebar::glyphAlpha() {
+        const double t = std::chrono::duration<double>(std::chrono::steady_clock::now() - m_hoverSince).count();
+        const double w = 2 * M_PI / GLYPH_SPRING, x = 1 - (1 + w * t) * std::exp(-w * t);
+        return float(m_glyphFrom + ((m_hover ? 1.0 : 0.0) - m_glyphFrom) * x);
     }
 
     void CTitlebar::draw(Render::CRenderContext& ctx, PHLMONITOR mon, float const& a, const Render::SWindowRenderPresentation& presentation) {
@@ -205,33 +299,27 @@ namespace lg {
         fill.workspacePresentation = presentation;
         g_pHyprRenderer->addPassElement(ctx, makeUnique<CRectPassElement>(fill));
 
-        // traffic lights: colour when active or hovered, grey otherwise; glyphs on hover
-        const auto layout = geometry(*params, {}).layout; // size only; positions come from `bar`
+        // traffic lights: colour when active or hovered, flat translucent otherwise, the pressed colour
+        // while the pointer is still on the pressed light; glyphs fade in on hover
+        const auto  layout = geometry(*params, {}).layout; // size only; positions come from `bar`
+        const float glyphA = glyphAlpha();
+        auto        place  = [&](const SP<Render::ITexture>& tex, const CBox& b, float alpha) {
+            if (!tex || !tex->ok() || alpha <= 0.002f)
+                return;
+            CTexPassElement::SRenderData d;
+            d.tex = tex;
+            d.box = CBox{b.x + (b.w - tex->m_size.x) / 2, b.y + (b.h - tex->m_size.y) / 2, tex->m_size.x, tex->m_size.y}.round();
+            d.a   = alpha;
+            g_pHyprRenderer->addPassElement(ctx, makeUnique<CTexPassElement>(d));
+        };
         for (int i = 0; i < 3; ++i) {
-            const CBox b = layout.buttons[i].copy().translate(bar.pos()).scale(scale).round();
-
-            CRectPassElement::SRectData ring; // thin darker rim like macOS
-            ring.box   = b;
-            ring.round = int(b.w / 2);
-            ring.color = CHyprColor{0, 0, 0, 0.12f * a};
-            g_pHyprRenderer->addPassElement(ctx, makeUnique<CRectPassElement>(ring));
-
-            CRectPassElement::SRectData dot;
-            dot.box   = b.copy().expand(-0.5 * scale);
-            dot.round = int(dot.box.w / 2);
-            dot.color = (isActive || m_hover) ? rgba(rgbaFromHex(LIGHTS[i]), a) : rgba(rgbaFromHex(m_dark ? GREYED_DARK : GREYED), a);
-            g_pHyprRenderer->addPassElement(ctx, makeUnique<CRectPassElement>(dot));
-
-            if (m_hover) {
-                if (const auto tex = glyphTexture(i, scale); tex && tex->ok()) {
-                    CTexPassElement::SRenderData glyph;
-                    glyph.tex = tex;
-                    glyph.box = CBox{b.x + (b.w - tex->m_size.x) / 2, b.y + (b.h - tex->m_size.y) / 2, tex->m_size.x, tex->m_size.y}.round();
-                    glyph.a   = a;
-                    g_pHyprRenderer->addPassElement(ctx, makeUnique<CTexPassElement>(glyph));
-                }
-            }
+            const CBox b     = layout.buttons[i].copy().translate(bar.pos()).scale(scale).round();
+            const int  state = m_pressed == i && m_hoverButton == i ? 2 : (isActive || m_hover) ? 0 : 1;
+            place(lightTexture(i, state, dark, scale), b, a);
+            place(glyphTexture(i, scale), b, a * glyphA);
         }
+        if (std::abs(glyphA - (m_hover ? 1.f : 0.f)) > 0.002f)
+            damageEntire(); // keep the fade going
 
         // centred title (SF Pro 13 semibold)
         const auto title = window->metadata().title();
@@ -253,9 +341,17 @@ namespace lg {
             return;
         const auto [bar, layout] = geometry(*params, window->presentation().floatingOffset());
         const bool hover         = lightsArea(layout, params->titlebarGap).translate(bar.pos()).containsPoint(global);
+        const int  button        = buttonAt(layout, global.x - bar.x, global.y - bar.y, params->titlebarGap);
         if (hover != m_hover) {
-            m_hover = hover;
+            m_glyphFrom  = glyphAlpha();
+            m_hoverSince = std::chrono::steady_clock::now();
+            m_hover      = hover;
             damageEntire();
+        }
+        if (button != m_hoverButton) {
+            m_hoverButton = button;
+            if (m_pressed >= 0)
+                damageEntire();
         }
     }
 
@@ -289,6 +385,8 @@ namespace lg {
             if (!Desktop::focusState()->isWindowActive(window))
                 Desktop::focusState()->rawWindowFocus(window, Desktop::FOCUS_REASON_CLICK);
             m_pressed = hit;
+            if (hit >= 0)
+                damageEntire(); // pressed colour
             if (hit < 0) { // the rest of the bar moves the window
                 g_layoutManager->beginDragTarget(window->layoutTarget(), MBIND_MOVE);
                 m_dragging = true;
@@ -301,6 +399,8 @@ namespace lg {
         onButtonRelease();
         if (!wasDragging && hit >= 0 && hit == m_pressed)
             act(hit);
+        if (m_pressed >= 0)
+            damageEntire();
         m_pressed = -1;
         return true;
     }
