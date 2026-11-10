@@ -21,6 +21,12 @@ Item {
     property color selectionColor: Tokens.control.segmentSelected
     property real selectionInset: Tokens.control.segmentInset
     property bool reduceMotion: Tokens.reduceMotion
+    property real iconSize: 16             // `icon` images are drawn iconSize x iconSize (rendered at 2x)
+    property real iconOpacity: 1           // opacity of the `icon` images (e.g. to apply a colour's alpha)
+    property var separatorBoundaries: null // null = a separator at every inner boundary; or an array of the
+                                           // boundaries to draw: b sits between segment b-1 and b (1..count-1)
+    property color separatorColor: Tokens.control.separator
+    property bool separatorFade: true      // false = separators stay visible next to the selection pill
     readonly property int count: model ? model.length : 0
     readonly property int pressedIndex: ma.pressed && ma.containsMouse ? ma.indexAt(ma.mouseX) : -1
     signal activated(int index)
@@ -105,12 +111,14 @@ Item {
             required property int index
             readonly property int b: index + 1      // boundary between segment b-1 and b
             readonly property real d: b < pos.value ? pos.value - b : b > pos.value + 1 ? b - pos.value - 1 : 0
+            objectName: "separator" + b
+            visible: sc.separatorBoundaries === null || sc.separatorBoundaries.indexOf(b) >= 0
             x: b * sc._w - 0.5
             width: 1
             height: Math.round(sc.height * 0.55)    // Finder ref: 24 of 44
             anchors.verticalCenter: parent.verticalCenter
-            color: Tokens.control.separator
-            opacity: pill.visible ? Math.min(1, d * 2) : 1
+            color: sc.separatorColor
+            opacity: pill.visible && sc.separatorFade ? Math.min(1, d * 2) : 1
         }
     }
     Repeater {
@@ -130,10 +138,12 @@ Item {
                 anchors.centerIn: parent
                 spacing: 4
                 Image {
+                    objectName: "icon"
                     visible: !!seg.entry.icon
                     source: seg.entry.icon || ""
-                    width: 16; height: 16      // guessed
-                    sourceSize: Qt.size(32, 32)
+                    width: sc.iconSize; height: sc.iconSize   // 16 guessed
+                    sourceSize: Qt.size(2 * sc.iconSize, 2 * sc.iconSize)
+                    opacity: sc.iconOpacity
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {

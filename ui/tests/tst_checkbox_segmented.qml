@@ -51,6 +51,16 @@ Item {
         currentIndex: 0
     }
 
+    SegmentedControl {
+        id: iconSeg
+        x: 200; y: 200
+        segmentWidth: 46
+        reduceMotion: true
+        model: [{ icon: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24'/></svg>" },
+                { glyph: "list" }, { glyph: "grid_view" }, { glyph: "star" }]
+        currentIndex: 2
+    }
+
     SignalSpy { id: refusingSpy; target: refusing; signalName: "toggled" }
     SignalSpy { id: mixedSpy; target: mixedBox; signalName: "toggled" }
     SignalSpy { id: disabledSpy; target: disabledBox; signalName: "toggled" }
@@ -195,6 +205,44 @@ Item {
             compare(seg.currentIndex, 2);
             const pill = findChild(seg, "pill");
             compare(pill.x, 2 * seg.width / 3 + seg.selectionInset);
+        }
+        function test_segmented_icon_defaults_and_options() {
+            const img = findChild(iconSeg, "icon");
+            compare(img.width, 16);
+            compare(img.height, 16);
+            compare(img.sourceSize.width, 32);             // rendered at 2x
+            compare(img.opacity, 1);
+            iconSeg.iconSize = 24;
+            iconSeg.iconOpacity = 0.85;
+            compare(img.width, 24);
+            compare(img.sourceSize.width, 48);
+            compare(img.opacity, 0.85);
+            iconSeg.iconSize = 16;
+            iconSeg.iconOpacity = 1;
+        }
+        function test_segmented_separator_boundaries() {
+            compare(iconSeg.separatorBoundaries, null);    // default: every inner boundary
+            for (let b = 1; b < 4; b++) verify(findChild(iconSeg, "separator" + b).visible);
+            iconSeg.separatorBoundaries = [2, 3];          // not between segment 0 and 1
+            verify(!findChild(iconSeg, "separator1").visible);
+            verify(findChild(iconSeg, "separator2").visible);
+            verify(findChild(iconSeg, "separator3").visible);
+            iconSeg.separatorBoundaries = [];
+            for (let b = 1; b < 4; b++) verify(!findChild(iconSeg, "separator" + b).visible);
+            iconSeg.separatorBoundaries = null;
+        }
+        function test_segmented_separator_color() {
+            compare(findChild(iconSeg, "separator1").color, Tokens.control.separator);
+            iconSeg.separatorColor = "red";
+            compare(findChild(iconSeg, "separator1").color, "#ff0000");
+            iconSeg.separatorColor = Qt.binding(() => Tokens.control.separator);
+        }
+        function test_segmented_separator_fade() {
+            const next = findChild(iconSeg, "separator2");  // touches the pill on segment 2
+            compare(next.opacity, 0);
+            iconSeg.separatorFade = false;
+            compare(next.opacity, 1);
+            iconSeg.separatorFade = true;
         }
         function test_segmented_accessible() {
             compare(seg.Accessible.role, Accessible.Grouping);
