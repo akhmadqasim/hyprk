@@ -955,3 +955,165 @@ Files: pictures in `reference/screens/27.2.1/windows/`, data in `reference/re/27
   - Esc cancel: the image slides back to the source in about 0.25 s, ease-out (.28 .36 .44 .52 .59 .65 .72 .78 .84 .89 .93 .96 .99 1), no fade.
   (curmon + 60 fps recording + `finder-drag-image-dark.png`)
 - Q-windows-28: not measured: neither Chrome nor VS Code is installed on this Mac.
+
+## REA 27.2.1: Dock, Mission Control, Cmd-Tab
+
+Static analysis only, macOS 27.2.1 (26B131), M2. Dock = `/System/Library/CoreServices/Dock.app/Contents/MacOS/Dock`
+(arm64e slice, symbols stripped; names come from ObjC metadata, objc_msgSend stubs and ivar tables). Mission Control =
+`WindowManager.framework` (dyld cache, disassembled with `dyld_info -disassemble`) plus `WindowManager.app` (WindowManagerAgent).
+Addresses are unslid VAs in the named image. Pseudocode excerpts are in `~/hyprk/reference/re/27.2.1/decomp/dock-*.c`.
+Defaults on this account (read-only check): no `genie-speed` and no `com.apple.WindowManager` spring keys, so built-in defaults apply.
+
+### 1. Dock launch bounce, attention bounce
+- Code: Dock `-[Tile updateBouncing]` 0x10002d9f4. Height use: Dock `-[Tile updateRect]` 0x100012088. Setup: Dock
+  `-[DockBar handleDockEventAppLaunch:alreadyExists:appLaunch:context:]` 0x10008dfd8 (writes at 0x10008e134..0x10008e15c),
+  `handleDockEventAppNeedsAttention:...` 0x10009140c, `handleDockEventAddBounce:context:` 0x100091590.
+- Tile ivars: `_bounceNow` f 0xe0, `_bouncePeriod` f 0xe4, `_bounceST` d 0x108, `_bounceDur` d 0x110, flags byte 0x68
+  (`_bouncing`, `_bounceEnding`, `_bounceStop`, `_notifyBounce`). Clock = `mainMillis` (ms).
+- Launch bounce (`_notifyBounce` = 0): `_bouncePeriod` = 350.0 (half-period), `_bounceDur` = 120000 ms cap.
+  `bounceNow = 1 - (x/350)^2`, with x = |fmod(t + 350, 700) - 350|. So the shape is a plain parabola, `h = H * 4u(1-u)`,
+  u = t / 700 ms. There is no hold at the top. The icon is on the ground only at u = 0.
+- Launch end: setting `_bounceStop` rounds `_bounceDur` up to `(floor(t/700) + 1) * 700`. So the bounce in progress
+  finishes and the icon stays down. No settle.
+- Launch height (bottom Dock): `offset = bounceNow * ((tileRectH - 8) * 0.2 + 6) * (1 - autoHide)`, with 0.2 = float
+  0x1002580c0. For tile 33 this gives 11.0. For tile 64 it gives 17.2.
+- Attention bounce (`_notifyBounce` = 1, `requestUserAttention`): this is a separate curve. `_bouncePeriod` = 2000 ms cycle.
+  - Inside each cycle there are three parabolic hops: 500 ms at amplitude 1.0, then 326 ms at 0.5, then 212 ms at 0.25.
+  - The icon then rests until 2000 ms. A fourth hop (138 ms at 0.125) is computed but zeroed in code.
+  - Amplitude = `(tileRectH + 1) * (1 - autoHide) + autoHideOffset`, so a full tile height plus 1 pt.
+  - When the duration ends, it stops at the next rest point.
+- Attention durations, DockCore `DockGlobals` init 0x1001a66d4. All are in seconds and can be overridden with prefs:
+  - `bounce-duration` 60 (initial bouncing time, cycles of 2 s);
+  - then every `bounce-secondary-interval` 60 s, it bounces again for `bounce-secondary-duration` 3 s.
+- Single "bounce once" event (`AddBounce`): 2000 ms cycle with dur 350, so exactly one 1.038 s hop sequence.
+- Agreement:
+  - Period 0.70 s: **agrees** (exact 700 ms).
+  - Height at tile 33: **agrees** (11.0).
+  - Height at tile 64: **differs by 0.8 pt** (code 17.2, measured 18).
+  - Shape: **differs**. Code is a pure parabola; the measured 0.14 s flat top is not in the code. The parabola is at 0.96 at
+    u = 0.4 (about 0.7 pt below the top at tile 64). Guess: pixel rounding or sampling made it look flat.
+  - Touches the ground for one frame: **agrees**.
+  - "Finishes the current bounce": **agrees**.
+
+### 2. Dock magnification
+- Code: Dock FUN_1000118d4 (fish setup), per-tile edge mapping inline at 0x100011b68..0x100011ec0, bar rect FUN_100012670,
+  enter/leave duration FUN_10005bf08.
+- Constants: `-[DockBar fSize]` 0x1001b5690 = 3.0, `fishSpeed` 0x1001b5684 = 42.0, `moveSpeed` 270.0, `dropSpeed` 350.0,
+  K = pi (0x1002581d8).
+- Formula (T = tileSize, L = largeSize, c = pointer x, clamped to bar):
+  - F = fishSize = 3 T; Rs = realScale = ((L - T)/2) / sin(pi T / (4F)) * fish, with fish = 0..1;
+  - map(x) = x + Rs * sin(pi (x - c) / (2F)) for |x - c| < F, otherwise x +/- Rs;
+  - tile size = map(right edge) - map(left edge) + (unchanged base T). In closed form, for |d| <= F - T/2:
+    size = T + (L - T) * cos(pi d / (2F)) (d = unmagnified centre distance).
+  - The effect ends at d = F + T/2 = 3.5 T (224 pt at T 64). R therefore scales with tile size only; L sets the amplitude.
+- Enter/leave: `fish` is a DockFloatAnimatedProperty with `_easingFunction` 1, so p = 0.5 - 0.5 cos(pi t)
+  (0x10022eff4). Duration in ms = floor(42 * ln(|target - (T + currentFish)| / 2 + 1) + 1), which is 147 ms for 64 -> 128
+  in either direction.
+- Agreement:
+  - R: **agrees** (fit 222 against code 224).
+  - Sizes: **differ by up to 4.5 pt** at d = 155..175 (code 83.1 / 73.8, measured 87.6 / 78.3; RMS 2.5 pt). The data fit
+    F = 3.2 T with 0.14 pt RMS, but the code says 3 T. The cause was not found.
+  - Ease: **differs by about 0.03 s** (code 147 ms cosine ease-in-out, measured about 0.12 s; the first and last frames
+    move under 3 %).
+
+### 3. Dock hover label
+- Code: Dock `-[DOCKLabelLayer attach:]` 0x100014588, `-[DOCKLabelLayer _updateLabelImage:orientation:]` 0x10003f44c,
+  `-[DOCKLabelLayer update]` 0x1000138ac, `-[DockBar blendAwayLabel]` 0x10005c470, backdrop factory FUN_10003f170,
+  `ECCartoucheGlassLayerController` (Swift helpers 0x10018665c init, 0x100186fc0 layout, 0x10018767c / 0x10018772c /
+  0x1001877dc / 0x10018788c metrics, 0x100186e18 size table).
+- Appear: `attach:` sets blend = 1 and stops its animation, so the label shows at once.
+- Fade-out: `blendAwayLabel` animates blend 1 -> 0 over 300 ms (double 0x1002583f0), cosine ease-in-out. If autohide is on,
+  the autohide duration is used instead.
+- Material: Liquid Glass. The glass flag FUN_1000b4d40 returns 1.
+  - Bottom Dock: `ECCartoucheGlassLayerController` (`GlassMaterialProvider.Configuration.cartouchePopover`,
+    `Size.minimum`, `adaptive(false)`). This is a pill with a pointer.
+  - Side Docks: `ECRoundGlassLayerController` with radius 13.
+- Geometry, size 1:
+  - pill radius 13;
+  - pointer = square of side 16 rotated 45 deg, corner radius 2.5, vertical offset 4;
+  - (15, 8) from 0x100186e18: minimum body width 15 + 2*13 = 41 and 8 pt reserved for the pointer;
+  - smooth-union smoothness 25.
+- Label layer height = max(26, text image height). The text image is capH + 2*floor((floor(ascent + descent + 5) - capH)/2),
+  about 19 pt for 14 pt text. Body height = layer height - 8. Guess: an 18 pt pill plus an 8 pt pointer.
+- Horizontal padding: not resolved. The text image is exactly the text width; the body is max(width, 41).
+- Font: `CTFontCreateUIFontForLanguage(kCTFontUIFontSystem, 14)`. A second style is 11 pt system with monospaced digits.
+  Text maximum width is 600 pt, truncated in the middle.
+- Gap: the label sits 9 pt above the tile top minus `distanceTop` (5 pt when magnification is on).
+- Agreement:
+  - No delay: **agrees**.
+  - Fade: **differs by 0.07 s** (code 300 ms cosine ease-in-out, measured about 0.23 s; the cosine tails are near-invisible).
+  - Material: glass **found**. Height, radius and font: **found**, as above.
+
+### 4. Minimise (genie, scale, suck)
+- Code:
+  - Dock effect duration in ms (DockBar `effectDur`): `doCommand:` 0x10002f05c and FUN_1000568a4 set genie 500
+    (0x43fa0000), suck 400, scale 200.
+  - Window animation: minimise FUN_100053ca0, restore FUN_100054204, `-[WAWindow genieTo:direction:genie:]` 0x1001cd4fc.
+  - Genie mesh step: FUN_10006933c, two cosine phases whose lengths are 50 * int(ln(distance/2 + 1)).
+- Durations:
+  - genie = pref `genie-speed`, default 0.5 s (x10 with Shift);
+  - scale 0.25 s (2.5 s);
+  - suck 0.4 s (4 s);
+  - genie falls back to scale when the target rect is under 5 pt.
+- Timing: no timing function is set, so the WATransaction default applies (FUN_100007f34 default duration 0.25,
+  timingFunctionForType(0)).
+- WATimingFunction table at 0x100258470:
+  - 0 = bezier(0.25, 0.1, 0.25, 1);
+  - 1 = linear;
+  - 2 = (0.42, 0, 1, 1);
+  - 3 = (0, 0, 0.58, 1);
+  - 4 = (0.42, 0, 0.58, 1);
+  - 5 = spring with mass 1, stiffness 100, damping 10.
+- Minimise and restore use the same 0.5 s genie. `minimize-to-application` does not change the duration.
+- Agreement: **differs by about 0.28 s** (code 0.5 s, measured 0.22 s for both directions).
+  - Guess: the ease bezier(0.25, 0.1, 0.25, 1) reaches about 80 % by 0.22 s, and the rest is a small window near the icon,
+    under the pixel-change threshold.
+  - WindowManager only handles miniaturise for Stage Manager (`StageManagerMiniaturizeWindowTransitionModifier`), so normal
+    minimise stays in the Dock.
+
+### 5. Mission Control, Spaces bar, Cmd-Tab
+- Mission Control runs in WindowManagerAgent (WindowManager.app). The Dock only forwards to it (`wmExposeCoordinator`,
+  "Failed to show app expose via Window Manager").
+- Preference defaults: WindowManager.framework `WindowManagerPreferencesController` init, stores at 0x1d2a7ad7c..0x1d2a7ae94.
+  Each is a key string plus a Double default:
+
+  | Key | Default |
+  |---|---|
+  | `ExposeSpringDampingRatio` | 1.0 |
+  | `ExposeSpringResponse` | 0.25 |
+  | `SpacesBarExitSpringResponse` | 0.125 |
+  | `ExposeTrackpadVelocityThreshold` | 5.0 |
+  | `ExposeTrackpadSpringResponseScale` | 0.6 |
+  | `MissionControlAppIconSize` | 48.0 |
+  | `AnimationSpeed` | 1.0 |
+
+- WindowManagerAgent SpringBehavior:
+  - `SpringBehavior.init(dampingRatio:response:)` 0x100073a14: tension = (2pi/response)^2,
+    friction = dampingRatio * 2 sqrt(tension), settlingDuration from CASpringAnimation (mass 1) at 0x10007394c.
+  - Factories: expose 0x100134554 (1.0, 0.25), Spaces bar exit 0x1001345a0 (1.0, 0.125), trackpad 0x1001345e4
+    (response x 0.6 when |velocity| > 5).
+  - The globals are filled at 0x1003d9574 and read by about ten Expose and Mission Control modifiers (e.g. FUN_10021ffa8,
+    FUN_10025d374, FUN_1003aadb4).
+- Mission Control enter and exit use the same spring: critically damped (no overshoot), response 0.25 s. Its time to within
+  0.1 % is 0.37 s.
+- Agreement:
+  - Total duration: enter **agrees** (0.37 against 0.38 s); exit **differs by 0.04 s** (measured 0.33).
+  - Curve: **differs**. The recorded progress is slower in the middle (best critically damped fit: response 0.41 s for enter,
+    0.30 s for exit). Guess: the pixel-change metric is not the spring position.
+  - Spaces bar: exit spring 0.125 s **found**; it was not measured.
+- Cmd-Tab: Dock `-[ASAppSwitcher show:]` 0x1000897d4, `-[ASAppSwitcher exit:immediately:]` 0x10008a0f8,
+  `-[BezelIconList show:]` 0x10003919c, `-[BezelIconList hide:completion:]` 0x100039438, fade block FUN_1000396d4.
+  - It is in the Dock process. The `AppSwitcher/OutOfProcessAppSwitcher` feature check at 0x10008259c finds no domain plist,
+    so it is off.
+  - Show: the windows are ordered in at system level 0x1f2 with no animation.
+  - Release of Cmd (`exit:1 immediately:0`): the layer opacity goes to 0 in a CATransaction with
+    `kCAMediaTimingFunctionEaseInEaseOut`. No duration is set, so the CA default of 0.25 s applies (inferred: no override
+    found on this path).
+  - Agreement: appears instantly **agrees**; fade-out **differs by about 0.15 s** (code 0.25 s ease-in-out, measured about
+    0.1 s). The cause was not found.
+
+### Side notes (found in passing)
+- Guess: the tile move animation uses `moveSpeed` 270 ms with cosine ease (FUN_100011268), which may be the measured 0.25 s
+  slot growth on app insert. Not checked against the insert path.
+- All Dock DockFloatAnimatedProperty instances (fish, blend, x, scale, squeeze, autoHide) are created with
+  `_easingFunction` = 1, which is cosine ease-in-out.
