@@ -1,7 +1,6 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
-import qs.components
 
 // Layer surface per screen for the two transitions the session lock cannot show itself (Hyprland
 // stops drawing the desktop under a lock surface):
@@ -51,9 +50,15 @@ PanelWindow {
         easing.type: Easing.BezierSpline; easing.bezierCurve: LockTheme.ease
         onFinished: Lock.finish()
     }
-    FramePresented {
-        id: presented
-        onPresented: Lock.overlayReady()
+    // "out": tell Lock once a frame of this window is on screen. A frame swap after a scene sync that
+    // started after the window was created holds the full picture (render-thread signals arrive queued).
+    property int frameState: 0          // 0 idle, 1 waiting for a sync, 2 waiting for its swap
+    Item { id: probe; readonly property var qw: Window.window }   // the QQuickWindow behind this PanelWindow
+    Connections {
+        target: probe.qw
+        enabled: w.frameState > 0
+        function onAfterSynchronizing() { if (w.frameState === 1) w.frameState = 2; }
+        function onFrameSwapped() { if (w.frameState === 2) { w.frameState = 0; Lock.overlayReady(); } }
     }
     Connections {
         target: Lock
@@ -62,6 +67,6 @@ PanelWindow {
     }
     Component.onCompleted: {
         if (mode === "in") fadeIn.start();
-        else presented.arm();
+        else Qt.callLater(() => { w.frameState = 1; if (probe.qw) probe.qw.update(); });
     }
 }
