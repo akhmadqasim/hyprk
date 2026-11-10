@@ -6,6 +6,7 @@
 #   clipboard.sh watch <cap>          run wl-paste --watch, store each new clipboard (stdout: new items)
 #   clipboard.sh store <cap>          store stdin (called by wl-paste --watch), keep the newest <cap>
 #   clipboard.sh list <maxAgeMin>     all items, newest first; deletes items older than maxAgeMin (0 = keep)
+#   clipboard.sh prune <maxAgeMin>    delete items older than maxAgeMin
 #   clipboard.sh copy <file>          put an item back on the clipboard
 #   clipboard.sh clear                delete the history
 #
@@ -58,8 +59,9 @@ store)
     [ "$drop" -gt 0 ] && rm -f "${items[@]:0:drop}"
     emit "$f"
     ;;
-list)
+list|prune)
     [ "${2:-0}" -gt 0 ] && find "$DIR" -maxdepth 1 -type f -name '[0-9]*_*' -mmin +"$2" -delete 2>/dev/null
+    [ "$1" = prune ] && exit 0
     items=("$DIR"/[0-9]*_*)
     for (( i = ${#items[@]} - 1; i >= 0; i-- )); do emit "${items[i]}"; done
     ;;

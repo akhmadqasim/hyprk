@@ -37,12 +37,12 @@ Singleton {
         const grim = area ? `g=$(slurp) && grim -g "$g" ${file}` : `grim ${file}`;
         Quickshell.execDetached(["sh", "-c", `sleep 0.4; ${grim} && ${sound}`]);
     }
-    // hyprk System Settings on a pane, GNOME Settings when it is missing (like Apps.openSettings)
-    function openPane(id) {
-        const app = Apps.hyprkApps["org.hyprk.Settings"];
-        const alts = app.fallbacks.map(c => `command -v ${c} >/dev/null && exec ${c};`).join(" ");
-        Quickshell.execDetached(["sh", "-c", `[ -x "$2" ] && HYPRK_SETTINGS_PANE="$1" exec "$2"; ${alts} exit 1`, "sh", id, hyprk + "/" + app.run]);
-        Apps.markLaunching(app.id);
+    // System Settings on a pane (GNOME Settings when hyprk Settings is missing)
+    function openPane(id) { Apps.runHyprkApp("org.hyprk.Settings", { HYPRK_SETTINGS_PANE: id }); }
+    // macOS asks before logging out / restarting / shutting down
+    function confirm(title, label, fn) {
+        Panels.showAlert({ icon: "system-shutdown", title: title, message: "",
+                           buttons: [{ label: "Cancel", isCancel: true }, { label: label, isDefault: true, action: fn }] });
     }
 
     readonly property var system: {
@@ -73,18 +73,19 @@ Singleton {
         add({ id: "missioncontrol", title: "Mission Control", symbol: "display", keywords: ["windows", "overview"], run: () => Panels.toggle("mission") });
         add({ id: "apps", title: "Show Apps", symbol: "square.grid", keywords: ["launchpad"], run: () => Panels.toggle("launchpad") });
         add({ id: "empty-trash", title: "Empty Trash", symbol: "trash", run: () => Apps.confirmEmptyTrash() });
-        if (Clipboard.enabled)
+        if (SpotlightState.clipboardHistory !== "off")      // don't create Clipboard just to ask
             add({ id: "clear-clipboard", title: "Clear Clipboard History", symbol: "clipboard", keywords: ["clipboard"], run: () => Clipboard.clear() });
         const blocked = Power.allowed ? "" : "Blocked in this session";
         add({ id: "lock", title: "Lock Screen", subtitle: blocked, symbol: "lock", run: () => Power.lock() });
         add({ id: "sleep", title: "Sleep", subtitle: blocked, symbol: "moon", run: () => Power.sleep() });
-        add({ id: "restart", title: "Restart", subtitle: blocked, symbol: "power", run: () => Power.restart() });
-        add({ id: "shutdown", title: "Shut Down", subtitle: blocked, symbol: "power", keywords: ["power off"], run: () => Power.shutdown() });
-        add({ id: "logout", title: "Log Out", symbol: "power", keywords: ["sign out", "exit"], run: () => Power.logout() });
+        add({ id: "restart", title: "Restart", subtitle: blocked, symbol: "power", run: () => root.confirm("Are you sure you want to restart your computer now?", "Restart", Power.restart) });
+        add({ id: "shutdown", title: "Shut Down", subtitle: blocked, symbol: "power", keywords: ["power off"], run: () => root.confirm("Are you sure you want to shut down your computer now?", "Shut Down", Power.shutdown) });
+        add({ id: "logout", title: "Log Out", symbol: "power", keywords: ["sign out", "exit"], run: () => root.confirm("Are you sure you want to quit all applications and log out now?", "Log Out", Power.logout) });
         // the same panes as the Settings sidebar (Battery on laptops, Energy on desktops)
         for (const p of Panes.visible(State.hasBattery(UPower.devices.values), ""))
             add({ id: "settings:" + p.id, title: p.title + " Settings", subtitle: "System Settings", appIcon: "settings",
-                  keywords: ["settings", "preferences"], run: () => root.openPane(p.id) });
+                  // pane titles use U+2011 (Wi‑Fi): also match a typed ASCII hyphen
+                  keywords: ["settings", "preferences", p.title.replace("\u2011", "-")], run: () => root.openPane(p.id) });
         return out;
     }
 

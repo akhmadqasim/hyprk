@@ -235,12 +235,14 @@ Singleton {
         else launch(item.entry, item.id);
     }
 
-    // hyprk System Settings (settings/run.sh), GNOME Settings when it is missing
-    function runHyprkApp(id) {
+    // hyprk System Settings (settings/run.sh), GNOME Settings when it is missing.
+    // env: extra variables, e.g. { HYPRK_SETTINGS_PANE: "wifi" } (Spotlight pane actions)
+    function runHyprkApp(id, env) {
         const app = hyprkApps[id];
         const run = Quickshell.shellDir + "/../" + app.run;
         const alts = app.fallbacks.map(c => `command -v ${c} >/dev/null && exec ${c};`).join(" ");
-        Quickshell.execDetached(["sh", "-c", `[ -x "${run}" ] && exec "${run}"; ${alts} exit 1`]);
+        const vars = Object.keys(env || {}).map(k => k + "=" + env[k]);
+        Quickshell.execDetached(["env"].concat(vars, ["sh", "-c", `[ -x "${run}" ] && exec "${run}"; ${alts} exit 1`]));
         markLaunching(id);
     }
     function openSettings() { runHyprkApp("org.hyprk.Settings"); }

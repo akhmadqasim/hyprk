@@ -39,13 +39,16 @@ Singleton {
         }
     }
 
-    // the watcher runs while history is on; restarts if wl-paste dies (compositor restart)
+    // the watcher runs while history is on; restarts if wl-paste dies (compositor restart).
+    // cliphist needs a second watcher for images; each is its own Process so stopping kills it.
+    Process {
+        running: root.shouldWatch && root.cliphist
+        command: ["wl-paste", "--type", "image", "--watch", "cliphist", "store"]
+    }
     Process {
         id: watcher
         running: root.shouldWatch
-        command: root.cliphist
-            ? ["sh", "-c", "wl-paste --watch cliphist store & wl-paste --type image --watch cliphist store & wait"]
-            : [root.script, "watch", String(root.cap)]
+        command: root.cliphist ? ["wl-paste", "--watch", "cliphist", "store"] : [root.script, "watch", String(root.cap)]
         stdout: SplitParser {
             onRead: line => {
                 const it = SL.parseClipLine(line, false);
@@ -79,10 +82,21 @@ Singleton {
         if (next > 0) { expiry.interval = Math.max(1000, next - Date.now()); expiry.restart(); }
         else expiry.stop();
     }
-    Timer { id: expiry; onTriggered: root.setItems(root.items) }
+    // an item expired: delete expired files too (built-in store; cliphist has no ages)
+    Timer {
+        id: expiry
+        onTriggered: {
+            if (!root.cliphist) Quickshell.execDetached([root.script, "prune", String(Math.round(root.retentionMs / 60000))]);
+            root.setItems(root.items);
+        }
+    }
 
+    onEnabledChanged: reload()
     // turning history off deletes it (nothing copied is kept on disk without consent)
-    onEnabledChanged: if (enabled) reload(); else if (detected && available) clear()
+    Connections {
+        target: SpotlightState
+        function onHistoryTurnedOff() { if (root.detected && root.available) root.clear(); }
+    }
     onRetentionChanged: reload()
 
     function copy(item) {

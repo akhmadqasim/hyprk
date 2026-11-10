@@ -34,7 +34,7 @@ Singleton {
         printErrors: false
         watchChanges: true
         onFileChanged: reload()
-        onLoaded: root.xbelRows = SL.parseXbel(text(), 60)
+        onLoaded: { root.xbelRows = SL.parseXbel(text(), 60); root.loadRecents(); }
     }
     function loadRecents() {
         exists.exec(["sh", "-c", 'for p; do [ -e "$p" ] && echo "$p"; done', "sh"].concat(xbelRows.map(r => r.path)));

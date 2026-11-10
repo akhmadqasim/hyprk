@@ -124,8 +124,9 @@ function searchCommand(tool, query, home, limit) {
     const n = String(limit || 40);
     const skip = ["node_modules", ".cache", ".git", "target", "snap"];
     if (tool === "plocate" || tool === "locate")
-        // whole-system database, file names only (-b): keep $HOME, drop hidden paths, stop after limit
-        return ["sh", "-c", `${tool} -b -i -l 2000 -- "$1" | grep -F -- "$2/" | grep -v '/\\.' | head -n "$3"`, "sh", q, home, n];
+        // whole-system database, file names only (-b): keep paths under $HOME, drop hidden and
+        // skipped folders, stop after limit (head closes the pipe, which ends the search)
+        return ["sh", "-c", `${tool} -b -i -- "$1" | awk -v h="$2/" 'index($0, h) == 1' | grep -v -E '/\\.|/(${skip.join("|")})/' | head -n "$3"`, "sh", q, home, n];
     if (tool === "fd" || tool === "fdfind")
         return [tool, "--ignore-case", "--fixed-strings", "--max-results", n, "--color", "never"]
             .concat(...skip.map(s => ["--exclude", s])).concat(["--", q, home]);

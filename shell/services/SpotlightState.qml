@@ -41,7 +41,14 @@ Singleton {
         watchChanges: true
         printErrors: false
         onFileChanged: reload()
-        onLoaded: root.prefs = State.parse(text(), root.defaults)
+        onLoaded: {
+            const p = State.parse(text(), root.defaults);
+            // only an explicit "off" in a readable file counts as turning history off
+            // (a half-written or missing file falls back to defaults but must not wipe it)
+            const wasOn = root.clipboardHistory !== "off";
+            root.prefs = p;
+            if (wasOn && p.clipboardHistory === "off" && /"clipboardHistory"\s*:\s*"off"/.test(text())) root.historyTurnedOff();
+        }
         // a deleted file means defaults again (clipboard history off)
         onLoadFailed: root.prefs = root.defaults
     }
@@ -49,7 +56,13 @@ Singleton {
         prefs = Object.assign({}, prefs, changes);
         file.setText(JSON.stringify(prefs, null, 2) + "\n");
     }
-    function setClipboardHistory(r) { save({ clipboardHistory: SL.retentionMs(r) > 0 ? r : "off" }); }
+    // emitted when the user turns clipboard history off: Clipboard deletes the history
+    signal historyTurnedOff()
+    function setClipboardHistory(r) {
+        const wasOn = clipboardHistory !== "off";
+        save({ clipboardHistory: SL.retentionMs(r) > 0 ? r : "off" });
+        if (wasOn && clipboardHistory === "off") historyTurnedOff();
+    }
     function setQuickKey(actionId, key) { save({ quickKeys: SL.setQuickKey(quickKeys, actionId, key) }); }
 
     // hyprk:spotlight-apps, -files, -actions, -clipboard
