@@ -141,11 +141,12 @@ Singleton {
         readonly property color red: theme.dark ? "#FF453A" : "#FF3B30"
         readonly property color indigo: theme.dark ? "#5E5CE6" : "#5856D6"
 
-        // Menu bar is transparent in macOS 26+; text is white over the wallpaper.
-        // macOS adapts menu bar text to the wallpaper behind it
+        // Menu bar: no background (MAC-ANSWERS.md Q9.1: bar pixels = desktop pixels over a solid wallpaper).
+        // Text follows the wallpaper behind the bar, not the appearance (white over a checker in light and
+        // dark mode, measured); the luma switch itself is guessed (menuBarLumaThreshold).
         readonly property color menuBarText: theme.menuBarOnLight ? Qt.rgba(0, 0, 0, 0.85) : "#FFFFFF"
-        readonly property color menuBarHighlight: theme.menuBarOnLight ? Qt.rgba(0, 0, 0, 0.10) : Qt.rgba(1, 1, 1, 0.22)   // pressed title pill, TODO verify
-        readonly property color menuBarBackground: Qt.rgba(0, 0, 0, 0.0)              // "Show menu bar background" off
+        readonly property color menuBarPillShadow: Qt.rgba(0, 0, 0, 0.05)   // 206 -> 196 just below the pill (measured), shape guessed
+        readonly property color menuBarBackground: Qt.rgba(0, 0, 0, 0.0)              // no bar background (measured)
 
         // menu highlight
         readonly property color menuSelection: accent
@@ -183,13 +184,22 @@ Singleton {
 
     // ---------- menu bar ----------
     readonly property QtObject menuBar: QtObject {
-        readonly property int height: 30                 // SPEC.md 7: Solarium menu bar 30 pt (legacy 24)
+        // SPEC.md 7: Solarium menu bar 30 pt (legacy 24). The 27.2.1 Mac measured 34 (metrics-*.json, MAC-ANSWERS
+        // Q9.1), but that is a notched MacBook Air, where the bar matches the notch; a display without a notch
+        // was not measured, so this stays 30 until it is.
+        readonly property int height: 30
         readonly property int sidePadding: 14            // left edge to the logo / right edge to clock, TODO verify
         readonly property int logoSize: 16               // distro logo box; the Apple glyph was 14 + 2
         readonly property int titleHPadding: 9           // inner padding of a menu title pill, TODO verify
         readonly property int titleSpacing: 2            // gap between pills, TODO verify
-        readonly property int titleRadius: titleHeight / 2   // pressed glass pill = capsule (reference CC icon)
-        readonly property int titleHeight: 24            // pressed pill height, TODO verify
+        readonly property real titleRadius: titleHeight / 2  // capsule (MAC-ANSWERS.md Q9.1)
+        // open title pill = the blurred desktop picture, re-saturated and brightened. Fitted to the Mac pill over
+        // solid blue, (69,83,206) -> (90,105,230) (MAC-ANSWERS.md Q9.1, same in light and dark), from what
+        // our pre-blurred wallpaper makes of that blue, (87,99,204) (scripts/wallpaper.sh brightens and
+        // desaturates it): saturation 1.13, brightness x1.06. One colour fitted, so other hues are approximate.
+        readonly property real pillSaturation: 1.13
+        readonly property real pillGain: 1.06
+        readonly property int titleHeight: 23            // open title pill y 6..29 pt (MAC-ANSWERS.md Q9.1), centred here
         readonly property int statusIconSize: 16         // TODO verify
         readonly property int statusSpacing: 4           // ~20pt icon pitch in reference, TODO verify
         readonly property int statusHPadding: 8          // TODO verify
