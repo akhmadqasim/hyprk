@@ -259,8 +259,37 @@ Column {
             }
         }
         FormRow { label: "Refresh rate"; Popup { enabled: false; model: [pane.mon ? pane.mon.refreshRate + " Hertz" : "—"] } }
-        FormRow { label: "Automatically adjust brightness"; Switch { enabled: false } }
-        FormRow { label: "True Tone"; sublabel: "Automatically adapt display to make colors appear consistent in different ambient lighting."; Switch { enabled: false } }
+    }
+
+    // 27.2.1 below the sizes (displays-light.png): a Brightness card (slider with sun end buttons, Automatically adjust
+    // brightness, True Tone), Colour profile, When connected to TV. No backend for any of these yet: kept locally.
+    Card {
+        FormRow {
+            label: "Brightness"
+            Slider {
+                id: bright
+                width: 230
+                value: 0.5
+                leftGlyph: "light_mode"; rightGlyph: "light_mode"
+                onMoved: v => value = v
+            }
+        }
+        FormRow { label: "Automatically adjust brightness"; LocalSwitch { checked: true } }
+        FormRow {
+            label: "True Tone"
+            sublabel: "Automatically adapt display to make colors appear consistent in different ambient lighting conditions."
+            LocalSwitch { }
+        }
+    }
+    Card {
+        FormRow { label: "Color profile"; LocalPopup { model: ["Color LCD", "sRGB IEC61966-2.1", "Display P3"] } }
+    }
+    Card {
+        FormRow {
+            label: "When connected to TV"
+            sublabel: "Choose what to show or use the TV as a secondary display."
+            LocalPopup { model: ["Ask What to Show", "Mirror Entire Screen", "Extended Display"] }
+        }
     }
 
     PaneFooter { Button { text: "Advanced…" } Button { text: "Night Shift…" } }
