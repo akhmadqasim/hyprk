@@ -375,6 +375,8 @@ Singleton {
         readonly property int gridTop: 12                // separator to first row
         readonly property int gridBottom: 28             // room for the page dots
         readonly property int headerGap: 10
+        // icon grid rows on one page of a panel this tall (Launchpad.qml, LaunchpadPreload.qml)
+        function rowsFor(panelHeight) { return Math.max(1, Math.floor((panelHeight - headerHeight - gridTop - gridBottom) / cellHeight)); }
     }
 
     // ---------- app icons ----------

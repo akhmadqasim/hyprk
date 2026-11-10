@@ -25,6 +25,9 @@ ShellWindow {
         onClicked: m => Panels.openContext(Menus.desktop(), m.x, m.y, false, screen)
     }
 
+    // Launchpad's first page of icons, decoded ahead (LaunchpadPreload.qml)
+    LaunchpadPreload { screen: modelData }
+
     Image {
         z: -1
         anchors.fill: parent

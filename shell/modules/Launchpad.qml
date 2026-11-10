@@ -30,7 +30,7 @@ ShellWindow {
 
     property string query: ""
     readonly property var apps: query === "" ? Apps.sortedEntries : Search.rank(Apps.visibleEntries, query, 200)
-    readonly property int rows: Math.max(1, Math.floor((panel.height - Theme.launchpad.headerHeight - Theme.launchpad.gridTop - Theme.launchpad.gridBottom) / Theme.launchpad.cellHeight))
+    readonly property int rows: Theme.launchpad.rowsFor(panel.height)
     readonly property int perPage: Theme.launchpad.columns * rows
     readonly property int pages: Math.max(1, Math.ceil(apps.length / perPage))
     property int page: 0
