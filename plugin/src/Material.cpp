@@ -111,7 +111,8 @@ namespace lg {
         }();
 
         // Regular + the Mac glass menu shadow, the same at every size. Measured on macOS 27.2.1
-        // (LIVE-27.2.1.md): 0.7 light, 0.8 dark, radius 24, y 10 (SPEC 9.5 had 0.6 / 0.7: alerts use that)
+        // (LIVE-27.2.1.md): 0.7 light, 0.8 dark, radius 24, y 10. A real alert has 0.6 / 0.7 (SPEC 9.5), but
+        // the shell draws alerts in the same layer as menus (hyprk-overlay:menu), so they get this one too
         constexpr SRecipe MENU = [] {
             SRecipe r   = REGULAR;
             r.name      = "menu";

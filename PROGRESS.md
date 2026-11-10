@@ -156,3 +156,8 @@ glass material 65 (03:35, orchestrator; too cyan)
   inactive-window variant (the plugin's blur is tuned by eye on top of Hyprland's blur), popover pop
   (spring 0.25 / 0.9 from 12.5 %, see LIVE-27.2.1.md), Spotlight recipe (branch still open).
 - [Mac] QML syntax check on the Mac: /opt/homebrew/opt/qtdeclarative/bin/qmllint (brew qtdeclarative; it cannot resolve Quickshell imports, parse errors only).
+- [Mac] Independent review of the branch (read only, nothing built): no compile or load errors found. Fixed from it:
+  alert starts at popFrom before the first tick, no size jump when dismissed mid-pop. Known and left: hyprk-overlay and
+  hyprk-menubar both map to the `menu` recipe, so alerts and everything else in the overlay get the menu shadow
+  0.7 / 0.8 (a real alert has 0.6 / 0.7, Notification Center cards the Regular by-size shadow); splitting that needs
+  separate layer namespaces in the shell.

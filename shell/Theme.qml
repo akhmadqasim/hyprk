@@ -394,7 +394,8 @@ Singleton {
         readonly property real titleSize: 13             // measured: SF bold 13
         readonly property real messageSize: 13           // measured: SF regular 13 (was 11)
         // pop on show (measured from a 60 fps recording): scale popFrom -> popPeak in popRise ms
-        // (ease-in), back to 1 in popSettle ms; the peak is read from the moving outline, so about
+        // (ease-in), back to 1 in popSettle ms; the peak is read from the moving outline, which includes
+        // the shadow, so it is approximate
         readonly property real popFrom: 0.04
         readonly property real popPeak: 1.15
         readonly property int popRise: 200

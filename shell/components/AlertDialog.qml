@@ -59,13 +59,13 @@ Item {
                 fadeIn.restart();
             } else {
                 fade = 1;
+                pop = Theme.alert.popFrom;   // before the first tick, so no full-size frame
                 popIn.restart();
             }
             Qt.callLater(forceActiveFocus);   // after `visible` follows
         } else {
             fadeIn.stop();
-            popIn.stop();
-            pop = 1;
+            popIn.stop();   // dismissed mid-pop: fades at the size it has, no jump
             fadeOut.start();
         }
     }
