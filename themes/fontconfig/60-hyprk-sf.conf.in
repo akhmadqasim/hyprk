@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
-<!-- hyprk-managed: SF fonts for GTK, Qt and hyprlock. the font dir and cache dir below are filled in by themes/*/install.sh (the two @-placeholders).
+<!-- hyprk-managed: SF fonts and Apple Color Emoji for GTK, Qt and hyprlock. the font dir and cache dir below are filled in by themes/*/install.sh (the two @-placeholders).
      Real family names: "SF Pro", "SF Pro Rounded", "SF Compact", "SF Mono", "New York". Fallback order when SF is missing:
      Inter, then Cantarell, then whatever fontconfig picks. -->
 <fontconfig>
@@ -9,4 +9,46 @@
   <alias binding="same"><family>sans-serif</family><prefer><family>SF Pro</family><family>Inter</family><family>Cantarell</family></prefer></alias>
   <alias binding="same"><family>monospace</family><prefer><family>SF Mono</family></prefer></alias>
   <alias binding="same"><family>System Font</family><prefer><family>SF Pro</family></prefer></alias>
+  <!-- emoji: Apple Color Emoji (in @FONTDIR@) ahead of Noto Color Emoji; same rules as config/fontconfig/emoji.conf. This drop-in is read
+       before the system 60-generic.conf, which only appends Noto after these rules, so Apple stays first. Colour bitmap fonts stay unhinted. -->
+  <!-- the generic "emoji" family and every emoji font name an app may ask for by name -->
+  <match target="pattern">
+    <test qual="any" name="family"><string>emoji</string></test>
+    <edit name="family" mode="prepend_first" binding="strong"><string>Apple Color Emoji</string></edit>
+  </match>
+  <match target="pattern">
+    <test qual="any" name="family"><string>Noto Color Emoji</string></test>
+    <edit name="family" mode="prepend_first" binding="strong"><string>Apple Color Emoji</string></edit>
+  </match>
+  <match target="pattern">
+    <test qual="any" name="family"><string>Segoe UI Emoji</string></test>
+    <edit name="family" mode="prepend_first" binding="strong"><string>Apple Color Emoji</string></edit>
+  </match>
+  <match target="pattern">
+    <test qual="any" name="family"><string>Twitter Color Emoji</string></test>
+    <edit name="family" mode="prepend_first" binding="strong"><string>Apple Color Emoji</string></edit>
+  </match>
+  <!-- emoji fallback of the generic families: after the real text fonts, ahead of Noto -->
+  <match target="pattern">
+    <test qual="any" name="family"><string>sans-serif</string></test>
+    <edit name="family" mode="append" binding="same"><string>Apple Color Emoji</string></edit>
+  </match>
+  <match target="pattern">
+    <test qual="any" name="family"><string>serif</string></test>
+    <edit name="family" mode="append" binding="same"><string>Apple Color Emoji</string></edit>
+  </match>
+  <match target="pattern">
+    <test qual="any" name="family"><string>monospace</string></test>
+    <edit name="family" mode="append" binding="same"><string>Apple Color Emoji</string></edit>
+  </match>
+  <match target="pattern">
+    <test qual="any" name="family"><string>system-ui</string></test>
+    <edit name="family" mode="append" binding="same"><string>Apple Color Emoji</string></edit>
+  </match>
+  <match target="font">
+    <test name="color" compare="eq"><bool>true</bool></test>
+    <edit name="embeddedbitmap" mode="assign"><bool>true</bool></edit>
+    <edit name="hinting" mode="assign"><bool>false</bool></edit>
+    <edit name="hintstyle" mode="assign"><const>hintnone</const></edit>
+  </match>
 </fontconfig>

@@ -2,3 +2,5 @@
 # this repo is private. Never make it public with them; see reference/ASSETS.md.
 __pycache__/
 build/
+# the unreduced Apple Color Emoji (192 MB, over the GitHub limit) lives in /mnt/code/hyprk-assets/fonts, never in the repo
+Apple Color Emoji.ttc
