@@ -1,0 +1,624 @@
+{
+ "screen": [
+  1710,
+  1107
+ ],
+ "menubar": 34,
+ "controlCenter": {
+  "gridX": [
+   1404,
+   1696
+  ],
+  "gridTop": 46,
+  "rightMargin": 14,
+  "tile2x1": [
+   140,
+   64
+  ],
+  "tile1x1": [
+   64,
+   64
+  ],
+  "tile2x2": [
+   140,
+   140
+  ],
+  "slider": [
+   292,
+   64
+  ],
+  "gap": {
+   "white": 229,
+   "grey127": 114,
+   "black": 0
+  },
+  "radiusFits_pt": {
+   "2x1": {
+    "continuous": 31.5,
+    "circle": 32.1
+   },
+   "2x2": {
+    "continuous": 31.6,
+    "circle": 32.4
+   },
+   "1x1": {
+    "circle": 31.5
+   },
+   "slider": {
+    "continuous": 23.5,
+    "circle": 24.0
+   },
+   "editControls": {
+    "circle": 11.6
+   },
+   "subPanel": {
+    "continuous": 16.0
+   }
+  },
+  "recentsPill": {
+   "frame": [
+    1481.5,
+    44,
+    137.5,
+    24
+   ],
+   "gridShift": 28
+  },
+  "tileRGB_centre": {
+   "white": 186,
+   "grey127": 109,
+   "black": 32
+  },
+  "tile_2ptFromTop": {
+   "white": 198,
+   "grey127": 123,
+   "black": 42
+  },
+  "tile_2ptFromBottom": {
+   "white": 201,
+   "grey127": 127,
+   "black": 45
+  },
+  "variantProbe_v9": {
+   "dark": [
+    207,
+    115,
+    25
+   ],
+   "light": [
+    244,
+    157,
+    71
+   ]
+  },
+  "focusOn": {
+   "circle": 255,
+   "moonMostSaturated": [
+    119,
+    131,
+    254
+   ],
+   "chevron": [
+    6,
+    10.5
+   ]
+  },
+  "fonts": {
+   "title": "SF 12 semibold",
+   "subtitle": "SF 11 regular",
+   "sliderTitle": "SF 12 semibold",
+   "editControls": "SF 12 regular"
+  },
+  "tileLayout_rel": {
+   "circle": [
+    14,
+    14,
+    36,
+    36
+   ],
+   "textInkX": 56.5,
+   "titleCapTop": 19,
+   "subtitleCapTop": 36
+  },
+  "hoverPress_overGrey127": {
+   "tileRest": 109,
+   "tileHover": 116,
+   "tilePress": [
+    144,
+    148
+   ],
+   "roundHover": 116,
+   "roundPress": 163,
+   "roundPressScale": 1.045,
+   "circlePress": 206,
+   "hoverRamp_s": 0.25,
+   "releaseFrames": 3
+  },
+  "sliderClickProgress_perFrame": [
+   0.11,
+   0.19,
+   0.38,
+   0.56,
+   0.71,
+   0.83,
+   0.9,
+   0.95,
+   0.97,
+   0.99,
+   1.0
+  ],
+  "sliderOverdrag": {
+   "trackEnd": 1618,
+   "stretchedTo": [
+    1621.5,
+    1623
+   ],
+   "backFrames": 8
+  },
+  "sliderKnob": {
+   "hover": [
+    18,
+    14
+   ],
+   "dragLens": [
+    24,
+    20
+   ]
+  },
+  "nowPlaying": {
+   "art": [
+    1570,
+    60,
+    40,
+    40
+   ],
+   "artRadius": 10,
+   "title": [
+    1570,
+    118
+   ],
+   "buttons": [
+    [
+     1571,
+     142,
+     30,
+     30
+    ],
+    [
+     1611,
+     142,
+     30,
+     30
+    ],
+    [
+     1651,
+     142,
+     30,
+     30
+    ]
+   ]
+  },
+  "subPanels": {
+   "x": [
+    1394,
+    1702
+   ],
+   "top": 40,
+   "heights": {
+    "wifi": 175,
+    "bluetooth": 280,
+    "focus": 280,
+    "display": 189,
+    "sound": 258.5
+   },
+   "row": [
+    280,
+    32
+   ],
+   "radius": 16
+  }
+ },
+ "spotlight": {
+  "owner": "Siri process, layer 23, not in AX",
+  "bar": [
+   595,
+   251,
+   520,
+   87
+  ],
+  "barCalculator": [
+   595,
+   251,
+   520,
+   172.5
+  ],
+  "resultsTop": 348,
+  "gapBarResults": 10,
+  "resultsHeightMax": 410,
+  "barGradient": {
+   "overWhite": [
+    8,
+    65,
+    127
+   ],
+   "overGrey": [
+    6,
+    36,
+    64
+   ],
+   "overBlack": [
+    1,
+    6,
+    17
+   ]
+  },
+  "fonts": {
+   "query": "SF 22 regular",
+   "placeholder": "Search or Ask, SF 22 regular",
+   "rowTitle": "SF 17 regular",
+   "rowSubtitle": "SF 15 regular",
+   "topHitHint": "SF 10 regular",
+   "chip": "SF 15 regular",
+   "calcLine1": "SF 12 regular",
+   "calcValue": "SF 16 semibold",
+   "showResults": "SF 13 regular",
+   "modeLabel": "SF 17 regular",
+   "modeShortcut": "SF 14 regular"
+  },
+  "row": {
+   "pitch": 62,
+   "iconX": 620,
+   "titleX": 675,
+   "selection": [
+    607,
+    409,
+    495,
+    62
+   ],
+   "selectionRadius": 22
+  },
+  "caret": {
+   "w": 2,
+   "h": 26,
+   "y": [
+    281,
+    307
+   ],
+   "x": 632
+  },
+  "modeList": {
+   "frame": [
+    595,
+    348,
+    520,
+    214
+   ],
+   "rowPitch": 48,
+   "glyphCentreX": 639,
+   "labelX": 676.5,
+   "shortcutRight": 1076,
+   "appear_s": 0.17,
+   "appearProgress": [
+    0.04,
+    0.11,
+    0.22,
+    0.36,
+    0.51,
+    0.66,
+    0.78,
+    0.87,
+    0.94,
+    0.98,
+    1.0
+   ]
+  },
+  "modes": {
+   "cmd1": "Applications 844x617 at (433,251)",
+   "cmd2": "Files 844x617",
+   "cmd3": "Actions 520 wide, panel y 348..838",
+   "cmd4": "Clipboard 520 wide, window 520x587"
+  },
+  "showResultsPill": [
+   782,
+   434,
+   148,
+   44
+  ]
+ },
+ "banner": {
+  "frame": [
+   1350,
+   44,
+   344,
+   58
+  ],
+  "heights": {
+   "title+body": 58,
+   "title+subtitle+body": 75,
+   "3-line body": 90,
+   "4-line body": 105.5
+  },
+  "radius": 20,
+  "fill": {
+   "black": 33,
+   "grey127": 114
+  },
+  "textX": 1408,
+  "linePitch": 17,
+  "icon": [
+   1363,
+   66,
+   32,
+   32
+  ],
+  "hover": {
+   "close": [
+    1340,
+    36,
+    28,
+    28
+   ],
+   "chevron": [
+    1666,
+    50,
+    16,
+    20
+   ],
+   "action": [
+    1620,
+    117.5,
+    64,
+    22
+   ]
+  },
+  "inLeftEdge": [
+   [
+    0.394,
+    1644
+   ],
+   [
+    0.43,
+    1548
+   ],
+   [
+    0.484,
+    1419.5
+   ],
+   [
+    0.536,
+    1390.5
+   ],
+   [
+    0.574,
+    1373
+   ],
+   [
+    0.606,
+    1363
+   ],
+   [
+    0.638,
+    1357
+   ],
+   [
+    0.671,
+    1354
+   ],
+   [
+    0.702,
+    1352
+   ],
+   [
+    0.735,
+    1351
+   ],
+   [
+    0.766,
+    1350.5
+   ]
+  ],
+  "outLeftEdge_fromPost": [
+   [
+    5.09,
+    1412.5
+   ],
+   [
+    5.13,
+    1510
+   ],
+   [
+    5.16,
+    1561
+   ],
+   [
+    5.19,
+    1630
+   ],
+   [
+    5.22,
+    null
+   ]
+  ],
+  "onScreen_s": 4.7,
+  "hoverPauses": true,
+  "leaveAfterHover_s": 1.0,
+  "suppressedWhileRecording": true
+ },
+ "notificationCenter": {
+  "column": [
+   1350,
+   1694
+  ],
+  "top": 44,
+  "cardWidth": 344,
+  "cardGap": 6,
+  "cardRadius": 20,
+  "cardFill": {
+   "black": 32,
+   "white": 128
+  },
+  "sectionHeading": [
+   1351,
+   "y",
+   159,
+   21
+  ],
+  "clearAll": [
+   28,
+   28
+  ],
+  "stackPlates": {
+   "count": 2,
+   "peek": 8
+  },
+  "groupHeader": {
+   "title": [
+    94.5,
+    19
+   ],
+   "showLess": [
+    80.5,
+    28
+   ],
+   "clear": [
+    28,
+    28
+   ]
+  },
+  "moreButton": [
+   124.5,
+   24
+  ],
+  "widgets": {
+   "small": [
+    164,
+    164
+   ],
+   "gap": 16
+  },
+  "editWidgets": [
+   1462.5,
+   1010,
+   87,
+   24
+  ],
+  "scrim": false
+ },
+ "alert": {
+  "width": 260,
+  "heights": {
+   "2buttons": 234,
+   "withFieldCheckbox": 274,
+   "3buttons": 334
+  },
+  "icon": [
+   19,
+   19,
+   66,
+   66
+  ],
+  "textX": 21,
+  "textW": 218,
+  "topFormula": "top = 289.5 - h/4",
+  "buttons2": {
+   "ax": [
+    112,
+    30
+   ],
+   "x": [
+    15,
+    133
+   ],
+   "bottom": 15
+  },
+  "buttons3": {
+   "ax": [
+    230,
+    30
+   ],
+   "pitch": 34,
+   "order": [
+    "default",
+    "third",
+    "cancel"
+   ]
+  },
+  "fills_dark": {
+   "default": [
+    52,
+    120,
+    246
+   ],
+   "plain": [
+    71,
+    72,
+    79
+   ],
+   "plainPressed": [
+    89,
+    90,
+    96
+   ],
+   "body": [
+    55,
+    56,
+    63
+   ],
+   "destructiveText": [
+    220,
+    57,
+    41
+   ]
+  },
+  "scrim": false
+ },
+ "sheet": {
+  "centredOnParent": true,
+  "custom": {
+   "size": [
+    440,
+    220
+   ],
+   "fill_dark": [
+    34,
+    35,
+    47
+   ],
+   "radius": 16,
+   "glass": false
+  },
+  "alertSheet": {
+   "size": [
+    260,
+    154
+   ],
+   "glass": "regular r26",
+   "icon": false
+  },
+  "parentDim": {
+   "content": [
+    32,
+    26
+   ],
+   "titlebar": [
+    40,
+    29
+   ]
+  },
+  "textEditSave": {
+   "size": [
+    390,
+    218
+   ],
+   "fill_dark": [
+    35,
+    33,
+    46
+   ],
+   "closeVariant": [
+    390,
+    318
+   ]
+  }
+ }
+}

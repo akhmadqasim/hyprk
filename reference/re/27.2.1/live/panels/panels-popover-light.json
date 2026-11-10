@@ -1,0 +1,941 @@
+[
+  {
+    "alpha" : 1,
+    "backgroundColor" : "Optional(Generic Gray Gamma 2.2 Profile colorspace 0 0)",
+    "class" : "_NSPopoverWindow",
+    "frame" : [
+      712,
+      677,
+      286,
+      166
+    ],
+    "hasShadow" : true,
+    "layers" : {
+      "class" : "CALayer",
+      "frame" : [
+        0,
+        0,
+        286,
+        166
+      ],
+      "mask" : {
+        "class" : "CAShapeLayer",
+        "frame" : [
+          0,
+          0,
+          0,
+          0
+        ],
+        "name" : "NSCGSWindow mask path",
+        "opacity" : 1,
+        "props" : {
+          "fillRule" : "non-zero",
+          "lineCap" : "butt",
+          "lineDashPattern" : null,
+          "lineDashPhase" : 0,
+          "lineJoin" : "miter",
+          "lineWidth" : 1,
+          "miterLimit" : 10,
+          "strokeEnd" : 1,
+          "strokeStart" : 0
+        }
+      },
+      "name" : "NSCGSWindow",
+      "opacity" : 1,
+      "sublayers" : [
+        {
+          "class" : "CABackdropLayer",
+          "filters" : [
+            {
+              "cachesInputImage" : false,
+              "class" : "CAFilter",
+              "enabled" : true,
+              "inputKeys" : [
+                "inputClamp",
+                "inputClampPreserveHue"
+              ],
+              "inputs" : {
+
+              },
+              "name" : "sdrNormalize",
+              "type" : "sdrNormalize"
+            },
+            {
+              "cachesInputImage" : false,
+              "class" : "CAFilter",
+              "enabled" : true,
+              "inputKeys" : [
+                "inputQuality",
+                "inputRadius",
+                "inputBounds",
+                "inputHardEdges",
+                "inputNormalizeEdges",
+                "inputNormalizeEdgesTransparent",
+                "inputDither",
+                "inputLinear",
+                "inputIntermediateBitDepth"
+              ],
+              "inputs" : {
+                "inputNormalizeEdges" : true,
+                "inputRadius" : 30
+              },
+              "name" : "gaussianBlur",
+              "type" : "gaussianBlur"
+            }
+          ],
+          "frame" : [
+            0,
+            0,
+            286,
+            166
+          ],
+          "name" : "NSCGSWindow capture backdrop",
+          "opacity" : 1,
+          "props" : {
+            "allowsFilteredLuma" : false,
+            "allowsInPlaceFiltering" : false,
+            "allowsSubstituteColor" : true,
+            "backdropRect" : "NSRect: {{0, 0}, {0, 0}}",
+            "bleedAmount" : 0,
+            "captureOnly" : true,
+            "disableFilterCache" : false,
+            "disablesOccludedBackdropBlurs" : false,
+            "enabled" : true,
+            "groupName" : "NSCGSWindowBehindWindowCaptureBackdropGroup",
+            "groupNamespace" : "hostingNamespacedContext",
+            "ignoresOffscreenGroups" : false,
+            "ignoresScreenClip" : false,
+            "lumaSubrect" : "NSRect: {{0, 0}, {0, 0}}",
+            "lumaUpdateRate" : 0.25,
+            "marginWidth" : 0,
+            "mt_colorMatrixDrivenInoperativeOpacity" : 1,
+            "mt_colorMatrixDrivenOpacity" : 1,
+            "preallocatesScreenArea" : false,
+            "reducesCaptureBitDepth" : false,
+            "scale" : 0.125,
+            "sourceSublayerDefinesBounds" : false,
+            "tracksLuma" : false,
+            "tracksLumaWhileHidden" : false,
+            "updateRate" : 0,
+            "usesGlobalGroupNamespace" : false,
+            "windowServerAware" : true,
+            "zoom" : 0
+          }
+        },
+        {
+          "class" : "CALayer",
+          "frame" : [
+            0,
+            0,
+            0,
+            0
+          ],
+          "name" : "NSWindow content layer",
+          "opacity" : 1,
+          "sublayers" : [
+            {
+              "class" : "NSViewBackingLayer",
+              "frame" : [
+                0,
+                0,
+                286,
+                166
+              ],
+              "masksToBounds" : true,
+              "name" : "NSPopoverFrame",
+              "opacity" : 1,
+              "sublayers" : [
+                {
+                  "class" : "BackingLayer",
+                  "frame" : [
+                    0,
+                    0,
+                    286,
+                    166
+                  ],
+                  "name" : "_TtCE6AppKitCSo17NSGlassEffectViewP33_92F0BB6107B916AA04C9A991F505A16412BackingLayer: NSGlassView",
+                  "opacity" : 1,
+                  "sublayers" : [
+                    {
+                      "class" : "CALayer",
+                      "frame" : [
+                        0,
+                        0,
+                        286,
+                        166
+                      ],
+                      "name" : "contentHolderView",
+                      "opacity" : 1
+                    },
+                    {
+                      "class" : "NSViewBackingLayer",
+                      "frame" : [
+                        0,
+                        0,
+                        286,
+                        166
+                      ],
+                      "name" : "_TtGC6AppKit18_NSCoreHostingViewVES_CSo17NSGlassEffectViewP10$19ca35b508RootView_",
+                      "opacity" : 1,
+                      "sublayers" : [
+                        {
+                          "class" : "CALayer",
+                          "frame" : [
+                            0,
+                            0,
+                            286,
+                            166
+                          ],
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "class" : "SDFLayer",
+                              "frame" : [
+                                0,
+                                0,
+                                286,
+                                166
+                              ],
+                              "opacity" : 1,
+                              "sublayers" : [
+                                {
+                                  "class" : "CALayer",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "opacity" : 1,
+                                  "sublayers" : [
+                                    {
+                                      "class" : "CALayer",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        286,
+                                        166
+                                      ],
+                                      "opacity" : 1,
+                                      "sublayers" : [
+                                        {
+                                          "class" : "ColorShapeLayer",
+                                          "filters" : [
+                                            {
+                                              "cachesInputImage" : false,
+                                              "class" : "CAFilter",
+                                              "enabled" : true,
+                                              "inputKeys" : [
+                                                "inputColorMatrix",
+                                                "inputBackdropAware",
+                                                "inputClamp",
+                                                "inputClampPreserveHue"
+                                              ],
+                                              "inputs" : {
+                                                "inputBackdropAware" : true,
+                                                "inputColorMatrix" : [
+                                                  0.3125,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  -0.25,
+                                                  0,
+                                                  0.3125,
+                                                  0,
+                                                  0,
+                                                  -0.25,
+                                                  0,
+                                                  0,
+                                                  0.3125,
+                                                  0,
+                                                  -0.25,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                                ]
+                                              },
+                                              "name" : "vibrantColorMatrix",
+                                              "type" : "vibrantColorMatrix"
+                                            }
+                                          ],
+                                          "frame" : [
+                                            0,
+                                            0,
+                                            286,
+                                            166
+                                          ],
+                                          "opacity" : 1,
+                                          "sublayers" : [
+                                            {
+                                              "class" : "CAShapeLayer",
+                                              "frame" : [
+                                                0,
+                                                0,
+                                                286,
+                                                166
+                                              ],
+                                              "opacity" : 1,
+                                              "props" : {
+                                                "fillRule" : "non-zero",
+                                                "lineCap" : "butt",
+                                                "lineDashPattern" : null,
+                                                "lineDashPhase" : 0,
+                                                "lineJoin" : "miter",
+                                                "lineWidth" : 1,
+                                                "miterLimit" : 10,
+                                                "strokeEnd" : 1,
+                                                "strokeStart" : 0
+                                              }
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "class" : "CALayer",
+                                          "frame" : [
+                                            0,
+                                            0,
+                                            286,
+                                            166
+                                          ],
+                                          "mask" : {
+                                            "class" : "MaskLayer",
+                                            "frame" : [
+                                              0,
+                                              0,
+                                              0,
+                                              0
+                                            ],
+                                            "opacity" : 1,
+                                            "props" : {
+                                              "fillRule" : "non-zero",
+                                              "lineCap" : "butt",
+                                              "lineDashPattern" : null,
+                                              "lineDashPhase" : 0,
+                                              "lineJoin" : "miter",
+                                              "lineWidth" : 1,
+                                              "miterLimit" : 10,
+                                              "strokeEnd" : 1,
+                                              "strokeStart" : 0
+                                            }
+                                          },
+                                          "opacity" : 1,
+                                          "sublayers" : [
+                                            {
+                                              "class" : "CAPortalLayer",
+                                              "frame" : [
+                                                0,
+                                                0,
+                                                286,
+                                                166
+                                              ],
+                                              "opacity" : 1,
+                                              "props" : {
+                                                "allowedInContextTransform" : false,
+                                                "allowsBackdropGroups" : true,
+                                                "crossDisplay" : false,
+                                                "excludeSeparated" : false,
+                                                "hidesSourceLayer" : true,
+                                                "hidesSourceLayerInOtherPortals" : false,
+                                                "matchesOpacity" : false,
+                                                "matchesPosition" : true,
+                                                "matchesTransform" : true,
+                                                "overrides" : null,
+                                                "sourceContextId" : 0,
+                                                "sourceLayer" : "layer:CALayer",
+                                                "sourceLayerOpacityScale" : 1,
+                                                "sourceLayerRenderId" : 0
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "class" : "CALayer",
+                                  "frame" : [
+                                    13,
+                                    13,
+                                    260,
+                                    150.64979553222656
+                                  ],
+                                  "opacity" : 1,
+                                  "sublayers" : [
+                                    {
+                                      "class" : "CABackdropLayer",
+                                      "filters" : [
+                                        {
+                                          "cachesInputImage" : false,
+                                          "class" : "DLCAFilter",
+                                          "enabled" : true,
+                                          "inputKeys" : [
+                                            "inputSourceSublayerName",
+                                            "inputInnerRefractionAmount",
+                                            "inputInnerRefractionHeight",
+                                            "inputOuterRefractionAmount",
+                                            "inputOuterRefractionHeight",
+                                            "inputRefractionDistance0",
+                                            "inputRefractionDistance1",
+                                            "inputRefractionOpacity",
+                                            "inputBlurRadius",
+                                            "inputBlurOpacity0",
+                                            "inputBlurOpacity1",
+                                            "inputBlurOpacity2",
+                                            "inputBlurOpacity3",
+                                            "inputBlurOpacity4",
+                                            "inputBlurDistance0",
+                                            "inputBlurDistance1",
+                                            "inputBlurDistance2",
+                                            "inputBlurDistance3",
+                                            "inputBlurDistance4",
+                                            "inputFaceOpacity",
+                                            "inputFaceColorMatrixWhite",
+                                            "inputFaceColorMatrixBlack",
+                                            "inputFaceColorMatrixSaturation",
+                                            "inputFaceColorMatrixFillColor",
+                                            "inputFaceColorMatrixMaxLuma",
+                                            "inputFaceColorMatrixMaxLumaSDR",
+                                            "inputBleedAmount",
+                                            "inputBleedHeight",
+                                            "inputBleedBlurRadius",
+                                            "inputBleedDistance0",
+                                            "inputBleedDistance1",
+                                            "inputBleedOpacity",
+                                            "inputBleedDarkenBlend",
+                                            "inputBleedColorMatrixWhite",
+                                            "inputBleedColorMatrixBlack",
+                                            "inputBleedColorMatrixSaturation",
+                                            "inputBleedColorMatrixFillColor",
+                                            "inputShadowOffset",
+                                            "inputShadowAmount",
+                                            "inputShadowHeight",
+                                            "inputShadowOpacity",
+                                            "inputShadowColorMatrixWhite",
+                                            "inputShadowColorMatrixBlack",
+                                            "inputShadowColorMatrixSaturation",
+                                            "inputShadowColorMatrixFillColor",
+                                            "inputShadowDistanceOffset",
+                                            "inputShadowBlurRadius",
+                                            "inputShadowRadius",
+                                            "inputRingShadowOffset",
+                                            "inputRingShadowStrokeWidth",
+                                            "inputRingShadowBlurRadius",
+                                            "inputRingShadowOpacity",
+                                            "inputRingShadowMask",
+                                            "inputKeyFillHighlightHeight",
+                                            "inputKeyFillHighlightAngle",
+                                            "inputKeyFillHighlightSpread",
+                                            "inputKeyFillHighlightSpreadSDR",
+                                            "inputKeyFillHighlightAmount",
+                                            "inputKeyFillHighlightEffectOffset",
+                                            "inputKeyFillHighlightColorBias",
+                                            "inputBlurFillBlurRadius",
+                                            "inputBlurFillLightenOpacity",
+                                            "inputBlurFillDarkenOpacity",
+                                            "inputBlurFillNormalOpacity",
+                                            "inputSDRHoldingToneEnabled",
+                                            "inputSDRHoldingToneWhite",
+                                            "inputSDRGradientDistance0",
+                                            "inputSDRGradientDistance1",
+                                            "inputSDRShadowOpacity",
+                                            "inputMaxHeadroom",
+                                            "inputShadowVibrancyContribution",
+                                            "inputClamp",
+                                            "inputClampPreserveHue",
+                                            "inputAberrationAmount",
+                                            "inputAberrationHeight",
+                                            "inputAberrationOffset",
+                                            "inputAberrationAngle"
+                                          ],
+                                          "inputs" : {
+                                            "inputBleedAmount" : 52.727428436279297,
+                                            "inputBleedBlurRadius" : 52.727428436279297,
+                                            "inputBleedColorMatrixBlack" : 0.89999997615814209,
+                                            "inputBleedColorMatrixSaturation" : 1.2000000476837158,
+                                            "inputBleedColorMatrixWhite" : 1,
+                                            "inputBleedDarkenBlend" : true,
+                                            "inputBleedDistance0" : 1,
+                                            "inputBleedDistance1" : 0,
+                                            "inputBleedHeight" : 52.727428436279297,
+                                            "inputBleedOpacity" : 0.45130100846290588,
+                                            "inputBlurDistance0" : -75.324897766113281,
+                                            "inputBlurDistance1" : -1,
+                                            "inputBlurDistance2" : 0,
+                                            "inputBlurDistance3" : 0,
+                                            "inputBlurFillBlurRadius" : 8,
+                                            "inputBlurFillDarkenOpacity" : 0,
+                                            "inputBlurFillLightenOpacity" : 0.89999997615814209,
+                                            "inputBlurFillNormalOpacity" : 0.50711458921432495,
+                                            "inputBlurOpacity0" : 0.72208160161972046,
+                                            "inputBlurOpacity1" : 0.36104080080986023,
+                                            "inputBlurOpacity2" : 0.5,
+                                            "inputBlurOpacity3" : 1,
+                                            "inputBlurRadius" : 5,
+                                            "inputClamp" : 1.0696101188659668,
+                                            "inputClampPreserveHue" : false,
+                                            "inputFaceColorMatrixBlack" : 0.40000000596046448,
+                                            "inputFaceColorMatrixFillColor" : {
+                                              "color" : [
+                                                1,
+                                                1,
+                                                1,
+                                                0.20426875352859497
+                                              ],
+                                              "space" : "kCGColorSpaceExtendedSRGB"
+                                            },
+                                            "inputFaceColorMatrixMaxLuma" : 1,
+                                            "inputFaceColorMatrixMaxLumaSDR" : 0.93999999761581421,
+                                            "inputFaceColorMatrixSaturation" : 1.2000000476837158,
+                                            "inputFaceColorMatrixWhite" : 1.0299999713897705,
+                                            "inputFaceOpacity" : 1,
+                                            "inputInnerRefractionAmount" : -60,
+                                            "inputInnerRefractionHeight" : 5,
+                                            "inputKeyFillHighlightAmount" : 0.40000000000000002,
+                                            "inputKeyFillHighlightAngle" : 1.5707963267948966,
+                                            "inputKeyFillHighlightColorBias" : -0.25,
+                                            "inputKeyFillHighlightEffectOffset" : -0.5,
+                                            "inputKeyFillHighlightHeight" : 0.5,
+                                            "inputKeyFillHighlightSpread" : 1.6755160819145565,
+                                            "inputKeyFillHighlightSpreadSDR" : 1.8500490071139892,
+                                            "inputMaxHeadroom" : 9999,
+                                            "inputOuterRefractionAmount" : 37.662448883056641,
+                                            "inputOuterRefractionHeight" : 30.129959106445312,
+                                            "inputRefractionDistance0" : -1,
+                                            "inputRefractionDistance1" : 0,
+                                            "inputRefractionOpacity" : 0.60000002384185791,
+                                            "inputRingShadowBlurRadius" : 5,
+                                            "inputRingShadowMask" : 1,
+                                            "inputRingShadowOffset" : 8,
+                                            "inputRingShadowOpacity" : 0.059999998658895493,
+                                            "inputRingShadowStrokeWidth" : 4,
+                                            "inputSDRGradientDistance0" : 0,
+                                            "inputSDRGradientDistance1" : 0,
+                                            "inputSDRHoldingToneEnabled" : false,
+                                            "inputSDRHoldingToneWhite" : 1,
+                                            "inputSDRShadowOpacity" : 0,
+                                            "inputShadowAmount" : 0,
+                                            "inputShadowBlurRadius" : 0,
+                                            "inputShadowColorMatrixBlack" : 0,
+                                            "inputShadowColorMatrixFillColor" : {
+                                              "color" : [
+                                                0,
+                                                0,
+                                                0,
+                                                0.30000001192092896
+                                              ],
+                                              "space" : "kCGColorSpaceExtendedSRGB"
+                                            },
+                                            "inputShadowColorMatrixSaturation" : 1,
+                                            "inputShadowColorMatrixWhite" : 1,
+                                            "inputShadowDistanceOffset" : 0,
+                                            "inputShadowHeight" : 0,
+                                            "inputShadowOffset" : [
+                                              0,
+                                              8
+                                            ],
+                                            "inputShadowOpacity" : 0.36493673920631409,
+                                            "inputShadowRadius" : 22.052040735880535,
+                                            "inputShadowVibrancyContribution" : 0,
+                                            "inputSourceSublayerName" : "@0"
+                                          },
+                                          "name" : "glassBackground",
+                                          "type" : "glassBackground"
+                                        }
+                                      ],
+                                      "frame" : [
+                                        13,
+                                        13,
+                                        260,
+                                        150.64979553222656
+                                      ],
+                                      "name" : "@0",
+                                      "opacity" : 1,
+                                      "props" : {
+                                        "allowsFilteredLuma" : true,
+                                        "allowsInPlaceFiltering" : false,
+                                        "allowsSubstituteColor" : false,
+                                        "backdropRect" : "NSRect: {{0, 0}, {0, 0}}",
+                                        "bleedAmount" : 0,
+                                        "captureOnly" : false,
+                                        "disableFilterCache" : false,
+                                        "disablesOccludedBackdropBlurs" : false,
+                                        "enabled" : true,
+                                        "groupName" : "SwiftUI:58.00.0",
+                                        "groupNamespace" : "owningContext",
+                                        "ignoresOffscreenGroups" : false,
+                                        "ignoresScreenClip" : false,
+                                        "lumaSubrect" : "NSRect: {{0, 0}, {0, 0}}",
+                                        "lumaUpdateRate" : 0.25,
+                                        "marginWidth" : 52.727428436279297,
+                                        "mt_colorMatrixDrivenInoperativeOpacity" : 1,
+                                        "mt_colorMatrixDrivenOpacity" : 1,
+                                        "preallocatesScreenArea" : false,
+                                        "reducesCaptureBitDepth" : false,
+                                        "scale" : 0.5,
+                                        "sourceSublayerDefinesBounds" : true,
+                                        "tracksLuma" : false,
+                                        "tracksLumaWhileHidden" : false,
+                                        "updateRate" : 0,
+                                        "usesGlobalGroupNamespace" : false,
+                                        "windowServerAware" : true,
+                                        "zoom" : 0
+                                      },
+                                      "sublayers" : [
+                                        {
+                                          "class" : "CASDFLayer",
+                                          "frame" : [
+                                            13,
+                                            13,
+                                            260,
+                                            150.64979553222656
+                                          ],
+                                          "name" : "@0",
+                                          "opacity" : 1,
+                                          "props" : {
+                                            "effect" : {
+                                              "class" : "CASDFOutputEffect",
+                                              "maximum" : 34.211449067351872,
+                                              "minimum" : -10000
+                                            },
+                                            "effectOffset" : 0,
+                                            "experimentalCulling" : false,
+                                            "gaussianRadius" : 0,
+                                            "mergeElements" : false,
+                                            "smoothness" : 8
+                                          },
+                                          "sublayers" : [
+                                            {
+                                              "class" : "CALayer",
+                                              "frame" : [
+                                                0,
+                                                0,
+                                                0,
+                                                0
+                                              ],
+                                              "opacity" : 1,
+                                              "sublayers" : [
+                                                {
+                                                  "class" : "CASDFElementLayer",
+                                                  "contentsScale" : 2,
+                                                  "cornerCurve" : "continuous",
+                                                  "cornerRadius" : 20,
+                                                  "frame" : [
+                                                    -22,
+                                                    -22,
+                                                    330,
+                                                    220
+                                                  ],
+                                                  "hasContents" : true,
+                                                  "opacity" : 1,
+                                                  "props" : {
+                                                    "contentsOneValueDistance" : -75.324897766113281,
+                                                    "contentsZeroValueDistance" : 34.211449067351872,
+                                                    "gradientOvalization" : 0,
+                                                    "hitTestsAsFill" : true,
+                                                    "mode" : "contents",
+                                                    "operation" : "union"
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "class" : "SDFPortalLayer",
+                                      "frame" : [
+                                        13,
+                                        13,
+                                        260,
+                                        150.64979553222656
+                                      ],
+                                      "name" : "@1",
+                                      "opacity" : 1,
+                                      "props" : {
+                                        "allowedInContextTransform" : false,
+                                        "allowsBackdropGroups" : true,
+                                        "crossDisplay" : false,
+                                        "excludeSeparated" : false,
+                                        "hidesSourceLayer" : true,
+                                        "hidesSourceLayerInOtherPortals" : false,
+                                        "matchesOpacity" : false,
+                                        "matchesPosition" : false,
+                                        "matchesTransform" : false,
+                                        "overrides" : null,
+                                        "sourceContextId" : 3673642034,
+                                        "sourceLayer" : "layer:CALayer",
+                                        "sourceLayerOpacityScale" : 1,
+                                        "sourceLayerRenderId" : 10650975959717377533
+                                      }
+                                    },
+                                    {
+                                      "class" : "CASDFLayer",
+                                      "filters" : [
+                                        {
+                                          "cachesInputImage" : false,
+                                          "class" : "CAFilter",
+                                          "enabled" : true,
+                                          "inputKeys" : [
+                                            "inputColorMatrix",
+                                            "inputBackdropAware",
+                                            "inputClamp",
+                                            "inputClampPreserveHue"
+                                          ],
+                                          "inputs" : {
+                                            "inputClamp" : 1,
+                                            "inputColorMatrix" : [
+                                              1.1201999187469482,
+                                              -0.18940000236034393,
+                                              -0.018999999389052391,
+                                              0,
+                                              0.14710000157356262,
+                                              -0.056299999356269836,
+                                              0.98709994554519653,
+                                              -0.019099999219179153,
+                                              0,
+                                              0.14710000157356262,
+                                              -0.056299999356269836,
+                                              -0.18930000066757202,
+                                              1.1574000120162964,
+                                              0,
+                                              0.14710000157356262,
+                                              0,
+                                              0,
+                                              0,
+                                              1,
+                                              0
+                                            ]
+                                          },
+                                          "name" : "vibrantColorMatrix",
+                                          "type" : "vibrantColorMatrix"
+                                        }
+                                      ],
+                                      "frame" : [
+                                        13,
+                                        13,
+                                        260,
+                                        150.64979553222656
+                                      ],
+                                      "name" : "@2",
+                                      "opacity" : 1,
+                                      "props" : {
+                                        "effect" : {
+                                          "class" : "CASDFKeyFillHighlightEffect",
+                                          "curvature" : 0.75,
+                                          "diffuseAmountScale" : 0.15000000596046448,
+                                          "diffuseHeightScale" : 8,
+                                          "diffuseSpreadScale" : 0.64999997615814209,
+                                          "fillAmount" : 0.5,
+                                          "fillAngle" : 3.1415926535897931,
+                                          "fillHeight" : 1,
+                                          "fillHeightOffset" : 0,
+                                          "fillHeightScale" : 1,
+                                          "fillSpread" : 1.4956195336349469,
+                                          "fillSpreadOffset" : 0,
+                                          "fillSpreadScale" : 1,
+                                          "global" : false,
+                                          "keyAmount" : 0.5,
+                                          "keyAngle" : 0,
+                                          "keyHeight" : 1,
+                                          "keyHeightOffset" : 0,
+                                          "keyHeightScale" : 1,
+                                          "keySpread" : 1.4956195336349469,
+                                          "keySpreadOffset" : 0,
+                                          "keySpreadScale" : 1
+                                        },
+                                        "effectOffset" : 0,
+                                        "experimentalCulling" : false,
+                                        "gaussianRadius" : 0,
+                                        "mergeElements" : false,
+                                        "smoothness" : 8
+                                      },
+                                      "sublayers" : [
+                                        {
+                                          "class" : "SDFPortalLayer",
+                                          "frame" : [
+                                            0,
+                                            0,
+                                            0,
+                                            0
+                                          ],
+                                          "opacity" : 1,
+                                          "props" : {
+                                            "allowedInContextTransform" : false,
+                                            "allowsBackdropGroups" : false,
+                                            "crossDisplay" : false,
+                                            "excludeSeparated" : false,
+                                            "hidesSourceLayer" : false,
+                                            "hidesSourceLayerInOtherPortals" : false,
+                                            "matchesOpacity" : false,
+                                            "matchesPosition" : false,
+                                            "matchesTransform" : false,
+                                            "overrides" : null,
+                                            "sourceContextId" : 3673642034,
+                                            "sourceLayer" : "layer:CALayer",
+                                            "sourceLayerOpacityScale" : 1,
+                                            "sourceLayerRenderId" : 10650975959708429629
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "class" : "NSViewBackingLayer",
+                  "frame" : [
+                    13,
+                    13,
+                    260,
+                    140
+                  ],
+                  "name" : "NSView",
+                  "opacity" : 1,
+                  "sublayers" : [
+                    {
+                      "class" : "NSViewBackingLayer",
+                      "frame" : [
+                        20,
+                        60,
+                        220,
+                        20
+                      ],
+                      "name" : "NSTextField",
+                      "opacity" : 1,
+                      "sublayers" : [
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "contentsScale" : 2,
+                          "frame" : [
+                            0,
+                            0,
+                            220,
+                            20
+                          ],
+                          "hasContents" : true,
+                          "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "class" : "ContentLayer",
+                              "contentsScale" : 2,
+                              "frame" : [
+                                -11.5,
+                                -4.5,
+                                160,
+                                26.5
+                              ],
+                              "hasContents" : true,
+                              "masksToBounds" : true,
+                              "opacity" : 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "level" : 0,
+    "number" : 3733,
+    "opaque" : false,
+    "styleMask" : 0,
+    "views" : {
+      "blending" : 0,
+      "class" : "NSPopoverFrame",
+      "frame" : [
+        0,
+        0,
+        286,
+        166
+      ],
+      "material" : 0,
+      "state" : 0,
+      "subviews" : [
+        {
+          "class" : "NSGlassView",
+          "frame" : [
+            0,
+            0,
+            286,
+            166
+          ],
+          "glassCornerRadius" : 20,
+          "glassStyle" : 0,
+          "subviews" : [
+            {
+              "class" : "ContentHolderView",
+              "frame" : [
+                0,
+                0,
+                286,
+                166
+              ]
+            },
+            {
+              "class" : "_NSCoreHostingView<RootView>",
+              "frame" : [
+                0,
+                0,
+                286,
+                166
+              ]
+            }
+          ]
+        },
+        {
+          "class" : "NSView",
+          "frame" : [
+            13,
+            13,
+            260,
+            140
+          ],
+          "subviews" : [
+            {
+              "class" : "NSTextField",
+              "font" : ".AppleSystemUIFont 13.0",
+              "frame" : [
+                20,
+                60,
+                220,
+                20
+              ],
+              "subviews" : [
+                {
+                  "class" : "NSTextFieldSimpleLabel",
+                  "frame" : [
+                    0,
+                    0,
+                    220,
+                    20
+                  ]
+                }
+              ],
+              "text" : "hyprk test popover",
+              "textColor" : "Optional(Catalog color: System labelColor)",
+              "weight" : "{\n    NSCTFontProportionTrait = 0;\n    NSCTFontSlantTrait = 0;\n    NSCTFontSymbolicTrait = 16384;\n    NSCTFontUIFontDesignTrait = NSCTFontUIFontDesignDefault;\n    NSCTFontWeightTrait = 0;\n}"
+            }
+          ]
+        }
+      ]
+    },
+    "visible" : true
+  }
+]
