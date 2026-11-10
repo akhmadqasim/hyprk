@@ -59,11 +59,12 @@ namespace lg {
         // dark (0.05, 0.92, 1.25) + black 2 %; blur 1.5; inner 0.08 D / -0.18 D; outer layer opacity 0.2 with no
         // displacement (outer height and amount 0); rim -0.25 at 120 deg, highlight target light (0.2, 1.2, 1.333),
         // dark (0.25, 0.95, 1.2). The light face matches the real Dock (MAC-ANSWERS Q-dock-01: white 229, black 38,
-        // grey 127 -> 134).
+        // grey 127 -> 134). Dark: max luma 0.75 (probe) bends the face to the Mac's 176 / 107 / 12 over white / grey
+        // 127 / black (MAC-ANSWERS "Glass checks (#53)"); the 0.92 white alone gave 228 / 119 / 12.
         constexpr SRecipe DOCK = {
             .name              = "dock",
             .light             = {.ycc = {0.15f, 0.9f, 1.25f}, .fill = {}, .bleed = CLEAR_BLEED, .keyYcc = {0.2f, 1.2f, 1.3334f}, .darkSpread = 120},
-            .dark              = {.ycc = {0.05f, 0.92f, 1.25f}, .fill = {0, 0, 0, 0.02f}, .bleed = CLEAR_BLEED, .keyYcc = {0.25f, 0.95f, 1.2f}, .darkSpread = 120},
+            .dark              = {.ycc = {0.05f, 0.92f, 1.25f}, .fill = {0, 0, 0, 0.02f}, .bleed = CLEAR_BLEED, .keyYcc = {0.25f, 0.95f, 1.2f}, .darkSpread = 120, .maxLuma = 0.75f},
             .refractionHeightN = 0.08f,
             .refractionAmountN = -0.18f,
             .outerOpacity      = 0.2f,

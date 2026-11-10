@@ -99,6 +99,8 @@ int main() {
         CHECK(near(r.refractionHeight, 20, 1e-4) && near(r.refractionAmount, -60, 1e-4) && near(r.blurRadius, 4, 1e-4));
         CHECK(near(resolveMaterial(reg, 104).blurRadius, 3, 1e-4));
         CHECK(near(recipeByName("dock").light.ycc.white, 0.9, 1e-6));
+        // dark Dock max luma 0.75 (probe), every other face 1 (MAC-ANSWERS "Glass checks (#53)")
+        CHECK(near(recipeByName("dock").dark.maxLuma, 0.75, 1e-6) && near(recipeByName("dock").light.maxLuma, 1) && near(recipeByName("controlcenter").dark.maxLuma, 1));
         CHECK(near(resolveMaterial(recipeByName("controlcenter"), 60).refractionAmount, -80, 1e-4));
         CHECK(std::string{recipeByName("nope").name} == "regular");
         // 27.2.1 probe (reference/re/27.2.1/live/glass-params-*.json): Control Center (also the HUD) is the

@@ -636,7 +636,7 @@ namespace lg {
             glUniform1f(u.bleedAmount, res.bleedAmount * p.refractionScale * scale);
             glUniform1f(u.bleedLod, std::log2(1.f + res.bleedBlur * scale));
             glUniform3f(u.bleedYcc, face.bleed.black, face.bleed.white, face.bleed.saturation);
-            glUniform3f(u.faceYcc, face.ycc.black, face.ycc.white, face.ycc.saturation);
+            glUniform4f(u.faceYcc, face.ycc.black, face.ycc.white, face.ycc.saturation, face.maxLuma);
             glUniform4f(u.faceFill, face.fill.r, face.fill.g, face.fill.b, face.fill.a);
             glUniform3f(u.keyYcc, face.keyYcc.black, face.keyYcc.white, face.keyYcc.saturation);
             const float keyRad = res.keySpread * float(M_PI / 180.0);

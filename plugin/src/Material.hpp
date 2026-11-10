@@ -38,6 +38,9 @@ namespace lg {
         SYcc  keyYcc = {0.1471f, 1.0588f, 1.1765f};
         float darkBias   = -0.25f; // glass filter key highlight colourBias ("dark specular")
         float darkSpread = 96;     // its spread, degrees
+        // inputFaceColorMatrixMaxLuma: the face's luma is bent so white lands here (1 = off). The probe gives
+        // the parameter; the curve Y - (1 - m) Y^2 is fitted to the dark Dock (MAC-ANSWERS "Glass checks (#53)")
+        float maxLuma = 1;
     };
 
     struct SRecipe {

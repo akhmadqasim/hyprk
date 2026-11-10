@@ -44,7 +44,7 @@ uniform float bleedAmount;          // px, + = outward
 uniform float bleedLod;
 uniform vec3  bleedYcc;
 
-uniform vec3  faceYcc;              // black, white, saturation
+uniform vec4  faceYcc;              // black, white, saturation, max luma
 uniform vec4  faceFill;             // rgb + amount ("normalFill")
 
 // rim (27.2.1 probe + HUD pixels, see the rim block in main)
@@ -253,7 +253,10 @@ void main() {
         }
 
         // YCC face effect, then the fill (SPEC 9.7)
-        col = ycc(col, mix(vec3(0.0, 1.0, 1.0), faceYcc, mat)); // (0, 1, 1) = identity
+        col = ycc(col, mix(vec3(0.0, 1.0, 1.0), faceYcc.xyz, mat)); // (0, 1, 1) = identity
+        // max luma (inputFaceColorMatrixMaxLuma < 1): Y' -> Y' - (1 - m) Y'^2, so white lands on m
+        float Yf = luma(col);
+        col -= vec3((1.0 - mix(1.0, faceYcc.w, mat)) * Yf * Yf);
         col = mix(col, faceFill.rgb, faceFill.a * mat);
         // edge bleed: outside colour pulled into the rim through its own colour effect (step 4.7)
         if (bleedOpacity > 0.0 && depth < bleedHeight) {
