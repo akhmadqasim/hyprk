@@ -22,7 +22,8 @@
 
 namespace {
 
-// image://icon/<theme name or absolute path> for .desktop application icons.
+// image://icon/<theme name or absolute path> for .desktop application icons the macOS table
+// (FileIcon.qml, themes/icons/apple-map.txt) has no icon for.
 class IconProvider : public QQuickImageProvider {
 public:
     IconProvider() : QQuickImageProvider(QQuickImageProvider::Pixmap) {}
@@ -113,6 +114,10 @@ int main(int argc, char *argv[])
         {QStringLiteral("blur"), qgetenv("HYPRK_BLUR") == "1"},
         // macOS document/folder icons extracted into themes/icons/system
         {QStringLiteral("hasSysIcons"), QDir(iconDir).exists(QStringLiteral("GenericDocumentIcon-512.png"))},
+        // macOS app icons (themes/icons/apps) for .desktop apps, picked in FileIcon.qml through the
+        // shared Linux name -> macOS name table (themes/icons/apple-map.txt, finder/qml/lib/macicons.js)
+        {QStringLiteral("iconRoot"), QDir::cleanPath(iconDir + QStringLiteral("/.."))},
+        {QStringLiteral("hasAppIcons"), QDir(iconDir).exists(QStringLiteral("../apps/Finder-512.png"))},
     });
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreationFailed, &app,
                      [] { QCoreApplication::exit(1); }, Qt::QueuedConnection);

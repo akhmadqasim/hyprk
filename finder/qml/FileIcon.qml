@@ -1,11 +1,14 @@
 import QtQuick
 import "lib/files.js" as Files
 import "lib/icons.js" as Icons
+import "lib/macicons.js" as MacIcons
 import HyprK
 
 // Icon for one entry, best first: content thumbnail (images, PDFs, videos with a cached
-// thumbnail; generated off the UI thread by image://thumb), app icon, the macOS icon from
-// themes/icons/system, and the drawn SVG icon when those PNGs are missing.
+// thumbnail; generated off the UI thread by image://thumb), app icon (the macOS icon from
+// themes/icons/apps when themes/icons/apple-map.txt has one, as the Dock shows it, else the host
+// icon theme on a squircle tile), the macOS icon from themes/icons/system, and the drawn SVG
+// icon when those PNGs are missing.
 Item {
     id: root
 
@@ -79,14 +82,21 @@ Item {
         }
     }
 
+    // mapped macOS icon of a .desktop app: the same table as the shell's Dock (apple-map.txt)
+    readonly property string macApp: root.kind === "app" && typeof startup !== "undefined" && startup.hasAppIcons
+                                     ? MacIcons.lookup([entry.appId || "", entry.icon || ""]) : ""
+
     // .desktop app icon on the macOS 26 tile (HyprK AppIconTile); its body
-    // matches the padding of the macOS PNGs used for the other icons
+    // matches the padding of the macOS PNGs used for the other icons. A mapped macOS icon is
+    // drawn as it is (it is already a squircle), everything else goes through the host theme.
     AppIconTile {
         id: appIcon
         visible: root.kind === "app" && status === Image.Ready
         anchors.centerIn: parent
         size: root.size
-        source: root.kind === "app" && root.entry.icon ? "image://icon/" + root.entry.icon : ""
+        trusted: root.macApp !== ""
+        source: root.macApp !== "" ? "file://" + startup.iconRoot + "/" + MacIcons.file(root.macApp)
+              : root.kind === "app" && root.entry.icon ? "image://icon/" + root.entry.icon : ""
     }
 
     Image {
