@@ -5,6 +5,11 @@ import qs.services
 
 // hyprk: macOS 27-style desktop shell for Hyprland.
 ShellRoot {
+    // singletons that must run from start: clipboard history watcher (when turned on),
+    // Spotlight mode shortcuts (hyprk:spotlight-<mode>)
+    readonly property bool clipboardWatching: Clipboard.watching
+    readonly property string spotlightMode: SpotlightState.mode
+
     Variants {
         model: Quickshell.screens
         delegate: Component {

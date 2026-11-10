@@ -5,9 +5,13 @@ import qs
 import qs.components
 import qs.services
 import "../lib/search.js" as Search
+import "../lib/spotlight.js" as SL
+import "spotlight"
 
 // Spotlight (Super+Space): capsule search bar, results below in a second
-// glass panel. Apps from .desktop entries, inline calculator, files placeholder.
+// glass panel. Apps from .desktop entries, inline calculator, actions (quick keys
+// first), files. Browse modes (macOS 26/27, Super/Ctrl/Alt+1..4 or the mode buttons):
+// Applications, Files, Actions, Clipboard, drawn by spotlight/ModeView.qml.
 ShellWindow {
     id: sp
 
@@ -28,12 +32,27 @@ ShellWindow {
     property string query: ""
     property int selected: 0
     readonly property var calcValue: Search.calc(query)
-    readonly property var apps: shown && query.trim() !== "" ? Search.rank(Apps.visibleEntries, query, Theme.spotlight.maxApps) : []
-    // rows: {kind: "calc"|"app"|"files", ...}
+    readonly property var apps: shown && mode === "" && query.trim() !== "" ? Search.rank(Apps.visibleEntries, query, Theme.spotlight.maxApps) : []
+    // browse mode ("" = all results), shared with SpotlightState so global shortcuts can open one
+    readonly property string mode: SpotlightState.mode
+    readonly property var modeInfo: SL.modeInfo(mode)
+    // the mode buttons show once the pointer moves over Spotlight, or while a mode is active
+    property bool pointerMoved: false
+    readonly property var actions: mode === "" && query.trim() !== "" ? SpotlightActions.rank(query, 2) : []
+    readonly property bool quickKeyHit: SL.quickKeyAction(SpotlightState.quickKeys, query) !== ""
+    readonly property var files: mode === "" ? FileSearch.results.slice(0, 3) : []
+    Binding { target: FileSearch; property: "query"; value: sp.mode === "" || sp.mode === "files" ? sp.query : "" }
+    // rows: {kind: "calc"|"app"|"action"|"file", ...}
     // macOS 26/27 layout: section headers, few tall rows, no per-row type column
     readonly property var rows: {
-        if (query.trim() === "") return [];
+        if (mode !== "" || query.trim() === "") return [];
         const r = [];
+        const addActions = () => {
+            if (actions.length === 0) return;
+            r.push({ kind: "header", title: "Actions" });
+            for (const a of actions) r.push({ kind: "action", title: a.title, subtitle: a.subtitle || "", action: a });
+        };
+        if (quickKeyHit) addActions();      // a typed quick key puts its action on top
         if (calcValue !== null) {
             r.push({ kind: "header", title: "Calculator" });
             r.push({ kind: "calc", title: Search.formatNumber(calcValue), subtitle: query.trim() + " =" });
@@ -42,9 +61,36 @@ ShellWindow {
             r.push({ kind: "header", title: "Applications" });
             for (const a of apps) r.push({ kind: "app", title: a.name, entry: a, icon: a.icon });
         }
-        r.push({ kind: "header", title: "Files" });
-        r.push({ kind: "files", title: "Search Files for “" + query.trim() + "”" });
+        if (!quickKeyHit) addActions();
+        if (files.length > 0) {
+            r.push({ kind: "header", title: "Files" });
+            for (const f of files) r.push({ kind: "file", title: f.name, subtitle: f.dir, file: f });
+        }
         return r;
+    }
+    function setMode(m) {
+        SpotlightState.mode = m;
+        pointerMoved = true;
+        input.forceActiveFocus();
+    }
+    // query field keys without a dedicated handler: Super/Ctrl/Alt+1..4 pick a mode,
+    // Left/Right on an empty field cycle the modes (macOS) or move in the Apps grid
+    function handleKey(event) {
+        const m = SL.modeForKey(event.key, event.modifiers & Qt.MetaModifier, event.modifiers & Qt.ControlModifier, event.modifiers & Qt.AltModifier);
+        if (m !== "") { setMode(m === mode ? "" : m); event.accepted = true; return; }
+        const dir = event.key === Qt.Key_Right ? 1 : event.key === Qt.Key_Left ? -1 : 0;
+        if (dir === 0 || input.text !== "") return;
+        if (mode === "apps") modeView.move(dir, 0);
+        else setMode(SL.cycleMode(mode, dir));
+        event.accepted = true;
+    }
+    function moveSel(dir) { if (mode !== "") modeView.move(0, dir); else step(dir); }
+    function acceptSel() { if (mode !== "") modeView.accept(); else accept(); }
+    // Esc in a mode clears the query, then leaves the mode; then closes Spotlight
+    function escapeKey() {
+        if (mode === "") Panels.close();
+        else if (input.text !== "") input.text = "";
+        else setMode("");
     }
     function selectable(i) { return rows[i] && rows[i].kind !== "header"; }
     // next selectable row in direction dir (wraps), skipping section headers
@@ -62,22 +108,32 @@ ShellWindow {
         input.text = Panels.spotlightQuery;
         Panels.spotlightQuery = "";
     }
-    Component.onCompleted: { takeQuery(); input.forceActiveFocus(); }
+    Component.onCompleted: { takeQuery(); input.forceActiveFocus(); FileSearch.loadRecents(); }
     Connections {
         target: Panels
         function onSpotlightQueryChanged() { sp.takeQuery(); }
     }
-    onQueryChanged: { selected = 0; if (!selectable(0)) step(1); }
+    function selectFirst() { selected = 0; if (!selectable(0)) step(1); }
+    onQueryChanged: selectFirst()
+    // rows can fill in after the query changed (window creation, streamed files): keep a row selected
+    onRowsChanged: if (!selectable(selected)) selectFirst()
 
     function accept() {
         const row = rows[selected];
         if (!row) return;
+        if (row.kind === "action") { SpotlightActions.run(row.action); return; }
         if (row.kind === "app") Apps.launch(row.entry, row.entry.id);
+        else if (row.kind === "file") FileSearch.open(row.file);
         else if (row.kind === "calc") Quickshell.clipboardText = row.title;
         Panels.close();
     }
 
-    MouseArea { anchors.fill: parent; onPressed: Panels.close() }
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+        onPressed: Panels.close()
+        onPositionChanged: sp.pointerMoved = true
+    }
 
     // `qs ipc call spotlight search "2+2"`: open with a query (scripted screenshots)
     readonly property real panelX: (width - Theme.spotlight.width) / 2
@@ -89,18 +145,20 @@ ShellWindow {
         x: sp.panelX
         y: sp.panelY
         width: Theme.spotlight.width
-        height: Theme.spotlight.barHeight + (sp.rows.length > 0 ? list.height + Theme.spotlight.listInset * 2 + 1 : 0)
+        readonly property bool expanded: sp.mode !== "" || sp.rows.length > 0
+        height: Theme.spotlight.barHeight + (sp.mode !== "" ? modeView.height + Theme.spotlight.listInset * 2 + 1
+                                            : sp.rows.length > 0 ? list.height + Theme.spotlight.listInset * 2 + 1 : 0)
         opacity: sp.appear
         scale: 0.97 + 0.03 * sp.appear
 
         Glass {
             anchors.fill: parent
-            radius: sp.rows.length > 0 ? Theme.spotlight.resultsRadius : Theme.spotlight.radius
+            radius: panel.expanded ? Theme.spotlight.resultsRadius : Theme.spotlight.radius
             sx: panel.x
             sy: panel.y
             tint: Theme.glass.tintStrong
         }
-        MouseArea { anchors.fill: parent }
+        MouseArea { anchors.fill: parent; hoverEnabled: true; onPositionChanged: sp.pointerMoved = true }
 
         Item {
             id: bar
@@ -117,7 +175,7 @@ ShellWindow {
                 id: mag
                 x: Theme.spotlight.hPadding
                 anchors.verticalCenter: parent.verticalCenter
-                name: "magnifyingglass"
+                name: sp.modeInfo ? sp.modeInfo.symbol : "magnifyingglass"
                 size: Theme.spotlight.iconSize
                 color: Theme.color.secondaryLabel
             }
@@ -134,17 +192,18 @@ ShellWindow {
                 selectionColor: Theme.color.accent
                 clip: true
                 onTextChanged: sp.query = text
-                Keys.onEscapePressed: Panels.close()
-                Keys.onReturnPressed: sp.accept()
-                Keys.onEnterPressed: sp.accept()
-                Keys.onDownPressed: sp.step(1)
-                Keys.onUpPressed: sp.step(-1)
-                Keys.onTabPressed: sp.step(1)
+                Keys.onEscapePressed: sp.escapeKey()
+                Keys.onReturnPressed: sp.acceptSel()
+                Keys.onEnterPressed: sp.acceptSel()
+                Keys.onDownPressed: sp.moveSel(1)
+                Keys.onUpPressed: sp.moveSel(-1)
+                Keys.onTabPressed: sp.moveSel(1)
+                Keys.onPressed: event => sp.handleKey(event)
 
                 Text {
                     visible: input.text === ""
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Spotlight Search"
+                    text: sp.modeInfo ? sp.modeInfo.placeholder : "Spotlight Search"
                     font: input.font
                     color: Theme.color.tertiaryLabel
                 }
@@ -152,7 +211,7 @@ ShellWindow {
         }
 
         Rectangle {
-            visible: sp.rows.length > 0
+            visible: panel.expanded
             y: bar.height
             x: Theme.spotlight.hPadding
             width: parent.width - Theme.spotlight.hPadding * 2
@@ -160,9 +219,21 @@ ShellWindow {
             color: Theme.color.separator
         }
 
+        ModeView {
+            id: modeView
+            visible: sp.mode !== ""
+            mode: sp.mode
+            query: sp.query
+            x: Theme.spotlight.listInset
+            y: bar.height + 1 + Theme.spotlight.listInset
+            width: parent.width - Theme.spotlight.listInset * 2
+            onDone: Panels.close()
+            onEditFinished: input.forceActiveFocus()
+        }
+
         Column {
             id: list
-            visible: sp.rows.length > 0
+            visible: sp.mode === "" && sp.rows.length > 0
             x: Theme.spotlight.listInset
             y: bar.height + 1 + Theme.spotlight.listInset
             width: parent.width - Theme.spotlight.listInset * 2
@@ -175,6 +246,8 @@ ShellWindow {
                     required property int index
                     readonly property bool header: modelData.kind === "header"
                     readonly property bool sel: index === sp.selected
+                    // file and action rows are drawn by spotlight/ResultRow.qml
+                    readonly property bool rich: modelData.kind === "file" || modelData.kind === "action"
                     width: list.width
                     height: header ? Theme.spotlight.headerHeight
                           : modelData.kind === "calc" ? Theme.spotlight.rowHeight * Theme.spotlight.calcRowScale : Theme.spotlight.rowHeight
@@ -200,7 +273,7 @@ ShellWindow {
                     }
                     Item {
                         id: ic
-                        visible: !r.header
+                        visible: !r.header && !r.rich
                         x: Theme.spotlight.rowInset
                         width: Theme.spotlight.rowIcon
                         height: width
@@ -221,7 +294,7 @@ ShellWindow {
                         }
                     }
                     Column {
-                        visible: !r.header
+                        visible: !r.header && !r.rich
                         anchors.left: ic.right
                         anchors.leftMargin: Theme.spotlight.textGap
                         anchors.right: parent.right
@@ -244,6 +317,19 @@ ShellWindow {
                             color: Theme.color.secondaryLabel
                         }
                     }
+                    ResultRow {
+                        anchors.fill: parent
+                        visible: r.rich
+                        readonly property var d: r.modelData.kind === "action" ? r.modelData.action : r.modelData.file
+                        title: r.modelData.title
+                        subtitle: r.modelData.subtitle || ""
+                        symbol: r.rich && r.modelData.kind === "action" ? (d.symbol || "bolt") : "doc"
+                        appIcon: r.modelData.kind === "action" ? (d.appIcon || "") : ""
+                        appId: r.modelData.kind === "action" ? (d.appId || "") : ""
+                        themeIcon: r.modelData.kind === "file" ? SL.fileIcon(d.path, d.isDir, d.mime) : ""
+                        accessory: r.modelData.kind === "action" && SpotlightState.quickKeys[d.id] ? SpotlightState.quickKeys[d.id].toUpperCase() : ""
+                        badge: accessory !== ""
+                    }
                     MouseArea {
                         anchors.fill: parent
                         enabled: !r.header
@@ -254,5 +340,17 @@ ShellWindow {
                 }
             }
         }
+    }
+
+    // mode buttons (Applications, Files, Actions, Clipboard) to the right of the bar
+    ModeButtons {
+        x: sp.panelX + Theme.spotlight.width + 12
+        y: sp.panelY
+        originX: x
+        originY: y
+        mode: sp.mode
+        reveal: (sp.pointerMoved || sp.mode !== "") ? sp.appear : 0
+        Behavior on reveal { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+        onPicked: m => sp.setMode(m)
     }
 }

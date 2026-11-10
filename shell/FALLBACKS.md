@@ -26,6 +26,9 @@ Every surface has a designed state for missing features, so nothing looks broken
 | Apps with no window after launch | launch timer (6 s) | Dock bounce stops after 6 s. |
 | Power actions in a nested/test session | `HYPRK_ALLOW_POWER` unset | Sleep/Restart/Shut Down/Lock only log; Log Out exits Hyprland. |
 | No running apps for Cmd+Tab | empty list | Switcher does not open. |
+| Spotlight file search tool | `services/FileSearch.qml` probes plocate, locate, fd, fdfind | First found is used; else `find` over $HOME (hidden dirs skipped, 40 hits, 180 ms debounce). No recently-used.xbel: Files shows "No Recent Files". |
+| Clipboard history backend | `services/Clipboard.qml`: wl-paste/wl-copy, cliphist | Off until the user turns it on (Spotlight Cmd+4 "Turn On", or `state/spotlight.json` `clipboardHistory` set to "30m", "8h" or "7d"). cliphist when installed (images show a photo glyph, no thumbnail), else `scripts/clipboard.sh` in `$XDG_STATE_HOME/hyprk/clipboard` (200 items, 20 MB max each, password-manager copies skipped). No wl-clipboard: the Clipboard view says so and offers no switch. Turning it off deletes the history. Selecting an item copies it (no auto-paste: no virtual keyboard tool assumed). |
+| Spotlight actions without backend | no Wi-Fi device / Bluetooth adapter / slurp | The Wi-Fi, Bluetooth, area-screenshot actions are not listed. Power actions show "Blocked in this session" without `HYPRK_ALLOW_POWER=1`. |
 
 ## Settings state files (`state/*.json`, written by the Settings app)
 
@@ -39,4 +42,5 @@ from `settings/Parsers.js`. `HYPRK_STATE=<dir>` points the shell at another fold
 | `notifications.json` | per app (`apps["<desktop id>"]`): `allow: false` drops the notification, `style: "none"` = Notification Center only, `"alerts"` = banner stays until dismissed, `sounds: false` = silent. `previews: "never"` hides bodies. |
 | `lock.json` | idle display off after `displayOffAfter` s (Hyprland DPMS); lock after `screenSaverAfter + requirePasswordAfter` s with hyprlock + `lockscreen/hyprlock.conf`, loginctl fallback, only when `HYPRK_ALLOW_POWER=1`. 0 = never. |
 | `input.json` | keyboard repeat applied with `hyprctl eval` at start and on change (0.57 has no `hyprctl keyword`) |
+| `spotlight.json` | `clipboardHistory` ("off" default, "30m", "8h", "7d"), `quickKeys` (`{"<action id>": "<key>"}`, written by Spotlight's "Add Quick Keys") |
 | `wallpaper.json` | `path` replaces the default wallpaper; menu bar text turns dark over bright wallpaper tops |

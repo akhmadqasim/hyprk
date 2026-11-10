@@ -13,6 +13,7 @@ function load(name) {
 }
 
 const S = load("search.js"), C = load("clock.js"), ST = load("state.js");
+const SL = load("spotlight.js");
 let pass = 0, fail = 0;
 function test(name, fn) {
     try { fn(); pass++; } catch (e) { fail++; console.error("FAIL " + name + "\n  " + e.message); }
@@ -137,6 +138,7 @@ test("lua input", () => assert.equal(ST.luaInput({ repeatRate: 30, repeatDelay: 
 test("lua input clamps", () => assert.equal(ST.luaInput({ repeatRate: 999, repeatDelay: 5 }), "hl.config({ input = { repeat_rate = 100, repeat_delay = 100 } })"));
 test("lua input defaults", () => assert.equal(ST.luaInput({}), "hl.config({ input = { repeat_rate = 25, repeat_delay = 600 } })"));
 
+
 // ---- icon shape (macOS 26 squircle tile) ----
 const IS = load("iconshape.js");
 function mask(n, inside) {   // n*n alpha array (stride 1)
@@ -175,6 +177,111 @@ test("squircle points in box", () => {
     const d = Math.max(...p.map(([x, y]) => Math.abs(x - 50) === Math.abs(y - 50) ? Math.abs(x - 50) : 0));
     assert.ok(d > 40 && d < 50);
 });
+
+// ---- spotlight modes, files, actions, clipboard ----
+test("modes order", () => assert.deepEqual(SL.modes().map(m => m.id), ["apps", "files", "actions", "clipboard"]));
+test("mode key super+2", () => assert.equal(SL.modeForKey(0x32, true, false, false), "files"));
+test("mode key ctrl+4", () => assert.equal(SL.modeForKey(0x34, false, true, false), "clipboard"));
+test("mode key alt+1", () => assert.equal(SL.modeForKey(0x31, false, false, true), "apps"));
+test("mode key plain digit", () => assert.equal(SL.modeForKey(0x31, false, false, false), ""));
+test("mode key 5", () => assert.equal(SL.modeForKey(0x35, true, false, false), ""));
+test("cycle right from all", () => assert.equal(SL.cycleMode("", 1), "apps"));
+test("cycle left from all wraps", () => assert.equal(SL.cycleMode("", -1), "clipboard"));
+test("cycle right from clipboard", () => assert.equal(SL.cycleMode("clipboard", 1), ""));
+test("modeInfo placeholder", () => assert.equal(SL.modeInfo("files").placeholder, "Search Files"));
+test("modeInfo none", () => assert.equal(SL.modeInfo(""), null));
+test("app category dev", () => assert.equal(SL.appCategory(["Development", "IDE"]), "Developer Tools"));
+test("app category other", () => assert.equal(SL.appCategory([]), "Other"));
+test("app chips present only", () => assert.deepEqual(SL.appCategoryChips([{ categories: ["Game"] }, { categories: ["Utility"] }]), ["Games", "Utilities"]));
+const xbel = `<?xml version="1.0"?><xbel>
+<bookmark href="file:///home/u/Docs/a%20b.pdf" added="2026-01-01T00:00:00Z" modified="2026-01-02T00:00:00Z" visited="2026-01-02T00:00:00Z"><info><metadata><mime:mime-type type="application/pdf"/></metadata></info></bookmark>
+<bookmark href="file:///home/u/new.txt" modified="2026-03-01T00:00:00Z"><info><metadata><mime:mime-type type="text/plain"/></metadata></info></bookmark>
+<bookmark href="https://example.com" modified="2026-04-01T00:00:00Z"></bookmark>
+<bookmark href="file:///home/u/R&amp;D.md" modified="2026-02-01T00:00:00Z"></bookmark>
+</xbel>`;
+test("xbel newest first, file only", () => assert.deepEqual(SL.parseXbel(xbel).map(r => r.path), ["/home/u/new.txt", "/home/u/R&D.md", "/home/u/Docs/a b.pdf"]));
+test("xbel mime", () => assert.equal(SL.parseXbel(xbel).find(r => r.path.endsWith(".pdf")).mime, "application/pdf"));
+test("xbel limit", () => assert.equal(SL.parseXbel(xbel, 1).length, 1));
+test("xbel garbage", () => assert.deepEqual(SL.parseXbel("<nope"), []));
+test("fileRow dir slash", () => assert.deepEqual(SL.fileRow("/home/u/Music/", "/home/u"), { path: "/home/u/Music", name: "Music", dir: "~", isDir: true }));
+test("fileRow nested", () => assert.equal(SL.fileRow("/home/u/a/b.txt", "/home/u").dir, "~/a"));
+test("fileRow outside home", () => assert.equal(SL.fileRow("/etc/hosts", "/home/u").dir, "/etc"));
+test("fileIcon video mime", () => assert.equal(SL.fileIcon("/x.webm", false, "video/webm"), "video-x-generic"));
+test("fileIcon dir", () => assert.equal(SL.fileIcon("/x", true, ""), "folder"));
+test("fileIcon mime", () => assert.equal(SL.fileIcon("/x.pdf", false, "application/pdf"), "application-pdf"));
+test("fileIcon ext", () => assert.equal(SL.fileIcon("/x/Photo.JPG", false, ""), "image-x-generic"));
+test("fileIcon dotdir no ext", () => assert.equal(SL.fileIcon("/x.d/README", false, ""), "text-x-generic"));
+test("matchesQuery basename", () => assert.ok(SL.matchesQuery("/home/u/Report.pdf", "repo")));
+test("matchesQuery dir only", () => assert.ok(!SL.matchesQuery("/home/u/report/x.txt", "repo")));
+test("matchesQuery trailing slash", () => assert.ok(SL.matchesQuery("/home/u/Reports/", "reports")));
+test("search cmd fd", () => {
+    const c = SL.searchCommand("fdfind", "a b", "/home/u", 10);
+    assert.equal(c[0], "fdfind"); assert.ok(c.includes("--fixed-strings")); assert.deepEqual(c.slice(-3), ["--", "a b", "/home/u"]);
+});
+test("search cmd plocate passes args", () => assert.deepEqual(SL.searchCommand("plocate", "x", "/h", 5).slice(-4), ["sh", "x", "/h", "5"]));
+test("search cmd find escapes glob", () => assert.equal(SL.searchCommand("find", "a*b", "/h", 5)[4], "a\\*b"));
+test("merge recents first, dedup", () => {
+    const r = [{ path: "/h/a.txt", name: "a.txt" }, { path: "/h/z.txt", name: "z.txt" }];
+    const h = [{ path: "/h/b-a.txt", name: "b-a.txt" }, { path: "/h/a.txt", name: "a.txt" }];
+    assert.deepEqual(SL.mergeFiles(r, h, "a").map(x => x.path), ["/h/a.txt", "/h/b-a.txt"]);
+});
+const acts = [{ id: "dark-mode", title: "Turn On Dark Mode", keywords: ["appearance"] }, { id: "lock", title: "Lock Screen" },
+              { id: "dnd", title: "Turn On Do Not Disturb" }];
+test("quick key exact wins", () => assert.equal(SL.rankActions(acts, "ls", { lock: "ls" }, S.score)[0].id, "lock"));
+test("quick key beats name", () => assert.equal(SL.rankActions(acts, "dm", { "dark-mode": "dm", dnd: "d" }, S.score)[0].id, "dark-mode"));
+test("action by name", () => assert.equal(SL.rankActions(acts, "lock", {}, S.score)[0].id, "lock"));
+test("action by keyword", () => assert.equal(SL.rankActions(acts, "appear", {}, S.score)[0].id, "dark-mode"));
+test("action empty query lists all", () => assert.equal(SL.rankActions(acts, "", {}, S.score).length, 3));
+test("action no match", () => assert.equal(SL.rankActions(acts, "zzz", {}, S.score).length, 0));
+test("quickKeyAction", () => assert.equal(SL.quickKeyAction({ lock: "ls" }, " LS "), "lock"));
+test("quickKeyAction none", () => assert.equal(SL.quickKeyAction({ lock: "ls" }, "l"), ""));
+test("normQuickKey", () => assert.equal(SL.normQuickKey(" SM "), "sm"));
+test("normQuickKey rejects", () => assert.equal(SL.normQuickKey("a b"), ""));
+test("normQuickKey too long", () => assert.equal(SL.normQuickKey("abcdefg"), ""));
+test("setQuickKey moves key", () => assert.deepEqual(SL.setQuickKey({ a: "x", b: "y" }, "b", "x"), { b: "x" }));
+test("setQuickKey clear", () => assert.deepEqual(SL.setQuickKey({ a: "x" }, "a", ""), {}));
+test("retention", () => assert.equal(SL.retentionMs("8h"), 8 * 3600e3));
+test("retention off", () => assert.equal(SL.retentionMs("off"), 0));
+test("clip line builtin", () => {
+    const it = SL.parseClipLine("/s/clipboard/1700000000000_abcdef0123.txt\ttext/plain\thello world");
+    assert.deepEqual(it, { id: "abcdef0123", file: "/s/clipboard/1700000000000_abcdef0123.txt", mime: "text/plain", ts: 1700000000000, text: "hello world" });
+});
+test("clip line image", () => assert.equal(SL.parseClipLine("/s/1_ab.png\timage/png\t").mime, "image/png"));
+test("clip line bad", () => assert.equal(SL.parseClipLine("garbage"), null));
+test("clip line cliphist text", () => assert.equal(SL.parseClipLine("12\thi there", true).text, "hi there"));
+test("clip line cliphist image", () => assert.equal(SL.parseClipLine("13\t[[ binary data 2 KiB png 10x10 ]]", true).mime, "image/png"));
+test("addClip moves dup to top", () => assert.deepEqual(SL.addClip([{ id: "a" }, { id: "b" }], { id: "b", n: 2 }).map(i => i.id), ["b", "a"]));
+test("addClip cap", () => assert.equal(SL.addClip([{ id: "a" }, { id: "b" }], { id: "c" }, 2).length, 2));
+test("pruneClips", () => assert.deepEqual(SL.pruneClips([{ ts: 1000 }, { ts: 9000 }, { ts: 0 }], 10000, 5000).map(i => i.ts), [9000, 0]));
+test("filterClips", () => assert.equal(SL.filterClips([{ text: "Hello", mime: "text/plain" }, { text: "", mime: "image/png" }], "image").length, 1));
+test("clipTitle collapses", () => assert.equal(SL.clipTitle({ mime: "text/plain", text: "  a \n b " }), "a b"));
+test("clipTitle image", () => assert.equal(SL.clipTitle({ mime: "image/png" }), "Image"));
+test("relTime", () => assert.deepEqual([30e3, 300e3, 7200e3, 100000e3, 400000e3].map(d => SL.relTime(1e9 - d, 1e9)),
+    ["Just now", "5 min ago", "2 hr ago", "Yesterday", "4 days ago"]));
+
+
+// ---- scripts/clipboard.sh (built-in clipboard store) ----
+{
+    const { execFileSync } = await import("node:child_process");
+    const { mkdtempSync, rmSync } = await import("node:fs");
+    const { tmpdir } = await import("node:os");
+    const dir = mkdtempSync(join(tmpdir(), "hyprk-clip-"));
+    const sh = join(here, "..", "scripts", "clipboard.sh");
+    const run = (args, input, env) => execFileSync(sh, args, { input: input || "", env: Object.assign({}, process.env, { HYPRK_CLIP_DIR: dir }, env || {}) }).toString();
+    run(["store", "3", "0"], "first");
+    run(["store", "3", "0"], "second");
+    run(["store", "3", "0"], "first");                       // duplicate moves to the top
+    run(["store", "3", "0"], "secret", { CLIPBOARD_STATE: "sensitive" });
+    run(["store", "3", "0"], "");
+    const lines = run(["list", "0"]).trim().split("\n").map(l => SL.parseClipLine(l));
+    test("clip store dedup + order", () => assert.deepEqual(lines.map(i => i.text.trim()), ["first", "second"]));
+    test("clip store skips sensitive", () => assert.ok(!lines.some(i => i.text.includes("secret"))));
+    for (const n of ["3", "4", "5"]) run(["store", "3", "0"], "item" + n);
+    test("clip store cap", () => assert.equal(run(["list", "0"]).trim().split("\n").length, 3));
+    run(["clear"]);
+    test("clip clear", () => assert.equal(run(["list", "0"]).trim(), ""));
+    rmSync(dir, { recursive: true, force: true });
+}
 
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
