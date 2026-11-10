@@ -77,18 +77,25 @@ ShellWindow {
     }
 
     // ---------- menu ----------
+    // shows Panels.menuShown, not menuIndex: switching menus goes in order with the menu bar's
+    // title pill (Panels.stepMenu), which waits for this surface's frame
+    FramePresented { id: framePresented; onPresented: Panels.menuPresented("overlay") }
+    Connections {
+        target: Panels
+        function onMenuFrameWanted(surface) { if (surface === "overlay" && Panels.activeScreen === ov.modelData) framePresented.arm(); }
+    }
     MenuDropdown {
         id: menu
         shown: Panels.open === "menu" && Panels.activeScreen === ov.modelData
-        x: Math.min(Panels.menuX, ov.width - width - 4)
+        x: Math.min(Panels.menuShownX, ov.width - width - 4)
         y: Theme.menu.offsetY
         originX: x
         originY: y + Theme.menuBar.height
         // from the menu bar title
-        anchorX: Panels.menuX - x
+        anchorX: Panels.menuShownX - x
         anchorY: -Theme.menu.offsetY
-        items: Panels.menuIndex < 0 ? []
-             : Menus.forIndex(Panels.menuIndex, Apps.appIdOf(Hyprland.activeToplevel), Apps.activeAppName(), Quickshell.env("USER"))
+        items: Panels.menuShown < 0 ? []
+             : Menus.forIndex(Panels.menuShown, Apps.appIdOf(Hyprland.activeToplevel), Apps.activeAppName(), Quickshell.env("USER"))
     }
 
     // ---------- notification center ----------

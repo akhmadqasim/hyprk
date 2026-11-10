@@ -32,6 +32,13 @@ ShellWindow {
     // 12/24h and date order follow the time locale like macOS (LC_ALL > LC_TIME > LANG)
     readonly property var clockStyle: Clock.styleFor(Quickshell.env("LC_ALL") || Quickshell.env("LC_TIME") || Quickshell.env("LANG"))
 
+    // menu switching: Panels.stepMenu waits for this surface's frame (old pill gone)
+    FramePresented { id: framePresented; onPresented: Panels.menuPresented("bar") }
+    Connections {
+        target: Panels
+        function onMenuFrameWanted(surface) { if (surface === "bar" && Panels.activeScreen === bar.screen) framePresented.arm(); }
+    }
+
     // ---------- left: distro logo (the Apple menu) + app name + menus ----------
     Row {
         id: left
@@ -165,7 +172,12 @@ ShellWindow {
         width: contentWidth + Theme.menuBar.titleHPadding * 2
         height: Theme.menuBar.titleHeight
 
-        HighlightPill { shown: mt.open; pressed: titleMa.containsPress; instant: true }
+        // the pill follows Panels.menuPill, set once the Overlay shows this title's menu
+        HighlightPill {
+            shown: Panels.open === "menu" && Panels.menuPill === mt.menuIndex && Panels.activeScreen === bar.screen
+            pressed: titleMa.containsPress
+            instant: true
+        }
         Text {
             id: label
             anchors.centerIn: parent

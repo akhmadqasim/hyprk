@@ -22,6 +22,39 @@ Singleton {
     property int menuIndex: -1          // index of the open menu bar title (0 = Apple)
     property real menuX: 0              // screen x of the open menu title
 
+    // The title pill (MenuBar) and the dropdown (Overlay) are two layer surfaces that commit
+    // separately, so a hover switch could put the new pill on screen one frame before the new
+    // dropdown, or the new dropdown under the old pill. They now change in order, each step
+    // waiting until the previous surface has presented its frame (components/FramePresented.qml):
+    // the old pill goes, then the Overlay shows the new menu, then the pill comes. Never a pill
+    // over the wrong menu or with none; the cost is a frame or two with no pill while switching.
+    property int menuShown: -1          // menu the Overlay draws
+    property real menuShownX: 0
+    property int menuPill: -1           // title whose pill the menu bar draws
+    property string menuWait: ""        // "bar" | "overlay": waiting for that surface's frame
+    signal menuFrameWanted(string surface)
+    function stepMenu() {
+        if (open !== "menu" || menuIndex < 0 || menuWait !== "") return;
+        if (menuShown !== menuIndex) {
+            if (menuPill >= 0) { menuPill = -1; waitMenuFrame("bar"); return; }
+            menuShown = menuIndex;
+            menuShownX = menuX;
+            waitMenuFrame("overlay");
+            return;
+        }
+        menuPill = menuShown;
+    }
+    function waitMenuFrame(surface) { menuWait = surface; menuWaitTimeout.restart(); menuFrameWanted(surface); }
+    function menuPresented(surface) {
+        if (surface !== menuWait) return;
+        menuWait = "";
+        menuWaitTimeout.stop();
+        stepMenu();
+    }
+    // a surface that never presents (unmapped, render loop without the signals) cannot stall a menu
+    Timer { id: menuWaitTimeout; interval: 100; onTriggered: { root.menuWait = ""; root.stepMenu(); } }
+    onMenuIndexChanged: stepMenu()
+
     // context menu (desktop, Dock): items as in lib/menus.js, action may be a function.
     // (contextX, contextY) is the screen point; with contextAbove the menu ends there (Dock).
     property var contextItems: []
@@ -57,7 +90,7 @@ Singleton {
         open = name;
     }
     function close() { open = ""; menuIndex = -1; }
-    function openMenu(index, x, scr) { activeScreen = scr || screen; menuIndex = index; menuX = x; open = "menu"; }
+    function openMenu(index, x, scr) { activeScreen = scr || screen; menuX = x; menuIndex = index; open = "menu"; }
 
     // Surfaces created on open (shell.qml LazyLoader) stay loaded while they dematerialize: closing
     // one holds it until its window releases it (ShellWindow.lingerAs), at most 1.5 s. The loaders
@@ -81,7 +114,13 @@ Singleton {
     Timer { id: holdTimeout; interval: 1500; onTriggered: { root.held = ({}); root.updateLoaded(); } }
 
     onOpenChanged: {
-        if (open !== "menu") menuIndex = -1;
+        if (open !== "menu") {
+            menuIndex = -1;
+            menuShown = -1;
+            menuPill = -1;
+            menuWait = "";
+            menuWaitTimeout.stop();
+        } else stepMenu();
         if (previous !== open && lazySurfaces.indexOf(previous) !== -1) {
             held = Object.assign({}, held, { [previous]: true });
             holdTimeout.restart();
