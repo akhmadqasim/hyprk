@@ -1,0 +1,33 @@
+{"d":0,"role":"AXApplication","title":"MenuBarAgent"}
+{"d":1,"frame":[0,0,1710,34],"role":"AXWindow","sub":"AXDialog"}
+{"d":2,"frame":[1492,0,22,34],"role":"AXGroup"}
+{"d":3,"frame":[1492,0,22,34],"role":"AXGroup","sub":"AXHostingView"}
+{"d":4,"desc":"Wi‑Fi, connected, 3 bars","enabled":"1","frame":[1492,6,22,22],"id":"com.apple.menuextra.wifi","role":"AXMenuBarItem","sub":"AXMenuExtra"}
+{"d":2,"frame":[1450,0,26,34],"role":"AXGroup"}
+{"d":3,"frame":[1450,0,26,34],"role":"AXGroup","sub":"AXHostingView"}
+{"d":4,"desc":"Battery","enabled":"1","frame":[1450,6,26,22],"id":"com.apple.menuextra.battery","role":"AXMenuBarItem","sub":"AXMenuExtra","value":"100%, charging"}
+{"d":2,"frame":[1530,0,26,34],"role":"AXGroup"}
+{"d":3,"frame":[1530,0,26,34],"role":"AXGroup","sub":"AXHostingView"}
+{"d":4,"desc":"Control Centre","enabled":"1","frame":[1530,6,26,22],"id":"com.apple.menuextra.controlcenter","role":"AXMenuBarItem","sub":"AXMenuExtra"}
+{"d":2,"frame":[1572,0,118,34],"role":"AXGroup"}
+{"d":3,"frame":[1572,0,118,34],"role":"AXGroup","sub":"AXHostingView"}
+{"d":4,"desc":"Clock","enabled":"1","frame":[1572,6,118,22],"id":"com.apple.menuextra.clock","role":"AXMenuBarItem","sub":"AXMenuExtra","value":"Wed 11 Nov  00.22"}
+{"d":2,"frame":[1407,0,35,34],"role":"AXGroup"}
+{"d":3,"enabled":"1","frame":[1406,5,36.5,24],"role":"AXButton"}
+{"d":2,"frame":[1240,0,47,34],"role":"AXGroup"}
+{"d":3,"enabled":"1","frame":[1247,5,33,24],"help":"CPU: Mini","role":"AXButton"}
+{"d":2,"frame":[1371,0,36,34],"role":"AXGroup"}
+{"d":3,"enabled":"1","frame":[1370,5,38,24],"role":"AXButton"}
+{"d":2,"frame":[1334,0,37,34],"role":"AXGroup"}
+{"d":3,"enabled":"1","frame":[1333,5,39,24],"role":"AXButton","title":"Apple Passwords Key"}
+{"d":2,"frame":[1287,0,47,34],"role":"AXGroup"}
+{"d":3,"enabled":"1","frame":[1294,5,33,24],"help":"RAM: Mini","role":"AXButton"}
+{"d":1,"desc":"Menu Extras","enabled":"0","frame":[1450,0,240,34],"role":"AXMenuBar"}
+{"d":2,"frame":[1450,0,26,34],"role":"AXGroup","sub":"AXHostingView"}
+{"d":3,"desc":"Battery","enabled":"1","frame":[1450,6,26,22],"id":"com.apple.menuextra.battery","role":"AXMenuBarItem","sub":"AXMenuExtra","value":"100%, charging"}
+{"d":2,"frame":[1492,0,22,34],"role":"AXGroup","sub":"AXHostingView"}
+{"d":3,"desc":"Wi‑Fi, connected, 3 bars","enabled":"1","frame":[1492,6,22,22],"id":"com.apple.menuextra.wifi","role":"AXMenuBarItem","sub":"AXMenuExtra"}
+{"d":2,"frame":[1530,0,26,34],"role":"AXGroup","sub":"AXHostingView"}
+{"d":3,"desc":"Control Centre","enabled":"1","frame":[1530,6,26,22],"id":"com.apple.menuextra.controlcenter","role":"AXMenuBarItem","sub":"AXMenuExtra"}
+{"d":2,"frame":[1572,0,118,34],"role":"AXGroup","sub":"AXHostingView"}
+{"d":3,"desc":"Clock","enabled":"1","frame":[1572,6,118,22],"id":"com.apple.menuextra.clock","role":"AXMenuBarItem","sub":"AXMenuExtra","value":"Wed 11 Nov  00.22"}

@@ -1,0 +1,3057 @@
+[
+  {
+    "alpha" : 1,
+    "class" : "NSStatusBarWindow",
+    "frame" : [
+      1200,
+      1073,
+      40,
+      34
+    ],
+    "hasShadow" : true,
+    "layers" : {
+      "class" : "CALayer",
+      "frame" : [
+        0,
+        0,
+        0,
+        0
+      ],
+      "name" : "NSWindow content layer",
+      "sublayers" : [
+        {
+          "bg" : [
+            0,
+            0
+          ],
+          "class" : "NSViewBackingLayer",
+          "frame" : [
+            0,
+            0,
+            40,
+            34
+          ],
+          "name" : "NSNextStepFrame",
+          "sublayers" : [
+            {
+              "class" : "NSViewBackingLayer",
+              "frame" : [
+                0,
+                0,
+                40,
+                34
+              ],
+              "name" : "NSStatusBarContentView",
+              "sublayers" : [
+                {
+                  "class" : "NSViewBackingLayer",
+                  "frame" : [
+                    0,
+                    6,
+                    40,
+                    22
+                  ],
+                  "name" : "NSView",
+                  "sublayers" : [
+                    {
+                      "class" : "NSViewBackingLayer",
+                      "contents" : true,
+                      "frame" : [
+                        0,
+                        0,
+                        40,
+                        22
+                      ],
+                      "name" : "NSStatusBarButton",
+                      "sublayers" : [
+                        {
+                          "class" : "ContentLayer",
+                          "contents" : true,
+                          "frame" : [
+                            0,
+                            -2.5,
+                            40,
+                            26.5
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "level" : 25,
+    "number" : 4294967296,
+    "views" : {
+      "class" : "NSNextStepFrame",
+      "frame" : [
+        0,
+        0,
+        40,
+        34
+      ],
+      "subviews" : [
+        {
+          "class" : "NSStatusBarContentView",
+          "frame" : [
+            0,
+            0,
+            40,
+            34
+          ],
+          "subviews" : [
+            {
+              "class" : "NSView",
+              "frame" : [
+                0,
+                6,
+                40,
+                22
+              ],
+              "subviews" : [
+                {
+                  "class" : "NSStatusBarButton",
+                  "frame" : [
+                    0,
+                    0,
+                    40,
+                    22
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "alpha" : 1,
+    "class" : "NSStatusBarWindow",
+    "frame" : [
+      0,
+      -34,
+      40,
+      34
+    ],
+    "hasShadow" : true,
+    "layers" : {
+      "class" : "CALayer",
+      "frame" : [
+        0,
+        0,
+        0,
+        0
+      ],
+      "name" : "NSWindow content layer",
+      "sublayers" : [
+        {
+          "bg" : [
+            0,
+            0
+          ],
+          "class" : "NSViewBackingLayer",
+          "frame" : [
+            0,
+            0,
+            40,
+            34
+          ],
+          "name" : "NSNextStepFrame",
+          "sublayers" : [
+            {
+              "class" : "NSViewBackingLayer",
+              "frame" : [
+                0,
+                0,
+                40,
+                34
+              ],
+              "name" : "NSStatusBarContentView",
+              "sublayers" : [
+                {
+                  "class" : "NSViewBackingLayer",
+                  "frame" : [
+                    0,
+                    6,
+                    40,
+                    22
+                  ],
+                  "name" : "NSView",
+                  "sublayers" : [
+                    {
+                      "class" : "NSViewBackingLayer",
+                      "frame" : [
+                        0,
+                        0,
+                        40,
+                        22
+                      ],
+                      "name" : "NSStatusItemReplicantView",
+                      "sublayers" : [
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "contents" : true,
+                          "frame" : [
+                            0,
+                            0,
+                            40,
+                            22
+                          ],
+                          "name" : "NSStatusItemReplicantShadowView"
+                        },
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "contents" : true,
+                          "frame" : [
+                            0,
+                            0,
+                            40,
+                            22
+                          ],
+                          "name" : "NSStatusItemReplicantImageView",
+                          "sublayers" : [
+                            {
+                              "class" : "ContentLayer",
+                              "contents" : true,
+                              "frame" : [
+                                0,
+                                0,
+                                40,
+                                22
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "level" : 25,
+    "number" : 8589934592,
+    "views" : {
+      "class" : "NSNextStepFrame",
+      "frame" : [
+        0,
+        0,
+        40,
+        34
+      ],
+      "subviews" : [
+        {
+          "class" : "NSStatusBarContentView",
+          "frame" : [
+            0,
+            0,
+            40,
+            34
+          ],
+          "subviews" : [
+            {
+              "class" : "NSView",
+              "frame" : [
+                0,
+                6,
+                40,
+                22
+              ],
+              "subviews" : [
+                {
+                  "class" : "NSStatusItemReplicantView",
+                  "frame" : [
+                    0,
+                    0,
+                    40,
+                    22
+                  ],
+                  "subviews" : [
+                    {
+                      "class" : "NSStatusItemReplicantShadowView",
+                      "frame" : [
+                        0,
+                        0,
+                        40,
+                        22
+                      ]
+                    },
+                    {
+                      "class" : "NSStatusItemReplicantImageView",
+                      "frame" : [
+                        0,
+                        0,
+                        40,
+                        22
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "alpha" : 1,
+    "class" : "NSStatusBarWindow",
+    "frame" : [
+      0,
+      -34,
+      40,
+      34
+    ],
+    "hasShadow" : true,
+    "layers" : {
+      "class" : "CALayer",
+      "frame" : [
+        0,
+        0,
+        0,
+        0
+      ],
+      "name" : "NSWindow content layer",
+      "sublayers" : [
+        {
+          "bg" : [
+            0,
+            0
+          ],
+          "class" : "NSViewBackingLayer",
+          "frame" : [
+            0,
+            0,
+            40,
+            34
+          ],
+          "name" : "NSNextStepFrame",
+          "sublayers" : [
+            {
+              "class" : "NSViewBackingLayer",
+              "frame" : [
+                0,
+                0,
+                40,
+                34
+              ],
+              "name" : "NSStatusBarContentView",
+              "sublayers" : [
+                {
+                  "class" : "NSViewBackingLayer",
+                  "frame" : [
+                    0,
+                    6,
+                    40,
+                    22
+                  ],
+                  "name" : "NSView",
+                  "sublayers" : [
+                    {
+                      "class" : "NSViewBackingLayer",
+                      "frame" : [
+                        0,
+                        0,
+                        40,
+                        22
+                      ],
+                      "name" : "NSStatusItemReplicantView",
+                      "sublayers" : [
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "contents" : true,
+                          "frame" : [
+                            0,
+                            0,
+                            40,
+                            22
+                          ],
+                          "name" : "NSStatusItemReplicantShadowView"
+                        },
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "compositingFilter" : "plusLIgnoreAlpha",
+                          "contents" : true,
+                          "frame" : [
+                            0,
+                            0,
+                            40,
+                            22
+                          ],
+                          "name" : "NSStatusItemReplicantImageView",
+                          "sublayers" : [
+                            {
+                              "class" : "ContentLayer",
+                              "contents" : true,
+                              "frame" : [
+                                0,
+                                0,
+                                40,
+                                22
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "level" : 25,
+    "number" : 12884901888,
+    "views" : {
+      "class" : "NSNextStepFrame",
+      "frame" : [
+        0,
+        0,
+        40,
+        34
+      ],
+      "subviews" : [
+        {
+          "class" : "NSStatusBarContentView",
+          "frame" : [
+            0,
+            0,
+            40,
+            34
+          ],
+          "subviews" : [
+            {
+              "class" : "NSView",
+              "frame" : [
+                0,
+                6,
+                40,
+                22
+              ],
+              "subviews" : [
+                {
+                  "class" : "NSStatusItemReplicantView",
+                  "frame" : [
+                    0,
+                    0,
+                    40,
+                    22
+                  ],
+                  "subviews" : [
+                    {
+                      "class" : "NSStatusItemReplicantShadowView",
+                      "frame" : [
+                        0,
+                        0,
+                        40,
+                        22
+                      ]
+                    },
+                    {
+                      "class" : "NSStatusItemReplicantImageView",
+                      "frame" : [
+                        0,
+                        0,
+                        40,
+                        22
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "alpha" : 1,
+    "class" : "NSPopupMenuWindow",
+    "frame" : [
+      150,
+      894,
+      203,
+      178
+    ],
+    "hasShadow" : true,
+    "layers" : {
+      "class" : "CALayer",
+      "cornerRadius" : 12,
+      "frame" : [
+        0,
+        0,
+        203,
+        178
+      ],
+      "name" : "NSCGSWindow",
+      "sublayers" : [
+        {
+          "class" : "CABackdropLayer",
+          "filters" : [
+            {
+              "inputs" : {
+
+              },
+              "name" : "sdrNormalize",
+              "type" : "sdrNormalize"
+            },
+            {
+              "inputs" : {
+                "inputNormalizeEdges" : true,
+                "inputRadius" : 30
+              },
+              "name" : "gaussianBlur",
+              "type" : "gaussianBlur"
+            }
+          ],
+          "frame" : [
+            0,
+            0,
+            203,
+            178
+          ],
+          "name" : "NSCGSWindow capture backdrop"
+        },
+        {
+          "class" : "CALayer",
+          "frame" : [
+            0,
+            0,
+            0,
+            0
+          ],
+          "name" : "NSWindow content layer",
+          "sublayers" : [
+            {
+              "class" : "NSViewBackingLayer",
+              "frame" : [
+                0,
+                0,
+                203,
+                178
+              ],
+              "name" : "NSGlassContentFrameView",
+              "sublayers" : [
+                {
+                  "bg" : [
+                    0,
+                    0
+                  ],
+                  "class" : "CUIWindowFrameLayer",
+                  "frame" : [
+                    0,
+                    0,
+                    203,
+                    178
+                  ],
+                  "name" : "CUIWindowFrameLayer",
+                  "sublayers" : [
+                    {
+                      "class" : "CALayer",
+                      "contents" : true,
+                      "frame" : [
+                        0,
+                        0,
+                        203,
+                        178
+                      ],
+                      "name" : "CUIWindowOverlayLayer",
+                      "opacity" : 0
+                    }
+                  ]
+                },
+                {
+                  "class" : "NSViewBackingLayer",
+                  "frame" : [
+                    0,
+                    0,
+                    203,
+                    178
+                  ],
+                  "name" : "NSView",
+                  "sublayers" : [
+                    {
+                      "class" : "NSViewBackingLayer",
+                      "frame" : [
+                        0,
+                        0,
+                        203,
+                        178
+                      ],
+                      "name" : "NSMenuScrollView",
+                      "sublayers" : [
+                        {
+                          "class" : "CABackdropLayer",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            0
+                          ],
+                          "name" : "CABackdropLayer: _TtCC6AppKit14NSScrollPocketP33_EC3F85FAB7755D56E669206D2B17725B12BackdropView"
+                        },
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "frame" : [
+                            0,
+                            0,
+                            203,
+                            178
+                          ],
+                          "name" : "NSClipView",
+                          "sublayers" : [
+                            {
+                              "bg" : [
+                                0,
+                                0
+                              ],
+                              "class" : "NSViewBackingLayer",
+                              "frame" : [
+                                0,
+                                0,
+                                203,
+                                178
+                              ],
+                              "name" : "NSTableViewBackedMenuRepresentation",
+                              "sublayers" : [
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "hidden" : true,
+                                  "name" : "NSRootMenuWindowBackgroundView",
+                                  "sublayers" : [
+                                    {
+                                      "bg" : [
+                                        0,
+                                        0.47843137254901963,
+                                        1,
+                                        1
+                                      ],
+                                      "class" : "CALayer",
+                                      "cornerRadius" : 7,
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        0,
+                                        0
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    0,
+                                    5,
+                                    203,
+                                    24
+                                  ],
+                                  "name" : "NSTableRowView",
+                                  "sublayers" : [
+                                    {
+                                      "bg" : [
+                                        0,
+                                        0
+                                      ],
+                                      "class" : "CALayer",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        24
+                                      ]
+                                    },
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "contents" : true,
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        24
+                                      ],
+                                      "name" : "NSContextMenuItemView",
+                                      "sublayers" : [
+                                        {
+                                          "class" : "NSViewBackingLayer",
+                                          "frame" : [
+                                            28,
+                                            4,
+                                            126,
+                                            16
+                                          ],
+                                          "name" : "_NSMenuItemTextField",
+                                          "sublayers" : [
+                                            {
+                                              "class" : "NSViewBackingLayer",
+                                              "contents" : true,
+                                              "frame" : [
+                                                0,
+                                                0,
+                                                126,
+                                                16
+                                              ],
+                                              "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                              "sublayers" : [
+                                                {
+                                                  "class" : "ContentLayer",
+                                                  "contents" : true,
+                                                  "frame" : [
+                                                    -11.5,
+                                                    -4,
+                                                    123,
+                                                    24
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "class" : "NSViewBackingLayer",
+                                          "contents" : true,
+                                          "frame" : [
+                                            12,
+                                            6,
+                                            13,
+                                            11
+                                          ],
+                                          "name" : "_NSMenuItemImageView",
+                                          "sublayers" : [
+                                            {
+                                              "class" : "ContentLayer",
+                                              "contents" : true,
+                                              "frame" : [
+                                                1.5,
+                                                1,
+                                                9.5,
+                                                9
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    0,
+                                    29,
+                                    203,
+                                    24
+                                  ],
+                                  "name" : "NSTableRowView",
+                                  "sublayers" : [
+                                    {
+                                      "bg" : [
+                                        0,
+                                        0
+                                      ],
+                                      "class" : "CALayer",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        24
+                                      ]
+                                    },
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "contents" : true,
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        24
+                                      ],
+                                      "name" : "NSContextMenuItemView",
+                                      "sublayers" : [
+                                        {
+                                          "class" : "NSViewBackingLayer",
+                                          "frame" : [
+                                            28,
+                                            4,
+                                            126,
+                                            16
+                                          ],
+                                          "name" : "_NSMenuItemTextField",
+                                          "sublayers" : [
+                                            {
+                                              "class" : "NSViewBackingLayer",
+                                              "contents" : true,
+                                              "frame" : [
+                                                0,
+                                                0,
+                                                126,
+                                                16
+                                              ],
+                                              "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                              "sublayers" : [
+                                                {
+                                                  "class" : "ContentLayer",
+                                                  "contents" : true,
+                                                  "frame" : [
+                                                    -11.5,
+                                                    -4,
+                                                    106,
+                                                    24
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "class" : "NSViewBackingLayer",
+                                          "contents" : true,
+                                          "frame" : [
+                                            13,
+                                            10,
+                                            12,
+                                            4
+                                          ],
+                                          "name" : "_NSMenuItemImageView",
+                                          "sublayers" : [
+                                            {
+                                              "class" : "ContentLayer",
+                                              "contents" : true,
+                                              "frame" : [
+                                                1.5,
+                                                1,
+                                                9,
+                                                2
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    0,
+                                    53,
+                                    203,
+                                    24
+                                  ],
+                                  "name" : "NSTableRowView",
+                                  "sublayers" : [
+                                    {
+                                      "bg" : [
+                                        0,
+                                        0
+                                      ],
+                                      "class" : "CALayer",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        24
+                                      ]
+                                    },
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "contents" : true,
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        24
+                                      ],
+                                      "name" : "NSContextMenuItemView",
+                                      "sublayers" : [
+                                        {
+                                          "class" : "NSViewBackingLayer",
+                                          "frame" : [
+                                            28,
+                                            4,
+                                            126,
+                                            16
+                                          ],
+                                          "name" : "_NSMenuItemTextField",
+                                          "sublayers" : [
+                                            {
+                                              "class" : "NSViewBackingLayer",
+                                              "contents" : true,
+                                              "frame" : [
+                                                0,
+                                                0,
+                                                126,
+                                                16
+                                              ],
+                                              "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                              "sublayers" : [
+                                                {
+                                                  "class" : "ContentLayer",
+                                                  "contents" : true,
+                                                  "frame" : [
+                                                    -11.5,
+                                                    -4,
+                                                    89,
+                                                    24
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    0,
+                                    77,
+                                    203,
+                                    24
+                                  ],
+                                  "name" : "NSTableRowView",
+                                  "sublayers" : [
+                                    {
+                                      "bg" : [
+                                        0,
+                                        0
+                                      ],
+                                      "class" : "CALayer",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        24
+                                      ]
+                                    },
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "contents" : true,
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        24
+                                      ],
+                                      "name" : "NSContextMenuItemView",
+                                      "sublayers" : [
+                                        {
+                                          "class" : "NSViewBackingLayer",
+                                          "frame" : [
+                                            31,
+                                            4,
+                                            126,
+                                            16
+                                          ],
+                                          "name" : "_NSMenuItemTextField",
+                                          "sublayers" : [
+                                            {
+                                              "class" : "NSViewBackingLayer",
+                                              "contents" : true,
+                                              "frame" : [
+                                                0,
+                                                0,
+                                                126,
+                                                16
+                                              ],
+                                              "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                              "sublayers" : [
+                                                {
+                                                  "class" : "ContentLayer",
+                                                  "contents" : true,
+                                                  "frame" : [
+                                                    -11.5,
+                                                    -4,
+                                                    92.5,
+                                                    24
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    0,
+                                    101,
+                                    203,
+                                    24
+                                  ],
+                                  "name" : "NSTableRowView",
+                                  "sublayers" : [
+                                    {
+                                      "bg" : [
+                                        0,
+                                        0
+                                      ],
+                                      "class" : "CALayer",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        24
+                                      ]
+                                    },
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "contents" : true,
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        24
+                                      ],
+                                      "name" : "NSContextMenuItemView",
+                                      "sublayers" : [
+                                        {
+                                          "class" : "NSViewBackingLayer",
+                                          "frame" : [
+                                            43,
+                                            4,
+                                            126,
+                                            16
+                                          ],
+                                          "name" : "_NSMenuItemTextField",
+                                          "sublayers" : [
+                                            {
+                                              "class" : "NSViewBackingLayer",
+                                              "contents" : true,
+                                              "frame" : [
+                                                0,
+                                                0,
+                                                126,
+                                                16
+                                              ],
+                                              "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                              "sublayers" : [
+                                                {
+                                                  "class" : "ContentLayer",
+                                                  "contents" : true,
+                                                  "frame" : [
+                                                    -11.5,
+                                                    -4,
+                                                    92.5,
+                                                    24
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    0,
+                                    125,
+                                    203,
+                                    24
+                                  ],
+                                  "name" : "NSTableRowView",
+                                  "sublayers" : [
+                                    {
+                                      "bg" : [
+                                        0,
+                                        0
+                                      ],
+                                      "class" : "CALayer",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        24
+                                      ]
+                                    },
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "contents" : true,
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        24
+                                      ],
+                                      "name" : "NSContextMenuItemView",
+                                      "sublayers" : [
+                                        {
+                                          "class" : "NSViewBackingLayer",
+                                          "frame" : [
+                                            28,
+                                            4,
+                                            126,
+                                            16
+                                          ],
+                                          "name" : "_NSMenuItemTextField",
+                                          "sublayers" : [
+                                            {
+                                              "class" : "NSViewBackingLayer",
+                                              "contents" : true,
+                                              "frame" : [
+                                                0,
+                                                0,
+                                                126,
+                                                16
+                                              ],
+                                              "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                              "sublayers" : [
+                                                {
+                                                  "class" : "ContentLayer",
+                                                  "contents" : true,
+                                                  "frame" : [
+                                                    -11.5,
+                                                    -4,
+                                                    152.5,
+                                                    24
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "class" : "NSViewBackingLayer",
+                                          "contents" : true,
+                                          "frame" : [
+                                            12,
+                                            6,
+                                            13,
+                                            11
+                                          ],
+                                          "name" : "_NSMenuItemImageView",
+                                          "sublayers" : [
+                                            {
+                                              "class" : "ContentLayer",
+                                              "contents" : true,
+                                              "frame" : [
+                                                1.5,
+                                                1,
+                                                9.5,
+                                                9
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    0,
+                                    149,
+                                    203,
+                                    24
+                                  ],
+                                  "name" : "NSTableRowView",
+                                  "sublayers" : [
+                                    {
+                                      "bg" : [
+                                        0,
+                                        0
+                                      ],
+                                      "class" : "CALayer",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        24
+                                      ]
+                                    },
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "contents" : true,
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        24
+                                      ],
+                                      "name" : "NSContextMenuItemView",
+                                      "sublayers" : [
+                                        {
+                                          "class" : "NSViewBackingLayer",
+                                          "frame" : [
+                                            28,
+                                            4,
+                                            126,
+                                            16
+                                          ],
+                                          "name" : "_NSMenuItemTextField",
+                                          "sublayers" : [
+                                            {
+                                              "class" : "NSViewBackingLayer",
+                                              "contents" : true,
+                                              "frame" : [
+                                                0,
+                                                0,
+                                                126,
+                                                16
+                                              ],
+                                              "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                              "sublayers" : [
+                                                {
+                                                  "class" : "ContentLayer",
+                                                  "contents" : true,
+                                                  "frame" : [
+                                                    -11.5,
+                                                    -4,
+                                                    130,
+                                                    24
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "class" : "NSViewBackingLayer",
+                                          "frame" : [
+                                            173,
+                                            4,
+                                            17,
+                                            16
+                                          ],
+                                          "name" : "_NSMenuItemTextField",
+                                          "sublayers" : [
+                                            {
+                                              "class" : "NSViewBackingLayer",
+                                              "contents" : true,
+                                              "frame" : [
+                                                0,
+                                                0,
+                                                17,
+                                                16
+                                              ],
+                                              "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                              "sublayers" : [
+                                                {
+                                                  "class" : "ContentLayer",
+                                                  "contents" : true,
+                                                  "frame" : [
+                                                    -15,
+                                                    -4,
+                                                    45,
+                                                    24
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "class" : "NSViewBackingLayer",
+                                          "frame" : [
+                                            160,
+                                            4,
+                                            21,
+                                            16
+                                          ],
+                                          "name" : "_NSMenuItemTextField",
+                                          "sublayers" : [
+                                            {
+                                              "class" : "NSViewBackingLayer",
+                                              "contents" : true,
+                                              "frame" : [
+                                                0,
+                                                0,
+                                                21,
+                                                16
+                                              ],
+                                              "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                              "sublayers" : [
+                                                {
+                                                  "class" : "ContentLayer",
+                                                  "contents" : true,
+                                                  "frame" : [
+                                                    -15,
+                                                    -4,
+                                                    45.5,
+                                                    24
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "class" : "NSViewBackingLayer",
+                                          "contents" : true,
+                                          "frame" : [
+                                            12,
+                                            6,
+                                            13,
+                                            11
+                                          ],
+                                          "name" : "_NSMenuItemImageView",
+                                          "sublayers" : [
+                                            {
+                                              "class" : "ContentLayer",
+                                              "contents" : true,
+                                              "frame" : [
+                                                1.5,
+                                                1,
+                                                9.5,
+                                                9
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            0
+                          ],
+                          "name" : "NSScrollPocket",
+                          "sublayers" : [
+                            {
+                              "class" : "CALayer",
+                              "frame" : [
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "name" : "v8",
+                              "opacity" : 0
+                            },
+                            {
+                              "class" : "NSViewBackingLayer",
+                              "frame" : [
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "hidden" : true,
+                              "name" : "PocketMask",
+                              "opacity" : 0,
+                              "sublayers" : [
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "filters" : [
+                                    {
+                                      "inputs" : {
+                                        "inputDither" : true,
+                                        "inputNormalizeEdges" : false,
+                                        "inputRadius" : 20
+                                      },
+                                      "name" : "gaussianBlur",
+                                      "type" : "gaussianBlur"
+                                    }
+                                  ],
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "name" : "BlurContainer",
+                                  "sublayers" : [
+                                    {
+                                      "bg" : [
+                                        0,
+                                        1
+                                      ],
+                                      "class" : "NSViewBackingLayer",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        0,
+                                        0
+                                      ],
+                                      "hidden" : true,
+                                      "name" : "ShapeView"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "class" : "CABackdropLayer",
+                              "frame" : [
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "hidden" : true,
+                              "name" : "PocketBlur",
+                              "opacity" : 0,
+                              "sublayers" : [
+                                {
+                                  "class" : "CAPortalLayer",
+                                  "compositingFilter" : "destIn",
+                                  "filters" : [
+                                    {
+                                      "inputs" : {
+                                        "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 00000000 00000000 00000000 ... 0000a03f 000080be }"
+                                      },
+                                      "name" : "colorMatrix",
+                                      "type" : "colorMatrix"
+                                    }
+                                  ],
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "class" : "NSViewBackingLayer",
+                              "frame" : [
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "hidden" : true,
+                              "name" : "NSHardPocketView",
+                              "sublayers" : [
+                                {
+                                  "class" : "CALayer",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "name" : "v8",
+                                  "sublayers" : [
+                                    {
+                                      "class" : "CABackdropLayer",
+                                      "filters" : [
+                                        {
+                                          "inputs" : {
+                                            "inputDither" : true,
+                                            "inputNormalizeEdges" : true,
+                                            "inputRadius" : 6
+                                          },
+                                          "name" : "gaussianBlur",
+                                          "type" : "gaussianBlur"
+                                        },
+                                        {
+                                          "inputs" : {
+                                            "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 17b7d1b8 17b7d138 00000000 ... 0000803f 00000000 }"
+                                          },
+                                          "name" : "colorMatrix",
+                                          "type" : "colorMatrix"
+                                        },
+                                        {
+                                          "inputs" : {
+                                            "inputClamp" : 1,
+                                            "inputClampPreserveHue" : true
+                                          },
+                                          "name" : "sdrNormalize",
+                                          "type" : "sdrNormalize"
+                                        }
+                                      ],
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        0,
+                                        0
+                                      ],
+                                      "name" : "HardPocketContentBlur",
+                                      "sublayers" : [
+                                        {
+                                          "class" : "CAGradientLayer",
+                                          "frame" : [
+                                            0,
+                                            0,
+                                            0,
+                                            0
+                                          ],
+                                          "hidden" : true,
+                                          "name" : "HardPocketContentBlurMask"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "class" : "CABackdropLayer",
+                                      "filters" : [
+                                        {
+                                          "inputs" : {
+                                            "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 17b7d1b8 17b7d138 00000000 ... 0000803f 00000000 }"
+                                          },
+                                          "name" : "colorMatrix",
+                                          "type" : "colorMatrix"
+                                        },
+                                        {
+                                          "inputs" : {
+                                            "inputClamp" : 1,
+                                            "inputClampPreserveHue" : true
+                                          },
+                                          "name" : "sdrNormalize",
+                                          "type" : "sdrNormalize"
+                                        }
+                                      ],
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        0,
+                                        0
+                                      ],
+                                      "name" : "HardPocketBackgroundReplay",
+                                      "sublayers" : [
+                                        {
+                                          "class" : "CAGradientLayer",
+                                          "frame" : [
+                                            0,
+                                            0,
+                                            0,
+                                            0
+                                          ],
+                                          "name" : "HardPocketBackgroundReplayMask"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "bg" : [
+                                        0,
+                                        0.10000000000000001
+                                      ],
+                                      "class" : "CALayer",
+                                      "frame" : [
+                                        0,
+                                        -0.5,
+                                        0,
+                                        0.5
+                                      ],
+                                      "name" : "Separator"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "bg" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0.050000000000000003
+                                  ],
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    1
+                                  ],
+                                  "name" : "_TtC6AppKitP33_EC3F85FAB7755D56E669206D2B17725B26_NSLayerBasedFillColorView"
+                                }
+                              ]
+                            },
+                            {
+                              "class" : "NSViewBackingLayer",
+                              "frame" : [
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "hidden" : true,
+                              "name" : "LuminanceAdjustment",
+                              "sublayers" : [
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "name" : "Container",
+                                  "sublayers" : [
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        0,
+                                        0
+                                      ],
+                                      "name" : "BackgroundReplays",
+                                      "opacity" : 0,
+                                      "sublayers" : [
+                                        {
+                                          "class" : "CABackdropLayer",
+                                          "frame" : [
+                                            0,
+                                            0,
+                                            0,
+                                            0
+                                          ],
+                                          "name" : "BackgroundReplay",
+                                          "opacity" : 0.60000002384185791
+                                        },
+                                        {
+                                          "class" : "NSViewBackingLayer",
+                                          "frame" : [
+                                            0,
+                                            0,
+                                            0,
+                                            0
+                                          ],
+                                          "name" : "BackgroundColorReplay",
+                                          "opacity" : 0.60000002384185791
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        0,
+                                        0
+                                      ],
+                                      "name" : "LuminanceAdjustments",
+                                      "opacity" : 0,
+                                      "sublayers" : [
+                                        {
+                                          "bg" : [
+                                            0,
+                                            1
+                                          ],
+                                          "class" : "NSViewBackingLayer",
+                                          "frame" : [
+                                            0,
+                                            0,
+                                            0,
+                                            0
+                                          ],
+                                          "name" : "Darkening",
+                                          "opacity" : 0
+                                        },
+                                        {
+                                          "bg" : [
+                                            1,
+                                            1
+                                          ],
+                                          "class" : "NSViewBackingLayer",
+                                          "frame" : [
+                                            0,
+                                            0,
+                                            0,
+                                            0
+                                          ],
+                                          "name" : "Lightening",
+                                          "opacity" : 0
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "class" : "CAPortalLayer",
+                                  "compositingFilter" : "destIn",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "name" : "PocketMask"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "class" : "NSViewBackingLayer",
+                  "frame" : [
+                    0,
+                    178,
+                    203,
+                    0
+                  ],
+                  "name" : "NSTitlebarContainerView",
+                  "sublayers" : [
+                    {
+                      "class" : "NSViewBackingLayer",
+                      "frame" : [
+                        0,
+                        0,
+                        203,
+                        0
+                      ],
+                      "name" : "NSTitlebarBackgroundView"
+                    },
+                    {
+                      "class" : "NSViewBackingLayer",
+                      "frame" : [
+                        0,
+                        0,
+                        203,
+                        0
+                      ],
+                      "name" : "NSTitlebarView",
+                      "sublayers" : [
+                        {
+                          "class" : "CABackdropLayer",
+                          "frame" : [
+                            0,
+                            0,
+                            203,
+                            0
+                          ]
+                        },
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "compositingFilter" : "plusD",
+                          "frame" : [
+                            18,
+                            -8,
+                            10,
+                            16
+                          ],
+                          "name" : "NSTextField",
+                          "sublayers" : [
+                            {
+                              "class" : "NSViewBackingLayer",
+                              "contents" : true,
+                              "frame" : [
+                                0,
+                                0,
+                                10,
+                                16
+                              ],
+                              "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "class" : "NSViewBackingLayer",
+                      "frame" : [
+                        0,
+                        0,
+                        203,
+                        0
+                      ],
+                      "name" : "_NSTitlebarDecorationView",
+                      "sublayers" : [
+                        {
+                          "class" : "CUIWindowFrameLayer",
+                          "frame" : [
+                            0,
+                            0,
+                            203,
+                            0
+                          ],
+                          "name" : "Decoration",
+                          "sublayers" : [
+                            {
+                              "class" : "CAGradientLayer",
+                              "frame" : [
+                                0,
+                                0,
+                                203,
+                                22
+                              ],
+                              "hidden" : true,
+                              "name" : "CUIWindowTitlebarGradientLayer - Removed"
+                            },
+                            {
+                              "class" : "CALayer",
+                              "contents" : true,
+                              "frame" : [
+                                0,
+                                0,
+                                203,
+                                0
+                              ],
+                              "hidden" : true,
+                              "name" : "CUIWindowOverlayLayer - Removed",
+                              "opacity" : 0
+                            },
+                            {
+                              "class" : "CALayer",
+                              "compositingFilter" : "plusD",
+                              "frame" : [
+                                -1,
+                                21,
+                                204,
+                                1
+                              ],
+                              "name" : "CUIWindowSeparatorBarLayer"
+                            },
+                            {
+                              "class" : "CALayer",
+                              "contents" : true,
+                              "frame" : [
+                                0,
+                                0,
+                                203,
+                                0
+                              ],
+                              "hidden" : true,
+                              "name" : "CUIWindowBorderLayer"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "level" : 101,
+    "number" : 2241,
+    "views" : {
+      "class" : "NSGlassContentFrameView",
+      "frame" : [
+        0,
+        0,
+        203,
+        178
+      ],
+      "subviews" : [
+        {
+          "class" : "NSView",
+          "frame" : [
+            0,
+            0,
+            203,
+            178
+          ],
+          "subviews" : [
+            {
+              "class" : "NSMenuScrollView",
+              "frame" : [
+                0,
+                0,
+                203,
+                178
+              ],
+              "subviews" : [
+                {
+                  "class" : "BackdropView",
+                  "frame" : [
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "class" : "NSClipView",
+                  "frame" : [
+                    0,
+                    0,
+                    203,
+                    178
+                  ],
+                  "subviews" : [
+                    {
+                      "class" : "NSTableViewBackedMenuRepresentation",
+                      "frame" : [
+                        0,
+                        0,
+                        203,
+                        178
+                      ],
+                      "subviews" : [
+                        {
+                          "class" : "NSRootMenuWindowBackgroundView",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            0
+                          ],
+                          "hidden" : true
+                        },
+                        {
+                          "class" : "NSTableRowView",
+                          "frame" : [
+                            0,
+                            5,
+                            203,
+                            24
+                          ],
+                          "subviews" : [
+                            {
+                              "class" : "NSContextMenuItemView",
+                              "frame" : [
+                                0,
+                                0,
+                                203,
+                                24
+                              ],
+                              "subviews" : [
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "font" : ".AppleSystemUIFont 13.0",
+                                  "frame" : [
+                                    28,
+                                    4,
+                                    126,
+                                    16
+                                  ],
+                                  "subviews" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        126,
+                                        16
+                                      ]
+                                    }
+                                  ],
+                                  "text" : "Checked Row",
+                                  "textColor" : "Optional(Catalog color: System labelColor)",
+                                  "traits" : "{\n    NSCTFontProportionTrait = 0;\n    NSCTFontSlantTrait = 0;\n    NSCTFontSymbolicTrait = 16384;\n    NSCTFontUIFontDesignTrait = NSCTFontUIFontDesignDefault;\n    NSCTFontWeightTrait = 0;\n}"
+                                },
+                                {
+                                  "class" : "_NSMenuItemImageView",
+                                  "frame" : [
+                                    12,
+                                    6,
+                                    13,
+                                    11
+                                  ],
+                                  "image" : "? (13.0, 11.0)",
+                                  "tint" : "nil"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSTableRowView",
+                          "frame" : [
+                            0,
+                            29,
+                            203,
+                            24
+                          ],
+                          "subviews" : [
+                            {
+                              "class" : "NSContextMenuItemView",
+                              "frame" : [
+                                0,
+                                0,
+                                203,
+                                24
+                              ],
+                              "subviews" : [
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "font" : ".AppleSystemUIFont 13.0",
+                                  "frame" : [
+                                    28,
+                                    4,
+                                    126,
+                                    16
+                                  ],
+                                  "subviews" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        126,
+                                        16
+                                      ]
+                                    }
+                                  ],
+                                  "text" : "Mixed Row",
+                                  "textColor" : "Optional(Catalog color: System labelColor)",
+                                  "traits" : "{\n    NSCTFontProportionTrait = 0;\n    NSCTFontSlantTrait = 0;\n    NSCTFontSymbolicTrait = 16384;\n    NSCTFontUIFontDesignTrait = NSCTFontUIFontDesignDefault;\n    NSCTFontWeightTrait = 0;\n}"
+                                },
+                                {
+                                  "class" : "_NSMenuItemImageView",
+                                  "frame" : [
+                                    13,
+                                    10,
+                                    12,
+                                    4
+                                  ],
+                                  "image" : "? (12.0, 4.0)",
+                                  "tint" : "nil"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSTableRowView",
+                          "frame" : [
+                            0,
+                            53,
+                            203,
+                            24
+                          ],
+                          "subviews" : [
+                            {
+                              "class" : "NSContextMenuItemView",
+                              "frame" : [
+                                0,
+                                0,
+                                203,
+                                24
+                              ],
+                              "subviews" : [
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "font" : ".AppleSystemUIFont 13.0",
+                                  "frame" : [
+                                    28,
+                                    4,
+                                    126,
+                                    16
+                                  ],
+                                  "subviews" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        126,
+                                        16
+                                      ]
+                                    }
+                                  ],
+                                  "text" : "Off Row",
+                                  "textColor" : "Optional(Catalog color: System labelColor)",
+                                  "traits" : "{\n    NSCTFontProportionTrait = 0;\n    NSCTFontSlantTrait = 0;\n    NSCTFontSymbolicTrait = 16384;\n    NSCTFontUIFontDesignTrait = NSCTFontUIFontDesignDefault;\n    NSCTFontWeightTrait = 0;\n}"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSTableRowView",
+                          "frame" : [
+                            0,
+                            77,
+                            203,
+                            24
+                          ],
+                          "subviews" : [
+                            {
+                              "class" : "NSContextMenuItemView",
+                              "frame" : [
+                                0,
+                                0,
+                                203,
+                                24
+                              ],
+                              "subviews" : [
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "font" : ".AppleSystemUIFont 13.0",
+                                  "frame" : [
+                                    31,
+                                    4,
+                                    126,
+                                    16
+                                  ],
+                                  "subviews" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        126,
+                                        16
+                                      ]
+                                    }
+                                  ],
+                                  "text" : "Indent 1",
+                                  "textColor" : "Optional(Catalog color: System labelColor)",
+                                  "traits" : "{\n    NSCTFontProportionTrait = 0;\n    NSCTFontSlantTrait = 0;\n    NSCTFontSymbolicTrait = 16384;\n    NSCTFontUIFontDesignTrait = NSCTFontUIFontDesignDefault;\n    NSCTFontWeightTrait = 0;\n}"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSTableRowView",
+                          "frame" : [
+                            0,
+                            101,
+                            203,
+                            24
+                          ],
+                          "subviews" : [
+                            {
+                              "class" : "NSContextMenuItemView",
+                              "frame" : [
+                                0,
+                                0,
+                                203,
+                                24
+                              ],
+                              "subviews" : [
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "font" : ".AppleSystemUIFont 13.0",
+                                  "frame" : [
+                                    43,
+                                    4,
+                                    126,
+                                    16
+                                  ],
+                                  "subviews" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        126,
+                                        16
+                                      ]
+                                    }
+                                  ],
+                                  "text" : "Indent 2",
+                                  "textColor" : "Optional(Catalog color: System labelColor)",
+                                  "traits" : "{\n    NSCTFontProportionTrait = 0;\n    NSCTFontSlantTrait = 0;\n    NSCTFontSymbolicTrait = 16384;\n    NSCTFontUIFontDesignTrait = NSCTFontUIFontDesignDefault;\n    NSCTFontWeightTrait = 0;\n}"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSTableRowView",
+                          "frame" : [
+                            0,
+                            125,
+                            203,
+                            24
+                          ],
+                          "subviews" : [
+                            {
+                              "class" : "NSContextMenuItemView",
+                              "frame" : [
+                                0,
+                                0,
+                                203,
+                                24
+                              ],
+                              "subviews" : [
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "font" : ".AppleSystemUIFont 13.0",
+                                  "frame" : [
+                                    28,
+                                    4,
+                                    126,
+                                    16
+                                  ],
+                                  "subviews" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        126,
+                                        16
+                                      ]
+                                    }
+                                  ],
+                                  "text" : "Checked Disabled",
+                                  "textColor" : "Optional(Catalog color: System tertiaryLabelColor)",
+                                  "traits" : "{\n    NSCTFontProportionTrait = 0;\n    NSCTFontSlantTrait = 0;\n    NSCTFontSymbolicTrait = 16384;\n    NSCTFontUIFontDesignTrait = NSCTFontUIFontDesignDefault;\n    NSCTFontWeightTrait = 0;\n}"
+                                },
+                                {
+                                  "class" : "_NSMenuItemImageView",
+                                  "frame" : [
+                                    12,
+                                    6,
+                                    13,
+                                    11
+                                  ],
+                                  "image" : "? (13.0, 11.0)",
+                                  "tint" : "nil"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSTableRowView",
+                          "frame" : [
+                            0,
+                            149,
+                            203,
+                            24
+                          ],
+                          "subviews" : [
+                            {
+                              "class" : "NSContextMenuItemView",
+                              "frame" : [
+                                0,
+                                0,
+                                203,
+                                24
+                              ],
+                              "subviews" : [
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "font" : ".AppleSystemUIFont 13.0",
+                                  "frame" : [
+                                    28,
+                                    4,
+                                    126,
+                                    16
+                                  ],
+                                  "subviews" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        126,
+                                        16
+                                      ]
+                                    }
+                                  ],
+                                  "text" : "With Shortcut",
+                                  "textColor" : "Optional(Catalog color: System labelColor)",
+                                  "traits" : "{\n    NSCTFontProportionTrait = 0;\n    NSCTFontSlantTrait = 0;\n    NSCTFontSymbolicTrait = 16384;\n    NSCTFontUIFontDesignTrait = NSCTFontUIFontDesignDefault;\n    NSCTFontWeightTrait = 0;\n}"
+                                },
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "font" : ".Keyboard 13.0",
+                                  "frame" : [
+                                    173,
+                                    4,
+                                    17,
+                                    16
+                                  ],
+                                  "subviews" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        17,
+                                        16
+                                      ]
+                                    }
+                                  ],
+                                  "text" : "‎S",
+                                  "textColor" : "Optional(Catalog color: System tertiaryLabelColor)",
+                                  "traits" : "{\n    NSCTFontProportionTrait = 0;\n    NSCTFontSlantTrait = 0;\n    NSCTFontSymbolicTrait = 3221225472;\n    NSCTFontWeightTrait = 0;\n}"
+                                },
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "font" : ".Keyboard 13.0",
+                                  "frame" : [
+                                    160,
+                                    4,
+                                    21,
+                                    16
+                                  ],
+                                  "subviews" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        21,
+                                        16
+                                      ]
+                                    }
+                                  ],
+                                  "text" : "￼",
+                                  "textColor" : "Optional(Catalog color: System tertiaryLabelColor)",
+                                  "traits" : "{\n    NSCTFontProportionTrait = 0;\n    NSCTFontSlantTrait = 0;\n    NSCTFontSymbolicTrait = 3221225472;\n    NSCTFontWeightTrait = 0;\n}"
+                                },
+                                {
+                                  "class" : "_NSMenuItemImageView",
+                                  "frame" : [
+                                    12,
+                                    6,
+                                    13,
+                                    11
+                                  ],
+                                  "image" : "? (13.0, 11.0)",
+                                  "tint" : "nil"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "class" : "NSScrollPocket",
+                  "frame" : [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "subviews" : [
+                    {
+                      "alpha" : 0,
+                      "class" : "PocketMask",
+                      "frame" : [
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "hidden" : true,
+                      "subviews" : [
+                        {
+                          "class" : "NSView",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            0
+                          ],
+                          "subviews" : [
+                            {
+                              "class" : "NSView",
+                              "frame" : [
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "hidden" : true
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "alpha" : 0,
+                      "class" : "PocketBlur",
+                      "frame" : [
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "hidden" : true,
+                      "subviews" : [
+                        {
+                          "class" : "PortalView",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            0
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "class" : "NSHardPocketView",
+                      "frame" : [
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "hidden" : true,
+                      "subviews" : [
+                        {
+                          "class" : "_NSLayerBasedFillColorView",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            1
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "class" : "LuminanceAdjustment",
+                      "frame" : [
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "hidden" : true,
+                      "subviews" : [
+                        {
+                          "class" : "NSView",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            0
+                          ],
+                          "subviews" : [
+                            {
+                              "alpha" : 0,
+                              "class" : "NSView",
+                              "frame" : [
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "subviews" : [
+                                {
+                                  "alpha" : 0.59999999999999998,
+                                  "class" : "BackdropView",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ]
+                                },
+                                {
+                                  "alpha" : 0.59999999999999998,
+                                  "class" : "_NSScrollViewContentBackgroundView",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "alpha" : 0,
+                              "class" : "NSView",
+                              "frame" : [
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "subviews" : [
+                                {
+                                  "alpha" : 0,
+                                  "class" : "NSView",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ]
+                                },
+                                {
+                                  "alpha" : 0,
+                                  "class" : "NSView",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "PortalView",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            0
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "class" : "NSTitlebarContainerView",
+          "frame" : [
+            0,
+            178,
+            203,
+            0
+          ],
+          "subviews" : [
+            {
+              "class" : "NSTitlebarBackgroundView",
+              "frame" : [
+                0,
+                0,
+                203,
+                0
+              ]
+            },
+            {
+              "class" : "NSTitlebarView",
+              "frame" : [
+                0,
+                0,
+                203,
+                0
+              ],
+              "subviews" : [
+                {
+                  "class" : "NSView",
+                  "frame" : [
+                    0,
+                    0,
+                    203,
+                    0
+                  ]
+                },
+                {
+                  "class" : "NSTextField",
+                  "font" : ".AppleSystemUIFaceHeadline 13.0",
+                  "frame" : [
+                    18,
+                    -8,
+                    10,
+                    16
+                  ],
+                  "subviews" : [
+                    {
+                      "class" : "NSTextFieldSimpleLabel",
+                      "frame" : [
+                        0,
+                        0,
+                        10,
+                        16
+                      ]
+                    }
+                  ],
+                  "text" : "",
+                  "textColor" : "Optional(Catalog color: System windowFrameTextColor)",
+                  "traits" : "{\n    NSCTFontProportionTrait = 0;\n    NSCTFontSlantTrait = 0;\n    NSCTFontSymbolicTrait = 16386;\n    NSCTFontUIFontDesignTrait = NSCTFontUIFontDesignDefault;\n    NSCTFontWeightTrait = \"0.4000000059604645\";\n}"
+                }
+              ]
+            },
+            {
+              "class" : "_NSTitlebarDecorationView",
+              "frame" : [
+                0,
+                0,
+                203,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "alpha" : 1,
+    "class" : "_NSGlassEffectWindow",
+    "frame" : [
+      75,
+      819,
+      353,
+      328
+    ],
+    "hasShadow" : false,
+    "layers" : {
+      "class" : "CALayer",
+      "frame" : [
+        0,
+        0,
+        353,
+        328
+      ],
+      "name" : "NSCGSWindow",
+      "sublayers" : [
+        {
+          "class" : "CABackdropLayer",
+          "filters" : [
+            {
+              "inputs" : {
+
+              },
+              "name" : "sdrNormalize",
+              "type" : "sdrNormalize"
+            },
+            {
+              "inputs" : {
+                "inputNormalizeEdges" : true,
+                "inputRadius" : 30
+              },
+              "name" : "gaussianBlur",
+              "type" : "gaussianBlur"
+            }
+          ],
+          "frame" : [
+            0,
+            0,
+            353,
+            328
+          ],
+          "name" : "NSCGSWindow capture backdrop"
+        },
+        {
+          "class" : "CALayer",
+          "frame" : [
+            0,
+            0,
+            0,
+            0
+          ],
+          "name" : "NSWindow content layer",
+          "sublayers" : [
+            {
+              "bg" : [
+                0,
+                0
+              ],
+              "class" : "NSViewBackingLayer",
+              "frame" : [
+                0,
+                0,
+                353,
+                328
+              ],
+              "name" : "_TtC6AppKitP33_1000D58E68E3645B307D42088FFA59FB24NSGlassEffectWindowFrame",
+              "sublayers" : [
+                {
+                  "class" : "BackingLayer",
+                  "frame" : [
+                    75,
+                    75,
+                    203,
+                    178
+                  ],
+                  "name" : "_TtCE6AppKitCSo17NSGlassEffectViewP33_92F0BB6107B916AA04C9A991F505A16412BackingLayer: NSGlassEffectView",
+                  "sublayers" : [
+                    {
+                      "class" : "CALayer",
+                      "frame" : [
+                        0,
+                        0,
+                        203,
+                        178
+                      ],
+                      "name" : "contentHolderView",
+                      "sublayers" : [
+                        {
+                          "class" : "_NSGlassEffectWindowLayerHost",
+                          "contents" : true,
+                          "frame" : [
+                            0,
+                            0,
+                            203,
+                            178
+                          ],
+                          "name" : "_NSGlassEffectWindowLayerHost: _NSGlassEffectWindowLayerHostView"
+                        }
+                      ]
+                    },
+                    {
+                      "class" : "NSViewBackingLayer",
+                      "frame" : [
+                        0,
+                        0,
+                        203,
+                        178
+                      ],
+                      "name" : "_TtGC6AppKit18_NSCoreHostingViewVES_CSo17NSGlassEffectViewP10$19ca35b508RootView_",
+                      "sublayers" : [
+                        {
+                          "class" : "CALayer",
+                          "frame" : [
+                            0,
+                            0,
+                            203,
+                            178
+                          ],
+                          "sublayers" : [
+                            {
+                              "class" : "SDFLayer",
+                              "frame" : [
+                                0,
+                                0,
+                                203,
+                                178
+                              ],
+                              "sublayers" : [
+                                {
+                                  "class" : "CALayer",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "sublayers" : [
+                                    {
+                                      "class" : "CALayer",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        178
+                                      ],
+                                      "sublayers" : [
+                                        {
+                                          "bg" : [
+                                            1,
+                                            1,
+                                            1,
+                                            1
+                                          ],
+                                          "class" : "CALayer",
+                                          "cornerRadius" : 12,
+                                          "filters" : [
+                                            {
+                                              "inputs" : {
+                                                "inputBackdropAware" : true,
+                                                "inputColorMatrix" : "{length = 80, bytes = 0x0000a03e 00000000 00000000 00000000 ... 00000000 00000000 }"
+                                              },
+                                              "name" : "vibrantColorMatrix",
+                                              "type" : "vibrantColorMatrix"
+                                            }
+                                          ],
+                                          "frame" : [
+                                            0,
+                                            0,
+                                            203,
+                                            178
+                                          ]
+                                        },
+                                        {
+                                          "class" : "CALayer",
+                                          "cornerRadius" : 12,
+                                          "frame" : [
+                                            0,
+                                            0,
+                                            203,
+                                            178
+                                          ],
+                                          "sublayers" : [
+                                            {
+                                              "class" : "CAPortalLayer",
+                                              "frame" : [
+                                                0,
+                                                0,
+                                                203,
+                                                178
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "class" : "CALayer",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    203,
+                                    178
+                                  ],
+                                  "sublayers" : [
+                                    {
+                                      "class" : "CABackdropLayer",
+                                      "filters" : [
+                                        {
+                                          "inputs" : {
+                                            "inputBleedAmount" : 62.299999999999997,
+                                            "inputBleedBlurRadius" : 62.299999999999997,
+                                            "inputBleedColorMatrixBlack" : 0.89999997615814209,
+                                            "inputBleedColorMatrixSaturation" : 1.2000000476837158,
+                                            "inputBleedColorMatrixWhite" : 1,
+                                            "inputBleedDarkenBlend" : true,
+                                            "inputBleedDistance0" : 1,
+                                            "inputBleedDistance1" : 0,
+                                            "inputBleedHeight" : 62.299999999999997,
+                                            "inputBleedOpacity" : 0.5,
+                                            "inputBlurDistance0" : -89,
+                                            "inputBlurDistance1" : -1,
+                                            "inputBlurDistance2" : 0,
+                                            "inputBlurDistance3" : 0,
+                                            "inputBlurFillBlurRadius" : 8,
+                                            "inputBlurFillDarkenOpacity" : 0,
+                                            "inputBlurFillLightenOpacity" : 0.89999997615814209,
+                                            "inputBlurFillNormalOpacity" : 0.50711458921432495,
+                                            "inputBlurOpacity0" : 0.80000001192092896,
+                                            "inputBlurOpacity1" : 0.40000000596046448,
+                                            "inputBlurOpacity2" : 0.5,
+                                            "inputBlurOpacity3" : 1,
+                                            "inputBlurRadius" : 5,
+                                            "inputClamp" : 1.0696101188659668,
+                                            "inputClampPreserveHue" : false,
+                                            "inputFaceColorMatrixBlack" : 0.40000000596046448,
+                                            "inputFaceColorMatrixFillColor" : [
+                                              1,
+                                              1,
+                                              1,
+                                              0.20426875352859497
+                                            ],
+                                            "inputFaceColorMatrixMaxLuma" : 1,
+                                            "inputFaceColorMatrixMaxLumaSDR" : 0.93999999761581421,
+                                            "inputFaceColorMatrixSaturation" : 1.2000000476837158,
+                                            "inputFaceColorMatrixWhite" : 1.0299999713897705,
+                                            "inputFaceOpacity" : 1,
+                                            "inputInnerRefractionAmount" : -60,
+                                            "inputInnerRefractionHeight" : 20,
+                                            "inputKeyFillHighlightAmount" : 0.40000000000000002,
+                                            "inputKeyFillHighlightAngle" : 1.5707963267948966,
+                                            "inputKeyFillHighlightColorBias" : -0.25,
+                                            "inputKeyFillHighlightEffectOffset" : -0.5,
+                                            "inputKeyFillHighlightHeight" : 0.5,
+                                            "inputKeyFillHighlightSpread" : 1.6755160819145565,
+                                            "inputKeyFillHighlightSpreadSDR" : 1.8500490071139892,
+                                            "inputMaxHeadroom" : 9999,
+                                            "inputOuterRefractionAmount" : 44.5,
+                                            "inputOuterRefractionHeight" : 35.600000000000001,
+                                            "inputRefractionDistance0" : -1,
+                                            "inputRefractionDistance1" : 0,
+                                            "inputRefractionOpacity" : 0.60000002384185791,
+                                            "inputRingShadowBlurRadius" : 5,
+                                            "inputRingShadowMask" : 1,
+                                            "inputRingShadowOffset" : 8,
+                                            "inputRingShadowOpacity" : 0.059999998658895493,
+                                            "inputRingShadowStrokeWidth" : 4,
+                                            "inputSDRGradientDistance0" : 0,
+                                            "inputSDRGradientDistance1" : 0,
+                                            "inputSDRHoldingToneEnabled" : false,
+                                            "inputSDRHoldingToneWhite" : 1,
+                                            "inputSDRShadowOpacity" : 0,
+                                            "inputShadowAmount" : 0,
+                                            "inputShadowBlurRadius" : 0,
+                                            "inputShadowColorMatrixBlack" : 0,
+                                            "inputShadowColorMatrixFillColor" : [
+                                              0,
+                                              0,
+                                              0,
+                                              0.30000001192092896
+                                            ],
+                                            "inputShadowColorMatrixSaturation" : 1,
+                                            "inputShadowColorMatrixWhite" : 1,
+                                            "inputShadowDistanceOffset" : 0,
+                                            "inputShadowHeight" : 0,
+                                            "inputShadowOffset" : [
+                                              0,
+                                              10
+                                            ],
+                                            "inputShadowOpacity" : 0.69999998807907104,
+                                            "inputShadowRadius" : 24,
+                                            "inputShadowVibrancyContribution" : 0,
+                                            "inputSourceSublayerName" : "@0"
+                                          },
+                                          "name" : "glassBackground",
+                                          "type" : "glassBackground"
+                                        }
+                                      ],
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        178
+                                      ],
+                                      "name" : "@0",
+                                      "sublayers" : [
+                                        {
+                                          "class" : "CASDFLayer",
+                                          "frame" : [
+                                            0,
+                                            0,
+                                            203,
+                                            178
+                                          ],
+                                          "name" : "@0",
+                                          "sublayers" : [
+                                            {
+                                              "class" : "CALayer",
+                                              "frame" : [
+                                                0,
+                                                0,
+                                                0,
+                                                0
+                                              ],
+                                              "sublayers" : [
+                                                {
+                                                  "class" : "CASDFElementLayer",
+                                                  "cornerRadius" : 12,
+                                                  "frame" : [
+                                                    0,
+                                                    0,
+                                                    203,
+                                                    178
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "class" : "SDFPortalLayer",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        178
+                                      ],
+                                      "name" : "@1"
+                                    },
+                                    {
+                                      "class" : "CASDFLayer",
+                                      "filters" : [
+                                        {
+                                          "inputs" : {
+                                            "inputClamp" : 1,
+                                            "inputColorMatrix" : "{length = 80, bytes = 0xb6628f3f 13f241be e3a59bbc 00000000 ... 0000803f 00000000 }"
+                                          },
+                                          "name" : "vibrantColorMatrix",
+                                          "type" : "vibrantColorMatrix"
+                                        }
+                                      ],
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        203,
+                                        178
+                                      ],
+                                      "name" : "@2",
+                                      "sublayers" : [
+                                        {
+                                          "class" : "SDFPortalLayer",
+                                          "frame" : [
+                                            0,
+                                            0,
+                                            0,
+                                            0
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "level" : 101,
+    "number" : 2242,
+    "views" : {
+      "class" : "NSGlassEffectWindowFrame",
+      "frame" : [
+        0,
+        0,
+        353,
+        328
+      ],
+      "subviews" : [
+        {
+          "_subvariant" : "menu",
+          "_variant" : 0,
+          "class" : "NSGlassEffectView",
+          "frame" : [
+            75,
+            75,
+            203,
+            178
+          ],
+          "glassCornerRadius" : 12,
+          "glassStyle" : 0,
+          "subviews" : [
+            {
+              "class" : "ContentHolderView",
+              "frame" : [
+                0,
+                0,
+                203,
+                178
+              ],
+              "subviews" : [
+                {
+                  "class" : "_NSGlassEffectWindowLayerHostView",
+                  "frame" : [
+                    0,
+                    0,
+                    203,
+                    178
+                  ]
+                }
+              ]
+            },
+            {
+              "class" : "_NSCoreHostingView<RootView>",
+              "frame" : [
+                0,
+                0,
+                203,
+                178
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+]
