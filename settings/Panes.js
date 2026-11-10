@@ -26,7 +26,7 @@ const panes = [
     { id: "trackpad", title: "Trackpad", glyph: "crop_landscape", tint: "gray", file: "Trackpad", group: 5 }
 ];
 
-// Every pane has its real macOS 27.2.1 icon, themes/icons/settings/<id>@<64|128>-<light|dark>.png, rendered by
+// Every pane has its real macOS 27.2.1 icon, themes/icons/settings/<id>@<64|128>-<default|dark|clear|tinted>-<light|dark>.png (one set per icon style), rendered by
 // IconServices on the Mac (reference/re/MAC-ANSWERS.md R3b); glyph and tint above are the fallback tile.
 function hasRealIcon(id) { return panes.some(p => p.id === id); }
 

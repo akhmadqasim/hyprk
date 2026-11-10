@@ -1,12 +1,12 @@
 import QtQuick
-import QtQuick.Effects
 import ".."
 import "../HyprK"
 import "../Panes.js" as Panes
 
 // System Settings pane icon. Panes use the real macOS 27.2.1 icons rendered by IconServices,
-// themes/icons/settings/<iconId>@<64|128>-<light|dark>.png (reference/re/MAC-ANSWERS.md R3b); anything else
-// (or a missing file) gets a coloured rounded-square tile with a Material Icons glyph.
+// themes/icons/settings/<iconId>@<64|128>-<default|dark|clear|tinted>-<light|dark>.png, one set per "Icon & widget
+// style" (Appearance pane, AppState.appearance.iconStyle) and appearance (reference/re/MAC-ANSWERS.md R3b, names.json
+// settingsIconStyles); anything else (or a missing file) gets a coloured rounded-square tile with a Material Icons glyph.
 Item {
     id: pi
     property int size: Theme.sidebar.iconSize
@@ -28,10 +28,10 @@ Item {
     // Drawn so the body is `size`, like the glyph tile; the 64 px file up to 64 device px, else the 128 px one.
     readonly property real art: size * 128 / 104
     readonly property real artPx: Math.ceil(art * Screen.devicePixelRatio)
-    // Light file = coloured tile, dark file = black tile with the symbol in the tile colour (IconServices
-    // appearance 0 / 1). Which one macOS shows for the "Default" style in Dark Mode was not measured: we follow
-    // the appearance, and the "Dark" style always takes the dark file.
-    readonly property bool darkArt: pi.style === "dark" || Theme.dark
+    // Measured on 27.2.1: style Default shows the coloured light tiles also in Dark Mode (the -default-dark files are
+    // byte-identical to -default-light); dark tiles only with style Dark (the same in both appearances); Clear and
+    // Tinted differ between light and dark. Tinted is rendered with the default (blue) accent, it does not follow ours.
+    readonly property bool darkArt: pi.style !== "default" && Theme.dark
     Image {
         id: asset
         anchors.centerIn: parent
@@ -39,16 +39,13 @@ Item {
         visible: status === Image.Ready
         source: pi.imageSource === "" && Panes.hasRealIcon(pi.iconId)
             ? "file://" + Backend.root + "/themes/icons/settings/" + pi.iconId + "@" + (pi.artPx > 64 ? 128 : 64)
-              + "-" + (pi.darkArt ? "dark" : "light") + ".png" : ""
+              + "-" + pi.style + "-" + (pi.darkArt ? "dark" : "light") + ".png" : ""
         sourceSize: Qt.size(pi.artPx, pi.artPx)   // scaled once when decoded, cached per size
         smooth: true
-        // "Clear" icon style shows images as monochrome glass, like macOS 26+
-        layer.enabled: pi.style === "clear"
-        layer.effect: MultiEffect { saturation: -1.0; brightness: 0.05 }
     }
     // Icon & widget style (Appearance pane): default = colored tile, dark = black tile with
-    // a tinted glyph, clear = gray glass tile, tinted = accent-colored tile.
-    readonly property string style: AppState.appearance.iconStyle
+    // a tinted glyph, clear = gray glass tile, tinted = accent-colored tile. Also picks the pane icon file above.
+    readonly property string style: AppState.appearance.iconStyle || "default"
     readonly property color tileColor: style === "dark" ? "#1C1C1E"
         : style === "clear" ? (Theme.dark ? "#5A5A5E" : "#7E7E7E")   // ref (clear style)
         : style === "tinted" ? Theme.accent : tint
