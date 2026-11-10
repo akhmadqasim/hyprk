@@ -344,7 +344,7 @@ Singleton {
         readonly property int width: 640                 // SPEC.md 7: standardWindowWidth 640
         readonly property int barHeight: 56              // SPEC.md 7: heightCollapsed 56
         readonly property int radius: 28                 // SPEC.md 7: windowCornerRadius 28
-        readonly property int resultsRadius: 28          // same window radius when expanded
+        readonly property int resultsRadius: 37          // results glass: RoundedRectangle(cornerRadius: 37) (REA 27.2.1, SpotlightUIInternal)
         readonly property real top: 0.22                 // bar top at 22% of the screen height (reference/JUDGE-r3.md)
         readonly property int iconSize: 20               // magnifier, TODO verify
         readonly property int rowHeight: 48              // tall rows (macOS 26/27), TODO verify

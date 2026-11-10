@@ -637,6 +637,15 @@ test("mode buttons start inside the field, end in place", () => {
         const t = SP.firstCrossing(SP.fromBounce(0.28, 0.41), 0, 0.001);
         assert.ok(t > 0.115 && t < 0.13, `t ${t}`);
     });
+    test("spring curve: the modules use the library, with Apple's numbers", () => {
+        assert.match(src("modules/NotificationCenter.qml"), /SpringLib\.fromBounce\(0\.3, -0\.2\)/);
+        assert.match(src("modules/ControlCenterWindow.qml"), /SpringLib\.fromBounce\(0\.25, -0\.027\)/);
+        const hud = src("services/Hud.qml");
+        for (const re of [/fromPhysics\(2, 300, 50\)/, /fromResponse\(0\.48669, 1\)/, /fromResponse\(0\.2, 0\.85\)/]) assert.match(hud, re);
+        const sl = src("modules/Spotlight.qml");
+        for (const re of [/fromBounce\(0\.28, 0\.41\)/, /fromBounce\(0\.28, 0\.32\)/, /fromBounce\(0\.45, 0\.05\)/]) assert.match(sl, re);
+        assert.ok(!/slideCurve/.test(src("modules/NotificationCenter.qml")), "no hand-fitted NC curve left");
+    });
 }
 
 console.log(`${pass} passed, ${fail} failed`);

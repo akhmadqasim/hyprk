@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import qs
@@ -8,6 +7,7 @@ import qs.services
 import qs.HyprK
 import "../lib/search.js" as Search
 import "../lib/spotlight.js" as SL
+import "../lib/spring.js" as SpringLib
 import "spotlight"
 
 // Spotlight (Super+Space): capsule search bar, results below in a second
@@ -21,26 +21,54 @@ ShellWindow {
     screen: modelData
 
     readonly property bool shown: Panels.open === "spotlight"
-    // MAC-ANSWERS.md R2 (27.2.1): Spotlight appears complete in one frame at about 1.05 x its final size
-    // and shrinks to 1.0 within 5 frames (about 0.08 s), no fade-in (curve not measured: ease-out); on close
-    // it fades out with a blur and a slight growth in 3 frames (about 0.05 s; the growth (2 %) and blur
-    // (up to 5 pt, like the AppKit window close) are not measured). Then the window is unloaded.
-    // Reduce motion: no scale, the fade stays.
-    property real openScale: 1 + Theme.travel(0.05)
-    NumberAnimation { id: settleIn; target: sp; property: "openScale"; from: 1 + Theme.travel(0.05); to: 1; duration: 80; easing.type: Easing.OutQuad }
-    // the window is created on open: start shrinking once its first frame (at 1.05) is on screen,
-    // else creating the surface eats the first frames of the 0.08 s
+    // MAC-ANSWERS.md "REA 27.2.1" section 4 (SpotlightUIInternal, CASpringAnimation(perceptualDuration:bounce:)),
+    // each on one exact spring (components/SpringCurve.qml):
+    // - open (FUN_2adea2ff0, FUN_2ade9ef14 flag 0): transform.scale.x 1.12 -> 1 on Spring(0.28, 0.41),
+    //   scale.y 0.95 -> 1 on Spring(0.28, 0.32), window alpha 0 -> 1 on Spring(0.28, 0.41);
+    // - close (FUN_2adea36c8, FUN_2ade9ef14 flag 1): scale.x 1 -> 1.12 and scale.y 1 -> 0.95 on Spring(0.45, 0.05),
+    //   alpha 1 -> 0 on Spring(0.28, 0.41). The window is unloaded when the alpha first reaches 0 (0.12 s); it
+    //   would only swing back to 0.01 after that.
+    // Not done: the open's contentBlurRadius 25 -> 0 on Spring(0.51, 0.05) (no cheap compositor blur of a
+    // layer's content; an offscreen QML blur would also miss the plugin glass), and transform.translation.y
+    // (its start value is not read). The scale anchor is not read: the search field's centre.
+    // The window is created on open: the springs start on its first frame (alpha 0), else creating the surface
+    // eats their first frames. Reduce motion: no scale (Theme.travel), the fade stays.
+    property real scaleX: 1.12
+    property real scaleY: 0.95
+    property real alpha: 0
+    readonly property var springOpenX: SpringLib.fromBounce(0.28, 0.41)
+    readonly property var springOpenY: SpringLib.fromBounce(0.28, 0.32)
+    readonly property var springClose: SpringLib.fromBounce(0.45, 0.05)
+    readonly property var springAlpha: SpringLib.fromBounce(0.28, 0.41)
+    SpringCurve { id: animX; target: sp; property: "scaleX" }
+    SpringCurve { id: animY; target: sp; property: "scaleY" }
+    SpringCurve {
+        id: animAlpha
+        target: sp
+        property: "alpha"
+        spring: sp.springAlpha
+        onFinished: if (!sp.shown) sp.gone = true
+    }
+    property bool gone: false
+    function animate(open) {
+        gone = false;
+        animX.spring = open ? springOpenX : springClose;
+        animY.spring = open ? springOpenY : springClose;
+        animAlpha.cutAt = open ? 0 : SpringLib.firstCrossing(springAlpha, 0, 0.001);
+        animX.go(open ? 1 : 1.12);
+        animY.go(open ? 1 : 0.95);
+        animAlpha.go(open ? 1 : 0);
+        settleGlass(Math.max(animX.duration, animY.duration, animAlpha.duration) + 50);   // the glass follows the scale
+    }
     property bool firstFrame: true
     Connections {
         target: sp.firstFrame ? sp.contentItem.Window.window : null
-        function onFrameSwapped() { sp.firstFrame = false; settleIn.restart(); }
+        function onFrameSwapped() { sp.firstFrame = false; if (sp.shown) sp.animate(true); }
     }
-    property real out: shown ? 0 : 1          // 0 shown .. 1 gone
-    Behavior on out { NumberAnimation { duration: 50 } }
-    visible: shown || out < 1
+    visible: shown || !gone
     lingerAs: "spotlight"
-    lingering: !shown && out < 1
-    glassOpacity: 1 - out
+    lingering: !shown && !gone
+    glassOpacity: alpha
     // while dematerializing it takes no input, so it never eats the next click
     acceptsInput: shown
     anchors { top: true; left: true; right: true; bottom: true }
@@ -131,9 +159,9 @@ ShellWindow {
         input.text = Panels.spotlightQuery;
         Panels.spotlightQuery = "";
     }
-    function present() { if (!firstFrame) settleIn.restart(); takeQuery(); input.forceActiveFocus(); FileSearch.loadRecents(); }
+    function present() { if (!firstFrame) animate(true); takeQuery(); input.forceActiveFocus(); FileSearch.loadRecents(); }
     Component.onCompleted: present()
-    onShownChanged: if (shown) present()       // reopened while still fading out
+    onShownChanged: shown ? present() : animate(false)       // present(): also reopened while still fading out
     Connections {
         target: Panels
         function onSpotlightQueryChanged() { sp.takeQuery(); }
@@ -188,17 +216,12 @@ ShellWindow {
         height: A11y.reduceMotion ? targetHeight : grow.value
         // around the search field's centre
         transform: Scale {
-            readonly property real s: sp.openScale * (1 + Theme.travel(0.02) * sp.out)
             origin.x: panel.width / 2
             origin.y: Theme.spotlight.barHeight / 2
-            xScale: s
-            yScale: s
+            xScale: 1 + Theme.travel(sp.scaleX - 1)
+            yScale: 1 + Theme.travel(sp.scaleY - 1)
         }
-        opacity: 1 - sp.out
-        // the close blur, only for those 3 frames
-        layer.enabled: sp.out > 0
-        layer.effect: MultiEffect { blurEnabled: true; blurMax: 10; blur: sp.out }
-
+        opacity: sp.alpha
         Glass {
             anchors.fill: parent
             radius: panel.expanded ? Theme.spotlight.resultsRadius : Theme.spotlight.radius
@@ -416,8 +439,8 @@ ShellWindow {
         originX: x
         originY: y
         mode: sp.mode
-        shown: (sp.shown || sp.out < 1) && (sp.pointerMoved || sp.mode !== "")   // they fade with the window
-        opacity: 1 - sp.out
+        shown: (sp.shown || !sp.gone) && (sp.pointerMoved || sp.mode !== "")   // they fade with the window
+        opacity: sp.alpha
         gap: 12
         onPicked: m => sp.setMode(m)
     }
