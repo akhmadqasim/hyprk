@@ -30,21 +30,21 @@ Column {
             { id: "hovertext", title: "Hover Text", glyph: "text_fields", about: "Show a larger version of the text under the pointer, or of what you type." },
             { id: "display", title: "Display", glyph: "desktop_windows", file: "Display" },
             { id: "motion", title: "Motion", glyph: "animation", file: "Motion" },
-            { id: "readspeak", title: "Read & Speak", glyph: "chat", file: "ReadSpeak" }
+            { id: "readspeak", title: "Read & Speak", glyph: "chat", file: "ReadSpeak" },
+            { id: "audiodesc", title: "Audio Descriptions", glyph: "speaker_notes", about: "Hear descriptions of the visual content of videos, when they are available." }
+        ] },
+        { title: "Physical and Motor", rows: [
+            { id: "voicecontrol", title: "Voice Control", glyph: "settings_voice", about: "Control your computer and apps with spoken commands." },
+            { id: "keyboard", title: "Keyboard", glyph: "keyboard", file: "KeyboardA11y" },
+            { id: "pointer", title: "Pointer Control", glyph: "mouse", file: "PointerControl" },
+            { id: "switchcontrol", title: "Switch Control", glyph: "toggle_on", about: "Control your computer with adaptive switches." }
         ] },
         { title: "Hearing", rows: [
-            { id: "audiodesc", title: "Audio Descriptions", glyph: "speaker_notes", about: "Hear descriptions of the visual content of videos, when they are available." },
             { id: "hearingdevices", title: "Hearing Devices", glyph: "hearing", about: "Pair and adjust Made for iPhone hearing devices." },
             { id: "audio", title: "Audio", glyph: "volume_up", file: "Audio" },
             { id: "captions", title: "Captions", glyph: "closed_caption", file: "Captions" },
             { id: "livecaptions", title: "Live Captions", glyph: "subtitles", about: "Get real-time captions of spoken audio, transcribed on this computer." },
             { id: "namerecognition", title: "Name Recognition", glyph: "person_search", about: "Get a notification when your name is called." }
-        ] },
-        { title: "Motor", rows: [
-            { id: "voicecontrol", title: "Voice Control", glyph: "settings_voice", about: "Control your computer and apps with spoken commands." },
-            { id: "keyboard", title: "Keyboard", glyph: "keyboard", file: "KeyboardA11y" },
-            { id: "pointer", title: "Pointer Control", glyph: "mouse", file: "PointerControl" },
-            { id: "switchcontrol", title: "Switch Control", glyph: "toggle_on", about: "Control your computer with adaptive switches." }
         ] },
         { title: "Speech", rows: [
             { id: "livespeech", title: "Live Speech", glyph: "keyboard_voice", file: "LiveSpeech" },
@@ -59,11 +59,16 @@ Column {
     readonly property var _rows: sections.reduce((all, s) => all.concat(s.rows), [])
 
     // ---------- overview ----------
+    // 27.2.1 (accessibility-light.png): compact hero; Vision (with Audio Descriptions), then Physical and Motor, rows 42
     HeroCard {
         visible: pane.page === ""
+        compact: true
         iconId: "accessibility"; glyph: "accessibility_new"; tint: Theme.tile.blue
         title: "Accessibility"
-        text: "Personalize your computer in ways that work for you, with features for vision, hearing, motor, speech and more."
+        text: "Personalize your computer in ways that work best for you with accessibility features for vision, hearing, motor, speech and cognition."
+        link: "Learn more…"
+        // no Apple help book here: what each feature does on Linux (settings/FALLBACKS.md)
+        onLinkActivated: Qt.openUrlExternally("file://" + Backend.root + "/settings/FALLBACKS.md")
     }
     Repeater {
         model: pane.page === "" ? pane.sections : []
@@ -75,6 +80,9 @@ Column {
                 model: section.modelData.rows
                 FormRow {
                     required property var modelData
+                    required property int index
+                    implicitHeight: index > 0 ? 43 : 42   // 42 + the separator
+                    iconSize: 20
                     glyph: modelData.glyph; tint: Theme.tile.blue
                     label: modelData.title
                     onClicked: pane.page = modelData.id

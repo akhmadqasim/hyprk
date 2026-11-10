@@ -10,6 +10,7 @@ Item {
     property string glyph            // Material Icons ligature for a small tile
     property string iconSource       // app icon image instead of the glyph tile
     property color tint: Theme.tile.blue
+    property real iconSize: 22
     property bool dim: false
     property string value            // gray trailing text, e.g. "Off"
     property bool alignTop: false    // tall rows (pickers) keep the label at the top, like macOS
@@ -29,7 +30,7 @@ Item {
     PaneIcon {
         id: icon
         visible: row.glyph !== "" || row.iconSource !== ""
-        size: 22; glyph: row.glyph; tint: row.tint; imageSource: row.iconSource
+        size: row.iconSize; glyph: row.glyph; tint: row.tint; imageSource: row.iconSource
         x: Theme.content.rowPadding; anchors.verticalCenter: parent.verticalCenter
     }
     Column {
