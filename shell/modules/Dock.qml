@@ -39,11 +39,13 @@ ShellWindow {
     readonly property bool magnification: Prefs.dock.magnification === true
 
     // ---------- launch bounce ----------
-    // A ball under gravity: each hop is one parabola (fast at the bottom, stopped at the top), no squash,
-    // never below the rest position, repeated until the app has a window (Apps stops it after 6 s).
-    // The Dock does not resize. Names match reference/re/MAC-REQUESTS.md R2 (height, time per bounce, curve).
-    readonly property real bounceHeight: Math.round(base * 0.5)   // guessed: half a tile; R2 will measure it in pt
-    readonly property int bouncePeriod: 600                       // ms per hop, up and down; guessed, R2 will measure it
+    // MAC-ANSWERS.md R2 (27.2.1): 0.70 s per bounce at every tile size, rise, a 0.14 s hold at the top,
+    // a mirrored fall, one frame on the ground (curve in lib/dock.js bounceOffset), repeated while the app
+    // launches (until it has a window; Apps stops it after 6 s); when launching ends the bounce in
+    // progress finishes and the icon stays down. Height 11 pt at tile 33, 18 pt at tile 64, linear in
+    // the tile size. No squash, never below the rest position, the Dock does not resize.
+    readonly property real bounceHeight: DockLayout.bounceHeight(base)
+    readonly property int bouncePeriod: 700
 
     readonly property int iconRoom: (magnification ? magnified : base) + Math.max(tooltipRoom, bounceHeight)
     anchors { bottom: true; left: true; right: true }
@@ -139,14 +141,26 @@ ShellWindow {
     // ramp the curve in and out (`magnify`), around the last pointer position.
     property real focusX: 0
     readonly property real baseWidth: geom.baseWidth
+    // MAC-ANSWERS.md R2 (27.2.1): grows in about 0.12 s (7 frames, ease-in-out) on entering the Dock and
+    // collapses the same way on leaving
     property real magnify: magnification && pointerIn && shown && Panels.open !== "context" ? 1 : 0
-    Behavior on magnify { NumberAnimation { duration: Theme.anim.magnify; easing.type: Theme.anim.easing } }
+    Behavior on magnify { NumberAnimation { duration: 120; easing.type: Easing.InOutQuad } }
 
     readonly property var geom: DockLayout.layout(cellWidths, {
         base: base, big: magnified, amount: magnify, focus: focusX,
-        range: base * Theme.dock.magnifyRange,     // SPEC.md 7: magnification width 3 x tilesize
+        range: DockLayout.magnifyRange(base),      // MAC-ANSWERS.md R2 (27.2.1): 222 pt at tile 64
         spacing: Theme.dock.iconSpacing, sidePad: sidePad, dpr: dpr
     })
+
+    // ---------- app name label ----------
+    // MAC-ANSWERS.md R2 (27.2.1): it appears in the frame after the pointer reaches an icon (no delay, no
+    // fade-in), moves to the next icon in one frame, and on leaving the Dock fades out in about 0.23 s
+    // (ease-in-out). One label shows at a time: `tipCell` is the cell that has it.
+    property int tipCell: -1
+    property real tipAlpha: 0
+    NumberAnimation { id: tipFade; target: dock; property: "tipAlpha"; to: 0; duration: 230; easing.type: Easing.InOutQuad }
+    function tipShow(i) { tipFade.stop(); tipCell = i; tipAlpha = 1; }
+    function tipHide(i) { if (tipCell === i) tipFade.restart(); }
 
     // hit area: the background, plus the magnified band while magnified; hidden by autohide only
     // the bottom edge below it (reveals it), hidden by a full-screen window nothing
@@ -233,7 +247,7 @@ ShellWindow {
                     color: Theme.dock.separator
                 }
 
-                // one hop of the launch bounce, 0..1, linear in time (the parabola is in bounceOffset)
+                // one bounce, 0..1, linear in time (the shape is in lib/dock.js bounceOffset)
                 property real hop: 1
                 NumberAnimation on hop {
                     running: cell.bouncing
@@ -276,9 +290,12 @@ ShellWindow {
                     color: Theme.color.dockDot
                 }
 
-                // app name label above the icon
+                // app name label above the icon (timing: dock.tipShow / tipHide)
+                readonly property bool tipWanted: ma.containsMouse && !cell.modelData.separator && !cell.bouncing && Panels.open !== "context"
+                onTipWantedChanged: tipWanted ? dock.tipShow(index) : dock.tipHide(index)
                 Rectangle {
-                    visible: ma.containsMouse && !cell.modelData.separator && !cell.bouncing && Panels.open !== "context"
+                    visible: dock.tipCell === cell.index && dock.tipAlpha > 0
+                    opacity: dock.tipAlpha
                     x: Math.round((cell.width - width) / 2)
                     y: icon.y - height - Theme.dock.tooltipGap
                     width: tip.implicitWidth + Theme.dock.tooltipHPad * 2
@@ -297,11 +314,12 @@ ShellWindow {
                     }
                 }
 
-                // the whole cell column (icon and the band above it), so the label does not flicker in the
-                // gap while an icon bounces or the sizes change
+                // the whole cell column (icon and the band above it) plus half the icon spacing on each
+                // side, so the label does not flicker in a gap while an icon bounces or the sizes change,
+                // and moving to the next icon swaps it in one frame
                 MouseArea {
                     id: ma
-                    x: 0; y: icon.y; width: cell.width; height: cell.height - icon.y + dock.pad
+                    x: -Theme.dock.iconSpacing / 2; y: icon.y; width: cell.width + Theme.dock.iconSpacing; height: cell.height - icon.y + dock.pad
                     hoverEnabled: true
                     enabled: !cell.modelData.separator
                     acceptedButtons: Qt.LeftButton | Qt.RightButton

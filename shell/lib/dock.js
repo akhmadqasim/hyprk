@@ -1,15 +1,21 @@
 // Dock geometry and launch bounce, pure functions (tested in shell/tests/run.mjs).
 .pragma library
 
+// Half-width of the magnification curve: 222 pt at tilesize 64 (MAC-ANSWERS.md R2 (27.2.1), AX frames
+// of every tile at 81 pointer positions, 64 -> 128). Only measured at 64; scaled with the tile.
+function magnifyRange(base) {
+    return base * 222 / 64;
+}
+
 // Size of a tile whose centre (in the unmagnified layout) is `center`, with the pointer at `focus`.
-// Raised cosine that is `big` under the pointer and falls to `base` at `range` px on each side.
+// MAC-ANSWERS.md R2 (27.2.1): size = base + (large - base) * (1 - (d / range)^2)^1.5 for d < range,
+// d = distance from the pointer to the tile's unmagnified centre (RMS 0.4 pt against the measurement).
 // `amount` 0..1 ramps the whole curve in and out when the pointer enters or leaves the Dock.
-// Curve shape: by eye (SPEC.md 7 has only its width and the 128 pt largesize).
 function magnifiedSize(base, big, amount, focus, center, range) {
     if (!(amount > 0) || big <= base || !(range > 0)) return base;
     const d = Math.abs(focus - center) / range;
     if (d >= 1) return base;
-    return base + (big - base) * Math.min(1, amount) * (Math.cos(d * Math.PI) + 1) / 2;
+    return base + (big - base) * Math.min(1, amount) * Math.pow(1 - d * d, 1.5);
 }
 
 // Lays out the Dock tiles left to right.
@@ -46,9 +52,19 @@ function layout(widths, o) {
     return out;
 }
 
-// Launch bounce: height above the rest position at `phase` 0..1 of one hop. A ball under gravity:
-// a parabola, fastest at the bottom, stopped at the top, never below 0 (no squash, no overshoot).
+// Launch bounce height in pt for a tile size: 11 pt at tilesize 33, 18 pt at 64 (MAC-ANSWERS.md R2
+// (27.2.1)), linear between and beyond the two measured points.
+function bounceHeight(tile) {
+    return Math.max(0, 11 + (tile - 33) * 7 / 31);
+}
+
+// Launch bounce: height above the rest position at `phase` 0..1 of one bounce (0.70 s).
+// MAC-ANSWERS.md R2 (27.2.1) shape: rises for 0.4 of the period, holds at the top from 0.40 to 0.60
+// (0.14 s), falls as the mirror image of the rise, and touches the ground only at the phase wrap (one
+// frame). Rise = 1 - (1 - p / 0.4)^1.55, least-squares fit to the 19 measured points (RMS 0.22 pt at
+// 11 pt; the plain parabola was 0.31 pt and has no hold). Never below 0, no squash.
 function bounceOffset(phase, height) {
     const p = Math.min(1, Math.max(0, phase));
-    return 4 * height * p * (1 - p);
+    const u = Math.min(p, 1 - p);
+    return u >= 0.4 ? height : height * (1 - Math.pow(1 - u / 0.4, 1.55));
 }

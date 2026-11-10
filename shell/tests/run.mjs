@@ -155,14 +155,27 @@ test("dock.json without the key keeps magnification off", () => {
             prev = l;
         }
     });
-    test("dock bounce is a parabola above the rest position", () => {
+    test("dock magnification curve (MAC-ANSWERS.md R2, 64 -> 128)", () => {
+        // measured size against the distance to the unmagnified centre, within 1.2 pt (fit RMS 0.4 pt)
+        const m = [[0, 128], [15, 127.6], [35, 125.7], [55, 122.3], [75, 117.7], [95, 111.6], [115, 104.5],
+                   [135, 96.5], [155, 87.6], [175, 78.3], [195, 70.8], [215, 66.0], [235, 64]];
+        for (const [d, s] of m) assert.ok(Math.abs(DK.magnifiedSize(64, 128, 1, d, 0, DK.magnifyRange(64)) - s) < 1.2, `d ${d}`);
+        assert.equal(DK.magnifyRange(64), 222);
+    });
+    test("dock bounce height from the tile size", () => {
+        assert.equal(DK.bounceHeight(33), 11);
+        assert.equal(DK.bounceHeight(64), 18);
+        assert.ok(DK.bounceHeight(48) > 11 && DK.bounceHeight(48) < 18);
+    });
+    test("dock bounce: rise, hold, mirrored fall, above the rest position", () => {
         assert.equal(DK.bounceOffset(0, 22), 0);
         assert.equal(DK.bounceOffset(1, 22), 0);
-        assert.equal(DK.bounceOffset(0.5, 22), 22);
-        assert.equal(DK.bounceOffset(0.25, 22), 16.5);
+        for (const p of [0.4, 0.45, 0.5, 0.55, 0.6]) assert.equal(DK.bounceOffset(p, 22), 22);
         for (let p = 0; p <= 1; p += 0.05) assert.ok(DK.bounceOffset(p, 22) >= 0);
-        // fastest at the bottom, slowest at the top
-        assert.ok(DK.bounceOffset(0.05, 22) - DK.bounceOffset(0, 22) > DK.bounceOffset(0.5, 22) - DK.bounceOffset(0.45, 22));
+        for (const p of [0.07, 0.17, 0.31]) assert.ok(Math.abs(DK.bounceOffset(p, 1) - DK.bounceOffset(1 - p, 1)) < 1e-9);
+        // measured shape (fraction of the height), within 0.06
+        const m = [[0.02, 0.09], [0.07, 0.30], [0.12, 0.43], [0.17, 0.60], [0.21, 0.69], [0.26, 0.81], [0.31, 0.90], [0.36, 0.95]];
+        for (const [p, h] of m) assert.ok(Math.abs(DK.bounceOffset(p, 1) - h) < 0.06, `phase ${p}`);
     });
 }
 test("state array", () => assert.deepEqual(ST.parse("[1]", defs), defs));
