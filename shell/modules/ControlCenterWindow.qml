@@ -54,9 +54,9 @@ ShellWindow {
     ControlCenter {
         id: cc
         anchors.right: parent.right
-        anchors.rightMargin: Theme.cc.marginRight
-        y: Theme.cc.marginTop
-        originX: ccw.width - width - Theme.cc.marginRight
+        anchors.rightMargin: Theme.cc.right
+        y: Theme.cc.top
+        originX: ccw.width - width - Theme.cc.right
         originY: y + Theme.menuBar.height
         opacity: ccw.fade
         scale: 1 + Theme.travel(0.01) * (1 - ccw.fade)
@@ -70,7 +70,7 @@ ShellWindow {
         visible: ccw.visible
         anchors { top: true; right: true }
         margins.top: Theme.menuBar.height
-        implicitWidth: cc.width + Theme.cc.marginRight + Theme.cc.dimFeather * 1.5
+        implicitWidth: cc.width + Theme.cc.right + Theme.cc.dimFeather * 1.5
         implicitHeight: cc.y + cc.height + Theme.cc.dimFeather * 1.5
         exclusionMode: ExclusionMode.Ignore
         WlrLayershell.namespace: "hyprk-controlcenter"
@@ -79,9 +79,9 @@ ShellWindow {
         mask: Region {}
         // full inside the tiles' box (and past the screen and menu bar edges), about 75 % at 12 pt outside
         RectangularShadow {
-            x: parent.width - cc.width - Theme.cc.marginRight - 30
+            x: parent.width - cc.width - Theme.cc.right - 30
             y: -Theme.cc.dimFeather
-            width: cc.width + Theme.cc.marginRight + 30 + Theme.cc.dimFeather
+            width: cc.width + Theme.cc.right + 30 + Theme.cc.dimFeather
             height: cc.y + cc.height + 30 + Theme.cc.dimFeather
             blur: Theme.cc.dimFeather * 0.6
             color: Theme.cc.dim

@@ -71,13 +71,14 @@ Item {
         radius: Theme.cc.tileRadius
         interactive: false                       // only its media buttons take clicks
 
+        // 27.2.1 idle tile (Q-panels-11): art placeholder, "Not Playing" at y 72, three 30 pt buttons at y 96
         ClippingRectangle {
-            x: Theme.cc.tilePadding + 4
-            y: Theme.cc.tilePadding + 4
-            width: Theme.cc.artSize
-            height: Theme.cc.artSize
-            radius: Theme.cc.artRadius
-            color: Theme.cc.toggleOffBg
+            x: Theme.cc.npArtXY
+            y: Theme.cc.npArtXY
+            width: Theme.cc.npArt
+            height: Theme.cc.npArt
+            radius: Theme.cc.npArtRadius
+            color: Theme.cc.npArtFill
             Image {
                 anchors.fill: parent
                 visible: source != ""
@@ -86,32 +87,27 @@ Item {
             }
         }
         Column {
-            x: Theme.cc.tilePadding + 4
+            x: Theme.cc.npArtXY
+            y: Theme.cc.npTitleY
             width: parent.width - x * 2
-            anchors.bottom: controls.top
-            anchors.bottomMargin: 6
             Text {
                 width: parent.width
                 text: cc.player ? (cc.player.trackTitle || cc.player.identity) : "Not Playing"
                 elide: Text.ElideRight
-                font: Typography.font(Theme.font.ccTitle, Typography.semibold)
+                font: Typography.font(Theme.font.ccTileTitle, Typography.semibold)
                 color: Theme.cc.text
             }
-            Text {
+            PlusText {
                 width: parent.width
                 visible: text !== ""
                 text: cc.player ? cc.player.trackArtist : ""
-                elide: Text.ElideRight
-                font: Typography.subheadline
-                color: Theme.cc.subtext
             }
         }
         Row {
             id: controls
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: Theme.cc.tilePadding + 4
-            spacing: 14
+            x: Theme.cc.npButtonsX
+            y: Theme.cc.npButtonsY
+            spacing: Theme.cc.npButtonPitch - Theme.cc.npButton
             opacity: cc.player ? 1 : 0.55
             MediaButton { symbol: "backward"; onActivated: if (cc.player && cc.player.canGoPrevious) cc.player.previous() }
             MediaButton {
@@ -204,11 +200,13 @@ Item {
         height: cc.rowH
         // unavailable looks like "off" (macOS shows Wi-Fi off, not a dead tile); taps do nothing
 
+        // circle 36 at x 14, text from x 56, title / subtitle baselines 27.5 / 44 (Q-panels-07); a title alone
+        // is centred (not measured)
         Rectangle {
             id: circle
-            x: (cc.rowH - width) / 2
+            x: Theme.cc.circleX
             anchors.verticalCenter: parent.verticalCenter
-            width: Theme.cc.toggleSize
+            width: Theme.cc.circle
             height: width
             radius: width / 2
             color: cap.on ? Theme.cc.toggleOnBg : Theme.cc.capsuleOffBg
@@ -217,31 +215,28 @@ Item {
                 anchors.centerIn: parent
                 name: cap.symbol
                 surface: "ccToggle"
-                size: Theme.cc.toggleSize * Theme.cc.toggleGlyph
+                size: Theme.cc.circle * Theme.cc.circleGlyph
                 color: cap.on ? cap.onAccent : Theme.cc.capsuleOffIcon
             }
         }
-        Column {
-            anchors.left: circle.right
-            anchors.leftMargin: 8
-            anchors.right: parent.right
-            anchors.rightMargin: 10
-            anchors.verticalCenter: parent.verticalCenter
-            Text {
-                width: parent.width
-                text: cap.title
-                elide: Text.ElideRight
-                font: Typography.font(Theme.font.ccTitle, Typography.semibold)
-                color: Theme.cc.text
-            }
-            Text {
-                width: parent.width
-                visible: text !== ""
-                text: cap.subtitle
-                elide: Text.ElideRight
-                font: Typography.subheadline
-                color: Theme.cc.subtext
-            }
+        Text {
+            id: capTitle
+            x: Theme.cc.textX
+            width: parent.width - x - Theme.cc.textRight
+            anchors.baseline: parent.top
+            anchors.baselineOffset: cap.subtitle !== "" ? Theme.cc.titleBaseline : (parent.height + capTitle.font.pixelSize * 0.7) / 2
+            text: cap.title
+            elide: Text.ElideRight
+            font: Typography.font(Theme.font.ccTileTitle, Typography.semibold)
+            color: Theme.cc.title
+        }
+        PlusText {
+            x: Theme.cc.textX
+            width: capTitle.width
+            visible: text !== ""
+            anchors.baseline: parent.top
+            anchors.baselineOffset: Theme.cc.subtitleBaseline
+            text: cap.subtitle
         }
         interactive: available
         onClicked: toggled()
@@ -277,12 +272,30 @@ Item {
         property string symbol
         property bool big: false
         signal activated()
-        width: big ? 26 : 22
+        width: Theme.cc.npButton
         height: width
         Symbol { anchors.centerIn: parent; name: mb.symbol; surface: mb.big ? "ccPlay" : "ccMedia"; size: parent.width; color: Theme.cc.text }
-        MouseArea { anchors.fill: parent; anchors.margins: -4; onClicked: mb.activated() }
+        MouseArea { anchors.fill: parent; onClicked: mb.activated() }
     }
 
+    // subtitle: SF 11 regular, plus-lighter T + 140 over the tile (MAC-ANSWERS.md "Glass checks (#53)")
+    component PlusText: Text {
+        elide: Text.ElideRight
+        font: Typography.font(Theme.font.ccTileSub)
+        color: "#FFFFFF"                     // only its coverage is used
+        layer.enabled: visible
+        layer.effect: ShaderEffect {
+            property real lift: Theme.cc.subtitleLift
+            fragmentShader: Qt.resolvedUrl("../shaders/plustext.frag.qsb")
+        }
+    }
+
+    // 27.2.1 slider module (MAC-ANSWERS.md Q-panels-08, -09): 292 x 64, r 24. No knob at rest; hovering the
+    // module shows a white 18 x 14 knob whose right edge is the fill end (the fill runs 9 pt ahead of the pointer);
+    // pressing turns it into a clear lens about 24 x 20 within about 3 frames (HyprK Knob: the lens is drawn as a
+    // rim, the track is not magnified through it). A click springs the fill to the point (about 0.2 s), a drag
+    // follows 1:1; past an end the track and fill stretch up to about 5 pt and spring back in 0.13 s on release.
+    // The module itself does not move. Not built: the hover chevron (no sub-panels) and Sound's AirPlay button.
     component SliderModule: Module {
         id: sm
         property string title
@@ -295,34 +308,37 @@ Item {
         property bool dragging: false
         Spring { id: shownValue; target: sm.value; response: Theme.anim.sliderJumpResponse }
         readonly property real shown: dragging || A11y.reduceMotion ? sm.value : shownValue.value
+        property real over: 0                    // stretch past an end in pt (< 0 = the left end)
+        Behavior on over {
+            enabled: !trackMa.pressed && !A11y.reduceMotion
+            NumberAnimation { duration: Theme.cc.overdragBackMs; easing.type: Easing.OutCubic }
+        }
 
         width: cc.width
         height: cc.rowH
+        radius: Theme.cc.sliderRadius
         interactive: false                       // the track below takes the input
-        pressed: trackMa.pressed
-        // the fill stays readable when disabled (the value is still shown)
+        HoverHandler { id: hover; enabled: sm.available }
 
         Text {
-            x: Theme.cc.sliderInset
-            y: 9
+            x: Theme.cc.sliderTitleX
+            anchors.baseline: parent.top
+            anchors.baselineOffset: Theme.cc.sliderTitleBaseline
             text: sm.title
-            font: Typography.font(Theme.font.ccTitle, Typography.semibold)
+            font: Typography.font(Theme.font.ccTileTitle, Typography.semibold)
             color: Theme.cc.text
         }
         Symbol {
-            id: ls
-            x: Theme.cc.sliderInset
-            anchors.verticalCenter: track.verticalCenter
+            x: Theme.cc.glyphLeft - width / 2
+            y: Theme.cc.trackY - height / 2
             name: sm.leftSymbol
             surface: "ccSlider"
-            size: 13
+            size: 18
             color: Theme.cc.text
         }
         Symbol {
-            id: rs
-            anchors.right: parent.right
-            anchors.rightMargin: Theme.cc.sliderInset
-            anchors.verticalCenter: track.verticalCenter
+            x: parent.width - Theme.cc.glyphRight - width / 2
+            y: Theme.cc.trackY - height / 2
             name: sm.rightSymbol
             surface: "ccSlider"
             size: 18
@@ -330,22 +346,38 @@ Item {
         }
         Item {
             id: track
-            anchors.left: ls.right
-            anchors.leftMargin: 8
-            anchors.right: rs.left
-            anchors.rightMargin: 8
-            y: parent.height - 19
-            height: Theme.cc.sliderTrack
-            Rectangle {
-                anchors.fill: parent
-                radius: height / 2
-                color: Theme.cc.sliderTrackColor
+            x: Theme.cc.trackX
+            width: parent.width - Theme.cc.trackX - Theme.cc.trackRight
+            y: Theme.cc.trackY - height / 2
+            height: Theme.cc.trackHeight
+            readonly property real fillW: width * Math.max(0, Math.min(1, sm.shown))
+            // track: plus-lighter T + 20 (shaders/plusfill.frag), stretched past an end
+            ShaderEffect {
+                x: Math.min(0, sm.over)
+                width: parent.width + Math.abs(sm.over)
+                height: parent.height
+                property vector4d fill: Qt.vector4d(Theme.cc.trackLift, Theme.cc.trackLift, Theme.cc.trackLift, 0)
+                property size sizePt: Qt.size(width, height)
+                property real radius: height / 2
+                property real dpr: Screen.devicePixelRatio
+                fragmentShader: Qt.resolvedUrl("../shaders/plusfill.frag.qsb")
             }
             Rectangle {
-                width: parent.width * Math.max(0, Math.min(1, sm.shown))
+                x: Math.min(0, sm.over)
+                width: track.fillW + Math.abs(sm.over)
                 height: parent.height
                 radius: height / 2
                 color: Theme.cc.sliderFillColor
+            }
+            Knob {
+                visible: hover.hovered || trackMa.pressed
+                restW: Theme.cc.knobW
+                restH: Theme.cc.knobH
+                grow: Theme.cc.lensGrow
+                cx: Math.max(restW / 2, track.fillW + Math.max(0, sm.over) - restW / 2)
+                cy: track.height / 2
+                lift: trackMa.pressed ? 1 : 0
+                Behavior on lift { NumberAnimation { duration: Theme.cc.lensMs } }
             }
             MouseArea {
                 id: trackMa
@@ -353,15 +385,16 @@ Item {
                 anchors.topMargin: -10
                 anchors.bottomMargin: -10
                 enabled: sm.available
-                // dragging past an end stretches the module like a rubber band
+                // the fill end runs half a knob ahead of the pointer; past an end: a damped stretch
                 function update(mx) {
-                    const v = mx / track.width, c = Math.max(0, Math.min(1, v));
-                    sm.stretch = Math.max(-1, Math.min(1, (v - c) * 2));
+                    const v = (mx + Theme.cc.knobW / 2) / track.width, c = Math.max(0, Math.min(1, v));
+                    const past = (v - c) * track.width;
+                    sm.over = Math.sign(past) * Theme.cc.overdrag * (1 - Math.exp(-Math.abs(past) / 30));
                     sm.moved(c);
                 }
                 onPressedChanged: {
                     if (!pressed) {
-                        sm.stretch = 0;
+                        sm.over = 0;
                         if (sm.dragging) shownValue.snap();   // a click keeps springing to its point
                         sm.dragging = false;
                     }
