@@ -1,0 +1,85 @@
+{"d": 6, "frame": [716, 284, 508, 573], "role": "AXScrollArea"}
+{"d": 7, "enabled": "1", "frame": [736, -4, 468, 319], "role": "AXGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 5.9, 73, 16], "role": "AXStaticText", "value": "Appearance"}
+{"d": 8, "desc": "Light", "enabled": "1", "frame": [956, 6, 74, 65.9], "help": "Use a light appearance for buttons, menus and windows.", "role": "AXButton"}
+{"d": 8, "desc": "Dark", "enabled": "1", "frame": [1038, 6, 74, 65.9], "help": "Use a dark appearance for buttons, menus and windows.", "role": "AXButton"}
+{"d": 8, "desc": "Auto", "enabled": "1", "frame": [1120, 6, 74, 65.9], "help": "Automatically adjusts the appearance of buttons, menus and windows throughout th", "role": "AXButton"}
+{"d": 8, "enabled": "1", "frame": [746, 92.9, 74, 16], "role": "AXStaticText", "value": "Liquid Glass"}
+{"d": 8, "frame": [926, 93, 268, 180], "role": "AXScrollArea"}
+{"d": 9, "desc": "Apple Park", "enabled": "1", "frame": [926, 79.5, 268, 178.5], "role": "AXImage"}
+{"d": 9, "enabled": "1", "frame": [942, 260.9, 165.5, 19], "role": "AXStaticText", "value": "Welcome to Apple Park"}
+{"d": 9, "enabled": "1", "frame": [942, 283.9, 141, 19], "role": "AXStaticText", "value": "Cupertino, California"}
+{"d": 9, "enabled": "1", "frame": [942, 314.9, 230.5, 48], "role": "AXStaticText", "value": "Learn about the design and history of Apple Park, and discover its unique nature"}
+{"d": 9, "desc": "The Architecture", "enabled": "1", "frame": [942, 387, 236, 157.5], "role": "AXImage"}
+{"d": 9, "enabled": "1", "frame": [942, 568.6, 123.5, 19], "role": "AXStaticText", "value": "The Architecture"}
+{"d": 9, "enabled": "1", "frame": [942, 595.6, 229.5, 64], "role": "AXStaticText", "value": "Apple Park was made for walking and exploring. The innovative design elements em"}
+{"d": 9, "desc": "The Pond", "enabled": "1", "frame": [942, 683.5, 236, 157.5], "role": "AXImage"}
+{"d": 9, "enabled": "1", "frame": [942, 865, 69, 19], "role": "AXStaticText", "value": "The Pond"}
+{"d": 9, "enabled": "1", "frame": [942, 892, 217, 48], "role": "AXStaticText", "value": "With gently lapping waves and a surrounding of trees, it\u2019s one of the most seren"}
+{"d": 9, "desc": "The Rainbow", "enabled": "1", "frame": [942, 964, 236, 263.5], "role": "AXImage"}
+{"d": 9, "enabled": "1", "frame": [942, 1251.6, 94.5, 19], "role": "AXStaticText", "value": "The Rainbow"}
+{"d": 9, "enabled": "1", "frame": [942, 1278.6, 230, 48], "role": "AXStaticText", "value": "One of the most iconic features of Apple Park, the Rainbow brings much joy to al"}
+{"d": 9, "enabled": "1", "frame": [1176, 144, 19, 114], "role": "AXScrollBar", "value": "0"}
+{"d": 10, "frame": [1185, 148, 6, 26], "role": "AXValueIndicator", "value": "0"}
+{"d": 10, "frame": [1177, 145, 0, 0], "role": "AXButton", "sub": "AXIncrementArrow"}
+{"d": 10, "frame": [1177, 145, 0, 0], "role": "AXButton", "sub": "AXDecrementArrow"}
+{"d": 10, "frame": [1185, 174, 6, 80], "role": "AXButton", "sub": "AXIncrementPage"}
+{"d": 10, "frame": [1185, 148, 6, 0], "role": "AXButton", "sub": "AXDecrementPage"}
+{"d": 8, "desc": "Capsule Shape On A Rectangle With A Liquid Glass Effect", "enabled": "1", "frame": [927.5, 288.5, 16, 13], "role": "AXButton"}
+{"d": 8, "desc": "Liquid Glass Tint Amount", "enabled": "1", "frame": [949, 286, 221.5, 16], "role": "AXSlider", "value": "0.8957816362380981"}
+{"d": 9, "enabled": "1", "frame": [1129.5, 286, 20, 16], "role": "AXValueIndicator"}
+{"d": 8, "desc": "Capsule Shape On A Rectangle", "enabled": "1", "frame": [1176, 288, 17, 13.5], "role": "AXButton"}
+{"d": 7, "desc": "Theme", "enabled": "1", "frame": [746, 344.9, 43.5, 16], "role": "AXHeading"}
+{"d": 7, "enabled": "1", "frame": [736, 371, 468, 100], "role": "AXGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 380.9, 40.5, 16], "role": "AXStaticText", "value": "Colour"}
+{"d": 8, "desc": "Multicolour", "enabled": "1", "frame": [878, 377, 32, 32], "role": "AXButton"}
+{"d": 8, "desc": "Blue", "enabled": "1", "frame": [914, 377, 32, 32], "role": "AXButton"}
+{"d": 8, "desc": "Purple", "enabled": "1", "frame": [950, 377, 32, 32], "role": "AXButton"}
+{"d": 8, "desc": "Pink", "enabled": "1", "frame": [986, 377, 32, 32], "role": "AXButton"}
+{"d": 8, "desc": "Red", "enabled": "1", "frame": [1022, 377, 32, 32], "role": "AXButton"}
+{"d": 8, "desc": "Orange", "enabled": "1", "frame": [1058, 377, 32, 32], "role": "AXButton"}
+{"d": 8, "desc": "Yellow", "enabled": "1", "frame": [1094, 377, 32, 32], "role": "AXButton"}
+{"d": 8, "desc": "Green", "enabled": "1", "frame": [1130, 377, 32, 32], "role": "AXButton"}
+{"d": 8, "desc": "Graphite", "enabled": "1", "frame": [1166, 377, 32, 32], "role": "AXButton"}
+{"d": 8, "frame": [864.5, 408.7, 59, 14], "role": "AXStaticText", "value": "Multicolour"}
+{"d": 9, "enabled": "1", "frame": [864.5, 408.7, 59, 14], "role": "AXStaticText", "value": "Multicolour"}
+{"d": 8, "enabled": "1", "frame": [746, 443.7, 123.5, 16], "role": "AXStaticText", "value": "Text highlight colour"}
+{"d": 8, "enabled": "1", "frame": [1061, 440, 133, 24], "id": "HighlightColorPicker", "role": "AXPopUpButton", "value": "Automatic"}
+{"d": 7, "enabled": "1", "frame": [736, 481, 468, 129], "role": "AXGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 491, 115.5, 16], "role": "AXStaticText", "value": "Icon & widget style"}
+{"d": 8, "desc": "Default", "enabled": "1", "frame": [1001, 490, 40, 52], "role": "AXButton"}
+{"d": 8, "desc": "Dark", "enabled": "1", "frame": [1055, 490, 38, 52], "role": "AXButton"}
+{"d": 8, "desc": "Clear", "enabled": "1", "frame": [1106, 490, 38, 52], "role": "AXButton"}
+{"d": 8, "desc": "Tinted", "enabled": "1", "frame": [1157, 490, 38, 52], "role": "AXButton"}
+{"d": 8, "enabled": "1", "frame": [1194, 559, 0, 0], "role": "AXRadioGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 580, 80, 16], "role": "AXStaticText", "value": "Folder colour"}
+{"d": 8, "desc": "Folder colour", "enabled": "1", "frame": [1061, 576, 133, 24], "role": "AXPopUpButton", "value": "Automatic"}
+{"d": 7, "desc": "Windows", "enabled": "1", "frame": [746, 640.2, 57.5, 16], "role": "AXHeading"}
+{"d": 7, "enabled": "1", "frame": [736, 666, 468, 75], "role": "AXGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 676.2, 103.5, 16], "role": "AXStaticText", "value": "Sidebar icon size"}
+{"d": 8, "enabled": "1", "frame": [1098, 672.5, 96, 24], "id": "SidebarIconSizePicker", "role": "AXPopUpButton", "value": "Medium"}
+{"d": 8, "enabled": "1", "frame": [746, 714.5, 281, 16], "role": "AXStaticText", "value": "Tint window background with wallpaper colour"}
+{"d": 8, "enabled": "1", "frame": [1158, 715, 36, 16], "id": "TintWindowBackgroundToggle", "role": "AXCheckBox", "sub": "AXSwitch", "value": "1"}
+{"d": 7, "enabled": "1", "frame": [736, 751, 468, 189], "role": "AXGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 761, 279.5, 85], "role": "AXRadioGroup"}
+{"d": 9, "enabled": "1", "frame": [746, 761, 99.5, 16], "role": "AXStaticText", "value": "Show scroll bars"}
+{"d": 9, "desc": "Automatically based on mouse or trackpad", "enabled": "1", "frame": [746, 785, 279.5, 16.5], "role": "AXRadioButton", "value": "1"}
+{"d": 9, "desc": "When scrolling", "enabled": "1", "frame": [746, 807.4, 111, 16.6], "role": "AXRadioButton", "value": "0"}
+{"d": 9, "desc": "Always", "enabled": "1", "frame": [746, 829.8, 63.5, 16.2], "role": "AXRadioButton", "value": "0"}
+{"d": 8, "enabled": "1", "frame": [746, 867.2, 208, 62.8], "role": "AXRadioGroup"}
+{"d": 9, "enabled": "1", "frame": [746, 867.2, 143, 16], "role": "AXStaticText", "value": "Click in the scroll bar to"}
+{"d": 9, "desc": "Jump to the next page", "enabled": "1", "frame": [746, 891.2, 157, 16.3], "role": "AXRadioButton", "value": "1"}
+{"d": 9, "desc": "Jump to the spot that\u2019s clicked", "enabled": "1", "frame": [746, 913.7, 208, 16.3], "role": "AXRadioButton", "value": "0"}
+{"d": 7, "desc": "More in Accessibility Settings\u2026", "enabled": "1", "frame": [957.5, 960, 212.5, 24], "role": "AXButton"}
+{"d": 7, "desc": "Help", "enabled": "1", "frame": [1180, 960, 24, 24], "role": "AXButton"}
+{"d": 7, "enabled": "1", "frame": [1206, 283, 19, 575], "role": "AXScrollBar", "value": "0.6711409395973155"}
+{"d": 8, "frame": [1215, 445.5, 6, 330.5], "role": "AXValueIndicator", "value": "0.6711409395973155"}
+{"d": 8, "frame": [1207, 284, 0, 0], "role": "AXButton", "sub": "AXIncrementArrow"}
+{"d": 8, "frame": [1207, 284, 0, 0], "role": "AXButton", "sub": "AXDecrementArrow"}
+{"d": 8, "frame": [1215, 776.5, 6, 77.5], "role": "AXButton", "sub": "AXIncrementPage"}
+{"d": 8, "frame": [1215, 287, 6, 158.5], "role": "AXButton", "sub": "AXDecrementPage"}
+{"d": 3, "frame": [720, 232, 81, 52], "role": "AXGroup"}
+{"d": 4, "enabled": "1", "frame": [724, 240, 73, 36], "role": "AXGroup"}
+{"d": 5, "desc": "Go Back", "enabled": "1", "frame": [724, 240, 36, 36], "help": "Go Back", "id": "chevron.backward", "role": "AXButton", "sub": "AXSegment"}
+{"d": 5, "desc": "Go Forward", "enabled": "0", "frame": [760, 240, 37, 36], "help": "Go Forward", "id": "chevron.forward", "role": "AXMenuButton", "sub": "AXSegment"}
+{"d": 2, "enabled": "1", "frame": [801, 232, 411, 52], "role": "AXStaticText", "value": "Appearance"}

@@ -1,0 +1,37 @@
+{
+  "note": "System Settings > Appearance, macOS 27.2.1 (26B131). Window 740x625 pt; content column x 232..740 (508 wide), cards x 252..720 (468). y = window y at scroll offset 0 (toolbar 0..52). Visible content 573 pt, document 1036.5 pt, max scroll offset 463.5. Sources: AX (ax-scroll*.jsonl) + 2x pixels.",
+  "toolbar": {"h": 52, "title": "Appearance (in toolbar, does not scroll)", "hairline_when_scrolled": {"y": 52, "h_px": 1, "light": "#E5E5E5", "dark": "#2E2F33"}},
+  "sections": [
+    {"kind": "card", "y": 64, "h": 319, "gap_above": 12, "rows": [
+      {"title": "Appearance", "y": 64, "h": 86, "controls": "3 thumbnail buttons Light/Dark/Auto, AX 74x66 at x 472/554/636 y 74 (pitch 82)"},
+      {"separator": 150, "h_px": 2},
+      {"title": "Liquid Glass", "y": 151, "h": 232, "controls": "preview scroll view 268x180 at (442,161); slider row y 354 h16: clear-glass end button 16x13 at (443.5,356.5), slider 221.5 wide at x 465, tinted end button 17x13.5 at (692,356); 3 tick dots 2x2 at y 368 under knob centres for 0, 0.5, 1"}]},
+    {"kind": "heading", "title": "Theme", "y": 413, "h": 16, "gap_above": 30},
+    {"kind": "card", "y": 439, "h": 100, "gap_above": 10, "rows": [
+      {"title": "Colour", "y": 439, "h": 62, "controls": "9 swatch buttons AX 32x32 at y 445, x 394..682 pitch 36; caption 11 pt under the selected one (y 476.8, 14 tall)"},
+      {"separator": 501},
+      {"title": "Text highlight colour", "y": 502, "h": 37, "controls": "pop-up 133x24 at (577,508)"}]},
+    {"kind": "card", "y": 549, "h": 145.5, "gap_above": 10, "note": "h 129 when Default is selected (no radio row)", "rows": [
+      {"title": "Icon & widget style", "y": 549, "h": 104.5, "controls": "4 tile buttons AX 38x52 at y 558, x 518/571/622/673 (Default AX 40 wide when selected); radio row y 627 h 16.5 right-aligned to x 710: Dark -> Always/Auto (121 wide), Clear/Tinted -> Light/Dark/Auto (167 wide)"},
+      {"separator": 653.5},
+      {"title": "Folder colour (Tinted: Icon, widget & folder colour)", "y": 654.5, "h": 40, "controls": "pop-up, width follows its text (Automatic 133, Red 95, Choose Colour… 171), right edge x 710, y 660.5"}]},
+    {"kind": "heading", "title": "Windows", "y": 724.7, "h": 16, "gap_above": 30},
+    {"kind": "card", "y": 750.5, "h": 75, "gap_above": 10, "rows": [
+      {"title": "Sidebar icon size", "y": 750.5, "h": 37.5, "controls": "pop-up 96x24 at (614,757)"},
+      {"separator": 788},
+      {"title": "Tint window background with wallpaper colour", "y": 789, "h": 36.5, "controls": "mini switch 36x16 at (674,799.5)"}]},
+    {"kind": "card", "y": 835.5, "h": 189, "gap_above": 10, "rows": [
+      {"title": "Show scroll bars", "y": 835.5, "h": 105, "controls": "label + 3 radios (Automatically based on mouse or trackpad / When scrolling / Always), radio pitch 22.5"},
+      {"separator": 940.5},
+      {"title": "Click in the scroll bar to", "y": 941.5, "h": 83, "controls": "label + 2 radios (Jump to the next page / Jump to the spot that's clicked)"}]},
+    {"kind": "buttons", "y": 1044.5, "h": 24, "gap_above": 20, "controls": "More in Accessibility Settings… 212.5x24 at x 473.5; Help ? 24x24 at x 696"},
+    {"kind": "bottom_margin", "h": 20}
+  ],
+  "colours": {"card": {"light": "#F7F7F7", "dark": "#25262B"}, "window_bg": {"light": "#FFFFFF", "dark": "#1E1F24"}, "separator_2px": {"dark": "#2F3035"}},
+  "defaults": {
+    "NSGlassTintAmount": "-g float 0..1, continuous (no snapping), written on mouse-up; end buttons step -0.1/+0.1",
+    "AppleIconAppearanceTheme": "-g string: key removed = Default; RegularDark/RegularAutomatic; ClearLight/ClearDark/ClearAutomatic; TintedLight/TintedDark/TintedAutomatic",
+    "AppleIconAppearanceTintColor": "-g string: absent = Automatic; Red/Orange/Yellow/Green/Blue/Purple/Pink/Graphite; Other = custom",
+    "AppleIconAppearanceCustomTintColor": "-g string 'r g b a' (sRGB 0..1, 6 decimals), written with TintColor=Other from the Choose Colour popover; Use Theme Colour removes both tint keys"
+  }
+}
