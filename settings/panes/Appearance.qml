@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Shapes
 import ".."
 import "../controls"
 import "../Parsers.js" as P
@@ -7,6 +8,11 @@ import "../Parsers.js" as P
 Column {
     id: pane
     spacing: Theme.content.sectionGap
+
+    // Accent swatch fills: controlAccent<Name>Color from SystemAppearance Aqua.car / DarkAqua.car (macOS 27.2).
+    readonly property var accentSwatch: Theme.dark
+        ? ({ blue: "#007AFF", purple: "#A550A7", pink: "#F74F9E", red: "#FF5257", orange: "#F7821B", yellow: "#FFC600", green: "#62BA46", graphite: "#8C8C8C" })
+        : ({ blue: "#007AFF", purple: "#953D96", pink: "#F74F9E", red: "#E0383E", orange: "#F7821B", yellow: "#FFC726", green: "#62BA46", graphite: "#989898" })
 
     // Mini window thumbnail used by the Appearance and widget-style pickers.
     component Choice: Column {
@@ -152,18 +158,57 @@ Column {
                         id: sw
                         required property string modelData
                         readonly property bool sel: AppState.appearance.accent === modelData
-                        spacing: 4
-                        Rectangle {
+                        spacing: 8 // clears the selection ring, which overhangs the swatch by 4pt
+                        // ref (RE, macOS 27.2 Appearance.appex AccentCircle): a 24pt image clipped to a
+                        // circle, a 1pt quinaryLabel inner edge (plus-darker, so light mode only), and when
+                        // selected a 3pt accent-colour ring whose outer edge is 32pt. Multicolor's image
+                        // is AppKit's NSMulticolorAccent: a soft conic colour wheel, red at 3 o'clock.
+                        Item {
                             anchors.horizontalCenter: parent.horizontalCenter
-                            width: 24; height: 24; radius: 12
-                            color: sw.sel ? "transparent" : "transparent"
-                            border.width: sw.sel ? 2 : 0
-                            border.color: Theme.accent
+                            width: 24; height: 24
                             Rectangle {
                                 anchors.centerIn: parent
-                                width: sw.sel ? 18 : 24; height: width; radius: width / 2
-                                color: sw.modelData === "multicolor" ? "transparent" : Theme.tile[sw.modelData]
-                                gradient: sw.modelData === "multicolor" ? multi : null
+                                visible: sw.sel
+                                width: 32; height: 32; radius: 16
+                                color: "transparent"
+                                border.width: 3; border.color: Theme.accent
+                            }
+                            Rectangle {
+                                anchors.fill: parent; radius: 12
+                                visible: sw.modelData !== "multicolor"
+                                color: pane.accentSwatch[sw.modelData] ?? "transparent"
+                            }
+                            Shape {
+                                anchors.fill: parent
+                                visible: sw.modelData === "multicolor"
+                                preferredRendererType: Shape.CurveRenderer
+                                ShapePath {
+                                    strokeWidth: -1
+                                    fillGradient: ConicalGradient {
+                                        centerX: 12; centerY: 12; angle: 0
+                                        // sampled every 30 deg counter-clockwise from 3 o'clock (NSMulticolorAccent@2x)
+                                        GradientStop { position: 0 / 12; color: "#AD3C4F" }
+                                        GradientStop { position: 1 / 12; color: "#BD5886" }
+                                        GradientStop { position: 2 / 12; color: "#A1579C" }
+                                        GradientStop { position: 3 / 12; color: "#8A57A9" }
+                                        GradientStop { position: 4 / 12; color: "#7161AD" }
+                                        GradientStop { position: 5 / 12; color: "#5D6BB1" }
+                                        GradientStop { position: 6 / 12; color: "#538AB3" }
+                                        GradientStop { position: 7 / 12; color: "#4BA5B5" }
+                                        GradientStop { position: 8 / 12; color: "#6DA485" }
+                                        GradientStop { position: 9 / 12; color: "#95A150" }
+                                        GradientStop { position: 10 / 12; color: "#C9A54E" }
+                                        GradientStop { position: 11 / 12; color: "#BA7240" }
+                                        GradientStop { position: 12 / 12; color: "#AD3C4F" }
+                                    }
+                                    PathAngleArc { centerX: 12; centerY: 12; radiusX: 12; radiusY: 12; startAngle: 0; sweepAngle: 360 }
+                                }
+                            }
+                            Rectangle {
+                                anchors.fill: parent; radius: 12
+                                visible: !Theme.dark
+                                color: "transparent"
+                                border.width: 1; border.color: Qt.rgba(0, 0, 0, 0.047)
                             }
                             MouseArea { anchors.fill: parent; onClicked: AppState.set("appearance", { accent: sw.modelData }) }
                         }
@@ -237,12 +282,4 @@ Column {
         FormRow { label: "Click in the scroll bar to"; MacPopup { model: ["Jump to the next page", "Jump to the spot that's clicked"] } }
     }
 
-    Gradient {
-        id: multi
-        GradientStop { position: 0.0; color: "#FF3B30" }
-        GradientStop { position: 0.3; color: "#FFCC00" }
-        GradientStop { position: 0.55; color: "#34C759" }
-        GradientStop { position: 0.8; color: "#0A84FF" }
-        GradientStop { position: 1.0; color: "#AF52DE" }
-    }
 }
