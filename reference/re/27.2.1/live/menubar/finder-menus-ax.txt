@@ -1,0 +1,185 @@
+MENU [5, 35, 274, 305]
+[5, 40, 274, 24] en   About This Mac
+[5, 40, 274, 24] en   System Information
+[5, 64, 274, 11] DIS   ---
+[5, 75, 274, 24] en   System Settings…
+[5, 99, 274, 24] en   App Store
+[5, 123, 274, 11] DIS   ---
+[5, 134, 274, 24] en   Recent Items
+[5, 158, 274, 11] DIS   ---
+[5, 169, 274, 24] en  ⌥⌘⎋ Force Quit…
+[5, 169, 274, 24] en  ⌥⇧⌘⎋ Force Quit Finder
+[5, 193, 274, 11] DIS   ---
+[5, 204, 274, 24] en   Sleep
+[5, 228, 274, 24] en   Restart…
+[5, 228, 274, 24] en   Restart
+[5, 252, 274, 24] en   Shut Down…
+[5, 252, 274, 24] en   Shut Down
+[5, 276, 274, 11] DIS   ---
+[5, 287, 274, 24] en  ⌃⌘Q Lock Screen
+[5, 311, 274, 24] en  ⇧⌘Q Log Out <user>…
+[5, 311, 274, 24] en  ⌥⇧⌘Q Log Out <user>
+[5, 35, 0, 0] DIS   ---
+MENU [38, 35, 195, 222]
+[38, 40, 195, 24] en   About Finder
+[38, 64, 195, 11] DIS   ---
+[38, 75, 195, 24] en  ⌘, Settings…
+[38, 99, 195, 11] DIS   ---
+[38, 110, 195, 24] en  ⇧⌘ Empty Bin…
+[38, 110, 195, 24] en  ⌥⇧⌘ Empty Bin
+[38, 134, 195, 11] DIS   ---
+[38, 145, 195, 24] en   Services
+[38, 169, 195, 11] DIS   ---
+[38, 180, 195, 24] DIS  ⌘H Hide Finder
+[38, 204, 195, 24] DIS  ⌥⌘H Hide Others
+[38, 228, 195, 24] en   Show All
+MENU [99, 35, 273, 628]
+[99, 40, 273, 24] en  ⌘N New Finder Window
+[99, 64, 273, 24] en  ⇧⌘N New Folder
+[99, 88, 273, 24] DIS  ⌃⌘N New Folder with Selection
+[99, 112, 273, 24] en   New Smart Folder
+[99, 136, 273, 24] en  ⌘T New Tab
+[99, 160, 273, 24] DIS  ⌘O Open
+[99, 160, 273, 24] en  ⌃⌘O Open in New Tab
+[99, 160, 273, 24] DIS  ⌥⌘O Open in New Window and Close
+[99, 184, 273, 24] DIS   Open With
+[99, 184, 273, 24] DIS   Always Open With
+[99, 208, 273, 24] DIS  ⌘W Close Window
+[99, 208, 273, 24] en  ⌥⌘W Close All
+[99, 232, 273, 11] DIS   ---
+[99, 243, 273, 24] en  ⌘I Get Info
+[99, 243, 273, 24] en  ⌥⌘I Show Inspector
+[99, 243, 273, 24] en  ⌃⌘I Get Summary Info
+[99, 267, 273, 24] DIS   Rename
+[99, 291, 273, 24] DIS   Compress
+[99, 291, 273, 24] DIS   Compress
+[99, 315, 273, 24] DIS  ⌘D Duplicate
+[99, 315, 273, 24] DIS  ⌥⇧⌘D Duplicate Exactly
+[99, 339, 273, 24] DIS  ⌃⌘A Make Alias
+[99, 363, 273, 24] DIS  ⌘Y Quick Look
+[99, 363, 273, 24] DIS  ⌥⌘Y Slideshow
+[99, 387, 273, 11] DIS   ---
+[99, 398, 273, 24] DIS   Share…
+[99, 422, 273, 24] DIS   Manage Shared Folder…
+[99, 446, 273, 11] DIS   ---
+[99, 457, 273, 24] DIS  ⌘R Show Original
+[99, 481, 273, 24] DIS  ⌃⌘T Add to Sidebar
+[99, 481, 273, 24] DIS  ⌃⇧⌘T Add to Dock
+[99, 505, 273, 11] DIS   ---
+[99, 516, 273, 24] DIS  ⌘ Move to Bin
+[99, 516, 273, 24] DIS  ⌥⌘ Delete Immediately…
+[99, 540, 273, 24] DIS  ⌘E Eject
+[99, 540, 273, 24] DIS  ⌃⌘E Eject
+[99, 540, 273, 24] DIS  ⌥⌘E Eject
+[99, 564, 273, 11] DIS   ---
+[99, 575, 273, 24] en   Tags…
+[99, 599, 273, 24] DIS   Customise Folder…
+[99, 623, 273, 11] DIS   ---
+[99, 634, 273, 24] DIS  ⌘P Print
+MENU [140, 35, 217, 318]
+[140, 40, 217, 24] DIS  ⌘Z Undo
+[140, 64, 217, 24] DIS  ⇧⌘Z Redo
+[140, 88, 217, 11] DIS   ---
+[140, 99, 217, 24] DIS  ⌘X Cut
+[140, 123, 217, 24] DIS  ⌘C Copy
+[140, 123, 217, 24] en  ⌥⌘C Copy “Desktop” as Pathname
+[140, 123, 217, 24] DIS  ⌃⌥⌘C Copy as Link
+[140, 147, 217, 24] en  ⌘V Paste Item
+[140, 147, 217, 24] DIS  ⌥⌘V Move Item Here
+[140, 147, 217, 24] en  ⌥⇧⌘V Paste Item Exactly
+[140, 171, 217, 24] en  ⌘A Select All
+[140, 171, 217, 24] DIS  ⌥⌘A Deselect All
+[140, 195, 217, 11] DIS   ---
+[140, 206, 217, 24] en   Show Clipboard
+[140, 230, 217, 11] DIS   ---
+[140, 241, 217, 24] en  ⌘F Search
+[140, 241, 217, 24] en  ⌃⇧⌘F Search by Name…
+[140, 265, 217, 11] DIS   ---
+[140, 276, 217, 24] en   AutoFill
+[140, 300, 217, 24] DIS  🎤 Start Dictation
+[140, 324, 217, 24] en  🌐 Emoji & Symbols
+MENU [184, 35, 262, 543]
+[184, 40, 262, 24] DIS  ⌘1 as Icons
+[184, 64, 262, 24] DIS  ⌘2 as List
+[184, 88, 262, 24] DIS ✓ ⌘3 as Columns
+[184, 112, 262, 24] DIS  ⌘4 as Gallery
+[184, 136, 262, 11] DIS   ---
+[184, 147, 262, 24] en ✓ ⌃⌘0 Use Stacks
+[184, 171, 262, 24] en   Group Stacks By
+[184, 171, 262, 24] en   Sort Stacks By
+[184, 195, 262, 24] DIS   Clean Up
+[184, 195, 262, 24] DIS   Clean Up Selection
+[184, 219, 262, 24] DIS   Clean Up By
+[184, 243, 262, 11] DIS   ---
+[184, 254, 262, 24] DIS  ⇧⌘T Show Tab Bar
+[184, 278, 262, 24] DIS  ⇧⌘\ Show All Tabs
+[184, 302, 262, 11] DIS   ---
+[184, 313, 262, 24] DIS  ⌃⌘S Hide Sidebar
+[184, 337, 262, 24] DIS  ⇧⌘P Hide Preview
+[184, 361, 262, 11] DIS   ---
+[184, 372, 262, 24] DIS  ⌥⌘T Hide Toolbar
+[184, 396, 262, 24] DIS  ⌥⌘P Hide Path Bar
+[184, 420, 262, 24] DIS  ⌘/ Show Status Bar
+[184, 444, 262, 11] DIS   ---
+[184, 455, 262, 24] DIS   Customise Toolbar…
+[184, 479, 262, 11] DIS   ---
+[184, 490, 262, 24] en  ⌘J Show View Options
+[184, 514, 262, 24] DIS   Show Preview Options
+[184, 538, 262, 11] DIS   ---
+[184, 549, 262, 24] DIS  fnF Enter Full Screen
+MENU [233, 35, 238, 475]
+[233, 40, 238, 24] DIS  ⌘[ Back
+[233, 64, 238, 24] DIS  ⌘] Forward
+[233, 88, 238, 24] en  ⌘ Enclosing Folder
+[233, 88, 238, 24] en  ⌥⌘ Enclosing Folder
+[233, 88, 238, 24] en  ⌃⌘ Enclosing Folder in New Window
+[233, 88, 238, 24] en  ⇧⌘ Select Startup Disk
+[233, 112, 238, 11] DIS   ---
+[233, 123, 238, 24] en  ⇧⌘F Recents
+[233, 147, 238, 24] en  ⇧⌘O Documents
+[233, 171, 238, 24] en  ⇧⌘D Desktop
+[233, 195, 238, 24] en  ⌥⌘L Downloads
+[233, 219, 238, 24] en  ⇧⌘H Home
+[233, 243, 238, 24] en   Library
+[233, 243, 238, 24] en  ⇧⌘C Computer
+[233, 267, 238, 24] en  ⇧⌘R AirDrop
+[233, 291, 238, 24] en  ⇧⌘K Network
+[233, 315, 238, 24] en  ⇧⌘I iCloud Drive
+[233, 339, 238, 24] en  ⇧⌘S Shared
+[233, 363, 238, 24] en  ⇧⌘A Applications
+[233, 387, 238, 24] en  ⇧⌘U Utilities
+[233, 411, 238, 11] DIS   ---
+[233, 422, 238, 24] en   Recent Folders
+[233, 446, 238, 11] DIS   ---
+[233, 457, 238, 24] en  ⇧⌘G Go to Folder…
+[233, 481, 238, 24] en  ⌘K Connect to Server…
+MENU [270, 35, 286, 449]
+[270, 40, 286, 24] DIS  ⌘M Minimise
+[270, 40, 286, 24] DIS  ⌥⌘M Minimise All
+[270, 64, 286, 24] DIS   Zoom
+[270, 64, 286, 24] DIS   Zoom All
+[270, 88, 286, 24] DIS  28F Fill
+[270, 112, 286, 24] DIS  28C Centre
+[270, 136, 286, 11] DIS   ---
+[270, 147, 286, 24] en   Move & Resize
+[270, 171, 286, 24] DIS   Full-Screen Tile
+[270, 195, 286, 11] DIS   ---
+[270, 206, 286, 24] en   Bring All to Front
+[270, 206, 286, 24] en   Arrange in Front
+[270, 230, 286, 24] en  ⌘` Cycle Through Windows
+[270, 254, 286, 24] DIS   Remove Window from Set
+[270, 278, 286, 11] DIS   ---
+[270, 289, 286, 24] DIS  13	 Show Previous Tab
+[270, 313, 286, 24] DIS  ⌃	 Show Next Tab
+[270, 337, 286, 24] DIS   Move Tab to New Window
+[270, 361, 286, 24] DIS   Merge All Windows
+[270, 385, 286, 11] DIS   ---
+[270, 396, 286, 24] DIS   ---
+[270, 396, 286, 24] DIS   Show Progress Window
+[270, 420, 286, 11] DIS   ---
+[270, 431, 286, 24] en ◆  Applications
+[270, 455, 286, 24] en ◆  Utilities
+MENU [338, 35, 360, 93]
+[338, 35, 360, 40] en   ---
+[338, 75, 360, 24] en   Mac User Guide
+[338, 99, 360, 24] en   Tips for Your Mac
