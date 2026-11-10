@@ -57,6 +57,9 @@ QVariantMap FileOps::entry(const QFileInfo &fi) const
         {QStringLiteral("isDir"), fi.isDir()},
         {QStringLiteral("size"), fi.isDir() ? -1 : fi.size()},
         {QStringLiteral("modified"), fi.lastModified().toMSecsSinceEpoch()},
+        // gallery / column preview "Information" rows; -1 when the filesystem has no birth time
+        {QStringLiteral("created"), fi.birthTime().isValid() ? fi.birthTime().toMSecsSinceEpoch() : qint64(-1)},
+        {QStringLiteral("opened"), fi.lastRead().toMSecsSinceEpoch()},
         {QStringLiteral("mime"), mt.name()},
         {QStringLiteral("kind"), fi.isDir() ? QStringLiteral("Folder") : mt.comment()},
         {QStringLiteral("hidden"), fi.isHidden()},

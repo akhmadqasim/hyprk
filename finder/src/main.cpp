@@ -2,6 +2,7 @@
 //
 // Usage: hyprk-finder [dir|recents:|applications:] [--view icons|list|columns|gallery] [--select name]
 //                     [--quicklook] [--dark] [--shot out.png [--delay ms]]
+// --size, --pathbar, --inactive and --panel set up reference screenshots.
 // --shot renders the window, saves a PNG and quits (works with QT_QPA_PLATFORM=offscreen).
 
 #include "fileops.h"
@@ -79,7 +80,12 @@ int main(int argc, char *argv[])
     const QCommandLineOption darkOpt(QStringLiteral("dark"), QStringLiteral("Dark appearance"));
     const QCommandLineOption shotOpt(QStringLiteral("shot"), QStringLiteral("Save a screenshot and quit"), QStringLiteral("png"));
     const QCommandLineOption delayOpt(QStringLiteral("delay"), QStringLiteral("Screenshot delay"), QStringLiteral("ms"), QStringLiteral("1200"));
-    cli.addOptions({viewOpt, selectOpt, qlOpt, darkOpt, shotOpt, delayOpt});
+    // for reference screenshots: window size, path bar, inactive look, an open panel
+    const QCommandLineOption sizeOpt(QStringLiteral("size"), QStringLiteral("Window size"), QStringLiteral("WxH"));
+    const QCommandLineOption pathBarOpt(QStringLiteral("pathbar"), QStringLiteral("Show the path bar"));
+    const QCommandLineOption inactiveOpt(QStringLiteral("inactive"), QStringLiteral("Draw the window as inactive"));
+    const QCommandLineOption panelOpt(QStringLiteral("panel"), QStringLiteral("Open alert2|alert3|sheet|popover"), QStringLiteral("name"));
+    cli.addOptions({viewOpt, selectOpt, qlOpt, darkOpt, shotOpt, delayOpt, sizeOpt, pathBarOpt, inactiveOpt, panelOpt});
     cli.process(app);
 
     // Without a platform theme (offscreen, bare Hyprland) Qt only searches ":/icons".
@@ -110,6 +116,10 @@ int main(int argc, char *argv[])
         {QStringLiteral("select"), cli.value(selectOpt)},
         {QStringLiteral("quicklook"), cli.isSet(qlOpt)},
         {QStringLiteral("dark"), cli.isSet(darkOpt)},
+        {QStringLiteral("size"), cli.value(sizeOpt)},
+        {QStringLiteral("pathBar"), cli.isSet(pathBarOpt)},
+        {QStringLiteral("inactive"), cli.isSet(inactiveOpt)},
+        {QStringLiteral("panel"), cli.value(panelOpt)},
         // Set by the hyprk session when Hyprland blurs behind this window.
         {QStringLiteral("blur"), qgetenv("HYPRK_BLUR") == "1"},
         // macOS document/folder icons extracted into themes/icons/system
