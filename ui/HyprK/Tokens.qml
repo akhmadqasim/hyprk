@@ -125,6 +125,42 @@ QtObject {
         readonly property color separator: t.dark ? Qt.rgba(1, 1, 1, 0.27) : Qt.rgba(0, 0, 0, 0.20)   // 113 on 61 | 200 on 252
     }
 
+    // ---------- alerts, sheets, popovers (AlertPanel, Sheet, Popover; geometry in panels.js) ----------
+    // macOS 27.2.1, MAC-ANSWERS.md Q-panels-33/34 and LIVE-27.2.1.md; colours from reference/screens/27.2.1/finder/
+    // alert-*.png, sheet-*.png (2x). The live alert and popover are regular glass; drawn flat here with the
+    // measured body colour.
+    readonly property QtObject panel: QtObject {
+        readonly property int alertRadius: 26
+        readonly property color alertFill: t.dark ? "#38383F" : "#FEFEFD"           // (56,56,63) | 254
+        readonly property color alertButton: t.dark ? "#47474E" : "#EBEBEB"         // (71,71,78) | 235
+        // pressed: dark 71 -> 89 (+18 = white a.098); light not measured, the push-button press layer
+        readonly property color alertButtonPressed: t.dark ? Qt.rgba(1, 1, 1, 0.098) : t.control.pressOverlay
+        readonly property color destructiveFill: t.dark ? "#653F43" : "#F9D1D0"     // (101,63,67) | (249,209,208)
+        readonly property color destructiveText: t.dark ? "#DC3929" : "#EB4C46"     // (220,57,41) | (235,76,70)
+        // the default button: (52,120,246) under Multicolour/Blue in both appearances, else the accent
+        readonly property color defaultFill: Accent.name === "multicolor" || Accent.name === "blue" ? "#3478F6" : t.accent
+        readonly property int sheetRadius: 16                                       // continuous r 16 (fit 17.9)
+        readonly property color sheetFill: t.dark ? "#22232F" : "#FFFFFF"           // windowBackground (34,35,47) | 255
+        readonly property color sheetDim: Qt.rgba(0, 0, 0, 0.2)                    // whole parent ~20 % darker
+        readonly property int popoverRadius: 20
+        readonly property color popoverFill: t.control.menuFill                     // glass live; flat like the menus
+        readonly property color popoverStroke: t.control.menuStroke
+        // motion (LIVE-27.2.1.md): alert grows from 4 % to a 1.15 peak at 0.2 s (in-quad), settles by 0.37 s
+        // (out-quad), dismiss = 0.1 s fade; sheet in 0.27 s, out 0.25 s, near-linear, size constant; popover a
+        // spring from 12.5 % (response 0.25, damping 0.9) from the arrow, close = fade 0.15..0.2 s
+        readonly property real alertPopFrom: 0.04
+        readonly property real alertPopPeak: 1.15
+        readonly property int alertPopRise: 200
+        readonly property int alertPopSettle: 170
+        readonly property int alertFadeOut: 100
+        readonly property int sheetIn: 270
+        readonly property int sheetOut: 250
+        readonly property real popoverFrom: 0.125
+        readonly property real popoverResponse: 0.25
+        readonly property real popoverDamping: 0.9
+        readonly property int popoverFadeOut: 180
+    }
+
     // ---------- traffic lights (SPEC 13; the plugin title bar has the same numbers in
     // plugin/src/Titlebar.cpp, checked by shell/tests/run.mjs) ----------
     readonly property QtObject lights: QtObject {
