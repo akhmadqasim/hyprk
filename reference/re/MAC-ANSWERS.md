@@ -745,3 +745,73 @@ Notification Center:
 - `sun`: the CC slider uses sun.min.fill / sun.max.fill.
 - `square.grid`: Stage Manager is sidebar.squares.leading.
 - Raised to sure: switch.2, screen.mirror, Now Playing, moon, airdrop.
+
+### R3b-3 Settings icons per "Icon & widget style", and Finder sidebar glyph size
+
+Same rules as before: no git, no GUI, no defaults writes. Nothing existing was overwritten.
+
+#### 1. Settings pane icons per icon style
+
+**How the style is selected**
+- The preference `AppleIconAppearanceTheme` is a SkyLight `SLSIconAppearanceTheme`. SkyLight's strings list the values in this order:
+
+  | Value | Name | Value | Name | Value | Name |
+  |---|---|---|---|---|---|
+  | 0 | RegularAutomatic | 3 | ClearAutomatic | 6 | TintedAutomatic |
+  | 1 | RegularLight | 4 | ClearLight | 7 | TintedLight |
+  | 2 | RegularDark | 5 | ClearDark | 8 | TintedDark |
+
+  Read with this numbering, this Mac's `fetchCurrentIconAppearanceConfiguration` returns 2 (RegularDark), which is its stored value.
+- IconServices reads that configuration through `-[ISImageDescriptor applyIconAppearanceConfiguration:]` (setting the appearance theme on a configuration object):
+  - It sets `appearance`: 0 = light tile, 1 = dark tile.
+  - It sets `appearanceVariant`: 0 = regular, 3 = clear, 2 = tinted.
+  - Measured results: RegularLight → appearance 0 in both light and dark mode; RegularDark → 1 in both; RegularAutomatic → follows the mode.
+- **What the Appearance pane writes** (`Appearance.appex`, decompiled with Ghidra):
+  - `IconAppearanceModel` stores a style kind t (0 Regular, 1 Clear, 2 Tinted) and a mode s (0 light, 1 dark/"Always", 2 automatic).
+  - It saves `theme = 3t + {light: 1, dark: 2, automatic: 0}` (function at 0x100030164, called before `setIconAppearanceTheme:`).
+  - The label function (0x100030034) shows which pair each UI style is:
+    - "[Icon Style] Default" / "Icon style, light." = t 0, s 0 → **RegularLight (1)**
+    - "[Icon Style] Dark" = t 0, s ≠ 0 → RegularDark (2) for "Always", RegularAutomatic (0) for "Automatic"
+    - "[Icon Style] Clear" = t 1 → 3/4/5
+    - "[Icon Style] Tinted" = t 2 → 6/7/8
+  - `-[SLSIconAppearanceConfiguration init]` defaults to icon theme 1 (RegularLight). So an untouched account is on Default = RegularLight.
+- **Does the sidebar follow this setting?** Likely yes. System Settings links `IconServices` and `_IconServices_SwiftUI`, and the latter observes `NSWorkspaceIconAppearanceConfigurationDidChangeNotification`. Also, `NSWorkspace` icons on this Mac (RegularDark) come out as dark tiles in both appearances.
+
+**Answer: Default style in Dark appearance shows the coloured light-style tile, not the dark tile.**
+- `<id>@<px>-default-dark.png` is byte-identical to `-default-light.png` and to the R3b `<id>@<px>-light.png`.
+- The dark tile appears only with the Dark style ("Always", or "Automatic" while in Dark Mode). Clear and Tinted also have dark versions.
+- This Mac (RegularDark) shows the dark tile in both appearances. The R3b `<id>@<px>-dark.png` files are byte-identical to `-dark-dark.png`. All 92 comparisons matched.
+- **Not measured:** a capture of the live sidebar.
+
+**Files:** 368 PNGs, `themes/icons/settings/<pane id>@<64|128>-<default|dark|clear|tinted>-<light|dark>.png`, covering all 23 panes. Each was rendered with an in-memory `SLSIconAppearanceConfiguration` (never saved) applied to the `ISImageDescriptor`.
+
+| Style | Theme used | Light / dark files |
+|---|---|---|
+| default | RegularLight | identical |
+| dark | RegularDark ("Always") | identical |
+| clear | ClearAutomatic | differ |
+| tinted | TintedAutomatic | differ |
+
+- Every style renders offscreen.
+- **Tinted:** the tint is "Automatic", which follows the accent colour. This Mac has no `AppleAccentColor` set, so the tint is blue. With an explicit tint colour (`AppleIconAppearanceTintColor`) the tint would differ.
+- **Clear:** the light tile is semi-transparent, so its look depends on the background behind it.
+- The theme mapping is also recorded in `names.json` → `settingsIconStyles`.
+
+#### 2. Finder sidebar "Shared" glyph and glyph size
+
+- **Shared = `person.2`** (outline two people) on 27.2.1 (sure).
+  - Evidence: the capture made on this Mac (`reference/screens/27.2.1/finder-toolbar-light.png`) shows it, and Finder references `person.2`.
+  - Apple's older macOS 27 marketing screenshot shows `folder.and.person`, which was my R3b answer. Finder lists that name among its iCloud symbols, so it is probably the iCloud Shared folder (guess).
+  - `names.json` `symbols.shared` is corrected to person.2, with folder.and.person kept as an extra.
+- **Sidebar glyph size: 13 pt, scale `.large`, weight `.medium`**, monochrome tinted with the accent colour (sure).
+  - Method: I rendered AppKit candidates at 11–19 pt × small/medium/large × regular–bold at 2x and compared them with the capture.
+  - clock and person.2 match 13 pt/.large/.medium with 0.2–0.3 % mean coverage difference and equal ink area. The next best, 13 pt/.large/.semibold, is 14–16 % off.
+  - 13 pt is the sidebar text size: the "Recents" cap height is 19 px at 2x.
+- **Toolbar glyphs: same config, 13 pt/.large/.medium** (likely).
+  - magnifyingglass, square.grid.2x2 and squares.below.rectangle fit best at 4–8 %.
+  - The selected or disabled items (list.bullet, rectangle.split.3x1, chevrons, tag) could not be fitted cleanly.
+- **Files:** 30 new SVGs in `themes/icons/sf-symbols/svg/`, all paths only and matching AppKit:
+  - `<symbol>.medium.13pt-large.svg` for 15 sidebar glyphs (including person.2, folder.and.person, clock, appstore, doc…) and 12 toolbar glyphs (including magnifyingglass).
+  - `person.2.<regular|medium|semibold>.svg` at 32 pt, to match the R3b set.
+  - They are listed in `names.json` → `finder.sidebarGlyph` and `finder.toolbarGlyph` (size/scale/weight, evidence, files), with per-file metrics under `files`.
+  - 13 pt `.large` is not the same as a larger point size at `.medium`, so use the 13pt-large files directly.

@@ -1248,23 +1248,36 @@
    "note": "Toolbar Share; Finder binary references it."
   },
   "shared": {
-   "symbol": "folder.and.person",
+   "symbol": "person.2",
    "surface": "finder",
    "surfaces": [
     "finder"
    ],
-   "confidence": "likely",
+   "confidence": "sure",
    "confidenceBySurface": {
-    "finder": "likely"
+    "finder": "sure"
    },
    "private": false,
    "variants": [
-    "folder.and.person.regular.svg",
-    "folder.and.person.medium.svg",
-    "folder.and.person.semibold.svg"
+    "person.2.regular.svg",
+    "person.2.medium.svg",
+    "person.2.semibold.svg",
+    "person.2.medium.13pt-large.svg"
    ],
-   "extras": [],
-   "note": "Sidebar Shared (shared folders). Finder binary references folder.and.person; the glyph (folder outline with tab line, filled person lower right) matches the PC drawing. folder.badge.person.crop is the older look, not rendered."
+   "extras": [
+    {
+     "symbol": "folder.and.person",
+     "why": "Apple's macOS 27 marketing screenshot (reference/screens/macos27-finder-window.png) shows this folder+person glyph for Shared; Finder lists it next to the icloud names",
+     "private": false,
+     "variants": [
+      "folder.and.person.regular.svg",
+      "folder.and.person.medium.svg",
+      "folder.and.person.semibold.svg",
+      "folder.and.person.medium.13pt-large.svg"
+     ]
+    }
+   ],
+   "note": "R3b-3: the 27.2.1 capture made on this Mac (reference/screens/27.2.1/finder-toolbar-light.png) shows Shared with person.2 (two outlined people); it fits person.2 at 13 pt / scale large / medium exactly (coverage difference 0.3 %). Finder references person.2. Earlier R3b answer folder.and.person matches only the older Apple marketing screenshot."
   },
   "tag": {
    "symbol": "tag",
@@ -29438,6 +29451,1002 @@
     52,
     28
    ]
+  },
+  "clock.medium.13pt-large.svg": {
+   "symbol": "clock",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    20,
+    20
+   ],
+   "alignmentRect": [
+    0,
+    5.5,
+    20,
+    9
+   ],
+   "baselineY": 14.5,
+   "capHeight": 9,
+   "glyphRect": [
+    1.5,
+    1.5,
+    17,
+    17
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    1,
+    0
+   ]
+  },
+  "person.2.medium.13pt-large.svg": {
+   "symbol": "person.2",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    27,
+    20
+   ],
+   "alignmentRect": [
+    0,
+    5.5,
+    27,
+    9
+   ],
+   "baselineY": 14.5,
+   "capHeight": 9,
+   "glyphRect": [
+    2,
+    2.0,
+    24,
+    16.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    1,
+    0,
+    0
+   ]
+  },
+  "folder.and.person.medium.13pt-large.svg": {
+   "symbol": "folder.and.person",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    26,
+    20
+   ],
+   "alignmentRect": [
+    0,
+    5.5,
+    23,
+    9
+   ],
+   "baselineY": 14.5,
+   "capHeight": 9,
+   "glyphRect": [
+    2,
+    2.0,
+    24,
+    16.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    1,
+    0,
+    0
+   ]
+  },
+  "appstore.medium.13pt-large.svg": {
+   "symbol": "appstore",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    21,
+    19
+   ],
+   "alignmentRect": [
+    0,
+    5.5,
+    20.5,
+    9
+   ],
+   "baselineY": 14.5,
+   "capHeight": 9,
+   "glyphRect": [
+    1.5,
+    1.5,
+    17.5,
+    16
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ]
+  },
+  "menubar.dock.rectangle.medium.13pt-large.svg": {
+   "symbol": "menubar.dock.rectangle",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    24,
+    19
+   ],
+   "alignmentRect": [
+    0,
+    5.5,
+    23.5,
+    9
+   ],
+   "baselineY": 14.5,
+   "capHeight": 9,
+   "glyphRect": [
+    2,
+    2.0,
+    19.5,
+    15.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    1,
+    0
+   ]
+  },
+  "doc.medium.13pt-large.svg": {
+   "symbol": "doc",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    18,
+    21
+   ],
+   "alignmentRect": [
+    0,
+    6.5,
+    18,
+    9
+   ],
+   "baselineY": 15.5,
+   "capHeight": 9,
+   "glyphRect": [
+    2,
+    1.5,
+    14,
+    18
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ]
+  },
+  "arrow.down.circle.medium.13pt-large.svg": {
+   "symbol": "arrow.down.circle",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    20,
+    20
+   ],
+   "alignmentRect": [
+    0,
+    5.5,
+    20,
+    9
+   ],
+   "baselineY": 14.5,
+   "capHeight": 9,
+   "glyphRect": [
+    1.5,
+    1.5,
+    17,
+    17
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    1,
+    0
+   ]
+  },
+  "icloud.medium.13pt-large.svg": {
+   "symbol": "icloud",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    24,
+    18
+   ],
+   "alignmentRect": [
+    0,
+    5.5,
+    24,
+    9
+   ],
+   "baselineY": 14.5,
+   "capHeight": 9,
+   "glyphRect": [
+    1.5,
+    2.0,
+    21,
+    14.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ]
+  },
+  "airdrop.medium.13pt-large.svg": {
+   "symbol": "airdrop",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    21,
+    20
+   ],
+   "alignmentRect": [
+    0,
+    6,
+    21,
+    9
+   ],
+   "baselineY": 15,
+   "capHeight": 9,
+   "glyphRect": [
+    1.5,
+    1.5,
+    18,
+    17
+   ],
+   "paths": 4,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  "trash.medium.13pt-large.svg": {
+   "symbol": "trash",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    19,
+    22
+   ],
+   "alignmentRect": [
+    0,
+    7.5,
+    19,
+    9
+   ],
+   "baselineY": 16.5,
+   "capHeight": 9,
+   "glyphRect": [
+    1.5,
+    2.0,
+    16,
+    18.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ]
+  },
+  "internaldrive.medium.13pt-large.svg": {
+   "symbol": "internaldrive",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    24,
+    18
+   ],
+   "alignmentRect": [
+    0,
+    5,
+    23.5,
+    9
+   ],
+   "baselineY": 14,
+   "capHeight": 9,
+   "glyphRect": [
+    2,
+    2.0,
+    19.5,
+    14.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ]
+  },
+  "externaldrive.medium.13pt-large.svg": {
+   "symbol": "externaldrive",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    24,
+    18
+   ],
+   "alignmentRect": [
+    0,
+    5,
+    23.5,
+    9
+   ],
+   "baselineY": 14,
+   "capHeight": 9,
+   "glyphRect": [
+    2,
+    2.0,
+    19.5,
+    14.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ]
+  },
+  "network.medium.13pt-large.svg": {
+   "symbol": "network",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    20,
+    20
+   ],
+   "alignmentRect": [
+    0,
+    5.5,
+    20,
+    9
+   ],
+   "baselineY": 14.5,
+   "capHeight": 9,
+   "glyphRect": [
+    1.5,
+    1.5,
+    17,
+    17
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ]
+  },
+  "eject.fill.medium.13pt-large.svg": {
+   "symbol": "eject.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    20,
+    19
+   ],
+   "alignmentRect": [
+    0,
+    5.5,
+    20,
+    9
+   ],
+   "baselineY": 14.5,
+   "capHeight": 9,
+   "glyphRect": [
+    2,
+    2.0,
+    16,
+    15.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ]
+  },
+  "eject.medium.13pt-large.svg": {
+   "symbol": "eject",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    21,
+    19
+   ],
+   "alignmentRect": [
+    0,
+    5.5,
+    20.5,
+    9
+   ],
+   "baselineY": 14.5,
+   "capHeight": 9,
+   "glyphRect": [
+    2,
+    1.5,
+    16.5,
+    16
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ]
+  },
+  "chevron.backward.medium.13pt-large.svg": {
+   "symbol": "chevron.backward",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    13,
+    18
+   ],
+   "alignmentRect": [
+    0,
+    5,
+    12.5,
+    9
+   ],
+   "baselineY": 14,
+   "capHeight": 9,
+   "glyphRect": [
+    1,
+    2.0,
+    8.5,
+    14.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ]
+  },
+  "chevron.forward.medium.13pt-large.svg": {
+   "symbol": "chevron.forward",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    13,
+    18
+   ],
+   "alignmentRect": [
+    0,
+    5,
+    12.5,
+    9
+   ],
+   "baselineY": 14,
+   "capHeight": 9,
+   "glyphRect": [
+    3,
+    2.0,
+    8.5,
+    14.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ]
+  },
+  "square.grid.2x2.medium.13pt-large.svg": {
+   "symbol": "square.grid.2x2",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    20,
+    19
+   ],
+   "alignmentRect": [
+    0,
+    5.5,
+    19.5,
+    9
+   ],
+   "baselineY": 14.5,
+   "capHeight": 9,
+   "glyphRect": [
+    2,
+    2.0,
+    15.5,
+    15.5
+   ],
+   "paths": 4,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  "list.bullet.medium.13pt-large.svg": {
+   "symbol": "list.bullet",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    21,
+    16
+   ],
+   "alignmentRect": [
+    0,
+    4,
+    21,
+    9
+   ],
+   "baselineY": 13,
+   "capHeight": 9,
+   "glyphRect": [
+    2,
+    2.0,
+    17,
+    12.5
+   ],
+   "paths": 6,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    1,
+    0,
+    1,
+    0,
+    1,
+    0
+   ]
+  },
+  "rectangle.split.3x1.medium.13pt-large.svg": {
+   "symbol": "rectangle.split.3x1",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    24,
+    19
+   ],
+   "alignmentRect": [
+    0,
+    5.5,
+    23.5,
+    9
+   ],
+   "baselineY": 14.5,
+   "capHeight": 9,
+   "glyphRect": [
+    2,
+    2.0,
+    19.5,
+    15.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ]
+  },
+  "squares.below.rectangle.medium.13pt-large.svg": {
+   "symbol": "squares.below.rectangle",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    23,
+    18
+   ],
+   "alignmentRect": [
+    0,
+    5,
+    23,
+    9
+   ],
+   "baselineY": 14,
+   "capHeight": 9,
+   "glyphRect": [
+    2,
+    2.0,
+    19,
+    14.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    1,
+    0
+   ]
+  },
+  "square.grid.3x1.below.line.grid.1x2.medium.13pt-large.svg": {
+   "symbol": "square.grid.3x1.below.line.grid.1x2",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    22,
+    21
+   ],
+   "alignmentRect": [
+    0,
+    6.5,
+    22,
+    9
+   ],
+   "baselineY": 15.5,
+   "capHeight": 9,
+   "glyphRect": [
+    2,
+    2.0,
+    18,
+    17.5
+   ],
+   "paths": 8,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  "chevron.down.medium.13pt-large.svg": {
+   "symbol": "chevron.down",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    19,
+    12
+   ],
+   "alignmentRect": [
+    0,
+    1.5,
+    18.5,
+    9
+   ],
+   "baselineY": 10.5,
+   "capHeight": 9,
+   "glyphRect": [
+    2,
+    2.0,
+    14.5,
+    8.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ]
+  },
+  "square.and.arrow.up.medium.13pt-large.svg": {
+   "symbol": "square.and.arrow.up",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    19,
+    23
+   ],
+   "alignmentRect": [
+    0,
+    8.5,
+    19,
+    9
+   ],
+   "baselineY": 17.5,
+   "capHeight": 9,
+   "glyphRect": [
+    2,
+    1.5,
+    15,
+    20
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    1,
+    0,
+    0
+   ]
+  },
+  "tag.medium.13pt-large.svg": {
+   "symbol": "tag",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    23,
+    22
+   ],
+   "alignmentRect": [
+    0,
+    6,
+    22.5,
+    9
+   ],
+   "baselineY": 15,
+   "capHeight": 9,
+   "glyphRect": [
+    1.5,
+    1.5,
+    19,
+    19
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ]
+  },
+  "ellipsis.medium.13pt-large.svg": {
+   "symbol": "ellipsis",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    19,
+    7
+   ],
+   "alignmentRect": [
+    0,
+    -0.5,
+    18.5,
+    9
+   ],
+   "baselineY": 8.5,
+   "capHeight": 9,
+   "glyphRect": [
+    1.5,
+    2.0,
+    15.5,
+    3.5
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ]
+  },
+  "magnifyingglass.medium.13pt-large.svg": {
+   "symbol": "magnifyingglass",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 13,
+   "scale": "large",
+   "size": [
+    21,
+    20
+   ],
+   "alignmentRect": [
+    0,
+    6,
+    20.5,
+    9
+   ],
+   "baselineY": 15,
+   "capHeight": 9,
+   "glyphRect": [
+    2,
+    2.0,
+    16.5,
+    16.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ]
+  },
+  "person.2.regular.svg": {
+   "symbol": "person.2",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "scale": "medium",
+   "size": [
+    52,
+    38
+   ],
+   "alignmentRect": [
+    0,
+    7.0,
+    52,
+    22.5
+   ],
+   "baselineY": 29.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4,
+    3.5,
+    46,
+    31.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    1,
+    0,
+    0
+   ]
+  },
+  "person.2.medium.svg": {
+   "symbol": "person.2",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "scale": "medium",
+   "size": [
+    52,
+    38
+   ],
+   "alignmentRect": [
+    0,
+    7.0,
+    52,
+    22.5
+   ],
+   "baselineY": 29.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4,
+    3.5,
+    46.5,
+    31.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    1,
+    0,
+    0
+   ]
+  },
+  "person.2.semibold.svg": {
+   "symbol": "person.2",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "scale": "medium",
+   "size": [
+    52,
+    38
+   ],
+   "alignmentRect": [
+    0,
+    6.5,
+    52,
+    22.5
+   ],
+   "baselineY": 29,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4,
+    3,
+    46.5,
+    32
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    1,
+    0,
+    0
+   ]
   }
  },
  "menubar": [
@@ -32723,5 +33732,66 @@
     ]
    }
   }
- ]
+ ],
+ "finder": {
+  "sidebarGlyph": {
+   "pointSize": 13,
+   "scale": "large",
+   "weight": "medium",
+   "rendering": "monochrome, tinted with the accent colour",
+   "confidence": "sure",
+   "evidence": "Best fit of AppKit renders against the 2x capture reference/screens/27.2.1/finder-toolbar-light.png: clock and person.2 match 13 pt/.large/.medium with mean coverage difference 0.2-0.3 % (next best 13 pt/.large/.semibold 14-16 %). 13 pt = the sidebar text size (Recents cap height 19 px at 2x).",
+   "files": [
+    "clock.medium.13pt-large.svg",
+    "person.2.medium.13pt-large.svg",
+    "folder.and.person.medium.13pt-large.svg",
+    "appstore.medium.13pt-large.svg",
+    "menubar.dock.rectangle.medium.13pt-large.svg",
+    "doc.medium.13pt-large.svg",
+    "arrow.down.circle.medium.13pt-large.svg",
+    "icloud.medium.13pt-large.svg",
+    "airdrop.medium.13pt-large.svg",
+    "trash.medium.13pt-large.svg",
+    "internaldrive.medium.13pt-large.svg",
+    "externaldrive.medium.13pt-large.svg",
+    "network.medium.13pt-large.svg",
+    "eject.fill.medium.13pt-large.svg",
+    "eject.medium.13pt-large.svg"
+   ]
+  },
+  "toolbarGlyph": {
+   "pointSize": 13,
+   "scale": "large",
+   "weight": "medium",
+   "rendering": "monochrome (label colour)",
+   "confidence": "likely",
+   "evidence": "Same fit on the toolbar of that capture: magnifyingglass, square.grid.2x2 and squares.below.rectangle fit 13 pt/.large/.medium best (4-8 %); list.bullet, rectangle.split.3x1 (selected) and the disabled chevrons/tag could not be fitted cleanly.",
+   "files": [
+    "chevron.backward.medium.13pt-large.svg",
+    "chevron.forward.medium.13pt-large.svg",
+    "square.grid.2x2.medium.13pt-large.svg",
+    "list.bullet.medium.13pt-large.svg",
+    "rectangle.split.3x1.medium.13pt-large.svg",
+    "squares.below.rectangle.medium.13pt-large.svg",
+    "square.grid.3x1.below.line.grid.1x2.medium.13pt-large.svg",
+    "chevron.down.medium.13pt-large.svg",
+    "square.and.arrow.up.medium.13pt-large.svg",
+    "tag.medium.13pt-large.svg",
+    "ellipsis.medium.13pt-large.svg",
+    "magnifyingglass.medium.13pt-large.svg"
+   ]
+  },
+  "note": "13 pt with scale .large is not the same as a bigger point size at scale .medium: use these files (or scale the 32 pt files by the glyphRect ratio)."
+ },
+ "settingsIconStyles": {
+  "files": "themes/icons/settings/<pane id>@<64|128>-<default|dark|clear|tinted>-<light|dark>.png (64 px = 32 pt @2x, 128 px = 128 pt @1x)",
+  "mapping": {
+   "default": "RegularLight (1): always the coloured tile, also in Dark appearance",
+   "dark": "RegularDark (2, \"Always\"): dark tile in both appearances; the Dark style's \"Automatic\" sub-option is RegularAutomatic (0) = default tile in light, dark tile in dark",
+   "clear": "ClearAutomatic (3); ClearLight 4 / ClearDark 5 force one appearance",
+   "tinted": "TintedAutomatic (6), tint colour Automatic (follows the accent colour); TintedLight 7 / TintedDark 8"
+  },
+  "answer": "Dark appearance + style Default = the coloured light-style tile (identical bytes to <id>@<px>-light.png).",
+  "thisMac": "AppleIconAppearanceTheme = RegularDark -> dark tile in both appearances (= <id>@<px>-dark.png)"
+ }
 }
