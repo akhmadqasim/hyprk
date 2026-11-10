@@ -42,7 +42,9 @@ Item {
     // 0 time label .. 1 "Show" capsule (hover over a collapsed stack), one spring both ways
     property real showMix: 0
     SpringCurve { id: showAnim; target: card; property: "showMix"; spring: NcLib.hoverSpring }
-    readonly property bool showWanted: hovered && stacked > 0 && !drag.active
+    readonly property bool showWanted: hovered && stacked > 0 && !drag.active && buttonHost !== null
+    // window that carries the buttons' regular glass (Notification Center); null: no "Show" capsule
+    property var buttonHost: null
     onShowWantedChanged: showAnim.go(showWanted ? 1 : 0)
 
     signal clicked()
@@ -80,10 +82,13 @@ Item {
                     height: Theme.notif.radius * 2
                     y: parent.height - height
                     radius: Theme.notif.radius
-                    color: Theme.dark ? Qt.rgba(0.20, 0.20, 0.21, 0.78 - 0.18 * parent.index)
-                                      : Qt.rgba(0.97, 0.97, 0.98, 0.62 - 0.16 * parent.index)
-                    border.width: 1
-                    border.color: Theme.glass.hairline
+                    color: Theme.notif.plateFill[parent.index]
+                }
+                Rectangle {
+                    x: Theme.notif.plateInset[parent.index] + Theme.notif.radius / 2
+                    width: card.width - x * 2
+                    height: 1
+                    color: Theme.notif.plateLine
                 }
             }
         }
@@ -188,16 +193,22 @@ Item {
         HoverHandler { id: hoverH }
 
         // "Show" on a collapsed stack (hover): bottom-right, crossfading with the time label (PC #62 3f)
-        Rectangle {
+        // regular glass on the Notification Center's button layer (buttonHost); none on banners
+        Item {
             x: card.width - width - Theme.notif.showInset.x
             y: card.height - height - Theme.notif.showInset.y
             width: Theme.notif.showSize.width
             height: Theme.notif.showSize.height
-            radius: height / 2
-            color: Theme.nc.pillLift
-            opacity: card.showMix
-            visible: opacity > 0.01
+            visible: card.buttonHost !== null && card.showMix > 0.01
+            Glass {
+                anchors.fill: parent
+                host: card.buttonHost
+                radius: height / 2
+                shadow: false
+                materialize: card.showMix
+            }
             Text {
+                opacity: card.showMix
                 anchors.centerIn: parent
                 text: "Show"
                 font: Typography.font(12, Typography.medium)

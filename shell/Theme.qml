@@ -307,6 +307,12 @@ Singleton {
         readonly property int maxBodyLines: 4
         readonly property int stackPeek: 8               // each plate of a collapsed stack shows 8 pt
         readonly property var plateInset: [17, 24]       // plate 1 and plate 2, per side
+        // plates are QML strips (over black they are darker than the glass): fill k at alpha a over the dimmed
+        // backdrop, fitted to plate 1 dark 129 / 88 / 15 and light 204 / 155 / 102 over white / grey / black (plate 2
+        // dark 130 / 86 / 14, light 199 / 148 / 94), each with a bright 1 px top line (22 dark / 112 light over black)
+        readonly property var plateFill: theme.dark ? [Qt.rgba(55 / 255, 55 / 255, 55 / 255, 0.37), Qt.rgba(52 / 255, 52 / 255, 52 / 255, 0.36)]
+                                                    : [Qt.rgba(223 / 255, 223 / 255, 223 / 255, 0.46), Qt.rgba(214 / 255, 214 / 255, 214 / 255, 0.443)]
+        readonly property color plateLine: theme.dark ? Qt.rgba(1, 1, 1, 0.03) : Qt.rgba(1, 1, 1, 0.065)
         // hover: x circle 20 pt at (-6, -4) from the card's top-left; "Show" capsule 64 x 22, 9.5 / 9 from the
         // bottom-right corner, crossfading with the time label
         readonly property int closeSize: 20
@@ -342,16 +348,16 @@ Singleton {
         readonly property color calendarBottom: Qt.rgba(13 / 255, 13 / 255, 13 / 255, 1)
         readonly property color widgetLabel: "#FFFFFF"
         readonly property color widgetSecondary: Qt.rgba(1, 1, 1, 0.55)
-        readonly property color pillLift: theme.dark ? Qt.rgba(1, 1, 1, 0.16) : Qt.rgba(0.45, 0.45, 0.47, 0.22)
+        // buttons are _Glass.regular on hyprk-overlay (the plugin's regular face) with no lift; pressed: .quaternary
+        readonly property color pillPress: theme.dark ? Qt.rgba(1, 1, 1, 0.1) : Qt.rgba(0, 0, 0, 0.1)
         readonly property color clockBg: "#1C1C1E"
         readonly property color clockFace: "#F5F5F5"
         readonly property color clockHand: "#1C1C1E"
         readonly property color clockSecond: "#FF9500"
-        // Column backdrop (PC #62 1d): the backdrop inside the column reads x 0.71 between the cards, x 0.78 behind a
-        // header, x 0.82 8 pt right of the cards, and fades back to 1 about 80 pt outside; the same in light and
-        // dark. One feathered shadow on a layer below the cards (the cards' glass samples it), edge 16 pt outside the
+        // Column backdrop (PC #62 1d, plugin hand-off): the backdrop inside the column reads x 0.71 (dark) / x 0.74
+        // (light) between the cards, x 0.82 8 pt right of the cards, and fades back to 1 about 80 pt outside. One feathered shadow on a layer below the cards (the cards' glass samples it), edge 16 pt outside the
         // cards (the 376 pt column frame), riding with the panel. Blur sigma about 3 pt inside: not done here.
-        readonly property color backdropDim: Qt.rgba(0, 0, 0, 0.29)
+        readonly property color backdropDim: Qt.rgba(0, 0, 0, theme.dark ? 0.29 : 0.26)
         readonly property int backdropOutset: 16
         readonly property real backdropBlur: 50
     }

@@ -40,14 +40,36 @@ ShellWindow {
         onThisScreen: Panels.activeScreen === ncw.modelData
         originX: ncw.width - width - Theme.nc.marginRight
         originY: y + Theme.menuBar.height
+        buttonHost: buttons
         MouseArea { anchors.fill: parent; z: -1 }   // swallow clicks so they don't close
     }
 
-    // The column backdrop (Theme.nc.backdropDim) on the layer below, so the cards' glass samples it as on the Mac: one
-    // feathered shadow under the column, riding with the slide. Same namespace (no layer animation), no glass, no input.
-    PanelWindow {
+    // The buttons' glass ("Show less", a stack's x, "Show", "Edit Widgets" and its x: _Glass.regular, PC #62 Static RE)
+    // on hyprk-overlay, which the plugin gives the regular (menu) face; on the cards' layer they would get the
+    // notificationCenter recipe (about 121 over white instead of 179). Same geometry as this window so the shapes
+    // land in place; below the cards' layer so the text drawn here stays on top. Glass only: no content, no input.
+    ShellWindow {
+        id: buttons
         screen: ncw.modelData
         visible: ncw.visible
+        anchors { top: true; left: true; right: true; bottom: true }
+        margins.top: Theme.menuBar.height
+        exclusionMode: ExclusionMode.Ignore
+        namespace: "hyprk-overlay"   // regular glass; no-anim like the other shell layers
+        WlrLayershell.layer: WlrLayer.Top
+        acceptsInput: false
+        glassOpacity: ncw.glassOpacity
+    }
+
+    // The column backdrop (Theme.nc.backdropDim, plugin hand-off): a Top-layer surface below the cards and the buttons, so
+    // their glass samples it as on the Mac: one feathered shadow under the column, riding with the slide (no fade of
+    // its own). Its visibility follows the buttons' window, which makes Hyprland list it below that one (checked with
+    // hyprctl layers; bound to ncw.visible directly it landed on top and darkened the buttons). Same namespace as the
+    // cards (no layer animation), no glass, no input. The column blur (sigma about 3 pt) is not done.
+    PanelWindow {
+        id: dim
+        screen: ncw.modelData
+        visible: buttons.visible
         anchors { top: true; right: true }
         margins.top: Theme.menuBar.height
         implicitWidth: Theme.nc.width + Theme.nc.marginRight + Theme.nc.backdropOutset + Theme.nc.backdropBlur * 2
@@ -59,11 +81,13 @@ ShellWindow {
         mask: Region {}
         RectangularShadow {
             // the 376 pt column frame: 16 pt either side of the cards (its right edge on the screen edge), from the
-            // menu bar to 16 pt below the last item
+            // menu bar to 16 pt below the last widget
             x: parent.width - Theme.nc.width - Theme.nc.marginRight - Theme.nc.backdropOutset
             y: 0
             width: Theme.nc.width + Theme.nc.marginRight + Theme.nc.backdropOutset + Theme.nc.backdropBlur
-            height: nc.y + nc.height + Theme.nc.backdropOutset
+            // to 16 pt below the last widget: it fades out over about 55 pt there (Mac about 85) and 20 pt below
+            // "Edit Widgets" the Mac's backdrop is back to 1
+            height: nc.y + nc.height - Theme.nc.editGap - Theme.nc.pillHeight + Theme.nc.backdropOutset
             blur: Theme.nc.backdropBlur
             color: Theme.nc.backdropDim
             transform: Translate { x: nc.slideX }

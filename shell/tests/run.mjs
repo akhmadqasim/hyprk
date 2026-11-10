@@ -844,6 +844,15 @@ test("mode buttons start inside the field, end in place", () => {
         assert.equal((num(c, "width") - num(c, "spacing")) / 2, 164, "widgets 164 square");
         assert.equal(num(c, "width") + 2 * num(c, "marginRight"), NC.panelTravel, "column frame 376 = slide travel");
     });
+    test("nc: cards on hyprk-notificationcenter, button glass on hyprk-overlay above the dim", () => {
+        const w = readFileSync(join(shell, "modules", "NotificationCenterWindow.qml"), "utf8");
+        assert.match(w, /namespace: "hyprk-notificationcenter"/);
+        assert.match(w, /namespace: "hyprk-overlay"/);
+        assert.ok(w.indexOf("id: buttons") < w.indexOf("id: dim") && /visible: buttons\.visible/.test(w), "dim maps after (below) the buttons");
+        const n = readFileSync(join(shell, "modules", "NotificationCenter.qml"), "utf8");
+        assert.match(n, /host: nc\.buttonHost/);
+        assert.ok(!/pillLift/.test(n), "no lift over the plugin's regular glass");
+    });
 }
 
 console.log(`${pass} passed, ${fail} failed`);

@@ -65,8 +65,10 @@ Item {
         target: root.registeredWith
         function onGlassMoved() { root.remeasure(); }
     }
-    // QsWindow.window is only set once the item is in a window, so follow it
-    readonly property var hostWindow: QsWindow.window
+    // QsWindow.window is only set once the item is in a window, so follow it. `host`: register with another ShellWindow
+    // of the same geometry instead (a different glass material for this shape, e.g. Notification Center buttons)
+    property var host: null
+    readonly property var hostWindow: host || QsWindow.window
     property var registeredWith: null
     function register(w) {
         if (registeredWith && registeredWith.unregisterGlass) registeredWith.unregisterGlass(shape);

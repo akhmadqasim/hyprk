@@ -45,7 +45,14 @@ Item {
     }
 
     // plugin glass shapes follow moving items only while the window re-measures
-    function settle() { const w = QsWindow.window; if (w && w.settleGlass) w.settleGlass(); }
+    function settle() {
+        const w = QsWindow.window;
+        if (w && w.settleGlass) w.settleGlass();
+        if (buttonHost) buttonHost.settleGlass();
+    }
+    // the buttons' glass is _Glass.regular, not the cards' notificationCenter recipe: their shapes go to this window
+    // (hyprk-overlay, same geometry; NotificationCenterWindow.qml), their text and input stay here
+    property var buttonHost: null
     // changes whenever anything in the list may have moved (scroll, a stack folding, open/close)
     // layouts settle after the change that moved them, so look again a frame later too
     property int settledTick: 0
@@ -341,6 +348,7 @@ Item {
                                 contentOpacity: Math.min(1, reveal)
                                 stacked: front && grp.ex < 0.05 ? Math.min(grp.n - 1, 2) : 0
                                 swipeable: front || grp.open
+                                buttonHost: nc.buttonHost
                                 sx: nc.originX + nc.slideX + x
                                 sy: nc.originY + grp.y + y - flick.contentY
                                 Component.onCompleted: grp.measure()
@@ -565,9 +573,9 @@ Item {
             anchors.fill: parent
             // the list clips its content, the compositor glass does not: no glass while scrolled out
             visible: pill.glass && nc.fits(pill, nc.layoutTick)
+            host: nc.buttonHost
             radius: height / 2
-            tint: Theme.nc.pillLift
-            pluginLift: pma.pressed ? Qt.darker(Theme.nc.pillLift, 1.4) : pma.containsMouse ? Qt.lighter(Theme.nc.pillLift, 1.25) : Theme.nc.pillLift
+            pluginLift: pma.pressed ? Theme.nc.pillPress : "transparent"
             shadow: false
             // fallback material samples the wallpaper at its screen position
             readonly property point pos: nc.layoutTick > -1e9 ? pill.mapToItem(null, 0, 0) : Qt.point(0, 0)
