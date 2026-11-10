@@ -73,7 +73,9 @@ QtObject {
         readonly property int height: 630             // ref (1260 px at 2x)
         readonly property int minWidth: 680          // TODO verify
         readonly property int minHeight: 420         // TODO verify
-        readonly property int radius: 26             // macOS 26 toolbar window corner, TODO verify
+        // 27.2.1: same corner as Finder (identical alpha profile in settings-toolbar-light.png and
+        // finder-toolbar-light.png), 16 pt (MAC-ANSWERS.md Q-windows-02, Tokens.frame)
+        readonly property int radius: Tokens.frame.radius
         readonly property int toolbarHeight: 52      // ref: lights/nav centered at 26
     }
 

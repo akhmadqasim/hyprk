@@ -8,7 +8,7 @@ import "Panes.js" as Panes
 Item {
     id: app
     readonly property int accountHeight: Theme.sidebar.accountAvatar + 18
-    property bool windowActive: true     // hosts bind this; forced on for snapshots
+    property bool windowActive: Window.active   // forced on for snapshots
     onSnapshotPathChanged: if (snapshotPath !== "") windowActive = true
     property string currentId: "appearance"
     // Non-empty: render once, save a PNG here and quit (reference comparisons).
@@ -238,5 +238,14 @@ Item {
             source: "panes/" + app.current.file + ".qml"
             onSourceChanged: flick.contentY = 0
         }
+    }
+
+    // inner white rim over everything; the compositor draws the outer black one (Tokens.frame)
+    Rectangle {
+        anchors.fill: parent
+        radius: Theme.window.radius
+        color: "transparent"
+        border.width: Tokens.frame.rimWidth
+        border.color: Tokens.frame.rim(app.windowActive)
     }
 }
