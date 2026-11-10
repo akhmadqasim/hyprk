@@ -132,8 +132,31 @@ crop-and-diff scripts. Raw videos were deleted after measuring (they showed pers
   small to resolve. Safari: gone in one frame (instant).
 - So the PC's "fade+blur 0.1 s" is right for most document windows; Safari is instant.
 
+### Mission Control, Cmd-Tab, Apps, minimise, zoom, full screen (progress = share of the total pixel change, 17 ms steps)
+- Mission Control enter (`open -a "Mission Control"`; a synthetic Ctrl-Up did not trigger it): about 0.38 s,
+  ease-out: 0.05, 0.15, 0.25, 0.37, 0.46, 0.54, 0.60, 0.67, 0.73, 0.78, 0.82, 0.84, 0.86, 0.88, 0.91, 0.93, 0.94,
+  0.95, 0.96, 0.98, 1.0. Windows move and scale to a non-overlapping layout, desktop widgets fade out, the menu bar
+  and Dock go away, the Spaces bar appears at the top (current Desktop as a small labelled pill, "+" at the right).
+  The wallpaper is not visibly dimmed or blurred. Exit: about 0.33 s, same ease-out (0.21, 0.34, 0.47, 0.57, 0.65,
+  0.72, 0.77, 0.82, 0.86, 0.89, 0.91, 0.93, 0.94, 0.96, 0.97, 0.98, 0.99).
+- Cmd-Tab: the switcher appears complete in one frame (no fade or scale); on releasing Cmd it disappears in about
+  0.1 s (6 frames).
+- Apps (Dock "Apps" / `open -a Apps`): on 27.2.1 it is an ordinary window titled "Applications" with a category bar
+  and an icon grid, not a full-screen Launchpad. It appears in one frame and fills its icons over about 0.5 s; Escape
+  closes it in one frame. Layout details still to be measured (Q-dock-23..26).
+- Minimise (Cmd-M, `minimize-to-application = 1`, small TextEdit window): about 0.22 s into the app's Dock icon,
+  genie shape (progress not monotonic). Restore by clicking the Dock icon: about 0.22 s, slow start then fast:
+  0.06, 0.09, 0.17, 0.28, 0.37, 0.45, 0.55, 0.72, 0.85, 0.95, 0.99.
+- Zoom (Window > Zoom): 0.33 s, symmetric ease-in-out: 0.01, 0.01, 0.03, 0.05, 0.07, 0.10, 0.14, 0.20, 0.26, 0.33,
+  0.41, 0.49, 0.58, 0.69, 0.79, 0.87, 0.93, 0.98, 1.0. Unzoom 0.33 s, ease-out from the start: 0.01, 0.05, 0.11,
+  0.18, 0.28, 0.38, 0.48, 0.56, 0.65, 0.71, 0.77, 0.83, 0.88, 0.92, 0.94, 0.96, 0.98, 0.99, 1.0.
+- Full screen enter (Ctrl-Cmd-F): about 0.42 s. The window grows to the screen while the desktop slides out to the
+  left and a black Space slides in from the right: 0.01, 0.03, 0.07, 0.14, 0.24, 0.33, 0.45, 0.59, 0.67, 0.72, 0.77,
+  0.81, 0.84, 0.87, 0.89, 0.91, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99. Exit: about 0.5 s in two steps (first
+  0.15 s to 0.47, a 0.15 s hold, then the rest over 0.3 s).
+
 ### Not measured yet
-Mission Control, Cmd-Tab, Apps, app launch window, minimise/zoom/full screen, control press states.
+App launch window from a Dock click, control press states (switch, checkbox, segmented, slider).
 
 ## R3b SF Symbols and Settings pane icons
 
