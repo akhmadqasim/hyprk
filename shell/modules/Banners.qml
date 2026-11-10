@@ -52,7 +52,8 @@ ShellWindow {
             by[d.appName].n++;
         }
         const want = order.slice(0, maxStacks);
-        for (let i = 0; i < stacks.count; i++) {
+        // backwards: a swiped row removes itself right away
+        for (let i = stacks.count - 1; i >= 0; i--) {
             const e = stacks.get(i);
             if (!e.leaving && want.indexOf(e.app) === -1) stacks.setProperty(i, "leaving", true);
         }
@@ -67,6 +68,11 @@ ShellWindow {
             const fresh = stacks.get(i).nid !== d.nid;
             stacks.set(i, row);
             if (fresh && i !== 0) stacks.move(i, 0, 1);
+        }
+        // newest first, also when an older app comes back into the top three
+        for (let k = 1; k < want.length; k++) {
+            const prev = find(want[k - 1]), i = find(want[k]);
+            if (i < prev) stacks.move(i, prev, 1);
         }
     }
 
@@ -159,7 +165,7 @@ ShellWindow {
             Timer {
                 interval: row.timeout > 0 ? row.timeout : Theme.notif.timeout
                 // critical and "Alerts" style stay until dismissed, like macOS alerts
-                running: row.armed && !card.hovered && !row.sticky && !row.leaving && card.swipeX === 0 && Panels.open !== "nc"
+                running: row.armed && !card.hovered && !row.sticky && !row.leaving && card.swipeX === 0
                 onTriggered: Notifs.hideBanners(row.app)
             }
         }

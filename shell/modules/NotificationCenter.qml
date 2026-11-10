@@ -66,6 +66,7 @@ Item {
     // ---------- open / close ----------
     readonly property bool shown: Panels.open === "nc"
     readonly property bool animating: openSpring.moving
+    readonly property real slideX: (1 - openSpring.value) * (nc.width + Theme.nc.marginRight + 30)
     NcSpring {
         id: openSpring
         onStarted: nc.settle()
@@ -114,7 +115,7 @@ Item {
         id: stage
         width: nc.width
         height: nc.height
-        transform: Translate { x: (1 - openSpring.value) * (nc.width + Theme.nc.marginRight + 30) }
+        transform: Translate { x: nc.slideX }
 
         Flickable {
             id: flick
@@ -143,7 +144,18 @@ Item {
                     delegate: Item {
                         id: grp
                         required property string app
-                        readonly property var items: nc.itemsByApp[app] || []
+                        // reassigned only when this app's notifications change, so the other
+                        // stacks keep their cards (a drag or hover is not cut off by a new arrival)
+                        property var items: []
+                        function syncItems() {
+                            const next = nc.itemsByApp[app] || [];
+                            if (next.map(x => x.nid).join() !== items.map(x => x.nid).join()) items = next;
+                        }
+                        Component.onCompleted: syncItems()
+                        Connections {
+                            target: nc
+                            function onItemsByAppChanged() { grp.syncItems(); }
+                        }
                         readonly property int n: items.length
                         readonly property bool open: n > 1 && nc.expanded[app] === true
                         property bool closing: false
@@ -170,10 +182,10 @@ Item {
                             onStarted: nc.settle()
                         }
                         readonly property real ex: fold.value
+                        // shrinks the stack while it is cleared (idle otherwise)
                         NcSpring {
                             id: size
                             epsilon: 0.3
-                            target: grp.closing ? 0 : grp.closedHeight + (grp.openHeight - grp.closedHeight) * (grp.open ? 1 : 0)
                             onStarted: nc.settle()
                         }
                         // follow the fold exactly while it runs, so content below moves with the cards
@@ -191,12 +203,16 @@ Item {
                         // clear the whole stack: shrink and fade, then remove for real
                         function clearAll() {
                             if (closing) return;
+                            startHeight = Math.max(1, liveHeight);   // also mid-fold: no jump
+                            size.target = startHeight;
                             size.snap();
-                            startHeight = Math.max(1, liveHeight);
                             closing = true;
+                            size.target = 0;
+                            clearing = items.map(x => x.nid);       // only what is on screen now
                             clearLater.start();
                         }
-                        Timer { id: clearLater; interval: 380; onTriggered: Notifs.clearApp(grp.app) }
+                        property var clearing: []
+                        Timer { id: clearLater; interval: 380; onTriggered: grp.clearing.forEach(id => Notifs.dismiss(id)) }
                         Connections {
                             target: nc
                             function onClearStack(app) { if (app === grp.app) grp.clearAll(); }
@@ -251,7 +267,7 @@ Item {
                                 contentOpacity: Math.min(1, reveal)
                                 stacked: front && grp.ex < 0.05 && !grp.closing ? Math.min(grp.n - 1, 2) : 0
                                 swipeable: front || grp.open
-                                sx: nc.originX + x
+                                sx: nc.originX + nc.slideX + x
                                 sy: nc.originY + grp.y + y - flick.contentY
                                 Component.onCompleted: grp.measure()
                                 onImplicitHeightChanged: grp.measure()

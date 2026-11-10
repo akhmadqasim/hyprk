@@ -60,6 +60,8 @@ Singleton {
         if (Prefs.notifications.previews === "never") d.body = "";   // Settings > Show previews: Never
         history.insert(0, d);
         if (dnd) return;                       // Focus: no banner, no sound
+        // Notification Center open: the notification shows there, no banner to pop up later
+        if (Panels.open === "nc") { if (!d.silent) Sounds.play(d.critical ? "alert" : "notification"); return; }
         if (d.style !== "none")
             // Banners.qml groups these by app and shows up to three stacks
             banners = [d].concat(banners.filter(b => b.nid !== d.nid)).slice(0, 12);
@@ -112,11 +114,17 @@ Singleton {
         else n.dismiss();
     }
 
+    // opening Notification Center takes the banners in, like macOS: they don't come back on close
+    Connections {
+        target: Panels
+        function onOpenChanged() { if (Panels.open === "nc") root.banners = []; }
+    }
+
     // grouped view for the Notification Center: [{appName, items:[...]}]
     function groups() {
         const order = [], map = {};
         for (let i = 0; i < history.count; i++) {
-            const h = history.get(i);
+            const h = Object.assign({}, history.get(i));   // plain copy, not a live row proxy
             if (!map[h.appName]) { map[h.appName] = []; order.push(h.appName); }
             map[h.appName].push(h);
         }
@@ -125,12 +133,6 @@ Singleton {
 
     // `qs ipc call notifs test "Title" "Body"`: local banner without D-Bus
     // (useful when another notification daemon owns the bus, e.g. nested sessions)
-    // opening Notification Center takes the banners in, like macOS: they don't come back on close
-    Connections {
-        target: Panels
-        function onOpenChanged() { if (Panels.open === "nc") root.banners = []; }
-    }
-
     property int testId: 1000000
     signal stackRequest(string app, string action)
     IpcHandler {
