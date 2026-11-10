@@ -169,10 +169,34 @@ Item {
     }
 
     // ---------- building blocks ----------
+    // Each module is its own glass: while materializing it shrinks from its hidden scale around its
+    // own centre (neighbours fuse for a moment through the plugin's smooth union, then separate).
+    // Interactive glass: pressing lifts it by a couple of points on a bouncy spring, a drag past a
+    // slider end stretches it (squish); the plugin lights the glass around the pointer.
+    // Reduce motion: none of it.
     component Module: Item {
         id: m
         property real radius: Theme.cc.tileRadius
+        property bool pressed: false
+        property real stretch: 0                 // -1..1 along x while dragging (sliders)
+        NcSpring {
+            id: press
+            target: m.pressed && !A11y.reduceMotion ? 1 : 0
+            response: Theme.anim.pressResponse
+            damping: Theme.anim.pressDamping(m.width, m.height)
+            onValueChanged: if (moving) glass.settle()   // also after a retarget mid-flight
+        }
+        transform: Scale {
+            origin.x: m.width / 2
+            origin.y: m.height / 2
+            readonly property real hidden: 1 - glass.materialize
+            readonly property real lift: (Theme.anim.pressScale(m.width, m.height) - 1) * press.value
+            readonly property real squish: Theme.anim.pressSquish * Math.abs(m.stretch) * press.value
+            xScale: (1 + hidden * (Theme.anim.hiddenScale(m.width) - 1)) * (1 + lift + squish)
+            yScale: (1 + hidden * (Theme.anim.hiddenScale(m.height) - 1)) * (1 + lift - squish / 2)
+        }
         Glass {
+            id: glass
             anchors.fill: parent
             radius: m.radius
             sx: cc.originX + m.x
@@ -242,6 +266,7 @@ Item {
         MouseArea {
             anchors.fill: parent
             enabled: cap.available
+            onPressedChanged: cap.pressed = pressed
             onClicked: cap.toggled()
         }
     }
@@ -267,7 +292,7 @@ Item {
             size: Theme.cc.buttonGlyph
             color: rb.on ? Theme.cc.toggleOnIcon : Theme.cc.toggleOffIcon
         }
-        MouseArea { anchors.fill: parent; enabled: rb.enabled; onClicked: rb.activated() }
+        MouseArea { anchors.fill: parent; enabled: rb.enabled; onPressedChanged: rb.pressed = pressed; onClicked: rb.activated() }
     }
 
     component MediaButton: Item {
@@ -344,7 +369,13 @@ Item {
                 anchors.topMargin: -10
                 anchors.bottomMargin: -10
                 enabled: sm.available
-                function update(mx) { sm.moved(Math.max(0, Math.min(1, mx / track.width))); }
+                // dragging past an end stretches the module like a rubber band
+                function update(mx) {
+                    const v = mx / track.width, c = Math.max(0, Math.min(1, v));
+                    sm.stretch = Math.max(-1, Math.min(1, (v - c) * 2));
+                    sm.moved(c);
+                }
+                onPressedChanged: { sm.pressed = pressed; if (!pressed) sm.stretch = 0; }
                 onPressed: m => update(m.x)
                 onPositionChanged: m => { if (pressed) update(m.x); }
             }

@@ -28,6 +28,9 @@ Item {
     property bool shadow: true
     property int stacked: 0             // >0: edges of stacked cards below (collapsed group), max 2 drawn
     property bool glass: true           // false while the card sits behind another (its region would merge)
+    // glass starts this far down (local px): a card unfolding from under another keeps its glass
+    // 1 px below that card, so the plugin blends the two (smooth union) instead of merging the boxes
+    property real glassTop: 0
     property real contentOpacity: 1
     property bool swipeable: true
     readonly property bool hovered: hoverH.hovered || closeMa.containsMouse
@@ -77,11 +80,13 @@ Item {
         }
 
         Glass {
-            anchors.fill: parent
-            visible: card.glass
-            radius: Theme.notif.radius
+            y: card.glassTop
+            width: parent.width
+            height: parent.height - card.glassTop
+            visible: card.glass && height >= 4
+            radius: Math.min(Theme.notif.radius, height / 2)
             sx: card.sx + slide.x
-            sy: card.sy
+            sy: card.sy + card.glassTop
             shadow: card.shadow
         }
 

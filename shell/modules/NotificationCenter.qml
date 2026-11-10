@@ -66,6 +66,7 @@ Item {
     // ---------- open / close ----------
     readonly property bool shown: Panels.open === "nc"
     readonly property bool animating: openSpring.moving
+    readonly property real progress: openSpring.value   // 0 off-screen .. 1 open (Overlay: glass materialize)
     readonly property real slideX: (1 - openSpring.value) * (nc.width + Theme.nc.marginRight + 30)
     NcSpring {
         id: openSpring
@@ -73,8 +74,6 @@ Item {
         onValueChanged: if (moving) nc.settle()
     }
     onShownChanged: {
-        // the Overlay hid us half-way through the last close: start from off-screen again
-        if (shown && nc.opacity < 0.05) { openSpring.target = 0; openSpring.snap(); }
         openSpring.response = shown ? 0.5 : 0.4;
         openSpring.target = shown ? 1 : 0;
         if (shown) refresh();
@@ -171,6 +170,7 @@ Item {
                             for (let k = 0; k < i; k++) y += h(k) + nc.cardGap;
                             return y;
                         }
+                        function cardY(i) { return closedY(i) + (openY(i) - closedY(i)) * ex; }
                         // behind the first card, bottom edges where its peek strips are drawn
                         function closedY(i) { return i === 0 ? 0 : h(0) - h(i) + Math.min(i, 2) * Theme.notif.stackPeek; }
                         readonly property real closedHeight: h(0) + Math.min(n - 1, 2) * Theme.notif.stackPeek
@@ -234,8 +234,10 @@ Item {
                                 font.weight: Theme.font.semibold
                                 color: Theme.color.label
                             }
-                            Pill { text: "Show Less"; onActivated: nc.setExpanded(grp.app, false) }
-                            Pill { symbol: "xmark"; onActivated: grp.clearAll() }
+                            // no glass until the front card has slid below the header (overlapping
+                            // regions would merge into one box)
+                            Pill { text: "Show Less"; glass: grp.cardY(0) >= nc.headerHeight; onActivated: nc.setExpanded(grp.app, false) }
+                            Pill { symbol: "xmark"; glass: grp.cardY(0) >= nc.headerHeight; onActivated: grp.clearAll() }
                         }
 
                         Repeater {
@@ -249,10 +251,12 @@ Item {
                                 // past the third card nothing peeks: those stay hidden until unfolded
                                 readonly property real reveal: front ? 1 : index > 2 ? Math.max(0, (grp.ex - 0.5) / 0.5) : Math.max(0, (grp.ex - 0.15) / 0.6)
                                 width: nc.width
-                                y: grp.closedY(index) + (grp.openY(index) - grp.closedY(index)) * grp.ex
+                                y: grp.cardY(index)
                                 z: -index
                                 scale: front ? 1 : 1 - Math.min(index, 2) * 0.045 * (1 - grp.ex)
                                 transformOrigin: Item.Bottom
+                                // keep the glass 1 px below the card above while unfolding (scale is about the bottom)
+                                glassTop: front ? 0 : Math.max(0, (grp.cardY(index - 1) + grp.h(index - 1) + 1 - y - height * (1 - scale)) / Math.max(scale, 0.01))
                                 visible: front || grp.ex > 0.01
                                 nid: modelData.nid
                                 appName: modelData.appName
@@ -484,13 +488,14 @@ Item {
         id: pill
         property string text
         property string symbol
+        property bool glass: true
         signal activated()
         implicitWidth: symbol ? implicitHeight : pt.implicitWidth + 20
         implicitHeight: 24
         Glass {
             anchors.fill: parent
             // the list clips its content, the compositor glass does not: no glass while scrolled out
-            visible: nc.fits(pill, nc.layoutTick)
+            visible: pill.glass && nc.fits(pill, nc.layoutTick)
             radius: height / 2
             tint: Theme.nc.pillLift
             pluginLift: pma.pressed ? Qt.darker(Theme.nc.pillLift, 1.4) : pma.containsMouse ? Qt.lighter(Theme.nc.pillLift, 1.25) : Theme.nc.pillLift

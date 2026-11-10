@@ -411,5 +411,21 @@ Singleton {
         readonly property int bounce: 340                // one dock bounce up+down, TODO verify
         readonly property int magnify: 150               // dock magnification ramp on enter/leave (by eye; the cursor follow is not animated)
         readonly property int easing: Easing.OutCubic
+
+        // Liquid Glass motion, from SwiftUICore 27.2 (liquid-glass-re notes/round3, for components/NcSpring)
+        // materialize: GlassContainer TransitionSettings.default = Spring(duration 0.5, bounce 0.3)
+        readonly property real materializeResponse: 0.5
+        readonly property real materializeDamping: 0.7
+        readonly property real crossfade: 0.15           // Reduce motion: FadeIn/FadeOut 0.15 s (SPEC 9.9.5)
+        // hidden glass is scaled up per axis around its own centre: min((dim + 16) / dim, 1.2)
+        // (AppearanceSettings.materialize: scale 1.2, maxPointScale 16; GlassAppearanceScaleEffect)
+        function hiddenScale(dim) { return Math.min((dim + 16) / Math.max(dim, 1), 1.2); }
+        // interactive press (FlexInteraction cursor presets, small 80 pt / large 160 pt, lerped by the
+        // smaller side): lift 2.25 / 2 pt -> scale (min + lift) / min, spring 0.25 s, damping 0.375 / 0.6
+        function pressT(w, h) { return Math.max(0, Math.min(1, (Math.min(w, h) - 80) / 80)); }
+        function pressScale(w, h) { const m = Math.max(Math.min(w, h), 1); return (m + 2.25 - 0.25 * pressT(w, h)) / m; }
+        function pressDamping(w, h) { return 0.375 + 0.225 * pressT(w, h); }
+        readonly property real pressResponse: 0.25
+        readonly property real pressSquish: 0.06         // drag past a slider end stretches x, squeezes y (by eye)
     }
 }

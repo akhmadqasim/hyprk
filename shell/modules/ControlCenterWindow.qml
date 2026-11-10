@@ -17,7 +17,7 @@ ShellWindow {
     // modelData, not screen: mapping the window re-emits screenChanged, which made
     // this binding loop on every open
     readonly property bool shown: Panels.open === "cc" && Panels.activeScreen === modelData
-    visible: shown || cc.opacity > 0
+    visible: shown || appear.moving    // the spring overshoots below 0 on close: not its value
 
     anchors { top: true; left: true; right: true; bottom: true }
     margins.top: Theme.menuBar.height
@@ -26,9 +26,13 @@ ShellWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
+    // Liquid Glass: each module's glass materializes (lensing, blur and rim ramp in, shrinking from
+    // its hidden scale, ControlCenter.qml Module) on the SwiftUI transition spring while the content
+    // fades in; Reduce motion: a short crossfade of glass and content, no scale
+    glassMaterialize: A11y.reduceMotion ? 1 : appear.value
+    glassOpacity: A11y.reduceMotion ? cc.opacity : 1
     // while fading out the layer takes no input, so it never eats the click
     // that opened the next panel
-    glassOpacity: cc.opacity
     mask: shown ? null : noInput
     Region { id: noInput }
     MouseArea { anchors.fill: parent; enabled: ccw.shown; onPressed: Panels.close() }
@@ -41,26 +45,15 @@ ShellWindow {
         y: Theme.cc.marginTop
         originX: ccw.width - width - Theme.cc.marginRight
         originY: y + Theme.menuBar.height
-        opacity: 0
-        scale: 0.96
-        transformOrigin: Item.TopRight
+        opacity: Math.max(0, Math.min(1, appear.value))
         MouseArea { anchors.fill: parent; z: -1 }   // swallow clicks so they don't close
     }
 
-    // open on the SwiftUI spring, close fast; each starts from wherever the other left off
-    onShownChanged: {
-        openAnim.stop();
-        closeAnim.stop();
-        (shown ? openAnim : closeAnim).start();
-    }
-    ParallelAnimation {
-        id: openAnim
-        NumberAnimation { target: cc; property: "opacity"; to: 1; duration: Theme.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
-        NumberAnimation { target: cc; property: "scale"; to: 1; duration: Theme.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
-    }
-    ParallelAnimation {
-        id: closeAnim
-        NumberAnimation { target: cc; property: "opacity"; to: 0; duration: Theme.anim.close; easing.type: Theme.anim.easing }
-        NumberAnimation { target: cc; property: "scale"; to: 0.96; duration: Theme.anim.close; easing.type: Theme.anim.easing }
+    // retargets from wherever it is (Glass items re-measure themselves as materialize changes)
+    NcSpring {
+        id: appear
+        target: ccw.shown ? 1 : 0
+        response: A11y.reduceMotion ? Theme.anim.crossfade : Theme.anim.materializeResponse
+        damping: A11y.reduceMotion ? 1 : Theme.anim.materializeDamping
     }
 }

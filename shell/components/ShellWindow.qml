@@ -17,6 +17,11 @@ PanelWindow {
     // opacity, so it is sent as a 1x1 marker in the bottom row of the region, x = opacity x (width - 1),
     // committed with the same frame (plugin/src/Shape.hpp takeOpacityMarker). 1 sends no marker.
     property real glassOpacity: 1
+    // Liquid Glass materialize progress of this window's glass: 0 = the untouched backdrop,
+    // 1 = the full material. The plugin ramps lensing, blur, tint, rim and shadow with it instead
+    // of fading alpha (Glass.qml sends it per shape as a 1 px hole, plugin/src/Shape.hpp).
+    // Glass items follow it unless they set their own `materialize`.
+    property real glassMaterialize: 1
     // Windows created on open (shell.qml LazyLoader) never run a Behavior: with fadeIn, `appear`
     // goes 0 -> 1 on the SwiftUI spring from creation, for the window to drive opacity/scale from
     property bool fadeIn: false

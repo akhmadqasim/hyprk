@@ -19,10 +19,12 @@ ShellWindow {
     // modelData, not screen: mapping the window re-emits screenChanged (binding loop)
     readonly property bool active: ["menu", "context", "alert", "nc"].indexOf(Panels.open) !== -1
                                    && Panels.activeScreen === modelData
-    visible: active || nc.opacity > 0
-    // NC fades its compositor glass with it (menus and alerts do not animate)
-    // (not while a menu/alert already shows on this layer during the NC fade-out)
-    glassOpacity: nc.visible && (Panels.open === "nc" || !active) ? nc.opacity : 1
+    visible: active || nc.animating
+    // NotificationCenter slides itself in and out on its spring; its glass materializes along
+    // (menus and alerts do not animate; not while one already shows during the NC slide-out)
+    readonly property bool ncDrives: nc.animating && (Panels.open === "nc" || !active)
+    glassMaterialize: ncDrives && !A11y.reduceMotion ? Math.min(1, nc.progress) : 1
+    glassOpacity: ncDrives && A11y.reduceMotion ? Math.max(0, Math.min(1, nc.progress)) : 1   // Reduce motion: crossfade
 
     anchors { top: true; left: true; right: true; bottom: true }
     margins.top: Theme.menuBar.height
@@ -87,27 +89,7 @@ ShellWindow {
         maxHeight: ov.height - y - 20
         originX: ov.width - width - Theme.nc.marginRight
         originY: y + Theme.menuBar.height
-        opacity: 0
-        visible: opacity > 0
-        transform: Translate { id: ncSlide; x: 40 }
+        visible: shown || animating            // no glass regions off-screen while a menu shows
         MouseArea { anchors.fill: parent; z: -1 }
-
-        // open on the SwiftUI spring, close fast; each starts from wherever the other left off
-        readonly property bool shown: Panels.open === "nc"
-        onShownChanged: {
-            ncOpen.stop();
-            ncClose.stop();
-            (shown ? ncOpen : ncClose).start();
-        }
-        ParallelAnimation {
-            id: ncOpen
-            NumberAnimation { target: nc; property: "opacity"; to: 1; duration: Theme.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
-            NumberAnimation { target: ncSlide; property: "x"; to: 0; duration: Theme.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
-        }
-        ParallelAnimation {
-            id: ncClose
-            NumberAnimation { target: nc; property: "opacity"; to: 0; duration: Theme.anim.close; easing.type: Theme.anim.easing }
-            NumberAnimation { target: ncSlide; property: "x"; to: 40; duration: Theme.anim.close; easing.type: Theme.anim.easing }
-        }
     }
 }

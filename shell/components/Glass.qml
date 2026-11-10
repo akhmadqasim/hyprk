@@ -26,16 +26,40 @@ Item {
     property color pluginLift: Theme.dark ? Theme.glass.darkVeil : "transparent"
     // optional 1px rim drawn over plugin glass (the plugin's own rim is subtle)
     property color pluginRim: "transparent"
+    // Liquid Glass materialize progress (ShellWindow.glassMaterialize). The QML fallback fades.
+    property real materialize: registeredWith ? registeredWith.glassMaterialize : 1
 
     Region {
         id: shape
         item: root.visible && Theme.compositorGlass ? root : null
         radius: root.radius
+        // materialize < 1: a 1 px hole in the middle row, x = left + 1 + round(m (w - 3))
+        Region { id: hole; intersection: Intersection.Subtract; width: 0; height: 1 }
     }
     function remeasure() {
         shape.item = null;
         shape.item = Qt.binding(() => root.visible && Theme.compositorGlass ? root : null);
+        placeHole();
     }
+    // same rounding as Quickshell's Region (origin truncated, size rounded up)
+    function placeHole() {
+        const p = root.mapToItem(null, 0, 0), e = root.mapToItem(null, root.width, root.height);
+        const w = Math.ceil(e.x - p.x), h = Math.ceil(e.y - p.y);
+        if (materialize >= 1 || !shape.item || w < 4 || h < 2) {
+            hole.width = 0;
+            return;
+        }
+        hole.x = Math.floor(p.x) + 1 + Math.round(Math.max(0, materialize) * (w - 3));
+        hole.y = Math.floor(p.y) + Math.floor(h / 2);
+        hole.width = 1;
+    }
+    // a materializing glass also changes scale (ControlCenter Module): re-measure, not just the hole
+    onMaterializeChanged: if (Theme.compositorGlass) remeasure()
+    onVisibleChanged: placeHole()
+    onWidthChanged: placeHole()
+    onHeightChanged: placeHole()
+    // re-measure every frame for a while (call when this glass starts to move or scale)
+    function settle() { if (registeredWith) registeredWith.settleGlass(); }
     Connections {
         target: root.registeredWith
         function onGlassMoved() { root.remeasure(); }
@@ -64,6 +88,7 @@ Item {
     Item {
         anchors.fill: parent
         visible: !Theme.compositorGlass
+        opacity: Math.max(0, root.materialize)
 
         RectangularShadow {
             visible: root.shadow
