@@ -3,8 +3,7 @@
 // Exact SwiftUI / CoreAnimation springs as QML NumberAnimation curves (no per-frame script).
 // A spring is { response, ratio }: response = 2π/ω0 in seconds, ratio = damping ratio ζ (mass 1).
 // Apple's notations convert as (MAC-ANSWERS.md "Spring notation"):
-//   Spring(duration d, bounce b), CASpringAnimation(perceptualDuration d, bounce b): response d, ratio 1 - b (b >= 0)
-//     or 1 / (1 + b) (b < 0)
+//   Spring(duration d, bounce b): response d, ratio 1 - b (b >= 0), else 1 (SwiftUI clamps to critical, see fromBounce)
 //   spring(response r, dampingFraction f): response r, ratio f
 //   interpolatingSpring(mass m, stiffness k, damping c): response 2π sqrt(m / k), ratio c / (2 sqrt(k m))
 // The motion is normalised: from 0 at rest (or with initial velocity v0, in units of the distance per
@@ -14,14 +13,18 @@
 // carries the same share of the fourth derivative's fourth root (the cubic Hermite error term), and
 // segments are added until the worst error, sampled every 0.5 ms, is below `tol` of the distance.
 
+// SwiftUICore's SpringAnimation (Spring(duration:bounce:) and interpolatingSpring) clamps an overdamped ratio to the
+// critical curve x(t) = 1 - (1 + w t) e^(-w t); spring(response:dampingFraction:) (FluidSpringAnimation) does not
+// (MAC-ANSWERS.md "NC panel spring": the NC panel's Spring(0.3, bounce -0.2) records as critical, RMS 0.75 / 0.52 pt
+// against 11.9 / 4.6 pt for ratio 1.25). So a negative bounce gives ratio 1 here.
 function fromBounce(duration, bounce) {
-    return { response: duration, ratio: bounce >= 0 ? 1 - bounce : 1 / (1 + bounce) };
+    return { response: duration, ratio: bounce >= 0 ? 1 - bounce : 1 };
 }
 function fromResponse(response, dampingFraction) {
     return { response: response, ratio: dampingFraction };
 }
 function fromPhysics(mass, stiffness, damping) {
-    return { response: 2 * Math.PI * Math.sqrt(mass / stiffness), ratio: damping / (2 * Math.sqrt(stiffness * mass)) };
+    return { response: 2 * Math.PI * Math.sqrt(mass / stiffness), ratio: Math.min(1, damping / (2 * Math.sqrt(stiffness * mass))) };
 }
 
 // [x, x'] at time t (seconds) of the normalised spring

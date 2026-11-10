@@ -30,7 +30,8 @@ ShellWindow {
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
     // MAC-ANSWERS.md "REA 27.2.1" section 2 (ControlCenter FUN_1002dc74c / FUN_1002dce40): open and close
-    // both run withAnimation(Spring(duration: 0.25, bounce: -0.027)) = response 0.25 s, damping ratio 1.028, on
+    // both run withAnimation(Spring(duration: 0.25, bounce: -0.027)) = response 0.25 s, critically damped (SwiftUI clamps
+    // the ratio 1.028 to 1, lib/spring.js fromBounce), on
     // a transition progress that sets bentoBoxOpacity = progress and bentoBoxScale = 1.01 - 0.01 x progress
     // (hidden: opacity 0, scale 1.01). Here `fade` is that opacity, on one exact spring (components/SpringCurve.qml)
     // in both directions; the window goes when it settles (0.4 s). Glass and content take the same value in the

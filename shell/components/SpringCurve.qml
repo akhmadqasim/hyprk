@@ -8,7 +8,7 @@ import "../lib/spring.js" as SpringLib
 // (like SwiftUI retargeting a spring). cutAt > 0 stops the run at that time, where the spring really
 // is (the property does not jump to `to`); otherwise it runs until within 0.001 of the distance and
 // then lands on `to`. Reduce motion: the same curve over at most 0.15 s (Theme.ms).
-// Usage: SpringCurve { id: fade; target: w; property: "fade"; spring: SpringLib.fromBounce(0.25, -0.027) }
+// Usage: SpringCurve { id: fade; target: w; property: "fade"; spring: SpringLib.fromResponse(0.3, 1) }
 //        ...  fade.go(1)
 NumberAnimation {
     id: a

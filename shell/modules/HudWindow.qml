@@ -14,7 +14,8 @@ import "../lib/hud.js" as HudLib
 // SF Symbol and a bar of 16 dashes.
 // Motion (exact springs, lib/spring.js via components/SpringCurve.qml): one progress `shownness` drives scale
 // 0.9 -> 1 and opacity 0 -> 1 (BannerContentController: _scaleFactor 0.9, _opacity 0).
-// - appear: interpolatingSpring(mass 2, stiffness 300, damping 50) (response 0.513 s, ratio 1.021), also when a
+// - appear: interpolatingSpring(mass 2, stiffness 300, damping 50) (response 0.513 s, ratio 1.021, which SwiftUI
+//   clamps to critical: lib/spring.js fromPhysics), also when a
 //   press brings back a HUD that is hiding;
 // - hide: spring(response 0.48669, dampingFraction 1) to 0, and the window goes at 0.48669 s (the dismissal
 //   completion's asyncAfter), where the spring stands at 0.986;

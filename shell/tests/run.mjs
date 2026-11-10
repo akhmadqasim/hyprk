@@ -738,17 +738,19 @@ test("mode buttons start inside the field, end in place", () => {
         }
     });
     test("spring curve: Apple notations", () => {
+        // SwiftUI clamps Spring(duration:bounce:) and interpolatingSpring to critical (MAC-ANSWERS "NC panel spring")
         const b = SP.fromBounce(0.25, -0.027), k = (2 * Math.PI / 0.25) ** 2;
-        assert.ok(Math.abs(k - 631.65) < 0.01 && Math.abs(2 * b.ratio * Math.sqrt(k) - 51.66) < 0.01, "CC: stiffness 631.65, damping 51.66");
+        assert.ok(Math.abs(k - 631.65) < 0.01 && b.ratio === 1, "CC: stiffness 631.65, damping 51.66 (ratio 1.028) -> critical");
         const n = SP.fromBounce(0.3, -0.2);
-        assert.ok(Math.abs(n.ratio - 1.25) < 1e-12 && Math.abs((2 * Math.PI / 0.3) ** 2 - 438.65) < 0.01);
+        assert.ok(n.ratio === 1 && Math.abs((2 * Math.PI / 0.3) ** 2 - 438.65) < 0.01, "NC: Spring(0.3, -0.2) -> critical");
         const h = SP.fromPhysics(2, 300, 50);
-        assert.ok(Math.abs(2 * Math.PI / h.response - 12.247) < 1e-3 && Math.abs(h.ratio - 1.0206) < 1e-4, "HUD: w0 12.25, ratio 1.02");
+        assert.ok(Math.abs(2 * Math.PI / h.response - 12.247) < 1e-3 && h.ratio === 1, "HUD: w0 12.25, ratio 1.02 -> critical");
+        assert.equal(SP.fromResponse(0.3, 1.25).ratio, 1.25, "spring(response:dampingFraction:) is not clamped");
         assert.ok(Math.abs(SP.fromBounce(0.45, 0.05).ratio - 0.95) < 1e-12);
     });
-    test("spring curve: HUD appear values (MAC-ANSWERS: 0.34, 0.69, 0.87, 0.95, 0.98 at 0.1..0.5 s)", () => {
+    test("spring curve: HUD appear values (critical w0 12.25: 0.35, 0.70, 0.88, 0.96, 0.98 at 0.1..0.5 s)", () => {
         const h = SP.fromPhysics(2, 300, 50);
-        [0.34, 0.69, 0.87, 0.95, 0.98].forEach((x, i) => assert.ok(Math.abs(SP.value(h, 0, (i + 1) / 10) - x) < 0.01, `${(i + 1) / 10} s`));
+        [0.346, 0.702, 0.881, 0.956, 0.984].forEach((x, i) => assert.ok(Math.abs(SP.value(h, 0, (i + 1) / 10) - x) < 0.01, `${(i + 1) / 10} s`));
     });
     test("spring curve: HUD hide stops at 0.986 at 0.48669 s", () => {
         const p = SP.plan(SP.fromResponse(0.48669, 1), 1, 0, 0, 0.48669);
