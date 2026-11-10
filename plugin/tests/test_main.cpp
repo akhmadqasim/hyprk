@@ -100,7 +100,18 @@ int main() {
         CHECK(near(resolveMaterial(reg, 104).blurRadius, 3, 1e-4));
         CHECK(near(recipeByName("dock").light.ycc.white, 0.9, 1e-6));
         // dark Dock max luma 0.75 (probe), every other face 1 (MAC-ANSWERS "Glass checks (#53)")
-        CHECK(near(recipeByName("dock").dark.maxLuma, 0.75, 1e-6) && near(recipeByName("dock").light.maxLuma, 1) && near(recipeByName("controlcenter").dark.maxLuma, 1));
+        CHECK(near(resolveMaterial(recipeByName("dock"), 84).maxLumaDark, 0.75, 1e-6) && near(resolveMaterial(recipeByName("dock"), 84).maxLumaLight, 1) &&
+              near(resolveMaterial(recipeByName("controlcenter"), 300).maxLumaDark, 1));
+        // Regular / menu = the 27.2.1 probe `regular`: face, fill, max luma and blur opacities by D
+        {
+            const auto& mn = recipeByName("menu");
+            CHECK(near(mn.light.ycc.white, 1.03, 1e-6) && near(mn.light.fill.a, 0.2, 1e-6) && near(mn.light.blurFill.lighten, 0.9, 1e-6));
+            CHECK(near(resolveMaterial(mn, 24).maxLumaDark, 0.6, 1e-6) && near(resolveMaterial(mn, 96).maxLumaDark, 0.4, 1e-6) &&
+                  near(resolveMaterial(mn, 112).maxLumaDark, 0.375, 1e-6) && near(resolveMaterial(mn, 400).maxLumaDark, 0.35, 1e-6));
+            const auto a96 = resolveMaterial(mn, 96).blurAlpha, a24 = resolveMaterial(mn, 24).blurAlpha, a240 = resolveMaterial(mn, 240).blurAlpha;
+            CHECK(near(a96[0], 0.26667, 1e-4) && near(a96[1], 0.13333, 1e-4) && near(a96[2], 0.5, 1e-6) && near(a24[0], 0) && near(a240[0], 0.8, 1e-6));
+            CHECK(near(resolveMaterial(recipeByName("controlcenter"), 30).blurAlpha[0], 1, 1e-6));
+        }
         CHECK(near(resolveMaterial(recipeByName("controlcenter"), 60).refractionAmount, -80, 1e-4));
         CHECK(std::string{recipeByName("nope").name} == "regular");
         // 27.2.1 probe (reference/re/27.2.1/live/glass-params-*.json): Control Center (also the HUD) is the
@@ -176,7 +187,8 @@ int main() {
     {
         auto l = titlebarLayout(600, 32, 14, 7, 15);
         CHECK(near(l.buttons[0].x, 15) && near(l.buttons[1].x, 36) && near(l.buttons[2].x, 57) && near(l.buttons[0].y, 9));
-        CHECK(near(l.title.x, 85) && near(l.title.w, 600 - 170)); // symmetric around the centre
+        CHECK(near(l.title.x, 15 + 2 * 21 + 14 + 31) && near(l.title.w, 600 - 15 - 102)); // left-aligned, 31 pt after the lights
+        CHECK(near(titlebarLayout(700, 32, 14, 9, 9).title.x, 100)); // Mac TextEdit: lights at 9 / 32 / 55, title at 100
         CHECK(buttonAt(l, 22, 16, 7) == 0 && buttonAt(l, 64, 16, 7) == 2 && buttonAt(l, 300, 16, 7) == -1);
         CHECK(lightsArea(l, 7).containsPoint({40, 16}) && !lightsArea(l, 7).containsPoint({200, 16}));
         CHECK(near(titlebarLayout(100, 32, 14, 7, 15).title.w, 0)); // narrow window: no room for a title

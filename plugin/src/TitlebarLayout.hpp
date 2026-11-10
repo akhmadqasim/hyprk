@@ -10,8 +10,11 @@ namespace lg {
 
     struct STitlebarLayout {
         std::array<CBox, 3> buttons; // close, minimise, zoom
-        CBox                title;   // area the centred title may use (symmetric, clear of the lights)
+        CBox                title;   // area of the left-aligned title (starts where the Mac draws it)
     };
+
+    // title x after the zoom light's right edge, pt: proxy icon 13 pt after it, 16 pt wide, then 2 pt (Q-windows-11)
+    constexpr double TITLE_AFTER_LIGHTS = 31;
 
     STitlebarLayout titlebarLayout(double width, double height, double button, double gap, double inset);
 

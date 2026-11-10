@@ -1,7 +1,7 @@
 #pragma once
 
 #include <chrono>
-// macOS title bar (traffic lights + centred title) as a window decoration for windows that do not
+// macOS title bar (traffic lights + left-aligned title) as a window decoration for windows that do not
 // draw one themselves (server-side decorations), e.g. foot and Qt apps.
 
 #include "Config.hpp"

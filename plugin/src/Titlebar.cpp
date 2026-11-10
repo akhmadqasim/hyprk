@@ -75,8 +75,10 @@ namespace lg {
     static constexpr uint32_t LIGHT_PRESSED[2][3] = {{0xFFAC9E, 0xFFFF70, 0xC6FF8F}, {0xFF7C68, 0xFFFF58, 0x56F66E}}; // 27.2.1, Q-windows-08
     static constexpr uint32_t GLYPH_RGB[3]        = {0x9E0000, 0xBE4900, 0x097900}; // light, Q-windows-10
     static constexpr double   GLYPH_SPRING        = 0.3; // s, critically damped
-    // title text on a dark bar (light bars use titlebar_text / titlebar_text_inactive)
-    static constexpr SRgba                    TEXT_ON_DARK{1, 1, 1, 0.85f}, TEXT_ON_DARK_INACTIVE{1, 1, 1, 0.4f};
+    // title text on a dark bar (light bars use titlebar_text / titlebar_text_inactive): TextEdit dark renders
+    // (165,164,172) active / (105,106,112) inactive on #28282E, white a.58 / a.30 (MAC-ANSWERS.md Q-windows-11)
+    static constexpr SRgba                    TEXT_ON_DARK{1, 1, 1, 0.58f}, TEXT_ON_DARK_INACTIVE{1, 1, 1, 0.30f};
+    static constexpr int                      TITLE_WEIGHT = 700; // SF 13 bold (weight 0.4), Q-windows-11
 
     static CHyprColor rgba(const SRgba& c, float a = 1.f) {
         return CHyprColor{c.r, c.g, c.b, c.a * a};
@@ -138,7 +140,7 @@ namespace lg {
             const auto& p     = *params;
             const auto  color = rgba(dark ? (isActive ? TEXT_ON_DARK : TEXT_ON_DARK_INACTIVE) : (isActive ? p.titlebarText : p.titlebarTextInactive));
             m_title           = {title, isActive, scale, width, params, dark,
-                                g_pHyprRenderer->renderText(title, color, int(std::round(p.titlebarFontSize * scale)), false, p.titlebarFont, width, 600)};
+                                g_pHyprRenderer->renderText(title, color, int(std::round(p.titlebarFontSize * scale)), false, p.titlebarFont, width, TITLE_WEIGHT)};
         }
         return m_title.tex;
     }
@@ -322,13 +324,13 @@ namespace lg {
         if (std::abs(glyphA - (m_hover ? 1.f : 0.f)) > 0.002f)
             damageEntire(); // keep the fade going
 
-        // centred title (SF Pro 13 semibold)
+        // title left-aligned after the lights, where the Mac starts it behind its proxy icon (no icon drawn here)
         const auto title = window->metadata().title();
         if (!title.empty() && layout.title.w > 8) {
             if (const auto tex = titleTexture(params, title, isActive, dark, scale, layout.title.w); tex && tex->ok()) {
                 CTexPassElement::SRenderData text;
                 text.tex = tex;
-                text.box = CBox{barPx.x + (barPx.w - tex->m_size.x) / 2, barPx.y + (barPx.h - tex->m_size.y) / 2, tex->m_size.x, tex->m_size.y}.round();
+                text.box = CBox{barPx.x + layout.title.x * scale, barPx.y + (barPx.h - tex->m_size.y) / 2, tex->m_size.x, tex->m_size.y}.round();
                 text.a   = a;
                 g_pHyprRenderer->addPassElement(ctx, makeUnique<CTexPassElement>(text));
             }

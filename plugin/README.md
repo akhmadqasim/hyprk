@@ -104,7 +104,7 @@ Apple's numbers from `/mnt/code/liquid-glass-re/SPEC.md` section 9 (glass versio
 
 | Recipe | Face YCC light (black, white, sat) | Fill / lift light | Inner refraction height / amount | Outer layer (h / amount / opacity) | Blur | Shadow | Used for (default) |
 |---|---|---|---|---|---|---|---|
-| `regular` | 0.4, 0.92, 1.0 (Apple 1.03, 1.2) | white 12% (Apple 20%) | 0.25 D (max 20) / -0.5 D (min -60) | 0.2 D / 0.25 D / 0.6 | D 48→160 : 2→4 (Apple 64→160 : 0→4), variable: full until 1 pt from the edge (Apple: half at 1 pt) | D 64→160 : 0.25→0.75, r 24, y 8 | notifications, switcher |
+| `regular` | 0.4, 1.03, 1.2 (27.2.1 probe; dark 0.125, 1.125, 1.3, max luma 0.6 / 0.4 / 0.35 at D 64 / 96 / 128) | white 20% | 0.25 D (max 20) / -0.5 D (min -60) | 0.2 D / 0.25 D / 0.6 | D 48→160 : 2→4 (Apple 5), variable: opacities 0.8 / 0.4 / 0.5, the first two from 0 at D 64 to full at D 160 (probe) | D 64→160 : 0.25→0.75, r 24, y 8 | notifications, switcher |
 | `menu` | as regular | as regular | as regular | as regular | as regular | 0.6, r 24, y 10 | `hyprk-overlay` |
 | `spotlight` | 0.1, 1.0, 1.25 (SiriRecipe branch A, reference/re/NOTES.md; light and dark) | none | 0.4 D / -0.72 D (no caps) | 0.4 D / 0.4 D / 1.0 | 6 (Apple 8 x opacity 0.75), variable: full from 60 pt in to 1 pt from the edge; blur fill darken 0.75, normal 0.5 | none, no edge bleed, no ring | `hyprk-spotlight` |
 | `clear` | 0.125, 1.08, 1.06 (27.2.1 probe) | none | 0.36 D (max 20) / -0.65 D (min -60) | none | 0.75 | none, no edge bleed | |
@@ -113,7 +113,7 @@ Apple's numbers from `/mnt/code/liquid-glass-re/SPEC.md` section 9 (glass versio
 
 The face colour is Apple's YCC composite (SPEC 9.7): `Y' = black + (white - black) Y`, chroma x saturation,
 then the fill, all in gamma space: that reproduces the Mac's pixels (HUD and Dock over flat colours).
-Regular keeps its by-eye light face (see Material.cpp); the others use Apple's numbers.
+All recipes use the 27.2.1 probe numbers (Regular since the menu pass, see Material.cpp).
 
 Rim (every recipe, `reference/re/27.2.1/live/glass-params-*.json` + the HUD screenshots): the glass filter's
 key highlight with a negative colour bias (-0.25, Control Center -0.3) keyed sideways, 0.5 pt at the edge
@@ -125,7 +125,8 @@ Also per recipe (SPEC 9.2/9.3): edge bleed (opacity D 64→160 : 0→0.5, height
 regular (0.9, 1, 1.2), clear family (0.75, 1, 1.2)), blur fill (regular light: lighten 0.9, normal 0.5;
 dark: darken 0.9, normal 0.5), drop shadow coloured by the backdrop saturated x1.2,
 regular ring shadow (offset 8, stroke 4, radius 5, opacity 0.06). Dark sides: regular (0.125, 1.125, 1.3),
-dock (0.05, 0.92, 1.25), others as light.
+dock (0.05, 0.92, 1.25, max luma 0.75), others as light. Max luma bends the backdrop luma before the face:
+Y - (1 - m) Y^2.
 
 Variable blur needs the unblurred backdrop: the plugin copies the framebuffer being rendered (one blit +
 mip chain per glass element) and mixes it with Hyprland's blur by Apple's per-pixel blur amount.
@@ -232,7 +233,7 @@ own) prevents one, `titlebar = "classes"` only uses the regex, `"off"` disables 
 | `titlebar_height` / `titlebar_button` / `titlebar_gap` / `titlebar_inset` | 32 / 14 / 9 / 15 pt (SPEC: bar 32, buttons 14, gap 9; inset measured on the reference screenshot, toolbar windows use 19) |
 | `titlebar_font` / `titlebar_font_size` | `SF Pro Text` / 13 |
 | `titlebar_color` / `titlebar_color_inactive` | `0xF3F1EFFF` / `0xF6F5F4FF` |
-| `titlebar_text` / `titlebar_text_inactive` | `0x333333D9` / `0x33333359` |
+| `titlebar_text` / `titlebar_text_inactive` | `0x000000B3` / `0x00000040` (TextEdit #4C4C4C / #BEBEBE on white, Q-windows-11) |
 | `titlebar_auto_color` | 1 |
 | `titlebar_glass` | 0 |
 

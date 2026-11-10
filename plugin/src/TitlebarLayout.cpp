@@ -8,8 +8,10 @@ namespace lg {
         const double    y = (height - button) / 2;
         for (int i = 0; i < 3; ++i)
             l.buttons[i] = CBox{inset + i * (button + gap), y, button, button};
-        const double side = l.buttons[2].x + button + gap * 2; // keep the title centred on the bar
-        l.title           = CBox{side, 0, std::max(0.0, width - 2 * side), height};
+        // left-aligned title (MAC-ANSWERS.md Q-windows-11, TextEdit): zoom disc ends at 69, the 16 pt proxy icon
+        // sits at 82 and the title starts at 100, so 31 pt after the last light; the right margin mirrors the inset
+        const double x = l.buttons[2].x + button + TITLE_AFTER_LIGHTS;
+        l.title        = CBox{x, 0, std::max(0.0, width - inset - x), height};
         return l;
     }
 
