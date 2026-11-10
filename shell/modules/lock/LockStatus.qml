@@ -22,19 +22,11 @@ Row {
         visible: s.laptop
         width: LockTheme.statusBox
         height: LockTheme.statusBox
-        Item {
+        BatteryIcon {   // the 26 x 14 bitmap macOS draws, as in the menu bar
             anchors.centerIn: parent
-            width: LockTheme.statusGlyph + 8
-            height: LockTheme.statusGlyph + 8
-            Symbol { anchors.fill: parent; name: "battery"; size: parent.width; color: LockTheme.statusColor }
-            Rectangle {   // charge level inside the outline, as in the menu bar
-                x: parent.width * 4 / 24
-                y: parent.height * 9 / 24
-                height: parent.height * 6 / 24
-                width: parent.width * 14 / 24 * UPower.displayDevice.percentage
-                radius: 1.5
-                color: UPower.displayDevice.percentage < 0.2 ? Theme.color.red : LockTheme.statusColor
-            }
+            level: UPower.displayDevice.percentage
+            charging: UPower.displayDevice.state === UPowerDeviceState.Charging
+            color: LockTheme.statusColor
         }
     }
     Item {

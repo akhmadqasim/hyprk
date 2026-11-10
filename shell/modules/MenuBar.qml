@@ -70,6 +70,7 @@ ShellWindow {
 
     // ---------- right: status items + clock ----------
     readonly property var wifiDev: State.wifiDevice(Networking.devices.values)
+    readonly property var wifiNet: wifiDev ? wifiDev.networks.values.find(n => n.connected) || null : null
     readonly property bool laptop: State.hasBattery(UPower.devices.values)
 
     Row {
@@ -92,19 +93,11 @@ ShellWindow {
                     color: bar.fg
                     font: Typography.font(12)   // battery percentage, 12 by eye (not measured)
                 }
-                Item {
-                    width: Theme.menuBar.statusIconSize + 8
-                    height: Theme.menuBar.statusIconSize + 8
+                BatteryIcon {
                     anchors.verticalCenter: parent.verticalCenter
-                    Symbol { anchors.fill: parent; name: "battery"; size: parent.width; color: bar.fg }
-                    Rectangle {   // charge level inside the outline (x 2.5..19.5 of 24)
-                        x: parent.width * 4 / 24
-                        y: parent.height * 9 / 24
-                        height: parent.height * 6 / 24
-                        width: parent.width * 14 / 24 * UPower.displayDevice.percentage
-                        radius: 1.5
-                        color: UPower.displayDevice.percentage < 0.2 ? Theme.color.red : bar.fg
-                    }
+                    level: UPower.displayDevice.percentage
+                    charging: UPower.displayDevice.state === UPowerDeviceState.Charging
+                    color: bar.fg
                 }
             }
         }
@@ -113,7 +106,9 @@ ShellWindow {
             Symbol {
                 anchors.centerIn: parent
                 name: bar.wifiDev && bar.wifiDev.connected ? "wifi" : "wifi.slash"
+                surface: "menubar"
                 size: Theme.menuBar.statusIconSize
+                variableValue: bar.wifiNet ? bar.wifiNet.signalStrength : -1   // 0..1 -> bars lit (sf.js pick)
                 color: bar.fg
                 opacity: bar.wifiDev && bar.wifiDev.connected ? 1 : 0.5
             }
@@ -122,16 +117,17 @@ ShellWindow {
         // Focus: shown only while Do Not Disturb is on, like macOS
         StatusItem {
             visible: Notifs.dnd
-            Symbol { anchors.centerIn: parent; name: "moon"; size: Theme.menuBar.statusIconSize - 1; color: bar.fg }
+            Symbol { anchors.centerIn: parent; name: "moon"; surface: "menubar"; size: Theme.menuBar.statusIconSize - 1; color: bar.fg }
             onClicked: Panels.toggle("cc", bar.screen)
         }
         StatusItem {
-            Symbol { anchors.centerIn: parent; name: "magnifyingglass"; size: Theme.menuBar.statusIconSize - 1; color: bar.fg }
+            Symbol { anchors.centerIn: parent; name: "magnifyingglass"; surface: "menubar"; size: Theme.menuBar.statusIconSize - 1; color: bar.fg }
             onClicked: Panels.toggle("spotlight")
         }
         StatusItem {
-            active: Panels.open === "cc" && Panels.activeScreen === bar.screen
-            Symbol { anchors.centerIn: parent; name: "controlcenter"; size: Theme.menuBar.statusIconSize; color: bar.fg }
+            // lit while Control Center is open and while the volume/brightness HUD shows (it hangs under this item)
+            active: (Panels.open === "cc" && Panels.activeScreen === bar.screen) || (Hud.shown && Hud.screen === bar.modelData)
+            Symbol { anchors.centerIn: parent; name: "controlcenter"; surface: "menubar"; size: Theme.menuBar.statusIconSize; color: bar.fg }
             onClicked: Panels.toggle("cc", bar.screen)
         }
         StatusItem {

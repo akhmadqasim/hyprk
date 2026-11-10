@@ -124,11 +124,11 @@ Item {
     }
 
     // ---------- round buttons ----------
-    Round { x: cc.colX(1); y: cc.rowY(2); symbol: "square.grid"; enabled: false }               // Stage Manager placeholder
+    Round { x: cc.colX(1); y: cc.rowY(2); symbol: "sidebar.squares.leading"; enabled: false }               // Stage Manager placeholder
     Round { x: cc.colX(1) + cc.colW - cc.rowH; y: cc.rowY(2); symbol: "screen.mirror"; enabled: false }  // Screen Mirroring placeholder
     Round {
         x: cc.colX(0); y: cc.rowY(3)
-        symbol: Theme.dark ? "moon" : "sun"
+        symbol: "appearance.darkmode"
         onActivated: Theme.dark = !Theme.dark
     }
     Round {
@@ -152,8 +152,8 @@ Item {
         y: cc.rowY(4)
         title: "Display"
         available: Brightness.available
-        leftSymbol: "sun"
-        rightSymbol: "sun"
+        leftSymbol: "sun.min.fill"
+        rightSymbol: "sun.max.fill"
         value: Brightness.available ? Brightness.value : 1
         onMoved: v => Brightness.set(v)
     }
@@ -161,8 +161,8 @@ Item {
         y: cc.rowY(5)
         title: "Sound"
         available: Audio.available
-        leftSymbol: "speaker"
-        rightSymbol: "speaker"
+        leftSymbol: "speaker.fill"
+        rightSymbol: "speaker.wave.3.fill"
         value: Audio.muted ? 0 : Audio.volume
         onMoved: v => Audio.setVolume(v)
     }
@@ -216,6 +216,7 @@ Item {
             Symbol {
                 anchors.centerIn: parent
                 name: cap.symbol
+                surface: "ccToggle"
                 size: Theme.cc.toggleSize * Theme.cc.toggleGlyph
                 color: cap.on ? cap.onAccent : Theme.cc.capsuleOffIcon
             }
@@ -263,6 +264,7 @@ Item {
         Symbol {
             anchors.centerIn: parent
             name: rb.symbol
+            surface: "ccRound"
             opacity: rb.enabled ? 1 : Theme.color.disabledOpacity
             size: Theme.cc.buttonGlyph
             color: rb.on ? Theme.cc.toggleOnIcon : Theme.cc.toggleOffIcon
@@ -277,7 +279,7 @@ Item {
         signal activated()
         width: big ? 26 : 22
         height: width
-        Symbol { anchors.centerIn: parent; name: mb.symbol; size: parent.width; color: Theme.cc.text }
+        Symbol { anchors.centerIn: parent; name: mb.symbol; surface: mb.big ? "ccPlay" : "ccMedia"; size: parent.width; color: Theme.cc.text }
         MouseArea { anchors.fill: parent; anchors.margins: -4; onClicked: mb.activated() }
     }
 
@@ -312,6 +314,7 @@ Item {
             x: Theme.cc.sliderInset
             anchors.verticalCenter: track.verticalCenter
             name: sm.leftSymbol
+            surface: "ccSlider"
             size: 13
             color: Theme.cc.text
         }
@@ -321,6 +324,7 @@ Item {
             anchors.rightMargin: Theme.cc.sliderInset
             anchors.verticalCenter: track.verticalCenter
             name: sm.rightSymbol
+            surface: "ccSlider"
             size: 18
             color: Theme.cc.text
         }

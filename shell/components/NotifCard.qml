@@ -205,7 +205,7 @@ Item {
                 border.width: 1
                 border.color: Theme.glass.hairline
             }
-            Symbol { anchors.centerIn: parent; name: "xmark"; size: 11; color: Theme.color.secondaryLabel }
+            Symbol { anchors.centerIn: parent; name: "xmark"; surface: "nc"; size: 11; color: Theme.color.secondaryLabel }
             MouseArea { id: closeMa; anchors.fill: parent; anchors.margins: -2; hoverEnabled: true; onClicked: card.closed() }
         }
     }

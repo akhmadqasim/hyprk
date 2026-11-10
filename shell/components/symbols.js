@@ -26,7 +26,6 @@ const symbols = {
     "distro": [S(circle(12, 12, 9.3), 1.9), S("M8.3 9.4L11.9 12L8.3 14.6", 1.9), S("M13.2 15H16.2", 1.9)],
     "wifi": wifiArcs,
     "wifi.slash": wifiArcs.concat([S("M4 3L20 21", 2.1)]),
-    "battery": [S(rr(2.5, 7.5, 17, 9, 2.6), 1.3), F(rr(20.6, 10.4, 1.6, 3.2, 0.8))],
     "controlcenter": [S(rr(2.5, 4, 19, 7, 3.5), 1.5), F(circle(18, 7.5, 2.1)),
                       S(rr(2.5, 13, 19, 7, 3.5), 1.5), F(circle(6, 16.5, 2.1))],
     "magnifyingglass": [S(circle(10.2, 10.2, 6.4), 2.0), S("M15 15L20.5 20.5", 2.3)],
@@ -73,10 +72,9 @@ const symbols = {
     "gear": [S(circle(12, 12, 3.2), 1.8), S("M12 2.8V5.2M12 18.8V21.2M2.8 12H5.2M18.8 12H21.2M5.5 5.5L7.2 7.2M16.8 16.8L18.5 18.5M5.5 18.5L7.2 16.8M16.8 7.2L18.5 5.5", 2.0)],
 };
 
-// Names that keep the hand-drawn glyph although an SVG exists:
-// battery: MenuBar.qml lays its level bar on this outline (x 4/24, y 9/24); the real empty outline is
-// battery.0percent, whose inside differs.
-const handDrawn = ["battery"];
+// Names that keep the hand-drawn glyph although an SVG exists: none now. (The menu bar and lock screen battery is
+// BatteryIcon.qml, the BatteryUIKit bitmap, not an SF Symbol.)
+const handDrawn = [];
 function handDrawnOnly(name) {
     return handDrawn.indexOf(name) !== -1;
 }

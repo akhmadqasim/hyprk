@@ -517,7 +517,7 @@ Item {
             font: Typography.font(12, Typography.medium)
             color: Theme.color.label
         }
-        Symbol { visible: !!pill.symbol; anchors.centerIn: parent; name: pill.symbol || "xmark"; size: 12; color: Theme.color.label }
+        Symbol { visible: !!pill.symbol; anchors.centerIn: parent; name: pill.symbol || "xmark"; surface: "nc"; size: 12; color: Theme.color.label }
         MouseArea { id: pma; anchors.fill: parent; hoverEnabled: true; onClicked: pill.activated() }
     }
 }
