@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import qs.modules
+import qs.modules.lock
 import qs.services
 
 // hyprk: macOS 27-style desktop shell for Hyprland.
@@ -9,6 +10,7 @@ ShellRoot {
     // SpotlightState registers hyprk:spotlight-<mode> shortcuts, Clipboard runs the
     // history watcher (only created while history is on, the default is off).
     readonly property bool clipboardHistory: SpotlightState.clipboardHistory !== "off" && Clipboard.enabled
+    readonly property QtObject lockScreen: Lock   // lock screen (modules/lock): IPC target `lock`, Power.lock
     // A11y (re-applies state/accessibility.lua, syncs the plugin's reduce_motion) starts with the
     // Dock, whose Materializer reads A11y.reduceMotion
 
