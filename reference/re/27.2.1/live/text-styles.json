@@ -1,0 +1,2211 @@
+{
+  "_about": "R4.2 NSFont text styles, control sizes, named UI fonts, SF Pro tracking/optical size per point size, and R4.3 text-sample layout. macOS 27.2.1 (26B131), measured in-process with AppKit/CoreText (no defaults changed). Units: points unless noted; font units = 1/2048 em (SFNS upm 2048).",
+  "generated": "2026-11-10",
+  "findings": {
+    "systemFontFile": "/System/Library/Fonts/SFNS.ttf (\".SF NS\", 22.0d5e1), variable: wdth 30..150, opsz 17..96 (default 28), GRAD 400..1000, wght 1..1000. All text styles resolve to .SFNS-* instances of this file.",
+    "opticalSize": "opsz axis = point size, clamped to [17,96]. <=17 pt -> opsz 17 = SF Pro Text design (n advance 583.496/1000 em, identical to static SFProText-Regular). 18..27 pt -> continuous interpolation. >=28 pt -> advances identical to static SFProDisplay-Regular (526.855/1000 em); opsz keeps rising to 96 but advances do not change after 28 (outline changes beyond 28 not measured). No discrete Text/Display switch at 20 pt any more.",
+    "tracking": "Tracking is baked into glyph advances by CoreText from the SFNS trak table, track \"Normal\" (0.0), selected by POINT SIZE (not the clamped opsz), linearly interpolated between table sizes; fractional interpolated unit values are truncated (25 pt: 11.5 -> 11, 27 pt: 22.5 -> 22, 29 pt: 27.5 -> 27, 34 pt: 23.5 -> 23). trackingPt = units * size / 2048. Same per glyph (spread 0 across n,H,o,0,a). NSAttributedString .tracking/.kern 0 do not remove it. Method: advance of system font at size S minus advance of the same font file with all axes pinned to the same values at 100 pt (trak Normal = 0 at >=80 pt), scaled to S.",
+    "trakTableNormal": {
+      "sizes": [
+        6,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        20,
+        22,
+        24,
+        28,
+        32,
+        36,
+        50,
+        64,
+        80,
+        100,
+        138
+      ],
+      "units": [
+        82,
+        38,
+        24,
+        12,
+        0,
+        -12,
+        -22,
+        -32,
+        -40,
+        -52,
+        -46,
+        -24,
+        6,
+        28,
+        26,
+        21,
+        14,
+        7,
+        0,
+        0,
+        0
+      ],
+      "otherTracks": {
+        "Tight(-1)": [
+          54,
+          10,
+          -4,
+          -16,
+          -28,
+          -40,
+          -50,
+          -60,
+          -68,
+          -80,
+          -76,
+          -58,
+          -34,
+          0,
+          -2,
+          -7,
+          -14,
+          -21,
+          -28,
+          -28,
+          -28
+        ],
+        "Loose(+1)": [
+          110,
+          66,
+          52,
+          40,
+          28,
+          16,
+          6,
+          -4,
+          -12,
+          -24,
+          -18,
+          4,
+          34,
+          56,
+          54,
+          49,
+          42,
+          35,
+          28,
+          28,
+          28
+        ]
+      }
+    },
+    "lineHeight": "lineHeight = NSLayoutManager.defaultLineHeight(for:) and equals ascender - descender + leading exactly (an integer for every style: 32/26/22/20/16/14/16/15/13/13/13); SF leading is nonzero and size dependent. NSCTFontSizeCategoryAttribute = 3 for all styles (no Dynamic Type scaling on macOS).",
+    "weights": "Descriptor weight trait is 0 for every style except headline (0.4 = bold); caption2 reports trait 0 but resolves to .SFNS-Medium (wght axis 510). headline = .SFNS-Bold (wght 700). All others .SFNS-Regular (wght 400)."
+  },
+  "textStylesCompact": [
+    {
+      "style": "largeTitle",
+      "pointSize": 26,
+      "weight": "regular",
+      "weightTrait": 0,
+      "wghtAxis": 400,
+      "opsz": 26,
+      "postScriptName": ".SFNS-Regular",
+      "lineHeight": 32,
+      "ascender": 25.1367,
+      "descender": -5.4844,
+      "leading": 1.3789,
+      "trackingPt": 0.2158,
+      "uiUsage": "UICTFontTextStyleTitle0"
+    },
+    {
+      "style": "title1",
+      "pointSize": 22,
+      "weight": "regular",
+      "weightTrait": 0,
+      "wghtAxis": 400,
+      "opsz": 22,
+      "postScriptName": ".SFNS-Regular",
+      "lineHeight": 26,
+      "ascender": 21.2695,
+      "descender": -4.6406,
+      "leading": 0.0898,
+      "trackingPt": -0.2578,
+      "uiUsage": "UICTFontTextStyleTitle1"
+    },
+    {
+      "style": "title2",
+      "pointSize": 17,
+      "weight": "regular",
+      "weightTrait": 0,
+      "wghtAxis": 400,
+      "opsz": 17,
+      "postScriptName": ".SFNS-Regular",
+      "lineHeight": 22,
+      "ascender": 16.4355,
+      "descender": -3.5859,
+      "leading": 1.9785,
+      "trackingPt": -0.4316,
+      "uiUsage": "UICTFontTextStyleTitle2"
+    },
+    {
+      "style": "title3",
+      "pointSize": 15,
+      "weight": "regular",
+      "weightTrait": 0,
+      "wghtAxis": 400,
+      "opsz": 17,
+      "postScriptName": ".SFNS-Regular",
+      "lineHeight": 20,
+      "ascender": 14.502,
+      "descender": -3.1641,
+      "leading": 2.334,
+      "trackingPt": -0.2344,
+      "uiUsage": "UICTFontTextStyleTitle3"
+    },
+    {
+      "style": "headline",
+      "pointSize": 13,
+      "weight": "bold",
+      "weightTrait": 0.4,
+      "wghtAxis": 700,
+      "opsz": 17,
+      "postScriptName": ".SFNS-Bold",
+      "lineHeight": 16,
+      "ascender": 12.5684,
+      "descender": -2.7422,
+      "leading": 0.6895,
+      "trackingPt": -0.0762,
+      "uiUsage": "UICTFontTextStyleHeadline"
+    },
+    {
+      "style": "subheadline",
+      "pointSize": 11,
+      "weight": "regular",
+      "weightTrait": 0,
+      "wghtAxis": 400,
+      "opsz": 17,
+      "postScriptName": ".SFNS-Regular",
+      "lineHeight": 14,
+      "ascender": 10.6348,
+      "descender": -2.3203,
+      "leading": 1.0449,
+      "trackingPt": 0.0645,
+      "uiUsage": "UICTFontTextStyleSubhead"
+    },
+    {
+      "style": "body",
+      "pointSize": 13,
+      "weight": "regular",
+      "weightTrait": 0,
+      "wghtAxis": 400,
+      "opsz": 17,
+      "postScriptName": ".SFNS-Regular",
+      "lineHeight": 16,
+      "ascender": 12.5684,
+      "descender": -2.7422,
+      "leading": 0.6895,
+      "trackingPt": -0.0762,
+      "uiUsage": "UICTFontTextStyleBody"
+    },
+    {
+      "style": "callout",
+      "pointSize": 12,
+      "weight": "regular",
+      "weightTrait": 0,
+      "wghtAxis": 400,
+      "opsz": 17,
+      "postScriptName": ".SFNS-Regular",
+      "lineHeight": 15,
+      "ascender": 11.6016,
+      "descender": -2.5313,
+      "leading": 0.8672,
+      "trackingPt": 0,
+      "uiUsage": "UICTFontTextStyleCallout"
+    },
+    {
+      "style": "footnote",
+      "pointSize": 10,
+      "weight": "regular",
+      "weightTrait": 0,
+      "wghtAxis": 400,
+      "opsz": 17,
+      "postScriptName": ".SFNS-Regular",
+      "lineHeight": 13,
+      "ascender": 9.668,
+      "descender": -2.1094,
+      "leading": 1.2227,
+      "trackingPt": 0.1172,
+      "uiUsage": "UICTFontTextStyleFootnote"
+    },
+    {
+      "style": "caption1",
+      "pointSize": 10,
+      "weight": "regular",
+      "weightTrait": 0,
+      "wghtAxis": 400,
+      "opsz": 17,
+      "postScriptName": ".SFNS-Regular",
+      "lineHeight": 13,
+      "ascender": 9.668,
+      "descender": -2.1094,
+      "leading": 1.2227,
+      "trackingPt": 0.1172,
+      "uiUsage": "UICTFontTextStyleCaption1"
+    },
+    {
+      "style": "caption2",
+      "pointSize": 10,
+      "weight": "medium",
+      "weightTrait": 0,
+      "wghtAxis": 510,
+      "opsz": 17,
+      "postScriptName": ".SFNS-Medium",
+      "lineHeight": 13,
+      "ascender": 9.668,
+      "descender": -2.1094,
+      "leading": 1.2227,
+      "trackingPt": 0.1172,
+      "uiUsage": "UICTFontTextStyleCaption2"
+    }
+  ],
+  "textStyles": [
+    {
+      "ascender": 25.1367,
+      "baselineOffset_NSLayoutManager": 25,
+      "capHeight": 18.3193,
+      "descender": -5.4844,
+      "descriptorAttributes": {
+        "NSCTFontSizeCategoryAttribute": "3",
+        "NSCTFontUIUsageAttribute": "UICTFontTextStyleTitle0",
+        "NSFontSizeAttribute": "26"
+      },
+      "displayName": "System Font Regular",
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".SFNS-Regular",
+      "fullName": "System Font Regular",
+      "leading": 1.3789,
+      "lineHeight_ascPlusDescPlusLeading": 32,
+      "lineHeight_NSLayoutManager": 32,
+      "pointSize": 26,
+      "postScriptName": ".SFNS-Regular",
+      "style": "largeTitle",
+      "textStyleRaw": "UICTFontTextStyleTitle0",
+      "tracking": {
+        "measuredEm": 0.0083,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.2158,
+        "rawFontVariationCheck": {
+          "opsz": 26
+        },
+        "trakTableNormalPt": 0.2158,
+        "trakTableNormalUnits": 17
+      },
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 26
+      },
+      "weightName": "regular",
+      "xHeight": 13.2412
+    },
+    {
+      "ascender": 21.2695,
+      "baselineOffset_NSLayoutManager": 21,
+      "capHeight": 15.501,
+      "descender": -4.6406,
+      "descriptorAttributes": {
+        "NSCTFontSizeCategoryAttribute": "3",
+        "NSCTFontUIUsageAttribute": "UICTFontTextStyleTitle1",
+        "NSFontSizeAttribute": "22"
+      },
+      "displayName": "System Font Regular",
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".SFNS-Regular",
+      "fullName": "System Font Regular",
+      "leading": 0.0898,
+      "lineHeight_ascPlusDescPlusLeading": 26,
+      "lineHeight_NSLayoutManager": 26,
+      "pointSize": 22,
+      "postScriptName": ".SFNS-Regular",
+      "style": "title1",
+      "textStyleRaw": "UICTFontTextStyleTitle1",
+      "tracking": {
+        "measuredEm": -0.0117,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": -0.2578,
+        "rawFontVariationCheck": {
+          "opsz": 22
+        },
+        "trakTableNormalPt": -0.2578,
+        "trakTableNormalUnits": -24
+      },
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 22
+      },
+      "weightName": "regular",
+      "xHeight": 11.3652
+    },
+    {
+      "ascender": 16.4355,
+      "baselineOffset_NSLayoutManager": 16,
+      "capHeight": 11.978,
+      "descender": -3.5859,
+      "descriptorAttributes": {
+        "NSCTFontSizeCategoryAttribute": "3",
+        "NSCTFontUIUsageAttribute": "UICTFontTextStyleTitle2",
+        "NSFontSizeAttribute": "17"
+      },
+      "displayName": "System Font Regular",
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".SFNS-Regular",
+      "fullName": "System Font Regular",
+      "leading": 1.9785,
+      "lineHeight_ascPlusDescPlusLeading": 22,
+      "lineHeight_NSLayoutManager": 22,
+      "pointSize": 17,
+      "postScriptName": ".SFNS-Regular",
+      "style": "title2",
+      "textStyleRaw": "UICTFontTextStyleTitle2",
+      "tracking": {
+        "measuredEm": -0.0254,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": -0.4316,
+        "rawFontVariationCheck": {
+          "opsz": 17
+        },
+        "trakTableNormalPt": -0.4316,
+        "trakTableNormalUnits": -52
+      },
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17
+      },
+      "weightName": "regular",
+      "xHeight": 8.9482
+    },
+    {
+      "ascender": 14.502,
+      "baselineOffset_NSLayoutManager": 15,
+      "capHeight": 10.5688,
+      "descender": -3.1641,
+      "descriptorAttributes": {
+        "NSCTFontSizeCategoryAttribute": "3",
+        "NSCTFontUIUsageAttribute": "UICTFontTextStyleTitle3",
+        "NSFontSizeAttribute": "15"
+      },
+      "displayName": "System Font Regular",
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".SFNS-Regular",
+      "fullName": "System Font Regular",
+      "leading": 2.334,
+      "lineHeight_ascPlusDescPlusLeading": 20,
+      "lineHeight_NSLayoutManager": 20,
+      "pointSize": 15,
+      "postScriptName": ".SFNS-Regular",
+      "style": "title3",
+      "textStyleRaw": "UICTFontTextStyleTitle3",
+      "tracking": {
+        "measuredEm": -0.0156,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": -0.2344,
+        "rawFontVariationCheck": {
+          "opsz": 17
+        },
+        "trakTableNormalPt": -0.2344,
+        "trakTableNormalUnits": -32
+      },
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17
+      },
+      "weightName": "regular",
+      "xHeight": 7.8955
+    },
+    {
+      "ascender": 12.5684,
+      "baselineOffset_NSLayoutManager": 13,
+      "capHeight": 9.1597,
+      "descender": -2.7422,
+      "descriptorAttributes": {
+        "NSCTFontSizeCategoryAttribute": "3",
+        "NSCTFontUIUsageAttribute": "UICTFontTextStyleHeadline",
+        "NSFontSizeAttribute": "13"
+      },
+      "displayName": "System Font Bold",
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".SFNS-Bold",
+      "fullName": "System Font Bold",
+      "leading": 0.6895,
+      "lineHeight_ascPlusDescPlusLeading": 16,
+      "lineHeight_NSLayoutManager": 16,
+      "pointSize": 13,
+      "postScriptName": ".SFNS-Bold",
+      "style": "headline",
+      "textStyleRaw": "UICTFontTextStyleHeadline",
+      "tracking": {
+        "measuredEm": -0.0059,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": -0.0762,
+        "rawFontVariationCheck": {
+          "opsz": 17,
+          "wght": 700
+        },
+        "trakTableNormalPt": -0.0762,
+        "trakTableNormalUnits": -12
+      },
+      "traits": {
+        "slant": 0,
+        "symbolic": 16386,
+        "weight": 0.4000000059604645,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17,
+        "wght": 700
+      },
+      "weightName": "bold",
+      "xHeight": 6.9888
+    },
+    {
+      "ascender": 10.6348,
+      "baselineOffset_NSLayoutManager": 11,
+      "capHeight": 7.7505,
+      "descender": -2.3203,
+      "descriptorAttributes": {
+        "NSCTFontSizeCategoryAttribute": "3",
+        "NSCTFontUIUsageAttribute": "UICTFontTextStyleSubhead",
+        "NSFontSizeAttribute": "11"
+      },
+      "displayName": "System Font Regular",
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".SFNS-Regular",
+      "fullName": "System Font Regular",
+      "leading": 1.0449,
+      "lineHeight_ascPlusDescPlusLeading": 14,
+      "lineHeight_NSLayoutManager": 14,
+      "pointSize": 11,
+      "postScriptName": ".SFNS-Regular",
+      "style": "subheadline",
+      "textStyleRaw": "UICTFontTextStyleSubhead",
+      "tracking": {
+        "measuredEm": 0.0059,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.0645,
+        "rawFontVariationCheck": {
+          "opsz": 17
+        },
+        "trakTableNormalPt": 0.0645,
+        "trakTableNormalUnits": 12
+      },
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17
+      },
+      "weightName": "regular",
+      "xHeight": 5.79
+    },
+    {
+      "ascender": 12.5684,
+      "baselineOffset_NSLayoutManager": 13,
+      "capHeight": 9.1597,
+      "descender": -2.7422,
+      "descriptorAttributes": {
+        "NSCTFontSizeCategoryAttribute": "3",
+        "NSCTFontUIUsageAttribute": "UICTFontTextStyleBody",
+        "NSFontSizeAttribute": "13"
+      },
+      "displayName": "System Font Regular",
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".SFNS-Regular",
+      "fullName": "System Font Regular",
+      "leading": 0.6895,
+      "lineHeight_ascPlusDescPlusLeading": 16,
+      "lineHeight_NSLayoutManager": 16,
+      "pointSize": 13,
+      "postScriptName": ".SFNS-Regular",
+      "style": "body",
+      "textStyleRaw": "UICTFontTextStyleBody",
+      "tracking": {
+        "measuredEm": -0.0059,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": -0.0762,
+        "rawFontVariationCheck": {
+          "opsz": 17
+        },
+        "trakTableNormalPt": -0.0762,
+        "trakTableNormalUnits": -12
+      },
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17
+      },
+      "weightName": "regular",
+      "xHeight": 6.8428
+    },
+    {
+      "ascender": 11.6016,
+      "baselineOffset_NSLayoutManager": 12,
+      "capHeight": 8.4551,
+      "descender": -2.5313,
+      "descriptorAttributes": {
+        "NSCTFontSizeCategoryAttribute": "3",
+        "NSCTFontUIUsageAttribute": "UICTFontTextStyleCallout",
+        "NSFontSizeAttribute": "12"
+      },
+      "displayName": "System Font Regular",
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".SFNS-Regular",
+      "fullName": "System Font Regular",
+      "leading": 0.8672,
+      "lineHeight_ascPlusDescPlusLeading": 15,
+      "lineHeight_NSLayoutManager": 15,
+      "pointSize": 12,
+      "postScriptName": ".SFNS-Regular",
+      "style": "callout",
+      "textStyleRaw": "UICTFontTextStyleCallout",
+      "tracking": {
+        "measuredEm": 0,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0,
+        "rawFontVariationCheck": {
+          "opsz": 17
+        },
+        "trakTableNormalPt": 0,
+        "trakTableNormalUnits": 0
+      },
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17
+      },
+      "weightName": "regular",
+      "xHeight": 6.3164
+    },
+    {
+      "ascender": 9.668,
+      "baselineOffset_NSLayoutManager": 10,
+      "capHeight": 7.0459,
+      "descender": -2.1094,
+      "descriptorAttributes": {
+        "NSCTFontSizeCategoryAttribute": "3",
+        "NSCTFontUIUsageAttribute": "UICTFontTextStyleFootnote",
+        "NSFontSizeAttribute": "10"
+      },
+      "displayName": "System Font Regular",
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".SFNS-Regular",
+      "fullName": "System Font Regular",
+      "leading": 1.2227,
+      "lineHeight_ascPlusDescPlusLeading": 13,
+      "lineHeight_NSLayoutManager": 13,
+      "pointSize": 10,
+      "postScriptName": ".SFNS-Regular",
+      "style": "footnote",
+      "textStyleRaw": "UICTFontTextStyleFootnote",
+      "tracking": {
+        "measuredEm": 0.0117,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.1172,
+        "rawFontVariationCheck": {
+          "opsz": 17
+        },
+        "trakTableNormalPt": 0.1172,
+        "trakTableNormalUnits": 24
+      },
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17
+      },
+      "weightName": "regular",
+      "xHeight": 5.2637
+    },
+    {
+      "ascender": 9.668,
+      "baselineOffset_NSLayoutManager": 10,
+      "capHeight": 7.0459,
+      "descender": -2.1094,
+      "descriptorAttributes": {
+        "NSCTFontSizeCategoryAttribute": "3",
+        "NSCTFontUIUsageAttribute": "UICTFontTextStyleCaption1",
+        "NSFontSizeAttribute": "10"
+      },
+      "displayName": "System Font Regular",
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".SFNS-Regular",
+      "fullName": "System Font Regular",
+      "leading": 1.2227,
+      "lineHeight_ascPlusDescPlusLeading": 13,
+      "lineHeight_NSLayoutManager": 13,
+      "pointSize": 10,
+      "postScriptName": ".SFNS-Regular",
+      "style": "caption1",
+      "textStyleRaw": "UICTFontTextStyleCaption1",
+      "tracking": {
+        "measuredEm": 0.0117,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.1172,
+        "rawFontVariationCheck": {
+          "opsz": 17
+        },
+        "trakTableNormalPt": 0.1172,
+        "trakTableNormalUnits": 24
+      },
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17
+      },
+      "weightName": "regular",
+      "xHeight": 5.2637
+    },
+    {
+      "ascender": 9.668,
+      "baselineOffset_NSLayoutManager": 10,
+      "capHeight": 7.0459,
+      "descender": -2.1094,
+      "descriptorAttributes": {
+        "NSCTFontSizeCategoryAttribute": "3",
+        "NSCTFontUIUsageAttribute": "UICTFontTextStyleCaption2",
+        "NSFontSizeAttribute": "10"
+      },
+      "displayName": "System Font Medium",
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".SFNS-Medium",
+      "fullName": "System Font Medium",
+      "leading": 1.2227,
+      "lineHeight_ascPlusDescPlusLeading": 13,
+      "lineHeight_NSLayoutManager": 13,
+      "pointSize": 10,
+      "postScriptName": ".SFNS-Medium",
+      "style": "caption2",
+      "textStyleRaw": "UICTFontTextStyleCaption2",
+      "tracking": {
+        "measuredEm": 0.0117,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.1172,
+        "rawFontVariationCheck": {
+          "opsz": 17,
+          "wght": 510
+        },
+        "trakTableNormalPt": 0.1172,
+        "trakTableNormalUnits": 24
+      },
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17,
+        "wght": 510
+      },
+      "weightName": "regular",
+      "xHeight": 5.3027
+    }
+  ],
+  "systemFontSizeForControlSize": {
+    "extraLarge": 13,
+    "large": 13,
+    "mini": 9,
+    "regular": 13,
+    "small": 11
+  },
+  "systemFontSize": 13,
+  "smallSystemFontSize": 11,
+  "labelFontSize": 10,
+  "namedFonts": {
+    "boldSystemFont(0)": {
+      "ascender": 12.5684,
+      "descender": -2.7422,
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".AppleSystemUIFontBold",
+      "leading": 0,
+      "lineHeight_NSLayoutManager": 16,
+      "pointSize": 13,
+      "postScriptName": ".SFNS-Bold",
+      "traits": {
+        "slant": 0,
+        "symbolic": 16386,
+        "weight": 0.4000000059604645,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17,
+        "wght": 700
+      },
+      "weightName": "bold"
+    },
+    "controlContentFont(0)": {
+      "ascender": 11.6016,
+      "descender": -2.5313,
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".AppleSystemUIFont",
+      "leading": 0,
+      "lineHeight_NSLayoutManager": 15,
+      "pointSize": 12,
+      "postScriptName": ".SFNS-Regular",
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17
+      },
+      "weightName": "regular"
+    },
+    "labelFont(0)": {
+      "ascender": 9.668,
+      "descender": -2.1094,
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".AppleSystemUIFont",
+      "leading": 0,
+      "lineHeight_NSLayoutManager": 12,
+      "pointSize": 10,
+      "postScriptName": ".SFNS-Regular",
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17
+      },
+      "weightName": "regular"
+    },
+    "menuBarFont(0)": {
+      "ascender": 12.5684,
+      "descender": -2.7422,
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".AppleSystemUIFont",
+      "leading": 0,
+      "lineHeight_NSLayoutManager": 16,
+      "pointSize": 13,
+      "postScriptName": ".SFNS-Regular",
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17
+      },
+      "weightName": "regular"
+    },
+    "menuFont(0)": {
+      "ascender": 12.5684,
+      "descender": -2.7422,
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".AppleSystemUIFont",
+      "leading": 0,
+      "lineHeight_NSLayoutManager": 16,
+      "pointSize": 13,
+      "postScriptName": ".SFNS-Regular",
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17
+      },
+      "weightName": "regular"
+    },
+    "messageFont(0)": {
+      "ascender": 12.5684,
+      "descender": -2.7422,
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".AppleSystemUIFont",
+      "leading": 0,
+      "lineHeight_NSLayoutManager": 16,
+      "pointSize": 13,
+      "postScriptName": ".SFNS-Regular",
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17
+      },
+      "weightName": "regular"
+    },
+    "monospacedDigitSystemFont(0,regular)": {
+      "ascender": 12.5684,
+      "descender": -2.7422,
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".SFNS-Regular",
+      "leading": 0,
+      "lineHeight_NSLayoutManager": 16,
+      "pointSize": 13,
+      "postScriptName": ".SFNS-Regular",
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17
+      },
+      "weightName": "regular"
+    },
+    "monospacedSystemFont(0,regular)": {
+      "ascender": 12.5684,
+      "descender": -2.7422,
+      "familyName": ".AppleSystemUIFontMonospaced",
+      "fontName": ".AppleSystemUIFontMonospaced-Regular",
+      "leading": 0,
+      "lineHeight_NSLayoutManager": 16,
+      "pointSize": 13,
+      "postScriptName": ".AppleSystemUIFontMonospaced-Regular",
+      "traits": {
+        "slant": 0,
+        "symbolic": 17408,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "wght": 400,
+        "YAXS": 324.3341
+      },
+      "weightName": "regular"
+    },
+    "paletteFont(0)": {
+      "ascender": 10.6348,
+      "descender": -2.3203,
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".AppleSystemUIFont",
+      "leading": 0,
+      "lineHeight_NSLayoutManager": 13,
+      "pointSize": 11,
+      "postScriptName": ".SFNS-Regular",
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17
+      },
+      "weightName": "regular"
+    },
+    "systemFont(0)": {
+      "ascender": 12.5684,
+      "descender": -2.7422,
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".AppleSystemUIFont",
+      "leading": 0,
+      "lineHeight_NSLayoutManager": 16,
+      "pointSize": 13,
+      "postScriptName": ".SFNS-Regular",
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17
+      },
+      "weightName": "regular"
+    },
+    "titleBarFont(0)": {
+      "ascender": 12.5684,
+      "descender": -2.7422,
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".AppleSystemUIFaceHeadline",
+      "leading": 0.6895,
+      "lineHeight_NSLayoutManager": 16,
+      "pointSize": 13,
+      "postScriptName": ".SFNS-Bold",
+      "traits": {
+        "slant": 0,
+        "symbolic": 16386,
+        "weight": 0.4000000059604645,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17,
+        "wght": 700
+      },
+      "weightName": "bold"
+    },
+    "toolTipsFont(0)": {
+      "ascender": 10.6348,
+      "descender": -2.3203,
+      "familyName": ".AppleSystemUIFont",
+      "fontName": ".AppleSystemUIFont",
+      "leading": 0,
+      "lineHeight_NSLayoutManager": 13,
+      "pointSize": 11,
+      "postScriptName": ".SFNS-Regular",
+      "traits": {
+        "slant": 0,
+        "symbolic": 16384,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {
+        "opsz": 17
+      },
+      "weightName": "regular"
+    },
+    "userFixedPitchFont(0)": {
+      "ascender": 10.2104,
+      "descender": -2.5942,
+      "familyName": "Menlo",
+      "fontName": "Menlo-Regular",
+      "leading": 0,
+      "lineHeight_NSLayoutManager": 13,
+      "pointSize": 11,
+      "postScriptName": "Menlo-Regular",
+      "traits": {
+        "slant": 0,
+        "symbolic": 2147484672,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {},
+      "weightName": "regular"
+    },
+    "userFont(0)": {
+      "ascender": 9.2402,
+      "descender": -2.7598,
+      "familyName": "Helvetica",
+      "fontName": "Helvetica",
+      "leading": 0,
+      "lineHeight_NSLayoutManager": 14,
+      "pointSize": 12,
+      "postScriptName": "Helvetica",
+      "traits": {
+        "slant": 0,
+        "symbolic": 2147483648,
+        "weight": 0,
+        "width": 0
+      },
+      "variation": {},
+      "weightName": "regular"
+    }
+  },
+  "sfProRegularTrackingBySizeCompact": [
+    {
+      "size": 9,
+      "opsz": 17,
+      "design": "Text (opsz clamped to axis min 17)",
+      "trackingPt": 0.167,
+      "trakUnits_linearInterp": 38,
+      "trakPt_linearInterp": 0.167,
+      "measuredUnits": 38.0,
+      "untracked_n_advance_per1000em": 583.4961,
+      "advance_n_pt": 5.4185,
+      "pangramWidthPt": 196.4531
+    },
+    {
+      "size": 10,
+      "opsz": 17,
+      "design": "Text (opsz clamped to axis min 17)",
+      "trackingPt": 0.1172,
+      "trakUnits_linearInterp": 24,
+      "trakPt_linearInterp": 0.1172,
+      "measuredUnits": 24.0,
+      "untracked_n_advance_per1000em": 583.4961,
+      "advance_n_pt": 5.9521,
+      "pangramWidthPt": 215.3418
+    },
+    {
+      "size": 11,
+      "opsz": 17,
+      "design": "Text (opsz clamped to axis min 17)",
+      "trackingPt": 0.0645,
+      "trakUnits_linearInterp": 12,
+      "trakPt_linearInterp": 0.0645,
+      "measuredUnits": 12.01,
+      "untracked_n_advance_per1000em": 583.4961,
+      "advance_n_pt": 6.4829,
+      "pangramWidthPt": 234.1045
+    },
+    {
+      "size": 12,
+      "opsz": 17,
+      "design": "Text (opsz clamped to axis min 17)",
+      "trackingPt": 0,
+      "trakUnits_linearInterp": 0,
+      "trakPt_linearInterp": 0,
+      "measuredUnits": 0.0,
+      "untracked_n_advance_per1000em": 583.4961,
+      "advance_n_pt": 7.002,
+      "pangramWidthPt": 252.3633
+    },
+    {
+      "size": 13,
+      "opsz": 17,
+      "design": "Text (opsz clamped to axis min 17)",
+      "trackingPt": -0.0762,
+      "trakUnits_linearInterp": -12,
+      "trakPt_linearInterp": -0.0762,
+      "measuredUnits": -12.0,
+      "untracked_n_advance_per1000em": 583.4961,
+      "advance_n_pt": 7.5093,
+      "pangramWidthPt": 270.1182
+    },
+    {
+      "size": 14,
+      "opsz": 17,
+      "design": "Text (opsz clamped to axis min 17)",
+      "trackingPt": -0.1504,
+      "trakUnits_linearInterp": -22,
+      "trakPt_linearInterp": -0.1504,
+      "measuredUnits": -22.0,
+      "untracked_n_advance_per1000em": 583.4961,
+      "advance_n_pt": 8.0186,
+      "pangramWidthPt": 287.957
+    },
+    {
+      "size": 15,
+      "opsz": 17,
+      "design": "Text (opsz clamped to axis min 17)",
+      "trackingPt": -0.2344,
+      "trakUnits_linearInterp": -32,
+      "trakPt_linearInterp": -0.2344,
+      "measuredUnits": -32.0,
+      "untracked_n_advance_per1000em": 583.4961,
+      "advance_n_pt": 8.5181,
+      "pangramWidthPt": 305.376
+    },
+    {
+      "size": 16,
+      "opsz": 17,
+      "design": "Text (opsz clamped to axis min 17)",
+      "trackingPt": -0.3125,
+      "trakUnits_linearInterp": -40,
+      "trakPt_linearInterp": -0.3125,
+      "measuredUnits": -40.0,
+      "untracked_n_advance_per1000em": 583.4961,
+      "advance_n_pt": 9.0234,
+      "pangramWidthPt": 323.0469
+    },
+    {
+      "size": 17,
+      "opsz": 17,
+      "design": "Text (opsz clamped to axis min 17)",
+      "trackingPt": -0.4316,
+      "trakUnits_linearInterp": -52,
+      "trakPt_linearInterp": -0.4316,
+      "measuredUnits": -52.0,
+      "untracked_n_advance_per1000em": 583.4961,
+      "advance_n_pt": 9.4878,
+      "pangramWidthPt": 338.9541
+    },
+    {
+      "size": 18,
+      "opsz": 18,
+      "design": "between Text and Display (opsz 18, continuous)",
+      "trackingPt": -0.4395,
+      "trakUnits_linearInterp": -50,
+      "trakPt_linearInterp": -0.4395,
+      "measuredUnits": -50.01,
+      "untracked_n_advance_per1000em": 580.9206,
+      "advance_n_pt": 10.0171,
+      "pangramWidthPt": 357.4604
+    },
+    {
+      "size": 19,
+      "opsz": 19,
+      "design": "between Text and Display (opsz 19, continuous)",
+      "trackingPt": -0.4453,
+      "trakUnits_linearInterp": -48,
+      "trakPt_linearInterp": -0.4453,
+      "measuredUnits": -48.0,
+      "untracked_n_advance_per1000em": 578.3485,
+      "advance_n_pt": 10.5433,
+      "pangramWidthPt": 375.8106
+    },
+    {
+      "size": 20,
+      "opsz": 20,
+      "design": "between Text and Display (opsz 20, continuous)",
+      "trackingPt": -0.4492,
+      "trakUnits_linearInterp": -46,
+      "trakPt_linearInterp": -0.4492,
+      "measuredUnits": -46.0,
+      "untracked_n_advance_per1000em": 570.1103,
+      "advance_n_pt": 10.953,
+      "pangramWidthPt": 388.6534
+    },
+    {
+      "size": 21,
+      "opsz": 21,
+      "design": "between Text and Display (opsz 21, continuous)",
+      "trackingPt": -0.3589,
+      "trakUnits_linearInterp": -35,
+      "trakPt_linearInterp": -0.3589,
+      "measuredUnits": -35.0,
+      "untracked_n_advance_per1000em": 561.8687,
+      "advance_n_pt": 11.4404,
+      "pangramWidthPt": 404.7673
+    },
+    {
+      "size": 22,
+      "opsz": 22,
+      "design": "between Text and Display (opsz 22, continuous)",
+      "trackingPt": -0.2578,
+      "trakUnits_linearInterp": -24,
+      "trakPt_linearInterp": -0.2578,
+      "measuredUnits": -24.0,
+      "untracked_n_advance_per1000em": 553.6305,
+      "advance_n_pt": 11.9221,
+      "pangramWidthPt": 420.5687
+    },
+    {
+      "size": 23,
+      "opsz": 23,
+      "design": "between Text and Display (opsz 23, continuous)",
+      "trackingPt": -0.1011,
+      "trakUnits_linearInterp": -9,
+      "trakPt_linearInterp": -0.1011,
+      "measuredUnits": -9.0,
+      "untracked_n_advance_per1000em": 545.3923,
+      "advance_n_pt": 12.4429,
+      "pangramWidthPt": 437.9861
+    },
+    {
+      "size": 24,
+      "opsz": 24,
+      "design": "between Text and Display (opsz 24, continuous)",
+      "trackingPt": 0.0703,
+      "trakUnits_linearInterp": 6,
+      "trakPt_linearInterp": 0.0703,
+      "measuredUnits": 6.0,
+      "untracked_n_advance_per1000em": 537.1541,
+      "advance_n_pt": 12.962,
+      "pangramWidthPt": 455.2557
+    },
+    {
+      "size": 25,
+      "opsz": 25,
+      "design": "between Text and Display (opsz 25, continuous)",
+      "trackingPt": 0.1343,
+      "trakUnits_linearInterp": 11.5,
+      "trakPt_linearInterp": 0.1404,
+      "measuredUnits": 11.0,
+      "untracked_n_advance_per1000em": 534.5786,
+      "advance_n_pt": 13.4987,
+      "pangramWidthPt": 473.8102
+    },
+    {
+      "size": 26,
+      "opsz": 26,
+      "design": "between Text and Display (opsz 26, continuous)",
+      "trackingPt": 0.2158,
+      "trakUnits_linearInterp": 17,
+      "trakPt_linearInterp": 0.2158,
+      "measuredUnits": 17.0,
+      "untracked_n_advance_per1000em": 532.003,
+      "advance_n_pt": 14.0479,
+      "pangramWidthPt": 492.8774
+    },
+    {
+      "size": 27,
+      "opsz": 27,
+      "design": "between Text and Display (opsz 27, continuous)",
+      "trackingPt": 0.29,
+      "trakUnits_linearInterp": 22.5,
+      "trakPt_linearInterp": 0.2966,
+      "measuredUnits": 22.0,
+      "untracked_n_advance_per1000em": 529.431,
+      "advance_n_pt": 14.5847,
+      "pangramWidthPt": 511.391
+    },
+    {
+      "size": 28,
+      "opsz": 28,
+      "design": "Display (opsz 28 = axis default)",
+      "trackingPt": 0.3828,
+      "trakUnits_linearInterp": 28,
+      "trakPt_linearInterp": 0.3828,
+      "measuredUnits": 28.0,
+      "untracked_n_advance_per1000em": 526.8555,
+      "advance_n_pt": 15.1348,
+      "pangramWidthPt": 530.4551
+    },
+    {
+      "size": 29,
+      "opsz": 29,
+      "design": "Display, opsz 29 (axis runs to 96)",
+      "trackingPt": 0.3823,
+      "trakUnits_linearInterp": 27.5,
+      "trakPt_linearInterp": 0.3894,
+      "measuredUnits": 27.0,
+      "untracked_n_advance_per1000em": 526.8555,
+      "advance_n_pt": 15.6611,
+      "pangramWidthPt": 548.791
+    },
+    {
+      "size": 30,
+      "opsz": 30,
+      "design": "Display, opsz 30 (axis runs to 96)",
+      "trackingPt": 0.3955,
+      "trakUnits_linearInterp": 27,
+      "trakPt_linearInterp": 0.3955,
+      "measuredUnits": 27.0,
+      "untracked_n_advance_per1000em": 526.8555,
+      "advance_n_pt": 16.2012,
+      "pangramWidthPt": 567.7148
+    },
+    {
+      "size": 34,
+      "opsz": 34,
+      "design": "Display, opsz 34 (axis runs to 96)",
+      "trackingPt": 0.3818,
+      "trakUnits_linearInterp": 23.5,
+      "trakPt_linearInterp": 0.3901,
+      "measuredUnits": 23.0,
+      "untracked_n_advance_per1000em": 526.8555,
+      "advance_n_pt": 18.2949,
+      "pangramWidthPt": 640.5547
+    },
+    {
+      "size": 40,
+      "opsz": 40,
+      "design": "Display, opsz 40 (axis runs to 96)",
+      "trackingPt": 0.3711,
+      "trakUnits_linearInterp": 19,
+      "trakPt_linearInterp": 0.3711,
+      "measuredUnits": 19.0,
+      "untracked_n_advance_per1000em": 526.8555,
+      "advance_n_pt": 21.4453,
+      "pangramWidthPt": 750.2344
+    },
+    {
+      "size": 48,
+      "opsz": 48,
+      "design": "Display, opsz 48 (axis runs to 96)",
+      "trackingPt": 0.3516,
+      "trakUnits_linearInterp": 15,
+      "trakPt_linearInterp": 0.3516,
+      "measuredUnits": 15.0,
+      "untracked_n_advance_per1000em": 526.8555,
+      "advance_n_pt": 25.6406,
+      "pangramWidthPt": 896.25
+    }
+  ],
+  "sfProRegularTrackingBySize": [
+    {
+      "advance_n_pt": 5.4185,
+      "opsz": 17,
+      "opticalDesign": "Text (opsz clamped to axis min 17)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 583.4961,
+      "size": 9,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": 0.0186,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.167,
+        "rawFontVariationCheck": {
+          "opsz": 17
+        },
+        "trakTableNormalPt": 0.167,
+        "trakTableNormalUnits": 38
+      },
+      "width_pangram_pt": 196.4531
+    },
+    {
+      "advance_n_pt": 5.9521,
+      "opsz": 17,
+      "opticalDesign": "Text (opsz clamped to axis min 17)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 583.4961,
+      "size": 10,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": 0.0117,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.1172,
+        "rawFontVariationCheck": {
+          "opsz": 17
+        },
+        "trakTableNormalPt": 0.1172,
+        "trakTableNormalUnits": 24
+      },
+      "width_pangram_pt": 215.3418
+    },
+    {
+      "advance_n_pt": 6.4829,
+      "opsz": 17,
+      "opticalDesign": "Text (opsz clamped to axis min 17)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 583.4961,
+      "size": 11,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": 0.0059,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.0645,
+        "rawFontVariationCheck": {
+          "opsz": 17
+        },
+        "trakTableNormalPt": 0.0645,
+        "trakTableNormalUnits": 12
+      },
+      "width_pangram_pt": 234.1045
+    },
+    {
+      "advance_n_pt": 7.002,
+      "opsz": 17,
+      "opticalDesign": "Text (opsz clamped to axis min 17)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 583.4961,
+      "size": 12,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": 0,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0,
+        "rawFontVariationCheck": {
+          "opsz": 17
+        },
+        "trakTableNormalPt": 0,
+        "trakTableNormalUnits": 0
+      },
+      "width_pangram_pt": 252.3633
+    },
+    {
+      "advance_n_pt": 7.5093,
+      "opsz": 17,
+      "opticalDesign": "Text (opsz clamped to axis min 17)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 583.4961,
+      "size": 13,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": -0.0059,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": -0.0762,
+        "rawFontVariationCheck": {
+          "opsz": 17
+        },
+        "trakTableNormalPt": -0.0762,
+        "trakTableNormalUnits": -12
+      },
+      "width_pangram_pt": 270.1182
+    },
+    {
+      "advance_n_pt": 8.0186,
+      "opsz": 17,
+      "opticalDesign": "Text (opsz clamped to axis min 17)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 583.4961,
+      "size": 14,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": -0.0107,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": -0.1504,
+        "rawFontVariationCheck": {
+          "opsz": 17
+        },
+        "trakTableNormalPt": -0.1504,
+        "trakTableNormalUnits": -22
+      },
+      "width_pangram_pt": 287.957
+    },
+    {
+      "advance_n_pt": 8.5181,
+      "opsz": 17,
+      "opticalDesign": "Text (opsz clamped to axis min 17)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 583.4961,
+      "size": 15,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": -0.0156,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": -0.2344,
+        "rawFontVariationCheck": {
+          "opsz": 17
+        },
+        "trakTableNormalPt": -0.2344,
+        "trakTableNormalUnits": -32
+      },
+      "width_pangram_pt": 305.376
+    },
+    {
+      "advance_n_pt": 9.0234,
+      "opsz": 17,
+      "opticalDesign": "Text (opsz clamped to axis min 17)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 583.4961,
+      "size": 16,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": -0.0195,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": -0.3125,
+        "rawFontVariationCheck": {
+          "opsz": 17
+        },
+        "trakTableNormalPt": -0.3125,
+        "trakTableNormalUnits": -40
+      },
+      "width_pangram_pt": 323.0469
+    },
+    {
+      "advance_n_pt": 9.4878,
+      "opsz": 17,
+      "opticalDesign": "Text (opsz clamped to axis min 17)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 583.4961,
+      "size": 17,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": -0.0254,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": -0.4316,
+        "rawFontVariationCheck": {
+          "opsz": 17
+        },
+        "trakTableNormalPt": -0.4316,
+        "trakTableNormalUnits": -52
+      },
+      "width_pangram_pt": 338.9541
+    },
+    {
+      "advance_n_pt": 10.0171,
+      "opsz": 18,
+      "opticalDesign": "between Text and Display (opsz 18, continuous)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 580.9206,
+      "size": 18,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": -0.0244,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": -0.4395,
+        "rawFontVariationCheck": {
+          "opsz": 18
+        },
+        "trakTableNormalPt": -0.4395,
+        "trakTableNormalUnits": -50
+      },
+      "width_pangram_pt": 357.4604
+    },
+    {
+      "advance_n_pt": 10.5433,
+      "opsz": 19,
+      "opticalDesign": "between Text and Display (opsz 19, continuous)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 578.3485,
+      "size": 19,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": -0.0234,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": -0.4453,
+        "rawFontVariationCheck": {
+          "opsz": 19
+        },
+        "trakTableNormalPt": -0.4453,
+        "trakTableNormalUnits": -48
+      },
+      "width_pangram_pt": 375.8106
+    },
+    {
+      "advance_n_pt": 10.953,
+      "opsz": 20,
+      "opticalDesign": "between Text and Display (opsz 20, continuous)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 570.1103,
+      "size": 20,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": -0.0225,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": -0.4492,
+        "rawFontVariationCheck": {
+          "opsz": 20
+        },
+        "trakTableNormalPt": -0.4492,
+        "trakTableNormalUnits": -46
+      },
+      "width_pangram_pt": 388.6534
+    },
+    {
+      "advance_n_pt": 11.4404,
+      "opsz": 21,
+      "opticalDesign": "between Text and Display (opsz 21, continuous)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 561.8687,
+      "size": 21,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": -0.0171,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": -0.3589,
+        "rawFontVariationCheck": {
+          "opsz": 21
+        },
+        "trakTableNormalPt": -0.3589,
+        "trakTableNormalUnits": -35
+      },
+      "width_pangram_pt": 404.7673
+    },
+    {
+      "advance_n_pt": 11.9221,
+      "opsz": 22,
+      "opticalDesign": "between Text and Display (opsz 22, continuous)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 553.6305,
+      "size": 22,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": -0.0117,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": -0.2578,
+        "rawFontVariationCheck": {
+          "opsz": 22
+        },
+        "trakTableNormalPt": -0.2578,
+        "trakTableNormalUnits": -24
+      },
+      "width_pangram_pt": 420.5687
+    },
+    {
+      "advance_n_pt": 12.4429,
+      "opsz": 23,
+      "opticalDesign": "between Text and Display (opsz 23, continuous)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 545.3923,
+      "size": 23,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": -0.0044,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": -0.1011,
+        "rawFontVariationCheck": {
+          "opsz": 23
+        },
+        "trakTableNormalPt": -0.1011,
+        "trakTableNormalUnits": -9
+      },
+      "width_pangram_pt": 437.9861
+    },
+    {
+      "advance_n_pt": 12.962,
+      "opsz": 24,
+      "opticalDesign": "between Text and Display (opsz 24, continuous)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 537.1541,
+      "size": 24,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": 0.0029,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.0703,
+        "rawFontVariationCheck": {
+          "opsz": 24
+        },
+        "trakTableNormalPt": 0.0703,
+        "trakTableNormalUnits": 6
+      },
+      "width_pangram_pt": 455.2557
+    },
+    {
+      "advance_n_pt": 13.4987,
+      "opsz": 25,
+      "opticalDesign": "between Text and Display (opsz 25, continuous)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 534.5786,
+      "size": 25,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": 0.0054,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.1343,
+        "rawFontVariationCheck": {
+          "opsz": 25
+        },
+        "trakTableNormalPt": 0.1404,
+        "trakTableNormalUnits": 11.5
+      },
+      "width_pangram_pt": 473.8102
+    },
+    {
+      "advance_n_pt": 14.0479,
+      "opsz": 26,
+      "opticalDesign": "between Text and Display (opsz 26, continuous)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 532.003,
+      "size": 26,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": 0.0083,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.2158,
+        "rawFontVariationCheck": {
+          "opsz": 26
+        },
+        "trakTableNormalPt": 0.2158,
+        "trakTableNormalUnits": 17
+      },
+      "width_pangram_pt": 492.8774
+    },
+    {
+      "advance_n_pt": 14.5847,
+      "opsz": 27,
+      "opticalDesign": "between Text and Display (opsz 27, continuous)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 529.431,
+      "size": 27,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": 0.0107,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.29,
+        "rawFontVariationCheck": {
+          "opsz": 27
+        },
+        "trakTableNormalPt": 0.2966,
+        "trakTableNormalUnits": 22.5
+      },
+      "width_pangram_pt": 511.391
+    },
+    {
+      "advance_n_pt": 15.1348,
+      "opsz": 28,
+      "opticalDesign": "Display (opsz 28 = axis default)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 526.8555,
+      "size": 28,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": 0.0137,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.3828,
+        "rawFontVariationCheck": {},
+        "trakTableNormalPt": 0.3828,
+        "trakTableNormalUnits": 28
+      },
+      "width_pangram_pt": 530.4551
+    },
+    {
+      "advance_n_pt": 15.6611,
+      "opsz": 29,
+      "opticalDesign": "Display, opsz 29 (axis runs to 96)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 526.8555,
+      "size": 29,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": 0.0132,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.3823,
+        "rawFontVariationCheck": {
+          "opsz": 29
+        },
+        "trakTableNormalPt": 0.3894,
+        "trakTableNormalUnits": 27.5
+      },
+      "width_pangram_pt": 548.791
+    },
+    {
+      "advance_n_pt": 16.2012,
+      "opsz": 30,
+      "opticalDesign": "Display, opsz 30 (axis runs to 96)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 526.8555,
+      "size": 30,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": 0.0132,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.3955,
+        "rawFontVariationCheck": {
+          "opsz": 30
+        },
+        "trakTableNormalPt": 0.3955,
+        "trakTableNormalUnits": 27
+      },
+      "width_pangram_pt": 567.7148
+    },
+    {
+      "advance_n_pt": 18.2949,
+      "opsz": 34,
+      "opticalDesign": "Display, opsz 34 (axis runs to 96)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 526.8555,
+      "size": 34,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": 0.0112,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.3818,
+        "rawFontVariationCheck": {
+          "opsz": 34
+        },
+        "trakTableNormalPt": 0.3901,
+        "trakTableNormalUnits": 23.5
+      },
+      "width_pangram_pt": 640.5547
+    },
+    {
+      "advance_n_pt": 21.4453,
+      "opsz": 40,
+      "opticalDesign": "Display, opsz 40 (axis runs to 96)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 526.8555,
+      "size": 40,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": 0.0093,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.3711,
+        "rawFontVariationCheck": {
+          "opsz": 40
+        },
+        "trakTableNormalPt": 0.3711,
+        "trakTableNormalUnits": 19
+      },
+      "width_pangram_pt": 750.2344
+    },
+    {
+      "advance_n_pt": 25.6406,
+      "opsz": 48,
+      "opticalDesign": "Display, opsz 48 (axis runs to 96)",
+      "postScriptName": ".SFNS-Regular",
+      "rawAdvance_n_per_pt_em1000": 526.8555,
+      "size": 48,
+      "staticSFProDisplay_n_em1000": 526.8555,
+      "staticSFProText_n_em1000": 583.4961,
+      "tracking": {
+        "measuredEm": 0.0073,
+        "measuredPerGlyphSpread": 0,
+        "measuredPt": 0.3516,
+        "rawFontVariationCheck": {
+          "opsz": 48
+        },
+        "trakTableNormalPt": 0.3516,
+        "trakTableNormalUnits": 15
+      },
+      "width_pangram_pt": 896.25
+    }
+  ],
+  "textSample": {
+    "dark": {
+      "background_windowBackgroundColor": "#1E1E1E",
+      "file": "text-sample-dark.png",
+      "lines": [
+        {
+          "baselinePt": 27,
+          "font": ".AppleSystemUIFont",
+          "lineFragmentHeightPt": 13,
+          "pointSize": 11,
+          "postScriptName": ".SFNS-Regular",
+          "text": "SF Pro 11 Regular — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 16,
+          "usedWidthPt": 411.356,
+          "weight": 0
+        },
+        {
+          "baselinePt": 46,
+          "font": ".AppleSystemUIFontDemi",
+          "lineFragmentHeightPt": 13,
+          "pointSize": 11,
+          "postScriptName": ".SFNS-Semibold",
+          "text": "SF Pro 11 Semibold — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 35,
+          "usedWidthPt": 435.5951,
+          "weight": 0.30000001192092896
+        },
+        {
+          "baselinePt": 65,
+          "font": ".AppleSystemUIFontBold",
+          "lineFragmentHeightPt": 13,
+          "pointSize": 11,
+          "postScriptName": ".SFNS-Bold",
+          "text": "SF Pro 11 Bold — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 54,
+          "usedWidthPt": 417.1943,
+          "weight": 0.4000000059604645
+        },
+        {
+          "baselinePt": 86,
+          "font": ".AppleSystemUIFont",
+          "lineFragmentHeightPt": 16,
+          "pointSize": 13,
+          "postScriptName": ".SFNS-Regular",
+          "text": "SF Pro 13 Regular — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 73,
+          "usedWidthPt": 476.9946,
+          "weight": 0
+        },
+        {
+          "baselinePt": 108,
+          "font": ".AppleSystemUIFontDemi",
+          "lineFragmentHeightPt": 16,
+          "pointSize": 13,
+          "postScriptName": ".SFNS-Semibold",
+          "text": "SF Pro 13 Semibold — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 95,
+          "usedWidthPt": 505.4403,
+          "weight": 0.30000001192092896
+        },
+        {
+          "baselinePt": 130,
+          "font": ".AppleSystemUIFontBold",
+          "lineFragmentHeightPt": 16,
+          "pointSize": 13,
+          "postScriptName": ".SFNS-Bold",
+          "text": "SF Pro 13 Bold — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 117,
+          "usedWidthPt": 484.2754,
+          "weight": 0.4000000059604645
+        },
+        {
+          "baselinePt": 155,
+          "font": ".AppleSystemUIFont",
+          "lineFragmentHeightPt": 20,
+          "pointSize": 17,
+          "postScriptName": ".SFNS-Regular",
+          "text": "SF Pro 17 Regular — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 139,
+          "usedWidthPt": 598.2124,
+          "weight": 0
+        },
+        {
+          "baselinePt": 181,
+          "font": ".AppleSystemUIFontDemi",
+          "lineFragmentHeightPt": 20,
+          "pointSize": 17,
+          "postScriptName": ".SFNS-Semibold",
+          "text": "SF Pro 17 Semibold — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 165,
+          "usedWidthPt": 635.005,
+          "weight": 0.30000001192092896
+        },
+        {
+          "baselinePt": 207,
+          "font": ".AppleSystemUIFontBold",
+          "lineFragmentHeightPt": 20,
+          "pointSize": 17,
+          "postScriptName": ".SFNS-Bold",
+          "text": "SF Pro 17 Bold — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 191,
+          "usedWidthPt": 608.6133,
+          "weight": 0.4000000059604645
+        },
+        {
+          "baselinePt": 242,
+          "font": ".AppleSystemUIFont",
+          "lineFragmentHeightPt": 30,
+          "pointSize": 26,
+          "postScriptName": ".SFNS-Regular",
+          "text": "SF Pro 26 Regular — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 217,
+          "usedWidthPt": 886.0571,
+          "weight": 0
+        },
+        {
+          "baselinePt": 278,
+          "font": ".AppleSystemUIFontDemi",
+          "lineFragmentHeightPt": 30,
+          "pointSize": 26,
+          "postScriptName": ".SFNS-Semibold",
+          "text": "SF Pro 26 Semibold — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 253,
+          "usedWidthPt": 947.7285,
+          "weight": 0.30000001192092896
+        },
+        {
+          "baselinePt": 314,
+          "font": ".AppleSystemUIFontBold",
+          "lineFragmentHeightPt": 30,
+          "pointSize": 26,
+          "postScriptName": ".SFNS-Bold",
+          "text": "SF Pro 26 Bold — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 289,
+          "usedWidthPt": 912.0863,
+          "weight": 0.4000000059604645
+        },
+        {
+          "baselinePt": 338,
+          "font": ".AppleSystemUIFont",
+          "lineFragmentHeightPt": 16,
+          "pointSize": 13,
+          "postScriptName": ".SFNS-Regular",
+          "text": "13 pt 😀👍🏽❤️🇮🇩🧑‍💻",
+          "topPt": 325,
+          "usedWidthPt": 128.6934,
+          "weight": 0
+        },
+        {
+          "baselinePt": 372,
+          "font": ".AppleSystemUIFont",
+          "lineFragmentHeightPt": 30,
+          "pointSize": 26,
+          "postScriptName": ".SFNS-Regular",
+          "text": "26 pt 😀👍🏽❤️🇮🇩🧑‍💻",
+          "topPt": 347,
+          "usedWidthPt": 215.6207,
+          "weight": 0
+        }
+      ],
+      "pixels": [
+        2000,
+        786
+      ],
+      "text_textColor": "#FFFFFF a1.000"
+    },
+    "drawing": "NSLayoutManager.drawGlyphs (TextKit 1) into NSBitmapImageRep via NSGraphicsContext(bitmapImageRep:), flipped CTM, 2x",
+    "heightPt": 393,
+    "light": {
+      "background_windowBackgroundColor": "#FFFFFF",
+      "file": "text-sample-light.png",
+      "lines": [
+        {
+          "baselinePt": 27,
+          "font": ".AppleSystemUIFont",
+          "lineFragmentHeightPt": 13,
+          "pointSize": 11,
+          "postScriptName": ".SFNS-Regular",
+          "text": "SF Pro 11 Regular — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 16,
+          "usedWidthPt": 411.356,
+          "weight": 0
+        },
+        {
+          "baselinePt": 46,
+          "font": ".AppleSystemUIFontDemi",
+          "lineFragmentHeightPt": 13,
+          "pointSize": 11,
+          "postScriptName": ".SFNS-Semibold",
+          "text": "SF Pro 11 Semibold — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 35,
+          "usedWidthPt": 435.5951,
+          "weight": 0.30000001192092896
+        },
+        {
+          "baselinePt": 65,
+          "font": ".AppleSystemUIFontBold",
+          "lineFragmentHeightPt": 13,
+          "pointSize": 11,
+          "postScriptName": ".SFNS-Bold",
+          "text": "SF Pro 11 Bold — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 54,
+          "usedWidthPt": 417.1943,
+          "weight": 0.4000000059604645
+        },
+        {
+          "baselinePt": 86,
+          "font": ".AppleSystemUIFont",
+          "lineFragmentHeightPt": 16,
+          "pointSize": 13,
+          "postScriptName": ".SFNS-Regular",
+          "text": "SF Pro 13 Regular — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 73,
+          "usedWidthPt": 476.9946,
+          "weight": 0
+        },
+        {
+          "baselinePt": 108,
+          "font": ".AppleSystemUIFontDemi",
+          "lineFragmentHeightPt": 16,
+          "pointSize": 13,
+          "postScriptName": ".SFNS-Semibold",
+          "text": "SF Pro 13 Semibold — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 95,
+          "usedWidthPt": 505.4403,
+          "weight": 0.30000001192092896
+        },
+        {
+          "baselinePt": 130,
+          "font": ".AppleSystemUIFontBold",
+          "lineFragmentHeightPt": 16,
+          "pointSize": 13,
+          "postScriptName": ".SFNS-Bold",
+          "text": "SF Pro 13 Bold — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 117,
+          "usedWidthPt": 484.2754,
+          "weight": 0.4000000059604645
+        },
+        {
+          "baselinePt": 155,
+          "font": ".AppleSystemUIFont",
+          "lineFragmentHeightPt": 20,
+          "pointSize": 17,
+          "postScriptName": ".SFNS-Regular",
+          "text": "SF Pro 17 Regular — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 139,
+          "usedWidthPt": 598.2124,
+          "weight": 0
+        },
+        {
+          "baselinePt": 181,
+          "font": ".AppleSystemUIFontDemi",
+          "lineFragmentHeightPt": 20,
+          "pointSize": 17,
+          "postScriptName": ".SFNS-Semibold",
+          "text": "SF Pro 17 Semibold — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 165,
+          "usedWidthPt": 635.005,
+          "weight": 0.30000001192092896
+        },
+        {
+          "baselinePt": 207,
+          "font": ".AppleSystemUIFontBold",
+          "lineFragmentHeightPt": 20,
+          "pointSize": 17,
+          "postScriptName": ".SFNS-Bold",
+          "text": "SF Pro 17 Bold — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 191,
+          "usedWidthPt": 608.6133,
+          "weight": 0.4000000059604645
+        },
+        {
+          "baselinePt": 242,
+          "font": ".AppleSystemUIFont",
+          "lineFragmentHeightPt": 30,
+          "pointSize": 26,
+          "postScriptName": ".SFNS-Regular",
+          "text": "SF Pro 26 Regular — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 217,
+          "usedWidthPt": 886.0571,
+          "weight": 0
+        },
+        {
+          "baselinePt": 278,
+          "font": ".AppleSystemUIFontDemi",
+          "lineFragmentHeightPt": 30,
+          "pointSize": 26,
+          "postScriptName": ".SFNS-Semibold",
+          "text": "SF Pro 26 Semibold — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 253,
+          "usedWidthPt": 947.7285,
+          "weight": 0.30000001192092896
+        },
+        {
+          "baselinePt": 314,
+          "font": ".AppleSystemUIFontBold",
+          "lineFragmentHeightPt": 30,
+          "pointSize": 26,
+          "postScriptName": ".SFNS-Bold",
+          "text": "SF Pro 26 Bold — The quick brown fox jumps over the lazy dog 0123456789",
+          "topPt": 289,
+          "usedWidthPt": 912.0863,
+          "weight": 0.4000000059604645
+        },
+        {
+          "baselinePt": 338,
+          "font": ".AppleSystemUIFont",
+          "lineFragmentHeightPt": 16,
+          "pointSize": 13,
+          "postScriptName": ".SFNS-Regular",
+          "text": "13 pt 😀👍🏽❤️🇮🇩🧑‍💻",
+          "topPt": 325,
+          "usedWidthPt": 128.6934,
+          "weight": 0
+        },
+        {
+          "baselinePt": 372,
+          "font": ".AppleSystemUIFont",
+          "lineFragmentHeightPt": 30,
+          "pointSize": 26,
+          "postScriptName": ".SFNS-Regular",
+          "text": "26 pt 😀👍🏽❤️🇮🇩🧑‍💻",
+          "topPt": 347,
+          "usedWidthPt": 215.6207,
+          "weight": 0
+        }
+      ],
+      "pixels": [
+        2000,
+        786
+      ],
+      "text_textColor": "#000000 a1.000"
+    },
+    "scale": 2,
+    "widthPt": 1000,
+    "files": [
+      "reference/screens/27.2.1/text-sample-light.png",
+      "reference/screens/27.2.1/text-sample-dark.png"
+    ]
+  }
+}

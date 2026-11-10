@@ -1,0 +1,1588 @@
+{
+  "_about": "R4.1 font file hashes on the Mac (macOS 27.2.1 build 26B131, MacBook Air M2) and comparison with the PC copies in themes/fonts/. nameVersion = name table ID 5; ctFontVersionName = CTFontCopyName(kCTFontVersionNameKey); headFontRevision = head.fontRevision.",
+  "generated": "2026-11-10",
+  "os": "macOS 27.2.1 (26B131)",
+  "systemFonts": [
+    {
+      "path": "/System/Library/Fonts/SFArabic.ttf",
+      "size": 719968,
+      "sha256": "12b5b582315dbddf432e467f677b28a87597f474322bfba7d62bc1468a79ce72",
+      "nameVersion": "22.0d4e1",
+      "headFontRevision": 2.0,
+      "headModified": "2026-06-12 23:18:38",
+      "family": ".SF Arabic",
+      "defaultPostScriptName": ".SFArabic-Regular",
+      "hasTrak": false,
+      "fvarAxes": {
+        "wght": [
+          1.0,
+          400.0,
+          1000.0
+        ],
+        "opsz": [
+          17.0,
+          28.0,
+          80.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/SFArabicRounded.ttf",
+      "size": 783568,
+      "sha256": "2bbda7767d5b053335be80ee78bd6f81f3dcbb0a7144f01107f2596e79ca43c2",
+      "nameVersion": "22.0d4e1",
+      "headFontRevision": 2.0,
+      "headModified": "2026-06-12 23:18:41",
+      "family": ".SF Arabic Rounded",
+      "defaultPostScriptName": ".SFArabicRounded-Regular",
+      "hasTrak": false,
+      "fvarAxes": {
+        "wght": [
+          1.0,
+          400.0,
+          1000.0
+        ],
+        "opsz": [
+          17.0,
+          28.0,
+          80.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/SFArmenian.ttf",
+      "size": 86792,
+      "sha256": "0be96891f71de37d0bf3d0504c613ad852d0c04d9638dc7ba90f86a670d73904",
+      "nameVersion": "22.0d3e4",
+      "headFontRevision": 1.0,
+      "headModified": "2026-06-11 19:50:16",
+      "family": ".SF Armenian",
+      "defaultPostScriptName": ".SFArmenian-Regular",
+      "hasTrak": true,
+      "fvarAxes": {
+        "wght": [
+          1.0,
+          400.0,
+          1000.0
+        ],
+        "opsz": [
+          17.0,
+          28.0,
+          28.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/SFArmenianRounded.ttf",
+      "size": 62640,
+      "sha256": "8ffc57e8d7c999f628de49e4a41d2590b7e3df0c99a0f0814c911ac95b61949a",
+      "nameVersion": "22.0d3e4",
+      "headFontRevision": 1.0,
+      "headModified": "2026-06-11 19:50:17",
+      "family": ".SF Armenian Rounded",
+      "defaultPostScriptName": ".SFArmenianRounded-Regular",
+      "hasTrak": true,
+      "fvarAxes": {
+        "wght": [
+          1.0,
+          400.0,
+          1000.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/SFCamera.ttf",
+      "size": 117636,
+      "sha256": "2f09c510f0c17e8c36cdc1b3f6a2129f2de8ee93c8868d476aad4943f85f169a",
+      "nameVersion": "22.0d3e2",
+      "headFontRevision": 1.0,
+      "headModified": "2026-05-08 18:02:47",
+      "family": ".SF Camera",
+      "defaultPostScriptName": "..SFCamera-Regular",
+      "hasTrak": true,
+      "fvarAxes": {
+        "wght": [
+          1.0,
+          400.0,
+          1000.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/SFCompact.ttf",
+      "size": 1896040,
+      "sha256": "044376cb245cb5cdd5c027c22e2854acfe648a2c8e885ecc4a12fdd84df88fee",
+      "nameVersion": "22.0d5e1",
+      "headFontRevision": 1.0,
+      "headModified": "2026-07-21 18:52:49",
+      "family": ".SF Compact",
+      "defaultPostScriptName": ".SFCompact-Black",
+      "hasTrak": true,
+      "ctFontVersionName": "22.0d5e1",
+      "fvarAxes": {
+        "opsz": [
+          19.0,
+          19.0,
+          20.0
+        ],
+        "GRAD": [
+          400.0,
+          400.0,
+          1000.0
+        ],
+        "wght": [
+          1.0,
+          1000.0,
+          1000.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/SFCompactItalic.ttf",
+      "size": 1012892,
+      "sha256": "489239f84611e546b7a09987bf46142ff8099337ae7d3affa2fb59bfadb1cff7",
+      "nameVersion": "22.0d5e1",
+      "headFontRevision": 1.0,
+      "headModified": "2026-07-21 18:52:47",
+      "family": ".SF Compact",
+      "defaultPostScriptName": ".SFCompact-BlackItalic",
+      "hasTrak": true,
+      "ctFontVersionName": "22.0d5e1",
+      "fvarAxes": {
+        "opsz": [
+          19.0,
+          19.0,
+          19.0
+        ],
+        "GRAD": [
+          400.0,
+          400.0,
+          1000.0
+        ],
+        "wght": [
+          1.0,
+          1000.0,
+          1000.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/SFCompactRounded.ttf",
+      "size": 1080280,
+      "sha256": "2db181772dd231c68de536d7f1616d77a093cf932fc28582c6636623b2c61559",
+      "nameVersion": "22.0d3e2",
+      "headFontRevision": 1.0,
+      "headModified": "2026-07-21 18:52:50",
+      "family": ".SF Compact Rounded",
+      "defaultPostScriptName": "..SFCompactRounded-Regular",
+      "hasTrak": true,
+      "ctFontVersionName": "22.0d3e2",
+      "fvarAxes": {
+        "wght": [
+          1.0,
+          400.0,
+          1000.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/SFGeorgian.ttf",
+      "size": 94468,
+      "sha256": "82e01b8585b45b13c37e6cd6d6da36245920aaf09eb459d69888360859baeefe",
+      "nameVersion": "22.0d4e1",
+      "headFontRevision": 1.0,
+      "headModified": "2026-06-11 17:25:21",
+      "family": ".SF Georgian",
+      "defaultPostScriptName": ".SFGeorgian-Regular",
+      "hasTrak": true,
+      "fvarAxes": {
+        "wght": [
+          1.0,
+          400.0,
+          1000.0
+        ],
+        "opsz": [
+          17.0,
+          28.0,
+          28.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/SFGeorgianRounded.ttf",
+      "size": 61664,
+      "sha256": "aeddbaf1ed81ffe2d2fbef48bb51775a33a09e37a87295305d9cf80e091403e1",
+      "nameVersion": "22.0d4e1",
+      "headFontRevision": 1.0,
+      "headModified": "2026-06-11 17:25:31",
+      "family": ".SF Georgian Rounded",
+      "defaultPostScriptName": ".SFGeorgianRounded-Regular",
+      "hasTrak": true,
+      "fvarAxes": {
+        "wght": [
+          1.0,
+          400.0,
+          1000.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/SFHebrew.ttf",
+      "size": 62376,
+      "sha256": "2e69b72734e849f93ca52c560ccf4bd7d70633bd36c7cdb5f8f59cb3b4d91462",
+      "nameVersion": "22.0d3e3",
+      "headFontRevision": 0.0,
+      "headModified": "2026-06-11 18:35:40",
+      "family": ".SF Hebrew",
+      "defaultPostScriptName": ".SFHebrew-Regular",
+      "hasTrak": true,
+      "fvarAxes": {
+        "wght": [
+          1.0,
+          400.0,
+          1000.0
+        ],
+        "opsz": [
+          17.0,
+          28.0,
+          28.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/SFHebrewRounded.ttf",
+      "size": 55100,
+      "sha256": "e94c0202d94163e6bbcb927b076a585a73d9de0078a8e8e0994417e24375acbe",
+      "nameVersion": "22.0d3e3",
+      "headFontRevision": 1.0,
+      "headModified": "2026-06-11 18:35:59",
+      "family": ".SF Hebrew Rounded",
+      "defaultPostScriptName": ".SFHebrewRounded-Regular",
+      "hasTrak": true,
+      "fvarAxes": {
+        "wght": [
+          1.0,
+          400.0,
+          1000.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/SFIndia.ttc",
+      "size": 2269684,
+      "sha256": "d9aef9fb79aaf5aa0c96df2593c1f461b24ab8c74695baded690a69949d15ce9",
+      "nameVersion": "22.0d6e1",
+      "headFontRevision": 2025.039,
+      "headModified": "2026-07-08 21:29:41",
+      "family": ".SF Bangla",
+      "defaultPostScriptName": ".SFBangla-Regular",
+      "hasTrak": true,
+      "fvarAxes": {
+        "opsz": [
+          17.0,
+          28.0,
+          28.0
+        ],
+        "wght": [
+          1.0,
+          400.0,
+          1000.0
+        ]
+      },
+      "faces": 9
+    },
+    {
+      "path": "/System/Library/Fonts/SFNS.ttf",
+      "size": 7872432,
+      "sha256": "44890958f3e0b997028121ed7c7a789f3f5cce227c7a93ce8f86ec0db26da571",
+      "nameVersion": "22.0d5e1",
+      "headFontRevision": 1.0,
+      "headModified": "2026-07-21 18:53:23",
+      "family": "System Font",
+      "defaultPostScriptName": ".SFNS-Regular",
+      "hasTrak": true,
+      "ctFontVersionName": "22.0d5e1",
+      "fvarAxes": {
+        "wdth": [
+          30.0,
+          100.0,
+          150.0
+        ],
+        "opsz": [
+          17.0,
+          28.0,
+          96.0
+        ],
+        "GRAD": [
+          400.0,
+          400.0,
+          1000.0
+        ],
+        "wght": [
+          1.0,
+          400.0,
+          1000.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/SFNSItalic.ttf",
+      "size": 1057128,
+      "sha256": "8f6a91c3340283d7653eda26bdc8ef9a3e7b31b5af20175348e9372d6836ffa0",
+      "nameVersion": "22.0d5e1",
+      "headFontRevision": 1.0,
+      "headModified": "2026-07-21 18:53:25",
+      "family": "System Font",
+      "defaultPostScriptName": ".SFNS-RegularItalic",
+      "hasTrak": true,
+      "ctFontVersionName": "22.0d5e1",
+      "fvarAxes": {
+        "opsz": [
+          17.0,
+          28.0,
+          28.0
+        ],
+        "YAXS": [
+          400.0,
+          400.0,
+          1000.0
+        ],
+        "wght": [
+          1.0,
+          400.0,
+          1000.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/SFNSMono.ttf",
+      "size": 218796,
+      "sha256": "fc99d1608690ab5f2e1f78af9fbd4ef9ffef61f3eef36ceeea3ac3c844e652d4",
+      "nameVersion": "22.0d3e3",
+      "headFontRevision": 0.0,
+      "headModified": "2026-05-08 18:11:06",
+      "family": ".SF NS Mono",
+      "defaultPostScriptName": ".SFNSMono-Light",
+      "hasTrak": false,
+      "ctFontVersionName": "22.0d3e3",
+      "fvarAxes": {
+        "YAXS": [
+          294.673,
+          294.673,
+          900.0
+        ],
+        "wght": [
+          294.673,
+          294.673,
+          900.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/SFNSMonoItalic.ttf",
+      "size": 195864,
+      "sha256": "80d965ef0603bd0bfa8617c3894c10a2f111d8a5952298d84bd6f8ab807f4ae1",
+      "nameVersion": "22.0d3e3",
+      "headFontRevision": 0.0,
+      "headModified": "2026-05-08 18:11:07",
+      "family": ".SF NS Mono",
+      "defaultPostScriptName": ".SFNSMono-LightItalic",
+      "hasTrak": false,
+      "ctFontVersionName": "22.0d3e3",
+      "fvarAxes": {
+        "YAXS": [
+          294.673,
+          294.673,
+          900.0
+        ],
+        "wght": [
+          294.673,
+          294.673,
+          900.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/SFNSRounded.ttf",
+      "size": 1773444,
+      "sha256": "9ccd6c9a1ec93ac11092a28c30b71c442269f0a8539704d975f8e09e677f4f74",
+      "nameVersion": "22.0d3e2",
+      "headFontRevision": 1.0,
+      "headModified": "2026-07-21 18:54:03",
+      "family": ".SF NS Rounded",
+      "defaultPostScriptName": ".SFNSRounded-Regular",
+      "hasTrak": true,
+      "ctFontVersionName": "22.0d3e2",
+      "fvarAxes": {
+        "GRAD": [
+          400.0,
+          400.0,
+          1000.0
+        ],
+        "wght": [
+          1.0,
+          400.0,
+          1000.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/NewYork.ttf",
+      "size": 721580,
+      "sha256": "2f2a5b0e743cd2d954dd407a7281dc0e974d93144c0cdbbc82fee43c32caa926",
+      "nameVersion": "22.0d4e2",
+      "headFontRevision": 1.0,
+      "headModified": "2026-07-21 22:22:58",
+      "family": ".New York",
+      "defaultPostScriptName": ".NewYork-Regular",
+      "hasTrak": true,
+      "ctFontVersionName": "22.0d4e2",
+      "fvarAxes": {
+        "opsz": [
+          12.0,
+          256.0,
+          256.0
+        ],
+        "wght": [
+          400.0,
+          400.0,
+          1000.0
+        ],
+        "GRAD": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Library/Fonts/NewYorkItalic.ttf",
+      "size": 597572,
+      "sha256": "50e4d2aefa6646bda9c213b915dc130d51e11d21dd8ceef67d5d23e2254431e2",
+      "nameVersion": "22.0d4e2",
+      "headFontRevision": 1.0,
+      "headModified": "2026-07-21 22:22:56",
+      "family": ".New York",
+      "defaultPostScriptName": ".NewYork-RegularItalic",
+      "hasTrak": true,
+      "ctFontVersionName": "22.0d4e2",
+      "fvarAxes": {
+        "opsz": [
+          12.0,
+          256.0,
+          256.0
+        ],
+        "wght": [
+          400.0,
+          400.0,
+          1000.0
+        ],
+        "GRAD": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      }
+    }
+  ],
+  "appleColorEmoji": {
+    "path": "/System/Library/Fonts/Apple Color Emoji.ttc",
+    "size": 192120460,
+    "sha256": "12bc8221a908c5bcf05f0fce940d3c3f6e9d09d8d806ffe31a969b4ac9be8f9e",
+    "note": "already sent separately; sha256 re-verified on the Mac"
+  },
+  "libraryFonts_developerDownload": [
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-Black.otf",
+      "size": 5787188,
+      "sha256": "5df453046afb628320341eeea437e2e35e43dfdf5e037378b059dc4d8ed663a8",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:30:21",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-Black",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-BlackItalic.otf",
+      "size": 5682280,
+      "sha256": "5fa50f15816984bf7634ea1cc9f5ad463fc63eb81eceb82a1c0cd1797555fe94",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:31:03",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-BlackItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-Bold.otf",
+      "size": 6189264,
+      "sha256": "aba6c3030f7ef1b26b6dd71ae2faed372dca4701fbd26a0a49b3e1fe7e2a733c",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:31:48",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-Bold",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-BoldItalic.otf",
+      "size": 6080196,
+      "sha256": "eaad3aa98848e52ef5907fbfabf209f45f138889e62f9bf41761ec8f43b8499e",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:32:26",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-BoldItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-Heavy.otf",
+      "size": 6191448,
+      "sha256": "c78790a41eb97690a1c4cd69d1cfaccf10334f1a0f34091376cae079208a8730",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:33:07",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-Heavy",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-HeavyItalic.otf",
+      "size": 6085784,
+      "sha256": "df4201750aee2bf326617cec444093289e4689887e8925972793fe8ffc4bddf4",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:33:47",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-HeavyItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-Light.otf",
+      "size": 6162792,
+      "sha256": "3fa2b09b6ffc0c6c9727a12766bfbb5912c8ab9f57a205526cff34195b429275",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:34:26",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-Light",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-LightItalic.otf",
+      "size": 6075288,
+      "sha256": "45e2b6e03d67eb029f051bb3bfa741fd35368ddbabca3e100e6a4c145e8daed2",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:35:02",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-LightItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-Medium.otf",
+      "size": 6181416,
+      "sha256": "dc5d3b59e2d9e7471961de3513855e937c679e48c45cc98f499a82c2f15907c5",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:35:40",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-Medium",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-MediumItalic.otf",
+      "size": 6057196,
+      "sha256": "0d05914b15ebb6c5674d89fff5bad3784ccd0b2616538cfefe56e4fba8cce01e",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:36:15",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-MediumItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-Regular.otf",
+      "size": 6054016,
+      "sha256": "0b3b3e1067c931613f983eb108397f98fc31a7128f482bd64e9e5700ffe0870d",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:36:51",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-Regular",
+      "hasTrak": true,
+      "ctFontVersionName": "Version 21.0d6e2"
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-RegularItalic.otf",
+      "size": 5973424,
+      "sha256": "33b3b1418c1b1c3e759384fe3d9ebd5fa21bfcd546b86d5b851dd0d8bcfa4ac6",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:37:25",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-RegularItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-Semibold.otf",
+      "size": 6249240,
+      "sha256": "e67e000fe23c0d287d0d5a9790b96678344d56d2f6756c419ac7b34962a21567",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:37:59",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-Semibold",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-SemiboldItalic.otf",
+      "size": 6144564,
+      "sha256": "3fab0ff3c65ab03f025ea21f75961c26e87ac93e09ac323fce5b70de57f5f8f1",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:38:33",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-SemiboldItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-Thin.otf",
+      "size": 6082724,
+      "sha256": "f0141f1b908b8dbc711458d7fc3f5275cbc62b129baa5fd5d5f174e232caef3f",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:39:08",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-Thin",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-ThinItalic.otf",
+      "size": 5994108,
+      "sha256": "da8f529ff690b096da1d1677dba7fc89434a764bbc7f02bba4c791044c94329a",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:39:43",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-ThinItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-Ultralight.otf",
+      "size": 6102856,
+      "sha256": "9082bd9e42a65e953700ba3d9dbf5859f07c342da3517500d9510afe6620f857",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:40:18",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-Ultralight",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Display-UltralightItalic.otf",
+      "size": 6018540,
+      "sha256": "459ef9b6bf50875ec5df6cebc3f1d195bd9e886099021c03d4f536f730df2a2e",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:40:52",
+      "family": "SF Pro Display",
+      "defaultPostScriptName": "SFProDisplay-UltralightItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Italic.ttf",
+      "size": 19973544,
+      "sha256": "5992fca393ef34f81516f8481267235b88069ae848f80da01fc53a2bed0d111e",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 08:57:53",
+      "family": "SF Pro",
+      "defaultPostScriptName": "SFPro-RegularItalic",
+      "hasTrak": true,
+      "ctFontVersionName": "Version 21.0d6e2",
+      "fvarAxes": {
+        "opsz": [
+          17.0,
+          28.0,
+          28.0
+        ],
+        "YAXS": [
+          400.0,
+          400.0,
+          1000.0
+        ],
+        "wght": [
+          1.0,
+          400.0,
+          1000.0
+        ]
+      }
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Rounded-Black.otf",
+      "size": 5851640,
+      "sha256": "91679b1ba6e74553c2f7bf35401c74275196abb8b44d12d2719f3c4f02f7eed3",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:30:21",
+      "family": "SF Pro Rounded",
+      "defaultPostScriptName": "SFProRounded-Black",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Rounded-Bold.otf",
+      "size": 6267820,
+      "sha256": "6574337396ff1db19b5f4c1c91de9f3bed05d2a8d465c8ea3b7d8dfa22fdfb49",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:31:05",
+      "family": "SF Pro Rounded",
+      "defaultPostScriptName": "SFProRounded-Bold",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Rounded-Heavy.otf",
+      "size": 6280776,
+      "sha256": "03094b029b51587d4394be79302ce10eaa058f49c5783efa87a3197f213c9ac6",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:31:48",
+      "family": "SF Pro Rounded",
+      "defaultPostScriptName": "SFProRounded-Heavy",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Rounded-Light.otf",
+      "size": 6252240,
+      "sha256": "4561df0b2d3c9f277a76514ba3b735ffdd64a6bdd5ad099fec75d41140a35c77",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:32:30",
+      "family": "SF Pro Rounded",
+      "defaultPostScriptName": "SFProRounded-Light",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Rounded-Medium.otf",
+      "size": 6255132,
+      "sha256": "40c088c257630667b098b79b260d11819df3ecef4f7e21fe2b348e08708d3e66",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:33:12",
+      "family": "SF Pro Rounded",
+      "defaultPostScriptName": "SFProRounded-Medium",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Rounded-Regular.otf",
+      "size": 6117872,
+      "sha256": "8f1363669d192a7e1a31b8ccb1281e58b8ba1e8b0407cdfc4b304b34e5adaac8",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:33:55",
+      "family": "SF Pro Rounded",
+      "defaultPostScriptName": "SFProRounded-Regular",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Rounded-Semibold.otf",
+      "size": 6332172,
+      "sha256": "e247bd0fbb562968f595e4466812f383ed1863ca1bc42c0f4f4383674410588c",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:34:35",
+      "family": "SF Pro Rounded",
+      "defaultPostScriptName": "SFProRounded-Semibold",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Rounded-Thin.otf",
+      "size": 6173420,
+      "sha256": "7bb12396cae2cc5701944c2f699342b7e7a3d4f95cda227542925a11975cf22e",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:35:12",
+      "family": "SF Pro Rounded",
+      "defaultPostScriptName": "SFProRounded-Thin",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Rounded-Ultralight.otf",
+      "size": 6197580,
+      "sha256": "5f6211689d960c0f6e72815985d9e48d221ee16e190c8b490ffdad7c9154fd7c",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:35:52",
+      "family": "SF Pro Rounded",
+      "defaultPostScriptName": "SFProRounded-Ultralight",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-Black.otf",
+      "size": 5768004,
+      "sha256": "0c01a376ccf4b1f11daf70e4a279f8717a8cb6af873b47767778fa3c02906041",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:30:21",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-Black",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-BlackItalic.otf",
+      "size": 5698200,
+      "sha256": "b9f4d26c585fdcd895d4bfa767653dfc81475c7020bafb692ca50783faa59124",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:31:03",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-BlackItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-Bold.otf",
+      "size": 6164980,
+      "sha256": "852b59ef26530f5778daa94123172a24a794a7c8d913a03efd6ce3f3440feddf",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:31:48",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-Bold",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-BoldItalic.otf",
+      "size": 6090248,
+      "sha256": "d89795d97703d25682ee2e83174ea22b01ede9cf4f2fa93688e582dcee05b79b",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:32:26",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-BoldItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-Heavy.otf",
+      "size": 6166464,
+      "sha256": "514dea003894fc9a2366841994f64068e08dc2cb7267b446b3cb9e87a044688f",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:33:07",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-Heavy",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-HeavyItalic.otf",
+      "size": 6097012,
+      "sha256": "11a8a928245e7d30341bbea5715044df7b0d0a26e6bd522de429e59e3718375e",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:33:47",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-HeavyItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-Light.otf",
+      "size": 6156004,
+      "sha256": "8ecbf3f11732b094b65d6d2629a773939f4360a956363632c58d9fde4cffe6d3",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:34:25",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-Light",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-LightItalic.otf",
+      "size": 6079984,
+      "sha256": "de9151d43a03c3d5b9f553acc70eabf5d358cb0b009a9655c7a014cabd18c213",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:35:02",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-LightItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-Medium.otf",
+      "size": 6159232,
+      "sha256": "7bc2139f930d996d7c35536f9442434b738bf35f0cad76a6c2ce374764787e9e",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:35:39",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-Medium",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-MediumItalic.otf",
+      "size": 6065960,
+      "sha256": "ec91786bc70430e71faa41093dcea17c1507f642c58334e9941e96f3d93462bf",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:36:15",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-MediumItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-Regular.otf",
+      "size": 6057916,
+      "sha256": "f9d75abf3d410ef8dddf7cb044288fdd619b5a4db0d2af9d9579797104fbc89b",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:36:51",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-Regular",
+      "hasTrak": true,
+      "ctFontVersionName": "Version 21.0d6e2"
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-RegularItalic.otf",
+      "size": 5977860,
+      "sha256": "066e877265fa092a1d41456a41af5cbbe4da5aa1e3d8a876d30c60385a99e1c4",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:37:25",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-RegularItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-Semibold.otf",
+      "size": 6222932,
+      "sha256": "cb17375508472119de7246dacb1beb801fe72c6234cd3b72e1e58fd69c0fa745",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:37:59",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-Semibold",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-SemiboldItalic.otf",
+      "size": 6151792,
+      "sha256": "61a49f5f3a10ae0b51cf32e0b0aec60950f2dd348eee5906a24b65097a50d1c2",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:38:34",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-SemiboldItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-Thin.otf",
+      "size": 6066948,
+      "sha256": "8f0603c2032f090240f85f44bdc500700e1c9997ad04545cb3d3e24879a0fa64",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:39:09",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-Thin",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-ThinItalic.otf",
+      "size": 5998256,
+      "sha256": "831d6374fa2cd965a5a7daa66f9e615d94811bb04f346bb3b6a2640684aba0f1",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:39:43",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-ThinItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-Ultralight.otf",
+      "size": 6095492,
+      "sha256": "7de20b8f07cf4c1d78c5f1973db05dccfba58ab27419207edbd9e5feb0934a41",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:40:18",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-Ultralight",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro-Text-UltralightItalic.otf",
+      "size": 6018336,
+      "sha256": "52b1472c5fd660e600336e16a7e5ade6e5772712ea9f35b0858622ffda027671",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 00:40:52",
+      "family": "SF Pro Text",
+      "defaultPostScriptName": "SFProText-UltralightItalic",
+      "hasTrak": true
+    },
+    {
+      "path": "/Library/Fonts/SF-Pro.ttf",
+      "size": 25816756,
+      "sha256": "006e7ddf99badf4a08d938957d5a7b83c1ee285d945931abb134c184ac9c2211",
+      "nameVersion": "Version 21.0d6e2",
+      "headFontRevision": 1.0,
+      "headModified": "2025-08-11 08:57:00",
+      "family": "SF Pro",
+      "defaultPostScriptName": "SFPro-Regular",
+      "hasTrak": true,
+      "ctFontVersionName": "Version 21.0d6e2",
+      "fvarAxes": {
+        "wdth": [
+          30.0,
+          100.0,
+          150.0
+        ],
+        "opsz": [
+          17.0,
+          28.0,
+          28.0
+        ],
+        "wght": [
+          1.0,
+          400.0,
+          1000.0
+        ]
+      }
+    }
+  ],
+  "terminalAppSFMono": [
+    {
+      "path": "/System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SF-Mono-Bold.otf",
+      "size": 110280,
+      "sha256": "d76ed08961deb1069e3b62d36bba1a444009a0fa6805d2f8d25792b266897dc4",
+      "nameVersion": "Version 15.0d5e1",
+      "headFontRevision": 0.0,
+      "headModified": "2019-08-16 02:25:18",
+      "family": "SF Mono",
+      "defaultPostScriptName": "SFMono-Bold",
+      "hasTrak": false
+    },
+    {
+      "path": "/System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SF-Mono-BoldItalic.otf",
+      "size": 101336,
+      "sha256": "886d96b504938c526f14d5a917e85d90b4267e24ab7c253a1208827e96e69d69",
+      "nameVersion": "Version 15.0d5e1",
+      "headFontRevision": 0.0,
+      "headModified": "2019-08-16 02:25:18",
+      "family": "SF Mono",
+      "defaultPostScriptName": "SFMono-BoldItalic",
+      "hasTrak": false
+    },
+    {
+      "path": "/System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SF-Mono-Heavy.otf",
+      "size": 102584,
+      "sha256": "ad0b55b29cbbb95ff757249be673c294a6a94b4a873b6c3f1364bd1af5e73911",
+      "nameVersion": "Version 15.0d5e1",
+      "headFontRevision": 0.0,
+      "headModified": "2019-08-16 02:25:19",
+      "family": "SF Mono",
+      "defaultPostScriptName": "SFMono-Heavy",
+      "hasTrak": false
+    },
+    {
+      "path": "/System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SF-Mono-HeavyItalic.otf",
+      "size": 91560,
+      "sha256": "c43264d651eb0ae0ccc50cc631591838f5803047add570ac120cae20420d2337",
+      "nameVersion": "Version 15.0d5e1",
+      "headFontRevision": 0.0,
+      "headModified": "2019-08-16 02:25:19",
+      "family": "SF Mono",
+      "defaultPostScriptName": "SFMono-HeavyItalic",
+      "hasTrak": false
+    },
+    {
+      "path": "/System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SF-Mono-Light.otf",
+      "size": 102088,
+      "sha256": "fc9cc1369cacbed36f6f9772234a8433f0d967cab7bf067f6ca731d2b42c9afb",
+      "nameVersion": "Version 15.0d5e1",
+      "headFontRevision": 0.0,
+      "headModified": "2019-08-16 02:25:20",
+      "family": "SF Mono",
+      "defaultPostScriptName": "SFMono-Light",
+      "hasTrak": false
+    },
+    {
+      "path": "/System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SF-Mono-LightItalic.otf",
+      "size": 92112,
+      "sha256": "1c27e168e619f2e4c780a39d66d8ad23f435109827485839a4df56c9a3470551",
+      "nameVersion": "Version 15.0d5e1",
+      "headFontRevision": 0.0,
+      "headModified": "2019-08-16 02:25:20",
+      "family": "SF Mono",
+      "defaultPostScriptName": "SFMono-LightItalic",
+      "hasTrak": false
+    },
+    {
+      "path": "/System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SF-Mono-Medium.otf",
+      "size": 111468,
+      "sha256": "e4b7e3a7483f545abae07b6c380f80d66ed60645ff35324c9fe1b7d2ae1b6957",
+      "nameVersion": "Version 15.0d5e1",
+      "headFontRevision": 0.0,
+      "headModified": "2019-08-16 02:25:21",
+      "family": "SF Mono",
+      "defaultPostScriptName": "SFMono-Medium",
+      "hasTrak": false
+    },
+    {
+      "path": "/System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SF-Mono-MediumItalic.otf",
+      "size": 102004,
+      "sha256": "860c20f4c3092b8d9d34781deb5ab212ef8b3e3c8d7aec16874bf16db137518d",
+      "nameVersion": "Version 15.0d5e1",
+      "headFontRevision": 0.0,
+      "headModified": "2019-08-16 02:25:21",
+      "family": "SF Mono",
+      "defaultPostScriptName": "SFMono-MediumItalic",
+      "hasTrak": false
+    },
+    {
+      "path": "/System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SF-Mono-Regular.otf",
+      "size": 110560,
+      "sha256": "7c1d0d943e0167970d042217ed04e73faa435b6330bfc4644dd1a231a87907c7",
+      "nameVersion": "Version 15.0d5e1",
+      "headFontRevision": 0.0,
+      "headModified": "2019-08-16 02:25:22",
+      "family": "SF Mono",
+      "defaultPostScriptName": "SFMono-Regular",
+      "hasTrak": false,
+      "ctFontVersionName": "Version 15.0d5e1"
+    },
+    {
+      "path": "/System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SF-Mono-RegularItalic.otf",
+      "size": 102180,
+      "sha256": "cff5ecbfa83084d6588790f15b92955b21b8a6c5700864c07f489a89e38d37e1",
+      "nameVersion": "Version 15.0d5e1",
+      "headFontRevision": 0.0,
+      "headModified": "2019-08-16 02:25:22",
+      "family": "SF Mono",
+      "defaultPostScriptName": "SFMono-RegularItalic",
+      "hasTrak": false
+    },
+    {
+      "path": "/System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SF-Mono-Semibold.otf",
+      "size": 111096,
+      "sha256": "eb98c68b28c03aa8a6b940c9026d430bd4f27d1d850f9dd7bec25bed354eecf9",
+      "nameVersion": "Version 15.0d5e1",
+      "headFontRevision": 0.0,
+      "headModified": "2019-08-16 02:25:23",
+      "family": "SF Mono",
+      "defaultPostScriptName": "SFMono-Semibold",
+      "hasTrak": false
+    },
+    {
+      "path": "/System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SF-Mono-SemiboldItalic.otf",
+      "size": 102568,
+      "sha256": "2dd2fec07ac92bb37bcb72c406ac4d295d14310b944c6cc0b9f1dc0fa3cd32aa",
+      "nameVersion": "Version 15.0d5e1",
+      "headFontRevision": 0.0,
+      "headModified": "2019-08-16 02:25:23",
+      "family": "SF Mono",
+      "defaultPostScriptName": "SFMono-SemiboldItalic",
+      "hasTrak": false
+    },
+    {
+      "path": "/System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SFMono-Terminal.ttf",
+      "size": 225376,
+      "sha256": "c0e2dbe34c83447eb5051accfee2effab4d7ca213da7e9a0603b727fe59fd0e0",
+      "nameVersion": "21.0d1e2",
+      "headFontRevision": 0.0,
+      "headModified": "2025-05-22 19:26:24",
+      "family": "SF Mono Terminal",
+      "defaultPostScriptName": "SFMonoTerminal-Light",
+      "hasTrak": false,
+      "ctFontVersionName": "21.0d1e2",
+      "fvarAxes": {
+        "YAXS": [
+          294.673,
+          294.673,
+          900.0
+        ],
+        "wght": [
+          294.673,
+          294.673,
+          900.0
+        ]
+      }
+    },
+    {
+      "path": "/System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SFMonoItalic-Terminal.ttf",
+      "size": 202224,
+      "sha256": "d8c4a1ca3ee7ec9ade84f6d048b430d031ad8a218d288f3e53690e4ebacca534",
+      "nameVersion": "21.0d1e4",
+      "headFontRevision": 0.0,
+      "headModified": "2025-05-23 16:10:03",
+      "family": "SF Mono Terminal",
+      "defaultPostScriptName": "SFMono-LightItalic",
+      "hasTrak": false,
+      "fvarAxes": {
+        "YAXS": [
+          294.673,
+          294.673,
+          900.0
+        ],
+        "wght": [
+          294.673,
+          294.673,
+          900.0
+        ]
+      }
+    }
+  ],
+  "sfMonoLocations": {
+    "/System/Library/Fonts/SFNSMono.ttf": "system UI mono (.SF NS Mono, 22.0d3e3, variable wght 294.673..900) = monospacedSystemFont",
+    "Terminal.app/Contents/Resources/Fonts/SFMono-Terminal.ttf": "SF Mono Terminal 21.0d1e2 (variable)",
+    "Terminal.app/Contents/Resources/Fonts/SF-Mono-*.otf": "static SF Mono 15.0d5e1 (Version 15.0d5e1), 12 files",
+    "/Library/Fonts": "no SF Mono / SF Compact / New York here; only SF Pro developer files"
+  },
+  "pcComparison": [
+    {
+      "pcFile": "themes/fonts/NewYork.ttf",
+      "size": 721580,
+      "sha256": "2f2a5b0e743cd2d954dd407a7281dc0e974d93144c0cdbbc82fee43c32caa926",
+      "nameVersion": "22.0d4e2",
+      "family": ".New York",
+      "postScriptName": ".NewYork-Regular",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/NewYork.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/NewYorkItalic.ttf",
+      "size": 597572,
+      "sha256": "50e4d2aefa6646bda9c213b915dc130d51e11d21dd8ceef67d5d23e2254431e2",
+      "nameVersion": "22.0d4e2",
+      "family": ".New York",
+      "postScriptName": ".NewYork-RegularItalic",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/NewYorkItalic.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/SFArabic.ttf",
+      "size": 719968,
+      "sha256": "12b5b582315dbddf432e467f677b28a87597f474322bfba7d62bc1468a79ce72",
+      "nameVersion": "22.0d4e1",
+      "family": ".SF Arabic",
+      "postScriptName": ".SFArabic-Regular",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFArabic.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/SFArabicRounded.ttf",
+      "size": 783568,
+      "sha256": "2bbda7767d5b053335be80ee78bd6f81f3dcbb0a7144f01107f2596e79ca43c2",
+      "nameVersion": "22.0d4e1",
+      "family": ".SF Arabic Rounded",
+      "postScriptName": ".SFArabicRounded-Regular",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFArabicRounded.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/SFArmenian.ttf",
+      "size": 86792,
+      "sha256": "0be96891f71de37d0bf3d0504c613ad852d0c04d9638dc7ba90f86a670d73904",
+      "nameVersion": "22.0d3e4",
+      "family": ".SF Armenian",
+      "postScriptName": ".SFArmenian-Regular",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFArmenian.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/SFArmenianRounded.ttf",
+      "size": 62640,
+      "sha256": "8ffc57e8d7c999f628de49e4a41d2590b7e3df0c99a0f0814c911ac95b61949a",
+      "nameVersion": "22.0d3e4",
+      "family": ".SF Armenian Rounded",
+      "postScriptName": ".SFArmenianRounded-Regular",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFArmenianRounded.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/SFCamera.ttf",
+      "size": 117636,
+      "sha256": "2f09c510f0c17e8c36cdc1b3f6a2129f2de8ee93c8868d476aad4943f85f169a",
+      "nameVersion": "22.0d3e2",
+      "family": ".SF Camera",
+      "postScriptName": "..SFCamera-Regular",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFCamera.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/SFCompact.ttf",
+      "size": 1896040,
+      "sha256": "044376cb245cb5cdd5c027c22e2854acfe648a2c8e885ecc4a12fdd84df88fee",
+      "nameVersion": "22.0d5e1",
+      "family": ".SF Compact",
+      "postScriptName": ".SFCompact-Black",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFCompact.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/SFCompactItalic.ttf",
+      "size": 1012892,
+      "sha256": "489239f84611e546b7a09987bf46142ff8099337ae7d3affa2fb59bfadb1cff7",
+      "nameVersion": "22.0d5e1",
+      "family": ".SF Compact",
+      "postScriptName": ".SFCompact-BlackItalic",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFCompactItalic.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/SFCompactRounded.ttf",
+      "size": 1080280,
+      "sha256": "2db181772dd231c68de536d7f1616d77a093cf932fc28582c6636623b2c61559",
+      "nameVersion": "22.0d3e2",
+      "family": ".SF Compact Rounded",
+      "postScriptName": "..SFCompactRounded-Regular",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFCompactRounded.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/SFGeorgian.ttf",
+      "size": 94468,
+      "sha256": "82e01b8585b45b13c37e6cd6d6da36245920aaf09eb459d69888360859baeefe",
+      "nameVersion": "22.0d4e1",
+      "family": ".SF Georgian",
+      "postScriptName": ".SFGeorgian-Regular",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFGeorgian.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/SFGeorgianRounded.ttf",
+      "size": 61664,
+      "sha256": "aeddbaf1ed81ffe2d2fbef48bb51775a33a09e37a87295305d9cf80e091403e1",
+      "nameVersion": "22.0d4e1",
+      "family": ".SF Georgian Rounded",
+      "postScriptName": ".SFGeorgianRounded-Regular",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFGeorgianRounded.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/SFHebrew.ttf",
+      "size": 62376,
+      "sha256": "2e69b72734e849f93ca52c560ccf4bd7d70633bd36c7cdb5f8f59cb3b4d91462",
+      "nameVersion": "22.0d3e3",
+      "family": ".SF Hebrew",
+      "postScriptName": ".SFHebrew-Regular",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFHebrew.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/SFHebrewRounded.ttf",
+      "size": 55100,
+      "sha256": "e94c0202d94163e6bbcb927b076a585a73d9de0078a8e8e0994417e24375acbe",
+      "nameVersion": "22.0d3e3",
+      "family": ".SF Hebrew Rounded",
+      "postScriptName": ".SFHebrewRounded-Regular",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFHebrewRounded.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/SFIndia.ttc",
+      "size": 2269684,
+      "sha256": "d9aef9fb79aaf5aa0c96df2593c1f461b24ab8c74695baded690a69949d15ce9",
+      "nameVersion": "22.0d6e1",
+      "family": ".SF Bangla",
+      "postScriptName": ".SFBangla-Regular",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFIndia.ttc"
+    },
+    {
+      "pcFile": "themes/fonts/SFNS.ttf",
+      "size": 7872432,
+      "sha256": "44890958f3e0b997028121ed7c7a789f3f5cce227c7a93ce8f86ec0db26da571",
+      "nameVersion": "22.0d5e1",
+      "family": "System Font",
+      "postScriptName": ".SFNS-Regular",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFNS.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/SFNSItalic.ttf",
+      "size": 1057128,
+      "sha256": "8f6a91c3340283d7653eda26bdc8ef9a3e7b31b5af20175348e9372d6836ffa0",
+      "nameVersion": "22.0d5e1",
+      "family": "System Font",
+      "postScriptName": ".SFNS-RegularItalic",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFNSItalic.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/SFNSMono.ttf",
+      "size": 218796,
+      "sha256": "fc99d1608690ab5f2e1f78af9fbd4ef9ffef61f3eef36ceeea3ac3c844e652d4",
+      "nameVersion": "22.0d3e3",
+      "family": ".SF NS Mono",
+      "postScriptName": ".SFNSMono-Light",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFNSMono.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/SFNSMonoItalic.ttf",
+      "size": 195864,
+      "sha256": "80d965ef0603bd0bfa8617c3894c10a2f111d8a5952298d84bd6f8ab807f4ae1",
+      "nameVersion": "22.0d3e3",
+      "family": ".SF NS Mono",
+      "postScriptName": ".SFNSMono-LightItalic",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFNSMonoItalic.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/SFNSRounded.ttf",
+      "size": 1773444,
+      "sha256": "9ccd6c9a1ec93ac11092a28c30b71c442269f0a8539704d975f8e09e677f4f74",
+      "nameVersion": "22.0d3e2",
+      "family": ".SF NS Rounded",
+      "postScriptName": ".SFNSRounded-Regular",
+      "verdict": "same",
+      "identicalTo": "/System/Library/Fonts/SFNSRounded.ttf"
+    },
+    {
+      "pcFile": "themes/fonts/named/NewYork-Italic.ttf",
+      "size": 597524,
+      "sha256": "3836d00299e848eec22df9e1df0c89718bc3e825798c5036b55c96c62cab1440",
+      "nameVersion": "22.0d4e2",
+      "family": "New York",
+      "postScriptName": "NewYork-Italic",
+      "verdict": "differs",
+      "macCounterpart": "/System/Library/Fonts/NewYorkItalic.ttf",
+      "macCounterpartVersion": "22.0d4e2",
+      "macCounterpartSha256": "50e4d2aefa6646bda9c213b915dc130d51e11d21dd8ceef67d5d23e2254431e2",
+      "note": "only the name table differs (table-by-table sha256 compare; head checksumAdjustment/modified ignored): renamed copy of the 27.2.1 system file, same version 22.0d4e2; names changed from \".New York\"/.NewYork-RegularItalic to \"New York\"/NewYork-Italic"
+    },
+    {
+      "pcFile": "themes/fonts/named/NewYork.ttf",
+      "size": 721548,
+      "sha256": "62dc11434a7697a8a3471ef94f744022337686f6effc4003b14a0d00581e2fed",
+      "nameVersion": "22.0d4e2",
+      "family": "New York",
+      "postScriptName": "NewYork-Regular",
+      "verdict": "differs",
+      "macCounterpart": "/System/Library/Fonts/NewYork.ttf",
+      "macCounterpartVersion": "22.0d4e2",
+      "macCounterpartSha256": "2f2a5b0e743cd2d954dd407a7281dc0e974d93144c0cdbbc82fee43c32caa926",
+      "note": "only the name table differs (table-by-table sha256 compare; head checksumAdjustment/modified ignored): renamed copy of the 27.2.1 system file, same version 22.0d4e2; names changed from \".New York\"/.NewYork-Regular to \"New York\"/NewYork-Regular"
+    },
+    {
+      "pcFile": "themes/fonts/named/SF-Compact-Italic.ttf",
+      "size": 1012908,
+      "sha256": "c256ceafc274b29eeed170c14ea3ecd1f851730568c37b164a02461e940e8fe3",
+      "nameVersion": "22.0d5e1",
+      "family": "SF Compact",
+      "postScriptName": "SFCompact-Italic",
+      "verdict": "differs",
+      "macCounterpart": "/System/Library/Fonts/SFCompactItalic.ttf",
+      "macCounterpartVersion": "22.0d5e1",
+      "macCounterpartSha256": "489239f84611e546b7a09987bf46142ff8099337ae7d3affa2fb59bfadb1cff7",
+      "note": "only the name table differs (table-by-table sha256 compare; head checksumAdjustment/modified ignored): renamed copy of the 27.2.1 system file, same version 22.0d5e1; names changed from \".SF Compact\"/.SFCompact-BlackItalic to \"SF Compact\"/SFCompact-Italic"
+    },
+    {
+      "pcFile": "themes/fonts/named/SF-Compact-Rounded.ttf",
+      "size": 1080196,
+      "sha256": "cde867ae7649d6b08515b567121ae69851e8ff46d6d0639cdb457aa058ac2a79",
+      "nameVersion": "22.0d3e2",
+      "family": "SF Compact Rounded",
+      "postScriptName": "SFCompactRounded-Regular",
+      "verdict": "differs",
+      "macCounterpart": "/System/Library/Fonts/SFCompactRounded.ttf",
+      "macCounterpartVersion": "22.0d3e2",
+      "macCounterpartSha256": "2db181772dd231c68de536d7f1616d77a093cf932fc28582c6636623b2c61559",
+      "note": "only the name table differs (table-by-table sha256 compare; head checksumAdjustment/modified ignored): renamed copy of the 27.2.1 system file, same version 22.0d3e2; names changed from \".SF Compact Rounded\"/..SFCompactRounded-Regular to \"SF Compact Rounded\"/SFCompactRounded-Regular"
+    },
+    {
+      "pcFile": "themes/fonts/named/SF-Compact.ttf",
+      "size": 1896020,
+      "sha256": "5029b3d95446ed85d3396f32eaa99810c602bf48399b10254ebe890b10377d70",
+      "nameVersion": "22.0d5e1",
+      "family": "SF Compact",
+      "postScriptName": "SFCompact-Regular",
+      "verdict": "differs",
+      "macCounterpart": "/System/Library/Fonts/SFCompact.ttf",
+      "macCounterpartVersion": "22.0d5e1",
+      "macCounterpartSha256": "044376cb245cb5cdd5c027c22e2854acfe648a2c8e885ecc4a12fdd84df88fee",
+      "note": "only the name table differs (table-by-table sha256 compare; head checksumAdjustment/modified ignored): renamed copy of the 27.2.1 system file, same version 22.0d5e1; names changed from \".SF Compact\"/.SFCompact-Black to \"SF Compact\"/SFCompact-Regular"
+    },
+    {
+      "pcFile": "themes/fonts/named/SF-Mono-Italic.ttf",
+      "size": 195804,
+      "sha256": "5e6ebc1e49f5ac44638e7b046b9168ce2b3ee89728eb1156b9ef78490bc3df1b",
+      "nameVersion": "22.0d3e3",
+      "family": "SF Mono",
+      "postScriptName": "SFMono-Italic",
+      "verdict": "differs",
+      "macCounterpart": "/System/Library/Fonts/SFNSMonoItalic.ttf",
+      "macCounterpartVersion": "22.0d3e3",
+      "macCounterpartSha256": "80d965ef0603bd0bfa8617c3894c10a2f111d8a5952298d84bd6f8ab807f4ae1",
+      "note": "only the name table differs (table-by-table sha256 compare; head checksumAdjustment/modified ignored): renamed copy of the 27.2.1 system file, same version 22.0d3e3; names changed from \".SF NS Mono\"/.SFNSMono-LightItalic to \"SF Mono\"/SFMono-Italic"
+    },
+    {
+      "pcFile": "themes/fonts/named/SF-Mono.ttf",
+      "size": 218724,
+      "sha256": "b5da6c6cba32d4601eb6b41d892b4c3364b83227b7b153f6da88e29ed89ac99d",
+      "nameVersion": "22.0d3e3",
+      "family": "SF Mono",
+      "postScriptName": "SFMono-Regular",
+      "verdict": "differs",
+      "macCounterpart": "/System/Library/Fonts/SFNSMono.ttf",
+      "macCounterpartVersion": "22.0d3e3",
+      "macCounterpartSha256": "fc99d1608690ab5f2e1f78af9fbd4ef9ffef61f3eef36ceeea3ac3c844e652d4",
+      "note": "only the name table differs (table-by-table sha256 compare; head checksumAdjustment/modified ignored): renamed copy of the 27.2.1 system file, same version 22.0d3e3; names changed from \".SF NS Mono\"/.SFNSMono-Light to \"SF Mono\"/SFMono-Regular"
+    },
+    {
+      "pcFile": "themes/fonts/named/SF-Pro-Italic.ttf",
+      "size": 1052544,
+      "sha256": "4f388ff522d8ebaf168c856391e372c974bc9d8b80e4d595ca13e6995a37ed50",
+      "nameVersion": "22.0d5e1",
+      "family": "SF Pro",
+      "postScriptName": "SFPro-Italic",
+      "verdict": "differs",
+      "macCounterpart": "/System/Library/Fonts/SFNSItalic.ttf",
+      "macCounterpartVersion": "22.0d5e1",
+      "macCounterpartSha256": "8f6a91c3340283d7653eda26bdc8ef9a3e7b31b5af20175348e9372d6836ffa0",
+      "note": "only the name table differs (table-by-table sha256 compare; head checksumAdjustment/modified ignored): renamed copy of the 27.2.1 system file, same version 22.0d5e1; names changed from \"System Font\"/.SFNS-RegularItalic to \"SF Pro\"/SFPro-Italic",
+      "alsoDiffersFrom": {
+        "path": "/Library/Fonts/SF-Pro-Italic.ttf",
+        "sha256": "5992fca393ef34f81516f8481267235b88069ae848f80da01fc53a2bed0d111e",
+        "nameVersion": "Version 21.0d6e2",
+        "note": "Apple developer-download SF Pro (older 21.0d6e2, opsz axis 17..28 instead of 17..96)"
+      }
+    },
+    {
+      "pcFile": "themes/fonts/named/SF-Pro-Rounded.ttf",
+      "size": 1773416,
+      "sha256": "b112b3495ab04a969674a66e8cd03a84ed64e139f2bcfee485dbcd6d008904cb",
+      "nameVersion": "22.0d3e2",
+      "family": "SF Pro Rounded",
+      "postScriptName": "SFProRounded-Regular",
+      "verdict": "differs",
+      "macCounterpart": "/System/Library/Fonts/SFNSRounded.ttf",
+      "macCounterpartVersion": "22.0d3e2",
+      "macCounterpartSha256": "9ccd6c9a1ec93ac11092a28c30b71c442269f0a8539704d975f8e09e677f4f74",
+      "note": "only the name table differs (table-by-table sha256 compare; head checksumAdjustment/modified ignored): renamed copy of the 27.2.1 system file, same version 22.0d3e2; names changed from \".SF NS Rounded\"/.SFNSRounded-Regular to \"SF Pro Rounded\"/SFProRounded-Regular"
+    },
+    {
+      "pcFile": "themes/fonts/named/SF-Pro.ttf",
+      "size": 7870080,
+      "sha256": "19cd277a1814338d6f8118707b42e6d3c81c8508a646b953be05f3601aac4deb",
+      "nameVersion": "22.0d5e1",
+      "family": "SF Pro",
+      "postScriptName": "SFPro-Regular",
+      "verdict": "differs",
+      "macCounterpart": "/System/Library/Fonts/SFNS.ttf",
+      "macCounterpartVersion": "22.0d5e1",
+      "macCounterpartSha256": "44890958f3e0b997028121ed7c7a789f3f5cce227c7a93ce8f86ec0db26da571",
+      "note": "only the name table differs (table-by-table sha256 compare; head checksumAdjustment/modified ignored): renamed copy of the 27.2.1 system file, same version 22.0d5e1; names changed from \"System Font\"/.SFNS-Regular to \"SF Pro\"/SFPro-Regular",
+      "alsoDiffersFrom": {
+        "path": "/Library/Fonts/SF-Pro.ttf",
+        "sha256": "006e7ddf99badf4a08d938957d5a7b83c1ee285d945931abb134c184ac9c2211",
+        "nameVersion": "Version 21.0d6e2",
+        "note": "Apple developer-download SF Pro (older 21.0d6e2, opsz axis 17..28 instead of 17..96)"
+      }
+    }
+  ],
+  "pcComparisonSummary": {
+    "same": 20,
+    "differs": 10,
+    "text": "All 20 files in themes/fonts/*.tt? are byte-identical to /System/Library/Fonts on 27.2.1. All 10 files in themes/fonts/named/ differ only in the name table (renamed copies of the same 22.0dXeY system files)."
+  }
+}

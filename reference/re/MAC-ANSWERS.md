@@ -381,3 +381,121 @@ blurred photo at the right end is a desktop widget seen through the glass).
   (both glyphs visible in the middle frame); no hide/show between them.
 - Not measured: changing from the Control Center slider, full screen, a second display, real hardware key repeat,
   maximum level, keyboard backlight.
+
+## R4 Fonts and emoji
+
+Measured on macOS 27.2.1 (26B131), MacBook Air M2, in-process with AppKit/CoreText. No defaults were changed.
+
+**Font files** (`reference/re/27.2.1/live/font-hashes.json`)
+- System UI fonts are in `/System/Library/Fonts`. SFNS.ttf is 22.0d5e1, 7,872,432 B, sha256 `44890958…26da571`. SFNSItalic is 22.0d5e1, SFNSRounded 22.0d3e2, SFNSMono/MonoItalic 22.0d3e3, SFCompact/CompactItalic 22.0d5e1, SFCompactRounded 22.0d3e2 and NewYork/NewYorkItalic 22.0d4e2. The CTFont version string matches the name ID 5 string for every file.
+- SF Mono exists in three places:
+  - `SFNSMono.ttf`: the system mono font, variable wght 294.673–900. This is what `monospacedSystemFont` uses.
+  - `Terminal.app/Contents/Resources/Fonts/SFMono-Terminal.ttf`: version 21.0d1e2.
+  - 12 static `SF-Mono-*.otf` files: version 15.0d5e1.
+- `/Library/Fonts` holds only the SF Pro developer download (21.0d6e2): SF-Pro.ttf (opsz 17–28), SF-Pro-Italic.ttf, and the static Text, Display and Rounded OTFs. There is no SF Compact, SF Mono or New York there.
+- Apple Color Emoji.ttc: 192,120,460 B, sha256 `12bc8221…be8f9e` (re-checked, same as sent earlier).
+- **PC comparison:** all 20 files in `themes/fonts/*.ttf|ttc` are **byte-identical** to the 27.2.1 system files. All 10 files in `themes/fonts/named/` **differ only in the `name` table** (checked table by table): they are renamed copies of the same system files at the same versions. `named/SF-Pro.ttf` is the 22.0d5e1 system SFNS. It is not the older 21.0d6e2 developer `/Library/Fonts/SF-Pro.ttf`.
+
+**Text styles** (`text-styles.json`). All styles use `.SFNS-*` from SFNS.ttf.
+
+| style | pt | font | line height | tracking pt |
+|---|---|---|---|---|
+| largeTitle | 26 | Regular | 32 | +0.2158 |
+| title1 | 22 | Regular | 26 | −0.2578 |
+| title2 | 17 | Regular | 22 | −0.4316 |
+| title3 | 15 | Regular | 20 | −0.2344 |
+| headline | 13 | **Bold** (wght 700) | 16 | −0.0762 |
+| subheadline | 11 | Regular | 14 | +0.0645 |
+| body | 13 | Regular | 16 | −0.0762 |
+| callout | 12 | Regular | 15 | 0 |
+| footnote | 10 | Regular | 13 | +0.1172 |
+| caption1 | 10 | Regular | 13 | +0.1172 |
+| caption2 | 10 | **Medium** (wght 510) | 13 | +0.1172 |
+
+- caption2's descriptor weight trait says 0, but the font it resolves to is Medium.
+- Line height = ascender − descender + leading. The result is an exact integer for every style.
+- `systemFontSize(for:)`: mini 9, small 11, regular 13, large 13, extraLarge 13.
+- systemFontSize 13, smallSystemFontSize 11, labelFontSize 10.
+- menu, menuBar and message fonts are 13. toolTips and palette fonts are 11. controlContent is 12, label is 10, titleBar is 13 `.SFNS-Bold`. userFont is Helvetica 12 and userFixedPitch is Menlo 11.
+
+**Optical size:** the opsz axis follows the point size, clamped to the range 17–96.
+- ≤17 pt uses the Text design. Advance widths are identical to static SFProText.
+- 18–27 pt interpolates continuously between Text and Display.
+- ≥28 pt has advance widths identical to static SFProDisplay. They do not change from 28 to 96.
+- There is no longer a hard switch at 20 pt.
+
+**Tracking:** CoreText builds tracking into the glyph advances, using the SFNS `trak` table's "Normal" track.
+- It is chosen by point size and linearly interpolated between table entries. Fractional unit values are truncated (25 pt: 11.5 → 11).
+- Normal values in units/2048 at 9…17 pt: 38, 24, 12, 0, −12, −22, −32, −40, −52.
+- Values at 20/22/24/28/32 pt: −46, −24, 6, 28, 26. The table returns to 0 from 80 pt.
+- The full measured table for 9–30, 34, 40 and 48 pt is in `sfProRegularTrackingBySizeCompact`.
+
+**Text samples:**
+- `reference/screens/27.2.1/text-sample-light.png` and `text-sample-dark.png`: 2000×786 px (2x), drawn with real NSLayoutManager text drawing.
+- They show SF Pro at 11, 13, 17 and 26 pt in Regular, Semibold and Bold, plus emoji lines at 13 and 26 pt.
+- Light background is #FFFFFF with text #000000. Dark background (windowBackgroundColor) is #1E1E1E with text #FFFFFF.
+- Baselines and widths for each line are in `text-styles.json` under `textSample`.
+
+## R5 Accent and Multicolor
+
+The current user's real values: `AppleAccentColor` is **absent** (Multicolor), `AppleHighlightColor` is **absent** (Automatic), and `AppleInterfaceStyle` is Dark. Full data is in `reference/re/27.2.1/live/accent-colors.json`.
+
+The pane on this Mac offers 9 accents: Multicolor −2 (key absent), Graphite −1, and 0–6. Key −3 "This Mac" (enclosure colour) appears only on Macs with a coloured enclosure. Simulated values are in the JSON. Values 7, 8, 9 and −3 fall back to Multicolor.
+
+Argument domain: negative values must be passed as `-AppleAccentColor "<integer>-1</integer>"`. A bare `-1` is silently ignored.
+
+Values are sRGB hex, light / dark. "/.50" means alpha 0.5.
+
+| accent | controlAccent | selectedContentBg | selectedTextBg = selectedControl | keyboardFocusIndicator |
+|---|---|---|---|---|
+| Multicolor (no app accent) | #007AFF / #007AFF | #0064E1 / #0059D1 | #B3D7FF / #3F638B | #0067F4/.50 / #1AA9FF/.50 |
+| Blue 4 | #007AFF / #007AFF | #0064E1 / #0059D1 | #B3D7FF / #3F638B | #0067F4/.50 / #1AA9FF/.50 |
+| Purple 5 | #953D96 / #A550A7 | #7D2A7E / #803482 | #DFC5E0 / #705771 | #842685/.50 / #DC78DE/.50 |
+| Pink 6 | #F74F9E / #F74F9E | #D93B86 / #C93379 | #FDCBE2 / #89576E | #EC398D/.50 / #FF77D4/.50 |
+| Red 0 | #E0383E / #FF5257 | #C4262B / #D13539 | #F6C4C5 / #8B5759 | #D32127/.50 / #FF7A80/.50 |
+| Orange 1 | #F7821B / #F7821B | #D96B0A / #C96003 | #FDDABB / #896647 | #EC7002/.50 / #FFB33A/.50 |
+| Yellow 2 | #FFC726 / #FFC600 | #E1AC15 / #D19E00 | #FFEEBE / #8B7A3F | #F4B90E/.50 / #FFFF1A/.50 |
+| Green 3 | #62BA46 / #62BA46 | #4DA033 / #43932A | #D0EAC8 / #5C7654 | #4EAB30/.50 / #8DF56C/.50 |
+| Graphite −1 | #989898 / #8C8C8C | #808080 / #696969 | #E0E0E0 / #696969 | #99999E / #C3C3C3/.50 |
+
+These colours are the same for every accent:
+- unemphasizedSelectedContentBackground: #DCDCDC / #464646
+- alternateSelectedControlText: #FFFFFF
+- link: #0068DA / #419CFF
+- control: #FFFFFF / #FFFFFF at alpha 0.25
+- findHighlight: #FFFF00
+
+**Highlight colour:**
+- With `AppleHighlightColor` absent, selectedTextBackgroundColor follows the accent. In Multicolor it follows the app's own accent.
+- AppKit writes the value with the format `"%f %f %f %@"`. The name strings in AppKit are Red, Orange, Yellow, Green, Blue, Purple, Pink, Brown, Graphite and ThisMac.
+- When reading, AppKit uses the trailing name (case-sensitive) and ignores the rgb:
+  - A known colour name selects that key.
+  - `Accent` or `ThisMac` selects Automatic.
+  - `Other` uses a softened version of the custom rgb.
+  - An unknown name (including `Automatic` and `Brown`) or rgb only uses the rgb verbatim.
+- I did not observe the exact rgb Settings writes on 27.2.1, because writing defaults was off-limits. The light highlight display colours are in the JSON.
+
+**Multicolor:**
+- In Multicolor, each app uses its own Info.plist `NSAccentColorName` or `NSAppAccentColorName` from its asset catalog. Apps with neither get Blue #007AFF.
+- Picking any explicit accent overrides the app's colour. I verified this with scratch bundles that carry a copied Assets.car.
+- Apps with their own accent, shown as runtime light / dark:
+  - Notes #FCB827
+  - Calculator #FF9300
+  - Home and Clock #FF8D28 / #FF9230
+  - Calendar #FF383C / #FF4245
+  - Freeform #00C0E8 / #3CD3FE
+  - Journal #6155F5 / #6D7CFF
+  - Podcasts #7224D8 / #9C5AF2
+  - News #FF0054 / #FF005A
+  - Stocks #4EACF8
+  - Books #262626 / #FFFFFF
+  - Games #FFFFFF
+  - Mail, Contacts, TV and Siri AI use systemBlue #0088FF / #0091FF
+  - Setup Assistant #0068DA / #419CFF
+- Music, Photos, Messages, Safari and Finder have no accent key, so they get #007AFF.
+- Catalog colours that reference a system colour resolve to the new 27 system palette. For example, systemBlue is #0088FF, not #007AFF.
+
+**Multicolor swatch:**
+- `reference/screens/27.2.1/multicolor-swatch.png` is AppKit's `NSMulticolorAccent` image, 32×32 px, an opaque square that the pane clips to a circle. It is identical in light and dark.
+- `multicolor-highlight-swatch.png` is `NSMulticolorHighlight`, 48×24 px.
+- Both come from AppKit's Assets.car. The Appearance.appex asset catalog has no Multicolor swatch.
