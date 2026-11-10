@@ -13,9 +13,16 @@ uniform sampler2D sharpTex;         // unblurred backdrop copy, same size/uv as 
 uniform vec2  uvTopLeft;            // quad corners in tex uv (both textures)
 uniform vec2  uvBottomRight;
 uniform vec2  quadSize;             // px
-uniform vec4  glassBox;             // glass rect inside the quad, px (x, y, w, h)
-uniform float radius;               // px
+// Glass shapes of this quad, drawn as one smooth-union SDF (GlassEffectContainer-like merging).
+// A single shape is the plain case (smoothK has no effect then).
+#define MAX_SHAPES 8
+uniform int   shapeCount;
+uniform vec4  shapeBox[MAX_SHAPES]; // centre x, y (quad px), half w, h
+uniform vec2  shapeInfo[MAX_SHAPES];// corner radius px, materialize 0..1
+uniform float smoothK;              // px reach of the smooth union (polynomial smin), 0 = plain min
 uniform float roundingPower;        // 2 = circle
+uniform vec2  pointer;              // quad px
+uniform vec3  pointerLight;         // amount (0 = off), radius px, press 0..1
 uniform float alpha;                // layer fade
 uniform int   linearLight;          // 1: work in linear light like QuartzCore (sRGB decode/encode)
 
@@ -63,14 +70,32 @@ out vec4 fragColor;
 
 float sat(float x) { return clamp(x, 0.0, 1.0); }
 
-float sdShape(vec2 p) {
-    vec2  half_ = glassBox.zw * 0.5;
-    float r     = clamp(radius, 0.0, min(half_.x, half_.y));
-    vec2  q     = abs(p) - half_ + r;
-    vec2  m     = max(q, 0.0);
-    float c     = (m.x > 0.0 || m.y > 0.0) ? pow(pow(m.x, roundingPower) + pow(m.y, roundingPower), 1.0 / roundingPower) : 0.0;
+float sdBox(vec2 p, vec2 half_, float radius) {
+    float r = clamp(radius, 0.0, min(half_.x, half_.y));
+    vec2  q = abs(p) - half_ + r;
+    vec2  m = max(q, 0.0);
+    float c = (m.x > 0.0 || m.y > 0.0) ? pow(pow(m.x, roundingPower) + pow(m.y, roundingPower), 1.0 / roundingPower) : 0.0;
     return c + min(max(q.x, q.y), 0.0) - r;
 }
+
+// distance to the union of the shapes (x) and the materialize progress there (y), blended
+// across the smooth zone like the distance
+vec2 scene(vec2 qp) {
+    vec2 res = vec2(1e5, 1.0);
+    for (int i = 0; i < MAX_SHAPES; i++) {
+        if (i >= shapeCount)
+            break;
+        float di = sdBox(qp - shapeBox[i].xy, shapeBox[i].zw, shapeInfo[i].x);
+        if (smoothK > 0.0) {
+            float h = clamp(0.5 + 0.5 * (res.x - di) / smoothK, 0.0, 1.0);
+            res     = vec2(mix(res.x, di, h) - smoothK * h * (1.0 - h), mix(res.y, shapeInfo[i].y, h));
+        } else if (di < res.x)
+            res = vec2(di, shapeInfo[i].y);
+    }
+    return res;
+}
+
+float sdShape(vec2 qp) { return scene(qp).x; }
 
 // 1 - sqrt(1 - (1-t)^2): Apple's quarter-circle bevel
 float bevel(float depth, float h) {
@@ -145,10 +170,13 @@ vec3 sampleFace(vec2 pos, float b) {
 }
 
 void main() {
-    vec2  qp     = v_texcoord * quadSize;
-    vec2  centre = glassBox.xy + glassBox.zw * 0.5;
-    vec2  p      = qp - centre;
-    float d      = sdShape(p);
+    vec2  qp  = v_texcoord * quadSize;
+    vec2  sc  = scene(qp);
+    float d   = sc.x;
+    // materialize: every effect ramps from identity (the untouched backdrop) to the full
+    // material, instead of fading the glass with alpha (Liquid Glass "materializes" by
+    // modulating its lensing)
+    float mat = sat(sc.y);
 
     float fw  = max(fwidth(d), 1e-3);
     float cov = sat(0.5 - d / fw);
@@ -156,7 +184,7 @@ void main() {
     // drop shadow: erfc-blurred shape, coloured by the saturated backdrop (Apple's shadow_cm)
     float sh = 0.0;
     if (shadowOpacity > 0.0 && cov < 1.0)
-        sh = gEdge(sdShape(p - shadowOffset) / max(shadowRadius, 1e-3)) * shadowOpacity;
+        sh = gEdge(sdShape(qp - shadowOffset) / max(shadowRadius, 1e-3)) * shadowOpacity * mat;
 
     if (cov <= 0.0 && sh <= 0.002)
         discard;
@@ -172,20 +200,20 @@ void main() {
         vec2 n = vec2(0.0);
         if (depth < max(max(refractionHeight, outerHeight), max(highlightWidth, bleedHeight)) + 1.0) {
             const vec2 e = vec2(0.5, 0.0);
-            n = vec2(sdShape(p + e.xy) - sdShape(p - e.xy), sdShape(p + e.yx) - sdShape(p - e.yx));
+            n = vec2(sdShape(qp + e.xy) - sdShape(qp - e.xy), sdShape(qp + e.yx) - sdShape(qp - e.yx));
             n = n / max(length(n), 1e-5);
         }
 
         // refraction on the bevel (n points outward; Apple's amounts are negative = inward)
         float bev = bevel(depth, refractionHeight);
-        float m   = refraction * bev;
+        float m   = refraction * bev * mat;
         vec2  pR  = qp + n * m;
-        float b   = blurAmount(d - abs(m)); // Apple: dEff = d + m with an inward (negative) m
+        float b   = blurAmount(d - abs(m)) * mat; // Apple: dEff = d + m with an inward (negative) m
 
         vec3 col;
-        if (aberration * bev > 0.05) {
+        if (aberration * bev * mat > 0.05) {
             // 7 taps: +A feeds R/G, -A feeds G/B (SPEC section 3, step 4.3)
-            vec2 A   = n * aberration * bev;
+            vec2 A   = n * aberration * bev * mat;
             vec3 acc = vec3(0.0);
             for (int i = 0; i < 3; i++) {
                 float t = 1.0 - float(i) / 3.0;
@@ -206,38 +234,40 @@ void main() {
         // blur fill: lighten/darken against a wider blur (SPEC step 4.4)
         if (dot(blurFill, vec3(1.0)) > 0.0) {
             vec3 bf = fetch(qp, blurLod + 1.5);
-            col     = mix(blurFill.y * min(col, bf) + blurFill.x * max(col, bf) + (1.0 - blurFill.x - blurFill.y) * col, bf, blurFill.z);
+            vec3 filled = mix(blurFill.y * min(col, bf) + blurFill.x * max(col, bf) + (1.0 - blurFill.x - blurFill.y) * col, bf, blurFill.z);
+            col         = mix(col, filled, mat);
         }
 
         // outer refraction layer over the rim band (SPEC step 4.5)
         if (outerOpacity > 0.0 && d > outerThreshold.x) {
-            float mo = outerAmount * bevel(depth, outerHeight);
-            vec3  so = sampleFace(qp + n * mo, blurAmount(d));
-            col      = mix(col, so, sat((d - outerThreshold.x) / (outerThreshold.y - outerThreshold.x)) * outerOpacity);
+            float mo = outerAmount * bevel(depth, outerHeight) * mat;
+            vec3  so = sampleFace(qp + n * mo, blurAmount(d) * mat);
+            col      = mix(col, so, sat((d - outerThreshold.x) / (outerThreshold.y - outerThreshold.x)) * outerOpacity * mat);
         }
 
         // YCC face effect, then the fill (SPEC 9.7)
-        col = ycc(col, faceYcc);
-        col = mix(col, faceFill.rgb, faceFill.a);
+        col = ycc(col, mix(vec3(0.0, 1.0, 1.0), faceYcc, mat)); // (0, 1, 1) = identity
+        col = mix(col, faceFill.rgb, faceFill.a * mat);
         // edge bleed: outside colour pulled into the rim through its own colour effect (step 4.7)
         if (bleedOpacity > 0.0 && depth < bleedHeight) {
             float mb = bleedAmount * bevel(depth, bleedHeight);
             vec3  eb = ycc(fetchSharp(qp + n * mb, bleedLod), bleedYcc);
             float w  = 1.0 - depth / max(bleedHeight, 1e-3);
-            col      = mix(col, eb, w * w * w * w * bleedOpacity);
+            col      = mix(col, eb, w * w * w * w * bleedOpacity * mat);
         }
 
         // keep the tile tone inside its range over any backdrop (after the bleed, before the rim
         // light): lift darks additively in gamma (keeps hue); cap brights by real relative luminance
         // (linear), so a saturated warm face cannot pass the cap and still fail label contrast
-        if (faceLuma.x > 0.0 || faceLuma.y < 1.0) {
+        vec2 fl = mix(vec2(0.0, 1.0), faceLuma, mat);
+        if (fl.x > 0.0 || fl.y < 1.0) {
             vec3  g  = encode(clamp(col, 0.0, 1.0));
             float Lg = luma(g);
-            if (Lg < faceLuma.x)
-                col = decode(clamp(g + (faceLuma.x - Lg), 0.0, 1.0));
+            if (Lg < fl.x)
+                col = decode(clamp(g + (fl.x - Lg), 0.0, 1.0));
             vec3  lin    = srgbToLinear(encode(clamp(col, 0.0, 1.0)));
             float Ylin   = luma(lin);
-            float capLin = srgbToLinear(vec3(faceLuma.y)).x;
+            float capLin = srgbToLinear(vec3(fl.y)).x;
             if (Ylin > capLin)
                 col = decode(linearToSrgb(lin * (capLin / Ylin)));
         }
@@ -245,20 +275,34 @@ void main() {
         // subtle inner shadow along the rim
         if (innerShadow > 0.0) {
             float k = 1.0 - sat(depth / max(innerShadowSize, 1e-3));
-            col *= 1.0 - innerShadow * k * k;
+            col *= 1.0 - innerShadow * k * k * mat;
         }
 
         // two-lobe rim highlight (light side and the opposite side). Apple applies it as a colour
         // bias, which over a blue backdrop came out as a thick cyan rim (JUDGE-r5); macOS shows a
         // thin near-white hairline, so the rim desaturates first and then lifts toward white
+        // pointer light (interactive glass): the rim lights up near the pointer, wider and brighter
+        // while a button is held, and the face glows faintly around the touch point; light falls
+        // off with distance, so neighbouring glass catches some of it
+        float pl = 0.0, pf = 0.0;
+        if (pointerLight.x > 0.0) {
+            vec2  dp = qp - pointer;
+            float r  = pointerLight.y * (1.0 + 0.5 * pointerLight.z);
+            pl       = pointerLight.x * exp(-dot(dp, dp) / (r * r));
+            pf       = pl * (0.03 + 0.09 * pointerLight.z);
+            pl      *= 0.6 + 0.4 * pointerLight.z;
+        }
+        if (pf > 0.0)
+            col = mix(col, vec3(1.0), pf * mat);
+
         if (highlightBias != 0.0 && highlightWidth > 0.0) {
-            float k     = 1.0 - sat(depth / highlightWidth);
+            float k     = 1.0 - sat(depth / (highlightWidth * (1.0 + pl)));
             float band  = (0.25 * step(0.001, k) + 0.75 * k) * cov;
             float ndl   = dot(-lightDir, n);
             vec2  lobes = clamp((vec2(ndl, -ndl) - highlightSpread) / max(1.0 - highlightSpread, 1e-3), 0.0, 1.0);
             lobes       = lobes / (highlightCurve * (1.0 - lobes) + 1.0);
-            float h     = max(lobes.x + lobes.y, rim) * band;
-            float w     = clamp(highlightBias * h, 0.0, 1.0);
+            float h     = (max(lobes.x + lobes.y, rim) + pl) * band;
+            float w     = clamp(highlightBias * h, 0.0, 1.0) * mat;
             col         = mix(col, vec3(luma(col)), w);           // no tint on the edge
             col         = mix(col, vec3(1.0), w * 0.95);          // near-white hairline
         }
@@ -270,9 +314,9 @@ void main() {
 
     // ring shadow: soft contour of the shape sampled at an offset, inside the glass only
     if (ringOpacity > 0.0 && cov > 0.0) {
-        float dr   = sdShape(p + ringOffset);
+        float dr   = sdShape(qp + ringOffset);
         float rr   = max(ringRadius, 1e-3);
-        float ring = sat(gEdge(0.7071 * dr / rr) - gEdge(0.7071 * (dr + ringStroke) / rr)) * ringOpacity * cov;
+        float ring = sat(gEdge(0.7071 * dr / rr) - gEdge(0.7071 * (dr + ringStroke) / rr)) * ringOpacity * cov * mat;
         c          = c * (1.0 - ring) + vec4(0.0, 0.0, 0.0, ring);
     }
 

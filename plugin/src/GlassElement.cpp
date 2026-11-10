@@ -11,8 +11,10 @@
 
 #include <GLES3/gl32.h>
 
+#include <chrono>
 #include <cmath>
 #include <cstring>
+#include <array>
 #include <map>
 #include <fstream>
 #include <sstream>
@@ -77,8 +79,10 @@ namespace lg {
             .uvTopLeft        = loc("uvTopLeft"),
             .uvBottomRight    = loc("uvBottomRight"),
             .quadSize         = loc("quadSize"),
-            .glassBox         = loc("glassBox"),
-            .radius           = loc("radius"),
+            .shapeCount       = loc("shapeCount"),
+            .shapeBox         = loc("shapeBox"),
+            .shapeInfo        = loc("shapeInfo"),
+            .smoothK          = loc("smoothK"),
             .roundingPower    = loc("roundingPower"),
             .alpha            = loc("alpha"),
             .blurLod          = loc("blurLod"),
@@ -118,10 +122,12 @@ namespace lg {
             .ringOffset       = loc("ringOffset"),
             .ringStroke       = loc("ringStroke"),
             .ringRadius       = loc("ringRadius"),
+            .pointer          = loc("pointer"),
+            .pointerLight     = loc("pointerLight"),
         };
         // the sampler and the quad mapping are the minimum a custom shader must keep
-        if (u.tex < 0 || u.uvTopLeft < 0 || u.uvBottomRight < 0 || u.quadSize < 0 || u.glassBox < 0) {
-            fail("shader lacks the required uniforms tex/uvTopLeft/uvBottomRight/quadSize/glassBox");
+        if (u.tex < 0 || u.uvTopLeft < 0 || u.uvBottomRight < 0 || u.quadSize < 0 || u.shapeCount < 0 || u.shapeBox < 0) {
+            fail("shader lacks the required uniforms tex/uvTopLeft/uvBottomRight/quadSize/shapeCount/shapeBox");
             return false;
         }
 
@@ -190,6 +196,72 @@ namespace lg {
         std::vector<std::pair<CBox, bool>> g_claims;
     }
 
+    // ── pointer light (interactive glass) ────────────────────────────────────
+
+    namespace {
+        struct SPointer {
+            Vector2D                              pos{-1e6, -1e6}; // global logical
+            bool                                  held = false;
+            std::chrono::steady_clock::time_point released{};
+        } g_pointer;
+        constexpr double PRESS_FADE = 0.3; // s, the press light fades after release
+
+        // glass with pointer light, per layer: global logical boxes, frame last drawn
+        struct SLit {
+            std::vector<CBox> boxes;
+            double            reach = 0; // logical px the light reaches outside the boxes
+            uint64_t          frame = 0;
+        };
+        std::map<uintptr_t, SLit> g_lit;
+    }
+    static double pressLevel() {
+        if (g_pointer.held)
+            return 1;
+        const double t = std::chrono::duration<double>(std::chrono::steady_clock::now() - g_pointer.released).count();
+        return t < PRESS_FADE ? 1 - t / PRESS_FADE : 0;
+    }
+
+    static void notePointerGlass(const CGlassElement::SData& data) {
+        auto& lit = g_lit[data.owner];
+        lit.boxes.clear();
+        for (const auto& g : data.groups)
+            lit.boxes.emplace_back(CBox{g.box.x + data.monitorPos.x, g.box.y + data.monitorPos.y, g.box.w, g.box.h}.expand(2));
+        // exp falloff: below 2 % at 2 radii (1.5 x radius while pressed)
+        lit.reach = 3.0 * data.params->pointerLightRadius;
+        lit.frame = g_frame;
+    }
+
+    // redraw lit glass within the light's reach of any of the points
+    static void damageLit(std::initializer_list<Vector2D> points) {
+        if (!g_pHyprRenderer)
+            return;
+        std::erase_if(g_lit, [](const auto& kv) { return g_frame - kv.second.frame > 600; });
+        for (const auto& [owner, lit] : g_lit)
+            for (const auto& box : lit.boxes)
+                for (const auto& pt : points)
+                    if (box.copy().expand(lit.reach).containsPoint(pt)) {
+                        g_pHyprRenderer->damageBox(box);
+                        break;
+                    }
+    }
+
+    void onPointer(const Vector2D& global, std::optional<bool> pressed) {
+        const Vector2D old = g_pointer.pos;
+        g_pointer.pos      = global;
+        if (pressed) {
+            if (g_pointer.held && !*pressed)
+                g_pointer.released = std::chrono::steady_clock::now();
+            g_pointer.held = *pressed;
+        }
+        if (!g_lit.empty())
+            damageLit({old, global});
+    }
+
+    void onFrameDone() {
+        if (!g_pointer.held && pressLevel() > 0 && !g_lit.empty())
+            damageLit({g_pointer.pos});
+    }
+
     void onFrame() {
         g_claims.clear();
         if (++g_frame % 60)
@@ -199,6 +271,7 @@ namespace lg {
     }
 
     void forgetOwner(uintptr_t owner) {
+        g_lit.erase(owner);
         std::erase_if(g_luma, [owner](const auto& kv) { return kv.first.first == owner; });
     }
 
@@ -282,11 +355,14 @@ namespace lg {
     // ── element ─────────────────────────────────────────────────────────────
 
     static void resolveShapes(CGlassElement::SData& data) {
-        if (data.resolved.size() == data.shapes.size())
+        if (!data.groups.empty() || data.shapes.empty())
             return;
+        data.groups = groupShapes(data.shapes, data.smoothK);
         data.resolved.clear();
-        for (const auto& s : data.shapes)
-            data.resolved.push_back(resolveMaterial(*data.recipe, std::min(s.box.w, s.box.h)));
+        for (const auto& g : data.groups) {
+            const auto& lead = data.shapes[g.lead].box;
+            data.resolved.push_back(resolveMaterial(*data.recipe, std::min(lead.w, lead.h)));
+        }
     }
 
     CGlassElement::CGlassElement(SData data) : m_data(std::move(data)) {
@@ -299,8 +375,8 @@ namespace lg {
     }
 
     // physical-px box the glass draws into plus what its shader reads
-    static CBox readBox(const SGlassShape& s, double margin, double reach, float scale) {
-        return CBox{s.box.x - margin - reach, s.box.y - margin - reach, s.box.w + 2 * (margin + reach), s.box.h + 2 * (margin + reach)}.scale(scale).round();
+    static CBox readBox(const SRect& b, double margin, double reach, float scale) {
+        return CBox{b.x - margin - reach, b.y - margin - reach, b.w + 2 * (margin + reach), b.h + 2 * (margin + reach)}.scale(scale).round();
     }
 
     static double reachOf(const SParams& p, const SResolved& res) {
@@ -316,8 +392,10 @@ namespace lg {
         const double m = margin(data);
         if (data.params->fullDamage)
             return; // everything is redrawn anyway
-        for (size_t i = 0; i < data.shapes.size(); ++i)
-            g_claims.emplace_back(readBox(data.shapes[i], m, reachOf(*data.params, data.resolved[i]), mon->m_scale), false);
+        for (size_t i = 0; i < data.groups.size(); ++i)
+            g_claims.emplace_back(readBox(data.groups[i].box, m, reachOf(*data.params, data.resolved[i]), mon->m_scale), false);
+        if (data.pointerLight)
+            notePointerGlass(data);
 
         // a box added now can touch glass claimed earlier this frame: repeat until stable
         for (bool grew = true; grew;) {
@@ -390,17 +468,20 @@ namespace lg {
         const auto& p     = *m_data.params;
         for (size_t i = 0; i < m_data.shapes.size(); ++i) {
             const auto& s    = m_data.shapes[i];
-            const auto  it   = g_luma.find({m_data.owner, i});
+            // light/dark state is kept per group
+            const auto group = std::ranges::find_if(m_data.groups, [i](const SGlassGroup& g) { return std::ranges::contains(g.members, i); });
+            const auto it    = g_luma.find({m_data.owner, size_t(group - m_data.groups.begin())});
             const bool  dark = p.appearance == 2 || (p.appearance == 0 && it != g_luma.end() && it->second.dark);
             const auto& face = dark ? m_data.recipe->dark : m_data.recipe->light;
             // rough stand-in for the face effect: the recipe fill, or half its black point as a white lift
             const auto tint = face.fill.a > 0 ? face.fill : SRgba{1, 1, 1, face.ycc.black * 0.5f};
             CBox box = CBox{s.box.x, s.box.y, s.box.w, s.box.h}.scale(scale).round();
-            if (box.w < 1 || box.h < 1)
+            const float a = m_data.alpha * float(s.materialize);
+            if (box.w < 1 || box.h < 1 || a <= 0.001f)
                 continue;
-            g_pHyprOpenGL->renderRect(ctx, box, CHyprColor{tint.r, tint.g, tint.b, tint.a * m_data.alpha},
+            g_pHyprOpenGL->renderRect(ctx, box, CHyprColor{tint.r, tint.g, tint.b, tint.a * a},
                                       {.round = sc<int>(std::round(s.radius * scale)), .roundingPower = m_data.roundingPower.value_or(p.roundingPower), .blur = true,
-                                       .blurA = m_data.alpha});
+                                       .blurA = a});
         }
     }
 
@@ -425,9 +506,9 @@ namespace lg {
         };
         std::vector<SQuad> quads;
         CRegion            blurDamage;
-        for (size_t i = 0; i < m_data.shapes.size(); ++i) {
-            const auto& s    = m_data.shapes[i];
-            const CBox  quad = readBox(s, m, 0, scale);
+        for (size_t i = 0; i < m_data.groups.size(); ++i) {
+            const auto& g    = m_data.groups[i];
+            const CBox  quad = readBox(g.box, m, 0, scale);
             if (quad.w < 1 || quad.h < 1)
                 continue;
             CRegion damage{ctx.m_data.damage};
@@ -435,7 +516,7 @@ namespace lg {
             if (damage.empty())
                 continue;
             quads.push_back({i, quad, std::move(damage), m_data.resolved[i]});
-            blurDamage.add(readBox(s, m, reachOf(p, m_data.resolved[i]), scale));
+            blurDamage.add(readBox(g.box, m, reachOf(p, m_data.resolved[i]), scale));
         }
         if (quads.empty())
             return true;
@@ -467,7 +548,7 @@ namespace lg {
         if (p.appearance == 0) {
             for (size_t q = 0; q < quads.size(); ++q) {
                 auto&       l = g_luma[{m_data.owner, quads[q].index}];
-                const auto& s = m_data.shapes[quads[q].index];
+                const auto& s = m_data.groups[quads[q].index];
                 // a shape index taken over by a differently sized shape starts fresh
                 if (std::abs(l.w - s.box.w) > 2 || std::abs(l.h - s.box.h) > 2) {
                     l.valid = false;
@@ -515,6 +596,10 @@ namespace lg {
         glUniform1f(u.ringStroke, r.ringStroke * scale);
         glUniform1f(u.ringRadius, r.ringRadius * scale);
 
+        glUniform1f(u.smoothK, m_data.smoothK * scale);
+        const Vector2D ptr   = (g_pointer.pos - m_data.monitorPos) * scale; // monitor-local physical px
+        const float    press = float(pressLevel());
+
         g_pHyprOpenGL->blend(true);
         g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         g_pHyprOpenGL->setActiveTexture(GL_TEXTURE1);
@@ -524,15 +609,29 @@ namespace lg {
 
         for (size_t q = 0; q < quads.size(); ++q) {
             const auto& [index, quad, damage, res] = quads[q];
-            const auto& s                          = m_data.shapes[index];
+            const auto& g                          = m_data.groups[index];
             const auto& face                       = dark[q] ? r.dark : r.light;
 
             shader->setUniformMatrix3fv(SHADER_PROJ, 1, GL_TRUE, g_pHyprRenderer->projectBoxToTarget(ctx, quad).getMatrix());
             glUniform2f(u.uvTopLeft, quad.x / tex->m_size.x, quad.y / tex->m_size.y);
             glUniform2f(u.uvBottomRight, (quad.x + quad.w) / tex->m_size.x, (quad.y + quad.h) / tex->m_size.y);
             glUniform2f(u.quadSize, quad.w, quad.h);
-            glUniform4f(u.glassBox, s.box.x * scale - quad.x, s.box.y * scale - quad.y, s.box.w * scale, s.box.h * scale);
-            glUniform1f(u.radius, s.radius * scale);
+            std::array<float, 4 * MAX_GROUP> boxes{};
+            std::array<float, 2 * MAX_GROUP> info{};
+            for (size_t k = 0; k < g.members.size(); ++k) {
+                const auto& s   = m_data.shapes[g.members[k]];
+                boxes[4 * k]     = (s.box.x + s.box.w / 2) * scale - quad.x;
+                boxes[4 * k + 1] = (s.box.y + s.box.h / 2) * scale - quad.y;
+                boxes[4 * k + 2] = s.box.w * scale / 2;
+                boxes[4 * k + 3] = s.box.h * scale / 2;
+                info[2 * k]      = s.radius * scale;
+                info[2 * k + 1]  = s.materialize;
+            }
+            glUniform1i(u.shapeCount, int(g.members.size()));
+            glUniform4fv(u.shapeBox, MAX_GROUP, boxes.data());
+            glUniform2fv(u.shapeInfo, MAX_GROUP, info.data());
+            glUniform2f(u.pointer, ptr.x - quad.x, ptr.y - quad.y);
+            glUniform3f(u.pointerLight, m_data.pointerLight ? p.pointerLight : 0.f, p.pointerLightRadius * scale, press);
             glUniform1f(u.blurLod, p.blurLod + p.blurLodScale * std::log2(1.f + res.blurRadius)); // mip levels over Hyprland's blur
             glUniform1f(u.refraction, res.refractionAmount * p.refractionScale * scale);
             glUniform1f(u.refractionHeight, res.refractionHeight * scale);

@@ -17,6 +17,7 @@
 #include <hyprland/src/event/EventBus.hpp>
 #include <hyprland/src/helpers/Color.hpp>
 #include <hyprland/src/managers/SessionLockManager.hpp>
+#include <hyprland/src/managers/input/InputManager.hpp>
 #include <hyprland/src/plugins/PluginAPI.hpp>
 #include <hyprland/src/render/Renderer.hpp>
 #include <hyprland/src/state/MonitorState.hpp>
@@ -91,7 +92,10 @@ static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext
         return;
     }
     lg::CGlassElement::SData data{
-        .shapes = std::move(shapes),
+        .shapes       = std::move(shapes),
+        .smoothK      = lg::smoothKFor(*params, layer->m_namespace),
+        .pointerLight = lg::pointerLightFor(*params, layer->m_namespace),
+        .monitorPos   = mon->m_position,
         .alpha  = float(layer->alpha()[Desktop::View::LS_ALPHA_FADE]->value() * opacity),
         .params = params,
         .recipe = &lg::recipeByName(lg::materialFor(*params, layer->m_namespace)),
@@ -176,6 +180,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
                 lg::stats::begin(lg::stats::FRAME);
                 break;
             case RENDER_POST:
+                lg::onFrameDone();
                 if (lg::stats::enabled() && Render::GL::g_pHyprOpenGL) {
                     Render::GL::g_pHyprOpenGL->makeEGLCurrent();
                     lg::stats::end(lg::stats::FRAME);
@@ -195,6 +200,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     // title bars: hover state of the traffic lights, and the end of a title-bar drag
     g_listeners.push_back(Event::bus()->m_events.input.mouse.move.listen([](Vector2D pos, Event::SCallbackInfo&) {
         forEachTitlebar([&pos](lg::CTitlebar& bar) { bar.onPointerMove(pos); });
+        lg::onPointer(pos, std::nullopt);
     }));
     g_listeners.push_back(Event::bus()->m_events.window.title.listen([](PHLWINDOW w) {
         forEachTitlebar([&w](lg::CTitlebar& bar) {
@@ -205,6 +211,8 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     g_listeners.push_back(Event::bus()->m_events.input.mouse.button.listen([](IPointer::SButtonEvent e, Event::SCallbackInfo&) {
         if (e.state == WL_POINTER_BUTTON_STATE_RELEASED)
             forEachTitlebar([](lg::CTitlebar& bar) { bar.onButtonRelease(); });
+        if (g_pInputManager)
+            lg::onPointer(g_pInputManager->getMouseCoordsInternal(), e.state == WL_POINTER_BUTTON_STATE_PRESSED);
     }));
 
     // window glass: a bottom decoration on every window, active only for window_classes

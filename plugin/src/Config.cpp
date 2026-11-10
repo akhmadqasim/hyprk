@@ -51,6 +51,8 @@ namespace lg {
             {K("shadow_scale"), &SParams::shadowScale},
             {K("shadow_tint"), &SParams::shadowTint},
             {K("ring_scale"), &SParams::ringScale},
+            {K("pointer_light"), &SParams::pointerLight},
+            {K("pointer_light_radius"), &SParams::pointerLightRadius},
             {K("window_radius"), &SParams::windowRadius},
             {K("titlebar_height"), &SParams::titlebarHeight},
             {K("titlebar_button"), &SParams::titlebarButton},
@@ -70,6 +72,7 @@ namespace lg {
             {K("titlebar_text"), 0x333333D9, [](SParams& p, long long v) { p.titlebarText = rgbaFromHex(v); }},
             {K("titlebar_text_inactive"), 0x33333359, [](SParams& p, long long v) { p.titlebarTextInactive = rgbaFromHex(v); }},
             {K("stats"), 0, [](SParams& p, long long v) { p.stats = v != 0; }},
+            {K("reduce_motion"), 0, [](SParams& p, long long v) { p.reduceMotion = v != 0; }},
             {K("require_region"), 1, [](SParams& p, long long v) { p.requireRegion = v != 0; }},
         };
 
@@ -81,6 +84,11 @@ namespace lg {
             {K("radii"), "", [](SParams& p, const std::string& v) { p.radii = parseNumberMap(v); }},
             {K("materials"), "hyprk-dock:dock,hyprk-controlcenter:controlcenter,hyprk-overlay:menu,hyprk-menubar:menu,hyprk-spotlight:spotlight",
              [](SParams& p, const std::string& v) { p.materials = parseStringMap(v); }},
+            // CC tiles sit 12 apart: spacing 6 keeps them separate at rest (a press scale-up makes them reach)
+            {K("spacing"), "hyprk-controlcenter:6,hyprk-dock:12,hyprk-menubar:6,hyprk-overlay:8",
+             [](SParams& p, const std::string& v) { p.spacing = parseNumberMap(v); }},
+            {K("pointer_light_namespaces"), "hyprk-controlcenter,hyprk-dock,hyprk-menubar",
+             [](SParams& p, const std::string& v) { p.pointerLightNamespaces = splitList(v); }},
             {K("material"), "regular", [](SParams& p, const std::string& v) { p.defaultMaterial = v; }},
             {K("window_material"), "regular", [](SParams& p, const std::string& v) { p.windowMaterial = v; }},
             {K("appearance"), "auto", [](SParams& p, const std::string& v) { p.appearance = parseAppearance(v); }},

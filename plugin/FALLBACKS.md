@@ -5,7 +5,7 @@ User rule: if the glass cannot run, log once and fall back to plain Hyprland blu
 | Case | Detection | What happens |
 |---|---|---|
 | Shader does not compile or link (driver, GLES < 3.0, broken `shader_path` file) | `CShader::createProgram(..., dynamic=true, silent=true)` returns false. The GL info log goes to `hyprland.log` (`CShader::logShaderError`). | One `ERR [liquidglass] glass disabled, using plain Hyprland blur: ...` line plus one desktop notification. Every glassed surface is then drawn with Hyprland's own blur (`renderRect` with `blur = true`) in the same rounded shape, tinted with the recipe fill (or a white lift from its black point). Changing `shader_path` gives one new attempt. |
-| Custom shader lacks required uniforms (`tex`, `uvTopLeft`, `uvBottomRight`, `quadSize`, `glassBox`) | `glGetUniformLocation` < 0 | Same as above. |
+| Custom shader lacks required uniforms (`tex`, `uvTopLeft`, `uvBottomRight`, `quadSize`, `shapeCount`, `shapeBox`) | `glGetUniformLocation` < 0 | Same as above. |
 | Renderer is not OpenGL (future Vulkan renderer) | `g_pHyprRenderer->type() != RT_GL` | Same as above (the fallback uses the renderer-neutral blur call). |
 | Blur framebuffer missing for a frame | `blurMainFramebuffer()` returns null | That frame uses the plain-blur fallback. |
 | `renderLayer` symbol not found or already hooked by another plugin (e.g. hyprglass) | `findFunctionsByName` / `CFunctionHook::hook()` | Plugin stays loaded but does nothing. One log line + notification. Hyprland's normal layer blur (layer rules / ext-background-effect) keeps working. |

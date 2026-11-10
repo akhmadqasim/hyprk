@@ -40,6 +40,14 @@ namespace lg {
         float                                        innerShadow = 0.06f, innerShadowSize = 8;
         float                                        shadowScale = 1, shadowTint = 0.35f, ringScale = 1;
 
+        // Liquid Glass motion. spacing: ns -> px; shapes of one layer closer than this merge into one
+        // smooth-union glass (GlassEffectContainer(spacing:)), between 1x and 2x it they bulge toward
+        // each other. pointer light: namespaces whose glass lights up around the pointer.
+        std::unordered_map<std::string, double>      spacing;
+        std::vector<std::string>                     pointerLightNamespaces;
+        float                                        pointerLight = 1, pointerLightRadius = 60;
+        bool                                         reduceMotion = false; // no merging, no pointer light
+
         bool                                         fullDamage    = false; // true: redraw the whole output while glass is visible
         bool                                         stats         = false; // GPU timestamp queries, `hyprctl liquidglass`
         bool                                         linearLight   = false; // 1: shader in linear light (recipes are tuned for 0, see README)
@@ -77,6 +85,10 @@ namespace lg {
     bool namespaceMatches(const SParams& p, const std::string& ns);
 
     const std::string& materialFor(const SParams& p, const std::string& ns);
+
+    // smooth-union reach (px, logical) for a namespace: 2 x spacing, 0 with reduce_motion
+    double smoothKFor(const SParams& p, const std::string& ns);
+    bool   pointerLightFor(const SParams& p, const std::string& ns);
 
     // Hyprland side (Config.cpp, needs the compositor)
     void registerConfig(void* handle);

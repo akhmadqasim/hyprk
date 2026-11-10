@@ -123,6 +123,12 @@ int main() {
     CHECK(namespaceMatches(p, "other"));
     CHECK(near(radiusFor(p, "hyprk-menubar", 12), 0));
     CHECK(near(radiusFor(p, "hyprk-dock", 12), 12));
+    p.spacing = {{"hyprk-dock", 12}};
+    p.pointerLightNamespaces = {"hyprk-dock"};
+    CHECK(near(smoothKFor(p, "hyprk-dock"), 24) && near(smoothKFor(p, "x"), 0) && pointerLightFor(p, "hyprk-dock") && !pointerLightFor(p, "x"));
+    p.reduceMotion = true;
+    CHECK(near(smoothKFor(p, "hyprk-dock"), 0) && !pointerLightFor(p, "hyprk-dock"));
+    p.reduceMotion = false;
     p.defaultRadius = 8;
     CHECK(near(radiusFor(p, "hyprk-dock", 12), 8));
 
@@ -152,6 +158,34 @@ int main() {
         std::vector<SRect> wide = {{0, 700, 200, 20}};
         CHECK(near(takeOpacityMarker(wide, 1280, 720), 1) && wide.size() == 1);
     }
+
+    // materialize hole: 1x1 gap in the middle row, x = left + 1 + round(m (w - 3))
+    {
+        auto rows = roundedRows(100, 50, 103, 40, 12);
+        CHECK(near(clusterRegion(rows)[0].materialize, 1));
+        auto& mid = rows[20];                        // y 70, full width 100..203
+        const double hx = 100 + 1 + 25;              // m = 25 / 100
+        rows.push_back({hx + 1, mid.y, mid.right() - hx - 1, 1});
+        mid.w = hx - mid.x;
+        auto shapes = clusterRegion(rows);
+        CHECK(shapes.size() == 1 && near(shapes[0].materialize, 0.25) && near(shapes[0].box.w, 103));
+        CHECK(std::abs(shapes[0].radius - 12) <= 3);
+        // two separate shapes 1 px apart in one row are not a hole
+        auto two = clusterRegion({{0, 0, 10, 1}, {11, 0, 10, 1}});
+        CHECK(two.size() == 2 && near(two[0].materialize, 1) && near(two[1].materialize, 1));
+    }
+
+    // groups: shapes closer than k share one smooth-union group, lead = largest area
+    {
+        std::vector<SGlassShape> s = {{{0, 0, 64, 64}, 16}, {{76, 0, 64, 64}, 16}, {{0, 76, 140, 64}, 16}, {{400, 0, 20, 20}, 4}};
+        CHECK(groupShapes(s, 12).size() == 4);        // gap 12 is not < 12: all alone (CC at rest)
+        auto g = groupShapes(s, 13);
+        CHECK(g.size() == 2 && g[0].members.size() == 3 && g[0].lead == 2 && near(g[0].box.w, 140) && near(g[0].box.h, 140));
+        CHECK(groupShapes(s, 0).size() == 4);
+        std::vector<SGlassShape> many(10, SGlassShape{{0, 0, 10, 10}, 2});
+        CHECK(groupShapes(many, 5).size() == 2);      // capped at MAX_GROUP
+    }
+    CHECK(near(smoothMin(1, 5, 2), 1) && near(smoothMin(3, 3, 4), 2) && near(smoothMin(3, 3, 0), 3));
 
     std::printf(g_fail ? "%d failures\n" : "all tests passed\n", g_fail);
     return g_fail ? 1 : 0;

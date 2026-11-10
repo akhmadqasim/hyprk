@@ -51,6 +51,45 @@ Check a value: `hyprctl getoption plugin:liquidglass:refraction_scale`.
 The backdrop is Hyprland's own blur (`decoration.blur.*`, so size/passes/vibrancy there set the base frost),
 mipmapped by the plugin for the extra per-pixel blur. Recommended base: `blur = { size = 10, passes = 3 }`.
 
+## Motion (materialize, merging, interactive light)
+
+Liquid Glass does not fade: it *materializes* (WWDC25 "Meet Liquid Glass": it appears by modulating its
+light bending and lensing). The plugin takes a materialize progress `m` (0..1) per shape and ramps every
+effect from identity to the full material in the shader: refraction, aberration, outer layer, edge bleed,
+blur (the variable-blur amount, so the backdrop goes from sharp to frosted), blur fill, face YCC (from
+(0, 1, 1) = untouched), fill, tone range, inner shadow, rim, drop and ring shadow. At `m = 0` the glass draws
+the backdrop unchanged; layer alpha stays 1. The shell drives `m` with its open/close springs.
+
+Channel: a 1x1 **hole** in the shape's own region, in its middle row (y = top + floor(h / 2)), at
+x = left + 1 + round(m (w - 3)) (shell/components/Glass.qml `materialize`). Shapes without a hole are at 1.
+The older window-wide opacity marker (1x1 rect in the surface's bottom row, x = opacity x (W - 1)) is still
+read and still fades the whole layer.
+
+Merging: shapes of one layer whose boxes are closer than `2 x spacing` are drawn as one group (max 8) with a
+polynomial smooth-min SDF (`k = 2 x spacing`, GlassEffectContainer-like). Shapes closer than `spacing` fuse,
+between 1x and 2x they reach toward each other; farther apart they are pixel-identical to separate glass.
+A group uses the recipe values of its largest shape (Apple's `minimumDistanceOfLargestArea`), and per-pixel
+materialize blends across the smooth zone like the distance. This makes a pressed, swelling Control Center
+module bridge to its neighbour and lets shapes moving together morph into one.
+
+Interactive light (`pointer_light_namespaces`): the rim brightens and widens around the pointer
+(Gaussian, `pointer_light_radius`), the face glows faintly, and while a button is held the light is
+brighter and 1.5x wider, fading over 0.3 s after release. Light reaches nearby glass too. The plugin damages
+only glass within reach of the old and new pointer position.
+
+`reduce_motion = 1` (the shell sets it from Settings > Accessibility > Reduce motion) turns off merging and
+the pointer light; the shell then crossfades panels instead of materializing them.
+
+| Key | Default | Meaning |
+|---|---|---|
+| `spacing` | `hyprk-controlcenter:6,hyprk-dock:12,hyprk-menubar:6,hyprk-overlay:8` | `ns:px` merge spacing (CC tiles are 12 apart: 6 keeps them separate at rest) |
+| `pointer_light_namespaces` | `hyprk-controlcenter,hyprk-dock,hyprk-menubar` | glass that lights up around the pointer |
+| `pointer_light` / `pointer_light_radius` | 1 / 60 | strength (0 = off), Gaussian radius in px |
+| `reduce_motion` | 0 | 1 = no merging, no pointer light |
+
+Custom shaders (`shader_path`) must now declare `shapeCount` and `shapeBox` (the old `glassBox`/`radius`
+uniforms are gone): see the header of `shaders/liquidglass.frag`.
+
 ## Materials (recipes)
 
 Apple's numbers from `/mnt/code/liquid-glass-re/SPEC.md` section 9 (glass version v2) live in

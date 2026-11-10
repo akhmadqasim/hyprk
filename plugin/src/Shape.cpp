@@ -63,6 +63,21 @@ namespace lg {
                     shape.radius = stair;
             }
         }
+        // materialize holes: two 1 px tall rects of one cluster with exactly 1 px between them
+        for (size_t i = 0; i < n; ++i) {
+            const auto& a = rects[i];
+            if (a.h != 1 || a.w <= 0)
+                continue;
+            for (size_t j = 0; j < n; ++j) {
+                const auto& b = rects[j];
+                if (j == i || b.h != 1 || b.y != a.y || b.x != a.right() + 1 || find(i) != find(j) || slot[find(i)] < 0)
+                    continue;
+                auto& shape = out[slot[find(i)]];
+                if (shape.box.w > 3)
+                    shape.materialize = std::clamp((a.right() - shape.box.x - 1) / (shape.box.w - 3), 0.0, 1.0);
+            }
+        }
+
         for (auto& s : out) {
             // a rasterised quarter circle reaches the edge sqrt(r) rows early (inset < 0.5px):
             // stair = r - sqrt(r)  =>  r = ((1 + sqrt(1 + 4 stair)) / 2)^2
@@ -74,6 +89,63 @@ namespace lg {
         }
 
         return out;
+    }
+
+    std::vector<SGlassGroup> groupShapes(const std::vector<SGlassShape>& shapes, double smoothK) {
+        const size_t        n = shapes.size();
+        std::vector<size_t> parent(n);
+        std::iota(parent.begin(), parent.end(), 0);
+        auto find = [&](size_t i) {
+            while (parent[i] != i)
+                i = parent[i] = parent[parent[i]];
+            return i;
+        };
+        std::vector<size_t> count(n, 1);
+        if (smoothK > 0) {
+            for (size_t i = 0; i < n; ++i)
+                for (size_t j = i + 1; j < n; ++j) {
+                    const auto& a = shapes[i].box;
+                    const auto& b = shapes[j].box;
+                    // gap between the boxes (0 when they overlap); the smooth union reaches k
+                    const double dx = std::max({0.0, b.x - a.right(), a.x - b.right()});
+                    const double dy = std::max({0.0, b.y - a.bottom(), a.y - b.bottom()});
+                    const size_t ri = find(i), rj = find(j);
+                    if (ri == rj || std::hypot(dx, dy) >= smoothK || count[ri] + count[rj] > MAX_GROUP)
+                        continue;
+                    parent[ri] = rj;
+                    count[rj] += count[ri];
+                }
+        }
+
+        std::vector<SGlassGroup> out;
+        std::vector<long>        slot(n, -1);
+        for (size_t i = 0; i < n; ++i) {
+            const size_t root = find(i);
+            const auto&  b    = shapes[i].box;
+            if (slot[root] < 0) {
+                slot[root] = long(out.size());
+                out.push_back({{i}, b, i});
+                continue;
+            }
+            auto& g = out[slot[root]];
+            g.members.push_back(i);
+            const double x2 = std::max(g.box.right(), b.right()), y2 = std::max(g.box.bottom(), b.bottom());
+            g.box.x         = std::min(g.box.x, b.x);
+            g.box.y         = std::min(g.box.y, b.y);
+            g.box.w         = x2 - g.box.x;
+            g.box.h         = y2 - g.box.y;
+            const auto& lead = shapes[g.lead].box;
+            if (b.w * b.h > lead.w * lead.h)
+                g.lead = i;
+        }
+        return out;
+    }
+
+    double smoothMin(double a, double b, double k) {
+        if (k <= 0)
+            return std::min(a, b);
+        const double h = std::clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
+        return b + (a - b) * h - k * h * (1.0 - h);
     }
 
     double takeOpacityMarker(std::vector<SRect>& rects, double surfaceW, double surfaceH) {
