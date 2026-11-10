@@ -1,0 +1,188 @@
+{"d": 0, "role": "AXApplication", "title": "System Settings"}
+{"d": 1, "frame": [484, 232, 740, 625], "id": "Main", "role": "AXWindow", "sub": "AXStandardWindow", "title": "Displays"}
+{"d": 2, "frame": [484, 232, 740, 625], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 3, "frame": [484, 232, 740, 625], "id": "Main, SidebarNavigationSplitView", "role": "AXSplitGroup"}
+{"d": 4, "frame": [484, 232, 232, 625], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 5, "frame": [484, 330, 232, 527], "role": "AXScrollArea"}
+{"d": 6, "desc": "Sidebar", "enabled": "1", "frame": [484, 330, 232, 527], "id": "com.apple.settings.sidebar.collectionView", "role": "AXOutline"}
+{"d": 7, "frame": [484, 330, 232, 0], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 330, 212, 0], "role": "AXCell"}
+{"d": 9, "frame": [498, 330, 216, 0], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 7, "frame": [484, 330, 232, 46], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 330, 212, 46], "role": "AXCell"}
+{"d": 9, "desc": "<account name>, Apple Account", "enabled": "1", "frame": [500, 334, 141.5, 38], "id": "com.apple.systempreferences.AppleIDSettings*AppleIDSettings", "role": "AXButton"}
+{"d": 7, "frame": [484, 376, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 376, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Family", "enabled": "1", "frame": [501, 381.5, 80, 21], "id": "com.apple.settings.family", "role": "AXButton"}
+{"d": 7, "frame": [484, 421, 232, 0], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 421, 212, 0], "role": "AXCell"}
+{"d": 9, "frame": [498, 421, 216, 0], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 7, "frame": [484, 421, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 421, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Wi-Fi", "enabled": "1", "frame": [501, 425, 61.5, 24], "id": "com.apple.settings.wifi", "role": "AXButton"}
+{"d": 7, "frame": [484, 453, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 453, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Bluetooth", "enabled": "1", "frame": [501, 457, 88, 24], "id": "com.apple.settings.bluetooth", "role": "AXButton"}
+{"d": 7, "frame": [484, 485, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 485, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Network", "enabled": "1", "frame": [501, 489, 80, 24], "id": "com.apple.settings.network", "role": "AXButton"}
+{"d": 7, "frame": [484, 517, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 517, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "VPN", "enabled": "1", "frame": [501, 521, 55.5, 24], "id": "com.apple.settings.vpn", "role": "AXButton"}
+{"d": 7, "frame": [484, 549, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 549, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Battery", "enabled": "1", "frame": [501, 553, 73.5, 24], "id": "com.apple.settings.battery", "role": "AXButton"}
+{"d": 7, "frame": [484, 594, 232, 0], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 594, 212, 0], "role": "AXCell"}
+{"d": 9, "frame": [498, 594, 216, 0], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 7, "frame": [484, 594, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 594, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "General", "enabled": "1", "frame": [501, 598, 76.5, 24], "id": "com.apple.settings.general", "role": "AXButton"}
+{"d": 7, "frame": [484, 626, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 626, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Accessibility", "enabled": "1", "frame": [501, 630, 105, 24], "id": "com.apple.settings.accessibility", "role": "AXButton"}
+{"d": 7, "frame": [484, 658, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 658, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Appearance", "enabled": "1", "frame": [501, 662, 102, 24], "id": "com.apple.settings.appearance", "role": "AXButton"}
+{"d": 7, "frame": [484, 690, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 690, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Desktop & Dock", "enabled": "1", "frame": [501, 694, 127, 24], "id": "com.apple.settings.desktopAndDock", "role": "AXButton"}
+{"d": 7, "frame": [484, 722, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 722, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Displays", "enabled": "1", "frame": [501, 726, 82.5, 24], "id": "com.apple.settings.displayAndBrightness", "role": "AXButton"}
+{"d": 7, "frame": [484, 754, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 754, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Menu Bar", "enabled": "1", "frame": [501, 758, 87, 24], "id": "com.apple.settings.controlCenter", "role": "AXButton"}
+{"d": 7, "frame": [484, 786, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 786, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Siri", "enabled": "1", "frame": [501, 790, 48.5, 24], "id": "com.apple.settings.siri", "role": "AXButton"}
+{"d": 7, "frame": [484, 818, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 818, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Spotlight", "enabled": "1", "frame": [501, 822, 84, 24], "id": "com.apple.settings.search", "role": "AXButton"}
+{"d": 7, "frame": [484, 850, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 850, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Wallpaper", "enabled": "1", "frame": [501, 854, 89.5, 24], "id": "com.apple.settings.wallpaper", "role": "AXButton"}
+{"d": 7, "frame": [484, 895, 232, 19], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 895, 212, 19], "role": "AXCell"}
+{"d": 9, "frame": [498, 895, 216, 0], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 7, "frame": [484, 895, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 895, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Notifications", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "com.apple.settings.notifications", "role": "AXButton"}
+{"d": 7, "frame": [484, 927, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 927, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Sound", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "com.apple.settings.sounds", "role": "AXButton"}
+{"d": 7, "frame": [484, 959, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 978, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Focus", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "com.apple.settings.focus", "role": "AXButton"}
+{"d": 7, "frame": [484, 1010, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1010, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Screen Time", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "com.apple.settings.screenTime", "role": "AXButton"}
+{"d": 7, "frame": [484, 1055, 232, 19], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1055, 212, 19], "role": "AXCell"}
+{"d": 9, "frame": [498, 1055, 216, 0], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 7, "frame": [484, 1055, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1055, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Lock Screen", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "com.apple.settings.lockScreen", "role": "AXButton"}
+{"d": 7, "frame": [484, 1087, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1087, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Privacy & Security", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "com.apple.settings.privacyAndSecurity", "role": "AXButton"}
+{"d": 7, "frame": [484, 1119, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1138, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Touch ID & Password", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "com.apple.settings.passcodeAndBiometrics", "role": "AXButton"}
+{"d": 7, "frame": [484, 1170, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1170, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Users & Groups", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "com.apple.settings.usersAndGroups", "role": "AXButton"}
+{"d": 7, "frame": [484, 1215, 232, 19], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1215, 212, 19], "role": "AXCell"}
+{"d": 9, "frame": [498, 1215, 216, 19], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 7, "frame": [484, 1234, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1234, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Game Center", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "com.apple.settings.gameCenter", "role": "AXButton"}
+{"d": 7, "frame": [484, 1266, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1266, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "iCloud", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "com.apple.settings.iCloud", "role": "AXButton"}
+{"d": 7, "frame": [484, 1298, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1298, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Internet Accounts", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "com.apple.settings.internetAccounts", "role": "AXButton"}
+{"d": 7, "frame": [484, 1330, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1330, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Wallet & Apple Pay", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "com.apple.settings.walletAndApplePay", "role": "AXButton"}
+{"d": 7, "frame": [484, 1375, 232, 19], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1375, 212, 19], "role": "AXCell"}
+{"d": 9, "frame": [498, 1375, 216, 0], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 7, "frame": [484, 1375, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1375, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Keyboard", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "com.apple.settings.keyboard", "role": "AXButton"}
+{"d": 7, "frame": [484, 1407, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1407, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Trackpad", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "com.apple.settings.trackpad", "role": "AXButton"}
+{"d": 7, "frame": [484, 1439, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1458, 212, 32], "role": "AXCell"}
+{"d": 9, "desc": "Printers & Scanners", "enabled": "1", "frame": [0, 1107, 0, 0], "id": "com.apple.settings.printerAndScanner", "role": "AXButton"}
+{"d": 7, "frame": [484, 1503, 232, 19], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1503, 212, 19], "role": "AXCell"}
+{"d": 9, "frame": [498, 1503, 216, 19], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 7, "frame": [484, 1522, 232, 32], "role": "AXRow", "sub": "AXOutlineRow"}
+{"d": 8, "enabled": "1", "frame": [494, 1522, 212, 32], "role": "AXCell"}
+{"d": 9, "enabled": "1", "frame": [0, 1107, 0, 0], "id": "org.gpgtools.gpgpreferences", "role": "AXButton"}
+{"d": 10, "enabled": "1", "frame": [0, 1107, 0, 0], "role": "AXStaticText", "value": "GPG Suite"}
+{"d": 7, "frame": [494, 330, 212, 1234], "id": "ListColumn", "role": "AXColumn"}
+{"d": 6, "enabled": "1", "frame": [698, 329, 19, 529], "role": "AXScrollBar", "value": "0"}
+{"d": 7, "frame": [707, 333, 6, 244], "role": "AXValueIndicator", "value": "0"}
+{"d": 7, "frame": [699, 330, 0, 0], "role": "AXButton", "sub": "AXIncrementArrow"}
+{"d": 7, "frame": [699, 330, 0, 0], "role": "AXButton", "sub": "AXDecrementArrow"}
+{"d": 7, "frame": [707, 577.5, 6, 276.5], "role": "AXButton", "sub": "AXIncrementPage"}
+{"d": 7, "frame": [707, 333, 6, 0], "role": "AXButton", "sub": "AXDecrementPage"}
+{"d": 4, "frame": [494, 293, 212, 28], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 5, "enabled": "1", "frame": [494, 293, 212, 28], "role": "AXTextField", "sub": "AXSearchField"}
+{"d": 6, "desc": "Search", "enabled": "1", "frame": [497, 293.5, 25, 28], "role": "AXButton"}
+{"d": 4, "enabled": "0", "frame": [715.5, 284, 0.5, 573], "role": "AXSplitter", "value": "231.5"}
+{"d": 4, "frame": [484, 232, 740, 625], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 5, "frame": [484, 232, 740, 625], "role": "AXGroup", "sub": "AXHostingView"}
+{"d": 6, "desc": "Displays", "frame": [716, 284, 508, 158], "role": "AXScrollArea"}
+{"d": 7, "desc": "Built-in Display", "enabled": "1", "frame": [818, 284, 304, 157], "role": "AXButton"}
+{"d": 6, "desc": "Display settings for Built-in Display", "frame": [716, 442, 508, 415], "role": "AXScrollArea"}
+{"d": 7, "enabled": "1", "frame": [736, 465, 468, 108], "id": "resolutionSection", "role": "AXOpaqueProviderGroup", "sub": "AXOpaqueProviderGrid"}
+{"d": 8, "desc": "1024 × 663", "enabled": "1", "frame": [762.5, 484, 50, 50], "role": "AXButton"}
+{"d": 8, "desc": "1280 × 828", "enabled": "1", "frame": [854, 484, 50, 50], "role": "AXButton"}
+{"d": 8, "desc": "1440 × 932", "enabled": "1", "frame": [945, 484, 50, 50], "role": "AXButton"}
+{"d": 8, "desc": "1710 × 1107 (Default)", "enabled": "1", "frame": [1036, 484, 50, 50], "role": "AXButton"}
+{"d": 8, "desc": "1920 × 1243", "enabled": "1", "frame": [1127.5, 484, 50, 50], "role": "AXButton"}
+{"d": 7, "enabled": "1", "frame": [736, 583, 468, 143], "role": "AXGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 593, 65, 16], "role": "AXStaticText", "value": "Brightness"}
+{"d": 8, "desc": "Reduce Brightness", "enabled": "1", "frame": [949, 593, 16.5, 16.5], "role": "AXButton"}
+{"d": 8, "desc": "Brightness", "enabled": "1", "frame": [971, 593.5, 198, 16], "id": "ambienceSection", "role": "AXSlider"}
+{"d": 9, "enabled": "1", "frame": [1059.5, 593.5, 20, 16], "role": "AXValueIndicator"}
+{"d": 8, "desc": "Increase Brightness", "enabled": "1", "frame": [1174.5, 592.5, 18, 18], "role": "AXButton"}
+{"d": 8, "enabled": "1", "frame": [746, 632.8, 190.5, 16], "role": "AXStaticText", "value": "Automatically adjust brightness"}
+{"d": 8, "enabled": "1", "frame": [1158, 633.5, 36, 16], "id": "ambienceSection", "role": "AXCheckBox", "sub": "AXSwitch", "value": "1"}
+{"d": 8, "enabled": "1", "frame": [746, 670.3, 60, 16], "role": "AXStaticText", "value": "True Tone"}
+{"d": 8, "enabled": "1", "frame": [746, 687.8, 392, 28], "role": "AXStaticText", "value": "Automatically adapt display to make colours appear consistent in different ambie"}
+{"d": 8, "enabled": "1", "frame": [1158, 671, 36, 16], "id": "ambienceSection", "role": "AXCheckBox", "sub": "AXSwitch", "value": "0"}
+{"d": 7, "enabled": "1", "frame": [736, 736, 468, 37], "role": "AXGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 745.8, 82.5, 16], "role": "AXStaticText", "value": "Colour profile"}
+{"d": 8, "enabled": "1", "frame": [1077, 742, 117, 24], "id": "profileSection", "role": "AXPopUpButton", "value": "Colour LCD"}
+{"d": 7, "enabled": "1", "frame": [736, 793, 468, 66], "role": "AXGroup"}
+{"d": 8, "enabled": "1", "frame": [746, 803, 139, 16], "role": "AXStaticText", "value": "When connected to TV"}
+{"d": 8, "enabled": "1", "frame": [746, 821, 214, 28], "role": "AXStaticText", "value": "Choose what to show or use the TV as a secondary display."}
+{"d": 8, "enabled": "1", "frame": [1036, 799.5, 158, 24], "id": "tvDisplayModesSection", "role": "AXPopUpButton", "value": "Ask What to Show"}
+{"d": 7, "desc": "Advanced…", "enabled": "1", "frame": [970.5, 879, 94.5, 24], "role": "AXButton"}
+{"d": 7, "desc": "Night Shift…", "enabled": "1", "frame": [1073, 879, 99, 24], "role": "AXButton"}
+{"d": 7, "desc": "Help", "enabled": "1", "frame": [1180, 879, 24, 24], "role": "AXButton"}
+{"d": 7, "enabled": "1", "frame": [1206, 441, 19, 409.5], "role": "AXScrollBar", "value": "0"}
+{"d": 8, "frame": [1215, 445, 6, 345.5], "role": "AXValueIndicator", "value": "0"}
+{"d": 8, "frame": [1207, 442, 0, 0], "role": "AXButton", "sub": "AXIncrementArrow"}
+{"d": 8, "frame": [1207, 442, 0, 0], "role": "AXButton", "sub": "AXDecrementArrow"}
+{"d": 8, "frame": [1215, 791, 6, 55.5], "role": "AXButton", "sub": "AXIncrementPage"}
+{"d": 8, "frame": [1215, 445, 6, 0], "role": "AXButton", "sub": "AXDecrementPage"}
+{"d": 2, "frame": [484, 232, 740, 52], "role": "AXToolbar"}
+{"d": 3, "frame": [720, 232, 81, 52], "role": "AXGroup"}
+{"d": 4, "enabled": "1", "frame": [724, 240, 73, 36], "role": "AXGroup"}
+{"d": 5, "desc": "Go Back", "enabled": "1", "frame": [724, 240, 36, 36], "help": "Go Back", "id": "chevron.backward", "role": "AXButton", "sub": "AXSegment"}
+{"d": 5, "desc": "Go Forward", "enabled": "0", "frame": [760, 240, 37, 36], "help": "Go Forward", "id": "chevron.forward", "role": "AXMenuButton", "sub": "AXSegment"}
+{"d": 2, "enabled": "1", "frame": [502, 250, 16, 16], "role": "AXButton", "sub": "AXCloseButton"}
+{"d": 2, "enabled": "1", "frame": [548, 250, 16, 16], "role": "AXButton", "sub": "AXZoomButton"}
+{"d": 3, "frame": [549, 251, 14, 14], "role": "AXGroup"}
+{"d": 4, "frame": [549, 251, 14, 14], "role": "AXGroup"}
+{"d": 2, "enabled": "1", "frame": [525, 250, 16, 16], "role": "AXButton", "sub": "AXMinimizeButton"}
+{"d": 2, "enabled": "1", "frame": [801, 232, 411, 52], "role": "AXStaticText", "value": "Displays"}
