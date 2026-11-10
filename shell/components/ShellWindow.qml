@@ -34,7 +34,16 @@ PanelWindow {
 
     property string lingerAs: ""
     property bool lingering: false
-    onLingeringChanged: if (lingerAs !== "" && !lingering) Panels.release(lingerAs)
+    // once it has dematerialized, drop the glass region before the window goes: while the window
+    // is torn down its Glass items unregister one by one, and a commit with a shape that lost its
+    // materialize hole made the plugin draw it at full material for one frame (a bright flash of
+    // the Spotlight field about 0.6 s after closing)
+    property bool glassDropped: false
+    onLingeringChanged: {
+        if (lingerAs === "" || lingering) return;
+        if (Panels.open !== lingerAs) glassDropped = true;
+        Panels.release(lingerAs);
+    }
     Component.onDestruction: if (lingerAs !== "") Panels.release(lingerAs)
 
     // Glass items call these on creation/destruction
@@ -62,7 +71,10 @@ PanelWindow {
     onVisibleChanged: settleGlass()
     Connections {
         target: Panels
-        function onOpenChanged() { win.settleGlass(); }
+        function onOpenChanged() {
+            if (win.lingerAs !== "" && Panels.open === win.lingerAs) win.glassDropped = false;   // reopened before it went
+            win.settleGlass();
+        }
     }
     Connections {
         target: Notifs
@@ -81,7 +93,7 @@ PanelWindow {
 
     color: "transparent"
     WlrLayershell.namespace: namespace
-    BackgroundEffect.blurRegion: Theme.compositorGlass ? glassUnion : null
+    BackgroundEffect.blurRegion: Theme.compositorGlass && !glassDropped ? glassUnion : null
 
     Region {
         id: glassUnion
