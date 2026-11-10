@@ -137,5 +137,44 @@ test("lua input", () => assert.equal(ST.luaInput({ repeatRate: 30, repeatDelay: 
 test("lua input clamps", () => assert.equal(ST.luaInput({ repeatRate: 999, repeatDelay: 5 }), "hl.config({ input = { repeat_rate = 100, repeat_delay = 100 } })"));
 test("lua input defaults", () => assert.equal(ST.luaInput({}), "hl.config({ input = { repeat_rate = 25, repeat_delay = 600 } })"));
 
+// ---- icon shape (macOS 26 squircle tile) ----
+const IS = load("iconshape.js");
+function mask(n, inside) {   // n*n alpha array (stride 1)
+    const a = new Uint8Array(n * n);
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) a[y * n + x] = inside((x + 0.5) / n, (y + 0.5) / n) ? 255 : 0;
+    return a;
+}
+const sq = (m, e) => (x, y) => x > m && x < 1 - m && y > m && y < 1 - m
+    && Math.pow(Math.abs(x - 0.5) / (0.5 - m), e) + Math.pow(Math.abs(y - 0.5) / (0.5 - m), e) <= 1;
+test("squircle detected", () => assert.ok(IS.analyze(mask(48, sq(0.06, 5)), 48, 1).squircle));
+test("rounded rect detected", () => assert.ok(IS.analyze(mask(48, sq(0.1, 4)), 48, 1).squircle));
+test("circle is tiled", () => assert.ok(!IS.analyze(mask(48, sq(0.05, 2)), 48, 1).squircle));
+test("plain square is tiled", () => assert.ok(!IS.analyze(mask(48, (x, y) => x > 0.1 && x < 0.9 && y > 0.1 && y < 0.9), 48, 1).squircle));
+test("small glyph is tiled", () => assert.ok(!IS.analyze(mask(48, sq(0.3, 5)), 48, 1).squircle));
+test("wide logo is tiled", () => assert.ok(!IS.analyze(mask(48, (x, y) => y > 0.35 && y < 0.65), 48, 1).squircle));
+test("empty icon", () => assert.equal(IS.analyze(new Uint8Array(48 * 48), 48, 1).squircle, false));
+test("rgba stride", () => {
+    const a = mask(48, sq(0.06, 5)), rgba = new Uint8Array(48 * 48 * 4);
+    a.forEach((v, i) => { rgba[i * 4 + 3] = v; });
+    assert.ok(IS.analyze(rgba, 48, 4).squircle);
+});
+test("extent and centre", () => {
+    const i = IS.analyze(mask(48, (x, y) => x > 0.5 && y > 0.5), 48, 1);
+    assert.equal(i.extent, 0.5); assert.equal(i.cx, 0.75); assert.equal(i.cy, 0.75);
+});
+test("fit scales body to target and centres it", () => {
+    const f = IS.fit({ extent: 0.5, cx: 0.75, cy: 0.5 }, 0.6, 2);
+    assert.ok(Math.abs(f.scale - 1.2) < 1e-9); assert.ok(Math.abs(f.dx + 0.3) < 1e-9); assert.equal(f.dy, 0);
+});
+test("fit clamps", () => assert.equal(IS.fit({ extent: 0.1, cx: 0.5, cy: 0.5 }, 0.6, 1.6).scale, 1.6));
+test("cache", () => { IS.store("u", { squircle: true }); assert.ok(IS.cached("u").squircle); assert.equal(IS.cached("v"), undefined); });
+test("squircle points in box", () => {
+    const p = IS.squirclePoints(100);
+    assert.ok(p.every(([x, y]) => x >= 0 && x <= 100 && y >= 0 && y <= 100));
+    // continuous corner: the diagonal point sits at ~0.93 of the half-diagonal (circle 0.71, square 1)
+    const d = Math.max(...p.map(([x, y]) => Math.abs(x - 50) === Math.abs(y - 50) ? Math.abs(x - 50) : 0));
+    assert.ok(d > 40 && d < 50);
+});
+
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

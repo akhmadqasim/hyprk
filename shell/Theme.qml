@@ -19,6 +19,8 @@ Singleton {
     // macOS "Reduce transparency": solid tinted material instead of blurred glass.
     // Also forced on when the blurred wallpaper could not be produced (no magick).
     property bool reduceTransparency: false
+    // Appearance > Icon & widget style (default | dark | clear | tinted), see components/AppIconTile
+    property string iconStyle: "default"
     property bool blurAvailable: true
     readonly property bool solidMaterial: reduceTransparency || !blurAvailable
     // set by services/Wallpaper from the luminance of the strip behind the menu bar
@@ -47,9 +49,10 @@ Singleton {
         printErrors: false
         onFileChanged: reload()
         onLoaded: {
-            const o = State.parse(text(), { dark: theme.dark, reduceTransparency: theme.reduceTransparency });
+            const o = State.parse(text(), { dark: theme.dark, reduceTransparency: theme.reduceTransparency, iconStyle: theme.iconStyle });
             theme.dark = o.dark;
             theme.reduceTransparency = o.reduceTransparency;
+            theme.iconStyle = o.iconStyle;
         }
     }
 
@@ -352,10 +355,7 @@ Singleton {
     // ---------- app icons ----------
     readonly property QtObject appIcon: QtObject {
         readonly property real body: 0.82               // icon body inside its tile (macOS template)
-        readonly property real radius: 0.225            // squircle corner as a fraction of the body
-        readonly property real inner: 0.72              // non-macOS art inside the plate
-        readonly property color plate: theme.dark ? "#3A3A3C" : "#F4F4F6"
-        readonly property color plateEdge: Qt.rgba(0, 0, 0, 0.08)
+        readonly property real inner: 0.70              // non-squircle art body inside its tile
     }
 
     // ---------- alert dialog ----------

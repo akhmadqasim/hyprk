@@ -13,12 +13,19 @@ Item {
     property color tint: Theme.tile.blue
     width: size; height: size
 
+    // app icons: the shell's macOS 26 tile (symlink to shell/components/AppIconTile.qml)
+    AppIconTile {
+        visible: pi.imageSource !== ""
+        anchors.centerIn: parent
+        size: pi.size / body               // icon body = the pane icon size
+        source: pi.imageSource
+        style: pi.style || "default"
+    }
     Image {
         id: asset
         anchors.fill: parent
         visible: status === Image.Ready
-        source: pi.imageSource !== "" ? pi.imageSource
-              : pi.iconId !== "" ? "file://" + Backend.root + "/themes/icons/settings/" + pi.iconId + ".png" : ""
+        source: pi.imageSource === "" && pi.iconId !== "" ? "file://" + Backend.root + "/themes/icons/settings/" + pi.iconId + ".png" : ""
         sourceSize: Qt.size(pi.size * 2, pi.size * 2)
         smooth: true; mipmap: true
         // "Clear" icon style shows images as monochrome glass, like macOS 26+
@@ -32,7 +39,7 @@ Item {
         : style === "clear" ? (Theme.dark ? "#5A5A5E" : "#7E7E7E")   // ref (clear style)
         : style === "tinted" ? Theme.accent : tint
     Rectangle {
-        visible: !asset.visible
+        visible: pi.imageSource === "" && !asset.visible
         anchors.fill: parent
         radius: pi.size * 0.27
         border.width: pi.style === "clear" ? 1 : 0

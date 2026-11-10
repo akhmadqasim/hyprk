@@ -1,6 +1,7 @@
 import QtQuick
 import "lib/files.js" as Files
 import "lib/icons.js" as Icons
+import "../../shell/components" as Shell
 
 // Icon for one entry, best first: content thumbnail (images, PDFs, videos with a cached
 // thumbnail; generated off the UI thread by image://thumb), app icon, the macOS icon from
@@ -78,14 +79,14 @@ Item {
         }
     }
 
-    Image {
+    // .desktop app icon on the macOS 26 tile (shell/components/AppIconTile.qml); its body
+    // matches the padding of the macOS PNGs used for the other icons
+    Shell.AppIconTile {
         id: appIcon
         visible: root.kind === "app" && status === Image.Ready
-        anchors.fill: parent
-        anchors.margins: root.size * 0.06
-        asynchronous: true
+        anchors.centerIn: parent
+        size: root.size
         source: root.kind === "app" && root.entry.icon ? "image://icon/" + root.entry.icon : ""
-        sourceSize: Qt.size(root.px, root.px)
     }
 
     Image {
