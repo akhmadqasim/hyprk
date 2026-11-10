@@ -46,6 +46,21 @@ Notes, Reminders, Photos, Music, Maps, Messages, Preview, TextEdit, Calculator, 
 Disk Utility, Font Book, Archive Utility, Screenshot, Trash empty and full, the Downloads stack, the generic
 folder and document, the generic application. The PC maps Linux apps to these.
 
+Status on the PC (2026-11-10): all 72 app icons are now the real 512 or 1024 px renditions from the 27.2 IPSW
+(`themes/icons/apps`, list in `apps-sources.txt`). Only send app icons whose artwork changed in 27.2.1.
+
+## R3b SF Symbols and Settings pane icons (the PC cannot decode these)
+- Every glyph in the menu bar, Control Center, Finder sidebar and toolbars is hand-drawn on the PC, because
+  the symbols only exist as undecoded `BVG` vectors in CoreGlyphs. Please render with
+  `NSImage(systemSymbolName:)` to vector (PDF or SVG, template, regular/medium/semibold weight, plus the
+  hierarchical or multicolor variant where the system UI uses one) every symbol named in
+  `shell/components/symbols.js`, `finder/qml/lib/symbols.js` and `themes/icons/settings/panes.json`
+  (map the hand-drawn names to the real symbol names; say which real symbol each system surface uses where you
+  can tell) -> `themes/icons/sf-symbols/svg/<symbol.name>.<weight>.svg` with a `names.json`.
+- The System Settings sidebar icons are drawn at run time (enclosure + symbol), so the IPSW has no bitmaps:
+  21 of 23 panes are still Material glyphs on the PC. Render each pane's sidebar icon (64 and 128 px PNG,
+  light and dark) -> `themes/icons/settings/<pane id>.png`; pane ids are in `settings/Panes.js`.
+
 ## R4 Fonts and emoji
 - `Apple Color Emoji.ttc` -> `themes/fonts/` (the PC has no Apple emoji yet).
 - sha256 of the SF Pro, SF Compact, SF Mono and New York files on 27.2.1 so the PC can compare with its copies.
