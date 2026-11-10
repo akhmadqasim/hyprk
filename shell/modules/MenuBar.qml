@@ -165,7 +165,7 @@ ShellWindow {
         width: contentWidth + Theme.menuBar.titleHPadding * 2
         height: Theme.menuBar.titleHeight
 
-        HighlightPill { shown: mt.open; pressed: titleMa.containsPress }
+        HighlightPill { shown: mt.open; pressed: titleMa.containsPress; instant: true }
         Text {
             id: label
             anchors.centerIn: parent
@@ -196,22 +196,40 @@ ShellWindow {
     // open/hovered state of a title or status item: a small glass capsule (macOS 26+) that
     // materializes in and out and lifts while pressed (interactive glass, ultraSmall preset).
     // The Glass (and its Region) exists only while shown or animating, not one per title.
+    // `instant` (menu titles): the highlight follows the open menu at once like the menu itself
+    // (LIVE-27.2.1.md: a menu opens without animation), so moving across the titles never shows
+    // two pills or a pill still materializing; it goes away with no fade when another title takes
+    // over, and fades with the menu (0.2 s OutQuad, Theme.anim.menuFadeOut) on the final close.
+    // That the title fades along with its menu is guessed (MAC-REQUESTS.md R2 asks).
     component HighlightPill: Item {
         id: hp
         property bool shown: false
         property bool pressed: false
+        property bool instant: false
         anchors.fill: parent
-        Materializer { id: pm; shown: hp.shown }
+        Materializer { id: pm; shown: hp.shown && !hp.instant }
+        // instant mode: 1 while shown, cut to 0 when another menu took over, else fades out
+        property real fade: 0
+        NumberAnimation { id: pillFade; target: hp; property: "fade"; to: 0; duration: Theme.anim.menuFadeOut; easing.type: Easing.OutQuad }
+        onShownChanged: {
+            if (!instant) return;
+            pillFade.stop();
+            if (shown) fade = 1;
+            else if (Panels.open === "menu") fade = 0;
+            else pillFade.start();
+        }
+        Component.onCompleted: if (instant && shown) fade = 1
+        readonly property real progress: instant ? fade : pm.progress
         PressSpring { id: pp; pressed: hp.pressed && hp.shown; w: hp.width; h: hp.height }
         transform: Scale {
             origin.x: hp.width / 2
             origin.y: hp.height / 2
-            xScale: pm.scaleFor(hp.width) * pp.scale
-            yScale: pm.scaleFor(hp.height) * pp.scale
+            xScale: (hp.instant ? 1 : pm.scaleFor(hp.width)) * pp.scale
+            yScale: (hp.instant ? 1 : pm.scaleFor(hp.height)) * pp.scale
         }
         Loader {
             anchors.fill: parent
-            active: pm.active
+            active: hp.instant ? hp.shown || hp.fade > 0 : pm.active
             sourceComponent: Glass {
                 radius: Theme.menuBar.titleRadius
                 // the bar sits at the screen origin, so the scene position is the screen position
@@ -223,7 +241,7 @@ ShellWindow {
                 tint: Theme.color.menuBarHighlight
                 pluginLift: Theme.color.menuBarHighlight
                 shadow: false
-                materialize: pm.progress
+                materialize: hp.progress
             }
         }
     }
