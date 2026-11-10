@@ -125,7 +125,14 @@ Singleton {
 
     // `qs ipc call notifs test "Title" "Body"`: local banner without D-Bus
     // (useful when another notification daemon owns the bus, e.g. nested sessions)
+    // opening Notification Center takes the banners in, like macOS: they don't come back on close
+    Connections {
+        target: Panels
+        function onOpenChanged() { if (Panels.open === "nc") root.banners = []; }
+    }
+
     property int testId: 1000000
+    signal stackRequest(string app, string action)
     IpcHandler {
         target: "notifs"
         function test(summary: string, body: string): void { testApp("Messages", summary, body); }
@@ -134,6 +141,9 @@ Singleton {
                         body: body, time: Date.now(), timeout: 0, critical: false, style: "banners", silent: true });
         }
         function clear(): void { root.clearAll(); }
+        // drive a Notification Center stack from scripts (tests): unfold/fold, clear
+        function expand(app: string, on: bool): void { root.stackRequest(app, on ? "expand" : "collapse"); }
+        function clearStack(app: string): void { root.stackRequest(app, "clear"); }
     }
 
     NotificationServer {
