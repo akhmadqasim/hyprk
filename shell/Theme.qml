@@ -83,10 +83,15 @@ Singleton {
         // detached: a fast second toggle must not be dropped while the first still runs
         Quickshell.execDetached(["hyprctl", "eval", `hl.config({ plugin = { liquidglass = { appearance = "${dark ? "dark" : "light"}" } } })`]);
     }
-    onDarkChanged: syncPluginAppearance()
+    // window shadow and rim densities differ in light and dark (config/hypr/hyprland.lua hyprk_appearance)
+    function syncWindowChrome() {
+        Quickshell.execDetached(["hyprctl", "eval", `if hyprk_appearance then hyprk_appearance(${dark}) end`]);
+    }
+    onDarkChanged: { syncPluginAppearance(); syncWindowChrome(); }
     onCompositorGlassChanged: syncPluginAppearance()
     Component.onCompleted: {
         syncPluginAppearance();
+        syncWindowChrome();
         // the shared HyprK controls and motion helpers follow this appearance
         Tokens.dark = Qt.binding(() => theme.dark);
         Tokens.reduceMotion = Qt.binding(() => theme.reduceMotion);
