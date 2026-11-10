@@ -110,6 +110,10 @@ fallbacks:
 | Cursors | Adwaita | needs the `start.sh`/`hyprland.lua` change below (`HYPRK_CURSOR_THEME`) |
 | Sounds | silent | `shell/scripts/sound.sh` exits when a file is missing |
 
+`themes/fonts/named/AppleColorEmoji.ttc` (79.4 MB, reduced from the 192 MB original, `reference/ASSETS.md`) is under `themes/fonts`, so it is in every
+package without a list change (git ls-files, `cp -a themes`, the flake's `cp -r themes`). A package grows by about 77 MB (zstd -3 of the file; the
+PNG strikes do not compress), measured on the file, not by building a package.
+
 `install.sh --assets DIR` copies more from a checkout laid out like this repo (or your own extraction, `reference/ASSETS.md`):
 it copies `DIR/themes/fonts`, `themes/wallpapers`, `themes/icons/{apps,system,hyprk-apple}`,
 `themes/cursors/theme/hyprk-cursors`, `sounds/{oga,wav}` when present. Nothing is ever downloaded.
