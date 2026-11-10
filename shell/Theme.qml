@@ -376,12 +376,12 @@ Singleton {
         // T + 140 (255/249/172), drawn by shaders/plustext.frag; slider titles and glyphs 255
         readonly property color title: Qt.rgba(1, 1, 1, 0.85)
         readonly property real subtitleLift: 140 / 255
-        // slider module 292 x 64, continuous r 24 (Q-panels-05, -08): title ink x 17, cap top 13.5 (baseline 22);
+        // slider module 292 x 64, continuous r 24 (Q-panels-05, -08): title ink x 17, cap top 13.5;
         // track 4 tall, centre y 42, x 36.5..254 (Display); end glyphs centred at x 23 and 24.25 from the right;
         // fill 255, track plus-lighter T + 20
         readonly property int sliderRadius: 24
-        readonly property real sliderTitleX: 17
-        readonly property real sliderTitleBaseline: 22
+        readonly property real sliderTitleX: 16          // "D" ink at 17 (its side bearing is 1)
+        readonly property real sliderTitleBaseline: 22.5 // cap top 13.5
         readonly property real trackX: 36.5
         readonly property real trackRight: 38
         readonly property real trackHeight: 4
@@ -389,11 +389,22 @@ Singleton {
         readonly property real glyphLeft: 23
         readonly property real glyphRight: 24.25
         readonly property real trackLift: 20 / 255
-        // knob: none at rest, white 18 x 14 on hover, a clear lens about 24 x 20 while pressed, in about 3 frames
-        // (Q-panels-08, -09); past an end the track and fill stretch up to about 5 pt and spring back in 0.13 s
+        // knob: none at rest, white 18 x 14 on hover with its right edge at the fill end; pressed, a clear lens about
+        // 24 x 20 centred on the fill end, in about 3 frames (Q-panels-08, -09). Lens pixels over grey 127 (sound
+        // slider drag frame): a dark 1 pt rim (~40 on a 106 module), the fill seen through it 213..235 and the module
+        // 109..125, so a light grey .15 wash over the shadow, a light top edge (+30), a soft shadow below (85..93 next to it) and the fill
+        // band about 1 pt thicker inside. Past an end the track and fill stretch up to about 5 pt and spring back in
+        // 0.13 s
         readonly property real knobW: 18
         readonly property real knobH: 14
-        readonly property real lensGrow: 24 / 18
+        readonly property real lensW: 24
+        readonly property real lensH: 20
+        readonly property color lensWash: Qt.rgba(0.75, 0.75, 0.75, 0.15)
+        readonly property color lensRim: Qt.rgba(0, 0, 0, 0.6)
+        readonly property color lensTopEdge: Qt.rgba(1, 1, 1, 0.25)
+        readonly property real lensBand: 5               // the fill band inside the lens (track 4)
+        readonly property color knobShadow: Qt.rgba(0, 0, 0, 0.12)
+        readonly property color lensShadow: Qt.rgba(0, 0, 0, 0.15)
         readonly property int lensMs: 50
         readonly property real overdrag: 5
         readonly property int overdragBackMs: 130

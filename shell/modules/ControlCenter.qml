@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Networking
@@ -292,8 +293,9 @@ Item {
 
     // 27.2.1 slider module (MAC-ANSWERS.md Q-panels-08, -09): 292 x 64, r 24. No knob at rest; hovering the
     // module shows a white 18 x 14 knob whose right edge is the fill end (the fill runs 9 pt ahead of the pointer);
-    // pressing turns it into a clear lens about 24 x 20 within about 3 frames (HyprK Knob: the lens is drawn as a
-    // rim, the track is not magnified through it). A click springs the fill to the point (about 0.2 s), a drag
+    // pressing turns it into a clear lens about 24 x 20 centred on the fill end within about 3 frames (drawn: a grey
+    // wash, a dark rim, a light top edge, a shadow and a thicker fill band; no live refraction). A click springs the
+    // fill to the point (about 0.2 s), a drag
     // follows 1:1; past an end the track and fill stretch up to about 5 pt and spring back in 0.13 s on release.
     // The module itself does not move. Not built: the hover chevron (no sub-panels) and Sound's AirPlay button.
     component SliderModule: Module {
@@ -369,15 +371,57 @@ Item {
                 radius: height / 2
                 color: Theme.cc.sliderFillColor
             }
-            Knob {
+            Item {
+                id: knob
                 visible: hover.hovered || trackMa.pressed
-                restW: Theme.cc.knobW
-                restH: Theme.cc.knobH
-                grow: Theme.cc.lensGrow
-                cx: Math.max(restW / 2, track.fillW + Math.max(0, sm.over) - restW / 2)
-                cy: track.height / 2
-                lift: trackMa.pressed ? 1 : 0
+                property real lift: trackMa.pressed ? 1 : 0
                 Behavior on lift { NumberAnimation { duration: Theme.cc.lensMs } }
+                readonly property real end: track.fillW + Math.max(0, sm.over)
+                width: Theme.cc.knobW + (Theme.cc.lensW - Theme.cc.knobW) * lift
+                height: Theme.cc.knobH + (Theme.cc.lensH - Theme.cc.knobH) * lift
+                // knob: right edge on the fill end; lens: centred on it
+                x: Math.max(-width * lift / 2, end - Theme.cc.knobW * (1 - lift) - width * lift / 2)
+                y: (track.height - height) / 2
+                RectangularShadow {
+                    anchors.fill: parent
+                    radius: parent.height / 2
+                    blur: 3 + 3 * knob.lift
+                    offset.y: 1 + knob.lift
+                    color: knob.lift > 0 ? Theme.cc.lensShadow : Theme.cc.knobShadow
+                }
+                Rectangle {
+                    anchors.fill: parent
+                    radius: height / 2
+                    color: Theme.cc.sliderFillColor
+                    opacity: 1 - knob.lift
+                }
+                Item {
+                    anchors.fill: parent
+                    opacity: knob.lift
+                    visible: opacity > 0
+                    Rectangle {
+                        x: 1
+                        width: parent.width / 2 - 1
+                        height: Theme.cc.lensBand
+                        anchors.verticalCenter: parent.verticalCenter
+                        radius: height / 2
+                        color: Theme.cc.sliderFillColor
+                    }
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: height / 2
+                        color: Theme.cc.lensWash
+                        border.width: 1
+                        border.color: Theme.cc.lensRim
+                    }
+                    Rectangle {
+                        x: parent.height / 2
+                        width: parent.width - parent.height
+                        y: 1
+                        height: 1
+                        color: Theme.cc.lensTopEdge
+                    }
+                }
             }
             MouseArea {
                 id: trackMa
