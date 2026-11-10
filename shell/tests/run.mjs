@@ -110,6 +110,18 @@ test("state null", () => assert.equal(ST.parse('{"dark":null}', defs).dark, fals
 // ---- Dock (lib/dock.js, dock defaults in lib/state.js) ----
 const DK = load("dock.js");
 test("dock magnification off by default", () => assert.equal(ST.dockDefaults().magnification, false));
+test("dock tile: absent size is 64 (Q-dock-02)", () => {
+    assert.equal(ST.dockTile(ST.dockDefaults()), 64);
+    assert.equal(ST.dockTile({}), 64);
+    assert.equal(ST.dockTile(null), 64);
+    assert.equal(ST.dockTile({ size: "x" }), 64);
+});
+test("dock tile: slider value is the tile in pt, clamped 16..128", () => {
+    assert.deepEqual([16, 33, 48, 64, 128].map(s => ST.dockTile({ size: s })), [16, 33, 48, 64, 128]);
+    assert.equal(ST.dockTile({ size: 47.6 }), 48);
+    assert.equal(ST.dockTile({ size: 4 }), 16);
+    assert.equal(ST.dockTile({ size: 300 }), 128);
+});
 test("dock magnified ratio from the sliders", () => {
     assert.equal(ST.magnifyRatio(ST.dockDefaults()), 2);
     assert.equal(ST.magnifyRatio({ size: 64, magnifiedSize: 128 }), 2);

@@ -273,9 +273,8 @@ Singleton {
 
     // ---------- dock ----------
     // Geometry per tile size: lib/dock.js metrics() (27.2.1 AX frames, Q-dock-02..07). Colours here.
+    // Tile size: state/dock.json `size` (lib/state.js dockTile, 64 when absent, Q-dock-02).
     readonly property QtObject dock: QtObject {
-        // the built-in tilesize when the key is absent (Q-dock-02); shrunk to fit the screen width
-        readonly property int tile: 64
         // separator and running dot: vibrant plus-lighter +65/255 and +125/255 in dark (Q-dock-06, Q-dock-07),
         // drawn additively (shaders/plusfill.frag). Light is plus-darker -57/255 and -128/255, which an
         // over-blend cannot do: there it stays a black line / dot at these alphas (by eye, TODO verify)

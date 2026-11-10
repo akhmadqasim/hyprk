@@ -14,7 +14,8 @@ import "../lib/state.js" as State
 // Floating glass Dock as on macOS 27.2.1 (MAC-ANSWERS.md Q-dock and "REA 27.2.1: Dock"): pinned apps, the recent
 // section (running unpinned and recent apps), Downloads + Trash; running dots, the app name label on hover, the
 // launch and attention bounces, the icon darkened while pressed, magnification when switched on. Geometry from
-// lib/dock.js metrics() at the tile size Theme.dock.tile (shrunk to fit the screen).
+// lib/dock.js metrics() at the tile size from state/dock.json `size` (lib/state.js dockTile: 64 when absent), shrunk
+// to fit the screen.
 // Hidden while a window is full screen on this output, and with "Automatically hide and show the Dock"
 // (state/dock.json) until the pointer reaches the bottom edge: a pure slide, nothing left on screen.
 // Reduce motion: a dissolve in place, and no bounces (only the running dot).
@@ -33,7 +34,7 @@ ShellWindow {
     readonly property int trashIndex: items.length - 1
 
     // ---------- geometry ----------
-    readonly property int tile: DockLayout.fitTile(Theme.dock.tile, items.length - separators, separators, screen ? screen.width : 1920)
+    readonly property int tile: DockLayout.fitTile(State.dockTile(Prefs.dock), items.length - separators, separators, screen ? screen.width : 1920)
     readonly property var m: DockLayout.metrics(tile)
     // magnified size: the Magnification slider's ratio to the Size slider (state/dock.json, default 96/48 = 2)
     readonly property int large: Math.round(tile * State.magnifyRatio(Prefs.dock))
