@@ -44,14 +44,17 @@ function parseNmcliWifi(text) {
 }
 
 // wpctl status: the Sinks block inside the Audio section.
-function parseWpctlSinks(text) {
+function parseWpctlSinks(text) { return parseWpctlNodes(text, "Sinks"); }
+function parseWpctlSources(text) { return parseWpctlNodes(text, "Sources"); }
+// the Audio section's Sinks or Sources of `wpctl status`
+function parseWpctlNodes(text, kind) {
     const sinks = [];
     let inAudio = false, inSinks = false;
     for (const raw of String(text || "").split("\n")) {
         if (/^Audio\b/.test(raw)) { inAudio = true; continue; }
         if (/^\S/.test(raw)) { inAudio = false; inSinks = false; continue; }
         if (!inAudio) continue;
-        if (/[├└]─\s*(\w+):/.test(raw)) { inSinks = /Sinks:/.test(raw); continue; }
+        if (/[├└]─\s*(\w+):/.test(raw)) { inSinks = raw.indexOf(kind + ":") >= 0; continue; }
         if (!inSinks) continue;
         const m = raw.match(/(\*)?\s*(\d+)\.\s+(.+?)\s*(?:\[vol:\s*([\d.]+)(\s+MUTED)?\])?\s*$/);
         if (m) sinks.push({ id: parseInt(m[2]), name: m[3], isDefault: !!m[1], volume: m[4] !== undefined ? parseFloat(m[4]) : 0, muted: !!m[5] });
@@ -360,7 +363,7 @@ function monitorMode(m) {
 }
 
 if (typeof module !== "undefined")
-    module.exports = { splitTerse, parseNmcliDevices, wifiDevice, parseNmcliWifi, parseWpctlSinks, parseWpctlVolume,
+    module.exports = { splitTerse, parseNmcliDevices, wifiDevice, parseNmcliWifi, parseWpctlSinks, parseWpctlSources, parseWpctlVolume,
         parseBluetoothShow, parseBluetoothDevices, parseHyprMonitors, hasBattery,
         parseHyprOption, luaString, luaMonitor, luaInput,
         normalizeAppearance, normalizeDock, normalizeSound, mergeState, monitorMode, prettyFileName,

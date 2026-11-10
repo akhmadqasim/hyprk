@@ -180,3 +180,10 @@ test("icon style sub-choice carries over (PC #60 section 3)", () => {
     assert.equal(P.iconStyleVariantAfter("clear", "light", "dark"), "dark");      // Light is not offered by Dark: Always
     assert.equal(P.iconStyleVariantAfter("dark", "dark", "tinted"), "dark");
 });
+
+test("wpctl sources (Sound > Input table)", () => {
+    const t = "Audio\n ├─ Devices:\n │      40. Built-in Audio [alsa]\n ├─ Sinks:\n │  *   52. Speakers [vol: 0.40]\n ├─ Sources:\n │  *   53. Internal Microphone [vol: 1.00]\n │      60. USB Mic [vol: 0.50 MUTED]\n ├─ Filters:\n";
+    assert.deepEqual(P.parseWpctlSinks(t).map(s => s.name), ["Speakers"]);
+    const src = P.parseWpctlSources(t);
+    assert.deepEqual(src.map(s => [s.id, s.name, s.isDefault, s.muted]), [[53, "Internal Microphone", true, false], [60, "USB Mic", false, true]]);
+});
