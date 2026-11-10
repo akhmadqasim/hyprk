@@ -3,7 +3,8 @@ import HyprK
 import "lib/symbols.js" as Symbols
 
 // Unified toolbar over the content area: back/forward, title, view switcher, group,
-// actions (share, tag, more) and search. Empty space drags the window.
+// actions (share, tag, more) and search. Empty space drags the window. The strip itself has no fill and
+// no glass; only the capsules are drawn (macOS 27.2.1, MAC-ANSWERS.md Q9.2).
 Item {
     id: root
 
@@ -32,12 +33,14 @@ Item {
         x: Theme.toolbar.leftPad
         y: Theme.toolbar.capsuleY
         ToolButton {
+            implicitWidth: (Theme.toolbar.navWidth - 1) / 2
             icon: "chevron.left"
             enabled: root.browser.canGoBack
             onClicked: root.browser.back()
         }
-        Rectangle { width: 1; height: 24; anchors.verticalCenter: parent.verticalCenter; color: Theme.color.separator }
+        Rectangle { width: 1; height: Theme.toolbar.dividerHeight; anchors.verticalCenter: parent.verticalCenter; color: Theme.color.toolbarSeparator }
         ToolButton {
+            implicitWidth: (Theme.toolbar.navWidth - 1) / 2
             icon: "chevron.right"
             enabled: root.browser.canGoForward
             onClicked: root.browser.forward()
@@ -65,16 +68,17 @@ Item {
             id: viewSwitcher
             readonly property var modes: ["icons", "list", "columns", "gallery"]
             readonly property string iconHex: Qt.rgba(Theme.color.toolbarIcon.r, Theme.color.toolbarIcon.g, Theme.color.toolbarIcon.b, 1).toString()
-            segmentWidth: Theme.toolbar.segment
-            width: implicitWidth                   // as before: four 46px buttons and two 1px separators
+            segmentWidth: Theme.toolbar.viewsWidth / 4
+            width: implicitWidth
             height: Theme.toolbar.capsuleHeight
             iconSize: Theme.toolbar.iconSize
             iconOpacity: Theme.color.toolbarIcon.a
-            separatorBoundaries: [2, 3]            // before columns and before gallery
-            separatorColor: Theme.color.separator
-            separatorSpacing: 1
-            separatorFade: false
-            selectionInset: 4
+            // a separator at every boundary, hidden next to the selected segment: with Columns selected
+            // the 27.2.1 Finder shows only the one between Icons and List
+            separatorColor: Theme.color.toolbarSeparator
+            separatorHeight: Theme.toolbar.segmentSeparator
+            selectionInset: Theme.toolbar.segmentInsetY
+            selectionInsetX: Theme.toolbar.segmentInsetX
             trackColor: "transparent"
             selectionColor: Theme.color.capsuleSelected
             model: modes.map(m => ({ icon: Symbols.url("view." + m, iconHex, "white") }))
@@ -113,18 +117,21 @@ Item {
         y: Theme.toolbar.capsuleY
         visible: root.width > 560
         ToolButton {
+            implicitWidth: Theme.toolbar.actionsWidth / 3
             icon: "share"
             enabled: root.browser.selectedCount > 0
             onClicked: root.browser.openSelection()
         }
         ToolButton {
             id: tagButton
+            implicitWidth: Theme.toolbar.actionsWidth / 3
             icon: "tag"
             enabled: root.browser.selectedCount > 0 && root.browser.userFiles
             onClicked: root.tagRequested(tagButton)
         }
         ToolButton {
             id: more
+            implicitWidth: Theme.toolbar.actionsWidth / 3
             icon: "ellipsis"
             onClicked: root.moreRequested(more)
         }

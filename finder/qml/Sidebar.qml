@@ -2,8 +2,10 @@ import QtQuick
 import Finder.Native
 import "lib/files.js" as Files
 
-// Floating sidebar: Recents, Favorites, Locations, Tags.
-// Glass (translucent) when the compositor blurs behind us, else the solid reference color.
+// Sidebar: Recents, Favorites, Locations, Tags. A flat full-height panel flush with the window's left, top
+// and bottom edges, no radius of its own (the window corners clip it), no shadow: macOS 27.2.1 sidebar glass
+// (_variant 18) has refraction opacity 0 and no shadows (MAC-ANSWERS.md Q9.3).
+// Translucent when the compositor blurs behind us, else the solid reference color.
 Rectangle {
     id: root
 

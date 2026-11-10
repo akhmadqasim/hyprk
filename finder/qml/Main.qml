@@ -3,7 +3,7 @@ import Finder.Native
 import HyprK
 import "lib/files.js" as Files
 
-// Finder window: frameless, client-side traffic lights, floating sidebar, unified toolbar.
+// Finder window: frameless, client-side traffic lights, flush full-height sidebar, unified toolbar.
 Window {
     id: win
 

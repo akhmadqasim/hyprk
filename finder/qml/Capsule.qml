@@ -1,6 +1,8 @@
 import QtQuick
+import HyprK
 
-// Liquid-glass style toolbar capsule: near-white fill, hairline border, faint drop shadow.
+// Toolbar item-group capsule: a flat raised platter (macOS 27.2.1 renders it as glass that, at 36 pt, has
+// almost no blur; the Finder is a plain Qt window, so it draws the measured look, HyprK ToolbarPlatter).
 Item {
     id: root
     default property alias content: row.data
@@ -10,19 +12,9 @@ Item {
     implicitWidth: row.implicitWidth + 2 * padding
     implicitHeight: Theme.toolbar.capsuleHeight
 
-    Rectangle {   // shadow
+    ToolbarPlatter {
         anchors.fill: parent
-        anchors.topMargin: 2
-        anchors.bottomMargin: -2
-        radius: height / 2
-        color: Theme.color.capsuleShadow
-    }
-    Rectangle {
-        anchors.fill: parent
-        radius: height / 2
-        color: Theme.color.capsule
-        border.width: 1
-        border.color: Theme.color.capsuleBorder
+        unit: Theme.toolbar.pt
     }
     Row {
         id: row

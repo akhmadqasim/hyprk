@@ -78,16 +78,19 @@ QtObject {
         readonly property color window: Tokens.windowBackground
         readonly property color windowBorder: theme.dark ? Qt.rgba(1, 1, 1, 0.14) : "#BEBEBE"  // ref 1px
         // solid fallback sidebar is what the reference shows: #EDEDED
-        readonly property color sidebarSolid: theme.dark ? "#2B2B2D" : "#EDEDED"
-        readonly property color sidebarGlass: theme.dark ? Qt.rgba(0.17, 0.17, 0.18, 0.62) : Qt.rgba(0.93, 0.93, 0.93, 0.62)
+        // dark: 27.2.1 Finder sidebar reads 38..39 (reference/screens/27.2.1/finder-toolbar-dark.png)
+        readonly property color sidebarSolid: theme.dark ? "#272727" : "#EDEDED"
+        // over compositor blur: the sidebar glass fill colour (LIVE-27.2.1.md Sidebar, glass-table-dark.txt)
+        readonly property color sidebarGlass: theme.dark ? Qt.rgba(0.15, 0.15, 0.15, 0.75) : Qt.rgba(0.87, 0.88, 0.91, 0.7)
         readonly property color sidebarSelection: theme.dark ? Qt.rgba(1, 1, 1, 0.12) : "#E2E2E2"  // ref (226)
         readonly property color sidebarHeader: theme.dark ? Qt.rgba(1, 1, 1, 0.40) : Qt.rgba(0, 0, 0, 0.45)
 
-        // toolbar glass capsules
+        // toolbar capsules: HyprK ToolbarPlatter (Tokens.toolbar, measured on 27.2.1)
+        readonly property color capsuleSelected: Tokens.toolbar.selection
+        // Quick Look's Open button (not a toolbar platter)
         readonly property color capsule: theme.dark ? Qt.rgba(1, 1, 1, 0.08) : "#FAFAFA"
         readonly property color capsuleBorder: theme.dark ? Qt.rgba(1, 1, 1, 0.12) : Qt.rgba(0, 0, 0, 0.07)
-        readonly property color capsuleShadow: Qt.rgba(0, 0, 0, theme.dark ? 0.30 : 0.06)
-        readonly property color capsuleSelected: theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0, 0, 0, 0.07)
+        readonly property color toolbarSeparator: Tokens.toolbar.separator
         readonly property color toolbarIcon: theme.dark ? Qt.rgba(1, 1, 1, 0.85) : "#1C1C1C"
         readonly property color toolbarIconDisabled: theme.dark ? Qt.rgba(1, 1, 1, 0.30) : Qt.rgba(0, 0, 0, 0.28)
         readonly property color title: theme.dark ? Qt.rgba(1, 1, 1, 0.80) : "#4D4D4D"     // ref (77)
@@ -159,17 +162,28 @@ QtObject {
         readonly property int tagDot: 14         // ref
     }
 
+    // Toolbar: the strip has no fill and no glass, only the item-group capsules (MAC-ANSWERS.md Q9.2).
+    // The Finder is drawn at its reference image's scale: the 44 px capsule of the ref is the 36 pt capsule
+    // measured on 27.2.1, so pt values below are x pt (= 44 / 36). The ref's 64 px toolbar and 10 px capsule y
+    // agree (52 pt toolbar, capsule at 8 pt).
     readonly property QtObject toolbar: QtObject {
-        readonly property int height: 64         // ref (capsules 10..53, content starts ~64)
-        readonly property int capsuleHeight: 44  // ref
-        readonly property int capsuleY: 10       // ref
-        readonly property int buttonWidth: 44    // ref (back/forward halves of 88)
+        readonly property real pt: 44 / 36
+        readonly property int height: 64         // ref (capsules 10..53, content starts ~64) = 52 pt
+        readonly property int capsuleHeight: 44  // ref = 36 pt (27.2.1)
+        readonly property int capsuleY: 10       // ref = 8 pt
+        readonly property int buttonWidth: 44    // a lone button is a 36 pt circle (27.2.1)
+        readonly property real navWidth: Math.round(74 * pt)        // back/forward: one 74 x 36 pt capsule (27.2.1)
+        readonly property real dividerHeight: Math.round(20 * pt)   // its 1 x 20 pt divider (27.2.1)
         readonly property int iconSize: 24
-        readonly property int gap: 20            // between capsule groups, ref
-        readonly property int leftPad: 10        // sidebar edge to back/forward capsule, ref (191 -> 200)
+        readonly property int gap: Math.round(7 * pt)       // between capsule groups: 7..7.5 pt (27.2.1 Finder shot)
+        readonly property int leftPad: 10        // sidebar edge to back/forward capsule, ref (191 -> 200) = 8 pt (27.2.1)
         readonly property int rightPad: 12       // ref
-        readonly property int titleGap: 15       // capsule to title, ref
-        readonly property int segment: 46        // view switcher segment width, ref (648..840 / 4)
+        readonly property int titleGap: Math.round(13.5 * pt)  // capsule to title: 13.5 pt (27.2.1 Finder shot)
+        readonly property real viewsWidth: Math.round(158 * pt)   // view switcher: one 158 x 36 pt capsule (27.2.1)
+        readonly property real segmentInsetX: 3 * pt     // selected segment 33.5 x 28 pt in a 39.5 pt segment (27.2.1)
+        readonly property real segmentInsetY: 4 * pt
+        readonly property real segmentSeparator: Math.round(24 * pt)   // 1 x ~24 pt (27.2.1 Finder shot)
+        readonly property real actionsWidth: Math.round(112 * pt)   // share, tag, action: one 112 pt capsule (27.2.1)
         readonly property int searchWidth: 220   // expanded search field
     }
 
