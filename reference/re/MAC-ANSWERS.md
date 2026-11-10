@@ -1117,3 +1117,98 @@ Defaults on this account (read-only check): no `genie-speed` and no `com.apple.W
   slot growth on app insert. Not checked against the insert path.
 - All Dock DockFloatAnimatedProperty instances (fish, blend, x, scale, squeeze, autoHide) are created with
   `_easingFunction` = 1, which is cosine ease-in-out.
+
+## REA 27.2.1: Notification Center panel (open, close, trackpad swipe)
+
+Binary: `/System/Library/CoreServices/NotificationCenter.app/Contents/MacOS/NotificationCenter`, arm64e slice
+(`lipo -thin arm64e`), Ghidra 12.1.4. All addresses are in that slice. Type and field names come from Swift reflection
+metadata (`CenterAnimationController`, `MainController`, `FluidSpringAnimator`). The panel animation code lives in the app
+itself. The frameworks it uses only supply the curve (SwiftUI `Animation`) and the system gesture (WindowManager
+`NotificationCenterSystemGesture`). Pseudocode excerpts are in `~/hyprk/reference/re/27.2.1/decomp/NotificationCenter-panel.c`.
+
+### 1. Click open and close (clock click, Esc, click outside): one SwiftUI spring for both directions
+- Open: `CenterAnimationController` open request `FUN_1001c10d0` (log "Center open requested (%s)")
+  -> `MainController` `FUN_100176de0` -> `FUN_1001d39d8` -> main-queue async `FUN_1001fbb08` -> `FUN_1001e18b0`
+  -> `FUN_1001e19c4` = `withAnimation(DAT_1003c1388, completionCriteria: .logicallyComplete) { FUN_1001e195c }`.
+  `FUN_1001e195c` sets the panel model's `openProgress` (+0x68, setter `FUN_1001ddd18`) to 1.0 and its x offset
+  (+0x30, setter `FUN_1001dd848`) to 0.
+- Close: close request `FUN_1001c175c` (log "Center close requested %s") -> `FUN_100178444(0)` -> `FUN_1001d3ebc`
+  -> the same `FUN_1001e19c4` with closure `FUN_1001e1b58`, which sets openProgress to 0 and the x offset back to
+  the model's width W (+0x58). After that it calls `FUN_1001773d0(animated: false)`, which only does cleanup (it
+  releases key focus and does no animation).
+- Curve `DAT_1003c1388`, built by `FUN_1001910a4` -> `FUN_1001910d8`: `Spring(duration: 0.3 (@0x1002dbd50), bounce: -0.2
+  (@0x1002dbd58))`. The conversion is SwiftUI's own, inlined: stiffness = (2π/duration)², dampingRatio = 1/(1+bounce)
+  for bounce < 0, damping = 2·√stiffness·ratio. It ends in
+  `Animation.interpolatingSpring(mass: 1, stiffness: 438.65, damping: 52.36, initialVelocity: 0)`.
+  - In plain terms: **response 0.3 s, damping ratio 1.25** (overdamped, so it never overshoots).
+  - Closed form: x(t) = 1 − (r2·e^(r1·t) − r1·e^(r2·t))/(r2 − r1), with r1 = −41.89 and r2 = −10.47 per second.
+  - Values: 0.54 at 0.1 s, 0.72 at 0.15 s, 0.84 at 0.2 s, 0.94 at 0.3 s, 0.98 at 0.4 s. It reaches 90 % at 0.25 s,
+    95 % at 0.31 s and 99 % at 0.47 s.
+- What moves: only the x offset (W -> 0 on open, 0 -> W on close), plus openProgress (0 -> 1).
+  - No opacity, scale or blur call sits in this path (checked: the two closures touch only these two fields).
+  - The view-side use of openProgress (`OpenSlideModifier`: inCenter, clamp, transitionProgress, hideInWidgetEditing,
+    reduceMotion) was not traced.
+  - W is a model field; its value was not read. Guess: 424 pt. The gesture code uses `frame.width − 424` and
+    `424` (@0x1002dd998 / @0x1002dd9a0, `FUN_1001c7498`) as the right-edge panel region.
+- Agreement with the recording: **differs**.
+  - Open: the recording (0.11 … 0.99 over 17 frames) fits a critically damped spring with response 0.3 s (RMS
+    0.015). The code's ratio of 1.25 fits worse (RMS 0.055): at frame 17 the model gives 0.94, the recording 0.99.
+  - Close: the recording (0.92 … 0.11 in 9 frames, then gone) fits response 0.25 s with ratio 1.0 (RMS 0.013), while
+    the code's curve would still be at 0.28 after 9 frames.
+  - Guess, not verified: `.logicallyComplete` lets the completion run before the spring settles, so the window may be
+    ordered out early and the tail is cut. That does not explain why the open looks faster than the code.
+  - Nothing else in the binary drives a click open or close, so treat the code values as the real ones and the
+    recording as possibly distorted (pixel-change share, about 58 fps).
+
+### 2. Two-finger swipe from the right trackpad edge: interactive, follows the finger
+- The gesture is recognised by WindowManager (`WindowManager.NotificationCenterSystemGesture`, with show and hide
+  directions) and comes in as a progress value.
+- `FUN_1001c6ca8` stores it at most once per display refresh (`eventQueue_currentVBL` throttle):
+  - p < 0 -> 0;
+  - p > 1 -> rubber band 1 + 0.25·(p−1)/((p−1)/0.75 + 1) (limit 1.1875);
+  - the value is passed on through a dispatch-source "data replace" (`progressSource`).
+- The handler `FUN_1001c3a14` -> `MainController` `FUN_100178548` sets x offset = (1 − p)·W directly, with no
+  animation. So the panel tracks the finger 1:1.
+- Release: `FUN_1001c70b4` (log "System gesture did end, close=%d, velocity=%f"). The close/open decision and the
+  velocity come from WindowManager; no threshold constant is in NotificationCenter (not traced in WindowManager).
+  - close -> `FUN_1001773d0(animated: true, reason 2, velocity: −v)`;
+  - open -> `FUN_1001781b4(progress, velocity)`.
+  - Both run `FluidSpringAnimator` (below), not the SwiftUI spring.
+- `FluidSpringAnimator` (class `_TtC21NotificationCenterApp19FluidSpringAnimator`):
+  - Timer: a Combine DispatchQueue timer every 1/60 s (`FUN_10021099c`, frameRate 60, fixed at both call sites).
+    It is created by `FUN_100210c50(progress, velocity)`; velocity is 1.0 when none is passed.
+  - Per tick, `FUN_100211574`, with p = progress and v = velocity:
+    ```
+    v = 0.695·v + 2·(1 − p)          // 0.695 @0x1002e1768
+    p' = p + v/60
+    if !allowOvershoot && p' > 1 { p = 1; v = 0; done }
+    v = 0.85·v − 0.8·(p' − 1)          // 0.85 @0x1002cda98, −0.8 @0x1002e1770
+    if |v| < 0.01 { p = 1; v = 0; done } else { p = p' }   // 0.01 @0x1002dea10
+    ```
+  - Overshoot is allowed when completing an open and off when completing a close.
+  - Offset mapping: open = (1 − p)·W (callback `FUN_100179e90` -> `FUN_100178330`); close = p·W
+    (`FUN_1001778a4`; it animates p from 1 − current toward 1).
+  - From rest (p 0, v 1) it gives per 60 Hz frame: 0.045 0.11 0.19 0.27 0.35 0.42 0.49 0.55 0.61 0.66 0.70 …
+    0.90 at frame 19, 0.95 at frame 24.
+  - With a real release velocity it starts faster. This path was not covered by the recording (it used clicks).
+
+### 3. Stagger, delay
+- NotificationCenter has no `Animation.delay` call site; the only animation modifier used is `speed` (once).
+- The open and close closures set two scalars on one model, so the whole panel moves as one piece. No per-widget or
+  per-notification stagger was found.
+- Not traced: per-item effects inside `OpenSlideModifier` or `BannerTransitionModifier`. The latter's provider enum
+  has cases completeSlide(start, velocity), none, slide and fade, plus `__Key_bannerSlideProgress`, and is used for
+  notification banners.
+
+### 4. Other NotificationCenter animation constants (for reference, not the panel)
+- spring(response 0.35, ratio 1.25), `DAT_1003c1390`: widget Add Sheet show/hide (`FUN_1000fc6d4` "ShowAddSheet",
+  `FUN_1000ee9c8` "Hide Add Sheet").
+- spring(response 0.3, ratio 1.25), `DAT_1003c13b8`: used in `FUN_1001bc2fc`.
+- spring(response 0.2, ratio 1), `DAT_1003c13a8`: used in `FUN_1002023c4`.
+- `CASpringAnimation` mass 1, stiffness 20.00008, damping 8.94429, duration 1.40496 (critically damped, response
+  1.405 s), `DAT_1003c13a0`: used with `_interiorLightFraction` / `_exteriorLightFraction` keys (`FUN_1000e5730`), so
+  probably a light or indicator effect.
+- `interpolatingSpring(mass 1, stiffness 100, damping 100, initialVelocity v/100)` in `FUN_1001e2284` (ratio 5):
+  velocity-driven, probably the notification swipe dismissal (guess).
+- `easeInOut` 0.1, 0.15, 0.25, 0.35 and 0.5 s; `spring(0.5, 0.85)` ×7; an `NSAnimationContext` group of 0.15 s
+  linear (`FUN_10017b76c`).
