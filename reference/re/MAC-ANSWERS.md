@@ -2083,3 +2083,243 @@ Sidebar crops (below the account block), 2x: `screens/27.2.1/settings/sidebar-ic
     the window mode (Auto follows the mode).
 - User values restored and verified with `defaults read -g`: Dark, RegularDark, accent absent (Multicolour),
   NSGlassTintAmount 0.5071146, NSTableViewDefaultSizeMode 2.
+
+## Q-finder (27.2.1)
+
+Measured live on Finder, macOS 27.2.1 (26B131), 2x. Window 920 x 560 pt on a test folder (on a mounted test disk image, not Documents: the user's Documents may not be captured). Points are window-relative (0,0 = window top-left). Colours are sRGB from 2x window captures. Light = light appearance, dark = dark; a = key window, i = inactive. Account: Multicolour accent (blue), icon style Dark, glass tint 0.5. Data: `reference/re/27.2.1/live/finder/` (`finder-measurements.json`, `crops/`, `ax/`, `icons-*`); pictures: `reference/screens/27.2.1/finder/` (+ INDEX.md; the private sidebar rows are blanked).
+
+- Q-finder-01: Yes, all five are glass: back/forward, view switcher, Group, Share/Tags/Action and Search are each an NSToolbar item-group platter = NSGlassEffectView `_variant` 0 (regular), 36 pt, full capsule. All platters right of the sidebar share one NSGlassContainerView (one `glassBackground` backdrop, shapes merged). Recipe at 36 pt, from MAC-ANSWERS Q9 + LIVE:
+  - light: face black .4, white 1.03, saturation 1.2, fill white a.2;
+  - dark: black .125, white 1.125, saturation 1.3, no fill;
+  - both: blur r5 with opacities 0, 0, .5, 1; inner refraction 9 / -18; outer refraction 16 / 16 at opacity .6; ring shadow .06; drop shadow .04, r4, y 8; clamp 1.07 light / 1.31 dark.
+  - Live pixels: light capsule 252 on the 255 strip; dark (61,62,70) on (32,33,39), or (67,69,77) while the pointer is in the toolbar. Inactive: light 240, dark (58,60,67).
+  (Q9 probe dump + live pixels)
+- Q-finder-02: Toolbar height 52 (AXToolbar). Every capsule spans y 8–44 (36 tall).
+  - Back/forward x 170.5–244.5 (74; AX segments 36 + 37). It starts 7.5 pt after the 163 pt sidebar.
+  - Title ink starts at x 256.
+  - View switcher x 533.5–694.5 (161; 4 segments of 40.5).
+  - Group x 702–749.5 (47.5).
+  - Share / Tags / Action x 756.5–868.5 (112; buttons 36 / 38 / 37).
+  - Search circle x 875.5–912.5 (36).
+  - Gaps between capsules 7–7.5. Right inset 7.5. No other left inset (traffic lights at 18,18; pitch 23).
+  - Glyphs are 13 pt `.large` `.medium` symbols (R3b-3). Ink: chevron 8x14, grid 15.5, list 16.5x12, columns 19.5x15, gallery 19x14.5, search 16x16.5, ellipsis 15x3.
+  - At this width the view switcher shows 4 segments. At 800 pt (the user's windows), or when search is open, it collapses into one 51x38 popup.
+  (AX frames + pixel edges)
+- Q-finder-03: Glass `_variant` 18. It is edge to edge, not a floating inset panel: flush with the left, top and bottom edges, running under the toolbar from y 0, with no radius of its own (the window corner clips it). See MAC-ANSWERS Q9 §3 for the recipe and D, and Q-windows-15.
+  - Width 163; 0.5 pt divider at x 162.5.
+  - Live fill: light (237,237,238) a / (242,242,243) i. Dark over Electric Blue (36,38,55) a / (36,38,54) i (flat when inactive).
+  (Q9 + AX + pixels)
+- Q-finder-04: Sidebar layout.
+  - Width 163. Rows 32. Section header rows 19.
+  - First row (Recents) at y 52, directly under the toolbar.
+  - Selection cell x 10–153 (inset 10, 143 wide), radius about 8.
+  - Icon centre x 29 (ink 16–18 pt, e.g. clock 17x17, person.2 23x15.5). Text x 45 (AX), ink 46.5. Header text x 15 (ink 16.5).
+  - Gap between sections: 13 pt of empty space before each header row, so 32 pt from the last row of one section to the first row of the next.
+  (AX + pixels)
+- Q-finder-05: See Q-windows-01/02/03; the same values hold for this Finder window.
+  - Radius 16, continuous corner (spans about 24 pt).
+  - Outer rim 0.5 pt black: a.21 light / a.93 dark (active).
+  - Inner rim 1 pt white a.10.
+  - Shadow: blur 20, y 18, density .40 light / .70 dark when active; 8 / 7 and .22 / .45 when inactive. Alpha profiles are in Q-windows-01.
+- Q-finder-06: Title text.
+  - SF **15 Semibold**: ink 88.5 pt for "finder-demo" equals SF 15 Semibold. This corrects Q-windows-12's "bold 13".
+  - Only the folder name; no " — Local" and no subtitle.
+  - Left-aligned at ink x 256, 11.5 pt after the back/forward capsule. The AX field fills the free space (248–530); the text truncates when it runs out.
+  - Vertically centred in the 52 pt bar (ascender 19.5 to baseline 32).
+  - Colours: light #4C4C4C a / #BFBDBD i; dark #E9E9E9 a / #5F5F64 i.
+  (ink fit against AppKit renders)
+- Q-finder-07: Sidebar text.
+  - Items: SF 13 Regular. The selected row is 13 **Semibold** (ink 78.5 = 13 Semibold, against 74 for Regular).
+  - Item colour: light black (0 at glyph cores, vibrant), dark 255. Inactive: light 113, dark (146,147,155).
+  - Headers: SF 11 Semibold. Light 135 (about black a.43), dark (113,115,132) (about white a.35). Inactive 166 / (87,89,105).
+  - Hovering a header shows a `chevron.down` at the right (ink 9.5x5.5 at x 136.5–146, centred on the header row, dark (160,162,177)). The header gets no fill.
+  (ink fits + hover capture)
+- Q-finder-08: Sidebar icons. They are monochrome 13 pt `.large` `.medium` symbols (R3b-3), not all tinted.
+  - Recents (clock), Shared (person.2) and all Favourites use the accent: light (0,107,239), dark (30,152,255).
+  - Locations (iCloud Drive, home, AirDrop, Bin) are not tinted: grey, light (123,123,128), dark (181,181,195).
+  - All turn grey when inactive: light 127, dark (143,144,155). On a selected row the icon keeps its colour.
+  - AirDrop = the `airdrop` glyph (ink 18x17).
+  - Tag dots in the sidebar: not measured (the Tags section is off on this account).
+  (pixels per row)
+- Q-finder-09: Sidebar selection is a grey pill, not the accent.
+  - Light (215,215,216) a / (231,231,232) i, on (237,237,238) / (242,242,243).
+  - Dark (65,67,84) a / (50,52,67) i, on (36,38,55).
+  - Geometry: x 10–153, 32 tall, radius about 8.
+  - Hover: none. Pressed: none (the row selects on mouse-up, with no pressed fill).
+  - A drag over a row shows an accent pill (47,110,237) with white text (drop target).
+  (captures; press with drv3)
+- Q-finder-10: Toolbar button states.
+  - Hover: an inner capsule 28 tall (y 12–40), 30 wide on back/forward and Action, 35.5 on view segments; on Search the whole 36 circle lightens. The back/forward divider hides on hover.
+  - Hover colours: light 242 on 252 (Search 236); dark (87,89,96) on (67,69,77).
+  - Pressed looks the same as hover at 80 ms. Holding back/forward about 0.3 s opens the history menu.
+  - Disabled: no hover; glyph tertiary (light 173; dark (113,114,122)).
+  - The pill is a flat fill inside the glass capsule; the capsule is the glass.
+  - Dark only: the whole toolbar strip lightens (32,33,39 → 39,41,47) while the pointer is anywhere in the toolbar, and also when the window is inactive.
+  (still captures; recording)
+- Q-finder-11: View switcher.
+  - Selected segment: inner capsule 35.5x28, radius 14, inset 4 from the capsule top and bottom. Fill: light 231 on 252; dark (81,82,90) on (61,62,70).
+  - Separators: 1 pt, about 20 tall, only between two unselected segments (hidden next to the selected or hovered one). Light 200, dark (113,114,122).
+  - Icons: square.grid.2x2, list.bullet, rectangle.split.3x1, squares.below.rectangle (R3b-3).
+  - Switching: the pill jumps in 1 frame (no slide), the same frame as the content change.
+  (pixels + 60 fps)
+- Q-finder-12: Icon grid.
+  - Icon 64 (View Options: icon-size slider 24, grid spacing 54, text 12, labels at the bottom).
+  - Cell 112 x 112 (icon pitch 112 in both directions). The grid starts at (173,62) = content + 10, toolbar + 10.
+  - First icon at (197,66): centred in the cell, 4 pt from the cell top.
+  - Label cap top 10 pt below the icon. Label max width about 104 (ink).
+  (AX)
+- Q-finder-13: Icon view selection.
+  - Plate: 72x72, radius 7, icon inset 4. Light 230, dark (54,55,60). Unchanged when inactive.
+  - Label: pill 17 tall for 1 line (2 pt below the plate), radius 5, about 5 pt side padding, white text. Fill: light (42,99,217) a / 220 i (text 33); dark (37,88,201) a / 70 i (text 228).
+  - Hover: none.
+  - Drop target: a grey plate (226), radius about 8.
+  (rr fit)
+- Q-finder-14: Icon label text.
+  - SF 12 Regular, colour light 38 (label a.85), dark 221.
+  - Line pitch 16 pt. At most 2 lines, centred; a long name wraps, then middle-truncates the last line with "…" ("from the…mber.txt").
+  - Tag dots: 10 pt circles inside the label, left of the name. Each extra tag sits 5 pt to the right, behind the previous, with a 0.5 pt white ring. The text starts about 3 pt after the dots.
+  - A tagged folder icon takes the tag colour (Projects with the orange tag is an orange folder).
+  (ink fits)
+- Q-finder-15: List view.
+  - Header y 52–80 (28). Rows 20; first row at y 85.
+  - Rows inset 10 pt both sides (x 173–910).
+  - Disclosure triangle AX 15x22 at x 174. Icon 16 at x 189. Name x 209.
+  - Default columns: Name 338, Date Modified 181, Size 97 (right-aligned, 7 pt pad), Kind 121.
+  - Text: SF 13 Regular. Name = label colour (39 light); other columns secondary (128).
+  - Header: SF 11.
+  (AX + ink fits)
+- Q-finder-16: List stripes and selection.
+  - Stripes on the 2nd, 4th, … rows: light (244,245,245), dark (42,43,49). Full 20 pt, x 173–910, radius about 8.
+  - Selection: same rect. Light (42,98,217), dark (36,87,201). Text white; secondary columns (191,208,244).
+  - Inactive selection: light 220 (text 33 / 109); dark 70 (text 227 / 172).
+  - Disclosure chevron: ink 5x8.5, secondary (dark 155).
+  (pixels)
+- Q-finder-17: List header.
+  - Light: no own fill (white, like the content). Dark: a solid (40,40,46) bar that also covers the toolbar strip (hard pocket), over the (32,33,39) content.
+  - Column separators: 1 pt x 16 (y 58–74). Light 229, dark (76,76,82).
+  - Bottom line: 1 pt at y 79. Light 229, dark (66,66,72).
+  - Sorted column: SF 11 Semibold in label colour (76 / 255), with a 7.5x5 chevron 6.5 pt left of the column edge. Other headers: 11 Regular, secondary 127.
+  - Hover: none. Pressed: the cell fills 242 (light), square.
+  - Resize cursor 30x24, hotspot (15,12), within about 1 pt of a boundary.
+  (pixels + curmon)
+- Q-finder-18: Exact strings on this account (en_GB, region Indonesia, 24 h; "." time and "," decimal come from the region).
+  - Dates: "Today at 00.15", "Yesterday at 14.30", "9 Nov 2026 at 11.20" (this year, also within the week), "14 Jun 2023 at 16.05" (older). The year is shown in all cases.
+  - Preview / inspector: "5 March 2026 at 09.12", "Yesterday, 14.30".
+  - Sizes: "--" for folders, "43 bytes", "8 KB" (8000 B), "12 KB" (12134 B), "12,3 MB" (12345678 B). Decimal (1000) units, 1 decimal from MB up, none for KB.
+  - 12 h strings: not measured (would mean changing the user's clock format).
+  (AX values)
+- Q-finder-19: Column view.
+  - Columns 245 wide, with a 1 pt divider (light 229, dark 57). No grip; the resize cursor shows over the divider.
+  - Rows 24. Icon 18. Text at column x + 38. Folder chevrons at the right.
+  - Selection: inset 10 left / 11 right, 24 tall, radius about 8. Active column accent (light (41,98,217), dark (36,87,202)); parent columns grey (220 / 70); all grey when inactive.
+  - Preview column (about 240): preview 219x259, name 13 bold, kind 11, "Information" rows (Created / Modified / Last opened) 23 pt pitch, Tags editor, Markup / More… buttons.
+  - When opened on a volume, the first column lists Demo, Macintosh HD and Network.
+  (AX + pixels)
+- Q-finder-20: Gallery view.
+  - Preview 443x357 at (195,84).
+  - Strip: 48x48 thumbnails, pitch 59 (gap 11), at y 476.
+  - Selected thumbnail: plate 54x54, radius 7 (light 189, dark (87,88,92)), unchanged when inactive.
+  - Right pane, about 240–250 wide: same material as the sidebar (light 237, dark (36,38,55)), with a 0.5 pt edge. It holds:
+    - a 50 pt icon;
+    - the name, 15 Semibold;
+    - "PNG image - 8 KB", 13 Regular tertiary;
+    - "Information" (13 Semibold) with "Show More" (11, accent);
+    - rows Created / Modified / Last opened: 11, label secondary, value Medium;
+    - "Tags" with a tag editor;
+    - Rotate Left / Markup / More… buttons at the bottom.
+  (AX + ink)
+- Q-finder-21: Yes, there is a status bar, hidden by default here (ShowStatusBar 0). It was toggled on, measured and turned off again.
+  - Height 28, below the path bar; the window grows by 28.
+  - No own fill (content background), 0.5 pt line above.
+  - Centred text "9 items, 112,1 MB available" / "1 of 9 selected, …", about 11 pt, secondary (128).
+  - In icon view: an icon-size slider 82x16 at the right.
+  (AX + pixels)
+- Q-finder-22: Path bar (on by default here).
+  - At the bottom: 1 pt top line at y 531.5 (light 221–229, dark (66,67,73)), then 28 pt, with no fill and no glass.
+  - Items: 16 pt icons + SF 11 Regular secondary (127). Chevron separators 4x6 secondary. Item x starts about 6 pt in from the content edge (AX 169).
+  - Hover: none.
+  - Drag target: the item gets an accent capsule behind its label (seen through the drag image).
+  (AX + pixels)
+- Q-finder-23: Finder context menus, in order (Finder's menu is not in AX; read from captures). Separators are shown as |.
+  - File: Ask Siri | Open, Open With ▸ | Move to Bin | Get Info, Rename, Compress "Notes.txt", Duplicate, Make Alias, Quick Look, Copy | Share… | Quick Actions ▸ | Services ▸
+  - Folder: Ask Siri | Open in New Tab, Paste Item* | Move to Bin | Get Info, Rename, Compress "Photos", Duplicate, Make Alias, Quick Look, Copy | Share… | Customise Folder… | Quick Actions ▸ | Services ▸
+  - Multi-select: Ask Siri | New Folder with Selection (2 Items), Open, Open With ▸ | Move to Bin | Get Info, Rename…, Compress, Duplicate, Make Alias, Quick Look, Copy | Share… | Quick Actions ▸ | Services ▸
+  - Background (icon view): Ask Siri | New Folder, Paste Item* | Get Info | View ▸, Use Groups, Sort By ▸, Clean Up, Clean Up By ▸, Show View Options
+  - * only when something is on the clipboard.
+  - No shortcuts are shown. Leading icons on Move to Bin, Share, Customise Folder, Quick Actions and Services; their text is at x 39, plain rows at 16.
+  - No tag row, because this account has no favourite tags (FavoriteTagNames = ('')).
+  - Files in `crops/context-menu-*.png`.
+- Q-finder-24: See Q-menubar-12/22/24; context menus behave the same.
+  - Hover: solid accent (0,122,255), rect inset 5 pt left/right, full 24 pt row, radius about 7, label / shortcut / chevron white.
+  - Disabled: tertiary (a.25), no highlight on hover.
+  - No animation: the highlight moves within 1 frame; activation blinks off 67 ms, on 50 ms, then a 0.2 s fade.
+  - Text x 16 (28–30 with a state column, 39 with icons).
+- Q-finder-25: not measured: the tag dots row only lists favourite tags, and this account has none (FavoriteTagNames is empty and syncs via iCloud, so it was not changed). What is visible instead:
+  - Toolbar Edit Tags popover: a glass popover with an arrow, 252x99 pt, title "Assign tags to "<name>"" (11–12 pt secondary), a tag token field 218x27 (token = a tinted capsule with the tag name, e.g. "Red"), and an empty suggestion table. Picture: `popover-*.png`.
+  - Icon labels: tag dots are 10 pt (Q-14).
+  - List view: AX tag image 26x14 at the right end of the Name column.
+- Q-finder-26: Quick Look.
+  - A separate floating window (layer 3, AXWindow subrole "Quick Look"), not a sheet or an in-window panel. 1463x951 for a 1600x1000 px image (fits the screen), centred on screen.
+  - Radius about 20 pt.
+  - Title bar 38 with:
+    - close and full-screen 14 pt discs (dark glyph discs) at (11,12) and (31,12);
+    - the file name in 13 bold;
+    - Markup, Rotate and Share buttons 34x26;
+    - an "Open with Preview" capsule 139x26.
+  - Content inset 5 on the left, right and bottom.
+  - Frame grey 134–137 in light (over blue; looks opaque and neutral); the material could not be dumped.
+  - Open: appears at about 0.79 scale, centred, and grows to 1 in about 0.25 s, ease-out (per frame .79 .85 .90 .93 .95 .97 .98 .98 .99 → 1), no fade seen.
+  - Close: shrinks and moves into the file's icon in about 0.18 s.
+  - Shadow: standard window shadow (not measured separately).
+  (60 fps, AX)
+- Q-finder-27: Rename field.
+  - Fill: white text field. The base name is selected (#BAD6FB, 186,214,251); the extension is not.
+  - Ring: 3 pt focus ring outside the field, accent at about a.5 (light (149,179,246)), with a 0.5 pt darker inner edge (114,158,244). Outer radius about 5; field corners almost square.
+  - Icon view: the field is the label size (74x14 for "Old Letter.rtf"), text 12.
+  - List view: the field is 16 tall in the 20 pt row and the ring spills over the row; the row keeps its accent selection.
+  (pixels, light)
+- Q-finder-28: Drag feedback.
+  - Drag image: icon + accent label at about 0.90 opacity (label (62,113,221) vs (41,98,218)).
+  - Multi-item: only the first item's image, plus a red count badge 19 pt (231,74,64) with a white bold number, at the icon's bottom-right.
+  - Icon-view folder target: a grey plate 226, radius about 8, behind the folder.
+  - Sidebar target: accent pill (47,110,237) with white text.
+  - Path bar target: accent capsule.
+  - List-view folder row: no highlight seen within 0.7 s.
+  - Spring-load: the hovered folder opens in place within 1.9 s; Esc returns to the original folder and cancels.
+  - Snap-back: Q-windows-27 (0.25 s, ease-out, no fade).
+  - Cursor: Q-windows-27.
+  (captures with drv3)
+- Q-finder-29: Inactive window; values given as active → inactive.
+  - Traffic lights grey.
+  - Title: light #4C4C4C → #BFBDBD; dark #E9E9E9 → #5F5F64.
+  - Toolbar capsules: light 252 → 240, glyphs 0 → 164; dark (61,62,70) → (58,60,67), glyphs dim. The dark strip lightens to (39,41,47).
+  - Sidebar: flat (light 237 → 242). Text: light 0 → 113; dark 255 → 146. Icons grey: light 127; dark (143,144,155).
+  - Sidebar selection: light 215 → 231; dark (65,67,84) → (50,52,67).
+  - Icon / list / column selection: accent → grey (light 220, dark 70) with label-coloured text.
+  - Unchanged: icon plates and gallery plates, stripes, content background, icons and labels.
+  (a/i capture pairs)
+- Q-finder-30: Motion, from 60 fps recordings.
+  - View switch (Cmd-1..4): content and pill change in 1 frame.
+  - Folder enter (Cmd-↓) and back: 1 frame, no slide.
+  - Selection change: 1 frame.
+  - Sidebar hover: none.
+  - Search expand (click): the circle widens into a capsule (about 241 wide) in about 0.15–0.17 s, ease-out (left edge progress .19, .85, .86, .95, .99, 1). The view switcher collapses into its popup in 1 frame at the start. The focus ring appears after the expand, without a fade.
+  - Search collapse (Esc twice): about 0.17 s.
+  - Quick Look open and close: see Q-26.
+- Q-finder-31: Rendered icons are in `icons-rendered/` (NSWorkspace icons: generic folder, Documents folder, Applications folder, PDF, txt, png, zip at 16 / 18 / 32 / 48 / 64 / 77 pt, 2x, light and dark). Live crops are in `icons-live/` (64 pt icon view, 16 pt list).
+  - Light and dark renders are byte-identical, and the live Finder icons are pixel-identical in light and dark: no tint change in dark (this account's "Dark" icon style does not touch Finder's file icons).
+  - Live folder blue (123,192,235) / (101,173,219).
+  - In icon view, documents show Quick Look thumbnails (txt / pdf pages, the png image), not type icons.
+  - A tagged folder is drawn in the tag colour.
+  - The 64 pt live folder is about 9/255 mean different from the NSWorkspace render; the 16 pt one about 7.
+- Q-finder-32: Tab bar (2 tabs; the second was opened with Open in New Tab on a test folder, then closed).
+  - A 28 pt capsule track directly under the toolbar (y 52–80, x 167–879.5, radius 14). Light 232 with a 220 rim; dark (56,56,63) with a (72,72,78) rim.
+  - Tabs share the width (AX 369 / 339).
+  - Selected tab: an inner capsule 24 tall (2 pt inset), radius 12. Light 253 (text 75); dark (61,61,69) (text 235).
+  - Unselected: no fill, text light 181 / dark 132.
+  - Hover on an unselected tab: its segment darkens (light 220, dark (66,66,73)) and a × close glyph shows at its left (AX 18x18 at tab x + 4).
+  - Text SF 11 Regular, centred.
+  - New-tab "+" button: about 30 pt circle at x 883.5–912 (light fill 249, rim 191).
+  - Inactive: everything dims (selected tab light 240, dark (51,51,60)).
+  - When the tab bar shows, the toolbar keeps its 52 pt and the content moves down 28.
+  (AX + pixels, `crops/tabbar-*.png`)
