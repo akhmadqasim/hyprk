@@ -42,6 +42,8 @@ Item {
 
     // plugin glass only follows moving items while the window re-measures
     function settle() { const w = QsWindow.window; if (w && w.settleGlass) w.settleGlass(); }
+    // slide off to the right, then `swiped` (close button in Notification Center)
+    function swipeAway() { back.stop(); away.start(); }
 
     Item {
         id: face
@@ -124,17 +126,17 @@ Item {
                 }
             }
 
-            ColumnLayout {
+            // explicit widths (not a ColumnLayout): the wrapped body knows its height at creation,
+            // so lists animate to the right place instead of correcting one frame later
+            Column {
                 id: textCol
-                anchors.left: iconBox.right
-                anchors.leftMargin: Theme.notif.iconGap
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.notif.padding
+                x: iconBox.x + iconBox.width + Theme.notif.iconGap
+                width: card.width - x - Theme.notif.padding
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 1
 
                 RowLayout {
-                    Layout.fillWidth: true
+                    width: parent.width
                     spacing: 6
                     Text {
                         Layout.fillWidth: true
@@ -153,7 +155,7 @@ Item {
                     }
                 }
                 Text {
-                    Layout.fillWidth: true
+                    width: parent.width
                     visible: text !== ""
                     text: card.body
                     textFormat: Text.PlainText
