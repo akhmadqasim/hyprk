@@ -2938,3 +2938,292 @@ Already known and not redone: Q-settings-11/12/16/17/18/25/26/27, #35.
   - Colour: light #808080 (black a.5), dark #8F9192 (white about a.5).
   - It appears on the first scroll frame and stays about 0.6 s after the last scroll event, then fades out over
     about 0.15 s (9 frames). 60 fps clip, two scrolls.
+
+
+## Notification Center glass and transitions (PC #62)
+
+# Notification Center: glass, open/close, banners, stacks (macOS 27.2.1, live)
+
+## Setup
+- **Account:** the user's own (icon & widget style Dark, glass slider 0.5).
+- **Backdrops:** a full-screen solid window from the new probe `re/tools/probe/ncbg.swift`.
+  - It sits at level -2147483600, above the desktop icons and the desktop widgets (-2147483601) and below NC (layer 23).
+  - A solid wallpaper of the same colour was set under it. The wallpaper was restored afterwards.
+  - Colours: white 255, grey 127, black 0, blue sRGB (69,83,206). The blue reads as (72,83,199) in display RGB, the
+    same way the screen shows the blue wallpaper itself.
+  - There is also a "checker N" mode (black/white checkerboard) for testing blur.
+- **Values:** display RGB from 2x `screencapture`, 3x3 px medians. Single numbers mean R = G = B.
+- **Notifications:** test notifications came from `osascript display notification` (app "Script Editor", grouped).
+  The user's real notifications were never dismissed and never saved. In the PNGs they are blanked out; the numbers
+  come only from the test stack, the widgets and the empty areas.
+- **Recordings:** 60 fps avfoundation, deleted after analysis.
+- **A change on the Mac that matters:** banners do not show while the screen is being recorded. The setting
+  Notifications > "when mirroring or sharing the display" was switched to Allow for (3), then set back to
+  "Notifications Off".
+
+## (1) Glass
+
+### 1a. Notification card (front card of a stack, and a single card)
+- **Geometry:**
+  - x 1350..1694 (**344 wide**). The top section starts at y 44 (10 below the menu bar).
+  - Gap between cards **6**. Single cards (banner style) are 75 tall with title + subtitle + body.
+  - Corner: the curve leaves the straight edge about 11 pt from the corner (profile 17, 11.5, 8.5, 7, 5.5, 4.5, 3.5,
+    2.5, 1.5, 1, 0.5, 0 at dy 0..11). That fits the continuous r ≈ 18–20 found before.
+- **Interior** (it hardly changes from top to bottom: 126 → 129 over white):
+
+| backdrop | dark | light |
+|---|---|---|
+| white 255 | **128** | **237** |
+| grey 127 | **104** | **190** |
+| black 0 | **32** | **136** |
+| blue | **(71,80,184)** | **(161,169,255)** |
+
+  - The response is **not linear**. Dark gives 32 → 104 → 128, so most of the change comes in the lower half of
+    the backdrop range. Light gives 136 → 190 → 237.
+  - Over the checker the card blurs heavily: the 10–90 % edge is about 16 pt wide (Gaussian σ ≈ 6 pt). The 0/255
+    checker comes out as only 68..116 in dark, so the backdrop contrast drops to about 19 % (strong tone compression).
+- **Rim:**
+  - **Top and bottom only:** a bright 1 pt line (2 px). Values below are outer px → inner px → body:
+
+| backdrop | dark | light |
+|---|---|---|
+| black | 68 → 53 → 35 | 161 → 151 → 137 |
+| grey | 132 → 120 → 105 | 210 → 201 → 191 |
+| white | 154 → 143 → 129 | 252 → 245 → 237, plus a 255 px just outside the card |
+| blue | (147) → (132) → (114) | — |
+
+  - **Vertical sides:** no bright rim. Instead the outermost 0.5 pt is darker than both the card and the backdrop:
+    70 over white, 44 over grey, 43 over blue, dark mode. The rim depends on angle, like the Dock.
+- **Stack plates** (collapsed group), measured on the white backdrop:
+  - plate 1 is **8 pt** high and inset **17 pt** each side (306 wide); plate 2 is **8 pt** and inset **24 pt** (292).
+  - Fill, dark: plate 1 129 / 88 / 15 / (55,63,152) over white / grey / black / blue; plate 2 130 / 86 / 14.
+  - Fill, light: plate 1 204 / 155 / 102; plate 2 199 / 148 / 94.
+  - So the plates are a darker, less opaque version of the card glass.
+  - Each plate has a bright 1 px top line (over black: 22 dark, 112 light).
+
+### 1b. Widgets
+- **Geometry:**
+  - **164 × 164**, gap 16, x 1350..1514 and 1530..1694.
+  - Corner: the curve leaves the edge about 27–30 pt from the corner, so continuous r ≈ 22–24.
+- **The widgets do not depend on light or dark appearance** (identical pixels). They follow the "Dark" icon & widget
+  style.
+- **Calendar widget:** opaque, (32,31,31) at the top to 13 at the bottom, the same over every backdrop.
+- **Batteries widget (translucent):**
+  - 65 / 39 / 13 / (20,27,103) over white / grey / black / blue, which is **13 + 0.204·in**, linear.
+  - That makes it a dark tint at about 80 % over the blurred backdrop.
+
+### 1c. "Edit Widgets" capsule and the small circle buttons
+- **"Edit Widgets":** 24 tall (capsule, r 12), about 81–87 wide, centred, near y 1010.
+  - Dark: 179 / 128 / 31 / (85,97,226). Light: 246 / 190 / 131 / (157,167,255).
+  - Over grey and black it is close to the card fill. Over white it is brighter than a card (179 vs 128 in dark).
+- **x circle next to it:** 24 tall, the same glass (178 / 128 / 32 dark).
+- **Section "Clear All" circle** (28 pt, at x 1675..1693 next to the "Notification Centre" header):
+  - Dark: 167 / 116 / 32 / (79,89,200). Light: 231 / 184 / 135.
+- **"N more notifications" capsule:**
+  - Dark: 163 / 112 / 31. Light: 224 / 178 / 129 / (151,158,244).
+
+### 1d. Section header, "No Notifications", and the column backdrop
+- **Section header** "Notification Centre": white text with a soft shadow, sitting on the column backdrop (no glass
+  of its own).
+- **"No Notifications" / date header: not measured.** It only shows when NC is empty, and that would mean clearing
+  the user's real notifications.
+- **Is there a backdrop behind the cards? Yes, and it covers only the column.**
+  - **Blur.** Over a 40 pt checker, the area between the cards and behind the section header is blurred: the 10–90 %
+    edge is 7.5 pt, so Gaussian σ ≈ 3 pt (≈ 6 px). The blur region is the column rect (x ≈ 1350..1694) and feathers
+    out over about 5–10 pt at its edges. Outside it the checker stays sharp, even 4 pt from the cards.
+    `dark-checker40-top.png` shows it.
+  - **Darkening.** It multiplies the backdrop and is the same in light and dark appearance:
+    - **×0.71** in the 6 pt gaps between cards (white → 181 dark / 189 light; grey → 91; blue → (52,59,142); black
+      stays 0);
+    - ×0.78 behind the section header row (200);
+    - ×0.80 in the 16 pt gap between the widgets (204);
+    - ×0.82 right of the column (x 1702).
+  - **The darkening is a soft shadow, not a scrim.** Going left from a card edge over white: 200 at 4 pt, 207 at 8,
+    214 at 12, 224 at 20, 235 at 30, 248 at 50, 255 at about 80 pt. Below the last widget it fades to 255 over about
+    85 pt; 20 pt below "Edit Widgets" it is back to 255. Above the first card (y 35–43) it is 0.82–0.85.
+  - With NC closed, the screen is the plain backdrop. The far wallpaper never changes with NC open.
+  - Static RE agrees: NotificationCenter.app has `NotificationBackdropLayer` (a CABackdropLayer subclass),
+    `NotificationCenterApp/NotificationCenterBlurView.swift`, `BlurMask`, `toggleBlurDebug`, `wantsSubduedGlass`.
+- **Shadow per card:** not separable from the column shadow. Every card, widget and capsule sits inside the same soft
+  shadow field described above.
+
+### 1e. Which _Glass variant or recipe
+See "Static RE" at the end. In short: cards use `_Glass.notificationCenter` (Regular base, no inactive branch) with r 20 continuous; the buttons use `_Glass.regular`; there is a column backdrop blur of 1.5·openProgress, masked, with no dim.
+
+## (2) Open/close transition (clock click; dark mode, grey backdrop, 7 cards + 2 widgets present)
+
+### 2a. Trackpad swipe
+**Not measured.** The two-finger swipe from the right edge is a WindowManager system gesture
+(`NotificationCenterSystemGesture`) that runs on multitouch input. CGEvent cannot synthesise it: we have no
+synthetic NSTouch / dock-swipe path that WindowManager accepts.
+- From RE (already in MAC-ANSWERS): the panel follows the finger 1:1 and rubber-bands above 1.
+- The release is completed by `FluidSpringAnimator`.
+
+### 2b. Open
+- **Timing:**
+  - The NC window (layer 23, full screen) is on screen **0.24 s after the synthetic click** (`winpoll` probe, 4 ms
+    polling).
+  - Motion starts in the first frame the window is visible.
+- **Curve:** x offset per frame, starting at +339 pt:
+  339, 293.5, 245, 199, 159.5, 125, 97.5, 75.5, 57.5, 44, 33.5, (frame dropped), 14.5, 11, 8, 5.5, 4.5, 3.5, 2.5, 2,
+  1.5, 1, 1, 0.5, 0.5, 0.
+  - **Best fit: a spring from rest, response 0.30 s, damping ratio 1.0 (critically damped), travel W = 386 pt, RMS
+    0.74 pt.**
+  - The code's Spring(0.3, bounce −0.2) = ratio 1.25 fits at 12.5 pt RMS.
+  - Read this as: response 0.3, **critical** damping, from x + ~386.
+- **All elements move together.**
+  - Card, section header, the other cards, Calendar and Batteries keep constant x offsets to each other in every
+    frame (header − card = 59.0 pt, calendar − card = −2.5 pt in all frames).
+  - No stagger and no parallax.
+- **No panel alpha, scale or blur.**
+  - The card glass fill is final (92–93 in video units) from the first measurable frame.
+  - Card text is full brightness from the first frame. Row spacing is constant, so there is no scale.
+  - The glass does **not** materialise late.
+- **Exception: the Calendar widget's content fades in.**
+  - The digits fade while the widget body is opaque from frame 1.
+  - Alpha against time since motion start: 0.27 @0.045 s, 0.44 @0.078, 0.63 @0.111, 0.77 @0.145, 0.87 @0.178,
+    0.95 @0.228, 0.98 @0.295. That tracks the open spring (openProgress).
+  - The Batteries widget text is full from the start. So this is per widget (probably widget content becoming
+    visible), not a panel effect.
+  - See `open-click-strip-widgets.png`.
+- **The column blur and shadow ride with the panel.** At a fixed point (x 1520) the gap pixel goes 115 → 111 → 92 →
+  87 … → 79 (video units) as the panel passes; it does not fade in separately.
+- **The rest of the desktop does not change:** no dim and no blur outside the column.
+
+### 2c. Close (second click on the clock)
+- **Timing:** motion starts about 0.08 s after the click.
+- **Curve:** offset per frame: 0, 7, 38, 83, 131.5, 178, 216.5, 250, 278.5, 300.5, 317.5, 332, 342.5, 350.5, 357,
+  then off screen.
+  - **Fit: a spring from rest, response 0.28–0.31 s, ratio 1.0–1.1, W ≈ 380–385 pt (RMS 1.2–1.3 pt).** It is the
+    same spring as the open, in reverse.
+  - It **decelerates** at the end. The older "accelerating ~0.15 s" in MAC-ANSWERS came from pixel-change share and
+    is wrong: the content leaves the screen after about 0.23 s while the spring is still running.
+- **Window lifetime:** the window is ordered out 0.375 s after motion start (0.457 s after the click), when the spring
+  is at about 99.7 %.
+- No alpha change, no stagger, no blur. Widget content does not fade out on close.
+
+## (3) Banners and in-NC changes
+
+### 3a. Banner arrives (NC closed)
+- **Final frame:** x 1350..1694, top at y 44, the same column and size as an NC card.
+- **Entry:** it slides in from the right, starting partly off screen (first visible frame at +276 pt).
+  - Card-left offsets: 276, 220.5, 178.5, (dup), 138, 111.5, 83.5, 64.5, 48.5, 37, 28, 21, (–), 12, 9, … 2.5 @+18
+    frames, 0.5 @+22.
+  - That is an ease-out of about 0.35 s. Spring fit: response ≈ 0.43, ratio ≈ 0.9 (RMS 5 pt; the start is off
+    screen).
+- **Fade and blur during entry:**
+  - Content and glass fade in: darkest px 101 → 13 over about 15 frames.
+  - The content is blurred at first and sharpens: max gradient 5 → 142 over about 0.25 s.
+  - The icon is about 0.85× size in the first sharp frames, then 1.0. So there is a small scale-up as well, about
+    0.85 → 1.
+- **Duration:** the banner stays **4.97 s**, then auto-dismisses.
+
+### 3b. Banner auto-dismiss ("into NC")
+- **Motion:** it slides back to the right. Offsets 0, 10, 51, 104, 148, 192, 230.5, 260.5, 297.5, 319.5.
+  - Fit: spring response 0.31, ratio 1.25 (RMS 2.6 pt). That is the code's NC spring (Spring 0.3, bounce −0.2).
+  - It fades and blurs out at the same time (darkest px 15 → 111) and is gone in about **0.15 s** (9 frames).
+- **No flight into the NC panel:** it just leaves to the right edge.
+- Strips: `banner-arrive-strip.png`, `banner-dismiss-strip.png`.
+
+### 3c. New notification while NC is open
+- **The list moves down 81 pt** (card 75 + gap 6).
+  - Per frame: 5, 5, 13.5, 36.5, 44, 51, 57, 62.5, 67, 70, 72.5, 74.5, 76.5, 77.5, 78.5, 79, 79.5, 80, … 81.
+  - About 0.35 s, ease-out.
+- **The new card** shows about 0.08 s after the list starts moving, at its final place.
+  - It fades in and unblurs: text 123 → 228 and sharpness 39 → 156 over about 0.25 s.
+  - It does not slide.
+
+### 3d. Expanding a stack (click the stack)
+- **At the click:** the "Show less" capsule and the x circle appear instantly (1 frame). The group header (app name)
+  fades in.
+- **Front card:** moves down 44 pt (to make room for the header).
+  - Per frame: 0, 5.5, 5.5, 20.5, 25, 29, 32, 35, 37, 39, 40, 41, 41, 42, 42.5, 43, 43, 43.5, 43.5, 43.5, 44.
+  - Fit: **spring response ≈ 0.20, ratio 1.25** (RMS 0.35 pt); about 0.35 s to settle.
+- **Hidden cards:** they unfold from the plates, sliding down from behind the front card and fading in. The cards
+  below are pushed down by the same spring.
+- **"Show" on the front card:** fades out in about 0.15 s.
+
+### 3e. Collapsing ("Show less")
+- **Header and buttons:** "Show less" and x vanish in 1 frame; the app-name header fades out in about 0.1 s.
+- **Other cards:** they move up about 47 pt in 6 frames, slide under the front card (clipped) and fade (icon min lum
+  16 → 58). They are gone after about 0.1 s.
+- **Front card:** moves up 44 pt. Per frame: 0, 2, 6.5, 12, 16.5, 25.5, 27, 30.5, 33.5, 36, 38, 39.5, 40.5, 41.5,
+  42, 42.5, 43, 43.5, 44 (about 0.3 s).
+- **List below:** follows with the same spring, starting about 0.1 s later.
+
+### 3f. Hover on a card
+- **x circle:** about 20 pt, the card glass, centred on the card's top-left corner (≈ 1354, 248). It appears and
+  disappears in **1 frame, with no fade**.
+- **"Show" capsule:**
+  - 64 × 22 pt at the card's bottom-right (x 1620..1684, y 285..307), glass.
+  - It **crossfades with the time label** ("2m ago") over about 0.3 s, symmetric in and out.
+  - In: 0.07, 0.13, 0.23, 0.32, 0.39, 0.48, 0.57, 0.64, 0.69, 0.74, 0.78, 0.82, 0.86, 0.90, 0.92, 0.95 per frame
+    (50 % at 0.1 s, 95 % at 0.27 s).
+  - The crossfade starts 1 frame after the x shows.
+- **Group:** hovering the x of a collapsed group widens it into a "Clear All" capsule.
+- Pictures: `hover-off-on-dark-grey.png`.
+
+### 3g. Clearing (x on my test group)
+- **One click cleared the whole collapsed group.** It removed only the test notifications; the real ones were never
+  touched.
+- **The card blurs and fades in place in about 0.07 s** (4–5 frames). It does not slide.
+- **The list below moves up 97 pt.** Remaining offset per frame: 97, 95.5, 71.5, 63, 51, 41, 33, 25.5, 19.5, 15,
+  11.5, 9, 6.5, 6.5, 5.5, 3, 2, 1.5, … 0 (about 0.4 s).
+  - Fit: spring response ≈ 0.22, ratio 1.25 (RMS 1.9 pt).
+  - That is the same list-reflow spring as expand/collapse: **response ≈ 0.2, ratio 1.25**.
+- **Not measured:** swiping a card away (it needs a trackpad gesture) and the clear-all confirm on the section header
+  (it would clear real notifications).
+
+## Static RE (glass variant)
+Done by a separate static agent: NotificationCenter arm64e plus the DesignLibrary dump. Excerpts are in
+`re/27.2.1/decomp/NotificationCenter-glass.c`.
+
+### Cards (single and stacked; high confidence)
+- `NotificationBackgroundModifier` (FUN_100119fe8 / FUN_10011a374):
+  `_glassEffect(_Glass.notificationCenter.forceSubdued(isObscured).mix(with: .identity, by: 1-p).surfaceSize(.medium), in: RoundedRectangle(cornerRadius: 20, style: .continuous))`.
+  - p = 1 unless Reduce Motion is on, so with normal settings the glass is never mixed out.
+- `NotificationCenterRecipe` = RegularBase + RegularDiffusionAmount + ShadowVibrancy (shadow.vibrancyContribution 1),
+  plus the accessibility conditionals.
+  - It has no WindowActiveShadow and no Inactive branch, so `forceSubdued` probably does nothing to the material.
+  - The numeric RegularBase values were not decoded.
+- The stack plates are probably the same modifier with isObscured = true (inferred).
+
+### Widgets (medium confidence)
+- NC applies no glass to widgets. It only passes `CHSGlassOptions withSubduedGlass` to the widget renderer
+  (FUN_1001560a4).
+- The recipe is not determinable: it runs in the widget renderer, outside NC; no `_Glass` imports in WidgetKit,
+  ChronoKit or ChronoUIServices. That fits the measurement that widgets ignore light/dark.
+
+### Buttons (`NotificationButtonStyle`; high confidence)
+- **Common style:** a fill of `.quaternary` while pressed, then `_glassEffect(glass, RoundedRectangle(r, .continuous))`
+  and `glassEffectTransition(.identity)`.
+- **Per button:**
+
+| Button | Height | Radius | Padding | Glass |
+|---|---|---|---|---|
+| Card hover x | 20 or 24 | h/2 | — | `.notificationCenter.forceSubdued(true)` |
+| "Show less" | 20 | 10 | 10 | `.regular` |
+| Group Clear / x | 20 | 10 | — | `.regular` |
+| "Edit Widgets" | 24 | 12 | 10 | `.regular` |
+| Clear All circle | 24 × 24 | — | — | `.regular` |
+
+- **"N more notifications":** `Material._glass(.regular)` background, height 24, padding 10.
+- **Conflict with earlier values:** MAC-ANSWERS Q-panels-32 gives 28 for "Show less" and "Clear", from AX frames that
+  probably include the hit area. The code says 20 for these two and 24 for the Clear All circle.
+
+### Column backdrop (`NotificationCenterBackground`, FUN_100139bbc)
+- **Frame:** width 376, horizontal padding 16.
+- **Layer:** `NotificationBackdropLayer`, padding −40, with one variable blur.
+  - inputRadius = **1.5 × openProgress**, or 0 with Reduce Transparency; `normalizeEdges` on.
+  - Mask: a black sublayer inset 60, corner radius 40, itself Gaussian-blurred with radius 20.
+  - **No dim, tint or colour matrix.**
+- So the column blur ramps with openProgress during open and close. That is consistent with what was seen (it arrives
+  with the panel). The measured σ ≈ 3 pt against radius 1.5 is a difference in units or behaviour that was not
+  resolved.
+- **Outside shadow** (`NotificationsListShadowBackground`):
+  - RoundedRectangle(20, continuous), black shadow at opacity 0.2 × progress, radius 30, no offset.
+  - This matches the soft fade of about 70–80 pt that was measured.
+
+### Not resolved
+- The ×0.71 / ×0.78 darkening between cards is not in the backdrop layer. It is probably overlapping card and list
+  shadows (radius 30, opacity 0.2 each).

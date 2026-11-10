@@ -1,0 +1,20 @@
+{
+ "_note": "macOS 27.2.1, MacBook Air M2, dark appearance, backdrop solid grey 127 (ncbg probe). Recorded at ~58-60 fps (avfoundation), positions in pt. Offsets are x (or y) distance from the rest position.",
+ "click_open": {"element_offsets_pt_per_frame_from_first_visible": [339, 293.5, 245, 199, 159.5, 125, 97.5, 75.5, 57.5, 44, 33.5, null, 14.5, 11, 8, 5.5, 4.5, 3.5, 2.5, 2, 1.5, 1, 1, 0.5, 0.5, 0],
+   "fit": {"model": "spring from rest", "response_s": 0.30, "damping_ratio": 1.0, "travel_W_pt": 386, "rms_pt": 0.74},
+   "fit_code_values_response0.3_ratio1.25_rms_pt": 12.5,
+   "click_to_window_on_screen_s": 0.236, "all_elements_move_together": true, "alpha_scale_blur": "none on panel; calendar widget content (not body) fades in with ~openProgress",
+   "calendar_content_alpha_vs_t_since_motion_start": [[0.045, 0.27], [0.061, 0.33], [0.078, 0.44], [0.095, 0.54], [0.111, 0.63], [0.128, 0.71], [0.145, 0.77], [0.178, 0.87], [0.228, 0.95], [0.295, 0.98]]},
+ "click_close": {"element_offsets_pt_per_frame": [0, 7, 38, 83, 131.5, 178, 216.5, 250, 278.5, 300.5, 317.5, 332, 342.5, 350.5, 357],
+   "fit": {"model": "spring from rest", "response_s": 0.28, "damping_ratio": 1.1, "travel_W_pt": 385, "rms_pt": 1.2, "alt": "response 0.31 ratio 1.0 W 380 rms 1.3"},
+   "click_to_motion_s": 0.08, "motion_start_to_window_ordered_out_s": 0.375},
+ "banner_arrive": {"card_left_offsets_pt": {"f0": 276, "f1": 220.5, "f2": 178.5, "f4": 138, "f5": 111.5, "f6": 83.5, "f7": 64.5, "f8": 48.5, "f9": 37, "f10": 28, "f11": 21, "f13": 12, "f14": 9, "f18": 2.5, "f22": 0.5},
+   "fit": {"response_s": 0.43, "damping_ratio": 0.9, "rms_pt": 5.3}, "fade_minLum_per_frame": [101, 91, 77, 77, 59, 45, 36, 31, 27, 23, 22, 20, 17, 16, 16, 15, 14, 13], "blur_maxGrad_per_frame": [5, 9, 13, 14, 21, 28, 29, 40, 39, 40, 43, 59, 76, 84, 94, 142], "final_frame_pt": [1350, 44, 1694, 128]},
+ "banner_dismiss_after_s": 4.97,
+ "banner_dismiss": {"card_left_offsets_pt": [0, 10, 51, 104, 148, 192, 230.5, 260.5, 297.5, 319.5], "fit": {"response_s": 0.31, "damping_ratio": 1.25, "W_pt": 460, "rms_pt": 2.6}, "fade_minLum_per_frame": [15, 24, 41, 58, 79, 91, 98, 104, 106, 108, 111], "duration_visible_s": 0.15},
+ "nc_open_new_notification": {"list_push_down_pt_per_frame": [5, 5, 13.5, 36.5, 44, 51, 57, 62.5, 67, 70, 72.5, 74.5, 76.5, 77.5, 78.5, 79, 79.5, 80, 80, 80.5, 80.5, 80.5, 81], "push_total_pt": 81, "new_card_text_p99_per_frame_from_first_visible": [123, 133, 143, 154, 161, 172, 184, 198, 207, 214, 219, 222, 225, 225, 226, 227], "new_card_sharpness_maxGrad": [39, 27, 32, 35, 36, 38, 41, 55, 69, 75, 100, 101, 133, 114, 116, 156]},
+ "stack_expand": {"front_card_down_pt_per_frame": [0, 5.5, 5.5, 20.5, 25, 29, 32, 35, 37, 39, 40, 41, 41, 42, 42.5, 43, 43, 43.5, 43.5, 43.5, 44], "fit": {"response_s": 0.2, "damping_ratio": 1.25, "rms_pt": 0.35}, "show_less_and_x_appear": "instant (1 frame) at click", "click_to_motion_s": 0.035},
+ "stack_collapse": {"front_card_up_pt_per_frame": [0, 2, 6.5, 12, 16.5, 25.5, 27, 30.5, 33.5, 36, 38, 39.5, 40.5, 41.5, 42, 42.5, 43, 43.5, 44], "other_cards": "move up ~47 pt in ~6 frames, shrink (clip) under the front card and fade (icon min lum 16 -> 58), gone after ~0.1 s", "header_and_buttons": "Show less + x vanish in 1 frame, 'Script Editor' header fades ~0.1 s"},
+ "hover_card": {"x_circle": "appears/disappears in 1 frame (no fade)", "show_button_and_time_crossfade_progress_per_frame_in": [0.07, 0.13, 0.23, 0.32, 0.39, 0.48, 0.57, 0.64, 0.69, 0.74, 0.78, 0.82, 0.86, 0.90, 0.92, 0.95, 0.96, 0.97], "out": [0.92, 0.85, 0.76, 0.68, 0.61, 0.51, 0.42, 0.36, 0.31, 0.26, 0.21, 0.16, 0.12, 0.08, 0.07, 0.05, 0.04, 0.03]},
+ "clear_group": {"card": "blurs and fades in place in ~4-5 frames (~0.07 s), no slide", "list_up_pt_remaining_per_frame": [97, 95.5, 71.5, 63, null, 51, null, 41, 33, 25.5, 19.5, 15, 11.5, null, 9, 6.5, 6.5, 5.5, 3, 2, 1.5, 1.5, 1, 0.5], "fit": {"response_s": 0.22, "damping_ratio": 1.25, "rms_pt": 1.9}}
+}
