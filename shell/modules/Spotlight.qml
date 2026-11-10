@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import qs
@@ -20,11 +21,26 @@ ShellWindow {
     screen: modelData
 
     readonly property bool shown: Panels.open === "spotlight"
-    // Liquid Glass: materializes from creation, dematerializes after closing (then unloaded)
-    Materializer { id: mat; shown: sp.shown; initial: 0 }
-    visible: mat.active
+    // MAC-ANSWERS.md R2 (27.2.1): Spotlight appears complete in one frame at about 1.05 x its final size
+    // and shrinks to 1.0 within 5 frames (about 0.08 s), no fade-in (curve not measured: ease-out); on close
+    // it fades out with a blur and a slight growth in 3 frames (about 0.05 s; the growth (2 %) and blur
+    // (up to 5 pt, like the AppKit window close) are not measured). Then the window is unloaded.
+    // Reduce motion: no scale, the fade stays.
+    property real openScale: 1 + Theme.travel(0.05)
+    NumberAnimation { id: settleIn; target: sp; property: "openScale"; from: 1 + Theme.travel(0.05); to: 1; duration: 80; easing.type: Easing.OutQuad }
+    // the window is created on open: start shrinking once its first frame (at 1.05) is on screen,
+    // else creating the surface eats the first frames of the 0.08 s
+    property bool firstFrame: true
+    Connections {
+        target: sp.firstFrame ? sp.contentItem.Window.window : null
+        function onFrameSwapped() { sp.firstFrame = false; settleIn.restart(); }
+    }
+    property real out: shown ? 0 : 1          // 0 shown .. 1 gone
+    Behavior on out { NumberAnimation { duration: 50 } }
+    visible: shown || out < 1
     lingerAs: "spotlight"
-    lingering: !shown && mat.moving
+    lingering: !shown && out < 1
+    glassOpacity: 1 - out
     // while dematerializing it takes no input, so it never eats the next click
     acceptsInput: shown
     anchors { top: true; left: true; right: true; bottom: true }
@@ -115,9 +131,9 @@ ShellWindow {
         input.text = Panels.spotlightQuery;
         Panels.spotlightQuery = "";
     }
-    function present() { takeQuery(); input.forceActiveFocus(); FileSearch.loadRecents(); }
+    function present() { if (!firstFrame) settleIn.restart(); takeQuery(); input.forceActiveFocus(); FileSearch.loadRecents(); }
     Component.onCompleted: present()
-    onShownChanged: if (shown) present()       // reopened while still dematerializing
+    onShownChanged: if (shown) present()       // reopened while still fading out
     Connections {
         target: Panels
         function onSpotlightQueryChanged() { sp.takeQuery(); }
@@ -170,14 +186,18 @@ ShellWindow {
         // results grow and shrink the glass on a spring (Reduce motion: at once)
         Spring { id: grow; target: panel.targetHeight; response: Theme.anim.resizeResponse; damping: Theme.anim.resizeDamping; epsilon: 0.3 }
         height: A11y.reduceMotion ? targetHeight : grow.value
-        // materializes around the search field's centre
-        transform: MaterializeScale {
-            mat: mat
+        // around the search field's centre
+        transform: Scale {
+            readonly property real s: sp.openScale * (1 + Theme.travel(0.02) * sp.out)
             origin.x: panel.width / 2
             origin.y: Theme.spotlight.barHeight / 2
-            w: panel.width
-            h: panel.height
+            xScale: s
+            yScale: s
         }
+        opacity: 1 - sp.out
+        // the close blur, only for those 3 frames
+        layer.enabled: sp.out > 0
+        layer.effect: MultiEffect { blurEnabled: true; blurMax: 10; blur: sp.out }
 
         Glass {
             anchors.fill: parent
@@ -185,7 +205,6 @@ ShellWindow {
             sx: panel.x
             sy: panel.y
             tint: Theme.glass.tintStrong
-            materialize: mat.progress
         }
         MouseArea { anchors.fill: parent; hoverEnabled: true; onPositionChanged: mouse => sp.notePointer(this, mouse.x, mouse.y) }
 
@@ -193,7 +212,6 @@ ShellWindow {
             id: bar
             width: parent.width
             height: Theme.spotlight.barHeight
-            opacity: mat.progress
             // the query sits in a capsule field (macOS 26/27 Spotlight)
             Rectangle {
                 anchors.fill: parent
@@ -247,7 +265,6 @@ ShellWindow {
             width: parent.width
             height: panel.height
             clip: panel.height < panel.targetHeight - 0.5
-            opacity: mat.progress
 
             Rectangle {
                 visible: panel.expanded && panel.height > bar.height + 1
@@ -391,7 +408,8 @@ ShellWindow {
         originX: x
         originY: y
         mode: sp.mode
-        shown: sp.shown && (sp.pointerMoved || sp.mode !== "")
+        shown: (sp.shown || sp.out < 1) && (sp.pointerMoved || sp.mode !== "")   // they fade with the window
+        opacity: 1 - sp.out
         gap: 12
         onPicked: m => sp.setMode(m)
     }
