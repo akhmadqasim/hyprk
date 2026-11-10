@@ -49,13 +49,13 @@ hl.config({
         rounding_power = 2.8,            -- SPEC.md 7.1: continuous corner guess
         active_opacity = 1.0,
         inactive_opacity = 1.0,
-        shadow = {                       -- SPEC 9 macWindowShadow: active r24 (0,10) a0.6 light / 0.7 dark,
-            enabled = true,              --   inactive r16 (0,4) a0.45
-            range = 24,
-            render_power = 3,
-            offset = "0 10",
-            color = 0x99000000,          -- 0.6 active
-            color_inactive = 0x73000000, -- 0.45 inactive (Hyprland has no separate inactive range/offset)
+        shadow = {                       -- macOS window shadow is wide and soft; the SPEC 9 r24/a0.6 numbers are
+            enabled = true,              --   CoreAnimation values and look like a hard dark band in Hyprland's
+            range = 60,                  --   shadow, so this is tuned by eye against reference/screens (2026-11-10)
+            render_power = 2,
+            offset = "0 18",
+            color = 0x47000000,
+            color_inactive = 0x2e000000,
         },
         blur = {
             enabled = true,
