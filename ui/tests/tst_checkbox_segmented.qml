@@ -64,6 +64,7 @@ Item {
     SignalSpy { id: refusingSpy; target: refusing; signalName: "toggled" }
     SignalSpy { id: mixedSpy; target: mixedBox; signalName: "toggled" }
     SignalSpy { id: disabledSpy; target: disabledBox; signalName: "toggled" }
+    SignalSpy { id: iconSpy; target: iconSeg; signalName: "activated" }
     SignalSpy { id: segSpy; target: seg; signalName: "activated" }
 
     TestCase {
@@ -230,6 +231,33 @@ Item {
             iconSeg.separatorBoundaries = [];
             for (let b = 1; b < 4; b++) verify(!findChild(iconSeg, "separator" + b).visible);
             iconSeg.separatorBoundaries = null;
+        }
+        function test_segmented_separator_spacing() {
+            iconSeg.reduceMotion = true;
+            iconSeg.separatorBoundaries = [2, 3];
+            iconSeg.separatorSpacing = 1;
+            compare(iconSeg.implicitWidth, 4 * 46 + 2);
+            iconSeg.width = iconSeg.implicitWidth;
+            const pill = findChild(iconSeg, "pill");
+            iconSeg.currentIndex = 2;
+            compare(pill.x, 2 * 46 + 1 + iconSeg.selectionInset);     // after one gap
+            iconSeg.currentIndex = 3;
+            compare(pill.x, 3 * 46 + 2 + iconSeg.selectionInset);     // after two gaps
+            compare(pill.width, 46 - 2 * iconSeg.selectionInset);
+            iconSeg.currentIndex = 1;
+            compare(pill.x, 46 + iconSeg.selectionInset);              // no gap before segment 1
+            compare(findChild(iconSeg, "separator2").x, 92);           // the 1px gap 92..93
+            compare(findChild(iconSeg, "separator3").x, 139);
+            iconSpy.clear();
+            iconSeg.currentIndex = 0;
+            mouseClick(iconSeg, 100, 22);                              // inside segment 2 (93..139)
+            compare(iconSpy.signalArguments[0][0], 2);
+            mouseClick(iconSeg, 91.5, 22);                             // left of the gap middle: segment 1
+            compare(iconSpy.signalArguments[1][0], 1);
+            iconSeg.separatorSpacing = 0;
+            iconSeg.separatorBoundaries = null;
+            iconSeg.width = iconSeg.implicitWidth;
+            iconSeg.currentIndex = 2;
         }
         function test_segmented_separator_color() {
             compare(findChild(iconSeg, "separator1").color, Tokens.control.separator);

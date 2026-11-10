@@ -25,6 +25,8 @@ Item {
     property real iconOpacity: 1           // opacity of the `icon` images (e.g. to apply a colour's alpha)
     property var separatorBoundaries: null // null = a separator at every inner boundary; or an array of the
                                            // boundaries to draw: b sits between segment b-1 and b (1..count-1)
+    property real separatorSpacing: 0      // extra width reserved at each drawn separator, which then sits in
+                                           // that gap (0 = segments touch and separators overlap their edges)
     property color separatorColor: Tokens.control.separator
     property bool separatorFade: true      // false = separators stay visible next to the selection pill
     readonly property int count: model ? model.length : 0
@@ -32,7 +34,7 @@ Item {
     signal activated(int index)
 
     implicitHeight: Tokens.control.segmentedHeight
-    implicitWidth: count * _segW
+    implicitWidth: count * _segW + _nSep * separatorSpacing
     opacity: enabled ? 1 : Tokens.control.disabledOpacity
     activeFocusOnTab: true
 
@@ -46,7 +48,28 @@ Item {
         return w;
     }
     readonly property real _segW: segmentWidth > 0 ? segmentWidth : _contentW + 2 * Tokens.control.segmentPadding
-    readonly property real _w: count > 0 ? width / count : 0   // laid out width per segment
+    function _drawn(b) { return separatorBoundaries === null || separatorBoundaries.indexOf(b) >= 0; }
+    readonly property int _nSep: {
+        let n = 0;
+        for (let b = 1; b < count; b++) if (_drawn(b)) n++;
+        return n;
+    }
+    readonly property real _w: count > 0 ? (width - _nSep * separatorSpacing) / count : 0   // laid out width per segment
+    readonly property var _xs: {   // left edge of each segment
+        const a = [];
+        let x = 0;
+        for (let i = 0; i < count; i++) {
+            if (i > 0 && _drawn(i)) x += separatorSpacing;
+            a.push(x);
+            x += _w;
+        }
+        return a;
+    }
+    function _posX(p) {            // left edge at a fractional segment position (the pill, mid-slide)
+        if (count < 1) return 0;
+        const i = Math.max(0, Math.min(count - 1, Math.floor(p)));
+        return _xs[i] + (p - i) * (i + 1 < count ? _xs[i + 1] - _xs[i] : _w);
+    }
 
     Spring {
         id: pos       // pill position in segments
@@ -76,7 +99,7 @@ Item {
         Rectangle {
             required property int index
             visible: sc.pressedIndex === index && index !== sc.currentIndex
-            x: index * sc._w + sc.selectionInset
+            x: sc._xs[index] + sc.selectionInset
             y: sc.selectionInset
             width: sc._w - 2 * sc.selectionInset
             height: sc.height - 2 * sc.selectionInset
@@ -88,7 +111,7 @@ Item {
         id: pill
         objectName: "pill"
         visible: sc.count > 0 && sc.currentIndex >= 0 && sc.currentIndex < sc.count
-        x: pos.value * sc._w + sc.selectionInset
+        x: sc._posX(pos.value) + sc.selectionInset
         y: sc.selectionInset
         width: sc._w - 2 * sc.selectionInset
         height: sc.height - 2 * sc.selectionInset
@@ -112,8 +135,8 @@ Item {
             readonly property int b: index + 1      // boundary between segment b-1 and b
             readonly property real d: b < pos.value ? pos.value - b : b > pos.value + 1 ? b - pos.value - 1 : 0
             objectName: "separator" + b
-            visible: sc.separatorBoundaries === null || sc.separatorBoundaries.indexOf(b) >= 0
-            x: b * sc._w - 0.5
+            visible: sc._drawn(b)
+            x: sc._xs[b] - sc.separatorSpacing / 2 - 0.5          // centred in its gap
             width: 1
             height: Math.round(sc.height * 0.55)    // Finder ref: 24 of 44
             anchors.verticalCenter: parent.verticalCenter
@@ -130,7 +153,7 @@ Item {
             readonly property var entry: sc._entry(index)
             readonly property bool selected: index === sc.currentIndex
             readonly property real contentW: content.implicitWidth
-            x: index * sc._w
+            x: sc._xs[index]
             width: sc._w
             height: sc.height
             Row {
@@ -178,7 +201,11 @@ Item {
         id: ma
         anchors.fill: parent
         preventStealing: true
-        function indexAt(x) { return sc._w > 0 ? Math.max(0, Math.min(sc.count - 1, Math.floor(x / sc._w))) : -1; }
+        function indexAt(x) {
+            if (sc._w <= 0) return -1;
+            for (let i = sc.count - 1; i > 0; i--) if (x >= sc._xs[i] - (sc._drawn(i) ? sc.separatorSpacing / 2 : 0)) return i;
+            return 0;
+        }
         onReleased: m => { if (containsMouse) sc._activate(indexAt(m.x)); }
     }
     Keys.onPressed: e => {
