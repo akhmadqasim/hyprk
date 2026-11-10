@@ -251,7 +251,10 @@ namespace lg {
         if (pressed) {
             if (g_pointer.held && !*pressed)
                 g_pointer.released = std::chrono::steady_clock::now();
-            g_pointer.held = *pressed;
+            // only a press that starts on lit glass is a glass press (not a window drag nearby)
+            g_pointer.held = *pressed && std::ranges::any_of(g_lit, [&global](const auto& kv) {
+                return std::ranges::any_of(kv.second.boxes, [&global](const CBox& b) { return b.containsPoint(global); });
+            });
         }
         if (!g_lit.empty())
             damageLit({old, global});
@@ -391,12 +394,12 @@ namespace lg {
             return;
         resolveShapes(data);
         const double m = margin(data);
+        if (data.pointerLight)
+            notePointerGlass(data);
         if (data.params->fullDamage)
             return; // everything is redrawn anyway
         for (size_t i = 0; i < data.groups.size(); ++i)
             g_claims.emplace_back(readBox(data.groups[i].box, m, reachOf(*data.params, data.resolved[i]), mon->m_scale), false);
-        if (data.pointerLight)
-            notePointerGlass(data);
 
         // a box added now can touch glass claimed earlier this frame: repeat until stable
         for (bool grew = true; grew;) {

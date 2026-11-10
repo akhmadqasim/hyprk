@@ -110,18 +110,6 @@ SScene scene(vec2 qp) {
     return res;
 }
 
-// distance only (shadow, ring): plain smooth min, the blur hides the difference
-float sdShape(vec2 qp) {
-    float d = 1e4;
-    for (int i = 0; i < MAX_SHAPES; i++) {
-        if (i >= shapeCount)
-            break;
-        float di = sdBoxN(qp - shapeBox[i].xy, shapeBox[i].zw, shapeInfo[i].x).x;
-        float h  = sminH(d, di, smoothK);
-        d        = mix(d, di, h) - smoothK * h * (1.0 - h);
-    }
-    return d;
-}
 
 // 1 - sqrt(1 - (1-t)^2): Apple's quarter-circle bevel
 float bevel(float depth, float h) {
@@ -211,7 +199,7 @@ void main() {
     // drop shadow: erfc-blurred shape, coloured by the saturated backdrop (Apple's shadow_cm)
     float sh = 0.0;
     if (shadowOpacity > 0.0 && cov < 1.0)
-        sh = gEdge(sdShape(qp - shadowOffset) / max(shadowRadius, 1e-3)) * shadowOpacity * mat;
+        sh = gEdge(scene(qp - shadowOffset).d / max(shadowRadius, 1e-3)) * shadowOpacity * mat;
 
     if (cov <= 0.0 && sh <= 0.002)
         discard;
@@ -335,7 +323,7 @@ void main() {
 
     // ring shadow: soft contour of the shape sampled at an offset, inside the glass only
     if (ringOpacity > 0.0 && cov > 0.0 && -d < length(ringOffset) + ringStroke + 3.0 * ringRadius) {
-        float dr   = sdShape(qp + ringOffset);
+        float dr   = scene(qp + ringOffset).d;
         float rr   = max(ringRadius, 1e-3);
         float ring = sat(gEdge(0.7071 * dr / rr) - gEdge(0.7071 * (dr + ringStroke) / rr)) * ringOpacity * cov * mat;
         c          = c * (1.0 - ring) + vec4(0.0, 0.0, 0.0, ring);
