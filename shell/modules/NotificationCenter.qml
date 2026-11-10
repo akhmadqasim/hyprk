@@ -65,7 +65,9 @@ Item {
     }
 
     // ---------- open / close ----------
-    readonly property bool shown: Panels.open === "nc"
+    // false on the Overlays of the other screens, so they do not slide a copy in and out
+    property bool onThisScreen: true
+    readonly property bool shown: Panels.open === "nc" && onThisScreen
     readonly property bool animating: openSpring.moving
     readonly property real progress: openSpring.value   // 0 off-screen .. 1 open (Overlay: glass materialize)
     readonly property real slideX: Theme.travel((1 - openSpring.value) * (nc.width + Theme.nc.marginRight + 30))   // Reduce motion: fades

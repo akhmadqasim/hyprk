@@ -19,8 +19,11 @@ ShellWindow {
     // modelData, not screen: mapping the window re-emits screenChanged (binding loop)
     readonly property bool active: ["menu", "context", "alert", "nc"].indexOf(Panels.open) !== -1
                                    && Panels.activeScreen === modelData
-    // stays mapped while a menu, alert or Notification Center animates out, taking no input then
-    visible: active || nc.animating || menu.visible || context.visible || alert.visible
+    // stays mapped while a menu, alert or Notification Center animates out, taking no input then.
+    // nc.progress, not nc.animating: this binding can run before Notification Center has kicked its
+    // spring for the new Panels.open, and then read a stale `animating`, so the layer unmapped and
+    // mapped again (one empty frame at the start of the close); the spring value only moves later
+    visible: active || nc.progress > 0 || nc.animating || menu.visible || context.visible || alert.visible
     acceptsInput: active
     // NotificationCenter slides itself in and out on its spring; its glass materializes along
     // (menus and alerts materialize on their own; not while one already shows during the NC slide-out)
@@ -95,9 +98,10 @@ ShellWindow {
         anchors.rightMargin: Theme.nc.marginRight
         y: Theme.nc.marginTop
         maxHeight: ov.height - y - 20
+        onThisScreen: Panels.activeScreen === ov.modelData
         originX: ov.width - width - Theme.nc.marginRight
         originY: y + Theme.menuBar.height
-        visible: shown || animating            // no glass regions off-screen while a menu shows
+        visible: shown || animating || progress > 0   // no glass regions off-screen while a menu shows (progress: see `visible` above)
         MouseArea { anchors.fill: parent; z: -1 }
     }
 }
