@@ -156,6 +156,7 @@ hyprk_env_setup() {
   <dir>$real_data/fonts</dir>
   <dir>$HOME/.fonts</dir>
   <cachedir>$dir/cache/fontconfig</cachedir>
+  <include ignore_missing="yes">$HYPRK_ROOT/config/fontconfig/macos-text.conf</include>
   <match target="pattern">
     <test qual="any" name="family"><string>sans-serif</string></test>
     <edit name="family" mode="prepend" binding="same"><string>SF Pro</string></edit>
