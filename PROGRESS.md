@@ -213,3 +213,13 @@ glass material 65 (03:35, orchestrator; too cyan)
   from the field overlap and fuse as one box for 2 frames (same plugin clustering); a resting pointer still selects in the
   Spotlight Apps grid; window close fades about 0.1 s with blur while LIVE-27.2.1.md measured close as instant (probe
   windows; MAC-REQUESTS R2 asks); Launchpad icons load in over the first frames (icon code, not touched).
+- [PC, 2026-11-10] Transition sweep leftovers (same frame method, headless scratch session). Spotlight mode buttons no
+  longer fuse into one box while emerging: shell fix, not plugin, because the plugin only gets the pixel union of a
+  surface's regions and cannot split overlapping shapes; the smooth union already blends shapes that arrive apart. Each
+  button's circle now stops 2 pt short of the field and of its neighbour (dbc1040). Launchpad: first page of icons
+  preloaded undrawn in the primary wallpaper window (LaunchpadPreload.qml), so the first frame has them (5f6a680).
+  Menu bar: pill and dropdown switch in order, each step after the other surface presented (FramePresented.qml): never a
+  wrong or orphan pill, but a frame or two with no pill while switching (091cbb9). One PointerGate for "only a real move
+  selects" (Spotlight, Cmd-Tab, Spotlight Apps grid, re-armed on keyboard moves) (309dca4); the grid case did not
+  reproduce on the old code in three tries. Not done: Spotlight Files/Actions lists and the main results list still
+  select on enter.
