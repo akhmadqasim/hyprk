@@ -15,7 +15,8 @@ const tokenFile = process.env.HYPRK_CHAT_TOKEN_FILE ?? `${home}/.config/hyprk-ch
 const logFile = process.env.HYPRK_CHAT_LOG ?? `${home}/.local/state/hyprk-chat/log.jsonl`;
 const token = readFileSync(tokenFile, "utf8").trim();
 if (token.length < 16) throw new Error("token too short");
-mkdirSync(dirname(logFile), { recursive: true });
+const inbox = process.env.HYPRK_CHAT_INBOX ?? `${dirname(logFile)}/inbox`;
+mkdirSync(inbox, { recursive: true });
 
 type Msg = { id: number; from: string; ts: string; text: string };
 type Peer = { name: string; since: number };
@@ -30,6 +31,7 @@ const name = (s: string | null) => (s && /^[a-z0-9-]{1,16}$/.test(s) ? s : null)
 const server = Bun.serve<Peer, never>({
     hostname: process.env.HOST ?? "0.0.0.0",
     port: Number(process.env.PORT ?? 8787),
+    maxRequestBodySize: 512 * 1024 * 1024, // for /put
     async fetch(req, srv) {
         const url = new URL(req.url);
         if (url.searchParams.get("token") !== token) return new Response("forbidden\n", { status: 403 });
@@ -50,6 +52,14 @@ const server = Bun.serve<Peer, never>({
             let heard = 0;
             for (const ws of peers) if (ws.data.name !== from) { ws.send(line(m)); heard++; }
             return new Response(`ok #${m.id}, ${heard} listening\n`);
+        }
+        if (url.pathname === "/put" && req.method === "PUT") {
+            // curl -sS -T file "http://HOST:PORT/put?token=T&name=<file name>": files too big for git land in the inbox
+            const base = (url.searchParams.get("name") ?? "").replace(/[^A-Za-z0-9._ -]/g, "_").replace(/^\.+/, "");
+            if (!base) return new Response("name?\n", { status: 400 });
+            const dest = `${inbox}/${base}`;
+            const bytes = await Bun.write(dest, req);
+            return new Response(`ok ${bytes} bytes -> ${dest}\n`);
         }
         if (url.pathname === "/log") return new Response(msgs.filter((m) => m.id > since).map(line).join("\n") + "\n");
         return new Response("not found\n", { status: 404 });
