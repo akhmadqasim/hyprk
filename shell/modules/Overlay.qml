@@ -21,7 +21,8 @@ ShellWindow {
                                    && Panels.activeScreen === modelData
     visible: active || nc.opacity > 0
     // NC fades its compositor glass with it (menus and alerts do not animate)
-    glassOpacity: nc.visible ? nc.opacity : 1
+    // (not while a menu/alert already shows on this layer during the NC fade-out)
+    glassOpacity: nc.visible && (Panels.open === "nc" || !active) ? nc.opacity : 1
 
     anchors { top: true; left: true; right: true; bottom: true }
     margins.top: Theme.menuBar.height

@@ -15,7 +15,7 @@ Buka terminal di GNOME, lalu:
 - Jendela baru muncul. Isinya hyprk. Tunggu sekitar 5 detik sampai menu bar dan Dock muncul.
 - Opsi: `--dark` (tema GTK/Qt gelap), `--sound` (nyalakan suara, default senyap), `--share-config`
   (app bisa lihat `~/.config` asli kamu, default tidak).
-- Keluar: `Ctrl+Alt+Q`, atau menu Apple > Log Out, atau `Ctrl+C` di terminal tadi.
+- Keluar: `Ctrl+Alt+Q`, atau the logo menu > Log Out, atau `Ctrl+C` di terminal tadi.
   Script otomatis mematikan semua proses miliknya sendiri (termasuk sisa proses Hyprland).
 - Nested memakai D-Bus milik GNOME, tapi pengaturan GTK dibaca dari file keyfile pribadi (bukan dconf/portal GNOME). Jadi tema dan tombol kiri hanya berlaku di dalam jendela.
 - Semua pengaturan tema, font, kursor, dan config ada di `~/.local/share/hyprk-try`. Script hanya menulis file asli di folder itu, tidak pernah lewat symlink ke `~/.config` atau `~/.local/share` kamu. App tetap melihat daftar app dan icon kamu (hanya baca).

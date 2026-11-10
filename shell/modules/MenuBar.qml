@@ -31,7 +31,7 @@ ShellWindow {
     // 12/24h and date order follow the time locale like macOS (LC_ALL > LC_TIME > LANG)
     readonly property var clockStyle: Clock.styleFor(Quickshell.env("LC_ALL") || Quickshell.env("LC_TIME") || Quickshell.env("LANG"))
 
-    // ---------- left: Apple + app name + menus ----------
+    // ---------- left: distro logo (the Apple menu) + app name + menus ----------
     Row {
         id: left
         anchors.left: parent.left
@@ -41,13 +41,12 @@ ShellWindow {
 
         MenuTitle {
             menuIndex: 0
-            Symbol {
+            DistroLogo {
                 anchors.centerIn: parent
-                name: "apple"
-                size: Theme.menuBar.appleLogoSize + 2
+                size: Theme.menuBar.logoSize
                 color: bar.fg
             }
-            contentWidth: Theme.menuBar.appleLogoSize + 2
+            contentWidth: Theme.menuBar.logoSize
         }
         MenuTitle {
             menuIndex: 1

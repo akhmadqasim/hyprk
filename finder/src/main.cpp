@@ -37,11 +37,19 @@ public:
     }
 };
 
+// A hyprk resource dir: $HYPRK_ROOT/<rel> when HYPRK_ROOT is set (installed copy), else the
+// path baked in at build time (the source checkout), so the binary works from any prefix.
+QString resourceDir(const char *rel, const char *builtIn)
+{
+    const QString root = qEnvironmentVariable("HYPRK_ROOT");
+    return root.isEmpty() ? QString::fromUtf8(builtIn) : root + QLatin1Char('/') + QLatin1String(rel);
+}
+
 // Registers SF from themes/fonts. SFNS is variable with a display default (opsz 28),
 // so the app font pins the text optical size (17) that macOS uses for UI text.
 void loadFonts()
 {
-    const QDir dir(QStringLiteral(FINDER_FONT_DIR));
+    const QDir dir(resourceDir("themes/fonts", FINDER_FONT_DIR));
     for (const QString &f : {QStringLiteral("SFNS.ttf"), QStringLiteral("SFNSRounded.ttf"), QStringLiteral("SFNSMono.ttf")})
         if (dir.exists(f))
             QFontDatabase::addApplicationFont(dir.filePath(f));
@@ -88,10 +96,11 @@ int main(int argc, char *argv[])
     qmlRegisterSingletonInstance("Finder.Native", 1, 0, "FileOps", &ops);
 
     const QString dir = cli.positionalArguments().value(0);
+    const QString iconDir = resourceDir("themes/icons/system", FINDER_ICON_DIR);
     QQmlApplicationEngine engine;
     engine.addImageProvider(QStringLiteral("icon"), new IconProvider);
     engine.addImageProvider(QStringLiteral("thumb"), new ThumbnailProvider);
-    engine.addImageProvider(QStringLiteral("sysicon"), new SysIconProvider(QStringLiteral(FINDER_ICON_DIR)));
+    engine.addImageProvider(QStringLiteral("sysicon"), new SysIconProvider(iconDir));
     engine.rootContext()->setContextProperty(QStringLiteral("startup"), QVariantMap{
         // "recents:", "applications:" and "tag:<Name>" are virtual locations, not paths
         {QStringLiteral("path"), dir.isEmpty() || dir.endsWith(QLatin1Char(':')) || dir.startsWith(QLatin1String("tag:")) ? dir : QDir(dir).absolutePath()},
@@ -102,11 +111,11 @@ int main(int argc, char *argv[])
         // Set by the hyprk session when Hyprland blurs behind this window.
         {QStringLiteral("blur"), qgetenv("HYPRK_BLUR") == "1"},
         // macOS document/folder icons extracted into themes/icons/system
-        {QStringLiteral("hasSysIcons"), QDir(QStringLiteral(FINDER_ICON_DIR)).exists(QStringLiteral("GenericDocumentIcon-512.png"))},
+        {QStringLiteral("hasSysIcons"), QDir(iconDir).exists(QStringLiteral("GenericDocumentIcon-512.png"))},
     });
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreationFailed, &app,
                      [] { QCoreApplication::exit(1); }, Qt::QueuedConnection);
-    engine.load(QUrl::fromLocalFile(QStringLiteral(FINDER_QML_DIR "/Main.qml")));
+    engine.load(QUrl::fromLocalFile(resourceDir("finder/qml", FINDER_QML_DIR) + QStringLiteral("/Main.qml")));
 
     if (cli.isSet(shotOpt)) {
         const QString out = cli.value(shotOpt);

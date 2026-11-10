@@ -1,5 +1,5 @@
 -- hyprk System Settings window rules (Hyprland 0.57 Lua config).
--- The shell config sources this file: dofile("/mnt/code/hyprk/settings/hyprland-rules.lua")
+-- The shell config sources this file: dofile(HYPRK_ROOT .. "/settings/hyprland-rules.lua")
 -- shell.qml sets app id org.hyprk.Settings (//@ pragma AppId). The `qml` tool
 -- fallback (main.qml) is matched by its title instead.
 -- Size and rounding mirror settings/Theme.qml (window.width/height/radius).

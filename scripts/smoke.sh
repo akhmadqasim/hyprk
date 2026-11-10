@@ -19,7 +19,8 @@ EXTRA=("$@")
 SHOT_ARGS=()
 
 # shellcheck disable=SC1091
-source /mnt/code/hypr-dev/env.sh
+HYPRK_DEV=${HYPRK_DEV:-$HYPRK_ROOT/../hypr-dev}   # source-built prefix, optional with distro packages
+[ -f "$HYPRK_DEV/env.sh" ] && source "$HYPRK_DEV/env.sh"
 command -v Hyprland >/dev/null || { echo "smoke: Hyprland not in PATH (dev env not ready)"; exit 2; }
 command -v qs >/dev/null || command -v quickshell >/dev/null || { echo "smoke: quickshell not in PATH"; exit 2; }
 [ -n "${WAYLAND_DISPLAY:-}" ] || { echo "smoke: needs a host Wayland session"; exit 2; }

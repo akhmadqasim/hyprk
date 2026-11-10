@@ -1,9 +1,9 @@
 # source me: points GTK/Qt apps, grim and hyprctl at the private headless Hyprland started by hypr-headless.sh.
 # Paths can be overridden: HK_DIR (scratch + state), HYPR_DEV (dev prefix with Hyprland/hyprlock).
-export HYPR_DEV=${HYPR_DEV:-/mnt/code/hypr-dev}
+export HYPR_DEV=${HYPR_DEV:-${HYPRK_DEV:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)/hypr-dev}}
 export HK_DIR=${HK_DIR:-${XDG_RUNTIME_DIR:-/tmp}/hyprk}
 mkdir -p "$HK_DIR"
-source "$HYPR_DEV/env.sh"
+[ -f "$HYPR_DEV/env.sh" ] && source "$HYPR_DEV/env.sh"
 { read -r HK_SIG < "$HK_DIR/sig"; } 2>/dev/null || :; export HK_SIG HYPRLAND_INSTANCE_SIGNATURE=$HK_SIG
 { read -r HK_WL < "$HK_DIR/wl"; } 2>/dev/null || :; export HK_WL
 # fonts: one fontconfig for every rig script (SF Pro, SF Pro Rounded, SF Mono by their family names from themes/fonts/named),

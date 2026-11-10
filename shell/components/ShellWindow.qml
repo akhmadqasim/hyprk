@@ -21,6 +21,8 @@ PanelWindow {
     // goes 0 -> 1 on the SwiftUI spring from creation, for the window to drive opacity/scale from
     property bool fadeIn: false
     property real appear: 1
+    // re-measure the glass on each appear frame (the window may be created after Panels changed)
+    onAppearChanged: if (fadeIn && appear < 1) glassMoved()
     NumberAnimation on appear { running: win.fadeIn; from: 0; to: 1; duration: Theme.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
 
     // Glass items call these on creation/destruction

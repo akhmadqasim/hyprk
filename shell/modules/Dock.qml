@@ -60,7 +60,7 @@ ShellWindow {
         id: hit
         x: bg.x
         width: bg.width
-        y: dock.hovering ? bg.y - (dock.magnified - dock.base) : bg.y
+        y: dock.magnify > 0 ? bg.y - (dock.magnified - dock.base) : bg.y   // until the ramp-out ends
         height: dock.height - y
     }
 

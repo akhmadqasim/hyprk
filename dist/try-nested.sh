@@ -9,11 +9,12 @@
 #   --shot FILE      test mode: wait for the shell, grim screenshot to FILE, exit
 #   --wait SEC       how long to wait for the shell (default 40)
 #
-# Window size: GNOME decides it (about 1920x1050 on a 2560x1440 logical screen); aquamarine ignores a size
-# set in the Hyprland config. Resize the window with the mouse, hyprk follows. On a scaled host screen
-# (4K at 150%) GNOME upscales the nested picture, so it looks a bit soft. The login session is sharp.
+# Window size: GNOME lets the client pick, so it opens at 1280x720 (logical). Resize or maximise it with the
+# mouse, hyprk follows. Sharp text on a scaled host screen (4K at 200% or 150%): the patched aquamarine
+# (hypr-dev/patches/aquamarine-*-wayland-hidpi.patch) renders at the host's preferred (fractional) scale,
+# and HYPRK_SCALE (default: the GNOME primary monitor scale) sets the matching Hyprland scale.
 # Private dirs: ~/.local/share/hyprk-try/{config,data,state,cache}. Delete that folder to reset.
-# Exit: Ctrl+Alt+Q, Super+Shift+Escape, Apple menu > Log Out, or Ctrl+C here. On exit only the processes this
+# Exit: Ctrl+Alt+Q, Super+Shift+Escape, the logo menu > Log Out, or Ctrl+C here. On exit only the processes this
 # script started (its own session) are killed, including the stray Hyprland child.
 set -u
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -25,7 +26,7 @@ while [ $# -gt 0 ]; do
         --share-config) MODE=farm ;;
         --shot) SHOT=$2; shift ;;
         --wait) WAIT=$2; shift ;;
-        -h|--help) sed -n 2,19p "$0"; exit 0 ;;
+        -h|--help) sed -n 2,18p "$0"; exit 0 ;;
         *) echo "try-nested: unknown option $1" >&2; exit 2 ;;
     esac
     shift
@@ -45,6 +46,16 @@ unset HYPRLAND_INSTANCE_SIGNATURE
 export XDG_CURRENT_DESKTOP=Hyprland        # nested only: stops the "managed externally" warning
 export HYPRLAND_NO_SD_VARS=1               # never touch the host systemd/dbus environment
 export HYPRK_NESTED=1                      # adds Ctrl+Alt fallbacks for the Super binds (hyprk-dist.lua)
+# Hyprland scale = host scale, so the nested UI has the same size as host apps (hyprk-dist.lua reads it)
+host_scale() {
+    python3 -I -c '
+from gi.repository import Gio
+r = Gio.bus_get_sync(Gio.BusType.SESSION).call_sync("org.gnome.Mutter.DisplayConfig", "/org/gnome/Mutter/DisplayConfig",
+    "org.gnome.Mutter.DisplayConfig", "GetCurrentState", None, None, 0, 2000, None).unpack()
+print(next((lm[2] for lm in r[2] if lm[4]), r[2][0][2]))' 2>/dev/null
+}
+export HYPRK_SCALE=${HYPRK_SCALE:-$(host_scale)}
+export HYPRK_SCALE=${HYPRK_SCALE:-1}
 
 LOG=$XDG_STATE_HOME/nested-$(date +%H%M%S).log
 # own session (setsid): everything started from here shares session id = $HPID, so we can clean up exactly it
@@ -106,5 +117,5 @@ if [ -n "$SHOT" ]; then
     exit 0   # EXIT trap closes it
 fi
 
-echo "try-nested: running. Exit with Ctrl+Alt+Q, Super+Shift+Escape, Apple menu > Log Out, or Ctrl+C here."
+echo "try-nested: running. Exit with Ctrl+Alt+Q, Super+Shift+Escape, the logo menu > Log Out, or Ctrl+C here."
 while alive; do sleep 0.5; done

@@ -79,7 +79,7 @@ namespace lg {
     double takeOpacityMarker(std::vector<SRect>& rects, double surfaceW, double surfaceH) {
         if (surfaceW <= 1 || surfaceH <= 0)
             return 1;
-        const auto it = std::ranges::find_if(rects, [&](const SRect& r) { return r.w <= 3 && r.h <= 3 && r.bottom() >= surfaceH - 0.5; });
+        const auto it = std::ranges::find_if(rects, [&](const SRect& r) { return r.w <= 1 && r.h <= 1 && r.bottom() >= surfaceH - 0.5; });
         if (it == rects.end())
             return 1;
         const double opacity = std::clamp(it->x / (surfaceW - 1), 0.0, 1.0);

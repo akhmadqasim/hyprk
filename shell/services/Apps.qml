@@ -169,10 +169,15 @@ Singleton {
         "user-trash": "@TrashIcon", "user-trash-full": "@FullTrashIcon", "folder-download": "@DownloadsFolder",
     })
     readonly property string iconDir: Quickshell.shellDir + "/../themes/icons"
-    readonly property string genericIcon: "file://" + iconDir + "/system/GenericApplicationIcon-512.png"
+    // The macOS icons are user-provided (never shipped). HYPRK_APPLE_ICONS=0 (set by packaging/ when
+    // themes/icons/apps is missing) maps nothing and uses the icon theme instead.
+    readonly property bool appleIcons: Quickshell.env("HYPRK_APPLE_ICONS") !== "0"
+    readonly property string genericIcon: appleIcons ? "file://" + iconDir + "/system/GenericApplicationIcon-512.png"
+                                                     : Quickshell.iconPath("application-x-executable", true)
 
     // mapped macOS icon name for an app, "" when there is none
     function macIconFor(name, appId) {
+        if (!appleIcons) return "";
         for (const k of [appId, name]) {
             const mac = macIcons[Search.normId(k).split(".").pop()];
             if (mac) return mac;

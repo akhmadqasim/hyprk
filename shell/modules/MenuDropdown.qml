@@ -29,6 +29,12 @@ Item {
         }
         switch (action) {
         case "settings": Apps.openSettings(); break;
+        case "about": Panels.showAlert({
+            icon: Distro.aboutIcon,
+            title: "About This Computer",
+            message: Distro.prettyName + (Distro.kernel ? "\nLinux " + Distro.kernel : ""),
+            buttons: [{ label: "More Info…", action: Apps.openSettings }, { label: "OK", isDefault: true }],
+        }); break;
         case "forcequit": Hyprland.dispatch("hl.dsp.window.kill()"); break;
         case "close": Hyprland.dispatch("hl.dsp.window.close()"); break;
         case "fullscreen": Hyprland.dispatch("hl.dsp.window.fullscreen()"); break;

@@ -61,12 +61,23 @@ Singleton {
         history.insert(0, d);
         if (dnd) return;                       // Focus: no banner, no sound
         if (d.style !== "none")
-            banners = [d].concat(banners.filter(b => b.nid !== d.nid)).slice(0, 3);
+            // Banners.qml groups these by app and shows up to three stacks
+            banners = [d].concat(banners.filter(b => b.nid !== d.nid)).slice(0, 12);
         if (!d.silent) Sounds.play(d.critical ? "alert" : "notification");
     }
 
     function hideBanner(id) {
         banners = banners.filter(b => b.nid !== id);
+    }
+
+    // a banner stack goes away as a whole (expired, swiped, clicked)
+    function hideBanners(appName) {
+        banners = banners.filter(b => b.appName !== appName);
+    }
+
+    // close button on a banner stack: the notifications are removed, like macOS
+    function dismissBanners(appName) {
+        banners.filter(b => b.appName === appName).forEach(b => dismiss(b.nid));
     }
 
     function forget(id) {
@@ -117,9 +128,10 @@ Singleton {
     property int testId: 1000000
     IpcHandler {
         target: "notifs"
-        function test(summary: string, body: string): void {
-            root.push({ nid: ++root.testId, appName: "Messages", appIcon: "", image: "", summary: summary,
-                        body: body, time: Date.now(), timeout: 0, critical: false });
+        function test(summary: string, body: string): void { testApp("Messages", summary, body); }
+        function testApp(app: string, summary: string, body: string): void {
+            root.push({ nid: ++root.testId, appName: app, appIcon: "", image: "", summary: summary,
+                        body: body, time: Date.now(), timeout: 0, critical: false, style: "banners", silent: true });
         }
         function clear(): void { root.clearAll(); }
     }

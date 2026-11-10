@@ -156,8 +156,8 @@ Singleton {
     // ---------- menu bar ----------
     readonly property QtObject menuBar: QtObject {
         readonly property int height: 30                 // SPEC.md 7: Solarium menu bar 30 pt (legacy 24)
-        readonly property int sidePadding: 14            // left edge to Apple logo / right edge to clock, TODO verify
-        readonly property int appleLogoSize: 14          // TODO verify
+        readonly property int sidePadding: 14            // left edge to the logo / right edge to clock, TODO verify
+        readonly property int logoSize: 16               // distro logo box; the Apple glyph was 14 + 2
         readonly property int titleHPadding: 9           // inner padding of a menu title pill, TODO verify
         readonly property int titleSpacing: 2            // gap between pills, TODO verify
         readonly property int titleRadius: titleHeight / 2   // pressed glass pill = capsule (reference CC icon)
