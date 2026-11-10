@@ -1,5 +1,10 @@
 # hyprk packaging
 
+**PRIVATE USE ONLY.** What these files build contains Apple fonts, icons, cursors, sounds and wallpapers taken from
+macOS. The built package, the SRPM, the Source0 tarball, a flake's store path and a PKGBUILD's `src/` must NEVER be
+uploaded or shared: not the AUR, not COPR, not a PPA or other repo, not a GitHub release, not a binary cache. They are for
+the machines of the repo's owner. There is no upload or publish step anywhere in packaging/, and none may be added.
+
 Goal: install hyprk on any Linux distro (Ubuntu/Debian, Arch and derivatives, Fedora, openSUSE, others)
 without the dev prefix at `/mnt/code/hypr-dev` and without hard-coded `/mnt/code` paths.
 
@@ -15,7 +20,7 @@ without the dev prefix at `/mnt/code/hypr-dev` and without hard-coded `/mnt/code
 ## Install layout (install.sh)
 
 ```
-${XDG_DATA_HOME:-~/.local/share}/hyprk/     HYPRK_ROOT: tracked repo files (no reference/, no Apple assets)
+${XDG_DATA_HOME:-~/.local/share}/hyprk/     HYPRK_ROOT: tracked repo files incl. fonts, icons, cursors, sounds (no reference/, small wallpaper set)
   bin/hyprk-session                          login session: exports HYPRK_ROOT/HYPRK_DEV, runs dist/hyprk-session
   bin/hyprk-try                              nested try: runs dist/try-nested.sh
   bin/hyprk-rebuild-plugin                   rebuild liquidglass after a Hyprland update
@@ -73,15 +78,27 @@ Why not a COPR/PPA first: Fedora and Ubuntu both lack a new-enough Hyprland in t
 repos (solopasha/hyprland COPR and similar) could not be checked (COPR pages were behind a bot check). A COPR is
 the right long-term answer for Fedora (below); the source build works today.
 
-## Apple assets: never shipped
+## Apple assets: bundled (private use only), except the wallpaper collection
 
-The repo is private and TRACKS the Apple assets on purpose (commit f6ca83b), so `git ls-files` alone is not a filter.
-Every packaging file therefore drops the same list (`NOSHIP` in `install.sh`, `_noship` in the PKGBUILD, the
-`git archive` command and the `%prep` check in the spec, `noship` in the flake): `reference/`, `packaging/`, `state/`,
-`themes/fonts`, `themes/wallpapers`, `themes/icons/{apps,apps-hires,system,hyprk-apple}`,
-`themes/cursors/{png,accessibility,hiservices,cursorasset,theme/hyprk-cursors}`, `sounds/{oga,wav,originals}`.
-If a new asset directory is added to the repo, add it to all five places. Nothing is downloaded. The spec's Source0
-tarball must be made with the exclusions (the SRPM would otherwise carry the assets). Default look without them:
+The look needs the Apple fonts, icons, cursors and sounds, so every package contains them and works fully without
+`--assets` (the repo is private and tracks them, commit f6ca83b). One list, mirrored in four files (`NOSHIP` +
+`SHIP_WALLPAPERS` + `WP_MAX` in `install.sh`, `_noship` + `_wallpapers` + `_wpmax` in the PKGBUILD, the `git archive`
+commands + `%prep` guard + `%install` loop in the spec, `noship` + `wallpapers` + `wpmax` in the flake):
+
+| Included | Left out |
+|---|---|
+| everything tracked, i.e. `themes/fonts`, `themes/icons` (`apps`, `apps-hires`, `system`, `hyprk-apple`), `themes/cursors`, `sounds/{oga,wav}` | `reference/` (screenshots, RE dumps), `packaging/`, `state/` |
+| from `themes/wallpapers/png` only `TahoeLight.png`, `TahoeDark.png`, `DefaultAerial.png` (the names `wallpaper.sh`, `lockscreen/` and the Appearance pane use as defaults), downscaled to 3840 px, plus generated `hyprk-gradient-{light,dark}.png` | the rest of the wallpapers (`heic/`, `dynamic-sonoma/`, 16 more PNGs: 1.4 GB), `sounds/originals` (unconverted duplicates of `wav`/`oga`) |
+
+If a new asset dir is added to the repo it is shipped automatically (it is tracked); if it is big or not needed at
+runtime, add it to the left-out list in all four places. To get the other wallpapers: `install.sh --assets <checkout>`
+copies the whole `themes/wallpapers` (full size) into the install, or copy PNG/JPG files into
+`<prefix>/themes/wallpapers/png/` by hand (`/usr/share/hyprk/...` for the PKGBUILD and the spec, with sudo). The
+Wallpaper pane lists the files in that directory, so it works with the small set and shows the extra ones once copied.
+The spec's Source0 tarball must be made with the `git archive` commands at the top of the spec (the `%prep` guard
+fails when `reference/`, `packaging/`, `state/`, `sounds/originals` or extra wallpapers are in it).
+A checkout without the Apple assets (for example a public tarball) still installs: `install.sh` then uses these
+fallbacks:
 
 | Asset | Default | Where the fallback lives |
 |---|---|---|
@@ -93,8 +110,8 @@ tarball must be made with the exclusions (the SRPM would otherwise carry the ass
 | Cursors | Adwaita | needs the `start.sh`/`hyprland.lua` change below (`HYPRK_CURSOR_THEME`) |
 | Sounds | silent | `shell/scripts/sound.sh` exits when a file is missing |
 
-Optional step for users who extracted the files from their own macOS install (`reference/ASSETS.md`):
-`install.sh --assets DIR` copies `DIR/themes/fonts`, `themes/wallpapers`, `themes/icons/{apps,system,hyprk-apple}`,
+`install.sh --assets DIR` copies more from a checkout laid out like this repo (or your own extraction, `reference/ASSETS.md`):
+it copies `DIR/themes/fonts`, `themes/wallpapers`, `themes/icons/{apps,system,hyprk-apple}`,
 `themes/cursors/theme/hyprk-cursors`, `sounds/{oga,wav}` when present. Nothing is ever downloaded.
 On this machine `--assets /mnt/code/hyprk` works because the checkout has that layout.
 
@@ -178,22 +195,27 @@ same `hyprland` derivation (ABI always matches) and wraps `dist/hyprk-session`. 
   are missing in the repos (Ubuntu 24.04 with `--from-source no`, Fedora with `--from-source no`). Not checked on
   openSUSE (zypper cannot simulate without root, so names are not pre-checked there).
 - Real `install.sh --yes` in an archlinux container (distro Hyprland 0.57.2): packages, Finder + liquidglass built,
-  447 files, no asset file, gradient wallpapers, lock config rewritten, session file written, `hyprk-session --print`
-  resolves, no `state/` created. Never logged in to the session.
+  2270 files, 193 MB installed (wallpapers 51 MB). Fonts, icons, cursors, sounds and the 3 default wallpapers are in,
+  the wallpaper collection, `reference/` and `sounds/originals` are not. Lock config points at TahoeLight.png and SF Pro,
+  `HYPRK_APPLE_ICONS=1`. `hyprk-session --print` resolves, no `state/` created. Never logged in to the session.
 - All source tags in `SRC_TAGS` exist upstream (`git ls-remote`). The source build itself was not run on any distro here.
-- PKGBUILD: `makepkg -s` in archlinux (Hyprland 0.57.2): builds, 476 files, 10 MB, no asset file,
-  `hyprland=<version>` pin in .PKGINFO. namcap leftovers: ELF files under /usr/share (by design), `custom` license.
+- PKGBUILD: `makepkg -s` in archlinux: 2394 files, 134 MB package, 192 MB installed, `hyprland=<version>` pin in
+  .PKGINFO, same content checks as above. namcap leftovers: ELF files under /usr/share (by design), `custom` license.
 - Spec: rpmlint (spec and RPM) and `rpmbuild -bb` in fedora:latest with only the plugin step stubbed (no
-  hyprland-devel in Fedora): builds, 407 files, no asset file. rpmlint leftovers: binary in /usr/share, license TBD, devel
-  files. Requires that Fedora lacks: hyprland, hyprlock, hypridle, quickshell >= 0.3.2 (COPR needed).
+  hyprland-devel in Fedora): 2326 files, 126 MB RPM, same content checks. The `%prep` guard was shown to fail for an extra
+  wallpaper in the tarball and for `reference/` in it. rpmlint leftovers: binary in /usr/share, license TBD, devel files.
+  Requires that Fedora lacks: hyprland, hyprlock, hypridle, quickshell >= 0.3.2.
 - Flake: `nix flake check --no-build` and a full `nix build` in nixos/nix (nixpkgs 2026-11-07): Finder and plugin built
-  against nixpkgs hyprland, 414 files, no asset file. Not run as a session.
+  against nixpkgs hyprland, 2155 files, 183 MB, same content checks. Not run as a session.
+- Wallpaper part of every package: 52 MB (TahoeLight 16.7, TahoeDark 16.4, DefaultAerial 9.8 MB, two gradients 9.5 MB).
+  The Tahoe originals are 6016 px and 46 MB each as PNG; they are downscaled to 3840 px at package time with ImageMagick.
 
-Defects found and fixed in this pass: the repo now tracks the Apple assets, so every package would have shipped them
-(install.sh, PKGBUILD, spec, flake all filter now); flake `src = ../.` pointed at packaging/ instead of the repo
-(`../..`) and lacked hyprutils; spec used `%cmake_build --dir`, which silently builds the wrong directory, and did not
-install `/usr/bin/hyprk-session` or the session entry; reinstall overwrote `state/`; the GCC check came after the
-package install; `dist/install-session.sh --uninstall` removed any hyprk.desktop, even a package's.
+Defects found and fixed in the first pass: flake `src = ../.` pointed at packaging/ instead of the repo (`../..`) and
+lacked hyprutils; spec used `%cmake_build --dir`, which silently builds the wrong directory, and did not install
+`/usr/bin/hyprk-session` or the session entry; reinstall overwrote `state/`; the GCC check came after the package
+install; `dist/install-session.sh --uninstall` removed any hyprk.desktop, even a package's. Second pass: the packages
+now bundle the Apple fonts, icons, cursors and sounds (they are needed for the look) and only a small wallpaper set;
+a `%prep` macro in a spec comment is expanded by rpm and had to be reworded.
 
 Never run: a login into an installed session, the source build of the hyprwm stack / hyprlock / Quickshell, `--assets`,
 `install.sh --yes` on a non-Arch distro, the spec whole (needs a COPR with Hyprland 0.57), a package on Manjaro/Endeavour.

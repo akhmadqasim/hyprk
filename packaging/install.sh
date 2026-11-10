@@ -10,7 +10,7 @@
 #   --prefix DIR         install root (default ${XDG_DATA_HOME:-~/.local/share}/hyprk), becomes HYPRK_ROOT
 #   --from-source MODE   auto (default) | yes | no: build Hyprland, Quickshell and hyprlock from source into
 #                        PREFIX/dev/prefix. auto = only when the distro package is missing or too old.
-#   --assets DIR         copy YOUR OWN extracted macOS assets (fonts, wallpapers, icons, sounds, cursors) from DIR,
+#   --assets DIR         copy more of your own extracted assets (typically the rest of the wallpapers) from DIR,
 #                        laid out like the repo (DIR/themes/fonts, DIR/sounds/oga ...). Never downloaded, never shipped.
 #   --no-deps            do not install distro packages (print them only)
 #   --no-session         do not install /usr/share/wayland-sessions/hyprk.desktop (the only step that needs sudo
@@ -33,11 +33,15 @@ SRC_TAGS="wayland-protocols=1.50 hyprwayland-scanner=v0.4.6 hyprutils=v0.14.3 hy
 hyprland-protocols=v0.8.0 hyprcursor=v0.1.14 hyprgraphics=v0.6.0 aquamarine=v0.16.0 Hyprland=v0.57.2
 quickshell=v0.3.2 hyprlock=v0.9.7"
 
-# Never copied into an install: Apple-derived assets (the repo is private and tracks them on purpose), reference/
-# (macOS screenshots), packaging/, and the dev's own state/. Same list as packaging/arch, fedora and nix.
-NOSHIP="reference packaging state themes/fonts themes/wallpapers themes/icons/apps themes/icons/apps-hires
-themes/icons/system themes/icons/hyprk-apple themes/cursors/png themes/cursors/accessibility themes/cursors/hiservices
-themes/cursors/cursorasset themes/cursors/theme/hyprk-cursors sounds/oga sounds/wav sounds/originals"
+# What an install contains. The repo is private and tracks Apple fonts, icons, cursors, sounds and wallpapers; the look
+# needs them, so they are copied (this install is for YOUR machine only: never upload or share the result).
+# Left out: reference/ (macOS screenshots, RE dumps), packaging/, the dev's state/, sounds/originals (the unconverted
+# duplicates of sounds/wav and sounds/oga) and the whole wallpaper collection (1.4 GB). Only the wallpapers in
+# SHIP_WALLPAPERS (themes/wallpapers/png, what the code uses as defaults) are copied, downscaled to WP_MAX px.
+# The same lists are mirrored in packaging/arch/PKGBUILD, fedora/hyprk.spec and nix/flake.nix.
+NOSHIP="reference packaging state themes/wallpapers sounds/originals"
+SHIP_WALLPAPERS="TahoeLight.png TahoeDark.png DefaultAerial.png"
+WP_MAX=3840
 
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 SRC=${HYPRK_SRC:-$(cd "$HERE/.." && pwd)}
@@ -364,12 +368,12 @@ else
 fi
 
 # ---------------------------------------------------------------- 3. files ----
-step "3. copy hyprk into $PREFIX (no Apple assets, no reference/, no build dirs)"
+step "3. copy hyprk into $PREFIX (fonts, icons, cursors, sounds included; no reference/, no wallpaper collection)"
 [ -d "$SRC/shell" ] && [ -d "$SRC/config/hypr" ] || { say "ERROR: $SRC is not a hyprk checkout"; exit 1; }
 run mkdir -p "$PREFIX"
 NOSHIP_RE="^($(echo $NOSHIP | tr ' ' '|'))/"
 if [ -d "$SRC/.git" ] && have git; then
-    # the tracked files minus NOSHIP (the repo tracks the Apple assets, so the filter is what keeps them out)
+    # the tracked files minus NOSHIP
     say "[files] git ls-files minus: $(echo $NOSHIP) ($(git -C "$SRC" ls-files | grep -cvE "$NOSHIP_RE") files)"
     if [ $YES = 1 ]; then
         git -C "$SRC" ls-files -z | grep -zvE "$NOSHIP_RE" | tar -C "$SRC" --null -T - -cf - | tar -C "$PREFIX" -xf -
@@ -387,23 +391,29 @@ run mkdir -p "$PREFIX/bin" "$PREFIX/themes/wallpapers/png"
 
 # ---------------------------------------------------------------- 4. assets ----
 step "4. assets"
+has_file() { [ -e "$SRC/$1" ] || { [ -n "$ASSETS" ] && [ -e "$ASSETS/$1" ]; }; }
+# the small default wallpaper set from the checkout, downscaled (the originals are 6016 px, 46 MB each)
+for w in $SHIP_WALLPAPERS; do
+    [ -f "$SRC/themes/wallpapers/png/$w" ] || { say "  - wallpaper $w: not in $SRC, skipped"; continue; }
+    if have magick || [ $YES = 0 ]; then
+        run magick "$SRC/themes/wallpapers/png/$w" -resize "${WP_MAX}x${WP_MAX}>" -define png:compression-level=9 "$PREFIX/themes/wallpapers/png/$w"
+    else run cp "$SRC/themes/wallpapers/png/$w" "$PREFIX/themes/wallpapers/png/$w"; fi
+done
 if [ -n "$ASSETS" ]; then
-    say "your own assets from $ASSETS (only these sub-dirs, each only if present):"
+    say "more of your own assets from $ASSETS (only these sub-dirs, each only if present; e.g. the rest of the wallpapers):"
     for d in themes/fonts themes/wallpapers themes/icons/apps themes/icons/system themes/icons/hyprk-apple \
              themes/cursors/theme/hyprk-cursors sounds/oga sounds/wav; do
         [ -d "$ASSETS/$d" ] || { say "  - $d: not in $ASSETS, skipped"; continue; }
         run mkdir -p "$PREFIX/$(dirname "$d")"
         run cp -a "$ASSETS/$d" "$PREFIX/$(dirname "$d")/"
     done
-else
-    say "no --assets: free defaults (Inter font, generated gradient wallpaper, icon theme icons, Adwaita cursors, no sounds)"
 fi
+# which look is available (a checkout without the Apple assets, e.g. a public tarball, gets the free fallbacks)
 HAS_SF=0 HAS_ICONS=0 HAS_CURSORS=0
-if [ -n "$ASSETS" ]; then
-    [ -d "$ASSETS/themes/fonts" ] && HAS_SF=1
-    [ -d "$ASSETS/themes/icons/apps" ] && HAS_ICONS=1
-    [ -d "$ASSETS/themes/cursors/theme/hyprk-cursors" ] && HAS_CURSORS=1
-fi
+has_file themes/fonts && HAS_SF=1
+has_file themes/icons/apps && HAS_ICONS=1
+has_file themes/cursors/theme/hyprk-cursors && HAS_CURSORS=1
+[ $HAS_SF = 1 ] && [ $HAS_ICONS = 1 ] && [ $HAS_CURSORS = 1 ] || say "note: some of fonts/icons/cursors are not in $SRC: the free fallbacks (Inter, icon theme, Adwaita) are used for those"
 # a free wallpaper (ImageMagick): wallpaper.sh picks *light* / *dark* from themes/wallpapers
 for m in light dark; do
     f=$PREFIX/themes/wallpapers/png/hyprk-gradient-$m.png
@@ -416,7 +426,7 @@ done
 
 # hyprlock has no relative paths: point the in-tree lock config at this prefix (and at Inter without SF fonts)
 LOCKCONF=$PREFIX/lockscreen/hyprlock.conf
-SED=(-e "s|^\\\$WALLPAPER = .*|\$WALLPAPER = $PREFIX/themes/wallpapers/png/$([ -n "$ASSETS" ] && [ -f "$ASSETS/themes/wallpapers/png/TahoeLight.png" ] && echo TahoeLight || echo hyprk-gradient-light).png|"
+SED=(-e "s|^\\\$WALLPAPER = .*|\$WALLPAPER = $PREFIX/themes/wallpapers/png/$(has_file themes/wallpapers/png/TahoeLight.png && echo TahoeLight || echo hyprk-gradient-light).png|"
      -e "s|^\\\$AVATAR = .*|\$AVATAR = $PREFIX/lockscreen/assets/avatar-default.png|"
      -e "s|^\\\$STATUS = .*|\$STATUS = $PREFIX/lockscreen/scripts/status-icon.sh|"
      -e "s|^\\\$STATUS_DIR = .*|\$STATUS_DIR = $PREFIX/lockscreen/assets/status|")

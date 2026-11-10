@@ -1,8 +1,14 @@
 # hyprk for Arch / Manjaro / EndeavourOS. Built and packaged in an archlinux container (Hyprland 0.57.2) on 2026-11-10,
-# never installed or run as a session. Private repo: the source is the local checkout (HYPRK_SRC, default two dirs
-# above this file), so only COMMITTED files are packaged. No Apple asset is ever packaged (see the filter in package()).
+# never installed or run as a session. Source = the local checkout (HYPRK_SRC, default two dirs above this file), so only
+# COMMITTED files are packaged.
 #
 #   cd packaging/arch && makepkg -si
+#
+# !! The built package CONTAINS APPLE FONTS, ICONS, CURSORS, SOUNDS AND WALLPAPERS. It is for your own machines only.
+# !! NEVER upload it or this source tree with the assets anywhere: not the AUR, not a repo, not a release, not a cache.
+# What goes in: everything tracked except reference/, packaging/, state/, sounds/originals (duplicates of sounds/wav)
+# and the wallpaper collection. Only the wallpapers in _wallpapers are included, downscaled (see package()).
+# The rest of the wallpapers: copy them to /usr/share/hyprk/themes/wallpapers/png/ by hand (packaging/README.md).
 #
 # /usr/share/hyprk is read-only: config/hypr/state-dir.sh (sourced by start.sh) puts the state in
 # ${XDG_STATE_HOME:-~/.local/state}/hyprk then, so the wrapper below does not set HYPRK_STATE.
@@ -11,9 +17,9 @@
 pkgname=hyprk-git
 pkgver=r0
 pkgrel=1
-pkgdesc='macOS 27-look desktop on Hyprland: Quickshell shell, Liquid Glass plugin, Finder, System Settings (no Apple assets)'
+pkgdesc='macOS 27-look desktop on Hyprland: Quickshell shell, Liquid Glass plugin, Finder, System Settings (contains Apple assets, private use only)'
 arch=('x86_64' 'aarch64')
-url='https://example.invalid/hyprk'   # private repo, no public URL
+url='https://example.invalid/hyprk'   # private repo, no public URL; do not publish this package
 license=('custom')                    # not chosen yet (namcap wants an SPDX id or a license file)
 depends=('hyprland>=0.57' 'quickshell>=0.3.2' 'hyprlock>=0.9' 'hypridle'
          'qt6-base' 'qt6-declarative' 'qt6-wayland' 'qt6-svg'
@@ -27,9 +33,10 @@ options=('!debug')   # the two binaries live under /usr/share/hyprk (hyprk looks
 source=("hyprk::git+file://${HYPRK_SRC:-$(cd ../.. && pwd)}")
 sha256sums=('SKIP')
 
-# Never packaged: Apple-derived assets (tracked in the private repo), reference/, packaging/, the dev's state/.
-# Keep in sync with NOSHIP in packaging/install.sh.
-_noship='^(reference|packaging|state|themes/fonts|themes/wallpapers|themes/icons/(apps|apps-hires|system|hyprk-apple)|themes/cursors/(png|accessibility|hiservices|cursorasset|theme/hyprk-cursors)|sounds/(oga|wav|originals))/'
+# Left out (keep in sync with NOSHIP / SHIP_WALLPAPERS in packaging/install.sh, the spec and the flake):
+_noship='^(reference|packaging|state|themes/wallpapers|sounds/originals)/'
+_wallpapers=(TahoeLight.png TahoeDark.png DefaultAerial.png)   # themes/wallpapers/png, the defaults the code uses
+_wpmax=3840                                                    # px, the originals are 6016 px and 46 MB each
 
 pkgver() {
     cd hyprk
@@ -53,22 +60,22 @@ package() {
     git ls-files -z | grep -zvE "$_noship" | tar --null -T - -cf - | tar -C "$root" -xf -
     install -Dm755 build-finder/hyprk-finder "$root/finder/build/hyprk-finder"
     install -Dm755 build-plugin/libliquidglass.so "$root/plugin/build/libliquidglass.so"
-    # config/icons/hyprk-cursors points into the cursor theme that is not shipped
-    find "$root" -xtype l -delete; rmdir --ignore-fail-on-non-empty "$root/config/icons"
-    # free defaults for the assets that are not shipped: gradient wallpapers, Inter instead of SF Pro (same as install.sh)
+    # the default wallpapers, downscaled, plus gradient fallbacks (same as install.sh)
     install -d "$root/themes/wallpapers/png"
+    local w
+    for w in "${_wallpapers[@]}"; do
+        magick "themes/wallpapers/png/$w" -resize "${_wpmax}x${_wpmax}>" -define png:compression-level=9 \
+            "$root/themes/wallpapers/png/$w"
+    done
     magick -size 3840x2160 'gradient:#2f7fd8-#7cc4f0' \( -size 3840x2160 'radial-gradient:#9a7be0-none' \) \
         -compose over -composite "$root/themes/wallpapers/png/hyprk-gradient-light.png"
     magick -size 3840x2160 'gradient:#0b1a3a-#1d4f8f' \( -size 3840x2160 'radial-gradient:#3a1f5c-none' \) \
         -compose over -composite "$root/themes/wallpapers/png/hyprk-gradient-dark.png"
     # hyprlock has no relative paths
-    sed -i -e 's|/mnt/code/hyprk|/usr/share/hyprk|g' \
-        -e 's|^\$WALLPAPER = .*|$WALLPAPER = /usr/share/hyprk/themes/wallpapers/png/hyprk-gradient-light.png|' \
-        -e 's|^\$FONT = SF Pro$|$FONT = Inter|' -e 's|^\$FONT_ROUNDED = SF Pro Rounded$|$FONT_ROUNDED = Inter|' \
-        "$root/lockscreen/hyprlock.conf"
+    sed -i 's|/mnt/code/hyprk|/usr/share/hyprk|g' "$root/lockscreen/hyprlock.conf"
     install -Dm755 /dev/stdin "$pkgdir/usr/bin/hyprk-session" <<'SH'
 #!/bin/sh
-export HYPRK_ROOT=/usr/share/hyprk HYPRK_DEV=/usr/share/hyprk/dev HYPRK_APPLE_ICONS=0 HYPRK_CURSOR_THEME=Adwaita
+export HYPRK_ROOT=/usr/share/hyprk HYPRK_DEV=/usr/share/hyprk/dev
 exec /usr/share/hyprk/dist/hyprk-session "$@"
 SH
     install -d "$root/dev"; echo ': # distro Hyprland' > "$root/dev/env.sh"
