@@ -126,8 +126,8 @@ Singleton {
         readonly property real notifTime: 11        // TODO verify
         readonly property real notifApp: 11         // TODO verify
         readonly property real switcherLabel: 13    // TODO verify
-        readonly property real ccTitle: 13          // measured ~2x reference
-        readonly property real ccSub: 11            // TODO verify
+        readonly property real ccTileTitle: 12      // CC toggle and slider titles: SF 12 semibold (Q-panels-06)
+        readonly property real ccTileSub: 11        // CC toggle subtitle: SF 11 regular (Q-panels-06)
         readonly property real spotlightInput: 26   // query text dominates (reference/JUDGE.md)
         readonly property real spotlightRow: 15     // TODO verify
         readonly property real spotlightHeader: 11  // TODO verify
@@ -189,7 +189,6 @@ Singleton {
         readonly property real blurRadius: 40                 // px, magick gaussian sigma ~ radius/2, TODO verify
         // tint over the blurred wallpaper
         readonly property color tint: theme.dark ? Qt.rgba(0.11, 0.11, 0.12, 0.55) : Qt.rgba(0.98, 0.98, 0.99, 0.55)   // TODO verify
-        readonly property color darkVeil: Qt.rgba(0.10, 0.10, 0.11, 0.62)             // dark mode over plugin glass, TODO verify
         readonly property color tintStrong: theme.dark ? Qt.rgba(0.12, 0.12, 0.13, 0.72) : Qt.rgba(0.97, 0.97, 0.98, 0.74) // menus / spotlight
         // Reduce-transparency solid materials (opaque grey-white / dark grey)
         readonly property color solid: theme.dark ? "#2A2A2C" : "#ECECEE"          // TODO verify
@@ -343,16 +342,7 @@ Singleton {
         readonly property int width: columnWidth * 2 + gap   // SPEC 9.9.1: 292 = rect4x1 tile span (304 grid incl. 6pt half-gaps)
         readonly property int tileHeight: 64             // SPEC 9.9.1: 1x1 height
         readonly property int tileRadius: tileHeight / 2 // capsule
-        readonly property int tilePadding: 12            // TODO verify
-        readonly property int toggleSize: 38             // white circle inside a capsule, measured vs reference
-        readonly property int sliderTrack: 6             // knobless white fill, measured vs reference
-        readonly property real toggleGlyph: 0.56         // glyph size / toggle circle
-        readonly property int buttonGlyph: 22            // round button glyph, TODO verify
-        readonly property int sliderInset: 16            // TODO verify
-        readonly property int artSize: 38                // Now Playing art placeholder, TODO verify
-        readonly property int artRadius: 8
-        readonly property int marginTop: 10              // below menu bar, measured
-        readonly property int marginRight: 12            // TODO verify
+        readonly property int buttonGlyph: 24            // round 64 buttons: ~24 pt symbols (Q-panels-07)
         // darkening veil over the plugin glass: white labels need ~5:1 like the reference
         // the plugin's controlcenter recipe gives the reference grey frost itself; no extra veil
         readonly property color pluginLift: "transparent"
@@ -364,17 +354,63 @@ Singleton {
         readonly property color tileTint: theme.dark ? Qt.rgba(0.12, 0.12, 0.13, 0.45) : Qt.rgba(0.30, 0.28, 0.27, 0.42)   // QML material: dark neutral frost
         readonly property color tileSolid: theme.dark ? "#3A3A3C" : "#8E8E93"
         readonly property color text: "#FFFFFF"
-        readonly property color subtext: Qt.rgba(1, 1, 1, 0.78)
         readonly property color toggleOnBg: "#FFFFFF"
         readonly property color toggleOnIcon: Tokens.accent   // follows the accent (Blue under Multicolor), not measured
-        readonly property color toggleOffBg: Qt.rgba(1, 1, 1, 0.18)     // round buttons
         readonly property color toggleOffIcon: "#FFFFFF"
         // capsule toggles when off: white at 25 % over the tile, white glyph (MAC-ANSWERS #53: 203 / 146 / 88
         // over a 186 / 109 / 32 tile, all glyphs 255)
         readonly property color capsuleOffBg: Qt.rgba(1, 1, 1, 0.25)
         readonly property color capsuleOffIcon: "#FFFFFF"
-        readonly property color sliderTrackColor: Qt.rgba(1, 1, 1, 0.28)
         readonly property color sliderFillColor: "#FFFFFF"
+
+        // ---- 27.2.1 measurements (MAC-ANSWERS.md Q-panels-05..-11, "Glass checks (#53)"), pt ----
+        readonly property int top: 12                    // grid top 12 below the menu bar (Q-panels-05)
+        readonly property int right: 14                  // grid right margin (Q-panels-05)
+        // 2x1 toggle tile (Q-panels-07): circle 36 at x 14, centred; text from x 56 (ink 56.5); right pad 10;
+        // with a subtitle the title baseline is 27.5 and the subtitle's 44
+        readonly property int circle: 36
+        readonly property int circleX: 14
+        readonly property real circleGlyph: 0.5          // ~18 pt symbols in the 36 circle
+        readonly property int textX: 56
+        readonly property int textRight: 10
+        readonly property real titleBaseline: 27.5
+        readonly property real subtitleBaseline: 44
+        // labels over the tile T (#53): title = white at 85 % (245/233/221 over 186/109/32); subtitle = plus-lighter
+        // T + 140 (255/249/172), drawn by shaders/plustext.frag; slider titles and glyphs 255
+        readonly property color title: Qt.rgba(1, 1, 1, 0.85)
+        readonly property real subtitleLift: 140 / 255
+        // slider module 292 x 64, continuous r 24 (Q-panels-05, -08): title ink x 17, cap top 13.5 (baseline 22);
+        // track 4 tall, centre y 42, x 36.5..254 (Display); end glyphs centred at x 23 and 24.25 from the right;
+        // fill 255, track plus-lighter T + 20
+        readonly property int sliderRadius: 24
+        readonly property real sliderTitleX: 17
+        readonly property real sliderTitleBaseline: 22
+        readonly property real trackX: 36.5
+        readonly property real trackRight: 38
+        readonly property real trackHeight: 4
+        readonly property real trackY: 42
+        readonly property real glyphLeft: 23
+        readonly property real glyphRight: 24.25
+        readonly property real trackLift: 20 / 255
+        // knob: none at rest, white 18 x 14 on hover, a clear lens about 24 x 20 while pressed, in about 3 frames
+        // (Q-panels-08, -09); past an end the track and fill stretch up to about 5 pt and spring back in 0.13 s
+        readonly property real knobW: 18
+        readonly property real knobH: 14
+        readonly property real lensGrow: 24 / 18
+        readonly property int lensMs: 50
+        readonly property real overdrag: 5
+        readonly property int overdragBackMs: 130
+        // Now Playing 2x2 (Q-panels-11): art 40 at (14, 14), continuous r 10, white 14 %; title at y 72;
+        // buttons 30 x 30 at y 96, x 15 / 55 / 95
+        readonly property int npArt: 40
+        readonly property int npArtXY: 14
+        readonly property int npArtRadius: 10
+        readonly property color npArtFill: Qt.rgba(1, 1, 1, 0.14)
+        readonly property int npTitleY: 72
+        readonly property int npButton: 30
+        readonly property int npButtonsX: 15
+        readonly property int npButtonsY: 96
+        readonly property int npButtonPitch: 40
     }
 
     // ---------- spotlight ----------

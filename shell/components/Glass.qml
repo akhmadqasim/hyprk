@@ -22,8 +22,9 @@ Item {
     property color solidColor: Theme.glass.solid
     property bool shadow: true
     // tint drawn on top of the plugin's glass (the plugin owns blur, rim, shadow)
-    // default: in dark mode a dark veil, so the plugin glass stays dark over bright windows
-    property color pluginLift: Theme.dark ? Theme.glass.darkVeil : "transparent"
+    // default: none, the plugin's recipes carry Apple's probe values themselves (a dark-mode veil made dark menus
+    // read 62 over white instead of the Mac's 120)
+    property color pluginLift: "transparent"
     // optional 1px rim drawn over plugin glass (the plugin's own rim is subtle)
     property color pluginRim: "transparent"
     // Liquid Glass materialize progress (ShellWindow.glassMaterialize). The QML fallback fades.
