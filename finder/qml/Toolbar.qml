@@ -148,6 +148,9 @@ Item {
 
         ToolButton {
             icon: "magnifyingglass"
+            iconWeight: "medium"       // 13 pt, .large, medium (names.json finder.toolbarGlyph, likely)
+            iconScale: "large"
+            iconPointSize: 13
             onClicked: {
                 root.searching = true;
                 field.forceActiveFocus();

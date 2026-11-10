@@ -6,6 +6,9 @@ Item {
 
     property string icon
     property real iconSize: Theme.toolbar.iconSize
+    property string iconWeight: "regular"
+    property string iconScale: ""
+    property real iconPointSize: 0           // 0 = the default for the size
     signal clicked()
 
     implicitWidth: Theme.toolbar.buttonWidth
@@ -20,9 +23,13 @@ Item {
         visible: tap.pressed
     }
     Symbol {
+        id: glyph
         anchors.centerIn: parent
         name: root.icon
         size: root.iconSize
+        weight: root.iconWeight
+        scale: root.iconScale
+        pointSize: root.iconPointSize > 0 ? root.iconPointSize : glyph.defaultPointSize
         color: root.enabled ? Theme.color.toolbarIcon : Theme.color.toolbarIconDisabled
     }
     TapHandler {

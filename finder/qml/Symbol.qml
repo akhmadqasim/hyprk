@@ -13,10 +13,13 @@ Item {
     property real size: 16                           // layout box, size x size
     property color color: Theme.color.label
     property color knockColor: "white"               // hand-drawn fallback only
-    property real pointSize: Symbols.pointSize(name, size)
+    readonly property real defaultPointSize: Symbols.pointSize(name, size)
+    property real pointSize: defaultPointSize
     property string weight: "regular"                // the 27.2.1 Finder toolbar glyphs match regular
+    // "large" = the 13 pt / .large / medium renders of the sidebar glyphs (set pointSize: 13 and weight: "medium")
+    property string scale: ""
 
-    readonly property string key: Symbols.sfKey(name, weight)
+    readonly property string key: Symbols.sfKey(name, weight, scale)
     readonly property var box: key ? SF.layout(key, pointSize, size, false) : null
 
     function hex(c) { return Qt.rgba(c.r, c.g, c.b, 1).toString(); }

@@ -41,7 +41,6 @@ const table = {
     "chevron.left": [S("M15 4.5L7.5 12L15 19.5", 2.1)],
     "chevron.right": [S("M9 4.5L16.5 12L9 19.5", 2.1)],
     "chevron.down": [S("M7 10L12 15L17 10", 2.2)],
-    "chevron.small.right": [S("M10 7L15 12L10 17", 1.6)],
     "view.icons": [S(rr(4, 4, 6.8, 6.8, 1.8)), S(rr(13.2, 4, 6.8, 6.8, 1.8)), S(rr(4, 13.2, 6.8, 6.8, 1.8)), S(rr(13.2, 13.2, 6.8, 6.8, 1.8))],
     "view.list": [F(circle(4.6, 6, 1.3)), F(circle(4.6, 12, 1.3)), F(circle(4.6, 18, 1.3)),
                   S("M8.5 6H20.5M8.5 12H20.5M8.5 18H20.5", 1.7)],
@@ -71,7 +70,7 @@ const scale = { "chevron.small.right": 0.65 };
 function has(name) { return table.hasOwnProperty(name) || SF.resolve(name) !== ""; }
 
 // SF Symbol file key for `name` ("" when it has none) and its point size in a `size` box.
-function sfKey(name, weight) { return SF.pick(name, weight || "regular", "", -1); }
+function sfKey(name, weight, scale) { return SF.pick(name, weight || "regular", "", -1, scale || ""); }
 function pointSize(name, size) { return size * SF.pointScale * (scale[name] || 1); }
 
 // SVG markup of the hand-drawn `name` in `color` (CSS color string). knock parts are drawn in `knockColor`.

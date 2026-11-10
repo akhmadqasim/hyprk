@@ -50,6 +50,21 @@ test("pick: weight, AppKit default rendering, variable levels", () => {
     assert.equal(SF.pick("speaker.wave.3.fill", "medium", "", 0.3), "speaker.wave.3.fill.medium.var-20");
 });
 
+test("pick: the Finder's 13 pt large-scale glyphs", () => {
+    assert.equal(SF.pick("shared", "medium", "", -1, "large"), "person.2.medium-large");
+    assert.equal(SF.pick("clock", "medium", "", -1, "large"), "clock.medium-large");
+    assert.equal(SF.pick("magnifyingglass", "regular", "", -1, "large"), "magnifyingglass.medium-large");
+    assert.equal(SF.pick("zoom", "medium", "", -1, "large"), "");                  // no SVG at all
+    assert.equal(SF.pick("wifi", "regular", "", -1, "large"), "wifi.regular");      // no large file: the normal one
+    for (const w of ["regular", "medium", "semibold"]) assert.ok(SF.glyphs["person.2." + w], w);
+    assert.equal(SF.glyphs["clock.medium-large"][0], 13);                           // drawn at pointSize 13
+    // the 27 glyphs of names.json finder (sidebarGlyph + toolbarGlyph) are in
+    const names = JSON.parse(readFileSync(join(icons, "sf-symbols", "names.json"), "utf8"));
+    const files = [...names.finder.sidebarGlyph.files, ...names.finder.toolbarGlyph.files];
+    assert.equal(new Set(files).size, 27);
+    for (const f of files) assert.ok(SF.glyphs[f.replace(/\.13pt-large\.svg$/, "-large")], f);
+});
+
 test("layout centres the advance and the cap-height centre in the box", () => {
     const g = SF.glyphs["wifi.regular"], s = 14 / g[0];
     const b = SF.layout("wifi.regular", 14, 16, false);

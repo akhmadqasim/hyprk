@@ -102,6 +102,9 @@ Rectangle {
                                 anchors.verticalCenter: parent.verticalCenter
                                 name: row.modelData.icon || ""
                                 size: Theme.sidebar.iconSize
+                                pointSize: 13          // 27.2.1 (names.json finder.sidebarGlyph, sure): 13 pt, .large, medium
+                                weight: "medium"
+                                scale: "large"
                                 color: Theme.color.sidebarIcon
                             }
                             Rectangle {

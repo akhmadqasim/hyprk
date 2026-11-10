@@ -120,12 +120,15 @@ function resolve(name) {
 }
 
 // File key for a glyph name, weight ("regular" | "medium" | "semibold"), rendering mode ("" = AppKit's
-// default, "monochrome", "hierarchical", "multicolor") and variable value (0..1, < 0 = none). "" when the
-// name has no SVG. A variable value picks the level file (wifi, speaker.wave.3.fill): layer i of 3 lights
+// default, "monochrome", "hierarchical", "multicolor"), variable value (0..1, < 0 = none) and symbol scale
+// ("" = medium, the 32 pt renders; "large" = the Finder's sidebar and toolbar glyphs, rendered at 13 pt with
+// NSImageSymbolScaleLarge, medium weight only: they are drawn at pointSize 13). "" when the name has no SVG.
+// A variable value picks the level file (wifi, speaker.wave.3.fill): layer i of 3 lights
 // when value > i/3, as AppKit draws it (var-20 = 1 lit, var-50 = 2 lit).
-function pick(name, weight, mode, value) {
+function pick(name, weight, mode, value, scale) {
     const s = resolve(name);
     if (!s) return "";
+    if (scale === "large" && glyphs[s + ".medium-large"]) return s + ".medium-large";
     const w = glyphs[s + "." + weight] ? weight : "regular";
     const k = s + "." + w;
     if (value >= 0 && glyphs[k + ".var-0"])
