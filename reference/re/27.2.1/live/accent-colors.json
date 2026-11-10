@@ -1,0 +1,3173 @@
+{
+  "_about": "R5 accent colours, macOS 27.2.1 (26B131). One process per accent, accent passed via the NSArgumentDomain (no defaults written). Colours resolved inside NSAppearance aqua (light) / darkAqua (dark) via performAsCurrentDrawingAppearance and converted to sRGB 0..255 (alpha 0..1). Private AppKit functions used read-only: NSColorEnumerateUserAccentColors/HighlightColors, NSColorGetUserAccentColor, NSColorGetUserHighlightColor, NSColorLocalizedNameFor*, NSColorDisplayColorForUserHighlightKey, NSColorBaseDisplayImageForUserAccentKey, NSUserHighlightColorForUserAccentKey.",
+  "generated": "2026-11-10",
+  "userCurrentValues": {
+    "AppleAccentColor": "absent (= Multicolor)",
+    "AppleHighlightColor": "absent (= Automatic, follows accent)",
+    "AppleInterfaceStyle": "Dark",
+    "method": "defaults read -g (read only)"
+  },
+  "accentKeys": [
+    {
+      "key": -2,
+      "name": "Multicolor",
+      "highlightKeyForAccent": -1,
+      "highlightNameForAccent": "Automatic",
+      "swatch": "NSMulticolorAccent image 16x16pt (AppKit Assets.car)",
+      "swatchCenter_light": "#FCAB42",
+      "swatchCenter_dark": "#FCAB42"
+    },
+    {
+      "key": 4,
+      "name": "Blue",
+      "highlightKeyForAccent": 4,
+      "highlightNameForAccent": "Blue",
+      "swatch": "drawn (NSCustomImageRep)",
+      "swatchCenter_light": "#007AFF",
+      "swatchCenter_dark": "#007AFF"
+    },
+    {
+      "key": 5,
+      "name": "Purple",
+      "highlightKeyForAccent": 5,
+      "highlightNameForAccent": "Purple",
+      "swatch": "drawn (NSCustomImageRep)",
+      "swatchCenter_light": "#953D96",
+      "swatchCenter_dark": "#A550A7"
+    },
+    {
+      "key": 6,
+      "name": "Pink",
+      "highlightKeyForAccent": 6,
+      "highlightNameForAccent": "Pink",
+      "swatch": "drawn (NSCustomImageRep)",
+      "swatchCenter_light": "#F74F9E",
+      "swatchCenter_dark": "#F74F9E"
+    },
+    {
+      "key": 0,
+      "name": "Red",
+      "highlightKeyForAccent": 0,
+      "highlightNameForAccent": "Red",
+      "swatch": "drawn (NSCustomImageRep)",
+      "swatchCenter_light": "#E0383E",
+      "swatchCenter_dark": "#FF5257"
+    },
+    {
+      "key": 1,
+      "name": "Orange",
+      "highlightKeyForAccent": 1,
+      "highlightNameForAccent": "Orange",
+      "swatch": "drawn (NSCustomImageRep)",
+      "swatchCenter_light": "#F7821B",
+      "swatchCenter_dark": "#F7821B"
+    },
+    {
+      "key": 2,
+      "name": "Yellow",
+      "highlightKeyForAccent": 2,
+      "highlightNameForAccent": "Yellow",
+      "swatch": "drawn (NSCustomImageRep)",
+      "swatchCenter_light": "#FFC726",
+      "swatchCenter_dark": "#FFC600"
+    },
+    {
+      "key": 3,
+      "name": "Green",
+      "highlightKeyForAccent": 3,
+      "highlightNameForAccent": "Green",
+      "swatch": "drawn (NSCustomImageRep)",
+      "swatchCenter_light": "#62BA46",
+      "swatchCenter_dark": "#62BA46"
+    },
+    {
+      "key": -1,
+      "name": "Graphite",
+      "highlightKeyForAccent": 8,
+      "highlightNameForAccent": "Graphite",
+      "swatch": "drawn (NSCustomImageRep)",
+      "swatchCenter_light": "#989898",
+      "swatchCenter_dark": "#8C8C8C"
+    }
+  ],
+  "accentKeyNotes": [
+    "Appearance pane on this Mac offers exactly 9: Multicolor(-2 = key absent), Graphite(-1), Red 0, Orange 1, Yellow 2, Green 3, Blue 4, Purple 5, Pink 6 (NSColorEnumerateUserAccentColors order: -2,4,5,6,0,1,2,3,-1).",
+    "Extra key -3 \"This Mac\" (hardware enclosure colour, AppKit strings DeviceEnclosureColor / controlAccentEnclosure%iColor) is enumerated only on Macs with a coloured enclosure; not offered on this MacBook Air M2. Simulated values below (NSColorSimulateHardwareAccent / NSColorSimulatedHardwareEnclosureNumber argument-domain flags).",
+    "Values 7, 8, 9, -3 (without hardware) and -2 resolve to Multicolor (invalid = absent).",
+    "Argument domain: negative values must be passed as plist, e.g. -AppleAccentColor \"<integer>-1</integer>\"; a bare \"-1\" is parsed as a new key and silently ignored.",
+    "Graphite (-1) maps to highlight key 8 \"Graphite\"; every colour accent maps to the highlight key with the same number; Multicolor maps to highlight -1 \"Automatic\"."
+  ],
+  "accents": {
+    "multicolor": {
+      "AppleAccentColor": null,
+      "argumentDomain": "key absent (real user default is absent too)",
+      "NSColorGetUserAccentColor": -2,
+      "highlightKey": -1,
+      "light": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#007AFF",
+          "rgba": [
+            0,
+            122,
+            255,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#0067F4",
+          "rgba": [
+            0,
+            103,
+            244,
+            0.498
+          ]
+        },
+        "linkColor": {
+          "hex": "#0068DA",
+          "rgba": [
+            0,
+            104,
+            218,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#0064E1",
+          "rgba": [
+            0,
+            100,
+            225,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#B3D7FF",
+          "rgba": [
+            179,
+            215,
+            255,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#B3D7FF",
+          "rgba": [
+            179,
+            215,
+            255,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#000000",
+          "rgba": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        }
+      },
+      "dark": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#007AFF",
+          "rgba": [
+            0,
+            122,
+            255,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            0.247
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#1AA9FF",
+          "rgba": [
+            26,
+            169,
+            255,
+            0.498
+          ]
+        },
+        "linkColor": {
+          "hex": "#419CFF",
+          "rgba": [
+            65,
+            156,
+            255,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#0059D1",
+          "rgba": [
+            0,
+            89,
+            209,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#3F638B",
+          "rgba": [
+            63,
+            99,
+            139,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#3F638B",
+          "rgba": [
+            63,
+            99,
+            139,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        }
+      }
+    },
+    "graphite": {
+      "AppleAccentColor": -1,
+      "argumentDomain": "-AppleAccentColor \"<integer>-1</integer>\"",
+      "NSColorGetUserAccentColor": -1,
+      "highlightKey": -1,
+      "light": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#989898",
+          "rgba": [
+            152,
+            152,
+            152,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#99999E",
+          "rgba": [
+            153,
+            153,
+            158,
+            1
+          ]
+        },
+        "linkColor": {
+          "hex": "#0068DA",
+          "rgba": [
+            0,
+            104,
+            218,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#808080",
+          "rgba": [
+            128,
+            128,
+            128,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#E0E0E0",
+          "rgba": [
+            224,
+            224,
+            224,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#E0E0E0",
+          "rgba": [
+            224,
+            224,
+            224,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#000000",
+          "rgba": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        }
+      },
+      "dark": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#8C8C8C",
+          "rgba": [
+            140,
+            140,
+            140,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            0.247
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#C3C3C3",
+          "rgba": [
+            195,
+            195,
+            195,
+            0.498
+          ]
+        },
+        "linkColor": {
+          "hex": "#419CFF",
+          "rgba": [
+            65,
+            156,
+            255,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#696969",
+          "rgba": [
+            105,
+            105,
+            105,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#696969",
+          "rgba": [
+            105,
+            105,
+            105,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#696969",
+          "rgba": [
+            105,
+            105,
+            105,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        }
+      }
+    },
+    "red": {
+      "AppleAccentColor": 0,
+      "argumentDomain": "-AppleAccentColor \"<integer>0</integer>\"",
+      "NSColorGetUserAccentColor": 0,
+      "highlightKey": -1,
+      "light": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#E0383E",
+          "rgba": [
+            224,
+            56,
+            62,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#D32127",
+          "rgba": [
+            211,
+            33,
+            39,
+            0.498
+          ]
+        },
+        "linkColor": {
+          "hex": "#0068DA",
+          "rgba": [
+            0,
+            104,
+            218,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#C4262B",
+          "rgba": [
+            196,
+            38,
+            43,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#F6C4C5",
+          "rgba": [
+            246,
+            196,
+            197,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#F6C4C5",
+          "rgba": [
+            246,
+            196,
+            197,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#000000",
+          "rgba": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        }
+      },
+      "dark": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#FF5257",
+          "rgba": [
+            255,
+            82,
+            87,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            0.247
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#FF7A80",
+          "rgba": [
+            255,
+            122,
+            128,
+            0.498
+          ]
+        },
+        "linkColor": {
+          "hex": "#419CFF",
+          "rgba": [
+            65,
+            156,
+            255,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#D13539",
+          "rgba": [
+            209,
+            53,
+            57,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#8B5759",
+          "rgba": [
+            139,
+            87,
+            89,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#8B5759",
+          "rgba": [
+            139,
+            87,
+            89,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        }
+      }
+    },
+    "orange": {
+      "AppleAccentColor": 1,
+      "argumentDomain": "-AppleAccentColor \"<integer>1</integer>\"",
+      "NSColorGetUserAccentColor": 1,
+      "highlightKey": -1,
+      "light": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#F7821B",
+          "rgba": [
+            247,
+            130,
+            27,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#EC7002",
+          "rgba": [
+            236,
+            112,
+            2,
+            0.498
+          ]
+        },
+        "linkColor": {
+          "hex": "#0068DA",
+          "rgba": [
+            0,
+            104,
+            218,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#D96B0A",
+          "rgba": [
+            217,
+            107,
+            10,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#FDDABB",
+          "rgba": [
+            253,
+            218,
+            187,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#FDDABB",
+          "rgba": [
+            253,
+            218,
+            187,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#000000",
+          "rgba": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        }
+      },
+      "dark": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#F7821B",
+          "rgba": [
+            247,
+            130,
+            27,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            0.247
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#FFB33A",
+          "rgba": [
+            255,
+            179,
+            58,
+            0.498
+          ]
+        },
+        "linkColor": {
+          "hex": "#419CFF",
+          "rgba": [
+            65,
+            156,
+            255,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#C96003",
+          "rgba": [
+            201,
+            96,
+            3,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#896647",
+          "rgba": [
+            137,
+            102,
+            71,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#896647",
+          "rgba": [
+            137,
+            102,
+            71,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        }
+      }
+    },
+    "yellow": {
+      "AppleAccentColor": 2,
+      "argumentDomain": "-AppleAccentColor \"<integer>2</integer>\"",
+      "NSColorGetUserAccentColor": 2,
+      "highlightKey": -1,
+      "light": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#FFC726",
+          "rgba": [
+            255,
+            199,
+            38,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#F4B90E",
+          "rgba": [
+            244,
+            185,
+            14,
+            0.498
+          ]
+        },
+        "linkColor": {
+          "hex": "#0068DA",
+          "rgba": [
+            0,
+            104,
+            218,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#E1AC15",
+          "rgba": [
+            225,
+            172,
+            21,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#FFEEBE",
+          "rgba": [
+            255,
+            238,
+            190,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#FFEEBE",
+          "rgba": [
+            255,
+            238,
+            190,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#000000",
+          "rgba": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        }
+      },
+      "dark": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#FFC600",
+          "rgba": [
+            255,
+            198,
+            0,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            0.247
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#FFFF1A",
+          "rgba": [
+            255,
+            255,
+            26,
+            0.498
+          ]
+        },
+        "linkColor": {
+          "hex": "#419CFF",
+          "rgba": [
+            65,
+            156,
+            255,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#D19E00",
+          "rgba": [
+            209,
+            158,
+            0,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#8B7A3F",
+          "rgba": [
+            139,
+            122,
+            63,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#8B7A3F",
+          "rgba": [
+            139,
+            122,
+            63,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        }
+      }
+    },
+    "green": {
+      "AppleAccentColor": 3,
+      "argumentDomain": "-AppleAccentColor \"<integer>3</integer>\"",
+      "NSColorGetUserAccentColor": 3,
+      "highlightKey": -1,
+      "light": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#62BA46",
+          "rgba": [
+            98,
+            186,
+            70,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#4EAB30",
+          "rgba": [
+            78,
+            171,
+            48,
+            0.498
+          ]
+        },
+        "linkColor": {
+          "hex": "#0068DA",
+          "rgba": [
+            0,
+            104,
+            218,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#4DA033",
+          "rgba": [
+            77,
+            160,
+            51,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#D0EAC8",
+          "rgba": [
+            208,
+            234,
+            200,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#D0EAC8",
+          "rgba": [
+            208,
+            234,
+            200,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#000000",
+          "rgba": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        }
+      },
+      "dark": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#62BA46",
+          "rgba": [
+            98,
+            186,
+            70,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            0.247
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#8DF56C",
+          "rgba": [
+            141,
+            245,
+            108,
+            0.498
+          ]
+        },
+        "linkColor": {
+          "hex": "#419CFF",
+          "rgba": [
+            65,
+            156,
+            255,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#43932A",
+          "rgba": [
+            67,
+            147,
+            42,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#5C7654",
+          "rgba": [
+            92,
+            118,
+            84,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#5C7654",
+          "rgba": [
+            92,
+            118,
+            84,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        }
+      }
+    },
+    "blue": {
+      "AppleAccentColor": 4,
+      "argumentDomain": "-AppleAccentColor \"<integer>4</integer>\"",
+      "NSColorGetUserAccentColor": 4,
+      "highlightKey": -1,
+      "light": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#007AFF",
+          "rgba": [
+            0,
+            122,
+            255,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#0067F4",
+          "rgba": [
+            0,
+            103,
+            244,
+            0.498
+          ]
+        },
+        "linkColor": {
+          "hex": "#0068DA",
+          "rgba": [
+            0,
+            104,
+            218,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#0064E1",
+          "rgba": [
+            0,
+            100,
+            225,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#B3D7FF",
+          "rgba": [
+            179,
+            215,
+            255,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#B3D7FF",
+          "rgba": [
+            179,
+            215,
+            255,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#000000",
+          "rgba": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        }
+      },
+      "dark": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#007AFF",
+          "rgba": [
+            0,
+            122,
+            255,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            0.247
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#1AA9FF",
+          "rgba": [
+            26,
+            169,
+            255,
+            0.498
+          ]
+        },
+        "linkColor": {
+          "hex": "#419CFF",
+          "rgba": [
+            65,
+            156,
+            255,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#0059D1",
+          "rgba": [
+            0,
+            89,
+            209,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#3F638B",
+          "rgba": [
+            63,
+            99,
+            139,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#3F638B",
+          "rgba": [
+            63,
+            99,
+            139,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        }
+      }
+    },
+    "purple": {
+      "AppleAccentColor": 5,
+      "argumentDomain": "-AppleAccentColor \"<integer>5</integer>\"",
+      "NSColorGetUserAccentColor": 5,
+      "highlightKey": -1,
+      "light": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#953D96",
+          "rgba": [
+            149,
+            61,
+            150,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#842685",
+          "rgba": [
+            132,
+            38,
+            133,
+            0.498
+          ]
+        },
+        "linkColor": {
+          "hex": "#0068DA",
+          "rgba": [
+            0,
+            104,
+            218,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#7D2A7E",
+          "rgba": [
+            125,
+            42,
+            126,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#DFC5E0",
+          "rgba": [
+            223,
+            197,
+            224,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#DFC5E0",
+          "rgba": [
+            223,
+            197,
+            224,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#000000",
+          "rgba": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        }
+      },
+      "dark": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#A550A7",
+          "rgba": [
+            165,
+            80,
+            167,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            0.247
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#DC78DE",
+          "rgba": [
+            220,
+            120,
+            222,
+            0.498
+          ]
+        },
+        "linkColor": {
+          "hex": "#419CFF",
+          "rgba": [
+            65,
+            156,
+            255,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#803482",
+          "rgba": [
+            128,
+            52,
+            130,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#705771",
+          "rgba": [
+            112,
+            87,
+            113,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#705771",
+          "rgba": [
+            112,
+            87,
+            113,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        }
+      }
+    },
+    "pink": {
+      "AppleAccentColor": 6,
+      "argumentDomain": "-AppleAccentColor \"<integer>6</integer>\"",
+      "NSColorGetUserAccentColor": 6,
+      "highlightKey": -1,
+      "light": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#F74F9E",
+          "rgba": [
+            247,
+            79,
+            158,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#EC398D",
+          "rgba": [
+            236,
+            57,
+            141,
+            0.498
+          ]
+        },
+        "linkColor": {
+          "hex": "#0068DA",
+          "rgba": [
+            0,
+            104,
+            218,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#D93B86",
+          "rgba": [
+            217,
+            59,
+            134,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#FDCBE2",
+          "rgba": [
+            253,
+            203,
+            226,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#FDCBE2",
+          "rgba": [
+            253,
+            203,
+            226,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#000000",
+          "rgba": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#DCDCDC",
+          "rgba": [
+            220,
+            220,
+            220,
+            1
+          ]
+        }
+      },
+      "dark": {
+        "alternateSelectedControlTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "controlAccentColor": {
+          "hex": "#F74F9E",
+          "rgba": [
+            247,
+            79,
+            158,
+            1
+          ]
+        },
+        "controlColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            0.247
+          ]
+        },
+        "findHighlightColor": {
+          "hex": "#FFFF00",
+          "rgba": [
+            255,
+            255,
+            0,
+            1
+          ]
+        },
+        "keyboardFocusIndicatorColor": {
+          "hex": "#FF77D4",
+          "rgba": [
+            255,
+            119,
+            212,
+            0.498
+          ]
+        },
+        "linkColor": {
+          "hex": "#419CFF",
+          "rgba": [
+            65,
+            156,
+            255,
+            1
+          ]
+        },
+        "selectedContentBackgroundColor": {
+          "hex": "#C93379",
+          "rgba": [
+            201,
+            51,
+            121,
+            1
+          ]
+        },
+        "selectedControlColor": {
+          "hex": "#89576E",
+          "rgba": [
+            137,
+            87,
+            110,
+            1
+          ]
+        },
+        "selectedMenuItemTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "selectedTextBackgroundColor": {
+          "hex": "#89576E",
+          "rgba": [
+            137,
+            87,
+            110,
+            1
+          ]
+        },
+        "selectedTextColor": {
+          "hex": "#FFFFFF",
+          "rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        "unemphasizedSelectedContentBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        },
+        "unemphasizedSelectedTextBackgroundColor": {
+          "hex": "#464646",
+          "rgba": [
+            70,
+            70,
+            70,
+            1
+          ]
+        }
+      }
+    }
+  },
+  "highlightKeys": [
+    {
+      "key": -1,
+      "name": "Automatic",
+      "light": null,
+      "dark": null,
+      "darkAlpha": null,
+      "catalogColor": "pattern image NSMulticolorHighlight (24x12pt) for the menu swatch; actual colour = current accent highlight"
+    },
+    {
+      "key": 4,
+      "name": "Blue",
+      "light": "#B3D7FF",
+      "dark": "#3F638B",
+      "darkAlpha": 1,
+      "catalogColor": "Catalog color: #$dynamic Catalog color: System controlAccentBlueColor"
+    },
+    {
+      "key": 5,
+      "name": "Purple",
+      "light": "#DFC5E0",
+      "dark": "#705771",
+      "darkAlpha": 1,
+      "catalogColor": "Catalog color: #$dynamic Catalog color: System controlAccentPurpleColor"
+    },
+    {
+      "key": 6,
+      "name": "Pink",
+      "light": "#FDCBE2",
+      "dark": "#89576E",
+      "darkAlpha": 1,
+      "catalogColor": "Catalog color: #$dynamic Catalog color: System controlAccentPinkColor"
+    },
+    {
+      "key": 0,
+      "name": "Red",
+      "light": "#F6C4C5",
+      "dark": "#8B5759",
+      "darkAlpha": 1,
+      "catalogColor": "Catalog color: #$dynamic Catalog color: System controlAccentRedColor"
+    },
+    {
+      "key": 1,
+      "name": "Orange",
+      "light": "#FDDABB",
+      "dark": "#896647",
+      "darkAlpha": 1,
+      "catalogColor": "Catalog color: #$dynamic Catalog color: System controlAccentOrangeColor"
+    },
+    {
+      "key": 2,
+      "name": "Yellow",
+      "light": "#FFEEBE",
+      "dark": "#8B7A3F",
+      "darkAlpha": 1,
+      "catalogColor": "Catalog color: #$dynamic Catalog color: System controlAccentYellowColor"
+    },
+    {
+      "key": 3,
+      "name": "Green",
+      "light": "#D0EAC8",
+      "dark": "#5C7654",
+      "darkAlpha": 1,
+      "catalogColor": "Catalog color: #$dynamic Catalog color: System controlAccentGreenColor"
+    },
+    {
+      "key": 8,
+      "name": "Graphite",
+      "light": "#E0E0E0",
+      "dark": "#696969",
+      "darkAlpha": 1,
+      "catalogColor": "Catalog color: #$dynamic Catalog color: System controlAccentNoColor"
+    },
+    {
+      "key": -2,
+      "name": "Choose Color…",
+      "light": "#BBC2CA",
+      "dark": "#474E56",
+      "darkAlpha": 1,
+      "catalogColor": "Catalog color: #$dynamic sRGB IEC61966-2.1 colorspace hdrm(1) 0.1 0.2 0.3 1",
+      "note": "custom colour; values shown are for a test colour sRGB(0.1,0.2,0.3) passed in"
+    }
+  ],
+  "highlightColor": {
+    "AppleHighlightColorAbsent": "selectedTextBackgroundColor follows the accent (highlight key -1 \"Automatic\"); e.g. Purple accent -> #DFC5E0 light / #705771 dark.",
+    "defaultsFormat": "AppKit _userDefaultValueForHighlightColor writes \"%f %f %f %@\" (r g b Name). Name strings in AppKit next to that format: Orange, Purple, Brown, Graphite, ThisMac (plus Red/Yellow/Green/Blue/Pink/Other, de-duplicated elsewhere in the string pool). Exact rgb written by Settings for 27.2.1 not observed (writing is forbidden here); the light-appearance display colours are listed in highlightKeys, e.g. Blue would be \"0.701961 0.843137 1.000000 Blue\" if AppKit writes the sRGB display colour (unverified; pre-Big Sur value was \"0.698039 0.843137 1.000000 Blue\").",
+    "parsing": "Reader keys on the trailing name (case-sensitive): Red/Orange/Yellow/Green/Blue/Purple/Pink/Graphite -> that key, rgb ignored. \"Accent\" and \"ThisMac\" -> Automatic (-1) (ThisMac falls back to Automatic without hardware accent). \"Other\" -> Choose Color (-2), rgb used but softened per appearance (#BBC2CA/#474E56 for 0.1 0.2 0.3). Unknown names (\"Automatic\", \"Multicolor\", \"Brown\", \"accent\") or rgb only -> custom colour used verbatim in both appearances. Empty string -> Automatic.",
+    "graphiteHighlightDark": "Explicit Graphite highlight in dark = white a0.247; Graphite accent with Automatic highlight in dark = #696969 a1.",
+    "tests": [
+      {
+        "case": "graphite_noHL",
+        "args": [
+          "-AppleAccentColor",
+          "<integer>-1</integer>"
+        ],
+        "highlightKey": -1,
+        "highlightName": "Automatic",
+        "accentKey": -1,
+        "selectedTextBackground_light": "#E0E0E0",
+        "selectedTextBackground_dark": "#696969"
+      },
+      {
+        "case": "green_HLautomatic",
+        "args": [
+          "-AppleAccentColor",
+          "<integer>3</integer>",
+          "-AppleHighlightColor",
+          "0.1 0.2 0.3 Automatic"
+        ],
+        "highlightKey": -2,
+        "highlightName": "Choose Color…",
+        "accentKey": 3,
+        "selectedTextBackground_light": "#1A334D",
+        "selectedTextBackground_dark": "#1A334D"
+      },
+      {
+        "case": "multi_HLautomatic",
+        "args": [
+          "-AppleHighlightColor",
+          "0.698039 0.843137 1.000000 Automatic"
+        ],
+        "highlightKey": 4,
+        "highlightName": "Blue",
+        "accentKey": -2,
+        "selectedTextBackground_light": "#B3D7FF",
+        "selectedTextBackground_dark": "#3F638B"
+      },
+      {
+        "case": "multi_HLbrown",
+        "args": [
+          "-AppleHighlightColor",
+          "0.929412 0.870588 0.811765 Brown"
+        ],
+        "highlightKey": -2,
+        "highlightName": "Choose Color…",
+        "accentKey": -2,
+        "selectedTextBackground_light": "#EDDECF",
+        "selectedTextBackground_dark": "#EDDECF"
+      },
+      {
+        "case": "multi_HLempty",
+        "args": [
+          "-AppleHighlightColor",
+          ""
+        ],
+        "highlightKey": -1,
+        "highlightName": "Automatic",
+        "accentKey": -2,
+        "selectedTextBackground_light": "#B3D7FF",
+        "selectedTextBackground_dark": "#3F638B"
+      },
+      {
+        "case": "multi_HLgraphite",
+        "args": [
+          "-AppleHighlightColor",
+          "0.847059 0.847059 0.862745 Graphite"
+        ],
+        "highlightKey": 8,
+        "highlightName": "Graphite",
+        "accentKey": -2,
+        "selectedTextBackground_light": "#E0E0E0",
+        "selectedTextBackground_dark": "#FFFFFF a0.247"
+      },
+      {
+        "case": "multi_HLother",
+        "args": [
+          "-AppleHighlightColor",
+          "0.1 0.2 0.3 Other"
+        ],
+        "highlightKey": -2,
+        "highlightName": "Choose Color…",
+        "accentKey": -2,
+        "selectedTextBackground_light": "#BBC2CA",
+        "selectedTextBackground_dark": "#474E56"
+      },
+      {
+        "case": "multi_HLpurple",
+        "args": [
+          "-AppleHighlightColor",
+          "0.968627 0.831373 1.000000 Purple"
+        ],
+        "highlightKey": 5,
+        "highlightName": "Purple",
+        "accentKey": -2,
+        "selectedTextBackground_light": "#DFC5E0",
+        "selectedTextBackground_dark": "#705771"
+      },
+      {
+        "case": "multi_HLpurple_bogusrgb",
+        "args": [
+          "-AppleHighlightColor",
+          "0.1 0.2 0.3 Purple"
+        ],
+        "highlightKey": 5,
+        "highlightName": "Purple",
+        "accentKey": -2,
+        "selectedTextBackground_light": "#DFC5E0",
+        "selectedTextBackground_dark": "#705771"
+      },
+      {
+        "case": "multi_HLred",
+        "args": [
+          "-AppleHighlightColor",
+          "1.000000 0.733333 0.721569 Red"
+        ],
+        "highlightKey": 0,
+        "highlightName": "Red",
+        "accentKey": -2,
+        "selectedTextBackground_light": "#F6C4C5",
+        "selectedTextBackground_dark": "#8B5759"
+      },
+      {
+        "case": "multi_HLrgbonly",
+        "args": [
+          "-AppleHighlightColor",
+          "0.1 0.2 0.3"
+        ],
+        "highlightKey": -2,
+        "highlightName": "Choose Color…",
+        "accentKey": -2,
+        "selectedTextBackground_light": "#1A334D",
+        "selectedTextBackground_dark": "#1A334D"
+      },
+      {
+        "case": "multi_HLthismac",
+        "args": [
+          "-AppleHighlightColor",
+          "0.1 0.2 0.3 ThisMac"
+        ],
+        "highlightKey": -1,
+        "highlightName": "Automatic",
+        "accentKey": -2,
+        "selectedTextBackground_light": "#B3D7FF",
+        "selectedTextBackground_dark": "#3F638B"
+      },
+      {
+        "case": "purple_HLblue",
+        "args": [
+          "-AppleAccentColor",
+          "<integer>5</integer>",
+          "-AppleHighlightColor",
+          "0.698039 0.843137 1.000000 Blue"
+        ],
+        "highlightKey": 4,
+        "highlightName": "Blue",
+        "accentKey": 5,
+        "selectedTextBackground_light": "#B3D7FF",
+        "selectedTextBackground_dark": "#3F638B"
+      },
+      {
+        "case": "purple_noHL",
+        "args": [
+          "-AppleAccentColor",
+          "<integer>5</integer>"
+        ],
+        "highlightKey": -1,
+        "highlightName": "Automatic",
+        "accentKey": 5,
+        "selectedTextBackground_light": "#DFC5E0",
+        "selectedTextBackground_dark": "#705771"
+      }
+    ]
+  },
+  "thisMacSimulated": [
+    {
+      "enclosure": 0,
+      "accentSwatch_light": null,
+      "accentSwatch_dark": null,
+      "highlight_light": null,
+      "highlight_dark": null
+    },
+    {
+      "enclosure": 1,
+      "accentSwatch_light": null,
+      "accentSwatch_dark": null,
+      "highlight_light": null,
+      "highlight_dark": null
+    },
+    {
+      "enclosure": 2,
+      "accentSwatch_light": null,
+      "accentSwatch_dark": null,
+      "highlight_light": null,
+      "highlight_dark": null
+    },
+    {
+      "enclosure": 3,
+      "accentSwatch_light": "#E3A024",
+      "accentSwatch_dark": "#F3B036",
+      "highlight_light": "#F7E3BE",
+      "highlight_dark": "#87734F"
+    },
+    {
+      "enclosure": 4,
+      "accentSwatch_light": "#2E676B",
+      "accentSwatch_dark": "#427E82",
+      "highlight_light": "#C1D2D3",
+      "highlight_dark": "#536566"
+    },
+    {
+      "enclosure": 5,
+      "accentSwatch_light": "#3D637D",
+      "accentSwatch_dark": "#507791",
+      "highlight_light": "#C5D1D8",
+      "highlight_dark": "#57626A"
+    },
+    {
+      "enclosure": 6,
+      "accentSwatch_light": "#CC3338",
+      "accentSwatch_dark": "#CD565A",
+      "highlight_light": "#F0C2C4",
+      "highlight_dark": "#7C595A"
+    },
+    {
+      "enclosure": 7,
+      "accentSwatch_light": "#484D7C",
+      "accentSwatch_dark": "#5D6291",
+      "highlight_light": "#C8CAD8",
+      "highlight_dark": "#5B5C6A"
+    },
+    {
+      "enclosure": 8,
+      "accentSwatch_light": "#BD542D",
+      "accentSwatch_dark": "#EF8056",
+      "highlight_light": "#EBCCC0",
+      "highlight_dark": "#866559"
+    },
+    {
+      "enclosure": 9,
+      "accentSwatch_light": "#E3A024",
+      "accentSwatch_dark": "#F3B036",
+      "highlight_light": "#F7E3BE",
+      "highlight_dark": "#87734F"
+    },
+    {
+      "enclosure": 10,
+      "accentSwatch_light": "#2E676B",
+      "accentSwatch_dark": "#427E82",
+      "highlight_light": "#C1D2D3",
+      "highlight_dark": "#536566"
+    },
+    {
+      "enclosure": 11,
+      "accentSwatch_light": "#3D637D",
+      "accentSwatch_dark": "#507791",
+      "highlight_light": "#C5D1D8",
+      "highlight_dark": "#57626A"
+    },
+    {
+      "enclosure": 12,
+      "accentSwatch_light": "#CC3338",
+      "accentSwatch_dark": "#CD565A",
+      "highlight_light": "#F0C2C4",
+      "highlight_dark": "#7C595A"
+    },
+    {
+      "enclosure": 13,
+      "accentSwatch_light": "#484D7C",
+      "accentSwatch_dark": "#5D6291",
+      "highlight_light": "#C8CAD8",
+      "highlight_dark": "#5B5C6A"
+    },
+    {
+      "enclosure": 14,
+      "accentSwatch_light": "#BD542D",
+      "accentSwatch_dark": "#EF8056",
+      "highlight_light": "#EBCCC0",
+      "highlight_dark": "#866559"
+    },
+    {
+      "enclosure": 15,
+      "accentSwatch_light": "#98A8D9",
+      "accentSwatch_dark": "#98A8D9",
+      "highlight_light": "#E0E5F4",
+      "highlight_dark": "#6C7180"
+    },
+    {
+      "enclosure": 16,
+      "accentSwatch_light": "#B5D65A",
+      "accentSwatch_dark": "#B5D65A",
+      "highlight_light": "#E9F3CE",
+      "highlight_dark": "#757F5A"
+    }
+  ],
+  "multicolor": {
+    "meaning": "Multicolor = AppleAccentColor absent. Each app uses its own accent from Info.plist NSAccentColorName or NSAppAccentColorName (asset-catalog colour name); apps without one get Blue (#007AFF). Choosing any explicit accent overrides app accents (verified with scratch bundles carrying a copied Assets.car + Info.plist key: Notes-like bundle -> #FCB827 under Multicolor, #007AFF with -AppleAccentColor 4). Automatic highlight follows the app accent (Notes-like: selectedTextBackground #FEEABF / #8A764B). Both plist keys behave the same (Freeform colour tested with either key). AppKit also contains NSMulticolorAccent / NSMulticolorHighlight image names (swatches).",
+    "catalogSystemColorNote": "Asset colours that reference a system colour (System Color Name in assetutil) resolve to the 27.2.1 system colour, not the stored components: systemBlue -> #0088FF light / #0091FF dark (Mail, Contacts, TV, Siri AI), systemCyan -> #00C0E8/#3CD3FE (Freeform), systemRed -> #FF383C/#FF4245 (Calendar), systemPurple -> #CB30E0/#DB34F2.",
+    "appsWithoutAccentKey": "Music, Photos, Messages, Maps, Reminders, Preview, FaceTime, System Settings, App Store, Weather, Passwords, Safari, Finder: no accent key -> Blue #007AFF under Multicolor.",
+    "swatchFiles": {
+      "reference/screens/27.2.1/multicolor-swatch.png": "NSMulticolorAccent@2x from /System/Library/Frameworks/AppKit.framework/Resources/Assets.car, 32x32 px, opaque sRGB square (pane clips it to a circle); same image NSColorBaseDisplayImageForUserAccentKey(-2) returns; identical in light and dark",
+      "reference/screens/27.2.1/multicolor-highlight-swatch.png": "NSMulticolorHighlight@2x, 48x24 px, swatch for highlight \"Automatic\""
+    },
+    "appearanceExtension": "/System/Library/ExtensionKit/Extensions/Appearance.appex: its Assets.car has no Multicolor swatch (only Appearance thumbnails, accentDot, selectionColor_mask, shadow); swatches come from AppKit.",
+    "apps": [
+      {
+        "app": "Games",
+        "infoPlist": {
+          "NSAccentColorName": "AccentColor"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#FFFFFF",
+            "colorSpace": "srgb",
+            "systemColorName": null
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#FFFFFF",
+          "dark": "#FFFFFF"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#FFFFFF",
+          "dark": "#8B8B8B"
+        }
+      },
+      {
+        "app": "Books",
+        "infoPlist": {
+          "NSAccentColorName": "BrandColor"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#262626",
+            "colorSpace": "srgb",
+            "systemColorName": null
+          },
+          {
+            "appearance": "UIAppearanceDark",
+            "stored": "#FFFFFF",
+            "colorSpace": "extended gray",
+            "systemColorName": null
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#262626",
+          "dark": "#FFFFFF"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#BEBEBE",
+          "dark": "#8B8B8B"
+        }
+      },
+      {
+        "app": "Notes",
+        "infoPlist": {
+          "NSAccentColorName": "Accent"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#FCB827",
+            "colorSpace": "srgb",
+            "systemColorName": null
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#FCB827",
+          "dark": "#FCB827"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#FEEABF",
+          "dark": "#8A764B"
+        }
+      },
+      {
+        "app": "Home",
+        "infoPlist": {
+          "NSAccentColorName": "AccentColor"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#FF8D28",
+            "colorSpace": "srgb",
+            "systemColorName": "systemOrangeColor"
+          },
+          {
+            "appearance": "UIAppearanceDark",
+            "stored": "#FF9230",
+            "colorSpace": "srgb",
+            "systemColorName": "systemOrangeColor"
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#FF8D28",
+          "dark": "#FF9230"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#FFDDBF",
+          "dark": "#8B6B4D"
+        }
+      },
+      {
+        "app": "Freeform",
+        "infoPlist": {
+          "NSAccentColorName": "AccentColor"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#55BEF0",
+            "colorSpace": "srgb",
+            "systemColorName": "systemCyanColor"
+          },
+          {
+            "appearance": "NSAppearanceNameDarkAqua",
+            "stored": "#5AC8F5",
+            "colorSpace": "srgb",
+            "systemColorName": "systemCyanColor"
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#00C0E8",
+          "dark": "#3CD3FE"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#B3ECF8",
+          "dark": "#517E8B"
+        }
+      },
+      {
+        "app": "Siri AI",
+        "infoPlist": {
+          "NSAccentColorName": "AccentColor"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#007AFF",
+            "colorSpace": "srgb",
+            "systemColorName": "systemBlueColor"
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#0088FF",
+          "dark": "#0091FF"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#B3DCFF",
+          "dark": "#3F6A8B"
+        }
+      },
+      {
+        "app": "Calculator",
+        "infoPlist": {
+          "NSAccentColorName": "AccentColor"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#FF9300",
+            "colorSpace": "srgb",
+            "systemColorName": null
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#FF9300",
+          "dark": "#FF9300"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#FFDFB3",
+          "dark": "#8B6B3F"
+        }
+      },
+      {
+        "app": "Journal",
+        "infoPlist": {
+          "NSAccentColorName": "AccentColor"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#6155F5",
+            "colorSpace": "srgb",
+            "systemColorName": "systemIndigoColor"
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#6155F5",
+          "dark": "#6D7CFF"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#D0CCFC",
+          "dark": "#5F648B"
+        }
+      },
+      {
+        "app": "Clock",
+        "infoPlist": {
+          "NSAccentColorName": "Accent Color"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#FF8D28",
+            "colorSpace": "srgb",
+            "systemColorName": "systemOrangeColor"
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#FF8D28",
+          "dark": "#FF9230"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#FFDDBF",
+          "dark": "#8B6B4D"
+        }
+      },
+      {
+        "app": "Calendar",
+        "infoPlist": {
+          "NSAccentColorName": "CalendarAccentColor",
+          "NSAppAccentColorName": "CalendarAccentColor"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#FF3B30",
+            "colorSpace": "srgb",
+            "systemColorName": "systemRedColor"
+          },
+          {
+            "appearance": "NSAppearanceNameDarkAqua",
+            "stored": "#FF453A",
+            "colorSpace": "srgb",
+            "systemColorName": "systemRedColor"
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#FF383C",
+          "dark": "#FF4245"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#FFC4C5",
+          "dark": "#8B5354"
+        }
+      },
+      {
+        "app": "News",
+        "infoPlist": {
+          "NSAccentColorName": "NewsAccentColor"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#FD3259",
+            "colorSpace": "p3",
+            "systemColorName": null
+          },
+          {
+            "appearance": "UIAppearanceDark",
+            "stored": "#FF375F",
+            "colorSpace": "p3",
+            "systemColorName": null
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#FF0054",
+          "dark": "#FF005A"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#FEC2CE",
+          "dark": "#8B4F5B"
+        }
+      },
+      {
+        "app": "Podcasts",
+        "infoPlist": {
+          "NSAccentColorName": "AccentColor"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#7224D8",
+            "colorSpace": "srgb",
+            "systemColorName": null
+          },
+          {
+            "appearance": "UIAppearanceDark",
+            "stored": "#9C5AF2",
+            "colorSpace": "srgb",
+            "systemColorName": null
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#7224D8",
+          "dark": "#9C5AF2"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#D5BEF3",
+          "dark": "#6D5A87"
+        }
+      },
+      {
+        "app": "TV",
+        "infoPlist": {
+          "NSAccentColorName": "KeyColor"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#007AFF",
+            "colorSpace": "srgb",
+            "systemColorName": "systemBlueColor"
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#0088FF",
+          "dark": "#0091FF"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#B3DCFF",
+          "dark": "#3F6A8B"
+        }
+      },
+      {
+        "app": "Stocks",
+        "infoPlist": {
+          "NSAccentColorName": "AccentColor"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#4EACF8",
+            "colorSpace": "extended srgb",
+            "systemColorName": null
+          },
+          {
+            "appearance": "UIAppearanceDark",
+            "stored": "#4EACF8",
+            "colorSpace": "extended srgb",
+            "systemColorName": null
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#4EACF8",
+          "dark": "#4EACF8"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#CAE6FD",
+          "dark": "#567289"
+        }
+      },
+      {
+        "app": "Mail",
+        "infoPlist": {
+          "NSAppAccentColorName": "AppAccentColor"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#007AFF",
+            "colorSpace": "srgb",
+            "systemColorName": "systemBlueColor"
+          },
+          {
+            "appearance": "NSAppearanceNameDarkAqua",
+            "stored": "#0A84FF",
+            "colorSpace": "srgb",
+            "systemColorName": "systemBlueColor"
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#0088FF",
+          "dark": "#0091FF"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#B3DCFF",
+          "dark": "#3F6A8B"
+        }
+      },
+      {
+        "app": "Contacts",
+        "infoPlist": {
+          "NSAccentColorName": "ContactsAccentColor"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#007AFF",
+            "colorSpace": "srgb",
+            "systemColorName": "systemBlueColor"
+          },
+          {
+            "appearance": "NSAppearanceNameDarkAqua",
+            "stored": "#0A84FF",
+            "colorSpace": "srgb",
+            "systemColorName": "systemBlueColor"
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#0088FF",
+          "dark": "#0091FF"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#B3DCFF",
+          "dark": "#3F6A8B"
+        }
+      },
+      {
+        "app": "FileProvider-Feedback",
+        "infoPlist": {
+          "NSAppAccentColorName": "AppAccentColor"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#AF52DE",
+            "colorSpace": "srgb",
+            "systemColorName": "systemPurpleColor"
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#CB30E0",
+          "dark": "#DB34F2"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#F0C1F6",
+          "dark": "#804E87"
+        }
+      },
+      {
+        "app": "Setup Assistant",
+        "infoPlist": {
+          "NSAccentColorName": "accent-color"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#0068DA",
+            "colorSpace": "srgb",
+            "systemColorName": "linkColor"
+          },
+          {
+            "appearance": "NSAppearanceNameDarkAqua",
+            "stored": "#419CFF",
+            "colorSpace": "srgb",
+            "systemColorName": "linkColor"
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#0068DA",
+          "dark": "#419CFF"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#B3D2F4",
+          "dark": "#526D8B"
+        }
+      },
+      {
+        "app": "Feedback Assistant",
+        "infoPlist": {
+          "NSAppAccentColorName": "AppAccentColor"
+        },
+        "assetCatalog": [
+          {
+            "appearance": "any",
+            "stored": "#AF52DE",
+            "colorSpace": "srgb",
+            "systemColorName": "systemPurpleColor"
+          }
+        ],
+        "controlAccentUnderMulticolor": {
+          "light": "#CB30E0",
+          "dark": "#DB34F2"
+        },
+        "selectedTextBackgroundUnderMulticolor": {
+          "light": "#F0C1F6",
+          "dark": "#804E87"
+        }
+      }
+    ]
+  }
+}
