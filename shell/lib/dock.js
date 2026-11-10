@@ -45,3 +45,10 @@ function layout(widths, o) {
     out.width = Math.round(x - gaps + o.sidePad);
     return out;
 }
+
+// Launch bounce: height above the rest position at `phase` 0..1 of one hop. A ball under gravity:
+// a parabola, fastest at the bottom, stopped at the top, never below 0 (no squash, no overshoot).
+function bounceOffset(phase, height) {
+    const p = Math.min(1, Math.max(0, phase));
+    return 4 * height * p * (1 - p);
+}

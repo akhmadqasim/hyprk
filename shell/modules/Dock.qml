@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs
@@ -14,7 +15,7 @@ import "../lib/state.js" as State
 // Hidden while a window is full screen on this output, and with "Automatically hide and show the
 // Dock" (state/dock.json) until the pointer rests on the bottom edge for the autohide delay.
 // Liquid Glass: it slides down while dematerializing and comes back materializing (also when the
-// shell starts). Reduce motion: a dissolve in place.
+// shell starts). Reduce motion: a dissolve in place, and no launch bounce (only the running dot).
 ShellWindow {
     id: dock
 
@@ -36,7 +37,14 @@ ShellWindow {
     // Desktop & Dock > Magnification). Off: hovering only shows the app name, nothing moves.
     readonly property bool magnification: Prefs.dock.magnification === true
 
-    readonly property int iconRoom: (magnification ? magnified : base) + Math.max(tooltipRoom, Theme.dock.bounceHeight)
+    // ---------- launch bounce ----------
+    // A ball under gravity: each hop is one parabola (fast at the bottom, stopped at the top), no squash,
+    // never below the rest position, repeated until the app has a window (Apps stops it after 6 s).
+    // The Dock does not resize. Names match reference/re/MAC-REQUESTS.md R2 (height, time per bounce, curve).
+    readonly property real bounceHeight: Math.round(base * 0.5)   // guessed: half a tile; R2 will measure it in pt
+    readonly property int bouncePeriod: 600                       // ms per hop, up and down; guessed, R2 will measure it
+
+    readonly property int iconRoom: (magnification ? magnified : base) + Math.max(tooltipRoom, bounceHeight)
     anchors { bottom: true; left: true; right: true }
     implicitHeight: iconRoom + pad + Theme.dock.bottomMargin
     exclusiveZone: autohide ? 0 : bgHeight + Theme.dock.bottomMargin
@@ -124,6 +132,13 @@ ShellWindow {
         onHoveredChanged: dock.pointerIn = hovered
     }
 
+    // test hook: `qs ipc call dock bounce <dock item id>` bounces that icon as if it were launching
+    IpcHandler {
+        target: "dock"
+        enabled: dock.primaryDock
+        function bounce(id: string): void { Apps.markLaunching(id); }
+    }
+
     Item {
         id: stage
         anchors.fill: parent
@@ -166,7 +181,8 @@ ShellWindow {
                 readonly property real baseCenter: dock.geom.center[index] || 0
                 readonly property real size: modelData.separator ? dock.base : dock.geom.w[index] || dock.base
                 readonly property bool running: (modelData.windows || []).length > 0
-                readonly property bool bouncing: Apps.isLaunching(modelData.id) && !running
+                readonly property bool launching: Apps.isLaunching(modelData.id) && !running
+                readonly property bool bouncing: launching && !A11y.reduceMotion
 
                 x: bg.x + (dock.geom.x[index] || 0)
                 y: bg.y + dock.pad
@@ -185,6 +201,17 @@ ShellWindow {
                     color: Theme.dock.separator
                 }
 
+                // one hop of the launch bounce, 0..1, linear in time (the parabola is in bounceOffset)
+                property real hop: 1
+                NumberAnimation on hop {
+                    running: cell.bouncing
+                    from: 0; to: 1
+                    duration: dock.bouncePeriod
+                    loops: Animation.Infinite
+                    alwaysRunToEnd: true         // a hop in the air lands before it stops
+                }
+                readonly property real bounceY: Math.round(DockLayout.bounceOffset(hop, dock.bounceHeight) * dock.dpr) / dock.dpr
+
                 // interactive press: the icon lifts (FlexInteraction ultraSmall) and darkens
                 PressSpring { id: press; pressed: ma.containsPress; w: icon.width; h: icon.height; settlesGlass: false }
                 AppIcon {
@@ -194,18 +221,9 @@ ShellWindow {
                     size: cell.size
                     loadSize: dock.magnified     // load once at full size, then only scale
                     x: 0
-                    y: cell.height - height - bounceY
-                    property real bounceY: 0
+                    y: cell.height - height - cell.bounceY
                     icon: cell.modelData.icon || ""
                     appId: cell.modelData.id
-
-                    SequentialAnimation on bounceY {
-                        running: cell.bouncing
-                        loops: Animation.Infinite
-                        alwaysRunToEnd: true
-                        NumberAnimation { to: Theme.dock.bounceHeight; duration: Theme.anim.bounce / 2; easing.type: Easing.OutQuad }
-                        NumberAnimation { to: 0; duration: Theme.anim.bounce / 2; easing.type: Easing.InQuad }
-                    }
                 }
                 Rectangle {
                     x: icon.x; y: icon.y; width: icon.width; height: icon.height
@@ -215,9 +233,9 @@ ShellWindow {
                     radius: width * 0.22
                 }
 
-                // running indicator
+                // running indicator, also while launching (with Reduce Motion it is the only launch feedback)
                 Rectangle {
-                    visible: cell.running
+                    visible: cell.running || cell.launching
                     width: Theme.dock.dotSize
                     height: width
                     radius: width / 2

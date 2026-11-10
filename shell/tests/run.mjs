@@ -155,6 +155,15 @@ test("dock.json without the key keeps magnification off", () => {
             prev = l;
         }
     });
+    test("dock bounce is a parabola above the rest position", () => {
+        assert.equal(DK.bounceOffset(0, 22), 0);
+        assert.equal(DK.bounceOffset(1, 22), 0);
+        assert.equal(DK.bounceOffset(0.5, 22), 22);
+        assert.equal(DK.bounceOffset(0.25, 22), 16.5);
+        for (let p = 0; p <= 1; p += 0.05) assert.ok(DK.bounceOffset(p, 22) >= 0);
+        // fastest at the bottom, slowest at the top
+        assert.ok(DK.bounceOffset(0.05, 22) - DK.bounceOffset(0, 22) > DK.bounceOffset(0.5, 22) - DK.bounceOffset(0.45, 22));
+    });
 }
 test("state array", () => assert.deepEqual(ST.parse("[1]", defs), defs));
 test("state unknown key", () => assert.ok(!("x" in ST.parse('{"x":1}', defs))));
