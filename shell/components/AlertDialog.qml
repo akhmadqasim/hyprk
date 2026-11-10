@@ -103,14 +103,8 @@ Item {
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap
             text: root.model ? root.model.title : ""
-            font.family: Theme.fontText
-            font.pixelSize: Theme.alert.titleSize
-            // Bold 13 (LIVE-27.2.1.md alert metrics). Not Font.Bold: SF Pro is a variable font, and Qt 6.10
-            // fakes bold (FreeType emboldening) on top of its Bold named instance for any weight >= Bold,
-            // which drew the title double-struck. DemiBold plus the wght axis at 700 gives the real Bold
-            // outlines; fonts without the axis fall back to their semibold face.
-            font.weight: Font.DemiBold
-            font.variableAxes: ({ "wght": 700 })
+            // Bold 13 (LIVE-27.2.1.md alert metrics) = the headline style, real Bold on the wght axis (Typography)
+            font: Typography.headline
             color: Theme.color.label
         }
         Text {
@@ -119,8 +113,7 @@ Item {
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap
             text: root.model && root.model.message ? root.model.message : ""
-            font.family: Theme.fontText
-            font.pixelSize: Theme.alert.messageSize
+            font: Typography.message   // messageFont 13 (measured)
             color: Theme.color.label
         }
         Row {
@@ -139,9 +132,7 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text: btn.modelData.label
-                        font.family: Theme.fontText
-                        font.pixelSize: Theme.font.menu
-                        font.weight: Font.Medium
+                        font: Typography.font(13, Typography.medium)   // 13 measured, Medium by eye
                         color: btn.modelData.isDefault ? Theme.color.textOnAccent : Theme.color.label
                     }
                     MouseArea { id: bma; anchors.fill: parent; onClicked: root.press(btn.modelData) }

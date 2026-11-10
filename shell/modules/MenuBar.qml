@@ -90,8 +90,7 @@ ShellWindow {
                     anchors.verticalCenter: parent.verticalCenter
                     text: Math.round(UPower.displayDevice.percentage * 100) + "%"
                     color: bar.fg
-                    font.family: Theme.fontText
-                    font.pixelSize: Theme.font.menuBar - 1
+                    font: Typography.font(12)   // battery percentage, 12 by eye (not measured)
                 }
                 Item {
                     width: Theme.menuBar.statusIconSize + 8
@@ -143,8 +142,7 @@ ShellWindow {
                 anchors.centerIn: parent
                 text: Clock.format(clock.date, bar.clockStyle)
                 color: bar.fg
-                font.family: Theme.fontText
-                font.pixelSize: Theme.font.clock
+                font: Typography.menuBar
             }
             onClicked: Panels.toggle("nc", bar.screen)
         }
@@ -180,12 +178,8 @@ ShellWindow {
             visible: mt.text !== ""
             text: mt.text
             color: bar.fg
-            font.family: Theme.fontText
-            font.pixelSize: Theme.font.menuBar
-            // bold app name: DemiBold + wght 700, not Font.Bold (Qt fakes bold on top of SF Pro's variable
-            // Bold instance, see AlertDialog.qml)
-            font.weight: mt.bold ? Theme.font.semibold : Theme.font.regular
-            font.variableAxes: mt.bold ? ({ "wght": 700 }) : ({})
+            // menuBarFont 13; the app name in bold (boldSystemFont 13, real wght 700: Typography)
+            font: mt.bold ? Typography.systemBold : Typography.menuBar
         }
         Item { id: holder; anchors.fill: parent }
         MouseArea {

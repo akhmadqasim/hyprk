@@ -22,6 +22,9 @@ Singleton {
     property bool reduceTransparency: false
     // Appearance > Icon & widget style (default | dark | clear | tinted), see HyprK AppIconTile
     property string iconStyle: "default"
+    // Appearance > Theme > Color (multicolor, graphite, red, ...). Under Multicolor the shell's own surfaces
+    // have no app accent, so they get Blue #007AFF, like apps without NSAccentColorName (MAC-ANSWERS R5)
+    property string accent: "multicolor"
     property bool blurAvailable: true
     // Accessibility (same file; services/A11y.qml holds the Hyprland side). Theme cannot import
     // qs.services (the services import qs), so it reads them itself. Increase contrast also
@@ -63,12 +66,13 @@ Singleton {
         onFileChanged: reload()
         onLoaded: {
             const o = State.parse(text(), { dark: theme.dark, reduceTransparency: theme.reduceTransparency, iconStyle: theme.iconStyle,
-                                            reduceMotion: false, increaseContrast: false });
+                                            reduceMotion: false, increaseContrast: false, accent: "multicolor" });
             theme.dark = o.dark;
             theme.reduceTransparency = o.reduceTransparency;
             theme.iconStyle = o.iconStyle;
             theme.reduceMotion = o.reduceMotion;
             theme.increaseContrast = o.increaseContrast;
+            theme.accent = o.accent;
         }
     }
 
@@ -89,6 +93,7 @@ Singleton {
         Tokens.reduceTransparency = Qt.binding(() => theme.reduceTransparency);
         Tokens.increaseContrast = Qt.binding(() => theme.increaseContrast);
         Tokens.fontText = Qt.binding(() => theme.fontText);
+        Accent.name = Qt.binding(() => theme.accent);
     }
 
     IpcHandler {
@@ -100,20 +105,23 @@ Singleton {
         function material(): string { return theme.compositorGlass ? "plugin" : theme.solidMaterial ? "solid" : "qml"; }
     }
 
+    // Text: whole fonts from Typography (ui/HyprK, the 27.2.1 text styles with optical size, tracking and real
+    // weights), e.g. font: Typography.menu. The sizes below are for Texts that still set font.pixelSize (they get
+    // neither the optical size nor the tracking; see Typography.qml) and for sizes that are not a system style.
     readonly property QtObject font: QtObject {
-        readonly property real menuBar: 13          // SPEC 9.9.3: menuBarFontOfSize 13
-        readonly property real menu: 13             // SPEC 9.9.3: menu item font 13
-        readonly property real clock: 13            // TODO verify
+        readonly property real menuBar: Typography.styles.body.size   // menuBarFont 13 (27.2.1)
+        readonly property real menu: Typography.styles.body.size      // menuFont 13 (27.2.1)
+        readonly property real clock: Typography.styles.body.size     // menuBarFont 13
         readonly property real notifTitle: 13       // TODO verify
         readonly property real notifBody: 13        // TODO verify
         readonly property real notifTime: 11        // TODO verify
         readonly property real notifApp: 11         // TODO verify
+        readonly property real switcherLabel: 13    // TODO verify
         readonly property real ccTitle: 13          // measured ~2x reference
         readonly property real ccSub: 11            // TODO verify
         readonly property real spotlightInput: 26   // query text dominates (reference/JUDGE.md)
         readonly property real spotlightRow: 15     // TODO verify
         readonly property real spotlightHeader: 11  // TODO verify
-        readonly property real switcherLabel: 13    // TODO verify
         readonly property real launchpadLabel: 11   // TODO verify
         readonly property real launchpadSearch: 20  // header text, TODO verify
         readonly property real dockTooltip: 14      // SPEC 9.9.3: Dock app-name label, system 14
@@ -126,7 +134,7 @@ Singleton {
         readonly property int medium: Font.Medium
         readonly property int semibold: Font.DemiBold
         // no `bold`: SF Pro is a variable font and Qt 6.10 fakes bold on top of Font.Bold. Real bold =
-        // semibold + font.variableAxes: ({ "wght": 700 }) (see MenuBar.qml, AlertDialog.qml)
+        // Typography.font(pt, Typography.bold) or Typography.headline / systemBold
     }
 
     // ---------- colors ----------
@@ -137,6 +145,7 @@ Singleton {
         readonly property color tertiaryLabel: Tokens.tertiaryLabel
         readonly property color separator: theme.dark ? theme.stroke(1, 1, 1, 0.10) : theme.stroke(0, 0, 0, 0.10)
         readonly property color accent: Tokens.accent
+        readonly property color textSelection: Accent.selectedText   // selectedTextBackgroundColor (text keeps its colour)
         readonly property color textOnAccent: "#FFFFFF"
         readonly property color red: theme.dark ? "#FF453A" : "#FF3B30"
         readonly property color indigo: theme.dark ? "#5E5CE6" : "#5856D6"
@@ -321,7 +330,7 @@ Singleton {
         readonly property color text: "#FFFFFF"
         readonly property color subtext: Qt.rgba(1, 1, 1, 0.78)
         readonly property color toggleOnBg: "#FFFFFF"
-        readonly property color toggleOnIcon: Tokens.systemBlue
+        readonly property color toggleOnIcon: Tokens.accent   // follows the accent (Blue under Multicolor), not measured
         readonly property color toggleOffBg: Qt.rgba(1, 1, 1, 0.18)     // round buttons
         readonly property color toggleOffIcon: "#FFFFFF"
         // capsule toggles when off (macOS Wi-Fi "Off"): white circle, grey glyph

@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Widgets
 import qs
 import qs.services
+import qs.HyprK
 import "../lib/clock.js" as Clock
 
 // One notification (banner and Notification Center), macOS 27 layout: app icon
@@ -150,15 +151,12 @@ Item {
                         Layout.fillWidth: true
                         text: card.summary || card.appName
                         elide: Text.ElideRight
-                        font.family: Theme.fontText
-                        font.pixelSize: Theme.font.notifTitle
-                        font.weight: Theme.font.semibold
+                        font: Typography.font(13, Typography.semibold)   // TODO verify (not measured)
                         color: Theme.color.label
                     }
                     Text {
                         text: Clock.relative(card.time, Notifs.now)
-                        font.family: Theme.fontText
-                        font.pixelSize: Theme.font.notifTime
+                        font: Typography.subheadline   // 11, TODO verify
                         color: Theme.color.secondaryLabel
                     }
                 }
@@ -170,8 +168,7 @@ Item {
                     wrapMode: Text.Wrap
                     maximumLineCount: Theme.notif.maxBodyLines
                     elide: Text.ElideRight
-                    font.family: Theme.fontText
-                    font.pixelSize: Theme.font.notifBody
+                    font: Typography.body
                     color: Theme.color.label
                 }
             }

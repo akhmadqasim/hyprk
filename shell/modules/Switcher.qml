@@ -140,8 +140,7 @@ ShellWindow {
                         horizontalAlignment: Text.AlignHCenter
                         elide: Text.ElideRight
                         text: c.modelData.name
-                        font.family: Theme.fontText
-                        font.pixelSize: Theme.font.switcherLabel
+                        font: Typography.body
                         color: Theme.color.label
                     }
                     MouseArea {

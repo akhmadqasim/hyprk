@@ -72,7 +72,7 @@ Item {
     }
 
     // width of the widest label + shortcut
-    FontMetrics { id: metrics; font.family: Theme.fontText; font.pixelSize: Theme.font.menu }
+    FontMetrics { id: metrics; font: Typography.menu }
     readonly property real maxTextWidth: {
         let w = 0;
         for (const it of shownItems)
@@ -158,8 +158,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     x: Theme.menu.itemInset + Theme.menu.itemHPadding
                     text: row.modelData.label || ""
-                    font.family: Theme.fontText
-                    font.pixelSize: Theme.font.menu
+                    font: Typography.menu
                     color: !row.enabled ? Theme.color.tertiaryLabel : row.selected ? Theme.color.menuSelectionText : Theme.color.label
                 }
                 Text {
@@ -168,8 +167,7 @@ Item {
                     anchors.right: parent.right
                     anchors.rightMargin: Theme.menu.itemInset + Theme.menu.itemHPadding
                     text: row.modelData.shortcut || ""
-                    font.family: Theme.fontText
-                    font.pixelSize: Theme.font.menu
+                    font: Typography.menu
                     color: row.selected ? Theme.color.menuSelectionText : Theme.color.tertiaryLabel
                 }
                 Symbol {
