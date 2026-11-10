@@ -1,23 +1,27 @@
 import QtQuick
 
+// System Settings sidebar search field (MAC-ANSWERS.md Q-settings-10): a flat translucent 28 pt capsule, not glass,
+// with a 0.5 pt dark rim (pixels of desktop-dock-{light,dark}.png). Magnifier at the left in a 25 pt button,
+// placeholder "Search" 13 pt secondary. Focus: the 3 pt focus ring outside the capsule.
 Rectangle {
     id: sf
     property alias text: input.text
     implicitHeight: Tokens.control.searchHeight
     radius: Tokens.control.searchRadius
     color: Tokens.control.searchFill
-    border.color: input.activeFocus ? Qt.alpha(Tokens.accent, 0.6) : Tokens.control.searchStroke
-    border.width: input.activeFocus ? 2 : 1
+    border.color: Tokens.control.searchStroke
+    border.width: 0.5
+    FocusRing { visible: input.activeFocus }
     Text {
         id: mag
-        x: 9; anchors.verticalCenter: parent.verticalCenter
+        x: 25 / 2 - width / 2 + 2; anchors.verticalCenter: parent.verticalCenter
         text: "search"; font.family: Tokens.fontGlyph; font.pixelSize: 16
         color: Tokens.secondaryLabel
     }
     TextInput {
         id: input
         MouseArea { anchors.fill: parent; acceptedButtons: Qt.NoButton; cursorShape: Qt.IBeamCursor }   // TextInput sets no I-beam itself
-        anchors.left: mag.right; anchors.leftMargin: 4
+        anchors.left: parent.left; anchors.leftMargin: 26
         anchors.right: parent.right; anchors.rightMargin: 10
         anchors.verticalCenter: parent.verticalCenter
         font: Typography.control

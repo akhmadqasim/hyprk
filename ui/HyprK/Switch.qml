@@ -1,21 +1,26 @@
 import QtQuick
+import "controls.js" as G
 
-// macOS 26/27 switch: accent capsule when on, white knob that turns into a Liquid Glass
-// lens (GlassKnob) from the mouse-down frame until it has landed. Click toggles on release;
-// the knob can also be dragged across and lands on the nearer end.
+// macOS 27.2.1 switch (MAC-ANSWERS.md Q-settings-16, -17): accent track when on, white capsule knob (Knob).
+// Not glass at rest. On mouse-down the knob grows x1.56 into a clear lens (45 ms delay, 185 ms ease-in-out, no
+// overshoot) and shrinks back in 0.3 s on release. Click toggles on release; the knob can also be dragged across
+// and lands on the nearer end. Space toggles when it has keyboard focus.
+// Sizes: controlSize "regular" 54 x 24, "small" 44 x 20, "mini" 36 x 16 (Settings; default Tokens.switchSize).
 // Controlled: it shows `checked` and emits toggled(value); the caller owns the state, so
 // `checked: backend.on; onToggled: on => backend.set(on)` keeps its binding.
-// Motion values: Tokens.motion (SPEC 10 "Controls motion").
 Item {
     id: sw
     property bool checked: false
+    property string controlSize: Tokens.switchSize
     property bool reduceMotion: Tokens.reduceMotion
+    readonly property bool pressed: ma.pressed
     signal toggled(bool value)
-    implicitWidth: Tokens.control.switchWidth
-    implicitHeight: Tokens.control.switchHeight
-    opacity: enabled ? 1 : Tokens.control.disabledOpacity
+    readonly property var _m: G.switchTrack(controlSize)
+    implicitWidth: _m.width
+    implicitHeight: _m.height
+    activeFocusOnTab: true
 
-    // knob position, 0 off .. 1 on (may overshoot while it lands)
+    // knob position, 0 off .. 1 on (overshoots a little while it lands)
     Spring {
         id: along
         target: sw.checked ? 1 : 0
@@ -24,36 +29,43 @@ Item {
         epsilon: 0.001
         instant: ma.dragging
     }
-    // lens amount: up on mouse-down, held while the knob travels
-    Spring {
-        id: lift
-        // Reduce Motion keeps the lens but not the growth (GlassKnob.reduceMotion)
-        target: ma.pressed || Math.abs(along.target - along.value) > 0.04 ? 1 : 0
-        response: Tokens.motion.lensResponse
-        damping: ma.pressed ? Tokens.motion.lensDamping : 1
-        epsilon: 0.001
-    }
     readonly property real _a: Math.max(0, Math.min(1, along.value))
-    readonly property real _range: width - height
 
-    Item {
-        id: trackLayer
-        anchors.fill: parent
-        Rectangle {
-            anchors.fill: parent
-            radius: height / 2
-            color: Qt.tint(Tokens.control.switchOff, Qt.rgba(Tokens.accent.r, Tokens.accent.g, Tokens.accent.b, sw._a))
+    // lens amount 0 .. 1: runs only between mouse-down and the end of the release
+    property real _lift: 0
+    SequentialAnimation {
+        id: liftIn
+        PauseAnimation { duration: Tokens.motion.lensDelay }
+        NumberAnimation {
+            target: sw; property: "_lift"; to: 1
+            duration: Tokens.motion.lensDuration; easing.type: Easing.InOutSine
         }
     }
-    GlassKnob {
-        source: trackLayer
-        restW: sw.height - 4; restH: sw.height - 4
-        grow: Tokens.motion.switchLift; growH: Tokens.motion.switchLift - 1
-        glass: lift.value
+    NumberAnimation {
+        id: liftOut
+        target: sw; property: "_lift"; to: 0
+        duration: Tokens.motion.lensRelease * sw._lift; easing.type: Easing.InOutSine
+    }
+    function _press() { liftOut.stop(); liftIn.start(); }
+    function _release() { liftIn.stop(); if (_lift > 0) liftOut.start(); }
+
+    Rectangle { // track; disabled: the background layers at opacity 0.5 (the knob stays white)
+        anchors.fill: parent
+        radius: height / 2
+        readonly property color on: Tokens.control.switchOn
+        readonly property color off: Tokens.control.trackOff
+        color: Qt.rgba(off.r + (on.r - off.r) * sw._a, off.g + (on.g - off.g) * sw._a, off.b + (on.b - off.b) * sw._a,
+                       (off.a + (on.a - off.a) * sw._a) * (sw.enabled ? 1 : Tokens.control.disabledOpacity))
+        FocusRing { visible: sw.activeFocus }
+    }
+    Knob {
+        restW: sw._m.knobWidth; restH: sw._m.knobHeight
+        grow: Tokens.motion.switchLift
+        lift: sw._lift
         // overshoot past an end flattens the knob against it instead of moving it
         squash: Math.max(0, along.value - 1, -along.value) * 2
         reduceMotion: sw.reduceMotion
-        cx: sw.height / 2 + sw._a * sw._range
+        cx: G.switchKnobX(sw._m, sw._a) + sw._m.knobWidth / 2
         cy: sw.height / 2
     }
     MouseArea {
@@ -64,23 +76,35 @@ Item {
         property bool dragging: false
         property real pressX: 0
         property real grabOffset: 0     // pointer minus knob centre at mouse-down
+        readonly property real range: sw._m.width - 2 * sw._m.inset - sw._m.knobWidth
+        function knobCx(a) { return G.switchKnobX(sw._m, a) + sw._m.knobWidth / 2; }
         function land() { along.target = Qt.binding(() => sw.checked ? 1 : 0); }
         onPressed: m => {
             pressX = m.x;
-            grabOffset = m.x - 4 - (sw.height / 2 + sw._a * sw._range);
+            grabOffset = m.x - 4 - knobCx(sw._a);
             dragging = false;
+            sw._press();
         }
         onPositionChanged: m => {
             if (!dragging && Math.abs(m.x - pressX) > Tokens.motion.dragThreshold) dragging = true;
             if (dragging) // the knob keeps the spot it was grabbed at
-                along.target = Math.max(0, Math.min(1, (m.x - 4 - grabOffset - sw.height / 2) / sw._range));
+                along.target = Math.max(0, Math.min(1, (m.x - 4 - grabOffset - knobCx(0)) / range));
         }
         onReleased: {
             const v = dragging ? along.value > 0.5 : !sw.checked;
             dragging = false;           // spring on: lands from where the knob is
+            sw._release();
             if (v !== sw.checked) sw.toggled(v);
             land();                     // on the caller's new state, or back if it kept the old one
         }
-        onCanceled: { dragging = false; land(); }
+        onCanceled: { dragging = false; sw._release(); land(); }
     }
+    Keys.onPressed: e => {
+        if (e.key === Qt.Key_Space && !e.isAutoRepeat) { sw.toggled(!sw.checked); e.accepted = true; }
+    }
+
+    Accessible.role: Accessible.CheckBox
+    Accessible.checkable: true
+    Accessible.checked: checked
+    Accessible.onToggleAction: toggled(!checked)
 }

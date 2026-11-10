@@ -1,43 +1,46 @@
 import QtQuick
+import "controls.js" as G
 
-// macOS 26/27 segmented control (select-one): capsule track with a selection pill that slides to the
-// chosen segment. Separators sit between segments and fade out next to the pill (Finder toolbar view
-// switcher, reference/screens/macos27-finder-window.png).
+// macOS 27.2.1 segmented control, select-one (MAC-ANSWERS.md Q-settings-22): push-fill track (24 r6; small 20 r5,
+// mini 16 r4, large 28 r14) with a full-height accent segment and white text for the selection. Not glass.
+// The selection does not slide: it jumps in one frame (AppKit and Settings' SwiftUI picker; the Finder toolbar's
+// view switcher too, Q-finder-11). Separators 1 x 14 sit only between two unselected segments.
 // model: array of strings, or of objects { text, glyph, icon } (glyph = a ligature in Tokens.fontGlyph,
 // icon = an image url; either may go with or without text).
-// Mouse: the segment under the pointer highlights while pressed; release on a segment activates it,
-// so a press can be dragged to another segment (NSSegmentedControl tracking). Keyboard: Left/Right move
-// the selection one segment when it has focus.
+// Mouse: the segment under the pointer gets a black a.098 layer while pressed; release on a segment activates it,
+// so a press can be dragged to another segment (NSSegmentedControl tracking). Keyboard: Left/Right move the
+// selection one segment when it has focus; the focus ring goes around the selected segment only.
 // Controlled: it shows `currentIndex` and emits activated(index); the caller owns the state.
-// Slide: Tokens.motion.segmentResponse/Damping (SPEC 10.8 + 9.9.4, SwiftUI default spring). Reduce Motion:
-// the pill jumps (as NSSliderCell skips its value animation, SPEC 10.7). Sizes and colours:
-// Tokens.control.segment* (guessed, except the separator colour); the Finder toolbar overrides them.
+// The Finder toolbar overrides the colours, radii and insets (a glass capsule with an inner pill).
 Item {
     id: sc
     property var model: []
     property int currentIndex: 0
     property real segmentWidth: 0          // fixed width per segment; 0 = all as wide as the widest content
-    property color trackColor: Tokens.control.segmentTrack
+    property string controlSize: "regular"
+    readonly property var _m: G.push(controlSize)
+    property color trackColor: Tokens.control.pushFill
+    property real trackRadius: _m.radius
     property color selectionColor: Tokens.control.segmentSelected
-    property real selectionInset: Tokens.control.segmentInset
+    property real selectionRadius: trackRadius
+    property color selectedLabelColor: Tokens.windowActive ? Accent.alternateSelectedControlText : Tokens.label
+    property real selectionInset: 0
     property real selectionInsetX: selectionInset   // horizontal inset of the pill, if it differs (Finder: 3 x 4 pt)
-    property bool reduceMotion: Tokens.reduceMotion
     property real iconSize: 16             // `icon` images are drawn iconSize x iconSize (rendered at 2x)
     property real iconOpacity: 1           // opacity of the `icon` images (e.g. to apply a colour's alpha)
     property var separatorBoundaries: null // null = a separator at every inner boundary; or an array of the
                                            // boundaries to draw: b sits between segment b-1 and b (1..count-1)
     property real separatorSpacing: 0      // extra width reserved at each drawn separator, which then sits in
                                            // that gap (0 = segments touch and separators overlap their edges)
-    property color separatorColor: Tokens.control.separator
-    property bool separatorFade: true      // false = separators stay visible next to the selection pill
-    property real separatorHeight: Math.round(height * 0.55)   // Finder ref: 24 of 44
+    property color separatorColor: Tokens.control.segmentSeparator
+    property bool separatorFade: true      // false = separators stay visible next to the selected segment
+    property real separatorHeight: Math.round(height * 7 / 12)   // 14 in 24 (Q-22); other sizes scaled, not measured
     readonly property int count: model ? model.length : 0
     readonly property int pressedIndex: ma.pressed && ma.containsMouse ? ma.indexAt(ma.mouseX) : -1
     signal activated(int index)
 
-    implicitHeight: Tokens.control.segmentedHeight
+    implicitHeight: _m.height
     implicitWidth: count * _segW + _nSep * separatorSpacing
-    opacity: enabled ? 1 : Tokens.control.disabledOpacity
     activeFocusOnTab: true
 
     function _entry(i) {
@@ -49,7 +52,7 @@ Item {
         for (let i = 0; i < segs.count; i++) { const it = segs.itemAt(i); if (it) w = Math.max(w, it.contentW); }
         return w;
     }
-    readonly property real _segW: segmentWidth > 0 ? segmentWidth : _contentW + 2 * Tokens.control.segmentPadding
+    readonly property real _segW: segmentWidth > 0 ? segmentWidth : _contentW + 2 * _m.padding
     function _drawn(b) { return separatorBoundaries === null || separatorBoundaries.indexOf(b) >= 0; }
     readonly property int _nSep: {
         let n = 0;
@@ -67,75 +70,42 @@ Item {
         }
         return a;
     }
-    function _posX(p) {            // left edge at a fractional segment position (the pill, mid-slide)
-        if (count < 1) return 0;
-        const i = Math.max(0, Math.min(count - 1, Math.floor(p)));
-        return _xs[i] + (p - i) * (i + 1 < count ? _xs[i + 1] - _xs[i] : _w);
-    }
-
-    Spring {
-        id: pos       // pill position in segments
-        target: Math.max(0, Math.min(sc.count - 1, sc.currentIndex))
-        response: Tokens.motion.segmentResponse
-        damping: Tokens.motion.segmentDamping
-        epsilon: 0.001
-        instant: sc.reduceMotion
-    }
-
-    Rectangle { // keyboard focus ring (SPEC 10.6 opacity; width guessed)
-        visible: sc.activeFocus
+    Rectangle { // track; disabled: the background layers at opacity 0.5 (Q-06)
         anchors.fill: parent
-        anchors.margins: -Tokens.control.focusRingWidth
-        radius: height / 2
-        color: "transparent"
-        border.width: Tokens.control.focusRingWidth
-        border.color: Qt.rgba(Tokens.accent.r, Tokens.accent.g, Tokens.accent.b, Tokens.control.focusRingOpacity)
-    }
-    Rectangle {
-        anchors.fill: parent
-        radius: height / 2
+        radius: sc.trackRadius
         color: sc.trackColor
-    }
-    Repeater { // pressed highlight on a segment that is not the selected one
-        model: sc.count
-        Rectangle {
-            required property int index
-            visible: sc.pressedIndex === index && index !== sc.currentIndex
-            x: sc._xs[index] + sc.selectionInsetX
-            y: sc.selectionInset
-            width: sc._w - 2 * sc.selectionInsetX
-            height: sc.height - 2 * sc.selectionInset
-            radius: height / 2
-            color: Tokens.control.fillPressed
-        }
+        opacity: sc.enabled ? 1 : Tokens.control.disabledOpacity
     }
     Rectangle {
         id: pill
         objectName: "pill"
         visible: sc.count > 0 && sc.currentIndex >= 0 && sc.currentIndex < sc.count
-        x: sc._posX(pos.value) + sc.selectionInsetX
+        x: visible ? sc._xs[sc.currentIndex] + sc.selectionInsetX : 0
         y: sc.selectionInset
         width: sc._w - 2 * sc.selectionInsetX
         height: sc.height - 2 * sc.selectionInset
-        radius: height / 2
+        radius: sc.selectionRadius
         color: sc.selectionColor
-        // soft lift under an opaque light pill, guessed
-        Rectangle {
-            z: -1
-            visible: !Tokens.dark && sc.selectionColor.a > 0.99
-            anchors.fill: parent
-            anchors.topMargin: 0.5
-            anchors.bottomMargin: -0.5
-            radius: parent.radius
-            color: Qt.rgba(0, 0, 0, 0.12)
-        }
+        opacity: sc.enabled ? 1 : Tokens.control.disabledOpacity
+        FocusRing { visible: sc.activeFocus }
     }
-    Repeater { // separators at the inner boundaries, hidden where the pill touches them
+    Rectangle { // pressed segment: black a.098 (an unselected one also gets the push fill again)
+        objectName: "pressed"
+        visible: sc.pressedIndex >= 0
+        x: visible ? sc._xs[sc.pressedIndex] + sc.selectionInsetX : 0
+        y: sc.selectionInset
+        width: sc._w - 2 * sc.selectionInsetX
+        height: sc.height - 2 * sc.selectionInset
+        radius: sc.selectionRadius
+        color: sc.pressedIndex === sc.currentIndex ? "transparent" : Tokens.control.pushFill
+        Rectangle { anchors.fill: parent; radius: parent.radius; color: Tokens.control.pressOverlay }
+    }
+    Repeater { // separators at the inner boundaries, only between two unselected segments
         model: Math.max(0, sc.count - 1)
         Rectangle {
             required property int index
             readonly property int b: index + 1      // boundary between segment b-1 and b
-            readonly property real d: b < pos.value ? pos.value - b : b > pos.value + 1 ? b - pos.value - 1 : 0
+            readonly property bool touches: pill.visible && (sc.currentIndex === b - 1 || sc.currentIndex === b)
             objectName: "separator" + b
             visible: sc._drawn(b)
             x: sc._xs[b] - sc.separatorSpacing / 2 - 0.5          // centred in its gap
@@ -143,7 +113,7 @@ Item {
             height: sc.separatorHeight
             anchors.verticalCenter: parent.verticalCenter
             color: sc.separatorColor
-            opacity: pill.visible && sc.separatorFade ? Math.min(1, d * 2) : 1
+            opacity: touches && sc.separatorFade ? 0 : 1
         }
     }
     Repeater {
@@ -176,14 +146,14 @@ Item {
                     text: seg.entry.glyph || ""
                     font.family: Tokens.fontGlyph
                     font.pixelSize: 15         // as Slider's end glyphs
-                    color: Tokens.label
+                    color: seg.selected ? sc.selectedLabelColor : Tokens.label
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
                     visible: text !== ""
                     text: seg.entry.text || ""
                     font: Typography.control
-                    color: Tokens.label
+                    color: !sc.enabled ? Tokens.control.disabledText : seg.selected ? sc.selectedLabelColor : Tokens.label
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }

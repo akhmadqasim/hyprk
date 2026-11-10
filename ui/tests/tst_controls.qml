@@ -22,6 +22,11 @@ Item {
         onToggled: v => backend.on = v
     }
     Switch {
+        id: mini
+        x: 120; y: 20
+        controlSize: "mini"
+    }
+    Switch {
         id: refusing          // a caller that rejects the change: the switch stays as it was
         x: 20; y: 60
         checked: false
@@ -58,6 +63,43 @@ Item {
             compare(toggledSpy.count, 1);
             compare(toggledSpy.signalArguments[0][0], true);
             compare(refusing.checked, false);
+        }
+        function knobOf(c) {
+            for (let i = 0; i < c.children.length; i++) if (c.children[i].restW !== undefined) return c.children[i];
+            return null;
+        }
+        function test_switch_sizes() {
+            compare(sw.width, 54); compare(sw.height, 24);
+            compare(mini.width, 36); compare(mini.height, 16);
+            const k = knobOf(mini);
+            compare(k.width, 21); compare(k.height, 13);
+            compare(k.x, 1.5);                       // off: 1.5 pt inset
+        }
+        // Q-settings-17: the knob grows x1.56 by 0.23 s after mouse-down, no overshoot, then shrinks on release.
+        // Sampled every 10 ms (the test clock is coarse: a sample can land a frame late).
+        function test_switch_press_lens() {
+            const k = knobOf(refusing);
+            mousePress(refusing);
+            let peak = 0, early = -1;
+            for (let t = 0; t < 400; t += 10) {
+                wait(10);
+                peak = Math.max(peak, k.width);
+                if (early < 0 && t >= 100) early = k.width;
+            }
+            verify(early > 33 && early < 46, "width near 0.11 s: " + early);
+            fuzzyCompare(peak, 32 * 1.56, 0.05);     // no overshoot past 49.9
+            mouseRelease(refusing);
+            tryCompare(k, "width", 32, 1000);
+        }
+        function test_slider_press_lens() {
+            let tr = null; for (let i = 0; i < sl.children.length; i++) if (sl.children[i].usable !== undefined) tr = sl.children[i];
+            const k = knobOf(tr);
+            const cx = k.x + k.width / 2;
+            mousePress(sl, cx, sl.height / 2);
+            tryCompare(k, "width", 25, 1000);
+            compare(k.height, 20);
+            mouseRelease(sl, cx, sl.height / 2);
+            tryCompare(k, "width", 20, 1000);
         }
         function test_popup_keeps_binding() {
             mouseClick(pop);                 // opens the menu (a click leaves it open)

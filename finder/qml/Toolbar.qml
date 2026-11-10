@@ -78,6 +78,8 @@ Item {
             separatorHeight: Theme.toolbar.segmentSeparator
             selectionInset: Theme.toolbar.segmentInsetY
             selectionInsetX: Theme.toolbar.segmentInsetX
+            trackRadius: height / 2                       // the glass capsule and its inner pill (Q-finder-11)
+            selectionRadius: height / 2 - Theme.toolbar.segmentInsetY
             trackColor: "transparent"
             selectionColor: Theme.color.capsuleSelected
             model: modes.map(m => ({ icon: Symbols.url("view." + m, iconHex, "white") }))

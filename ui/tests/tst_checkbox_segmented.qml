@@ -2,7 +2,7 @@ import QtQuick
 import QtTest
 import HyprK
 
-// Checkbox and SegmentedControl: controlled state, mouse, keyboard, disabled, motion.
+// Checkbox (and radio) and SegmentedControl: controlled state, mouse, keyboard, disabled, 27.2.1 metrics.
 // Run: QT_QPA_PLATFORM=offscreen qmltestrunner -import ui -input ui/tests
 Item {
     id: root
@@ -55,12 +55,18 @@ Item {
         id: iconSeg
         x: 200; y: 200
         segmentWidth: 46
-        reduceMotion: true
         model: [{ icon: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24'/></svg>" },
                 { glyph: "list" }, { glyph: "grid_view" }, { glyph: "star" }]
         currentIndex: 2
     }
 
+    Checkbox {
+        id: radio
+        x: 200; y: 20
+        radio: true
+        text: "Auto"
+    }
+    SignalSpy { id: radioSpy; target: radio; signalName: "toggled" }
     SignalSpy { id: refusingSpy; target: refusing; signalName: "toggled" }
     SignalSpy { id: mixedSpy; target: mixedBox; signalName: "toggled" }
     SignalSpy { id: disabledSpy; target: disabledBox; signalName: "toggled" }
@@ -76,7 +82,7 @@ Item {
             backend.on = false;
             backend.index = 0;
             Tokens.reduceMotion = false;
-            refusingSpy.clear(); mixedSpy.clear(); disabledSpy.clear(); segSpy.clear();
+            refusingSpy.clear(); mixedSpy.clear(); radioSpy.clear(); disabledSpy.clear(); segSpy.clear();
         }
 
         // ---------- Checkbox ----------
@@ -112,7 +118,9 @@ Item {
         function test_checkbox_disabled() {
             mouseClick(disabledBox);
             compare(disabledSpy.count, 0);
-            compare(disabledBox.opacity, Tokens.control.disabledOpacity);
+            const box = findChild(disabledBox, "box");    // only the background layers fade (Q-settings-06)
+            compare(disabledBox.opacity, 1);
+            fuzzyCompare(box.color.a, Tokens.control.trackOff.a * Tokens.control.disabledOpacity, 0.01);
         }
         function test_checkbox_space() {
             cb.forceActiveFocus();
@@ -128,16 +136,28 @@ Item {
             compare(cb.Accessible.checked, true);
             compare(mixedBox.Accessible.checkStateMixed, true);
         }
-        function test_checkbox_tick_wipes_in() {
+        function test_checkbox_state_changes_at_once() {      // no animation in the 120 Hz samples
+            verify(!findChild(cb, "tick").visible);
             backend.on = true;
-            const w = findChild(cb, "wipe");
-            verify(w.width < Tokens.control.checkboxSize); // still moving on the first frame
-            tryCompare(w, "width", Tokens.control.checkboxSize, 1000);
+            verify(findChild(cb, "tick").visible);
+            compare(findChild(cb, "box").color, Tokens.control.checkboxOn);
+            verify(findChild(mixedBox, "dash").visible);
+            verify(!findChild(mixedBox, "tick").visible);
         }
-        function test_checkbox_reduce_motion_instant() {
-            Tokens.reduceMotion = true;
-            backend.on = true;
-            compare(findChild(cb, "wipe").width, Tokens.control.checkboxSize);
+        function test_radio_asks_only_for_true() {
+            radio.checked = true;
+            mouseClick(radio);
+            compare(radioSpy.signalArguments[0][0], true);
+            verify(findChild(radio, "dot").visible);
+            compare(findChild(radio, "box").radius, 8);
+            compare(radio.Accessible.role, Accessible.RadioButton);
+        }
+        function test_checkbox_sizes() {
+            const box = findChild(cb, "box");
+            compare(box.width, 16); compare(box.radius, 5.5);
+            cb.controlSize = "mini";
+            compare(box.width, 12); compare(box.radius, 3.5);
+            cb.controlSize = "regular";
         }
 
         // ---------- SegmentedControl ----------
@@ -192,20 +212,29 @@ Item {
             verify(seg.implicitWidth > 0);
             compare(seg.implicitWidth % 3, 0);             // three equal segments
         }
-        function test_segmented_pill_slides() {
+        function test_segmented_pill_jumps() {               // Q-settings-22: no slide, one frame
             const pill = findChild(seg, "pill");
             backend.index = 2;
-            wait(50);
-            const mid = (pill.x - seg.selectionInset) / (seg.width / 3);
-            verify(mid > 0 && mid < 2, "pill in flight at " + mid);
-            tryCompare(pill, "x", 2 * seg.width / 3 + seg.selectionInset, 2000);
+            compare(pill.x, 2 * seg.width / 3);
+            compare(pill.height, seg.height);              // full height, no inset
         }
-        function test_segmented_reduce_motion_jumps() {
-            Tokens.reduceMotion = true;
-            backend.index = 2;
-            compare(seg.currentIndex, 2);
-            const pill = findChild(seg, "pill");
-            compare(pill.x, 2 * seg.width / 3 + seg.selectionInset);
+        function test_segmented_metrics() {
+            compare(seg.height, 24);
+            compare(seg.trackRadius, 6);
+            compare(seg.selectionColor, Tokens.control.segmentSelected);
+            compare(findChild(seg, "separator1").height, 14);
+            seg.controlSize = "small";
+            compare(seg.implicitHeight, 20);
+            compare(seg.trackRadius, 5);
+            seg.controlSize = "regular";
+        }
+        function test_segmented_pressed_layer() {
+            mousePress(seg, segX(seg, 1), seg.height / 2);
+            const p = findChild(seg, "pressed");
+            verify(p.visible);
+            compare(p.x, seg.width / 3);
+            mouseRelease(seg, segX(seg, 1), seg.height / 2);
+            verify(!p.visible);
         }
         function test_segmented_icon_defaults_and_options() {
             const img = findChild(iconSeg, "icon");
@@ -241,13 +270,12 @@ Item {
             compare(pill.y, y0);
             compare(pill.height, h0);
             iconSeg.selectionInsetX = Qt.binding(() => iconSeg.selectionInset);
-            compare(findChild(iconSeg, "separator1").height, Math.round(iconSeg.height * 0.55));
+            compare(findChild(iconSeg, "separator1").height, Math.round(iconSeg.height * 7 / 12));
             iconSeg.separatorHeight = 7;
             compare(findChild(iconSeg, "separator1").height, 7);
-            iconSeg.separatorHeight = Qt.binding(() => Math.round(iconSeg.height * 0.55));
+            iconSeg.separatorHeight = Qt.binding(() => Math.round(iconSeg.height * 7 / 12));
         }
         function test_segmented_separator_spacing() {
-            iconSeg.reduceMotion = true;
             iconSeg.separatorBoundaries = [2, 3];
             iconSeg.separatorSpacing = 1;
             compare(iconSeg.implicitWidth, 4 * 46 + 2);
@@ -274,10 +302,10 @@ Item {
             iconSeg.currentIndex = 2;
         }
         function test_segmented_separator_color() {
-            compare(findChild(iconSeg, "separator1").color, Tokens.control.separator);
+            compare(findChild(iconSeg, "separator1").color, Tokens.control.segmentSeparator);
             iconSeg.separatorColor = "red";
             compare(findChild(iconSeg, "separator1").color, "#ff0000");
-            iconSeg.separatorColor = Qt.binding(() => Tokens.control.separator);
+            iconSeg.separatorColor = Qt.binding(() => Tokens.control.segmentSeparator);
         }
         function test_segmented_separator_fade() {
             const next = findChild(iconSeg, "separator2");  // touches the pill on segment 2

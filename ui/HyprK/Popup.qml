@@ -1,34 +1,41 @@
 import QtQuick
 import QtQuick.Controls.Basic as C
 
-// Pop-up button: current value plus an up/down chevron; opens a menu
-// with a checkmark on the current item.
+// Pop-up button as System Settings draws it (MAC-ANSWERS.md Q-settings-19, -20): the value in 13 pt, then the
+// up/down chevron in a 24 pt push-fill circle. Pressed: an extra black a.098 layer; disabled: the fill at 0.5.
+// The menu: rows 24, padding 5, radius 12, at least the button's width, the checked item placed over the
+// button, accent highlight pill (inset 5, radius 6) with white text, checkmark column at the left. It opens at
+// once and fades out in 0.2 s. (The live menu is regular glass; drawn flat here.)
 // Controlled: it shows `currentIndex` and emits activated(index); the caller owns the state.
 Item {
     id: pop
     property var model: []          // array of strings
     property int currentIndex: 0
     signal activated(int index)
-    implicitHeight: Tokens.control.popupHeight
+    implicitHeight: Tokens.control.popupChevron
     implicitWidth: label.implicitWidth + Tokens.control.popupChevron + 8
-    opacity: enabled ? 1 : Tokens.control.disabledOpacity
 
     Text {
         id: label
         anchors.right: chev.left; anchors.rightMargin: 7; anchors.verticalCenter: parent.verticalCenter
         text: pop.model.length > pop.currentIndex && pop.currentIndex >= 0 ? pop.model[pop.currentIndex] : ""
         font: Typography.control
-        color: Tokens.label
+        color: pop.enabled ? Tokens.label : Tokens.control.disabledText
     }
-    Rectangle { // ref: round chevron button
+    Rectangle { // round chevron button
         id: chev
         anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
         width: Tokens.control.popupChevron; height: width; radius: width / 2
-        color: ma.pressed || menu.visible ? Tokens.control.fillPressed : Tokens.control.fill
+        color: Qt.alpha(Tokens.control.pushFill, Tokens.control.pushFill.a * (pop.enabled ? 1 : Tokens.control.disabledOpacity))
+        Rectangle {
+            visible: ma.pressed || menu.visible
+            anchors.fill: parent; radius: parent.radius
+            color: Tokens.control.pressOverlay
+        }
         Text {
             anchors.centerIn: parent
             text: "unfold_more"; font.family: Tokens.fontGlyph; font.pixelSize: 15
-            color: Tokens.label
+            color: pop.enabled ? Tokens.label : Tokens.control.disabledText
         }
     }
     // NSPopUpButton: the menu opens on mouse-down; press-drag-release picks the item under
@@ -59,10 +66,12 @@ Item {
 
     C.Popup {
         id: menu
-        y: -pop.currentIndex * Tokens.control.menuItemHeight - 5
+        y: -pop.currentIndex * Tokens.control.menuItemHeight - Tokens.control.menuPadding
         x: pop.width - width
-        padding: 5
-        width: Math.max(pop.width + 20, col.implicitWidth + 10)
+        padding: Tokens.control.menuPadding
+        width: Math.max(pop.width, col.implicitWidth + 2 * Tokens.control.menuPadding)
+        exit: Transition { NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 200 } }
+        enter: Transition { NumberAnimation { property: "opacity"; to: 1; duration: 0 } }
         background: Rectangle {
             radius: Tokens.control.menuRadius; color: Tokens.control.menuFill
             border.color: Tokens.control.menuStroke
@@ -74,7 +83,8 @@ Item {
                 Rectangle {
                     required property int index
                     required property string modelData
-                    width: menu.width - 10; height: Tokens.control.menuItemHeight; radius: 5
+                    width: menu.width - 2 * Tokens.control.menuPadding; height: Tokens.control.menuItemHeight
+                    radius: Tokens.control.menuHighlightRadius
                     implicitWidth: t.implicitWidth + 44
                     readonly property bool hot: pop._dragIndex >= 0 ? pop._dragIndex === index : im.containsMouse
                     color: hot ? Tokens.accent : "transparent"

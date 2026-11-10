@@ -14,6 +14,10 @@ QtObject {
     property bool reduceMotion: false
     property bool reduceTransparency: false
     property bool increaseContrast: false
+    // the app's window is key; false greys the accent controls (MAC-ANSWERS.md Q-settings-06). Single-window apps bind it.
+    property bool windowActive: true
+    // size of a Switch that sets none: Settings uses mini switches (36 x 16, Q-settings-16)
+    property string switchSize: "regular"
     // controlAccentColor of the user's accent (Accent.qml; each app's Theme sets Accent.name)
     property color accent: Accent.color
     property string fontText: "Sans Serif"
@@ -34,57 +38,57 @@ QtObject {
 
     // accent colours per choice, light and dark: Accent.qml (measured on 27.2.1)
 
-    // ---------- controls (Switch, Slider, Popup, Button, SearchField) ----------
+    // ---------- controls (Switch, Slider, Checkbox, SegmentedControl, Button, Popup, SearchField) ----------
+    // macOS 27.2.1 control gallery probe + System Settings (reference/re/MAC-ANSWERS.md Q-settings-06, -15..-24,
+    // re/27.2.1/live/controls/*.json). Geometry per control size (regular, small, mini, large): controls.js.
+    // None of these is glass at rest. Accent layers are a stack: accent, black (light) or white (dark) a.098,
+    // accent a.75, flattened by onFill().
+    function onFill(c) {
+        const k = 0.75 + 0.25 * 0.902, w = t.dark ? 0.25 * 0.098 : 0;
+        return Qt.rgba(c.r * k + w, c.g * k + w, c.b * k + w, 1);
+    }
     readonly property QtObject control: QtObject {
-        readonly property int switchWidth: 38        // TODO verify
-        readonly property int switchHeight: 22       // TODO verify
-        readonly property int popupHeight: 22        // Settings ref
-        readonly property int popupChevron: 20       // Settings ref round chevron button
-        readonly property int menuItemHeight: 24     // pop-up menu row
-        readonly property int menuRadius: 10         // pop-up menu, TODO verify
-        readonly property int sliderTrack: 4         // TODO verify
-        readonly property int sliderKnobW: 24        // macOS 26 capsule knob, TODO verify
-        readonly property int sliderKnobH: 16        // TODO verify
-        readonly property int buttonHeight: 24       // TODO verify
-        readonly property int buttonRadius: 12       // capsule push button (macOS 26), TODO verify
-        readonly property real disabledOpacity: 0.4
+        readonly property int menuItemHeight: 24     // pop-up menu row (Q-20)
+        readonly property int menuPadding: 5         // menu padding and highlight inset (Q-20)
+        readonly property int menuRadius: 12         // Q-20 (live: regular glass r12; drawn flat here)
+        readonly property real menuHighlightRadius: 6
+        readonly property int popupChevron: 24       // Settings: the double chevron sits in a 24 pt circle (Q-19)
+        readonly property real disabledOpacity: 0.5  // disabled: the background layers at opacity 0.5 (Q-06)
         // control fonts: whole fonts are Typography.control (13), controlSmall (11), controlMini (9); these two
         // sizes are for Texts that still set font.pixelSize
         readonly property real fontSize: Typography.controlSize.regular   // NSFont.systemFontSize 13
         readonly property real smallFontSize: Typography.controlSize.small // 11
 
-        readonly property color fill: t.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.08)   // Settings ref popup circle #E4E4E5
-        readonly property color fillPressed: t.dark ? Qt.rgba(1, 1, 1, 0.18) : Qt.rgba(0, 0, 0, 0.12)
-        readonly property color switchOff: t.dark ? Qt.rgba(1, 1, 1, 0.16) : Qt.rgba(0, 0, 0, 0.09)
+        // push button, pop-up, segmented track: two layers a.047 + a.03 (#ECECEC on white, #303137 on #202127)
+        readonly property color pushFill: t.dark ? Qt.rgba(1, 1, 1, 0.0756) : Qt.rgba(0, 0, 0, 0.0756)
+        // switch off, slider track, checkbox and radio off: black / white a.098 (#E4E4E4 / #36373C)
+        readonly property color trackOff: t.dark ? Qt.rgba(1, 1, 1, 0.098) : Qt.rgba(0, 0, 0, 0.098)
+        // the extra layer while pressed (push, pop-up, checkbox, segment): black a.098, no animation
+        readonly property color pressOverlay: Qt.rgba(0, 0, 0, 0.098)
+        // label of a disabled control (disabledControlTextColor), disabled tick and slider ticks: black a.26 / white a.25
+        readonly property color disabledText: t.dark ? Qt.rgba(1, 1, 1, 0.25) : Qt.rgba(0, 0, 0, 0.26)
+        // the accent stack; the window not key: grey (Q-06; switch from Settings, the others from the probe)
+        readonly property color accentOn: t.onFill(t.accent)
+        readonly property color switchOn: t.windowActive ? accentOn : (t.dark ? "#414244" : "#D3D3D3")
+        readonly property color sliderFill: t.windowActive ? accentOn : (t.dark ? "#535357" : "#C5C5C5")
+        readonly property color segmentSelected: t.windowActive ? accentOn : (t.dark ? "#4A4B50" : "#CFCFCF")
+        readonly property color checkboxOn: t.windowActive ? accentOn : (t.dark ? "#535456" : "#C1C1C1")
+        readonly property color sliderDisabled: t.dark ? "#404146" : "#DBDBDB"   // track and fill, flat (Q-06)
+        readonly property color segmentSeparator: trackOff   // 1 x 14 between unselected segments (Q-22)
         readonly property color knob: "#FFFFFF"
-        readonly property color menuFill: t.dark ? "#2C2C2E" : "#F6F6F6"   // TODO verify
+        // knob shadows: black a.10 radius 12 y 3, black a.10 radius 2 y 1 (Q-16)
+        readonly property color knobShadow: Qt.rgba(0, 0, 0, 0.10)
+        // Applications window selection (shell); not a control fill
+        readonly property color fill: t.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.08)
+        readonly property color menuFill: t.dark ? "#2C2C2E" : "#F6F6F6"   // TODO verify (the live menu is glass)
         readonly property color menuStroke: t.dark ? Qt.rgba(1, 1, 1, 0.12) : Qt.rgba(0, 0, 0, 0.10)
-        readonly property color searchFill: t.dark ? Qt.rgba(1, 1, 1, 0.07) : Qt.rgba(0, 0, 0, 0.04)    // Settings ref #EAE9E7 over the sidebar
-        readonly property color searchStroke: t.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(1, 1, 1, 0.85) // Settings ref light rim
-        readonly property int searchHeight: 28       // Settings ref
-        readonly property int searchRadius: 14       // Settings ref capsule
-
-        // Checkbox. No macOS 27 source for these yet (SPEC 10.8 lists the checkbox as not found): guessed,
-        // from the classic AppKit regular-size checkbox.
-        readonly property int checkboxSize: 14       // guessed
-        readonly property real checkboxRadius: 4     // guessed
-        readonly property real checkStroke: 2        // tick and dash line width, guessed
-        readonly property int checkboxGap: 6         // box to label, guessed
-        readonly property color checkboxOff: t.dark ? Qt.rgba(1, 1, 1, 0.12) : "#FFFFFF"   // guessed
-        readonly property color checkboxOffPressed: t.dark ? Qt.rgba(1, 1, 1, 0.20) : "#E6E6E6" // guessed
-        readonly property color checkboxBorder: t.increaseContrast ? (t.dark ? Qt.rgba(1, 1, 1, 0.6) : Qt.rgba(0, 0, 0, 0.6))
-                                                                   : (t.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.22))   // guessed
-        readonly property color checkMark: "#FFFFFF" // tick on the accent fill (selectedMenuItemText, LIVE-27.2.1 metrics)
-
-        // Segmented control
-        readonly property int segmentedHeight: 24    // guessed (same as buttonHeight)
-        readonly property real segmentInset: 2       // selection pill inset in the track, guessed
-        readonly property int segmentPadding: 10     // label side padding, guessed
-        readonly property color segmentTrack: fill   // track = control fill, guessed
-        readonly property color segmentSelected: t.dark ? Qt.rgba(1, 1, 1, 0.24) : "#FFFFFF"   // guessed
-        readonly property color separator: t.dark ? Qt.rgba(1, 1, 1, 0.12) : Qt.rgba(0, 0, 0, 0.10)   // separatorColor, LIVE-27.2.1 metrics-{light,dark}
-        readonly property real focusRingOpacity: 0.5 // _NSAutomaticFocusRing maxOpacity, SPEC 10.6
-        readonly property real focusRingWidth: 3     // guessed
+        // Settings sidebar search capsule (desktop-dock-{light,dark}.png): a faint fill and a 0.5 pt dark rim
+        readonly property color searchFill: t.dark ? Qt.rgba(1, 1, 1, 0.21) : Qt.rgba(0, 0, 0, 0.017)
+        readonly property color searchStroke: t.dark ? Qt.rgba(0, 0, 0, 0.65) : Qt.rgba(0, 0, 0, 0.27)
+        readonly property int searchHeight: 28       // Q-10: 212 x 28 capsule
+        readonly property int searchRadius: 14
+        readonly property int checkboxGap: 6         // box to label (text at x 22, Q-21)
+        readonly property real focusRingWidth: 3     // Q-24: 3 pt, gap 0, radius + 3, Accent.focusRing, no animation
     }
 
     // ---------- window toolbar platters (Finder, Settings; ToolbarPlatter) ----------
@@ -147,16 +151,24 @@ QtObject {
 
     // ---------- motion (springs: response s, dampingFraction) ----------
     readonly property QtObject motion: QtObject {
-        // SPEC 10 "Controls motion"
-        readonly property real switchResponse: 0.47   // knob slide, DesignLibrary switch spring(0.47, 0.7)
-        readonly property real switchDamping: 0.7
-        readonly property real switchLift: 1.55       // knob w and h x1.55 while pressed (lens)
-        readonly property real lensResponse: 0.444    // liquidLens scale spring (small knob)
-        readonly property real lensDamping: 0.56
-        readonly property real sliderLift: 1.25       // slider knob x1.25 while pressed
-        readonly property real sliderLiftResponse: 0.25 // spring(0.25, 0.75)
-        readonly property real sliderLiftDamping: 0.75
-        readonly property real sliderJumpResponse: 0.25 // track click: NSSliderCell 0.25 s ease-in-out value animation
+        // Controls (MAC-ANSWERS.md Q-settings-17, 120 Hz layer samples in controls-press-light.json)
+        // switch knob travel: 95 % at 0.2 s, overshoot 0.7 of 18 pt (4 %), settled by 0.45 s
+        readonly property real switchResponse: 0.43
+        readonly property real switchDamping: 0.72
+        // pressed knob: grows x1.56 (32 x 20 -> 50 x 31) into a clear lens; it starts 45 ms after mouse-down and peaks
+        // at 0.23 s on an ease-in-out sine, no overshoot (fits the quick-click series within 0.01); release: 0.3 s
+        readonly property real switchLift: 1.56
+        readonly property int lensDelay: 45
+        readonly property int lensDuration: 185
+        readonly property int lensRelease: 300
+        // slider knob: 20 x 16 -> 25 x 20 (x1.25), glass in 0.17 s (0.02 s delay + 0.15 s), back in 0.15 s
+        readonly property real sliderLift: 1.25
+        readonly property int sliderLiftDelay: 20
+        readonly property int sliderLiftDuration: 150
+        readonly property int sliderLiftRelease: 150
+        // track click: the knob runs to the click point, ease-out, no overshoot: 50 % at 0.07 s, 90 % at 0.18 s
+        // after it starts (a critically damped spring of 0.27 s; the 0.066 s start delay is not drawn)
+        readonly property real sliderJumpResponse: 0.27
         readonly property real reducedResponse: 0.2   // Reduce Motion: easeInOut(0.2)-like, no growth (lens stays)
         readonly property int dragThreshold: 3        // px before a switch press becomes a drag
         // Liquid Glass (SwiftUICore 27.2, liquid-glass-re notes/round3; SPEC 9.9.4/9.9.5/10.3)
@@ -165,12 +177,5 @@ QtObject {
         readonly property real crossfade: 0.15            // Reduce motion: FadeIn/FadeOut 0.15 s (SPEC 9.9.5)
         readonly property real pressResponse: 0.25        // FlexInteraction press lift (SPEC 10.3)
         readonly property real pressSquish: 0.06          // drag past a slider end stretches x, squeezes y (by eye)
-        // Segmented selection slide: SPEC 10.8 found no literal spring in DesignLibrary's segment code and
-        // reads it as SwiftUI's default Animation, which SPEC 9.9.4 gives as FluidSpring(0.5, 1.0).
-        readonly property real segmentResponse: 0.5
-        readonly property real segmentDamping: 1.0
-        // Checkbox tick reveal and fill change: no source (SPEC 10.8, checkbox motion not found), guessed.
-        readonly property real checkResponse: 0.2
-        readonly property real checkDamping: 1.0
     }
 }
