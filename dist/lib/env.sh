@@ -147,7 +147,7 @@ hyprk_env_setup() {
         echo "pad=10x6 center"
     } | _hyprk_write "$cfg/foot/foot.ini"
 
-    # --- fonts: system fontconfig + SF fonts + your own ~/.local/share/fonts, private cache ---
+    # --- fonts: system fontconfig + SF fonts + Apple Color Emoji (themes/fonts/named) + your own ~/.local/share/fonts, private cache ---
     mkdir -p "$dir/cache/fontconfig"
     _hyprk_write "$cfg/fontconfig/fonts.conf" <<FC
 <?xml version="1.0"?>
@@ -160,6 +160,7 @@ hyprk_env_setup() {
   <dir>$HOME/.fonts</dir>
   <cachedir>$dir/cache/fontconfig</cachedir>
   <include ignore_missing="yes">$HYPRK_ROOT/config/fontconfig/macos-text.conf</include>
+  <include ignore_missing="yes">$HYPRK_ROOT/config/fontconfig/emoji.conf</include>
   <match target="pattern">
     <test qual="any" name="family"><string>sans-serif</string></test>
     <edit name="family" mode="prepend" binding="same"><string>SF Pro</string><string>Inter</string></edit>
