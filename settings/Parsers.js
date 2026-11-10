@@ -128,10 +128,23 @@ function hasBattery(text) {
 // iconStyle: macOS 26+ "Icon & widget style" (default | dark | clear | tinted). iconStyleVariant: the style's own
 // Light / Dark / Auto choice (Clear and Tinted; Dark offers Always = "dark" / Auto), Settings only
 // (MAC-ANSWERS.md Q-settings-27, #35: the tiles follow it, not the window mode, unless Auto).
-const appearanceDefaults = { mode: "light", dark: false, reduceTransparency: false, increaseContrast: false, reduceMotion: false, accent: "multicolor", sidebarIconSize: "medium", glass: 0.5, iconStyle: "default", iconStyleVariant: "auto" };
+const appearanceDefaults = { mode: "light", dark: false, reduceTransparency: false, increaseContrast: false, reduceMotion: false, accent: "multicolor", sidebarIconSize: "medium", glass: 0.5, iconStyle: "default", iconStyleVariant: "auto", iconTint: "" };
 const iconStyleVariants = ["light", "dark", "auto"];
 const appearanceModes = ["light", "dark", "auto"];
 const iconStyles = ["default", "dark", "clear", "tinted"];
+// Tinted colour (AppleIconAppearanceTintColor, PC #60 section 3): "" = Automatic (key absent), in the Mac menu's order
+const iconTints = ["", "red", "orange", "yellow", "green", "blue", "purple", "pink", "graphite"];
+// Sub-choice of an icon style: Dark = Always ("dark") / Auto, Clear and Tinted = Light / Dark / Auto, Default none.
+function iconStyleVariantsOf(style) {
+    return style === "dark" ? ["dark", "auto"] : style === "clear" || style === "tinted" ? ["light", "dark", "auto"] : [];
+}
+// The mode carries over when the style changes (PC #60: Tinted + Auto -> Dark kept Auto); from Default, or when the
+// old mode is not offered, the first choice (Default -> Clear gave ClearLight).
+function iconStyleVariantAfter(fromStyle, fromVariant, toStyle) {
+    const offered = iconStyleVariantsOf(toStyle);
+    if (!offered.length) return fromVariant;
+    return fromStyle !== "default" && offered.indexOf(fromVariant) >= 0 ? fromVariant : offered[0];
+}
 
 function normalizeAppearance(obj) {
     const src = (obj && typeof obj === "object") ? obj : {};
@@ -144,6 +157,7 @@ function normalizeAppearance(obj) {
     o.reduceMotion = !!o.reduceMotion;           // Accessibility > Motion
     if (iconStyles.indexOf(o.iconStyle) === -1) o.iconStyle = appearanceDefaults.iconStyle;
     if (iconStyleVariants.indexOf(o.iconStyleVariant) === -1) o.iconStyleVariant = appearanceDefaults.iconStyleVariant;
+    if (iconTints.indexOf(o.iconTint) === -1) o.iconTint = "";
     o.glass = isFinite(Number(o.glass)) ? Math.min(1, Math.max(0, Number(o.glass))) : appearanceDefaults.glass;
     return o;
 }
@@ -351,6 +365,6 @@ if (typeof module !== "undefined")
         parseHyprOption, luaString, luaMonitor, luaInput,
         normalizeAppearance, normalizeDock, normalizeSound, mergeState, monitorMode, prettyFileName,
         gecosName, normalizeLock, normalizeInput, normalizeNotifications, parseDesktopApps,
-        appearanceDefaults, dockDefaults, soundDefaults, alertSounds,
+        appearanceDefaults, iconTints, iconStyleVariantsOf, iconStyleVariantAfter, dockDefaults, soundDefaults, alertSounds,
         displaysDefaults, normalizeDisplays, parseScaleReport, sizeText, sizeKey, looksLikeChiclets, looksLikeBlock,
         looksLikeSelected, luaScalePolicy, luaScaleSet, luaScaleReport, lockDefaults, inputDefaults, notificationsDefaults, notifAppDefaults };

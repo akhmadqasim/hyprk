@@ -112,6 +112,9 @@ test("appearance.json defaults and round trip", () => {
     assert.equal(P.mergeState('{"iconStyleVariant": "dark"}', {}, P.normalizeAppearance).iconStyleVariant, "dark");
     assert.equal(P.mergeState('{"iconStyleVariant": "dim"}', {}, P.normalizeAppearance).iconStyleVariant, "auto");
     assert.equal(P.mergeState('{"glass": "x"}', {}, P.normalizeAppearance).glass, 0.5);
+    assert.equal(P.mergeState('{}', {}, P.normalizeAppearance).iconTint, "");
+    assert.equal(P.mergeState('{"iconTint": "red"}', {}, P.normalizeAppearance).iconTint, "red");
+    assert.equal(P.mergeState('{"iconTint": "teal"}', {}, P.normalizeAppearance).iconTint, "");
     // unknown keys from the shell survive
     assert.equal(P.mergeState(JSON.stringify({ extra: 5 }), {}, P.normalizeAppearance).extra, 5);
 });
@@ -166,4 +169,14 @@ test("desktop apps list", () => {
     assert.deepEqual(apps.map(a => a.id), ["org.gnome.Calendar.desktop", "firefox_firefox.desktop", "org.gnome.Software.desktop"]);
     assert.equal(apps[1].icon, "/snap/firefox/current/default256.png");
     assert.deepEqual(P.parseDesktopApps(""), []);
+});
+
+test("icon style sub-choice carries over (PC #60 section 3)", () => {
+    assert.deepEqual(P.iconStyleVariantsOf("default"), []);
+    assert.deepEqual(P.iconStyleVariantsOf("dark"), ["dark", "auto"]);
+    assert.deepEqual(P.iconStyleVariantsOf("tinted"), ["light", "dark", "auto"]);
+    assert.equal(P.iconStyleVariantAfter("default", "auto", "clear"), "light");   // Default -> Clear = ClearLight
+    assert.equal(P.iconStyleVariantAfter("tinted", "auto", "dark"), "auto");      // Tinted+Auto -> Dark = RegularAutomatic
+    assert.equal(P.iconStyleVariantAfter("clear", "light", "dark"), "dark");      // Light is not offered by Dark: Always
+    assert.equal(P.iconStyleVariantAfter("dark", "dark", "tinted"), "dark");
 });

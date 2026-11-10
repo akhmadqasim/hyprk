@@ -190,6 +190,43 @@ Item {
         }
     }
 
+    // ---------- content ----------
+    // The scroll view fills the column under the toolbar too (PC #60 section 5): the document starts at the toolbar's
+    // bottom (offset 0: first card 12 below it) and scrolls under the toolbar strip, which fades it. Appearance:
+    // 573 pt visible, document 1036.5, max offset 463.5.
+    Flickable {
+        id: flick
+        anchors.left: sidebar.right; anchors.right: parent.right
+        anchors.top: parent.top; anchors.bottom: parent.bottom
+        clip: true
+        contentHeight: pane.y + pane.height + Theme.content.padding   // bottom margin 20
+        boundsBehavior: Flickable.StopAtBounds
+        Loader {
+            id: pane
+            x: Math.max(Theme.content.padding, (flick.width - width) / 2)
+            y: Theme.window.toolbarHeight + Theme.content.top
+            width: Math.min(Theme.content.maxWidth, flick.width - 2 * Theme.content.padding)
+            source: "panes/" + app.current.file + ".qml"
+            onSourceChanged: { scroller._silent = true; flick.contentY = 0; scroller._silent = false; scroller.hide(); }
+        }
+    }
+    Rectangle { // the toolbar strip over scrolled content (scroll edge effect; no blur, see Theme.scrollEdgeFade*)
+        visible: flick.contentY > 0
+        x: flick.x; width: flick.width; height: Theme.window.toolbarHeight
+        topRightRadius: Theme.window.radius
+        gradient: Gradient {
+            GradientStop { position: 0; color: Qt.alpha(Theme.windowBg, Theme.scrollEdgeFadeTop) }
+            GradientStop { position: 1; color: Qt.alpha(Theme.windowBg, Theme.scrollEdgeFadeBottom) }
+        }
+    }
+    OverlayScrollbar {
+        id: scroller
+        flickable: flick
+        x: parent.width - Tokens.scroller.inset - width
+        y: Theme.window.toolbarHeight + Tokens.scroller.inset
+        height: parent.height - y - Tokens.scroller.inset
+    }
+
     // ---------- toolbar ----------
     // no fill and no glass: only the back/forward capsule is drawn (macOS 27.2.1, MAC-ANSWERS.md Q9.2)
     Item {
@@ -225,25 +262,6 @@ Item {
             text: app.current.title
             font: Typography.toolbarTitle   // 15 Semibold, measured on 27.2.1 (was 16 Bold)
             color: Theme.toolbarTitle
-        }
-    }
-
-    // ---------- content ----------
-    Flickable {
-        id: flick
-        anchors.left: sidebar.right; anchors.right: parent.right
-        anchors.top: toolbar.bottom; anchors.bottom: parent.bottom
-        anchors.bottomMargin: 8
-        clip: true
-        contentHeight: pane.y + pane.height + Theme.content.padding
-        boundsBehavior: Flickable.StopAtBounds
-        Loader {
-            id: pane
-            x: Math.max(Theme.content.padding, (flick.width - width) / 2)
-            y: Theme.content.top
-            width: Math.min(Theme.content.maxWidth, flick.width - 2 * Theme.content.padding)
-            source: "panes/" + app.current.file + ".qml"
-            onSourceChanged: flick.contentY = 0
         }
     }
 

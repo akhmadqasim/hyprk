@@ -5,7 +5,10 @@ import "../controls"
 import "../HyprK"
 import "../Parsers.js" as P
 
-// Functional: writes mode/dark/accent to state/appearance.json (read by the shell).
+// Functional: writes mode/dark/accent/glass/icon style to state/appearance.json (read by the shell).
+// Layout: macOS 27.2.1 (MAC-ANSWERS.md PC #60 section 1, re/27.2.1/live/settings/appearance/layout.json). Row
+// heights below include the 1 pt separator above every row but the first: cards 319, 100, 145.5 (129 with
+// Default), 75, 189; headings 30 below a card, 16 tall, 10 above theirs; button row 20 below the last card.
 Column {
     id: pane
     spacing: Theme.content.sectionGap
@@ -66,12 +69,36 @@ Column {
         }
     }
 
+    // Liquid Glass end buttons (liquidglass-slider-zoom4x-*.png): a rounded rectangle with a capsule over its lower
+    // right; outlined = "Capsule Shape On A Rectangle With A Liquid Glass Effect", filled = "... On A Rectangle".
+    // Pressed: the label colour (darker).
+    component GlassEndIcon: Item {
+        property bool filled
+        readonly property bool down: parent && parent.pressed === true
+        readonly property color ink: down ? Theme.label : Theme.secondaryLabel
+        width: filled ? 17 : 16; height: filled ? 13.5 : 13
+        Rectangle {
+            x: 0; y: 0; width: parent.width * 0.72; height: parent.height * 0.62; radius: 3
+            color: parent.filled ? parent.ink : "transparent"
+            border.width: parent.filled ? 0 : 1; border.color: parent.ink
+        }
+        Rectangle {
+            x: parent.width * 0.22; y: parent.height * 0.34; width: parent.width * 0.78; height: parent.height * 0.66
+            radius: height / 2
+            color: parent.filled ? parent.ink : Theme.cardFill
+            border.width: 1; border.color: parent.filled ? Theme.cardFill : parent.ink
+        }
+    }
+    Component { id: glassClear; GlassEndIcon { filled: false } }
+    Component { id: glassTinted; GlassEndIcon { filled: true } }
+
     Card {
         FormRow {
             label: "Appearance"
             alignTop: true
             implicitHeight: 86
             Row {
+                y: -1        // AX 74 x 66 at 10 below the row top
                 spacing: 8   // AX 74 x 66 each, pitch 82
                 Repeater {
                     model: [{ m: "light", t: "Light" }, { m: "dark", t: "Dark" }, { m: "auto", t: "Auto" }]
@@ -93,9 +120,9 @@ Column {
         FormRow {
             label: "Liquid Glass"
             alignTop: true
-            implicitHeight: 233   // the card ends 22 below the slider (appearance-light.png)
+            implicitHeight: 233   // 1 + 232: preview 268 x 180 at 10 below the row, slider row 13 under it, 13 to the end
             Column {
-                spacing: 10
+                spacing: 13
                 Rectangle { // preview: wallpaper with glass controls on top
                     width: 268; height: 180; radius: 14; clip: true
                     gradient: Gradient {
@@ -126,9 +153,12 @@ Column {
                             Rectangle {
                                 required property var modelData
                                 width: modelData.w; height: 36; radius: 18
-                                // 0 = clear glass, 1 = frosted/tinted
-                                color: Qt.rgba(1, 1, 1, 0.18 + 0.6 * AppState.appearance.glass)
-                                border.color: Qt.rgba(1, 1, 1, 0.7)
+                                // 0 = clearer, 1 = frosted: lighter in light mode, greyer in dark (PC #60 section 2;
+                                // the Mac's Search capsule light #E1DBCB -> #E6E5E2, dark #989590 -> #5A5A57 over its
+                                // photo). Follows the stored value, so it changes once on mouse-up, not while dragging.
+                                color: Theme.dark ? Qt.rgba(0.30, 0.30, 0.29, 0.25 + 0.6 * AppState.appearance.glass)
+                                                  : Qt.rgba(1, 1, 1, 0.18 + 0.6 * AppState.appearance.glass)
+                                border.color: Qt.rgba(1, 1, 1, Theme.dark ? 0.35 : 0.7)
                                 Row {
                                     x: 10; anchors.verticalCenter: parent.verticalCenter; spacing: 5
                                     Text { text: modelData.g; font.family: Theme.fontGlyph; font.pixelSize: 18; color: "#1C1C1E" }
@@ -138,12 +168,18 @@ Column {
                         }
                     }
                 }
+                // "Liquid Glass Tint Amount": one continuous slider, track 221.5 at x 465, end buttons 16 x 13 and
+                // 17 x 13.5 that step -0.1 / +0.1, 3 tick dots (0, 0.5, 1), no labels, no snapping. NSGlassTintAmount is
+                // written on mouse-up only; here appearance.glass the same way.
                 Slider {
-                    width: 268
+                    objectName: "glassSlider"
+                    x: 1.5; width: 265.5
+                    glyphGap: 5.5
                     value: AppState.appearance.glass
-                    leftGlyph: "filter_none"; rightGlyph: "content_copy"   // end buttons: Clear (0) and Tinted (1)
-                    tickMarks: 5
-                    onMoved: v => AppState.set("appearance", { glass: Math.round(v * 100) / 100 })
+                    leftIcon: glassClear; rightIcon: glassTinted
+                    endStep: 0.1
+                    tickMarks: 3
+                    onCommitted: v => AppState.set("appearance", { glass: Math.round(v * 1000) / 1000 })
                 }
             }
         }
@@ -230,6 +266,7 @@ Column {
         }
         FormRow {
             label: "Text highlight color"
+            implicitHeight: 38   // 1 + 37
             Rectangle { // ref: swatch of the current highlight colour before the pop-up
                 width: 16; height: 16; radius: 8
                 anchors.verticalCenter: parent ? parent.verticalCenter : undefined
@@ -257,13 +294,15 @@ Column {
             label: "Icon & widget style"
             alignTop: true
             readonly property string style: AppState.appearance.iconStyle
-            // Dark offers Always / Auto, Clear and Tinted Light / Dark / Auto (Q-settings-27)
-            readonly property var variants: style === "dark" ? [["Always", "dark"], ["Auto", "auto"]]
-                : style === "clear" || style === "tinted" ? [["Light", "light"], ["Dark", "dark"], ["Auto", "auto"]] : []
-            implicitHeight: variants.length ? 104 : 88
-            Column {
-                spacing: 14
+            // Dark offers Always / Auto, Clear and Tinted Light / Dark / Auto (Q-settings-27, PC #60 section 3)
+            readonly property var names: ({ light: "Light", dark: style === "dark" ? "Always" : "Dark", auto: "Auto" })
+            readonly property var variants: P.iconStyleVariantsOf(style)
+            implicitHeight: variants.length ? 104.5 : 88   // the radio row (16.5 at 69 below the tiles) goes with Default
+            Item {
+                y: -2   // tiles: AX 38 x 52 at 9 below the row top
+                width: tiles.width; height: styleRow.variants.length ? 85.5 : 52
                 Row {
+                    id: tiles
                     anchors.right: parent.right
                     spacing: 13
                     Repeater {
@@ -273,11 +312,15 @@ Column {
                             w: 29; h: 29; r: 7; gap: 1.5   // AX 38 x 52 with the caption; tile 29, ring gap 1.5
                             caption: modelData.t
                             selected: AppState.appearance.iconStyle === modelData.t.toLowerCase()
-                            // Default removes the key on the Mac; the variant resets to Auto with each style
-                            onPicked: AppState.set("appearance", { iconStyle: modelData.t.toLowerCase(), iconStyleVariant: "auto" })
+                            // Default removes the key on the Mac; the mode carries over to the next style (P)
+                            onPicked: AppState.set("appearance", {
+                                iconStyle: modelData.t.toLowerCase(),
+                                iconStyleVariant: P.iconStyleVariantAfter(styleRow.style, AppState.appearance.iconStyleVariant, modelData.t.toLowerCase())
+                            })
                             Rectangle {   // Wi-Fi tile body per style (#35)
                                 anchors.fill: parent; radius: 7
-                                color: modelData.c
+                                // Tinted shows the chosen tint (iconstyle-tinted-red-auto-light.png)
+                                color: modelData.t === "Tinted" && AppState.appearance.iconTint ? Accent.swatch(AppState.appearance.iconTint) : modelData.c
                                 Text {
                                     anchors.centerIn: parent; text: "cloud"; font.family: Theme.fontGlyph; font.pixelSize: 17
                                     color: modelData.t === "Dark" ? "#3C88F5" : "white"
@@ -286,27 +329,40 @@ Column {
                         }
                     }
                 }
-                Row {
+                Row { // right-aligned at the card's inner edge; radios 52 / 49.5 / 49.5 wide, 8 apart (Clear, Tinted)
                     anchors.right: parent.right
+                    y: 69
                     visible: styleRow.variants.length > 0
-                    spacing: 16
+                    spacing: 8
                     Repeater {
                         model: styleRow.variants
                         Checkbox {
-                            required property var modelData
+                            required property string modelData
                             radio: true
-                            text: modelData[0]
-                            checked: AppState.appearance.iconStyleVariant === modelData[1]
-                            onToggled: AppState.set("appearance", { iconStyleVariant: modelData[1] })
+                            text: styleRow.names[modelData]
+                            checked: AppState.appearance.iconStyleVariant === modelData
+                            onToggled: AppState.set("appearance", { iconStyleVariant: modelData })
                         }
                     }
                 }
             }
         }
+        // AppleIconAppearanceTintColor: Automatic | Red ... Graphite (with colour dots) | Choose Colour… (PC #60
+        // section 3); here appearance.iconTint ("" = Automatic). The custom colour popover is not drawn.
         FormRow {
+            id: tintRow
             label: AppState.appearance.iconStyle === "tinted" ? "Icon, widget & folder color" : "Folder color"
-            Rectangle { width: 16; height: 16; radius: 8; color: Accent.swatch("blue"); anchors.verticalCenter: parent ? parent.verticalCenter : undefined }
-            LocalPopup { model: ["Automatic", "Blue", "Purple", "Pink", "Red", "Orange", "Yellow", "Green", "Graphite"] }
+            implicitHeight: 41   // 1 + 40
+            readonly property var names: ["Automatic", "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Pink", "Graphite"]
+            readonly property int index: Math.max(0, P.iconTints.indexOf(AppState.appearance.iconTint))
+            function dot(i) { return i === 0 ? Theme.accent : Accent.swatch(P.iconTints[i]); }
+            Rectangle { width: 16; height: 16; radius: 8; color: tintRow.dot(tintRow.index); anchors.verticalCenter: parent ? parent.verticalCenter : undefined }
+            Popup {
+                model: tintRow.names
+                dots: tintRow.names.map((n, i) => tintRow.dot(i))
+                currentIndex: tintRow.index
+                onActivated: i => AppState.set("appearance", { iconTint: P.iconTints[i] })
+            }
         }
     }
 
@@ -314,27 +370,30 @@ Column {
         title: "Windows"
         FormRow {
             label: "Sidebar icon size"
+            implicitHeight: 37.5
             StatePopup { stateKey: "appearance"; field: "sidebarIconSize"; choices: [["Small", "small"], ["Medium", "medium"], ["Large", "large"]] }
         }
-        FormRow { label: "Tint window background with wallpaper color"; LocalSwitch { checked: true } }
+        FormRow { label: "Tint window background with wallpaper color"; implicitHeight: 37.5; LocalSwitch { checked: true } }   // 1 + 36.5, mini switch
     }
 
-    // radio groups under their label, one per row (held locally until a backend exists)
-    component RadioGroup: Column {
+    // radio groups under their label, one per row (held locally until a backend exists). Label centre 18 below the
+    // row, radio centres from 42 at a 22.5 pitch; rows 105 (3 radios) and 1 + 83 (2) (appearance-full-light.png)
+    component RadioGroup: Item {
         id: rg
         property string label
         property var options: []
         property int current: 0
+        property bool separator: false
+        readonly property real _top: separator ? 1 : 0
         width: parent ? parent.width : 0
-        topPadding: 10; bottomPadding: 10
-        leftPadding: Theme.content.rowPadding
-        spacing: 6
-        MacText { text: rg.label; bottomPadding: 2 }
+        Rectangle { visible: rg.separator; x: Theme.content.separatorInset; width: parent.width - 2 * x; height: 1; color: Theme.separator }
+        MacText { x: Theme.content.rowPadding; y: rg._top + 18 - height / 2; text: rg.label }
         Repeater {
             model: rg.options
             Checkbox {
                 required property string modelData
                 required property int index
+                x: Theme.content.rowPadding; y: rg._top + 42 + index * 22.5 - height / 2
                 radio: true
                 text: modelData
                 checked: rg.current === index
@@ -343,9 +402,8 @@ Column {
         }
     }
     Card {
-        RadioGroup { label: "Show scroll bars"; options: ["Automatically based on mouse or trackpad", "When scrolling", "Always"] }
-        Rectangle { x: Theme.content.separatorInset; width: parent.width - 2 * x; height: 1; color: Theme.separator }
-        RadioGroup { label: "Click in the scroll bar to"; options: ["Jump to the next page", "Jump to the spot that's clicked"] }
+        RadioGroup { implicitHeight: 105; label: "Show scroll bars"; options: ["Automatically based on mouse or trackpad", "When scrolling", "Always"] }
+        RadioGroup { implicitHeight: 84; separator: true; label: "Click in the scroll bar to"; options: ["Jump to the next page", "Jump to the spot that's clicked"] }
     }
 
     PaneFooter { Button { text: "More in Accessibility Settings…" } }
