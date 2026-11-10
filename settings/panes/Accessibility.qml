@@ -103,7 +103,7 @@ Column {
             Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: "Accessibility"
-                font.family: Theme.fontText; font.pixelSize: Theme.font.body
+                font: Typography.body
                 color: Theme.accent
             }
         }
@@ -111,7 +111,7 @@ Column {
         MacText {
             anchors.centerIn: parent
             text: pane.current ? pane.current.title : ""
-            font.family: Theme.fontDisplay; font.pixelSize: Theme.font.body; weight: Font.Bold
+            font: Typography.headline
             color: Theme.label
         }
     }

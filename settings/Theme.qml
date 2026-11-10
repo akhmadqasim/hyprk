@@ -21,22 +21,18 @@ QtObject {
     property bool compositorBlur: false        // set by AppState from Backend
     property bool reduceMotion: false          // set by AppState (Accessibility > Motion)
     readonly property bool translucent: compositorBlur && !reduceTransparency && !increaseContrast
-    // Appearance > Accent color (state/appearance.json "accent"), set by AppState.
-    // Colours: SPEC 15 controlAccent<Name>Color, one table shared with the shell (HyprK Tokens.accentSwatches).
-    // Multicolor lets each app pick; System Settings itself then uses blue, so it maps to the blue swatch.
+    // Appearance > Theme > Color (state/appearance.json "accent"), set by AppState. Colours: HyprK Accent
+    // (measured on 27.2.1). Under Multicolor each app uses its own accent; System Settings has none
+    // (accent-colors.json multicolor.appsWithoutAccentKey), so it is Blue #007AFF.
     property string accentName: "multicolor"
-    readonly property color accent: Tokens.accentSwatches[accentName] ?? Tokens.accentSwatches.blue
-    // NSMulticolorAccent conic wheel, sampled every 30 deg counter-clockwise from 3 o'clock (SPEC 15).
-    // Not in Tokens yet (only Settings draws it); move it there when the shell needs it.
-    readonly property var multicolorStops: ["#AD3C4F", "#BD5886", "#A1579C", "#8A57A9", "#7161AD", "#5D6BB1",
-                                            "#538AB3", "#4BA5B5", "#6DA485", "#95A150", "#C9A54E", "#BA7240"]
+    readonly property color accent: Accent.color
 
     Component.onCompleted: {
         Tokens.dark = Qt.binding(() => theme.dark);
         Tokens.reduceMotion = Qt.binding(() => theme.reduceMotion);
         Tokens.reduceTransparency = Qt.binding(() => theme.reduceTransparency);
         Tokens.increaseContrast = Qt.binding(() => theme.increaseContrast);
-        Tokens.accent = Qt.binding(() => theme.accent);
+        Accent.name = Qt.binding(() => theme.accentName);
         Tokens.fontText = Qt.binding(() => theme.fontText);
         Tokens.fontGlyph = Qt.binding(() => theme.fontGlyph);
         // measured on the reference Settings window (below), so the controls match the panes
@@ -58,19 +54,17 @@ QtObject {
     // One family for text and display: SFNS has optical sizes built in.
     readonly property string fontText: _sfName || pickFont(["SF Pro", "Inter", "Cantarell", "Noto Sans", "Sans Serif"])
     readonly property string fontDisplay: fontText
-    // Weights: SFNS is a variable font, and Qt fakes bold unless the wght axis is set.
-    // Use both on every weighted Text:  font.weight: Theme.fw(W); font.variableAxes: Theme.axes(W)
-    function fw(w) { return _sfName ? Font.Normal : w; }
-    function axes(w) { return _sfName ? { "wght": w } : {}; }
+    // Text: MacText (size + wght) or a whole style, font: Typography.body (HyprK Typography: the 27.2.1 text
+    // styles with optical size, tracking and real weights on SF's axes)
 
     // Generic glyph font for pane icons when themes/icons/settings/<id>.svg is missing.
     readonly property string fontGlyph: "Material Icons"
 
     readonly property QtObject font: QtObject {
-        readonly property real body: 13         // NSFont.systemFontSize, TODO verify
-        readonly property real small: 11        // footnotes, account subtitle, TODO verify
-        readonly property real title: 16        // ref toolbar title (bold)
-        readonly property real sectionHeader: 13 // bold group header above a card, TODO verify
+        readonly property real body: Typography.styles.body.size          // 13: form labels measured on 27.2.1
+        readonly property real small: Typography.styles.subheadline.size  // 11: footnotes, account subtitle
+        readonly property real title: 15        // toolbar title: Typography.toolbarTitle, 15 Semibold (27.2.1)
+        readonly property real sectionHeader: Typography.styles.headline.size  // 13 Bold group header
     }
 
     // ---------- window ----------
@@ -108,11 +102,13 @@ QtObject {
         readonly property int groupGap: 13          // ref
         readonly property int searchTop: 61          // ref
         readonly property int accountAvatar: 40      // TODO verify
-        // ref (238,236,234). Over compositor blur it is 88 % opaque so the desktop only
-        // softly shows through; otherwise (no blur, Reduce transparency) it is flat.
+        // 27.2.1 System Settings sidebar over a plain desktop: (37,38,38) dark, (237,237,237) light
+        // (reference/screens/27.2.1/settings-toolbar-{dark,light}.png; Finder's reads 38 / 237). Over compositor
+        // blur it is 88 % opaque so the desktop only softly shows through; otherwise (no blur, Reduce
+        // transparency) it is flat.
         readonly property color fill: theme.translucent
-            ? (theme.dark ? Qt.rgba(0.165, 0.165, 0.173, 0.88) : Qt.rgba(0.933, 0.925, 0.918, 0.88))
-            : (theme.dark ? "#2A2A2C" : "#EEECEA")
+            ? (theme.dark ? Qt.rgba(37 / 255, 38 / 255, 38 / 255, 0.88) : Qt.rgba(237 / 255, 237 / 255, 237 / 255, 0.88))
+            : (theme.dark ? "#252626" : "#EDEDED")
         readonly property color stroke: theme.increaseContrast ? (theme.dark ? Qt.rgba(1, 1, 1, 0.4) : Qt.rgba(0, 0, 0, 0.4))
             : theme.dark ? Qt.rgba(1, 1, 1, 0.08) : Qt.rgba(0, 0, 0, 0.05)
         readonly property color selection: theme.accent

@@ -1,5 +1,6 @@
 import QtQuick
 import ".."
+import "../HyprK"
 
 // Full-pane empty state, e.g. "Bluetooth Unavailable" when no controller exists.
 Item {
@@ -21,14 +22,14 @@ Item {
         MacText {
             anchors.horizontalCenter: parent.horizontalCenter
             text: u.title
-            font.family: Theme.fontDisplay; font.pixelSize: Theme.font.title; weight: Font.DemiBold
+            size: 16; weight: Typography.semibold   // TODO verify (not measured)
             color: Theme.secondaryLabel
         }
         Text {
             width: parent.width
             horizontalAlignment: Text.AlignHCenter; wrapMode: Text.WordWrap
             text: u.text
-            font.family: Theme.fontText; font.pixelSize: Theme.font.small
+            font: Typography.subheadline
             color: Theme.secondaryLabel
         }
     }

@@ -1,5 +1,6 @@
 import QtQuick
 import ".."
+import "../HyprK"
 
 // One row inside a Card: optional icon, label (+ sublabel), trailing control.
 Item {
@@ -40,14 +41,14 @@ Item {
         Text {
             width: parent.width; elide: Text.ElideRight
             text: row.label
-            font.family: Theme.fontText; font.pixelSize: Theme.font.body
+            font: Typography.body
             color: row.dim ? Theme.secondaryLabel : Theme.label
         }
         Text {
             visible: row.sublabel !== ""
             width: parent.width; wrapMode: Text.WordWrap
             text: row.sublabel
-            font.family: Theme.fontText; font.pixelSize: Theme.font.small
+            font: Typography.subheadline
             color: Theme.secondaryLabel
         }
     }
@@ -61,7 +62,7 @@ Item {
             visible: row.value !== ""
             anchors.verticalCenter: parent.verticalCenter
             text: row.value
-            font.family: Theme.fontText; font.pixelSize: Theme.font.body
+            font: Typography.body
             color: Theme.secondaryLabel
         }
     }

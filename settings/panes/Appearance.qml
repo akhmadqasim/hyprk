@@ -10,9 +10,6 @@ Column {
     id: pane
     spacing: Theme.content.sectionGap
 
-    // Accent swatch fills: SPEC 15 controlAccent<Name>Color (Tokens.accentSwatches)
-    readonly property var accentSwatch: Tokens.accentSwatches
-
     // Mini window thumbnail used by the Appearance and widget-style pickers.
     component Choice: Column {
         id: ch
@@ -34,8 +31,7 @@ Column {
         MacText {
             anchors.horizontalCenter: parent.horizontalCenter
             text: ch.caption
-            font.family: Theme.fontText; font.pixelSize: Theme.font.body
-            weight: ch.selected ? Font.DemiBold : Font.Normal
+            weight: ch.selected ? Typography.semibold : Typography.regular
             color: ch.selected ? Theme.label : Theme.secondaryLabel
         }
     }
@@ -111,7 +107,7 @@ Column {
                         MacText {
                             x: 14; anchors.verticalCenter: parent.verticalCenter
                             text: P.prettyFileName(preview.path)
-                            font.pixelSize: Theme.font.body; weight: Font.DemiBold
+                            weight: Typography.semibold
                         }
                     }
                     Row {
@@ -127,7 +123,7 @@ Column {
                                 Row {
                                     x: 10; anchors.verticalCenter: parent.verticalCenter; spacing: 5
                                     Text { text: modelData.g; font.family: Theme.fontGlyph; font.pixelSize: 18; color: "#1C1C1E" }
-                                    Text { text: modelData.t; font.family: Theme.fontText; font.pixelSize: Theme.font.body; color: "#3A3A3C"; anchors.verticalCenter: parent.verticalCenter }
+                                    Text { text: modelData.t; font: Typography.body; color: "#3A3A3C"; anchors.verticalCenter: parent.verticalCenter }
                                 }
                             }
                         }
@@ -175,7 +171,7 @@ Column {
                             Rectangle {
                                 anchors.fill: parent; radius: 12
                                 visible: sw.modelData !== "multicolor"
-                                color: pane.accentSwatch[sw.modelData] ?? "transparent"
+                                color: Accent.swatch(sw.modelData)   // controlAccentColor, light/dark (27.2.1)
                             }
                             Shape {
                                 anchors.fill: parent
@@ -185,20 +181,20 @@ Column {
                                     strokeWidth: -1
                                     fillGradient: ConicalGradient {
                                         centerX: 12; centerY: 12; angle: 0
-                                        // NSMulticolorAccent@2x stops (SPEC 15), kept in Theme.multicolorStops
-                                        GradientStop { position: 0 / 12; color: Theme.multicolorStops[0] }
-                                        GradientStop { position: 1 / 12; color: Theme.multicolorStops[1] }
-                                        GradientStop { position: 2 / 12; color: Theme.multicolorStops[2] }
-                                        GradientStop { position: 3 / 12; color: Theme.multicolorStops[3] }
-                                        GradientStop { position: 4 / 12; color: Theme.multicolorStops[4] }
-                                        GradientStop { position: 5 / 12; color: Theme.multicolorStops[5] }
-                                        GradientStop { position: 6 / 12; color: Theme.multicolorStops[6] }
-                                        GradientStop { position: 7 / 12; color: Theme.multicolorStops[7] }
-                                        GradientStop { position: 8 / 12; color: Theme.multicolorStops[8] }
-                                        GradientStop { position: 9 / 12; color: Theme.multicolorStops[9] }
-                                        GradientStop { position: 10 / 12; color: Theme.multicolorStops[10] }
-                                        GradientStop { position: 11 / 12; color: Theme.multicolorStops[11] }
-                                        GradientStop { position: 12 / 12; color: Theme.multicolorStops[0] }
+                                        // NSMulticolorAccent@2x, sampled from reference/screens/27.2.1/multicolor-swatch.png (Accent)
+                                        GradientStop { position: 0 / 12; color: Accent.multicolorStops[0] }
+                                        GradientStop { position: 1 / 12; color: Accent.multicolorStops[1] }
+                                        GradientStop { position: 2 / 12; color: Accent.multicolorStops[2] }
+                                        GradientStop { position: 3 / 12; color: Accent.multicolorStops[3] }
+                                        GradientStop { position: 4 / 12; color: Accent.multicolorStops[4] }
+                                        GradientStop { position: 5 / 12; color: Accent.multicolorStops[5] }
+                                        GradientStop { position: 6 / 12; color: Accent.multicolorStops[6] }
+                                        GradientStop { position: 7 / 12; color: Accent.multicolorStops[7] }
+                                        GradientStop { position: 8 / 12; color: Accent.multicolorStops[8] }
+                                        GradientStop { position: 9 / 12; color: Accent.multicolorStops[9] }
+                                        GradientStop { position: 10 / 12; color: Accent.multicolorStops[10] }
+                                        GradientStop { position: 11 / 12; color: Accent.multicolorStops[11] }
+                                        GradientStop { position: 12 / 12; color: Accent.multicolorStops[0] }
                                     }
                                     PathAngleArc { centerX: 12; centerY: 12; radiusX: 12; radiusY: 12; startAngle: 0; sweepAngle: 360 }
                                 }
@@ -215,7 +211,7 @@ Column {
                             anchors.horizontalCenter: parent.horizontalCenter
                             width: 1; horizontalAlignment: Text.AlignHCenter
                             text: sw.sel ? sw.modelData.charAt(0).toUpperCase() + sw.modelData.slice(1) : ""
-                            font.family: Theme.fontText; font.pixelSize: Theme.font.small
+                            font: Typography.subheadline
                             color: Theme.secondaryLabel
                         }
                     }
@@ -229,14 +225,15 @@ Column {
                 anchors.verticalCenter: parent ? parent.verticalCenter : undefined
                 readonly property var names: ["", "accent", "blue", "purple", "pink", "red", "orange", "yellow", "green", "graphite"]
                 readonly property string name: names[hl.currentIndex]
-                // SPEC 15 accent colours (Tokens.accentSwatches), same table as the accent swatches above
-                color: name === "accent" ? Theme.accent : name ? Tokens.accentSwatches[name] : "transparent"
-                gradient: name ? null : auto   // Automatic: accent fading to pink, as in the reference
-                Gradient {
+                // the accent colours of the swatches above (Accent, 27.2.1)
+                color: name === "accent" ? Theme.accent : name ? Accent.swatch(name) : "transparent"
+                gradient: name ? null : auto
+                Gradient {   // Automatic: AppKit's NSMulticolorHighlight (multicolor-highlight-swatch.png)
                     id: auto
                     orientation: Gradient.Horizontal
-                    GradientStop { position: 0; color: Qt.lighter(Theme.accent, 1.6) }
-                    GradientStop { position: 1; color: "#E9A6C7" }
+                    GradientStop { position: 0; color: Accent.multicolorHighlightStops[0] }
+                    GradientStop { position: 0.5; color: Accent.multicolorHighlightStops[1] }
+                    GradientStop { position: 1; color: Accent.multicolorHighlightStops[2] }
                 }
             }
             LocalPopup { id: hl; model: ["Automatic", "Accent Color", "Blue", "Purple", "Pink", "Red", "Orange", "Yellow", "Green", "Graphite"] }

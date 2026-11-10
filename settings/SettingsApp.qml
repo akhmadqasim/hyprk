@@ -138,8 +138,8 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         elide: Text.ElideRight
                         text: d.modelData.title
-                        font.family: Theme.fontText; font.pixelSize: Theme.sidebar.fontSize
-                        weight: d.selected ? Font.DemiBold : Font.Normal
+                        size: Theme.sidebar.fontSize
+                        weight: d.selected ? Typography.semibold : Typography.regular
                         color: d.selected ? Theme.sidebar.selectionText : Theme.label
                     }
                     MouseArea { id: rowMa; anchors.fill: parent; hoverEnabled: true; onClicked: app.open(d.modelData.id) }
@@ -171,12 +171,12 @@ Item {
                 spacing: 1
                 MacText {
                     text: AppState.userName
-                    font.family: Theme.fontText; font.pixelSize: Theme.font.body; weight: Font.DemiBold
+                    weight: Typography.semibold
                     color: Theme.label
                 }
                 Text {
                     text: "Local Account"
-                    font.family: Theme.fontText; font.pixelSize: Theme.font.small
+                    font: Typography.subheadline
                     color: Theme.secondaryLabel
                 }
             }
@@ -216,7 +216,7 @@ Item {
         MacText {
             anchors.left: nav.right; anchors.leftMargin: 13; anchors.verticalCenter: parent.verticalCenter
             text: app.current.title
-            font.family: Theme.fontDisplay; font.pixelSize: Theme.font.title; weight: Font.Bold
+            font: Typography.toolbarTitle   // 15 Semibold, measured on 27.2.1 (was 16 Bold)
             color: Theme.label
         }
     }

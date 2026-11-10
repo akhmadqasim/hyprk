@@ -153,7 +153,7 @@ Column {
                                 horizontalAlignment: Text.AlignHCenter
                                 elide: Text.ElideRight
                                 text: modelData.model || modelData.description
-                                font.family: Theme.fontText; font.pixelSize: Theme.font.small; color: Theme.label
+                                font: Typography.subheadline; color: Theme.label
                             }
                         }
                     }
@@ -197,7 +197,7 @@ Column {
                                 anchors.centerIn: parent
                                 text: "Aa"
                                 // bigger text for smaller looks-like sizes: relative to the Default's size (guessed)
-                                font.pixelSize: Math.max(8, Math.min(24, Math.round(15 * (pane.out ? pane.out.def[0] : ch.modelData.w) / ch.modelData.w)))
+                                size: Math.max(8, Math.min(24, Math.round(15 * (pane.out ? pane.out.def[0] : ch.modelData.w) / ch.modelData.w)))
                                 color: Theme.secondaryLabel
                             }
                             MouseArea {
@@ -212,7 +212,7 @@ Column {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: ch.modelData.label
-                            font.family: Theme.fontText; font.pixelSize: Theme.font.small
+                            font: Typography.subheadline
                             color: Theme.secondaryLabel
                         }
                     }
@@ -223,7 +223,7 @@ Column {
                 anchors.top: chicletRow.bottom; anchors.topMargin: 10
                 readonly property var c: (pane.hovered || pane.selected).split("x")
                 text: c.length === 2 ? "Looks like " + P.sizeText(c[0], c[1]) : ""
-                font.family: Theme.fontText; font.pixelSize: Theme.font.small
+                font: Typography.subheadline
                 color: Theme.secondaryLabel
             }
         }

@@ -1,5 +1,6 @@
 import QtQuick
 import ".."
+import "../HyprK"
 
 // Grouped inset section: optional bold header, rounded card, optional footer.
 Column {
@@ -26,7 +27,7 @@ Column {
         rightPadding: Theme.content.rowPadding
         wrapMode: Text.WordWrap
         text: card.footer
-        font.family: Theme.fontText; font.pixelSize: Theme.font.small
+        font: Typography.subheadline
         color: Theme.secondaryLabel
     }
 }

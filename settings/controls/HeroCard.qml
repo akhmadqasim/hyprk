@@ -1,5 +1,6 @@
 import QtQuick
 import ".."
+import "../HyprK"
 
 // Pane header card: big tile, title, description (General, Appearance, etc.).
 Rectangle {
@@ -23,7 +24,7 @@ Rectangle {
         MacText {
             anchors.horizontalCenter: parent.horizontalCenter
             text: h.title
-            font.family: Theme.fontDisplay; font.pixelSize: Theme.font.title + 2; weight: Font.Bold
+            size: 18; weight: Typography.bold   // TODO verify (not measured)
             color: Theme.label
         }
         Text {
@@ -31,7 +32,7 @@ Rectangle {
             width: parent.width
             horizontalAlignment: Text.AlignHCenter; wrapMode: Text.WordWrap
             text: h.text
-            font.family: Theme.fontText; font.pixelSize: Theme.font.small
+            font: Typography.subheadline
             color: Theme.secondaryLabel
         }
     }

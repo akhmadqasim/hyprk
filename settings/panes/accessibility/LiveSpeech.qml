@@ -27,7 +27,7 @@ Column {
                     anchors.fill: parent; anchors.leftMargin: 8; anchors.rightMargin: 8
                     verticalAlignment: TextInput.AlignVCenter
                     enabled: page.can; clip: true
-                    font.family: Theme.fontText; font.pixelSize: Theme.font.body
+                    font: Typography.body
                     color: Theme.label
                     onAccepted: if (text !== "") page.ctl.speak(text)
                 }

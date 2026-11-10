@@ -1,5 +1,6 @@
 import QtQuick
 import ".."
+import "../HyprK"
 
 // Calm one-line explanation shown instead of raw errors.
 Row {
@@ -17,7 +18,7 @@ Row {
         width: Math.min(implicitWidth, (n.parent ? n.parent.width : 400) - 24)
         wrapMode: Text.WordWrap
         text: n.text
-        font.family: Theme.fontText; font.pixelSize: Theme.font.small
+        font: Typography.subheadline
         color: Theme.secondaryLabel
         anchors.verticalCenter: parent.verticalCenter
     }
