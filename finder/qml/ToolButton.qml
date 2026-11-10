@@ -1,12 +1,11 @@
 import QtQuick
 
-// Icon button inside a Capsule. `selected` draws the inner pill used by the view switcher.
+// Icon button inside a Capsule. The inner pill shows while pressed.
 Item {
     id: root
 
     property string icon
     property real iconSize: Theme.toolbar.iconSize
-    property bool selected: false
     signal clicked()
 
     implicitWidth: Theme.toolbar.buttonWidth
@@ -18,7 +17,7 @@ Item {
         anchors.margins: 4
         radius: height / 2
         color: Theme.color.capsuleSelected
-        visible: root.selected || tap.pressed
+        visible: tap.pressed
     }
     Symbol {
         anchors.centerIn: parent

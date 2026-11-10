@@ -1,4 +1,6 @@
 import QtQuick
+import HyprK
+import "lib/symbols.js" as Symbols
 
 // Unified toolbar over the content area: back/forward, title, view switcher, group,
 // actions (share, tag, more) and search. Empty space drags the window.
@@ -59,24 +61,19 @@ Item {
         anchors.rightMargin: Theme.toolbar.gap
         y: Theme.toolbar.capsuleY
         visible: root.width > 640
-        Repeater {
-            model: [["icons", "view.icons"], ["list", "view.list"], ["columns", "view.columns"], ["gallery", "view.gallery"]]
-            Row {
-                required property var modelData
-                required property int index
-                Rectangle {
-                    visible: index >= 2
-                    width: 1; height: 24
-                    anchors.verticalCenter: parent.verticalCenter
-                    color: Theme.color.separator
-                }
-                ToolButton {
-                    implicitWidth: Theme.toolbar.segment
-                    icon: modelData[1]
-                    selected: root.view === modelData[0]
-                    onClicked: root.viewRequested(modelData[0])
-                }
-            }
+        SegmentedControl {
+            id: viewSwitcher
+            readonly property var modes: ["icons", "list", "columns", "gallery"]
+            readonly property string iconHex: Qt.rgba(Theme.color.toolbarIcon.r, Theme.color.toolbarIcon.g, Theme.color.toolbarIcon.b, 1).toString()
+            segmentWidth: Theme.toolbar.segment
+            height: Theme.toolbar.capsuleHeight
+            selectionInset: 4
+            trackColor: "transparent"
+            selectionColor: Theme.color.capsuleSelected
+            model: modes.map(m => ({ icon: Symbols.url("view." + m, iconHex, "white") }))
+            currentIndex: modes.indexOf(root.view)
+            onActivated: i => root.viewRequested(modes[i])
+            Accessible.name: "View"
         }
     }
 
