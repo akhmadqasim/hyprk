@@ -227,13 +227,26 @@ ShellWindow {
                 size: Theme.spotlight.iconSize
                 color: Theme.color.secondaryLabel
             }
+            // 27.2.1 has a dictation mic at the right end of the field. hyprk has no assistant or dictation behind
+            // "Ask", so it is shown disabled (tertiary colour, no action): the field keeps the macOS layout and
+            // nothing looks broken. Glyph: mic.fill, the only mic in the extracted set (not checked against a
+            // 27.2.1 screenshot, there is none of the Spotlight bar).
+            Symbol {
+                id: mic
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spotlight.hPadding
+                anchors.verticalCenter: parent.verticalCenter
+                name: "mic.fill"
+                size: Theme.spotlight.iconSize
+                color: Theme.color.tertiaryLabel
+            }
             TextInput {
                 id: input
                 MouseArea { anchors.fill: parent; acceptedButtons: Qt.NoButton; cursorShape: Qt.IBeamCursor }   // TextInput sets no I-beam itself
                 anchors.left: mag.right
                 anchors.leftMargin: 12
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.spotlight.hPadding
+                anchors.right: mic.left
+                anchors.rightMargin: 12
                 anchors.verticalCenter: parent.verticalCenter
                 font: Typography.font(Theme.font.spotlightInput)
                 color: Theme.color.label
@@ -251,7 +264,7 @@ ShellWindow {
                 Text {
                     visible: input.text === ""
                     anchors.verticalCenter: parent.verticalCenter
-                    text: sp.modeInfo ? sp.modeInfo.placeholder : "Spotlight Search"
+                    text: sp.modeInfo ? sp.modeInfo.placeholder : "Search or Ask"   // 27.2.1 (MAC-ANSWERS.md R2)
                     font: input.font
                     color: Theme.color.tertiaryLabel
                 }
