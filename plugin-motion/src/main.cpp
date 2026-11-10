@@ -2,6 +2,7 @@
 // Today: the Dock genie for minimize/restore (Dock.app WAGenieAnimation, SPEC.md 11.3).
 // Minimize stays "move to special:minimized" (plugin/src/Titlebar.cpp); this plugin delays
 // that move by the genie duration and warps the live window into the Dock meanwhile.
+#include "Close.hpp"
 #include "GenieTransformer.hpp"
 
 #include <hyprland/src/config/ConfigValue.hpp>
@@ -216,10 +217,13 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     if (!g_moveHook)
         HyprlandAPI::addNotification(handle, "[hyprkmotion] could not hook CWindow::moveToWorkspace, no genie", CHyprColor{1.0, 0.6, 0.2, 1.0}, 6000);
 
+    if (!motion::close::init(handle))
+        HyprlandAPI::addNotification(handle, "[hyprkmotion] close hooks missing: no close blur / null-buffer snapshot fix", CHyprColor{1.0, 0.6, 0.2, 1.0}, 6000);
+
     g_listeners.push_back(Event::bus()->m_events.tick.listen([] { onTick(); }));
     g_listeners.push_back(Event::bus()->m_events.window.close.listen([](PHLWINDOW w) { finishFor(w, eEnd::DROP); }));
 
-    return {"hyprkmotion", "macOS window motion: Dock genie minimize/restore", "hyprk", "0.1.0"};
+    return {"hyprkmotion", "macOS window motion: Dock genie, close blur", "hyprk", "0.1.0"};
 }
 
 APICALL EXPORT void PLUGIN_EXIT() {
@@ -228,6 +232,7 @@ APICALL EXPORT void PLUGIN_EXIT() {
     for (auto& a : pending)
         endAnim(a, eEnd::NOW);   // pending minimizes still happen; no transformer may outlive the .so
     g_listeners.clear();
+    motion::close::exit();
     if (g_moveHook)
         HyprlandAPI::removeFunctionHook(g_handle, g_moveHook);
     g_moveHook = nullptr;

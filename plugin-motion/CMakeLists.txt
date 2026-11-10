@@ -17,7 +17,7 @@ set_target_properties(motioncore PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(motioncore PUBLIC src)
 
 if(HYPRLAND_FOUND)
-  add_library(hyprkmotion SHARED src/main.cpp src/GenieTransformer.cpp)
+  add_library(hyprkmotion SHARED src/main.cpp src/GenieTransformer.cpp src/Close.cpp)
   target_link_libraries(hyprkmotion PRIVATE motioncore PkgConfig::HYPRLAND)
   target_compile_options(hyprkmotion PRIVATE -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers)
 else()
