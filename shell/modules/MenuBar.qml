@@ -163,10 +163,7 @@ ShellWindow {
         height: Theme.menuBar.titleHeight
 
         // the pill jumps at once (MAC-ANSWERS.md R2); the dropdown follows a few frames later (Panels.stepMenu)
-        HighlightPill {
-            shown: mt.open
-            fadesWithMenu: true
-        }
+        HighlightPill { shown: mt.open }
         Text {
             id: label
             anchors.centerIn: parent
@@ -189,34 +186,21 @@ ShellWindow {
         }
     }
 
-    // open/hovered state of a title or status item. No glass (MENUBAR-REA-27.2.1.md): a capsule of the
+    // open state of a title or status item. No glass (MENUBAR-REA-27.2.1.md): a capsule of the
     // blurred desktop picture through a colour matrix (shaders/menupill.frag), with a faint shadow
     // (MAC-ANSWERS.md Q9.1). Nothing but the wallpaper is ever under the bar, so the pre-blurred wallpaper
     // is the exact backdrop: no compositor blur and no per-frame work while it stands still. The pill
-    // exists only while shown or fading, not one per title.
-    // It appears in full at once and jumps between titles in one frame (MAC-ANSWERS.md R2); the per-frame
-    // alpha of open and close was not measured. `fadesWithMenu` (menu titles): it goes away with no fade
-    // when another title takes over, and fades with the menu (0.2 s OutQuad, Theme.anim.menuFadeOut,
-    // measured for the menu on Esc) on the final close; that the title fades along is guessed.
+    // exists only while shown, not one per title.
+    // Per-frame alpha on 27.2.1 (relay #52): full in the first frame of an open, jumps between titles within
+    // one frame (no slide), and is gone in one frame on close (Esc or click) while the dropdown still fades.
     component HighlightPill: Item {
         id: hp
         property bool shown: false
-        property bool fadesWithMenu: false
         anchors.fill: parent
-        // 1 while shown; on hide cut to 0, or fade out with the closing menu
-        property real fade: shown ? 1 : 0
-        NumberAnimation { id: pillFade; target: hp; property: "fade"; to: 0; duration: Theme.anim.menuFadeOut; easing.type: Easing.OutQuad }
-        onShownChanged: {
-            pillFade.stop();
-            if (shown) fade = 1;
-            else if (fadesWithMenu && Panels.open !== "menu") pillFade.start();
-            else fade = 0;
-        }
         Loader {
             anchors.fill: parent
-            active: hp.shown || hp.fade > 0
+            active: hp.shown
             sourceComponent: Item {
-                opacity: hp.fade
                 // faint shadow under the pill: 206 -> 196 just below it over solid blue (measured);
                 // offset and blur guessed
                 RectangularShadow {
@@ -270,9 +254,9 @@ ShellWindow {
         width: contentWidth + Theme.menuBar.statusHPadding * 2
         height: Theme.menuBar.titleHeight
 
-        // macOS 27 status items: the pill shows on hover too
-        HighlightPill { shown: si.active || sma.containsMouse || sma.pressed }
+        // pressed or open only: hovering a status item shows no pill (27.2.1, relay #52)
+        HighlightPill { shown: si.active || sma.pressed }
         Item { id: sholder; anchors.fill: parent }
-        MouseArea { id: sma; anchors.fill: parent; hoverEnabled: true; onClicked: si.clicked() }
+        MouseArea { id: sma; anchors.fill: parent; onClicked: si.clicked() }
     }
 }
