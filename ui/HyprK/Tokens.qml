@@ -33,10 +33,6 @@ QtObject {
     readonly property color groupFill: dark ? Qt.rgba(1, 1, 1, 0.05) : Qt.rgba(0, 0, 0, 0.03)   // grouped form card, Settings ref #F7F7F7 on white
 
     // accent colours per choice, light and dark: Accent.qml (measured on 27.2.1)
-    // old name of Accent.swatch(); goes once Settings uses Accent
-    readonly property var accentSwatches: dark
-        ? ({ blue: "#007AFF", purple: "#A550A7", pink: "#F74F9E", red: "#FF5257", orange: "#F7821B", yellow: "#FFC600", green: "#62BA46", graphite: "#8C8C8C" })
-        : ({ blue: "#007AFF", purple: "#953D96", pink: "#F74F9E", red: "#E0383E", orange: "#F7821B", yellow: "#FFC726", green: "#62BA46", graphite: "#989898" })
 
     // ---------- controls (Switch, Slider, Popup, Button, SearchField) ----------
     readonly property QtObject control: QtObject {

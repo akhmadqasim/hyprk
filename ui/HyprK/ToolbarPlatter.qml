@@ -3,19 +3,17 @@ import QtQuick.Effects
 
 // Capsule platter behind a group of window-toolbar items (macOS 27.2.1 NSToolbarPlatterView, Tokens.toolbar):
 // a flat raised capsule, not a glass strip. Put the items on top of it. Static: nothing animates.
-// `unit` scales the shadow offsets for apps drawn at another scale (the Finder's reference px).
 Item {
     id: p
     property real radius: height / 2
-    property real unit: 1
 
     implicitHeight: Tokens.toolbar.platterHeight
 
     RectangularShadow {
         anchors.fill: parent
         radius: p.radius
-        blur: Tokens.toolbar.shadowRadius * p.unit
-        offset.y: Tokens.toolbar.shadowOffsetY * p.unit
+        blur: Tokens.toolbar.shadowRadius
+        offset.y: Tokens.toolbar.shadowOffsetY
         color: Tokens.toolbar.shadow
     }
     Rectangle {
