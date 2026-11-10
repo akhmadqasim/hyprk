@@ -104,6 +104,7 @@ Item {
         Symbol {
             anchors.verticalCenter: parent.verticalCenter
             name: "chevron.down"
+            weight: "semibold"
             size: 11
             color: Theme.color.toolbarIcon
         }
