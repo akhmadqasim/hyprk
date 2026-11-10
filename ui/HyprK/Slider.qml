@@ -6,7 +6,7 @@ import "controls.js" as G
 // lens and the fill darkens by a black a.098 layer (20 ms delay, 150 ms ease-in-out; back in 150 ms).
 // Mouse-down on the knob grabs it where it was hit; mouse-down on the track sends the knob there (ease-out, no
 // overshoot) and keeps tracking. tickMarks > 1 draws 2 x 2 dots under the track; onlyTicks snaps to them.
-// End glyphs sit beside the track (6 pt gap); text labels sit under it, 11 pt (Desktop & Dock): leftText /
+// End glyphs sit beside the track (6 pt gap) and are buttons that send the value to that end; text labels sit under it, 11 pt (Desktop & Dock): leftText /
 // rightText, or `labels: [[text, fraction], ...]` (0 = left-aligned at the start, 1 = right-aligned at the end,
 // otherwise centred under that knob position).
 // Controlled: it shows `value` and emits moved(value) while dragged; the caller owns the state.
@@ -71,6 +71,7 @@ Item {
         text: s.leftGlyph
         font.family: Tokens.fontGlyph; font.pixelSize: 15
         color: Tokens.secondaryLabel
+        MouseArea { anchors.fill: parent; onClicked: { s.moved(s.from); s.released(); } }
     }
     Text {
         id: rg; visible: s.rightGlyph !== ""
@@ -78,6 +79,7 @@ Item {
         text: s.rightGlyph
         font.family: Tokens.fontGlyph; font.pixelSize: 18
         color: Tokens.secondaryLabel
+        MouseArea { anchors.fill: parent; onClicked: { s.moved(s.to); s.released(); } }
     }
     Item {
         id: track
