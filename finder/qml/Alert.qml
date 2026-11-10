@@ -1,4 +1,5 @@
 import QtQuick
+import HyprK
 
 // Minimal alert sheet for errors (rename clash, trash failure).
 Item {
@@ -33,8 +34,8 @@ Item {
                 wrapMode: Text.Wrap
                 horizontalAlignment: Text.AlignHCenter
                 color: Theme.color.label
-                font.pixelSize: 13
-                weight: Font.DemiBold
+                size: 13
+                weight: Typography.semibold
             }
             Text {
                 width: parent.width
@@ -43,8 +44,7 @@ Item {
                 wrapMode: Text.Wrap
                 horizontalAlignment: Text.AlignHCenter
                 color: Theme.color.secondaryLabel
-                font.family: Theme.fontText
-                font.pixelSize: 11
+                font: Typography.font(11)
             }
             Rectangle {
                 id: ok
@@ -59,8 +59,7 @@ Item {
                     anchors.centerIn: parent
                     text: "OK"
                     color: "white"
-                    font.family: Theme.fontText
-                    font.pixelSize: 13
+                    font: Typography.body
                 }
                 TapHandler { onTapped: root.message = "" }
             }

@@ -1,4 +1,5 @@
 import QtQuick
+import HyprK
 import QtQuick.Controls.Basic
 import Finder.Native
 import "lib/files.js" as Files
@@ -90,27 +91,27 @@ Item {
                     radius: Theme.list.rowRadius
                     color: !selected ? "transparent" : col.last ? Theme.color.listSelection : Theme.color.listSelectionInactive
 
+                    // 27.2.1 column view: icon ink at 17 pt, name at 39.5 pt from the column's left edge
                     FileIcon {
-                        x: 6
+                        x: 8.5
                         anchors.verticalCenter: parent.verticalCenter
                         entry: row.modelData
                         size: Theme.columns.iconSize
                     }
                     Text {
                         visible: !row.renaming
-                        x: 30
+                        x: 33.5
                         width: parent.width - x - 22
                         anchors.verticalCenter: parent.verticalCenter
                         text: Files.hasTags(row.modelData) ? Files.styledName(row.modelData, Theme.color.tagColors) : row.modelData.name
                         textFormat: Files.hasTags(row.modelData) ? Text.StyledText : Text.PlainText
                         elide: Text.ElideMiddle
                         color: row.selected && col.last ? "white" : Theme.color.label
-                        font.family: Theme.fontText
-                        font.pixelSize: Theme.font.list
+                        font: Typography.body
                     }
                     Loader {
                         active: row.renaming
-                        x: 28
+                        x: 31.5
                         width: parent.width - x - 20
                         anchors.verticalCenter: parent.verticalCenter
                         sourceComponent: RenameField {
@@ -177,22 +178,20 @@ Item {
                 elide: Text.ElideMiddle
                 text: root.previewEntry.name
                 color: Theme.color.label
-                font.pixelSize: 15
-                weight: Font.DemiBold
+                size: 15
+                weight: Typography.semibold
             }
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: root.previewEntry.kind + " – " + Files.formatSize(root.previewEntry.size, false)
                 color: Theme.color.secondaryLabel
-                font.family: Theme.fontText
-                font.pixelSize: Theme.font.list
+                font: Typography.body
             }
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "Modified " + Files.formatDate(root.previewEntry.modified)
                 color: Theme.color.secondaryLabel
-                font.family: Theme.fontText
-                font.pixelSize: Theme.font.list
+                font: Typography.body
             }
         }
     }

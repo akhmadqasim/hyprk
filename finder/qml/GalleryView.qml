@@ -1,4 +1,5 @@
 import QtQuick
+import HyprK
 import QtQuick.Controls.Basic
 import "lib/files.js" as Files
 
@@ -58,8 +59,8 @@ Item {
         elide: Text.ElideMiddle
         text: root.focused ? root.focused.name : ""
         color: Theme.color.label
-        font.pixelSize: 15
-        weight: Font.DemiBold
+        size: 15
+        weight: Typography.semibold
     }
 
     ListView {

@@ -12,10 +12,7 @@ Item {
     implicitWidth: row.implicitWidth + 2 * padding
     implicitHeight: Theme.toolbar.capsuleHeight
 
-    ToolbarPlatter {
-        anchors.fill: parent
-        unit: Theme.toolbar.pt
-    }
+    ToolbarPlatter { anchors.fill: parent }
     Row {
         id: row
         x: root.padding

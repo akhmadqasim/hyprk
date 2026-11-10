@@ -54,8 +54,7 @@ Item {
         text: root.browser.title
         elide: Text.ElideRight
         color: Theme.color.title
-        font.pixelSize: Theme.font.title
-        weight: Font.DemiBold
+        font: Typography.toolbarTitle   // 15 Semibold (27.2.1)
     }
 
     Capsule {
@@ -63,7 +62,7 @@ Item {
         anchors.right: group.left
         anchors.rightMargin: Theme.toolbar.gap
         y: Theme.toolbar.capsuleY
-        visible: root.width > 640
+        visible: root.width > 524
         SegmentedControl {
             id: viewSwitcher
             readonly property var modes: ["icons", "list", "columns", "gallery"]
@@ -93,21 +92,22 @@ Item {
         anchors.right: actions.left
         anchors.rightMargin: Theme.toolbar.gap
         y: Theme.toolbar.capsuleY
-        padding: 4
-        visible: root.width > 760
+        // 27.2.1: 46 pt capsule, group glyph centred at 17, chevron at 36.5
+        padding: 3
+        visible: root.width > 622
         ToolButton {
             id: groupButton
-            implicitWidth: 34
+            implicitWidth: 28
             icon: "group"
             onClicked: root.groupRequested(groupButton)
         }
         Symbol {
             anchors.verticalCenter: parent.verticalCenter
             name: "chevron.down"
-            size: 14
+            size: 11
             color: Theme.color.toolbarIcon
         }
-        Item { width: 6; height: 1 }
+        Item { width: Theme.toolbar.groupWidth - 6 - 28 - 11; height: 1 }
     }
 
     Capsule {
@@ -115,7 +115,7 @@ Item {
         anchors.right: search.left
         anchors.rightMargin: Theme.toolbar.gap
         y: Theme.toolbar.capsuleY
-        visible: root.width > 560
+        visible: root.width > 458
         ToolButton {
             implicitWidth: Theme.toolbar.actionsWidth / 3
             icon: "share"
@@ -163,9 +163,9 @@ Item {
                 verticalAlignment: TextInput.AlignVCenter
                 clip: true
                 color: Theme.color.label
-                selectionColor: Theme.color.accent
-                font.family: Theme.fontText
-                font.pixelSize: Theme.font.list + 1
+                selectionColor: Theme.color.textSelection
+                selectedTextColor: Theme.color.label
+                font: Typography.body
                 text: root.browser.query
                 onTextEdited: root.browser.query = text
                 // Return/arrows must not reach the window's key handler (rename, cursor moves)

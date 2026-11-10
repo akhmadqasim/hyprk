@@ -1,4 +1,5 @@
 import QtQuick
+import HyprK
 import QtQuick.Controls.Basic
 
 // macOS 26 style menu: rounded translucent panel, blue rounded highlight.
@@ -57,8 +58,7 @@ Popup {
                     anchors.verticalCenter: parent.verticalCenter
                     text: "✓"
                     color: hover.hovered ? "white" : Theme.color.label
-                    font.family: Theme.fontText
-                    font.pixelSize: 13
+                    font: Typography.body
                 }
                 Text {
                     id: label
@@ -67,8 +67,7 @@ Popup {
                     anchors.verticalCenter: parent.verticalCenter
                     text: it.modelData.text || ""
                     color: !it.on ? Theme.color.tertiaryLabel : hover.hovered ? "white" : Theme.color.label
-                    font.family: Theme.fontText
-                    font.pixelSize: 13
+                    font: Typography.body
                 }
                 Text {
                     id: shortcutText
@@ -78,8 +77,7 @@ Popup {
                     anchors.verticalCenter: parent.verticalCenter
                     text: it.modelData.shortcut || ""
                     color: hover.hovered && it.on ? "white" : Theme.color.secondaryLabel
-                    font.family: Theme.fontText
-                    font.pixelSize: 13
+                    font: Typography.body
                 }
                 HoverHandler { id: hover; enabled: it.plain }
                 Row {

@@ -1,4 +1,5 @@
 import QtQuick
+import HyprK
 import QtQuick.Controls.Basic
 import "lib/files.js" as Files
 
@@ -46,8 +47,8 @@ Item {
                     horizontalAlignment: h.modelData.right ? Text.AlignRight : Text.AlignLeft
                     text: h.modelData.title
                     color: Theme.color.secondaryLabel
-                    font.pixelSize: Theme.font.listHeader
-                    weight: root.browser.sortKey === h.modelData.key ? Font.DemiBold : Font.Medium
+                    size: Theme.font.listHeader
+                    weight: root.browser.sortKey === h.modelData.key ? Typography.semibold : Typography.medium
                 }
                 Symbol {
                     visible: root.browser.sortKey === h.modelData.key
@@ -130,8 +131,7 @@ Item {
                         textFormat: Files.hasTags(row.modelData) ? Text.StyledText : Text.PlainText
                         elide: Text.ElideMiddle
                         color: row.textColor
-                        font.family: Theme.fontText
-                        font.pixelSize: Theme.font.list
+                        font: Typography.body
                     }
                     Loader {
                         active: row.renaming
@@ -164,8 +164,7 @@ Item {
                         text: modelData
                         elide: Text.ElideRight
                         color: row.selected ? "white" : Theme.color.secondaryLabel
-                        font.family: Theme.fontText
-                        font.pixelSize: Theme.font.list
+                        font: Typography.body
                     }
                 }
             }

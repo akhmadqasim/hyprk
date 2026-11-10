@@ -1,4 +1,5 @@
 import QtQuick
+import HyprK
 import QtQuick.Controls.Basic
 import Finder.Native
 import "lib/files.js" as Files
@@ -42,8 +43,8 @@ Rectangle {
             elide: Text.ElideMiddle
             text: root.open ? root.entry.name : ""
             color: Theme.color.label
-            font.pixelSize: Theme.font.preview
-            weight: Font.DemiBold
+            size: Theme.font.preview
+            weight: Typography.semibold
         }
         Rectangle {
             anchors.right: parent.right
@@ -58,8 +59,7 @@ Rectangle {
                 anchors.centerIn: parent
                 text: "Open"
                 color: Theme.color.label
-                font.family: Theme.fontText
-                font.pixelSize: Theme.font.preview
+                font: Typography.font(Theme.font.preview)
             }
             TapHandler { id: openTap; onTapped: if (root.open) FileOps.open(root.entry.path) }
         }
@@ -108,22 +108,20 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: root.open ? root.entry.name : ""
                 color: Theme.color.label
-                font.pixelSize: 17
-                weight: Font.DemiBold
+                size: 17
+                weight: Typography.semibold
             }
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: root.open ? root.entry.kind + " – " + Files.formatSize(root.entry.size, root.entry.isDir) : ""
                 color: Theme.color.secondaryLabel
-                font.family: Theme.fontText
-                font.pixelSize: Theme.font.preview
+                font: Typography.font(Theme.font.preview)
             }
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: root.open ? "Modified " + Files.formatDate(root.entry.modified) : ""
                 color: Theme.color.secondaryLabel
-                font.family: Theme.fontText
-                font.pixelSize: Theme.font.preview
+                font: Typography.font(Theme.font.preview)
             }
         }
     }

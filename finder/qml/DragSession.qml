@@ -1,4 +1,5 @@
 import QtQuick
+import HyprK
 import Finder.Native
 import "lib/files.js" as Files
 
@@ -130,8 +131,7 @@ Item {
             maximumLineCount: 1
             color: Theme.color.label
             opacity: 0.62
-            font.family: Theme.fontText
-            font.pixelSize: Theme.font.label
+            font: Typography.font(Theme.font.label)
         }
         Rectangle {   // count badge, like the red Finder drag badge
             visible: root.entries.length > 1
@@ -146,9 +146,7 @@ Item {
                 anchors.centerIn: parent
                 text: root.entries.length
                 color: "white"
-                font.family: Theme.fontText
-                font.pixelSize: 13
-                font.weight: Font.DemiBold
+                font: Typography.font(13, Typography.semibold)
             }
         }
     }

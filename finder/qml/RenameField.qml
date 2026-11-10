@@ -1,4 +1,5 @@
 import QtQuick
+import HyprK
 import "lib/files.js" as Files
 
 // Inline rename editor. Selects the base name (not the extension) like Finder.
@@ -41,8 +42,7 @@ Rectangle {
         selectionColor: Theme.color.accent
         selectedTextColor: "white"
         selectByMouse: true
-        font.family: Theme.fontText
-        font.pixelSize: root.fontSize
+        font: Typography.font(root.fontSize)
         Keys.onReturnPressed: root.finish(true)
         Keys.onEnterPressed: root.finish(true)
         Keys.onEscapePressed: root.finish(false)

@@ -1,4 +1,5 @@
 import QtQuick
+import HyprK
 import "lib/files.js" as Files
 
 // Path bar (View > Show Path Bar): every ancestor of the current folder, clickable.
@@ -54,8 +55,7 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
                         text: modelData.name
                         color: Theme.color.secondaryLabel
-                        font.family: Theme.fontText
-                        font.pixelSize: Theme.font.pathBar
+                        font: Typography.font(Theme.font.pathBar)
                         TapHandler { onTapped: root.browser.go(modelData.path) }
                     }
                 }

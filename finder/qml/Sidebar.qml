@@ -1,5 +1,6 @@
 import QtQuick
 import Finder.Native
+import HyprK
 import "lib/files.js" as Files
 
 // Sidebar: Recents, Favorites, Locations, Tags. A flat full-height panel flush with the window's left, top
@@ -73,8 +74,8 @@ Rectangle {
                         verticalAlignment: Text.AlignVCenter
                         text: section.modelData.header
                         color: Theme.color.sidebarHeader
-                        font.pixelSize: Theme.font.sidebarHeader
-                        weight: Font.DemiBold
+                        size: Theme.font.sidebarHeader
+                        weight: Typography.semibold
                     }
 
                     Repeater {
@@ -119,8 +120,8 @@ Rectangle {
                                 text: row.modelData.label
                                 elide: Text.ElideRight
                                 color: Theme.color.label
-                                font.pixelSize: Theme.font.sidebarItem
-                                weight: row.current ? Font.DemiBold : Font.Normal
+                                size: Theme.font.sidebarItem
+                                weight: row.current ? Typography.semibold : Typography.regular
                             }
                             TapHandler {
                                 id: tap
@@ -140,7 +141,7 @@ Rectangle {
         }
     }
 
-    // soft edge between sidebar and content, ref (189..193 fades to white)
+    // soft edge between sidebar and content (27.2.1: one 0.5 pt step at x 325 px, 211 between 237 and 255)
     Rectangle {
         anchors.right: parent.right
         width: 1

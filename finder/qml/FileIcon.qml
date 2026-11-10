@@ -124,8 +124,8 @@ Item {
             y: root.size * 0.70
             text: Files.badge(root.entry)
             color: "#8E8E93"
-            font.pixelSize: Math.round(root.size * 0.135)
-            weight: Font.DemiBold
+            size: Math.round(root.size * 0.135)
+            weight: Typography.semibold
         }
     }
 }

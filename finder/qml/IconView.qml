@@ -1,4 +1,5 @@
 import QtQuick
+import HyprK
 import QtQuick.Controls.Basic
 import "lib/files.js" as Files
 
@@ -124,8 +125,7 @@ GridView {
             elide: Text.ElideRight
             lineHeight: 1.12
             color: cell.selected ? "white" : Theme.color.label
-            font.family: Theme.fontText
-            font.pixelSize: Theme.font.label
+            font: Typography.font(Theme.font.label)
         }
         Loader {
             active: cell.renaming

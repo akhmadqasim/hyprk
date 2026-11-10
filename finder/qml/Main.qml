@@ -99,6 +99,7 @@ Window {
 
         Toolbar {
             id: toolbar
+            y: -keys.y   // measured from the window's top edge, not inside the 1 px frame
             width: parent.width
             browser: fm
             window: win
@@ -127,8 +128,7 @@ Window {
             anchors.centerIn: viewLoader
             text: "No Results"
             color: Theme.color.tertiaryLabel
-            font.family: Theme.fontText
-            font.pixelSize: 15
+            font: Typography.font(15)
         }
 
         PathBar {
