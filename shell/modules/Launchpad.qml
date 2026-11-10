@@ -93,6 +93,7 @@ ShellWindow {
             }
             TextInput {
                 id: search
+                MouseArea { anchors.fill: parent; acceptedButtons: Qt.NoButton; cursorShape: Qt.IBeamCursor }   // TextInput sets no I-beam itself
                 anchors.left: mg.right
                 anchors.leftMargin: Theme.launchpad.headerGap
                 anchors.right: more.left

@@ -17,6 +17,7 @@ Rectangle {
     }
     TextInput {
         id: input
+        MouseArea { anchors.fill: parent; acceptedButtons: Qt.NoButton; cursorShape: Qt.IBeamCursor }   // TextInput sets no I-beam itself
         anchors.left: mag.right; anchors.leftMargin: 4
         anchors.right: parent.right; anchors.rightMargin: 10
         anchors.verticalCenter: parent.verticalCenter

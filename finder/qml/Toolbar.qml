@@ -147,6 +147,7 @@ Item {
             height: Theme.toolbar.capsuleHeight
             TextInput {
                 id: field
+                MouseArea { anchors.fill: parent; acceptedButtons: Qt.NoButton; cursorShape: Qt.IBeamCursor }   // TextInput sets no I-beam itself
                 anchors.fill: parent
                 verticalAlignment: TextInput.AlignVCenter
                 clip: true

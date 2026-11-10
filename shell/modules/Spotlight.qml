@@ -191,6 +191,7 @@ ShellWindow {
             }
             TextInput {
                 id: input
+                MouseArea { anchors.fill: parent; acceptedButtons: Qt.NoButton; cursorShape: Qt.IBeamCursor }   // TextInput sets no I-beam itself
                 anchors.left: mag.right
                 anchors.leftMargin: 12
                 anchors.right: parent.right

@@ -318,6 +318,7 @@ Item {
                     z: 2
                     TextInput {
                         id: keyInput
+                        MouseArea { anchors.fill: parent; acceptedButtons: Qt.NoButton; cursorShape: Qt.IBeamCursor }   // TextInput sets no I-beam itself
                         anchors.fill: parent
                         anchors.leftMargin: 10
                         anchors.rightMargin: 10
