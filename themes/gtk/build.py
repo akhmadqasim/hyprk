@@ -17,7 +17,9 @@ SRC = ROOT / 'src'
 
 def _gtk(s, **own):
     """GTK colour keys = shared tokens renamed + the GTK-only ones in `own`."""
-    own = {'header_bg': s['window'], 'header_backdrop': s['window'], **own}   # dark: title bar a step lighter than the content
+    # title bar / toolbar = the window background: macOS 27.2.1 toolbars have no fill of their own, the window
+    # content shows behind the item capsules (reference/re/MAC-ANSWERS.md Q9.2), also in dark mode and when inactive
+    own = {'header_bg': s['window'], 'header_backdrop': s['window'], **own}
     return dict(accent_bg=s['accent'], accent_text=s['accent_text'], window_bg=s['window'], view_bg=s['field'],
                 sidebar_bg=s['sidebar'], card_bg=s['card'],
                 dialog_bg=s['dialog'], popover_bg=s['popover'],
@@ -38,7 +40,7 @@ PALETTES = {
     'dark': _gtk(
         SHARED['dark'],
         destructive='#FF453A', success='#30D158', warning='#FF9F0A', error='#FF453A', fg='rgba(255,255,255,0.85)',
-        sidebar_backdrop='#262626', thumb_bg='#2C2C2C', header_bg='#2B2B2B', header_backdrop='#262626',
+        sidebar_backdrop='#262626', thumb_bg='#2C2C2C',
         sep='rgba(255,255,255,0.10)', shade='rgba(0,0,0,0.35)', fill='rgba(255,255,255,0.08)', fill_hover='rgba(255,255,255,0.13)',
         fill_active='rgba(255,255,255,0.20)', sel_grey='rgba(255,255,255,0.12)',
         ctl_bg='rgba(255,255,255,0.14)', ctl_bg_hover='rgba(255,255,255,0.20)', ctl_bg_active='rgba(255,255,255,0.28)',

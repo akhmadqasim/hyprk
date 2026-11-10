@@ -195,7 +195,8 @@ toolbarview > .top-bar headerbar, toolbarview > .bottom-bar headerbar, headerbar
 toolbarview > .top-bar { background-color: @mac_header_bg; }
 toolbarview > .top-bar:backdrop { background-color: @mac_header_backdrop; }
 /* a hairline only appears when content scrolls under the bar */
-toolbarview > .top-bar.raised { box-shadow: 0 1px 0 0 @mac_sep; }
+/* no hairline under the toolbar: on 27.2.1 the window content runs straight under it (MAC-ANSWERS.md Q9.2) */
+toolbarview > .top-bar.raised { box-shadow: none; }
 toolbarview > .bottom-bar.raised { box-shadow: 0 -1px 0 0 @mac_sep; }
 
 /* sidebar-side headerbars blend with the sidebar like Finder */
