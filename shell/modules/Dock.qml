@@ -38,12 +38,21 @@ ShellWindow {
     readonly property real baseWidth: (items.length - 1) * base + sepCell + (items.length - 1) * Theme.dock.iconSpacing + sidePad * 2
     property real mouseX: -1
     readonly property bool hovering: mouseX >= 0
+    // last cursor x over the Dock: icons shrink back around it after the cursor leaves
+    property real focusX: 0
+    onMouseXChanged: if (mouseX >= 0) focusX = mouseX
+
+    // Like macOS: icon sizes follow the cursor directly every frame; only entering and
+    // leaving the Dock ramp the magnification in and out. (A Behavior on each icon's
+    // size chased the cursor and lagged behind it, so icons overlapped and jittered.)
+    property real magnify: hovering && Panels.open !== "context" ? 1 : 0
+    Behavior on magnify { NumberAnimation { duration: Theme.anim.magnify; easing.type: Easing.OutCubic } }
 
     function sizeFor(baseCenter) {
-        if (!hovering || Panels.open === "context") return base;
-        const d = Math.abs(mouseX - baseCenter) / (base * Theme.dock.magnifyRange);
+        if (magnify <= 0) return base;
+        const d = Math.abs(focusX - baseCenter) / (base * Theme.dock.magnifyRange);
         if (d >= 1) return base;
-        return base + (dock.magnified - base) * (Math.cos(d * Math.PI) + 1) / 2;
+        return base + (dock.magnified - base) * magnify * (Math.cos(d * Math.PI) + 1) / 2;
     }
 
     // hit area: background, plus the magnified band while hovering
@@ -99,7 +108,6 @@ ShellWindow {
 
                 width: modelData.separator ? dock.sepCell : size
                 height: dock.base            // constant; the icon grows upward out of the cell
-                Behavior on width { enabled: !cell.modelData.separator; NumberAnimation { duration: Theme.anim.magnify } }
 
                 // separator
                 Rectangle {
@@ -116,6 +124,7 @@ ShellWindow {
                     id: icon
                     visible: !cell.modelData.separator
                     size: cell.size
+                    loadSize: dock.magnified     // load once at full size, then only scale
                     anchors.horizontalCenter: parent.horizontalCenter
                     y: parent.height - height - bounceY
                     property real bounceY: 0

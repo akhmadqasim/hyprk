@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell.Widgets
 import qs
 import qs.services
 
@@ -12,6 +11,7 @@ Item {
     property string icon
     property string appId
     property real size: 48
+    property real loadSize: size
     readonly property bool plated: !Apps.isMacIcon(icon, appId)
 
     implicitWidth: size
@@ -28,11 +28,19 @@ Item {
         border.width: 1
         border.color: Theme.appIcon.plateEdge
     }
-    IconImage {
+    // Plain Image, not IconImage: IconImage reloads the file whenever its size changes, so the
+    // magnifying Dock reloaded (and blanked) every icon on every frame. The image is loaded once
+    // at loadSize and scaled; set loadSize to the largest size the icon is drawn at.
+    Image {
+        readonly property real k: root.plated ? Theme.appIcon.body * Theme.appIcon.inner : 1
         anchors.centerIn: parent
-        implicitSize: root.plated ? root.size * Theme.appIcon.body * Theme.appIcon.inner : root.size
+        width: root.size * k
+        height: width
+        sourceSize: Qt.size(Math.ceil(root.loadSize * k), Math.ceil(root.loadSize * k))
+        fillMode: Image.PreserveAspectFit
         source: Apps.iconUrl(root.icon, root.appId)
         asynchronous: true
+        smooth: true
         mipmap: true
     }
 }

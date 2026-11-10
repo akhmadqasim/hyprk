@@ -402,7 +402,7 @@ Singleton {
         readonly property int close: 250                 // panels close (ScaleDownAndOut)
         readonly property int bannerIn: 380              // TODO verify
         readonly property int bounce: 340                // one dock bounce up+down, TODO verify
-        readonly property int magnify: 90                // dock magnification follow, TODO verify
+        readonly property int magnify: 150               // dock magnification ramp on enter/leave (by eye; the cursor follow is not animated)
         readonly property int easing: Easing.OutCubic
     }
 }
