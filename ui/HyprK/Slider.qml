@@ -84,10 +84,10 @@ Item {
             id: lt; visible: !s.leftIcon
             text: s.leftGlyph
             font.family: Tokens.fontGlyph; font.pixelSize: 15
-            color: Tokens.secondaryLabel
+            color: lma.pressed ? Tokens.label : Tokens.secondaryLabel   // pressed: darker (borderless image button)
         }
-        Loader { id: li; sourceComponent: s.leftIcon }
-        MouseArea { anchors.fill: parent; anchors.margins: -3; onClicked: s._end(-1) }
+        Loader { id: li; sourceComponent: s.leftIcon; property bool pressed: lma.pressed }
+        MouseArea { id: lma; objectName: "leftEnd"; anchors.fill: parent; anchors.margins: -3; onClicked: s._end(-1) }
     }
     Item {
         id: rg; visible: s.rightGlyph !== "" || s.rightIcon !== null
@@ -97,10 +97,10 @@ Item {
             id: rt; visible: !s.rightIcon
             text: s.rightGlyph
             font.family: Tokens.fontGlyph; font.pixelSize: 18
-            color: Tokens.secondaryLabel
+            color: rma.pressed ? Tokens.label : Tokens.secondaryLabel
         }
-        Loader { id: ri; sourceComponent: s.rightIcon }
-        MouseArea { anchors.fill: parent; anchors.margins: -3; onClicked: s._end(1) }
+        Loader { id: ri; sourceComponent: s.rightIcon; property bool pressed: rma.pressed }
+        MouseArea { id: rma; objectName: "rightEnd"; anchors.fill: parent; anchors.margins: -3; onClicked: s._end(1) }
     }
     Item {
         id: track

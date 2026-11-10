@@ -19,6 +19,7 @@ Checkbox 1.0 Checkbox.qml
 SegmentedControl 1.0 SegmentedControl.qml
 ToolbarPlatter 1.0 ToolbarPlatter.qml
 Slider 1.0 Slider.qml
+OverlayScrollbar 1.0 OverlayScrollbar.qml
 Knob 1.0 Knob.qml
 FocusRing 1.0 FocusRing.qml
 Popup 1.0 Popup.qml

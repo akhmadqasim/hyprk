@@ -91,6 +91,17 @@ QtObject {
         readonly property real focusRingWidth: 3     // Q-24: 3 pt, gap 0, radius + 3, Accent.focusRing, no animation
     }
 
+    // ---------- overlay scroll bar (OverlayScrollbar; MAC-ANSWERS.md PC #60 section 5) ----------
+    // knob 6 pt, r 3, 3 pt from the window's right edge; light #808080 (black a.5), dark #8F9192 (white a.5 on #1E1F24)
+    readonly property QtObject scroller: QtObject {
+        readonly property real width: 6
+        readonly property real inset: 3            // from the right edge, below the toolbar and above the bottom
+        readonly property real minLength: 18       // TODO verify (not measured; AppKit keeps the knob grabbable)
+        readonly property color knob: t.dark ? Qt.rgba(1, 1, 1, 0.5) : Qt.rgba(0, 0, 0, 0.5)
+        readonly property int hold: 600            // stays after the last scroll event
+        readonly property int fade: 150            // then fades out (9 frames)
+    }
+
     // ---------- window toolbar platters (Finder, Settings; ToolbarPlatter) ----------
     // macOS 27.2.1 (reference/re/MAC-ANSWERS.md Q9.2): the toolbar strip has no fill and no glass. Each item
     // group sits on a capsule platter (NSToolbarPlatterView > NSGlassEffectView, regular, 36 pt, radius 18).
