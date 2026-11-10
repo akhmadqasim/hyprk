@@ -815,3 +815,143 @@ Same rules as before: no git, no GUI, no defaults writes. Nothing existing was o
   - `person.2.<regular|medium|semibold>.svg` at 32 pt, to match the R3b set.
   - They are listed in `names.json` → `finder.sidebarGlyph` and `finder.toolbarGlyph` (size/scale/weight, evidence, files), with per-file metrics under `files`.
   - 13 pt `.large` is not the same as a larger point size at `.medium`, so use the 13pt-large files directly.
+
+## Q-windows (27.2.1)
+
+Files: pictures in `reference/screens/27.2.1/windows/`, data in `reference/re/27.2.1/live/windows/` (`windows-measurements.json` has every number below; `probe-windows-{light,dark}.json` is the AppKit dump; `cursors/` and `cursors-live/` hold cursor PNGs). Probe source: `reference/re/tools/probe/windows.swift`. Colours are sRGB from 2x screenshots. The wallpaper was solid blue (69,83,206).
+
+- Q-windows-01: The shadow is pure black with alpha, so it looks the same over white and over the wallpaper. AppKit `shadowParameters` for a document window: blur radius 20 active / 8 inactive, y offset 18 / 7 pt, density 0.40 / 0.22 in light and 0.70 / 0.45 in dark. Finder, measured: alpha at 2, 8, 16 and 32 pt from the edge:
+  - Dark active: below .56 .49 .38 .17; side .33 .25 .15 .04; above .11 .07 .03 .00. Visible extent: below 64.5 pt, side 46, above 29.5.
+  - Light active: below .32 .28 .22 .09; side .18 .14 .09 .02; above .06 .04 .02 0. Extent: 61.5 / 43.5 / 24.5 pt.
+  - Dark inactive: below .33 .21 .06 0; side .19 .08 .01; above .06 .02 0. Extent: 24.5 / 18 / 10.5 pt.
+  - Light inactive: below .16 .10 .03 0; side .09 .04 0; above .03 .01 0. Extent: 22.5 / 16 / 8 pt.
+  - Utility panel: radius 8, offset 4, density .25 light / .30 dark.
+  (screencapture -l alpha profiles; NSWindow `shadowParameters` from the probe)
+- Q-windows-02: 16 pt for every window type measured: TextEdit, Finder, Safari, and the Fonts utility panel. AppKit `_cornerRadius` is also 16 for utility, toolbar and fixed-size windows. The curve is continuous, not a circle: the corner spans 24 pt (1.5 r).
+  - Fits on the Finder corner: Apple continuous r 16 to 17 pt (RMS 0.32 pt); best circle 17 pt (RMS 0.56 pt, poor); Hyprland-style superellipse rounding 39.5 pt, power 5.75 (RMS 0.18 pt).
+  - Alert: about 26 pt (circle 26 to 28 pt; the glass edge is soft).
+  - Green-button popover: about 9 pt.
+  (alpha profile of -o captures fitted to circle, continuous curve and superellipse)
+- Q-windows-03: Two rims around every edge. There is no extra top highlight.
+  - Outside: a 0.5 pt (1 px) black rim. Alpha about .93 active / .83 inactive in dark, .21 / .19 in light.
+  - Inside: a 1 pt white rim, alpha .10 (.08 dark inactive).
+  - TextEdit dark active, top edge from outside to inside: on white 221 → 16 → (61,61,67) ×2 px → bar (40,40,46); on blue (62,72,171) → (5,5,13) → (61,61,67).
+  - Light active: on white 232 → 184 → 255; on blue (65,75,182) → (52,60,144) → 255. The inner rim is invisible on white and shows on grey (sidebar 235 → 237).
+  (2x pixel rows across each edge over a white window and over blue, active and inactive)
+- Q-windows-04: No glass in any of the four.
+  - TextEdit and Terminal: the bar is an NSScrollPocket "hard pocket" made of two CABackdropLayers (gaussianBlur r6 + colorMatrix with saturation about 1.2 and +0.03, then a colorMatrix) over the window's own background (NSVisualEffectView material 18). Measured pixels are the same over white and over blue, so it is effectively a solid fill.
+  - Finder: see MAC-ANSWERS Q9 (empty backdrop; only the item platters are glass).
+  - Safari: the 52 pt strip has no fill; page content shows through under it, and only the controls are glass capsules (pixels only; another process's layers cannot be dumped).
+  (probe layer dump with filter inputs + pixels)
+- Q-windows-05:
+  - TextEdit dark: #28282E active, #28282F inactive, over content #1E1E1E, so a separate fill in dark.
+  - TextEdit light: #FFFFFF active and inactive, the same as the content.
+  - Terminal dark: #28282E.
+  - Finder has no bar colour: the toolbar shows the content (dark #202127, light #FFFFFF) with the scroll-edge blur.
+  (2x pixels, white and blue backdrops)
+- Q-windows-06: Bar heights from AX: TextEdit 32 pt, Terminal 32, Finder 52 (AXToolbar), Safari 52 plus a 38 pt tab bar.
+  - TextEdit and Terminal have a 0.5 pt divider at the top of the content: black a.10 in light (#E5E5E5 on white), white a.07 in dark (#2E2E2E on #1E1E1E). It is always drawn, not only when content scrolls.
+  - Finder and Safari have no divider; they use the scroll edge effect (Q9).
+  (AX frames, probe layer, pixels)
+- Q-windows-07: All frames are window-relative.
+  - TextEdit and Terminal: 14 pt discs at x 9, 32, 55 (pitch 23), y 9, so the centre is at 16 of 32. AX frames are 16×16 at (8,8), (31,8), (54,8).
+  - Finder and Safari (52 pt toolbar): AX (18,18), (41,18), (64,18), so discs at x 19, 42, 65 with centre y 26.
+  - Utility panel: 10 pt discs at x 8, 25, 42 (pitch 17).
+  (axd + probe `standardWindowButton` frames)
+- Q-windows-08: Colours at rest, top / centre / bottom of each disc:
+  - Dark close: #E87061 / #E1675B / #DE6F64, with a 1 px specular rim at top and bottom (#F6C6BC / #F5C4BA) and plain sides.
+  - Dark min: #F1B835 / #F3C22D / #F6CF50, rim #F5F581.
+  - Dark zoom: #6EC341 / #62BD2D / #6DC04B, rim #BFF69A.
+  - Light close: #ED786B / #EA857B / #E89189 with a darker rim (#E97469).
+  - Light min: #F2BD50 / #F5CB59 / #F8D562 with a darker rim.
+  - Light zoom: #7DCD4A / #98D46F / #A9DA86 with a darker rim.
+  - Light discs also have a faint coloured glow about 1 pt outside.
+  - Pressed: the disc grows to 16 to 17 pt (about 1.15×) and gets brighter, not darker. Fill beside the glyph: close #FF7C68 dark / #FFAC9E light, min #FFFF70 (bottom) and #F06000, zoom #C6FF8F light.
+  - Holding green about 0.3 s opens the tile popover (Q19).
+  (2x crops `lights-*.png`)
+- Q-windows-09: The discs are grey in a non-key window.
+  - Dark: #4C4C52 fill (#47484D at the bottom) with a light grey rim (#B4B4B4 at the top px).
+  - Light: #EFEFF3 to #F6F7F8 with a grey ring (#EAEAEE).
+  - On hover they turn fully coloured with glyphs, the same as the active hover state.
+  (crops `lights-inactive*.png`)
+- Q-windows-10: Glyphs show on all three buttons when the pointer enters the group, about 0.07 s after entering.
+  - Fade-in per 60 fps frame: .30 .64 .81 .90 .95 .96 .97 1, about 0.1 s ease-out. Fade-out: .22 .52 .77 .89 .96 .97 .99, about 0.1 s. No delay on exit.
+  - Glyph sizes: × 7×7 pt; − 7.5×1.9 pt; full-screen glyph (two triangles) 6×6 pt; Option turns it into + 8×8 pt. Stroke about 1.9 pt.
+  - Colours: dark #850000 / #AA3600 / #005500; light #9E0000 / #BE4900 / #097900.
+  (60 fps recording, patch progress + 2x coverage)
+- Q-windows-11: The TextEdit title is SF (.AppleSystemUIFaceHeadline) 13 pt bold (weight 0.4), labelColor a.85 drawn with a plus-lighter blend.
+  - Rendered colour: dark active (165,164,172), about white a.58; inactive (105,106,112), about a.30. Light active #4C4C4C, about black a.70; inactive #BEBEBE, about a.25.
+  - Position: not centred. It is left-aligned at x 100 after the 16 pt proxy icon (x 82), y 8 to 24.
+  - Truncation is at the tail.
+  - The utility panel title is SF 11 regular and centred.
+  (probe font dump + AX + pixels)
+- Q-windows-12:
+  - Finder: the title ("Applications") is bold 13 and left-aligned right after the back/forward capsule (text from x≈256 pt; its AX field spans the free space 248 to 525). It is vertically centred in the 52 pt bar. Active is (58,59,57) light / (236,236,235) dark; inactive (129,132,128) / (117,115,103).
+  - Safari: no title text, only the profile capsule and the URL field.
+  - Mail: not measured (no Mail window was open, and opening one would show mail). Probe `NSWindow.subtitle` instead: title .SFNS-Bold 13 labelColor; subtitle .SFNS-Regular 11 secondaryLabel (black a.50 light / white a.55 dark); left-aligned at the same x, subtitle directly below; title line 16 pt, subtitle line 14 pt.
+  (AX, probe, pixels)
+- Q-windows-13: Finder: yes, every item group is a regular glass platter (see Q9). Here: back/forward capsule 74×36; view popup capsule about 45×36; Group; one shared capsule for Share/Tags/Action; search is a 36 pt circle. Safari: all items look like glass capsules (sidebar 36 circle, profile capsule 128 wide, back/forward 75×36, extensions capsule, search field 238×31 capsule with focus ring, right capsule for Downloads/Share/+/Tabs). Dark fill is about #585C67 on a #3F4151 strip. Pixels only. Safari tab bar: not measured (it shows the user's pinned tabs). (AX + `safari-toolbar-left-dark.png`)
+- Q-windows-14: See MAC-ANSWERS Q9. The strip is not glass and not an NSVisualEffectView. Content scrolls under it with a scroll edge effect about 52 pt tall (visible blur of the icons in `finder-toolbar-*.png`). TextEdit/Terminal content does not go under the bar.
+- Q-windows-15: Glass (NSGlassEffectView `_variant` 18 per Q9; not vibrancy). It is flush with the window's left, top and bottom edges, 163 pt wide, with a 0.5 pt divider on the right (#D3D4D5 light / #3D4150 dark).
+  - Active it lets the desktop through, more at the outer edge. Colours at x 6 pt → x 96 pt: dark over white #424352 → #2E3040; dark over blue #252B6D → #232749; light over white #EBEBEC; light over blue #D4DAFF → #E4E7FD.
+  - Inactive it is flat and almost independent of the backdrop: dark #262837, light #F1F1F2.
+  - Item rows are 32 pt, section headers 19 pt.
+  - Selection is a grey pill, not the accent colour: #D7D7D8 active / #E7E7E8 inactive in light, 32 pt tall, x 10 to 153, radius about 8 pt.
+  - The selected icon uses the accent (#006BEE light / #28A2FF dark); it turns grey when inactive.
+  (pixels white/blue × active/inactive, AX rows)
+- Q-windows-16: See MAC-ANSWERS R2 and LIVE: the window is complete in the first frame (95 % in frame 1, the rest within 0.1 s); no scale or fade is visible. Reduce Motion: not measured (it is an accessibility toggle, and the open is already instant).
+- Q-windows-17: See MAC-ANSWERS R2: a fade of about 0.1 s, alpha per frame 1 .71 .44 .27 .16 .09 .05 .03 (TextEdit). There is a slight blur on Finder; scale cannot be resolved. Safari closes instantly.
+- Q-windows-18: See MAC-ANSWERS R2 and LIVE: genie of about 0.22 s into the app's Dock icon (whole effect about 0.65 s); restore about 0.22 s. The default mineffect is genie (this account says genie; the Dock default is genie). Window alpha during genie: not measured.
+- Q-windows-19:
+  - Click: native full screen. On this notch screen the window becomes 0,34 1710×1073, with its own 32 pt titlebar window.
+  - Option-click: zoom to the visible frame 0,34 1710×1020. While Option is held the glyph is +. Option-click again restores.
+  - Hover about 0.8 s, or hold about 0.3 s: a glass popover (ThemeWidgetControlViewService window, layer 101). Body 238×190.5 pt plus a 9 pt arrow pointing at the button. It appears in 1 frame with no fade and stays while the pointer is on it; Esc closes it.
+  - Popover items: "Move & Resize" (Left, Right, Top, Bottom), "Fill & Arrange" (Fill, Left & Right, Left & Quarters, Quarters), a separator, then "Full Screen ›".
+  - The default on 27.2.1 is full screen.
+  (60 fps recording + `green-button-hover-menu-*.png`)
+- Q-windows-20: See MAC-ANSWERS R2: zoom 0.33 s ease-in-out (unzoom ease-out); full screen enter about 0.42 s, exit about 0.5 s in two steps. Menu bar reveal in full screen: not measured.
+- Q-windows-21: Double-click on the titlebar zooms; it toggles between 300,200 700×450 and 0,34 1710×1020. AppleActionOnDoubleClick here is "Maximize", which is the "Zoom" default. Mouse-down on an inactive window's titlebar raises and activates it at once, before any drag (the lights turn coloured). The shadow while dragging is the normal active shadow, with no lift. (synthetic down/drag + wins + -l alpha)
+- Q-windows-22: TextEdit (autosave) shows no dot in the close button when edited. The title becomes "Chrome Test.txt — Edited" with "Edited" dimmer; on hover a chevron appears.
+  - Click on the title: a glass popover (Name, Tags, Where + lock) anchored under the chevron.
+  - Cmd-click: path menu.
+  - The 16 pt proxy icon is always shown left of the title.
+  - Fixed-size window (probe, no .resizable): the zoom button is disabled; disc pixels not measured. Settings > Appearance in 27.2.1 reports zoom enabled (AXZoomButton).
+  (`textedit-edited-title-states-dark.png`, `title-click-document-popover-dark.png`)
+- Q-windows-23: Resize zones, using NSCursor.currentSystem at 0.5 to 1 pt steps:
+  - Edges: about ±3 pt around the frame line (left/top observed −2..+2, right/bottom −3..+3), so about half the zone is outside the window.
+  - Corners: the diagonal cursor runs for 16 pt along each edge from the corner and about 8 pt diagonally inside.
+  - Cursor sizes (hotspot in brackets): left/right 24×18 (12,9); top/bottom 18×28 (9,14); corner 22×22 (11,11). These match NSCursor.frameResize.
+  - Minimum size: TextEdit 115×46, Finder 479×280.
+  - Live resize: the frame and content follow the drag every frame.
+- Q-windows-24: Tiling.
+  - Edge-drag: the preview appears only when the pointer touches the screen edge (at x=0, not at x=2).
+  - The preview is a WindowManager "Drag Guide Window" equal to the tile frame: radius about 16 pt, a 3 pt light rim (about white a.5), the interior darkened about 17 %, and a soft shadow about 8 pt. It fades in about 0.13 s and out about 0.15 s with no visible scale.
+  - Option-drag: the preview follows the half under the pointer anywhere on screen.
+  - Window > Move & Resize with margins off (this account): Left 0,34 855×1020; Top Right 855,34 855×510; Fill 0,34 1710×1020; no gap.
+  - With margins on (turned on briefly, then restored): 8 pt screen-edge margin and 8 pt gap. Left & Right: 8,42 843×1004 and 859,42 843×1004.
+  - 60 fps of the tile move itself: not measured.
+  (wins + screenshots + recording; `tile-preview-left-corner.png`)
+- Q-windows-25: What changes when a Finder window becomes inactive; content icons and labels do not change.
+  - Lights turn grey.
+  - Title dims (light 58 → 129, dark 236 → 117).
+  - Toolbar glass platters flatten (light fill 245 → 236, dark 76 → 60) and their glyphs dim.
+  - The sidebar loses its translucency (flat #F1F1F2 / #262837) and its icons turn grey instead of the accent.
+  - The selection pill gets lighter (#D7D7D8 → #E7E7E8) with grey text.
+  - The shadow gets smaller (Q01) and the rim lighter (Q03).
+  (`finder-toolbar-*`, `finder-sidebar-*`)
+- Q-windows-26: 2x PNGs and hotspots are in `live/windows/cursors/` (NSCursor) and `cursors-live/` (captured on real windows). Sizes in pt with hotspot:
+  - arrow 28×40 canvas (5,5); I-beam 23×22 (12,11)
+  - pointingHand 32×32 (12,8); open/closedHand 32×32 (15,16)
+  - edge resize 24×18 (12,9) and 18×28 (9,14); corner 22×22 (11,11)
+  - column resize 30×24 (15,12); row resize 24×28 (12,14)
+  - dragCopy and operationNotAllowed 28×40 (5,5); dragLink 16×21 (11,3)
+  - Pointer size on this account is 1.02.
+- Q-windows-27: Finder drag cursors:
+  - Plain move: arrow, no badge.
+  - Option: copy cursor (arrow with a green + badge, = dragCopy).
+  - Cmd-Option: alias cursor (curved arrow, = dragLink).
+  - Over the menu bar: plain arrow (no not-allowed cursor seen).
+  - Drag image: icon and label at scale 1.0, opacity about 0.9, soft shadow.
+  - Esc cancel: the image slides back to the source in about 0.25 s, ease-out (.28 .36 .44 .52 .59 .65 .72 .78 .84 .89 .93 .96 .99 1), no fade.
+  (curmon + 60 fps recording + `finder-drag-image-dark.png`)
+- Q-windows-28: not measured: neither Chrome nor VS Code is installed on this Mac.

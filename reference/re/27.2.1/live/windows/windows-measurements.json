@@ -1,0 +1,32 @@
+{
+  "source": "macOS 27.2.1 (26B131), MacBook Air M2, 2x, Dark/Light, measured 2026-11-10; px = 2x pixels, pt = points",
+  "shadowParameters_NSWindow": {
+    "document": {"light": {"densityActive": 0.4, "densityInactive": 0.22, "radiusActive": 20, "radiusInactive": 8, "yOffsetActive": 18, "yOffsetInactive": 7, "rimDensity": [0.6, 0.55], "rimRadius": 3, "rimHard": 0, "innerRimWhiteDensity": [0.1, 0.1], "innerRimRadius": 2},
+                 "dark":  {"densityActive": 0.7, "densityInactive": 0.45, "radiusActive": 20, "radiusInactive": 8, "yOffsetActive": 18, "yOffsetInactive": 7, "rimDensity": [0.95, 0.85], "rimRadius": 2, "rimHard": 1, "innerRimWhiteDensity": [0.1, 0.08], "innerRimRadius": 3}},
+    "utilityPanel": {"light": {"densityActive": 0.25, "densityInactive": 0.22, "radius": 8, "yOffset": 4}, "dark": {"density": 0.3, "radius": 8, "yOffset": 4}}
+  },
+  "shadowAlphaFinder_pt": {
+    "note": "alpha of black shadow at distance d pt from the window edge (screencapture -l, independent of background); extent = last pixel with alpha > 1/255",
+    "darkActive":   {"below": {"2": 0.557, "8": 0.486, "16": 0.38, "32": 0.169}, "side": {"2": 0.325, "8": 0.247, "16": 0.153, "32": 0.039}, "above": {"2": 0.114, "8": 0.071, "16": 0.031, "32": 0.004}, "extent": {"below": 64.5, "side": 46, "above": 29.5}},
+    "lightActive":  {"below": {"2": 0.318, "8": 0.278, "16": 0.216, "32": 0.094}, "side": {"2": 0.184, "8": 0.141, "16": 0.086, "32": 0.024}, "above": {"2": 0.063, "8": 0.039, "16": 0.02, "32": 0.0}, "extent": {"below": 61.5, "side": 43.5, "above": 24.5}},
+    "darkInactive": {"below": {"2": 0.333, "8": 0.212, "16": 0.059, "32": 0.0}, "side": {"2": 0.188, "8": 0.075, "16": 0.008}, "above": {"2": 0.059, "8": 0.016, "16": 0.0}, "extent": {"below": 24.5, "side": 18, "above": 10.5}},
+    "lightInactive":{"below": {"2": 0.161, "8": 0.102, "16": 0.027, "32": 0.0}, "side": {"2": 0.09, "8": 0.035, "16": 0.004}, "above": {"2": 0.027, "8": 0.008, "16": 0.0}, "extent": {"below": 22.5, "side": 16, "above": 8}}
+  },
+  "edgePixels": {
+    "note": "1 px = 0.5 pt outer rim just outside the frame, 2 px = 1 pt inner white rim inside; TextEdit window, sampled mid-edge",
+    "darkActive":   {"onWhite_top": ["221 shadow", "16 rim", "61,61,67 inner rim", "40,40,46 titlebar"], "onBlue_top": ["62,72,171", "5,5,13", "61,61,67", "40,40,46"], "rimBlackAlpha": 0.93, "innerWhiteAlpha": 0.10},
+    "darkInactive": {"onWhite_top": ["232", "40", "56,57,64", "39,40,47"], "rimBlackAlpha": 0.83, "innerWhiteAlpha": 0.08},
+    "lightActive":  {"onWhite_top": ["232", "184", "255", "255"], "onBlue_top": ["65,75,182", "52,60,144", "255", "255"], "rimBlackAlpha": 0.21},
+    "lightInactive":{"onWhite_top": ["241", "195", "255", "255"], "rimBlackAlpha": 0.19}
+  },
+  "cornerRadius": {"AppKit_cornerRadius_pt": 16, "curve": "continuous; corner spans 24 pt (1.5 r)", "fit_Finder_pt": {"continuous_r": 17, "continuous_rms": 0.32, "circle_r": 17, "circle_rms": 0.56, "superellipse_extent": 39.5, "superellipse_n": 5.75, "superellipse_rms": 0.18}, "sameProfile": ["TextEdit", "Finder", "Safari", "Fonts utility panel"], "alert_pt": 26, "greenButtonPopover_pt": 9},
+  "titlebar": {"TextEdit": {"height": 32, "dark": {"active": "#28282E", "inactive": "#28282F", "content": "#1E1E1E"}, "light": {"active": "#FFFFFF", "inactive": "#FFFFFF", "content": "#FFFFFF"}, "divider": "0.5 pt at top of content: light black a0.10 (#E5E5E5), dark white a0.07 (#2E2E2E)", "layers": "NSScrollPocket hard pocket: CABackdrop gaussianBlur r6 + colorMatrix, CABackdrop colorMatrix; window background NSVisualEffectView material 18"},
+               "Terminal": {"height": 32, "dark": "#28282E"}, "Finder": {"toolbar": 52}, "Safari": {"toolbar": 52, "tabBar": 38}},
+  "trafficLights": {"documentWindow": {"disc": 14, "x": [9, 32, 55], "y": 9, "pitch": 23, "AXframe": 16}, "toolbarWindow52": {"x": [19, 42, 65], "y": 19}, "utility": {"disc": 10, "x": [8, 25, 42], "pitch": 17}},
+  "glyphs": {"fadeIn_progressPerFrame": [0.30, 0.64, 0.81, 0.90, 0.95, 0.96, 0.97, 1.0], "fadeOut_progressPerFrame": [0.22, 0.52, 0.77, 0.89, 0.96, 0.97, 0.99], "delayAfterEnter_s": 0.07, "x_pt": 7, "minus_pt": [7.5, 1.9], "fullscreen_pt": 6, "plus_pt": 8, "stroke_pt": 1.9, "colourDark": {"close": "#850000", "min": "#AA3600", "zoom": "#005500"}, "colourLight": {"close": "#9E0000", "min": "#BE4900", "zoom": "#097900"}},
+  "greenButton": {"click": "full screen", "optionClick": "zoom to visible frame 0,34,1710,1020", "hoverDelay_s": 0.8, "popover": {"process": "ThemeWidgetControlViewService", "layer": 101, "body_pt": [238, 190.5], "arrow_pt": 9, "appear": "1 frame", "items": ["Move & Resize: Left, Right, Top, Bottom", "Fill & Arrange: Fill, Left & Right, Left & Quarters, Quarters", "Full Screen >"]}},
+  "resizeZones_pt": {"edge": "-3..+3 around the frame line (left/top observed -2..+2)", "cornerAlongEdge": 16, "cornerDiagonalInside": 8, "minSize": {"TextEdit": [115, 46], "Finder": [479, 280]}},
+  "tiling": {"marginsOff": {"Left": [0, 34, 855, 1020], "TopRight": [855, 34, 855, 510], "Fill": [0, 34, 1710, 1020]}, "marginsOn": {"edge": 8, "gap": 8, "LeftRight": [[8, 42, 843, 1004], [859, 42, 843, 1004]], "TopLeft": [8, 42, 843, 498], "Fill": [8, 42, 1694, 1004]},
+             "edgeDragHotzone": "pointer at x=0 only", "preview": {"window": "WindowManager Drag Guide Window, frame = tile + 15 pt", "rim_pt": 3, "interiorDarken": 0.17, "radius_pt": 16, "fadeIn_s": 0.13, "fadeOut_s": 0.15}, "optionDrag": "preview of the half under the pointer, no edge needed"},
+  "dragAndDrop": {"move": "arrow, no badge", "option": "dragCopy 28x40 hot 5,5", "cmdOption": "dragLink 16x21 hot 11,3", "overMenuBar": "arrow", "dragImageScale": 1.0, "dragImageAlpha": 0.9, "cancelSlideBack_s": 0.25, "cancelProgressPerFrame": [0.28, 0.36, 0.44, 0.52, 0.59, 0.65, 0.72, 0.78, 0.84, 0.89, 0.93, 0.96, 0.99, 1.0]}
+}

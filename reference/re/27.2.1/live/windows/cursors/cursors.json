@@ -1,0 +1,706 @@
+[
+  {
+    "hotSpotPt" : [
+      5,
+      5
+    ],
+    "name" : "arrow",
+    "png" : "cursors\/arrow.png",
+    "px" : [
+      280,
+      400
+    ],
+    "reps" : [
+      "28x40",
+      "56x80",
+      "140x200",
+      "280x400"
+    ],
+    "sizePt" : [
+      28,
+      40
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      12,
+      11
+    ],
+    "name" : "iBeam",
+    "png" : "cursors\/iBeam.png",
+    "px" : [
+      230,
+      220
+    ],
+    "reps" : [
+      "23x22",
+      "46x44",
+      "115x110",
+      "230x220"
+    ],
+    "sizePt" : [
+      23,
+      22
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      12,
+      8
+    ],
+    "name" : "pointingHand",
+    "png" : "cursors\/pointingHand.png",
+    "px" : [
+      66,
+      66
+    ],
+    "reps" : [
+      "32x32",
+      "33x33",
+      "64x64",
+      "66x66"
+    ],
+    "sizePt" : [
+      32,
+      32
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      15,
+      16
+    ],
+    "name" : "closedHand",
+    "png" : "cursors\/closedHand.png",
+    "px" : [
+      66,
+      66
+    ],
+    "reps" : [
+      "32x32",
+      "33x33",
+      "64x64",
+      "66x66"
+    ],
+    "sizePt" : [
+      32,
+      32
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      15,
+      16
+    ],
+    "name" : "openHand",
+    "png" : "cursors\/openHand.png",
+    "px" : [
+      66,
+      66
+    ],
+    "reps" : [
+      "32x32",
+      "33x33",
+      "64x64",
+      "66x66"
+    ],
+    "sizePt" : [
+      32,
+      32
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      11,
+      11
+    ],
+    "name" : "crosshair",
+    "png" : "cursors\/crosshair.png",
+    "px" : [
+      50,
+      50
+    ],
+    "reps" : [
+      "24x24",
+      "25x25",
+      "48x48",
+      "50x50"
+    ],
+    "sizePt" : [
+      24,
+      24
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      5,
+      5
+    ],
+    "name" : "disappearingItem",
+    "png" : "cursors\/disappearingItem.png",
+    "px" : [
+      58,
+      82
+    ],
+    "reps" : [
+      "28x40",
+      "29x41",
+      "56x80",
+      "58x82"
+    ],
+    "sizePt" : [
+      28,
+      40
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      5,
+      5
+    ],
+    "name" : "operationNotAllowed",
+    "png" : "cursors\/operationNotAllowed.png",
+    "px" : [
+      58,
+      82
+    ],
+    "reps" : [
+      "28x40",
+      "29x41",
+      "56x80",
+      "58x82"
+    ],
+    "sizePt" : [
+      28,
+      40
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      11,
+      3
+    ],
+    "name" : "dragLink",
+    "png" : "cursors\/dragLink.png",
+    "px" : [
+      33,
+      43
+    ],
+    "reps" : [
+      "16x21",
+      "17x22",
+      "32x42",
+      "33x43"
+    ],
+    "sizePt" : [
+      16,
+      21
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      5,
+      5
+    ],
+    "name" : "dragCopy",
+    "png" : "cursors\/dragCopy.png",
+    "px" : [
+      58,
+      82
+    ],
+    "reps" : [
+      "28x40",
+      "29x41",
+      "56x80",
+      "58x82"
+    ],
+    "sizePt" : [
+      28,
+      40
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      5,
+      5
+    ],
+    "name" : "contextualMenu",
+    "png" : "cursors\/contextualMenu.png",
+    "px" : [
+      58,
+      82
+    ],
+    "reps" : [
+      "28x40",
+      "29x41",
+      "56x80",
+      "58x82"
+    ],
+    "sizePt" : [
+      28,
+      40
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      11,
+      10
+    ],
+    "name" : "iBeamVertical",
+    "png" : "cursors\/iBeamVertical.png",
+    "px" : [
+      45,
+      43
+    ],
+    "reps" : [
+      "22x21",
+      "23x22",
+      "44x42",
+      "45x43"
+    ],
+    "sizePt" : [
+      22,
+      21
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      15,
+      12
+    ],
+    "name" : "resizeLeftRight",
+    "png" : "cursors\/resizeLeftRight.png",
+    "px" : [
+      62,
+      50
+    ],
+    "reps" : [
+      "30x24",
+      "31x25",
+      "60x48",
+      "62x50"
+    ],
+    "sizePt" : [
+      30,
+      24
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      12,
+      14
+    ],
+    "name" : "resizeUpDown",
+    "png" : "cursors\/resizeUpDown.png",
+    "px" : [
+      50,
+      58
+    ],
+    "reps" : [
+      "24x28",
+      "25x29",
+      "48x56",
+      "50x58"
+    ],
+    "sizePt" : [
+      24,
+      28
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      12,
+      12
+    ],
+    "name" : "resizeLeft",
+    "png" : "cursors\/resizeLeft.png",
+    "px" : [
+      50,
+      50
+    ],
+    "reps" : [
+      "24x24",
+      "25x25",
+      "48x48",
+      "50x50"
+    ],
+    "sizePt" : [
+      24,
+      24
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      12,
+      12
+    ],
+    "name" : "resizeRight",
+    "png" : "cursors\/resizeRight.png",
+    "px" : [
+      50,
+      50
+    ],
+    "reps" : [
+      "24x24",
+      "25x25",
+      "48x48",
+      "50x50"
+    ],
+    "sizePt" : [
+      24,
+      24
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      12,
+      13
+    ],
+    "name" : "resizeUp",
+    "png" : "cursors\/resizeUp.png",
+    "px" : [
+      50,
+      50
+    ],
+    "reps" : [
+      "24x24",
+      "25x25",
+      "48x48",
+      "50x50"
+    ],
+    "sizePt" : [
+      24,
+      24
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      12,
+      11
+    ],
+    "name" : "resizeDown",
+    "png" : "cursors\/resizeDown.png",
+    "px" : [
+      50,
+      50
+    ],
+    "reps" : [
+      "24x24",
+      "25x25",
+      "48x48",
+      "50x50"
+    ],
+    "sizePt" : [
+      24,
+      24
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      15,
+      12
+    ],
+    "name" : "columnResize",
+    "png" : "cursors\/columnResize.png",
+    "px" : [
+      62,
+      50
+    ],
+    "reps" : [
+      "30x24",
+      "31x25",
+      "60x48",
+      "62x50"
+    ],
+    "sizePt" : [
+      30,
+      24
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      12,
+      14
+    ],
+    "name" : "rowResize",
+    "png" : "cursors\/rowResize.png",
+    "px" : [
+      50,
+      58
+    ],
+    "reps" : [
+      "24x28",
+      "25x29",
+      "48x56",
+      "50x58"
+    ],
+    "sizePt" : [
+      24,
+      28
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      12,
+      11
+    ],
+    "name" : "zoomIn",
+    "png" : "cursors\/zoomIn.png",
+    "px" : [
+      58,
+      54
+    ],
+    "reps" : [
+      "28x26",
+      "29x27",
+      "56x52",
+      "58x54"
+    ],
+    "sizePt" : [
+      28,
+      26
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      12,
+      11
+    ],
+    "name" : "zoomOut",
+    "png" : "cursors\/zoomOut.png",
+    "px" : [
+      58,
+      54
+    ],
+    "reps" : [
+      "28x26",
+      "29x27",
+      "56x52",
+      "58x54"
+    ],
+    "sizePt" : [
+      28,
+      26
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      9,
+      14
+    ],
+    "name" : "frameResize-top-all",
+    "png" : "cursors\/frameResize-top-all.png",
+    "px" : [
+      37,
+      58
+    ],
+    "reps" : [
+      "18x28",
+      "19x29",
+      "36x56",
+      "37x58"
+    ],
+    "sizePt" : [
+      18,
+      28
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      12,
+      9
+    ],
+    "name" : "frameResize-left-all",
+    "png" : "cursors\/frameResize-left-all.png",
+    "px" : [
+      50,
+      37
+    ],
+    "reps" : [
+      "24x18",
+      "25x19",
+      "48x36",
+      "50x37"
+    ],
+    "sizePt" : [
+      24,
+      18
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      9,
+      14
+    ],
+    "name" : "frameResize-bottom-all",
+    "png" : "cursors\/frameResize-bottom-all.png",
+    "px" : [
+      37,
+      58
+    ],
+    "reps" : [
+      "18x28",
+      "19x29",
+      "36x56",
+      "37x58"
+    ],
+    "sizePt" : [
+      18,
+      28
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      12,
+      9
+    ],
+    "name" : "frameResize-right-all",
+    "png" : "cursors\/frameResize-right-all.png",
+    "px" : [
+      50,
+      37
+    ],
+    "reps" : [
+      "24x18",
+      "25x19",
+      "48x36",
+      "50x37"
+    ],
+    "sizePt" : [
+      24,
+      18
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      11,
+      11
+    ],
+    "name" : "frameResize-topLeft-all",
+    "png" : "cursors\/frameResize-topLeft-all.png",
+    "px" : [
+      45,
+      45
+    ],
+    "reps" : [
+      "22x22",
+      "23x23",
+      "44x44",
+      "45x45"
+    ],
+    "sizePt" : [
+      22,
+      22
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      11,
+      11
+    ],
+    "name" : "frameResize-topRight-all",
+    "png" : "cursors\/frameResize-topRight-all.png",
+    "px" : [
+      45,
+      45
+    ],
+    "reps" : [
+      "22x22",
+      "23x23",
+      "44x44",
+      "45x45"
+    ],
+    "sizePt" : [
+      22,
+      22
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      11,
+      11
+    ],
+    "name" : "frameResize-bottomLeft-all",
+    "png" : "cursors\/frameResize-bottomLeft-all.png",
+    "px" : [
+      45,
+      45
+    ],
+    "reps" : [
+      "22x22",
+      "23x23",
+      "44x44",
+      "45x45"
+    ],
+    "sizePt" : [
+      22,
+      22
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      11,
+      11
+    ],
+    "name" : "frameResize-bottomRight-all",
+    "png" : "cursors\/frameResize-bottomRight-all.png",
+    "px" : [
+      45,
+      45
+    ],
+    "reps" : [
+      "22x22",
+      "23x23",
+      "44x44",
+      "45x45"
+    ],
+    "sizePt" : [
+      22,
+      22
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      12,
+      9
+    ],
+    "name" : "frameResize-left-inward",
+    "png" : "cursors\/frameResize-left-inward.png",
+    "px" : [
+      50,
+      37
+    ],
+    "reps" : [
+      "24x18",
+      "25x19",
+      "48x36",
+      "50x37"
+    ],
+    "sizePt" : [
+      24,
+      18
+    ]
+  },
+  {
+    "hotSpotPt" : [
+      12,
+      9
+    ],
+    "name" : "frameResize-left-outward",
+    "png" : "cursors\/frameResize-left-outward.png",
+    "px" : [
+      50,
+      37
+    ],
+    "reps" : [
+      "24x18",
+      "25x19",
+      "48x36",
+      "50x37"
+    ],
+    "sizePt" : [
+      24,
+      18
+    ]
+  }
+]
