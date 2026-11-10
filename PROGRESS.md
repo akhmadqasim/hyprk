@@ -155,3 +155,4 @@ glass material 65 (03:35, orchestrator; too cyan)
   Merge into master if it looks right. Left out on purpose: blur radius 5 with the opacity ramp and the
   inactive-window variant (the plugin's blur is tuned by eye on top of Hyprland's blur), popover pop
   (spring 0.25 / 0.9 from 12.5 %, see LIVE-27.2.1.md), Spotlight recipe (branch still open).
+- [Mac] QML syntax check on the Mac: /opt/homebrew/opt/qtdeclarative/bin/qmllint (brew qtdeclarative; it cannot resolve Quickshell imports, parse errors only).

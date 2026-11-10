@@ -42,5 +42,8 @@ All of this lives in the repo so it can be used from the Ubuntu PC and the MacBo
   - then, under one condition (idiom flag 0x1000a set, or a variant byte == 2; not identified yet): backdropScale 0.99,
     blur opacity 0, blurFill lighten/normal 0, face opacity 0 with identity YCC; ringShadow opacity 0.4 with
     verticalOffset 32 s, strokeWidth 12 s, blurRadius 12 s, s = size / 105 (default 0.457). Otherwise ringShadow opacity 0.
+  Likely reading (not confirmed): the second branch is the Siri orb, since it has no face, no blur and a ring
+  shadow scaled by size / 105, which fits a round orb and not a wide field; spotlightField would then take the
+  first branch. The modifier structs carry no field metadata, so confirming it needs the SiriRecipe builder traced.
   Open: which branch is spotlightField; ComposeModifier (0x195f2ebf4) and SiriHighlightsModifier (0x195f2ebfc) not read yet.
 - RegularBase.Base (0x195f1e860) builds the whole Spec in a stack temporary, so annot.py shows no field names for it.
