@@ -150,11 +150,25 @@ glass material 65 (03:35, orchestrator; too cyan)
   (0.2 s + 0.17 s) and fades out in 0.1 s; alert message font 13 (was 11).
   Checked on the Mac: Material.cpp + the new test cases compile and pass with clang; the QML parses (qmllint).
   NOT checked: GlassElement.cpp (needs Hyprland headers), lgtests as a whole, and the look.
-- [NEXT, on the PC] (the branch was merged into master on 2026-11-10 at the user's request, still not run in Hyprland) `git pull`, build the plugin, run lgtests, then `dist/try-nested.sh`:
-  look at the dock and CC without shadow, a menu (shadow, close fade), an alert (pop), small glass (faint shadow).
-  If something looks wrong, the commits to revert are 8f972fa and c3c838c. Left out on purpose: blur radius 5 with the opacity ramp and the
-  inactive-window variant (the plugin's blur is tuned by eye on top of Hyprland's blur), popover pop
-  (spring 0.25 / 0.9 from 12.5 %, see LIVE-27.2.1.md), Spotlight recipe (branch still open).
+- [PC, 2026-11-10, run in Hyprland] 8f972fa and c3c838c run in a headless nested session (`HYPRK_HEADLESS=1 HYPRK_KEEP=1 scripts/smoke.sh`,
+  2560x1664 at 2x, plugin glass). Plugin built; lgtests, shell tests (183) and settings tests (30) pass. Shadows measured as the pixel
+  difference between plugin `shadow_scale` 0 and 1, motion from repeated cropped grim shots (16 to 32 ms apart).
+  Dock: no pixel changes with the shadow on or off, light and dark. Control Center: no shadow around the tiles (only the pressed
+  status pill in the menu bar has one, it is hyprk-menubar:menu). Menu: opens in one frame; shadow reaches about 45 pt, darkening
+  at the edge 0.21 sides / 0.33 below / 0.10 above in light and 0.23 / 0.37 / 0.10 in dark (the 0.7 : 0.8 ratio), so about 10 pt down.
+  Alert: 260 pt wide, message at the menu font size, same shadow as the menu (known, see below). Pop: first frame at 0.04, 0.97 at
+  about 0.16 s, peak 1.13 or more at about 0.2 s, back to 1 by about 0.35 s, centre fixed; dismiss fades in about 0.1 s without
+  scale; dismissed mid-pop it fades at the size it has. Banner (62 pt high): shadow at most 0.03, about 5 pt wide.
+  No QML errors or warnings from Theme.qml, AlertDialog.qml or MenuDropdown.qml in the Quickshell log.
+  Found and fixed: a menu bar menu lost its items in the first frame of the close, so only an empty strip faded out. Panels
+  resets menuIndex before `shown` turns false and the `Binding` took the empty list; MenuDropdown now latches the items itself
+  and never takes an empty list. After the fix the close reads about 0.70 0.57 0.44 0.34 0.26 0.18 0.12 0.07 0.03 0.01 0 per
+  1/60 s (Mac: 0.71 0.55 0.42 0.31 0.22 0.15 0.10 0.06 0.04 0.02 0). Context menus were not affected.
+  NOT checked: shadow strength against Mac pixels (no Mac screenshot of a menu or alert shadow here, only the parameters), real
+  pointer use (hover, click to close), 1x outputs, corner radii beyond a look at the screenshots (12 and 26 are unchanged tokens).
+  Seen and left: the bold alert title looks double-struck (not looked into).
+  Still left out on purpose: blur radius 5 with the opacity ramp and the inactive-window variant (the plugin's blur is tuned by
+  eye on top of Hyprland's blur), popover pop (spring 0.25 / 0.9 from 12.5 %, see LIVE-27.2.1.md), Spotlight recipe (branch still open).
 - [Mac] QML syntax check on the Mac: /opt/homebrew/opt/qtdeclarative/bin/qmllint (brew qtdeclarative; it cannot resolve Quickshell imports, parse errors only).
 - [Mac] Independent review of the branch (read only, nothing built): no compile or load errors found. Fixed from it:
   alert starts at popFrom before the first tick, no size jump when dismissed mid-pop. Known and left: hyprk-overlay and
