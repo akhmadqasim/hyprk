@@ -97,7 +97,6 @@ hl.config({
 --   Reduce Motion: no window open/close animation at all, Spaces cross-fade (SPEC 11.2).
 -- Hyprland speed unit is 100 ms (speed 5 = 0.5 s); springs run in real time and ignore speed.
 hl.curve("swiftui",   { type = "spring", mass = 1, stiffness = 158, damping = 25 })   -- (2pi/0.5)^2, 4pi/0.5
-hl.curve("caSpring",  { type = "spring", mass = 1, stiffness = 100, damping = 10 })
 hl.curve("macEase",   { type = "bezier", points = { {0.25, 0.1}, {0.25, 1} } })
 hl.curve("macOut",    { type = "bezier", points = { {0.2, 0.9}, {0.3, 1} } })
 hl.curve("easeInOut", { type = "bezier", points = { {0.42, 0}, {0.58, 1} } })   -- SwiftUI legacy / NSAnimation default

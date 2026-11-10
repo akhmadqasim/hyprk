@@ -24,9 +24,12 @@ namespace motion {
         damage();
     }
 
+    double CGenieTransformer::elapsed() const {
+        return std::chrono::duration<double>(std::chrono::steady_clock::now() - m_start).count();
+    }
+
     double CGenieTransformer::progress() const {
-        const double t = std::chrono::duration<double>(std::chrono::steady_clock::now() - m_start).count() / m_seconds;
-        const double p = std::clamp(t, 0.0, 1.0);   // the Dock drives the mesh with linear time
+        const double p = std::clamp(elapsed() / m_seconds, 0.0, 1.0);   // the Dock drives the mesh with linear time
         return m_reverse ? 1.0 - p : p;
     }
 
@@ -123,8 +126,13 @@ namespace motion {
     bool CGenieTransformer::tick() {
         if (m_done)
             return false;
-        damage();
-        return std::chrono::duration<double>(std::chrono::steady_clock::now() - m_start).count() < m_seconds && !m_window.expired();
+        // ticks run near 1 kHz, frames at the refresh rate: damage about once per frame
+        const double t = elapsed();
+        if (t - m_lastDamage >= 0.004) {
+            m_lastDamage = t;
+            damage();
+        }
+        return t < m_seconds && !m_window.expired();
     }
 
     void CGenieTransformer::stop() {

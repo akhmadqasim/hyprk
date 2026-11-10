@@ -20,7 +20,8 @@
 #include <algorithm>
 #include <chrono>
 #include <format>
-#include <unordered_map>
+#include <optional>
+#include <utility>
 
 namespace {
     using namespace Config::Values;
@@ -34,11 +35,9 @@ namespace {
     // The transformer is owned by the window's list (Hyprland may delete inactive ones at any
     // time), so it is looked up each tick instead of keeping a pointer.
     struct SAnim {
-        PHLWINDOWREF          window;
-        bool                  minimize = false;   // a delayed move to special:minimized is pending
-        bool                  moving   = false;   // that move was dispatched; waiting for it to land
-        std::chrono::steady_clock::time_point movedAt;
-        std::function<void()> onDone;   // the delayed minimize move
+        PHLWINDOWREF                                         window;
+        std::function<void()>                                onDone;    // the delayed minimize move (minimize only)
+        std::optional<std::chrono::steady_clock::time_point> movedAt;   // when that move ran
     };
     std::vector<SAnim> g_anims;
 
@@ -95,16 +94,13 @@ namespace {
     // window out of its old workspace for a moment; the genie, which draws nothing at p = 1,
     // stays 400 ms longer so no frame shows the plain window.
     void endAnim(SAnim& a, eEnd how) {
-        if (a.onDone) {
-            auto cb  = std::move(a.onDone);
-            a.onDone = nullptr;
-            a.moving  = true;
+        if (auto cb = std::exchange(a.onDone, nullptr)) {
             a.movedAt = std::chrono::steady_clock::now();
             if (how != eEnd::DROP)
                 cb();
         }
         const auto w = a.window.lock();
-        if (how == eEnd::NORMAL && a.moving && w && std::chrono::steady_clock::now() - a.movedAt < std::chrono::milliseconds(400))
+        if (how == eEnd::NORMAL && a.movedAt && w && std::chrono::steady_clock::now() - *a.movedAt < std::chrono::milliseconds(400))
             return;   // checked again next tick
         removeGenie(w);
         a.window.reset();
@@ -131,24 +127,21 @@ namespace {
             return;
         }
         w->effects().transformers()->emplace<motion::CGenieTransformer>(w, dockTarget(mon), reverse, genieSeconds());
-        g_anims.push_back(SAnim{.window = PHLWINDOWREF{w}, .minimize = !reverse, .onDone = std::move(onDone)});
+        g_anims.push_back(SAnim{.window = PHLWINDOWREF{w}, .onDone = std::move(onDone)});
         if (Animation::mgr())
             Animation::mgr()->requestTick();
     }
 
     void hkMoveToWorkspace(CWindow* self, PHLWORKSPACE ws) {
         const auto w = self ? self->m_self.lock() : nullptr;
-        if (g_inOriginal || !w || !ws || !enabled() || !w->mapped() || genieSeconds() <= 0) {
+        // no-op moves too: Hyprland repeats the call while laying out
+        if (g_inOriginal || !w || !ws || !enabled() || !w->mapped() || genieSeconds() <= 0 || w->m_workspace == ws) {
             callOriginal(self, ws);
             return;
         }
         const auto from = w->m_workspace;
-        if (from == ws) {   // no-op moves (Hyprland repeats the call while laying out)
-            callOriginal(self, ws);
-            return;
-        }
         // the same minimize again while its genie runs: the delayed move covers it
-        if (isMinimized(ws) && std::ranges::any_of(g_anims, [&](const SAnim& a) { return a.minimize && a.window.lock() == w; }))
+        if (isMinimized(ws) && std::ranges::any_of(g_anims, [&](const SAnim& a) { return a.onDone && a.window.lock() == w; }))
             return;
         finishFor(w, eEnd::NOW);   // any other move ends a genie in flight (its own delayed move runs first)
 

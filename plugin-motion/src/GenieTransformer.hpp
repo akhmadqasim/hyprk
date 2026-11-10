@@ -25,6 +25,7 @@ namespace motion {
         void stop();
 
       private:
+        double                                elapsed() const;
         double                                progress() const;
         void                                  damage() const;
 
@@ -33,6 +34,7 @@ namespace motion {
         bool                                  m_reverse = false;
         double                                m_seconds = 0.5;
         std::chrono::steady_clock::time_point m_start;
-        bool                                  m_done = false;
+        bool                                  m_done       = false;
+        double                                m_lastDamage = -1;
     };
 }
