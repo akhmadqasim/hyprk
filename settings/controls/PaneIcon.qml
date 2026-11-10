@@ -2,9 +2,11 @@ import QtQuick
 import QtQuick.Effects
 import ".."
 import "../HyprK"
+import "../Panes.js" as Panes
 
-// Colored rounded-square tile with a white glyph. Uses themes/icons/settings/<iconId>.png
-// when the assets agent provides it, else a Material Icons glyph (generic fallback).
+// Colored rounded-square tile with a white glyph. Uses the real System Settings icon
+// themes/icons/settings/<iconId>.png for the panes that have one (Panes.realIcons), else a
+// Material Icons glyph (generic fallback).
 Item {
     id: pi
     property int size: Theme.sidebar.iconSize
@@ -26,7 +28,7 @@ Item {
         id: asset
         anchors.fill: parent
         visible: status === Image.Ready
-        source: pi.imageSource === "" && pi.iconId !== "" ? "file://" + Backend.root + "/themes/icons/settings/" + pi.iconId + ".png" : ""
+        source: pi.imageSource === "" && Panes.hasRealIcon(pi.iconId) ? "file://" + Backend.root + "/themes/icons/settings/" + pi.iconId + ".png" : ""
         sourceSize: Qt.size(pi.size * 2, pi.size * 2)
         smooth: true; mipmap: true
         // "Clear" icon style shows images as monochrome glass, like macOS 26+

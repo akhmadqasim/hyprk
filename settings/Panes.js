@@ -26,6 +26,11 @@ const panes = [
     { id: "trackpad", title: "Trackpad", glyph: "crop_landscape", tint: "gray", file: "Trackpad", group: 5 }
 ];
 
+// Panes whose sidebar icon is a real bitmap, themes/icons/settings/<id>.png. macOS 27 draws the others
+// at run time (enclosure colour + SF Symbol, themes/icons/settings/panes.json), so they keep the glyph tile.
+const realIcons = ["siri", "spotlight"];
+function hasRealIcon(id) { return realIcons.indexOf(id) !== -1; }
+
 function visible(hasBattery, query) {
     const q = String(query || "").toLowerCase();
     return panes.filter(p => (p.needsBattery === undefined || p.needsBattery === hasBattery)
