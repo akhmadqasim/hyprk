@@ -86,6 +86,29 @@ QtObject {
         readonly property real focusRingWidth: 3     // guessed
     }
 
+    // ---------- window toolbar platters (Finder, Settings; ToolbarPlatter) ----------
+    // macOS 27.2.1 (reference/re/MAC-ANSWERS.md Q9.2): the toolbar strip has no fill and no glass. Each item
+    // group sits on a capsule platter (NSToolbarPlatterView > NSGlassEffectView, regular, 36 pt, radius 18).
+    // At 36 pt the glass recipe has almost no blur (blur opacities 0, 0, 0.5, 1), ring shadow 0.06 and a drop
+    // shadow of 0.04 x fill black 0.3, radius 4, y 8, so it reads as a flat raised capsule; it is drawn so here.
+    // Colours: pixels of reference/screens/27.2.1/{finder,settings}-toolbar-{light,dark}.png (2x) over the
+    // window background (255 light, 31 dark).
+    readonly property QtObject toolbar: QtObject {
+        readonly property int platterHeight: 36
+        readonly property int buttonSize: 36            // a lone button is a 36 x 36 circle
+        readonly property int navWidth: 74               // back/forward share one 74 x 36 capsule
+        readonly property int dividerHeight: 20          // 1 x 20 divider in the back/forward capsule
+        readonly property color face: t.dark ? Qt.rgba(1, 1, 1, 0.13) : Qt.rgba(0, 0, 0, 0.025)   // 61 on 31 | 249 on 255
+        readonly property color rim: t.increaseContrast ? (t.dark ? Qt.rgba(1, 1, 1, 0.4) : Qt.rgba(0, 0, 0, 0.4))
+            : t.dark ? Qt.rgba(1, 1, 1, 0.03) : Qt.rgba(0, 0, 0, 0.06)   // light edge 229..240; dark sides ~ face
+        readonly property color rimLit: t.dark ? Qt.rgba(1, 1, 1, 0.22) : "transparent"   // dark top and bottom edge 75..89
+        readonly property color shadow: Qt.rgba(0, 0, 0, 0.04 * 0.3)   // recipe; 252..253 under the light capsule
+        readonly property real shadowRadius: 4
+        readonly property real shadowOffsetY: 8
+        readonly property color selection: t.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.07)   // selected segment 81 on 61 | 231 on 250
+        readonly property color separator: t.dark ? Qt.rgba(1, 1, 1, 0.27) : Qt.rgba(0, 0, 0, 0.20)   // 113 on 61 | 200 on 252
+    }
+
     // ---------- traffic lights (SPEC 13; the plugin title bar has the same numbers in
     // plugin/src/Titlebar.cpp, checked by shell/tests/run.mjs) ----------
     readonly property QtObject lights: QtObject {

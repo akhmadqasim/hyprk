@@ -20,6 +20,7 @@ Item {
     property color trackColor: Tokens.control.segmentTrack
     property color selectionColor: Tokens.control.segmentSelected
     property real selectionInset: Tokens.control.segmentInset
+    property real selectionInsetX: selectionInset   // horizontal inset of the pill, if it differs (Finder: 3 x 4 pt)
     property bool reduceMotion: Tokens.reduceMotion
     property real iconSize: 16             // `icon` images are drawn iconSize x iconSize (rendered at 2x)
     property real iconOpacity: 1           // opacity of the `icon` images (e.g. to apply a colour's alpha)
@@ -29,6 +30,7 @@ Item {
                                            // that gap (0 = segments touch and separators overlap their edges)
     property color separatorColor: Tokens.control.separator
     property bool separatorFade: true      // false = separators stay visible next to the selection pill
+    property real separatorHeight: Math.round(height * 0.55)   // Finder ref: 24 of 44
     readonly property int count: model ? model.length : 0
     readonly property int pressedIndex: ma.pressed && ma.containsMouse ? ma.indexAt(ma.mouseX) : -1
     signal activated(int index)
@@ -99,9 +101,9 @@ Item {
         Rectangle {
             required property int index
             visible: sc.pressedIndex === index && index !== sc.currentIndex
-            x: sc._xs[index] + sc.selectionInset
+            x: sc._xs[index] + sc.selectionInsetX
             y: sc.selectionInset
-            width: sc._w - 2 * sc.selectionInset
+            width: sc._w - 2 * sc.selectionInsetX
             height: sc.height - 2 * sc.selectionInset
             radius: height / 2
             color: Tokens.control.fillPressed
@@ -111,9 +113,9 @@ Item {
         id: pill
         objectName: "pill"
         visible: sc.count > 0 && sc.currentIndex >= 0 && sc.currentIndex < sc.count
-        x: sc._posX(pos.value) + sc.selectionInset
+        x: sc._posX(pos.value) + sc.selectionInsetX
         y: sc.selectionInset
-        width: sc._w - 2 * sc.selectionInset
+        width: sc._w - 2 * sc.selectionInsetX
         height: sc.height - 2 * sc.selectionInset
         radius: height / 2
         color: sc.selectionColor
@@ -138,7 +140,7 @@ Item {
             visible: sc._drawn(b)
             x: sc._xs[b] - sc.separatorSpacing / 2 - 0.5          // centred in its gap
             width: 1
-            height: Math.round(sc.height * 0.55)    // Finder ref: 24 of 44
+            height: sc.separatorHeight
             anchors.verticalCenter: parent.verticalCenter
             color: sc.separatorColor
             opacity: pill.visible && sc.separatorFade ? Math.min(1, d * 2) : 1

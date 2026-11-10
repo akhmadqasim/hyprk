@@ -232,6 +232,20 @@ Item {
             for (let b = 1; b < 4; b++) verify(!findChild(iconSeg, "separator" + b).visible);
             iconSeg.separatorBoundaries = null;
         }
+        function test_segmented_inset_x_and_separator_height() {
+            const pill = findChild(iconSeg, "pill");
+            compare(iconSeg.selectionInsetX, iconSeg.selectionInset);   // default: same inset both ways
+            const w0 = pill.width, y0 = pill.y, h0 = pill.height;
+            iconSeg.selectionInsetX = iconSeg.selectionInset + 1;
+            compare(pill.width, w0 - 2);
+            compare(pill.y, y0);
+            compare(pill.height, h0);
+            iconSeg.selectionInsetX = Qt.binding(() => iconSeg.selectionInset);
+            compare(findChild(iconSeg, "separator1").height, Math.round(iconSeg.height * 0.55));
+            iconSeg.separatorHeight = 7;
+            compare(findChild(iconSeg, "separator1").height, 7);
+            iconSeg.separatorHeight = Qt.binding(() => Math.round(iconSeg.height * 0.55));
+        }
         function test_segmented_separator_spacing() {
             iconSeg.reduceMotion = true;
             iconSeg.separatorBoundaries = [2, 3];
