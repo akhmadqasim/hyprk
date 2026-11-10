@@ -5,12 +5,12 @@ without the dev prefix at `/mnt/code/hypr-dev` and without hard-coded `/mnt/code
 
 | File | Status |
 |---|---|
-| `install.sh` | Per-user installer. Dry run by default, `--yes` executes. Tested as a dry run only (see "Tested"). |
+| `install.sh` | Per-user installer. Dry run by default, `--yes` executes. Dry run checked in containers, never run with `--yes` on a clean machine (see "Tested"). |
 | `DEPENDENCIES.md` | Inventory of runtime/build deps and the per-distro package map. |
 | `patches/hyprland-0.57.2-gcc15-compat.patch` | Copy of the dev-prefix patch, applied by the source build when GCC < 16. |
-| `arch/PKGBUILD` | DRAFT, untested. |
-| `fedora/hyprk.spec` | DRAFT, untested. COPR notes below. |
-| `nix/flake.nix` | DRAFT, untested, never evaluated. |
+| `arch/PKGBUILD` | Built with makepkg in an archlinux container. Never installed or run as a session. |
+| `fedora/hyprk.spec` | rpmlint + rpmbuild with the plugin step stubbed (Fedora has no Hyprland 0.57). COPR notes below. |
+| `nix/flake.nix` | `nix flake check` passes; see "Tested" for the build. |
 
 ## Install layout (install.sh)
 
@@ -22,7 +22,8 @@ ${XDG_DATA_HOME:-~/.local/share}/hyprk/     HYPRK_ROOT: tracked repo files (no r
   dev/env.sh                                 HYPRK_DEV/env.sh, sourced by dist/lib/env.sh (no-op with distro packages)
   dev/prefix/, dev/src/                      only with a source build (Hyprland stack, hyprlock, Quickshell)
   finder/build/hyprk-finder, plugin/build/libliquidglass.so
-  state/                                     shell + settings state (writable, inside the prefix)
+  state/                                     shell + settings state, created on first start by config/hypr/state-dir.sh
+                                             (the prefix is writable); a reinstall never touches it
   .hyprk-install                             marker: --uninstall only deletes a prefix that has it
 /usr/share/wayland-sessions/hyprk.desktop    the only file outside the prefix (sudo), Exec = absolute bin/hyprk-session
 ```
@@ -74,10 +75,13 @@ the right long-term answer for Fedora (below); the source build works today.
 
 ## Apple assets: never shipped
 
-`.gitignore` already keeps every extracted macOS file out of git (`themes/fonts`, `themes/wallpapers`,
-`themes/icons/{apps,apps-hires,system}`, `themes/cursors/{png,accessibility,hiservices,theme/hyprk-cursors}`,
-`sounds/{oga,wav,originals}`). `install.sh` copies only `git ls-files` (or, from a tarball, excludes those dirs),
-and also leaves out `reference/` (macOS screenshots). Default look without them:
+The repo is private and TRACKS the Apple assets on purpose (commit f6ca83b), so `git ls-files` alone is not a filter.
+Every packaging file therefore drops the same list (`NOSHIP` in `install.sh`, `_noship` in the PKGBUILD, the
+`git archive` command and the `%prep` check in the spec, `noship` in the flake): `reference/`, `packaging/`, `state/`,
+`themes/fonts`, `themes/wallpapers`, `themes/icons/{apps,apps-hires,system,hyprk-apple}`,
+`themes/cursors/{png,accessibility,hiservices,cursorasset,theme/hyprk-cursors}`, `sounds/{oga,wav,originals}`.
+If a new asset directory is added to the repo, add it to all five places. Nothing is downloaded. The spec's Source0
+tarball must be made with the exclusions (the SRPM would otherwise carry the assets). Default look without them:
 
 | Asset | Default | Where the fallback lives |
 |---|---|---|
@@ -90,7 +94,7 @@ and also leaves out `reference/` (macOS screenshots). Default look without them:
 | Sounds | silent | `shell/scripts/sound.sh` exits when a file is missing |
 
 Optional step for users who extracted the files from their own macOS install (`reference/ASSETS.md`):
-`install.sh --assets DIR` copies `DIR/themes/fonts`, `themes/wallpapers`, `themes/icons/{apps,system,settings}`,
+`install.sh --assets DIR` copies `DIR/themes/fonts`, `themes/wallpapers`, `themes/icons/{apps,system,hyprk-apple}`,
 `themes/cursors/theme/hyprk-cursors`, `sounds/{oga,wav}` when present. Nothing is ever downloaded.
 On this machine `--assets /mnt/code/hyprk` works because the checkout has that layout.
 
@@ -117,7 +121,7 @@ Needed in files owned by other agents (not edited here):
   `${HYPRK_CURSOR_THEME:-hyprk-cursors}` (or test that `themes/cursors/theme/hyprk-cursors` exists, else Adwaita).
 - `config/hypr/hyprland.lua:4` falls back to `"/mnt/code/hyprk"`. start.sh always exports `HYPRK_ROOT`, so fail
   loudly instead (or derive from the config path). Lines 20/22: same cursor theme fallback.
-  Line 174 reads `hyprk .. "/state/appearance.json"`: use `HYPRK_STATE` (system packages, below). Line 2: comment.
+  (State paths now go through `HYPRK_STATE`, see "System packages".) Line 2: comment.
 - `plugin/CMakeLists.txt:32` message names `/mnt/code/hypr-dev/env.sh`: say "source your HYPRK_DEV env.sh".
   `plugin/test/{run,bench,shell-shot}.sh` set `ROOT=/mnt/code/hyprk` and source `/mnt/code/hypr-dev/env.sh`:
   derive ROOT from the script dir, `HYPRK_DEV` optional. `plugin/test/qs/shell.qml:23` has a `file:///mnt/code/...`
@@ -137,16 +141,17 @@ Needed in files owned by other agents (not edited here):
   `dist/README.md` paths `/mnt/code/hyprk/...`: mention `~/.local/share/hyprk/bin/hyprk-try` for installs.
 - `PROGRESS.md` layout line about the dev env: mention packaging/.
 
-## System packages (PKGBUILD, spec, Nix): one blocker
+## System packages (PKGBUILD, spec, Nix)
 
-All three drafts install to a read-only `/usr/share/hyprk` (or the Nix store). hyprk still writes its state into
-its own tree, in four places that disagree:
-`shell/services/Prefs.qml:18` and `shell/scripts/sound.sh:12` and `lockscreen/install.sh:25` honour
-`HYPRK_STATE`; `settings/Backend.qml:31` (`root + "/state"`), `shell/Theme.qml:47` and `config/hypr/hyprland.lua:174`
-do not. Make all of them `HYPRK_STATE`, default `${XDG_STATE_HOME:-~/.local/state}/hyprk`; the packaged
-`hyprk-session` then sets it. Until then only the per-user `install.sh` works (its prefix is writable).
-Second rule for every system package: depend on the exact Hyprland version the plugin was built with
-(Arch: rebuild on every `hyprland` bump; RPM: `Requires: hyprland = %{hl_ver}`).
+All three drafts install to a read-only `/usr/share/hyprk` (or the Nix store). State is not a blocker any more:
+`config/hypr/state-dir.sh` (sourced by `config/hypr/start.sh` and `settings/run.sh`) keeps `HYPRK_STATE` if set,
+else uses `$HYPRK_ROOT/state` when writable, else `${XDG_STATE_HOME:-~/.local/state}/hyprk`, and creates it on first
+start. So no wrapper or `.desktop` sets `HYPRK_STATE`, and install.sh does not create `$PREFIX/state` (the per-user
+prefix is writable, so the first start creates it there). The packages ship the file because they copy `config/`
+whole (PKGBUILD and install.sh: every tracked file outside the NOSHIP list; spec and flake: `cp -a config ...`).
+Nothing in packaging/ starts Settings without `settings/run.sh`.
+Rule for every system package: depend on the exact Hyprland version the plugin was built with
+(Arch: package() pins `hyprland=<installed version>`, rebuild on every bump; RPM: `Requires: hyprland = %{hl_ver}`).
 
 ### Fedora COPR notes (draft)
 
@@ -163,21 +168,32 @@ nixpkgs unstable has hyprland 0.57.x and quickshell 0.3.2, so `nix/flake.nix` bu
 same `hyprland` derivation (ABI always matches) and wraps `dist/hyprk-session`. A NixOS module would enable
 `programs.hyprland`, add the package and register `hyprk.desktop` via `services.displayManager.sessionPackages`.
 
-## Tested (2026-11-10)
+## Tested (2026-11-10, second pass; all in throwaway docker containers, nothing installed on the dev machine)
 
-- shellcheck 0.11 (in a debian:sid container, `-S warning`): clean for `install.sh`, `lockscreen/install.sh`,
-  `settings/run.sh`, `scripts/smoke.sh`.
-- Dry runs: this Ubuntu 26.04 (full source build planned: Hyprland 0.53.3 and no Quickshell in the repo), and fake
-  os-release files via `HYPRK_OS_RELEASE` for arch, manjaro, fedora, opensuse-tumbleweed, gentoo (unknown) and
-  nixos (asks for `--no-deps`).
-- Dry runs plus package-name lookups inside unprivileged official containers: archlinux, debian:sid, ubuntu:26.04,
-  ubuntu:26.10, fedora:43, opensuse/tumbleweed. Results in `DEPENDENCIES.md` "Verified".
-- One real `--yes --no-deps --no-session --from-source no` run into a scratch prefix (dev prefix env sourced so
-  Hyprland 0.57.2 headers were found): copy (287 tracked files, no Apple assets, 17 MB incl. builds), gradient
-  wallpapers, hyprlock.conf relocation (paths + Inter), Finder and liquidglass built, launchers written;
-  `bin/hyprk-session --print` resolves every path into the prefix. Then `--uninstall --yes` removed it.
-  Finder from another root: `HYPRK_ROOT=... hyprk-finder --shot` rendered offscreen.
-- Lock wallpaper fallback tested with and without TahoeLight.png present.
+- shellcheck 0.11 (debian:sid) `-S warning`: clean for `install.sh` and `dist/install-session.sh`. `bash -n` on every script.
+- `install.sh` dry runs as a normal user, repo mounted read-only: ubuntu 24.04, 26.04, 26.10, debian sid, archlinux,
+  fedora 43 and 45 (`fedora:latest`), opensuse tumbleweed. Package names looked up with `apt-get install -s`,
+  `pacman -Sp`, `dnf install --assumeno`, `zypper install --dry-run`. Now also built into the installer: before any
+  install it stops with one clear message when GCC < 15 is needed and not available (Ubuntu 24.04) or when packages
+  are missing in the repos (Ubuntu 24.04 with `--from-source no`, Fedora with `--from-source no`). Not checked on
+  openSUSE (zypper cannot simulate without root, so names are not pre-checked there).
+- Real `install.sh --yes` in an archlinux container (distro Hyprland 0.57.2): packages, Finder + liquidglass built,
+  447 files, no asset file, gradient wallpapers, lock config rewritten, session file written, `hyprk-session --print`
+  resolves, no `state/` created. Never logged in to the session.
+- All source tags in `SRC_TAGS` exist upstream (`git ls-remote`). The source build itself was not run on any distro here.
+- PKGBUILD: `makepkg -s` in archlinux (Hyprland 0.57.2): builds, 476 files, 10 MB, no asset file,
+  `hyprland=<version>` pin in .PKGINFO. namcap leftovers: ELF files under /usr/share (by design), `custom` license.
+- Spec: rpmlint (spec and RPM) and `rpmbuild -bb` in fedora:latest with only the plugin step stubbed (no
+  hyprland-devel in Fedora): builds, 407 files, no asset file. rpmlint leftovers: binary in /usr/share, license TBD, devel
+  files. Requires that Fedora lacks: hyprland, hyprlock, hypridle, quickshell >= 0.3.2 (COPR needed).
+- Flake: `nix flake check --no-build` and a full `nix build` in nixos/nix (nixpkgs 2026-11-07): Finder and plugin built
+  against nixpkgs hyprland, 414 files, no asset file. Not run as a session.
 
-Never run: `--yes` with package installs or the session entry (sudo), the source build of the hyprwm stack /
-hyprlock / Quickshell on any distro, a login into an installed session, `--assets`, the PKGBUILD, spec and flake.
+Defects found and fixed in this pass: the repo now tracks the Apple assets, so every package would have shipped them
+(install.sh, PKGBUILD, spec, flake all filter now); flake `src = ../.` pointed at packaging/ instead of the repo
+(`../..`) and lacked hyprutils; spec used `%cmake_build --dir`, which silently builds the wrong directory, and did not
+install `/usr/bin/hyprk-session` or the session entry; reinstall overwrote `state/`; the GCC check came after the
+package install; `dist/install-session.sh --uninstall` removed any hyprk.desktop, even a package's.
+
+Never run: a login into an installed session, the source build of the hyprwm stack / hyprlock / Quickshell, `--assets`,
+`install.sh --yes` on a non-Arch distro, the spec whole (needs a COPR with Hyprland 0.57), a package on Manjaro/Endeavour.

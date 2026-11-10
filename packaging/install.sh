@@ -33,6 +33,12 @@ SRC_TAGS="wayland-protocols=1.50 hyprwayland-scanner=v0.4.6 hyprutils=v0.14.3 hy
 hyprland-protocols=v0.8.0 hyprcursor=v0.1.14 hyprgraphics=v0.6.0 aquamarine=v0.16.0 Hyprland=v0.57.2
 quickshell=v0.3.2 hyprlock=v0.9.7"
 
+# Never copied into an install: Apple-derived assets (the repo is private and tracks them on purpose), reference/
+# (macOS screenshots), packaging/, and the dev's own state/. Same list as packaging/arch, fedora and nix.
+NOSHIP="reference packaging state themes/fonts themes/wallpapers themes/icons/apps themes/icons/apps-hires
+themes/icons/system themes/icons/hyprk-apple themes/cursors/png themes/cursors/accessibility themes/cursors/hiservices
+themes/cursors/cursorasset themes/cursors/theme/hyprk-cursors sounds/oga sounds/wav sounds/originals"
+
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 SRC=${HYPRK_SRC:-$(cd "$HERE/.." && pwd)}
 YES=0 UNINSTALL=0 FROM_SOURCE=auto ASSETS='' NO_DEPS=0 NO_SESSION=0 PRINT_DEPS=0
@@ -74,6 +80,7 @@ write() {
         say "[dry-run] write $f (mode $m):"; sed 's/^/    | /'
     fi
 }
+tag() { local kv; for kv in $SRC_TAGS; do [ "${kv%%=*}" = "$1" ] && { echo "${kv#*=}"; return; }; done; }
 have() { command -v "$1" >/dev/null 2>&1; }
 vge()  { [ "$(printf '%s\n%s\n' "$2" "$1" | sort -V | head -n1)" = "$2" ]; }   # vge A B: A >= B
 
@@ -264,14 +271,35 @@ if [ "$FROM_SOURCE" = no ]; then
     case "$H_SRC$Q_SRC" in *source*) say "WARNING: --from-source no but a component is missing/too old; the session will not start until you fix that." ;; esac
 fi
 
-# ---------------------------------------------------------------- 1. packages ----
-step "1. distro packages"
+# ---------------------------------------------------------------- preflight: stop before anything is installed ----
 LIST="$(pkgs "$FAMILY" runtime) $(pkgs "$FAMILY" build)"
 [ $BUILD_HYPR = 1 ] || LIST="$LIST $(pkgs "$FAMILY" hypr)"
 [ $BUILD_QS = 1 ] || LIST="$LIST $(pkgs "$FAMILY" qs)"
 [ $BUILD_HYPR = 1 ] || [ $BUILD_QS = 1 ] && LIST="$LIST $(pkgs "$FAMILY" srcbuild)"
 # shellcheck disable=SC2206
 PKGS=($LIST)
+stop() { say ""; say "ERROR: $*"; say "Nothing was installed or changed."; exit 1; }
+if [ $BUILD_HYPR = 1 ] && [ $FAMILY != unknown ] && [ $FAMILY != nixos ]; then
+    # Hyprland 0.57 is C++26: needs GCC >= 15. Installed g++ first, else what the repos would give.
+    case $FAMILY in debian) GCCPKG=g++ ;; arch) GCCPKG=gcc ;; *) GCCPKG=gcc-c++ ;; esac
+    GCC_PLAN=$( (g++ -dumpversion 2>/dev/null || repo_version $GCCPKG) | cut -d. -f1)
+    case $GCC_PLAN in ''|*[!0-9]*) say "note: could not tell which GCC this system has; the source build needs GCC >= 15" ;;
+        *) [ "$GCC_PLAN" -ge 15 ] || stop "building Hyprland $(tag Hyprland) needs GCC >= 15 (C++26), this system has GCC $GCC_PLAN. Use a newer release of $PRETTY_NAME, or install a newer Hyprland yourself and re-run with --from-source no." ;;
+    esac
+fi
+if [ $NO_DEPS = 0 ] && [ ${#PKGS[@]} -gt 0 ]; then
+    # read-only simulation with the package manager: which of the packages do not exist in this release's repos?
+    case $FAMILY in
+        debian) MISSING=$(apt-get install -s "${PKGS[@]}" 2>&1 | sed -n "s/^E: Unable to locate package //p; s/^E: Package '\(.*\)' has no installation candidate.*/\1/p" | sort -u) || true ;;
+        arch)   MISSING=$(pacman -Sp --needed "${PKGS[@]}" 2>&1 >/dev/null | sed -n 's/^error: target not found: //p' | sort -u) || true ;;
+        fedora) MISSING=$(dnf -q install --assumeno "${PKGS[@]}" 2>&1 | sed -n 's/^No match for argument: //p' | sort -u) || true ;;
+        *)      MISSING='' ;;   # suse: zypper needs root even to simulate, so the names are not checked here
+    esac
+    [ -z "$MISSING" ] || stop "this release of $PRETTY_NAME does not have: $(echo $MISSING). Its repos are too old or too different for hyprk (see packaging/DEPENDENCIES.md). If the package lists are empty or stale, refresh them and re-run."
+fi
+
+# ---------------------------------------------------------------- 1. packages ----
+step "1. distro packages"
 if [ ${#PKGS[@]} -eq 0 ]; then say "(no package list for family $FAMILY)"
 elif [ $NO_DEPS = 1 ]; then say "skipped (--no-deps). Needed: ${PKGS[*]}"
 else
@@ -282,7 +310,6 @@ fi
 
 # ---------------------------------------------------------------- 2. source build ----
 P=$DEV/prefix
-tag() { local kv; for kv in $SRC_TAGS; do [ "${kv%%=*}" = "$1" ] && { echo "${kv#*=}"; return; }; done; }
 url() {
     case $1 in
         wayland-protocols) echo https://gitlab.freedesktop.org/wayland/wayland-protocols.git ;;
@@ -314,7 +341,9 @@ GCC_MAJOR=$( (g++ -dumpversion 2>/dev/null || echo 0) | cut -d. -f1)
 step "2. source build into $P"
 if [ $BUILD_HYPR = 0 ] && [ $BUILD_QS = 0 ]; then say "not needed (distro packages are new enough)"
 else
-    if [ $BUILD_HYPR = 1 ] && [ "$GCC_MAJOR" -lt 15 ]; then
+    # without g++ (dry run before the packages exist) use the version the preflight read from the repos
+    [ "$GCC_MAJOR" -gt 0 ] || case ${GCC_PLAN:-} in ''|*[!0-9]*) ;; *) GCC_MAJOR=$GCC_PLAN ;; esac
+    if [ $BUILD_HYPR = 1 ] && [ "$GCC_MAJOR" -lt 15 ] && { [ $YES = 1 ] || [ "$GCC_MAJOR" -gt 0 ]; }; then
         say "ERROR: Hyprland $(tag Hyprland) needs GCC >= 15 (C++26); this system has g++ ${GCC_MAJOR}."
         say "Use a newer distro release, or a toolchain such as a distro gcc-15 package, then re-run."
         [ $YES = 1 ] && exit 1
@@ -338,23 +367,21 @@ fi
 step "3. copy hyprk into $PREFIX (no Apple assets, no reference/, no build dirs)"
 [ -d "$SRC/shell" ] && [ -d "$SRC/config/hypr" ] || { say "ERROR: $SRC is not a hyprk checkout"; exit 1; }
 run mkdir -p "$PREFIX"
+NOSHIP_RE="^($(echo $NOSHIP | tr ' ' '|'))/"
 if [ -d "$SRC/.git" ] && have git; then
-    # exactly the tracked files: Apple assets are untracked (.gitignore), so they never come along
-    say "[files] git ls-files minus reference/ and packaging/ ($(git -C "$SRC" ls-files | grep -cvE '^(reference|packaging)/') files)"
+    # the tracked files minus NOSHIP (the repo tracks the Apple assets, so the filter is what keeps them out)
+    say "[files] git ls-files minus: $(echo $NOSHIP) ($(git -C "$SRC" ls-files | grep -cvE "$NOSHIP_RE") files)"
     if [ $YES = 1 ]; then
-        git -C "$SRC" ls-files -z | grep -zvE '^(reference|packaging)/' | tar -C "$SRC" --null -T - -cf - | tar -C "$PREFIX" -xf -
-    else say "[dry-run] git -C $(q "$SRC") ls-files -z | grep -zvE '^(reference|packaging)/' | tar -C $(q "$SRC") --null -T - -cf - | tar -C $(q "$PREFIX") -xf -"; fi
+        git -C "$SRC" ls-files -z | grep -zvE "$NOSHIP_RE" | tar -C "$SRC" --null -T - -cf - | tar -C "$PREFIX" -xf -
+    else say "[dry-run] git -C $(q "$SRC") ls-files -z | grep -zvE $(q "$NOSHIP_RE") | tar -C $(q "$SRC") --null -T - -cf - | tar -C $(q "$PREFIX") -xf -"; fi
 else
-    # tarball without .git: copy everything except the asset dirs listed in .gitignore
-    EXC=(--exclude=./reference --exclude=./packaging --exclude='*/build' --exclude=__pycache__ --exclude=./state
-         --exclude=./themes/fonts --exclude=./themes/wallpapers --exclude=./themes/icons/apps --exclude=./themes/icons/apps-hires
-         --exclude=./themes/icons/system --exclude=./themes/cursors/accessibility --exclude=./themes/cursors/hiservices
-         --exclude=./themes/cursors/png --exclude=./themes/cursors/theme/hyprk-cursors --exclude=./sounds/oga
-         --exclude=./sounds/wav --exclude=./sounds/originals)
+    # tarball without .git: copy everything except NOSHIP
+    EXC=(--exclude='*/build' --exclude=__pycache__)
+    for d in $NOSHIP; do EXC+=("--exclude=./$d"); done
     if [ $YES = 1 ]; then tar -C "$SRC" "${EXC[@]}" -cf - . | tar -C "$PREFIX" -xf -
     else say "[dry-run] tar -C $(q "$SRC") ${EXC[*]} -cf - . | tar -C $(q "$PREFIX") -xf -"; fi
 fi
-run mkdir -p "$PREFIX/state" "$PREFIX/bin" "$PREFIX/themes/wallpapers/png"
+run mkdir -p "$PREFIX/bin" "$PREFIX/themes/wallpapers/png"
 [ $YES = 1 ] && date -u +"installed %Y-%m-%dT%H:%M:%SZ from $SRC" > "$PREFIX/$MARKER"
 [ $YES = 1 ] || say "[dry-run] write $PREFIX/$MARKER"
 
@@ -362,7 +389,7 @@ run mkdir -p "$PREFIX/state" "$PREFIX/bin" "$PREFIX/themes/wallpapers/png"
 step "4. assets"
 if [ -n "$ASSETS" ]; then
     say "your own assets from $ASSETS (only these sub-dirs, each only if present):"
-    for d in themes/fonts themes/wallpapers themes/icons/apps themes/icons/system themes/icons/settings \
+    for d in themes/fonts themes/wallpapers themes/icons/apps themes/icons/system themes/icons/hyprk-apple \
              themes/cursors/theme/hyprk-cursors sounds/oga sounds/wav; do
         [ -d "$ASSETS/$d" ] || { say "  - $d: not in $ASSETS, skipped"; continue; }
         run mkdir -p "$PREFIX/$(dirname "$d")"
