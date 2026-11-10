@@ -1,0 +1,7219 @@
+[
+  {
+    "t" : 0.28294420833321965,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.2834292083332457,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.30004029166661894,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.30940466666675093,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.31760708333331422,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.32595912500005397,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.33352337499991336,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.34273316666667597,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.35096150000003945,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.35930574999997589,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.36764408333328902,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.37596341666676381,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.38429291666670906,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.39263041666663412,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.40094670833332202,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.40928537500008133,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.41763962499999252,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.42596991666664508,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.43430041666670149,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.44261237499995332,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.45095958333331509,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.45926829166660355,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.46761329166656651,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.47596520833326394,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.48428112500005227,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.49262712499989902,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.50096445833332837,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.50928166666676589,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.51687716666674532,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.5260249999998905,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.53425683333330198,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.54260970833342981,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.55094495833327528,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.55917137500000536,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.56762574999993376,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.57594245833342939,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.58428091666655746,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.59260116666655449,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.60100504166666724,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.6087507499998992,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.61768395833337308,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.62594770833334223,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.63428291666673431,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.64264287500009232,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.65096970833337764,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.65929783333331216,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.66763091666666696,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.67596524999999019,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.68429587500008893,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.6926302916667737,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.70096187500007545,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.70865395833334333,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.71771595833342872,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.7259647916666836,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.73431779166662636,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.74259679166675596,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.75098470833336251,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.7592919166665979,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.76764470833336418,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.77592858333332515,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.78428216666657136,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.79263416666663034,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.80096679166672402,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.80929558333332352,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.81766908333338506,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.82594429166670125,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.83428783333329193,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.84262016666662021,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.85095158333342624,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.85927220833332285,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.86679699999990589,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.87604608333322176,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.88427216666673303,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.89260558333330664,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.90094383333325823,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.90926487499996256,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.91759770833323273,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.92594358333326454,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.93428900000003523,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.94260325000004741,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.95094199999994089,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.95877420833335236,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.96770958333331691,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.975924166666573,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.9842890833333513,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.99264704166671436,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.0009406666665654,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.0090993750000052,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.0173171666667713,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.0259817083333473,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.0342593333332388,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.0426097083334298,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.0509320000001026,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.05926508333323,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.0676368333333812,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.0759317916665623,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.0842807916667425,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.0926019999999426,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.1009367083333927,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.1092887916665859,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.1176031249999596,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.1259489999999914,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.1342647500000567,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.1425957916667357,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.1509360416666823,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.1593009583332332,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.1675974583333755,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.1759406250000666,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.1842794166666408,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.1926097499999742,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.2009643750000123,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.2092790833332856,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.2176429999999527,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.2259702500000458,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.2343044166666459,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.2420947083332976,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.2510116250000465,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.2592771249999259,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.2676287500000853,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.2759479583332904,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSAlertPanel",
+        "frame" : [
+          450,
+          399,
+          260,
+          154
+        ],
+        "visible" : true
+      },
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSGlassEffectWindow",
+        "frame" : [
+          375,
+          324,
+          410,
+          304
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 1.5712439166666172,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.5796669999999722,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.5834139583332671,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.5927275416665907,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.6009601666667095,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.6093131666666523,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.617635458333325,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.6260020833333328,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.6342823333334309,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.6426237083333035,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.6509879583334168,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.659335583333359,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.6676397916667156,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.675968791666719,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.6843341250000776,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.6926268333334065,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.7009566666665705,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.7092917083332395,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.717618583333433,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.7259518749999643,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.7339293333334354,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.7426665833334027,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.7509604166666577,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.7592843333334258,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.77598224999997,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.7842966250000245,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.7919041249999736,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.8010245000000396,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.8089278333334278,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.8176719166667681,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.8259526249998999,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.8334575833332565,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.8424989166667274,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.8509742916667165,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.8592826250001053,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.867072250000092,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.8760277916667292,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.8840900833333762,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.8926470416665779,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.900965000000042,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.9092774583332357,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.9176156666667339,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.9259718333332785,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.9343002083332976,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.9426256249998914,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.9509435416666747,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.9592860000000201,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.9676239166667528,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.9759514166667032,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.9842805000000681,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.9926192499999615,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.0009570833333328,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.0093158333334031,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.0172556666666424,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.0260007500000938,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.0342804583333418,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.0426152499999262,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.0509454166667638,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.0592852499999026,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.0676209999999173,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.0759526249998999,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.0842788333334283,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.0926238750000721,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.1009507916667189,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.1093116249999184,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.1176146666666682,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.125996083333348,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.1426189166666063,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.1509619583332551,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.1592805833333841,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.1676213333332726,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.1759487083334079,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.1842874166666206,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.1926349166667478,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.2009375416666899,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.2093045416665973,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.2259579166666299,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.2342869999999948,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.242615541666737,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.250980458333288,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.2592946666666194,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.2676075833333016,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 2.2759585416665686,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          727,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  }
+]

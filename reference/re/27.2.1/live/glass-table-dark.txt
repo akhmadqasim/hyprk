@@ -1,0 +1,1467 @@
+## regular 120x24
+   BleedAmount=8.4  BleedBlurRadius=0  BleedColorMatrixBlack=0.125  BleedColorMatrixSaturation=1  BleedColorMatrixWhite=0.5  BleedDarkenBlend=False  BleedDistance0=1  BleedDistance1=0  BleedHeight=8.4  BleedOpacity=0  BlurDistance0=-12  BlurDistance1=-1  BlurDistance2=0  BlurDistance3=0  BlurFillBlurRadius=8  BlurFillDarkenOpacity=0.9  BlurFillLightenOpacity=0  BlurFillNormalOpacity=0.5  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0.5  BlurOpacity3=1  BlurRadius=5  Clamp=1.308  ClampPreserveHue=False  FaceColorMatrixBlack=0.125  FaceColorMatrixFillColor=rgba(0,0,0,0)  FaceColorMatrixMaxLuma=0.6  FaceColorMatrixMaxLumaSDR=0.6  FaceColorMatrixSaturation=1.3  FaceColorMatrixWhite=1.125  FaceOpacity=1  InnerRefractionAmount=-12  InnerRefractionHeight=6  KeyFillHighlightAmount=0.4  KeyFillHighlightAngle=1.571  KeyFillHighlightColorBias=-0.25  KeyFillHighlightEffectOffset=-0.5  KeyFillHighlightHeight=0.5  KeyFillHighlightSpread=1.309  KeyFillHighlightSpreadSDR=1.309  MaxHeadroom=9999  OuterRefractionAmount=16  OuterRefractionHeight=16  RefractionDistance0=-1  RefractionDistance1=0  RefractionOpacity=0.6  RingShadowBlurRadius=5  RingShadowMask=1  RingShadowOffset=8  RingShadowOpacity=0.06  RingShadowStrokeWidth=4  SDRGradientDistance0=0  SDRGradientDistance1=0  SDRHoldingToneEnabled=False  SDRHoldingToneWhite=1  SDRShadowOpacity=0  ShadowAmount=0  ShadowBlurRadius=0  ShadowColorMatrixBlack=0  ShadowColorMatrixFillColor=rgba(0,0,0,0.3)  ShadowColorMatrixSaturation=1  ShadowColorMatrixWhite=1  ShadowDistanceOffset=0  ShadowHeight=0  ShadowOffset=[0,8]  ShadowOpacity=0.04  ShadowRadius=4  ShadowVibrancyContribution=0  SourceSublayerName=@0
+   backdrop: scale=0.5 marginWidth=16
+## regular 120x32
+   BleedAmount=11.2  BleedBlurRadius=0  BleedColorMatrixBlack=0.125  BleedColorMatrixSaturation=1  BleedColorMatrixWhite=0.5  BleedDarkenBlend=False  BleedDistance0=1  BleedDistance1=0  BleedHeight=11.2  BleedOpacity=0  BlurDistance0=-16  BlurDistance1=-1  BlurDistance2=0  BlurDistance3=0  BlurFillBlurRadius=8  BlurFillDarkenOpacity=0.9  BlurFillLightenOpacity=0  BlurFillNormalOpacity=0.5  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0.5  BlurOpacity3=1  BlurRadius=5  Clamp=1.308  ClampPreserveHue=False  FaceColorMatrixBlack=0.125  FaceColorMatrixFillColor=rgba(0,0,0,0)  FaceColorMatrixMaxLuma=0.6  FaceColorMatrixMaxLumaSDR=0.6  FaceColorMatrixSaturation=1.3  FaceColorMatrixWhite=1.125  FaceOpacity=1  InnerRefractionAmount=-16  InnerRefractionHeight=8  KeyFillHighlightAmount=0.4  KeyFillHighlightAngle=1.571  KeyFillHighlightColorBias=-0.25  KeyFillHighlightEffectOffset=-0.5  KeyFillHighlightHeight=0.5  KeyFillHighlightSpread=1.309  KeyFillHighlightSpreadSDR=1.309  MaxHeadroom=9999  OuterRefractionAmount=16  OuterRefractionHeight=16  RefractionDistance0=-1  RefractionDistance1=0  RefractionOpacity=0.6  RingShadowBlurRadius=5  RingShadowMask=1  RingShadowOffset=8  RingShadowOpacity=0.06  RingShadowStrokeWidth=4  SDRGradientDistance0=0  SDRGradientDistance1=0  SDRHoldingToneEnabled=False  SDRHoldingToneWhite=1  SDRShadowOpacity=0  ShadowAmount=0  ShadowBlurRadius=0  ShadowColorMatrixBlack=0  ShadowColorMatrixFillColor=rgba(0,0,0,0.3)  ShadowColorMatrixSaturation=1  ShadowColorMatrixWhite=1  ShadowDistanceOffset=0  ShadowHeight=0  ShadowOffset=[0,8]  ShadowOpacity=0.04  ShadowRadius=4  ShadowVibrancyContribution=0  SourceSublayerName=@0
+   backdrop: scale=0.5 marginWidth=16
+## regular 120x44
+   BleedAmount=15.4  BleedBlurRadius=0  BleedColorMatrixBlack=0.125  BleedColorMatrixSaturation=1  BleedColorMatrixWhite=0.5  BleedDarkenBlend=False  BleedDistance0=1  BleedDistance1=0  BleedHeight=15.4  BleedOpacity=0  BlurDistance0=-22  BlurDistance1=-1  BlurDistance2=0  BlurDistance3=0  BlurFillBlurRadius=8  BlurFillDarkenOpacity=0.9  BlurFillLightenOpacity=0  BlurFillNormalOpacity=0.5  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0.5  BlurOpacity3=1  BlurRadius=5  Clamp=1.308  ClampPreserveHue=False  FaceColorMatrixBlack=0.125  FaceColorMatrixFillColor=rgba(0,0,0,0)  FaceColorMatrixMaxLuma=0.6  FaceColorMatrixMaxLumaSDR=0.6  FaceColorMatrixSaturation=1.3  FaceColorMatrixWhite=1.125  FaceOpacity=1  InnerRefractionAmount=-22  InnerRefractionHeight=11  KeyFillHighlightAmount=0.4  KeyFillHighlightAngle=1.571  KeyFillHighlightColorBias=-0.25  KeyFillHighlightEffectOffset=-0.5  KeyFillHighlightHeight=0.5  KeyFillHighlightSpread=1.309  KeyFillHighlightSpreadSDR=1.309  MaxHeadroom=9999  OuterRefractionAmount=16  OuterRefractionHeight=16  RefractionDistance0=-1  RefractionDistance1=0  RefractionOpacity=0.6  RingShadowBlurRadius=5  RingShadowMask=1  RingShadowOffset=8  RingShadowOpacity=0.06  RingShadowStrokeWidth=4  SDRGradientDistance0=0  SDRGradientDistance1=0  SDRHoldingToneEnabled=False  SDRHoldingToneWhite=1  SDRShadowOpacity=0  ShadowAmount=0  ShadowBlurRadius=0  ShadowColorMatrixBlack=0  ShadowColorMatrixFillColor=rgba(0,0,0,0.3)  ShadowColorMatrixSaturation=1  ShadowColorMatrixWhite=1  ShadowDistanceOffset=0  ShadowHeight=0  ShadowOffset=[0,8]  ShadowOpacity=0.04  ShadowRadius=4  ShadowVibrancyContribution=0  SourceSublayerName=@0
+   backdrop: scale=0.5 marginWidth=16
+## regular 120x64
+   BleedAmount=22.4  BleedBlurRadius=0  BleedColorMatrixBlack=0.125  BleedColorMatrixSaturation=1  BleedColorMatrixWhite=0.5  BleedDarkenBlend=False  BleedDistance0=1  BleedDistance1=0  BleedHeight=22.4  BleedOpacity=0  BlurDistance0=-32  BlurDistance1=-1  BlurDistance2=0  BlurDistance3=0  BlurFillBlurRadius=8  BlurFillDarkenOpacity=0.9  BlurFillLightenOpacity=0  BlurFillNormalOpacity=0.5  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0.5  BlurOpacity3=1  BlurRadius=5  Clamp=1.308  ClampPreserveHue=False  FaceColorMatrixBlack=0.125  FaceColorMatrixFillColor=rgba(0,0,0,0)  FaceColorMatrixMaxLuma=0.6  FaceColorMatrixMaxLumaSDR=0.6  FaceColorMatrixSaturation=1.3  FaceColorMatrixWhite=1.125  FaceOpacity=1  InnerRefractionAmount=-32  InnerRefractionHeight=16  KeyFillHighlightAmount=0.4  KeyFillHighlightAngle=1.571  KeyFillHighlightColorBias=-0.25  KeyFillHighlightEffectOffset=-0.5  KeyFillHighlightHeight=0.5  KeyFillHighlightSpread=1.309  KeyFillHighlightSpreadSDR=1.309  MaxHeadroom=9999  OuterRefractionAmount=16  OuterRefractionHeight=16  RefractionDistance0=-1  RefractionDistance1=0  RefractionOpacity=0.6  RingShadowBlurRadius=5  RingShadowMask=1  RingShadowOffset=8  RingShadowOpacity=0.06  RingShadowStrokeWidth=4  SDRGradientDistance0=0  SDRGradientDistance1=0  SDRHoldingToneEnabled=False  SDRHoldingToneWhite=1  SDRShadowOpacity=0  ShadowAmount=0  ShadowBlurRadius=0  ShadowColorMatrixBlack=0  ShadowColorMatrixFillColor=rgba(0,0,0,0.3)  ShadowColorMatrixSaturation=1  ShadowColorMatrixWhite=1  ShadowDistanceOffset=0  ShadowHeight=0  ShadowOffset=[0,8]  ShadowOpacity=0.04  ShadowRadius=4  ShadowVibrancyContribution=0  SourceSublayerName=@0
+   backdrop: scale=0.5 marginWidth=16
+## regular 153x96
+   BleedAmount=33.6  BleedBlurRadius=33.6  BleedColorMatrixBlack=0.125  BleedColorMatrixSaturation=1  BleedColorMatrixWhite=0.5  BleedDarkenBlend=False  BleedDistance0=1  BleedDistance1=0  BleedHeight=33.6  BleedOpacity=0.2667  BlurDistance0=-48  BlurDistance1=-1  BlurDistance2=0  BlurDistance3=0  BlurFillBlurRadius=8  BlurFillDarkenOpacity=0.9  BlurFillLightenOpacity=0  BlurFillNormalOpacity=0.5  BlurOpacity0=0.2667  BlurOpacity1=0.1333  BlurOpacity2=0.5  BlurOpacity3=1  BlurRadius=5  Clamp=1.308  ClampPreserveHue=False  FaceColorMatrixBlack=0.125  FaceColorMatrixFillColor=rgba(0,0,0,0)  FaceColorMatrixMaxLuma=0.4  FaceColorMatrixMaxLumaSDR=0.4  FaceColorMatrixSaturation=1.3  FaceColorMatrixWhite=1.125  FaceOpacity=1  InnerRefractionAmount=-48  InnerRefractionHeight=20  KeyFillHighlightAmount=0.4  KeyFillHighlightAngle=1.571  KeyFillHighlightColorBias=-0.25  KeyFillHighlightEffectOffset=-0.5  KeyFillHighlightHeight=0.5  KeyFillHighlightSpread=1.309  KeyFillHighlightSpreadSDR=1.309  MaxHeadroom=9999  OuterRefractionAmount=24  OuterRefractionHeight=19.2  RefractionDistance0=-1  RefractionDistance1=0  RefractionOpacity=0.6  RingShadowBlurRadius=5  RingShadowMask=1  RingShadowOffset=8  RingShadowOpacity=0.06  RingShadowStrokeWidth=4  SDRGradientDistance0=0  SDRGradientDistance1=0  SDRHoldingToneEnabled=False  SDRHoldingToneWhite=1  SDRShadowOpacity=0  ShadowAmount=0  ShadowBlurRadius=0  ShadowColorMatrixBlack=0  ShadowColorMatrixFillColor=rgba(0,0,0,0.3)  ShadowColorMatrixSaturation=1  ShadowColorMatrixWhite=1  ShadowDistanceOffset=0  ShadowHeight=0  ShadowOffset=[0,8]  ShadowOpacity=0.2267  ShadowRadius=10.67  ShadowVibrancyContribution=0  SourceSublayerName=@0
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular 204x128
+   BleedAmount=44.8  BleedBlurRadius=44.8  BleedColorMatrixBlack=0.125  BleedColorMatrixSaturation=1  BleedColorMatrixWhite=0.5  BleedDarkenBlend=False  BleedDistance0=1  BleedDistance1=0  BleedHeight=44.8  BleedOpacity=0.5333  BlurDistance0=-64  BlurDistance1=-1  BlurDistance2=0  BlurDistance3=0  BlurFillBlurRadius=8  BlurFillDarkenOpacity=0.9  BlurFillLightenOpacity=0  BlurFillNormalOpacity=0.5  BlurOpacity0=0.5333  BlurOpacity1=0.2667  BlurOpacity2=0.5  BlurOpacity3=1  BlurRadius=5  Clamp=1.308  ClampPreserveHue=False  FaceColorMatrixBlack=0.125  FaceColorMatrixFillColor=rgba(0,0,0,0)  FaceColorMatrixMaxLuma=0.35  FaceColorMatrixMaxLumaSDR=0.35  FaceColorMatrixSaturation=1.3  FaceColorMatrixWhite=1.125  FaceOpacity=1  InnerRefractionAmount=-60  InnerRefractionHeight=20  KeyFillHighlightAmount=0.4  KeyFillHighlightAngle=1.571  KeyFillHighlightColorBias=-0.25  KeyFillHighlightEffectOffset=-0.5  KeyFillHighlightHeight=0.5  KeyFillHighlightSpread=1.309  KeyFillHighlightSpreadSDR=1.309  MaxHeadroom=9999  OuterRefractionAmount=32  OuterRefractionHeight=25.6  RefractionDistance0=-1  RefractionDistance1=0  RefractionOpacity=0.6  RingShadowBlurRadius=5  RingShadowMask=1  RingShadowOffset=8  RingShadowOpacity=0.06  RingShadowStrokeWidth=4  SDRGradientDistance0=0  SDRGradientDistance1=0  SDRHoldingToneEnabled=False  SDRHoldingToneWhite=1  SDRShadowOpacity=0  ShadowAmount=0  ShadowBlurRadius=0  ShadowColorMatrixBlack=0  ShadowColorMatrixFillColor=rgba(0,0,0,0.3)  ShadowColorMatrixSaturation=1  ShadowColorMatrixWhite=1  ShadowDistanceOffset=0  ShadowHeight=0  ShadowOffset=[0,8]  ShadowOpacity=0.4133  ShadowRadius=17.33  ShadowVibrancyContribution=0  SourceSublayerName=@0
+   backdrop: scale=0.5 marginWidth=44.8
+## regular 256x160
+   BleedAmount=56  BleedBlurRadius=56  BleedColorMatrixBlack=0.125  BleedColorMatrixSaturation=1  BleedColorMatrixWhite=0.5  BleedDarkenBlend=False  BleedDistance0=1  BleedDistance1=0  BleedHeight=56  BleedOpacity=0.8  BlurDistance0=-80  BlurDistance1=-1  BlurDistance2=0  BlurDistance3=0  BlurFillBlurRadius=8  BlurFillDarkenOpacity=0.9  BlurFillLightenOpacity=0  BlurFillNormalOpacity=0.5  BlurOpacity0=0.8  BlurOpacity1=0.4  BlurOpacity2=0.5  BlurOpacity3=1  BlurRadius=5  Clamp=1.308  ClampPreserveHue=False  FaceColorMatrixBlack=0.125  FaceColorMatrixFillColor=rgba(0,0,0,0)  FaceColorMatrixMaxLuma=0.35  FaceColorMatrixMaxLumaSDR=0.35  FaceColorMatrixSaturation=1.3  FaceColorMatrixWhite=1.125  FaceOpacity=1  InnerRefractionAmount=-60  InnerRefractionHeight=20  KeyFillHighlightAmount=0.4  KeyFillHighlightAngle=1.571  KeyFillHighlightColorBias=-0.25  KeyFillHighlightEffectOffset=-0.5  KeyFillHighlightHeight=0.5  KeyFillHighlightSpread=1.309  KeyFillHighlightSpreadSDR=1.309  MaxHeadroom=9999  OuterRefractionAmount=40  OuterRefractionHeight=32  RefractionDistance0=-1  RefractionDistance1=0  RefractionOpacity=0.6  RingShadowBlurRadius=5  RingShadowMask=1  RingShadowOffset=8  RingShadowOpacity=0.06  RingShadowStrokeWidth=4  SDRGradientDistance0=0  SDRGradientDistance1=0  SDRHoldingToneEnabled=False  SDRHoldingToneWhite=1  SDRShadowOpacity=0  ShadowAmount=0  ShadowBlurRadius=0  ShadowColorMatrixBlack=0  ShadowColorMatrixFillColor=rgba(0,0,0,0.3)  ShadowColorMatrixSaturation=1  ShadowColorMatrixWhite=1  ShadowDistanceOffset=0  ShadowHeight=0  ShadowOffset=[0,8]  ShadowOpacity=0.6  ShadowRadius=24  ShadowVibrancyContribution=0  SourceSublayerName=@0
+   backdrop: scale=0.25 marginWidth=56
+## regular 384x240
+   BleedAmount=84  BleedBlurRadius=84  BleedColorMatrixBlack=0.125  BleedColorMatrixSaturation=1  BleedColorMatrixWhite=0.5  BleedDarkenBlend=False  BleedDistance0=1  BleedDistance1=0  BleedHeight=84  BleedOpacity=0.8  BlurDistance0=-120  BlurDistance1=-1  BlurDistance2=0  BlurDistance3=0  BlurFillBlurRadius=8  BlurFillDarkenOpacity=0.9  BlurFillLightenOpacity=0  BlurFillNormalOpacity=0.5  BlurOpacity0=0.8  BlurOpacity1=0.4  BlurOpacity2=0.5  BlurOpacity3=1  BlurRadius=5  Clamp=1.308  ClampPreserveHue=False  FaceColorMatrixBlack=0.125  FaceColorMatrixFillColor=rgba(0,0,0,0)  FaceColorMatrixMaxLuma=0.35  FaceColorMatrixMaxLumaSDR=0.35  FaceColorMatrixSaturation=1.3  FaceColorMatrixWhite=1.125  FaceOpacity=1  InnerRefractionAmount=-60  InnerRefractionHeight=20  KeyFillHighlightAmount=0.4  KeyFillHighlightAngle=1.571  KeyFillHighlightColorBias=-0.25  KeyFillHighlightEffectOffset=-0.5  KeyFillHighlightHeight=0.5  KeyFillHighlightSpread=1.309  KeyFillHighlightSpreadSDR=1.309  MaxHeadroom=9999  OuterRefractionAmount=60  OuterRefractionHeight=48  RefractionDistance0=-1  RefractionDistance1=0  RefractionOpacity=0.6  RingShadowBlurRadius=5  RingShadowMask=1  RingShadowOffset=8  RingShadowOpacity=0.06  RingShadowStrokeWidth=4  SDRGradientDistance0=0  SDRGradientDistance1=0  SDRHoldingToneEnabled=False  SDRHoldingToneWhite=1  SDRShadowOpacity=0  ShadowAmount=0  ShadowBlurRadius=0  ShadowColorMatrixBlack=0  ShadowColorMatrixFillColor=rgba(0,0,0,0.3)  ShadowColorMatrixSaturation=1  ShadowColorMatrixWhite=1  ShadowDistanceOffset=0  ShadowHeight=0  ShadowOffset=[0,8]  ShadowOpacity=0.6  ShadowRadius=24  ShadowVibrancyContribution=0  SourceSublayerName=@0
+   backdrop: scale=0.25 marginWidth=84
+## regular 640x400
+   BleedAmount=140  BleedBlurRadius=140  BleedColorMatrixBlack=0.125  BleedColorMatrixSaturation=1  BleedColorMatrixWhite=0.5  BleedDarkenBlend=False  BleedDistance0=1  BleedDistance1=0  BleedHeight=140  BleedOpacity=0.8  BlurDistance0=-200  BlurDistance1=-1  BlurDistance2=0  BlurDistance3=0  BlurFillBlurRadius=8  BlurFillDarkenOpacity=0.9  BlurFillLightenOpacity=0  BlurFillNormalOpacity=0.5  BlurOpacity0=0.8  BlurOpacity1=0.4  BlurOpacity2=0.5  BlurOpacity3=1  BlurRadius=5  Clamp=1.308  ClampPreserveHue=False  FaceColorMatrixBlack=0.125  FaceColorMatrixFillColor=rgba(0,0,0,0)  FaceColorMatrixMaxLuma=0.35  FaceColorMatrixMaxLumaSDR=0.35  FaceColorMatrixSaturation=1.3  FaceColorMatrixWhite=1.125  FaceOpacity=1  InnerRefractionAmount=-60  InnerRefractionHeight=20  KeyFillHighlightAmount=0.4  KeyFillHighlightAngle=1.571  KeyFillHighlightColorBias=-0.25  KeyFillHighlightEffectOffset=-0.5  KeyFillHighlightHeight=0.5  KeyFillHighlightSpread=1.309  KeyFillHighlightSpreadSDR=1.309  MaxHeadroom=9999  OuterRefractionAmount=100  OuterRefractionHeight=80  RefractionDistance0=-1  RefractionDistance1=0  RefractionOpacity=0.6  RingShadowBlurRadius=5  RingShadowMask=1  RingShadowOffset=8  RingShadowOpacity=0.06  RingShadowStrokeWidth=4  SDRGradientDistance0=0  SDRGradientDistance1=0  SDRHoldingToneEnabled=False  SDRHoldingToneWhite=1  SDRShadowOpacity=0  ShadowAmount=0  ShadowBlurRadius=0  ShadowColorMatrixBlack=0  ShadowColorMatrixFillColor=rgba(0,0,0,0.3)  ShadowColorMatrixSaturation=1  ShadowColorMatrixWhite=1  ShadowDistanceOffset=0  ShadowHeight=0  ShadowOffset=[0,8]  ShadowOpacity=0.6  ShadowRadius=24  ShadowVibrancyContribution=0  SourceSublayerName=@0
+   backdrop: scale=0.25 marginWidth=140
+## dock 120x24
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1.5  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixFillColor=rgba(0,0,0,0.02)  FaceColorMatrixMaxLuma=0.75  FaceColorMatrixMaxLumaSDR=0.75  FaceColorMatrixSaturation=1.25  FaceColorMatrixWhite=0.92  InnerRefractionAmount=-4.32  InnerRefractionHeight=1.92  KeyFillHighlightSpread=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0.2  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=15  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=9.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## dock 120x32
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1.5  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixFillColor=rgba(0,0,0,0.02)  FaceColorMatrixMaxLuma=0.75  FaceColorMatrixMaxLumaSDR=0.75  FaceColorMatrixSaturation=1.25  FaceColorMatrixWhite=0.92  InnerRefractionAmount=-5.76  InnerRefractionHeight=2.56  KeyFillHighlightSpread=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0.2  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=20  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=12.8  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## dock 120x44
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1.5  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixFillColor=rgba(0,0,0,0.02)  FaceColorMatrixMaxLuma=0.75  FaceColorMatrixMaxLumaSDR=0.75  FaceColorMatrixSaturation=1.25  FaceColorMatrixWhite=0.92  InnerRefractionAmount=-7.92  InnerRefractionHeight=3.52  KeyFillHighlightSpread=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0.2  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=27.5  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=17.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## dock 120x64
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1.5  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixFillColor=rgba(0,0,0,0.02)  FaceColorMatrixMaxLuma=0.75  FaceColorMatrixMaxLumaSDR=0.75  FaceColorMatrixSaturation=1.25  FaceColorMatrixWhite=0.92  InnerRefractionAmount=-11.52  InnerRefractionHeight=5.12  KeyFillHighlightSpread=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0.2  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=40  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=25.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## dock 153x96
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1.5  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixFillColor=rgba(0,0,0,0.02)  FaceColorMatrixMaxLuma=0.75  FaceColorMatrixMaxLumaSDR=0.75  FaceColorMatrixSaturation=1.25  FaceColorMatrixWhite=0.92  InnerRefractionAmount=-17.28  InnerRefractionHeight=7.68  KeyFillHighlightSpread=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0.2  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=60  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=38.4  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## dock 204x128
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1.5  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixFillColor=rgba(0,0,0,0.02)  FaceColorMatrixMaxLuma=0.75  FaceColorMatrixMaxLumaSDR=0.75  FaceColorMatrixSaturation=1.25  FaceColorMatrixWhite=0.92  InnerRefractionAmount=-23.04  InnerRefractionHeight=10.24  KeyFillHighlightSpread=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0.2  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=51.2  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## dock 256x160
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1.5  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixFillColor=rgba(0,0,0,0.02)  FaceColorMatrixMaxLuma=0.75  FaceColorMatrixMaxLumaSDR=0.75  FaceColorMatrixSaturation=1.25  FaceColorMatrixWhite=0.92  InnerRefractionAmount=-28.8  InnerRefractionHeight=12.8  KeyFillHighlightSpread=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0.2  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=64  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## dock 384x240
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1.5  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixFillColor=rgba(0,0,0,0.02)  FaceColorMatrixMaxLuma=0.75  FaceColorMatrixMaxLumaSDR=0.75  FaceColorMatrixSaturation=1.25  FaceColorMatrixWhite=0.92  InnerRefractionAmount=-43.2  InnerRefractionHeight=19.2  KeyFillHighlightSpread=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0.2  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=96  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## dock 640x400
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1.5  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixFillColor=rgba(0,0,0,0.02)  FaceColorMatrixMaxLuma=0.75  FaceColorMatrixMaxLumaSDR=0.75  FaceColorMatrixSaturation=1.25  FaceColorMatrixWhite=0.92  KeyFillHighlightSpread=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0.2  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=160  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## appIcons 120x24
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurDistance0=-32  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  InnerRefractionAmount=-41.6  InnerRefractionHeight=9.6  KeyFillHighlightColorBias=-0.5  KeyFillHighlightSpread=1.85  KeyFillHighlightSpreadSDR=1.85  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=40  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=25.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## appIcons 120x32
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurDistance0=-32  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  InnerRefractionAmount=-41.6  InnerRefractionHeight=9.6  KeyFillHighlightColorBias=-0.5  KeyFillHighlightSpread=1.85  KeyFillHighlightSpreadSDR=1.85  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=40  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=25.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## appIcons 120x44
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurDistance0=-32  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  InnerRefractionAmount=-41.6  InnerRefractionHeight=9.6  KeyFillHighlightColorBias=-0.5  KeyFillHighlightSpread=1.85  KeyFillHighlightSpreadSDR=1.85  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=40  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=25.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## appIcons 120x64
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  InnerRefractionAmount=-41.6  InnerRefractionHeight=9.6  KeyFillHighlightColorBias=-0.5  KeyFillHighlightSpread=1.85  KeyFillHighlightSpreadSDR=1.85  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=40  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=25.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## appIcons 153x96
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurDistance0=-32  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  InnerRefractionAmount=-41.6  InnerRefractionHeight=9.6  KeyFillHighlightColorBias=-0.5  KeyFillHighlightSpread=1.85  KeyFillHighlightSpreadSDR=1.85  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=40  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=25.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## appIcons 204x128
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurDistance0=-32  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  InnerRefractionAmount=-41.6  InnerRefractionHeight=9.6  KeyFillHighlightColorBias=-0.5  KeyFillHighlightSpread=1.85  KeyFillHighlightSpreadSDR=1.85  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=40  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=25.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## appIcons 256x160
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurDistance0=-32  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  InnerRefractionAmount=-41.6  InnerRefractionHeight=9.6  KeyFillHighlightColorBias=-0.5  KeyFillHighlightSpread=1.85  KeyFillHighlightSpreadSDR=1.85  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=40  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=25.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## appIcons 384x240
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurDistance0=-32  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  InnerRefractionAmount=-41.6  InnerRefractionHeight=9.6  KeyFillHighlightColorBias=-0.5  KeyFillHighlightSpread=1.85  KeyFillHighlightSpreadSDR=1.85  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=40  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=25.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## appIcons 640x400
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurDistance0=-32  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  InnerRefractionAmount=-41.6  InnerRefractionHeight=9.6  KeyFillHighlightColorBias=-0.5  KeyFillHighlightSpread=1.85  KeyFillHighlightSpreadSDR=1.85  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=40  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=25.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## widgets 120x24
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurDistance0=-82  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  InnerRefractionAmount=-60  InnerRefractionHeight=20  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=65.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## widgets 120x32
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurDistance0=-82  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  InnerRefractionAmount=-60  InnerRefractionHeight=20  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=65.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## widgets 120x44
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurDistance0=-82  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  InnerRefractionAmount=-60  InnerRefractionHeight=20  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=65.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## widgets 120x64
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurDistance0=-82  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  InnerRefractionAmount=-60  InnerRefractionHeight=20  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=65.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## widgets 153x96
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurDistance0=-82  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  InnerRefractionAmount=-60  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=65.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## widgets 204x128
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurDistance0=-82  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=65.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## widgets 256x160
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurDistance0=-82  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=65.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## widgets 384x240
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurDistance0=-82  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=65.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## widgets 640x400
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurDistance0=-82  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1  Clamp=1  FaceColorMatrixBlack=0.05  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.8  FaceColorMatrixWhite=0.3  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=65.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## text 120x24
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0.5  BlurOpacity1=1  BlurRadius=3  Clamp=1  FaceColorMatrixBlack=0.5  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-57.73  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.2  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance1=10  RefractionOpacity=0  RingShadowMask=0  RingShadowOpacity=0  ShadowColorMatrixFillColor=None  ShadowOffset=[0,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## text 120x32
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0.5  BlurOpacity1=1  BlurRadius=3  Clamp=1  FaceColorMatrixBlack=0.5  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-57.73  InnerRefractionHeight=6  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.2  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance1=10  RefractionOpacity=0  RingShadowMask=0  RingShadowOpacity=0  ShadowColorMatrixFillColor=None  ShadowOffset=[0,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## text 120x44
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0.5  BlurOpacity1=1  BlurRadius=3  Clamp=1  FaceColorMatrixBlack=0.5  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-57.73  InnerRefractionHeight=6  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.2  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance1=10  RefractionOpacity=0  RingShadowMask=0  RingShadowOpacity=0  ShadowColorMatrixFillColor=None  ShadowOffset=[0,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## text 120x64
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0.5  BlurOpacity1=1  BlurRadius=3  Clamp=1  FaceColorMatrixBlack=0.5  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-57.73  InnerRefractionHeight=6  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.2  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance1=10  RefractionOpacity=0  RingShadowMask=0  RingShadowOpacity=0  ShadowColorMatrixFillColor=None  ShadowOffset=[0,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## text 153x96
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0.5  BlurOpacity1=1  BlurRadius=3  Clamp=1  FaceColorMatrixBlack=0.5  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-57.73  InnerRefractionHeight=6  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.2  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance1=10  RefractionOpacity=0  RingShadowMask=0  RingShadowOpacity=0  ShadowColorMatrixFillColor=None  ShadowOffset=[0,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## text 204x128
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0.5  BlurOpacity1=1  BlurRadius=3  Clamp=1  FaceColorMatrixBlack=0.5  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-57.73  InnerRefractionHeight=6  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.2  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance1=10  RefractionOpacity=0  RingShadowMask=0  RingShadowOpacity=0  ShadowColorMatrixFillColor=None  ShadowOffset=[0,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## text 256x160
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0.5  BlurOpacity1=1  BlurRadius=3  Clamp=1  FaceColorMatrixBlack=0.5  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-57.73  InnerRefractionHeight=6  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.2  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance1=10  RefractionOpacity=0  RingShadowMask=0  RingShadowOpacity=0  ShadowColorMatrixFillColor=None  ShadowOffset=[0,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## text 384x240
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0.5  BlurOpacity1=1  BlurRadius=3  Clamp=1  FaceColorMatrixBlack=0.5  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-57.73  InnerRefractionHeight=6  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.2  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance1=10  RefractionOpacity=0  RingShadowMask=0  RingShadowOpacity=0  ShadowColorMatrixFillColor=None  ShadowOffset=[0,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## text 640x400
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0.5  BlurOpacity1=1  BlurRadius=3  Clamp=1  FaceColorMatrixBlack=0.5  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-57.73  InnerRefractionHeight=6  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.2  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance1=10  RefractionOpacity=0  RingShadowMask=0  RingShadowOpacity=0  ShadowColorMatrixFillColor=None  ShadowOffset=[0,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## avplayer 120x24
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  InnerRefractionAmount=-15.6  InnerRefractionHeight=8.64  OuterRefractionAmount=4.8  OuterRefractionHeight=3  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=15  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=9.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## avplayer 120x32
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  InnerRefractionAmount=-20.8  InnerRefractionHeight=11.52  OuterRefractionAmount=6.4  OuterRefractionHeight=4  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=20  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=12.8  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## avplayer 120x44
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  InnerRefractionAmount=-28.6  InnerRefractionHeight=15.84  OuterRefractionAmount=8.8  OuterRefractionHeight=5.5  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=27.5  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=17.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## avplayer 120x64
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  InnerRefractionAmount=-41.6  InnerRefractionHeight=20  OuterRefractionAmount=12.8  OuterRefractionHeight=8  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=40  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=25.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## avplayer 153x96
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  InnerRefractionAmount=-60  OuterRefractionAmount=19.2  OuterRefractionHeight=12  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=60  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=38.4  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## avplayer 204x128
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  OuterRefractionAmount=25.6  OuterRefractionHeight=16  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=51.2  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## avplayer 256x160
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  OuterRefractionAmount=32  OuterRefractionHeight=20  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=64  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## avplayer 384x240
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  OuterRefractionAmount=48  OuterRefractionHeight=30  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=96  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## avplayer 640x400
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  OuterRefractionAmount=80  OuterRefractionHeight=50  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=160  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## facetime 120x24
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  InnerRefractionAmount=-15.6  InnerRefractionHeight=8.64  OuterRefractionAmount=4.8  OuterRefractionHeight=3  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=15  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=9.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## facetime 120x32
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  InnerRefractionAmount=-20.8  InnerRefractionHeight=11.52  OuterRefractionAmount=6.4  OuterRefractionHeight=4  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=20  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=12.8  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## facetime 120x44
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  InnerRefractionAmount=-28.6  InnerRefractionHeight=15.84  OuterRefractionAmount=8.8  OuterRefractionHeight=5.5  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=27.5  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=17.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## facetime 120x64
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  InnerRefractionAmount=-41.6  InnerRefractionHeight=20  OuterRefractionAmount=12.8  OuterRefractionHeight=8  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=40  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=25.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## facetime 153x96
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  InnerRefractionAmount=-60  OuterRefractionAmount=19.2  OuterRefractionHeight=12  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=60  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=38.4  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## facetime 204x128
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  OuterRefractionAmount=25.6  OuterRefractionHeight=16  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=51.2  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## facetime 256x160
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  OuterRefractionAmount=32  OuterRefractionHeight=20  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=64  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## facetime 384x240
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  OuterRefractionAmount=48  OuterRefractionHeight=30  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=96  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## facetime 640x400
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  OuterRefractionAmount=80  OuterRefractionHeight=50  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=160  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## controlCenter 120x24
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurDistance0=-100  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.1  BlurRadius=4  Clamp=1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.2  FaceColorMatrixWhite=0.8  InnerRefractionAmount=-48  InnerRefractionHeight=5.4  KeyFillHighlightColorBias=-0.3  OuterRefractionAmount=1.714  OuterRefractionHeight=0.8568  RefractionOpacity=0.1525  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=15  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=9.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=1.7136
+## controlCenter 120x32
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurDistance0=-100  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.1  BlurRadius=4  Clamp=1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.2  FaceColorMatrixWhite=0.8  InnerRefractionAmount=-64  InnerRefractionHeight=7.2  KeyFillHighlightColorBias=-0.3  OuterRefractionAmount=2.285  OuterRefractionHeight=1.142  RefractionOpacity=0.1525  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=20  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=12.8  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=2.2848
+## controlCenter 120x44
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurDistance0=-100  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.1  BlurRadius=4  Clamp=1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.2  FaceColorMatrixWhite=0.8  InnerRefractionAmount=-80  InnerRefractionHeight=9.9  KeyFillHighlightColorBias=-0.3  OuterRefractionAmount=3.142  OuterRefractionHeight=1.571  RefractionOpacity=0.1525  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=27.5  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=17.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=3.1416000000000004
+## controlCenter 120x64
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurDistance0=-100  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.1  BlurRadius=4  Clamp=1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.2  FaceColorMatrixWhite=0.8  InnerRefractionAmount=-80  InnerRefractionHeight=14.4  KeyFillHighlightColorBias=-0.3  OuterRefractionAmount=4.57  OuterRefractionHeight=2.285  RefractionOpacity=0.1525  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=40  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=25.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=4.5696
+## controlCenter 153x96
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurDistance0=-100  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.1  BlurRadius=4  Clamp=1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.2  FaceColorMatrixWhite=0.8  InnerRefractionAmount=-80  InnerRefractionHeight=21.6  KeyFillHighlightColorBias=-0.3  OuterRefractionAmount=6.854  OuterRefractionHeight=3.427  RefractionOpacity=0.1525  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=60  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=38.4  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=6.8544
+## controlCenter 204x128
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurDistance0=-100  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.1  BlurRadius=4  Clamp=1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.2  FaceColorMatrixWhite=0.8  InnerRefractionAmount=-80  InnerRefractionHeight=25  KeyFillHighlightColorBias=-0.3  OuterRefractionAmount=9.139  OuterRefractionHeight=4.57  RefractionOpacity=0.1525  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=51.2  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=9.1392
+## controlCenter 256x160
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurDistance0=-100  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.1  BlurRadius=4  Clamp=1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.2  FaceColorMatrixWhite=0.8  InnerRefractionAmount=-80  InnerRefractionHeight=25  KeyFillHighlightColorBias=-0.3  OuterRefractionAmount=11.42  OuterRefractionHeight=5.712  RefractionOpacity=0.1525  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=64  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=11.424000000000001
+## controlCenter 384x240
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurDistance0=-100  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.1  BlurRadius=4  Clamp=1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.2  FaceColorMatrixWhite=0.8  InnerRefractionAmount=-80  InnerRefractionHeight=25  KeyFillHighlightColorBias=-0.3  OuterRefractionAmount=17.14  OuterRefractionHeight=8.568  RefractionOpacity=0.1525  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=96  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=17.136000000000003
+## controlCenter 640x400
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurDistance0=-100  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.1  BlurRadius=4  Clamp=1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.2  FaceColorMatrixWhite=0.8  InnerRefractionAmount=-80  InnerRefractionHeight=25  KeyFillHighlightColorBias=-0.3  OuterRefractionAmount=28.56  OuterRefractionHeight=14.28  RefractionOpacity=0.1525  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=160  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=28.560000000000002
+## notificationCenter 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## notificationCenter 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## notificationCenter 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## notificationCenter 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## notificationCenter 153x96
+   ShadowVibrancyContribution=1
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## notificationCenter 204x128
+   ShadowVibrancyContribution=1
+   backdrop: scale=0.5 marginWidth=44.8
+## notificationCenter 256x160
+   ShadowVibrancyContribution=1
+   backdrop: scale=0.25 marginWidth=56
+## notificationCenter 384x240
+   ShadowVibrancyContribution=1
+   backdrop: scale=0.25 marginWidth=84
+## notificationCenter 640x400
+   ShadowVibrancyContribution=1
+   backdrop: scale=0.25 marginWidth=140
+## monogram 120x24
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-50  InnerRefractionHeight=20  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  OuterRefractionAmount=10  RefractionDistance0=4  RefractionDistance1=-1  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowColorMatrixWhite=0.9  ShadowOffset=[0,2.6]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0
+## monogram 120x32
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-50  InnerRefractionHeight=20  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  OuterRefractionAmount=10  RefractionDistance0=4  RefractionDistance1=-1  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowColorMatrixWhite=0.9  ShadowOffset=[0,2.6]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0
+## monogram 120x44
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-50  InnerRefractionHeight=20  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  OuterRefractionAmount=10  RefractionDistance0=4  RefractionDistance1=-1  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowColorMatrixWhite=0.9  ShadowOffset=[0,2.6]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0
+## monogram 120x64
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-50  InnerRefractionHeight=20  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  OuterRefractionAmount=10  RefractionDistance0=4  RefractionDistance1=-1  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowColorMatrixWhite=0.9  ShadowOffset=[0,2.6]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0
+## monogram 153x96
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-50  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  OuterRefractionAmount=10  OuterRefractionHeight=16  RefractionDistance0=4  RefractionDistance1=-1  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowColorMatrixWhite=0.9  ShadowOffset=[0,2.6]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0
+## monogram 204x128
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-50  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  OuterRefractionAmount=10  OuterRefractionHeight=16  RefractionDistance0=4  RefractionDistance1=-1  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowColorMatrixWhite=0.9  ShadowOffset=[0,2.6]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0
+## monogram 256x160
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-50  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  OuterRefractionAmount=10  OuterRefractionHeight=16  RefractionDistance0=4  RefractionDistance1=-1  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowColorMatrixWhite=0.9  ShadowOffset=[0,2.6]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0
+## monogram 384x240
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-50  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  OuterRefractionAmount=10  OuterRefractionHeight=16  RefractionDistance0=4  RefractionDistance1=-1  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowColorMatrixWhite=0.9  ShadowOffset=[0,2.6]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0
+## monogram 640x400
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=-50  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  OuterRefractionAmount=10  OuterRefractionHeight=16  RefractionDistance0=4  RefractionDistance1=-1  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowColorMatrixWhite=0.9  ShadowOffset=[0,2.6]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0
+## bubbles 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## bubbles 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## bubbles 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## bubbles 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## bubbles 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## bubbles 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## bubbles 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## bubbles 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## bubbles 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## identity 120x24
+   (no glassBackground filter)  layers: 
+## identity 120x32
+   (no glassBackground filter)  layers: 
+## identity 120x44
+   (no glassBackground filter)  layers: 
+## identity 120x64
+   (no glassBackground filter)  layers: 
+## identity 153x96
+   (no glassBackground filter)  layers: 
+## identity 204x128
+   (no glassBackground filter)  layers: 
+## identity 256x160
+   (no glassBackground filter)  layers: 
+## identity 384x240
+   (no glassBackground filter)  layers: 
+## identity 640x400
+   (no glassBackground filter)  layers: 
+## focusBorder 120x24
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=1 marginWidth=0
+## focusBorder 120x32
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=1 marginWidth=0
+## focusBorder 120x44
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=1 marginWidth=0
+## focusBorder 120x64
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=1 marginWidth=0
+## focusBorder 153x96
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=1 marginWidth=0
+## focusBorder 204x128
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=1 marginWidth=0
+## focusBorder 256x160
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=1 marginWidth=0
+## focusBorder 384x240
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=1 marginWidth=0
+## focusBorder 640x400
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  FaceOpacity=0  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=1 marginWidth=0
+## focusPlatter 120x24
+   (no glassBackground filter)  layers: CALayer, CAPortalLayer, CASDFElementLayer, CASDFLayer, SDFPortalLayer
+## focusPlatter 120x32
+   (no glassBackground filter)  layers: CALayer, CAPortalLayer, CASDFElementLayer, CASDFLayer, SDFPortalLayer
+## focusPlatter 120x44
+   (no glassBackground filter)  layers: CALayer, CAPortalLayer, CASDFElementLayer, CASDFLayer, SDFPortalLayer
+## focusPlatter 120x64
+   (no glassBackground filter)  layers: CALayer, CAPortalLayer, CASDFElementLayer, CASDFLayer, SDFPortalLayer
+## focusPlatter 153x96
+   (no glassBackground filter)  layers: CALayer, CAPortalLayer, CASDFElementLayer, CASDFLayer, SDFPortalLayer
+## focusPlatter 204x128
+   (no glassBackground filter)  layers: CALayer, CAPortalLayer, CASDFElementLayer, CASDFLayer, SDFPortalLayer
+## focusPlatter 256x160
+   (no glassBackground filter)  layers: CALayer, CAPortalLayer, CASDFElementLayer, CASDFLayer, SDFPortalLayer
+## focusPlatter 384x240
+   (no glassBackground filter)  layers: CALayer, CAPortalLayer, CASDFElementLayer, CASDFLayer, SDFPortalLayer
+## focusPlatter 640x400
+   (no glassBackground filter)  layers: CALayer, CAPortalLayer, CASDFElementLayer, CASDFLayer, SDFPortalLayer
+## keyboard 120x24
+   BleedAmount=0  BleedHeight=0  BlurDistance0=-66.67  BlurDistance1=-66.67  BlurDistance2=-1  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=0.32  BlurRadius=2.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixFillColor=rgba(0.15,0.15,0.15,0.75)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.4  FaceColorMatrixWhite=0.5  InnerRefractionAmount=-7.2  InnerRefractionHeight=15.84  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## keyboard 120x32
+   BleedAmount=0  BleedHeight=0  BlurDistance0=-66.67  BlurDistance1=-66.67  BlurDistance2=-1  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=0.32  BlurRadius=2.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixFillColor=rgba(0.15,0.15,0.15,0.75)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.4  FaceColorMatrixWhite=0.5  InnerRefractionAmount=-9.6  InnerRefractionHeight=20  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## keyboard 120x44
+   BleedAmount=0  BleedHeight=0  BlurDistance0=-66.67  BlurDistance1=-66.67  BlurDistance2=-1  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=0.32  BlurRadius=2.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixFillColor=rgba(0.15,0.15,0.15,0.75)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.4  FaceColorMatrixWhite=0.5  InnerRefractionAmount=-13.2  InnerRefractionHeight=20  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## keyboard 120x64
+   BleedAmount=0  BleedHeight=0  BlurDistance0=-66.67  BlurDistance1=-66.67  BlurDistance2=-1  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=0.32  BlurRadius=2.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixFillColor=rgba(0.15,0.15,0.15,0.75)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.4  FaceColorMatrixWhite=0.5  InnerRefractionAmount=-19.2  InnerRefractionHeight=20  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## keyboard 153x96
+   BleedAmount=0  BleedBlurRadius=0  BleedHeight=0  BleedOpacity=0  BlurDistance0=-66.67  BlurDistance1=-66.67  BlurDistance2=-1  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=0.32  BlurRadius=2.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixFillColor=rgba(0.15,0.15,0.15,0.75)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.4  FaceColorMatrixWhite=0.5  InnerRefractionAmount=-28.8  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## keyboard 204x128
+   BleedAmount=0  BleedBlurRadius=0  BleedHeight=0  BleedOpacity=0  BlurDistance0=-66.67  BlurDistance1=-66.67  BlurDistance2=-1  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=0.32  BlurRadius=2.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixFillColor=rgba(0.15,0.15,0.15,0.75)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.4  FaceColorMatrixWhite=0.5  InnerRefractionAmount=-38.4  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## keyboard 256x160
+   BleedAmount=0  BleedBlurRadius=0  BleedHeight=0  BleedOpacity=0  BlurDistance1=-66.67  BlurDistance2=-1  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=0.32  BlurRadius=2.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixFillColor=rgba(0.15,0.15,0.15,0.75)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.4  FaceColorMatrixWhite=0.5  InnerRefractionAmount=-48  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## keyboard 384x240
+   BleedAmount=0  BleedBlurRadius=0  BleedHeight=0  BleedOpacity=0  BlurDistance1=-66.67  BlurDistance2=-1  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=0.32  BlurRadius=2.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixFillColor=rgba(0.15,0.15,0.15,0.75)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.4  FaceColorMatrixWhite=0.5  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## keyboard 640x400
+   BleedAmount=0  BleedBlurRadius=0  BleedHeight=0  BleedOpacity=0  BlurDistance1=-66.67  BlurDistance2=-1  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=0.32  BlurRadius=2.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixFillColor=rgba(0.15,0.15,0.15,0.75)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.4  FaceColorMatrixWhite=0.5  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## sidebar 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## sidebar 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## sidebar 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## sidebar 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## sidebar 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## sidebar 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## sidebar 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## sidebar 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## sidebar 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## abuttedSidebar 120x24
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=16
+## abuttedSidebar 120x32
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=16
+## abuttedSidebar 120x44
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=16
+## abuttedSidebar 120x64
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=16
+## abuttedSidebar 153x96
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## abuttedSidebar 204x128
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=44.8
+## abuttedSidebar 256x160
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=56
+## abuttedSidebar 384x240
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=84
+## abuttedSidebar 640x400
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=140
+## inspector 120x24
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[-1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=16
+## inspector 120x32
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[-1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=16
+## inspector 120x44
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[-1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=16
+## inspector 120x64
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[-1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=16
+## inspector 153x96
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[-1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## inspector 204x128
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[-1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=44.8
+## inspector 256x160
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[-1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=56
+## inspector 384x240
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[-1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=84
+## inspector 640x400
+   BleedColorMatrixBlack=0.1  BleedColorMatrixSaturation=1.5  Clamp=1  FaceColorMatrixBlack=0.1  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=0.6  FaceColorMatrixWhite=0.5  KeyFillHighlightHeight=0  RefractionOpacity=0  RingShadowOpacity=0  ShadowOffset=[-1,0]  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=140
+## control 120x24
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixFillColor=rgba(0,0,0,0)  BleedColorMatrixWhite=1  BleedHeight=0  BlurDistance0=-10  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=None  ClampPreserveHue=None  FaceColorMatrixBlack=0.06  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  InnerRefractionAmount=-7.2  InnerRefractionHeight=2.28  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.3  KeyFillHighlightEffectOffset=-1  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=4  RingShadowMask=0  RingShadowOffset=12  RingShadowOpacity=0.07  ShadowAmount=6  ShadowColorMatrixFillColor=rgba(0,0,0,1)  ShadowOffset=[0,7]  ShadowOpacity=0.02  ShadowRadius=8
+   backdrop: scale=1 marginWidth=1
+## control 120x32
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixFillColor=rgba(0,0,0,0)  BleedColorMatrixWhite=1  BleedHeight=0  BlurDistance0=-10  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=None  ClampPreserveHue=None  FaceColorMatrixBlack=0.06  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  InnerRefractionAmount=-9.6  InnerRefractionHeight=3.04  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.3  KeyFillHighlightEffectOffset=-1  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=4  RingShadowMask=0  RingShadowOffset=12  RingShadowOpacity=0.07  ShadowAmount=8  ShadowColorMatrixFillColor=rgba(0,0,0,1)  ShadowOffset=[0,7]  ShadowOpacity=0.02  ShadowRadius=8
+   backdrop: scale=1 marginWidth=1
+## control 120x44
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixFillColor=rgba(0,0,0,0)  BleedColorMatrixWhite=1  BleedHeight=0  BlurDistance0=-10  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=None  ClampPreserveHue=None  FaceColorMatrixBlack=0.06  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  InnerRefractionAmount=-13.2  InnerRefractionHeight=4.18  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.3  KeyFillHighlightEffectOffset=-1  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=4  RingShadowMask=0  RingShadowOffset=12  RingShadowOpacity=0.07  ShadowAmount=11  ShadowColorMatrixFillColor=rgba(0,0,0,1)  ShadowOffset=[0,7]  ShadowOpacity=0.02  ShadowRadius=8
+   backdrop: scale=1 marginWidth=1
+## control 120x64
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixFillColor=rgba(0,0,0,0)  BleedColorMatrixWhite=1  BleedHeight=0  BlurDistance0=-10  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=None  ClampPreserveHue=None  FaceColorMatrixBlack=0.06  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  InnerRefractionAmount=-19.2  InnerRefractionHeight=6.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.3  KeyFillHighlightEffectOffset=-1  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=4  RingShadowMask=0  RingShadowOffset=12  RingShadowOpacity=0.07  ShadowAmount=16  ShadowColorMatrixFillColor=rgba(0,0,0,1)  ShadowOffset=[0,7]  ShadowOpacity=0.02  ShadowRadius=8
+   backdrop: scale=1 marginWidth=1
+## control 153x96
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixFillColor=rgba(0,0,0,0)  BleedColorMatrixWhite=1  BleedHeight=0  BleedOpacity=0  BlurDistance0=-10  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=None  ClampPreserveHue=None  FaceColorMatrixBlack=0.06  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  InnerRefractionAmount=-28.8  InnerRefractionHeight=9.12  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.3  KeyFillHighlightEffectOffset=-1  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=4  RingShadowMask=0  RingShadowOffset=12  RingShadowOpacity=0.07  ShadowAmount=24  ShadowColorMatrixFillColor=rgba(0,0,0,1)  ShadowOffset=[0,7]  ShadowOpacity=0.02  ShadowRadius=8
+   backdrop: scale=1 marginWidth=1
+## control 204x128
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixFillColor=rgba(0,0,0,0)  BleedColorMatrixWhite=1  BleedHeight=0  BleedOpacity=0  BlurDistance0=-10  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=None  ClampPreserveHue=None  FaceColorMatrixBlack=0.06  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  InnerRefractionAmount=-38.4  InnerRefractionHeight=12.16  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.3  KeyFillHighlightEffectOffset=-1  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=4  RingShadowMask=0  RingShadowOffset=12  RingShadowOpacity=0.07  ShadowAmount=32  ShadowColorMatrixFillColor=rgba(0,0,0,1)  ShadowOffset=[0,7]  ShadowOpacity=0.02  ShadowRadius=8
+   backdrop: scale=1 marginWidth=1
+## control 256x160
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixFillColor=rgba(0,0,0,0)  BleedColorMatrixWhite=1  BleedHeight=0  BleedOpacity=0  BlurDistance0=-10  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=None  ClampPreserveHue=None  FaceColorMatrixBlack=0.06  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  InnerRefractionAmount=-48  InnerRefractionHeight=15.2  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.3  KeyFillHighlightEffectOffset=-1  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=4  RingShadowMask=0  RingShadowOffset=12  RingShadowOpacity=0.07  ShadowAmount=40  ShadowColorMatrixFillColor=rgba(0,0,0,1)  ShadowOffset=[0,7]  ShadowOpacity=0.02  ShadowRadius=8
+   backdrop: scale=1 marginWidth=1
+## control 384x240
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixFillColor=rgba(0,0,0,0)  BleedColorMatrixWhite=1  BleedHeight=0  BleedOpacity=0  BlurDistance0=-10  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=None  ClampPreserveHue=None  FaceColorMatrixBlack=0.06  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.3  KeyFillHighlightEffectOffset=-1  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=4  RingShadowMask=0  RingShadowOffset=12  RingShadowOpacity=0.07  ShadowAmount=60  ShadowColorMatrixFillColor=rgba(0,0,0,1)  ShadowOffset=[0,7]  ShadowOpacity=0.02  ShadowRadius=8
+   backdrop: scale=1 marginWidth=1
+## control 640x400
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixFillColor=rgba(0,0,0,0)  BleedColorMatrixWhite=1  BleedHeight=0  BleedOpacity=0  BlurDistance0=-10  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=None  ClampPreserveHue=None  FaceColorMatrixBlack=0.06  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.3  KeyFillHighlightEffectOffset=-1  KeyFillHighlightHeight=1  KeyFillHighlightSpread=1.571  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowBlurRadius=4  RingShadowMask=0  RingShadowOffset=12  RingShadowOpacity=0.07  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,1)  ShadowOffset=[0,7]  ShadowOpacity=0.02  ShadowRadius=8
+   backdrop: scale=1 marginWidth=1
+## loupe 120x24
+   InnerRefractionHeight=5
+   backdrop: scale=0.5 marginWidth=16
+## loupe 120x32
+   InnerRefractionHeight=5
+   backdrop: scale=0.5 marginWidth=16
+## loupe 120x44
+   InnerRefractionHeight=5
+   backdrop: scale=0.5 marginWidth=16
+## loupe 120x64
+   InnerRefractionHeight=5
+   backdrop: scale=0.5 marginWidth=16
+## loupe 153x96
+   InnerRefractionHeight=5
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## loupe 204x128
+   InnerRefractionHeight=5
+   backdrop: scale=0.5 marginWidth=44.8
+## loupe 256x160
+   InnerRefractionHeight=5
+   backdrop: scale=0.25 marginWidth=56
+## loupe 384x240
+   InnerRefractionHeight=5
+   backdrop: scale=0.25 marginWidth=84
+## loupe 640x400
+   InnerRefractionHeight=5
+   backdrop: scale=0.25 marginWidth=140
+## slider 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## slider 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## slider 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## slider 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## slider 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## slider 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## slider 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## slider 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## slider 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## camera 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## camera 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## camera 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## camera 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## camera 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## camera 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## camera 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## camera 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## camera 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## cartouchePopover 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## cartouchePopover 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## cartouchePopover 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## cartouchePopover 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## cartouchePopover 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## cartouchePopover 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## cartouchePopover 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## cartouchePopover 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## cartouchePopover 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## clear 120x24
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  InnerRefractionAmount=-15.6  InnerRefractionHeight=8.64  OuterRefractionAmount=4.8  OuterRefractionHeight=3  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=15  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=9.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## clear 120x32
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  InnerRefractionAmount=-20.8  InnerRefractionHeight=11.52  OuterRefractionAmount=6.4  OuterRefractionHeight=4  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=20  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=12.8  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## clear 120x44
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  InnerRefractionAmount=-28.6  InnerRefractionHeight=15.84  OuterRefractionAmount=8.8  OuterRefractionHeight=5.5  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=27.5  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=17.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## clear 120x64
+   BleedAmount=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  InnerRefractionAmount=-41.6  InnerRefractionHeight=20  OuterRefractionAmount=12.8  OuterRefractionHeight=8  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=40  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=25.6  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## clear 153x96
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  InnerRefractionAmount=-60  OuterRefractionAmount=19.2  OuterRefractionHeight=12  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=60  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=38.4  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## clear 204x128
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  OuterRefractionAmount=25.6  OuterRefractionHeight=16  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=51.2  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## clear 256x160
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  OuterRefractionAmount=32  OuterRefractionHeight=20  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=64  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## clear 384x240
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  OuterRefractionAmount=48  OuterRefractionHeight=30  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=96  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## clear 640x400
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0.75  BleedColorMatrixSaturation=1.2  BleedColorMatrixWhite=1  BleedDarkenBlend=True  BleedHeight=0  BleedOpacity=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=0.75  Clamp=1.192  FaceColorMatrixFillColor=rgba(1,1,1,0)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1.06  FaceColorMatrixWhite=1.08  OuterRefractionAmount=80  OuterRefractionHeight=50  RefractionOpacity=0  RingShadowBlurRadius=0  RingShadowMask=0  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  ShadowAmount=75  ShadowColorMatrixFillColor=rgba(0,0,0,0.1)  ShadowColorMatrixSaturation=1.2  ShadowHeight=160  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## regular.menu 120x24
+   ShadowOffset=[0,10]  ShadowOpacity=0.8  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=16
+## regular.menu 120x32
+   ShadowOffset=[0,10]  ShadowOpacity=0.8  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=16
+## regular.menu 120x44
+   ShadowOffset=[0,10]  ShadowOpacity=0.8  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=16
+## regular.menu 120x64
+   ShadowOffset=[0,10]  ShadowOpacity=0.8  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=16
+## regular.menu 153x96
+   ShadowOffset=[0,10]  ShadowOpacity=0.8  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.menu 204x128
+   ShadowOffset=[0,10]  ShadowOpacity=0.8  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=44.8
+## regular.menu 256x160
+   ShadowOffset=[0,10]  ShadowOpacity=0.8
+   backdrop: scale=0.25 marginWidth=56
+## regular.menu 384x240
+   ShadowOffset=[0,10]  ShadowOpacity=0.8
+   backdrop: scale=0.25 marginWidth=84
+## regular.menu 640x400
+   ShadowOffset=[0,10]  ShadowOpacity=0.8
+   backdrop: scale=0.25 marginWidth=140
+## regular.window 120x24
+   ShadowOffset=[0,10]  ShadowOpacity=0.8  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=16
+## regular.window 120x32
+   ShadowOffset=[0,10]  ShadowOpacity=0.8  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=16
+## regular.window 120x44
+   ShadowOffset=[0,10]  ShadowOpacity=0.8  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=16
+## regular.window 120x64
+   ShadowOffset=[0,10]  ShadowOpacity=0.8  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=16
+## regular.window 153x96
+   ShadowOffset=[0,10]  ShadowOpacity=0.8  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.window 204x128
+   ShadowOffset=[0,10]  ShadowOpacity=0.8  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=44.8
+## regular.window 256x160
+   ShadowOffset=[0,10]  ShadowOpacity=0.8
+   backdrop: scale=0.25 marginWidth=56
+## regular.window 384x240
+   ShadowOffset=[0,10]  ShadowOpacity=0.8
+   backdrop: scale=0.25 marginWidth=84
+## regular.window 640x400
+   ShadowOffset=[0,10]  ShadowOpacity=0.8
+   backdrop: scale=0.25 marginWidth=140
+## regular.documentModalWindow 120x24
+   ShadowOffset=[0,10]  ShadowOpacity=0.7  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=16
+## regular.documentModalWindow 120x32
+   ShadowOffset=[0,10]  ShadowOpacity=0.7  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=16
+## regular.documentModalWindow 120x44
+   ShadowOffset=[0,10]  ShadowOpacity=0.7  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=16
+## regular.documentModalWindow 120x64
+   ShadowOffset=[0,10]  ShadowOpacity=0.7  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=16
+## regular.documentModalWindow 153x96
+   ShadowOffset=[0,10]  ShadowOpacity=0.7  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.documentModalWindow 204x128
+   ShadowOffset=[0,10]  ShadowOpacity=0.7  ShadowRadius=24
+   backdrop: scale=0.5 marginWidth=44.8
+## regular.documentModalWindow 256x160
+   ShadowOffset=[0,10]  ShadowOpacity=0.7
+   backdrop: scale=0.25 marginWidth=56
+## regular.documentModalWindow 384x240
+   ShadowOffset=[0,10]  ShadowOpacity=0.7
+   backdrop: scale=0.25 marginWidth=84
+## regular.documentModalWindow 640x400
+   ShadowOffset=[0,10]  ShadowOpacity=0.7
+   backdrop: scale=0.25 marginWidth=140
+## regular.sheet 120x24
+   BleedAmount=0  BleedHeight=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  OuterRefractionAmount=0  OuterRefractionHeight=0
+   backdrop: scale=0.5 marginWidth=16
+## regular.sheet 120x32
+   BleedAmount=0  BleedHeight=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  OuterRefractionAmount=0  OuterRefractionHeight=0
+   backdrop: scale=0.5 marginWidth=16
+## regular.sheet 120x44
+   BleedAmount=0  BleedHeight=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  OuterRefractionAmount=0  OuterRefractionHeight=0
+   backdrop: scale=0.5 marginWidth=16
+## regular.sheet 120x64
+   BleedAmount=0  BleedHeight=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  OuterRefractionAmount=0  OuterRefractionHeight=0
+   backdrop: scale=0.5 marginWidth=16
+## regular.sheet 153x96
+   BleedAmount=0  BleedBlurRadius=0  BleedHeight=0  BleedOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=1.333  OuterRefractionAmount=0  OuterRefractionHeight=0
+   backdrop: scale=0.5 marginWidth=16
+## regular.sheet 204x128
+   BleedAmount=0  BleedBlurRadius=0  BleedHeight=0  BleedOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=2.667  OuterRefractionAmount=0  OuterRefractionHeight=0
+   backdrop: scale=0.5 marginWidth=16
+## regular.sheet 256x160
+   BleedAmount=0  BleedBlurRadius=0  BleedHeight=0  BleedOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=4  OuterRefractionAmount=0  OuterRefractionHeight=0
+   backdrop: scale=0.25 marginWidth=16
+## regular.sheet 384x240
+   BleedAmount=0  BleedBlurRadius=0  BleedHeight=0  BleedOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=4  OuterRefractionAmount=0  OuterRefractionHeight=0
+   backdrop: scale=0.25 marginWidth=16
+## regular.sheet 640x400
+   BleedAmount=0  BleedBlurRadius=0  BleedHeight=0  BleedOpacity=0  BlurOpacity0=1  BlurOpacity1=0.5  BlurRadius=4  OuterRefractionAmount=0  OuterRefractionHeight=0
+   backdrop: scale=0.25 marginWidth=16
+## regular.spotlightField 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.spotlightField 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.spotlightField 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.spotlightField 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.spotlightField 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.spotlightField 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular.spotlightField 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular.spotlightField 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular.spotlightField 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular.searchResults 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.searchResults 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.searchResults 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.searchResults 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.searchResults 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.searchResults 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular.searchResults 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular.searchResults 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular.searchResults 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular.compose 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.compose 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.compose 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.compose 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.compose 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.compose 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular.compose 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular.compose 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular.compose 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular.listening 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.listening 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.listening 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.listening 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.listening 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.listening 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular.listening 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular.listening 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular.listening 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular.thinking 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.thinking 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.thinking 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.thinking 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.thinking 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.thinking 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular.thinking 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular.thinking 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular.thinking 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular.response 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.response 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.response 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.response 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.response 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.response 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular.response 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular.response 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular.response 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular.entryField 120x24
+   BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1
+   backdrop: scale=1 marginWidth=16
+## regular.entryField 120x32
+   BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1
+   backdrop: scale=1 marginWidth=16
+## regular.entryField 120x44
+   BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1
+   backdrop: scale=1 marginWidth=16
+## regular.entryField 120x64
+   BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1
+   backdrop: scale=1 marginWidth=16
+## regular.entryField 153x96
+   BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1
+   backdrop: scale=1 marginWidth=33.599999999999994
+## regular.entryField 204x128
+   BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1
+   backdrop: scale=1 marginWidth=44.8
+## regular.entryField 256x160
+   BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1
+   backdrop: scale=1 marginWidth=56
+## regular.entryField 384x240
+   BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1
+   backdrop: scale=1 marginWidth=84
+## regular.entryField 640x400
+   BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=0  BlurOpacity1=0  BlurOpacity2=0  BlurOpacity3=0  BlurRadius=0  Clamp=1  FaceColorMatrixBlack=0  FaceColorMatrixFillColor=None  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=1
+   backdrop: scale=1 marginWidth=140
+## regular.focusedButtonFill 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.focusedButtonFill 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.focusedButtonFill 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.focusedButtonFill 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.focusedButtonFill 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.focusedButtonFill 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular.focusedButtonFill 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular.focusedButtonFill 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular.focusedButtonFill 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular.customizeSheet 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.customizeSheet 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.customizeSheet 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.customizeSheet 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.customizeSheet 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.customizeSheet 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular.customizeSheet 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular.customizeSheet 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular.customizeSheet 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular.volumeSlider 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.volumeSlider 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.volumeSlider 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.volumeSlider 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.volumeSlider 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.volumeSlider 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular.volumeSlider 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular.volumeSlider 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular.volumeSlider 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular.siriSnippet 120x24
+   BlurOpacity0=0.2667  BlurOpacity1=0.1333  FaceColorMatrixFillColor=rgba(0,0,0,0.4)
+   backdrop: scale=0.5 marginWidth=16
+## regular.siriSnippet 120x32
+   BlurOpacity0=0.2667  BlurOpacity1=0.1333  FaceColorMatrixFillColor=rgba(0,0,0,0.4)
+   backdrop: scale=0.5 marginWidth=16
+## regular.siriSnippet 120x44
+   BlurOpacity0=0.2667  BlurOpacity1=0.1333  FaceColorMatrixFillColor=rgba(0,0,0,0.4)
+   backdrop: scale=0.5 marginWidth=16
+## regular.siriSnippet 120x64
+   BlurOpacity0=0.2667  BlurOpacity1=0.1333  FaceColorMatrixFillColor=rgba(0,0,0,0.4)
+   backdrop: scale=0.5 marginWidth=16
+## regular.siriSnippet 153x96
+   BlurOpacity0=0.6444  BlurOpacity1=0.3222  FaceColorMatrixFillColor=rgba(0,0,0,0.4)
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.siriSnippet 204x128
+   BlurOpacity0=1  BlurOpacity1=0.5  BlurOpacity2=0.4891  BlurOpacity3=0.9783  BlurRadius=5.111  FaceColorMatrixFillColor=rgba(0,0,0,0.4)
+   backdrop: scale=0.25 marginWidth=44.8
+## regular.siriSnippet 256x160
+   BlurOpacity0=1  BlurOpacity1=0.5  BlurOpacity2=0.3571  BlurOpacity3=0.7143  BlurRadius=7  FaceColorMatrixFillColor=rgba(0,0,0,0.4)
+   backdrop: scale=0.25 marginWidth=56
+## regular.siriSnippet 384x240
+   BlurOpacity0=1  BlurOpacity1=0.5  BlurOpacity2=0.3571  BlurOpacity3=0.7143  BlurRadius=7  FaceColorMatrixFillColor=rgba(0,0,0,0.4)
+   backdrop: scale=0.25 marginWidth=84
+## regular.siriSnippet 640x400
+   BlurOpacity0=1  BlurOpacity1=0.5  BlurOpacity2=0.3571  BlurOpacity3=0.7143  BlurRadius=7  FaceColorMatrixFillColor=rgba(0,0,0,0.4)
+   backdrop: scale=0.25 marginWidth=140
+## regular.lockscreenNotifications 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.lockscreenNotifications 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.lockscreenNotifications 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.lockscreenNotifications 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.lockscreenNotifications 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.lockscreenNotifications 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular.lockscreenNotifications 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular.lockscreenNotifications 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular.lockscreenNotifications 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular.lockscreenControls 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.lockscreenControls 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.lockscreenControls 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.lockscreenControls 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.lockscreenControls 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.lockscreenControls 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular.lockscreenControls 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular.lockscreenControls 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular.lockscreenControls 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular.homescreenFolder 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.homescreenFolder 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.homescreenFolder 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.homescreenFolder 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.homescreenFolder 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.homescreenFolder 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular.homescreenFolder 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular.homescreenFolder 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular.homescreenFolder 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular.transientCanvas 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.transientCanvas 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.transientCanvas 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.transientCanvas 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular.transientCanvas 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.transientCanvas 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular.transientCanvas 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular.transientCanvas 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular.transientCanvas 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular.cursorAccessory 120x24
+   BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0
+   backdrop: scale=0.5 marginWidth=16
+## regular.cursorAccessory 120x32
+   BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0
+   backdrop: scale=0.5 marginWidth=16
+## regular.cursorAccessory 120x44
+   BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0
+   backdrop: scale=0.5 marginWidth=16
+## regular.cursorAccessory 120x64
+   BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0
+   backdrop: scale=0.5 marginWidth=16
+## regular.cursorAccessory 153x96
+   BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular.cursorAccessory 204x128
+   BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0
+   backdrop: scale=0.5 marginWidth=44.8
+## regular.cursorAccessory 256x160
+   BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0
+   backdrop: scale=0.25 marginWidth=56
+## regular.cursorAccessory 384x240
+   BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0
+   backdrop: scale=0.25 marginWidth=84
+## regular.cursorAccessory 640x400
+   BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0
+   backdrop: scale=0.25 marginWidth=140
+## regular+_adaptiveAppearance=1 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_adaptiveAppearance=1 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_adaptiveAppearance=1 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_adaptiveAppearance=1 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_adaptiveAppearance=1 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular+_adaptiveAppearance=1 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular+_adaptiveAppearance=1 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular+_adaptiveAppearance=1 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular+_adaptiveAppearance=1 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular+_adaptiveAppearance=2 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_adaptiveAppearance=2 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_adaptiveAppearance=2 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_adaptiveAppearance=2 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_adaptiveAppearance=2 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular+_adaptiveAppearance=2 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular+_adaptiveAppearance=2 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular+_adaptiveAppearance=2 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular+_adaptiveAppearance=2 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular+_interactionState=1 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_interactionState=1 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_interactionState=1 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_interactionState=1 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_interactionState=1 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular+_interactionState=1 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular+_interactionState=1 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular+_interactionState=1 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular+_interactionState=1 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular+_interactionState=2 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_interactionState=2 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_interactionState=2 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_interactionState=2 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_interactionState=2 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular+_interactionState=2 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular+_interactionState=2 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular+_interactionState=2 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular+_interactionState=2 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular+_scrimState=1 120x24
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=1  BlurRadius=4  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixFillColor=rgba(0,0,0,0.4)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=0.6  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0
+## regular+_scrimState=1 120x32
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=1  BlurRadius=4  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixFillColor=rgba(0,0,0,0.4)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=0.6  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0
+## regular+_scrimState=1 120x44
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=1  BlurRadius=4  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixFillColor=rgba(0,0,0,0.4)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=0.6  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0
+## regular+_scrimState=1 120x64
+   BleedAmount=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=1  BlurRadius=4.444  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixFillColor=rgba(0,0,0,0.4)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=0.6  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0
+## regular+_scrimState=1 153x96
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=1  BlurRadius=5.333  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixFillColor=rgba(0,0,0,0.4)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=0.6  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0
+## regular+_scrimState=1 204x128
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=1  BlurRadius=6  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixFillColor=rgba(0,0,0,0.4)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=0.6  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0
+## regular+_scrimState=1 256x160
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=1  BlurRadius=6  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixFillColor=rgba(0,0,0,0.4)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=0.6  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0
+## regular+_scrimState=1 384x240
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=1  BlurRadius=6  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixFillColor=rgba(0,0,0,0.4)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=0.6  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0
+## regular+_scrimState=1 640x400
+   BleedAmount=0  BleedBlurRadius=0  BleedColorMatrixBlack=0  BleedColorMatrixWhite=1  BleedDistance0=0  BleedHeight=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurFillBlurRadius=0  BlurFillDarkenOpacity=0  BlurFillNormalOpacity=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=1  BlurRadius=6  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixFillColor=rgba(0,0,0,0.4)  FaceColorMatrixMaxLuma=1  FaceColorMatrixMaxLumaSDR=1  FaceColorMatrixSaturation=1  FaceColorMatrixWhite=0.6  InnerRefractionAmount=0  InnerRefractionHeight=0  KeyFillHighlightEffectOffset=0  KeyFillHighlightHeight=0  MaxHeadroom=1.2  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionDistance0=0  RefractionOpacity=0  RingShadowBlurRadius=1  RingShadowOffset=0  RingShadowOpacity=0  RingShadowStrokeWidth=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowColorMatrixFillColor=None  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0
+## regular+_scrimState=2 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_scrimState=2 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_scrimState=2 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_scrimState=2 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_scrimState=2 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular+_scrimState=2 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular+_scrimState=2 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular+_scrimState=2 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular+_scrimState=2 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular+_subduedState=1 120x24
+   BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.4  BlurOpacity1=0.4  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=16
+## regular+_subduedState=1 120x32
+   BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.4  BlurOpacity1=0.4  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=16
+## regular+_subduedState=1 120x44
+   BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.4  BlurOpacity1=0.4  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=16
+## regular+_subduedState=1 120x64
+   BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.4  BlurOpacity1=0.4  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=16
+## regular+_subduedState=1 153x96
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.5333  BlurOpacity1=0.5333  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=16
+## regular+_subduedState=1 204x128
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.6667  BlurOpacity1=0.6667  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=16
+## regular+_subduedState=1 256x160
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity1=0.8  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=16
+## regular+_subduedState=1 384x240
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity1=0.8  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=16
+## regular+_subduedState=1 640x400
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity1=0.8  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=16
+## regular+_subduedState=2 120x24
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_subduedState=2 120x32
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_subduedState=2 120x44
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_subduedState=2 120x64
+   
+   backdrop: scale=0.5 marginWidth=16
+## regular+_subduedState=2 153x96
+   
+   backdrop: scale=0.5 marginWidth=33.599999999999994
+## regular+_subduedState=2 204x128
+   
+   backdrop: scale=0.5 marginWidth=44.8
+## regular+_subduedState=2 256x160
+   
+   backdrop: scale=0.25 marginWidth=56
+## regular+_subduedState=2 384x240
+   
+   backdrop: scale=0.25 marginWidth=84
+## regular+_subduedState=2 640x400
+   
+   backdrop: scale=0.25 marginWidth=140
+## regular+inactiveApp 120x24
+   BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.4  BlurOpacity1=0.4  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## regular+inactiveApp 120x32
+   BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.4  BlurOpacity1=0.4  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## regular+inactiveApp 120x44
+   BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.4  BlurOpacity1=0.4  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## regular+inactiveApp 120x64
+   BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.4  BlurOpacity1=0.4  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## regular+inactiveApp 153x96
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.5333  BlurOpacity1=0.5333  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## regular+inactiveApp 204x128
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.6667  BlurOpacity1=0.6667  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.5 marginWidth=0.5
+## regular+inactiveApp 256x160
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity1=0.8  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## regular+inactiveApp 384x240
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity1=0.8  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## regular+inactiveApp 640x400
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity1=0.8  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOpacity=0  ShadowRadius=0
+   backdrop: scale=0.25 marginWidth=0.5
+## regular.menu+inactiveApp 120x24
+   BlurDistance0=0  BlurDistance1=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=0.8333  BlurOpacity3=0.8333  BlurRadius=6  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixWhite=0.3  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.25 marginWidth=0.5
+## regular.menu+inactiveApp 120x32
+   BlurDistance0=0  BlurDistance1=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=0.8333  BlurOpacity3=0.8333  BlurRadius=6  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixWhite=0.3  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.25 marginWidth=0.5
+## regular.menu+inactiveApp 120x44
+   BlurDistance0=0  BlurDistance1=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=0.8333  BlurOpacity3=0.8333  BlurRadius=6  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixWhite=0.3  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.25 marginWidth=0.5
+## regular.menu+inactiveApp 120x64
+   BlurDistance0=0  BlurDistance1=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=0.8333  BlurOpacity3=0.8333  BlurRadius=6  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixWhite=0.3  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.25 marginWidth=0.5
+## regular.menu+inactiveApp 153x96
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=0.625  BlurOpacity3=0.625  BlurRadius=8  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixWhite=0.3  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.25 marginWidth=0.5
+## regular.menu+inactiveApp 204x128
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity3=0.5  BlurRadius=10  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixWhite=0.3  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.25 marginWidth=0.5
+## regular.menu+inactiveApp 256x160
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=0.4167  BlurOpacity3=0.4167  BlurRadius=12  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixWhite=0.3  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.125 marginWidth=0.5
+## regular.menu+inactiveApp 384x240
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=0.4167  BlurOpacity3=0.4167  BlurRadius=12  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixWhite=0.3  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.125 marginWidth=0.5
+## regular.menu+inactiveApp 640x400
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity0=1  BlurOpacity1=1  BlurOpacity2=0.4167  BlurOpacity3=0.4167  BlurRadius=12  Clamp=1  FaceColorMatrixBlack=0.15  FaceColorMatrixWhite=0.3  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.125 marginWidth=0.5
+## regular.window+inactiveApp 120x24
+   BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.4  BlurOpacity1=0.4  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.5 marginWidth=0.5
+## regular.window+inactiveApp 120x32
+   BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.4  BlurOpacity1=0.4  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.5 marginWidth=0.5
+## regular.window+inactiveApp 120x44
+   BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.4  BlurOpacity1=0.4  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.5 marginWidth=0.5
+## regular.window+inactiveApp 120x64
+   BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.4  BlurOpacity1=0.4  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.5 marginWidth=0.5
+## regular.window+inactiveApp 153x96
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.5333  BlurOpacity1=0.5333  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.5 marginWidth=0.5
+## regular.window+inactiveApp 204x128
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity0=0.6667  BlurOpacity1=0.6667  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.5 marginWidth=0.5
+## regular.window+inactiveApp 256x160
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity1=0.8  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.25 marginWidth=0.5
+## regular.window+inactiveApp 384x240
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity1=0.8  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.25 marginWidth=0.5
+## regular.window+inactiveApp 640x400
+   BleedBlurRadius=0  BleedOpacity=0  BlurDistance0=0  BlurDistance1=0  BlurOpacity1=0.8  BlurOpacity2=1  FaceColorMatrixBlack=0.08  KeyFillHighlightAmount=0.5  KeyFillHighlightColorBias=-0.1875  KeyFillHighlightSpread=2.094  KeyFillHighlightSpreadSDR=2.094  OuterRefractionAmount=0  OuterRefractionHeight=0  RefractionOpacity=0  RingShadowOpacity=0  SDRGradientDistance0=1  SDRGradientDistance1=1  ShadowOffset=[0,4]  ShadowOpacity=0.65  ShadowRadius=16
+   backdrop: scale=0.25 marginWidth=0.5

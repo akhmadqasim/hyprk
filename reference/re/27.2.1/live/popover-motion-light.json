@@ -1,0 +1,3555 @@
+[
+  {
+    "t" : 0.028510374999996202,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.033964083333330564,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.0426913333333232,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.050976416666571822,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.059310416666676247,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.066938708333282193,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.076056916666630059,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.084294249999857129,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.09264983333332566,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.10097399999995105,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.10930641666664087,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.11765124999988075,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.12596887499989862,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.13371829166658245,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.14269212499993955,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.15097620833330438,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.15932537499998034,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.16763595833322142,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.1759679583333309,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.18433183333331726,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.19263075000003482,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.20096745833325258,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.20929649999993671,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.21735604166656231,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.226010874999929,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.23429033333331972,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.24262383333325488,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.25033579166665731,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.2593847083333003,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.26761912500001017,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.27596558333334542,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.28415712499986512,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.29264962499996727,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.30095541666651116,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.30930204166656949,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.31763299999988703,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.32597333333319511,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.3342907500000365,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.34263516666669602,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.35029525000004469,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.35938233333331482,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.36762008333334961,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.37596141666654148,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.38431287499997779,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.39263916666664045,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.40095654166657368,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.40929600000004029,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.41764712500003043,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.42596887499985314,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.43428887499999291,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.44263149999983398,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.45096554166661917,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.45909645833330615,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.46677012500003912,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.47605316666658837,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.4842886249998628,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.49242954166652453,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.50929170833319404,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.51764054166665119,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.52546149999989211,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.53434604166659483,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.54261449999989964,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.55095649999998386,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.55928949999997712,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.56762895833321636,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.57598558333324945,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.58410129166668412,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.59265400000003865,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.60930308333331595,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.61764908333316271,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.62598729166666089,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.63428912499989565,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.64262029166661705,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.65095291666671073,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.65929249999999229,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.66762616666665053,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.67595270833317045,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.68428529166658336,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.69262683333317909,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.70095733333323551,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.70929629166653285,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.71763416666658486,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.72594887499985816,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.7343332499999633,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.74263645833320879,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.75096787500001483,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.759280249999847,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.76764191666666193,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.77598304166667731,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.78429824999989251,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.79262320833322519,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.80931808333320987,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.81762541666671495,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : true
+      }
+    ]
+  },
+  {
+    "t" : 0.83760562499992375,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.84223887500002093,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.85103387499998462,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.85931987499998286,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.8676444583331886,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.87595916666668927,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.88429933333327426,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.89263058333335721,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.90096399999993082,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.90928454166669326,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.91720349999991413,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.92601012499994795,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.93427862499993353,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.94261904166660315,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.95095816666662358,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.95902329166665368,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.96721962499987058,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.97600345833325264,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.98428583333316055,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 0.99185608333323216,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.0010660416667179,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.0092942916667198,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.0176507916667106,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.025978083333257,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.0343140833333564,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.0426371249998283,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.0509766249999757,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.0592923750000409,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.0676559583332619,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.0759707916665775,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.0843196250000346,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.0926427916665489,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.1009758333332229,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.1093049583332686,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.1176471249998485,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.1259947083333373,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.1343179999998938,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.1426391249999597,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.1509737083333675,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.1593437499998345,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.1676518750000469,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.1755462083333441,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.1834842083333115,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.1927519999999276,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.2009697083333322,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.2092947916667072,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.2176830833332133,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.2259778333332179,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.2426259583332921,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.2510144999998829,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.2593088749999879,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.2674292083331693,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.2759918750000452,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.2843425416665468,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.2925561249999191,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.3007115833331682,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.3093205833333741,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.3176659166665559,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.3259661666666034,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.3334654999998747,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.3427077500000451,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.3509755000000041,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.3592779583332231,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.3672265000000152,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.3760077083331907,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.3843233333332137,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.39264141666672,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.4009618333332128,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.4092933333333804,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.4176335833333269,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.4259808750000502,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.4342957083333658,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.4426279583333326,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.4509602499999801,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.459281666666584,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.4676281249999192,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.4759904166667184,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.4843017916666668,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.4926138333332801,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.5009660833331964,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.5092820416666655,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.5176309999999376,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.5257921666666334,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.5343044583332812,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.5426230416665021,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.5506353333332754,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.5593365833333337,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.5676154999998744,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.5759511249998468,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.5839434166666706,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.5918735416667005,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.6010767499999474,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.6093070416666251,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  },
+  {
+    "t" : 1.6173757916665181,
+    "windows" : [
+      {
+        "alpha" : 1,
+        "animations" : [
+
+        ],
+        "class" : "_NSPopoverWindow",
+        "frame" : [
+          742,
+          680,
+          286,
+          166
+        ],
+        "visible" : false
+      }
+    ]
+  }
+]

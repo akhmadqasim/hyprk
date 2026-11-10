@@ -1,0 +1,95 @@
+{
+  "colors" : {
+    "controlAccent" : [
+      0,
+      0.47799999999999998,
+      1,
+      1
+    ],
+    "controlBackground" : [
+      0.11799999999999999,
+      0.11799999999999999,
+      0.11799999999999999,
+      1
+    ],
+    "disabledControlText" : [
+      1,
+      1,
+      1,
+      0.247
+    ],
+    "label" : [
+      1,
+      1,
+      1,
+      0.84699999999999998
+    ],
+    "secondaryLabel" : [
+      1,
+      1,
+      1,
+      0.54900000000000004
+    ],
+    "selectedContentBackground" : [
+      0,
+      0.34899999999999998,
+      0.81999999999999995,
+      1
+    ],
+    "selectedMenuItemText" : [
+      1,
+      1,
+      1,
+      1
+    ],
+    "separator" : [
+      1,
+      1,
+      1,
+      0.12
+    ],
+    "tertiaryLabel" : [
+      1,
+      1,
+      1,
+      0.247
+    ],
+    "underPageBackground" : [
+      0.157,
+      0.157,
+      0.157,
+      1
+    ],
+    "windowBackground" : [
+      0.11799999999999999,
+      0.11799999999999999,
+      0.11799999999999999,
+      1
+    ]
+  },
+  "menuBarFont" : ".AppleSystemUIFont 13.0",
+  "menuBarHeight" : 34,
+  "menuBarThickness" : 22,
+  "menuFont" : ".AppleSystemUIFont 13.0",
+  "reduceMotion" : false,
+  "reduceTransparency" : false,
+  "safeAreaTop" : 33.5,
+  "scale" : 2,
+  "screen" : [
+    0,
+    0,
+    1710,
+    1107
+  ],
+  "systemFont" : ".AppleSystemUIFont 13.0",
+  "titleBarFont" : ".AppleSystemUIFaceHeadline 13.0",
+  "titlebarHeight" : 32,
+  "toolTipsFont" : ".AppleSystemUIFont 11.0",
+  "visibleFrame" : [
+    0,
+    53,
+    1710,
+    1020
+  ],
+  "windowNumber" : 226
+}
