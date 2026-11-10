@@ -1,4 +1,5 @@
 import QtQuick
+import Qt.labs.folderlistmodel
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
@@ -91,6 +92,37 @@ ShellWindow {
     readonly property bool shown: !fullscreen && (!autohide || revealed || (Panels.open === "context" && Panels.contextAbove && Panels.activeScreen === dock.screen))
     Materializer { id: mat; shown: dock.shown; initial: 0 }
     readonly property real hideY: A11y.reduceMotion ? 0 : (1 - mat.value) * (bgHeight + Theme.dock.bottomMargin + 12)
+
+    // ---------- Trash: full can while the XDG trash has files ----------
+    // Watched by FolderListModel (a directory watch, no polling). A missing folder (nothing trashed
+    // yet) is retried every 5 s until it exists. Per-volume .Trash-$UID folders are not read.
+    readonly property string trashFiles: (Quickshell.env("XDG_DATA_HOME") || Quickshell.env("HOME") + "/.local/share") + "/Trash/files"
+    readonly property string trashUrl: "file://" + trashFiles
+    FolderListModel {
+        id: trash
+        folder: dock.trashUrl
+        showDirs: true
+        showHidden: true
+        showDotAndDotDot: false
+        sortField: FolderListModel.Unsorted
+    }
+    Timer {
+        interval: 5000
+        repeat: true
+        running: !dock.trashWatched
+        onTriggered: { trash.folder = ""; trash.folder = dock.trashUrl; }
+    }
+    // a missing folder makes FolderListModel fall back to the working directory: not the trash
+    readonly property bool trashWatched: trash.status === FolderListModel.Ready && String(trash.folder) === trashUrl
+    // kept while the model reloads (status Loading), so adding a second file does not flicker the can
+    property bool trashFull: false
+    function updateTrash() { if (trash.status !== FolderListModel.Loading) trashFull = trashWatched && trash.count > 0; }
+    Connections {
+        target: trash
+        function onStatusChanged() { dock.updateTrash(); }
+        function onCountChanged() { dock.updateTrash(); }
+        function onFolderChanged() { dock.updateTrash(); }
+    }
 
     readonly property var items: Apps.dockItems.concat([{ id: "hyprk-separator", separator: true },
                                                         { id: "hyprk-downloads", name: "Downloads", icon: "folder-download", folder: "Downloads" },
@@ -222,7 +254,7 @@ ShellWindow {
                     loadSize: dock.magnified     // load once at full size, then only scale
                     x: 0
                     y: cell.height - height - cell.bounceY
-                    icon: cell.modelData.icon || ""
+                    icon: cell.modelData.trash && dock.trashFull ? "user-trash-full" : cell.modelData.icon || ""
                     appId: cell.modelData.id
                 }
                 Rectangle {
