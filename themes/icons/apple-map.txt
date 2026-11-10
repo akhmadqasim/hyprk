@@ -1,67 +1,284 @@
-# Linux icon name (Icon= in .desktop files)  ->  macOS app icon (themes/icons/apps/<Name>-512.png)
-# Used by build-apple-theme.sh for the LOCAL hyprk-apple icon theme layer. Apple icons are never
-# shipped: the layer only exists when the user extracted them (reference/ASSETS.md).
+# Linux icon name or app id  ->  macOS app icon (themes/icons/apps/<Name>-512.png)
+#
+# The one source of truth for which macOS icon stands for a Linux app:
+#   - build-apple-theme.sh builds the hyprk-apple icon theme layer from it,
+#   - tools/gen-map.mjs generates apple-map.js from it (shell/services/macicons.js and
+#     finder/qml/lib/macicons.js are symlinks to that file), so the Dock, Launchpad, Spotlight,
+#     notifications and the Finder Applications view all use the same table.
+# Lookup (apple-map.js): the whole name lowercased (".desktop" dropped), then its last dot segment
+# against the last dot segment of every key below (org.gnome.Calculator also matches Calculator).
+# The first line for a segment wins. A name starting with @ is an icon from themes/icons/system
+# (Trash, folders). Only apps with an obvious macOS counterpart among the extracted icons are listed.
+# Apple artwork is tracked on purpose: this repo is private (CONTRIBUTING.md, "Assets").
+# After editing: node themes/icons/tools/gen-map.mjs && themes/icons/build-apple-theme.sh
+
+# --- hyprk ---
+hyprk-finder Finder
+hyprk-launchpad Apps
+org.hyprk.Settings System_Settings
+settings System_Settings
+view-app-grid-symbolic Apps
+view-app-grid Apps
+appgrid Apps
+
+# --- Finder (file managers) ---
 org.gnome.Nautilus Finder
 nautilus Finder
 system-file-manager Finder
 org.kde.dolphin Finder
 thunar Finder
+nemo Finder
+pcmanfm Finder
+pcmanfm-qt Finder
+caja Finder
+org.gnome.Files Finder
+
+# --- Safari (web browsers) ---
 firefox Safari
+firefox_firefox Safari
 org.mozilla.firefox Safari
+librewolf Safari
+io.gitlab.librewolf-community Safari
 brave-browser Safari
+com.brave.Browser Safari
 google-chrome Safari
+com.google.Chrome Safari
 chromium Safari
 chromium-browser Safari
+org.chromium.Chromium Safari
+microsoft-edge Safari
+com.microsoft.Edge Safari
+vivaldi-stable Safari
+com.vivaldi.Vivaldi Safari
+opera Safari
 web-browser Safari
 org.gnome.Epiphany Safari
+org.kde.falkon Safari
+app.zen_browser.zen Safari
+
+# --- Terminal ---
 com.mitchellh.ghostty Terminal
 org.gnome.Ptyxis Terminal
 org.gnome.Console Terminal
+org.gnome.Terminal Terminal
+org.kde.konsole Terminal
+org.wezfurlong.wezterm Terminal
 foot Terminal
 kitty Terminal
+alacritty Terminal
+xterm Terminal
+terminator Terminal
+com.gexperts.Tilix Terminal
+xfce4-terminal Terminal
+lxterminal Terminal
 utilities-terminal Terminal
-org.gnome.Terminal Terminal
+
+# --- System Settings ---
 org.gnome.Settings System_Settings
 gnome-control-center System_Settings
 preferences-system System_Settings
 systemsettings System_Settings
+org.kde.systemsettings System_Settings
+xfce4-settings-manager System_Settings
+
+# --- Calculator ---
 org.gnome.Calculator Calculator
-org.gnome.clocks Clock
-org.gnome.Calendar Calendar
-org.gnome.TextEditor TextEdit
-org.gnome.gedit TextEdit
-org.gnome.Loupe Preview
-org.gnome.Papers Preview
-org.gnome.Evince Preview
+gnome-calculator Calculator
+org.kde.kcalc Calculator
+kcalc Calculator
+galculator Calculator
+mate-calc Calculator
+accessories-calculator Calculator
+
+# --- Activity Monitor (system monitors) ---
+org.gnome.SystemMonitor Activity_Monitor
+gnome-system-monitor Activity_Monitor
+net.nokyan.Resources Activity_Monitor
+io.missioncenter.MissionCenter Activity_Monitor
+org.kde.plasma-systemmonitor Activity_Monitor
+ksysguard Activity_Monitor
+htop Activity_Monitor
+btop Activity_Monitor
+utilities-system-monitor Activity_Monitor
+
+# --- Disk Utility ---
 org.gnome.DiskUtility Disk_Utility
+gnome-disks Disk_Utility
 org.gnome.baobab Disk_Utility
+org.kde.partitionmanager Disk_Utility
+gparted Disk_Utility
+
+# --- Font Book ---
 org.gnome.font-viewer Font_Book
 org.gnome.Characters Font_Book
-org.gnome.SystemMonitor Activity_Monitor
-net.nokyan.Resources Activity_Monitor
-org.gnome.Logs Console
-org.gnome.Weather Weather
-org.gnome.Maps Maps
+org.kde.kfontview Font_Book
+org.kde.kfontinst Font_Book
+font-manager Font_Book
+
+# --- Archive Utility ---
+org.gnome.FileRoller Archive_Utility
+file-roller Archive_Utility
+org.kde.ark Archive_Utility
+engrampa Archive_Utility
+xarchiver Archive_Utility
+
+# --- Screenshot ---
+org.gnome.Screenshot Screenshot
+org.kde.spectacle Screenshot
+flameshot Screenshot
+org.flameshot.Flameshot Screenshot
+org.ksnip.ksnip Screenshot
+
+# --- Preview (image and document viewers) ---
+org.gnome.Loupe Preview
+org.gnome.eog Preview
+eog Preview
+org.kde.gwenview Preview
+ristretto Preview
+org.gnome.Papers Preview
+org.gnome.Evince Preview
+evince Preview
+org.kde.okular Preview
+atril Preview
+org.pwmt.zathura Preview
+zathura Preview
+
+# --- TextEdit (text editors) ---
+org.gnome.TextEditor TextEdit
+org.gnome.gedit TextEdit
+gedit TextEdit
+org.kde.kwrite TextEdit
+org.kde.kate TextEdit
+org.xfce.mousepad TextEdit
+mousepad TextEdit
+pluma TextEdit
+xed TextEdit
+
+# --- Calendar, Contacts, Maps, Weather, Clock ---
+org.gnome.Calendar Calendar
+org.kde.korganizer Calendar
 org.gnome.Contacts Contacts
+org.kde.kaddressbook Contacts
+org.gnome.Maps Maps
+org.gnome.Weather Weather
+org.kde.kweather Weather
+org.gnome.clocks Clock
+org.kde.kclock Clock
+
+# --- App Store (software centres) ---
+org.gnome.Software App_Store
+gnome-software App_Store
+snap-store App_Store
+snap-store_snap-store App_Store
+io.snapcraft.SnapStore App_Store
+org.kde.discover App_Store
+pamac-manager App_Store
+org.gnome.Software.Plugin.Flatpak App_Store
+
+# --- Passwords (password managers) ---
+org.gnome.seahorse.Application Passwords
+seahorse Passwords
+org.keepassxc.KeePassXC Passwords
+keepassxc Passwords
+com.bitwarden.desktop Passwords
+bitwarden Passwords
+1password Passwords
+org.kde.kwalletmanager5 Passwords
+
+# --- Music, Podcasts, Books ---
 org.gnome.Music Music
+org.gnome.Rhythmbox3 Music
 rhythmbox Music
+rhythmbox3 Music
+org.kde.elisa Music
+org.gnome.Podcasts Podcasts
+org.gnome.gPodder Podcasts
+calibre-gui Books
+calibre-ebook-viewer Books
+com.github.johnfactotum.Foliate Books
+
+# --- QuickTime Player (video players) ---
 org.gnome.Totem QuickTime_Player
 org.gnome.Showtime QuickTime_Player
+org.videolan.VLC QuickTime_Player
 vlc QuickTime_Player
+io.mpv.Mpv QuickTime_Player
+mpv QuickTime_Player
+io.github.celluloid_player.Celluloid QuickTime_Player
+smplayer QuickTime_Player
+
+# --- Photos, Photo Booth, Voice Memos ---
+org.gnome.Photos Photos
+org.gnome.Shotwell Photos
+shotwell Photos
+org.kde.digikam Photos
 org.gnome.Snapshot Photo_Booth
-org.gnome.Screenshot Screenshot
-org.gnome.Software App_Store
-snap-store App_Store
+org.gnome.Cheese Photo_Booth
+cheese Photo_Booth
+org.gnome.SoundRecorder VoiceMemos
+gnome-sound-recorder VoiceMemos
+
+# --- Mail ---
 org.gnome.Evolution Mail
+evolution Mail
+org.mozilla.Thunderbird Mail
+net.thunderbird.Thunderbird Mail
 thunderbird Mail
 org.gnome.Geary Mail
+geary Mail
+org.kde.kmail2 Mail
+
+# --- Notes, Reminders, Stickies, Dictionary, Chess, Messages ---
+org.gnome.Notes Notes
+org.gnome.Todo Reminders
+org.gnome.Endeavour Reminders
+xpad Stickies
+org.gnome.Dictionary Dictionary
+goldendict Dictionary
+org.gnome.Chess Chess
+org.gnome.Fractal Messages
+im.dino.Dino Messages
+org.gnome.Polari Messages
+
+# --- Other utilities ---
 org.gnome.Yelp Tips
 help-browser Tips
-org.gnome.seahorse.Application Passwords
 simple-scan Image_Capture
 org.gnome.SimpleScan Image_Capture
-org.gnome.FileRoller Archive_Utility
+org.kde.skanlite Image_Capture
+system-config-printer Print_Center
+org.gnome.Logs Console
+org.kde.ksystemlog Console
+org.gnome.DejaDup Time_Machine
+deja-dup Time_Machine
+timeshift Time_Machine
+org.remmina.Remmina Screen_Sharing
+remmina Screen_Sharing
+org.gnome.Connections Screen_Sharing
+org.kde.kinfocenter System_Information
+hardinfo System_Information
+gpick Digital_Color_Meter
+orca VoiceOver_Utility
 bluetooth Bluetooth_File_Exchange
-hyprk-finder Finder
-hyprk-launchpad Apps
-settings System_Settings
+blueman-manager Bluetooth_File_Exchange
+
+# --- Generic icon names (Icon=mail, Icon=calendar, ...) ---
+mail Mail
+messages Messages
+facetime FaceTime
+reminders Reminders
+calendar Calendar
+contacts Contacts
+notes Notes
+photos Photos
+music Music
+maps Maps
+weather Weather
+terminal Terminal
+calculator Calculator
+screenshot Screenshot
+
+# --- System icons (themes/icons/system) ---
+user-trash @TrashIcon
+user-trash-full @FullTrashIcon
+folder-download @DownloadsFolder
