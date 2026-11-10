@@ -53,26 +53,28 @@ hl.config({
     general = {
         gaps_in = 6,
         gaps_out = 10,
-        border_size = 1,                 -- macOS: thin dark contour (SPEC.md 7.1 ring shadow), not a colored border
-        col = {
-            active_border   = "rgba(0000001f)",
-            inactive_border = "rgba(00000017)",
-        },
+        border_size = 1,                 -- the outer black rim; colours per appearance in hyprk_appearance() below
         resize_on_border = true,
         layout = "dwindle",
     },
     decoration = {
-        rounding = 16,                   -- SPEC.md 7: titled window corner radius 16 pt
-        rounding_power = 2.8,            -- SPEC.md 7.1: continuous corner guess
+        -- MAC-ANSWERS.md Q-windows-02: 16 pt continuous corner on every window type (it spans 24 pt). Hyprland's
+        -- superellipse fitted to the alpha edge of the 27.2.1 Finder/Settings corner (finder-toolbar-light.png,
+        -- rows 0..26 pt): rounding 36, power 5.05, RMS 0.19 pt (the old 16 / 2.8 was 1.8 pt, a circle 16 is 0.74).
+        -- Clients that draw their own corner use a 16 pt circle, which lies inside this shape (0.14 pt at most).
+        rounding = 36,
+        rounding_power = 5.05,
         active_opacity = 1.0,
         inactive_opacity = 1.0,
-        shadow = {                       -- macOS window shadow is wide and soft; the SPEC 9 r24/a0.6 numbers are
-            enabled = true,              --   CoreAnimation values and look like a hard dark band in Hyprland's
-            range = 60,                  --   shadow, so this is tuned by eye against reference/screens (2026-11-10)
-            render_power = 2,
-            offset = "0 18",
-            color = 0x47000000,
-            color_inactive = 0x2e000000,
+        -- Q-windows-01: pure black, alpha measured at 2/8/16/32 pt below, beside and above a Finder window. Hyprland's
+        -- falloff a * (x / range)^power was fitted to all four states with one shared geometry (only the colour can
+        -- differ between active and inactive): range 52, power 4, y 12, RMS alpha 0.040 (the old 60/2/18 was 0.084).
+        -- Colours per appearance in hyprk_appearance() below.
+        shadow = {
+            enabled = true,
+            range = 52,
+            render_power = 4,
+            offset = "0 12",
         },
         blur = {
             enabled = true,
@@ -102,6 +104,20 @@ hl.config({
     },
     dwindle = { preserve_split = true },
 })
+
+-- Light and dark chrome (MAC-ANSWERS.md Q-windows-01, -03), black alpha per state:
+--   shadow: fitted density (see decoration.shadow) dark .494 active / .218 inactive, light .281 / .105
+--   outer rim: 0.5 pt (1 px at 2x) black dark .93 / .83, light .21 / .19. Hyprland's border is 1 pt (2 px at 2x),
+--     so its alpha carries the same ink over 2 px: 1 - (1 - a)^(1/2) = dark .735 / .588, light .111 / .100.
+-- Global so the shell can switch it with the appearance (shell/Theme.qml, `hyprctl eval`).
+function hyprk_appearance(dark)
+    local c = dark and { shadow = 0x7e000000, shadowInactive = 0x38000000, rim = "rgba(000000bb)", rimInactive = "rgba(00000096)" }
+                    or { shadow = 0x48000000, shadowInactive = 0x1b000000, rim = "rgba(0000001c)", rimInactive = "rgba(0000001a)" }
+    hl.config({
+        general = { col = { active_border = c.rim, inactive_border = c.rimInactive } },
+        decoration = { shadow = { color = c.shadow, color_inactive = c.shadowInactive } },
+    })
+end
 
 -- macOS motion. Values from the binaries: liquid-glass-re/SPEC.md 9.9.4 (SwiftUI) and 11 (windows).
 --   Window open: complete in one frame, no scale, no fade (MAC-ANSWERS.md R2 (27.2.1): Finder, TextEdit,
@@ -164,6 +180,7 @@ do  -- start from the saved setting so the first frame is already right
     local txt = f and f:read("a") or ""
     if f then f:close() end
     hyprk_motion(txt:match('"reduceMotion"%s*:%s*true') ~= nil)
+    hyprk_appearance(txt:match('"dark"%s*:%s*true') ~= nil)
 end
 
 ------------------------------------------------------- liquid glass ----
