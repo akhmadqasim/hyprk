@@ -28,7 +28,8 @@ QtObject {
     // True when the compositor blurs behind our translucent surfaces (Hyprland).
     // Otherwise the sidebar paints its own blurred wallpaper.
     readonly property bool compositorBlur: _info ? _info.hyprland : false
-    readonly property string stateDir: root + "/state"
+    // $HYPRK_STATE (the shell reads the same folder); without it (plain `qml`, no env access) the checkout's state/
+    readonly property string stateDir: (_info && _info.stateDir) || root + "/state"
 
     // cb(code, stdout). code 127 = not supported / not installed.
     function run(argv, cb) {

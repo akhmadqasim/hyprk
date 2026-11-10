@@ -123,9 +123,10 @@ const motionOff = ['if hyprk_motion then hyprk_motion(true) else '
 const bordersNormal = 'hl.config({ general = { col = { active_border = "rgba(0000001f)", inactive_border = "rgba(00000017)" } } })';
 const bordersStrong = 'hl.config({ general = { col = { active_border = "rgba(000000a6)", inactive_border = "rgba(00000080)" } } })';
 
-// Lua for `hyprctl eval` (and the shell at login). root = hyprk checkout.
+// Lua for `hyprctl eval` (and the shell at login). root = hyprk checkout, stateDir = $HYPRK_STATE (the
+// screen filter shader is written there).
 // Every line is idempotent: running it twice gives the same state.
-function luaApply(a, appearance, root) {
+function luaApply(a, appearance, root, stateDir) {
     const ap = appearance || {};
     const scripts = root + "/settings/scripts/";
     const exec = (script, arg) => "hl.dsp.exec_cmd(" + luaString(shWord(scripts + script) + (arg ? " " + arg : "")) + ")";
@@ -150,7 +151,7 @@ function luaApply(a, appearance, root) {
     out.push("hl.exec_cmd(" + luaString("hyprctl setcursor \"${HYPRCURSOR_THEME:-hyprk-cursors}\" " + size) + ")");
     // clear first: Hyprland recompiles the shader file only when the option changes
     out.push('hl.config({ decoration = { screen_shader = "" } })');
-    if (needsShader(a)) out.push("hl.config({ decoration = { screen_shader = " + luaString(root + "/state/a11y-screen.frag") + " } })");
+    if (needsShader(a)) out.push("hl.config({ decoration = { screen_shader = " + luaString(stateDir + "/a11y-screen.frag") + " } })");
 
     // Motion and contrast
     out.push(...(ap.reduceMotion ? motionOff : motionOn));

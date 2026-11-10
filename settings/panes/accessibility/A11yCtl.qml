@@ -34,7 +34,7 @@ QtObject {
     }
     property string _applied: ""      // last Lua + shader sent, to skip no-op applies
     function applyNow() {
-        const lua = A.luaApply(a, ap, root);
+        const lua = A.luaApply(a, ap, root, Backend.stateDir);
         const shader = A.needsShader(a) ? A.shaderSource(_template, a) : "";
         if (A.needsShader(a) && shader === "") return;   // template not read yet: applied once it is
         if (lua + shader === _applied) return;

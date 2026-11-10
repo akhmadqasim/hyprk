@@ -87,6 +87,8 @@ is the same colour, opaque.
 
 ## Files written for other parts of hyprk
 
+They go to `$HYPRK_STATE` (`Backend.stateDir`, set once by `config/hypr/start.sh`/`run.sh`: `<root>/state` if writable, else `~/.local/state/hyprk`; plain `qml` has no env and uses `<root>/state`).
+
 Settings writes these; the readers belong to the shell/config agents. As of this commit
 `appearance.json`, `dock.json`, `sound.json` and `wallpaper.json` have readers or are
 planned; `displays.json` is read by `config/hypr/scale-policy.lua` (Hyprland start and hotplug); **`notifications.json`, `lock.json` and `input.json` have no reader yet**, so those
