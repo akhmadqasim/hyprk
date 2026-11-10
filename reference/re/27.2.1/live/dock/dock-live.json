@@ -1,0 +1,403 @@
+{
+ "material_dock_and_cmdtab": {
+  "method": "solid-colour borderless window behind the Dock, sample the Dock bg between icons (sRGB 0-255). Cmd-Tab panel fill over Electric Blue = Dock fill (59,75,216), i.e. same material.",
+  "dark": {
+   "white": [
+    176,
+    176,
+    176
+   ],
+   "black": [
+    12,
+    12,
+    12
+   ],
+   "grey127": [
+    108,
+    108,
+    108
+   ],
+   "red": [
+    248,
+    38,
+    20
+   ],
+   "green": [
+    59,
+    197,
+    16
+   ],
+   "blue": [
+    6,
+    6,
+    255
+   ],
+   "electric_blue_69_83_206": [
+    59,
+    75,
+    216
+   ]
+  },
+  "light": {
+   "white": [
+    229,
+    229,
+    229
+   ],
+   "black": [
+    38,
+    38,
+    38
+   ],
+   "grey127": [
+    134,
+    134,
+    134
+   ],
+   "red": [
+    255,
+    58,
+    38
+   ],
+   "green": [
+    79,
+    247,
+    28
+   ],
+   "blue": [
+    29,
+    29,
+    255
+   ]
+  },
+  "fits": {
+   "dark": "out = 12 + 164*(in/255)^0.77 per channel on greys, plus saturation boost",
+   "light": "out = 38 + 0.75*in (linear on greys), plus saturation boost"
+  },
+  "edge_profile_over_black_dark": "1 pt rim 104 at the top edge, then 30,22,18,16,14,13,12 per pt; bottom rim 65 then 26,20,17,15,14,13 upward",
+  "edge_profile_over_black_light": "rim 116 then 54,47,43,41,40,39,38; bottom rim 83 then 49,45,42,41,40,39",
+  "blur": "8 pt bars stay fully resolved (plateaus reach the solid-colour levels), edges soften over about 2 pt: small blur, sigma about 1-2 pt; strong lens refraction within about 6 pt of the rounded edges (4 pt checker and 2 pt bars are distorted there)",
+  "running_dot": {
+   "diameter_pt": 4.1,
+   "dark": "plus-lighter +125/255 (white add): 12->137, 109->234, red bg (248,39,21)->(255,164,145)",
+   "light": "plus-darker -128/255: 230->102, 136->7, 40->0"
+  },
+  "separator": {
+   "width_pt": 1.0,
+   "dark": "plus-lighter +65",
+   "light": "plus-darker -57"
+  },
+  "cmdtab_selection": {
+   "dark": "plus-lighter +65",
+   "light": "plus-darker -57"
+  }
+ },
+ "hover_label": {
+  "shape": "capsule 26 pt tall (r 13) with a tail at the bottom centre: tail about 16 pt wide at the base, 6.5 pt tall, rounded tip; tip 2.5 pt above the Dock bg top (13 pt above the art top at tile 33)",
+  "width": "text + 2*14 pt (\"Finder\": 67.5 pt)",
+  "font": "SF 14 pt regular (ink width 39.5 for Finder = 14 pt regular)",
+  "text": {
+   "dark": "white (244)",
+   "light": "near black (37)"
+  },
+  "fill_over_solid": {
+   "dark": {
+    "black": 31,
+    "white": 180,
+    "grey127": 131
+   },
+   "light": {
+    "black": 131,
+    "white": 249,
+    "grey127": 192
+   }
+  },
+  "glass": "yes: a 4 pt checker and 2 pt bars show through, refracted at the edges, 1 pt light rim; very faint shadow (<=3 levels)",
+  "left_dock": "capsule right of the icon, 5.5 pt from the Dock bg, vertically centred on the icon, no tail seen",
+  "timing": "appears in the frame the pointer enters (R2); fade-out cosine 0.29 s (reconciliation-42.json)"
+ },
+ "press_state": {
+  "effect": "icon art multiplied by 0.475 (all channels, rms 0.4), no scale change",
+  "timing": "on in 1 frame at mouse down, off in 1 frame at mouse up, no animation",
+  "long_press": "holding opens the context menu (under 0.8 s)"
+ },
+ "context_menu": {
+  "shape": "glass bubble with a tail pointing at the icon (like the label), radius about 14 pt (visual)",
+  "window": "menu window x = icon centre - 40; window bottom = Dock bg top (1055); body inset 13 pt in the window; rows 24 pt, separators 11 pt",
+  "tail": "tip about 3 pt above the Dock bg, at the icon centre; body extends to the right of the icon (left edge = icon centre - 27)",
+  "highlight": "accent pill, as in normal menus",
+  "submenu": "normal rounded glass menu to the right, no tail"
+ },
+ "cmdtab_8_apps": {
+  "panel": [
+   298,
+   466,
+   1114,
+   176
+  ],
+  "buttons": [
+   [
+    322,
+    490,
+    128,
+    128
+   ],
+   [
+    456,
+    490,
+    128,
+    128
+   ],
+   [
+    590,
+    490,
+    128,
+    128
+   ],
+   [
+    724,
+    490,
+    128,
+    128
+   ],
+   [
+    858,
+    490,
+    128,
+    128
+   ],
+   [
+    992,
+    490,
+    128,
+    128
+   ],
+   [
+    1126,
+    490,
+    128,
+    128
+   ],
+   [
+    1260,
+    490,
+    128,
+    128
+   ]
+  ]
+ },
+ "cmdtab_16_apps": {
+  "panel": [
+   34,
+   483,
+   1642,
+   142
+  ],
+  "buttons": [
+   [
+    58,
+    507,
+    94,
+    94
+   ],
+   [
+    158,
+    507,
+    94,
+    94
+   ],
+   [
+    258,
+    507,
+    94,
+    94
+   ],
+   [
+    358,
+    507,
+    94,
+    94
+   ],
+   [
+    458,
+    507,
+    94,
+    94
+   ],
+   [
+    558,
+    507,
+    94,
+    94
+   ],
+   [
+    658,
+    507,
+    94,
+    94
+   ],
+   [
+    758,
+    507,
+    94,
+    94
+   ],
+   [
+    858,
+    507,
+    94,
+    94
+   ],
+   [
+    958,
+    507,
+    94,
+    94
+   ],
+   [
+    1058,
+    507,
+    94,
+    94
+   ],
+   [
+    1158,
+    507,
+    94,
+    94
+   ],
+   [
+    1258,
+    507,
+    94,
+    94
+   ],
+   [
+    1358,
+    507,
+    94,
+    94
+   ],
+   [
+    1458,
+    507,
+    94,
+    94
+   ],
+   [
+    1558,
+    507,
+    94,
+    94
+   ]
+  ]
+ },
+ "cmdtab_notes": {
+  "icon": 128,
+  "pitch": 134,
+  "gap": 6,
+  "padding": 24,
+  "panel_h": "icon+48",
+  "centre": "screen centre (855,554)",
+  "radius": "about 58 pt circle-equivalent (straight edge starts 56 pt from the corner)",
+  "selection": "squircle 120x120 centred on the icon (icon frame inset 4), corner superellipse n about 3, extent 46 pt (circle-equivalent 34)",
+  "label": "app name under the selected icon, SF 13 pt bold, white in dark, top 2.5 pt below the 128 frame, baseline y 631 (panel bottom 642)",
+  "overflow": "16 apps: icons shrink to 94 (pitch 100), panel 34 pt from the screen sides, still one row",
+  "show_delay_s": 0.19,
+  "quick_tap": "Cmd+Tab released within 30 ms switches without showing the panel"
+ },
+ "autohide": {
+  "trigger": "pointer y >= 1105 (bottom 2 pt) anywhere along the bottom edge",
+  "hidden_sliver_px": 0,
+  "show_delay_s": 0.23,
+  "show": "slide up, 0.17 s, top edge per frame 1105 1100 1094 1087 1083 1077 1070 1065 1060 1057 1055",
+  "hide": "starts about 0.05 s after the pointer leaves, slide down 0.17 s: 1057 1060 1062 1068 1074 1080 1087 1090 1097 1103 gone",
+  "fade": "none, pure slide"
+ },
+ "position_left": {
+  "ax_list": [
+   10,
+   202,
+   47,
+   738
+  ],
+  "item": [
+   5,
+   204.7,
+   47,
+   35
+  ],
+  "bg_x": [
+   4.5,
+   52.5
+  ],
+  "gap_to_screen_edge": 5,
+  "dot": "left of the icon"
+ },
+ "badges": {
+  "tile33": {
+   "height": 13,
+   "one_or_two_digits": "13x13 circle",
+   "999": 16,
+   "12345": 22,
+   "long_text": "max about 34 pt, middle-truncated (\"New\u2026sage\")",
+   "right_edge": "3.75 pt right of the art edge",
+   "top": "4 pt above the art top",
+   "colour": [
+    228,
+    84,
+    69
+   ],
+   "text": "white, about 9-10 pt"
+  }
+ },
+ "attention": {
+  "critical": "jump 36 pt (tile 33) then rebounds 18 and 9 pt (heights halve): arcs 0.50 + 0.31 + 0.22 s = about 1.0 s, rest about 1.0 s, repeats every 2.0 s until the app is activated",
+  "informational": "one jump group (36/18/9) only",
+  "launch_bounce_for_comparison": "11 pt, period 0.70 s (R2)"
+ },
+ "drag_remove": {
+  "lift": "dragged icon keeps the Dock art size (no lift scale)",
+  "label": "\"Remove\" bubble with a tail, same style as the hover label, above the dragged icon, shown while the icon is outside the Dock (seen 0.25 s after leaving)",
+  "drop": "icon and label fade out linearly in 0.25 s; no poof cloud seen",
+  "reorder": "not measured"
+ },
+ "stack": {
+  "fan": "items rise in an arc to the right, sizes 65.5 -> 78.3 pt bottom to top, vertical step 64.6 pt, glass capsule labels to the left, top item \"Open in Finder\"; Dock tile shows a chevron while open",
+  "grid": {
+   "ax_group": [
+    895,
+    613,
+    546,
+    438
+   ],
+   "scroll_area": [
+    912,
+    643,
+    512,
+    384
+   ],
+   "cell": 128,
+   "columns": 4,
+   "title": "folder name centred at the top (y 620, 19 pt)",
+   "last_cell": "Open in Finder",
+   "shape": "glass bubble with tail, radius about 28 pt (visual)"
+  },
+  "list": {
+   "ax_menu": [
+    1128,
+    696,
+    198,
+    359
+   ],
+   "rows": 24,
+   "content": "files (small icons), separator, Options >, Open in Finder",
+   "shape": "same bubble as the context menu"
+  },
+  "context_menu": "Sort by (Name, Date Added, Date Modified, Date Created, Kind) | Display as (Folder, Stack) | View content as (Fan, Grid, List, Automatic) | Options > (Remove from Dock, Show in Finder) | Open \"<folder>\""
+ },
+ "minimised_tile": {
+  "min_to_app_0": "own tile right of the separator, after the stacks, before Trash; tile = app tile (35x47 at 33)",
+  "art": "window thumbnail fitted to about 31 pt wide (1300x900 window -> 31x21.5), app icon about 10 pt at the bottom-right corner"
+ }
+}
