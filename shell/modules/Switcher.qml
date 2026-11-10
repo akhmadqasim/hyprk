@@ -28,6 +28,17 @@ ShellWindow {
     property var apps: []
     Binding on apps { value: sw.liveApps; when: sw.shown; restoreMode: Binding.RestoreNone }
     property int selected: 0
+    // hover selects only after the pointer really moved: a resting pointer gets enter events as the
+    // materializing panel scales under it, so a pointer near a cell edge flipped the selection
+    // between two apps on every frame of the open (same rule as Spotlight's mode buttons)
+    property bool pointerMoved: false
+    property point firstPointer: Qt.point(NaN, NaN)
+    function notePointer(item, mx, my) {
+        if (pointerMoved) return;
+        const p = item.mapToItem(null, mx, my);
+        if (isNaN(firstPointer.x)) firstPointer = p;
+        else if (Math.abs(p.x - firstPointer.x) + Math.abs(p.y - firstPointer.y) > 2) pointerMoved = true;
+    }
 
     // Liquid Glass: materializes from creation, dematerializes after closing (then unloaded)
     Materializer { id: mat; shown: sw.shown && sw.liveApps.length > 0; initial: 0 }
@@ -57,7 +68,7 @@ ShellWindow {
         if (app) Apps.focusWindow(app.windows[0]);
     }
 
-    MouseArea { anchors.fill: parent; onPressed: Panels.close() }
+    MouseArea { anchors.fill: parent; hoverEnabled: true; onPressed: Panels.close(); onPositionChanged: mouse => sw.notePointer(this, mouse.x, mouse.y) }
 
     Item {
         id: keys
@@ -140,7 +151,8 @@ ShellWindow {
                     MouseArea {
                         anchors.fill: parent
                         hoverEnabled: true
-                        onEntered: sw.selected = c.index
+                        onEntered: { sw.notePointer(this, mouseX, mouseY); if (sw.pointerMoved) sw.selected = c.index; }
+                        onPositionChanged: mouse => { sw.notePointer(this, mouse.x, mouse.y); if (sw.pointerMoved) sw.selected = c.index; }
                         onClicked: sw.commit()
                     }
                 }
