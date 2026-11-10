@@ -175,9 +175,9 @@ QtObject {
         readonly property real navWidth: Math.round(74 * pt)        // back/forward: one 74 x 36 pt capsule (27.2.1)
         readonly property real dividerHeight: Math.round(20 * pt)   // its 1 x 20 pt divider (27.2.1)
         readonly property int iconSize: 24
-        readonly property int gap: Math.round(7 * pt)       // between capsule groups: 7..7.5 pt (27.2.1 Finder shot)
+        readonly property int gap: Math.round(8 * pt)       // between capsule groups: 8 pt (27.2.1 toolbar probe dump)
         readonly property int leftPad: 10        // sidebar edge to back/forward capsule, ref (191 -> 200) = 8 pt (27.2.1)
-        readonly property int rightPad: 12       // ref
+        readonly property int rightPad: Math.round(8 * pt)  // last capsule to the window edge: 8 pt (27.2.1 probe dump)
         readonly property int titleGap: Math.round(13.5 * pt)  // capsule to title: 13.5 pt (27.2.1 Finder shot)
         readonly property real viewsWidth: Math.round(158 * pt)   // view switcher: one 158 x 36 pt capsule (27.2.1)
         readonly property real segmentInsetX: 3 * pt     // selected segment 33.5 x 28 pt in a 39.5 pt segment (27.2.1)
