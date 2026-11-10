@@ -11,7 +11,11 @@ Rectangle {
     implicitHeight: Theme.control.buttonHeight
     implicitWidth: Math.max(64, label.implicitWidth + 24)
     radius: Theme.control.buttonRadius
-    color: primary ? Theme.accent : (ma.pressed ? Theme.controlFillPressed : Theme.controlFill)
+    // highlight on mouse-down, cleared while the pointer is dragged outside (AppKit tracking);
+    // the action fires on release inside, like NSButton
+    readonly property bool down: ma.pressed && ma.containsMouse
+    color: primary ? (down ? Qt.darker(Theme.accent, 1.15) : Theme.accent)
+                   : (down ? Theme.controlFillPressed : Theme.controlFill)
     opacity: enabled_ ? 1 : 0.4
     Text {
         id: label

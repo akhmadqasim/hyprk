@@ -32,7 +32,31 @@ Item {
             color: Theme.label
         }
     }
-    MouseArea { id: ma; anchors.fill: parent; hoverEnabled: true; enabled: pop.enabled_; onClicked: menu.open() }
+    // NSPopUpButton: the menu opens on mouse-down; press-drag-release picks the item under
+    // the pointer, a plain click leaves the menu open.
+    property int _dragIndex: -1
+    MouseArea {
+        id: ma; anchors.fill: parent; hoverEnabled: true; enabled: pop.enabled_
+        property point pressAt
+        property bool moved: false
+        function itemAt(m) {
+            const p = mapToItem(col, m.x, m.y);
+            return p.x >= 0 && p.x < col.width && p.y >= 0 && p.y < col.height ? Math.floor(p.y / 24) : -1;
+        }
+        onPressed: m => { pressAt = Qt.point(m.x, m.y); moved = false; pop._dragIndex = -1; menu.open(); }
+        onPositionChanged: m => {
+            if (!pressed) return;
+            if (Math.abs(m.x - pressAt.x) + Math.abs(m.y - pressAt.y) > 3) moved = true;
+            if (moved) pop._dragIndex = itemAt(m);
+        }
+        onReleased: m => {
+            const i = moved ? itemAt(m) : -1;
+            pop._dragIndex = -1;
+            if (!moved) return;                 // a plain click leaves the menu open
+            if (i >= 0 && i !== pop.currentIndex) { pop.currentIndex = i; pop.activated(i); }
+            menu.close();                       // released on an item or outside the menu
+        }
+    }
 
     C.Popup {
         id: menu
@@ -53,18 +77,19 @@ Item {
                     required property string modelData
                     width: menu.width - 10; height: 24; radius: 5
                     implicitWidth: t.implicitWidth + 44
-                    color: im.containsMouse ? Theme.accent : "transparent"
+                    readonly property bool hot: pop._dragIndex >= 0 ? pop._dragIndex === index : im.containsMouse
+                    color: hot ? Theme.accent : "transparent"
                     Text {
                         x: 6; anchors.verticalCenter: parent.verticalCenter
                         visible: index === pop.currentIndex
                         text: "check"; font.family: Theme.fontGlyph; font.pixelSize: 14
-                        color: im.containsMouse ? "white" : Theme.label
+                        color: parent.hot ? "white" : Theme.label
                     }
                     Text {
                         id: t
                         x: 26; anchors.verticalCenter: parent.verticalCenter
                         text: modelData; font.family: Theme.fontText; font.pixelSize: Theme.font.body
-                        color: im.containsMouse ? "white" : Theme.label
+                        color: parent.hot ? "white" : Theme.label
                     }
                     MouseArea {
                         id: im; anchors.fill: parent; hoverEnabled: true

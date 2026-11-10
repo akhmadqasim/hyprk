@@ -133,6 +133,21 @@ QtObject {
         readonly property int buttonRadius: 12       // capsule push button (macOS 26), TODO verify
         readonly property int animMs: 180            // TODO verify
     }
+    // ---------- control motion (SPEC 10 "Controls motion"; springs = response s, dampingFraction) ----------
+    readonly property QtObject motion: QtObject {
+        readonly property real switchResponse: 0.47   // knob slide, DesignLibrary switch spring(0.47, 0.7)
+        readonly property real switchDamping: 0.7
+        readonly property real switchLift: 1.55       // knob w and h x1.55 while pressed (lens)
+        readonly property real lensResponse: 0.444    // liquidLens scale spring (small knob)
+        readonly property real lensDamping: 0.56
+        readonly property real sliderLift: 1.25       // slider knob x1.25 while pressed
+        readonly property real sliderLiftResponse: 0.25 // spring(0.25, 0.75)
+        readonly property real sliderLiftDamping: 0.75
+        readonly property real sliderJumpResponse: 0.25 // track click: NSSliderCell 0.25 s ease-in-out value animation
+        readonly property real reducedResponse: 0.2   // Reduce Motion: easeInOut(0.2)-like, no growth (lens stays)
+        readonly property int dragThreshold: 3        // px before a switch press becomes a drag
+    }
+
 
     // ---------- colors ----------
     readonly property color windowBg: theme.dark ? "#1E1E1E" : "#FFFFFF"          // TODO verify
