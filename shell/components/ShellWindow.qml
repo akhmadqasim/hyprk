@@ -13,6 +13,10 @@ PanelWindow {
 
     property string namespace: "hyprk"
     property list<QtObject> glassRegions
+    // Opacity of the compositor glass, for panels that fade in/out: the plugin cannot see QML
+    // opacity, so it is sent as a 1x1 marker in the bottom row of the region, x = opacity x (width - 1),
+    // committed with the same frame (plugin/src/Shape.hpp takeOpacityMarker). 1 sends no marker.
+    property real glassOpacity: 1
 
     // Glass items call these on creation/destruction
     function registerGlass(r) { glassRegions.push(r); }
@@ -50,6 +54,13 @@ PanelWindow {
 
     Region {
         id: glassUnion
-        regions: win.glassRegions
+        regions: win.glassOpacity < 1 ? Array.from(win.glassRegions).concat([opacityMarker]) : win.glassRegions
+    }
+    Region {
+        id: opacityMarker
+        x: Math.round(Math.max(0, win.glassOpacity) * (win.width - 1))
+        y: win.height - 1
+        width: 1
+        height: 1
     }
 }

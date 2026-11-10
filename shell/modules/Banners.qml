@@ -57,7 +57,8 @@ ShellWindow {
                     from: Theme.notif.width
                     to: 0
                     duration: Theme.anim.bannerIn
-                    easing.type: Easing.OutCubic
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: Theme.anim.spring
                 }
                 Timer {
                     interval: card.modelData.timeout > 0 ? card.modelData.timeout : Theme.notif.timeout

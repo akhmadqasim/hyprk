@@ -52,7 +52,7 @@ ShellWindow {
         x: (lp.width - width) / 2
         y: (lp.height - height) / 2 - Theme.menuBar.height
         scale: lp.shown ? 1 : 0.96
-        Behavior on scale { NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing } }
+        Behavior on scale { NumberAnimation { duration: Theme.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring } }
 
         Glass {
             anchors.fill: parent

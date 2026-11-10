@@ -28,6 +28,7 @@ ShellWindow {
 
     // while fading out the layer takes no input, so it never eats the click
     // that opened the next panel
+    glassOpacity: cc.opacity
     mask: shown ? null : noInput
     Region { id: noInput }
     MouseArea { anchors.fill: parent; enabled: ccw.shown; onPressed: Panels.close() }
@@ -40,12 +41,26 @@ ShellWindow {
         y: Theme.cc.marginTop
         originX: ccw.width - width - Theme.cc.marginRight
         originY: y + Theme.menuBar.height
-        opacity: ccw.shown ? 1 : 0
-        scale: ccw.shown ? 1 : 0.96
+        opacity: 0
+        scale: 0.96
         transformOrigin: Item.TopRight
-        readonly property int dur: ccw.shown ? Theme.anim.normal : Theme.anim.close
-        Behavior on opacity { NumberAnimation { duration: cc.dur; easing.type: Theme.anim.easing } }
-        Behavior on scale { NumberAnimation { duration: cc.dur; easing.type: Theme.anim.easing } }
         MouseArea { anchors.fill: parent; z: -1 }   // swallow clicks so they don't close
+    }
+
+    // open on the SwiftUI spring, close fast; each starts from wherever the other left off
+    onShownChanged: {
+        openAnim.stop();
+        closeAnim.stop();
+        (shown ? openAnim : closeAnim).start();
+    }
+    ParallelAnimation {
+        id: openAnim
+        NumberAnimation { target: cc; property: "opacity"; to: 1; duration: Theme.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
+        NumberAnimation { target: cc; property: "scale"; to: 1; duration: Theme.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
+    }
+    ParallelAnimation {
+        id: closeAnim
+        NumberAnimation { target: cc; property: "opacity"; to: 0; duration: Theme.anim.close; easing.type: Theme.anim.easing }
+        NumberAnimation { target: cc; property: "scale"; to: 0.96; duration: Theme.anim.close; easing.type: Theme.anim.easing }
     }
 }

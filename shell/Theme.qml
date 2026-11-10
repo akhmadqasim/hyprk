@@ -395,12 +395,16 @@ Singleton {
     // ---------- animation ----------
     readonly property QtObject anim: QtObject {
         // SPEC 9.9.4: SwiftUI Animation.default = spring(response 0.5, dampingFraction 1.0),
-        // critically damped. A 350 ms OutCubic is the closest QML ease for a settle at ~0.5 s.
+        // critically damped: x(t) = 1 - (1 + wt) e^-wt, w = 2pi / 0.5. It starts with zero velocity
+        // and is at 99.5 % after 0.6 s. `spring` is a cubic bezier fitted to it over `normal`
+        // (max error 1.5 %; the old 350 ms OutCubic jumped 14 % in the first frame, the spring 2 %).
+        // Use with easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring.
         // SPEC 9.9.5: window ScaleUpAndIn 0.5 s, ScaleDownAndOut 0.25 s (Solarium).
         readonly property int fast: 120                  // hover / press
-        readonly property int normal: 350                // panels open (spring 0.5 critically damped)
+        readonly property int normal: 600                // panels open (spring 0.5 critically damped)
+        readonly property var spring: [0.25, 0.248, 0.1, 1.0, 1, 1]
         readonly property int close: 250                 // panels close (ScaleDownAndOut)
-        readonly property int bannerIn: 380              // TODO verify
+        readonly property int bannerIn: 600              // banner slide-in, same spring as panels
         readonly property int bounce: 340                // one dock bounce up+down, TODO verify
         readonly property int magnify: 150               // dock magnification ramp on enter/leave (by eye; the cursor follow is not animated)
         readonly property int easing: Easing.OutCubic
