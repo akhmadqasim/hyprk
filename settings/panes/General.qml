@@ -4,7 +4,7 @@ import "../controls"
 
 Column {
     spacing: Theme.content.sectionGap
-    HeroCard { glyph: "settings"; tint: Theme.tile.gray; title: "General"; text: "Manage your overall setup and preferences for your computer, such as software updates, device language, AirDrop and more." }
+    HeroCard { iconId: "general"; glyph: "settings"; tint: Theme.tile.gray; title: "General"; text: "Manage your overall setup and preferences for your computer, such as software updates, device language, AirDrop and more." }
     Card {
         FormRow { glyph: "info"; tint: Theme.tile.gray; label: "About" }
         FormRow { glyph: "update"; tint: Theme.tile.gray; label: "Software Update" }

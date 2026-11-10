@@ -61,7 +61,7 @@ Column {
     // ---------- overview ----------
     HeroCard {
         visible: pane.page === ""
-        glyph: "accessibility_new"; tint: Theme.tile.blue
+        iconId: "accessibility"; glyph: "accessibility_new"; tint: Theme.tile.blue
         title: "Accessibility"
         text: "Personalize your computer in ways that work for you, with features for vision, hearing, motor, speech and more."
     }
