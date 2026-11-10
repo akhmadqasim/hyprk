@@ -247,6 +247,29 @@ int main() {
         CHECK(groupShapes(many, 5).size() == 2);      // capped at MAX_GROUP
     }
 
+    // mipFootprint: every texel a read in the box touches at that level (bilinear + tent) is refreshed.
+    // A read box starting at x 1724 (not a multiple of 128): box + 128 px left part of the level-7
+    // texels on its left edge to an older frame
+    {
+        const auto f = mipFootprint({1724, 0, 836, 310}, 7, 2560, 1664);
+        CHECK(near(f.x, 1536) && near(f.y, 0) && near(f.right(), 2560) && near(f.bottom(), 512));
+        // brute force: the texels a read at the level touches lie inside the footprint
+        for (int level : {0, 3, 5, 7}) {
+            const SRect  r{301.5, 77, 223, 95};
+            const auto   g = mipFootprint(r, level, 4096, 4096);
+            const double t = std::ldexp(1.0, level);
+            bool inside = std::fmod(g.x, t) == 0 && std::fmod(g.y, t) == 0; // whole texels at this level
+            for (double u : {r.x, r.right(), r.x + 17.25})
+                for (double o : {-t / 2, t / 2}) {                      // fetchSharp's tent taps
+                    const double k = std::floor((u + o) / t - 0.5); // bilinear: texels k and k + 1
+                    inside = inside && k * t >= g.x && (k + 2) * t <= g.right();
+                }
+            CHECK(inside);
+        }
+        const auto edge = mipFootprint({0, 0, 50, 50}, 7, 100, 80); // clipped to the texture
+        CHECK(near(edge.x, 0) && near(edge.w, 100) && near(edge.h, 80));
+    }
+
     std::printf(g_fail ? "%d failures\n" : "all tests passed\n", g_fail);
     return g_fail ? 1 : 0;
 }

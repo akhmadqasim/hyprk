@@ -280,16 +280,25 @@ namespace lg {
     namespace {
         std::map<MONITORID, SP<Render::IFramebuffer>> g_sharp; // per monitor: sizes may differ
 
-        // mip footprint of the deepest level the shader reads (lod ~6): copy this much more
-        constexpr double SHARP_MARGIN = 128;
+        constexpr int SHARP_LEVELS = 7; // the shader reads the sharp copy up to lod 7 (bleed)
 
-        // The unblurred backdrop of one glass element: its boxes (plus the mip footprint) are copied
+        // the area to refresh so that reads in `read` up to mip `level` see no texel of an older frame
+        CRegion footprintOf(const CRegion& read, int level, const Vector2D& size) {
+            CRegion out;
+            for (const auto& r : read.getRects()) {
+                const auto f = mipFootprint({double(r.x1), double(r.y1), double(r.x2 - r.x1), double(r.y2 - r.y1)}, level, size.x, size.y);
+                out.add(CBox{f.x, f.y, f.w, f.h});
+            }
+            return out;
+        }
+
+        // The unblurred backdrop of one glass element: its boxes (whole level-7 texels around them) are copied
         // from what Hyprland blurs (the backdrop capture when a scope is open, else the framebuffer
         // being rendered), then the mip chain is rebuilt. Per element, at its own turn in the pass:
         // a copy shared across the frame showed stale pixels in the real shell (the framebuffer
         // under a later layer is not final at an earlier element's turn), see README Performance.
         // Returns the texture, or null when a copy is not possible.
-        SP<Render::ITexture> sharpBackdrop(Render::CRenderContext& ctx, const Vector2D& size, CRegion copy) {
+        SP<Render::ITexture> sharpBackdrop(Render::CRenderContext& ctx, const Vector2D& size, const CRegion& read) {
             const auto  mon      = ctx.m_data.pMonitor.lock();
             const auto& captures = ctx.m_backdropCaptures;
             const auto  source   = !captures.empty() && captures.back().framebuffer ? captures.back().framebuffer : ctx.m_data.currentFB;
@@ -306,11 +315,14 @@ namespace lg {
             const auto tex = fb->getTexture();
             if (!dst || !tex)
                 return nullptr;
-            copy.intersect(CBox{{}, size});
+            const CRegion copy = footprintOf(read, SHARP_LEVELS, size);
             if (copy.empty())
                 return tex;
             {
                 CFramebufferBindingGuard guard{g_pHyprRenderer->glBackend()};
+                // a blit is clipped by the scissor test: whatever rect the last draw left would be all
+                // that gets copied, and the rest of the copy keeps an older backdrop
+                g_pHyprOpenGL->disableScissor();
                 g_pHyprOpenGL->bindFramebuffer(GL_READ_FRAMEBUFFER, src->getFBID());
                 g_pHyprOpenGL->bindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->getFBID());
                 // texel rows follow the top-down box space of the uvs
@@ -377,6 +389,11 @@ namespace lg {
     // physical-px box the glass draws into plus what its shader reads
     static CBox readBox(const SRect& b, double margin, double reach, float scale) {
         return CBox{b.x - margin - reach, b.y - margin - reach, b.w + 2 * (margin + reach), b.h + 2 * (margin + reach)}.scale(scale).round();
+    }
+
+    // mip levels over Hyprland's blur
+    static float blurLodOf(const SParams& p, const SResolved& res) {
+        return p.blurLod + p.blurLodScale * std::log2(1.f + res.blurRadius);
     }
 
     static double reachOf(const SParams& p, const SResolved& res) {
@@ -505,6 +522,7 @@ namespace lg {
         };
         std::vector<SQuad> quads;
         CRegion            blurDamage;
+        float              maxLod = 0;
         for (size_t i = 0; i < m_data.groups.size(); ++i) {
             const auto& g    = m_data.groups[i];
             const CBox  quad = readBox(g.box, m, 0, scale);
@@ -516,13 +534,15 @@ namespace lg {
                 continue;
             quads.push_back({i, quad, std::move(damage), m_data.resolved[i]});
             blurDamage.add(readBox(g.box, m, reachOf(p, m_data.resolved[i]), scale));
+            maxLod = std::max(maxLod, blurLodOf(p, m_data.resolved[i]) + 2.f); // the shadow reads blurLod + 2
         }
         if (quads.empty())
             return true;
         blurDamage.intersect(CBox{{}, mon->m_transformedSize});
 
-        // one blur + one mip chain (the blur pyramid the per-pixel LOD reads) for all shapes
-        const auto blurredFB = g_pHyprRenderer->blurMainFramebuffer(ctx, 1.f, blurDamage);
+        // one blur + one mip chain (the blur pyramid the per-pixel LOD reads) for all shapes. Hyprland
+        // refreshes only the region it is given, so it gets every texel the deepest read touches
+        const auto blurredFB = g_pHyprRenderer->blurMainFramebuffer(ctx, 1.f, footprintOf(blurDamage, std::clamp(int(std::ceil(maxLod)), 0, 12), mon->m_transformedSize));
         const auto tex       = blurredFB ? blurredFB->getTexture() : nullptr;
         if (!tex || tex->m_size.x <= 0 || tex->m_size.y <= 0)
             return false;
@@ -533,7 +553,7 @@ namespace lg {
             return false;
 
         // without the copy, the blurred texture stands in: variable blur and bleed then stay blurred
-        auto sharp = sharpBackdrop(ctx, tex->m_size, blurDamage.copy().expand(SHARP_MARGIN));
+        auto sharp = sharpBackdrop(ctx, tex->m_size, blurDamage);
         if (!sharp)
             sharp = tex;
 
@@ -623,7 +643,7 @@ namespace lg {
             glUniform2fv(u.shapeInfo, GLsizei(g.members.size()), info.data());
             glUniform2f(u.pointer, ptr.x - quad.x, ptr.y - quad.y);
             glUniform3f(u.pointerLight, m_data.pointerLight ? p.pointerLight : 0.f, p.pointerLightRadius * scale, press);
-            glUniform1f(u.blurLod, p.blurLod + p.blurLodScale * std::log2(1.f + res.blurRadius)); // mip levels over Hyprland's blur
+            glUniform1f(u.blurLod, blurLodOf(p, res));
             glUniform1f(u.refraction, res.refractionAmount * p.refractionScale * scale);
             glUniform1f(u.refractionHeight, res.refractionHeight * scale);
             glUniform2f(u.blurDist, res.blurDist0 * scale, r.blurDist1 * scale);

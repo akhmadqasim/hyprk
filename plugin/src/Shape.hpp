@@ -43,6 +43,12 @@ namespace lg {
     // shape alone) into one group each, at most MAX_GROUP shapes per group.
     std::vector<SGlassGroup> groupShapes(const std::vector<SGlassShape>& shapes, double smoothK);
 
+    // The texture area (px) to copy or blur so that a read anywhere in `r` at mip `level` or below
+    // (bilinear, plus the half-texel tent of fetchSharp) touches only texels rebuilt from fresh pixels:
+    // `r` grown to whole level-`level` texels plus one texel each side, clipped to w x h.
+    // Outside it the texture keeps whatever an earlier frame or element left there.
+    SRect mipFootprint(const SRect& r, int level, double w, double h);
+
     // Glass opacity marker (hyprk ShellWindow.glassOpacity): a 1x1 rect in the bottom row
     // edge of the surface, opacity = x / (surfaceW - 1). It lets the shell fade the compositor glass with
     // its content, in the same commit. Removes the marker from rects; returns 1 when there is none.

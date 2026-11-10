@@ -206,4 +206,11 @@ namespace lg {
         }
         return out;
     }
+
+    SRect mipFootprint(const SRect& r, int level, double w, double h) {
+        const double t  = std::ldexp(1.0, std::max(level, 0)); // texel size at `level`
+        const double x1 = std::max(0.0, (std::floor(r.x / t) - 1) * t), y1 = std::max(0.0, (std::floor(r.y / t) - 1) * t);
+        const double x2 = std::min(w, (std::floor(r.right() / t) + 2) * t), y2 = std::min(h, (std::floor(r.bottom() / t) + 2) * t);
+        return {x1, y1, std::max(0.0, x2 - x1), std::max(0.0, y2 - y1)};
+    }
 }
