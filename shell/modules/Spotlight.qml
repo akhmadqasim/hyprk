@@ -16,6 +16,12 @@ ShellWindow {
 
     readonly property bool shown: Panels.open === "spotlight"
     visible: shown
+
+    // the window is created on open (shell.qml LazyLoader), so a Behavior never ran: fade and
+    // scale in from creation on the SwiftUI spring, glass included
+    property real appear: 0
+    NumberAnimation on appear { to: 1; duration: Theme.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
+    glassOpacity: appear
     anchors { top: true; left: true; right: true; bottom: true }
     exclusionMode: ExclusionMode.Ignore
     namespace: "hyprk-spotlight"
@@ -87,8 +93,8 @@ ShellWindow {
         y: sp.panelY
         width: Theme.spotlight.width
         height: Theme.spotlight.barHeight + (sp.rows.length > 0 ? list.height + Theme.spotlight.listInset * 2 + 1 : 0)
-        scale: sp.shown ? 1 : 0.97
-        Behavior on scale { NumberAnimation { duration: Theme.anim.fast; easing.type: Theme.anim.easing } }
+        opacity: sp.appear
+        scale: 0.97 + 0.03 * sp.appear
 
         Glass {
             anchors.fill: parent

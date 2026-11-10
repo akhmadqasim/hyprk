@@ -16,6 +16,12 @@ ShellWindow {
 
     readonly property bool shown: Panels.open === "launchpad"
     visible: shown
+
+    // the window is created on open (shell.qml LazyLoader), so a Behavior never ran: fade and
+    // scale in from creation on the SwiftUI spring, glass included
+    property real appear: 0
+    NumberAnimation on appear { to: 1; duration: Theme.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
+    glassOpacity: appear
     anchors { top: true; left: true; right: true; bottom: true }
     exclusionMode: ExclusionMode.Ignore
     namespace: "hyprk-launchpad"
@@ -51,8 +57,8 @@ ShellWindow {
         height: Math.round(lp.height * Theme.launchpad.heightFraction)
         x: (lp.width - width) / 2
         y: (lp.height - height) / 2 - Theme.menuBar.height
-        scale: lp.shown ? 1 : 0.96
-        Behavior on scale { NumberAnimation { duration: Theme.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring } }
+        opacity: lp.appear
+        scale: 0.96 + 0.04 * lp.appear
 
         Glass {
             anchors.fill: parent
