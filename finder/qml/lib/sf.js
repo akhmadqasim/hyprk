@@ -1,0 +1,1 @@
+../../../themes/icons/sf-symbols/sf.js

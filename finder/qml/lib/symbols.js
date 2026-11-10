@@ -1,6 +1,9 @@
-// Original SF-Symbols-like glyphs on a 24x24 grid, emitted as SVG so they render with
-// any Qt Quick backend (software included). Parts: S = stroked path, F = filled path.
+// Finder glyphs as SVG data URLs, so they render with any Qt Quick backend (software included).
+// Real SF Symbols from macOS 27.2.1 (sf.js, names mapped through themes/icons/sf-symbols/names.json);
+// the original glyphs on a 24x24 grid below only for names without an SVG ("zoom").
+// Parts: S = stroked path, F = filled path.
 .pragma library
+.import "sf.js" as SF
 
 function rr(x, y, w, h, r) {
     return "M" + (x + r) + " " + y + "H" + (x + w - r) + "A" + r + " " + r + " 0 0 1 " + (x + w) + " " + (y + r)
@@ -61,9 +64,17 @@ const table = {
     "arrow.up.down": [S("M8 19V5M4.5 8.5L8 5L11.5 8.5M16 5V19M12.5 15.5L16 19L19.5 15.5", 1.5)],
 };
 
-function has(name) { return table.hasOwnProperty(name); }
+// Point size relative to SF.pointScale for names drawn smaller than their SF Symbol:
+// chevron.small.right is chevron.forward at the ink height of the old drawing (11.6 of 24); not measured on a Mac.
+const scale = { "chevron.small.right": 0.65 };
 
-// SVG markup for `name` in `color` (CSS color string). knock parts are drawn in `knockColor`.
+function has(name) { return table.hasOwnProperty(name) || SF.resolve(name) !== ""; }
+
+// SF Symbol file key for `name` ("" when it has none) and its point size in a `size` box.
+function sfKey(name, weight) { return SF.pick(name, weight || "regular", "", -1); }
+function pointSize(name, size) { return size * SF.pointScale * (scale[name] || 1); }
+
+// SVG markup of the hand-drawn `name` in `color` (CSS color string). knock parts are drawn in `knockColor`.
 function svg(name, color, knockColor) {
     const parts = table[name] || [];
     let body = "";
@@ -77,6 +88,11 @@ function svg(name, color, knockColor) {
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">' + body + "</svg>";
 }
 
+// Image URL of `name` in `color` (opaque CSS colour), filling a square box: drawn into a box of any size,
+// it shows the glyph at the same point size and placement as Symbol.qml at that size.
 function url(name, color, knockColor) {
+    const key = sfKey(name);
+    if (key)
+        return SF.url(key, color, SF.layout(key, pointSize(name, 24), 24, true).vb);
     return "data:image/svg+xml;utf8," + encodeURIComponent(svg(name, color, knockColor));
 }
