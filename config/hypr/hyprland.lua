@@ -104,27 +104,42 @@ hl.config({
 })
 
 -- macOS motion. Values from the binaries: liquid-glass-re/SPEC.md 9.9.4 (SwiftUI) and 11 (windows).
---   Window open = AppKit ScaleUpAndIn (Solarium): 0.5 s, scale 0.98 -> 1 on a CASpringAnimation
---     (perceptual 0.3, bounce ~0.27, initialVelocity 11.5), NO fade. Hyprland springs start at rest,
---     so the curve is a bezier fitted to the sampled spring (max error 0.013, overshoot 1.046 at 40%).
---   Window close = ScaleDownAndOut: 0.25 s, scale 1 -> 0.98, alpha 1 -> 0 on a critically damped
---     spring (perceptual 0.1812, v0 13) = strong ease-out (bezier fit, max error 0.013).
---   Zoom / frame changes: NSWindow animationResizeTime caps at 0.35 s; NSAnimation default easeInOut.
---   Spaces: Dock's spring was not recovered (SPEC 11.6); SwiftUI default spring (0.5, 1.0) stays.
+--   Window open: complete in one frame, no scale, no fade (MAC-ANSWERS.md R2 (27.2.1): Finder, TextEdit,
+--     Safari, Terminal), so windowsIn is off. (The binaries' ScaleUpAndIn 0.5 s spring is not what 27.2.1 shows.)
+--   Window close: a fade of about 0.1 s, alpha per frame 1, 0.71, 0.44, 0.27, 0.16, 0.09, 0.05, 0.03 (TextEdit),
+--     i.e. x0.6 per 60 Hz frame, exp(-t / 33 ms) (MAC-ANSWERS.md R2 (27.2.1)). winClose is that decay as a
+--     bezier over 0.12 s (RMS 0.008 against the TextEdit and Terminal frames); plugin-motion adds the slight
+--     blur. Scale 1 -> 0.98 (ScaleDownAndOut) is kept: too small to resolve in the recording.
+--     Safari closes in one frame on the Mac; hyprk does not special-case browsers.
+--   Zoom / frame changes (windowsMove): MAC-ANSWERS.md R2 (27.2.1) Window > Zoom 0.33 s ease-in-out, share per frame
+--     0.01 0.01 0.03 0.05 0.07 0.10 0.14 0.20 0.26 0.33 0.41 0.49 0.58 0.69 0.79 0.87 0.93 0.98 1.0: bezier "zoom"
+--     over 0.29 s (RMS 0.006). Unzoom is an ease-out over the same time (bezier (0.3,0.2),(0.4,0.9), RMS 0.006),
+--     full screen 0.42 s in / 0.5 s out with a Space slide: Hyprland has one windowsMove leaf for all of them, so
+--     they use the zoom curve.
+--   Window dim (fadeDim): off. With windowsIn off, Hyprland showed a new window dimmed to about 50 % and faded
+--     the dim out over 0.3 s (seen frame by frame in a test session); macOS never dims windows.
+--   App menus (fadePopups): open in one frame, fade out in about 0.2 s ease-out, like the measured menu bar menus.
+--   global: the fallback for leaves set nowhere else (zoomFactor, monitorAdded); not measured, kept at 0.2 s so
+--     nothing silently takes the old 0.5 s.
+--   Spaces: Dock's spring was not recovered (SPEC 11.6) and the Spaces switch is not measured on 27.2.1 yet;
+--     the SwiftUI default spring (0.5, 1.0) stays.
 --   Reduce Motion: no window open/close animation at all, Spaces cross-fade (SPEC 11.2).
 -- Hyprland speed unit is 100 ms (speed 5 = 0.5 s); springs run in real time and ignore speed.
 hl.curve("swiftui",   { type = "spring", mass = 1, stiffness = 158, damping = 25 })   -- (2pi/0.5)^2, 4pi/0.5
 hl.curve("macEase",   { type = "bezier", points = { {0.25, 0.1}, {0.25, 1} } })
 hl.curve("macOut",    { type = "bezier", points = { {0.2, 0.9}, {0.3, 1} } })
 hl.curve("easeInOut", { type = "bezier", points = { {0.42, 0}, {0.58, 1} } })   -- SwiftUI legacy / NSAnimation default
-hl.curve("winOpen",   { type = "bezier", points = { {0.275, 1.475}, {0.225, 0.95} } })  -- ScaleUpAndIn spring
-hl.curve("winClose",  { type = "bezier", points = { {0.312, 1.25}, {0.5, 0.912} } })    -- ScaleDownAndOut spring
+hl.curve("zoom",      { type = "bezier", points = { {0.6, 0.1}, {0.7, 0.8} } })     -- Window > Zoom on 27.2.1
+hl.curve("winClose",  { type = "bezier", points = { {0.3, 0.9}, {0.6, 0.9} } })          -- alpha x0.6 per frame over 0.12 s
 
-hl.animation({ leaf = "global",      enabled = true, speed = 5,   bezier = "macEase" })
+hl.animation({ leaf = "global",      enabled = true, speed = 2,   bezier = "macEase" })
 hl.animation({ leaf = "fade",        enabled = true, speed = 3,   bezier = "macEase" })
 hl.animation({ leaf = "layersIn",    enabled = true, speed = 3.5, bezier = "macOut",  style = "fade" })
 hl.animation({ leaf = "layersOut",   enabled = true, speed = 2.5, bezier = "macEase", style = "fade" })
 hl.animation({ leaf = "border",      enabled = false })
+hl.animation({ leaf = "fadeDim",     enabled = false })
+hl.animation({ leaf = "fadePopupsIn",  enabled = false })
+hl.animation({ leaf = "fadePopupsOut", enabled = true, speed = 2, bezier = "macOut" })
 
 -- Global so Settings > Accessibility (state/accessibility.lua via `hyprctl eval`, same Lua state)
 -- can switch it: hyprk_motion(true) = Reduce Motion.
@@ -136,13 +151,13 @@ function hyprk_motion(reduce)
         hl.animation({ leaf = "fadeOut",     enabled = false })
         hl.animation({ leaf = "workspaces",  enabled = true, speed = 4, bezier = "easeInOut", style = "fade" })
     else
-        hl.animation({ leaf = "windowsIn",   enabled = true, speed = 5,   bezier = "winOpen",  style = "popin 98%" })
-        hl.animation({ leaf = "windowsOut",  enabled = true, speed = 2.5, bezier = "winClose", style = "popin 98%" })
+        hl.animation({ leaf = "windowsIn",   enabled = false })   -- macOS windows appear complete in one frame
+        hl.animation({ leaf = "windowsOut",  enabled = true, speed = 1.2, bezier = "winClose", style = "popin 98%" })
         hl.animation({ leaf = "fadeIn",      enabled = false })   -- macOS windows appear at full alpha
-        hl.animation({ leaf = "fadeOut",     enabled = true, speed = 2.5, bezier = "winClose" })
+        hl.animation({ leaf = "fadeOut",     enabled = true, speed = 1.2, bezier = "winClose" })
         hl.animation({ leaf = "workspaces",  enabled = true, speed = 5, spring = "swiftui", style = "slide" })
     end
-    hl.animation({ leaf = "windowsMove", enabled = not reduce, speed = 3.5, bezier = "easeInOut" })   -- zoom cap 0.35 s
+    hl.animation({ leaf = "windowsMove", enabled = not reduce, speed = 2.9, bezier = "zoom" })   -- Zoom 0.29 to 0.33 s
 end
 do  -- start from the saved setting so the first frame is already right
     local f = io.open(state .. "/appearance.json", "r")
