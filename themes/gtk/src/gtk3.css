@@ -46,7 +46,10 @@ headerbar button.titlebutton.close@HI@, headerbar button.titlebutton.close@HI@:b
 headerbar button.titlebutton.minimize@HI@, headerbar button.titlebutton.minimize@HI@:backdrop { background-color: @mac_tl_min; }
 headerbar button.titlebutton.maximize@HI@, headerbar button.titlebutton.maximize@HI@:backdrop { background-color: @mac_tl_max; }
 headerbar:backdrop button.titlebutton.close@HI@, headerbar:backdrop button.titlebutton.minimize@HI@, headerbar:backdrop button.titlebutton.maximize@HI@ { background-color: @mac_tl_off; }
-headerbar button.titlebutton@HI@:active { opacity: 0.8; }
+/* pressed: brighter fill (MAC-ANSWERS.md Q-windows-08); GTK 3 CSS has no transform for the 1.15x growth */
+headerbar button.titlebutton.close@HI@:active { background-color: @mac_tl_close_down; }
+headerbar button.titlebutton.minimize@HI@:active { background-color: @mac_tl_min_down; }
+headerbar button.titlebutton.maximize@HI@:active { background-color: @mac_tl_max_down; }
 headerbar button.titlebutton@HI@ image { opacity: 0; min-width: 0; min-height: 0; -gtk-icon-source: none; margin: 0; padding: 0; }
 
 /* buttons: capsule */

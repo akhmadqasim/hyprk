@@ -45,6 +45,18 @@
 @define-color mac_knob #FFFFFF;
 @define-color mac_knob_shadow rgba(0,0,0,0.45);
 @define-color mac_menu_ring rgba(255,255,255,0.14);
+@define-color mac_tl_close_down #FF7C68;
+@define-color mac_tl_min_down #FFFF58;
+@define-color mac_tl_max_down #56F66E;
+@define-color mac_glyph_close #850000;
+@define-color mac_glyph_min #AA3600;
+@define-color mac_glyph_max #005500;
+@define-color mac_title_fg #ECECEB;
+@define-color mac_title_backdrop #757367;
+@define-color mac_doc_title_fg rgba(255,255,255,0.58);
+@define-color mac_doc_title_backdrop rgba(255,255,255,0.30);
+@define-color mac_frame_rim rgba(255,255,255,0.10);
+@define-color mac_frame_rim_backdrop rgba(255,255,255,0.08);
 @define-color accent_bg_color #007AFF;
 @define-color accent_fg_color #ffffff;
 @define-color accent_color #4FA3FF;
@@ -141,7 +153,10 @@ headerbar button.titlebutton.close:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.
 headerbar button.titlebutton.minimize:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar button.titlebutton.minimize:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):backdrop { background-color: @mac_tl_min; }
 headerbar button.titlebutton.maximize:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar button.titlebutton.maximize:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):backdrop { background-color: @mac_tl_max; }
 headerbar:backdrop button.titlebutton.close:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar:backdrop button.titlebutton.minimize:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7), headerbar:backdrop button.titlebutton.maximize:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7) { background-color: @mac_tl_off; }
-headerbar button.titlebutton:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):active { opacity: 0.8; }
+/* pressed: brighter fill (MAC-ANSWERS.md Q-windows-08); GTK 3 CSS has no transform for the 1.15x growth */
+headerbar button.titlebutton.close:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):active { background-color: @mac_tl_close_down; }
+headerbar button.titlebutton.minimize:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):active { background-color: @mac_tl_min_down; }
+headerbar button.titlebutton.maximize:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7):active { background-color: @mac_tl_max_down; }
 headerbar button.titlebutton:not(.hi1):not(.hi2):not(.hi3):not(.hi4):not(.hi5):not(.hi6):not(.hi7) image { opacity: 0; min-width: 0; min-height: 0; -gtk-icon-source: none; margin: 0; padding: 0; }
 
 /* buttons: capsule */

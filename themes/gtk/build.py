@@ -26,6 +26,39 @@ def _gtk(s, **own):
                 tl_close=s['tl_close'], tl_min=s['tl_min'], tl_max=s['tl_max'], tl_off=s['tl_off'], accent_fg='#ffffff', **own)
 
 
+# Window chrome measured on 27.2.1 (reference/re/MAC-ANSWERS.md Q-windows; same numbers as ui/HyprK/Tokens.qml):
+#   tl_*_down  pressed disc fill beside the glyph (Q-windows-08; dark zoom did not change in its crop: CoreUI #56F66E)
+#   glyph_*    hover glyph colour (Q-windows-10)
+#   title_*    toolbar title, Finder (Q-windows-12); doc_title_* the 32 pt document title bar, TextEdit (Q-windows-11)
+#   frame_rim  the 1 pt inner white rim (Q-windows-03); the compositor draws the outer black one
+CHROME = {
+    'light': dict(tl_close_down='#FFAC9E', tl_min_down='#FFFF70', tl_max_down='#C6FF8F',
+                  glyph_close='#9E0000', glyph_min='#BE4900', glyph_max='#097900',
+                  title_fg='#3A3B39', title_backdrop='#818480', doc_title_fg='rgba(0,0,0,0.70)', doc_title_backdrop='rgba(0,0,0,0.25)',
+                  frame_rim='rgba(255,255,255,0.10)', frame_rim_backdrop='rgba(255,255,255,0.10)'),
+    'dark': dict(tl_close_down='#FF7C68', tl_min_down='#FFFF58', tl_max_down='#56F66E',
+                 glyph_close='#850000', glyph_min='#AA3600', glyph_max='#005500',
+                 title_fg='#ECECEB', title_backdrop='#757367', doc_title_fg='rgba(255,255,255,0.58)', doc_title_backdrop='rgba(255,255,255,0.30)',
+                 frame_rim='rgba(255,255,255,0.10)', frame_rim_backdrop='rgba(255,255,255,0.08)'),
+}
+
+# Hover glyphs (Q-windows-10): 1.9 pt round-cap strokes on the 14 pt disc, x 7 x 7, minus 7.5 wide, full screen
+# two triangles 6 x 6 (the zoom button's 27.2.1 default action). SVG cannot read @define-color, so one rule per palette.
+GLYPHS = {
+    'close': "<path d='M4.45 4.45l5.1 5.1M9.55 4.45l-5.1 5.1' stroke='{c}' stroke-width='1.9' stroke-linecap='round'/>",
+    'minimize': "<path d='M4.2 7h5.6' stroke='{c}' stroke-width='1.9' stroke-linecap='round'/>",
+    'maximize': "<path d='M4 4h4.7L4 8.7zM10 10H5.3L10 5.3z' fill='{c}'/>",
+}
+
+
+def glyph_css(p):
+    out = []
+    for k, key in (('close', 'glyph_close'), ('minimize', 'glyph_min'), ('maximize', 'glyph_max')):
+        svg = "<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14'>" + GLYPHS[k].format(c=p[key].replace('#', '%23')) + '</svg>'
+        out.append(f'windowcontrols:hover > button.{k}{TOKENS["WCB"]} > image {{ background-image: url("data:image/svg+xml;utf8,{svg}"); }}')
+    return '\n'.join(out) + '\n'
+
+
 PALETTES = {
     'light': _gtk(
         SHARED['light'],
@@ -36,7 +69,8 @@ PALETTES = {
         ctl_bg='#FFFFFF', ctl_bg_hover='#F4F4F4', ctl_bg_active='#E4E4E4', ctl_ring='rgba(0,0,0,0.13)', ctl_shadow='rgba(0,0,0,0.16)',
         glass_bg='rgba(255,255,255,0.86)', glass_ring='rgba(0,0,0,0.06)', glass_shadow='rgba(0,0,0,0.07)',
         field_bg='#FFFFFF', check_bg='#FFFFFF', check_ring='rgba(0,0,0,0.30)', tab_sel='#FFFFFF',
-        track='rgba(0,0,0,0.12)', knob='#FFFFFF', knob_shadow='rgba(0,0,0,0.30)', menu_ring='rgba(0,0,0,0.14)'),
+        track='rgba(0,0,0,0.12)', knob='#FFFFFF', knob_shadow='rgba(0,0,0,0.30)', menu_ring='rgba(0,0,0,0.14)',
+        **CHROME['light']),
     'dark': _gtk(
         SHARED['dark'],
         destructive='#FF453A', success='#30D158', warning='#FF9F0A', error='#FF453A', fg='rgba(255,255,255,0.85)',
@@ -47,7 +81,8 @@ PALETTES = {
         ctl_ring='rgba(255,255,255,0.08)', ctl_shadow='rgba(0,0,0,0.30)',
         glass_bg='rgba(70,70,70,0.70)', glass_ring='rgba(255,255,255,0.12)', glass_shadow='rgba(0,0,0,0.40)',
         field_bg='rgba(255,255,255,0.08)', check_bg='rgba(255,255,255,0.10)', check_ring='rgba(255,255,255,0.25)', tab_sel='rgba(255,255,255,0.24)',
-        track='rgba(255,255,255,0.16)', knob='#FFFFFF', knob_shadow='rgba(0,0,0,0.45)', menu_ring='rgba(255,255,255,0.14)'),
+        track='rgba(255,255,255,0.16)', knob='#FFFFFF', knob_shadow='rgba(0,0,0,0.45)', menu_ring='rgba(255,255,255,0.14)',
+        **CHROME['dark']),
 }
 
 
@@ -89,7 +124,7 @@ def palette(variant, root=True):
         out.append('  --border-opacity: 12%; --dim-opacity: 55%; --disabled-opacity: 40%;')
         out.append('  --window-radius: 16px;')
         out.append('}')
-    return '\n'.join(out) + '\n'
+    return '\n'.join(out) + '\n' + (glyph_css(p) if root else '')   # root = GTK 4 (GTK 3 has no windowcontrols)
 
 def indent(s, n=2):
     return '\n'.join((' ' * n + l) if l.strip() else l for l in s.splitlines()) + '\n'

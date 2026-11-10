@@ -9,7 +9,12 @@ window, popover, tooltip, .background {
 .title-1, .title-2, .title-3, .title-4, .heading, headerbar .title, windowtitle .title {
   font-family: "SF Pro Display", "SF Pro", "SF Pro Text", "System Font", ".SF NS", "Inter", "Cantarell", sans-serif;
 }
-headerbar .title, windowtitle .title { font-weight: 700; font-size: 14px; padding: 0 12px; }
+/* toolbar title, Finder on 27.2.1: 15 Semibold (HyprK Typography.toolbarTitle), MAC-ANSWERS.md Q-windows-12 colours */
+headerbar .title, windowtitle .title { font-weight: 590; font-size: 15px; padding: 0 12px; color: @mac_title_fg; }
+window:backdrop headerbar .title, window:backdrop windowtitle .title { color: @mac_title_backdrop; }
+/* plain title bar = TextEdit's 32 pt document bar: 13 Bold (Q-windows-11) */
+headerbar.default-decoration .title { font-weight: 700; font-size: 13px; color: @mac_doc_title_fg; }
+window:backdrop headerbar.default-decoration .title { color: @mac_doc_title_backdrop; }
 headerbar .subtitle, windowtitle .subtitle { font-size: 11px; opacity: 0.55; }
 
 /* ---------------------------------------------------------------------------------------------
@@ -21,6 +26,11 @@ window.csd, window.csd.background {
   border-radius: 16px;
 }
 window.csd, window.csd:backdrop { box-shadow: none; }
+/* the 1 pt inner white rim (MAC-ANSWERS.md Q-windows-03), drawn over the content: GTK paints outlines after the children */
+window.csd { outline: 1px solid @mac_frame_rim; outline-offset: -1px; }
+window.csd:backdrop { outline-color: @mac_frame_rim_backdrop; }
+/* not .maximized/.tiled: Hyprland marks floating windows tiled, and a zoomed Mac window keeps its rims */
+window.fullscreen, window.ssd, window.solid-csd { outline: none; }
 /* server-side decorated windows (the compositor / plugin draws the title bar and the outer rounding): the client must not
  * round its own top corners under it, or title-bar coloured notches show at both corners */
 window.ssd, window.ssd.background, window.solid-csd, window.solid-csd.background, window.ssd headerbar, window.ssd > contents { border-radius: 0; box-shadow: none; }
@@ -41,10 +51,11 @@ headerbar {
 }
 headerbar:backdrop { background-color: @mac_header_backdrop; }
 headerbar:backdrop > windowhandle { filter: none; }
-headerbar > windowhandle > box { padding: 8px 16px 8px 16px; }
+headerbar > windowhandle > box { padding: 8px 16px 8px 9px; }
 headerbar > windowhandle > box > box.start, headerbar > windowhandle > box > box.end { border-spacing: 10px; }
-headerbar.default-decoration { min-height: 44px; }
-headerbar.default-decoration > windowhandle > box { padding: 4px 12px; }
+/* plain title bar: 32 pt like TextEdit and Terminal (Q-windows-06), lights centred */
+headerbar.default-decoration { min-height: 32px; }
+headerbar.default-decoration > windowhandle > box { padding: 0 12px 0 0; }
 toolbarview > .top-bar headerbar, toolbarview > .bottom-bar headerbar, headerbar.flat { background-color: transparent; box-shadow: none; }
 toolbarview > .top-bar { background-color: @mac_header_bg; }
 toolbarview > .top-bar:backdrop { background-color: @mac_header_backdrop; }
@@ -59,9 +70,11 @@ toolbarview > .bottom-bar.raised { box-shadow: 0 -1px 0 0 @mac_sep; }
 /* ---------------------------------------------------------------------------------------------
  * Traffic lights (left side; set gtk-decoration-layout=close,minimize,maximize: in settings.ini)
  * ------------------------------------------------------------------------------------------- */
-/* WCB expands (build.py) to the :not() chain that out-ranks the generic capsule button rules below */
+/* WCB expands (build.py) to the :not() chain that out-ranks the generic capsule button rules below.
+ * Red disc at x 19 in the 52 pt bar, x 9 in the 32 pt one (MAC-ANSWERS.md Q-windows-07) */
 windowcontrols { border-spacing: 9px; margin: 0 9px 0 4px; }
-windowcontrols > button@WCB@ {
+headerbar.default-decoration windowcontrols.start { margin-left: 3px; }
+windowcontrols > button@WCB@, windowcontrols > button@WCB@:hover, windowcontrols > button@WCB@:active {
   min-width: 14px; min-height: 14px; padding: 0; margin: 0;
   background: none; box-shadow: none; border: none; outline: none;
 }
@@ -77,19 +90,14 @@ windowcontrols > button@WCB@ > image {
 windowcontrols > button.close@WCB@ > image { background-color: @mac_tl_close; }
 windowcontrols > button.minimize@WCB@ > image { background-color: @mac_tl_min; }
 windowcontrols > button.maximize@WCB@ > image { background-color: @mac_tl_max; }
-windowcontrols > button@WCB@:active > image { filter: brightness(0.82); }
+/* pressed: the disc grows to about 1.15x with a brighter fill (Q-windows-08) */
+windowcontrols > button@WCB@:active > image { transform: scale(1.15); }
+windowcontrols > button.close@WCB@:active > image { background-color: @mac_tl_close_down; }
+windowcontrols > button.minimize@WCB@:active > image { background-color: @mac_tl_min_down; }
+windowcontrols > button.maximize@WCB@:active > image { background-color: @mac_tl_max_down; }
 /* grey when the window is not focused */
 window:backdrop windowcontrols > button@WCB@ > image { background-color: @mac_tl_off; }
-/* glyphs show while the pointer is over the group, like macOS */
-windowcontrols:hover > button.close@WCB@ > image {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14'><path d='M4.6 4.6l4.8 4.8M9.4 4.6l-4.8 4.8' stroke='rgba(76,0,0,0.75)' stroke-width='1.3' stroke-linecap='round'/></svg>");
-}
-windowcontrols:hover > button.minimize@WCB@ > image {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14'><path d='M3.9 7h6.2' stroke='rgba(110,70,0,0.75)' stroke-width='1.3' stroke-linecap='round'/></svg>");
-}
-windowcontrols:hover > button.maximize@WCB@ > image {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14'><path d='M4.4 9.6V5.6M4.4 9.6h4M9.6 4.4v4M9.6 4.4h-4' stroke='rgba(0,70,0,0.75)' stroke-width='1.3' stroke-linecap='round'/></svg>");
-}
+/* glyphs show while the pointer is over the group, like macOS: per palette, see build.py glyph_css() */
 window:backdrop windowcontrols:hover > button@WCB@ > image { background-image: none; }
 
 /* ---------------------------------------------------------------------------------------------
