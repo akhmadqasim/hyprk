@@ -171,21 +171,15 @@ Item {
     }
 
     // ---------- building blocks ----------
-    // Each module is its own glass: while materializing it shrinks from its hidden scale around its
-    // own centre (neighbours fuse for a moment through the plugin's smooth union, then separate).
+    // Each module is its own glass. Open and close are a fade of the whole window (ControlCenterWindow,
+    // MAC-ANSWERS.md R2 (27.2.1): no scale), so the modules never move or grow and neighbours never touch
+    // (the hidden-scale clamp of 56df7cd is gone with the scale).
     // Interactive glass: pressing lifts it by a couple of points on a bouncy spring, a drag past a
     // slider end stretches it (squish); the plugin lights the glass around the pointer.
     // Reduce motion: none of it.
     component Module: GlassButton {
         id: m
         property real radius: Theme.cc.tileRadius
-        // the hidden scale (motion.js hiddenScale: + min(8, 0.1 dim) per side) and the spring's
-        // undershoot below 0 on close grew neighbours into each other: overlapping glass regions
-        // arrive at the plugin as one cluster, so for a few frames the tiles turned into one hard
-        // rectangle. The scale stops 1 pt short of the half gap, so neighbours still fuse through
-        // the plugin's smooth union but their regions never touch.
-        readonly property real growMax: Math.max(Math.min(8, 0.1 * width), Math.min(8, 0.1 * height))
-        materialize: growMax > 0 ? Math.max(glass.materialize, 1 - (cc.gap / 2 - 1) / growMax) : glass.materialize
         Glass {
             id: glass
             anchors.fill: parent
