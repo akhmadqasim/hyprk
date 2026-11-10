@@ -3,26 +3,25 @@ import qs
 import qs.components
 import qs.services
 
-// Launchpad is created on open (shell.qml LazyLoader), so its icons used to decode then: the
-// first frames showed empty cells or bare tiles that filled in over about 100 ms. This keeps
-// the first page's AppIcons alive, never drawn (opacity 0), in the always-mapped wallpaper
-// window of the same screen: the decoded images stay referenced in Qt's pixmap cache (same url
-// and size, so Launchpad's own Images find them at once) and the tile shape checks
-// (iconshape.js) are cached before the first open. About 1.5 MB at 2x for 35 icons of 52 pt.
+// The Applications window (ApplicationsWindow.qml) is created on open, so its icons would decode
+// then and fill in over the first frames (the 27.2.1 Mac also fills them in over about 0.5 s; ours
+// are complete in the first frame). This keeps the first screen of its "All" grid as AppIcons
+// alive, never drawn (opacity 0), in the always-mapped wallpaper window of the primary screen: the
+// decoded images stay referenced in Qt's pixmap cache (same url and size, so the window's own
+// Images find them at once) and the tile shape checks (iconshape.js) are cached before the first
+// open. About 2 MB at 2x for 28 icons of 64 pt. (Name kept: Background.qml instantiates it.)
 Item {
     id: pre
     required property var screen
-    visible: screen === Panels.screen       // Launchpad opens on the primary screen
+    visible: screen === Panels.screen       // the window opens on the focused screen; most often the primary
     opacity: 0
     enabled: false
-    readonly property int count: Theme.launchpad.columns
-        * Theme.launchpad.rowsFor(Math.round((screen ? screen.height : 0) * Theme.launchpad.heightFraction))
 
     Repeater {
-        model: pre.visible ? Apps.sortedEntries.slice(0, pre.count) : []
+        model: pre.visible ? Apps.sortedEntries.slice(0, AppsView.metrics.firstScreen) : []
         AppIcon {
             required property var modelData
-            size: Theme.launchpad.iconSize
+            size: AppsView.metrics.iconSize
             icon: modelData.icon
             appId: modelData.id
         }

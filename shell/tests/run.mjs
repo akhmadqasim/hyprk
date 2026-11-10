@@ -516,5 +516,19 @@ test("mode buttons start inside the field, end in place", () => {
     });
 }
 
+// ---- Applications window categories (lib/appcategories.js) ----
+{
+    const AC = load("appcategories.js");
+    test("terminal is productivity, as on the Mac", () => assert.equal(AC.groupOf(["System", "TerminalEmulator"]), "Productivity & Finance"));
+    test("text editor beats utility", () => assert.equal(AC.groupOf(["GNOME", "GTK", "Utility", "TextEditor"]), "Productivity & Finance"));
+    test("mail client is productivity", () => assert.equal(AC.groupOf(["Network", "Email"]), "Productivity & Finance"));
+    test("calculator is a utility", () => assert.equal(AC.groupOf(["GNOME", "GTK", "Utility", "Calculator"]), "Utilities"));
+    test("browser is information", () => assert.equal(AC.groupOf(["Network", "WebBrowser"]), "Information & Reading"));
+    test("game", () => assert.equal(AC.groupOf(["Game", "BoardGame"]), "Games"));
+    test("no categories is other", () => assert.equal(AC.groupOf(undefined), "Other"));
+    test("bar lists only groups in use, in order", () => assert.deepEqual(
+        AC.present([{ categories: ["Utility"] }, { categories: ["Game"] }, { categories: [] }]), ["Games", "Utilities", "Other"]));
+}
+
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

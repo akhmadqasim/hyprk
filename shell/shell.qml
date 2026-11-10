@@ -1,3 +1,4 @@
+//@ pragma AppId org.hyprk.Shell
 import QtQuick
 import Quickshell
 import qs.modules
@@ -5,6 +6,9 @@ import qs.modules.lock
 import qs.services
 
 // hyprk: macOS 27-style desktop shell for Hyprland.
+// AppId: the class of the shell's own windows (the Applications window), so the liquidglass plugin's
+// default titlebar_exclude (^org\.hyprk\.) leaves its client-drawn toolbar alone and the Dock maps it
+// to the Apps item (AppsView.appId).
 ShellRoot {
     // Singletons are created on first use; these must exist from the start:
     // SpotlightState registers hyprk:spotlight-<mode> shortcuts, Clipboard runs the
@@ -43,9 +47,10 @@ ShellRoot {
         active: Panels.loaded.switcher === true
         Switcher { modelData: Panels.screen }
     }
+    // Applications: an ordinary window, created on open and destroyed on close (AppsView)
     LazyLoader {
-        active: Panels.loaded.launchpad === true
-        Launchpad { modelData: Panels.screen }
+        active: AppsView.open
+        ApplicationsWindow {}
     }
     LazyLoader {
         active: Panels.loaded.mission === true
