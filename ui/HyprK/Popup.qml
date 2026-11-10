@@ -10,6 +10,7 @@ import QtQuick.Controls.Basic as C
 Item {
     id: pop
     property var model: []          // array of strings
+    property var dots: []           // optional colour per item ("" = none): a 12 pt dot before the item's text
     property int currentIndex: 0
     signal activated(int index)
     implicitHeight: Tokens.control.popupChevron
@@ -85,7 +86,8 @@ Item {
                     required property string modelData
                     width: menu.width - 2 * Tokens.control.menuPadding; height: Tokens.control.menuItemHeight
                     radius: Tokens.control.menuHighlightRadius
-                    implicitWidth: t.implicitWidth + 44
+                    readonly property color dot: pop.dots.length > index && pop.dots[index] ? pop.dots[index] : "transparent"
+                    implicitWidth: t.implicitWidth + 44 + (pop.dots.length ? 18 : 0)
                     readonly property bool hot: pop._dragIndex >= 0 ? pop._dragIndex === index : im.containsMouse
                     color: hot ? Tokens.accent : "transparent"
                     Text {
@@ -94,9 +96,14 @@ Item {
                         text: "check"; font.family: Tokens.fontGlyph; font.pixelSize: 14
                         color: parent.hot ? "white" : Tokens.label
                     }
+                    Rectangle {
+                        visible: pop.dots.length > 0
+                        x: 26; anchors.verticalCenter: parent.verticalCenter
+                        width: 12; height: 12; radius: 6; color: parent.dot
+                    }
                     Text {
                         id: t
-                        x: 26; anchors.verticalCenter: parent.verticalCenter
+                        x: pop.dots.length ? 44 : 26; anchors.verticalCenter: parent.verticalCenter
                         text: modelData; font: Typography.menu
                         color: parent.hot ? "white" : Tokens.label
                     }

@@ -6,10 +6,12 @@ import "controls.js" as G
 // lens and the fill darkens by a black a.098 layer (20 ms delay, 150 ms ease-in-out; back in 150 ms).
 // Mouse-down on the knob grabs it where it was hit; mouse-down on the track sends the knob there (ease-out, no
 // overshoot) and keeps tracking. tickMarks > 1 draws 2 x 2 dots under the track; onlyTicks snaps to them.
-// End glyphs sit beside the track (6 pt gap) and are buttons that send the value to that end; text labels sit under it, 11 pt (Desktop & Dock): leftText /
+// End glyphs (or leftIcon / rightIcon components) sit beside the track (glyphGap, 6 pt) and are buttons: they send the
+// value to that end, or step it by endStep when that is > 0 (Liquid Glass: 0.1). Text labels sit under it, 11 pt (Desktop & Dock): leftText /
 // rightText, or `labels: [[text, fraction], ...]` (0 = left-aligned at the start, 1 = right-aligned at the end,
 // otherwise centred under that knob position).
-// Controlled: it shows `value` and emits moved(value) while dragged; the caller owns the state.
+// Controlled: it shows `value` and emits moved(value) while dragged and committed(value) once on mouse-up or an end
+// button click (for settings written only on release, like NSGlassTintAmount); the caller owns the state.
 Item {
     id: s
     property real from: 0
@@ -20,11 +22,20 @@ Item {
     property string controlSize: "regular"
     property string leftGlyph: ""
     property string rightGlyph: ""
+    property Component leftIcon: null
+    property Component rightIcon: null
+    property real endStep: 0
+    property real glyphGap: 6
     property string leftText: ""
     property string rightText: ""
     property var labels: (leftText !== "" ? [[leftText, 0]] : []).concat(rightText !== "" ? [[rightText, 1]] : [])
     signal moved(real value)
     signal released()
+    signal committed(real value)
+    function _end(dir) {
+        const v = endStep > 0 ? Math.max(from, Math.min(to, value + dir * endStep)) : dir < 0 ? from : to;
+        moved(v); released(); committed(v);
+    }
     readonly property var _m: G.slider(controlSize)
     implicitWidth: 220
     implicitHeight: _m.height + (labels.length > 0 ? 15 : 0)
@@ -65,28 +76,38 @@ Item {
     }
     on_DraggingChanged: if (_dragging) { liftOut.stop(); liftIn.start(); } else { liftIn.stop(); if (_lift > 0) liftOut.start(); }
 
-    Text {
-        id: lg; visible: s.leftGlyph !== ""
+    Item {
+        id: lg; visible: s.leftGlyph !== "" || s.leftIcon !== null
         anchors.left: parent.left; anchors.verticalCenter: track.verticalCenter
-        text: s.leftGlyph
-        font.family: Tokens.fontGlyph; font.pixelSize: 15
-        color: Tokens.secondaryLabel
-        MouseArea { anchors.fill: parent; onClicked: { s.moved(s.from); s.released(); } }
+        width: s.leftIcon ? li.width : lt.implicitWidth; height: s.leftIcon ? li.height : lt.implicitHeight
+        Text {
+            id: lt; visible: !s.leftIcon
+            text: s.leftGlyph
+            font.family: Tokens.fontGlyph; font.pixelSize: 15
+            color: Tokens.secondaryLabel
+        }
+        Loader { id: li; sourceComponent: s.leftIcon }
+        MouseArea { anchors.fill: parent; anchors.margins: -3; onClicked: s._end(-1) }
     }
-    Text {
-        id: rg; visible: s.rightGlyph !== ""
+    Item {
+        id: rg; visible: s.rightGlyph !== "" || s.rightIcon !== null
         anchors.right: parent.right; anchors.verticalCenter: track.verticalCenter
-        text: s.rightGlyph
-        font.family: Tokens.fontGlyph; font.pixelSize: 18
-        color: Tokens.secondaryLabel
-        MouseArea { anchors.fill: parent; onClicked: { s.moved(s.to); s.released(); } }
+        width: s.rightIcon ? ri.width : rt.implicitWidth; height: s.rightIcon ? ri.height : rt.implicitHeight
+        Text {
+            id: rt; visible: !s.rightIcon
+            text: s.rightGlyph
+            font.family: Tokens.fontGlyph; font.pixelSize: 18
+            color: Tokens.secondaryLabel
+        }
+        Loader { id: ri; sourceComponent: s.rightIcon }
+        MouseArea { anchors.fill: parent; anchors.margins: -3; onClicked: s._end(1) }
     }
     Item {
         id: track
         anchors.left: lg.visible ? lg.right : parent.left
         anchors.right: rg.visible ? rg.left : parent.right
-        anchors.leftMargin: lg.visible ? 6 : 0
-        anchors.rightMargin: rg.visible ? 6 : 0
+        anchors.leftMargin: lg.visible ? s.glyphGap : 0
+        anchors.rightMargin: rg.visible ? s.glyphGap : 0
         height: s._m.height
         readonly property real usable: width - s._m.knobWidth
         readonly property real knobCx: s._m.knobWidth / 2 + pos.value * usable
@@ -161,7 +182,7 @@ Item {
                 else upd(m.x);
             }
             onPositionChanged: m => { if (pressed) upd(m.x); }
-            onReleased: { s._dragging = false; s._jump = false; s.released(); }
+            onReleased: { const v = s._dragValue; s._dragging = false; s._jump = false; s.released(); s.committed(v); }
             onCanceled: { s._dragging = false; s._jump = false; }
         }
     }

@@ -16,7 +16,8 @@ Item {
     id: sc
     property var model: []
     property int currentIndex: 0
-    property real segmentWidth: 0          // fixed width per segment; 0 = all as wide as the widest content
+    property real segmentWidth: 0          // fixed width per segment; 0 = each as wide as its own content plus
+                                           // the side padding (NSSegmentedControl sizes segments by content)
     property string controlSize: "regular"
     readonly property var _m: G.push(controlSize)
     property color trackColor: Tokens.control.pushFill
@@ -40,33 +41,39 @@ Item {
     signal activated(int index)
 
     implicitHeight: _m.height
-    implicitWidth: count * _segW + _nSep * separatorSpacing
+    implicitWidth: _sum(_ws) + _nSep * separatorSpacing
     activeFocusOnTab: true
 
     function _entry(i) {
         const m = model[i];
         return typeof m === "object" && m !== null ? m : { text: String(m) };
     }
-    readonly property real _contentW: {   // widest segment content
-        let w = 0;
-        for (let i = 0; i < segs.count; i++) { const it = segs.itemAt(i); if (it) w = Math.max(w, it.contentW); }
-        return w;
+    function _sum(a) { return a.reduce((t, w) => t + w, 0); }
+    readonly property var _ws: {   // natural width of each segment
+        const a = [];
+        for (let i = 0; i < count; i++) {
+            const it = segs.count === count ? segs.itemAt(i) : null;
+            a.push(segmentWidth > 0 ? segmentWidth : (it ? it.contentW : 0) + 2 * _m.padding);
+        }
+        return a;
     }
-    readonly property real _segW: segmentWidth > 0 ? segmentWidth : _contentW + 2 * _m.padding
     function _drawn(b) { return separatorBoundaries === null || separatorBoundaries.indexOf(b) >= 0; }
     readonly property int _nSep: {
         let n = 0;
         for (let b = 1; b < count; b++) if (_drawn(b)) n++;
         return n;
     }
-    readonly property real _w: count > 0 ? (width - _nSep * separatorSpacing) / count : 0   // laid out width per segment
+    readonly property var _wl: {   // laid-out width of each segment: the natural widths scaled to the control's width
+        const n = _sum(_ws), k = n > 0 ? (width - _nSep * separatorSpacing) / n : 0;
+        return _ws.map(w => w * k);
+    }
     readonly property var _xs: {   // left edge of each segment
         const a = [];
         let x = 0;
         for (let i = 0; i < count; i++) {
             if (i > 0 && _drawn(i)) x += separatorSpacing;
             a.push(x);
-            x += _w;
+            x += _wl[i] || 0;
         }
         return a;
     }
@@ -82,7 +89,7 @@ Item {
         visible: sc.count > 0 && sc.currentIndex >= 0 && sc.currentIndex < sc.count
         x: visible ? sc._xs[sc.currentIndex] + sc.selectionInsetX : 0
         y: sc.selectionInset
-        width: sc._w - 2 * sc.selectionInsetX
+        width: visible ? sc._wl[sc.currentIndex] - 2 * sc.selectionInsetX : 0
         height: sc.height - 2 * sc.selectionInset
         radius: sc.selectionRadius
         color: sc.selectionColor
@@ -94,7 +101,7 @@ Item {
         visible: sc.pressedIndex >= 0
         x: visible ? sc._xs[sc.pressedIndex] + sc.selectionInsetX : 0
         y: sc.selectionInset
-        width: sc._w - 2 * sc.selectionInsetX
+        width: visible ? sc._wl[sc.pressedIndex] - 2 * sc.selectionInsetX : 0
         height: sc.height - 2 * sc.selectionInset
         radius: sc.selectionRadius
         color: sc.pressedIndex === sc.currentIndex ? "transparent" : Tokens.control.pushFill
@@ -126,7 +133,7 @@ Item {
             readonly property bool selected: index === sc.currentIndex
             readonly property real contentW: content.implicitWidth
             x: sc._xs[index]
-            width: sc._w
+            width: sc._wl[index] || 0
             height: sc.height
             Row {
                 id: content
@@ -173,7 +180,7 @@ Item {
         anchors.fill: parent
         preventStealing: true
         function indexAt(x) {
-            if (sc._w <= 0) return -1;
+            if (sc.count <= 0 || sc.width <= 0) return -1;
             for (let i = sc.count - 1; i > 0; i--) if (x >= sc._xs[i] - (sc._drawn(i) ? sc.separatorSpacing / 2 : 0)) return i;
             return 0;
         }

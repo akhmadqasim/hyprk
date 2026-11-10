@@ -161,7 +161,7 @@ Item {
         }
 
         // ---------- SegmentedControl ----------
-        function segX(c, i) { return (i + 0.5) * c.width / c.count; }
+        function segX(c, i) { return c._xs[i] + c._wl[i] / 2; }
 
         function test_segmented_keeps_binding() {
             mouseClick(seg, segX(seg, 2), seg.height / 2);
@@ -207,15 +207,18 @@ Item {
             seg.enabled = true;
             compare(segSpy.count, 0);
         }
-        function test_segmented_equal_and_fixed_widths() {
+        function test_segmented_content_and_fixed_widths() {
             compare(fixedSeg.implicitWidth, 2 * 46);
-            verify(seg.implicitWidth > 0);
-            compare(seg.implicitWidth % 3, 0);             // three equal segments
+            // NSSegmentedControl: each segment as wide as its own content plus 12 pt a side (not equal widths)
+            verify(seg._ws[2] > seg._ws[0]);               // "Three" with a glyph is wider than "One"
+            compare(seg.implicitWidth, seg._ws[0] + seg._ws[1] + seg._ws[2]);
+            compare(seg._xs[1], seg._wl[0]);
         }
         function test_segmented_pill_jumps() {               // Q-settings-22: no slide, one frame
             const pill = findChild(seg, "pill");
             backend.index = 2;
-            compare(pill.x, 2 * seg.width / 3);
+            compare(pill.x, seg._xs[2]);
+            compare(pill.width, seg._wl[2]);
             compare(pill.height, seg.height);              // full height, no inset
         }
         function test_segmented_metrics() {
@@ -232,7 +235,7 @@ Item {
             mousePress(seg, segX(seg, 1), seg.height / 2);
             const p = findChild(seg, "pressed");
             verify(p.visible);
-            compare(p.x, seg.width / 3);
+            compare(p.x, seg._xs[1]);
             mouseRelease(seg, segX(seg, 1), seg.height / 2);
             verify(!p.visible);
         }
