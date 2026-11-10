@@ -115,6 +115,9 @@ test("appearance.json defaults and round trip", () => {
 
 test("dock.json defaults and clamping", () => {
     assert.deepEqual(P.mergeState("", {}, P.normalizeDock), P.dockDefaults);
+    // magnification is off on a clean account (macOS: com.apple.dock magnification 0), also when the key is missing
+    assert.equal(P.dockDefaults.magnification, false);
+    assert.equal(P.mergeState('{"autohide": true}', {}, P.normalizeDock).magnification, false);
     const d = P.mergeState('{"size": 500, "magnifiedSize": 10, "position": "top"}', {}, P.normalizeDock);
     assert.equal(d.size, 128);
     assert.equal(d.magnifiedSize, 128);

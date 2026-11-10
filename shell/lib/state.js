@@ -18,6 +18,19 @@ function parse(text, defaults) {
     return out;
 }
 
+// state/dock.json defaults, like a clean macOS account (`defaults read com.apple.dock magnification` = 0):
+// magnification is off until the user turns it on in Desktop & Dock. Same values as settings/Parsers.js
+// dockDefaults (size and magnifiedSize in pt; the shell uses only their ratio, see magnifyRatio).
+function dockDefaults() {
+    return { autohide: false, magnification: false, size: 48, magnifiedSize: 96 };
+}
+
+// Magnified size / tile size from dock.json, 1..8 (Settings clamps both to 16..128 pt).
+function magnifyRatio(dock) {
+    const r = Number(dock && dock.magnifiedSize) / Number(dock && dock.size);
+    return isFinite(r) && r > 0 ? Math.min(8, Math.max(1, r)) : 2;
+}
+
 // UPower devices -> true only if a real (non-peripheral) laptop battery is present.
 // UPowerDeviceType.Battery == 2 in Quickshell.
 function hasBattery(devices) {

@@ -21,21 +21,24 @@ Singleton {
     property var lock: ({ screenSaverAfter: 1200, displayOffAfter: 600, requirePasswordAfter: 0, largeClock: "lock" })
     property var input: ({ repeatRate: 25, repeatDelay: 600 })
     property var wallpaper: ({ path: "" })
-    property var dock: ({ autohide: false })
+    property var dock: State.dockDefaults()
 
     component StateFile: FileView {
         required property string key
+        // set: merge over these instead of the current values, so a key removed from the file goes back
+        // to its default (dock.json without `magnification` = off)
+        property var defaults: null
         path: root.dir + key + ".json"
         watchChanges: true
         printErrors: false
         onFileChanged: reload()
-        onLoaded: root[key] = State.parse(text(), root[key])
+        onLoaded: root[key] = State.parse(text(), defaults || root[key])
     }
     StateFile { key: "notifications" }
     StateFile { key: "lock" }
     StateFile { key: "input"; onLoaded: root.applyInput() }
     StateFile { key: "wallpaper" }
-    StateFile { key: "dock" }
+    StateFile { key: "dock"; defaults: State.dockDefaults() }
 
     // ---------- input.json -> Hyprland ----------
     function applyInput() {

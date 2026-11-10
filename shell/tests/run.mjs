@@ -106,6 +106,19 @@ test("state invalid json", () => assert.deepEqual(ST.parse("{oops", defs), defs)
 test("state empty", () => assert.deepEqual(ST.parse("", defs), defs));
 test("state wrong type", () => assert.equal(ST.parse('{"dark":"yes"}', defs).dark, false));
 test("state null", () => assert.equal(ST.parse('{"dark":null}', defs).dark, false));
+
+// ---- Dock defaults (lib/state.js) ----
+test("dock magnification off by default", () => assert.equal(ST.dockDefaults().magnification, false));
+test("dock magnified ratio from the sliders", () => {
+    assert.equal(ST.magnifyRatio(ST.dockDefaults()), 2);
+    assert.equal(ST.magnifyRatio({ size: 64, magnifiedSize: 128 }), 2);
+    assert.equal(ST.magnifyRatio({ size: 48, magnifiedSize: 48 }), 1);
+    assert.equal(ST.magnifyRatio({ size: "x" }), 2);
+});
+test("dock.json without the key keeps magnification off", () => {
+    assert.equal(ST.parse('{"autohide": true}', ST.dockDefaults()).magnification, false);
+    assert.equal(ST.parse('{"magnification": true}', ST.dockDefaults()).magnification, true);
+});
 test("state array", () => assert.deepEqual(ST.parse("[1]", defs), defs));
 test("state unknown key", () => assert.ok(!("x" in ST.parse('{"x":1}', defs))));
 test("state no mutation", () => { ST.parse('{"dark":true}', defs); assert.equal(defs.dark, false); });

@@ -6,8 +6,9 @@ import qs
 import qs.components
 import qs.services
 import qs.HyprK
+import "../lib/state.js" as State
 
-// Floating glass Dock: magnification, running dots, separator + Trash,
+// Floating glass Dock: magnification (when switched on), running dots, separator + Trash,
 // launch on click with bounce, app name tooltip, press lift on icons.
 // Hidden while a window is full screen on this output, and with "Automatically hide and show the
 // Dock" (state/dock.json) until the pointer rests on the bottom edge for the autohide delay.
@@ -21,14 +22,20 @@ ShellWindow {
 
     // tile from the screen width (see Theme.dock.tileFraction)
     readonly property int base: Math.round((screen ? screen.width : 1440) * Theme.dock.tileFraction)
-    readonly property int magnified: Math.round(base * Theme.dock.magnifyRatio)
+    // magnified size: the Magnification slider's ratio to the Size slider (state/dock.json, default 96/48 = 2,
+    // SPEC.md 7 largesize 128 / tilesize 64); the tile itself follows the screen width
+    readonly property int magnified: Math.round(base * State.magnifyRatio(Prefs.dock))
     readonly property int pad: Theme.dock.padding
     readonly property int sidePad: Theme.dock.sidePadding
     readonly property int bgHeight: base + pad * 2
     readonly property int tooltipRoom: Theme.dock.tooltipHeight + Theme.dock.tooltipGap + 8
 
+    // Magnification is off by default, like macOS (state/dock.json `magnification`, Settings >
+    // Desktop & Dock > Magnification). Off: hovering only shows the app name, nothing moves.
+    readonly property bool magnification: Prefs.dock.magnification === true
+
     anchors { bottom: true; left: true; right: true }
-    implicitHeight: dock.magnified + pad + Theme.dock.bottomMargin + tooltipRoom
+    implicitHeight: (magnification ? magnified : base) + Math.max(tooltipRoom, Theme.dock.bounceHeight) + pad + Theme.dock.bottomMargin
     exclusiveZone: autohide ? 0 : bgHeight + Theme.dock.bottomMargin
     namespace: "hyprk-dock"
     WlrLayershell.layer: WlrLayer.Top
@@ -91,7 +98,7 @@ ShellWindow {
     // Like macOS: icon sizes follow the cursor directly every frame; only entering and
     // leaving the Dock ramp the magnification in and out. (A Behavior on each icon's
     // size chased the cursor and lagged behind it, so icons overlapped and jittered.)
-    property real magnify: hovering && Panels.open !== "context" ? 1 : 0
+    property real magnify: magnification && hovering && Panels.open !== "context" ? 1 : 0
     Behavior on magnify { NumberAnimation { duration: Theme.anim.magnify; easing.type: Theme.anim.easing } }
 
     function sizeFor(baseCenter) {
