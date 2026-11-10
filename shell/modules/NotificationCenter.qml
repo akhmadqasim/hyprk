@@ -7,15 +7,14 @@ import qs
 import qs.components
 import qs.services
 import qs.HyprK
-import "../lib/spring.js" as SpringLib
+import "../lib/nc.js" as NcLib
 
 // Notification Center (macOS 27): grouped notifications on top, widgets below.
-// Motion: the whole column slides in from the right screen edge and back out on close (springs fitted
-// to MAC-ANSWERS.md REA 27.2.1 Notification Center panel, see slideAnim).
-// Groups: one card per app with the edges of up to two more peeking below; a click
-// unfolds the stack (cards glide down from behind the first, header with the app
-// name, Show Less and a clear button fades in), Show Less folds it back. Hover shows
-// a close button; swipe right or close clears a card (or a collapsed stack).
+// Motion (lib/nc.js, MAC-ANSWERS.md PC #62): the whole column slides in from the right screen edge as one sheet and
+// back out on close (slideAnim); the list reflows on one spring (stack fold, a card arriving, a stack cleared).
+// Groups: one card per app with two plates peeking below; a click unfolds the stack (cards glide down from behind
+// the first, the app name fades in, Show less and a clear button appear), Show less folds it back. Hover shows a
+// close button; swipe right or close clears a card (or a collapsed stack).
 Item {
     id: nc
 
@@ -28,8 +27,8 @@ Item {
     // the list is clipped for scrolling; this much room around it keeps the close buttons whole
     readonly property int bleed: 12
 
-    readonly property int headerHeight: 28
-    readonly property int cardGap: 8
+    readonly property int headerHeight: Theme.nc.headerHeight
+    readonly property int cardGap: Theme.notif.spacing
     property var expanded: ({})       // appName -> bool
     property string photo: ""
     readonly property string wallpaperDir: Quickshell.shellDir + "/../themes/wallpapers/png"
@@ -66,38 +65,33 @@ Item {
     }
 
     // ---------- open / close ----------
-    // false on the Overlays of the other screens, so they do not slide a copy in and out
+    // false on the windows of the other screens, so they do not slide a copy in and out
     property bool onThisScreen: true
     readonly property bool shown: Panels.open === "nc" && onThisScreen
     readonly property bool animating: slideAnim.running
-    readonly property real progress: slide   // 0 off-screen .. 1 open (Overlay: glass materialize)
-    // share of the panel on screen (0 = its left edge at the screen edge). Reduce motion: fades
+    readonly property real progress: slide   // 0 off-screen .. 1 open
+    // openProgress: 0 off screen .. 1 open. Reduce motion: fades
     property real slide: 0
-    readonly property real slideX: Theme.travel((1 - slide) * (nc.width + Theme.nc.marginRight))
-    // MAC-ANSWERS.md "REA 27.2.1: Notification Center panel": a click open and a click close use ONE curve, SwiftUI
-    // Spring(duration 0.3, bounce -0.2) = interpolatingSpring(mass 1, stiffness 438.65, damping 52.36): response 0.3 s,
-    // damping ratio 1.25, overdamped (no overshoot; 90 % at 0.25 s, 99 % at 0.47 s). Only the x offset animates
-    // (one panel width W -> 0 and back): no fade, scale, blur or stagger. Close: the window is unmapped once the
-    // panel is fully off screen (below 1 % shown) instead of waiting for the spring to settle.
-    // Exact spring on one NumberAnimation (components/SpringCurve.qml, lib/spring.js): runs until within 0.001
-    // of the distance (0.69 s). No per-frame script but the glass settle.
+    readonly property real slideX: Theme.travel((1 - slide) * NcLib.panelTravel)
+    // open and close (lib/nc.js): one critically damped spring, response 0.3 s, over the 376 pt column frame; only
+    // the x offset moves (no fade, scale, blur or stagger; the glass is there from the first frame). The close stops
+    // 0.375 s in (the spring at 99.7 %) and the window goes, as on the Mac. Exact spring on one NumberAnimation
+    // (components/SpringCurve.qml); no per-frame script but the glass settle.
     SpringCurve {
         id: slideAnim
         target: nc
         property: "slide"
-        spring: SpringLib.fromBounce(0.3, -0.2)
+        spring: NcLib.panelSpring
         onRunningChanged: if (running) nc.settle()
     }
-    onSlideChanged: {
-        if (!slideAnim.running) return;
-        if (!shown && slideAnim.goal === 0 && slide < 0.01) slideAnim.snap(0);
-        else settle();
+    Connections {
+        target: slideAnim
+        function onFinished() { if (slideAnim.goal === 0) slideAnim.snap(0); }
     }
-    // The Overlay window is unmapped while nothing shows, so opening maps a new layer surface and the compositor
-    // takes a few frames to present it. A spring started with `shown` ran those frames unseen (the first 2 to 3 steps
-    // of the slide were lost). So the slide starts on the window's first presented frame (frameSwapped, like
-    // Spotlight), which shows the panel still off screen; the next frame is step 1. If the window is already mapped
-    // (a menu was open) it starts at once.
+    onSlideChanged: if (slideAnim.running) settle()
+    // The window is unmapped while nothing shows, so opening maps a new layer surface and the compositor takes a few
+    // frames to present it. A spring started with `shown` ran those frames unseen. So the slide starts on the window's
+    // first presented frame (frameSwapped), which shows the panel still off screen; the next frame is step 1.
     property bool windowLive: false
     property bool openPending: false
     Connections {
@@ -112,6 +106,7 @@ Item {
     function startOpen() {
         openPending = false;
         if (!shown) return;
+        slideAnim.cutAt = 0;
         slideAnim.go(1);
     }
     onShownChanged: {
@@ -121,10 +116,13 @@ Item {
             refresh();
         } else {
             openPending = false;
+            slideAnim.cutAt = NcLib.panelCloseCut;
             slideAnim.go(0);
             expanded = ({});         // macOS reopens with every stack collapsed
         }
     }
+    // open and at rest: a group created now is a notification arriving (it pushes the list down and fades in)
+    readonly property bool live: shown && !slideAnim.running && slide === 1
 
     // ---------- groups: one stable row per app, so stacks animate instead of being rebuilt ----------
     property var itemsByApp: ({})
@@ -197,92 +195,116 @@ Item {
                             const next = nc.itemsByApp[app] || [];
                             if (next.map(x => x.nid).join() !== items.map(x => x.nid).join()) items = next;
                         }
-                        Component.onCompleted: syncItems()
                         Connections {
                             target: nc
                             function onItemsByAppChanged() { grp.syncItems(); }
                         }
                         readonly property int n: items.length
                         readonly property bool open: n > 1 && nc.expanded[app] === true
-                        property bool closing: false
                         property var heights: []
                         function measure() {
                             const h = [];
                             for (let i = 0; i < cards.count; i++) h.push(cards.itemAt(i) ? cards.itemAt(i).implicitHeight : 0);
                             heights = h;
                         }
-                        function h(i) { return heights[i] || Theme.notif.iconSize + Theme.notif.padding * 2; }
+                        function h(i) { return heights[i] || Theme.notif.iconSize + Theme.notif.padY * 2; }
                         function openY(i) {
                             let y = nc.headerHeight + nc.cardGap;
                             for (let k = 0; k < i; k++) y += h(k) + nc.cardGap;
                             return y;
                         }
                         function cardY(i) { return closedY(i) + (openY(i) - closedY(i)) * ex; }
-                        // behind the first card, bottom edges where its peek strips are drawn
+                        // behind the first card, bottom edges where its plates are drawn
                         function closedY(i) { return i === 0 ? 0 : h(0) - h(i) + Math.min(i, 2) * Theme.notif.stackPeek; }
                         readonly property real closedHeight: h(0) + Math.min(n - 1, 2) * Theme.notif.stackPeek
                         readonly property real openHeight: n > 1 ? openY(n - 1) + h(n - 1) : h(0)
-                        // one spring drives the whole fold: 0 stacked, 1 unfolded
-                        Spring {
-                            id: fold
-                            target: grp.open ? 1 : 0
-                            onStarted: nc.settle()
+                        // the fold: 0 stacked, 1 unfolded, on the list reflow spring (lib/nc.js)
+                        property real ex: 0
+                        SpringCurve { id: fold; target: grp; property: "ex"; spring: NcLib.reflowSpring }
+                        onOpenChanged: fold.go(open ? 1 : 0)
+                        // the group's share of the list: 0 -> 1 when it arrives while the panel is open (the list
+                        // below is pushed down), 1 -> 0 after it was cleared (the list closes up); same spring
+                        property real slot: 1
+                        SpringCurve { id: slotAnim; target: grp; property: "slot"; spring: NcLib.reflowSpring }
+                        // opacity of the cards: an arriving card fades in at its final place, a cleared one fades out
+                        property real shade: 1
+                        Component.onCompleted: {
+                            syncItems();
+                            if (!nc.live) return;
+                            slot = 0;
+                            shade = 0;
+                            slotAnim.go(1);
+                            arrive.start();
                         }
-                        readonly property real ex: fold.value
-                        // shrinks the stack while it is cleared (idle otherwise)
-                        Spring {
-                            id: size
-                            epsilon: 0.3
-                            onStarted: nc.settle()
+                        SequentialAnimation {
+                            id: arrive
+                            PauseAnimation { duration: Theme.ms(NcLib.arriveDelayMs) }
+                            NumberAnimation { target: grp; property: "shade"; to: 1; duration: Theme.ms(NcLib.arriveFadeMs) }
                         }
-                        // follow the fold exactly while it runs, so content below moves with the cards
-                        readonly property real liveHeight: grp.closing ? size.value
-                            : closedHeight + (openHeight - closedHeight) * ex
+                        readonly property real liveHeight: closedHeight + (openHeight - closedHeight) * ex
                         Layout.fillWidth: true
-                        Layout.preferredHeight: Math.max(0, liveHeight)
-                        // while clearing, the gap below closes with the height
-                        property real startHeight: 1
-                        readonly property real remain: grp.closing ? Math.max(0, size.value) / startHeight : 1
-                        Layout.bottomMargin: -nc.cardGap * (1 - remain)
-                        opacity: remain
+                        Layout.preferredHeight: Math.max(0, liveHeight * slot)
+                        Layout.bottomMargin: -nc.cardGap * (1 - slot)
                         onLiveHeightChanged: nc.settle()
+                        onSlotChanged: nc.settle()
 
-                        // clear the whole stack: shrink and fade, then remove for real
+                        // clear the whole stack: fade out in place, then the list closes up, then remove for real
+                        property bool closing: false
+                        property var clearing: []
                         function clearAll() {
                             if (closing) return;
-                            startHeight = Math.max(1, liveHeight);   // also mid-fold: no jump
-                            size.target = startHeight;
-                            size.snap();
                             closing = true;
-                            size.target = 0;
+                            arrive.stop();
                             clearing = items.map(x => x.nid);       // only what is on screen now
-                            clearLater.start();
+                            vanish.start();
                         }
-                        property var clearing: []
-                        Timer { id: clearLater; interval: 380; onTriggered: grp.clearing.forEach(id => Notifs.dismiss(id)) }
+                        SequentialAnimation {
+                            id: vanish
+                            NumberAnimation { target: grp; property: "shade"; to: 0; duration: Theme.ms(NcLib.clearFadeMs) }
+                            ScriptAction { script: grp.closeUp() }
+                        }
+                        function closeUp() {
+                            slotAnim.go(0);
+                            removeLater.interval = slotAnim.duration;
+                            removeLater.start();
+                        }
+                        Timer { id: removeLater; onTriggered: grp.clearing.forEach(id => Notifs.dismiss(id)) }
                         Connections {
                             target: nc
                             function onClearStack(app) { if (app === grp.app) grp.clearAll(); }
                         }
 
-                        // header of an unfolded stack
+                        // header of an unfolded stack: the app name fades with the fold, the buttons appear and go at
+                        // once (PC #62 3d/3e); their glass waits until the front card has slid below them (touching
+                        // compositor glass shapes merge into one box)
                         RowLayout {
                             width: parent.width
                             height: nc.headerHeight
-                            opacity: Math.max(0, (grp.ex - 0.4) / 0.6)
-                            visible: opacity > 0.01
+                            visible: grp.ex > 0.01
+                            spacing: Theme.nc.pillGap
                             Text {
                                 Layout.fillWidth: true
                                 Layout.leftMargin: 4
+                                opacity: Math.max(0, (grp.ex - 0.4) / 0.6)
                                 text: grp.app
                                 elide: Text.ElideRight
                                 font: Typography.font(15, Typography.semibold)
                                 color: Theme.color.label
                             }
-                            // no glass until the front card has slid below the header (overlapping
-                            // regions would merge into one box)
-                            Pill { text: "Show Less"; glass: grp.cardY(0) >= nc.headerHeight; onActivated: nc.setExpanded(grp.app, false) }
-                            Pill { symbol: "xmark"; glass: grp.cardY(0) >= nc.headerHeight; onActivated: grp.clearAll() }
+                            Pill {
+                                text: "Show less"
+                                implicitHeight: Theme.nc.pillSmall
+                                visible: grp.open
+                                glass: grp.cardY(0) >= nc.headerHeight
+                                onActivated: nc.setExpanded(grp.app, false)
+                            }
+                            Pill {
+                                symbol: "xmark"
+                                implicitHeight: Theme.nc.pillSmall
+                                visible: grp.open
+                                glass: grp.cardY(0) >= nc.headerHeight
+                                onActivated: grp.clearAll()
+                            }
                         }
 
                         Repeater {
@@ -298,11 +320,14 @@ Item {
                                 width: nc.width
                                 y: grp.cardY(index)
                                 z: -index
-                                scale: front ? 1 : 1 - Math.min(index, 2) * 0.045 * (1 - grp.ex)
+                                // grows from its plate (inset 17 / 24 pt per side) as it unfolds
+                                scale: front ? 1 : 1 - Theme.notif.plateInset[Math.min(index, 2) - 1] * 2 / width * (1 - grp.ex)
                                 transformOrigin: Item.Bottom
                                 // keep the glass 1 px below the card above while unfolding (scale is about the bottom)
                                 glassTop: front ? 0 : Math.max(0, (grp.cardY(index - 1) + grp.h(index - 1) + 1 - y - height * (1 - scale)) / Math.max(scale, 0.01))
                                 visible: front || grp.ex > 0.01
+                                opacity: grp.shade
+                                materialize: grp.shade
                                 nid: modelData.nid
                                 appName: modelData.appName
                                 appIcon: modelData.appIcon
@@ -312,9 +337,9 @@ Item {
                                 time: modelData.time
                                 shadow: false
                                 // stacked behind the first card its glass region would merge into one box
-                                glass: !grp.closing && (front || grp.ex > 0.05) && nc.fits(c, nc.layoutTick + y)
+                                glass: grp.shade > 0 && (front || grp.ex > 0.05) && nc.fits(c, nc.layoutTick + y)
                                 contentOpacity: Math.min(1, reveal)
-                                stacked: front && grp.ex < 0.05 && !grp.closing ? Math.min(grp.n - 1, 2) : 0
+                                stacked: front && grp.ex < 0.05 ? Math.min(grp.n - 1, 2) : 0
                                 swipeable: front || grp.open
                                 sx: nc.originX + nc.slideX + x
                                 sy: nc.originY + grp.y + y - flick.contentY
@@ -334,10 +359,18 @@ Item {
 
                 }
 
-                // widgets: medium Calendar (month grid left, Up Next right), small analog Clock
+                // widgets: medium Calendar (month grid left, Up Next right), small analog Clock. "Dark" widget style
+                // in light and dark appearance alike (PC #62 1b)
                 Widget {
                     Layout.preferredWidth: Theme.nc.width
-                    color: Theme.nc.calendarBg
+                    gradient: Gradient {
+                        GradientStop { position: 0; color: Theme.nc.calendarTop }
+                        GradientStop { position: 1; color: Theme.nc.calendarBottom }
+                    }
+                    // the Calendar's content fades in with the open (PC #62 2b: alpha tracks openProgress), not on close
+                    Item {
+                    anchors.fill: parent
+                    opacity: nc.shown ? nc.slide : 1
                     // left half: month name and grid, today in a red circle
                     Column {
                         x: Theme.nc.widgetPadding
@@ -380,7 +413,7 @@ Item {
                                         anchors.centerIn: parent
                                         text: parent.isHeader ? month.dayNames[parent.index] : parent.day > 0 ? parent.day : ""
                                         font: Typography.font(Theme.font.widgetMonth, parent.isHeader ? Typography.semibold : Typography.regular)
-                                        color: parent.isToday ? Theme.nc.onImage : parent.isHeader ? Theme.color.secondaryLabel : Theme.color.label
+                                        color: parent.isToday ? Theme.nc.onImage : parent.isHeader ? Theme.nc.widgetSecondary : Theme.nc.widgetLabel
                                     }
                                 }
                             }
@@ -399,7 +432,7 @@ Item {
                         Text {
                             text: clock.date.getDate()
                             font: Typography.font(Theme.font.widgetBig)
-                            color: Theme.color.label
+                            color: Theme.nc.widgetLabel
                         }
                         Text {
                             width: parent.width
@@ -407,8 +440,9 @@ Item {
                             wrapMode: Text.WordWrap
                             text: "No more events today"
                             font: Typography.font(Theme.font.widgetSmall + 1, Typography.medium)
-                            color: Theme.color.secondaryLabel
+                            color: Theme.nc.widgetSecondary
                         }
+                    }
                     }
                 }
                 Widget {
@@ -487,7 +521,8 @@ Item {
 
                 RowLayout {
                     Layout.alignment: Qt.AlignHCenter
-                    spacing: 8
+                    Layout.topMargin: Theme.nc.editGap - content.spacing
+                    spacing: Theme.nc.pillGap
                     Pill { text: "Edit Widgets" }
                     Pill { symbol: "xmark"; onActivated: Panels.close() }
                 }
@@ -525,7 +560,7 @@ Item {
         property bool glass: true
         signal activated()
         implicitWidth: symbol ? implicitHeight : pt.implicitWidth + 20
-        implicitHeight: 24
+        implicitHeight: Theme.nc.pillHeight
         Glass {
             anchors.fill: parent
             // the list clips its content, the compositor glass does not: no glass while scrolled out

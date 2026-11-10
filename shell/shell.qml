@@ -29,6 +29,7 @@ ShellRoot {
                 Dock { modelData: perScreen.modelData }
                 Overlay { modelData: perScreen.modelData }
                 ControlCenterWindow { modelData: perScreen.modelData }
+                NotificationCenterWindow { modelData: perScreen.modelData }
             }
         }
     }

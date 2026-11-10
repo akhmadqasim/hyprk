@@ -7,13 +7,14 @@ import qs
 import qs.services
 import qs.HyprK
 import "../lib/clock.js" as Clock
+import "../lib/nc.js" as NcLib
 
-// One notification (banner and Notification Center), macOS 27 layout: app icon
+// One notification (banner and Notification Center), macOS 27 layout (Theme.notif, PC #62): app icon
 // (or the sender's picture with a small app badge), bold title + relative time,
-// body. Hover shows a round close button on the top-left corner; a drag to the
-// right swipes it away. `stacked` draws the edges of the cards behind a collapsed
-// group as plain QML strips: the compositor glass merges touching shapes into
-// one box, so real glass cards behind would just make this card taller.
+// body. Hover shows a round close button on the top-left corner at once and, on a stack, a "Show" capsule that
+// crossfades with the time; a drag to the right swipes it away. `stacked` draws the plates of the cards behind a
+// collapsed group as plain QML strips: the compositor glass merges touching shapes into one box, so real glass
+// cards behind would just make this card taller.
 Item {
     id: card
 
@@ -38,13 +39,18 @@ Item {
     property bool swipeable: true
     readonly property bool hovered: hoverH.hovered || closeMa.containsMouse
     readonly property real swipeX: slide.x
+    // 0 time label .. 1 "Show" capsule (hover over a collapsed stack), one spring both ways
+    property real showMix: 0
+    SpringCurve { id: showAnim; target: card; property: "showMix"; spring: NcLib.hoverSpring }
+    readonly property bool showWanted: hovered && stacked > 0 && !drag.active
+    onShowWantedChanged: showAnim.go(showWanted ? 1 : 0)
 
     signal clicked()
     signal closed()                     // close button
     signal swiped()                     // dragged off to the right
 
     implicitWidth: Theme.notif.width
-    implicitHeight: Math.max(Theme.notif.iconSize, textCol.implicitHeight) + Theme.notif.padding * 2
+    implicitHeight: Math.max(Theme.notif.iconSize, textCol.implicitHeight) + Theme.notif.padY * 2
 
     // plugin glass only follows moving items while the window re-measures
     function settle() { const w = QsWindow.window; if (w && w.settleGlass) w.settleGlass(); }
@@ -69,7 +75,7 @@ Item {
                 height: Theme.notif.stackPeek
                 clip: true
                 Rectangle {
-                    x: parent.depth * Theme.notif.stackInset
+                    x: Theme.notif.plateInset[parent.index]
                     width: card.width - x * 2
                     height: Theme.notif.radius * 2
                     y: parent.height - height
@@ -102,7 +108,7 @@ Item {
             // icon: sender picture with a small app badge (Messages, Mail), else the app icon
             Item {
                 id: iconBox
-                x: Theme.notif.padding
+                x: Theme.notif.padX
                 anchors.verticalCenter: parent.verticalCenter
                 width: Theme.notif.iconSize
                 height: Theme.notif.iconSize
@@ -140,7 +146,7 @@ Item {
             Column {
                 id: textCol
                 x: iconBox.x + iconBox.width + Theme.notif.iconGap
-                width: card.width - x - Theme.notif.padding
+                width: card.width - x - Theme.notif.padRight
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 1
 
@@ -156,8 +162,9 @@ Item {
                     }
                     Text {
                         text: Clock.relative(card.time, Notifs.now)
-                        font: Typography.subheadline   // 11, TODO verify
+                        font: Typography.subheadline   // 11 ("2m ago" is 38 pt wide on the Mac)
                         color: Theme.color.secondaryLabel
+                        opacity: 1 - card.showMix
                     }
                 }
                 Text {
@@ -180,16 +187,32 @@ Item {
         }
         HoverHandler { id: hoverH }
 
-        // close button: round, on the top-left corner, fades in on hover (macOS)
+        // "Show" on a collapsed stack (hover): bottom-right, crossfading with the time label (PC #62 3f)
+        Rectangle {
+            x: card.width - width - Theme.notif.showInset.x
+            y: card.height - height - Theme.notif.showInset.y
+            width: Theme.notif.showSize.width
+            height: Theme.notif.showSize.height
+            radius: height / 2
+            color: Theme.nc.pillLift
+            opacity: card.showMix
+            visible: opacity > 0.01
+            Text {
+                anchors.centerIn: parent
+                text: "Show"
+                font: Typography.font(12, Typography.medium)
+                color: Theme.color.label
+            }
+        }
+
+        // close button: round, on the top-left corner, shows and hides at once on hover (PC #62 3f)
         Item {
             id: closeBtn
-            x: -7
-            y: -7
-            width: 20
-            height: 20
-            opacity: card.hovered && card.contentOpacity > 0.5 && !drag.active ? 1 : 0
-            visible: opacity > 0
-            Behavior on opacity { NumberAnimation { duration: Theme.anim.fast } }
+            x: Theme.notif.closeAt.x
+            y: Theme.notif.closeAt.y
+            width: Theme.notif.closeSize
+            height: Theme.notif.closeSize
+            visible: card.hovered && card.contentOpacity > 0.5 && !drag.active
             RectangularShadow {
                 anchors.fill: parent
                 radius: width / 2

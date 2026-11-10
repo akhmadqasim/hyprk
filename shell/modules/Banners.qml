@@ -5,13 +5,15 @@ import qs
 import qs.components
 import qs.services
 import qs.HyprK
+import "../lib/nc.js" as NcLib
 
-// Notification banners, top-right below the menu bar (macOS 27):
-// - one banner per app; more from the same app stack behind it (edges peek below)
-// - slide in from the right edge on the SwiftUI spring (0.5 s, critically damped), the glass
-//   materializing as it comes (Liquid Glass: lensing, blur and rim ramp in with the slide)
-// - expire after Theme.notif.timeout unless hovered, then slide back out to the right
-//   (dematerializing); Reduce motion: they dissolve in place instead
+// Notification banners, top-right below the menu bar, in the Notification Center card column (macOS 27.2.1, PC #62 3a/3b,
+// lib/nc.js):
+// - one banner per app; more from the same app stack behind it (plates below)
+// - slide in from the right (spring 0.43 s, ratio 0.9, from 462 pt out) while fading in and growing from 0.85; the
+//   glass materializes with the fade. One progress value (`enter`) drives offset, opacity and scale
+// - expire after Theme.notif.timeout (4.97 s) unless hovered, then slide back out to the right on Spring(0.3, -0.2),
+//   fading out, gone after 0.15 s (`leave`); they do not fly into Notification Center. Reduce motion: they dissolve
 // - the others glide up into the gap; swipe right sends the stack to Notification Center
 // - close button (hover, top-left) removes the notifications; a click opens the app
 ShellWindow {
@@ -22,11 +24,10 @@ ShellWindow {
 
     readonly property int maxStacks: 3
     readonly property int edge: 24                     // room for shadow and close button
-    readonly property real slideOut: Theme.notif.width + Theme.notif.marginRight + edge
 
     visible: stacks.count > 0 && Panels.open !== "nc"
     anchors { top: true; right: true }
-    margins.top: Theme.notif.marginTop
+    margins.top: Theme.notif.marginTop - list.y
     margins.right: Theme.notif.marginRight - edge
     implicitWidth: Theme.notif.width + edge * 2
     implicitHeight: Math.max(1, list.contentHeight + edge * 2)
@@ -90,22 +91,8 @@ ShellWindow {
         spacing: Theme.notif.spacing
         model: stacks
 
-        // The compositor glass merges touching shapes into one box, so the older banners make
-        // room first (faster spring) and the new one enters just behind them from off-screen.
-        add: Transition {
-            SequentialAnimation {
-                PropertyAction { property: "x"; value: A11y.reduceMotion ? 0 : win.slideOut }
-                PropertyAction { property: "fade"; value: A11y.reduceMotion ? 0 : 1 }
-                PauseAnimation { duration: list.count > 1 ? 150 : 0 }
-                ParallelAnimation {
-                    NumberAnimation { property: "x"; to: 0; duration: Theme.anim.bannerIn; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
-                    NumberAnimation { property: "fade"; to: 1; duration: Tokens.motion.crossfade * 1000 }
-                }
-            }
-        }
         displaced: Transition {
             NumberAnimation { property: "y"; duration: 360; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
-            NumberAnimation { property: "x"; to: 0; duration: 360; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
         }
         move: Transition {
             NumberAnimation { property: "y"; duration: Theme.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
@@ -130,21 +117,32 @@ ShellWindow {
             height: card.height + Math.min(stack - 1, 2) * Theme.notif.stackPeek
             property bool swipedAway: false
             property bool armed: true
-            property real fade: 1                  // Reduce motion: dissolve instead of the slide
 
-            transform: Translate { id: out; x: 0 }
+            // 0 off to the right .. 1 in place; Reduce motion: a fade only
+            property real enter: 0
+            SpringCurve { id: enterAnim; target: row; property: "enter"; spring: NcLib.bannerInSpring }
+            // 0 in place .. 1 gone to the right (cut at 0.15 s, where the Mac's banner is gone)
+            property real leave: 0
+            SpringCurve {
+                id: leaveAnim
+                target: row; property: "leave"; spring: NcLib.bannerOutSpring; cutAt: NcLib.bannerOutCut
+                onFinished: { stacks.remove(row.index); win.settleGlass(); }
+            }
+            readonly property real offset: Theme.travel((1 - enter) * NcLib.bannerInTravel + leave * NcLib.bannerOutTravel)
+            readonly property real fade: NcLib.bannerInOpacity(enter) * NcLib.bannerOutOpacity(leave)
+            // The compositor glass merges touching shapes into one box, so the older banners make room first and the
+            // new one enters just behind them
+            Component.onCompleted: {
+                if (index > 0 || list.count < 2) enterAnim.go(1);
+                else enterLater.start();
+                win.settleGlass(enterAnim.duration + 200);
+            }
+            Timer { id: enterLater; interval: 150; onTriggered: { enterAnim.go(1); win.settleGlass(enterAnim.duration + 50); } }
             onLeavingChanged: {
                 if (!leaving) return;
-                if (swipedAway) { stacks.remove(index); win.settleGlass(); }
-                else leave.start();
-            }
-            SequentialAnimation {
-                id: leave
-                ParallelAnimation {
-                    NumberAnimation { target: out; property: "x"; to: A11y.reduceMotion ? 0 : win.slideOut; duration: 380; easing.type: Easing.InOutCubic }
-                    NumberAnimation { target: row; property: "fade"; to: A11y.reduceMotion ? 0 : 1; duration: Tokens.motion.crossfade * 1000 }
-                }
-                ScriptAction { script: { stacks.remove(row.index); win.settleGlass(); } }
+                if (swipedAway) { stacks.remove(index); win.settleGlass(); return; }
+                leaveAnim.go(1);
+                win.settleGlass(leaveAnim.duration + 50);
             }
             onXChanged: win.settleGlass()
             onYChanged: win.settleGlass()
@@ -162,10 +160,12 @@ ShellWindow {
                 stacked: row.stack - 1
                 swipeable: !row.leaving
                 opacity: row.fade
-                materialize: row.fade * Math.max(0, Math.min(1, 1 - (row.x + out.x) / win.slideOut))
+                materialize: row.fade
+                scale: Theme.reduceMotion ? 1 : NcLib.bannerInScale(row.enter)
+                transform: Translate { x: row.offset }
                 // banner window origin: right-aligned below the menu bar
-                sx: win.screen.width - win.width - (Theme.notif.marginRight - win.edge) + list.x + row.x + out.x
-                sy: Theme.menuBar.height + Theme.notif.marginTop + list.y + row.y
+                sx: win.screen.width - win.width - (Theme.notif.marginRight - win.edge) + list.x + row.x + row.offset
+                sy: Theme.menuBar.height + Theme.notif.marginTop + row.y
                 onClicked: { Notifs.invokeDefault(nid); Notifs.hideBanners(row.app); }
                 onClosed: Notifs.dismissBanners(row.app)
                 onSwiped: { row.swipedAway = true; Notifs.hideBanners(row.app); }

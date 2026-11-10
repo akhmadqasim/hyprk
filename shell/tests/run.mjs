@@ -766,13 +766,83 @@ test("mode buttons start inside the field, end in place", () => {
         assert.ok(t > 0.115 && t < 0.13, `t ${t}`);
     });
     test("spring curve: the modules use the library, with Apple's numbers", () => {
-        assert.match(src("modules/NotificationCenter.qml"), /SpringLib\.fromBounce\(0\.3, -0\.2\)/);
+        assert.match(src("modules/NotificationCenter.qml"), /spring: NcLib\.panelSpring/);
         assert.match(src("modules/ControlCenterWindow.qml"), /SpringLib\.fromBounce\(0\.25, -0\.027\)/);
         const hud = src("services/Hud.qml");
         for (const re of [/fromPhysics\(2, 300, 50\)/, /fromResponse\(0\.48669, 1\)/, /fromResponse\(0\.2, 0\.85\)/]) assert.match(hud, re);
         const sl = src("modules/Spotlight.qml");
         for (const re of [/fromBounce\(0\.28, 0\.41\)/, /fromBounce\(0\.28, 0\.32\)/, /fromBounce\(0\.45, 0\.05\)/]) assert.match(sl, re);
         assert.ok(!/slideCurve/.test(src("modules/NotificationCenter.qml")), "no hand-fitted NC curve left");
+    });
+}
+
+// ---- Notification Center motion and layout (lib/nc.js, Theme; MAC-ANSWERS PC #62 and "NC panel spring") ----
+{
+    const shell = join(here, "..");
+    const ncSrc = readFileSync(join(shell, "lib", "nc.js"), "utf8").replace(/^\.pragma library\s*$/m, "");
+    const NC = new Function(ncSrc + "\nreturn {" + [...ncSrc.matchAll(/^(?:var|function) (\w+)/gm)].map(m => m[1]).join(",") + "};")();
+    const SPL = load("spring.js");
+    // Mac tracks (pt per 60 fps frame, motion.json): open from the first visible frame, close from motion start
+    const open = [339, 293.5, 245, 199, 159.5, 125, 97.5, 75.5, 57.5, 44, 33.5, null, 14.5, 11, 8, 5.5, 4.5, 3.5, 2.5, 2, 1.5, 1, 1, 0.5, 0.5, 0];
+    const close = [0, 7, 38, 83, 131.5, 178, 216.5, 250, 278.5, 300.5, 317.5, 332, 342.5, 350.5, 357];
+    // best RMS over start time and travel
+    function fit(track, s, isOpen, W0, W1) {
+        let best = 1e9;
+        for (let W = W0; W <= W1; W += 1) for (let t0 = -0.03; t0 <= 0.1; t0 += 0.001) {
+            let se = 0, n = 0;
+            track.forEach((y, i) => {
+                if (y === null) return;
+                const v = SPL.value(s, 0, Math.max(0, t0 + i / 60));
+                se += ((isOpen ? W * (1 - v) : W * v) - y) ** 2; n++;
+            });
+            best = Math.min(best, Math.sqrt(se / n));
+        }
+        return best;
+    }
+    test("nc: panel spring is the clamped Spring(0.3, -0.2)", () => {
+        assert.deepEqual(NC.panelSpring, SPL.fromBounce(0.3, -0.2));
+    });
+    test("nc: critical fits the open and close tracks, ratio 1.25 does not", () => {
+        const crit = NC.panelSpring, over = SPL.fromResponse(0.3, 1.25);
+        const o1 = fit(open, crit, true, 360, 400), c1 = fit(close, crit, false, 360, 400);
+        const o2 = fit(open, over, true, 360, 480), c2 = fit(close, over, false, 360, 480);
+        assert.ok(o1 < 1.5 && c1 < 1, `critical ${o1.toFixed(2)} / ${c1.toFixed(2)} pt`);
+        assert.ok(o2 > 10 && c2 > 3, `ratio 1.25 ${o2.toFixed(2)} / ${c2.toFixed(2)} pt`);
+    });
+    test("nc: close stops at 0.375 s with the spring at 99.7 %", () => {
+        assert.ok(Math.abs(SPL.value(NC.panelSpring, 0, NC.panelCloseCut) - 0.9966) < 0.0005);
+    });
+    test("nc: list reflow 0.2 / 1.25 fits the stack expand (44 pt)", () => {
+        const ex = [0, 5.5, 5.5, 20.5, 25, 29, 32, 35, 37, 39, 40, 41, 41, 42, 42.5, 43, 43, 43.5, 43.5, 43.5, 44];
+        assert.ok(fit(ex, NC.reflowSpring, false, 40, 48) < 2);
+    });
+    test("nc: banner out fits the dismiss track, fades out by the cut", () => {
+        const out = [0, 10, 51, 104, 148, 192, 230.5, 260.5, 297.5, 319.5];
+        assert.ok(fit(out, NC.bannerOutSpring, false, 440, 460) < 3);
+        const p = SPL.value(NC.bannerOutSpring, 0, NC.bannerOutCut);
+        assert.ok(NC.bannerOutOpacity(p) < 0.03 && NC.bannerOutOpacity(0) === 1, `opacity at the cut ${NC.bannerOutOpacity(p)}`);
+    });
+    test("nc: banner in from 462 pt, opacity and scale ramp to 1", () => {
+        const arr = [276, 220.5, 178.5, null, 138, 111.5, 83.5, 64.5, 48.5, 37, 28, 21, null, 12, 9];
+        assert.ok(fit(arr, NC.bannerInSpring, true, NC.bannerInTravel, NC.bannerInTravel) < 6);
+        assert.equal(NC.bannerInOpacity(1), 1); assert.equal(NC.bannerInOpacity(0.2), 0);
+        assert.equal(NC.bannerInScale(0), 0.85); assert.equal(NC.bannerInScale(1), 1);
+    });
+    test("nc: hover crossfade 50 % at 0.1 s, 95 % at 0.27 s", () => {
+        const v = t => SPL.value(NC.hoverSpring, 0, t);
+        assert.ok(Math.abs(v(0.1) - 0.5) < 0.05 && Math.abs(v(0.27) - 0.95) < 0.02);
+    });
+    test("nc: layout numbers (Theme)", () => {
+        const th = readFileSync(join(shell, "Theme.qml"), "utf8");
+        const block = name => th.slice(th.indexOf(`property QtObject ${name}: QtObject`), th.indexOf("\n    }\n", th.indexOf(`property QtObject ${name}: QtObject`)));
+        const num = (b, k) => Number(b.match(new RegExp(`property \\w+ ${k}: ([\\d.]+)`))[1]);
+        const n = block("notif"), c = block("nc");
+        assert.deepEqual([num(n, "width"), num(n, "radius"), num(n, "spacing"), num(n, "marginTop"), num(n, "marginRight"), num(n, "stackPeek"), num(n, "closeSize"), num(n, "timeout")],
+                         [344, 20, 6, 10, 16, 8, 20, 4970]);
+        assert.match(n, /plateInset: \[17, 24\]/);
+        assert.deepEqual([num(c, "width"), num(c, "spacing"), num(c, "pillHeight"), num(c, "pillSmall"), num(c, "marginRight")], [344, 16, 24, 20, 16]);
+        assert.equal((num(c, "width") - num(c, "spacing")) / 2, 164, "widgets 164 square");
+        assert.equal(num(c, "width") + 2 * num(c, "marginRight"), NC.panelTravel, "column frame 376 = slide travel");
     });
 }
 

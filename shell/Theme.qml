@@ -290,29 +290,44 @@ Singleton {
 
     // ---------- notifications ----------
     readonly property QtObject notif: QtObject {
-        readonly property int width: 344                 // TODO verify
-        readonly property int radius: 24                 // macOS 26 banner, TODO verify
-        readonly property int padding: 14                // TODO verify
-        readonly property int iconSize: 34               // TODO verify
-        readonly property int iconGap: 10                // icon to text, TODO verify
-        readonly property int marginTop: 8               // below menu bar, TODO verify
-        readonly property int marginRight: 10            // TODO verify
-        readonly property int spacing: 8                 // between stacked banners, TODO verify
-        readonly property int timeout: 5000              // ms banner visible
-        readonly property int closeSize: 18
+        // card geometry: MAC-ANSWERS "Notification Center glass and transitions (PC #62)" 1a and the 2x crops in
+        // reference/screens/27.2.1/nc (hover-off-on-dark-grey.png, stack-*.png); banners use the same card
+        readonly property int width: 344                 // x 1350..1694
+        readonly property int radius: 20                 // RoundedRectangle(cornerRadius: 20, style: .continuous)
+        readonly property int padX: 13                   // card edge to the icon
+        readonly property int padY: 12                   // 75 tall with three 17 pt lines
+        readonly property int padRight: 14               // the time label's right edge
+        readonly property int iconSize: 32
+        readonly property int iconGap: 13                // icon to text
+        readonly property int lineHeight: 17
+        readonly property int marginTop: 10              // below the menu bar (top at y 44 under a 34 pt bar)
+        readonly property int marginRight: 16            // 1694 on a 1710 pt screen
+        readonly property int spacing: 6                 // between cards
+        readonly property int timeout: 4970              // ms a banner stays (PC #62 3a)
         readonly property int maxBodyLines: 4
-        readonly property int stackPeek: 8               // visible edge of grouped cards below, TODO verify
-        readonly property int stackInset: 10             // each stacked card is this much narrower per side
+        readonly property int stackPeek: 8               // each plate of a collapsed stack shows 8 pt
+        readonly property var plateInset: [17, 24]       // plate 1 and plate 2, per side
+        // hover: x circle 20 pt at (-6, -4) from the card's top-left; "Show" capsule 64 x 22, 9.5 / 9 from the
+        // bottom-right corner, crossfading with the time label
+        readonly property int closeSize: 20
+        readonly property point closeAt: Qt.point(-6, -4)
+        readonly property size showSize: Qt.size(64, 22)
+        readonly property point showInset: Qt.point(9.5, 9)
     }
 
-    readonly property QtObject nc: QtObject {          // Notification Center (reference ~2x, measured)
-        readonly property int width: 328
+    readonly property QtObject nc: QtObject {          // Notification Center (PC #62, 27.2.1)
+        readonly property int width: 344                 // the card column
         readonly property int marginTop: 10
-        readonly property int marginRight: 14            // TODO verify
+        readonly property int marginRight: 16
         readonly property int spacing: 16                // between widgets
-        readonly property int widgetRadius: 22
-        readonly property int widgetSmall: (width - spacing) / 2
+        readonly property int widgetRadius: 22           // continuous r 22-24
+        readonly property int widgetSmall: (width - spacing) / 2   // 164
         readonly property int widgetPadding: 16
+        readonly property int editGap: 56                // last widget to "Edit Widgets"
+        readonly property int headerHeight: 38           // app name row of an unfolded stack: the front card moves 44 pt
+        readonly property int pillHeight: 24             // "Edit Widgets" and its x (r 12, padding 10)
+        readonly property int pillSmall: 20              // "Show less" and a stack's x (r 10, padding 10)
+        readonly property int pillGap: 6
         readonly property real upNextSplit: 0.56         // Calendar: month grid left, Up Next right
         readonly property int monthCell: 17              // mini month cell
         readonly property int monthGap: 2
@@ -321,12 +336,24 @@ Singleton {
         readonly property color onImageSecondary: Qt.rgba(1, 1, 1, 0.85)
         readonly property real photoScrim: 0.45          // bottom gradient behind the caption
         readonly property real photoAspect: 0.48         // Photos widget height / width, measured
-        readonly property color calendarBg: theme.dark ? "#1C1C1E" : "#FFFFFF"   // opaque like macOS widgets
+        // widgets follow the "Dark" widget style in light and dark alike (PC #62 1b): the Calendar is opaque,
+        // (32,31,31) at the top to 13 at the bottom, white text
+        readonly property color calendarTop: Qt.rgba(32 / 255, 31 / 255, 31 / 255, 1)
+        readonly property color calendarBottom: Qt.rgba(13 / 255, 13 / 255, 13 / 255, 1)
+        readonly property color widgetLabel: "#FFFFFF"
+        readonly property color widgetSecondary: Qt.rgba(1, 1, 1, 0.55)
         readonly property color pillLift: theme.dark ? Qt.rgba(1, 1, 1, 0.16) : Qt.rgba(0.45, 0.45, 0.47, 0.22)
         readonly property color clockBg: "#1C1C1E"
         readonly property color clockFace: "#F5F5F5"
         readonly property color clockHand: "#1C1C1E"
         readonly property color clockSecond: "#FF9500"
+        // Column backdrop (PC #62 1d): the backdrop inside the column reads x 0.71 between the cards, x 0.78 behind a
+        // header, x 0.82 8 pt right of the cards, and fades back to 1 about 80 pt outside; the same in light and
+        // dark. One feathered shadow on a layer below the cards (the cards' glass samples it), edge 16 pt outside the
+        // cards (the 376 pt column frame), riding with the panel. Blur sigma about 3 pt inside: not done here.
+        readonly property color backdropDim: Qt.rgba(0, 0, 0, 0.29)
+        readonly property int backdropOutset: 16
+        readonly property real backdropBlur: 50
     }
 
     // ---------- control center ----------

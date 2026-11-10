@@ -8,8 +8,8 @@ import qs.services
 import "../lib/menus.js" as Menus
 
 // Transparent click-catcher below the menu bar that hosts the pull-down
-// menus, context menus, alerts and Notification Center. Clicking outside
-// closes. Control Center has its own layer (ControlCenterWindow.qml).
+// menus, context menus and alerts. Clicking outside closes. Control Center and
+// Notification Center have their own layers (ControlCenterWindow.qml, NotificationCenterWindow.qml).
 ShellWindow {
     id: ov
 
@@ -17,19 +17,11 @@ ShellWindow {
     screen: modelData
 
     // modelData, not screen: mapping the window re-emits screenChanged (binding loop)
-    readonly property bool active: ["menu", "context", "alert", "nc"].indexOf(Panels.open) !== -1
+    readonly property bool active: ["menu", "context", "alert"].indexOf(Panels.open) !== -1
                                    && Panels.activeScreen === modelData
-    // stays mapped while a menu, alert or Notification Center animates out, taking no input then.
-    // nc.progress, not nc.animating: this binding can run before Notification Center has kicked its
-    // spring for the new Panels.open, and then read a stale `animating`, so the layer unmapped and
-    // mapped again (one empty frame at the start of the close); the spring value only moves later
-    visible: active || nc.progress > 0 || nc.animating || menu.visible || context.visible || alert.visible
+    // stays mapped while a menu or alert animates out, taking no input then
+    visible: active || menu.visible || context.visible || alert.visible
     acceptsInput: active
-    // NotificationCenter slides itself in and out on its spring with its glass at full material
-    // (MAC-ANSWERS.md R2 (27.2.1): a slide, nothing fades); menus and alerts materialize on their own.
-    // Reduce motion: no slide, a crossfade (not while a menu already shows during the NC slide-out)
-    readonly property bool ncDrives: nc.animating && (Panels.open === "nc" || !active)
-    glassOpacity: ncDrives && A11y.reduceMotion ? Math.max(0, Math.min(1, nc.progress)) : 1
 
     anchors { top: true; left: true; right: true; bottom: true }
     margins.top: Theme.menuBar.height
@@ -91,19 +83,5 @@ ShellWindow {
         originY: y + Theme.menuBar.height
         items: Panels.menuShown < 0 ? []
              : Menus.forIndex(Panels.menuShown, Apps.appIdOf(Hyprland.activeToplevel), Apps.activeAppName(), Quickshell.env("USER"))
-    }
-
-    // ---------- notification center ----------
-    NotificationCenter {
-        id: nc
-        anchors.right: parent.right
-        anchors.rightMargin: Theme.nc.marginRight
-        y: Theme.nc.marginTop
-        maxHeight: ov.height - y - 20
-        onThisScreen: Panels.activeScreen === ov.modelData
-        originX: ov.width - width - Theme.nc.marginRight
-        originY: y + Theme.menuBar.height
-        visible: shown || animating || progress > 0   // no glass regions off-screen while a menu shows (progress: see `visible` above)
-        MouseArea { anchors.fill: parent; z: -1 }
     }
 }
