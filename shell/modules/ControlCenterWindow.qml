@@ -5,6 +5,7 @@ import qs
 import qs.components
 import qs.services
 import qs.HyprK
+import "../lib/spring.js" as SpringLib
 
 // Control Center on its own layer namespace (hyprk-controlcenter) so the
 // liquidglass plugin gives its tiles the controlcenter recipe, not the menu one.
@@ -27,21 +28,20 @@ ShellWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
-    // MAC-ANSWERS.md R2 (27.2.1): Control Center fades in, no scale and no slide (the tiles are in
-    // their final place from the first frame), the tile glass filling in during the same fade: share of
-    // the change 0.16, 0.29, 0.40, 0.51, 0.61, 0.71 ... at 17 ms steps, 1.0 at about 0.3 s. OutCubic over
-    // 320 ms fits it within 0.03 (least squares over OutQuad..OutQuint and springs). It fades out in
-    // about 0.17 to 0.2 s (curve not measured: ease-out like the menus). Glass and content take the same
-    // value in the same frame: the plugin glass as glassOpacity, the content as opacity.
-    // Reduce motion: the same fade, at most 0.15 s (Theme.ms).
+    // MAC-ANSWERS.md "REA 27.2.1" section 2 (ControlCenter FUN_1002dc74c / FUN_1002dce40): open and close
+    // both run withAnimation(Spring(duration: 0.25, bounce: -0.027)) = response 0.25 s, damping ratio 1.028, on
+    // a transition progress that sets bentoBoxOpacity = progress and bentoBoxScale = 1.01 - 0.01 x progress
+    // (hidden: opacity 0, scale 1.01). Here `fade` is that opacity, on one exact spring (components/SpringCurve.qml)
+    // in both directions; the window goes when it settles (0.4 s). Glass and content take the same value in the
+    // same frame: the plugin glass as glassOpacity, the content as opacity. The scale anchor is not read: the
+    // panel's centre (SwiftUI's default). Reduce motion: no scale (Theme.travel), at most 0.15 s (Theme.ms).
     property real fade: 0
-    NumberAnimation { id: fadeAnim; target: ccw; property: "fade"; easing.type: Easing.OutCubic }
+    SpringCurve { id: fadeAnim; target: ccw; property: "fade"; spring: SpringLib.fromBounce(0.25, -0.027) }
     onShownChanged: {
-        fadeAnim.stop();
-        fadeAnim.to = shown ? 1 : 0;
-        fadeAnim.duration = Theme.ms(shown ? 320 : 200);
-        fadeAnim.start();
+        fadeAnim.go(shown ? 1 : 0);
+        settleGlass(fadeAnim.duration + 50);      // the glass follows the 1 % scale
     }
+    onVisibleChanged: if (visible) settleGlass(fadeAnim.duration + 50)
     glassMaterialize: 1
     glassOpacity: fade
     // while fading out the layer takes no input, so it never eats the click
@@ -58,6 +58,7 @@ ShellWindow {
         originX: ccw.width - width - Theme.cc.marginRight
         originY: y + Theme.menuBar.height
         opacity: ccw.fade
+        scale: 1 + Theme.travel(0.01) * (1 - ccw.fade)
         MouseArea { anchors.fill: parent; z: -1 }   // swallow clicks so they don't close
     }
 
