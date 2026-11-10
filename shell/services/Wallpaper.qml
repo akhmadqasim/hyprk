@@ -35,7 +35,9 @@ Singleton {
 
     // state/wallpaper.json path (Settings > Wallpaper) wins over the default pick
     readonly property string chosen: Prefs.wallpaper.path || ""
-    onChosenChanged: refresh()
+    // later: the Process `environment` binding reads `chosen` too and may not have updated yet, so the
+    // script ran with the previous wallpaper (bar text colour one wallpaper behind)
+    onChosenChanged: Qt.callLater(refresh)
 
     Process {
         id: proc
