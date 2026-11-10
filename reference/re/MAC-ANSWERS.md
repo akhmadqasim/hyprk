@@ -2751,3 +2751,190 @@ grey 127 unless noted.
   - the close-with-changes variant is 390 × 318, with "Delete" at the bottom left.
 
   **Text field / checkbox alert:** see Q-33 (field 222 × 26, checkbox under it). (own probe: AX + pixels + layer dump)
+
+
+## Appearance pane, Liquid Glass, icon style, switches, scrolling (PC #60)
+
+# Appearance pane, 27.2.1 (live Mac, 2x)
+
+Method: AX frames from `axd` (window at 484,232, so window y = AX y − 232), 2x `screencapture -o -l` pixel scans, 60 fps
+clips, and a new probe `reference/re/tools/probe/switches.swift`, which samples NSSwitch presentation layers at about
+one sample per display frame. y is the window y at scroll offset 0 unless noted. Wallpaper was Tahoe Light/Dark.
+Already known and not redone: Q-settings-11/12/16/17/18/25/26/27, #35.
+
+## 1. Pane, top to bottom
+- Pictures: `screens/27.2.1/settings/appearance/appearance-full-{light,dark}.png` (stitched, 508x1088.5 pt). Window
+  shots at offsets 0/10/250/463.5. Data: `re/27.2.1/live/settings/appearance/layout.json` and `ax-scroll*.jsonl`.
+- Geometry:
+  - Toolbar 52. The visible content is 573 tall.
+  - The document is 1036.5 tall, so the maximum scroll is 463.5.
+  - Cards are 468 wide at x 252 (20 pt side margins).
+- Sections in order (y = top, h = height, gap = space above it):
+
+  | # | section | y | h | gap | contents |
+  |---|---|---|---|---|---|
+  | 1 | Card (no heading) | 64 | 319 | 12 below the toolbar | see the two rows below |
+  | 2 | Heading "Theme" (13 Bold) | 413 | 16 | 30 | |
+  | 3 | Card | 439 | 100 | 10 | see the two rows below |
+  | 4 | Card | 549 | 145.5 | 10 | see the two rows below |
+  | 5 | Heading "Windows" | 724.7 | 16 | 30 | |
+  | 6 | Card | 750.5 | 75 | 10 | see the two rows below |
+  | 7 | Card | 835.5 | 189 | 10 | see the two rows below |
+  | 8 | Button row | 1044.5 | 24 | 20 | "More in Accessibility Settings…" 212.5x24 at x 473.5, then "?" 24x24 at x 696 (gap 10) |
+  | | Bottom margin | | 20 | | |
+
+- Rows inside the cards:
+  - Card 1:
+    - "Appearance" row, 86 tall: three thumbnail buttons, AX 74x66 at y 74, x 472/554/636.
+    - Separator.
+    - "Liquid Glass" row, 232 tall: preview 268x180 at (442,161), then the slider row at y 354.
+  - Card 3:
+    - "Colour" row, 62 tall: 9 swatches, AX 32 pt, pitch 36, at y 445, with the caption under the selected one.
+    - Separator.
+    - "Text highlight colour" row, 37 tall: pop-up 133x24.
+  - Card 4:
+    - "Icon & widget style" row, 104.5 tall: 4 tiles, AX 38x52 at y 558, then the radio row at y 627 (16.5 tall).
+    - Separator.
+    - "Folder colour" row, 40 tall.
+    - With Default selected the radio row goes away and the card is 129 tall.
+  - Card 6:
+    - "Sidebar icon size" row, 37.5 tall: pop-up 96x24.
+    - Separator.
+    - "Tint window background with wallpaper colour" row, 36.5 tall: mini switch 36x16 at x 674.
+  - Card 7:
+    - "Show scroll bars" row, 105 tall: label plus 3 radios at a 22.5 pitch.
+    - Separator.
+    - "Click in the scroll bar to" row, 83 tall: label plus 2 radios.
+- Separators are 2 px (1 pt at 2x) here, #2F3035 on the #25262B dark card, inset 10 pt.
+- Same layout in light and dark (AX identical).
+
+## 2. Liquid Glass
+- **No Clear/Tinted cards.** The control is one continuous slider, "Liquid Glass Tint Amount".
+  - Track 221.5 pt wide at x 465, in a 16 pt row. Knob 20x16, as Q-18.
+  - Left end: button "Capsule Shape On A Rectangle With A Liquid Glass Effect", 16x13, an outlined clear capsule.
+  - Right end: button "Capsule Shape On A Rectangle", 17x13.5, a filled grey capsule. Gap to the track is about 6.
+  - **3 tick dots, 2x2 pt**, at y 368–370 (bottom of the row, under the track), at the knob-centre positions for 0, 0.5 and 1 (x 475, 575.75, 676.5).
+    - Dot colour: #B7B7B7 light, #5B5C5F dark.
+    - The middle dot is hidden under the knob at 0.5.
+  - Fill: accent #3375F0 light, #397BF7 dark. Unfilled: #DFDFDF light, #37383C dark.
+  - There are no text labels; the end icons are the labels. The selected state is just the knob position.
+- Behaviour:
+  - It does not snap: dragging gave 0.2555831.
+  - Clicking an end button steps the value by −0.1 / +0.1.
+  - The preview (glass capsules over the Apple Park article) does not change while dragging. It updates in a single
+    frame (no animation) about 50 ms after mouse-up (60 fps clip).
+  - 0 = clearer, more transparent capsules. 1 = frosted, more opaque capsules: lighter in light mode, darker/greyer
+    in dark mode.
+  - Mean colour of the Search capsule: light 0 #E1DBCB, 0.5 #E0DDD4, 1 #E6E5E2; dark 0 #989590, 0.5 #8F8E89, 1 #5A5A57.
+  - In dark mode the window's own back/forward toolbar capsule also changes: face #3C3E40 at 0, #4B4E52 at 1. The sidebar does not change.
+- Defaults:
+  - Only the global domain changes: `NSGlassTintAmount` (float), written on mouse-up. `com.apple.WindowManager` is unchanged.
+  - Restored to 0.5071146 (float) by setting the slider's AXValue. `defaults read-type` gives float, and the whole
+    `defaults read -g` output matches the backup.
+- Pictures: `liquidglass-0-mid-1-*.png`, `liquidglass-slider-zoom4x-*.png`.
+
+## 3. Icon & widget style
+- Tiles:
+  - Default/Dark/Clear/Tinted: AX 38x52 (Default is 40 wide when selected, because of the bold caption).
+  - Pitch: Default to Dark 53, then 51, 51.
+  - Tile 29 pt. Caption 11 pt, bold when selected.
+- Selected state:
+  - A 3 pt #3478F6 ring with a 1.5 pt gap (ring outer = the AX frame, 38). Pixel-confirmed in light and dark.
+  - The tile itself is unchanged.
+- Sub-choice (radio row, right-aligned at x 710):
+  - Dark → Always / Auto (121 wide).
+  - Clear and Tinted → Light / Dark / Auto (167 wide; radios 52, 49.5 and 49.5 wide at x 543/603/660.5).
+  - Default → no row.
+  - The mode carries over between styles. Default → Clear gave ClearLight. Tinted+Auto → Dark gave RegularAutomatic
+    (Auto stayed selected).
+- Tint colour (only with Tinted):
+  - The row label becomes "Icon, widget & folder colour".
+  - It is a pop-up menu: Automatic | Red, Orange, Yellow, Green, Blue, Purple, Pink, Graphite (each with a colour dot) | Choose Colour….
+  - The pop-up width follows the text: 133 for Automatic, 95 for Red, 171 for Choose Colour….
+- "Choose Colour…" opens a popover (310x178) with:
+  - A Hue slider: a 264x28 rainbow capsule.
+  - An opacity slider: 264x28, from transparent to the colour.
+  - Both knobs are about 24 pt circles filled with the colour, with a light ring.
+  - Two 264x24 buttons: "Colour Picker" (eyedropper) and "Use Theme Colour".
+  - In dark mode the popover was 290 wide inside, and the two buttons were side by side (141 each).
+- Keys written (`defaults read -g` diff):
+
+  | action | AppleIconAppearanceTheme | tint keys |
+  |---|---|---|
+  | Default | key removed | |
+  | Clear | ClearLight | |
+  | Tinted | TintedLight | |
+  | Auto radio | TintedAutomatic | |
+  | Always | RegularDark | |
+  | pick Red | | `AppleIconAppearanceTintColor = Red` (string) |
+  | Hue +0.1 in the popover | | `AppleIconAppearanceTintColor = Other` and `AppleIconAppearanceCustomTintColor = "0.978757 0.638603 0.222359 1.000000"` (sRGB r g b a string) |
+  | opacity −0.075 | | the 4th number becomes 0.925000 |
+  | Use Theme Colour | | both tint keys removed (back to Automatic) |
+
+- Restored: Dark + Always = RegularDark. No tint keys are left; `defaults read -g` is identical to before.
+- Caveat: synthetic mouse clicks inside the colour popover broke event delivery to the Appearance extension until
+  System Settings was relaunched. The popover was then driven through AX instead (AXPress, AXIncrement).
+- Pictures: `iconstyle-*.png`.
+
+## 4. Switches
+- Size (probe and Settings agree with Q-16):
+
+  | size | track | knob | knob x off → on | travel |
+  |---|---|---|---|---|
+  | regular | 54x24 r12 | 32x20 | 2 → 20 | 18 |
+  | small | 44x20 | 26x16 | | |
+  | mini | 36x16 r8 | 21x13 | 1.5 → 13.5 inside the track | 12 |
+
+  Settings' "Tint window background" switch is mini: the knob measures 20.5x12.5 white pixels.
+- Colours (probe pixels; Multicolour = blue accent):
+
+  | | off track | on track | knob |
+  |---|---|---|---|
+  | light | #E5E5E5 | #3374EF | #FFFFFF |
+  | dark (on #272726) | #3C3C3B | #397AF6 | #FFFFFF |
+
+  The real Settings switch: on #3374EF light, #397AF6 dark.
+- Layers: track = accent + accent a.75 + white/black a.098. Off = white a.098 (dark) / black a.098 (light).
+- Knob travel (240 Hz sampler, which gets one value per display frame; data in `probe-switch-knob-series-dark.json`):
+  - Movement starts 1–2 frames (17–35 ms) after the state flips on mouse-up.
+  - From the start of movement: 10 % at about 33 ms, 50 % at about 100 ms, 90 % at about 183 ms. It reaches the
+    target at about 233 ms and peaks at +4.2 % (+0.75 pt regular, +0.5 pt mini) at about 330 ms. Within 1 % by about
+    430 ms.
+  - **Shape: an underdamped spring from rest.** Fit: ζ 0.72, ω 13.75 rad/s (mass 1, stiffness ≈ 189, damping ≈ 19.8;
+    SwiftUI-style response ≈ 0.46 s, dampingFraction ≈ 0.72). rms 0.003.
+  - An ease-in-out fit is clearly worse (rms 0.02, 0.28 s).
+  - Regular and mini have the identical normalised curve. Both directions are the same.
+- Press-and-hold (down, 700–800 ms, up):
+  - The knob grows centred: regular 32x20 → 50x31, mini 21x13 → 33x20 (×1.56).
+  - At the same time the white knob cross-fades into a glass lens (SDF layer opacity = growth progress).
+  - Growth starts on the mouse-down frame and matches **CAMediaTimingFunction easeInEaseOut (0.42,0,0.58,1), 0.20 s**
+    exactly (rms 0.0002). Per frame: 0.014, 0.056, 0.129, 0.232, 0.359, 0.5, 0.641, …, 1.
+  - The knob does not move while held.
+  - On release it travels with the spring above while shrinking back to 32x20 over about 0.27 s; the glass fades out
+    with it.
+  - A quick click (down and up in the same instant) grows the knob only to about 33 wide.
+- Track colour:
+  - On→off: the accent layers' alpha falls from 1 to 0.1 over about 0.25 s from release, ease-out-like.
+  - Off→on: about 0.23 s (0.455 → 0.689 s in the sample).
+- Real Settings switch (Tint window background, 60 fps clip, toggled off and back on; no defaults diff remained):
+  - Same behaviour: the knob turns glass while pressed. A click moves it 12 pt in about 0.18 s with a ~0.5 pt
+    overshoot, settled by about 0.37 s.
+  - The track cross-fades in about 0.17–0.2 s.
+  - Hold: the white knob disappears into glass in about 0.2 s.
+- Raw videos deleted. Probe source: `reference/re/tools/probe/switches.swift`. Data:
+  `re/27.2.1/live/settings/appearance/probe-switch-*.json*`.
+
+## 5. Scrolling
+- The pane title "Appearance" is the toolbar title. It does not scroll; there is no large title in the content.
+- Scroll edge:
+  - At offset 0 there is no line.
+  - From the first scrolled frame, a 0.5 pt (1 px) hairline sits at y 52: light #E5E5E5 on white, dark #2E2F33 on #1E1F24.
+  - Content under the 52 pt toolbar strip is faded and blurred into the window background. At offset 250 the strip
+    is #E7E8E9 light / #26282D dark over the photo (cf. Q-settings-04).
+- Scroll bar:
+  - Overlay style ("Automatically" with a trackpad). No track, only the knob.
+  - Knob 6 pt wide at x 731–737 (3 pt from the window's right edge), from y 55 (3 pt below the toolbar) to 622.
+    Length 325.5 at this content size (573 / 1036.5 of the track); ends rounded r 3.
+  - Colour: light #808080 (black a.5), dark #8F9192 (white about a.5).
+  - It appears on the first scroll frame and stays about 0.6 s after the last scroll event, then fades out over
+    about 0.15 s (9 frames). 60 fps clip, two scrolls.
