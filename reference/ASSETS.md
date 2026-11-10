@@ -39,13 +39,49 @@ From OS `/System/Library/Fonts` (copied unchanged to `themes/fonts/`):
 
 ## themes/icons/
 
-- `apps/<Name>-512.png` and `-128.png`: 72 app icons (all of `/System/Applications`, Utilities, plus Finder, Dock, Spotlight, ControlCenter, Screenshot, Siri, ... from OS and Safari from AppOS). Includes Finder, Safari, Messages, Maps, Photos, FaceTime, Calendar, Contacts, Reminders, Notes, Music, TV, App Store, System Settings, Terminal, Apps (= Launchpad replacement), and more.
-- `apps-hires/`: native pre-rendered bitmap straight from each app's `Assets.car` (1024 px or 512 px, 65 apps). I wrote a small BOM/CSI reader (`KCBC` + LZFSE blocks, BGRA premultiplied) because no Linux tool for `.car` exists. 512/128 files for these apps are downscaled from here. Colours were checked visually.
-- Upscaled from the 256 px `.icns` (only 256 px exists as a flat file): Mail, Freeform, Dock, Spotlight, ControlCenter, Archive Utility, Install Command Line Developer Tools. Mail's real icon is only stored as vector layers (Icon Composer `.iconstack`), which I could not render. No icon file at all: Notification Center, Software Update, Keychain Circle Notification.
-- `system/<Name>-512/128.png`: 257 `CoreTypes.bundle` icons (OS `/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources`) from the `.icns` at real 1024 px. Trash: `TrashIcon` (empty), `FullTrashIcon`. Folders: `GenericFolderIcon`, `OpenFolderIcon`, `ApplicationsFolderIcon`, `DesktopFolderIcon`, `DocumentsFolderIcon`, `DownloadsFolder`, `MovieFolderIcon`, `MusicFolderIcon`, `PicturesFolderIcon`, `HomeFolderIcon`, `Sidebar*`, and more. Also Mac models (`com.apple.*`) and file types.
-- Logs: `extract.log` (icns route) and `hires.log` (Assets.car route, with source path per app).
-- Not extracted: SF Symbols. They live in `/System/Library/CoreServices/CoreGlyphs.bundle/Contents/Resources/Assets.car` (118 MB, ~31k vector renditions) but as Apple's binary vector format `BVG` inside `DWAR` blocks, no tool on Linux, not decoded. The SF fonts do not contain them either. Metadata (`symbol_order.plist`, `name_availability.plist`, ...) is next to the car file on the volume, not copied. Alternative for toolbar glyphs: a free icon set (Lucide, Phosphor).
-- Liquid Glass layered icon sources (`*.iconstack`, SVG/PDF layer renditions) not exported.
+Re-extracted 2026-11-10 (second pass). Mounts used: OS `141-12228-170.dmg` and AppOS `141-12233-175.dmg`, each
+`apfs-fuse -o ro <dmg> /mnt/code/scratch/<dir>` (under /mnt/code, never $HOME), unmounted afterwards.
+Tool: `themes/icons/tools/car.py`, a small pure-Python reader for `Assets.car` (BOM store, RENDITIONS tree, CSI blocks;
+decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse). It replaces the earlier one-off reader that was not saved.
+- `apps/<Name>-1024|512|128.png`: all 72 app icons are now real Apple renditions (0 upscaled). Built by
+  `themes/icons/tools/build-apps.py <OS root> [<AppOS root>]` from `apps-sources.txt` (app bundle + icon name in its `Assets.car`);
+  `apps-build.log` says which rendition each came from. Rule: pre-rendered 1024 px bitmap if the car has one (15 apps: Books, Clock,
+  ControlCenter, FaceTime, FindMy, Home, Journal, Maps, Messages, News, Phone, Podcasts, Stocks, VoiceMemos, Weather), else the
+  pre-rendered 512 px (= 256@2x) bitmap. 512 and 128 are Lanczos-downsampled (premultiplied alpha) from that, `-1024` is the source itself.
+- The first pass missed the 512 px bitmaps of Mail, Freeform, Dock, Spotlight, Archive Utility and Install Command Line Developer Tools
+  (found now, `ApplicationIcon256x256_...`/`AppIcon256x256_...` at 512x512@2x) and the real 1024 px classic icon of ControlCenter
+  (`icon_512x512@2x.png` in its car). So only the flat 256 px `.icns` route was upscaled before; that no longer applies to any app.
+- Route that did not matter: Liquid Glass layered `.icon` sources (`*.iconstack`, per-layer SVG, gradients, fills in the same car) are not rendered;
+  Apple's own pre-rendered bitmaps are used. `apps-hires/` and `hires.log` were removed (their 512 px files equal `apps/*-512.png`).
+  `extract.log` is the log of the old `.icns` route: its `apps/` lines are superseded by `apps-build.log`, its `system/` lines still hold.
+- No icon at all for: Notification Center, Software Update, Keychain Circle Notification.
+- `apple-map.txt` (Linux app id or icon name -> macOS icon, ~220 names) is the single source for the shell, the Finder and the `hyprk-apple`
+  theme; `apple-map.js` is generated from it (`tools/gen-map.mjs`, tested in `themes/icons/tests`).
+- `system/<Name>-512/128.png`: 257 `CoreTypes.bundle` icons (OS `/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources`) from the
+  `.icns` at real 1024 px. Trash: `TrashIcon` (empty), `FullTrashIcon`. Folders: `GenericFolderIcon`, `OpenFolderIcon`, `ApplicationsFolderIcon`,
+  `DesktopFolderIcon`, `DocumentsFolderIcon`, `DownloadsFolder`, `MovieFolderIcon`, `MusicFolderIcon`, `PicturesFolderIcon`, `HomeFolderIcon`,
+  `Sidebar*`, and more. Also Mac models (`com.apple.*`) and file types.
+- `settings/`: System Settings sidebar icons. macOS 27 has no bitmaps for them: IconServices draws a coloured enclosure with an SF Symbol at run
+  time, configured by `CFBundleIcons > ISGraphicIconConfiguration` (ISEnclosureColor, ISSymbolName, ISSymbolColor) in each pane's
+  `/System/Library/ExtensionKit/Extensions/*.appex/Contents/Info.plist`, or by a `com.apple.graphic-icon.*` UTI declared in
+  `CoreTypes.bundle/Contents/Info.plist`. `settings/panes.json` holds that data for every hyprk pane id. Only Siri (`AppIconSiri`) and Spotlight
+  (`AppIcon`) have no config and show real bitmaps: `settings/siri.png`, `settings/spotlight.png` (512 px renditions from their appex
+  `Assets.car`, cropped to the 412 px squircle body). The other legacy pane artwork (Network globe, Displays monitor, Dock, Accessibility ring,
+  Screen Time, `icon.icns` = generic extension brick) is the old large-icon style and is not what the sidebar shows, so it was not used.
+  The 21 other panes keep the glyph tile until SF Symbols can be drawn.
+- `sf-symbols/` (item for a later switch-over, nothing uses it yet): the IPSW has no symbols font. SFNS/SFCompact/SFNSRounded contain no symbol
+  glyphs, the only font is `SFSymbolsNeededByCoreMedia-Semibold.ttf` (copied, 5 symbols). All symbols are in
+  `/System/Library/CoreServices/CoreGlyphs.bundle/Contents/Resources/Assets.car` (118 MB, too big to track, re-extract with `car.py`;
+  CoreGlyphsPrivate.bundle has 26 MB more). In that car the facet name is the SF Symbol name (8649 facets, `wifi`, `gearshape`, `bolt.fill`).
+  Each facet has 3 vector renditions (layout 1022, blob `DWAR` + `BVG `, 300-800 bytes, rendition key attribute 26 = 1, 4, 9, apparently the
+  light/regular/black weight masters, plus a transform and per-layer names like `p0.34`/`p0.68` for the hierarchical colour layers) and many
+  small pre-rasterised GA8 bitmaps (11-112 px, 1x/2x, in `ZZZZPackedAsset` atlases compressed as deepmap2/`dmp2`, not decoded here).
+  BVG is not decoded. `car.py bvg <car> <outdir> <names>` dumps the raw blobs; `sf-symbols/bvg-samples/` has 16 symbols x 3 masters for a decoder.
+  Copied tables (binary plists, from CoreGlyphs and `private/` from CoreGlyphsPrivate): `symbol_order.plist` (names in SF Symbols app order),
+  `name_availability.plist` (name -> release year), `symbol_search.plist` (name -> search terms), `symbol_categories.plist` and
+  `categories.plist`, `name_aliases.strings` (old name -> current name), `nofill_to_fill.strings`, `legacy_flippable.plist`,
+  `symbol_restrictions.strings` (Apple-only symbols), `semantic_to_descriptive_name.strings`, `private/container_recipes.plist`.
+  Mapping: a symbol name (after `name_aliases`) is the facet name in the car; a variant suffix is part of the name (`.fill`, `.slash` are shape variants; `.ar` and `.hi` are apparently Arabic and Hindi variants, not checked).
 
 ## themes/cursors/
 
@@ -56,4 +92,4 @@ From OS `/System/Library/Fonts` (copied unchanged to `themes/fonts/`):
 
 ## What failed or was skipped (summary)
 
-SF Symbols (BVG), Mail/Freeform hi-res icons, `.madesktop` wallpapers, arrow cursor from CursorAsset, Xcursor packaging, static SF font instances.
+SF Symbols (BVG vector format not decoded), `.madesktop` wallpapers, arrow cursor from CursorAsset, Xcursor packaging, static SF font instances.
