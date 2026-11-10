@@ -61,17 +61,26 @@ QtObject {
         readonly property int toolbarHeight: 52      // ref: lights/nav centered at 26
     }
 
-    // ---------- traffic lights ----------
+    // ---------- traffic lights (SPEC 13; same values in finder/qml/Theme.qml and the plugin title bar) ----------
     readonly property QtObject lights: QtObject {
-        readonly property int size: 14               // ref
-        readonly property int spacing: 9             // gap between buttons, TODO verify
-        readonly property int left: 19               // ref: first button edge
-        readonly property color close: "#FF5F57"
-        readonly property color minimize: "#FEBC2E"
-        readonly property color zoom: "#28C840"
-        readonly property color inactive: theme.dark ? "#4D4D50" : "#D6D6D8"
-        readonly property color border: Qt.rgba(0, 0, 0, 0.12)
-        readonly property color glyph: Qt.rgba(0, 0, 0, 0.55)
+        readonly property int size: 14               // NSThemeFrame sizeOfTitlebarButtons, Solarium regular
+        readonly property int spacing: 9             // _windowTitlebarButtonSpacingWidth, Solarium
+        readonly property int left: 19               // ref: 2x System Settings shot, 18.75 pt from the window edge (top 19 = centred in the 52 pt toolbar)
+        readonly property real rimWidth: 0.75        // DesignLibrary StrokeStyle(lineWidth: 0.75)
+        // gradient top, bottom (WindowControlColors), pressed (CoreUI art), glyph (CoreUI hover art)
+        readonly property var closeSet: theme.dark ? ["#FA6A61", "#EF6962", "#FF8D85", "#730100"]
+                                                   : ["#FF6D63", Qt.rgba(0.961, 0.447, 0.412, 0.80), "#C04741", "#730000"]
+        readonly property var minimizeSet: theme.dark ? ["#FAB51A", "#FECF34", "#FFEA5C", "#985600"]
+                                                      : [Qt.rgba(0.984, 0.702, 0.086, 0.92), Qt.rgba(1, 0.820, 0.204, 0.92), "#BF8E22", "#985600"]
+        readonly property var zoomSet: theme.dark ? ["#56C83A", "#52C43D", "#56F66E", "#006200"]
+                                                  : ["#5ACF1F", Qt.rgba(0.475, 0.827, 0.298, 0.73), "#1E9730", "#006200"]
+        readonly property var inactive: theme.dark ? [Qt.rgba(0.980, 0.980, 0.980, 0.20), Qt.rgba(0.937, 0.937, 0.937, 0.16)]
+                                                   : [Qt.rgba(0.894, 0.894, 0.937, 0.30), Qt.rgba(0.878, 0.878, 0.922, 0.30)]
+        readonly property color rim: Qt.rgba(0, 0, 0, theme.dark ? 0.12 : 0.2)
+        readonly property color inactiveRim: theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0, 0, 0, 0.14)
+        readonly property color close: closeSet[0]   // swatches (Appearance pane)
+        readonly property color minimize: minimizeSet[0]
+        readonly property color zoom: zoomSet[0]
     }
 
     // ---------- sidebar ----------
@@ -147,7 +156,6 @@ QtObject {
         readonly property real reducedResponse: 0.2   // Reduce Motion: easeInOut(0.2)-like, no growth (lens stays)
         readonly property int dragThreshold: 3        // px before a switch press becomes a drag
     }
-
 
     // ---------- colors ----------
     readonly property color windowBg: theme.dark ? "#1E1E1E" : "#FFFFFF"          // TODO verify

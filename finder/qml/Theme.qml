@@ -94,13 +94,6 @@ QtObject {
         readonly property color rubberBand: theme.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.08)
         readonly property color rubberBandBorder: theme.dark ? Qt.rgba(1, 1, 1, 0.35) : Qt.rgba(0, 0, 0, 0.25)
 
-        // traffic lights, ref
-        readonly property color close: "#EC6765"
-        readonly property color minimize: "#F2CA44"
-        readonly property color zoom: "#65C466"
-        readonly property color lightRim: Qt.rgba(0, 0, 0, 0.12)
-        readonly property color lightGlyph: Qt.rgba(0, 0, 0, 0.55)
-        readonly property color lightInactive: theme.dark ? "#4A4A4C" : "#D6D6D6"
 
         // folder icon (macOS blue folder)
         // drawn-fallback folder; SysIconProvider tints the PNG folders to the same ref colours
@@ -137,11 +130,25 @@ QtObject {
         readonly property int resizeMargin: 6
     }
 
+    // Traffic lights: SPEC "13. Traffic lights", the same values as settings/Theme.qml and the
+    // plugin title bar. (The reference shot is ~1.14x: its 16 px discs are 14 pt.)
     readonly property QtObject lights: QtObject {
-        readonly property int size: 16           // ref (diameter)
-        readonly property int spacing: 12        // gap between circles, ref (centers 28 apart)
-        readonly property int x: 24              // ref (left edge of red)
-        readonly property int y: 24              // ref (top edge)
+        readonly property int size: 14               // NSThemeFrame sizeOfTitlebarButtons, Solarium regular
+        readonly property int spacing: 9             // _windowTitlebarButtonSpacingWidth, Solarium
+        readonly property int x: 19                  // left edge of the red disc from the window edge
+        readonly property int y: (theme.toolbar.height - size) / 2   // centred in the toolbar
+        readonly property real rimWidth: 0.75        // DesignLibrary StrokeStyle(lineWidth: 0.75)
+        // gradient top, bottom (WindowControlColors), pressed (CoreUI art), glyph (CoreUI hover art)
+        readonly property var closeSet: theme.dark ? ["#FA6A61", "#EF6962", "#FF8D85", "#730100"]
+                                                   : ["#FF6D63", Qt.rgba(0.961, 0.447, 0.412, 0.80), "#C04741", "#730000"]
+        readonly property var minimizeSet: theme.dark ? ["#FAB51A", "#FECF34", "#FFEA5C", "#985600"]
+                                                      : [Qt.rgba(0.984, 0.702, 0.086, 0.92), Qt.rgba(1, 0.820, 0.204, 0.92), "#BF8E22", "#985600"]
+        readonly property var zoomSet: theme.dark ? ["#56C83A", "#52C43D", "#56F66E", "#006200"]
+                                                  : ["#5ACF1F", Qt.rgba(0.475, 0.827, 0.298, 0.73), "#1E9730", "#006200"]
+        readonly property var inactive: theme.dark ? [Qt.rgba(0.980, 0.980, 0.980, 0.20), Qt.rgba(0.937, 0.937, 0.937, 0.16)]
+                                                   : [Qt.rgba(0.894, 0.894, 0.937, 0.30), Qt.rgba(0.878, 0.878, 0.922, 0.30)]
+        readonly property color rim: Qt.rgba(0, 0, 0, theme.dark ? 0.12 : 0.2)
+        readonly property color inactiveRim: theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0, 0, 0, 0.14)
     }
 
     readonly property QtObject sidebar: QtObject {
