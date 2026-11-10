@@ -33,8 +33,7 @@ ShellWindow {
     glassOpacity: A11y.reduceMotion ? cc.opacity : 1
     // while fading out the layer takes no input, so it never eats the click
     // that opened the next panel
-    mask: shown ? null : noInput
-    Region { id: noInput }
+    acceptsInput: shown
     MouseArea { anchors.fill: parent; enabled: ccw.shown; onPressed: Panels.close() }
     Item { anchors.fill: parent; focus: true; Keys.onEscapePressed: Panels.close() }
 

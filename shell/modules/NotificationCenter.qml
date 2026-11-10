@@ -67,7 +67,7 @@ Item {
     readonly property bool shown: Panels.open === "nc"
     readonly property bool animating: openSpring.moving
     readonly property real progress: openSpring.value   // 0 off-screen .. 1 open (Overlay: glass materialize)
-    readonly property real slideX: (1 - openSpring.value) * (nc.width + Theme.nc.marginRight + 30)
+    readonly property real slideX: Theme.travel((1 - openSpring.value) * (nc.width + Theme.nc.marginRight + 30))   // Reduce motion: fades
     NcSpring {
         id: openSpring
         onStarted: nc.settle()
@@ -115,6 +115,7 @@ Item {
         width: nc.width
         height: nc.height
         transform: Translate { x: nc.slideX }
+        opacity: Theme.reduceMotion ? Math.max(0, Math.min(1, openSpring.value)) : 1
 
         Flickable {
             id: flick

@@ -79,6 +79,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         visible: Theme.compositorGlass && (root.pluginLift.a > 0 || root.pluginRim.a > 0)
+        opacity: root.materialize   // the tint comes in with the glass (opacity clamps to 0..1)
         radius: root.radius
         color: root.pluginLift
         border.width: root.pluginRim.a > 0 ? 1 : 0

@@ -15,10 +15,12 @@ ShellWindow {
     screen: modelData
 
     readonly property bool shown: Panels.open === "launchpad"
-    visible: shown
-
-    fadeIn: true                 // created on open: fade and scale in from creation, glass included
-    glassOpacity: appear
+    // Liquid Glass: materializes from creation, dematerializes after closing (then unloaded)
+    Materializer { id: mat; shown: lp.shown; initial: 0 }
+    visible: mat.active
+    lingerAs: "launchpad"
+    lingering: !shown && mat.moving
+    acceptsInput: shown               // no input while dematerializing
     anchors { top: true; left: true; right: true; bottom: true }
     exclusionMode: ExclusionMode.Ignore
     namespace: "hyprk-launchpad"
@@ -33,11 +35,13 @@ ShellWindow {
     property int page: 0
 
     // the window exists only while open (shell.qml LazyLoader)
-    Component.onCompleted: {
+    function present() {
         search.text = "";
         page = 0;
         if (shown) search.forceActiveFocus();
     }
+    Component.onCompleted: present()
+    onShownChanged: if (shown) present()       // reopened while still dematerializing
 
     onQueryChanged: page = 0
 
@@ -54,8 +58,13 @@ ShellWindow {
         height: Math.round(lp.height * Theme.launchpad.heightFraction)
         x: (lp.width - width) / 2
         y: (lp.height - height) / 2 - Theme.menuBar.height
-        opacity: lp.appear
-        scale: 0.96 + 0.04 * lp.appear
+        transform: MaterializeScale {
+            mat: mat
+            origin.x: panel.width / 2
+            origin.y: panel.height / 2
+            w: panel.width
+            h: panel.height
+        }
 
         Glass {
             anchors.fill: parent
@@ -63,6 +72,7 @@ ShellWindow {
             sx: panel.x
             sy: panel.y
             tint: Theme.glass.tint
+            materialize: mat.progress
         }
         MouseArea {
             anchors.fill: parent
@@ -72,6 +82,7 @@ ShellWindow {
         // header: App Store-like glyph + search field
         Item {
             id: header
+            opacity: mat.progress
             width: parent.width
             height: Theme.launchpad.headerHeight
             Symbol {
@@ -128,6 +139,7 @@ ShellWindow {
 
         Grid {
             id: grid
+            opacity: mat.progress
             x: Theme.launchpad.padding
             y: header.height + Theme.launchpad.gridTop
             columns: Theme.launchpad.columns
@@ -171,6 +183,7 @@ ShellWindow {
         // page dots
         Row {
             visible: lp.pages > 1
+            opacity: mat.progress
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 12

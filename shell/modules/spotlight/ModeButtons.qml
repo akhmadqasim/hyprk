@@ -1,24 +1,36 @@
 import QtQuick
 import qs
 import qs.components
+import qs.services
 import "../../lib/spotlight.js" as SL
+import "../../lib/motion.js" as Motion
 
 // The four mode buttons to the right of the Spotlight bar (macOS 26/27: they appear when
 // the pointer moves over Spotlight or a mode is active; Cmd+1..4 select them).
 // Each is a glass circle; the active one is filled with the accent colour.
-Row {
+// Liquid Glass: they materialize out of the search field's right end and spring to their places,
+// so each one fuses with the field (and its neighbours) on the plugin's smooth union on the way
+// and then separates; on hide they retract into the field. Pressing one lifts it.
+// Reduce motion: a dissolve in place.
+Item {
     id: buttons
 
     property string mode: ""
     property real originX: 0                // screen position of this row, for Glass sampling
     property real originY: 0
-    property real reveal: 0                 // 0 hidden .. 1 shown
+    property bool shown: false
+    property real gap: 12                   // distance from the field's right edge
     readonly property int diameter: Theme.spotlight.barHeight
+    readonly property int spacing: 10
     signal picked(string mode)
 
-    spacing: 10
-    opacity: reveal
-    visible: reveal > 0
+    width: SL.modes().length * (diameter + spacing) - spacing
+    height: diameter
+    visible: mat.active
+
+    Materializer { id: mat; shown: buttons.shown; initial: 0 }
+    // at value 0 every button sits just inside the field's right end
+    function offset(i) { return A11y.reduceMotion ? 0 : Motion.emergeOffset(i, mat.value, gap + diameter, diameter + spacing); }
 
     Repeater {
         model: SL.modes()
@@ -27,8 +39,17 @@ Row {
             required property var modelData
             required property int index
             readonly property bool on: buttons.mode === modelData.id
+            x: index * (buttons.diameter + buttons.spacing) - buttons.offset(index)
             width: buttons.diameter
             height: width
+
+            PressSpring { id: press; pressed: hover.containsPress; w: b.width; h: b.height }
+            transform: Scale {
+                origin.x: b.width / 2
+                origin.y: b.height / 2
+                xScale: press.scale
+                yScale: press.scale
+            }
 
             Glass {
                 anchors.fill: parent
@@ -36,24 +57,30 @@ Row {
                 sx: buttons.originX + b.x
                 sy: buttons.originY
                 tint: Theme.glass.tintStrong
+                materialize: mat.progress
             }
-            Rectangle {
+            Item {
                 anchors.fill: parent
-                anchors.margins: 6
-                radius: width / 2
-                visible: b.on || hover.containsMouse
-                color: b.on ? Theme.color.accent : Theme.spotlight.selection
-            }
-            Symbol {
-                anchors.centerIn: parent
-                name: b.modelData.symbol
-                size: Theme.spotlight.iconSize
-                color: b.on ? Theme.color.textOnAccent : Theme.color.label
+                opacity: mat.progress
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.margins: 6
+                    radius: width / 2
+                    visible: b.on || hover.containsMouse
+                    color: b.on ? Theme.color.accent : Theme.spotlight.selection
+                }
+                Symbol {
+                    anchors.centerIn: parent
+                    name: b.modelData.symbol
+                    size: Theme.spotlight.iconSize
+                    color: b.on ? Theme.color.textOnAccent : Theme.color.label
+                }
             }
             MouseArea {
                 id: hover
                 anchors.fill: parent
                 hoverEnabled: true
+                enabled: buttons.shown
                 onClicked: buttons.picked(b.on ? "" : b.modelData.id)
             }
         }

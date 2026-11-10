@@ -6,8 +6,20 @@ import qs.services
 // macOS-style alert: glass card (Theme.alert.radius), app icon, bold title, message,
 // capsule buttons. Model: { icon, title, message, buttons: [{ label, action, isDefault, isCancel }] }.
 // Enter runs the default button, Escape the cancel button.
+// Liquid Glass: materializes in around its centre while `shown`, out after (Reduce motion: dissolve).
 Item {
     id: root
+
+    property bool shown: false
+    visible: mat.active
+    Materializer { id: mat; shown: root.shown }
+    transform: MaterializeScale {
+        mat: mat
+        origin.x: root.width / 2
+        origin.y: root.height / 2
+        w: root.width
+        h: root.height
+    }
 
     property var model: null
     property real originX: 0
@@ -25,8 +37,8 @@ Item {
     function pressCancel() { press(buttons.find(b => b.isCancel) || null); }
 
     // keyboard: Return/Enter = default button, Escape = cancel
-    focus: visible
-    onVisibleChanged: if (visible) forceActiveFocus()
+    focus: shown
+    onShownChanged: if (shown) Qt.callLater(forceActiveFocus)   // after `visible` follows
     Keys.onEscapePressed: pressCancel()
     Keys.onReturnPressed: pressDefault()
     Keys.onEnterPressed: pressDefault()
@@ -37,11 +49,14 @@ Item {
         sx: root.originX
         sy: root.originY
         tint: Theme.glass.tintStrong
+        materialize: mat.progress
     }
     MouseArea { anchors.fill: parent }
 
     Column {
         id: col
+        opacity: mat.progress
+        enabled: root.shown
         x: Theme.alert.padding
         y: Theme.alert.padding
         width: parent.width - Theme.alert.padding * 2

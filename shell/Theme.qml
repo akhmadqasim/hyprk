@@ -22,13 +22,25 @@ Singleton {
     // Appearance > Icon & widget style (default | dark | clear | tinted), see components/AppIconTile
     property string iconStyle: "default"
     property bool blurAvailable: true
-    readonly property bool solidMaterial: reduceTransparency || !blurAvailable
+    // Accessibility (same file; services/A11y.qml holds the Hyprland side). Theme cannot import
+    // qs.services (the services import qs), so it reads them itself. Increase contrast also
+    // drops the glass, like macOS.
+    property bool reduceMotion: false
+    property bool increaseContrast: false
+    // a duration of `v` ms: Reduce motion swaps motion for short dissolves, at most 150 ms
+    function ms(v) { return reduceMotion ? Math.min(v, 150) : v; }
+    // a distance or scale delta to animate: 0 under Reduce motion (crossfade only)
+    function travel(v) { return reduceMotion ? 0 : v; }
+    // hairlines and separators: clearly visible with Increase contrast
+    function strokeAlpha(a) { return increaseContrast ? Math.max(a, 0.45) : a; }
+    function stroke(r, g, b, a) { return Qt.rgba(r, g, b, strokeAlpha(a)); }
+    readonly property bool solidMaterial: reduceTransparency || increaseContrast || !blurAvailable
     // set by services/Wallpaper from the luminance of the strip behind the menu bar
     property bool menuBarOnLight: false
     readonly property real menuBarLumaThreshold: 0.62   // TODO verify
     // liquidglass Hyprland plugin loaded (config/hypr/hyprland.lua exports HYPRK_GLASS=plugin);
     // Reduce transparency still wins and uses the solid QML material
-    readonly property bool compositorGlass: Quickshell.env("HYPRK_GLASS") === "plugin" && !reduceTransparency
+    readonly property bool compositorGlass: Quickshell.env("HYPRK_GLASS") === "plugin" && !reduceTransparency && !increaseContrast
     readonly property string hyprkRoot: Quickshell.shellDir + "/.."
 
     // ---------- fonts ----------
@@ -44,15 +56,18 @@ Singleton {
     readonly property string fontDisplay: pickFont(["SF Pro Display", "SF Pro", "System Font", ".SF NS", "Inter Display", "Inter", "Cantarell", "Sans Serif"])
 
     FileView {
-        path: theme.hyprkRoot + "/state/appearance.json"
+        path: (Quickshell.env("HYPRK_STATE") || theme.hyprkRoot + "/state") + "/appearance.json"
         watchChanges: true
         printErrors: false
         onFileChanged: reload()
         onLoaded: {
-            const o = State.parse(text(), { dark: theme.dark, reduceTransparency: theme.reduceTransparency, iconStyle: theme.iconStyle });
+            const o = State.parse(text(), { dark: theme.dark, reduceTransparency: theme.reduceTransparency, iconStyle: theme.iconStyle,
+                                            reduceMotion: false, increaseContrast: false });
             theme.dark = o.dark;
             theme.reduceTransparency = o.reduceTransparency;
             theme.iconStyle = o.iconStyle;
+            theme.reduceMotion = o.reduceMotion;
+            theme.increaseContrast = o.increaseContrast;
         }
     }
 
@@ -110,7 +125,7 @@ Singleton {
         readonly property color label: theme.dark ? Qt.rgba(1, 1, 1, 0.85) : Qt.rgba(0, 0, 0, 0.85)
         readonly property color secondaryLabel: theme.dark ? Qt.rgba(1, 1, 1, 0.55) : Qt.rgba(0, 0, 0, 0.50)
         readonly property color tertiaryLabel: theme.dark ? Qt.rgba(1, 1, 1, 0.25) : Qt.rgba(0, 0, 0, 0.26)
-        readonly property color separator: theme.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.10)
+        readonly property color separator: theme.dark ? theme.stroke(1, 1, 1, 0.10) : theme.stroke(0, 0, 0, 0.10)
         readonly property color accent: theme.dark ? "#0A84FF" : "#007AFF"           // systemBlue
         readonly property color textOnAccent: "#FFFFFF"
         readonly property color red: theme.dark ? "#FF453A" : "#FF3B30"
@@ -145,10 +160,10 @@ Singleton {
         readonly property color solidDock: theme.dark ? "#303032" : "#E4E4E7"      // TODO verify
         readonly property color tintClear: theme.dark ? Qt.rgba(0.16, 0.16, 0.17, 0.30) : Qt.rgba(1, 1, 1, 0.26)         // Dock: light near-neutral clear glass, TODO glass-defaults.json
         // 1px inner highlight stroke (top-lit rim)
-        readonly property color rimTop: theme.dark ? Qt.rgba(1, 1, 1, 0.22) : Qt.rgba(1, 1, 1, 0.55)                  // specular hairline, top-lit, TODO verify
-        readonly property color rimBottom: theme.dark ? Qt.rgba(1, 1, 1, 0.05) : Qt.rgba(1, 1, 1, 0.12)                // TODO verify
+        readonly property color rimTop: theme.dark ? theme.stroke(1, 1, 1, 0.22) : theme.stroke(1, 1, 1, 0.55)                  // specular hairline, top-lit, TODO verify
+        readonly property color rimBottom: theme.dark ? theme.stroke(1, 1, 1, 0.05) : theme.stroke(1, 1, 1, 0.12)                // TODO verify
         // 0.5px outer hairline that separates glass from light backgrounds
-        readonly property color hairline: theme.dark ? Qt.rgba(0, 0, 0, 0.35) : Qt.rgba(0, 0, 0, 0.07)                // TODO verify
+        readonly property color hairline: theme.dark ? theme.stroke(0, 0, 0, 0.35) : theme.stroke(0, 0, 0, 0.07)                // TODO verify
         readonly property real rimWidth: 1
         // drop shadow
         readonly property color shadow: Qt.rgba(0, 0, 0, theme.dark ? 0.45 : 0.22)   // TODO verify
@@ -207,8 +222,8 @@ Singleton {
         // tall, a near-black 1 pt line (reference/screens/macos27-dock-default.png)
         readonly property int separatorHPad: 8
         readonly property int separatorInset: 7          // vertical inset of separator
-        readonly property color separator: theme.dark ? Qt.rgba(1, 1, 1, 0.30) : Qt.rgba(0, 0, 0, 0.55)
-        readonly property int bounceHeight: 28           // launch bounce, TODO verify
+        readonly property color separator: theme.dark ? theme.stroke(1, 1, 1, 0.30) : theme.stroke(0, 0, 0, 0.55)
+        readonly property int bounceHeight: theme.travel(28)           // launch bounce, TODO verify
         readonly property int tooltipGap: 6
         readonly property int tooltipRadius: 8
         readonly property int tooltipHPad: 10
@@ -404,12 +419,12 @@ Singleton {
         // Use with easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring.
         // SPEC 9.9.5: window ScaleUpAndIn 0.5 s, ScaleDownAndOut 0.25 s (Solarium).
         readonly property int fast: 120                  // hover / press
-        readonly property int normal: 600                // panels open (spring 0.5 critically damped)
+        readonly property int normal: theme.ms(600)                // panels open (spring 0.5 critically damped)
         readonly property var spring: [0.25, 0.248, 0.1, 1.0, 1, 1]
-        readonly property int close: 250                 // panels close (ScaleDownAndOut)
+        readonly property int close: theme.ms(250)                 // panels close (ScaleDownAndOut)
         readonly property int bannerIn: normal           // banner slide-in, same spring as panels
         readonly property int bounce: 340                // one dock bounce up+down, TODO verify
-        readonly property int magnify: 150               // dock magnification ramp on enter/leave (by eye; the cursor follow is not animated)
+        readonly property int magnify: theme.ms(150)               // dock magnification ramp on enter/leave (by eye; the cursor follow is not animated)
         readonly property int easing: Easing.OutCubic
 
         // Liquid Glass motion, from SwiftUICore 27.2 (liquid-glass-re notes/round3, for components/NcSpring)
@@ -417,19 +432,22 @@ Singleton {
         readonly property real materializeResponse: 0.5
         readonly property real materializeDamping: 0.7
         readonly property real crossfade: 0.15           // Reduce motion: FadeIn/FadeOut 0.15 s (SPEC 9.9.5)
-        // hidden glass is scaled up per axis around its own centre: min((dim + 16) / dim, 1.2)
-        // (AppearanceSettings.materialize: scale 1.2, maxPointScale 16; GlassAppearanceScaleEffect)
-        function hiddenScale(dim) { return Math.min((dim + 16) / Math.max(dim, 1), 1.2); }
-        // interactive press (FlexInteraction cursor presets, SPEC 10): smaller side < 120 pt is
-        // ultraSmall (lift 2.5 pt, damping 0.629), from 120 small -> large over 40 pt (lift 2.25 -> 2,
-        // damping 0.375 -> 0.6); scale (min + lift) / min, spring response 0.25 s
-        function pressT(w, h) { return Math.max(0, Math.min(1, (Math.min(w, h) - 120) / 40)); }
-        function pressScale(w, h) {
-            const m = Math.max(Math.min(w, h), 1);
-            return (m + (m < 120 ? 2.5 : 2.25 - 0.25 * pressT(w, h))) / m;
-        }
-        function pressDamping(w, h) { return Math.min(w, h) < 120 ? 0.629 : 0.375 + 0.225 * pressT(w, h); }
+        // hidden scale and press lift math: lib/motion.js
         readonly property real pressResponse: 0.25
+        // menu selection glides between rows with the response of FlexInteraction.Settings.menu's
+        // cursor tracking spring (round3 flex-presets +0x110: 0.15 s), critically damped (that preset's
+        // 0.5 belongs to its scale, and a bouncing highlight read as wobbly: by eye). The menu preset
+        // has no lift.
+        readonly property real menuTrackResponse: 0.15
+        readonly property real menuTrackDamping: 1.0
+        // Mission Control (WindowManager ExposeSpringResponse / DampingRatio, SPEC 11.4)
+        readonly property real exposeResponse: 0.25
+        readonly property real exposeDamping: 1.0
+        readonly property int spacesBarExit: 125         // SPEC 11.4: the Spaces bar leaves in 0.125 s
+        // a growing or shrinking glass (Spotlight results): SwiftUI .snappy, bounce 0.15 (by eye)
+        readonly property real resizeResponse: 0.5
+        readonly property real resizeDamping: 0.85
+        readonly property int dockAutohideDelay: 150     // SPEC 7: Dock autohide-delay 0.15 s
         // a click on a slider track springs the shown value to the click point, then drags follow 1:1
         readonly property real sliderJumpResponse: 0.3
         readonly property real pressSquish: 0.06         // drag past a slider end stretches x, squeezes y (by eye)

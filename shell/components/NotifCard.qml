@@ -32,6 +32,8 @@ Item {
     // 1 px below that card, so the plugin blends the two (smooth union) instead of merging the boxes
     property real glassTop: 0
     property real contentOpacity: 1
+    // Liquid Glass materialize of this card's glass (banners: follows the slide), times the window's
+    property real materialize: 1
     property bool swipeable: true
     readonly property bool hovered: hoverH.hovered || closeMa.containsMouse
     readonly property real swipeX: slide.x
@@ -88,6 +90,7 @@ Item {
             sx: card.sx + slide.x
             sy: card.sy + card.glassTop
             shadow: card.shadow
+            materialize: card.materialize * (registeredWith ? registeredWith.glassMaterialize : 1)
         }
 
         Item {

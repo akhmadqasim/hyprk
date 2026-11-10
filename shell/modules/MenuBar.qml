@@ -164,7 +164,7 @@ ShellWindow {
         width: contentWidth + Theme.menuBar.titleHPadding * 2
         height: Theme.menuBar.titleHeight
 
-        HighlightPill { shown: mt.open }
+        HighlightPill { shown: mt.open; pressed: titleMa.containsPress }
         Text {
             id: label
             anchors.centerIn: parent
@@ -177,6 +177,7 @@ ShellWindow {
         }
         Item { id: holder; anchors.fill: parent }
         MouseArea {
+            id: titleMa
             anchors.fill: parent
             hoverEnabled: true
             onPressed: {
@@ -188,24 +189,38 @@ ShellWindow {
         }
     }
 
-    // pressed/open state of a title or status item: a small glass capsule (macOS 26+)
-    // built only while shown: one Glass (and Region) instead of one per title
-    component HighlightPill: Loader {
+    // open/hovered state of a title or status item: a small glass capsule (macOS 26+) that
+    // materializes in and out and lifts while pressed (interactive glass, ultraSmall preset).
+    // The Glass (and its Region) exists only while shown or animating, not one per title.
+    component HighlightPill: Item {
         id: hp
         property bool shown: false
+        property bool pressed: false
         anchors.fill: parent
-        active: shown
-        sourceComponent: Glass {
-            radius: Theme.menuBar.titleRadius
-            // the bar sits at the screen origin, so the scene position is the screen position
-            // re-evaluated when the title/status item moves inside its Row
-            readonly property point pos: hp.parent.x + hp.parent.y >= -1e9 ? hp.mapToItem(null, 0, 0) : Qt.point(0, 0)
-            onPosChanged: remeasure()
-            sx: pos.x
-            sy: pos.y
-            tint: Theme.color.menuBarHighlight
-            pluginLift: Theme.color.menuBarHighlight
-            shadow: false
+        Materializer { id: pm; shown: hp.shown }
+        PressSpring { id: pp; pressed: hp.pressed && hp.shown; w: hp.width; h: hp.height }
+        transform: Scale {
+            origin.x: hp.width / 2
+            origin.y: hp.height / 2
+            xScale: pm.scaleFor(hp.width) * pp.scale
+            yScale: pm.scaleFor(hp.height) * pp.scale
+        }
+        Loader {
+            anchors.fill: parent
+            active: pm.active
+            sourceComponent: Glass {
+                radius: Theme.menuBar.titleRadius
+                // the bar sits at the screen origin, so the scene position is the screen position
+                // re-evaluated when the title/status item moves inside its Row
+                readonly property point pos: hp.parent.x + hp.parent.y >= -1e9 ? hp.parent.mapToItem(null, 0, 0) : Qt.point(0, 0)   // parent: no materialize/press scale
+                onPosChanged: remeasure()
+                sx: pos.x
+                sy: pos.y
+                tint: Theme.color.menuBarHighlight
+                pluginLift: Theme.color.menuBarHighlight
+                shadow: false
+                materialize: pm.progress
+            }
         }
     }
 
@@ -219,8 +234,9 @@ ShellWindow {
         width: contentWidth + Theme.menuBar.statusHPadding * 2
         height: Theme.menuBar.titleHeight
 
-        HighlightPill { shown: si.active || sma.pressed }
+        // macOS 27 status items: the pill shows on hover too
+        HighlightPill { shown: si.active || sma.containsMouse || sma.pressed; pressed: sma.containsPress }
         Item { id: sholder; anchors.fill: parent }
-        MouseArea { id: sma; anchors.fill: parent; onClicked: si.clicked() }
+        MouseArea { id: sma; anchors.fill: parent; hoverEnabled: true; onClicked: si.clicked() }
     }
 }

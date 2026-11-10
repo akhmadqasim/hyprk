@@ -17,27 +17,37 @@ ShellWindow {
     readonly property bool shown: Panels.open === "switcher"
     // one entry per running app, most recently focused first is not tracked by Hyprland IPC,
     // so keep the active app first and the rest in dock order
-    readonly property var apps: {
+    readonly property var liveApps: {
         const running = Apps.dockItems.filter(i => (i.windows || []).length > 0);
         const activeIdx = running.findIndex(i => i.windows.indexOf(Hyprland.activeToplevel) !== -1);
         if (activeIdx > 0) running.unshift(running.splice(activeIdx, 1)[0]);
         return running;
     }
+    // frozen while dematerializing, so the row does not reorder when the chosen app takes focus
+    property var apps: []
+    Binding on apps { value: sw.liveApps; when: sw.shown; restoreMode: Binding.RestoreNone }
     property int selected: 0
 
-    visible: shown && apps.length > 0
+    // Liquid Glass: materializes from creation, dematerializes after closing (then unloaded)
+    Materializer { id: mat; shown: sw.shown && sw.liveApps.length > 0; initial: 0 }
+    visible: mat.active
+    lingerAs: "switcher"
+    lingering: !shown && mat.moving
+    acceptsInput: shown               // no input while dematerializing
     anchors { top: true; left: true; right: true; bottom: true }
     exclusionMode: ExclusionMode.Ignore
     namespace: "hyprk-switcher"
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-    // the window exists only while open (shell.qml LazyLoader)
-    Component.onCompleted: {
-        if (apps.length === 0) { Qt.callLater(Panels.close); return; }   // not during construction
-        selected = apps.length > 1 ? 1 : 0;
+    // the window exists only while open or dematerializing (shell.qml LazyLoader)
+    function present() {
+        if (liveApps.length === 0) { Qt.callLater(Panels.close); return; }   // not during construction
+        selected = liveApps.length > 1 ? 1 : 0;
         keys.forceActiveFocus();
     }
+    Component.onCompleted: present()
+    onShownChanged: if (shown) present()
 
 
     function commit() {
@@ -72,6 +82,13 @@ ShellWindow {
         width: sw.apps.length * cell + Theme.switcher.padding * 2
         height: cell + Theme.switcher.labelHeight + Theme.switcher.padding * 2
         anchors.centerIn: parent
+        transform: MaterializeScale {
+            mat: mat
+            origin.x: panel.width / 2
+            origin.y: panel.height / 2
+            w: panel.width
+            h: panel.height
+        }
 
         Glass {
             anchors.fill: parent
@@ -79,9 +96,11 @@ ShellWindow {
             sx: panel.x
             sy: panel.y
             tint: Theme.glass.tintStrong
+            materialize: mat.progress
         }
 
         Row {
+            opacity: mat.progress
             x: Theme.switcher.padding
             y: Theme.switcher.padding
             Repeater {

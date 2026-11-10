@@ -19,10 +19,13 @@ ShellWindow {
     screen: modelData
 
     readonly property bool shown: Panels.open === "spotlight"
-    visible: shown
-
-    fadeIn: true                 // created on open: fade and scale in from creation, glass included
-    glassOpacity: appear
+    // Liquid Glass: materializes from creation, dematerializes after closing (then unloaded)
+    Materializer { id: mat; shown: sp.shown; initial: 0 }
+    visible: mat.active
+    lingerAs: "spotlight"
+    lingering: !shown && mat.moving
+    // while dematerializing it takes no input, so it never eats the next click
+    acceptsInput: shown
     anchors { top: true; left: true; right: true; bottom: true }
     exclusionMode: ExclusionMode.Ignore
     namespace: "hyprk-spotlight"
@@ -108,7 +111,9 @@ ShellWindow {
         input.text = Panels.spotlightQuery;
         Panels.spotlightQuery = "";
     }
-    Component.onCompleted: { takeQuery(); input.forceActiveFocus(); FileSearch.loadRecents(); }
+    function present() { takeQuery(); input.forceActiveFocus(); FileSearch.loadRecents(); }
+    Component.onCompleted: present()
+    onShownChanged: if (shown) present()       // reopened while still dematerializing
     Connections {
         target: Panels
         function onSpotlightQueryChanged() { sp.takeQuery(); }
@@ -157,9 +162,18 @@ ShellWindow {
         width: Theme.spotlight.width
         readonly property bool expanded: sp.mode !== "" || sp.rows.length > 0
         readonly property real contentHeight: sp.mode !== "" ? modeView.height : sp.rows.length > 0 ? list.height : -1
-        height: Theme.spotlight.barHeight + (contentHeight >= 0 ? contentHeight + Theme.spotlight.listInset * 2 + 1 : 0)
-        opacity: sp.appear
-        scale: 0.97 + 0.03 * sp.appear
+        readonly property real targetHeight: Theme.spotlight.barHeight + (contentHeight >= 0 ? contentHeight + Theme.spotlight.listInset * 2 + 1 : 0)
+        // results grow and shrink the glass on a spring (Reduce motion: at once)
+        NcSpring { id: grow; target: panel.targetHeight; response: Theme.anim.resizeResponse; damping: Theme.anim.resizeDamping; epsilon: 0.3 }
+        height: A11y.reduceMotion ? targetHeight : grow.value
+        // materializes around the search field's centre
+        transform: MaterializeScale {
+            mat: mat
+            origin.x: panel.width / 2
+            origin.y: Theme.spotlight.barHeight / 2
+            w: panel.width
+            h: panel.height
+        }
 
         Glass {
             anchors.fill: parent
@@ -167,6 +181,7 @@ ShellWindow {
             sx: panel.x
             sy: panel.y
             tint: Theme.glass.tintStrong
+            materialize: mat.progress
         }
         MouseArea { anchors.fill: parent; hoverEnabled: true; onPositionChanged: sp.pointerMoved = true }
 
@@ -174,6 +189,7 @@ ShellWindow {
             id: bar
             width: parent.width
             height: Theme.spotlight.barHeight
+            opacity: mat.progress
             // the query sits in a capsule field (macOS 26/27 Spotlight)
             Rectangle {
                 anchors.fill: parent
@@ -221,148 +237,158 @@ ShellWindow {
             }
         }
 
-        Rectangle {
-            visible: panel.expanded
-            y: bar.height
-            x: Theme.spotlight.hPadding
-            width: parent.width - Theme.spotlight.hPadding * 2
-            height: 1
-            color: Theme.color.separator
-        }
+        // results: clipped to the growing glass
+        Item {
+            id: results
+            width: parent.width
+            height: panel.height
+            clip: panel.height < panel.targetHeight - 0.5
+            opacity: mat.progress
 
-        ModeView {
-            id: modeView
-            visible: sp.mode !== ""
-            mode: sp.mode
-            query: sp.query
-            x: Theme.spotlight.listInset
-            y: bar.height + 1 + Theme.spotlight.listInset
-            width: parent.width - Theme.spotlight.listInset * 2
-            onDone: Panels.close()
-            onEditFinished: input.forceActiveFocus()
-        }
+            Rectangle {
+                visible: panel.expanded && panel.height > bar.height + 1
+                y: bar.height
+                x: Theme.spotlight.hPadding
+                width: parent.width - Theme.spotlight.hPadding * 2
+                height: 1
+                color: Theme.color.separator
+            }
 
-        Column {
-            id: list
-            visible: sp.mode === "" && sp.rows.length > 0
-            x: Theme.spotlight.listInset
-            y: bar.height + 1 + Theme.spotlight.listInset
-            width: parent.width - Theme.spotlight.listInset * 2
+            ModeView {
+                id: modeView
+                visible: sp.mode !== ""
+                mode: sp.mode
+                query: sp.query
+                x: Theme.spotlight.listInset
+                y: bar.height + 1 + Theme.spotlight.listInset
+                width: parent.width - Theme.spotlight.listInset * 2
+                onDone: Panels.close()
+                onEditFinished: input.forceActiveFocus()
+            }
 
-            Repeater {
-                model: sp.rows
-                delegate: Item {
-                    id: r
-                    required property var modelData
-                    required property int index
-                    readonly property bool header: modelData.kind === "header"
-                    readonly property bool sel: index === sp.selected
-                    // file and action rows are drawn by spotlight/ResultRow.qml
-                    readonly property bool rich: modelData.kind === "file" || modelData.kind === "action"
-                    width: list.width
-                    height: header ? Theme.spotlight.headerHeight
-                          : modelData.kind === "calc" ? Theme.spotlight.rowHeight * Theme.spotlight.calcRowScale : Theme.spotlight.rowHeight
+            Column {
+                id: list
+                visible: sp.mode === "" && sp.rows.length > 0
+                x: Theme.spotlight.listInset
+                y: bar.height + 1 + Theme.spotlight.listInset
+                width: parent.width - Theme.spotlight.listInset * 2
 
-                    Text {
-                        visible: r.header
-                        x: Theme.spotlight.rowInset
-                        anchors.bottom: parent.bottom
-                        anchors.bottomMargin: Theme.spotlight.headerBaseline
-                        text: r.modelData.title
-                        font.family: Theme.fontText
-                        font.pixelSize: Theme.font.spotlightHeader
-                        font.weight: Theme.font.semibold
-                        color: Theme.color.secondaryLabel
-                    }
+                Repeater {
+                    model: sp.rows
+                    delegate: Item {
+                        id: r
+                        required property var modelData
+                        required property int index
+                        readonly property bool header: modelData.kind === "header"
+                        readonly property bool sel: index === sp.selected
+                        // file and action rows are drawn by spotlight/ResultRow.qml
+                        readonly property bool rich: modelData.kind === "file" || modelData.kind === "action"
+                        width: list.width
+                        height: header ? Theme.spotlight.headerHeight
+                              : modelData.kind === "calc" ? Theme.spotlight.rowHeight * Theme.spotlight.calcRowScale : Theme.spotlight.rowHeight
 
-                    // neutral grey selection pill, inset like macOS
-                    Rectangle {
-                        visible: r.sel && !r.header
-                        anchors.fill: parent
-                        radius: Theme.spotlight.rowRadius
-                        color: Theme.spotlight.selection
-                    }
-                    Item {
-                        id: ic
-                        visible: !r.header && !r.rich
-                        x: Theme.spotlight.rowInset
-                        width: Theme.spotlight.rowIcon
-                        height: width
-                        anchors.verticalCenter: parent.verticalCenter
-                        AppIcon {
-                            anchors.fill: parent
-                            visible: r.modelData.kind === "app"
-                            size: parent.width
-                            icon: r.modelData.icon || ""
-                            appId: r.modelData.entry ? r.modelData.entry.id : ""
-                        }
-                        Symbol {
-                            anchors.centerIn: parent
-                            visible: r.modelData.kind !== "app"
-                            name: r.modelData.kind === "calc" ? "equal" : "folder"
-                            size: parent.width * Theme.appIcon.inner
-                            color: Theme.color.secondaryLabel
-                        }
-                    }
-                    Column {
-                        visible: !r.header && !r.rich
-                        anchors.left: ic.right
-                        anchors.leftMargin: Theme.spotlight.textGap
-                        anchors.right: parent.right
-                        anchors.rightMargin: Theme.spotlight.textGap
-                        anchors.verticalCenter: parent.verticalCenter
                         Text {
-                            width: parent.width
+                            visible: r.header
+                            x: Theme.spotlight.rowInset
+                            anchors.bottom: parent.bottom
+                            anchors.bottomMargin: Theme.spotlight.headerBaseline
                             text: r.modelData.title
-                            elide: Text.ElideRight
-                            font.family: r.modelData.kind === "calc" ? Theme.fontDisplay : Theme.fontText
-                            font.pixelSize: r.modelData.kind === "calc" ? Theme.font.spotlightInput : Theme.font.spotlightRow
-                            color: Theme.color.label
-                        }
-                        Text {
-                            width: parent.width
-                            visible: r.modelData.kind === "calc"
-                            text: r.modelData.subtitle || ""
                             font.family: Theme.fontText
                             font.pixelSize: Theme.font.spotlightHeader
+                            font.weight: Theme.font.semibold
                             color: Theme.color.secondaryLabel
                         }
-                    }
-                    ResultRow {
-                        anchors.fill: parent
-                        visible: r.rich
-                        readonly property bool isAction: r.modelData.kind === "action"
-                        readonly property var d: isAction ? r.modelData.action : r.modelData.file
-                        title: r.modelData.title
-                        subtitle: r.modelData.subtitle || ""
-                        symbol: isAction ? (d.symbol || "bolt") : "doc"
-                        appIcon: isAction ? (d.appIcon || "") : ""
-                        appId: isAction ? (d.appId || "") : ""
-                        themeIcon: r.modelData.kind === "file" ? SL.fileIcon(d.path, d.isDir, d.mime) : ""
-                        accessory: isAction ? SL.quickKeyLabel(SpotlightState.quickKeys, d.id, false) : ""
-                        badge: accessory !== ""
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        enabled: !r.header
-                        hoverEnabled: true
-                        onEntered: sp.selected = r.index
-                        onClicked: { sp.selected = r.index; sp.accept(); }
+
+                        // neutral grey selection pill, inset like macOS
+                        Rectangle {
+                            visible: r.sel && !r.header
+                            anchors.fill: parent
+                            radius: Theme.spotlight.rowRadius
+                            color: Theme.spotlight.selection
+                        }
+                        Item {
+                            id: ic
+                            visible: !r.header && !r.rich
+                            x: Theme.spotlight.rowInset
+                            width: Theme.spotlight.rowIcon
+                            height: width
+                            anchors.verticalCenter: parent.verticalCenter
+                            AppIcon {
+                                anchors.fill: parent
+                                visible: r.modelData.kind === "app"
+                                size: parent.width
+                                icon: r.modelData.icon || ""
+                                appId: r.modelData.entry ? r.modelData.entry.id : ""
+                            }
+                            Symbol {
+                                anchors.centerIn: parent
+                                visible: r.modelData.kind !== "app"
+                                name: r.modelData.kind === "calc" ? "equal" : "folder"
+                                size: parent.width * Theme.appIcon.inner
+                                color: Theme.color.secondaryLabel
+                            }
+                        }
+                        Column {
+                            visible: !r.header && !r.rich
+                            anchors.left: ic.right
+                            anchors.leftMargin: Theme.spotlight.textGap
+                            anchors.right: parent.right
+                            anchors.rightMargin: Theme.spotlight.textGap
+                            anchors.verticalCenter: parent.verticalCenter
+                            Text {
+                                width: parent.width
+                                text: r.modelData.title
+                                elide: Text.ElideRight
+                                font.family: r.modelData.kind === "calc" ? Theme.fontDisplay : Theme.fontText
+                                font.pixelSize: r.modelData.kind === "calc" ? Theme.font.spotlightInput : Theme.font.spotlightRow
+                                color: Theme.color.label
+                            }
+                            Text {
+                                width: parent.width
+                                visible: r.modelData.kind === "calc"
+                                text: r.modelData.subtitle || ""
+                                font.family: Theme.fontText
+                                font.pixelSize: Theme.font.spotlightHeader
+                                color: Theme.color.secondaryLabel
+                            }
+                        }
+                        ResultRow {
+                            anchors.fill: parent
+                            visible: r.rich
+                            readonly property bool isAction: r.modelData.kind === "action"
+                            readonly property var d: isAction ? r.modelData.action : r.modelData.file
+                            title: r.modelData.title
+                            subtitle: r.modelData.subtitle || ""
+                            symbol: isAction ? (d.symbol || "bolt") : "doc"
+                            appIcon: isAction ? (d.appIcon || "") : ""
+                            appId: isAction ? (d.appId || "") : ""
+                            themeIcon: r.modelData.kind === "file" ? SL.fileIcon(d.path, d.isDir, d.mime) : ""
+                            accessory: isAction ? SL.quickKeyLabel(SpotlightState.quickKeys, d.id, false) : ""
+                            badge: accessory !== ""
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            enabled: !r.header
+                            hoverEnabled: true
+                            onEntered: sp.selected = r.index
+                            onClicked: { sp.selected = r.index; sp.accept(); }
+                        }
                     }
                 }
             }
         }
     }
 
-    // mode buttons (Applications, Files, Actions, Clipboard) to the right of the bar
+    // mode buttons (Applications, Files, Actions, Clipboard) to the right of the bar: they emerge
+    // from the field (fusing with it on the glass union) and retract into it
     ModeButtons {
-        x: sp.panelX + Theme.spotlight.width + 12
+        x: sp.panelX + Theme.spotlight.width + gap
         y: sp.panelY
         originX: x
         originY: y
         mode: sp.mode
-        reveal: (sp.pointerMoved || sp.mode !== "") ? sp.appear : 0
-        Behavior on reveal { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+        shown: sp.shown && (sp.pointerMoved || sp.mode !== "")
+        gap: 12
         onPicked: m => sp.setMode(m)
     }
 }

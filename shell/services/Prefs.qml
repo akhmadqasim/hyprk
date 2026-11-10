@@ -21,6 +21,7 @@ Singleton {
     property var lock: ({ screenSaverAfter: 1200, displayOffAfter: 600, requirePasswordAfter: 0, largeClock: "lock" })
     property var input: ({ repeatRate: 25, repeatDelay: 600 })
     property var wallpaper: ({ path: "" })
+    property var dock: ({ autohide: false })
 
     component StateFile: FileView {
         required property string key
@@ -34,6 +35,7 @@ Singleton {
     StateFile { key: "lock" }
     StateFile { key: "input"; onLoaded: root.applyInput() }
     StateFile { key: "wallpaper" }
+    StateFile { key: "dock" }
 
     // ---------- input.json -> Hyprland ----------
     function applyInput() {

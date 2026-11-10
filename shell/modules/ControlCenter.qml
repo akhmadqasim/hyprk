@@ -8,6 +8,7 @@ import qs
 import qs.components
 import qs.services
 import "../lib/state.js" as State
+import "../lib/motion.js" as Motion
 
 // Control Center, macOS 26/27 layout: no panel, separate clear-glass modules
 // on a 2-column grid. Missing hardware or services dim the module and show
@@ -179,21 +180,14 @@ Item {
         property real radius: Theme.cc.tileRadius
         property bool pressed: false
         property real stretch: 0                 // -1..1 along x while dragging (sliders)
-        NcSpring {
-            id: press
-            target: m.pressed && !A11y.reduceMotion ? 1 : 0
-            response: Theme.anim.pressResponse
-            damping: Theme.anim.pressDamping(m.width, m.height)
-            onValueChanged: if (moving) glass.settle()   // also after a retarget mid-flight
-        }
+        PressSpring { id: press; pressed: m.pressed; w: m.width; h: m.height }
         transform: Scale {
             origin.x: m.width / 2
             origin.y: m.height / 2
-            readonly property real hidden: 1 - glass.materialize
-            readonly property real lift: (Theme.anim.pressScale(m.width, m.height) - 1) * press.value
+            readonly property real lift: press.scale - 1
             readonly property real squish: Theme.anim.pressSquish * Math.abs(m.stretch) * press.value
-            xScale: (1 + hidden * (Theme.anim.hiddenScale(m.width) - 1)) * (1 + lift + squish)
-            yScale: (1 + hidden * (Theme.anim.hiddenScale(m.height) - 1)) * (1 + lift - squish / 2)
+            xScale: Motion.materializeScale(m.width, glass.materialize, false) * (1 + lift + squish)
+            yScale: Motion.materializeScale(m.height, glass.materialize, false) * (1 + lift - squish / 2)
         }
         Glass {
             id: glass

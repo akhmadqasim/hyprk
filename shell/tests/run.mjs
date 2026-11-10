@@ -290,5 +290,42 @@ test("relTime", () => assert.deepEqual([30e3, 300e3, 7200e3, 100000e3, 400000e3]
     rmSync(dir, { recursive: true, force: true });
 }
 
+// ---- Liquid Glass motion (lib/motion.js) ----
+const M = load("motion.js");
+const near = (a, b, e = 1e-6) => assert.ok(Math.abs(a - b) < e, `${a} != ${b}`);
+test("hidden scale caps at 1.2 for small glass", () => near(M.hiddenScale(40), 1.2));
+test("hidden scale is +16 pt for large glass", () => near(M.hiddenScale(640), 656 / 640));
+test("materialize scale: hidden, shown, reduce motion", () => {
+    near(M.materializeScale(640, 0, false), 656 / 640);
+    near(M.materializeScale(640, 1, false), 1);
+    near(M.materializeScale(640, 0, true), 1);
+});
+test("press lift: ultraSmall 2.5 pt below 120", () => near(M.pressScale(54, 54), 56.5 / 54));
+test("press lift: small 2.25 at 120, large 2 from 160", () => {
+    near(M.pressScale(120, 300), 122.25 / 120);
+    near(M.pressScale(200, 300), 202 / 200);
+});
+test("press damping by size", () => {
+    near(M.pressDamping(64, 64), 0.629);
+    near(M.pressDamping(120, 120), 0.375);
+    near(M.pressDamping(160, 400), 0.6);
+});
+test("spring settles at target, overshoots at damping 0.7", () => {
+    let x = 0, v = 0, peak = 0;
+    for (let i = 0; i < 120; i++) { [x, v] = M.springStep(x, v, 1, 0.5, 0.7, 1 / 60); peak = Math.max(peak, x); }
+    near(x, 1, 1e-3);
+    assert.ok(peak > 1.03 && peak < 1.07, "overshoot " + peak);
+});
+test("critically damped spring does not overshoot", () => {
+    let x = 0, v = 0, peak = 0;
+    for (let i = 0; i < 120; i++) { [x, v] = M.springStep(x, v, 1, 0.25, 1, 1 / 60); peak = Math.max(peak, x); }
+    assert.ok(peak <= 1 + 1e-9, "peak " + peak);
+});
+test("mode buttons start inside the field, end in place", () => {
+    near(M.emergeOffset(0, 1, 68, 66), 0);
+    // at 0 every button is shifted to the same x as button 0 minus the travel
+    near(0 * 66 - M.emergeOffset(0, 0, 68, 66), 3 * 66 - M.emergeOffset(3, 0, 68, 66));
+});
+
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

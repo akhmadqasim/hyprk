@@ -22,13 +22,19 @@ PanelWindow {
     // of fading alpha (Glass.qml sends it per shape as a 1 px hole, plugin/src/Shape.hpp).
     // Glass items follow it unless they set their own `materialize`.
     property real glassMaterialize: 1
-    // Windows created on open (shell.qml LazyLoader) never run a Behavior: with fadeIn, `appear`
-    // goes 0 -> 1 on the SwiftUI spring from creation, for the window to drive opacity/scale from
-    property bool fadeIn: false
-    property real appear: 1
-    // re-measure the glass on each appear frame (the window may be created after Panels changed)
-    onAppearChanged: if (fadeIn && appear < 1) glassMoved()
-    NumberAnimation on appear { running: win.fadeIn; from: 0; to: 1; duration: Theme.anim.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
+    // Windows created on open (shell.qml LazyLoader) set `lingerAs` to their Panels name and
+    // `lingering` while they dematerialize after closing: Panels keeps them loaded until then.
+    // input region: `inputMask` (null = the whole window) while `acceptsInput`, else none, so a
+    // surface animating out never eats the click that opened the next one
+    property bool acceptsInput: true
+    property Region inputMask: null
+    mask: acceptsInput ? inputMask : noInput
+    Region { id: noInput }
+
+    property string lingerAs: ""
+    property bool lingering: false
+    onLingeringChanged: if (lingerAs !== "" && !lingering) Panels.release(lingerAs)
+    Component.onDestruction: if (lingerAs !== "") Panels.release(lingerAs)
 
     // Glass items call these on creation/destruction
     function registerGlass(r) { glassRegions.push(r); }
@@ -40,15 +46,17 @@ PanelWindow {
     signal glassMoved()
     // Re-measure on every rendered frame while something may animate (was a 40 ms timer = 25 Hz,
     // so the compositor glass stepped behind the 60 Hz content and looked choppy).
-    function settleGlass() {
+    // tail: how long to keep going (default covers a panel's open animation; springs that call
+    // this on every frame pass a couple of frames, so it stops right after they settle)
+    function settleGlass(tail) {
         if (!Theme.compositorGlass || !visible || glassRegions.length === 0) return;
-        settle.until = Date.now() + Theme.anim.normal + 80;   // normal: the longest shell animation
+        settle.until = Math.max(settle.until, Date.now() + (tail === undefined ? Theme.anim.normal + 80 : tail));
         settle.running = true;
     }
     FrameAnimation {
         id: settle
         property double until: 0
-        onTriggered: { win.glassMoved(); if (Date.now() >= until) stop(); }
+        onTriggered: { win.glassMoved(); if (Date.now() >= until) { stop(); until = 0; } }
     }
     onVisibleChanged: settleGlass()
     Connections {

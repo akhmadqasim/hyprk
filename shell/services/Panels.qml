@@ -59,7 +59,36 @@ Singleton {
     function close() { open = ""; menuIndex = -1; }
     function openMenu(index, x, scr) { activeScreen = scr || screen; menuIndex = index; menuX = x; open = "menu"; }
 
-    onOpenChanged: if (open !== "menu") menuIndex = -1
+    // Surfaces created on open (shell.qml LazyLoader) stay loaded while they dematerialize: closing
+    // one holds it until its window releases it (ShellWindow.lingerAs), at most 1.5 s. The loaders
+    // read only `loaded`, set here after `held`, so they never see a closed surface unheld.
+    readonly property var lazySurfaces: ["spotlight", "switcher", "launchpad", "mission"]
+    property var loaded: ({})           // name -> true while open or held
+    property var held: ({})
+    property string previous: ""
+    function updateLoaded() {
+        const l = {};
+        for (const n of lazySurfaces) if (open === n || held[n]) l[n] = true;
+        if (JSON.stringify(l) !== JSON.stringify(loaded)) loaded = l;   // menu hovers change `open` often
+    }
+    function release(name) {
+        if (!held[name]) return;
+        const h = Object.assign({}, held);
+        delete h[name];
+        held = h;
+        updateLoaded();
+    }
+    Timer { id: holdTimeout; interval: 1500; onTriggered: { root.held = ({}); root.updateLoaded(); } }
+
+    onOpenChanged: {
+        if (open !== "menu") menuIndex = -1;
+        if (previous !== open && lazySurfaces.indexOf(previous) !== -1) {
+            held = Object.assign({}, held, { [previous]: true });
+            holdTimeout.restart();
+        }
+        previous = open;
+        updateLoaded();
+    }
 
     // Hyprland binds call these via hl.dsp.global("hyprk:<name>")
     GlobalShortcut { appid: "hyprk"; name: "spotlight"; description: "Spotlight"; onPressed: root.toggle("spotlight") }

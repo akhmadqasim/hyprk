@@ -7,8 +7,10 @@ import qs.services
 
 // Notification banners, top-right below the menu bar (macOS 27):
 // - one banner per app; more from the same app stack behind it (edges peek below)
-// - slide in from the right edge on the SwiftUI spring (0.5 s, critically damped)
+// - slide in from the right edge on the SwiftUI spring (0.5 s, critically damped), the glass
+//   materializing as it comes (Liquid Glass: lensing, blur and rim ramp in with the slide)
 // - expire after Theme.notif.timeout unless hovered, then slide back out to the right
+//   (dematerializing); Reduce motion: they dissolve in place instead
 // - the others glide up into the gap; swipe right sends the stack to Notification Center
 // - close button (hover, top-left) removes the notifications; a click opens the app
 ShellWindow {
@@ -91,9 +93,13 @@ ShellWindow {
         // room first (faster spring) and the new one enters just behind them from off-screen.
         add: Transition {
             SequentialAnimation {
-                PropertyAction { property: "x"; value: win.slideOut }
+                PropertyAction { property: "x"; value: A11y.reduceMotion ? 0 : win.slideOut }
+                PropertyAction { property: "fade"; value: A11y.reduceMotion ? 0 : 1 }
                 PauseAnimation { duration: list.count > 1 ? 150 : 0 }
-                NumberAnimation { property: "x"; to: 0; duration: Theme.anim.bannerIn; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
+                ParallelAnimation {
+                    NumberAnimation { property: "x"; to: 0; duration: Theme.anim.bannerIn; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring }
+                    NumberAnimation { property: "fade"; to: 1; duration: Theme.anim.crossfade * 1000 }
+                }
             }
         }
         displaced: Transition {
@@ -123,6 +129,7 @@ ShellWindow {
             height: card.height + Math.min(stack - 1, 2) * Theme.notif.stackPeek
             property bool swipedAway: false
             property bool armed: true
+            property real fade: 1                  // Reduce motion: dissolve instead of the slide
 
             transform: Translate { id: out; x: 0 }
             onLeavingChanged: {
@@ -132,7 +139,10 @@ ShellWindow {
             }
             SequentialAnimation {
                 id: leave
-                NumberAnimation { target: out; property: "x"; to: win.slideOut; duration: 380; easing.type: Easing.InOutCubic }
+                ParallelAnimation {
+                    NumberAnimation { target: out; property: "x"; to: A11y.reduceMotion ? 0 : win.slideOut; duration: 380; easing.type: Easing.InOutCubic }
+                    NumberAnimation { target: row; property: "fade"; to: A11y.reduceMotion ? 0 : 1; duration: Theme.anim.crossfade * 1000 }
+                }
                 ScriptAction { script: { stacks.remove(row.index); win.settleGlass(); } }
             }
             onXChanged: win.settleGlass()
@@ -150,6 +160,8 @@ ShellWindow {
                 time: row.time
                 stacked: row.stack - 1
                 swipeable: !row.leaving
+                opacity: row.fade
+                materialize: row.fade * Math.max(0, Math.min(1, 1 - (row.x + out.x) / win.slideOut))
                 // banner window origin: right-aligned below the menu bar
                 sx: win.screen.width - win.width - (Theme.notif.marginRight - win.edge) + list.x + row.x + out.x
                 sy: Theme.menuBar.height + Theme.notif.marginTop + list.y + row.y

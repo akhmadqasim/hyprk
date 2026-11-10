@@ -10,6 +10,10 @@ import qs.services
 // Mission Control (Super+Up): Spaces bar on top, live thumbnails of the
 // windows on the current Space laid out in a grid over the dimmed desktop.
 // Click a window to focus it, a Space to switch, empty space or Esc to close.
+// Motion: on the Exposé spring (WindowManager ExposeSpringResponse 0.25, damping 1.0, SPEC 11.4)
+// the windows fly from where they are on screen into the grid and back on close, the backdrop
+// darkens and the Spaces bar slides down (on close it leaves in 0.125 s, SPEC 11.4).
+// Reduce motion: a crossfade.
 ShellWindow {
     id: mc
 
@@ -17,18 +21,43 @@ ShellWindow {
     screen: modelData
 
     readonly property bool shown: Panels.open === "mission"
-    visible: shown
+    NcSpring {
+        id: expose
+        initial: 0
+        target: mc.shown ? 1 : 0
+        response: A11y.reduceMotion ? Theme.anim.crossfade : Theme.anim.exposeResponse
+        damping: A11y.reduceMotion ? 1 : Theme.anim.exposeDamping
+    }
+    readonly property real e: Math.max(0, Math.min(1, expose.value))   // 0 = windows in place
+    readonly property real travel: A11y.reduceMotion ? 0 : 1 - e         // 1 = at the real window rect
+    // Spaces bar: in with the Exposé spring, out in 0.125 s
+    NcSpring {
+        id: barSpring
+        initial: 0
+        target: mc.shown ? 1 : 0
+        response: mc.shown ? Theme.anim.exposeResponse : Theme.anim.spacesBarExit / 1000
+    }
+    readonly property real bar: Math.max(0, Math.min(1, barSpring.value))
+    visible: shown || expose.moving
+    lingerAs: "mission"
+    lingering: !shown && expose.moving
+    acceptsInput: shown               // no input while closing
     anchors { top: true; left: true; right: true; bottom: true }
     exclusionMode: ExclusionMode.Ignore
     namespace: "hyprk-mission"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-    readonly property var windows: shown ? Hyprland.toplevels.values.filter(t => t.workspace && t.workspace === Hyprland.focusedWorkspace) : []
-    readonly property var spaces: !shown ? [] : Hyprland.workspaces.values.filter(w => w.id > 0).sort((a, b) => a.id - b.id)
+    // frozen while closing, so the windows fly back to where they were
+    property var windows: []
+    Binding on windows { value: Hyprland.toplevels.values.filter(t => t.workspace && t.workspace === Hyprland.focusedWorkspace); when: mc.shown; restoreMode: Binding.RestoreNone }
+    property var spaces: []
+    Binding on spaces { value: Hyprland.workspaces.values.filter(w => w.id > 0).sort((a, b) => a.id - b.id); when: mc.shown; restoreMode: Binding.RestoreNone }
 
     // the window exists only while open (shell.qml LazyLoader)
-    Component.onCompleted: { Hyprland.refreshToplevels(); keys.forceActiveFocus(); }
+    function present() { Hyprland.refreshToplevels(); keys.forceActiveFocus(); }
+    Component.onCompleted: present()
+    onShownChanged: if (shown) present()
 
     // grid geometry: as square as possible, cells share the area below the Spaces bar
     readonly property int cols: Math.max(1, Math.ceil(Math.sqrt(windows.length)))
@@ -46,18 +75,20 @@ ShellWindow {
     // backdrop: blurred wallpaper, dimmed
     Image {
         anchors.fill: parent
+        opacity: mc.e
         readonly property string path: Wallpaper.blurred || Wallpaper.wallpaper
         source: path ? "file://" + path : ""
         asynchronous: true
     }
-    Rectangle { anchors.fill: parent; color: Qt.rgba(0, 0, 0, Theme.mission.dim) }
+    Rectangle { anchors.fill: parent; color: Qt.rgba(0, 0, 0, Theme.mission.dim); opacity: mc.e }
     MouseArea { anchors.fill: parent; onClicked: Panels.close() }
 
     // Spaces bar: a wallpaper thumbnail per Space with its name under it,
     // the current one outlined (macOS shows these when the bar is expanded)
     Row {
         anchors.horizontalCenter: parent.horizontalCenter
-        y: Theme.mission.spacesTop
+        y: Theme.mission.spacesTop - (A11y.reduceMotion ? 0 : 1 - mc.bar) * (height + Theme.mission.spacesTop)
+        opacity: mc.bar
         spacing: Theme.mission.spaceSpacing
         Repeater {
             model: mc.spaces
@@ -118,9 +149,33 @@ ShellWindow {
             width: mc.cellW
             height: mc.cellH
 
+            // where the window really is (Hyprland logical layout px, made screen-local); the
+            // thumbnail starts and ends there. Unknown (no IPC data yet): it stays in the grid.
+            readonly property var ipcRect: {
+                const o = cell.modelData.lastIpcObject;
+                if (!o || !o.at || !o.size || !mc.screen) return null;
+                return Qt.rect(o.at[0] - mc.screen.x, o.at[1] - mc.screen.y, o.size[0], o.size[1]);
+            }
+            // taken only before the fly-in is under way (IPC data arrives asynchronously: no jump)
+            property var real: null
+            function takeRect() { if (mc.e < 0.05) real = ipcRect; }
+            onIpcRectChanged: takeRect()
+            Component.onCompleted: takeRect()
+            readonly property real fly: real && thumb.width > 0 ? mc.travel : 0
             ClippingRectangle {
                 id: thumb
                 anchors.centerIn: parent
+                opacity: cell.real && !A11y.reduceMotion ? 1 : mc.e
+                transform: [
+                    Scale {
+                        xScale: 1 + cell.fly * (cell.real ? cell.real.width / thumb.width - 1 : 0)
+                        yScale: 1 + cell.fly * (cell.real ? cell.real.height / thumb.height - 1 : 0)
+                    },
+                    Translate {
+                        x: cell.fly * (cell.real ? cell.real.x - cell.x - thumb.x : 0)
+                        y: cell.fly * (cell.real ? cell.real.y - cell.y - thumb.y : 0)
+                    }
+                ]
                 width: view.width
                 height: view.height
                 radius: Theme.mission.thumbRadius
@@ -151,7 +206,7 @@ ShellWindow {
                 }
                 Rectangle {
                     anchors.fill: parent
-                    radius: parent.radius
+                    radius: Theme.mission.thumbRadius
                     color: "transparent"
                     border.width: wma.containsMouse ? Theme.mission.hoverBorder : 0
                     border.color: Theme.color.accent
@@ -159,7 +214,7 @@ ShellWindow {
             }
             // title under the hovered window, styled like the Dock tooltip
             Rectangle {
-                visible: wma.containsMouse
+                visible: wma.containsMouse && mc.shown
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: thumb.y + thumb.height + Theme.dock.tooltipGap
                 width: Math.min(cell.width, title.implicitWidth + Theme.dock.tooltipHPad * 2)

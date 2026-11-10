@@ -9,6 +9,8 @@ ShellRoot {
     // SpotlightState registers hyprk:spotlight-<mode> shortcuts, Clipboard runs the
     // history watcher (only created while history is on, the default is off).
     readonly property bool clipboardHistory: SpotlightState.clipboardHistory !== "off" && Clipboard.enabled
+    // A11y (re-applies state/accessibility.lua, syncs the plugin's reduce_motion) starts with the
+    // Dock, whose Materializer reads A11y.reduceMotion
 
     Variants {
         model: Quickshell.screens
@@ -28,22 +30,22 @@ ShellRoot {
     // transient surfaces live on the primary screen
     Banners { modelData: Panels.screen }
 
-    // Rarely used full-screen surfaces exist only while open, so their windows,
-    // delegates and textures cost nothing at idle (see PERF.md).
+    // Rarely used full-screen surfaces exist only while open (and while they dematerialize after
+    // closing, Panels.loaded), so their windows, delegates and textures cost nothing at idle (PERF.md).
     LazyLoader {
-        active: Panels.open === "spotlight"
+        active: Panels.loaded.spotlight === true
         Spotlight { modelData: Panels.screen }
     }
     LazyLoader {
-        active: Panels.open === "switcher"
+        active: Panels.loaded.switcher === true
         Switcher { modelData: Panels.screen }
     }
     LazyLoader {
-        active: Panels.open === "launchpad"
+        active: Panels.loaded.launchpad === true
         Launchpad { modelData: Panels.screen }
     }
     LazyLoader {
-        active: Panels.open === "mission"
+        active: Panels.loaded.mission === true
         MissionControl { modelData: Panels.screen }
     }
 }

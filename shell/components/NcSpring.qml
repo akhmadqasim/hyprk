@@ -1,4 +1,6 @@
 import QtQuick
+import Quickshell
+import "../lib/motion.js" as Motion
 
 // A retargetable spring for the notification surfaces, parameterised like SwiftUI
 // (response in seconds, dampingFraction; SPEC 9.9.4: Animation.default = 0.5, 1.0).
@@ -17,10 +19,23 @@ Item {
     property real response: 0.5
     property real damping: 1.0
     property real epsilon: 0.002          // in the unit of value: 0.002 for 0..1, ~0.3 for pixels
+    // where to start on creation (NaN = at target, no motion): 0 for surfaces created on open
+    property real initial: NaN
     readonly property bool moving: fa.running
     signal started()
+    // true when glass scales or moves with this value: the plugin glass only follows a moving
+    // parent while its window re-measures every frame (ShellWindow.settleGlass)
+    property bool settlesGlass: false
+    onValueChanged: if (settlesGlass && moving) {
+        const w = QsWindow.window;
+        if (w && w.settleGlass) w.settleGlass(50);   // two frames past the last step
+    }
 
-    Component.onCompleted: { value = target; velocity = 0; }
+    Component.onCompleted: {
+        value = isNaN(initial) ? target : initial;
+        velocity = 0;
+        if (value !== target) { fa.start(); started(); }
+    }
 
     // jump without motion (first layout, hidden items)
     function snap() { fa.stop(); value = target; velocity = 0; }
@@ -33,15 +48,7 @@ Item {
 
     function step(dt) {
         dt = Math.min(Math.max(dt, 0), 0.05);          // a stalled frame must not explode the integrator
-        const w = 2 * Math.PI / Math.max(response, 0.02);
-        const k = w * w, c = 2 * damping * w;
-        const n = Math.max(1, Math.ceil(dt / 0.004));
-        const h = dt / n;
-        let v = velocity, x = value;
-        for (let i = 0; i < n; i++) {
-            v += (k * (target - x) - c * v) * h;
-            x += v * h;
-        }
+        const [x, v] = Motion.springStep(value, velocity, target, response, damping, dt);
         if (Math.abs(target - x) < epsilon && Math.abs(v) < epsilon * 10) {
             velocity = 0;
             value = target;

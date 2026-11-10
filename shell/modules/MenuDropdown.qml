@@ -7,12 +7,31 @@ import qs.services
 
 // Pull-down menu of the menu bar, macOS 26 style: rounded glass, inset
 // rounded selection, shortcut column on the right.
+// Liquid Glass: the menu materializes in while `shown` (from its hidden scale toward the anchor:
+// the menu bar title, the click point) and dematerializes out with the last items it showed; the
+// selection glides from row to row instead of jumping. Reduce motion: dissolve, no glide.
 Item {
     id: root
 
     property var items: []
+    property bool shown: false
     property real originX: 0       // screen position of this item, for the glass backdrop
     property real originY: 0
+    property real anchorX: 0       // materialize anchor, local
+    property real anchorY: 0
+
+    // the items stay while the menu dematerializes (the caller may clear them on close)
+    property var shownItems: []
+    Binding on shownItems { value: root.items; when: root.shown; restoreMode: Binding.RestoreNone }
+    visible: mat.active
+    Materializer { id: mat; shown: root.shown }
+    transform: MaterializeScale {
+        mat: mat
+        origin.x: root.anchorX
+        origin.y: root.anchorY
+        w: root.width
+        h: root.height
+    }
 
     readonly property real contentWidth: Math.max(Theme.menu.minWidth, maxTextWidth + Theme.menu.itemHPadding * 2 + Theme.menu.itemInset * 2 + 40)
     width: contentWidth
@@ -57,7 +76,7 @@ Item {
     FontMetrics { id: metrics; font.family: Theme.fontText; font.pixelSize: Theme.font.menu }
     readonly property real maxTextWidth: {
         let w = 0;
-        for (const it of items)
+        for (const it of shownItems)
             if (!it.sep) w = Math.max(w, metrics.advanceWidth(it.label) + (it.shortcut ? metrics.advanceWidth(it.shortcut) + Theme.menu.shortcutGap : 0));
         return w;
     }
@@ -68,19 +87,54 @@ Item {
         sx: root.originX
         sy: root.originY
         tint: Theme.glass.tintStrong
+        materialize: mat.progress
+    }
+
+    // selection: one inset pill that glides to the hovered row; it appears in place when the
+    // pointer comes in from outside the menu
+    property int hover: -1
+    property real hoverY: 0
+    property real hoverH: Theme.menu.itemHeight
+    function enterRow(i, y, h) {
+        const fresh = hover < 0;
+        hover = i;
+        hoverY = y;
+        hoverH = h;
+        if (fresh || A11y.reduceMotion) selY.snap();
+    }
+    // leaving a row and entering the next arrive in one pointer event: clear only if none took over
+    // (a closing menu keeps its selection while it dematerializes)
+    function leaveRow(i) { Qt.callLater(() => { if (root.shown && root.hover === i) root.hover = -1; }); }
+    onShownItemsChanged: hover = -1
+    onShownChanged: if (shown) hover = -1
+    NcSpring { id: selY; target: root.hoverY; response: Theme.anim.menuTrackResponse; damping: Theme.anim.menuTrackDamping; epsilon: 0.3 }
+    Rectangle {
+        visible: root.hover >= 0
+        x: Theme.menu.itemInset
+        y: list.y + selY.value
+        width: parent.width - Theme.menu.itemInset * 2
+        height: root.hoverH
+        radius: Theme.menu.itemRadius
+        color: Theme.color.menuSelection
+        opacity: mat.progress
     }
 
     Column {
         id: list
         y: Theme.menu.padding
         width: parent.width
+        opacity: mat.progress
 
         Repeater {
-            model: root.items
+            model: root.shownItems
             delegate: Item {
                 id: row
                 required property var modelData
+                required property int index
                 readonly property bool enabled: !modelData.sep && !modelData.disabled
+                readonly property bool hovered: ma.containsMouse && enabled
+                readonly property bool selected: root.hover === index
+                onHoveredChanged: hovered ? root.enterRow(index, y, height) : root.leaveRow(index)
                 width: list.width
                 height: modelData.sep ? Theme.menu.separatorHeight : Theme.menu.itemHeight
 
@@ -91,15 +145,6 @@ Item {
                     height: 1
                     color: Theme.color.separator
                 }
-                Rectangle {
-                    visible: !row.modelData.sep
-                    anchors.fill: parent
-                    anchors.leftMargin: Theme.menu.itemInset
-                    anchors.rightMargin: Theme.menu.itemInset
-                    radius: Theme.menu.itemRadius
-                    color: Theme.color.menuSelection
-                    opacity: ma.containsMouse && row.enabled ? 1 : 0
-                }
                 Text {
                     visible: !row.modelData.sep
                     anchors.verticalCenter: parent.verticalCenter
@@ -107,7 +152,7 @@ Item {
                     text: row.modelData.label || ""
                     font.family: Theme.fontText
                     font.pixelSize: Theme.font.menu
-                    color: !row.enabled ? Theme.color.tertiaryLabel : ma.containsMouse ? Theme.color.menuSelectionText : Theme.color.label
+                    color: !row.enabled ? Theme.color.tertiaryLabel : row.selected ? Theme.color.menuSelectionText : Theme.color.label
                 }
                 Text {
                     visible: !row.modelData.sep && (row.modelData.shortcut !== undefined)
@@ -117,7 +162,7 @@ Item {
                     text: row.modelData.shortcut || ""
                     font.family: Theme.fontText
                     font.pixelSize: Theme.font.menu
-                    color: ma.containsMouse && row.enabled ? Theme.color.menuSelectionText : Theme.color.tertiaryLabel
+                    color: row.selected ? Theme.color.menuSelectionText : Theme.color.tertiaryLabel
                 }
                 Symbol {
                     visible: row.modelData.submenu === true
@@ -126,12 +171,13 @@ Item {
                     anchors.rightMargin: Theme.menu.itemInset + Theme.menu.itemHPadding - 4
                     name: "chevron.right"
                     size: 11
-                    color: ma.containsMouse && row.enabled ? Theme.color.menuSelectionText : Theme.color.secondaryLabel
+                    color: row.selected ? Theme.color.menuSelectionText : Theme.color.secondaryLabel
                 }
                 MouseArea {
                     id: ma
                     anchors.fill: parent
                     hoverEnabled: true
+                    enabled: root.shown
                     onClicked: if (row.enabled) root.trigger(row.modelData.action)
                 }
             }

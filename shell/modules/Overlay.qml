@@ -19,9 +19,11 @@ ShellWindow {
     // modelData, not screen: mapping the window re-emits screenChanged (binding loop)
     readonly property bool active: ["menu", "context", "alert", "nc"].indexOf(Panels.open) !== -1
                                    && Panels.activeScreen === modelData
-    visible: active || nc.animating
+    // stays mapped while a menu, alert or Notification Center animates out, taking no input then
+    visible: active || nc.animating || menu.visible || context.visible || alert.visible
+    acceptsInput: active
     // NotificationCenter slides itself in and out on its spring; its glass materializes along
-    // (menus and alerts do not animate; not while one already shows during the NC slide-out)
+    // (menus and alerts materialize on their own; not while one already shows during the NC slide-out)
     readonly property bool ncDrives: nc.animating && (Panels.open === "nc" || !active)
     glassMaterialize: ncDrives && !A11y.reduceMotion ? Math.min(1, nc.progress) : 1
     glassOpacity: ncDrives && A11y.reduceMotion ? Math.max(0, Math.min(1, nc.progress)) : 1   // Reduce motion: crossfade
@@ -48,19 +50,22 @@ ShellWindow {
     // ---------- context menu (desktop, Dock) ----------
     MenuDropdown {
         id: context
-        visible: Panels.open === "context"
-        items: visible ? Panels.contextItems : []
+        shown: Panels.open === "context" && Panels.activeScreen === ov.modelData
+        items: Panels.contextItems
         x: Math.max(Theme.menu.screenMargin, Math.min(ov.width - width - Theme.menu.screenMargin, Panels.contextAbove ? Panels.contextX - width / 2 : Panels.contextX))
         y: Math.max(0, Math.min(ov.height - height - Theme.menu.screenMargin,
                                 Panels.contextY - Theme.menuBar.height - (Panels.contextAbove ? height : 0)))
         originX: x
         originY: y + Theme.menuBar.height
+        // from the click point: above the Dock it ends at the point, else it starts there
+        anchorX: Panels.contextAbove ? width / 2 : 0
+        anchorY: Panels.contextAbove ? height : 0
     }
 
     // ---------- alert ----------
     AlertDialog {
         id: alert
-        visible: Panels.open === "alert"
+        shown: Panels.open === "alert" && Panels.activeScreen === ov.modelData
         model: Panels.alert
         x: (ov.width - width) / 2
         y: (ov.height - height) * Theme.alert.verticalBias
@@ -71,11 +76,14 @@ ShellWindow {
     // ---------- menu ----------
     MenuDropdown {
         id: menu
-        visible: Panels.open === "menu"
+        shown: Panels.open === "menu" && Panels.activeScreen === ov.modelData
         x: Math.min(Panels.menuX, ov.width - width - 4)
         y: Theme.menu.offsetY
         originX: x
         originY: y + Theme.menuBar.height
+        // from the menu bar title
+        anchorX: Panels.menuX - x
+        anchorY: -Theme.menu.offsetY
         items: Panels.menuIndex < 0 ? []
              : Menus.forIndex(Panels.menuIndex, Apps.appIdOf(Hyprland.activeToplevel), Apps.activeAppName(), Quickshell.env("USER"))
     }
