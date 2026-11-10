@@ -25,10 +25,10 @@ by Qt's font engines = 35 MB RSS for one 7.8 MB file). A bare one-window Quicksh
   GTK3 platform theme and widget stack are no longer loaded (-45 MB RSS with the next item).
 - **Wallpaper decoded at logical size** (`Background.qml` `sourceSize`): the wallpaper is soft; at
   4K/1.5 the pixel-size decode cost ~18 MB more.
-- **On-demand surfaces** (`shell.qml` `LazyLoader`): Spotlight, Cmd+Tab switcher, Apps and Mission
-  Control windows (and their delegates, icon textures and live window captures) exist only while open.
+- **On-demand surfaces** (`shell.qml` `LazyLoader`): Spotlight, Cmd+Tab switcher, the Applications window
+  (`ApplicationsWindow.qml`) and Mission Control (and their delegates, icon textures and live window captures) exist only while open.
   Their open logic also runs on creation (`opened()`); Spotlight's IPC moved to `Panels`.
-- **Hidden content not built**: the Apps grid and switcher are freed with their LazyLoader windows.
+- **Hidden content not built**: the Applications window (and its icon grid) and the switcher are freed when they close.
   The Photos widget's picture (640 px wide, about 1 MB) stays decoded: loading it on open showed an
   empty black card for the first 50 to 80 ms of the Notification Center slide-in.
 

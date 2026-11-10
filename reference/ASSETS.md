@@ -69,9 +69,8 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
 - `settings/`: System Settings sidebar icons. macOS 27 has no bitmaps for them: IconServices draws a coloured enclosure with an SF Symbol at run
   time, configured by `CFBundleIcons > ISGraphicIconConfiguration` (ISEnclosureColor, ISSymbolName, ISSymbolColor) in each pane's
   `/System/Library/ExtensionKit/Extensions/*.appex/Contents/Info.plist`, or by a `com.apple.graphic-icon.*` UTI declared in
-  `CoreTypes.bundle/Contents/Info.plist`. `settings/panes.json` holds that data for every hyprk pane id. Only Siri (`AppIconSiri`) and Spotlight
-  (`AppIcon`) have no config and show real bitmaps: `settings/siri.png`, `settings/spotlight.png` (512 px renditions from their appex
-  `Assets.car`, cropped to the 412 px squircle body). The other legacy pane artwork (Network globe, Displays monitor, Dock, Accessibility ring,
+  `CoreTypes.bundle/Contents/Info.plist`. `settings/panes.json` holds that data for every hyprk pane id. Siri and Spotlight are rendered the same
+  way (32ee0c7 dropped the `siri.png` / `spotlight.png` crops); every pane icon is in `themes/icons/settings/`. The other legacy pane artwork (Network globe, Displays monitor, Dock, Accessibility ring,
   Screen Time, `icon.icns` = generic extension brick) is the old large-icon style and is not what the sidebar shows, so it was not used.
   The 21 other panes keep the glyph tile until SF Symbols can be drawn.
 - `sf-symbols/` (item for a later switch-over, nothing uses it yet): the IPSW has no symbols font. SFNS/SFCompact/SFNSRounded contain no symbol

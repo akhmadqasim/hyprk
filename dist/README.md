@@ -30,7 +30,7 @@ Pakai tombol Ctrl+Alt ini (belum dites dengan keyboard asli, baru dites lewat pe
 |---|---|---|
 | Spotlight | Ctrl+Alt+S | Super+Space |
 | Pindah app (Cmd+Tab) | Ctrl+Alt+W | Super+Tab |
-| Launchpad | Ctrl+Alt+A | Super+A atau F4 |
+| Jendela Applications | Ctrl+Alt+A | Super+A atau F4 |
 | Notification Center | Ctrl+Alt+N | Super+N |
 | Control Center | Ctrl+Alt+C | Super+Shift+C |
 | Mission Control | Ctrl+Alt+M | Super+Up, Ctrl+Up, atau F3 |

@@ -122,8 +122,6 @@ Singleton {
         readonly property real spotlightInput: 26   // query text dominates (reference/JUDGE.md)
         readonly property real spotlightRow: 15     // TODO verify
         readonly property real spotlightHeader: 11  // TODO verify
-        readonly property real launchpadLabel: 11   // TODO verify
-        readonly property real launchpadSearch: 20  // header text, TODO verify
         readonly property real dockTooltip: 14      // SPEC 9.9.3: Dock app-name label, system 14
         readonly property real widgetBig: 34        // TODO verify
         readonly property real widgetSmall: 11      // TODO verify
@@ -379,25 +377,6 @@ Singleton {
         readonly property color selection: theme.dark ? Qt.rgba(1, 1, 1, 0.18) : Qt.rgba(0, 0, 0, 0.12)
     }
 
-    // ---------- launchpad / apps ----------
-    readonly property QtObject launchpad: QtObject {
-        // macOS 27 "Apps" is a centered glass panel (reference/screens/macos27-apps-view.png)
-        readonly property real widthFraction: 0.56       // of screen width, measured
-        readonly property real heightFraction: 0.56      // of screen height, measured
-        readonly property int radius: 26                 // TODO verify
-        readonly property int iconSize: 52               // measured vs reference at the same panel/screen ratio
-        readonly property int columns: 7
-        readonly property int cellHeight: 88             // row pitch, measured; rows per page = what fits
-        readonly property int headerHeight: 46           // measured
-        readonly property int padding: 18                // measured
-        readonly property int headerGlyph: 18
-        readonly property int gridTop: 12                // separator to first row
-        readonly property int gridBottom: 28             // room for the page dots
-        readonly property int headerGap: 10
-        // icon grid rows on one page of a panel this tall (Launchpad.qml, LaunchpadPreload.qml)
-        function rowsFor(panelHeight) { return Math.max(1, Math.floor((panelHeight - headerHeight - gridTop - gridBottom) / cellHeight)); }
-    }
-
     // ---------- app icons ----------
     readonly property QtObject appIcon: QtObject {
         readonly property real body: 0.8047             // icon body: 824 of 1024 (legacy inset 100/1024, SPEC.md App icons)
@@ -430,8 +409,6 @@ Singleton {
 
     // ---------- mission control ----------
     readonly property QtObject mission: QtObject {
-        readonly property real dim: 0.35                 // backdrop darkening, TODO verify
-        readonly property int spacesHeight: 150          // Spaces bar with thumbnails, TODO verify
         readonly property int spacesTop: 16
         readonly property int spaceThumbWidth: 150       // TODO verify
         readonly property int spaceRadius: 8
@@ -475,9 +452,6 @@ Singleton {
         // a menu opens at once and fades out in about 0.2 s, ease-out (measured on macOS 27.2.1)
         readonly property int menuFadeOut: theme.ms(200)
         readonly property real menuTrackDamping: 1.0
-        // Mission Control (WindowManager ExposeSpringResponse / DampingRatio, SPEC 11.4)
-        readonly property real exposeResponse: 0.25
-        readonly property real exposeDamping: 1.0
         readonly property int spacesBarExit: 125         // SPEC 11.4: the Spaces bar leaves in 0.125 s
         // a growing or shrinking glass (Spotlight results): SwiftUI .snappy, bounce 0.15 (by eye)
         readonly property real resizeResponse: 0.5

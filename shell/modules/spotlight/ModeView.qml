@@ -252,7 +252,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     elide: Text.ElideRight
                     text: cell.modelData.name
-                    font: Typography.font(Theme.font.launchpadLabel)
+                    font: Typography.subheadline
                     color: Theme.color.label
                 }
                 MouseArea {

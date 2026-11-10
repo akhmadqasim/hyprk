@@ -61,15 +61,4 @@ Singleton {
         function close(): void { root.close(); }
         function isOpen(): bool { return root.open; }
     }
-
-    // Callers that still open the old Launchpad surface (Panels.toggle("launchpad"): Go > Applications,
-    // Spotlight's "Show Apps", the hyprk:launchpad shortcut) open this window instead.
-    Connections {
-        target: Panels
-        function onOpenChanged() {
-            if (Panels.open !== "launchpad") return;
-            Qt.callLater(() => { if (Panels.open === "launchpad") Panels.close(); });
-            root.show();
-        }
-    }
 }

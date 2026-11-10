@@ -71,7 +71,7 @@ Singleton {
         add({ id: "controlcenter", title: "Show Control Center", symbol: "controlcenter", run: () => Panels.toggle("cc") });
         add({ id: "notificationcenter", title: "Show Notification Center", symbol: "bell", run: () => Panels.toggle("nc") });
         add({ id: "missioncontrol", title: "Mission Control", symbol: "display", keywords: ["windows", "overview"], run: () => Panels.toggle("mission") });
-        add({ id: "apps", title: "Show Apps", symbol: "square.grid", keywords: ["launchpad"], run: () => Panels.toggle("launchpad") });
+        add({ id: "apps", title: "Show Apps", symbol: "square.grid", keywords: ["launchpad"], run: () => AppsView.show() });
         add({ id: "empty-trash", title: "Empty Trash", symbol: "trash", run: () => Apps.confirmEmptyTrash() });
         if (SpotlightState.clipboardHistory !== "off")      // don't create Clipboard just to ask
             add({ id: "clear-clipboard", title: "Clear Clipboard History", symbol: "clipboard", keywords: ["clipboard"], run: () => Clipboard.clear() });

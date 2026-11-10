@@ -169,7 +169,7 @@ end
 ------------------------------------------------------- liquid glass ----
 -- shell layers that carry glass (namespaces hyprk-<name>), shared by the plugin and the blur rule
 -- (no menubar: the macOS 26+ menu bar is transparent; its menus live in hyprk-overlay)
-local glassLayers = { "dock", "overlay", "controlcenter", "notifications", "spotlight", "switcher", "launchpad", "hud" }
+local glassLayers = { "dock", "overlay", "controlcenter", "notifications", "spotlight", "switcher", "hud" }
 -- Own compositor plugin (plugin/, see plugin/README.md). When it loads, the shell
 -- sends its glass shapes as ext-background-effect regions (HYPRK_GLASS=plugin) and the
 -- plugin draws Liquid Glass behind them. Without it the shell's QML glass is used.
@@ -211,7 +211,7 @@ end
 -- ignore_alpha keeps fully transparent parts (shadows, click catchers) unblurred.
 -- Namespaces (set in shell/modules/*.qml via WlrLayershell.namespace):
 --   hyprk-menubar hyprk-dock hyprk-overlay hyprk-controlcenter hyprk-notifications
---   hyprk-spotlight hyprk-switcher hyprk-launchpad hyprk-wallpaper
+--   hyprk-spotlight hyprk-switcher hyprk-mission hyprk-hud hyprk-wallpaper
 hl.layer_rule({
     name = "hyprk-glass-blur",
     match = { namespace = "^hyprk-(" .. table.concat(glassLayers, "|") .. ")$" },
@@ -221,7 +221,7 @@ hl.layer_rule({
 hl.layer_rule({
     -- the shell animates these itself
     name = "hyprk-no-anim",
-    match = { namespace = "^hyprk-(overlay|controlcenter|spotlight|switcher|launchpad|mission|notifications|dock|menubar|wallpaper|hud)$" },
+    match = { namespace = "^hyprk-(overlay|controlcenter|spotlight|switcher|mission|notifications|dock|menubar|wallpaper|hud)$" },
     no_anim = true,
 })
 

@@ -58,7 +58,7 @@ Item {
         case "fullscreen": Hyprland.dispatch("hl.dsp.window.fullscreen()"); break;
         case "zoom": Hyprland.dispatch("hl.dsp.window.fullscreen({ mode = \"maximized\" })"); break;
         case "spotlight": Panels.open = "spotlight"; break;
-        case "launchpad": Panels.open = "launchpad"; break;
+        case "apps": AppsView.show(); break;
         case "sleep": Power.sleep(); break;
         case "restart": Power.restart(); break;
         case "shutdown": Power.shutdown(); break;

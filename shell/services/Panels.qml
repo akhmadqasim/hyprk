@@ -7,7 +7,7 @@ import Quickshell.Io
 import "../lib/menus.js" as Menus
 
 // Which transient surface is open. Only one at a time, like macOS.
-// Values: "" | "menu" | "context" | "alert" | "cc" | "nc" | "spotlight" | "launchpad" | "switcher" | "mission"
+// Values: "" | "menu" | "context" | "alert" | "cc" | "nc" | "spotlight" | "switcher" | "mission"
 Singleton {
     id: root
 
@@ -83,7 +83,7 @@ Singleton {
     // Surfaces created on open (shell.qml LazyLoader) stay loaded while they dematerialize: closing
     // one holds it until its window releases it (ShellWindow.lingerAs), at most 1.5 s. The loaders
     // read only `loaded`, set here after `held`, so they never see a closed surface unheld.
-    readonly property var lazySurfaces: ["spotlight", "switcher", "launchpad", "mission"]
+    readonly property var lazySurfaces: ["spotlight", "switcher", "mission"]
     property var loaded: ({})           // name -> true while open or held
     property var held: ({})
     property string previous: ""
@@ -117,7 +117,6 @@ Singleton {
 
     // Hyprland binds call these via hl.dsp.global("hyprk:<name>")
     GlobalShortcut { appid: "hyprk"; name: "spotlight"; description: "Spotlight"; onPressed: root.toggle("spotlight") }
-    GlobalShortcut { appid: "hyprk"; name: "launchpad"; description: "Apps"; onPressed: root.toggle("launchpad") }
     GlobalShortcut { appid: "hyprk"; name: "controlcenter"; description: "Control Center"; onPressed: root.toggle("cc") }
     GlobalShortcut { appid: "hyprk"; name: "notificationcenter"; description: "Notification Center"; onPressed: root.toggle("nc") }
     GlobalShortcut { appid: "hyprk"; name: "switcher"; description: "App switcher"; onPressed: root.open = "switcher" }

@@ -58,7 +58,7 @@ const finder = {
                  { label: "Get Info", shortcut: "⌘I" }, SEP, { label: "Find", shortcut: "⌘F", action: "spotlight" }],
         "Go": [{ label: "Back", shortcut: "⌘[" }, { label: "Forward", shortcut: "⌘]" }, SEP,
                { label: "Recents", shortcut: "⇧⌘F" }, { label: "Documents", shortcut: "⇧⌘O" }, { label: "Desktop", shortcut: "⇧⌘D" },
-               { label: "Downloads", shortcut: "⌥⌘L" }, { label: "Home", shortcut: "⇧⌘H" }, { label: "Applications", shortcut: "⇧⌘A", action: "launchpad" }],
+               { label: "Downloads", shortcut: "⌥⌘L" }, { label: "Home", shortcut: "⇧⌘H" }, { label: "Applications", shortcut: "⇧⌘A", action: "apps" }],
     },
 };
 
