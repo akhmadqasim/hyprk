@@ -22,17 +22,17 @@ PanelWindow {
     // transforms (slide/scale animations). While things may be animating,
     // Glass items re-measure their shape on every glassMoved().
     signal glassMoved()
+    // Re-measure on every rendered frame while something may animate (was a 40 ms timer = 25 Hz,
+    // so the compositor glass stepped behind the 60 Hz content and looked choppy).
     function settleGlass() {
         if (!Theme.compositorGlass || !visible || glassRegions.length === 0) return;
-        settle.ticks = Math.ceil(Theme.anim.bannerIn / settle.interval) + 2;
-        settle.restart();
+        settle.until = Date.now() + Math.max(Theme.anim.bannerIn, Theme.anim.normal) + 80;
+        settle.running = true;
     }
-    Timer {
+    FrameAnimation {
         id: settle
-        property int ticks: 0
-        interval: 40
-        repeat: true
-        onTriggered: { win.glassMoved(); if (--ticks <= 0) stop(); }
+        property double until: 0
+        onTriggered: { win.glassMoved(); if (Date.now() >= until) stop(); }
     }
     onVisibleChanged: settleGlass()
     Connections {
