@@ -1212,3 +1212,252 @@ itself. The frameworks it uses only supply the curve (SwiftUI `Animation`) and t
   velocity-driven, probably the notification swipe dismissal (guess).
 - `easeInOut` 0.1, 0.15, 0.25, 0.35 and 0.5 s; `spring(0.5, 0.85)` ×7; an `NSAnimationContext` group of 0.15 s
   linear (`FUN_10017b76c`).
+
+## REA 27.2.1: HUD, Control Center, Notification Center, Spotlight, symbol effects
+
+macOS 27.2.1 (26B131), MacBook Air M2. Apps are read as their arm64e slice (`lipo -thin arm64e`, image base
+0x100000000). Frameworks come from the dyld shared cache and are listed at their cache addresses. Tools: `dyld_info
+-disassemble`, a stub resolver (call targets inside the cache resolved with `dladdr` in a live process), Ghidra 12.1.4 headless.
+Swift names come from reflection metadata; the RenderBox C++ names come from the extracted image's symbols.
+Pseudocode excerpts (about 170 KB) are in `~/hyprk/reference/re/27.2.1/decomp/`: `SystemBannerUI-hud.c`,
+`MenuBarAgent-banner.c`, `ControlCenter-panel.c`, `NotificationCenter-panel.c`, `SpotlightUIInternal-window.c`,
+`RenderBox-symbol-animation.c`.
+
+**Spring notation.** "Spring(d, b)" is SwiftUI `Spring(duration:bounce:)` or CoreAnimation
+`CASpringAnimation(perceptualDuration:bounce:)`. Both use stiffness = (2π/d)²; the damping ratio is 1 − b for b ≥ 0 and
+1/(1 + b) for b < 0. The apps inline this conversion before calling `interpolatingSpring(mass: 1, …)`.
+
+### 1. Volume and brightness HUD
+**Who draws what.**
+- The window belongs to MenuBarAgent. Its system-banner scene hosts content made in the ControlCenter process.
+- ControlCenter's `SystemBannerService` (`showVolume:max:isEnabled:` at ControlCenter 0x10041238c) builds a
+  `VolumeSystemBannerContent` (ControlCenter `FUN_10040f684`).
+- That content is rendered by **SystemBannerUI.framework**, which does the capsule, glass, glyph, slider and the
+  appear/hide animation.
+
+**Size.** SystemBannerUI `FUN_2aed61dd8`: `frame(width: 307, height: 66)`, `HStack(spacing: 7)`, padding leading 16,
+trailing 31, vertical 18. The window content rect is 367 wide (`FUN_2aed4ea84`, `initWithContentRect` width 367).
+- Agrees: recorded 307.5 × 65.5 (within the 0.5 pt edge anti-aliasing) and window 367 wide.
+- Trailing padding 31 agrees with the recorded 30.5. Bar start: 16 + glyph frame + 7 against the recorded 63; the
+  glyph frame width was not read.
+
+**Position.**
+- `BannerContentController` init (`FUN_2aed44e40`): `_scaleFactor` 0.9, `_opacity` 0, `_topMargin` 10. So 10 pt
+  under the menu bar agrees.
+- The 10 pt right margin was not found as a constant. The window (367 wide) is centred on the capsule with 30 pt
+  around it; MenuBarAgent places it. Not confirmed.
+
+**Appear.** `FUN_2aed4c4c0`. For the first show, `withAnimation(Animation.interpolatingSpring(mass: 2, stiffness: 300,
+damping: 50))` runs (static `DAT_2e1bf6780`, set in `FUN_2aed436a4`). It animates scale 0.9 → 1 and opacity 0 → 1.
+- That spring has ω0 12.25 rad/s and damping ratio 1.02 (just overdamped). Content values: 0.34 at 0.1 s,
+  0.69 at 0.2 s, 0.87 at 0.3 s, 0.95 at 0.4 s, 0.98 at 0.5 s.
+- **Agrees** with the recorded about 0.55 s. The recorded alpha fits *opacity²* almost exactly (RMS 0.017 with no
+  time shift). A reason it could be squared (inference, not verified): the view uses `.opacity(o)` and the glass is
+  `_Glass.controlCenter.mix(with: .identity, by: 1 − o)` (see Glass below), so it fades twice.
+- The recorded width 0.82 → 0.92 at the start is the scale 0.9 → 1 seen through that fade. Agrees.
+
+**Content swap (volume ↔ brightness, repeated presses).** When content is already showing, the same function uses
+`spring(response: 0.2, dampingFraction: 0.85)` (static `DAT_2e1bf6788`, `FUN_2aed436dc`) for the new content. It then
+runs the interpolating spring again through `FUN_2aed49f8c`.
+- Agrees: crossfade in about 3 frames.
+- The bar fill is `TickedSliderTrack` / `TickedTrackMask` (fill width = value × width, so it moves continuously). It
+  changes inside that 0.2/0.85 spring, which settles in about 0.2 s. Agrees with the recorded continuous fill that
+  eases out in 0.15–0.2 s.
+
+**Hide.** `FUN_2aed49520` / `FUN_2aed49a34`: `withAnimation(spring(response: 0.48669, dampingFraction: 1))` (static
+`DAT_2e1bf6778`, `FUN_2aed43744`). The end values are scale 0.9 and opacity 0 (`FUN_2aed44be4`). The dismissal
+completion runs on `DispatchQueue.main.asyncAfter(now + 0.48669)`.
+- Agrees: recorded alpha ≈ (1 − x)² with RMS 0.017.
+- The glyph and bar "linger to about 0.5 s" matches the 0.48669 s completion delay.
+- The recorded ~0.3 s is the time to 5 % of the squared value.
+
+**Idle timeout.** MenuBarAgent `FUN_10031d44c` maps `SystemBannerTimeoutMode` to seconds: custom(t) → t, short → 1.0,
+standard → 4.0, long → 20.0, keepAlive → assert.
+- The timer restarts from `lastClientUpdateTime` on every press
+  (`extendSystemBannerAssertionLifetimeWithID:lastClientUpdateTime:timeoutMode:…`).
+- The recorded 1.05 s fits `short` (1.0 s) plus about 3 frames of hosting latency. Guess: the volume banner uses
+  `.short`; the mode ControlCenter passes was not traced.
+
+**Steps.**
+- `TickedTrackMask(tickCount: 16, tickWidth: 1.0, tickProgress: 0|1)` (`FUN_2aed661ec`). The track frame height is 4;
+  the leading corners have radius 2, and the trailing corners too when value == 1. Agrees with 16 dashes and 4 pt
+  height.
+- The key step of 1/16 and 1/64 with Option+Shift is **not found** in MenuBarAgent, ControlCenter or SystemBannerUI;
+  the key handling lives elsewhere.
+
+**Glyph.** SystemBannerUI `FUN_2aed5ab20`, used when ControlCenter gives no device image: `Image(systemName: "speaker." + x)`
+with `.symbolVariant(.fill)`. x is:
+- `slash` when value < 0.001;
+- `wave.1` when value < 0.333;
+- `wave.2` when value < 0.667;
+- `wave.3` otherwise.
+
+Agrees: wave.1 at 3/16, wave.2 at 7/16, slash when muted.
+- No symbol effect is applied to the HUD glyph; SystemBannerUI imports no SymbolEffect API.
+- The Control Center Sound module and the menu bar extra use a different rule (ControlCenter `FUN_1005542f8`):
+  `speaker.wave.3.fill` with `variableValue` 0.01 / 0.34 / 1.0 at the same 0.333 / 0.667 thresholds,
+  `speaker.slash.fill` under `muteVolumeEpsilon`, and `headphones` / `headphones.slash` for headphones.
+
+**Glass.** `_glassEffect(_Glass.controlCenter.mix(with: _Glass.identity, by: 1 − opacity), in: Capsule())`.
+- `_Glass.controlCenter` is static `DAT_2e1bf6760`, set by `FUN_2aed43774`. SwiftCore encodes it as tag 0x48, which is
+  index 9 = `InternalConfiguration.Base.controlCenter`, so DesignLibrary's **ControlCenterRecipe** applies (IdiomModifier
+  0x195f0a2bc, MacICExtra 0x195f0a2c4, RTExtra 0x195f0a2c0; decoded in `recipes-annotated.c`).
+- No subvariant is set. The glass fades by mixing towards identity, not through its alpha.
+
+### 2. Control Center panel (bento box)
+**Open and close.** Both run in ControlCenter. Open is `FUN_1002dc74c`, close is `FUN_1002dce40` (completion log "bento
+box dismiss animation did complete"). Both call `withAnimation(DAT_10095bf80, completionCriteria: .logicallyComplete)`.
+- `DAT_10095bf80` is set by `FUN_10027f1f8` → `FUN_10027f228`: `Spring(duration: 0.25, bounce: -0.027)`, which
+  becomes `interpolatingSpring(mass 1, stiffness 631.65, damping 51.66)`. That is **response 0.25 s, damping ratio
+  1.028**.
+- It animates a transition progress p. `FUN_1002db3fc` maps it to the view state:
+  - appearing: `bentoBoxOpacity` = p, `bentoBoxScale` = 1.01 − 0.01·p (@0x1006f2bf8 = 1.01, @0x1006f2c00 = −0.01);
+  - dismissing: opacity = 1 − p, scale = 1.0 → 1.01;
+  - hidden: opacity 0, scale 1.01.
+
+**Agreement.**
+- Open: agrees. The model gives 0.13, 0.28, 0.43, 0.56 … 0.96 at 12 frames; recorded 0.16, 0.29, 0.40, 0.51 …
+  0.94 (about half a frame offset). This is the "ease-out mostly done in 0.15 s".
+- Close: agrees. 95 % is reached at 0.19 s; recorded 0.17–0.2 s.
+- Scale: differs. There is a 1 % scale (1.01 → 1.0 on open, 1.0 → 1.01 on close) that the recording reported as "no
+  scale". It is 3–4 pt on a 350 pt panel and probably below what the recording could resolve.
+
+Module tile sizes: not done.
+
+### 3. Notification Center panel
+Sent earlier as `REA-B-NC.md`; full detail there and in `NotificationCenter-panel.c`. Summary:
+
+**Click open and close.** Both use one SwiftUI `Spring(duration: 0.3, bounce: -0.2)`: response 0.3 s, damping ratio
+1.25 (`FUN_1001910a4` → `FUN_1001910d8`, static `DAT_1003c1388`).
+- It is used through `FUN_1001e19c4` (`withAnimation(…, .logicallyComplete)`). Open sets x offset 0 and
+  openProgress 1 (`FUN_1001e195c`); close sets x offset W and openProgress 0 (`FUN_1001e1b58`).
+- It moves x only: no fade, scale or blur, and no `Animation.delay` (no stagger).
+
+**Agreement: differs.** The recording fits a critically damped spring better: response 0.3 s for open (RMS 0.015
+against 0.055) and 0.25 s for close.
+
+**Trackpad swipe.** WindowManager's `NotificationCenterSystemGesture` supplies the progress; the panel follows it 1:1.
+- Above 1 it rubber-bands as 1 + 0.25(p−1)/((p−1)/0.75 + 1) (`FUN_1001c6ca8`).
+- Release (`FUN_1001c70b4`): WindowManager decides close or open and supplies the velocity. Completion runs
+  `FluidSpringAnimator` at 60 Hz (`FUN_100211574`):
+  `v = 0.695v + 2(1−p); p += v/60; v = 0.85v − 0.8(p−1)`, stopping when |v| < 0.01.
+
+### 4. Spotlight (SpotlightUIInternal.framework; Spotlight.app holds no UI code)
+**Search field glass.** The glass elements are drawn by the `GlassEffect` / `GlassElementModifier` path,
+`FUN_2adf11f2c`:
+
+    materialEffect(Material._glass(_GlassVariant.regular.size(.large).adaptive(false).excludingShadow()
+                   .interactionState(.disabled).contentLensing(true)), in: _ShapeSet(shapes, smoothness))
+
+- So in 27.2.1 the field uses the **Regular** recipe at size large, with content lensing ("lens") switched on. It does
+  **not** use SiriRecipe or a `spotlightField` subvariant; that string does not occur in SpotlightUIInternal, SearchUI,
+  SpotlightUIShared or SpotlightUIServices. The SiriRecipe branch-A/lens question therefore does not apply to the field.
+- Guess, not traced into DesignLibrary: `contentLensing(true)` resolves to `ResolvedContentEffect.lense` on that
+  recipe.
+
+**Results panel glass.** `FUN_2ade6f690`:
+`_glassEffect(_Glass.siri.subvariant("searchResults").adaptive(false).excludingShadow(true), in: RoundedRectangle(cornerRadius: 37))`.
+- Base `siri` with subvariant `searchResults` takes SiriRecipe **branch A** (not `.listening`) unless contentEffect
+  resolves to `.lense`. The call sets no contentEffect, so it gets the default, which was not traced.
+- Branch A values: face YCC 0.1 / 1.0 / 1.25, blur 8, no ring shadow.
+- A second path, `FUN_2ade65b28`, uses public `Glass.regular` with `glassEffect` plus a window drag gesture. It is
+  probably the compact or drag state (guess).
+
+**Open (invocation).** `FUN_2ade99418` → `FUN_2adea2ff0` adds three `CASpringAnimation`s on the content layer:
+- `transform.scale.x` 1.12 → 1: Spring(0.28, bounce 0.41), or 0.32 under a flag;
+- `transform.scale.y` 0.95 → 1: Spring(0.28, 0.32);
+- `transform.translation.y` → 0: Spring(0.28, 0.32).
+
+The window also gets `alphaValue` with Spring(0.28, 0.41) in `FUN_2ade9ef14`. `WindowAnimationCoordinator.
+InvocationAnimationState` = {xScale 1.12, yScale 0.95, opacity 0, blurRadius 25}, from `FUN_2ade9a5ec` and
+`FUN_2ade9bff0`.
+
+Agreement: partly.
+- The code starts at 1.12× width, not the recorded 1.05×. Model x at frames 1–5: 1.113, 1.096, 1.074, 1.052, 1.031,
+  1.003 at frame 7, then a slight undershoot (0.995 at frame 8, 0.99 at frame 9). With the alpha fade, the first clearly visible frame is around
+  frame 3–4, at about 1.05–1.07×. So it agrees if the first visible frame is about 3 frames in.
+- The code fades alpha in over about 0.1 s and squashes y 0.95 → 1; the recording saw "no fade-in". Differs slightly.
+
+**Close (dismissal).** `FUN_2ade9c2dc` → `FUN_2adea36c8`:
+- layer `transform.scale.x` 1 → 1.12, `scale.y` 1 → 0.95 and `translation.y` → 0, each Spring(0.45, bounce 0.05);
+- window `alphaValue` Spring(0.28, 0.41) and `contentBlurRadius` 0 → 25 with Spring(0.51, 0.05) (`FUN_2ade9ef14`, flag 0).
+
+Agrees qualitatively: fade + blur + slight growth. The recorded 0.05 s is shorter than these springs; the window
+probably orders out once the alpha is about 0.5 (guess).
+
+**Other springs.** `WindowAnimationCoordinator.Animations` statics (`FUN_2ade84974` ff.):
+- Spring(0.49, 0.15).delay(0.17);
+- Spring(0.71, 0.01) and Spring(0.39, 0.39);
+- size-dependent set A: (0.35, 0.43), (0.45, 0.39), (0.55, 0.35), (0.6, 0.31);
+- size-dependent set B: (0.41, 0.394), (0.55, 0.35), (0.65, 0.32);
+- Spring(0.41, 0.12) and Spring(0.2, 0.05).
+
+These are used for resize, morph and jump-to-app; the mapping was not traced.
+
+### 5. SF Symbol effects
+**Where the system UI applies them.**
+- ControlCenter is the only one of the four apps that uses them, through SwiftUI. The contexts below come from nearby
+  strings and are marked as guesses:
+  - `variableColor` `.sequential.reversing` as an indefinite `_SymbolEffectModifier`: `FUN_10031ec60`, the Wi-Fi
+    module (WiFiContentView), so most likely Wi-Fi searching;
+  - variableColor sequential reversing plus `pulse`: `FUN_100425e18` (ListeningMode / MusicRecognition area);
+  - indefinite `Pulse`: `FUN_1005315c0`, Screen Mirroring;
+  - `Appear.up` transition: `FUN_10055d874`;
+  - `DrawOn` transition: `FUN_1005dedd8`;
+  - `Bounce`, `Replace`, and `Rotate` with `SymbolEffectOptions.speed(2)`: `FUN_100266fc8`
+    (Bluetooth / app status items);
+  - `ContentTransition.symbolReplace(.default)` at 10 sites, among them the Sound module (`FUN_10055494c`), Bluetooth
+    (`FUN_10023f8c8`, `FUN_100240188`) and the menu-extra symbol (`FUN_10036fba8`,
+    `SystemBannerAwareMenuExtraSymbolView`).
+- MenuBarAgent, NotificationCenter, SystemBannerUI (the HUD speaker) and SpotlightUIInternal import no symbol-effect
+  API. So the NC bell and the HUD speaker have no effect in 27.2.1.
+- AirDrop was not found in these four.
+
+**Implementation.**
+- The Symbols framework holds the public API. `-[NSSymbolEffect _rbAnimation]` maps effects to RBSymbolAnimation ids
+  (table @0x196a61330): variableColor 1, pulse 2, bounce 3, scale 4, appear 5, disappear 9, wiggle 10, rotate 11,
+  breathe 12, drawOn 13, drawOff 14. Replace uses 6–8; not mapped.
+- The engine is **RenderBox.framework, `RB::Symbol::Animation`**.
+
+**Durations** at speed 1, from `local_duration` 0x196b15570, `intro_duration` 0x196b15904 and `outro_duration`
+0x196b15b9c:
+
+| Effect | Duration |
+|---|---|
+| Bounce | 0.70 s; in split intro/outro mode 0.4333 intro + 0.2667 outro |
+| Wiggle | 0.935 s; split mode 0.3333 + 0.41667 |
+| Rotate | 2.0 s; split mode 2.5 intro and 2.5 outro |
+| Pulse | 2.0 s (1.0 s with flag bit 31) |
+| Breathe | 3.0 s |
+| Scale, Appear | 0.25 s |
+| Disappear | 0.1667 s |
+| Variable color | 1/3 + 1/3·clamp(layers, 1, 3), with other forms for more layers |
+| Replace | 0.667, 0.7, 1.0, or 0.25/0.5 depending on style |
+| DrawOn / DrawOff | `draw_duration` with a base of 0.25 / 0.1667 per layer |
+| Default | 1/3 s |
+
+**Per-layer delay** (`layer_delay` 0x196b15dc0).
+- Bounce and wiggle: 0.05 s per layer; with more than 4 layers, 0.15/(n−1). Down bounces run the layers in reverse
+  order.
+- Variable color: the layer index times 1/9 · (1/3 + n/12 + (2n−8)/60)⁻¹ … for more than 3 layers. The exact form is
+  in the excerpt.
+- `frame_delay`: 0.05 s for the variable-color and pulse types.
+
+**Keyframe tables** (`bounce_keyframes` 0x196b18c14 etc.).
+- Bounce peak 1.109 (up) / 0.909 (down); whole-symbol values 0.95 / 1.05 and 1.059 / 0.95.
+- Bounce segment times 0.21667, 0.21667 and 0.15 (minus the layer offset); outro 0.26667.
+- Pulse goes 1 → 0 → 1 in two equal halves of 1.0 s (0.5 s with the flag).
+- Wiggle angle 0.08727 rad = 5°. In the Symbols framework the direction angles are ±90°, 180° and 360°.
+
+The exact meaning of each pushed value (scale or curve parameter) and the curve ids 1/3/4/5 were not decoded. The
+wiggle and breathe keyframe functions failed to decompile. Treat the keyframe values as raw.
+
+### Not found / not done
+- Volume step size (1/16 and 1/64): not found in these images.
+- The HUD's 10 pt right margin: not found as a constant.
+- Timeout mode for the volume banner: `.short` is a guess.
+- Control Center module tile sizes: not done.
+- NC panel width W: probably 424 (guess).
+- The view-side use of NC's `OpenSlideModifier`: not traced.
+- Spotlight: the mapping of the Animations statics, and the results panel's contentEffect default: not traced.
+- RenderBox keyframe curve semantics: not decoded.
