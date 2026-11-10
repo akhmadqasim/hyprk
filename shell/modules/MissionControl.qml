@@ -6,8 +6,8 @@ import Quickshell.Hyprland
 import Quickshell.Widgets
 import qs
 import qs.components
-import qs.services
 import qs.HyprK
+import qs.services
 import "../lib/spring.js" as SpringLib
 
 // Mission Control (Super+Up): live thumbnails of the windows on the current Space laid out

@@ -6,8 +6,8 @@ import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs
 import qs.components
-import qs.services
 import qs.HyprK
+import qs.services
 import "../lib/dock.js" as DockLayout
 import "../lib/state.js" as State
 

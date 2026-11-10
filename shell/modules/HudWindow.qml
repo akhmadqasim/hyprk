@@ -5,8 +5,8 @@ import Quickshell.Io
 import Quickshell.Wayland
 import qs
 import qs.components
-import qs.services
 import qs.HyprK
+import qs.services
 import "../lib/hud.js" as HudLib
 
 // Volume / brightness HUD (macOS 27.2.1, MAC-ANSWERS.md "REA 27.2.1" section 1, SystemBannerUI): a glass

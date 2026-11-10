@@ -3,8 +3,8 @@ import Quickshell
 import Quickshell.Wayland
 import qs
 import qs.components
-import qs.services
 import qs.HyprK
+import qs.services
 import "../lib/nc.js" as NcLib
 
 // Notification banners, top-right below the menu bar, in the Notification Center card column (macOS 27.2.1, PC #62 3a/3b,

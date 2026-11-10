@@ -5,8 +5,8 @@ import Quickshell.Io
 import Quickshell.Widgets
 import qs
 import qs.components
-import qs.services
 import qs.HyprK
+import qs.services
 import "../lib/nc.js" as NcLib
 
 // Notification Center (macOS 27): grouped notifications on top, widgets below.

@@ -2,8 +2,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import qs
-import qs.services
 import qs.HyprK
+import qs.services
 
 // Base for every shell layer surface. Glass items inside register their
 // shapes here; with the liquidglass compositor plugin active the union is

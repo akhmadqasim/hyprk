@@ -3,8 +3,8 @@ import Quickshell
 import Quickshell.Hyprland
 import qs
 import qs.components
-import qs.services
 import qs.HyprK
+import qs.services
 
 // Menu of macOS 27.2.1, one component for every menu: menu bar pull-downs and the context menus of the
 // desktop and the Dock (Overlay.qml). Pull-down and context menu are the same glass, radius 12, with

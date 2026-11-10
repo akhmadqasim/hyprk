@@ -1,8 +1,8 @@
 import QtQuick
 import Quickshell.Widgets
 import qs
-import qs.services
 import qs.HyprK
+import qs.services
 
 // macOS-style alert: glass card (Theme.alert.radius), app icon, bold title, message,
 // capsule buttons. Model: { icon, title, message, buttons: [{ label, action, isDefault, isCancel }] }.

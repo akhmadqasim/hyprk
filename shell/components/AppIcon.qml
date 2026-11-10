@@ -1,7 +1,7 @@
 import QtQuick
 import qs
-import qs.services
 import qs.HyprK
+import qs.services
 
 // App icon for the shell: resolves the icon (macOS icon when mapped, else the icon theme)
 // and draws it with AppIconTile (macOS 26 squircle tile for icons that are not squircles).

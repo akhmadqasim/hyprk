@@ -4,8 +4,8 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
 import qs
-import qs.services
 import qs.HyprK
+import qs.services
 import "../lib/clock.js" as Clock
 import "../lib/nc.js" as NcLib
 

@@ -3,8 +3,8 @@ import Quickshell
 import Quickshell.Wayland
 import qs
 import qs.components
-import qs.services
 import qs.HyprK
+import qs.services
 import "../lib/search.js" as Search
 import "../lib/spotlight.js" as SL
 import "../lib/spring.js" as SpringLib

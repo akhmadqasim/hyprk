@@ -7,8 +7,8 @@ import Quickshell.Bluetooth
 import Quickshell.Services.Mpris
 import qs
 import qs.components
-import qs.services
 import qs.HyprK
+import qs.services
 import "../lib/state.js" as State
 
 // Control Center, macOS 26/27 layout: no panel, separate clear-glass modules

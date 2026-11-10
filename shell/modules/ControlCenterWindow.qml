@@ -4,8 +4,8 @@ import Quickshell
 import Quickshell.Wayland
 import qs
 import qs.components
-import qs.services
 import qs.HyprK
+import qs.services
 import "../lib/spring.js" as SpringLib
 
 // Control Center on its own layer namespace (hyprk-controlcenter) so the
