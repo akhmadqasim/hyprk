@@ -181,3 +181,18 @@ glass material 65 (03:35, orchestrator; too cyan)
   Spotlight asks for the `lense` content effect, which is still unknown (set in SpotlightUI* / SearchUI, not traced).
   It cannot be measured live: AppKit does not reach base `siri`. plugin SPOTLIGHT is unchanged (by eye, score 81);
   trying branch A there is an optional experiment for the PC, compare with reference/screens/macos27-spotlight.png.
+- [PC, 2026-11-10] Run in a headless nested session (2560x1664 at 2x, plugin glass), lgtests and shell tests (183) pass.
+  - plugin `spotlight` now takes SiriRecipe branch A (747160f): face 0.1 / 1.0 / 1.25 without fill, refraction 0.4 D / -0.72 D
+    uncapped, outer 0.4 D / 0.4 D at 1.0, blur 8 x 0.75 = 6 from 60 pt inside, blur fill darken 0.75 normal 0.5, no shadow,
+    edge bleed or ring. Blur 3 and 6 compared by eye, barely different, 6 kept. Not modelled: backdropScale 0.5, darkSpecular
+    spread / amount / colorBias (rim keeps Regular's bias), blur-fill lighten (Regular's kept, Siri base not traced). Still
+    "branch A unless lense". Shots: reference/ours/plugin-spotlight-{byeye,branchA}-{light,dark}.png. In dark mode the
+    shell's dark veil dominates, so the change shows mostly in light.
+  - Alert title looked double-struck: Qt 6.10 adds FreeType emboldening on SF Pro's variable Bold instance for any weight
+    >= Bold. Fixed with DemiBold + `variableAxes {wght: 700}` in AlertDialog and the menu bar app name (f480c1e);
+    not config/fontconfig (fc-match picks the Bold instance without embolden). Other Font.Bold users outside shell/
+    (ui/, settings/, finder/) were not checked.
+  - Popover show/close motion: not applied. No shell surface is a macOS popover (menus, context menus, alerts, Control Center,
+    Notification Center, Spotlight, Cmd-Tab, Mission Control, Launchpad, Dock tooltips); status items open Control Center.
+  - Mission Control glass: no source. No Mission Control reference screenshot, SPEC 11.4 has only WindowManager motion
+    defaults, the DesignLibrary variants have no Spaces or Mission Control entry. Left without glass.
