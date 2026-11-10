@@ -42,6 +42,16 @@ ShellWindow {
     readonly property var modeInfo: SL.modeInfo(mode)
     // the mode buttons show once the pointer moves over Spotlight, or while a mode is active
     property bool pointerMoved: false
+    // a surface mapped under a resting pointer gets an enter and a motion event at that point, so
+    // only a real move (from where the pointer was first seen) counts: before, the buttons always
+    // emerged on open when the pointer happened to rest over the Spotlight layer
+    property point firstPointer: Qt.point(NaN, NaN)
+    function notePointer(item, mx, my) {
+        if (pointerMoved) return;
+        const p = item.mapToItem(null, mx, my);
+        if (isNaN(firstPointer.x)) firstPointer = p;
+        else if (Math.abs(p.x - firstPointer.x) + Math.abs(p.y - firstPointer.y) > 2) pointerMoved = true;
+    }
     readonly property var actions: mode === "" && query.trim() !== "" ? SpotlightActions.rank(query, 2) : []
     readonly property bool quickKeyHit: SL.quickKeyAction(SpotlightState.quickKeys, query) !== ""
     readonly property var files: mode === "" ? FileSearch.results.slice(0, 3) : []
@@ -148,7 +158,7 @@ ShellWindow {
         anchors.fill: parent
         hoverEnabled: true
         onPressed: Panels.close()
-        onPositionChanged: sp.pointerMoved = true
+        onPositionChanged: mouse => sp.notePointer(this, mouse.x, mouse.y)
     }
 
     // `qs ipc call spotlight search "2+2"`: open with a query (scripted screenshots)
@@ -184,7 +194,7 @@ ShellWindow {
             tint: Theme.glass.tintStrong
             materialize: mat.progress
         }
-        MouseArea { anchors.fill: parent; hoverEnabled: true; onPositionChanged: sp.pointerMoved = true }
+        MouseArea { anchors.fill: parent; hoverEnabled: true; onPositionChanged: mouse => sp.notePointer(this, mouse.x, mouse.y) }
 
         Item {
             id: bar
