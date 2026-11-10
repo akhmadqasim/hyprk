@@ -7,8 +7,9 @@ import "Panes.js" as Panes
 // Quickshell) give it a window and handle the window signals.
 Item {
     id: app
-    // the account row plus the group break after it (Family, the second row of that group, is not drawn)
-    readonly property int accountHeight: Theme.sidebar.accountHeight + Theme.sidebar.groupGap
+    // the account row, the Family row and the group break after them (27.2.1: the first pane row's top at y 188,
+    // 90 below the list top; *-light.png have both rows blanked flat, so the Family row's look is not measured)
+    readonly property int accountHeight: Theme.sidebar.accountHeight + Theme.sidebar.rowHeight + Theme.sidebar.groupGap
     property bool windowActive: Window.active   // forced on for snapshots
     Binding { target: Theme; property: "windowActive"; value: app.windowActive }
     Binding { target: Tokens; property: "windowActive"; value: app.windowActive }
@@ -159,6 +160,22 @@ Item {
         id: accountCard
         Item {
             width: list.width; height: app.accountHeight
+            Item { // Family: a row like a pane row (people glyph in a grey circle, label); no pane behind it here
+                y: Theme.sidebar.accountHeight
+                width: parent.width; height: Theme.sidebar.rowHeight
+                Rectangle {
+                    width: Theme.sidebar.iconSize; height: width; radius: width / 2
+                    x: Theme.sidebar.iconCenter - width / 2; anchors.verticalCenter: parent.verticalCenter
+                    color: Theme.tile.gray
+                    Text { anchors.centerIn: parent; text: "group"; font.family: Theme.fontGlyph; font.pixelSize: parent.width * 0.7; color: "white" }
+                }
+                MacText {
+                    x: Theme.sidebar.labelLeft; anchors.verticalCenter: parent.verticalCenter
+                    text: "Family"
+                    size: Theme.sidebar.fontSize
+                    color: app.windowActive ? Theme.label : Theme.sidebar.labelInactive
+                }
+            }
             Rectangle {
                 id: avatar
                 x: 6; y: (Theme.sidebar.accountHeight - height) / 2   // the account button starts at window x 16
