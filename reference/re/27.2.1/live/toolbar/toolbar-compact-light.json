@@ -1,0 +1,4206 @@
+{
+  "contentLayoutRect" : [
+    0,
+    0,
+    980,
+    520
+  ],
+  "mode" : "light",
+  "surfaces" : [
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+
+          },
+          "name" : "sdrNormalize",
+          "type" : "sdrNormalize"
+        },
+        {
+          "inputs" : {
+            "inputNormalizeEdges" : "1",
+            "inputRadius" : "30"
+          },
+          "name" : "gaussianBlur",
+          "type" : "gaussianBlur"
+        }
+      ],
+      "frameInWindow" : [
+        0,
+        0,
+        980,
+        560
+      ],
+      "hidden" : false,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 1,
+      "path" : "CALayer > CABackdropLayer"
+    },
+    {
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        0,
+        0,
+        980,
+        560
+      ],
+      "hidden" : false,
+      "layerClass" : "NSViewBackingLayer",
+      "opacity" : 1,
+      "path" : "CALayer > CALayer > NSThemeFrame > NSVisualEffectView",
+      "viewFrameInWindow" : [
+        0,
+        0,
+        980,
+        560
+      ],
+      "visualEffect" : {
+        "blending" : 1,
+        "material" : 18,
+        "state" : 1
+      }
+    },
+    {
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        144,
+        0,
+        836,
+        560
+      ],
+      "hidden" : false,
+      "layerClass" : "NSViewBackingLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSSplitView > _NSSplitViewItemViewWrapper > NSScrollView > _NSScrollViewContentBackgroundView > NSVisualEffectView",
+      "viewFrameInWindow" : [
+        144,
+        0,
+        836,
+        560
+      ],
+      "visualEffect" : {
+        "blending" : 1,
+        "material" : 18,
+        "state" : 0
+      }
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        144,
+        520,
+        836,
+        40
+      ],
+      "hidden" : false,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 1,
+      "path" : "NSThemeFrame > NSView > NSSplitView > _NSSplitViewItemViewWrapper > NSScrollView > BackdropView",
+      "viewFrameInWindow" : [
+        144,
+        520,
+        836,
+        40
+      ]
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputColorMatrix" : "{length = 80, bytes = 0x849e4d3f 22fd363e 7346943c 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "colorMatrix",
+          "type" : "colorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        144,
+        520,
+        836,
+        40
+      ],
+      "hidden" : false,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 0.5,
+      "path" : "NSSplitView > _NSSplitViewItemViewWrapper > NSScrollView > NSScrollPocket > CALayer > CABackdropLayer"
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBlurFillBlurRadius" : "16",
+            "inputBlurFillDarkenOpacity" : "0.4",
+            "inputBlurFillLightenOpacity" : "0.6",
+            "inputBlurFillNormalOpacity" : "0.25",
+            "inputDither" : "1",
+            "inputFade" : "0",
+            "inputMaskImage" : "<CGImage 0x7b0213e800> (DP)\n\t<<CGColorSpace 0x100cbe030> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1)>\n\t\theadroom = 1.000000  \n\t\twidth = 1,",
+            "inputNormalizeEdges" : "1",
+            "inputRadius" : "2"
+          },
+          "name" : "variableBlur",
+          "type" : "variableBlur"
+        },
+        {
+          "inputs" : {
+            "inputColorMatrix" : "{length = 80, bytes = 0x0534993f 8f3137be bc7493bc 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "colorMatrix",
+          "type" : "colorMatrix"
+        },
+        {
+          "inputs" : {
+            "inputClamp" : "1",
+            "inputClampPreserveHue" : "1"
+          },
+          "name" : "sdrNormalize",
+          "type" : "sdrNormalize"
+        }
+      ],
+      "frameInWindow" : [
+        144,
+        520,
+        836,
+        40
+      ],
+      "hidden" : false,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 1,
+      "path" : "NSSplitView > _NSSplitViewItemViewWrapper > NSScrollView > NSScrollPocket > CALayer > CABackdropLayer"
+    },
+    {
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputDither" : "1",
+            "inputNormalizeEdges" : "0",
+            "inputRadius" : "20"
+          },
+          "name" : "gaussianBlur",
+          "type" : "gaussianBlur"
+        }
+      ],
+      "frameInWindow" : [
+        144,
+        520,
+        0,
+        0
+      ],
+      "hidden" : false,
+      "layerClass" : "NSViewBackingLayer",
+      "opacity" : 1,
+      "path" : "NSSplitView > _NSSplitViewItemViewWrapper > NSScrollView > NSScrollPocket > PocketMask > NSView",
+      "viewFrameInWindow" : [
+        144,
+        520,
+        0,
+        0
+      ]
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        144,
+        520,
+        0,
+        0
+      ],
+      "hidden" : true,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSSplitView > _NSSplitViewItemViewWrapper > NSScrollView > NSScrollPocket > PocketBlur",
+      "viewFrameInWindow" : [
+        144,
+        520,
+        0,
+        0
+      ]
+    },
+    {
+      "compositingFilter" : "destIn",
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 00000000 00000000 00000000 ... 0000a03f 000080be }"
+          },
+          "name" : "colorMatrix",
+          "type" : "colorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        144,
+        520,
+        0,
+        0
+      ],
+      "hidden" : false,
+      "layerClass" : "CAPortalLayer",
+      "opacity" : 1,
+      "path" : "NSSplitView > _NSSplitViewItemViewWrapper > NSScrollView > NSScrollPocket > PocketBlur > PortalView",
+      "viewFrameInWindow" : [
+        144,
+        520,
+        0,
+        0
+      ]
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputDither" : "1",
+            "inputNormalizeEdges" : "1",
+            "inputRadius" : "6"
+          },
+          "name" : "gaussianBlur",
+          "type" : "gaussianBlur"
+        },
+        {
+          "inputs" : {
+            "inputColorMatrix" : "{length = 80, bytes = 0x0534993f 8f3137be bc7493bc 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "colorMatrix",
+          "type" : "colorMatrix"
+        },
+        {
+          "inputs" : {
+            "inputClamp" : "1",
+            "inputClampPreserveHue" : "1"
+          },
+          "name" : "sdrNormalize",
+          "type" : "sdrNormalize"
+        }
+      ],
+      "frameInWindow" : [
+        144,
+        520,
+        0,
+        0
+      ],
+      "hidden" : false,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 1,
+      "path" : "_NSSplitViewItemViewWrapper > NSScrollView > NSScrollPocket > NSHardPocketView > CALayer > CABackdropLayer"
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputColorMatrix" : "{length = 80, bytes = 0x0a46753f e3a51b3d 24977f3b 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "colorMatrix",
+          "type" : "colorMatrix"
+        },
+        {
+          "inputs" : {
+            "inputClamp" : "1",
+            "inputClampPreserveHue" : "1"
+          },
+          "name" : "sdrNormalize",
+          "type" : "sdrNormalize"
+        }
+      ],
+      "frameInWindow" : [
+        144,
+        520,
+        0,
+        0
+      ],
+      "hidden" : false,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 0.82450002431869507,
+      "path" : "_NSSplitViewItemViewWrapper > NSScrollView > NSScrollPocket > NSHardPocketView > CALayer > CABackdropLayer"
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        144,
+        520,
+        0,
+        0
+      ],
+      "hidden" : true,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 0.60000002384185791,
+      "path" : "NSScrollView > NSScrollPocket > LuminanceAdjustment > NSView > NSView > BackdropView",
+      "viewFrameInWindow" : [
+        144,
+        520,
+        0,
+        0
+      ]
+    },
+    {
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        144,
+        520,
+        0,
+        0
+      ],
+      "hidden" : false,
+      "layerClass" : "NSViewBackingLayer",
+      "opacity" : 1,
+      "path" : "NSScrollPocket > LuminanceAdjustment > NSView > NSView > _NSScrollViewContentBackgroundView > NSVisualEffectView",
+      "viewFrameInWindow" : [
+        144,
+        520,
+        0,
+        0
+      ],
+      "visualEffect" : {
+        "blending" : 1,
+        "material" : 18,
+        "state" : 0
+      }
+    },
+    {
+      "compositingFilter" : "destIn",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        144,
+        520,
+        0,
+        0
+      ],
+      "hidden" : false,
+      "layerClass" : "CAPortalLayer",
+      "opacity" : 1,
+      "path" : "NSSplitView > _NSSplitViewItemViewWrapper > NSScrollView > NSScrollPocket > LuminanceAdjustment > PortalView",
+      "viewFrameInWindow" : [
+        144,
+        520,
+        0,
+        0
+      ]
+    },
+    {
+      "_adaptiveAppearance" : "1",
+      "_interactionState" : "0",
+      "_scrimState" : "0",
+      "_subduedState" : "0",
+      "_variant" : "18",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        0,
+        0,
+        144,
+        560
+      ],
+      "glassView" : "NSGlassEffectView",
+      "hidden" : false,
+      "layerClass" : "BackingLayer",
+      "opacity" : 1,
+      "path" : "CALayer > NSThemeFrame > NSView > NSSplitView > _NSSplitViewItemViewWrapper > NSGlassEffectView",
+      "style" : "0",
+      "viewFrameInWindow" : [
+        0,
+        0,
+        144,
+        560
+      ]
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        0,
+        520,
+        144,
+        40
+      ],
+      "hidden" : false,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 1,
+      "path" : "_NSSplitViewItemViewWrapper > NSGlassEffectView > ContentHolderView > NSView > NSScrollView > BackdropView",
+      "viewFrameInWindow" : [
+        0,
+        520,
+        144,
+        40
+      ]
+    },
+    {
+      "compositingFilter" : "vibrantColorMatrixSourceOver",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        16,
+        496,
+        112,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "NSViewBackingLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSScrollView > NSClipView > NSTableView > NSTableRowView > NSTextField",
+      "viewFrameInWindow" : [
+        16,
+        496,
+        112,
+        24
+      ]
+    },
+    {
+      "compositingFilter" : "vibrantColorMatrixSourceOver",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        16,
+        472,
+        112,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "NSViewBackingLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSScrollView > NSClipView > NSTableView > NSTableRowView > NSTextField",
+      "viewFrameInWindow" : [
+        16,
+        472,
+        112,
+        24
+      ]
+    },
+    {
+      "compositingFilter" : "vibrantColorMatrixSourceOver",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        16,
+        448,
+        112,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "NSViewBackingLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSScrollView > NSClipView > NSTableView > NSTableRowView > NSTextField",
+      "viewFrameInWindow" : [
+        16,
+        448,
+        112,
+        24
+      ]
+    },
+    {
+      "compositingFilter" : "vibrantColorMatrixSourceOver",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        16,
+        424,
+        112,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "NSViewBackingLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSScrollView > NSClipView > NSTableView > NSTableRowView > NSTextField",
+      "viewFrameInWindow" : [
+        16,
+        424,
+        112,
+        24
+      ]
+    },
+    {
+      "compositingFilter" : "vibrantColorMatrixSourceOver",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        16,
+        400,
+        112,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "NSViewBackingLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSScrollView > NSClipView > NSTableView > NSTableRowView > NSTextField",
+      "viewFrameInWindow" : [
+        16,
+        400,
+        112,
+        24
+      ]
+    },
+    {
+      "compositingFilter" : "vibrantColorMatrixSourceOver",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        16,
+        376,
+        112,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "NSViewBackingLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSScrollView > NSClipView > NSTableView > NSTableRowView > NSTextField",
+      "viewFrameInWindow" : [
+        16,
+        376,
+        112,
+        24
+      ]
+    },
+    {
+      "compositingFilter" : "vibrantColorMatrixSourceOver",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        16,
+        352,
+        112,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "NSViewBackingLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSScrollView > NSClipView > NSTableView > NSTableRowView > NSTextField",
+      "viewFrameInWindow" : [
+        16,
+        352,
+        112,
+        24
+      ]
+    },
+    {
+      "compositingFilter" : "vibrantColorMatrixSourceOver",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        16,
+        328,
+        112,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "NSViewBackingLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSScrollView > NSClipView > NSTableView > NSTableRowView > NSTextField",
+      "viewFrameInWindow" : [
+        16,
+        328,
+        112,
+        24
+      ]
+    },
+    {
+      "compositingFilter" : "vibrantColorMatrixSourceOver",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        16,
+        304,
+        112,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "NSViewBackingLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSScrollView > NSClipView > NSTableView > NSTableRowView > NSTextField",
+      "viewFrameInWindow" : [
+        16,
+        304,
+        112,
+        24
+      ]
+    },
+    {
+      "compositingFilter" : "vibrantColorMatrixSourceOver",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        16,
+        280,
+        112,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "NSViewBackingLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSScrollView > NSClipView > NSTableView > NSTableRowView > NSTextField",
+      "viewFrameInWindow" : [
+        16,
+        280,
+        112,
+        24
+      ]
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBlurFillBlurRadius" : "0",
+            "inputBlurFillDarkenOpacity" : "0",
+            "inputBlurFillLightenOpacity" : "0",
+            "inputBlurFillNormalOpacity" : "0",
+            "inputDither" : "1",
+            "inputFade" : "1",
+            "inputMaskImage" : "<CGImage 0x7b0213e940> (DP)\n\t<(null)>\n\t\twidth = 1, height = 256, bpc = 8, bpp = 8, row bytes = 1, \n\t\tkCGImageAlphaNone | 0 (default byte order)  | kCGImagePixel",
+            "inputNormalizeEdges" : "1",
+            "inputRadius" : "1"
+          },
+          "name" : "variableBlur",
+          "type" : "variableBlur"
+        }
+      ],
+      "frameInWindow" : [
+        0,
+        520,
+        144,
+        40
+      ],
+      "hidden" : false,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 1,
+      "path" : "ContentHolderView > NSView > NSScrollView > NSScrollPocket > CALayer > CABackdropLayer"
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        0,
+        520,
+        144,
+        40
+      ],
+      "hidden" : false,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 1,
+      "path" : "ContentHolderView > NSView > NSScrollView > NSScrollPocket > CALayer > CABackdropLayer"
+    },
+    {
+      "compositingFilter" : "destIn",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        0,
+        520,
+        144,
+        40
+      ],
+      "hidden" : false,
+      "layerClass" : "CAGradientLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSScrollView > NSScrollPocket > CALayer > CABackdropLayer > CAGradientLayer"
+    },
+    {
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputDither" : "1",
+            "inputNormalizeEdges" : "0",
+            "inputRadius" : "20"
+          },
+          "name" : "gaussianBlur",
+          "type" : "gaussianBlur"
+        }
+      ],
+      "frameInWindow" : [
+        0,
+        520,
+        0,
+        0
+      ],
+      "hidden" : false,
+      "layerClass" : "NSViewBackingLayer",
+      "opacity" : 1,
+      "path" : "ContentHolderView > NSView > NSScrollView > NSScrollPocket > PocketMask > NSView",
+      "viewFrameInWindow" : [
+        0,
+        520,
+        0,
+        0
+      ]
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        0,
+        520,
+        0,
+        0
+      ],
+      "hidden" : true,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 0,
+      "path" : "NSGlassEffectView > ContentHolderView > NSView > NSScrollView > NSScrollPocket > PocketBlur",
+      "viewFrameInWindow" : [
+        0,
+        520,
+        0,
+        0
+      ]
+    },
+    {
+      "compositingFilter" : "destIn",
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 00000000 00000000 00000000 ... 0000a03f 000080be }"
+          },
+          "name" : "colorMatrix",
+          "type" : "colorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        0,
+        520,
+        0,
+        0
+      ],
+      "hidden" : false,
+      "layerClass" : "CAPortalLayer",
+      "opacity" : 1,
+      "path" : "ContentHolderView > NSView > NSScrollView > NSScrollPocket > PocketBlur > PortalView",
+      "viewFrameInWindow" : [
+        0,
+        520,
+        0,
+        0
+      ]
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputDither" : "1",
+            "inputNormalizeEdges" : "1",
+            "inputRadius" : "6"
+          },
+          "name" : "gaussianBlur",
+          "type" : "gaussianBlur"
+        },
+        {
+          "inputs" : {
+            "inputColorMatrix" : "{length = 80, bytes = 0x0534993f 8f3137be bc7493bc 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "colorMatrix",
+          "type" : "colorMatrix"
+        },
+        {
+          "inputs" : {
+            "inputClamp" : "1",
+            "inputClampPreserveHue" : "1"
+          },
+          "name" : "sdrNormalize",
+          "type" : "sdrNormalize"
+        }
+      ],
+      "frameInWindow" : [
+        0,
+        520,
+        0,
+        0
+      ],
+      "hidden" : false,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSScrollView > NSScrollPocket > NSHardPocketView > CALayer > CABackdropLayer"
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputColorMatrix" : "{length = 80, bytes = 0x0a46753f e3a51b3d 24977f3b 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "colorMatrix",
+          "type" : "colorMatrix"
+        },
+        {
+          "inputs" : {
+            "inputClamp" : "1",
+            "inputClampPreserveHue" : "1"
+          },
+          "name" : "sdrNormalize",
+          "type" : "sdrNormalize"
+        }
+      ],
+      "frameInWindow" : [
+        0,
+        520,
+        0,
+        0
+      ],
+      "hidden" : false,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 0.82450002431869507,
+      "path" : "NSView > NSScrollView > NSScrollPocket > NSHardPocketView > CALayer > CABackdropLayer"
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        0,
+        520,
+        0,
+        0
+      ],
+      "hidden" : false,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 0.60000002384185791,
+      "path" : "NSScrollView > NSScrollPocket > LuminanceAdjustment > NSView > NSView > BackdropView",
+      "viewFrameInWindow" : [
+        0,
+        520,
+        0,
+        0
+      ]
+    },
+    {
+      "compositingFilter" : "destIn",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        0,
+        520,
+        0,
+        0
+      ],
+      "hidden" : false,
+      "layerClass" : "CAPortalLayer",
+      "opacity" : 1,
+      "path" : "ContentHolderView > NSView > NSScrollView > NSScrollPocket > LuminanceAdjustment > PortalView",
+      "viewFrameInWindow" : [
+        0,
+        520,
+        0,
+        0
+      ]
+    },
+    {
+      "backgroundColor" : "<CGColor 0x7b02fd3410> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 1 1 1 1 )",
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000a03e 00000000 00000000 00000000 ... 00000000 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        0,
+        0,
+        144,
+        560
+      ],
+      "hidden" : false,
+      "layerClass" : "CALayer",
+      "opacity" : 1,
+      "path" : "_NSCoreHostingView<RootView> > CALayer > SDFLayer > CALayer > CALayer > CALayer"
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBleedAmount" : "50.4",
+            "inputBleedBlurRadius" : "50.4",
+            "inputBleedColorMatrixBlack" : "0.75",
+            "inputBleedColorMatrixSaturation" : "1.5",
+            "inputBleedColorMatrixWhite" : "0.9",
+            "inputBleedDarkenBlend" : "1",
+            "inputBleedDistance0" : "1",
+            "inputBleedDistance1" : "0",
+            "inputBleedHeight" : "50.4",
+            "inputBleedOpacity" : "0.4166667",
+            "inputBlurDistance0" : "-72",
+            "inputBlurDistance1" : "-1",
+            "inputBlurDistance2" : "0",
+            "inputBlurDistance3" : "0",
+            "inputBlurFillBlurRadius" : "8",
+            "inputBlurFillDarkenOpacity" : "0",
+            "inputBlurFillLightenOpacity" : "0.9",
+            "inputBlurFillNormalOpacity" : "0.5071146",
+            "inputBlurOpacity0" : "0.6666666",
+            "inputBlurOpacity1" : "0.3333333",
+            "inputBlurOpacity2" : "0.5",
+            "inputBlurOpacity3" : "1",
+            "inputBlurRadius" : "5",
+            "inputClamp" : "1.06961",
+            "inputClampPreserveHue" : "0",
+            "inputFaceColorMatrixBlack" : "0.4",
+            "inputFaceColorMatrixFillColor" : "<CGColor 0x7b02fd3330> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 1 1 1 ",
+            "inputFaceColorMatrixMaxLuma" : "0.85",
+            "inputFaceColorMatrixMaxLumaSDR" : "0.85",
+            "inputFaceColorMatrixSaturation" : "1.2",
+            "inputFaceColorMatrixWhite" : "1.03",
+            "inputFaceOpacity" : "1",
+            "inputInnerRefractionAmount" : "-60",
+            "inputInnerRefractionHeight" : "20",
+            "inputKeyFillHighlightAmount" : "0.4",
+            "inputKeyFillHighlightAngle" : "1.570796326794897",
+            "inputKeyFillHighlightColorBias" : "-0.25",
+            "inputKeyFillHighlightEffectOffset" : "-0.5",
+            "inputKeyFillHighlightHeight" : "0",
+            "inputKeyFillHighlightSpread" : "1.675516081914556",
+            "inputKeyFillHighlightSpreadSDR" : "1.850049007113989",
+            "inputMaxHeadroom" : "9999",
+            "inputOuterRefractionAmount" : "36",
+            "inputOuterRefractionHeight" : "28.8",
+            "inputRefractionDistance0" : "-1",
+            "inputRefractionDistance1" : "0",
+            "inputRefractionOpacity" : "0",
+            "inputRingShadowBlurRadius" : "5",
+            "inputRingShadowMask" : "1",
+            "inputRingShadowOffset" : "8",
+            "inputRingShadowOpacity" : "0",
+            "inputRingShadowStrokeWidth" : "4",
+            "inputSDRGradientDistance0" : "0",
+            "inputSDRGradientDistance1" : "0",
+            "inputSDRHoldingToneEnabled" : "0",
+            "inputSDRHoldingToneWhite" : "1",
+            "inputSDRShadowOpacity" : "0",
+            "inputShadowAmount" : "0",
+            "inputShadowBlurRadius" : "0",
+            "inputShadowColorMatrixBlack" : "0",
+            "inputShadowColorMatrixFillColor" : "<CGColor 0x7b02fd32c0> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 0 0 0 ",
+            "inputShadowColorMatrixSaturation" : "1",
+            "inputShadowColorMatrixWhite" : "1",
+            "inputShadowDistanceOffset" : "0",
+            "inputShadowHeight" : "0",
+            "inputShadowOffset" : "NSSize: {1, 0}",
+            "inputShadowOpacity" : "0",
+            "inputShadowRadius" : "0",
+            "inputShadowVibrancyContribution" : "0",
+            "inputSourceSublayerName" : "@0"
+          },
+          "name" : "glassBackground",
+          "type" : "glassBackground"
+        }
+      ],
+      "frameInWindow" : [
+        0,
+        0,
+        144,
+        560
+      ],
+      "hidden" : false,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 1,
+      "path" : "NSGlassEffectView > _NSCoreHostingView<RootView> > CALayer > SDFLayer > CALayer > CABackdropLayer"
+    },
+    {
+      "compositingFilter" : "colorBlendMode",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        0,
+        0,
+        144,
+        560
+      ],
+      "hidden" : false,
+      "layerClass" : "CAChameleonLayer",
+      "opacity" : 0.05000000074505806,
+      "path" : "NSGlassEffectView > _NSCoreHostingView<RootView> > CALayer > SDFLayer > CALayer > CAChameleonLayer"
+    },
+    {
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputClamp" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0xb6628f3f 13f241be e3a59bbc 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        0,
+        0,
+        144,
+        560
+      ],
+      "hidden" : false,
+      "layerClass" : "CASDFLayer",
+      "opacity" : 0,
+      "path" : "NSGlassEffectView > _NSCoreHostingView<RootView> > CALayer > SDFLayer > CALayer > CASDFLayer"
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        0,
+        520,
+        980,
+        40
+      ],
+      "hidden" : false,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 1,
+      "path" : "CALayer > CALayer > NSThemeFrame > NSTitlebarContainerView > NSTitlebarView > NSView",
+      "viewFrameInWindow" : [
+        0,
+        520,
+        980,
+        40
+      ]
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        148,
+        520,
+        340,
+        40
+      ],
+      "hidden" : true,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 1,
+      "path" : "NSThemeFrame > NSTitlebarContainerView > NSTitlebarView > NSToolbarView > NSToolbarTitleView > CABackdropLayer"
+    },
+    {
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        0,
+        520,
+        980,
+        40
+      ],
+      "glassView" : "NSGlassContainerView",
+      "hidden" : false,
+      "layerClass" : "BackingLayer",
+      "opacity" : 1,
+      "path" : "CALayer > NSThemeFrame > NSTitlebarContainerView > NSTitlebarView > NSToolbarView > NSGlassContainerView",
+      "viewFrameInWindow" : [
+        0,
+        520,
+        980,
+        40
+      ]
+    },
+    {
+      "_adaptiveAppearance" : "2",
+      "_interactionState" : "0",
+      "_scrimState" : "0",
+      "_subduedState" : "0",
+      "_variant" : "0",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        624,
+        528,
+        146,
+        24
+      ],
+      "glassView" : "NSGlassEffectView",
+      "hidden" : false,
+      "layerClass" : "BackingLayer",
+      "opacity" : 1,
+      "path" : "NSTitlebarView > NSToolbarView > NSGlassContainerView > NSView > NSToolbarPlatterView > NSGlassEffectView",
+      "style" : "0",
+      "viewFrameInWindow" : [
+        624,
+        528,
+        146,
+        24
+      ]
+    },
+    {
+      "backgroundColor" : "<CGColor 0x7b02fd3410> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 1 1 1 1 )",
+      "cornerRadius" : 10,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputClamp" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 00000000 00000000 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        626,
+        530,
+        32.5,
+        20
+      ],
+      "hidden" : false,
+      "layerClass" : "CALayer",
+      "opacity" : 1,
+      "path" : "NSView > NSToolbarItemViewer > NSToolbarItemGroupPickerView > NSToolbarItemGroupPickerExpandedView > _NSCoreHostingView<AppKitSegmentedControl> > CALayer"
+    },
+    {
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputClamp" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 00000000 00000000 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        632.5,
+        531,
+        20,
+        19
+      ],
+      "hidden" : false,
+      "layerClass" : "ImageLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSToolbarItemViewer > NSToolbarItemGroupPickerView > NSToolbarItemGroupPickerExpandedView > _NSCoreHostingView<AppKitSegmentedControl> > ImageLayer"
+    },
+    {
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputClamp" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 00000000 00000000 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        669,
+        532.5,
+        21,
+        16
+      ],
+      "hidden" : false,
+      "layerClass" : "ImageLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSToolbarItemViewer > NSToolbarItemGroupPickerView > NSToolbarItemGroupPickerExpandedView > _NSCoreHostingView<AppKitSegmentedControl> > ImageLayer"
+    },
+    {
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputClamp" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 00000000 00000000 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        704,
+        531,
+        24,
+        19
+      ],
+      "hidden" : false,
+      "layerClass" : "ImageLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSToolbarItemViewer > NSToolbarItemGroupPickerView > NSToolbarItemGroupPickerExpandedView > _NSCoreHostingView<AppKitSegmentedControl> > ImageLayer"
+    },
+    {
+      "backgroundColor" : "<CGColor 0x7b02fd3410> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 1 1 1 1 )",
+      "cornerRadius" : 0.5,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputClamp" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 00000000 00000000 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        697,
+        533,
+        1,
+        14
+      ],
+      "hidden" : false,
+      "layerClass" : "CALayer",
+      "opacity" : 1,
+      "path" : "NSView > NSToolbarItemViewer > NSToolbarItemGroupPickerView > NSToolbarItemGroupPickerExpandedView > _NSCoreHostingView<AppKitSegmentedControl> > CALayer"
+    },
+    {
+      "backgroundColor" : "<CGColor 0x7b02ab9f80> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 0 0 0 0.125 )",
+      "compositingFilter" : "plusD",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        697,
+        533,
+        1,
+        14
+      ],
+      "hidden" : false,
+      "layerClass" : "CALayer",
+      "opacity" : 1,
+      "path" : "NSView > NSToolbarItemViewer > NSToolbarItemGroupPickerView > NSToolbarItemGroupPickerExpandedView > _NSCoreHostingView<AppKitSegmentedControl> > CALayer"
+    },
+    {
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputClamp" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 00000000 00000000 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        741,
+        531,
+        23,
+        19
+      ],
+      "hidden" : false,
+      "layerClass" : "ImageLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSToolbarItemViewer > NSToolbarItemGroupPickerView > NSToolbarItemGroupPickerExpandedView > _NSCoreHostingView<AppKitSegmentedControl> > ImageLayer"
+    },
+    {
+      "backgroundColor" : "<CGColor 0x7b02fd3410> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 1 1 1 1 )",
+      "cornerRadius" : 0.5,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputClamp" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 00000000 00000000 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        733.5,
+        533,
+        1,
+        14
+      ],
+      "hidden" : false,
+      "layerClass" : "CALayer",
+      "opacity" : 1,
+      "path" : "NSView > NSToolbarItemViewer > NSToolbarItemGroupPickerView > NSToolbarItemGroupPickerExpandedView > _NSCoreHostingView<AppKitSegmentedControl> > CALayer"
+    },
+    {
+      "backgroundColor" : "<CGColor 0x7b02ab9f80> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 0 0 0 0.125 )",
+      "compositingFilter" : "plusD",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        733.5,
+        533,
+        1,
+        14
+      ],
+      "hidden" : false,
+      "layerClass" : "CALayer",
+      "opacity" : 1,
+      "path" : "NSView > NSToolbarItemViewer > NSToolbarItemGroupPickerView > NSToolbarItemGroupPickerExpandedView > _NSCoreHostingView<AppKitSegmentedControl> > CALayer"
+    },
+    {
+      "_adaptiveAppearance" : "2",
+      "_interactionState" : "0",
+      "_scrimState" : "0",
+      "_subduedState" : "0",
+      "_variant" : "0",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        492,
+        528,
+        53,
+        24
+      ],
+      "glassView" : "NSGlassEffectView",
+      "hidden" : false,
+      "layerClass" : "BackingLayer",
+      "opacity" : 1,
+      "path" : "NSTitlebarView > NSToolbarView > NSGlassContainerView > NSView > NSToolbarPlatterView > NSGlassEffectView",
+      "style" : "0",
+      "viewFrameInWindow" : [
+        492,
+        528,
+        53,
+        24
+      ]
+    },
+    {
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputClamp" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 00000000 00000000 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        499,
+        531.5,
+        13,
+        18
+      ],
+      "hidden" : false,
+      "layerClass" : "ImageLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSToolbarItemViewer > NSToolbarItemGroupPickerView > NSToolbarItemGroupPickerExpandedView > _NSCoreHostingView<AppKitSegmentedControl> > ImageLayer"
+    },
+    {
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputClamp" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 00000000 00000000 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        526,
+        531.5,
+        13,
+        18
+      ],
+      "hidden" : false,
+      "layerClass" : "ImageLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSToolbarItemViewer > NSToolbarItemGroupPickerView > NSToolbarItemGroupPickerExpandedView > _NSCoreHostingView<AppKitSegmentedControl> > ImageLayer"
+    },
+    {
+      "backgroundColor" : "<CGColor 0x7b02fd3410> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 1 1 1 1 )",
+      "cornerRadius" : 0.5,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputClamp" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 00000000 00000000 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        518.5,
+        533,
+        1,
+        14
+      ],
+      "hidden" : false,
+      "layerClass" : "CALayer",
+      "opacity" : 1,
+      "path" : "NSView > NSToolbarItemViewer > NSToolbarItemGroupPickerView > NSToolbarItemGroupPickerExpandedView > _NSCoreHostingView<AppKitSegmentedControl> > CALayer"
+    },
+    {
+      "backgroundColor" : "<CGColor 0x7b02ab9f80> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 0 0 0 0.125 )",
+      "compositingFilter" : "plusD",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        518.5,
+        533,
+        1,
+        14
+      ],
+      "hidden" : false,
+      "layerClass" : "CALayer",
+      "opacity" : 1,
+      "path" : "NSView > NSToolbarItemViewer > NSToolbarItemGroupPickerView > NSToolbarItemGroupPickerExpandedView > _NSCoreHostingView<AppKitSegmentedControl> > CALayer"
+    },
+    {
+      "_adaptiveAppearance" : "2",
+      "_interactionState" : "0",
+      "_scrimState" : "0",
+      "_subduedState" : "0",
+      "_variant" : "0",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        943,
+        528,
+        29,
+        24
+      ],
+      "glassView" : "NSGlassEffectView",
+      "hidden" : false,
+      "layerClass" : "BackingLayer",
+      "opacity" : 1,
+      "path" : "NSTitlebarView > NSToolbarView > NSGlassContainerView > NSView > NSToolbarPlatterView > NSGlassEffectView",
+      "style" : "0",
+      "viewFrameInWindow" : [
+        943,
+        528,
+        29,
+        24
+      ]
+    },
+    {
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputClamp" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 00000000 00000000 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        947.5,
+        530.5,
+        21,
+        20
+      ],
+      "hidden" : false,
+      "layerClass" : "ImageLayer",
+      "opacity" : 1,
+      "path" : "NSView > NSToolbarItemViewer > NSSearchToolbarItemView > NSButton > _NSCoreHostingView<AppKitButton> > ImageLayer"
+    },
+    {
+      "_adaptiveAppearance" : "2",
+      "_interactionState" : "0",
+      "_scrimState" : "0",
+      "_subduedState" : "0",
+      "_variant" : "0",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        778,
+        528,
+        157,
+        24
+      ],
+      "glassView" : "NSGlassEffectView",
+      "hidden" : false,
+      "layerClass" : "BackingLayer",
+      "opacity" : 1,
+      "path" : "NSTitlebarView > NSToolbarView > NSGlassContainerView > NSView > NSToolbarPlatterView > NSGlassEffectView",
+      "style" : "0",
+      "viewFrameInWindow" : [
+        778,
+        528,
+        157,
+        24
+      ]
+    },
+    {
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputClamp" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 00000000 00000000 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        829,
+        530,
+        19,
+        23
+      ],
+      "hidden" : false,
+      "layerClass" : "ImageLayer",
+      "opacity" : 1,
+      "path" : "ContentHolderView > NSView > NSToolbarItemViewer > NSToolbarButton > _NSCoreHostingView<AppKitButton> > ImageLayer"
+    },
+    {
+      "_adaptiveAppearance" : "2",
+      "_interactionState" : "0",
+      "_scrimState" : "0",
+      "_subduedState" : "0",
+      "_variant" : "0",
+      "cornerRadius" : 0,
+      "frameInWindow" : [
+        91.5,
+        528,
+        31.5,
+        24
+      ],
+      "glassView" : "NSGlassEffectView",
+      "hidden" : false,
+      "layerClass" : "BackingLayer",
+      "opacity" : 1,
+      "path" : "NSTitlebarView > NSToolbarView > NSGlassContainerView > NSView > NSToolbarPlatterView > NSGlassEffectView",
+      "style" : "0",
+      "viewFrameInWindow" : [
+        91.5,
+        528,
+        31.5,
+        24
+      ]
+    },
+    {
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputClamp" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000803f 00000000 00000000 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        95.5,
+        531,
+        24,
+        19
+      ],
+      "hidden" : false,
+      "layerClass" : "ImageLayer",
+      "opacity" : 1,
+      "path" : "ContentHolderView > NSView > NSToolbarItemViewer > NSButton > _NSCoreHostingView<AppKitButton> > ImageLayer"
+    },
+    {
+      "backgroundColor" : "<CGColor 0x7b02fd3410> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 1 1 1 1 )",
+      "cornerRadius" : 12,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000a03e 00000000 00000000 00000000 ... 00000000 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        624,
+        528,
+        146,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "CALayer",
+      "opacity" : 1,
+      "path" : "_NSCoreHostingView<RootView> > CALayer > SDFLayer > CALayer > CALayer > CALayer"
+    },
+    {
+      "backgroundColor" : "<CGColor 0x7b02fd3410> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 1 1 1 1 )",
+      "cornerRadius" : 12,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000a03e 00000000 00000000 00000000 ... 00000000 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        492,
+        528,
+        53,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "CALayer",
+      "opacity" : 1,
+      "path" : "_NSCoreHostingView<RootView> > CALayer > SDFLayer > CALayer > CALayer > CALayer"
+    },
+    {
+      "backgroundColor" : "<CGColor 0x7b02fd3410> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 1 1 1 1 )",
+      "cornerRadius" : 12,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000a03e 00000000 00000000 00000000 ... 00000000 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        943,
+        528,
+        29,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "CALayer",
+      "opacity" : 1,
+      "path" : "_NSCoreHostingView<RootView> > CALayer > SDFLayer > CALayer > CALayer > CALayer"
+    },
+    {
+      "backgroundColor" : "<CGColor 0x7b02fd3410> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 1 1 1 1 )",
+      "cornerRadius" : 12,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000a03e 00000000 00000000 00000000 ... 00000000 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        778,
+        528,
+        157,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "CALayer",
+      "opacity" : 1,
+      "path" : "_NSCoreHostingView<RootView> > CALayer > SDFLayer > CALayer > CALayer > CALayer"
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBleedAmount" : "8.399999999999999",
+            "inputBleedBlurRadius" : "0",
+            "inputBleedColorMatrixBlack" : "0.9",
+            "inputBleedColorMatrixSaturation" : "1.2",
+            "inputBleedColorMatrixWhite" : "1",
+            "inputBleedDarkenBlend" : "1",
+            "inputBleedDistance0" : "1",
+            "inputBleedDistance1" : "0",
+            "inputBleedHeight" : "8.399999999999999",
+            "inputBleedOpacity" : "0",
+            "inputBlurDistance0" : "-12",
+            "inputBlurDistance1" : "-1",
+            "inputBlurDistance2" : "0",
+            "inputBlurDistance3" : "0",
+            "inputBlurFillBlurRadius" : "8",
+            "inputBlurFillDarkenOpacity" : "0",
+            "inputBlurFillLightenOpacity" : "0.9",
+            "inputBlurFillNormalOpacity" : "0.5071146",
+            "inputBlurOpacity0" : "0",
+            "inputBlurOpacity1" : "0",
+            "inputBlurOpacity2" : "0.5",
+            "inputBlurOpacity3" : "1",
+            "inputBlurRadius" : "5",
+            "inputClamp" : "1.06961",
+            "inputClampPreserveHue" : "0",
+            "inputFaceColorMatrixBlack" : "0.4",
+            "inputFaceColorMatrixFillColor" : "<CGColor 0x7b020927d0> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 1 1 1 ",
+            "inputFaceColorMatrixMaxLuma" : "1",
+            "inputFaceColorMatrixMaxLumaSDR" : "0.94",
+            "inputFaceColorMatrixSaturation" : "1.2",
+            "inputFaceColorMatrixWhite" : "1.03",
+            "inputFaceOpacity" : "1",
+            "inputInnerRefractionAmount" : "-12",
+            "inputInnerRefractionHeight" : "6",
+            "inputKeyFillHighlightAmount" : "0.4",
+            "inputKeyFillHighlightAngle" : "1.570796326794897",
+            "inputKeyFillHighlightColorBias" : "-0.25",
+            "inputKeyFillHighlightEffectOffset" : "-0.5",
+            "inputKeyFillHighlightHeight" : "0.5",
+            "inputKeyFillHighlightSpread" : "1.675516081914556",
+            "inputKeyFillHighlightSpreadSDR" : "1.850049007113989",
+            "inputMaxHeadroom" : "9999",
+            "inputOuterRefractionAmount" : "16",
+            "inputOuterRefractionHeight" : "16",
+            "inputRefractionDistance0" : "-1",
+            "inputRefractionDistance1" : "0",
+            "inputRefractionOpacity" : "0.6",
+            "inputRingShadowBlurRadius" : "5",
+            "inputRingShadowMask" : "1",
+            "inputRingShadowOffset" : "8",
+            "inputRingShadowOpacity" : "0.06",
+            "inputRingShadowStrokeWidth" : "4",
+            "inputSDRGradientDistance0" : "0",
+            "inputSDRGradientDistance1" : "0",
+            "inputSDRHoldingToneEnabled" : "0",
+            "inputSDRHoldingToneWhite" : "1",
+            "inputSDRShadowOpacity" : "0",
+            "inputShadowAmount" : "0",
+            "inputShadowBlurRadius" : "0",
+            "inputShadowColorMatrixBlack" : "0",
+            "inputShadowColorMatrixFillColor" : "<CGColor 0x7b02fd32c0> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 0 0 0 ",
+            "inputShadowColorMatrixSaturation" : "1",
+            "inputShadowColorMatrixWhite" : "1",
+            "inputShadowDistanceOffset" : "0",
+            "inputShadowHeight" : "0",
+            "inputShadowOffset" : "NSSize: {0, 8}",
+            "inputShadowOpacity" : "0.04",
+            "inputShadowRadius" : "4",
+            "inputShadowVibrancyContribution" : "0",
+            "inputSourceSublayerName" : "@0"
+          },
+          "name" : "glassBackground",
+          "type" : "glassBackground"
+        }
+      ],
+      "frameInWindow" : [
+        492,
+        528,
+        480,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 1,
+      "path" : "NSGlassContainerView > _NSCoreHostingView<RootView> > CALayer > SDFLayer > CALayer > CABackdropLayer"
+    },
+    {
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputClamp" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0xb6628f3f 13f241be e3a59bbc 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        492,
+        528,
+        480,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "CASDFLayer",
+      "opacity" : 1,
+      "path" : "NSGlassContainerView > _NSCoreHostingView<RootView> > CALayer > SDFLayer > CALayer > CASDFLayer"
+    },
+    {
+      "backgroundColor" : "<CGColor 0x7b02fd3410> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 1 1 1 1 )",
+      "cornerRadius" : 12,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBackdropAware" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0x0000a03e 00000000 00000000 00000000 ... 00000000 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        91.5,
+        528,
+        31.5,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "CALayer",
+      "opacity" : 1,
+      "path" : "_NSCoreHostingView<RootView> > CALayer > SDFLayer > CALayer > CALayer > CALayer"
+    },
+    {
+      "backdrop" : true,
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputBleedAmount" : "8.399999999999999",
+            "inputBleedBlurRadius" : "0",
+            "inputBleedColorMatrixBlack" : "0.9",
+            "inputBleedColorMatrixSaturation" : "1.2",
+            "inputBleedColorMatrixWhite" : "1",
+            "inputBleedDarkenBlend" : "1",
+            "inputBleedDistance0" : "1",
+            "inputBleedDistance1" : "0",
+            "inputBleedHeight" : "8.399999999999999",
+            "inputBleedOpacity" : "0",
+            "inputBlurDistance0" : "-12",
+            "inputBlurDistance1" : "-1",
+            "inputBlurDistance2" : "0",
+            "inputBlurDistance3" : "0",
+            "inputBlurFillBlurRadius" : "8",
+            "inputBlurFillDarkenOpacity" : "0",
+            "inputBlurFillLightenOpacity" : "0.9",
+            "inputBlurFillNormalOpacity" : "0.5071146",
+            "inputBlurOpacity0" : "0",
+            "inputBlurOpacity1" : "0",
+            "inputBlurOpacity2" : "0.5",
+            "inputBlurOpacity3" : "1",
+            "inputBlurRadius" : "5",
+            "inputClamp" : "1.06961",
+            "inputClampPreserveHue" : "0",
+            "inputFaceColorMatrixBlack" : "0.4",
+            "inputFaceColorMatrixFillColor" : "<CGColor 0x7b020927d0> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 1 1 1 ",
+            "inputFaceColorMatrixMaxLuma" : "1",
+            "inputFaceColorMatrixMaxLumaSDR" : "0.94",
+            "inputFaceColorMatrixSaturation" : "1.2",
+            "inputFaceColorMatrixWhite" : "1.03",
+            "inputFaceOpacity" : "1",
+            "inputInnerRefractionAmount" : "-12",
+            "inputInnerRefractionHeight" : "6",
+            "inputKeyFillHighlightAmount" : "0.4",
+            "inputKeyFillHighlightAngle" : "1.570796326794897",
+            "inputKeyFillHighlightColorBias" : "-0.25",
+            "inputKeyFillHighlightEffectOffset" : "-0.5",
+            "inputKeyFillHighlightHeight" : "0.5",
+            "inputKeyFillHighlightSpread" : "1.675516081914556",
+            "inputKeyFillHighlightSpreadSDR" : "1.850049007113989",
+            "inputMaxHeadroom" : "9999",
+            "inputOuterRefractionAmount" : "16",
+            "inputOuterRefractionHeight" : "16",
+            "inputRefractionDistance0" : "-1",
+            "inputRefractionDistance1" : "0",
+            "inputRefractionOpacity" : "0.6",
+            "inputRingShadowBlurRadius" : "5",
+            "inputRingShadowMask" : "1",
+            "inputRingShadowOffset" : "8",
+            "inputRingShadowOpacity" : "0.06",
+            "inputRingShadowStrokeWidth" : "4",
+            "inputSDRGradientDistance0" : "0",
+            "inputSDRGradientDistance1" : "0",
+            "inputSDRHoldingToneEnabled" : "0",
+            "inputSDRHoldingToneWhite" : "1",
+            "inputSDRShadowOpacity" : "0",
+            "inputShadowAmount" : "0",
+            "inputShadowBlurRadius" : "0",
+            "inputShadowColorMatrixBlack" : "0",
+            "inputShadowColorMatrixFillColor" : "<CGColor 0x7b02fd32c0> [<CGColorSpace 0x7b02fd2a00> (kCGColorSpaceICCBased; kCGColorSpaceModelRGB; sRGB IEC61966-2.1; extended range)] headroom unknown ( 0 0 0 ",
+            "inputShadowColorMatrixSaturation" : "1",
+            "inputShadowColorMatrixWhite" : "1",
+            "inputShadowDistanceOffset" : "0",
+            "inputShadowHeight" : "0",
+            "inputShadowOffset" : "NSSize: {0, 8}",
+            "inputShadowOpacity" : "0.04",
+            "inputShadowRadius" : "4",
+            "inputShadowVibrancyContribution" : "0",
+            "inputSourceSublayerName" : "@0"
+          },
+          "name" : "glassBackground",
+          "type" : "glassBackground"
+        }
+      ],
+      "frameInWindow" : [
+        91.5,
+        528,
+        31.5,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "CABackdropLayer",
+      "opacity" : 1,
+      "path" : "NSGlassContainerView > _NSCoreHostingView<RootView> > CALayer > SDFLayer > CALayer > CABackdropLayer"
+    },
+    {
+      "cornerRadius" : 0,
+      "filters" : [
+        {
+          "inputs" : {
+            "inputClamp" : "1",
+            "inputColorMatrix" : "{length = 80, bytes = 0xb6628f3f 13f241be e3a59bbc 00000000 ... 0000803f 00000000 }"
+          },
+          "name" : "vibrantColorMatrix",
+          "type" : "vibrantColorMatrix"
+        }
+      ],
+      "frameInWindow" : [
+        91.5,
+        528,
+        31.5,
+        24
+      ],
+      "hidden" : false,
+      "layerClass" : "CASDFLayer",
+      "opacity" : 1,
+      "path" : "NSGlassContainerView > _NSCoreHostingView<RootView> > CALayer > SDFLayer > CALayer > CASDFLayer"
+    }
+  ],
+  "toolbarStyle" : "compact",
+  "views" : {
+    "class" : "NSThemeFrame",
+    "frameInWindow" : [
+      0,
+      0,
+      980,
+      560
+    ],
+    "subviews" : [
+      {
+        "class" : "NSVisualEffectView",
+        "frameInWindow" : [
+          0,
+          0,
+          980,
+          560
+        ]
+      },
+      {
+        "class" : "NSView",
+        "frameInWindow" : [
+          0,
+          0,
+          980,
+          560
+        ],
+        "subviews" : [
+          {
+            "class" : "NSSplitView",
+            "frameInWindow" : [
+              0,
+              0,
+              980,
+              560
+            ],
+            "subviews" : [
+              {
+                "class" : "_NSSplitViewItemViewWrapper",
+                "frameInWindow" : [
+                  144,
+                  0,
+                  836,
+                  560
+                ],
+                "subviews" : [
+                  {
+                    "class" : "NSScrollView",
+                    "frameInWindow" : [
+                      144,
+                      0,
+                      836,
+                      560
+                    ],
+                    "subviews" : [
+                      {
+                        "class" : "_NSScrollViewContentBackgroundView",
+                        "frameInWindow" : [
+                          144,
+                          0,
+                          836,
+                          560
+                        ],
+                        "subviews" : [
+                          {
+                            "class" : "NSVisualEffectView",
+                            "frameInWindow" : [
+                              144,
+                              0,
+                              836,
+                              560
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "class" : "BackdropView",
+                        "frameInWindow" : [
+                          144,
+                          520,
+                          836,
+                          40
+                        ]
+                      },
+                      {
+                        "class" : "NSClipView",
+                        "frameInWindow" : [
+                          144,
+                          0,
+                          836,
+                          560
+                        ],
+                        "subviews" : [
+                          {
+                            "class" : "NSTextView",
+                            "frameInWindow" : [
+                              144,
+                              -2274,
+                              836,
+                              2800
+                            ],
+                            "subviews" : [
+                              {
+                                "class" : "_NSTextSelectionView",
+                                "frameInWindow" : [
+                                  144,
+                                  -2274,
+                                  836,
+                                  2800
+                                ],
+                                "hidden" : true
+                              },
+                              {
+                                "class" : "_NSTextRenderingSurfacesGroupView",
+                                "frameInWindow" : [
+                                  144,
+                                  -2274,
+                                  836,
+                                  2800
+                                ]
+                              },
+                              {
+                                "class" : "_NSTextContentView",
+                                "frameInWindow" : [
+                                  144,
+                                  -2274,
+                                  836,
+                                  2800
+                                ],
+                                "subviews" : [
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      509,
+                                      268,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      495,
+                                      268,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      481,
+                                      268,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      467,
+                                      268,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      453,
+                                      268,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      439,
+                                      268,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      425,
+                                      268,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      411,
+                                      268,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      397,
+                                      268,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      383,
+                                      268,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      369,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      355,
+                                      274,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      341,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      327,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      313,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      299,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      285,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      271,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      257,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      243,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      229,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      215,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      201,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      187,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      173,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      159,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      145,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      131,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      117,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      103,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      89,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      75,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      61,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      47,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      33,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      19,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      5,
+                                      275,
+                                      20
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSTextViewportElementView",
+                                    "frameInWindow" : [
+                                      137,
+                                      -9,
+                                      275,
+                                      20
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "class" : "NSScrollPocket",
+                        "frameInWindow" : [
+                          144,
+                          520,
+                          836,
+                          40
+                        ],
+                        "subviews" : [
+                          {
+                            "class" : "PocketMask",
+                            "frameInWindow" : [
+                              144,
+                              520,
+                              0,
+                              0
+                            ],
+                            "hidden" : true,
+                            "subviews" : [
+                              {
+                                "class" : "NSView",
+                                "frameInWindow" : [
+                                  144,
+                                  520,
+                                  0,
+                                  0
+                                ],
+                                "subviews" : [
+                                  {
+                                    "class" : "NSView",
+                                    "frameInWindow" : [
+                                      144,
+                                      520,
+                                      0,
+                                      0
+                                    ],
+                                    "hidden" : true
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "class" : "PocketBlur",
+                            "frameInWindow" : [
+                              144,
+                              520,
+                              0,
+                              0
+                            ],
+                            "hidden" : true,
+                            "subviews" : [
+                              {
+                                "class" : "PortalView",
+                                "frameInWindow" : [
+                                  144,
+                                  520,
+                                  0,
+                                  0
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "class" : "NSHardPocketView",
+                            "frameInWindow" : [
+                              144,
+                              520,
+                              0,
+                              0
+                            ],
+                            "hidden" : true,
+                            "subviews" : [
+                              {
+                                "class" : "_NSLayerBasedFillColorView",
+                                "frameInWindow" : [
+                                  144,
+                                  520,
+                                  0,
+                                  1
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "class" : "LuminanceAdjustment",
+                            "frameInWindow" : [
+                              144,
+                              520,
+                              0,
+                              0
+                            ],
+                            "hidden" : true,
+                            "subviews" : [
+                              {
+                                "class" : "NSView",
+                                "frameInWindow" : [
+                                  144,
+                                  520,
+                                  0,
+                                  0
+                                ],
+                                "subviews" : [
+                                  {
+                                    "class" : "NSView",
+                                    "frameInWindow" : [
+                                      144,
+                                      520,
+                                      0,
+                                      0
+                                    ],
+                                    "subviews" : [
+                                      {
+                                        "class" : "BackdropView",
+                                        "frameInWindow" : [
+                                          144,
+                                          520,
+                                          0,
+                                          0
+                                        ],
+                                        "hidden" : true
+                                      },
+                                      {
+                                        "class" : "_NSScrollViewContentBackgroundView",
+                                        "frameInWindow" : [
+                                          144,
+                                          520,
+                                          0,
+                                          0
+                                        ],
+                                        "subviews" : [
+                                          {
+                                            "class" : "NSVisualEffectView",
+                                            "frameInWindow" : [
+                                              144,
+                                              520,
+                                              0,
+                                              0
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "class" : "NSView",
+                                    "frameInWindow" : [
+                                      144,
+                                      520,
+                                      0,
+                                      0
+                                    ],
+                                    "subviews" : [
+                                      {
+                                        "class" : "NSView",
+                                        "frameInWindow" : [
+                                          144,
+                                          520,
+                                          0,
+                                          0
+                                        ]
+                                      },
+                                      {
+                                        "class" : "NSView",
+                                        "frameInWindow" : [
+                                          144,
+                                          520,
+                                          0,
+                                          0
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "class" : "PortalView",
+                                "frameInWindow" : [
+                                  144,
+                                  520,
+                                  0,
+                                  0
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "class" : "NSScroller",
+                        "frameInWindow" : [
+                          963,
+                          7.5,
+                          17,
+                          512.5
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "class" : "NSTitlebarBackgroundView",
+                "frameInWindow" : [
+                  0,
+                  520,
+                  144,
+                  40
+                ]
+              },
+              {
+                "class" : "NSTitlebarBackgroundView",
+                "frameInWindow" : [
+                  144,
+                  520,
+                  836,
+                  40
+                ]
+              },
+              {
+                "class" : "_NSSplitViewItemViewWrapper",
+                "frameInWindow" : [
+                  0,
+                  0,
+                  144,
+                  560
+                ],
+                "subviews" : [
+                  {
+                    "class" : "NSGlassEffectView",
+                    "frameInWindow" : [
+                      0,
+                      0,
+                      144,
+                      560
+                    ],
+                    "subviews" : [
+                      {
+                        "class" : "ContentHolderView",
+                        "frameInWindow" : [
+                          0,
+                          0,
+                          144,
+                          560
+                        ],
+                        "subviews" : [
+                          {
+                            "class" : "NSView",
+                            "frameInWindow" : [
+                              0,
+                              0,
+                              144,
+                              560
+                            ],
+                            "subviews" : [
+                              {
+                                "class" : "NSScrollView",
+                                "frameInWindow" : [
+                                  0,
+                                  0,
+                                  144,
+                                  560
+                                ],
+                                "subviews" : [
+                                  {
+                                    "class" : "BackdropView",
+                                    "frameInWindow" : [
+                                      0,
+                                      520,
+                                      144,
+                                      40
+                                    ]
+                                  },
+                                  {
+                                    "class" : "NSClipView",
+                                    "frameInWindow" : [
+                                      0,
+                                      0,
+                                      144,
+                                      560
+                                    ],
+                                    "subviews" : [
+                                      {
+                                        "class" : "NSTableView",
+                                        "frameInWindow" : [
+                                          0,
+                                          0,
+                                          144,
+                                          520
+                                        ],
+                                        "subviews" : [
+                                          {
+                                            "class" : "NSTableRowView",
+                                            "frameInWindow" : [
+                                              0,
+                                              496,
+                                              144,
+                                              24
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "cell" : "NSTextFieldCell",
+                                                "class" : "NSTextField",
+                                                "frameInWindow" : [
+                                                  16,
+                                                  496,
+                                                  112,
+                                                  24
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "class" : "NSTextFieldSimpleLabel",
+                                                    "frameInWindow" : [
+                                                      16,
+                                                      496,
+                                                      112,
+                                                      24
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "class" : "NSTableRowView",
+                                            "frameInWindow" : [
+                                              0,
+                                              472,
+                                              144,
+                                              24
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "cell" : "NSTextFieldCell",
+                                                "class" : "NSTextField",
+                                                "frameInWindow" : [
+                                                  16,
+                                                  472,
+                                                  112,
+                                                  24
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "class" : "NSTextFieldSimpleLabel",
+                                                    "frameInWindow" : [
+                                                      16,
+                                                      472,
+                                                      112,
+                                                      24
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "class" : "NSTableRowView",
+                                            "frameInWindow" : [
+                                              0,
+                                              448,
+                                              144,
+                                              24
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "cell" : "NSTextFieldCell",
+                                                "class" : "NSTextField",
+                                                "frameInWindow" : [
+                                                  16,
+                                                  448,
+                                                  112,
+                                                  24
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "class" : "NSTextFieldSimpleLabel",
+                                                    "frameInWindow" : [
+                                                      16,
+                                                      448,
+                                                      112,
+                                                      24
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "class" : "NSTableRowView",
+                                            "frameInWindow" : [
+                                              0,
+                                              424,
+                                              144,
+                                              24
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "cell" : "NSTextFieldCell",
+                                                "class" : "NSTextField",
+                                                "frameInWindow" : [
+                                                  16,
+                                                  424,
+                                                  112,
+                                                  24
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "class" : "NSTextFieldSimpleLabel",
+                                                    "frameInWindow" : [
+                                                      16,
+                                                      424,
+                                                      112,
+                                                      24
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "class" : "NSTableRowView",
+                                            "frameInWindow" : [
+                                              0,
+                                              400,
+                                              144,
+                                              24
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "cell" : "NSTextFieldCell",
+                                                "class" : "NSTextField",
+                                                "frameInWindow" : [
+                                                  16,
+                                                  400,
+                                                  112,
+                                                  24
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "class" : "NSTextFieldSimpleLabel",
+                                                    "frameInWindow" : [
+                                                      16,
+                                                      400,
+                                                      112,
+                                                      24
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "class" : "NSTableRowView",
+                                            "frameInWindow" : [
+                                              0,
+                                              376,
+                                              144,
+                                              24
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "cell" : "NSTextFieldCell",
+                                                "class" : "NSTextField",
+                                                "frameInWindow" : [
+                                                  16,
+                                                  376,
+                                                  112,
+                                                  24
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "class" : "NSTextFieldSimpleLabel",
+                                                    "frameInWindow" : [
+                                                      16,
+                                                      376,
+                                                      112,
+                                                      24
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "class" : "NSTableRowView",
+                                            "frameInWindow" : [
+                                              0,
+                                              352,
+                                              144,
+                                              24
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "cell" : "NSTextFieldCell",
+                                                "class" : "NSTextField",
+                                                "frameInWindow" : [
+                                                  16,
+                                                  352,
+                                                  112,
+                                                  24
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "class" : "NSTextFieldSimpleLabel",
+                                                    "frameInWindow" : [
+                                                      16,
+                                                      352,
+                                                      112,
+                                                      24
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "class" : "NSTableRowView",
+                                            "frameInWindow" : [
+                                              0,
+                                              328,
+                                              144,
+                                              24
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "cell" : "NSTextFieldCell",
+                                                "class" : "NSTextField",
+                                                "frameInWindow" : [
+                                                  16,
+                                                  328,
+                                                  112,
+                                                  24
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "class" : "NSTextFieldSimpleLabel",
+                                                    "frameInWindow" : [
+                                                      16,
+                                                      328,
+                                                      112,
+                                                      24
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "class" : "NSTableRowView",
+                                            "frameInWindow" : [
+                                              0,
+                                              304,
+                                              144,
+                                              24
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "cell" : "NSTextFieldCell",
+                                                "class" : "NSTextField",
+                                                "frameInWindow" : [
+                                                  16,
+                                                  304,
+                                                  112,
+                                                  24
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "class" : "NSTextFieldSimpleLabel",
+                                                    "frameInWindow" : [
+                                                      16,
+                                                      304,
+                                                      112,
+                                                      24
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "class" : "NSTableRowView",
+                                            "frameInWindow" : [
+                                              0,
+                                              280,
+                                              144,
+                                              24
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "cell" : "NSTextFieldCell",
+                                                "class" : "NSTextField",
+                                                "frameInWindow" : [
+                                                  16,
+                                                  280,
+                                                  112,
+                                                  24
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "class" : "NSTextFieldSimpleLabel",
+                                                    "frameInWindow" : [
+                                                      16,
+                                                      280,
+                                                      112,
+                                                      24
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "class" : "NSScrollPocket",
+                                    "frameInWindow" : [
+                                      0,
+                                      520,
+                                      144,
+                                      40
+                                    ],
+                                    "subviews" : [
+                                      {
+                                        "class" : "PocketMask",
+                                        "frameInWindow" : [
+                                          0,
+                                          520,
+                                          0,
+                                          0
+                                        ],
+                                        "hidden" : true,
+                                        "subviews" : [
+                                          {
+                                            "class" : "NSView",
+                                            "frameInWindow" : [
+                                              0,
+                                              520,
+                                              0,
+                                              0
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "class" : "NSView",
+                                                "frameInWindow" : [
+                                                  0,
+                                                  520,
+                                                  0,
+                                                  0
+                                                ],
+                                                "hidden" : true
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "class" : "PocketBlur",
+                                        "frameInWindow" : [
+                                          0,
+                                          520,
+                                          0,
+                                          0
+                                        ],
+                                        "hidden" : true,
+                                        "subviews" : [
+                                          {
+                                            "class" : "PortalView",
+                                            "frameInWindow" : [
+                                              0,
+                                              520,
+                                              0,
+                                              0
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "class" : "NSHardPocketView",
+                                        "frameInWindow" : [
+                                          0,
+                                          520,
+                                          0,
+                                          0
+                                        ],
+                                        "hidden" : true,
+                                        "subviews" : [
+                                          {
+                                            "class" : "_NSLayerBasedFillColorView",
+                                            "frameInWindow" : [
+                                              0,
+                                              520,
+                                              0,
+                                              1
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "class" : "LuminanceAdjustment",
+                                        "frameInWindow" : [
+                                          0,
+                                          520,
+                                          0,
+                                          0
+                                        ],
+                                        "hidden" : true,
+                                        "subviews" : [
+                                          {
+                                            "class" : "NSView",
+                                            "frameInWindow" : [
+                                              0,
+                                              520,
+                                              0,
+                                              0
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "class" : "NSView",
+                                                "frameInWindow" : [
+                                                  0,
+                                                  520,
+                                                  0,
+                                                  0
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "class" : "BackdropView",
+                                                    "frameInWindow" : [
+                                                      0,
+                                                      520,
+                                                      0,
+                                                      0
+                                                    ]
+                                                  },
+                                                  {
+                                                    "class" : "_NSScrollViewContentBackgroundView",
+                                                    "frameInWindow" : [
+                                                      0,
+                                                      520,
+                                                      0,
+                                                      0
+                                                    ]
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "class" : "NSView",
+                                                "frameInWindow" : [
+                                                  0,
+                                                  520,
+                                                  0,
+                                                  0
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "class" : "NSView",
+                                                    "frameInWindow" : [
+                                                      0,
+                                                      520,
+                                                      0,
+                                                      0
+                                                    ]
+                                                  },
+                                                  {
+                                                    "class" : "NSView",
+                                                    "frameInWindow" : [
+                                                      0,
+                                                      520,
+                                                      0,
+                                                      0
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "class" : "PortalView",
+                                            "frameInWindow" : [
+                                              0,
+                                              520,
+                                              0,
+                                              0
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "class" : "_NSCoreHostingView<RootView>",
+                        "frameInWindow" : [
+                          0,
+                          0,
+                          144,
+                          560
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "class" : "NSSplitDividerView",
+                "frameInWindow" : [
+                  143.5,
+                  0,
+                  0.5,
+                  560
+                ]
+              },
+              {
+                "class" : "_NSSplitViewCollapsedInteractionsView",
+                "frameInWindow" : [
+                  0,
+                  0,
+                  15,
+                  560
+                ]
+              },
+              {
+                "class" : "_NSSplitViewCollapsedInteractionsView",
+                "frameInWindow" : [
+                  965,
+                  0,
+                  15,
+                  560
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "class" : "NSTitlebarContainerView",
+        "frameInWindow" : [
+          0,
+          520,
+          980,
+          40
+        ],
+        "subviews" : [
+          {
+            "class" : "NSTitlebarView",
+            "frameInWindow" : [
+              0,
+              520,
+              980,
+              40
+            ],
+            "subviews" : [
+              {
+                "class" : "NSView",
+                "frameInWindow" : [
+                  0,
+                  520,
+                  980,
+                  40
+                ]
+              },
+              {
+                "class" : "NSToolbarView",
+                "frameInWindow" : [
+                  0,
+                  520,
+                  980,
+                  40
+                ],
+                "subviews" : [
+                  {
+                    "class" : "NSToolbarTitleView",
+                    "frameInWindow" : [
+                      148,
+                      520,
+                      340,
+                      40
+                    ],
+                    "subviews" : [
+                      {
+                        "class" : "NSToolbarTitleStackView",
+                        "frameInWindow" : [
+                          156,
+                          532,
+                          328,
+                          16
+                        ],
+                        "subviews" : [
+                          {
+                            "class" : "NSToolbarPrimaryTitleContainerView",
+                            "frameInWindow" : [
+                              156,
+                              532,
+                              328,
+                              16
+                            ],
+                            "subviews" : [
+                              {
+                                "class" : "NSStackView",
+                                "frameInWindow" : [
+                                  156,
+                                  532,
+                                  71.5,
+                                  16
+                                ],
+                                "subviews" : [
+                                  {
+                                    "cell" : "NSTextFieldCell",
+                                    "class" : "_NSToolbarTitleField",
+                                    "frameInWindow" : [
+                                      154,
+                                      532,
+                                      75.5,
+                                      16
+                                    ],
+                                    "subviews" : [
+                                      {
+                                        "class" : "NSTextFieldSimpleLabel",
+                                        "frameInWindow" : [
+                                          154,
+                                          532,
+                                          75.5,
+                                          16
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "class" : "NSGlassContainerView",
+                    "frameInWindow" : [
+                      0,
+                      520,
+                      980,
+                      40
+                    ],
+                    "subviews" : [
+                      {
+                        "class" : "NSView",
+                        "frameInWindow" : [
+                          0,
+                          520,
+                          980,
+                          40
+                        ],
+                        "subviews" : [
+                          {
+                            "class" : "NSToolbarPlatterView",
+                            "frameInWindow" : [
+                              624,
+                              528,
+                              146,
+                              24
+                            ],
+                            "subviews" : [
+                              {
+                                "class" : "NSGlassEffectView",
+                                "frameInWindow" : [
+                                  624,
+                                  528,
+                                  146,
+                                  24
+                                ],
+                                "subviews" : [
+                                  {
+                                    "class" : "ContentHolderView",
+                                    "frameInWindow" : [
+                                      624,
+                                      528,
+                                      146,
+                                      24
+                                    ],
+                                    "subviews" : [
+                                      {
+                                        "class" : "NSView",
+                                        "frameInWindow" : [
+                                          624,
+                                          528,
+                                          146,
+                                          24
+                                        ],
+                                        "subviews" : [
+                                          {
+                                            "class" : "NSToolbarItemViewer",
+                                            "frameInWindow" : [
+                                              624,
+                                              520,
+                                              150,
+                                              40
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "class" : "NSToolbarItemGroupPickerView",
+                                                "frameInWindow" : [
+                                                  624,
+                                                  528,
+                                                  146,
+                                                  24
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "cell" : "NSToolbarItemGroupPickerExpandedViewCell",
+                                                    "class" : "NSToolbarItemGroupPickerExpandedView",
+                                                    "frameInWindow" : [
+                                                      624,
+                                                      528,
+                                                      146,
+                                                      24
+                                                    ],
+                                                    "segments" : 4,
+                                                    "segmentStyle" : 0,
+                                                    "subviews" : [
+                                                      {
+                                                        "class" : "_NSCoreHostingView<AppKitSegmentedControl>",
+                                                        "frameInWindow" : [
+                                                          624,
+                                                          528,
+                                                          146,
+                                                          24
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSCoreHostingView<RootView>",
+                                    "frameInWindow" : [
+                                      624,
+                                      528,
+                                      146,
+                                      24
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "class" : "NSToolbarPlatterView",
+                            "frameInWindow" : [
+                              492,
+                              528,
+                              53,
+                              24
+                            ],
+                            "subviews" : [
+                              {
+                                "class" : "NSGlassEffectView",
+                                "frameInWindow" : [
+                                  492,
+                                  528,
+                                  53,
+                                  24
+                                ],
+                                "subviews" : [
+                                  {
+                                    "class" : "ContentHolderView",
+                                    "frameInWindow" : [
+                                      492,
+                                      528,
+                                      53,
+                                      24
+                                    ],
+                                    "subviews" : [
+                                      {
+                                        "class" : "NSView",
+                                        "frameInWindow" : [
+                                          492,
+                                          528,
+                                          53,
+                                          24
+                                        ],
+                                        "subviews" : [
+                                          {
+                                            "class" : "NSToolbarItemViewer",
+                                            "frameInWindow" : [
+                                              488,
+                                              520,
+                                              61,
+                                              40
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "class" : "NSToolbarItemGroupPickerView",
+                                                "frameInWindow" : [
+                                                  492,
+                                                  528,
+                                                  53,
+                                                  24
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "cell" : "NSToolbarItemGroupPickerExpandedViewCell",
+                                                    "class" : "NSToolbarItemGroupPickerExpandedView",
+                                                    "frameInWindow" : [
+                                                      492,
+                                                      528,
+                                                      53,
+                                                      24
+                                                    ],
+                                                    "segments" : 2,
+                                                    "segmentStyle" : 0,
+                                                    "subviews" : [
+                                                      {
+                                                        "class" : "_NSCoreHostingView<AppKitSegmentedControl>",
+                                                        "frameInWindow" : [
+                                                          492,
+                                                          528,
+                                                          53,
+                                                          24
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSCoreHostingView<RootView>",
+                                    "frameInWindow" : [
+                                      492,
+                                      528,
+                                      53,
+                                      24
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "class" : "NSToolbarPlatterView",
+                            "frameInWindow" : [
+                              943,
+                              528,
+                              29,
+                              24
+                            ],
+                            "subviews" : [
+                              {
+                                "class" : "NSGlassEffectView",
+                                "frameInWindow" : [
+                                  943,
+                                  528,
+                                  29,
+                                  24
+                                ],
+                                "subviews" : [
+                                  {
+                                    "class" : "ContentHolderView",
+                                    "frameInWindow" : [
+                                      943,
+                                      528,
+                                      29,
+                                      24
+                                    ],
+                                    "subviews" : [
+                                      {
+                                        "class" : "NSView",
+                                        "frameInWindow" : [
+                                          943,
+                                          528,
+                                          29,
+                                          24
+                                        ],
+                                        "subviews" : [
+                                          {
+                                            "class" : "NSToolbarItemViewer",
+                                            "frameInWindow" : [
+                                              939,
+                                              520,
+                                              37,
+                                              40
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "class" : "NSSearchToolbarItemView",
+                                                "frameInWindow" : [
+                                                  943,
+                                                  528,
+                                                  29,
+                                                  24
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "cell" : "NSSearchFieldCell",
+                                                    "class" : "NSSearchField",
+                                                    "frameInWindow" : [
+                                                      943,
+                                                      528,
+                                                      29,
+                                                      24
+                                                    ],
+                                                    "hidden" : true,
+                                                    "subviews" : [
+                                                      {
+                                                        "class" : "_NSCoreHostingView<AppKitSearchField>",
+                                                        "frameInWindow" : [
+                                                          943,
+                                                          528,
+                                                          29,
+                                                          24
+                                                        ],
+                                                        "subviews" : [
+                                                          {
+                                                            "class" : "NSCorePlatformViewHost<PlatformViewRepresentableAdaptor<SearchFieldAccessoryButtonRepresentable>>",
+                                                            "frameInWindow" : [
+                                                              944.5,
+                                                              527.5,
+                                                              21,
+                                                              24
+                                                            ],
+                                                            "subviews" : [
+                                                              {
+                                                                "bezel" : 0,
+                                                                "bordered" : false,
+                                                                "cell" : "NSButtonCell",
+                                                                "class" : "NSButton",
+                                                                "frameInWindow" : [
+                                                                  944.5,
+                                                                  525,
+                                                                  21,
+                                                                  30
+                                                                ],
+                                                                "subviews" : [
+                                                                  {
+                                                                    "class" : "NSButtonImageView",
+                                                                    "frameInWindow" : [
+                                                                      947,
+                                                                      532.5,
+                                                                      16,
+                                                                      15
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          },
+                                                          {
+                                                            "class" : "NSCorePlatformViewHost<PlatformViewRepresentableAdaptor<SearchFieldAccessoryButtonRepresentable>>",
+                                                            "frameInWindow" : [
+                                                              966,
+                                                              535,
+                                                              15.5,
+                                                              9
+                                                            ],
+                                                            "subviews" : [
+                                                              {
+                                                                "bezel" : 0,
+                                                                "bordered" : false,
+                                                                "cell" : "NSButtonCell",
+                                                                "class" : "_NSSearchFieldClearButton",
+                                                                "frameInWindow" : [
+                                                                  966,
+                                                                  532,
+                                                                  16,
+                                                                  16
+                                                                ],
+                                                                "hidden" : true,
+                                                                "subviews" : [
+                                                                  {
+                                                                    "class" : "NSButtonImageView",
+                                                                    "frameInWindow" : [
+                                                                      966,
+                                                                      532,
+                                                                      16,
+                                                                      16
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      },
+                                                      {
+                                                        "class" : "NSSimpleLabel",
+                                                        "frameInWindow" : [
+                                                          963.5,
+                                                          532,
+                                                          4,
+                                                          16
+                                                        ]
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "bezel" : 11,
+                                                    "bordered" : true,
+                                                    "cell" : "NSButtonCell",
+                                                    "class" : "NSButton",
+                                                    "frameInWindow" : [
+                                                      943.5,
+                                                      528,
+                                                      28.5,
+                                                      24
+                                                    ],
+                                                    "subviews" : [
+                                                      {
+                                                        "class" : "_NSCoreHostingView<AppKitButton>",
+                                                        "frameInWindow" : [
+                                                          943.5,
+                                                          528,
+                                                          28.5,
+                                                          24
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSCoreHostingView<RootView>",
+                                    "frameInWindow" : [
+                                      943,
+                                      528,
+                                      29,
+                                      24
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "class" : "NSToolbarPlatterView",
+                            "frameInWindow" : [
+                              778,
+                              528,
+                              157,
+                              24
+                            ],
+                            "subviews" : [
+                              {
+                                "class" : "NSGlassEffectView",
+                                "frameInWindow" : [
+                                  778,
+                                  528,
+                                  157,
+                                  24
+                                ],
+                                "subviews" : [
+                                  {
+                                    "class" : "ContentHolderView",
+                                    "frameInWindow" : [
+                                      778,
+                                      528,
+                                      157,
+                                      24
+                                    ],
+                                    "subviews" : [
+                                      {
+                                        "class" : "NSView",
+                                        "frameInWindow" : [
+                                          778,
+                                          528,
+                                          157,
+                                          24
+                                        ],
+                                        "subviews" : [
+                                          {
+                                            "class" : "NSToolbarItemViewer",
+                                            "frameInWindow" : [
+                                              774,
+                                              520,
+                                              46,
+                                              40
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "cell" : "NSImageCell",
+                                                "class" : "NSToolbarImageView",
+                                                "frameInWindow" : [
+                                                  778,
+                                                  524.5,
+                                                  42.5,
+                                                  32
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "class" : "_NSImageViewSimpleImageView",
+                                                    "frameInWindow" : [
+                                                      786,
+                                                      528.5,
+                                                      27,
+                                                      24
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "class" : "NSToolbarItemViewer",
+                                            "frameInWindow" : [
+                                              820,
+                                              520,
+                                              36,
+                                              40
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "bezel" : 11,
+                                                "bordered" : true,
+                                                "cell" : "_NSToolbarButtonCell",
+                                                "class" : "NSToolbarButton",
+                                                "frameInWindow" : [
+                                                  822,
+                                                  528,
+                                                  32,
+                                                  24
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "class" : "_NSCoreHostingView<AppKitButton>",
+                                                    "frameInWindow" : [
+                                                      822,
+                                                      528,
+                                                      32,
+                                                      24
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "class" : "NSToolbarItemViewer",
+                                            "frameInWindow" : [
+                                              856,
+                                              520,
+                                              42,
+                                              40
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "cell" : "NSImageCell",
+                                                "class" : "NSToolbarImageView",
+                                                "frameInWindow" : [
+                                                  856,
+                                                  523,
+                                                  42.5,
+                                                  34
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "class" : "_NSImageViewSimpleImageView",
+                                                    "frameInWindow" : [
+                                                      864,
+                                                      527,
+                                                      27,
+                                                      26
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "class" : "NSToolbarItemViewer",
+                                            "frameInWindow" : [
+                                              898,
+                                              520,
+                                              41,
+                                              40
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "cell" : "NSImageCell",
+                                                "class" : "NSToolbarImageView",
+                                                "frameInWindow" : [
+                                                  898,
+                                                  524.5,
+                                                  37,
+                                                  31
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "class" : "_NSImageViewSimpleImageView",
+                                                    "frameInWindow" : [
+                                                      905,
+                                                      528.5,
+                                                      23,
+                                                      23
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSCoreHostingView<RootView>",
+                                    "frameInWindow" : [
+                                      778,
+                                      528,
+                                      157,
+                                      24
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "class" : "NSToolbarPlatterView",
+                            "frameInWindow" : [
+                              91.5,
+                              528,
+                              31.5,
+                              24
+                            ],
+                            "subviews" : [
+                              {
+                                "class" : "NSGlassEffectView",
+                                "frameInWindow" : [
+                                  91.5,
+                                  528,
+                                  31.5,
+                                  24
+                                ],
+                                "subviews" : [
+                                  {
+                                    "class" : "ContentHolderView",
+                                    "frameInWindow" : [
+                                      91.5,
+                                      528,
+                                      31.5,
+                                      24
+                                    ],
+                                    "subviews" : [
+                                      {
+                                        "class" : "NSView",
+                                        "frameInWindow" : [
+                                          91.5,
+                                          528,
+                                          31.5,
+                                          24
+                                        ],
+                                        "subviews" : [
+                                          {
+                                            "class" : "NSToolbarItemViewer",
+                                            "frameInWindow" : [
+                                              85,
+                                              520,
+                                              44,
+                                              40
+                                            ],
+                                            "subviews" : [
+                                              {
+                                                "bezel" : 11,
+                                                "bordered" : true,
+                                                "cell" : "NSButtonCell",
+                                                "class" : "NSButton",
+                                                "frameInWindow" : [
+                                                  91.5,
+                                                  528,
+                                                  31.5,
+                                                  24
+                                                ],
+                                                "subviews" : [
+                                                  {
+                                                    "class" : "_NSCoreHostingView<AppKitButton>",
+                                                    "frameInWindow" : [
+                                                      91.5,
+                                                      528,
+                                                      31.5,
+                                                      24
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "class" : "_NSCoreHostingView<RootView>",
+                                    "frameInWindow" : [
+                                      91.5,
+                                      528,
+                                      31.5,
+                                      24
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "class" : "NSToolbarItemViewer",
+                            "frameInWindow" : [
+                              549,
+                              520,
+                              67,
+                              40
+                            ],
+                            "subviews" : [
+                              {
+                                "cell" : "NSTextFieldCell",
+                                "class" : "NSTextField",
+                                "frameInWindow" : [
+                                  547,
+                                  532,
+                                  71,
+                                  16
+                                ],
+                                "subviews" : [
+                                  {
+                                    "class" : "NSTextFieldSimpleLabel",
+                                    "frameInWindow" : [
+                                      547,
+                                      532,
+                                      71,
+                                      16
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "class" : "NSToolbarItemViewer",
+                            "frameInWindow" : [
+                              616,
+                              520,
+                              8,
+                              40
+                            ],
+                            "subviews" : [
+                              {
+                                "class" : "_NSToolbarFlexibleSpace",
+                                "frameInWindow" : [
+                                  616,
+                                  528,
+                                  8,
+                                  24
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "class" : "_NSCoreHostingView<RootView>",
+                        "frameInWindow" : [
+                          0,
+                          520,
+                          980,
+                          40
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "bezel" : 0,
+                "bordered" : false,
+                "cell" : "_NSThemeCloseWidgetCell",
+                "class" : "_NSThemeCloseWidget",
+                "frameInWindow" : [
+                  12,
+                  533,
+                  14,
+                  14
+                ],
+                "subviews" : [
+                  {
+                    "class" : "_NSCoreHostingView<ThemeWidgetView>",
+                    "frameInWindow" : [
+                      12,
+                      533,
+                      14,
+                      14
+                    ]
+                  }
+                ]
+              },
+              {
+                "bezel" : 0,
+                "bordered" : false,
+                "cell" : "_NSThemeZoomWidgetCell",
+                "class" : "_NSThemeZoomWidget",
+                "frameInWindow" : [
+                  58,
+                  533,
+                  14,
+                  14
+                ],
+                "subviews" : [
+                  {
+                    "class" : "_NSCoreHostingView<ThemeWidgetView>",
+                    "frameInWindow" : [
+                      58,
+                      533,
+                      14,
+                      14
+                    ]
+                  }
+                ]
+              },
+              {
+                "bezel" : 0,
+                "bordered" : false,
+                "cell" : "_NSThemeWidgetCell",
+                "class" : "_NSThemeWidget",
+                "frameInWindow" : [
+                  35,
+                  533,
+                  14,
+                  14
+                ],
+                "subviews" : [
+                  {
+                    "class" : "_NSCoreHostingView<ThemeWidgetView>",
+                    "frameInWindow" : [
+                      35,
+                      533,
+                      14,
+                      14
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "class" : "_NSTitlebarDecorationView",
+            "frameInWindow" : [
+              0,
+              520,
+              980,
+              40
+            ]
+          },
+          {
+            "class" : "NSTitlebarContainerBlockingView",
+            "frameInWindow" : [
+              141,
+              520,
+              5.5,
+              40
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "windowFrame" : [
+    200,
+    200,
+    980,
+    560
+  ]
+}
