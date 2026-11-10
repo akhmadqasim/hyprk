@@ -161,6 +161,14 @@ hyprk_env_setup() {
     <edit name="family" mode="prepend" binding="same"><string>SF Pro</string></edit>
   </match>
   <match target="pattern">
+    <test qual="any" name="family"><string>system-ui</string></test>
+    <edit name="family" mode="prepend" binding="same"><string>SF Pro</string></edit>
+  </match>
+  <match target="pattern">
+    <test qual="any" name="family"><string>serif</string></test>
+    <edit name="family" mode="prepend" binding="same"><string>New York</string></edit>
+  </match>
+  <match target="pattern">
     <test qual="any" name="family"><string>monospace</string></test>
     <edit name="family" mode="prepend" binding="same"><string>SF Mono</string></edit>
   </match>
