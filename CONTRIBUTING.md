@@ -36,9 +36,9 @@ Reduce Motion, missing service). Check the `FALLBACKS.md` next to the code you c
 ## Commits
 
 Short subject that starts with the area, for example `dock: fix separator height`.
-Areas: `shell`, `settings`, `finder`, `plugin`, `config`, `themes`, `dist`, `packaging`.
+Areas: `shell`, `settings`, `finder`, `ui`, `plugin`, `config`, `themes`, `dist`, `packaging`, `re`.
 
 ## Assets
 
-Don't commit Apple fonts, icons, wallpapers or sounds, or any other file you aren't
-allowed to redistribute.
+This repo is private because it holds Apple fonts, icons, cursors, wallpapers and sounds.
+Never make it public and never copy those files into a public repo or package.
