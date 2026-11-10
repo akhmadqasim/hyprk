@@ -62,13 +62,14 @@ namespace lg {
     // ── decoration ──────────────────────────────────────────────────────────
 
     // macOS 27 traffic lights (liquid-glass-re SPEC 13): two-stop vertical gradients top -> bottom,
-    // [dark][button][stop] as 0xRRGGBB + alpha
+    // [dark][button][stop] as 0xRRGGBB + alpha. Same numbers as ui/HyprK/Tokens.qml (lights), checked by
+    // shell/tests/run.mjs
     struct SStop {
         uint32_t rgb;
         float    a;
     };
     static constexpr SStop    LIGHT_GRADIENT[2][3][2] = {
-        {{{0xFF6D63, 1}, {0xF57269, 0.8f}}, {{0xFBB316, 1}, {0xFFD134, 0.92f}}, {{0x5ACF1F, 1}, {0x79D34C, 0.73f}}},
+        {{{0xFF6D63, 1}, {0xF57269, 0.8f}}, {{0xFBB316, 0.92f}, {0xFFD134, 0.92f}}, {{0x5ACF1F, 1}, {0x79D34C, 0.73f}}},
         {{{0xFA6A61, 1}, {0xEF6962, 1}}, {{0xFAB51A, 1}, {0xFECF34, 1}}, {{0x56C83A, 1}, {0x52C43D, 1}}},
     };
     static constexpr uint32_t LIGHT_PRESSED[2][3] = {{0xC04741, 0xBF8E22, 0x1E9730}, {0xFF8D85, 0xFFEA5C, 0x56F66E}};
