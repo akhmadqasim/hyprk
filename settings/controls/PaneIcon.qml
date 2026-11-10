@@ -4,9 +4,9 @@ import ".."
 import "../HyprK"
 import "../Panes.js" as Panes
 
-// Colored rounded-square tile with a white glyph. Uses the real System Settings icon
-// themes/icons/settings/<iconId>.png for the panes that have one (Panes.realIcons), else a
-// Material Icons glyph (generic fallback).
+// System Settings pane icon. Panes use the real macOS 27.2.1 icons rendered by IconServices,
+// themes/icons/settings/<iconId>@<64|128>-<light|dark>.png (reference/re/MAC-ANSWERS.md R3b); anything else
+// (or a missing file) gets a coloured rounded-square tile with a Material Icons glyph.
 Item {
     id: pi
     property int size: Theme.sidebar.iconSize
@@ -24,13 +24,24 @@ Item {
         source: pi.imageSource
         style: pi.style || "default"
     }
+    // The PNG is the whole icon canvas: the tile body is 104 of 128 px (12..116), the rest is its shadow.
+    // Drawn so the body is `size`, like the glyph tile; the 64 px file up to 64 device px, else the 128 px one.
+    readonly property real art: size * 128 / 104
+    readonly property real artPx: Math.ceil(art * Screen.devicePixelRatio)
+    // Light file = coloured tile, dark file = black tile with the symbol in the tile colour (IconServices
+    // appearance 0 / 1). Which one macOS shows for the "Default" style in Dark Mode was not measured: we follow
+    // the appearance, and the "Dark" style always takes the dark file.
+    readonly property bool darkArt: pi.style === "dark" || Theme.dark
     Image {
         id: asset
-        anchors.fill: parent
+        anchors.centerIn: parent
+        width: pi.art; height: pi.art
         visible: status === Image.Ready
-        source: pi.imageSource === "" && Panes.hasRealIcon(pi.iconId) ? "file://" + Backend.root + "/themes/icons/settings/" + pi.iconId + ".png" : ""
-        sourceSize: Qt.size(pi.size * 2, pi.size * 2)
-        smooth: true; mipmap: true
+        source: pi.imageSource === "" && Panes.hasRealIcon(pi.iconId)
+            ? "file://" + Backend.root + "/themes/icons/settings/" + pi.iconId + "@" + (pi.artPx > 64 ? 128 : 64)
+              + "-" + (pi.darkArt ? "dark" : "light") + ".png" : ""
+        sourceSize: Qt.size(pi.artPx, pi.artPx)   // scaled once when decoded, cached per size
+        smooth: true
         // "Clear" icon style shows images as monochrome glass, like macOS 26+
         layer.enabled: pi.style === "clear"
         layer.effect: MultiEffect { saturation: -1.0; brightness: 0.05 }

@@ -82,7 +82,7 @@ is the same colour, opaque.
 | Asset | Preferred | Fallback |
 |---|---|---|
 | UI font | `themes/fonts/SFNS.ttf` loaded with FontLoader (weights through the `wght` axis) | Inter, then Cantarell, then Noto Sans (`Theme.pickFont`) |
-| Pane icons | `themes/icons/settings/<pane id>.png` | colored rounded tile + Material Icons glyph (`fonts-material-design-icons-iconfont`, already installed) |
+| Pane icons | `themes/icons/settings/<pane id>@<64\|128>-<light\|dark>.png` (all 23 panes) | colored rounded tile + Material Icons glyph (`fonts-material-design-icons-iconfont`, already installed) |
 | Wallpaper thumbnails | freedesktop `~/.cache/thumbnails/large` (made by `scripts/thumbs.sh`) | the full image |
 
 ## Files written for other parts of hyprk
