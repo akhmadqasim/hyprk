@@ -168,7 +168,8 @@ end
 
 ------------------------------------------------------- liquid glass ----
 -- shell layers that carry glass (namespaces hyprk-<name>), shared by the plugin and the blur rule
--- (no menubar: the macOS 26+ menu bar is transparent; its menus live in hyprk-overlay)
+-- (no menubar: the 27.2.1 bar has no glass or blur of its own, see reference/re/MENUBAR-REA-27.2.1.md;
+-- its menus are glass in hyprk-overlay)
 local glassLayers = { "dock", "overlay", "controlcenter", "notifications", "spotlight", "switcher", "hud" }
 -- Own compositor plugin (plugin/, see plugin/README.md). When it loads, the shell
 -- sends its glass shapes as ext-background-effect regions (HYPRK_GLASS=plugin) and the
@@ -182,11 +183,10 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
     local ok, err = pcall(function()
         hl.plugin.load(glassSo)
         hl.config({ plugin = { liquidglass = {
-            -- menubar too: only its pressed title/status pills send glass regions
-            namespaces = "hyprk-menubar,hyprk-" .. table.concat(glassLayers, ",hyprk-"),
+            namespaces = "hyprk-" .. table.concat(glassLayers, ",hyprk-"),
             -- recipes per layer: the plugin's own `materials` default (plugin/src/Config.cpp) plus the
             -- volume/brightness HUD on clear glass (MAC-ANSWERS.md HUD); keep the rest in sync with Config.cpp
-            materials = "hyprk-dock:dock,hyprk-controlcenter:controlcenter,hyprk-overlay:menu,hyprk-menubar:menu,"
+            materials = "hyprk-dock:dock,hyprk-controlcenter:controlcenter,hyprk-overlay:menu,"
                      .. "hyprk-spotlight:spotlight,hyprk-hud:clear",
         } } })
     end)
