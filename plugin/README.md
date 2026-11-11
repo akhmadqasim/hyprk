@@ -188,6 +188,32 @@ Not Apple's: the shadow tint amount and the shadow's backdrop level (6), Spotlig
 (fitted to the Mac's pixels, not decoded), the pyramid base at backdrop scale 0.25 / 0.125 (ours: the 13-tap levels of
 the 0.5 base, Apple: a 4x4 / 8x8 box; the half-size base Apple uses when R > 2 is not modelled either).
 
+## Appearance switch (Dark <-> Light)
+
+macOS changes the whole screen with one cross-fade: AppKit 27.2.1 `NSGlobalPreferenceTransition` (`+transition` 0x18aeb1ce0
+calls `SLSCopyBeginGlobalPreferenceTransitionCompletionBlock`) puts a borderless `NSGlobalPreferenceTransitionOverlay` window
+on every screen whose layer holds `SLDisplayCreateImage` of that display (`-initOnScreen:` 0x18aeb17c4), posts the change
+with `SLSPostCoordinatedDistributedNotification` (timeout 0.5 s, `-postChangeNotification:completionHandler:` 0x18aeb1d4c) so
+the apps repaint under the snapshot, and then `-endPresentation` (0x18aeb1b20) sets the layer's opacity to 0 inside a
+`CATransaction` of duration `NSGlobalPreferenceTransitionDuration` (default 0.5 s, `_NSGetCGFloatAppConfig`), actions
+enabled, no timing function set: an implicit CoreAnimation fade, i.e. CA's default curve (0.25, 0.1, 0.25, 1) (the curve is
+CA's documented default for implicit animations, not read from QuartzCore). One fade per display, not per window.
+
+`src/AppearanceFade.cpp` does the same in the compositor: when the `appearance` option goes light <-> dark, each output's
+last presented buffer (the swapchain buffer before the one being drawn) is copied once at that output's next frame and
+drawn as the last element of every pass at `appearanceSnapshotAlpha(t)` (`src/Fade.cpp`): 1 for `appearance_hold`, then
+1 -> 0 over `appearance_fade` on that curve. The whole output is damaged each frame only while it runs; the copy is freed at
+the end; nothing at rest. Skipped with `reduce_motion`, for "auto", on rotated outputs and while the session is locked (a
+running fade ends at once when a lock starts: the snapshot shows the unlocked desktop).
+The hold is ours (0.15 s): there is no client acknowledgement here, Apple waits for the apps' answers, at most 0.5 s.
+The option must reach the compositor before the first client repaints, or that client snaps before the snapshot exists:
+whoever starts the switch sends it on Hyprland's socket in the same turn (Quickshell:
+`Hyprland.dispatch('function() hl.config({ plugin = { liquidglass = { appearance = "light" } } }) end')`), not through a
+spawned `hyprctl`. `hyprctl liquidglass fade` prints the running fades and the last one's frames and length.
+Measured (mcap, MBA, Finder + Settings + Dock, option then state file, both directions): the new look's share against the
+decoded curve rms 0.001-0.002 (Finder, Settings; 6 runs at scale 2, 2 at 1.6) and 0.004 (Dock), monotonic, 2-98 % 384-405 ms,
+the fade starting 162-180 ms after the switch command; `reduce_motion`: done in 94 ms, no fade.
+
 ## Config keys (`plugin:liquidglass:<key>`; lengths in logical px)
 
 | Key | Default | Meaning |
@@ -209,6 +235,7 @@ the 0.5 base, Apple: a 4x4 / 8x8 box; the half-size base Apple uses when R > 2 i
 | `refraction_scale` | 1 | multiplies the recipe's refraction amount (0 = off) |
 | `aberration` | 0 | px R/B split at the edge (7 taps); 0 = off (Apple: none on background glass) |
 | `highlight` | 1 | scales the key/fill highlight mask (1 = Apple) |
+| `appearance_fade` / `appearance_hold` | 0.5 / 0.15 | s: the cross-fade after an appearance switch and the time the old picture stays whole before it (see Appearance switch); fade 0 = off |
 | `tint_amount` | 0.5 | Liquid Glass slider (macOS NSGlassTintAmount) 0..1, see Materials. Live: `hyprctl eval 'hl.config({ plugin = { liquidglass = { tint_amount = 0.3 } } })'` then `hyprctl liquidglass damage` (the eval fires no reload event, the damage redraws every output now) |
 | `shadow_scale` / `shadow_tint` | 1 / 0.35 | drop shadow opacity scale; 0 = black shadow, 1 = saturated backdrop colour |
 | `ring_scale` | 1 | ring shadow opacity scale |

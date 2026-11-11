@@ -1,6 +1,7 @@
 // hyprk liquidglass: macOS 27 Liquid Glass material behind chosen layer surfaces
 // (and optionally windows) for Hyprland 0.57.2. See README.md and FALLBACKS.md.
 
+#include "AppearanceFade.hpp"
 #include "Config.hpp"
 #include "GlassElement.hpp"
 #include "PopupGlass.hpp"
@@ -208,9 +209,13 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
                 g_params = lg::readConfig();
                 lg::onFrame();
                 lg::stats::setEnabled(g_params->stats);
+                if (e.context)
+                    lg::appearancefade::begin(e.monitor, e.context->get(), *g_params);
                 break;
             // the pass (all GPU work of the frame) runs in endRender(), between these two stages
             case RENDER_LAST_MOMENT:
+                if (e.context && g_params)
+                    lg::appearancefade::lastMoment(e.monitor, e.context->get(), *g_params);
                 lg::stats::poll();
                 lg::stats::begin(lg::stats::FRAME);
                 break;
@@ -258,6 +263,8 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
         .handler = [](const IPC::Socket1::SRequest& req) -> IPC::Socket1::SResponse {
             // `hyprctl liquidglass trace NS FILE` appends NS's region holes and shapes on every draw to FILE (a debug aid
             // for motion steps); `trace` alone stops
+            if (req.command.find("fade") != std::string::npos)
+                return lg::appearancefade::status();
             if (const auto at = req.command.find("trace"); at != std::string::npos) {
                 if (g_traceFile)
                     std::fclose(g_traceFile);
@@ -297,6 +304,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
 }
 
 APICALL EXPORT void PLUGIN_EXIT() {
+    lg::appearancefade::clear();
     if (g_traceFile)
         std::fclose(g_traceFile);
     g_traceFile = nullptr;

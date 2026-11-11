@@ -228,3 +228,50 @@ shell's Dock and menu bar finish about 190 ms after the frame (shell, not plugin
   over grey (before: the window at 0,0 1280x832), exit back to its frame, zoom (maximized) unchanged (1,67 1278x675). Other
   outputs keep true full screen; on MBA too with `fullscreen_top = ""`. Enter on the inset box (foot over black, window-rect
   area): 0.020 / 6.4 ms, 2-98 % 317 ms (one clean run). Not done: the titles' hover reveal on the strip (shell hand-off).
+
+## Appearance switch cross-fade (user report 2026-11-11: Dark <-> Light snapped)
+
+No Mac measurement exists (MAC-ANSWERS has none, the Mac is offline). From the 27.2.1 binaries (AppKit in the dyld cache,
+`ipsw dyld disass --vaddr`):
+
+| what | where | value |
+|---|---|---|
+| start of a global transition | `+[NSGlobalPreferenceTransition transition]` 0x18aeb1ce0 | `SLSCopyBeginGlobalPreferenceTransitionCompletionBlock` |
+| the snapshot | `-[NSGlobalPreferenceTransitionOverlay initOnScreen:]` 0x18aeb17c4 | one window per screen (level, collection behaviour, not movable, does not hide on deactivate), layer contents = `SLDisplayCreateImage` |
+| apps repaint under it | `-[NSGlobalPreferenceTransition postChangeNotification:completionHandler:]` 0x18aeb1d4c | `SLSPostCoordinatedDistributedNotification(cid, name, block, 0.5)` |
+| the fade | `-[NSGlobalPreferenceTransitionOverlay endPresentation]` 0x18aeb1b20 | `CATransaction begin; setCompletionBlock:; setAnimationDuration: d; setDisableActions: NO; [layer setOpacity: 0]; commit` |
+| d | same, 0x18aeb1c18 | `_NSGetCGFloatAppConfig(@"NSGlobalPreferenceTransitionDuration", 0.5)` |
+| in-process variant (System Settings) | `+[NSLocalGlobalPreferenceTransition localTransition]` 0x18aeb20ac | a space above everything (`SLSSpaceCreate`, `SLSSpaceSetAbsoluteLevel`, `SLSShowSpaces`) holding one overlay per screen |
+
+Decoded: one display-wide snapshot fade, 0.5 s. Inferred, not decoded: the curve (no timing function is set, so the
+implicit animation takes CoreAnimation's default (0.25, 0.1, 0.25, 1); QuartzCore was not read for it) and how long the
+snapshot stays before the fade (until the coordinated notification is answered, 0.5 s at most; who calls `endPresentation`
+was not traced into SkyLight). Mac capture that would settle both: a 60 fps recording of a Dark -> Light switch over a
+grey 127 desktop with one TextEdit window, from the click to 1 s after it.
+
+Ours (plugin `src/AppearanceFade.cpp`, README "Appearance switch"): snapshot = the output's last presented swapchain buffer,
+hold 0.15 s (ours), fade 0.5 s on (0.25, 0.1, 0.25, 1). mcap, MBA headless, grey 127, Finder + Settings + Calculator open,
+strip across the windows and the Dock, trigger = option on the socket, then the state file:
+
+| run | new look vs the decoded curve, rms | 2-98 % | fade starts | intervals max |
+|---|---|---|---|---|
+| scale 2, dark -> light / light -> dark, Finder and Settings, 6 runs | 0.001-0.002 | 384-405 ms | +162..178 ms | 19.5-21.1 ms |
+| scale 2, Dock strip, both directions | 0.004 | 401-405 ms | +176..178 ms | 20.0-20.7 ms |
+| scale 1.6, both directions | 0.001-0.002 | 384-402 ms | +164..180 ms | 19.6-20.6 ms |
+| `reduce_motion = 1` | no fade, done 94 ms after the command | | | |
+
+Every track is monotonic and starts at 0 (no client visible before the snapshot). GPU while it runs (stats, same session,
+600 frames with four fades): whole frame avg 10.3 ms / p95 16.2 ms, glass 0.19 ms per frame; the fade itself is one
+full-output copy at the start and one textured quad per frame. Before: every surface snapped at its own time (fade off,
+4 switches by the state file: Settings and Finder first change 10-44 ms after the write, done by 27-73 ms; the glass
+146-1063 ms after it, when the shell's `hyprctl eval` arrived).
+
+Not covered, hand-offs:
+- settings/ and shell/: send the option on the socket before the own theme flips (README line). Today Settings flips itself,
+  writes the file 16 ms later, and the shell answers the file 146 / 246 / 1063 ms after a replaced file (3 runs) with a
+  spawned `hyprctl eval`; with that order the Settings window and Finder change before the snapshot is taken.
+- shell/: the shell's own theme (bar and menu text) follows the file that late, so it can change after the 0.15 s hold.
+- GTK apps: Calculator changed 3.1 s after the switch in one run and not within 3.5 s in another (it follows the keyfile
+  the shell writes): after the fade, a snap.
+- Not tried on screen: a lock during a fade (sessions are never locked in tests; by code the fade ends when a lock starts),
+  two outputs, a rotated output (skipped by code).

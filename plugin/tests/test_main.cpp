@@ -1,6 +1,7 @@
 // Unit tests for the pure logic (region clustering, SDF, parsing). No framework.
 #include "Config.hpp"
 #include "Material.hpp"
+#include "Fade.hpp"
 #include "Shape.hpp"
 #include "TitlebarLayout.hpp"
 
@@ -108,6 +109,17 @@ int main() {
     CHECK(near(sdRoundedBox(-136, -32, 146, 32, 24, 0), 3.8483, 2e-3));
     CHECK(near(sdRoundedBox(-126, -32, 146, 32, 24, 0), 0.7589, 2e-3));
     CHECK(near(sdRoundedBox(-116, -32, 146, 32, 24, 0), 0.1144, 2e-3));
+
+    // appearance switch: the snapshot stays at 1 for the hold, then fades on CA's default curve over the duration
+    CHECK(near(cubicBezier(0.25, 0.1, 0.25, 1, 0), 0) && near(cubicBezier(0.25, 0.1, 0.25, 1, 1), 1));
+    CHECK(near(cubicBezier(0.25, 0.1, 0.25, 1, 0.5), 0.8024, 1e-3)); // CSS "ease" at half time
+    CHECK(near(cubicBezier(0, 0, 1, 1, 0.3), 0.3, 1e-6));
+    CHECK(near(appearanceSnapshotAlpha(0, 0.15, 0.5), 1) && near(appearanceSnapshotAlpha(0.15, 0.15, 0.5), 1));
+    CHECK(near(appearanceSnapshotAlpha(0.4, 0.15, 0.5), 1 - 0.8024, 1e-3));
+    CHECK(near(appearanceSnapshotAlpha(0.65, 0.15, 0.5), 0) && near(appearanceSnapshotAlpha(9, 0.15, 0.5), 0));
+    CHECK(near(appearanceSnapshotAlpha(0.2, 0.15, 0), 0)); // no duration: a snap after the hold
+    for (double t = 0; t < 0.7; t += 0.01)
+        CHECK(appearanceSnapshotAlpha(t + 0.01, 0.15, 0.5) <= appearanceSnapshotAlpha(t, 0.15, 0.5) + 1e-12);
 
     // bevel: 1 at the edge, 0 at full depth, monotonic
     CHECK(near(bevel(0, 10), 1));
