@@ -571,3 +571,52 @@ Ours is about half a frame ahead of the Mac on the knob (the Mac's first sample 
 first frame is one refresh interval in). Not measured here: HUD dismiss (unchanged), the Control Center lens (same
 component and curve), the Sound module's open (Control Center's open spring), banner out, Mission Control, full screen,
 Cmd-Tab, Dock autohide, slot grow / shrink, drag-off, submenu delay, bar peek, lock / unlock.
+
+## Session 15 (2026-11-12): Mission Control, banner trace, HUD against the Mac track, the 23.09.23 recording
+
+Own headless sessions (MBA 2560x1664), scratch copy of the tree, private D-Bus, no PipeWire, fresh sessions: session
+1 68 mcap runs, session 2 under 60; quiet host (load under 1). Per-frame series in the CSV (`*-s15-*`). Metric: `alpha`
+over the whole output at `-k 4` for Mission Control (as sessions 7-11), over the HUD's layer box for the HUD, over a
+380 x 90 pt box for the banner (against the frame 650 ms after the notification, the banner fully in).
+
+| Motion | Mac | Before | After | Runs |
+|---|---|---|---|---|
+| Mission Control enter, one Settings window, scale 2 (d56415b) | R2 enter series, 333 ms | 2-98 % 418 ms: the window went to its inactive look 4-5 frames before the flight (.05 held), a one-frame .86 spike in the share metric (the cover's plain colour under a picture not yet drawn), the hover title over the real window before the flight | 335-352 ms, time rms 14-17 -> 4.7-5.2 ms, value rms .008-.009 -> .010-.012 | 2 / 3 |
+| Mission Control exit, same | R2 exit, 267 ms | 267-268 ms | unchanged, 267-268 ms, .005-.007 | 3 |
+| Mission Control, Settings + 3 overlapping foot windows (one off-screen), scale 2 (2b25e0b) | R2 | judge #5: enter 311-350, exit 242-250 with a .94 plateau, 2 of 3 inactive terminals without a title bar | enter 350-352 ms (3 of 4 the same series), exit 200-202 ms, no plateau; every foot thumbnail has its bar (drawn from `hyprctl liquidglass bars` where the screen still has none) | 4 |
+| Same at scale 1.6 | R2 | judge #5 (one Settings window): enter .061-.100 / 20-32 ms starting with .39 held 4-5 frames, exit .109-.114 starting at .56, plateau .93 | 4 windows: enter 317-318 ms, exit 167-186 ms; one Settings window: enter .020-.021 / 10.6-11.2 ms, no hold; exit .016-.022 / 6-12 ms, 218-235 ms, no plateau | 4 + 4 |
+| Full screen enter, foot, top strip (judge #5: titles blank one frame, 4 of 4) | R2 | - | not reproduced at 90c4bb0+: the bar's title contrast falls 39 38 35 31 24 17 10 5 2 1 in 8 of 8 enters (two window positions) | 8 |
+| HUD appear (`hud volume`) | verify/A hud-appear-fit track: .024 .064 .119 .180 .250 .318 .382 .447 .508 ... | - | .01 .03 .06 .10 .14 .18 .24 .29 .33 ... 2-98 % 500-535 ms (Mac 450-483); rms .035-.038 / 17-18 ms: ours starts about two frames later and lower, the tail is close | 4 |
+| HUD dismiss (`hud hide`) | the four dismiss tracks in hud-appear-fit.json (episode 2: .018 .086 .177 .266 .349 .43 .50 .56 .62 .72 .72 .76 .82, then cut) | judge #5: 331-353 ms in an aged session | .04 .15 .32 .48 .59 .68 .75 .80 .84 .87 .90, 2-98 % 317-319 ms: ahead of every Mac track in the first 10 frames (the tracks end at 80-85 %, so no Mac 2-98 % exists; judge #5's 267 is the formula 1 - (1 - s)^2, which the tracks do not follow) | 4 |
+| Banner in / out (one banner, timeout 0.9 s) | - | judge #5: out loses or repeats its 2nd value in 4 of 6 | in: 6 of 6 the same series (.03 .08 .13 .21 .28 .36 .45 .51 ...), 4 of 6 with the first value twice; out .70 .41 .21 .10 .05 .02 in 5 of 6, one .47 .41 | 6 |
+
+Traced, banner out: the shell's own log (FrameClock ticks and frameSwapped against mcap's presents, one clock line per
+tick) shows the lost value: the leave spring ticked frame 1 at +949.5 ms and frame 2 at +950.5 ms (Qt built two frames
+back to back) and both commits fell between the presents at 947.8 and 964.6, so frame 1 never reached the screen (.70 .22
+.21). Tried: a tick less than half an interval after the last one keeps the frame (same value). It turned the loss into
+a repeat in 7 of 8 (.70 .70 .41): the compositor shows such twins on two refreshes most of the time, so the twin cannot
+be told apart from Qt's side. Dropped, not committed. The banner list's ViewTransitions (`displaced`, `move`) do not run
+for a single banner, so they are not the cause here; they still run on Qt's timer when banners make room.
+
+Mission Control, what moved: the layer takes the keyboard only once the wallpaper covers the windows (the focused
+window keeps its active look, as on the Mac: screens/27.2.1/dock/mc-light.png), the cover draws no plain colour under a
+picture and waits for the picture, the hover ring and title wait for the flight. Still visible in the 3-6 frames before
+the flight: Settings' sidebar blur changes when the overlay layer maps (Hyprland; Spotlight's layer does the same) and
+the Dock's `wallpaper_under` quad hides the window shadow near the Dock (both .02-.05 of the screen's change).
+
+The 23.09.23 recording (Settings > Appearance, dark), read per frame in scratch (no frame kept):
+- Slider drag: the preview's capsules follow the knob while it is held (Search capsule 93,129,106 at 0.5 -> 66,82,75 at
+  1, frames 2529-2640) and jump in one frame when a click sets the value (frame 2786) while the knob slides. Ours changed
+  them on mouse-up only; fixed (daa0e57).
+- Toolbar buttons (largest open difference): hovering a button lights a disc around it inside its capsule; a press
+  lightens the whole capsule by about 50 levels over the sky (143,152,164 -> 194,212,232), strongest at the button and
+  +27 about 45 pt away, rising over 3 frames (capsule mean 152 159 169 173, frames 218-221). Ours: the press lift only.
+  Not built: the disc's size and the glow's profile need a careful read with the recorder's click rings masked.
+- Not compared yet: the article's scroll physics and rubber band (frames 1260-1600), the blur of the content in the
+  capsules while scrolling.
+
+Not done in this session: Cmd-Tab's partial first frame, Quick Look placement, the full-screen title bar (gone at once
+on enter; AppKit cross-fades the before / after contents on (0, 1, 1, 1) over half the 0.5 s, so the bar would fade over
+about 15 frames: the plugin draws no decoration for a full-screen window, a fade needs its own pass), the Qt-timer
+motions (RubberBand, lock shake / minute, Switch), Dock autohide, slot grow / shrink, drag-off, submenu delay, bar
+peek, lock / unlock, the Dock label over backdrops.
