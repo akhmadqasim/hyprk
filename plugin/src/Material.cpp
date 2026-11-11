@@ -49,18 +49,23 @@ namespace lg {
 
         // Dock (DockRecipe.Other): face light (0.15, 0.9, 1.25), dark (0.05, 0.92, 1.25) + black 2 % with max luma 0.75;
         // blur 1.5; outer layer opacity 0.2 without displacement; rim -0.25 at 75 deg (SDR; 120 only with HDR
-        // headroom), highlight target light (0.2, 1.2, 1.333), dark (0.25, 0.95, 1.2). Inner refraction: the real Dock
-        // (Dock process) fits Regular's min(0.25 D, 20) / max(-0.5 D, -60) at its end caps (rms 1.4-1.9 levels), not
-        // the probe variant's 0.08 D / -0.18 D (6.7-7.2): MAC-ANSWERS PC #67 B notes. Light face = the real Dock
-        // (white 229, black 38, grey 127 -> 134), dark 176 / 107 / 12 (MAC-ANSWERS "Glass checks (#53)").
+        // headroom), highlight target light (0.2, 1.2, 1.333), dark (0.25, 0.95, 1.2). Inner refraction 0.08 D / -0.18 D
+        // at size class medium (Dock.app GlassMaterialProvider.Configuration.dock .size = .medium, MAC-ANSWERS PC #67 B2
+        // 3): 13.28 pt / -29.88 pt at every Dock size (real Dock rms 0.4-1.1 pt). Light face = the real Dock (white 229,
+        // black 38, grey 127 -> 134), dark 176 / 107 / 12 (MAC-ANSWERS "Glass checks (#53)").
         constexpr SRecipe DOCK = {
-            .name         = "dock",
-            .family       = eFamily::CLEAR,
-            .light        = {.ycc = {0.15f, 0.9f, 1.25f}, .keyYcc = {0.2f, 1.2f, 1.3334f}},
-            .dark         = {.ycc = {0.05f, 0.92f, 1.25f}, .fill = {0, 0, 0, 0.02f}, .keyYcc = {0.25f, 0.95f, 1.2f}, .maxLuma = 0.75f},
-            .outerOpacity = 0.2f,
+            .name                = "dock",
+            .family              = eFamily::CLEAR,
+            .light               = {.ycc = {0.15f, 0.9f, 1.25f}, .keyYcc = {0.2f, 1.2f, 1.3334f}},
+            .dark                = {.ycc = {0.05f, 0.92f, 1.25f}, .fill = {0, 0, 0, 0.02f}, .keyYcc = {0.25f, 0.95f, 1.2f}, .maxLuma = 0.75f},
+            .refractionHeightN   = 0.08f,
+            .refractionHeightMax = 1e6f,
+            .refractionAmountN   = -0.18f,
+            .refractionAmountMin = -1e6f,
+            .outerOpacity        = 0.2f,
             .blurLo = 1.5f, .blurHi = 1.5f, // constant
             LG_NO_SHADOW,
+            .sizeD = SIZE_MEDIUM,
         };
 
         // Control Center (= the volume/brightness HUD, SystemBannerUI _Glass.controlCenter), light and dark alike:
@@ -127,16 +132,22 @@ namespace lg {
         }();
 
         // Notification Center cards and banners: _Glass.notificationCenter (reference/re/27.2.1/decomp/
-        // NotificationCenter-glass.c) = Regular in every dumped input. The modifier ends in .surfaceSize(.medium) and
-        // the slider's max luma reads dimensions.minimumDistanceOfLargestArea, the whole column here: the real NC
-        // (MAC-ANSWERS PC #62: banner 33 / 114 over black / grey 127, card 128 / 104 / 32) fits only the max luma of
-        // D >= 104 (0.35), at the card's own 75 pt (0.53) the banner over grey would read 129.
+        // NotificationCenter-glass.c) = Regular at size class medium (D 166, MAC-ANSWERS PC #67 B2 notes): max luma
+        // 0.35 dark (the real NC, PC #62: banner 33 / 114 over black / grey 127, card 128 / 104 / 32), bleed and
+        // refraction of a 166 pt panel on every card. Shadow: Regular's at D 166 is 0.6 dark / 0.4 light, r 24, y 8; like
+        // the menu's, those inputs give too much ink through this shader, so radius and offset stay and the opacity is
+        // fitted to the gap between two cards over white (with the shell's list shadow, black 0.2): Mac 181 dark / 189
+        // light (PC #62); 0.21 / 0.135 give 181 / 189 (Regular's 0.6 / 0.4 gave 155 / 172, the own-size 0.10 gave 199).
         // Rim: the real NC card's top / bottom line (outer px -> inner px -> body, dark: 68 -> 53 -> 35 over black)
         // is the 1 pt key band alone at 1.23 x Regular's (mask 1.0 and 0.54 in the two px): not decoded, Mac pixels.
         constexpr SRecipe NOTIFICATIONCENTER = [] {
             SRecipe r       = REGULAR;
             r.name          = "notificationcenter";
-            r.faceDMin      = 104;
+            r.sizeD         = SIZE_MEDIUM;
+            r.shadowD0 = r.shadowD1 = 0;
+            r.shadowOpacityLo = r.shadowOpacityHi = 0.135f;
+            r.shadowOpacityHiDark                 = 0.21f;
+            r.shadowRadiusLo                      = r.shadowRadius;
             r.keyScale      = 1.23f;
             r.diffuseAmount = 0;
             return r;
@@ -170,6 +181,8 @@ namespace lg {
     }
 
     SResolved resolveMaterial(const SRecipe& r, double D, bool dark, double tint) {
+        if (r.sizeD > 0) // size class: a fixed D for every size-dependent input
+            D = r.sizeD;
         const SFace& f    = dark ? r.dark : r.light;
         const double a    = std::clamp(std::isfinite(tint) ? tint : 0.5, 0.0, 1.0);
         const double u    = std::clamp(2 * a, 0.0, 1.0), t = std::clamp(2 * a - 1, 0.0, 1.0);
@@ -209,7 +222,7 @@ namespace lg {
             res.bleedOpacity = float((dark ? 0.8 : 0.5) * q);
             res.bleedAmount = res.bleedHeight = float(0.35 * D);
             // max luma: dark lerp(0.6, 0.35) over D 64 -> 104, light maxLumaSDR 0.94
-            const double s = clampedLinear(std::max(D, double(r.faceDMin)), 64, 104, 0, 1);
+            const double s = clampedLinear(D, 64, 104, 0, 1);
             res.maxLuma    = dark ? float(0.6 + (0.35 - 0.6) * s) : 0.94f;
 
             // RegularDiffusionAmount (0x195f22ea0); 0.5 is the recipe as is

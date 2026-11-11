@@ -305,7 +305,9 @@ void main() {
             float spec = (dpt < 1.0 ? 1.0 - 0.75 * dpt : 0.0) * lob.x;
             float diff = max(1.0 - dpt / 8.0, 0.0) * lob.y;
             float hm   = highlight.x * (schlick(spec, highlight.y) + schlick(diff, highlight.z)) * mat;
-            col        = col + hm * (ycc(col, keyYcc) - col);
+            // the layer's colour matrix result is clamped BEFORE the mix (vibrant_color_matrix_sover: clamp(v, -0.75,
+            // inputClamp), then (1 - a) dst + v a; m is not saturated): MAC-ANSWERS PC #67 B2 4b
+            col        = col + hm * (clamp(ycc(col, keyYcc), -0.75, 1.0) - col);
         }
 
         face = vec4(encode(clamp(col, 0.0, 1.0)), 1.0);

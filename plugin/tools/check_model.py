@@ -41,9 +41,7 @@ PORTED = ["InnerRefractionAmount", "InnerRefractionHeight", "OuterRefractionAmou
           "RingShadowOpacity", "BlurRadiusRel"]
 # measured on the real surfaces, so the plugin follows them instead of the AppKit probe (reasons in Material.cpp)
 DEVIATIONS = {("menu", "ShadowOpacity"): "dumped 0.7 / 0.8 give twice the Mac's ink through our shadow; fitted to Q-menubar-28 pixels",
-              ("dock", "InnerRefractionAmount"): "real Dock end caps fit Regular's geometry (MAC-ANSWERS PC #67 B notes)",
-              ("dock", "InnerRefractionHeight"): "same",
-              ("notificationcenter", "MaxLuma"): "real NC reads the column's D (minimumDistanceOfLargestArea), Mac PC #62 pixels"}
+              ("notificationcenter", "ShadowOpacity"): "fitted to the PC #62 gaps between cards (181 dark / 189 light over white)"}
 W709 = np.array([.2126, .7152, .0722])
 WB = np.array([.2125, .7154, .0721])
 
@@ -143,7 +141,7 @@ def rim_rows(dst, P, n, px_per_pt=2):
         m = P["KeyScale"] * (schlick(spec, P["KeyAmount"]) + schlick(diff, P["DiffuseAmount"]))
         k = P["KeyYcc"]
         Y = dst @ W709
-        v = k[0] + (k[1] - k[0]) * Y + k[2] * (dst - Y)
+        v = np.clip(k[0] + (k[1] - k[0]) * Y + k[2] * (dst - Y), -0.75, 1)  # clamped before the mix (PC #67 B2 4b)
         out.append(float(np.clip(dst + m * (v - dst), 0, 1).mean() * 255))
     return out
 
@@ -153,7 +151,11 @@ def rim_rows(dst, P, n, px_per_pt=2):
 RIM_CASES = [("regular highlight alone over black", "regular", True, 64, [0, 0, 0], [56, 33, 11, 8, 6, 5, 4]),
              ("NC card top, dark, over black", "notificationcenter", True, 64, [35, 35, 35], [68, 53, 35]),
              ("Dock top, light, over black", "dock", False, 64, [38, 38, 38], [116]),
-             ("Dock top, dark, over black", "dock", True, 64, [12, 12, 12], [104])]
+             ("Dock top, dark, over black", "dock", True, 64, [12, 12, 12], [104]),
+             # real Control Center module top rim, dark (PC #67 B2 4b), D 64 (140 x 64 module)
+             ("CC module top, over grey (body 110)", "controlcenter", True, 64, [110, 110, 110], [233, 180, 134, 128, 124, 121]),
+             ("CC module top, over white (body 187)", "controlcenter", True, 64, [187, 187, 187], [255, 247, 208, 202]),
+             ("CC module top, over black (body 32)", "controlcenter", True, 64, [32, 32, 32], [123, 84, 50, 45])]
 
 
 def face_apple(c255, g):
@@ -188,8 +190,9 @@ def main():
         for dark in (False, True):
             for D in GRID_D:
                 for a in GRID_A:
-                    ref = A.inputs(mat, D, a, dark)
-                    ref["BlurRadiusRel"] = ref["BlurRadius"] / A.inputs(mat, D, 0.5, dark)["BlurRadius"]
+                    Dm = A.size_d(mat, D)
+                    ref = A.inputs(mat, Dm, a, dark)
+                    ref["BlurRadiusRel"] = ref["BlurRadius"] / A.inputs(mat, Dm, 0.5, dark)["BlurRadius"]
                     ref["BackdropScale"] = A.backdrop_scale(mat, ref)
                     got = ours.get((mat, dark, D, a))
                     if got is None:
@@ -226,6 +229,8 @@ def main():
             continue
         mat, D = ramp_m[name]
         dark, a = mode == "dark", float(a[2:])
+        if mat in A.SIZE:  # the probe was automatic (its own D); ours resolves at the size class, checked in 3b
+            continue
         P = ours.get((mat, dark, D, a))
         if P is None:
             continue
@@ -248,7 +253,7 @@ def main():
                     P = ours.get((mat, dark, D, a))
                     if P is None:
                         continue
-                    g = A.inputs(mat, D, a, dark)
+                    g = A.inputs(mat, A.size_d(mat, D), a, dark)
                     for bd in backdrops:
                         e = face(np.array(bd) / 255, P) * 255 - face_apple(bd, g)
                         errs.append(e)
@@ -260,7 +265,7 @@ def main():
         print("    %-19s %6.2f / %6.2f   worst at D %s a %s %s backdrop %s" % (mat, rms, mx, *worst[1]))
         if mx > 1.0 and (mat, "MaxLuma") not in DEVIATIONS:
             grid_bad.append(mat)
-    print("    (notificationcenter differs by its max luma deviation, see 2.)" if ("notificationcenter", "MaxLuma") in DEVIATIONS else "")
+    print("    (size-class materials %s: 3a skipped, the probe was automatic)" % ", ".join(sorted(A.SIZE)))
 
     # 4. rim: the key/fill highlight mask of the shader (port of rimRows below) against the Mac's rows, 2x display
     print("4. rim rows from the edge inward (2x), ours vs Mac")

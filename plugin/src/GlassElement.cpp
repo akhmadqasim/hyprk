@@ -328,8 +328,9 @@ namespace lg {
         const auto&  lead = data.shapes[data.groups[gi].lead];
         const double D    = std::min(lead.box.w, lead.box.h);
         auto         res  = resolveMaterial(*data.recipe, D, dark, tint);
-        // shadow marker (SGlassShape::regularShadow): Regular's shadow for this size instead of the layer's
-        if (lead.regularShadow && hasShadow(*data.recipe)) {
+        // shadow marker (SGlassShape::regularShadow): Regular's shadow for this size instead of the layer's; a recipe with
+        // a size class has one size, so its own shadow stays (Notification Center cards)
+        if (lead.regularShadow && hasShadow(*data.recipe) && data.recipe->sizeD <= 0) {
             const auto reg    = resolveMaterial(recipeByName("regular"), D, dark, tint);
             res.shadowOpacity = reg.shadowOpacity;
             res.shadowRadius  = reg.shadowRadius;
@@ -629,8 +630,11 @@ namespace lg {
             glUniform1f(u.bleedOpacity, res.bleedOpacity);
             glUniform1f(u.bleedHeight, res.bleedHeight * scale);
             glUniform1f(u.bleedAmount, res.bleedAmount * p.refractionScale * scale);
-            // Apple samples the bleed from its backdrop texture (scale 0.5 / 0.25 / 0.125 of the display) at mip 0
-            glUniform1f(u.bleedLod, -std::log2(res.backdropScale));
+            // the bleed sample is blurred: radius 0.175 D, Gaussian sigma 0.35 D = bleedAmount (MAC-ANSWERS PC #67 C3 3), read
+            // as one tap of the sharp copy's mips (box chain + trilinear: sigma ~0.41 x 2^L px), never sharper than
+            // Apple's backdrop scale, capped by the levels the copy has (lod 6 = sigma ~26 px)
+            const float bleedSigma = res.bleedAmount * float(scale) / 0.41f;
+            glUniform1f(u.bleedLod, std::clamp(std::log2(std::max(bleedSigma, 1.f)), -std::log2(res.backdropScale), float(SHARP_LEVELS - 1)));
             glUniform4f(u.bleedYcc, res.bleed.black, res.bleed.white, res.bleed.saturation, res.bleedLighten ? 1.f : 0.f);
             glUniform4f(u.faceYcc, res.ycc.black, res.ycc.white, res.ycc.saturation, res.maxLuma);
             glUniform3f(u.blurAlpha, res.blurAlpha[0], res.blurAlpha[1], res.blurAlpha[2]);

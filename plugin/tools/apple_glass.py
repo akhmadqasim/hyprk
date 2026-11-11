@@ -12,6 +12,14 @@ MATERIALS = ["regular", "menu", "notificationcenter", "clear", "dock", "controlc
 # names in the Mac's dumps
 APPLE_NAME = {"regular": "regular", "menu": "regular.menu", "notificationcenter": "notificationCenter", "clear": "clear",
               "dock": "dock", "controlcenter": "controlCenter"}
+# size classes (GlassMaterialProvider.Size, MAC-ANSWERS PC #67 B2 3 and notes): the real Dock and Notification Center
+# resolve every size-dependent input at D 166 (medium), whatever their shape; the Mac's probe dumps (live/verify/C, C2)
+# are AppKit/automatic, so inputs() takes D as given and the checker passes size_d(material, D)
+SIZE = {"dock": 166.0, "notificationcenter": 166.0}
+
+
+def size_d(material, D):
+    return SIZE.get(material, D)
 
 
 def clamp(x, lo=0.0, hi=1.0):

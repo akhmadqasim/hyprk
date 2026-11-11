@@ -50,6 +50,8 @@ namespace lg {
         float maxLuma = 1;
     };
 
+    constexpr float SIZE_MINIMUM = 48.f, SIZE_MEDIUM = 166.f, SIZE_MAXIMUM = 201.3f;
+
     struct SRecipe {
         const char* name   = "regular";
         eFamily     family = eFamily::REGULAR;
@@ -84,8 +86,11 @@ namespace lg {
         // key/fill highlight (CASDFKeyFillHighlightEffect): key amount, diffuse band amount (Apple 0.5 and 0.5 x 0.15)
         // and a scale of the whole mask (1 = Apple; Notification Center 1.23, its measured rim)
         float keyAmount = 0.5f, diffuseAmount = 0.075f, keyScale = 1;
-        // D the slider's max luma reads at least (DesignLibrary dimensions.minimumDistanceOfLargestArea): 0 = the shape's
-        float faceDMin = 0;
+
+        // size class (GlassMaterialProvider.Size, SwiftUI _Glass.SurfaceSize, MAC-ANSWERS PC #67 B2 3 and notes): every
+        // size-dependent input reads this fixed D instead of the shape's shortest side. 0 = automatic (the shape's own,
+        // AppKit NSGlassEffectView), SIZE_MINIMUM / SIZE_MEDIUM / SIZE_MAXIMUM = 48 / 166 / 201.3 pt
+        float sizeD = 0;
 
         // ring shadow: offset y, stroke, blur radius, opacity (0 = off)
         float ringOffsetY = 0, ringStroke = 0, ringRadius = 0, ringOpacity = 0;

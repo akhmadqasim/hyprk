@@ -132,11 +132,13 @@ int main() {
               near(r.shadowRadius, 24, 1e-5) && near(r.shadowOffsetY, 10));
         CHECK(near(resolveMaterial(mn, 24, true).shadowOpacity, 0.36, 1e-6)); // fitted to Q-menubar-28 (Material.cpp)
 
-        // Notification Center: Regular, max luma of the column's D (>= 104), rim = 1.23 x the key band, no diffuse
+        // Notification Center: Regular at size class medium (D 166 at any card size), rim = 1.23 x the key band, no diffuse
         const auto& nc = recipeByName("notificationcenter");
         CHECK(std::string{nc.name} == "notificationcenter" && hasShadow(nc) && near(resolveMaterial(nc, 75, true).maxLuma, 0.35, 1e-6) &&
               near(resolveMaterial(nc, 75, false).maxLuma, 0.94, 1e-6) && near(resolveMaterial(nc, 75, true).keyScale, 1.23, 1e-6) &&
-              near(resolveMaterial(nc, 75, true).diffuseAmount, 0) && near(resolveMaterial(nc, 75, true).shadowOpacity, resolveMaterial(reg, 75, true).shadowOpacity, 1e-6));
+              near(resolveMaterial(nc, 75, true).diffuseAmount, 0) && near(resolveMaterial(nc, 75, true).shadowOpacity, 0.21, 1e-6) && near(resolveMaterial(nc, 75, false).shadowOpacity, 0.135, 1e-6) &&
+              near(resolveMaterial(nc, 75, true).shadowRadius, 24, 1e-6) &&
+              near(resolveMaterial(nc, 75, true).bleedAmount, 0.35 * 166, 1e-4));
         CHECK(std::string{recipeByName("nope").name} == "regular");
 
         // Clear family: no bleed, no shadow, colours fixed; the slider scales the blur (x 2a) or adds a blur fill (2a - 1)
@@ -155,7 +157,8 @@ int main() {
         const auto& dock = recipeByName("dock");
         r                = resolveMaterial(dock, 64, true);
         CHECK(near(r.maxLuma, 0.75, 1e-6) && near(r.fill.a, 0.02, 1e-6) && near(r.ycc.saturation, 1.25, 1e-6) && near(r.darkSpread, 75) && near(r.outerOpacity, 0.2, 1e-6) &&
-              near(r.outerAmount, 0) && near(r.refractionAmount, -32, 1e-4) && near(resolveMaterial(dock, 64, false).ycc.white, 0.9, 1e-6) && !hasShadow(dock));
+              near(r.outerAmount, 0) && near(r.refractionAmount, -29.88, 1e-4) && near(r.refractionHeight, 13.28, 1e-4) &&
+              near(resolveMaterial(dock, 120, true).refractionAmount, -29.88, 1e-4) && near(resolveMaterial(dock, 64, false).ycc.white, 0.9, 1e-6) && !hasShadow(dock));
 
         // Spotlight (SiriRecipe, not in the verified model): unclamped refraction 0.4 D / -0.72 D, outer 0.4 D at 1.0,
         // blur from 60 pt inside the edge; the slider changes nothing
