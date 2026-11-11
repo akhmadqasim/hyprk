@@ -173,3 +173,38 @@ below its top 7.7 vs 7.9.
   by 100 pt; the bar sits at 189..276 pt (ours; the Mac's crop has the same 86.5 pt bar well below the 34 pt bar), so the
   gradient adds 0 there, while the Mac field rises 0.23 x in at mid-height and 0.5 x in at the bottom (white / grey / black mid
   65 / 36 / 6, bottom 127 / 64 / 17). The results panel sits lower still. Left as is.
+
+## Corner curve and rim rows (judge #4 gap 12, 2026-11-11, plugin 295e523)
+
+Judge #4: the CC tile's top and bottom rim rows flat in ours (peak to peak 2-3) where the Mac's show the stripes (31 / 51).
+Row by row against the Mac's C2 crop (`cc-real-stripes-a0.5071146.png`, slider tile 292 x 64, r 24):
+
+- **The rim rows are flat on the Mac too.** Middle of the tile (crop x 200..440), rows 0..5 px below the top: Mac mean / peak to
+  peak 231.0 / 0, 179.2 / 1, 133.1 / 2, 127.0 / 2, 123.0 / 2, 120.4 / 3; ours 231.0 / 0, 179.0 / 1, 133.2 / 2, 126.8 / 2,
+  122.5 / 2, 119.5 / 3. No stripes in the rim; edge bleed and lens were not the cause.
+- **The 31 / 51 are the corners.** Read across the tile (x 40..556) rows 3 and 4 px below the top are 52 / 33 on the Mac and were
+  3 / 4 in ours: the Mac's top edge has already left the flat 20 pt from the tile's end, ours left it 7 pt later.
+- **Cause 1, the curve.** The plugin drew an Lp superellipse (power 2.6) that spans r. QuartzCore's shape is
+  `supercircle_sdf` (metallib, `decomp/QuartzCore-metallib-glass_background_sdf_all_lpf.ll`): the corner spans 1.528665 r, with a
+  4th-degree polynomial in the corner angle, and goes over to the circle where a half side is shorter than that span. Ported
+  (decoded, nothing fitted). Mac top edges near a corner against the port, rms px: slider tile r 24 0.16 / 0.15 (old curve 1.36 /
+  1.11), 2x2 tile r 32 0.12 (`panels/cc-nowplaying-idle-dark-grey127.png`), banner r 20 0.11 (`panels/banner-dark-black.png`),
+  Dock at tile 33 0.09 with r 15.5 (`dock/dock-dark.png`; the shell's 14 x 31.1 / 27.6 = 15.8).
+- **Cause 2, the radius.** Quickshell's Region corners are Qt ellipse regions (a flattened polygon, whole radius): the stair
+  formula read the Dock's 31 as 37.1 and the 2x2 tile's 32 as 38.2. Now exact from Qt's own staircase (README "Corners").
+
+| MBA 2x, dark, 4 pt stripes at the Mac crop's phase, slider tile | Mac | before | after |
+|---|---|---|---|
+| rim rows 0..4 px, across both corners (x 40..556), peak to peak | 140 / 103 / 91 / 52 / 33 | 118 / 31 / 40 / 3 / 4 | 135 / 98 / 87 / 50 / 31 |
+| top edge 11..46 pt from the end vs the Mac's, rms px (left / right) | | 1.41 / 1.17 | 0.21 / 0.20 |
+| rim rows of the left corner (x 20..120) vs the crop, rms levels | | 25.5 | 6.2 |
+| rim rows in the middle, means | 231 179 133 127 123 120 | 231 179 133 127 123 120 | 231 179 133 127 123 120 |
+| interior 8 / 15 pt, gap peak to peak / mean | 7.9 at 15, 32 / 114.8 | 8 / 8, 32 / 114.3 | 8 / 8, 32 / 114.3 |
+| flat tile white / grey / black; rim over white, black | 186 / 109 / 32; 255 247 208 202, 123 84 50 45 | same | 186 / 109 / 32; 255 247 207 202, 123 84 50 45 |
+
+Same rows on the other glass over the same stripes (no Mac capture over stripes for any of them): HUD capsule, middle, rows 0..5
+mean / peak to peak 241 / 2, 189 / 4, 142 / 12, 135 / 18, 130 / 23, 127 / 28 (interior 63-66: the highlight mix flattens the
+first rows, there is no panel blur under the HUD); Dock top between the icons 155 / 37, 134 / 51, 116 / 64, 113 / 66 (body 70);
+menu 142 / 16, 129 / 1, 112 / 1 (Regular at that size is fully blurred, as C2 says).
+
+Hand-off (shell): the 1x1 Control Center tiles are 64 x 63 pt in the region (Mac: circle, d 64).
