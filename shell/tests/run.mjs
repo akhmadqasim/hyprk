@@ -366,6 +366,25 @@ test("squircle points in box", () => {
 
 // ---- spotlight modes, files, actions, clipboard ----
 test("modes order", () => assert.deepEqual(SL.modes().map(m => m.id), ["apps", "files", "actions", "clipboard"]));
+{
+    // the Mac's Spotlight Files mode and the Finder File > Eject row draw the outline glyphs ("folder" / "eject"
+    // alone are hyprk aliases of the .fill ones); Actions and Clipboard keep bolt / clipboard (no layered squares
+    // or doc.on.clipboard SVG in our set)
+    const SF = load("sf.js", join(here, "..", "components"));
+    const sym = id => SL.modes().find(m => m.id === id).symbol;
+    test("spotlight modes: Files is the outline folder", () => {
+        assert.equal(SF.resolve(sym("files")), "folder");
+        assert.equal(SF.resolve("folder"), "folder.fill");
+        assert.equal(sym("actions"), "bolt");
+        assert.equal(sym("clipboard"), "clipboard");
+    });
+    test("menus: Eject is the outline eject, every menu icon has a glyph", () => {
+        const src = readFileSync(join(here, "..", "lib", "menus.js"), "utf8");
+        assert.match(src, /f\("Eject", "⌘E", null, null, \{ icon: "sf:eject" \}\)/);
+        assert.equal(SF.resolve("sf:eject"), "eject");
+        for (const [, n] of src.matchAll(/icon: "([^"]+)"/g)) assert.ok(SF.resolve(n), n);
+    });
+}
 test("mode key super+2", () => assert.equal(SL.modeForKey(0x32, true, false, false), "files"));
 test("mode key ctrl+4", () => assert.equal(SL.modeForKey(0x34, false, true, false), "clipboard"));
 test("mode key alt+1", () => assert.equal(SL.modeForKey(0x31, false, false, true), "apps"));

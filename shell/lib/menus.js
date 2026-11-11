@@ -75,7 +75,7 @@ function finderMenus(win) {
             f("Add to Sidebar", "⌃⌘T"),
             SEP,
             f("Move to Trash", "⌘⌫", null, null, { icon: "trash" }),
-            f("Eject", "⌘E", null, null, { icon: "eject" }),
+            f("Eject", "⌘E", null, null, { icon: "sf:eject" }),
             SEP,
             f("Tags…", "", null, null, { icon: "tag" }),
             f("Customize Folder…", ""),
