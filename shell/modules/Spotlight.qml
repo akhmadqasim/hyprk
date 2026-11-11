@@ -510,7 +510,8 @@ ShellWindow {
                 width: parent.width - Theme.spotlight.pillInset - Theme.spotlight.pillRightInset
                 height: Theme.spotlight.resultsMax - 2 * Theme.spotlight.pillInset
                 interactive: contentHeight > height
-                boundsBehavior: Flickable.StopAtBounds
+                boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
+                RubberBand { flickable: results }
                 model: sp.rows
                 currentIndex: sp.selected
                 onCurrentIndexChanged: positionViewAtIndex(currentIndex, ListView.Contain)

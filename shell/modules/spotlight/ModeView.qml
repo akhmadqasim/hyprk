@@ -169,7 +169,8 @@ Item {
             model: view.items
             currentIndex: view.selected
             onCurrentIndexChanged: positionViewAtIndex(currentIndex, ListView.Contain)
-            boundsBehavior: Flickable.StopAtBounds
+            boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
+            RubberBand { flickable: list }
             delegate: ResultRow {
                 id: rr
                 required property var modelData

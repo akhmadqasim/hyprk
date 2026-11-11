@@ -127,13 +127,15 @@ Item {
         cellWidth: panel.m.pitch
         cellHeight: panel.m.rowPitch
         cacheBuffer: panel.m.rowPitch
-        boundsBehavior: Flickable.StopAtBounds
+        boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
+        RubberBand { flickable: grid }
         model: panel.apps
         header: Item {
             width: grid.width
             height: AG.gridTop(panel.browsing)
             // chips: y 20, 26 tall, from x 20, gap 8; fill +9 over the panel, grey SF 15 text
             ListView {
+                id: chipStrip
                 visible: panel.browsing
                 x: panel.m.inset - grid.x
                 y: panel.m.chipsTop
@@ -142,7 +144,8 @@ Item {
                 orientation: ListView.Horizontal
                 spacing: panel.m.chipGap
                 clip: true
-                boundsBehavior: Flickable.StopAtBounds
+                boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
+                RubberBand { flickable: chipStrip }
                 model: panel.browsing ? panel.chips : []
                 delegate: Item {
                     id: chip

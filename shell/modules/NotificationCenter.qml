@@ -177,7 +177,8 @@ Item {
             height: nc.height + nc.bleed
             contentHeight: content.implicitHeight + nc.bleed
             clip: true
-            boundsBehavior: Flickable.StopAtBounds
+            boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
+            RubberBand { flickable: flick }
             onContentYChanged: nc.settle()
 
             ColumnLayout {
