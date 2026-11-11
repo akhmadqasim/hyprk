@@ -601,6 +601,11 @@ namespace lg {
         const auto params = m_params();
         if (!window || !params || m_height <= 0)
             return;
+        if (m_dragArmed && global != m_armedAt) {
+            m_dragArmed = false;
+            g_layoutManager->beginDragTarget(window->layoutTarget(), MBIND_MOVE);
+            m_dragging = true;
+        }
         const auto [bar, layout] = geometry(*params, window->presentation().floatingOffset());
         const bool hover         = lightsArea(layout, params->titlebarGap).translate(bar.pos()).containsPoint(global);
         const int  button        = buttonAt(layout, global.x - bar.x, global.y - bar.y, params->titlebarGap);
@@ -657,12 +662,24 @@ namespace lg {
         if (e.state == WL_POINTER_BUTTON_STATE_PRESSED) {
             if (!Desktop::focusState()->isWindowActive(window))
                 Desktop::focusState()->rawWindowFocus(window, Desktop::FOCUS_REASON_CLICK);
+            // a double-click on the bar zooms, again to restore (Q-windows-21: AppleActionOnDoubleClick "Maximize", the
+            // Zoom default; the same toggle as Option-click on green). The second press does not start a move. The
+            // interval is the 400 ms Qt uses for the Finder toolbar's double-click (the Mac's is not in the repo)
+            const auto now = std::chrono::steady_clock::now();
+            if (hit < 0 && now - m_barPressAt < std::chrono::milliseconds(400)) {
+                m_barPressAt = {};
+                m_pressed    = -1;
+                HyprlandAPI::invokeHyprctlCommand("dispatch", std::format(R"(hl.dsp.window.fullscreen({{ mode = "maximized", window = "address:0x{:x}" }}))",
+                                                                          reinterpret_cast<uintptr_t>(window.get())));
+                return true;
+            }
+            m_barPressAt = hit < 0 ? now : std::chrono::steady_clock::time_point{};
             m_pressed = hit;
             if (hit >= 0)
                 damageEntire(); // pressed colour
-            if (hit < 0) { // the rest of the bar moves the window
-                g_layoutManager->beginDragTarget(window->layoutTarget(), MBIND_MOVE);
-                m_dragging = true;
+            if (hit < 0) { // the rest of the bar moves the window, from the first motion (onPointerMove)
+                m_dragArmed = true;
+                m_armedAt   = pos;
             }
             return true;
         }
@@ -679,6 +696,7 @@ namespace lg {
     }
 
     void CTitlebar::onButtonRelease() {
+        m_dragArmed = false;
         if (!m_dragging)
             return;
         m_dragging = false;

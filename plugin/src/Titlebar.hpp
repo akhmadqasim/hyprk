@@ -95,6 +95,12 @@ namespace lg {
         bool                     m_option    = false; // Option held while hovering: the green glyph is +
         std::chrono::steady_clock::time_point m_hoverSince{};
         bool                     m_dragging = false;
+        // the last press on the bar outside the lights, for the double-click zoom (Q-windows-21)
+        std::chrono::steady_clock::time_point m_barPressAt{};
+        // a press on the bar moves the window from the first pointer motion on, so a click (or the first click of a
+        // double-click) on a zoomed window does not drag it out of its zoom
+        bool                     m_dragArmed = false;
+        Vector2D                 m_armedAt;
 
         // wantsTitlebar() verdict for this params snapshot and window class (held, so no ABA)
         std::shared_ptr<const SParams> m_decidedFor;
