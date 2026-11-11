@@ -256,6 +256,11 @@ Singleton {
         const wins = item.windows || [];
         const out = wins.map(w => ({ label: w.title || item.name, action: () => root.focusWindow(w) }));
         if (out.length > 0) out.push({ sep: true });
+        // Finder's own rows (live/dock/dock-menus.json "Finder"); the folder rows have no feature here: disabled
+        if (item.id === "hyprk-finder")
+            out.push({ label: "New Finder Window", action: () => root.openFinder("") }, { label: "New Smart Folder", disabled: true },
+                     { label: "Find…", action: () => { Panels.open = "spotlight"; } }, { sep: true },
+                     { label: "Go to Folder…", disabled: true }, { label: "Connect to Server…", disabled: true }, { sep: true });
         // Options ▸ as on 27.2.1 (MAC-ANSWERS.md Q-dock-10): pinned "Remove from Dock", else "Keep in Dock", then
         // Open at Login and Show in Finder. The Dock list is fixed and there is no login-items store, so they show disabled
         const pinned = root.pinned.some(p => p.id === item.id);
@@ -265,8 +270,10 @@ Singleton {
             { label: "Show in Finder", disabled: true },
         ] });
         out.push({ sep: true });
+        // running: Show All Windows, Hide, Quit (dock-menus.json); App Exposé and Hide do not exist here: disabled
         if (wins.length > 0)
-            out.push({ label: "Quit", action: () => wins.forEach(root.closeWindow) });
+            out.push({ label: "Show All Windows", disabled: true }, { label: "Hide", disabled: true },
+                     { label: "Quit", action: () => wins.forEach(root.closeWindow) });
         else
             out.push({ label: "Open", action: () => root.activate(item) });
         return out;
