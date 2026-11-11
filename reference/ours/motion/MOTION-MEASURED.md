@@ -469,17 +469,17 @@ table; old and new are read from the same regions.
 | All seven (140 runs per tree) | 7 / 3 | 15 / 3 | 51 / 32 | 49 / 32 | 48 / 38 | 56 / 43 | 129 / 124 | 133 / 126 |
 
 (cells: runs with an interval over 25 ms / over 31 ms, of the runs, mean frames per run.) Whole machine, 18 loops on 16
-cores, scale 2 (stopped half way at the user's request): 76 of 82 old, 78 of 82 new, frames per run 7.5-25.2 old against
-7.4-25.9 new. Whole machine, 24 loops, Control Center close, three sessions with the trees rotated through all of
+cores, scale 2 (stopped half way at the user's request): 76 of 82 old, 78 of 82 new, frames per run 6.7-25.2 old against
+6.7-25.9 new. Whole machine, 24 loops, Control Center close, three sessions with the trees rotated through all of
 them: 10.7 frames per run old, 10.2 new. The quiet columns were taken in sessions 20 to 60 minutes old, which adds gaps
-of its own (below); the five gap runs of new's banner and HUD rows at scale 2 fell while a test suite ran on the
-host. In sessions a few minutes old on a quiet host: 0 gap runs in 70 (7 rows x 5 runs x 2 trees), the same series in
+of its own (below); new's banner and HUD rows at scale 2 were captured in the minutes in which this session also ran the
+test suites on the host. In sessions a few minutes old on a quiet host: 0 gap runs in 70 (7 rows x 5 runs x 2 trees), the same series in
 4-5 of 5 runs for new in Control Center open / close, menu fade, HUD appear, banner in (old: 2-4 of 5); per-frame
 series in the CSV (`*-s12-new-run*`, `*-s12-old-run*`).
 
 What the gaps are (second method, the shell's own Wayland trace, WAYLAND_DEBUG=client plus qt.scenegraph.time.renderloop,
 both trees under the pinned load, 5 closes each): the panel surface's commits are 20 to 45 ms apart in both trees and
-mcap's long intervals of the same runs are 31 to 59 ms, so a gap is a refresh at which that surface had no new buffer,
+mcap's long intervals of the same runs are 27 to 59 ms, so a gap is a refresh at which that surface had no new buffer,
 not a frame the capture missed. The commit follows the frame callback that released it by 1-7 ms on the frame clock
 (typically 3-4) and by 0-5 ms in the old tree (typically 2): the tick sits between the callback and the commit, but it
 is 1-2 ms of a 16.7 ms period. The callbacks themselves come 20 to 45 ms apart: the time goes between a commit and the
@@ -492,12 +492,12 @@ captured at the same moment, Control Center close: a Hyprland 65 minutes old (ab
 restarts, scale switches, the load tests) 7 of 8 gap runs and 1,445 ms of compositor CPU per run; one started a minute
 before 0 of 8, the same series in 8 of 8, 258 ms per run. For four Control Center open / close without any capture:
 4,000-4,750 ms of main-thread CPU against 1,100-2,000 ms, with 7,392 minor page faults against 0, the same number of
-syscalls and of frames (255 against 265), and the pango thread at 130 ms against 10 ms. It stays with both plugins
+syscalls and of frames in a run of three toggles (255 against 265), and the pango thread at 130 ms against 10 ms. It stays with both plugins
 unloaded (4,670 against 1,510 ms), so it is in Hyprland 0.57 or aquamarine's headless backend, not in liquidglass,
 hyprkmotion or the shell (the shell's CPU was lower in the old session). Not found: what makes it grow. Tried on a
 fresh session without effect: 80 Control Center toggles, 500 captures, 30 HUD + banner + menu rounds, 3 scale round
 trips, 3 shell restarts. Not tried: an hour of plain uptime, the load tests themselves. perf is not usable on this host
-(perf_event_paranoid 4) and gdb cannot attach (ptrace_scope 1). Session 11's "old" session was the younger one.
+(perf_event_paranoid 4) and gdb cannot attach (ptrace_scope 1).
 Not from the scheduler: sessions started from one command share an autogroup, but a compositor alone in its group, two
 sharing one, and one set to nice 19 gave the same counts under 10, 18 and 24 loops.
 
