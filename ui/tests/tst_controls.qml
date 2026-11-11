@@ -52,6 +52,7 @@ Item {
     }
     PressSpring { id: capLift; w: 78; h: 37 }
     GlassButton { id: flexBtn; x: 300; y: 150; width: 78; height: 37 }
+    GlassButton { id: pairBtn; x: 300; y: 200; width: 74; height: 37; segments: [37, 37] }
 
     SignalSpy { id: toggledSpy; target: refusing; signalName: "toggled" }
     SignalSpy { id: movedSpy; target: sl; signalName: "moved" }
@@ -232,14 +233,27 @@ Item {
         // FlexInteraction drag stretch (applyScale): a drag inside the pressed glass stretches it along the drag by
         // |d| / (4 * 60000) and shifts it toward the pointer by width * k; nothing at rest
         function test_press_drag_stretch() {
-            compare(flexBtn.transform[1].x, 0);
+            compare(flexBtn.transform[2].x, 0);
             mousePress(flexBtn, 10, 18);
             mouseMove(flexBtn, 70, 18, -1, Qt.LeftButton);
             const k = 60 / 240000;
-            tryVerify(() => Math.abs(flexBtn.transform[1].x - 78 * k) < 0.002, 2000);
-            verify(flexBtn.transform[0].xScale > flexBtn.transform[0].yScale, "stretched along x");
+            tryVerify(() => Math.abs(flexBtn.transform[2].x - 78 * k) < 0.002, 2000);
+            verify(flexBtn.transform[1].xScale > flexBtn.transform[1].yScale, "stretched along x");
             mouseRelease(flexBtn, 70, 18);
-            tryVerify(() => flexBtn.transform[1].x === 0, 1000);
+            tryVerify(() => flexBtn.transform[2].x === 0, 1000);
+        }
+        // two merged buttons: the pressed one lifts by its own 37 pt (2.5 pt), only its outer end moves (1.25 pt)
+        function test_press_merged_pair_grows_outer_edge() {
+            mousePress(pairBtn, 10, 18);
+            tryVerify(() => Math.abs(pairBtn.transform[1].yScale - 39.5 / 37) < 0.001, 2000);
+            const t = pairBtn.transform[1];
+            const left = t.origin.x - t.origin.x * t.xScale, right = t.origin.x + (74 - t.origin.x) * t.xScale - 74;
+            verify(Math.abs(left + 1.25) < 0.02, "left end out 1.25 pt: " + left);
+            verify(Math.abs(right) < 0.001, "right end stays: " + right);
+            mouseRelease(pairBtn, 10, 18);
+            mousePress(pairBtn, 60, 18);
+            tryVerify(() => Math.abs(pairBtn.transform[1].origin.x) < 0.001 && pairBtn.transform[1].xScale > 1.016, 2000);
+            mouseRelease(pairBtn, 60, 18);
         }
         // FlexInteraction glow: the press light follows the pointer and dims beyond 50 pt from where the press began
         function test_press_light_follows_pointer() {

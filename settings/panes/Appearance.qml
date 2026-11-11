@@ -254,6 +254,8 @@ Column {
                             id: cap
                             required property var modelData
                             x: modelData.x; y: 7; width: modelData.w; height: 37
+                            // share | more: two glass buttons merged; each 37 wide (half the 74, centres 19.25 / 54.5)
+                            segments: modelData.c.length === 2 ? [modelData.w / 2, modelData.w / 2] : []
                             LensGlass {
                                 anchors.fill: parent
                                 source: articleView
