@@ -120,17 +120,16 @@ namespace lg {
 #undef LG_NO_SHADOW
 
         // regular.menu: Regular + the glass menu shadow, the same at every size. Mac dumps: opacity 0.7 light / 0.8 dark,
-        // radius 24, y 10; through this shader (erfc edge, shadow_tint 0.35) those inputs give twice the Mac's ink, so the
-        // opacity is fitted to the Mac's pixels over white (Q-menubar-28, below and beside at 2..40 pt): radius 24 and y
-        // 10 come out of the free fit unchanged, opacity 0.32 light (rms 0.3 level) / 0.36 dark (rms 0.2): below at
-        // 2/10/20 pt 219/228/240 light, 214/225/238 dark (Mac the same). The shell draws alerts in the same layer
-        // (hyprk-overlay:menu), so they get this one too.
+        // radius 24, y 10, black fill 0.3, no vibrancy: the filter darkens by 0.3 x 0.7 = 0.21 / 0.24 x edge. The earlier
+        // fit to the Mac's pixels over white (Q-menubar-28, below and beside at 2..40 pt; radius 24 and y 10 unchanged by the
+        // free fit) found 0.32 / 0.36 through the old shadow (ink x 0.65): 0.208 / 0.234, the decoded ink within 3 %.
+        // The shell draws alerts in the same layer (hyprk-overlay:menu), so they get this one too.
         constexpr SRecipe MENU = [] {
             SRecipe r         = REGULAR;
             r.name            = "menu";
             r.shadowD0        = r.shadowD1 = 0;
-            r.shadowOpacityLo = r.shadowOpacityHi = 0.32f;
-            r.shadowOpacityHiDark                 = 0.36f;
+            r.shadowOpacityLo = r.shadowOpacityHi = 0.7f;
+            r.shadowOpacityHiDark                 = 0.8f;
             r.shadowRadiusLo                      = r.shadowRadius;
             r.shadowOffsetY                       = 10;
             return r;
@@ -139,10 +138,11 @@ namespace lg {
         // Notification Center cards and banners: _Glass.notificationCenter (reference/re/27.2.1/decomp/
         // NotificationCenter-glass.c) = Regular at size class medium (D 166, MAC-ANSWERS PC #67 B2 notes): max luma
         // 0.35 dark (the real NC, PC #62: banner 33 / 114 over black / grey 127, card 128 / 104 / 32), bleed and
-        // refraction of a 166 pt panel on every card. Shadow: Regular's at D 166 is 0.6 dark / 0.4 light, r 24, y 8; like
-        // the menu's, those inputs give too much ink through this shader, so radius and offset stay and the opacity is
-        // fitted to the gap between two cards over white (with the shell's list shadow, black 0.2): Mac 181 dark / 189
-        // light (PC #62); 0.21 / 0.135 give 181 / 189 (Regular's 0.6 / 0.4 gave 155 / 172, the own-size 0.10 gave 199).
+        // refraction of a 166 pt panel on every card. Shadow: Regular's at D 166 is 0.6 dark / 0.4 light, r 24, y 8, with
+        // ShadowVibrancyContribution 1 (the notificationCenter dumps from D 96: tinted by the backdrop); radius and offset
+        // stay, the opacity is fitted to the gap between two cards over white (with the shell's list shadow, black 0.2): Mac
+        // 181 dark / 189 light (PC #62): darkening 0.1365 / 0.0878 = 0.3 x 0.455 / 0.2925 (the decoded 0.6 / 0.4 give
+        // 0.18 / 0.12, too dark: the cards' D is not decoded).
         // Rim: the real NC card's top / bottom line (outer px -> inner px -> body, dark: 68 -> 53 -> 35 over black)
         // is the 1 pt key band alone at 1.23 x Regular's (mask 1.0 and 0.54 in the two px): not decoded, Mac pixels.
         constexpr SRecipe NOTIFICATIONCENTER = [] {
@@ -150,8 +150,9 @@ namespace lg {
             r.name          = "notificationcenter";
             r.sizeD         = SIZE_MEDIUM;
             r.shadowD0 = r.shadowD1 = 0;
-            r.shadowOpacityLo = r.shadowOpacityHi = 0.135f;
-            r.shadowOpacityHiDark                 = 0.21f;
+            r.shadowOpacityLo = r.shadowOpacityHi = 0.2925f;
+            r.shadowOpacityHiDark                 = 0.455f;
+            r.shadowVibrancy                      = 1;
             r.shadowRadiusLo                      = r.shadowRadius;
             r.keyScale      = 1.23f;
             r.diffuseAmount = 0;
@@ -213,6 +214,8 @@ namespace lg {
             .shadowOpacity = float(clampedLinear(D, r.shadowD0, r.shadowD1, r.shadowOpacityLo, dark ? r.shadowOpacityHiDark : r.shadowOpacityHi)),
             .shadowRadius  = float(clampedLinear(D, r.shadowD0, r.shadowD1, r.shadowRadiusLo, r.shadowRadius)),
             .shadowOffsetY = r.shadowOffsetY,
+            .shadowFill    = r.shadowFill,
+            .shadowVibrancy = r.shadowVibrancy,
             .keySpread     = float(clampedLinear(D, 96, 191, 80, 90)),
             .keyYcc        = f.keyYcc,
             .keyAmount     = r.keyAmount,

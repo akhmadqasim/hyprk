@@ -53,8 +53,7 @@ PORTED = ["InnerRefractionAmount", "InnerRefractionHeight", "OuterRefractionAmou
           "BleedDarkenBlend", "KeyFillHighlightColorBias", "KeyFillHighlightSpreadDeg", "ShadowOpacity", "ShadowRadius", "ShadowOffset",
           "RingShadowOpacity", "BlurRadius", "BlurOpacity0", "BlurOpacity1", "BlurOpacity2", "BlurDistance0"]
 # measured on the real surfaces, so the plugin follows them instead of the AppKit probe (reasons in Material.cpp)
-DEVIATIONS = {("menu", "ShadowOpacity"): "dumped 0.7 / 0.8 give twice the Mac's ink through our shadow; fitted to Q-menubar-28 pixels",
-              ("notificationcenter", "ShadowOpacity"): "fitted to the PC #62 gaps between cards (181 dark / 189 light over white)"}
+DEVIATIONS = {("notificationcenter", "ShadowOpacity"): "fitted to the PC #62 gaps between cards (181 dark / 189 light over white)"}
 W709 = np.array([.2126, .7152, .0722])
 WB = np.array([.2125, .7154, .0721])
 

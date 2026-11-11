@@ -79,7 +79,13 @@ namespace lg {
         // (LIVE-27.2.1.md), radius 4 + 20 q, q = clamp((D - 64) / 96), y 8.
         float shadowD0 = 64, shadowD1 = 160, shadowOpacityLo = 0.04f, shadowOpacityHi = 0.4f, shadowOpacityHiDark = 0.6f;
         float shadowRadiusLo = 4, shadowRadius = 24, shadowOffsetY = 8, shadowSaturation = 1.f;
-        // a black shadow (AppKit's window shadow) instead of one tinted by the backdrop (`shadow_tint`)
+        // the glassBackground filter's shadow colour (metallib glass_background_base, uniforms shadow_cm / _contribution /
+        // _face_opacity; CA::OGL::GlassBackgroundFilter::render 0x18debc058): ShadowColorMatrixFillColor black, alpha
+        // shadowFill (0.3 in every recipe dumped) and ShadowVibrancyContribution v: premultiplied shadow = (v x 0.7 x the
+        // blurred backdrop, mix(0.3, 1, v)) x ShadowOpacity x the erfc edge, i.e. it darkens by 0.3 x ShadowOpacity x edge
+        // (v = 0: black; v = 1, Notification Center from D 96: tinted by the backdrop)
+        float shadowFill = 0.3f, shadowVibrancy = 0;
+        // a black shadow at full ShadowOpacity (AppKit's window shadow, not the glass filter's)
         bool shadowBlack = false;
 
         // key/fill highlight (CASDFKeyFillHighlightEffect): key amount, diffuse band amount (Apple 0.5 and 0.5 x 0.15)
@@ -114,6 +120,7 @@ namespace lg {
         bool  bleedLighten = false;
         float backdropScale = 0.5f; // Apple's backdrop texture scale (perceptual estimator), the bleed sample's mip
         float shadowOpacity = 0, shadowRadius = 0, shadowOffsetY = 0;
+        float shadowFill = 0.3f, shadowVibrancy = 0;
         float keySpread = 80; // degrees, key/fill highlight lobe: 80 up to D 96, 90 from D 191
         SYcc  keyYcc;
         float keyAmount = 0.5f, diffuseAmount = 0.075f, keyScale = 1;

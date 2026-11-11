@@ -40,7 +40,7 @@ namespace lg {
         std::string                                  appearanceAck;         // "dark" | "light" [":" stamp]: the shell's windows have drawn that appearance
         float                                        dither = 1; // noise of half a level where the glass draws a slow gradient (0 = off)
         float                                        tintAmount = 0.5f; // Liquid Glass slider (NSGlassTintAmount) 0..1, 0.5 = the recipes as is
-        float                                        shadowScale = 1, shadowTint = 0.35f, ringScale = 1;
+        float                                        shadowScale = 1, ringScale = 1;
 
         // Liquid Glass motion. spacing: ns -> pt, the smoothness k of the union of a layer's shapes
         // (SwiftUI passes GlassEffectContainer(spacing:) straight to CASDFLayer.smoothness, default 8):

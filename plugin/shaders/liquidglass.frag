@@ -77,7 +77,7 @@ uniform float sdfRange;             // px between the values 0.5 and 1
 uniform float shadowOpacity;
 uniform float shadowRadius;         // px
 uniform vec2  shadowOffset;         // px
-uniform float shadowTint;           // 0 = black shadow, 1 = saturated backdrop colour
+uniform float shadowTint;           // premultiplied shadow colour = shadowTint x the blurred backdrop (0 = black)
 uniform float shadowSaturation;
 uniform float ringOpacity;          // Apple ring shadow (thin soft contour), 0 = off
 uniform vec2  ringOffset;           // px

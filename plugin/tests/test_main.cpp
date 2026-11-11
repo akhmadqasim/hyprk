@@ -199,18 +199,20 @@ int main() {
         CHECK(near(resolveMaterial(reg, 96, false).shadowOpacity, 0.16, 1e-5) && near(resolveMaterial(reg, 96, true).shadowOpacity, 0.22667, 1e-5) &&
               near(resolveMaterial(reg, 400, true).shadowOpacity, 0.6, 1e-6) && near(resolveMaterial(reg, 400, false).shadowRadius, 24, 1e-5));
         CHECK(hasShadow(reg) && near(resolveMaterial(reg, 400, true, 0).shadowOpacity, 0.6, 1e-6)); // the slider leaves the shadow
+        // the filter's shadow colour: black fill 0.3, no vibrancy (darkens by 0.3 x ShadowOpacity x edge)
+        CHECK(near(r.shadowFill, 0.3, 1e-6) && near(r.shadowVibrancy, 0) && near(resolveMaterial(reg, 400, false).shadowFill, 0.3, 1e-6));
 
         const auto& mn = recipeByName("menu");
         r              = resolveMaterial(mn, 24, false);
-        CHECK(near(r.ycc.white, 1.03, 1e-6) && near(r.fill.a, 0.2, 1e-6) && near(r.blurFill.lighten, 0.9, 1e-6) && near(r.shadowOpacity, 0.32, 1e-6) &&
+        CHECK(near(r.ycc.white, 1.03, 1e-6) && near(r.fill.a, 0.2, 1e-6) && near(r.blurFill.lighten, 0.9, 1e-6) && near(r.shadowOpacity, 0.7, 1e-6) &&
               near(r.shadowRadius, 24, 1e-5) && near(r.shadowOffsetY, 10));
-        CHECK(near(resolveMaterial(mn, 24, true).shadowOpacity, 0.36, 1e-6)); // fitted to Q-menubar-28 (Material.cpp)
+        CHECK(near(resolveMaterial(mn, 24, true).shadowOpacity, 0.8, 1e-6)); // the Mac dump (Q-menubar-28 pixels agree, Material.cpp)
 
         // Notification Center: Regular at size class medium (D 166 at any card size), rim = 1.23 x the key band, no diffuse
         const auto& nc = recipeByName("notificationcenter");
         CHECK(std::string{nc.name} == "notificationcenter" && hasShadow(nc) && near(resolveMaterial(nc, 75, true).maxLuma, 0.35, 1e-6) &&
               near(resolveMaterial(nc, 75, false).maxLuma, 0.94, 1e-6) && near(resolveMaterial(nc, 75, true).keyScale, 1.23, 1e-6) &&
-              near(resolveMaterial(nc, 75, true).diffuseAmount, 0) && near(resolveMaterial(nc, 75, true).shadowOpacity, 0.21, 1e-6) && near(resolveMaterial(nc, 75, false).shadowOpacity, 0.135, 1e-6) &&
+              near(resolveMaterial(nc, 75, true).diffuseAmount, 0) && near(resolveMaterial(nc, 75, true).shadowOpacity, 0.455, 1e-6) && near(resolveMaterial(nc, 75, false).shadowOpacity, 0.2925, 1e-6) && near(resolveMaterial(nc, 75, true).shadowVibrancy, 1) &&
               near(resolveMaterial(nc, 75, true).shadowRadius, 24, 1e-6) &&
               near(resolveMaterial(nc, 75, true).bleedAmount, 0.35 * 166, 1e-4));
         CHECK(std::string{recipeByName("nope").name} == "regular");

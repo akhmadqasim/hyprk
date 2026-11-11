@@ -281,7 +281,7 @@ boxes); nothing at rest.
 | `appearance_ack` | "" | the shell's answer, "dark" or "light" with ":<stamp>": ends the hold (set by `hyprk_appearance_ready`) |
 | `dither` | 1 | half a level of fixed per-pixel noise where the glass or the panel blur draws a slow gradient (see Precision); 0 = off |
 | `tint_amount` | 0.5 | Liquid Glass slider (macOS NSGlassTintAmount) 0..1, see Materials. Live: `hyprctl eval 'hl.config({ plugin = { liquidglass = { tint_amount = 0.3 } } })'` then `hyprctl liquidglass damage` (the eval fires no reload event, the damage redraws every output now) |
-| `shadow_scale` / `shadow_tint` | 1 / 0.35 | drop shadow opacity scale; 0 = black shadow, 1 = saturated backdrop colour |
+| `shadow_scale` | 1 | drop shadow opacity scale (the colour is the filter's: black fill 0.3, tinted by the backdrop where the recipe's ShadowVibrancyContribution is 1; Material.hpp `shadowFill`) |
 | `ring_scale` | 1 | ring shadow opacity scale |
 | `require_region` | 1 | only layers that set an ext-background-effect blur region get glass |
 | `linear` | 0 | 1 = shader works in linear light. Keep 0: Apple's face and rim numbers reproduce the Mac's pixels in gamma space (HUD, Dock) |

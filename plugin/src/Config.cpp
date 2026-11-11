@@ -44,7 +44,6 @@ namespace lg {
             {K("appearance_fade"), &SParams::appearanceFade},
             {K("appearance_hold"), &SParams::appearanceHold},
             {K("shadow_scale"), &SParams::shadowScale},
-            {K("shadow_tint"), &SParams::shadowTint},
             {K("ring_scale"), &SParams::ringScale},
             {K("window_radius"), &SParams::windowRadius},
             {K("popup_radius"), &SParams::popupRadius},

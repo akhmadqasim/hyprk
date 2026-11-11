@@ -517,6 +517,8 @@ void main() {
             res.shadowOpacity = reg.shadowOpacity;
             res.shadowRadius  = reg.shadowRadius;
             res.shadowOffsetY = reg.shadowOffsetY;
+            res.shadowFill    = reg.shadowFill;
+            res.shadowVibrancy = reg.shadowVibrancy;
         }
         return res;
     }
@@ -836,7 +838,6 @@ void main() {
         glUniform1f(u.ditherAmount, m_data.params->dither);
         glUniform1f(u.aberration, p.aberration * scale);
         glUniform1f(u.pxPerPt, scale);
-        glUniform1f(u.shadowTint, r.shadowBlack ? 0.f : p.shadowTint);
         glUniform1f(u.shadowSaturation, r.shadowSaturation);
         glUniform1f(u.ringOpacity, r.ringOpacity * p.ringScale);
         glUniform2f(u.ringOffset, 0.f, r.ringOffsetY * scale);
@@ -940,7 +941,12 @@ void main() {
             const bool  inner = std::ranges::any_of(m_data.groups, [&](const SGlassGroup& o) {
                 return &o != &g && o.box.x <= lb.x && o.box.y <= lb.y && o.box.right() >= lb.right() && o.box.bottom() >= lb.bottom();
             });
-            glUniform1f(u.shadowOpacity, m_data.shadow && !inner ? res.shadowOpacity * p.shadowScale : 0.f);
+            // the filter's shadow (SRecipe::shadowFill): alpha mix(fill, 1, v) x ShadowOpacity, colour v x (1 - fill) x the
+            // blurred backdrop (premultiplied); AppKit's black window shadow (shadowBlack) at full opacity
+            const float vib    = r.shadowBlack ? 0.f : res.shadowVibrancy;
+            const float shAlpha = r.shadowBlack ? 1.f : res.shadowFill + (1.f - res.shadowFill) * vib;
+            glUniform1f(u.shadowOpacity, m_data.shadow && !inner ? res.shadowOpacity * shAlpha * p.shadowScale : 0.f);
+            glUniform1f(u.shadowTint, vib * (1.f - res.shadowFill) / std::max(shAlpha, 1e-6f));
             glUniform1f(u.shadowRadius, res.shadowRadius * scale);
             glUniform2f(u.shadowOffset, 0.f, res.shadowOffsetY * scale);
 
