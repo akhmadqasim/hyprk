@@ -44,7 +44,9 @@ Column {
             label: "Speaking rate"; dim: !page.can
             Slider {
                 width: 220; enabled: page.can
-                // the Mac's ends are tortoise.fill / hare.fill: not in themes/icons/sf-symbols yet, so none are drawn
+                // the Mac's ends, tortoise.fill / hare.fill (decoded from CoreGlyphs 27.2.1); their size on the Mac is not
+                // measured: the Slider's default glyph size
+                leftGlyph: "tortoise.fill"; rightGlyph: "hare.fill"
                 value: page.a.speechRate
                 onReleased: page.ctl.set({ speechRate: Math.round(_dragValue * 100) / 100 })
             }

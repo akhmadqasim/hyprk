@@ -2713,6 +2713,196 @@
    ],
    "extras": [],
    "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render). Shell (2026-11-12): Control Center's Sound module, the built-in output's glyph (AVRouting's endpoint models; the user's photo)."
+  },
+  "hifispeaker.fill": {
+   "symbol": "hifispeaker.fill",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "hifispeaker.fill.regular.svg",
+    "hifispeaker.fill.medium.svg",
+    "hifispeaker.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Control Center Sound module device kinds (AVRouting 27.2.1, e90e569) Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "tv": {
+   "symbol": "tv",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "tv.regular.svg",
+    "tv.medium.svg",
+    "tv.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Control Center Sound module device kinds (AVRouting 27.2.1, e90e569) Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "mediastick": {
+   "symbol": "mediastick",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "mediastick.regular.svg",
+    "mediastick.medium.svg",
+    "mediastick.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Control Center Sound module device kinds (AVRouting 27.2.1, e90e569) Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "tv.and.mediabox": {
+   "symbol": "tv.and.mediabox",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "tv.and.mediabox.regular.svg",
+    "tv.and.mediabox.medium.svg",
+    "tv.and.mediabox.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Control Center Sound module device kinds (AVRouting 27.2.1, e90e569) Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "appletv.fill": {
+   "symbol": "appletv.fill",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "appletv.fill.regular.svg",
+    "appletv.fill.medium.svg",
+    "appletv.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Control Center Sound module device kinds (AVRouting 27.2.1, e90e569) Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "homepod.fill": {
+   "symbol": "homepod.fill",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "homepod.fill.regular.svg",
+    "homepod.fill.medium.svg",
+    "homepod.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Control Center Sound module device kinds (AVRouting 27.2.1, e90e569) Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "headphones": {
+   "symbol": "headphones",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "headphones.regular.svg",
+    "headphones.medium.svg",
+    "headphones.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Control Center Sound module device kinds (AVRouting 27.2.1, e90e569) Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "airpodspro": {
+   "symbol": "airpodspro",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "airpodspro.regular.svg",
+    "airpodspro.medium.svg",
+    "airpodspro.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Control Center Sound module device kinds (AVRouting 27.2.1, e90e569) Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render); 'airpodspro' is an alias of 'airpods.pro' (name_aliases.strings)."
+  },
+  "tortoise.fill": {
+   "symbol": "tortoise.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "tortoise.fill.regular.svg",
+    "tortoise.fill.medium.svg",
+    "tortoise.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Accessibility > Spoken Content speaking rate slider ends Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "hare.fill": {
+   "symbol": "hare.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "hare.fill.regular.svg",
+    "hare.fill.medium.svg",
+    "hare.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Accessibility > Spoken Content speaking rate slider ends Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
   }
  },
  "skipped": {
@@ -36233,6 +36423,984 @@
     0
    ],
    "fontBaselineY": 31.057
+  },
+  "hifispeaker.fill.regular.svg": {
+   "symbol": "hifispeaker.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    32,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    32.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    24.0,
+    32.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.222
+  },
+  "hifispeaker.fill.medium.svg": {
+   "symbol": "hifispeaker.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    33,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    33.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    25.0,
+    33.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.913
+  },
+  "hifispeaker.fill.semibold.svg": {
+   "symbol": "hifispeaker.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    34,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    33.5,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    25.5,
+    33.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.677
+  },
+  "tv.regular.svg": {
+   "symbol": "tv",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    48,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    47.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    39.5,
+    31.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.781
+  },
+  "tv.medium.svg": {
+   "symbol": "tv",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    48,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    48.0,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    40.0,
+    32.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.352
+  },
+  "tv.semibold.svg": {
+   "symbol": "tv",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    48,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    48.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    40.5,
+    33.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.027
+  },
+  "mediastick.regular.svg": {
+   "symbol": "mediastick",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    50,
+    23
+   ],
+   "alignmentRect": [
+    0.0,
+    1.0,
+    49.5,
+    22.5
+   ],
+   "baselineY": 23.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    41.5,
+    16.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 26.398
+  },
+  "mediastick.medium.svg": {
+   "symbol": "mediastick",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    51,
+    23
+   ],
+   "alignmentRect": [
+    0.0,
+    0.5,
+    50.5,
+    22.5
+   ],
+   "baselineY": 23.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    42.5,
+    16.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 26.206
+  },
+  "mediastick.semibold.svg": {
+   "symbol": "mediastick",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    52,
+    23
+   ],
+   "alignmentRect": [
+    0.0,
+    0.5,
+    51.5,
+    22.5
+   ],
+   "baselineY": 23.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    43.5,
+    17.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 26.059
+  },
+  "tv.and.mediabox.regular.svg": {
+   "symbol": "tv.and.mediabox",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    53,
+    42
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    52.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    47.0,
+    35.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.648
+  },
+  "tv.and.mediabox.medium.svg": {
+   "symbol": "tv.and.mediabox",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    54,
+    43
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    53.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    47.5,
+    37.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.895
+  },
+  "tv.and.mediabox.semibold.svg": {
+   "symbol": "tv.and.mediabox",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    54,
+    44
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    54.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    48.5,
+    37.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.324
+  },
+  "appletv.fill.regular.svg": {
+   "symbol": "appletv.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    40,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    39.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    31.5,
+    31.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.838
+  },
+  "appletv.fill.medium.svg": {
+   "symbol": "appletv.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    40,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    39.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    32.0,
+    31.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.664
+  },
+  "appletv.fill.semibold.svg": {
+   "symbol": "appletv.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    40,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    40.0,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    32.0,
+    32.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.532
+  },
+  "homepod.fill.regular.svg": {
+   "symbol": "homepod.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    34,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    33.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    25.5,
+    32.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.335
+  },
+  "homepod.fill.medium.svg": {
+   "symbol": "homepod.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    34,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    34.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    26.0,
+    33.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.0
+  },
+  "homepod.fill.semibold.svg": {
+   "symbol": "homepod.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    35,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    34.5,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    26.5,
+    33.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.745
+  },
+  "headphones.regular.svg": {
+   "symbol": "headphones",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    40,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    40.0,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    32.0,
+    33.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.695
+  },
+  "headphones.medium.svg": {
+   "symbol": "headphones",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    41,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    40.5,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    32.5,
+    34.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.507
+  },
+  "headphones.semibold.svg": {
+   "symbol": "headphones",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    41,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    41.0,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    33.0,
+    34.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.365
+  },
+  "airpodspro.regular.svg": {
+   "symbol": "airpodspro",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    47,
+    36
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    46.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.5,
+    3.5,
+    41.5,
+    29.5
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 33.426
+  },
+  "airpodspro.medium.svg": {
+   "symbol": "airpodspro",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    48,
+    36
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    47.0,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.5,
+    3.0,
+    42.5,
+    30.0
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 33.225
+  },
+  "airpodspro.semibold.svg": {
+   "symbol": "airpodspro",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    48,
+    37
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    48.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.0,
+    3.5,
+    43.5,
+    30.5
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 34.074
+  },
+  "tortoise.fill.regular.svg": {
+   "symbol": "tortoise.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    60,
+    32
+   ],
+   "alignmentRect": [
+    0.0,
+    2.5,
+    59.5,
+    22.5
+   ],
+   "baselineY": 25.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    51.5,
+    26.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 27.893
+  },
+  "tortoise.fill.medium.svg": {
+   "symbol": "tortoise.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    60,
+    32
+   ],
+   "alignmentRect": [
+    0.0,
+    2.0,
+    60.0,
+    22.5
+   ],
+   "baselineY": 24.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    52.5,
+    26.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 27.814
+  },
+  "tortoise.fill.semibold.svg": {
+   "symbol": "tortoise.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    61,
+    33
+   ],
+   "alignmentRect": [
+    0.0,
+    3.0,
+    60.5,
+    22.5
+   ],
+   "baselineY": 25.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    52.5,
+    26.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 28.755
+  },
+  "hare.fill.regular.svg": {
+   "symbol": "hare.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    55,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    10.0,
+    55.0,
+    22.5
+   ],
+   "baselineY": 32.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    47.0,
+    34.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 35.672
+  },
+  "hare.fill.medium.svg": {
+   "symbol": "hare.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    56,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    11.0,
+    56.0,
+    22.5
+   ],
+   "baselineY": 33.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    48.0,
+    34.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 36.445
+  },
+  "hare.fill.semibold.svg": {
+   "symbol": "hare.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    57,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    10.5,
+    56.5,
+    22.5
+   ],
+   "baselineY": 33.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    48.5,
+    34.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 36.273
   }
  },
  "menubar": [

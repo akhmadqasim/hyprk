@@ -77,13 +77,24 @@ function deviceName(n) {
 // symbols hifispeaker.fill, hifispeakertwo, tv, tvandhifispeaker, mediastick, tv.and.mediabox, laptopcomputer,
 // desktopcomputer, and the user's photo shows the laptop for the built-in speakers. PipeWire says only whether a
 // sink is built in (device.form-factor "internal", or an analog output on the PCI bus): that is the computer,
-// laptopcomputer with a battery, else desktopcomputer. Anything else keeps the speaker (the Mac's TV and HomePod
-// glyphs are not in sf-symbols: CoreGlyphs' Assets.car is not on this disk).
+// laptopcomputer with a battery, else desktopcomputer. A form factor PipeWire does give picks the Mac's glyph for that
+// kind (tv, hifispeaker.fill, headphones; decoded from CoreGlyphs 27.2.1), and an AirPlay / Bluetooth device named as
+// Apple's own gets its own (homepod.fill, appletv.fill, airpodspro). hifispeakertwo and tvandhifispeaker (a stereo pair,
+// a TV with speakers) have no PipeWire counterpart. Anything else keeps the speaker.
 function deviceSymbol(props, laptop) {
     const p = props || {};
-    const internal = p["device.form-factor"] === "internal"
+    const ff = p["device.form-factor"] || "";
+    const internal = ff === "internal"
         || (p["device.bus"] === "pci" && /analog/i.test(p["node.name"] || "") && !/hdmi|displayport/i.test(p["node.name"] || ""));
-    return internal ? (laptop ? "laptopcomputer" : "desktopcomputer") : "speaker.wave.2.fill";
+    if (internal) return laptop ? "laptopcomputer" : "desktopcomputer";
+    const name = String(p["device.description"] || p["node.description"] || "");
+    if (/\bHomePod\b/i.test(name)) return "homepod.fill";
+    if (/\bApple TV\b/i.test(name)) return "appletv.fill";
+    if (/\bAirPods Pro\b/i.test(name)) return "airpodspro";
+    if (ff === "tv") return "tv";
+    if (ff === "speaker" || ff === "hifi") return "hifispeaker.fill";
+    if (ff === "headphone" || ff === "headset") return "headphones";
+    return "speaker.wave.2.fill";
 }
 
 // Wi-Fi status: available with a NetworkManager wifi device.

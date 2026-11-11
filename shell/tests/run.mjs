@@ -368,6 +368,12 @@ test("output glyph: built-in is the computer", () => assert.deepEqual([
     ST.deviceSymbol({ "device.bus": "usb", "node.name": "alsa_output.usb-x.analog-stereo" }, true),
     ST.deviceSymbol(null, true)],
     ["laptopcomputer", "desktopcomputer", "laptopcomputer", "speaker.wave.2.fill", "speaker.wave.2.fill", "speaker.wave.2.fill"]));
+test("output glyph: the kinds PipeWire gives, Apple's own devices by name", () => assert.deepEqual([
+    ST.deviceSymbol({ "device.form-factor": "tv" }, true), ST.deviceSymbol({ "device.form-factor": "speaker" }, true),
+    ST.deviceSymbol({ "device.form-factor": "headset" }, true), ST.deviceSymbol({ "device.form-factor": "headphone" }, true),
+    ST.deviceSymbol({ "device.form-factor": "headset", "device.description": "Ann's AirPods Pro" }, true),
+    ST.deviceSymbol({ "node.description": "Kitchen HomePod" }, true), ST.deviceSymbol({ "device.description": "Living Room Apple TV" }, true)],
+    ["tv", "hifispeaker.fill", "headphones", "headphones", "airpodspro", "homepod.fill", "appletv.fill"]));
 test("wifi none", () => assert.equal(ST.wifiDevice([{ type: 0 }]), null));
 test("wifi found", () => assert.equal(ST.wifiDevice([{ type: 0 }, { type: 1, name: "wlan0" }]).name, "wlan0"));
 test("player none", () => assert.equal(ST.pickPlayer([]), null));

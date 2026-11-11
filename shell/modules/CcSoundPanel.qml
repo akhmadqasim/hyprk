@@ -15,7 +15,8 @@ import qs.services
 // a 26 pt disc from x 14.5 (selected: white with the accent glyph; else white .25, as the grid's off circles, white
 // glyph), the name from x 49.4, 13 regular; "Sound Settings…" baseline 20.2 under the last separator, the panel
 // ends 32.6 under it. The device glyph is the device's kind (Audio.symbol, lib/state.js deviceSymbol: the computer for
-// built-in outputs, else speaker.wave.2.fill; the Mac's TV and HomePod glyphs are not decoded here).
+// built-in outputs, the TV, HiFi speaker, headphones, HomePod, Apple TV and AirPods Pro glyphs where PipeWire tells
+// the kind, else speaker.wave.2.fill).
 Item {
     id: p
     property real originX: 0
