@@ -386,28 +386,12 @@ Column {
             label: "Text highlight color"
             implicitHeight: 38   // 1 + 37
             readonly property int index: Math.max(0, P.highlightNames.indexOf(AppState.appearance.highlight))
-            readonly property string name: P.highlightNames[index]
-            Rectangle { // swatch of the current highlight colour before the pop-up
-                width: 16; height: 16; radius: 8
-                anchors.verticalCenter: parent ? parent.verticalCenter : undefined
-                color: hlRow.name ? Accent.swatch(hlRow.name) : "transparent"
-                gradient: hlRow.name ? null : auto
-                // Automatic: AppKit's NSMulticolorHighlight (multicolor-highlight-swatch.png, 24 x 12 pt) at its own
-                // size from the dot's left edge, so the 16 pt circle shows its left two thirds: appearance-light.png
-                // reads (172,152,213) .. (228,154,173) .. (255,164,153) across the dot, the image (168,154,216) at
-                // 1/12, (223,154,177) at 4/12, (255,160,153) at 7/12. It showed the whole image, ending in yellow.
-                Gradient {
-                    id: auto
-                    orientation: Gradient.Horizontal
-                    GradientStop { position: 0; color: Accent.multicolorHighlightStops[0] }
-                    GradientStop { position: 0.75; color: Accent.multicolorHighlightStops[1] }
-                    GradientStop { position: 1; color: "#FFB099" }   // the image at 2/3 of its width
-                }
-            }
             Popup {
                 objectName: "highlightPopup"
                 model: P.highlightNames.map(n => n ? n.charAt(0).toUpperCase() + n.slice(1) : "Automatic")
-                dots: P.highlightNames.map(n => n ? Accent.swatch(n) : Accent.multicolorHighlightStops[1])
+                // the current colour's dot sits inside the button (appearance-light.png: 16 pt, 12 pt from the button's
+                // left edge, 8 pt before the text). Automatic: AppKit's NSMulticolorHighlight
+                dots: P.highlightNames.map(n => n ? Accent.swatch(n) : Accent.multicolorHighlightDot)
                 currentIndex: hlRow.index
                 onActivated: i => AppState.set("appearance", { highlight: P.highlightNames[i] })
             }

@@ -71,4 +71,9 @@ QtObject {
                                             "#2487E2", "#01B8D7", "#44B982", "#9BB717", "#FCB004", "#FD7207"]
     // NSMulticolorHighlight (multicolor-highlight-swatch.png, "Automatic" highlight): left to right
     readonly property var multicolorHighlightStops: ["#9F99DF", "#FF9A99", "#FFEE99"]
+    // the same image as a round swatch draws it: at its own size (24 x 12 pt) from the dot's left edge, so a 16 pt dot
+    // shows its left two thirds (Popup `dots` stops). Across the pop-up's dot on appearance-dark.png, converted from
+    // Display P3: (161,154,220) (180,154,208) (229,153,174) (254,159,153) (255,171,154); these stops give
+    // (165,153,219) (185,153,204) (225,154,175) (255,161,153) (255,172,153).
+    readonly property var multicolorHighlightDot: [[0, multicolorHighlightStops[0]], [0.75, multicolorHighlightStops[1]], [1, "#FFB099"]]
 }

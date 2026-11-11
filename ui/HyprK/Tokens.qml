@@ -54,7 +54,9 @@ QtObject {
         readonly property int menuPadding: 5         // menu padding and highlight inset (Q-20)
         readonly property int menuRadius: 12         // Q-20 (live: regular glass r12; drawn flat here)
         readonly property real menuHighlightRadius: 6
-        readonly property int popupChevron: 24       // Settings: the double chevron sits in a 24 pt circle (Q-19)
+        readonly property int popupHeight: 24        // the pop-up button's frame (Q-19; the menu row lies over it)
+        readonly property int popupChevron: 20       // Settings: the double chevron's circle, 40 px on appearance-,
+                                                     // sound- and displays-light.png, 3.5 pt from the frame's right edge
         readonly property real disabledOpacity: 0.5  // disabled: the background layers at opacity 0.5 (Q-06)
         // control fonts: whole fonts are Typography.control (13), controlSmall (11), controlMini (9); these two
         // sizes are for Texts that still set font.pixelSize
