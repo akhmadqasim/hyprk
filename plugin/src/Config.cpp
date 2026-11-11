@@ -100,6 +100,9 @@ namespace lg {
             // the Dock's glass over Mission Control's backdrop: the shell's Mission Control layer covers the windows with the
             // wallpaper, but it sits above the Dock, whose glass would still refract the real window under it
             {K("wallpaper_under"), "hyprk-dock:hyprk-mission", [](SParams& p, const std::string& v) { p.wallpaperUnder = parseStringMap(v); }},
+            // textures handed over as layer surfaces (README "Textures from the shell"); off until the shell maps them
+            {K("icon_masks"), "", [](SParams& p, const std::string& v) { p.iconMasks = parseStringMap(v); }},
+            {K("sdf_layers"), "", [](SParams& p, const std::string& v) { p.sdfLayers = parseSdfMap(v); }},
             {K("popup_classes"), "^hyprk-finder$", [](SParams& p, const std::string& v) { p.popupClasses = v; }},
             {K("popup_material"), "menu", [](SParams& p, const std::string& v) { p.popupMaterial = v; }},
             {K("material"), "regular", [](SParams& p, const std::string& v) { p.defaultMaterial = v; }},

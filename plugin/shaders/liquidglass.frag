@@ -65,6 +65,15 @@ uniform vec2  keySpread;            // cos of the key and diffuse lobe spreads
 uniform vec3  highlight;            // scale of the key/fill mask (1 = Apple), key amount, diffuse amount
 uniform vec2  darkSpec;             // colourBias of the dark specular, cos of its spread
 
+// A texture handed over by the client as a layer surface of its own (README "Textures from the shell"), one per element:
+// the Dock icons' clear-mode masks, or an SDF picture that is the element's shape. Rect w = 0: none.
+uniform sampler2D aux;
+uniform vec4  maskRect;             // x, y, w, h (quad px) of the mask picture: premultiplied r = lighten, g = darken, b = highlights
+uniform vec4  maskLighten;          // IconRendering ClearMode.lighteningVCM: black, white, saturation, headroom
+uniform vec4  maskHighlights;       // ClearMode.highlightsVCM
+uniform vec4  sdfRect;              // x, y, w, h (quad px) of the SDF picture: r = distance (0.5 at the edge), gb = normal
+uniform float sdfRange;             // px between the values 0.5 and 1
+
 uniform float shadowOpacity;
 uniform float shadowRadius;         // px
 uniform vec2  shadowOffset;         // px
@@ -149,6 +158,15 @@ SScene scene(vec2 qp) {
         float h = sminH(res.d, b.x, k);
         res     = SScene(mix(res.d, b.x, h) - k * h * (1.0 - h), mix(res.n, b.yz, h), mix(res.m, mi, h),
                          shapeInfo[i].x < 0.0 ? res.plain : min(res.plain, b.x));
+    }
+    if (sdfRect.z > 0.0) {
+        // the shape is the picture's: distance and normal read instead of computed; past the picture's rect the distance
+        // grows by the way to it, so the shadow and the outside line have a field to read
+        vec2 uv = (qp - sdfRect.xy) / sdfRect.zw;
+        vec4 t  = texture(aux, clamp(uv, 0.0, 1.0));
+        vec2 o  = max(max(sdfRect.xy - qp, qp - sdfRect.xy - sdfRect.zw), 0.0);
+        float dt = (t.r - 0.5) * 2.0 * sdfRange + length(o);
+        res      = SScene(dt, t.gb * 2.0 - 1.0, res.m, dt);
     }
     return res;
 }
@@ -356,7 +374,22 @@ void main() {
         if (pointerFill.y > 0.0)
             col = mix(col, vec3(pointerFill.x) + col * (1.0 - pointerFill.y), sat(0.5 + sc.plain) * mat);
 
-        face = vec4(encode(clamp(col, 0.0, 1.0)), 1.0);
+        col = encode(clamp(col, 0.0, 1.0));
+        // IconRendering's clear mode (clear, and tinted in light): the icon is three masks that the glass under it takes,
+        // the live layer's CAFilter passes of 0x1cfd69ffc in ClearMode.passOrder 0 (reference/ASSETS.md): the backdrop
+        // replaced by lighteningVCM of itself where the lighten mask is, minus the darken mask (plusD), then
+        // highlightsVCM where the highlights mask is; each matrix clamped to its headroom, the result to 1 at the write
+        if (maskRect.z > 0.0) {
+            vec2 uv = (qp - maskRect.xy) / maskRect.zw;
+            if (uv.x >= 0.0 && uv.y >= 0.0 && uv.x <= 1.0 && uv.y <= 1.0) {
+                vec3 mk = texture(aux, uv).rgb * mat;
+                col     = mix(col, clamp(ycc(col, maskLighten.xyz), 0.0, maskLighten.w), mk.r);
+                col     = max(col - mk.g, 0.0);
+                col     = mix(col, clamp(ycc(col, maskHighlights.xyz), 0.0, maskHighlights.w), mk.b);
+                col     = min(col, 1.0);
+            }
+        }
+        face = vec4(col, 1.0);
     }
 
     vec4 c = mix(shadow, face, cov);

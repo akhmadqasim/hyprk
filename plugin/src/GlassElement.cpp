@@ -126,6 +126,12 @@ namespace lg {
             .ringOffset       = loc("ringOffset"),
             .ringStroke       = loc("ringStroke"),
             .ringRadius       = loc("ringRadius"),
+            .aux              = loc("aux"),
+            .maskRect         = loc("maskRect"),
+            .maskLighten      = loc("maskLighten"),
+            .maskHighlights   = loc("maskHighlights"),
+            .sdfRect          = loc("sdfRect"),
+            .sdfRange         = loc("sdfRange"),
         };
         // the sampler and the quad mapping are the minimum a custom shader must keep
         if (u.tex < 0 || u.uvTopLeft < 0 || u.uvBottomRight < 0 || u.quadSize < 0 || u.shapeCount < 0 || u.shapeBox < 0) {
@@ -694,9 +700,10 @@ void main() {
             return {};
 
         stats::begin(stats::GLASS);
-        if (!glassProgram().ensure(m_data.params->shaderPath) || !drawGlass(ctx))
-            drawFallback(ctx);
-        else
+        if (!glassProgram().ensure(m_data.params->shaderPath) || !drawGlass(ctx)) {
+            if (m_data.auxKind != SData::eAux::SDF) // a picture's shape has no plain stand-in
+                drawFallback(ctx);
+        } else
             drawFills(ctx);
         stats::end(stats::GLASS);
         return {};
@@ -731,6 +738,13 @@ void main() {
         const auto mon = ctx.m_data.pMonitor.lock();
         if (!mon)
             return false;
+
+        // the client's picture for this element, if any; an external (YUV) texture has no sampler2D: the masks are then
+        // left out, and an SDF element has no shape to draw
+        using eAux     = SData::eAux;
+        const bool aux = m_data.auxKind != eAux::NONE && m_data.aux && m_data.aux->m_type != Render::TEXTURE_EXTERNAL && m_data.auxBox.w > 0 && m_data.auxBox.h > 0;
+        if (m_data.auxKind == eAux::SDF && !aux)
+            return true;
 
         auto&          prog  = glassProgram();
         const auto&    p     = *m_data.params;
@@ -827,6 +841,22 @@ void main() {
         glUniform1f(u.appearBlur, 10.f * scale); // SwiftUI materialize AppearanceSettings.blurRadius
         glUniform1f(u.fillAmount, 0.f);
 
+        // the client's texture for this element (icon masks or an SDF shape) on unit 1
+        if (aux) {
+            g_pHyprOpenGL->setActiveTexture(GL_TEXTURE1);
+            m_data.aux->bind();
+            m_data.aux->setTexParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            m_data.aux->setTexParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            m_data.aux->setTexParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            m_data.aux->setTexParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
+            glUniform1i(u.aux, 1);
+            // IconRendering ICRRenderingParameters.default ClearMode (themes/icons/tools/icr-params.json, read from
+            // 0x1cfd87b98): lighteningVCM 0.9 / 2.5 / 2.0 and highlightsVCM 0.2 / 1.35 / 1.4, headroom 1.2 both
+            glUniform4f(u.maskLighten, 0.9f, 2.5f, 2.0f, 1.2f);
+            glUniform4f(u.maskHighlights, 0.2f, 1.35f, 1.4f, 1.2f);
+            glUniform1f(u.sdfRange, float(m_data.sdfRange) * scale);
+        }
         g_pHyprOpenGL->blend(true);
         g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         glBindVertexArray(shader->getUniformLocation(SHADER_SHADER_VAO));
@@ -853,8 +883,15 @@ void main() {
                 info[2 * k]      = (s.pointer ? -POINTER_RADIUS : s.radius) * scale;
                 info[2 * k + 1]  = s.materialize;
             }
+            const auto auxRect = [&](int loc, bool on) {
+                glUniform4f(loc, on ? float(m_data.auxBox.x * scale - quad.x) : 0.f, on ? float(m_data.auxBox.y * scale - quad.y) : 0.f, on ? float(m_data.auxBox.w * scale) : 0.f,
+                            on ? float(m_data.auxBox.h * scale) : 0.f);
+            };
+            auxRect(u.maskRect, aux && m_data.auxKind == eAux::MASKS);
+            auxRect(u.sdfRect, aux && m_data.auxKind == eAux::SDF);
             glUniform1f(u.smoothK, float(g.smoothK) * scale);
-            glUniform1i(u.shapeCount, int(g.members.size()));
+            // an SDF element's one shape is its picture: no analytic shapes
+            glUniform1i(u.shapeCount, m_data.auxKind == eAux::SDF ? 0 : int(g.members.size()));
             glUniform4fv(u.shapeBox, GLsizei(g.members.size()), boxes.data());
             glUniform2fv(u.shapeInfo, GLsizei(g.members.size()), info.data());
             // Apple's blur (C3 2): R = 1.6 x radius x backdrop texels per pt, level log2(1 / scale) + lod(R)
@@ -909,6 +946,10 @@ void main() {
 
         glBindVertexArray(0);
         g_pHyprOpenGL->disableScissor();
+        if (aux) {
+            g_pHyprOpenGL->setActiveTexture(GL_TEXTURE1);
+            m_data.aux->unbind();
+        }
         g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
         tex->setTexParameter(GL_TEXTURE_MIN_FILTER, tex->minFilter);
         tex->unbind();
@@ -969,6 +1010,8 @@ void main() {
         glUniform1f(u.smoothK, 0.f);
         glUniform1f(u.appearBlur, 0.f);
         glUniform1f(u.fillAmount, 0.f);
+        glUniform4f(u.maskRect, 0.f, 0.f, 0.f, 0.f);
+        glUniform4f(u.sdfRect, 0.f, 0.f, 0.f, 0.f);
 
         shader->setUniformMatrix3fv(SHADER_PROJ, 1, GL_TRUE, g_pHyprRenderer->projectBoxToTarget(ctx, quad).getMatrix());
         glUniform2f(u.uvTopLeft, (quad.x - pyr.box.x) / pyr.box.w, (quad.y - pyr.box.y) / pyr.box.h);
@@ -1041,6 +1084,8 @@ void main() {
         glUniform1f(u.roundingPower, m_data.roundingPower.value_or(m_data.params->roundingPower));
         glUniform1f(u.alpha, m_data.alpha);
         glUniform1f(u.ditherAmount, 0.f); // fills read no backdrop
+        glUniform4f(u.maskRect, 0.f, 0.f, 0.f, 0.f);
+        glUniform4f(u.sdfRect, 0.f, 0.f, 0.f, 0.f);
         glUniform1f(u.smoothK, 0.f);
         glUniform1f(u.appearBlur, 10.f * scale);
         glUniform1i(u.shapeCount, 1);

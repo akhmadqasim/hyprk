@@ -30,6 +30,7 @@
 #include <hyprutils/string/String.hpp>
 #include <hyprutils/string/VarList.hpp>
 
+#include <algorithm>
 #include <chrono>
 #include <cstdio>
 #include <format>
@@ -88,17 +89,34 @@ static std::vector<lg::SGlassShape> shapesFor(const PHLLS& layer, const PHLMONIT
     return shapes;
 }
 
+// The buffer of a layer the shell maps only to hand a texture to the glass (`icon_masks`, `sdf_layers`), and its box
+static SP<Render::ITexture> layerTexture(const PHLLS& ls, const PHLMONITOR& mon, lg::SRect& box) {
+    const auto surface = ls && ls->mapped() ? ls->wlSurface() : nullptr;
+    const auto res     = surface ? surface->resource() : nullptr;
+    if (!res || !res->m_current.texture)
+        return nullptr;
+    const auto pos = ls->position(Desktop::View::IGeometric::GEOMETRIC_CURRENT) - mon->m_position;
+    const auto sz  = ls->size(Desktop::View::IGeometric::GEOMETRIC_CURRENT);
+    box            = {pos.x, pos.y, sz.x, sz.y};
+    return res->m_current.texture;
+}
+
+static PHLLS layerOn(const PHLMONITOR& mon, const std::string& ns) {
+    for (const auto& level : mon->m_layerSurfaceLayers)
+        for (const auto& l : level)
+            if (const auto ls = l.lock(); ls && ls->mapped() && ls->m_namespace == ns)
+                return ls;
+    return nullptr;
+}
+
+static bool isMaskLayer(const lg::SParams& p, const std::string& ns) {
+    return std::ranges::any_of(p.iconMasks, [&ns](const auto& kv) { return kv.second == ns; });
+}
+
 // `wallpaper_under`: the output's background layers again, inside what the glass of `data` reads, so that glass samples the
 // wallpaper and not the windows under it. One textured quad per background layer, clipped to that region.
 static void addWallpaperUnder(Render::CRenderContext& ctx, const PHLMONITOR& mon, const lg::CGlassElement::SData& data, const std::string& other) {
-    const auto mappedOn = [&mon](const std::string& ns) {
-        for (const auto& level : mon->m_layerSurfaceLayers)
-            for (const auto& l : level)
-                if (const auto ls = l.lock(); ls && ls->mapped() && ls->m_namespace == ns)
-                    return true;
-        return false;
-    };
-    if (!mappedOn(other))
+    if (!layerOn(mon, other))
         return;
     const CRegion region = lg::CGlassElement::readRegionOf(mon, data);
     if (region.empty())
@@ -127,9 +145,39 @@ static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext
     const bool aboveLock = layer && layer->m_ruleApplicator->aboveLock().valueOrDefault();
     const bool lockSkip  = lockscreen ? !aboveLock : (aboveLock && g_pSessionLockManager && g_pSessionLockManager->isSessionLocked());
 
+    // a layer that only hands a picture to the glass (README "Textures from the shell") is never drawn as a surface while
+    // the plugin is on, not into a fade-out snapshot either: the masks are applied by their glass, an SDF layer's picture
+    // is the shape of its own glass
+    const bool live = params && params->enabled && !popups && !ctx.m_renderingSnapshot && layer && mon && !lockSkip && layer->mapped() && layer->alphaNonZero();
+    if (params && params->enabled && layer && !popups) {
+        if (isMaskLayer(*params, layer->m_namespace))
+            return;
+        if (const auto sdf = params->sdfLayers.find(layer->m_namespace); sdf != params->sdfLayers.end()) {
+            lg::SRect  box;
+            const auto tex = live ? layerTexture(layer, mon, box) : nullptr;
+            if (!tex)
+                return;
+            // the shape's own part of the picture is the glass box (its size picks the recipe's values), the rest is padding
+            const double             pad = (1 - sdf->second.extent) / 2;
+            lg::CGlassElement::SData data{
+                .shapes   = {lg::SGlassShape{.box = {box.x + pad * box.w, box.y + pad * box.h, box.w * sdf->second.extent, box.h * sdf->second.extent}}},
+                .alpha    = float(layer->alpha()[Desktop::View::LS_ALPHA_FADE]->value()),
+                .params   = params,
+                .recipe   = &lg::recipeByName(lg::materialFor(*params, layer->m_namespace)),
+                .owner    = reinterpret_cast<uintptr_t>(layer.get()),
+                .auxKind  = lg::CGlassElement::SData::eAux::SDF,
+                .aux      = tex,
+                .auxBox   = box,
+                .sdfRange = sdf->second.range * box.w,
+            };
+            lg::CGlassElement::claimDamage(ctx, data);
+            g_pHyprRenderer->currentPass(ctx).add(makeUnique<lg::CGlassElement>(std::move(data)));
+            return;
+        }
+    }
+
     const double fill  = params ? lg::fillFor(*params, layer ? layer->m_namespace : std::string{}) : 0;
-    const bool wanted = params && params->enabled && !popups && !ctx.m_renderingSnapshot && layer && mon && !lockSkip && layer->mapped() && layer->alphaNonZero() &&
-        (fill != 0 || lg::namespaceMatches(*params, layer->m_namespace));
+    const bool wanted = live && (fill != 0 || lg::namespaceMatches(*params, layer->m_namespace));
     // no shapes = no region with require_region: the layer is left to Hyprland
     double opacity = 1;
     auto   shapes  = wanted ? shapesFor(layer, mon, *params, opacity) : std::vector<lg::SGlassShape>{};
@@ -163,6 +211,13 @@ static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext
         .recipe = &lg::recipeByName(lg::materialFor(*params, layer->m_namespace)),
         .owner  = reinterpret_cast<uintptr_t>(layer.get()),
     };
+    // the icons' clear-mode masks for this glass, when the shell has mapped their layer on this output
+    if (const auto it = params->iconMasks.find(layer->m_namespace); it != params->iconMasks.end())
+        if (const auto masks = layerOn(mon, it->second)) {
+            data.aux = layerTexture(masks, mon, data.auxBox);
+            if (data.aux)
+                data.auxKind = lg::CGlassElement::SData::eAux::MASKS;
+        }
     lg::CGlassElement::claimDamage(ctx, data);
     if (const auto it = params->wallpaperUnder.find(layer->m_namespace); it != params->wallpaperUnder.end())
         addWallpaperUnder(ctx, mon, data, it->second);

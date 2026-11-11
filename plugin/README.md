@@ -267,6 +267,7 @@ boxes); nothing at rest.
 | `panel_blur` | `hyprk-controlcenter:1.79` | `ns:radius`: draw that panel blur behind the layer's glass (see Materials) |
 | `fill_layers` | "" | `ns:lighter` / `ns:darker`: every shape of that layer is a plus-lighter (+65/255) or plus-darker (-57/255) fill over what lies under it, drawn before the layer's content (Cmd-Tab selection tile, Dock dots: Qt cannot blend with the compositor's glass). `ns:lighter:125` / `ns:darker:128` sets the amount in 1/255 (0 < a <= 255; the Dock's running dots, Q-dock-07). The fill takes the layer's opacity like the glass under it; give the namespace the `no_anim` layer rule, or Hyprland's layer fade runs on it and it trails the glass |
 | `wallpaper_under` | `hyprk-dock:hyprk-mission` | `ns:other`: while a layer `other` is mapped on the output, the glass of `ns` samples the output's background layers (the wallpaper) and not what lies under it: the background layers' textures are drawn again inside what that glass reads, right before it. The Dock while Mission Control is open: the shell's Mission Control layer covers the windows with the wallpaper but sits above the Dock, whose glass refracted the real window under it (red window parked under the Dock, Dock box against the Dock over the bare wallpaper: rms 115.2 -> 0.5 levels). One clipped quad, only while `other` is mapped |
+| `icon_masks` / `sdf_layers` | "" / "" | pictures handed over as layer surfaces: the Dock icons' clear-mode masks, an SDF picture as a glass shape (see Textures from the shell) |
 | `popup_classes` / `popup_material` / `popup_radius` | `^hyprk-finder$` / `menu` / 12 | glass behind the xdg_popups of matching windows (see Client popups) |
 | `refraction_scale` | 1 | multiplies the recipe's refraction amount (0 = off) |
 | `aberration` | 0 | px R/B split at the edge (7 taps); 0 = off (Apple: none on background glass) |
@@ -402,6 +403,44 @@ Hyprland's own popup blur is turned off for it. Q-menubar-13: pull-down and cont
 the default is the shell dropdown's `menu` recipe and shadow. A Qt popup destroys its surface on close, which leaves Hyprland's
 popup fadeout empty, so the plugin keeps the popup's last buffer and fades it with its glass over the shell menus' 185 ms
 ease-out (materialize 1 -> 0). The client draws no fill when `plugin:liquidglass:enabled` is 1.
+
+## Textures from the shell (icon masks, SDF shapes)
+
+Two things the glass needs as pictures, not as rounded rects. The hand-off is a layer surface of its own per picture: its
+buffer is the texture, its box says where it lies, and while the plugin is enabled Hyprland never draws it (with the key
+unset, or the plugin off, it is an ordinary layer and shows its picture, so the shell maps it only when the key is set).
+Both keys are empty by default: nothing in the shell maps such a layer yet. Give the layer an empty input region and
+`exclusionMode: Ignore`; an external (YUV) buffer is not taken.
+
+**`icon_masks = "hyprk-dock:hyprk-dock-masks"`** (glass namespace : mask namespace). IconRendering's clear mode (icon style
+Clear, and Tinted in light) draws no picture: the icon is three masks that the glass under it takes (0x1cfd71dfc, the live
+layer's CAFilter passes 0x1cfd69ffc, reference/ASSETS.md). The mask layer's buffer, premultiplied, anywhere over the glass:
+R = lighten, G = darken (the amount taken off: totalDarkeningStrength x darkening, `icr.render_masks()` channel 1), B =
+highlights; (0, 0, 0, 0) = nothing. The glass shader applies, on its own finished colour and inside its coverage only,
+`mix(c, clamp(VCM(c; 0.9, 2.5, 2.0), 0, 1.2), R)`, then `max(c - G, 0)`, then `mix(c, clamp(VCM(c; 0.2, 1.35, 1.4), 0, 1.2), B)`
+(ICRRenderingParameters.default ClearMode, pass order lighten first), clipped to 1 at the write. One more texture read in the
+Dock's own pass, no copy, no pass of its own. On screen (MBA 2x, dark Dock over white, four test squares of masks) against
+the same formula on the Dock without masks: rms 1.0 level over 18,166 px, nothing changed outside the masks. GPU, Dock
+redrawn every frame: 0.050 -> 0.053 ms per frame.
+Not Apple's, or not known: values above 1 are clipped (what CoreAnimation does after `inputClamp` was not read); the masks
+act where the Dock's glass is, so a magnified icon's part above the Dock gets none; and what the Dock puts under each icon
+is not built: every `DOCKTileLayer` has a glass background of its own (`_requiresGlassBackground` 0x10007f9d4,
+`setGlassBackgroundStyle:` 0x100080264, a `DockGlassMaterialLayerController` per tile, `initWithVariant:adaptive:`
+0x100176f18; variant -> recipe not read). The icon port's still test says what to expect until then: these passes over the
+Dock's flat colour fit the Mac's Dock worse than the fitted rule (ClearLight rms 7.0 against 5.8, TintedLight 18.8-23.0
+against 11.4, ASSETS.md), so the key is for trying the masks on live glass, not yet a replacement.
+
+**`sdf_layers = "ns"`** or `"ns:one:padding:size"`. The layer's buffer is an SDF picture, R = distance with 0.5 at the edge
+(below inside), G / B = the outward normal as n / 2 + 0.5, opaque; the glass of that namespace (recipe from `materials`) takes
+its shape from it: the shader's distance and normal are read from the picture instead of computed, everything after is the
+same code (refraction along the normal, rim, shadow). `one` is the distance of value 1 from the edge, `padding` the margin
+around the shape and `size` the picture's side, in the picture's own px; a bare name is Dock.app's `s-trashempty-sdf.png`
+(128, 152, 384: the Dock Trash's glass, `preferredGlassBackgroundStyle: 2`). The shape's own part of the picture is the glass
+box (it picks the recipe's size values). On screen (a 40 pt rounded square as a 384 px picture, Control Center recipe over
+white): the silhouette is the picture's (5,900 px inside, 100 of them unchanged, 208 changed outside: the rim's edge pixels),
+body 204 as the recipe's. GPU: 0.027 ms per frame for that shape (its own backdrop copy).
+Assumed, not checked against the asset (it is not on this machine): the sign of the distance and the normal's encoding.
+Not read: which recipe glass background style 2 is.
 
 ## Dock label pointer
 

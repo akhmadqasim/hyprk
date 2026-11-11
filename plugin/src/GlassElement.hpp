@@ -6,6 +6,7 @@
 
 #include <hyprland/src/render/pass/PassElement.hpp>
 #include <hyprland/src/render/Shader.hpp>
+#include <hyprland/src/render/Texture.hpp>
 
 #include <cstdint>
 
@@ -37,6 +38,7 @@ namespace lg {
             int pxPerPt, keyYcc, keySpread, highlight, darkSpec;
             int shadowOpacity, shadowRadius, shadowOffset, shadowTint, shadowSaturation;
             int ringOpacity, ringOffset, ringStroke, ringRadius;
+            int aux, maskRect, maskLighten, maskHighlights, sdfRect, sdfRange;
         } u{};
 
       private:
@@ -74,6 +76,12 @@ namespace lg {
             uintptr_t                      owner  = 0;    // layer/window identity, keys the light/dark state
             bool                           shadow = true; // windows draw their own
             std::optional<float>           roundingPower; // override params->roundingPower
+            // a texture the client hands over as a layer surface of its own (README "Textures from the shell")
+            enum class eAux { NONE, MASKS, SDF };
+            eAux                           auxKind = eAux::NONE;
+            SP<Render::ITexture>           aux;            // MASKS: the icons' clear-mode masks; SDF: the element's shape
+            SRect                          auxBox;         // its layer's box, monitor-local logical px
+            double                         sdfRange = 0;   // SDF: logical px between the values 0.5 and 1
             std::vector<SGlassGroup>       groups;        // filled by claimDamage()/the ctor
             std::vector<SGlassShape>       fills;         // fill-marker shapes, moved out of `shapes` there
             std::vector<SResolved>         resolved;      // per group, from its lead shape

@@ -82,6 +82,31 @@ namespace lg {
         return out;
     }
 
+    std::unordered_map<std::string, SParams::SSdf> parseSdfMap(std::string_view s) {
+        std::unordered_map<std::string, SParams::SSdf> out;
+        for (const auto& item : splitList(s)) {
+            const auto f = Hyprutils::String::CVarList{item, 0, ':'};
+            if ((f.size() != 1 && f.size() != 4) || f[0].empty())
+                continue;
+            SParams::SSdf sdf;
+            if (f.size() == 4) {
+                double v[3] = {};
+                bool   ok   = true;
+                for (int i = 0; i < 3 && ok; ++i) {
+                    const auto num     = Hyprutils::String::trim(f[i + 1]);
+                    const auto [p, ec] = std::from_chars(num.data(), num.data() + num.size(), v[i]);
+                    ok                 = ec == std::errc{} && p == num.data() + num.size();
+                }
+                // one value distance > 0, padding >= 0, the shape left between the paddings
+                if (!ok || !(v[0] > 0) || v[1] < 0 || !(v[2] > 2 * v[1]))
+                    continue;
+                sdf = {v[0] / v[2], (v[2] - 2 * v[1]) / v[2]};
+            }
+            out[Hyprutils::String::trim(f[0])] = sdf;
+        }
+        return out;
+    }
+
     double panelBlurFor(const SParams& p, const std::string& ns) {
         const auto it = p.panelBlur.find(ns);
         return it == p.panelBlur.end() ? 0.0 : std::max(it->second, 0.0);

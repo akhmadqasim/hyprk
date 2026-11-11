@@ -62,6 +62,17 @@ namespace lg {
         // Mission Control's backdrop)
         std::unordered_map<std::string, std::string> wallpaperUnder;
 
+        // Textures from the shell (README): a layer surface whose buffer is not drawn but handed to the glass.
+        // iconMasks: glass ns -> the ns of a layer holding the Dock icons' clear-mode masks (IconRendering's lighten / darken /
+        // highlights passes over that glass). sdfLayers: ns of a layer whose buffer is an SDF picture (r = distance, 0.5 at the
+        // edge, gb = normal) that is the shape of its own glass (the Dock Trash's glass layer)
+        std::unordered_map<std::string, std::string> iconMasks;
+        struct SSdf {
+            double range  = 128.0 / 384.0;                 // distance between the values 0.5 and 1, as a part of the picture's width
+            double extent = (384.0 - 2 * 152.0) / 384.0;   // the shape's part of the picture (the rest is padding)
+        };
+        std::unordered_map<std::string, SSdf>        sdfLayers;
+
         // glass behind the xdg_popups of windows whose class matches (PopupGlass.cpp): a client's context menu
         std::string                                  popupClasses = "^hyprk-finder$";
         std::string                                  popupMaterial = "menu";
@@ -118,6 +129,10 @@ namespace lg {
     // "ns:lighter, ns2:darker, ns3:lighter:125" -> {{ns, 65/255}, {ns2, -57/255}, {ns3, 125/255}}: an optional third field
     // is the amount in 1/255 (0 < a <= 255; the default amounts are the Cmd-Tab tile's); other items are skipped
     std::unordered_map<std::string, double> parseFillMap(std::string_view s);
+
+    // "ns, ns2:one:padding:size" -> the SDF pictures' geometry in the picture's own px (Dock.app's s-trashempty-sdf.png: one
+    // value distance 128, padding 152, size 384; the default for a bare name); items with bad numbers are skipped
+    std::unordered_map<std::string, SParams::SSdf> parseSdfMap(std::string_view s);
 
     // Apple blur radius (pt) of the panel blur behind a namespace's glass (`panel_blur`), 0 = none
     double panelBlurFor(const SParams& p, const std::string& ns);

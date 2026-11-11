@@ -420,6 +420,9 @@ int main() {
         // an explicit amount in 1/255 (the Dock's running dots, Q-dock-07: +125 dark, -128 light); bad amounts are skipped
         const auto fa = parseFillMap("d:lighter:125, e : darker : 128, f:lighter:0, g:darker:256, h:lighter:x, i:lighter:1:2, j:darker:12.5");
         CHECK(fa.size() == 3 && near(fa.at("d"), 125.0 / 255) && near(fa.at("e"), -128.0 / 255) && near(fa.at("j"), -12.5 / 255));
+        // SDF layers: a bare name is Dock.app's s-trashempty-sdf.png (one value distance 128, padding 152, size 384)
+        const auto sm = parseSdfMap("t, u:64:32:256, v:0:1:2, w:1:2, x:8:60:100, y:a:1:9");
+        CHECK(sm.size() == 2 && near(sm.at("t").range, 128.0 / 384) && near(sm.at("t").extent, 80.0 / 384) && near(sm.at("u").range, 0.25) && near(sm.at("u").extent, 0.75));
         // pill 26 pt tall above, the pointer's box 3 pt below it: alone at the layer's k 0, one group at 25
         std::vector<SGlassShape> lab = {{{90, 0, 60, 26}, 13}, s[0]};
         lab[1].box = {88, 29, 23, 23};
