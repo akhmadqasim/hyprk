@@ -3738,3 +3738,15 @@ afinfo (path | format; duration):
 - /System/Library/Sounds/Blow.aiff | Data format:     2 ch,  48000 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 1.401833 sec
 - /System/Library/Sounds/Funk.aiff | Data format:     2 ch,  48000 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 2.163458 sec
 - /System/Library/Sounds/Glass.aiff | Data format:     2 ch,  48000 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 1.650083 sec
+
+
+## Rubber-band scroll constants (PC #73 part 2, static + dlsym, no live scroll)
+
+Status: SEBAGIAN (code read and the functions called in-process; no live overscroll measured because the Mac was shut down).
+Source: AppKit 27.2.1 disassembly `reference/re/27.2.1/decomp/AppKit-rubberband.asm`; probe `reference/re/tools/probe/rubberband.m` calls the private functions through dlsym (C names start with one underscore, e.g. `_NSElasticDeltaForTimeDelta`).
+
+- Stiffness `NSScrollViewRubberbandStiffness` = 20 (default, app config can override). Direction-lock stretch ratio 1, minimum delta before stretch 10 pt.
+- Classic (linear) model: `_NSElasticDeltaForReboundDelta(d) = d / max(stiffness, 1)` = d / 20, `_NSReboundDeltaForElasticDelta(e) = e · 20` (0x18A64D7EC, 0x18A64D1F8).
+- Hyperbolic model (0x18AE6C3B8 / 0x18AE6C3FC): `elastic(d, c, D) = sign(d) · D · (1 − 1/(1 + |d|·c/D))`, inverse `rebound(e, c, D) = sign(e) · D · (1/(1 − |e|/D) − 1) / c`; if D ≤ 0 it falls back to d/20. Coefficients: trackpad c = 0.075 (`NSScrollingBehaviorHyperbolicCoefficientTrackpad`), touch c = 0.55. D is presumably the visible dimension (not verified by a call site).
+- Return to rest after release (`_NSElasticDeltaForTimeDelta` → `_NSElasticDeltaForTimeDelta2` 0x18AE6C204): `x(t) = (x0 + C1·v·t) · exp(−stiffness·t / C2)` with C2 = 1.6, C1 = −0.31 (as evaluated; sign follows AppKit's velocity convention), v clamped to ±`NSScrollViewScrollVelocityMax`. With stiffness 20 that is a critically damped decay with rate 12.5 /s: x0 = 100 → 53.5 / 28.7 / 8.2 / 2.4 / 0.67 / 0.19 at 0.05 / 0.1 / 0.2 / 0.3 / 0.4 / 0.5 s.
+- Not measured: momentum deceleration rate after a flick, scroll bar during overscroll, which model (classic vs hyperbolic) Finder list and Settings use.
