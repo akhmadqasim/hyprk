@@ -61,7 +61,8 @@ Item {
         leftMargin: Theme.gallery.pad
         rightMargin: 10
         model: root.browser.entries
-        boundsBehavior: Tokens.scroller.bounds
+        boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
+        RubberBand { flickable: strip }
         currentIndex: root.browser.cursor
         highlightFollowsCurrentItem: false
         onCurrentIndexChanged: if (currentIndex >= 0) positionViewAtIndex(currentIndex, ListView.Contain)

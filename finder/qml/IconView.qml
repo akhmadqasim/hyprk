@@ -20,7 +20,8 @@ GridView {
     cellWidth: Theme.grid.cellWidth
     cellHeight: Theme.grid.cellHeight
     interactive: false     // wheel still scrolls; drags make a rubber band instead of flicking
-    boundsBehavior: Tokens.scroller.bounds
+    boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
+    RubberBand { flickable: grid }
     clip: true
     currentIndex: browser.cursor
     highlightFollowsCurrentItem: false

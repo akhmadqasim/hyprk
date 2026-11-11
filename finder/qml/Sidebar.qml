@@ -54,7 +54,8 @@ Rectangle {
         id: flick
         contentHeight: column.height + 16
         clip: true
-        boundsBehavior: Tokens.scroller.bounds
+        boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
+        RubberBand { flickable: flick }
 
         Column {
             id: column

@@ -98,7 +98,8 @@ Item {
         topMargin: Theme.list.firstRowGap
         clip: true
         model: root.browser.entries
-        boundsBehavior: Tokens.scroller.bounds
+        boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
+        RubberBand { flickable: list }
         currentIndex: root.browser.cursor
         highlightFollowsCurrentItem: false
 

@@ -36,7 +36,8 @@ Item {
         id: strip
         anchors.fill: parent
         orientation: ListView.Horizontal
-        boundsBehavior: Tokens.scroller.bounds
+        boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
+        RubberBand { flickable: strip }
         clip: true
         model: root.columnDirs.length + (root.previewEntry ? 1 : 0)
         onCountChanged: Qt.callLater(() => positionViewAtEnd())
@@ -72,7 +73,8 @@ Item {
                 topMargin: Theme.columns.top
                 clip: true
                 model: col.entries
-                boundsBehavior: Tokens.scroller.bounds
+                boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
+                RubberBand { flickable: list }
                 footer: MouseArea {
                     width: list.width
                     height: Math.max(0, list.height - list.topMargin - list.count * Theme.columns.rowHeight)

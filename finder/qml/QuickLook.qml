@@ -109,8 +109,10 @@ Rectangle {
         }
 
         ScrollView {
+            id: textScroll
             anchors.fill: parent
             visible: root.isText
+            Component.onCompleted: contentItem.boundsBehavior = Flickable.StopAtBounds   // the wheel stops at the edge
             TextArea {
                 readOnly: true
                 text: root.text
@@ -122,6 +124,7 @@ Rectangle {
                 padding: 12
             }
         }
+        RubberBand { flickable: root.isText ? textScroll.contentItem : null }   // trackpad stretch at the ends
 
         Column {
             visible: root.open && !root.isImage && !root.isText
