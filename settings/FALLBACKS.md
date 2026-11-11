@@ -90,7 +90,7 @@ is the same colour, opaque.
 | Asset | Preferred | Fallback |
 |---|---|---|
 | UI font | `themes/fonts/SFNS.ttf` loaded with FontLoader (weights through the `wght` axis) | Inter, then Cantarell, then Noto Sans (`Theme.pickFont`) |
-| Glyphs in rows and the toolbar | SF Symbols outlines in `controls/sfpaths.js` (drawn by `controls/SfSymbol.qml`; add names with `scripts/sfpaths.py`) | none: a name that is not in the table draws nothing |
+| Glyphs in rows and the toolbar | SF Symbols outlines in `ui/HyprK/sfpaths.js` (drawn by HyprK `SfSymbol`, which the shared controls use too; add names with `ui/scripts/sfpaths.py`) | none: a name that is not in the table draws nothing |
 | Pane icons | `themes/icons/settings/<pane id>@<64\|128>-<default\|dark\|clear\|tinted>-<light\|dark>.png` (all 23 panes, picked by the icon style and appearance) | a plain coloured rounded tile |
 | Row icons | `themes/icons/settings/<id>@48-...png`: the Mac's 24 pt row icon at 2x, built from Apple's graphic icon configuration of that row (`Panes.js` rowIcons, `themes/icons/settings/graphic.json`) | a plain coloured rounded tile |
 | Wallpaper thumbnails | freedesktop `~/.cache/thumbnails/large` (made by `scripts/thumbs.sh`) | the full image |

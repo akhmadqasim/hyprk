@@ -102,10 +102,10 @@ Column {
             label: "Alert volume"
             implicitHeight: 40
             Slider {
-                width: 248   // speaker to speaker ink 243 pt (sound-light.png: x 930..1416 px at 2x)
+                width: 246   // the end images' layout frames span 463.6 .. 709.6 pt on sound-light.png
                 tickMarks: 7
                 value: AppState.sound.alertVolume
-                leftGlyph: "volume_mute"; rightGlyph: "volume_up"
+                leftGlyph: "speaker.fill"; rightGlyph: "speaker.wave.3.fill"; rightGlyphSize: 12.7
                 onMoved: v => AppState.set("sound", { alertVolume: Math.round(v * 100) / 100 })
                 // macOS plays the alert once you let go of the knob
                 onReleased: pane.play(pane.soundsDir + "/Sounds/" + AppState.sound.alertSound + ".wav", AppState.sound.alertVolume)
@@ -173,13 +173,13 @@ Column {
             implicitHeight: 62
             alignTop: true
             Item {   // the slider with the Mute checkbox right-aligned under it
-                width: 248; height: 45
+                width: 246; height: 45
                 Slider {
-                    width: 248
+                    width: 246
                     tickMarks: 7
                     value: pane.vol.volume
                     enabled: pane.status === "ok"
-                    leftGlyph: "volume_mute"; rightGlyph: "volume_up"
+                    leftGlyph: "speaker.fill"; rightGlyph: "speaker.wave.3.fill"; rightGlyphSize: 12.7
                     onMoved: v => { pane.dragging = true; pane.setVolume(v); dragRelease.restart(); }
                     onReleased: if (AppState.sound.volumeFeedback) pane.play(pane.soundsDir + "/misc/BezelServices-volume.wav", 1)
                     Timer { id: dragRelease; interval: 600; onTriggered: pane.dragging = false }

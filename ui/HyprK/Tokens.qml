@@ -24,7 +24,6 @@ QtObject {
     // controlAccentColor of the user's accent (Accent.qml; each app's Theme sets Accent.name)
     property color accent: Accent.color
     property string fontText: "Sans Serif"
-    property string fontGlyph: "Material Icons"   // Settings' glyph font (popup chevron, checkmark, search)
     // a Spring with settlesGlass stepped: the shell re-measures that window's glass (ShellWindow)
     signal glassStepped(Item spring)
 

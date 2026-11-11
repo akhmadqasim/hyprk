@@ -5,7 +5,7 @@ import "controls.js" as G
 // mini 16 r4, large 28 r14) with a full-height accent segment and white text for the selection. Not glass.
 // The selection does not slide: it jumps in one frame (AppKit and Settings' SwiftUI picker; the Finder toolbar's
 // view switcher too, Q-finder-11). Separators 1 x 14 sit only between two unselected segments.
-// model: array of strings, or of objects { text, glyph, icon } (glyph = a ligature in Tokens.fontGlyph,
+// model: array of strings, or of objects { text, glyph, icon } (glyph = an SF Symbol name in sfpaths.js,
 // icon = an image url; either may go with or without text).
 // Mouse: the segment under the pointer gets a black a.098 layer while pressed; release on a segment activates it,
 // so a press can be dragged to another segment (NSSegmentedControl tracking). Keyboard: Left/Right move the
@@ -151,11 +151,10 @@ Item {
                     opacity: sc.iconOpacity
                     anchors.verticalCenter: parent.verticalCenter
                 }
-                Text {
+                SfSymbol {
                     visible: !!seg.entry.glyph
-                    text: seg.entry.glyph || ""
-                    font.family: Tokens.fontGlyph
-                    font.pixelSize: 15         // as Slider's end glyphs
+                    name: seg.entry.glyph || ""
+                    pointSize: 13              // the text's size; no caller and no Mac sample yet
                     color: seg.selected ? sc.selectedLabelColor : Tokens.label
                     anchors.verticalCenter: parent.verticalCenter
                 }

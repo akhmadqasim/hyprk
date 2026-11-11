@@ -6,7 +6,10 @@ import "controls.js" as G
 // lens and the fill darkens by a black a.098 layer (20 ms delay, 150 ms ease-in-out; back in 150 ms).
 // Mouse-down on the knob grabs it where it was hit; mouse-down on the track sends the knob there (ease-out, no
 // overshoot) and keeps tracking. tickMarks > 1 draws 2 x 2 dots under the track; onlyTicks snaps to them.
-// End glyphs (or leftIcon / rightIcon components) sit beside the track (glyphGap, 6 pt) and are buttons: they send the
+// End glyphs (SF Symbol names; or leftIcon / rightIcon components) sit beside the track and are buttons. A glyph is laid
+// out by its layout frame, as the Mac's minimum / maximum value images are (sound-light.png and displays-light.png:
+// the frames of speaker.fill / speaker.wave.3.fill and sun.min.fill / sun.max.fill span 463.6 .. 709.6 pt and end
+// 3.9 - 4.4 pt before the track, on both sides; an icon component sits glyphGap away with its own box). They send the
 // value to that end, or step it by endStep when that is > 0 (Liquid Glass: 0.1). Text labels sit under it, 11 pt (Desktop & Dock): leftText /
 // rightText, or `labels: [[text, fraction], ...]` (0 = left-aligned at the start, 1 = right-aligned at the end,
 // otherwise centred under that knob position).
@@ -26,7 +29,12 @@ Item {
     property Component leftIcon: null
     property Component rightIcon: null
     property real endStep: 0
-    property real glyphGap: 6
+    property real glyphSize: 12.5          // pt; regular weight. Sound: speaker.fill 12.5 (alpha rms 0.021), Displays 16.5
+    property real rightGlyphSize: glyphSize
+    property real glyphGap: leftIcon || rightIcon ? 6 : 4
+    // with tick marks the track sits above the control's middle: the end images are 0.8 - 1.3 pt under the track's
+    // centre on sound-light.png (both sliders), 0.0 - 0.1 pt on displays-light.png (no ticks)
+    readonly property real _glyphDy: tickMarks > 1 && !leftIcon && !rightIcon ? 1 : 0
     property string leftText: ""
     property string rightText: ""
     property var labels: (leftText !== "" ? [[leftText, 0]] : []).concat(rightText !== "" ? [[rightText, 1]] : [])
@@ -100,11 +108,12 @@ Item {
     Item {
         id: lg; visible: s.leftGlyph !== "" || s.leftIcon !== null
         anchors.left: parent.left; anchors.verticalCenter: track.verticalCenter
-        width: s.leftIcon ? li.width : lt.implicitWidth; height: s.leftIcon ? li.height : lt.implicitHeight
-        Text {
+        anchors.verticalCenterOffset: s._glyphDy; anchors.alignWhenCentered: false   // no rounding to whole points
+        width: s.leftIcon ? li.width : lt.advance; height: s.leftIcon ? li.height : lt.height
+        SfSymbol {
             id: lt; visible: !s.leftIcon
-            text: s.leftGlyph
-            font.family: Tokens.fontGlyph; font.pixelSize: 15
+            x: bearing
+            name: s.leftGlyph; pointSize: s.glyphSize
             color: lma.pressed ? Tokens.label : Tokens.secondaryLabel   // pressed: darker (borderless image button)
         }
         Loader { id: li; sourceComponent: s.leftIcon; property bool pressed: lma.pressed }
@@ -113,11 +122,12 @@ Item {
     Item {
         id: rg; visible: s.rightGlyph !== "" || s.rightIcon !== null
         anchors.right: parent.right; anchors.verticalCenter: track.verticalCenter
-        width: s.rightIcon ? ri.width : rt.implicitWidth; height: s.rightIcon ? ri.height : rt.implicitHeight
-        Text {
+        anchors.verticalCenterOffset: s._glyphDy; anchors.alignWhenCentered: false   // no rounding to whole points
+        width: s.rightIcon ? ri.width : rt.advance; height: s.rightIcon ? ri.height : rt.height
+        SfSymbol {
             id: rt; visible: !s.rightIcon
-            text: s.rightGlyph
-            font.family: Tokens.fontGlyph; font.pixelSize: 18
+            x: bearing
+            name: s.rightGlyph; pointSize: s.rightGlyphSize
             color: rma.pressed ? Tokens.label : Tokens.secondaryLabel
         }
         Loader { id: ri; sourceComponent: s.rightIcon; property bool pressed: rma.pressed }

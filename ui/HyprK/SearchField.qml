@@ -1,7 +1,7 @@
 import QtQuick
 
 // System Settings sidebar search field (MAC-ANSWERS.md Q-settings-10): a flat translucent 28 pt capsule, not glass,
-// with a 0.5 pt dark rim (pixels of desktop-dock-{light,dark}.png). Magnifier at the left in a 25 pt button,
+// with a 0.5 pt dark rim (pixels of desktop-dock-{light,dark}.png). Magnifier (magnifyingglass, 13 pt) at the left,
 // placeholder "Search" 13 pt secondary. Focus: the 3 pt focus ring outside the capsule.
 Rectangle {
     id: sf
@@ -13,10 +13,10 @@ Rectangle {
     border.color: Tokens.control.searchStroke
     border.width: 0.5
     FocusRing { visible: input.activeFocus }
-    Text {
+    SfSymbol {   // regular, 13 pt: alpha rms 0.015 light / 0.012 dark on appearance-{light,dark}.png, ink centre 16.25 pt in
         id: mag
-        x: 15 - width / 2; anchors.verticalCenter: parent.verticalCenter
-        text: "search"; font.family: Tokens.fontGlyph; font.pixelSize: 16
+        x: 16.25 - width / 2; y: (parent.height - height) / 2 + 0.2
+        name: "magnifyingglass"; pointSize: 13
         color: Tokens.secondaryLabel
     }
     TextInput {

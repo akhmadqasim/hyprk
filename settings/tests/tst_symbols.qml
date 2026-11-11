@@ -1,9 +1,9 @@
 import QtQuick
 import QtTest
-import "../controls"
-import "../controls/sfpaths.js" as Sf
+import "../HyprK"
+import "../HyprK/sfpaths.js" as Sf
 
-// Every SF Symbol Settings names is in controls/sfpaths.js (decoded outlines, no icon font) and has an ink box.
+// Every SF Symbol Settings names is in HyprK/sfpaths.js (decoded outlines, no icon font) and has an ink box.
 // Run: QT_QPA_PLATFORM=offscreen qmltestrunner -input settings/tests/tst_symbols.qml
 Item {
     width: 200; height: 100
@@ -19,7 +19,8 @@ Item {
                           "person.fill", "lock.fill", "wifi", "wifi.var-50", "wifi.var-20", "magnifyingglass", "square.on.square",
                           "square.and.arrow.up", "ellipsis", "capsule.on.rectangle.fill", "capsule.on.rectangle.liquid.glass",
                           "person.2.fill", "cloud.fill", "play.circle", "info.circle", "bluetooth.slash", "moon.fill",
-                          "bed.double.fill", "person.lanyardcard.fill"];
+                          "bed.double.fill", "person.lanyardcard.fill", "speaker.fill", "speaker.wave.3.fill", "sun.min.fill",
+                          "sun.max.fill", "chevron.up.chevron.down.semibold"];
             for (const n of used) {
                 const w = n.endsWith(".semibold") ? "semibold" : "regular";
                 const g = Sf.get(w === "semibold" ? n.slice(0, -9) : n, w);

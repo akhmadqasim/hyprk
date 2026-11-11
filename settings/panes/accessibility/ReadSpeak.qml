@@ -44,7 +44,7 @@ Column {
             label: "Speaking rate"; dim: !page.can
             Slider {
                 width: 220; enabled: page.can
-                leftGlyph: "directions_walk"; rightGlyph: "directions_run"
+                // the Mac's ends are tortoise.fill / hare.fill: not in themes/icons/sf-symbols yet, so none are drawn
                 value: page.a.speechRate
                 onReleased: page.ctl.set({ speechRate: Math.round(_dragValue * 100) / 100 })
             }

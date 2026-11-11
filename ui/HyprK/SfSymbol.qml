@@ -1,19 +1,21 @@
 import QtQuick
 import QtQuick.Shapes
-import ".."
 import "sfpaths.js" as Sf
 
 // An SF Symbol drawn from its real outline (sfpaths.js) at `pointSize`, in one colour. The item is the glyph's ink
-// box, so it can be placed by the numbers measured on a Mac shot. Names not in the table draw nothing; add them
-// with settings/scripts/sfpaths.py from themes/icons/sf-symbols.
+// box, so it can be placed by the numbers measured on a Mac shot; `advance` and `bearing` give the symbol's layout
+// frame (what AppKit and SwiftUI lay an image out by) for callers that place it as the Mac does. Names not in the
+// table draw nothing; add them with ui/scripts/sfpaths.py from themes/icons/sf-symbols.
 Item {
     id: g
     property string name
     property string weight: "regular"
     property real pointSize: 13
-    property color color: Theme.label
+    property color color: Tokens.label
     readonly property var glyph: Sf.get(name, weight)
     readonly property real unit: pointSize / (glyph && glyph.pt ? glyph.pt : 32)   // "pt": outlines kept at another size
+    readonly property real advance: glyph ? (glyph.a ? glyph.a[1] : glyph.rect[2]) * unit : 0   // width of the layout frame
+    readonly property real bearing: glyph && glyph.a ? (glyph.rect[0] - glyph.a[0]) * unit : 0  // frame's left edge to the ink
     implicitWidth: glyph ? glyph.rect[2] * unit : 0
     implicitHeight: glyph ? glyph.rect[3] * unit : 0
     Repeater {

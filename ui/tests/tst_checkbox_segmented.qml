@@ -39,7 +39,7 @@ Item {
     SegmentedControl {
         id: seg
         x: 20; y: 150
-        model: ["One", "Two", { text: "Three", glyph: "star" }]
+        model: ["One", "Two", { text: "Three", glyph: "checkmark" }]
         currentIndex: backend.index
         onActivated: i => backend.index = i
     }
@@ -47,7 +47,7 @@ Item {
         id: fixedSeg
         x: 20; y: 200
         segmentWidth: 46
-        model: [{ glyph: "grid_view" }, { glyph: "list" }]
+        model: [{ glyph: "square.on.square" }, { glyph: "ellipsis" }]
         currentIndex: 0
     }
 
@@ -56,7 +56,7 @@ Item {
         x: 200; y: 200
         segmentWidth: 46
         model: [{ icon: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24'/></svg>" },
-                { glyph: "list" }, { glyph: "grid_view" }, { glyph: "star" }]
+                { glyph: "ellipsis" }, { glyph: "square.on.square" }, { glyph: "checkmark" }]
         currentIndex: 2
     }
 

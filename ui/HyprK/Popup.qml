@@ -33,9 +33,9 @@ Item {
             anchors.fill: parent; radius: parent.radius
             color: Tokens.control.pressOverlay
         }
-        Text {
-            anchors.centerIn: parent
-            text: "unfold_more"; font.family: Tokens.fontGlyph; font.pixelSize: 15
+        SfSymbol {   // semibold, 10.25 pt: ink 15 x 21 px on appearance-{light,dark}.png, alpha rms 0.039 (10.0 and 10.5: 0.063)
+            anchors.centerIn: parent; anchors.alignWhenCentered: false
+            name: "chevron.up.chevron.down"; weight: "semibold"; pointSize: 10.25
             color: pop.enabled ? Tokens.label : Tokens.control.disabledText
         }
     }
@@ -90,10 +90,10 @@ Item {
                     implicitWidth: t.implicitWidth + 44 + (pop.dots.length ? 18 : 0)
                     readonly property bool hot: pop._dragIndex >= 0 ? pop._dragIndex === index : im.containsMouse
                     color: hot ? Tokens.accent : "transparent"
-                    Text {
-                        x: 6; anchors.verticalCenter: parent.verticalCenter
+                    SfSymbol {   // popup-menu-open-{light,dark}.png: semibold, 10.7 pt (alpha rms 0.076), ink 8.5 pt into the
+                        x: 8.5; y: (parent.height - height) / 2 + 0.5   // highlight, 8.1 .. 17.0 pt down
                         visible: index === pop.currentIndex
-                        text: "check"; font.family: Tokens.fontGlyph; font.pixelSize: 14
+                        name: "checkmark"; weight: "semibold"; pointSize: 10.7
                         color: parent.hot ? "white" : Tokens.label
                     }
                     Rectangle {

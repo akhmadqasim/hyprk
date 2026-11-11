@@ -284,9 +284,9 @@ Column {
             label: "Brightness"
             Slider {
                 id: bright
-                width: 230
+                width: 246   // as Sound's: the frames span 463.5 .. 709.7 pt on displays-light.png
                 value: 0.5
-                leftGlyph: "light_mode"; rightGlyph: "light_mode"
+                leftGlyph: "sun.min.fill"; rightGlyph: "sun.max.fill"; glyphSize: 16.5   // displays-light.png: alpha rms 0.041 / 0.056 at 16.5 pt
                 onMoved: v => value = v
             }
         }

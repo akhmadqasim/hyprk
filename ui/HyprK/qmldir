@@ -27,6 +27,7 @@ RubberBand 1.0 RubberBand.qml
 Knob 1.0 Knob.qml
 LensGlass 1.0 LensGlass.qml
 FocusRing 1.0 FocusRing.qml
+SfSymbol 1.0 SfSymbol.qml
 Popup 1.0 Popup.qml
 SearchField 1.0 SearchField.qml
 TrafficLights 1.0 TrafficLights.qml

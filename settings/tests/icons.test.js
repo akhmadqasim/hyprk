@@ -1,6 +1,6 @@
 // Run: node --test settings/tests/*.test.js
 // The icon ids Settings names (Panes.js) have their files in themes/icons/settings, nothing in Settings asks for the
-// Material icon font any more (the shared HyprK controls are not checked here), and writes to the host desktop's
+// Material icon font any more (the shared HyprK controls in ui/ neither), and writes to the host desktop's
 // settings (gsettings / dconf) only go through Backend.runHost (real session only).
 const test = require("node:test");
 const assert = require("node:assert/strict");
@@ -47,6 +47,9 @@ test("every iconId in the panes is a known icon; no Material font left in settin
         for (const m of src.matchAll(/\b(?:iconId|icon): (?:[^;\n]*? )?"([a-z0-9-]+)"/g))
             if (/iconId|icon: "/.test(m[0]) && !/glyph/.test(m[0])) assert.ok(P.hasRealIcon(m[1]), `${path.relative(root, f)}: ${m[1]}`);
     }
+    const ui = path.join(root, "../ui/HyprK");           // the shared controls draw SF Symbols too (SfSymbol)
+    for (const f of fs.readdirSync(ui).filter(f => /\.(qml|js)$/.test(f)))
+        assert.ok(!/fontGlyph|Material Icons/.test(fs.readFileSync(path.join(ui, f), "utf8")), `ui/HyprK/${f} still asks for the glyph font`);
 });
 
 test("gsettings / dconf writes only through Backend.runHost", () => {

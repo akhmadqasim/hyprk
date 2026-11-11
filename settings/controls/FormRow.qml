@@ -9,7 +9,7 @@ Item {
     property string sublabel
     property string iconId           // tile: a pane icon or a row icon (Panes.js), themes/icons/settings
     property string iconSource       // app icon image instead of the tile
-    property string symbol           // or a bare SF Symbol (controls/sfpaths.js) in symbolColor, no tile
+    property string symbol           // or a bare SF Symbol (HyprK sfpaths.js) in symbolColor, no tile
     property color symbolColor: Theme.label
     property color tint: Theme.tile.blue
     property real iconSize: 20       // the Mac's row tile: 40 px at 2x (accessibility-light.png)

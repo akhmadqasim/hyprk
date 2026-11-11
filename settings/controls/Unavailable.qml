@@ -5,7 +5,7 @@ import "../HyprK"
 // Full-pane empty state, e.g. "Bluetooth Unavailable" when no controller exists.
 Item {
     id: u
-    property string symbol           // SF Symbol (controls/sfpaths.js) above the title, optional
+    property string symbol           // SF Symbol (HyprK sfpaths.js) above the title, optional
     property string title
     property string text
     width: parent ? parent.width : 0
