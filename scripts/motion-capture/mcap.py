@@ -9,6 +9,8 @@
                     (the Mac reconciliation-42 genie metric)
            col      for the brightest/most changed column per frame: x position (in logical px of the region)
                     of the leading edge of changed samples (for slides)
+  mcap.py compare METRIC PREFIX "MAC SERIES" [--step ms] [--thr N] [--sub ...]
+                    rms in value (best time shift) and in time (at equal progress, 5..95 %), 2-98 % durations
   t is from the trigger (t0) to the frame's presentation time. --sub restricts to a sub-rectangle (logical
   px inside the region). Library use: load(), metric(), fit_shift() for rms against a Mac series.
 """
@@ -73,7 +75,45 @@ def fit_shift(t, y, mac, step=16.667, lo=-60.0, hi=60.0):
     return best
 
 
+def durations(t, y, lo=0.02, hi=0.98):
+    """Time from the last sample below lo to the first sample at or above hi (rising 0..1 series)."""
+    i0 = np.nonzero(y < lo)[0]
+    i1 = np.nonzero(y >= hi)[0]
+    if not len(i1):
+        return float("nan")
+    start = t[i0[i0 < i1[0]].max()] if len(i0[i0 < i1[0]]) else t[0]
+    return float(t[i1[0]] - start)
+
+
+def time_rms(t, y, mac, step, shift):
+    """rms (ms) of t - t_mac(y) over samples with 5 % < y < 95 %, mac monotonic-ised for the inverse."""
+    mt = np.arange(len(mac)) * step + shift
+    mm = np.maximum.accumulate(np.asarray(mac, float))
+    m = (y > 0.05) & (y < 0.95)
+    if not m.any():
+        return float("nan")
+    return float(np.sqrt(np.mean((t[m] - np.interp(y[m], mm + np.arange(len(mm)) * 1e-9, mt)) ** 2)))
+
+
+def compare(t, y, mac, step=16.667):
+    mac = np.asarray(mac, float)
+    r, s, n = fit_shift(t, y, mac, step, lo=-100, hi=200)
+    return {"rms": r, "shift_ms": s, "n": n, "time_rms_ms": time_rms(t, y, mac, step, s),
+            "ours_ms": durations(t, y), "mac_ms": durations(np.arange(len(mac)) * step, mac)}
+
+
 def main():
+    a = sys.argv[1:]
+    if a and a[0] == "compare":
+        step = float(a[a.index("--step") + 1]) if "--step" in a else 16.667
+        thr = float(a[a.index("--thr") + 1]) if "--thr" in a else 12.0
+        rect = [float(v) for v in a[a.index("--sub") + 1].split(",")] if "--sub" in a else None
+        meta, t, frames = load(a[2])
+        y = metric(a[1], sub(meta, frames, rect), thr)
+        res = compare(t, y, [float(v) for v in a[3].replace(",", " ").split()], step)
+        print(" ".join(f"{k}={v:.4g}" if isinstance(v, float) else f"{k}={v}" for k, v in res.items()))
+        print("ours:", " ".join(f"{yi:.2f}" for yi in y[(t > -20)][:40]))
+        return
     a = sys.argv[1:]
     if len(a) < 2:
         print(__doc__)
