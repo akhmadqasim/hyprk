@@ -124,6 +124,7 @@ int main(int argc, char *argv[])
     engine.addImportPath(resourceDir("ui", FINDER_UI_DIR));   // shared controls and tokens: import HyprK
     engine.addImageProvider(QStringLiteral("icon"), new IconProvider);
     engine.addImageProvider(QStringLiteral("thumb"), new ThumbnailProvider);
+    engine.addImageProvider(QStringLiteral("pdfpage"), new PdfPageProvider);
     engine.addImageProvider(QStringLiteral("sysicon"), new SysIconProvider(iconDir));
     // display.dpr: the window's real device pixel ratio, for FileIcon's texture sizes (QML only has the screen's,
     // which is 2 on a 1.6 output); kept current from the window's frames

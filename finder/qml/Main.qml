@@ -238,7 +238,7 @@ Window {
         Component { id: iconView; IconView { browser: fm; onContextMenu: (e, p) => win.contextMenu(e, p) } }
         Component { id: listView; FileList { browser: fm; onContextMenu: (e, p) => win.contextMenu(e, p) } }
         Component { id: columnView; ColumnView { browser: fm; onContextMenu: (e, p) => win.contextMenu(e, p) } }
-        Component { id: galleryView; GalleryView { browser: fm; onContextMenu: (e, p) => win.contextMenu(e, p) } }
+        Component { id: galleryView; GalleryView { browser: fm; onContextMenu: (e, p) => win.contextMenu(e, p); onTagRequested: anchor => tagPopover.show(anchor) } }
 
 
         PathBar {
@@ -377,6 +377,10 @@ Window {
         menu.items = items;
         menu.x = x;
         menu.y = y;
+        // the menu's left edge on the screen, for its submenus (PopupMenu.showSub): the window's place from
+        // Hyprland; the compositor keeps the menu itself on the screen
+        const me = Hypr.windows().find(w => w.title === win.title);
+        menu.screenLeft = me ? Math.min(me.x + x, Screen.virtualX + Screen.width - menu.width) : NaN;
         menu.open();
     }
     // the View rows (background menu View ▸, the toolbar's collapsed view popup)

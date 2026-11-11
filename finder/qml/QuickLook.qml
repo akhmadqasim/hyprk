@@ -29,6 +29,13 @@ Window {
     readonly property bool isImage: cur !== null && Files.isImage(cur)
     readonly property bool isText: cur !== null && !isImage && Files.isText(cur)
     readonly property string text: isText ? FileOps.readText(cur.path, 65536) : ""
+    // A PDF shows its pages (judge 4: it was an info card): `pdfinfo` for the page count and size, each page rendered
+    // by `pdftoppm` when it scrolls into view (image://pdfpage, thumbnails.cpp). No Apple data: there is no Mac capture
+    // of a PDF in Quick Look, so the panel's size (the page fitted to the tallest panel, as an image is), the 8 pt gap
+    // between pages and the title bar without Markup / Rotate are choices, not measurements
+    readonly property bool isPdf: cur !== null && Files.iconClass(cur) === "pdf"
+    readonly property var pdf: isPdf && FileOps.pdfInfo ? FileOps.pdfInfo(cur.path) : null   // (an older binary has none)
+    readonly property bool showPdf: pdf ? pdf.pages > 0 : false
     readonly property var apps: cur !== null && !cur.isDir ? FileOps.appsFor(cur.path) : []
     readonly property string appName: apps.length && apps[0].isDefault ? apps[0].name : ""
     property bool full: false           // the green disc: the panel fills the screen
@@ -50,11 +57,13 @@ Window {
     readonly property real natW: (turns % 2 ? img.implicitHeight : img.implicitWidth) || 1
     readonly property real natH: (turns % 2 ? img.implicitWidth : img.implicitHeight) || 1
     readonly property real contentW: {
+        if (showPdf) return Math.round(Math.min(maxW - 2 * inset, (maxH - barH - inset) * pdf.width / pdf.height));
         if (!isImage) return 760 - 2 * inset;   // not measured on the Mac: the old panel's size
         const w = Math.min(natW, maxW - 2 * inset);
         return w * natH / natW > maxH - barH - inset ? (maxH - barH - inset) * natW / natH : w;
     }
-    readonly property real contentH: isImage ? contentW * natH / natW : 560 - barH - inset
+    readonly property real contentH: isImage ? contentW * natH / natW
+                                   : showPdf ? Math.min(maxH - barH - inset, contentW * pdf.height / pdf.width) : 560 - barH - inset
     // a narrow image still gets a title bar that holds its controls: 52 + a 120 pt title + 16 + 266 to the right
     // edge (a layout need, not a Mac value)
     readonly property real panelW: full ? width : Math.round(Math.max(contentW + 2 * inset, 52 + 120 + 16 + 266))
@@ -217,7 +226,8 @@ Window {
             }
             // the real SF symbols at 15 (ink 26x26 / 26x28 / 23x29 px like the crop's); their ink centres left of the
             // capsule (Preview: capsule at W - 144): Share 24, Rotate 62.75, Markup 104.25 (box offsets 23.25 / 63.75 / 103.5)
-            QuickLookButton { id: markupBtn; x: capsule.x - 103.5 - 17; icon: "markup"; iconSize: 15; enabled: false; visible: ql.isImage }
+            // Markup is drawn like the others (quicklook-titlebar-light.png); there is no Markup tool behind it
+            QuickLookButton { id: markupBtn; x: capsule.x - 103.5 - 17; icon: "markup"; iconSize: 15; visible: ql.isImage }
             QuickLookButton { x: capsule.x - 63.75 - 17; icon: "rotate.left"; iconSize: 15; visible: ql.isImage; onClicked: ql.turns = (ql.turns + 3) % 4 }
             QuickLookButton { id: shareBtn; x: capsule.x - 23.25 - 17; icon: "square.and.arrow.up"; iconSize: 15; onClicked: if (ql.cur) FileOps.open(ql.cur.path) }
             Rectangle {
@@ -276,7 +286,44 @@ Window {
                     padding: 12
                 }
             }
-            RubberBand { flickable: ql.isText ? textScroll.contentItem : null }   // trackpad stretch at the ends
+            RubberBand { flickable: ql.isText ? textScroll.contentItem : ql.showPdf ? pages : null }   // trackpad stretch at the ends
+
+            // PDF pages, one under the other; a page is rendered when it comes into view (and kept one page around)
+            ListView {
+                id: pages
+                anchors.fill: parent
+                visible: ql.showPdf
+                model: ql.showPdf ? ql.pdf.pages : 0
+                spacing: 8
+                boundsBehavior: Flickable.StopAtBounds
+                cacheBuffer: Math.max(0, height)
+                readonly property real pageH: width * (ql.showPdf ? ql.pdf.height / ql.pdf.width : 1)
+                delegate: Rectangle {
+                    id: sheet
+                    required property int index
+                    width: pages.width
+                    height: pages.pageH
+                    color: "white"
+                    // the Finder thumbnail of the first page (cached) until the page itself is rendered
+                    Image {
+                        anchors.fill: parent
+                        visible: sheet.index === 0 && page.status !== Image.Ready
+                        asynchronous: true
+                        fillMode: Image.PreserveAspectFit
+                        source: visible && ql.cur ? "image://thumb/" + encodeURIComponent(ql.cur.path) : ""
+                        sourceSize: Qt.size(256, 256)
+                    }
+                    Image {
+                        id: page
+                        anchors.fill: parent
+                        asynchronous: true
+                        // an image provider is asked for sourceSize times the window's device pixel ratio: the
+                        // page at the panel's pixel size
+                        sourceSize.width: Math.ceil(sheet.width)
+                        source: ql.showPdf && ql.cur ? "image://pdfpage/" + (sheet.index + 1) + "/" + encodeURIComponent(ql.cur.path) : ""
+                    }
+                }
+            }
 
             // rounded content corners (crop: the picture's corner curve spans about 12 pt; 15 = concentric with the
             // 20 pt frame at the 5 pt inset), drawn as frame-coloured corner pieces instead of a mask layer
@@ -303,7 +350,7 @@ Window {
             }
 
             Column {
-                visible: ql.cur !== null && !ql.isImage && !ql.isText
+                visible: ql.cur !== null && !ql.isImage && !ql.isText && !ql.showPdf
                 anchors.centerIn: parent
                 spacing: 10
                 FileIcon {

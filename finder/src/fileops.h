@@ -53,6 +53,9 @@ public:
     // Creates "<baseName>", "<baseName> 2", ... in dir. Returns the new path or "" on failure.
     Q_INVOKABLE QString makeFolder(const QString &dir, const QString &baseName) const;
     Q_INVOKABLE QString readText(const QString &path, int maxBytes) const;
+    // { pages, width, height (pt, first page) } of a PDF for Quick Look, from `pdfinfo`; pages 0 when it cannot be
+    // read. Blocking (10-20 ms)
+    Q_INVOKABLE QVariantMap pdfInfo(const QString &path) const;
 
     // Context menu (MAC-ANSWERS live/finder/crops/context-menu-*.png). Names follow Finder:
     //   Duplicate  "Notes copy.txt", "Notes copy 2.txt", folder "Photos copy"

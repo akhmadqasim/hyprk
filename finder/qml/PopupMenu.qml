@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Window
 import HyprK
 import QtQuick.Controls.Basic
 import Finder.Native
@@ -41,12 +42,20 @@ Popup {
         subDelay.row = row;
         subDelay.restart();
     }
+    // Where this menu's left edge is on the screen, when the opener knows it (Main.qml asks Hyprland for the window's
+    // place: a Wayland popup cannot see its own). A submenu that would cross the screen's right edge opens to the
+    // left of its menu instead, as AppKit does (the compositor would only slide it over the menu). Not measured on
+    // the Mac: the same 5 pt overlap is assumed on that side
+    property real screenLeft: NaN
     function showSub(row, list) {
         sub.active = true;
         const m = sub.item;
         m.parent = row;
         m.items = list;
-        m.x = row.width + root.padding - 5;
+        const known = !isNaN(root.screenLeft);
+        const fits = !known || root.screenLeft + root.width - 5 + m.width <= Screen.virtualX + Screen.width;
+        m.x = fits ? row.width + root.padding - 5 : 5 - root.padding - m.width;
+        m.screenLeft = known ? root.screenLeft + (fits ? root.width - 5 : 5 - m.width) : NaN;
         m.y = -root.padding;
         m.open();
     }

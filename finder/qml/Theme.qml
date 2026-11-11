@@ -103,7 +103,9 @@ QtObject {
         // rename field: the selected base name (186,214,251) (Q-finder-27)
         readonly property color textSelection: blueAccent && !theme.dark ? "#BAD6FB" : Accent.selectedText
 
-        readonly property color window: Tokens.windowBackground
+        // the content background. Dark: (31,31,37) in every view's 27.2.1 shot (icons / list / columns / gallery-dark.png,
+        // over TahoeDark, as the sidebar's measured colour); the shared token's 30 grey is not measured
+        readonly property color window: theme.dark ? Qt.rgba(31 / 255, 31 / 255, 37 / 255, 1) : Tokens.windowBackground
         // sidebar (Q-finder-03/07/08/09): fill, text, headers, icons; a = key window, i = inactive
         // key window: + the chameleon layer (5 % light colour blend); the inactive sidebar is flat. Dark: the measured
         // (36,38,55) already holds the wallpaper's tint: over TahoeDark the Mac shows (36,37,53) active (list-dark.png)

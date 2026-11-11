@@ -333,6 +333,31 @@ QString FileOps::readText(const QString &path, int maxBytes) const
     return QString::fromUtf8(f.read(maxBytes));
 }
 
+QVariantMap FileOps::pdfInfo(const QString &path) const
+{
+    QVariantMap out{{QStringLiteral("pages"), 0}, {QStringLiteral("width"), 612.0}, {QStringLiteral("height"), 792.0}};
+    QProcess p;
+    p.start(QStringLiteral("pdfinfo"), {path});
+    if (!p.waitForFinished(5000) || p.exitStatus() != QProcess::NormalExit || p.exitCode() != 0)
+        return out;
+    for (const QByteArray &line : p.readAllStandardOutput().split('\n')) {
+        if (line.startsWith("Pages:")) {
+            out[QStringLiteral("pages")] = line.mid(6).trimmed().toInt();
+        } else if (line.startsWith("Page size:")) {          // "Page size:      595.276 x 841.89 pts (A4)"
+            const QList<QByteArray> f = line.mid(10).simplified().split(' ');
+            if (f.size() >= 3 && f[0].toDouble() > 0 && f[2].toDouble() > 0) {
+                out[QStringLiteral("width")] = f[0].toDouble();
+                out[QStringLiteral("height")] = f[2].toDouble();
+            }
+        } else if (line.startsWith("Page rot:") && line.mid(9).trimmed().toInt() % 180 != 0) {
+            out[QStringLiteral("rotated")] = true;
+        }
+    }
+    if (out.value(QStringLiteral("rotated")).toBool())      // a quarter-turned page is drawn turned
+        std::swap(out[QStringLiteral("width")], out[QStringLiteral("height")]);
+    return out;
+}
+
 void FileOps::listAsync(const QString &location, int token)
 {
     // m_pool is drained in the destructor, so `this` outlives every task.

@@ -191,6 +191,16 @@ Item {
     // preview column: the preview (219 wide), name, kind and size, Information rows
     Component {
         id: previewColumn
+        Item {
+        // the action bar at the column's bottom, a hairline above it (columns-dark.png: 461-532 pt, Markup and More...)
+        PreviewBar {
+            anchors.bottom: parent.bottom
+            width: parent.width
+            z: 1
+            line: true
+            entry: root.previewEntry
+            onMore: pos => { if (root.previewEntry) root.contextMenu(root.previewEntry, pos); }
+        }
         Column {
             readonly property var entry: root.previewEntry
             leftPadding: 10
@@ -220,6 +230,7 @@ Item {
                 width: Theme.columns.previewImage
                 entry: parent.entry
             }
+        }
         }
     }
 }

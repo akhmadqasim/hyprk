@@ -19,3 +19,15 @@ public:
 private:
     QThreadPool m_pool;
 };
+
+// image://pdfpage/<page, from 1>/<url-encoded absolute path>: one PDF page for Quick Look, rendered by `pdftoppm`
+// (no Qt PDF module here) at the requested width in pixels (Qt asks for the Image's sourceSize times the window's
+// device pixel ratio), off the UI thread. One page per request, so a long document costs nothing until it is scrolled.
+class PdfPageProvider : public QQuickAsyncImageProvider {
+public:
+    PdfPageProvider();
+    QQuickImageResponse *requestImageResponse(const QString &id, const QSize &requestedSize) override;
+
+private:
+    QThreadPool m_pool;
+};

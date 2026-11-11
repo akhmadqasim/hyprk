@@ -140,6 +140,49 @@ private:
 
 } // namespace
 
+namespace {
+
+class PageResponse : public QQuickImageResponse, public QRunnable {
+public:
+    PageResponse(QString path, int page, int width) : m_path(std::move(path)), m_page(page), m_width(width) { setAutoDelete(false); }
+    QQuickTextureFactory *textureFactory() const override { return QQuickTextureFactory::textureFactoryForImage(m_image); }
+    QString errorString() const override { return m_image.isNull() ? QStringLiteral("no page") : QString(); }
+    void run() override
+    {
+        // PNG on stdout (no output root); the height follows the page's aspect ratio
+        QProcess p;
+        const QString n = QString::number(m_page);
+        p.start(QStringLiteral("pdftoppm"), {QStringLiteral("-png"), QStringLiteral("-f"), n, QStringLiteral("-l"), n,
+                                             QStringLiteral("-scale-to-x"), QString::number(m_width),
+                                             QStringLiteral("-scale-to-y"), QStringLiteral("-1"), m_path});
+        if (p.waitForFinished(30000) && p.exitStatus() == QProcess::NormalExit && p.exitCode() == 0)
+            m_image.loadFromData(p.readAllStandardOutput(), "PNG");
+        emit finished();
+    }
+
+private:
+    QString m_path;
+    int m_page;
+    int m_width;
+    QImage m_image;
+};
+
+} // namespace
+
+PdfPageProvider::PdfPageProvider()
+{
+    m_pool.setMaxThreadCount(2);
+}
+
+QQuickImageResponse *PdfPageProvider::requestImageResponse(const QString &id, const QSize &requestedSize)
+{
+    const qsizetype slash = id.indexOf(QLatin1Char('/'));
+    const int width = std::clamp(requestedSize.width() > 0 ? requestedSize.width() : 1200, 64, 4096);
+    auto *r = new PageResponse(QUrl::fromPercentEncoding(id.mid(slash + 1).toUtf8()), std::max(1, id.left(slash).toInt()), width);
+    m_pool.start(r);
+    return r;
+}
+
 ThumbnailProvider::ThumbnailProvider()
 {
     m_pool.setMaxThreadCount(std::max(2, QThread::idealThreadCount() / 2));

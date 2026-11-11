@@ -10,6 +10,7 @@ Item {
 
     required property var browser
     signal contextMenu(var entry, point pos)
+    signal tagRequested(Item anchor)
     readonly property int columns: 1
 
     function ensureVisible(i) { strip.positionViewAtIndex(i, ListView.Contain); }
@@ -135,22 +136,92 @@ Item {
                     }
                 }
             }
-            Item { width: 1; height: 14 }
-            InfoRows {
+            // gallery-dark.png, pane rows from the toolbar's bottom line: Information centre 96.5, rows from 107.5,
+            // Tags centre 198, the token field 211-243.5 (the icon row above ends at 72)
+            Column {
                 width: parent.width
-                entry: root.focused
+                topPadding: 85.5 - 72 - 6
+                InfoRows {
+                    width: parent.width
+                    entry: root.focused
+                }
+                Item { width: 1; height: 10.5 }
+                TextLabel {
+                    height: 22
+                    verticalAlignment: Text.AlignVCenter
+                    text: "Tags"
+                    size: Theme.font.preview
+                    weight: Typography.semibold
+                }
+                Item { width: 1; height: 2 }
+                // the tag field: the content background, 32.5 pt high; each tag a 14 pt token in its colour (fill
+                // at 0.27 dark / 0.13 light, dashed rim 0.47 / 0.24), then "Add Tag" in (53,120,246). A file without
+                // tags was not captured: the field then holds "Add Tag" alone
+                Rectangle {
+                    id: tagField
+                    width: parent.width
+                    height: 32.5
+                    color: Theme.color.window
+                    Row {
+                        x: 1
+                        y: 2
+                        spacing: 4
+                        Repeater {
+                            model: root.focused && root.focused.tags ? root.focused.tags : []
+                            Item {
+                                id: token
+                                required property string modelData
+                                readonly property color tag: Theme.color.tagColors[modelData] || Theme.color.secondaryLabel
+                                width: tokenText.implicitWidth + 9
+                                height: 14
+                                Rectangle {
+                                    anchors.fill: parent
+                                    radius: 3
+                                    color: Qt.rgba(token.tag.r, token.tag.g, token.tag.b, Theme.dark ? 0.27 : 0.13)
+                                }
+                                Canvas {      // the dashed rim (a Rectangle border cannot dash)
+                                    anchors.fill: parent
+                                    readonly property color ink: Qt.rgba(token.tag.r, token.tag.g, token.tag.b, Theme.dark ? 0.47 : 0.24)
+                                    onInkChanged: requestPaint()
+                                    onPaint: {
+                                        const ctx = getContext("2d");
+                                        ctx.clearRect(0, 0, width, height);
+                                        ctx.strokeStyle = ink;
+                                        ctx.lineWidth = 1;
+                                        ctx.setLineDash([2, 1.5]);
+                                        ctx.beginPath();
+                                        ctx.roundedRect(0.5, 0.5, width - 1, height - 1, 3, 3);
+                                        ctx.stroke();
+                                    }
+                                }
+                                TextLabel {
+                                    id: tokenText
+                                    anchors.centerIn: parent
+                                    text: token.modelData
+                                    size: Theme.font.small
+                                }
+                            }
+                        }
+                        Item { width: 2; height: 1 }
+                        TextLabel {
+                            id: addTag
+                            height: 14
+                            verticalAlignment: Text.AlignVCenter
+                            text: "Add Tag"
+                            color: Qt.rgba(53 / 255, 120 / 255, 246 / 255, 1)
+                            size: Theme.font.small
+                            TapHandler { onTapped: root.tagRequested(addTag) }
+                        }
+                    }
+                }
             }
-            Item { width: 1; height: 10 }
-            TextLabel {
-                visible: tagLine.visible
-                text: "Tags"
-                size: Theme.font.preview
-                weight: Typography.semibold
-            }
-            TagDots {
-                id: tagLine
-                tags: root.focused && root.focused.tags ? root.focused.tags : []
-            }
+        }
+
+        PreviewBar {
+            anchors.bottom: parent.bottom
+            width: parent.width
+            entry: root.focused
+            onMore: pos => { if (root.focused) root.contextMenu(root.focused, pos); }
         }
     }
 }
