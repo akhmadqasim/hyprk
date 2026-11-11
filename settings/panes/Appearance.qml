@@ -125,8 +125,13 @@ Column {
                 Item { // preview: an article scrolling under glass toolbar capsules (Q-settings-26: a scroll view 268 x 180)
                     id: glassPreview
                     width: 268; height: 180
-                    // the Mac draws the preview's capsules with the stored value only (it changes once on mouse-up)
-                    readonly property real tint: AppState.appearance.glass
+                    // the capsules follow the slider while it is dragged, the stored value otherwise. The 23.09.23
+                    // recording (dark, 60 fps): the Search capsule over the pond darkens frame by frame with the knob
+                    // (93,129,106 at 0.5 -> 66,82,75 at 1, frames 2529-2640, the knob held) and jumps in one frame when a
+                    // click sets the value (frame 2786) while the knob still slides. Before: the stored value only,
+                    // which NSGlassTintAmount gets on mouse-up
+                    property real dragTint: -1
+                    readonly property real tint: dragTint >= 0 ? dragTint : AppState.appearance.glass
                     // rounded corners for the scrolling article (Rectangle.clip only clips to the bounding box)
                     layer.enabled: true
                     layer.effect: MultiEffect {
@@ -291,7 +296,9 @@ Column {
                     leftIcon: glassClear; rightIcon: glassTinted
                     endStep: 0.1
                     tickMarks: 3
-                    onCommitted: v => AppState.set("appearance", { glass: Math.round(v * 1000) / 1000 })
+                    onMoved: v => glassPreview.dragTint = v
+                    onReleased: Qt.callLater(() => glassPreview.dragTint = -1)
+                    onCommitted: v => { AppState.set("appearance", { glass: Math.round(v * 1000) / 1000 }); glassPreview.dragTint = -1; }
                 }
             }
         }
