@@ -30,7 +30,9 @@ Column {
         }
         FormRow {
             label: "Prefer non-blinking cursor"; dim: !page.ctl.hasGsettings
-            sublabel: page.ctl.hasGsettings ? "The insertion point stops blinking in GTK and GNOME apps." : "Needs gsettings (GNOME settings) to reach apps."
+            sublabel: !page.ctl.hasGsettings ? "Needs gsettings (GNOME settings) to reach apps."
+                    : Backend.realSession ? "The insertion point stops blinking in GTK and GNOME apps."
+                    : "Saved. It reaches GTK and GNOME apps when hyprk is your session."
             Switch { enabled: page.ctl.hasGsettings; checked: page.ctl.a.nonBlinkingCursor; onToggled: on => page.ctl.setNonBlinkingCursor(on) }
         }
         FormRow {

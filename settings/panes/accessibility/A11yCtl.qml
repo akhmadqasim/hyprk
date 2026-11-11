@@ -58,10 +58,11 @@ QtObject {
     }
     function speak(text) { Backend.run([scripts + "a11y-speak.sh", "say", text]); }
 
-    // GTK/GNOME setting shared with the host desktop: only written on an explicit change.
+    // GTK/GNOME setting of the desktop: written on an explicit change, and only when hyprk is the session
+    // (Backend.runHost); elsewhere (nested preview, standalone window on GNOME) only hyprk's own state changes.
     function setNonBlinkingCursor(on) {
         AppState.set("accessibility", { nonBlinkingCursor: on });
-        Backend.run(["gsettings", "set", "org.gnome.desktop.interface", "cursor-blink", on ? "false" : "true"]);
+        Backend.runHost(["gsettings", "set", "org.gnome.desktop.interface", "cursor-blink", on ? "false" : "true"]);
     }
 
     Component.onCompleted: {

@@ -31,6 +31,16 @@ QtObject {
     // $HYPRK_STATE (the shell reads the same folder); without it (plain `qml`, no env access) the checkout's state/
     readonly property string stateDir: (_info && _info.stateDir) || root + "/state"
 
+    // True only when hyprk is the login session (QsInfo.realSession). Settings of the HOST desktop (gsettings / dconf)
+    // are written only then: in a nested preview on a GNOME host, or a standalone settings/run.sh, such a write would
+    // change the user's real desktop. hyprk's own state ($HYPRK_STATE) is written either way.
+    readonly property bool realSession: _info ? _info.realSession : false
+    // A write to the host desktop's settings: runs only in the real session; cb(code, out), 0 without running otherwise
+    function runHost(argv, cb) {
+        if (realSession) run(argv, cb);
+        else { console.log("hyprk settings: host setting not written outside the hyprk session:", argv.join(" ")); if (cb) Qt.callLater(cb, 0, ""); }
+    }
+
     // cb(code, stdout). code 127 = not supported / not installed.
     function run(argv, cb) {
         if (!canRun) { if (cb) Qt.callLater(cb, 127, ""); return; }
@@ -49,7 +59,11 @@ QtObject {
     // (127 = can't run). Returns the process (destroyed with `owner`) or null.
     function stream(owner, argv, onLine, onEnd) {
         if (!canRun) { if (onEnd) Qt.callLater(onEnd, 127); return null; }
-        const p = _stream.createObject(owner, { command: argv });
+        // The child gets SIGTERM when Settings dies, also from SIGKILL (Quickshell only kills its processes on a clean
+        // exit; `nmcli monitor` and `pw-mon` stayed behind): setpriv sets PR_SET_PDEATHSIG and execs the command in
+        // the same process. Without setpriv (util-linux) the command runs as before; sh exits 127 for a missing one.
+        const p = _stream.createObject(owner, { command: ["sh", "-c",
+            'command -v setpriv >/dev/null 2>&1 && exec setpriv --pdeathsig TERM "$@"; exec "$@"', "sh"].concat(argv) });
         p.line.connect(onLine);
         if (onEnd) p.ended.connect(onEnd);
         return p;
