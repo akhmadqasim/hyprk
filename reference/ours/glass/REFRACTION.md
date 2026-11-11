@@ -108,6 +108,29 @@ sharp stripes, and the tiles read a fitted `underlay_blur` (2.05) composed into 
 - The phase of the stripes against the tile edge differs between the Mac crop and our screen, so row rms against the crop is
   phase-dominated on screen (4.2 before, 4.9 after); band positions and ripple amplitude are the phase-free measures above.
 
+## Rounded-end ripple (judge #3 gap 15, 2026-11-11)
+
+Judge #3 read the CC tiles' rounded ends at ±4-6 levels vs the Mac's ±3-4. Most of that was stripe phase: re-measured with the
+wallpaper's stripes at the Mac crop's phase (black from 4.5 px left of the tile edge, the phase the Mac's gap row fits; MBA 2x,
+dark, Display tile left end, rows 58..72 px of the tile = 15 rows above its slider, depth 2..28 pt), ours was 103..115, peak to
+peak 12.0, vs the Mac's 105.6..115, 9.3: the troughs too deep by 2.6 levels. Cause: the panel blur's ramp. Beyond the lens the
+tile reads straight down, and in the lens it reads up to 80 pt inside, both within the ramp; our gap row there had 90 where the
+Mac has 96 (second trough, 15 pt in). A single linear ramp cannot give the Mac's gap row (sharp first stripe, full blur from the
+third) and the tile end together (best: gap 2.0 / tile 1.4 or gap 3.6 / tile 1.1), so the ramp now has a knee: 0 at 54 pt
+outside the tiles, 0.15 x the radius at 36 pt in from there, full at 72 pt (fitted, 4 parameters, not decoded; the shader's
+BlurOpacity0..2 carry it, no new code). Model (check_model's port of the tile row over the ramped panel row) and screen:
+
+| MBA 2x, dark, 4 pt stripes at the Mac's phase | Mac | before (44.8 / 72 linear) | after (54 / 36 @ 0.15 / 72) |
+|---|---|---|---|
+| Display tile left end, peak to peak / min / max | 9.3 / 105.6 / 115 | 12.0 / 103 / 115 | **9.0 / 105 / 114** |
+| same, mean row rms vs the Mac crop / bias | | 1.34 / -1.09 | 1.16 / -0.96 |
+| gap row where it leaves the tile column, rms over 140 px | | 2.28 | 2.27 |
+| gap interior peak to peak / mean (x 1015..1235 pt) | 32 / 114.8 | 31 / 114.6 | 31 / 114.6 |
+| Display tile 8 / 15 pt below its top | 7.9 at 15 | 8 / 8 | 8 / 8 |
+| right end troughs | | 103 | 104 |
+
+The panel box grows from 44.8 to 54 pt outside the tiles (a few more pixels redrawn while the CC changes; nothing at rest).
+
 ## Other glass checks (same session)
 
 - **Finder context menu (plugin `popup_classes`):** before, the client's translucent tint over Hyprland's popup blur; after,

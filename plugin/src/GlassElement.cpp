@@ -501,10 +501,13 @@ void main() {
     }
 
     // Control Center panel blur (panel_blur): the box of the layer's shapes grown by PANEL_OUT, its blur radius ramping from 0
-    // at that edge to the full radius PANEL_RAMP inside (linear in radius, as Apple's BlurOpacity). Both fitted to the Mac's
-    // gap row over 4 pt stripes where it leaves the tile column (C2 cc-real-stripes, 140 px: rms 2.8 levels, 11.2 without
-    // the ramp); the radius itself to the gap between the tiles (rms 0.47). REFRACTION.md "Panel blur".
-    constexpr double PANEL_OUT = 44.8, PANEL_RAMP = 72.0;
+    // at that edge to PANEL_KNEE_OPACITY of the full radius PANEL_KNEE inside and to the full radius PANEL_RAMP inside
+    // (piecewise linear in radius, as Apple's BlurOpacity). All four fitted, not decoded: together to the Mac's gap row over
+    // 4 pt stripes where it leaves the tile column (C2 cc-real-stripes, 140 px: rms 2.31 levels, the single linear ramp
+    // 44.8 / 72 had 2.33) and to the Display tile's rounded end, which reads that blur through its lens (rows 58..72, depth
+    // 2..28 pt: rms 1.54 -> 1.23, peak to peak 12.9 -> 10.4, Mac 9.3); the radius itself to the gap between the tiles (rms
+    // 0.47). REFRACTION.md "Panel blur".
+    constexpr double PANEL_OUT = 54.0, PANEL_RAMP = 72.0, PANEL_KNEE = 36.0, PANEL_KNEE_OPACITY = 0.15;
 
     static SRect panelBoxOf(const CGlassElement::SData& data) {
         double x1 = 1e9, y1 = 1e9, x2 = -1e9, y2 = -1e9;
@@ -917,9 +920,11 @@ void main() {
         glUniform1f(u.underlay, 0.f);
         glUniform1f(u.refraction, 0.f);
         glUniform1f(u.refractionHeight, 1.f);
-        // opacity 0 at d = -1 pt (the quad's edge) to 1 at PANEL_RAMP inside it
-        glUniform2f(u.blurDist, -float(PANEL_RAMP + 1) * scale, -1.f * scale);
-        glUniform3f(u.blurAlpha, 1.f, 0.f, 0.f);
+        // opacity 0 at d = -1 pt (the quad's edge), PANEL_KNEE_OPACITY at PANEL_KNEE inside it, 1 at PANEL_RAMP inside it:
+        // BlurOpacity0..2 = 1, knee, -knee / PANEL_KNEE over BlurDistance0, 1 = -(PANEL_RAMP + 1), -(PANEL_KNEE + 1) pt (the
+        // last segment runs to d = 0, 1 pt past the quad's edge, where it would reach -knee / PANEL_KNEE; it is 0 at the edge)
+        glUniform2f(u.blurDist, -float(PANEL_RAMP + 1) * scale, -float(PANEL_KNEE + 1) * scale);
+        glUniform3f(u.blurAlpha, 1.f, float(PANEL_KNEE_OPACITY), float(-PANEL_KNEE_OPACITY / PANEL_KNEE));
         glUniform1f(u.outerOpacity, 0.f);
         glUniform1f(u.outerAmount, 0.f);
         glUniform1f(u.outerHeight, 0.f);
