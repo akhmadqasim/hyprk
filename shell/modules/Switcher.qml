@@ -6,6 +6,7 @@ import qs
 import qs.components
 import qs.HyprK
 import qs.services
+import "../lib/dock.js" as DockLayout
 
 // Cmd/Super+Tab app switcher: row of large icons on glass, one per running
 // app. Tab / Shift+Tab cycle while Super is held, releasing Super switches.
@@ -22,12 +23,9 @@ ShellWindow {
     readonly property bool shown: Panels.open === "switcher"
     // one entry per running app, most recently focused first is not tracked by Hyprland IPC,
     // so keep the active app first and the rest in dock order
-    readonly property var liveApps: {
-        const running = Apps.dockItems.filter(i => (i.windows || []).length > 0);
-        const activeIdx = running.findIndex(i => i.windows.indexOf(Hyprland.activeToplevel) !== -1);
-        if (activeIdx > 0) running.unshift(running.splice(activeIdx, 1)[0]);
-        return running;
-    }
+    // Finder always, first while the desktop has the keyboard (lib/dock.js switcherApps)
+    readonly property var liveApps: DockLayout.switcherApps(Apps.dockItems, Apps.desktopFocus !== "",
+                                                            i => (i.windows || []).indexOf(Hyprland.activeToplevel) !== -1)
     // frozen while dematerializing, so the row does not reorder when the chosen app takes focus
     property var apps: []
     Binding on apps { value: sw.liveApps; when: sw.shown; restoreMode: Binding.RestoreNone }
@@ -94,7 +92,7 @@ ShellWindow {
     // Its last app quit: nothing left to switch to, so it closes (present() rule)
     function quit() {
         const app = apps[selected];
-        if (!app) return;
+        if (!app || app.id === "hyprk-finder") return;   // Finder has no Quit (dock-menus.json "Finder")
         (app.windows || []).forEach(Apps.closeWindow);
     }
     onLiveAppsChanged: if (shown && selected >= liveApps.length) selected = Math.max(0, liveApps.length - 1)
@@ -115,7 +113,8 @@ ShellWindow {
         const app = apps[selected];
         Panels.close();
         if (app && Apps.isHidden(app.windows)) Apps.showWindows(app.windows, true);
-        else if (app) Apps.focusWindow(app.windows[0]);
+        else if (app && (app.windows || []).length > 0) Apps.focusWindow(app.windows[0]);
+        else if (app && app.id === "hyprk-finder") Apps.activateDesktop();   // windowless Finder: the desktop
     }
 
     Item {

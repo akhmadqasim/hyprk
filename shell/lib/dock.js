@@ -321,3 +321,14 @@ function pushRecent(recent, item, max) {
 function labelWidth(textWidth) {
     return Math.max(41, Math.min(600, textWidth) + 28);
 }
+
+// ---------- Cmd-Tab ----------
+// The switcher's apps: every Dock item with a window, plus Finder always (its Dock dot never goes, the desktop is
+// Finder's: cmdtab-light.png lists it with no Finder window); the frontmost first (Finder while the desktop has the
+// keyboard), the rest in Dock order. `isActive(item)` tells whether the item owns the focused window.
+function switcherApps(items, desktopFocused, isActive) {
+    const running = items.filter(i => (i.windows || []).length > 0 || i.id === "hyprk-finder");
+    const front = desktopFocused ? running.findIndex(i => i.id === "hyprk-finder") : running.findIndex(isActive);
+    if (front > 0) running.unshift(running.splice(front, 1)[0]);
+    return running;
+}

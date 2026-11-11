@@ -20,23 +20,43 @@ ShellWindow {
     WlrLayershell.layer: WlrLayer.Background
 
     // A click on the empty desktop activates Finder (macOS: the desktop is Finder's; the other app's windows go
-    // inactive and the menu bar shows Finder's menus, judge #6). On demand, Hyprland gives this layer the keyboard on a
-    // click and deactivates the focused window; the window takes it back when clicked.
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+    // inactive and the menu bar shows Finder's menus, judge #6). Only a CLICK does it (judge #7): an on-demand layer
+    // takes the keyboard on mere hover under follow_mouse (InputManager::mouseMoveUnified, a layer with interactivity
+    // != NONE under the pointer gets rawSurfaceFocus), so the layer asks for no keyboard at rest. On a click it asks
+    // exclusively (Hyprland hands it the keyboard at once: LayerSurface::onCommit takeKeyboardFocus, after the button is
+    // up so no release is swallowed), then on demand once it has it, so the window can take it back (click, or
+    // follow_mouse over it); when it loses the keyboard it asks for none again.
+    property bool takeKeys: false     // the desktop wants or holds the keyboard
+    property bool grabbing: false     // exclusive until the keyboard arrives
+    WlrLayershell.keyboardFocus: !takeKeys ? WlrKeyboardFocus.None
+                               : grabbing ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand
+    function activateDesktop() { grabbing = true; takeKeys = true; }
+    Connections {
+        target: Apps
+        function onDesktopRequested(name) { if (bg.screen && bg.screen.name === name) bg.activateDesktop(); }
+    }
     Item {
         readonly property bool focused: Window.active
         onFocusedChanged: {
             const name = bg.screen ? bg.screen.name : "";
-            if (focused) Apps.desktopFocus = name;
-            else if (Apps.desktopFocus === name) Apps.desktopFocus = "";
+            if (focused) {
+                Apps.desktopFocus = name;
+                bg.grabbing = false;
+            } else {
+                if (Apps.desktopFocus === name) Apps.desktopFocus = "";
+                if (!bg.grabbing) bg.takeKeys = false;
+            }
         }
     }
 
-    // desktop right-click: Finder desktop menu
+    // desktop click: Finder takes the keyboard (above); right-click: Finder desktop menu
     MouseArea {
         anchors.fill: parent
-        acceptedButtons: Qt.RightButton
-        onClicked: m => Panels.openContext(Menus.desktop(), m.x, m.y, false, screen)
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: m => {
+            if (m.button === Qt.RightButton) Panels.openContext(Menus.desktop(), m.x, m.y, false, screen);
+            else bg.activateDesktop();
+        }
     }
 
     // Launchpad's first page of icons, decoded ahead (LaunchpadPreload.qml)

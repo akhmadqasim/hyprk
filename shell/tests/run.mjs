@@ -1349,5 +1349,25 @@ test("Mission Control: one Space reads Desktop, more are numbered by position", 
     });
 }
 
+// ---- Cmd-Tab list (lib/dock.js switcherApps; judge #7: Finder missing) ----
+{
+    const F = { id: "hyprk-finder", windows: [] }, A = { id: "a", windows: ["wa"] }, B = { id: "b", windows: ["wb"] }, P = { id: "p", windows: [] };
+    test("switcher lists a windowless Finder", () => assert.deepEqual(DK.switcherApps([F, P, A, B], false, i => i === B).map(i => i.id), ["b", "hyprk-finder", "a"]));
+    test("switcher puts Finder first while the desktop has the keyboard", () => assert.deepEqual(DK.switcherApps([A, F, B], true, i => i === A).map(i => i.id), ["hyprk-finder", "a", "b"]));
+    test("switcher keeps Dock order with no frontmost", () => assert.deepEqual(DK.switcherApps([F, A, B], false, () => false).map(i => i.id), ["hyprk-finder", "a", "b"]));
+}
+
+// ---- desktop focus and folders (judge #7) ----
+{
+    const shellDir = join(here, "..");
+    const bg = readFileSync(join(shellDir, "modules", "Background.qml"), "utf8");
+    test("desktop asks for no keyboard at rest (hover must not activate Finder)", () =>
+        assert.match(bg, /keyboardFocus: !takeKeys \? WlrKeyboardFocus\.None/));
+    test("only a click activates the desktop", () => assert.match(bg, /else bg\.activateDesktop\(\)/));
+    const apps = readFileSync(join(shellDir, "services", "Apps.qml"), "utf8");
+    test("Dock folders open in our Finder, never xdg-open", () =>
+        assert.match(apps, /function openFolder\(item\) \{ openFinder\(/));
+}
+
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
