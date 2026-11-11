@@ -23,20 +23,35 @@ Popup {
 
     property var items: []
     signal chose()   // a row ran its action (a submenu closes its parent through this)
-    onClosed: if (sub.item) sub.item.close()
+    onClosed: closeSub()
     Loader { id: sub; active: false; source: "PopupMenu.qml" }
     Connections { target: sub.item; function onChose() { root.chose(); root.close(); } }
+    // Q-menubar-23 (Finder's context menus behave the same, Q-finder-24): the submenu appears about 0.22 s after its row
+    // highlights, whole in one frame; it overlaps the menu by 5 pt (x = the menu's right edge - 5) and its first row lines
+    // up with the hovered row (y = row top - 5); another row closes it in the same frame
+    Timer {
+        id: subDelay
+        interval: 220
+        property Item row
+        onTriggered: if (row) root.showSub(row, row.modelData.submenu)
+    }
     function openSub(row, list) {
+        if (sub.item && sub.item.opened && sub.item.items === list) return;
+        closeSub();
+        subDelay.row = row;
+        subDelay.restart();
+    }
+    function showSub(row, list) {
         sub.active = true;
         const m = sub.item;
-        if (m.opened && m.items === list) return;
         m.parent = row;
         m.items = list;
-        m.x = row.width + root.padding - 1;
+        m.x = row.width + root.padding - 5;
         m.y = -root.padding;
         m.open();
     }
-    function closeSub() { if (sub.item) sub.item.close(); }
+    readonly property Item subRow: sub.item && sub.item.opened ? sub.item.parent : null
+    function closeSub() { subDelay.stop(); if (sub.item) sub.item.close(); }
 
     padding: 5
     // the widest row's own width (a Column sizes to its rows' widths, which follow the menu's: circular)
@@ -72,6 +87,8 @@ Popup {
                 width: root.width - 2 * root.padding
                 height: sep ? 11 : tagRow ? 30 : 24
                 readonly property bool hasSub: !!modelData.submenu
+                // highlighted while hovered, and while its submenu is open (the pointer in the submenu leaves this row)
+                readonly property bool lit: hover.hovered || root.subRow === it
                 implicitWidth: !plain ? 0 : label.x + label.implicitWidth + shortcutText.implicitWidth + (hasSub ? 40 : 0) + 53
 
                 Rectangle {
@@ -82,7 +99,7 @@ Popup {
                     color: Theme.color.separator
                 }
                 Rectangle {
-                    visible: it.plain && it.on && hover.hovered
+                    visible: it.plain && it.on && it.lit
                     anchors.fill: parent
                     radius: 7
                     color: Theme.color.accent
@@ -92,7 +109,7 @@ Popup {
                     x: 8
                     anchors.verticalCenter: parent.verticalCenter
                     text: "✓"
-                    color: hover.hovered ? "white" : Theme.color.label
+                    color: it.lit ? "white" : Theme.color.label
                     font: Typography.body
                 }
                 Symbol {   // leading symbol: 10.4 pt (ink of trash / share / gearshape 20x23 / 18x23 / 22x22 px in
@@ -104,7 +121,7 @@ Popup {
                     weight: "medium"
                     anchors.verticalCenter: parent.verticalCenter
                     name: it.modelData.icon || ""
-                    color: !it.on ? Theme.color.tertiaryLabel : hover.hovered ? "white" : Theme.color.label
+                    color: !it.on ? Theme.color.tertiaryLabel : it.lit ? "white" : Theme.color.label
                 }
                 Symbol {
                     visible: it.plain && it.hasSub
@@ -113,7 +130,7 @@ Popup {
                     anchors.verticalCenter: parent.verticalCenter
                     size: 13
                     name: visible ? "chevron.right" : ""
-                    color: !it.on ? Theme.color.tertiaryLabel : hover.hovered ? "white" : Theme.color.label
+                    color: !it.on ? Theme.color.tertiaryLabel : it.lit ? "white" : Theme.color.label
                 }
                 Text {
                     id: label
@@ -121,7 +138,7 @@ Popup {
                     x: it.modelData.icon ? 34 : root.hasChecks ? 23 : 11
                     anchors.verticalCenter: parent.verticalCenter
                     text: it.modelData.text || ""
-                    color: !it.on ? Theme.color.tertiaryLabel : hover.hovered ? "white" : Theme.color.label
+                    color: !it.on ? Theme.color.tertiaryLabel : it.lit ? "white" : Theme.color.label
                     font: Typography.body
                 }
                 Text {
@@ -131,7 +148,7 @@ Popup {
                     anchors.rightMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
                     text: it.modelData.shortcut || ""
-                    color: hover.hovered && it.on ? "white" : Theme.color.secondaryLabel
+                    color: it.lit && it.on ? "white" : Theme.color.secondaryLabel
                     font: Typography.body
                 }
                 HoverHandler {
