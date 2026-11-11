@@ -39,7 +39,8 @@ Popup {
     function closeSub() { if (sub.item) sub.item.close(); }
 
     padding: 5
-    width: Math.max(200, list.implicitWidth + 2 * padding)
+    // the widest row's own width (a Column sizes to its rows' widths, which follow the menu's: circular)
+    width: Math.max(200, list.rowsWidth + 2 * padding)
     implicitHeight: list.implicitHeight + 2 * padding
     modal: false
     focus: true
@@ -58,6 +59,7 @@ Popup {
 
     contentItem: Column {
         id: list
+        readonly property real rowsWidth: { let w = 0; for (const c of children) w = Math.max(w, c.implicitWidth || 0); return w; }
         Repeater {
             model: root.items
             Item {
