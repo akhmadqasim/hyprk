@@ -402,7 +402,17 @@ namespace lg {
         data.resolved.clear();
         for (const auto& g : data.groups) {
             const auto& lead = data.shapes[g.lead].box;
-            data.resolved.push_back(resolveMaterial(*data.recipe, std::min(lead.w, lead.h)));
+            const double D   = std::min(lead.w, lead.h);
+            auto         res = resolveMaterial(*data.recipe, D);
+            // shadow marker (SGlassShape::regularShadow): Regular's shadow for this size instead of the layer's
+            if (data.shapes[g.lead].regularShadow && hasShadow(*data.recipe)) {
+                const auto reg        = resolveMaterial(recipeByName("regular"), D);
+                res.shadowOpacity     = reg.shadowOpacity;
+                res.shadowOpacityDark = reg.shadowOpacityDark;
+                res.shadowRadius      = reg.shadowRadius;
+                res.shadowOffsetY     = reg.shadowOffsetY;
+            }
+            data.resolved.push_back(res);
         }
     }
 
@@ -637,7 +647,6 @@ namespace lg {
         glUniform1f(u.aberration, p.aberration * scale);
         glUniform1f(u.pxPerPt, scale);
         glUniform2f(u.highlight, p.highlight, r.diffuse);
-        glUniform2f(u.shadowOffset, 0.f, r.shadowOffsetY * scale);
         glUniform1f(u.shadowTint, p.shadowTint);
         glUniform1f(u.shadowSaturation, r.shadowSaturation);
         glUniform1f(u.ringOpacity, r.ringOpacity * p.ringScale);
@@ -706,6 +715,7 @@ namespace lg {
             glUniform2f(u.darkSpec, face.darkBias, std::cos(face.darkSpread * float(M_PI / 180.0)));
             glUniform1f(u.shadowOpacity, m_data.shadow ? (dark[q] ? res.shadowOpacityDark : res.shadowOpacity) * p.shadowScale : 0.f);
             glUniform1f(u.shadowRadius, res.shadowRadius * scale);
+            glUniform2f(u.shadowOffset, 0.f, res.shadowOffsetY * scale);
 
             damage.forEachRect([&ctx](const auto& rect) {
                 g_pHyprOpenGL->scissor(ctx, &rect, ctx.m_data.transformDamage);

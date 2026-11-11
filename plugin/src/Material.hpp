@@ -93,7 +93,7 @@ namespace lg {
         float blurDist0    = 0;
         float bleedOpacity = 0, bleedHeight = 0, bleedAmount = 0, bleedBlur = 0;
         float shadowOpacity = 0, shadowOpacityDark = 0; // light side, dark side
-        float shadowRadius  = 0;
+        float shadowRadius  = 0, shadowOffsetY = 0;
         float keySpread     = 80; // degrees, key/fill highlight lobe (SPEC 9.4: D 96 -> 192 : 80 -> 90)
         std::array<float, 3> blurAlpha = {1, 0.5f, 0.5f};
         float maxLumaLight = 1, maxLumaDark = 1; // SFace::maxLuma at this D

@@ -19,6 +19,10 @@ namespace lg {
         double radius = 0; // inferred corner radius in the same units as box
         // materialize progress 0..1 (Liquid Glass appear/disappear ramp), from a materialize hole
         double materialize = 1;
+        // shadow marker (hyprk Glass.qml `shadow: false`): a 1x1 hole in the row below the middle one, at the
+        // centre column. The shape then takes Regular's drop shadow for its size (probe: 0.04, radius 4 pt at
+        // D <= 64) instead of its layer recipe's (hyprk-overlay = menu: 0.7, radius 24 at every size)
+        bool regularShadow = false;
     };
 
     // Shapes drawn as one smooth-union SDF (GlassEffectContainer-like): indices into the shape list.
@@ -36,7 +40,8 @@ namespace lg {
     // height of the staircase at the left edge.
     // A materialize hole (hyprk Glass.qml) is a 1x1 gap in the shape's middle row: x = left + 1 +
     // round(m * (w - 3)). It arrives as two 1 px tall rects of the same cluster 1 px apart and sets
-    // SGlassShape::materialize = m; shapes without one stay at 1.
+    // SGlassShape::materialize = m; shapes without one stay at 1. The same kind of gap one row lower
+    // (y = top + floor(h / 2) + 1, x = left + floor(w / 2)) sets SGlassShape::regularShadow.
     std::vector<SGlassShape> clusterRegion(const std::vector<SRect>& rects);
 
     // Groups shapes whose boxes are closer than `smoothK` (the smooth union's reach, px; 0 = every

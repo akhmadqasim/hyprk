@@ -234,6 +234,25 @@ int main() {
         // two separate shapes 1 px apart in one row are not a hole
         auto two = clusterRegion({{0, 0, 10, 1}, {11, 0, 10, 1}});
         CHECK(two.size() == 2 && near(two[0].materialize, 1) && near(two[1].materialize, 1));
+        CHECK(!shapes[0].regularShadow);
+    }
+
+    // shadow marker: 1x1 gap in the row below the middle one (y = top + floor(h / 2) + 1), centre column;
+    // with a materialize hole in the middle row both are read, without it materialize stays 1
+    {
+        auto rows = roundedRows(300, 500, 120, 24, 12); // a 120 x 24 capsule
+        CHECK(!clusterRegion(rows)[0].regularShadow);
+        auto split = [&](size_t row, double hx) {
+            auto& r = rows[row];
+            rows.push_back({hx + 1, r.y, r.right() - hx - 1, 1});
+            r.w = hx - r.x;
+        };
+        split(13, 360); // y 513
+        auto marked = clusterRegion(rows);
+        CHECK(marked.size() == 1 && marked[0].regularShadow && near(marked[0].materialize, 1) && near(marked[0].box.h, 24));
+        split(12, 300 + 1 + 39); // y 512: materialize hole at m = 39 / 117
+        marked = clusterRegion(rows);
+        CHECK(marked.size() == 1 && marked[0].regularShadow && near(marked[0].materialize, 39.0 / 117.0));
     }
 
     // groups: shapes closer than k share one smooth-union group, lead = largest area

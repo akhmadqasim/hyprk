@@ -77,7 +77,7 @@ namespace lg {
                     shape.radius = stair;
             }
         }
-        // materialize holes: two 1 px tall rects of one cluster with exactly 1 px between them
+        // materialize (middle row) and shadow (row below) holes: two 1 px tall rects of one cluster with exactly 1 px between them
         for (size_t i = 0; i < n; ++i) {
             const auto& a = rects[i];
             if (a.h != 1 || a.w <= 0)
@@ -86,9 +86,12 @@ namespace lg {
                 const auto& b = rects[j];
                 if (j == i || b.h != 1 || b.y != a.y || b.x != a.right() + 1 || find(i) != find(j) || slot[find(i)] < 0)
                     continue;
-                auto& shape = out[slot[find(i)]];
-                if (shape.box.w > 3)
+                auto&        shape = out[slot[find(i)]];
+                const double mid   = shape.box.y + std::floor(shape.box.h / 2);
+                if (a.y == mid && shape.box.w > 3)
                     shape.materialize = std::clamp((a.right() - shape.box.x - 1) / (shape.box.w - 3), 0.0, 1.0);
+                else if (a.y == mid + 1)
+                    shape.regularShadow = true;
             }
         }
 

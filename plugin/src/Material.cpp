@@ -187,6 +187,7 @@ namespace lg {
             .shadowOpacity     = float(clampedLinear(D, r.shadowD0, r.shadowD1, r.shadowOpacityLo, r.shadowOpacityHi)),
             .shadowOpacityDark = float(clampedLinear(D, r.shadowD0, r.shadowD1, r.shadowOpacityLo, r.shadowOpacityHiDark)),
             .shadowRadius      = float(clampedLinear(D, r.shadowD0, r.shadowD1, r.shadowRadiusLo, r.shadowRadius)),
+            .shadowOffsetY     = r.shadowOffsetY,
             .keySpread         = float(clampedLinear(D, 96, 192, 80, 90)),
             .blurAlpha         = {r.blurAlpha[0] * ramp, r.blurAlpha[1] * ramp, r.blurAlpha[2]},
             .maxLumaLight      = maxLumaAt(r.light, D),
