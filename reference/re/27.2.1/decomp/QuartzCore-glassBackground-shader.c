@@ -89,9 +89,12 @@ vec4 glass_background_base(...) {
     //    rgb = clamp(rgb / a, -0.75, clamp_limit) * a  (or hue-preserving scale);  * edr_scale
 }
 // Edge-bleed sample: displaced along the outward normal by BleedAmount at the edge, falling to 0 at depth BleedHeight
-// (both 0.35 * D), read sharp (BleedBlurRadius 0 -> mip 0 of the backdrop texture, i.e. only as soft as the backdrop
-// scale makes it), before blur fill and face. No separate layer, no blend mode other than mix, no mask other than
+// (both 0.35 * D), before blur fill and face. No separate layer, no blend mode other than mix, no mask other than
 // the glass shape.
+// CORRECTION (verify C3): the sample is NOT sharp. inputBleedBlurRadius = BleedAmount (0.35 * D) whenever
+// BleedOpacity > 0 (it is 0 only at D <= 64, where the bleed is off), and the shader blurs with half of it:
+// radius 0.175 * D. Measured over a black/white edge under 96 .. 300 pt panels: rms 0.24 .. 0.66 with that radius,
+// 1 .. 8.7 (max 20) with a sharp sample. See QuartzCore-glass-blur-pyramid.c and live/verify/C3/bleed-blur-fit.json.
 
 // ---------------------------------------------------------------------------------------------------------------
 // 3. Values that reach the shader for Regular glass (probe dumps, D = shortest side)

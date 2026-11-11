@@ -3537,3 +3537,74 @@ Files
 - Code: ~/hyprk/reference/re/27.2.1/decomp/DesignLibrary-surface-size-content-lensing.asm, Dock-glass-configuration.asm, QuartzCore-GlassForegroundFilter-render-excerpts.asm; QuartzCore-glass-shaders.c updated (ring shadow, clamp order, glass_foreground)
 - Tools: ~/hyprk/reference/re/tools/probe/lensprobe.swift (new), glassfit.swift (content pattern, menu-window dump, view properties), ~/hyprk/reference/re/tools/gotsym.c (resolves shared-cache stubs / GOT slots)
 - PNG: ~/hyprk/reference/screens/27.2.1/verify/B2/
+
+
+### C3. Sidebar chameleon tint, blur kernel, edge-bleed blur
+
+# Verify C3: sidebar glass colours and the glass blur kernel, macOS 27.2.1 (26B131)
+
+1. Sidebar glass colours — **TERKONFIRMASI** — sidebar glass (`NSGlassEffectView` `_variant` 17 and 18) has one layer that regular glass does not: a **`CAChameleonLayer`, compositingFilter `colorBlendMode`, opacity 0.10 dark / 0.05 light**, directly above the `glassBackground` backdrop and below the rim highlight. It is a solid fill in the window's "chameleon colour" = the **mean wallpaper colour under the window frame**, quantised to 6 bits per channel. Result: `out = f + (SetLum(tint, Lum(f)) − f)·opacity`, `f` = glass output clamped to 0…1, `Lum = 0.30 R + 0.59 G + 0.11 B`. The slider does not change it. With "Tint window background with wallpaper colour" off the layer is not created. — code: layer tree dump (class, filter, opacity); QuartzCore `CA::Render::Updater::prepare_layer0` 0x18dec6898 (copies the context colour into the layer), `render_subclass…ChameleonLayer` 0x18de36bf0 (solid fill), `CARenderContextSetChameleonColor` 0x18de86c9c; SkyLight `CGXWindow::resolved_chameleon_color` 0x1829f697c → `Payload::average_color` 0x182a94d60 (box mean over the window rect from a summed-area table, then `min(trunc(c·64), 63)/63`); SwiftUICore `Material.Layer.chameleon(fallbackColor:filters:)` 0x19122dfbc. Measured: 50 uniform backdrops × a = 0 / 0.5 / 1 × 6 sidebar views (17 and 18 at 160×64, 200×200, 240×500): **dark rms 0.48–0.88, max 3.0; light rms 0.46–0.75, max 2.7** (same data without the layer: dark rms 3.5–6.4, max 21; light 1.7–3.2, max 12.6). Regular glass in the same captures, no layer: rms 0.38–0.54, max 1.9.
+2. Blur kernel — **TERKONFIRMASI** — the blur is one trilinear read of a mip pyramid. Backdrop at scale s = box average of 1/s × 1/s screen pixels; each mip level = the level below filtered by 13 bilinear taps (weights 0.1055 centre, 0.0902 at (±1.96, 0) and (0, ±1.96), 0.0771 at (±1.96, ±1.96), 0.0563 at (±3.92, 0) and (0, ±3.92) texels) and halved; level read = `lod(R) = max(0, log2(R < 2 ? R/2 + 1 : R))`, `R = 1.6 · radius[pt] · (backdrop texels per pt)`. **Gaussian equivalent: σ = 2.0 · radius points** (sd 0.03, 1.93–2.04, R ≥ 4), independent of the backdrop scale, isotropic. — code: shader `glass_background_base` (lod), `variable_blur_downsample_frag` (the 13 taps, AIR bitcode), `prepare_blur_mipmap` 0x18e078efc, `compute_variable_blur_parameters` 0x18de2bfe4, `MetalContext::create_variable_blur_mip_surface` 0x18df6be08. Measured: blur-only probe glass, radius 0…24 × scale 0.125 / 0.25 / 0.5 / 1, 349 captures: **edge rms 0.66 mean (0.04–2.1), 1 px line 0.24 mean (max 0.8), 8 px line 0.49 mean**, of 255; one configuration does not fit (scale 0.125, radius 6: rms 8.7). Stock recipes (Regular 64…300 pt, Menu, Clear, Dock, Control Center, Sidebar) over edge / line / stripes at a = 0 / 0.5 / 1, full model: **rms 0.1–1.0 per recipe (worst single capture 1.9), max 3.5**.
+3. Correction of verify-C2 (edge bleed) — **TERKONFIRMASI** — the edge-bleed sample is not sharp. `inputBleedBlurRadius = BleedAmount = 0.35·D` whenever the bleed is on, and the shader blurs with half of it: **radius 0.175·D (σ ≈ 0.35·D)**. — code: `get_glass_filter_bleed_blur_radius` 0x18de1a408 (`0.5 × inputBleedBlurRadius`), probe dumps (33.6 / 42 / 56 / 70 / 84 / 105 at D = 96 / 120 / 160 / 200 / 240 / 300). Measured over an edge under 96…300 pt panels, dark and light: rms 0.24–0.66 (max 2.2) with that radius; 0.5–8.7 (max 20) with a sharp sample. C2 could not see it: its backdrops were uniform.
+
+Restored / untouched: `NSGlassTintAmount` = 0.5071146 (float) was never written this time (the probe takes the value as a launch argument, `-NSGlassTintAmount <a>`, its own process only). Dark mode on, wallpaper untouched, no global default written, lock released, no probe left running.
+
+## 1. Sidebar: the missing layer
+Layer tree under the glass view (sidebar; regular glass is the same without `@1`):
+```
+CABackdropLayer  "@0"  filters [glassBackground]
+CAChameleonLayer "@1"  compositingFilter colorBlendMode, opacity 0.10 (dark) / 0.05 (light)
+SDFPortalLayer   "@2"
+CASDFLayer       "@3"  key/fill highlight, filters [vibrantColorMatrix]
+```
+```
+f    = clamp(glassBackground output, 0, 1)            // model of verify-C2
+L    = 0.30 f.r + 0.59 f.g + 0.11 f.b
+b    = ClipColor(tint + (L − Lum(tint)))              // PDF / CSS "color" blend
+out  = f + (b − f) · (dark ? 0.10 : 0.05)
+tint = quantise6(mean of the wallpaper pixels under the window frame)   // encoded values, not linear light
+```
+- Tint colour: measured with a bare `CAChameleonLayer` at opacity 1, moved over 20 screen positions: equals the mean of the wallpaper under the window, rms 1.8, max 3.7 (linear-light mean: rms 4.2, max 20). It follows the window at once (same value 0.25 s and 1.6 s after a move). An app can override it per window (`SLSSetChameleonOverrideColor`) or inherit a parent's.
+- Bare layer vs the blend formula, 50 backdrops: opacity 1 rms 0.32 (max 0.70), opacity 0.1 rms 0.50 (max 1.45).
+- Over greys the effect is a slight tint (dark, this wallpaper: 127 → 126 / 127 / 128). Over colours it pulls 10 % toward a near-grey of the same luminosity: pure blue under dark sidebar 28 / 29 / 235 (model 28.2 / 29.1 / 235.3; regular glass 26 / 26 / 255).
+- `AppleReduceDesktopTinting = YES` (given to the probe as a launch argument): no `CAChameleonLayer` in either sidebar variant, sidebar 17 over grey = regular glass (134).
+- The two sidebar variants differ in the glass recipe, not in this layer:
+
+| | variant 17 | variant 18 (the one Finder and Settings use) |
+|---|---|---|
+| face black / white / saturation, dark | 0.125 / 1.125 / 1.3 (= Regular) | 0.10 / 0.50 / 0.6 |
+| maxLuma, dark | 0.6 → 0.35 with size (= Regular) | 1 |
+| face, light | 0.4 / 1.03 / 1.2, fill white 0.2, maxLumaSDR 0.94 | same, maxLumaSDR 0.85 |
+| bleed black / white / saturation | 0.125 / 0.5 / 1 dark, 0.9 / 1 / 1.2 light | 0.10 / 0.5 / 1.5 dark, 0.75 / 0.9 / 1.5 light |
+| refraction opacity, drop and ring shadow | 0.6, as Regular | 0, none |
+| slider above 0.5 | face fill to 50 % (black dark, white light) | no face change (blur fill only) |
+
+## 2. Blur: what to implement
+- **Simple:** Gaussian with σ[pt] = 2.0 × filter radius (× display scale for pixels). The DesignLibrary spec radius is twice the filter radius, so σ ≈ spec radius. Stock values: blur fill radius 8 → σ 16 pt; Regular panel ≥ 160 pt own blur 5 × 0.8 → σ 8 pt; Control Center 4 × opacity(depth); Dock 1.5; Clear 0.75; edge-bleed sample 0.175·D → σ 0.35·D.
+- Small radii do not go to zero: the backdrop scale sets a floor. σ (pt) from the model, stock recipes:
+
+| filter radius | 0 | 0.375 | 0.75 | 1 | 1.5 | 2 | 3 | 4 | 5 | 8 | 16 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| scale 0.5 | 0.50 | 0.94 | 1.56 | 1.87 | 2.69 | 3.81 | 5.81 | 7.94 | 9.62 | 16.1 | 32.1 |
+| scale 0.25 | 0.96 | 1.29 | 1.82 | 2.29 | 3.09 | 3.75 | 5.38 | 7.62 | 9.44 | 15.9 | 32.1 |
+| scale 0.125 | 1.91 | 2.19 | 2.54 | 2.88 | 3.60 | 4.56 | 6.19 | 7.50 | 8.50 | 15.3 | 31.8 |
+
+- **Exact:** downsample the backdrop by 1/s (box), build levels with the 13-tap kernel, read `lod(R)` trilinearly. A dual-Kawase chain is the same idea; match it by σ per level: level L has σ ≈ 1.31 · 2^L texels of the scaled backdrop.
+- Blur fill reads two taps at ∓L/4 texels (diagonal) of its level and averages them; then `m = lighten·max(c, B) + darken·min(c, B) + (1 − lighten − darken)·c`, `c = mix(m, B, normal)` (verify-C formulas, now checked on edges and lines).
+- The gauss fit is good but not perfect: residual of an erf fit rms 0.3–1.4, max 5 of 255 (the kernel has slightly heavier tails).
+- Isotropy: horizontal vs vertical edge 10–90 % widths within 2 px; second moments of a dot along x / y / diagonal within 3 %.
+- Detail only the probe hits: when the smallest blur radius of a backdrop group gives R > 2, the pyramid is stored from level 1 (half size) and the shader gets R/2, so the level is `1 + lod(R/2)` for 2 < R < 4 (measured 1.61 / 1.69 / 1.86 at R = 2.08 / 2.4 / 3.2; rule 1.60 / 1.68 / 1.85). Stock recipes fit with plain `lod(R)`.
+
+## Not covered
+- The mean wallpaper colour was checked on this one wallpaper (20 positions). The 6-bit quantisation is from code; the pixels agree with it only as far as the 2-level fit error shows.
+- The SwiftUI / DesignLibrary site that sets opacity 0.10 / 0.05 was not located (symbol found, call site not); the values are from the live layer tree.
+- Real Finder / Settings sidebars were not re-measured; variant 18 was measured in the probe only.
+- Blur outlier: scale 0.125 with radius 6 in the blur-only probe (rms 8.7), not explained beyond a one-texel misalignment of the half-size base.
+- Dual-Kawase pass counts for Hyprland were not derived; the table gives the σ to match.
+
+## Files
+- Model: `reference/re/27.2.1/live/verify/C3/glass_model.py` (superset of the C2 model: `face`, `chameleon`, `chameleon_color`, `level`, `sigma_pt`, `Pyramid1D`, `backdrop_1d`, `profile_1d`); fits: `fit_c3.py`
+- Data, same folder: `sidebar-fit.json`, `sidebar-recipe-inputs.json`, `layer-tree-dark.json`, `layer-tree-light.json`, `layer-tree-dark-reduce-desktop-tinting.json`, `chameleon-vs-wallpaper.json`, `blur-kernel-fit.json`, `blur-level-fine.json`, `blur-gauss-fit.json`, `blur-sigma-table.json`, `blur-isotropy.json`, `blur-profiles.json` (measured edge / line responses, for testing an implementation), `recipes-edge-fit.json`, `bleed-blur-fit.json`
+- Code excerpts: `reference/re/27.2.1/decomp/QuartzCore-SkyLight-chameleon.c`, `QuartzCore-glass-blur-pyramid.c`; correction note added to `QuartzCore-glassBackground-shader.c`
+- Probes: `reference/re/tools/probe/glass3.swift` (tree / sb / blur / nat / nat3), `cham.swift`
+- Pictures: `reference/screens/27.2.1/verify/C3/` (probe windows only)

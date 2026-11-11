@@ -1,0 +1,77 @@
+{
+ "note": "Gaussian sigma (pt) that best matches the modelled edge response (erf least squares), plain lod(R) as in stock recipes, mean over grid phases. Large radii: 2.0 * radius. Small radii: the backdrop scale sets a floor.",
+ "table": [
+  {
+   "radius": 0,
+   "sigma_pt_scale_0_5": 0.5,
+   "sigma_pt_scale_0_25": 0.96,
+   "sigma_pt_scale_0_125": 1.91
+  },
+  {
+   "radius": 0.375,
+   "sigma_pt_scale_0_5": 0.94,
+   "sigma_pt_scale_0_25": 1.29,
+   "sigma_pt_scale_0_125": 2.19
+  },
+  {
+   "radius": 0.75,
+   "sigma_pt_scale_0_5": 1.56,
+   "sigma_pt_scale_0_25": 1.82,
+   "sigma_pt_scale_0_125": 2.54
+  },
+  {
+   "radius": 1,
+   "sigma_pt_scale_0_5": 1.87,
+   "sigma_pt_scale_0_25": 2.29,
+   "sigma_pt_scale_0_125": 2.88
+  },
+  {
+   "radius": 1.5,
+   "sigma_pt_scale_0_5": 2.69,
+   "sigma_pt_scale_0_25": 3.09,
+   "sigma_pt_scale_0_125": 3.6
+  },
+  {
+   "radius": 2,
+   "sigma_pt_scale_0_5": 3.81,
+   "sigma_pt_scale_0_25": 3.75,
+   "sigma_pt_scale_0_125": 4.56
+  },
+  {
+   "radius": 2.33,
+   "sigma_pt_scale_0_5": 4.44,
+   "sigma_pt_scale_0_25": 4.12,
+   "sigma_pt_scale_0_125": 5.19
+  },
+  {
+   "radius": 3,
+   "sigma_pt_scale_0_5": 5.81,
+   "sigma_pt_scale_0_25": 5.38,
+   "sigma_pt_scale_0_125": 6.19
+  },
+  {
+   "radius": 4,
+   "sigma_pt_scale_0_5": 7.94,
+   "sigma_pt_scale_0_25": 7.62,
+   "sigma_pt_scale_0_125": 7.5
+  },
+  {
+   "radius": 5,
+   "sigma_pt_scale_0_5": 9.62,
+   "sigma_pt_scale_0_25": 9.44,
+   "sigma_pt_scale_0_125": 8.5
+  },
+  {
+   "radius": 8,
+   "sigma_pt_scale_0_5": 16.06,
+   "sigma_pt_scale_0_25": 15.94,
+   "sigma_pt_scale_0_125": 15.31
+  },
+  {
+   "radius": 16,
+   "sigma_pt_scale_0_5": 32.12,
+   "sigma_pt_scale_0_25": 32.12,
+   "sigma_pt_scale_0_125": 31.81
+  }
+ ]
+}

@@ -1,0 +1,422 @@
+[
+ {
+  "x": 10,
+  "y": 40,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   19.0,
+   28.0,
+   36.0
+  ],
+  "wallpaper_mean_encoded": [
+   17.1,
+   27.9,
+   34.4
+  ],
+  "wallpaper_mean_linear": [
+   18.0,
+   28.6,
+   34.5
+  ]
+ },
+ {
+  "x": 352,
+  "y": 40,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   19.0,
+   28.0,
+   36.0
+  ],
+  "wallpaper_mean_encoded": [
+   16.5,
+   27.8,
+   35.0
+  ],
+  "wallpaper_mean_linear": [
+   17.1,
+   28.2,
+   35.1
+  ]
+ },
+ {
+  "x": 695,
+  "y": 40,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   23.0,
+   32.0,
+   36.0
+  ],
+  "wallpaper_mean_encoded": [
+   20.3,
+   31.3,
+   36.2
+  ],
+  "wallpaper_mean_linear": [
+   21.7,
+   32.3,
+   36.4
+  ]
+ },
+ {
+  "x": 1038,
+  "y": 40,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   78.0,
+   81.0,
+   81.0
+  ],
+  "wallpaper_mean_encoded": [
+   80.6,
+   82.9,
+   83.7
+  ],
+  "wallpaper_mean_linear": [
+   98.4,
+   95.4,
+   93.6
+  ]
+ },
+ {
+  "x": 1380,
+  "y": 40,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   169.0,
+   162.0,
+   151.0
+  ],
+  "wallpaper_mean_encoded": [
+   172.1,
+   163.6,
+   151.8
+  ],
+  "wallpaper_mean_linear": [
+   173.4,
+   165.1,
+   152.9
+  ]
+ },
+ {
+  "x": 10,
+  "y": 319,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   27.0,
+   36.0,
+   33.0
+  ],
+  "wallpaper_mean_encoded": [
+   24.9,
+   34.0,
+   33.0
+  ],
+  "wallpaper_mean_linear": [
+   27.9,
+   36.0,
+   33.3
+  ]
+ },
+ {
+  "x": 352,
+  "y": 319,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   19.0,
+   28.0,
+   36.0
+  ],
+  "wallpaper_mean_encoded": [
+   17.9,
+   28.2,
+   35.5
+  ],
+  "wallpaper_mean_linear": [
+   18.2,
+   28.4,
+   35.7
+  ]
+ },
+ {
+  "x": 695,
+  "y": 319,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   27.0,
+   36.0,
+   44.0
+  ],
+  "wallpaper_mean_encoded": [
+   26.7,
+   36.7,
+   42.4
+  ],
+  "wallpaper_mean_linear": [
+   28.8,
+   38.0,
+   43.5
+  ]
+ },
+ {
+  "x": 1038,
+  "y": 319,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   112.0,
+   106.0,
+   105.0
+  ],
+  "wallpaper_mean_encoded": [
+   113.3,
+   108.2,
+   106.8
+  ],
+  "wallpaper_mean_linear": [
+   117.3,
+   111.1,
+   109.2
+  ]
+ },
+ {
+  "x": 1380,
+  "y": 319,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   172.0,
+   162.0,
+   151.0
+  ],
+  "wallpaper_mean_encoded": [
+   173.3,
+   164.1,
+   153.5
+  ],
+  "wallpaper_mean_linear": [
+   173.7,
+   164.6,
+   153.9
+  ]
+ },
+ {
+  "x": 10,
+  "y": 598,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   27.0,
+   36.0,
+   33.0
+  ],
+  "wallpaper_mean_encoded": [
+   23.4,
+   32.3,
+   30.7
+  ],
+  "wallpaper_mean_linear": [
+   25.7,
+   33.9,
+   30.9
+  ]
+ },
+ {
+  "x": 352,
+  "y": 598,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   46.0,
+   52.0,
+   49.0
+  ],
+  "wallpaper_mean_encoded": [
+   44.3,
+   50.5,
+   48.7
+  ],
+  "wallpaper_mean_linear": [
+   46.6,
+   51.9,
+   49.8
+  ]
+ },
+ {
+  "x": 695,
+  "y": 598,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   58.0,
+   64.0,
+   68.0
+  ],
+  "wallpaper_mean_encoded": [
+   60.7,
+   65.1,
+   70.8
+  ],
+  "wallpaper_mean_linear": [
+   62.3,
+   66.0,
+   71.5
+  ]
+ },
+ {
+  "x": 1038,
+  "y": 598,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   100.0,
+   97.0,
+   97.0
+  ],
+  "wallpaper_mean_encoded": [
+   101.9,
+   98.1,
+   99.2
+  ],
+  "wallpaper_mean_linear": [
+   103.3,
+   99.1,
+   99.9
+  ]
+ },
+ {
+  "x": 1380,
+  "y": 598,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   136.0,
+   130.0,
+   130.0
+  ],
+  "wallpaper_mean_encoded": [
+   137.5,
+   129.5,
+   129.0
+  ],
+  "wallpaper_mean_linear": [
+   137.9,
+   129.9,
+   129.4
+  ]
+ },
+ {
+  "x": 10,
+  "y": 877,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   19.0,
+   28.0,
+   32.0
+  ],
+  "wallpaper_mean_encoded": [
+   16.9,
+   25.9,
+   30.5
+  ],
+  "wallpaper_mean_linear": [
+   17.4,
+   26.3,
+   30.5
+  ]
+ },
+ {
+  "x": 352,
+  "y": 877,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   42.0,
+   48.0,
+   41.0
+  ],
+  "wallpaper_mean_encoded": [
+   40.2,
+   46.1,
+   37.9
+  ],
+  "wallpaper_mean_linear": [
+   44.3,
+   48.6,
+   40.1
+  ]
+ },
+ {
+  "x": 695,
+  "y": 877,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   81.0,
+   81.0,
+   77.0
+  ],
+  "wallpaper_mean_encoded": [
+   80.4,
+   80.5,
+   77.2
+  ],
+  "wallpaper_mean_linear": [
+   83.1,
+   82.2,
+   79.4
+  ]
+ },
+ {
+  "x": 1038,
+  "y": 877,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   116.0,
+   110.0,
+   106.0
+  ],
+  "wallpaper_mean_encoded": [
+   115.8,
+   110.4,
+   108.7
+  ],
+  "wallpaper_mean_linear": [
+   116.7,
+   111.1,
+   109.2
+  ]
+ },
+ {
+  "x": 1380,
+  "y": 877,
+  "w": 320,
+  "h": 220,
+  "chameleon": [
+   128.0,
+   122.0,
+   122.0
+  ],
+  "wallpaper_mean_encoded": [
+   129.8,
+   123.4,
+   123.8
+  ],
+  "wallpaper_mean_linear": [
+   130.5,
+   124.0,
+   124.2
+  ]
+ }
+]
