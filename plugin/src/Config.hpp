@@ -73,7 +73,7 @@ namespace lg {
         int                                          titlebar = 1; // 0 off, 1 auto (client asked for server-side decorations), 2 classes only
         std::string                                  titlebarClasses;  // regex: always get a bar
         std::string                                  titlebarExclude = TITLEBAR_EXCLUDE; // regex: never (they draw their own)
-        float                                        titlebarHeight = 32, titlebarButton = 14, titlebarGap = 9, titlebarInset = 15, titlebarFontSize = 13;
+        float                                        titlebarHeight = 32, titlebarButton = 14, titlebarGap = 9, titlebarInset = 9, titlebarFontSize = 13;
         // colours are set from the hex defaults in Config.cpp's key table
         SRgba                                        titlebarColor, titlebarColorInactive, titlebarText, titlebarTextInactive;
         std::string                                  titlebarFont = "SF Pro Text";

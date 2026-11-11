@@ -94,6 +94,32 @@ namespace lg {
         {{0xEFEFF3, 0xF2F3F5, 0xF6F7F8}, {0xEAEAEE, 0xABABAE, 0xABABAE, 0xABABAE, 0xE7E7EA}, 0, {0, 0, 0, 0}},
         {{0x4C4C52, 0x4C4C52, 0x47484D}, {0xB4B4B4, 0xB4B4B4, 0x4A4B50, 0xADADAD, 0xADADAD}, 0, {0, 0, 0, 0}},
     };
+    // What is drawn: the discs as glass (plugin/tools/lights_model.py: the model, its fit to the lights-*.png crops and the
+    // residuals). The Mac's discs have a lit top, a darker belt above the middle, a caustic glow in the lower centre, a
+    // specular rim (dark: arcs at top and bottom; light: a dark rim on the sides) and in light a soft coloured shadow
+    // below; the flat LIGHTS gradients above read as plain discs (user report). One row per disc:
+    // T, M, B (sRGB bytes, M may be below 0: the crops clip P3), sg, rim axis (0 top/bottom, 1 sides), rim power, rim colour,
+    // e0, e1, glow colour, g0. ui/HyprK/shaders/lights.frag draws the same formula for the QML title bars.
+    struct SLightGlass {
+        float T[3], M[3], B[3], sg, axis, n, rimC[3], e0, e1, glowC[3], g0;
+    };
+    // [light/dark][rest/pressed/inactive][close/minimise/zoom]
+    // generated: plugin/tools/lights_model.py emit (check: lights_model.py check)
+    static constexpr SLightGlass GLASS[2][3][3] = {
+        {
+            {{237, 119, 106, 234, 121, 109, 233, 160, 152, 1.3, 1, 2.5, 167, 24, 10, 1, 0.2, 225, 26, 0, 0.14}, {241, 186, 82, 244, 195, 79, 250, 224, 109, 1, 1, 2.5, 131, 59, 0, 1, 0.2, 229, 112, 0, 0.129}, {121, 204, 67, 136, 207, 90, 190, 227, 162, 1.3, 1, 2, 43, 94, 18, 1, 0.25, 52, 154, 0, 0.13}},
+            {{255, 157, 140, 255, 162, 146, 255, 207, 196, 1.3, 1, 3, 255, 85, 72, 1, 0.55, 222, 25, 0, 0.174}, {255, 257, 111, 255, 253, 103, 255, 256, 143, 0.8, 1, 3, 247, 92, 0, 0.8, 0.16, 222, 116, 0, 0.197}, {162, 255, 91, 183, 255, 121, 244, 255, 203, 2, 1, 3, 76, 178, 44, 1, 0.35, 52, 151, 0, 0.177}},
+            {{248, 248, 252, 239, 240, 242, 249, 250, 252, 0.5, 1, 1.5, 51, 50, 59, 0.4, 0.1, 0, 0, 0, 0}, {248, 248, 252, 239, 240, 242, 249, 250, 252, 0.5, 1, 1.5, 51, 50, 59, 0.4, 0.1, 0, 0, 0, 0}, {248, 248, 252, 239, 240, 242, 249, 250, 252, 0.5, 1, 1.5, 51, 50, 59, 0.4, 0.1, 0, 0, 0, 0}},
+        },
+        {
+            {{234, 121, 110, 226, 93, 78, 220, 124, 117, 0.6, 0, 2.5, 255, 197, 188, 1, 0.45, 0, 0, 0, 0}, {239, 183, 86, 241, 184, -12, 249, 223, 145, 0.7, 0, 1.5, 255, 244, 114, 1, 0.6, 0, 0, 0, 0}, {129, 200, 112, 78, 185, -6, 133, 197, 137, 0.6, 0, 1.5, 175, 255, 140, 1, 0.4, 0, 0, 0, 0}},
+            {{255, 159, 143, 255, 126, 107, 255, 160, 148, 0.5, 0, 3, 255, 253, 244, 0.7, 0.67, 0, 0, 0, 0}, {255, 245, 117, 255, 247, -7, 255, 277, 154, 0.7, 0, 1.5, 254, 250, 152, 0.8, 0.76, 0, 0, 0, 0}, {156, 241, 135, 94, 223, -6, 155, 230, 160, 0.6, 0, 1.5, 175, 255, 140, 0.7, 0.67, 0, 0, 0, 0}},
+            {{81, 82, 88, 78, 79, 85, 67, 68, 74, 1.3, 0, 3, 243, 243, 240, 0.6, 0.24, 0, 0, 0, 0}, {81, 82, 88, 78, 79, 85, 67, 68, 74, 1.3, 0, 3, 243, 243, 240, 0.6, 0.24, 0, 0, 0, 0}, {81, 82, 88, 78, 79, 85, 67, 68, 74, 1.3, 0, 3, 243, 243, 240, 0.6, 0.24, 0, 0, 0, 0}},
+        },
+    };
+    static constexpr double V0 = -0.35, GLOW_DY = 0.75, GLOW_SIGMA = 1; // lights_model.py
+    static constexpr double GLASS_MARGIN = 3.5;                          // pt around the disc for the glow
+
     // Tokens.lights: rimWidth, glyphStroke (pt); glyph reveal (Q-windows-10, 60 fps) = after GLYPH_DELAY an OutCubic over
     // GLYPH_IN, out at once as an OutQuad over GLYPH_OUT (s), the same curves as the QML Behavior in TrafficLights.qml
     static constexpr double   RIM_WIDTH = 0.5, GLYPH_STROKE = 1.9, GLOW_WIDTH = 1.0;
@@ -222,62 +248,71 @@ namespace lg {
                         cairo_line_to(cr, c + (x2 - 7) * k, c + (y2 - 7) * k);
                         cairo_close_path(cr);
                     };
-                    tri(4, 4, 8.4, 4, 4, 8.4);
-                    tri(10, 10, 5.6, 10, 10, 5.6);
+                    tri(4.1, 4.1, 8.9, 4.1, 4.1, 8.9); // a 5.8 pt box, fitted on lights-hover-*.png (as TrafficLights.qml)
+                    tri(9.9, 9.9, 5.1, 9.9, 9.9, 5.1);
                     cairo_fill(cr);
                     return;
                 }
                 switch (button) {
                     case 0: line(4.45, 4.45, 9.55, 9.55); line(9.55, 4.45, 4.45, 9.55); break;
-                    case 1: line(4.2, 7, 9.8, 7); break;
+                    case 1: line(4.05, 7, 9.95, 7); break;
                     default: line(3.95, 7, 10.05, 7); line(7, 3.95, 7, 10.05); break;
                 }
-                cairo_set_line_width(cr, GLYPH_STROKE * k);
+                // fitted on lights-hover-*.png over the disc model: x 2.05 pt, minus 2.0 x 7.9 pt (TrafficLights.qml has the same)
+                cairo_set_line_width(cr, (button == 0 ? 2.05 : button == 1 ? 2.0 : GLYPH_STROKE) * k);
                 cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
                 cairo_stroke(cr);
             });
         return tex;
     }
 
-    // fill and the 0.5 pt ring, both vertical gradients (LIGHTS), over the 1 pt glow (baked in, no extra draw; the texture
-    // is 1 pt larger all round); state 0 rest, 1 inactive, 2 pressed
+    // the glass disc of lights_model.py, computed per pixel (once per state and scale): body, rim, antialiased edge, over
+    // the glow; the texture is GLASS_MARGIN pt larger all round and a pressed disc is drawn at its own radius (sharp, not
+    // a scaled texture); state 0 rest, 1 inactive, 2 pressed
     SP<Render::ITexture> CTitlebar::lightTexture(int button, int state, bool dark, float scale) {
         const auto params = m_params();
         resetOnScale(m_glyphScale, m_glyphParams, params, scale, m_glyphs, m_lights);
         auto& tex = m_lights[(state * 2 + (dark ? 1 : 0)) * 3 + button];
-        if (!tex) {
-            const double size = params->titlebarButton * scale, pt = size / 14.0; // 14 pt artboard
-            tex = paintLight(
-                size,
-                [&](cairo_t* cr, double c, double r) {
-                    const auto& col  = state == 1 ? LIGHTS_INACTIVE[dark] : LIGHTS[dark][state == 2][button];
-                    auto        grad = [&](const uint32_t* rgb, int n) {
-                        cairo_pattern_t* pat = cairo_pattern_create_linear(0, c - r, 0, c + r);
-                        static constexpr double AT3[] = {0, 0.5, 1}, AT5[] = {0, 0.2, 0.5, 0.8, 1};
-                        for (int i = 0; i < n; ++i)
-                            cairo_pattern_add_color_stop_rgb(pat, (n == 3 ? AT3 : AT5)[i], ((rgb[i] >> 16) & 0xFF) / 255.0, ((rgb[i] >> 8) & 0xFF) / 255.0, (rgb[i] & 0xFF) / 255.0);
-                        return pat;
-                    };
-                    if (col.glow.a > 0) {
-                        cairo_arc(cr, c, c, r + GLOW_WIDTH * pt, 0, 2 * M_PI);
-                        cairo_set_source_rgba(cr, col.glow.r, col.glow.g, col.glow.b, col.glow.a);
-                        cairo_fill(cr);
-                    }
-                    cairo_pattern_t* fill = grad(col.fill, 3);
-                    cairo_arc(cr, c, c, r, 0, 2 * M_PI);
-                    cairo_set_source(cr, fill);
-                    cairo_fill(cr);
-                    cairo_pattern_destroy(fill);
-                    const double     w    = RIM_WIDTH * pt;
-                    cairo_pattern_t* ring = grad(col.ring, 5);
-                    cairo_arc(cr, c, c, r - w / 2, 0, 2 * M_PI);
-                    cairo_set_source(cr, ring);
-                    cairo_set_line_width(cr, w);
-                    cairo_stroke(cr);
-                    cairo_pattern_destroy(ring);
-                },
-                GLOW_WIDTH * pt);
+        if (tex)
+            return tex;
+        const auto&      g    = GLASS[dark][state == 2 ? 1 : state == 1 ? 2 : 0][button];
+        const double     ppt  = params->titlebarButton * scale / 14.0;        // device px per pt of the 14 pt artboard
+        const double     R    = 7.0 * (state == 2 ? PRESS_GROW : 1.0);        // pt
+        const int        px   = std::max(2, 2 * int(std::ceil((7.0 * PRESS_GROW + GLASS_MARGIN) * ppt)));
+        cairo_surface_t* surf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, px, px);
+        cairo_surface_flush(surf);
+        auto*      data   = cairo_image_surface_get_data(surf);
+        const int  stride = cairo_image_surface_get_stride(surf);
+        const auto mix    = [](double a, double b, double t) { return a + (b - a) * t; };
+        for (int j = 0; j < px; ++j) {
+            auto* row = rc<uint32_t*>(data + j * stride);
+            for (int i = 0; i < px; ++i) {
+                const double x = (i + 0.5 - px / 2.0) / ppt, y = (j + 0.5 - px / 2.0) / ppt; // pt from the centre
+                const double dist = std::hypot(x, y), u = x / R, v = y / R, rho = dist / R;
+                const double cov  = std::clamp((R - dist) * ppt + 0.5, 0.0, 1.0);
+                const double ga   = g.g0 > 0 ? g.g0 * 0.5 * std::erfc((std::hypot(x, y - GLOW_DY) - R) / (GLOW_SIGMA * M_SQRT2)) : 0.0;
+                if (cov <= 0 && ga <= 0.002) {
+                    row[i] = 0;
+                    continue;
+                }
+                const double a  = std::clamp((V0 - v) / (V0 + 1), 0.0, 1.0);
+                const double b  = std::clamp((v - V0) / (1 - V0), 0.0, 1.0) * std::exp(-(u / g.sg) * (u / g.sg));
+                const double d  = R - dist; // pt inside the edge
+                const double e  = d <= 0.25 ? g.e0 : d <= 0.75 ? mix(g.e0, g.e1, (d - 0.25) / 0.5) : std::max(0.0, g.e1 * (1.25 - d) / 0.5);
+                const double w  = e * std::pow(std::abs((g.axis > 0.5 ? u : v) / std::max(rho, 1e-6)), g.n);
+                const double oa = cov + (1 - cov) * ga;
+                uint32_t     out = uint32_t(std::lround(oa * 255)) << 24;
+                for (int c = 0; c < 3; ++c) {
+                    const double body = g.M[c] + (g.T[c] - g.M[c]) * a + (g.B[c] - g.M[c]) * b;
+                    const double col  = std::clamp(mix(body, g.rimC[c], w), 0.0, 255.0);
+                    out |= uint32_t(std::lround(col * cov + g.glowC[c] * ga * (1 - cov))) << (16 - 8 * c); // premultiplied
+                }
+                row[i] = out;
+            }
         }
+        cairo_surface_mark_dirty(surf);
+        tex = g_pHyprRenderer->createTexture(surf);
+        cairo_surface_destroy(surf);
         return tex;
     }
 
@@ -388,7 +423,7 @@ namespace lg {
             const int  state = m_pressed == i && m_hoverButton == i ? 2 : (isActive || m_hover) ? 0 : 1;
             // pressed: brighter, with a stronger glow, and 1.15x larger, glyph included (Q-windows-08)
             const double grow = state == 2 ? PRESS_GROW : 1.0;
-            auto         put  = [&](const SP<Render::ITexture>& tex, float alpha) {
+            auto         put  = [&](const SP<Render::ITexture>& tex, float alpha, double grow) {
                 if (!tex || !tex->ok() || alpha <= 0.002f)
                     return;
                 const double w = tex->m_size.x * grow, h = tex->m_size.y * grow;
@@ -398,8 +433,8 @@ namespace lg {
                 d.a   = alpha;
                 g_pHyprRenderer->addPassElement(ctx, makeUnique<CTexPassElement>(d));
             };
-            put(lightTexture(i, state, dark, scale), a);
-            put(glyphTexture(i == 2 && m_option ? 3 : i, state == 2, dark, scale), a * glyphA);
+            put(lightTexture(i, state, dark, scale), a, 1.0); // a pressed disc is painted at its own size
+            put(glyphTexture(i == 2 && m_option ? 3 : i, state == 2, dark, scale), a * glyphA, grow);
         }
         if (std::abs(glyphA - (m_hover ? 1.f : 0.f)) > 0.002f)
             damageEntire(); // keep the fade going

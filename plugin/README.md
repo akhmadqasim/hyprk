@@ -278,7 +278,7 @@ own) prevents one, `titlebar = "classes"` only uses the regex, `"off"` disables 
 |---|---|
 | `titlebar` | `auto` |
 | `titlebar_classes` / `titlebar_exclude` | "" / `^(org\.hyprk\..*|hyprk-.*)$` |
-| `titlebar_height` / `titlebar_button` / `titlebar_gap` / `titlebar_inset` | 32 / 14 / 9 / 15 pt (SPEC: bar 32, buttons 14, gap 9; inset measured on the reference screenshot, toolbar windows use 19) |
+| `titlebar_height` / `titlebar_button` / `titlebar_gap` / `titlebar_inset` | 32 / 14 / 9 / 9 pt (SPEC: bar 32, buttons 14, gap 9; inset: MAC-ANSWERS Q-windows-07, TextEdit and Terminal discs at x 9, 32, 55 on 27.2.1 (was 15 from an older screenshot); toolbar windows use 19) |
 | `titlebar_font` / `titlebar_font_size` | `SF Pro Text` / 13 |
 | `titlebar_color` / `titlebar_color_inactive` | `0xF3F1EFFF` / `0xF6F5F4FF` |
 | `titlebar_text` / `titlebar_text_inactive` | `0x000000B3` / `0x00000040` (TextEdit #4C4C4C / #BEBEBE on white, Q-windows-11) |
