@@ -369,8 +369,8 @@ The HUD's appear fits the Mac worse than its dismiss (slow start); the 84 ms gap
 
 Headless MBA 2560x1664 at 2x, own state, mcap from 088840a, small regions (240 x 240 pt and less; Mission Control full
 screen at k 4). "Before" is the tree at 7176610 in a second headless session on the same host, measured the same day
-with the same commands. 8 runs per row unless said. Per-frame series of the last run of each row: `motion-measured.csv`
-(`*-s11-after-run*`). Other headless sessions ran on the host: at times the compositor's own presentation times were
+with the same commands. 8 runs per row unless said. Per-frame series of the last 8 runs of eleven rows:
+`motion-measured.csv` (`*-s11-after-run*`; that batch ran partly in a loaded phase, see the gap column). Other headless sessions ran on the host: at times the compositor's own presentation times were
 uneven (intervals of 11 to 33 ms instead of 16.7; column "gap runs" = runs with an interval over 25 ms). A run with
 such a gap steps over a value on purpose (FrameClock keeps the speed), so those runs are counted apart.
 
@@ -434,7 +434,7 @@ Apps, HUD dismiss, full-screen peek, lock.
 
 Open: (1) frame gaps. With the motion tied to frames, a compositor frame that comes late is visible as one stepped-over
 value; in a quiet phase a row is 8 of 8, in a loaded one most runs have a gap, and in three back-to-back comparisons
-the unmodified tree's session showed none while this one did (Control Center close 0 of 14 against 9 of 14; NC close 0
-of 16 against 11 of 16). The GUI thread's ticks were then 26-30 ms apart although the tick itself took under 6 ms;
+the unmodified tree's session showed none while this one did (Control Center close 0 of 20 against 12 of 20; NC close 0
+of 16 against 10 of 16). The GUI thread's ticks were then 26-30 ms apart although the tick itself took under 6 ms;
 what delays the frame callback there is not traced. (2) Inside the Dock's glass Mission Control still shows the real
 window under the Dock.
