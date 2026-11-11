@@ -830,7 +830,11 @@ void main() {
             // the Dock label's fill on its pointer: the shell draws Theme.dock.labelFill (k + c (1 - a), fitted to
             // Q-dock-08: dark k 23.5 / 255 a 0.083, light 107 / 255 0.382) over the pill only, so the pointer read
             // darker than the pill (over black 14 vs 35; on the Mac one shape, 31). Same fill outside the pill.
-            const bool pointerGroup = std::ranges::any_of(g.members, [&](size_t i) { return m_data.shapes[i].pointer; });
+            // Only on the Dock recipe (the label on the Dock's namespace). On its own namespace with Apple's label recipe
+            // (hyprk-dock-label: regular, hyprland.lua) the label needs no fill: Regular at that size over the wallpaper
+            // is the Mac's label (32 / 134 / 185 dark, 133 / 195 / 253 light vs 31 / 131 / 180 and 131 / 192 / 249).
+            const bool pointerGroup = m_data.recipe && std::string_view{m_data.recipe->name} == "dock" &&
+                std::ranges::any_of(g.members, [&](size_t i) { return m_data.shapes[i].pointer; });
             glUniform2f(u.pointerFill, pointerGroup ? (dark[q] ? 23.5f : 107.f) / 255.f : 0.f, pointerGroup ? (dark[q] ? 0.083f : 0.382f) : 0.f);
             glUniform3f(u.keyYcc, res.keyYcc.black, res.keyYcc.white, res.keyYcc.saturation);
             const float keyRad = res.keySpread * float(M_PI / 180.0);

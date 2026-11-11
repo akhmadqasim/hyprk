@@ -239,7 +239,7 @@ end
 -- shell layers that carry glass (namespaces hyprk-<name>), shared by the plugin and the blur rule
 -- (no menubar: the 27.2.1 bar has no glass or blur of its own, see reference/re/MENUBAR-REA-27.2.1.md;
 -- its menus are glass in hyprk-overlay)
-local glassLayers = { "dock", "overlay", "controlcenter", "notifications", "notificationcenter", "spotlight", "switcher", "hud" }
+local glassLayers = { "dock", "dock-label", "overlay", "controlcenter", "notifications", "notificationcenter", "spotlight", "switcher", "hud" }
 -- Own compositor plugin (plugin/, see plugin/README.md). When it loads, the shell
 -- sends its glass shapes as ext-background-effect regions (HYPRK_GLASS=plugin) and the
 -- plugin draws Liquid Glass behind them. Without it the shell's QML glass is used.
@@ -282,7 +282,12 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
             -- volume/brightness HUD on the Control Center recipe (SystemBannerUI _Glass.controlCenter, no subvariant:
             -- MAC-ANSWERS.md "REA 27.2.1" section 1) and Cmd-Tab on the Dock's (pixel-identical on 27.2.1,
             -- MAC-ANSWERS.md Q-dock-19); keep the rest in sync with Config.cpp
-            materials = "hyprk-dock:dock,hyprk-controlcenter:controlcenter,hyprk-overlay:menu,"
+            -- the Dock's hover label on a namespace of its own (hyprk-dock-label, used once the shell maps it there): Dock
+            -- `GlassMaterialProvider.Configuration.cartouchePopover` (MAC-ANSWERS "REA 27.2.1" 3) has no filter dump, but
+            -- Apple's Regular at that size over the wallpaper gives 32 / 134 / 185 dark and 133 / 195 / 253 light over
+            -- black / grey 127 / white, the Mac's label reads 31 / 131 / 180 and 131 / 192 / 249 (Q-dock-08): the label
+            -- floats above the Dock and samples the wallpaper, not the Dock's glass. A fit of the recipe, no shell fill.
+            materials = "hyprk-dock:dock,hyprk-dock-label:regular,hyprk-controlcenter:controlcenter,hyprk-overlay:menu,"
                      .. "hyprk-spotlight:spotlight,hyprk-hud:controlcenter,hyprk-switcher:dock,"
                      -- banners and Notification Center cards: _Glass.notificationCenter (MAC-ANSWERS PC #62)
                      .. "hyprk-notifications:notificationcenter,hyprk-notificationcenter:notificationcenter",
