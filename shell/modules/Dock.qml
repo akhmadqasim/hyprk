@@ -234,6 +234,36 @@ ShellWindow {
     readonly property real hideY: A11y.reduceMotion ? 0 : Math.ceil((1 - slide) * (m.height + m.bottomGap))
     readonly property real restY: height - m.height - m.bottomGap
 
+    // ---------- Downloads: a stack of its newest items ----------
+    // Display as Stack (the Dock's default for Downloads): the tile shows the newest item's icon, the next one behind
+    // it (Q-dock-12; dock-dark.png / dock-light.png: a ZIP document over a landscape photo's thumbnail, both centred,
+    // not rotated, the photo 24 pt wide in the 33 pt tile; the same in light and dark under the Dark icon style, so
+    // not styled). An empty folder shows the folder. Watched by FolderListModel (a directory watch, no polling).
+    // Not seen on the Mac: a third item and more, the Clear and Tinted styles.
+    readonly property string downloadsUrl: "file://" + Quickshell.env("HOME") + "/Downloads"
+    FolderListModel {
+        id: downloads
+        folder: dock.downloadsUrl
+        showDirs: true
+        showHidden: false
+        showDotAndDotDot: false
+        sortField: FolderListModel.Time
+    }
+    readonly property bool downloadsWatched: downloads.status === FolderListModel.Ready && String(downloads.folder) === downloadsUrl
+    // the newest two, front first: {path, image}
+    readonly property var downloadsStack: {
+        const out = [];
+        if (!downloadsWatched) return out;
+        for (let i = 0; i < Math.min(2, downloads.count); i++) {
+            const path = String(downloads.get(i, "filePath")), dir = downloads.get(i, "fileIsDir");
+            out.push({ path: path, dir: dir, image: !dir && /\.(png|jpe?g|gif|webp|bmp|tiff?)$/i.test(path) });
+        }
+        return out;
+    }
+    readonly property real stackPhoto: 24 / 33     // a picture's long side in the tile (dock-dark.png: 48 px at tile 66 px)
+    readonly property real stackIcon: 0.92         // a document icon's box in the tile (the ZIP page 59 px tall at tile 66,
+                                                   // the page is 496 / 512 of its icon)
+
     // ---------- Trash: full can while the XDG trash has files ----------
     // Watched by FolderListModel (a directory watch, no polling). A missing folder (nothing trashed
     // yet) is retried every 5 s until it exists. Per-volume .Trash-$UID folders are not read.
@@ -473,9 +503,10 @@ ShellWindow {
                 readonly property real iconTop: dock.m.iconTop + dock.tile - size
 
                 // pressed: the art darkened x 0.475, no scale, on and off in one frame (Q-dock-09)
+                readonly property bool stack: cell.modelData.folder === "Downloads" && dock.downloadsStack.length > 0
                 AppIcon {
                     id: icon
-                    visible: !cell.separator && dock.dragCell !== cell
+                    visible: !cell.separator && dock.dragCell !== cell && !cell.stack
                     size: cell.size
                     loadSize: dock.magnification ? dock.large : dock.tile    // load once at full size, then only scale
                     x: Math.round((cell.width - width) / 2 * dock.dpr) / dock.dpr
@@ -489,6 +520,51 @@ ShellWindow {
                     layer.effect: ShaderEffect {
                         property real k: 0.475
                         fragmentShader: Qt.resolvedUrl("../shaders/darken.frag.qsb")
+                    }
+                }
+
+                Item {
+                    visible: cell.stack && dock.dragCell !== cell
+                    width: cell.size
+                    height: cell.size
+                    x: icon.x
+                    y: icon.y
+                    scale: icon.scale
+                    transformOrigin: Item.Bottom
+                    layer.enabled: ma.containsPress
+                    layer.effect: ShaderEffect {
+                        property real k: 0.475
+                        fragmentShader: Qt.resolvedUrl("../shaders/darken.frag.qsb")
+                    }
+                    Repeater {
+                        model: cell.stack ? dock.downloadsStack.slice().reverse() : []
+                        Item {
+                            required property var modelData
+                            anchors.fill: parent
+                            // a picture: its own thumbnail, fitted to stackPhoto of the tile
+                            Image {
+                                visible: modelData.image
+                                anchors.centerIn: parent
+                                width: parent.width * dock.stackPhoto
+                                height: width
+                                fillMode: Image.PreserveAspectFit
+                                source: modelData.image ? "file://" + modelData.path : ""
+                                sourceSize: Qt.size(Math.ceil(width * dock.dpr), Math.ceil(width * dock.dpr))
+                                asynchronous: true
+                                cache: false
+                                smooth: true
+                            }
+                            // anything else: the macOS document or folder icon
+                            AppIconTile {
+                                visible: !modelData.image
+                                anchors.centerIn: parent
+                                size: parent.width * dock.stackIcon
+                                trusted: true
+                                dpr: dock.dpr
+                                source: modelData.image ? "" : "file://" + Apps.iconDir + "/system/"
+                                        + (modelData.dir ? "GenericFolderIcon" : "GenericDocumentIcon") + "-512.png"
+                            }
+                        }
                     }
                 }
 
