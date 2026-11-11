@@ -89,6 +89,11 @@ ShellWindow {
     property string category: ""            // Applications: the chip picked, shown as a token in the field
     property int selected: 0
     readonly property var calcValue: Search.calc(query)
+    // "2+2": no list, the bar grows with a result card (Q-panels-20, -21) until Show Results asks for the list
+    property bool showAll: false
+    readonly property bool calcCard: mode === "" && calcValue !== null && !showAll
+    readonly property string calcText: calcValue !== null ? Search.formatNumber(calcValue) : ""
+    onCalcCardChanged: settleGlass(200)
     // browse mode ("" = all results), shared with SpotlightState so global shortcuts and the Dock can open one
     readonly property string mode: SpotlightState.mode
     readonly property var modeInfo: SL.modeInfo(mode)
@@ -99,7 +104,7 @@ ShellWindow {
     Binding { target: FileSearch; property: "query"; value: sp.mode === "" || sp.mode === "files" ? sp.query : "" }
     // rows: {kind: "calc"|"app"|"action"|"file", ...}; 27.2.1 has no section headers (Q-panels-20)
     readonly property var rows: {
-        if (mode !== "" || query.trim() === "") return [];
+        if (mode !== "" || query.trim() === "" || calcCard) return [];
         const r = [];
         const addActions = () => { for (const a of actions) r.push({ kind: "action", title: a.title, subtitle: a.subtitle || "", action: a }); };
         if (quickKeyHit) addActions();      // a typed quick key puts its action on top
@@ -166,7 +171,7 @@ ShellWindow {
         target: Panels
         function onSpotlightQueryChanged() { sp.takeQuery(); }
     }
-    onQueryChanged: selected = 0
+    onQueryChanged: { selected = 0; showAll = false; }
     // rows fill in after the query changed (streamed files, late actions): the selection
     // follows its row by key, so Return never opens a row that slid under the index
     function rowKey(r) {
@@ -181,6 +186,7 @@ ShellWindow {
     }
 
     function accept() {
+        if (calcCard) { Quickshell.clipboardText = calcText; Panels.close(); return; }
         const row = rows[selected];
         if (!row) return;
         if (row.kind === "action") { SpotlightActions.run(row.action); return; }
@@ -216,8 +222,10 @@ ShellWindow {
             y: stage.barY
             width: Theme.spotlight.barW
             height: Theme.spotlight.barH
+            readonly property real fullHeight: sp.calcCard ? Theme.spotlight.calcBarH : Theme.spotlight.barH
             Glass {
-                anchors.fill: parent
+                width: parent.width
+                height: bar.fullHeight
                 radius: Theme.spotlight.barRadius
                 sx: bar.x
                 sy: bar.y
@@ -225,7 +233,8 @@ ShellWindow {
             }
             // the dark vertical gradient (Q-panels-14)
             Rectangle {
-                anchors.fill: parent
+                width: parent.width
+                height: bar.fullHeight
                 radius: Theme.spotlight.barRadius
                 gradient: Gradient {
                     GradientStop { position: 0; color: Theme.spotlight.barTopTint }
@@ -286,10 +295,11 @@ ShellWindow {
                     anchors.centerIn: parent
                     width: 28 / Theme.appIcon.body       // the top hit's icon art is about 28
                     height: width
-                    visible: sp.mode === "" && sp.apps.length > 0
+                    visible: sp.mode === "" && (sp.apps.length > 0 || sp.calcCard)
                     size: width
-                    icon: sp.apps.length > 0 ? sp.apps[0].icon || "" : ""
-                    appId: sp.apps.length > 0 ? sp.apps[0].id : ""
+                    // the calculator's icon with an answer (Q-panels-21)
+                    icon: sp.calcCard ? "accessories-calculator" : sp.apps.length > 0 ? sp.apps[0].icon || "" : ""
+                    appId: sp.calcCard ? "org.gnome.Calculator" : sp.apps.length > 0 ? sp.apps[0].id : ""
                 }
                 Symbol {
                     anchors.right: parent.right
@@ -329,7 +339,79 @@ ShellWindow {
                     font: input.font
                     color: Theme.spotlight.placeholder
                 }
+                // the answer inline after the query, on the completion pill (Q-panels-16, -21)
+                Rectangle {
+                    visible: sp.calcCard
+                    x: input.contentWidth + 2
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: completion.implicitWidth + 8
+                    height: completion.implicitHeight + 4
+                    radius: Theme.spotlight.completionRadius
+                    color: Theme.spotlight.completionFill
+                    Text {
+                        id: completion
+                        anchors.centerIn: parent
+                        text: "= " + sp.calcText
+                        font: input.font
+                        color: Theme.spotlight.completionText
+                    }
+                }
             }
+            // the result card: "2+2 =" 12 regular grey, the answer 16 semibold white, a round copy button
+            Rectangle {
+                visible: sp.calcCard
+                x: Theme.spotlight.calcCardInset
+                y: Theme.spotlight.barH
+                width: parent.width - 2 * Theme.spotlight.calcCardInset
+                height: Theme.spotlight.calcCardH
+                radius: height / 2
+                color: Theme.spotlight.completionFill
+                border.width: 1
+                border.color: Qt.rgba(1, 1, 1, 0.3)
+                Column {
+                    x: 19
+                    anchors.verticalCenter: parent.verticalCenter
+                    Text { text: sp.query.trim() + " ="; font: Typography.font(12); color: Theme.spotlight.placeholder }
+                    Text { text: sp.calcText; font: Typography.font(16, Typography.semibold); color: Theme.spotlight.text }
+                }
+                Rectangle {
+                    anchors.right: parent.right
+                    anchors.rightMargin: 15
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: Theme.spotlight.calcCopy
+                    height: width
+                    radius: width / 2
+                    color: Theme.spotlight.tokenFill
+                    Symbol { anchors.centerIn: parent; name: "doc"; size: 14; color: Theme.spotlight.text }
+                    MouseArea { anchors.fill: parent; onClicked: { Quickshell.clipboardText = sp.calcText; Panels.close(); } }
+                }
+            }
+        }
+
+        // "Show Results" under the grown bar: shows the list for the query (Q-panels-21)
+        Item {
+            id: showResults
+            visible: sp.calcCard
+            width: Theme.spotlight.showResultsW
+            height: Theme.spotlight.showResultsH
+            x: Math.round((stage.width - width) / 2)
+            y: bar.y + bar.fullHeight + Theme.spotlight.gap
+            Glass {
+                anchors.fill: parent
+                radius: height / 2
+                sx: showResults.x
+                sy: showResults.y
+                tint: Theme.glass.tintStrong
+            }
+            // the same dark material as the bar's lower half (the capsule reads like it on the Mac shot)
+            Rectangle { anchors.fill: parent; radius: height / 2; color: Theme.spotlight.barBottomTint }
+            Row {
+                anchors.centerIn: parent
+                spacing: 8
+                AppIcon { anchors.verticalCenter: parent.verticalCenter; width: 22; height: 22; size: 22; icon: "accessories-calculator"; appId: "org.gnome.Calculator" }
+                Text { anchors.verticalCenter: parent.verticalCenter; text: "Show Results"; font: Typography.font(13); color: Theme.spotlight.text }
+            }
+            MouseArea { anchors.fill: parent; onClicked: sp.showAll = true }
         }
 
         // ---------- the panel under it ----------

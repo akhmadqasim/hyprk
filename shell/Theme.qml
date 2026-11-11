@@ -499,6 +499,18 @@ Singleton {
         // both; other icon styles not measured).
         readonly property int barW: 520
         readonly property int barH: 87
+        // calculator answer (Q-panels-21): the bar grows to 172.5 with a result card (19 inset, 60 tall, capsule) under
+        // the field, the answer inline in the field on a completion pill (Q-panels-15, -16: white ~15 %, r 6, text 203),
+        // and a "Show Results" capsule 148 x 44 10 below the bar
+        readonly property real calcBarH: 172.5
+        readonly property real calcCardInset: 19
+        readonly property real calcCardH: 60
+        readonly property real calcCopy: 30
+        readonly property color completionFill: Qt.rgba(1, 1, 1, 0.15)
+        readonly property color completionText: Qt.rgba(203 / 255, 203 / 255, 203 / 255, 1)
+        readonly property real completionRadius: 6
+        readonly property real showResultsW: 148
+        readonly property real showResultsH: 44
         readonly property real barRadius: 43.5
         readonly property real barTop: 0.227             // bar top at 22.7 % of the screen height
         readonly property int gap: 10
