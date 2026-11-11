@@ -396,7 +396,8 @@ for _, k in ipairs({ "Super_L", "Super_R" }) do
     end, { release = true, transparent = true, non_consuming = true, submap_universal = true })
 end
 hl.bind(cmd .. " + F4",      hl.dsp.global("hyprk:apps"))   -- Apps: Spotlight's Applications mode (shell/services/AppsView.qml)
-hl.bind(cmd .. " + A",       hl.dsp.global("hyprk:apps"))
+-- Cmd-A and Cmd-Return are not global on the Mac: Cmd-A is Select All of the focused field or app (the Edit menu) and
+-- Cmd-Return belongs to the focused app, so neither is bound here (they were Apps and the terminal)
 hl.bind(cmd .. " + N",       hl.dsp.global("hyprk:notificationcenter"))
 hl.bind(cmd .. " + SHIFT + C", hl.dsp.global("hyprk:controlcenter"))
 hl.bind(cmd .. " + Up",      hl.dsp.global("hyprk:missioncontrol"))   -- macOS: Ctrl+Up
@@ -411,7 +412,6 @@ hl.bind(cmd .. " + W",       hl.dsp.window.close())
 -- plugin-motion turns the move to special:minimized into the genie
 hl.bind(cmd .. " + M",       hl.dsp.window.move({ workspace = "special:minimized", follow = false }))
 hl.bind(cmd .. " + CTRL + F", hl.dsp.window.fullscreen())
-hl.bind(cmd .. " + Return",  hl.dsp.exec_cmd(terminal))
 hl.bind(cmd .. " + SHIFT + Escape", hl.dsp.exit())
 -- Lock Screen like macOS (Ctrl+Cmd+Q): the shell's lock screen, hyprlock when the shell is not running
 -- (lockscreen/lock.sh, lockscreen/FALLBACKS.md). Its fade layers animate themselves.

@@ -30,16 +30,16 @@ Pakai tombol Ctrl+Alt ini (belum dites dengan keyboard asli, baru dites lewat pe
 |---|---|---|
 | Spotlight | Ctrl+Alt+S | Super+Space |
 | Pindah app (Cmd+Tab) | Ctrl+Alt+W | Super+Tab |
-| Jendela Applications | Ctrl+Alt+A | Super+A atau F4 |
+| Jendela Applications | Ctrl+Alt+A | Super+F4 |
 | Notification Center | Ctrl+Alt+N | Super+N |
 | Control Center | Ctrl+Alt+C | Super+Shift+C |
 | Mission Control | Ctrl+Alt+M | Super+Up, Ctrl+Up, atau F3 |
-| Buka terminal (ghostty) | Ctrl+Alt+Return | Super+Return |
+| Buka terminal (ghostty) | Ctrl+Alt+Return | - (Super+Return milik app, seperti di Mac) |
 | Keluar dari hyprk | Ctrl+Alt+Q | Super+Shift+Escape |
 
 Tombol lain (ada di kedua mode, kecuali yang pakai Super):
 
-- Super+Q atau Super+W: tutup jendela. Super+M: jendela mengambang atau tidak. Super+Ctrl+F: layar penuh.
+- Super+W: tutup jendela. Super+Q: keluar dari app (semua jendelanya). Super+H: sembunyikan app, Super+Alt+H: sembunyikan app lain. Super+M: minimize ke Dock. Super+Ctrl+F: layar penuh.
 - Super + tahan klik kiri: geser jendela. Super + tahan klik kanan: ubah ukuran.
 - Ctrl+1 sampai Ctrl+9: pindah Space. Ctrl+Shift+1..9: kirim jendela ke Space itu. Ctrl+kiri/kanan: Space sebelum/sesudah.
 - Super+Shift+3: screenshot layar penuh. Super+Shift+4: screenshot area (butuh `slurp`). Print juga bisa.

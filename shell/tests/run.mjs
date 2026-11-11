@@ -1298,5 +1298,50 @@ test("Mission Control: one Space reads Desktop, more are numbered by position", 
     });
 }
 
+// ---- text field key bindings (ui/HyprK/keybindings.js, AppKit StandardKeyBinding.dict 27.2.1) ----
+{
+    const KB = load("keybindings.js", hyprk);
+    const st = (text, cursor, anchor) => ({ text: text, cursor: cursor, anchor: anchor === undefined ? cursor : anchor });
+    const ev = (key, mods) => ({ key: key, modifiers: mods || 0 });
+    const CTRL = 0x04000000, ALT = 0x08000000, SHIFT = 0x02000000, CMD = 0x10000000;
+    test("key bindings: names map to the dict's actions", () => {
+        assert.equal(KB.actionFor(ev(0x41, CTRL)), "moveToBeginningOfParagraph");        // ^a, not Select All
+        assert.equal(KB.actionFor(ev(0x45, CTRL | SHIFT)), "moveToEndOfParagraphAndModifySelection");
+        assert.equal(KB.actionFor(ev(0x4b, CTRL)), "deleteToEndOfParagraph");
+        assert.equal(KB.actionFor(ev(0x01000012, ALT)), "moveWordLeft");
+        assert.equal(KB.actionFor(ev(0x01000014, CMD | SHIFT)), "moveToRightEndOfLineAndModifySelection");
+        assert.equal(KB.actionFor(ev(0x01000003, ALT)), "deleteWordBackward");
+        assert.equal(KB.actionFor(ev(0x01000003, CMD)), "deleteToBeginningOfLine");
+        assert.equal(KB.actionFor(ev(0x41, CMD)), "selectAll");
+        assert.equal(KB.actionFor(ev(0x01000013)), "");                                   // plain Up: the field's
+        assert.equal(KB.actionFor(ev(0x51, CTRL)), "");
+    });
+    test("key bindings: moves, words and selections on one line", () => {
+        const t = "hello, big world";
+        assert.deepEqual(KB.apply(st(t, 16), "moveWordLeft"), st(t, 11));
+        assert.deepEqual(KB.apply(st(t, 11), "moveWordLeft"), st(t, 7));
+        assert.deepEqual(KB.apply(st(t, 5), "moveWordRight"), st(t, 10));
+        assert.deepEqual(KB.apply(st(t, 3, 8), "moveLeft"), st(t, 3));                    // collapses to the start
+        assert.deepEqual(KB.apply(st(t, 3, 8), "moveRight"), st(t, 8));
+        assert.deepEqual(KB.apply(st(t, 5), "moveWordRightAndModifySelection"), st(t, 10, 5));
+        assert.deepEqual(KB.apply(st(t, 5, 2), "moveToEndOfParagraphAndModifySelection"), st(t, 16, 2));
+        assert.equal(KB.apply(st(t, 5), "scrollToBeginningOfDocument"), null);             // Home only scrolls
+        assert.deepEqual(KB.apply(st(t, 9), "moveToBeginningOfParagraph"), st(t, 0));
+    });
+    test("key bindings: deletes, kill and yank, transpose", () => {
+        const t = "hello, big world";
+        assert.deepEqual(KB.apply(st(t, 10), "deleteWordBackward"), st("hello,  world", 7));
+        assert.deepEqual(KB.apply(st(t, 5), "deleteWordForward"), st("hello world", 5));
+        const k = KB.apply(st(t, 7), "deleteToEndOfParagraph");
+        assert.equal(k.text, "hello, ");
+        assert.equal(k.kill, "big world");
+        assert.deepEqual(KB.apply(st("ab", 0), "yank", "XY"), st("XYab", 2));
+        assert.deepEqual(KB.apply(st("abc", 1), "transpose"), st("bac", 2));
+        assert.deepEqual(KB.apply(st("abc", 3), "transpose"), st("acb", 3));
+        assert.deepEqual(KB.apply(st("abc", 2, 0), "deleteBackward"), st("c", 0));
+        assert.deepEqual(KB.changedSpan("hello world", "hello, world"), { start: 5, end: 5, insert: "," });
+    });
+}
+
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

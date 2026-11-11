@@ -30,6 +30,7 @@ Column {
                     font: Typography.body
                     color: Theme.label
                     onAccepted: if (text !== "") page.ctl.speak(text)
+                    Keys.onPressed: e => KeyBindings.handle(e, phrase)   // AppKit's text keys (HyprK keybindings.js)
                 }
             }
         }

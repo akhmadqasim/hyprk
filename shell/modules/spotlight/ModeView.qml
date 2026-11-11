@@ -227,6 +227,7 @@ Item {
                         Keys.onReturnPressed: view.finishEdit(rr.d.id, text)
                         Keys.onEnterPressed: view.finishEdit(rr.d.id, text)
                         Keys.onEscapePressed: view.finishEdit("", "")
+                        Keys.onPressed: e => KeyBindings.handle(e, keyInput)   // AppKit's text keys
                     }
                 }
             }

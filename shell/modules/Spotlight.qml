@@ -429,7 +429,8 @@ ShellWindow {
                 Keys.onDownPressed: sp.moveSel(1)
                 Keys.onUpPressed: sp.moveSel(-1)
                 Keys.onTabPressed: sp.moveSel(1)
-                Keys.onPressed: event => sp.handleKey(event)
+                // the mode keys and the Apps grid's arrows first, then AppKit's text keys (HyprK keybindings.js)
+                Keys.onPressed: event => { sp.handleKey(event); if (!event.accepted) KeyBindings.handle(event, input); }
 
                 Text {
                     visible: input.text === "" && sp.category === ""

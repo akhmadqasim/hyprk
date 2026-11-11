@@ -1,4 +1,5 @@
 import QtQuick
+import "keybindings.js" as KeyBindings
 
 // System Settings sidebar search field (MAC-ANSWERS.md Q-settings-10): a flat translucent 28 pt capsule, not glass,
 // with a 0.5 pt dark rim (pixels of desktop-dock-{light,dark}.png). Magnifier (magnifyingglass, 13 pt) at the left,
@@ -30,6 +31,7 @@ Rectangle {
         selectionColor: Accent.selectedText   // selectedTextBackgroundColor
         selectedTextColor: Tokens.label
         clip: true
+        Keys.onPressed: e => KeyBindings.handle(e, input)   // AppKit's text keys (keybindings.js)
         Text {
             visible: !input.text && !input.preeditText
             text: "Search"
