@@ -16,6 +16,8 @@ AppIconTile {
     // macOS icons carry the style in their file; only other icons get the styled tile and glyph effect
     style: Apps.isMacIcon(icon, appId) ? "default" : Theme.iconTileStyle
     tint: Theme.color.accent
+    // Clear / Tinted in their dark form: the style's own Dark choice, or Auto in dark mode (iconStyleVariant)
+    styleDark: Theme.iconStyleVariant === "dark" || (Theme.iconStyleVariant !== "light" && Theme.dark)
     // a Dark / Clear / Tinted rendition is not cached: a style switch drops the whole set, and Qt's cache only frees
     // unreferenced images a quarter every 30 s (cycling 4 styles x 2 modes left +38 MB, still +14 MB 90 s later)
     cache: !/-256-(dark|clear|tinted)-(dark|light)\.png$/.test(String(source))

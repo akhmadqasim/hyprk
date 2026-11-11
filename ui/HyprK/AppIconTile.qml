@@ -62,10 +62,13 @@ Item {
     readonly property bool _clear: style === "clear"
     readonly property bool _tinted: style === "tinted"
     // Clear and Tinted: a flat tile and the art mapped by its luminance (shaders/iconstyle.frag), the rule read from
-    // the Mac's ClearLight / TintedLight Dock for icons without layers (WebStorm, Spotify; themes/icons/README.md).
-    // The Mac's dark appearance has no other files for these styles (the Apple renditions fall back to the light
-    // ones), so the same is drawn in both appearances
+    // Apple's tiles and code for icons without layers (themes/icons agent, b0ba729 / 53470ff; ramps in the shader).
+    // The appearance (Tokens.dark) picks the light or the dark form: dark Tinted is a dark tile with a blue tint fading
+    // down, dark Clear an opaque grey 43 tile
     readonly property bool _mapped: _clear || _tinted
+    // the dark form of Clear / Tinted: the appearance by default; the shell binds the style's own Light / Dark / Auto
+    property bool styleDark: Tokens.dark
+    readonly property bool _darkMode: styleDark
 
     // built only for icons that get a tile (most icons are trusted or already squircles and never draw one);
     // the outlines are shared by every tile (IconShape.tilePoints)
@@ -78,8 +81,9 @@ Item {
 
         sourceComponent: root._mapped ? flatTile : fullTile
     }
-    // Clear / Tinted tile: flat, the colour of the Apple renditions' tile (build-styles.py): Tinted sRGB 0,109,195,
-    // Clear white at alpha 0.20 (the Mac's glass tile over the Dock: 176 -> 192)
+    // Clear / Tinted tile: the colour of the Apple renditions' tile (build-styles.py): light Tinted sRGB 0,109,195,
+    // light Clear white at alpha 0.20 (the Mac's glass tile over the Dock: 176 -> 192); dark Tinted 25 + 0.15 x
+    // (0,122,249) x (1 - y) from top to bottom, dark Clear opaque 43
     Component {
         id: flatTile
         Item { Shape {
@@ -90,8 +94,16 @@ Item {
             preferredRendererType: Shape.CurveRenderer
             ShapePath {
                 strokeColor: "transparent"
-                fillColor: root._clear ? Qt.rgba(1, 1, 1, 0.20) : Qt.rgba(0, 109 / 255, 195 / 255, 1)
+                fillColor: root._darkMode ? (root._clear ? Qt.rgba(43 / 255, 43 / 255, 43 / 255, 1) : "#191919")
+                         : root._clear ? Qt.rgba(1, 1, 1, 0.20) : Qt.rgba(0, 109 / 255, 195 / 255, 1)
+                fillGradient: root._darkMode && root._tinted ? darkTint : null
                 PathPolyline { path: IconShape.tilePoints(0) }
+            }
+            LinearGradient {
+                id: darkTint
+                x1: 0; y1: 0; x2: 0; y2: 100
+                GradientStop { position: 0; color: Qt.rgba(25 / 255, (25 + 0.15 * 122) / 255, (25 + 0.15 * 249) / 255, 1) }
+                GradientStop { position: 1; color: Qt.rgba(25 / 255, 25 / 255, 25 / 255, 1) }
             }
         } }
     }
@@ -199,6 +211,11 @@ Item {
         sourceComponent: ShaderEffect {
             property Item source: art
             property real clear: root._clear ? 1 : 0
+            property real darkMode: root._darkMode ? 1 : 0
+            // the art's rows in the tile's own 0..1 (dark Tinted's tile gradient runs under it)
+            readonly property real tileSize: root.size * root.body
+            property real tileTop: (art.y - (root.size - tileSize) / 2) / Math.max(1, tileSize)
+            property real tileSpan: art.height / Math.max(1, tileSize)
             fragmentShader: Qt.resolvedUrl("shaders/iconstyle.frag.qsb")
         }
     }
