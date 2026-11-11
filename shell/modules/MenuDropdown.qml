@@ -14,8 +14,8 @@ import "../lib/menus.js" as Menus
 // (`checked`: true or "mixed"), 40 / 51 for rows with an `icon` (Q-menubar-15..17); key column right-aligned
 // at W - 18.5 with modifiers 3 pt before it (Q-menubar-18). No minimum width (Q-menubar-19).
 // Motion: appears complete at once, a chosen row blinks once (off 67 ms, on 50 ms) and then the menu runs
-// the item and fades out in 0.2 s ease-out, as on Esc (Q-menubar-23, -24). The selection glides from row to
-// row (Reduce motion: no glide).
+// the item and fades out in 0.2 s ease-out, as on Esc (Q-menubar-23, -24). The selection jumps from row to
+// row in one frame, no glide (MAC-ANSWERS "No animation: the highlight moves within 1 frame").
 // Submenus (Q-menubar-23): a row with `submenu: true` and `items` opens them 0.22 s after it is highlighted (at once on
 // a click, Right or Return), on its own surface (MenuSubmenu.qml) overlapping this menu's right edge by 5 pt with its
 // first row level with the row; the row stays highlighted while it is open; another row closes it in the same frame.
@@ -138,12 +138,10 @@ Item {
         materialize: root.fade
     }
 
-    // selection: one inset pill that glides to the hovered row; it appears in place when the
-    // pointer comes in from outside the menu
+    // selection: one inset pill that jumps to the hovered row
     property int hover: -1
     property real hoverY: 0
     function enterRow(i, y) {
-        const fresh = hover < 0;
         // another row: an open submenu goes in the same frame; a submenu row starts the open delay
         if (i !== subIndex) {
             closeSub();
@@ -154,7 +152,6 @@ Item {
         }
         hover = i;
         hoverY = y;
-        if (fresh || A11y.reduceMotion) selY.snap();
     }
     // leaving a row and entering the next arrive in one pointer event: clear only if none took over
     // (a closing menu keeps its selection while it fades out)
@@ -248,11 +245,10 @@ Item {
         return false;
     }
 
-    Spring { id: selY; target: root.hoverY; response: Theme.anim.menuTrackResponse; damping: Theme.anim.menuTrackDamping; epsilon: 0.3 }
     Rectangle {
         visible: root.hover >= 0 && !root.blinkOff
         x: Theme.menu.itemInset
-        y: list.y + selY.value
+        y: list.y + root.hoverY
         width: parent.width - Theme.menu.itemInset * 2
         height: Theme.menu.itemHeight
         radius: Theme.menu.itemRadius

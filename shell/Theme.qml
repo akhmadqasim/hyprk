@@ -655,14 +655,8 @@ Singleton {
         readonly property int easing: Easing.OutCubic
 
         // Liquid Glass motion (materialize, press, Reduce motion crossfade): Tokens.motion
-        // menu selection glides between rows with the response of FlexInteraction.Settings.menu's
-        // cursor tracking spring (round3 flex-presets +0x110: 0.15 s), critically damped (that preset's
-        // 0.5 belongs to its scale, and a bouncing highlight read as wobbly: by eye). The menu preset
-        // has no lift.
-        readonly property real menuTrackResponse: 0.15
         // a menu opens at once and fades out in about 0.2 s, ease-out (measured on macOS 27.2.1)
         readonly property int menuFadeOut: theme.ms(200)
-        readonly property real menuTrackDamping: 1.0
         // a growing or shrinking glass (Spotlight results): SwiftUI .snappy, bounce 0.15 (by eye)
         readonly property real resizeResponse: 0.5
         readonly property real resizeDamping: 0.85
