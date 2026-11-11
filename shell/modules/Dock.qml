@@ -462,7 +462,9 @@ ShellWindow {
                 // unmagnified centre of this cell (background coordinates)
                 readonly property real baseCenter: dock.geom.center[index] || 0
                 readonly property real size: dock.geom.size[index] || dock.tile
-                readonly property bool running: (modelData.windows || []).length > 0
+                // Finder always runs on the Mac (its dot shows with no Finder window, screens/27.2.1/dock/dock-*.png; the
+                // desktop is Finder's, Q-menubar-31)
+                readonly property bool running: (modelData.windows || []).length > 0 || modelData.id === "hyprk-finder"
                 readonly property bool launching: Apps.isLaunching(modelData.id) && !running
                 // a window appeared: launching is over, the bounce in progress still lands (Apps.stopLaunching)
                 readonly property bool launchDone: running && Apps.isLaunching(modelData.id)
@@ -571,7 +573,8 @@ ShellWindow {
                 // running dot, also while launching (with Reduce Motion it is the only launch feedback): 4.1 pt,
                 // its centre 5 pt below the art bottom at rest (Q-dock-07). On the plugin it is a fill shape on the
                 // dots surface below (dock.pluginDots); this one is the fallback
-                readonly property bool dot: cell.running || cell.launching
+                // "Show indicators for open applications" (Desktop & Dock, show-process-indicators, on by default)
+                readonly property bool dot: (cell.running || cell.launching) && Prefs.dock.showIndicators !== false
                 ShaderEffect {
                     visible: cell.dot && !dock.dotsUp
                     width: dock.m.dot

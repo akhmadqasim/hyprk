@@ -238,7 +238,7 @@ function normalizeAppearance(obj) {
     return o;
 }
 
-const dockDefaults = { size: 48, magnification: false, magnifiedSize: 96, position: "bottom", autohide: false, minimizeEffect: "genie", showRecents: true };
+const dockDefaults = { size: 48, magnification: false, magnifiedSize: 96, position: "bottom", autohide: false, minimizeEffect: "genie", showRecents: true, showIndicators: true };
 const dockPositions = ["left", "bottom", "right"];
 
 function clamp(v, lo, hi, dflt) {
@@ -254,6 +254,7 @@ function normalizeDock(obj) {
     o.magnification = !!o.magnification;
     o.autohide = !!o.autohide;
     o.showRecents = !!o.showRecents;
+    o.showIndicators = !!o.showIndicators;
     return o;
 }
 

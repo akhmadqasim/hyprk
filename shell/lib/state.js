@@ -31,7 +31,7 @@ function spaceName(index, count) {
 }
 
 function dockDefaults() {
-    return { autohide: false, magnification: false, size: 64, magnifiedSize: 128, showRecents: true };
+    return { autohide: false, magnification: false, size: 64, magnifiedSize: 128, showRecents: true, showIndicators: true };
 }
 
 // Dock tile size in pt from dock.json `size`. Settings' Size slider writes the Mac's `tilesize` itself (16..128,

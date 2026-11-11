@@ -62,7 +62,7 @@ Column {
     Card {
         FormRow { label: "Automatically hide and show the Dock"; Switch { checked: pane.d.autohide; onToggled: on => AppState.set("dock", { autohide: on }) } }
         FormRow { label: "Animate opening applications"; LocalSwitch { checked: true } }
-        FormRow { label: "Show indicators for open applications"; LocalSwitch { checked: true } }
+        FormRow { label: "Show indicators for open applications"; Switch { checked: pane.d.showIndicators; onToggled: on => AppState.set("dock", { showIndicators: on }) } }
         FormRow { label: "Show suggested and recent apps in Dock"; Switch { checked: pane.d.showRecents; onToggled: on => AppState.set("dock", { showRecents: on }) } }
     }
 
