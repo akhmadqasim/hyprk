@@ -11,6 +11,7 @@ import qs.HyprK
 import qs.services
 import "../lib/spring.js" as SpringLib
 import "../lib/state.js" as State
+import "../lib/expose.js" as Expose
 
 // Mission Control (Super+Up): live thumbnails of the windows on the current Space laid out
 // without overlap, the Spaces bar at the top. Click a window to focus it, a Space to switch,
@@ -53,30 +54,51 @@ ShellWindow {
         // the strip that fades with `e`: the menu bar and the wallpaper's top dimming under it (Background.qml topDim)
         readonly property int stripHeight: 100
         readonly property var barExit: SpringLib.fromResponse(0.125, 1)    // SpacesBarExitSpringResponse
-        // collapsed Spaces bar: labelled pills, guessed (no 27.2.1 screenshot of it yet, Q-dock-31)
-        readonly property int barHeight: 44
-        readonly property int pillHeight: 26
-        readonly property int pillPadding: 12
+        // collapsed Spaces bar (Q-dock-31, mission-control.json spaces_bar, dock/mc-{dark,light}.png): a band 74 pt
+        // tall over the menu bar zone, name pills 24 pt tall (r 12) centred on y 53.5 with a +35 / 255 fill, "+" a
+        // 20 pt glyph, grey 229, 16 pt from the right edge, centre y 37
+        readonly property int barHeight: 74
+        readonly property int pillHeight: 24
+        readonly property real pillCentre: 53.5
+        readonly property real pillPadding: 11.5      // "Desktop" in a 75 pt pill
         readonly property int pillSpacing: 6
         readonly property real labelSize: 13
-        readonly property color pill: Qt.rgba(1, 1, 1, 0.24)
-        readonly property color pillHover: Qt.rgba(1, 1, 1, 0.14)
-        readonly property int plusSize: 28
+        readonly property color pill: Qt.rgba(1, 1, 1, 35 / 255)
+        readonly property color pillHover: Qt.rgba(1, 1, 1, 18 / 255)   // ours: no hover seen on the Mac
+        readonly property int plusSize: 20
+        readonly property real plusCentre: 37
+        readonly property color plusColor: Qt.rgba(229 / 255, 229 / 255, 229 / 255, 1)
         readonly property int plusInset: 16          // from the right screen edge
+        // The band is a blur + tint material, no rim (Q-dock-27). Only the wallpaper is ever behind it (the windows
+        // sit below y 108), so it is the pre-blurred wallpaper (Wallpaper.blurredUrl, sigma about 44 pt; a gaussian of
+        // 32-48 pt fits the Mac band best) through a tint fitted on the two Mac shots over Tahoe (rms 4.4-5.6 of
+        // 255; other wallpapers inferred). Below it a 1 pt line at x0.74 and a shadow from x0.80 to x0.94 over 25 pt
+        // (column at x 300 of mc-light.png: 138 149 152 156 160 165 169 172 174 for wallpaper 186)
+        readonly property real bandContrast: Theme.dark ? -0.10 : -0.25
+        readonly property real bandBrightness: Theme.dark ? -0.015 : 0.05
+        readonly property real bandSaturation: Theme.dark ? 0 : 0.95
+        readonly property real bandLine: 0.26
+        readonly property real bandShadowTop: 0.20
+        readonly property real bandShadowEnd: 0.06
+        readonly property int bandShadowHeight: 25
+        readonly property int bandShadowTail: 11      // the rest fades out below (not separable from the wallpaper on the Mac shots)
         readonly property int expandMs: 250          // bar grows into thumbnails on hover, guessed
         readonly property int gateMs: 150            // longest wait for the first window captures
-        // window layout below the bar, guessed (Q-dock-28)
-        readonly property int gridTop: barHeight + Theme.mission.margin / 2
+        // window layout: lib/expose.js, decoded from WindowManager 27.2.1. Its inputs: the Spaces bar height (73.5
+        // reproduces the Mac's captured frames, mission-control.json) and the Dock's thickness (the Dock's band here)
+        readonly property real layoutBar: 73.5
+        // the plugin's title bar on windows that have one (plugin README titlebar_height; asked at open)
+        readonly property int titleBar: 32
         // wallpaper layer colour when no image is set (Background.qml)
         readonly property color empty: Theme.dark ? "#1c1c1e" : "#3a6fb0"
     }
 
     // 0 = everything in place, 1 = Mission Control
     property real e: 0
-    SpringCurve { id: anim; target: mc; property: "e"; spring: mc.m.expose }
+    FrameSpring { id: anim; target: mc; property: "e"; spring: mc.m.expose }
     // Spaces bar: in with the windows, out on its own spring
     property real bar: 0
-    SpringCurve { id: barAnim; target: mc; property: "bar"; spring: mc.m.expose }
+    FrameSpring { id: barAnim; target: mc; property: "bar"; spring: mc.m.expose }
     function go() {
         anim.spring = shown ? m.expose : m.exposeExit;
         anim.kick = shown ? 0 : m.exitKick;
@@ -107,32 +129,51 @@ ShellWindow {
     property var spaces: []
     Binding on spaces { value: Hyprland.workspaces.values.filter(w => w.id > 0).sort((a, b) => a.id - b.id); when: mc.shown; restoreMode: Binding.RestoreNone }
 
-    // Stacking order (address -> index, higher is on top): Hyprland lists its clients bottom to top (a raise moves a
-    // window to the end; focusing one does not raise it, so focusHistoryID is not the stacking order: a Settings window
-    // over a focused Finder flew back under it and jumped on top when the layer went, a 6 % step, mcap). Asked once per
-    // open on the compositor's request socket; the reply is in before the thumbnails' first captures.
+    // Asked once per open on the compositor's request socket, in one batch; the reply is in before the thumbnails'
+    // first captures.
+    // `stack` (address -> index, higher is on top): Hyprland lists its clients bottom to top (a raise moves a window to
+    // the end; focusing one does not raise it, so focusHistoryID is not the stacking order: a Settings window over a
+    // focused Finder flew back under it and jumped on top when the layer went, a 6 % step, mcap).
+    // `bars` (address -> true): windows that carry the liquidglass plugin's title bar, a decoration above the window
+    // box that a window capture does not contain (judge #4: terminals and GTK windows lost their title bar and
+    // lights in the thumbnails). Such a window's thumbnail gets the bar's strip cut from a still of the screen.
     property var stack: ({})
+    property var bars: ({})
+    property bool asked: false          // the reply is in
     Socket {
         id: stackQuery
         path: Quickshell.env("XDG_RUNTIME_DIR") + "/hypr/" + Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE") + "/.socket.sock"
         property string reply: ""
+        property var addresses: []
         parser: SplitParser { splitMarker: ""; onRead: data => stackQuery.reply += data }
         onConnectionStateChanged: {
             if (connected) {
                 reply = "";
-                write("j/clients");
+                // the toplevel's own address: a new window's lastIpcObject is still empty here
+                addresses = mc.windows.map(t => mc.addressOf(t)).filter(a => a);
+                write("[[BATCH]]j/clients;" + addresses.map(a => "/decorations address:" + a).join(";"));
                 flush();
             } else if (reply !== "") {
                 try {
-                    const s = {};
-                    JSON.parse(reply).forEach((c, i) => s[c.address] = i);
+                    const parts = reply.split(/\n\n\n+/), s = {}, b = {};
+                    JSON.parse(parts[0]).forEach((c, i) => s[c.address] = i);
+                    addresses.forEach((a, i) => { if ((parts[i + 1] || "").includes("liquidglass-titlebar\t")) b[a] = true; });
                     mc.stack = s;
+                    mc.bars = b;
                 } catch (err) {}
                 reply = "";
+                mc.asked = true;
+                mc.relayout();
+                mc.maybeGo();
             }
         }
     }
 
+    function addressOf(t) {
+        const o = t.lastIpcObject;
+        if (o && o.address) return o.address;
+        return t.address ? (String(t.address).startsWith("0x") ? t.address : "0x" + t.address) : "";
+    }
     function centreOf(t) {
         const o = t.lastIpcObject;
         return o && o.at && o.size ? { x: o.at[0] + o.size[0] / 2, y: o.at[1] + o.size[1] / 2 } : { x: 0, y: 0 };
@@ -155,14 +196,17 @@ ShellWindow {
     property bool pending: false
     function present() {
         Hyprland.refreshToplevels();
+        asked = false;
         stackQuery.connected = true;
+        if (e === 0 && still.captureSource) still.captureFrame();
         keys.forceActiveFocus();
         pending = true;
         gate.restart();
         maybeGo();
     }
     function maybeGo() {
-        if (!pending || thumbs.count < windows.length) return;
+        if (!pending || !asked || thumbs.count < windows.length) return;
+        if (anyBar && !still.hasContent) return;
         for (let i = 0; i < thumbs.count; i++) {
             const c = thumbs.itemAt(i);
             if (c && !c.ready) return;
@@ -186,11 +230,61 @@ ShellWindow {
     Component.onCompleted: { completed = true; present(); }
     onShownChanged: if (completed) shown ? present() : go()
 
-    // grid geometry: as square as possible, cells share the area below the Spaces bar
-    readonly property int cols: Math.max(1, Math.ceil(Math.sqrt(windows.length)))
-    readonly property int rows: Math.max(1, Math.ceil(windows.length / cols))
-    readonly property real cellW: (width - Theme.mission.margin * 2 - Theme.mission.gap * (cols - 1)) / cols
-    readonly property real cellH: (height - dockZone - m.gridTop - Theme.mission.margin * 1.5 - Theme.mission.gap * (rows - 1)) / rows
+    // ---------- layout (lib/expose.js): one uniform scale, the windows near where they are ----------
+    readonly property var area: Expose.usableArea({ x: 0, y: 0, w: width, h: height }, dockZone, m.layoutBar)
+    function clientRect(t) {
+        const o = t.lastIpcObject;
+        if (!o || !o.at || !o.size || !screen) return null;
+        return Qt.rect(o.at[0] - screen.x, o.at[1] - screen.y, o.size[0], o.size[1]);
+    }
+    // the plugin title bar's strip above the window, when the screen still shows all of it: on the screen below the
+    // menu bar and above the Dock's band, with no window stacked higher over it
+    function barRect(t) {
+        const o = t.lastIpcObject, c = clientRect(t);
+        if (!c || !bars[o.address]) return null;
+        const b = Qt.rect(c.x, c.y - m.titleBar, c.width, m.titleBar);
+        if (b.x < 0 || b.x + b.width > width || b.y < Theme.menuBar.height || c.y > height - dockZone) return null;
+        const z = stack[o.address];
+        for (const u of windows) {
+            const uo = u.lastIpcObject, r = u === t ? null : clientRect(u);
+            if (!r || !(stack[uo.address] > z)) continue;
+            const top = r.y - (bars[uo.address] ? m.titleBar : 0);
+            if (r.x < b.x + b.width && b.x < r.x + r.width && top < b.y + b.height && b.y < r.y + r.height) return null;
+        }
+        return b;
+    }
+    // the whole window as it is on screen: the client box plus its title bar strip
+    function fullRect(t) {
+        const c = clientRect(t), b = c ? barRect(t) : null;
+        return b ? Qt.rect(c.x, b.y, c.width, c.height + b.height) : c;
+    }
+    readonly property bool anyBar: windows.some(t => t.lastIpcObject && bars[t.lastIpcObject.address])
+    // where each window goes, and the scale; taken before the fly-in is under way (IPC data and the title bar reply
+    // arrive asynchronously) and kept while closing so the windows fly back from where they are
+    property var frames: []
+    property real layoutScale: 1
+    function relayout() {
+        if (e >= 0.05) return;
+        const rects = windows.map(t => fullRect(t));
+        if (rects.some(r => !r)) return;
+        const out = Expose.layout(rects.map(r => ({ x: r.x, y: r.y, w: r.width, h: r.height })), area);
+        frames = out.frames;
+        layoutScale = out.scale;
+    }
+    onWindowsChanged: relayout()
+    onAreaChanged: relayout()
+
+    // a still of the screen for the title bar strips, taken while this layer is still clear (only with such windows)
+    ScreencopyView {
+        id: still
+        visible: false
+        width: mc.width
+        height: mc.height
+        constraintSize: Qt.size(mc.width, mc.height)
+        captureSource: mc.anyBar ? mc.screen : null
+        live: false
+        onHasContentChanged: mc.maybeGo()
+    }
 
     Item {
         id: keys
@@ -241,10 +335,44 @@ ShellWindow {
         Behavior on grow { NumberAnimation { duration: Theme.ms(mc.m.expandMs); easing.type: Easing.OutCubic } }
         HoverHandler { id: barHover }
 
+        // the band: blurred wallpaper through the tint, a darker line under it and its shadow on the wallpaper
+        Item {
+            anchors.fill: parent
+            clip: true
+            Rectangle { anchors.fill: parent; color: mc.m.empty }
+            Image {
+                y: spacesBar.y < 0 ? -spacesBar.y : 0      // the picture stays in place while the band slides in
+                width: mc.width
+                height: mc.height
+                source: Theme.solidMaterial ? Wallpaper.urlFor(mc.screen) : Wallpaper.blurredUrl
+                sourceSize: Theme.solidMaterial ? Wallpaper.pixelSizeOf(mc.screen) : undefined
+                fillMode: Image.PreserveAspectCrop
+                asynchronous: true
+                cache: true
+                layer.enabled: true
+                layer.effect: MultiEffect {
+                    contrast: mc.m.bandContrast
+                    brightness: mc.m.bandBrightness
+                    saturation: mc.m.bandSaturation
+                }
+            }
+        }
+        Rectangle { y: parent.height; width: parent.width; height: 1; color: Qt.rgba(0, 0, 0, mc.m.bandLine) }
+        Rectangle {
+            y: parent.height + 1
+            width: parent.width
+            height: mc.m.bandShadowHeight + mc.m.bandShadowTail
+            gradient: Gradient {
+                GradientStop { position: 0; color: Qt.rgba(0, 0, 0, mc.m.bandShadowTop) }
+                GradientStop { position: mc.m.bandShadowHeight / (mc.m.bandShadowHeight + mc.m.bandShadowTail); color: Qt.rgba(0, 0, 0, mc.m.bandShadowEnd) }
+                GradientStop { position: 1; color: "transparent" }
+            }
+        }
+
         Row {
             id: pills
             anchors.horizontalCenter: parent.horizontalCenter
-            y: (mc.m.barHeight - mc.m.pillHeight) / 2
+            y: mc.m.pillCentre - mc.m.pillHeight / 2
             spacing: mc.m.pillSpacing
             opacity: 1 - spacesBar.grow
             visible: opacity > 0
@@ -326,19 +454,19 @@ ShellWindow {
         }
 
         // "+": a new empty Desktop (Hyprland makes it current; macOS adds it without switching)
-        Rectangle {
+        Item {
             anchors.right: parent.right
             anchors.rightMargin: mc.m.plusInset
-            y: (mc.m.barHeight - height) / 2
+            y: mc.m.plusCentre - height / 2
             width: mc.m.plusSize
             height: width
-            radius: width / 2
-            color: plus.containsMouse ? mc.m.pill : mc.m.pillHover
-            Rectangle { anchors.centerIn: parent; width: 12; height: 1.5; radius: 0.75; color: Theme.mission.text }
-            Rectangle { anchors.centerIn: parent; width: 1.5; height: 12; radius: 0.75; color: Theme.mission.text }
+            opacity: plus.containsMouse ? 1 : 0.9
+            Rectangle { anchors.centerIn: parent; width: 17; height: 1.5; radius: 0.75; color: mc.m.plusColor }
+            Rectangle { anchors.centerIn: parent; width: 1.5; height: 17; radius: 0.75; color: mc.m.plusColor }
             MouseArea {
                 id: plus
                 anchors.fill: parent
+                anchors.margins: -6
                 hoverEnabled: true
                 onClicked: Hyprland.dispatch('hl.dsp.focus({ workspace = "emptynm" })')
             }
@@ -364,67 +492,77 @@ ShellWindow {
                 if (o && mc.stack[o.address] !== undefined) return mc.stack[o.address];
                 return -1000 - (o && o.focusHistoryID !== undefined ? o.focusHistoryID : 0);
             }
-            // a short last row is centered
-            readonly property int row: Math.floor(index / mc.cols)
-            readonly property int inRow: Math.min(mc.cols, mc.windows.length - row * mc.cols)
-            x: Theme.mission.margin + (mc.cols - inRow) * (mc.cellW + Theme.mission.gap) / 2
-               + (index % mc.cols) * (mc.cellW + Theme.mission.gap)
-            y: mc.m.gridTop + row * (mc.cellH + Theme.mission.gap)
-            width: mc.cellW
-            height: mc.cellH
+            // where the layout puts the whole window (title bar strip included)
+            readonly property var frame: mc.frames[index] || null
+            x: frame ? frame.x : 0
+            y: frame ? frame.y : 0
+            width: frame ? frame.w : 0
+            height: frame ? frame.h : 0
 
-            // where the window really is (Hyprland logical layout px, made screen-local); the
-            // thumbnail starts and ends there. Unknown (no IPC data yet): it stays in the grid.
-            readonly property var ipcRect: {
-                const o = cell.modelData.lastIpcObject;
-                if (!o || !o.at || !o.size || !mc.screen) return null;
-                return Qt.rect(o.at[0] - mc.screen.x, o.at[1] - mc.screen.y, o.size[0], o.size[1]);
-            }
-            // taken only before the fly-in is under way (IPC data arrives asynchronously: no jump)
+            // where the window really is, with its title bar strip (screen-local); the thumbnail starts and ends
+            // there. Taken only before the fly-in is under way (IPC data arrives asynchronously: no jump).
+            readonly property var ipcRect: mc.bars && mc.stack ? mc.fullRect(cell.modelData) : null
+            readonly property var ipcBar: mc.bars && mc.stack ? mc.barRect(cell.modelData) : null
             property var real: null
-            function takeRect() { if (mc.e < 0.05) real = ipcRect; }
+            property var bar: null
+            function takeRect() {
+                if (mc.e >= 0.05) return;
+                real = mc.fullRect(cell.modelData);
+                bar = mc.barRect(cell.modelData);
+                mc.relayout();
+            }
             onIpcRectChanged: takeRect()
-            readonly property real fly: real && thumb.width > 0 ? mc.travel : 0
+            onIpcBarChanged: takeRect()
+            readonly property real fly: real && width > 0 ? mc.travel : 0
             // its capture is in (or there is nothing to fly from)
             readonly property bool ready: view.hasContent || !real
             onReadyChanged: mc.maybeGo()
             Component.onCompleted: { takeRect(); mc.maybeGo(); }
+            // the bar strip's height in the thumbnail
+            readonly property real barHeight: bar && real ? bar.height * width / real.width : 0
             Item {
                 id: thumb
-                anchors.centerIn: parent
-                opacity: cell.real && !A11y.reduceMotion ? 1 : mc.e
+                anchors.fill: parent
+                // While the captures of this open are awaited the thumbnail is drawn at an opacity too low to change a
+                // pixel (the real window shows through): its textures are uploaded before the flight, and a stale
+                // picture from the last open neither shows nor gets into the screen still.
+                opacity: mc.pending ? 0.002 : cell.real && !A11y.reduceMotion ? 1 : mc.e
                 transform: [
                     Scale {
                         xScale: 1 + cell.fly * (cell.real ? cell.real.width / thumb.width - 1 : 0)
                         yScale: 1 + cell.fly * (cell.real ? cell.real.height / thumb.height - 1 : 0)
                     },
                     Translate {
-                        x: cell.fly * (cell.real ? cell.real.x - cell.x - thumb.x : 0)
-                        y: cell.fly * (cell.real ? cell.real.y - cell.y - thumb.y : 0)
+                        x: cell.fly * (cell.real ? cell.real.x - cell.x : 0)
+                        y: cell.fly * (cell.real ? cell.real.y - cell.y : 0)
                     }
                 ]
-                width: view.width
-                height: view.height
-                // hover look only while open: on exit the ring and the 1.0x scale went away only when the layer
-                // unmapped, a pop 0.15 s after the windows landed (mcap, MOTION-MEASURED.md)
-                scale: wma.containsMouse && mc.shown ? Theme.mission.hoverScale : 1
-                Behavior on scale { NumberAnimation { duration: Theme.anim.fast } }
-                // window shadow, comes in with the layout (the real window's own shadow fades out
-                // under the wallpaper); radius and offset as the glass shadow, guessed for here
+                // window shadow: it takes over from the real window's own shadow as the wallpaper covers that
+                // (mc.cover), so the window keeps a shadow through the flight; radius and offset as the glass
+                // shadow, guessed for here
                 RectangularShadow {
                     anchors.fill: parent
                     radius: Theme.mission.thumbRadius
                     blur: Theme.glass.shadowRadius
                     offset.y: Theme.glass.shadowYOffset
                     color: Theme.glass.shadow
-                    opacity: mc.e
+                    opacity: mc.cover
                 }
                 ClippingRectangle {
                     anchors.fill: parent
                     radius: Theme.mission.thumbRadius
                     color: "transparent"
+                    // the plugin title bar's strip, cut from the screen still
+                    ShaderEffectSource {
+                        visible: cell.bar !== null && still.hasContent
+                        width: parent.width
+                        height: cell.barHeight
+                        sourceItem: visible ? still : null
+                        sourceRect: cell.bar ? cell.bar : Qt.rect(0, 0, 0, 0)
+                    }
                     ScreencopyView {
                         id: view
+                        y: cell.barHeight
                         captureSource: cell.modelData.wayland
                         // one still per open, not a live feed: live, every window was captured and redrawn at 60 fps
                         // for as long as Mission Control stayed open (reference/PERF-2026-11-10.md item 2). The still
@@ -433,17 +571,13 @@ ShellWindow {
                         Connections { target: mc; function onShownChanged() { if (mc.shown) view.captureFrame(); } }
                         // No second still on exit (one was taken in the tail for the windows' active look): the capture
                         // held qs's frames there, a 0.96 plateau for 2-4 frames (mcap); the look changes when the layer goes
-                        // fit the cell but never grow past Theme.mission.maxScale of the real window
-                        readonly property real dpr: mc.screen ? mc.screen.devicePixelRatio : 1
-                        readonly property real maxW: cell.width
-                        readonly property real maxH: cell.height
-                        constraintSize: Qt.size(Math.min(maxW, sourceSize.width / dpr * Theme.mission.maxScale || maxW),
-                                                Math.min(maxH, sourceSize.height / dpr * Theme.mission.maxScale || maxH))
+                        constraintSize: Qt.size(cell.width, Math.max(1, cell.height - cell.barHeight))
                     }
                     // fallback while no frame is available: app icon on a plain card
                     Rectangle {
                         anchors.fill: parent
-                        visible: !view.hasContent
+                        // not while the first captures are awaited: the card flashed over the window for a frame (mcap)
+                        visible: !view.hasContent && !mc.pending && mc.e > 0
                         color: Theme.glass.solid
                         IconImage {
                             anchors.centerIn: parent
@@ -452,11 +586,15 @@ ShellWindow {
                         }
                     }
                 }
+                // hover: an accent ring 4.5 pt wide, 1 pt outside the window frame, no scale (Q-dock-30); only while
+                // open (on exit it went away only when the layer unmapped, a pop after the windows landed, mcap)
                 Rectangle {
+                    visible: wma.containsMouse && mc.shown
                     anchors.fill: parent
-                    radius: Theme.mission.thumbRadius
+                    anchors.margins: -5.5
+                    radius: Theme.mission.thumbRadius + 5.5
                     color: "transparent"
-                    border.width: wma.containsMouse && mc.shown ? Theme.mission.hoverBorder : 0
+                    border.width: 4.5
                     border.color: Theme.color.accent
                 }
             }
@@ -480,7 +618,7 @@ ShellWindow {
             }
             MouseArea {
                 id: wma
-                x: thumb.x; y: thumb.y; width: thumb.width; height: thumb.height
+                anchors.fill: parent
                 hoverEnabled: true
                 onClicked: { Panels.close(); Apps.focusWindow(cell.modelData); }
             }

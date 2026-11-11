@@ -1023,6 +1023,20 @@ test("mode buttons start inside the field, end in place", () => {
         assert.equal(N.notificationSoundArg({ "sound-file": "file:///a/b%20c.oga" }), "/a/b c.oga");
     });
 }
+test("Mission Control layout reproduces the Mac's frames (mission-control.json)", () => {
+    const E = load("expose.js");
+    const d = JSON.parse(readFileSync(join(here, "..", "..", "reference", "re", "27.2.1", "live", "dock", "mission-control.json"), "utf8"));
+    const area = E.usableArea({ x: 0, y: 0, w: 1710, h: 1107 }, 53, 73.5);
+    assert.deepEqual(area, { x: 20, y: 113.5, w: 1670, h: 926.5 });
+    for (const [name, v] of Object.entries(d.layouts)) {
+        const out = E.layout(v.before.map(r => ({ x: r[0], y: r[1], w: r[2], h: r[3] })), area);
+        out.frames.forEach((f, i) => {
+            const m = v.mc[i];   // CGWindowList integers: the covering rect of a scaled frame
+            const dev = Math.max(Math.abs(f.x - m[0]), Math.abs(f.y - m[1]), Math.abs(f.x + f.w - m[0] - m[2]), Math.abs(f.y + f.h - m[1] - m[3]));
+            assert.ok(dev <= 1.01, name + " window " + i + ": " + dev.toFixed(2) + " pt off");
+        });
+    }
+});
 test("Mission Control: one Space reads Desktop, more are numbered by position", () => {
     assert.equal(ST.spaceName(0, 1), "Desktop");
     assert.equal(ST.spaceName(1, 3), "Desktop 2");

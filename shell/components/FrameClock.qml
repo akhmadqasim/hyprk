@@ -8,8 +8,8 @@ import QtQuick
 // frames 16.7 ms apart drift: a tick's value reaches the screen 8 to 24 ms later, and about every 0.4 s two ticks fall
 // between two frames, so one value is never drawn (the "lost frame" of mcap's unlock, peek and Mission Control rows).
 // QQuickWindow.afterAnimating is emitted on the GUI thread right before each frame of this window is built, so a value
-// set there is in that very frame, and frame k is on screen k refresh intervals after frame 0. `elapsed` counts
-// those intervals (k * 16.7 ms at 60 Hz), read against the wall clock only to notice a frame that was never built.
+// set there is drawn exactly once, and frame k is on screen k refresh intervals after frame 0. `elapsed` counts
+// those intervals (k * 16.7 ms at 60 Hz) and skips the ones the window missed (frameSwapped more than one interval apart).
 // Nothing runs while `running` is false.
 Item {
     id: fc
@@ -18,10 +18,16 @@ Item {
     readonly property real interval: 1000 / (Screen.refreshRate > 0 ? Screen.refreshRate : 60)
     signal tick()
 
-    property double last: 0
+    property int frame: 0              // frames since the first tick's
+    property bool ticked: false
+    property double swapped: 0         // when this window last showed a frame
+    property int swaps: 0
     readonly property var win: Window.window
     function start(): void {
-        last = 0;
+        ticked = false;
+        swapped = 0;
+        swaps = 0;
+        frame = 0;
         elapsed = 0;
         running = true;
         if (win) win.update();
@@ -33,11 +39,18 @@ Item {
         target: fc.win
         enabled: fc.running
         function onAfterAnimating() {
-            const now = Date.now();
-            if (fc.last > 0) fc.elapsed += Math.max(1, Math.round((now - fc.last) / fc.interval)) * fc.interval;
-            fc.last = now;
+            if (fc.ticked) fc.frame++;
+            fc.ticked = true;
+            fc.elapsed = fc.frame * fc.interval;
             fc.tick();
             if (fc.running) fc.win.update();
+        }
+        // a frame shown two or more intervals after the one before it: the frames in between were never built (a
+        // busy GUI or render thread), so the count moves on with the screen. The first gap after idle does not count.
+        function onFrameSwapped() {
+            const now = Date.now();
+            if (++fc.swaps > 2) fc.frame += Math.max(0, Math.round((now - fc.swapped) / fc.interval) - 1);
+            fc.swapped = now;
         }
     }
 }
