@@ -17,6 +17,7 @@ Item {
     signal groupRequested(Item anchor)
     signal tagRequested(Item anchor)
     readonly property Item tagAnchor: tagButton
+    readonly property Item moreAnchor: more
 
     height: Theme.toolbar.height
 

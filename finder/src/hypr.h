@@ -24,6 +24,9 @@ public:
     // taller than the work area: Hyprland's new_float_force_onscreen pushes such a window up out of the screen at map
     // (y = work area bottom - height), and no window rule moves it back.
     Q_INVOKABLE void moveWindow(const QString &title, double x, double y) const;
+    // Minimizes this process's window titled `title` the hyprk way (special:minimized, where the shell's Minimize and
+    // the Dock genie put windows): Hyprland ignores xdg_toplevel.set_minimized. False outside Hyprland.
+    Q_INVOKABLE bool minimizeWindow(const QString &title) const;
     // Input region of a window (Qt Wayland sends the mask as wl_surface.set_input_region): clicks outside `r`
     // reach the windows below. An empty rect clears the mask (whole window).
     Q_INVOKABLE void setInputRect(QWindow *window, const QRectF &r) const;

@@ -88,6 +88,45 @@ Window {
         if (sel.length > 0) quickLookEntry = sel[0];
     }
     function focusContent() { keys.forceActiveFocus(); }
+
+    // ---------- tabs ----------
+    // each tab keeps its place ({ path, history, historyIndex, title, view }); `fm` shows the selected one. One tab
+    // = no bar (tabs empty). New Tab opens where a new window does (home).
+    property var tabs: []
+    property int tabIndex: 0
+    function saved() { return Object.assign(fm.state(), { view: win.view }); }
+    function newTab(path) {
+        if (!path) return;
+        const t = tabs.length ? tabs.slice() : [saved()];
+        t[tabIndex] = saved();
+        t.push({ path: path, history: [path], historyIndex: 0, title: "", view: win.view });
+        tabs = t;
+        tabIndex = t.length - 1;
+        fm.restore(t[tabIndex]);
+        keys.forceActiveFocus();
+    }
+    function selectTab(i) {
+        if (i === tabIndex || i < 0 || i >= tabs.length) return;
+        const t = tabs.slice();
+        t[tabIndex] = saved();
+        tabs = t;
+        tabIndex = i;
+        quickLookEntry = null;
+        view = t[i].view;
+        fm.restore(t[i]);
+        keys.forceActiveFocus();
+    }
+    function closeTab(i) {
+        if (tabs.length < 2) { win.close(); return; }
+        const t = tabs.slice();
+        t[tabIndex] = saved();
+        t.splice(i, 1);
+        const next = i < tabIndex ? tabIndex - 1 : Math.min(tabIndex, t.length - 1);
+        const switching = i === tabIndex;
+        tabs = t.length > 1 ? t : [];
+        tabIndex = t.length > 1 ? next : 0;
+        if (switching) { view = t[next].view; fm.restore(t[next]); }
+    }
     function setView(v) {
         view = v;
         keys.forceActiveFocus();
@@ -114,7 +153,7 @@ Window {
         active: Theme.active
         fullScreenButton: true   // green = full screen, Option-click = zoom (MAC-ANSWERS.md Q-windows-19)
         onCloseClicked: win.close()
-        onMinimizeClicked: win.showMinimized()
+        onMinimizeClicked: win.minimize()
         onZoomClicked: win.visibility === Window.Maximized ? win.showNormal() : win.showMaximized()
         onFullScreenClicked: win.visibility === Window.FullScreen ? win.showNormal() : win.showFullScreen()
     }
@@ -149,9 +188,26 @@ Window {
             onTagRequested: anchor => tagPopover.show(anchor)
         }
 
+        // tabs (Q-finder-32): the bar shows with two or more; the track's bottom is at 80 (the gap under it was not
+        // measured: 4 pt, so the list header does not touch it)
+        TabBar {
+            id: tabBar
+            visible: win.tabs.length > 1
+            x: 8
+            y: Theme.toolbar.height
+            width: parent.width - x - 8.5
+            height: visible ? implicitHeight : 0
+            titles: win.tabs.map((t, i) => i === win.tabIndex ? fm.title : t.title)
+            current: win.tabIndex
+            onSelected: i => win.selectTab(i)
+            onCloseRequested: i => win.closeTab(i)
+            onNewTabRequested: win.newTab(FileOps.homePath())
+        }
+
         Loader {
             id: viewLoader
-            anchors.top: toolbar.bottom
+            anchors.top: tabBar.visible ? tabBar.bottom : toolbar.bottom
+            anchors.topMargin: tabBar.visible ? 4 : 0
             anchors.bottom: pathBar.visible ? pathBar.top : parent.bottom
             anchors.bottomMargin: 0
             width: parent.width
@@ -270,7 +326,14 @@ Window {
     Shortcut { sequence: "Ctrl+Shift+F"; onActivated: fm.go("recents:") }
     Shortcut { sequence: "Ctrl+Shift+."; onActivated: fm.showHidden = !fm.showHidden }
     Shortcut { sequence: "Ctrl+Alt+P"; onActivated: win.showPathBar = !win.showPathBar }
-    Shortcut { sequence: "Ctrl+W"; onActivated: win.close() }
+    Shortcut { sequence: "Ctrl+W"; onActivated: win.tabs.length > 1 ? win.closeTab(win.tabIndex) : win.close() }
+    Shortcut { sequence: "Ctrl+T"; onActivated: win.newTab(FileOps.homePath()) }
+    // Settings… (Cmd-,) and Hide Finder (Cmd-H), sent by the shell's app menu (shell/lib/menus.js): Finder's
+    // settings have no window here, the nearest real ones are View > Show Path Bar / hidden files (the Action menu);
+    // Hide = the window leaves the screen as on minimize (special:minimized, the Dock brings it back)
+    Shortcut { sequence: "Ctrl+,"; onActivated: win.popup(win.moreMenu, toolbar.moreAnchor) }
+    Shortcut { sequence: "Ctrl+H"; onActivated: win.minimize() }
+    function minimize() { if (!Hypr.minimizeWindow(win.title)) win.showMinimized(); }
     Shortcut { sequence: "Ctrl+Y"; onActivated: win.quickLook() }
     // Finder > Empty Trash… ⇧⌘⌫, and Empty Trash ⌥⇧⌘⌫ without the question (Q-menubar-31); the alert's words are
     // the shell's (shell/services/Apps.qml confirmEmptyTrash)
@@ -300,51 +363,58 @@ Window {
         if (fm.selectedCount === 1) fm.renamingPath = fm.selectedPaths()[0];
         else if (fm.selectedCount > 1) renameSheet.open(fm.selectedEntries());
     }
-    // The 27.2.1 context menus (live/finder/crops/context-menu-{file,folder,background}-light.png), in the Mac's order,
-    // with its leading symbols and submenus; Finder shows no shortcuts in context menus. Rows hyprk cannot do are
-    // left out where a Mac without the feature has none (Ask Siri: Siri off; Open in New Tab: no tabs; Customise
-    // Folder…, Clean Up, Clean Up By, Show View Options, Use Groups) or shown disabled where the Mac always has the
-    // row (Quick Actions ▸ Customise…, Services ▸ No Services Apply). The tag dots follow Share….
+    // The 27.2.1 context menus (Q-finder-23, live/finder/crops/context-menu-{file,folder,multi,background}-light.png),
+    // in the Mac's order with its separators and leading symbols (Move to Trash, Share…, Customize Folder…, Quick
+    // Actions, Services); Finder shows no shortcuts in context menus. Not here: the Ask Siri header (deferred) and the
+    // tag dots row (the Mac lists favourite tags there and the captured account has none). Rows Finder cannot do here
+    // stay as the Mac shows them, disabled: Customize Folder…, Use Groups, Clean Up, Clean Up By, Show View Options,
+    // Quick Actions ▸ Customise…, Services ▸ No Services Apply. Paste Item only with files on the clipboard.
     function contextMenu(entry, pos) {
         const sel = fm.selectedEntries();
         const n = sel.length;
         const paths = sel.map(e => e.path);
         const writable = !fm.isVirtual;
         const one = n === 1 ? sel[0] : null;
+        const pasteRow = dest => Clipboard.files.length && writable
+            ? [{ text: Clipboard.files.length > 1 ? "Paste Items" : "Paste Item", action: () => fm.drop(Clipboard.files, dest, "copy") }] : [];
         const tail = [
             // no share sheet on Linux: Share… does what the toolbar's Share does (FALLBACKS.md)
             { text: "Share…", icon: "square.and.arrow.up", action: () => fm.openSelection() },
-            { separator: true },
-            { tagRow: true, action: tag => fm.toggleTag(tag) },
-            { separator: true },
+            { separator: true }
+        ].concat(one && one.isDir ? [
+            { text: "Customize Folder…", icon: "tag", enabled: false },
+            { separator: true }
+        ] : []).concat([
             { text: "Quick Actions", icon: "gear", submenu: [{ text: "Customise…", enabled: false }] },
             { separator: true },
             { text: "Services", icon: "gear.2", submenu: [{ text: "No Services Apply", enabled: false }] }
-        ];
+        ]);
         let items;
         if (entry) {
-            const apps = one && !one.isDir ? FileOps.appsFor(one.path) : [];
+            const first = sel.find(e => !e.isDir);
+            const apps = first ? FileOps.appsFor(first.path) : [];
             const openWith = apps.map(a => ({ text: a.name + (a.isDefault ? " (default)" : ""),
                                              action: () => FileOps.openWith(a.desktop, paths) }));
             const def = openWith.length && apps[0].isDefault ? 1 : 0;
             if (def && openWith.length > 1) openWith.splice(1, 0, { separator: true });
-            items = [
-                { text: "Open", action: () => fm.openSelection() }
-            ].concat(one && one.isDir ? [] : [
-                { text: "Open With", enabled: openWith.length > 0, submenu: openWith.length ? openWith : null }
-            ]).concat(Clipboard.files.length && one && one.isDir && writable ? [
-                { text: Clipboard.files.length > 1 ? "Paste Items" : "Paste Item", action: () => fm.drop(Clipboard.files, one.path, "copy") }
-            ] : []).concat([
+            const head = one && one.isDir
+                ? [{ text: "Open in New Tab", action: () => win.newTab(one.path) }].concat(pasteRow(one.path))
+                : (n > 1 ? [{ text: "New Folder with Selection (" + n + " Items)", enabled: writable && fm.userFiles,
+                              action: () => fm.newFolderWithSelection() }] : []).concat([
+                      { text: "Open", action: () => fm.openSelection() },
+                      { text: "Open With", enabled: openWith.length > 0, submenu: openWith.length ? openWith : null }
+                  ]);
+            items = head.concat([
                 { separator: true },
                 { text: "Move to Trash", icon: "trash", enabled: n > 0 && fm.userFiles, action: () => fm.trashSelection() },
                 { separator: true },
                 { text: "Get Info", action: () => info.show(entry.path, pos.x, pos.y) },
                 { text: n > 1 ? "Rename…" : "Rename", enabled: n > 0 && writable, action: () => win.startRename() },
-                { text: n > 1 ? "Compress " + n + " Items" : "Compress “" + entry.name + "”", enabled: writable, action: () => FileOps.compress(paths) },
+                { text: n > 1 ? "Compress" : "Compress “" + entry.name + "”", enabled: writable, action: () => FileOps.compress(paths) },
                 { text: "Duplicate", enabled: writable, action: () => FileOps.duplicate(paths) },
                 { text: "Make Alias", enabled: writable, action: () => { const e = FileOps.makeAlias(paths); if (e) fm.errorRaised(e); fm.reload(); } },
                 { text: "Quick Look", action: () => win.quickLook() },
-                { text: n > 1 ? "Copy " + n + " Items" : "Copy", action: () => Clipboard.copyFiles(paths) },
+                { text: "Copy", action: () => Clipboard.copyFiles(paths) },
                 { separator: true }
             ]).concat(tail).concat(fm.isVirtual ? [{ separator: true }, { text: "Show in Enclosing Folder", action: () => {
                 fm.go(Files.parentPath(entry.path));
@@ -354,14 +424,18 @@ Window {
             const view = (key, label) => ({ text: label, checked: win.view === key, action: () => win.view = key });
             items = [
                 { text: "New Folder", enabled: writable, action: () => fm.newFolder() }
-            ].concat(Clipboard.files.length && writable ? [
-                { text: Clipboard.files.length > 1 ? "Paste Items" : "Paste Item", action: () => fm.drop(Clipboard.files, fm.path, "copy") }
-            ] : []).concat([
+            ].concat(pasteRow(fm.path)).concat([
                 { separator: true },
                 { text: "Get Info", enabled: writable, action: () => info.show(fm.path, pos.x, pos.y) },
                 { separator: true },
                 { text: "View", submenu: [view("icons", "as Icons"), view("list", "as List"), view("columns", "as Columns"), view("gallery", "as Gallery")] },
+                { text: "Use Groups", enabled: false },
                 { text: "Sort By", submenu: sortItems() }
+            ]).concat(win.view === "icons" ? [   // the captured menu is the icon view's; Clean Up arranges free icons
+                { text: "Clean Up", enabled: false },
+                { text: "Clean Up By", enabled: false, submenu: [] }
+            ] : []).concat([
+                { text: "Show View Options", enabled: false }
             ]);
         }
         showMenu(items, pos.x, pos.y);

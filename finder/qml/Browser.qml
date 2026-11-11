@@ -134,6 +134,13 @@ QtObject {
         expanded = ({});
         reload();
     }
+    // a tab's saved place (Main.qml tabs): its location and history
+    function state() { return { path: path, history: history, historyIndex: historyIndex, title: title }; }
+    function restore(st) {
+        history = st.history;
+        historyIndex = st.historyIndex;
+        _enter(st.path);
+    }
     function isVirtualPath(p) { return p === "recents:" || p === "applications:" || p.indexOf("tag:") === 0; }
 
     // ---------- selection ----------
@@ -214,6 +221,18 @@ QtObject {
         if (isVirtual) return;
         const created = FileOps.makeFolder(path, "untitled folder");
         if (!created) { errorRaised("You don’t have permission to create a folder here."); return; }
+        reload();
+        selectPaths([created]);
+        renamingPath = created;
+    }
+    // File > New Folder with Selection: the selected items move into a new folder that is then renamed in place
+    // (the folder's name was not captured on the Mac: "New Folder With Items" is the name macOS gives it)
+    function newFolderWithSelection() {
+        const paths = selectedPaths();
+        if (isVirtual || paths.length === 0) return;
+        const created = FileOps.makeFolder(path, "New Folder With Items");
+        if (!created) { errorRaised("You don’t have permission to create a folder here."); return; }
+        FileOps.transfer(paths, created, "move");
         reload();
         selectPaths([created]);
         renamingPath = created;

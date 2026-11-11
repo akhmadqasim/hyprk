@@ -68,6 +68,21 @@ void Hypr::moveWindow(const QString &title, double x, double y) const
     }
 }
 
+bool Hypr::minimizeWindow(const QString &title) const
+{
+    const qint64 pid = QCoreApplication::applicationPid();
+    const QJsonArray all = QJsonDocument::fromJson(request("j/clients")).array();
+    for (const QJsonValue &v : all) {
+        const QJsonObject c = v.toObject();
+        if (c.value(QLatin1String("pid")).toInteger() != pid || c.value(QLatin1String("title")).toString() != title)
+            continue;
+        request(QStringLiteral("dispatch hl.dsp.window.move({ workspace = \"special:minimized\", window = \"address:%1\" })")
+                    .arg(c.value(QLatin1String("address")).toString()).toUtf8());
+        return true;
+    }
+    return false;
+}
+
 int Hypr::option(const QString &name, int fallback) const
 {
     const QJsonObject o = QJsonDocument::fromJson(request("j/getoption " + name.toUtf8())).object();
