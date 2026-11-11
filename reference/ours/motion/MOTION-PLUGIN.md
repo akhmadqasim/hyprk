@@ -166,6 +166,40 @@ mixing the cosine slide, the cross-fade and the window, or a wait between the Do
   (enter) and 0.003 (exit), no held frame.
 - Still inferred: the menu bar's 0.15 s on enter, and what the notch strip itself does during the Mac's transition.
 
+## Lost frames mid-motion (judge #4 gap 3): what is real
+
+Test client `fcount` (scratch, not in the repo): an xdg toplevel that paints a frame counter as colour on every frame
+callback and asks for presentation feedback of every commit; mcap over the same interval. Headless MBA 2x.
+
+- Compositor and headless backend, steady client: every buffer presented once. 0 discarded of about 3,000 commits, feedback
+  intervals 16.66 ms median, max 21. mcap's time equals the feedback time of the same buffer within 0.14 ms.
+- Capture tool: mcap asked for the next frame only after converting and writing the ready one. 8 pt and 600x400 pt regions:
+  0 missed of 900 / 241. Full output: `-k 4` 4 of 241, `-k 8` 1 of 240, `-k 2` 67 of 240 missed, while the compositor
+  presented all of them. Fixed in 088840a (next request first, two buffers): 0-1, 0 and 1-3. A miss is a 2-period interval
+  in `present_ns`; the JSON now counts them (`long_intervals`). Window rows captured at full output before that fix
+  (genie, zoom, full screen at `-k 8` or finer) can carry capture losses.
+- Control Center open, 6 runs, 440x240 pt at `-k 4` (the shell's fade takes fixed values per shell frame, .042 .049 .152
+  .272 .401 .522 .632 .730 .800 .855 ..., so a missing value is a shell frame that was not shown): a value missing in 6 of
+  6. In 4 the presentation intervals around it are 22-34 ms (and one of 8 ms) instead of 16.7: the shell's commit came
+  later than a refresh interval. The headless output has no vblank grid (aquamarine `CHeadlessOutput::scheduleFrame`: the
+  next frame fires at lastFrame + 1/60 s, or at once when a frame is scheduled later than that, and `commit()` reports
+  presented at once), so it shows a late buffer at once with a stretched interval; a DRM output flips at the next vblank,
+  a repeated frame. Either way the cause is the late shell frame, not the capture and not the compositor. In 2 of 6 the
+  value is missing at regular 16.7 ms intervals: two shell steps inside one compositor frame (not traced further).
+- Plugin cost: `plugin:liquidglass:stats` over 3 Control Center opens and closes: glass 0.76 ms GPU per frame, p95 1.12,
+  max 1.77. Not a cost spike.
+- By code, on every backend: `CWLSurfaceResource::map()` (protocols/core/Compositor.cpp:561) answers a new surface's frame
+  callback at once, so the first two buffers of a newly mapped layer fall into one refresh interval (the "frame lost after
+  the layer maps" of MOTION-MEASURED session 4). Real on a DRM output too; in Hyprland, not in the plugins.
+- Not separated: the host ran 4-6 other headless sessions during these runs, which lengthens shell frames.
+
+## Unzoom tail (judge #4 gap 15)
+
+Window edges per frame (row band, foot): the frame reaches .998 at frame 19 and 1 at frame 20, 2-98 % 283 ms (Mac 267, one
+frame of sampling), rms 0.002-0.009 vs the R2 series. The full-output alpha metric's .97 -> 1 over 150 ms is not the
+window: at +340 ms the frames still differ from the last only in the Dock band (y 728-832 pt) and the menu bar band. The
+shell's Dock and menu bar finish about 190 ms after the frame (shell, not plugin-motion).
+
 ## Not derived from Apple data
 
 - Inferred, not traced: the menu bar's enter timing (0.15 s default above).
