@@ -291,7 +291,7 @@ hl.layer_rule({
 hl.layer_rule({
     -- the shell animates these itself
     name = "hyprk-no-anim",
-    match = { namespace = "^hyprk-(overlay|controlcenter|spotlight|switcher|mission|notifications|notificationcenter|dock|menubar|wallpaper|hud)$" },
+    match = { namespace = "^hyprk-(overlay|controlcenter|spotlight|switcher|switcher-fill|switcher-fill-dark|mission|notifications|notificationcenter|dock|menubar|wallpaper|hud)$" },
     no_anim = true,
 })
 
