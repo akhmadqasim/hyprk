@@ -39,11 +39,17 @@ if [ -z "$src" ]; then
     fi
 fi
 
-key=$(printf '%s %s %s %s' "$src" "$(stat -c %Y "$src" 2>/dev/null)" "${W}x${H}" "$SIGMA" "${PW}x${PH}" | md5sum | cut -c1-12)
+# A picture with an embedded colour profile (Apple's wallpapers are Display P3) is converted to sRGB: Qt Quick and
+# Hyprland show a file's numbers as sRGB, so the P3 numbers came out less saturated than on the Mac (TahoeLight at
+# 2000,800 px of a 2560x1664 cut: file and screen 84,139,212, converted 63,141,218; COLOUR-P3-AUDIT.md 3.6). A picture
+# without a profile only gets the sRGB tag. assets/sRGB.icc is LittleCMS's built-in sRGB profile.
+ICC="$HERE/shell/assets/sRGB.icc"
+[ -f "$ICC" ] && conv=(-profile "$ICC") || conv=()
+key=$(printf '%s %s %s %s %s' "$src" "$(stat -c %Y "$src" 2>/dev/null)" "${W}x${H}" "$SIGMA" "${PW}x${PH}" "srgb${#conv[@]}" | md5sum | cut -c1-12)
 wall="$CACHE/wall-$key.png"
 blur="$CACHE/blur-$key.png"
 if [ ! -f "$wall" ]; then
-    magick "$src" -resize "${PW}x${PH}^" -gravity center -extent "${PW}x${PH}" "$wall" 2>/dev/null || wall=$src
+    magick "$src" "${conv[@]}" -resize "${PW}x${PH}^" -gravity center -extent "${PW}x${PH}" "$wall" 2>/dev/null || wall=$src
 fi
 echo "SRC=$src"
 if [ "${HYPRK_WALL_ONLY:-0}" = 1 ]; then echo "WALL=$wall"; exit 0; fi   # another screen's cut: no blur, no luma
