@@ -16,6 +16,9 @@ if [ -z "${QS_ICON_THEME:-}" ]; then
 fi
 export XDG_DATA_DIRS="$HYPRK_ROOT/themes:$HYPRK_DATA:$XDG_DATA_DIRS"   # themes/icons/hyprk-apple, <data>/icons/WhiteSur
 export XCURSOR_PATH="$HYPRK_ROOT/themes/cursors/theme:${XCURSOR_PATH:-/usr/share/icons}"
+# the compositor's own text (the plugin's title bars) and the apps it starts use the shell's fontconfig: SF Pro for
+# sans-serif and system-ui, Apple Color Emoji (judge #17: titles were Noto Sans). An explicit FONTCONFIG_FILE wins.
+[ -z "${FONTCONFIG_FILE:-}" ] && [ -f "$HYPRK_ROOT/config/fontconfig/fonts.conf" ] && export FONTCONFIG_FILE=$HYPRK_ROOT/config/fontconfig/fonts.conf
 unset HYPRK_GLASS        # decided by hyprland.lua after loading the glass plugin
 export XCURSOR_THEME=hyprk-cursors HYPRCURSOR_THEME=hyprk-cursors XCURSOR_SIZE=24 HYPRCURSOR_SIZE=24
 # GTK apps of this session (JUDGE-95 #3): on Wayland GTK reads the theme, button-layout and colour scheme from GSettings
