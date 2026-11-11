@@ -155,3 +155,14 @@ The panel box grows from 44.8 to 54 pt outside the tiles (a few more pixels redr
   Siri-branch recipe + veil: grey 6 / 37 / 71, Mac 6 / 36 / 64), so the old recipe stays; what darkens the real field on top of
   the Regular glass is not found. The Mac shows a soft shadow under the bar (127 -> 96 at the edge) although the code says
   excludingShadow(); ours has none.
+- **Spotlight shadow (judge #3 gap 2, 2026-11-11):** the Mac's empty bar (`panels/spotlight-empty-*.png`, mid-width, below and
+  above) fits density x 0.5 erfc((d -+ y) / (sigma sqrt 2)) with light 0.404 / y 18 / sigma 20 pt (rms 0.002), dark 0.71 / 19 /
+  19 (rms 0.011): AppKit's active window shadow (SHADOW.md), i.e. the panel window's own shadow, not the glass's (which the code
+  excludes). The `spotlight` recipe now has it, black. Darkening below at 2 / 10 / 18 pt, above at 1 / 6 / 12 pt, over white:
+  light Mac .318 .263 .204 / .067 .043 .024, before 0 everywhere, after .318 .263 .200 / .067 .043 .024; dark Mac .562 .469
+  .375 / .125 .062 .031, after .553 .463 .353 / .118 .078 .043. A shape inside another group's box (the result card in the grown
+  bar) casts none; "Show Results" gets one, as on the Mac (calculator shot). 20 and 30 pt are outside the Mac crop.
+- **Field gradient vs the menu bar's contrast gradient:** does not explain it. Q-menubar-02's darkening is 30 % at 60 pt and gone
+  by 100 pt; the bar sits at 189..276 pt (ours; the Mac's crop has the same 86.5 pt bar well below the 34 pt bar), so the
+  gradient adds 0 there, while the Mac field rises 0.23 x in at mid-height and 0.5 x in at the bottom (white / grey / black mid
+  65 / 36 / 6, bottom 127 / 64 / 17). The results panel sits lower still. Left as is.

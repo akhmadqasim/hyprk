@@ -166,10 +166,12 @@ int main() {
         // Spotlight (SiriRecipe, not in the verified model): unclamped refraction 0.4 D / -0.72 D, outer 0.4 D at 1.0,
         // blur from 60 pt inside the edge; the slider changes nothing
         const auto& sp = recipeByName("spotlight");
-        CHECK(std::string{sp.name} == "spotlight" && !hasShadow(sp) && near(sp.ringOpacity, 0));
+        CHECK(std::string{sp.name} == "spotlight" && hasShadow(sp) && sp.shadowBlack && near(sp.ringOpacity, 0));
+        CHECK(near(resolveMaterial(sp, 86, false).shadowOpacity, 0.4, 1e-6) && near(resolveMaterial(sp, 86, true).shadowOpacity, 0.7, 1e-6) &&
+              near(resolveMaterial(sp, 86, true).shadowOffsetY, 18) && near(resolveMaterial(sp, 30, false).shadowRadius, 28.284, 1e-3));
         r = resolveMaterial(sp, 60, false);
         CHECK(near(r.refractionHeight, 24, 1e-4) && near(r.refractionAmount, -43.2, 1e-4) && near(r.outerHeight, 24, 1e-4) && near(r.outerAmount, 24, 1e-4) &&
-              near(r.outerOpacity, 1) && near(r.bleedOpacity, 0) && near(r.shadowOpacity, 0) && near(r.blurDist0, -60, 1e-4));
+              near(r.outerOpacity, 1) && near(r.bleedOpacity, 0) && near(r.shadowOpacity, 0.4f, 1e-6) && near(r.blurDist0, -60, 1e-4));
         CHECK(near(resolveMaterial(sp, 60, true, 0).blurFill.darken, 0.75, 1e-6) && near(resolveMaterial(sp, 60, true, 1).blurAlpha[0], 1) &&
               near(resolveMaterial(sp, 400, false).refractionAmount, -288, 1e-3));
     }

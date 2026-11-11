@@ -766,7 +766,7 @@ void main() {
         glUniform1f(u.alpha, m_data.alpha);
         glUniform1f(u.aberration, p.aberration * scale);
         glUniform1f(u.pxPerPt, scale);
-        glUniform1f(u.shadowTint, p.shadowTint);
+        glUniform1f(u.shadowTint, r.shadowBlack ? 0.f : p.shadowTint);
         glUniform1f(u.shadowSaturation, r.shadowSaturation);
         glUniform1f(u.ringOpacity, r.ringOpacity * p.ringScale);
         glUniform2f(u.ringOffset, 0.f, r.ringOffsetY * scale);
@@ -837,7 +837,12 @@ void main() {
             glUniform2f(u.keySpread, std::cos(keyRad), std::cos(0.65f * keyRad)); // diffuse: 0.65 x the spread
             glUniform3f(u.highlight, p.highlight * res.keyScale, res.keyAmount, res.diffuseAmount);
             glUniform2f(u.darkSpec, res.darkBias, std::cos(res.darkSpread * float(M_PI / 180.0)));
-            glUniform1f(u.shadowOpacity, m_data.shadow ? res.shadowOpacity * p.shadowScale : 0.f);
+            // a group inside another group's box (a card inside the grown Spotlight bar) casts no shadow on it
+            const auto& lb    = m_data.shapes[g.lead].box;
+            const bool  inner = std::ranges::any_of(m_data.groups, [&](const SGlassGroup& o) {
+                return &o != &g && o.box.x <= lb.x && o.box.y <= lb.y && o.box.right() >= lb.right() && o.box.bottom() >= lb.bottom();
+            });
+            glUniform1f(u.shadowOpacity, m_data.shadow && !inner ? res.shadowOpacity * p.shadowScale : 0.f);
             glUniform1f(u.shadowRadius, res.shadowRadius * scale);
             glUniform2f(u.shadowOffset, 0.f, res.shadowOffsetY * scale);
 

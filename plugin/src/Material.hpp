@@ -79,6 +79,8 @@ namespace lg {
         // (LIVE-27.2.1.md), radius 4 + 20 q, q = clamp((D - 64) / 96), y 8.
         float shadowD0 = 64, shadowD1 = 160, shadowOpacityLo = 0.04f, shadowOpacityHi = 0.4f, shadowOpacityHiDark = 0.6f;
         float shadowRadiusLo = 4, shadowRadius = 24, shadowOffsetY = 8, shadowSaturation = 1.f;
+        // a black shadow (AppKit's window shadow) instead of one tinted by the backdrop (`shadow_tint`)
+        bool shadowBlack = false;
 
         // key/fill highlight (CASDFKeyFillHighlightEffect): key amount, diffuse band amount (Apple 0.5 and 0.5 x 0.15)
         // and a scale of the whole mask (1 = Apple; Notification Center 1.23, its measured rim)

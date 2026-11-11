@@ -122,7 +122,7 @@ and the rim rows; run it after any change here.
 | `clear` | 0.125, 1.08, 1.06 | none | min(0.36 D, 20) / max(-0.65 D, -60) | none | none | |
 | `dock` | 0.15, 0.9, 1.25 / 0.05, 0.92, 1.25 + black 2 %, max luma 0.75 | | as regular (the real Dock's end caps; the probe variant has 0.08 D / -0.18 D) | 0 / 0 / 0.2 | none | `hyprk-dock` |
 | `controlcenter` | 0.125, 0.8, 1.2 both | none | min(0.225 D, 25) / max(-2 D, -80) | 0.0357 D / 0.0714 D / 0.1525 | none | `hyprk-controlcenter`, `hyprk-hud` |
-| `spotlight` | 0.1, 1.0, 1.25 (SiriRecipe branch A, reference/re/NOTES.md; not in the verified model) | none | 0.4 D / -0.72 D | 0.4 D / 0.4 D / 1.0 | none | `hyprk-spotlight` |
+| `spotlight` | 0.1, 1.0, 1.25 (SiriRecipe branch A, reference/re/NOTES.md; not in the verified model) | none | 0.4 D / -0.72 D | 0.4 D / 0.4 D / 1.0 | AppKit's active window shadow, black: 0.40 light / 0.70 dark, sigma 20 (radius 20 sqrt 2), y 18 (fitted to the Mac's bar, = shadowParameters); a shape inside another group's box casts none | `hyprk-spotlight` |
 
 q = clamp((D - 64) / 96). Face (all in display-encoded values): max luma `k = clamp(1 - Y (1 - M))`, luma `k Y`,
 chroma `x k (1 + 0.3 (1 - k))` (skipped at M = 1); then `black + (white - black) Y + sat (c - Y)` and the fill.

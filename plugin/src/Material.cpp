@@ -110,7 +110,12 @@ namespace lg {
             .blurRadius          = 6, // 8 x 0.75 (NOTES.md); full from 1 pt inside, sharp at the edge
             .blurDist0N = 0, .blurDist0Fixed = -60, .blurDist1 = -1,
             .blurAlpha = {1, 1, 0},
-            LG_NO_SHADOW,
+            // the Spotlight panel is a window with AppKit's active window shadow: fitted to the Mac's empty bar
+            // (panels/spotlight-empty-*.png, below and above at mid-width) as density x 0.5 erfc((d -+ y) / (sigma sqrt 2)):
+            // light 0.404 / y 18 / sigma 20 (rms 0.002), dark 0.71 / 19 / 19 (rms 0.011), i.e. shadowParameters active
+            // (0.40 / 0.70, y 18, blur 20, SHADOW.md); black. The shader's edge is 0.5 erfc(d / radius): radius 20 sqrt 2
+            .shadowD0 = 1, .shadowD1 = 1, .shadowOpacityLo = 0.4f, .shadowOpacityHi = 0.4f, .shadowOpacityHiDark = 0.7f,
+            .shadowRadiusLo = 28.284f, .shadowRadius = 28.284f, .shadowOffsetY = 18, .shadowBlack = true,
         };
 #undef LG_NO_SHADOW
 
