@@ -520,7 +520,7 @@ ShellWindow {
     // Gone when the label starts to fade: the plugin draws the pointer at full material whatever the pill's materialize
     // (and the layer's opacity), so kept through the fade it stood alone for 300 ms and then popped off (mcap)
     Glass {
-        visible: label.visible && dock.tipAlpha >= 1 && Theme.compositorGlass && !Theme.solidMaterial
+        visible: label.visible && Theme.compositorGlass && !Theme.solidMaterial
         width: Theme.dock.labelPointer.width
         height: Theme.dock.labelPointer.height
         x: Math.round(label.x + label.width / 2) - width / 2
