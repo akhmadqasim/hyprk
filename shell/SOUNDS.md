@@ -104,3 +104,14 @@ So: the Alert volume scales screenshot, Bin and Volume Mount sounds as well as a
 path), and "Play user interface sound effects" silences only the UI sounds. That is what `sound.sh` does (`vol=1` only
 for the volume feedback and the power chime, which BezelServices and PowerChime play with NSSound). Not measured on a
 Mac: the loudness of a UI sound at two Alert volume settings (a recording of the output would confirm the binary).
+
+## Open (2026-11-12, session 19)
+
+- **Needs the Mac:** key-up -> sound start time of the volume pop and the shutter (ours 26-40 ms and 23 ms to the
+  player); the loudness of a UI sound at two Alert volume settings (the binary says it scales); the double-click
+  interval (the plugin's title-bar double-click uses Qt's 400 ms).
+- **Not decoded yet:** whether Settings > Sound's Output volume slider inverts the pop with Shift (Sound.appex; ours
+  plays on let-go when the switch is on, without Shift); the Control Center feedback controller's own throttle
+  (ControlCenter.framework 0x20a532114 compares a stored date with now before it plays).
+- Volume keys and the Hyprland binds: a press that changes nothing (already at 0 going down) still sets the key-up pop,
+  as `VSDecrease` does (it sets the flag whatever the level).
