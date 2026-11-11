@@ -66,6 +66,10 @@ public:
     // [{ name, desktop, icon, isDefault }]. openWith launches one with the files (gio launch).
     Q_INVOKABLE QVariantList appsFor(const QString &path) const;
     Q_INVOKABLE bool openWith(const QString &desktopFile, const QStringList &paths) const;
+    // System sound through the shell's scripts/sound.sh (same settings, HYPRK_MUTE and HYPRK_SOUND_LOG); e.g.
+    // "trash-move". main() sets the script path; nothing plays without it.
+    void setSoundScript(const QString &path) { m_soundScript = path; }
+    Q_INVOKABLE void playSound(const QString &event) const;
 
 signals:
     void directoryChanged(const QString &dir);
@@ -89,4 +93,5 @@ private:
     mutable QJsonObject m_tagIndex;
     mutable bool m_tagIndexLoaded = false;
     QMimeDatabase m_mime;
+    QString m_soundScript;
 };

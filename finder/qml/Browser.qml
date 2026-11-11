@@ -238,6 +238,7 @@ QtObject {
         function onListed(token, list) { if (token === b._token) b._setEntries(list); }
         function onTrashFinished(error) {
             if (error) b.errorRaised(error);
+            else FileOps.playSound("trash-move");   // Finder's "move to trash" sound (shell/scripts/sound.sh)
             b.reload();
         }
         function onTransferFinished(error) {

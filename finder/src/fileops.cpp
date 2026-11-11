@@ -598,3 +598,9 @@ bool FileOps::openWith(const QString &desktopFile, const QStringList &paths) con
 {
     return QProcess::startDetached(QStringLiteral("gio"), QStringList{QStringLiteral("launch"), desktopFile} + paths);
 }
+
+void FileOps::playSound(const QString &event) const
+{
+    if (!m_soundScript.isEmpty() && QFileInfo(m_soundScript).isExecutable())
+        QProcess::startDetached(m_soundScript, {event});
+}

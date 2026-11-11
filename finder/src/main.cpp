@@ -102,6 +102,7 @@ int main(int argc, char *argv[])
     loadFonts();
 
     FileOps ops;
+    ops.setSoundScript(resourceDir("shell/scripts", FINDER_UI_DIR "/../shell/scripts") + QStringLiteral("/sound.sh"));
     qmlRegisterSingletonInstance("Finder.Native", 1, 0, "FileOps", &ops);
     qmlRegisterType<StateFile>("Finder.Native", 1, 0, "StateFile");
     Clipboard clipboard;
