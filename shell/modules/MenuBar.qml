@@ -37,7 +37,7 @@ ShellWindow {
     // 12/24h and date order follow the time locale like macOS (LC_ALL > LC_TIME > LANG)
     readonly property var clockStyle: Clock.styleFor(Quickshell.env("LC_ALL") || Quickshell.env("LC_TIME") || Quickshell.env("LANG"))
 
-    // ---------- left: distro logo (the Apple menu) + app name + menus ----------
+    // ---------- left: Apple logo (the Apple menu) + app name + menus ----------
     Row {
         id: left
         anchors.left: parent.left
@@ -47,10 +47,16 @@ ShellWindow {
 
         MenuTitle {
             menuIndex: 0
-            DistroLogo {
-                anchors.centerIn: parent
-                size: Theme.menuBar.logoSize
+            // the Mac's glyph: SF Pro U+F8FF at the measured ink box and position (Theme.menuBar.appleSize)
+            Text {
+                readonly property real s: Theme.menuBar.appleSize
+                // ink x 95..1356 of 2048 units: centre the ink, not the advance, in the 13 pt content
+                x: Theme.menuBar.titleHPadding + (Theme.menuBar.appleWidth - 1261 / 2048 * s) / 2 - 95 / 2048 * s
+                y: Theme.menuBar.appleBaseline - baselineOffset
+                text: ""
                 color: bar.fg
+                font.family: "SF Pro"
+                font.pixelSize: s
             }
             contentWidth: Theme.menuBar.appleWidth
         }
@@ -140,7 +146,8 @@ ShellWindow {
             contentWidth: clockText.implicitWidth
             Text {
                 id: clockText
-                anchors.centerIn: parent
+                anchors.horizontalCenter: parent.horizontalCenter
+                y: Theme.menuBar.titleBaseline - baselineOffset
                 text: Clock.format(clock.date, bar.clockStyle)
                 color: bar.statusFg
                 font: Typography.menuBar
@@ -171,7 +178,8 @@ ShellWindow {
         HighlightPill { shown: mt.open; outset: Theme.menuBar.titlePillOutset; pillHeight: Theme.menuBar.titlePillHeight }
         Text {
             id: label
-            anchors.centerIn: parent
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: Theme.menuBar.titleBaseline - baselineOffset   // cap ink 11..21 like the Mac (Q-menubar-06)
             visible: mt.text !== ""
             text: mt.text
             color: bar.fg

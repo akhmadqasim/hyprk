@@ -220,16 +220,23 @@ Singleton {
 
     // ---------- menu bar ----------
     readonly property QtObject menuBar: QtObject {
-        // SPEC.md 7: Solarium menu bar 30 pt (legacy 24). The 27.2.1 Mac measured 34 (metrics-*.json, MAC-ANSWERS
-        // Q9.1), but that is a notched MacBook Air, where the bar matches the notch; a display without a notch
-        // was not measured, so this stays 30 until it is.
-        readonly property int height: 30
+        // 34 pt: the only 27.2.1 measurement (AXMenuBar, NSMenu.menuBarHeight, MAC-ANSWERS Q-menubar-01), on the
+        // notched Air. A display without a notch was not measured (none attached), so every output uses 34;
+        // the headless "MBA" test output (2560x1664@2x) is the notched 13" Air's panel, where 34 is exact.
+        readonly property int height: 34
+        // text baselines from the bar top, as measured in the 34 pt bar: title and clock cap ink y 11..21
+        // (Q-menubar-06, -09) -> baseline 21; Apple glyph ink y 8.5..24 (Q-menubar-07), the glyph sits
+        // 0.11 pt below its baseline at appleSize -> 23.9
+        readonly property real titleBaseline: 21
+        readonly property real appleBaseline: 23.9
+        // the Apple logo is U+F8FF of SF Pro (themes/fonts): ink 0.616 x 0.757 em, so 20.75 pt gives the
+        // measured 13 x 15.5 pt ink (12.8 x 15.7) centred at x 27 in the 10..44 item (Q-menubar-07)
+        readonly property real appleSize: 20.75
         // 27.2.1 AX title frames (Q-menubar-05, -07): Apple item 10..44 around its 13 pt glyph, every title = text
         // + ~10.5 a side, neighbours overlap 1 pt; the clock ends 20 pt from the right edge (Q-menubar-09)
         readonly property real leftMargin: 10
         readonly property real rightMargin: 20
         readonly property real appleWidth: 13           // content width of the logo item (Apple glyph ink 13)
-        readonly property int logoSize: 16               // distro logo box; the Apple glyph was 14 + 2
         readonly property real titleHPadding: 10.5
         readonly property real titleSpacing: -1
         // open title pill: capsule 4 pt outside the title frame, y 5.25..28.75 (Q-menubar-05)
