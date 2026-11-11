@@ -78,6 +78,15 @@ QtObject {
         readonly property color knob: "#FFFFFF"
         // knob shadows: black a.10 radius 12 y 3, black a.10 radius 2 y 1 (Q-16)
         readonly property color knobShadow: Qt.rgba(0, 0, 0, 0.10)
+        // pressed knob lens (LensGlass), fitted to switch-press-strip-light.png (peak frame, 50 x 31 lens over the
+        // 54 x 24 track): the track reads 17.5 pt tall inside and its end 16 pt from the centre (18 real) ->
+        // refraction band = half the lens height, offset at the rim 0.34 x the lens height; a 0.5 pt rim line
+        // (249 -> 164 on white, 96 -> 35 on the track: black about a.4)
+        readonly property real lensBand: 0.5
+        readonly property real lensAmount: 0.34
+        readonly property real lensOutline: 0.4
+        // what the lens shows outside the track: the Settings card (Q-settings-11: #F7F7F7 / #25262B)
+        readonly property color lensBackdrop: t.dark ? "#25262B" : "#F7F7F7"
         // Applications window selection (shell); not a control fill
         readonly property color fill: t.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.08)
         readonly property color menuFill: t.dark ? "#2C2C2E" : "#F6F6F6"   // TODO verify (the live menu is glass)

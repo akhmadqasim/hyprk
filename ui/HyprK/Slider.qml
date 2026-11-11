@@ -112,39 +112,44 @@ Item {
         readonly property real usable: width - s._m.knobWidth
         readonly property real knobCx: s._m.knobWidth / 2 + pos.value * usable
 
-        Rectangle {
-            anchors.verticalCenter: parent.verticalCenter
-            width: parent.width; height: s._m.track; radius: height / 2
-            color: s.enabled ? Tokens.control.trackOff : Tokens.control.sliderDisabled
-        }
-        Rectangle { // fill to the knob's centre; disabled: grey (Q-06)
-            anchors.verticalCenter: parent.verticalCenter
-            width: track.knobCx; height: s._m.track; radius: height / 2
-            color: s.enabled ? Tokens.control.sliderFill : Tokens.control.sliderDisabled
-            Rectangle { // held: black a.098 over the fill
-                visible: s._lift > 0
-                anchors.fill: parent; radius: parent.radius
-                color: Qt.alpha(Tokens.control.pressOverlay, Tokens.control.pressOverlay.a * s._lift)
-            }
-        }
-        Repeater {
-            model: s.tickMarks > 1 ? s.tickMarks : 0
+        Item { // what the pressed knob's lens shows: track, fill and ticks
+            id: bar
+            anchors.fill: parent
             Rectangle {
-                required property int index
-                width: s._m.tick; height: s._m.tick; radius: s._m.tick / 2
-                x: G.tickX(track.width, s._m.knobWidth, index, s.tickMarks) - width / 2
-                y: s._m.tickY
-                color: Tokens.control.disabledText
+                anchors.verticalCenter: parent.verticalCenter
+                width: parent.width; height: s._m.track; radius: height / 2
+                color: s.enabled ? Tokens.control.trackOff : Tokens.control.sliderDisabled
+            }
+            Rectangle { // fill to the knob's centre; disabled: grey (Q-06)
+                anchors.verticalCenter: parent.verticalCenter
+                width: track.knobCx; height: s._m.track; radius: height / 2
+                color: s.enabled ? Tokens.control.sliderFill : Tokens.control.sliderDisabled
+                Rectangle { // held: black a.098 over the fill
+                    visible: s._lift > 0
+                    anchors.fill: parent; radius: parent.radius
+                    color: Qt.alpha(Tokens.control.pressOverlay, Tokens.control.pressOverlay.a * s._lift)
+                }
+            }
+            Repeater {
+                model: s.tickMarks > 1 ? s.tickMarks : 0
+                Rectangle {
+                    required property int index
+                    width: s._m.tick; height: s._m.tick; radius: s._m.tick / 2
+                    x: G.tickX(track.width, s._m.knobWidth, index, s.tickMarks) - width / 2
+                    y: s._m.tickY
+                    color: Tokens.control.disabledText
+                }
             }
         }
         Knob {
             restW: s._m.knobWidth; restH: s._m.knobHeight
             grow: Tokens.motion.sliderLift
             lift: s._lift
+            lensSource: bar
             reduceMotion: s.reduceMotion
             cx: track.knobCx
             cy: track.height / 2
-            FocusRing { visible: s.activeFocus }
+            FocusRing { visible: s.activeFocus; shapeRadius: parent.height / 2 }   // a capsule round the knob (focus-rings-light.png)
         }
         Repeater {
             model: s.labels

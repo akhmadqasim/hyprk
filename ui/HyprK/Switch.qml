@@ -60,6 +60,7 @@ Item {
     function _release() { liftIn.stop(); _held = false; shrink.from(_grow); }
 
     Rectangle { // track; disabled: the background layers at opacity 0.5 (the knob stays white)
+        id: track
         anchors.fill: parent
         radius: height / 2
         readonly property color on: Tokens.control.switchOn
@@ -72,6 +73,7 @@ Item {
         restW: sw._m.knobWidth; restH: sw._m.knobHeight
         grow: Tokens.motion.switchLift
         lift: sw._lift
+        lensSource: track
         reduceMotion: sw.reduceMotion
         cx: G.switchKnobX(sw._m, along.value) + sw._m.knobWidth / 2
         cy: sw.height / 2
