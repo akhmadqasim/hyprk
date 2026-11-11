@@ -620,3 +620,46 @@ on enter; AppKit cross-fades the before / after contents on (0, 1, 1, 1) over ha
 about 15 frames: the plugin draws no decoration for a full-screen window, a fade needs its own pass), the Qt-timer
 motions (RubberBand, lock shake / minute, Switch), Dock autohide, slot grow / shrink, drag-off, submenu delay, bar
 peek, lock / unlock, the Dock label over backdrops.
+
+## Session 16 (2026-11-12): appearance switch in step again, Quick Look, lock shake, HUD dismiss with the Mac's metric
+
+Own headless sessions (MBA 2560x1664), scratch copy of the tree, private D-Bus, no PipeWire, four fresh sessions
+(A scale 2, about 40 mcap runs; B scale 2 and 1.6, about 45; C scale 1.6 and 2, about 56; D scale 2 with the PAM test
+double, 15), quiet host (load under 1). Per-frame series in the CSV (`*-s16-*`, session D).
+
+Appearance switch metric: `alpha` per region over a full-output capture at `-k 4`: Settings pane (the Appearance card),
+Settings sidebar, menu bar, Dock, wallpaper (right edge, nothing but the picture); "spread" = the largest difference
+between the regions in one frame while their mean is between .03 and .97; "monotonic" = no region steps back.
+
+| Motion | Mac | Before | After | Runs |
+|---|---|---|---|---|
+| Appearance switch, Settings click, scale 2 (86d3db4) | AppKit: snapshot held until the apps answer, then one 0.5 s cross-fade | pane / sidebar .02 .05 .09 .15 .22 .30, bar .00 .00 .09 .14, Dock and wallpaper .15 .25 .36 .48 then back to .37 when the picture arrived: spread .21-.33 in 5 of 5, steps back .10-.11 in 2 of 5 (same session) | every region .02 .05 .10 .15 .22 .30 .37 .45 .52 .58 .64 .69 .73 .77 .80 .84 .86 .89 .91 .93 .94 .96 .97 .98, spread .000-.004, monotonic, 2-98 % 385-404 ms | 7 of 7 valid (one capture failed) |
+| Same, shell shortcut `hyprk:appearance-*` (86d3db4, 9765325) | same | judge #5: shell steps back, Settings does not change | spread .000-.004, Settings pane in the same curve, monotonic | 7 of 7 + 6 + 4 |
+| Same at scale 1.6, Settings click (07ddaa7) | same | first switches after the scale change: the mode's wallpaper cut not made yet, hold ran out at 473 ms, the wallpaper changed after the fade (2 of 8) | 8 of 8 in step, spread .002-.004, hold 187-239 ms, 2-98 % 384-403 ms | 8 |
+| Same at 1.6, shortcut | same | - | 8 of 8 spread .002-.003 | 8 |
+| Hold (trigger to the fade's first frame), shortcut, scale 2 | answer at most 0.5 s | 205-235 ms (wallpaper.sh decoded the cut for the menu bar luminance on every run) | 172-201 ms (luminance cached, 07ddaa7) | 6 |
+| Quick Look close, one-page PDF (045dadf) | Q-finder-26: ~0.18 s into the icon, curve not measured | judge #5: a repeated value in 3 of 4 | .06 .19 .36 .55 .74 .88 .96 .99 in 3 of 3 runs without a compositor gap (the 4th had 2 long present intervals) | 4 |
+| Lock field shake (7898526) | 400 ms, A 14 / 8.25 / 6.75 pt | judge #5: 384 ms, one frame lost in 3 of 3 | x of the "?" button 0 -10 -14 -10 0 10 14 10 0 -10 -14 -10 0 6 8 6 0 -6 -8 -6 0 5 6.5 5 0, 25 frames in 400 ms, longest interval 17.3 ms | 4 of 4 the same |
+| Lock minute change (7898526) | B8 | Qt timer | 32 frames, no repeated value, longest interval 17.1 ms | 1 |
+| HUD dismiss (`hud hide`), unchanged code | hud-appear-fit.json dismiss tracks, glyph p97 brightness (verify/A/scripts/hudana2.py): episode 2 .98 .91 .82 .73 .65 .57 .50 .44 .38 .28 .28 .24 .18, then cut | judge #5 / session 15: box alpha .04 .15 .32 .48 (glass at opacity^2 plus the 0.9 scale), "3 frames ahead"; end snap .06-.10 | the Mac's own metric on ours (p97 of the glyph box against the frame after): .98 .92 .85 .75 .67 .59 .52 .45 .39 .34 .28 .25 .21 .18, rms about .02 against episode 2; box alpha .04 .15 .30 .45 .57 .66 .74 .80 ... reaching 1.00 at 430 ms with no end step | 3 + 2 |
+
+What the appearance fault was: wallpaper.sh cuts the mode's picture and the Background's asynchronous Image reloads
+it; an Image whose source changes draws nothing while it loads, so the wallpaper layer showed its window colour for
+3-4 frames, and the glass over it with it. The fixed 0.15 s hold before 64e0b28 covered that; the hold that ends on the
+shell's answer (a9e060c) did not, because the Background answered with its empty frame. The picture is now swapped
+only once decoded and the Background's answer waits for it (ShellWindow.appearanceBusy).
+
+Measured, not changed:
+- Mission Control at 1.6 with one Settings window: enter 318-335 ms against R2 333 (rms .023-.025); exit 218-233 ms against
+  267 (rms .071-.075, front-loaded). The window fits at scale 1 at 1.6 and stays where it is (mission-control.json:
+  max scale 1.0, near the real position), so the share metric reads only the Spaces bar (its own 0.125 s exit spring),
+  the menu bar strip and the cover's hand-over (a one-frame .40 -> .63 at 190 ms when the real window shows again),
+  not a flight: no R2-comparable number. The 4-window exit (200-217 ms, judge #5) needs the Mac's 4-window recording.
+- Cmd-Tab: label "System Settings" ink 25 x 210 px = SF Pro Bold 13 pt (PIL render 25 x 212; 14 pt 28 x 228; the Mac's
+  "TextEdit" 20 x 104 px = 13 pt); selection tile over Settings' white card 163 under a panel of 220 (plus-darker -57,
+  Q-dock-21). The "unblurred patch" is the Liquid Glass preview photo of Settings behind the panel through the Dock
+  recipe's 1.5 pt blur (Material.cpp `dock`, LIVE-27.2.1 Dock: blur 1.5). First frame: complete in 3 of 5 opens, in 2
+  of 5 the panel's glass shows one frame before the icons (fill surface, .15 of the change). Tried and dropped: drawing
+  the row at 0.0011 before the reveal (7 of 8 partial), revealing the panel at the fill surface's swap (5 of 8 partial,
+  icons first) or at its afterAnimating (4 of 8). Two surfaces cannot commit together; one surface with the panel glass
+  and the tile fill needs per-shape fills in the plugin.
