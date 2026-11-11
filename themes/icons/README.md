@@ -36,9 +36,11 @@ run-time folder, back flap + front flap from CoreTypes' `Assets.car`, sRGB, buil
 by IconServices' recipe, same tool; none needs a tint, and the Finder tints tagged folders at run time by
 IconServices' rule (`finder/src/sysicons.cpp`). `SmartFolderIcon`, `SystemFolderIcon` and `OpenFolderIcon` are
 still the older `.icns` art, and no folder has the Mac's drop shadow), `settings/` (real System
-Settings pane icons, `<pane>@<64|128>-<light|dark>.png`, see `panes.json`), `sf-symbols/` (SF Symbols
+Settings pane icons, `<pane>@<64|128>-<light|dark>.png`, see `panes.json`; plus the icons built offline by
+`tools/build-graphic.py` from Apple's graphic icon configurations, listed in `settings/graphic.json`: the 24 pt row
+tiles `<id>@48-...` and 8 more pane icons, see `reference/ASSETS.md` "Graphic icons built offline"), `sf-symbols/` (SF Symbols
 rendered on macOS 27.2.1: `svg/`, `names.json`; `sf.js` is generated from them by `tools/gen-sf.mjs` and
-used by the shell and Finder through symlinks), `tools/` (`car.py` Assets.car reader, `build-apps.py`, `build-styles.py` + `iconstack.py` + `dmp2.py` +
+used by the shell and Finder through symlinks), `tools/` (`car.py` Assets.car reader, `bvg.py` SF Symbol outlines, `add-sf.py` to register more of them, `build-graphic.py`, `build-apps.py`, `build-styles.py` + `iconstack.py` + `dmp2.py` +
 `check-styles.py` + `glass.py` for the styles, `gen-map.mjs`, `gen-sf.mjs`).
 3. **Styles** (Settings > Appearance > Icon & widget style, `iconStyle` + `iconStyleVariant` in
    `state/appearance.json`): `default`, `dark`, `clear`, `tinted`.

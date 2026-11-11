@@ -1987,6 +1987,728 @@
    ],
    "extras": [],
    "note": "Settings. Named by the Settings agent (2026-11-11), not shown by the shell or Finder, so not in sf.js. Decoded from CoreGlyphs' BVG blob with tools/bvg.py (no Mac render): validated on 73 Mac-rendered symbols x 3 weights, IoU median 0.9997, min 0.989."
+  },
+  "person.2.fill": {
+   "symbol": "person.2.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "person.2.fill.regular.svg",
+    "person.2.fill.medium.svg",
+    "person.2.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "cloud.fill": {
+   "symbol": "cloud.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "cloud.fill.regular.svg",
+    "cloud.fill.medium.svg",
+    "cloud.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "play.circle": {
+   "symbol": "play.circle",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "play.circle.regular.svg",
+    "play.circle.medium.svg",
+    "play.circle.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "info.circle": {
+   "symbol": "info.circle",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "info.circle.regular.svg",
+    "info.circle.medium.svg",
+    "info.circle.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "bluetooth.slash": {
+   "symbol": "bluetooth.slash",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": true,
+   "variants": [
+    "bluetooth.slash.regular.svg",
+    "bluetooth.slash.medium.svg",
+    "bluetooth.slash.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "gear.badge": {
+   "symbol": "gear.badge",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "gear.badge.regular.svg",
+    "gear.badge.medium.svg",
+    "gear.badge.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "externaldrive.fill": {
+   "symbol": "externaldrive.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "externaldrive.fill.regular.svg",
+    "externaldrive.fill.medium.svg",
+    "externaldrive.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "globe": {
+   "symbol": "globe",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "globe.regular.svg",
+    "globe.medium.svg",
+    "globe.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "calendar.badge.clock": {
+   "symbol": "calendar.badge.clock",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "calendar.badge.clock.regular.svg",
+    "calendar.badge.clock.medium.svg",
+    "calendar.badge.clock.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "figure.walk.diamond.fill": {
+   "symbol": "figure.walk.diamond.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "figure.walk.diamond.fill.regular.svg",
+    "figure.walk.diamond.fill.medium.svg",
+    "figure.walk.diamond.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "arrow.counterclockwise": {
+   "symbol": "arrow.counterclockwise",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "arrow.counterclockwise.regular.svg",
+    "arrow.counterclockwise.medium.svg",
+    "arrow.counterclockwise.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "internaldrive.fill": {
+   "symbol": "internaldrive.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "internaldrive.fill.regular.svg",
+    "internaldrive.fill.medium.svg",
+    "internaldrive.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "record.circle": {
+   "symbol": "record.circle",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "record.circle.regular.svg",
+    "record.circle.medium.svg",
+    "record.circle.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "apple.nowplaying": {
+   "symbol": "apple.nowplaying",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": true,
+   "variants": [
+    "apple.nowplaying.regular.svg",
+    "apple.nowplaying.medium.svg",
+    "apple.nowplaying.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "clock.fill": {
+   "symbol": "clock.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "clock.fill.regular.svg",
+    "clock.fill.medium.svg",
+    "clock.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "ethernet": {
+   "symbol": "ethernet",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": true,
+   "variants": [
+    "ethernet.regular.svg",
+    "ethernet.medium.svg",
+    "ethernet.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "firewall.fill": {
+   "symbol": "firewall.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "firewall.fill.regular.svg",
+    "firewall.fill.medium.svg",
+    "firewall.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "voiceover": {
+   "symbol": "voiceover",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "voiceover.regular.svg",
+    "voiceover.medium.svg",
+    "voiceover.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "arrowtriangles.up.right.down.left.magnifyingglass": {
+   "symbol": "arrowtriangles.up.right.down.left.magnifyingglass",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": true,
+   "variants": [
+    "arrowtriangles.up.right.down.left.magnifyingglass.regular.svg",
+    "arrowtriangles.up.right.down.left.magnifyingglass.medium.svg",
+    "arrowtriangles.up.right.down.left.magnifyingglass.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "character.magnify": {
+   "symbol": "character.magnify",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "character.magnify.regular.svg",
+    "character.magnify.medium.svg",
+    "character.magnify.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "circle.dotted.and.circle": {
+   "symbol": "circle.dotted.and.circle",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "circle.dotted.and.circle.regular.svg",
+    "circle.dotted.and.circle.medium.svg",
+    "circle.dotted.and.circle.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "rectangle.3.group.bubble.left.fill": {
+   "symbol": "rectangle.3.group.bubble.left.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "rectangle.3.group.bubble.left.fill.regular.svg",
+    "rectangle.3.group.bubble.left.fill.medium.svg",
+    "rectangle.3.group.bubble.left.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render); 'rectangle.3.group.bubble.left.fill' is an alias of 'rectangle.3.group.bubble.fill' (name_aliases.strings)."
+  },
+  "quote.bubble.fill": {
+   "symbol": "quote.bubble.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "quote.bubble.fill.regular.svg",
+    "quote.bubble.fill.medium.svg",
+    "quote.bubble.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "cursorarrow": {
+   "symbol": "cursorarrow",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "cursorarrow.regular.svg",
+    "cursorarrow.medium.svg",
+    "cursorarrow.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render); 'cursorarrow' is an alias of 'pointer.arrow' (name_aliases.strings)."
+  },
+  "speaker.eye.fill": {
+   "symbol": "speaker.eye.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": true,
+   "variants": [
+    "speaker.eye.fill.regular.svg",
+    "speaker.eye.fill.medium.svg",
+    "speaker.eye.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "captions.bubble.fill": {
+   "symbol": "captions.bubble.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "captions.bubble.fill.regular.svg",
+    "captions.bubble.fill.medium.svg",
+    "captions.bubble.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "waveform.bubble.fill": {
+   "symbol": "waveform.bubble.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": true,
+   "variants": [
+    "waveform.bubble.fill.regular.svg",
+    "waveform.bubble.fill.medium.svg",
+    "waveform.bubble.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "person.wave.2.fill": {
+   "symbol": "person.wave.2.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "person.wave.2.fill.regular.svg",
+    "person.wave.2.fill.medium.svg",
+    "person.wave.2.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "keyboard.badge.waveform.fill": {
+   "symbol": "keyboard.badge.waveform.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": true,
+   "variants": [
+    "keyboard.badge.waveform.fill.regular.svg",
+    "keyboard.badge.waveform.fill.medium.svg",
+    "keyboard.badge.waveform.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "person.badge.waveform.fill": {
+   "symbol": "person.badge.waveform.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": true,
+   "variants": [
+    "person.badge.waveform.fill.regular.svg",
+    "person.badge.waveform.fill.medium.svg",
+    "person.badge.waveform.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "waveform.arrow.triangle.branch.right": {
+   "symbol": "waveform.arrow.triangle.branch.right",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": true,
+   "variants": [
+    "waveform.arrow.triangle.branch.right.regular.svg",
+    "waveform.arrow.triangle.branch.right.medium.svg",
+    "waveform.arrow.triangle.branch.right.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "accessibility.badge.arrow.up.right": {
+   "symbol": "accessibility.badge.arrow.up.right",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "accessibility.badge.arrow.up.right.regular.svg",
+    "accessibility.badge.arrow.up.right.medium.svg",
+    "accessibility.badge.arrow.up.right.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "hourglass": {
+   "symbol": "hourglass",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "hourglass.regular.svg",
+    "hourglass.medium.svg",
+    "hourglass.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "touchid": {
+   "symbol": "touchid",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "touchid.regular.svg",
+    "touchid.medium.svg",
+    "touchid.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "at": {
+   "symbol": "at",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "at.regular.svg",
+    "at.medium.svg",
+    "at.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "printer.fill": {
+   "symbol": "printer.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "printer.fill.regular.svg",
+    "printer.fill.medium.svg",
+    "printer.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "desktopcomputer": {
+   "symbol": "desktopcomputer",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "desktopcomputer.regular.svg",
+    "desktopcomputer.medium.svg",
+    "desktopcomputer.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "laptopcomputer": {
+   "symbol": "laptopcomputer",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "laptopcomputer.regular.svg",
+    "laptopcomputer.medium.svg",
+    "laptopcomputer.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
   }
  },
  "skipped": {
@@ -31742,6 +32464,3771 @@
     0
    ],
    "fontBaselineY": 34.878
+  },
+  "person.2.fill.regular.svg": {
+   "symbol": "person.2.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    51,
+    37
+   ],
+   "alignmentRect": [
+    0.0,
+    6.5,
+    51.0,
+    22.5
+   ],
+   "baselineY": 29.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    45.0,
+    30.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 32.215
+  },
+  "person.2.fill.medium.svg": {
+   "symbol": "person.2.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    51,
+    37
+   ],
+   "alignmentRect": [
+    0.0,
+    6.5,
+    51.0,
+    22.5
+   ],
+   "baselineY": 29.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    45.5,
+    31.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 31.997
+  },
+  "person.2.fill.semibold.svg": {
+   "symbol": "person.2.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    51,
+    37
+   ],
+   "alignmentRect": [
+    0.0,
+    6.0,
+    51.0,
+    22.5
+   ],
+   "baselineY": 28.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    45.5,
+    31.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 31.832
+  },
+  "cloud.fill.regular.svg": {
+   "symbol": "cloud.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    43,
+    31
+   ],
+   "alignmentRect": [
+    0.0,
+    4.5,
+    42.5,
+    22.5
+   ],
+   "baselineY": 27.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    37.5,
+    25.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 30.152
+  },
+  "cloud.fill.medium.svg": {
+   "symbol": "cloud.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    43,
+    32
+   ],
+   "alignmentRect": [
+    0.0,
+    5.5,
+    43.0,
+    22.5
+   ],
+   "baselineY": 28.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    38.0,
+    25.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 30.97
+  },
+  "cloud.fill.semibold.svg": {
+   "symbol": "cloud.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    44,
+    32
+   ],
+   "alignmentRect": [
+    0.0,
+    5.0,
+    43.5,
+    22.5
+   ],
+   "baselineY": 27.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    38.5,
+    26.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 30.833
+  },
+  "play.circle.regular.svg": {
+   "symbol": "play.circle",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    37.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    32.0,
+    32.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.469
+  },
+  "play.circle.medium.svg": {
+   "symbol": "play.circle",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    32.5,
+    32.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.264
+  },
+  "play.circle.semibold.svg": {
+   "symbol": "play.circle",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    33.0,
+    33.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.108
+  },
+  "info.circle.regular.svg": {
+   "symbol": "info.circle",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    37.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    32.0,
+    32.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.469
+  },
+  "info.circle.medium.svg": {
+   "symbol": "info.circle",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    32.5,
+    32.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.264
+  },
+  "info.circle.semibold.svg": {
+   "symbol": "info.circle",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    33.0,
+    33.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.108
+  },
+  "bluetooth.slash.regular.svg": {
+   "symbol": "bluetooth.slash",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    32,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    31.5,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    1.5,
+    3.5,
+    30.0,
+    33.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.755
+  },
+  "bluetooth.slash.medium.svg": {
+   "symbol": "bluetooth.slash",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    33,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    32.0,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    1.5,
+    3.0,
+    30.5,
+    34.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.507
+  },
+  "bluetooth.slash.semibold.svg": {
+   "symbol": "bluetooth.slash",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    33,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    9.5,
+    32.5,
+    22.5
+   ],
+   "baselineY": 32.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    1.5,
+    3.5,
+    31.0,
+    34.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 35.319
+  },
+  "gear.badge.regular.svg": {
+   "symbol": "gear.badge",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    42,
+    43
+   ],
+   "alignmentRect": [
+    0.0,
+    11.0,
+    42.0,
+    22.5
+   ],
+   "baselineY": 33.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    37.0,
+    37.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 36.428
+  },
+  "gear.badge.medium.svg": {
+   "symbol": "gear.badge",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    43,
+    44
+   ],
+   "alignmentRect": [
+    0.0,
+    11.5,
+    42.0,
+    22.5
+   ],
+   "baselineY": 34.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    37.5,
+    37.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 37.184
+  },
+  "gear.badge.semibold.svg": {
+   "symbol": "gear.badge",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    43,
+    44
+   ],
+   "alignmentRect": [
+    0.0,
+    11.5,
+    42.5,
+    22.5
+   ],
+   "baselineY": 34.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    38.0,
+    38.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 36.999
+  },
+  "externaldrive.fill.regular.svg": {
+   "symbol": "externaldrive.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    44,
+    33
+   ],
+   "alignmentRect": [
+    0.0,
+    5.5,
+    44.0,
+    22.5
+   ],
+   "baselineY": 28.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    36.0,
+    26.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 31.292
+  },
+  "externaldrive.fill.medium.svg": {
+   "symbol": "externaldrive.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    45,
+    33
+   ],
+   "alignmentRect": [
+    0.0,
+    5.5,
+    44.5,
+    22.5
+   ],
+   "baselineY": 28.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    37.0,
+    27.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 30.957
+  },
+  "externaldrive.fill.semibold.svg": {
+   "symbol": "externaldrive.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    45,
+    34
+   ],
+   "alignmentRect": [
+    0.0,
+    6.0,
+    45.0,
+    22.5
+   ],
+   "baselineY": 28.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    37.0,
+    27.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 31.702
+  },
+  "globe.regular.svg": {
+   "symbol": "globe",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    37.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    32.0,
+    32.0
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 33.469
+  },
+  "globe.medium.svg": {
+   "symbol": "globe",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    32.5,
+    32.5
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 34.264
+  },
+  "globe.semibold.svg": {
+   "symbol": "globe",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    33.0,
+    33.0
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 34.108
+  },
+  "calendar.badge.clock.regular.svg": {
+   "symbol": "calendar.badge.clock",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    44,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    6.5,
+    39.5,
+    22.5
+   ],
+   "baselineY": 29.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    40.0,
+    34.0
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 31.922
+  },
+  "calendar.badge.clock.medium.svg": {
+   "symbol": "calendar.badge.clock",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    45,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    7.0,
+    40.0,
+    22.5
+   ],
+   "baselineY": 29.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    40.5,
+    34.5
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 32.733
+  },
+  "calendar.badge.clock.semibold.svg": {
+   "symbol": "calendar.badge.clock",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    45,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    7.0,
+    40.5,
+    22.5
+   ],
+   "baselineY": 29.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    41.0,
+    35.0
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 32.591
+  },
+  "figure.walk.diamond.fill.regular.svg": {
+   "symbol": "figure.walk.diamond.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    42,
+    43
+   ],
+   "alignmentRect": [
+    0.0,
+    10.5,
+    42.0,
+    22.5
+   ],
+   "baselineY": 33.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.5,
+    3.0,
+    37.0,
+    37.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 36.094
+  },
+  "figure.walk.diamond.fill.medium.svg": {
+   "symbol": "figure.walk.diamond.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    43,
+    44
+   ],
+   "alignmentRect": [
+    0.0,
+    11.0,
+    42.5,
+    22.5
+   ],
+   "baselineY": 33.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.5,
+    3.5,
+    37.5,
+    37.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 36.836
+  },
+  "figure.walk.diamond.fill.semibold.svg": {
+   "symbol": "figure.walk.diamond.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    43,
+    44
+   ],
+   "alignmentRect": [
+    0.0,
+    11.0,
+    43.0,
+    22.5
+   ],
+   "baselineY": 33.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.5,
+    3.0,
+    38.0,
+    38.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 36.64
+  },
+  "arrow.counterclockwise.regular.svg": {
+   "symbol": "arrow.counterclockwise",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    34,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    11.0,
+    33.5,
+    22.5
+   ],
+   "baselineY": 33.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    28.0,
+    34.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 36.431
+  },
+  "arrow.counterclockwise.medium.svg": {
+   "symbol": "arrow.counterclockwise",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    34,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    10.5,
+    33.5,
+    22.5
+   ],
+   "baselineY": 33.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    28.0,
+    34.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 36.305
+  },
+  "arrow.counterclockwise.semibold.svg": {
+   "symbol": "arrow.counterclockwise",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    34,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    11.5,
+    34.0,
+    22.5
+   ],
+   "baselineY": 34.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    28.5,
+    34.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 37.209
+  },
+  "internaldrive.fill.regular.svg": {
+   "symbol": "internaldrive.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    44,
+    33
+   ],
+   "alignmentRect": [
+    0.0,
+    5.5,
+    44.0,
+    22.5
+   ],
+   "baselineY": 28.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    36.0,
+    26.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 31.292
+  },
+  "internaldrive.fill.medium.svg": {
+   "symbol": "internaldrive.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    45,
+    33
+   ],
+   "alignmentRect": [
+    0.0,
+    5.5,
+    44.5,
+    22.5
+   ],
+   "baselineY": 28.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    37.0,
+    27.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 30.957
+  },
+  "internaldrive.fill.semibold.svg": {
+   "symbol": "internaldrive.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    45,
+    34
+   ],
+   "alignmentRect": [
+    0.0,
+    6.0,
+    45.0,
+    22.5
+   ],
+   "baselineY": 28.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    37.0,
+    27.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 31.702
+  },
+  "record.circle.regular.svg": {
+   "symbol": "record.circle",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    37.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    32.0,
+    32.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.469
+  },
+  "record.circle.medium.svg": {
+   "symbol": "record.circle",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    32.5,
+    32.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.264
+  },
+  "record.circle.semibold.svg": {
+   "symbol": "record.circle",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    33.0,
+    33.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.108
+  },
+  "apple.nowplaying.regular.svg": {
+   "symbol": "apple.nowplaying",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    28,
+    33
+   ],
+   "alignmentRect": [
+    0.0,
+    5.5,
+    28.0,
+    22.5
+   ],
+   "baselineY": 28.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    24.0,
+    26.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 31.282
+  },
+  "apple.nowplaying.medium.svg": {
+   "symbol": "apple.nowplaying",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    29,
+    34
+   ],
+   "alignmentRect": [
+    0.0,
+    6.0,
+    29.0,
+    22.5
+   ],
+   "baselineY": 28.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    25.0,
+    27.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 31.829
+  },
+  "apple.nowplaying.semibold.svg": {
+   "symbol": "apple.nowplaying",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    30,
+    34
+   ],
+   "alignmentRect": [
+    0.0,
+    6.0,
+    29.5,
+    22.5
+   ],
+   "baselineY": 28.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    25.5,
+    28.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 31.485
+  },
+  "clock.fill.regular.svg": {
+   "symbol": "clock.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    37.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    32.0,
+    32.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.469
+  },
+  "clock.fill.medium.svg": {
+   "symbol": "clock.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    32.5,
+    32.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.264
+  },
+  "clock.fill.semibold.svg": {
+   "symbol": "clock.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    33.0,
+    33.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.108
+  },
+  "ethernet.regular.svg": {
+   "symbol": "ethernet",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    47,
+    29
+   ],
+   "alignmentRect": [
+    0.0,
+    3.5,
+    47.0,
+    22.5
+   ],
+   "baselineY": 26.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    40.5,
+    23.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 29.098
+  },
+  "ethernet.medium.svg": {
+   "symbol": "ethernet",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    49,
+    30
+   ],
+   "alignmentRect": [
+    0.0,
+    4.0,
+    49.0,
+    22.5
+   ],
+   "baselineY": 26.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    43.0,
+    23.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 29.775
+  },
+  "ethernet.semibold.svg": {
+   "symbol": "ethernet",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    51,
+    30
+   ],
+   "alignmentRect": [
+    0.0,
+    4.0,
+    50.5,
+    22.5
+   ],
+   "baselineY": 26.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    44.5,
+    24.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 29.53
+  },
+  "firewall.fill.regular.svg": {
+   "symbol": "firewall.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    34,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    34.0,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    26.0,
+    31.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.623
+  },
+  "firewall.fill.medium.svg": {
+   "symbol": "firewall.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    34,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    34.0,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    26.0,
+    31.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.523
+  },
+  "firewall.fill.semibold.svg": {
+   "symbol": "firewall.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    35,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    34.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    26.5,
+    31.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.447
+  },
+  "voiceover.regular.svg": {
+   "symbol": "voiceover",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    43,
+    41
+   ],
+   "alignmentRect": [
+    5.5,
+    8.5,
+    37.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    0.0,
+    3.5,
+    40.0,
+    34.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.147
+  },
+  "voiceover.medium.svg": {
+   "symbol": "voiceover",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    44,
+    41
+   ],
+   "alignmentRect": [
+    5.0,
+    8.5,
+    38.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    0.0,
+    3.0,
+    40.5,
+    35.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.956
+  },
+  "voiceover.semibold.svg": {
+   "symbol": "voiceover",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    44,
+    41
+   ],
+   "alignmentRect": [
+    5.0,
+    8.0,
+    38.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    0.0,
+    3.0,
+    41.0,
+    35.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.813
+  },
+  "arrowtriangles.up.right.down.left.magnifyingglass.regular.svg": {
+   "symbol": "arrowtriangles.up.right.down.left.magnifyingglass",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    37
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    38.0,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.5,
+    3.0,
+    31.0,
+    31.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 32.978
+  },
+  "arrowtriangles.up.right.down.left.magnifyingglass.medium.svg": {
+   "symbol": "arrowtriangles.up.right.down.left.magnifyingglass",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    38.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.5,
+    3.5,
+    31.0,
+    31.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.825
+  },
+  "arrowtriangles.up.right.down.left.magnifyingglass.semibold.svg": {
+   "symbol": "arrowtriangles.up.right.down.left.magnifyingglass",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    38.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.5,
+    3.5,
+    31.5,
+    31.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.708
+  },
+  "character.magnify.regular.svg": {
+   "symbol": "character.magnify",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    45,
+    37
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    44.5,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    38.0,
+    30.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.261
+  },
+  "character.magnify.medium.svg": {
+   "symbol": "character.magnify",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    45,
+    37
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    45.0,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    38.5,
+    31.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.053
+  },
+  "character.magnify.semibold.svg": {
+   "symbol": "character.magnify",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    46,
+    37
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    45.5,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    38.5,
+    31.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 32.896
+  },
+  "circle.dotted.and.circle.regular.svg": {
+   "symbol": "circle.dotted.and.circle",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    50,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    50.0,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    44.5,
+    32.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.469
+  },
+  "circle.dotted.and.circle.medium.svg": {
+   "symbol": "circle.dotted.and.circle",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    51,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    50.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    45.0,
+    32.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.264
+  },
+  "circle.dotted.and.circle.semibold.svg": {
+   "symbol": "circle.dotted.and.circle",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    51,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    50.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    45.0,
+    33.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.108
+  },
+  "rectangle.3.group.bubble.left.fill.regular.svg": {
+   "symbol": "rectangle.3.group.bubble.left.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    43,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    42.5,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    34.5,
+    32.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.135
+  },
+  "rectangle.3.group.bubble.left.fill.medium.svg": {
+   "symbol": "rectangle.3.group.bubble.left.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    43,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    43.0,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    35.0,
+    33.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 32.904
+  },
+  "rectangle.3.group.bubble.left.fill.semibold.svg": {
+   "symbol": "rectangle.3.group.bubble.left.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    44,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    43.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    35.5,
+    33.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.73
+  },
+  "quote.bubble.fill.regular.svg": {
+   "symbol": "quote.bubble.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    43,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    42.5,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    34.5,
+    32.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.135
+  },
+  "quote.bubble.fill.medium.svg": {
+   "symbol": "quote.bubble.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    43,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    43.0,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    35.0,
+    33.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 32.904
+  },
+  "quote.bubble.fill.semibold.svg": {
+   "symbol": "quote.bubble.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    44,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    43.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    35.5,
+    33.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.73
+  },
+  "cursorarrow.regular.svg": {
+   "symbol": "cursorarrow",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    26,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    26.0,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    18.5,
+    32.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.465
+  },
+  "cursorarrow.medium.svg": {
+   "symbol": "cursorarrow",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    27,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    26.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    19.0,
+    33.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.11
+  },
+  "cursorarrow.semibold.svg": {
+   "symbol": "cursorarrow",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    27,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    27.0,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    19.5,
+    33.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.841
+  },
+  "speaker.eye.fill.regular.svg": {
+   "symbol": "speaker.eye.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    53,
+    33
+   ],
+   "alignmentRect": [
+    0.0,
+    5.5,
+    53.0,
+    22.5
+   ],
+   "baselineY": 28.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    45.0,
+    26.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 31.146
+  },
+  "speaker.eye.fill.medium.svg": {
+   "symbol": "speaker.eye.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    54,
+    33
+   ],
+   "alignmentRect": [
+    0.0,
+    5.5,
+    54.0,
+    22.5
+   ],
+   "baselineY": 28.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    46.0,
+    27.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 30.985
+  },
+  "speaker.eye.fill.semibold.svg": {
+   "symbol": "speaker.eye.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    55,
+    34
+   ],
+   "alignmentRect": [
+    0.0,
+    6.5,
+    54.5,
+    22.5
+   ],
+   "baselineY": 29.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    46.5,
+    27.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 31.862
+  },
+  "captions.bubble.fill.regular.svg": {
+   "symbol": "captions.bubble.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    43,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    42.5,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    34.5,
+    32.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.135
+  },
+  "captions.bubble.fill.medium.svg": {
+   "symbol": "captions.bubble.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    43,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    43.0,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    35.0,
+    33.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 32.904
+  },
+  "captions.bubble.fill.semibold.svg": {
+   "symbol": "captions.bubble.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    44,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    43.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    35.5,
+    33.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.73
+  },
+  "waveform.bubble.fill.regular.svg": {
+   "symbol": "waveform.bubble.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    43,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    42.5,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    34.5,
+    32.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.135
+  },
+  "waveform.bubble.fill.medium.svg": {
+   "symbol": "waveform.bubble.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    43,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    43.0,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    35.0,
+    33.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 32.904
+  },
+  "waveform.bubble.fill.semibold.svg": {
+   "symbol": "waveform.bubble.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    44,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    43.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    35.5,
+    33.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.73
+  },
+  "person.wave.2.fill.regular.svg": {
+   "symbol": "person.wave.2.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    41,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    11.0,
+    40.5,
+    22.5
+   ],
+   "baselineY": 33.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    35.5,
+    33.0
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 36.352
+  },
+  "person.wave.2.fill.medium.svg": {
+   "symbol": "person.wave.2.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    42,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    10.5,
+    41.5,
+    22.5
+   ],
+   "baselineY": 33.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    36.0,
+    33.0
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 36.279
+  },
+  "person.wave.2.fill.semibold.svg": {
+   "symbol": "person.wave.2.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    42,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    11.5,
+    42.0,
+    22.5
+   ],
+   "baselineY": 34.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    36.5,
+    33.5
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 37.224
+  },
+  "keyboard.badge.waveform.fill.regular.svg": {
+   "symbol": "keyboard.badge.waveform.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    55,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    5.0,
+    47.5,
+    22.5
+   ],
+   "baselineY": 27.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    50.5,
+    32.5
+   ],
+   "paths": 6,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 30.445
+  },
+  "keyboard.badge.waveform.fill.medium.svg": {
+   "symbol": "keyboard.badge.waveform.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    55,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    4.5,
+    48.0,
+    22.5
+   ],
+   "baselineY": 27.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    51.0,
+    33.0
+   ],
+   "paths": 6,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 30.348
+  },
+  "keyboard.badge.waveform.fill.semibold.svg": {
+   "symbol": "keyboard.badge.waveform.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    56,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    4.5,
+    48.5,
+    22.5
+   ],
+   "baselineY": 27.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    51.5,
+    33.0
+   ],
+   "paths": 6,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 30.277
+  },
+  "person.badge.waveform.fill.regular.svg": {
+   "symbol": "person.badge.waveform.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    41,
+    42
+   ],
+   "alignmentRect": [
+    0.0,
+    6.0,
+    34.5,
+    22.5
+   ],
+   "baselineY": 28.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    37.0,
+    36.0
+   ],
+   "paths": 6,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 31.468
+  },
+  "person.badge.waveform.fill.medium.svg": {
+   "symbol": "person.badge.waveform.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    42,
+    43
+   ],
+   "alignmentRect": [
+    0.0,
+    6.5,
+    34.5,
+    22.5
+   ],
+   "baselineY": 29.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    37.5,
+    36.5
+   ],
+   "paths": 6,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 32.265
+  },
+  "person.badge.waveform.fill.semibold.svg": {
+   "symbol": "person.badge.waveform.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    42,
+    43
+   ],
+   "alignmentRect": [
+    0.0,
+    6.5,
+    34.5,
+    22.5
+   ],
+   "baselineY": 29.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    38.0,
+    36.5
+   ],
+   "paths": 6,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 32.112
+  },
+  "waveform.arrow.triangle.branch.right.regular.svg": {
+   "symbol": "waveform.arrow.triangle.branch.right",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    40,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    37.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    35.5,
+    33.0
+   ],
+   "paths": 5,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 34.063
+  },
+  "waveform.arrow.triangle.branch.right.medium.svg": {
+   "symbol": "waveform.arrow.triangle.branch.right",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    41,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    38.0,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    36.5,
+    33.5
+   ],
+   "paths": 5,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 34.734
+  },
+  "waveform.arrow.triangle.branch.right.semibold.svg": {
+   "symbol": "waveform.arrow.triangle.branch.right",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    42,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    38.5,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    37.5,
+    34.0
+   ],
+   "paths": 5,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 34.484
+  },
+  "accessibility.badge.arrow.up.right.regular.svg": {
+   "symbol": "accessibility.badge.arrow.up.right",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    43,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    37.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    40.0,
+    34.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.147
+  },
+  "accessibility.badge.arrow.up.right.medium.svg": {
+   "symbol": "accessibility.badge.arrow.up.right",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    44,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    40.5,
+    35.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.956
+  },
+  "accessibility.badge.arrow.up.right.semibold.svg": {
+   "symbol": "accessibility.badge.arrow.up.right",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    44,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    38.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    41.0,
+    35.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.813
+  },
+  "hourglass.regular.svg": {
+   "symbol": "hourglass",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    27,
+    35
+   ],
+   "alignmentRect": [
+    0.0,
+    6.5,
+    26.5,
+    22.5
+   ],
+   "baselineY": 29.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    18.5,
+    29.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 32.04
+  },
+  "hourglass.medium.svg": {
+   "symbol": "hourglass",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    27,
+    36
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    27.0,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    19.0,
+    29.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 32.852
+  },
+  "hourglass.semibold.svg": {
+   "symbol": "hourglass",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    27,
+    36
+   ],
+   "alignmentRect": [
+    0.0,
+    7.0,
+    27.0,
+    22.5
+   ],
+   "baselineY": 29.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    19.0,
+    29.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 32.71
+  },
+  "touchid.regular.svg": {
+   "symbol": "touchid",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    40,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    40.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.5,
+    3.0,
+    35.0,
+    34.0
+   ],
+   "paths": 6,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 34.334
+  },
+  "touchid.medium.svg": {
+   "symbol": "touchid",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    41,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    9.5,
+    41.0,
+    22.5
+   ],
+   "baselineY": 32.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.5,
+    3.0,
+    35.5,
+    35.0
+   ],
+   "paths": 6,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 35.068
+  },
+  "touchid.semibold.svg": {
+   "symbol": "touchid",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    41,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    9.5,
+    41.0,
+    22.5
+   ],
+   "baselineY": 32.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.5,
+    3.0,
+    35.5,
+    35.0
+   ],
+   "paths": 6,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 34.865
+  },
+  "at.regular.svg": {
+   "symbol": "at",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    32.5,
+    33.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.118
+  },
+  "at.medium.svg": {
+   "symbol": "at",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    33.0,
+    33.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.049
+  },
+  "at.semibold.svg": {
+   "symbol": "at",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    33.0,
+    33.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.997
+  },
+  "printer.fill.regular.svg": {
+   "symbol": "printer.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    44,
+    42
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    43.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.0,
+    3.0,
+    39.5,
+    36.0
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 34.177
+  },
+  "printer.fill.medium.svg": {
+   "symbol": "printer.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    44,
+    43
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    43.5,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.0,
+    3.0,
+    40.0,
+    37.0
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 34.78
+  },
+  "printer.fill.semibold.svg": {
+   "symbol": "printer.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    44,
+    44
+   ],
+   "alignmentRect": [
+    0.0,
+    10.0,
+    44.0,
+    22.5
+   ],
+   "baselineY": 32.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    1.5,
+    3.5,
+    40.5,
+    37.5
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 35.478
+  },
+  "desktopcomputer.regular.svg": {
+   "symbol": "desktopcomputer",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    46,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    45.5,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    37.5,
+    31.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.11
+  },
+  "desktopcomputer.medium.svg": {
+   "symbol": "desktopcomputer",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    46,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    46.0,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    38.0,
+    32.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.794
+  },
+  "desktopcomputer.semibold.svg": {
+   "symbol": "desktopcomputer",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    47,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    46.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    38.5,
+    33.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.554
+  },
+  "laptopcomputer.regular.svg": {
+   "symbol": "laptopcomputer",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    54,
+    32
+   ],
+   "alignmentRect": [
+    0.0,
+    5.0,
+    53.5,
+    22.5
+   ],
+   "baselineY": 27.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    45.5,
+    25.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 30.666
+  },
+  "laptopcomputer.medium.svg": {
+   "symbol": "laptopcomputer",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    54,
+    33
+   ],
+   "alignmentRect": [
+    0.0,
+    5.5,
+    54.0,
+    22.5
+   ],
+   "baselineY": 28.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    46.0,
+    26.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 31.32
+  },
+  "laptopcomputer.semibold.svg": {
+   "symbol": "laptopcomputer",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    55,
+    33
+   ],
+   "alignmentRect": [
+    0.0,
+    5.5,
+    55.0,
+    22.5
+   ],
+   "baselineY": 28.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    47.0,
+    27.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 31.057
   }
  },
  "menubar": [

@@ -1,0 +1,1330 @@
+{
+ "_comment": "IconServices graphic icons built by tools/build-graphic.py (27.2.1): symbol and colours from the plist named in `source`, `recipe` copied from CoreGlyphsPrivate's container_recipes.plist (--recipes <os root>). Sizes are file px: 48 = the 24 pt icon of a row at 2x, 64 / 128 = the 32 / 64 pt pane icon as panes.json's. checkRecipes: the recipes of the 20 panes Apple rendered, for --check.",
+ "icons": {
+  "screentime": {
+   "symbol": "hourglass",
+   "enclosure": "indigo",
+   "symbolColor": "white",
+   "sizes": [
+    64,
+    128
+   ],
+   "source": "CoreTypes.bundle Info.plist UTI com.apple.graphic-icon.screen-time (ScreenTimePreferencesExtension.appex CFBundleIcons ISTypeIdentifier)",
+   "recipe": {
+    "name": "hourglass",
+    "26": {
+     "pointsize_to_shape_mul": 1.4189096715328466,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.4895833333333335,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "touchid": {
+   "symbol": "touchid",
+   "enclosure": "white",
+   "symbolColor": "pink",
+   "sizes": [
+    64,
+    128
+   ],
+   "source": "Touch ID & Password.appex CFBundleIcons (ISSymbolColor pink, no enclosure colour); CoreTypes.bundle Info.plist UTI com.apple.graphic-icon.touch-id: white / pink",
+   "recipe": {
+    "name": "touchid",
+    "26": {
+     "pointsize_to_shape_mul": 1.539156253866139,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6158192090395482,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "users": {
+   "symbol": "person.2.fill",
+   "enclosure": "blue",
+   "symbolColor": "white",
+   "sizes": [
+    64,
+    128
+   ],
+   "source": "UsersGroups.appex CFBundleIcons",
+   "recipe": {
+    "name": "person.2.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.7297184567257562,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.815873015873016,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "internetaccounts": {
+   "symbol": "at",
+   "enclosure": "blue",
+   "symbolColor": "white",
+   "sizes": [
+    64,
+    128
+   ],
+   "source": "InternetAccountsSettingsExtension.appex CFBundleIcons",
+   "recipe": {
+    "name": "at",
+    "26": {
+     "pointsize_to_shape_mul": 1.539156253866139,
+     "symbol_size": "Medium",
+     "symbol_weight": "Medium",
+     "y_offset": 0.01
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6158192090395482,
+     "symbol_size": "Medium",
+     "symbol_weight": "Medium",
+     "y_offset": 0.01
+    }
+   }
+  },
+  "printers": {
+   "symbol": "printer.fill",
+   "enclosure": "gray",
+   "symbolColor": "white",
+   "sizes": [
+    64,
+    128
+   ],
+   "source": "PrinterScannerSettings.appex CFBundleIcons",
+   "recipe": {
+    "name": "printer.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.681670721816707,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.765432098765432,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "general-about": {
+   "symbol": "desktopcomputer",
+   "enclosure": "gray",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "AboutExtension.appex CFBundleIcons: ISCurrentDevice on gray. ISCurrentDevice is the Mac model's symbol; a PC has none, hyprk's choice: desktopcomputer",
+   "recipe": {
+    "name": "desktopcomputer",
+    "26": {
+     "pointsize_to_shape_mul": 1.7297184567257562,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.815873015873016,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "general-about-laptop": {
+   "symbol": "laptopcomputer",
+   "enclosure": "gray",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "as general-about, for a computer with a battery (hyprk's choice)",
+   "recipe": {
+    "name": "laptopcomputer",
+    "26": {
+     "pointsize_to_shape_mul": 1.681670721816707,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "y_offset": 0.02
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.765432098765432,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "y_offset": 0.02
+    }
+   }
+  },
+  "general-softwareupdate": {
+   "symbol": "gear.badge",
+   "enclosure": "gray",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "SoftwareUpdateSettingsExtension.appex CFBundleIcons",
+   "recipe": {
+    "name": "gear.badge",
+    "26": {
+     "pointsize_to_shape_mul": 1.5135036496350365,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.5888888888888888,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "general-storage": {
+   "symbol": "externaldrive.fill",
+   "enclosure": "gray",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "Storage.appex CFBundleIcons",
+   "recipe": {
+    "name": "externaldrive.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.621611053180396,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.7023809523809523,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "general-airdrop": {
+   "symbol": "airdrop",
+   "enclosure": "white",
+   "symbolColor": "blue",
+   "sizes": [
+    48
+   ],
+   "source": "AirDropHandoffExtension.appex -> CoreTypes.bundle Info.plist UTI com.apple.graphic-icon.airdrop",
+   "recipe": {
+    "name": "airdrop",
+    "26": {
+     "pointsize_to_shape_mul": 1.539156253866139,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6158192090395482,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "general-loginitems": {
+   "symbol": "list.bullet",
+   "enclosure": "gray",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "LoginItems.appex CFBundleIcons",
+   "recipe": {
+    "name": "list.bullet",
+    "26": {
+     "pointsize_to_shape_mul": 1.539156253866139,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "y_offset": 0.01
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6158192090395482,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "y_offset": 0.01
+    }
+   }
+  },
+  "general-language": {
+   "symbol": "globe",
+   "enclosure": "blue",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "Localization.appex CFBundleIcons",
+   "recipe": {
+    "name": "globe",
+    "26": {
+     "pointsize_to_shape_mul": 1.539156253866139,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6158192090395482,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "general-datetime": {
+   "symbol": "calendar.badge.clock",
+   "enclosure": "blue",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "DateAndTime Extension.appex CFBundleIcons",
+   "recipe": {
+    "name": "calendar.badge.clock",
+    "26": {
+     "pointsize_to_shape_mul": 1.681670721816707,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "x_offset": -0.03,
+     "y_offset": 0.02
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.7654320987654322,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "x_offset": -0.03,
+     "y_offset": 0.02
+    }
+   }
+  },
+  "general-sharing": {
+   "symbol": "figure.walk.diamond.fill",
+   "enclosure": "gray",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "Sharing.appex CFBundleIcons",
+   "recipe": {
+    "name": "figure.walk.diamond.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.539156253866139,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6158192090395482,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "general-transfer": {
+   "symbol": "arrow.counterclockwise",
+   "enclosure": "gray",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "TransferResetExtension.appex CFBundleIcons",
+   "recipe": {
+    "name": "arrow.counterclockwise",
+    "26": {
+     "pointsize_to_shape_mul": 1.5417694223786451,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.618562535370685,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "general-startupdisk": {
+   "symbol": "internaldrive.fill",
+   "enclosure": "gray",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "StartupDisk.appex CFBundleIcons",
+   "recipe": {
+    "name": "internaldrive.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.621611053180396,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.7023809523809523,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "privacy-location": {
+   "symbol": "location.fill",
+   "enclosure": "blue",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "CoreTypes.bundle Info.plist UTI com.apple.graphic-icon.location (named in SecurityPrivacyExtension's binary)",
+   "recipe": {
+    "name": "location.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.681670721816707,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.765432098765432,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "privacy-microphone": {
+   "symbol": "mic.fill",
+   "enclosure": "gray",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "CoreTypes.bundle Info.plist UTI com.apple.graphic-icon.microphone (SecurityPrivacyExtension binary)",
+   "recipe": {
+    "name": "microphone.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.6369736842105262,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6926530612244899,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "privacy-camera": {
+   "symbol": "video.fill",
+   "enclosure": "gray",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "CoreTypes.bundle Info.plist UTI com.apple.graphic-icon.video-camera (SecurityPrivacyExtension binary)",
+   "recipe": {
+    "name": "video.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.816204379562044,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "x_offset": -0.007903999999999998
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.9066666666666667,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "x_offset": -0.007903999999999998
+    }
+   }
+  },
+  "privacy-screenrecording": {
+   "symbol": "record.circle",
+   "enclosure": "red",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "CoreTypes.bundle Info.plist UTI com.apple.graphic-icon.screen-recording (SecurityPrivacyExtension binary)",
+   "recipe": {
+    "name": "record.circle",
+    "26": {
+     "pointsize_to_shape_mul": 1.4189096715328466,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.4895833333333335,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "privacy-files": {
+   "symbol": "folder.fill",
+   "enclosure": "cyan",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "SecurityPrivacyExtension.appex UTI com.apple.settings.PrivacySecurity.extension.privacy-filesandfolders",
+   "recipe": {
+    "name": "folder.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.780592528982396,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.869281045751634,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "display": {
+   "symbol": "display",
+   "enclosure": "blue",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "ControlCenterSettings.appex UTI com.apple.controlcenter.display; AccessibilitySettingsExtension.appex UTI com.apple.accessibility-settings.icon.display",
+   "recipe": {
+    "name": "display",
+    "26": {
+     "pointsize_to_shape_mul": 1.7297184567257562,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.815873015873016,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   },
+   "hierarchical": true
+  },
+  "menubar-nowplaying": {
+   "symbol": "apple.nowplaying",
+   "enclosure": "white",
+   "symbolColor": "pink",
+   "sizes": [
+    48
+   ],
+   "source": "ControlCenterSettings.appex UTI com.apple.controlcenter.nowplaying",
+   "recipe": {
+    "name": "apple.nowplaying",
+    "26": {
+     "pointsize_to_shape_mul": 1.508,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.5798095238095238,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "menubar-clock": {
+   "symbol": "clock.fill",
+   "enclosure": "gray",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "ControlCenterSettings.appex UTI com.apple.controlcenter.clock",
+   "recipe": {
+    "name": "clock.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.539156253866139,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "y_offset": 0.02
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6158192090395482,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "y_offset": 0.02
+    }
+   }
+  },
+  "network-ethernet": {
+   "symbol": "ethernet",
+   "enclosure": "gray",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "CoreTypes.bundle Info.plist UTI com.apple.graphic-icon.ethernet",
+   "recipe": {
+    "name": "ethernet",
+    "26": {
+     "pointsize_to_shape_mul": 1.6588,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.7279166666666668,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "network-firewall": {
+   "symbol": "firewall.fill",
+   "enclosure": "orange",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "Network.appex UTI com.apple.graphic-icon.network.firewall",
+   "recipe": {
+    "name": "firewall.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.539156253866139,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6158192090395482,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "ax-voiceover": {
+   "symbol": "voiceover",
+   "enclosure": "black",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "AccessibilityUIServer.app UTI com.apple.AccessibilityUIServer.voiceover",
+   "recipe": {
+    "name": "voiceover",
+    "26": {
+     "pointsize_to_shape_mul": 1.539156253866139,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "x_offset": 0.03,
+     "y_offset": 0.02
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6158192090395482,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "x_offset": 0.03,
+     "y_offset": 0.02
+    }
+   }
+  },
+  "ax-zoom": {
+   "symbol": "arrowtriangles.up.right.down.left.magnifyingglass",
+   "enclosure": "black",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "com.apple.AccessibilityUIServer.zoom",
+   "recipe": {
+    "name": "arrowtriangles.up.right.down.left.magnifyingglass",
+    "26": {
+     "pointsize_to_shape_mul": 1.6004301775189795,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "y_offset": 0.018695
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6588,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "y_offset": 0.018695
+    }
+   }
+  },
+  "ax-hovertext": {
+   "symbol": "character.magnify",
+   "enclosure": "blue",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "com.apple.AccessibilityUIServer.hovertext",
+   "recipe": {
+    "name": "character.magnify",
+    "26": {
+     "pointsize_to_shape_mul": 1.5535714285714288,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "x_offset": -0.007716049382716028,
+     "y_offset": 0.007587448559670751
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6158192090395482,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "x_offset": -0.007716049382716028,
+     "y_offset": 0.011381172839506126
+    }
+   }
+  },
+  "ax-motion": {
+   "symbol": "circle.dotted.and.circle",
+   "enclosure": "green",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "com.apple.AccessibilityUIServer.motion",
+   "recipe": {
+    "name": "circle.dotted.and.circle",
+    "26": {
+     "pointsize_to_shape_mul": 1.539156253866139,
+     "symbol_size": "Small",
+     "symbol_weight": "Regular",
+     "x_offset": 0.011065058365758744
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6158192090395482,
+     "symbol_size": "Small",
+     "symbol_weight": "Regular",
+     "x_offset": 0.011065
+    }
+   }
+  },
+  "ax-readspeak": {
+   "symbol": "rectangle.3.group.bubble.left.fill",
+   "enclosure": "black",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "com.apple.AccessibilityUIServer.spoken.content",
+   "recipe": {
+    "name": "rectangle.3.group.bubble.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.681670721816707,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.7654320987654322,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "ax-audiodesc": {
+   "symbol": "quote.bubble.fill",
+   "enclosure": "blue",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "com.apple.AccessibilityUIServer.audio.descriptions",
+   "recipe": {
+    "name": "quote.bubble.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.681670721816707,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.765432098765432,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "ax-voicecontrol": {
+   "symbol": "voice.control",
+   "enclosure": "blue",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "com.apple.AccessibilityUIServer.voice.control",
+   "recipe": {
+    "name": "voice.control",
+    "26": {
+     "pointsize_to_shape_mul": 1.7339372822299652,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "y_offset": 0.01
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.7836559139784947,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "y_offset": 0.01
+    }
+   }
+  },
+  "ax-pointer": {
+   "symbol": "cursorarrow",
+   "enclosure": "gray",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "AccessibilitySettingsExtension.appex UTI com.apple.accessibility-settings.icon.pointercontrol",
+   "recipe": {
+    "name": "pointer.arrow",
+    "26": {
+     "pointsize_to_shape_mul": 1.539156253866139,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6158192090395482,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "ax-switchcontrol": {
+   "symbol": "square.grid.2x2",
+   "enclosure": "black",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "com.apple.AccessibilityUIServer.switch.control",
+   "recipe": {
+    "name": "square.grid.2x2",
+    "26": {
+     "pointsize_to_shape_mul": 1.539156253866139,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6158192090395482,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "ax-hearingdevices": {
+   "symbol": "hearingdevice.ear",
+   "enclosure": "blue",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "com.apple.AccessibilityUIServer.hearing.devices",
+   "recipe": {
+    "name": "hearingdevice.ear",
+    "26": {
+     "pointsize_to_shape_mul": 1.539156253866139,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "y_offset": -0.018482490272373524
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6158192090395482,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "y_offset": -0.018482490272373524
+    }
+   }
+  },
+  "ax-audio": {
+   "symbol": "speaker.eye.fill",
+   "enclosure": "blue",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "com.apple.AccessibilityUIServer.audio.visual",
+   "recipe": {
+    "name": "speaker.eye.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.8993893129770993,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "y_offset": 0.014
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.974761904761905,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "y_offset": 0.014
+    }
+   }
+  },
+  "ax-captions": {
+   "symbol": "captions.bubble.fill",
+   "enclosure": "blue",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "com.apple.AccessibilityUIServer.subtitles.captioning",
+   "recipe": {
+    "name": "captions.bubble.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.681670721816707,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.765432098765432,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "ax-livecaptions": {
+   "symbol": "waveform.bubble.fill",
+   "enclosure": "blue",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "com.apple.AccessibilityUIServer.live.captions",
+   "recipe": {
+    "name": "waveform.bubble.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.681670721816707,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.765432098765432,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  },
+  "ax-namerecognition": {
+   "symbol": "person.wave.2.fill",
+   "enclosure": "blue",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "com.apple.accessibility-settings.icon.namerecognition"
+  },
+  "ax-livespeech": {
+   "symbol": "keyboard.badge.waveform.fill",
+   "enclosure": "black",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "com.apple.AccessibilityUIServer.live.speech",
+   "recipe": {
+    "name": "keyboard.badge.waveform.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.8993893129770993,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "x_offset": -0.03579855706874193,
+     "y_offset": 0.0018948605706874027
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.9066666666666667,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "x_offset": -0.033180447470817165,
+     "y_offset": 0.0029182879377431803
+    }
+   }
+  },
+  "ax-personalvoice": {
+   "symbol": "person.badge.waveform.fill",
+   "enclosure": "blue",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "com.apple.AccessibilityUIServer.personal.voice",
+   "recipe": {
+    "name": "person.badge.waveform.fill",
+    "26": {
+     "pointsize_to_shape_mul": 1.539156253866139,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "x_offset": -0.054744503023703914,
+     "y_offset": 0.044791
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6158192090395482,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "x_offset": -0.047885792461289656,
+     "y_offset": 0.044791
+    }
+   }
+  },
+  "ax-vocalshortcuts": {
+   "symbol": "waveform.arrow.triangle.branch.right",
+   "enclosure": "black",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "com.apple.AccessibilityUIServer.vocal.shortcuts",
+   "recipe": {
+    "name": "waveform.arrow.triangle.branch.right",
+    "26": {
+     "pointsize_to_shape_mul": 1.539156253866139,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "x_offset": -0.04119328440366969,
+     "y_offset": 0.021158
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6158192090395482,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "x_offset": -0.036835486238532056,
+     "y_offset": 0.021158
+    }
+   }
+  },
+  "ax-shortcut": {
+   "symbol": "accessibility.badge.arrow.up.right",
+   "enclosure": "blue",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "com.apple.accessibility-settings.icon.shortcut",
+   "recipe": {
+    "name": "accessibility.badge.arrow.up.right",
+    "26": {
+     "pointsize_to_shape_mul": 1.539156253866139,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "x_offset": -0.03,
+     "y_offset": 0.02
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.6158192090395482,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular",
+     "x_offset": -0.03,
+     "y_offset": 0.02
+    }
+   }
+  },
+  "bluetooth-headphones": {
+   "symbol": "headphones",
+   "enclosure": "gray",
+   "symbolColor": "white",
+   "sizes": [
+    48
+   ],
+   "source": "hyprk's choice (the Mac's device rows were not read)",
+   "recipe": {
+    "name": "headphones",
+    "26": {
+     "pointsize_to_shape_mul": 1.780592528982396,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    },
+    "29": {
+     "pointsize_to_shape_mul": 1.869281045751634,
+     "symbol_size": "Medium",
+     "symbol_weight": "Regular"
+    }
+   }
+  }
+ },
+ "stacks": {
+  "gamecenter": {
+   "appex": "GameCenterMacOSSettingsExtension.appex",
+   "stem": "GCAppIcon",
+   "sizes": [
+    64,
+    128
+   ],
+   "source": "GameCenterMacOSSettingsExtension.appex CFBundleIconName GCAppIcon (Icon Composer stack in its Assets.car)"
+  },
+  "wallet": {
+   "appex": "WalletSettingsExtension.appex",
+   "stem": "AppIcon",
+   "sizes": [
+    64,
+    128
+   ],
+   "source": "WalletSettingsExtension.appex CFBundleIconName AppIcon (Icon Composer stack)"
+  },
+  "general-timemachine": {
+   "appex": "TimeMachineSettings.appex",
+   "stem": "TimeMachineSettingsIcon",
+   "sizes": [
+    48
+   ],
+   "source": "TimeMachineSettings.appex CFBundleIconName TimeMachineSettingsIcon (Icon Composer stack)"
+  }
+ },
+ "bitmaps": {
+  "icloud": {
+   "appex": "AppleIDSettings.appex",
+   "facet": "icloud",
+   "sizes": [
+    64,
+    128
+   ],
+   "source": "AppleIDSettings.appex Assets.car `icloud` (icon_512x512@2x.png, the only iCloud icon in a Settings extension; which bundle draws the sidebar's com.apple.settings.iCloud row was not read)"
+  }
+ },
+ "checkRecipes": {
+  "wifi": {
+   "name": "wifi",
+   "26": {
+    "pointsize_to_shape_mul": 1.539156253866139,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.6158192090395482,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   }
+  },
+  "bluetooth": {
+   "name": "bluetooth",
+   "26": {
+    "pointsize_to_shape_mul": 1.539156253866139,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.6158192090395482,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   }
+  },
+  "network": {
+   "name": "network",
+   "26": {
+    "pointsize_to_shape_mul": 1.4189096715328466,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular",
+    "y_offset": 0.005333333333333333
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.4895833333333335,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular",
+    "y_offset": 0.008
+   }
+  },
+  "network.badge.shield.half.filled": {
+   "name": "network.badge.shield.half.filled",
+   "26": {
+    "pointsize_to_shape_mul": 1.4529635036496351,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular",
+    "x_offset": -0.03
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.5253333333333334,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular",
+    "x_offset": -0.03
+   }
+  },
+  "bolt.fill": {
+   "name": "bolt.fill",
+   "26": {
+    "pointsize_to_shape_mul": 1.5782062666497527,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.6158192090395482,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   }
+  },
+  "gear": {
+   "name": "gear",
+   "26": {
+    "pointsize_to_shape_mul": 1.4189096715328466,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.4895833333333335,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   }
+  },
+  "accessibility": {
+   "name": "accessibility",
+   "26": {
+    "pointsize_to_shape_mul": 1.4189096715328466,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.4895833333333335,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   }
+  },
+  "appearance": {
+   "name": "appearance.darkmode",
+   "26": {
+    "pointsize_to_shape_mul": 1.4189096715328466,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.4895833333333335,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   }
+  },
+  "switch.2": {
+   "name": "switch.2",
+   "26": {
+    "pointsize_to_shape_mul": 1.539156253866139,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular",
+    "y_offset": 0.009241
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.6158192090395482,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular",
+    "y_offset": 0.009241
+   }
+  },
+  "menubar.dock.rectangle": {
+   "name": "menubar.dock.rectangle",
+   "26": {
+    "pointsize_to_shape_mul": 1.681670721816707,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.765432098765432,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   }
+  },
+  "sun.max.fill": {
+   "name": "sun.max.fill",
+   "26": {
+    "pointsize_to_shape_mul": 1.539156253866139,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.6158192090395482,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   }
+  },
+  "photos": {
+   "name": "apple.photos",
+   "26": {
+    "pointsize_to_shape_mul": 1.539156253866139,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.6158192090395482,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   }
+  },
+  "bell.badge.fill": {
+   "name": "bell.badge.fill",
+   "26": {
+    "pointsize_to_shape_mul": 1.539156253866139,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.6158192090395482,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   }
+  },
+  "speaker.wave.3.fill": {
+   "name": "speaker.wave.3.fill",
+   "26": {
+    "pointsize_to_shape_mul": 1.7659163471069474,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.8538738663115082,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   }
+  },
+  "moon.fill": {
+   "name": "moon.fill",
+   "26": {
+    "pointsize_to_shape_mul": 1.681670721816707,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.765432098765432,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   }
+  },
+  "dots.below.lock.fill": {
+   "name": "lock.dots.fill",
+   "26": {
+    "pointsize_to_shape_mul": 1.539156253866139,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.6158192090395482,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   }
+  },
+  "hand.raised.fill": {
+   "name": "hand.raised.fill",
+   "26": {
+    "pointsize_to_shape_mul": 1.539156253866139,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.6158192090395482,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   }
+  },
+  "keyboard.fill": {
+   "name": "keyboard.fill",
+   "26": {
+    "pointsize_to_shape_mul": 1.681670721816707,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.765432098765432,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   }
+  },
+  "magicmouse.fill": {
+   "name": "magicmouse.fill",
+   "26": {
+    "pointsize_to_shape_mul": 1.539156253866139,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   },
+   "29": {
+    "pointsize_to_shape_mul": 1.6158192090395482,
+    "symbol_size": "Medium",
+    "symbol_weight": "Regular"
+   }
+  }
+ }
+}

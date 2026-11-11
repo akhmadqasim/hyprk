@@ -422,6 +422,58 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
   way (32ee0c7 dropped the `siri.png` / `spotlight.png` crops); every pane icon is in `themes/icons/settings/`. The other legacy pane artwork (Network globe, Displays monitor, Dock, Accessibility ring,
   Screen Time, `icon.icns` = generic extension brick) is the old large-icon style and is not what the sidebar shows, so it was not used.
   The 21 other panes keep the glyph tile until SF Symbols can be drawn.
+- Graphic icons built offline (2026-11-11, 27.2.1, OS volume `141-12228-174.dmg`): `themes/icons/tools/build-graphic.py`
+  builds the icons nobody rendered on the Mac, listed in `settings/graphic.json` with the plist each one was read
+  from: 41 row tiles (the 24 pt icon of a Settings row at 2x: `<id>@48-<style>-<mode>.png`; General, Privacy, Menu
+  Bar, Network, Accessibility rows) and 8 pane icons Settings has no pane for yet (`screentime`, `touchid`, `users`,
+  `gamecenter`, `icloud`, `internetaccounts`, `wallet`, `printers`, `@64` / `@128` as the others).
+  * What IconServices does (27.2.1 dyld cache): `-[IFSymbol imageForGraphicSymbolDescriptor:]` 0x197536954 ->
+    `_iconStackForGraphicSymbolDescriptor:` 0x19753718c -> `_graphicVariantVectorGlyphForGraphicSymbolDescriptor:...`
+    0x197537d04 fills a `CUIVectorGlyphGraphicVariantOptions` (shape, fill, fillColors = resolved enclosure
+    colours, contentEffect, shapeEffect, imageOffset, border, monochromeForegroundColor) and CoreUI's
+    `-[CUINamedVectorGlyph graphicVariantWithOptions:]` 0x18f23bd94 / `-[_CUIGraphicVariantVectorGlyph
+    layerStackWithDisplayScale:forTargetSize:withPaletteColors:]` 0x18f2f21bc turn it into an icon layer stack that
+    IconRendering composes like an app icon. CoreUI's part (`_createContentEffectsForTargetSize:...` 0x18f2f1e5c,
+    `_createShapeEffectsForTargetSize:scale:` 0x18f2f1f58: shape effect presets of the design library) was NOT
+    decoded; the group's glass was measured instead (below).
+  * Symbol size and place, from data: `CoreGlyphsPrivate.bundle/Contents/Resources/container_recipes.plist` (650
+    symbols; read by `IFGraphicSymbolOverrides` 0x197542358): symbol -> `rounded_rect` -> enclosure size 14 / 20 /
+    26 / 29 -> `pointsize_to_shape_mul`, `symbol_size`, `symbol_weight`, `x_offset`, `y_offset`; the lookup uses
+    the alias target (`name_aliases.strings`: battery.100 -> battery.100percent 1.9985, appearance ->
+    appearance.darkmode). Point size = chiclet / mul (`-[IFGraphicSymbolDescriptor pointSize]` 0x197531860): wifi
+    52 / 1.6158 = 32.2 pt in the 64 pt icon (measured 32.0), network 34.9 (35.0), speaker.wave.3.fill 28.1 (27.6).
+  * Measured on Apple's 20 symbol pane renders and on the Mac's Accessibility shot (nothing else to read them
+    from): the bucket is the enclosure size nearest to the icon's point size (64 and 32 pt -> 29; 24 pt -> 26:
+    the 7 Vision rows fit at rms 7.8-16.6 with 26, 35.6-74.7 with 20); `y_offset` points up; the symbol is centred
+    on its alignment rect; a symbol without a recipe uses 1.543 (trackpad.fill; = 1.2 x the medium glyph
+    transform, `+[CUIVectorGlyphGraphicVariantOptions defaultSymbolPointSizeRatio]` 0x18f2f2398); the symbol
+    group's glass is specular on, translucency 0.3, neutral shadow 0.5; sub-pixel nudge 0.25 px.
+  * The enclosure's fill is IconRendering's automatic gradient of the system colour (`iconstack.auto_gradient`):
+    it reproduces the stops fitted on Apple's tiles within 3 levels (blue 0,149,255 -> 0,136,255 against 1,145,256
+    -> 1,133,249; gray 159 -> 142 against 157 -> 139). Dark style: the symbol in the enclosure's dark system
+    colour on the system dark fill; Clear / Tinted: a white symbol on the tintable stack.
+  * Check (`build-graphic.py --check`: the 20 panes rebuilt against Apple's renders, chiclet body rms 0..255):
+    128 px default 11.8, dark 12.4, clear light 11.5, clear dark 14.7, tinted light 13.6, tinted dark 12.0;
+    64 px 12.8 / 14.6 / 13.5 / 19.1 / 16.3 / 11.1 (mean; the error sits on the symbol's edges). In the pane
+    (offscreen snapshot against accessibility-{light,dark}.png): the 7 Vision row tiles land on the Mac's pixels
+    (offset 0, 0 px), symbol alpha rms 0.043-0.110 at 2x, ink boxes equal on 6 of 7 (Motion 27 against 28 px wide).
+  * Rendering mode: IconFoundation asks the glyph for its preferred mode; which symbols prefer hierarchical is not
+    decoded and bvg.py does not decode hierarchy layers. `display` uses the Mac's own hierarchical render
+    (`display.regular.hierarchical.svg`: the screen filled at 0.3, as on the Mac's Display row); every other
+    built icon is monochrome. Known from Apple's pane renders to differ: menubar.dock.rectangle's menu bar strip.
+  * Three panes are Icon Composer stacks in the extension's `Assets.car` (Game Center `GCAppIcon`, Wallet
+    `AppIcon`, Time Machine `TimeMachineSettingsIcon`): composed by icr.py like Siri / Spotlight (their tiles
+    against Apple's at 128 px: default 8.8 / 12.8 from the light stack, the car's pre-rendered bitmap 13.6 /
+    27.3). iCloud is a legacy bitmap (`icloud` in AppleIDSettings' car, deepmap2): Default and Dark are the
+    bitmap, Clear / Tinted the Dock-fitted legacy rule of build-styles.py (not checked against a Settings tile).
+  * `bvg.from_car` now prefers the plain rendition: a facet can also have localized ones (rendition attribute
+    13; character.magnify has 22 scripts, the last one in the tree was taken) and directional ones (attribute 4:
+    5 left to right, 4 right to left; quote.bubble.fill, gear.badge, calendar.badge.clock).
+    `themes/icons/tools/add-sf.py <os root> <surface> <note> <names>` decodes symbols (alias targets too) and
+    registers them in `sf-symbols/names.json`; 38 symbols added for Settings (114 SVGs).
+  * Not established: `ISCurrentDevice` (About) for a PC (hyprk uses desktopcomputer / laptopcomputer); which
+    bundle draws the sidebar's iCloud row; Family's sidebar picture (FamilySettings holds `family_icon-macos-24`,
+    a 24 pt bitmap in a packed atlas: link TLV 0x3F2 "INLK" = x, y from the bottom left, w, h, then the atlas key).
 - `sf-symbols/` (item for a later switch-over, nothing uses it yet): the IPSW has no symbols font. SFNS/SFCompact/SFNSRounded contain no symbol
   glyphs, the only font is `SFSymbolsNeededByCoreMedia-Semibold.ttf` (copied, 5 symbols). All symbols are in
   `/System/Library/CoreServices/CoreGlyphs.bundle/Contents/Resources/Assets.car` (118 MB, too big to track, re-extract with `car.py`;

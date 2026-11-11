@@ -584,12 +584,18 @@ def from_car(car_path, names):
         na = struct.unpack_from("<H", v, 4)[0]
         at = dict(struct.unpack_from("<HH", v, 6 + 4 * j) for j in range(na))
         facet[at.get(17)] = k.decode("latin1")
-    want, out = set(names), {}
+    want, out, rank = set(names), {}, {}
     for k, v in c.tree("RENDITIONS"):
         at = dict(zip(toks, struct.unpack_from("<%dH" % (len(k) // 2), k)))
         nm = facet.get(at.get(17))
         if nm not in want or v[:4] != b"ISTC" or struct.unpack_from("<H", v, 36)[0] != 1022: continue
         w = at.get(26)
+        # a symbol can have localized (attribute 13: character.magnify has 22 scripts), appearance (7) and
+        # directional renditions (4: 5 = left to right, 4 = right to left; quote.bubble.fill, gear.badge) next to
+        # the plain one; the plain / left-to-right one wins, whatever the order in the tree
+        r = (at.get(13, 0) != 0, at.get(7, 0) != 0, at.get(4, 0) == 4)
+        if (nm, w) in rank and rank[(nm, w)] <= r: continue
+        rank[(nm, w)] = r
         csi = C.parse_csi(v)
         if csi["payload"][:4] == b"DWAR" and csi["payload"][12:16] == b"BVG ":
             out.setdefault(nm, ({}, {}))[0][w] = csi["payload"][12:]
