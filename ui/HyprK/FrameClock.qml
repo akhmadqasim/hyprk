@@ -9,7 +9,7 @@ import QtQuick
 // between two frames, so one value is never drawn (the "lost frame" of mcap's unlock, peek and Mission Control rows).
 // QQuickWindow.afterAnimating is emitted on the GUI thread right before each frame of this window is built, so a value
 // set there is drawn exactly once, and frame k is on screen k refresh intervals after frame 0. `elapsed` counts
-// those intervals (k * 16.7 ms at 60 Hz) and skips the ones the window missed (frameSwapped more than one interval apart).
+// those intervals (k * 16.7 ms at 60 Hz) and skips the ones the window missed (a tick that comes late, see below).
 // Nothing runs while `running` is false.
 // `watchdog`: a window that draws no frame (unmapped, on a sleeping output) would hold a motion for ever; with it,
 // stalled() is emitted when no tick came for one to two `stallMs`, and the owner jumps to its end. The timer only
@@ -30,8 +30,8 @@ Item {
     property int frame: 0              // frames since the first tick's
     property int ticks: 0
     property bool ticked: false
-    property double swapped: 0         // when this window last showed a frame
-    property int swaps: 0
+    property double phase: 0           // the earliest tick phase of this run (ms), see the tick
+    property int swaps: 0              // frames of this window swapped since start()
     property int built: 0              // frames of this window built since start()
     property bool flushOnSwap: false
     readonly property var win: Window.window
@@ -56,7 +56,6 @@ Item {
         fresh = !win || !win.visible || Date.now() - shownAt < 150;
         tick0 = ticks;
         ticked = false;
-        swapped = 0;
         swaps = 0;
         built = 0;
         flushOnSwap = false;
@@ -81,6 +80,20 @@ Item {
             if (fc.fresh && fc.ticks - fc.tick0 <= fc.freshHold) { fc.win.update(); return; }
             if (fc.ticked) fc.frame++;
             fc.ticked = true;
+            // A frame the window missed (a busy GUI or render thread) is stepped over, so the motion keeps its speed
+            // and the late frame shows the value of its time. Lateness is read against the earliest phase any tick of
+            // this run had (ticks follow the frame callbacks, so that is the screen's grid): a tick 3/4 of an interval
+            // or more behind it has lost a frame. Not from the gaps between frameSwapped signals, as before: those
+            // reach this thread with a jitter of half an interval, and a gap of 25 ms followed by one of 8 skipped a
+            // value although every frame was shown (mcap: menu fade, a value lost in 5 of 8 with no gap on screen).
+            const now = Date.now();
+            let phase = now - fc.frame * fc.interval;
+            if (fc.frame === 0 || phase < fc.phase) fc.phase = phase;
+            else if (phase - fc.phase >= 0.75 * fc.interval) {
+                fc.frame += Math.floor((phase - fc.phase) / fc.interval + 0.25);
+                phase = now - fc.frame * fc.interval;
+                if (phase < fc.phase) fc.phase = phase;
+            }
             fc.elapsed = fc.frame * fc.interval;
             fc.tick();
             // What the tick changed outside the scene (Quickshell sends a window's blur region and input mask to
@@ -93,12 +106,8 @@ Item {
             else fc.flushOnSwap = true;
             if (fc.running) fc.win.update();
         }
-        // a frame shown two or more intervals after the one before it: the frames in between were never built (a
-        // busy GUI or render thread), so the count moves on with the screen. The first gap after idle does not count.
         function onFrameSwapped() {
-            const now = Date.now();
-            if (++fc.swaps > 2) fc.frame += Math.max(0, Math.round((now - fc.swapped) / fc.interval) - 1);
-            fc.swapped = now;
+            fc.swaps++;
             if (fc.flushOnSwap && fc.built - 1 - fc.swaps <= 0) fc.flush();
         }
     }

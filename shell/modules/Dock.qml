@@ -622,8 +622,8 @@ ShellWindow {
 
     // App name label: a glass capsule 26 pt tall (radius 13), text + 2 x 14 wide (at least 41), its bottom 9 pt
     // above the tile top (above the Dock background at rest), centred on the icon (lib/dock.js labelWidth).
-    // Material: Liquid Glass (ECCartoucheGlassLayerController); on the plugin it gets the Dock layer's glass plus
-    // Theme.dock.labelFill. Pointer (Q-dock-08: about 16 x 6.5 pt, rounded tip 2.5 pt above the Dock): a marker rect
+    // Material: Liquid Glass (ECCartoucheGlassLayerController); on the plugin the label's own recipe (namespace
+    // hyprk-dock-label below). Pointer (Q-dock-08: about 16 x 6.5 pt, rounded tip 2.5 pt above the Dock): a marker rect
     // under the capsule that the plugin draws as Apple's pointer, a 16 pt square turned 45 deg with corner 2.5 unioned
     // to the pill at smoothness 25 (plugin/README.md "Dock label pointer"). The tip is inside that reach of the Dock
     // too, so the label is on a surface of its own (same geometry and recipe as the Dock: the union is per surface),
