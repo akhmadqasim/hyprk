@@ -63,43 +63,15 @@ namespace lg {
 
     // ── decoration ──────────────────────────────────────────────────────────
 
-    // macOS 27.2.1 traffic lights, the same numbers as ui/HyprK/Tokens.qml `lights` (sampled on lights-*.png, MAC-ANSWERS.md
-    // Q-windows-08/-09/-10; shell/tests/run.mjs compares both): fill = vertical gradient top / centre / bottom, ring = the outer
-    // 0.5 pt as a vertical gradient (stops 0, .2, .5, .8, 1): light discs have a dark coloured rim on the sides, dark discs a
-    // light arc at top and bottom; glyph = hover ink; glow = the 1 pt halo just outside the disc (rgba, 0 = none).
-    struct SGlow {
-        float r, g, b, a;
-    };
-    struct SLightColors {
-        uint32_t fill[3], ring[5], glyph;
-        SGlow    glow;
-    };
-    // The glyph colours are the Mac's hover crops in sRGB (the crops hold Display P3 values: #9E0000 there is #AD0000;
-    // reference/ours/COLOUR-P3-AUDIT.md row 8). fill / ring / glow are the old flat lights, no longer drawn.
+    // macOS 27.2.1 traffic lights. The hover glyph inks, the same numbers as ui/HyprK/Tokens.qml `lights` glyph (the Mac's
+    // hover crops in sRGB: the crops hold Display P3 values, #9E0000 there is #AD0000; reference/ours/COLOUR-P3-AUDIT.md
+    // row 8; shell/tests/run.mjs compares both). A non-key window shows no glyph.
     // [light/dark][rest/pressed][close/minimise/zoom]
-    static constexpr SLightColors LIGHTS[2][2][3] = {
-        {{{{0xED786B, 0xEA857B, 0xE89189}, {0xED786B, 0xB40A0A, 0xB40A0A, 0xB40A0A, 0xE89189}, 0xAD0000, {0.71f, 0.04f, 0.04f, 0.065f}},
-          {{0xF2BD50, 0xF5CB59, 0xF8D562}, {0xF2BD50, 0x91210A, 0x91210A, 0x91210A, 0xF8D562}, 0xCE3E00, {0.57f, 0.13f, 0.04f, 0.05f}},
-          {{0x7DCD4A, 0x98D46F, 0xA9DA86}, {0x7DCD4A, 0x0A550A, 0x0A550A, 0x0A550A, 0xA9DA86}, 0x007B00, {0.04f, 0.33f, 0.04f, 0.05f}}},
-         {{{0xFF9A8B, 0xFFA898, 0xFFB6A8}, {0xFF9A8B, 0xF42319, 0xF42319, 0xF42319, 0xFFB6A8}, 0xE80000, {0.96f, 0.14f, 0.1f, 0.22f}},
-          {{0xFFF66C, 0xFFFB6B, 0xFFFF7E}, {0xFFF66C, 0xD04020, 0xD04020, 0xD04020, 0xFFFF7E}, 0xFF5600, {0.82f, 0.25f, 0.13f, 0.2f}},
-          {{0xA0FF60, 0xB9FF84, 0xD2FFA7}, {0xA0FF60, 0x347F20, 0x347F20, 0x347F20, 0xD2FFA7}, 0x00A700, {0.2f, 0.5f, 0.13f, 0.22f}}}},
-        {{{{0xE87061, 0xE1675B, 0xDE6F64}, {0xF6C6BC, 0xF6C6BC, 0xD96156, 0xF5C4BA, 0xF5C4BA}, 0x920000, {0, 0, 0, 0}},
-          {{0xF1B835, 0xF3C22D, 0xF6CF50}, {0xF6F581, 0xF6F581, 0xEABA19, 0xF5F58D, 0xF5F58D}, 0xB92800, {0, 0, 0, 0}},
-          {{0x6EC341, 0x62BD2D, 0x6DC04B}, {0xBFF69A, 0xBFF69A, 0x59B61C, 0xB8F697, 0xB8F697}, 0x005700, {0, 0, 0, 0}}},
-         {{{0xFF9381, 0xFF9381, 0xFF9485}, {0xFEFBED, 0xFEFBED, 0xFD7B6E, 0xFEF7EC, 0xFEF7EC}, 0xC70000, {1, 0.85f, 0.8f, 0.07f}},
-          {{0xFFFF8E, 0xFFFF5C, 0xFFFF7A}, {0xFBFB98, 0xFBFB98, 0xF9D623, 0xFBFBA6, 0xFBFBA6}, 0xFB3E00, {1, 1, 0.6f, 0.07f}},
-          {{0x56F66E, 0x56F66E, 0x56F66E}, {0xBFF69A, 0xBFF69A, 0x59B61C, 0xB8F697, 0xB8F697}, 0x005700, {0, 0, 0, 0}}}},
-    };
-    // non-key window (Q-windows-09): no glyph, no glow; [light/dark]
-    static constexpr SLightColors LIGHTS_INACTIVE[2] = {
-        {{0xEFEFF3, 0xF2F3F5, 0xF6F7F8}, {0xEAEAEE, 0xABABAE, 0xABABAE, 0xABABAE, 0xE7E7EA}, 0, {0, 0, 0, 0}},
-        {{0x4C4C52, 0x4C4C52, 0x47484D}, {0xB4B4B4, 0xB4B4B4, 0x4A4B50, 0xADADAD, 0xADADAD}, 0, {0, 0, 0, 0}},
-    };
+    static constexpr uint32_t GLYPHS[2][2][3] = {{{0xAD0000, 0xCE3E00, 0x007B00}, {0xE80000, 0xFF5600, 0x00A700}}, {{0x920000, 0xB92800, 0x005700}, {0xC70000, 0xFB3E00, 0x005700}}};
     // What is drawn: the discs as glass (plugin/tools/lights_model.py: the model, its fit to the lights-*.png crops and the
     // residuals). The Mac's discs have a lit top, a darker belt above the middle, a caustic glow in the lower centre, a
     // specular rim (dark: arcs at top and bottom; light: a dark rim on the sides) and in light a soft coloured shadow
-    // below; the flat LIGHTS gradients above read as plain discs (user report). One row per disc:
+    // below; flat gradients read as plain discs (user report). One row per disc:
     // T, M, B (sRGB bytes, M may be below 0: the crops clip P3), sg, rim axis (0 top/bottom, 1 sides), rim power, rim colour,
     // e0, e1, glow colour, g0. ui/HyprK/shaders/lights.frag draws the same formula for the QML title bars.
     struct SLightGlass {
@@ -122,9 +94,9 @@ namespace lg {
     static constexpr double V0 = -0.35, GLOW_DY = 0.75, GLOW_SIGMA = 1; // lights_model.py
     static constexpr double GLASS_MARGIN = 3.5;                          // pt around the disc for the glow
 
-    // Tokens.lights: rimWidth, glyphStroke (pt); glyph reveal (Q-windows-10, 60 fps) = after GLYPH_DELAY an OutCubic over
+    // Tokens.lights: glyphStroke (pt); glyph reveal (Q-windows-10, 60 fps) = after GLYPH_DELAY an OutCubic over
     // GLYPH_IN, out at once as an OutQuad over GLYPH_OUT (s), the same curves as the QML Behavior in TrafficLights.qml
-    static constexpr double   RIM_WIDTH = 0.5, GLYPH_STROKE = 1.9, GLOW_WIDTH = 1.0;
+    static constexpr double   GLYPH_STROKE = 1.9;
     static constexpr double   GLYPH_DELAY = 0.070, GLYPH_IN = 0.133, GLYPH_OUT = 0.117;
     static constexpr double   PRESS_GROW = 1.15; // Tokens.lights.pressedScale: pressed disc 16 pt from 14 (Q-windows-08)
     // title text on a dark bar (light bars use titlebar_text / titlebar_text_inactive): TextEdit dark renders
@@ -242,7 +214,7 @@ namespace lg {
                     cairo_move_to(cr, c + (x1 - 7) * k, c + (y1 - 7) * k);
                     cairo_line_to(cr, c + (x2 - 7) * k, c + (y2 - 7) * k);
                 };
-                setSource(cr, LIGHTS[dark][pressed][std::min(button, 2)].glyph, 1);
+                setSource(cr, GLYPHS[dark][pressed][std::min(button, 2)], 1);
                 if (button == 2) {
                     auto tri = [&](double x0, double y0, double x1, double y1, double x2, double y2) {
                         cairo_move_to(cr, c + (x0 - 7) * k, c + (y0 - 7) * k);

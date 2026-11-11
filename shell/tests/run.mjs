@@ -6,6 +6,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { createRequire } from "node:module";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const hyprk = join(here, "..", "..", "ui", "HyprK");
@@ -586,88 +587,31 @@ test("mode buttons start inside the field, end in place", () => {
     test("Switch never writes checked", () => assert.ok(!/\bsw\.checked\s*=[^=]/.test(qml("Switch.qml"))));
     test("Popup never writes currentIndex", () => assert.ok(!/currentIndex\s*=[^=]/.test(qml("Popup.qml"))));
     test("Slider never writes value", () => assert.ok(!/\bs\.value\s*=[^=]/.test(qml("Slider.qml"))));
-    // the plugin title bar draws the same traffic lights (plugin/src/Titlebar.cpp): every colour exact, timings within 1 ms
+    // the plugin title bar draws the same traffic lights (plugin/src/Titlebar.cpp): the glyph inks exact, timings within 1 ms
     test("traffic lights: plugin colours and timing match Tokens.lights", () => {
         const cpp = readFileSync(join(here, "..", "..", "plugin", "src", "Titlebar.cpp"), "utf8");
         const tokens = qml("Tokens.qml");
         const lightsQml = tokens.slice(tokens.indexOf("property QtObject lights:"), tokens.indexOf("property QtObject frame:"));
-        // QML colour -> [rrggbb, r, g, b, a] (transparent = alpha 0)
-        const qcol = c => {
-            c = c.trim();
-            if (c === '"transparent"') return { a: 0 };
-            let m = c.match(/^"#([0-9A-Fa-f]{6})"$/);
-            if (m) return { hex: m[1].toLowerCase(), a: 1 };
-            m = c.match(/^Qt\.rgba\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)$/);
-            assert.ok(m, "colour " + c);
-            return { rgb: [+m[1], +m[2], +m[3]], a: +m[4] };
-        };
-        const qlist = s => s.match(/"#[0-9A-Fa-f]{6}"|"transparent"|Qt\.rgba\([^)]*\)/g).map(qcol);
-        // { fill: [..], ring: [..], glyph: c, glow: c } from one QML object literal (without its press: part)
-        const qset = s => ({
-            fill: qlist(s.match(/fill: \[([^\]]*)\]/)[1]).map(c => c.hex),
-            ring: qlist(s.match(/ring: \[([^\]]*)\]/)[1]).map(c => c.hex),
-            glyph: qcol(s.match(/glyph: ("[^"]*"|Qt\.rgba\([^)]*\))/)[1]),
-            glow: qcol(s.match(/glow: ("[^"]*"|Qt\.rgba\([^)]*\))/)[1]),
-        });
-        const qbutton = k => {
+        // Tokens.lights.<button>: [dark rest, dark press, light rest, light press] glyph inks as rrggbb
+        const qglyphs = k => {
             const m = lightsQml.match(new RegExp("property var " + k + ": t\\.dark\\s*\\?\\s*(\\{[\\s\\S]*?)\\n\\s*:\\s*(\\{[\\s\\S]*?)\\n\\s*(?://|readonly|\\})"));
             assert.ok(m, "Tokens.lights." + k);
-            const part = s => {
-                const i = s.indexOf("press:");
-                return i < 0 ? [qset(s)] : [qset(s.slice(0, i)), qset(s.slice(i))];
-            };
-            return { dark: part(m[1]), light: part(m[2]) };
+            const inks = s => [...s.matchAll(/glyph: "#([0-9A-Fa-f]{6})"/g)].map(x => x[1].toLowerCase());
+            const dark = inks(m[1]), light = inks(m[2]);
+            assert.equal(dark.length, 2, k + " dark: rest and press"); assert.equal(light.length, 2, k + " light: rest and press");
+            return { dark, light };
         };
-        // C++ tables: {{fill x3}, {ring x5}, glyph, {r, g, b, a}} in source order
-        const centries = body => [...body.matchAll(/\{\{([^}]*)\}, \{([^}]*)\}, (0x[0-9A-F]+|0), \{([^}]*)\}\}/g)].map(m => ({
-            fill: m[1].match(/0x[0-9A-F]{6}/g).map(h => h.slice(2).toLowerCase()),
-            ring: m[2].match(/0x[0-9A-F]{6}/g).map(h => h.slice(2).toLowerCase()),
-            glyph: +m[3],
-            glow: m[4].split(",").map(x => parseFloat(x)),
-        }));
-        const lights = centries(cpp.match(/SLightColors LIGHTS\[2\]\[2\]\[3\] = \{([\s\S]*?)\n    \};/)[1]);
-        const inactive = centries(cpp.match(/SLightColors LIGHTS_INACTIVE\[2\] = \{([\s\S]*?)\n    \};/)[1]);
-        assert.equal(lights.length, 12);
-        assert.equal(inactive.length, 2);
-        // The plugin's legacy table holds the numbers as sampled from the Mac shots, which are Display P3; Tokens.lights
-        // holds them converted to sRGB (reference/ours/COLOUR-P3-AUDIT.md section 2). Equal after the conversion, or
-        // equal as written once the plugin's table is converted too.
-        const M = [[1.2249401763, -0.2249401763, 0], [-0.0420569547, 1.0420569547, 0], [-0.0196375546, -0.0786360456, 1.0982736001]];
-        const toSrgb = rgb => {   // 0..1 in, 0..1 out
-            const lin = rgb.map(c => c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
-            return M.map(r => Math.min(1, Math.max(0, r[0] * lin[0] + r[1] * lin[1] + r[2] * lin[2])))
-                .map(c => c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055);
-        };
-        const hexSrgb = h => {
-            const rgb = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)), out = toSrgb(rgb.map(c => c / 255)).map(c => Math.round(c * 255));
-            // a colour the conversion moves by one level or less is left as sampled (a neutral)
-            return (out.some((c, i) => Math.abs(c - rgb[i]) > 1) ? out : rgb).map(c => c.toString(16).padStart(2, "0")).join("");
-        };
-        const hexSame = (c, q, what) => assert.ok(q === c || q === hexSrgb(c) || c === "56f66e", `${what}: plugin ${c} (sRGB ${hexSrgb(c)}), Tokens ${q}`);
-        const same = (q, c, what) => {
-            c.fill.forEach((h, i) => hexSame(h, q.fill[i], what + " fill"));
-            c.ring.forEach((h, i) => hexSame(h, q.ring[i], what + " ring"));
-            assert.equal(c.fill.length, q.fill.length, what + " fill");
-            assert.equal(c.ring.length, q.ring.length, what + " ring");
-            if (!q.glyph.a) assert.equal(c.glyph, 0, what + " glyph");
-            else hexSame(c.glyph.toString(16).padStart(6, "0"), q.glyph.hex, what + " glyph");
-            if (!q.glow.a) { assert.deepEqual(c.glow, [0, 0, 0, 0], what + " glow"); return; }
-            assert.equal(c.glow[3], q.glow.a, what + " glow alpha");
-            const conv = toSrgb(c.glow.slice(0, 3));
-            assert.ok(q.glow.rgb.every((v, i) => Math.abs(v - c.glow[i]) < 0.0015 || Math.abs(v - conv[i]) < 0.0015), `${what} glow: plugin ${c.glow}, Tokens ${q.glow.rgb}`);
-        };
-        ["light", "dark"].forEach((mode, d) => {
-            ["close", "minimize", "zoom"].forEach((k, b) => {
-                const q = qbutton(k)[mode];
-                assert.equal(q.length, 2, `${mode} ${k} has a press state`);
-                [0, 1].forEach(p => same(q[p], lights[(d * 2 + p) * 3 + b], `${mode} ${k} ${p ? "press" : "rest"}`));
-            });
-            same(qbutton("inactive")[mode][0], inactive[d], `${mode} inactive`);
-        });
+        // C++: GLYPHS[light/dark][rest/pressed][close/minimise/zoom]
+        const table = cpp.match(/uint32_t GLYPHS\[2\]\[2\]\[3\] = ([^;]*);/);
+        assert.ok(table, "Titlebar.cpp GLYPHS");
+        const inks = table[1].match(/0x[0-9A-F]{6}/g).map(h => h.slice(2).toLowerCase());
+        assert.equal(inks.length, 12);
+        ["light", "dark"].forEach((mode, d) => ["close", "minimize", "zoom"].forEach((k, b) => [0, 1].forEach(p =>
+            assert.equal(inks[(d * 2 + p) * 3 + b], qglyphs(k)[mode][p], `${mode} ${k} ${p ? "press" : "rest"} glyph`))));
+        assert.match(lightsQml, /property var inactive: [\s\S]*?glyph: "transparent"[\s\S]*?glyph: "transparent"/);   // a non-key window has no glyph
         // constants and the glyph reveal: 70 ms delay + OutCubic 133 ms in, OutQuad 117 ms out on both sides
         const tok = n => +lightsQml.match(new RegExp("property (?:int|real) " + n + ": ([\\d.]+)"))[1];
         const con = n => +cpp.match(new RegExp("\\b" + n + " = ([\\d.]+)"))[1];
-        near(con("RIM_WIDTH"), tok("rimWidth"), 1e-9);
         near(con("GLYPH_STROKE"), tok("glyphStroke"), 1e-9);
         near(con("PRESS_GROW"), tok("pressedScale"), 1e-9);
         near(con("GLYPH_DELAY") * 1000, tok("glyphDelay"), 1);
@@ -680,11 +624,36 @@ test("mode buttons start inside the field, end in place", () => {
         // and the QML table is the model's (the same generator writes the plugin's C++ table)
         const chk = spawnSync("python3", [join(here, "..", "..", "plugin", "tools", "lights_model.py"), "check"], { encoding: "utf8" });
         assert.equal(chk.status, 0, "lights_model.py check: " + chk.stdout + chk.stderr);
-        near(con("GLOW_WIDTH"), 1, 1e-9);
         assert.match(tlq, /easing\.type: tl\._glyphs \? Easing\.OutCubic : Easing\.OutQuad/);
         const ga = cpp.slice(cpp.indexOf("float CTitlebar::glyphAlpha()"), cpp.indexOf("void CTitlebar::draw("));
         assert.match(ga, /\(t - GLYPH_DELAY\) \/ GLYPH_IN : t \/ GLYPH_OUT/);
         assert.match(ga, /m_hover \? 1 - \(1 - u\) \* \(1 - u\) \* \(1 - u\) : 1 - \(1 - u\) \* \(1 - u\);/);
+    });
+}
+
+// ---- Appearance > Auto (shell/lib/sun.js is a copy of the rule in settings/Parsers.js) ----
+{
+    const SUN = load("sun.js");
+    const P = createRequire(import.meta.url)(join(here, "..", "..", "settings", "Parsers.js"));
+    const tab = "ID\t-0610+10648\tAsia/Jakarta\tJava, Sumatra\nNO\t+5955+01045\tEurope/Oslo\n";
+    test("auto appearance: zone lookup as Settings", () => {
+        assert.deepEqual(SUN.zoneCoords(tab, "Asia/Jakarta"), P.zoneCoords(tab, "Asia/Jakarta"));
+        assert.equal(SUN.zoneCoords(tab, "Mars/Olympus"), null);
+        assert.equal(SUN.zoneName("/usr/share/zoneinfo/Asia/Makassar\n"), "Asia/Makassar");
+    });
+    test("auto appearance: the sun's answer and its next change as Settings", () => {
+        const t0 = Date.UTC(2026, 10, 11, 0, 0, 0);
+        for (const [lat, lon] of [[-6.17, 106.8], [59.92, 10.75], [-5.12, 119.4], [78.2, 15.6]])
+            for (let h = 0; h < 48; h += 5) {
+                const t = t0 + h * 3600000;
+                assert.equal(SUN.autoDark(t, lat, lon), P.autoDark(t, lat, lon));
+                assert.equal(SUN.nextAutoFlip(t, lat, lon), P.nextAutoFlip(t, lat, lon));
+            }
+        // Jakarta, 11 Nov 2026: dark at midnight local, light at noon, the next change within a day
+        assert.equal(SUN.autoDark(Date.UTC(2026, 10, 10, 17, 0), -6.17, 106.8), true);
+        assert.equal(SUN.autoDark(Date.UTC(2026, 10, 11, 5, 0), -6.17, 106.8), false);
+        const f = SUN.nextAutoFlip(Date.UTC(2026, 10, 11, 5, 0), -6.17, 106.8);
+        assert.ok(f > Date.UTC(2026, 10, 11, 10, 0) && f < Date.UTC(2026, 10, 11, 12, 0), String(new Date(f)));
     });
 }
 
