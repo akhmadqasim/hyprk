@@ -2903,6 +2903,25 @@
    ],
    "extras": [],
    "note": "Accessibility > Spoken Content speaking rate slider ends Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "squares.leading.rectangle": {
+   "symbol": "squares.leading.rectangle",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "squares.leading.rectangle.regular.svg",
+    "squares.leading.rectangle.medium.svg",
+    "squares.leading.rectangle.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Control Center Stage Manager button (WindowManagerControlsExtension 27.2.1 StageManagerToggleControl: Image(systemName:) at 0x100003d1c). Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
   }
  },
  "skipped": {
@@ -37401,6 +37420,105 @@
     0
    ],
    "fontBaselineY": 36.273
+  },
+  "squares.leading.rectangle.regular.svg": {
+   "symbol": "squares.leading.rectangle",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    48,
+    33
+   ],
+   "alignmentRect": [
+    0.0,
+    5.5,
+    47.5,
+    22.5
+   ],
+   "baselineY": 28.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    39.5,
+    27.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 30.983
+  },
+  "squares.leading.rectangle.medium.svg": {
+   "symbol": "squares.leading.rectangle",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    49,
+    34
+   ],
+   "alignmentRect": [
+    0.0,
+    6.0,
+    48.5,
+    22.5
+   ],
+   "baselineY": 28.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    40.5,
+    27.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 31.739
+  },
+  "squares.leading.rectangle.semibold.svg": {
+   "symbol": "squares.leading.rectangle",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    49,
+    34
+   ],
+   "alignmentRect": [
+    0.0,
+    6.0,
+    49.0,
+    22.5
+   ],
+   "baselineY": 28.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    41.0,
+    28.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 31.554
   }
  },
  "menubar": [
