@@ -46,7 +46,7 @@ Item {
     // in one Lanczos pass on the device pixel grid, where a plain Image blurs whatever is not drawn 1:1 (a 128 px
     // folder at 102 px on a 1.6 output kept 0.4-0.6 of a Lanczos downscale's detail).
     // The window's real device pixel ratio (main.cpp; Screen.devicePixelRatio is 2 on a 1.6 output)
-    readonly property real dpr: typeof display !== "undefined" && display.dpr > 0 ? display.dpr : Screen.devicePixelRatio
+    readonly property real dpr: typeof windowInfo !== "undefined" && windowInfo && windowInfo.dpr > 0 ? windowInfo.dpr : Screen.devicePixelRatio
     // texture size for a themes/icons/system icon (128 and 512 px files): the 128 px file when it is drawn 1:1 or
     // at 2/3 and less, else the 512 halved to 256 up to 256 px, else the 512 (the rule of AppIconTile's app icons)
     // and halved while it is 4x the drawn size or more (16 pt list rows: 64 px). The provider returns exactly this
@@ -57,6 +57,10 @@ Item {
         while (px >= 4 * exact && px > 16) px /= 2;
         return px;
     }
+
+    // AppIconTile draws its art with a ShaderEffect, which the software scene graph (QT_QPA_PLATFORM=offscreen, the
+    // --shot renders) does not run: there the same sources go through a plain Image, so the shots show the icons
+    readonly property bool software: GraphicsInfo.api === GraphicsInfo.Software
 
     width: size
     height: size
@@ -93,6 +97,13 @@ Item {
             source: root.showThumb ? "image://thumb/" + encodeURIComponent(root.entry.path) : ""
             decodeSize: root.px
             onStatusChanged: if (status === Image.Error) root.thumbFailed = true
+        }
+        Image {
+            anchors.fill: thumb
+            visible: root.software
+            source: visible ? thumb.source : ""
+            sourceSize: Qt.size(root.px, root.px)
+            fillMode: Image.PreserveAspectFit
         }
         Rectangle {   // hairline frame
             anchors.fill: parent
@@ -132,8 +143,8 @@ Item {
         dpr: root.dpr
         // a system icon at the size picked above; the text icon and the drawn SVG fallbacks at the drawn size
         decodeSize: sysSource !== "" && !root.textIcon ? Math.ceil(root.size) : 0
-        readonly property string sysSource: root.sysFailed ? "" : Theme.sysIcon(root.sysName, root.sysPx, root.kind === "folder",
-                                                                                     root.kind === "folder" && Files.hasTags(root.entry) ? Theme.color.tagColors[root.entry.tags[0]] : "")
+        readonly property string sysSource: root.sysFailed ? "" : Theme.sysIcon(root.sysName, root.sysPx,
+                                                                                     root.kind === "folder" && Files.hasTags(root.entry) ? Theme.color.tagFolderColors[root.entry.tags[0]] : "")
         onStatusChanged: if (status === Image.Error && sysSource) root.sysFailed = true
         source: root.textIcon ? Qt.resolvedUrl("icons/doc-txt@" + root.textIconPt + "pt.png")
              : sysSource
@@ -141,6 +152,12 @@ Item {
                  ? Icons.folder(Theme.color.folderBack.toString(), Theme.color.folderFront.toString(), Theme.color.folderTop.toString())
                  : Icons.document(Theme.dark))
 
+        Image {
+            anchors.fill: parent
+            visible: root.software
+            source: visible ? plain.source : ""
+            fillMode: Image.PreserveAspectFit
+        }
         Image {
             anchors.fill: parent
             visible: root.kind === "archive"

@@ -44,9 +44,9 @@ QtObject {
 
     // ---------- macOS file icons (themes/icons/system), "" = use the drawn fallbacks ----------
     property bool hasSysIcons: false
-    // tint: the folder blue; tag: a tag colour ("#RRGGBB") for a tagged folder
-    function sysIcon(name, px, tint, tag) {
-        return !hasSysIcons ? "" : "image://sysicon/" + (tag ? "tag/" + tag.slice(1, 7) + "/" : tint ? "tint/" : "") + name + "@" + px;
+    // tag: a colour ("#RRGGBB") that tints a folder (a tagged folder: Theme.color.tagFolderColors)
+    function sysIcon(name, px, tag) {
+        return !hasSysIcons ? "" : "image://sysicon/" + (tag ? "tag/" + tag.slice(1, 7) + "/" : "") + name + "@" + px;
     }
     // folders that get their own icon, by absolute path
     readonly property var folderIcons: {
@@ -209,6 +209,12 @@ QtObject {
             for (const t of tags) m[t.name] = t.color;
             return m;
         }
+        // What tints a tagged folder: the tag's system colour (IconServices systemColorFromTagColorIndex), light
+        // appearance. Red, Green, Blue, Purple: macOS 27's values as measured elsewhere in this repo; Orange: checked
+        // on the Mac's tagged folder crop (sysicons.cpp); Yellow and Gray: Apple's published palette, not measured.
+        // Whether the Mac takes the dark variants for a folder in dark appearance was not checked.
+        readonly property var tagFolderColors: ({ Red: "#FF383C", Orange: "#FF8D28", Yellow: "#FFCC00", Green: "#34C759",
+                                                  Blue: "#0088FF", Purple: "#CB30E0", Gray: "#8E8E93" })
     }
 
     // ---------- window ----------

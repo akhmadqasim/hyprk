@@ -126,11 +126,12 @@ int main(int argc, char *argv[])
     engine.addImageProvider(QStringLiteral("thumb"), new ThumbnailProvider);
     engine.addImageProvider(QStringLiteral("pdfpage"), new PdfPageProvider);
     engine.addImageProvider(QStringLiteral("sysicon"), new SysIconProvider(iconDir));
-    // display.dpr: the window's real device pixel ratio, for FileIcon's texture sizes (QML only has the screen's,
-    // which is 2 on a 1.6 output); kept current from the window's frames
+    // windowInfo.dpr: the window's real device pixel ratio, for FileIcon's texture sizes (QML only has the screen's,
+    // which is 2 on a 1.6 output); kept current from the window's frames. Not named "display": inside a view's
+    // delegate that name is the model's display role (null for a JS array model), which hid this object there
     QQmlPropertyMap display;
     display.insert(QStringLiteral("dpr"), 0.0);
-    engine.rootContext()->setContextProperty(QStringLiteral("display"), &display);
+    engine.rootContext()->setContextProperty(QStringLiteral("windowInfo"), &display);
     engine.rootContext()->setContextProperty(QStringLiteral("startup"), QVariantMap{
         // "recents:", "applications:" and "tag:<Name>" are virtual locations, not paths
         {QStringLiteral("path"), dir.isEmpty() || dir.endsWith(QLatin1Char(':')) || dir.startsWith(QLatin1String("tag:")) ? dir : QDir(dir).absolutePath()},
