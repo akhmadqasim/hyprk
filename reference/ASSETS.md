@@ -85,10 +85,24 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
   vibrant opacity 0.75, neutral 0.375, vibrantBrightness 0.75; mitigated tints (Reduce Transparency) light tint
   0.5,0.5,.. factor 0.9, dark clear 0.17. How the renderer maps the HighlightSettings onto the kernel inputs was
   not decoded, so `glass.py`'s inputs are fitted (see there).
-- Icon Composer group glass in the car: TLV 0x3fd per child 20 bytes, by the `CUINamedIconLayerGroup` ivars
-  (hasSpecular, translucency, shadowStyle, shadowOpacity, blurStrength...) probably u32 specular, f32 translucency,
-  u32 shadow style, f32 shadow opacity, f32 blur (Notes: 1, 0.5, 0, 0.5, 0 and 1, 0, 2, 0.4, 0; tintable 1, 0.3, 3,
-  0.6, 0): field order not confirmed in CoreUI's reader. TLV 0x3fe (12 bytes per child) was all zero in the cars read.
+- Icon Composer group glass in the car, decoded 2026-11-11 from CoreUI's reader (27.2.1 dyld cache,
+  `-[_CUILayerStackRendition _initWithCSIHeader:version:]` at 0x18f2af564; the tag switch is at 0x18f2af734, selectors
+  read from the objc stubs it calls): TLV 0x3fd, per child 20 bytes = u32 hasSpecular (bit 0), f32 translucency,
+  u32 shadowStyle, f32 shadowOpacity, u32 specularPlacement (not blur, as guessed before: blurStrength lives on the
+  layer image); TLV 0x3fe, per child 12 bytes = f32 refractionStrength, f32 refractionHeight, u32 not read. The same
+  reader takes TLV 0x3f4 children as u32 flags (bit 0 fixedFrame), frame, u32 blendMode, f32 opacity, key.
+  `themes/icons/tools/iconstack.py` decodes both into `glass` on every group and layer and prints them. Over the 72
+  app cars x 3 appearances: only groups carry values (layers and the background are all zero); specular on or off,
+  translucency 0 / 0.2 / 0.25 / 0.3 / 0.5, shadowStyle 0 / 2 / 3 (enum names not decoded; ICRRenderingParameters has
+  a "neutral" and a "vibrant" shadow opacity), shadowOpacity 0.3-0.6, specularPlacement 0 or 2, refraction 0
+  everywhere; an appearance can change them (Notes' sash group: translucency 0 / style 2 / 0.4 in Aqua and DarkAqua,
+  0.3 / 3 / 0.6 in Tintable; Finder's head 0.25 with style 2 dark, 3 light).
+  STILL NOT DECODED (so `build-styles.py` composes flat and its rms did not change: Dock 66 px Dark 6.4-14.9, Clear
+  2.9-9.2, Tinted 7.8-15.4; tiles Dark 15.5 / 19.3, TintedDark 10.4 / 10.6, ClearDark 16.7 / 18.1): how IconRendering
+  turns these into pixels (which blur and backdrop a translucency of 0.5 means, the shadow's offset / radius per
+  style, where the per-group specular goes for placement 0 against 2), the Highlights builder (0x1cfd8cd9c) and how
+  HighlightSettings feed the `glassHighlight` kernel inputs. Reproducing them without that would be a fit to the
+  368 Settings tiles, not Apple's rule.
 - Settings pane tiles as ground truth: per style the chiclet is the same on every symbol pane (spread <= 3/255):
   Dark 31 -> 15 grey, TintedLight flat 0,122,249, TintedDark grey 25 + accent x (0.15 top -> 0 bottom), ClearLight
   opaque 125, ClearDark opaque 43, each with a thin top/bottom specular edge. White symbols map to 167,240,255 /
@@ -139,6 +153,18 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
   `categories.plist`, `name_aliases.strings` (old name -> current name), `nofill_to_fill.strings`, `legacy_flippable.plist`,
   `symbol_restrictions.strings` (Apple-only symbols), `semantic_to_descriptive_name.strings`, `private/container_recipes.plist`.
   Mapping: a symbol name (after `name_aliases`) is the facet name in the car; a variant suffix is part of the name (`.fill`, `.slash` are shape variants; `.ar` and `.hi` are apparently Arabic and Hindi variants, not checked).
+
+- The Dock's own Trash (2026-11-11): Dock.app (`/System/Library/CoreServices/Dock.app`, 27.2.1 OS dmg) draws
+  `Contents/Resources/s-trash*.png`, not CoreTypes' TrashIcon, and picks by `[iconAppearance style]` (0 light, 1 dark,
+  2 clear light, 3 clear dark, 4 tinted light, 5 tinted dark; chooser at 0x1000090ac in the arm64e slice, CFStrings
+  0x1002e5d68-0x1002e5f08, tint matrix 0x1000e2514 with constants at 0x10025c3c0, tint = `[iconAppearance tintColor]`).
+  The eight 256 px results are `system/DockTrash[Full]-256[-<style>-<mode>].png`, built by `tools/build-trash.py`
+  (rule and what is not Apple's in its header). Its glass layer (`s-trashempty-sdf.png`, 384 px, zero / one value
+  distance -128 / 128, padding 152, glass background style 2) is not built. Dock.app has no per-style art for folders
+  or stacks (only `s-pileArrow*`), so the Downloads stack stays as it is.
+- App icon sizes: `apps/<Name>-256.png` (Lanczos from the 1024 / 512, `tools/build-apps.py`) joins 128 and 512 so
+  `ui/HyprK/AppIconTile.qml` can load the smallest file at or above the drawn size; its shader
+  (`ui/HyprK/shaders/iconart.frag`) resamples in one Lanczos-3 pass on the device pixel grid.
 
 ## themes/cursors/
 

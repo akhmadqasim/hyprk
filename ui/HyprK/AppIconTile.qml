@@ -61,7 +61,7 @@ Item {
     }
     on_KeyChanged: _lookup()
     onTrustedChanged: _lookup()
-    Component.onCompleted: _lookup()
+    Component.onCompleted: { _lookup(); Qt.callLater(() => root._built = true); }
 
     implicitWidth: size
     implicitHeight: size
@@ -240,9 +240,11 @@ Item {
         cache: root.cache
         smooth: true
     }
-    // off while the size animates (Dock magnification), so the icon does not step by device pixels
+    // off while the size animates (Dock magnification), so the icon does not step by device pixels. The sizes set
+    // while the tile is being built do not count: it starts on the grid
     property bool _still: true
-    onSizeChanged: { if (_still) _still = false; settle.restart(); }
+    property bool _built: false
+    onSizeChanged: { if (!_built) return; if (_still) _still = false; settle.restart(); }
     Timer { id: settle; interval: 150; onTriggered: root._still = true }
     // the art, resampled (and in Clear / Tinted mapped through the ramp): one quad sampling the art's own texture
     // (no offscreen layer), over the rows and columns the art covers

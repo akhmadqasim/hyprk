@@ -15,7 +15,12 @@ Record layouts (all little endian, found by reading the cars; field names are ou
       u32 ?, i32 x, i32 y, i32 w, i32 h (1024 canvas units; 0,0,0,0 = whole canvas), u32 ?, f32 opacity,
       u32 keylen, keylen bytes of (u16 attribute, u16 value) rendition-key pairs (1 element, 2 part, 17 name id)
   CSI TLV 0x3fc fills: u32 count, u32 0, then per child u32 ?, u32 ?, u32 len, name[len] (COLR or GGRA name, "" = own colours)
-  CSI TLV 0x3fd / 0x3fe: per-child glass parameters (shadow, translucency, specular): reference/ASSETS.md, not used
+  CSI TLV 0x3fd glass per child (20 bytes; CoreUI 27.2.1 -[_CUILayerStackRendition _initWithCSIHeader:version:] at
+      0x18f2af564 reads them into the child's CUINamedIconLayerGroup / layer): u32 hasSpecular (bit 0), f32 translucency,
+      u32 shadowStyle, f32 shadowOpacity, u32 specularPlacement
+  CSI TLV 0x3fe refraction per child (12 bytes): f32 refractionStrength, f32 refractionHeight, u32 not read
+      Both are decoded into node["glass"] (Stack.glass) and printed; the flat render does not use them: how
+      IconRendering turns them into pixels is not decoded (reference/ASSETS.md)
   COLR "RLOC": u32 1, u32 colour space (1 sRGB, 2 Gray Gamma 2.2, 3 Display P3, 4 extended sRGB, 6 extended gray), u32 n, n doubles
   GGRA "ARGG": u32 stops, u32 type (1 linear, 0 = one colour, Icon Composer "automatic gradient"), u32 0,
       f32 x0 y0 x1 y1 (unit square), then per stop f32 location, u32 len, colour name[len]
@@ -98,6 +103,20 @@ class Stack:
         return out
 
     @staticmethod
+    def glass(t, n):
+        """the n children's glass settings from a stack's or group's TLVs (0x3fd, 0x3fe), None where absent"""
+        out = [None] * n
+        d = t.get(0x3fd)
+        for i in range(min(n, struct.unpack_from("<I", d, 0)[0]) if d else 0):
+            sp, tr, style, sop, place = struct.unpack_from("<IfIfI", d, 8 + 20 * i)
+            out[i] = dict(specular=bool(sp & 1), translucency=tr, shadowStyle=style, shadowOpacity=sop, specularPlacement=place)
+        e = t.get(0x3fe)
+        for i in range(min(n, struct.unpack_from("<I", e, 0)[0]) if e else 0):
+            st, h = struct.unpack_from("<ff", e, 8 + 12 * i)
+            out[i] = dict(out[i] or {}, refractionStrength=st, refractionHeight=h)
+        return out
+
+    @staticmethod
     def children(d):
         cnt = struct.unpack_from("<I", d, 0)[0]; o = 8; out = []
         for _ in range(cnt):
@@ -158,10 +177,12 @@ class Stack:
         top = self.pick([x for x in self.byname.get(stem, []) if struct.unpack_from("<H", x[1], 36)[0] == 1019], app)
         if top is None: return None
         out = []
-        for ch in self.children(self.tlvs(top[1])[0x3f4]):
+        tt = self.tlvs(top[1])
+        kids = self.children(tt[0x3f4])
+        for ch, gl in zip(kids, self.glass(tt, len(kids))):
             part, fid = ch["key"].get(2), ch["key"].get(17)
             r = self.pick(self.byid.get((part, fid), []), app)
-            node = dict(ch, name=self.names.get(fid), part=part)
+            node = dict(ch, name=self.names.get(fid), part=part, glass=gl)
             if r is None: continue
             if part in (247, 217):
                 node["fill"] = self.fill(node["name"], app)
@@ -170,7 +191,8 @@ class Stack:
                 layers = self.children(gt[0x3f4])
                 fl = self.fills(gt[0x3fc]) if 0x3fc in gt else [None] * len(layers)
                 node["layers"] = []
-                for L, F in zip(layers, fl):
+                for L, F, G in zip(layers, fl, self.glass(gt, len(layers))):
+                    L["glass"] = G
                     lr = self.pick(self.byid.get((L["key"].get(2), L["key"].get(17)), []), app)
                     if lr is None: continue
                     csi = C.parse_csi(lr[1])
@@ -260,7 +282,8 @@ def flat(tree, N=1024, layers_only=False):
 if __name__ == "__main__":
     s = Stack(sys.argv[1])
     for ch in s.tree(sys.argv[2], sys.argv[3]) or []:
-        print(ch["name"], ch["rect"], round(ch["opacity"], 3), "fill" if "fill" in ch else "")
+        fmt = lambda g: "" if not g else " ".join(f"{k}={round(v, 3) if isinstance(v, float) else v}" for k, v in g.items())
+        print(ch["name"], ch["rect"], round(ch["opacity"], 3), "fill" if "fill" in ch else "", fmt(ch.get("glass")))
         for L in ch.get("layers", []):
             f = L["fill"]
-            print("   ", L["name"], L["rect"], round(L["opacity"], 3), "gradient" if isinstance(f, dict) else f)
+            print("   ", L["name"], L["rect"], round(L["opacity"], 3), "gradient" if isinstance(f, dict) else f, fmt(L.get("glass")))
