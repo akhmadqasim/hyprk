@@ -152,3 +152,17 @@ done of a mapping layer wait for the vblank that shows it).
 
 - No Apple data: window move/resize, Spotlight calculator card growth.
 - Not done: Spotlight's open blur 25 -> 0: tried twice in session 3, it drops frames (see the table).
+
+## Session 5 (2026-11-11): shell hand-offs H1-H4 of the plugin's 61e74c6, regression check
+
+Same method, MBA headless session, per-frame values in `motion-measured.csv` (`*-s5`). Changes: wallpaper decoded at the
+pixel size (1ee085c), Dock label pointer from the plugin (fbc2541, 526a333), Cmd-Tab selection tile as a plus-darker /
+plus-lighter fill on a second surface `hyprk-switcher-fill(-dark)` (2db3868).
+
+| Motion | Mac | Before (rows above) | After (measured) | rms (value / time) | Method | Status |
+|---|---|---|---|---|---|---|
+| Cmd-Tab show | 1 frame, 0.19 s after Tab (Q-dock-22) | ~180 ms after the ipc, 1 frame | 216 ms after the Tab key (virtual keyboard, no ipc); panel, tile, icons and name in the same frame, only with a `no_anim` layer rule for the fill namespaces (`hyprctl eval` in the test session). Without it the fill surface comes one frame after the panel (alpha -0.04 at 216 ms, 0.92 at 232) and Hyprland's layer fade-in adds a tail to 331 ms | - | alpha, panel region | matches with the rule; config hand-off |
+| Cmd-Tab dismiss (Escape) | `cmdtab_hide_alpha`, ease-in-out 0.236 s (#42 b) | 2-98 % 202 ms, 0.013 / 3 ms | panel region 218 ms, 0.016 / 4.0 ms; panel glass alone 201 ms, 0.011 / 2.1 ms. The tile lags the glass by about 2 frames: the plugin's fill goes linearly with the layer opacity, its glass does not | 0.016 / 4.0 ms | alpha vs the Mac series | matches (value 1.6 %) |
+| Dock hover label fade-out | `dock_label_fadeout_alpha`, cosine 0.292 s | 252 ms, 0.029 / 6.9 ms | dark, grey: 266 ms, 0.012 / 4.4 ms. The pointer leaves when the fade starts: the plugin draws it at full material through any materialize or layer opacity (kept, it stood alone for 300 ms and then popped) | 0.012 / 4.4 ms | alpha vs the Mac series | matches; the pointer's own fade is a plugin hand-off |
+| Dock magnification ramp | 147 ms cosine (REA) | in 135 / out 151 ms (icon left edge) | Finder icon top: in 150-151 ms, 0.014-0.016 / 1.5-1.9 ms in 2 of 4 clean runs, 2 runs repeat 1-2 frames at the start (167-182 ms, 0.03-0.05); out 153 ms, 0.013 / 1.2 ms. With the pointer turned off the same repeats come in 2 of 4 runs: they are the label surface mapping (repeated frame after a layer maps, above), not the pointer | 0.014 / 1.5 ms | icon top row vs cosine 147 ms | unchanged |
+| Dock launch bounce | H 18.0 pt, P 0.6997 s | H 18.0, P 0.695 | H 18.0, hops 64 -> 748 and 765 -> 1449 ms (P ~0.69 s) | - | icon top row, k 1 | unchanged |
