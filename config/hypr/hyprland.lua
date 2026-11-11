@@ -224,12 +224,15 @@ function hyprk_motion(reduce)
     end
     hl.animation({ leaf = "windowsMove", enabled = not reduce, speed = 2.9, bezier = "zoom" })   -- Zoom 0.29 to 0.33 s
 end
+local savedDark, savedGlass   -- appearance.json as saved; the glass plugin starts from them too (below)
 do  -- start from the saved setting so the first frame is already right
     local f = io.open(state .. "/appearance.json", "r")
     local txt = f and f:read("a") or ""
     if f then f:close() end
     hyprk_motion(txt:match('"reduceMotion"%s*:%s*true') ~= nil)
-    hyprk_appearance(txt:match('"dark"%s*:%s*true') ~= nil)
+    if txt:match('"dark"%s*:%s*%a+') then savedDark = txt:match('"dark"%s*:%s*true') ~= nil end
+    savedGlass = tonumber(txt:match('"glass"%s*:%s*(-?[%d.]+)'))
+    hyprk_appearance(savedDark == true)
 end
 
 ------------------------------------------------------- liquid glass ----
@@ -290,6 +293,13 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
             -- the Dock dots are circles (4.1 pt, Q-dock-07): their 4 pt square regions get this radius (clamped to 2)
             radii = "hyprk-dock-dots:2.05,hyprk-dock-dots-dark:2.05",
         })
+        -- the saved Liquid Glass slider and appearance, so the first frame after a start or a config reload is right:
+        -- a reload put tint_amount back to 0.5 and appearance to auto until the shell sent them again (0d59d9e). The
+        -- shell stays the one that changes them live (shell/Theme.qml syncPluginGlass / syncPluginAppearance)
+        local saved = {}
+        if savedGlass then saved.tint_amount = math.max(0, math.min(1, savedGlass)) end
+        if savedDark ~= nil then saved.appearance = savedDark and "dark" or "light" end
+        if next(saved) then pluginConfig("liquidglass", saved) end
     end)
     if ok then
         hl.env("HYPRK_GLASS", "plugin")

@@ -15,6 +15,7 @@
 #      tile on the Mac (C2 cc-real-stripes, centre row through the rounded end: interior ripple and lens bands) and
 #      against Apple's shader on the Mac's own panel-blurred backdrop; then the port against Apple's model for every
 #      material (same backdrop, no underlay).
+#   6. The Liquid Glass slider on the real Dock over 4 pt stripes at a = 0, 0.5, 1 (live/verify/C/dock-real.json).
 #
 # Usage: check_model.py --dump <lgdump binary or its JSON output> [--strict] [--port module.py]
 #   --strict: exit 1 when step 1 is not exact, a ported input differs, or the face is off by more than the limits below.
@@ -350,6 +351,47 @@ def stripes_check(ours):
     return bad
 
 
+def slider_check(ours):
+    """6. The Liquid Glass slider on the real Dock (MAC-ANSWERS Verify C 2, live/verify/C/dock-real.json: the Dock
+    relaunched at NSGlassTintAmount 0 / 0.507 / 1 over 4 pt stripes, std along x and mean of the body): ClearDiffusionAmount
+    scales the blur radius by 2a below 0.5 and adds a radius-8 blur fill with normal opacity 2a - 1 above. The port: the
+    face sample of row_ours 8.5 pt inside the edge and the shader's blur fill block (two taps at -+ L / 4 texels of
+    its level; keep in step with shaders/liquidglass.frag)."""
+    print("\n6. Liquid Glass slider, Dock dark over 4 pt stripes: std along x / mean of the body (2x px)")
+    real = json.load(open(os.path.join(VERIFY, "C", "dock-real.json")))
+    x = np.arange(1200)
+    stripes = np.where((x // 8) % 2 == 0, 0.0, 1.0)
+    bad = []
+    for a, key in ((0, "d0"), (0.5, "dbase"), (1, "d1")):
+        P = ours[("dock", True, 64, a)]
+        s = P["BackdropScale"]
+        pyr = GM3.Pyramid1D(stripes, s)
+        k = 1.6 * 2 * s
+        # the Dock's free body is the band between its edge and the icons: 8.5 pt inside the top edge (the stripes run
+        # along the normal there, so the lens only moves the blur opacity's depth)
+        depth = 8.5
+        m = P["InnerRefractionAmount"] * lens(depth, P["InnerRefractionHeight"])
+        L = apple_lod(k * P["BlurRadius"] * blur_opacity(-depth + m, P))
+        li, dk, nm = P["BlurFillLightenOpacity"], P["BlurFillDarkenOpacity"], P["BlurFillNormalOpacity"]
+        Lf = apple_lod(k * 8.0)
+        o = 0.25 * Lf / s
+        out = []
+        for px in range(400, 496):   # 6 stripe periods
+            v = pyr_at(pyr, L, px + 0.5)
+            if li + dk + nm > 0:
+                bf = 0.5 * (pyr_at(pyr, Lf, px + 0.5 - o) + pyr_at(pyr, Lf, px + 0.5 + o))
+                f = dk * min(v, bf) + li * max(v, bf) + (1 - li - dk) * v
+                v = f + (bf - f) * nm
+            out.append(face_ours(np.array([v, v, v]), P)[0] * 255)
+        out = np.array(out)
+        m = real[key]["stripes"]
+        print("    a %-4s ours std %5.1f mean %5.1f | Mac std %5.1f mean %5.1f%s" % (a, out.std(), out.mean(), m["stdx"], m["mean"][0], "  (Mac at 0.507)" if a == 0.5 else ""))
+        if abs(out.std() - m["stdx"]) > 4.0 or abs(out.mean() - m["mean"][0]) > 6.0:
+            bad.append("dock slider a %s" % a)
+    print("    over flat colours the Dock does not change with the slider (Mac 177 / 109 / 17 at all three): inputs in step 2")
+    return bad
+
+
 def load_dump(arg):
     txt = open(arg).read() if arg.endswith(".json") else subprocess.run([arg], capture_output=True, text=True, check=True).stdout
     return {(e["material"], e["dark"], e["D"], e["a"]): e["inputs"] for e in json.loads(txt)}
@@ -461,7 +503,7 @@ def main():
         print("    %-44s ours %-26s Mac %-24s max %.1f" % (label, " ".join("%.0f" % x for x in rows), " ".join(str(x) for x in mac), e))
         if e > 2.0:
             rim_bad.append(label)
-    stripe_bad = stripes_check(ours)
+    stripe_bad = stripes_check(ours) + slider_check(ours)
     if args.strict and (not ok or param_bad or face_bad or grid_bad or rim_bad or stripe_bad):
         print("\nFAIL: reference %s, %d inputs differ, face off vs Mac: %s, vs model: %s, rim: %s, stripes: %s" % ("ok" if ok else "differs", param_bad, face_bad, grid_bad, rim_bad, stripe_bad))
         return 1
