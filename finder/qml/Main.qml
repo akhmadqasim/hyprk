@@ -22,6 +22,9 @@ Window {
     property string view: ["icons", "list", "columns", "gallery"].indexOf(startup.view) !== -1 ? startup.view : "icons"
     property bool showPathBar: startup.pathBar
     property var quickLookEntry: null
+    // last left press in the window (Quick Look closes into the item there); a passive PointHandler sees every press
+    property point lastPress: Qt.point(width / 2, height / 2)
+    PointHandler { acceptedButtons: Qt.LeftButton | Qt.RightButton; onActiveChanged: if (active) win.lastPress = point.scenePosition }
     // a zoomed (maximized) window keeps its corners and rims on macOS; only full screen drops them. (Hyprland
     // also reports a floating window as maximized to Qt.)
     readonly property bool fullScreen: visibility === Window.FullScreen
@@ -377,6 +380,7 @@ Window {
         height: Math.min(parent.height - 80, 560)
         anchors.centerIn: parent
         entry: win.quickLookEntry
+        closeTo: win.lastPress
         onCloseRequested: win.quickLookEntry = null
     }
 
