@@ -30,22 +30,20 @@ namespace lg {
         float                                        roundingPower   = 2.6f; // Apple's continuous corner is close to 2.6-3
 
         float                                        blurLod = 0, blurLodScale = 0.6f; // extra mip blur: blurLod + scale*log2(1 + recipe radius)
-        float                                        refractionScale = 1, aberration = 1.5f;
+        float                                        refractionScale = 1, aberration = 0; // Apple: no aberration on background glass
 
         int                                          appearance = 0;                   // 0 auto, 1 light, 2 dark
         float                                        adaptLow = 0.1f, adaptHigh = 0.3f; // V2 light range (SPEC 9.6)
 
         float                                        highlight = 1; // scales the key/fill highlight (1 = Apple)
+        float                                        tintAmount = 0.5f; // Liquid Glass slider (NSGlassTintAmount) 0..1, 0.5 = the recipes as is
         float                                        shadowScale = 1, shadowTint = 0.35f, ringScale = 1;
 
         // Liquid Glass motion. spacing: ns -> pt, the smoothness k of the union of a layer's shapes
         // (SwiftUI passes GlassEffectContainer(spacing:) straight to CASDFLayer.smoothness, default 8):
         // shapes fuse when the gap is below k / 2 and reach toward each other below k.
-        // pointer light: namespaces whose glass lights up around the pointer.
         std::unordered_map<std::string, double>      spacing;
-        std::vector<std::string>                     pointerLightNamespaces;
-        float                                        pointerLight = 1, pointerLightRadius = 60;
-        bool                                         reduceMotion = false; // no merging, no pointer light
+        bool                                         reduceMotion = false; // no merging
 
         bool                                         fullDamage    = false; // true: redraw the whole output while glass is visible
         bool                                         stats         = false; // GPU timestamp queries, `hyprctl liquidglass`
@@ -87,7 +85,6 @@ namespace lg {
 
     // smooth-union smoothness k (logical px) for a namespace: its spacing, 0 with reduce_motion
     double smoothKFor(const SParams& p, const std::string& ns);
-    bool   pointerLightFor(const SParams& p, const std::string& ns);
 
     // Hyprland side (Config.cpp, needs the compositor)
     void registerConfig(void* handle);

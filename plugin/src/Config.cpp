@@ -4,6 +4,7 @@
 #include <hyprland/src/config/values/ConfigValues.hpp>
 #include <hyprland/src/plugins/PluginAPI.hpp>
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <memory>
@@ -40,11 +41,10 @@ namespace lg {
             {K("adapt_low"), &SParams::adaptLow},
             {K("adapt_high"), &SParams::adaptHigh},
             {K("highlight"), &SParams::highlight},
+            {K("tint_amount"), &SParams::tintAmount},
             {K("shadow_scale"), &SParams::shadowScale},
             {K("shadow_tint"), &SParams::shadowTint},
             {K("ring_scale"), &SParams::ringScale},
-            {K("pointer_light"), &SParams::pointerLight},
-            {K("pointer_light_radius"), &SParams::pointerLightRadius},
             {K("window_radius"), &SParams::windowRadius},
             {K("titlebar_height"), &SParams::titlebarHeight},
             {K("titlebar_button"), &SParams::titlebarButton},
@@ -85,8 +85,6 @@ namespace lg {
             // Spotlight's mode buttons fuse with the field only while they emerge from it
             {K("spacing"), "hyprk-controlcenter:8,hyprk-dock:8,hyprk-overlay:8,hyprk-spotlight:8",
              [](SParams& p, const std::string& v) { p.spacing = parseNumberMap(v); }},
-            {K("pointer_light_namespaces"), "hyprk-controlcenter,hyprk-dock",
-             [](SParams& p, const std::string& v) { p.pointerLightNamespaces = splitList(v); }},
             {K("material"), "regular", [](SParams& p, const std::string& v) { p.defaultMaterial = v; }},
             {K("window_material"), "regular", [](SParams& p, const std::string& v) { p.windowMaterial = v; }},
             {K("appearance"), "auto", [](SParams& p, const std::string& v) { p.appearance = parseAppearance(v); }},
@@ -104,7 +102,10 @@ namespace lg {
                                              K("shadow_radius"), K("shadow_offset_y"), K("ring_opacity"), K("ring_width"),
                                              // by-eye rim of the second iteration, replaced by the 27.2.1 rim (Material.cpp)
                                              K("light_angle"), K("highlight_width"), K("highlight_spread"), K("highlight_curve"), K("rim"),
-                                             K("lift"), K("inner_shadow"), K("inner_shadow_size")};
+                                             K("lift"), K("inner_shadow"), K("inner_shadow_size"),
+                                             // pointer light of the third iteration: the 27.2.1 light is fixed in layer space (MAC-ANSWERS PC #67 B 4)
+                                             K("pointer_light"), K("pointer_light_radius")};
+        const char* const LEGACY_STRINGS[] = {K("pointer_light_namespaces")};
         const char* const LEGACY_INTS[]   = {K("tint_light"), K("tint_dark"), K("debug_copy_per_element")};
 #undef K
 
@@ -136,6 +137,8 @@ namespace lg {
             HyprlandAPI::addConfigValueV2(handle, makeShared<CFloatValue>(name, "deprecated, ignored", 0.F));
         for (const auto* name : LEGACY_INTS)
             HyprlandAPI::addConfigValueV2(handle, makeShared<CIntValue>(name, "deprecated, ignored", 0));
+        for (const auto* name : LEGACY_STRINGS)
+            HyprlandAPI::addConfigValueV2(handle, makeShared<CStringValue>(name, "deprecated, ignored", Config::STRING{""}));
 
         g_cache = std::make_unique<SCache>();
         for (size_t i = 0; i < std::size(FLOATS); ++i)
@@ -176,6 +179,7 @@ namespace lg {
         for (size_t i = 0; i < std::size(STRINGS); ++i)
             STRINGS[i].apply(*p, raw.strings[i]);
         p->roundingPower = std::max(p->roundingPower, 1.f);
+        p->tintAmount    = std::clamp(p->tintAmount, 0.f, 1.f);
         auto compile = [](const std::string& pattern) -> std::optional<std::regex> {
             if (pattern.empty())
                 return std::nullopt;

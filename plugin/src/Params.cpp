@@ -44,10 +44,6 @@ namespace lg {
         return p.reduceMotion || it == p.spacing.end() ? 0.0 : std::max(it->second, 0.0);
     }
 
-    bool pointerLightFor(const SParams& p, const std::string& ns) {
-        return !p.reduceMotion && p.pointerLight > 0 && std::ranges::find(p.pointerLightNamespaces, ns) != p.pointerLightNamespaces.end();
-    }
-
     const std::string& materialFor(const SParams& p, const std::string& ns) {
         const auto it = p.materials.find(ns);
         return it != p.materials.end() ? it->second : p.defaultMaterial;

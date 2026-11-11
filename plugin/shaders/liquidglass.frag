@@ -1,9 +1,12 @@
 #version 300 es
 // hyprk Liquid Glass material, GLSL ES 3.00.
-// Math follows the macOS 27.2 QuartzCore glass_background_* pipeline recovered in
-// /mnt/code/liquid-glass-re/SPEC.md (bevel profile, erfc edge, ring shadow, two-lobe colour-bias
-// highlight, 7-tap aberration, YCC face effect). Values come from the recipes in src/Material.cpp,
-// resolved per shape on the CPU (light or dark side chosen there, with hysteresis).
+// Math follows the macOS 27.2.1 QuartzCore glass_background_base shader and the CASDFKeyFillHighlightEffect layer as
+// verified on the Mac (reference/re/27.2.1/decomp/QuartzCore-glassBackground-shader.c, QuartzCore-glass-shaders.c;
+// MAC-ANSWERS PC #67 B, C2): quarter-circle refraction profile, outer refraction in the last 1 pt, max luma with its
+// chroma boost, YCC face + fill, edge bleed, dark specular line outside the left/right edges, key/fill highlight.
+// The blur is hyprk's own (Hyprland's blur + mips of a sharp copy). Values come from src/Material.cpp, resolved per
+// shape on the CPU (light or dark side chosen there, with hysteresis; Liquid Glass slider). The face and rim maths is
+// ported line by line in tools/check_model.py (face_ours, rim_rows): change both together.
 precision highp float;
 
 in vec2 v_texcoord;                 // 0..1 across the drawn quad (glass box + shadow margin)
@@ -23,8 +26,6 @@ uniform vec2  shapeInfo[MAX_SHAPES];// corner radius px, materialize 0..1
 uniform float smoothK;              // px, smoothness of the union (= GlassEffectContainer spacing), 0 = plain min
 uniform float appearBlur;           // px edge softness of fully hidden glass (materialize 0)
 uniform float roundingPower;        // 2 = circle
-uniform vec2  pointer;              // quad px
-uniform vec3  pointerLight;         // amount (0 = off), radius px, press 0..1
 uniform float alpha;                // layer fade
 uniform int   linearLight;          // 1: work in linear light like QuartzCore (sRGB decode/encode)
 
@@ -36,23 +37,23 @@ uniform float refractionHeight;     // px depth of the bevel
 uniform float outerAmount;          // outer refraction layer (px, + = outward)
 uniform float outerHeight;
 uniform float outerOpacity;
-uniform vec2  outerThreshold;       // rim band (px of d) over which the outer layer fades in
-uniform float aberration;           // px R/B split at the edge
+uniform vec2  outerThreshold;       // band (px of d) over which the outer layer fades in: -1 pt .. 0
+uniform float aberration;           // px R/B split at the edge (Apple: none on background glass)
 uniform vec3  blurFill;             // lighten, darken, normal (wider blur: blurLod + 1.5)
-uniform float bleedOpacity;         // edge bleed
+uniform float bleedOpacity;         // edge bleed: mix(face, bleed, g^4 opacity) over the whole interior
 uniform float bleedHeight;          // px
 uniform float bleedAmount;          // px, + = outward
-uniform float bleedLod;
-uniform vec3  bleedYcc;
+uniform float bleedLod;             // Apple's backdrop scale as a mip level of the sharp copy
+uniform vec4  bleedYcc;             // black, white, saturation, 1 = weight by Y(face) (light), 0 = by 1 - Y(face) (dark)
 
 uniform vec4  faceYcc;              // black, white, saturation, max luma
 uniform vec4  faceFill;             // rgb + amount ("normalFill")
 
-// rim (27.2.1 probe + HUD pixels, see the rim block in main)
+// rim (see the rim blocks in main)
 uniform float pxPerPt;              // output scale
 uniform vec3  keyYcc;               // key/fill highlight target (the highlight layer's vibrantColorMatrix)
 uniform vec2  keySpread;            // cos of the key and diffuse lobe spreads
-uniform vec2  highlight;            // scale of the key/fill highlight (1 = Apple), diffuse band amount (SRecipe::diffuse)
+uniform vec3  highlight;            // scale of the key/fill mask (1 = Apple), key amount, diffuse amount
 uniform vec2  darkSpec;             // colourBias of the dark specular, cos of its spread
 
 uniform float shadowOpacity;
@@ -158,6 +159,17 @@ vec3 fetchSharp(vec2 quadPx, float lod) {
     return decode(s.rgb / max(s.a, 1e-4));
 }
 
+// single tap of the sharp copy (edge bleed, the backdrop under the dark specular line)
+vec3 fetchSharp1(vec2 quadPx, float lod) {
+    vec4 s = textureLod(sharpTex, mix(sharpUv.xy, sharpUv.zw, quadPx / quadSize), lod);
+    return decode(s.rgb / max(s.a, 1e-4));
+}
+
+// Apple's tone curve for the highlight masks, v / ((1 / amount - 2)(1 - v) + 1); amount 0 = off
+float schlick(float v, float amount) {
+    return amount > 0.0 ? v / ((1.0 / amount - 2.0) * (1.0 - v) + 1.0) : 0.0;
+}
+
 // Apple's YCC composite: Y' = black + (white - black) Y, chroma x saturation
 vec3 ycc(vec3 c, vec3 k) {
     float Y = luma(c);
@@ -200,7 +212,18 @@ void main() {
     if (shadowOpacity > 0.0 && cov < 1.0)
         sh = gEdge(scene(qp - shadowOffset).d / max(shadowRadius, 1e-3)) * shadowOpacity * mat;
 
-    if (cov <= 0.0 && sh <= 0.002)
+    // dark specular (the glass filter's KeyFillHighlight inputs, offset -0.5 pt in stroke mode): a 0.5 pt line just
+    // OUTSIDE the edge, (1 - coverage) x AA(0.5 pt - d), on the sides (angle 90 deg: two lobes along x), amount 0.4
+    float line = 0.0;
+    if (darkSpec.x != 0.0) {
+        float dl = sat(0.5 * pxPerPt - d + 0.5) * (1.0 - cov);
+        if (dl > 0.0) {
+            float v = sat((abs(sc.n.x) / max(length(sc.n), 1e-5) - darkSpec.y) / max(1.0 - darkSpec.y, 1e-3)) * dl;
+            line    = schlick(v, 0.4) * mat;
+        }
+    }
+
+    if (cov <= 0.0 && sh <= 0.002 && line <= 0.0)
         discard;
 
     vec4 shadow = vec4(0.0);
@@ -246,67 +269,43 @@ void main() {
             col         = mix(col, filled, mat);
         }
 
-        // outer refraction layer over the rim band (SPEC step 4.5)
+        // outer refraction: a second sample from outside the shape, mixed into the outermost 1 pt
         if (outerOpacity > 0.0 && d > outerThreshold.x) {
             float mo = outerAmount * bevel(depth, outerHeight) * mat;
             vec3  so = sampleFace(qp + n * mo, blurAmount(d) * mat);
             col      = mix(col, so, sat((d - outerThreshold.x) / (outerThreshold.y - outerThreshold.x)) * outerOpacity * mat);
         }
 
-        // max luma (inputFaceColorMatrixMaxLuma < 1) on the backdrop: Yl = Y - (1 - m) Y^2, so white enters the
-        // face as m, and the chroma scales with it, (Yl / Y)(c - Y) (MAC-ANSWERS PC #67 C, fit rms 0.6 at D <= 64);
-        // then the YCC face and the fill (SPEC 9.7)
-        float Yb = luma(col);
-        float Yl = Yb - (1.0 - mix(1.0, faceYcc.w, mat)) * Yb * Yb;
-        col      = vec3(Yl) + (Yl / max(Yb, 1e-4)) * (col - vec3(Yb));
+        // face: max luma (luma k Y, chroma x k (1 + 0.3 (1 - k)), k = clamp(1 - Y (1 - M)), skipped at M = 1), then
+        // the YCC colour matrix and the fill
+        float M = mix(1.0, faceYcc.w, mat);
+        if (M < 1.0) {
+            float Y = luma(col);
+            float k = sat(1.0 - Y * (1.0 - M));
+            col     = vec3(k * Y) + k * (1.0 + 0.3 * (1.0 - k)) * (col - vec3(Y));
+        }
         col = ycc(col, mix(vec3(0.0, 1.0, 1.0), faceYcc.xyz, mat)); // (0, 1, 1) = identity
         col = mix(col, faceFill.rgb, faceFill.a * mat);
-        // edge bleed: outside colour pulled into the rim through its own colour effect (step 4.7)
-        if (bleedOpacity > 0.0 && depth < bleedHeight) {
-            float mb = bleedAmount * bevel(depth, bleedHeight);
-            vec3  eb = ycc(fetchSharp(qp + n * mb, bleedLod), bleedYcc);
-            float w  = 1.0 - depth / max(bleedHeight, 1e-3);
-            col      = mix(col, eb, w * w * w * w * bleedOpacity * mat);
+        // edge bleed: a sharp sample moved outward by bleedAmount at the edge (0 from depth bleedHeight on) through
+        // its own colour matrix, mixed by g^4 opacity, g = Y(face) (light) or 1 - Y(face) (dark), over the whole interior
+        if (bleedOpacity > 0.0) {
+            float Yf = sat(dot(col, vec3(0.2125, 0.7154, 0.0721)));
+            float g  = bleedYcc.w > 0.5 ? Yf : 1.0 - Yf;
+            float w  = g * g * g * g * bleedOpacity * mat;
+            if (w > 0.002)
+                col = mix(col, ycc(fetchSharp1(qp + n * bleedAmount * bevel(depth, bleedHeight), bleedLod), bleedYcc.xyz), w);
         }
 
-        // pointer light (interactive glass): the rim lights up near the pointer, wider and brighter
-        // while a button is held, and the face glows faintly around the touch point; light falls
-        // off with distance, so neighbouring glass catches some of it
-        float pl = 0.0, pf = 0.0;
-        if (pointerLight.x > 0.0) {
-            vec2  dp = qp - pointer;
-            float r  = pointerLight.y * (1.0 + 0.5 * pointerLight.z);
-            pl       = pointerLight.x * exp(-dot(dp, dp) / (r * r));
-            pf       = pl * (0.03 + 0.09 * pointerLight.z);
-            pl      *= 0.6 + 0.4 * pointerLight.z;
-        }
-        if (pf > 0.0)
-            col = mix(col, vec3(1.0), pf * mat);
-
-        // Rim, two parts (SPEC section 3 step 1 for the lobes: two of them, on the key axis and opposite;
-        // spread as a cos threshold, Apple's tone curve x / (amount (1 - x) + 1)).
-        // 1. Dark specular: the glass filter's key highlight with a negative colourBias, keyed sideways
-        //    (angle 90 deg), height 0.5 pt at the very edge: rgb *= 1 + bias h (3 - 2 rgb), tone amount 0.4.
-        //    The Mac HUD shows it as a 1 px dark line at both round ends.
-        // 2. Key/fill highlight layer (CASDFKeyFillHighlightEffect, key angle 0 = top, fill = bottom, under a
-        //    vibrantColorMatrix): mix toward keyYcc(col) by a mask m, clamped to 1.5 (CASDFOutputEffect max).
-        //    Mask fitted to the HUD over flat blue (top and bottom rows agree, light = dark):
-        //    key band 1 pt, 1.23 (0.25 + 0.75 k); diffuse 0.49 (1 - depth / 8 pt)^3 with 0.65 x the spread (0.49 = SRecipe::diffuse)
-        //    (Apple's diffuse height and spread scales 8 and 0.65); curvature 0.75.
+        // key/fill highlight layer (CASDFKeyFillHighlightEffect: key at the top, fill at the bottom, same strength), a
+        // mix toward the layer's vibrantColorMatrix: spec 1 pt, 1 - 0.75 depth / 1 pt; diffuse 8 pt linear at 0.65 x
+        // the spread; each lobe through schlick() with its amount (key 0.5, diffuse 0.5 x 0.15)
         {
-            float ax   = abs(n.x), ay = abs(n.y);
-            float dLob = sat((ax - darkSpec.y) / max(1.0 - darkSpec.y, 1e-3));
-            dLob       = dLob / (0.4 * (1.0 - dLob) + 1.0);
-            float dBand = sat((0.5 * pxPerPt - depth) + 0.5); // 0.5 pt, anti-aliased over 1 px
-            col *= 1.0 + (darkSpec.x * dLob * dBand * mat) * (3.0 - 2.0 * clamp(col, 0.0, 1.0));
-
-            vec2  lob = sat2((vec2(ay) - keySpread) / max(1.0 - keySpread, vec2(1e-3)));
-            lob       = lob / (0.75 * (1.0 - lob) + 1.0);
-            float kk  = 1.0 - sat(depth / (pxPerPt * (1.0 + pl)));
-            float dk  = 1.0 - sat(depth / (8.0 * pxPerPt));
-            float hm  = 1.23 * (0.25 * step(0.001, kk) + 0.75 * kk) * (lob.x + pl) + highlight.y * dk * dk * dk * lob.y;
-            hm        = min(hm * highlight.x, 1.5) * mat;
-            col       = mix(col, clamp(ycc(col, keyYcc), 0.0, 1.0), hm);
+            float dpt  = depth / pxPerPt;
+            vec2  lob  = sat2((vec2(abs(n.y)) - keySpread) / max(1.0 - keySpread, vec2(1e-3)));
+            float spec = (dpt < 1.0 ? 1.0 - 0.75 * dpt : 0.0) * lob.x;
+            float diff = max(1.0 - dpt / 8.0, 0.0) * lob.y;
+            float hm   = highlight.x * (schlick(spec, highlight.y) + schlick(diff, highlight.z)) * mat;
+            col        = col + hm * (ycc(col, keyYcc) - col);
         }
 
         face = vec4(encode(clamp(col, 0.0, 1.0)), 1.0);
@@ -314,12 +313,19 @@ void main() {
 
     vec4 c = mix(shadow, face, cov);
 
+
     // ring shadow: soft contour of the shape sampled at an offset, inside the glass only
     if (ringOpacity > 0.0 && cov > 0.0 && -d < length(ringOffset) + ringStroke + 3.0 * ringRadius) {
         float dr   = scene(qp + ringOffset).d;
         float rr   = max(ringRadius, 1e-3);
         float ring = sat(gEdge(0.7071 * dr / rr) - gEdge(0.7071 * (dr + ringStroke) / rr)) * ringOpacity * cov * mat;
         c          = c * (1.0 - ring) + vec4(0.0, 0.0, 0.0, ring);
+    }
+
+    // the dark specular line, a tone curve on what lies there (backdrop under the shadow): c (1 + bias h (3 - 2 c))
+    if (line > 0.0) {
+        vec3 base = c.rgb + encode(fetchSharp1(qp, 0.0)) * (1.0 - c.a);
+        c         = vec4(base * (1.0 + darkSpec.x * line * (3.0 - 2.0 * clamp(base, 0.0, 1.0))), 1.0);
     }
 
     fragColor = c * alpha;

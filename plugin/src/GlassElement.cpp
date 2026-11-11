@@ -120,8 +120,6 @@ namespace lg {
             .ringOffset       = loc("ringOffset"),
             .ringStroke       = loc("ringStroke"),
             .ringRadius       = loc("ringRadius"),
-            .pointer          = loc("pointer"),
-            .pointerLight     = loc("pointerLight"),
         };
         // the sampler and the quad mapping are the minimum a custom shader must keep
         // (sharpUv too when the shader reads sharpTex: the two textures hold different parts of the output)
@@ -204,86 +202,16 @@ namespace lg {
         std::vector<std::pair<CBox, bool>> g_claims;
     }
 
-    // ── pointer light (interactive glass) ────────────────────────────────────
-
-    namespace {
-        struct SPointer {
-            Vector2D                              pos{-1e6, -1e6}; // global logical
-            bool                                  held = false;
-            std::chrono::steady_clock::time_point released{};
-        } g_pointer;
-        constexpr double PRESS_FADE = 0.3; // s, the press light fades after release
-
-        // glass with pointer light, per layer: global logical boxes, frame last drawn
-        struct SLit {
-            std::vector<CBox> boxes;
-            double            reach = 0; // logical px the light reaches outside the boxes
-            uint64_t          frame = 0;
-        };
-        std::map<uintptr_t, SLit> g_lit;
-    }
-    static double pressLevel() {
-        if (g_pointer.held)
-            return 1;
-        const double t = std::chrono::duration<double>(std::chrono::steady_clock::now() - g_pointer.released).count();
-        return t < PRESS_FADE ? 1 - t / PRESS_FADE : 0;
-    }
-
-    static void notePointerGlass(const CGlassElement::SData& data) {
-        auto& lit = g_lit[data.owner];
-        lit.boxes.clear();
-        for (const auto& g : data.groups)
-            lit.boxes.emplace_back(CBox{g.box.x + data.monitorPos.x, g.box.y + data.monitorPos.y, g.box.w, g.box.h}.expand(2));
-        // exp falloff: below 2 % at 2 radii (1.5 x radius while pressed)
-        lit.reach = 3.0 * data.params->pointerLightRadius;
-        lit.frame = g_frame;
-    }
-
-    // redraw lit glass within the light's reach of any of the points
-    static void damageLit(std::initializer_list<Vector2D> points) {
-        if (!g_pHyprRenderer)
-            return;
-        for (const auto& [owner, lit] : g_lit)
-            for (const auto& box : lit.boxes)
-                for (const auto& pt : points)
-                    if (box.copy().expand(lit.reach).containsPoint(pt)) {
-                        g_pHyprRenderer->damageBox(box);
-                        break;
-                    }
-    }
-
-    void onPointer(const Vector2D& global, std::optional<bool> pressed) {
-        const Vector2D old = g_pointer.pos;
-        g_pointer.pos      = global;
-        if (pressed) {
-            if (g_pointer.held && !*pressed)
-                g_pointer.released = std::chrono::steady_clock::now();
-            // only a press that starts on lit glass is a glass press (not a window drag nearby)
-            g_pointer.held = *pressed && std::ranges::any_of(g_lit, [&global](const auto& kv) {
-                return std::ranges::any_of(kv.second.boxes, [&global](const CBox& b) { return b.containsPoint(global); });
-            });
-        }
-        if (!g_lit.empty())
-            damageLit({old, global});
-    }
-
-    void onFrameDone() {
-        if (!g_pointer.held && pressLevel() > 0 && !g_lit.empty())
-            damageLit({g_pointer.pos});
-    }
-
     void onFrame() {
         g_claims.clear();
         if (++g_frame % 60)
             return;
         // forget surfaces not drawn for ~10 s at 60 Hz
-        std::erase_if(g_lit, [](const auto& kv) { return g_frame - kv.second.frame > 600; });
         std::erase_if(g_luma, [](const auto& kv) { return g_frame - kv.second.seen >= 600; });
         std::erase_if(g_boxes, [](const auto& kv) { return g_frame - kv.second.frame >= 600; });
     }
 
     void forgetOwner(uintptr_t owner) {
-        g_lit.erase(owner);
         std::erase_if(g_luma, [owner](const auto& kv) { return kv.first.first == owner; });
         std::erase_if(g_boxes, [owner](const auto& kv) { return std::get<0>(kv.first) == owner; });
     }
@@ -291,7 +219,7 @@ namespace lg {
     // ── unblurred backdrop copy (variable blur, edge bleed) ──────────────────
 
     namespace {
-        constexpr int SHARP_LEVELS = 7; // the shader reads the sharp copy up to lod 7 (bleed)
+        constexpr int SHARP_LEVELS = 7; // the shader reads the sharp copy up to lod 6 (variable blur) + its 4-tap tent
 
         // the area to refresh so that reads in `read` up to mip `level` see no texel of an older frame
         CRegion footprintOf(const CRegion& read, int level, const Vector2D& size) {
@@ -395,25 +323,29 @@ namespace lg {
 
     // ── element ─────────────────────────────────────────────────────────────
 
+    // the material of group `gi` (its lead shape sets D), light or dark, at Liquid Glass slider `tint`
+    static SResolved resolveGroup(const CGlassElement::SData& data, size_t gi, bool dark, float tint) {
+        const auto&  lead = data.shapes[data.groups[gi].lead];
+        const double D    = std::min(lead.box.w, lead.box.h);
+        auto         res  = resolveMaterial(*data.recipe, D, dark, tint);
+        // shadow marker (SGlassShape::regularShadow): Regular's shadow for this size instead of the layer's
+        if (lead.regularShadow && hasShadow(*data.recipe)) {
+            const auto reg    = resolveMaterial(recipeByName("regular"), D, dark, tint);
+            res.shadowOpacity = reg.shadowOpacity;
+            res.shadowRadius  = reg.shadowRadius;
+            res.shadowOffsetY = reg.shadowOffsetY;
+        }
+        return res;
+    }
+
+    // groups and their geometry (reach, damage, mip levels: the same light and dark, the slider only lowers the blur)
     static void resolveShapes(CGlassElement::SData& data) {
         if (!data.groups.empty() || data.shapes.empty())
             return;
         data.groups = groupShapes(data.shapes, data.smoothK);
         data.resolved.clear();
-        for (const auto& g : data.groups) {
-            const auto& lead = data.shapes[g.lead].box;
-            const double D   = std::min(lead.w, lead.h);
-            auto         res = resolveMaterial(*data.recipe, D);
-            // shadow marker (SGlassShape::regularShadow): Regular's shadow for this size instead of the layer's
-            if (data.shapes[g.lead].regularShadow && hasShadow(*data.recipe)) {
-                const auto reg        = resolveMaterial(recipeByName("regular"), D);
-                res.shadowOpacity     = reg.shadowOpacity;
-                res.shadowOpacityDark = reg.shadowOpacityDark;
-                res.shadowRadius      = reg.shadowRadius;
-                res.shadowOffsetY     = reg.shadowOffsetY;
-            }
-            data.resolved.push_back(res);
-        }
+        for (size_t gi = 0; gi < data.groups.size(); ++gi)
+            data.resolved.push_back(resolveGroup(data, gi, false, 0.5f));
     }
 
     CGlassElement::CGlassElement(SData data) : m_data(std::move(data)) {
@@ -436,7 +368,7 @@ namespace lg {
     }
 
     static double reachOf(const SParams& p, const SResolved& res) {
-        const double shift = std::max({std::abs(res.refractionAmount), std::abs(res.outerAmount), res.bleedAmount}) * std::abs(p.refractionScale);
+        const double shift = std::max({std::abs(res.refractionAmount), res.outerOpacity > 0 ? std::abs(res.outerAmount) : 0.f, res.bleedAmount}) * std::abs(p.refractionScale);
         return shift + p.aberration + 8.0;
     }
 
@@ -446,8 +378,6 @@ namespace lg {
             return;
         resolveShapes(data);
         const double m = margin(data);
-        if (data.pointerLight)
-            notePointerGlass(data);
         if (data.params->fullDamage)
             return; // everything is redrawn anyway
         for (size_t i = 0; i < data.groups.size(); ++i)
@@ -639,14 +569,12 @@ namespace lg {
         glUniform1i(u.tex, 0);
         glUniform1i(u.sharpTex, 1);
         glUniform1i(u.linearLight, p.linearLight ? 1 : 0);
-        glUniform1f(u.outerOpacity, r.outerOpacity);
-        // QuartzCore defaults for the rim band of the outer layer (SPEC 9.7: distances -11 / -3)
-        glUniform2f(u.outerThreshold, -11.f * scale, -3.f * scale);
+        // the outer layer fades in over the outermost 1 pt (RefractionDistance0 / 1 = -1 / 0)
+        glUniform2f(u.outerThreshold, -1.f * scale, 0.f);
         glUniform1f(u.roundingPower, m_data.roundingPower.value_or(p.roundingPower));
         glUniform1f(u.alpha, m_data.alpha);
         glUniform1f(u.aberration, p.aberration * scale);
         glUniform1f(u.pxPerPt, scale);
-        glUniform2f(u.highlight, p.highlight, r.diffuse);
         glUniform1f(u.shadowTint, p.shadowTint);
         glUniform1f(u.shadowSaturation, r.shadowSaturation);
         glUniform1f(u.ringOpacity, r.ringOpacity * p.ringScale);
@@ -656,8 +584,6 @@ namespace lg {
 
         glUniform1f(u.smoothK, m_data.smoothK * scale);
         glUniform1f(u.appearBlur, 10.f * scale); // SwiftUI materialize AppearanceSettings.blurRadius
-        const Vector2D ptr   = (g_pointer.pos - m_data.monitorPos) * scale; // monitor-local physical px
-        const float    press = float(pressLevel());
 
         g_pHyprOpenGL->blend(true);
         g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -667,9 +593,9 @@ namespace lg {
         glBindVertexArray(shader->getUniformLocation(SHADER_SHADER_VAO));
 
         for (size_t q = 0; q < quads.size(); ++q) {
-            const auto& [index, quad, damage, res] = quads[q];
+            const auto& [index, quad, damage, geo] = quads[q];
             const auto& g                          = m_data.groups[index];
-            const auto& face                       = dark[q] ? r.dark : r.light;
+            const auto  res                        = resolveGroup(m_data, index, dark[q], p.tintAmount);
 
             shader->setUniformMatrix3fv(SHADER_PROJ, 1, GL_TRUE, g_pHyprRenderer->projectBoxToTarget(ctx, quad).getMatrix());
             // quad corners in each texture's uv (the textures hold different parts of the output)
@@ -692,28 +618,29 @@ namespace lg {
             glUniform1i(u.shapeCount, int(g.members.size()));
             glUniform4fv(u.shapeBox, GLsizei(g.members.size()), boxes.data());
             glUniform2fv(u.shapeInfo, GLsizei(g.members.size()), info.data());
-            glUniform2f(u.pointer, ptr.x - quad.x, ptr.y - quad.y);
-            glUniform3f(u.pointerLight, m_data.pointerLight ? p.pointerLight : 0.f, p.pointerLightRadius * scale, press);
             glUniform1f(u.blurLod, blurLodOf(p, res));
             glUniform1f(u.refraction, res.refractionAmount * p.refractionScale * scale);
             glUniform1f(u.refractionHeight, res.refractionHeight * scale);
             glUniform2f(u.blurDist, res.blurDist0 * scale, r.blurDist1 * scale);
+            glUniform1f(u.outerOpacity, res.outerOpacity);
             glUniform1f(u.outerAmount, res.outerAmount * p.refractionScale * scale);
             glUniform1f(u.outerHeight, res.outerHeight * scale);
-            glUniform3f(u.blurFill, face.blurFill.lighten, face.blurFill.darken, face.blurFill.normal);
+            glUniform3f(u.blurFill, res.blurFill.lighten, res.blurFill.darken, res.blurFill.normal);
             glUniform1f(u.bleedOpacity, res.bleedOpacity);
             glUniform1f(u.bleedHeight, res.bleedHeight * scale);
             glUniform1f(u.bleedAmount, res.bleedAmount * p.refractionScale * scale);
-            glUniform1f(u.bleedLod, std::log2(1.f + res.bleedBlur * scale));
-            glUniform3f(u.bleedYcc, face.bleed.black, face.bleed.white, face.bleed.saturation);
-            glUniform4f(u.faceYcc, face.ycc.black, face.ycc.white, face.ycc.saturation, dark[q] ? res.maxLumaDark : res.maxLumaLight);
+            // Apple samples the bleed from its backdrop texture (scale 0.5 / 0.25 / 0.125 of the display) at mip 0
+            glUniform1f(u.bleedLod, -std::log2(res.backdropScale));
+            glUniform4f(u.bleedYcc, res.bleed.black, res.bleed.white, res.bleed.saturation, res.bleedLighten ? 1.f : 0.f);
+            glUniform4f(u.faceYcc, res.ycc.black, res.ycc.white, res.ycc.saturation, res.maxLuma);
             glUniform3f(u.blurAlpha, res.blurAlpha[0], res.blurAlpha[1], res.blurAlpha[2]);
-            glUniform4f(u.faceFill, face.fill.r, face.fill.g, face.fill.b, face.fill.a);
-            glUniform3f(u.keyYcc, face.keyYcc.black, face.keyYcc.white, face.keyYcc.saturation);
+            glUniform4f(u.faceFill, res.fill.r, res.fill.g, res.fill.b, res.fill.a);
+            glUniform3f(u.keyYcc, res.keyYcc.black, res.keyYcc.white, res.keyYcc.saturation);
             const float keyRad = res.keySpread * float(M_PI / 180.0);
             glUniform2f(u.keySpread, std::cos(keyRad), std::cos(0.65f * keyRad)); // diffuse: 0.65 x the spread
-            glUniform2f(u.darkSpec, face.darkBias, std::cos(face.darkSpread * float(M_PI / 180.0)));
-            glUniform1f(u.shadowOpacity, m_data.shadow ? (dark[q] ? res.shadowOpacityDark : res.shadowOpacity) * p.shadowScale : 0.f);
+            glUniform3f(u.highlight, p.highlight * res.keyScale, res.keyAmount, res.diffuseAmount);
+            glUniform2f(u.darkSpec, res.darkBias, std::cos(res.darkSpread * float(M_PI / 180.0)));
+            glUniform1f(u.shadowOpacity, m_data.shadow ? res.shadowOpacity * p.shadowScale : 0.f);
             glUniform1f(u.shadowRadius, res.shadowRadius * scale);
             glUniform2f(u.shadowOffset, 0.f, res.shadowOffsetY * scale);
 

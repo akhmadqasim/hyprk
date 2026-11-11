@@ -1,17 +1,19 @@
 #pragma once
-// macOS 27.2 glass material recipes (DesignLibrary GlassRecipes, glass version v2), recovered in
-// /mnt/code/liquid-glass-re/SPEC.md section 9 and glass-defaults.json; drop shadows from the resolved
-// filter inputs measured on a real Mac (reference/re/LIVE-27.2.1.md). Pure code, unit tested.
+// macOS 27.2.1 glass material recipes (DesignLibrary GlassRecipes, glass version v2) and the Liquid Glass slider,
+// as verified on the Mac against the binaries and the screen (reference/re/MAC-ANSWERS.md "Verification of motion and
+// glass claims (PC #67)" B and C, "C2. Remaining glass items"; code in reference/re/27.2.1/decomp/
+// DesignLibrary-diffusion-amount.c and QuartzCore-glassBackground-shader.c). Pure code, unit tested, and checked
+// against Apple's model by plugin/tools/check_model.py.
 //
-// Apple's numbers are size-relative: most lengths are "normalized x D" where D is the smallest
-// extent of the glass shape in points. resolveMaterial() turns a recipe + D into concrete values.
+// Apple's numbers are size-relative: D is the smallest extent of the glass shape in points. resolveMaterial() turns a
+// recipe + D + light/dark + slider value into the inputs the shader takes.
 
 #include <array>
 #include <string_view>
 
 namespace lg {
 
-    // YCC colour effect (CA::ColorMatrix::set_ycc_composite, SPEC 9.7):
+    // YCC colour effect (CA::ColorMatrix::set_ycc_composite):
     // Y' = black + (white - black) Y, chroma x saturation, then the fill over it
     struct SYcc {
         float black = 0, white = 1, saturation = 1;
@@ -26,58 +28,64 @@ namespace lg {
         float lighten = 0, darken = 0, normal = 0;
     };
 
-    // one side (light or dark) of a recipe
+    // which DesignLibrary base the recipe has, and with it the slider response
+    enum class eFamily {
+        REGULAR, // RegularBase + RegularDiffusionAmount: Regular, Menu, Notification Center
+        CLEAR,   // ClearSpec + ClearDiffusionAmount: Clear, Dock, Control Center
+        FIXED,   // not decoded (Spotlight / Siri): the slider changes nothing
+    };
+
+    // one side (light or dark) of a recipe, as at slider 0.5
     struct SFace {
         SYcc      ycc;
-        SRgba     fill;  // "normalFill"
-        SYcc      bleed; // edge bleed colour effect
+        SRgba     fill;     // normalFill (straight alpha)
+        SYcc      bleed;    // edge bleed colour matrix (Regular family)
         SBlurFill blurFill;
-        // rim, both from the 27.2.1 probe (reference/re/27.2.1/live/glass-params-*.json):
-        // key/fill highlight layer target = its vibrantColorMatrix as YCC (the matrix is
-        // a*I - k*luma plus an offset: black = offset, white = offset + a - k, saturation = a)
+        // key/fill highlight layer target = its vibrantColorMatrix as YCC (the matrix is a*I - k*luma plus an
+        // offset: black = offset, white = offset + a - k, saturation = a). Regular: R row 1.1202 -0.1894 -0.019 | 0.1471
         SYcc  keyYcc = {0.1471f, 1.0588f, 1.1765f};
-        float darkBias   = -0.25f; // glass filter key highlight colourBias ("dark specular")
-        float darkSpread = 96;     // its spread, degrees
-        // inputFaceColorMatrixMaxLuma at D <= 64, 96 and >= 128 (the probe's sizes, linear in between; 1 = off):
-        // the backdrop luma is bent so white lands here before the face, Y - (1 - m) Y^2. Parameter from the probe;
-        // curve and its place fitted to the dark Dock (MAC-ANSWERS "Glass checks (#53)") and the dark menu (Q-menubar-13)
-        std::array<float, 3> maxLuma = {1, 1, 1};
+        float darkBias   = -0.25f; // dark specular colourBias
+        float darkSpread = 75;     // its spread on SDR (KeyFillHighlightSpreadSDR), degrees
+        // max luma of the CLEAR / FIXED families (Dock dark 0.75); the REGULAR family computes it (resolveMaterial)
+        float maxLuma = 1;
     };
 
     struct SRecipe {
-        const char* name = "regular";
+        const char* name   = "regular";
+        eFamily     family = eFamily::REGULAR;
         SFace       light, dark;
 
         // inner refraction: height = clamp(heightN * D, 0, heightMax); amount = max(amountN * D, amountMin)
         float refractionHeightN = 0.25f, refractionHeightMax = 20.f;
         float refractionAmountN = -0.5f, refractionAmountMin = -60.f;
 
-        // outer refraction layer: height/amount x D, mixed in over the rim band by outerOpacity
-        float outerHeightN = 0, outerAmountN = 0, outerOpacity = 0;
+        // outer refraction (a second sample outside the shape, mixed into the outermost 1 pt):
+        // height = max(outerHeightN * D, outerMin), amount = max(outerAmountN * D, outerMin)
+        float outerHeightN = 0, outerAmountN = 0, outerMin = 0, outerOpacity = 0;
 
-        // Apple blur radius: lerp(blurLo, blurHi) over D in [blurD0, blurD1]
+        // blur of the face: hyprk's own kernel (Hyprland's blur + mips of a sharp copy, see README "Blur"), not
+        // Apple's mip-of-a-scaled-backdrop. radius lerp(blurLo, blurHi) over D in [blurD0, blurD1] feeds the mip level.
         float blurD0 = 64, blurD1 = 160, blurLo = 0, blurHi = 4;
         // variable blur: radius x (alpha0 - alpha1 ramp(d, dist0, dist1) - alpha2 ramp(d, dist1, 0)),
-        // d < 0 inside. dist0 = dist0N * D + dist0Fixed (Apple's "inset 0.5" read as half of D, a guess)
+        // d < 0 inside. dist0 = dist0N * D + dist0Fixed
         float                blurDist0N = -0.5f, blurDist0Fixed = 0, blurDist1 = -1;
         std::array<float, 3> blurAlpha  = {1, 0.5f, 0.5f};
         // alpha0 and alpha1 x lerp(0, 1) over D in [blurAlphaD0, blurAlphaD1] (equal: always full)
         float blurAlphaD0 = 0, blurAlphaD1 = 0;
+        // Apple's BlurRadius, only for the backdrop scale estimator (Regular family)
+        float appleBlurRadius = 5;
 
-        // edge bleed: opacity lerp over D, height/amount/blur x D (blur max 160)
-        float bleedD0 = 64, bleedD1 = 160, bleedOpacityLo = 0, bleedOpacityHi = 0.5f;
-        float bleedHeightN = 0.35f, bleedAmountN = 0.35f, bleedBlurN = 0.35f;
-
-        // drop shadow: opacity and Gaussian radius lerp over D (shadowD0 == shadowD1: always the high
-        // end), the dark side has its own top opacity, offset, backdrop saturation (tint).
-        // Defaults = Regular measured on macOS 27.2.1 (reference/re/LIVE-27.2.1.md).
+        // drop shadow: opacity and Gaussian radius lerp over D (shadowD0 == shadowD1: always the high end),
+        // the dark side has its own top opacity. Regular: 0.04 + 0.56 q dark (Mac dumps by size), light 0.04 -> 0.4
+        // (LIVE-27.2.1.md), radius 4 + 20 q, q = clamp((D - 64) / 96), y 8.
         float shadowD0 = 64, shadowD1 = 160, shadowOpacityLo = 0.04f, shadowOpacityHi = 0.4f, shadowOpacityHiDark = 0.6f;
         float shadowRadiusLo = 4, shadowRadius = 24, shadowOffsetY = 8, shadowSaturation = 1.f;
 
-        // rim: amount of the key/fill highlight's diffuse band, (1 - depth / 8 pt)^3 under the 1 pt key band
-        // (shaders/liquidglass.frag). 0.49 fitted to the Mac HUD (Control Center glass); the Notification Center
-        // card's rim fits the key band alone (MAC-ANSWERS PC #62 1a), so that recipe has 0
-        float diffuse = 0.49f;
+        // key/fill highlight (CASDFKeyFillHighlightEffect): key amount, diffuse band amount (Apple 0.5 and 0.5 x 0.15)
+        // and a scale of the whole mask (1 = Apple; Notification Center 1.23, its measured rim)
+        float keyAmount = 0.5f, diffuseAmount = 0.075f, keyScale = 1;
+        // D the slider's max luma reads at least (DesignLibrary dimensions.minimumDistanceOfLargestArea): 0 = the shape's
+        float faceDMin = 0;
 
         // ring shadow: offset y, stroke, blur radius, opacity (0 = off)
         float ringOffsetY = 0, ringStroke = 0, ringRadius = 0, ringOpacity = 0;
@@ -88,21 +96,35 @@ namespace lg {
 
     struct SResolved { // pt unless noted
         float refractionHeight = 0, refractionAmount = 0;
-        float outerHeight = 0, outerAmount = 0;
-        float blurRadius   = 0; // Apple units (backdrop texels at 1/4 scale)
+        float outerHeight = 0, outerAmount = 0, outerOpacity = 0;
+        float blurRadius   = 0; // hyprk blur units (mip level input)
         float blurDist0    = 0;
-        float bleedOpacity = 0, bleedHeight = 0, bleedAmount = 0, bleedBlur = 0;
-        float shadowOpacity = 0, shadowOpacityDark = 0; // light side, dark side
-        float shadowRadius  = 0, shadowOffsetY = 0;
-        float keySpread     = 80; // degrees, key/fill highlight lobe (SPEC 9.4: D 96 -> 192 : 80 -> 90)
         std::array<float, 3> blurAlpha = {1, 0.5f, 0.5f};
-        float maxLumaLight = 1, maxLumaDark = 1; // SFace::maxLuma at this D
+        SYcc      ycc;
+        SRgba     fill;
+        SBlurFill blurFill;
+        float     maxLuma = 1;
+        // edge bleed: out = mix(face, bleed(s), g^4 opacity), g = Y(face) if bleedLighten else 1 - Y(face)
+        float bleedOpacity = 0, bleedAmount = 0, bleedHeight = 0;
+        SYcc  bleed;
+        bool  bleedLighten = false;
+        float backdropScale = 0.5f; // Apple's backdrop texture scale (perceptual estimator), the bleed sample's mip
+        float shadowOpacity = 0, shadowRadius = 0, shadowOffsetY = 0;
+        float keySpread = 80; // degrees, key/fill highlight lobe: 80 up to D 96, 90 from D 191
+        SYcc  keyYcc;
+        float keyAmount = 0.5f, diffuseAmount = 0.075f, keyScale = 1;
+        float darkBias = -0.25f, darkSpread = 75;
     };
 
     // false when the recipe never draws a drop shadow (Clear, Dock, Control Center)
     bool hasShadow(const SRecipe& r);
 
-    SResolved resolveMaterial(const SRecipe& r, double D);
+    // tint = Liquid Glass slider (NSGlassTintAmount) 0..1, 0.5 = the recipe as is
+    SResolved resolveMaterial(const SRecipe& r, double D, bool dark, double tint = 0.5);
+
+    // DesignLibrary GlassMaterialProvider.BackdropScalePerceptualEstimator: first of 0.125 / 0.25 / 0.5 whose
+    // visible alias is <= 0.05 (r = blur radius x opacity0, rf = blur-fill radius, N = normal opacity, F = fill alpha)
+    float backdropScale(double r, double rf, double N, double F);
 
     // clampedLinear(in0, in1, out0, out1) on x, Apple's ParameterScale
     double clampedLinear(double x, double in0, double in1, double out0, double out1);

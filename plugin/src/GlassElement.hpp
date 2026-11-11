@@ -37,7 +37,6 @@ namespace lg {
             int pxPerPt, keyYcc, keySpread, highlight, darkSpec;
             int shadowOpacity, shadowRadius, shadowOffset, shadowTint, shadowSaturation;
             int ringOpacity, ringOffset, ringStroke, ringRadius;
-            int pointer, pointerLight;
         } u{};
 
       private:
@@ -55,11 +54,6 @@ namespace lg {
 
     // once per monitor frame: ages the per-surface light/dark state
     void onFrame();
-    // pointer for the interactive light: global logical position and whether a button is held.
-    // Damages the glass the light moves over (call from the input listeners).
-    void onPointer(const Vector2D& global, std::optional<bool> pressed);
-    // after a frame: keeps redrawing glass under the pointer while the press light fades out
-    void onFrameDone();
     // a layer or window went away: drop its light/dark state (its address may be reused)
     void forgetOwner(uintptr_t owner);
     // frees the plugin's GL objects (PLUGIN_EXIT, GL context current)
@@ -72,8 +66,6 @@ namespace lg {
         struct SData {
             std::vector<SGlassShape>       shapes; // monitor-local logical px
             double                         smoothK = 0;          // smooth-union reach (logical px), 0 = no merging
-            bool                           pointerLight = false; // interactive light around the pointer
-            Vector2D                       monitorPos;           // global position of the monitor (pointer light)
             float                          alpha = 1.f;
             std::shared_ptr<const SParams> params;
             const SRecipe*                 recipe = &recipeByName("regular");

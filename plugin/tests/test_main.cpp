@@ -90,78 +90,82 @@ int main() {
         CHECK(m.size() == 1 && m["hyprk-dock"] == "dock");
     }
 
-    // recipes: SPEC 9 values resolved against D (smallest extent, pt)
+    // recipes resolved against D (smallest extent, pt), light/dark and the Liquid Glass slider; the full grid is checked
+    // against Apple's model by tools/check_model.py (ctest apple_model), these pin the numbers the shell relies on
     {
         const auto& reg = recipeByName("regular");
-        auto        r   = resolveMaterial(reg, 40);
-        CHECK(near(r.refractionHeight, 10, 1e-4) && near(r.refractionAmount, -20, 1e-4) && near(r.blurRadius, 2)); // blur floor 2 (JUDGE-r2)
-        r = resolveMaterial(reg, 200); // clamps: height 20, amount -60, blur 4
-        CHECK(near(r.refractionHeight, 20, 1e-4) && near(r.refractionAmount, -60, 1e-4) && near(r.blurRadius, 4, 1e-4));
-        CHECK(near(resolveMaterial(reg, 104).blurRadius, 3, 1e-4));
-        CHECK(near(recipeByName("dock").light.ycc.white, 0.9, 1e-6));
-        // dark Dock max luma 0.75 (probe), every other face 1 (MAC-ANSWERS "Glass checks (#53)")
-        CHECK(near(resolveMaterial(recipeByName("dock"), 84).maxLumaDark, 0.75, 1e-6) && near(resolveMaterial(recipeByName("dock"), 84).maxLumaLight, 1) &&
-              near(resolveMaterial(recipeByName("controlcenter"), 300).maxLumaDark, 1));
-        // Regular / menu = the 27.2.1 probe `regular`: face, fill, max luma and blur opacities by D
-        {
-            const auto& mn = recipeByName("menu");
-            CHECK(near(mn.light.ycc.white, 1.03, 1e-6) && near(mn.light.fill.a, 0.2, 1e-6) && near(mn.light.blurFill.lighten, 0.9, 1e-6));
-            CHECK(near(resolveMaterial(mn, 24).maxLumaDark, 0.6, 1e-6) && near(resolveMaterial(mn, 96).maxLumaDark, 0.4, 1e-6) &&
-                  near(resolveMaterial(mn, 112).maxLumaDark, 0.375, 1e-6) && near(resolveMaterial(mn, 400).maxLumaDark, 0.35, 1e-6));
-            const auto a96 = resolveMaterial(mn, 96).blurAlpha, a24 = resolveMaterial(mn, 24).blurAlpha, a240 = resolveMaterial(mn, 240).blurAlpha;
-            CHECK(near(a96[0], 0.26667, 1e-4) && near(a96[1], 0.13333, 1e-4) && near(a96[2], 0.5, 1e-6) && near(a24[0], 0) && near(a240[0], 0.8, 1e-6));
-            CHECK(near(resolveMaterial(recipeByName("controlcenter"), 30).blurAlpha[0], 1, 1e-6));
-        }
-        CHECK(near(resolveMaterial(recipeByName("controlcenter"), 60).refractionAmount, -80, 1e-4));
+        auto        r   = resolveMaterial(reg, 40, true);
+        CHECK(near(r.refractionHeight, 10, 1e-4) && near(r.refractionAmount, -20, 1e-4) && near(r.blurRadius, 2)); // hyprk blur floor 2 (JUDGE-r2)
+        CHECK(near(r.outerHeight, 16, 1e-5) && near(r.outerAmount, 16, 1e-5) && near(r.outerOpacity, 0.6, 1e-6)); // outer max(0.2 D, 16) / max(0.25 D, 16)
+        r = resolveMaterial(reg, 200, true); // clamps: height 20, amount -60, blur 4
+        CHECK(near(r.refractionHeight, 20, 1e-4) && near(r.refractionAmount, -60, 1e-4) && near(r.blurRadius, 4, 1e-4) && near(r.outerHeight, 40, 1e-4) &&
+              near(r.outerAmount, 50, 1e-4));
+        // face: dark max luma lerp(0.6, 0.35) over D 64 -> 104, light maxLumaSDR 0.94; edge bleed 0.8 / 0.5 x q
+        CHECK(near(resolveMaterial(reg, 24, true).maxLuma, 0.6, 1e-6) && near(resolveMaterial(reg, 96, true).maxLuma, 0.4, 1e-6) &&
+              near(resolveMaterial(reg, 400, true).maxLuma, 0.35, 1e-6) && near(resolveMaterial(reg, 64, false).maxLuma, 0.94, 1e-6));
+        CHECK(near(resolveMaterial(reg, 96, true).bleedOpacity, 0.26667, 1e-4) && near(resolveMaterial(reg, 96, false).bleedOpacity, 0.16667, 1e-4) &&
+              near(resolveMaterial(reg, 64, true).bleedOpacity, 0) && near(resolveMaterial(reg, 200, true).bleedAmount, 70, 1e-4));
+        CHECK(resolveMaterial(reg, 200, false).bleedLighten && !resolveMaterial(reg, 200, true).bleedLighten);
+        // the slider (RegularDiffusionAmount): blur fill, fill, dark max luma; 0.5 = the recipe
+        r = resolveMaterial(reg, 64, true, 0);
+        CHECK(near(r.blurFill.darken, 0.675, 1e-6) && near(r.blurFill.normal, 0) && near(r.fill.a, 0) && near(r.maxLuma, 0.6, 1e-6));
+        r = resolveMaterial(reg, 64, true, 1);
+        CHECK(near(r.blurFill.darken, 0.9, 1e-6) && near(r.blurFill.normal, 1) && near(r.fill.r, 0.125, 1e-6) && near(r.fill.a, 0.5, 1e-6));
+        CHECK(near(resolveMaterial(reg, 64, false, 0.75).fill.a, 0.35, 1e-6) && near(resolveMaterial(reg, 64, false, 0.25).fill.a, 0.1, 1e-6));
+        CHECK(near(resolveMaterial(reg, 200, true, 0).maxLuma, 0.45, 1e-6) && near(resolveMaterial(reg, 200, true, 0.25).maxLuma, 0.4, 1e-6));
+        // backdrop scale estimator: 0.5 at D <= 64 below a = 1, 0.25 for panels from a = 0.5, 0.125 at a = 1 (Mac C2 4)
+        CHECK(near(resolveMaterial(reg, 64, true, 0.75).backdropScale, 0.5) && near(resolveMaterial(reg, 64, true, 1).backdropScale, 0.125) &&
+              near(resolveMaterial(reg, 200, true, 0.5).backdropScale, 0.25) && near(resolveMaterial(reg, 200, false, 0.25).backdropScale, 0.5));
+        // rim: dark specular 75 deg dark / 106 light, key spread 80 -> 90 over D 96 -> 191, key amount 0.5, diffuse 0.075
+        CHECK(near(resolveMaterial(reg, 64, true).darkSpread, 75) && near(resolveMaterial(reg, 64, false).darkSpread, 106) &&
+              near(resolveMaterial(reg, 191, true).keySpread, 90, 1e-4) && near(resolveMaterial(reg, 64, true).diffuseAmount, 0.075, 1e-6));
+        // shadow by size: 0.04 + 0.56 q dark, light to 0.4, radius 4 + 20 q, y 8
+        r = resolveMaterial(reg, 24, true);
+        CHECK(near(r.shadowOpacity, 0.04, 1e-6) && near(r.shadowRadius, 4, 1e-5) && near(r.shadowOffsetY, 8));
+        CHECK(near(resolveMaterial(reg, 96, false).shadowOpacity, 0.16, 1e-5) && near(resolveMaterial(reg, 96, true).shadowOpacity, 0.22667, 1e-5) &&
+              near(resolveMaterial(reg, 400, true).shadowOpacity, 0.6, 1e-6) && near(resolveMaterial(reg, 400, false).shadowRadius, 24, 1e-5));
+        CHECK(hasShadow(reg) && near(resolveMaterial(reg, 400, true, 0).shadowOpacity, 0.6, 1e-6)); // the slider leaves the shadow
+
+        const auto& mn = recipeByName("menu");
+        r              = resolveMaterial(mn, 24, false);
+        CHECK(near(r.ycc.white, 1.03, 1e-6) && near(r.fill.a, 0.2, 1e-6) && near(r.blurFill.lighten, 0.9, 1e-6) && near(r.shadowOpacity, 0.7, 1e-6) &&
+              near(r.shadowRadius, 24, 1e-5) && near(r.shadowOffsetY, 10));
+        CHECK(near(resolveMaterial(mn, 24, true).shadowOpacity, 0.8, 1e-6));
+
+        // Notification Center: Regular, max luma of the column's D (>= 104), rim = 1.23 x the key band, no diffuse
+        const auto& nc = recipeByName("notificationcenter");
+        CHECK(std::string{nc.name} == "notificationcenter" && hasShadow(nc) && near(resolveMaterial(nc, 75, true).maxLuma, 0.35, 1e-6) &&
+              near(resolveMaterial(nc, 75, false).maxLuma, 0.94, 1e-6) && near(resolveMaterial(nc, 75, true).keyScale, 1.23, 1e-6) &&
+              near(resolveMaterial(nc, 75, true).diffuseAmount, 0) && near(resolveMaterial(nc, 75, true).shadowOpacity, resolveMaterial(reg, 75, true).shadowOpacity, 1e-6));
         CHECK(std::string{recipeByName("nope").name} == "regular");
-        {
-            // Notification Center: Regular with the dark max luma held at the D >= 128 value (surfaceSize .medium)
-            const auto& nc = recipeByName("notificationcenter");
-            CHECK(std::string{nc.name} == "notificationcenter" && hasShadow(nc) && near(nc.dark.ycc.white, 1.125, 1e-6) && near(nc.diffuse, 0) &&
-                  near(reg.diffuse, 0.49, 1e-6));
-            CHECK(near(resolveMaterial(nc, 75).maxLumaDark, 0.35, 1e-6) && near(resolveMaterial(nc, 24).maxLumaDark, 0.35, 1e-6) &&
-                  near(resolveMaterial(nc, 75).maxLumaLight, 1));
-            CHECK(near(resolveMaterial(nc, 75).shadowOpacityDark, resolveMaterial(reg, 75).shadowOpacityDark, 1e-6));
-        }
-        // 27.2.1 probe (reference/re/27.2.1/live/glass-params-*.json): Control Center (also the HUD) is the
-        // same face light and dark, no bleed; Clear and Dock as resolved there; key spread 80 -> 90 over D 96 -> 192
+
+        // Clear family: no bleed, no shadow, colours fixed; the slider scales the blur (x 2a) or adds a blur fill (2a - 1)
         const auto& cc = recipeByName("controlcenter");
-        for (const auto* f : {&cc.light, &cc.dark})
-            CHECK(near(f->ycc.black, 0.125, 1e-6) && near(f->ycc.white, 0.8, 1e-6) && near(f->ycc.saturation, 1.2, 1e-6) && near(f->fill.a, 0) &&
-                  near(f->darkBias, -0.3, 1e-6) && near(f->darkSpread, 75) && near(f->keyYcc.white, 1.4666, 1e-4));
-        CHECK(near(cc.blurAlpha[1], 0.1, 1e-6) && near(resolveMaterial(cc, 96).bleedOpacity, 0) && near(resolveMaterial(cc, 160).keySpread, 86.6667, 1e-3));
-        r = resolveMaterial(recipeByName("clear"), 64);
-        CHECK(near(r.refractionHeight, 20, 1e-4) && near(r.refractionAmount, -41.6, 1e-4) && near(r.blurRadius, 0.75, 1e-6) && near(r.bleedOpacity, 0));
-        r = resolveMaterial(recipeByName("dock"), 64);
-        CHECK(near(r.refractionHeight, 5.12, 1e-4) && near(r.refractionAmount, -11.52, 1e-4) && near(r.outerAmount, 0) && near(r.bleedOpacity, 0));
-        CHECK(near(recipeByName("dock").light.ycc.saturation, 1.25, 1e-6) && near(recipeByName("dock").dark.fill.a, 0.02, 1e-6));
-        // drop shadows as measured on macOS 27.2.1 (reference/re/LIVE-27.2.1.md)
-        r = resolveMaterial(reg, 24);
-        CHECK(near(r.shadowOpacity, 0.04, 1e-6) && near(r.shadowOpacityDark, 0.04, 1e-6) && near(r.shadowRadius, 4, 1e-5));
-        r = resolveMaterial(reg, 96);
-        CHECK(near(r.shadowOpacity, 0.16, 1e-5) && near(r.shadowOpacityDark, 0.22667, 1e-5) && near(r.shadowRadius, 10.66667, 1e-4));
-        r = resolveMaterial(reg, 400);
-        CHECK(near(r.shadowOpacity, 0.4, 1e-6) && near(r.shadowOpacityDark, 0.6, 1e-6) && near(r.shadowRadius, 24, 1e-5));
-        r = resolveMaterial(recipeByName("menu"), 24);
-        CHECK(near(r.shadowOpacity, 0.7, 1e-6) && near(r.shadowOpacityDark, 0.8, 1e-6) && near(r.shadowRadius, 24, 1e-5));
-        CHECK(near(recipeByName("menu").shadowOffsetY, 10, 1e-6));
-        for (const char* n : {"clear", "dock", "controlcenter"})
-            CHECK(!hasShadow(recipeByName(n)) && near(resolveMaterial(recipeByName(n), 200).shadowOpacityDark, 0, 1e-6));
-        CHECK(hasShadow(reg));
-        // Spotlight = SiriRecipe.SiriModifier branch A (reference/re/NOTES.md): no shadow, no edge bleed, no ring,
-        // unclamped refraction 0.4 D / -0.72 D, outer 0.4 D / 0.4 D at 1.0, blur from 60 pt inside the edge
+        for (const bool dark : {false, true}) {
+            r = resolveMaterial(cc, 64, dark);
+            CHECK(near(r.ycc.black, 0.125, 1e-6) && near(r.ycc.white, 0.8, 1e-6) && near(r.ycc.saturation, 1.2, 1e-6) && near(r.fill.a, 0) &&
+                  near(r.darkBias, -0.3, 1e-6) && near(r.darkSpread, 75) && near(r.keyYcc.white, 1.4666, 1e-4) && near(r.maxLuma, 1) && near(r.bleedOpacity, 0));
+        }
+        CHECK(near(resolveMaterial(cc, 60, true).refractionAmount, -80, 1e-4) && near(resolveMaterial(cc, 30, true).blurAlpha[0], 1, 1e-6) &&
+              near(resolveMaterial(cc, 30, true, 0.25).blurAlpha[0], 0.5, 1e-6) && near(resolveMaterial(cc, 30, true, 0.75).blurFill.normal, 0.5, 1e-6) &&
+              near(resolveMaterial(cc, 30, true, 0.75).ycc.white, 0.8, 1e-6));
+        r = resolveMaterial(recipeByName("clear"), 64, false, 0);
+        CHECK(near(r.refractionHeight, 20, 1e-4) && near(r.refractionAmount, -41.6, 1e-4) && near(r.blurRadius, 0) && near(r.outerOpacity, 0) && !hasShadow(recipeByName("clear")));
+        CHECK(near(resolveMaterial(recipeByName("clear"), 64, false, 1).blurRadius, 0.75, 1e-6) && near(resolveMaterial(recipeByName("clear"), 64, false, 1).blurFill.normal, 1));
+        const auto& dock = recipeByName("dock");
+        r                = resolveMaterial(dock, 64, true);
+        CHECK(near(r.maxLuma, 0.75, 1e-6) && near(r.fill.a, 0.02, 1e-6) && near(r.ycc.saturation, 1.25, 1e-6) && near(r.darkSpread, 75) && near(r.outerOpacity, 0.2, 1e-6) &&
+              near(r.outerAmount, 0) && near(r.refractionAmount, -32, 1e-4) && near(resolveMaterial(dock, 64, false).ycc.white, 0.9, 1e-6) && !hasShadow(dock));
+
+        // Spotlight (SiriRecipe, not in the verified model): unclamped refraction 0.4 D / -0.72 D, outer 0.4 D at 1.0,
+        // blur from 60 pt inside the edge; the slider changes nothing
         const auto& sp = recipeByName("spotlight");
         CHECK(std::string{sp.name} == "spotlight" && !hasShadow(sp) && near(sp.ringOpacity, 0));
-        r = resolveMaterial(sp, 60);
-        CHECK(near(r.refractionHeight, 24, 1e-4) && near(r.refractionAmount, -43.2, 1e-4));
-        CHECK(near(r.outerHeight, 24, 1e-4) && near(r.outerAmount, 24, 1e-4) && near(sp.outerOpacity, 1));
-        CHECK(near(r.bleedOpacity, 0) && near(r.shadowOpacity, 0) && near(r.shadowOpacityDark, 0));
-        CHECK(near(r.blurDist0, -60, 1e-4) && near(sp.blurDist1, -1) && near(sp.blurAlpha[0], 1) && near(sp.blurAlpha[1], 0) && near(sp.blurAlpha[2], 1));
-        r = resolveMaterial(sp, 400); // no regular caps, constant blur
-        CHECK(near(r.refractionHeight, 160, 1e-3) && near(r.refractionAmount, -288, 1e-3) && near(r.blurRadius, resolveMaterial(sp, 30).blurRadius));
-        for (const auto* f : {&sp.light, &sp.dark})
-            CHECK(near(f->ycc.black, 0.1, 1e-6) && near(f->ycc.white, 1) && near(f->ycc.saturation, 1.25, 1e-6) && near(f->fill.a, 0) &&
-                  near(f->blurFill.darken, 0.75, 1e-6) && near(f->blurFill.normal, 0.5, 1e-6));
+        r = resolveMaterial(sp, 60, false);
+        CHECK(near(r.refractionHeight, 24, 1e-4) && near(r.refractionAmount, -43.2, 1e-4) && near(r.outerHeight, 24, 1e-4) && near(r.outerAmount, 24, 1e-4) &&
+              near(r.outerOpacity, 1) && near(r.bleedOpacity, 0) && near(r.shadowOpacity, 0) && near(r.blurDist0, -60, 1e-4));
+        CHECK(near(resolveMaterial(sp, 60, true, 0).blurFill.darken, 0.75, 1e-6) && near(resolveMaterial(sp, 60, true, 1).blurAlpha[0], 1) &&
+              near(resolveMaterial(sp, 400, false).refractionAmount, -288, 1e-3));
     }
     CHECK(near(clampedLinear(48, 48, 160, 0.25, 0.75), 0.25) && near(clampedLinear(104, 48, 160, 0.25, 0.75), 0.5) && near(clampedLinear(500, 48, 160, 0.25, 0.75), 0.75));
 
@@ -184,10 +188,9 @@ int main() {
     CHECK(near(radiusFor(p, "hyprk-menubar", 12), 0));
     CHECK(near(radiusFor(p, "hyprk-dock", 12), 12));
     p.spacing = {{"hyprk-dock", 12}};
-    p.pointerLightNamespaces = {"hyprk-dock"};
-    CHECK(near(smoothKFor(p, "hyprk-dock"), 12) && near(smoothKFor(p, "x"), 0) && pointerLightFor(p, "hyprk-dock") && !pointerLightFor(p, "x"));
+    CHECK(near(smoothKFor(p, "hyprk-dock"), 12) && near(smoothKFor(p, "x"), 0));
     p.reduceMotion = true;
-    CHECK(near(smoothKFor(p, "hyprk-dock"), 0) && !pointerLightFor(p, "hyprk-dock"));
+    CHECK(near(smoothKFor(p, "hyprk-dock"), 0));
     p.reduceMotion = false;
     p.defaultRadius = 8;
     CHECK(near(radiusFor(p, "hyprk-dock", 12), 8));
