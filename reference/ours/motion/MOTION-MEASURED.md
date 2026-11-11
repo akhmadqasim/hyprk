@@ -90,7 +90,7 @@ not available here: that libinput finger scrolls reach Qt the same way is read f
 | Rubber band (trackpad), Finder and shell views (judge #2) | AppKit filter floor(D(1 - 1/(1 + d c / D))), c 0.075, first 10 pt nothing | judge: 0 px with a virtual pointer | 300 pt pull: 21 pt stretch in Finder and the Apps grid (filter 20.9), held while the fingers rest, returned on lift | - | content offset, fscroll finger events | works on screen; the judge's virtual pointer sent wheel events (see Method) |
 | Traffic-light glyphs (plugin, report only) | 0.07 s delay, ~0.1 s ease-out (M877) | in: starts ~70 ms after hover, 14/48/67/81/90/95/100 % per frame; out: 31/56/75/88/94/100 % | - | - | alpha on the lights | matches by eye |
 | Quick Look | 0.79 -> 1 in 0.25 s ease-out (.79 .85 .90 .93 .95 .97 .98 .98 .99 1, Q-finder-26) | code OutQuint 250 ms = the Mac series within 0.01 | on screen the first frame (0.79) shows twice (panel created), then the curve | not tracked (panel edge lost in the icon grid) | alpha, width | near (1 repeated frame) |
-| Mission Control exit, session 4 (one Settings window) | R2 exit series 0.21 .. 0.99; a critically damped spring fits it at rms 0.0043 only with a start velocity (response 0.355, 10 x the distance per second; from rest 0.0079 with its first 46 ms missing) | spring 0.31 from rest: 2-98 % 317-333 ms, first frame 0.07, a 3.8 % step at ~420 ms | start velocity 10/s (SpringCurve.kick): 282-285 ms, first frame 0.21 | 0.018-0.032 / 8.5-19 ms -> 0.011 / 4.6-8.5 ms (a third run dropped its first frame: 0.043) | alpha, full screen, k 4 | improved (Mac 267 ms); two windows at one place not re-measured |
+| Mission Control exit, session 4 (one Settings window, NOT reproduced: judge #3 measured 368 ms, 0.032-0.061, a repeated first frame and a 0.94 plateau; session 7 measured the same, see below) | R2 exit series 0.21 .. 0.99; a critically damped spring fits it at rms 0.0043 only with a start velocity (response 0.355, 10 x the distance per second; from rest 0.0079 with its first 46 ms missing) | spring 0.31 from rest: 2-98 % 317-333 ms, first frame 0.07, a 3.8 % step at ~420 ms | start velocity 10/s (SpringCurve.kick): 282-285 ms, first frame 0.21 | 0.018-0.032 / 8.5-19 ms -> 0.011 / 4.6-8.5 ms (a third run dropped its first frame: 0.043) | alpha, full screen, k 4 | improved (Mac 267 ms); two windows at one place not re-measured |
 | Notification Center open / close over 16 pt stripes, session 4 (plugin e7184e5) | nc/motion.json offsets, W 386 pt | - | open 3 runs, close 3 runs | open 0.0063-0.0066 (2.4-2.5 pt); close 0.007-0.029 (2.7-11 pt; one run with a late frame) | leading edge, threshold 30 | matches; the first frame comes 240 ms after the ipc call (Mac: 0.24 s after the click) |
 | Control Center open, repeated 2nd frame (session 4) | REA spring 0.25 | first visible frames 0.06, 0.09, then 0.21 / 0.34 (steps of 0.13) | tried: the spring started on the first swapped frame (no change: 0.06, 0.09) and one frame ahead (0.02, 0.02-0.03, then 0.18: the hold moves before the motion); both reverted | 0.007-0.022 / 5-11 ms either way | alpha | not fixed shell-side: see "Repeated frame after a layer maps" |
 
@@ -199,4 +199,48 @@ region (with the glassOpacity marker) from the GUI thread at the window's polish
 N+1 can run before the render thread commits frame N, so the region rides on the wrong commit. The fill surface and the
 panel are two windows on one animation, which makes it visible there. A clean fix is in Quickshell (set the region
 from the render thread right before the swap, or with the frame's commit), not in the shell; not done.
+
+## Session 7 (2026-11-11): Mission Control, render loop, HUD (after judge #3)
+
+Headless MBA, mcap alpha over the full screen (k 4) or the panel; per-frame values in `motion-measured.csv` (`*-s7*`).
+The host ran 6-9 other headless sessions on the same GPU: runs with frames 30-40 ms apart ("gaps") came and went in
+both render loops, so every row below is several runs and the spread is given.
+
+Mission Control (shell 455ae3a): the old layer faded the wallpaper over the real windows with `e`, so the real
+windows cross-faded under the flying thumbnails: the screen ran ahead of the spring early and behind it late, and the
+0.31 / 0.35 responses were stretches of that. Now the wallpaper is opaque over the windows for the whole flight (only
+the 100 pt menu bar strip fades with `e`), the thumbnails stack in Hyprland's client order, the flight starts on the
+first presented frame with the thumbnails in, and the tail capture (the 0.96 plateau: it held qs's frames) is gone.
+Exit 0.25 (the code's ExposeSpringResponse) with the R2 track's start velocity 10/s; enter 0.33.
+
+| Motion | Mac | Before (judge #3, reproduced) | After | rms (value / time) | Status |
+|---|---|---|---|---|---|
+| MC exit, 1 Finder, pointer off the windows | R2 exit, 2-98 % 267 ms | 351 ms, first state twice, 0.96 plateau 3-4 frames, 0.044-0.059 / 20-30 ms | basic loop: 267 ms, no repeat, 0.010-0.011 / 4.6 ms (2 of 3; 1 run 0.055 with a late first frame); threaded: 250-333 ms, 0.029-0.040 / 16-18 ms (skipped mid-flight frames) | 0.010 / 4.6 ms (basic) | fixed with the basic loop; threaded improved |
+| MC exit, 1 Finder, pointer on the thumbnail | as above | 0.05 hover frame repeated | basic: 283 ms, 0.0087 / 3.3 ms, no repeat (3 of 3); threaded: the 0.05 frame twice in 4 of 4, 0.021 / 11.6 ms | 0.009 / 3.3 ms | matches (basic) |
+| MC exit, Finder + Settings overlapping | as above | 350-366 ms, 0.046-0.051, a 6 % step at the end (Settings landed under the focused Finder) | 300-333 ms, 0.035 / 18-20 ms, end step 1.3 % | 0.035 | improved; the share-of-change metric runs long with two overlapping windows |
+| MC exit, 3-4 windows | as above | - | 200-260 ms, 0.04-0.09 / 24-47 ms, frame gaps in most runs (both loops) | 0.05-0.08 | the metric runs short with small thumbnails; gaps from host load |
+| MC enter, 1 Finder | R2 enter, 333 ms | 333 ms, repeats 0.23 0.23, 0.89 0.89 | basic 0.33: 327-338 ms, 0.014-0.038 / 11-24 ms, no repeat in 6 runs; threaded: the first frame twice in 4 of 4 | 0.014-0.038 | improved |
+| HUD appear | verify/A hud-appear-fit | 0.040-0.045 / 25-32 ms, 0.57 -> 0.76 step | with Glass sub-point edges (87022d7, plugin 016799b..): 0.022-0.024 / 16-18 ms, the step now .51 -> .61 (twice its neighbours); glass at s instead of s^2: 0.013-0.023 (better) | 0.022-0.024 | improved; s^2 kept (see dismiss) |
+| HUD dismiss | REA s^2, s = spring 0.48669, 2-98 % 283 ms | 4-12 % snap (judge) | glass at s^2: 265-300 ms, 0.011-0.017 / 3.6-4.2 ms, no snap; glass at s: 0.011-0.029 | 0.011-0.017 | matches (no snap seen in 6 runs) |
+
+Render loop (QSG_RENDER_LOOP=basic vs the default threaded loop, same session, 5 runs each, warm):
+
+| Row | threaded | basic | better |
+|---|---|---|---|
+| MC exit 1 window (above) | 0.029-0.040, hover repeat 4/4 | 0.009-0.011, 0 repeats | basic |
+| MC enter 1 window | first frame twice 4/4 | 0 repeats | basic |
+| CC open vs REA spring 0.25 | 0.005 / 1.2 ms in 4 of 5, first visible 61-64 ms | 0.006-0.013 / 2.3-5 ms: 0.14 -> 0.37 (a frame lost after the layer maps) every run | threaded |
+| HUD appear vs hud-appear-fit | 0.031-0.037, 2-98 % 467-483 ms (Mac 467) | 0.029-0.036, 500-516 ms | mixed (rms basic, duration threaded) |
+| NC open (alpha, panel) | 350-367 ms, 0 repeats | 366-384 ms, 0 repeats | threaded by a frame |
+| Spotlight open | 117-134 ms, 0 repeats | 117-134 ms warm; the first open after start: first frame at 0.55 | equal warm |
+| Spotlight + HUD at once | 0 repeats, 250 ms | 0 repeats warm; first run after start a 245 ms stall (basic renders every window on the GUI thread, first pipeline builds block all) | threaded |
+| Dock press (input to first changed frame) | 12-13 ms | 12 ms | equal |
+| qs CPU at rest, 30 s | 1 tick | 0 ticks | equal |
+| qs CPU, the whole bench | 351 ticks | 320 ticks | basic |
+| qs anon RSS after start | 172 MB (long-running) | 137 MB (fresh); not compared at equal age | not decided |
+| Multi-monitor | not measured | not measured | - |
+
+Not adopted: CC open and the first-use stalls are worse with the basic loop, so not every row is as good or better.
+The env stays unset; a shell-side switch is one line (`//@ pragma DefaultEnv QSG_RENDER_LOOP=basic` in shell/shell.qml).
+The Finder uses the basic loop since b65ebe8 (Quick Look first frame).
 
