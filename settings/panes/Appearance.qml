@@ -263,6 +263,10 @@ Column {
                                                  : Qt.rgba(1, 1, 1, glassPreview.tint <= 0.5 ? 0.44 * glassPreview.tint
                                                                                               : 0.22 + 0.52 * (glassPreview.tint - 0.5))
                                 outline: Theme.dark ? 0.5 : 0.4
+                                discCentre: light.discCentre
+                                discLift: light.discLift
+                                glowCentre: light.glowCentre
+                                glowGain: light.glowGain
                             }
                             Repeater {
                                 model: cap.modelData.g
@@ -276,6 +280,14 @@ Column {
                                     y: (cap.height - height) / 2
                                     color: search ? (Theme.dark ? "#FFFFFF" : "#3A3A3C") : (Theme.dark ? "#FFFFFF" : "#1C1C1E")
                                 }
+                            }
+                            // hover disc and press glow of its buttons (the 23.09.23 recording: the share button); the
+                            // Search field has no reading
+                            ToolbarHighlight {
+                                id: light
+                                anchors.fill: parent
+                                enabled: cap.modelData.t === ""
+                                centres: cap.modelData.c
                             }
                             Text {
                                 visible: cap.modelData.t !== ""

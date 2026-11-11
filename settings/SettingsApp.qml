@@ -285,6 +285,12 @@ Item {
                 }
             }
         }
+        ToolbarHighlight {   // hover and press light of back / forward (dark)
+            x: nav.x; y: nav.y; width: nav.width; height: nav.height
+            source: nav
+            backdrop: Theme.windowBg
+            centres: [nav.width / 4, nav.width * 3 / 4]
+        }
         MacText {
             anchors.left: nav.right; anchors.leftMargin: 13; anchors.verticalCenter: parent.verticalCenter
             text: app.current.title

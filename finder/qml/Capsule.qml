@@ -14,8 +14,14 @@ Item {
     property real padding: 0
     readonly property real inset: Theme.dark && Theme.active ? 0.5 : 0
 
+    // hover and press light of its buttons (HyprK ToolbarHighlight, dark): for capsules of plain buttons
+    property bool lights: false
     implicitWidth: row.implicitWidth + 2 * padding
     implicitHeight: Theme.toolbar.capsuleHeight
+
+    Item {
+    id: body
+    anchors.fill: parent
 
     ToolbarPlatter {
         id: platter
@@ -64,6 +70,14 @@ Item {
         id: row
         x: root.padding
         anchors.verticalCenter: parent.verticalCenter
+    }
+    }
+    ToolbarHighlight {
+        visible: root.lights && Theme.active
+        anchors.fill: parent
+        source: body
+        backdrop: Theme.color.window
+        centres: Array.from(row.children).filter(c => c.visible && c.width > 2).map(c => row.x + c.x + c.width / 2)
     }
 
     Gradient {   // y 17..86 px over the 59 face: white (v - 59) / 196

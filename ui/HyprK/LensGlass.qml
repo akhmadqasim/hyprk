@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Window
 
-// In-window Liquid Glass capsule (shaders/glasslens.frag): draws what lies under it in `source`, bent near the rim,
+// In-window Liquid Glass capsule (shaders/glasslens2.frag): draws what lies under it in `source`, bent near the rim,
 // blurred, tinted, lit and outlined. Client windows cannot sample the desktop, so this only reaches content of the same window
 // (the pressed switch / slider knob over its track, the Appearance pane's Liquid Glass preview over its article).
 // `origin` is the capsule's top-left in `source` coordinates (bound by the caller; a moving capsule or a scrolling
@@ -37,6 +37,15 @@ Item {
     // 12 pt: unclamped their top and right end were cut away (user report). Edge repeat itself is inferred, not measured
     property bool clampToSource: false
     readonly property real margin: Math.ceil(Math.abs(amount) + blur + 1)
+    // a button's light (ToolbarHighlight): a disc of Tokens.toolbar.hoverDiscRadius round discCentre with discLift added,
+    // and the colour times 1 + glowGain (1 - r / Tokens.toolbar.pressReach) round glowCentre (item px)
+    property point discCentre: Qt.point(0, 0)
+    property real discLift: 0
+    property point glowCentre: Qt.point(0, 0)
+    property real glowGain: 0
+    // only draw the light the disc and the glow add (over the capsule as already drawn; give `backdrop` the opaque
+    // colour under the capsule so the gain sees what is on screen)
+    property bool additive: false
 
     ShaderEffectSource {
         id: tex
@@ -53,7 +62,7 @@ Item {
     ShaderEffect {
         anchors.fill: parent
         visible: g.source !== null && g.width > 0 && g.height > 0
-        fragmentShader: Qt.resolvedUrl("shaders/glasslens.frag.qsb")
+        fragmentShader: Qt.resolvedUrl("shaders/glasslens2.frag.qsb")
         property var source: tex
         property size size: Qt.size(g.width, g.height)
         property real margin: g.margin
@@ -70,6 +79,10 @@ Item {
         property vector4d bounds: g.clampToSource && g.source
             ? Qt.vector4d(0.25 - g.origin.x, 0.25 - g.origin.y, g.source.width - g.origin.x - 0.25, g.source.height - g.origin.y - 0.25)
             : Qt.vector4d(-1e6, -1e6, 1e6, 1e6)
+        property vector4d glow: Qt.vector4d(g.glowCentre.x, g.glowCentre.y, g.glowGain, Tokens.toolbar.pressReach)
+        property vector4d disc: Qt.vector4d(g.discCentre.x, g.discCentre.y, Tokens.toolbar.hoverDiscRadius, g.discLift)
+        property real discEdge: Tokens.toolbar.hoverDiscEdge
+        property real additive: g.additive ? 1 : 0
         property vector4d backdrop: Qt.vector4d(g.backdrop.r * g.backdrop.a, g.backdrop.g * g.backdrop.a,
                                                 g.backdrop.b * g.backdrop.a, g.backdrop.a)
     }

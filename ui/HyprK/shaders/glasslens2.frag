@@ -1,5 +1,5 @@
 #version 440
-// Build: /usr/lib/qt6/bin/qsb --qt6 -o glasslens.frag.qsb glasslens.frag
+// Build: /usr/lib/qt6/bin/qsb --qt6 -o glasslens2.frag.qsb glasslens2.frag
 // In-window Liquid Glass capsule (HyprK LensGlass): samples a texture of what lies under the capsule (a
 // ShaderEffectSource `margin` px larger on every side), bends it near the rim, blurs it, tints it, lights it and
 // draws a rim line. Units are item px (logical points). Premultiplied in and out. lens.frag plus the light terms.
@@ -12,6 +12,9 @@
 //   key.y on the bottom (both x the cube of the rim normal's vertical part), key.w on the round ends; key.z its falloff in pt)
 // - rim: the outer outlineWidth pt shows the plain sample darkened by `outline` (the face's light and gain left out)
 // - where the texture is empty the light and the rim line are drawn alone (white lit, black outline)
+// - a button's light (HyprK ToolbarHighlight): the colour times 1 + glow.z (1 - r / glow.w) round glow.xy, plus disc.w
+//   inside a disc of radius disc.z round disc.xy (edge discEdge pt wide); `additive`: only that light, with alpha 0, so
+//   it adds to the window (a translucent capsule redrawn over itself doubled its face)
 layout(location = 0) in vec2 qt_TexCoord0;
 layout(location = 0) out vec4 fragColor;
 layout(std140, binding = 0) uniform buf {
@@ -31,6 +34,10 @@ layout(std140, binding = 0) uniform buf {
     vec4 tint;      // rgb + mix amount (not premultiplied)
     vec4 backdrop;  // premultiplied colour under empty texture
     vec4 bounds;    // x0, y0, x1, y1 of the source in capsule px: samples are clamped into it (edge repeat)
+    vec4 glow;      // press: centre x, y, gain at the centre, reach (pt)
+    vec4 disc;      // hover: centre x, y, radius (pt), lift
+    float discEdge; // hover disc edge width (pt)
+    float additive; // 1: output only the light the glow and the disc add (alpha 0: added to what is drawn already)
 };
 layout(binding = 1) uniform sampler2D source;
 
@@ -74,10 +81,17 @@ void main() {
     float px = max(fwidth(d), 1e-4);
     float line = 1.0 - smoothstep(outlineWidth - 0.5 * px, outlineWidth + 0.5 * px, in_);
     rgb = mix(rgb, raw * (1.0 - outline), line);
+    vec3 unlit = rgb;
+    rgb = min(rgb * (1.0 + glow.z * max(0.0, 1.0 - length(p - glow.xy) / max(glow.w, 1e-3)))
+              + disc.w * (1.0 - smoothstep(disc.z - 0.5 * discEdge, disc.z + 0.5 * discEdge, length(p - disc.xy))), vec3(1.0));
     // where the source is empty (a knob over a window's own glass, backdrop transparent) the light and the rim are
     // drawn on their own: white `lit` over the face, black `outline` on the rim line
     float la = clamp(lit, 0.0, 1.0) * (1.0 - line);
     vec4 over = vec4(vec3(la), la) * (1.0 - outline * line) + vec4(0.0, 0.0, 0.0, outline * line);
     float cover = clamp(0.5 - d / px, 0.0, 1.0);
+    if (additive > 0.5) {   // over an opaque `backdrop`: c.a = 1 inside the source
+        fragColor = vec4((rgb - unlit) * c.a, 0.0) * cover * qt_Opacity;
+        return;
+    }
     fragColor = (vec4(rgb, 1.0) * c.a + over * (1.0 - c.a)) * cover * qt_Opacity;
 }

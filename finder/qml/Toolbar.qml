@@ -33,6 +33,7 @@ Item {
 
     Capsule {
         id: nav
+        lights: true
         x: Theme.toolbar.leftPad
         y: Theme.toolbar.capsuleY
         ToolButton {
@@ -107,6 +108,7 @@ Item {
     // chevron, laid out like the group button (crops/search-expand-frames-light.png, in one frame: Q-finder-30)
     Capsule {
         id: viewPopup
+        lights: true
         anchors.right: group.left
         anchors.rightMargin: Theme.toolbar.viewsGap
         y: Theme.toolbar.capsuleY
@@ -131,6 +133,7 @@ Item {
 
     Capsule {
         id: group
+        lights: true
         anchors.right: actions.left
         anchors.rightMargin: Theme.toolbar.gap
         y: Theme.toolbar.capsuleY
@@ -158,6 +161,7 @@ Item {
 
     Capsule {
         id: actions
+        lights: true
         anchors.right: search.left
         anchors.rightMargin: Theme.toolbar.gap
         y: Theme.toolbar.capsuleY
