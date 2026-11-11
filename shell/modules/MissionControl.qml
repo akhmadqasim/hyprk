@@ -34,7 +34,11 @@ ShellWindow {
 
     // Numbers that are ours (no Theme.qml tokens yet; Q-dock-27..31 will answer the guessed ones)
     readonly property QtObject m: QtObject {
-        readonly property var expose: SpringLib.fromResponse(0.25, 1)      // ExposeSpringResponse / DampingRatio
+        // ExposeSpringResponse is 0.25 in code, but on screen the Mac's enter/exit tracks (R2) fit critically damped
+        // responses 0.395 / 0.300 while ours, measured the same way (mcap, share of the total pixel change), ran at
+        // 0.285 / 0.220 with 0.25: the screen runs about 1.37x slower than the code value in both directions, so
+        // 0.35 here (MOTION-MEASURED.md: enter rms 0.060 -> see there, exit likewise)
+        readonly property var expose: SpringLib.fromResponse(0.35, 1)
         readonly property var barExit: SpringLib.fromResponse(0.125, 1)    // SpacesBarExitSpringResponse
         // collapsed Spaces bar: labelled pills, guessed (no 27.2.1 screenshot of it yet, Q-dock-31)
         readonly property int barHeight: 44
@@ -332,7 +336,9 @@ ShellWindow {
                 ]
                 width: view.width
                 height: view.height
-                scale: wma.containsMouse ? Theme.mission.hoverScale : 1
+                // hover look only while open: on exit the ring and the 1.0x scale went away only when the layer
+                // unmapped, a pop 0.15 s after the windows landed (mcap, MOTION-MEASURED.md)
+                scale: wma.containsMouse && mc.shown ? Theme.mission.hoverScale : 1
                 Behavior on scale { NumberAnimation { duration: Theme.anim.fast } }
                 // window shadow, comes in with the layout (the real window's own shadow fades out
                 // under the wallpaper); radius and offset as the glass shadow, guessed for here
@@ -379,7 +385,7 @@ ShellWindow {
                     anchors.fill: parent
                     radius: Theme.mission.thumbRadius
                     color: "transparent"
-                    border.width: wma.containsMouse ? Theme.mission.hoverBorder : 0
+                    border.width: wma.containsMouse && mc.shown ? Theme.mission.hoverBorder : 0
                     border.color: Theme.color.accent
                 }
             }
