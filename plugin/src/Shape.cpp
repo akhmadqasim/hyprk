@@ -200,6 +200,20 @@ namespace lg {
         return out;
     }
 
+    void pointerFollowsGroup(std::vector<SGlassShape>& shapes, const std::vector<SGlassGroup>& groups) {
+        for (const auto& g : groups) {
+            const SGlassShape* body = nullptr;
+            for (const size_t i : g.members)
+                if (!shapes[i].pointer && (!body || shapes[i].box.w * shapes[i].box.h > body->box.w * body->box.h))
+                    body = &shapes[i];
+            if (!body)
+                continue;
+            for (const size_t i : g.members)
+                if (shapes[i].pointer)
+                    shapes[i].materialize = body->materialize;
+        }
+    }
+
     double takeOpacityMarker(std::vector<SRect>& rects, double surfaceW, double surfaceH) {
         if (surfaceW <= 1 || surfaceH <= 0)
             return 1;

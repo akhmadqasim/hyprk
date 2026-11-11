@@ -29,10 +29,11 @@ namespace lg {
         // POINTER_SIDE turned 45 deg, corner radius POINTER_RADIUS, centred on the rect's centre column POINTER_OFFSET above
         // the pill's bottom edge; its box becomes the square's bounds, and its group unions with smoothness POINTER_SMOOTH.
         bool pointer = false;
-        // a compositing fill instead of glass (`fill_layers`, every shape of such a layer): +1 plus-lighter (dst +
-        // FILL_LIGHTER), -1 plus-darker (dst - FILL_DARKER), per channel inside the rounded rect, over what lies there.
-        // Qt cannot blend with what the compositor drew (the Cmd-Tab selection tile, the Dock's running dots).
-        int fill = 0;
+        // a compositing fill instead of glass (`fill_layers`, every shape of such a layer): the signed amount per channel
+        // (0..1) inside the rounded rect, over what lies there: > 0 plus-lighter (dst + fill), < 0 plus-darker
+        // (dst - |fill|), 0 = glass. Qt cannot blend with what the compositor drew (the Cmd-Tab selection tile, the Dock's
+        // running dots).
+        double fill = 0;
     };
     inline constexpr double FILL_LIGHTER = 65.0 / 255.0, FILL_DARKER = 57.0 / 255.0;
     inline constexpr double POINTER_SIDE = 16, POINTER_RADIUS = 2.5, POINTER_OFFSET = 4, POINTER_SMOOTH = 25;
@@ -56,6 +57,10 @@ namespace lg {
     // SGlassShape::materialize = m; shapes without one stay at 1. The same kind of gap one row lower
     // (y = top + floor(h / 2) + 1, x = left + floor(w / 2)) sets SGlassShape::regularShadow.
     std::vector<SGlassShape> clusterRegion(const std::vector<SRect>& rects);
+
+    // A pointer shape has no materialize hole (its marker is a hole of its own): it takes the materialize of the largest
+    // other shape of its group (the label pill), so pill and pointer come and go as one shape. Alone it keeps its own.
+    void pointerFollowsGroup(std::vector<SGlassShape>& shapes, const std::vector<SGlassGroup>& groups);
 
     // Groups shapes whose boxes are closer than `smoothK` (the smooth union's reach, px; 0 = every
     // shape alone) into one group each, at most MAX_GROUP shapes per group. A pair with a pointer shape reaches

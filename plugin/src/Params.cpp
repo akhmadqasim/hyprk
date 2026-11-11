@@ -2,6 +2,10 @@
 #include "Config.hpp"
 
 #include <algorithm>
+#include <charconv>
+
+#include <hyprutils/string/String.hpp>
+#include <hyprutils/string/VarList.hpp>
 
 namespace lg {
     int parseAppearance(const std::string& s) {
@@ -49,18 +53,31 @@ namespace lg {
         return it == p.underlay.end() ? 0.0 : std::max(it->second, 0.0);
     }
 
-    int fillFor(const SParams& p, const std::string& ns) {
+    double fillFor(const SParams& p, const std::string& ns) {
         const auto it = p.fillLayers.find(ns);
-        return it == p.fillLayers.end() ? 0 : it->second;
+        return it == p.fillLayers.end() ? 0.0 : it->second;
     }
 
-    std::unordered_map<std::string, int> parseFillMap(std::string_view s) {
-        std::unordered_map<std::string, int> out;
-        for (const auto& [ns, mode] : parseStringMap(s)) {
-            if (mode == "lighter")
-                out[ns] = 1;
-            else if (mode == "darker")
-                out[ns] = -1;
+    std::unordered_map<std::string, double> parseFillMap(std::string_view s) {
+        std::unordered_map<std::string, double> out;
+        for (const auto& item : splitList(s)) {
+            const auto f = Hyprutils::String::CVarList{item, 0, ':'};
+            if (f.size() < 2 || f.size() > 3 || f[0].empty())
+                continue;
+            const auto mode = Hyprutils::String::trim(f[1]);
+            const int  sign = mode == "lighter" ? 1 : mode == "darker" ? -1 : 0;
+            if (sign == 0)
+                continue;
+            double amount = sign > 0 ? FILL_LIGHTER : FILL_DARKER;
+            if (f.size() == 3) {
+                const auto num     = Hyprutils::String::trim(f[2]);
+                double     v       = 0;
+                const auto [p, ec] = std::from_chars(num.data(), num.data() + num.size(), v);
+                if (ec != std::errc{} || p != num.data() + num.size() || !(v > 0 && v <= 255))
+                    continue;
+                amount = v / 255.0;
+            }
+            out[Hyprutils::String::trim(f[0])] = sign * amount;
         }
         return out;
     }

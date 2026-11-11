@@ -50,9 +50,9 @@ namespace lg {
         // Center panel blurs the desktop between and under its tiles (MAC-ANSWERS C2 3, REFRACTION.md "Panel blur")
         std::unordered_map<std::string, double>      panelBlur;
 
-        // ns -> +1 plus-lighter / -1 plus-darker: every shape of that layer is a compositing fill over what lies under it,
-        // drawn before the layer's own content (Shape.hpp SGlassShape::fill)
-        std::unordered_map<std::string, int>         fillLayers;
+        // ns -> signed fill amount (0..1, > 0 plus-lighter, < 0 plus-darker): every shape of that layer is a compositing
+        // fill over what lies under it, drawn before the layer's own content (Shape.hpp SGlassShape::fill)
+        std::unordered_map<std::string, double>      fillLayers;
 
         // glass behind the xdg_popups of windows whose class matches (PopupGlass.cpp): a client's context menu
         std::string                                  popupClasses = "^hyprk-finder$";
@@ -103,10 +103,11 @@ namespace lg {
     // Apple blur radius (pt) of the layer under the glass of a namespace (`underlay_blur`), 0 = none
     double underlayFor(const SParams& p, const std::string& ns);
 
-    // `fill_layers` entry of a namespace: +1 lighter, -1 darker, 0 none
-    int fillFor(const SParams& p, const std::string& ns);
-    // "ns:lighter, ns2:darker" -> {{ns, 1}, {ns2, -1}}; other values are skipped
-    std::unordered_map<std::string, int> parseFillMap(std::string_view s);
+    // `fill_layers` entry of a namespace: the signed fill amount (> 0 lighter, < 0 darker), 0 none
+    double fillFor(const SParams& p, const std::string& ns);
+    // "ns:lighter, ns2:darker, ns3:lighter:125" -> {{ns, 65/255}, {ns2, -57/255}, {ns3, 125/255}}: an optional third field
+    // is the amount in 1/255 (0 < a <= 255; the default amounts are the Cmd-Tab tile's); other items are skipped
+    std::unordered_map<std::string, double> parseFillMap(std::string_view s);
 
     // Apple blur radius (pt) of the panel blur behind a namespace's glass (`panel_blur`), 0 = none
     double panelBlurFor(const SParams& p, const std::string& ns);

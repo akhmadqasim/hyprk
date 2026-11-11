@@ -83,7 +83,7 @@ static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext
     const bool aboveLock = layer && layer->m_ruleApplicator->aboveLock().valueOrDefault();
     const bool lockSkip  = lockscreen ? !aboveLock : (aboveLock && g_pSessionLockManager && g_pSessionLockManager->isSessionLocked());
 
-    const int  fill   = params ? lg::fillFor(*params, layer ? layer->m_namespace : std::string{}) : 0;
+    const double fill  = params ? lg::fillFor(*params, layer ? layer->m_namespace : std::string{}) : 0;
     const bool wanted = params && params->enabled && !popups && !ctx.m_renderingSnapshot && layer && mon && !lockSkip && layer->mapped() && layer->alphaNonZero() &&
         (fill != 0 || lg::namespaceMatches(*params, layer->m_namespace));
     // no shapes = no region with require_region: the layer is left to Hyprland

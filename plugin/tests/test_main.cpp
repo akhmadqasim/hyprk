@@ -314,11 +314,23 @@ int main() {
               near(s[0].box.y, 42 - h, 1e-9) && near(s[0].box.w, 2 * h, 1e-9) && near(s[0].radius, POINTER_RADIUS));
         CHECK(!clusterRegion({{100, 50, 23, 23}})[0].pointer);
         const auto fm = parseFillMap("a:lighter, b:darker, c:other");
-        CHECK(fm.size() == 2 && fm.at("a") == 1 && fm.at("b") == -1);
+        CHECK(fm.size() == 2 && near(fm.at("a"), 65.0 / 255) && near(fm.at("b"), -57.0 / 255));
+        // an explicit amount in 1/255 (the Dock's running dots, Q-dock-07: +125 dark, -128 light); bad amounts are skipped
+        const auto fa = parseFillMap("d:lighter:125, e : darker : 128, f:lighter:0, g:darker:256, h:lighter:x, i:lighter:1:2, j:darker:12.5");
+        CHECK(fa.size() == 3 && near(fa.at("d"), 125.0 / 255) && near(fa.at("e"), -128.0 / 255) && near(fa.at("j"), -12.5 / 255));
         // pill 26 pt tall above, the pointer's box 3 pt below it: alone at the layer's k 0, one group at 25
         std::vector<SGlassShape> lab = {{{90, 0, 60, 26}, 13}, s[0]};
         lab[1].box = {88, 29, 23, 23};
         CHECK(groupShapes(lab, 0).size() == 1 && near(groupShapes(lab, 0)[0].smoothK, POINTER_SMOOTH) && groupShapes(lab, 0)[0].lead == 0);
+        // the pointer fades with the pill (its materialize, from the pill's hole), alone it keeps its own
+        lab[0].materialize = 0.3;
+        pointerFollowsGroup(lab, groupShapes(lab, 0));
+        CHECK(near(lab[1].materialize, 0.3) && near(lab[0].materialize, 0.3));
+        lab[1].materialize = 1;
+        lab[1].box.y       = 200;
+        pointerFollowsGroup(lab, groupShapes(lab, 0));
+        CHECK(near(lab[1].materialize, 1));
+        lab[1].box.y   = 29;
         lab[1].pointer = false;
         CHECK(groupShapes(lab, 0).size() == 2 && near(groupShapes(lab, 8)[0].smoothK, 8));
     }

@@ -176,7 +176,7 @@ the 0.5 base, Apple: a 4x4 / 8x8 box; the half-size base Apple uses when R > 2 i
 | `adapt_low` / `adapt_high` | 0.1 / 0.3 | hysteresis band (SPEC 9.6, V2 light range) |
 | `underlay_blur` | "" | `ns:radius` (Apple blur radius, pt) of a blur composed into that glass's reads without a pass (the panel blur's older stand-in; 2.05 fitted the CC tiles) |
 | `panel_blur` | `hyprk-controlcenter:1.79` | `ns:radius`: draw that panel blur behind the layer's glass (see Materials) |
-| `fill_layers` | "" | `ns:lighter` / `ns:darker`: every shape of that layer is a plus-lighter (+65/255) or plus-darker (-57/255) fill over what lies under it, drawn before the layer's content (Cmd-Tab selection tile, Dock dots: Qt cannot blend with the compositor's glass) |
+| `fill_layers` | "" | `ns:lighter` / `ns:darker`: every shape of that layer is a plus-lighter (+65/255) or plus-darker (-57/255) fill over what lies under it, drawn before the layer's content (Cmd-Tab selection tile, Dock dots: Qt cannot blend with the compositor's glass). `ns:lighter:125` / `ns:darker:128` sets the amount in 1/255 (0 < a <= 255; the Dock's running dots, Q-dock-07). The fill takes the layer's opacity like the glass under it; give the namespace the `no_anim` layer rule, or Hyprland's layer fade runs on it and it trails the glass |
 | `popup_classes` / `popup_material` / `popup_radius` | `^hyprk-finder$` / `menu` / 12 | glass behind the xdg_popups of matching windows (see Client popups) |
 | `refraction_scale` | 1 | multiplies the recipe's refraction amount (0 = off) |
 | `aberration` | 0 | px R/B split at the edge (7 taps); 0 = off (Apple: none on background glass) |
@@ -302,3 +302,5 @@ A plain rect with a 1x1 hole in its top row at left + 1, hanging 1 pt below the 
 (Dock `ECCartoucheGlassLayerController`, MAC-ANSWERS "REA 27.2.1" 3): a square of side 16 turned 45 deg, corner radius 2.5, centred
 4 pt above the pill's bottom edge, unioned with the pill at smoothness 25 (a group with a pointer uses 25 instead of the layer's
 `spacing`). The hole is needed because a region is a union: a shape touching the pill would merge with it.
+The pointer has no materialize hole of its own: it takes the materialize of the largest other shape of its group (the pill),
+so pill and pointer fade as one shape; the layer's opacity covers both (one draw). Alone in a group it stays at 1.

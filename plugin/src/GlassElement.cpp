@@ -480,6 +480,7 @@ void main() {
         if (data.shapes.empty())
             return;
         data.groups = groupShapes(data.shapes, data.smoothK);
+        pointerFollowsGroup(data.shapes, data.groups);
         data.resolved.clear();
         for (size_t gi = 0; gi < data.groups.size(); ++gi)
             data.resolved.push_back(resolveGroup(data, gi, false, 0.5f));
@@ -983,7 +984,7 @@ void main() {
             const float info[2] = {float(f.radius * scale), float(f.materialize)};
             glUniform4fv(u.shapeBox, 1, box);
             glUniform2fv(u.shapeInfo, 1, info);
-            glUniform1f(u.fillAmount, float(f.fill > 0 ? FILL_LIGHTER : FILL_DARKER));
+            glUniform1f(u.fillAmount, float(std::abs(f.fill)));
             glBlendEquation(f.fill > 0 ? GL_FUNC_ADD : GL_FUNC_REVERSE_SUBTRACT);
             g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE);
             damage.forEachRect([&ctx](const auto& rect) {
