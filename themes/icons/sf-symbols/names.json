@@ -1930,6 +1930,63 @@
    ],
    "extras": [],
    "note": "Finder toolbar: the view switcher collapsed into a popup button while the search field is open (crops/search-expand-frames-light.png, the up/down chevrons after the grid glyph). Decoded from CoreGlyphs' BVG blob with tools/bvg.py (no Mac render): validated on 73 Mac-rendered symbols x 3 weights, IoU median 0.9997, min 0.989."
+  },
+  "square.on.square": {
+   "symbol": "square.on.square",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "square.on.square.regular.svg",
+    "square.on.square.medium.svg",
+    "square.on.square.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings (copy / duplicate glyph). Named by the Settings agent (2026-11-11), not shown by the shell or Finder, so not in sf.js. Decoded from CoreGlyphs' BVG blob with tools/bvg.py (no Mac render): validated on 73 Mac-rendered symbols x 3 weights, IoU median 0.9997, min 0.989."
+  },
+  "capsule.on.rectangle.fill": {
+   "symbol": "capsule.on.rectangle.fill",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "capsule.on.rectangle.fill.regular.svg",
+    "capsule.on.rectangle.fill.medium.svg",
+    "capsule.on.rectangle.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings. Named by the Settings agent (2026-11-11), not shown by the shell or Finder, so not in sf.js. Decoded from CoreGlyphs' BVG blob with tools/bvg.py (no Mac render): validated on 73 Mac-rendered symbols x 3 weights, IoU median 0.9997, min 0.989."
+  },
+  "capsule.on.rectangle.liquid.glass": {
+   "symbol": "capsule.on.rectangle.liquid.glass",
+   "surface": "settings",
+   "surfaces": [
+    "settings"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "settings": "sure"
+   },
+   "private": false,
+   "variants": [
+    "capsule.on.rectangle.liquid.glass.regular.svg",
+    "capsule.on.rectangle.liquid.glass.medium.svg",
+    "capsule.on.rectangle.liquid.glass.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Settings. Named by the Settings agent (2026-11-11), not shown by the shell or Finder, so not in sf.js. Decoded from CoreGlyphs' BVG blob with tools/bvg.py (no Mac render): validated on 73 Mac-rendered symbols x 3 weights, IoU median 0.9997, min 0.989."
   }
  },
  "skipped": {
@@ -31385,6 +31442,306 @@
     0
    ],
    "fontBaselineY": 34.268
+  },
+  "square.on.square.regular.svg": {
+   "symbol": "square.on.square",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    42,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    41.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    33.5,
+    33.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.016
+  },
+  "square.on.square.medium.svg": {
+   "symbol": "square.on.square",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    42,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    42.0,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    34.0,
+    33.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.629
+  },
+  "square.on.square.semibold.svg": {
+   "symbol": "square.on.square",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    43,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    9.5,
+    42.5,
+    22.5
+   ],
+   "baselineY": 32.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    34.5,
+    34.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 35.336
+  },
+  "capsule.on.rectangle.fill.regular.svg": {
+   "symbol": "capsule.on.rectangle.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    48,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    48.0,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    42.0,
+    34.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.39
+  },
+  "capsule.on.rectangle.fill.medium.svg": {
+   "symbol": "capsule.on.rectangle.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    49,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    48.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    43.0,
+    35.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.944
+  },
+  "capsule.on.rectangle.fill.semibold.svg": {
+   "symbol": "capsule.on.rectangle.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    49,
+    42
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    49.0,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    43.5,
+    35.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.605
+  },
+  "capsule.on.rectangle.liquid.glass.regular.svg": {
+   "symbol": "capsule.on.rectangle.liquid.glass",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    48,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    48.0,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    40.0,
+    32.0
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 33.523
+  },
+  "capsule.on.rectangle.liquid.glass.medium.svg": {
+   "symbol": "capsule.on.rectangle.liquid.glass",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    49,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    48.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    40.5,
+    32.5
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 34.157
+  },
+  "capsule.on.rectangle.liquid.glass.semibold.svg": {
+   "symbol": "capsule.on.rectangle.liquid.glass",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    49,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    9.5,
+    49.0,
+    22.5
+   ],
+   "baselineY": 32.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    41.0,
+    33.5
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 34.878
   }
  },
  "menubar": [
