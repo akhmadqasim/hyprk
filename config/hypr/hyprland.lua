@@ -68,15 +68,19 @@ hl.config({
         rounding_power = 5.39,
         active_opacity = 1.0,
         inactive_opacity = 1.0,
-        -- Q-windows-01: pure black, alpha measured at 2/8/16/32 pt below, beside and above a Finder window. Hyprland's
-        -- falloff a * (x / range)^power was fitted to all four states with one shared geometry (only the colour can
-        -- differ between active and inactive): range 52, power 4, y 12, RMS alpha 0.040 (the old 60/2/18 was 0.084).
-        -- Colours per appearance in hyprk_appearance() below.
+        -- Q-windows-01: pure black, alpha measured at 2/8/16/32 pt below, beside and above a Finder window; AppKit
+        -- draws a Gaussian (blur 20 / 8 pt, y 18 / 7, density .40 / .22 light, .70 / .45 dark, active / inactive),
+        -- so below the window is ~1.7x darker than beside it at 2 pt. Hyprland has one falloff a * (x / range)^power
+        -- for all sides and all states, with the edge at full alpha, so one colour cannot get both (best single fit,
+        -- range 52 / power 4 / y 12: side .27 vs .18 at 2 pt). The colour is a gradient over the shadow box, though:
+        -- a vertical one (top -> bottom stops, hyprk_appearance() below) gives the band above, the sides and the band
+        -- below their own alpha. Fit of range, power, offset and the three alphas per state to the 48 profile points
+        -- (window 700 x 533): range 70, power 3, y 4. See reference/ours/windows/SHADOW.md for the on-screen numbers.
         shadow = {
             enabled = true,
-            range = 52,
-            render_power = 4,
-            offset = "0 12",
+            range = 70,
+            render_power = 3,
+            offset = "0 4",
         },
         blur = {
             enabled = true,
@@ -116,7 +120,12 @@ hl.config({
 })
 
 -- Light and dark chrome (MAC-ANSWERS.md Q-windows-01, -03), black alpha per state:
---   shadow: fitted density (see decoration.shadow) dark .494 active / .218 inactive, light .281 / .105
+--   shadow: alpha above / beside / below (see decoration.shadow), as a 10-stop vertical gradient over the shadow box
+--     (top, top, side x6, bottom, bottom: stops are evenly spaced, so the band above and below keeps its own alpha
+--     for windows from ~520 pt tall; on smaller ones the ends blend into the side value). The side alpha also ramps
+--     to the bottom value over the lowest ~75 pt of the window's sides (Mac: constant to the corner), the cost of
+--     the gradient: 2D field rms against the Gaussian model is still .039 -> .031.
+--     light active .074 / .19 / .327, inactive .027 / .067 / .122; dark active .132 / .334 / .573, inactive .054 / .143 / .252
 --   outer rim: 0.5 pt (1 px at 2x) black dark .93 / .83, light .21 / .19. Hyprland's border is 1 pt (2 px at 2x),
 --     so its alpha carries the same ink over 2 px: 1 - (1 - a)^(1/2) = dark .735 / .588, light .111 / .100.
 -- Global so the shell can switch it with the appearance (shell/Theme.qml, `hyprctl eval`).
@@ -137,9 +146,16 @@ local function hyprk_gtk(dark)
     os.rename(tmp, gtkKeyfile)   -- atomic: GLib's file monitor sees one complete file
 end
 
+local function shadowGradient(above, side, below)   -- alphas 0..255, see the comment above
+    local function c(a) return string.format("rgba(000000%02x)", a) end
+    return { colors = { c(above), c(above), c(side), c(side), c(side), c(side), c(side), c(side), c(below), c(below) }, angle = 90 }
+end
+
 function hyprk_appearance(dark)
-    local c = dark and { shadow = 0x7e000000, shadowInactive = 0x38000000, rim = "rgba(000000bb)", rimInactive = "rgba(00000096)" }
-                    or { shadow = 0x48000000, shadowInactive = 0x1b000000, rim = "rgba(0000001c)", rimInactive = "rgba(0000001a)" }
+    local c = dark and { shadow = shadowGradient(0x22, 0x55, 0x92), shadowInactive = shadowGradient(0x0e, 0x24, 0x40),
+                         rim = "rgba(000000bb)", rimInactive = "rgba(00000096)" }
+                    or { shadow = shadowGradient(0x13, 0x30, 0x53), shadowInactive = shadowGradient(0x07, 0x11, 0x1f),
+                         rim = "rgba(0000001c)", rimInactive = "rgba(0000001a)" }
     hl.config({
         general = { col = { active_border = c.rim, inactive_border = c.rimInactive } },
         decoration = { shadow = { color = c.shadow, color_inactive = c.shadowInactive } },
