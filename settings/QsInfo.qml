@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 
 // Quickshell-only facts (Backend loads it dynamically; absent under `qml`).
 QtObject {
@@ -10,4 +11,6 @@ QtObject {
     function iconPath(name) { return Quickshell.iconPath(name, true); }
     // Hyprland blurs what is behind our translucent sidebar (hyprland-rules.lua).
     readonly property bool hyprland: (Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE") ?? "") !== ""
+    // a dispatcher (Lua) on Hyprland's socket: there in the order sent, no process to start
+    function hyprDispatch(lua) { Hyprland.dispatch(lua); }
 }

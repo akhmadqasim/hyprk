@@ -33,7 +33,17 @@ QtObject {
     property string userName: "User"
 
     function set(key, patch) {
-        app[key] = _normalize[key](Object.assign({}, app[key], patch));
+        // Light <-> Dark: the compositor hears it first. The glass plugin snapshots every output when its `appearance`
+        // option changes and cross-fades for 0.5 s (plugin 911cbe1, AppKit's NSGlobalPreferenceTransition), which only
+        // hides the switch if no surface has drawn the other appearance yet; then the shell (its global, shell/Theme.qml:
+        // the state file reached it 146 to 1063 ms later), then this window.
+        const next = _normalize[key](Object.assign({}, app[key], patch));
+        if (key === "appearance" && next.dark !== app.appearance.dark) {
+            const a = next.dark ? "dark" : "light";
+            Backend.hyprDispatch(`function() hl.config({ plugin = { liquidglass = { appearance = "${a}" } } }) end`);
+            Backend.hyprDispatch(`hl.dsp.global("hyprk:appearance-${a}")`);
+        }
+        app[key] = next;
         _patches[key] = Object.assign(_patches[key] || {}, patch);
         _flush.interval = key === "appearance" ? appearanceDebounce : debounce;
         _flush.restart();

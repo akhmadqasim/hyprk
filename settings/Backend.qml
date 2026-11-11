@@ -55,6 +55,9 @@ QtObject {
         return p;
     }
 
+    // A dispatcher on Hyprland's own socket (no process, in order); nothing outside Hyprland or under `qml`.
+    function hyprDispatch(lua) { if (_info && _info.hyprland) _info.hyprDispatch(lua); }
+
     // Run Lua in Hyprland (`hyprctl eval`); cb(status) with "ok" | "missing" | "failed".
     // hyprctl prints "ok" on success and an error text otherwise.
     function hyprEval(lua, cb) {

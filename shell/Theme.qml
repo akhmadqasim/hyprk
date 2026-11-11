@@ -95,11 +95,17 @@ Singleton {
 
     // the glass plugin must use the same appearance as our labels, else dark-mode
     // white text can land on light glass (its default "auto" follows the backdrop)
+    // On Hyprland's socket, not a spawned hyprctl: the plugin cross-fades a snapshot of each output over 0.5 s when
+    // this option changes (plugin 911cbe1, AppKit's NSGlobalPreferenceTransition), which only hides the switch if the
+    // option is there before the first surface draws the other appearance. A process took 10 ms or more to start.
     function syncPluginAppearance() {
         if (!compositorGlass) return;
-        // detached: a fast second toggle must not be dropped while the first still runs
-        Quickshell.execDetached(["hyprctl", "eval", `hl.config({ plugin = { liquidglass = { appearance = "${dark ? "dark" : "light"}" } } })`]);
+        Hyprland.dispatch(`function() hl.config({ plugin = { liquidglass = { appearance = "${dark ? "dark" : "light"}" } } }) end`);
     }
+    // Settings (or anything else that switches the appearance) says so here before it writes appearance.json: the
+    // file's change arrived 146 to 1063 ms after Settings had switched, past the plugin's 0.5 s cross-fade
+    GlobalShortcut { appid: "hyprk"; name: "appearance-dark"; description: "Dark appearance"; onPressed: theme.dark = true }
+    GlobalShortcut { appid: "hyprk"; name: "appearance-light"; description: "Light appearance"; onPressed: theme.dark = false }
     // the Liquid Glass slider for the plugin (its live-updatable 0..1 option; Mac: NSGlassTintAmount, a running app
     // re-reads it on the coordinated notification, MAC-ANSWERS PC #67 C2 item 5)
     // plugin option tint_amount (plugin/README.md, commit 2821fa0); the eval fires no reload event, so the plugin
@@ -111,7 +117,7 @@ Singleton {
     }
     // window shadow and rim densities differ in light and dark (config/hypr/hyprland.lua hyprk_appearance)
     function syncWindowChrome() {
-        Quickshell.execDetached(["hyprctl", "eval", `if hyprk_appearance then hyprk_appearance(${dark}) end`]);
+        Hyprland.dispatch(`function() if hyprk_appearance then hyprk_appearance(${dark}) end end`);
     }
     onDarkChanged: { syncPluginAppearance(); syncWindowChrome(); }
     onCompositorGlassChanged: { syncPluginAppearance(); syncPluginGlass(); }
