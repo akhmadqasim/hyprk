@@ -21,10 +21,12 @@ layout(std140, binding = 0) uniform buf {
     float outline;  // black alpha of the 0.5 pt rim line
     vec4 tint;      // rgb + mix amount (not premultiplied)
     vec4 backdrop;  // premultiplied colour under empty texture
+    vec4 bounds;    // x0, y0, x1, y1 of the source in capsule px: samples are clamped into it (edge repeat)
 };
 layout(binding = 1) uniform sampler2D source;
 
 vec4 tap(vec2 p) {
+    p = clamp(p, bounds.xy, bounds.zw);
     vec4 s = texture(source, (p + margin) / (size + 2.0 * margin));
     return s + backdrop * (1.0 - s.a);
 }

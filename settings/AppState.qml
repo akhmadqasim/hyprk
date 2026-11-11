@@ -35,15 +35,21 @@ QtObject {
     function set(key, patch) {
         app[key] = _normalize[key](Object.assign({}, app[key], patch));
         _patches[key] = Object.assign(_patches[key] || {}, patch);
+        _flush.interval = key === "appearance" ? appearanceDebounce : debounce;
         _flush.restart();
     }
     function setWallpaper(p) { set("wallpaper", { path: p }); }
 
     // Unsaved local changes per key. External edits that arrive meanwhile are
     // merged under them, so neither side is lost.
+    // Appearance has no control that writes while it is dragged (the Liquid Glass slider commits on mouse-up, as the
+    // Mac writes NSGlassTintAmount), so it is written at once: the Mac's preview and Dock follow about 50 ms after
+    // mouse-up (MAC-ANSWERS Appearance 2); with 250 ms the glass changed 260-270 ms late (user report)
+    property int debounce: 250
+    property int appearanceDebounce: 16
     property var _patches: ({})
     property Timer _flush: Timer {
-        interval: 250
+        interval: app.debounce
         onTriggered: {
             for (const key in app._patches) Backend.writeFile(app.path(key), JSON.stringify(app[key], null, 2) + "\n");
             app._patches = {};

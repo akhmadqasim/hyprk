@@ -18,6 +18,11 @@ Item {
     property real outline: 0
     property color tint: "transparent"   // rgb + mix amount in alpha
     property color backdrop: "transparent"
+    // true: a sample that falls outside `source` (the bent rim or the blur of a capsule near the source's edge) repeats
+    // the source's edge pixel. false: it is empty there and the capsule is transparent over `backdrop` (a knob that
+    // leaves its track). The Liquid Glass preview's capsules sit 7 pt from the article's top and right edge and bend
+    // 12 pt: unclamped their top and right end were cut away (user report). Edge repeat itself is inferred, not measured
+    property bool clampToSource: false
     readonly property real margin: Math.ceil(Math.abs(amount) + blur + 1)
 
     ShaderEffectSource {
@@ -45,6 +50,9 @@ Item {
         property real gain: g.gain
         property real outline: g.outline
         property vector4d tint: Qt.vector4d(g.tint.r, g.tint.g, g.tint.b, g.tint.a)
+        property vector4d bounds: g.clampToSource && g.source
+            ? Qt.vector4d(0.25 - g.origin.x, 0.25 - g.origin.y, g.source.width - g.origin.x - 0.25, g.source.height - g.origin.y - 0.25)
+            : Qt.vector4d(-1e6, -1e6, 1e6, 1e6)
         property vector4d backdrop: Qt.vector4d(g.backdrop.r * g.backdrop.a, g.backdrop.g * g.backdrop.a,
                                                 g.backdrop.b * g.backdrop.a, g.backdrop.a)
     }

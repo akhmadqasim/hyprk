@@ -18,7 +18,7 @@ Item {
         when: windowShown
 
         function initTestCase() {
-            AppState._flush.interval = 24 * 3600 * 1000;   // never reaches the state file
+            AppState.debounce = AppState.appearanceDebounce = 24 * 3600 * 1000;   // never reaches the state file
             AppState.set("appearance", { iconStyle: "dark", iconStyleVariant: "dark", glass: 0.5 });
         }
         function cleanupTestCase() { AppState._flush.stop(); AppState._patches = {}; }

@@ -77,24 +77,32 @@ Column {
         }
     }
 
-    // Liquid Glass end buttons (liquidglass-slider-zoom4x-*.png): a rounded rectangle with a capsule over its lower
-    // right; outlined = "Capsule Shape On A Rectangle With A Liquid Glass Effect", filled = "... On A Rectangle".
-    // Pressed: the label colour (darker).
+    // Liquid Glass end buttons (liquidglass-slider-zoom4x-*.png, 4 px per pt): two rounded rectangles, the front one
+    // over the lower right. Outlined (16 x 13, "Capsule Shape On A Rectangle With A Liquid Glass Effect"): back 12.15 x
+    // 9.4 r 2.2, front 12.4 x 9.7 r 4.2 at (3, 2.7), 0.75 pt lines, the back's line shows through the front. Filled
+    // (17 x 13.5, "... On A Rectangle"): back 12.5 x 9.9 r 2.5, front 13.5 x 10.9 r 4.8 at (2.5, 2) with a 0.6 pt gap
+    // in the card colour around it; one ink for both (124 on 247 light, 157 on 37 dark). Pressed: the label colour.
     component GlassEndIcon: Item {
+        id: ei
         property bool filled
         readonly property bool down: parent && parent.pressed === true
         readonly property color ink: down ? Theme.label : Theme.secondaryLabel
         width: filled ? 17 : 16; height: filled ? 13.5 : 13
         Rectangle {
-            x: 0; y: 0; width: parent.width * 0.72; height: parent.height * 0.62; radius: 3
-            color: parent.filled ? parent.ink : "transparent"
-            border.width: parent.filled ? 0 : 1; border.color: parent.ink
+            width: ei.filled ? 12.5 : 12.15; height: ei.filled ? 9.9 : 9.4; radius: ei.filled ? 2.5 : 2.2
+            color: ei.filled ? ei.ink : "transparent"
+            border.width: ei.filled ? 0 : 0.75; border.color: ei.ink
+        }
+        Rectangle {   // the gap: the card colour under the filled front shape (also keeps a translucent ink from doubling)
+            visible: ei.filled
+            x: 2.5 - 0.6; y: 2 - 0.6; width: 13.5 + 1.2; height: 10.9 + 1.2; radius: 4.8 + 0.6
+            color: Theme.cardFill
         }
         Rectangle {
-            x: parent.width * 0.22; y: parent.height * 0.34; width: parent.width * 0.78; height: parent.height * 0.66
-            radius: height / 2
-            color: parent.filled ? parent.ink : Theme.cardFill
-            border.width: 1; border.color: parent.filled ? Theme.cardFill : parent.ink
+            x: ei.filled ? 2.5 : 3; y: ei.filled ? 2 : 2.7
+            width: ei.filled ? 13.5 : 12.4; height: ei.filled ? 10.9 : 9.7; radius: ei.filled ? 4.8 : 4.2
+            color: ei.filled ? ei.ink : "transparent"
+            border.width: ei.filled ? 0 : 0.75; border.color: ei.ink
         }
     }
     Component { id: glassClear; GlassEndIcon { filled: false } }
@@ -195,6 +203,7 @@ Column {
                             LensGlass {
                                 anchors.fill: parent
                                 source: articleBody
+                                clampToSource: true   // 7 pt from the article's top and right edge, bends 12.6 pt
                                 origin: Qt.point(cap.x + article.contentX, cap.y + article.contentY)
                                 band: height * Tokens.control.lensBand
                                 amount: height * Tokens.control.lensAmount
