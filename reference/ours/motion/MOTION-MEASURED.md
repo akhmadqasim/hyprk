@@ -48,6 +48,7 @@ not available here: that libinput finger scrolls reach Qt the same way is read f
 | Space switch | no 27.2.1 track | 1->2: slide out, visible ~140 ms; 2->1: visible 146..514 ms (SwiftUI spring 0.5) | same | - | alpha | no Mac track |
 | Mission Control enter | crit. spring, track fits response 0.395 (R2) | 2-98 % 252 ms, fits response 0.285; first open had a 1-frame stall | 352 ms | 0.060 -> 0.024 / 29 -> 10.7 ms | alpha, full screen | fixed (value 2.4 %) |
 | Mission Control exit | track fits response 0.300 (R2) | 216 ms, fits 0.220; hover ring + scale popped 0.15 s after landing (4 %) | 302 ms, no pop | 0.061 -> 0.025 / 33 -> 19 ms | alpha | fixed in value, time 19 ms (1.1 frame) |
+| Mission Control exit, session 3 (daf9ac8) | R2 exit series (0.21 .. 0.99, 2-98 % 267 ms) | 0.35, still 100 ms in: 1 window 400-402 ms, 0.041-0.057 / 27-35 ms; 2 windows 301 ms, 0.035-0.045 / 15-18 ms, one repeated frame mid-flight (0.61 0.61) | exit spring 0.31, still taken in the tail: 1 window 351-369 ms, 0.023-0.030 / 17-23 ms; 2 windows 250-283 ms, 0.031-0.049 / 18-27 ms, no mid-flight repeat | see before/after | alpha, full screen | improved; a 2 % step when the layer goes and the spring's S-shaped start (Mac frame 1 = 0.21) remain |
 | Mission Control exit, 2 windows at one place (judge #2) | as above | 450-500 ms, 5 % snap at ~575 ms (back window's thumb on top, inactive still) | snap 1.7 % (scaled still vs sharp window), 450 ms | 0.042 / 66-101 ms -> 0.022-0.043 / 28-44 ms | alpha, full screen | improved; the slow tail remains (see Remaining) |
 | Spaces bar exit | spring 0.125 (REA), not measured on Mac | - | - | - | - | no Mac track |
 | Cmd-Tab show | appears 0.19 s after Tab, 1 frame (Q-dock-22) | appears ~180 ms after the ipc lands, 1 frame | same | - | alpha | matches |
@@ -77,6 +78,10 @@ not available here: that libinput finger scrolls reach Qt the same way is read f
 | HUD appear | alpha track (verify/A hud-appear-fit), 2-98 % 483 ms | 586 ms; glass jumped 0.71 -> 0.92 in one frame (opacity marker swallowed) | 483 ms | 0.052 -> 0.030 / 55 -> 24 ms | alpha on the HUD | fixed (one odd glass frame remains at ~350 ms) |
 | HUD appear (plugin 80fd49d, judge #2) | hud-appear-fit.json | - | monotonic, no dip frame | 0.020-0.033 / 17-25 ms (frames dropped at random) | alpha | the judge's dip was the old plugin |
 | HUD dismiss | spring(0.48669, 1), alpha = (1-x)^2 (REA) | - | 2-98 % 350 ms vs model 283 ms, gone at 483 ms (REA completion 487 ms) | 0.023 / 17.5 ms | alpha from shown | near (our last 5 % lingers) |
+| HUD dismiss, session 3 (no change) | 1 - s(t)^2, s = spring(0.48669, 1): 2-98 % 267 ms | - | 317 ms; ahead of the model for the first 120 ms, behind after | 0.028 / 12-14 ms (3 runs) | alpha | the tail is the content, drawn at s while the glass is at s^2 (REA inference). The Mac appear track (verify/A hud-appear-fit) fits s (rms 0.0097, own omega) and s^2 (0.012) alike, so it cannot decide; no Mac dismiss track. Left as is |
+| Full screen enter, menu bar and Dock (session 3, 02acb33) | Dock on the Space slide 0.5 - 0.5 cos(pi t / 0.5 s); menu bar out over 0.15 s (inferred default) (MOTION-PLUGIN.md Full screen REA) | titles and Dock gone in frame 1 (10 ms) | titles fade 43..145 ms, Dock slides out over the growing window until ~360 ms | - | bar title strip contrast, Dock band frames | done (both sit on Overlay while they leave: Hyprland hides Top layers at once) |
+| Full screen exit, menu bar and Dock (session 3) | menu bar back over 0.5 s from the start (startMenuBarAnimation:), Dock on the 0.5 s cosine | Dock popped in whole at ~123 ms, menu bar faded 150 ms | Dock rises from the edge on the cosine, menu bar fades over 500 ms (curve CA ease-in-out, not decoded) | - | frames | done |
+| Spotlight open blur 25 -> 0 (session 3, tried, not kept) | InvocationAnimationState blurRadius 25, Spring(0.51, 0.05) | no blur: 0 dropped frames in 3 runs | full-screen layer: a repeated 2nd frame and a dropped frame in 2 of 4; on the bar only (1x texture, blurMax 32): still a dropped frame in 4 of 6 | - | alpha on the bar | reverted: the blur costs frames on this stack |
 | Spotlight open | scale 1.0877 -> 1 track (verify/A spotlight-open-fit) | first visible 1.092; first frame 63-113 ms after the shortcut (created on open) | first visible 1.096; 46-60 ms after the shortcut (kept loaded, unmapped) | scale 0.0027 -> 0.0005 (0.26 pt) | bar width | fixed (+1.9 MB anon at rest, 0 CPU) |
 | Spotlight close | REA: x 1 -> 1.12, y 1 -> 0.95 Spring(0.45, 0.05), alpha Spring(0.28, 0.41) (0 at 0.12 s), content blur 0 -> 25 Spring(0.51, 0.05); R2 eyeballed 3 frames | 7 frames, no blur | 6-7 frames, with the content blur | no Mac track | alpha, bar width | done per REA |
 | Spotlight mode list unfold | share per frame .04 .11 .22 .36 .51 .66 .78 .87 .94 .98 1 (Q-panels-26) | list came in one frame (Behavior gate race) | unfolds, 2-98 % 154 ms (Mac 167) | 0.24 -> 0.035 / 7 ms (two repeated frames at the start) | list bottom edge | fixed |
@@ -104,15 +109,17 @@ band; 40a1a15 fscroll; b725cd0 Spotlight mode list unfold.
 ## Remaining, with numbers
 
 - Unzoom, full screen: done in plugin-motion (MOTION-PLUGIN.md).
-- Mission Control exit with two windows at one place: after the stacking fix a 1.7 % step remains when the layer goes
-  (the scaled still against the sharp window), and the tail from ~0.90 to ~0.98 takes ~250 ms (2-98 % ~450 ms vs the
-  Mac's 267 ms): the thumbnails creep the last few percent of a long flight on the critically damped 0.35 tail.
+- Mission Control exit: session 3 brought 2-98 % to 250-283 ms (two windows at one place) and 351-369 ms (one
+  window) against the Mac's 267; a ~2 % step remains when the layer goes (scaled still against the sharp window).
 - HUD dismiss: our last 5 % lingers (2-98 % 350 ms vs 283 ms of the REA model), rms 0.023.
 - NC push: starts with a 2-frame hold (the Mac shows one of 2 frames too: 5, 5, 13.5 pt), rms 0.024-0.027.
 - Spotlight mode list: two repeated frames at the start of the unfold (rms 0.035).
 - Control Center open: its second frame repeats the first (rms 0.011-0.018).
 - Quick Look: the first frame shows twice (the panel is created on Space).
-- Repeated frames at the start of a motion are frames qs did not render in time (Dock magnification once in 3 runs,
-  CC, Spotlight list, NC push); not chased further.
+- Repeated frames at the start of a motion (Dock magnification once in 3 runs, CC, Spotlight list, NC push, Spotlight
+  open with any layer): session 3 tried the Spotlight open with QSG_RENDER_LOOP=basic and with
+  QSG_USE_SIMPLE_ANIMATION_DRIVER=1: the second frame still repeats (4 of 4 and 5 of 5), the spring values of the
+  frames are the same as with the default loop, so the animation clock is not the cause. The window's first commit after
+  mapping seems to wait one extra frame callback (compositor pacing; not proven, not fixed).
 - No Apple data: window move/resize, Spotlight calculator card growth.
-- Not done: Spotlight's open blur 25 -> 0 (the open matches the Mac's scale track without it).
+- Not done: Spotlight's open blur 25 -> 0: tried twice in session 3, it drops frames (see the table).
