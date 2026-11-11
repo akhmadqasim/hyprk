@@ -589,6 +589,8 @@ Singleton {
         readonly property real maxWidthFraction: 0.92    // of the screen
         readonly property int minIconSize: 32            // floor when many apps are open
         readonly property color selection: theme.dark ? Qt.rgba(1, 1, 1, 0.18) : Qt.rgba(0, 0, 0, 0.12)
+        // the panel shows about 0.19 s after Tab; releasing Cmd before that switches without it (Q-dock-22)
+        readonly property int showDelay: 190
     }
 
     // ---------- app icons ----------

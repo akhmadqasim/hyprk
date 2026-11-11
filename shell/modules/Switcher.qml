@@ -38,15 +38,19 @@ ShellWindow {
     PointerGate { id: hoverGate }
     function notePointer(item, mx, my) { return hoverGate.note(item, mx, my); }
 
-    // 1 = shown. Jumps to 1 on open, fades to 0 on close (then the window is unloaded).
-    property real fade: shown && liveApps.length > 0 ? 1 : 0
+    // 1 = shown. Jumps to 1 Theme.switcher.showDelay after open (Q-dock-22), fades to 0 on close (then the window is
+    // unloaded). Before that the surface is mapped but empty: it already holds the keyboard, so releasing Cmd during
+    // the delay switches to the selected (previous) app without the panel ever showing (quick tap).
+    property bool revealed: false
+    Timer { id: revealTimer; interval: Theme.switcher.showDelay; onTriggered: sw.revealed = true }
+    property real fade: shown && revealed && liveApps.length > 0 ? 1 : 0
     Behavior on fade {
         enabled: sw.fade > 0                     // fading in is a jump
         NumberAnimation { duration: Theme.ms(250); easing.type: Easing.BezierSpline; easing.bezierCurve: [0.42, 0, 0.58, 1, 1, 1] }
     }
     // the compositor glass fades with the content (ShellWindow.glassOpacity)
     glassOpacity: fade
-    visible: fade > 0
+    visible: (shown && liveApps.length > 0) || fade > 0
     lingerAs: "switcher"
     lingering: !shown && fade > 0
     acceptsInput: shown               // no input while dematerializing
@@ -60,6 +64,8 @@ ShellWindow {
     function present() {
         if (liveApps.length === 0) { Qt.callLater(Panels.close); return; }   // not during construction
         selected = liveApps.length > 1 ? 1 : 0;
+        revealed = false;
+        revealTimer.restart();
         keys.forceActiveFocus();
     }
     Component.onCompleted: present()
