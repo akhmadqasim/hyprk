@@ -423,11 +423,12 @@ test("modes order", () => assert.deepEqual(SL.modes().map(m => m.id), ["apps", "
         assert.equal(sym("actions"), "bolt");
         assert.equal(sym("clipboard"), "clipboard");
     });
-    test("menus: Eject is the outline eject, every menu icon has a glyph", () => {
+    test("menus: Eject is the outline eject, every menu icon has a glyph (an SVG or a hand-drawn one)", () => {
         const src = readFileSync(join(here, "..", "lib", "menus.js"), "utf8");
         assert.match(src, /f\("Eject", "⌘E", null, null, \{ icon: "sf:eject" \}\)/);
         assert.equal(SF.resolve("sf:eject"), "eject");
-        for (const [, n] of src.matchAll(/icon: "([^"]+)"/g)) assert.ok(SF.resolve(n), n);
+        const SY = load("symbols.js", join(here, "..", "components"));
+        for (const [, n] of src.matchAll(/icon: "([^"]+)"/g)) assert.ok(SF.resolve(n) || SY.get(n).length > 0, n);
     });
 }
 test("mode key super+2", () => assert.equal(SL.modeForKey(0x32, true, false, false), "files"));

@@ -69,6 +69,11 @@ const symbols = {
     "terminal": [S(rr(2.5, 4, 19, 16, 3), 1.6), S("M6.5 9L9.5 12L6.5 15M11.5 15.5H16.5", 1.8)],
     "trash": [S("M4 6.5H20M9.5 6.5V4.5H14.5V6.5M6 6.5L7 20.5H17L18 6.5", 1.7)],
     "photo": [S(rr(3, 4.5, 18, 15, 2.5), 1.6), F("M5.5 17L10 11.5L13.2 15L15.2 13L18.5 17Z"), F(circle(15.5, 8.5, 1.6))],
+    // no SVG of `printer` on the PC: traced from the File menu's Print row at 2x (menubar/pulldown-dark.png): body
+    // 18.3 x 12.2 r2.8 open at the bottom, sheet on top, paper with a line out of the bottom, a dot top right
+    "printer": [S("M6.5 18.7H5.4A2.8 2.8 0 0 1 2.6 15.9V9.3A2.8 2.8 0 0 1 5.4 6.5H18.1A2.8 2.8 0 0 1 20.9 9.3V15.9A2.8 2.8 0 0 1 18.1 18.7H17.5", 1.8),
+                S("M5.8 6.5V4.4A1.4 1.4 0 0 1 7.2 3H16.4A1.4 1.4 0 0 1 17.8 4.4V6.5", 1.8),
+                S(rr(6.5, 13.1, 11, 7.9, 1.0), 1.8), S("M6.5 17.1H17.5", 1.8), F(circle(18, 9.7, 0.95))],
     "gear": [S(circle(12, 12, 3.2), 1.8), S("M12 2.8V5.2M12 18.8V21.2M2.8 12H5.2M18.8 12H21.2M5.5 5.5L7.2 7.2M16.8 16.8L18.5 18.5M5.5 18.5L7.2 16.8M16.8 7.2L18.5 5.5", 2.0)],
 };
 

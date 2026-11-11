@@ -11,8 +11,9 @@ import "../lib/menus.js" as Menus
 // desktop and the Dock (Overlay.qml). Pull-down and context menu are the same glass, radius 12, with
 // identical rows (MAC-ANSWERS.md Q-menubar-13, -27). Rows 24 pt, separators 11, 5 pt top/bottom padding;
 // solid accent selection inset 5, radius 7 (Q-menubar-12); text at x 16, 30 when some row has a state
-// (`checked`: true or "mixed"), 40 / 51 for rows with an `icon` (Q-menubar-15..17); key column right-aligned
-// at W - 18.5 with modifiers 3 pt before it (Q-menubar-18). No minimum width (Q-menubar-19).
+// (`checked`: true or "mixed"), 40 / 51 for rows with an `icon` (Q-menubar-15..17); key column = the widest key ink,
+// right edge W - 18.5, each key centred by its ink; modifiers one glyph at a time 3.5 pt apart, ending 3 pt before
+// it (Q-menubar-18). Width: AppKit's columns (Theme.menu.columnGap); no minimum width (Q-menubar-19).
 // Motion: appears complete at once, a chosen row blinks once (off 4 frames, on 3) and then the menu runs
 // the item and fades out in 0.2 s ease-out, as on Esc (Q-menubar-23, -24). The selection jumps from row to
 // row in one frame, no glide (MAC-ANSWERS "No animation: the highlight moves within 1 frame").
@@ -47,32 +48,65 @@ Item {
 
     // ---------- columns ----------
     FontMetrics { id: metrics; font: Typography.menu }
+    // glyph ink at 10x: FontMetrics rounds the tight box to whole pixels (⌘ 10 for 9.4 at 13 px)
+    FontMetrics {
+        id: ink10
+        font: Qt.font({ family: Typography.menu.family, pixelSize: Typography.menu.pixelSize * 10,
+                        weight: Typography.menu.weight, variableAxes: Typography.menu.variableAxes })
+    }
+    function inkOf(t) {
+        const r = ink10.tightBoundingRect(t);
+        return Qt.rect(r.x / 10, r.y / 10, r.width / 10, r.height / 10);
+    }
     function keyOf(s) { const a = Array.from(s || ""); return a.length ? a[a.length - 1] : ""; }
     function modsOf(s) { return Array.from(s || "").slice(0, -1).join("").trim(); }
+    // the modifier run, laid out by ink: [{t, x}] from the run's left ink edge, and its ink width ("fn" stays whole)
+    function modsLayout(s) {
+        const toks = (modsOf(s).match(/fn|\S/gu) || []);
+        let cursor = 0;
+        const items = [];
+        for (const t of toks) {
+            const r = inkOf(t);
+            if (items.length) cursor += Theme.menu.modifierSpacing;
+            items.push({ t: t, x: cursor - r.x });
+            cursor += r.width;
+        }
+        return { items: items, width: cursor };
+    }
     // the state column exists as soon as one row has a state; it is per menu, not per row
     readonly property bool hasState: shownItems.some(it => !it.sep && !!it.checked)
     function textXOf(it) {
         if (it.icon) return hasState ? Theme.menu.stateIconTextX : Theme.menu.iconTextX;
         return hasState ? Theme.menu.stateTextX : Theme.menu.textX;
     }
-    // key column = the widest key glyph of this menu, each key centred in it
+    // key column = the widest key ink of this menu, each key centred in it; modifier column = the widest run
     readonly property real keyWidth: {
         let w = 0;
         for (const it of shownItems)
-            if (!it.sep && it.shortcut) w = Math.max(w, metrics.advanceWidth(keyOf(it.shortcut)));
+            if (!it.sep && it.shortcut) w = Math.max(w, inkOf(keyOf(it.shortcut)).width);
         return w;
     }
-    // width = the widest row: its text plus what trails it (shortcut columns, chevron field or the plain end)
-    readonly property real contentWidth: {
+    readonly property real modsWidth: {
         let w = 0;
+        for (const it of shownItems)
+            if (!it.sep && it.shortcut) w = Math.max(w, modsLayout(it.shortcut).width);
+        return w;
+    }
+    readonly property real keyLeft: width - Theme.menu.keyRight - keyWidth
+    // width: the label column (plain text x + widest label; the row icons do not widen it) + the shortcut columns,
+    // and no row cut short: icon rows, chevron rows and plain rows end with their own trailing field
+    readonly property real contentWidth: {
+        const base = hasState ? Theme.menu.stateTextX : Theme.menu.textX;
+        let w = 0, label = 0, keys = false;
         for (const it of shownItems) {
             if (it.sep) continue;
-            const m = modsOf(it.shortcut);
-            const tail = it.shortcut ? Theme.menu.shortcutGap + (m ? metrics.advanceWidth(m) + Theme.menu.modifierGap : 0) + keyWidth + Theme.menu.keyRight
-                       : it.submenu ? Theme.menu.shortcutGap + Theme.menu.chevronField
-                       : Theme.menu.trailing;
-            w = Math.max(w, textXOf(it) + metrics.advanceWidth(it.label || "") + tail);
+            const lw = metrics.advanceWidth(it.label || "");
+            keys = keys || !!it.shortcut;
+            label = Math.max(label, base + lw);
+            w = Math.max(w, textXOf(it) + lw + (it.submenu ? Theme.menu.shortcutGap + Theme.menu.chevronField : Theme.menu.trailing));
         }
+        if (keys) w = Math.max(w, label + Theme.menu.columnGap + (modsWidth > 0 ? modsWidth + Theme.menu.modifierGap : 0)
+                                  + keyWidth + Theme.menu.keyRight);
         return Math.ceil(w);
     }
     width: contentWidth
@@ -345,22 +379,24 @@ Item {
                     font: Typography.menu
                     color: row.ink
                 }
-                Text {   // modifiers, right-aligned before the key column
-                    visible: !row.modelData.sep && !!row.modelData.shortcut
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.right: key.left
-                    anchors.rightMargin: Theme.menu.modifierGap
-                    text: root.modsOf(row.modelData.shortcut)
-                    font: Typography.menu
-                    color: row.selected ? Theme.color.menuSelectionText : Theme.color.tertiaryLabel
+                // modifiers, glyph by glyph, the run's ink ending 3 pt before the key column
+                readonly property var mods: !modelData.sep && modelData.shortcut ? root.modsLayout(modelData.shortcut) : null
+                Repeater {
+                    model: row.mods ? row.mods.items : []
+                    Text {
+                        required property var modelData
+                        anchors.verticalCenter: parent.verticalCenter
+                        x: root.keyLeft - Theme.menu.modifierGap - row.mods.width + modelData.x
+                        text: modelData.t
+                        font: Typography.menu
+                        color: row.selected ? Theme.color.menuSelectionText : Theme.color.tertiaryLabel
+                    }
                 }
-                Text {
-                    id: key
+                Text {   // key, its ink centred in the key column
+                    readonly property rect ink: root.inkOf(text)
                     visible: !row.modelData.sep && !!row.modelData.shortcut
                     anchors.verticalCenter: parent.verticalCenter
-                    x: parent.width - Theme.menu.keyRight - width
-                    width: root.keyWidth
-                    horizontalAlignment: Text.AlignHCenter
+                    x: root.keyLeft + (root.keyWidth - ink.width) / 2 - ink.x
                     text: root.keyOf(row.modelData.shortcut)
                     font: Typography.menu
                     color: row.selected ? Theme.color.menuSelectionText : Theme.color.tertiaryLabel

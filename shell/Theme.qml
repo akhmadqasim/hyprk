@@ -280,6 +280,12 @@ Singleton {
         // 32 pt trailing field; a plain row ends ~17 pt before the edge (single "A" menu 41 wide)
         readonly property real keyRight: 18.5
         readonly property real modifierGap: 3
+        // AppKit lays the shortcut out as columns per menu: width = state/text x + widest label + 43.5 + widest
+        // modifier run + 3 + widest key ink + 18.5. 43.5 fits the Finder, File, Edit and View menus of the 27.2.1
+        // dump to +-1.5 pt (finder-menus-ax.txt widths 195/273/217/262; Option alternates and the row icons do not
+        // count, Q-menubar-17, -25). Modifier glyphs are drawn one by one 3.5 pt apart, ink to ink (Q-menubar-18)
+        readonly property real columnGap: 43.5
+        readonly property real modifierSpacing: 3.5
         readonly property real chevronX: 23.25
         readonly property real chevronField: 32
         readonly property real trailing: 17

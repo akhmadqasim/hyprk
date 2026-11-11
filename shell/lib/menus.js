@@ -78,9 +78,9 @@ function finderMenus(win) {
             f("Eject", "⌘E", null, null, { icon: "sf:eject" }),
             SEP,
             f("Tags…", "", null, null, { icon: "tag" }),
-            f("Customize Folder…", ""),
+            f("Customize Folder…", "", null, null, { icon: "tag" }),
             SEP,
-            f("Print", "⌘P"),
+            f("Print", "⌘P", null, null, { icon: "printer" }),
         ],
         "Edit": [
             f("Undo", "⌘Z"),
