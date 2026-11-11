@@ -11,7 +11,9 @@ namespace {
 // reads (236,151,80) in the shot, which holds Display P3 values (reference/ours/COLOUR-P3-AUDIT.md): (250,146,61)
 // in sRGB, where the blue one is (98,194,238): hue 27 for the 35 degree tag, saturation 0.76, value 0.98, shaded
 // like the blue body. Other tags use the same rule (not measured).
-void tagFolder(QImage &img, const QColor &tag)
+// mid: the file's body green at the middle of the front: 192 on the macOS 27 folder (GenericFolderIcon, read off the
+// PNG: front flap 192, back flap 174), 211 on the older .icns folders.
+void tagFolder(QImage &img, const QColor &tag, float mid)
 {
     img = img.convertToFormat(QImage::Format_ARGB32);
     const QColor base = QColor::fromHsvF(std::fmod(std::max(0.f, tag.hsvHueF()) + 1.f - 8.f / 360.f, 1.f), 0.76f, 0.98f);
@@ -21,13 +23,15 @@ void tagFolder(QImage &img, const QColor &tag)
             const QRgb p = line[x];
             if (qAlpha(p) == 0 || qBlue(p) - qRed(p) < 60)   // only the blue body
                 continue;
-            const float f = float(qGreen(p)) / 211.f;          // the PNG body green, 211 at the middle
+            const float f = float(qGreen(p)) / mid;
             line[x] = qRgba(std::min(255, int(base.red() * f)), std::min(255, int(base.green() * f)),
                             std::min(255, int(base.blue() * f)), qAlpha(p));
         }
     }
 }
 
+// Only for the older .icns folders (Documents, Downloads, ...). GenericFolderIcon is the macOS 27 art and takes no
+// tint: a least-squares gain of its body on Apple's renders is 1.00-1.05 at the top, 0.96-1.00 at the bottom (1b216e8).
 void tintFolder(QImage &img)
 {
     img = img.convertToFormat(QImage::Format_ARGB32);
@@ -79,6 +83,7 @@ QImage SysIconProvider::requestImage(const QString &id, QSize *size, const QSize
         const QString spec = tint ? id.mid(5) : tag ? id.mid(11) : id;
         const qsizetype at = spec.lastIndexOf(QLatin1Char('@'));
         const int px = at < 0 ? 128 : spec.mid(at + 1).toInt();
+        const bool folder27 = spec.left(at) == QLatin1String("GenericFolderIcon");   // the macOS 27 art
         img = QImage(QStringLiteral("%1/%2-%3.png").arg(m_dir, spec.left(at)).arg(px > 128 ? 512 : 128));
         // Exactly px wide, whatever Qt asks for: its request is the Image's sourceSize times the window's device
         // pixel ratio (128 became 256 on a 2x output: the 128 px file scaled up, then drawn at half size, a blur
@@ -86,10 +91,10 @@ QImage SysIconProvider::requestImage(const QString &id, QSize *size, const QSize
         // or 128 px file is an exact area average; scaled first so the tint loop runs on fewer pixels
         if (!img.isNull() && px > 0 && img.width() != px)
             img = img.scaled(QSize(px, px), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        if (!img.isNull() && tint)
+        if (!img.isNull() && tint && !folder27)
             tintFolder(img);
         else if (!img.isNull() && tag && tagColor.isValid())
-            tagFolder(img, tagColor);
+            tagFolder(img, tagColor, folder27 ? 192.f : 211.f);
         QMutexLocker lock(&m_lock);
         m_cache.insert(key, img);
     }
