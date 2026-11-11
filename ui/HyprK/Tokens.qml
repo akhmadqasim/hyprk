@@ -151,6 +151,15 @@ QtObject {
         // Gaussian fall-off. Edge pixel down the left end: light (appearance-light.png) 191 at the middle, 199-206 at
         // 1-2 pt, 214-232 at 3 pt, the 237 edge from 4 pt; dark (appearance-dark.png) 11-25 from 12.75 pt above to
         // 12.75 pt below the middle, 46 at 13.75, the lit 54-60 from 14.75 pt
+        // dark, inside the lit edge (settings-toolbar-dark.png, face 60). The second px follows the capsule: 88 along
+        // the straight top and bottom, 86-71 around the ends down to 11 pt from the middle, 63 at 6 pt, 60 at the
+        // middle (reliefInner, full from reliefInnerTo pt from the middle, none within reliefInnerFrom). Below it a glow
+        // that depends on the row only: 70 68 66 65 64 63 62 62 down the next 4 pt, the same up from the bottom
+        // (reliefGlow: white alpha at 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6 pt from the edge)
+        readonly property color reliefInner: t.dark ? Qt.rgba(1, 1, 1, 0.14) : "transparent"
+        readonly property real reliefInnerFrom: 5
+        readonly property real reliefInnerTo: 17
+        readonly property var reliefGlow: t.dark ? [0.05, 0.036, 0.027, 0.022, 0.018, 0.013, 0.009, 0.005, 0] : []
         readonly property real reliefSideFlat: t.dark ? 11.5 : 0
         readonly property real reliefSideSigma: t.dark ? 1.5 : 3
         // dark face with the Liquid Glass slider (MAC-ANSWERS Appearance 2: #3C3E40 at 0, #4B4E52 at 1, 60..61 at

@@ -261,7 +261,7 @@ Item {
         ToolbarPlatter { // back / forward share one 74 x 36 capsule with a 1 x 20 divider (27.2.1)
             id: nav
             relief: true   // the platter's own shading and edge (Tokens.toolbar.relief*, settings/appearance-*.png)
-            x: 8; anchors.verticalCenter: parent.verticalCenter   // 8 pt after the sidebar (27.2.1 Settings shot)
+            x: 7.5; anchors.verticalCenter: parent.verticalCenter   // settings-toolbar-dark.png: sidebar line px 463, capsule 479..626
             width: Tokens.toolbar.navWidth; height: Tokens.toolbar.platterHeight
             Rectangle { anchors.centerIn: parent; width: 1; height: Tokens.toolbar.dividerHeight; color: Tokens.toolbar.separator }
             Row {
