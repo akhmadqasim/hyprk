@@ -19,6 +19,7 @@ pixels.
 | Full screen enter | R2 series, ~0.42 s | zoom curve, 301 ms | Mac series, 385 ms (Mac 350) | 0.076 / 51 ms -> 0.033 / 16..18 ms | ff4f9d6 |
 | Full screen exit | 0.15 s to 0.47, 0.15 s hold, 0.3 s (R2, no per-frame series) | one step, 300 ms | two steps: 0.54 at 160 ms, held to ~330 ms, done 584 ms | vs the R2 anchors (0,0) (150,0.47) (300,0.47) (600,1): 0.26 -> 0.048..0.057 | ff4f9d6 |
 | HUD appear | `hud-appear-fit.json` alpha track | dips 0.70 -> 0.51 -> 0.79 (~400 ms) and 0.30 -> 0.29 (~265 ms): soft rimless glass | monotonic | 0.037 / 25 ms -> 0.026 / 15..24 ms | 80fd49d |
+| HUD appear, judge #3 gap 8 | `hud-appear-fit.json` alpha track | 0.55 -> 0.76 in one frame at ~400 ms (3 of 3) | no step: .51 .56 .60 .65 .70 .75 .78 (with the Glass.qml hand-off, scratch shell copy) | 0.048-0.052 -> 0.046 / 28 ms (the rest: our s^2 glass starts slower than the Mac, .01 .03 .05 .08 vs .02 .06 .12 .18) | 016799b + shell hand-off |
 | Window close (judge #3 gap 11) | R2 TextEdit alpha 1, .71, .44, .27, .16, .09, .05, .03 | first frame 0.11-0.13 (bezier started at the close, phase-dependent), then .44 .65 .79 .88 .93 .97 1 | .28 .56 .73 .84 .91 .95 .97 .98 in 5 of 5 runs | 0.012-0.028 / 1.4-3.2 ms -> 0.006-0.010 / 0.3-0.8 ms (one run 0.020, fit shift) | this change |
 | Control Center open | REA spring response 0.25, critically damped | last 3.5 % pops at ~470 ms, 2-98 % 392 ms | (shell hand-off below, verified with a scratch copy) 254 ms, no pop | 0.021 / 16 ms -> 0.0045 / 1.8 ms | hand-off |
 
@@ -48,6 +49,12 @@ fade), a tile at an integer x maps to x - 0.05 and truncates to x - 1, so every 
 pt larger until the spring lands on exactly 1, when it snaps (the measured "rims" pop: every tile outline moves 1 pt,
 max channel change 185). A scratch copy of `shell/components/Glass.qml` that sets the shape rect from rounded mapped
 edges removed the pop (hand-off below).
+
+**HUD appear step (judge #3).** Not a hole-decoding case: a per-frame log of the hyprk-hud region showed the shadow marker
+decoded in every frame and materialize 1 (the HUD fades by the opacity marker, smooth 0 -> 1). The capsule scaling 0.9 -> 1 grew
+in whole points (region box 277x60 -> 307x66, heights 60 / 62 / 64 / 66), and the last step (64 -> 66 at ~366 ms) lit the
+final top and bottom rim rows at once, which the alpha metric reads as 0.21. The plugin now reads sub-point edges from two more
+marker holes (README "Sub-point edges"); Glass.qml has to send them (hand-off, tested with a scratch shell copy).
 
 **Window close.** Hyprland starts `fadeOut` at the close, so the first frame drawn after it showed 0.03-0.16 of the fade
 depending on where the close fell between two frames (blank foot over white, 2-98 % 133 ms either way). plugin-motion
