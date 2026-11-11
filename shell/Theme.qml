@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Hyprland
 import qs.HyprK
 import "lib/state.js" as State
 
@@ -115,6 +116,17 @@ Singleton {
     onDarkChanged: { syncPluginAppearance(); syncWindowChrome(); }
     onCompositorGlassChanged: { syncPluginAppearance(); syncPluginGlass(); }
     onGlassTintChanged: syncPluginGlass()
+    // a config reload (Hyprland reloads by itself when a config file changes) puts every plugin option back to the
+    // config's value: tint_amount went back to 0.5 and appearance to "auto" while the shell still showed the saved
+    // slider value and appearance (hyprctl reload: 0.2 -> 0.5). Send both again after each reload.
+    Connections {
+        target: Hyprland
+        function onRawEvent(event: HyprlandEvent): void {
+            if (event.name !== "configreloaded") return;
+            theme.syncPluginAppearance();
+            theme.syncPluginGlass();
+        }
+    }
     Component.onCompleted: {
         syncPluginAppearance();
         syncPluginGlass();
@@ -122,6 +134,7 @@ Singleton {
         // the shared HyprK controls and motion helpers follow this appearance
         Tokens.dark = Qt.binding(() => theme.dark);
         Tokens.reduceMotion = Qt.binding(() => theme.reduceMotion);
+        Tokens.glassTint = Qt.binding(() => theme.glassTint);
         Tokens.reduceTransparency = Qt.binding(() => theme.reduceTransparency);
         Tokens.increaseContrast = Qt.binding(() => theme.increaseContrast);
         Tokens.fontText = Qt.binding(() => theme.fontText);
