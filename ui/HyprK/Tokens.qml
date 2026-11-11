@@ -166,24 +166,44 @@ QtObject {
     readonly property QtObject lights: QtObject {
         readonly property int size: 14               // NSThemeFrame sizeOfTitlebarButtons, Solarium regular
         readonly property int spacing: 9             // _windowTitlebarButtonSpacingWidth, Solarium
-        readonly property real rimWidth: 0.75        // DesignLibrary StrokeStyle(lineWidth: 0.75)
-        readonly property real glyphResponse: 0.3    // hover glyph reveal, spring(0.3, 1)
-        // MAC-ANSWERS.md Q-windows-10: glyph strokes about 1.9 pt (x 7 x 7, minus 7.5 wide, + 8 x 8, full screen 6 x 6)
+        // MAC-ANSWERS.md Q-windows-08 and lights-*.png (27.2.1, 2x): the rim is one device px (0.5 pt) at 2x
+        readonly property real rimWidth: 0.5
+        // Q-windows-10 (60 fps): glyphs appear 0.07 s after the pointer enters the group, then fade in
+        // .30 .64 .81 .90 .95 .96 .97 1 per frame (= OutCubic over 8 frames, 0.133 s); fade out
+        // .22 .52 .77 .89 .96 .97 .99 with no delay (about OutQuad over 7 frames, 0.117 s)
+        readonly property int glyphDelay: 70
+        readonly property int glyphIn: 133
+        readonly property int glyphOut: 117
+        // Q-windows-10: glyph strokes about 1.9 pt (x 7 x 7, minus 7.5 wide, + 8 x 8, full screen 6 x 6)
         readonly property real glyphStroke: 1.9
-        // Q-windows-08: a pressed disc grows to 16..17 pt (32 px of 28 at 2x) and gets brighter
+        // Q-windows-08: a pressed disc grows to 16 pt (32 px of 28 at 2x) and gets brighter, with a glow
         readonly property real pressedScale: 1.15
-        // gradient top, bottom (WindowControlColors), pressed (27.2.1 fill beside the glyph, Q-windows-08 and
-        // lights-press-*.png; dark zoom did not change in its crop, so it keeps the CoreUI #56F66E), glyph (Q-windows-10)
-        readonly property var closeSet: t.dark ? ["#FA6A61", "#EF6962", "#FF7C68", "#850000"]
-                                               : ["#FF6D63", Qt.rgba(0.961, 0.447, 0.412, 0.80), "#FFAC9E", "#9E0000"]
-        readonly property var minimizeSet: t.dark ? ["#FAB51A", "#FECF34", "#FFFF58", "#AA3600"]
-                                                  : [Qt.rgba(0.984, 0.702, 0.086, 0.92), Qt.rgba(1, 0.820, 0.204, 0.92), "#FFFF70", "#BE4900"]
-        readonly property var zoomSet: t.dark ? ["#56C83A", "#52C43D", "#56F66E", "#005500"]
-                                              : ["#5ACF1F", Qt.rgba(0.475, 0.827, 0.298, 0.73), "#C6FF8F", "#097900"]
-        readonly property var inactive: t.dark ? [Qt.rgba(0.980, 0.980, 0.980, 0.20), Qt.rgba(0.937, 0.937, 0.937, 0.16)]
-                                               : [Qt.rgba(0.894, 0.894, 0.937, 0.30), Qt.rgba(0.878, 0.878, 0.922, 0.30)]
-        readonly property color rim: Qt.rgba(0, 0, 0, t.dark ? 0.12 : 0.2)
-        readonly property color inactiveRim: t.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0, 0, 0, 0.14)
+        // Per button, sampled on lights-{rest,hover,press-*}-{light,dark}.png: fill top / centre / bottom (Q-windows-08),
+        // ring = the outer 0.5 pt as a vertical gradient (stops 0, .2, .5, .8, 1): light discs have a dark coloured rim on
+        // the sides that fades into the fill at top and bottom; dark discs a light specular arc at top and bottom and
+        // plain (slightly darker) sides. glow = the 1 pt halo just outside the disc (light: 252,239,237 at rest, 241,206,203 pressed over
+        // white). Glyph ink: Q-windows-10 (hover centre light close 159,0,0); pressed glyphs from the press crops.
+        // Dark zoom did not change in its press crop, so its pressed fill keeps CoreUI's #56F66E.
+        readonly property var close: t.dark
+            ? { fill: ["#E87061", "#E1675B", "#DE6F64"], ring: ["#F6C6BC", "#F6C6BC", "#D96156", "#F5C4BA", "#F5C4BA"], glyph: "#850000", glow: "transparent",
+                press: { fill: ["#FF9381", "#FF9381", "#FF9485"], ring: ["#FEFBED", "#FEFBED", "#FD7B6E", "#FEF7EC", "#FEF7EC"], glyph: "#B60000", glow: Qt.rgba(1, 0.85, 0.8, 0.07) } }
+            : { fill: ["#ED786B", "#EA857B", "#E89189"], ring: ["#ED786B", "#B40A0A", "#B40A0A", "#B40A0A", "#E89189"], glyph: "#9E0000", glow: Qt.rgba(0.71, 0.04, 0.04, 0.065),
+                press: { fill: ["#FF9A8B", "#FFA898", "#FFB6A8"], ring: ["#FF9A8B", "#F42319", "#F42319", "#F42319", "#FFB6A8"], glyph: "#D40000", glow: Qt.rgba(0.96, 0.14, 0.1, 0.22) } }
+        readonly property var minimize: t.dark
+            ? { fill: ["#F1B835", "#F3C22D", "#F6CF50"], ring: ["#F6F581", "#F6F581", "#EABA19", "#F5F58D", "#F5F58D"], glyph: "#AA3600", glow: "transparent",
+                press: { fill: ["#FFFF8E", "#FFFF5C", "#FFFF7A"], ring: ["#FBFB98", "#FBFB98", "#F9D623", "#FBFBA6", "#FBFBA6"], glyph: "#E74F00", glow: Qt.rgba(1, 1, 0.6, 0.07) } }
+            : { fill: ["#F2BD50", "#F5CB59", "#F8D562"], ring: ["#F2BD50", "#91210A", "#91210A", "#91210A", "#F8D562"], glyph: "#BE4900", glow: Qt.rgba(0.57, 0.13, 0.04, 0.05),
+                press: { fill: ["#FFF66C", "#FFFB6B", "#FFFF7E"], ring: ["#FFF66C", "#D04020", "#D04020", "#D04020", "#FFFF7E"], glyph: "#FF6500", glow: Qt.rgba(0.82, 0.25, 0.13, 0.2) } }
+        readonly property var zoom: t.dark
+            ? { fill: ["#6EC341", "#62BD2D", "#6DC04B"], ring: ["#BFF69A", "#BFF69A", "#59B61C", "#B8F697", "#B8F697"], glyph: "#005500", glow: "transparent",
+                press: { fill: ["#56F66E", "#56F66E", "#56F66E"], ring: ["#BFF69A", "#BFF69A", "#59B61C", "#B8F697", "#B8F697"], glyph: "#005500", glow: "transparent" } }
+            : { fill: ["#7DCD4A", "#98D46F", "#A9DA86"], ring: ["#7DCD4A", "#0A550A", "#0A550A", "#0A550A", "#A9DA86"], glyph: "#097900", glow: Qt.rgba(0.04, 0.33, 0.04, 0.05),
+                press: { fill: ["#A0FF60", "#B9FF84", "#D2FFA7"], ring: ["#A0FF60", "#347F20", "#347F20", "#347F20", "#D2FFA7"], glyph: "#15A400", glow: Qt.rgba(0.2, 0.5, 0.13, 0.22) } }
+        // Q-windows-09, non-key window (lights-inactive-*.png): dark #4C4C52 -> #47484D, light grey arcs at the top
+        // (#B4B4B4) and bottom (#ADADAD); light #EFEFF3 -> #F6F7F8, ring #EAEAEE at the top, #ABABAE on the sides
+        readonly property var inactive: t.dark
+            ? { fill: ["#4C4C52", "#4C4C52", "#47484D"], ring: ["#B4B4B4", "#B4B4B4", "#4A4B50", "#ADADAD", "#ADADAD"], glow: "transparent" }
+            : { fill: ["#EFEFF3", "#F2F3F5", "#F6F7F8"], ring: ["#EAEAEE", "#ABABAE", "#ABABAE", "#ABABAE", "#E7E7EA"], glow: "transparent" }
     }
 
     // ---------- window frame (MAC-ANSWERS.md Q-windows-02, -03) ----------

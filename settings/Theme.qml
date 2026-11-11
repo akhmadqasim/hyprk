@@ -85,9 +85,9 @@ QtObject {
     // ---------- traffic lights (SPEC 13, Tokens.lights) ----------
     readonly property QtObject lights: QtObject {
         readonly property int left: 19               // ref: 2x System Settings shot, 18.75 pt from the window edge (top 19 = centred in the 52 pt toolbar)
-        readonly property color close: Tokens.lights.closeSet[0]   // swatches (Appearance pane)
-        readonly property color minimize: Tokens.lights.minimizeSet[0]
-        readonly property color zoom: Tokens.lights.zoomSet[0]
+        readonly property color close: Tokens.lights.close.fill[0]   // swatches (Appearance pane)
+        readonly property color minimize: Tokens.lights.minimize.fill[0]
+        readonly property color zoom: Tokens.lights.zoom.fill[0]
     }
 
     // ---------- sidebar ----------
