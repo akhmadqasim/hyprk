@@ -79,6 +79,29 @@ close, 64 for minimise, 80 for zoom in the clipped channel). The dark pressed zo
 | fit, whole disc: dark rest / light rest | 4.1 / 5.4 | 4.7 / 5.7 | 8.4 / 6.8 |
 | the raw crop against its sRGB version (what the old fit could not see): dark / light | 12.4 / 10.5 | 21.1 / 18.5 | 38.5 / 16.0 |
 
-Light, pressed and inactive states: refitted the same way, not re-read on screen (foot keeps a dark bar in light mode).
-Hand-off (ui/): `ui/HyprK/TrafficLights.qml` still holds the old table: paste the second block of
-`plugin/tools/lights_model.py emit` (then `lights_model.py check` matches again).
+Light, pressed and inactive states read back on screen (2026-11-11, session 10; plugin title bar on foot, MBA 2x; a foot
+with a white background gets the light bar; press held with a virtual pointer, cursor hidden). Interior = the disc without
+its outer 1 pt, glyph pixels (luma under 0.8 of the disc's median, grown by 1 px) left out; against the crops converted to
+sRGB, rms levels close / minimise / zoom:
+
+| state | rms | glyph ink at the centre, ours = Mac |
+|---|---|---|
+| dark rest | 3.5 / 4.4 / 9.4 (the 3.0 / 4.0 / 8.9 above with this mask) | |
+| dark pressed | 5.0 / 5.8 / no Mac crop | 199,0,0; 251,62,0 |
+| dark inactive | 1.5 (one disc, three places) | |
+| light rest | 2.3 / 2.4 / 3.4 | |
+| light pressed | 2.7 / 3.8 / 4.4 | 232,0,0; 255,86,0; zoom 179,255,122 vs 183,255,128 beside the glyph |
+| light inactive | 1.4 | |
+
+The legacy flat table in `Titlebar.cpp` (`LIGHTS` / `LIGHTS_INACTIVE`: fill / ring / glow per state, raw Display P3) is
+dead but still there: only its glyph inks are drawn, and those are sRGB already, so nothing is left to convert. It cannot
+go alone: `shell/tests/run.mjs` ("traffic lights: plugin colours and timing match Tokens.lights") parses that table and
+`RIM_WIDTH` out of `Titlebar.cpp` and fails without them (tried: 287 passed, 1 failed). The removal (a 3 x 2 x 2 `GLYPHS`
+table in its place, 12 lines for 35) waits for that test to compare the glyph inks only.
+`#56F66E`, the dark pressed zoom fill it carries (also
+`ui/HyprK/Tokens.qml` and `themes/gtk/build.py`), is sRGB as it stands: it is a pixel of the legacy art
+`WindowFrame_WindowControlButtons_Regular@2x.psd` in DarkAqua.car (SPEC 13.6), whose CSI header has colour space id 1 (sRGB;
+3 would be Display P3) and whose pixels live in `ZZZZPackedAsset-2.0.0-gamut0` (ARGB, id 1). No conversion. It is the
+non-Solarium art, not what 27.2.1 draws: the Solarium disc has no crop of that press.
+The ui/ hand-off of the refit is done: `lights_model.py check` reports that the tables in `Titlebar.cpp` and
+`ui/HyprK/TrafficLights.qml` match (2026-11-11, session 10).
