@@ -253,11 +253,29 @@ Singleton {
     function focusWindow(t) { Hyprland.dispatch(`hl.dsp.focus(${windowSelector(t)})`); }
     function closeWindow(t) { Hyprland.dispatch(`hl.dsp.window.close(${windowSelector(t)})`); }
 
+    // minimized (yellow light, Hide, plugin-motion's client minimize): parked on special:minimized
+    function isMinimized(t) { return !!t && !!t.workspace && t.workspace.name === "special:minimized"; }
+    // back onto the focused monitor's workspace first (plugin-motion plays the genie out of the Dock), then focus: a
+    // focus alone only showed special:minimized over the screen with the window still in it
+    function restoreWindow(t) {
+        const m = Hyprland.focusedMonitor;
+        const ws = m && m.activeWorkspace ? m.activeWorkspace.name : "";
+        if (ws !== "") Hyprland.dispatch(`hl.dsp.window.move({ workspace = "${ws}", window = "address:${String(t.address).startsWith("0x") ? t.address : "0x" + t.address}" })`);
+        focusWindow(t);
+    }
+
     function activate(item) {
         if (item.windows && item.windows.length > 0) {
-            // cycle through windows of the app, like clicking an active Dock icon
-            const active = item.windows.findIndex(w => w === Hyprland.activeToplevel);
-            focusWindow(item.windows[(active + 1) % item.windows.length]);
+            // cycle through the app's windows on screen, like clicking an active Dock icon; with every window
+            // minimized the most recently used one comes back (lowest focusHistoryID)
+            const shown = item.windows.filter(w => !isMinimized(w));
+            if (shown.length > 0) {
+                const active = shown.findIndex(w => w === Hyprland.activeToplevel);
+                focusWindow(shown[(active + 1) % shown.length]);
+                return;
+            }
+            const hist = w => { const o = w.lastIpcObject; return o && o.focusHistoryID !== undefined ? o.focusHistoryID : 1e9; };
+            restoreWindow(item.windows.slice().sort((a, b) => hist(a) - hist(b))[0]);
             return;
         }
         // items without a .desktop entry carry their own action (Apps panel, hyprk Settings)
@@ -292,7 +310,7 @@ Singleton {
         if (item.folder)
             return [{ label: "Open “" + item.name + "”", action: () => root.openFolder(item) }];
         const wins = item.windows || [];
-        const out = wins.map(w => ({ label: w.title || item.name, action: () => root.focusWindow(w) }));
+        const out = wins.map(w => ({ label: w.title || item.name, action: () => root.isMinimized(w) ? root.restoreWindow(w) : root.focusWindow(w) }));
         if (out.length > 0) out.push({ sep: true });
         // Finder's own rows (live/dock/dock-menus.json "Finder"); the folder rows have no feature here: disabled
         if (item.id === "hyprk-finder")
