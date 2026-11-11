@@ -323,6 +323,9 @@ Singleton {
             out.push({ label: "New Finder Window", action: () => root.openFinder("") }, { label: "New Smart Folder", disabled: true },
                      { label: "Find…", action: () => { Panels.open = "spotlight"; } }, { sep: true },
                      { label: "Go to Folder…", disabled: true }, { label: "Connect to Server…", disabled: true }, { sep: true });
+        // and nothing else: Finder has no Options and no Quit (dock-menus.json "Finder" ends Show All Windows, Show/Hide)
+        if (item.id === "hyprk-finder")
+            return out.concat([{ label: "Show All Windows", disabled: true }, { label: "Hide", disabled: true }]);
         // Options ▸ as on 27.2.1 (MAC-ANSWERS.md Q-dock-10): pinned "Remove from Dock", else "Keep in Dock", then
         // Open at Login and Show in Finder. Keep in Dock only puts back a pinned app that was removed (the pinned list is
         // the built-in one minus `removed`); there is no login-items store, so the other two show disabled
