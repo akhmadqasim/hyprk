@@ -530,3 +530,26 @@ Traced:
   built their restyled frame within 10-24 ms (6 switches, quiet host; no image is reloaded, the render pass of those
   frames reads 0 ms). The 234-526 ms of MOTION-PLUGIN's loaded runs were taken while this session's whole-machine loops
   ran: the same stall as the gaps above, not a step of the restyle.
+
+## Session 13 (2026-11-11): no motion measured; why a compositor "ages"; what waits
+
+No row was captured in this session: the host's inotify instance limit (128) was used up by five other headless
+sessions for most of it (a session needs about 17: qs 14, Hyprland 3), and the work was stopped before a batch could
+run. Nothing was added to `motion-measured.csv`.
+
+Correction to session 12 ("what makes it grow was not found"), from the coordinator: Hyprland 0.57.2 leaks one
+screenshare session per wlr-screencopy region request at a scale other than 1 (about 45 per mcap run, 1 per grim):
+`CScreenshareManager::getManagedSession()` compares a logical box with a buffer-pixel box, and sessions are not stopped
+when the client exits. From about 5,000 to 10,000 leaked sessions frames drop. It is not uptime. Patch (not installed):
+`/mnt/code/hypr-dev/patches/hyprland-0.57.2-screencopy-session-leak.patch`. For measuring: a fresh session per motion
+batch, restarted after at most about 100 mcap runs. `mcap` (3d41b19) refuses `wayland-0` or an unset display without
+`-H`.
+
+Still open, unchanged from session 12: banner in (1-3 fewer frames per run under load) and banner out (second value
+twice in 6 of 8) are not traced; RubberBand's snap back, the lock's minute change and field shake and HyprK Switch /
+Slider still run on Qt's timer (a frame-clock port of RubberBand and of the two lock motions was written and passed the
+ui tests, but was not measured and is not committed); Dock autohide, slot grow / shrink, drag-off, submenu delay, bar
+peek and lock / unlock are not re-measured.
+
+One number from this session, not a capture: the shell's appearance handshake message (a9e060c) left the shell 52 and
+125 ms after the `hyprctl dispatch` that switched the appearance (own session, quiet host, hyprctl's start included).
