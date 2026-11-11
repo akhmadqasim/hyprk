@@ -96,7 +96,7 @@ QtObject {
     readonly property QtObject scroller: QtObject {
         readonly property real width: 6
         readonly property real inset: 3            // from the right edge, below the toolbar and above the bottom
-        readonly property real minLength: 18       // TODO verify (not measured; AppKit keeps the knob grabbable)
+        readonly property real minLength: 26       // NSScrollerImp overlay knobMinLength (MAC-ANSWERS "Scroller knob during overscroll")
         readonly property color knob: t.dark ? Qt.rgba(1, 1, 1, 0.5) : Qt.rgba(0, 0, 0, 0.5)
         readonly property int hold: 600            // stays after the last scroll event
         // Edges: every scroll view is StopAtBounds (a mouse wheel stops hard, as on the Mac) with a RubberBand

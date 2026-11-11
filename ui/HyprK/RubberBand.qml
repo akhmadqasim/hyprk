@@ -10,8 +10,8 @@ import "rubberband.js" as RB
 // Wayland sends no momentum events, so a trackpad scroll stops dead on lift. This overlay takes the trackpad events
 // (phase != NoScrollPhase) and leaves mouse-wheel steps to the Flickable:
 //  - while the fingers move, deltas scroll 1:1; past an edge they stretch by AppKit's hyperbolic filter
-//    (_NSScrollingRubberbandFilter: elastic = D (1 - 1 / (1 + |d| c / D)), c 0.075, D the visible size), after the
-//    first 10 pt of pull;
+//    (_NSScrollingRubberbandFilter: floor(D (1 - 1 / (1 + |d| c / D))), c 0.075, D the visible size), nothing for
+//    the first 10 pt of pull;
 //  - on lift a stretch returns by _NSElasticDeltaForTimeDelta (critically damped exp(-12.5 t)); otherwise the
 //    content coasts on AppKit's Cates momentum quartic and, hitting an edge, bounces out by its velocity there and
 //    returns the same way. Each is one SequentialAnimation of NumberAnimations with spline easings fitted once.
@@ -32,8 +32,10 @@ MouseArea {
 
     property int _axis: 0        // this gesture: 0 undecided, 1 x, 2 y, -1 passed on
     property bool _gesture: false
-    property real _pull: 0
-    property var _samples: []
+    property real _pull: 0       // finger travel past the edge (signed), 0 inside
+    property real _v: 0          // _NS1DVelocityFilter, pt/s
+    property double _t: 0        // last event, ms
+    property bool _first: true
 
     function _x(a) { return a === 1; }
     function _lo(a) { const f = flickable; return _x(a) ? f.originX - f.leftMargin : f.originY - f.topMargin; }
@@ -55,15 +57,19 @@ MouseArea {
         return !!(d & (_x(a) ? Flickable.HorizontalFlick : Flickable.VerticalFlick));
     }
 
-    function _begin() { seq.stop(); _gesture = true; _axis = 0; _pull = 0; _samples = []; }
+    function _begin() { seq.stop(); _gesture = true; _axis = 0; _pull = 0; _v = 0; _t = Date.now(); _first = true; }
 
-    // velocity of the last 50 ms of deltas (pt/s); 0 when the fingers rested before lifting
-    function _velocity() {
-        const now = Date.now();
-        let s = 0;
-        for (const e of _samples) if (now - e.t <= 50) s += e.d;
-        return s / 0.05;
+    // _NS1DVelocityFilter: v <- 0.2 d/dt + 0.8 v, the first sample (and after dt > 0.2 s or a sign flip) d/dt,
+    // samples under 2 ms apart are skipped
+    function _sample(d) {
+        const now = Date.now(), dt = (now - _t) / 1000;
+        if (dt < 0.002) return;
+        const fresh = _first || dt > 0.2 || (d !== 0 && _v !== 0 && (d < 0) !== (_v < 0));
+        _v = fresh ? d / dt : 0.2 * d / dt + 0.8 * _v;
+        _first = false; _t = now;
     }
+    // at lift; 0 when the fingers rested longer than NSScrollViewScrollVelocityZeroingTimeout (0.1 s) first
+    function _velocity() { return Date.now() - _t > 100 ? 0 : _v; }
 
     function _play(a, segs) {
         if (!segs.length) return;
@@ -109,11 +115,12 @@ MouseArea {
             if (_axis < 0) { w.accepted = false; return; }
         }
         const d = -(_x(_axis) ? dx : dy);
+        const over = _over(_axis);
+        if (_pull === 0 && over !== 0) _pull = RB.rebound(over, _dim(_axis), coefficient);   // caught mid-return
         const r = RB.step(_pos(_axis), d, _lo(_axis), _hi(_axis), _dim(_axis), _pull, coefficient);
         _pull = r.pull;
         _set(_axis, r.pos);
-        const now = Date.now();
-        _samples = _samples.filter(e => now - e.t <= 50).concat([{ t: now, d: d }]);
+        _sample(d);
     }
 
     SequentialAnimation {

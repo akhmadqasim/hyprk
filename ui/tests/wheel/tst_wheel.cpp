@@ -68,8 +68,8 @@ private slots:
 
     void stretchAndReturn() {
         setY(list, 0);
-        trackpad(list, {6, 6, 30, 30}, 4);                // 72 pt down at the top: 62 past the first 10
-        const double expect = -elastic(62, 300);
+        trackpad(list, {6, 6, 30, 30}, 4);                // 72 pt down at the top (the first 10 pt show nothing)
+        const double expect = -std::floor(elastic(72, 300));
         QVERIFY2(std::abs(y(list) - expect) < 1e-6, qPrintable(QString::number(y(list)) + " vs " + QString::number(expect)));
         QVariant stretched;
         QVERIFY(QMetaObject::invokeMethod(rb, "stretched", Q_RETURN_ARG(QVariant, stretched)));

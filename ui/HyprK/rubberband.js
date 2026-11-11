@@ -1,23 +1,27 @@
 .pragma library
 // Rubber-band (elastic overscroll) maths of AppKit 27.2.1, for RubberBand.qml. Sources: reference/re/MAC-ANSWERS.md
-// "Rubber-band scroll constants", reference/re/27.2.1/decomp/AppKit-rubberband.asm and the REA notes in
-// reference/ours/rubberband/README.md (which code path a scroll view takes, the momentum curve).
+// "Rubber-band scroll constants" and "Momentum, rubber-band model, overscroll scroller" (filter and probes
+// executed on the Mac), reference/re/27.2.1/decomp/AppKit-{rubberband,rubberband-filter,momentum}.asm and the
+// REA notes in reference/ours/rubberband/README.md.
 //
 // Positions are in content coordinates (contentY grows downwards). An overshoot is the signed distance past an
 // edge: < 0 before the start, > 0 after the end. Velocities are in pt/s. Time is in seconds.
 
-// NSScrollViewRubberbandStiffness, ...MinimumRequiredDeltaBeforeStretch (AppKit defaults)
+// NSScrollViewRubberbandStiffness, ...MinimumRequiredDeltaBeforeStretch (AppKit defaults); the first 10 pt of pull
+// past the edge give no stretch but count (they stay in the filter's _overflow)
 var STIFFNESS = 20;
 var MIN_DELTA_BEFORE_STRETCH = 10;
-// NSScrollingBehaviorHyperbolicCoefficientTrackpad (touch is 0.55)
+// NSScrollingBehaviorHyperbolicCoefficientTrackpad, stored by -[NSScrollingBehaviorConcurrentVBL
+// _scrollView:trackGestureScrollWithEvent:] (touch / pan is 0.55)
 var C_TRACKPAD = 0.075;
 var C_TOUCH = 0.55;
 // _NSElasticDeltaForTimeDelta2: x(t) = (x0 + C1 v t) exp(-stiffness t / C2), v clamped to NSScrollViewScrollVelocityMax
 var C1 = 0.31;
 var C2 = 1.6;
 var VELOCITY_MAX = 20000;
-// _NSScrollingMomentumCatesCalculator: duration = (distance / K)^(1/4), position = distance - K (T - t)^4;
-// it stops rubber-banding below REST pt and bisects the end time to BISECT s
+// _NSScrollingMomentumCatesCalculator (the default NSScrollBehaviorAnimationType 0) with K =
+// NSScrollingBehaviorMomentumConstant: T = cbrt(v0 / 4K), travel K T^4, x(t) = travel (1 - (1 - t/T)^4) (Qt
+// OutQuart); the flick speed is not clamped. It stops rubber-banding below REST pt and bisects that time to BISECT s.
 var CATES_K = 1000;
 var REST = 0.5;
 var BISECT = 0.01;
@@ -36,6 +40,8 @@ function elastic(d, D, c) {
     if (!(D > 0)) return d / STIFFNESS;
     return sign(d) * D * (1 - 1 / (1 + Math.abs(d) * c / D));
 }
+// what the filter shows: the stretch floored to whole points (probe: D 600, d 15/50/100/200 -> 1/3/7/14 pt)
+function stretch(d, D, c) { return sign(d) * Math.floor(Math.abs(elastic(d, D, c))); }
 // _NSHyperbolicReboundDeltaForElasticDelta(e, c, D): the inverse; a stretch of D or more maps to 999 D / c.
 function rebound(e, D, c) {
     if (c === undefined) c = C_TRACKPAD;
@@ -60,7 +66,7 @@ function restTime(x0, vOut, limit) {
 }
 
 // momentum after a release at v pt/s (content coordinates); AppKit's Cates quartic
-function momentumDuration(v) { return Math.cbrt(Math.abs(clampV(v)) / (4 * CATES_K)); }
+function momentumDuration(v) { return Math.cbrt(Math.abs(v) / (4 * CATES_K)); }
 function momentumDistance(v) { var T = momentumDuration(v); return sign(v) * CATES_K * Math.pow(T, 4); }
 function momentumAt(v, t) {   // distance travelled after t s
     var T = momentumDuration(v);
@@ -99,7 +105,6 @@ function planReturn(edge, over, vOut) {
 
 // Momentum from pos at v pt/s inside [lo, hi]; hitting an edge it bounces out by the edge velocity and returns.
 function planMomentum(pos, v, lo, hi) {
-    v = clampV(v);
     var T = momentumDuration(v), dist = momentumDistance(v);
     if (Math.abs(dist) < REST) return [];
     var target = pos + dist;
@@ -121,20 +126,22 @@ function planMomentum(pos, v, lo, hi) {
     return segs;
 }
 
-// One trackpad delta d (content coordinates) at pos in [lo, hi] with D visible; pull is the past-edge travel this
-// gesture has swallowed so far (AppKit stretches only after MIN_DELTA_BEFORE_STRETCH). Returns {pos, pull}.
+// One trackpad delta d (content coordinates) at pos in [lo, hi] with D visible. pull is the finger travel past the
+// edge (the filter's _overflow, signed, 0 inside): the shown stretch is stretch(pull) once |pull| passes
+// MIN_DELTA_BEFORE_STRETCH, 0 before. Returns {pos, pull}.
 function step(pos, d, lo, hi, D, pull, c) {
-    var over = pos < lo ? pos - lo : pos > hi ? pos - hi : 0;
-    if (over === 0) {
+    if (pull === 0) {
         var np = pos + d;
-        if (np >= lo && np <= hi) return { pos: np, pull: pull };
-        var edge = np < lo ? lo : hi, ex = np - edge;
-        var p = pull + Math.abs(ex);
-        if (p <= MIN_DELTA_BEFORE_STRETCH) return { pos: edge, pull: p };
-        return { pos: edge + elastic(sign(ex) * (p - MIN_DELTA_BEFORE_STRETCH), D, c), pull: MIN_DELTA_BEFORE_STRETCH };
+        if (np >= lo && np <= hi) return { pos: np, pull: 0 };
+        var edge = np < lo ? lo : hi;
+        pull = np - edge;
+    } else {
+        var edge0 = pull < 0 ? lo : hi;
+        var p = pull + d;
+        if (p === 0 || sign(p) !== sign(pull))                    // pushed back in: the rest scrolls 1:1
+            return { pos: Math.max(lo, Math.min(hi, edge0 + p)), pull: 0 };
+        pull = p;
     }
-    var edge2 = over < 0 ? lo : hi;
-    var r = rebound(over, D, c) + d;
-    if (sign(r) === sign(over) && r !== 0) return { pos: edge2 + elastic(r, D, c), pull: pull };
-    return { pos: Math.max(lo, Math.min(hi, edge2 + r)), pull: pull };   // pushed back in: the rest scrolls 1:1
+    var e = pull < 0 ? lo : hi;
+    return { pos: e + (Math.abs(pull) < MIN_DELTA_BEFORE_STRETCH ? 0 : stretch(pull, D, c)), pull: pull };
 }

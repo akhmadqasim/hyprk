@@ -50,20 +50,28 @@ Item {
             for (const d of [1, 10, 100, 1000, -250]) fuzzyCompare(RB.rebound(RB.elastic(d, 500), 500), d, 1e-6);
             compare(RB.rebound(600, 500), 500 * 999 / 0.075);
         }
+        function test_filter_probe() {
+            // MAC-ANSWERS "Which rubber-band model": D 600, d 15/50/100/200/300/400/500 -> 1/3/7/14/21/28/35 pt
+            const d = [15, 50, 100, 200, 300, 400, 500], mac = [1, 3, 7, 14, 21, 28, 35];
+            for (let i = 0; i < d.length; i++) compare(RB.stretch(d[i], 600), mac[i]);
+            compare(RB.stretch(-100, 600), -7);
+        }
         function test_step_min_delta_then_stretch() {
-            // at the top edge (lo 0), pulling up 6 + 6 pt: the first 10 pt are swallowed, then it stretches
-            let r = RB.step(0, -6, 0, 1000, 500, 0);
-            compare(r.pos, 0); compare(r.pull, 6);
-            r = RB.step(r.pos, -6, 0, 1000, 500, r.pull);
-            fuzzyCompare(r.pos, RB.elastic(-2, 500), 1e-9);
-            // more pull accumulates in rebound space
-            const r2 = RB.step(r.pos, -100, 0, 1000, 500, r.pull);
-            fuzzyCompare(r2.pos, RB.elastic(-102, 500), 1e-9);
-            // pushing back in: the stretch is undone first, the rest scrolls 1:1
-            const r3 = RB.step(r2.pos, 150, 0, 1000, 500, r2.pull);
-            fuzzyCompare(r3.pos, 48, 1e-6);
-            // inside the bounds deltas are 1:1
-            compare(RB.step(300, 25, 0, 1000, 500, 0).pos, 325);
+            // at the top edge (lo 0) pulling up 6 + 6 pt: nothing for the first 10 pt, then the whole 12 pt count
+            let r = RB.step(0, -6, 0, 1000, 600, 0);
+            compare(r.pos, 0); compare(r.pull, -6);
+            r = RB.step(r.pos, -6, 0, 1000, 600, r.pull);
+            compare(r.pull, -12);
+            compare(r.pos, RB.stretch(-12, 600));
+            // more pull accumulates: 112 pt in all -> floor(8.27)
+            const r2 = RB.step(r.pos, -100, 0, 1000, 600, r.pull);
+            compare(r2.pos, -8);
+            // pushing back in: the pull is undone first, the rest scrolls 1:1
+            const r3 = RB.step(r2.pos, 150, 0, 1000, 600, r2.pull);
+            compare(r3.pos, 38); compare(r3.pull, 0);
+            // at the bottom edge too; inside the bounds deltas are 1:1
+            compare(RB.step(1000, 300, 0, 1000, 600, 0).pos, 1021);
+            compare(RB.step(300, 25, 0, 1000, 600, 0).pos, 325);
         }
         function test_return_curve_through_qt() {
             const plan = RB.planReturn(0, -100, 0);

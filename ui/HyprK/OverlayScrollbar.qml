@@ -11,7 +11,8 @@ Item {
     width: Tokens.scroller.width
     readonly property real _ratio: flickable && flickable.contentHeight > 0 ? Math.min(1, flickable.height / flickable.contentHeight) : 1
     readonly property real _range: flickable ? flickable.contentHeight - flickable.height : 0
-    // past an edge (rubber band) the knob shortens by the overshoot share and stays at that edge
+    // past an edge (rubber band) the knob shortens and stays pinned there, as NSScrollerImp does (MAC-ANSWERS
+    // "Scroller knob during overscroll": proportion = max(visible - |stretch|, 0) / document, value clamped 0..1)
     readonly property real _over: !flickable ? 0 : flickable.contentY < 0 ? -flickable.contentY
                                  : Math.max(0, flickable.contentY - Math.max(0, _range))
     visible: opacity > 0 && _ratio < 1

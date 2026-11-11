@@ -31,11 +31,20 @@ Implemented in ui/HyprK/rubberband.js + RubberBand.qml; tests ui/tests/tst_rubbe
 - `_catesPositionAfterDuration` (0x18acfe8a4): position = origin + (distance - K max(T - t, 0)^4) / distance x delta,
   i.e. a quartic ease-out (Qt Easing.OutQuart), initial speed 4 distance / T; after the edge time it subtracts
   `_NSElasticDeltaForTimeDelta2(x0, v, t - tEdge)` with the speed at the edge, rounded to 1/8 pt pixel steps.
-  Ours derives T and distance from the lift speed v: T = (v / 4K)^(1/3), distance = K T^4.
+  Ours derives T and distance from the lift speed v: T = (v / 4K)^(1/3), distance = K T^4 (confirmed by the
+  Mac's calculateDestination read: dest = origin + sign(v) K (|v| / 4K)^(4/3)).
+
+## Settled by the Mac agent's later pass (MAC-ANSWERS "Momentum, rubber-band model, overscroll scroller", 2e21b97)
+- Trackpad c 0.075 is stored by `-[NSScrollingBehaviorConcurrentVBL _scrollView:trackGestureScrollWithEvent:]`;
+  the shown stretch is floored; the first 10 pt show nothing but count. Ours does the same (rubberband.js step).
+- Momentum: Cates is the default calculator; flick speed unclamped; lift speed = `_NS1DVelocityFilter`
+  (EMA 0.2, reset after 0.2 s or a sign flip, < 2 ms skipped). Ours does the same with Date.now() timestamps.
+- Knob: proportion max(visible - |stretch|, 0) / document, pinned, overlay min 26 pt: OverlayScrollbar already
+  shortens that way; Tokens.scroller.minLength is now 26.
 
 ## Still unknown
-- Whether Finder / Settings use Cates or `_NSScrollingMomentumBasCalculator` (Bas not read).
-- How AppKit measures the lift speed (macOS gets momentum events from the system); ours: deltas of the last 50 ms.
-- The scroll bar during overshoot; ours keeps the knob shortening by the overshoot (OverlayScrollbar.qml).
+- Lift with the fingers at rest: ours zeroes the speed after 0.1 s without events
+  (NSScrollViewScrollVelocityZeroingTimeout 0.1; its exact use not traced).
 - Sign convention of v in snap-back; ours: a stretch still growing at lift goes further out first
   (x0 + 0.31 v t) e^(-12.5 t).
+- The T > 2 s momentum cut (only above 32000 pt/s) is not implemented.
