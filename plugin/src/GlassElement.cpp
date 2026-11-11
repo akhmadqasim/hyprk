@@ -108,6 +108,7 @@ namespace lg {
             .bleedLod         = loc("bleedLod"),
             .bleedYcc         = loc("bleedYcc"),
             .faceFill         = loc("faceFill"),
+            .pointerFill      = loc("pointerFill"),
             .fillAmount       = loc("fillAmount"),
             .pxPerPt          = loc("pxPerPt"),
             .keyYcc           = loc("keyYcc"),
@@ -826,6 +827,11 @@ void main() {
             glUniform4f(u.faceYcc, res.ycc.black, res.ycc.white, res.ycc.saturation, res.maxLuma);
             glUniform3f(u.blurAlpha, res.blurAlpha[0], res.blurAlpha[1], res.blurAlpha[2]);
             glUniform4f(u.faceFill, res.fill.r, res.fill.g, res.fill.b, res.fill.a);
+            // the Dock label's fill on its pointer: the shell draws Theme.dock.labelFill (k + c (1 - a), fitted to
+            // Q-dock-08: dark k 23.5 / 255 a 0.083, light 107 / 255 0.382) over the pill only, so the pointer read
+            // darker than the pill (over black 14 vs 35; on the Mac one shape, 31). Same fill outside the pill.
+            const bool pointerGroup = std::ranges::any_of(g.members, [&](size_t i) { return m_data.shapes[i].pointer; });
+            glUniform2f(u.pointerFill, pointerGroup ? (dark[q] ? 23.5f : 107.f) / 255.f : 0.f, pointerGroup ? (dark[q] ? 0.083f : 0.382f) : 0.f);
             glUniform3f(u.keyYcc, res.keyYcc.black, res.keyYcc.white, res.keyYcc.saturation);
             const float keyRad = res.keySpread * float(M_PI / 180.0);
             glUniform2f(u.keySpread, std::cos(keyRad), std::cos(0.65f * keyRad)); // diffuse: 0.65 x the spread
@@ -936,6 +942,7 @@ void main() {
         glUniform4f(u.bleedYcc, 0.f, 1.f, 1.f, 0.f);
         glUniform4f(u.faceYcc, 0.f, 1.f, 1.f, 1.f); // identity face: blur only
         glUniform4f(u.faceFill, 0.f, 0.f, 0.f, 0.f);
+        glUniform2f(u.pointerFill, 0.f, 0.f);
         glUniform3f(u.keyYcc, 0.f, 1.f, 1.f);
         glUniform2f(u.keySpread, 1.f, 1.f);
         glUniform3f(u.highlight, 0.f, 0.f, 0.f);

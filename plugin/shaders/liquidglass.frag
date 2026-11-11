@@ -54,6 +54,8 @@ uniform vec4  bleedYcc;             // black, white, saturation, 1 = weight by Y
 
 uniform vec4  faceYcc;              // black, white, saturation, max luma
 uniform vec4  faceFill;             // rgb + amount ("normalFill")
+uniform vec2  pointerFill;          // (k, a): k + c (1 - a) outside the group's plain shapes (the Dock label's fill, which the
+                                    // shell draws over the pill only, extended to its pointer); a = 0: none
 
 // rim (see the rim blocks in main)
 uniform float pxPerPt;              // output scale
@@ -100,10 +102,10 @@ float sminH(float a, float b, float k) {
 // shader, SPEC round 3): k' = k (0.5 - 0.5 nA.nB), so facing edges (a gap) blend over the full k
 // and parallel edges stay sharp. Returns distance, normal (blended, not renormalised) and the
 // materialize progress blended like them.
-struct SScene { float d; vec2 n; float m; };
+struct SScene { float d; vec2 n; float m; float plain; };
 
 SScene scene(vec2 qp) {
-    SScene res = SScene(1e4, vec2(0.0), 1.0);
+    SScene res = SScene(1e4, vec2(0.0), 1.0, 1e4); // plain: min distance of the shapes that are not a pointer
     for (int i = 0; i < MAX_SHAPES; i++) {
         if (i >= shapeCount)
             break;
@@ -118,7 +120,8 @@ SScene scene(vec2 qp) {
         float mi = shapeInfo[i].y;
         float k = smoothK * sat(0.5 - 0.5 * dot(res.n, b.yz));
         float h = sminH(res.d, b.x, k);
-        res     = SScene(mix(res.d, b.x, h) - k * h * (1.0 - h), mix(res.n, b.yz, h), mix(res.m, mi, h));
+        res     = SScene(mix(res.d, b.x, h) - k * h * (1.0 - h), mix(res.n, b.yz, h), mix(res.m, mi, h),
+                         shapeInfo[i].x < 0.0 ? res.plain : min(res.plain, b.x));
     }
     return res;
 }
@@ -322,6 +325,9 @@ void main() {
             // inputClamp), then (1 - a) dst + v a; m is not saturated): MAC-ANSWERS PC #67 B2 4b
             col        = col + hm * (clamp(ycc(col, keyYcc), -0.75, 1.0) - col);
         }
+        // the label fill where the shell's (a rounded rect over the pill, anti-aliased over one px) does not reach
+        if (pointerFill.y > 0.0)
+            col = mix(col, vec3(pointerFill.x) + col * (1.0 - pointerFill.y), sat(0.5 + sc.plain) * mat);
 
         face = vec4(encode(clamp(col, 0.0, 1.0)), 1.0);
     }

@@ -312,3 +312,10 @@ A plain rect with a 1x1 hole in its top row at left + 1, hanging 1 pt below the 
 `spacing`). The hole is needed because a region is a union: a shape touching the pill would merge with it.
 The pointer has no materialize hole of its own: it takes the materialize of the largest other shape of its group (the pill),
 so pill and pointer fade as one shape; the layer's opacity covers both (one draw). Alone in a group it stays at 1.
+The shell draws the label's fill (`Theme.dock.labelFill`, k + c (1 - a)) over the pill rect only, so the plugin applies the same
+fill to a pointer group outside its plain shapes (dark k 23.5 / 255 a 0.083, light 107 / 255 a 0.382): over black the pointer
+read 14 under a 35 pill, now 36 (Mac: one shape, 31).
+Width with one threshold (50 % of the pill's contrast over black, dark, 2x): 17.9 / 13.0 / 8.7 / 4.5 pt at 0.75 / 1.75 /
+3.25 / 5.25 pt below the pill, tip 6.5 pt below it; Apple's decoded union (16 pt square, r 2.5, offset 4, k 25) at the same
+depths: 16.2 / 12.1 / 8.1 / 4.1, tip 6.4 (Q-dock-08 "about 16 wide x 6.5 tall" is the width right under the pill). Judge #3's
+12 pt "at the base" is this shape read about 1.75 pt lower, where the unfilled pointer also lost contrast.
