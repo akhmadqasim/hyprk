@@ -28,24 +28,25 @@ TestCase {
         compare(G.switchKnobX(m, 0), 1.5);
     }
     // PC #60 section 4 (probe-switch-knob-series-dark.json, 60 Hz): from the start of movement 50 % at about 0.10 s,
-    // the end at about 0.233 s, peak +4.2 % at about 0.33 s. The Mac then snaps the last 1.8 % home at about 0.45 s
-    // (36.32 -> 36 in the series); the spring here gets within 1 % by 0.49 s instead. Stepped at 60 Hz as drawn.
+    // the end at about 0.233 s, peak +4.2 % at about 0.33 s. PC #67 A3 (verify/A/switch-fit.json): the Mac cuts the
+    // spring after 27 frames, at 1.0176, and snaps home (Switch.qml's cut timer). Stepped at 60 Hz as drawn.
     function test_switch_travel_curve() {
         const r = Tokens.motion.switchTravelResponse, d = Tokens.motion.switchTravelDamping, dt = 1 / 60;
-        let x = 0, v = 0, t50 = -1, tEnd = -1, peak = 0, tPeak = 0, settled = -1;
+        let x = 0, v = 0, t50 = -1, tEnd = -1, peak = 0, tPeak = 0, at27 = 0;
         for (let i = 1; i <= 60; i++) {
             [x, v] = M.springStep(x, v, 1, r, d, dt);
             const t = i * dt;
             if (t50 < 0 && x >= 0.5) t50 = t;
             if (tEnd < 0 && x >= 1) tEnd = t;
             if (x > peak) { peak = x; tPeak = t; }
-            if (Math.abs(x - 1) > 0.01) settled = -1; else if (settled < 0) settled = t;
+            if (i === 27) at27 = x;
         }
         verify(Math.abs(t50 - 0.100) <= 0.017, "50 % at " + t50);
         verify(Math.abs(tEnd - 0.233) <= 0.025, "end at " + tEnd);
         verify(peak > 1.035 && peak < 1.047, "peak " + peak);
         verify(Math.abs(tPeak - 0.33) <= 0.035, "peak at " + tPeak);
-        verify(settled > 0 && settled <= 0.5, "within 1 % at " + settled);
+        verify(Math.abs(at27 - 1.0176) < 0.002, "frame 27 at " + at27);
+        verify(Tokens.motion.switchTravelCut > 27 * 1000 / 60 && Tokens.motion.switchTravelCut < 28 * 1000 / 60);
     }
     // press lens: CAMediaTimingFunction easeInEaseOut over 0.20 s, no delay
     function test_switch_lens_timing() {

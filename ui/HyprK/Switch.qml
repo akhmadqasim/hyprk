@@ -4,7 +4,8 @@ import "controls.js" as G
 // macOS 27.2.1 switch (MAC-ANSWERS.md Q-settings-16, -17 and PC #60 section 4): accent track when on, white
 // capsule knob (Knob). Not glass at rest. On mouse-down the knob grows x1.56 into a clear lens (easeInEaseOut
 // 0.20 s from that frame); on release it shrinks back with the travel spring while it slides. The knob travels on
-// a spring (response 0.457, damping 0.72) that carries it 4 % past the end; the track colour cross-fades in
+// a spring (SwiftUI response 0.47, dampingFraction 0.7) that carries it 4 % past the end and is cut after 27 frames
+// (0.46 s: the knob jumps the last 1.8 % home, PC #67 A3); the track colour cross-fades in
 // 0.24 s from the release. Click toggles on release; the knob can also be dragged across and lands on the nearer
 // end. Space toggles when it has keyboard focus.
 // Sizes: controlSize "regular" 54 x 24, "small" 44 x 20, "mini" 36 x 16 (Settings; default Tokens.switchSize).
@@ -30,7 +31,9 @@ Item {
         damping: sw.reduceMotion ? 1 : Tokens.motion.switchTravelDamping
         epsilon: 0.001
         instant: ma.dragging
+        onTargetChanged: cut.restart()
     }
+    Timer { id: cut; interval: Tokens.motion.switchTravelCut; onTriggered: along.snap() }
     // track colour 0 off .. 1 on: a cross-fade from the release, not tied to the knob
     property real _on: checked ? 1 : 0
     Behavior on _on { NumberAnimation { duration: Tokens.motion.switchTrackFade; easing.type: Easing.OutCubic } }

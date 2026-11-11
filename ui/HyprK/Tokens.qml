@@ -199,11 +199,15 @@ QtObject {
     // ---------- motion (springs: response s, dampingFraction) ----------
     readonly property QtObject motion: QtObject {
         // Controls (MAC-ANSWERS.md Q-settings-17, 120 Hz layer samples in controls-press-light.json)
-        // switch knob travel, 27.2.1 knob series (MAC-ANSWERS.md PC #60 section 4, probe-switch-knob-series-dark.json):
-        // an underdamped spring from rest, response 0.457 (omega 13.75): 50 % at 0.10 s, at the end 0.233 s, +4.2 % at
-        // 0.33 s; regular and mini alike, both directions. The knob really moves past the end (+0.75 pt regular).
-        readonly property real switchTravelResponse: 0.457
-        readonly property real switchTravelDamping: 0.71   // best fit over the 8 series (rms 0.003); 0.72 peaks low
+        // switch knob travel (MAC-ANSWERS.md PC #67 A3, verify/A/switch-fit.json): DesignLibrary's switch body runs
+        // SwiftUI .spring(response: 0.47, dampingFraction: 0.7), integrated at 1/300 s. motion.js springStep is the
+        // same integrator (4 ms substeps = 1/300 s at 60 Hz), so the code values go in as written: RMS 0.0003 pt
+        // against the 240 Hz knob series (the analytic equivalent is response 0.4624, ratio 0.7113). Overshoot
+        // 4.16 % (+0.75 pt regular), regular and mini alike, both directions.
+        readonly property real switchTravelResponse: 0.47
+        readonly property real switchTravelDamping: 0.7
+        // the animation is cut after 27 frames (about 0.46 s): the knob jumps from 1.0176 to 1.0 on the next frame
+        readonly property int switchTravelCut: 460
         // press: the knob grows x1.56 into the lens from the mouse-down frame, easeInEaseOut (0.42, 0, 0.58, 1) 0.20 s,
         // no delay (rms 0.0002); release: it shrinks with the travel spring above (width tracks x in the series)
         readonly property int switchLensIn: 200
