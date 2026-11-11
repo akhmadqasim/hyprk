@@ -57,6 +57,10 @@ namespace lg {
         // ns -> signed fill amount (0..1, > 0 plus-lighter, < 0 plus-darker): every shape of that layer is a compositing
         // fill over what lies under it, drawn before the layer's own content (Shape.hpp SGlassShape::fill)
         std::unordered_map<std::string, double>      fillLayers;
+        // ns -> signed fill amount for the cuts of that layer's region (`cut_fills`, light; `cut_fills_dark`, dark
+        // appearance): a hole of 2 x 2 px or more inside a glass shape is a fill of the hole's rounded rect over the glass
+        // (Shape.hpp cutShapes). The shell sends the glass and the fill in one commit of one surface (Cmd-Tab's selection tile)
+        std::unordered_map<std::string, double>      cutFills, cutFillsDark;
 
         // ns -> other namespace: while a layer `other` is mapped on the output, the glass of `ns` samples the output's background
         // layers (the wallpaper), not the windows under it (the Dock while Mission Control is open: the Mac's Dock sits over
@@ -127,6 +131,8 @@ namespace lg {
 
     // `fill_layers` entry of a namespace: the signed fill amount (> 0 lighter, < 0 darker), 0 none
     double fillFor(const SParams& p, const std::string& ns);
+    // the cut fill of a namespace for the plugin's appearance (`appearance` dark: `cut_fills_dark`, else `cut_fills`), 0 none
+    double cutFillFor(const SParams& p, const std::string& ns);
     // "ns:lighter, ns2:darker, ns3:lighter:125" -> {{ns, 65/255}, {ns2, -57/255}, {ns3, 125/255}}: an optional third field
     // is the amount in 1/255 (0 < a <= 255; the default amounts are the Cmd-Tab tile's); other items are skipped
     std::unordered_map<std::string, double> parseFillMap(std::string_view s);

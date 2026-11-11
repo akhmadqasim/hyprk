@@ -5,6 +5,7 @@
 #include "Shape.hpp"
 #include "TitlebarLayout.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 
@@ -52,6 +53,27 @@ int main() {
         auto shapes = clusterRegion(rects);
         CHECK(shapes.size() == 2);
         CHECK(near(shapes[1].box.y, 100) && near(shapes[1].radius, 0));
+    }
+    // a rounded cut inside a shape (Cmd-Tab's selection tile, `cut_fills`): the shape keeps its box, the cut is read like a
+    // shape of its own; 1 px marker holes are no cut, nor are the gaps between two shapes in other bands
+    {
+        const auto panel = roundedRows(100, 50, 400, 200, 24), tile = roundedRows(150, 90, 120, 120, 20);
+        std::vector<SRect> rects;
+        for (const auto& p : panel) {
+            const auto it = std::find_if(tile.begin(), tile.end(), [&](const SRect& t) { return t.y == p.y; });
+            if (it == tile.end()) { rects.push_back(p); continue; }
+            rects.push_back({p.x, p.y, it->x - p.x, 1});
+            rects.push_back({it->right(), p.y, p.right() - it->right(), 1});
+        }
+        rects.push_back({300, 150, 50, 1}); // a materialize-like 1 px gap next to a run
+        rects.push_back({351, 150, 50, 1});
+        const auto shapes = clusterRegion(rects);
+        CHECK(shapes.size() == 1 && near(shapes[0].box.w, 400) && near(shapes[0].box.h, 200));
+        const auto cuts = cutShapes(rects);
+        CHECK(cuts.size() == 1);
+        CHECK(!cuts.empty() && near(cuts[0].box.x, 150) && near(cuts[0].box.y, 90) && near(cuts[0].box.w, 120) && near(cuts[0].box.h, 120));
+        CHECK(!cuts.empty() && std::abs(cuts[0].radius - 20) <= 3);
+        CHECK(cutShapes(roundedRows(0, 0, 300, 80, 16)).empty());
     }
     // corner-only contact does not merge; empty rects ignored
     {

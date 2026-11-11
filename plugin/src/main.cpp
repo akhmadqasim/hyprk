@@ -80,12 +80,13 @@ static std::vector<lg::SGlassShape> shapesFor(const PHLLS& layer, const PHLMONIT
     const auto                   surface = layer->wlSurface();
     if (surface && surface->m_hasBackgroundEffect && !surface->m_blurRegion.empty())
         // the client's ext-background-effect region (Quickshell BackgroundEffect.blurRegion)
-        shapes = lg::shapesFromRegion(surface->m_blurRegion, off.x, off.y, &opacity, size);
+        shapes = lg::shapesFromRegion(surface->m_blurRegion, off.x, off.y, &opacity, size, lg::cutFillFor(p, layer->m_namespace));
     else if (!p.requireRegion)
         shapes.push_back({{off.x, off.y, size.x, size.y}, 0});
 
     for (auto& s : shapes)
-        s.radius = lg::radiusFor(p, layer->m_namespace, s.radius);
+        if (s.fill == 0) // a cut keeps the radius of its own staircase
+            s.radius = lg::radiusFor(p, layer->m_namespace, s.radius);
     return shapes;
 }
 
@@ -181,8 +182,9 @@ static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext
     // no shapes = no region with require_region: the layer is left to Hyprland
     double opacity = 1;
     auto   shapes  = wanted ? shapesFor(layer, mon, *params, opacity) : std::vector<lg::SGlassShape>{};
-    for (auto& s : shapes)
-        s.fill = fill; // a fill layer's shapes are fills, not glass
+    if (fill != 0)
+        for (auto& s : shapes)
+            s.fill = fill; // a fill layer's shapes are fills, not glass
     if (shapes.empty()) {
         original(thisptr, ctx, layer, mon, now, popups, lockscreen, workspaceScene);
         return;

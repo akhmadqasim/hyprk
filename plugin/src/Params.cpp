@@ -58,6 +58,12 @@ namespace lg {
         return it == p.fillLayers.end() ? 0.0 : it->second;
     }
 
+    double cutFillFor(const SParams& p, const std::string& ns) {
+        const auto& map = p.appearance == 2 ? p.cutFillsDark : p.cutFills;
+        const auto  it  = map.find(ns);
+        return it == map.end() ? 0.0 : it->second;
+    }
+
     std::unordered_map<std::string, double> parseFillMap(std::string_view s) {
         std::unordered_map<std::string, double> out;
         for (const auto& item : splitList(s)) {

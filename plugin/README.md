@@ -269,7 +269,8 @@ boxes); nothing at rest.
 | `adapt_low` / `adapt_high` | 0.1 / 0.3 | hysteresis band (SPEC 9.6, V2 light range) |
 | `underlay_blur` | "" | `ns:radius` (Apple blur radius, pt) of a blur composed into that glass's reads without a pass (the panel blur's older stand-in; 2.05 fitted the CC tiles) |
 | `panel_blur` | `hyprk-controlcenter:1.79` | `ns:radius`: draw that panel blur behind the layer's glass (see Materials) |
-| `fill_layers` | "" | `ns:lighter` / `ns:darker`: every shape of that layer is a plus-lighter (+65/255) or plus-darker (-57/255) fill over what lies under it, drawn before the layer's content (Cmd-Tab selection tile, Dock dots: Qt cannot blend with the compositor's glass). `ns:lighter:125` / `ns:darker:128` sets the amount in 1/255 (0 < a <= 255; the Dock's running dots, Q-dock-07). The fill takes the layer's opacity like the glass under it; give the namespace the `no_anim` layer rule, or Hyprland's layer fade runs on it and it trails the glass |
+| `fill_layers` | "" | `ns:lighter` / `ns:darker`: every shape of that layer is a plus-lighter (+65/255) or plus-darker (-57/255) fill over what lies under it, drawn before the layer's content (Dock dots; Cmd-Tab's tile is a cut, see Cuts: Qt cannot blend with the compositor's glass). `ns:lighter:125` / `ns:darker:128` sets the amount in 1/255 (0 < a <= 255; the Dock's running dots, Q-dock-07). The fill takes the layer's opacity like the glass under it; give the namespace the `no_anim` layer rule, or Hyprland's layer fade runs on it and it trails the glass |
+| `cut_fills` / `cut_fills_dark` | "" / "" | same syntax as `fill_layers`, used in light / dark `appearance`: the cuts of that layer's glass region (holes of 2 px or more across, see Cuts) are plus-lighter / plus-darker fills of the hole's rounded rect over the layer's glass, in the same commit as the glass (Cmd-Tab's selection tile) |
 | `wallpaper_under` | `hyprk-dock:hyprk-mission` | `ns:other`: while a layer `other` is mapped on the output, the glass of `ns` samples the output's background layers (the wallpaper) and not what lies under it: the background layers' textures are drawn again inside what that glass reads, right before it. The Dock while Mission Control is open: the shell's Mission Control layer covers the windows with the wallpaper but sits above the Dock, whose glass refracted the real window under it (red window parked under the Dock, Dock box against the Dock over the bare wallpaper: rms 115.2 -> 0.5 levels). One clipped quad, only while `other` is mapped |
 | `icon_masks` / `sdf_layers` | "" / "" | pictures handed over as layer surfaces: the Dock icons' clear-mode masks, an SDF picture as a glass shape (see Textures from the shell) |
 | `popup_classes` / `popup_material` / `popup_radius` | `^hyprk-finder$` / `menu` / 12 | glass behind the xdg_popups of matching windows (see Client popups) |
@@ -451,6 +452,17 @@ white): the silhouette is the picture's (5,900 px inside, 100 of them unchanged,
 body 204 as the recipe's. GPU: 0.027 ms per frame for that shape (its own backdrop copy).
 Assumed, not checked against the asset (it is not on this machine): the sign of the distance and the normal's encoding.
 Not read: which recipe glass background style 2 is.
+
+## Cuts (a fill in the glass's own commit)
+
+A fill on a surface of its own (`fill_layers`) commits apart from the glass it sits on, so the first frame of a panel could
+show the glass without the content of the other surface (Cmd-Tab: 2 of 5 opens, MOTION-MEASURED session 16). A cut keeps
+both on one surface: the shell subtracts the fill's rounded rect from the glass region (`Glass.cut`, Quickshell
+`Intersection.Subtract`), and for a namespace in `cut_fills` / `cut_fills_dark` the plugin reads every hole of 2 px or more
+across in the region's bands (`Shape.cpp cutShapes`; the marker holes are 1 px wide) as a shape of its own, box and corner
+radius from the hole's staircase, and draws it as a fill after the glass, before the surface. The glass itself is drawn from
+its shape's box and does not see the hole. A glass with a cut sends no sub-point edge markers (`Glass.subPointEdges`):
+those rows cross the cut. Cost: the same fill quad the fill layer drew, one layer element less.
 
 ## Dock label pointer
 

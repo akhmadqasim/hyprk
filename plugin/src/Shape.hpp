@@ -66,6 +66,11 @@ namespace lg {
     int fractionLevels(double w);
     std::vector<SGlassShape> clusterRegion(const std::vector<SRect>& rects);
 
+    // Cuts (`cut_fills`): the holes of 2 px or more across in a region's bands (a region subtracted from a glass shape,
+    // Quickshell Intersection.Subtract; the marker holes are 1 px wide), clustered and read like shapes (box, corner radius
+    // from the hole's own staircase). The glass is drawn from its shape's box, so a cut does not change it.
+    std::vector<SGlassShape> cutShapes(const std::vector<SRect>& rects);
+
     // A pointer shape has no materialize hole (its marker is a hole of its own): it takes the materialize of the largest
     // other shape of its group (the label pill), so pill and pointer come and go as one shape. Alone it keeps its own.
     void pointerFollowsGroup(std::vector<SGlassShape>& shapes, const std::vector<SGlassGroup>& groups);

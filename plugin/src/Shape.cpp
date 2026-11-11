@@ -240,6 +240,25 @@ namespace lg {
         return out;
     }
 
+    std::vector<SGlassShape> cutShapes(const std::vector<SRect>& rects) {
+        std::map<std::pair<double, double>, std::vector<SRect>> bands; // (y, h) -> the band's rects
+        for (const auto& r : rects)
+            if (r.w > 0 && r.h > 0)
+                bands[{r.y, r.h}].push_back(r);
+        std::vector<SRect> gaps;
+        for (auto& [key, row] : bands) {
+            std::ranges::sort(row, {}, &SRect::x);
+            for (size_t i = 0; i + 1 < row.size(); ++i)
+                if (const double gap = row[i + 1].x - row[i].right(); gap >= 2)
+                    gaps.push_back({row[i].right(), key.first, gap, key.second});
+        }
+        auto out = clusterRegion(gaps);
+        std::erase_if(out, [](const SGlassShape& s) { return s.box.w < 2 || s.box.h < 2; });
+        for (auto& s : out)
+            s.materialize = 1;
+        return out;
+    }
+
     std::vector<SGlassGroup> groupShapes(const std::vector<SGlassShape>& shapes, double smoothK, double pxPerUnit) {
         const size_t        n = shapes.size();
         SDisjointSet        set(n);

@@ -484,13 +484,18 @@ void main() {
         g_readFbo = 0;
     }
 
-    std::vector<SGlassShape> shapesFromRegion(const CRegion& region, double ox, double oy, double* opacity, const Vector2D& size) {
+    std::vector<SGlassShape> shapesFromRegion(const CRegion& region, double ox, double oy, double* opacity, const Vector2D& size, double cutFill) {
         std::vector<SRect> rects;
         for (const auto& r : region.getRects())
             rects.push_back({double(r.x1), double(r.y1), double(r.x2 - r.x1), double(r.y2 - r.y1)});
         if (opacity)
             *opacity = takeOpacityMarker(rects, size.x, size.y);
         auto shapes = clusterRegion(rects);
+        if (cutFill != 0)
+            for (auto& c : cutShapes(rects)) {
+                c.fill = cutFill;
+                shapes.push_back(c);
+            }
         for (auto& s : shapes) {
             s.box.x += ox;
             s.box.y += oy;
