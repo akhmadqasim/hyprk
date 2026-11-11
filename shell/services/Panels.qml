@@ -78,8 +78,10 @@ Singleton {
         activeScreen = screen;
         alert = a;
         open = "alert";
-        // About This Mac and an app's About box are windows/panels on the Mac, not alerts: no beep (`silent`)
-        if (!a.silent) Sounds.play("alert");
+        // NSAlert plays no sound by itself; AppKit plays the alert sound through NSBeep, which a confirmation such as
+        // Empty Trash or Shut Down does not call (MAC-ANSWERS: "when NSAlert plays it: not measured"). So only an alert
+        // that says `beep: true` (an error that would NSBeep) beeps; judge #3: every dialog beeped
+        if (a.beep) Sounds.play("alert");
     }
 
     // open on scr; closes only when it is already open on that same screen

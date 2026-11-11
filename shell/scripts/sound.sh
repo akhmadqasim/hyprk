@@ -19,9 +19,12 @@
 #   sent                           ID 1004 system/SentMessage.caf
 #   power                          PowerChime connect_power.aif
 #   (MAC-ANSWERS "Sounds per event" and "Sound ID -> file", reference/re/27.2.1/decomp/systemsoundserverd-ids.txt)
-# Volume: systemsoundserverd scales every system sound by the user volume pref (the Alert volume slider), UI sounds
-# included: volume = user vol x client vol scalar x CM vol on the one "Starting audio" path for every action ID
-# (27.2.1 arm64e, 0x10000b4c0..0x10000b6f4; the pref is stored at 0x10000dea4). uiSounds gates the UI sounds only.
+# Volume: systemsoundserverd scales every system sound it plays by the user volume pref (the Alert volume slider), UI
+# sounds included: volume = user vol x client vol scalar x CM vol on the one "Starting audio" path for every action ID
+# (27.2.1 arm64e, 0x10000b4c0..0x10000b6f4; the pref is stored at 0x10000dea4: read for commit 5c23f3e, no dump of that
+# range is under reference/). The volume feedback pop (BezelServices) and the power chime (PowerChime) are not played by
+# systemsoundserverd but with NSSound (MAC-ANSWERS "Sounds per event"), so the Alert volume does not reach them: they
+# play at 1 (the output volume only). uiSounds gates the UI sounds only.
 # Files: the Apple originals (sounds/originals, 24-bit PCM, same start latency in pw-play as the Vorbis copies:
 # ~11 ms to streaming for both); an install without them falls back to the Vorbis copies in sounds/oga.
 # HYPRK_MUTE=1 silences everything (nested test sessions at night). HYPRK_SOUND_LOG=<file>: append "<event> <file>"
@@ -72,6 +75,7 @@ esac
 [ -n "${HYPRK_SOUND_LOG:-}" ] && printf '%s %s\n' "$ev" "$f" >> "$HYPRK_SOUND_LOG"
 [ "${HYPRK_MUTE:-0}" = 1 ] && exit 0      # silent test runs
 
+case "$ev" in volume|power) vol=1 ;; esac    # NSSound, not systemsoundserverd: no alert volume
 if command -v pw-play >/dev/null; then
     exec pw-play --volume "$vol" "$f"
 elif command -v paplay >/dev/null; then
