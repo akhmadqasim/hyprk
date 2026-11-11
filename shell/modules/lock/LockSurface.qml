@@ -12,6 +12,7 @@ WlSessionLockSurface {
     LockContent {
         anchors.fill: parent
         primary: Lock.isMain(s.screen)
+        output: s.screen
         interactive: true
         focus: true
         Keys.onPressed: event => { event.accepted = Lock.key(event); }

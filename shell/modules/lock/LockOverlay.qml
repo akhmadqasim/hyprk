@@ -38,6 +38,7 @@ PanelWindow {
     LockContent {
         anchors.fill: parent
         primary: Lock.isMain(w.screen)
+        output: w.screen
         interactive: false
         wall: w.entering ? w.warm(L.track(LockTheme.inWall, w.t)) : 1 - L.track(LockTheme.outWall, w.t)
         bar: w.entering ? w.warm(L.track(LockTheme.inBar, w.t)) : 1 - L.track(LockTheme.outBar, w.t)

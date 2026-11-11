@@ -22,6 +22,7 @@ import "../../lib/clock.js" as Clock
 Item {
     id: c
     property bool primary: true
+    property var output: null      // the ShellScreen: its own wallpaper cut, as the desktop under it (Background.qml)
     property bool interactive: false
     property real wall: 1
     property real bar: 1
@@ -39,8 +40,8 @@ Item {
 
     // ---------- backdrop: the desktop wallpaper exactly as the desktop draws it (Background.qml) ----------
     component Wall: Image {
-        source: Wallpaper.url
-        sourceSize: Qt.size(Wallpaper.pixelWidth, Wallpaper.pixelHeight)
+        source: Wallpaper.urlFor(c.output)
+        sourceSize: Wallpaper.pixelSizeOf(c.output)
         fillMode: Image.PreserveAspectCrop
         cache: true               // the same pixmap as the desktop's and every lock surface's
         asynchronous: false
