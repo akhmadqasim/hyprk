@@ -265,6 +265,10 @@ Singleton {
         // activation: highlight off 4 frames, on 3, then the menu fades (Q-menubar-24)
         readonly property int blinkOff: 67
         readonly property int blinkOn: 50
+        // submenu (Q-menubar-23): opens 0.22 s after its row is highlighted, complete in one frame; its frame overlaps
+        // the parent's right edge by 5 pt and starts 5 pt above the row, so its first row lines up with it
+        readonly property int submenuDelay: 220
+        readonly property real submenuOverlap: 5
     }
 
     // ---------- dock ----------

@@ -1,4 +1,5 @@
-// Static menu definitions. Items: {label, shortcut, action, disabled, submenu:true} or {sep:true}.
+// Static menu definitions. Items: {label, shortcut, action, disabled, submenu:true, items:[...]} or {sep:true}.
+// A submenu row opens its `items` (MenuDropdown.qml); a submenu row without items shows the chevron only.
 // Shortcut glyphs use the macOS modifier symbols.
 .pragma library
 
@@ -111,4 +112,42 @@ function forApp(appId) {
     const key = String(appId || "").toLowerCase().split(".").pop();
     const spec = apps[key] || (appId ? { titles: ["File", "Edit", "View", "Window", "Help"], extra: { "File": fileMenu() } } : finder);
     return spec.titles.map(t => ({ title: t, items: (spec.extra && spec.extra[t]) || common[t] || [] }));
+}
+
+// ---------- keyboard and submenu geometry (MenuDropdown.qml, MAC-ANSWERS.md Q-menubar-23, -25) ----------
+
+function selectable(it) { return !!it && !it.sep && !it.disabled; }
+
+// next selectable row from `from` in direction dir (+1 Down, -1 Up), no wrap: stays put at either end.
+// Nothing selected (from < 0): Down picks the first selectable row, Up the last.
+function step(items, from, dir) {
+    if (from < 0) {
+        if (dir > 0) { for (let i = 0; i < items.length; i++) if (selectable(items[i])) return i; }
+        else { for (let i = items.length - 1; i >= 0; i--) if (selectable(items[i])) return i; }
+        return -1;
+    }
+    for (let i = from + dir; i >= 0 && i < items.length; i += dir) if (selectable(items[i])) return i;
+    return from;
+}
+
+// a submenu row that has something to open
+function opens(it) { return selectable(it) && it.submenu === true && Array.isArray(it.items) && it.items.length > 0; }
+
+// top of row i inside the row list (rows `row` pt, separators `sep` pt)
+function rowTop(items, i, row, sep) {
+    let y = 0;
+    for (let k = 0; k < i && k < items.length; k++) y += items[k].sep ? sep : row;
+    return y;
+}
+
+// Submenu frame in the parent's coordinate space (all in pt): x = parent right edge - overlap, y = row top - pad, so
+// its first row lines up with the parent row (Q-menubar-23). Not measured on the Mac, kept simple: when it does not
+// fit on the right it opens on the left with the same overlap; at the bottom it is shifted up to `margin` above the edge.
+// m: { menuX, menuY, menuW, rowTop, subW, subH, areaW, areaH, overlap, pad, margin }
+function submenuFrame(m) {
+    let x = m.menuX + m.menuW - m.overlap;
+    if (x + m.subW > m.areaW - m.margin) x = m.menuX - m.subW + m.overlap;
+    let y = m.menuY + m.rowTop - m.pad;
+    y = Math.max(0, Math.min(y, m.areaH - m.margin - m.subH));
+    return { x: x, y: y };
 }

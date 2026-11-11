@@ -855,5 +855,38 @@ test("mode buttons start inside the field, end in place", () => {
     });
 }
 
+// ---- menus: keyboard steps and submenu frames (MenuDropdown.qml, Q-menubar-23, -25) ----
+{
+    const M = load("menus.js");
+    const items = [{ label: "A" }, { sep: true }, { label: "B", disabled: true }, { label: "C" },
+                   { label: "D", submenu: true, items: [{ label: "x" }] }, { label: "E", submenu: true }];
+    test("menu keys: Down from nothing = first, Up from nothing = last selectable", () => {
+        assert.equal(M.step(items, -1, 1), 0);
+        assert.equal(M.step(items, -1, -1), 5);
+    });
+    test("menu keys: skip separators and disabled rows, no wrap", () => {
+        assert.equal(M.step(items, 0, 1), 3);
+        assert.equal(M.step(items, 3, -1), 0);
+        assert.equal(M.step(items, 0, -1), 0);
+        assert.equal(M.step(items, 5, 1), 5);
+    });
+    test("submenu opens only with items", () => {
+        assert.ok(M.opens(items[4]));
+        assert.ok(!M.opens(items[5]) && !M.opens(items[0]) && !M.opens({ label: "F", submenu: true, disabled: true, items: [{}] }));
+    });
+    test("rowTop: rows 24, separators 11", () => assert.equal(M.rowTop(items, 3, 24, 11), 24 + 11 + 24));
+    const base = { menuX: 100, menuY: 40, menuW: 200, rowTop: 5 + 59, subW: 150, subH: 100, areaW: 1280, areaH: 800, overlap: 5, pad: 5, margin: 6 };
+    test("submenu frame: parent right edge - 5, row top - 5 (first rows level)", () => {
+        const f = M.submenuFrame(base);
+        assert.equal(f.x, 295);
+        assert.equal(f.y, 40 + 64 - 5);
+    });
+    test("submenu frame: flips left at the right edge, shifted up at the bottom", () => {
+        const f = M.submenuFrame(Object.assign({}, base, { menuX: 1000, menuY: 700 }));
+        assert.equal(f.x, 1000 - 150 + 5);
+        assert.equal(f.y, 800 - 6 - 100);
+    });
+}
+
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

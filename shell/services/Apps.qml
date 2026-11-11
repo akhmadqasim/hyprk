@@ -252,8 +252,14 @@ Singleton {
         const wins = item.windows || [];
         const out = wins.map(w => ({ label: w.title || item.name, action: () => root.focusWindow(w) }));
         if (out.length > 0) out.push({ sep: true });
-        out.push({ label: "Options", submenu: true, disabled: true });
-        out.push({ label: "Show in Finder", disabled: true });
+        // Options ▸ as on 27.2.1 (MAC-ANSWERS.md Q-dock-10): pinned "Remove from Dock", else "Keep in Dock", then
+        // Open at Login and Show in Finder. The Dock list is fixed and there is no login-items store, so they show disabled
+        const pinned = root.pinned.some(p => p.id === item.id);
+        out.push({ label: "Options", submenu: true, items: [
+            { label: pinned ? "Remove from Dock" : "Keep in Dock", disabled: true },
+            { label: "Open at Login", disabled: true },
+            { label: "Show in Finder", disabled: true },
+        ] });
         out.push({ sep: true });
         if (wins.length > 0)
             out.push({ label: "Quit", action: () => wins.forEach(root.closeWindow) });

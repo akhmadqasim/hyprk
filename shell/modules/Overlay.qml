@@ -28,8 +28,9 @@ ShellWindow {
     exclusionMode: ExclusionMode.Ignore
     namespace: "hyprk-overlay"
     WlrLayershell.layer: WlrLayer.Overlay
-    // the alert must get Return/Escape even when opened without a click (IPC, Dock menu)
-    WlrLayershell.keyboardFocus: !active ? WlrKeyboardFocus.None : Panels.open === "alert" ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand
+    // the alert must get Return/Escape even when opened without a click (IPC, Dock menu); an open menu takes the keys
+    // too (Q-menubar-25: arrows, Return, Esc), although the click that opened it went to the menu bar or the Dock
+    WlrLayershell.keyboardFocus: active ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     MouseArea {
         anchors.fill: parent
@@ -40,11 +41,17 @@ ShellWindow {
         anchors.fill: parent
         focus: true
         Keys.onEscapePressed: Panels.close()
+        // arrows and Return go to the open menu (and on to its submenu, MenuDropdown.key)
+        Keys.onPressed: e => {
+            const m = menu.shown ? menu : context.shown ? context : null;
+            if (m && m.key(e.key)) e.accepted = true;
+        }
     }
 
     // ---------- context menu (desktop, Dock) ----------
     MenuDropdown {
         id: context
+        host: ov
         shown: Panels.open === "context" && Panels.activeScreen === ov.modelData
         items: Panels.contextItems
         // AppKit popUp at a point (MAC-ANSWERS.md Q-menubar-27): x = point, top = point - 5 so the first row
@@ -75,6 +82,7 @@ ShellWindow {
     // pill a few frames later (Panels.stepMenu)
     MenuDropdown {
         id: menu
+        host: ov
         shown: Panels.open === "menu" && Panels.activeScreen === ov.modelData
         // at the title frame x - 5, 1 pt below the bar, kept 6 pt off the right edge (Q-menubar-14)
         x: Math.max(0, Math.min(Panels.menuShownX + Theme.menu.offsetX, ov.width - width - Theme.menu.screenMargin))

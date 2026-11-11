@@ -5,6 +5,7 @@ import qs
 import qs.components
 import qs.HyprK
 import qs.services
+import "../lib/menus.js" as Menus
 
 // Menu of macOS 27.2.1, one component for every menu: menu bar pull-downs and the context menus of the
 // desktop and the Dock (Overlay.qml). Pull-down and context menu are the same glass, radius 12, with
@@ -15,6 +16,11 @@ import qs.services
 // Motion: appears complete at once, a chosen row blinks once (off 67 ms, on 50 ms) and then the menu runs
 // the item and fades out in 0.2 s ease-out, as on Esc (Q-menubar-23, -24). The selection glides from row to
 // row (Reduce motion: no glide).
+// Submenus (Q-menubar-23): a row with `submenu: true` and `items` opens them 0.22 s after it is highlighted (at once on
+// a click, Right or Return), on its own surface (MenuSubmenu.qml) overlapping this menu's right edge by 5 pt with its
+// first row level with the row; the row stays highlighted while it is open; another row closes it in the same frame.
+// Keys (Q-menubar-25, handed in by the Overlay): Up/Down without wrap, Right/Return open a submenu with its first row
+// selected, Left closes it, Return runs a row.
 Item {
     id: root
 
@@ -22,6 +28,11 @@ Item {
     property bool shown: false
     property real originX: 0       // screen position of this item, for the glass backdrop
     property real originY: 0
+    property var host: null        // the window this menu is in (Overlay or a submenu surface), for submenus
+    // a submenu's parent menu: closing with the parent (Esc, a chosen row) fades, a move to another parent row hides
+    // the submenu in one frame (read when it closes, not bound: the two change in the same event)
+    property var parentMenu: null
+    property bool selectFirst: false   // select the first row when shown (a submenu opened from the keyboard)
 
     // the items stay while the menu fades out. The menu bar clears them on close, and that arrives
     // while `shown` is still true (Panels resets menuIndex first), so an empty list is never taken
@@ -133,28 +144,110 @@ Item {
     property real hoverY: 0
     function enterRow(i, y) {
         const fresh = hover < 0;
+        // another row: an open submenu goes in the same frame; a submenu row starts the open delay
+        if (i !== subIndex) {
+            closeSub();
+            if (Menus.opens(shownItems[i])) {
+                subPending = i;
+                subTimer.restart();
+            }
+        }
         hover = i;
         hoverY = y;
         if (fresh || A11y.reduceMotion) selY.snap();
     }
     // leaving a row and entering the next arrive in one pointer event: clear only if none took over
     // (a closing menu keeps its selection while it fades out)
-    function leaveRow(i) { Qt.callLater(() => { if (root.shown && !root.activating && root.hover === i) root.hover = -1; }); }
-    onShownItemsChanged: hover = -1
+    // The row of an open submenu stays highlighted (the pointer went into the submenu); leaving a row whose delay is
+    // still running cancels it
+    function leaveRow(i) {
+        Qt.callLater(() => {
+            if (!root.shown || root.activating || root.hover !== i || root.subIndex === i) return;
+            root.hover = -1;
+            if (root.subPending === i) root.closeSub();
+        });
+    }
+    onShownItemsChanged: { hover = -1; closeSub(); }
+    onVisibleChanged: if (!visible) closeSub()   // faded out with its submenu: nothing left open for the next time
     onShownChanged: {
         if (shown) {
             latchItems();
             hover = -1;
+            closeSub();
             fadeOut.stop();
             fade = 1;
+            if (selectFirst) selectRow(Menus.step(shownItems, -1, 1));
         } else {
             blinkOffTimer.stop();
             blinkOnTimer.stop();
+            subTimer.stop();
             activating = false;
             blinkOff = false;
-            fadeOut.start();
+            if (!parentMenu || !parentMenu.shown) fadeOut.start();
+            else {
+                fadeOut.stop();
+                fade = 0;
+            }
         }
     }
+    function selectRow(i) {
+        if (i < 0) return;
+        enterRow(i, Menus.rowTop(shownItems, i, Theme.menu.itemHeight, Theme.menu.separatorHeight));
+        if (subPending === i) {   // a key highlights a submenu row without the hover delay: Right or Return opens it
+            subTimer.stop();
+            subPending = -1;
+        }
+    }
+
+    // ---------- submenu ----------
+    property int subIndex: -1          // row whose submenu is open
+    property int subPending: -1        // row whose submenu opens when the hover delay ends
+    property bool subKeyboard: false   // opened by a key: its first row is selected
+    readonly property var submenu: subLoader.item ? subLoader.item.menu : null
+    function openSub(i, keyboard) {
+        subTimer.stop();
+        subPending = -1;
+        if (!Menus.opens(shownItems[i])) return;
+        subKeyboard = !!keyboard;
+        subIndex = i;
+    }
+    function closeSub() {
+        subTimer.stop();
+        subPending = -1;
+        subIndex = -1;
+    }
+    Timer { id: subTimer; interval: Theme.menu.submenuDelay; onTriggered: root.openSub(root.subPending, false) }
+    Loader {
+        id: subLoader
+        active: root.host !== null && root.visible && (root.subIndex >= 0 || root.subPending >= 0)
+        source: "MenuSubmenu.qml"
+        onLoaded: item.owner = root
+    }
+
+    // keys from the Overlay; true when used. The deepest open submenu that has a selection takes them first.
+    function key(k) {
+        const sub = subIndex >= 0 ? submenu : null;
+        if (sub && sub.hover >= 0 && sub.key(k)) return true;
+        if (sub && k === Qt.Key_Left) {
+            closeSub();
+            return true;
+        }
+        if (k === Qt.Key_Down || k === Qt.Key_Up) {
+            selectRow(Menus.step(shownItems, hover, k === Qt.Key_Down ? 1 : -1));
+            return true;
+        }
+        const it = hover >= 0 ? shownItems[hover] : null;
+        if ((k === Qt.Key_Right || k === Qt.Key_Return || k === Qt.Key_Enter) && Menus.opens(it)) {
+            openSub(hover, true);
+            return true;
+        }
+        if ((k === Qt.Key_Return || k === Qt.Key_Enter) && Menus.selectable(it) && !it.submenu) {
+            activate(hover, it.action);
+            return true;
+        }
+        return false;
+    }
+
     Spring { id: selY; target: root.hoverY; response: Theme.anim.menuTrackResponse; damping: Theme.anim.menuTrackDamping; epsilon: 0.3 }
     Rectangle {
         visible: root.hover >= 0 && !root.blinkOff
@@ -262,7 +355,11 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     enabled: root.shown && !root.activating
-                    onClicked: if (row.enabled && !row.modelData.submenu) root.activate(row.index, row.modelData.action)
+                    onClicked: {
+                        if (!row.enabled) return;
+                        if (row.modelData.submenu) root.openSub(row.index, false);   // a click opens it at once
+                        else root.activate(row.index, row.modelData.action);
+                    }
                 }
             }
         }
