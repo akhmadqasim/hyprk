@@ -451,10 +451,14 @@ hl.bind("SHIFT + XF86AudioMute", volumeKey("mute shift"), { locked = true })
 
 -- screenshots like macOS: Cmd+Shift+3 full screen, Cmd+Shift+4 area (needs slurp), shutter sound
 -- xdg-user-dir knows localized folders; mkdir so a fresh home works
+-- The shutter sounds as the screen is taken, not after the file is written: screencapture 27.2.1 plays system sound
+-- 0x571 (FUN_10000cc88) before it writes the image, and grim spends ~1.5 s encoding a 2560x1664 PNG after its ~30 ms
+-- capture (session 19), so the sound starts with grim instead of after it
 local shotFile = '"$(d=$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures"); mkdir -p "$d"; echo "$d")/Screenshot $(date "+%Y-%m-%d at %H.%M.%S").png"'
-hl.bind(cmd .. " + SHIFT + 3", hl.dsp.exec_cmd("grim " .. shotFile .. " && " .. sound .. " screenshot"))
-hl.bind(cmd .. " + SHIFT + 4", hl.dsp.exec_cmd("command -v slurp >/dev/null && grim -g \"$(slurp)\" " .. shotFile .. " && " .. sound .. " screenshot"))
-hl.bind("Print",               hl.dsp.exec_cmd("grim " .. shotFile .. " && " .. sound .. " screenshot"))
+local shutter = "{ " .. sound .. " screenshot & } ; "
+hl.bind(cmd .. " + SHIFT + 3", hl.dsp.exec_cmd(shutter .. "grim " .. shotFile))
+hl.bind(cmd .. " + SHIFT + 4", hl.dsp.exec_cmd("command -v slurp >/dev/null && g=$(slurp) && { " .. shutter .. "grim -g \"$g\" " .. shotFile .. "; }"))
+hl.bind("Print",               hl.dsp.exec_cmd(shutter .. "grim " .. shotFile))
 
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 

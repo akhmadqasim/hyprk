@@ -26,7 +26,7 @@ changes apply at once. Missing file or keys fall back to the defaults.
 | `power` | a laptop goes from battery to the charger (UPower) | `misc/PowerChime-connect_power` | `uiSounds` |
 | `poof` | an app dragged off the Dock is let go there (Mac: Q-dock-17 "Remove" bubble, fade 0.25 s, ID 15) | `SystemSounds/dock/poof item off dock` | `uiSounds` |
 | `volume` | the volume keys (`scripts/volume-key.sh`, below), the Control Center Sound slider and the Sound module's slider when let go after a change, the Settings Output volume slider when let go | `misc/BezelServices-volume` | `volumeFeedback`, inverted while Shift is held (keys and Control Center); a new pop stops the previous one |
-| `screenshot` | Cmd+Shift+3, Cmd+Shift+4 (slurp), Print | `SystemSounds/system/Screen Capture` | `uiSounds` |
+| `screenshot` | Cmd+Shift+3, Cmd+Shift+4 (slurp), Print: as the screen is taken (screencapture 27.2.1 `FUN_10000cc88` plays ID 0x571 before writing the file; the only property it sets is CompletePlaybackIfAppDies `ifdi` = 1, so it stays a UI sound); ours starts with grim, 23 ms after the key (was after the PNG encode, ~1.5 s) | `SystemSounds/system/Screen Capture` | `uiSounds` |
 | `trash-empty` | Dock Trash right-click > Empty Trash | `SystemSounds/finder/empty trash` | `uiSounds` |
 | `trash-move`, `mount`, `unmount`, `sent` | available for other apps (Finder) | see `sound.sh` | `uiSounds` |
 
