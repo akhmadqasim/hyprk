@@ -97,9 +97,11 @@ sharp stripes, and the tiles read a fitted `underlay_blur` (2.05) composed into 
 | flat gap white / grey / black / blue | 229 / 114 / 0 / 62,75,185 | same | 229 / 114 / 0 / 62,75,185 |
 | top rim over grey, px 0..5 | 233 180 134 128 124 121 | 231 179 133 127 123 120 | 231 179 133 127 123 120 |
 
-- The on-screen stripes are softer than the Mac's: the shell decodes the wallpaper at the logical size (Background.qml
-  `sourceSize` = screen size in pt), so on a 2x output a 4 pt stripe has 4 px ramps; every on-screen contrast above is lower
-  than on a sharp backdrop (the model numbers are on sharp stripes).
+- The "after" column was taken with the wallpaper decoded at the logical size (4 pt stripes had 4 px ramps on the 2x
+  output). Since 1ee085c the shell cuts and decodes it at the output's pixel size, so the stripes are sharp as on the Mac.
+  Re-measured then (plugin 5e9aff0, same row between the Display and Sound tiles, x 1015..1235 pt): gap peak to peak
+  **31** levels (Mac 32), trapezoid **99..130** with 4 px flat tops, mean 114.4 (Mac 99..131, 114.8); Display tile 8 / 15 pt
+  below its top 8 / 8 (Mac 7.9 at 15). The other rows were not re-measured.
 - **Cost** (`stats = 1`, CC opened and closed 6 times, same session): glass per element avg 0.24 -> 0.39 ms, p95 0.33 -> 0.66
   ms (the CC element: a panel pass over its box and a second pyramid); whole frame p95 18.1 -> 18.0-19.4 ms (noise). Nothing
   runs at rest.
