@@ -132,12 +132,11 @@ function curve(s, v0, T, tol) {
 // { duration (ms), curve, to } where `to` is where the spring really is at the cut.
 // A run from rest only depends on the spring and the cut, so it is fitted once per process (the fit costs ~10 ms in
 // the QML engine: a SpringCurve started with a new card held the Notification Center list for a frame, mcap). So is a
-// run with a fixed start velocity (SpringCurve.kick: v0 a whole number of thousandths of the distance per second).
+// run that starts the same way every time (`fixed`: a SpringCurve leaving rest with its kick), keyed by its start velocity.
 const _rest = {};
-function plan(s, from, to, velocity, cutAt) {
+function plan(s, from, to, velocity, cutAt, fixed) {
     const d = to - from, v0 = d !== 0 ? (velocity || 0) / d : 0;
-    const key = Number.isInteger(Math.round(v0 * 1e6) / 1e3)
-        ? s.response + "/" + s.ratio + "/" + (cutAt > 0 ? cutAt : 0) + (v0 === 0 ? "" : "/" + v0) : "";
+    const key = v0 === 0 || fixed ? s.response + "/" + s.ratio + "/" + (cutAt > 0 ? cutAt : 0) + (v0 === 0 ? "" : "/" + v0) : "";
     let r = key ? _rest[key] : undefined;
     if (!r) {
         const T = cutAt > 0 ? cutAt : settleTime(s, v0, 0.001);

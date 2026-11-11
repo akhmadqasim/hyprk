@@ -28,14 +28,15 @@ NumberAnimation {
     function go(to) {
         const now = Date.now(), cur = target[property];
         let v = 0;
-        if (running && _plan) {
+        const wasRunning = running && _plan;
+        if (wasRunning) {
             const t = (now - _t0) / 1000 * _plan.duration / Math.max(1, duration);   // spring time
             v = SpringLib.velocityAt(_planSpring, _plan, _from, t);
         } else v = kick * (to - cur);
         stop();
         goal = to;
         if (cur === to && v === 0) return;
-        _plan = SpringLib.plan(spring, cur, to, v, cutAt);
+        _plan = SpringLib.plan(spring, cur, to, v, cutAt, !wasRunning);
         _planSpring = spring;
         _from = cur;
         _t0 = now;
