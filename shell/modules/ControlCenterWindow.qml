@@ -85,15 +85,17 @@ ShellWindow {
             target: ccw
             function onShownChanged() { dimAnim.go(ccw.shown ? 1 : 0); }
         }
-        // full inside the tiles' box (and past the screen and menu bar edges), about 75 % at 12 pt outside
-        RectangularShadow {
-            x: parent.width - cc.width - Theme.cc.right - 30
-            y: -Theme.cc.dimFeather
-            width: cc.width + Theme.cc.right + 30 + Theme.cc.dimFeather
-            height: cc.y + cc.height + 30 + Theme.cc.dimFeather
-            blur: Theme.cc.dimFeather * 0.6
-            color: Theme.cc.dim
+        // full inside the tiles' box (and past the screen and menu bar edges), about 75 % at 12 pt outside; dithered
+        // (shaders/dimfeather.frag: an 8 bit alpha ramp of 26 levels over the feather showed as rings, user report)
+        ShaderEffect {
+            anchors.fill: parent
+            property color color: Theme.cc.dim
+            property vector4d rect: Qt.vector4d(width - cc.width - Theme.cc.right - 30, -Theme.cc.dimFeather,
+                                                cc.width + Theme.cc.right + 30 + Theme.cc.dimFeather, cc.y + cc.height + 30 + Theme.cc.dimFeather)
+            property size sizePt: Qt.size(width, height)
+            property real sigma: Theme.cc.dimFeather * 0.27
             opacity: dimWin.fade
+            fragmentShader: Qt.resolvedUrl("../shaders/dimfeather.frag.qsb")
         }
     }
 
