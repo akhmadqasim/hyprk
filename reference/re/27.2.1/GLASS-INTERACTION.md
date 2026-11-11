@@ -73,14 +73,27 @@ above are complete for cursor.
 `applyScale(to:width:height:)` 0x190c225cc (decoded):
 - **Lift** (flag `Value+0x42`): `s = (max(w, h) + liftScalePoints) / max(w, h)` on both axes (`fcmp d9, d8; fcsel …
   ls` picks the LONGER side). So the longer side grows by exactly `liftScalePoints` pt (2.5 for a glass under 120 pt).
-- **Stretch** (flag `Value+0x43`, per axis, only when `scaleDistanceThreshold > 0`): from a 2D quantity at `Value+0x20/
-  +0x30` (selected by the byte at `+0x40`) `k = (|a| − |b|) / thr + |b| / (4 thr)` (or, with flag `+0x45`,
-  `(|a| − |b| + 40 |b| / w) / thr`); `scale.x += k, scale.y −= k` and `translation.x += w · sign(a) · k` (y the same
-  with the axes swapped). **Unknown:** what `a` / `b` are (an offset or a velocity; `thr` 60000 suggests a squared or
-  per-second quantity). Not built.
-- Springs: the scale animates on `FluidSpringAnimation` with `scaleSpringResponse / Damping` (updateEffect calls
-  `FluidSpringAnimation.animate` for each component); `scaleSpringTracking*` while tracking. **Unknown:** which pair the
-  release uses (the code path after `isActive` turns false was not traced).
+- **Stretch** (gate `flex`, `Value+0x43`, only when `scaleDistanceThreshold > 0`), round 2 (decoded): the `Value` read
+  here is `FlexValue.Interaction { phase: Phase, gates: Gates }` (swift-dump): `phase` is `active(LocalGesture)` /
+  `inactive(LocalGesture?)` with the tag byte at +0x40, `gates` = interaction +0x41, lift +0x42, flex +0x43, glow +0x44,
+  pulse +0x45. `LocalGesture { start, location, translation, internalTranslation }` (+0x00 / +0x10 / +0x20 / +0x30) comes
+  from `ResolvedLocalGesture.value` 0x190c20ae4: `start = gesture.startLocation - viewOrigin`, `translation =
+  gesture.translation` (the pointer's travel since the press, pt), `location = start + translation`, `internalTranslation
+  = clamp(location, 0, viewSize) - start` (the same travel with the pointer held inside the glass). Per axis, with
+  `d` = translation, `di` = internalTranslation, `thr` = scaleDistanceThreshold:
+  `k = (|d| - |di|) / thr + |di| / (4 thr)` (pulse gate: `(|d| - |di| + 40 |di| / w) / thr`); x: `scale.x += k, scale.y -= k,
+  translation.x += w · sign(d) · k`; y the same with the axes swapped. No velocity and no spring of its own: the target
+  scale / translation go through the same scale springs as the lift. Cursor thresholds 60000 (small, ultraSmall) / 70000
+  (large): a 60 pt drag inside a 78 pt capsule gives k = 0.00025 (+0.02 pt), 100 pt past the edge 0.0017 (+0.13 pt).
+  The pointer stretch is real but sub-point on a Mac; it is **not** the "water" the eye sees (that is the lift's
+  under-damped spring, below). Built (`motion.js pressStretch`, `GlassButton`).
+- Springs (round 2, `updateEffect` 0x190c220a0…0x190c22114, decoded): the scale / drift springs take
+  `scaleSpringTrackingResponse / Damping` (ParameterSet +0x80 / +0x88) only while the `pulse` gate is on **and** the phase
+  is active; otherwise, press **and release** alike, `scaleSpringResponse / Damping` (+0x70 / +0x78). A disabled or empty
+  view springs on 0.5 / 0.5. So by SwiftUI's code the release is the press spring (0.25 / 0.629 for a glass under 120 pt);
+  the recording shows a critically damped 0.21 s settle (below). `GlassContainer.MakeAnimatableInteractionState` (fields
+  `_transaction`, `_phase`, scaleX / scaleY / translationX / translationY as `AnimatableFloatingPoint`) animates the state
+  a second time inside the container with the current transaction: a likely source of the difference, not traced.
 - `applyScalePulse` / `interactionPulse*`: only `menu` (touch) has a pulse; not used for macOS buttons.
 - `applyMovement` (loupe / liquidLens / smallLoupe: `movementScalePoints`, min / max scale): the "magnifier" variants;
   not decoded further (no macOS control in this round uses them; the slider knob does not, see 5).
@@ -150,7 +163,22 @@ track**: there the value changes on mouse-down. A press on the slider's knob wit
   Reduce Motion path was not found in this round (unknown).
 - Shadows of interactive glass: FlexInteraction draws none; the glass shadow stays the recipe's (Verify B, SHADOW.md).
   No shadow value changed this round.
-- Merge / split of neighbouring glass (GlassEffectContainer): not decoded this round.
+- Merge of neighbouring glass while one is pressed (round 2, types decoded, functions not): the container keeps one
+  `InteractionStorage { state, animatedState, isActive }` per `Entry.StableID` (dictionaries at 0x19044dfc8 / 0x19044e0ec),
+  so each button of a merged capsule is its own entry and its own lift; the union is the container's usual shape blend.
+  No attraction term or constant appears in the interaction types: neighbours do not pull toward the pressed one, they
+  merge more only because its shape grew. The 0.35 pt the far end of the share | more capsule moves is that blend
+  (not drawn by hyprk).
+- Control Center (round 2, ControlCenter.app 27.2.1, `re-work/r2/CC.ann`): the module glass is picked from three cached
+  `_Glass` values (thunks 0x10027ed88 / 0x10027ee38 / 0x10027ec54, sites 0x100172828, 0x10029c148, 0x10045bf20, 0x10028c404):
+  environment Bool A off -> `_Glass.regular.subvariant("menu")`; A on and Bool B on -> `_Glass.controlCenter.forceSubdued(true)`;
+  A on and B off -> `_Glass.controlCenter.interactive(true)`. So the tiles do use FlexInteraction (variant automatic): a
+  140 x 64 tile takes the small cursor set (lift 2.25, damping 0.375), as built. The two environment keys (read through
+  0x100145fa8) are not named.
+- vibrantColorMatrix: `_ColorMatrix.YCC` builds its matrix through `_ColorMatrix.apply(blackWhite:saturation:hue:)`
+  (YCC.colorMatrix getter 0x190ec51e8, then `zapAndQuantize`), so `YCC(0.05, 1.05, 1.2, 0)` reads black .05, white 1.05,
+  saturation 1.2, hue 0 by that signature (the argument order inferred from the callee's labels, not traced through the
+  initializer). BigGlow / LittleGlow as two layers: not built.
 
 ## 7. What hyprk does with it (ui/HyprK)
 
@@ -158,7 +186,11 @@ track**: there the value changes on mouse-down. A press on the slider's knob wit
   small → large over the shorter side 80 … 160). `PressSpring` releases on the measured 0.21 s critically damped spring.
 - `ToolbarHighlight`: the press light's centre follows the pointer (0.15 s, damping 1), halves beyond 50 pt from the
   press point (0.5 s); its rise / fall tables already are the decoded big-glow springs.
-- Not built: the stretch term (input unknown), the glow's growth to ×4 on release (our light is a gain profile, not a
+- `motion.js pressStretch` / `GlassButton`: the decoded drag stretch (round 2); `GlassButton.segments`: the pressed button
+  of a merged capsule lifts by its own size, only its outer end moves (Appearance preview: left end 1.25 pt, right end 0;
+  the Mac 1.555 / 0.35).
+- Knob lens, light: the B2 model (ring shadow + key / fill light, `glasslens3.frag`); dark keeps the recording fit.
+- Not built: the glow's growth to ×4 on release (our light is a gain profile, not a
   layer; the measured fall table already covers its brightness), per-button lift inside a merged capsule (the
   Appearance preview's `GlassButton` is the whole capsule: the right edge grows 1.25 pt where the Mac's grows 0.35).
 
@@ -166,5 +198,9 @@ track**: there the value changes on mouse-down. A press on the slider's knob wit
 
 1. A glass button held while the pointer moves 0 → 80 pt across it (60 fps, dark and light): the light's track, the
    halving at 50 pt, and the stretch, if any (it would show `applyScale`'s input).
-2. The same capsule pressed on its right button: which edges grow (per-button lift and its anchor).
+2. The same capsule pressed on its right button: which edges grow (per-button lift and its anchor); a press held while
+   the pointer leaves the glass (does the lift stay, i.e. is the stretch past the edge ever visible).
+4. The held slider knob in dark over 4 pt stripes and a gradient (the ring / fill model is only measured in light).
+5. A glass button pressed in light mode (the press light) and the shadow under a pressed glass button (does it scale
+   with the lift).
 3. One `defaults read` of `FlexiGlass*` overrides on the Mac (to rule out tuning overrides).
