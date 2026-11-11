@@ -12,7 +12,8 @@ No Dark / Clear / Tinted bitmap is stored in any of the 72 cars (themes/icons/RE
 
 Record layouts (all little endian, found by reading the cars; field names are ours):
   CSI TLV 0x3f4 children: u32 count, u32 0, then per child
-      u32 ?, i32 x, i32 y, i32 w, i32 h (1024 canvas units; 0,0,0,0 = whole canvas), u32 ?, f32 opacity,
+      u32 flags, i32 x, i32 y, i32 w, i32 h (1024 canvas units; 0,0,0,0 = whole canvas), u32 blendMode (CGBlendMode),
+      f32 opacity,
       u32 keylen, keylen bytes of (u16 attribute, u16 value) rendition-key pairs (1 element, 2 part, 17 name id)
   CSI TLV 0x3fc fills: u32 count, u32 0, then per child u32 ?, u32 ?, u32 len, name[len] (COLR or GGRA name, "" = own colours)
   CSI TLV 0x3fd glass per child (20 bytes; CoreUI 27.2.1 -[_CUILayerStackRendition _initWithCSIHeader:version:] at
@@ -25,8 +26,8 @@ Record layouts (all little endian, found by reading the cars; field names are ou
   GGRA "ARGG": u32 stops, u32 type (1 linear, 0 = one colour, Icon Composer "automatic gradient"), u32 0,
       f32 x0 y0 x1 y1 (unit square), then per stop f32 location, u32 len, colour name[len]
 
-What this renders is the FLAT composite: no Liquid Glass (layer shadows, translucency; build-styles.py adds the
-chiclet's specular edge with glass.py).
+flat() renders the FLAT composite: no Liquid Glass. groups() hands the stack to icr.py (IconRendering's composition:
+shadows, translucency, highlights, the style modes), one image per group as IconRendering bakes them.
 Against Apple's own pre-rendered Default bitmaps the flat render of the Aqua stack is rms 2-15 (512 px).
 
   iconstack.py <Assets.car> <icon name> <dark|light|tintable>     # prints the decoded tree
@@ -48,19 +49,26 @@ AUTO_GRADIENT = 0.3
 
 
 def _enc(lin):
-    return np.where(lin <= 0.0031308, lin * 12.92, 1.055 * np.abs(lin) ** (1 / 2.4) * np.sign(lin) - 0.055)
+    a = np.abs(lin)
+    return np.sign(lin) * np.where(a <= 0.0031308, a * 12.92, 1.055 * a ** (1 / 2.4) - 0.055)
 
 
 def _lin(c):
-    c = np.asarray(c, float)
-    return np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
+    c = np.asarray(c, float); a = np.abs(c)
+    return np.sign(c) * np.where(a <= 0.04045, a / 12.92, ((a + 0.055) / 1.055) ** 2.4)
 
 
 P3_TO_SRGB = np.array([[1.2249, -0.2247, 0.0], [-0.0420, 1.0419, 0.0], [-0.0197, -0.0786, 1.0979]])
 
 
 class Stack:
-    def __init__(self, path):
+    def __init__(self, path, extended=False):
+        self.extended = extended      # keep Display P3 fills unclipped (extended sRGB), for icr.py
+        # IconRendering hands every IconColor to RenderBox as Display P3 (RBColorSpace 3). The Mac's Spotlight tile
+        # only fits when the car's sRGB-tagged components are used as they are, as P3 (Dark magnifier red 0, rms
+        # 11.5 -> 8.8; Default 28.2 -> 14.2): measured, the loader itself was not read
+        self.p3 = extended
+        self.path = path
         c = self.car = C.Car(path)
         kf = c.blk(c.vars["KEYFORMAT"]); n = struct.unpack_from("<I", kf, 8)[0]
         self.toks = list(struct.unpack_from("<%dI" % n, kf, 12))
@@ -120,10 +128,10 @@ class Stack:
     def children(d):
         cnt = struct.unpack_from("<I", d, 0)[0]; o = 8; out = []
         for _ in range(cnt):
-            _a, x, y, w, h, _c, op, kl = struct.unpack_from("<IiiiiIfI", d, o); o += 32
+            _a, x, y, w, h, bm, op, kl = struct.unpack_from("<IiiiiIfI", d, o); o += 32
             key = dict(struct.unpack_from("<HH", d, o + 4 * j) for j in range(kl // 4)); o += kl
             key.pop(0, None)
-            out.append(dict(rect=(x, y, w, h), opacity=op, key=key))
+            out.append(dict(rect=(x, y, w, h), opacity=op, blend=bm, key=key))
         return out
 
     @staticmethod
@@ -145,8 +153,10 @@ class Stack:
         if nc <= 2: rgb, a = np.array([comps[0]] * 3), (comps[1] if nc == 2 else 1.0)
         else: rgb, a = np.array(comps[:3]), (comps[3] if nc > 3 else 1.0)
         if cs == 2: rgb = _enc(np.clip(rgb, 0, None) ** 2.2)          # Gray Gamma 2.2
-        elif cs == 3: rgb = _enc(P3_TO_SRGB @ _lin(rgb))              # Display P3
-        return np.clip(np.append(rgb, a), 0, 1)
+        elif cs == 3 or (cs == 1 and self.extended and self.p3): rgb = _enc(P3_TO_SRGB @ _lin(rgb))   # Display P3
+        # extended sRGB: a Display P3 colour outside sRGB keeps its negative component, as in IconRendering's
+        # extended-range working space (the composite is clipped once, at the end)
+        return np.append(rgb if self.extended else np.clip(rgb, 0, 1), min(max(a, 0.0), 1.0))
 
     def gradient(self, pl, app):
         nst, typ = struct.unpack_from("<II", pl, 4)
@@ -253,14 +263,57 @@ def render_fill(f, N):
     if len(stops) == 1:
         top = cols[0].copy(); top[:3] += (1 - top[:3]) * AUTO_GRADIENT
         locs, cols = [0.0, 1.0], np.array([top, cols[0]])
+    cols = cols.copy(); cols[:, :3] *= cols[:, 3:4]      # stops are interpolated premultiplied (a clear stop has no hue)
     for ch in range(4): out[..., ch] = np.interp(t, locs, cols[:, ch])
-    out[..., :3] *= out[..., 3:4]
     return out
 
 
 def over(dst, src, op=1.0):
     src = src * op
     return src + dst * (1 - src[..., 3:4])
+
+
+# CGBlendMode (the car's u32) -> IconRendering's Icon.BlendMode name
+BLEND = {0: "normal", 1: "multiply", 2: "screen", 3: "overlay", 4: "darken", 5: "lighten", 6: "colorDodge", 7: "colorBurn",
+         8: "softLight", 9: "hardLight", 10: "difference", 11: "exclusion", 12: "hue", 13: "saturation", 14: "color",
+         15: "luminosity", 26: "plusDarker", 27: "plusLighter"}
+
+
+def groups(tree, N):
+    """the stack as IconRendering sees it: (background fill or None, [group]) with one premultiplied N x N image
+    per Icon Composer group (IconRendering bakes a group into one image, FinalizedIcon.Layer) and its glass record"""
+    fill, out = None, []
+    for ch in tree:
+        if "layers" not in ch:
+            if ch.get("fill") is not None: fill = ch["fill"]
+            # Icon.Fill.system: the car's own copy of these two gradients is not what IconRendering draws
+            # (ICRRenderingParameters.Fills.systemLightGradient / systemDarkGradient)
+            if (ch.get("name") or "").endswith(("/system-light", "/system-dark")): fill = ch["name"].rsplit("/", 1)[1]
+            continue
+        g = np.zeros((N, N, 4), np.float32)
+        for L in ch["layers"]:
+            l = render_svg(L["svg"], L["rect"], N) if L["svg"] is not None else render_bitmap(L["bitmap"], L["rect"], N)
+            if L["fill"] is not None: l = render_fill(L["fill"], N) * l[..., 3:4]
+            g = over(g, l, L["opacity"])
+        gl = ch.get("glass") or {}
+        out.append(dict(img=g, opacity=ch["opacity"], blend=BLEND.get(ch.get("blend", 0), "normal"), name=ch["name"],
+                        specular=gl.get("specular", False), translucency=gl.get("translucency", 0.0),
+                        shadowStyle=gl.get("shadowStyle", 0), shadowOpacity=gl.get("shadowOpacity", 0.0),
+                        specularPlacement=gl.get("specularPlacement", 0)))
+    return fill, out
+
+
+def fill_stops(f):
+    """a background fill -> [(location, straight rgb)] for IconRendering's chiclet gradient (drawn over 10 % .. 90 %
+    of the height whatever the fill's own points, 0x1cfd72690)"""
+    if f is None: return None
+    if isinstance(f, str): return f                              # "system-light" / "system-dark": IconRendering's own
+    if not isinstance(f, dict): return [(0.0, f[:3]), (1.0, f[:3])]
+    stops = [(l, c[:3]) for l, c in f["stops"] if c is not None and not isinstance(c, dict)]
+    if len(stops) == 1:
+        top = stops[0][1] + (1 - stops[0][1]) * AUTO_GRADIENT
+        return [(0.0, top), (1.0, stops[0][1])]
+    return sorted(stops, key=lambda s: s[0])
 
 
 def flat(tree, N=1024, layers_only=False):

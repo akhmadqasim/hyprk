@@ -72,7 +72,7 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
 - IconRendering (27.2.1, read 2026-11-11): `IconRendering.framework/Versions/A/Resources/default.metallib` holds the
   kernels as AIR bitcode (14 modules, `llvm-dis` 21 reads them after cutting at the `0x0B17C0DE` wrappers;
   `binary.metallib` is the AGX build of the same): `glassHighlight` (the specular edge, ported in
-  `themes/icons/tools/glass.py`), `glow`, `shapeAwareGradientMask`, `simplifiedShapeAwareGradientMask`, `sdfFill`,
+  `themes/icons/tools/glass.py` and `icr.py`), `glow`, `shapeAwareGradientMask`, `simplifiedShapeAwareGradientMask`, `sdfFill`,
   `clampToEdges`, `clampedPlusL` (min(1, a + b) on rgb, saturate on alpha, then max with b). All work on an SDF
   texture (r = distance, gb = normal). The renderer and its tunables are Swift: `ipsw swift-dump <DSC> IconRendering`
   gives `ICRRenderingParameters` with every field name and type (Highlights with 10 HighlightsSets of keySharp /
@@ -83,8 +83,7 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
   tiles measure 31 -> 15); ContourGradients light/dark tint start 0.15 end 0, light clear 0.10 / 0, dark clear
   0.12 / 0, fake glass 0.88 / 0.75; glyphTranslucency strength 1, upper opacity 1; Shadow box radius 0.3,
   vibrant opacity 0.75, neutral 0.375, vibrantBrightness 0.75; mitigated tints (Reduce Transparency) light tint
-  0.5,0.5,.. factor 0.9, dark clear 0.17. How the renderer maps the HighlightSettings onto the kernel inputs was
-  not decoded, so `glass.py`'s inputs are fitted (see there).
+  0.5,0.5,.. factor 0.9, dark clear 0.17. How the renderer uses all of it: the composition item below.
 - Icon Composer group glass in the car, decoded 2026-11-11 from CoreUI's reader (27.2.1 dyld cache,
   `-[_CUILayerStackRendition _initWithCSIHeader:version:]` at 0x18f2af564; the tag switch is at 0x18f2af734, selectors
   read from the objc stubs it calls): TLV 0x3fd, per child 20 bytes = u32 hasSpecular (bit 0), f32 translucency,
@@ -97,17 +96,159 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
   a "neutral" and a "vibrant" shadow opacity), shadowOpacity 0.3-0.6, specularPlacement 0 or 2, refraction 0
   everywhere; an appearance can change them (Notes' sash group: translucency 0 / style 2 / 0.4 in Aqua and DarkAqua,
   0.3 / 3 / 0.6 in Tintable; Finder's head 0.25 with style 2 dark, 3 light).
-  STILL NOT DECODED (so `build-styles.py` composes flat and its rms did not change: Dock 66 px Dark 6.4-14.9, Clear
-  2.9-9.2, Tinted 7.8-15.4; tiles Dark 15.5 / 19.3, TintedDark 10.4 / 10.6, ClearDark 16.7 / 18.1): how IconRendering
-  turns these into pixels (which blur and backdrop a translucency of 0.5 means, the shadow's offset / radius per
-  style, where the per-group specular goes for placement 0 against 2), the Highlights builder (0x1cfd8cd9c) and how
-  HighlightSettings feed the `glassHighlight` kernel inputs. Reproducing them without that would be a fit to the
-  368 Settings tiles, not Apple's rule.
-- Settings pane tiles as ground truth: per style the chiclet is the same on every symbol pane (spread <= 3/255):
-  Dark 31 -> 15 grey, TintedLight flat 0,122,249, TintedDark grey 25 + accent x (0.15 top -> 0 bottom), ClearLight
-  opaque 125, ClearDark opaque 43, each with a thin top/bottom specular edge. White symbols map to 167,240,255 /
-  24,134,253 / 249 / 237 (TintedLight / TintedDark / ClearLight / ClearDark). The Dock does not draw TintedLight like
-  these tiles (its tile is 0,109,195 in glass53/...-clear-tinted.png).
+  How IconRendering uses them is in the next item.
+- IconRendering composition, decoded 2026-11-11 (27.2.1 dyld cache; text dumped raw into Ghidra 12.2 at 0x1cfd26000,
+  ObjC stub names from `ipsw dyld disass`; addresses are cache addresses). What is exact, checked or still open is
+  listed at the end of this item.
+  * Enums (swift-dump field order): `Icon.GlassMaterial.ShadowStyle` automatic 0 / none 1 / vibrant 2 / neutral 3;
+    `SpecularPlacement` automatic 0 / inside 1 / outside 2; `SizeClass` small 0 / medium 1 / large 2 / display 3
+    (thresholds minMedium 25, minLarge 60, minDisplay 256); `GlobalConfiguration.RenderingSteps` chicletContents 1,
+    chicletHighlights 2, chicletDarklights 4, glyphContents 8, glyphInnerGlow 0x10, glyphHighlights 0x20,
+    glyphDarklights 0x40, glyphShadow 0x80, glyphTranslucency 0x100, glyphGlass 0x200, outline 0x400,
+    maskToChiclet 0x800; `RenderingMode.Contents` tinted(IconColor, saturation) / color / clear.
+  * `ICRRenderingParameters.default` (0x1cfd87b98, Highlights 0x1cfd8cd9c): every value is in
+    `themes/icons/tools/icr-params.json` (emulated, not read by eye): 10 HighlightsSets, Shadow (offsetY 32,
+    radius 0.3, ringWidth 16, vibrant 0.75, neutral 0.375, multiply), ClearMode (lightening 1.0, darkening 0.3,
+    highlights 1.0, VCMs), ChicletShadow, TranslucencyEffect, ContourGradients, SimulatedChiclet, glow = nil.
+  * `IconRenderer` struct offsets: globalConfig 0 (effectsAreEnabled 0x21, drawMitigatedVersion 0x22,
+    enabledRenderingSteps 0x28), parameters 0x68, icon 0x3d0, style 0x4e0 (appearance 0x4e1, renderingMode
+    0x4e8..0x510), list 0x520 (RBDisplayList, fill 0x530, shape 0x538), chicletShape 0x588, highlights 0x5f0,
+    shadow 0x4508, clearMode 0x4600, hasChicletShadow 0x469e, sizeClass 0x469f, pointUnit 0x46a0, pixelUnit 0x46a8.
+  * Top level 0x1cfd6ce14: transform, chiclet drop shadow (0x1cfd6d250, `addShadowStyleWithRadius:` from
+    ChicletShadow by size class), clip to the chiclet shape (maskToChiclet), then 0x1cfd70f98 -> 0x1cfd71dfc.
+  * 0x1cfd71dfc, the mode wrapper: effective clear mode = renderingMode clear, or tinted + light appearance
+    (ClearMode.applyToLightTintToo = true; chosen in 0x1cfd878e0). In clear mode the WHOLE icon is drawn through a
+    colour matrix R' = totalLighteningStrength x R, G' = totalDarkeningStrength x (1 - G), B' =
+    totalHighlightsStrength x B: the result is not a picture but three masks (lighten / darken / highlights) that
+    the system glass under the icon consumes (ClearMode.DebugMode names them: rawImage, lighteningMask,
+    darkeningMask, highlightsMask). That is why the Dock's TintedLight / Clear icons differ from IconServices'
+    Settings tiles: the tile is `SimulatedGlassRenderer`'s stand-in glass, the Dock's is real glass.
+    Tinted + dark is NOT clear mode: the layers are drawn in a layer with `addSaturationFilterWithAmount:`
+    (the mode's saturation) and a duotone colour matrix (0x1cfdab484) C' = black + (tint - black) x C.
+  * Highlights: 0x1cfd8c894 picks the chiclet HighlightsSet: colour mode by IconBrightness (normal / bright / dim,
+    limits maxDimChicletLuminance 0.2, minBrightChicletLuminance 0.99), clear mode -> chicletClear, tinted dark ->
+    chicletScreened. 0x1cfd59270 turns a set into up to 7 lights: keySharp and keyDiffuse at angleFromKey 0,
+    fillSharp / fillDiffuse at pi (matchKey = the key's settings), dark at +pi/2 and -pi/2 (isDarklight), rim at 0;
+    curvature = the set's highlight / darklight curvature for sharp, dark and rim, 1 for the diffuse ones.
+    0x1cfd7603c resolves one light for the size class: height = max(distance, minDistancePixels x pixelUnit),
+    inset likewise, opacity = lightIntensity x opacity, direction = (sin a, cos a) with a = angleFromKey + light
+    longitude (default 0 = from the top), colour = brightness grey, blend = plusLighter when brightness >= 0.5
+    else plusDarker (or blendModeOverride). 0x1cfd765d4 groups lights with equal constraints into one pass.
+  * A highlight pass on a vector shape (the chiclet), 0x1cfd34fb0 + 0x1cfd3a0cc: intensity over the angle around
+    the shape centre (a 256-stop conic gradient) l = max(0, (cos(theta - theta_light) - cos(spread)) / (1 -
+    cos(spread))), lights of one pass unioned; times the edge falloff 1 - curvature x d / height inside the band
+    0 <= d <= height (RBShape rendering mode 2 with argument height, the shape stroked 2 x height); then a 65-stop
+    gradient map alpha = t / ((1 / bias - 2)(1 - t) + 1) (Schlick bias); drawn with the pass opacity and blend mode.
+    This is the `glassHighlight` kernel's formula with spread = cos(spread angle) and biasAmount = 1 / bias - 2.
+    In clear mode chiclet highlights are drawn in pure blue (the highlights mask) with plusLighter and chiclet
+    darklights are skipped (leaveChicletDarklightsToSystem).
+  * Working space: the final image is rendered with RBColorMode 14 / RBColorSpace 1 (0x1cfd3b03c from
+    `FinalizedIcon.renderedIcon(at:with:)`), whose working colour space is sRGB with the sRGB transfer curve
+    (RenderBox `RBColorModeWorkingColorSpace` table 0x196bda4fc, `RB::ColorMode` 0x196a8f544): blending is done on
+    gamma-encoded values, extended range. IconColor values are passed as RBColorSpace 3 = Display P3
+    (`rb_color_space` table 0x196be7751). RBBlendMode from Icon.BlendMode (table 0x1cfdc2790): normal 0, darken 4,
+    multiply 1, colorBurn 7, plusDarker 26, lighten 5, screen 2, colorDodge 6, plusLighter 27, overlay 3, ...
+  * Chiclet contents 0x1cfd72690: an axial gradient from 10 % to 90 % of the bounds height. Stops from
+    0x1cfd87710: colour mode = the icon's own fill (no fill: fake glass 0.88 -> 0.75), tinted = ContourGradients
+    tint start -> end (0.15 -> 0) as greys, clear = 0.10 / 0.12 -> 0. In clear mode the chiclet is drawn as pure
+    green instead (no lightening, no darkening).
+  * The layers, 0x1cfd6d430 (the simple path; see open points). A `FinalizedIcon.Layer` is ONE Icon Composer group
+    baked into one image (0x1cfd40bc8) with an SDF texture and a baked shadow image. Per group, in order:
+    1. 0x1cfd74500: the group's shadow (0x1cfd740e8) and, with blurStrength / refraction, a backdrop blur
+       (blurStrength x blurStrengthMax 64) and refraction inside the SDF.
+       Shadow image bake 0x1cfd4589c: the group's content, as it is times vibrantBrightness 0.75 ("vibrant") or
+       as black with the content's alpha ("neutral"), offset (0, 32) canvas units, blurred with radius
+       blurStrengthMax 64 x Shadow.radius 0.3 = 19.2 units, clipped to the group's SDF grown by ringWidth 16.
+       Draw: tint white (vibrant) or black (neutral), alpha = group opacity x shadowOpacity x 0.75 (vibrant) or
+       0.375 (neutral), blend multiply (vibrant on a dim icon: normal). Style: colour mode: automatic and vibrant
+       -> vibrant, neutral -> neutral, none -> nothing; tinted and clear modes: everything but none -> neutral.
+    2. 0x1cfd74eec contents: translucency t > 0 clips the group by a vertical gradient over its effects frame
+       (0x1cfd37554, useSimpleMask = replicateBadSmoothing = true): alpha(v) = m^2 (3 - 2 m), m = 1 - t x strength x
+       v, v = 0 at the top, 1 at the bottom, 17 stops (0x1cfd348b0). Then the baked image with the group's opacity
+       and blend mode (0x1cfd75774). Clear mode: through R' = contentLighteningStrength 0.85 x R, G' =
+       contentDarkeningStrength x G + (1 - it) = 1, B' = 0 (0x1cfd75194).
+       Shadow overdraw (Shadow.drawOverContent, blend mode normal groups only): the group's shadow again, clipped
+       to the group's own content, alpha x min(1, t / translucencyForMaxOverdraw 0.3) x 0.5 (vibrant, automatic)
+       or 0.2 (neutral), overdrawBlendMode multiply.
+    3. glow: `ICRRenderingParameters.glow` is nil, nothing.
+    4. 0x1cfd73374 highlights (hasSpecular groups): the set from 0x1cfd8cac4 (glyphsDefault / Bright / Dim by
+       IconBrightness, glyphsClear, glyphsScreened), light = defaultGlyphLight, each light drawn by the
+       `glassHighlight` kernel on the group's SDF (0x1cfd35f90: biasAmount = 1 / bias - 2, sdfScaleFactor = -2 x
+       maxDistance, sdfZeroValue 0.5), opacity x group opacity. Not clear mode (glyphHighlightsUseVCM = true): the
+       kernel's output is only a MASK; inside it the backdrop is replaced by a vibrant colour matrix of itself
+       (BT.709 YCbCr, Y' = black + (white - black) Y, chroma x saturation; matrices 0x1cfdbda70 / 0x1cfdbdab0):
+       glyphHighlightVCM 0.2 / 1.2 / 1.25, glyphDarklightVCM -0.15 / 0.7 / 1.25. Clear mode: highlights are
+       screened into the red mask, darklights multiply the green one to 0.
+       Darklights with an outsetOpacity (all glyph sets: 0.9 / 0.9 / 0.2 / 0.2) are drawn OUTSIDE the group
+       (inset - height, opacity = outsetOpacity) unless specularPlacement is inside, or automatic on a bright icon
+       in colour mode.
+    Bake 0x1cfd40bc8: tinted and clear modes bake every group through `addGrayscaleFilterWithAmount: 1` into a
+    grey image (RBColorMode 0 / RBColorSpace 16), colour mode into RBColorMode 14 / sRGB.
+  * Then the chiclet highlights (0x1cfd715e0, above) and, only for the mitigated version in colour mode, the outline
+    (0x1cfd71b8c -> 0x1cfd76bc0, useDynamicOpacity): inside a stroke of lineWidth 1 point (large; 0.667 medium /
+    small, 1.333 display) the backdrop is mapped through a gradient map of its own luminance: white with alpha
+    lineOpacityOnDim 0.15 at luminance 0 fading to nothing at luminanceRangeOnDim 0.1 (bright icons: black 0.12
+    from luminance 0.9 up). Groups with knocksOutBorder are cut out of it in the static variant.
+  * The mitigated version (`GlobalConfiguration.drawMitigatedVersion`, 0x1cfd70f98): what IconServices' still
+    images are (the Settings tiles), because a still has no live glass under it. Colour mode: as above plus the
+    outline. Other modes: a plate colour (0x1cfd87564: clear light 0.5, clear dark 0.17, tinted dark 0.1, tinted
+    light = mix(0.5 grey, tint, 0.9 x saturation)), then the icon drawn into its own display list and put over the
+    plate with `FinalizedIcon`'s layer passes (0x1cfd69ffc, drawn by 0x1cfd6b4b0):
+    tinted dark: one pass, RBBlendMode 2 = screen. Clear (and tinted light), passOrder lightenFirst:
+    1. lighten: inside alpha = the red mask the backdrop is replaced by lighteningVCM (0.9 / 2.5 / 2.0, headroom 1.2)
+       of itself; 2. darken: plusDarker with the grey 1 - green mask, i.e. backdrop - 0.3 x darkening; 3. highlights:
+       inside alpha = the blue mask, highlightsVCM (0.2 / 1.35 / 1.4, headroom 1.2).
+       The same three passes exist as CAFilters (colorMatrix + vibrantColorMatrix, compositing plusL / plusD) for
+       the live layer (`ICRIconRenderingLayer` portals), which is what the Dock shows over its real glass.
+  * `simplifiedShapeAwareGradientMask` (default.metallib, the translucency mask when useSimpleMask is off): d =
+    (zero - r) x scale, e = saturate(d / borderWidth), v = saturate((y - y0) / height), m = mix(mix(contour bounds,
+    v), mix(opacity bounds, v), e), out = mix(1, m^2 (3 - 2 m), saturate(d + 1)).
+  * The port: `themes/icons/tools/icr.py` (numpy; `build-styles.py` builds the files, `check-styles.py` compares).
+    Checked stage by stage against the Mac's Settings tiles (IconServices stills, 128 px), nothing fitted unless
+    said:
+    - the Dark plate, identical on 21 panes: gradient only rms 7.7, + chiclet highlights 1.96, + outline 1.02
+      (the old fitted rim: 2.25); 64 px 1.24. The side edges only fit with darklights AND outline, so the tiles
+      are the mitigated version.
+    - Siri / Spotlight, rms before -> after: Dark 15.5 / 19.3 -> 7.1 / 8.8; TintedDark 10.4 / 10.6 -> 8.3 / 8.6;
+      ClearDark 16.7 / 18.1 -> 7.6 / 10.7; ClearLight (not compared before) 6.9 / 8.5; TintedLight 7.4 / 9.7.
+      Each stage alone (Spotlight Dark / ClearDark): without shadows 11.8 / 11.6 (measured before the P3 fix: 11.5 /
+      10.7 with), without highlights 11.7 / 14.3, without translucency 12.0 / 11.3, darklights inside instead of
+      outside 11.2 / 12.2.
+    - the Mac's Dark Dock at 66 px (files scaled down): Finder 11.1 -> 11.0, Mail 11.2 -> 11.1, Notes 6.4 -> 7.9,
+      System Settings 13.3 -> 9.4, Calculator 14.9 -> 9.5 (mean 11.4 -> 9.8); Safari (style sheet) 13.1 -> 15.4.
+      Without shadows mean 10.3, without highlights 10.6, without translucency 10.9, flat 10.9. The outline makes
+      no difference there.
+    - The Dock's TintedLight / ClearLight: the port over a fixed plate is WORSE than the old Dock fit (TintedLight
+      9-15 -> 11-27, ClearLight 3-9 -> 9-14), so those two styles keep the fitted rule. Explained, not solved: the
+      Dock puts the three masks on live glass (CAFilter passes on portal layers), the tiles on a plate.
+  * Measured, not read from code (marked in `icr.py` / `iconstack.py`):
+    - SDR tone curve of the clear-mode still: with the vibrant colour matrices clamped to their headroom 1.2
+      (`addContentHeadroom:` + style 9, as decoded), eight flat regions of the tiles (plates, white symbol,
+      Spotlight magnifier and lens, light and dark) sit on L' = L / (1 + 0.27 L) in linear light, on the
+      luminance (per channel fits the TintedLight tiles worse: 11-14 against 7-10); rms 0.8, without it 13.2.
+      RenderBox's own curve was not read.
+    - the car's sRGB-tagged fill components are used as Display P3 components (Spotlight Dark 11.5 -> 8.8).
+    - the tint of the Mac's captures is 0,122,255 taken as sRGB; the TintedLight tile plate 0,122,249 needs the mix
+      weight 0.9 x saturation to be 1 (saturation is the caller's; `RBColorAdd` mixes with ColorInterpolation 2).
+    Assumed: Gaussian sigma = RenderBox's blur radius; grey bake = BT.709 luma; IconBrightness = dim when the
+    chiclet's brightest stop is <= 0.2, bright when its darkest is >= 0.99; the shadow's ring clip is not offset.
+  * NOT decoded / not ported: the SDF generator (0x1cfd45064; the port computes the distance field of the baked
+    alpha itself); the automatic gradient of a one-colour fill (`Fills.AutomaticGradient` basePosition 0,
+    saturationBoost 0.2, lightening 0.04 / 0.08 / 0.15 / -0.05 by brightness; `iconstack.py` keeps its fitted 0.3);
+    the second layer path of 0x1cfd6d430 (shouldPreventDarklightCompounding, which draws darklights by reference
+    before the contents); blurStrength / refraction glass of a group (0x1cfd74500; refraction is 0 in every app
+    car, blurStrength is not in the group record); `SimulatedGlassRenderer` / `ICRSimulatedGlassChicletLayer`
+    (dimmingStrength 0.22, backdrop blur 0.0065, refraction 0.28 / 0.11); the live CAFilter path of the Dock;
+    hue / saturation / color / luminosity blend modes of a group.
+  * The Dock Trash's glass is not IconRendering's: Dock.app hands `s-trashempty-sdf.png` (384 px RGBA, r =
+    distance with 0.5 at the edge, gb = normal) to a CoreAnimation glass background (style 2). Not built;
+    `build-trash.py` is unchanged (full Trash against the Dark Dock shot rms 5.5).
+- Settings pane tiles as ground truth: they are IconServices stills = IconRendering's mitigated version (above).
+  Per style the chiclet is the same on every symbol pane (spread <= 3/255): Dark 31 -> 15 grey (systemDarkGradient
+  over 10 % .. 90 %), TintedDark = screen(0.1, tint x (0.15 -> 0)), TintedLight flat 0,122,249, ClearLight 125 (0.5
+  through the tone curve), ClearDark 43 (0.17). White symbols: 163,238,255 / 24,131,247 / 246 / 233 (TintedLight /
+  TintedDark / ClearLight / ClearDark). The Dock does not draw TintedLight like these tiles (its tile is 0,109,195
+  in glass53/...-clear-tinted.png): live glass under the masks instead of the plate.
 - `apple-map.txt` (Linux app id or icon name -> macOS icon, ~220 names) is the single source for the shell, the Finder and the `hyprk-apple`
   theme; `apple-map.js` is generated from it (`tools/gen-map.mjs`, tested in `themes/icons/tests`).
 - `system/<Name>-512/128.png`: 257 `CoreTypes.bundle` icons (OS `/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources`) from the

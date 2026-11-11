@@ -45,15 +45,22 @@ used by the shell and Finder through symlinks), `tools/` (`car.py` Assets.car re
      macOS 27.2.1 keeps no bitmap for these styles: each app's `Assets.car` has the Default bitmap plus the
      Icon Composer layers (`*.iconstack`, groups, SVG and deepmap2 bitmap layers, fills per appearance:
      DarkAqua, Aqua, ISAppearanceTintable), which IconRendering composes at run time.
-     `tools/build-styles.py` (with `iconstack.py`, `dmp2.py`, `glass.py`) renders those layers and adds the
-     chiclet's specular edge with Apple's own `glassHighlight` kernel (IconRendering's `default.metallib`), its
-     inputs fitted to the Mac-rendered Settings tiles (`settings/`: the chiclet is identical in all 21 symbol
-     panes per style). Dark = the DarkAqua layers; Clear / Tinted = the tintable layers' luminance mapped linearly
-     onto the style (light: fitted to the Mac's ClearLight / TintedLight Dock; dark: the Settings tiles' TintedDark /
-     ClearDark, no Mac Dock shot exists). Per-layer glass (translucency, blur, layer shadows, glyph specular) is not
-     reproduced. `tools/check-styles.py`: rms against the Mac's Dock at 66 px (Dark 6-15, Clear 3-9, Tinted 8-15;
-     Apple's own Default bitmap 6-14 on the same shots) and against the Siri / Spotlight Settings tiles at 128 px
-     (Dark 16-19, TintedDark 10-11, ClearDark 17-18). 256 px only: the shell draws app icons at most 128 pt.
+     `tools/build-styles.py` composes them with `tools/icr.py`, a port of IconRendering's own composition (27.2.1;
+     render graph, addresses and parameters in `reference/ASSETS.md` "IconRendering composition";
+     `tools/icr-params.json` is `ICRRenderingParameters.default`): chiclet gradient, per group the baked shadow,
+     translucency, contents and the highlights / darklights of the `glassHighlight` kernel through the vibrant
+     colour matrix, chiclet highlights, outline; Dark = colour mode on the DarkAqua stack, TintedDark = the
+     tintable stack baked grey, duotone to the tint, screened over the plate, ClearDark = the lighten / darken /
+     highlights masks over the plate (the mitigated version, which is what IconServices' stills are).
+     TintedLight / ClearLight stay FITTED to the Mac's Dock (flat luminance ramp + `glass.py`'s fitted rim): there
+     the masks act on live glass, and the port over a fixed plate fits the Dock shot worse.
+     `tools/check-styles.py`: rms against the Mac's Dock at 66 px (Dark 8-15, mean of the Dark Dock shot 11.4 -> 9.8;
+     Clear 3-9, Tinted 8-15 unchanged; Apple's own Default bitmap 6-14 on the same shots) and against the Siri / Spotlight Settings tiles
+     at 128 px (Dark 7.1 / 8.8, was 15.5 / 19.3; TintedDark 8.3 / 8.6, was 10.4 / 10.6; ClearDark 7.6 / 10.7, was
+     16.7 / 18.1; ClearLight 6.9 / 8.5 and TintedLight 7.4 / 9.7 by the port's mitigated version). Fitted or
+     assumed inside the port, each marked in `icr.py`: the SDR tone curve of the clear stills, Gaussian sigma =
+     RenderBox's blur radius, BT.709 grey bake, the automatic gradient's lightening. 256 px only: the shell draws
+     app icons at most 128 pt.
    - Linux icons (`AppIconTile.qml`): the Mac's rule for icons without layers (WebStorm, Spotify in the same Mac
      shot): Dark leaves them as they are (on the dark tile), Clear / Tinted map the art's luminance L with the same
      ramp as above (`ui/HyprK/shaders/iconart.frag`, one quad over the art's own texture, built only while the

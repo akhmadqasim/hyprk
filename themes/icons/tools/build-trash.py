@@ -17,7 +17,8 @@ The matrix (0x1000e2514, constants at 0x10025c3c0): RGB -> BT.709 YCbCr, Y' = 1.
 out = c (1 - t) + t per channel with t = tint rgb x tint alpha, tint = [iconAppearance tintColor] (the user's icon
 tint). Every variant also gets a glass layer under it, shaped by s-trashempty-sdf.png (setImage:
 preferredGlassBackgroundStyle: 2 glassCompositingFilter: normal sdfElementContents:, zero / one value distance
--128 / 128, padding 152): not built here, the Dock's own glass is behind the icon. When the flag from 0x100114acc
+-128 / 128, padding 152): not built here, the Dock's own glass is behind the icon. That glass is CoreAnimation's
+glass background, not IconRendering's composition (icr.py), so the port does not apply to it (reference/ASSETS.md). When the flag from 0x100114acc
 is off the Dock uses the legacy trashempty / trashfull files instead (not copied).
 
 Not from Apple: the matrix is applied to straight (not premultiplied) colour, and the tint is the fixed blue

@@ -1,0 +1,2017 @@
+{
+ "_source": "macOS 27.2.1 IconRendering ICRRenderingParameters.default, built by the once-initialiser 0x1cfd87b98 (Highlights by 0x1cfd8cd9c) in the dyld cache; emulated with Ghidra EmulatorHelper, struct read with the Swift field layout (ipsw swift-dump). SizeBasedValue order display/large/medium/small; angles in radians; distances in 1024-canvas units.",
+ "simulatedChiclet": {
+  "useSystemGlass": 0,
+  "dimmingStrength": 0.22,
+  "relativeBackdropBlurRadius": 0.0065,
+  "resultBlurRadius": 2.0,
+  "relativeRefractionStrength": 0.28,
+  "relativeRefractionHeight": 0.11,
+  "refractionSupersampling": 2,
+  "gradientSamplesExp": 4
+ },
+ "darkTintDuotoneShadowBlendFactor": 0.0,
+ "darkTintHighlightsBlendWithContent": 1,
+ "fills": {
+  "automaticGradient": {
+   "basePosition": 0.0,
+   "saturationBoost": 0.2,
+   "dimLightening": 0.04,
+   "midDimLightening": 0.08,
+   "midBrightLightening": 0.15,
+   "brightLightening": -0.05
+  },
+  "systemLightGradient": [
+   {
+    "color": [
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "location": 0.0
+   },
+   {
+    "color": [
+     0.960784,
+     0.960784,
+     0.960784,
+     1.0
+    ],
+    "location": 1.0
+   }
+  ],
+  "systemDarkGradient": [
+   {
+    "color": [
+     0.121569,
+     0.121569,
+     0.121569,
+     1.0
+    ],
+    "location": 0.0
+   },
+   {
+    "color": [
+     0.058824,
+     0.058824,
+     0.058824,
+     1.0
+    ],
+    "location": 1.0
+   }
+  ]
+ },
+ "mitigatedChicletLightTint": [
+  0.5,
+  0.5,
+  0.5,
+  1.0
+ ],
+ "mitigatedChicletLightTintFactor": 0.9,
+ "mitigatedChicletDarkTint": [
+  0.1,
+  0.1,
+  0.1,
+  1.0
+ ],
+ "mitigatedChicletDarkTintFactor": 0.0,
+ "mitigatedChicletLightClear": [
+  0.5,
+  0.5,
+  0.5,
+  1.0
+ ],
+ "mitigatedChicletDarkClear": [
+  0.17,
+  0.17,
+  0.17,
+  1.0
+ ],
+ "clearMode": {
+  "totalLighteningStrength": 1.0,
+  "totalDarkeningStrength": 0.3,
+  "totalHighlightsStrength": 1.0,
+  "contentLighteningStrength": 0.85,
+  "contentDarkeningStrength": 0.0,
+  "highlightsVCM": {
+   "black": 0.2,
+   "white": 1.35,
+   "saturation": 1.4,
+   "headroom": 1.2
+  },
+  "lighteningUsesVCM": 1,
+  "lighteningVCM": {
+   "black": 0.9,
+   "white": 2.5,
+   "saturation": 2.0,
+   "headroom": 1.2
+  },
+  "darkeningUsesVCM": 0,
+  "darkeningVCM": {
+   "black": -0.5,
+   "white": 0.5,
+   "saturation": 1.5,
+   "headroom": null
+  },
+  "passOrder": 0,
+  "applyToLightTintToo": 1,
+  "leaveChicletDarklightsToSystem": 1,
+  "drawByReference": 1,
+  "debugMode": 0
+ },
+ "chicletShadow": {
+  "opacity": {
+   "display": 0.25,
+   "large": 0.25,
+   "medium": 0.25,
+   "small": 0.35
+  },
+  "radius": {
+   "display": 20.0,
+   "large": 25.0,
+   "medium": 40.0,
+   "small": 50.0
+  },
+  "offsetX": {
+   "display": 0.0,
+   "large": 0.0,
+   "medium": 0.0,
+   "small": 0.0
+  },
+  "offsetY": {
+   "display": 10.0,
+   "large": 15.0,
+   "medium": 25.0,
+   "small": 25.0
+  }
+ },
+ "sdfGeneration": {
+  "clampThreshold": 0.002,
+  "useAdvancedStacking": 1,
+  "precisePixelFormatThreshold": 256,
+  "maxRelativeSmoothing": 0.005
+ },
+ "blurStrengthMax": 64.0,
+ "refractionHeightMin": 12.8,
+ "refractionHeightMax": 256.0,
+ "refractionHeightPower": 1.0,
+ "refractionStrengthMax": 640.0,
+ "refractionStrengthPower": 1.0,
+ "refractionSupersampling": 2,
+ "shouldClampPlusLBlending": 1,
+ "defaultChicletCornerRadius": 266.24,
+ "thresholds": {
+  "minMediumSize": 25.0,
+  "minLargeSize": 60.0,
+  "minDisplaySize": 256.0
+ },
+ "spatialHighlighting": {
+  "alignmentRange": 0.314159,
+  "intensityPower": 2.0,
+  "minIntensity": 0.5,
+  "spreadPower": 2.0,
+  "heightPower": 2.0,
+  "maxExtraHeight": 1.0
+ },
+ "shouldPreventDarklightCompounding": "RBProjectVersion-dependent (raw 119)",
+ "glow": null,
+ "shadow": {
+  "offsetX": 0.0,
+  "offsetY": 32.0,
+  "ringWidth": {
+   "display": 16.0,
+   "large": 16.0,
+   "medium": 16.0,
+   "small": 16.0
+  },
+  "radius": {
+   "display": 0.3,
+   "large": 0.3,
+   "medium": 0.3,
+   "small": 0.3
+  },
+  "vibrantOpacity": {
+   "display": 0.75,
+   "large": 0.75,
+   "medium": 0.75,
+   "small": 0.75
+  },
+  "neutralOpacity": {
+   "display": 0.375,
+   "large": 0.375,
+   "medium": 0.375,
+   "small": 0.375
+  },
+  "blendMode": "multiply",
+  "blendModeForVibrantOnDim": "normal",
+  "overdrawBlendMode": "multiply",
+  "vibrantBrightness": 0.75,
+  "ignoreFillOpacity": 1,
+  "drawOverContent": 1,
+  "translucencyForMaxOverdraw": 0.3,
+  "maxNeutralOverdrawOpacity": {
+   "display": 0.2,
+   "large": 0.2,
+   "medium": 0.2,
+   "small": 0.2
+  },
+  "maxVibrantOverdrawOpacity": {
+   "display": 0.5,
+   "large": 0.5,
+   "medium": 0.5,
+   "small": 0.5
+  }
+ },
+ "glyphTranslucency": {
+  "borderWidth": 0.0,
+  "replicateBadSmoothing": 1,
+  "useSimpleMask": 1,
+  "strength": {
+   "display": 1.0,
+   "large": 1.0,
+   "medium": 1.0,
+   "small": 1.0
+  },
+  "lowerOpacity": 0.0,
+  "upperOpacity": 1.0,
+  "lowerContourOpacity": 0.0,
+  "upperContourOpacity": 1.0
+ },
+ "contourGradients": {
+  "lightTintStartBrightness": 0.15,
+  "lightTintEndBrightness": 0.0,
+  "darkTintStartBrightness": 0.15,
+  "darkTintEndBrightness": 0.0,
+  "lightClearStartBrightness": 0.1,
+  "lightClearEndBrightness": 0.0,
+  "darkClearStartBrightness": 0.12,
+  "darkClearEndBrightness": 0.0,
+  "fakeGlassStartBrightness": 0.88,
+  "fakeGlassEndBrightness": 0.75
+ },
+ "outlines": {
+  "lineWidth": {
+   "display": 1.333333,
+   "large": 1.0,
+   "medium": 0.666667,
+   "small": 0.666667
+  },
+  "sizing": 1,
+  "lineOpacityOnBright": {
+   "display": 0.12,
+   "large": 0.12,
+   "medium": 0.12,
+   "small": 0.12
+  },
+  "lineOpacityOnDim": {
+   "display": 0.15,
+   "large": 0.15,
+   "medium": 0.15,
+   "small": 0.15
+  },
+  "useDynamicOpacity": 1,
+  "luminanceRangeOnBright": 0.1,
+  "luminanceRangeOnDim": 0.1,
+  "allowDespiteShadow": 0
+ },
+ "supportsChicletAlignmentForSystemFills": 1,
+ "recreateRadar153477135": 0,
+ "useOS26Compositing": 0,
+ "highlights": {
+  "defaultChicletLight": 0.0,
+  "defaultGlyphLight": 0.0,
+  "glyphHighlightCurvature": {
+   "display": 0.75,
+   "large": 0.75,
+   "medium": 0.75,
+   "small": 0.75
+  },
+  "glyphDarklightCurvature": {
+   "display": 0.75,
+   "large": 0.75,
+   "medium": 0.75,
+   "small": 0.75
+  },
+  "chicletHighlightCurvature": {
+   "display": 0.75,
+   "large": 0.75,
+   "medium": 0.75,
+   "small": 0.75
+  },
+  "chicletDarklightCurvature": {
+   "display": 0.75,
+   "large": 0.75,
+   "medium": 0.75,
+   "small": 0.75
+  },
+  "glyphHighlightsUseVCM": 1,
+  "maxDimChicletLuminance": 0.2,
+  "minBrightChicletLuminance": 0.99,
+  "iconBrightnessOnlyUsesMax": 0,
+  "glyphHighlightVCM": {
+   "black": 0.2,
+   "white": 1.2,
+   "saturation": 1.25,
+   "headroom": null
+  },
+  "glyphDarklightVCM": {
+   "black": -0.15,
+   "white": 0.7,
+   "saturation": 1.25,
+   "headroom": null
+  },
+  "glyphHighlightNonVCMScale": 1.0,
+  "glyphDarklightNonVCMScale": 1.0,
+  "chicletHighlightsAppearanceMode": 1,
+  "chicletDefault": {
+   "keySharp": {
+    "brightness": 1.1,
+    "opacity": {
+     "display": 0.2,
+     "large": 0.2,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 10.0,
+     "large": 10.0,
+     "medium": 10.0,
+     "small": 10.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 2.094395,
+     "large": 2.094395,
+     "medium": 2.094395,
+     "small": 2.094395
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "keyDiffuse": {
+    "brightness": 1.1,
+    "opacity": {
+     "display": 0.5,
+     "large": 0.5,
+     "medium": 0.5,
+     "small": 0.5
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 40.0,
+     "large": 40.0,
+     "medium": 40.0,
+     "small": 40.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.570796,
+     "large": 1.570796,
+     "medium": 1.570796,
+     "small": 1.570796
+    },
+    "bias": 0.08,
+    "blendModeOverride": null
+   },
+   "fillSharp": {
+    "brightness": 1.1,
+    "opacity": {
+     "display": 0.2,
+     "large": 0.2,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 10.0,
+     "large": 10.0,
+     "medium": 10.0,
+     "small": 10.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 2.094395,
+     "large": 2.094395,
+     "medium": 2.094395,
+     "small": 2.094395
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "fillDiffuse": {
+    "brightness": 1.1,
+    "opacity": {
+     "display": 0.25,
+     "large": 0.25,
+     "medium": 0.25,
+     "small": 0.25
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 40.0,
+     "large": 40.0,
+     "medium": 40.0,
+     "small": 40.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.570796,
+     "large": 1.570796,
+     "medium": 1.570796,
+     "small": 1.570796
+    },
+    "bias": 0.08,
+    "blendModeOverride": null
+   },
+   "dark": {
+    "brightness": 0.0,
+    "opacity": {
+     "display": 0.2,
+     "large": 0.2,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 10.0,
+     "large": 10.0,
+     "medium": 10.0,
+     "small": 10.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.047198,
+     "large": 1.047198,
+     "medium": 1.047198,
+     "small": 1.047198
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "rim": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 10.0,
+     "large": 10.0,
+     "medium": 10.0,
+     "small": 10.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 3.141593,
+     "large": 3.141593,
+     "medium": 3.141593,
+     "small": 3.141593
+    },
+    "bias": 1.0,
+    "blendModeOverride": null
+   }
+  },
+  "chicletBright": {
+   "keySharp": {
+    "brightness": 1.1,
+    "opacity": {
+     "display": 0.2,
+     "large": 0.2,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 10.0,
+     "large": 10.0,
+     "medium": 10.0,
+     "small": 10.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 2.094395,
+     "large": 2.094395,
+     "medium": 2.094395,
+     "small": 2.094395
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "keyDiffuse": {
+    "brightness": 1.1,
+    "opacity": {
+     "display": 0.5,
+     "large": 0.5,
+     "medium": 0.5,
+     "small": 0.5
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 40.0,
+     "large": 40.0,
+     "medium": 40.0,
+     "small": 40.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.570796,
+     "large": 1.570796,
+     "medium": 1.570796,
+     "small": 1.570796
+    },
+    "bias": 0.08,
+    "blendModeOverride": null
+   },
+   "fillSharp": {
+    "brightness": 1.1,
+    "opacity": {
+     "display": 0.2,
+     "large": 0.2,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 10.0,
+     "large": 10.0,
+     "medium": 10.0,
+     "small": 10.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 2.094395,
+     "large": 2.094395,
+     "medium": 2.094395,
+     "small": 2.094395
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "fillDiffuse": {
+    "brightness": 1.1,
+    "opacity": {
+     "display": 0.25,
+     "large": 0.25,
+     "medium": 0.25,
+     "small": 0.25
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 40.0,
+     "large": 40.0,
+     "medium": 40.0,
+     "small": 40.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.570796,
+     "large": 1.570796,
+     "medium": 1.570796,
+     "small": 1.570796
+    },
+    "bias": 0.08,
+    "blendModeOverride": null
+   },
+   "dark": {
+    "brightness": 0.0,
+    "opacity": {
+     "display": 0.2,
+     "large": 0.2,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 10.0,
+     "large": 10.0,
+     "medium": 10.0,
+     "small": 10.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.047198,
+     "large": 1.047198,
+     "medium": 1.047198,
+     "small": 1.047198
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "rim": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 10.0,
+     "large": 10.0,
+     "medium": 10.0,
+     "small": 10.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 3.141593,
+     "large": 3.141593,
+     "medium": 3.141593,
+     "small": 3.141593
+    },
+    "bias": 1.0,
+    "blendModeOverride": null
+   }
+  },
+  "chicletDim": {
+   "keySharp": {
+    "brightness": 1.1,
+    "opacity": {
+     "display": 0.2,
+     "large": 0.2,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 10.0,
+     "large": 10.0,
+     "medium": 10.0,
+     "small": 10.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 2.094395,
+     "large": 2.094395,
+     "medium": 2.094395,
+     "small": 2.094395
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "keyDiffuse": {
+    "brightness": 1.1,
+    "opacity": {
+     "display": 0.5,
+     "large": 0.5,
+     "medium": 0.5,
+     "small": 0.5
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 40.0,
+     "large": 40.0,
+     "medium": 40.0,
+     "small": 40.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.570796,
+     "large": 1.570796,
+     "medium": 1.570796,
+     "small": 1.570796
+    },
+    "bias": 0.08,
+    "blendModeOverride": null
+   },
+   "fillSharp": {
+    "brightness": 1.1,
+    "opacity": {
+     "display": 0.2,
+     "large": 0.2,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 10.0,
+     "large": 10.0,
+     "medium": 10.0,
+     "small": 10.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 2.094395,
+     "large": 2.094395,
+     "medium": 2.094395,
+     "small": 2.094395
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "fillDiffuse": {
+    "brightness": 1.1,
+    "opacity": {
+     "display": 0.25,
+     "large": 0.25,
+     "medium": 0.25,
+     "small": 0.25
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 40.0,
+     "large": 40.0,
+     "medium": 40.0,
+     "small": 40.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.570796,
+     "large": 1.570796,
+     "medium": 1.570796,
+     "small": 1.570796
+    },
+    "bias": 0.08,
+    "blendModeOverride": null
+   },
+   "dark": {
+    "brightness": 0.0,
+    "opacity": {
+     "display": 0.2,
+     "large": 0.2,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 10.0,
+     "large": 10.0,
+     "medium": 10.0,
+     "small": 10.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.047198,
+     "large": 1.047198,
+     "medium": 1.047198,
+     "small": 1.047198
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "rim": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 10.0,
+     "large": 10.0,
+     "medium": 10.0,
+     "small": 10.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 3.141593,
+     "large": 3.141593,
+     "medium": 3.141593,
+     "small": 3.141593
+    },
+    "bias": 1.0,
+    "blendModeOverride": null
+   }
+  },
+  "chicletClear": {
+   "keySharp": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 1.25,
+     "large": 1.25,
+     "medium": 1.25,
+     "small": 1.25
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 10.0,
+     "large": 10.0,
+     "medium": 10.0,
+     "small": 10.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.745329,
+     "large": 1.745329,
+     "medium": 1.745329,
+     "small": 1.745329
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "keyDiffuse": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 0.5,
+     "large": 0.5,
+     "medium": 0.5,
+     "small": 0.5
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 44.0,
+     "large": 44.0,
+     "medium": 44.0,
+     "small": 44.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 0.785398,
+     "large": 0.785398,
+     "medium": 0.785398,
+     "small": 0.785398
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "fillSharp": "matchKey",
+   "fillDiffuse": "matchKey",
+   "dark": {
+    "brightness": 0.0,
+    "opacity": {
+     "display": 0.25,
+     "large": 0.1,
+     "medium": 0.1,
+     "small": 0.0
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 9.0,
+     "large": 8.0,
+     "medium": 8.0,
+     "small": 9.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.134464,
+     "large": 1.134464,
+     "medium": 1.134464,
+     "small": 1.134464
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "rim": null
+  },
+  "chicletScreened": {
+   "keySharp": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 0.6,
+     "large": 0.7,
+     "medium": 0.7,
+     "small": 0.7
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 10.0,
+     "large": 10.0,
+     "medium": 10.0,
+     "small": 10.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.745329,
+     "large": 1.745329,
+     "medium": 1.745329,
+     "small": 1.745329
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "keyDiffuse": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 0.25,
+     "large": 0.3,
+     "medium": 0.3,
+     "small": 0.3
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 44.0,
+     "large": 44.0,
+     "medium": 44.0,
+     "small": 44.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 0.785398,
+     "large": 0.785398,
+     "medium": 0.785398,
+     "small": 0.785398
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "fillSharp": "matchKey",
+   "fillDiffuse": "matchKey",
+   "dark": {
+    "brightness": 0.0,
+    "opacity": {
+     "display": 0.25,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 9.0,
+     "large": 8.0,
+     "medium": 8.0,
+     "small": 9.0
+    },
+    "minDistancePixels": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.134464,
+     "large": 1.134464,
+     "medium": 1.134464,
+     "small": 1.134464
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "rim": null
+  },
+  "glyphsDefault": {
+   "keySharp": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 0.3
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 4.0,
+     "large": 6.0,
+     "medium": 6.0,
+     "small": 6.0
+    },
+    "minDistancePixels": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.570796,
+     "large": 1.570796,
+     "medium": 1.570796,
+     "small": 1.570796
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "keyDiffuse": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 16.0,
+     "large": 24.0,
+     "medium": 24.0,
+     "small": 24.0
+    },
+    "minDistancePixels": {
+     "display": 4.0,
+     "large": 4.0,
+     "medium": 4.0,
+     "small": 4.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.047198,
+     "large": 1.047198,
+     "medium": 1.047198,
+     "small": 1.047198
+    },
+    "bias": 0.08,
+    "blendModeOverride": null
+   },
+   "fillSharp": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 0.3
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 4.0,
+     "large": 6.0,
+     "medium": 6.0,
+     "small": 6.0
+    },
+    "minDistancePixels": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.047198,
+     "large": 1.047198,
+     "medium": 1.047198,
+     "small": 1.047198
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "fillDiffuse": "matchKey",
+   "dark": {
+    "brightness": 0.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "outsetOpacity": {
+     "display": 0.9,
+     "large": 0.9,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "distance": {
+     "display": 4.0,
+     "large": 6.0,
+     "medium": 6.0,
+     "small": 6.0
+    },
+    "minDistancePixels": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.570796,
+     "large": 1.570796,
+     "medium": 3.141593,
+     "small": 3.141593
+    },
+    "bias": 0.2,
+    "blendModeOverride": null
+   },
+   "rim": null
+  },
+  "glyphsBright": {
+   "keySharp": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 0.3
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 4.0,
+     "large": 6.0,
+     "medium": 6.0,
+     "small": 6.0
+    },
+    "minDistancePixels": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.570796,
+     "large": 1.570796,
+     "medium": 1.570796,
+     "small": 1.570796
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "keyDiffuse": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 16.0,
+     "large": 24.0,
+     "medium": 24.0,
+     "small": 24.0
+    },
+    "minDistancePixels": {
+     "display": 4.0,
+     "large": 4.0,
+     "medium": 4.0,
+     "small": 4.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.047198,
+     "large": 1.047198,
+     "medium": 1.047198,
+     "small": 1.047198
+    },
+    "bias": 0.08,
+    "blendModeOverride": null
+   },
+   "fillSharp": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 0.3
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 4.0,
+     "large": 6.0,
+     "medium": 6.0,
+     "small": 6.0
+    },
+    "minDistancePixels": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.047198,
+     "large": 1.047198,
+     "medium": 1.047198,
+     "small": 1.047198
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "fillDiffuse": "matchKey",
+   "dark": {
+    "brightness": 0.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "outsetOpacity": {
+     "display": 0.9,
+     "large": 0.9,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "distance": {
+     "display": 4.0,
+     "large": 6.0,
+     "medium": 6.0,
+     "small": 6.0
+    },
+    "minDistancePixels": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.570796,
+     "large": 1.570796,
+     "medium": 3.141593,
+     "small": 3.141593
+    },
+    "bias": 0.2,
+    "blendModeOverride": null
+   },
+   "rim": null
+  },
+  "glyphsDim": {
+   "keySharp": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 0.3
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 4.0,
+     "large": 6.0,
+     "medium": 6.0,
+     "small": 6.0
+    },
+    "minDistancePixels": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.570796,
+     "large": 1.570796,
+     "medium": 1.570796,
+     "small": 1.570796
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "keyDiffuse": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 16.0,
+     "large": 24.0,
+     "medium": 24.0,
+     "small": 24.0
+    },
+    "minDistancePixels": {
+     "display": 4.0,
+     "large": 4.0,
+     "medium": 4.0,
+     "small": 4.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.047198,
+     "large": 1.047198,
+     "medium": 1.047198,
+     "small": 1.047198
+    },
+    "bias": 0.08,
+    "blendModeOverride": null
+   },
+   "fillSharp": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 0.3
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 4.0,
+     "large": 6.0,
+     "medium": 6.0,
+     "small": 6.0
+    },
+    "minDistancePixels": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.047198,
+     "large": 1.047198,
+     "medium": 1.047198,
+     "small": 1.047198
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "fillDiffuse": "matchKey",
+   "dark": {
+    "brightness": 0.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "outsetOpacity": {
+     "display": 0.9,
+     "large": 0.9,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "distance": {
+     "display": 4.0,
+     "large": 6.0,
+     "medium": 6.0,
+     "small": 6.0
+    },
+    "minDistancePixels": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.570796,
+     "large": 1.570796,
+     "medium": 3.141593,
+     "small": 3.141593
+    },
+    "bias": 0.2,
+    "blendModeOverride": null
+   },
+   "rim": null
+  },
+  "glyphsClear": {
+   "keySharp": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 0.3
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 4.0,
+     "large": 6.0,
+     "medium": 6.0,
+     "small": 6.0
+    },
+    "minDistancePixels": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.570796,
+     "large": 1.570796,
+     "medium": 1.570796,
+     "small": 1.570796
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "keyDiffuse": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 16.0,
+     "large": 24.0,
+     "medium": 24.0,
+     "small": 24.0
+    },
+    "minDistancePixels": {
+     "display": 4.0,
+     "large": 4.0,
+     "medium": 4.0,
+     "small": 4.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.047198,
+     "large": 1.047198,
+     "medium": 1.047198,
+     "small": 1.047198
+    },
+    "bias": 0.08,
+    "blendModeOverride": null
+   },
+   "fillSharp": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 0.3
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 4.0,
+     "large": 6.0,
+     "medium": 6.0,
+     "small": 6.0
+    },
+    "minDistancePixels": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.047198,
+     "large": 1.047198,
+     "medium": 1.047198,
+     "small": 1.047198
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "fillDiffuse": "matchKey",
+   "dark": {
+    "brightness": 0.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "outsetOpacity": {
+     "display": 0.9,
+     "large": 0.9,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "distance": {
+     "display": 4.0,
+     "large": 6.0,
+     "medium": 6.0,
+     "small": 6.0
+    },
+    "minDistancePixels": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.570796,
+     "large": 1.570796,
+     "medium": 3.141593,
+     "small": 3.141593
+    },
+    "bias": 0.2,
+    "blendModeOverride": null
+   },
+   "rim": null
+  },
+  "glyphsScreened": {
+   "keySharp": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 0.3
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 4.0,
+     "large": 6.0,
+     "medium": 6.0,
+     "small": 6.0
+    },
+    "minDistancePixels": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.570796,
+     "large": 1.570796,
+     "medium": 1.570796,
+     "small": 1.570796
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "keyDiffuse": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 16.0,
+     "large": 24.0,
+     "medium": 24.0,
+     "small": 24.0
+    },
+    "minDistancePixels": {
+     "display": 4.0,
+     "large": 4.0,
+     "medium": 4.0,
+     "small": 4.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.047198,
+     "large": 1.047198,
+     "medium": 1.047198,
+     "small": 1.047198
+    },
+    "bias": 0.08,
+    "blendModeOverride": null
+   },
+   "fillSharp": {
+    "brightness": 1.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 0.3
+    },
+    "outsetOpacity": null,
+    "distance": {
+     "display": 4.0,
+     "large": 6.0,
+     "medium": 6.0,
+     "small": 6.0
+    },
+    "minDistancePixels": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.047198,
+     "large": 1.047198,
+     "medium": 1.047198,
+     "small": 1.047198
+    },
+    "bias": 0.5,
+    "blendModeOverride": null
+   },
+   "fillDiffuse": "matchKey",
+   "dark": {
+    "brightness": 0.0,
+    "opacity": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "outsetOpacity": {
+     "display": 0.9,
+     "large": 0.9,
+     "medium": 0.2,
+     "small": 0.2
+    },
+    "distance": {
+     "display": 4.0,
+     "large": 6.0,
+     "medium": 6.0,
+     "small": 6.0
+    },
+    "minDistancePixels": {
+     "display": 1.0,
+     "large": 1.0,
+     "medium": 1.0,
+     "small": 1.0
+    },
+    "inset": {
+     "display": 0.0,
+     "large": 0.0,
+     "medium": 0.0,
+     "small": 0.0
+    },
+    "minInsetPixels": null,
+    "spread": {
+     "display": 1.570796,
+     "large": 1.570796,
+     "medium": 3.141593,
+     "small": 3.141593
+    },
+    "bias": 0.2,
+    "blendModeOverride": null
+   },
+   "rim": null
+  }
+ }
+}

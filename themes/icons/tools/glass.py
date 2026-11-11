@@ -1,12 +1,11 @@
 #!/usr/bin/env python3 -I
-"""IconRendering's glass highlight (the specular edge of Liquid Glass icons), for build-styles.py.
+"""The FITTED rim of the two light Dock styles (build-styles.py DOCK_LIGHT); everything else is icr.py.
 
-The function is Apple's own: `glassHighlight` in macOS 27.2.1
-/System/Library/PrivateFrameworks/IconRendering.framework/Versions/A/Resources/default.metallib
-(AIR bitcode, disassembled with llvm-dis; IconRendering registers it as the CoreImage kernel
-`CUIGlassHighlight`, inputs inputHeight / inputSpread / inputBiasAmount / inputCurvature / inputAngleSinCos /
-inputSDFScaleFactor / inputSDFZeroValue). Per pixel, with d = the signed distance inside the shape minus the inset
-(texture r: d = (zero - r) * scale - inset) and n = the shape normal (texture gb: n = 1 - 2 gb):
+`highlight` is Apple's `glassHighlight` kernel (IconRendering default.metallib), kept here with the inputs that
+were fitted to the Mac's Settings tile plates before IconRendering's own values were decoded (RIM in
+build-styles.py). The decoded values and the composition around the kernel are in icr.py and
+reference/ASSETS.md; TintedLight / ClearLight still use this fit because their Dock look is live glass, which the
+port does not reproduce (build-styles.py says why).
 
     t    = saturate(d / height)
     w    = clamp(fwidth(d), 2^-10, 2) * 0.833
@@ -15,14 +14,6 @@ inputSDFScaleFactor / inputSDFZeroValue). Per pixel, with d = the signed distanc
     band = saturate((height - d) / w + 0.5) * saturate(d / w + 0.5)
     l    = saturate((dot(light, n) - spread) / max(1 - spread, 2^-10)) * fall
     out  = colour * band * l / max(1 + (1 - l) * bias, 2^-10)
-
-The values IconRendering feeds it (ICRRenderingParameters.Highlights: per icon brightness class a set of key /
-fill / rim / dark HighlightSettings, each with distance, inset, spread, bias, opacity, by size class; the light
-longitude; the curvature per size) are built in Swift (the `default` once-initialiser at 0x1cfd87b8c and the
-Highlights builder at 0x1cfd8cd9c in the 27.2.1 dyld cache) and were not all decoded, nor how the renderer maps
-them onto these inputs. So the inputs here are FITTED to Apple's rendered chiclets: the Settings pane tiles
-(themes/icons/settings, IconServices on 27.2.1) have an identical chiclet in every pane per style (spread across
-the 21 symbol panes <= 3/255), which is the plate the fit uses (`fit` below, numbers in build-styles.py).
 """
 import numpy as np
 from PIL import Image

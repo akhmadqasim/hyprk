@@ -3,10 +3,11 @@
 
   check-styles.py [<out-dir for side-by-side crops> [<os-volume-root>]]
 
-With the OS volume also the Settings pane tiles (themes/icons/settings, IconServices on 27.2.1, 128 px): Siri and
-Spotlight are layered app icons (SiriPreferenceExtension / SpotlightPreferenceExtension.appex Assets.car), built
-here with build-styles.render at 128 px and compared per style over the opaque tile (the light Clear / Tinted
-files follow the Mac's Dock, which draws them unlike the tiles, so those two are not compared there).
+With the OS volume also the Settings pane tiles (themes/icons/settings, IconServices on 27.2.1, 128 px = 128 pt at
+1x, size class large): Siri and Spotlight are layered app icons (SiriPreferenceExtension /
+SpotlightPreferenceExtension.appex Assets.car), composed here by icr.py as the mitigated version in all five
+styles and compared over the opaque tile. (build-styles.py's light Clear / Tinted FILES follow the Mac's Dock
+instead; the tiles' TintedLight plate needs the mode's saturation, which IconServices sets: 1 / 0.9 reproduces it.)
 
 Shots (macOS 27.2.1, 2x, Dock tilesize 33): reference/screens/27.2.1/dock/dock-dark.png (icon style Dark) and
 glass53/dock-dark-white-iconstyles-dark-default-clear-tinted.png (rows Dark / Default / ClearLight / TintedLight,
@@ -102,17 +103,23 @@ if __name__ == "__main__":
         spec = importlib.util.spec_from_file_location("bs", f"{here}/build-styles.py")
         bs = importlib.util.module_from_spec(spec); spec.loader.exec_module(bs)
         ext = f"{sys.argv[2]}/System/Library/ExtensionKit/Extensions"
-        print("Settings pane tiles (128 px, rms over the opaque tile):")
+        print("Settings pane tiles (128 px, the mitigated version by icr.py, rms over the opaque tile):")
+        modes = {"dark-dark": ("color", "dark", "dark"), "tinted-dark": ("tinted", "dark", "tintable"),
+                 "clear-dark": ("clear", "dark", "tintable"), "clear-light": ("clear", "light", "tintable"),
+                 "tinted-light": ("tinted", "light", "tintable")}
         for pane, appex, stem in (("siri", "SiriPreferenceExtension", "AppIconSiri"),
                                   ("spotlight", "SpotlightPreferenceExtension", "AppIcon")):
             st = f"{icons}/settings/{pane}@128"
-            r = bs.render(bs.IS.Stack(f"{ext}/{appex}.appex/Contents/Resources/Assets.car"), stem,
-                          Image.open(f"{st}-default-light.png"), 128)
-            line = [f"  {pane:16s}"]
-            for style in ("dark-dark", "tinted-dark", "clear-dark"):
-                ref = np.asarray(Image.open(f"{st}-{style}.png").convert("RGBA")).astype(np.float32) / 255
-                m = ref[..., 3] > 0.995
-                line.append(f"{style} {np.sqrt((((r[style][0] - ref[..., :3])[m] * 255) ** 2).mean()):5.1f}")
+            stack = bs.IS.Stack(f"{ext}/{appex}.appex/Contents/Resources/Assets.car", extended=True)
+            _, cov = bs.shape(Image.open(f"{st}-default-light.png"), 128)
+            y0, y1 = bs.body(cov)
+            line = [f"  {pane:10s}"]
+            for style, (mode, app, which) in modes.items():
+                rgb = bs.icr.render(bs.icon_for(stack, stem, which, cov), mode, app, 128, 1, tint=bs.TINT,
+                                    saturation=1 / 0.9, mitigated=True)
+                ref = np.asarray(Image.open(f"{st}-{style}.png").convert("RGBA")).astype(np.float32)[y0:y1, y0:y1] / 255
+                m = (ref[..., 3] > 0.995) & (cov[y0:y1, y0:y1] > 0.999)
+                line.append(f"{style} {np.sqrt((((rgb - ref[..., :3])[m] * 255) ** 2).mean()):5.1f}")
             print("  ".join(line))
     if out:
         os.makedirs(out, exist_ok=True)
