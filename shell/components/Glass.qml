@@ -48,6 +48,10 @@ Item {
         // _Glass.regular's drop shadow for its size instead of the layer recipe's (plugin 53efda0)
         Region { id: shadowHole; intersection: Intersection.Subtract; width: 0; height: 1 }
         Region { id: pointerHole; intersection: Intersection.Subtract; width: 0; height: 1 }
+        // a full circle (width = height = 2 radius): Qt's ellipse region leaves the top row empty, so the plugin read the
+        // shape as 64 x 63 pt one point down (Control Center's round buttons, session 12). Two cells in the middle of
+        // that row give the region its true box.
+        Region { id: topRow; intersection: Intersection.Combine; width: 0; height: 1 }
         // sub-point edges (plugin/README.md "Sub-point edges"): the region is whole points, so a glass that scales
         // (HUD appear 0.9 -> 1) grew in 1 pt steps and the last one lit the final rim rows at once (HUD alpha 0.55 ->
         // 0.76, judge #3). Rows mid - 4 (left / right) and mid - 5 (top / bottom) carry the true edges
@@ -67,6 +71,9 @@ Item {
         shadowHole.x = px + Math.floor(w / 2);
         shadowHole.y = py + Math.floor(h / 2) + 1;
         shadowHole.width = (!root.shadow && !root.pointer && root.on && w >= 4 && h >= 3) ? 1 : 0;
+        topRow.x = px + Math.floor(w / 2) - 1;
+        topRow.y = py;
+        topRow.width = (root.on && w === h && w >= 8 && Math.round(root.radius) * 2 === w) ? 2 : 0;
         pointerHole.x = px + 1;
         pointerHole.y = py;
         pointerHole.width = (root.pointer && root.on && w >= 3) ? 1 : 0;
