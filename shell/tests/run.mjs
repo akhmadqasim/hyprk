@@ -653,7 +653,9 @@ test("mode buttons start inside the field, end in place", () => {
         near(con("GLYPH_IN") * 1000, tok("glyphIn"), 1);
         near(con("GLYPH_OUT") * 1000, tok("glyphOut"), 1);
         const tlq = qml("TrafficLights.qml");
-        assert.match(tlq, /anchors\.margins: -1\b/); // the 1 pt glow
+        // the discs are drawn by shaders/lights.frag (the plugin's lights_model.py table); the built shader must ship
+        assert.match(tlq, /shaders\/lights\.frag\.qsb/);
+        assert.ok(readdirSync(join(hyprk, "shaders")).includes("lights.frag.qsb"));
         near(con("GLOW_WIDTH"), 1, 1e-9);
         assert.match(tlq, /easing\.type: tl\._glyphs \? Easing\.OutCubic : Easing\.OutQuad/);
         const ga = cpp.slice(cpp.indexOf("float CTitlebar::glyphAlpha()"), cpp.indexOf("void CTitlebar::draw("));
