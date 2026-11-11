@@ -157,7 +157,25 @@ function bounceOffset(t, height) {
     return height * 4 * u * (1 - u);
 }
 
-// When the bounce stops: launching ends (the app has a window, or the 6 s cap) `stopMs` after it started;
+// Launching ends at the latest 120 s after it started: -[Tile] `_bounceDur` = 120000 ms cap for the launch bounce
+// (MAC-ANSWERS.md "REA 27.2.1: Dock" section 1)
+const launchCapMs = 120000;
+// the ids in `launching` ({ id: { start, end } }, end 0 while launching) whose cap has passed at wall time `now`, and the
+// wall time of the next cap (0: none left)
+function launchCaps(launching, now) {
+    const due = [];
+    let next = 0;
+    for (const id in launching) {
+        const b = launching[id];
+        if (b.end !== 0) continue;
+        const t = b.start + launchCapMs;
+        if (t <= now) due.push(id);
+        else if (next === 0 || t < next) next = t;
+    }
+    return { due: due, next: next };
+}
+
+// When the bounce stops: launching ends (the app has a window, or the cap) `stopMs` after it started;
 // the bounce in progress is finished, so it ends at the next multiple of 700 ms (the code rounds _bounceDur up
 // to (floor(t / 700) + 1) * 700). The icon lands at the end of its arc and never snaps down mid-air.
 function bounceEnd(stopMs) {
