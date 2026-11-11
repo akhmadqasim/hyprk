@@ -348,7 +348,11 @@ ShellWindow {
                     ScreencopyView {
                         id: view
                         captureSource: cell.modelData.wayland
-                        live: mc.shown
+                        // one still per open, not a live feed: live, every window was captured and redrawn at 60 fps
+                        // for as long as Mission Control stayed open (reference/PERF-2026-11-10.md item 2). The still
+                        // is taken when the source is set (creation, on open) and again on a reopen while still loaded
+                        live: false
+                        Connections { target: mc; function onShownChanged() { if (mc.shown) view.captureFrame(); } }
                         // fit the cell but never grow past Theme.mission.maxScale of the real window
                         readonly property real dpr: mc.screen ? mc.screen.devicePixelRatio : 1
                         readonly property real maxW: cell.width
