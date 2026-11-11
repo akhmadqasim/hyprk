@@ -38,7 +38,10 @@ ShellWindow {
     margins.top: Theme.menuBar.height + m.gap
     margins.right: m.gap
     implicitWidth: Math.ceil(m.width)
-    implicitHeight: Math.ceil(m.height)
+    // one clear row under the capsule for ShellWindow's glass opacity marker: when the growing glass reached the bottom
+    // row the region union swallowed the 1x1 marker and the glass jumped to full opacity mid-appear (mcap: 0.71 -> 0.92
+    // in one frame, with one frame of a different glass look)
+    implicitHeight: Math.ceil(m.height) + 1
     acceptsInput: false                 // never takes clicks
 
     // 0 hidden .. 1 shown: opacity of the content; scale 0.9 + 0.1 x (Reduce motion: no scale, Theme.travel)
