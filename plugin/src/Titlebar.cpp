@@ -7,6 +7,7 @@
 #include <hyprland/src/desktop/view/window/WindowEffectsController.hpp>
 #include <hyprland/src/render/transformer/TransformerList.hpp>
 #include <hyprland/src/layout/LayoutManager.hpp>
+#include <hyprland/src/managers/fullscreen/FullscreenController.hpp>
 #include <hyprland/src/managers/input/InputManager.hpp>
 #include <hyprland/src/plugins/PluginAPI.hpp>
 #include <hyprland/src/protocols/XDGShell.hpp>
@@ -405,6 +406,13 @@ namespace lg {
         if (std::abs(glyphA - (m_hover ? 1.f : 0.f)) > 0.002f)
             damageEntire(); // keep the fade going
 
+        m_last = {.bar    = barGlobal().translate(presentation.floatingOffset),
+                  .window = CBox{window->positionAnimation()->value(), window->sizeAnimation()->value()},
+                  .radius = radius,
+                  .glyphA = glyphA,
+                  .active = isActive || m_hover,
+                  .drawn  = std::chrono::steady_clock::now()};
+
         // title left-aligned after the lights, where the Mac starts it behind its proxy icon (no icon drawn here)
         const auto title = window->metadata().title();
         if (!title.empty() && layout.title.w > 8) {
@@ -416,6 +424,100 @@ namespace lg {
                 g_pHyprRenderer->addPassElement(ctx, makeUnique<CTexPassElement>(text));
             }
         }
+    }
+
+    // CoreAnimation cubic bezier (0, 1, 1, 1): x(s) = 3 s^2 - 2 s^3, y(s) = 1 - (1 - s)^3; y at x by bisection
+    static double easeZeroOne(double x) {
+        double lo = 0, hi = 1;
+        for (int i = 0; i < 30; ++i) {
+            const double m = (lo + hi) / 2;
+            (3 * m * m - 2 * m * m * m < x ? lo : hi) = m;
+        }
+        const double s = (lo + hi) / 2;
+        return 1 - (1 - s) * (1 - s) * (1 - s);
+    }
+
+    void CTitlebar::drawFullscreenFade(Render::CRenderContext& ctx, const PHLMONITOR& mon) {
+        constexpr double FADE = 0.25, FADE_REDUCED = 0.5; // s: half of NSFullScreenTransitionDuration 0.5; Reduce Motion: all of it
+        const auto       window = m_window.lock();
+        const auto       params = m_params();
+        if (!window || !params || !mon)
+            return;
+        const bool full = Fullscreen::controller()->getFullscreenModes(window).internal == Fullscreen::FSMODE_FULLSCREEN;
+        const auto now  = std::chrono::steady_clock::now();
+        if (!full) {
+            m_wasFull = m_fading = false;
+            return;
+        }
+        if (!m_wasFull) {
+            m_wasFull   = true;
+            m_fadeStart = now;
+            // only from a bar drawn just before (not a window that opened full screen or a workspace switch onto one)
+            m_fading = m_height > 0 && !m_last.bar.empty() && now - m_last.drawn < std::chrono::milliseconds(100);
+        }
+        if (!m_fading || window->m_monitor.lock() != mon)
+            return;
+        const double t = std::chrono::duration<double>(now - m_fadeStart).count() / (params->reduceMotion ? FADE_REDUCED : FADE);
+        if (t >= 1) {
+            m_fading = false;
+            g_pHyprRenderer->damageMonitor(mon);
+            return;
+        }
+        const float a = float(params->reduceMotion ? 1 - t : 1 - easeZeroOne(t));
+
+        // the before-contents (bar + window as last drawn) scaled to the frame as it is now
+        const double x1 = std::min(m_last.bar.x, m_last.window.x), y1 = std::min(m_last.bar.y, m_last.window.y);
+        const CBox   from{x1, y1, std::max(m_last.bar.x + m_last.bar.w, m_last.window.x + m_last.window.w) - x1,
+                        std::max(m_last.bar.y + m_last.bar.h, m_last.window.y + m_last.window.h) - y1};
+        const CBox   now_ = CBox{window->positionAnimation()->value(), window->sizeAnimation()->value()};
+        if (from.w < 1 || from.h < 1)
+            return;
+        const double kx = params->reduceMotion ? 1 : now_.w / from.w, ky = params->reduceMotion ? 1 : now_.h / from.h;
+        const CBox   origin = params->reduceMotion ? from : now_;
+        CBox         bar{origin.x + (m_last.bar.x - from.x) * kx, origin.y + (m_last.bar.y - from.y) * ky, m_last.bar.w * kx, m_last.bar.h * ky};
+        bar.translate(-mon->m_position);
+        const float scale = mon->m_scale;
+        const CBox  barPx = bar.copy().scale(scale).round();
+        if (barPx.empty())
+            return;
+
+        const SLook look = this->look(*params, m_last.active, m_dark);
+        CRectPassElement::SRectData fill;
+        fill.box           = CBox{barPx.x, barPx.y, barPx.w, barPx.h + m_last.radius * scale * 2}.round();
+        fill.clipBox       = barPx;
+        fill.round         = int(std::round(m_last.radius * scale));
+        fill.roundingPower = window->presentation().roundingPower();
+        fill.color         = rgba(look.fill, a * (params->titlebarGlass ? 0.55f : 1.f));
+        fill.blur          = params->titlebarGlass;
+        g_pHyprRenderer->addPassElement(ctx, makeUnique<CRectPassElement>(fill));
+
+        const auto layout = geometry(*params, {}).layout;
+        const auto put    = [&](const SP<Render::ITexture>& tex, const CBox& b, float alpha) {
+            if (!tex || !tex->ok() || alpha <= 0.002f)
+                return;
+            const double w = tex->m_size.x * kx, h = tex->m_size.y * ky;
+            CTexPassElement::SRenderData d;
+            d.tex = tex;
+            d.box = CBox{b.x + (b.w - w) / 2, b.y + (b.h - h) / 2, w, h}.round();
+            d.a   = alpha;
+            g_pHyprRenderer->addPassElement(ctx, makeUnique<CTexPassElement>(d));
+        };
+        for (int i = 0; i < 3; ++i) {
+            const auto& l = layout.buttons[i];
+            const CBox  b = CBox{bar.x + l.x * kx, bar.y + l.y * ky, l.w * kx, l.h * ky}.scale(scale).round();
+            put(lightTexture(i, m_last.active ? 0 : 1, look.dark, scale), b, a);
+            put(glyphTexture(i == 2 && m_option ? 3 : i, false, look.dark, scale), b, a * m_last.glyphA);
+        }
+        const auto title = window->metadata().title();
+        if (!title.empty() && layout.title.w > 8)
+            if (const auto tex = titleTexture(params, title, m_last.active, look.dark, scale, layout.title.w); tex && tex->ok()) {
+                CTexPassElement::SRenderData text;
+                text.tex = tex;
+                text.box = CBox{barPx.x + layout.title.x * kx * scale, barPx.y + (barPx.h - tex->m_size.y * ky) / 2, tex->m_size.x * kx, tex->m_size.y * ky}.round();
+                text.a   = a;
+                g_pHyprRenderer->addPassElement(ctx, makeUnique<CTexPassElement>(text));
+            }
+        g_pHyprRenderer->damageBox(bar.copy().translate(mon->m_position).expand(2));
     }
 
     CTitlebar::SLook CTitlebar::look(const SParams& p, bool isActive, bool wasDark) const {

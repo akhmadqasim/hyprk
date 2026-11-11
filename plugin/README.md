@@ -395,6 +395,16 @@ top corners, so the two read as one shape.
 `look.inactive` = `{fill, dark, text}` (colours as `#AARRGGBB`, `dark` = the discs and text of a dark bar). Mission
 Control draws the bar from it in the thumbnails (a window capture holds the client only, the bar is a decoration).
 
+**Full screen enter.** Hyprland draws no decoration for a full-screen window, so the bar went in one frame. AppKit's
+`_NSFullScreenTransitionOverlayWindow` fades the after-contents in on (0, 1, 1, 1) over half the 0.5 s transition, over the
+before-contents (window and bar), both on the moving frame (MOTION-PLUGIN.md "Full screen REA"). `CTitlebar::drawFullscreenFade`
+(RENDER_POST_WINDOWS) draws the bar's last look (fill, lights, glyphs, title) over the window's top rows, mapped from the last
+drawn bar + window box to the window's current box, at 1 - (0, 1, 1, 1)(t / 0.25 s); Reduce Motion: linear over 0.5 s, not
+moved. Only for a bar drawn in the last 100 ms (not a window opened full screen). Cost: one rect and up to 7 small textured
+quads for about 15 frames; at rest one mode lookup per bar and frame. Red-light ink per frame, foot at 2x, 20 of 20 enters:
+1.03 .59 .48 .40 .33 .29 .24 .20 .15 .10 .05 .01 0 (the curve: 1 .60 .46 .36 .29 .23 .18 .14 .11 .08 .06 .04 .02; rms .038, was
+1 then 0: .265; the ink grows with the scaled lights mid-way).
+
 ## Windows
 
 `window_classes = "^(foot|hyprk-finder)$"` puts glass (no drop shadow, the window keeps its own) behind matching

@@ -304,6 +304,13 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
                 if (e.context)
                     lg::appearancefade::begin(e.monitor, e.context->get(), *g_params);
                 break;
+            // full screen enter: the title bar fades over the window (Titlebar.hpp drawFullscreenFade)
+            case RENDER_POST_WINDOWS:
+                if (e.context && e.monitor && g_params && g_params->enabled)
+                    for (const auto& t : g_titlebars)
+                        if (const auto bar = t.lock())
+                            bar->drawFullscreenFade(e.context->get(), e.monitor);
+                break;
             // the pass (all GPU work of the frame) runs in endRender(), between these two stages
             case RENDER_LAST_MOMENT:
                 if (e.context && g_params)

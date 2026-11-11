@@ -42,6 +42,13 @@ namespace lg {
         // a button release anywhere ends a title-bar drag we started
         void onButtonRelease();
         bool belongsTo(const PHLWINDOW& w) const { return m_window.lock() == w; }
+        // Full screen enter: Hyprland draws no decoration for a full-screen window, so the bar went in one frame. AppKit's
+        // _NSFullScreenTransitionOverlayWindow fades the after-contents in on (0, 1, 1, 1) over half the 0.5 s transition
+        // over the before-contents (the window with its bar), both scaled to the moving frame (MOTION-PLUGIN.md "Full screen
+        // REA"). Called once per monitor frame after the windows (RENDER_POST_WINDOWS): while that fade runs it draws the
+        // bar's last look over the window's top rows, scaled with the frame, at 1 - (0, 1, 1, 1)(t / 0.25 s); Reduce Motion:
+        // linear over the 0.5 s. Nothing at rest: one mode lookup per bar and frame.
+        void drawFullscreenFade(Render::CRenderContext& ctx, const PHLMONITOR& mon);
         // `hyprctl liquidglass bars`: what the bar draws, as one JSON object, or "" without a bar (Mission Control draws
         // it in the thumbnails of windows whose bar the screen does not show whole: a window capture holds the client only)
         std::string describe() const;
@@ -104,6 +111,15 @@ namespace lg {
         std::optional<SRgba>                m_sampled;
         bool                                m_dark = false; // bar colour is dark (hysteresis)
         unsigned                            m_recheck = 0;
+        // the last drawn bar (global logical px), its window box, rounding, look and glyph alpha, for drawFullscreenFade
+        struct {
+            CBox                                  bar, window;
+            float                                 radius = 0, glyphA = 0;
+            bool                                  active = false;
+            std::chrono::steady_clock::time_point drawn{};
+        } m_last;
+        bool                                  m_wasFull = false, m_fading = false;
+        std::chrono::steady_clock::time_point m_fadeStart{};
     };
 
     // Runs after the window is drawn (decoration layer OVER, takes no space): reads the client's top
