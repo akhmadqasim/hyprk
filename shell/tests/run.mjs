@@ -109,6 +109,51 @@ test("state null", () => assert.equal(ST.parse('{"dark":null}', defs).dark, fals
 
 // ---- Dock (lib/dock.js, dock defaults in lib/state.js) ----
 const DK = load("dock.js");
+// slots (Dock.qml ListModel): the edits keep every staying slot, keep leaving ones in place, end in `keys` order
+{
+    const applyEdits = (cur, ops) => {
+        const s = cur.map(c => ({ key: c.key, leaving: !!c.leaving }));
+        for (const o of ops) {
+            if (o.op === "leave") s[o.at].leaving = true;
+            else if (o.op === "revive") s[o.at].leaving = false;
+            else if (o.op === "insert") s.splice(o.at, 0, { key: o.key, leaving: false });
+            else s.splice(o.to, 0, s.splice(o.from, 1)[0]);
+        }
+        return s;
+    };
+    test("dock slots: a window opening changes nothing, an app added or removed is one edit", () => {
+        const cur = ["a", "b", "hyprk-separator", "t"].map(k => ({ key: k, leaving: false }));
+        assert.deepEqual(DK.slotEdits(cur, ["a", "b", "hyprk-separator", "t"]).ops, []);
+        assert.deepEqual(DK.slotEdits(cur, ["a", "b", "x", "hyprk-separator", "t"]).ops, [{ op: "insert", at: 2, key: "x" }]);
+        const r = DK.slotEdits(cur, ["a", "hyprk-separator", "t"]);
+        assert.deepEqual(r.ops, [{ op: "leave", at: 1 }]);
+        assert.deepEqual(DK.slotEdits(r.slots, ["a", "b", "hyprk-separator", "t"]).ops, [{ op: "revive", at: 1 }]);
+    });
+    test("dock slots: random edits replay to the target (400 cases)", () => {
+        let seed = 7;
+        const rnd = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+        const pick = () => [..."abcdefg"].filter(() => rnd() < 0.5).sort(() => rnd() - 0.5);
+        for (let n = 0; n < 400; n++) {
+            const cur = pick().map(k => ({ key: k, leaving: rnd() < 0.3 })), keys = pick();
+            const r = DK.slotEdits(cur, keys), s = applyEdits(cur, r.ops);
+            assert.deepEqual(s, r.slots);
+            assert.deepEqual(s.filter(c => !c.leaving).map(c => c.key), keys);
+            assert.equal(s.length, new Set(cur.map(c => c.key).concat(keys)).size); // nothing dropped, nothing doubled
+        }
+    });
+    test("dock slots: keys unique, grow 0.25 s, shrink 0.15 s, the layout scales a slot", () => {
+        assert.deepEqual(DK.slotKeys([{ id: "a" }, { id: "b" }, { id: "a" }]), ["a", "b", "a#2"]);
+        assert.equal(DK.slotDuration(true), 250);
+        assert.equal(DK.slotDuration(false), 150);
+        const cells = ["tile", "tile", "tile"], full = DK.layout(cells, { tile: 64, large: 64, fish: 0, focus: 0, dpr: 2 });
+        const half = DK.layout(cells, { tile: 64, large: 64, fish: 0, focus: 0, dpr: 2, grow: [1, 0.5, 1] });
+        const close = (a, b, e) => assert.ok(Math.abs(a - b) <= e, `${a} != ${b}`);
+        close(half.w[1], full.w[1] / 2, 0.5);
+        close(half.x[2], full.x[2] - full.w[1] / 2, 0.5);
+        close(half.width, full.width - full.w[1] / 2, 1);
+        assert.equal(DK.layout(cells, { tile: 64, large: 64, fish: 0, focus: 0, dpr: 2, grow: [1, 0, 1] }).w[1], 0);
+    });
+}
 test("dock magnification off by default", () => assert.equal(ST.dockDefaults().magnification, false));
 test("dock tile: absent size is 64 (Q-dock-02)", () => {
     assert.equal(ST.dockTile(ST.dockDefaults()), 64);

@@ -109,7 +109,8 @@ function layout(cells, o) {
     const dpr = o.dpr > 0 ? o.dpr : 1;
     const snap = v => Math.round(v * dpr) / dpr;
     const out = { center: [], x: [], w: [], size: [], width: 0, baseWidth: 0, metrics: m };
-    const widths = cells.map(k => k === "separator" ? m.separator : m.item);
+    // o.grow[i] (0..1): the slot of a tile being added or removed (Dock.qml), 1 when absent
+    const widths = cells.map((k, i) => (k === "separator" ? m.separator : m.item) * (o.grow && o.grow[i] !== undefined ? o.grow[i] : 1));
     let bx = m.margin;
     for (const w of widths) { out.center.push(bx + w / 2); bx += w; }
     const left = m.margin, right = bx;
@@ -227,6 +228,52 @@ function sections(pinned, runningUnpinned, recent, showRecents, others) {
     } else out = out.concat(runningUnpinned);
     return out.concat([sep("hyprk-separator")], others);
 }
+// ---------- slots ----------
+// A tile added to the Dock grows its slot from 0 to full width in 0.25 s, a removed one shrinks out in 0.15 s
+// (MAC-ANSWERS.md Q-dock launch bounce notes), both on the Dock's cosine ease in-out (DockFloatAnimatedProperty).
+// Dock.qml keeps one ListModel row per slot so a delegate survives every change of the items (running windows,
+// recents); a removed slot stays, `leaving`, where it was until its shrink ends.
+const slotGrowMs = 250, slotShrinkMs = 150;
+// one key per item: its id, made unique ("#2", "#3") if an id repeats
+function slotKeys(items) {
+    const seen = {};
+    return items.map(it => {
+        const k = String(it.id);
+        seen[k] = (seen[k] || 0) + 1;
+        return seen[k] > 1 ? k + "#" + seen[k] : k;
+    });
+}
+// The edits that turn the slots `cur` ([{key, leaving}]) into `keys` in order, leaving slots kept in place:
+// {op: "leave" | "revive", at}, {op: "move", from, to} (ListModel.move semantics), {op: "insert", at, key};
+// applied one after the other. `slots` is the result.
+function slotEdits(cur, keys) {
+    const s = cur.map(c => ({ key: c.key, leaving: !!c.leaving }));
+    const want = new Set(keys), ops = [];
+    s.forEach((c, i) => {
+        if (!c.leaving && !want.has(c.key)) { c.leaving = true; ops.push({ op: "leave", at: i }); }
+    });
+    let p = 0;
+    for (const k of keys) {
+        while (p < s.length && s[p].leaving && s[p].key !== k) p++;
+        let j = s.findIndex(c => c.key === k);
+        if (j < 0) {
+            s.splice(p, 0, { key: k, leaving: false });
+            ops.push({ op: "insert", at: p, key: k });
+        } else {
+            if (j !== p) {
+                const c = s.splice(j, 1)[0];
+                if (j < p) p--;
+                s.splice(p, 0, c);
+                ops.push({ op: "move", from: j, to: p });
+            }
+            if (s[p].leaving) { s[p].leaving = false; ops.push({ op: "revive", at: p }); }
+        }
+        p++;
+    }
+    return { ops: ops, slots: s };
+}
+function slotDuration(entering) { return entering ? slotGrowMs : slotShrinkMs; }
+
 // the recent list after app `id` stopped running: it goes first, kept unique, at most `max`
 function pushRecent(recent, item, max) {
     return [item].concat(recent.filter(a => a.id !== item.id)).slice(0, max || 3);

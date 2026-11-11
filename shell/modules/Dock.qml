@@ -33,6 +33,48 @@ ShellWindow {
     readonly property int separators: cells.filter(c => c === "separator").length
     readonly property int trashIndex: items.length - 1
 
+    // ---------- slots ----------
+    // One ListModel row per slot (lib/dock.js slotEdits), keyed by the item's id, so a change of the items (a window
+    // opens, recents move) updates the delegates in place: the launch bounce, the hover label and the pressed state
+    // live on. An added slot grows from 0 in 0.25 s, a removed one shrinks out in 0.15 s, cosine ease in-out
+    // (MAC-ANSWERS.md Q-dock); each runs one NumberAnimation on its delegate, nothing else ticks.
+    readonly property var itemKeys: DockLayout.slotKeys(items)
+    readonly property var byKey: {
+        const o = {};
+        items.forEach((it, i) => o[itemKeys[i]] = it);
+        return o;
+    }
+    ListModel { id: slots }
+    property var slotList: []          // mirror of `slots`: [{key, leaving}]
+    property bool slotsLive: false     // after the first fill: new slots grow in
+    function syncSlots() {
+        const r = DockLayout.slotEdits(slotList, itemKeys);
+        for (const o of r.ops) {
+            if (o.op === "leave") slots.setProperty(o.at, "leaving", true);
+            else if (o.op === "revive") slots.setProperty(o.at, "leaving", false);
+            else if (o.op === "move") slots.move(o.from, o.to, 1);
+            else slots.insert(o.at, { key: o.key, leaving: false });
+        }
+        slotList = r.slots;
+    }
+    function dropSlot(key) {
+        const i = slotList.findIndex(c => c.key === key);
+        if (i < 0 || !slotList[i].leaving) return;
+        slots.remove(i);
+        slotList = slotList.filter((c, j) => j !== i);
+    }
+    onItemKeysChanged: syncSlots()
+    readonly property var slotCells: slotList.map(c => /^hyprk-separator/.test(c.key) ? "separator" : "tile")
+    // the slots' widths (0..1) while one grows or shrinks
+    readonly property var slotGrow: {
+        const n = slotList.length, g = [];
+        for (let i = 0; i < n; i++) {
+            const it = cellRepeater.count === n ? cellRepeater.itemAt(i) : null;
+            g.push(it ? it.grow : 1);
+        }
+        return g;
+    }
+
     // ---------- geometry ----------
     readonly property int tile: DockLayout.fitTile(State.dockTile(Prefs.dock), items.length - separators, separators, screen ? screen.width : 1920)
     readonly property var m: DockLayout.metrics(tile)
@@ -87,12 +129,12 @@ ShellWindow {
     readonly property bool primaryDock: screen === Panels.screen
     readonly property string genieTarget: {
         if (!primaryDock || !screen) return "";
-        const x0 = screen.x + (dock.width - geom.baseWidth) / 2;
+        const x0 = screen.x + (dock.width - restGeom.baseWidth) / 2;
         const top = screen.y + screen.height - m.bottomGap - m.height + m.iconTop;
         const rect = left => [left, top, tile, tile].map(Math.round).join(" ");
-        const out = [rect(x0 + geom.center[trashIndex] - tile / 2)];
+        const out = [rect(x0 + restGeom.center[trashIndex] - tile / 2)];
         items.forEach((it, i) => (it.windows || []).forEach(w => {
-            if (w && w.address) out.push(String(w.address) + " " + rect(x0 + geom.center[i] - tile / 2));
+            if (w && w.address) out.push(String(w.address) + " " + rect(x0 + restGeom.center[i] - tile / 2));
         }));
         return out.join(";");
     }
@@ -144,6 +186,8 @@ ShellWindow {
     Component.onCompleted: {
         slideTo(shown ? 1 : 0);
         if (screen) Panels.setDockZone(screen.name, keepClear);
+        syncSlots();
+        Qt.callLater(() => dock.slotsLive = true);   // slots added from now on grow in
     }
     // the whole height of the background plus its gap: hidden, nothing is left on screen
     readonly property real hideY: A11y.reduceMotion ? 0 : Math.ceil((1 - slide) * (m.height + m.bottomGap))
@@ -194,18 +238,20 @@ ShellWindow {
         fishAnim.duration = Theme.ms(DockLayout.fishDuration((fishTarget - fish) * (large - tile)));
         fishAnim.start();
     }
-    readonly property var geom: DockLayout.layout(cells, { tile: tile, large: large, fish: fish, focus: fish > 0 ? focusX : 0, dpr: dpr })
+    readonly property var geom: DockLayout.layout(slotCells, { tile: tile, large: large, fish: fish, focus: fish > 0 ? focusX : 0, dpr: dpr, grow: slotGrow })
+    // the items at rest, every slot full (where minimized windows go)
+    readonly property var restGeom: DockLayout.layout(cells, { tile: tile, large: large, fish: 0, focus: 0, dpr: dpr })
 
     // ---------- app name label ----------
     // It shows in the frame the pointer reaches an icon (no fade-in), moves to the next icon in one frame, and on
     // leaving fades out over 300 ms on the Dock's cosine ease in-out, or over the autohide slide when autohide is on
-    // (-[DockBar blendAwayLabel], reconciliation-42.json: cosine T 0.29 s). One label at a time: `tipCell`.
-    property int tipCell: -1
+    // (-[DockBar blendAwayLabel], reconciliation-42.json: cosine T 0.29 s). One label at a time: `tipItem`.
+    property Item tipItem: null
     property real tipAlpha: 0
     NumberAnimation { id: tipFade; target: dock; property: "tipAlpha"; to: 0; easing.type: Easing.InOutSine
                       duration: Theme.ms(dock.autohide ? Theme.anim.dockSlide : 300) }
-    function tipShow(i) { tipFade.stop(); tipCell = i; tipAlpha = 1; }
-    function tipHide(i) { if (tipCell === i) tipFade.restart(); }
+    function tipShow(c) { tipFade.stop(); tipItem = c; tipAlpha = 1; }
+    function tipHide(c) { if (tipItem === c) tipFade.restart(); }
 
     // hit area: the background, plus the magnified band while magnified; hidden by autohide the bottom 2 pt of
     // the whole edge (reveals it), hidden by a full-screen window nothing
@@ -261,11 +307,37 @@ ShellWindow {
 
         Repeater {
             id: cellRepeater
-            model: dock.items
+            model: slots
             delegate: Item {
                 id: cell
-                required property var modelData
+                required property string key
+                required property bool leaving
                 required property int index
+                // the item, kept after it left the Dock while the slot shrinks
+                readonly property var live: dock.byKey[key]
+                property var kept: ({})
+                onLiveChanged: if (live) kept = live
+                readonly property var modelData: live !== undefined ? live : kept
+
+                // slot width 0..1: grows in when added after the first fill, shrinks out when removed, then goes
+                property real grow: 1
+                NumberAnimation {
+                    id: slotAnim
+                    target: cell; property: "grow"; easing.type: Easing.InOutSine
+                    onFinished: if (cell.leaving) dock.dropSlot(cell.key)
+                }
+                function slide(to) {
+                    slotAnim.stop();
+                    if (A11y.reduceMotion) {
+                        grow = to;
+                        if (leaving) Qt.callLater(() => dock.dropSlot(key));
+                        return;
+                    }
+                    slotAnim.to = to;
+                    slotAnim.duration = Theme.ms(DockLayout.slotDuration(to > grow)) * Math.abs(to - grow);
+                    slotAnim.start();
+                }
+                onLeavingChanged: slide(leaving ? 0 : 1)
 
                 readonly property bool separator: modelData.separator === true
                 // unmagnified centre of this cell (background coordinates)
@@ -282,6 +354,7 @@ ShellWindow {
                 Component.onCompleted: {
                     if (launchDone) Apps.stopLaunching(modelData.id);
                     if (urgent) Apps.markAttention(modelData.id, true);
+                    if (dock.slotsLive) { grow = 0; slide(1); }
                 }
 
                 x: dock.geom.x[index] || 0
@@ -318,8 +391,11 @@ ShellWindow {
                     loadSize: dock.magnification ? dock.large : dock.tile    // load once at full size, then only scale
                     x: Math.round((cell.width - width) / 2 * dock.dpr) / dock.dpr
                     y: cell.iconTop - cell.bounceY
+                    // a removed tile shrinks out with its slot; an added one is full size at once (in the air)
+                    scale: cell.leaving ? cell.grow : 1
+                    transformOrigin: Item.Bottom
                     icon: cell.modelData.trash && dock.trashFull ? "user-trash-full" : cell.modelData.icon || ""
-                    appId: cell.modelData.id
+                    appId: cell.modelData.id || ""
                     layer.enabled: ma.containsPress
                     layer.effect: ShaderEffect {
                         property real k: 0.475
@@ -343,8 +419,8 @@ ShellWindow {
                 }
 
                 // app name label (timing: dock.tipShow / tipHide)
-                readonly property bool tipWanted: ma.containsMouse && !separator && !bouncing && Panels.open !== "context"
-                onTipWantedChanged: tipWanted ? dock.tipShow(index) : dock.tipHide(index)
+                readonly property bool tipWanted: ma.containsMouse && !separator && !leaving && !bouncing && Panels.open !== "context"
+                onTipWantedChanged: tipWanted ? dock.tipShow(cell) : dock.tipHide(cell)
 
                 // the whole item frame (they abut, Q-dock-05) and the band above a magnified icon, so the label
                 // moves to the next icon in one frame
@@ -354,7 +430,7 @@ ShellWindow {
                     width: cell.width
                     height: cell.height - y
                     hoverEnabled: true
-                    enabled: !cell.separator
+                    enabled: !cell.separator && !cell.leaving
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
                     onClicked: m => {
                         if (m.button === Qt.RightButton) {
@@ -378,7 +454,6 @@ ShellWindow {
     // under the capsule that the plugin's smooth union (reach 8) joins to it with a tapering neck. The tip is inside
     // that reach of the Dock too, so the label is on a surface of its own (same geometry and recipe as the Dock: the
     // union is per surface), mapped only while the label shows.
-    readonly property var tipItem: tipCell >= 0 && tipCell < cellRepeater.count ? cellRepeater.itemAt(tipCell) : null
     ShellWindow {
         id: labelHost
         screen: dock.screen
