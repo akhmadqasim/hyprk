@@ -121,17 +121,25 @@ Singleton {
 
     function unlockNow(): void {
         ready = 0;
+        mapped = 0;
         released = false;
         phase = "out";
         outGuard.restart();
     }
-    // reveal overlays report their first frame; once every screen has one under the lock, release it
+    // reveal overlays report their first frame, Hyprland reports each one mapped ("openlayer"); once every screen
+    // has one under the lock, release it. The client's frame alone was not enough: in 3 of 10 unlocks Hyprland's first
+    // unlocked frame showed the bare desktop, the overlay not mapped yet (mcap)
     property int ready: 0
+    property int mapped: 0
     property bool released: false
     function overlayReady(): void {
         if (phase !== "out") return;
         ready++;
-        if (ready >= Quickshell.screens.length) release();
+        checkReady();
+    }
+    function checkReady(): void {
+        const n = Quickshell.screens.length;
+        if (ready >= n && mapped >= n) release();
     }
     function release(): void {
         if (phase !== "out" || released) return;
@@ -234,6 +242,10 @@ Singleton {
         enabled: root.phase !== ""
         function onRawEvent(event: HyprlandEvent): void {
             if (event.name === "activelayout") root.readKeyboard();
+            else if (event.name === "openlayer" && event.data === "hyprk-lock" && root.phase === "out") {
+                root.mapped++;
+                root.checkReady();
+            }
         }
     }
 

@@ -11,8 +11,8 @@ import "../../lib/clock.js" as Clock
 // and the clock; on the primary screen also the status items, the avatar, the field with its "?" button and the
 // line under it. Used by the session lock surface (static, interactive) and by the lock-in / unlock overlays,
 // which animate the opacities below (LockOverlay.qml):
-//   wall  the wallpaper layer (it covers the desktop, the Dock and the windows)
-//   bar   a copy of the wallpaper's top strip over the menu bar (the menu bar has its own, faster curve)
+//   wall  the wallpaper below the menu bar (it covers the desktop, the Dock and the windows)
+//   bar   the wallpaper's top strip over the menu bar (the menu bar has its own track)
 //   dim   the dimming over all of it
 //   ui    clock, date, field and "?"
 //   user  avatar, the line under the field and the status items (they go in one frame on unlock)
@@ -39,25 +39,31 @@ Item {
         cache: true               // the same pixmap as the desktop's and every lock surface's
         asynchronous: false
     }
-    Rectangle {
-        anchors.fill: parent
-        visible: Wallpaper.wallpaper === "" && opacity > 0
-        opacity: c.wall
-        color: LockTheme.fallbackFill
-    }
-    Wall {
+    // the wallpaper (or a plain fill without one), whole-screen sized, shown through the two strips below
+    component Backdrop: Item {
         width: c.width
         height: c.height
-        visible: Wallpaper.wallpaper !== "" && opacity > 0
+        Rectangle { anchors.fill: parent; visible: Wallpaper.wallpaper === ""; color: LockTheme.fallbackFill }
+        Wall { width: c.width; height: c.height; visible: Wallpaper.wallpaper !== "" }
+    }
+    // below the menu bar (it covers the desktop, the Dock and the windows) and over the menu bar: two strips so
+    // each region on screen follows only its own track (one layer over the other would multiply them)
+    Item {
+        y: Theme.menuBar.height
+        width: c.width
+        height: c.height - y
+        clip: true
+        visible: opacity > 0
         opacity: c.wall
+        Backdrop { y: -parent.y }
     }
     Item {
         width: c.width
         height: Theme.menuBar.height
         clip: true
-        visible: Wallpaper.wallpaper !== "" && c.bar > 0 && c.wall < 1
+        visible: opacity > 0
         opacity: c.bar
-        Wall { width: c.width; height: c.height }
+        Backdrop {}
     }
     Rectangle {
         anchors.fill: parent

@@ -23,22 +23,14 @@ Item {
     readonly property int fit: L.dotsFit(arrowLeft, LockTheme.caretWidth)
     readonly property real dim: Lock.busy ? LockTheme.busyDim : 1
 
-    // ---------- wrong password: shake (keyframes of lock.js shake(), exact sine quarter arcs) ----------
-    property real shakeX: 0
-    readonly property var keys: L.shakeKeys()
-    transform: Translate { x: f.shakeX }
-    component Quarter: NumberAnimation {
-        required property int k
-        target: f; property: "shakeX"
-        to: f.keys[k].to; duration: f.keys[k].ms
-        easing.type: f.keys[k].out ? Easing.OutSine : Easing.InSine
-    }
-    SequentialAnimation {
+    // ---------- wrong password: shake, lock.js shake() on one linear clock (B2) ----------
+    // (12 chained quarter-wave animations ran 367 ms instead of 400 on screen: mcap, 22 frames, rms 2.4 pt)
+    property real shakeT: LockTheme.shakeMs
+    transform: Translate { x: L.shake(f.shakeT / 1000) }
+    NumberAnimation {
         id: shake
-        Quarter { k: 0 } Quarter { k: 1 } Quarter { k: 2 } Quarter { k: 3 }
-        Quarter { k: 4 } Quarter { k: 5 } Quarter { k: 6 } Quarter { k: 7 }
-        Quarter { k: 8 } Quarter { k: 9 } Quarter { k: 10 } Quarter { k: 11 }
-        ScriptAction { script: f.shakeX = 0 }
+        target: f; property: "shakeT"
+        from: 0; to: LockTheme.shakeMs; duration: LockTheme.shakeMs
     }
     Connections {
         target: Lock

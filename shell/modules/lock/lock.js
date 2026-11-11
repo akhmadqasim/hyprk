@@ -114,17 +114,14 @@ function shake(t) {
     if (!(t > 0) || t >= SHAKE_DUR) return 0;
     return -shakeAmp(t) * Math.sin(2 * Math.PI * SHAKE_HZ * t);
 }
-// The same curve as keyframes for a declarative animation: one {to, ms, out} per quarter cycle, `out` true
-// when it runs from 0 to a peak (OutSine) and false from a peak back to 0 (InSine), both exact sine arcs.
-function shakeKeys() {
-    const q = 1 / (4 * SHAKE_HZ), keys = [];
-    let used = 0;
-    for (let k = 0; k < 12; k++) {
-        const mid = (Math.floor(k / 2) + 0.5) * 2 * q;          // peak time of this half cycle
-        const to = k % 2 === 0 ? shake(mid) : 0;
-        const end = Math.round((k + 1) * q * 1000);
-        keys.push({ to: to, ms: end - used, out: k % 2 === 0 });
-        used = end;
+// A measured per-frame track: `pts` is [[ms, value], ...] in rising ms (the Mac's frames, LOCKSCREEN-27.2.1.md
+// B1 / B3); the value at `ms` is linear between the two samples around it and held before the first / after the last.
+function track(pts, ms) {
+    if (!pts || pts.length === 0) return 0;
+    if (ms <= pts[0][0]) return pts[0][1];
+    for (let i = 1; i < pts.length; i++) {
+        const a = pts[i - 1], b = pts[i];
+        if (ms <= b[0]) return a[1] + (b[1] - a[1]) * (ms - a[0]) / (b[0] - a[0]);
     }
-    return keys;
+    return pts[pts.length - 1][1];
 }

@@ -133,28 +133,41 @@ Singleton {
     readonly property real playerArt: 48
 
     // ---------- motion (B1, B2, B3) ----------
-    // lock-in (t = 0 at the first changed frame): the menu bar goes ease-in-out 100 ms, the Dock (and so the
-    // whole wallpaper layer here) CSS ease 190 ms, the dim ~230 ms; the lock UI fades in ease-out quad 250 ms
-    // from +7 ms. Opacity only.
-    readonly property int inBar: Theme.ms(100)
-    readonly property int inWall: Theme.ms(190)
-    readonly property var cssEase: [0.25, 0.1, 0.25, 1.0, 1, 1]
-    readonly property int inDim: Theme.ms(230)
-    readonly property int inUiDelay: Theme.ms(7)
-    readonly property int inUi: Theme.ms(250)
-    readonly property int lockIn: inUiDelay + inUi      // the session lock engages after this
-    // unlock: avatar, line and status items go in one frame; clock, date, field and "?" fade ease-in quad
-    // 310 ms that started 87 ms before the first visible change, i.e. the last 223 ms of it (a quadratic, so
-    // exactly the bezier below); the Dock (wallpaper layer) back ease-in quad 135 ms from +89, the menu bar
-    // ease-in-out quad 165 ms from +111, the dim ~330 ms mostly in the first 200.
-    readonly property real outUiFrom: 0.921             // 1 - (87 / 310)^2
-    readonly property int outUi: Theme.ms(223)
-    readonly property var outUiCurve: [0.333, 0.146, 0.667, 0.479, 1, 1]
-    readonly property int outWallDelay: Theme.ms(89)
-    readonly property int outWall: Theme.ms(135)
-    readonly property int outBarDelay: Theme.ms(111)
-    readonly property int outBar: Theme.ms(165)
-    readonly property int outDim: Theme.ms(330)
-    readonly property int unlockOut: Math.max(outBarDelay + outBar, outDim)   // the overlay goes after this
-    // wrong password: keyframes from lock.js shakeKeys() (400 ms, 7.5 Hz, 14 / 8.25 / 6.75 pt)
+    // The Mac's per-frame tracks, [ms, progress] with ms from the first changed frame (light.mp4 lock-in, dark.mp4
+    // unlock; LOCKSCREEN-27.2.1.md B1 / B3 tables, verbatim). The overlays run one linear clock from -17 ms (the
+    // last unchanged frame) and read every layer from these (lock.js track()): the named fits (ease-in-out 100 ms,
+    // ease-out quad 250 ms from +7...) put the clock a frame early mid-curve and miss its 2-frame lead-in.
+    // Opacity only, nothing moves.
+    readonly property real trackStart: -17
+    // lock-in, progress towards the lock: menu bar, Dock (the wallpaper layer below the bar), wallpaper dim,
+    // clock (clock, date, field, "?"), avatar (avatar, line, status items)
+    readonly property var inBar: [[-17, 0], [0, 0.10], [17, 0.26], [33, 0.57], [50, 0.84], [67, 0.96], [83, 0.97],
+        [100, 0.97], [117, 0.98], [133, 1]]
+    readonly property var inWall: [[-17, 0], [0, 0.10], [17, 0.21], [33, 0.36], [50, 0.59], [67, 0.74], [83, 0.81],
+        [100, 0.89], [117, 0.96], [133, 0.96], [150, 0.97], [167, 1]]
+    readonly property var inDim: [[-17, 0], [0, 0.11], [17, 0.17], [33, 0.23], [50, 0.29], [67, 0.38], [83, 0.43],
+        [100, 0.49], [117, 0.58], [133, 0.63], [150, 0.70], [167, 0.75], [183, 0.85], [200, 0.89], [217, 0.94], [233, 1]]
+    readonly property var inUi: [[17, 0], [33, 0.28], [50, 0.35], [67, 0.43], [83, 0.51], [100, 0.59], [117, 0.66],
+        [133, 0.73], [150, 0.80], [167, 0.87], [183, 0.92], [200, 0.96], [217, 0.99], [233, 1]]
+    readonly property var inUser: [[17, 0], [33, 0.24], [50, 0.30], [67, 0.36], [83, 0.42], [100, 0.49], [117, 0.55],
+        [133, 0.62], [150, 0.69], [167, 0.76], [183, 0.82], [200, 0.89], [217, 0.97], [233, 1]]
+    readonly property int inEnd: 233
+    readonly property real warmOpacity: 0.002           // < 0.5 / 255 of any change; above Qt's 0.001 cull
+    readonly property int lockIn: Theme.ms(inEnd - trackStart)   // the session lock engages after this
+    // unlock, progress back to the desktop (the overlay shows 1 - it). Its clock starts at +0: the first frame after
+    // the start shows the start value, and at +0 the avatar, line and status items are already gone (one frame). The menu bar's lone 0.07 at +0 (0 again from +33) is left out. The dim's last sample is 0.97 at +333,
+    // when the overlay goes.
+    readonly property var outUi: [[-17, 0], [0, 0.06], [33, 0.16], [50, 0.20], [67, 0.25], [83, 0.30], [100, 0.36],
+        [117, 0.43], [133, 0.52], [150, 0.60], [167, 0.69], [200, 0.85], [217, 0.94], [233, 1]]
+    readonly property var outBar: [[117, 0], [133, 0.03], [150, 0.12], [167, 0.23], [200, 0.59], [217, 0.74],
+        [233, 0.90], [267, 1]]
+    readonly property var outWall: [[67, 0], [83, 0.02], [100, 0.02], [117, 0.04], [133, 0.09], [150, 0.21],
+        [167, 0.35], [200, 0.72], [217, 0.88], [233, 1]]
+    readonly property var outDim: [[-17, 0], [0, 0.04], [33, 0.19], [50, 0.22], [67, 0.26], [83, 0.30], [100, 0.33],
+        [117, 0.41], [133, 0.47], [150, 0.58], [167, 0.65], [200, 0.84], [217, 0.90], [233, 0.92], [267, 0.94],
+        [333, 0.97]]
+    readonly property int outEnd: 333
+    readonly property int unlockOut: Theme.ms(outEnd)   // the overlay goes after this
+    // wrong password: lock.js shake() on a linear 400 ms clock (7.5 Hz, 14 / 8.25 / 6.75 pt)
+    readonly property int shakeMs: 400
 }

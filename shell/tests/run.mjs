@@ -714,12 +714,10 @@ test("mode buttons start inside the field, end in place", () => {
         mac.forEach((v, i) => { const e = LK.shake(i / 60) - v; se += e * e; });
         assert.ok(Math.sqrt(se / mac.length) < 1, "rms " + Math.sqrt(se / mac.length));
     });
-    test("shake keyframes: 12 quarter waves, 400 ms, peaks of the curve", () => {
-        const k = LK.shakeKeys();
-        assert.equal(k.length, 12);
-        assert.equal(k.reduce((a, x) => a + x.ms, 0), 400);
-        assert.deepEqual(k.filter(x => x.out).map(x => x.to), [-14, 14, -14, 8.25, -8.25, 6.75].map(v => v));
-        assert.ok(k.filter(x => !x.out).every(x => x.to === 0));
+    test("lock track: linear between the Mac's frames, held outside", () => {
+        const pts = [[17, 0], [33, 0.28], [50, 0.35]];
+        near(LK.track(pts, 0), 0); near(LK.track(pts, 25), 0.14); near(LK.track(pts, 33), 0.28);
+        near(LK.track(pts, 41.5), 0.315); near(LK.track(pts, 99), 0.35); near(LK.track([], 5), 0);
     });
 }
 
