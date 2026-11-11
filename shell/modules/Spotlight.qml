@@ -205,6 +205,18 @@ ShellWindow {
             if (c === "clear" && mode !== "") { setMode(""); event.accepted = true; return; }
             if (c === "reveal" && revealSel()) { event.accepted = true; return; }
             if (c === "settings") { SpotlightActions.openPane("spotlight"); Panels.close(); event.accepted = true; return; }
+            // Cmd-C with no text selected in the field: the selected result (a file's path) to the clipboard
+            if (c === "copy" && input.selectedText === "") {
+                const t = SL.copyText(selectedRow());
+                if (t !== "") { Quickshell.clipboardText = t; event.accepted = true; return; }
+            }
+            // Cmd-B web search, Cmd-K Wikipedia: the query in the default browser
+            if ((c === "web" || c === "wikipedia") && input.text.trim() !== "") {
+                openUrl(c === "web" ? SL.webSearchUrl(input.text) : SL.wikipediaUrl(input.text));
+                Panels.close(); event.accepted = true; return;
+            }
+            // Cmd-Y Quick Look: our Finder opens on the file's folder with it selected and Quick Look up (--quicklook)
+            if (c === "quicklook" && quickLookSel()) { event.accepted = true; return; }
         }
         const m = SL.modeForKey(event.key, event.modifiers & Qt.MetaModifier, event.modifiers & Qt.ControlModifier, event.modifiers & Qt.AltModifier);
         if (m !== "") { setMode(m === mode ? "" : m); event.accepted = true; return; }
@@ -216,6 +228,25 @@ ShellWindow {
         if (mode === "apps") modePanel.item.move(0, dir);
         else if (mode !== "") modePanel.item.move(dir);
         else step(dir);
+    }
+    // the selected result in any mode, as a row ({ kind, title, file, ... })
+    function selectedRow() {
+        if (mode === "") return rows[selected] || null;
+        const it = modePanel.item;
+        const x = it && it.items ? it.items[it.selected] : null;
+        if (!x) return null;
+        return mode === "files" ? { kind: "file", title: x.name, file: x } : x;
+    }
+    // a URL in the default browser; HYPRK_URL_OPENER replaces xdg-open (tests stub it: never the host's browser)
+    function openUrl(url) { Quickshell.execDetached([Quickshell.env("HYPRK_URL_OPENER") || "xdg-open", url]); }
+    function quickLookSel(): bool {
+        const r = selectedRow();
+        const f = r && r.kind === "file" ? r.file : null;
+        if (!f || !f.path || f.isDir) return false;
+        const cut = f.path.lastIndexOf("/");
+        Apps.runHyprkApp("hyprk-finder", {}, [f.path.slice(0, cut) || "/", "--select", f.path.slice(cut + 1), "--quicklook"]);
+        Panels.close();
+        return true;
     }
     // the selected file's folder in the Finder (all results or Files); false when the selection is no file
     function revealSel(): bool {

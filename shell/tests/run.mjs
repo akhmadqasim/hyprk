@@ -459,6 +459,12 @@ test("mode key super+2", () => assert.equal(SL.modeForKey(0x32, true, false, fal
 test("mode key ctrl+4", () => assert.equal(SL.modeForKey(0x34, false, true, false), "clipboard"));
 test("Command shortcuts of the bar", () => {
     assert.deepEqual([0x30, 0x01000004, 0x52, 0x59, 0x2c, 0x41].map(SL.commandForKey), ["clear", "reveal", "reveal", "quicklook", "settings", ""]);
+    assert.deepEqual([0x43, 0x42, 0x4b, 0x49].map(SL.commandForKey), ["copy", "web", "wikipedia", "info"]);
+    assert.equal(SL.webSearchUrl(" a b&c "), "https://www.google.com/search?q=a%20b%26c");
+    assert.equal(SL.wikipediaUrl("x y"), "https://en.wikipedia.org/wiki/Special:Search?search=x%20y");
+    assert.equal(SL.copyText({ kind: "file", title: "n", file: { path: "/a/n" } }), "/a/n");
+    assert.equal(SL.copyText({ kind: "calc", title: "42" }), "42");
+    assert.equal(SL.copyText(null), "");
 });
 test("query kept 8 min after close", () => {
     assert.ok(SL.keepsQuery(1000, 1000 + 7.9 * 60e3));

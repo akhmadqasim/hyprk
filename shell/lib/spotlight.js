@@ -52,8 +52,21 @@ function commandForKey(key) {
     case 0x4b: return "wikipedia";
     case 0x2c: return "settings";
     case 0x48: return "help";
+    case 0x43: return "copy";       // Cmd-C: not in the decoded table (SearchUI's own handler, not traced)
     }
     return "";
+}
+
+// Cmd-B / Cmd-K (performWebSearch, openWikipediaResult): the query in the default browser. The engine is the
+// Mac's default (Google; Safari's search engine setting is not decoded), Wikipedia's search page for Cmd-K
+function webSearchUrl(q) { return "https://www.google.com/search?q=" + encodeURIComponent(String(q || "").trim()); }
+function wikipediaUrl(q) { return "https://en.wikipedia.org/wiki/Special:Search?search=" + encodeURIComponent(String(q || "").trim()); }
+// Cmd-C on a result: a file's path, a calculation's answer, else the row's title
+function copyText(row) {
+    if (!row) return "";
+    if (row.kind === "file" && row.file && row.file.path) return row.file.path;
+    if (row.path) return row.path;
+    return String(row.title || row.text || row.name || "");
 }
 
 // ---------- files ----------
