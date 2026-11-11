@@ -24,7 +24,7 @@ target_include_directories(lgcore PUBLIC src)
 target_link_libraries(lgcore PUBLIC PkgConfig::HYPRUTILS)
 
 if(HYPRLAND_FOUND)
-  add_library(liquidglass SHARED src/main.cpp src/PopupGlass.cpp src/Log.cpp src/Stats.cpp src/Readback.cpp src/Config.cpp src/GlassElement.cpp src/WindowGlass.cpp src/Titlebar.cpp)
+  add_library(liquidglass SHARED src/main.cpp src/PopupGlass.cpp src/Log.cpp src/Stats.cpp src/Readback.cpp src/Config.cpp src/GlassElement.cpp src/WindowGlass.cpp src/WindowShadow.cpp src/Titlebar.cpp)
   target_include_directories(liquidglass PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/gen)
   target_link_libraries(liquidglass PRIVATE lgcore PkgConfig::HYPRLAND)
   target_compile_options(liquidglass PRIVATE -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers)

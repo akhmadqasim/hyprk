@@ -198,6 +198,7 @@ the 0.5 base, Apple: a 4x4 / 8x8 box; the half-size base Apple uses when R > 2 i
 | `full_damage` | 0 | 1 = redraw the whole output while glass is visible (debug; see below) |
 | `shader_path` | "" | load this fragment shader instead of the built-in one |
 | `window_classes` | "" | regex: windows whose class matches get glass behind them |
+| `window_shadow` | 0 | 1 = AppKit's window shadow on every window (`src/WindowShadow.cpp`; turn Hyprland's `decoration.shadow` off). Black, alpha = density x Gx x Gy, two Gaussian edges (sigma = blur radius) of the frame (title bar and border included) moved down by y; blur 20 / 8 pt, y 18 / 7, density .40 / .22 light, .70 / .45 dark (active = focused window; light / dark = `appearance`). Nothing inside the rounded frame; `no_shadow`, `decorate = false` and full screen get none. One analytic quad per damaged window, about the cost of Hyprland's own shadow (reference/ours/windows/SHADOW.md) |
 | `window_radius` | -1 | window glass radius; < 0 = the window's rounding |
 
 Keys of earlier iterations (`blur_lod`, `blur_lod_scale`, `saturation`, `tint_light`, `tint_dark`, `brightness_*`, `refraction`, `shadow_opacity`, `light_angle`, `rim`, `lift`, `inner_shadow`, `pointer_light`, `pointer_light_radius`, `pointer_light_namespaces`, ...)

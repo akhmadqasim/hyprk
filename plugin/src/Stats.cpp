@@ -23,8 +23,8 @@ namespace lg::stats {
             bool   closed = false;
         };
         std::vector<SInterval>                 g_pending;
-        std::array<size_t, 2>                  g_open{}; // 1-based index into g_pending, 0 = none
-        std::array<std::deque<double>, 2>      g_ms; // last results per kind
+        std::array<size_t, 3>                  g_open{}; // 1-based index into g_pending, 0 = none
+        std::array<std::deque<double>, 3>      g_ms; // last results per kind
         std::vector<GLuint>                    g_free;
 
         constexpr size_t WINDOW = 600;
@@ -80,7 +80,7 @@ namespace lg::stats {
     }
 
     void poll() {
-        if (!g_on || g_open[FRAME] || g_open[GLASS])
+        if (!g_on || g_open[FRAME] || g_open[GLASS] || g_open[SHADOW])
             return; // indices into g_pending must stay valid while an interval is open
         // a disjoint event (clock change) makes every pending result meaningless
         GLint disjoint = 0;
@@ -122,7 +122,7 @@ namespace lg::stats {
             std::ranges::sort(s);
             return std::format("{}: n {} avg {:.3f} ms p95 {:.3f} ms max {:.3f} ms\n", name, d.size(), sum / d.size(), s[size_t(s.size() * 0.95)], mx);
         };
-        return line("frame (GPU, whole output)", g_ms[FRAME]) + line("glass (GPU, per element)", g_ms[GLASS]);
+        return line("frame (GPU, whole output)", g_ms[FRAME]) + line("glass (GPU, per element)", g_ms[GLASS]) + line("window shadow (GPU, per element)", g_ms[SHADOW]);
     }
 
     void reset() {

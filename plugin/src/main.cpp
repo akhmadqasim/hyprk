@@ -8,6 +8,7 @@
 #include "Stats.hpp"
 #include "Titlebar.hpp"
 #include "WindowGlass.hpp"
+#include "WindowShadow.hpp"
 
 #include <hyprland/src/debug/log/Logger.hpp>
 #include <hyprland/src/desktop/rule/layerRule/LayerRuleApplicator.hpp>
@@ -30,6 +31,7 @@ namespace {
     std::vector<CHyprSignalListener> g_listeners;
     std::shared_ptr<const lg::SParams> g_params; // snapshot, refreshed each monitor frame
     std::vector<WP<lg::CGlassDecoration>> g_decorations;
+    std::vector<WP<lg::CMacShadowDecoration>> g_shadows;
     std::vector<WP<lg::CTitlebar>>        g_titlebars;
     std::vector<WP<lg::CTitlebarProbe>>   g_probes;
     SP<IPC::Socket1::SCommand>            g_statsCommand;
@@ -128,6 +130,9 @@ static void addWindowDecorations(PHLWINDOW window) {
     auto glass = makeShared<lg::CGlassDecoration>(window, [] { return g_params; });
     g_decorations.emplace_back(glass);
     HyprlandAPI::addWindowDecoration(lg::handle(), window, std::move(glass));
+    auto shadow = makeShared<lg::CMacShadowDecoration>(window, [] { return g_params; });
+    g_shadows.emplace_back(shadow);
+    HyprlandAPI::addWindowDecoration(lg::handle(), window, std::move(shadow));
     // the title bar reserves no space until it decides the window wants one
     auto bar = makeShared<lg::CTitlebar>(window, [] { return g_params; });
     g_titlebars.emplace_back(bar);
@@ -141,6 +146,7 @@ static void forEachTitlebar(const std::function<void(lg::CTitlebar&)>& fn) {
     std::erase_if(g_titlebars, [](const auto& t) { return t.expired(); });
     std::erase_if(g_probes, [](const auto& t) { return t.expired(); });
     std::erase_if(g_decorations, [](const auto& t) { return t.expired(); });
+    std::erase_if(g_shadows, [](const auto& t) { return t.expired(); });
     for (const auto& t : g_titlebars)
         if (const auto bar = t.lock())
             fn(*bar);
@@ -256,6 +262,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
 APICALL EXPORT void PLUGIN_EXIT() {
     g_listeners.clear();
     removeAll(g_decorations);
+    removeAll(g_shadows);
     removeAll(g_titlebars);
     removeAll(g_probes);
     if (g_renderHook)
@@ -263,9 +270,10 @@ APICALL EXPORT void PLUGIN_EXIT() {
     g_renderHook = nullptr;
     lg::exitPopupGlass(lg::handle());
     if (g_pHyprRenderer)
-        g_pHyprRenderer->context().m_pass.removeAllOfType("CLiquidGlassElement");
+        g_pHyprRenderer->context().m_pass.removeAllOfType("CLiquidGlassElement"), g_pHyprRenderer->context().m_pass.removeAllOfType("CMacShadowElement");
     lg::glassProgram().destroy();
     lg::releaseGlState();
+    lg::releaseShadowGl();
     lg::stats::release();
     if (g_statsCommand)
         HyprlandAPI::unregisterHyprCtlCommand(lg::handle(), g_statsCommand);

@@ -6,7 +6,7 @@
 #include <string>
 
 namespace lg::stats {
-    enum eKind { FRAME = 0, GLASS = 1 };
+    enum eKind { FRAME = 0, GLASS = 1, SHADOW = 2 };
 
     bool        enabled();
     void        setEnabled(bool on);

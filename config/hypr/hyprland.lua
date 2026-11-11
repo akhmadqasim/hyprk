@@ -76,6 +76,7 @@ hl.config({
         -- a vertical one (top -> bottom stops, hyprk_appearance() below) gives the band above, the sides and the band
         -- below their own alpha. Fit of range, power, offset and the three alphas per state to the 48 profile points
         -- (window 700 x 533): range 70, power 3, y 4. See reference/ours/windows/SHADOW.md for the on-screen numbers.
+        -- With the liquidglass plugin loaded (below) the plugin draws AppKit's shadow instead and this one is off.
         shadow = {
             enabled = true,
             range = 70,
@@ -265,7 +266,12 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
             radii = "hyprk-dock-dots:2.05,hyprk-dock-dots-dark:2.05",
         } } })
     end)
-    if ok then hl.env("HYPRK_GLASS", "plugin") else print("hyprk: liquidglass not loaded: " .. tostring(err)) end
+    if ok then
+        hl.env("HYPRK_GLASS", "plugin")
+        -- AppKit's window shadow from the plugin (plugin/src/WindowShadow.cpp: the Gaussian of the frame, blur 20 / 8 pt,
+        -- y 18 / 7, density .40 / .22 light, .70 / .45 dark), Hyprland's off; without the plugin the gradient above stays
+        hl.config({ plugin = { liquidglass = { window_shadow = 1 } }, decoration = { shadow = { enabled = false } } })
+    else print("hyprk: liquidglass not loaded: " .. tostring(err)) end
 end
 -- Window motion Hyprland cannot express (plugin-motion/): the Dock genie on minimize/restore.
 -- Minimize stays "move to special:minimized"; the plugin plays the genie first.

@@ -57,3 +57,33 @@ light active .074 / .19 / .327, inactive .027 / .067 / .122; dark active .132 / 
 - **Rims** were not re-measured here (Q-windows-03; the border is per state already). In the light active crop the
   plugin's title bar covers the top edge, which shows no outer rim there (hand-off to `plugin/`, not compared with
   the Mac top edge).
+
+## Plugin shadow (judge #3 gap 7, 2026-11-11, second pass)
+
+Hyprland's falloff cannot give AppKit's shadow (one range for every side and state, the gradient's bands blend on short
+windows), so the liquidglass plugin now draws it (`window_shadow = 1`, `plugin/src/WindowShadow.cpp`) and the config turns
+Hyprland's off when the plugin loads. It is the 2D model above, analytic per pixel: black, alpha = density x Gx x Gy, Gx and Gy
+the Gaussian edges (sigma = blur radius, erf) of the frame (title bar and border included) moved down by y, with AppKit's
+numbers (blur 20 / 8 pt, y 18 / 7, density .40 / .22 light, .70 / .45 dark), nothing inside the rounded frame. Derived, no fit.
+
+Same method as above (blank foot 700 x 500 pt + title bar at 150,160, white, a small second window takes the focus; distances
+from outside the 1 pt rim; title bar taken as 32 pt):
+
+| state | Mac side / below / above at 2 / 8 / 16 / 32 pt | before (Hyprland gradient) | after (plugin) | rms before -> after (12 points) |
+|---|---|---|---|---|
+| light active | .18 .14 .09 .02 / .32 .28 .22 .09 / .06 .04 .02 0 | .17 .13 .09 .03 / .33 .27 .19 .07 / .06 .04 .03 .01 | .18 .14 .08 .02 / .32 .28 .22 .10 / .06 .04 .02 0 | .013 -> **.004** |
+| light inactive | .09 .04 0 0 / .16 .10 .03 0 / .03 .01 0 0 | .06 .05 .03 .01 / .12 .10 .07 .03 / .02 .02 .01 0 | .09 .03 0 0 / .16 .10 .03 0 / .03 .01 0 0 | .022 -> **.003** |
+| dark active | .33 .25 .15 .04 / .56 .49 .38 .17 / .11 .07 .03 0 | .31 .23 .15 .05 / .57 .48 .33 .12 / .10 .08 .05 .02 | .32 .24 .15 .04 / .55 .48 .38 .17 / .11 .07 .03 0 | .025 -> **.005** |
+| dark inactive | .19 .08 .01 0 / .33 .21 .06 0 / .06 .02 0 0 | .13 .10 .07 .02 / .25 .21 .14 .06 / .04 .03 .02 .01 | .18 .07 .01 0 / .33 .20 .06 0 / .06 .01 0 0 | .045 -> **.005** |
+
+All 48 points: rms .029 -> **.004**. Short windows and corners (light, 20 points: the three profiles plus the side 20 pt above
+the bottom and 20 pt below the top, against the AppKit model for that window): 250 pt tall active .029 -> .001, inactive .024
+-> .001; 350 pt .019 -> .001, .024 -> .001; 500 pt .030 -> .001, .025 -> .001 (before: side 20 pt above the bottom corner .27
+vs .18 at 500 pt, the band below .25 vs .32 at 250 pt).
+
+Cost (`stats = 1`, RX 6600 class GPU, MBA 2x, the 700 x 533 pt window moved every frame for 2 s, two windows): plugin shadow
+0.16-0.17 ms per draw (p95 0.18); Hyprland's shadow, timed the same way in a scratch build that wrapped its
+`drawShadowInternal`, 0.09 ms average over both windows, p95 0.18 ms (the large one). Same order; nothing is drawn at rest
+(only damaged parts are redrawn, no texture or cache). The closing fade takes the shadow with the window as before (both are
+window decorations). Not checked on screen: the shadow during the close fade, zoom and full screen exit frames.
+
