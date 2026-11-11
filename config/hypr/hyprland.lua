@@ -402,7 +402,9 @@ hl.bind(cmd .. " + Up",      hl.dsp.global("hyprk:missioncontrol"))   -- macOS: 
 hl.bind(cmd .. " + F3",      hl.dsp.global("hyprk:missioncontrol"))   -- plain F3/Ctrl+Up stay with apps
 hl.bind(cmd .. " + Q",       hl.dsp.window.close())
 hl.bind(cmd .. " + W",       hl.dsp.window.close())
-hl.bind(cmd .. " + M",       hl.dsp.window.float({ action = "toggle" }))
+-- Cmd-M minimises into the Dock like the yellow light (MAC-ANSWERS "Minimise (Cmd-M ...)": genie into the app's icon);
+-- plugin-motion turns the move to special:minimized into the genie
+hl.bind(cmd .. " + M",       hl.dsp.window.move({ workspace = "special:minimized", follow = false }))
 hl.bind(cmd .. " + CTRL + F", hl.dsp.window.fullscreen())
 hl.bind(cmd .. " + Return",  hl.dsp.exec_cmd(terminal))
 hl.bind(cmd .. " + SHIFT + Escape", hl.dsp.exit())
