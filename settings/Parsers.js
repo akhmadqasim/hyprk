@@ -131,7 +131,7 @@ function hasBattery(text) {
 // iconStyle: macOS 26+ "Icon & widget style" (default | dark | clear | tinted). iconStyleVariant: the style's own
 // Light / Dark / Auto choice (Clear and Tinted; Dark offers Always = "dark" / Auto), Settings only
 // (MAC-ANSWERS.md Q-settings-27, #35: the tiles follow it, not the window mode, unless Auto).
-const appearanceDefaults = { mode: "light", dark: false, reduceTransparency: false, increaseContrast: false, reduceMotion: false, accent: "multicolor", sidebarIconSize: "medium", glass: 0.5, iconStyle: "default", iconStyleVariant: "auto", iconTint: "" };
+const appearanceDefaults = { mode: "light", dark: false, reduceTransparency: false, increaseContrast: false, reduceMotion: false, accent: "multicolor", sidebarIconSize: "medium", glass: 0.5, iconStyle: "default", iconStyleVariant: "auto", iconTint: "", tintWindowBackground: true };
 const iconStyleVariants = ["light", "dark", "auto"];
 const appearanceModes = ["light", "dark", "auto"];
 const iconStyles = ["default", "dark", "clear", "tinted"];
@@ -158,6 +158,7 @@ function normalizeAppearance(obj) {
     o.reduceTransparency = !!o.reduceTransparency;
     o.increaseContrast = !!o.increaseContrast;   // Accessibility > Display
     o.reduceMotion = !!o.reduceMotion;           // Accessibility > Motion
+    o.tintWindowBackground = o.tintWindowBackground !== false;   // Windows > Tint window background (Mac default on)
     if (iconStyles.indexOf(o.iconStyle) === -1) o.iconStyle = appearanceDefaults.iconStyle;
     if (iconStyleVariants.indexOf(o.iconStyleVariant) === -1) o.iconStyleVariant = appearanceDefaults.iconStyleVariant;
     if (iconTints.indexOf(o.iconTint) === -1) o.iconTint = "";

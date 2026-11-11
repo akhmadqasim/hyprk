@@ -373,7 +373,7 @@ Column {
             implicitHeight: 37.5
             StatePopup { stateKey: "appearance"; field: "sidebarIconSize"; choices: [["Small", "small"], ["Medium", "medium"], ["Large", "large"]] }
         }
-        FormRow { label: "Tint window background with wallpaper color"; implicitHeight: 37.5; LocalSwitch { checked: true } }   // 1 + 36.5, mini switch
+        FormRow { label: "Tint window background with wallpaper color"; implicitHeight: 37.5; Switch { checked: AppState.appearance.tintWindowBackground; onToggled: on => AppState.set("appearance", { tintWindowBackground: on }) } }   // 1 + 36.5, mini switch; read by Finder and Settings sidebars
     }
 
     // radio groups under their label, one per row (held locally until a backend exists). Label centre 18 below the

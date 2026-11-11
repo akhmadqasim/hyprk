@@ -187,3 +187,9 @@ test("wpctl sources (Sound > Input table)", () => {
     const src = P.parseWpctlSources(t);
     assert.deepEqual(src.map(s => [s.id, s.name, s.isDefault, s.muted]), [[53, "Internal Microphone", true, false], [60, "USB Mic", false, true]]);
 });
+
+test("appearance.json tintWindowBackground defaults on and keeps false", () => {
+    assert.equal(P.normalizeAppearance({}).tintWindowBackground, true);
+    assert.equal(P.normalizeAppearance({ tintWindowBackground: false }).tintWindowBackground, false);
+    assert.equal(P.normalizeAppearance({ tintWindowBackground: "x" }).tintWindowBackground, true);
+});
