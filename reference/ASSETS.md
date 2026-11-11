@@ -90,6 +90,14 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
   light/regular/black weight masters, plus a transform and per-layer names like `p0.34`/`p0.68` for the hierarchical colour layers) and many
   small pre-rasterised GA8 bitmaps (11-112 px, 1x/2x, in `ZZZZPackedAsset` atlases compressed as deepmap2/`dmp2`, not decoded here).
   BVG is not decoded. `car.py bvg <car> <outdir> <names>` dumps the raw blobs; `sf-symbols/bvg-samples/` has 16 symbols x 3 masters for a decoder.
+  Read so far (2026-11-11, not enough to draw): after `BVG ` 01 a flags byte (low nibble = width of the next fields, 1 or 2
+  bytes), the blob size, the end offset, a section count (5) and count + 1 offsets. Sections: 0 a short bit-packed header,
+  1 the transform as text (`matrix(0.00634765 0 0 0.00634765 tx ty)`, 0.00634765 = 13/2048), 2 the symbol name, 3 the outline:
+  u16 0, the segment count (Z counted, M not: checkmark 13, minus 7), u16 the point count (29, 15), then a bit-packed stream
+  of about 11 bits per coordinate (the two halves of minus.w1 repeat at a nibble offset), 4 a second stream of unknown use;
+  then a tail that is identical across the three weights (scene/bytecode). Names in this car: the shell's `doc.on.doc.fill` is
+  `document.on.document.fill` (name_aliases), Quick Look's `markup` is `pencil.tip.crop.circle`; `printer`, `rotate.left` as is.
+  No public decoder exists (searched 2026-11-11: sfsym and the MCP servers render through AppKit's CUINamedVectorGlyph on a Mac).
   Copied tables (binary plists, from CoreGlyphs and `private/` from CoreGlyphsPrivate): `symbol_order.plist` (names in SF Symbols app order),
   `name_availability.plist` (name -> release year), `symbol_search.plist` (name -> search terms), `symbol_categories.plist` and
   `categories.plist`, `name_aliases.strings` (old name -> current name), `nofill_to_fill.strings`, `legacy_flippable.plist`,
