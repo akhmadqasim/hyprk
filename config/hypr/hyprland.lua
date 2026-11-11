@@ -99,6 +99,14 @@ hl.config({
         disable_watchdog_warning = true, -- smoke/nested runs start Hyprland directly
     },
     ecosystem = { no_update_news = true, no_donation_nag = true },
+    -- Shrinking frames (unzoom, full screen exit, a resize): when the box is larger than the size the client acked,
+    -- Hyprland's default draws the buffer 1:1 and smears its last row and column over the rest. Qt clients with a
+    -- fractional-scale viewport (Finder, Settings) take that path (foot does not), so for the first 120-180 ms of an
+    -- unzoom the window showed the new layout in a corner with a white L-shaped smear and the sidebar's bottom row
+    -- dragged down (mcap, black backdrop, window rect area share vs the R2 unzoom series: Finder rms 0.122 / 38 ms,
+    -- Settings 0.058 / 16 ms). Off, the buffer is stretched to the animated frame like any other client:
+    -- Finder 0.005-0.007 / 1.7-1.8 ms, Settings 0.007 / 2.0 ms (Mac 267 ms, ours 267 ms).
+    render = { expand_undersized_textures = false },
     input = {
         kb_layout = "us",
         follow_mouse = 1,
@@ -149,9 +157,10 @@ end
 --     Safari closes in one frame on the Mac; hyprk does not special-case browsers.
 --   Zoom / frame changes (windowsMove): MAC-ANSWERS.md R2 (27.2.1) Window > Zoom 0.33 s ease-in-out, share per frame
 --     0.01 0.01 0.03 0.05 0.07 0.10 0.14 0.20 0.26 0.33 0.41 0.49 0.58 0.69 0.79 0.87 0.93 0.98 1.0: bezier "zoom"
---     over 0.29 s (RMS 0.006). Unzoom, full screen enter (0.4 s) and the two-step full screen exit (0.15 s to 0.47,
---     0.15 s hold, 0.3 s) do not fit one windowsMove leaf: plugin-motion (FrameMotion) plays the Mac's per-frame
---     series on these same animations (plugin:hyprkmotion:frames = 0 leaves them on the zoom curve). With
+--     over 0.29 s (RMS 0.006). Unzoom, full screen enter (0.4 s) and full screen exit (AppKit's window curve
+--     (0.25, 0, 0, 1) over the Dock's 0.5 s, REA in reference/ours/motion/MOTION-PLUGIN.md) do not fit one
+--     windowsMove leaf: plugin-motion (FrameMotion) plays them on these same animations
+--     (plugin:hyprkmotion:frames = 0 leaves them on the zoom curve). With
 --     windowsMove off (Reduce Motion) none of them animate.
 --   Window dim (fadeDim): off. With windowsIn off, Hyprland showed a new window dimmed to about 50 % and faded
 --     the dim out over 0.3 s (seen frame by frame in a test session); macOS never dims windows.

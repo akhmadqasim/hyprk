@@ -32,11 +32,11 @@ int main() {
     CHECK(near(progress(eKind::FULLSCREEN_ENTER, 24 * F), 1));
     CHECK(near(duration(eKind::FULLSCREEN_ENTER), 0.4) && near(duration(eKind::UNZOOM), 19 * F));
 
-    // exit: 0.47 after 0.15 s, held to 0.30 s, 1 at 0.60 s
-    CHECK(near(progress(eKind::FULLSCREEN_EXIT, 0.15), 0.47, 1e-4));
-    CHECK(near(progress(eKind::FULLSCREEN_EXIT, 0.2), 0.47) && near(progress(eKind::FULLSCREEN_EXIT, 0.299), 0.47));
-    CHECK(near(progress(eKind::FULLSCREEN_EXIT, 0.45), 0.47 + 0.53 * 0.5, 1e-4)); // symmetric ease: half way at mid-time
-    CHECK(near(progress(eKind::FULLSCREEN_EXIT, 0.6), 1, 1e-6) && near(duration(eKind::FULLSCREEN_EXIT), 0.6));
+    // exit: cubic-bezier(0.25, 0, 0, 1) over 0.5 s (AppKit overlay window, Dock duration); 60 Hz samples per REA
+    CHECK(near(duration(eKind::FULLSCREEN_EXIT), 0.5));
+    CHECK(near(progress(eKind::FULLSCREEN_EXIT, 0.25), cubicBezier(0.25, 0, 0, 1, 0.5)));
+    CHECK(near(progress(eKind::FULLSCREEN_EXIT, 5 * F), 0.33, 0.01) && near(progress(eKind::FULLSCREEN_EXIT, 10 * F), 0.72, 0.01));
+    CHECK(near(progress(eKind::FULLSCREEN_EXIT, 0.5), 1, 1e-6));
 
     // every kind is monotonic
     for (auto k : {eKind::UNZOOM, eKind::FULLSCREEN_ENTER, eKind::FULLSCREEN_EXIT}) {

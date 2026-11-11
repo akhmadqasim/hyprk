@@ -15,8 +15,8 @@ namespace motion::frame {
         constexpr std::array<double, 24> ENTER_SERIES  = {0.01, 0.03, 0.07, 0.14, 0.24, 0.33, 0.45, 0.59, 0.67, 0.72, 0.77, 0.81,
                                                           0.84, 0.87, 0.89, 0.91, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0};
 
-        // exit: 0.15 s to 0.47, hold 0.15 s, the rest over 0.3 s (R2)
-        constexpr double EXIT_STEP1 = 0.15, EXIT_MID = 0.47, EXIT_HOLD = 0.15, EXIT_STEP2 = 0.30;
+        // exit: AppKit's window frame curve over the Dock's 0.5 s (Frame.hpp)
+        constexpr double EXIT_DURATION = 0.5;
 
         double series(std::span<const double> s, double t) {
             if (t <= 0)
@@ -27,10 +27,6 @@ namespace motion::frame {
                 return 1;
             const double a = i == 0 ? 0.0 : s[i - 1];
             return a + (s[i] - a) * (k - double(i));
-        }
-
-        double easeInOut(double x) {
-            return cubicBezier(0.42, 0, 0.58, 1, x);
         }
     }
 
@@ -52,7 +48,7 @@ namespace motion::frame {
         switch (kind) {
             case eKind::UNZOOM: return UNZOOM_SERIES.size() * FRAME;
             case eKind::FULLSCREEN_ENTER: return ENTER_SERIES.size() * FRAME;
-            case eKind::FULLSCREEN_EXIT: return EXIT_STEP1 + EXIT_HOLD + EXIT_STEP2;
+            case eKind::FULLSCREEN_EXIT: return EXIT_DURATION;
         }
         return 0;
     }
@@ -61,14 +57,7 @@ namespace motion::frame {
         switch (kind) {
             case eKind::UNZOOM: return series(UNZOOM_SERIES, t);
             case eKind::FULLSCREEN_ENTER: return series(ENTER_SERIES, t);
-            case eKind::FULLSCREEN_EXIT:
-                if (t <= 0)
-                    return 0;
-                if (t < EXIT_STEP1)
-                    return EXIT_MID * easeInOut(t / EXIT_STEP1);
-                if (t < EXIT_STEP1 + EXIT_HOLD)
-                    return EXIT_MID;
-                return std::min(1.0, EXIT_MID + (1 - EXIT_MID) * easeInOut((t - EXIT_STEP1 - EXIT_HOLD) / EXIT_STEP2));
+            case eKind::FULLSCREEN_EXIT: return t <= 0 ? 0 : cubicBezier(0.25, 0, 0, 1, t / EXIT_DURATION);
         }
         return 1;
     }
