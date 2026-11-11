@@ -284,7 +284,10 @@ if hm then
     -- Dock.app 27.2.1 `genie-speed` default 0.5 s, the same for minimise and restore and for every window size and
     -- distance (MAC-ANSWERS.md "REA 27.2.1" section 4 and Reconciliation (#42) a: the Mac's 0.22 s was a cut-off
     -- tail; re-measured 0.40 to 0.48 s visible, ease-in-out fit T 0.50 s)
-    else hl.config({ plugin = { hyprkmotion = { genie_duration = 0.5 } } }) end
+    -- fullscreen_top: on the notched Air a full-screen window sits below the 34 pt bar strip, which stays black
+    -- (MAC-ANSWERS Q-menubar-33); the MBA headless output models that Air. Other outputs keep true full screen
+    -- (`hyprctl eval 'hl.config({ plugin = { hyprkmotion = { fullscreen_top = "" } } })'` for it on MBA too)
+    else hl.config({ plugin = { hyprkmotion = { genie_duration = 0.5, fullscreen_top = "MBA:34" } } }) end
 end
 
 ---------------------------------------------------------- layer rules ----

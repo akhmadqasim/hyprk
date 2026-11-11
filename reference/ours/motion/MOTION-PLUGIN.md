@@ -141,4 +141,12 @@ mixing the cosine slide, the cross-fade and the window, or a wait between the Do
   0.5 s cosine `0.5 - 0.5 cos(pi t / 0.5)`; menu bar out on enter over 0.15 s (default, inferred), back on exit over
   0.5 s starting with the transition. Both need the layers to stay drawn while they fade: a shell-side fade before
   the fullscreen state lands, or a plugin hook on `isHiddenByFullscreen` for the length of the run (not done).
-- The full-screen window covers the menu-bar strip; on the notched Mac it sits below a black 34 pt strip (Q-menubar-33).
+- ~~The full-screen window covers the menu-bar strip~~ (judge #3 gap 12): on the notched Air a full-screen window is
+  0,34,1710,1073 under a black 34 pt strip (Q-menubar-33). The MBA headless output models that Air, so plugin-motion
+  (`fullscreen_top = "MBA:34"`, FrameMotion.cpp) hooks the window's setBox: a box that is exactly a listed monitor's, for a
+  window in full screen (internal mode), loses the strip at its top, on every relayout; and at RENDER_PRE_WINDOWS of a
+  full-screen workspace it adds a black rect over the strip (the wallpaper still draws there; the bar is a top layer that
+  Hyprland hides over full screen). On screen: foot full screen at 0,34 1280x798 (Mac 0,34 on its 1107 pt screen), strip 0/0/0
+  over grey (before: the window at 0,0 1280x832), exit back to its frame, zoom (maximized) unchanged (1,67 1278x675). Other
+  outputs keep true full screen; on MBA too with `fullscreen_top = ""`. Enter on the inset box (foot over black, window-rect
+  area): 0.020 / 6.4 ms, 2-98 % 317 ms (one clean run). Not done: the titles' hover reveal on the strip (shell hand-off).

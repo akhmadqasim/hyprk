@@ -8,9 +8,17 @@
 #include <hyprland/src/desktop/rule/windowRule/WindowRuleApplicator.hpp>
 #include <hyprland/src/desktop/view/window/Window.hpp>
 #include <hyprland/src/event/EventBus.hpp>
+#include <hyprland/src/desktop/state/WindowState.hpp>
+#include <hyprland/src/render/Renderer.hpp>
+#include <hyprland/src/render/pass/RectPassElement.hpp>
+#include <hyprland/src/plugins/HookSystem.hpp>
+#include <hyprland/src/plugins/PluginAPI.hpp>
 #include <hyprland/src/managers/fullscreen/FullscreenController.hpp>
+#include <hyprland/src/output/Monitor.hpp>
 
 #include <chrono>
+#include <cstdlib>
+#include <string>
 #include <optional>
 #include <unordered_map>
 
@@ -59,6 +67,60 @@ namespace motion::frame {
             std::erase_if(g_runs, [](const SRun& r) { return r.window.expired(); });
         }
 
+        // Notched displays (MAC-ANSWERS Q-menubar-33): a full-screen window sits below the 34 pt bar strip (window
+        // 0,34,1710,1073 on the Air), the strip stays black. `plugin:hyprkmotion:fullscreen_top` lists outputs and their
+        // strip, "MBA:34"; other outputs keep true full screen. The layout sets a full-screen window's box over the whole
+        // monitor (WindowTarget, setBox(monitor box)) after the fullscreen event and again on every relayout, so setBox is
+        // hooked: a box that is exactly a listed monitor's, for a window in full screen, loses the strip at its top.
+        double topInset(const PHLMONITOR& mon) {
+            static auto P = CConfigValue<Config::STRING>("plugin:hyprkmotion:fullscreen_top");
+            if (!mon)
+                return 0;
+            const std::string list = *P;
+            size_t            i    = 0;
+            while (i < list.size()) {
+                const size_t end   = std::min(list.find(',', i), list.size());
+                const auto   item  = list.substr(i, end - i);
+                const size_t colon = item.rfind(':');
+                if (colon != std::string::npos && item.substr(0, colon) == mon->m_name)
+                    return std::atof(item.c_str() + colon + 1);
+                i = end + 1;
+            }
+            return 0;
+        }
+
+        using setBox_t                = void (*)(Desktop::View::CGeometricMovableAnimated*, const CBox&);
+        CFunctionHook* g_setBoxHook   = nullptr;
+        HANDLE         g_handle       = nullptr;
+
+        void hkSetBox(Desktop::View::CGeometricMovableAnimated* self, const CBox& box) {
+            CBox out = box;
+            for (const auto& w : Desktop::windowState()->windows()) {
+                if (static_cast<Desktop::View::CGeometricMovableAnimated*>(w.get()) != self)
+                    continue;
+                const auto mon = w->m_monitor.lock();
+                if (mon && box == mon->logicalBox() && Fullscreen::controller()->getFullscreenModes(w).internal == Fullscreen::FSMODE_FULLSCREEN)
+                    if (const double inset = topInset(mon); inset > 0)
+                        out = {box.x, box.y + inset, box.w, box.h - inset};
+                break;
+            }
+            rc<setBox_t>(g_setBoxHook->m_original)(self, out);
+        }
+
+        // the strip itself: black under everything of the full-screen workspace (the wallpaper still draws there; the menu
+        // bar is a top layer, which Hyprland hides over full screen). Overlay layers (HUD, Control Center) stay above.
+        void blackStrip(const Event::SRenderStageEvent& e) {
+            if (e.stage != RENDER_PRE_WINDOWS || !e.context || !e.monitor || !Fullscreen::controller()->hasFullscreen(e.monitor, true))
+                return;
+            const double inset = topInset(e.monitor);
+            if (inset <= 0)
+                return;
+            CRectPassElement::SRectData data;
+            data.box   = CBox{0, 0, e.monitor->m_transformedSize.x, inset * e.monitor->m_scale}.round();
+            data.color = CHyprColor(0, 0, 0, 1);
+            g_pHyprRenderer->addPassElement(e.context->get(), makeUnique<CRectPassElement>(data));
+        }
+
         // Fired after the layout set the new goals (FullscreenController::setWindowFullscreenModeInternal), so the
         // position and size animations already run, on windowsMove; they continue on a private config.
         void onFullscreen(PHLWINDOW w) {
@@ -104,8 +166,22 @@ namespace motion::frame {
     }
 
     void init(HANDLE handle) {
+        g_handle = handle;
+        for (const auto& m : HyprlandAPI::findFunctionsByName(handle, "setBox"))
+            if (m.demangled.starts_with("Desktop::View::CGeometricMovableAnimated::setBox")) {
+                g_setBoxHook = HyprlandAPI::createFunctionHook(handle, m.address, rc<void*>(&hkSetBox));
+                if (g_setBoxHook && !g_setBoxHook->hook()) {
+                    HyprlandAPI::removeFunctionHook(handle, g_setBoxHook);
+                    g_setBoxHook = nullptr;
+                }
+                break;
+            }
         HyprlandAPI::addConfigValueV2(handle, makeShared<Config::Values::CIntValue>("plugin:hyprkmotion:frames", "Mac unzoom and full screen enter/exit timing", 1));
+        HyprlandAPI::addConfigValueV2(handle,
+                                      makeShared<Config::Values::CStringValue>("plugin:hyprkmotion:fullscreen_top", "output:pt, full-screen windows keep that strip at the top (notch)",
+                                                                               Config::STRING{""}));
         g_listeners.push_back(Event::bus()->m_events.window.fullscreen.listen([](PHLWINDOW w) { onFullscreen(w); }));
+        g_listeners.push_back(Event::bus()->m_events.render.stage.listen([](const Event::SRenderStageEvent& e) { blackStrip(e); }));
         g_listeners.push_back(Event::bus()->m_events.window.close.listen([](PHLWINDOW w) {
             finishFor(w);
             g_modes.erase(rc<uintptr_t>(w.get()));
@@ -113,6 +189,9 @@ namespace motion::frame {
     }
 
     void exit() {
+        if (g_setBoxHook)
+            HyprlandAPI::removeFunctionHook(g_handle, g_setBoxHook);
+        g_setBoxHook = nullptr;
         for (auto& r : g_runs)
             finish(r);
         g_runs.clear();
