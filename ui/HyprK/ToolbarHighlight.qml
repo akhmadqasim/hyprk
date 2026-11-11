@@ -2,7 +2,8 @@ import QtQuick
 
 // Hover and press light of the buttons on a glass capsule (window toolbars, the Liquid Glass preview; macOS 27.2.1 read
 // off the 23.09.23 recording, Tokens.toolbar.hover* / press*): hovering lights a disc round the button under the pointer
-// at once; a press brightens the whole capsule by a gain that falls off linearly from that button, rising over 9 frames
+// at once; a press brightens the whole capsule, disc included, by a gain that is flat over the disc and falls off
+// linearly beyond it, rising over 9 frames
 // and falling for about 0.8 s after the release (PressGlow). Put it above the capsule's buttons: it only watches the
 // pointer (HoverHandler, PointHandler: the buttons keep their own clicks). Dark only (no light data).
 // With `source` (the capsule and its content, not containing this item) and `backdrop` it draws the light itself: a
@@ -21,7 +22,7 @@ Item {
     property real pressX: width / 2
     readonly property real hoverX: nearest(hover.point.position.x)
     readonly property point discCentre: Qt.point(hoverX, height / 2)
-    readonly property real discLift: hovered ? Tokens.toolbar.hoverLift * (1 - glow.value) : 0
+    readonly property real discLift: hovered ? Tokens.toolbar.hoverLift : 0
     readonly property point glowCentre: Qt.point(pressX, height / 2)
     readonly property real glowGain: Tokens.toolbar.pressGain * glow.value
     readonly property bool lit: discLift > 0 || glowGain > 0

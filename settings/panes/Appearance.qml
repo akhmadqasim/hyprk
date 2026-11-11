@@ -236,8 +236,12 @@ Column {
                     // (161,192,223): light 0 / .5 / 1 -> (186,218,252), (200,225,251), (219,234,251) = the sample x1.14
                     // mixed with white .00 / .22 / .48; dark (136,164,192), (135,162,190), (84,97,111) = x0.85 mixed
                     // with #1E1E1E 0 / 0 / .5. Rim line black a.4 light (159 -> 97), a.5 dark (158 -> 81). Refraction:
-                    // the knob lens law (Tokens lensBand / lensAmount). Blur: not measurable from the shots (the
-                    // photo under the capsules is not visible without them); 1 pt at 0 to 5 pt at 1 by eye (estimate).
+                    // the knob lens law (Tokens lensBand / lensAmount). Dark gain 0.79, not the shots' 0.85: in the
+                    // 23.09.23 recording (dark, slider at 0.5) the share capsule's face over the same photo is 0.86 of
+                    // ours where the photo itself is 0.93 (the recording's darker mid-tones), so 0.85 x 0.93 (judge #6:
+                    // the rest capsule too bright, the press clipped it to white). Blur: the recording's face is smooth
+                    // (luminance std 4.3, column range 13.5 levels); 3 pt gave 8.8 / 25, 16 pt 5.8 / 17 (larger blurs
+                    // only add the 17-tap ring's noise): 16 pt at 0.5 on the earlier law's shape (1 + 4 x tint, by eye).
                     Repeater {
                         // glyphs: the view's SF Symbols (square.and.arrow.up, ellipsis, square.on.square, magnifyingglass),
                         // regular, 16.5 pt (ink on the Mac shot: share 14.5 wide, the three dots 15 wide and 3 tall,
@@ -257,8 +261,8 @@ Column {
                                 origin: Qt.point(cap.x, cap.y)
                                 band: height * Tokens.control.lensBand
                                 amount: height * Tokens.control.lensAmount
-                                blur: 1 + 4 * glassPreview.tint
-                                gain: Theme.dark ? 0.85 : 1.14
+                                blur: (1 + 4 * glassPreview.tint) * 16 / 3
+                                gain: Theme.dark ? 0.79 : 1.14
                                 tint: Theme.dark ? Qt.rgba(0.118, 0.118, 0.118, Math.max(0, glassPreview.tint - 0.5))
                                                  : Qt.rgba(1, 1, 1, glassPreview.tint <= 0.5 ? 0.44 * glassPreview.tint
                                                                                               : 0.22 + 0.52 * (glassPreview.tint - 0.5))

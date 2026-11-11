@@ -38,7 +38,8 @@ Item {
     property bool clampToSource: false
     readonly property real margin: Math.ceil(Math.abs(amount) + blur + 1)
     // a button's light (ToolbarHighlight): a disc of Tokens.toolbar.hoverDiscRadius round discCentre with discLift added,
-    // and the colour times 1 + glowGain (1 - r / Tokens.toolbar.pressReach) round glowCentre (item px)
+    // then the colour times 1 + glowGain round glowCentre (item px), flat over the disc's radius and falling linearly to
+    // 1 at Tokens.toolbar.pressReach
     property point discCentre: Qt.point(0, 0)
     property real discLift: 0
     property point glowCentre: Qt.point(0, 0)

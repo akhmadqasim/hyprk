@@ -12,8 +12,9 @@
 //   key.y on the bottom (both x the cube of the rim normal's vertical part), key.w on the round ends; key.z its falloff in pt)
 // - rim: the outer outlineWidth pt shows the plain sample darkened by `outline` (the face's light and gain left out)
 // - where the texture is empty the light and the rim line are drawn alone (white lit, black outline)
-// - a button's light (HyprK ToolbarHighlight): the colour times 1 + glow.z (1 - r / glow.w) round glow.xy, plus disc.w
-//   inside a disc of radius disc.z round disc.xy (edge discEdge pt wide); `additive`: only that light, with alpha 0, so
+// - a button's light (HyprK ToolbarHighlight): disc.w added inside a disc of radius disc.z round disc.xy (edge discEdge
+//   pt wide), then all of it times 1 + glow.z, flat over the disc's radius from glow.xy and falling linearly to 1 at
+//   glow.w; `additive`: only that light, with alpha 0, so
 //   it adds to the window (a translucent capsule redrawn over itself doubled its face)
 layout(location = 0) in vec2 qt_TexCoord0;
 layout(location = 0) out vec4 fragColor;
@@ -82,8 +83,9 @@ void main() {
     float line = 1.0 - smoothstep(outlineWidth - 0.5 * px, outlineWidth + 0.5 * px, in_);
     rgb = mix(rgb, raw * (1.0 - outline), line);
     vec3 unlit = rgb;
-    rgb = min(rgb * (1.0 + glow.z * max(0.0, 1.0 - length(p - glow.xy) / max(glow.w, 1e-3)))
-              + disc.w * (1.0 - smoothstep(disc.z - 0.5 * discEdge, disc.z + 0.5 * discEdge, length(p - disc.xy))), vec3(1.0));
+    float rg = length(p - glow.xy);
+    rgb = min((rgb + disc.w * (1.0 - smoothstep(disc.z - 0.5 * discEdge, disc.z + 0.5 * discEdge, length(p - disc.xy))))
+              * (1.0 + glow.z * clamp(1.0 - max(0.0, rg - disc.z) / max(glow.w - disc.z, 1e-3), 0.0, 1.0)), vec3(1.0));
     // where the source is empty (a knob over a window's own glass, backdrop transparent) the light and the rim are
     // drawn on their own: white `lit` over the face, black `outline` on the rim line
     float la = clamp(lit, 0.0, 1.0) * (1.0 - line);

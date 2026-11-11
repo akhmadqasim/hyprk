@@ -213,17 +213,22 @@ QtObject {
         // Hover and press on a glass button of a capsule (ToolbarHighlight), read off the 23.09.23 recording (Settings >
         // Appearance, dark, 60 fps, the preview's share button: rest frame 0, hover frames 8-63, press frame 196, release
         // 251; the capsule 37 pt = 71 px). Hover: a disc round the button, in one frame, +19.5 levels added (rest 134,148,158
-        // -> 153,168,178), flat to 28 px from the centre, gone at 32 (radius 15.9 pt, edge 1.6 pt). Press: the capsule's
-        // colour times 1 + g, g = 0.55 (1 - r / 81 pt) from the button (per 8 px ring against the rest frame: 1.39 at 23 pt,
-        // 1.34 at 31, 1.25 at 44, 1.20 at 52, 1.15 at the far end 56; a pure gain fits 7-9 levels rms, an added white
-        // 10-14), the disc gone under it. Over time per 60 Hz frame from the first frame after the press / the release,
+        // -> 153,168,178), flat to 28 px from the centre, gone at 32 (radius 15.9 pt, edge 1.6 pt). Press: the hovered
+        // capsule, disc included, times 1 + g from the button: frame 220 over frame 196 per 4 pt ring, red channel (green
+        // and blue clip inside the disc): 1.43 1.38 1.41 1.41 inside the disc, 1.37 at 18 pt, 1.34 at 22-26, 1.30 at 30,
+        // 1.27 at 34, 1.24 at 38, 1.13 at 50: 0.41 flat over the disc's radius, then linear to 0 at 66 pt. The recording
+        // darkens mid-tones more than highlights (the preview photo, ours -> recording per quantile: 162 -> 150, 227 ->
+        // 221), which inflates a ratio from ~165 to ~230 by 0.975 / 0.93: on screen g = 0.35. The disc
+        // stays lit (its edge shows in the press frames; the white glyph keeps its contrast, judge #6: an earlier fit
+        // against the rest frame, 0.55 (1 - r / 81) with the disc gone, clipped our capsule to white and hid the glyph).
+        // Over time per 60 Hz frame from the first frame after the press / the release,
         // capsule mean normalised (frames where the app repeated a frame interpolated: 263-264, 266-267, 270-271). Light:
         // no recording (needs the Mac), so nothing lights there
         readonly property real hoverDiscRadius: 15.9
         readonly property real hoverDiscEdge: 1.6
         readonly property real hoverLift: t.dark ? 19.5 / 255 : 0
-        readonly property real pressGain: t.dark ? 0.55 : 0
-        readonly property real pressReach: 81
+        readonly property real pressGain: t.dark ? 0.35 : 0
+        readonly property real pressReach: 66
         readonly property var pressRise: [0.255, 0.664, 0.836, 0.913, 0.955, 0.983, 0.985, 0.998, 1]
         readonly property var pressFall: [1, 1, 0.969, 0.922, 0.850, 0.775, 0.687, 0.619, 0.531, 0.477, 0.410, 0.361, 0.311,
             0.262, 0.232, 0.202, 0.172, 0.156, 0.135, 0.115, 0.094, 0.072, 0.066, 0.049, 0.047, 0.049,
