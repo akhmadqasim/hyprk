@@ -133,7 +133,7 @@ Item {
         // on in dark: the whole disc opaque white with a black glyph (MAC-ANSWERS Control Center section 1, Q-panels-01)
         on: Theme.dark
         onIcon: "#000000"
-        onActivated: Theme.dark = !Theme.dark
+        onActivated: Theme.setAppearance(!Theme.dark, true)
     }
     Round {
         x: cc.colX(0) + cc.colW - cc.rowH; y: cc.rowY(3)

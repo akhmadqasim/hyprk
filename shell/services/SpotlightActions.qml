@@ -49,7 +49,7 @@ Singleton {
         const out = [];
         const add = a => out.push(a);
         add({ id: "dark-mode", title: Theme.dark ? "Turn Off Dark Mode" : "Turn On Dark Mode", subtitle: "Appearance",
-              symbol: Theme.dark ? "sun" : "moon", keywords: ["dark", "light", "appearance", "theme"], run: () => Theme.dark = !Theme.dark });
+              symbol: Theme.dark ? "sun" : "moon", keywords: ["dark", "light", "appearance", "theme"], run: () => Theme.setAppearance(!Theme.dark, true) });
         if (wifiDev)
             add({ id: "wifi", title: Networking.wifiEnabled ? "Turn Off Wi‑Fi" : "Turn On Wi‑Fi", subtitle: "Wi‑Fi",
                   symbol: "wifi", keywords: ["wifi", "wireless", "network"], run: () => Networking.wifiEnabled = !Networking.wifiEnabled });
