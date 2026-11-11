@@ -48,10 +48,12 @@ function segments(p, rootName) {
     return out;
 }
 
-// Window title: the folder name, "/" shows as the disk name.
-function title(p) {
+// Window title: the folder name, "/" shows as the disk name, the freedesktop trash's files folder (`trash`, when
+// given) as "Trash" (its own name is "files").
+function title(p, trash) {
     const n = normalize(p);
     if (n === "/") return "Macintosh HD";
+    if (trash && n === normalize(trash)) return "Trash";
     return baseName(n);
 }
 

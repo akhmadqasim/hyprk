@@ -65,7 +65,7 @@ QtObject {
         : path.indexOf("tag:") === 0 ? path.slice(4)
         : path === FileOps.homePath() ? Files.baseName(path)
         : path === FileOps.standardPath("documents") || path === FileOps.standardPath("desktop") ? Files.title(path) + " \u2014 Local"
-        : Files.title(path)
+        : Files.title(path, trashPath)
 
     signal errorRaised(string message)
 

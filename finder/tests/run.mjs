@@ -58,6 +58,10 @@ test("fileUrl", () => {
 test("title", () => {
     assert.equal(F.title("/"), "Macintosh HD");
     assert.equal(F.title("/home/u/Downloads/"), "Downloads");
+    // the Dock's Trash opens ~/.local/share/Trash/files: titled "Trash", not "files"
+    assert.equal(F.title("/home/u/.local/share/Trash/files", "/home/u/.local/share/Trash/files"), "Trash");
+    assert.equal(F.title("/home/u/.local/share/Trash/files/", "/home/u/.local/share/Trash/files"), "Trash");
+    assert.equal(F.title("/home/u/files", "/home/u/.local/share/Trash/files"), "files");
 });
 
 // ---- sorting ----
