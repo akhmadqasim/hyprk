@@ -231,6 +231,13 @@ void main() {
         const CBox  quad  = reach().scale(scale).round();
         CRegion     damage{ctx.m_data.damage};
         damage.intersect(quad);
+        // nothing is drawn deeper inside the frame than its corner radius (the shadow stops at the frame, the rim is 1 pt):
+        // leave that out, or the rim's quad shades the whole window to light its edge (0.11 ms of 0.11 per element at
+        // 700 x 533 pt, 2x)
+        const CBox  body  = CBox{m_data.body}.scale(scale);
+        const double inset = std::max(m_data.radius, m_data.rim) * scale + 2;
+        if (body.w > 2 * inset && body.h > 2 * inset)
+            damage.subtract(CBox{body.x + inset, body.y + inset, body.w - 2 * inset, body.h - 2 * inset}.round());
         if (damage.empty() || quad.w < 1 || quad.h < 1)
             return {};
 
@@ -240,7 +247,6 @@ void main() {
             stats::end(stats::SHADOW);
             return {};
         }
-        const CBox body = CBox{m_data.body}.scale(scale);
         const auto bx = float(body.x - quad.x), by = float(body.y - quad.y);
         shader->setUniformMatrix3fv(SHADER_PROJ, 1, GL_TRUE, g_pHyprRenderer->projectBoxToTarget(ctx, quad).getMatrix());
         glUniform2f(g_prog.quadSize, quad.w, quad.h);
