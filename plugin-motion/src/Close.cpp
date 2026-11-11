@@ -120,7 +120,10 @@ namespace motion::close {
             return rc<snap_t>(g_snapHook->m_original)(self, window, mode);
         }
 
-        // 12 taps on two rings plus the centre, averaged by the 1/k "over" trick
+        // 12 taps on two rings plus the centre, averaged additively (each at 1 / N, blend ONE, ONE). The 1/k "over" trick
+        // used before averages opaque pixels only: over translucent ones (the window's shadow and rim, premultiplied) the
+        // alpha piled up, so the closing window's shadow got darker while the window faded (4 pt below a foot window, over
+        // a 100 backdrop: 68 at rest, then 53 / 71 / 82 at window alpha .73 / .47 / .30, i.e. 1.5-2x the faded shadow)
         void drawBlurred(SP<ITexture> tex, SP<IFramebuffer> out, double radiusPx) {
             auto&                        ctx = g_pHyprRenderer->context();
             GL::CFramebufferBindingGuard bindings{g_pHyprRenderer->glBackend()};
@@ -140,9 +143,12 @@ namespace motion::close {
                 taps.push_back(Vector2D{std::cos(i * M_PI / 4), std::sin(i * M_PI / 4)} * radiusPx);
             for (int i = 0; i < 4; ++i)
                 taps.push_back(Vector2D{std::cos(M_PI / 4 + i * M_PI / 2), std::sin(M_PI / 4 + i * M_PI / 2)} * (radiusPx * 0.5));
-            for (size_t k = 0; k < taps.size(); ++k)
-                GL::g_pHyprOpenGL->renderTexture(ctx, tex, CBox{taps[k], SIZE},
-                                                 GL::CHyprOpenGLImpl::STextureRenderData{.damage = &DAMAGE, .a = 1.F / sc<float>(k + 1), .allowDim = false});
+            GL::g_pHyprOpenGL->blend(true);
+            GL::g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE);
+            for (const auto& tap : taps)
+                GL::g_pHyprOpenGL->renderTexture(ctx, tex, CBox{tap, SIZE},
+                                                 GL::CHyprOpenGLImpl::STextureRenderData{.damage = &DAMAGE, .a = 1.F / sc<float>(taps.size()), .allowDim = false});
+            GL::g_pHyprOpenGL->blend(true); // back to premultiplied over
         }
 
         SP<IFramebuffer> hkFadeoutFramebuffer(const Desktop::IFadeout* self, eSceneMode mode) {
