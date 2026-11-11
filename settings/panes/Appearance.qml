@@ -158,8 +158,9 @@ Column {
                         contentHeight: articleBody.height
                         boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
                         RubberBand { flickable: article }
-                        // 27.2.1 (appearance-light.png): the photo fills the top 98 pt, then a text card (#E8E5E0 light,
-                        // #131210 dark) with a 15 pt Semibold title 25 pt under its top, a 13 pt secondary subtitle and
+                        // 27.2.1 (appearance-{light,dark}.png, 2x): the photo fills the top 152 pt (rows 322..626), then a
+                        // text card (#E8E5E0 light, #131210 dark) with a 15 pt Semibold title whose cap top is 23.5 pt
+                        // under the card's top (row 673, so 4.5 pt of it show at rest), a 13 pt secondary subtitle and
                         // the body, all at x 16. No Apple photo or article is shipped: the photo is the wallpaper, the
                         // text names it; the body runs on so the preview scrolls like the Mac's.
                         Column {
@@ -167,15 +168,15 @@ Column {
                             width: article.width
                             RoundedImage {
                                 id: preview
-                                width: parent.width; height: 98; radius: 0; decodeWidth: 540
+                                width: parent.width; height: 152; radius: 0; decodeWidth: 540
                                 path: AppState.wallpaperImage || Backend.root + "/themes/wallpapers/png/DefaultAerial.png"
                             }
                             Rectangle {
-                                width: parent.width; height: articleText.height + 14 + 20
+                                width: parent.width; height: articleText.height + 20 + 20
                                 color: Theme.previewCard
                                 Column {
                                     id: articleText
-                                    x: 16; y: 14; width: parent.width - 32; spacing: 3
+                                    x: 16; y: 20; width: parent.width - 32; spacing: 3
                                     MacText { text: P.prettyFileName(preview.path); size: 15; weight: Typography.semibold }
                                     MacText { text: "Wallpaper"; size: 13; color: Theme.secondaryLabel }
                                     MacText {
