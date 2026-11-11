@@ -422,10 +422,22 @@ hl.bind("CTRL + " .. cmd .. " + Q", hl.dsp.exec_cmd(hyprk .. "/lockscreen/lock.s
 hl.layer_rule({ name = "hyprk-lock", match = { namespace = "^hyprk-lock$" }, no_anim = true })
 hl.bind(cmd .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
 hl.bind(cmd .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+-- Ctrl+1..4 belong to Spotlight while its layer is open (Cmd-1..4 pick a browse mode, SPOTLIGHT-27.2.1.md; in a
+-- nested session Ctrl stands in for Cmd): those four Space binds are off from the layer's map to its unmap, counted per
+-- layer so a second monitor's Spotlight cannot leave them off. Super+digits are not bound here.
+local spotlightSpaceKeys, spotlightLayers = {}, 0
 for i = 1, 9 do
-    hl.bind("CTRL + " .. i, hl.dsp.focus({ workspace = i }))          -- macOS: Ctrl+N switches Spaces
+    local b = hl.bind("CTRL + " .. i, hl.dsp.focus({ workspace = i }))   -- macOS: Ctrl+N switches Spaces
+    if i <= 4 then spotlightSpaceKeys[#spotlightSpaceKeys + 1] = b end
     hl.bind("CTRL + SHIFT + " .. i, hl.dsp.window.move({ workspace = i }))
 end
+local function spotlightLayer(ls, d)
+    if not ls or ls.namespace ~= "hyprk-spotlight" then return end
+    spotlightLayers = math.max(0, spotlightLayers + d)
+    for _, b in ipairs(spotlightSpaceKeys) do b:set_enabled(spotlightLayers == 0) end
+end
+hl.on("layer.opened", function(ls) spotlightLayer(ls, 1) end)
+hl.on("layer.closed", function(ls) spotlightLayer(ls, -1) end)
 hl.bind("CTRL + left",  hl.dsp.focus({ workspace = "e-1" }))
 hl.bind("CTRL + right", hl.dsp.focus({ workspace = "e+1" }))
 -- volume and brightness keys as on macOS 27.2.1 (reference/re/MAC-ANSWERS.md HUD): one press = 1/16,
