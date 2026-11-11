@@ -158,14 +158,25 @@ Window {
         onFullScreenClicked: win.visibility === Window.FullScreen ? win.showNormal() : win.showFullScreen()
     }
 
-    // dark list view: the header's solid bar continues under the toolbar (hard pocket, Q-finder-17)
+    // dark list view: the header's solid bar continues under the toolbar (hard pocket, Q-finder-17); the gallery has
+    // the same kind of strip, (39,39,44), ended by a 1 px line at y 104 px that light has too (229 / (47,47,52);
+    // gallery-{light,dark}.png)
     Rectangle {
-        visible: win.view === "list" && Theme.dark
+        visible: (win.view === "list" || win.view === "gallery") && Theme.dark
         x: Theme.sidebar.width
         width: parent.width - x
         height: Theme.toolbar.height
         topRightRadius: win.radius
-        color: Theme.color.listHeaderFill
+        color: win.view === "gallery" ? "#27272C" : Theme.color.listHeaderFill
+    }
+    Rectangle {
+        visible: win.view === "gallery" && !tabBar.visible
+        x: Theme.sidebar.width
+        y: Theme.toolbar.height
+        width: parent.width - x
+        height: 0.5
+        z: 1
+        color: Theme.dark ? "#2F2F34" : "#E5E5E5"
     }
 
     // dark inactive window, other views: the toolbar strip lightens (Q-finder-29)
