@@ -43,10 +43,14 @@ ShellWindow {
     // the delay switches to the selected (previous) app without the panel ever showing (quick tap).
     property bool revealed: false
     Timer { id: revealTimer; interval: Theme.switcher.showDelay; onTriggered: sw.revealed = true }
-    property real fade: shown && revealed && liveApps.length > 0 ? 1 : 0
-    Behavior on fade {
-        enabled: sw.fade > 0                     // fading in is a jump
-        NumberAnimation { duration: Theme.ms(250); easing.type: Easing.BezierSpline; easing.bezierCurve: [0.42, 0, 0.58, 1, 1, 1] }
+    // one value per frame of this window (HyprK FrameEase)
+    readonly property real fade: fadeEase.value
+    FrameEase {
+        id: fadeEase
+        goal: sw.shown && sw.revealed && sw.liveApps.length > 0 ? 1 : 0
+        animate: goal < value                    // fading in is a jump
+        duration: Theme.ms(250)
+        curve: [0.42, 0, 0.58, 1, 1, 1]
     }
     // the compositor glass fades with the content (ShellWindow.glassOpacity)
     glassOpacity: fade

@@ -38,12 +38,10 @@ ShellWindow {
     // same frame: the plugin glass as glassOpacity, the content as opacity. The scale anchor is not read: the
     // panel's centre (SwiftUI's default). Reduce motion: no scale (Theme.travel), at most 0.15 s (Theme.ms).
     property real fade: 0
-    SpringCurve { id: fadeAnim; target: ccw; property: "fade"; spring: SpringLib.fromBounce(0.25, -0.027) }
-    onShownChanged: {
-        fadeAnim.go(shown ? 1 : 0);
-        settleGlass(fadeAnim.duration + 50);      // the glass follows the 1 % scale
-    }
-    onVisibleChanged: if (visible) settleGlass(fadeAnim.duration + 50)
+    readonly property var fadeSpring: SpringLib.fromBounce(0.25, -0.027)
+    // settlesGlass: the glass follows the 1 % scale, re-measured in the frame that draws the value
+    SpringCurve { id: fadeAnim; target: ccw; property: "fade"; spring: ccw.fadeSpring; settlesGlass: true }
+    onShownChanged: fadeAnim.go(shown ? 1 : 0)
     glassMaterialize: 1
     glassOpacity: fade
     // while fading out the layer takes no input, so it never eats the click
@@ -78,6 +76,15 @@ ShellWindow {
         WlrLayershell.layer: WlrLayer.Top
         color: "transparent"
         mask: Region {}
+        // the same spring on this window's own frames: a value stepped in the panel's frame reaches this window
+        // one frame late or not, by turns
+        id: dimWin
+        property real fade: 0
+        SpringCurve { id: dimAnim; target: dimWin; property: "fade"; spring: ccw.fadeSpring }
+        Connections {
+            target: ccw
+            function onShownChanged() { dimAnim.go(ccw.shown ? 1 : 0); }
+        }
         // full inside the tiles' box (and past the screen and menu bar edges), about 75 % at 12 pt outside
         RectangularShadow {
             x: parent.width - cc.width - Theme.cc.right - 30
@@ -86,7 +93,7 @@ ShellWindow {
             height: cc.y + cc.height + 30 + Theme.cc.dimFeather
             blur: Theme.cc.dimFeather * 0.6
             color: Theme.cc.dim
-            opacity: ccw.fade
+            opacity: dimWin.fade
         }
     }
 

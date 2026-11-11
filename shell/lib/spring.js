@@ -145,6 +145,14 @@ function plan(s, from, to, velocity, cutAt, fixed) {
     }
     return { duration: Math.round(r.T * 1000), curve: r.curve, to: from + d * r.xT, seconds: r.T, v0: v0 };
 }
+// settleTime(s, v0, 0.001) in seconds, cached per spring and start velocity (the scan costs up to a few ms)
+const _settle = {};
+function settleSeconds(s, v0) {
+    const key = s.response + "/" + s.ratio + "/" + v0;
+    let t = _settle[key];
+    if (t === undefined) t = _settle[key] = settleTime(s, v0, 0.001);
+    return t;
+}
 // velocity (value units per second) of a running plan `p` (from `from`) `t` seconds after its start
 function velocityAt(s, p, from, t) {
     const d = (p.to - from) / value(s, p.v0, p.seconds);

@@ -25,13 +25,16 @@ Item {
     }
     // the glass region does not follow transforms: re-measure it while the alert scales
     onPopChanged: Tokens.glassStepped(root)
-    SequentialAnimation {
+    // one value per frame of the window (HyprK FrameAnim); the settle starts in the frame after the rise's last
+    FrameAnim {
         id: popIn
-        NumberAnimation { target: root; property: "pop"; from: Theme.alert.popFrom; to: Theme.alert.popPeak; duration: Theme.alert.popRise; easing.type: Easing.InQuad }
-        NumberAnimation { target: root; property: "pop"; to: 1; duration: Theme.alert.popSettle; easing.type: Easing.OutQuad }
+        target: root; property: "pop"; from: Theme.alert.popFrom; to: Theme.alert.popPeak; duration: Theme.alert.popRise; ease: Easing.InQuad
+        onFinished: popSettle.start()
+        function halt(): void { stop(); popSettle.stop(); }
     }
-    NumberAnimation { id: fadeIn; target: root; property: "fade"; to: 1; duration: 150 }   // Reduce motion dissolve
-    NumberAnimation { id: fadeOut; target: root; property: "fade"; to: 0; duration: Theme.alert.fadeOut; easing.type: Easing.OutQuad }
+    FrameAnim { id: popSettle; target: root; property: "pop"; to: 1; duration: Theme.alert.popSettle; ease: Easing.OutQuad }
+    FrameAnim { id: fadeIn; target: root; property: "fade"; to: 1; duration: 150 }   // Reduce motion dissolve
+    FrameAnim { id: fadeOut; target: root; property: "fade"; to: 0; duration: Theme.alert.fadeOut; ease: Easing.OutQuad }
     Component.onCompleted: if (shown) fade = 1
 
     property var model: null
@@ -60,12 +63,13 @@ Item {
             } else {
                 fade = 1;
                 pop = Theme.alert.popFrom;   // before the first tick, so no full-size frame
+                popSettle.stop();
                 popIn.restart();
             }
             Qt.callLater(forceActiveFocus);   // after `visible` follows
         } else {
             fadeIn.stop();
-            popIn.stop();   // dismissed mid-pop: fades at the size it has, no jump
+            popIn.halt();   // dismissed mid-pop: fades at the size it has, no jump
             fadeOut.start();
         }
     }

@@ -53,10 +53,11 @@ ShellWindow {
     readonly property var springClose: SpringLib.fromBounce(0.45, 0.05)
     readonly property var springAlpha: SpringLib.fromBounce(0.28, 0.41)
     property real blurRadius: 0
+    property bool blurOn: false
     readonly property var springBlur: SpringLib.fromBounce(0.51, 0.05)
     SpringCurve { id: animBlur; target: sp; property: "blurRadius"; spring: sp.springBlur }
     SpringCurve { id: animX; target: sp; property: "scaleX" }
-    SpringCurve { id: animY; target: sp; property: "scaleY" }
+    SpringCurve { id: animY; target: sp; property: "scaleY"; settlesGlass: true }   // steps after animX: the glass is re-measured once both moved
     SpringCurve {
         id: animAlpha
         target: sp
@@ -76,12 +77,14 @@ ShellWindow {
             animX.snap(1);
             animY.snap(1);
             animAlpha.snap(open ? 1 : 0);
+            blurOn = false;
             animBlur.snap(0);
             gone = !open;
             settleGlass(50);
             return;
         }
-        if (open || A11y.reduceMotion) animBlur.snap(0);
+        blurOn = !open && !A11y.reduceMotion;
+        if (!blurOn) animBlur.snap(0);
         else animBlur.go(25);
         animX.spring = open ? springOpen : springClose;
         animY.spring = open ? springOpen : springClose;
@@ -145,13 +148,18 @@ ShellWindow {
     readonly property string below: mode === "apps" ? "apps" : mode !== "" ? "list"
         : rows.length > 0 ? "results" : modeListArmed && query === "" ? "modes" : ""
     // unfolds downward in about 0.18 s, ease-in-out (Q-panels-26); gone at once when text is typed
-    property real unfold: below === "modes" ? 1 : 0
-    Behavior on unfold {
-        // not on `below`: unfold's own binding could run before this one, and the list then came in one frame (mcap)
-        enabled: sp.query === "" && sp.mode === "" && !A11y.reduceMotion
-        NumberAnimation { duration: Theme.spotlight.unfoldMs; easing.type: Easing.InOutSine }
+    // one value per frame of this window (HyprK FrameEase), the glass re-measured with each
+    readonly property real unfold: unfoldEase.value
+    FrameEase {
+        id: unfoldEase
+        goal: sp.below === "modes" ? 1 : 0
+        // read when the goal changes: query and mode change before `below` does
+        animate: sp.query === "" && sp.mode === "" && !A11y.reduceMotion
+        duration: Theme.spotlight.unfoldMs
+        ease: Easing.InOutSine
+        settlesGlass: true
     }
-    onBelowChanged: settleGlass(Theme.spotlight.unfoldMs + 50)
+    onBelowChanged: settleGlass(50)
 
     function setMode(m) {
         SpotlightState.mode = m;
@@ -248,7 +256,9 @@ ShellWindow {
         anchors.fill: parent
         opacity: sp.alpha
         // the close's content blur (0 -> 25 pt); MultiEffect's blur reaches blurMax px at blur 1
-        layer.enabled: sp.blurRadius > 0.05
+        // switched on before the close's first frame, not by the first blur value: the springs step after the
+        // frame's polish, and an effect created then showed one empty frame (mcap: the bar gone, then back at .22)
+        layer.enabled: sp.blurOn
         layer.effect: MultiEffect {
             blurEnabled: true
             blurMax: 64

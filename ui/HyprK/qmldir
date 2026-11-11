@@ -9,6 +9,9 @@ singleton Tokens 1.0 Tokens.qml
 singleton Typography 1.0 Typography.qml
 singleton Accent 1.0 Accent.qml
 Spring 1.0 Spring.qml
+FrameClock 1.0 FrameClock.qml
+FrameAnim 1.0 FrameAnim.qml
+FrameEase 1.0 FrameEase.qml
 PressSpring 1.0 PressSpring.qml
 Materializer 1.0 Materializer.qml
 MaterializeScale 1.0 MaterializeScale.qml

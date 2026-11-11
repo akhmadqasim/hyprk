@@ -45,3 +45,45 @@ function springStep(x, v, target, response, damping, dt) {
 function emergeOffset(i, v, travel, pitch) {
     return (1 - v) * (travel + i * pitch);
 }
+
+// Qt's easing curves by QEasingCurve::Type number (Easing.Linear = 0, the In / Out / InOut / OutIn Quad, Cubic,
+// Quart and Quint families 1..16, the Sine family 17..20), for FrameAnim. p and the result are 0..1.
+function _pow(kind, n, p) {
+    if (kind === 0) return Math.pow(p, n);                                        // In
+    if (kind === 1) return 1 - Math.pow(1 - p, n);                                // Out
+    if (kind === 2) return p < 0.5 ? Math.pow(2 * p, n) / 2 : 1 - Math.pow(2 - 2 * p, n) / 2;   // InOut
+    return p < 0.5 ? (1 - Math.pow(1 - 2 * p, n)) / 2 : 0.5 + Math.pow(2 * p - 1, n) / 2;       // OutIn
+}
+function ease(type, p) {
+    if (p <= 0) return 0;
+    if (p >= 1) return 1;
+    if (type >= 1 && type <= 16) return _pow((type - 1) % 4, 2 + Math.floor((type - 1) / 4), p);
+    if (type === 17) return 1 - Math.cos(p * Math.PI / 2);
+    if (type === 18) return Math.sin(p * Math.PI / 2);
+    if (type === 19) return (1 - Math.cos(Math.PI * p)) / 2;
+    if (type === 20) return p < 0.5 ? Math.sin(Math.PI * p) / 2 : 1 - Math.sin(Math.PI * p) / 2;
+    return p;
+}
+// An Easing.BezierSpline list [c1x, c1y, c2x, c2y, ex, ey, ...] from (0, 0): y at x = p (x is monotonic per segment)
+function bezierSpline(pts, p) {
+    if (p <= 0) return 0;
+    if (p >= 1) return 1;
+    let x0 = 0, y0 = 0;
+    for (let i = 0; i + 5 < pts.length; i += 6) {
+        const x3 = pts[i + 4], y3 = pts[i + 5];
+        if (p <= x3 || i + 11 >= pts.length) {
+            const x1 = pts[i], y1 = pts[i + 1], x2 = pts[i + 2], y2 = pts[i + 3];
+            const bx = u => { const v = 1 - u; return v * v * v * x0 + 3 * v * v * u * x1 + 3 * v * u * u * x2 + u * u * u * x3; };
+            let lo = 0, hi = 1;
+            for (let k = 0; k < 24; k++) {
+                const mid = (lo + hi) / 2;
+                if (bx(mid) < p) lo = mid; else hi = mid;
+            }
+            const u = (lo + hi) / 2, v = 1 - u;
+            return v * v * v * y0 + 3 * v * v * u * y1 + 3 * v * u * u * y2 + u * u * u * y3;
+        }
+        x0 = x3;
+        y0 = y3;
+    }
+    return p;
+}

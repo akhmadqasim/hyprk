@@ -343,10 +343,16 @@ Item {
         property bool dragging: false
         Spring { id: shownValue; target: sm.value; response: Theme.anim.sliderJumpResponse }
         readonly property real shown: dragging || A11y.reduceMotion ? sm.value : shownValue.value
-        property real over: 0                    // stretch past an end in pt (< 0 = the left end)
-        Behavior on over {
-            enabled: !trackMa.pressed && !A11y.reduceMotion
-            NumberAnimation { duration: Theme.cc.overdragBackMs; easing.type: Easing.OutCubic }
+        // stretch past an end in pt (< 0 = the left end): `pull` while dragging, eased back on release, one value
+        // per frame of the window (HyprK FrameEase)
+        property real pull: 0
+        readonly property real over: overEase.value
+        FrameEase {
+            id: overEase
+            goal: sm.pull
+            animate: !trackMa.pressed && !A11y.reduceMotion
+            duration: Theme.cc.overdragBackMs
+            ease: Easing.OutCubic
         }
 
         width: cc.width
@@ -407,8 +413,8 @@ Item {
             Item {
                 id: knob
                 visible: hover.hovered || trackMa.pressed
-                property real lift: trackMa.pressed ? 1 : 0
-                Behavior on lift { NumberAnimation { duration: Theme.cc.lensMs } }
+                readonly property real lift: liftEase.value
+                FrameEase { id: liftEase; goal: trackMa.pressed ? 1 : 0; duration: Theme.cc.lensMs }
                 // Knob and lens share one centre, the fill end, kept half a knob inside the track ends (the Mac's drag
                 // frame: lens 23.5 pt centred on the fill end; its overdrag frame: lens centre 8 pt before the track
                 // end, cc-sound-slider-rest-hover-drag-overdrag-dark-grey127.png). The lens grows around that centre.
@@ -474,12 +480,12 @@ Item {
                 function update(mx) {
                     const v = (mx - grab) / track.width, c = Math.max(0, Math.min(1, v));
                     const past = (v - c) * track.width;
-                    sm.over = Math.sign(past) * Theme.cc.overdrag * (1 - Math.exp(-Math.abs(past) / 30));
+                    sm.pull = Math.sign(past) * Theme.cc.overdrag * (1 - Math.exp(-Math.abs(past) / 30));
                     sm.moved(c);
                 }
                 onPressedChanged: {
                     if (!pressed) {
-                        sm.over = 0;
+                        sm.pull = 0;
                         if (sm.dragging) shownValue.snap();   // a click keeps springing to its point
                         sm.dragging = false;
                     }

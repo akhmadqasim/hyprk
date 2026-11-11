@@ -331,8 +331,8 @@ ShellWindow {
         y: -(A11y.reduceMotion ? 0 : 1 - mc.bar) * mc.m.barHeight
         opacity: mc.bar
         readonly property bool expanded: barHover.hovered && mc.shown
-        property real grow: expanded ? 1 : 0
-        Behavior on grow { NumberAnimation { duration: Theme.ms(mc.m.expandMs); easing.type: Easing.OutCubic } }
+        readonly property real grow: growEase.value
+        FrameEase { id: growEase; goal: spacesBar.expanded ? 1 : 0; duration: Theme.ms(mc.m.expandMs); ease: Easing.OutCubic }
         HoverHandler { id: barHover }
 
         // the band: blurred wallpaper through the tint, a darker line under it and its shadow on the wallpaper
@@ -427,8 +427,8 @@ ShellWindow {
                         color: Theme.glass.solid
                         border.width: sp.current ? Theme.mission.hoverBorder : 0
                         border.color: Theme.mission.text
-                        scale: spm.containsMouse ? Theme.mission.hoverScale : 1
-                        Behavior on scale { NumberAnimation { duration: Theme.anim.fast } }
+                        scale: hoverEase.value
+                        FrameEase { id: hoverEase; goal: spm.containsMouse ? Theme.mission.hoverScale : 1; duration: Theme.anim.fast }
                         Image {
                             anchors.fill: parent
                             source: Wallpaper.url

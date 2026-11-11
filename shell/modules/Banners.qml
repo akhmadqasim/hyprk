@@ -120,12 +120,12 @@ ShellWindow {
 
             // 0 off to the right .. 1 in place; Reduce motion: a fade only
             property real enter: 0
-            SpringCurve { id: enterAnim; target: row; property: "enter"; spring: NcLib.bannerInSpring }
+            SpringCurve { id: enterAnim; target: row; property: "enter"; spring: NcLib.bannerInSpring; settlesGlass: true }
             // 0 in place .. 1 gone to the right (cut at 0.15 s, where the Mac's banner is gone)
             property real leave: 0
             SpringCurve {
                 id: leaveAnim
-                target: row; property: "leave"; spring: NcLib.bannerOutSpring; cutAt: NcLib.bannerOutCut
+                target: row; property: "leave"; spring: NcLib.bannerOutSpring; cutAt: NcLib.bannerOutCut; settlesGlass: true
                 onFinished: { stacks.remove(row.index); win.settleGlass(); }
             }
             readonly property real offset: Theme.travel((1 - enter) * NcLib.bannerInTravel + leave * NcLib.bannerOutTravel)
@@ -172,7 +172,7 @@ ShellWindow {
 
                 // a newer notification of the same app replaces the text: quick refocus
                 onNidChanged: { refocus.restart(); row.armed = false; row.armed = true; }   // and a fresh timeout
-                NumberAnimation { id: refocus; target: card; property: "contentOpacity"; from: 0.25; to: 1; duration: 260; easing.type: Easing.OutCubic }
+                FrameAnim { id: refocus; target: card; property: "contentOpacity"; from: 0.25; to: 1; duration: 260; ease: Easing.OutCubic }
             }
 
             Timer {

@@ -43,7 +43,7 @@ Item {
     // 1 while shown, then down to 0 on close: glass materialize and content opacity
     property real fade: 0
     visible: shown || fade > 0
-    NumberAnimation { id: fadeOut; target: root; property: "fade"; to: 0; duration: Theme.anim.menuFadeOut; easing.type: Easing.OutQuad }
+    FrameAnim { id: fadeOut; target: root; property: "fade"; to: 0; duration: Theme.anim.menuFadeOut; ease: Easing.OutQuad }
     Component.onCompleted: { latchItems(); if (shown) fade = 1; }
 
     // ---------- columns ----------
@@ -179,16 +179,16 @@ Item {
         pendingAction = action;
         blink.start();
     }
-    // one animation on the render clock, so the blink lasts whole frames whatever the click's phase (two Timers
-    // gave 3 to 5 frames per half, mcap); the pauses end between frames: off 4 frames, on 3
-    SequentialAnimation {
+    // counted in frames of this window (HyprK FrameAnim used as a pause: 58 ms ends with the 4th frame, 42 ms with
+    // the 3rd), so the blink is off 4 frames and on 3 whatever the click's phase (two Timers gave 3 to 5 frames per
+    // half, and a SequentialAnimation on Qt's 16 ms timer 4 / 3 in 5 of 8 runs, mcap)
+    QtObject {
         id: blink
-        PropertyAction { target: root; property: "blinkOff"; value: true }
-        PauseAnimation { duration: Theme.menu.blinkOff }
-        PropertyAction { target: root; property: "blinkOff"; value: false }
-        PauseAnimation { duration: Theme.menu.blinkOn }
-        ScriptAction { script: { root.activating = false; root.trigger(root.pendingAction); } }
+        function start(): void { stop(); root.blinkOff = true; blinkOffWait.start(); }
+        function stop(): void { blinkOffWait.stop(); blinkOnWait.stop(); }
     }
+    FrameAnim { id: blinkOffWait; to: 1; from: 0; duration: Theme.menu.blinkOff; onFinished: { root.blinkOff = false; blinkOnWait.start(); } }
+    FrameAnim { id: blinkOnWait; to: 1; from: 0; duration: Theme.menu.blinkOn; onFinished: { root.activating = false; root.trigger(root.pendingAction); } }
 
     Glass {
         anchors.fill: parent

@@ -61,12 +61,16 @@ PanelWindow {
     function settleGlass(tail) {
         if (!Theme.compositorGlass || !visible || glassRegions.length === 0) return;
         settle.until = Math.max(settle.until, Date.now() + (tail === undefined ? Theme.anim.normal + 80 : tail));
-        settle.running = true;
+        if (!settle.running) settle.start();
     }
-    FrameAnimation {
+    // on this window's frames (HyprK FrameClock), not a FrameAnimation: starting any Qt animation makes the render
+    // loop draw every window once more at once, which put a second buffer into the first frame of a motion
+    FrameClock {
         id: settle
         property double until: 0
-        onTriggered: { win.glassMoved(); if (Date.now() >= until) { stop(); until = 0; } }
+        watchdog: true
+        onTick: { win.glassMoved(); if (Date.now() >= until) { stop(); until = 0; } }
+        onStalled: { stop(); until = 0; }
     }
     onVisibleChanged: settleGlass()
     Connections {
@@ -80,14 +84,14 @@ PanelWindow {
         target: Notifs
         function onBannersChanged() { win.settleGlass(); }
     }
-    // a glass-moving Spring (settlesGlass) stepped somewhere: if it is in this window, keep the glass
-    // re-measuring for two frames past its last step
+    // a glass-moving Spring, SpringCurve or FrameAnim (settlesGlass) stepped somewhere: if it is in this window,
+    // re-measure the glass now (they step inside the frame that draws the value) and for two frames past the last step
     Connections {
         target: Tokens
         function onGlassStepped(spring) {
             if (!win.visible || !Theme.compositorGlass || win.glassRegions.length === 0) return;
             for (let p = spring; p; p = p.parent)
-                if (p === win.contentItem) { win.settleGlass(50); return; }
+                if (p === win.contentItem) { win.glassMoved(); win.settleGlass(50); return; }
         }
     }
 

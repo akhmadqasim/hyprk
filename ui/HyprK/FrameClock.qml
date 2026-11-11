@@ -1,0 +1,116 @@
+import QtQuick
+
+// One tick per frame of the window this item sits in, with the time since the first tick in whole frames.
+//
+// Why not FrameAnimation or a NumberAnimation: with more than one window exposed (the shell always has several) Qt's
+// threaded render loop advances all animations from a GUI-thread timer of int(1000 / 60) = 16 ms, not from the
+// window's frames (qsgthreadedrenderloop.cpp startOrStopAnimationTimer, Qt 6.10.2). Ticks 16.0 ms apart against
+// frames 16.7 ms apart drift: a tick's value reaches the screen 8 to 24 ms later, and about every 0.4 s two ticks fall
+// between two frames, so one value is never drawn (the "lost frame" of mcap's unlock, peek and Mission Control rows).
+// QQuickWindow.afterAnimating is emitted on the GUI thread right before each frame of this window is built, so a value
+// set there is drawn exactly once, and frame k is on screen k refresh intervals after frame 0. `elapsed` counts
+// those intervals (k * 16.7 ms at 60 Hz) and skips the ones the window missed (frameSwapped more than one interval apart).
+// Nothing runs while `running` is false.
+// `watchdog`: a window that draws no frame (unmapped, on a sleeping output) would hold a motion for ever; with it,
+// stalled() is emitted when no tick came for one to two `stallMs`, and the owner jumps to its end. The timer only
+// runs with the clock.
+Item {
+    id: fc
+    visible: false
+    width: 0
+    height: 0
+    property bool running: false
+    property real elapsed: 0           // ms since the first tick's frame, a multiple of `interval`
+    readonly property real interval: 1000 / (Screen.refreshRate > 0 ? Screen.refreshRate : 60)
+    signal tick()
+    property bool watchdog: false
+    property int stallMs: 300
+    signal stalled()
+
+    property int frame: 0              // frames since the first tick's
+    property int ticks: 0
+    property bool ticked: false
+    property double swapped: 0         // when this window last showed a frame
+    property int swaps: 0
+    property int built: 0              // frames of this window built since start()
+    property bool flushOnSwap: false
+    readonly property var win: Window.window
+    // A window shown less than 150 ms ago (or not yet): the compositor presents a new layer surface from about its
+    // third buffer, so the first `freshHold` frames built are never seen. They do not tick: the motion starts with
+    // the first frame that reaches the screen (Control Center open, mcap: hold 0 shows .02 .02 .17, hold 1 a lost or
+    // repeated value in 3 of 6 opens, hold 2 the same series .06 .17 .31 .45 in 7 of 8).
+    property double shownAt: 0
+    property bool fresh: false
+    property int tick0: 0
+    property int freshHold: 2
+    Connections {
+        target: fc.win
+        function onVisibleChanged() { if (fc.win.visible) fc.shownAt = Date.now(); }
+    }
+    function flush(): void {
+        flushOnSwap = false;
+        const root = Window.contentItem;
+        if (root) for (const c of root.children) c.ensurePolished();
+    }
+    function start(): void {
+        fresh = !win || !win.visible || Date.now() - shownAt < 150;
+        tick0 = ticks;
+        ticked = false;
+        swapped = 0;
+        swaps = 0;
+        built = 0;
+        flushOnSwap = false;
+        frame = 0;
+        elapsed = 0;
+        running = true;
+        if (win) win.update();
+    }
+    function stop(): void { running = false; }
+    onWinChanged: {
+        shownAt = Date.now();
+        if (running && win) win.update();
+    }
+
+    Connections {
+        target: fc.win
+        enabled: fc.running || fc.flushOnSwap
+        function onAfterAnimating() {
+            if (!fc.running) return;
+            fc.ticks++;
+            fc.built++;
+            if (fc.fresh && fc.ticks - fc.tick0 <= fc.freshHold) { fc.win.update(); return; }
+            if (fc.ticked) fc.frame++;
+            fc.ticked = true;
+            fc.elapsed = fc.frame * fc.interval;
+            fc.tick();
+            // What the tick changed outside the scene (Quickshell sends a window's blur region and input mask to
+            // the surface from its content item's polish, on this thread) has to ride on this frame's commit.
+            // Qt polishes before afterAnimating, so left alone it would go one frame late: polish now. But not
+            // while the frame before this one is still on its way to the compositor (after idle Qt builds two
+            // frames back to back, and from then on a frame is built while the one before waits for its frame
+            // callback): then it would ride on that one, so it is sent when that frame has been swapped.
+            if (fc.built - 1 - fc.swaps <= 0) fc.flush();
+            else fc.flushOnSwap = true;
+            if (fc.running) fc.win.update();
+        }
+        // a frame shown two or more intervals after the one before it: the frames in between were never built (a
+        // busy GUI or render thread), so the count moves on with the screen. The first gap after idle does not count.
+        function onFrameSwapped() {
+            const now = Date.now();
+            if (++fc.swaps > 2) fc.frame += Math.max(0, Math.round((now - fc.swapped) / fc.interval) - 1);
+            fc.swapped = now;
+            if (fc.flushOnSwap && fc.built - 1 - fc.swaps <= 0) fc.flush();
+        }
+    }
+    Timer {
+        property int seen: -1
+        interval: fc.stallMs
+        repeat: true
+        running: fc.running && fc.watchdog
+        onRunningChanged: seen = -1
+        onTriggered: {
+            if (fc.ticks === seen && fc.running) fc.stalled();
+            seen = fc.ticks;
+        }
+    }
+}

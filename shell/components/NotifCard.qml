@@ -258,15 +258,15 @@ Item {
             else back.start();
         }
     }
-    NumberAnimation {
+    FrameAnim {
         id: away
         target: slide; property: "x"; to: card.width + 60
-        duration: Theme.anim.close; easing.type: Easing.OutCubic
+        duration: Theme.anim.close; ease: Easing.OutCubic
         onFinished: card.swiped()
     }
-    NumberAnimation {
+    FrameAnim {
         id: back
         target: slide; property: "x"; to: 0
-        duration: 450; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.spring
+        duration: 450; curve: Theme.anim.spring
     }
 }

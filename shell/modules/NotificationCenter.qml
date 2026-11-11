@@ -83,13 +83,14 @@ Item {
     readonly property real slideX: Theme.travel((1 - slide) * NcLib.panelTravel)
     // open and close (lib/nc.js): one critically damped spring, response 0.3 s, over the 376 pt column frame; only
     // the x offset moves (no fade, scale, blur or stagger; the glass is there from the first frame). The close stops
-    // 0.375 s in (the spring at 99.7 %) and the window goes, as on the Mac. Exact spring on one NumberAnimation
-    // (components/SpringCurve.qml); no per-frame script but the glass settle.
+    // 0.375 s in (the spring at 99.7 %) and the window goes, as on the Mac. The exact spring, one value per frame of
+    // the window (components/SpringCurve.qml), the glass re-measured with each.
     SpringCurve {
         id: slideAnim
         target: nc
         property: "slide"
         spring: NcLib.panelSpring
+        settlesGlass: true
         onRunningChanged: if (running) nc.settle()
     }
     Connections {
@@ -247,11 +248,14 @@ Item {
                             slotAnim.go(1);
                             arrive.start();
                         }
-                        SequentialAnimation {
+                        // counted in frames of the panel's window (HyprK FrameAnim, the first as a pause)
+                        FrameAnim {
                             id: arrive
-                            PauseAnimation { duration: Theme.ms(NcLib.arriveDelayMs) }
-                            NumberAnimation { target: grp; property: "shade"; to: 1; duration: Theme.ms(NcLib.arriveFadeMs) }
+                            from: 0; to: 1; duration: Theme.ms(NcLib.arriveDelayMs)
+                            onFinished: arriveFade.start()
+                            function halt(): void { stop(); arriveFade.stop(); }
                         }
+                        FrameAnim { id: arriveFade; target: grp; property: "shade"; to: 1; duration: Theme.ms(NcLib.arriveFadeMs) }
                         readonly property real liveHeight: closedHeight + (openHeight - closedHeight) * ex
                         Layout.fillWidth: true
                         // whole points: the layout rounds sizes up, so a group 0.06 pt tall still took 1 pt and the list
@@ -271,14 +275,14 @@ Item {
                         function clearAll() {
                             if (closing) return;
                             closing = true;
-                            arrive.stop();
+                            arrive.halt();
                             clearing = items.map(x => x.nid);       // only what is on screen now
                             vanish.start();
                         }
-                        SequentialAnimation {
+                        FrameAnim {
                             id: vanish
-                            NumberAnimation { target: grp; property: "shade"; to: 0; duration: Theme.ms(NcLib.clearFadeMs) }
-                            ScriptAction { script: grp.closeUp() }
+                            target: grp; property: "shade"; to: 0; duration: Theme.ms(NcLib.clearFadeMs)
+                            onFinished: grp.closeUp()
                         }
                         // removed once the spring has landed on 0: a timer of the spring's length fired a frame early, with
                         // the group still 0.06 pt tall, which the layout rounded up to 1 pt (a 1 pt jump at the end, mcap)

@@ -86,7 +86,6 @@ ShellWindow {
         }
         fsAnim.to = to;
         fsAnim.duration = Theme.ms(ms);
-        fsAnim.easing.type = linear ? Easing.Linear : Easing.BezierSpline;
         fsAnim.start();
     }
     property bool peeked: false   // shown on the strip at least once in this full screen (white titles from then on)
@@ -99,7 +98,7 @@ ShellWindow {
         if (peeking) peeked = true;
         fade(peeking ? 1 : 0, peeking ? Theme.anim.menuBarPeekIn : Theme.anim.menuBarPeekOut, true);
     }
-    NumberAnimation { id: fsAnim; target: bar; property: "fsAlpha"; easing.type: Easing.BezierSpline; easing.bezierCurve: [0.42, 0, 0.58, 1, 1, 1] }
+    FrameAnim { id: fsAnim; target: bar; property: "fsAlpha"; curve: [0.42, 0, 0.58, 1, 1, 1] }
     Binding { target: bar.contentItem; property: "opacity"; value: bar.fsAlpha }
     // on Overlay for the whole full screen, taking input in its top 1 pt row until it shows: layer and input region
     // are sent with a frame, and nothing is drawn once it has faded out (whether there is a strip is known later)

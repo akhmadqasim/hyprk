@@ -55,6 +55,7 @@ Item {
 
     function _kick() {
         if (fa.running) return;
+        fa.last = 0;
         fa.start();
         started();
         _step(1 / 60);
@@ -73,9 +74,18 @@ Item {
     onInstantChanged: if (instant) snap()
     onValueChanged: if (settlesGlass && moving) Tokens.glassStepped(s)
 
-    FrameAnimation {
+    // one step per frame of the window this spring sits in (FrameClock: a FrameAnimation is ticked by Qt's 16 ms
+    // timer while several windows are exposed, and loses a value about every 0.4 s). The frame of the kick was
+    // already stepped; a frame the window missed is stepped over with the next one.
+    FrameClock {
         id: fa
-        // frameTime is 0 on the first tick after start; that frame was already stepped by the kick
-        onTriggered: if (frameTime > 0) s._step(frameTime)
+        property int last: 0
+        watchdog: true
+        onTick: {
+            const n = frame - last;
+            last = frame;
+            if (n > 0) s._step(n * interval / 1000);
+        }
+        onStalled: s.snap()
     }
 }

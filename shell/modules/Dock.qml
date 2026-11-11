@@ -111,16 +111,30 @@ ShellWindow {
     // Launch: 0.70 s parabolic hops, (R - 8) * 0.2 + 6 pt high; attention (an urgent window): the 2 s cycle of
     // three hops, R + 1 pt high, R = the tile rect (lib/dock.js, from Dock.app's -[Tile updateBouncing]), the
     // offset drawn in whole points like the Dock (PC #67 A1). The heights are read
-    // from the wall clock every frame while something bounces; the clock is off otherwise, and between attention
-    // bursts a timer wakes it.
+    // from a clock that moves one refresh interval per frame of the Dock's window while something bounces (HyprK
+    // FrameClock; a FrameAnimation is ticked by Qt's 16 ms timer and loses a value about every 0.4 s); the clock is off
+    // otherwise, and between attention bursts a timer wakes it.
     readonly property real bounceHeight: DockLayout.bounceHeight(tile)
     readonly property real attentionHeight: DockLayout.attentionHeight(tile)
     property real now: Date.now()
-    FrameAnimation {
+    FrameClock {
         id: clock
-        running: !A11y.reduceMotion && Apps.anyBouncing(dock.now)
-        onRunningChanged: if (running) dock.now = Date.now()
-        onTriggered: dock.now = Date.now()
+        property double t0: 0
+        readonly property bool wanted: !A11y.reduceMotion && Apps.anyBouncing(dock.now)
+        function follow(): void {
+            if (wanted === running) return;
+            if (!wanted) { stop(); return; }
+            t0 = Date.now();
+            dock.now = t0;
+            start();
+        }
+        // later: follow() moves dock.now, which `wanted` hangs on
+        onWantedChanged: Qt.callLater(follow)
+        Component.onCompleted: follow()
+        watchdog: true
+        onTick: dock.now = t0 + elapsed
+        // no frames (the Dock is off screen): keep the time moving so the bounce ends
+        onStalled: { t0 = Date.now() - elapsed; dock.now = Date.now(); }
     }
     readonly property real wakeAt: A11y.reduceMotion ? 0 : Apps.nextAttention(dock.now)
     Timer {
@@ -178,12 +192,13 @@ ShellWindow {
     readonly property bool shown: !fullscreen && (!autohide || revealed || (Panels.open === "context" && Panels.contextAbove && Panels.activeScreen === dock.screen))
     // 0 = hidden below the screen edge, 1 = in place; it also slides in when the shell starts
     property real slide: 0
-    NumberAnimation {
+    // every Dock motion below takes one value per frame of its window (HyprK FrameAnim)
+    FrameAnim {
         id: slideAnim
         target: dock
         property: "slide"
-        easing.type: Easing.InOutSine
-        onRunningChanged: if (running) dock.settleGlass(duration + 80)
+        ease: Easing.InOutSine
+        settlesGlass: true
     }
     function slideTo(v, ms) {
         slideAnim.stop();
@@ -251,7 +266,7 @@ ShellWindow {
     property real focusX: 0
     readonly property real fishTarget: magnification && pointerIn && shown && Panels.open !== "context" ? 1 : 0
     property real fish: 0
-    NumberAnimation { id: fishAnim; target: dock; property: "fish"; easing.type: Easing.InOutSine }
+    FrameAnim { id: fishAnim; target: dock; property: "fish"; ease: Easing.InOutSine }
     onFishTargetChanged: {
         fishAnim.stop();
         fishAnim.to = fishTarget;
@@ -268,8 +283,7 @@ ShellWindow {
     // (-[DockBar blendAwayLabel], reconciliation-42.json: cosine T 0.29 s). One label at a time: `tipItem`.
     property Item tipItem: null
     property real tipAlpha: 0
-    NumberAnimation { id: tipFade; target: dock; property: "tipAlpha"; to: 0; easing.type: Easing.InOutSine
-                      duration: Theme.ms(dock.autohide ? Theme.anim.dockSlide : 300) }
+    // (tipFade sits in the label's window below: it is that window's frames that show it)
     function tipShow(c) { tipFade.stop(); tipItem = c; tipAlpha = 1; }
     function tipHide(c) { if (tipItem === c) tipFade.restart(); }
 
@@ -294,11 +308,7 @@ ShellWindow {
     property real dragFade: 1
     readonly property bool removeShown: dragRemove && dragCell !== null
     Timer { id: removeDelay; interval: Theme.ms(250); onTriggered: dock.dragRemove = dock.dragOut }
-    NumberAnimation {
-        id: dropFade
-        target: dock; property: "dragFade"; from: 1; to: 0; duration: Theme.ms(250)
-        onFinished: dock.endDrag()
-    }
+    // (dropFade sits in the label's window below, which draws the icon and the bubble)
     function dragMove(c, x, y) {
         dragPos = Qt.point(x, y);
         const out = x < bg.x || x > bg.x + bg.width || y < bg.y || y > bg.y + bg.height;
@@ -390,9 +400,9 @@ ShellWindow {
 
                 // slot width 0..1: grows in when added after the first fill, shrinks out when removed, then goes
                 property real grow: 1
-                NumberAnimation {
+                FrameAnim {
                     id: slotAnim
-                    target: cell; property: "grow"; easing.type: Easing.InOutSine
+                    target: cell; property: "grow"; ease: Easing.InOutSine
                     onFinished: if (cell.leaving) dock.dropSlot(cell.key)
                 }
                 function slide(to) {
@@ -616,9 +626,19 @@ ShellWindow {
         implicitHeight: dock.dragCell !== null && dock.screen ? dock.screen.height : dock.implicitHeight
         readonly property real off: height - dock.height     // the Dock window's top in this one
         exclusionMode: ExclusionMode.Ignore
-        namespace: "hyprk-dock"   // the Dock's recipe and layer rules
+        // Apple's label glass from the plugin (Regular recipe at this size, plugin bbd615a; dark over black / grey /
+        // white 32 / 131 / 180, Mac 31 / 131 / 180), no fill of ours on top; the Dock's layer rules (config 9c2ca30)
+        namespace: "hyprk-dock-label"
         WlrLayershell.layer: WlrLayer.Top
         acceptsInput: false
+
+    FrameAnim { id: tipFade; target: dock; property: "tipAlpha"; to: 0; ease: Easing.InOutSine
+                duration: Theme.ms(dock.autohide ? Theme.anim.dockSlide : 300) }
+    FrameAnim {
+        id: dropFade
+        target: dock; property: "dragFade"; from: 1; to: 0; duration: Theme.ms(250)
+        onFinished: dock.endDrag()
+    }
 
     Glass {
         id: label
@@ -636,16 +656,6 @@ ShellWindow {
         pluginLift: "transparent"
         shadow: false
         materialize: dock.tipAlpha
-        ShaderEffect {
-            anchors.fill: parent
-            visible: Theme.compositorGlass && !Theme.solidMaterial
-            opacity: dock.tipAlpha
-            property vector4d fill: Theme.dock.labelFill
-            property size sizePt: Qt.size(width, height)
-            property real radius: 13
-            property real dpr: dock.dpr
-            fragmentShader: Qt.resolvedUrl("../shaders/plusfill.frag.qsb")
-        }
         Text {
             id: labelText
             anchors.centerIn: parent
@@ -703,16 +713,6 @@ ShellWindow {
         pluginLift: "transparent"
         shadow: false
         materialize: dock.dragFade
-        ShaderEffect {
-            anchors.fill: parent
-            visible: Theme.compositorGlass && !Theme.solidMaterial
-            opacity: dock.dragFade
-            property vector4d fill: Theme.dock.labelFill
-            property size sizePt: Qt.size(width, height)
-            property real radius: 13
-            property real dpr: dock.dpr
-            fragmentShader: Qt.resolvedUrl("../shaders/plusfill.frag.qsb")
-        }
         Text {
             id: removeText
             anchors.centerIn: parent
