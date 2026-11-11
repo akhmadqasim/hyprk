@@ -172,12 +172,7 @@ QtObject {
     // #2E2F33 on #1E1F24 (PC #60 section 5, appearance-scroll-010-*.png; was #DEDEDE / #34353A from Q-settings-04)
     readonly property color toolbarTitle: theme.dark ? "#E8E8E9" : "#4C4C4C"
     readonly property color scrollEdge: theme.dark ? "#2E2F33" : "#E5E5E5"
-    // content under the 52 pt toolbar strip fades into the window background (scroll edge effect). The Mac also
-    // blurs it; drawn here as a window-background veil, a.9 at the top to a.75 at the hairline. The Mac's strip lets
-    // more through (appearance-scroll-250-*.png: photo colours lightened, light ~#B5B9AF, dark ~#3B3F3C), but its blur
-    // keeps text under the title unreadable; without a blur a thinner veil lets rows clash with the title.
-    readonly property real scrollEdgeFadeTop: 0.9
-    readonly property real scrollEdgeFadeBottom: 0.75
+    // content under the 52 pt toolbar strip: HyprK ScrollEdge (AppKit's scroll pocket, blurred and veiled)
     readonly property color label: theme.dark ? Qt.rgba(1, 1, 1, 0.85) : Qt.rgba(0, 0, 0, 0.85)
     readonly property color secondaryLabel: theme.increaseContrast ? (theme.dark ? Qt.rgba(1, 1, 1, 0.75) : Qt.rgba(0, 0, 0, 0.7))
         : theme.dark ? Qt.rgba(1, 1, 1, 0.55) : Qt.rgba(0, 0, 0, 0.51) // ref #7D7C7B

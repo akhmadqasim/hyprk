@@ -234,14 +234,13 @@ Item {
             onSourceChanged: { scroller._silent = true; flick.contentY = 0; scroller._silent = false; scroller.hide(); }
         }
     }
-    Rectangle { // the toolbar strip over scrolled content (scroll edge effect; no blur, see Theme.scrollEdgeFade*)
-        visible: flick.contentY > 0
+    ScrollEdge { // the toolbar strip over scrolled content: AppKit's scroll pocket (HyprK ScrollEdge)
+        active: flick.contentY > 0
+        source: flick
         x: flick.x; width: flick.width; height: Theme.window.toolbarHeight
-        topRightRadius: Theme.window.radius
-        gradient: Gradient {
-            GradientStop { position: 0; color: Qt.alpha(Theme.windowBg, Theme.scrollEdgeFadeTop) }
-            GradientStop { position: 1; color: Qt.alpha(Theme.windowBg, Theme.scrollEdgeFadeBottom) }
-        }
+        dark: Theme.dark
+        windowColor: Theme.windowBg
+        cornerRadius: Theme.window.radius
     }
     OverlayScrollbar {
         id: scroller
