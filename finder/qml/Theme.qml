@@ -105,8 +105,11 @@ QtObject {
 
         readonly property color window: Tokens.windowBackground
         // sidebar (Q-finder-03/07/08/09): fill, text, headers, icons; a = key window, i = inactive
-        // key window: + the chameleon layer (10 % dark / 5 % light colour blend); the inactive sidebar is flat
-        readonly property color sidebarSolid: theme.chameleonOf(theme.dark ? "#242637" : theme.active ? "#EDEDEE" : "#F2F2F3")
+        // key window: + the chameleon layer (5 % light colour blend); the inactive sidebar is flat. Dark: the measured
+        // (36,38,55) already holds the wallpaper's tint: over TahoeDark the Mac shows (36,37,53) active (list-dark.png)
+        // and (36,38,55) / (36,38,54) active / inactive (crops/sidebar-top-dark-*), while the 10 % layer on top made it
+        // (36,37,62); so dark takes the measured colour as it is
+        readonly property color sidebarSolid: theme.dark ? "#242637" : theme.chameleonOf(theme.active ? "#EDEDEE" : "#F2F2F3")
         // over compositor blur: the sidebar glass fill colour (LIVE-27.2.1.md Sidebar, glass-table-dark.txt)
         readonly property color sidebarGlass: theme.chameleonOf(theme.dark ? Qt.rgba(0.15, 0.15, 0.15, 0.75) : Qt.rgba(0.87, 0.88, 0.91, 0.7))
         readonly property color sidebarSelection: theme.dark ? (theme.active ? "#414354" : "#323443")
