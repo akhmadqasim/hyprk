@@ -39,6 +39,9 @@ ShellWindow {
         // 0.285 / 0.220 with 0.25: the screen runs about 1.37x slower than the code value in both directions, so
         // 0.35 here (MOTION-MEASURED.md: enter rms 0.060 -> see there, exit likewise)
         readonly property var expose: SpringLib.fromResponse(0.35, 1)
+        // exit: 0.35 ran 2-98 % 301 ms (two windows at one place) / 400 ms (one window) against the Mac's 267; 0.31
+        // gives 250-283 / 351-367 ms (mcap, alpha vs the R2 exit series)
+        readonly property var exposeExit: SpringLib.fromResponse(0.31, 1)
         readonly property var barExit: SpringLib.fromResponse(0.125, 1)    // SpacesBarExitSpringResponse
         // collapsed Spaces bar: labelled pills, guessed (no 27.2.1 screenshot of it yet, Q-dock-31)
         readonly property int barHeight: 44
@@ -65,6 +68,7 @@ ShellWindow {
     property real bar: 0
     SpringCurve { id: barAnim; target: mc; property: "bar"; spring: mc.m.expose }
     function go() {
+        anim.spring = shown ? m.expose : m.exposeExit;
         anim.go(shown ? 1 : 0);
         barAnim.spring = shown ? m.expose : m.barExit;
         barAnim.go(shown ? 1 : 0);
@@ -368,8 +372,11 @@ ShellWindow {
                         Connections { target: mc; function onShownChanged() { if (mc.shown) view.captureFrame(); } }
                         // on exit the windows get their focus back and redraw active; one more still once they have,
                         // so the thumbnails land with the look of the real windows (the open's still was inactive:
-                        // traffic lights and sidebar changed in one frame when the layer went, a 3 % snap, mcap)
-                        Timer { running: !mc.shown && mc.e > 0; interval: 100; onTriggered: view.captureFrame() }
+                        // traffic lights and sidebar changed in one frame when the layer went, a 3 % snap, mcap).
+                        // Taken in the tail (5 % of the flight left, ~190 ms in): a capture holds qs's next frame, and
+                        // 100 ms in it repeated a frame mid-flight (0.61 0.61, mcap); in the tail the repeat is < 1 %
+                        readonly property bool tail: !mc.shown && mc.e > 0 && mc.e < 0.05
+                        onTailChanged: if (tail) view.captureFrame()
                         // fit the cell but never grow past Theme.mission.maxScale of the real window
                         readonly property real dpr: mc.screen ? mc.screen.devicePixelRatio : 1
                         readonly property real maxW: cell.width
