@@ -8,6 +8,9 @@ import Quickshell.Wayland
 WlSessionLockSurface {
     id: s
     color: "black"
+    // Lock waits one refresh interval after a surface's last frame before it releases the lock (Lock.checkReady)
+    Item { id: probe; readonly property var qw: Window.window }
+    Connections { target: probe.qw; function onFrameSwapped() { Lock.surfaceSwap = Date.now(); } }
 
     LockContent {
         anchors.fill: parent

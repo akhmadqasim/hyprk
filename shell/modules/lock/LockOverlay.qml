@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import qs.components
 import "lock.js" as L
 
 // Layer surface per screen for the two transitions the session lock cannot show itself (Hyprland
@@ -50,50 +51,32 @@ PanelWindow {
         caret: w.entering
     }
 
-    // `t` runs on the wall clock, read every frame: Qt's threaded render loop steps animations one vsync per frame,
-    // so a held frame delayed the rest of the track to the end (clock 95 % at +236 or later vs the Mac's +220, mcap).
-    // Now the frame after a held one shows the Mac's value for its time. "in": a frame is shown about `frameLead`
-    // after the GUI computes it; "out" (reveal) has no lead.
-    property double startedAt: 0
+    // `t` advances one refresh interval per frame of this window (FrameClock): frame k after the start shows the
+    // Mac's value for k * 16.7 ms, so each region crosses where B1 / B3 say and no value is skipped. A FrameAnimation
+    // on the wall clock (before) ticked from Qt's 16 ms timer: its values reached the screen 8 to 24 ms late in two
+    // modes one frame apart and one was dropped in 3 of 4 unlocks (trace + mcap, MOTION-MEASURED session 10).
+    // "out": the first frame after the release is +0 (avatar, line and status items gone, every track at its +0
+    // value); the overlay holds the full lock picture until then, also through a GUI stall.
     property real from: 0
     property real to: 0
     property int duration: 1
     function run(a: real, b: real, ms: int): void {
         from = a; to = b; duration = Math.max(1, ms);
-        startedAt = Date.now();
         t = a;
         clock.start();
     }
-    FrameAnimation {
+    FrameClock {
         id: clock
-        onTriggered: {
-            if (w.anchor) {
-                w.anchor = false;
-                w.userGone = true;
-                w.startedAt = Date.now();
-                w.t = w.from;
-                return;
-            }
-            w.t = Math.min(w.to, w.from + (Date.now() - w.startedAt + w.lead) * (w.to - w.from) / w.duration);
+        onTick: {
+            if (!w.entering) w.userGone = true;
+            w.t = Math.min(w.to, w.from + elapsed * (w.to - w.from) / w.duration);
             if (w.t < w.to) return;
             stop();
-            if (w.entering) Lock.engage();
-            else Lock.finish();
+            // not from inside this window's own frame: both calls unload it
+            Qt.callLater(w.entering ? Lock.engage : Lock.finish);
         }
     }
-    // "out" starts on the first animation tick after the release, not at the release: that tick builds the +0 frame
-    // (avatar, line and status items gone, every track at 0) and later frames read the wall clock from it, so both
-    // are paced the same and no lead is added. The GUI thread can stall 100-160 ms right after the lock surfaces go
-    // (2 of 30 dark unlocks, mcap + trace): the old clock started at the release ran on through the stall and the
-    // first frame after it showed the track half done (3 frames between the lock picture and the desktop instead of
-    // 11). Now the overlay keeps the full lock picture during such a stall and the whole fade follows it.
-    property bool anchor: false
-    readonly property int lead: entering ? LockTheme.frameLead : 0
-    function reveal(): void {
-        from = 0; to = LockTheme.outEnd; duration = LockTheme.unlockOut;
-        anchor = true;
-        clock.start();
-    }
+    function reveal(): void { run(0, LockTheme.outEnd, LockTheme.unlockOut); }
     // Start the fade ("in") or tell Lock ("out") once a frame of this window is on screen. A frame swap after a scene sync that started after the request holds the full picture (render-thread
     // signals arrive queued).
     property int frameState: 0          // 0 idle, 1 waiting for a sync, 2 waiting for its swap

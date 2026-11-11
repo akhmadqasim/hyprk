@@ -123,6 +123,7 @@ Singleton {
         ready = 0;
         mapped = 0;
         released = false;
+        quiet.waited = false;
         phase = "out";
         outGuard.restart();
     }
@@ -139,8 +140,24 @@ Singleton {
     }
     function checkReady(): void {
         const n = Quickshell.screens.length;
-        if (ready >= n && mapped >= n) release();
+        if (ready < n || mapped < n) return;
+        // Not while a lock surface has a frame in flight: destroying its window waits for its render thread, and that
+        // thread waits up to 100 ms in swapBuffers for the frame callback of its previous frame
+        // (QWaylandGLContext::swapBuffers -> waitForFrameSync(100), Qt 6.10.2), which never comes once the lock is
+        // gone: the GUI thread then stood still 106-163 ms right at the release (2-5 of 40 unlocks, trace). One
+        // refresh interval after a surface's last frame its callback has arrived. Waits once.
+        const wait = surfaceQuiet - (Date.now() - surfaceSwap);
+        if (wait > 0 && !quiet.waited) {
+            quiet.waited = true;
+            quiet.interval = wait;
+            quiet.restart();
+            return;
+        }
+        release();
     }
+    property double surfaceSwap: 0         // when a lock surface last showed a frame (LockSurface)
+    readonly property int surfaceQuiet: 20 // ms: one 60 Hz interval and a margin
+    Timer { id: quiet; property bool waited: false; onTriggered: root.checkReady() }
     function release(): void {
         if (phase !== "out" || released) return;
         outGuard.stop();

@@ -136,8 +136,8 @@ Singleton {
 
     // ---------- motion (B1, B2, B3) ----------
     // The Mac's per-frame tracks, [ms, progress] with ms from the first changed frame (light.mp4 lock-in, dark.mp4
-    // unlock; LOCKSCREEN-27.2.1.md B1 / B3 tables, verbatim). The overlays run one linear clock from -17 ms (the
-    // last unchanged frame) and read every layer from these (lock.js track()): the named fits (ease-in-out 100 ms,
+    // unlock; LOCKSCREEN-27.2.1.md B1 / B3 tables, verbatim). The overlays advance one refresh interval per frame from -17 ms (the
+    // last unchanged frame, components/FrameClock) and read every layer from these (lock.js track()): the named fits (ease-in-out 100 ms,
     // ease-out quad 250 ms from +7...) put the clock a frame early mid-curve and miss its 2-frame lead-in.
     // Opacity only, nothing moves.
     readonly property real trackStart: -17
@@ -179,9 +179,6 @@ Singleton {
         [333, 0.97]]
     readonly property int outEnd: 333
     readonly property int unlockOut: Theme.ms(outEnd)   // the overlay goes after this
-    // the overlays read the wall clock when Qt builds a frame; it is shown about this much later (mcap, 10 clean
-    // unlocks each: wall clock 7-9 ms behind the animation driver's frame time, which matched the Mac's tracks)
-    readonly property int frameLead: 8
     // wrong password: lock.js shake() on a linear 400 ms clock (7.5 Hz, 14 / 8.25 / 6.75 pt)
     readonly property int shakeMs: 400
 }
