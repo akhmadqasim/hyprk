@@ -418,7 +418,9 @@ Column {
                     anchors.right: parent.right
                     spacing: 13
                     Repeater {
-                        model: [{ t: "Default", c: "#3C88F5" }, { t: "Dark", c: "#171717" }, { t: "Clear", c: "#7D7D7D" }, { t: "Tinted", c: "#3478F1" }]
+                        // tile and sun colours: sampled on appearance-*.png (Display P3 numbers) and converted to sRGB
+                        // (reference/ours/COLOUR-P3-AUDIT.md: 60,136,245 -> 0,138,253; 249,196,22 -> 255,193,0)
+                        model: [{ t: "Default", c: "#008AFD" }, { t: "Dark", c: "#171717" }, { t: "Clear", c: "#7D7D7D" }, { t: "Tinted", c: "#007AF9" }]
                         Choice {
                             required property var modelData
                             w: 29; h: 29; r: 7; gap: 1.5   // AX 38 x 52 with the caption; tile 29, ring gap 1.5
@@ -437,7 +439,7 @@ Column {
                                 // centre (20, 12.5), cloud over the lower left; sampled sun #F9C416 / #EDB609 / #E0E1E1 / #96DEFF
                                 Rectangle {
                                     x: 14.5; y: 7; width: 11; height: 11; radius: 5.5
-                                    color: ({ Default: "#F9C416", Dark: "#EDB609", Clear: "#E0E1E1", Tinted: "#96DEFF" })[modelData.t]
+                                    color: ({ Default: "#FFC100", Dark: "#F7B300", Clear: "#E0E1E1", Tinted: "#7EE0FF" })[modelData.t]
                                 }
                                 Text {
                                     x: 2.5; y: 6; text: "cloud"; font.family: Theme.fontGlyph; font.pixelSize: 21
