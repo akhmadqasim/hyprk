@@ -430,7 +430,7 @@ ShellWindow {
                     height: width
                     radius: width / 2
                     color: Theme.spotlight.tokenFill
-                    Symbol { anchors.centerIn: parent; name: "doc"; size: 14; color: Theme.spotlight.text }
+                    Symbol { anchors.centerIn: parent; name: "doc.on.doc.fill"; size: 14; color: Theme.spotlight.text }
                     MouseArea { anchors.fill: parent; onClicked: { Quickshell.clipboardText = sp.calcText; Panels.close(); } }
                 }
             }
@@ -456,7 +456,13 @@ ShellWindow {
             Row {
                 anchors.centerIn: parent
                 spacing: 8
-                AppIcon { anchors.verticalCenter: parent.verticalCenter; width: 22; height: 22; size: 22; icon: "accessories-calculator"; appId: "org.gnome.Calculator" }
+                // Calculator in front of Finder, 10 pt apart, 16 pt bodies (panels/spotlight-calculator-*.png)
+                Item {
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 30; height: 20
+                    AppIcon { x: 10; width: 20; height: 20; size: 20; icon: "system-file-manager"; appId: "hyprk-finder" }
+                    AppIcon { width: 20; height: 20; size: 20; icon: "accessories-calculator"; appId: "org.gnome.Calculator" }
+                }
                 Text { anchors.verticalCenter: parent.verticalCenter; text: "Show Results"; font: Typography.font(13); color: Theme.spotlight.text }
             }
             MouseArea { anchors.fill: parent; onClicked: sp.showAll = true }
