@@ -59,20 +59,18 @@ Item {
     readonly property bool _dark: style === "dark"
     readonly property bool _clear: style === "clear"
     readonly property bool _tinted: style === "tinted"
-    readonly property var _unit: IconShape.squirclePoints(100).map(p => Qt.point(p[0], p[1]))
-    function _inset(d) {
-        const k = (100 - 2 * d) / 100;
-        return _unit.map(p => Qt.point(d + p.x * k, d + p.y * k));
-    }
 
-    Item {
+    // built only for icons that get a tile (most icons are trusted or already squircles and never draw one);
+    // the outlines are shared by every tile (IconShape.tilePoints)
+    Loader {
         id: tile
-        visible: root.tiled
+        active: root.tiled
         anchors.centerIn: parent
         width: root.size * root.body
         height: width
 
-        Shape {
+        // an Item the Loader sizes, with the 100 x 100 outline scaled inside it (a Loader resizes its item)
+        sourceComponent: Item { Shape {
             width: 100
             height: 100
             scale: tile.width / 100
@@ -83,12 +81,12 @@ Item {
             ShapePath {
                 strokeColor: "transparent"
                 fillColor: Qt.rgba(0, 0, 0, root._clear ? 0 : root._dark ? 0.22 : 0.07)
-                PathPolyline { path: root._unit.map(p => Qt.point(p.x, p.y + 2.2)) }
+                PathPolyline { path: IconShape.tilePoints(0, 2.2) }
             }
             ShapePath {
                 strokeColor: "transparent"
                 fillColor: Qt.rgba(0, 0, 0, root._clear ? 0 : root._dark ? 0.28 : 0.10)
-                PathPolyline { path: root._unit.map(p => Qt.point(p.x, p.y + 0.9)) }
+                PathPolyline { path: IconShape.tilePoints(0, 0.9) }
             }
             // edge: defines the tile against light backgrounds
             ShapePath {
@@ -96,7 +94,7 @@ Item {
                 fillColor: root._dark ? Qt.rgba(1, 1, 1, 0.14)
                          : root._clear ? Qt.rgba(1, 1, 1, 0.55) : Qt.rgba(0, 0, 0, 0.13)
                 fillRule: ShapePath.OddEvenFill       // rings, so translucent (clear) layers do not stack
-                PathMultiline { paths: [root._unit, root._inset(0.7)] }
+                PathMultiline { paths: [IconShape.tilePoints(0), IconShape.tilePoints(0.7)] }
             }
             // rim: bright at the top, darker at the bottom (the glass bevel / specular edge)
             ShapePath {
@@ -108,7 +106,7 @@ Item {
                     GradientStop { position: 1; color: root._dark ? "#2A2A2D" : root._clear ? Qt.rgba(1, 1, 1, 0.45) : "#CFCFD5" }
                 }
                 fillRule: ShapePath.OddEvenFill
-                PathMultiline { paths: [root._inset(0.7), root._inset(1.8)] }
+                PathMultiline { paths: [IconShape.tilePoints(0.7), IconShape.tilePoints(1.8)] }
             }
             // body: the system chiclet gradient (IconRendering Fills.systemLight/DarkGradient,
             // placed from 10% to 90% of the height; SPEC.md "App icons")
@@ -127,7 +125,7 @@ Item {
                              : root._tinted ? root.tint : "#F5F5F5"
                     }
                 }
-                PathPolyline { path: root._inset(1.8) }
+                PathPolyline { path: IconShape.tilePoints(1.8) }
             }
             // specular sheen on the upper half
             ShapePath {
@@ -137,9 +135,9 @@ Item {
                     GradientStop { position: 0; color: Qt.rgba(1, 1, 1, root._dark ? 0.10 : 0.55) }
                     GradientStop { position: 1; color: Qt.rgba(1, 1, 1, 0) }
                 }
-                PathPolyline { path: root._inset(1.8) }
+                PathPolyline { path: IconShape.tilePoints(1.8) }
             }
-        }
+        } }
     }
 
     // ---------- art ----------

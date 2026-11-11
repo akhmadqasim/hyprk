@@ -96,3 +96,17 @@ function squirclePoints(size, steps) {
         for (var j = 0; j < corner.length; j++) pts.push(maps[m](corner[j]));
     return pts;
 }
+
+// The 100 x 100 tile outline (squirclePoints(100)) as Qt points, inset by d on every side and moved down by dy.
+// Built once per (d, dy) per process and shared by every tile (AppIconTile.qml), not per icon instance.
+var tileCache = {};
+function tilePoints(d, dy) {
+    d = d || 0;
+    dy = dy || 0;
+    var key = d + "," + dy;
+    if (!tileCache[key]) {
+        var k = (100 - 2 * d) / 100;
+        tileCache[key] = squirclePoints(100).map(function (p) { return Qt.point(d + p[0] * k, d + p[1] * k + dy); });
+    }
+    return tileCache[key];
+}
