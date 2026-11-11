@@ -31,7 +31,7 @@ Column {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             text: root.more ? "Show Less" : "Show More"
-            color: Theme.dark ? Qt.rgba(89 / 255, 152 / 255, 245 / 255, 1) : Qt.rgba(46 / 255, 104 / 255, 211 / 255, 1)
+            color: Accent.link   // the shot's (89,152,245) / (46,104,211) are Display P3 readings of the catalog link colour
             size: Theme.font.small
             TapHandler { onTapped: root.more = !root.more }
         }

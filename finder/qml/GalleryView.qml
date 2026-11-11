@@ -208,7 +208,7 @@ Item {
                             height: 14
                             verticalAlignment: Text.AlignVCenter
                             text: "Add Tag"
-                            color: Qt.rgba(53 / 255, 120 / 255, 246 / 255, 1)
+                            color: Theme.color.accent   // the shot's (53,120,246) is a Display P3 reading of #007AFF
                             size: Theme.font.small
                             TapHandler { onTapped: root.tagRequested(addTag) }
                         }

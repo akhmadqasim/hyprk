@@ -8,12 +8,13 @@
 namespace {
 
 // A tagged folder takes the tag's colour (Q-finder-14/31). Only orange was measured: the live Projects folder body
-// is (236,151,80) where the blue one is (119,190,233): hue 28 for the 35 degree tag, saturation 0.66, value 0.93,
-// shaded like the blue body. Other tags use the same rule (not measured).
+// reads (236,151,80) in the shot, which holds Display P3 values (reference/ours/COLOUR-P3-AUDIT.md): (250,146,61)
+// in sRGB, where the blue one is (98,194,238): hue 27 for the 35 degree tag, saturation 0.76, value 0.98, shaded
+// like the blue body. Other tags use the same rule (not measured).
 void tagFolder(QImage &img, const QColor &tag)
 {
     img = img.convertToFormat(QImage::Format_ARGB32);
-    const QColor base = QColor::fromHsvF(std::fmod(std::max(0.f, tag.hsvHueF()) + 1.f - 7.f / 360.f, 1.f), 0.66f, 0.93f);
+    const QColor base = QColor::fromHsvF(std::fmod(std::max(0.f, tag.hsvHueF()) + 1.f - 8.f / 360.f, 1.f), 0.76f, 0.98f);
     for (int y = 0; y < img.height(); ++y) {
         auto *line = reinterpret_cast<QRgb *>(img.scanLine(y));
         for (int x = 0; x < img.width(); ++x) {
@@ -30,9 +31,11 @@ void tagFolder(QImage &img, const QColor &tag)
 void tintFolder(QImage &img)
 {
     img = img.convertToFormat(QImage::Format_ARGB32);
-    // per-channel gain, top -> bottom, measured as ref colour / PNG colour (122,211,251)
-    constexpr float top[3] = {1.06f, 0.94f, 0.95f};
-    constexpr float bottom[3] = {0.86f, 0.84f, 0.89f};
+    // per-channel gain, top -> bottom: least squares of the PNG body against the live folder crops (icons-live,
+    // 64 pt and 16 pt at 2x) converted from Display P3 to sRGB (reference/ours/COLOUR-P3-AUDIT.md). Apple's own sRGB
+    // renders (icons-rendered) agree with the converted crops within 2 levels
+    constexpr float top[3] = {0.92f, 0.97f, 0.96f};
+    constexpr float bottom[3] = {0.64f, 0.86f, 0.93f};
     const int h = img.height();
     for (int y = 0; y < h; ++y) {
         const float t = h > 1 ? float(y) / float(h - 1) : 0.f;

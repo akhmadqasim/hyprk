@@ -7,8 +7,9 @@
 // image://sysicon/[tint/]<Name>@<px>: a macOS icon PNG from themes/icons/system
 // (<Name>-128/-512.png), decoded off the UI thread and cached per id.
 // "tint/" re-colours the older, lighter folder blue (122,211,251) of that set to the macOS 27
-// folder, which runs (129,198,238) at the top to (105,178,224) at the bottom. Theme.qml's drawn
-// fallback folder uses the same top/front colours.
+// folder, whose front runs (112,205,246) at the top to (74,178,226) at the bottom (sRGB: Apple's
+// icons-rendered, and the live crops converted from Display P3). Theme.qml's drawn fallback folder
+// uses the colours of the same crops.
 class SysIconProvider : public QQuickImageProvider {
 public:
     explicit SysIconProvider(QString dir);

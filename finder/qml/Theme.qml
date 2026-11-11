@@ -100,8 +100,9 @@ QtObject {
         readonly property color separator: theme.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.10)
         // Finder has no accent of its own: Blue #007AFF under Multicolor (accent-colors.json), the user's accent otherwise
         readonly property color accent: Tokens.accent
-        // rename field: the selected base name (186,214,251) (Q-finder-27)
-        readonly property color textSelection: blueAccent && !theme.dark ? "#BAD6FB" : Accent.selectedText
+        // rename field: the selected base name. Q-finder-27's (186,214,251) is a Display P3 reading = #B3D7FF in sRGB,
+        // the catalog selectedTextBackground (reference/ours/COLOUR-P3-AUDIT.md)
+        readonly property color textSelection: Accent.selectedText
 
         // the content background. Dark: (31,31,37) in every view's 27.2.1 shot (icons / list / columns / gallery-dark.png,
         // over TahoeDark, as the sidebar's measured colour); the shared token's 30 grey is not measured
@@ -116,12 +117,14 @@ QtObject {
         readonly property color sidebarGlass: theme.chameleonOf(theme.dark ? Qt.rgba(0.15, 0.15, 0.15, 0.75) : Qt.rgba(0.87, 0.88, 0.91, 0.7))
         readonly property color sidebarSelection: theme.dark ? (theme.active ? "#414354" : "#323443")
                                                              : (theme.active ? "#D7D7D8" : "#E7E7E8")
-        readonly property color sidebarDrop: "#2F6EED"          // drop target pill, white text (Q-finder-09)
+        // drop target pill, white text: Q-finder-09 (47,110,237) is a Display P3 reading, #0070F5 in sRGB
+        readonly property color sidebarDrop: "#0070F5"
         readonly property color sidebarText: theme.dark ? (theme.active ? "#FFFFFF" : "#92939B") : (theme.active ? "#000000" : "#717171")
         readonly property color sidebarHeader: theme.dark ? Qt.rgba(1, 1, 1, theme.active ? 0.35 : 0.23)
                                                           : Qt.rgba(0, 0, 0, theme.active ? 0.43 : 0.30)
-        // Recents, Shared and Favourites: accent; Locations: grey; all grey while inactive
-        readonly property color sidebarIconAccent: !theme.active ? sidebarIconInactive : blueAccent ? (theme.dark ? "#1E98FF" : "#006BEF") : accent
+        // Recents, Shared and Favourites: accent; Locations: grey; all grey while inactive. Blue: Q-finder-08 reads
+        // (30,152,255) dark / (0,107,239) light in Display P3 = #009BFF / #006DF8 in sRGB
+        readonly property color sidebarIconAccent: !theme.active ? sidebarIconInactive : blueAccent ? (theme.dark ? "#009BFF" : "#006DF8") : accent
         readonly property color sidebarIconGrey: !theme.active ? sidebarIconInactive : theme.dark ? "#B5B5C3" : "#7B7B80"
         readonly property color sidebarIconInactive: theme.dark ? "#8F909B" : "#7F7F7F"
 
@@ -158,15 +161,16 @@ QtObject {
         // title (Q-finder-06): light #4C4C4C a / #BFBDBD i, dark #E9E9E9 a / #5F5F64 i
         readonly property color title: theme.dark ? (theme.active ? "#E9E9E9" : "#5F5F64") : (theme.active ? "#4C4C4C" : "#BFBDBD")
 
-        // content selection (Q-finder-13/16/19/29): accent while key, grey with label-coloured text while not
+        // content selection (Q-finder-13/16/19/29): accent while key, grey with label-coloured text while not. Blue: the
+        // shots read (42,98,217) light / (36,87,201) dark in Display P3 = (3,100,225) / (1,88,208) in sRGB, the catalog
+        // selectedContentBackground #0064E1 / #0059D1 (reference/ours/COLOUR-P3-AUDIT.md), so the shared token serves
         readonly property color iconPlate: theme.dark ? "#36373C" : "#E6E6E6"         // icon plate, unchanged inactive
-        readonly property color labelSelection: !theme.active ? Accent.unemphasizedSelectedContent
-                                              : blueAccent ? (theme.dark ? "#2558C9" : "#2A63D9") : Accent.selectedContent
-        readonly property color listSelection: !theme.active ? Accent.unemphasizedSelectedContent
-                                             : blueAccent ? (theme.dark ? "#2457C9" : "#2A62D9") : Accent.selectedContent
+        readonly property color labelSelection: !theme.active ? Accent.unemphasizedSelectedContent : Accent.selectedContent
+        readonly property color listSelection: labelSelection
         readonly property color listSelectionInactive: Accent.unemphasizedSelectedContent   // parent columns
         readonly property color selectedText: theme.active ? "#FFFFFF" : theme.dark ? "#E3E3E3" : "#212121"
-        readonly property color selectedSecondaryText: theme.active ? "#BFD0F4" : theme.dark ? "#ACACAC" : "#6D6D6D"
+        // Q-finder-16 (191,208,244), a Display P3 reading: #BBD1F7 in sRGB
+        readonly property color selectedSecondaryText: theme.active ? "#BBD1F7" : theme.dark ? "#ACACAC" : "#6D6D6D"
         readonly property color listAlternate: theme.dark ? "#2A2B31" : "#F4F5F5"
         // list header (Q-finder-17): dark = a solid bar (hard pocket) under the toolbar too; light no fill
         readonly property color listHeaderFill: theme.dark ? "#28282E" : "transparent"
@@ -181,15 +185,17 @@ QtObject {
         readonly property color rubberBandBorder: theme.dark ? Qt.rgba(1, 1, 1, 0.35) : Qt.rgba(0, 0, 0, 0.25)
 
         // folder icon (macOS blue folder)
-        // drawn-fallback folder; SysIconProvider tints the PNG folders to the same ref colours
-        readonly property color folderBack: "#5FA9DA"    // ref (95,169,218)
-        readonly property color folderFront: "#71B9E4"   // ref (113,185,228)
-        readonly property color folderTop: "#81C6EE"     // ref (129,198,238)
+        // drawn-fallback folder; SysIconProvider tints the PNG folders to the same crops. ref = the live folder crops,
+        // which hold Display P3 values; the colours are those converted to sRGB (reference/ours/COLOUR-P3-AUDIT.md)
+        readonly property color folderBack: "#40ABDF"    // ref (95,169,218) P3 = (64,171,223)
+        readonly property color folderFront: "#56BBE8"   // ref (113,185,228) P3 = (86,187,232)
+        readonly property color folderTop: "#69C8F2"     // ref (129,198,238) P3 = (105,200,242)
 
         readonly property color fieldBg: theme.dark ? Qt.rgba(1, 1, 1, 0.08) : "#FFFFFF"
-        // rename field ring: 3 pt accent a.5 outside, 0.5 pt darker inner edge (114,158,244) (Q-finder-27)
+        // rename field ring: 3 pt accent a.5 outside, 0.5 pt darker inner edge: Q-finder-27 (114,158,244), a Display P3
+        // reading = #65A0FB in sRGB
         readonly property color focusRing: Accent.focusRing
-        readonly property color focusEdge: blueAccent && !theme.dark ? "#729EF4" : Accent.color
+        readonly property color focusEdge: blueAccent && !theme.dark ? "#65A0FB" : Accent.color
 
         // Finder tag colors (system palette)
         readonly property var tags: [
