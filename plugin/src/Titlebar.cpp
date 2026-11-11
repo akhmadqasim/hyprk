@@ -67,7 +67,7 @@ namespace lg {
     // hover crops in sRGB: the crops hold Display P3 values, #9E0000 there is #AD0000; reference/ours/COLOUR-P3-AUDIT.md
     // row 8; shell/tests/run.mjs compares both). A non-key window shows no glyph.
     // [light/dark][rest/pressed][close/minimise/zoom]
-    static constexpr uint32_t GLYPHS[2][2][3] = {{{0xAD0000, 0xCE3E00, 0x007B00}, {0xE80000, 0xFF5600, 0x00A700}}, {{0x920000, 0xB92800, 0x005700}, {0xC70000, 0xFB3E00, 0x005700}}};
+    static constexpr uint32_t GLYPHS[2][2][3] = {{{0xAD0000, 0xCE3E00, 0x007B00}, {0xE80000, 0xFF5600, 0x00AE00}}, {{0x920000, 0xB92800, 0x005700}, {0xC70000, 0xFB3E00, 0x005700}}};
     // What is drawn: the discs as glass (plugin/tools/lights_model.py: the model, its fit to the lights-*.png crops and the
     // residuals). The Mac's discs have a lit top, a darker belt above the middle, a caustic glow in the lower centre, a
     // specular rim (dark: arcs at top and bottom; light: a dark rim on the sides) and in light a soft coloured shadow
@@ -222,8 +222,11 @@ namespace lg {
                         cairo_line_to(cr, c + (x2 - 7) * k, c + (y2 - 7) * k);
                         cairo_close_path(cr);
                     };
-                    tri(4.1, 4.1, 8.9, 4.1, 4.1, 8.9); // a 5.8 pt box, fitted on lights-hover-*.png (as TrafficLights.qml)
-                    tri(9.9, 9.9, 5.1, 9.9, 9.9, 5.1);
+                    // a 5.8 pt box, fitted on lights-hover-*.png; pressed corners 4.00 / 9.10 (the press crop,
+                    // tools/lights_model.py), as TrafficLights.qml
+                    const double a = pressed ? 4.0 : 4.1, b = pressed ? 9.1 : 8.9;
+                    tri(a, a, b, a, a, b);
+                    tri(14 - a, 14 - a, 14 - b, 14 - a, 14 - a, 14 - b);
                     cairo_fill(cr);
                     return;
                 }
