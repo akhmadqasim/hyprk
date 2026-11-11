@@ -12,25 +12,38 @@ Item {
     readonly property var win: Window.window
     property int stage: 0
     property int epoch: 0
+    // the window still prepares its new content (Background: the new appearance's wallpaper is cut and decoded
+    // asynchronously): the answer starts only once it is false. Read one event-loop turn after the switch, so a
+    // service that starts its work in its own handler of the same change is seen as busy.
+    property bool busy: false
+    property bool waiting: false   // registered for this switch, frames not followed yet
+    function start() {
+        if (!waiting || busy) return;
+        waiting = false;
+        apply(Handshake.step(0, "begin"));
+    }
+    onBusyChanged: if (!busy) start()
     function apply(r) {
         stage = r.stage;
         if (r.update && win) win.update();
         if (r.done) Theme.appearanceDone(epoch);
     }
-    function drop() { if (stage > 0) { stage = 0; Theme.appearanceDone(epoch); } }   // a window that went away has nothing left to show
+    function drop() { if (stage > 0 || waiting) { stage = 0; waiting = false; Theme.appearanceDone(epoch); } }   // a window that went away has nothing left to show
     Connections {
         target: Theme
         function onAppearanceEpochChanged() {
             ack.stage = 0;
+            ack.waiting = false;
             if (!ack.win || !ack.win.visible) return;
             ack.epoch = Theme.appearanceEpoch;
             Theme.appearanceWait();
-            ack.apply(Handshake.step(0, "begin"));
+            ack.waiting = true;
+            Qt.callLater(() => ack.start());
         }
     }
     Connections {
         target: ack.win
-        enabled: ack.stage > 0
+        enabled: ack.stage > 0 || ack.waiting
         function onAfterAnimating() { ack.apply(Handshake.step(ack.stage, "built")); }
         function onFrameSwapped() { ack.apply(Handshake.step(ack.stage, "swapped")); }
         function onVisibleChanged() { if (!ack.win.visible) ack.drop(); }

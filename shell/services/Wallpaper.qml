@@ -87,7 +87,10 @@ Singleton {
     // the picture the primary's cut came from (the chosen file, or the script's default pick for the mode)
     property string wallpaperSource: ""
 
+    // true from a refresh until its result is in `wallpaper` (the Background's appearance answer waits for it)
+    property bool busy: false
     function refresh() {
+        busy = true;
         proc.running = false;
         proc.running = true;
     }
@@ -121,8 +124,11 @@ Singleton {
                 }
                 Theme.menuBarOnLight = root.topLuma > Theme.menuBarLumaThreshold;
                 Theme.blurAvailable = root.blurred !== "";
+                root.busy = proc.running;
                 root.cutOthers();
             }
         }
+        // a script that wrote nothing (or a run replaced by the next refresh) leaves busy to its exit
+        onExited: Qt.callLater(() => root.busy = proc.running)
     }
 }

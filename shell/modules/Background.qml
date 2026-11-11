@@ -9,6 +9,7 @@ import "../lib/menus.js" as Menus
 // Desktop wallpaper on the background layer. The same image (blurred) is
 // the backdrop of every glass surface, so both stay in sync.
 ShellWindow {
+    id: bg
     required property var modelData
     screen: modelData
 
@@ -28,11 +29,31 @@ ShellWindow {
     // Launchpad's first page of icons, decoded ahead (LaunchpadPreload.qml)
     LaunchpadPreload { screen: modelData }
 
+    // The picture shown changes only once the next one is decoded: an Image whose source changes draws nothing
+    // while it loads, so an appearance switch (wallpaper.sh cuts the mode's picture, decoded asynchronously) showed
+    // the window colour for 3-4 frames inside the compositor's cross-fade (judge #5: the wallpaper, and the menu bar
+    // and Dock glass over it, stepped back mid-fade). `nextImage` decodes the wanted picture under the shown one; once
+    // it is ready the shown one takes it from the pixmap cache, and the window answers the appearance handshake only
+    // when the new picture is on screen (appearanceBusy).
+    readonly property string wantUrl: Wallpaper.urlFor(screen)
+    property string shownUrl: ""
+    appearanceBusy: Wallpaper.busy || shownUrl !== wantUrl || wallImage.status === Image.Loading
+    Image {
+        id: nextImage
+        z: -2
+        anchors.fill: parent
+        source: bg.shownUrl !== bg.wantUrl || wallImage.status !== Image.Ready ? bg.wantUrl : ""
+        sourceSize: Wallpaper.pixelSizeOf(screen)
+        fillMode: Image.PreserveAspectCrop
+        asynchronous: true
+        cache: true
+        onStatusChanged: if ((status === Image.Ready || status === Image.Error) && source == bg.wantUrl) bg.shownUrl = bg.wantUrl
+    }
     Image {
         id: wallImage
         z: -1
         anchors.fill: parent
-        source: Wallpaper.urlFor(screen)
+        source: bg.shownUrl
         // decoded at this output's pixel size (the size wallpaper.sh cuts it to, per distinct screen size), shown
         // 1:1: at the logical size a 2x output upscaled it and 4 pt stripes had 4 px ramps (0 7 20 77 177 234 248
         // 255), so the glass sampled a softer backdrop than the Mac's. Costs 4 bytes per pixel more (PERF.md)

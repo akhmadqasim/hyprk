@@ -95,7 +95,10 @@ PanelWindow {
         }
     }
 
-    AppearanceAck {}   // answers Theme's appearance handshake for this window
+    // true while this window still works on the new appearance's content (the wallpaper's new picture): its
+    // handshake answer waits for it (AppearanceAck.busy)
+    property bool appearanceBusy: false
+    AppearanceAck { busy: win.appearanceBusy }   // answers Theme's appearance handshake for this window
 
     color: "transparent"
     WlrLayershell.namespace: namespace
