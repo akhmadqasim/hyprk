@@ -311,3 +311,56 @@ Headless MBA 2560x1664 at 2x (dist config copy, own state), mcap k 1-2; per-fram
 
 Not done in this session: unlock per-region timing (B3), Mission Control Spaces band and first frame, Spotlight open blur,
 the HUD's GUI-thread stalls (not re-traced after the glyph rewrite, whose Shapes are now built once instead of per symbol).
+
+## Session 10 (2026-11-11): where the lost frames come from, unlock per region, Mission Control, HUD, peek
+
+Headless MBA 2560x1664 at 2x, own state, mcap rebuilt from 088840a; per-frame series in `motion-measured.csv` (`*-s10*`).
+Other headless sessions ran on the host. Not re-measured at scale 1.6.
+
+Cause of "one value lost mid-motion" (judge #4 gap 3; MOTION-PLUGIN "two shell steps inside one compositor frame"):
+with more than one window exposed, Qt's threaded render loop does not advance animations from a window's frames but
+from a GUI-thread timer of int(1000 / 60) = 16 ms (qtdeclarative 6.10.2 `qsgthreadedrenderloop.cpp`
+`startOrStopAnimationTimer`, lines 1096-1136: "with more than one window exposed we have to use the same path as the
+no-windows case"). The shell always has several windows. Trace of the unlock overlay: ticks 16.0 ms apart against
+frames 16.7 ms apart; a tick's value is on screen 8 to 24 ms later; about every 0.4 s two ticks fall between two frames
+and one value is never drawn. The default animation driver also adds 16.7 ms of animation time per 16.0 ms tick, so
+timer-driven animations run about 4 % fast. `shell/components/FrameClock.qml` ticks on `QQuickWindow.afterAnimating`
+(GUI thread, right before each frame of that window is built) and counts frames; `FrameSpring.qml` evaluates a spring on it.
+
+Tried and not adopted: `QSG_USE_SIMPLE_ANIMATION_DRIVER=1` (animations advance in each window's polishAndSync on the
+wall clock, no timer). 8 runs each: Spotlight open repeats its first frame in 7 of 8 (.05 .05 .16 .33, 2-98 % 137 ms
+against 111), Control Center open shows uneven steps and a repeat in 2 of 8 (timer driver: a missing value in 2 of 8),
+HUD appear no better. `ShellWindow`'s glass re-measure on FrameClock was tried too: Spotlight repeated its first frame
+in 6 of 6 (the forced frame has no new animation value), reverted.
+
+GUI stall at unlock (106-163 ms, session 8): `QSGThreadedRenderLoop::windowDestroyed` waits for the destroyed lock
+surface's render thread, which waits in `QWaylandGLContext::swapBuffers` -> `waitForFrameSync(100)` for the frame
+callback of its previous frame; that callback never comes once the lock is released. `animationStarted()` posts an
+update to every window, so the lock surface often has a frame in flight right then. Lock now releases at least 20 ms
+after a lock surface's last frame.
+
+| Motion | Mac | Before | After | Status |
+|---|---|---|---|---|
+| Unlock, clock 95 % from the avatar step (35ba87e) | ~+219 (B3) | 40 dark runs: 213-216 with one value lost (29), 229-233 one frame late (10) | 30 runs: 221 [221-223]; 16 more with the counting clock: 221-224 | matches |
+| Unlock, field 95 % | ~+219 | 207-227 | 214 [213-216] | matches |
+| Unlock, Dock 95 % | +226 | 221-241 | 227 [227-229] | matches |
+| Unlock, menu bar 5 % / 95 % | +137 / +250 | 123-145 / 242-263 | 137 [137-139] / 252 [251-254] | matches |
+| Unlock, wallpaper un-dim | from +0, .19 at +33 | .03 .11 .19 (starts at +0 here; judge #4 saw +152 under load) | .03 .12 .20 | matches |
+| Unlock, lost or repeated value | - | lost in 29 of 40 | 0 of 30 | fixed |
+| Unlock, GUI stall at the release | - | 1 of 40 to 6 of 12 | 0 of 86 | fixed (cause above) |
+| Unlock, Return to the avatar step | 367 ms (PAM) | 109-212 ms | 94-156 ms | - |
+| Lock-in, menu bar 95 % / clock / field | +67 / ~+196 / ~+214 | (judge #4: 67-74 / - / 191-222) | 65 / 191 / 216 (8 runs) | matches |
+| Mission Control enter, 2 terminals partly overlapping (fd20e46) | R2 enter series, 333 ms | judge #4, 1 window: first frame twice 3 of 3, 319-335 ms, .013-.024 | .09 .15 .24 .34 .44 .53 .62 .69 .75 .80 the same in 8 of 8 (one run skipped one value), no repeated first frame, 318-322 ms, rms .026-.028 | repeat fixed; rms not comparable (new layout, other windows) |
+| Mission Control exit, same | R2 exit series, 267 ms | judge #4, 1 window: 267-285 ms, .013-.019, a skipped frame 2 of 3 | .20 .39 .54 .65 .74 .80 .84 .87 .89 in 8 of 8, 277-281 ms, rms .029-.035, no skipped value | skip fixed; the windows now move less (Mac layout), the share-of-change metric runs ahead early |
+| Mission Control layout | mission-control.json (1 / 2 / 4 / 5 / 7 windows) | scaled grid | every frame within 1 pt (shell test) | matches (decoded from WindowManager) |
+| HUD appear, light Tahoe (eea3441) | hud-appear-fit, 483 ms | 492-520 ms, rms .026-.037, a value lost in 6 of 8 | 482-519 ms, rms .032-.035, same series every run, one run with an 84 ms gap | no lost values; rms unchanged (ours starts slower: .01 .03 .04 .07 .10 vs .02 .06 .12 .18 .25) |
+| HUD dismiss | series .96 .85 .71 .56 .45, 283 ms | 282-291 ms, rms .006-.037 (.02-.04 when a value was lost) | 270-288 ms, rms .011-.016 | matches |
+| HUD dismiss, content at opacity^2 (tried) | as above | - | 222-233 ms, rms .032-.038 | dropped: the binary has one .opacity on the content |
+| Full screen bar peek in (eea3441) | ~0.15 s, roughly linear | .20 .40 .50 .61 .70 .81 .92 1.00, one value skipped in most runs | .11 .22 .33 .44 .56 .67 .78 .89 1.00 in 10 of 10, 144 ms | fixed (B5) |
+| Full screen bar peek out | ~0.17 s | .20 .29 .38 ... | .10 .20 .29 .39 .49 .59 .69 .78 .88 .98 in 10 of 10, 159-168 ms | matches |
+| Spotlight open (timer driver, unchanged) | REA open spring | - | .05 .20 .37 .56 .73 .86 .97, a value missing in 4 of 8, 2-98 % 99-120 ms | open: still on a NumberAnimation |
+| Control Center open (unchanged) | - | - | .04 .07 .19 .31 .44 .55 .66, a value missing in 2 of 8, 235-245 ms | open: as above |
+
+Left open: Spotlight open (blur 25 -> 0 and the frame clock), Control Center open and the other Qt-animated panels still
+run on the 16 ms timer; moving a panel to FrameSpring is the fix that worked for Mission Control, the HUD and the peek.
+The HUD's appear fits the Mac worse than its dismiss (slow start); the 84 ms gap in 1 of 8 appears was not traced.
