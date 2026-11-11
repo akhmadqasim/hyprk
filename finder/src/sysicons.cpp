@@ -61,7 +61,8 @@ SysIconProvider::SysIconProvider(QString dir)
 
 QImage SysIconProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
 {
-    const QString key = id + QLatin1Char('#') + QString::number(requestedSize.width());
+    Q_UNUSED(requestedSize);
+    const QString &key = id;
     QImage img;
     {
         QMutexLocker lock(&m_lock);
@@ -76,8 +77,12 @@ QImage SysIconProvider::requestImage(const QString &id, QSize *size, const QSize
         const qsizetype at = spec.lastIndexOf(QLatin1Char('@'));
         const int px = at < 0 ? 128 : spec.mid(at + 1).toInt();
         img = QImage(QStringLiteral("%1/%2-%3.png").arg(m_dir, spec.left(at)).arg(px > 128 ? 512 : 128));
-        if (!img.isNull() && requestedSize.isValid())   // scale first so the tint loop runs on fewer pixels
-            img = img.scaled(requestedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        // Exactly px wide, whatever Qt asks for: its request is the Image's sourceSize times the window's device
+        // pixel ratio (128 became 256 on a 2x output: the 128 px file scaled up, then drawn at half size, a blur
+        // that kept 0.42-0.47 of the file's detail), and FileIcon picks px for the size it draws. Halving the 512
+        // or 128 px file is an exact area average; scaled first so the tint loop runs on fewer pixels
+        if (!img.isNull() && px > 0 && img.width() != px)
+            img = img.scaled(QSize(px, px), Qt::KeepAspectRatio, Qt::SmoothTransformation);
         if (!img.isNull() && tint)
             tintFolder(img);
         else if (!img.isNull() && tag && tagColor.isValid())

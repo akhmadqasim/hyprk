@@ -56,7 +56,7 @@ used by the shell and Finder through symlinks), `tools/` (`car.py` Assets.car re
      (Dark 16-19, TintedDark 10-11, ClearDark 17-18). 256 px only: the shell draws app icons at most 128 pt.
    - Linux icons (`AppIconTile.qml`): the Mac's rule for icons without layers (WebStorm, Spotify in the same Mac
      shot): Dark leaves them as they are (on the dark tile), Clear / Tinted map the art's luminance L with the same
-     ramp as above (`ui/HyprK/shaders/iconstyle.frag`, one quad over the art's own texture, built only while the
+     ramp as above (`ui/HyprK/shaders/iconart.frag`, one quad over the art's own texture, built only while the
      style is on): Tinted rgb (-84 + 198 L, 83 + 158 L, 189 + 66 L) on a flat sRGB 0,109,195 tile, Clear white at
      alpha (182 + 72 L - 176) / 79 on a flat white 0.20 tile. Same in dark appearance (the Apple renditions have no
      dark files either). Icons that already are squircles are mapped whole, as the Mac maps WebStorm's.

@@ -42,6 +42,21 @@ Item {
 
     // decode at a power of two (>= 2x) so zoom steps reuse cached images and thumbnails
     readonly property int px: Math.pow(2, Math.ceil(Math.log2(Math.max(16, size * 2))))
+    // Every icon is drawn by HyprK AppIconTile (trusted: no tile, the art as it is): its shader resamples the texture
+    // in one Lanczos pass on the device pixel grid, where a plain Image blurs whatever is not drawn 1:1 (a 128 px
+    // folder at 102 px on a 1.6 output kept 0.4-0.6 of a Lanczos downscale's detail).
+    // The window's real device pixel ratio (main.cpp; Screen.devicePixelRatio is 2 on a 1.6 output)
+    readonly property real dpr: typeof display !== "undefined" && display.dpr > 0 ? display.dpr : Screen.devicePixelRatio
+    // texture size for a themes/icons/system icon (128 and 512 px files): the 128 px file when it is drawn 1:1 or
+    // at 2/3 and less, else the 512 halved to 256 up to 256 px, else the 512 (the rule of AppIconTile's app icons)
+    // and halved while it is 4x the drawn size or more (16 pt list rows: 64 px). The provider returns exactly this
+    // size (the "@px" of the id), whatever sourceSize Qt asks for
+    readonly property int sysPx: {
+        const exact = size * dpr;
+        let px = Math.abs(128 - exact) < 0.5 || 128 >= 1.5 * exact ? 128 : exact <= 256.5 ? 256 : 512;
+        while (px >= 4 * exact && px > 16) px /= 2;
+        return px;
+    }
 
     width: size
     height: size
@@ -69,16 +84,14 @@ Item {
             radius: parent.radius + 1
             color: Qt.rgba(0, 0, 0, 0.08)
         }
-        Image {
+        AppIconTile {
             id: thumb
-            width: root.size * root.thumbScale
-            height: root.size * root.thumbScale
+            size: root.size * root.thumbScale
             x: (thumbBox.width - width) / 2
             y: (thumbBox.height - height) / 2
-            fillMode: Image.PreserveAspectFit
-            asynchronous: true
+            trusted: true
             source: root.showThumb ? "image://thumb/" + encodeURIComponent(root.entry.path) : ""
-            sourceSize: Qt.size(root.px, root.px)
+            decodeSize: root.px
             onStatusChanged: if (status === Image.Error) root.thumbFailed = true
         }
         Rectangle {   // hairline frame
@@ -102,6 +115,7 @@ Item {
         visible: root.kind === "app" && status === Image.Ready
         anchors.centerIn: parent
         size: root.size
+        dpr: root.dpr
         trusted: root.macApp !== ""
         // Icon & widget style (appearance.json iconStyle / iconStyleVariant): the icon's own rendition
         source: root.macApp !== "" ? "file://" + startup.iconRoot + "/"
@@ -109,13 +123,16 @@ Item {
               : root.kind === "app" && root.entry.icon ? "image://icon/" + root.entry.icon : ""
     }
 
-    Image {
+    AppIconTile {
         id: plain
         visible: !thumbBox.visible && !appIcon.visible
         anchors.fill: parent
-        asynchronous: sysSource !== ""   // inline SVG fallbacks load synchronously, no blank frame
-        sourceSize: Qt.size(root.px, root.px)
-        readonly property string sysSource: root.sysFailed ? "" : Theme.sysIcon(root.sysName, root.px, root.kind === "folder",
+        size: root.size
+        trusted: true
+        dpr: root.dpr
+        // a system icon at the size picked above; the text icon and the drawn SVG fallbacks at the drawn size
+        decodeSize: sysSource !== "" && !root.textIcon ? Math.ceil(root.size) : 0
+        readonly property string sysSource: root.sysFailed ? "" : Theme.sysIcon(root.sysName, root.sysPx, root.kind === "folder",
                                                                                      root.kind === "folder" && Files.hasTags(root.entry) ? Theme.color.tagColors[root.entry.tags[0]] : "")
         onStatusChanged: if (status === Image.Error && sysSource) root.sysFailed = true
         source: root.textIcon ? Qt.resolvedUrl("icons/doc-txt@" + root.textIconPt + "pt.png")
@@ -128,7 +145,7 @@ Item {
             anchors.fill: parent
             visible: root.kind === "archive"
             source: visible ? Icons.zipper() : ""
-            sourceSize: parent.sourceSize
+            sourceSize: Qt.size(root.px, root.px)
         }
         TextLabel {
             visible: root.kind !== "folder" && root.kind !== "app" && root.size >= 32 && !root.textIcon

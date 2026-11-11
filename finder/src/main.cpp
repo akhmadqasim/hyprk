@@ -17,6 +17,7 @@
 #include <QFontDatabase>
 #include <QGuiApplication>
 #include <QIcon>
+#include <QQmlPropertyMap>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QQuickImageProvider>
@@ -124,6 +125,11 @@ int main(int argc, char *argv[])
     engine.addImageProvider(QStringLiteral("icon"), new IconProvider);
     engine.addImageProvider(QStringLiteral("thumb"), new ThumbnailProvider);
     engine.addImageProvider(QStringLiteral("sysicon"), new SysIconProvider(iconDir));
+    // display.dpr: the window's real device pixel ratio, for FileIcon's texture sizes (QML only has the screen's,
+    // which is 2 on a 1.6 output); kept current from the window's frames
+    QQmlPropertyMap display;
+    display.insert(QStringLiteral("dpr"), 0.0);
+    engine.rootContext()->setContextProperty(QStringLiteral("display"), &display);
     engine.rootContext()->setContextProperty(QStringLiteral("startup"), QVariantMap{
         // "recents:", "applications:" and "tag:<Name>" are virtual locations, not paths
         {QStringLiteral("path"), dir.isEmpty() || dir.endsWith(QLatin1Char(':')) || dir.startsWith(QLatin1String("tag:")) ? dir : QDir(dir).absolutePath()},
@@ -150,6 +156,15 @@ int main(int argc, char *argv[])
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreationFailed, &app,
                      [] { QCoreApplication::exit(1); }, Qt::QueuedConnection);
     engine.load(QUrl::fromLocalFile(resourceDir("finder/qml", FINDER_QML_DIR) + QStringLiteral("/Main.qml")));
+    if (auto *win = engine.rootObjects().isEmpty() ? nullptr : qobject_cast<QQuickWindow *>(engine.rootObjects().first())) {
+        const auto update = [win, &display] {
+            const qreal d = win->effectiveDevicePixelRatio();
+            if (display.value(QStringLiteral("dpr")).toReal() != d)
+                display.insert(QStringLiteral("dpr"), d);
+        };
+        update();
+        QObject::connect(win, &QQuickWindow::frameSwapped, &app, update);
+    }
 
     if (cli.isSet(shotOpt)) {
         const QString out = cli.value(shotOpt);

@@ -31,11 +31,16 @@ Item {
     // screen's, which is the next integer on a fractional output (2 at 1.6). Only picks the file to load: the drawing
     // itself finds the device pixel grid in the shader
     property real dpr: 0
+    // the caller picked the texture size itself: this sourceSize as it is (pixels for a file; an image provider gets
+    // it times the window's ratio from Qt)
+    property int decodeSize: 0
 
     readonly property var info: _info
     readonly property bool tiled: !trusted && _info !== null && !_info.squircle
     readonly property bool ready: trusted || _info !== null
     readonly property alias status: art.status   // Image.Ready once the art is drawn
+    readonly property alias paintedWidth: art.paintedWidth     // the art's own box (it keeps its aspect ratio)
+    readonly property alias paintedHeight: art.paintedHeight
 
     property var _info: null
     readonly property string _key: String(source)
@@ -65,7 +70,7 @@ Item {
     readonly property bool _dark: style === "dark"
     readonly property bool _clear: style === "clear"
     readonly property bool _tinted: style === "tinted"
-    // Clear and Tinted: a flat tile and the art mapped by its luminance (shaders/iconstyle.frag), the rule read from
+    // Clear and Tinted: a flat tile and the art mapped by its luminance (shaders/iconart.frag), the rule read from
     // Apple's tiles and code for icons without layers (themes/icons agent, b0ba729 / 53470ff; ramps in the shader).
     // The appearance (Tokens.dark) picks the light or the dark form: dark Tinted is a dark tile with a blue tint fading
     // down, dark Clear an opaque grey 43 tile
@@ -188,7 +193,7 @@ Item {
     // Plain Image, not IconImage: IconImage reloads whenever its size changes (the magnifying
     // Dock would reload every icon every frame). Loaded once for loadSize, then drawn by the shader below.
     // The Image itself is never shown: Qt's bilinear / mipmap draw is soft (Laplacian energy 0.40-0.81 of a Lanczos
-    // downscale, 0.62 on a fractional output), so shaders/iconstyle.frag resamples the texture in one pass on the
+    // downscale, 0.62 on a fractional output), so shaders/iconart.frag resamples the texture in one pass on the
     // device pixel grid. No mipmaps: the texture is at most 4x the drawn size.
     Image {
         id: art
@@ -220,7 +225,14 @@ Item {
             while (d >= 4 * px && d > 16) d /= 2;
             return d;
         }
-        sourceSize: fileSize > 0 ? (decode === fileSize ? undefined : Qt.size(decode, decode)) : Qt.size(px, px)
+        // an image provider ("image://...") is asked for sourceSize times the window's real ratio by Qt itself, so it
+        // gets the size in pt (in px it rendered 2x too large: 256 px for a 64 pt icon); a file is decoded at
+        // sourceSize as given
+        readonly property bool provided: root._key.indexOf("image:") === 0
+        readonly property int pt: Math.ceil(root.loadSize * f.scale)
+        sourceSize: root.decodeSize > 0 ? Qt.size(root.decodeSize, root.decodeSize)
+                  : fileSize > 0 ? (decode === fileSize ? undefined : Qt.size(decode, decode))
+                  : provided ? Qt.size(pt, pt) : Qt.size(px, px)
         fillMode: Image.PreserveAspectFit
         source: !root.ready ? ""     // load once, at the final scale
               : fileSize > 0 && !named[4] && fileSize !== Number(named[3]) ? named[1] + "-" + fileSize + ".png" : root.source
@@ -250,8 +262,7 @@ Item {
             property real tileSpan: art.height / Math.max(1, tileSize)
             property real plain: root._mapped ? 0 : 1
             property real snap: root._still ? 1 : 0
-            property size texSize: Qt.size(art.implicitWidth, art.implicitHeight)
-            fragmentShader: Qt.resolvedUrl("shaders/iconstyle.frag.qsb")
+            fragmentShader: Qt.resolvedUrl("shaders/iconart.frag.qsb")
         }
     }
 
@@ -282,10 +293,32 @@ Item {
             onPaint: {
                 if (!isImageLoaded(url)) return;
                 const ctx = getContext("2d");
+                const n = IconShape.SAMPLE;
+                // The picture's own pixels, not a drawing of it: drawImage puts a pixmap that carries a device pixel
+                // ratio (Quickshell's icon provider: the application's, 2) at 2 / 1.6 of the asked size on a 1.6
+                // output, so the sample came back in the top left 0.8 and every such icon was fitted 1.25x too
+                // large and off centre (extent 0.71 at 0.40 where it is 0.875 at 0.50). Alpha at the sample's grid,
+                // 2 x 2 points per cell
+                const img = ctx.createImageData(url);
+                const w = img ? img.width : 0, h = img ? img.height : 0;
+                if (w > 0 && h > 0) {
+                    const p = img.data, m = new Array(n * n);
+                    for (let y = 0; y < n; ++y)
+                        for (let x = 0; x < n; ++x) {
+                            let a = 0;
+                            for (let j = 0; j < 2; ++j)
+                                for (let i = 0; i < 2; ++i)
+                                    a += p[(Math.min(h - 1, Math.floor((y + 0.25 + 0.5 * j) * h / n)) * w
+                                            + Math.min(w - 1, Math.floor((x + 0.25 + 0.5 * i) * w / n))) * 4 + 3];
+                            m[y * n + x] = a / 4;
+                        }
+                    done(IconShape.store(url, IconShape.analyze(m, n, 1)));
+                    return;
+                }
                 ctx.clearRect(0, 0, width, height);
                 ctx.drawImage(url, 0, 0, width, height);
                 const d = ctx.getImageData(0, 0, width, height).data;
-                done(IconShape.store(url, IconShape.analyze(d, IconShape.SAMPLE, 4)));
+                done(IconShape.store(url, IconShape.analyze(d, n, 4)));
             }
             // never leave an icon hidden if the canvas cannot paint (no window yet, odd format)
             Timer {

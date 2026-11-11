@@ -1,5 +1,6 @@
 #version 440
-// Build: /usr/lib/qt6/bin/qsb --qt6 -o iconstyle.frag.qsb iconstyle.frag
+// Build: /usr/lib/qt6/bin/qsb --glsl "300 es,150" --hlsl 50 --msl 12 -o iconart.frag.qsb iconart.frag
+// (not --qt6: textureSize() needs GLSL ES 3.00 / GLSL 1.50; Hyprland itself needs GLES 3.2)
 // App icon art for HyprK AppIconTile: one quad that resamples the art's texture itself and, for an icon without
 // macOS layers in the Clear / Tinted style, maps it through Apple's ramps.
 //
@@ -36,7 +37,6 @@ layout(std140, binding = 0) uniform buf {
     float tileSpan;   // the art's height in tile units
     float plain;      // 1 = the art as it is (resampled only)
     float snap;       // 1 = put the quad on the device pixel grid
-    vec2 texSize;     // the art texture's size in texels
 };
 layout(binding = 1) uniform sampler2D source;
 
@@ -52,6 +52,8 @@ float lanczos3(float x) {
 }
 
 vec4 resample(vec2 uv) {
+    // the texture as it is: an image provider is asked for sourceSize x the window's ratio, which QML cannot see
+    vec2 texSize = vec2(textureSize(source, 0));
     vec2 ddx = dFdx(uv), ddy = dFdy(uv);
     vec2 g = vec2(ddx.x, ddy.y);                       // uv per device pixel, signed (y may be flipped)
     bool axis = abs(ddx.y) + abs(ddy.x) < 1e-3 * (abs(g.x) + abs(g.y)) && g.x != 0.0 && g.y != 0.0;
