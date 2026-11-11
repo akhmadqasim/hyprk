@@ -112,6 +112,23 @@ hl.config({
 --   outer rim: 0.5 pt (1 px at 2x) black dark .93 / .83, light .21 / .19. Hyprland's border is 1 pt (2 px at 2x),
 --     so its alpha carries the same ink over 2 px: 1 - (1 - a)^(1/2) = dark .735 / .588, light .111 / .100.
 -- Global so the shell can switch it with the appearance (shell/Theme.qml, `hyprctl eval`).
+-- GTK apps of the session follow too: config/hypr/start.sh points them (GSETTINGS_BACKEND=keyfile) at this keyfile.
+local gtkKeyfile = os.getenv("HYPRK_GTK_KEYFILE")
+local function hyprk_gtk(dark)
+    if not gtkKeyfile or gtkKeyfile == "" then return end
+    local tmp = gtkKeyfile .. ".tmp"
+    local f = io.open(tmp, "w")
+    if not f then return end
+    f:write("# hyprk-managed (config/hypr/hyprland.lua hyprk_gtk)\n",
+            "[org/gnome/desktop/wm/preferences]\nbutton-layout='close,minimize,maximize:'\n\n",
+            "[org/gnome/desktop/interface]\n",
+            "gtk-theme='MacOS27", dark and "-Dark" or "", "'\n",
+            "color-scheme='", dark and "prefer-dark" or "prefer-light", "'\n",
+            "font-name='SF Pro 10'\nmonospace-font-name='SF Mono 10'\ncursor-theme='hyprk-cursors'\ncursor-size=24\n")
+    f:close()
+    os.rename(tmp, gtkKeyfile)   -- atomic: GLib's file monitor sees one complete file
+end
+
 function hyprk_appearance(dark)
     local c = dark and { shadow = 0x7e000000, shadowInactive = 0x38000000, rim = "rgba(000000bb)", rimInactive = "rgba(00000096)" }
                     or { shadow = 0x48000000, shadowInactive = 0x1b000000, rim = "rgba(0000001c)", rimInactive = "rgba(0000001a)" }
@@ -119,6 +136,7 @@ function hyprk_appearance(dark)
         general = { col = { active_border = c.rim, inactive_border = c.rimInactive } },
         decoration = { shadow = { color = c.shadow, color_inactive = c.shadowInactive } },
     })
+    hyprk_gtk(dark)
 end
 
 -- macOS motion. Values from the binaries: liquid-glass-re/SPEC.md 9.9.4 (SwiftUI) and 11 (windows).

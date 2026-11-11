@@ -18,6 +18,22 @@ export XDG_DATA_DIRS="$HYPRK_ROOT/themes:$HYPRK_DATA:$XDG_DATA_DIRS"   # themes/
 export XCURSOR_PATH="$HYPRK_ROOT/themes/cursors/theme:${XCURSOR_PATH:-/usr/share/icons}"
 unset HYPRK_GLASS        # decided by hyprland.lua after loading the glass plugin
 export XCURSOR_THEME=hyprk-cursors HYPRCURSOR_THEME=hyprk-cursors XCURSOR_SIZE=24 HYPRCURSOR_SIZE=24
+# GTK apps of this session (JUDGE-95 #3): on Wayland GTK reads the theme, button-layout and colour scheme from GSettings
+# and the host's portal, not from settings.ini, so they came up as Adwaita with the controls on the right and in the
+# host's light/dark. The session gets a private config dir inside $HYPRK_STATE (every real ~/.config entry linked in,
+# as dist farm mode, except the GTK/GLib ones) with the MacOS27 theme and a GSettings keyfile that hyprland.lua's
+# hyprk_appearance() rewrites on every appearance change (GLib watches the file, GTK 3 and libadwaita follow live).
+# Nothing outside $HYPRK_STATE is written; the real dconf and gsettings are not read or touched. HYPRK_GTK=0: off.
+if [ "${HYPRK_GTK:-1}" = 1 ]; then
+    . "$HYPRK_ROOT/dist/lib/env.sh"   # _hyprk_farm
+    G=$HYPRK_STATE/gtk-session
+    mkdir -p "$G/config/glib-2.0/settings" "$G/data" && chmod 700 "$G"
+    _hyprk_farm "${XDG_CONFIG_HOME:-$HOME/.config}" "$G/config" " gtk-3.0 gtk-4.0 glib-2.0 "
+    XDG_CONFIG_HOME=$G/config XDG_DATA_HOME=$G/data sh "$HYPRK_ROOT/themes/gtk/install.sh" >/dev/null
+    export XDG_CONFIG_HOME=$G/config XDG_DATA_DIRS="$G/data:$XDG_DATA_DIRS" HYPRK_GTK_KEYFILE=$G/config/glib-2.0/settings/keyfile
+    export GSETTINGS_BACKEND=keyfile ADW_DISABLE_PORTAL=1 HDY_DISABLE_PORTAL=1 GTK_USE_PORTAL=0 GDK_DEBUG="no-portals${GDK_DEBUG:+,$GDK_DEBUG}"
+    unset GTK_THEME   # it would pin one appearance
+fi
 HYPRK_DEV=${HYPRK_DEV:-$HYPRK_ROOT/../hypr-dev}   # optional source-built prefix
 [ -f "$HYPRK_DEV/env.sh" ] && source "$HYPRK_DEV/env.sh"
 exec env -u HYPRLAND_INSTANCE_SIGNATURE Hyprland --config "${HYPRK_CONFIG:-$HYPRK_ROOT/config/hypr/hyprland.lua}" "$@"
