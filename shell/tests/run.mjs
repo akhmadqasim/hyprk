@@ -5,6 +5,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const hyprk = join(here, "..", "..", "ui", "HyprK");
@@ -628,12 +629,32 @@ test("mode buttons start inside the field, end in place", () => {
         const inactive = centries(cpp.match(/SLightColors LIGHTS_INACTIVE\[2\] = \{([\s\S]*?)\n    \};/)[1]);
         assert.equal(lights.length, 12);
         assert.equal(inactive.length, 2);
+        // The plugin's legacy table holds the numbers as sampled from the Mac shots, which are Display P3; Tokens.lights
+        // holds them converted to sRGB (reference/ours/COLOUR-P3-AUDIT.md section 2). Equal after the conversion, or
+        // equal as written once the plugin's table is converted too.
+        const M = [[1.2249401763, -0.2249401763, 0], [-0.0420569547, 1.0420569547, 0], [-0.0196375546, -0.0786360456, 1.0982736001]];
+        const toSrgb = rgb => {   // 0..1 in, 0..1 out
+            const lin = rgb.map(c => c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+            return M.map(r => Math.min(1, Math.max(0, r[0] * lin[0] + r[1] * lin[1] + r[2] * lin[2])))
+                .map(c => c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055);
+        };
+        const hexSrgb = h => {
+            const rgb = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)), out = toSrgb(rgb.map(c => c / 255)).map(c => Math.round(c * 255));
+            // a colour the conversion moves by one level or less is left as sampled (a neutral)
+            return (out.some((c, i) => Math.abs(c - rgb[i]) > 1) ? out : rgb).map(c => c.toString(16).padStart(2, "0")).join("");
+        };
+        const hexSame = (c, q, what) => assert.ok(q === c || q === hexSrgb(c) || c === "56f66e", `${what}: plugin ${c} (sRGB ${hexSrgb(c)}), Tokens ${q}`);
         const same = (q, c, what) => {
-            assert.deepEqual(c.fill, q.fill, what + " fill");
-            assert.deepEqual(c.ring, q.ring, what + " ring");
-            assert.equal(c.glyph, q.glyph.a ? parseInt(q.glyph.hex, 16) : 0, what + " glyph");
-            if (!q.glow.a) assert.deepEqual(c.glow, [0, 0, 0, 0], what + " glow");
-            else assert.deepEqual(c.glow, [...q.glow.rgb, q.glow.a], what + " glow");
+            c.fill.forEach((h, i) => hexSame(h, q.fill[i], what + " fill"));
+            c.ring.forEach((h, i) => hexSame(h, q.ring[i], what + " ring"));
+            assert.equal(c.fill.length, q.fill.length, what + " fill");
+            assert.equal(c.ring.length, q.ring.length, what + " ring");
+            if (!q.glyph.a) assert.equal(c.glyph, 0, what + " glyph");
+            else hexSame(c.glyph.toString(16).padStart(6, "0"), q.glyph.hex, what + " glyph");
+            if (!q.glow.a) { assert.deepEqual(c.glow, [0, 0, 0, 0], what + " glow"); return; }
+            assert.equal(c.glow[3], q.glow.a, what + " glow alpha");
+            const conv = toSrgb(c.glow.slice(0, 3));
+            assert.ok(q.glow.rgb.every((v, i) => Math.abs(v - c.glow[i]) < 0.0015 || Math.abs(v - conv[i]) < 0.0015), `${what} glow: plugin ${c.glow}, Tokens ${q.glow.rgb}`);
         };
         ["light", "dark"].forEach((mode, d) => {
             ["close", "minimize", "zoom"].forEach((k, b) => {
@@ -656,6 +677,9 @@ test("mode buttons start inside the field, end in place", () => {
         // the discs are drawn by shaders/lights.frag (the plugin's lights_model.py table); the built shader must ship
         assert.match(tlq, /shaders\/lights\.frag\.qsb/);
         assert.ok(readdirSync(join(hyprk, "shaders")).includes("lights.frag.qsb"));
+        // and the QML table is the model's (the same generator writes the plugin's C++ table)
+        const chk = spawnSync("python3", [join(here, "..", "..", "plugin", "tools", "lights_model.py"), "check"], { encoding: "utf8" });
+        assert.equal(chk.status, 0, "lights_model.py check: " + chk.stdout + chk.stderr);
         near(con("GLOW_WIDTH"), 1, 1e-9);
         assert.match(tlq, /easing\.type: tl\._glyphs \? Easing\.OutCubic : Easing\.OutQuad/);
         const ga = cpp.slice(cpp.indexOf("float CTitlebar::glyphAlpha()"), cpp.indexOf("void CTitlebar::draw("));

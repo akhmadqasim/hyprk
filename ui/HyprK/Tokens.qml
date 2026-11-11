@@ -177,10 +177,11 @@ QtObject {
         readonly property color alertButton: t.dark ? "#47474E" : "#EBEBEB"         // (71,71,78) | 235
         // pressed: dark 71 -> 89 (+18 = white a.098); light not measured, the push-button press layer
         readonly property color alertButtonPressed: t.dark ? Qt.rgba(1, 1, 1, 0.098) : t.control.pressOverlay
-        readonly property color destructiveFill: t.dark ? "#653F43" : "#F9D1D0"     // (101,63,67) | (249,209,208)
-        readonly property color destructiveText: t.dark ? "#DC3929" : "#EB4C46"     // (220,57,41) | (235,76,70)
-        // the default button: (52,120,246) under Multicolour/Blue in both appearances, else the accent
-        readonly property color defaultFill: Accent.name === "multicolor" || Accent.name === "blue" ? "#3478F6" : t.accent
+        readonly property color destructiveFill: t.dark ? "#6B3D42" : "#FFCFCF"     // shot (101,63,67) | (249,209,208), Display P3
+        readonly property color destructiveText: t.dark ? "#F01D14" : "#FF393C"     // shot (220,57,41) | (235,76,70), Display P3
+        // the default button: the shots read (52,120,246) under Multicolour/Blue in both appearances, which is Display
+        // P3 for sRGB #007AFF (reference/ours/COLOUR-P3-AUDIT.md); else the accent
+        readonly property color defaultFill: Accent.name === "multicolor" || Accent.name === "blue" ? "#007AFF" : t.accent
         readonly property int sheetRadius: 16                                       // continuous r 16 (fit 17.9)
         readonly property color sheetFill: t.dark ? "#22232F" : "#FFFFFF"           // windowBackground (34,35,47) | 255
         readonly property color sheetDim: Qt.rgba(0, 0, 0, 0.2)                    // whole parent ~20 % darker
@@ -226,6 +227,8 @@ QtObject {
         readonly property real glyphStroke: 1.9
         // Q-windows-08: a pressed disc grows to 16 pt (32 px of 28 at 2x) and gets brighter, with a glow
         readonly property real pressedScale: 1.15
+        // The Mac shots hold Display P3 numbers: every value below is the sampled one converted to sRGB (p3_to_srgb of
+        // reference/ours/COLOUR-P3-AUDIT.md; before, the raw numbers were shown as sRGB, close red 232,112,97 for 250,103,90).
         // Per button, sampled on lights-{rest,hover,press-*}-{light,dark}.png: fill top / centre / bottom (Q-windows-08),
         // ring = the outer 0.5 pt as a vertical gradient (stops 0, .2, .5, .8, 1): light discs have a dark coloured rim on
         // the sides that fades into the fill at top and bottom; dark discs a light specular arc at top and bottom and
@@ -233,20 +236,20 @@ QtObject {
         // white). Glyph ink: Q-windows-10 (hover centre light close 159,0,0); pressed glyphs from the press crops.
         // Dark zoom did not change in its press crop, so its pressed fill keeps CoreUI's #56F66E.
         readonly property var close: t.dark
-            ? { fill: ["#E87061", "#E1675B", "#DE6F64"], ring: ["#F6C6BC", "#F6C6BC", "#D96156", "#F5C4BA", "#F5C4BA"], glyph: "#850000", glow: "transparent",
-                press: { fill: ["#FF9381", "#FF9381", "#FF9485"], ring: ["#FEFBED", "#FEFBED", "#FD7B6E", "#FEF7EC", "#FEF7EC"], glyph: "#B60000", glow: Qt.rgba(1, 0.85, 0.8, 0.07) } }
-            : { fill: ["#ED786B", "#EA857B", "#E89189"], ring: ["#ED786B", "#B40A0A", "#B40A0A", "#B40A0A", "#E89189"], glyph: "#9E0000", glow: Qt.rgba(0.71, 0.04, 0.04, 0.065),
-                press: { fill: ["#FF9A8B", "#FFA898", "#FFB6A8"], ring: ["#FF9A8B", "#F42319", "#F42319", "#F42319", "#FFB6A8"], glyph: "#D40000", glow: Qt.rgba(0.96, 0.14, 0.1, 0.22) } }
+            ? { fill: ["#FA675A", "#F25D54", "#EE675E"], ring: ["#FFC4BA", "#FFC4BA", "#EA574F", "#FEC2B8", "#FEC2B8"], glyph: "#920000", glow: "transparent",
+                press: { fill: ["#FF8C7B", "#FF8C7B", "#FF8D80"], ring: ["#FFFBEB", "#FFFBEB", "#FF7167", "#FEF7EC", "#FEF7EC"], glyph: "#C70000", glow: Qt.rgba(1, 0.843, 0.791, 0.07) } }
+            : { fill: ["#FE6F65", "#FA7E77", "#F68C86"], ring: ["#FE6F65", "#C50000", "#C50000", "#C50000", "#F68C86"], glyph: "#AD0000", glow: Qt.rgba(0.777, 0, 0, 0.065),
+                press: { fill: ["#FF9486", "#FFA394", "#FFB2A4"], ring: ["#FF9486", "#FF0000", "#FF0000", "#FF0000", "#FFB2A4"], glyph: "#E80000", glow: Qt.rgba(1, 0, 0, 0.22) } }
         readonly property var minimize: t.dark
-            ? { fill: ["#F1B835", "#F3C22D", "#F6CF50"], ring: ["#F6F581", "#F6F581", "#EABA19", "#F5F58D", "#F5F58D"], glyph: "#AA3600", glow: "transparent",
-                press: { fill: ["#FFFF8E", "#FFFF5C", "#FFFF7A"], ring: ["#FBFB98", "#FBFB98", "#F9D623", "#FBFBA6", "#FBFBA6"], glyph: "#E74F00", glow: Qt.rgba(1, 1, 0.6, 0.07) } }
-            : { fill: ["#F2BD50", "#F5CB59", "#F8D562"], ring: ["#F2BD50", "#91210A", "#91210A", "#91210A", "#F8D562"], glyph: "#BE4900", glow: Qt.rgba(0.57, 0.13, 0.04, 0.05),
-                press: { fill: ["#FFF66C", "#FFFB6B", "#FFFF7E"], ring: ["#FFF66C", "#D04020", "#D04020", "#D04020", "#FFFF7E"], glyph: "#FF6500", glow: Qt.rgba(0.82, 0.25, 0.13, 0.2) } }
+            ? { fill: ["#FCB500", "#FCC000", "#FECD28"], ring: ["#F6F56C", "#F6F56C", "#F3B800", "#F5F57C", "#F5F57C"], glyph: "#B92800", glow: "transparent",
+                press: { fill: ["#FFFF7B", "#FFFF26", "#FFFF5F"], ring: ["#FBFB89", "#FBFB89", "#FFD400", "#FBFB9A", "#FBFB9A"], glyph: "#FB3E00", glow: Qt.rgba(1, 1, 0.539, 0.07) } }
+            : { fill: ["#FCBA31", "#FDC93C", "#FFD347"], ring: ["#FCBA31", "#9E0D00", "#9E0D00", "#9E0D00", "#FFD347"], glyph: "#CE3E00", glow: Qt.rgba(0.622, 0.051, 0, 0.05),
+                press: { fill: ["#FFF64C", "#FFFB49", "#FFFF65"], ring: ["#FFF64C", "#E22E00", "#E22E00", "#E22E00", "#FFFF65"], glyph: "#FF5600", glow: Qt.rgba(0.891, 0.176, 0.004, 0.2) } }
         readonly property var zoom: t.dark
-            ? { fill: ["#6EC341", "#62BD2D", "#6DC04B"], ring: ["#BFF69A", "#BFF69A", "#59B61C", "#B8F697", "#B8F697"], glyph: "#005500", glow: "transparent",
-                press: { fill: ["#56F66E", "#56F66E", "#56F66E"], ring: ["#BFF69A", "#BFF69A", "#59B61C", "#B8F697", "#B8F697"], glyph: "#005500", glow: "transparent" } }
-            : { fill: ["#7DCD4A", "#98D46F", "#A9DA86"], ring: ["#7DCD4A", "#0A550A", "#0A550A", "#0A550A", "#A9DA86"], glyph: "#097900", glow: Qt.rgba(0.04, 0.33, 0.04, 0.05),
-                press: { fill: ["#A0FF60", "#B9FF84", "#D2FFA7"], ring: ["#A0FF60", "#347F20", "#347F20", "#347F20", "#D2FFA7"], glyph: "#15A400", glow: Qt.rgba(0.2, 0.5, 0.13, 0.22) } }
+            ? { fill: ["#4AC61D", "#35C000", "#4AC333"], ring: ["#AFF88E", "#AFF88E", "#23B900", "#A6F88B", "#A6F88B"], glyph: "#005700", glow: "transparent",
+                press: { fill: ["#56F66E", "#56F66E", "#56F66E"], ring: ["#AFF88E", "#AFF88E", "#23B900", "#A6F88B", "#A6F88B"], glyph: "#005700", glow: "transparent" } }
+            : { fill: ["#5FD02A", "#86D660", "#9BDC7B"], ring: ["#5FD02A", "#005700", "#005700", "#005700", "#9BDC7B"], glyph: "#007B00", glow: Qt.rgba(0, 0.336, 0, 0.05),
+                press: { fill: ["#7DFF3A", "#A4FF71", "#C6FF9C"], ring: ["#7DFF3A", "#008100", "#008100", "#008100", "#C6FF9C"], glyph: "#00A700", glow: Qt.rgba(0, 0.508, 0, 0.22) } }
         // Q-windows-09, non-key window (lights-inactive-*.png): dark #4C4C52 -> #47484D, light grey arcs at the top
         // (#B4B4B4) and bottom (#ADADAD); light #EFEFF3 -> #F6F7F8, ring #EAEAEE at the top, #ABABAE on the sides
         readonly property var inactive: t.dark
