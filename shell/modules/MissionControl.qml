@@ -166,10 +166,11 @@ ShellWindow {
             width: mc.width
             height: mc.height
             source: Wallpaper.url
-            sourceSize: Qt.size(mc.screen ? mc.screen.width : 1920, mc.screen ? mc.screen.height : 1080)
+            // the desktop's decoded pixmap (Background.qml: same url and sourceSize, cached): no decode on open
+            sourceSize: Qt.size(Wallpaper.pixelWidth, Wallpaper.pixelHeight)
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
-            cache: false
+            cache: true
         }
     }
     MouseArea { width: parent.width; height: parent.height - mc.dockZone; onClicked: Panels.close() }

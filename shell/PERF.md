@@ -68,8 +68,10 @@ by Qt's font engines = 35 MB RSS for one 7.8 MB file). A bare one-window Quicksh
 
 - **No QApplication** (`//@ pragma UseQApplication` removed): the shell uses no QtWidgets, so the
   GTK3 platform theme and widget stack are no longer loaded (-45 MB RSS with the next item).
-- **Wallpaper decoded at logical size** (`Background.qml` `sourceSize`): the wallpaper is soft; at
-  4K/1.5 the pixel-size decode cost ~18 MB more.
+- **Wallpaper decoded at the output's pixel size** since 2026-11-11 (`Background.qml` `sourceSize`, `wallpaper.sh` cuts it
+  to that size): the logical-size decode was upscaled on a 2x output, so the glass sampled a softer backdrop than the Mac's
+  (CC gap over 4 pt stripes 26 levels, Mac 32; now 31). Cost on the MBA output (2560x1664@2, default wallpaper): +8.3 MB
+  anon / +8.4 MB RSS at rest. One decoded copy: Mission Control's backdrop shares it (same url and sourceSize, cached).
 - **On-demand surfaces** (`shell.qml` `LazyLoader`): Spotlight (with its Apps panel, `spotlight/AppsPanel.qml`),
   Cmd+Tab switcher and Mission Control (and their delegates, icon textures and live window captures) exist only while open.
   Their open logic also runs on creation (`opened()`); Spotlight's IPC moved to `Panels`.

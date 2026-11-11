@@ -33,12 +33,13 @@ ShellWindow {
         z: -1
         anchors.fill: parent
         source: Wallpaper.url
-        // decoded at the logical size: the wallpaper is soft, and at 4K/1.5 the full
-        // pixel size costs ~18 MB more for no visible gain (PERF.md)
-        sourceSize: Qt.size(screen ? screen.width : 1920, screen ? screen.height : 1080)   // known before layout
+        // decoded at the output's pixel size (Wallpaper.pixelWidth/Height, the size wallpaper.sh cuts it to), shown
+        // 1:1: at the logical size a 2x output upscaled it and 4 pt stripes had 4 px ramps (0 7 20 77 177 234 248
+        // 255), so the glass sampled a softer backdrop than the Mac's. Costs 4 bytes per pixel more (PERF.md)
+        sourceSize: Qt.size(Wallpaper.pixelWidth, Wallpaper.pixelHeight)
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
-        cache: false
+        cache: true   // one decoded copy, shared with Mission Control's backdrop (same url and sourceSize)
     }
 
     // Contrast gradient over the top 100 pt behind the menu bar (MAC-ANSWERS.md Q-menubar-02,

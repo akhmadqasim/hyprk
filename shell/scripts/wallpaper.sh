@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Usage: wallpaper.sh <width> <height> <blur-sigma> [dark]
-# Prints two lines: WALL=<path> and BLUR=<path or empty>.
+# Usage: wallpaper.sh <width> <height> <blur-sigma> [dark] [pixel-width pixel-height]
+# Prints three lines: WALL=<path> (at the pixel size: the desktop shows it 1:1 on the output's pixels),
+# BLUR=<path or empty> (at the logical size) and LUMA=<menu bar strip luminance>.
 # Picks a wallpaper from themes/wallpapers (assets agent), falls back to a
 # generated gradient. The blurred copy is the QML glass material backdrop.
 set -u
-W=${1:-1920}; H=${2:-1080}; SIGMA=${3:-20}; MODE=${4:-light}
+W=${1:-1920}; H=${2:-1080}; SIGMA=${3:-20}; MODE=${4:-light}; PW=${5:-$W}; PH=${6:-$H}
 HERE=$(cd "$(dirname "$0")/../.." && pwd)
 CACHE=${XDG_CACHE_HOME:-$HOME/.cache}/hyprk
 mkdir -p "$CACHE"
@@ -37,20 +38,21 @@ if [ -z "$src" ]; then
     fi
 fi
 
-key=$(printf '%s %s %s %s' "$src" "$(stat -c %Y "$src" 2>/dev/null)" "${W}x${H}" "$SIGMA" | md5sum | cut -c1-12)
+key=$(printf '%s %s %s %s' "$src" "$(stat -c %Y "$src" 2>/dev/null)" "${W}x${H}" "$SIGMA" "${PW}x${PH}" | md5sum | cut -c1-12)
 wall="$CACHE/wall-$key.png"
 blur="$CACHE/blur-$key.png"
 if [ ! -f "$wall" ]; then
-    magick "$src" -resize "${W}x${H}^" -gravity center -extent "${W}x${H}" "$wall" 2>/dev/null || wall=$src
+    magick "$src" -resize "${PW}x${PH}^" -gravity center -extent "${PW}x${PH}" "$wall" 2>/dev/null || wall=$src
 fi
 if [ ! -f "$blur" ]; then
     # downscale, blur, upscale: cheap large-radius gaussian; slightly brighter and
     # desaturated so glass reads as near-neutral frost (macOS 27 Dock)
     # (shaders/menupill.frag undoes this -modulate: keep the two in step)
-    magick "$wall" -resize 25% -blur "0x$(( SIGMA / 4 + 1 ))" -modulate 106,92 -resize "${W}x${H}!" "$blur" 2>/dev/null || blur=""
+    # from the logical size, so the blur is the same at any output scale
+    magick "$wall" -resize "${W}x${H}!" -resize 25% -blur "0x$(( SIGMA / 4 + 1 ))" -modulate 106,92 -resize "${W}x${H}!" "$blur" 2>/dev/null || blur=""
 fi
 # mean luminance (0..1) of the menu bar strip, so the shell can pick white or dark menu bar text
-luma=$(magick "$wall" -crop "${W}x$(( H / 30 + 1 ))+0+0" -colorspace Gray -resize 1x1\! -format "%[fx:mean]" info: 2>/dev/null || echo 0.3)
+luma=$(magick "$wall" -crop "${PW}x$(( PH / 30 + 1 ))+0+0" -colorspace Gray -resize 1x1\! -format "%[fx:mean]" info: 2>/dev/null || echo 0.3)
 echo "WALL=$wall"
 echo "BLUR=$blur"
 echo "LUMA=$luma"

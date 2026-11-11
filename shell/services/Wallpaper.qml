@@ -19,6 +19,11 @@ Singleton {
     readonly property int thumbWidth: 320       // one decode size shared by all wallpaper thumbnails
     property int width: Panels.screen ? Panels.screen.width : 1920
     property int height: Panels.screen ? Panels.screen.height : 1080
+    // `wallpaper` is cut at the output's pixel size: decoded at the logical size a 2x output upscaled it, so 4 pt
+    // stripes showed 4 px ramps and every glass sampled a softer backdrop than the Mac's. `blurred` stays logical
+    readonly property real dpr: Panels.screen ? Panels.screen.devicePixelRatio : 1
+    readonly property int pixelWidth: Math.round(width * dpr)
+    readonly property int pixelHeight: Math.round(height * dpr)
 
     function refresh() {
         proc.running = false;
@@ -27,6 +32,7 @@ Singleton {
 
     onWidthChanged: refresh()
     onHeightChanged: refresh()
+    onDprChanged: refresh()
     Component.onCompleted: refresh()
     Connections {
         target: Theme
@@ -42,7 +48,7 @@ Singleton {
     Process {
         id: proc
         environment: ({ HYPRK_WALLPAPER: root.chosen })
-        command: [Quickshell.shellDir + "/scripts/wallpaper.sh", String(root.width), String(root.height), String(Theme.glass.blurRadius), Theme.dark ? "dark" : "light"]
+        command: [Quickshell.shellDir + "/scripts/wallpaper.sh", String(root.width), String(root.height), String(Theme.glass.blurRadius), Theme.dark ? "dark" : "light", String(root.pixelWidth), String(root.pixelHeight)]
         stdout: StdioCollector {
             onStreamFinished: {
                 for (const line of text.split("\n")) {
