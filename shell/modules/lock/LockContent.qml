@@ -14,8 +14,11 @@ import "../../lib/clock.js" as Clock
 //   wall  the wallpaper below the menu bar (it covers the desktop, the Dock and the windows)
 //   bar   the wallpaper's top strip over the menu bar (the menu bar has its own track)
 //   dim   the dimming over all of it
-//   ui    clock, date, field and "?"
-//   user  avatar, the line under the field and the status items (they go in one frame on unlock)
+//   ui    the clock
+//   date  the date
+//   field the field and "?"
+//   user  avatar, the line under the field, the status items and the notifications (they go in one frame on unlock)
+//   caret the field's caret (the lock-in overlay draws it so the locked field does not add it in one frame)
 Item {
     id: c
     property bool primary: true
@@ -24,7 +27,10 @@ Item {
     property real bar: 1
     property real dim: 1
     property real ui: 1
+    property real date: 1
+    property real field: 1
     property real user: 1
+    property bool caret: interactive
 
     readonly property string locale: Quickshell.env("LC_ALL") || Quickshell.env("LC_TIME") || Quickshell.env("LANG") || ""
     readonly property var clockStyle: Clock.styleFor(locale)
@@ -47,7 +53,9 @@ Item {
         Wall { width: c.width; height: c.height; visible: Wallpaper.wallpaper !== "" }
     }
     // below the menu bar (it covers the desktop, the Dock and the windows) and over the menu bar: two strips so
-    // each region on screen follows only its own track (one layer over the other would multiply them)
+    // each region on screen follows only its own track (one layer over the other would multiply them). The bar
+    // strip carries its own dim: on the Mac the menu bar region does not un-dim before the bar comes back (B3: 0
+    // from +33 to +117 while the wallpaper is at 0.19 to 0.41); under the shared dim it went to -0.10 first (mcap)
     Item {
         y: Theme.menuBar.height
         width: c.width
@@ -64,9 +72,12 @@ Item {
         visible: opacity > 0
         opacity: c.bar
         Backdrop {}
+        Rectangle { anchors.fill: parent; color: LockTheme.dim }
     }
     Rectangle {
-        anchors.fill: parent
+        y: Theme.menuBar.height
+        width: c.width
+        height: c.height - y
         visible: opacity > 0
         opacity: c.dim
         color: LockTheme.dim
@@ -81,7 +92,7 @@ Item {
         height: dateText.implicitHeight
         lift: LockTheme.dateLift
         visible: opacity > 0
-        opacity: c.ui
+        opacity: c.date
         FontMetrics { id: dateFm; font: LockTheme.dateFont }
         Text {
             id: dateText
@@ -161,11 +172,12 @@ Item {
             PasswordField {
                 id: field
                 interactive: c.interactive
+                caret: c.caret
                 // the capsule's centre is 0.5 right of the screen centre; the "?" hangs off its right end
                 x: Math.round((parent.width - LockTheme.fieldWidth) / 2 + LockTheme.fieldNudge)
                 y: parent.height - LockTheme.fieldBottom - height
                 visible: opacity > 0
-                opacity: c.ui
+                opacity: c.field
             }
 
             // line under the field; ~1 s after Return a spinner takes its place until PAM answers

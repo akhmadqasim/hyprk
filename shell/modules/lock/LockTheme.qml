@@ -139,8 +139,8 @@ Singleton {
     // ease-out quad 250 ms from +7...) put the clock a frame early mid-curve and miss its 2-frame lead-in.
     // Opacity only, nothing moves.
     readonly property real trackStart: -17
-    // lock-in, progress towards the lock: menu bar, Dock (the wallpaper layer below the bar), wallpaper dim,
-    // clock (clock, date, field, "?"), avatar (avatar, line, status items)
+    // lock-in, progress towards the lock: menu bar (the bar strip with its dim), Dock (the wallpaper layer below the
+    // bar), wallpaper dim, clock, date, field (with "?"), avatar (avatar, line, status items)
     readonly property var inBar: [[-17, 0], [0, 0.10], [17, 0.26], [33, 0.57], [50, 0.84], [67, 0.96], [83, 0.97],
         [100, 0.97], [117, 0.98], [133, 1]]
     readonly property var inWall: [[-17, 0], [0, 0.10], [17, 0.21], [33, 0.36], [50, 0.59], [67, 0.74], [83, 0.81],
@@ -149,6 +149,10 @@ Singleton {
         [100, 0.49], [117, 0.58], [133, 0.63], [150, 0.70], [167, 0.75], [183, 0.85], [200, 0.89], [217, 0.94], [233, 1]]
     readonly property var inUi: [[17, 0], [33, 0.28], [50, 0.35], [67, 0.43], [83, 0.51], [100, 0.59], [117, 0.66],
         [133, 0.73], [150, 0.80], [167, 0.87], [183, 0.92], [200, 0.96], [217, 0.99], [233, 1]]
+    readonly property var inDate: [[17, 0], [33, 0.26], [50, 0.33], [67, 0.40], [83, 0.47], [100, 0.54], [117, 0.60],
+        [133, 0.67], [150, 0.73], [167, 0.80], [183, 0.86], [200, 0.92], [217, 0.98], [233, 0.99]]
+    readonly property var inField: [[17, 0], [33, 0.21], [50, 0.26], [67, 0.35], [83, 0.42], [100, 0.52], [117, 0.56],
+        [133, 0.63], [150, 0.70], [167, 0.78], [183, 0.85], [200, 0.90], [217, 0.96], [233, 0.99]]
     readonly property var inUser: [[17, 0], [33, 0.24], [50, 0.30], [67, 0.36], [83, 0.42], [100, 0.49], [117, 0.55],
         [133, 0.62], [150, 0.69], [167, 0.76], [183, 0.82], [200, 0.89], [217, 0.97], [233, 1]]
     readonly property int inEnd: 233
@@ -159,6 +163,11 @@ Singleton {
     // when the overlay goes.
     readonly property var outUi: [[-17, 0], [0, 0.06], [33, 0.16], [50, 0.20], [67, 0.25], [83, 0.30], [100, 0.36],
         [117, 0.43], [133, 0.52], [150, 0.60], [167, 0.69], [200, 0.85], [217, 0.94], [233, 1]]
+    // date and field fade faster than the clock (B3: remaining 0.25 / 0.24 vs 0.31 at +167)
+    readonly property var outDate: [[-17, 0], [0, 0.07], [33, 0.18], [50, 0.24], [67, 0.31], [83, 0.39], [100, 0.46],
+        [117, 0.53], [133, 0.60], [150, 0.68], [167, 0.75], [200, 0.89], [217, 0.95], [233, 1]]
+    readonly property var outField: [[-17, 0], [0, 0.09], [33, 0.24], [50, 0.31], [67, 0.37], [83, 0.44], [100, 0.51],
+        [117, 0.57], [133, 0.64], [150, 0.70], [167, 0.76], [200, 0.89], [217, 0.96], [233, 1]]
     readonly property var outBar: [[117, 0], [133, 0.03], [150, 0.12], [167, 0.23], [200, 0.59], [217, 0.74],
         [233, 0.90], [267, 1]]
     readonly property var outWall: [[67, 0], [83, 0.02], [100, 0.02], [117, 0.04], [133, 0.09], [150, 0.21],
@@ -168,6 +177,9 @@ Singleton {
         [333, 0.97]]
     readonly property int outEnd: 333
     readonly property int unlockOut: Theme.ms(outEnd)   // the overlay goes after this
+    // the overlays read the wall clock when Qt builds a frame; it is shown about this much later (mcap, 10 clean
+    // unlocks each: wall clock 7-9 ms behind the animation driver's frame time, which matched the Mac's tracks)
+    readonly property int frameLead: 8
     // wrong password: lock.js shake() on a linear 400 ms clock (7.5 Hz, 14 / 8.25 / 6.75 pt)
     readonly property int shakeMs: 400
 }

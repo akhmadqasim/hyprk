@@ -43,23 +43,40 @@ PanelWindow {
         bar: w.entering ? w.warm(L.track(LockTheme.inBar, w.t)) : 1 - L.track(LockTheme.outBar, w.t)
         dim: w.entering ? w.warm(L.track(LockTheme.inDim, w.t)) : 1 - L.track(LockTheme.outDim, w.t)
         ui: w.entering ? w.warm(L.track(LockTheme.inUi, w.t)) : 1 - L.track(LockTheme.outUi, w.t)
+        date: w.entering ? w.warm(L.track(LockTheme.inDate, w.t)) : 1 - L.track(LockTheme.outDate, w.t)
+        field: w.entering ? w.warm(L.track(LockTheme.inField, w.t)) : 1 - L.track(LockTheme.outField, w.t)
         user: w.entering ? w.warm(L.track(LockTheme.inUser, w.t)) : w.userGone ? 0 : 1
+        caret: w.entering
     }
 
-    NumberAnimation {
-        id: fadeIn
-        target: w; property: "t"
-        from: LockTheme.trackStart; to: LockTheme.inEnd; duration: LockTheme.lockIn
-        onFinished: Lock.engage()
+    // `t` runs on the wall clock, read every frame: Qt's threaded render loop steps animations one vsync per frame,
+    // so frames held at the start (the GUI thread stalls 50-280 ms after the session lock goes in about a third of
+    // unlocks) delayed the rest of the track to the end (clock 95 % at +236 or later vs the Mac's +220, mcap). Now
+    // the frame after a held one shows the Mac's value for its time. A frame is shown about `frameLead` after the
+    // GUI computes it.
+    property double startedAt: 0
+    property real from: 0
+    property real to: 0
+    property int duration: 1
+    function run(a: real, b: real, ms: int): void {
+        from = a; to = b; duration = Math.max(1, ms);
+        startedAt = Date.now();
+        t = a;
+        clock.start();
     }
-    SequentialAnimation {
-        id: reveal
-        PropertyAction { target: w; property: "userGone"; value: true }
-        NumberAnimation {
-            target: w; property: "t"
-            from: 0; to: LockTheme.outEnd; duration: LockTheme.unlockOut
+    FrameAnimation {
+        id: clock
+        onTriggered: {
+            w.t = Math.min(w.to, w.from + (Date.now() - w.startedAt + LockTheme.frameLead) * (w.to - w.from) / w.duration);
+            if (w.t < w.to) return;
+            stop();
+            if (w.entering) Lock.engage();
+            else Lock.finish();
         }
-        ScriptAction { script: Lock.finish() }
+    }
+    function reveal(): void {
+        userGone = true;
+        run(0, LockTheme.outEnd, LockTheme.unlockOut);
     }
     // Start the fade ("in") or tell Lock ("out") once a frame of this window is on screen. A frame swap after a scene sync that started after the request holds the full picture (render-thread
     // signals arrive queued).
@@ -72,7 +89,7 @@ PanelWindow {
         function onFrameSwapped() {
             if (w.frameState !== 2) return;
             w.frameState = 0;
-            if (w.entering) fadeIn.start();
+            if (w.entering) w.run(LockTheme.trackStart, LockTheme.inEnd, LockTheme.lockIn);
             else Lock.overlayReady();
         }
     }
@@ -81,7 +98,7 @@ PanelWindow {
         enabled: w.mode === "out"
         // started at once: waiting for a frame of ours after the release showed the bare desktop for one frame in 3 of
         // 12 unlocks (mcap); started here the first frame is held once instead
-        function onReleasedChanged() { if (Lock.released) reveal.start(); }
+        function onReleasedChanged() { if (Lock.released) w.reveal(); }
     }
     Component.onCompleted: Qt.callLater(() => { w.frameState = 1; if (probe.qw) probe.qw.update(); })
 }

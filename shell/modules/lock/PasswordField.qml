@@ -12,6 +12,7 @@ import "lock.js" as L
 Item {
     id: f
     property bool interactive: false
+    property bool caret: interactive        // the lock-in overlay shows it too: the locked field has it from its first frame
 
     width: LockTheme.fieldWidth + LockTheme.hintGap + LockTheme.hintDisc
     height: LockTheme.fieldHeight
@@ -98,7 +99,7 @@ Item {
             }
         }
         Rectangle {
-            visible: f.interactive && !Lock.busy && f.selected === 0 && f.caretOn
+            visible: f.caret && !Lock.busy && f.selected === 0 && f.caretOn
             x: L.caretX(Math.min(f.typed, f.fit))
             anchors.verticalCenter: parent.verticalCenter
             width: LockTheme.caretWidth
