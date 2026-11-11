@@ -1,5 +1,6 @@
 import QtQuick
 import qs
+import qs.HyprK
 
 // The large lock clock (LOCKSCREEN-27.2.1.md A3, B8): `.SF Soft Numeric` 156 pt, proportional digits, centred
 // by the parent; ink = backdrop + lift with a white top line and a dark 1 px rim (LockPlus). On a minute change
@@ -32,11 +33,16 @@ LockPlus {
                 property string now: ""
                 property string old: ""
                 property real p: 1
-                width: cur.implicitWidth
+                // eases to the new character's width while it is revealed, one value per frame of this window (HyprK
+                // FrameEase; it was a Behavior on Qt's timer)
+                width: widthEase.value
                 height: fm.height
-                Behavior on width {
-                    enabled: slot.p < 1
-                    NumberAnimation { duration: LockTheme.minuteRecentre; easing.type: Easing.OutCubic }
+                FrameEase {
+                    id: widthEase
+                    goal: cur.implicitWidth
+                    animate: slot.p < 1
+                    duration: LockTheme.minuteRecentre
+                    ease: Easing.OutCubic
                 }
                 onChChanged: {
                     if (now === "" || !clk.animate || LockTheme.reduceMotion) { now = ch; return; }
@@ -46,7 +52,7 @@ LockPlus {
                     reveal.restart();
                 }
                 Component.onCompleted: now = ch
-                NumberAnimation { id: reveal; target: slot; property: "p"; from: 0; to: 1; duration: LockTheme.minuteChange }
+                FrameAnim { id: reveal; target: slot; property: "p"; from: 0; to: 1; duration: LockTheme.minuteChange }
 
                 Text {
                     id: cur
