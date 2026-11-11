@@ -13,7 +13,7 @@ Item {
     property real pointSize: 13
     property color color: Theme.label
     readonly property var glyph: Sf.get(name, weight)
-    readonly property real unit: pointSize / 32
+    readonly property real unit: pointSize / (glyph && glyph.pt ? glyph.pt : 32)   // "pt": outlines kept at another size
     implicitWidth: glyph ? glyph.rect[2] * unit : 0
     implicitHeight: glyph ? glyph.rect[3] * unit : 0
     Repeater {

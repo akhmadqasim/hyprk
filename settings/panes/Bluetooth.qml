@@ -41,7 +41,7 @@ Column {
 
     Unavailable {
         visible: pane.status === "nocontroller" || pane.status === "missing"
-        glyph: "bluetooth_disabled"
+        symbol: "bluetooth.slash"
         title: "Bluetooth Unavailable"
         text: pane.status === "missing" ? "BlueZ (bluetoothctl) is not installed." : "No Bluetooth controller was found. Connect a Bluetooth adapter to use wireless devices."
     }
@@ -49,7 +49,7 @@ Column {
     Card {
         visible: pane.status === "ok" || pane.status === "loading"
         FormRow {
-            glyph: "bluetooth"; tint: Theme.tile.blue
+            iconId: "bluetooth"
             label: "Bluetooth"
             sublabel: pane.ctl.powered ? "Now discoverable as “" + pane.ctl.name + "”." : ""
             Switch { checked: pane.ctl.powered; enabled: pane.status === "ok"; onToggled: on => { pane.ctl = Object.assign({}, pane.ctl, { powered: on }); pane.cmd(["power", on ? "on" : "off"], "Bluetooth could not be turned " + (on ? "on." : "off.")); } }
@@ -68,8 +68,8 @@ Column {
                 id: dev
                 required property var modelData
                 readonly property bool isOn: pane.connected.indexOf(modelData.mac) !== -1
-                glyph: /airpod|bud|head|phone|speaker/i.test(modelData.name) ? "headphones" : /mouse/i.test(modelData.name) ? "mouse" : /keyboard/i.test(modelData.name) ? "keyboard" : "bluetooth"
-                tint: Theme.tile.gray
+                // by the device's name; the tiles are hyprk's choice (the Mac's device rows were not read)
+                iconId: /airpod|bud|head|phone|speaker/i.test(modelData.name) ? "bluetooth-headphones" : /mouse/i.test(modelData.name) ? "mouse" : /keyboard/i.test(modelData.name) ? "keyboard" : "bluetooth"
                 label: modelData.name
                 sublabel: isOn ? "Connected" : "Not Connected"
                 Button {

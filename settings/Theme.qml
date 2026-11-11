@@ -44,7 +44,6 @@ QtObject {
         Tokens.increaseContrast = Qt.binding(() => theme.increaseContrast);
         Accent.name = Qt.binding(() => theme.accentName);
         Tokens.fontText = Qt.binding(() => theme.fontText);
-        Tokens.fontGlyph = Qt.binding(() => theme.fontGlyph);
         // measured on the reference Settings window (below), so the controls match the panes
         Tokens.label = Qt.binding(() => theme.label);
         Tokens.switchSize = "mini";   // Settings' form rows use mini switches, 36 x 16 (MAC-ANSWERS.md Q-settings-16)
@@ -67,9 +66,6 @@ QtObject {
     readonly property string fontDisplay: fontText
     // Text: MacText (size + wght) or a whole style, font: Typography.body (HyprK Typography: the 27.2.1 text
     // styles with optical size, tracking and real weights on SF's axes)
-
-    // Generic glyph font for pane icons when themes/icons/settings/<id>.svg is missing.
-    readonly property string fontGlyph: "Material Icons"
 
     readonly property QtObject font: QtObject {
         readonly property real body: Typography.styles.body.size          // 13: form labels measured on 27.2.1

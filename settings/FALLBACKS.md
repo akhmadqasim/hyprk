@@ -12,7 +12,15 @@ calm sentence. Parsers in `Parsers.js` return safe empty values on any input.
 
 Live updates come from event streams (`controls/EventSource.qml`): `nmcli monitor` (Wi-Fi,
 Network), `pw-mon` (Sound), `dbus-monitor` on BlueZ (Bluetooth). When a stream can't run
-or stops, the pane falls back to polling every 15 s.
+or stops, the pane falls back to polling every 15 s. A stream dies with Settings, also when
+Settings is killed (`Backend.stream` starts it through `setpriv --pdeathsig TERM`; without
+setpriv it runs as before).
+
+Settings of the host desktop (`gsettings`, today only "Prefer non-blinking cursor") go through
+`Backend.runHost()`: they are written only when hyprk is the login session (`HYPRK_ALLOW_POWER=1`
+from `dist/hyprk-session`, the same signal the shell's power actions use). In a nested preview,
+a smoke run or a standalone `settings/run.sh` on another desktop only hyprk's own state changes
+and the row says so.
 
 | Pane | Condition | What the user sees |
 |---|---|---|
@@ -83,7 +91,8 @@ is the same colour, opaque.
 |---|---|---|
 | UI font | `themes/fonts/SFNS.ttf` loaded with FontLoader (weights through the `wght` axis) | Inter, then Cantarell, then Noto Sans (`Theme.pickFont`) |
 | Glyphs in rows and the toolbar | SF Symbols outlines in `controls/sfpaths.js` (drawn by `controls/SfSymbol.qml`; add names with `scripts/sfpaths.py`) | none: a name that is not in the table draws nothing |
-| Pane icons | `themes/icons/settings/<pane id>@<64\|128>-<default\|dark\|clear\|tinted>-<light\|dark>.png` (all 23 panes, picked by the icon style and appearance) | colored rounded tile + Material Icons glyph (`fonts-material-design-icons-iconfont`, already installed) |
+| Pane icons | `themes/icons/settings/<pane id>@<64\|128>-<default\|dark\|clear\|tinted>-<light\|dark>.png` (all 23 panes, picked by the icon style and appearance) | a plain coloured rounded tile |
+| Row icons | `themes/icons/settings/<id>@48-...png`: the Mac's 24 pt row icon at 2x, built from Apple's graphic icon configuration of that row (`Panes.js` rowIcons, `themes/icons/settings/graphic.json`) | a plain coloured rounded tile |
 | Wallpaper thumbnails | freedesktop `~/.cache/thumbnails/large` (made by `scripts/thumbs.sh`) | the full image |
 
 ## Files written for other parts of hyprk

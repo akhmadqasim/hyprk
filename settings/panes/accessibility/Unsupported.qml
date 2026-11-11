@@ -13,7 +13,7 @@ Column {
 
     Card {
         FormRow {
-            glyph: page.info.glyph; tint: Theme.tile.blue; dim: true
+            iconId: page.info.icon; dim: true
             label: page.info.title
             sublabel: page.info.about || ""
             Switch { enabled: false }
@@ -21,7 +21,6 @@ Column {
     }
     Unavailable {
         height: 200
-        glyph: page.info.glyph
         title: page.info.title + " Unavailable"
         text: "This feature isn't available on Linux yet."
     }

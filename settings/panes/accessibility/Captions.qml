@@ -20,10 +20,11 @@ Column {
                 required property int index
                 label: modelData
                 onClicked: page.style = index
-                SfSymbol {   // checkmark at the body size (this list is not on a Mac shot: the size is not measured)
+                SfSymbol {   // Image(systemName: "checkmark").fontWeight(.semibold) and no font of its own = the body size:
+                    // AccessibilitySettingsUI 27.2.1, the three checkmark rows (0x25ecbea68, 0x25ecbfb1c, 0x25ed06cb8)
                     visible: page.style === index
                     anchors.verticalCenter: parent.verticalCenter
-                    name: "checkmark"; pointSize: 13; color: Theme.accent
+                    name: "checkmark"; weight: "semibold"; pointSize: 13; color: Theme.accent
                 }
             }
         }

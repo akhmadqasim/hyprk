@@ -5,7 +5,7 @@ import "../HyprK"
 // Full-pane empty state, e.g. "Bluetooth Unavailable" when no controller exists.
 Item {
     id: u
-    property string glyph
+    property string symbol           // SF Symbol (controls/sfpaths.js) above the title, optional
     property string title
     property string text
     width: parent ? parent.width : 0
@@ -14,9 +14,10 @@ Item {
         anchors.centerIn: parent
         width: Math.min(parent.width - 40, 360)
         spacing: 8
-        Text {
+        SfSymbol {   // hyprk's own empty state: no Mac measure
+            visible: u.symbol !== ""
             anchors.horizontalCenter: parent.horizontalCenter
-            text: u.glyph; font.family: Theme.fontGlyph; font.pixelSize: 54
+            name: u.symbol; pointSize: 40
             color: Theme.tertiaryLabel
         }
         MacText {

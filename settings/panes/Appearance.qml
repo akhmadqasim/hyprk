@@ -456,8 +456,9 @@ Column {
                                     x: 14.5; y: 7; width: 11; height: 11; radius: 5.5
                                     color: ({ Default: "#FFC100", Dark: "#F7B300", Clear: "#E0E1E1", Tinted: "#7EE0FF" })[modelData.t]
                                 }
-                                Text {
-                                    x: 2.5; y: 6; text: "cloud"; font.family: Theme.fontGlyph; font.pixelSize: 21
+                                SfSymbol {   // cloud.fill, fitted on appearance-light.png's tiles (the Mac's is the Weather
+                                    // icon's own cloud): ink 39 px wide, left edge 9 px and bottom 44 px in the 58 px tile
+                                    x: 4.1; y: 9; name: "cloud.fill"; pointSize: 16.6
                                     color: modelData.t === "Dark" ? Qt.rgba(0.85, 0.85, 0.86, 0.8) : modelData.t === "Clear" ? Qt.rgba(0.86, 0.86, 0.87, 0.85)
                                          : Qt.rgba(1, 1, 1, 0.62)
                                 }

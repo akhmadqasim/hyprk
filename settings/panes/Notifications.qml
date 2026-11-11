@@ -51,7 +51,6 @@ Column {
                 required property var modelData
                 readonly property var cfg: pane.app(modelData.id)
                 iconSource: Backend.iconUrl(modelData.icon)
-                glyph: "apps"; tint: Theme.tile.gray          // shown when the icon can't be found
                 label: modelData.name
                 sublabel: !cfg.allow ? "Off" : (cfg.style === "alerts" ? "Alerts" : "Banners") + (cfg.sounds ? ", Sounds" : "")
                 Popup {

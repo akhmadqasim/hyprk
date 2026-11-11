@@ -18,15 +18,19 @@ for arg in sys.argv[1:]:
     m = re.match(r"^(.*?)(?:\.(regular|medium|semibold))?(\.var-\d+)?$", arg)
     name, weight, variant = m.group(1), m.group(2) or "regular", m.group(3) or ""
     fn = f"{name}.{weight}{variant}.svg"
+    if fn not in files and not variant:      # no 32 pt file: the Mac's largest render ("pt" in the entry; symbols scale linearly)
+        c = [f for f, m in files.items() if f == f"{name}.{weight}.{m.get('pointSize')}pt.svg"]
+        if c: fn = max(c, key=lambda f: files[f]["pointSize"])
     meta = files.get(fn)
     if meta is None or not os.path.exists(os.path.join(sym, "svg", fn)):
-        sys.exit(f"sfpaths: {fn} is not in themes/icons/sf-symbols (ask the icons owner to decode it)")
+        sys.exit(f"sfpaths: {fn} is not in themes/icons/sf-symbols (add it with themes/icons/tools/add-sf.py)")
     svg = open(os.path.join(sym, "svg", fn)).read()
     paths = re.findall(r"<path\b[^>]*>", svg)
     d = [re.search(r'\bd="([^"]+)"', p).group(1).strip() for p in paths]
     op = [float(re.search(r'fill-opacity="([0-9.]+)"', p).group(1)) for p in paths]
     rules = {re.search(r'fill-rule="(\w+)"', p).group(1) for p in paths}
     e = {"size": meta["size"], "rect": meta["glyphRect"], "d": d}
+    if meta["pointSize"] != 32: e["pt"] = meta["pointSize"]
     if rules == {"evenodd"}: e["rule"] = "evenodd"
     if any(o != 1 for o in op): e["o"] = op          # variable symbols: the dimmed layers
     key = f"{name}{variant}.{weight}"

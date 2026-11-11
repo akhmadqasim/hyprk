@@ -81,10 +81,15 @@ Column {
                     pane.play(pane.soundsDir + "/Sounds/" + P.alertSoundMenu[i] + ".wav", AppState.sound.alertVolume);
                 }
             }
-            Text { // play button after the pop-up
+            Item { // play button after the pop-up: play.circle, ink 33 x 33 px on sound-light.png = 16.5 pt, in the
+                // symbol's own box (38 of 32 wide: the ink's right edge 12 pt inside the card, px 1416)
                 anchors.verticalCenter: parent ? parent.verticalCenter : undefined
-                text: "play_circle_outline"; font.family: Theme.fontGlyph; font.pixelSize: 20
-                color: playMa.pressed ? Theme.label : Theme.secondaryLabel
+                width: 20.5; height: 16.5
+                SfSymbol {
+                    anchors.centerIn: parent
+                    name: "play.circle"; pointSize: 16.5
+                    color: playMa.pressed ? Theme.label : Theme.secondaryLabel
+                }
                 MouseArea { id: playMa; anchors.fill: parent; anchors.margins: -2; onClicked: pane.play(pane.soundsDir + "/Sounds/" + AppState.sound.alertSound + ".wav", AppState.sound.alertVolume) }
             }
         }

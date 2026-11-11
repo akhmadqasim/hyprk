@@ -28,8 +28,7 @@ Column {
                 id: dev
                 required property var modelData
                 readonly property bool up: modelData.state.startsWith("connected")
-                glyph: modelData.type === "wifi" ? "wifi" : modelData.type === "ethernet" ? "settings_ethernet" : "vpn_key"
-                tint: Theme.tile.blue
+                iconId: modelData.type === "wifi" ? "wifi" : modelData.type === "ethernet" ? "network-ethernet" : "vpn"
                 label: modelData.type === "wifi" ? "Wi‑Fi" : modelData.type === "ethernet" ? "Ethernet" : modelData.device
                 sublabel: up ? "Connected" : "Not Connected"
                 Rectangle { width: 8; height: 8; radius: 4; color: dev.up ? Theme.tile.green : Theme.tertiaryLabel }
@@ -37,11 +36,11 @@ Column {
         }
     }
     Card {
-        FormRow { glyph: "local_fire_department"; tint: Theme.tile.gray; label: "Firewall"; value: "Inactive"; }
+        FormRow { iconId: "network-firewall"; label: "Firewall"; value: "Inactive"; }
     }
     Card {
         title: "Other Services"
-        FormRow { glyph: "vpn_lock"; tint: Theme.tile.blue; label: "VPN"; sublabel: "Not Configured" }
+        FormRow { iconId: "vpn"; label: "VPN"; sublabel: "Not Configured" }
     }
     PaneFooter { Button { text: "…" } }
 }

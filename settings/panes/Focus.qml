@@ -6,10 +6,13 @@ import "../HyprK"
 Column {
     spacing: Theme.content.sectionGap
     Card {
-        FormRow { glyph: "dark_mode"; tint: Theme.tile.indigo; label: "Do Not Disturb" }
-        FormRow { glyph: "bed"; tint: Theme.tile.teal; label: "Sleep"; sublabel: "Set Up" }
-        FormRow { glyph: "person"; tint: Theme.tile.purple; label: "Personal"; sublabel: "Set Up" }
-        FormRow { glyph: "work"; tint: Theme.tile.blue; label: "Work"; sublabel: "Set Up" }
+        // each mode's symbol in its colour: the modes' own configuration on 27.2.1 (themes/icons/sf-symbols/names.json
+        // focusModes: symbol, colorName and the light / dark colour). How the Mac's pane draws them (tile or bare
+        // symbol, size) is not measured: no shot of this pane.
+        FormRow { symbol: "moon.fill"; symbolColor: Theme.dark ? "#6D7CFF" : "#6155F5"; label: "Do Not Disturb" }
+        FormRow { symbol: "bed.double.fill"; symbolColor: Theme.dark ? "#6D7CFF" : "#6155F5"; label: "Sleep"; sublabel: "Set Up" }
+        FormRow { symbol: "person.fill"; symbolColor: Theme.dark ? "#DB34F2" : "#CB30E0"; label: "Personal"; sublabel: "Set Up" }
+        FormRow { symbol: "person.lanyardcard.fill"; symbolColor: Theme.dark ? "#00D2E0" : "#00C3D0"; label: "Work"; sublabel: "Set Up" }
     }
     PaneFooter { help: false; Button { text: "Add Focus…" } }
     Card {

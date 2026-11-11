@@ -5,7 +5,7 @@ import "../HyprK"
 
 Column {
     spacing: Theme.content.sectionGap
-    HeroCard { iconId: "siri"; glyph: "graphic_eq"; tint: Theme.tile.purple; title: "Siri"; text: "Siri is not available on this computer." }
+    HeroCard { iconId: "siri"; tint: Theme.tile.purple; title: "Siri"; text: "Siri is not available on this computer." }
     Card {
         FormRow { label: "Siri"; Switch { enabled: false } }
         FormRow { label: "Listen for"; Popup { enabled: false; model: ["Off"] } }

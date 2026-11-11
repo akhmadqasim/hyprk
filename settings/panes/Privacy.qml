@@ -6,16 +6,21 @@ import "../HyprK"
 Column {
     spacing: Theme.content.sectionGap
     Card {
+        id: privacy
         title: "Privacy"
-        FormRow { glyph: "near_me"; tint: Theme.tile.blue; label: "Location Services" }
-        FormRow { glyph: "contacts"; tint: Theme.tile.gray; label: "Contacts" }
-        FormRow { glyph: "calendar_month"; tint: Theme.tile.red; label: "Calendars" }
-        FormRow { glyph: "photo_library"; tint: Theme.tile.orange; label: "Photos" }
-        FormRow { glyph: "mic"; tint: Theme.tile.orange; label: "Microphone" }
-        FormRow { glyph: "videocam"; tint: Theme.tile.green; label: "Camera" }
-        FormRow { glyph: "screen_share"; tint: Theme.tile.purple; label: "Screen & System Audio Recording" }
-        FormRow { glyph: "folder"; tint: Theme.tile.blue; label: "Files & Folders" }
-        FormRow { glyph: "accessibility_new"; tint: Theme.tile.blue; label: "Accessibility" }
+        // icons as SecurityPrivacyExtension names them (TCCServiceList.plist: Contacts by bundle id, the others graphic
+        // icons; Calendars / Photos / Accessibility have a service class there, their icon is taken to be the app's / the
+        // pane's)
+        readonly property string apps: "file://" + Backend.root + "/themes/icons/apps/"
+        FormRow { iconId: "privacy-location"; label: "Location Services" }
+        FormRow { iconSource: privacy.apps + "Contacts-128.png"; label: "Contacts" }
+        FormRow { iconSource: privacy.apps + "Calendar-128.png"; label: "Calendars" }
+        FormRow { iconSource: privacy.apps + "Photos-128.png"; label: "Photos" }
+        FormRow { iconId: "privacy-microphone"; label: "Microphone" }
+        FormRow { iconId: "privacy-camera"; label: "Camera" }
+        FormRow { iconId: "privacy-screenrecording"; label: "Screen & System Audio Recording" }
+        FormRow { iconId: "privacy-files"; label: "Files & Folders" }
+        FormRow { iconId: "accessibility"; label: "Accessibility" }
     }
     Card {
         title: "Security"

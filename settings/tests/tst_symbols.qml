@@ -9,13 +9,17 @@ Item {
     width: 200; height: 100
     SfSymbol { id: chev; name: "chevron.forward"; weight: "semibold"; pointSize: 10.5 }
     SfSymbol { id: bars; name: "wifi.var-50" }
+    SfSymbol { id: bed; name: "bed.double.fill"; pointSize: 13 }
+    SfSymbol { id: play; name: "play.circle"; pointSize: 16.5 }
     TestCase {
         name: "SettingsSymbols"
         when: windowShown
         function test_names() {
             const used = ["chevron.forward", "chevron.backward", "chevron.forward.semibold", "chevron.backward.semibold", "checkmark",
                           "person.fill", "lock.fill", "wifi", "wifi.var-50", "wifi.var-20", "magnifyingglass", "square.on.square",
-                          "square.and.arrow.up", "ellipsis", "capsule.on.rectangle.fill", "capsule.on.rectangle.liquid.glass"];
+                          "square.and.arrow.up", "ellipsis", "capsule.on.rectangle.fill", "capsule.on.rectangle.liquid.glass",
+                          "person.2.fill", "cloud.fill", "play.circle", "info.circle", "bluetooth.slash", "moon.fill",
+                          "bed.double.fill", "person.lanyardcard.fill"];
             for (const n of used) {
                 const w = n.endsWith(".semibold") ? "semibold" : "regular";
                 const g = Sf.get(w === "semibold" ? n.slice(0, -9) : n, w);
@@ -28,6 +32,12 @@ Item {
         function test_row_chevron() {
             fuzzyCompare(chev.width, 5.5, 0.1);
             fuzzyCompare(chev.height, 9.4, 0.1);
+        }
+        // an outline kept at another size than 32 pt (the Mac's 18 pt render) draws at the size asked for
+        function test_other_size() {
+            compare(Sf.get("bed.double.fill").pt, 18);
+            fuzzyCompare(bed.width, 22.5 * 13 / 18, 0.01);
+            fuzzyCompare(play.width, 16.5, 0.01);   // play.circle: 33 px on sound-light.png
         }
         // variable symbols carry the dimmed layers: wifi at 0.5 = two bars, the outer arc at 0.3
         function test_variable() {

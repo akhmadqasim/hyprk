@@ -144,7 +144,7 @@ Item {
                         id: ic
                         size: Theme.sidebar.iconSize
                         x: Theme.sidebar.iconCenter - width / 2; anchors.verticalCenter: parent.verticalCenter
-                        glyph: d.modelData.glyph; iconId: d.modelData.id
+                        iconId: d.modelData.id
                         tint: Theme.tile[d.modelData.tint]
                     }
                     MacText {
@@ -174,7 +174,9 @@ Item {
                     width: Theme.sidebar.iconSize; height: width; radius: width / 2
                     x: Theme.sidebar.iconCenter - width / 2; anchors.verticalCenter: parent.verticalCenter
                     color: Theme.tile.gray
-                    Text { anchors.centerIn: parent; text: "group"; font.family: Theme.fontGlyph; font.pixelSize: parent.width * 0.7; color: "white" }
+                    // person.2.fill; the row is blanked on every Mac shot, so the picture and its size are not measured
+                    // (FamilySettings.appex also holds a 24 pt bitmap, family_icon-macos-24)
+                    SfSymbol { anchors.centerIn: parent; name: "person.2.fill"; pointSize: parent.width * 0.42; color: "white" }
                 }
                 MacText {
                     x: Theme.sidebar.labelLeft; anchors.verticalCenter: parent.verticalCenter

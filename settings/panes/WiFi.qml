@@ -63,7 +63,7 @@ Column {
 
     Card {
         FormRow {
-            glyph: "wifi"; tint: Theme.tile.blue
+            iconId: "wifi"
             label: "Wi‑Fi"
             sublabel: pane.status === "nohw" ? "No hardware installed"
                     : pane.status === "missing" || pane.status === "failed" ? "Not available on this system"
@@ -78,9 +78,11 @@ Column {
             visible: pane.current !== null && pane.radioOn
             label: pane.current ? pane.current.ssid : ""
             sublabel: "Connected"
-            // lock.fill and wifi at the body size (no Mac shot of this pane: sizes and colours are not measured)
-            SfSymbol { visible: pane.current !== null && pane.current.secure; anchors.verticalCenter: parent ? parent.verticalCenter : undefined; name: "lock.fill"; color: Theme.secondaryLabel }
-            SfSymbol { anchors.verticalCenter: parent ? parent.verticalCenter : undefined; name: "wifi"; color: Theme.label }
+            // lock.fill and wifi: .font(.system(size: 14)), no weight, in the network row of WiFiSettingsKit 27.2.1
+            // (Font.system(size:weight:design:) called with 14.0 at 0x2b4e44e7c for lock.fill and at 0x2b4e44bb8 for
+            // Image(systemName: "wifi", variableValue: bars / 3)). Colours not decoded, no Mac shot of this pane.
+            SfSymbol { visible: pane.current !== null && pane.current.secure; anchors.verticalCenter: parent ? parent.verticalCenter : undefined; name: "lock.fill"; pointSize: 14; color: Theme.secondaryLabel }
+            SfSymbol { anchors.verticalCenter: parent ? parent.verticalCenter : undefined; name: "wifi"; pointSize: 14; color: Theme.label }
             Button { text: "Details…" }
         }
     }
@@ -105,11 +107,11 @@ Column {
                 required property var modelData
                 label: modelData.ssid
                 onClicked: pane.join(modelData.ssid)
-                SfSymbol { visible: modelData.secure; anchors.verticalCenter: parent ? parent.verticalCenter : undefined; name: "lock.fill"; color: Theme.secondaryLabel }
-                SfSymbol {   // the variable symbol's 2 and 1 bar states (CoreGlyphs wifi at 0.5 and 0.2)
+                SfSymbol { visible: modelData.secure; anchors.verticalCenter: parent ? parent.verticalCenter : undefined; name: "lock.fill"; pointSize: 14; color: Theme.secondaryLabel }
+                SfSymbol {   // the variable symbol's 2 and 1 bar states (the Mac passes bars / 3; CoreGlyphs wifi at 0.5 and 0.2)
                     anchors.verticalCenter: parent ? parent.verticalCenter : undefined
                     name: modelData.signal > 66 ? "wifi" : modelData.signal > 33 ? "wifi.var-50" : "wifi.var-20"
-                    color: Theme.label
+                    pointSize: 14; color: Theme.label
                 }
             }
         }

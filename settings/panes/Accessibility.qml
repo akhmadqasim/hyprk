@@ -22,38 +22,40 @@ Column {
         if (c === 0 && _rows.some(r => r.id === out.trim())) page = out.trim();
     })
 
-    // id, title, glyph, page file in accessibility/ (none = Unsupported.qml showing `about`)
+    // id, title, icon, page file in accessibility/ (none = Unsupported.qml showing `about`). Icons: the row tiles of
+    // AccessibilityUIServer's / the extension's graphic icon UTIs (themes/icons/settings/graphic.json); the 7 Vision rows
+    // against accessibility-{light,dark}.png: tile body rms 7.8-16.6. Keyboard and Siri: the pane's icon (their UTI was not found).
     readonly property var sections: [
         { title: "Vision", rows: [
-            { id: "voiceover", title: "VoiceOver", glyph: "record_voice_over", file: "VoiceOver" },
-            { id: "zoom", title: "Zoom", glyph: "zoom_in", file: "Zoom" },
-            { id: "hovertext", title: "Hover Text", glyph: "text_fields", about: "Show a larger version of the text under the pointer, or of what you type." },
-            { id: "display", title: "Display", glyph: "desktop_windows", file: "Display" },
-            { id: "motion", title: "Motion", glyph: "animation", file: "Motion" },
-            { id: "readspeak", title: "Read & Speak", glyph: "chat", file: "ReadSpeak" },
-            { id: "audiodesc", title: "Audio Descriptions", glyph: "speaker_notes", about: "Hear descriptions of the visual content of videos, when they are available." }
+            { id: "voiceover", title: "VoiceOver", icon: "ax-voiceover", file: "VoiceOver" },
+            { id: "zoom", title: "Zoom", icon: "ax-zoom", file: "Zoom" },
+            { id: "hovertext", title: "Hover Text", icon: "ax-hovertext", about: "Show a larger version of the text under the pointer, or of what you type." },
+            { id: "display", title: "Display", icon: "display", file: "Display" },
+            { id: "motion", title: "Motion", icon: "ax-motion", file: "Motion" },
+            { id: "readspeak", title: "Read & Speak", icon: "ax-readspeak", file: "ReadSpeak" },
+            { id: "audiodesc", title: "Audio Descriptions", icon: "ax-audiodesc", about: "Hear descriptions of the visual content of videos, when they are available." }
         ] },
         { title: "Physical and Motor", rows: [
-            { id: "voicecontrol", title: "Voice Control", glyph: "settings_voice", about: "Control your computer and apps with spoken commands." },
-            { id: "keyboard", title: "Keyboard", glyph: "keyboard", file: "KeyboardA11y" },
-            { id: "pointer", title: "Pointer Control", glyph: "mouse", file: "PointerControl" },
-            { id: "switchcontrol", title: "Switch Control", glyph: "toggle_on", about: "Control your computer with adaptive switches." }
+            { id: "voicecontrol", title: "Voice Control", icon: "ax-voicecontrol", about: "Control your computer and apps with spoken commands." },
+            { id: "keyboard", title: "Keyboard", icon: "keyboard", file: "KeyboardA11y" },
+            { id: "pointer", title: "Pointer Control", icon: "ax-pointer", file: "PointerControl" },
+            { id: "switchcontrol", title: "Switch Control", icon: "ax-switchcontrol", about: "Control your computer with adaptive switches." }
         ] },
         { title: "Hearing", rows: [
-            { id: "hearingdevices", title: "Hearing Devices", glyph: "hearing", about: "Pair and adjust Made for iPhone hearing devices." },
-            { id: "audio", title: "Audio", glyph: "volume_up", file: "Audio" },
-            { id: "captions", title: "Captions", glyph: "closed_caption", file: "Captions" },
-            { id: "livecaptions", title: "Live Captions", glyph: "subtitles", about: "Get real-time captions of spoken audio, transcribed on this computer." },
-            { id: "namerecognition", title: "Name Recognition", glyph: "person_search", about: "Get a notification when your name is called." }
+            { id: "hearingdevices", title: "Hearing Devices", icon: "ax-hearingdevices", about: "Pair and adjust Made for iPhone hearing devices." },
+            { id: "audio", title: "Audio", icon: "ax-audio", file: "Audio" },
+            { id: "captions", title: "Captions", icon: "ax-captions", file: "Captions" },
+            { id: "livecaptions", title: "Live Captions", icon: "ax-livecaptions", about: "Get real-time captions of spoken audio, transcribed on this computer." },
+            { id: "namerecognition", title: "Name Recognition", icon: "ax-namerecognition", about: "Get a notification when your name is called." }
         ] },
         { title: "Speech", rows: [
-            { id: "livespeech", title: "Live Speech", glyph: "keyboard_voice", file: "LiveSpeech" },
-            { id: "personalvoice", title: "Personal Voice", glyph: "person", about: "Create a synthesized voice that sounds like you." },
-            { id: "vocalshortcuts", title: "Vocal Shortcuts", glyph: "mic", about: "Perform an action when you say a chosen word or sound." },
-            { id: "siri", title: "Siri", glyph: "graphic_eq", about: "Let Siri listen for atypical speech." }
+            { id: "livespeech", title: "Live Speech", icon: "ax-livespeech", file: "LiveSpeech" },
+            { id: "personalvoice", title: "Personal Voice", icon: "ax-personalvoice", about: "Create a synthesized voice that sounds like you." },
+            { id: "vocalshortcuts", title: "Vocal Shortcuts", icon: "ax-vocalshortcuts", about: "Perform an action when you say a chosen word or sound." },
+            { id: "siri", title: "Siri", icon: "siri", about: "Let Siri listen for atypical speech." }
         ] },
         { title: "General", rows: [
-            { id: "shortcut", title: "Shortcut", glyph: "accessibility_new", about: "Choose the features in the Accessibility Shortcuts panel." }
+            { id: "shortcut", title: "Shortcut", icon: "ax-shortcut", about: "Choose the features in the Accessibility Shortcuts panel." }
         ] }
     ]
     readonly property var _rows: sections.reduce((all, s) => all.concat(s.rows), [])
@@ -63,7 +65,7 @@ Column {
     HeroCard {
         visible: pane.page === ""
         compact: true
-        iconId: "accessibility"; glyph: "accessibility_new"; tint: Theme.tile.blue
+        iconId: "accessibility"
         title: "Accessibility"
         text: "Personalize your computer in ways that work best for you with accessibility features for vision, hearing, motor, speech and cognition."
         link: "Learn more…"
@@ -83,7 +85,7 @@ Column {
                     required property int index
                     implicitHeight: index > 0 ? 43 : 42   // 42 + the separator
                     iconSize: 20
-                    glyph: modelData.glyph; tint: Theme.tile.blue
+                    iconId: modelData.icon
                     label: modelData.title
                     onClicked: pane.page = modelData.id
                     // chevron.forward semibold 10.5 pt: fitted on accessibility-{light,dark}.png (alpha rms .026 /

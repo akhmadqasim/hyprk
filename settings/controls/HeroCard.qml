@@ -7,7 +7,6 @@ import "../HyprK"
 // (13 medium) and a 2-line 11 pt description ending in a "Learn more…" link (linkActivated).
 Rectangle {
     id: h
-    property string glyph
     property string iconId
     property color tint: Theme.tile.blue
     property string title
@@ -25,7 +24,7 @@ Rectangle {
         visible: h.compact
         x: 10; y: 10
         spacing: 12
-        PaneIcon { size: 26; glyph: h.glyph; iconId: h.iconId; tint: h.tint }
+        PaneIcon { size: 26; iconId: h.iconId; tint: h.tint }
         Column {
             width: h.width - 10 - 26 - 12 - 10
             // 13 Medium: the title's ink is 150 px at 2x on the Mac (accessibility-light.png), semibold measured 159
@@ -49,7 +48,7 @@ Rectangle {
         anchors.centerIn: parent
         width: parent.width - 60
         spacing: 6
-        PaneIcon { anchors.horizontalCenter: parent.horizontalCenter; size: Theme.content.heroIcon; glyph: h.glyph; iconId: h.iconId; tint: h.tint }
+        PaneIcon { anchors.horizontalCenter: parent.horizontalCenter; size: Theme.content.heroIcon; iconId: h.iconId; tint: h.tint }
         MacText {
             anchors.horizontalCenter: parent.horizontalCenter
             text: h.title

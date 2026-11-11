@@ -4,22 +4,24 @@ import "../controls"
 
 Column {
     spacing: Theme.content.sectionGap
-    HeroCard { iconId: "general"; glyph: "settings"; tint: Theme.tile.gray; title: "General"; text: "Manage your overall setup and preferences for your computer, such as software updates, device language, AirDrop and more." }
+    HeroCard { iconId: "general"; tint: Theme.tile.gray; title: "General"; text: "Manage your overall setup and preferences for your computer, such as software updates, device language, AirDrop and more." }
     Card {
-        FormRow { glyph: "info"; tint: Theme.tile.gray; label: "About" }
-        FormRow { glyph: "update"; tint: Theme.tile.gray; label: "Software Update" }
-        FormRow { glyph: "storage"; tint: Theme.tile.gray; label: "Storage" }
+        // each row: its sub-pane extension's own icon (themes/icons/settings/graphic.json). About is ISCurrentDevice on the
+        // Mac, the model's symbol: here a laptop with a battery, else a desktop computer.
+        FormRow { iconId: AppState.hasBattery ? "general-about-laptop" : "general-about"; label: "About" }
+        FormRow { iconId: "general-softwareupdate"; label: "Software Update" }
+        FormRow { iconId: "general-storage"; label: "Storage" }
     }
     Card {
-        FormRow { glyph: "airplay"; tint: Theme.tile.blue; label: "AirDrop & Handoff" }
-        FormRow { glyph: "login"; tint: Theme.tile.gray; label: "Login Items & Extensions" }
+        FormRow { iconId: "general-airdrop"; label: "AirDrop & Handoff" }
+        FormRow { iconId: "general-loginitems"; label: "Login Items & Extensions" }
     }
     Card {
-        FormRow { glyph: "language"; tint: Theme.tile.blue; label: "Language & Region" }
-        FormRow { glyph: "schedule"; tint: Theme.tile.blue; label: "Date & Time" }
-        FormRow { glyph: "share"; tint: Theme.tile.blue; label: "Sharing" }
-        FormRow { glyph: "history"; tint: Theme.tile.gray; label: "Time Machine" }
-        FormRow { glyph: "restart_alt"; tint: Theme.tile.gray; label: "Transfer or Reset" }
-        FormRow { glyph: "album"; tint: Theme.tile.gray; label: "Startup Disk" }
+        FormRow { iconId: "general-language"; label: "Language & Region" }
+        FormRow { iconId: "general-datetime"; label: "Date & Time" }
+        FormRow { iconId: "general-sharing"; label: "Sharing" }
+        FormRow { iconId: "general-timemachine"; label: "Time Machine" }
+        FormRow { iconId: "general-transfer"; label: "Transfer or Reset" }
+        FormRow { iconId: "general-startupdisk"; label: "Startup Disk" }
     }
 }

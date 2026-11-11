@@ -6,11 +6,10 @@ import "../HyprK"
 Row {
     id: n
     property string text
-    property string glyph: "info"
     spacing: 6
     visible: text !== ""
-    Text {
-        text: n.glyph; font.family: Theme.fontGlyph; font.pixelSize: 14
+    SfSymbol {   // info.circle at the text's size (hyprk's own control: no Mac measure)
+        name: "info.circle"; pointSize: 11
         color: Theme.secondaryLabel
         anchors.verticalCenter: parent.verticalCenter
     }

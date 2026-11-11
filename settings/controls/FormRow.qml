@@ -7,10 +7,12 @@ Item {
     id: row
     property string label
     property string sublabel
-    property string glyph            // Material Icons ligature for a small tile
-    property string iconSource       // app icon image instead of the glyph tile
+    property string iconId           // tile: a pane icon or a row icon (Panes.js), themes/icons/settings
+    property string iconSource       // app icon image instead of the tile
+    property string symbol           // or a bare SF Symbol (controls/sfpaths.js) in symbolColor, no tile
+    property color symbolColor: Theme.label
     property color tint: Theme.tile.blue
-    property real iconSize: 22
+    property real iconSize: 20       // the Mac's row tile: 40 px at 2x (accessibility-light.png)
     property bool dim: false
     property string value            // gray trailing text, e.g. "Off"
     property bool alignTop: false    // tall rows (pickers) keep the label at the top, like macOS
@@ -33,9 +35,15 @@ Item {
     }
     PaneIcon {
         id: icon
-        visible: row.glyph !== "" || row.iconSource !== ""
-        size: row.iconSize; glyph: row.glyph; tint: row.tint; imageSource: row.iconSource
+        visible: row.iconId !== "" || row.iconSource !== "" || row.symbol !== ""
+        size: row.iconSize; iconId: row.iconId; tint: row.tint; imageSource: row.iconSource
+        opacity: row.symbol !== "" ? 0 : 1
         x: Theme.content.rowPadding; anchors.verticalCenter: parent.verticalCenter
+    }
+    SfSymbol {   // size not measured on the Mac (no shot of a row with a bare symbol): the body size
+        visible: row.symbol !== ""
+        anchors.centerIn: icon
+        name: row.symbol; pointSize: 13; color: row.symbolColor
     }
     Column {
         id: texts

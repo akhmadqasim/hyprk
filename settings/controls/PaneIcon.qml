@@ -6,11 +6,11 @@ import "../Panes.js" as Panes
 // System Settings pane icon. Panes use the real macOS 27.2.1 icons rendered by IconServices,
 // themes/icons/settings/<iconId>@<64|128>-<default|dark|clear|tinted>-<light|dark>.png, one set per "Icon & widget
 // style" (Appearance pane, AppState.appearance.iconStyle) and appearance (reference/re/MAC-ANSWERS.md R3b, names.json
-// settingsIconStyles); anything else (or a missing file) gets a coloured rounded-square tile with a Material Icons glyph.
+// settingsIconStyles). Row icons (Panes.isRowIcon: the 24 pt tiles built from Apple's graphic icon configurations) come
+// as one 48 px file, the Mac's 24 pt icon at 2x. Anything else (or a missing file) gets a plain coloured tile.
 Item {
     id: pi
     property int size: Theme.sidebar.iconSize
-    property string glyph
     property string iconId
     property string imageSource          // e.g. an app icon; wins over iconId
     property color tint: Theme.tile.blue
@@ -27,7 +27,9 @@ Item {
     }
     // The PNG is the whole icon canvas: the tile body is 104 of 128 px (12..116), the rest is its shadow.
     // Drawn so the body is `size`, like the glyph tile; the 64 px file up to 64 device px, else the 128 px one.
-    readonly property real art: size * 128 / 104
+    // A row icon is drawn as the Mac draws it, a 24 pt icon for the 20 pt tile (accessibility-light.png: tile body
+    // 40 px, image 48 px), so at 2x its file lands on whole pixels.
+    readonly property real art: Panes.isRowIcon(iconId) ? size * 1.2 : size * 128 / 104
     // the window's real ratio (1.6 on a fractional output, where Screen.devicePixelRatio says 2), as Finder passes
     // its display.dpr: the art is decoded at the pixels it is drawn on
     readonly property real dpr: Theme.dpr > 0 ? Theme.dpr : Screen.devicePixelRatio
@@ -45,7 +47,7 @@ Item {
         width: pi.art; height: pi.art
         visible: status === Image.Ready
         source: pi.imageSource === "" && Panes.hasRealIcon(pi.iconId)
-            ? "file://" + Backend.root + "/themes/icons/settings/" + pi.iconId + "@" + (pi.artPx > 64 ? 128 : 64)
+            ? "file://" + Backend.root + "/themes/icons/settings/" + pi.iconId + "@" + Panes.iconPx(pi.iconId, pi.artPx)
               + "-" + pi.style + "-" + (pi.darkArt ? "dark" : "light") + ".png" : ""
         sourceSize: Qt.size(pi.artPx, pi.artPx)   // scaled once when decoded, cached per size
         smooth: true
@@ -65,12 +67,6 @@ Item {
         gradient: Gradient {
             GradientStop { position: 0; color: Qt.lighter(pi.tileColor, pi.style === "clear" ? 1.04 : 1.12) }
             GradientStop { position: 1; color: pi.tileColor }
-        }
-        Text {
-            anchors.centerIn: parent
-            text: pi.glyph
-            font.family: Theme.fontGlyph; font.pixelSize: Math.round(pi.size * 0.68)
-            color: pi.style === "dark" ? Qt.lighter(pi.tint, 1.15) : "white"
         }
     }
 }
