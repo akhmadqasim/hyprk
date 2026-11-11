@@ -36,6 +36,7 @@ Singleton {
     // Appearance > Theme > Color (multicolor, graphite, red, ...). Under Multicolor the shell's own surfaces
     // have no app accent, so they get Blue #007AFF, like apps without NSAccentColorName (MAC-ANSWERS R5)
     property string accent: "multicolor"
+    property string highlight: ""      // appearance.json `highlight`: text highlight colour, "" = Automatic
     property bool blurAvailable: true
     // Accessibility (same file; services/A11y.qml holds the Hyprland side). Theme cannot import
     // qs.services (the services import qs), so it reads them itself. Increase contrast also
@@ -81,7 +82,7 @@ Singleton {
         onFileChanged: reload()
         onLoaded: {
             const o = State.parse(text(), { dark: theme.dark, reduceTransparency: theme.reduceTransparency, iconStyle: theme.iconStyle,
-                                            iconStyleVariant: theme.iconStyleVariant, reduceMotion: false, increaseContrast: false, accent: "multicolor", glass: 0.5 });
+                                            iconStyleVariant: theme.iconStyleVariant, reduceMotion: false, increaseContrast: false, accent: "multicolor", highlight: "", glass: 0.5 });
             theme.dark = o.dark;
             theme.reduceTransparency = o.reduceTransparency;
             theme.iconStyle = o.iconStyle;
@@ -89,6 +90,7 @@ Singleton {
             theme.reduceMotion = o.reduceMotion;
             theme.increaseContrast = o.increaseContrast;
             theme.accent = o.accent;
+            theme.highlight = typeof o.highlight === "string" ? o.highlight : "";
             theme.glassTint = isFinite(o.glass) ? Math.min(1, Math.max(0, o.glass)) : 0.5;
         }
     }
@@ -145,6 +147,7 @@ Singleton {
         Tokens.increaseContrast = Qt.binding(() => theme.increaseContrast);
         Tokens.fontText = Qt.binding(() => theme.fontText);
         Accent.name = Qt.binding(() => theme.accent);
+        Accent.highlight = Qt.binding(() => theme.highlight);   // text highlight colour, "" = Automatic (follows the accent)
     }
 
     IpcHandler {
@@ -339,11 +342,6 @@ Singleton {
         // (premultiplied rgba for shaders/plusfill.frag: rgb is added, alpha covers)
         readonly property vector4d separator: theme.dark ? Qt.vector4d(65 / 255, 65 / 255, 65 / 255, 0) : Qt.vector4d(0, 0, 0, theme.strokeAlpha(0.55))
         readonly property vector4d dot: theme.dark ? Qt.vector4d(125 / 255, 125 / 255, 125 / 255, 0) : Qt.vector4d(0, 0, 0, 0.55)
-        // the app name label's fill over its glass, premultiplied (rgb may exceed alpha: shaders/plusfill.frag):
-        // least squares of dst * (1 - a) + k against the Mac's label over the Dock material on black, grey 127 and
-        // white (Q-dock-08 fills light 131/192/249, dark 31/131/180 against the Dock's 38/134/229, 12/108/176):
-        // light a 0.382, k 108/255 (rms 1.0); dark a 0.083, k 23.5/255 (rms 5)
-        readonly property vector4d labelFill: theme.dark ? Qt.vector4d(23.5 / 255, 23.5 / 255, 23.5 / 255, 0.083) : Qt.vector4d(107 / 255, 107 / 255, 107 / 255, 0.382)
         // label pointer marker for the plugin (plugin/README.md "Dock label pointer"): a rect this size hung 1 pt under the
         // pill with a hole at its top-left + 1 becomes Apple's pointer (a 16 pt square turned 45 deg, corner 2.5, centre
         // 4 pt above the pill's bottom, union smoothness 25: Dock ECCartoucheGlassLayerController, REA 27.2.1 3)

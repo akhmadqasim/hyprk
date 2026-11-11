@@ -45,7 +45,10 @@ QtObject {
     readonly property color selectedContent: _app ? Qt.darker(appAccent, 1.14) : _row.content[_i]   // app accent: guessed
     // selectedTextBackgroundColor (= selectedControlColor): text selection. An app accent's highlight is 30 % of
     // it over white (light) or over #5A5A5A (dark): fits Notes #FCB827 -> #FEEABF / #8A764B and Blue's row.
-    readonly property color selectedText: highlight !== "" && table[highlight] ? table[highlight].text[_i]
+    // The Graphite highlight chosen by hand is white a.247 in dark; under the Graphite accent with Automatic it is
+    // the table's #696969 (accent-colors.json highlightColor.graphiteHighlightDark).
+    readonly property color selectedText: highlight === "graphite" && dark ? Qt.rgba(1, 1, 1, 0.247)
+        : highlight !== "" && table[highlight] ? table[highlight].text[_i]
         : _app ? Qt.tint(dark ? "#5A5A5A" : "#FFFFFF", Qt.rgba(appAccent.r, appAccent.g, appAccent.b, 0.3))
         : _row.text[_i]
     readonly property color focusRing: _app ? Qt.rgba(color.r, color.g, color.b, 0.5) : _row.focus[_i]
