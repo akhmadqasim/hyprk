@@ -15,9 +15,12 @@
 #     ':(exclude)state' ':(exclude)themes/wallpapers' ':(exclude)sounds/originals'
 #   git archive --prefix=hyprk-0.1.0/ -o /tmp/w.tar HEAD -- themes/wallpapers/png/TahoeLight.png \
 #     themes/wallpapers/png/TahoeDark.png themes/wallpapers/png/DefaultAerial.png
-#   tar -Af /tmp/a.tar /tmp/w.tar && gzip -c /tmp/a.tar > ~/rpmbuild/SOURCES/hyprk-0.1.0.tar.gz
-# (same lists as NOSHIP and SHIP_WALLPAPERS in packaging/install.sh). The prep section stops the build if the
-# tarball holds anything else from themes/wallpapers, or reference/, packaging/, state/ or sounds/originals. The install
+#   git ls-files -z sounds/originals | grep -zE "$(sed -n 's/^SHIP_SOUNDS_RE="\(.*\)"$/\1/p' packaging/install.sh)" |
+#     xargs -0 git archive --prefix=hyprk-0.1.0/ -o /tmp/s.tar HEAD --
+#   tar -Af /tmp/a.tar /tmp/w.tar && tar -Af /tmp/a.tar /tmp/s.tar && gzip -c /tmp/a.tar > ~/rpmbuild/SOURCES/hyprk-0.1.0.tar.gz
+# (same lists as NOSHIP, SHIP_SOUNDS_RE and SHIP_WALLPAPERS in packaging/install.sh: the third archive adds the 23
+# sounds/originals files the shell plays). The prep section stops the build if the tarball holds anything else from
+# themes/wallpapers or sounds/originals, or reference/, packaging/ or state/. The install
 # section downscales the wallpapers to 3840 px (the originals are 6016 px and 46 MB each). The rest of the wallpapers:
 # copy them to /usr/share/hyprk/themes/wallpapers/png/ by hand (packaging/README.md).
 %global debug_package %{nil}
@@ -51,11 +54,14 @@ sounds and a few wallpapers: private use only, never upload it.
 
 %prep
 %autosetup
-for d in reference packaging state sounds/originals themes/wallpapers/heic themes/wallpapers/dynamic-sonoma; do
+for d in reference packaging state themes/wallpapers/heic themes/wallpapers/dynamic-sonoma; do
     if [ -e "$d" ]; then echo "Source0 contains $d: remake it with the git archive commands at the top of this spec"; exit 1; fi
 done
 extra=$(find themes/wallpapers -type f 2>/dev/null | grep -vE '^themes/wallpapers/png/(TahoeLight|TahoeDark|DefaultAerial)\.png$' || true)
 if [ -n "$extra" ]; then echo "Source0 holds more wallpapers than the allowlist: $extra"; exit 1; fi
+# sounds/originals: only what the shell plays (SHIP_SOUNDS_RE in packaging/install.sh)
+extra=$(find sounds/originals -type f 2>/dev/null | grep -vE '^sounds/originals/(Sounds/[^/]+$|misc/(BezelServices-volume|PowerChime-connect_power)\.|SystemSounds/(system/(Screen Capture|Volume Mount|Volume Unmount|SentMessage)|finder/empty trash|dock/(drag to trash|poof item off dock))\.)' || true)
+if [ -n "$extra" ]; then echo "Source0 holds more of sounds/originals than SHIP_SOUNDS_RE: $extra"; exit 1; fi
 
 %build
 cmake -S finder -B build-finder -G Ninja -DCMAKE_BUILD_TYPE=Release

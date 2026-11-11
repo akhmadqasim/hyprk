@@ -14,8 +14,12 @@
   outputs = { self, nixpkgs }:
     let
       # Left out (same lists as NOSHIP and SHIP_WALLPAPERS in install.sh): reference/, packaging/, the dev's state/,
-      # sounds/originals (duplicates of sounds/wav) and every wallpaper that is not in `wallpapers`.
-      noship = [ "reference" "packaging" "state" "sounds/originals" ];
+      # sounds/originals (duplicates of sounds/wav) but the files the shell plays (`shipSounds`, SHIP_SOUNDS_RE) and every
+      # wallpaper that is not in `wallpapers`.
+      noship = [ "reference" "packaging" "state" ];
+      # the 23 sounds/originals files shell/scripts/sound.sh plays (the 14 alert sounds and its event files, 6.2 MB);
+      # SHIP_SOUNDS_RE as a whole-path match (builtins.match is anchored, so no ^ / $)
+      shipSounds = "sounds/originals/(Sounds/[^/]+|misc/(BezelServices-volume|PowerChime-connect_power)\\.|SystemSounds/(system/(Screen Capture|Volume Mount|Volume Unmount|SentMessage)|finder/empty trash|dock/(drag to trash|poof item off dock))\\.).*";
       wallpapers = [ "TahoeLight.png" "TahoeDark.png" "DefaultAerial.png" ];   # themes/wallpapers/png, the code's defaults
       wpmax = "3840";   # px, the originals are 6016 px and 46 MB each
       system = "x86_64-linux";
@@ -33,8 +37,10 @@
             let rel = pkgs.lib.removePrefix (toString ../.. + "/") (toString path);
                 keepWp = rel == "themes/wallpapers" || rel == "themes/wallpapers/png"
                   || builtins.any (w: rel == "themes/wallpapers/png/" + w) wallpapers;
+                keepSound = type == "directory" || builtins.match shipSounds rel != null;
             in !(builtins.any (d: rel == d || pkgs.lib.hasPrefix (d + "/") rel) noship)
-               && (!(pkgs.lib.hasPrefix "themes/wallpapers/" rel) || keepWp);
+               && (!(pkgs.lib.hasPrefix "themes/wallpapers/" rel) || keepWp)
+               && (!(pkgs.lib.hasPrefix "sounds/originals/" rel) || keepSound);
         };
         nativeBuildInputs = with pkgs; [ cmake ninja pkg-config makeWrapper qt6.wrapQtAppsHook imagemagick ];
         # the plugin needs hyprland's own build inputs (hyprutils, aquamarine, ...) for hyprland.pc

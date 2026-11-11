@@ -7,7 +7,7 @@
 # !! The built package CONTAINS APPLE FONTS, ICONS, CURSORS, SOUNDS AND WALLPAPERS. It is for your own machines only.
 # !! NEVER upload it or this source tree with the assets anywhere: not the AUR, not a repo, not a release, not a cache.
 # What goes in: everything tracked except reference/, packaging/, state/, sounds/originals (duplicates of sounds/wav)
-# and the wallpaper collection. Only the wallpapers in _wallpapers are included, downscaled (see package()).
+# but the 23 originals the shell plays (_shipsounds), and the wallpaper collection. Only the wallpapers in _wallpapers are included, downscaled (see package()).
 # The rest of the wallpapers: copy them to /usr/share/hyprk/themes/wallpapers/png/ by hand (packaging/README.md).
 #
 # /usr/share/hyprk is read-only: config/hypr/state-dir.sh (sourced by start.sh) puts the state in
@@ -35,6 +35,8 @@ sha256sums=('SKIP')
 
 # Left out (keep in sync with NOSHIP / SHIP_WALLPAPERS in packaging/install.sh, the spec and the flake):
 _noship='^(reference|packaging|state|themes/wallpapers|sounds/originals)/'
+# the sounds/originals files shell/scripts/sound.sh plays (the 14 alert sounds and its event files, 6.2 MB)
+_shipsounds='^sounds/originals/(Sounds/[^/]+$|misc/(BezelServices-volume|PowerChime-connect_power)\.|SystemSounds/(system/(Screen Capture|Volume Mount|Volume Unmount|SentMessage)|finder/empty trash|dock/(drag to trash|poof item off dock))\.)'
 _wallpapers=(TahoeLight.png TahoeDark.png DefaultAerial.png)   # themes/wallpapers/png, the defaults the code uses
 _wpmax=3840                                                    # px, the originals are 6016 px and 46 MB each
 
@@ -57,7 +59,8 @@ package() {
     local hl; hl=$(pacman -Q hyprland 2>/dev/null | cut -d' ' -f2)
     [ -z "$hl" ] || depends+=("hyprland=$hl")   # plugin ABI: exact Hyprland build
     install -d "$root"
-    git ls-files -z | grep -zvE "$_noship" | tar --null -T - -cf - | tar -C "$root" -xf -
+    { git ls-files -z | grep -zvE "$_noship"; git ls-files -z sounds/originals | grep -zE "$_shipsounds"; } |
+        tar --null -T - -cf - | tar -C "$root" -xf -
     install -Dm755 build-finder/hyprk-finder "$root/finder/build/hyprk-finder"
     install -Dm755 build-plugin/libliquidglass.so "$root/plugin/build/libliquidglass.so"
     # the default wallpapers, downscaled, plus gradient fallbacks (same as install.sh)

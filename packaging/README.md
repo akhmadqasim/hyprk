@@ -87,8 +87,8 @@ commands + `%prep` guard + `%install` loop in the spec, `noship` + `wallpapers` 
 
 | Included | Left out |
 |---|---|
-| everything tracked, i.e. `themes/fonts`, `themes/icons` (`apps`, `apps-hires`, `system`, `hyprk-apple`), `themes/cursors`, `sounds/{oga,wav}` | `reference/` (screenshots, RE dumps), `packaging/`, `state/` |
-| from `themes/wallpapers/png` only `TahoeLight.png`, `TahoeDark.png`, `DefaultAerial.png` (the names `wallpaper.sh`, `lockscreen/` and the Appearance pane use as defaults), downscaled to 3840 px, plus generated `hyprk-gradient-{light,dark}.png` | the rest of the wallpapers (`heic/`, `dynamic-sonoma/`, 16 more PNGs: 1.4 GB), `sounds/originals` (unconverted duplicates of `wav`/`oga`) |
+| everything tracked, i.e. `themes/fonts`, `themes/icons` (`apps`, `apps-hires`, `system`, `hyprk-apple`), `themes/cursors`, `sounds/{oga,wav}`, and the 23 `sounds/originals` files the shell plays (`SHIP_SOUNDS_RE` in install.sh, `_shipsounds` in the PKGBUILD, the third `git archive` + `%prep` guard in the spec, `shipSounds` in the flake; 6.2 MB) | `reference/` (screenshots, RE dumps), `packaging/`, `state/` |
+| from `themes/wallpapers/png` only `TahoeLight.png`, `TahoeDark.png`, `DefaultAerial.png` (the names `wallpaper.sh`, `lockscreen/` and the Appearance pane use as defaults), downscaled to 3840 px, plus generated `hyprk-gradient-{light,dark}.png` | the rest of the wallpapers (`heic/`, `dynamic-sonoma/`, 16 more PNGs: 1.4 GB), the rest of `sounds/originals` (unconverted duplicates of `wav`/`oga`, 38 MB) |
 
 If a new asset dir is added to the repo it is shipped automatically (it is tracked); if it is big or not needed at
 runtime, add it to the left-out list in all four places. To get the other wallpapers: `install.sh --assets <checkout>`
@@ -96,7 +96,7 @@ copies the whole `themes/wallpapers` (full size) into the install, or copy PNG/J
 `<prefix>/themes/wallpapers/png/` by hand (`/usr/share/hyprk/...` for the PKGBUILD and the spec, with sudo). The
 Wallpaper pane lists the files in that directory, so it works with the small set and shows the extra ones once copied.
 The spec's Source0 tarball must be made with the `git archive` commands at the top of the spec (the `%prep` guard
-fails when `reference/`, `packaging/`, `state/`, `sounds/originals` or extra wallpapers are in it).
+fails when `reference/`, `packaging/`, `state/`, `sounds/originals` files outside `SHIP_SOUNDS_RE` or extra wallpapers are in it).
 A checkout without the Apple assets (for example a public tarball) still installs: `install.sh` then uses these
 fallbacks:
 
@@ -213,6 +213,11 @@ same `hyprland` derivation (ABI always matches) and wraps `dist/hyprk-session`. 
   against nixpkgs hyprland, 2155 files, 183 MB, same content checks. Not run as a session.
 - Wallpaper part of every package: 52 MB (TahoeLight 16.7, TahoeDark 16.4, DefaultAerial 9.8 MB, two gradients 9.5 MB).
   The Tahoe originals are 6016 px and 46 MB each as PNG; they are downscaled to 3840 px at package time with ImageMagick.
+- 2026-11-11, the sounds exception in the three recipes (nothing built): `bash -n` and `makepkg --printsrcinfo` (archlinux,
+  offline) on the PKGBUILD and its file list from the checkout: 23 `sounds/originals` files; `rpmspec -P` and rpmlint
+  (fedora:latest) on the spec: 0 errors, the 3 known warnings; the spec's third `git archive` gives 23 files and the
+  `%prep` guard passes them and stops on any other original; flake `nix-instantiate --parse` and `builtins.match shipSounds`
+  over `git ls-files sounds/originals` (nixos/nix, offline): 23. `nix flake check` was not rerun (it copies the 1.4 GB tree).
 
 Defects found and fixed in the first pass: flake `src = ../.` pointed at packaging/ instead of the repo (`../..`) and
 lacked hyprutils; spec used `%cmake_build --dir`, which silently builds the wrong directory, and did not install
