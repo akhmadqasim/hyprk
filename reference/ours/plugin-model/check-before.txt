@@ -1,0 +1,113 @@
+1. apple_glass.inputs() vs 194 Mac filter dumps: exact (all keys within 1e-3)
+
+2. plugin inputs vs Apple, 6 materials x light/dark x D [20, 24, 32, 64, 96, 200, 500] x a [0, 0.25, 0.5, 0.75, 1] (max |diff|, where it is largest)
+  regular             9 inputs differ:
+     BleedOpacity                0.3  (D 200 a 0 dark: Apple 0.8, ours 0.5)
+     BlurFillDarkenOpacity       0.225  (D 20 a 0 dark: Apple 0.675, ours 0.9)
+     BlurFillLightenOpacity      0.225  (D 20 a 0 light: Apple 0.675, ours 0.9)
+     BlurFillNormalOpacity       0.5  (D 20 a 0 light: Apple 0, ours 0.5)
+     Fill                        0.5  (D 20 a 1 dark: Apple [0.125, 0.125, 0.125, 0.5], ours [0, 0, 0, 0])
+     KeyFillHighlightSpreadDeg   10  (D 20 a 0 light: Apple 106, ours 96)
+     MaxLuma                     0.1  (D 200 a 0 dark: Apple 0.45, ours 0.35)
+     OuterRefractionAmount       11  (D 20 a 0 light: Apple 16, ours 5)
+     OuterRefractionHeight       12  (D 20 a 0 light: Apple 16, ours 4)
+  menu                9 inputs differ:
+     BleedOpacity                0.3  (D 200 a 0 dark: Apple 0.8, ours 0.5)
+     BlurFillDarkenOpacity       0.225  (D 20 a 0 dark: Apple 0.675, ours 0.9)
+     BlurFillLightenOpacity      0.225  (D 20 a 0 light: Apple 0.675, ours 0.9)
+     BlurFillNormalOpacity       0.5  (D 20 a 0 light: Apple 0, ours 0.5)
+     Fill                        0.5  (D 20 a 1 dark: Apple [0.125, 0.125, 0.125, 0.5], ours [0, 0, 0, 0])
+     KeyFillHighlightSpreadDeg   10  (D 20 a 0 light: Apple 106, ours 96)
+     MaxLuma                     0.1  (D 200 a 0 dark: Apple 0.45, ours 0.35)
+     OuterRefractionAmount       11  (D 20 a 0 light: Apple 16, ours 5)
+     OuterRefractionHeight       12  (D 20 a 0 light: Apple 16, ours 4)
+  notificationcenter  9 inputs differ:
+     BleedOpacity                0.3  (D 200 a 0 dark: Apple 0.8, ours 0.5)
+     BlurFillDarkenOpacity       0.225  (D 20 a 0 dark: Apple 0.675, ours 0.9)
+     BlurFillLightenOpacity      0.225  (D 20 a 0 light: Apple 0.675, ours 0.9)
+     BlurFillNormalOpacity       0.5  (D 20 a 0 light: Apple 0, ours 0.5)
+     Fill                        0.5  (D 20 a 1 dark: Apple [0.125, 0.125, 0.125, 0.5], ours [0, 0, 0, 0])
+     KeyFillHighlightSpreadDeg   10  (D 20 a 0 light: Apple 106, ours 96)
+     MaxLuma                     0.25  (D 20 a 0 dark: Apple 0.6, ours 0.35)
+     OuterRefractionAmount       11  (D 20 a 0 light: Apple 16, ours 5)
+     OuterRefractionHeight       12  (D 20 a 0 light: Apple 16, ours 4)
+  clear               4 inputs differ:
+     BlurFillNormalOpacity       1  (D 20 a 1 light: Apple 1, ours 0)
+     BlurRadiusRel               1  (D 20 a 0 light: Apple 0, ours 1)
+     OuterRefractionAmount       100  (D 500 a 0 light: Apple 100, ours 0)
+     OuterRefractionHeight       62.5  (D 500 a 0 light: Apple 62.5, ours 0)
+  dock                5 inputs differ:
+     BlurFillNormalOpacity       1  (D 20 a 1 light: Apple 1, ours 0)
+     BlurRadiusRel               1  (D 20 a 0 light: Apple 0, ours 1)
+     InnerRefractionAmount       30  (D 500 a 0 light: Apple -90, ours -60)
+     InnerRefractionHeight       20  (D 500 a 0 light: Apple 40, ours 20)
+     KeyFillHighlightSpreadDeg   45  (D 20 a 0 light: Apple 75, ours 120)
+  controlcenter       3 inputs differ:
+     BlurFillNormalOpacity       1  (D 20 a 1 light: Apple 1, ours 0)
+     BlurOpacity1                0.8  (D 20 a 0 light: Apple 0.1, ours 0.9)
+     BlurRadiusRel               1  (D 20 a 0 light: Apple 0, ours 1)
+
+3a. face vs the Mac's measured centre pixels (17 flat backdrops, a = 0 / 0.5 / 1), rms / max in levels of 255
+    probe                      ours             Apple model      (glass_model.py with the dumped inputs)
+    light regular a=0          23.64 / 49.44     0.53 /  1.60
+    light regular500 a=0       19.75 / 42.44     0.52 /  1.50
+    light menu200 a=0          19.75 / 42.44     0.52 /  1.50
+    light notificationCenter a=0 23.64 / 49.44     0.53 /  1.60
+    light regular200 a=0       19.76 / 42.44     0.52 /  1.50
+    light clear a=0             0.49 /  1.38     0.49 /  1.40
+    light dock a=0              0.48 /  1.06     0.49 /  1.10
+    light controlCenter a=0     0.47 /  1.49     0.47 /  1.50
+    light regular96 a=0        22.27 / 47.44     0.53 /  1.50
+    light regular a=0.5         2.00 /  5.53     0.52 /  1.40
+    light regular500 a=0.5      4.52 /  6.82     0.46 /  1.50
+    light menu200 a=0.5         4.52 /  6.82     0.46 /  1.50
+    light notificationCenter a=0.5  2.00 /  5.53     0.52 /  1.40
+    light regular200 a=0.5      4.58 /  7.07     0.49 /  1.50
+    light clear a=0.5           0.50 /  1.38     0.50 /  1.40
+    light dock a=0.5            0.49 /  0.96     0.50 /  1.00
+    light controlCenter a=0.5   0.47 /  1.49     0.48 /  1.50
+    light regular96 a=0.5       1.63 /  4.53     0.39 /  1.00
+    light regular a=1          34.87 / 78.56     0.40 /  1.10
+    light regular500 a=1       35.79 / 56.12     0.40 /  1.20
+    light menu200 a=1          35.79 / 56.12     0.40 /  1.20
+    light notificationCenter a=1 34.87 / 78.56     0.40 /  1.10
+    light regular200 a=1       35.96 / 57.12     0.58 /  2.00
+    light clear a=1             0.52 /  1.38     0.52 /  1.40
+    light dock a=1              0.49 /  0.96     0.50 /  1.00
+    light controlCenter a=1     0.50 /  1.59     0.51 /  1.60
+    light regular96 a=1        35.09 / 66.56     0.46 /  1.30
+    dark  regular a=0           2.01 /  6.80     0.50 /  1.30
+    dark  regular500 a=0       10.38 / 26.01     0.51 /  1.40
+    dark  menu200 a=0          10.38 / 26.01     0.51 /  1.40
+    dark  notificationCenter a=0 25.54 / 63.88     0.50 /  1.30
+    dark  regular200 a=0       10.37 / 26.01     0.52 /  1.40
+    dark  clear a=0             0.49 /  1.38     0.49 /  1.40
+    dark  dock a=0              1.34 /  4.45     0.54 /  1.50
+    dark  controlCenter a=0     0.47 /  1.49     0.47 /  1.50
+    dark  regular96 a=0         8.60 / 22.11     0.46 /  1.70
+    dark  regular a=0.5         2.01 /  6.80     0.50 /  1.30
+    dark  regular500 a=0.5      3.97 / 12.03     0.53 /  1.50
+    dark  menu200 a=0.5         3.97 / 12.03     0.53 /  1.50
+    dark  notificationCenter a=0.5 25.54 / 63.88     0.50 /  1.30
+    dark  regular200 a=0.5      3.94 / 12.03     0.53 /  1.50
+    dark  clear a=0.5           0.50 /  1.38     0.50 /  1.40
+    dark  dock a=0.5            1.35 /  4.45     0.56 /  1.50
+    dark  controlCenter a=0.5   0.47 /  1.49     0.48 /  1.50
+    dark  regular96 a=0.5       2.74 / 10.18     0.46 /  1.40
+    dark  regular a=1          49.07 / 100.30     0.39 /  1.00
+    dark  regular500 a=1       34.26 / 75.41     0.38 /  1.10
+    dark  menu200 a=1          34.26 / 75.41     0.38 /  1.10
+    dark  notificationCenter a=1 29.75 / 79.41     0.39 /  1.00
+    dark  regular200 a=1       34.58 / 76.41     0.47 /  1.50
+    dark  clear a=1             0.50 /  1.38     0.51 /  1.40
+    dark  dock a=1              1.35 /  4.45     0.56 /  1.50
+    dark  controlCenter a=1     0.48 /  1.49     0.49 /  1.50
+    dark  regular96 a=1        39.51 / 86.59     0.36 /  0.90
+
+3b. face vs glass_model.py on the grid (Apple inputs), per material over D x a x light/dark x 17 backdrops: rms / max
+    regular              21.94 / 100.50   worst at D 20 a 1 dark backdrop [69.0, 83.0, 205.0]
+    menu                 21.94 / 100.50   worst at D 20 a 1 dark backdrop [69.0, 83.0, 205.0]
+    notificationcenter   21.64 /  82.93   worst at D 96 a 1 dark backdrop [69.0, 83.0, 205.0]
+    clear                 0.00 /   0.00   worst at D 20 a 0 light backdrop [0.0, 0.0, 0.0]
+    dock                  0.90 /   5.03   worst at D 20 a 0 dark backdrop [230.0, 140.0, 39.0]
+    controlcenter         0.00 /   0.00   worst at D 20 a 0 light backdrop [0.0, 0.0, 0.0]

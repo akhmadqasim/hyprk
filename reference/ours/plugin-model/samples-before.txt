@@ -1,0 +1,26 @@
+light dock          229 / 133 / 38 / (80,97,251)
+light cc tile       186 / 108 / 32 / (64,79,211)
+light cc gap        229 / 114 / 0 / (62,75,185)
+light menu          255 / 196 / 133 / (158,172,255)
+light nc card       224 / 177 / 130 / (149,159,246)
+light edit widgets  251 / 194 / 132 / (157,170,251)
+light hud           (203,202,202) / (115,114,114) / (34,34,33) / (69,86,232)
+light nc top rim    white 214 214 253 247 239 239 238 238
+light nc top rim    grey  97 98 203 195 184 183 183 183
+light nc top rim    black 0 0 155 148 134 134 134 134
+light dock top rim  white 255 255 255 253 237 235 234 233 232 231 231 230
+light dock top rim  grey  127 127 190 179 148 145 143 140 139 137 136 135
+light dock top rim  black 0 0 105 84 53 50 48 45 43 42 41 40
+dark  dock          175 / 107 / 12 / (59,75,213)
+dark  cc tile       186 / 108 / 32 / (64,79,211)
+dark  cc gap        229 / 114 / 0 / (62,75,185)
+dark  menu          121 / 118 / 32 / (80,94,218)
+dark  nc card       127 / 99 / 31 / (68,79,173)
+dark  edit widgets  182 / 132 / 33 / (85,101,234)
+dark  hud           202 / (115,114,114) / 34 / (70,86,232)
+dark  nc top rim    white 209 209 152 142 129 129 129 129
+dark  nc top rim    grey  95 96 137 120 105 105 105 105
+dark  nc top rim    black 0 0 69 53 34 34 34 34
+dark  dock top rim  white 255 255 181 186 179 178 178 177 177 176 176 176
+dark  dock top rim  grey  127 127 144 136 117 115 113 112 111 110 109 108
+dark  dock top rim  black 0 0 98 67 30 27 23 21 19 17 16 14
