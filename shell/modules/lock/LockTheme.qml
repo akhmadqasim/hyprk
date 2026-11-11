@@ -27,7 +27,9 @@ Singleton {
     readonly property int dateWght: 590
     readonly property real dateTracking: -0.6           // pt per character on top of SF's own tracking
     readonly property real dateBaseline: 130            // from the screen top (cap top 107)
-    readonly property vector3d dateLift: dark ? Qt.vector3d(0.50, 0.50, 0.50) : Qt.vector3d(0.30, 0.31, 0.31)
+    // dark-sc3 / light-sc3 (lossless): over (20, 14, 135) + (139.5, 138.4, B clipped); over (141, 169, 199)
+    // + (83.8, G and B clipped, so >= 85.7 / 55.9); the clipped channels take the others' value
+    readonly property vector3d dateLift: dark ? Qt.vector3d(0.547, 0.543, 0.545) : Qt.vector3d(0.329, 0.336, 0.336)
     readonly property font dateFont: Qt.font({ family: Typography.family, pixelSize: dateSize,
         weight: Typography.qtWeight(dateWght), letterSpacing: Typography.letterSpacing(dateSize) + dateTracking,
         variableAxes: Typography.isSF ? { "wght": dateWght, "opsz": Typography.opsz(dateSize), "GRAD": Typography.grade(dateSize) } : {} })
