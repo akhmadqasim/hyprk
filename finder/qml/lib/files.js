@@ -202,22 +202,24 @@ function hasTags(entry) { return !!entry.tags && entry.tags.length > 0; }
 // Finder's tag dots (Q-finder-14): 10 pt circles, each extra tag 5 pt to the right and behind the previous one,
 // with a 0.5 pt ring in `ring`; `gap` pt of space after them. An SVG data URL `width` x 10 pt.
 function tagDotsWidth(n, gap) { return n > 0 ? 10 + 5 * (n - 1) + (gap || 0) : 0; }
-function tagDotsUrl(tags, colors, ring, gap) {
-    const n = tags.length, w = tagDotsWidth(n, gap);
+function tagDotsUrl(tags, colors, ring, gap, top) {
+    const n = tags.length, w = tagDotsWidth(n, gap), t = top || 0, h = 10 + Math.ceil(t);
     let c = "";
     for (let i = n - 1; i >= 0; i--)
-        c += '<circle cx="' + (5 + 5 * i) + '" cy="5" r="4.75" fill="' + (colors[tags[i]] || colors.Gray)
+        c += '<circle cx="' + (5 + 5 * i) + '" cy="' + (5 + t) + '" r="4.75" fill="' + (colors[tags[i]] || colors.Gray)
            + '" stroke="' + ring + '" stroke-width="0.5"/>';
     return "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="' + w
-           + '" height="10" viewBox="0 0 ' + w + ' 10">' + c + "</svg>");
+           + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">' + c + "</svg>");
 }
 
 // Name with the tag dots in front, 3 pt before the text, as StyledText. Use it only when hasTags(entry); plain
 // names stay PlainText. Runs of spaces are kept with &nbsp;. colors: tag name -> CSS color (unknown: Gray).
+// The image hangs from the line top (align="middle" grew the line: tagged labels sat 2.5 pt low, icons-light.png),
+// its dots 1.5 pt down: dot rows 278..297 px at 2x like the Mac's, the text on the untagged labels' rows.
 function styledName(entry, colors, ring) {
     const tags = entry.tags || [];
-    return '<img src="' + tagDotsUrl(tags, colors, ring || "white", 3) + '" width="' + tagDotsWidth(tags.length, 3)
-         + '" height="10" align="middle">' + escapeHtml(entry.name).replace(/ (?= )/g, "&nbsp;");
+    return '<img src="' + tagDotsUrl(tags, colors, ring || "white", 3, 1.5) + '" width="' + tagDotsWidth(tags.length, 3)
+         + '" height="12" align="top">' + escapeHtml(entry.name).replace(/ (?= )/g, "&nbsp;");
 }
 
 // ---------- layout ----------

@@ -119,7 +119,7 @@ test("rename validation", () => {
 // ---- tags ----
 test("styledName", () => {
     const html = F.styledName({ name: "a<b>  c", tags: ["Red"] }, { Red: "#f00" });
-    assert.match(html, /^<img src="data:image\/svg\+xml;utf8,[^"]+" width="13" height="10" align="middle">a&lt;b&gt;&nbsp; c$/);
+    assert.match(html, /^<img src="data:image\/svg\+xml;utf8,[^"]+" width="13" height="12" align="top">a&lt;b&gt;&nbsp; c$/);
     assert.equal(F.hasTags({ name: "x" }), false);
 });
 test("tag dots", () => {

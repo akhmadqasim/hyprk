@@ -26,6 +26,31 @@ GridView {
     currentIndex: browser.cursor
     highlightFollowsCurrentItem: false
 
+    // the label lays out in 1 pt more than the 104 pt ink width (advance includes the side bearings): "from the…mber.txt"
+    // advances 104.05 pt and the Mac draws it, ink 101 pt
+    readonly property real labelLayoutWidth: Theme.grid.labelWidth + 1
+    // A name longer than two lines keeps its first line's words and loses the middle of the rest, so the extension
+    // stays ("Meeting notes" / "from the…mber.txt" in icons-light.png; Qt could only cut the end: "from the plannin…")
+    Text { id: labelProbe; visible: false; font: Typography.font(Theme.font.label) }   // widths as the label lays out
+    readonly property QtObject labelMetrics: QtObject {
+        function advanceWidth(t) { labelProbe.text = t; return labelProbe.implicitWidth; }
+    }
+    function labelText(name) {
+        const w = labelLayoutWidth;
+        if (labelMetrics.advanceWidth(name) <= w) return name;
+        const words = name.split(" ");
+        let first = words[0], i = 1;
+        if (labelMetrics.advanceWidth(first) > w) return name;   // no word break: Qt wraps anywhere
+        while (i < words.length && labelMetrics.advanceWidth(first + " " + words[i]) <= w) first += " " + words[i++];
+        const rest = words.slice(i).join(" ");
+        if (labelMetrics.advanceWidth(rest) <= w) return name;   // two lines are enough
+        // middle elision by hand (FontMetrics.elidedText measured wider than the label draws: "from th…ber.txt", 86 pt)
+        let a = Math.ceil(rest.length / 2), b = rest.length - a;
+        const cut = () => rest.slice(0, a) + "\u2026" + rest.slice(rest.length - b);
+        while ((a > 0 || b > 0) && labelMetrics.advanceWidth(cut()) > w) { if (a > b) a--; else b--; }
+        return first + "\n" + cut();
+    }
+
     function ensureVisible(i) { positionViewAtIndex(i, GridView.Contain); }
     // the icon of entry i, when its delegate exists (Quick Look closes into it)
     function iconItem(i) { const c = itemAtIndex(i); return c ? c.iconItem : null; }
@@ -93,6 +118,11 @@ GridView {
         width: grid.cellWidth
         height: grid.cellHeight
         readonly property Item iconItem: icon
+        // set, not bound: labelText measures with a probe Text (a binding would loop on its width)
+        property string labelPlain
+        function relabel() { labelPlain = grid.labelText(modelData.name); }
+        Component.onCompleted: relabel()
+        onModelDataChanged: relabel()
 
         Rectangle {   // selection plate 72 x 72, r 7; also the folder drop target (Q-finder-13, -28)
             anchors.centerIn: icon
@@ -112,10 +142,12 @@ GridView {
         }
 
         Rectangle {   // label pill hugs the wrapped text: 17 tall for one line, r 5, about 5 pt side padding
+            // (a tagged name's pill 1 pt higher and 2 narrower: Sunset.png's 808..985 x 496..529 px in icons-light.png)
+            readonly property bool tagged: Files.hasTags(cell.modelData)
             visible: cell.selected && !cell.renaming
             anchors.horizontalCenter: label.horizontalCenter
-            y: label.y - 0.5
-            width: label.contentWidth + 2 * Theme.grid.labelPad
+            y: label.y - 0.5 - (tagged ? 1 : 0)
+            width: label.contentWidth + 2 * Theme.grid.labelPad - (tagged ? 2 : 0)
             height: label.contentHeight + 1
             radius: Theme.grid.labelRadius
             color: Theme.color.labelSelection
@@ -125,9 +157,9 @@ GridView {
             visible: !cell.renaming
             anchors.horizontalCenter: parent.horizontalCenter
             y: icon.y + icon.height + Theme.grid.labelGap
-            width: Theme.grid.labelWidth
+            width: grid.labelLayoutWidth
             horizontalAlignment: Text.AlignHCenter
-            text: Files.hasTags(cell.modelData) ? Files.styledName(cell.modelData, Theme.color.tagColors) : cell.modelData.name
+            text: Files.hasTags(cell.modelData) ? Files.styledName(cell.modelData, Theme.color.tagColors) : cell.labelPlain
             textFormat: Files.hasTags(cell.modelData) ? Text.StyledText : Text.PlainText
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             maximumLineCount: 2
