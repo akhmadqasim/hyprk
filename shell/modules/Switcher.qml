@@ -168,7 +168,17 @@ ShellWindow {
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
             acceptsInput: sw.shown
-            glassOpacity: sw.fade
+            // the same fade on this window's own frames: the panel's value, stepped in the panel's frame, reached this
+            // window a frame late or not, by turns (mcap: repeated and uneven values in most dismisses)
+            readonly property real fade: fillEase.value
+            FrameEase {
+                id: fillEase
+                goal: fadeEase.goal
+                animate: goal < value
+                duration: fadeEase.duration
+                curve: fadeEase.curve
+            }
+            glassOpacity: fade
             glassDropped: sw.glassDropped
 
             MouseArea { anchors.fill: parent; hoverEnabled: true; onPressed: Panels.close(); onPositionChanged: mouse => sw.notePointer(this, mouse.x, mouse.y) }
@@ -178,7 +188,7 @@ ShellWindow {
                 y: panel.y
                 width: panel.width
                 height: panel.height
-                opacity: sw.fade
+                opacity: fillHost.fade
 
                 Row {
                     x: Theme.switcher.padding
