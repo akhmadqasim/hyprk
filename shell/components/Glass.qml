@@ -30,9 +30,14 @@ Item {
     // Liquid Glass materialize progress (ShellWindow.glassMaterialize). The QML fallback fades.
     property real materialize: registeredWith ? registeredWith.glassMaterialize : 1
 
+    // The shape is placed by placeHole() from this item's window position, rounded to whole points like the
+    // compositor region: Region { item } truncated the origin and rounded the size up, so a glass inside a panel
+    // scaled by 1.01 sat 1 pt off until the scale was exactly 1 and then snapped (Control Center open: a 3.5 % rim
+    // pop at ~470 ms, mcap). It follows this item's own geometry like Region { item } did, and moving parents through
+    // glassMoved() (ShellWindow.settleGlass).
+    readonly property bool on: root.visible && Theme.compositorGlass
     Region {
         id: shape
-        item: root.visible && Theme.compositorGlass ? root : null
         radius: root.radius
         // materialize < 1: a 1 px hole in the middle row, x = left + 1 + round(m (w - 3))
         Region { id: hole; intersection: Intersection.Subtract; width: 0; height: 1 }
@@ -40,29 +45,32 @@ Item {
         // _Glass.regular's drop shadow for its size instead of the layer recipe's (plugin 53efda0)
         Region { id: shadowHole; intersection: Intersection.Subtract; width: 0; height: 1 }
     }
-    function remeasure() {
-        shape.item = null;
-        shape.item = Qt.binding(() => root.visible && Theme.compositorGlass ? root : null);
-        placeHole();
-    }
-    // same rounding as Quickshell's Region (origin truncated, size rounded up)
+    function remeasure() { placeHole(); }
+    // the shape and its marker holes from one rounded rect: corners rounded to whole points
     function placeHole() {
-        const p = root.mapToItem(null, 0, 0), e = root.mapToItem(null, root.width, root.height);
-        const w = Math.ceil(e.x - p.x), h = Math.ceil(e.y - p.y);
-        shadowHole.x = Math.floor(p.x) + Math.floor(w / 2);
-        shadowHole.y = Math.floor(p.y) + Math.floor(h / 2) + 1;
-        shadowHole.width = (!root.shadow && shape.item && w >= 4 && h >= 3) ? 1 : 0;
-        if (materialize >= 1 || !shape.item || w < 4 || h < 2) {
+        const q = root.mapToItem(null, 0, 0), e = root.mapToItem(null, root.width, root.height);
+        const px = Math.round(q.x), py = Math.round(q.y);
+        const w = root.on ? Math.round(e.x) - px : 0, h = root.on ? Math.round(e.y) - py : 0;
+        shape.x = px;
+        shape.y = py;
+        shape.width = Math.max(0, w);
+        shape.height = Math.max(0, h);
+        shadowHole.x = px + Math.floor(w / 2);
+        shadowHole.y = py + Math.floor(h / 2) + 1;
+        shadowHole.width = (!root.shadow && root.on && w >= 4 && h >= 3) ? 1 : 0;
+        if (materialize >= 1 || !root.on || w < 4 || h < 2) {
             hole.width = 0;
             return;
         }
-        hole.x = Math.floor(p.x) + 1 + Math.round(Math.max(0, materialize) * (w - 3));
-        hole.y = Math.floor(p.y) + Math.floor(h / 2);
+        hole.x = px + 1 + Math.round(Math.max(0, materialize) * (w - 3));
+        hole.y = py + Math.floor(h / 2);
         hole.width = 1;
     }
     // a materializing glass also changes scale (ControlCenter Module): re-measure, not just the hole
     onMaterializeChanged: if (Theme.compositorGlass) remeasure()
-    onVisibleChanged: placeHole()
+    onOnChanged: placeHole()
+    onXChanged: placeHole()
+    onYChanged: placeHole()
     onShadowChanged: placeHole()
     onWidthChanged: placeHole()
     onHeightChanged: placeHole()
