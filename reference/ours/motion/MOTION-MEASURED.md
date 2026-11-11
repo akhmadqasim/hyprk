@@ -90,6 +90,9 @@ not available here: that libinput finger scrolls reach Qt the same way is read f
 | Rubber band (trackpad), Finder and shell views (judge #2) | AppKit filter floor(D(1 - 1/(1 + d c / D))), c 0.075, first 10 pt nothing | judge: 0 px with a virtual pointer | 300 pt pull: 21 pt stretch in Finder and the Apps grid (filter 20.9), held while the fingers rest, returned on lift | - | content offset, fscroll finger events | works on screen; the judge's virtual pointer sent wheel events (see Method) |
 | Traffic-light glyphs (plugin, report only) | 0.07 s delay, ~0.1 s ease-out (M877) | in: starts ~70 ms after hover, 14/48/67/81/90/95/100 % per frame; out: 31/56/75/88/94/100 % | - | - | alpha on the lights | matches by eye |
 | Quick Look | 0.79 -> 1 in 0.25 s ease-out (.79 .85 .90 .93 .95 .97 .98 .98 .99 1, Q-finder-26) | code OutQuint 250 ms = the Mac series within 0.01 | on screen the first frame (0.79) shows twice (panel created), then the curve | not tracked (panel edge lost in the icon grid) | alpha, width | near (1 repeated frame) |
+| Mission Control exit, session 4 (one Settings window) | R2 exit series 0.21 .. 0.99; a critically damped spring fits it at rms 0.0043 only with a start velocity (response 0.355, 10 x the distance per second; from rest 0.0079 with its first 46 ms missing) | spring 0.31 from rest: 2-98 % 317-333 ms, first frame 0.07, a 3.8 % step at ~420 ms | start velocity 10/s (SpringCurve.kick): 282-285 ms, first frame 0.21 | 0.018-0.032 / 8.5-19 ms -> 0.011 / 4.6-8.5 ms (a third run dropped its first frame: 0.043) | alpha, full screen, k 4 | improved (Mac 267 ms); two windows at one place not re-measured |
+| Notification Center open / close over 16 pt stripes, session 4 (plugin e7184e5) | nc/motion.json offsets, W 386 pt | - | open 3 runs, close 3 runs | open 0.0063-0.0066 (2.4-2.5 pt); close 0.007-0.029 (2.7-11 pt; one run with a late frame) | leading edge, threshold 30 | matches; the first frame comes 240 ms after the ipc call (Mac: 0.24 s after the click) |
+| Control Center open, repeated 2nd frame (session 4) | REA spring 0.25 | first visible frames 0.06, 0.09, then 0.21 / 0.34 (steps of 0.13) | tried: the spring started on the first swapped frame (no change: 0.06, 0.09) and one frame ahead (0.02, 0.02-0.03, then 0.18: the hold moves before the motion); both reverted | 0.007-0.022 / 5-11 ms either way | alpha | not fixed shell-side: see "Repeated frame after a layer maps" |
 
 ## Fixes (commits)
 
@@ -109,8 +112,8 @@ band; 40a1a15 fscroll; b725cd0 Spotlight mode list unfold.
 ## Remaining, with numbers
 
 - Unzoom, full screen: done in plugin-motion (MOTION-PLUGIN.md).
-- Mission Control exit: session 3 brought 2-98 % to 250-283 ms (two windows at one place) and 351-369 ms (one
-  window) against the Mac's 267; a ~2 % step remains when the layer goes (scaled still against the sharp window).
+- Mission Control exit: session 4 (start velocity) 282-285 ms with one window against the Mac's 267, first frame 0.21
+  like the Mac; two windows at one place not re-measured since session 3 (250-283 ms).
 - HUD dismiss: our last 5 % lingers (2-98 % 350 ms vs 283 ms of the REA model), rms 0.023.
 - NC push: starts with a 2-frame hold (the Mac shows one of 2 frames too: 5, 5, 13.5 pt), rms 0.024-0.027.
 - Spotlight mode list: two repeated frames at the start of the unfold (rms 0.035).
@@ -119,7 +122,33 @@ band; 40a1a15 fscroll; b725cd0 Spotlight mode list unfold.
 - Repeated frames at the start of a motion (Dock magnification once in 3 runs, CC, Spotlight list, NC push, Spotlight
   open with any layer): session 3 tried the Spotlight open with QSG_RENDER_LOOP=basic and with
   QSG_USE_SIMPLE_ANIMATION_DRIVER=1: the second frame still repeats (4 of 4 and 5 of 5), the spring values of the
-  frames are the same as with the default loop, so the animation clock is not the cause. The window's first commit after
-  mapping seems to wait one extra frame callback (compositor pacing; not proven, not fixed).
+  frames are the same as with the default loop, so the animation clock is not the cause. Session 4: see below.
+
+## Repeated frame after a layer maps (session 4, WAYLAND_DEBUG=client on the shell + mcap of the same CC open)
+
+Times in ms from the shell's get_layer_surface (the Control Center maps two surfaces: the 456 x 646 panel on Top and a
+full-screen catcher on Overlay); frame-done times are the compositor's (CLOCK_MONOTONIC ms), mcap presentation times
+on the same clock:
+
+| ms | event |
+|---|---|
+| 0 | get_layer_surface (panel), initial commit; catcher likewise |
+| 11.5 | configure, ack |
+| 21.6 | first buffer attached and committed (frame callback requested 0.6 ms before) |
+| 21.8 | **frame done for that first commit, 0.2 ms after it** (no vblank in between) |
+| 34.6 | second buffer committed, 13 ms after the first (inside the same refresh interval) |
+| ~38 / ~55 | vblanks: mcap sees no Control Center pixel in either frame |
+| 53.5 | frame done (vblank t = 411): from here one commit per vblank, done 16.7 ms apart |
+| ~72 | first frame with Control Center pixels (alpha 0.057), next 0.085, then 0.21, 0.35, 0.48 |
+
+So the compositor shows the layer from the third vblank after its first buffer, and the first visible frames carry
+the spring's first state (fade 0: only the panel's compositor blur, alpha 0.06) and a small second step. Starting
+the spring on Qt's first swapped frame changed nothing; starting it one frame ahead moved the hold before the motion
+(1-3 frames at 0.02-0.03, then 0.18). The cause is on the compositor side: Hyprland answers the first frame
+callback of a new layer surface at once, so Qt draws two buffers in one interval, and the layer appears two vblanks
+later than its first buffer. Not fixable in QML (Qt gives no presentation feedback); hand-off to the plugin/config
+agent (report: does the liquidglass plugin hold a new glass layer until it has its shape, and can the first frame
+done of a mapping layer wait for the vblank that shows it).
+
 - No Apple data: window move/resize, Spotlight calculator card growth.
 - Not done: Spotlight's open blur 25 -> 0: tried twice in session 3, it drops frames (see the table).
