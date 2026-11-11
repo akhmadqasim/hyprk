@@ -57,8 +57,9 @@ ShellWindow {
     onKeepClearChanged: if (screen) Panels.setDockZone(screen.name, keepClear)
 
     // ---------- bounces ----------
-    // Launch: 0.70 s parabolic hops, (tile - 8) * 0.2 + 6 pt high; attention (an urgent window): the 2 s cycle of
-    // three hops, tile + 1 pt high (lib/dock.js, from Dock.app's -[Tile updateBouncing]). The heights are read
+    // Launch: 0.70 s parabolic hops, (R - 8) * 0.2 + 6 pt high; attention (an urgent window): the 2 s cycle of
+    // three hops, R + 1 pt high, R = the tile rect (lib/dock.js, from Dock.app's -[Tile updateBouncing]), the
+    // offset drawn in whole points like the Dock (PC #67 A1). The heights are read
     // from the wall clock every frame while something bounces; the clock is off otherwise, and between attention
     // bursts a timer wakes it.
     readonly property real bounceHeight: DockLayout.bounceHeight(tile)
@@ -305,7 +306,7 @@ ShellWindow {
                 readonly property real bounceT: A11y.reduceMotion || separator ? -1 : Apps.bounceTime(modelData.id, dock.now)
                 readonly property real attentionY: A11y.reduceMotion || separator ? 0 : Apps.attentionOffset(modelData.id, dock.now, dock.attentionHeight)
                 readonly property bool bouncing: bounceT >= 0 || attentionY > 0
-                readonly property real bounceY: Math.round((attentionY > 0 ? attentionY : bounceT < 0 ? 0 : DockLayout.bounceOffset(bounceT, dock.bounceHeight)) * dock.dpr) / dock.dpr
+                readonly property real bounceY: Math.round(attentionY > 0 ? attentionY : bounceT < 0 ? 0 : DockLayout.bounceOffset(bounceT, dock.bounceHeight))
                 // the tile's top edge at rest (it grows upward out of the cell when magnified)
                 readonly property real iconTop: dock.m.iconTop + dock.tile - size
 

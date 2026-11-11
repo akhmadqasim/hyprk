@@ -135,12 +135,19 @@ function layout(cells, o) {
 // -[Tile updateRect] 0x100012088; MAC-ANSWERS.md "REA 27.2.1: Dock", reference/re/27.2.1/decomp/dock-bounce.c).
 // Half period 350 ms: one bounce lasts 700 ms at every tile size, a plain parabola h = H * 4u(1 - u),
 // u = (t mod 700) / 700, on the ground only at u = 0 (one frame), no hold at the top, no squash.
+// The Dock draws the offset in whole points (Dock.qml rounds it).
 const bounceMs = 700;
 
-// Height in pt: (tile - 8) * 0.2 + 6 (the code's float 0x1002580c0 = 0.2): 11.0 at tile 33, 17.2 at tile 64.
-// (The recording measured 18 at tile 64; the code is the source.)
+// The tile RECT R the bounce heights are made from: the AX item width (35 at tile 33, 68 at tile 64,
+// about tile * 17 / 16), not the tile size (MAC-ANSWERS "Verification of motion and glass claims (PC #67)" A1, A2).
+function tileRect(tile) {
+    return metrics(tile).item;
+}
+
+// Height in pt: (R - 8) * 0.2 + 6 (the code's float 0x1002580c0 = 0.2): 11.4 at tile 33 (11 on screen),
+// 18.0 at tile 64; fits the recordings (verify/A/dock-launch-t33/t64.json) at RMS 0.39 / 0.47 pt.
 function bounceHeight(tile) {
-    return Math.max(0, (tile - 8) * 0.2 + 6);
+    return Math.max(0, (tileRect(tile) - 8) * 0.2 + 6);
 }
 
 // Height above the rest position `t` ms after the bounce started (any t >= 0; it repeats every 700 ms).
@@ -160,13 +167,13 @@ function bounceEnd(stopMs) {
 // requestUserAttention (Hyprland's urgent window), from the Dock's own code (-[Tile updateBouncing] with
 // _notifyBounce, DockGlobals init 0x1001a66d4; MAC-ANSWERS.md "REA 27.2.1: Dock" section 1): a 2000 ms cycle of
 // three parabolic hops, 500 ms at 1, 326 ms at 0.5, 212 ms at 0.25 of the amplitude, then rest until 2000 ms.
-// Amplitude (tile + 1) pt. It bounces for `bounce-duration` 60 s, then for `bounce-secondary-duration` 3 s every
+// Amplitude (R + 1) pt (36 / 69 at tile 33 / 64, verify/A/dock-attention-*.json). It bounces for `bounce-duration` 60 s, then for `bounce-secondary-duration` 3 s every
 // `bounce-secondary-interval` 60 s; a cycle that has started plays to its rest point.
 const _HOPS = [[0, 500, 1], [500, 326, 0.5], [826, 212, 0.25]];
 const attentionCycleMs = 2000;
 const attentionRestMs = 1038;
 function attentionHeight(tile) {
-    return tile + 1;
+    return tileRect(tile) + 1;
 }
 // whether the attention cycle starting at `cycleStart` ms (after the app asked) plays
 function attentionPlays(cycleStart) {

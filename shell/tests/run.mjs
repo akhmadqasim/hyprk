@@ -211,8 +211,9 @@ test("dock.json without the key keeps magnification off", () => {
         assert.equal(DK.fishDuration(-64), 147);
         assert.equal(DK.fishDuration(0), 1);
     });
-    test("dock attention bounce: 2 s cycle, hops 500 / 326 / 212 ms at 1 / 0.5 / 0.25 of tile + 1", () => {
-        const H = DK.attentionHeight(64);
+    test("dock attention bounce: 2 s cycle, hops 500 / 326 / 212 ms at 1 / 0.5 / 0.25 of R + 1", () => {
+        assert.equal(DK.attentionHeight(33), 36);
+        const H = DK.attentionHeight(64) - 4;   // the hop shape below is checked at 65 pt
         assert.equal(H, 65);
         assert.ok(Math.abs(DK.attentionOffset(250, H, -1) - 65) < 1e-9);
         assert.ok(Math.abs(DK.attentionOffset(663, H, -1) - 32.5) < 1e-9);
@@ -261,10 +262,12 @@ test("dock.json without the key keeps magnification off", () => {
         show.forEach((p, i) => { e += (cos((i * 1000 / 60 + 34) / 210) - p) ** 2; });
         assert.ok(Math.sqrt(e / show.length) < 0.025, `slide rms ${Math.sqrt(e / show.length)}`);
     });
-    test("dock bounce height from the tile size (Dock.app: (tile - 8) * 0.2 + 6)", () => {
-        assert.ok(Math.abs(DK.bounceHeight(33) - 11) < 1e-9);
-        assert.ok(Math.abs(DK.bounceHeight(64) - 17.2) < 1e-9);
-        assert.ok(DK.bounceHeight(48) > 11 && DK.bounceHeight(48) < 17.2);
+    test("dock bounce height from the tile rect R (Dock.app: (R - 8) * 0.2 + 6, PC #67 A1)", () => {
+        assert.equal(DK.tileRect(33), 35);
+        assert.equal(DK.tileRect(64), 68);
+        assert.ok(Math.abs(DK.bounceHeight(33) - 11.4) < 1e-9);
+        assert.ok(Math.abs(DK.bounceHeight(64) - 18) < 1e-9);
+        assert.ok(DK.bounceHeight(48) > 11.4 && DK.bounceHeight(48) < 18);
     });
     test("dock bounce: a pure parabola of 700 ms, on the ground only at the hop boundary", () => {
         assert.equal(DK.bounceOffset(0, 22), 0);
