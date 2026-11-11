@@ -128,7 +128,14 @@ Item {
             slideAnim.cutAt = NcLib.panelCloseCut;
             slideAnim.go(0);
             expanded = ({});         // macOS reopens with every stack collapsed
+            confirmClearAll = false;
         }
+    }
+    // the section heading's x asked once (its "Clear All" capsule shows); a second click clears every group
+    property bool confirmClearAll: false
+    function clearEverything() {
+        confirmClearAll = false;
+        for (let i = 0; i < groupModel.count; i++) clearStack(groupModel.get(i).app);
     }
     // open and at rest: a group created now is a notification arriving (it pushes the list down and fades in)
     readonly property bool live: shown && !slideAnim.running && slide === 1
@@ -188,6 +195,30 @@ Item {
                 y: nc.bleed
                 width: nc.width
                 spacing: Theme.nc.spacing
+
+                // section heading over the groups (Q-panels-32: "Notification Centre", about SF 17 bold, a "Clear All"
+                // glass circle with an xmark at the right edge; 24 pt in the code, MAC-ANSWERS NC button table). Its x
+                // turns into a "Clear All" capsule first and a second click clears every group, as a group's x does
+                // (the section's own confirm was not measured on the Mac)
+                RowLayout {
+                    Layout.fillWidth: true
+                    visible: groupModel.count > 0
+                    spacing: Theme.nc.pillGap
+                    Text {
+                        Layout.fillWidth: true
+                        Layout.leftMargin: 4
+                        text: "Notification Center"
+                        elide: Text.ElideRight
+                        font: Typography.font(17, Typography.bold)
+                        color: Theme.color.label
+                    }
+                    Pill {
+                        symbol: nc.confirmClearAll ? "" : "xmark"
+                        text: nc.confirmClearAll ? "Clear All" : ""
+                        implicitHeight: 24
+                        onActivated: if (nc.confirmClearAll) nc.clearEverything(); else nc.confirmClearAll = true
+                    }
+                }
 
                 ColumnLayout {
                     Layout.fillWidth: true
