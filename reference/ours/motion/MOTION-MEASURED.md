@@ -166,3 +166,36 @@ plus-lighter fill on a second surface `hyprk-switcher-fill(-dark)` (2db3868).
 | Dock hover label fade-out | `dock_label_fadeout_alpha`, cosine 0.292 s | 252 ms, 0.029 / 6.9 ms | dark, grey, plugin 8199aad/5e9aff0 (the pointer fades with the pill; the shell's workaround that hid it at the fade start is gone, d928bf4): label 267 ms, 0.011 / 4.4 ms; pointer region alone 267 ms, 0.019 / 6.9 ms, no step and no full-material frame | 0.011 / 4.4 ms | alpha vs the Mac series | matches |
 | Dock magnification ramp | 147 ms cosine (REA) | in 135 / out 151 ms (icon left edge) | Finder icon top: in 150-151 ms, 0.014-0.016 / 1.5-1.9 ms in 2 of 4 clean runs, 2 runs repeat 1-2 frames at the start (167-182 ms, 0.03-0.05); out 153 ms, 0.013 / 1.2 ms. With the pointer turned off the same repeats come in 2 of 4 runs: they are the label surface mapping (repeated frame after a layer maps, above), not the pointer | 0.014 / 1.5 ms | icon top row vs cosine 147 ms | unchanged |
 | Dock launch bounce | H 18.0 pt, P 0.6997 s | H 18.0, P 0.695 | H 18.0, hops 64 -> 748 and 765 -> 1449 ms (P ~0.69 s) | - | icon top row, k 1 | unchanged |
+
+## Session 6 (2026-11-11): which event repeats the Control Center's first state (follow-up of MAP-LATENCY.md)
+
+Headless MBA, plugin 8199aad/5e9aff0, CC opened with `hl.dsp.global("hyprk:controlcenter")`. A temporary log in
+ControlCenterWindow.qml (removed again) printed, per event of the panel's QQuickWindow, the time and `fade`:
+`afterAnimating`, `beforeSynchronizing` (the state a buffer gets), `frameSwapped`, and each change of `fade`.
+
+- Threaded render loop (default), every open: `go` -> afterAnimating / sync at fade 0 (buffer 1, empty) -> the spring's
+  first tick changes `fade` to 0.0611 **between** two frames (on Qt's animation timer, before the render loop's
+  driver runs) -> afterAnimating + sync at 0.0611 (buffer 2) -> a second afterAnimating in the same millisecond with
+  no advance, and after the swap a second sync at 0.0611 (buffer 3 = buffer 2) -> from then on one advance per sync
+  (0.2015, 0.3477, ...). So the duplicate is Qt's threaded loop taking over the animation clock: its first frame after
+  an animation starts outside a frame does not advance. Not the catcher: with the dim window mapped all the time
+  (`visible: true`, tried and reverted) the same pair of 0.0611 syncs came, plus a second fade-0 frame.
+- `QSG_RENDER_LOOP=basic` (qs restarted with it, test only): fade 0, 0, then 0.0611, 0.1925, 0.3386, 0.4778, ...
+  one advance per frame, no duplicate.
+- mcap, 5 opens each, alpha over 814,30,460,660: threaded first visible 46-48 ms, values 0.04-0.07, 0.12, 0.28, 0.43,
+  0 repeats at the 0.01 level in this session (the 2nd and 3rd buffer reach the screen in one vblank here), 2-98 %
+  233-251 ms; basic first visible 29 ms (44 once), 0.05, 0.17, 0.32, 0.45, 0 repeats, 2-98 % 237-257 ms: one frame
+  earlier. Before (MAP-LATENCY.md): 48-93 ms, 1 repeat in 5 of 5, 233-250 ms.
+- Not changed: the basic loop renders every window of the shell on the GUI thread one after another (Dock, menu bar,
+  panels, the lock), a global change whose cost was not measured; the first buffer still carries fade 0 there too.
+  A shell-side fix would start the spring inside a frame (on the window's `afterAnimating`, so its first tick is the
+  render loop's); the earlier tries (start on the first swapped frame, one frame ahead) did not do that and are not
+  repeated here.
+
+Cmd-Tab fill one commit late (hand-off d, 1 in 3 dismisses here): Quickshell sends a layer's ext-background-effect
+region (with the glassOpacity marker) from the GUI thread at the window's polish (`BackgroundEffect::onWindowPolished`,
+`wl_surface` pending state), while the threaded loop commits the content from the render thread. A polish of frame
+N+1 can run before the render thread commits frame N, so the region rides on the wrong commit. The fill surface and the
+panel are two windows on one animation, which makes it visible there. A clean fix is in Quickshell (set the region
+from the render thread right before the swap, or with the frame's commit), not in the shell; not done.
+
