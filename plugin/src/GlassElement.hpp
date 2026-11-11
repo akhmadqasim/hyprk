@@ -99,6 +99,9 @@ namespace lg {
         // the pass is built, before CRenderPass::render() consumes ctx.m_data.damage.
         static void claimDamage(Render::CRenderContext& ctx, SData& data);
 
+        // physical px the glass of `data` draws into and reads (after claimDamage, which resolves the groups)
+        static CRegion readRegionOf(const PHLMONITOR& mon, const SData& data);
+
       private:
         void  drawFallback(Render::CRenderContext& ctx);
         bool  drawGlass(Render::CRenderContext& ctx);

@@ -97,6 +97,9 @@ namespace lg {
             {K("panel_blur"), "hyprk-controlcenter:1.79", [](SParams& p, const std::string& v) { p.panelBlur = parseNumberMap(v); }},
             // plus-lighter / plus-darker fill layers (none by default; the shell's surfaces opt in by namespace)
             {K("fill_layers"), "", [](SParams& p, const std::string& v) { p.fillLayers = parseFillMap(v); }},
+            // the Dock's glass over Mission Control's backdrop: the shell's Mission Control layer covers the windows with the
+            // wallpaper, but it sits above the Dock, whose glass would still refract the real window under it
+            {K("wallpaper_under"), "hyprk-dock:hyprk-mission", [](SParams& p, const std::string& v) { p.wallpaperUnder = parseStringMap(v); }},
             {K("popup_classes"), "^hyprk-finder$", [](SParams& p, const std::string& v) { p.popupClasses = v; }},
             {K("popup_material"), "menu", [](SParams& p, const std::string& v) { p.popupMaterial = v; }},
             {K("material"), "regular", [](SParams& p, const std::string& v) { p.defaultMaterial = v; }},

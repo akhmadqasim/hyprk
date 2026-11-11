@@ -22,7 +22,9 @@
 #include <hyprland/src/managers/SessionLockManager.hpp>
 #include <hyprland/src/managers/input/InputManager.hpp>
 #include <hyprland/src/plugins/PluginAPI.hpp>
+#include <hyprland/src/protocols/core/Compositor.hpp>
 #include <hyprland/src/render/Renderer.hpp>
+#include <hyprland/src/render/pass/TexPassElement.hpp>
 #include <hyprland/src/state/MonitorState.hpp>
 
 #include <hyprutils/string/String.hpp>
@@ -86,6 +88,37 @@ static std::vector<lg::SGlassShape> shapesFor(const PHLLS& layer, const PHLMONIT
     return shapes;
 }
 
+// `wallpaper_under`: the output's background layers again, inside what the glass of `data` reads, so that glass samples the
+// wallpaper and not the windows under it. One textured quad per background layer, clipped to that region.
+static void addWallpaperUnder(Render::CRenderContext& ctx, const PHLMONITOR& mon, const lg::CGlassElement::SData& data, const std::string& other) {
+    const auto mappedOn = [&mon](const std::string& ns) {
+        for (const auto& level : mon->m_layerSurfaceLayers)
+            for (const auto& l : level)
+                if (const auto ls = l.lock(); ls && ls->mapped() && ls->m_namespace == ns)
+                    return true;
+        return false;
+    };
+    if (!mappedOn(other))
+        return;
+    const CRegion region = lg::CGlassElement::readRegionOf(mon, data);
+    if (region.empty())
+        return;
+    for (const auto& l : mon->m_layerSurfaceLayers[0]) {
+        const auto ls      = l.lock();
+        const auto surface = ls && ls->mapped() ? ls->wlSurface() : nullptr;
+        const auto res     = surface ? surface->resource() : nullptr;
+        if (!res || !res->m_current.texture)
+            continue;
+        CTexPassElement::SRenderData tex;
+        tex.tex        = res->m_current.texture;
+        tex.box        = CBox{ls->position(Desktop::View::IGeometric::GEOMETRIC_CURRENT) - mon->m_position, ls->size(Desktop::View::IGeometric::GEOMETRIC_CURRENT)}
+                             .scale(mon->m_scale)
+                             .round();
+        tex.clipRegion = region;
+        g_pHyprRenderer->currentPass(ctx).add(makeUnique<CTexPassElement>(std::move(tex)));
+    }
+}
+
 static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext& ctx, PHLLS layer, PHLMONITOR mon, const Time::steady_tp& now, bool popups, bool lockscreen,
                           bool workspaceScene) {
     const auto original = rc<renderLayerFn>(g_renderHook->m_original);
@@ -131,6 +164,8 @@ static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext
         .owner  = reinterpret_cast<uintptr_t>(layer.get()),
     };
     lg::CGlassElement::claimDamage(ctx, data);
+    if (const auto it = params->wallpaperUnder.find(layer->m_namespace); it != params->wallpaperUnder.end())
+        addWallpaperUnder(ctx, mon, data, it->second);
     g_pHyprRenderer->currentPass(ctx).add(makeUnique<lg::CGlassElement>(std::move(data)));
 
     std::optional<SBlurSuppression> suppress;

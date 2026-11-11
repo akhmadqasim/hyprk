@@ -57,6 +57,11 @@ namespace lg {
         // fill over what lies under it, drawn before the layer's own content (Shape.hpp SGlassShape::fill)
         std::unordered_map<std::string, double>      fillLayers;
 
+        // ns -> other namespace: while a layer `other` is mapped on the output, the glass of `ns` samples the output's background
+        // layers (the wallpaper), not the windows under it (the Dock while Mission Control is open: the Mac's Dock sits over
+        // Mission Control's backdrop)
+        std::unordered_map<std::string, std::string> wallpaperUnder;
+
         // glass behind the xdg_popups of windows whose class matches (PopupGlass.cpp): a client's context menu
         std::string                                  popupClasses = "^hyprk-finder$";
         std::string                                  popupMaterial = "menu";

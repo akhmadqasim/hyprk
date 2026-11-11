@@ -634,6 +634,16 @@ void main() {
         }
     }
 
+    CRegion CGlassElement::readRegionOf(const PHLMONITOR& mon, const SData& data) {
+        CRegion region;
+        if (!mon || !data.params)
+            return region;
+        const double m = margin(data);
+        for (size_t i = 0; i < data.groups.size() && i < data.resolved.size(); ++i)
+            region.add(readBox(data.groups[i].box, m, reachOf(*data.params, data.resolved[i]), mon->m_scale));
+        return region;
+    }
+
     bool CGlassElement::needsLiveBlur(Render::CRenderContext&) {
         return true;
     }
