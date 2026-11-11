@@ -292,3 +292,22 @@ dark 34 / 121 / 184 over black / grey / white (Mac 31 / 131 / 180), light 131 / 
 label sits on the Dock material (12 / 107 / 175 dark here, the Mac's 12 / 108 / 176) and the fill is a linear blend
 k + dst (1 - a); the Mac's lift over its own material (+19 / +23 / +4) is not linear in dst, so no a, k reaches all three:
 least squares (now) rms 6.0, max 8.5 at grey; minimax rms 6.4, max 6.4 (37 / 125 / 186). Left as is.
+
+## Session 9 (2026-11-11): user-report fixes, full-screen peek, HUD glyph, Dock drag-off (after judge #4)
+
+Headless MBA 2560x1664 at 2x (dist config copy, own state), mcap k 1-2; per-frame series in `motion-measured.csv` (`*-s9*`).
+
+| Motion | Mac | Before | After | Status |
+|---|---|---|---|---|
+| Full screen menu bar peek, shown at all (a0a9cf4) | Q-menubar-33 | judge #4: missed 1 of 3 entries | 10 of 10 entries (3 at 1.2 s, 7 at 0.35 s after the full screen) | fixed |
+| Peek in | ~0.15 s, roughly linear | first frame repeated 6 of 6 (judge #4) | .20 .40 .50 .61 .70 .81 .92 1.00 in 16.7 ms steps, no repeat in 10 of 10; one value skipped (.20 -> .40) in most runs | repeat fixed, skip left (lost after the shell's swap, session 8) |
+| Peek out | ~0.17 s | as above | .20 .29 .38 .48 .57 .66 .75 .84 1.00, no repeat in 10 of 10 | matches |
+| HUD speaker glyph, 1 -> 2 waves (cc232d4) | SystemBannerUI: Image(systemName:) swapped inside withAnimation(spring 0.2 / 0.85), no symbol effect; recording: HUD glyphs cross-fade with both visible (volume <-> brightness, "about 3 frames") | one frame | .09 .30 .50 .67 .80 .89 .95 .98 1.00 (3 runs, identical), the content spring | per-wave fade inferred: no Mac recording of a wave change |
+| HUD glyph, 2 waves -> slash / slash -> 1 wave | as above | one frame | .09 .27 .44 .58 .69 .76 .87 .96 .99 / .14 .42 .58 .72 .83 .90 .95 .98 | as above |
+| HUD appear over the wallpaper (not flat) | hud-appear series | (judge #4 .034-.045 over flat backdrops) | rms .007 / .011 / .013, time rms 3.5-5.8 ms, 2-98 % 502-517 ms (Mac 483) (3 runs) | not comparable with the judge's backdrops |
+| HUD dismiss over the wallpaper | 0.96 .85 .71 .56 .45 .36 .29 .23 .18 .14 .11 .09 .07 .05 .04 .03 | (judge #4 334-386 ms) | .97 .85 .72 .60 .50 .41 .34 .28 .24 .19 .16 .13 .10 .09 .07 .06, rms .029-.032 (3 runs): ours is the REA model (glass s^2, content s); the white glyph and bar at s dominate the least squares over a dark wallpaper | unchanged: needs a Mac dismiss track over flat grey to tell whether the content also goes at s^2 |
+| Dock drag-off on an empty desktop (95c796e) | Q-dock-17 | 0 of 1 (judge #4: nothing happens) | 10 of 10 remove the tile | fixed |
+| Liquid Glass slider: mouse-up to appearance.json / plugin tint_amount (22731a8) | preview one frame about 50 ms after mouse-up | 259 / 267 ms | under 55 / 77 ms (poll step about 20 ms) | matches within the poll step |
+
+Not done in this session: unlock per-region timing (B3), Mission Control Spaces band and first frame, Spotlight open blur,
+the HUD's GUI-thread stalls (not re-traced after the glyph rewrite, whose Shapes are now built once instead of per symbol).
