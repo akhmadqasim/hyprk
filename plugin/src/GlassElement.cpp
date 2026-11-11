@@ -672,7 +672,7 @@ void main() {
                 if (box.w < 1 || box.h < 1 || a <= 0.001f)
                     continue;
                 g_pHyprOpenGL->renderRect(ctx, box, CHyprColor{tint.r, tint.g, tint.b, tint.a * a},
-                                          {.round = sc<int>(std::round(s.radius * scale)), .roundingPower = m_data.roundingPower.value_or(p.roundingPower), .blur = true,
+                                          {.round = sc<int>(std::round(s.radius * scale)), .roundingPower = std::max(m_data.roundingPower.value_or(p.roundingPower), 2.f), .blur = true,
                                            .blurA = a});
             }
     }

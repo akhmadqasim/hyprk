@@ -57,6 +57,30 @@ int main() {
         auto shapes = clusterRegion({{0, 0, 10, 10}, {10, 10, 10, 10}, {50, 50, 0, 5}});
         CHECK(shapes.size() == 2);
     }
+    // Quickshell's corners are Qt ellipse regions, not circles: the staircases of radius 24 (the Control Center slider
+    // tile) and 32 (its 2x2 tile) as Qt 6.10.2 builds them read back as 24 and 32 (the circle formula gave 23.9 and 38.2)
+    {
+        const auto qtRows = [](double w, double h, const std::vector<int>& L, const std::vector<int>& R) {
+            std::vector<SRect> rects;
+            const double       n = double(L.size());
+            for (size_t k = 0; k < L.size(); ++k) {
+                rects.push_back({double(L[k]), double(k), w - L[k] - R[k], 1});
+                rects.push_back({double(L[k]), h - 1 - double(k), w - L[k] - R[k], 1});
+            }
+            rects.push_back({0, n, w, h - 2 * n});
+            return rects;
+        };
+        auto slider = clusterRegion(qtRows(292, 64, {19, 17, 15, 13, 11, 10, 9, 7, 7, 6, 5, 4, 4, 3, 3, 2, 2, 1, 1}, {19, 17, 15, 13, 11, 9, 8, 7, 6, 5, 4, 4, 3, 3, 2, 2, 1, 1, 0}));
+        CHECK(slider.size() == 1 && near(slider[0].radius, 24));
+        auto tile = clusterRegion(qtRows(140, 140, {32, 26, 23, 20, 17, 14, 13, 12, 11, 9, 9, 8, 7, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1, 1},
+                                         {32, 26, 23, 20, 17, 14, 12, 11, 10, 9, 8, 7, 6, 5, 5, 4, 4, 4, 3, 3, 3, 2, 2, 2, 1, 1, 1, 0, 0, 0, 0, 0}));
+        CHECK(tile.size() == 1 && near(tile[0].radius, 32));
+        CHECK(near(cornerRadius(31, 237), 31)); // the Dock at tile 64 (shell radius 31.1)
+        CHECK(near(cornerRadius(10, 40), 12));  // menus
+        CHECK(near(cornerRadius(2, 3), 4));     // 2 and 4 make the same region
+        CHECK(near(cornerRadius(26, 150), 31.6, 0.1)); // no Qt corner: a rasterised circle
+    }
+
     // pill: radius clamps to half height
     {
         auto shapes = clusterRegion(roundedRows(0, 0, 200, 40, 30));
@@ -70,6 +94,20 @@ int main() {
     CHECK(near(sdRoundedBox(40 + 10 / std::sqrt(2.0), 10 + 10 / std::sqrt(2.0), 50, 20, 10, 2), 0, 1e-9));
     // higher power pushes the corner outward (squircle): corner diagonal point is inside
     CHECK(sdRoundedBox(40 + 10 / std::sqrt(2.0), 10 + 10 / std::sqrt(2.0), 50, 20, 10, 4) < 0);
+
+    // Apple's continuous corner (power 0): straight edges as before, the corner spans 1.528665 r along the long edge
+    // (a point r from the corner on the top edge is already inside), circles and capsule ends stay circles
+    CHECK(near(sdRoundedBox(0, 0, 146, 32, 24, 0), -32, 1e-6));
+    CHECK(near(sdRoundedBox(0, 32, 146, 32, 24, 0), 0, 1e-6));
+    CHECK(near(sdRoundedBox(146, 0, 146, 32, 24, 0), 0.045, 2e-3)); // both corners meet on the short side (E 36.7 > 32)
+    CHECK(sdRoundedBox(146 - 24, 32, 146, 32, 24, 0) > 0.05);                 // a circle or Lp corner has its edge here
+    CHECK(near(sdRoundedBox(146 - 24 * 1.528665, 32, 146, 32, 24, 0), 0, 1e-6));
+    CHECK(std::abs(sdRoundedBox(32 / std::sqrt(2.0), 32 / std::sqrt(2.0), 32, 32, 32, 0)) < 1e-6); // circle d 64
+    CHECK(std::abs(sdRoundedBox(70 - 32 + 32 * std::cos(0.3), 32 * std::sin(0.3), 70, 32, 32, 0)) < 0.05); // capsule end
+    // the 292 x 64, r 24 slider tile's top edge 10 / 20 / 30 pt from its left end (Apple's formula, Python port)
+    CHECK(near(sdRoundedBox(-136, -32, 146, 32, 24, 0), 3.8483, 2e-3));
+    CHECK(near(sdRoundedBox(-126, -32, 146, 32, 24, 0), 0.7589, 2e-3));
+    CHECK(near(sdRoundedBox(-116, -32, 146, 32, 24, 0), 0.1144, 2e-3));
 
     // bevel: 1 at the edge, 0 at full depth, monotonic
     CHECK(near(bevel(0, 10), 1));

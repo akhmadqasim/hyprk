@@ -189,7 +189,7 @@ namespace lg {
             INTS[i].apply(*p, raw.ints[i]);
         for (size_t i = 0; i < std::size(STRINGS); ++i)
             STRINGS[i].apply(*p, raw.strings[i]);
-        p->roundingPower = std::max(p->roundingPower, 1.f);
+        p->roundingPower = p->roundingPower <= 0.f ? 0.f : std::max(p->roundingPower, 1.f);
         p->tintAmount    = std::clamp(p->tintAmount, 0.f, 1.f);
         auto compile = [](const std::string& pattern) -> std::optional<std::regex> {
             if (pattern.empty())

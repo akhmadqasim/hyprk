@@ -27,7 +27,7 @@ namespace lg {
         std::string                                  defaultMaterial = "regular";
         std::string                                  windowMaterial  = "regular";
         float                                        defaultRadius   = -1;   // < 0: infer from the client's blur region
-        float                                        roundingPower   = 2.6f; // Apple's continuous corner is close to 2.6-3
+        float                                        roundingPower   = 0.f;  // 0 = Apple's continuous corner (supercircle_sdf); >= 1 = Lp superellipse
 
         float                                        refractionScale = 1, aberration = 0; // Apple: no aberration on background glass
 

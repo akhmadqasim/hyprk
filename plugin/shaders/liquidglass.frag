@@ -25,7 +25,7 @@ uniform vec4  shapeBox[MAX_SHAPES]; // centre x, y (quad px), half w, h
 uniform vec2  shapeInfo[MAX_SHAPES];// corner radius px (< 0: a square turned 45 deg, half side = shapeBox.zw, corner -radius), materialize 0..1
 uniform float smoothK;              // px, smoothness of the union (= GlassEffectContainer spacing), 0 = plain min
 uniform float appearBlur;           // px edge softness of fully hidden glass (materialize 0)
-uniform float roundingPower;        // 2 = circle
+uniform float roundingPower;        // <= 0: Apple's continuous corner; >= 1: Lp superellipse (2 = circle)
 uniform float alpha;                // layer fade
 uniform float fillAmount;           // > 0: fill mode (plus-lighter / plus-darker marker shapes): output amount x coverage,
                                     // the caller's blend equation adds it to or subtracts it from the framebuffer
@@ -79,15 +79,41 @@ out vec4 fragColor;
 float sat(float x) { return clamp(x, 0.0, 1.0); }
 vec2  sat2(vec2 x) { return clamp(x, 0.0, 1.0); }
 
-// distance to a rounded box with Lp (superellipse) corners and its outward normal (x: distance, yz: normal)
+// Distance to a rounded box and its outward normal (x: distance, yz: normal).
+// roundingPower <= 0 (default): Apple's continuous corner, a port of CA::OGL::Metal::ShaderUtils::supercircle_sdf
+// (QuartzCore 27.2.1 metallib, reference/re/27.2.1/decomp/QuartzCore-metallib-glass_background_sdf_all_lpf.ll): the
+// corner spans E = 1.528665 r along each edge; where a half side is shorter than E the curve goes over to the circle
+// of radius r (cap, compute_sdf_with_mode's rule for continuous radii), so capsules and circles keep round ends.
+// roundingPower >= 1: an Lp superellipse of extent r (2 = circle), for shapes that follow Hyprland's window corner.
+const float SC_K = 1.528665;
 vec3 sdBoxN(vec2 p, vec2 half_, float radius) {
     float r = clamp(radius, 0.0, min(half_.x, half_.y));
-    vec2  q = abs(p) - half_ + r;
-    vec2  m = max(q, 0.0);
     vec2  s = vec2(p.x < 0.0 ? -1.0 : 1.0, p.y < 0.0 ? -1.0 : 1.0);
+    if (roundingPower <= 0.0 && r > 1e-3) {
+        vec2  a   = abs(p);
+        float E   = r * SC_K;
+        vec2  cap = sat2((SC_K - half_ / r) / (SC_K - 1.0));
+        float m   = mix(E, r, max(cap.x, cap.y));
+        vec2  q   = a - half_ + m;
+        vec2  t   = max((a - half_ + E) / E, 0.0);
+        float len = length(t);
+        float mx  = max(t.x, t.y);
+        float x   = mx > 0.0 ? sat(min(t.x, t.y) / mx) : 0.0;
+        float pol = 0.268531 + x * (1.26803 + x * (-3.64122 + x * (3.15601 - 0.926054 * x)));
+        float fc  = len + 1.0 - 1.0 / (1.0 - x * x * sat(len) * pol);                       // continuous
+        float fr  = length(max(t * SC_K - (SC_K - 1.0), 0.0)) / SC_K + (1.0 - 1.0 / SC_K); // circle of radius r
+        float sg  = t.y > t.x ? 1.0 : -1.0;
+        float f   = mix(mix(fc, fr, cap.x), mix(fc, fr, cap.y), sat(0.5 - sg + sg * x));
+        vec2  g   = max(q, 0.0);
+        vec2  n   = g.x + g.y > 0.0 ? normalize(g) : (q.x > q.y ? vec2(1.0, 0.0) : vec2(0.0, 1.0));
+        return vec3(min(max(q.x, q.y), 0.0) + E * (f - 1.0), s * n);
+    }
+    float pw = max(roundingPower, 1.0);
+    vec2  q  = abs(p) - half_ + r;
+    vec2  m  = max(q, 0.0);
     if (m.x > 0.0 || m.y > 0.0) {
-        vec2  g = pow(m, vec2(roundingPower - 1.0)); // gradient of the corner; m^p = m * g
-        float c = pow(dot(m, g), 1.0 / roundingPower);
+        vec2  g = pow(m, vec2(pw - 1.0)); // gradient of the corner; m^p = m * g
+        float c = pow(dot(m, g), 1.0 / pw);
         return vec3(c + min(max(q.x, q.y), 0.0) - r, s * g / max(length(g), 1e-6));
     }
     return vec3(max(q.x, q.y) - r, q.x > q.y ? vec2(s.x, 0.0) : vec2(0.0, s.y));

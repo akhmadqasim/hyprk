@@ -17,6 +17,10 @@
 #      material (same backdrop, no underlay).
 #   6. The Liquid Glass slider on the real Dock over 4 pt stripes at a = 0, 0.5, 1 (live/verify/C/dock-real.json).
 #
+#   7. The corner curve: the plugin's sdRoundedBox (lgdump --sdf) against a port of QuartzCore's supercircle_sdf, that
+#      port against the top edge of the real Control Center slider tile on the Mac (C2 cc-real-stripes), and the rim rows
+#      across that corner (the highlight's lobes on the curve's normal) against the Mac's rows.
+#
 # Usage: check_model.py --dump <lgdump binary or its JSON output> [--strict] [--port module.py]
 #   --strict: exit 1 when step 1 is not exact, a ported input differs, or the face is off by more than the limits below.
 import argparse, importlib.util, json, math, os, subprocess, sys
@@ -392,6 +396,106 @@ def slider_check(ours):
     return bad
 
 
+# ---- 7. corner curve
+SC_K = 1.528665
+
+
+def supercircle(px, py, hx, hy, R):
+    """CA::OGL::Metal::ShaderUtils::supercircle_sdf of QuartzCore 27.2.1 (reference/re/27.2.1/decomp/
+    QuartzCore-metallib-glass_background_sdf_all_lpf.ll) with compute_sdf_with_mode's cap for a continuous radius:
+    distance and the y part of the normal. Keep in step with sdBoxN in shaders/liquidglass.frag."""
+    ax, ay = np.abs(np.asarray(px, float)), np.abs(np.asarray(py, float))
+    E = R * SC_K
+    cx, cy = (min(max((SC_K - h / R) / (SC_K - 1), 0), 1) for h in (hx, hy))
+    m = E + (R - E) * max(cx, cy)
+    qx, qy = ax - hx + m, ay - hy + m
+    tx, ty = np.maximum((ax - hx + E) / E, 0), np.maximum((ay - hy + E) / E, 0)
+    ln, mx = np.hypot(tx, ty), np.maximum(tx, ty)
+    x = np.where(mx > 0, np.clip(np.minimum(tx, ty) / np.where(mx > 0, mx, 1), 0, 1), 0)
+    pol = 0.268531 + x * (1.26803 + x * (-3.64122 + x * (3.15601 - 0.926054 * x)))
+    fc = ln + 1 - 1 / (1 - x * x * np.clip(ln, 0, 1) * pol)
+    fr = np.hypot(np.maximum(tx * SC_K - (SC_K - 1), 0), np.maximum(ty * SC_K - (SC_K - 1), 0)) / SC_K + (1 - 1 / SC_K)
+    sg = np.where(ty > tx, 1.0, -1.0)
+    w = np.clip(0.5 - sg + sg * x, 0, 1)
+    f57, f58 = fc + (fr - fc) * cx, fc + (fr - fc) * cy
+    gx, gy = np.maximum(qx, 0), np.maximum(qy, 0)
+    gl = np.hypot(gx, gy)
+    ny = np.where(gl > 0, gy / np.where(gl > 0, gl, 1), np.where(qx > qy, 0.0, 1.0))
+    return np.minimum(np.maximum(qx, qy), 0) + E * (f57 + (f58 - f57) * w - 1), ny
+
+
+def lp_box(px, py, hx, hy, R, p):
+    qx, qy = np.abs(px) - hx + R, np.abs(py) - hy + R
+    mx, my = np.maximum(qx, 0), np.maximum(qy, 0)
+    return (mx ** p + my ** p) ** (1 / p) + np.minimum(np.maximum(qx, qy), 0) - R
+
+
+def corner_check(ours, dump):
+    from PIL import Image
+    bad = []
+    print("\n7. corner curve (QuartzCore supercircle_sdf: the corner spans 1.528665 r) and the rim rows across it")
+    if not dump.endswith(".json"):
+        rows = np.array(json.loads(subprocess.run([dump, "--sdf"], capture_output=True, text=True, check=True).stdout))
+        e = 0.0
+        for hx, hy, R in {tuple(r[:3]) for r in rows}:
+            sel = rows[(rows[:, 0] == hx) & (rows[:, 1] == hy) & (rows[:, 2] == R)]
+            e = max(e, float(np.abs(supercircle(sel[:, 3], sel[:, 4], hx, hy, R)[0] - sel[:, 5]).max()))
+        print("    plugin sdRoundedBox vs the port, %d points on 6 shapes: max |diff| %.2g pt" % (len(rows), e))
+        if e > 1e-4:
+            bad.append("sdf port")
+    # the real slider tile (292 x 64 pt, continuous r 24, MAC-ANSWERS Q-panels-05) in the C2 crop: left edge at px 8, top at 12
+    mac = np.asarray(Image.open(os.path.join(ROOT, "reference", "screens", "27.2.1", "verify", "C2", "cc-real-stripes-a0.5071146.png")).convert("L"), float)
+    HX, HY, R, XE, TOP = 146, 32, 24, 8.0, 12.0
+    xs = np.arange(30, 100)
+
+    def mac_edge(cols):  # sub-pixel top edge: the peak rim row minus the coverage of the row above it
+        out = []
+        for x in cols:
+            k = int(np.argmax(mac[5:24, x])) + 5
+            out.append(k - min(max((mac[k - 1, x] - mac[3, x]) / (236.0 - mac[3, x]), 0), 1))
+        return np.array(out)
+
+    def model_edge(fn, cols, xe):
+        ys = np.linspace(TOP - 1, TOP + 30, 3101)
+        out = []
+        for x in cols:
+            d = fn(np.full_like(ys, (x + 0.5 - xe) / 2 - HX), (ys - TOP) / 2 - HY)
+            out.append(ys[np.argmax(d < 0)])
+        return np.array(out)
+
+    apple = lambda x, y: supercircle(x, y, HX, HY, R)[0]
+    res = {}
+    for name, fn in (("Apple's curve", apple), ("Lp 2.6, extent r (the old corner)", lambda x, y: lp_box(x, y, HX, HY, R, 2.6)), ("circle", lambda x, y: lp_box(x, y, HX, HY, R, 2.0))):
+        l = mac_edge(xs) - model_edge(fn, xs, XE)
+        r = mac_edge(595 - xs) - model_edge(fn, xs, 596 - 2 * 2 * HX - XE)  # mirrored: the crop is 596 px wide
+        res[name] = (float(np.sqrt((l ** 2).mean())), float(np.sqrt((r ** 2).mean())))
+        print("    Mac tile top edge 11..46 pt from its end vs %-34s rms %.2f / %.2f px (left / right)" % (name, *res[name]))
+    if max(res["Apple's curve"]) > 0.3:
+        bad.append("corner contour")
+    # rim rows 0..5 px below the tile top across both corners (crop x 40..556): body 109, the gap row beside the tile
+    # under the pixel coverage, the highlight of step 4 with its lobes on the curve's normal
+    P = ours.get(("controlcenter", True, 64, 0.5))
+    X, Y = np.meshgrid(np.arange(40, 556), np.arange(12, 18))
+    d, ny = supercircle((X + 0.5 - XE) / 2 - HX, (Y + 0.5 - TOP) / 2 - HY, HX, HY, R)
+    depth = np.maximum(-d, 0)
+    cs, cd = math.cos(math.radians(P["KeySpreadDeg"])), math.cos(math.radians(0.65 * P["KeySpreadDeg"]))
+    spec = np.where(depth < 1, 1 - 0.75 * depth, 0) * np.clip((ny - cs) / (1 - cs), 0, 1)
+    diff = np.maximum(0, 1 - depth / 8) * np.clip((ny - cd) / (1 - cd), 0, 1)
+    sch = lambda v, a: v / ((1 / a - 2) * (1 - v) + 1)
+    mk = P["KeyScale"] * (sch(spec, P["KeyAmount"]) + sch(diff, P["DiffuseAmount"]))
+    b, k = 109 / 255, P["KeyYcc"]
+    ins = np.clip(b + mk * (np.clip(k[0] + (k[1] - k[0]) * b, -0.75, 1) - b), 0, 1) * 255
+    cov = np.clip(0.5 - d * 2, 0, 1)
+    v = cov * ins + (1 - cov) * mac[5:6, 40:556]
+    ref = mac[12:18, 40:556]
+    pp = lambda a: " ".join("%.0f" % (r.max() - r.min()) for r in a)
+    rms = float(np.sqrt(((v - ref) ** 2).mean()))
+    print("    rim rows 0..5 px across the corners, peak to peak: ours %s, Mac %s; rms %.1f levels" % (pp(v), pp(ref), rms))
+    if rms > 5 or any(abs((a.max() - a.min()) - (r.max() - r.min())) > 12 for a, r in zip(v, ref)):
+        bad.append("corner rim rows")
+    return bad
+
+
 def load_dump(arg):
     txt = open(arg).read() if arg.endswith(".json") else subprocess.run([arg], capture_output=True, text=True, check=True).stdout
     return {(e["material"], e["dark"], e["D"], e["a"]): e["inputs"] for e in json.loads(txt)}
@@ -503,7 +607,7 @@ def main():
         print("    %-44s ours %-26s Mac %-24s max %.1f" % (label, " ".join("%.0f" % x for x in rows), " ".join(str(x) for x in mac), e))
         if e > 2.0:
             rim_bad.append(label)
-    stripe_bad = stripes_check(ours) + slider_check(ours)
+    stripe_bad = stripes_check(ours) + slider_check(ours) + corner_check(ours, args.dump)
     if args.strict and (not ok or param_bad or face_bad or grid_bad or rim_bad or stripe_bad):
         print("\nFAIL: reference %s, %d inputs differ, face off vs Mac: %s, vs model: %s, rim: %s, stripes: %s" % ("ok" if ok else "differs", param_bad, face_bad, grid_bad, rim_bad, stripe_bad))
         return 1

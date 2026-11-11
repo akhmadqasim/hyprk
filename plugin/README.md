@@ -42,7 +42,7 @@ Check a value: `hyprctl getoption plugin:liquidglass:refraction_scale`.
 1. Its layer namespace is in `namespaces` (`*` = every layer).
 2. Shape: if the client sets an ext-background-effect blur region (Quickshell:
    `BackgroundEffect.blurRegion: Region { item: bg; radius: 24 }`), each connected part of the region is one
-   glass rounded rect. The corner radius is read back from the region's staircase, unless `radii` or
+   glass rounded rect. The corner radius is read back from the region's staircase (see Corners), unless `radii` or
    `default_radius` sets it. Without a region the layer is left to Hyprland (`require_region = 1`, default),
    or the whole layer box becomes glass (`require_region = 0`).
 3. The surface itself should be transparent where the glass is (draw only content, or a light tint on top).
@@ -52,6 +52,26 @@ The backdrop is Apple's blur pyramid (MAC-ANSWERS C3 2), built by the plugin fro
 level 1 is the 2x2 box (Apple's backdrop at scale 0.5), every deeper level the one above through Apple's 13-tap
 downsampler; each read is one trilinear tap at `log2(1 / scale) + lod(1.6 r texels-per-pt)`. Hyprland's
 `decoration.blur.*` no longer feeds the glass (it still blurs layers without glass).
+
+## Corners
+
+The shape is QuartzCore's own: a port of `CA::OGL::Metal::ShaderUtils::supercircle_sdf` (27.2.1 metallib,
+`reference/re/27.2.1/decomp/QuartzCore-metallib-glass_background_sdf_all_lpf.ll`; `sdBoxN` in the shader, `sdRoundedBox`
+in `src/Shape.cpp`). A continuous corner of radius r spans E = 1.528665 r along each edge; where a half side is shorter than
+E it goes over to the circle of radius r (`cap = (1.528665 - half / r) / 0.528665`, the rule `compute_sdf_with_mode` applies
+to a continuous radius), so circles and capsule ends stay round while a capsule's long edge still leaves the flat 1.53 r
+from its end. Every glass uses it (the Mac's shapes are `RoundedRectangle(style: .continuous)` / Capsule); window glass
+and title bars keep Hyprland's superellipse, which the window itself is clipped with.
+Until 2026-11-11 the corner was an Lp superellipse of power 2.6 and extent r. On the real Control Center slider tile
+(292 x 64, r 24) over 4 pt stripes the top edge 11..46 pt from the tile's end is off by 1.36 px rms with that curve and by
+0.16 px with Apple's, and the rim rows 0..4 px below the top, read across both corners (crop x 40..556), went from peak to
+peak 118 / 31 / 40 / 3 / 4 to 135 / 98 / 82 / 48 / 31 (Mac 140 / 103 / 91 / 52 / 33): judge #4's "flat rim rows" were the
+corner starting 12.7 pt late, not the rim. `tools/check_model.py` step 7 keeps the port, the Mac contour and those rows.
+
+The radius comes from the region's top left staircase. Quickshell rounds a Region with Qt ellipse regions of a whole radius,
+and Qt's ellipse is a flattened polygon, so the circle formula read 12 as 13.7, 31 as 37.1 and 32 as 38.2; `cornerRadius()`
+now knows Qt's staircase per radius (rows to the left edge + cells left out, 1..128, Qt 6.10.2) and returns that radius
+exactly, the formula for any other staircase. 2 and 4, and 3 and 5, make the same region (read as 4 and 5).
 
 ## Motion (materialize, merging)
 
@@ -179,7 +199,7 @@ the 0.5 base, Apple: a 4x4 / 8x8 box; the half-size base Apple uses when R > 2 i
 | `window_material` | `regular` | recipe for window glass |
 | `radii` | "" | `ns:radius` overrides |
 | `default_radius` | -1 | radius for all shapes; < 0 = infer from the blur region |
-| `rounding_power` | 2.6 | superellipse corner (2 = circle) |
+| `rounding_power` | 0 | 0 = Apple's continuous corner (QuartzCore `supercircle_sdf`, see Corners); >= 1 = an Lp superellipse of extent r (2 = circle) |
 | `appearance` | `auto` | `auto` (hysteresis on backdrop luminance), `light`, `dark` |
 | `adapt_low` / `adapt_high` | 0.1 / 0.3 | hysteresis band (SPEC 9.6, V2 light range) |
 | `underlay_blur` | "" | `ns:radius` (Apple blur radius, pt) of a blur composed into that glass's reads without a pass (the panel blur's older stand-in; 2.05 fitted the CC tiles) |

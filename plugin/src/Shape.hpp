@@ -86,8 +86,14 @@ namespace lg {
     // its content, in the same commit. Removes the marker from rects; returns 1 when there is none.
     double takeOpacityMarker(std::vector<SRect>& rects, double surfaceW, double surfaceH);
 
-    // Signed distance to a rounded rect whose corners are Lp superellipses
-    // (power 2 = circle). p is relative to the box centre, half = half size.
+    // Corner radius from a region's top left staircase: `stair` rows until it reaches the left edge and the `cells` it
+    // leaves out above that row. A Quickshell (Qt ellipse) corner of a whole radius is recognised exactly; anything
+    // else is read as a rasterised quarter circle, r = ((1 + sqrt(1 + 4 stair)) / 2)^2.
+    double cornerRadius(double stair, double cells);
+
+    // Signed distance to a rounded rect. power <= 0: Apple's continuous corner (QuartzCore supercircle_sdf: the
+    // corner spans 1.528665 r, and goes over to the circle where a half side is shorter than that);
+    // power >= 1: Lp superellipse corners (2 = circle). p is relative to the box centre, half = half size.
     // Negative inside. Mirrors sdShape() in shaders/liquidglass.frag.
     double sdRoundedBox(double px, double py, double halfW, double halfH, double radius, double power);
 
