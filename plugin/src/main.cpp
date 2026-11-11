@@ -365,6 +365,16 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
                     g_traceFile = std::fopen(args[1].c_str(), "a");
                 return std::format("trace '{}' {}\n", g_trace, g_traceFile ? "on" : "off");
             }
+            // `hyprctl liquidglass bars`: one JSON array, an object per window with this plugin's title bar (Titlebar.cpp
+            // describe(): colours per state, title, layout), for Mission Control's thumbnails
+            if (req.command.contains("bars")) {
+                std::string out = "[";
+                forEachTitlebar([&out](lg::CTitlebar& bar) {
+                    if (auto one = bar.describe(); !one.empty())
+                        out += (out.size() > 1 ? "," : "") + one;
+                });
+                return out + "]\n";
+            }
             if (req.command.contains("reset"))
                 lg::stats::reset();
             // `hyprctl liquidglass damage`: redraw every output, e.g. after hl.config() changed tint_amount through

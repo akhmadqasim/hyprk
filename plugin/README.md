@@ -389,6 +389,11 @@ Which clients asked for server-side decorations is read from Hyprland's private 
 (`#define private public` around one header, read only). The bar's fill also covers the window's rounded
 top corners, so the two read as one shape.
 
+`hyprctl liquidglass bars` prints one JSON array with an object per window that has this bar: `address`, `height`,
+`button`, `gap`, `inset`, `titleX` (pt), `font`, `fontSize`, `weight`, `title`, `active` and `look.active` /
+`look.inactive` = `{fill, dark, text}` (colours as `#AARRGGBB`, `dark` = the discs and text of a dark bar). Mission
+Control draws the bar from it in the thumbnails (a window capture holds the client only, the bar is a decoration).
+
 ## Windows
 
 `window_classes = "^(foot|hyprk-finder)$"` puts glass (no drop shadow, the window keeps its own) behind matching

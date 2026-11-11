@@ -361,21 +361,10 @@ namespace lg {
         const bool  isActive = Desktop::focusState()->window() == window;
         const float radius   = window->presentation().rounding();
 
-        // colour: the client's own top rows (so a dark terminal gets a dark bar), else the config
-        const bool sampled = wantsSample() && m_sampled;
-        SRgba      base    = isActive ? params->titlebarColor : params->titlebarColorInactive;
-        if (sampled) {
-            base = *m_sampled;
-            if (!isActive) { // inactive: a little flatter, like macOS
-                const float y = luma(base.r, base.g, base.b);
-                base          = {base.r + (y - base.r) * 0.3f, base.g + (y - base.g) * 0.3f, base.b + (y - base.b) * 0.3f, 1};
-            }
-        }
-        // light/dark with a dead band, so a mid-grey client does not flip the text colour back and forth
-        const float y = luma(base.r, base.g, base.b);
-        m_dark        = m_dark ? y < 0.55f : y < 0.45f;
-        // the configured text colours apply unless the bar took a dark colour from the client
-        const bool dark = sampled && m_dark;
+        const SLook look = this->look(*params, isActive, m_dark);
+        m_dark           = look.darkFill;
+        const SRgba base = look.fill;
+        const bool  dark = look.dark;
 
         // fill: rounded top corners only (the box runs on under the window and is clipped)
         CRectPassElement::SRectData fill;
@@ -427,6 +416,63 @@ namespace lg {
                 g_pHyprRenderer->addPassElement(ctx, makeUnique<CTexPassElement>(text));
             }
         }
+    }
+
+    CTitlebar::SLook CTitlebar::look(const SParams& p, bool isActive, bool wasDark) const {
+        // colour: the client's own top rows (so a dark terminal gets a dark bar), else the config
+        const bool sampled = wantsSample() && m_sampled;
+        SLook      out;
+        out.fill = isActive ? p.titlebarColor : p.titlebarColorInactive;
+        if (sampled) {
+            out.fill = *m_sampled;
+            if (!isActive) { // inactive: a little flatter, like macOS
+                const float y = luma(out.fill.r, out.fill.g, out.fill.b);
+                out.fill      = {out.fill.r + (y - out.fill.r) * 0.3f, out.fill.g + (y - out.fill.g) * 0.3f, out.fill.b + (y - out.fill.b) * 0.3f, 1};
+            }
+        }
+        // light/dark with a dead band, so a mid-grey client does not flip the text colour back and forth
+        const float y = luma(out.fill.r, out.fill.g, out.fill.b);
+        out.darkFill  = wasDark ? y < 0.55f : y < 0.45f;
+        // the configured text colours apply unless the bar took a dark colour from the client
+        out.dark = sampled && out.darkFill;
+        out.text = out.dark ? (isActive ? TEXT_ON_DARK : TEXT_ON_DARK_INACTIVE) : (isActive ? p.titlebarText : p.titlebarTextInactive);
+        return out;
+    }
+
+    static std::string hexColour(const SRgba& c) {
+        auto byte = [](float v) { return std::clamp(int(std::lround(v * 255.f)), 0, 255); };
+        return std::format("#{:02x}{:02x}{:02x}{:02x}", byte(c.a), byte(c.r), byte(c.g), byte(c.b)); // Qt's #AARRGGBB
+    }
+
+    static std::string jsonString(const std::string& in) {
+        std::string out = "\"";
+        for (const unsigned char ch : in) {
+            if (ch == '"' || ch == '\\')
+                out += '\\', out += char(ch);
+            else if (ch < 0x20)
+                out += std::format("\\u{:04x}", int(ch));
+            else
+                out += char(ch);
+        }
+        return out + "\"";
+    }
+
+    std::string CTitlebar::describe() const {
+        const auto window = m_window.lock();
+        const auto params = m_params();
+        if (!window || !params || m_height <= 0 || !window->m_ruleApplicator->decorate().valueOrDefault())
+            return "";
+        const auto& p      = *params;
+        const auto  layout = geometry(p, {}).layout;
+        auto        state  = [&](bool active) {
+            const SLook l = look(p, active, m_dark);
+            return std::format(R"({{"fill":"{}","dark":{},"text":"{}"}})", hexColour(l.fill), l.dark, hexColour(l.text));
+        };
+        return std::format(R"({{"address":"0x{:x}","height":{},"button":{},"gap":{},"inset":{},"titleX":{},"radius":{},"font":{},"fontSize":{},)"
+                           R"("weight":{},"title":{},"active":{},"look":{{"active":{},"inactive":{}}}}})",
+                           reinterpret_cast<uintptr_t>(window.get()), m_height, p.titlebarButton, p.titlebarGap, p.titlebarInset, layout.title.x,
+                           window->presentation().rounding(), jsonString(p.titlebarFont), p.titlebarFontSize, TITLE_WEIGHT, jsonString(window->metadata().title()),
+                           Desktop::focusState()->window() == window, state(true), state(false));
     }
 
     void CTitlebar::onPointerMove(const Vector2D& global) {

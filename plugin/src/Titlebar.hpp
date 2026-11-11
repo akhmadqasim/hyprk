@@ -42,11 +42,22 @@ namespace lg {
         // a button release anywhere ends a title-bar drag we started
         void onButtonRelease();
         bool belongsTo(const PHLWINDOW& w) const { return m_window.lock() == w; }
+        // `hyprctl liquidglass bars`: what the bar draws, as one JSON object, or "" without a bar (Mission Control draws
+        // it in the thumbnails of windows whose bar the screen does not show whole: a window capture holds the client only)
+        std::string describe() const;
         // colour of the client's top rows, from CTitlebarProbe (damages the bar when it changes)
         void onSampled(const SRgba& c);
         bool wantsSample() const;
 
       private:
+        // the bar's colours for one state: the fill, whether it counts as dark (the text and lights follow), the text
+        struct SLook {
+            SRgba fill;
+            bool  dark = false; // sampled and dark: white text, dark lights
+            bool  darkFill = false; // the fill's own verdict, with the dead band (kept in m_dark by draw)
+            SRgba text;
+        };
+        SLook look(const SParams& p, bool isActive, bool wasDark) const;
         struct SGeometry {
             CBox            bar; // logical, global
             STitlebarLayout layout;
