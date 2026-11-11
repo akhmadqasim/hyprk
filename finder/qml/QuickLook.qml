@@ -93,6 +93,8 @@ Window {
     property bool _hold: false
     onFrameSwapped: {
         if (_warm > 0) {
+            // mapped now: put the window on the screen's origin (finder/hyprland-rules.lua; Hypr.moveWindow)
+            if (_warm === 3) Hypr.moveWindow(ql.title, Screen.virtualX, Screen.virtualY);
             if (--_warm > 0) { ql.update(); return; }
             panel.visible = true;
             _step = Tokens.reduceMotion ? -1 : 0;

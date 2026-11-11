@@ -12,12 +12,14 @@ import Finder.Native
 // a menu that opens to the right while the row is hovered, the row showing a chevron.
 // A popup surface of its own (xdg_popup), as the Mac's NSPopupMenuWindow: it may leave the Finder window, and the
 // compositor's popup grab closes it on a click anywhere outside (an in-window popup only saw clicks inside Finder).
-// The live menu is "menu" glass (Q-menubar-13); where Hyprland blurs behind popups (decoration.blur.popups) the fill is
-// the translucent tint that glass measures to over flat backdrops, else the opaque shared menu fill.
+// The live menu is "menu" glass (Q-menubar-13). With the liquidglass plugin (plugin/README.md "Client popups", option
+// popup_classes) the compositor draws that glass, radius 12, and its shadow behind this popup surface, so the menu draws
+// no fill, as the shell's MenuDropdown over its glass; closing is then Hyprland's popup fadeout (fadePopupsOut, 0.2 s),
+// which dematerializes the glass with the content. Without the plugin: the opaque shared menu fill and a 0.2 s fade.
 Popup {
     id: root
     popupType: Popup.Window
-    readonly property bool blurred: Hypr.option("decoration:blur:popups", 0) === 1
+    readonly property bool glass: Hypr.option("plugin:liquidglass:enabled", 0) === 1
 
     property var items: []
     signal chose()   // a row ran its action (a submenu closes its parent through this)
@@ -45,12 +47,12 @@ Popup {
     readonly property bool hasChecks: items.some(i => i.checked !== undefined)
     readonly property bool hasIcons: items.some(i => !!i.icon)
     enter: Transition { NumberAnimation { property: "opacity"; to: 1; duration: 0 } }
-    exit: Transition { NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 200; easing.type: Easing.OutQuad } }
+    exit: Transition { NumberAnimation { property: "opacity"; from: 1; to: 0; duration: root.glass ? 0 : 200; easing.type: Easing.OutQuad } }
 
     background: Rectangle {
         radius: Tokens.control.menuRadius
-        color: root.blurred ? Theme.color.menuGlassFill : Tokens.control.menuFill
-        border.width: 1
+        color: root.glass ? "transparent" : Tokens.control.menuFill
+        border.width: root.glass ? 0 : 1
         border.color: Tokens.control.menuStroke
     }
 

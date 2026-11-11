@@ -50,6 +50,24 @@ QVariantList Hypr::windows() const
     return list;
 }
 
+void Hypr::moveWindow(const QString &title, double x, double y) const
+{
+    const qint64 pid = QCoreApplication::applicationPid();
+    const QJsonArray all = QJsonDocument::fromJson(request("j/clients")).array();
+    for (const QJsonValue &v : all) {
+        const QJsonObject c = v.toObject();
+        if (c.value(QLatin1String("pid")).toInteger() != pid || c.value(QLatin1String("title")).toString() != title)
+            continue;
+        const QJsonArray at = c.value(QLatin1String("at")).toArray();
+        if (at.at(0).toDouble() == x && at.at(1).toDouble() == y)
+            return;
+        const QString address = c.value(QLatin1String("address")).toString();
+        request(QStringLiteral("dispatch hl.dsp.window.move({ x = %1, y = %2, window = \"address:%3\" })")
+                    .arg(qRound(x)).arg(qRound(y)).arg(address).toUtf8());
+        return;
+    }
+}
+
 int Hypr::option(const QString &name, int fallback) const
 {
     const QJsonObject o = QJsonDocument::fromJson(request("j/getoption " + name.toUtf8())).object();

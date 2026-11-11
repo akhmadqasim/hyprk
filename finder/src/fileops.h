@@ -81,6 +81,7 @@ signals:
     void listed(int token, const QVariantList &entries);
 
 private:
+    // Duplicate / Compress: runs prog, ends in transferFinished; success plays the task-done sound
     void runChecked(const QString &prog, const QStringList &args, const QString &workDir, const QString &failure);
     QVariantMap entry(const class QFileInfo &fi) const;
     QVariantList recents(int max) const;

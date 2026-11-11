@@ -168,10 +168,6 @@ QtObject {
         readonly property color folderFront: "#71B9E4"   // ref (113,185,228)
         readonly property color folderTop: "#81C6EE"     // ref (129,198,238)
 
-        // context menu over Hyprland's popup blur: the 27.2.1 menu glass's empty-area pixel over flat backdrops
-        // (MAC-ANSWERS.md Q-menubar-13: light over white 251,252,255 / over black 137,137,138; dark 120,120,121 /
-        // 33,34,44) solved per channel for fill c and alpha a (over black c a, over white c a + 255 (1 - a))
-        readonly property color menuGlassFill: theme.dark ? Qt.rgba(50 / 255, 51 / 255, 63 / 255, 0.67) : Qt.rgba(248 / 255, 250 / 255, 1, 0.55)
         readonly property color fieldBg: theme.dark ? Qt.rgba(1, 1, 1, 0.08) : "#FFFFFF"
         // rename field ring: 3 pt accent a.5 outside, 0.5 pt darker inner edge (114,158,244) (Q-finder-27)
         readonly property color focusRing: Accent.focusRing

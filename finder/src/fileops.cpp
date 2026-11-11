@@ -279,8 +279,8 @@ void FileOps::transfer(const QStringList &paths, const QString &destDir, const Q
         emit transferFinished(QStringLiteral("Some items can\u2019t be %1.\n%2 could not be started.").arg(how.verb, how.prog));
         p->deleteLater();
     });
-    const bool move = how.prog == QLatin1String("mv");
-    connect(p, &QProcess::finished, this, [this, p, items, destDir, move, verb = how.verb, clashMsg](int code, QProcess::ExitStatus status) {
+    const bool move = how.prog == QLatin1String("mv"), link = how.prog == QLatin1String("ln");
+    connect(p, &QProcess::finished, this, [this, p, items, destDir, move, link, verb = how.verb, clashMsg](int code, QProcess::ExitStatus status) {
         if (move) {
             QStringList gone;   // items that really left; their tags follow them (one index rewrite)
             for (const QString &from : items)
@@ -293,6 +293,8 @@ void FileOps::transfer(const QStringList &paths, const QString &destDir, const Q
             const QString out = QString::fromUtf8(p->readAllStandardError()).trimmed().section(QLatin1Char('\n'), 0, 0);
             err = QStringLiteral("Some items can’t be %1.").arg(verb) + (out.isEmpty() ? QString() : QLatin1Char('\n') + out);
         }
+        if (err.isEmpty() && !link)
+            playSound(QStringLiteral("task-done"));   // Finder's copy / move task finished (see runChecked)
         emit transferFinished(err);
         p->deleteLater();
     });
@@ -508,6 +510,10 @@ void FileOps::runChecked(const QString &prog, const QStringList &args, const QSt
             const QString out = QString::fromUtf8(p->readAllStandardError()).trimmed().section(QLatin1Char('\n'), 0, 0);
             err = failure + (out.isEmpty() ? QString() : QLatin1Char('\n') + out);
         }
+        // a finished Finder task plays system sound 1, Volume Mount.aif (sound.sh "task-done": copy, move, duplicate,
+        // archive; static REA only, not heard on the Mac)
+        if (err.isEmpty())
+            playSound(QStringLiteral("task-done"));
         emit transferFinished(err);
         p->deleteLater();
     });
