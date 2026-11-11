@@ -358,10 +358,15 @@ Singleton {
         readonly property color clockFace: "#F5F5F5"
         readonly property color clockHand: "#1C1C1E"
         readonly property color clockSecond: "#FF9500"
-        // Column backdrop (PC #62 1d, plugin hand-off): the backdrop inside the column reads x 0.71 (dark) / x 0.74
-        // (light) between the cards, x 0.82 8 pt right of the cards, and fades back to 1 about 80 pt outside. One feathered shadow on a layer below the cards (the cards' glass samples it), edge 16 pt outside the
-        // cards (the 376 pt column frame), riding with the panel. Blur sigma about 3 pt inside: not done here.
-        readonly property color backdropDim: Qt.rgba(0, 0, 0, theme.dark ? 0.29 : 0.26)
+        // Column backdrop (PC #62 1d and Static RE): NotificationsListShadowBackground, a RoundedRectangle(20,
+        // continuous) with a black shadow at 0.2 x progress, radius 30, no offset, the same in light and dark. As a
+        // filled shadow it reads x 0.8 under the cards; the darker x 0.71 / 0.74 in the 6 pt gaps and just outside
+        // the cards is that field times the cards' own shadows, which the plugin draws around each card shape
+        // (outside it), so they are not repeated here. One feathered shadow on a layer below the cards (the cards'
+        // glass samples it), edge 16 pt outside the cards (the 376 pt column frame), riding with the panel.
+        // Blur sigma about 3 pt inside: not done here.
+        readonly property color backdropDim: Qt.rgba(0, 0, 0, 0.2)
+        readonly property int backdropRadius: 20
         readonly property int backdropOutset: 16
         readonly property real backdropBlur: 50
     }
