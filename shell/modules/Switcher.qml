@@ -58,7 +58,25 @@ ShellWindow {
     exclusionMode: ExclusionMode.Ignore
     namespace: "hyprk-switcher"
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    // with the compositor's submap the keys arrive as global shortcuts and the windows keep their focus (the Mac's do)
+    readonly property bool compositorKeys: Panels.submap === Panels.switcherSubmap
+    WlrLayershell.keyboardFocus: shown && !compositorKeys ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    Connections {
+        target: Panels
+        enabled: sw.shown
+        function onSwitcherKey(k) { sw.key(k); }
+    }
+    // Tab, `, Shift-Tab and Left/Right move and wrap at both ends, Home/End jump, release commits, Esc cancels (Q-dock-22)
+    function key(k) {
+        const n = apps.length;
+        if (n === 0 && k !== "cancel") return;
+        if (k === "next") selected = (selected + 1) % n;
+        else if (k === "prev") selected = (selected - 1 + n) % n;
+        else if (k === "first") selected = 0;
+        else if (k === "last") selected = n - 1;
+        else if (k === "commit") commit();
+        else if (k === "cancel") Panels.close();
+    }
 
     // the window exists only while open or dematerializing (shell.qml LazyLoader)
     function present() {
@@ -84,10 +102,12 @@ ShellWindow {
         id: keys
         focus: true
         Keys.onPressed: e => {
-            if (e.key === Qt.Key_Tab || e.key === Qt.Key_Right) sw.selected = (sw.selected + 1) % sw.apps.length;
-            else if (e.key === Qt.Key_Backtab || e.key === Qt.Key_Left) sw.selected = (sw.selected - 1 + sw.apps.length) % sw.apps.length;
-            else if (e.key === Qt.Key_Escape) Panels.close();
-            else if (e.key === Qt.Key_Return) sw.commit();
+            if (e.key === Qt.Key_Tab || e.key === Qt.Key_Right || e.key === Qt.Key_QuoteLeft) sw.key("next");
+            else if (e.key === Qt.Key_Backtab || e.key === Qt.Key_Left) sw.key("prev");
+            else if (e.key === Qt.Key_Home) sw.key("first");
+            else if (e.key === Qt.Key_End) sw.key("last");
+            else if (e.key === Qt.Key_Escape) sw.key("cancel");
+            else if (e.key === Qt.Key_Return) sw.key("commit");
             e.accepted = true;
         }
         Keys.onReleased: e => {
@@ -97,13 +117,15 @@ ShellWindow {
 
     Item {
         id: panel
-        // 128pt icons unless the row would not fit the screen
-        readonly property real icon: Math.max(Theme.switcher.minIconSize, Math.min(Theme.switcher.iconSize,
-            (sw.width * Theme.switcher.maxWidthFraction - Theme.switcher.padding * 2) / Math.max(1, sw.apps.length) - Theme.switcher.cellPadding * 2))
-        readonly property real cell: icon + Theme.switcher.cellPadding * 2
-        width: sw.apps.length * cell + Theme.switcher.padding * 2
-        height: cell + Theme.switcher.labelHeight + Theme.switcher.padding * 2
-        anchors.centerIn: parent
+        readonly property int n: Math.max(1, sw.apps.length)
+        // 128 pt icons, smaller when the row would come closer than 34 pt to the screen sides (Q-dock-20)
+        readonly property real icon: Math.max(Theme.switcher.minIconSize, Math.min(Theme.switcher.iconSize, Math.floor(
+            (sw.width - Theme.switcher.screenMargin * 2 - Theme.switcher.padding * 2 + Theme.switcher.gap) / n - Theme.switcher.gap)))
+        readonly property real pitch: icon + Theme.switcher.gap
+        width: n * pitch - Theme.switcher.gap + Theme.switcher.padding * 2
+        height: icon + Theme.switcher.padding * 2
+        x: Math.round((sw.width - width) / 2)
+        y: Math.round((sw.height - height) / 2)
         opacity: sw.fade
 
         Glass {
@@ -120,17 +142,20 @@ ShellWindow {
         Row {
             x: Theme.switcher.padding
             y: Theme.switcher.padding
+            spacing: Theme.switcher.gap
             Repeater {
                 model: sw.apps
                 delegate: Item {
                     id: c
                     required property var modelData
                     required property int index
-                    width: panel.cell
-                    height: panel.cell
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: Theme.switcher.selectionRadius
+                    width: panel.icon
+                    height: panel.icon
+                    Rectangle {   // 120 on a 128 icon, centred on it
+                        anchors.centerIn: parent
+                        width: Theme.switcher.selectionSize * panel.icon / Theme.switcher.iconSize
+                        height: width
+                        radius: Theme.switcher.selectionRadius * panel.icon / Theme.switcher.iconSize
                         color: Theme.switcher.selection
                         visible: c.index === sw.selected
                     }
@@ -140,20 +165,21 @@ ShellWindow {
                         icon: c.modelData.icon
                         appId: c.modelData.id
                     }
-                    // macOS shows the name of the selected app under its icon
+                    // the selected app's name under its icon, in the bottom padding
                     Text {
                         visible: c.index === sw.selected
                         anchors.horizontalCenter: parent.horizontalCenter
-                        y: parent.height + (Theme.switcher.labelHeight - height) / 2
-                        width: panel.cell * 1.6
+                        y: parent.height + Theme.switcher.labelTop
+                        width: panel.pitch * 1.6
                         horizontalAlignment: Text.AlignHCenter
                         elide: Text.ElideRight
                         text: c.modelData.name
-                        font: Typography.body
+                        font: Typography.headline
                         color: Theme.color.label
                     }
                     MouseArea {
                         anchors.fill: parent
+                        anchors.margins: -Theme.switcher.gap / 2
                         hoverEnabled: true
                         onEntered: if (sw.notePointer(this, mouseX, mouseY)) sw.selected = c.index
                         onPositionChanged: mouse => { if (sw.notePointer(this, mouse.x, mouse.y)) sw.selected = c.index; }

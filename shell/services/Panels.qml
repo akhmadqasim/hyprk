@@ -117,6 +117,8 @@ Singleton {
     Timer { id: holdTimeout; interval: 1500; onTriggered: { root.held = ({}); root.updateLoaded(); } }
 
     onOpenChanged: {
+        // the switcher's keys came from the compositor's submap: leave it with the switcher
+        if (open !== "switcher" && submap === switcherSubmap) Hyprland.dispatch('hl.dsp.submap("reset")');
         if (open !== "menu") {
             menuIndex = -1;
             menuShown = -1;
@@ -136,6 +138,23 @@ Singleton {
     GlobalShortcut { appid: "hyprk"; name: "notificationcenter"; description: "Notification Center"; onPressed: root.toggle("nc") }
     GlobalShortcut { appid: "hyprk"; name: "switcher"; description: "App switcher"; onPressed: root.open = "switcher" }
     GlobalShortcut { appid: "hyprk"; name: "missioncontrol"; description: "Mission Control"; onPressed: root.toggle("mission") }
+
+    // Cmd-Tab without taking the keyboard (the Mac's windows stay active under it): when the Cmd+Tab bind also enters
+    // the Hyprland submap "hyprk-switcher", its binds send these and the switcher takes no keyboard focus
+    // (Switcher.qml). Without the submap the switcher holds the keyboard itself, as before.
+    readonly property string switcherSubmap: "hyprk-switcher"
+    property string submap: ""
+    Connections {
+        target: Hyprland
+        function onRawEvent(e) { if (e.name === "submap") root.submap = e.data; }
+    }
+    signal switcherKey(string key)      // "next" | "prev" | "first" | "last" | "commit" | "cancel"
+    GlobalShortcut { appid: "hyprk"; name: "switcher-next"; description: "App switcher: next"; onPressed: root.switcherKey("next") }
+    GlobalShortcut { appid: "hyprk"; name: "switcher-prev"; description: "App switcher: previous"; onPressed: root.switcherKey("prev") }
+    GlobalShortcut { appid: "hyprk"; name: "switcher-first"; description: "App switcher: first"; onPressed: root.switcherKey("first") }
+    GlobalShortcut { appid: "hyprk"; name: "switcher-last"; description: "App switcher: last"; onPressed: root.switcherKey("last") }
+    GlobalShortcut { appid: "hyprk"; name: "switcher-commit"; description: "App switcher: switch"; onPressed: root.switcherKey("commit") }
+    GlobalShortcut { appid: "hyprk"; name: "switcher-cancel"; description: "App switcher: cancel"; onPressed: root.switcherKey("cancel") }
 
     // fallback entry points for scripts: `qs -p shell ipc call panels toggle spotlight`
     IpcHandler {

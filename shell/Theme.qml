@@ -610,16 +610,24 @@ Singleton {
 
     // ---------- app switcher ----------
     readonly property QtObject switcher: QtObject {
-        // macOS 26/27 Cmd+Tab: large glass panel, 128pt icons, rounded selection (no reference shot)
-        readonly property int iconSize: 128              // shrinks when the apps don't fit
-        readonly property int cellPadding: 10            // TODO verify
-        readonly property int padding: 18                // TODO verify
-        readonly property int radius: 34                 // TODO verify
-        readonly property int selectionRadius: 24        // TODO verify
-        readonly property int labelHeight: 24            // selected app name row, TODO verify
-        readonly property real maxWidthFraction: 0.92    // of the screen
-        readonly property int minIconSize: 32            // floor when many apps are open
-        readonly property color selection: theme.dark ? Qt.rgba(1, 1, 1, 0.18) : Qt.rgba(0, 0, 0, 0.12)
+        // 27.2.1 Cmd-Tab (Q-dock-19..21, AX + pixels): one row of 128 pt icons, pitch 134 (gap 6), 24 pt padding on all
+        // sides (8 apps: 1114 x 176 at the screen centre); with many apps the icons shrink (16 apps: 94, pitch 100) to keep
+        // the panel 34 pt from the screen sides. Corner ~58 pt circle-equivalent (concentric: selection 34 + padding 24)
+        readonly property int iconSize: 128
+        readonly property int gap: 6
+        readonly property int padding: 24
+        readonly property int screenMargin: 34
+        readonly property int radius: 58
+        // selection: a 120 x 120 squircle on a 128 icon (circle-equivalent 34), flat. The Mac blends it plus-darker
+        // -57 levels (light) / plus-lighter +65 (dark) with the glass under it (cmdtab-*.png: panel 41,134,220 -> tile
+        // 0,78,161; 26,61,179 -> 90,124,240). The glass is the compositor's, under this surface, so a plain alpha
+        // stands in: black 0.30 takes 57 off a 190 backdrop (light glass), white 0.33 adds 65 to a 60 one (dark glass)
+        readonly property real selectionSize: 120
+        readonly property int selectionRadius: 34
+        readonly property color selection: theme.dark ? Qt.rgba(1, 1, 1, 0.33) : Qt.rgba(0, 0, 0, 0.30)
+        // the selected app's name: SF 13 bold, its top 2.5 pt below the 128 frame, inside the bottom padding
+        readonly property real labelTop: 2.5
+        readonly property int minIconSize: 32            // floor when very many apps are open (no Mac data below 94)
         // the panel shows about 0.19 s after Tab; releasing Cmd before that switches without it (Q-dock-22)
         readonly property int showDelay: 190
     }
