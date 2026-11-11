@@ -33,6 +33,11 @@ namespace motion::frame {
     // percent = (elapsed / 100) / speed = p. A hold is a speed that grows with time.
     double hyprSpeed(double elapsedMs, double p);
 
+    // Window close, alpha (0..1 of the start) at presented frame k after the close (fractional k: between frames). The
+    // Mac's TextEdit frames (MAC-ANSWERS.md R2): 1, 0.71, 0.44, 0.27, 0.16, 0.09, 0.05, 0.03 at k = 0..7, then x0.6 per
+    // frame (the series' own decay), 0 below 0.004. k = 1 is the first frame drawn after the close, whatever its phase.
+    double closeAlpha(double k);
+
     // cubic-bezier(x1, y1, x2, y2) at x (CSS timing function)
     double cubicBezier(double x1, double y1, double x2, double y2, double x);
 }

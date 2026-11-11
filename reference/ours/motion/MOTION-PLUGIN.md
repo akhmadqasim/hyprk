@@ -19,6 +19,7 @@ pixels.
 | Full screen enter | R2 series, ~0.42 s | zoom curve, 301 ms | Mac series, 385 ms (Mac 350) | 0.076 / 51 ms -> 0.033 / 16..18 ms | ff4f9d6 |
 | Full screen exit | 0.15 s to 0.47, 0.15 s hold, 0.3 s (R2, no per-frame series) | one step, 300 ms | two steps: 0.54 at 160 ms, held to ~330 ms, done 584 ms | vs the R2 anchors (0,0) (150,0.47) (300,0.47) (600,1): 0.26 -> 0.048..0.057 | ff4f9d6 |
 | HUD appear | `hud-appear-fit.json` alpha track | dips 0.70 -> 0.51 -> 0.79 (~400 ms) and 0.30 -> 0.29 (~265 ms): soft rimless glass | monotonic | 0.037 / 25 ms -> 0.026 / 15..24 ms | 80fd49d |
+| Window close (judge #3 gap 11) | R2 TextEdit alpha 1, .71, .44, .27, .16, .09, .05, .03 | first frame 0.11-0.13 (bezier started at the close, phase-dependent), then .44 .65 .79 .88 .93 .97 1 | .28 .56 .73 .84 .91 .95 .97 .98 in 5 of 5 runs | 0.012-0.028 / 1.4-3.2 ms -> 0.006-0.010 / 0.3-0.8 ms (one run 0.020, fit shift) | this change |
 | Control Center open | REA spring response 0.25, critically damped | last 3.5 % pops at ~470 ms, 2-98 % 392 ms | (shell hand-off below, verified with a scratch copy) 254 ms, no pop | 0.021 / 16 ms -> 0.0045 / 1.8 ms | hand-off |
 
 ## Causes and fixes
@@ -47,6 +48,17 @@ fade), a tile at an integer x maps to x - 0.05 and truncates to x - 1, so every 
 pt larger until the spring lands on exactly 1, when it snaps (the measured "rims" pop: every tile outline moves 1 pt,
 max channel change 185). A scratch copy of `shell/components/Glass.qml` that sets the shape rect from rounded mapped
 edges removed the pop (hand-off below).
+
+**Window close.** Hyprland starts `fadeOut` at the close, so the first frame drawn after it showed 0.03-0.16 of the fade
+depending on where the close fell between two frames (blank foot over white, 2-98 % 133 ms either way). plugin-motion
+(`Close.cpp`) now counts frames: the first time the closing window's snapshot is drawn on a monitor is frame 1, and every
+time it is drawn after that (right before Hyprland reads its alpha) the fadeout's alpha variable is set to the TextEdit
+frame k = 1 + round(elapsed / frame time) (`Frame.cpp closeAlpha`, then x0.6 per frame). `fadeOut` (speed 1.4) only
+ends the fadeout now. `CWindowFadeout::alpha` itself is too short to hook. Over stripes the alpha metric also reads the
+window's blur-behind (alpha sqrt(a)), so the numbers are over flat white; Finder (0.81) and Terminal (0.59) show the
+Mac has the same phase spread in its first frame, TextEdit's 0.71 is the middle. Zoom / unzoom re-measured with the
+change (foot, black, window-rect area metric): zoom 0.011-0.014 / 2.8-3.4 ms, 267 ms; unzoom 0.012 / 3.8-3.9 ms, 283 ms
+(unchanged code path). Open: one frame, unchanged.
 
 ## Real app windows (Qt: Finder, Settings), 2026-11-11 follow-up
 

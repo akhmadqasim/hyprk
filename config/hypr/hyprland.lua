@@ -168,8 +168,10 @@ end
 --     Safari, Terminal), so windowsIn is off. (The binaries' ScaleUpAndIn 0.5 s spring is not what 27.2.1 shows.)
 --   Window close: a fade of about 0.1 s, alpha per frame 1, 0.71, 0.44, 0.27, 0.16, 0.09, 0.05, 0.03 (TextEdit),
 --     i.e. x0.6 per 60 Hz frame, exp(-t / 33 ms) (MAC-ANSWERS.md R2 (27.2.1)). winClose is that decay as a
---     bezier over 0.12 s (RMS 0.008 against the TextEdit and Terminal frames); plugin-motion adds the slight
---     blur. Scale 1 -> 0.98 (ScaleDownAndOut) is kept: too small to resolve in the recording.
+--     bezier; plugin-motion (Close.cpp) sets the window's alpha to the TextEdit frames counted from the first
+--     frame drawn after the close (the bezier, started at the close, showed 0.11-0.16 in that frame depending on
+--     the phase), so fadeOut only has to last the 8 frames (0.14 s); it adds the slight blur too.
+--     Scale 1 -> 0.98 (ScaleDownAndOut) is kept: too small to resolve in the recording.
 --     Safari closes in one frame on the Mac; hyprk does not special-case browsers.
 --   Zoom / frame changes (windowsMove): MAC-ANSWERS.md R2 (27.2.1) Window > Zoom 0.33 s ease-in-out, share per frame
 --     0.01 0.01 0.03 0.05 0.07 0.10 0.14 0.20 0.26 0.33 0.41 0.49 0.58 0.69 0.79 0.87 0.93 0.98 1.0: bezier "zoom"
@@ -216,7 +218,7 @@ function hyprk_motion(reduce)
         hl.animation({ leaf = "windowsIn",   enabled = false })   -- macOS windows appear complete in one frame
         hl.animation({ leaf = "windowsOut",  enabled = true, speed = 1.2, bezier = "winClose", style = "popin 98%" })
         hl.animation({ leaf = "fadeIn",      enabled = false })   -- macOS windows appear at full alpha
-        hl.animation({ leaf = "fadeOut",     enabled = true, speed = 1.2, bezier = "winClose" })
+        hl.animation({ leaf = "fadeOut",     enabled = true, speed = 1.4, bezier = "winClose" })   -- 0.14 s: covers the 8 Mac frames plugin-motion plays
         hl.animation({ leaf = "workspaces",  enabled = true, speed = 5, spring = "swiftui", style = "slide" })
     end
     hl.animation({ leaf = "windowsMove", enabled = not reduce, speed = 2.9, bezier = "zoom" })   -- Zoom 0.29 to 0.33 s

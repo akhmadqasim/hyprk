@@ -21,6 +21,10 @@ int main() {
     using namespace motion::frame;
     constexpr double F = 1.0 / 60.0;
 
+    // window close: the TextEdit frames from the first drawn frame on, then x0.6 per frame, then 0
+    CHECK(near(closeAlpha(0), 1) && near(closeAlpha(-1), 1) && near(closeAlpha(1), 0.71) && near(closeAlpha(2), 0.44));
+    CHECK(near(closeAlpha(7), 0.03) && near(closeAlpha(8), 0.018) && near(closeAlpha(1.5), (0.71 + 0.44) / 2) && near(closeAlpha(20), 0));
+
     // the Mac's frames come back exactly at frame times (R2 series)
     CHECK(near(progress(eKind::UNZOOM, 0), 0));
     CHECK(near(progress(eKind::UNZOOM, 1 * F), 0.01));

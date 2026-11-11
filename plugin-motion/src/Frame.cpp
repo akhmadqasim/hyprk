@@ -69,4 +69,17 @@ namespace motion::frame {
             return 1e6; // percent ~0
         return elapsedMs / 100.0 / p;
     }
+
+    double closeAlpha(double k) {
+        static constexpr double MAC[] = {1, 0.71, 0.44, 0.27, 0.16, 0.09, 0.05, 0.03};
+        constexpr int           LAST  = int(std::size(MAC)) - 1;
+        if (k <= 0)
+            return 1;
+        if (k >= LAST) {
+            const double a = MAC[LAST] * std::pow(0.6, k - LAST);
+            return a < 0.004 ? 0 : a;
+        }
+        const int i = int(std::floor(k));
+        return MAC[i] + (MAC[i + 1] - MAC[i]) * (k - i);
+    }
 }
