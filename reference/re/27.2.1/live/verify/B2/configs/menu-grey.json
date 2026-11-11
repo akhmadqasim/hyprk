@@ -1,0 +1,23 @@
+{
+ "mode": "dark",
+ "views": [],
+ "dump": "$SCRATCH/b2/cap/menu-grey.json",
+ "pattern": "solid:128,128,128",
+ "origin": [
+  40,
+  60
+ ],
+ "size": [
+  500,
+  420
+ ],
+ "secs": 8.5,
+ "popupMenu": [
+  120,
+  60
+ ],
+ "dumpWindowsAt": [
+  2.5,
+  4.0
+ ]
+}

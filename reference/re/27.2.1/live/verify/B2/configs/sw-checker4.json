@@ -1,0 +1,84 @@
+{
+ "mode": "dark",
+ "views": [
+  {
+   "frame": [
+    30,
+    30,
+    520,
+    87
+   ],
+   "shape": "capsule",
+   "lense": true,
+   "size": "large"
+  },
+  {
+   "frame": [
+    580,
+    30,
+    520,
+    87
+   ],
+   "shape": "capsule",
+   "lense": false,
+   "size": "large"
+  },
+  {
+   "frame": [
+    30,
+    150,
+    300,
+    150
+   ],
+   "shape": "rrect:40",
+   "lense": true,
+   "size": "large"
+  },
+  {
+   "frame": [
+    360,
+    150,
+    300,
+    150
+   ],
+   "shape": "rrect:40",
+   "lense": false,
+   "size": "large"
+  },
+  {
+   "frame": [
+    700,
+    150,
+    200,
+    44
+   ],
+   "shape": "capsule",
+   "lense": true,
+   "size": "auto"
+  },
+  {
+   "frame": [
+    700,
+    220,
+    300,
+    87
+   ],
+   "shape": "capsule",
+   "lense": true,
+   "size": "auto",
+   "inset": 20
+  }
+ ],
+ "dump": "$SCRATCH/b2/cap/sw-checker4.json",
+ "pattern": "solid:90,90,90",
+ "content": "checker:4",
+ "origin": [
+  40,
+  60
+ ],
+ "size": [
+  1140,
+  340
+ ],
+ "secs": 3.4
+}

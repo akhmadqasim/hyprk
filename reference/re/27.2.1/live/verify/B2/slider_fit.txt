@@ -1,0 +1,19 @@
+gradx FLAT: face fit a=25.93 levels (0.1017) b=0.8972; model 0.1+0.9c with inner -6/3.6: rms 0.29 levels, median |e| 0.23, n=1420  (identity geometry rms 0.82)
+   decoded source coord vs model: rms 0.162 pt, max 0.36 pt; max |disp| measured 2.28 model 2.07
+gradx FULL ring offset (0,8): rms 10.10 levels, median |e| 3.37; without highlight 10.37; without ring+hl 17.58
+     depth>3pt: rms 6.33, n=896
+gradx FULL ring offset (0,-8): rms 0.56 levels, median |e| 0.35; without highlight 2.37; without ring+hl 17.58
+     depth>3pt: rms 0.53, n=896
+grady FLAT: face fit a=26.77 levels (0.1050) b=0.8911; model 0.1+0.9c with inner -6/3.6: rms 0.29 levels, median |e| 0.23, n=1420  (identity geometry rms 0.92)
+   decoded source coord vs model: rms 0.163 pt, max 0.32 pt; max |disp| measured 2.28 model 2.07
+grady FULL ring offset (0,8): rms 10.79 levels, median |e| 3.59; without highlight 11.00; without ring+hl 19.10
+     depth>3pt: rms 6.75, n=896
+grady FULL ring offset (0,-8): rms 0.57 levels, median |e| 0.35; without highlight 2.26; without ring+hl 19.10
+     depth>3pt: rms 0.55, n=896
+centre-row slope of raw capture: 0.706 levels/px, intercept at x=900: 115.9 (pattern there 132)
+model centre row slope: 0.702
+meas  [115. 111. 108. 107. 106. 107. 107. 109. 110. 112. 113. 114. 116. 117. 119. 120. 122. 123. 125. 128. 131. 135. 140. 145. 144.]
+model [117. 113. 110. 108. 108. 108. 108. 109. 110. 111. 113. 114. 116. 117. 119. 120. 122. 124. 126. 129. 133. 138. 142. 147. 148.]
+vert meas  [172. 149. 144. 143. 141. 137. 134. 129. 126. 124. 125. 128. 134. 141. 150. 156. 163. 168. 171. 184. 101.]
+vert model [178. 147. 144. 142. 140. 137. 133. 129. 125. 124. 124. 128. 134. 142. 149. 157. 163. 168. 172. 187. 227.]
+vert model(-8) [182. 149. 144. 142. 140. 137. 133. 129. 125. 124. 124. 128. 134. 142. 149. 157. 163. 168. 171. 184. 222.]

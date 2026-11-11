@@ -1,0 +1,18 @@
+{
+ "mode": "dark",
+ "views": [],
+ "dump": "$SCRATCH/b2/cap/dock-grady.json",
+ "pattern": "grady",
+ "origin": [
+  440,
+  1000
+ ],
+ "size": [
+  830,
+  107
+ ],
+ "secs": 2.2,
+ "level": "floating",
+ "policy": "accessory",
+ "activate": false
+}
