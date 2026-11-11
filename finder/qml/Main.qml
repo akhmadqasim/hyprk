@@ -45,6 +45,12 @@ Window {
     // inotify (StateFile) like Settings' AppState. --dark forces dark for reference screenshots.
     StateFile { id: appearanceFile; path: startup.stateDir + "/appearance.json" }
     readonly property var appearance: P.mergeState(appearanceFile.text, null, P.normalizeAppearance)
+    // wallpaper (state/wallpaper.json {path}) -> its mean colour for the sidebar chameleon tint, once per change
+    StateFile { id: wallpaperFile; path: startup.stateDir + "/wallpaper.json" }
+    WallpaperTint {
+        path: P.mergeState(wallpaperFile.text, null, o => o).path || startup.stateDir + "/../themes/wallpapers/png/DefaultAerial.png"
+        onTintChanged: Theme.chameleon = tint
+    }
 
     Component.onCompleted: {
         Theme.dark = Qt.binding(() => startup.dark || win.appearance.dark);

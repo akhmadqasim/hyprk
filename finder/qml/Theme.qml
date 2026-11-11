@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Finder.Native
 import HyprK
+import "../../ui/HyprK/chameleon.js" as Ch
 
 // Every metric and color of the Finder window, in pt (1 pt = 1 logical px; HiDPI is the output scale, as for
 // the shell and Settings). "27.2.1" = measured on reference/screens/27.2.1/finder-toolbar-{light,dark}.png (2x)
@@ -21,6 +22,13 @@ QtObject {
     readonly property string sidebarSize: appearance.sidebarIconSize || "medium"
     // Appearance > "Tint window background with wallpaper color" (default on, as on the Mac)
     readonly property bool tintWindow: appearance.tintWindowBackground !== false
+    // sidebar chameleon tint (MAC-ANSWERS.md C3.1): mean wallpaper colour from Main's WallpaperTint
+    property var chameleon: null
+    function chameleonOf(c) {
+        c = Qt.lighter(c, 1);   // a colour, also when given "#RRGGBB"
+        const o = active && tintWindow ? Ch.apply(c, chameleon, dark) : null;
+        return o ? Qt.rgba(o.r, o.g, o.b, c.a) : c;
+    }
     Component.onCompleted: {
         Tokens.dark = Qt.binding(() => theme.dark);
         Tokens.reduceTransparency = Qt.binding(() => theme.appearance.reduceTransparency === true);
@@ -97,9 +105,10 @@ QtObject {
 
         readonly property color window: Tokens.windowBackground
         // sidebar (Q-finder-03/07/08/09): fill, text, headers, icons; a = key window, i = inactive
-        readonly property color sidebarSolid: theme.dark ? "#242637" : theme.active ? "#EDEDEE" : "#F2F2F3"
+        // key window: + the chameleon layer (10 % dark / 5 % light colour blend); the inactive sidebar is flat
+        readonly property color sidebarSolid: theme.chameleonOf(theme.dark ? "#242637" : theme.active ? "#EDEDEE" : "#F2F2F3")
         // over compositor blur: the sidebar glass fill colour (LIVE-27.2.1.md Sidebar, glass-table-dark.txt)
-        readonly property color sidebarGlass: theme.dark ? Qt.rgba(0.15, 0.15, 0.15, 0.75) : Qt.rgba(0.87, 0.88, 0.91, 0.7)
+        readonly property color sidebarGlass: theme.chameleonOf(theme.dark ? Qt.rgba(0.15, 0.15, 0.15, 0.75) : Qt.rgba(0.87, 0.88, 0.91, 0.7))
         readonly property color sidebarSelection: theme.dark ? (theme.active ? "#414354" : "#323443")
                                                              : (theme.active ? "#D7D7D8" : "#E7E7E8")
         readonly property color sidebarDrop: "#2F6EED"          // drop target pill, white text (Q-finder-09)
