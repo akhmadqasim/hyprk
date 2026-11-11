@@ -60,6 +60,10 @@ Singleton {
     // The Dock's glass on each screen (by name) in screen coordinates, { x, y, w, h, r }: Mission Control covers the
     // rest of the band, so a window that reaches into it does not show beside the Dock
     property var dockRects: ({})
+    // the menu bar's Spotlight item per screen (by name), { x, w } in screen coordinates: a press on it while Spotlight
+    // is open is the item's (Spotlight.qml), not a click outside
+    property var spotlightItems: ({})
+    function setSpotlightItem(name, r) { const o = Object.assign({}, spotlightItems); o[name] = r; spotlightItems = o; }
     function setDockRect(name, r) {
         const z = Object.assign({}, dockRects);
         z[name] = r;

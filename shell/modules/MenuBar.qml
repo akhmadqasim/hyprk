@@ -228,9 +228,29 @@ ShellWindow {
             Symbol { anchors.centerIn: parent; name: "moon"; surface: "menubar"; size: Theme.menuBar.statusIconSize - 1; color: bar.statusFg }
             onClicked: Panels.toggle("cc", bar.screen)
         }
+        // Spotlight: -[SPUISpotlightMenuItem _handleStatusItemPress:] (0x2ade56b60, an NSPressGestureRecognizer): opens on
+        // mouse-down; a click while it is open closes it on mouse-up; a press held 1.0 s (the NSTimer, 0x2ade56bcc)
+        // keeps it open (reference/re/27.2.1/SPOTLIGHT-27.2.1.md section 3)
         StatusItem {
+            id: spotItem
+            function publish() { const p = mapToItem(null, 0, 0); if (bar.screen) Panels.setSpotlightItem(bar.screen.name, { x: p.x, w: width }); }
+            // where it is when Spotlight opens (the status row is laid out from the right after this item is made)
+            Connections { target: Panels; function onOpenChanged() { if (Panels.open === "spotlight") spotItem.publish(); } }
+            property bool wasOpen: false
+            property bool longPress: false
             Symbol { anchors.centerIn: parent; name: "magnifyingglass"; surface: "menubar"; size: Theme.menuBar.statusIconSize - 1; color: bar.statusFg }
-            onClicked: Panels.toggle("spotlight")
+            onPressedDown: {
+                wasOpen = Panels.open === "spotlight";
+                longPress = false;
+                if (!wasOpen) Panels.toggle("spotlight");
+                spotHold.restart();
+            }
+            onReleasedUp: {
+                spotHold.stop();
+                if (wasOpen && !longPress && Panels.open === "spotlight") Panels.close();
+                wasOpen = false;
+            }
+            Timer { id: spotHold; interval: 1000; onTriggered: { spotItem.longPress = true; if (Panels.open !== "spotlight") Panels.toggle("spotlight"); } }
         }
         StatusItem {
             // lit while Control Center is open and while the volume/brightness HUD shows (it hangs under this item)
@@ -399,6 +419,8 @@ ShellWindow {
         property real hPad: Theme.menuBar.statusHPadding
         default property alias content: sholder.data
         signal clicked()
+        signal pressedDown()
+        signal releasedUp()
 
         width: contentWidth + hPad * 2
         height: bar.height
@@ -406,6 +428,6 @@ ShellWindow {
         // pressed or open only: hovering a status item shows no pill (27.2.1, relay #52)
         HighlightPill { shown: si.active || sma.pressed; outset: Theme.menuBar.statusPillOutset; pillHeight: Theme.menuBar.statusPillHeight }
         Item { id: sholder; anchors.fill: parent }
-        MouseArea { id: sma; anchors.fill: parent; onClicked: si.clicked() }
+        MouseArea { id: sma; anchors.fill: parent; onClicked: si.clicked(); onPressed: si.pressedDown(); onReleased: si.releasedUp() }
     }
 }

@@ -302,9 +302,28 @@ ShellWindow {
         Panels.close();
     }
 
+    // a press outside closes. On the menu bar's Spotlight item it is the item's press (SPUISpotlightMenuItem
+    // _handleStatusItemPress:, 0x2ade56b60): Spotlight was showing, so the release closes it unless the press was held
+    // 1.0 s (the long-press timer, 0x2ade56bcc)
     MouseArea {
+        id: outside
         anchors.fill: parent
-        onPressed: Panels.close()
+        property bool onItem: false
+        function isItem(m) {
+            const r = sp.screen ? Panels.spotlightItems[sp.screen.name] : null;
+            return !!r && m.y < Theme.menuBar.height && m.x >= r.x && m.x < r.x + r.w;
+        }
+        onPressed: m => {
+            onItem = isItem(m);
+            if (onItem) itemHold.restart();
+            else Panels.close();
+        }
+        onReleased: {
+            if (onItem && itemHold.running) Panels.close();
+            itemHold.stop();
+            onItem = false;
+        }
+        Timer { id: itemHold; interval: 1000 }
     }
 
     // bar and panel share the open/close scale, around the field's centre
