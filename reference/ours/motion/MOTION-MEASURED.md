@@ -553,3 +553,21 @@ peek and lock / unlock are not re-measured.
 
 One number from this session, not a capture: the shell's appearance handshake message (a9e060c) left the shell 52 and
 125 ms after the `hyprctl dispatch` that switched the appearance (own session, quiet host, hyprctl's start included).
+
+## Session 14 (2026-11-12): the shared slider knob, HUD appear, the appearance hold
+
+Own headless sessions (MBA 2560x1664 at 2x, scratch copies of the tree, a private D-Bus and a private PipeWire with
+null sinks), fresh sessions, under 60 mcap runs each, quiet host (load about 1). Per-frame series in the CSV
+(`slider-knob-*-s14`, `hud-appear-s14-*`).
+
+| Motion | Mac | Ours before | Ours after | Runs |
+|---|---|---|---|---|
+| Slider knob press (Settings > Appearance, dark, knob held still; alpha over a 50 x 30 pt region round the knob) | lens share per 60 Hz frame from the 120 Hz layer samples: .061 .219 .405 .579 .725 .837 .916 .968 .998 1 (cubic bezier (0.275, 0.240, 0.437, 0.912), 144 ms); the 23.09.23 recording by eye: .054 .223 .431 .614 .757 .871 .936 .98 1 | 20 ms delay + 150 ms InOutSine on Qt's timer (not captured) | .12 .31 .50 .67 .79 .89 .95 .99 1, 2-98 % 115-118 ms, 6 of 6 the same series; the first change 1-2 frames after the press reaches the client | 6 |
+| Slider knob release | the same series (layer samples: .088 .219 .405 ...) | 150 ms InOutSine x lift (not captured) | .12 .29 .48 .65 .79 .89 .95 .99 1, 116-118 ms, 6 of 6 the same | 6 |
+| HUD appear (`hud volume`, alpha over the HUD) | verify/A hud-appear-fit: 2-98 % 483 ms; .02 .06 .12 .18 .25 .32 .38 .45 .51 | 515-533 ms; .03 .06 .10 .15 .20 .26 .31 .36 .41 .46 | 499-501 ms; .02 .05 .11 .17 .23 .30 .37 .42 .47 .51 (glass at the opacity while appearing, 494ea3e); `mcap.py compare` rms .037-.040 -> .036-.039 | 4 + 4 |
+| Appearance cross-fade (plugin, `hyprctl liquidglass fade`) | AppKit: snapshot held until the apps answer (at most 0.5 s), then 0.5 s | fixed 0.15 s hold: 0.65 s | the hold ends at the shell's answer (64e0b28): 33 frames in 0.552 s, 5 of 5 switches | 5 |
+
+Ours is about half a frame ahead of the Mac on the knob (the Mac's first sample sits 8.7 ms into its curve; FrameAnim's
+first frame is one refresh interval in). Not measured here: HUD dismiss (unchanged), the Control Center lens (same
+component and curve), the Sound module's open (Control Center's open spring), banner out, Mission Control, full screen,
+Cmd-Tab, Dock autohide, slot grow / shrink, drag-off, submenu delay, bar peek, lock / unlock.
