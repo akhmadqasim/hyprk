@@ -22,6 +22,9 @@ Singleton {
     property bool reduceTransparency: false
     // Appearance > Icon & widget style (default | dark | clear | tinted), see HyprK AppIconTile
     property string iconStyle: "default"
+    // Settings > Appearance > Liquid Glass slider (state/appearance.json `glass`, 0 clear .. 1 tinted, 0.5 = the
+    // unchanged recipe like NSGlassTintAmount unset: MAC-ANSWERS PC #67 C)
+    property real glassTint: 0.5
     // Appearance > Theme > Color (multicolor, graphite, red, ...). Under Multicolor the shell's own surfaces
     // have no app accent, so they get Blue #007AFF, like apps without NSAccentColorName (MAC-ANSWERS R5)
     property string accent: "multicolor"
@@ -70,13 +73,14 @@ Singleton {
         onFileChanged: reload()
         onLoaded: {
             const o = State.parse(text(), { dark: theme.dark, reduceTransparency: theme.reduceTransparency, iconStyle: theme.iconStyle,
-                                            reduceMotion: false, increaseContrast: false, accent: "multicolor" });
+                                            reduceMotion: false, increaseContrast: false, accent: "multicolor", glass: 0.5 });
             theme.dark = o.dark;
             theme.reduceTransparency = o.reduceTransparency;
             theme.iconStyle = o.iconStyle;
             theme.reduceMotion = o.reduceMotion;
             theme.increaseContrast = o.increaseContrast;
             theme.accent = o.accent;
+            theme.glassTint = isFinite(o.glass) ? Math.min(1, Math.max(0, o.glass)) : 0.5;
         }
     }
 
@@ -87,14 +91,25 @@ Singleton {
         // detached: a fast second toggle must not be dropped while the first still runs
         Quickshell.execDetached(["hyprctl", "eval", `hl.config({ plugin = { liquidglass = { appearance = "${dark ? "dark" : "light"}" } } })`]);
     }
+    // the Liquid Glass slider for the plugin (its live-updatable 0..1 option; Mac: NSGlassTintAmount, a running app
+    // re-reads it on the coordinated notification, MAC-ANSWERS PC #67 C2 item 5)
+    // HANDOFF H4: the plugin option is not final. Set pluginGlassOption to its name (expected "tint_amount") and
+    // check the command below against the plugin's README; empty = nothing is sent.
+    readonly property string pluginGlassOption: ""
+    function syncPluginGlass() {
+        if (!compositorGlass || pluginGlassOption === "") return;
+        Quickshell.execDetached(["hyprctl", "eval", `hl.config({ plugin = { liquidglass = { ${pluginGlassOption} = ${glassTint.toFixed(4)} } } })`]);
+    }
     // window shadow and rim densities differ in light and dark (config/hypr/hyprland.lua hyprk_appearance)
     function syncWindowChrome() {
         Quickshell.execDetached(["hyprctl", "eval", `if hyprk_appearance then hyprk_appearance(${dark}) end`]);
     }
     onDarkChanged: { syncPluginAppearance(); syncWindowChrome(); }
-    onCompositorGlassChanged: syncPluginAppearance()
+    onCompositorGlassChanged: { syncPluginAppearance(); syncPluginGlass(); }
+    onGlassTintChanged: syncPluginGlass()
     Component.onCompleted: {
         syncPluginAppearance();
+        syncPluginGlass();
         syncWindowChrome();
         // the shared HyprK controls and motion helpers follow this appearance
         Tokens.dark = Qt.binding(() => theme.dark);
