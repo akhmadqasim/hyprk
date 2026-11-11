@@ -37,6 +37,26 @@ Item {
         const v = endStep > 0 ? Math.max(from, Math.min(to, value + dir * endStep)) : dir < 0 ? from : to;
         moved(v); released(); committed(v);
     }
+    // Arrow keys (AppKit 27.2.1 -[NSSliderCell _moveInDirection:] 0x18b15eb0c): a twentieth of the range per press, or
+    // one tick when the slider only takes ticks; Right / Up add, Left / Down subtract, Page Up / Down go to the ends.
+    // Home, End and any modifier are not taken. One moved / released / committed per press that changes the value.
+    activeFocusOnTab: true
+    Keys.onPressed: e => {
+        if (!enabled || e.modifiers & (Qt.ShiftModifier | Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier)) return;
+        const snap = onlyTicks && tickMarks > 1;
+        const step = snap ? (to - from) / (tickMarks - 1) : (to - from) / 20;
+        let v;
+        if (e.key === Qt.Key_Right || e.key === Qt.Key_Up) v = value + step;
+        else if (e.key === Qt.Key_Left || e.key === Qt.Key_Down) v = value - step;
+        else if (e.key === Qt.Key_PageUp) v = to;
+        else if (e.key === Qt.Key_PageDown) v = from;
+        else return;
+        e.accepted = true;
+        if (snap) v = from + Math.round((v - from) / step) * step;
+        v = Math.max(Math.min(from, to), Math.min(Math.max(from, to), v));
+        if (v === value) return;
+        moved(v); released(); committed(v);
+    }
     readonly property var _m: G.slider(controlSize)
     implicitWidth: 220
     implicitHeight: _m.height + (labels.length > 0 ? 15 : 0)

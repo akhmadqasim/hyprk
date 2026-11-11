@@ -206,6 +206,32 @@ Item {
             backend.index = 1;
             compare(pop.currentIndex, 1);
         }
+        // -[NSSliderCell _moveInDirection:]: a twentieth per arrow, Page Up / Down to the ends, no Home / End, no modifiers
+        function test_slider_arrow_keys() {
+            backend.level = 0.5;
+            sl.forceActiveFocus();
+            movedSpy.clear(); releasedSpy.clear(); committedSpy.clear();
+            keyClick(Qt.Key_Right);
+            fuzzyCompare(backend.level, 0.55, 1e-9);
+            keyClick(Qt.Key_Up);
+            fuzzyCompare(backend.level, 0.6, 1e-9);
+            keyClick(Qt.Key_Left); keyClick(Qt.Key_Down);
+            fuzzyCompare(backend.level, 0.5, 1e-9);
+            compare(movedSpy.count, 4); compare(releasedSpy.count, 4); compare(committedSpy.count, 4);
+            keyClick(Qt.Key_Home); keyClick(Qt.Key_End); keyClick(Qt.Key_Right, Qt.ShiftModifier);
+            fuzzyCompare(backend.level, 0.5, 1e-9);
+            compare(movedSpy.count, 4);
+            keyClick(Qt.Key_PageUp);
+            compare(backend.level, 1);
+            keyClick(Qt.Key_Right);                 // at the end: nothing to report
+            compare(movedSpy.count, 5);
+            keyClick(Qt.Key_PageDown);
+            compare(backend.level, 0);
+            sl.tickMarks = 5; sl.onlyTicks = true;  // ticks only: one tick per press
+            keyClick(Qt.Key_Right);
+            fuzzyCompare(backend.level, 0.25, 1e-9);
+            sl.tickMarks = 0; sl.onlyTicks = false;
+        }
         function test_slider_keeps_binding() {
             mouseClick(sl, sl.width - 2, sl.height / 2);
             verify(backend.level > 0.9);
