@@ -74,6 +74,11 @@ Item {
             keyBottom: Tokens.control.knobLensKeyBottom
             keyEnds: Tokens.control.knobLensKeyEnds
             keyFalloff: Tokens.control.knobLensKeyFalloff
+            ringOffset: Tokens.control.knobLensRingOffset
+            ringWidth: Tokens.control.knobLensRingWidth
+            ringBlur: Tokens.control.knobLensRingBlur
+            ringOpacity: Tokens.control.knobLensRingOpacity
+            fillLight: Tokens.control.knobLensFillLight
             outline: Tokens.control.knobLensOutline
             outlineWidth: Tokens.control.knobLensOutlineWidth
             backdrop: k.lensBackdrop

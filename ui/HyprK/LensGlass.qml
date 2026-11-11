@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Window
 
-// In-window Liquid Glass capsule (shaders/glasslens2.frag): draws what lies under it in `source`, bent near the rim,
+// In-window Liquid Glass capsule (shaders/glasslens3.frag): draws what lies under it in `source`, bent near the rim,
 // blurred, tinted, lit and outlined. Client windows cannot sample the desktop, so this only reaches content of the same window
 // (the pressed switch / slider knob over its track, the Appearance pane's Liquid Glass preview over its article).
 // `origin` is the capsule's top-left in `source` coordinates (bound by the caller; a moving capsule or a scrolling
@@ -29,6 +29,14 @@ Item {
     property real keyBottom: 0
     property real keyEnds: 0
     property real keyFalloff: 1
+    // the glassBackground filter's ring shadow (a band ringWidth pt wide inside the edge of the face moved ringOffset pt
+    // down, blurred ringBlur pt, darkening the face by ringOpacity) and its key / fill highlight (fillLight 0 .. 1);
+    // both off by default (glasslens3.frag)
+    property real ringOffset: 0
+    property real ringWidth: 0
+    property real ringBlur: 0
+    property real ringOpacity: 0
+    property real fillLight: 0
     property color tint: "transparent"   // rgb + mix amount in alpha
     property color backdrop: "transparent"
     // true: a sample that falls outside `source` (the bent rim or the blur of a capsule near the source's edge) repeats
@@ -63,7 +71,7 @@ Item {
     ShaderEffect {
         anchors.fill: parent
         visible: g.source !== null && g.width > 0 && g.height > 0
-        fragmentShader: Qt.resolvedUrl("shaders/glasslens2.frag.qsb")
+        fragmentShader: Qt.resolvedUrl("shaders/glasslens3.frag.qsb")
         property var source: tex
         property size size: Qt.size(g.width, g.height)
         property real margin: g.margin
@@ -84,6 +92,8 @@ Item {
         property vector4d disc: Qt.vector4d(g.discCentre.x, g.discCentre.y, Tokens.toolbar.hoverDiscRadius, g.discLift)
         property real discEdge: Tokens.toolbar.hoverDiscEdge
         property real additive: g.additive ? 1 : 0
+        property vector4d ring: Qt.vector4d(g.ringOffset, g.ringWidth, g.ringBlur, g.ringOpacity)
+        property real fillLight: g.fillLight
         property vector4d backdrop: Qt.vector4d(g.backdrop.r * g.backdrop.a, g.backdrop.g * g.backdrop.a,
                                                 g.backdrop.b * g.backdrop.a, g.backdrop.a)
     }

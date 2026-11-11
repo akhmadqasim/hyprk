@@ -255,6 +255,22 @@ Item {
             tryVerify(() => Math.abs(pairBtn.transform[1].origin.x) < 0.001 && pairBtn.transform[1].xScale > 1.016, 2000);
             mouseRelease(pairBtn, 60, 18);
         }
+        // pressed knob lens: light uses the Mac's B2 model (ring shadow 8 down, 4 wide, blur 3, .4; fill light), dark keeps
+        // the recording's fit (no ring, no fill light)
+        function test_knob_lens_light_model() {
+            const was = Tokens.dark;
+            Tokens.dark = false;
+            compare(Tokens.control.knobLensRingOpacity, 0.4);
+            compare(Tokens.control.knobLensFillLight, 1);
+            compare(Tokens.control.knobLensGain, 1);
+            compare(Tokens.control.knobLensHaze, 0.1);
+            compare(Tokens.control.knobLensKeyTop, 0);
+            Tokens.dark = true;
+            compare(Tokens.control.knobLensRingOpacity, 0);
+            compare(Tokens.control.knobLensFillLight, 0);
+            compare(Tokens.control.knobLensKeyTop, 0.135);
+            Tokens.dark = was;
+        }
         // FlexInteraction glow: the press light follows the pointer and dims beyond 50 pt from where the press began
         function test_press_light_follows_pointer() {
             Tokens.dark = true;

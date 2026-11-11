@@ -105,18 +105,30 @@ QtObject {
         // 0.9 pt (on the round ends the top / bottom light falls with the cube of the normal's vertical part: +5 there).
         // Rim: 1 pt outside the face reading 15-22 over 32 and 52 over the fill (116): the plain sample x .55.
         // Light: not in the recording; the 0.5 pt black .4 line of switch-press-strip-light.png and the same light terms.
+        // Light mode: the Mac's own model of the held slider knob (live/verify/B2 slider_fit.py over gradient captures,
+        // rms 0.56 levels; filter inputs of controls-press-light.json): face 0.1 + 0.9 x sample (gain 1, haze .1), the
+        // ring shadow (filter inputRingShadowOffset 8, StrokeWidth 4, BlurRadius 3; opacity .4 by the fit, the filter
+        // says .1 before its own scaling) and the key / fill highlight (bright at the bottom once the ring darkens the
+        // middle); none of the dark terms. Dark keeps the recording's fit above (the ring and fill model is not
+        // measured in dark: the recording's lens bottom rises 44 -> 60 over 4 px, frames 2684-2686, which the
+        // bottom key light already draws)
         readonly property real knobLensBand: 0.1
         readonly property real knobLensAmount: -0.15
-        readonly property real knobLensGain: 0.85
-        readonly property real knobLensHaze: 0.05
-        readonly property real knobLensDiffuseTop: 0.06
+        readonly property real knobLensGain: t.dark ? 0.85 : 1
+        readonly property real knobLensHaze: t.dark ? 0.05 : 0.1
+        readonly property real knobLensDiffuseTop: t.dark ? 0.06 : 0
         readonly property real knobLensDiffuseTopDepth: 12
-        readonly property real knobLensDiffuseBottom: 0.04
+        readonly property real knobLensDiffuseBottom: t.dark ? 0.04 : 0
         readonly property real knobLensDiffuseBottomDepth: 4
-        readonly property real knobLensKeyTop: 0.135
-        readonly property real knobLensKeyBottom: 0.083
-        readonly property real knobLensKeyEnds: 0.02
+        readonly property real knobLensKeyTop: t.dark ? 0.135 : 0
+        readonly property real knobLensKeyBottom: t.dark ? 0.083 : 0
+        readonly property real knobLensKeyEnds: t.dark ? 0.02 : 0
         readonly property real knobLensKeyFalloff: 0.9
+        readonly property real knobLensRingOffset: 8
+        readonly property real knobLensRingWidth: 4
+        readonly property real knobLensRingBlur: 3
+        readonly property real knobLensRingOpacity: t.dark ? 0 : 0.4
+        readonly property real knobLensFillLight: t.dark ? 0 : 1
         readonly property real knobLensOutline: t.dark ? 0.45 : 0.4
         readonly property real knobLensOutlineWidth: t.dark ? 1 : 0.5
         // under the lens: the lens shape 8 pt down, 1 pt wider (filter inputRingShadowOffset 8, StrokeWidth 4: 2 pt

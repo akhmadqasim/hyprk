@@ -1,5 +1,5 @@
 #version 440
-// Build: /usr/lib/qt6/bin/qsb --qt6 -o glasslens2.frag.qsb glasslens2.frag
+// Build: /usr/lib/qt6/bin/qsb --qt6 -o glasslens3.frag.qsb glasslens3.frag
 // In-window Liquid Glass capsule (HyprK LensGlass): samples a texture of what lies under the capsule (a
 // ShaderEffectSource `margin` px larger on every side), bends it near the rim, blurs it, tints it, lights it and
 // draws a rim line. Units are item px (logical points). Premultiplied in and out. lens.frag plus the light terms.
@@ -16,6 +16,12 @@
 //   pt wide), then all of it times 1 + glow.z, flat over the disc's radius from glow.xy and falling linearly to 1 at
 //   glow.w; `additive`: only that light, with alpha 0, so
 //   it adds to the window (a translucent capsule redrawn over itself doubled its face)
+// - ring shadow (glassBackground inputRingShadow*): the face times 1 - ring.w x a band ring.y pt wide just inside the
+//   edge of the face's own shape moved ring.x pt down, blurred by ring.z pt (the filter's polynomial Gaussian edge)
+// - fill light (inputKeyFillHighlight*): fillLight x the B2 model of the held slider knob (live/verify/B2,
+//   slider_fit.py, rms 0.56 levels): per vertical side a specular lobe (80 deg, the outer 1 pt) and a diffuse one
+//   (52 deg, fading over 8 pt), each through Schlick's bias (0.5 / 0.075), mixing the face toward c x .9118 + .1471
+//   (the filter's face colour matrix row); the face's depth counts from inside the rim line
 layout(location = 0) in vec2 qt_TexCoord0;
 layout(location = 0) out vec4 fragColor;
 layout(std140, binding = 0) uniform buf {
@@ -39,6 +45,8 @@ layout(std140, binding = 0) uniform buf {
     vec4 disc;      // hover: centre x, y, radius (pt), lift
     float discEdge; // hover disc edge width (pt)
     float additive; // 1: output only the light the glow and the disc add (alpha 0: added to what is drawn already)
+    vec4 ring;      // ring shadow: offset down (pt), band width (pt), blur (pt), opacity
+    float fillLight; // key / fill highlight amount (0: none)
 };
 layout(binding = 1) uniform sampler2D source;
 
@@ -47,6 +55,15 @@ vec4 tap(vec2 p) {
     vec4 s = texture(source, (p + margin) / (size + 2.0 * margin));
     return s + backdrop * (1.0 - s.a);
 }
+
+// the filter's Gaussian edge: 1 - Phi(x), polynomial in clamp(x / sqrt 2, -2, 2)
+float gedge(float x) {
+    float t = clamp(x * 0.7071, -2.0, 2.0);
+    float q = t * t;
+    return (((0.00295448 * q - 0.0344543) * q + 0.168213) * q - 0.560547) * t + 0.5;
+}
+float lobe(float c0, float spread) { return clamp((c0 - cos(spread)) / (1.0 - cos(spread)), 0.0, 1.0); }
+float schlick(float v, float a) { return v / ((1.0 / a - 2.0) * (1.0 - v) + 1.0); }
 
 void main() {
     vec2 p = qt_TexCoord0 * size;
@@ -79,6 +96,23 @@ void main() {
               + diffuse.z * max(0.0, 1.0 - (size.y - p.y) / max(diffuse.w, 1e-3))
               + spec * (key.x * pow(max(0.0, -n.y), 3.0) + key.y * pow(max(0.0, n.y), 3.0) + key.w * abs(n.x));
     rgb += (1.0 - rgb) * clamp(lit, 0.0, 1.0);
+    if (ring.w > 0.0) {   // the face's shape (inside the rim line) moved ring.x down
+        vec2 vr = v - vec2(0.0, ring.x);
+        vec2 qr = abs(vr) - h + r;
+        float sr = length(max(qr, 0.0)) + min(max(qr.x, qr.y), 0.0) - r + outlineWidth;
+        float b = max(ring.z, 1e-3);
+        rgb *= 1.0 - ring.w * clamp(gedge(sr / b) - gedge((sr + ring.y) / b), 0.0, 1.0);
+    }
+    if (fillLight > 0.0) {
+        float hl = 0.0;
+        for (int i = 0; i < 2; ++i) {
+            float c0 = n.y * (i == 0 ? -1.0 : 1.0);
+            float sp = (s < 1.0 ? 1.0 - 0.75 * s : 0.0) * lobe(c0, 1.3962634);
+            float df = max(0.0, 1.0 - s / 8.0) * lobe(c0, 0.9075712);
+            hl += schlick(sp, 0.5) + schlick(df, 0.075);
+        }
+        rgb = min(rgb + fillLight * hl * (rgb * 0.9118 + 0.1471 - rgb), vec3(1.0));
+    }
     float px = max(fwidth(d), 1e-4);
     float line = 1.0 - smoothstep(outlineWidth - 0.5 * px, outlineWidth + 0.5 * px, in_);
     rgb = mix(rgb, raw * (1.0 - outline), line);
