@@ -1,0 +1,68 @@
+{
+ "0": {
+  "shader + dumped inputs": {
+   "rms_all": 0.6460578517284424,
+   "rms_zone": 1.1494413574966655,
+   "n_zone": 101562
+  },
+  "same without the W/H aspect factor": {
+   "rms_all": 1.0005055596443233,
+   "rms_zone": 1.776208711339334,
+   "n_zone": 102208
+  },
+  "no aberration": {
+   "rms_all": 1.0122001684160338,
+   "rms_zone": 1.796970281103526,
+   "n_zone": 102208
+  },
+  "no lens at all": {
+   "rms_all": 3.582806457844249,
+   "rms_zone": 6.3565240135077135,
+   "n_zone": 102400
+  }
+ },
+ "2": {
+  "shader + dumped inputs": {
+   "rms_all": 0.35567279017586895,
+   "rms_zone": 0.809039246308886,
+   "n_zone": 54440
+  },
+  "same without the W/H aspect factor": {
+   "rms_all": 0.37339971092636487,
+   "rms_zone": 0.8493621920036271,
+   "n_zone": 54440
+  },
+  "no aberration": {
+   "rms_all": 0.40513899253120667,
+   "rms_zone": 0.921558674774405,
+   "n_zone": 54440
+  },
+  "no lens at all": {
+   "rms_all": 1.1206095145032395,
+   "rms_zone": 2.54902006018502,
+   "n_zone": 54440
+  }
+ },
+ "4": {
+  "shader + dumped inputs": {
+   "rms_all": 0.4275280628026946,
+   "rms_zone": 0.5326872771209215,
+   "n_zone": 38042
+  },
+  "same without the W/H aspect factor": {
+   "rms_all": 0.854558621749165,
+   "rms_zone": 1.0632222613655447,
+   "n_zone": 38352
+  },
+  "no aberration": {
+   "rms_all": 0.8840618777504321,
+   "rms_zone": 1.0999295366360309,
+   "n_zone": 38352
+  },
+  "no lens at all": {
+   "rms_all": 2.186463243726336,
+   "rms_zone": 2.7203474814039352,
+   "n_zone": 38352
+  }
+ }
+}

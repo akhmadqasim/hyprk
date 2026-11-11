@@ -1,0 +1,111 @@
+{
+ "mode": "dark",
+ "views": [
+  {
+   "frame": [
+    30,
+    30,
+    520,
+    87
+   ],
+   "radius": 43.5,
+   "variant": 0,
+   "kv": {
+    "_contentLensing": true
+   },
+   "contentPattern": "gradx"
+  },
+  {
+   "frame": [
+    580,
+    30,
+    520,
+    87
+   ],
+   "radius": 43.5,
+   "variant": 0,
+   "kv": {},
+   "contentPattern": "gradx"
+  },
+  {
+   "frame": [
+    30,
+    150,
+    300,
+    150
+   ],
+   "radius": 40,
+   "variant": 0,
+   "kv": {
+    "_contentLensing": true
+   },
+   "contentPattern": "gradx"
+  },
+  {
+   "frame": [
+    360,
+    150,
+    300,
+    150
+   ],
+   "radius": 40,
+   "variant": 0,
+   "kv": {},
+   "contentPattern": "gradx"
+  },
+  {
+   "frame": [
+    700,
+    150,
+    200,
+    44
+   ],
+   "radius": 22,
+   "variant": 0,
+   "kv": {
+    "_contentLensing": true
+   },
+   "contentPattern": "gradx"
+  },
+  {
+   "frame": [
+    700,
+    220,
+    64,
+    64
+   ],
+   "radius": 32,
+   "variant": 0,
+   "kv": {
+    "_contentLensing": true
+   },
+   "contentPattern": "gradx"
+  },
+  {
+   "frame": [
+    30,
+    330,
+    520,
+    87
+   ],
+   "radius": 43.5,
+   "variant": 0,
+   "kv": {
+    "_contentLensing": true
+   },
+   "contentPattern": "gradx",
+   "contentInset": 10
+  }
+ ],
+ "dump": "$SCRATCH/b2/cap/lens-gradx.json",
+ "pattern": "solid:90,90,90",
+ "origin": [
+  40,
+  60
+ ],
+ "size": [
+  1140,
+  520
+ ],
+ "secs": 3.4
+}

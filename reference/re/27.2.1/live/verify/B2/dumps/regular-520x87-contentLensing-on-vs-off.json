@@ -1,0 +1,3858 @@
+{
+  "appActive" : true,
+  "keyWindow" : true,
+  "resets" : 0,
+  "screenColorSpace" : "Color LCD",
+  "views" : [
+    {
+      "config" : {
+        "contentPattern" : "gradx",
+        "frame" : [
+          30,
+          30,
+          520,
+          87
+        ],
+        "kv" : {
+          "_contentLensing" : true
+        },
+        "radius" : 43.5,
+        "variant" : 0
+      },
+      "layers" : {
+        "class" : "BackingLayer",
+        "frame" : [
+          30,
+          30,
+          520,
+          87
+        ],
+        "hidden" : false,
+        "name" : "_TtCE6AppKitCSo17NSGlassEffectViewP33_92F0BB6107B916AA04C9A991F505A16412BackingLayer: NSGlassEffectView",
+        "opacity" : 1,
+        "sublayers" : [
+          {
+            "class" : "CALayer",
+            "frame" : [
+              0,
+              0,
+              520,
+              87
+            ],
+            "hidden" : false,
+            "name" : "contentHolderView",
+            "opacity" : 1,
+            "sublayers" : [
+              {
+                "class" : "NSViewBackingLayer",
+                "frame" : [
+                  0,
+                  0,
+                  520,
+                  87
+                ],
+                "hidden" : false,
+                "name" : "NSView",
+                "opacity" : 1,
+                "sublayers" : [
+                  {
+                    "class" : "NSViewBackingLayer",
+                    "contents" : "__NSCFType",
+                    "contentsMultiplyColor" : {
+                      "color" : [
+                        1,
+                        1,
+                        1,
+                        1
+                      ],
+                      "space" : "kCGColorSpaceSRGB"
+                    },
+                    "frame" : [
+                      0,
+                      0,
+                      520,
+                      87
+                    ],
+                    "hidden" : false,
+                    "name" : "glassfit.Flipped",
+                    "opacity" : 1
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "class" : "NSViewBackingLayer",
+            "frame" : [
+              0,
+              0,
+              520,
+              87
+            ],
+            "hidden" : false,
+            "name" : "_TtGC6AppKit18_NSCoreHostingViewVES_CSo17NSGlassEffectViewP10$19ca35b508RootView_",
+            "opacity" : 1,
+            "sublayers" : [
+              {
+                "class" : "CALayer",
+                "frame" : [
+                  0,
+                  0,
+                  520,
+                  87
+                ],
+                "hidden" : false,
+                "name" : "",
+                "opacity" : 1,
+                "sublayers" : [
+                  {
+                    "class" : "SDFLayer",
+                    "frame" : [
+                      0,
+                      0,
+                      520,
+                      87
+                    ],
+                    "hidden" : false,
+                    "name" : "",
+                    "opacity" : 1,
+                    "sdf" : {
+                      "cornerCurve" : "circular",
+                      "cornerRadius" : 0
+                    },
+                    "sublayers" : [
+                      {
+                        "class" : "CALayer",
+                        "frame" : [
+                          0,
+                          0,
+                          0,
+                          0
+                        ],
+                        "hidden" : false,
+                        "name" : "",
+                        "opacity" : 1,
+                        "sublayers" : [
+                          {
+                            "class" : "CALayer",
+                            "frame" : [
+                              0,
+                              0,
+                              520,
+                              87
+                            ],
+                            "hidden" : false,
+                            "name" : "",
+                            "opacity" : 1,
+                            "sublayers" : [
+                              {
+                                "backgroundColor" : {
+                                  "color" : [
+                                    1,
+                                    1,
+                                    1,
+                                    1
+                                  ],
+                                  "space" : "kCGColorSpaceExtendedSRGB"
+                                },
+                                "class" : "CALayer",
+                                "cornerCurve" : "continuous",
+                                "cornerRadius" : 43.5,
+                                "filters" : [
+                                  {
+                                    "inputs" : {
+                                      "inputBackdropAware" : true,
+                                      "inputColorMatrix" : [
+                                        0.3125,
+                                        0,
+                                        0,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0.3125,
+                                        0,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0,
+                                        0.3125,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0
+                                      ]
+                                    },
+                                    "name" : "vibrantColorMatrix",
+                                    "type" : "vibrantColorMatrix"
+                                  }
+                                ],
+                                "frame" : [
+                                  0,
+                                  0,
+                                  520,
+                                  87
+                                ],
+                                "hidden" : false,
+                                "name" : "",
+                                "opacity" : 1
+                              },
+                              {
+                                "class" : "CALayer",
+                                "cornerCurve" : "continuous",
+                                "cornerRadius" : 43.5,
+                                "frame" : [
+                                  0,
+                                  0,
+                                  520,
+                                  87
+                                ],
+                                "hidden" : false,
+                                "masksToBounds" : true,
+                                "name" : "",
+                                "opacity" : 1,
+                                "sublayers" : [
+                                  {
+                                    "class" : "CAPortalLayer",
+                                    "frame" : [
+                                      0,
+                                      0,
+                                      520,
+                                      87
+                                    ],
+                                    "hidden" : false,
+                                    "name" : "",
+                                    "opacity" : 1
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "class" : "CALayer",
+                        "frame" : [
+                          0,
+                          0,
+                          520,
+                          87
+                        ],
+                        "hidden" : false,
+                        "name" : "",
+                        "opacity" : 1,
+                        "sublayers" : [
+                          {
+                            "backdrop" : {
+                              "captureOnly" : false,
+                              "groupName" : "SwiftUI:17.00.0",
+                              "marginWidth" : 30.449999999999999,
+                              "scale" : 0.5,
+                              "zoom" : 0
+                            },
+                            "class" : "CABackdropLayer",
+                            "filters" : [
+                              {
+                                "inputs" : {
+                                  "inputBleedAmount" : 30.449999999999999,
+                                  "inputBleedBlurRadius" : 30.449999999999999,
+                                  "inputBleedColorMatrixBlack" : 0.125,
+                                  "inputBleedColorMatrixSaturation" : 1,
+                                  "inputBleedColorMatrixWhite" : 0.5,
+                                  "inputBleedDarkenBlend" : false,
+                                  "inputBleedDistance0" : 1,
+                                  "inputBleedDistance1" : 0,
+                                  "inputBleedHeight" : 30.449999999999999,
+                                  "inputBleedOpacity" : 0.19166666269302368,
+                                  "inputBlurDistance0" : -43.5,
+                                  "inputBlurDistance1" : -1,
+                                  "inputBlurDistance2" : 0,
+                                  "inputBlurDistance3" : 0,
+                                  "inputBlurFillBlurRadius" : 8,
+                                  "inputBlurFillDarkenOpacity" : 0.89999997615814209,
+                                  "inputBlurFillLightenOpacity" : 0,
+                                  "inputBlurFillNormalOpacity" : 0.50711458921432495,
+                                  "inputBlurOpacity0" : 0.19166666269302368,
+                                  "inputBlurOpacity1" : 0.095833331346511841,
+                                  "inputBlurOpacity2" : 0.5,
+                                  "inputBlurOpacity3" : 1,
+                                  "inputBlurRadius" : 5,
+                                  "inputClamp" : 1.308310866355896,
+                                  "inputClampPreserveHue" : false,
+                                  "inputFaceColorMatrixBlack" : 0.125,
+                                  "inputFaceColorMatrixFillColor" : {
+                                    "color" : [
+                                      0.0017786473035812378,
+                                      0.0017786473035812378,
+                                      0.0017786473035812378,
+                                      0.0071145892143249512
+                                    ],
+                                    "space" : "kCGColorSpaceExtendedSRGB"
+                                  },
+                                  "inputFaceColorMatrixMaxLuma" : 0.45625001192092896,
+                                  "inputFaceColorMatrixMaxLumaSDR" : 0.45625001192092896,
+                                  "inputFaceColorMatrixSaturation" : 1.2999999523162842,
+                                  "inputFaceColorMatrixWhite" : 1.125,
+                                  "inputFaceOpacity" : 1,
+                                  "inputInnerRefractionAmount" : -43.5,
+                                  "inputInnerRefractionHeight" : 20,
+                                  "inputKeyFillHighlightAmount" : 0.40000000000000002,
+                                  "inputKeyFillHighlightAngle" : 1.5707963267948966,
+                                  "inputKeyFillHighlightColorBias" : -0.25,
+                                  "inputKeyFillHighlightEffectOffset" : -0.5,
+                                  "inputKeyFillHighlightHeight" : 0.5,
+                                  "inputKeyFillHighlightSpread" : 1.3089969389957472,
+                                  "inputKeyFillHighlightSpreadSDR" : 1.3089969389957472,
+                                  "inputMaxHeadroom" : 9999,
+                                  "inputOuterRefractionAmount" : 21.75,
+                                  "inputOuterRefractionHeight" : 17.400000000000002,
+                                  "inputRefractionDistance0" : -1,
+                                  "inputRefractionDistance1" : 0,
+                                  "inputRefractionOpacity" : 0.60000002384185791,
+                                  "inputRingShadowBlurRadius" : 5,
+                                  "inputRingShadowMask" : 1,
+                                  "inputRingShadowOffset" : 8,
+                                  "inputRingShadowOpacity" : 0.059999998658895493,
+                                  "inputRingShadowStrokeWidth" : 4,
+                                  "inputSDRGradientDistance0" : 0,
+                                  "inputSDRGradientDistance1" : 0,
+                                  "inputSDRHoldingToneEnabled" : false,
+                                  "inputSDRHoldingToneWhite" : 1,
+                                  "inputSDRShadowOpacity" : 0,
+                                  "inputShadowAmount" : 0,
+                                  "inputShadowBlurRadius" : 0,
+                                  "inputShadowColorMatrixBlack" : 0,
+                                  "inputShadowColorMatrixFillColor" : {
+                                    "color" : [
+                                      0,
+                                      0,
+                                      0,
+                                      0.30000001192092896
+                                    ],
+                                    "space" : "kCGColorSpaceExtendedSRGB"
+                                  },
+                                  "inputShadowColorMatrixSaturation" : 1,
+                                  "inputShadowColorMatrixWhite" : 1,
+                                  "inputShadowDistanceOffset" : 0,
+                                  "inputShadowHeight" : 0,
+                                  "inputShadowOffset" : [
+                                    0,
+                                    8
+                                  ],
+                                  "inputShadowOpacity" : 0.17416664958000183,
+                                  "inputShadowRadius" : 8.7916666666666679,
+                                  "inputShadowVibrancyContribution" : 0,
+                                  "inputSourceSublayerName" : "@0"
+                                },
+                                "name" : "glassBackground",
+                                "type" : "glassBackground"
+                              }
+                            ],
+                            "frame" : [
+                              0,
+                              0,
+                              520,
+                              87
+                            ],
+                            "hidden" : false,
+                            "name" : "@0",
+                            "opacity" : 1,
+                            "sublayers" : [
+                              {
+                                "class" : "CASDFLayer",
+                                "effect" : {
+                                  "class" : "CASDFOutputEffect",
+                                  "maximum" : 11.647928537689651,
+                                  "minimum" : -10000
+                                },
+                                "frame" : [
+                                  0,
+                                  0,
+                                  520,
+                                  87
+                                ],
+                                "hidden" : false,
+                                "name" : "@0",
+                                "opacity" : 1,
+                                "sdf" : {
+                                  "cornerCurve" : "circular",
+                                  "cornerRadius" : 0,
+                                  "smoothness" : 8
+                                },
+                                "sublayers" : [
+                                  {
+                                    "class" : "CALayer",
+                                    "frame" : [
+                                      0,
+                                      0,
+                                      0,
+                                      0
+                                    ],
+                                    "hidden" : false,
+                                    "name" : "",
+                                    "opacity" : 1,
+                                    "sublayers" : [
+                                      {
+                                        "class" : "CASDFElementLayer",
+                                        "cornerCurve" : "continuous",
+                                        "cornerRadius" : 43.5,
+                                        "frame" : [
+                                          0,
+                                          0,
+                                          520,
+                                          87
+                                        ],
+                                        "hidden" : false,
+                                        "name" : "",
+                                        "opacity" : 1,
+                                        "sdf" : {
+                                          "cornerCurve" : "continuous",
+                                          "cornerRadius" : 43.5
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "class" : "SDFPortalLayer",
+                            "frame" : [
+                              0,
+                              0,
+                              520,
+                              87
+                            ],
+                            "hidden" : false,
+                            "name" : "@1",
+                            "opacity" : 1,
+                            "sdf" : {
+                              "cornerCurve" : "circular",
+                              "cornerRadius" : 0
+                            }
+                          },
+                          {
+                            "class" : "CASDFLayer",
+                            "effect" : {
+                              "class" : "CASDFKeyFillHighlightEffect",
+                              "curvature" : 0.75,
+                              "diffuseAmountScale" : 0.15000000596046448,
+                              "diffuseHeightScale" : 8,
+                              "diffuseSpreadScale" : 0.64999997615814209,
+                              "fillAmount" : 0.5,
+                              "fillAngle" : 3.1415926535897931,
+                              "fillColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceExtendedSRGB"
+                              },
+                              "fillHeight" : 1,
+                              "fillHeightOffset" : 0,
+                              "fillHeightScale" : 1,
+                              "fillSpread" : 1.3962634015954636,
+                              "fillSpreadOffset" : 0,
+                              "fillSpreadScale" : 1,
+                              "global" : false,
+                              "keyAmount" : 0.5,
+                              "keyAngle" : 0,
+                              "keyColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceExtendedSRGB"
+                              },
+                              "keyHeight" : 1,
+                              "keyHeightOffset" : 0,
+                              "keyHeightScale" : 1,
+                              "keySpread" : 1.3962634015954636,
+                              "keySpreadOffset" : 0,
+                              "keySpreadScale" : 1
+                            },
+                            "filters" : [
+                              {
+                                "inputs" : {
+                                  "inputClamp" : 1,
+                                  "inputColorMatrix" : [
+                                    1.1201999187469482,
+                                    -0.18940000236034393,
+                                    -0.018999999389052391,
+                                    0,
+                                    0.14710000157356262,
+                                    -0.056299999356269836,
+                                    0.98709994554519653,
+                                    -0.019099999219179153,
+                                    0,
+                                    0.14710000157356262,
+                                    -0.056299999356269836,
+                                    -0.18930000066757202,
+                                    1.1574000120162964,
+                                    0,
+                                    0.14710000157356262,
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    0
+                                  ]
+                                },
+                                "name" : "vibrantColorMatrix",
+                                "type" : "vibrantColorMatrix"
+                              }
+                            ],
+                            "frame" : [
+                              0,
+                              0,
+                              520,
+                              87
+                            ],
+                            "hidden" : false,
+                            "name" : "@2",
+                            "opacity" : 1,
+                            "sdf" : {
+                              "cornerCurve" : "circular",
+                              "cornerRadius" : 0,
+                              "smoothness" : 8
+                            },
+                            "sublayers" : [
+                              {
+                                "class" : "SDFPortalLayer",
+                                "frame" : [
+                                  0,
+                                  0,
+                                  0,
+                                  0
+                                ],
+                                "hidden" : false,
+                                "name" : "",
+                                "opacity" : 1,
+                                "sdf" : {
+                                  "cornerCurve" : "circular",
+                                  "cornerRadius" : 0
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "config" : {
+        "contentPattern" : "gradx",
+        "frame" : [
+          580,
+          30,
+          520,
+          87
+        ],
+        "kv" : {
+
+        },
+        "radius" : 43.5,
+        "variant" : 0
+      },
+      "layers" : {
+        "class" : "BackingLayer",
+        "frame" : [
+          580,
+          30,
+          520,
+          87
+        ],
+        "hidden" : false,
+        "name" : "_TtCE6AppKitCSo17NSGlassEffectViewP33_92F0BB6107B916AA04C9A991F505A16412BackingLayer: NSGlassEffectView",
+        "opacity" : 1,
+        "sublayers" : [
+          {
+            "class" : "CALayer",
+            "frame" : [
+              0,
+              0,
+              520,
+              87
+            ],
+            "hidden" : false,
+            "name" : "contentHolderView",
+            "opacity" : 1,
+            "sublayers" : [
+              {
+                "class" : "NSViewBackingLayer",
+                "frame" : [
+                  0,
+                  0,
+                  520,
+                  87
+                ],
+                "hidden" : false,
+                "name" : "NSView",
+                "opacity" : 1,
+                "sublayers" : [
+                  {
+                    "class" : "NSViewBackingLayer",
+                    "contents" : "__NSCFType",
+                    "contentsMultiplyColor" : {
+                      "color" : [
+                        1,
+                        1,
+                        1,
+                        1
+                      ],
+                      "space" : "kCGColorSpaceSRGB"
+                    },
+                    "frame" : [
+                      0,
+                      0,
+                      520,
+                      87
+                    ],
+                    "hidden" : false,
+                    "name" : "glassfit.Flipped",
+                    "opacity" : 1
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "class" : "NSViewBackingLayer",
+            "frame" : [
+              0,
+              0,
+              520,
+              87
+            ],
+            "hidden" : false,
+            "name" : "_TtGC6AppKit18_NSCoreHostingViewVES_CSo17NSGlassEffectViewP10$19ca35b508RootView_",
+            "opacity" : 1,
+            "sublayers" : [
+              {
+                "class" : "CALayer",
+                "frame" : [
+                  0,
+                  0,
+                  520,
+                  87
+                ],
+                "hidden" : false,
+                "name" : "",
+                "opacity" : 1,
+                "sublayers" : [
+                  {
+                    "class" : "SDFLayer",
+                    "frame" : [
+                      0,
+                      0,
+                      520,
+                      87
+                    ],
+                    "hidden" : false,
+                    "name" : "",
+                    "opacity" : 1,
+                    "sdf" : {
+                      "cornerCurve" : "circular",
+                      "cornerRadius" : 0
+                    },
+                    "sublayers" : [
+                      {
+                        "class" : "CALayer",
+                        "frame" : [
+                          0,
+                          0,
+                          0,
+                          0
+                        ],
+                        "hidden" : false,
+                        "name" : "",
+                        "opacity" : 1,
+                        "sublayers" : [
+                          {
+                            "class" : "CALayer",
+                            "frame" : [
+                              0,
+                              0,
+                              520,
+                              87
+                            ],
+                            "hidden" : false,
+                            "name" : "",
+                            "opacity" : 1,
+                            "sublayers" : [
+                              {
+                                "backgroundColor" : {
+                                  "color" : [
+                                    1,
+                                    1,
+                                    1,
+                                    1
+                                  ],
+                                  "space" : "kCGColorSpaceExtendedSRGB"
+                                },
+                                "class" : "CALayer",
+                                "cornerCurve" : "continuous",
+                                "cornerRadius" : 43.5,
+                                "filters" : [
+                                  {
+                                    "inputs" : {
+                                      "inputBackdropAware" : true,
+                                      "inputColorMatrix" : [
+                                        0.3125,
+                                        0,
+                                        0,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0.3125,
+                                        0,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0,
+                                        0.3125,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0
+                                      ]
+                                    },
+                                    "name" : "vibrantColorMatrix",
+                                    "type" : "vibrantColorMatrix"
+                                  }
+                                ],
+                                "frame" : [
+                                  0,
+                                  0,
+                                  520,
+                                  87
+                                ],
+                                "hidden" : false,
+                                "name" : "",
+                                "opacity" : 1
+                              },
+                              {
+                                "class" : "CALayer",
+                                "cornerCurve" : "continuous",
+                                "cornerRadius" : 43.5,
+                                "frame" : [
+                                  0,
+                                  0,
+                                  520,
+                                  87
+                                ],
+                                "hidden" : false,
+                                "masksToBounds" : true,
+                                "name" : "",
+                                "opacity" : 1,
+                                "sublayers" : [
+                                  {
+                                    "class" : "CAPortalLayer",
+                                    "frame" : [
+                                      0,
+                                      0,
+                                      520,
+                                      87
+                                    ],
+                                    "hidden" : false,
+                                    "name" : "",
+                                    "opacity" : 1
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "class" : "CALayer",
+                        "frame" : [
+                          0,
+                          0,
+                          520,
+                          87
+                        ],
+                        "hidden" : false,
+                        "name" : "",
+                        "opacity" : 1,
+                        "sublayers" : [
+                          {
+                            "backdrop" : {
+                              "captureOnly" : false,
+                              "groupName" : "SwiftUI:37.00.0",
+                              "marginWidth" : 30.449999999999999,
+                              "scale" : 0.5,
+                              "zoom" : 0
+                            },
+                            "class" : "CABackdropLayer",
+                            "filters" : [
+                              {
+                                "inputs" : {
+                                  "inputBleedAmount" : 30.449999999999999,
+                                  "inputBleedBlurRadius" : 30.449999999999999,
+                                  "inputBleedColorMatrixBlack" : 0.125,
+                                  "inputBleedColorMatrixSaturation" : 1,
+                                  "inputBleedColorMatrixWhite" : 0.5,
+                                  "inputBleedDarkenBlend" : false,
+                                  "inputBleedDistance0" : 1,
+                                  "inputBleedDistance1" : 0,
+                                  "inputBleedHeight" : 30.449999999999999,
+                                  "inputBleedOpacity" : 0.19166666269302368,
+                                  "inputBlurDistance0" : -43.5,
+                                  "inputBlurDistance1" : -1,
+                                  "inputBlurDistance2" : 0,
+                                  "inputBlurDistance3" : 0,
+                                  "inputBlurFillBlurRadius" : 8,
+                                  "inputBlurFillDarkenOpacity" : 0.89999997615814209,
+                                  "inputBlurFillLightenOpacity" : 0,
+                                  "inputBlurFillNormalOpacity" : 0.50711458921432495,
+                                  "inputBlurOpacity0" : 0.19166666269302368,
+                                  "inputBlurOpacity1" : 0.095833331346511841,
+                                  "inputBlurOpacity2" : 0.5,
+                                  "inputBlurOpacity3" : 1,
+                                  "inputBlurRadius" : 5,
+                                  "inputClamp" : 1.308310866355896,
+                                  "inputClampPreserveHue" : false,
+                                  "inputFaceColorMatrixBlack" : 0.125,
+                                  "inputFaceColorMatrixFillColor" : {
+                                    "color" : [
+                                      0.0017786473035812378,
+                                      0.0017786473035812378,
+                                      0.0017786473035812378,
+                                      0.0071145892143249512
+                                    ],
+                                    "space" : "kCGColorSpaceExtendedSRGB"
+                                  },
+                                  "inputFaceColorMatrixMaxLuma" : 0.45625001192092896,
+                                  "inputFaceColorMatrixMaxLumaSDR" : 0.45625001192092896,
+                                  "inputFaceColorMatrixSaturation" : 1.2999999523162842,
+                                  "inputFaceColorMatrixWhite" : 1.125,
+                                  "inputFaceOpacity" : 1,
+                                  "inputInnerRefractionAmount" : -43.5,
+                                  "inputInnerRefractionHeight" : 20,
+                                  "inputKeyFillHighlightAmount" : 0.40000000000000002,
+                                  "inputKeyFillHighlightAngle" : 1.5707963267948966,
+                                  "inputKeyFillHighlightColorBias" : -0.25,
+                                  "inputKeyFillHighlightEffectOffset" : -0.5,
+                                  "inputKeyFillHighlightHeight" : 0.5,
+                                  "inputKeyFillHighlightSpread" : 1.3089969389957472,
+                                  "inputKeyFillHighlightSpreadSDR" : 1.3089969389957472,
+                                  "inputMaxHeadroom" : 9999,
+                                  "inputOuterRefractionAmount" : 21.75,
+                                  "inputOuterRefractionHeight" : 17.400000000000002,
+                                  "inputRefractionDistance0" : -1,
+                                  "inputRefractionDistance1" : 0,
+                                  "inputRefractionOpacity" : 0.60000002384185791,
+                                  "inputRingShadowBlurRadius" : 5,
+                                  "inputRingShadowMask" : 1,
+                                  "inputRingShadowOffset" : 8,
+                                  "inputRingShadowOpacity" : 0.059999998658895493,
+                                  "inputRingShadowStrokeWidth" : 4,
+                                  "inputSDRGradientDistance0" : 0,
+                                  "inputSDRGradientDistance1" : 0,
+                                  "inputSDRHoldingToneEnabled" : false,
+                                  "inputSDRHoldingToneWhite" : 1,
+                                  "inputSDRShadowOpacity" : 0,
+                                  "inputShadowAmount" : 0,
+                                  "inputShadowBlurRadius" : 0,
+                                  "inputShadowColorMatrixBlack" : 0,
+                                  "inputShadowColorMatrixFillColor" : {
+                                    "color" : [
+                                      0,
+                                      0,
+                                      0,
+                                      0.30000001192092896
+                                    ],
+                                    "space" : "kCGColorSpaceExtendedSRGB"
+                                  },
+                                  "inputShadowColorMatrixSaturation" : 1,
+                                  "inputShadowColorMatrixWhite" : 1,
+                                  "inputShadowDistanceOffset" : 0,
+                                  "inputShadowHeight" : 0,
+                                  "inputShadowOffset" : [
+                                    0,
+                                    8
+                                  ],
+                                  "inputShadowOpacity" : 0.17416664958000183,
+                                  "inputShadowRadius" : 8.7916666666666679,
+                                  "inputShadowVibrancyContribution" : 0,
+                                  "inputSourceSublayerName" : "@0"
+                                },
+                                "name" : "glassBackground",
+                                "type" : "glassBackground"
+                              }
+                            ],
+                            "frame" : [
+                              0,
+                              0,
+                              520,
+                              87
+                            ],
+                            "hidden" : false,
+                            "name" : "@0",
+                            "opacity" : 1,
+                            "sublayers" : [
+                              {
+                                "class" : "CASDFLayer",
+                                "effect" : {
+                                  "class" : "CASDFOutputEffect",
+                                  "maximum" : 11.647928537689651,
+                                  "minimum" : -10000
+                                },
+                                "frame" : [
+                                  0,
+                                  0,
+                                  520,
+                                  87
+                                ],
+                                "hidden" : false,
+                                "name" : "@0",
+                                "opacity" : 1,
+                                "sdf" : {
+                                  "cornerCurve" : "circular",
+                                  "cornerRadius" : 0,
+                                  "smoothness" : 8
+                                },
+                                "sublayers" : [
+                                  {
+                                    "class" : "CALayer",
+                                    "frame" : [
+                                      0,
+                                      0,
+                                      0,
+                                      0
+                                    ],
+                                    "hidden" : false,
+                                    "name" : "",
+                                    "opacity" : 1,
+                                    "sublayers" : [
+                                      {
+                                        "class" : "CASDFElementLayer",
+                                        "cornerCurve" : "continuous",
+                                        "cornerRadius" : 43.5,
+                                        "frame" : [
+                                          0,
+                                          0,
+                                          520,
+                                          87
+                                        ],
+                                        "hidden" : false,
+                                        "name" : "",
+                                        "opacity" : 1,
+                                        "sdf" : {
+                                          "cornerCurve" : "continuous",
+                                          "cornerRadius" : 43.5
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "class" : "SDFPortalLayer",
+                            "frame" : [
+                              0,
+                              0,
+                              520,
+                              87
+                            ],
+                            "hidden" : false,
+                            "name" : "@1",
+                            "opacity" : 1,
+                            "sdf" : {
+                              "cornerCurve" : "circular",
+                              "cornerRadius" : 0
+                            }
+                          },
+                          {
+                            "class" : "CASDFLayer",
+                            "effect" : {
+                              "class" : "CASDFKeyFillHighlightEffect",
+                              "curvature" : 0.75,
+                              "diffuseAmountScale" : 0.15000000596046448,
+                              "diffuseHeightScale" : 8,
+                              "diffuseSpreadScale" : 0.64999997615814209,
+                              "fillAmount" : 0.5,
+                              "fillAngle" : 3.1415926535897931,
+                              "fillColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceExtendedSRGB"
+                              },
+                              "fillHeight" : 1,
+                              "fillHeightOffset" : 0,
+                              "fillHeightScale" : 1,
+                              "fillSpread" : 1.3962634015954636,
+                              "fillSpreadOffset" : 0,
+                              "fillSpreadScale" : 1,
+                              "global" : false,
+                              "keyAmount" : 0.5,
+                              "keyAngle" : 0,
+                              "keyColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceExtendedSRGB"
+                              },
+                              "keyHeight" : 1,
+                              "keyHeightOffset" : 0,
+                              "keyHeightScale" : 1,
+                              "keySpread" : 1.3962634015954636,
+                              "keySpreadOffset" : 0,
+                              "keySpreadScale" : 1
+                            },
+                            "filters" : [
+                              {
+                                "inputs" : {
+                                  "inputClamp" : 1,
+                                  "inputColorMatrix" : [
+                                    1.1201999187469482,
+                                    -0.18940000236034393,
+                                    -0.018999999389052391,
+                                    0,
+                                    0.14710000157356262,
+                                    -0.056299999356269836,
+                                    0.98709994554519653,
+                                    -0.019099999219179153,
+                                    0,
+                                    0.14710000157356262,
+                                    -0.056299999356269836,
+                                    -0.18930000066757202,
+                                    1.1574000120162964,
+                                    0,
+                                    0.14710000157356262,
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    0
+                                  ]
+                                },
+                                "name" : "vibrantColorMatrix",
+                                "type" : "vibrantColorMatrix"
+                              }
+                            ],
+                            "frame" : [
+                              0,
+                              0,
+                              520,
+                              87
+                            ],
+                            "hidden" : false,
+                            "name" : "@2",
+                            "opacity" : 1,
+                            "sdf" : {
+                              "cornerCurve" : "circular",
+                              "cornerRadius" : 0,
+                              "smoothness" : 8
+                            },
+                            "sublayers" : [
+                              {
+                                "class" : "SDFPortalLayer",
+                                "frame" : [
+                                  0,
+                                  0,
+                                  0,
+                                  0
+                                ],
+                                "hidden" : false,
+                                "name" : "",
+                                "opacity" : 1,
+                                "sdf" : {
+                                  "cornerCurve" : "circular",
+                                  "cornerRadius" : 0
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "config" : {
+        "contentPattern" : "gradx",
+        "frame" : [
+          30,
+          150,
+          300,
+          150
+        ],
+        "kv" : {
+          "_contentLensing" : true
+        },
+        "radius" : 40,
+        "variant" : 0
+      },
+      "layers" : {
+        "class" : "BackingLayer",
+        "frame" : [
+          30,
+          150,
+          300,
+          150
+        ],
+        "hidden" : false,
+        "name" : "_TtCE6AppKitCSo17NSGlassEffectViewP33_92F0BB6107B916AA04C9A991F505A16412BackingLayer: NSGlassEffectView",
+        "opacity" : 1,
+        "sublayers" : [
+          {
+            "class" : "CALayer",
+            "frame" : [
+              0,
+              0,
+              300,
+              150
+            ],
+            "hidden" : false,
+            "name" : "contentHolderView",
+            "opacity" : 1,
+            "sublayers" : [
+              {
+                "class" : "NSViewBackingLayer",
+                "frame" : [
+                  0,
+                  0,
+                  300,
+                  150
+                ],
+                "hidden" : false,
+                "name" : "NSView",
+                "opacity" : 1,
+                "sublayers" : [
+                  {
+                    "class" : "NSViewBackingLayer",
+                    "contents" : "__NSCFType",
+                    "contentsMultiplyColor" : {
+                      "color" : [
+                        1,
+                        1,
+                        1,
+                        1
+                      ],
+                      "space" : "kCGColorSpaceSRGB"
+                    },
+                    "frame" : [
+                      0,
+                      0,
+                      300,
+                      150
+                    ],
+                    "hidden" : false,
+                    "name" : "glassfit.Flipped",
+                    "opacity" : 1
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "class" : "NSViewBackingLayer",
+            "frame" : [
+              0,
+              0,
+              300,
+              150
+            ],
+            "hidden" : false,
+            "name" : "_TtGC6AppKit18_NSCoreHostingViewVES_CSo17NSGlassEffectViewP10$19ca35b508RootView_",
+            "opacity" : 1,
+            "sublayers" : [
+              {
+                "class" : "CALayer",
+                "frame" : [
+                  0,
+                  0,
+                  300,
+                  150
+                ],
+                "hidden" : false,
+                "name" : "",
+                "opacity" : 1,
+                "sublayers" : [
+                  {
+                    "class" : "SDFLayer",
+                    "frame" : [
+                      0,
+                      0,
+                      300,
+                      150
+                    ],
+                    "hidden" : false,
+                    "name" : "",
+                    "opacity" : 1,
+                    "sdf" : {
+                      "cornerCurve" : "circular",
+                      "cornerRadius" : 0
+                    },
+                    "sublayers" : [
+                      {
+                        "class" : "CALayer",
+                        "frame" : [
+                          0,
+                          0,
+                          0,
+                          0
+                        ],
+                        "hidden" : false,
+                        "name" : "",
+                        "opacity" : 1,
+                        "sublayers" : [
+                          {
+                            "class" : "CALayer",
+                            "frame" : [
+                              0,
+                              0,
+                              300,
+                              150
+                            ],
+                            "hidden" : false,
+                            "name" : "",
+                            "opacity" : 1,
+                            "sublayers" : [
+                              {
+                                "backgroundColor" : {
+                                  "color" : [
+                                    1,
+                                    1,
+                                    1,
+                                    1
+                                  ],
+                                  "space" : "kCGColorSpaceExtendedSRGB"
+                                },
+                                "class" : "CALayer",
+                                "cornerCurve" : "continuous",
+                                "cornerRadius" : 40,
+                                "filters" : [
+                                  {
+                                    "inputs" : {
+                                      "inputBackdropAware" : true,
+                                      "inputColorMatrix" : [
+                                        0.3125,
+                                        0,
+                                        0,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0.3125,
+                                        0,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0,
+                                        0.3125,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0
+                                      ]
+                                    },
+                                    "name" : "vibrantColorMatrix",
+                                    "type" : "vibrantColorMatrix"
+                                  }
+                                ],
+                                "frame" : [
+                                  0,
+                                  0,
+                                  300,
+                                  150
+                                ],
+                                "hidden" : false,
+                                "name" : "",
+                                "opacity" : 1
+                              },
+                              {
+                                "class" : "CALayer",
+                                "cornerCurve" : "continuous",
+                                "cornerRadius" : 40,
+                                "frame" : [
+                                  0,
+                                  0,
+                                  300,
+                                  150
+                                ],
+                                "hidden" : false,
+                                "masksToBounds" : true,
+                                "name" : "",
+                                "opacity" : 1,
+                                "sublayers" : [
+                                  {
+                                    "class" : "CAPortalLayer",
+                                    "frame" : [
+                                      0,
+                                      0,
+                                      300,
+                                      150
+                                    ],
+                                    "hidden" : false,
+                                    "name" : "",
+                                    "opacity" : 1
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "class" : "CALayer",
+                        "frame" : [
+                          0,
+                          0,
+                          300,
+                          150
+                        ],
+                        "hidden" : false,
+                        "name" : "",
+                        "opacity" : 1,
+                        "sublayers" : [
+                          {
+                            "backdrop" : {
+                              "captureOnly" : false,
+                              "groupName" : "SwiftUI:57.00.0",
+                              "marginWidth" : 52.5,
+                              "scale" : 0.5,
+                              "zoom" : 0
+                            },
+                            "class" : "CABackdropLayer",
+                            "filters" : [
+                              {
+                                "inputs" : {
+                                  "inputBleedAmount" : 52.5,
+                                  "inputBleedBlurRadius" : 52.5,
+                                  "inputBleedColorMatrixBlack" : 0.125,
+                                  "inputBleedColorMatrixSaturation" : 1,
+                                  "inputBleedColorMatrixWhite" : 0.5,
+                                  "inputBleedDarkenBlend" : false,
+                                  "inputBleedDistance0" : 1,
+                                  "inputBleedDistance1" : 0,
+                                  "inputBleedHeight" : 52.5,
+                                  "inputBleedOpacity" : 0.71666663885116577,
+                                  "inputBlurDistance0" : -75,
+                                  "inputBlurDistance1" : -1,
+                                  "inputBlurDistance2" : 0,
+                                  "inputBlurDistance3" : 0,
+                                  "inputBlurFillBlurRadius" : 8,
+                                  "inputBlurFillDarkenOpacity" : 0.89999997615814209,
+                                  "inputBlurFillLightenOpacity" : 0,
+                                  "inputBlurFillNormalOpacity" : 0.50711458921432495,
+                                  "inputBlurOpacity0" : 0.71666663885116577,
+                                  "inputBlurOpacity1" : 0.35833331942558289,
+                                  "inputBlurOpacity2" : 0.5,
+                                  "inputBlurOpacity3" : 1,
+                                  "inputBlurRadius" : 5,
+                                  "inputClamp" : 1.308310866355896,
+                                  "inputClampPreserveHue" : false,
+                                  "inputFaceColorMatrixBlack" : 0.125,
+                                  "inputFaceColorMatrixFillColor" : {
+                                    "color" : [
+                                      0.0017786473035812378,
+                                      0.0017786473035812378,
+                                      0.0017786473035812378,
+                                      0.0071145892143249512
+                                    ],
+                                    "space" : "kCGColorSpaceExtendedSRGB"
+                                  },
+                                  "inputFaceColorMatrixMaxLuma" : 0.34999999403953552,
+                                  "inputFaceColorMatrixMaxLumaSDR" : 0.34999999403953552,
+                                  "inputFaceColorMatrixSaturation" : 1.2999999523162842,
+                                  "inputFaceColorMatrixWhite" : 1.125,
+                                  "inputFaceOpacity" : 1,
+                                  "inputInnerRefractionAmount" : -60,
+                                  "inputInnerRefractionHeight" : 20,
+                                  "inputKeyFillHighlightAmount" : 0.40000000000000002,
+                                  "inputKeyFillHighlightAngle" : 1.5707963267948966,
+                                  "inputKeyFillHighlightColorBias" : -0.25,
+                                  "inputKeyFillHighlightEffectOffset" : -0.5,
+                                  "inputKeyFillHighlightHeight" : 0.5,
+                                  "inputKeyFillHighlightSpread" : 1.3089969389957472,
+                                  "inputKeyFillHighlightSpreadSDR" : 1.3089969389957472,
+                                  "inputMaxHeadroom" : 9999,
+                                  "inputOuterRefractionAmount" : 37.5,
+                                  "inputOuterRefractionHeight" : 30,
+                                  "inputRefractionDistance0" : -1,
+                                  "inputRefractionDistance1" : 0,
+                                  "inputRefractionOpacity" : 0.60000002384185791,
+                                  "inputRingShadowBlurRadius" : 5,
+                                  "inputRingShadowMask" : 1,
+                                  "inputRingShadowOffset" : 8,
+                                  "inputRingShadowOpacity" : 0.059999998658895493,
+                                  "inputRingShadowStrokeWidth" : 4,
+                                  "inputSDRGradientDistance0" : 0,
+                                  "inputSDRGradientDistance1" : 0,
+                                  "inputSDRHoldingToneEnabled" : false,
+                                  "inputSDRHoldingToneWhite" : 1,
+                                  "inputSDRShadowOpacity" : 0,
+                                  "inputShadowAmount" : 0,
+                                  "inputShadowBlurRadius" : 0,
+                                  "inputShadowColorMatrixBlack" : 0,
+                                  "inputShadowColorMatrixFillColor" : {
+                                    "color" : [
+                                      0,
+                                      0,
+                                      0,
+                                      0.30000001192092896
+                                    ],
+                                    "space" : "kCGColorSpaceExtendedSRGB"
+                                  },
+                                  "inputShadowColorMatrixSaturation" : 1,
+                                  "inputShadowColorMatrixWhite" : 1,
+                                  "inputShadowDistanceOffset" : 0,
+                                  "inputShadowHeight" : 0,
+                                  "inputShadowOffset" : [
+                                    0,
+                                    8
+                                  ],
+                                  "inputShadowOpacity" : 0.54166668653488159,
+                                  "inputShadowRadius" : 21.916666666666668,
+                                  "inputShadowVibrancyContribution" : 0,
+                                  "inputSourceSublayerName" : "@0"
+                                },
+                                "name" : "glassBackground",
+                                "type" : "glassBackground"
+                              }
+                            ],
+                            "frame" : [
+                              0,
+                              0,
+                              300,
+                              150
+                            ],
+                            "hidden" : false,
+                            "name" : "@0",
+                            "opacity" : 1,
+                            "sublayers" : [
+                              {
+                                "class" : "CASDFLayer",
+                                "effect" : {
+                                  "class" : "CASDFOutputEffect",
+                                  "maximum" : 36.243672883490525,
+                                  "minimum" : -10000
+                                },
+                                "frame" : [
+                                  0,
+                                  0,
+                                  300,
+                                  150
+                                ],
+                                "hidden" : false,
+                                "name" : "@0",
+                                "opacity" : 1,
+                                "sdf" : {
+                                  "cornerCurve" : "circular",
+                                  "cornerRadius" : 0,
+                                  "smoothness" : 8
+                                },
+                                "sublayers" : [
+                                  {
+                                    "class" : "CALayer",
+                                    "frame" : [
+                                      0,
+                                      0,
+                                      0,
+                                      0
+                                    ],
+                                    "hidden" : false,
+                                    "name" : "",
+                                    "opacity" : 1,
+                                    "sublayers" : [
+                                      {
+                                        "class" : "CASDFElementLayer",
+                                        "cornerCurve" : "continuous",
+                                        "cornerRadius" : 40,
+                                        "frame" : [
+                                          0,
+                                          0,
+                                          300,
+                                          150
+                                        ],
+                                        "hidden" : false,
+                                        "name" : "",
+                                        "opacity" : 1,
+                                        "sdf" : {
+                                          "cornerCurve" : "continuous",
+                                          "cornerRadius" : 40
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "class" : "SDFPortalLayer",
+                            "frame" : [
+                              0,
+                              0,
+                              300,
+                              150
+                            ],
+                            "hidden" : false,
+                            "name" : "@1",
+                            "opacity" : 1,
+                            "sdf" : {
+                              "cornerCurve" : "circular",
+                              "cornerRadius" : 0
+                            }
+                          },
+                          {
+                            "class" : "CASDFLayer",
+                            "effect" : {
+                              "class" : "CASDFKeyFillHighlightEffect",
+                              "curvature" : 0.75,
+                              "diffuseAmountScale" : 0.15000000596046448,
+                              "diffuseHeightScale" : 8,
+                              "diffuseSpreadScale" : 0.64999997615814209,
+                              "fillAmount" : 0.5,
+                              "fillAngle" : 3.1415926535897931,
+                              "fillColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceExtendedSRGB"
+                              },
+                              "fillHeight" : 1,
+                              "fillHeightOffset" : 0,
+                              "fillHeightScale" : 1,
+                              "fillSpread" : 1.4944381720201447,
+                              "fillSpreadOffset" : 0,
+                              "fillSpreadScale" : 1,
+                              "global" : false,
+                              "keyAmount" : 0.5,
+                              "keyAngle" : 0,
+                              "keyColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceExtendedSRGB"
+                              },
+                              "keyHeight" : 1,
+                              "keyHeightOffset" : 0,
+                              "keyHeightScale" : 1,
+                              "keySpread" : 1.4944381720201447,
+                              "keySpreadOffset" : 0,
+                              "keySpreadScale" : 1
+                            },
+                            "filters" : [
+                              {
+                                "inputs" : {
+                                  "inputClamp" : 1,
+                                  "inputColorMatrix" : [
+                                    1.1201999187469482,
+                                    -0.18940000236034393,
+                                    -0.018999999389052391,
+                                    0,
+                                    0.14710000157356262,
+                                    -0.056299999356269836,
+                                    0.98709994554519653,
+                                    -0.019099999219179153,
+                                    0,
+                                    0.14710000157356262,
+                                    -0.056299999356269836,
+                                    -0.18930000066757202,
+                                    1.1574000120162964,
+                                    0,
+                                    0.14710000157356262,
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    0
+                                  ]
+                                },
+                                "name" : "vibrantColorMatrix",
+                                "type" : "vibrantColorMatrix"
+                              }
+                            ],
+                            "frame" : [
+                              0,
+                              0,
+                              300,
+                              150
+                            ],
+                            "hidden" : false,
+                            "name" : "@2",
+                            "opacity" : 1,
+                            "sdf" : {
+                              "cornerCurve" : "circular",
+                              "cornerRadius" : 0,
+                              "smoothness" : 8
+                            },
+                            "sublayers" : [
+                              {
+                                "class" : "SDFPortalLayer",
+                                "frame" : [
+                                  0,
+                                  0,
+                                  0,
+                                  0
+                                ],
+                                "hidden" : false,
+                                "name" : "",
+                                "opacity" : 1,
+                                "sdf" : {
+                                  "cornerCurve" : "circular",
+                                  "cornerRadius" : 0
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "config" : {
+        "contentPattern" : "gradx",
+        "frame" : [
+          360,
+          150,
+          300,
+          150
+        ],
+        "kv" : {
+
+        },
+        "radius" : 40,
+        "variant" : 0
+      },
+      "layers" : {
+        "class" : "BackingLayer",
+        "frame" : [
+          360,
+          150,
+          300,
+          150
+        ],
+        "hidden" : false,
+        "name" : "_TtCE6AppKitCSo17NSGlassEffectViewP33_92F0BB6107B916AA04C9A991F505A16412BackingLayer: NSGlassEffectView",
+        "opacity" : 1,
+        "sublayers" : [
+          {
+            "class" : "CALayer",
+            "frame" : [
+              0,
+              0,
+              300,
+              150
+            ],
+            "hidden" : false,
+            "name" : "contentHolderView",
+            "opacity" : 1,
+            "sublayers" : [
+              {
+                "class" : "NSViewBackingLayer",
+                "frame" : [
+                  0,
+                  0,
+                  300,
+                  150
+                ],
+                "hidden" : false,
+                "name" : "NSView",
+                "opacity" : 1,
+                "sublayers" : [
+                  {
+                    "class" : "NSViewBackingLayer",
+                    "contents" : "__NSCFType",
+                    "contentsMultiplyColor" : {
+                      "color" : [
+                        1,
+                        1,
+                        1,
+                        1
+                      ],
+                      "space" : "kCGColorSpaceSRGB"
+                    },
+                    "frame" : [
+                      0,
+                      0,
+                      300,
+                      150
+                    ],
+                    "hidden" : false,
+                    "name" : "glassfit.Flipped",
+                    "opacity" : 1
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "class" : "NSViewBackingLayer",
+            "frame" : [
+              0,
+              0,
+              300,
+              150
+            ],
+            "hidden" : false,
+            "name" : "_TtGC6AppKit18_NSCoreHostingViewVES_CSo17NSGlassEffectViewP10$19ca35b508RootView_",
+            "opacity" : 1,
+            "sublayers" : [
+              {
+                "class" : "CALayer",
+                "frame" : [
+                  0,
+                  0,
+                  300,
+                  150
+                ],
+                "hidden" : false,
+                "name" : "",
+                "opacity" : 1,
+                "sublayers" : [
+                  {
+                    "class" : "SDFLayer",
+                    "frame" : [
+                      0,
+                      0,
+                      300,
+                      150
+                    ],
+                    "hidden" : false,
+                    "name" : "",
+                    "opacity" : 1,
+                    "sdf" : {
+                      "cornerCurve" : "circular",
+                      "cornerRadius" : 0
+                    },
+                    "sublayers" : [
+                      {
+                        "class" : "CALayer",
+                        "frame" : [
+                          0,
+                          0,
+                          0,
+                          0
+                        ],
+                        "hidden" : false,
+                        "name" : "",
+                        "opacity" : 1,
+                        "sublayers" : [
+                          {
+                            "class" : "CALayer",
+                            "frame" : [
+                              0,
+                              0,
+                              300,
+                              150
+                            ],
+                            "hidden" : false,
+                            "name" : "",
+                            "opacity" : 1,
+                            "sublayers" : [
+                              {
+                                "backgroundColor" : {
+                                  "color" : [
+                                    1,
+                                    1,
+                                    1,
+                                    1
+                                  ],
+                                  "space" : "kCGColorSpaceExtendedSRGB"
+                                },
+                                "class" : "CALayer",
+                                "cornerCurve" : "continuous",
+                                "cornerRadius" : 40,
+                                "filters" : [
+                                  {
+                                    "inputs" : {
+                                      "inputBackdropAware" : true,
+                                      "inputColorMatrix" : [
+                                        0.3125,
+                                        0,
+                                        0,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0.3125,
+                                        0,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0,
+                                        0.3125,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0
+                                      ]
+                                    },
+                                    "name" : "vibrantColorMatrix",
+                                    "type" : "vibrantColorMatrix"
+                                  }
+                                ],
+                                "frame" : [
+                                  0,
+                                  0,
+                                  300,
+                                  150
+                                ],
+                                "hidden" : false,
+                                "name" : "",
+                                "opacity" : 1
+                              },
+                              {
+                                "class" : "CALayer",
+                                "cornerCurve" : "continuous",
+                                "cornerRadius" : 40,
+                                "frame" : [
+                                  0,
+                                  0,
+                                  300,
+                                  150
+                                ],
+                                "hidden" : false,
+                                "masksToBounds" : true,
+                                "name" : "",
+                                "opacity" : 1,
+                                "sublayers" : [
+                                  {
+                                    "class" : "CAPortalLayer",
+                                    "frame" : [
+                                      0,
+                                      0,
+                                      300,
+                                      150
+                                    ],
+                                    "hidden" : false,
+                                    "name" : "",
+                                    "opacity" : 1
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "class" : "CALayer",
+                        "frame" : [
+                          0,
+                          0,
+                          300,
+                          150
+                        ],
+                        "hidden" : false,
+                        "name" : "",
+                        "opacity" : 1,
+                        "sublayers" : [
+                          {
+                            "backdrop" : {
+                              "captureOnly" : false,
+                              "groupName" : "SwiftUI:77.00.0",
+                              "marginWidth" : 52.5,
+                              "scale" : 0.5,
+                              "zoom" : 0
+                            },
+                            "class" : "CABackdropLayer",
+                            "filters" : [
+                              {
+                                "inputs" : {
+                                  "inputBleedAmount" : 52.5,
+                                  "inputBleedBlurRadius" : 52.5,
+                                  "inputBleedColorMatrixBlack" : 0.125,
+                                  "inputBleedColorMatrixSaturation" : 1,
+                                  "inputBleedColorMatrixWhite" : 0.5,
+                                  "inputBleedDarkenBlend" : false,
+                                  "inputBleedDistance0" : 1,
+                                  "inputBleedDistance1" : 0,
+                                  "inputBleedHeight" : 52.5,
+                                  "inputBleedOpacity" : 0.71666663885116577,
+                                  "inputBlurDistance0" : -75,
+                                  "inputBlurDistance1" : -1,
+                                  "inputBlurDistance2" : 0,
+                                  "inputBlurDistance3" : 0,
+                                  "inputBlurFillBlurRadius" : 8,
+                                  "inputBlurFillDarkenOpacity" : 0.89999997615814209,
+                                  "inputBlurFillLightenOpacity" : 0,
+                                  "inputBlurFillNormalOpacity" : 0.50711458921432495,
+                                  "inputBlurOpacity0" : 0.71666663885116577,
+                                  "inputBlurOpacity1" : 0.35833331942558289,
+                                  "inputBlurOpacity2" : 0.5,
+                                  "inputBlurOpacity3" : 1,
+                                  "inputBlurRadius" : 5,
+                                  "inputClamp" : 1.308310866355896,
+                                  "inputClampPreserveHue" : false,
+                                  "inputFaceColorMatrixBlack" : 0.125,
+                                  "inputFaceColorMatrixFillColor" : {
+                                    "color" : [
+                                      0.0017786473035812378,
+                                      0.0017786473035812378,
+                                      0.0017786473035812378,
+                                      0.0071145892143249512
+                                    ],
+                                    "space" : "kCGColorSpaceExtendedSRGB"
+                                  },
+                                  "inputFaceColorMatrixMaxLuma" : 0.34999999403953552,
+                                  "inputFaceColorMatrixMaxLumaSDR" : 0.34999999403953552,
+                                  "inputFaceColorMatrixSaturation" : 1.2999999523162842,
+                                  "inputFaceColorMatrixWhite" : 1.125,
+                                  "inputFaceOpacity" : 1,
+                                  "inputInnerRefractionAmount" : -60,
+                                  "inputInnerRefractionHeight" : 20,
+                                  "inputKeyFillHighlightAmount" : 0.40000000000000002,
+                                  "inputKeyFillHighlightAngle" : 1.5707963267948966,
+                                  "inputKeyFillHighlightColorBias" : -0.25,
+                                  "inputKeyFillHighlightEffectOffset" : -0.5,
+                                  "inputKeyFillHighlightHeight" : 0.5,
+                                  "inputKeyFillHighlightSpread" : 1.3089969389957472,
+                                  "inputKeyFillHighlightSpreadSDR" : 1.3089969389957472,
+                                  "inputMaxHeadroom" : 9999,
+                                  "inputOuterRefractionAmount" : 37.5,
+                                  "inputOuterRefractionHeight" : 30,
+                                  "inputRefractionDistance0" : -1,
+                                  "inputRefractionDistance1" : 0,
+                                  "inputRefractionOpacity" : 0.60000002384185791,
+                                  "inputRingShadowBlurRadius" : 5,
+                                  "inputRingShadowMask" : 1,
+                                  "inputRingShadowOffset" : 8,
+                                  "inputRingShadowOpacity" : 0.059999998658895493,
+                                  "inputRingShadowStrokeWidth" : 4,
+                                  "inputSDRGradientDistance0" : 0,
+                                  "inputSDRGradientDistance1" : 0,
+                                  "inputSDRHoldingToneEnabled" : false,
+                                  "inputSDRHoldingToneWhite" : 1,
+                                  "inputSDRShadowOpacity" : 0,
+                                  "inputShadowAmount" : 0,
+                                  "inputShadowBlurRadius" : 0,
+                                  "inputShadowColorMatrixBlack" : 0,
+                                  "inputShadowColorMatrixFillColor" : {
+                                    "color" : [
+                                      0,
+                                      0,
+                                      0,
+                                      0.30000001192092896
+                                    ],
+                                    "space" : "kCGColorSpaceExtendedSRGB"
+                                  },
+                                  "inputShadowColorMatrixSaturation" : 1,
+                                  "inputShadowColorMatrixWhite" : 1,
+                                  "inputShadowDistanceOffset" : 0,
+                                  "inputShadowHeight" : 0,
+                                  "inputShadowOffset" : [
+                                    0,
+                                    8
+                                  ],
+                                  "inputShadowOpacity" : 0.54166668653488159,
+                                  "inputShadowRadius" : 21.916666666666668,
+                                  "inputShadowVibrancyContribution" : 0,
+                                  "inputSourceSublayerName" : "@0"
+                                },
+                                "name" : "glassBackground",
+                                "type" : "glassBackground"
+                              }
+                            ],
+                            "frame" : [
+                              0,
+                              0,
+                              300,
+                              150
+                            ],
+                            "hidden" : false,
+                            "name" : "@0",
+                            "opacity" : 1,
+                            "sublayers" : [
+                              {
+                                "class" : "CASDFLayer",
+                                "effect" : {
+                                  "class" : "CASDFOutputEffect",
+                                  "maximum" : 36.243672883490525,
+                                  "minimum" : -10000
+                                },
+                                "frame" : [
+                                  0,
+                                  0,
+                                  300,
+                                  150
+                                ],
+                                "hidden" : false,
+                                "name" : "@0",
+                                "opacity" : 1,
+                                "sdf" : {
+                                  "cornerCurve" : "circular",
+                                  "cornerRadius" : 0,
+                                  "smoothness" : 8
+                                },
+                                "sublayers" : [
+                                  {
+                                    "class" : "CALayer",
+                                    "frame" : [
+                                      0,
+                                      0,
+                                      0,
+                                      0
+                                    ],
+                                    "hidden" : false,
+                                    "name" : "",
+                                    "opacity" : 1,
+                                    "sublayers" : [
+                                      {
+                                        "class" : "CASDFElementLayer",
+                                        "cornerCurve" : "continuous",
+                                        "cornerRadius" : 40,
+                                        "frame" : [
+                                          0,
+                                          0,
+                                          300,
+                                          150
+                                        ],
+                                        "hidden" : false,
+                                        "name" : "",
+                                        "opacity" : 1,
+                                        "sdf" : {
+                                          "cornerCurve" : "continuous",
+                                          "cornerRadius" : 40
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "class" : "SDFPortalLayer",
+                            "frame" : [
+                              0,
+                              0,
+                              300,
+                              150
+                            ],
+                            "hidden" : false,
+                            "name" : "@1",
+                            "opacity" : 1,
+                            "sdf" : {
+                              "cornerCurve" : "circular",
+                              "cornerRadius" : 0
+                            }
+                          },
+                          {
+                            "class" : "CASDFLayer",
+                            "effect" : {
+                              "class" : "CASDFKeyFillHighlightEffect",
+                              "curvature" : 0.75,
+                              "diffuseAmountScale" : 0.15000000596046448,
+                              "diffuseHeightScale" : 8,
+                              "diffuseSpreadScale" : 0.64999997615814209,
+                              "fillAmount" : 0.5,
+                              "fillAngle" : 3.1415926535897931,
+                              "fillColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceExtendedSRGB"
+                              },
+                              "fillHeight" : 1,
+                              "fillHeightOffset" : 0,
+                              "fillHeightScale" : 1,
+                              "fillSpread" : 1.4944381720201447,
+                              "fillSpreadOffset" : 0,
+                              "fillSpreadScale" : 1,
+                              "global" : false,
+                              "keyAmount" : 0.5,
+                              "keyAngle" : 0,
+                              "keyColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceExtendedSRGB"
+                              },
+                              "keyHeight" : 1,
+                              "keyHeightOffset" : 0,
+                              "keyHeightScale" : 1,
+                              "keySpread" : 1.4944381720201447,
+                              "keySpreadOffset" : 0,
+                              "keySpreadScale" : 1
+                            },
+                            "filters" : [
+                              {
+                                "inputs" : {
+                                  "inputClamp" : 1,
+                                  "inputColorMatrix" : [
+                                    1.1201999187469482,
+                                    -0.18940000236034393,
+                                    -0.018999999389052391,
+                                    0,
+                                    0.14710000157356262,
+                                    -0.056299999356269836,
+                                    0.98709994554519653,
+                                    -0.019099999219179153,
+                                    0,
+                                    0.14710000157356262,
+                                    -0.056299999356269836,
+                                    -0.18930000066757202,
+                                    1.1574000120162964,
+                                    0,
+                                    0.14710000157356262,
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    0
+                                  ]
+                                },
+                                "name" : "vibrantColorMatrix",
+                                "type" : "vibrantColorMatrix"
+                              }
+                            ],
+                            "frame" : [
+                              0,
+                              0,
+                              300,
+                              150
+                            ],
+                            "hidden" : false,
+                            "name" : "@2",
+                            "opacity" : 1,
+                            "sdf" : {
+                              "cornerCurve" : "circular",
+                              "cornerRadius" : 0,
+                              "smoothness" : 8
+                            },
+                            "sublayers" : [
+                              {
+                                "class" : "SDFPortalLayer",
+                                "frame" : [
+                                  0,
+                                  0,
+                                  0,
+                                  0
+                                ],
+                                "hidden" : false,
+                                "name" : "",
+                                "opacity" : 1,
+                                "sdf" : {
+                                  "cornerCurve" : "circular",
+                                  "cornerRadius" : 0
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "config" : {
+        "contentPattern" : "gradx",
+        "frame" : [
+          700,
+          150,
+          200,
+          44
+        ],
+        "kv" : {
+          "_contentLensing" : true
+        },
+        "radius" : 22,
+        "variant" : 0
+      },
+      "layers" : {
+        "class" : "BackingLayer",
+        "frame" : [
+          700,
+          150,
+          200,
+          44
+        ],
+        "hidden" : false,
+        "name" : "_TtCE6AppKitCSo17NSGlassEffectViewP33_92F0BB6107B916AA04C9A991F505A16412BackingLayer: NSGlassEffectView",
+        "opacity" : 1,
+        "sublayers" : [
+          {
+            "class" : "CALayer",
+            "frame" : [
+              0,
+              0,
+              200,
+              44
+            ],
+            "hidden" : false,
+            "name" : "contentHolderView",
+            "opacity" : 1,
+            "sublayers" : [
+              {
+                "class" : "NSViewBackingLayer",
+                "frame" : [
+                  0,
+                  0,
+                  200,
+                  44
+                ],
+                "hidden" : false,
+                "name" : "NSView",
+                "opacity" : 1,
+                "sublayers" : [
+                  {
+                    "class" : "NSViewBackingLayer",
+                    "contents" : "__NSCFType",
+                    "contentsMultiplyColor" : {
+                      "color" : [
+                        1,
+                        1,
+                        1,
+                        1
+                      ],
+                      "space" : "kCGColorSpaceSRGB"
+                    },
+                    "frame" : [
+                      0,
+                      0,
+                      200,
+                      44
+                    ],
+                    "hidden" : false,
+                    "name" : "glassfit.Flipped",
+                    "opacity" : 1
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "class" : "NSViewBackingLayer",
+            "frame" : [
+              0,
+              0,
+              200,
+              44
+            ],
+            "hidden" : false,
+            "name" : "_TtGC6AppKit18_NSCoreHostingViewVES_CSo17NSGlassEffectViewP10$19ca35b508RootView_",
+            "opacity" : 1,
+            "sublayers" : [
+              {
+                "class" : "CALayer",
+                "frame" : [
+                  0,
+                  0,
+                  200,
+                  44
+                ],
+                "hidden" : false,
+                "name" : "",
+                "opacity" : 1,
+                "sublayers" : [
+                  {
+                    "class" : "SDFLayer",
+                    "frame" : [
+                      0,
+                      0,
+                      200,
+                      44
+                    ],
+                    "hidden" : false,
+                    "name" : "",
+                    "opacity" : 1,
+                    "sdf" : {
+                      "cornerCurve" : "circular",
+                      "cornerRadius" : 0
+                    },
+                    "sublayers" : [
+                      {
+                        "class" : "CALayer",
+                        "frame" : [
+                          0,
+                          0,
+                          0,
+                          0
+                        ],
+                        "hidden" : false,
+                        "name" : "",
+                        "opacity" : 1,
+                        "sublayers" : [
+                          {
+                            "class" : "CALayer",
+                            "frame" : [
+                              0,
+                              0,
+                              200,
+                              44
+                            ],
+                            "hidden" : false,
+                            "name" : "",
+                            "opacity" : 1,
+                            "sublayers" : [
+                              {
+                                "backgroundColor" : {
+                                  "color" : [
+                                    1,
+                                    1,
+                                    1,
+                                    1
+                                  ],
+                                  "space" : "kCGColorSpaceExtendedSRGB"
+                                },
+                                "class" : "CALayer",
+                                "cornerCurve" : "continuous",
+                                "cornerRadius" : 22,
+                                "filters" : [
+                                  {
+                                    "inputs" : {
+                                      "inputBackdropAware" : true,
+                                      "inputColorMatrix" : [
+                                        0.3125,
+                                        0,
+                                        0,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0.3125,
+                                        0,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0,
+                                        0.3125,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0
+                                      ]
+                                    },
+                                    "name" : "vibrantColorMatrix",
+                                    "type" : "vibrantColorMatrix"
+                                  }
+                                ],
+                                "frame" : [
+                                  0,
+                                  0,
+                                  200,
+                                  44
+                                ],
+                                "hidden" : false,
+                                "name" : "",
+                                "opacity" : 1
+                              },
+                              {
+                                "class" : "CALayer",
+                                "cornerCurve" : "continuous",
+                                "cornerRadius" : 22,
+                                "frame" : [
+                                  0,
+                                  0,
+                                  200,
+                                  44
+                                ],
+                                "hidden" : false,
+                                "masksToBounds" : true,
+                                "name" : "",
+                                "opacity" : 1,
+                                "sublayers" : [
+                                  {
+                                    "class" : "CAPortalLayer",
+                                    "frame" : [
+                                      0,
+                                      0,
+                                      200,
+                                      44
+                                    ],
+                                    "hidden" : false,
+                                    "name" : "",
+                                    "opacity" : 1
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "class" : "CALayer",
+                        "frame" : [
+                          0,
+                          0,
+                          200,
+                          44
+                        ],
+                        "hidden" : false,
+                        "name" : "",
+                        "opacity" : 1,
+                        "sublayers" : [
+                          {
+                            "backdrop" : {
+                              "captureOnly" : false,
+                              "groupName" : "SwiftUI:97.00.0",
+                              "marginWidth" : 16,
+                              "scale" : 0.5,
+                              "zoom" : 0
+                            },
+                            "class" : "CABackdropLayer",
+                            "filters" : [
+                              {
+                                "inputs" : {
+                                  "inputBleedAmount" : 15.399999999999999,
+                                  "inputBleedBlurRadius" : 0,
+                                  "inputBleedColorMatrixBlack" : 0.125,
+                                  "inputBleedColorMatrixSaturation" : 1,
+                                  "inputBleedColorMatrixWhite" : 0.5,
+                                  "inputBleedDarkenBlend" : false,
+                                  "inputBleedDistance0" : 1,
+                                  "inputBleedDistance1" : 0,
+                                  "inputBleedHeight" : 15.399999999999999,
+                                  "inputBleedOpacity" : 0,
+                                  "inputBlurDistance0" : -22,
+                                  "inputBlurDistance1" : -1,
+                                  "inputBlurDistance2" : 0,
+                                  "inputBlurDistance3" : 0,
+                                  "inputBlurFillBlurRadius" : 8,
+                                  "inputBlurFillDarkenOpacity" : 0.89999997615814209,
+                                  "inputBlurFillLightenOpacity" : 0,
+                                  "inputBlurFillNormalOpacity" : 0.50711458921432495,
+                                  "inputBlurOpacity0" : 0,
+                                  "inputBlurOpacity1" : 0,
+                                  "inputBlurOpacity2" : 0.5,
+                                  "inputBlurOpacity3" : 1,
+                                  "inputBlurRadius" : 5,
+                                  "inputClamp" : 1.308310866355896,
+                                  "inputClampPreserveHue" : false,
+                                  "inputFaceColorMatrixBlack" : 0.125,
+                                  "inputFaceColorMatrixFillColor" : {
+                                    "color" : [
+                                      0.0017786473035812378,
+                                      0.0017786473035812378,
+                                      0.0017786473035812378,
+                                      0.0071145892143249512
+                                    ],
+                                    "space" : "kCGColorSpaceExtendedSRGB"
+                                  },
+                                  "inputFaceColorMatrixMaxLuma" : 0.60000002384185791,
+                                  "inputFaceColorMatrixMaxLumaSDR" : 0.60000002384185791,
+                                  "inputFaceColorMatrixSaturation" : 1.2999999523162842,
+                                  "inputFaceColorMatrixWhite" : 1.125,
+                                  "inputFaceOpacity" : 1,
+                                  "inputInnerRefractionAmount" : -22,
+                                  "inputInnerRefractionHeight" : 11,
+                                  "inputKeyFillHighlightAmount" : 0.40000000000000002,
+                                  "inputKeyFillHighlightAngle" : 1.5707963267948966,
+                                  "inputKeyFillHighlightColorBias" : -0.25,
+                                  "inputKeyFillHighlightEffectOffset" : -0.5,
+                                  "inputKeyFillHighlightHeight" : 0.5,
+                                  "inputKeyFillHighlightSpread" : 1.3089969389957472,
+                                  "inputKeyFillHighlightSpreadSDR" : 1.3089969389957472,
+                                  "inputMaxHeadroom" : 9999,
+                                  "inputOuterRefractionAmount" : 16,
+                                  "inputOuterRefractionHeight" : 16,
+                                  "inputRefractionDistance0" : -1,
+                                  "inputRefractionDistance1" : 0,
+                                  "inputRefractionOpacity" : 0.60000002384185791,
+                                  "inputRingShadowBlurRadius" : 5,
+                                  "inputRingShadowMask" : 1,
+                                  "inputRingShadowOffset" : 8,
+                                  "inputRingShadowOpacity" : 0.059999998658895493,
+                                  "inputRingShadowStrokeWidth" : 4,
+                                  "inputSDRGradientDistance0" : 0,
+                                  "inputSDRGradientDistance1" : 0,
+                                  "inputSDRHoldingToneEnabled" : false,
+                                  "inputSDRHoldingToneWhite" : 1,
+                                  "inputSDRShadowOpacity" : 0,
+                                  "inputShadowAmount" : 0,
+                                  "inputShadowBlurRadius" : 0,
+                                  "inputShadowColorMatrixBlack" : 0,
+                                  "inputShadowColorMatrixFillColor" : {
+                                    "color" : [
+                                      0,
+                                      0,
+                                      0,
+                                      0.30000001192092896
+                                    ],
+                                    "space" : "kCGColorSpaceExtendedSRGB"
+                                  },
+                                  "inputShadowColorMatrixSaturation" : 1,
+                                  "inputShadowColorMatrixWhite" : 1,
+                                  "inputShadowDistanceOffset" : 0,
+                                  "inputShadowHeight" : 0,
+                                  "inputShadowOffset" : [
+                                    0,
+                                    8
+                                  ],
+                                  "inputShadowOpacity" : 0.039999999105930328,
+                                  "inputShadowRadius" : 4,
+                                  "inputShadowVibrancyContribution" : 0,
+                                  "inputSourceSublayerName" : "@0"
+                                },
+                                "name" : "glassBackground",
+                                "type" : "glassBackground"
+                              }
+                            ],
+                            "frame" : [
+                              0,
+                              0,
+                              200,
+                              44
+                            ],
+                            "hidden" : false,
+                            "name" : "@0",
+                            "opacity" : 1,
+                            "sublayers" : [
+                              {
+                                "class" : "CASDFLayer",
+                                "effect" : {
+                                  "class" : "CASDFOutputEffect",
+                                  "maximum" : 8.8903576685517134,
+                                  "minimum" : -10000
+                                },
+                                "frame" : [
+                                  0,
+                                  0,
+                                  200,
+                                  44
+                                ],
+                                "hidden" : false,
+                                "name" : "@0",
+                                "opacity" : 1,
+                                "sdf" : {
+                                  "cornerCurve" : "circular",
+                                  "cornerRadius" : 0,
+                                  "smoothness" : 8
+                                },
+                                "sublayers" : [
+                                  {
+                                    "class" : "CALayer",
+                                    "frame" : [
+                                      0,
+                                      0,
+                                      0,
+                                      0
+                                    ],
+                                    "hidden" : false,
+                                    "name" : "",
+                                    "opacity" : 1,
+                                    "sublayers" : [
+                                      {
+                                        "class" : "CASDFElementLayer",
+                                        "cornerCurve" : "continuous",
+                                        "cornerRadius" : 22,
+                                        "frame" : [
+                                          0,
+                                          0,
+                                          200,
+                                          44
+                                        ],
+                                        "hidden" : false,
+                                        "name" : "",
+                                        "opacity" : 1,
+                                        "sdf" : {
+                                          "cornerCurve" : "continuous",
+                                          "cornerRadius" : 22
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "class" : "SDFPortalLayer",
+                            "frame" : [
+                              0,
+                              0,
+                              200,
+                              44
+                            ],
+                            "hidden" : false,
+                            "name" : "@1",
+                            "opacity" : 1,
+                            "sdf" : {
+                              "cornerCurve" : "circular",
+                              "cornerRadius" : 0
+                            }
+                          },
+                          {
+                            "class" : "CASDFLayer",
+                            "effect" : {
+                              "class" : "CASDFKeyFillHighlightEffect",
+                              "curvature" : 0.75,
+                              "diffuseAmountScale" : 0.15000000596046448,
+                              "diffuseHeightScale" : 8,
+                              "diffuseSpreadScale" : 0.64999997615814209,
+                              "fillAmount" : 0.5,
+                              "fillAngle" : 3.1415926535897931,
+                              "fillColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceExtendedSRGB"
+                              },
+                              "fillHeight" : 1,
+                              "fillHeightOffset" : 0,
+                              "fillHeightScale" : 1,
+                              "fillSpread" : 1.3962634015954636,
+                              "fillSpreadOffset" : 0,
+                              "fillSpreadScale" : 1,
+                              "global" : false,
+                              "keyAmount" : 0.5,
+                              "keyAngle" : 0,
+                              "keyColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceExtendedSRGB"
+                              },
+                              "keyHeight" : 1,
+                              "keyHeightOffset" : 0,
+                              "keyHeightScale" : 1,
+                              "keySpread" : 1.3962634015954636,
+                              "keySpreadOffset" : 0,
+                              "keySpreadScale" : 1
+                            },
+                            "filters" : [
+                              {
+                                "inputs" : {
+                                  "inputClamp" : 1,
+                                  "inputColorMatrix" : [
+                                    1.1201999187469482,
+                                    -0.18940000236034393,
+                                    -0.018999999389052391,
+                                    0,
+                                    0.14710000157356262,
+                                    -0.056299999356269836,
+                                    0.98709994554519653,
+                                    -0.019099999219179153,
+                                    0,
+                                    0.14710000157356262,
+                                    -0.056299999356269836,
+                                    -0.18930000066757202,
+                                    1.1574000120162964,
+                                    0,
+                                    0.14710000157356262,
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    0
+                                  ]
+                                },
+                                "name" : "vibrantColorMatrix",
+                                "type" : "vibrantColorMatrix"
+                              }
+                            ],
+                            "frame" : [
+                              0,
+                              0,
+                              200,
+                              44
+                            ],
+                            "hidden" : false,
+                            "name" : "@2",
+                            "opacity" : 1,
+                            "sdf" : {
+                              "cornerCurve" : "circular",
+                              "cornerRadius" : 0,
+                              "smoothness" : 8
+                            },
+                            "sublayers" : [
+                              {
+                                "class" : "SDFPortalLayer",
+                                "frame" : [
+                                  0,
+                                  0,
+                                  0,
+                                  0
+                                ],
+                                "hidden" : false,
+                                "name" : "",
+                                "opacity" : 1,
+                                "sdf" : {
+                                  "cornerCurve" : "circular",
+                                  "cornerRadius" : 0
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "config" : {
+        "contentPattern" : "gradx",
+        "frame" : [
+          700,
+          220,
+          64,
+          64
+        ],
+        "kv" : {
+          "_contentLensing" : true
+        },
+        "radius" : 32,
+        "variant" : 0
+      },
+      "layers" : {
+        "class" : "BackingLayer",
+        "frame" : [
+          700,
+          220,
+          64,
+          64
+        ],
+        "hidden" : false,
+        "name" : "_TtCE6AppKitCSo17NSGlassEffectViewP33_92F0BB6107B916AA04C9A991F505A16412BackingLayer: NSGlassEffectView",
+        "opacity" : 1,
+        "sublayers" : [
+          {
+            "class" : "CALayer",
+            "frame" : [
+              0,
+              0,
+              64,
+              64
+            ],
+            "hidden" : false,
+            "name" : "contentHolderView",
+            "opacity" : 1,
+            "sublayers" : [
+              {
+                "class" : "NSViewBackingLayer",
+                "frame" : [
+                  0,
+                  0,
+                  64,
+                  64
+                ],
+                "hidden" : false,
+                "name" : "NSView",
+                "opacity" : 1,
+                "sublayers" : [
+                  {
+                    "class" : "NSViewBackingLayer",
+                    "contents" : "__NSCFType",
+                    "contentsMultiplyColor" : {
+                      "color" : [
+                        1,
+                        1,
+                        1,
+                        1
+                      ],
+                      "space" : "kCGColorSpaceSRGB"
+                    },
+                    "frame" : [
+                      0,
+                      0,
+                      64,
+                      64
+                    ],
+                    "hidden" : false,
+                    "name" : "glassfit.Flipped",
+                    "opacity" : 1
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "class" : "NSViewBackingLayer",
+            "frame" : [
+              0,
+              0,
+              64,
+              64
+            ],
+            "hidden" : false,
+            "name" : "_TtGC6AppKit18_NSCoreHostingViewVES_CSo17NSGlassEffectViewP10$19ca35b508RootView_",
+            "opacity" : 1,
+            "sublayers" : [
+              {
+                "class" : "CALayer",
+                "frame" : [
+                  0,
+                  0,
+                  64,
+                  64
+                ],
+                "hidden" : false,
+                "name" : "",
+                "opacity" : 1,
+                "sublayers" : [
+                  {
+                    "class" : "SDFLayer",
+                    "frame" : [
+                      0,
+                      0,
+                      64,
+                      64
+                    ],
+                    "hidden" : false,
+                    "name" : "",
+                    "opacity" : 1,
+                    "sdf" : {
+                      "cornerCurve" : "circular",
+                      "cornerRadius" : 0
+                    },
+                    "sublayers" : [
+                      {
+                        "class" : "CALayer",
+                        "frame" : [
+                          0,
+                          0,
+                          0,
+                          0
+                        ],
+                        "hidden" : false,
+                        "name" : "",
+                        "opacity" : 1,
+                        "sublayers" : [
+                          {
+                            "class" : "CALayer",
+                            "frame" : [
+                              0,
+                              0,
+                              64,
+                              64
+                            ],
+                            "hidden" : false,
+                            "name" : "",
+                            "opacity" : 1,
+                            "sublayers" : [
+                              {
+                                "backgroundColor" : {
+                                  "color" : [
+                                    1,
+                                    1,
+                                    1,
+                                    1
+                                  ],
+                                  "space" : "kCGColorSpaceExtendedSRGB"
+                                },
+                                "class" : "CALayer",
+                                "cornerCurve" : "continuous",
+                                "cornerRadius" : 32,
+                                "filters" : [
+                                  {
+                                    "inputs" : {
+                                      "inputBackdropAware" : true,
+                                      "inputColorMatrix" : [
+                                        0.3125,
+                                        0,
+                                        0,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0.3125,
+                                        0,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0,
+                                        0.3125,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0
+                                      ]
+                                    },
+                                    "name" : "vibrantColorMatrix",
+                                    "type" : "vibrantColorMatrix"
+                                  }
+                                ],
+                                "frame" : [
+                                  0,
+                                  0,
+                                  64,
+                                  64
+                                ],
+                                "hidden" : false,
+                                "name" : "",
+                                "opacity" : 1
+                              },
+                              {
+                                "class" : "CALayer",
+                                "cornerCurve" : "continuous",
+                                "cornerRadius" : 32,
+                                "frame" : [
+                                  0,
+                                  0,
+                                  64,
+                                  64
+                                ],
+                                "hidden" : false,
+                                "masksToBounds" : true,
+                                "name" : "",
+                                "opacity" : 1,
+                                "sublayers" : [
+                                  {
+                                    "class" : "CAPortalLayer",
+                                    "frame" : [
+                                      0,
+                                      0,
+                                      64,
+                                      64
+                                    ],
+                                    "hidden" : false,
+                                    "name" : "",
+                                    "opacity" : 1
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "class" : "CALayer",
+                        "frame" : [
+                          0,
+                          0,
+                          64,
+                          64
+                        ],
+                        "hidden" : false,
+                        "name" : "",
+                        "opacity" : 1,
+                        "sublayers" : [
+                          {
+                            "backdrop" : {
+                              "captureOnly" : false,
+                              "groupName" : "SwiftUI:117.00.0",
+                              "marginWidth" : 16,
+                              "scale" : 0.5,
+                              "zoom" : 0
+                            },
+                            "class" : "CABackdropLayer",
+                            "filters" : [
+                              {
+                                "inputs" : {
+                                  "inputBleedAmount" : 22.399999999999999,
+                                  "inputBleedBlurRadius" : 0,
+                                  "inputBleedColorMatrixBlack" : 0.125,
+                                  "inputBleedColorMatrixSaturation" : 1,
+                                  "inputBleedColorMatrixWhite" : 0.5,
+                                  "inputBleedDarkenBlend" : false,
+                                  "inputBleedDistance0" : 1,
+                                  "inputBleedDistance1" : 0,
+                                  "inputBleedHeight" : 22.399999999999999,
+                                  "inputBleedOpacity" : 0,
+                                  "inputBlurDistance0" : -32,
+                                  "inputBlurDistance1" : -1,
+                                  "inputBlurDistance2" : 0,
+                                  "inputBlurDistance3" : 0,
+                                  "inputBlurFillBlurRadius" : 8,
+                                  "inputBlurFillDarkenOpacity" : 0.89999997615814209,
+                                  "inputBlurFillLightenOpacity" : 0,
+                                  "inputBlurFillNormalOpacity" : 0.50711458921432495,
+                                  "inputBlurOpacity0" : 0,
+                                  "inputBlurOpacity1" : 0,
+                                  "inputBlurOpacity2" : 0.5,
+                                  "inputBlurOpacity3" : 1,
+                                  "inputBlurRadius" : 5,
+                                  "inputClamp" : 1.308310866355896,
+                                  "inputClampPreserveHue" : false,
+                                  "inputFaceColorMatrixBlack" : 0.125,
+                                  "inputFaceColorMatrixFillColor" : {
+                                    "color" : [
+                                      0.0017786473035812378,
+                                      0.0017786473035812378,
+                                      0.0017786473035812378,
+                                      0.0071145892143249512
+                                    ],
+                                    "space" : "kCGColorSpaceExtendedSRGB"
+                                  },
+                                  "inputFaceColorMatrixMaxLuma" : 0.60000002384185791,
+                                  "inputFaceColorMatrixMaxLumaSDR" : 0.60000002384185791,
+                                  "inputFaceColorMatrixSaturation" : 1.2999999523162842,
+                                  "inputFaceColorMatrixWhite" : 1.125,
+                                  "inputFaceOpacity" : 1,
+                                  "inputInnerRefractionAmount" : -32,
+                                  "inputInnerRefractionHeight" : 16,
+                                  "inputKeyFillHighlightAmount" : 0.40000000000000002,
+                                  "inputKeyFillHighlightAngle" : 1.5707963267948966,
+                                  "inputKeyFillHighlightColorBias" : -0.25,
+                                  "inputKeyFillHighlightEffectOffset" : -0.5,
+                                  "inputKeyFillHighlightHeight" : 0.5,
+                                  "inputKeyFillHighlightSpread" : 1.3089969389957472,
+                                  "inputKeyFillHighlightSpreadSDR" : 1.3089969389957472,
+                                  "inputMaxHeadroom" : 9999,
+                                  "inputOuterRefractionAmount" : 16,
+                                  "inputOuterRefractionHeight" : 16,
+                                  "inputRefractionDistance0" : -1,
+                                  "inputRefractionDistance1" : 0,
+                                  "inputRefractionOpacity" : 0.60000002384185791,
+                                  "inputRingShadowBlurRadius" : 5,
+                                  "inputRingShadowMask" : 1,
+                                  "inputRingShadowOffset" : 8,
+                                  "inputRingShadowOpacity" : 0.059999998658895493,
+                                  "inputRingShadowStrokeWidth" : 4,
+                                  "inputSDRGradientDistance0" : 0,
+                                  "inputSDRGradientDistance1" : 0,
+                                  "inputSDRHoldingToneEnabled" : false,
+                                  "inputSDRHoldingToneWhite" : 1,
+                                  "inputSDRShadowOpacity" : 0,
+                                  "inputShadowAmount" : 0,
+                                  "inputShadowBlurRadius" : 0,
+                                  "inputShadowColorMatrixBlack" : 0,
+                                  "inputShadowColorMatrixFillColor" : {
+                                    "color" : [
+                                      0,
+                                      0,
+                                      0,
+                                      0.30000001192092896
+                                    ],
+                                    "space" : "kCGColorSpaceExtendedSRGB"
+                                  },
+                                  "inputShadowColorMatrixSaturation" : 1,
+                                  "inputShadowColorMatrixWhite" : 1,
+                                  "inputShadowDistanceOffset" : 0,
+                                  "inputShadowHeight" : 0,
+                                  "inputShadowOffset" : [
+                                    0,
+                                    8
+                                  ],
+                                  "inputShadowOpacity" : 0.039999999105930328,
+                                  "inputShadowRadius" : 4,
+                                  "inputShadowVibrancyContribution" : 0,
+                                  "inputSourceSublayerName" : "@0"
+                                },
+                                "name" : "glassBackground",
+                                "type" : "glassBackground"
+                              }
+                            ],
+                            "frame" : [
+                              0,
+                              0,
+                              64,
+                              64
+                            ],
+                            "hidden" : false,
+                            "name" : "@0",
+                            "opacity" : 1,
+                            "sublayers" : [
+                              {
+                                "class" : "CASDFLayer",
+                                "effect" : {
+                                  "class" : "CASDFOutputEffect",
+                                  "maximum" : 8.8903576685517134,
+                                  "minimum" : -10000
+                                },
+                                "frame" : [
+                                  0,
+                                  0,
+                                  64,
+                                  64
+                                ],
+                                "hidden" : false,
+                                "name" : "@0",
+                                "opacity" : 1,
+                                "sdf" : {
+                                  "cornerCurve" : "circular",
+                                  "cornerRadius" : 0,
+                                  "smoothness" : 8
+                                },
+                                "sublayers" : [
+                                  {
+                                    "class" : "CALayer",
+                                    "frame" : [
+                                      0,
+                                      0,
+                                      0,
+                                      0
+                                    ],
+                                    "hidden" : false,
+                                    "name" : "",
+                                    "opacity" : 1,
+                                    "sublayers" : [
+                                      {
+                                        "class" : "CASDFElementLayer",
+                                        "cornerCurve" : "continuous",
+                                        "cornerRadius" : 32,
+                                        "frame" : [
+                                          0,
+                                          0,
+                                          64,
+                                          64
+                                        ],
+                                        "hidden" : false,
+                                        "name" : "",
+                                        "opacity" : 1,
+                                        "sdf" : {
+                                          "cornerCurve" : "continuous",
+                                          "cornerRadius" : 32
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "class" : "SDFPortalLayer",
+                            "frame" : [
+                              0,
+                              0,
+                              64,
+                              64
+                            ],
+                            "hidden" : false,
+                            "name" : "@1",
+                            "opacity" : 1,
+                            "sdf" : {
+                              "cornerCurve" : "circular",
+                              "cornerRadius" : 0
+                            }
+                          },
+                          {
+                            "class" : "CASDFLayer",
+                            "effect" : {
+                              "class" : "CASDFKeyFillHighlightEffect",
+                              "curvature" : 0.75,
+                              "diffuseAmountScale" : 0.15000000596046448,
+                              "diffuseHeightScale" : 8,
+                              "diffuseSpreadScale" : 0.64999997615814209,
+                              "fillAmount" : 0.5,
+                              "fillAngle" : 3.1415926535897931,
+                              "fillColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceExtendedSRGB"
+                              },
+                              "fillHeight" : 1,
+                              "fillHeightOffset" : 0,
+                              "fillHeightScale" : 1,
+                              "fillSpread" : 1.3962634015954636,
+                              "fillSpreadOffset" : 0,
+                              "fillSpreadScale" : 1,
+                              "global" : false,
+                              "keyAmount" : 0.5,
+                              "keyAngle" : 0,
+                              "keyColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceExtendedSRGB"
+                              },
+                              "keyHeight" : 1,
+                              "keyHeightOffset" : 0,
+                              "keyHeightScale" : 1,
+                              "keySpread" : 1.3962634015954636,
+                              "keySpreadOffset" : 0,
+                              "keySpreadScale" : 1
+                            },
+                            "filters" : [
+                              {
+                                "inputs" : {
+                                  "inputClamp" : 1,
+                                  "inputColorMatrix" : [
+                                    1.1201999187469482,
+                                    -0.18940000236034393,
+                                    -0.018999999389052391,
+                                    0,
+                                    0.14710000157356262,
+                                    -0.056299999356269836,
+                                    0.98709994554519653,
+                                    -0.019099999219179153,
+                                    0,
+                                    0.14710000157356262,
+                                    -0.056299999356269836,
+                                    -0.18930000066757202,
+                                    1.1574000120162964,
+                                    0,
+                                    0.14710000157356262,
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    0
+                                  ]
+                                },
+                                "name" : "vibrantColorMatrix",
+                                "type" : "vibrantColorMatrix"
+                              }
+                            ],
+                            "frame" : [
+                              0,
+                              0,
+                              64,
+                              64
+                            ],
+                            "hidden" : false,
+                            "name" : "@2",
+                            "opacity" : 1,
+                            "sdf" : {
+                              "cornerCurve" : "circular",
+                              "cornerRadius" : 0,
+                              "smoothness" : 8
+                            },
+                            "sublayers" : [
+                              {
+                                "class" : "SDFPortalLayer",
+                                "frame" : [
+                                  0,
+                                  0,
+                                  0,
+                                  0
+                                ],
+                                "hidden" : false,
+                                "name" : "",
+                                "opacity" : 1,
+                                "sdf" : {
+                                  "cornerCurve" : "circular",
+                                  "cornerRadius" : 0
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "config" : {
+        "contentInset" : 10,
+        "contentPattern" : "gradx",
+        "frame" : [
+          30,
+          330,
+          520,
+          87
+        ],
+        "kv" : {
+          "_contentLensing" : true
+        },
+        "radius" : 43.5,
+        "variant" : 0
+      },
+      "layers" : {
+        "class" : "BackingLayer",
+        "frame" : [
+          30,
+          330,
+          520,
+          87
+        ],
+        "hidden" : false,
+        "name" : "_TtCE6AppKitCSo17NSGlassEffectViewP33_92F0BB6107B916AA04C9A991F505A16412BackingLayer: NSGlassEffectView",
+        "opacity" : 1,
+        "sublayers" : [
+          {
+            "class" : "CALayer",
+            "frame" : [
+              0,
+              0,
+              520,
+              87
+            ],
+            "hidden" : false,
+            "name" : "contentHolderView",
+            "opacity" : 1,
+            "sublayers" : [
+              {
+                "class" : "NSViewBackingLayer",
+                "frame" : [
+                  0,
+                  0,
+                  520,
+                  87
+                ],
+                "hidden" : false,
+                "name" : "NSView",
+                "opacity" : 1,
+                "sublayers" : [
+                  {
+                    "class" : "NSViewBackingLayer",
+                    "contents" : "__NSCFType",
+                    "contentsMultiplyColor" : {
+                      "color" : [
+                        1,
+                        1,
+                        1,
+                        1
+                      ],
+                      "space" : "kCGColorSpaceSRGB"
+                    },
+                    "frame" : [
+                      10,
+                      10,
+                      500,
+                      67
+                    ],
+                    "hidden" : false,
+                    "name" : "glassfit.Flipped",
+                    "opacity" : 1
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "class" : "NSViewBackingLayer",
+            "frame" : [
+              0,
+              0,
+              520,
+              87
+            ],
+            "hidden" : false,
+            "name" : "_TtGC6AppKit18_NSCoreHostingViewVES_CSo17NSGlassEffectViewP10$19ca35b508RootView_",
+            "opacity" : 1,
+            "sublayers" : [
+              {
+                "class" : "CALayer",
+                "frame" : [
+                  0,
+                  0,
+                  520,
+                  87
+                ],
+                "hidden" : false,
+                "name" : "",
+                "opacity" : 1,
+                "sublayers" : [
+                  {
+                    "class" : "SDFLayer",
+                    "frame" : [
+                      0,
+                      0,
+                      520,
+                      87
+                    ],
+                    "hidden" : false,
+                    "name" : "",
+                    "opacity" : 1,
+                    "sdf" : {
+                      "cornerCurve" : "circular",
+                      "cornerRadius" : 0
+                    },
+                    "sublayers" : [
+                      {
+                        "class" : "CALayer",
+                        "frame" : [
+                          0,
+                          0,
+                          0,
+                          0
+                        ],
+                        "hidden" : false,
+                        "name" : "",
+                        "opacity" : 1,
+                        "sublayers" : [
+                          {
+                            "class" : "CALayer",
+                            "frame" : [
+                              0,
+                              0,
+                              520,
+                              87
+                            ],
+                            "hidden" : false,
+                            "name" : "",
+                            "opacity" : 1,
+                            "sublayers" : [
+                              {
+                                "backgroundColor" : {
+                                  "color" : [
+                                    1,
+                                    1,
+                                    1,
+                                    1
+                                  ],
+                                  "space" : "kCGColorSpaceExtendedSRGB"
+                                },
+                                "class" : "CALayer",
+                                "cornerCurve" : "continuous",
+                                "cornerRadius" : 43.5,
+                                "filters" : [
+                                  {
+                                    "inputs" : {
+                                      "inputBackdropAware" : true,
+                                      "inputColorMatrix" : [
+                                        0.3125,
+                                        0,
+                                        0,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0.3125,
+                                        0,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0,
+                                        0.3125,
+                                        0,
+                                        0.93750011920928955,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0
+                                      ]
+                                    },
+                                    "name" : "vibrantColorMatrix",
+                                    "type" : "vibrantColorMatrix"
+                                  }
+                                ],
+                                "frame" : [
+                                  0,
+                                  0,
+                                  520,
+                                  87
+                                ],
+                                "hidden" : false,
+                                "name" : "",
+                                "opacity" : 1
+                              },
+                              {
+                                "class" : "CALayer",
+                                "cornerCurve" : "continuous",
+                                "cornerRadius" : 43.5,
+                                "frame" : [
+                                  0,
+                                  0,
+                                  520,
+                                  87
+                                ],
+                                "hidden" : false,
+                                "masksToBounds" : true,
+                                "name" : "",
+                                "opacity" : 1,
+                                "sublayers" : [
+                                  {
+                                    "class" : "CAPortalLayer",
+                                    "frame" : [
+                                      0,
+                                      0,
+                                      520,
+                                      87
+                                    ],
+                                    "hidden" : false,
+                                    "name" : "",
+                                    "opacity" : 1
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "class" : "CALayer",
+                        "frame" : [
+                          0,
+                          0,
+                          520,
+                          87
+                        ],
+                        "hidden" : false,
+                        "name" : "",
+                        "opacity" : 1,
+                        "sublayers" : [
+                          {
+                            "backdrop" : {
+                              "captureOnly" : false,
+                              "groupName" : "SwiftUI:137.00.0",
+                              "marginWidth" : 30.449999999999999,
+                              "scale" : 0.5,
+                              "zoom" : 0
+                            },
+                            "class" : "CABackdropLayer",
+                            "filters" : [
+                              {
+                                "inputs" : {
+                                  "inputBleedAmount" : 30.449999999999999,
+                                  "inputBleedBlurRadius" : 30.449999999999999,
+                                  "inputBleedColorMatrixBlack" : 0.125,
+                                  "inputBleedColorMatrixSaturation" : 1,
+                                  "inputBleedColorMatrixWhite" : 0.5,
+                                  "inputBleedDarkenBlend" : false,
+                                  "inputBleedDistance0" : 1,
+                                  "inputBleedDistance1" : 0,
+                                  "inputBleedHeight" : 30.449999999999999,
+                                  "inputBleedOpacity" : 0.19166666269302368,
+                                  "inputBlurDistance0" : -43.5,
+                                  "inputBlurDistance1" : -1,
+                                  "inputBlurDistance2" : 0,
+                                  "inputBlurDistance3" : 0,
+                                  "inputBlurFillBlurRadius" : 8,
+                                  "inputBlurFillDarkenOpacity" : 0.89999997615814209,
+                                  "inputBlurFillLightenOpacity" : 0,
+                                  "inputBlurFillNormalOpacity" : 0.50711458921432495,
+                                  "inputBlurOpacity0" : 0.19166666269302368,
+                                  "inputBlurOpacity1" : 0.095833331346511841,
+                                  "inputBlurOpacity2" : 0.5,
+                                  "inputBlurOpacity3" : 1,
+                                  "inputBlurRadius" : 5,
+                                  "inputClamp" : 1.308310866355896,
+                                  "inputClampPreserveHue" : false,
+                                  "inputFaceColorMatrixBlack" : 0.125,
+                                  "inputFaceColorMatrixFillColor" : {
+                                    "color" : [
+                                      0.0017786473035812378,
+                                      0.0017786473035812378,
+                                      0.0017786473035812378,
+                                      0.0071145892143249512
+                                    ],
+                                    "space" : "kCGColorSpaceExtendedSRGB"
+                                  },
+                                  "inputFaceColorMatrixMaxLuma" : 0.45625001192092896,
+                                  "inputFaceColorMatrixMaxLumaSDR" : 0.45625001192092896,
+                                  "inputFaceColorMatrixSaturation" : 1.2999999523162842,
+                                  "inputFaceColorMatrixWhite" : 1.125,
+                                  "inputFaceOpacity" : 1,
+                                  "inputInnerRefractionAmount" : -43.5,
+                                  "inputInnerRefractionHeight" : 20,
+                                  "inputKeyFillHighlightAmount" : 0.40000000000000002,
+                                  "inputKeyFillHighlightAngle" : 1.5707963267948966,
+                                  "inputKeyFillHighlightColorBias" : -0.25,
+                                  "inputKeyFillHighlightEffectOffset" : -0.5,
+                                  "inputKeyFillHighlightHeight" : 0.5,
+                                  "inputKeyFillHighlightSpread" : 1.3089969389957472,
+                                  "inputKeyFillHighlightSpreadSDR" : 1.3089969389957472,
+                                  "inputMaxHeadroom" : 9999,
+                                  "inputOuterRefractionAmount" : 21.75,
+                                  "inputOuterRefractionHeight" : 17.400000000000002,
+                                  "inputRefractionDistance0" : -1,
+                                  "inputRefractionDistance1" : 0,
+                                  "inputRefractionOpacity" : 0.60000002384185791,
+                                  "inputRingShadowBlurRadius" : 5,
+                                  "inputRingShadowMask" : 1,
+                                  "inputRingShadowOffset" : 8,
+                                  "inputRingShadowOpacity" : 0.059999998658895493,
+                                  "inputRingShadowStrokeWidth" : 4,
+                                  "inputSDRGradientDistance0" : 0,
+                                  "inputSDRGradientDistance1" : 0,
+                                  "inputSDRHoldingToneEnabled" : false,
+                                  "inputSDRHoldingToneWhite" : 1,
+                                  "inputSDRShadowOpacity" : 0,
+                                  "inputShadowAmount" : 0,
+                                  "inputShadowBlurRadius" : 0,
+                                  "inputShadowColorMatrixBlack" : 0,
+                                  "inputShadowColorMatrixFillColor" : {
+                                    "color" : [
+                                      0,
+                                      0,
+                                      0,
+                                      0.30000001192092896
+                                    ],
+                                    "space" : "kCGColorSpaceExtendedSRGB"
+                                  },
+                                  "inputShadowColorMatrixSaturation" : 1,
+                                  "inputShadowColorMatrixWhite" : 1,
+                                  "inputShadowDistanceOffset" : 0,
+                                  "inputShadowHeight" : 0,
+                                  "inputShadowOffset" : [
+                                    0,
+                                    8
+                                  ],
+                                  "inputShadowOpacity" : 0.17416664958000183,
+                                  "inputShadowRadius" : 8.7916666666666679,
+                                  "inputShadowVibrancyContribution" : 0,
+                                  "inputSourceSublayerName" : "@0"
+                                },
+                                "name" : "glassBackground",
+                                "type" : "glassBackground"
+                              }
+                            ],
+                            "frame" : [
+                              0,
+                              0,
+                              520,
+                              87
+                            ],
+                            "hidden" : false,
+                            "name" : "@0",
+                            "opacity" : 1,
+                            "sublayers" : [
+                              {
+                                "class" : "CASDFLayer",
+                                "effect" : {
+                                  "class" : "CASDFOutputEffect",
+                                  "maximum" : 11.647928537689651,
+                                  "minimum" : -10000
+                                },
+                                "frame" : [
+                                  0,
+                                  0,
+                                  520,
+                                  87
+                                ],
+                                "hidden" : false,
+                                "name" : "@0",
+                                "opacity" : 1,
+                                "sdf" : {
+                                  "cornerCurve" : "circular",
+                                  "cornerRadius" : 0,
+                                  "smoothness" : 8
+                                },
+                                "sublayers" : [
+                                  {
+                                    "class" : "CALayer",
+                                    "frame" : [
+                                      0,
+                                      0,
+                                      0,
+                                      0
+                                    ],
+                                    "hidden" : false,
+                                    "name" : "",
+                                    "opacity" : 1,
+                                    "sublayers" : [
+                                      {
+                                        "class" : "CASDFElementLayer",
+                                        "cornerCurve" : "continuous",
+                                        "cornerRadius" : 43.5,
+                                        "frame" : [
+                                          0,
+                                          0,
+                                          520,
+                                          87
+                                        ],
+                                        "hidden" : false,
+                                        "name" : "",
+                                        "opacity" : 1,
+                                        "sdf" : {
+                                          "cornerCurve" : "continuous",
+                                          "cornerRadius" : 43.5
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "class" : "SDFPortalLayer",
+                            "frame" : [
+                              0,
+                              0,
+                              520,
+                              87
+                            ],
+                            "hidden" : false,
+                            "name" : "@1",
+                            "opacity" : 1,
+                            "sdf" : {
+                              "cornerCurve" : "circular",
+                              "cornerRadius" : 0
+                            }
+                          },
+                          {
+                            "class" : "CASDFLayer",
+                            "effect" : {
+                              "class" : "CASDFKeyFillHighlightEffect",
+                              "curvature" : 0.75,
+                              "diffuseAmountScale" : 0.15000000596046448,
+                              "diffuseHeightScale" : 8,
+                              "diffuseSpreadScale" : 0.64999997615814209,
+                              "fillAmount" : 0.5,
+                              "fillAngle" : 3.1415926535897931,
+                              "fillColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceExtendedSRGB"
+                              },
+                              "fillHeight" : 1,
+                              "fillHeightOffset" : 0,
+                              "fillHeightScale" : 1,
+                              "fillSpread" : 1.3962634015954636,
+                              "fillSpreadOffset" : 0,
+                              "fillSpreadScale" : 1,
+                              "global" : false,
+                              "keyAmount" : 0.5,
+                              "keyAngle" : 0,
+                              "keyColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceExtendedSRGB"
+                              },
+                              "keyHeight" : 1,
+                              "keyHeightOffset" : 0,
+                              "keyHeightScale" : 1,
+                              "keySpread" : 1.3962634015954636,
+                              "keySpreadOffset" : 0,
+                              "keySpreadScale" : 1
+                            },
+                            "filters" : [
+                              {
+                                "inputs" : {
+                                  "inputClamp" : 1,
+                                  "inputColorMatrix" : [
+                                    1.1201999187469482,
+                                    -0.18940000236034393,
+                                    -0.018999999389052391,
+                                    0,
+                                    0.14710000157356262,
+                                    -0.056299999356269836,
+                                    0.98709994554519653,
+                                    -0.019099999219179153,
+                                    0,
+                                    0.14710000157356262,
+                                    -0.056299999356269836,
+                                    -0.18930000066757202,
+                                    1.1574000120162964,
+                                    0,
+                                    0.14710000157356262,
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    0
+                                  ]
+                                },
+                                "name" : "vibrantColorMatrix",
+                                "type" : "vibrantColorMatrix"
+                              }
+                            ],
+                            "frame" : [
+                              0,
+                              0,
+                              520,
+                              87
+                            ],
+                            "hidden" : false,
+                            "name" : "@2",
+                            "opacity" : 1,
+                            "sdf" : {
+                              "cornerCurve" : "circular",
+                              "cornerRadius" : 0,
+                              "smoothness" : 8
+                            },
+                            "sublayers" : [
+                              {
+                                "class" : "SDFPortalLayer",
+                                "frame" : [
+                                  0,
+                                  0,
+                                  0,
+                                  0
+                                ],
+                                "hidden" : false,
+                                "name" : "",
+                                "opacity" : 1,
+                                "sdf" : {
+                                  "cornerCurve" : "circular",
+                                  "cornerRadius" : 0
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "windowFrame" : [
+    40,
+    60,
+    1140,
+    520
+  ]
+}

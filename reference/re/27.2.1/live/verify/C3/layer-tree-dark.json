@@ -1,0 +1,1932 @@
+{
+"mode": "dark",
+"tint": 0,
+"note": "layer trees below the probe window content: [1] regular 160x64, [2] sidebar variant 17, [3] sidebar variant 18, last three = bare CAChameleonLayer patches",
+"layers": [
+{
+"class": "BackingLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+20,
+20,
+160,
+64
+],
+"name": "_TtCE6AppKitCSo17NSGlassEffectViewP33_92F0BB6107B916AA04C9A991F505A16412BackingLayer: NSGlassEffectView",
+"sublayers": [
+{
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "contentHolderView",
+"sublayers": [
+{
+"class": "NSViewBackingLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "NSView",
+"view": "NSView"
+}
+],
+"view": "ContentHolderView"
+},
+{
+"allowsGroupOpacity": false,
+"class": "NSViewBackingLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "_TtGC6AppKit18_NSCoreHostingViewVES_CSo17NSGlassEffectViewP10$19ca35b508RootView_",
+"sublayers": [
+{
+"allowsGroupOpacity": false,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"sublayers": [
+{
+"allowsGroupOpacity": false,
+"class": "SDFLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"sublayers": [
+{
+"allowsGroupOpacity": false,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+0,
+0
+],
+"sublayers": [
+{
+"allowsGroupOpacity": false,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"backgroundColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceExtendedSRGB"
+},
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"cornerRadius": 20,
+"filters": [
+{
+"enabled": true,
+"inputs": {
+"inputBackdropAware": true,
+"inputColorMatrix": [
+0.3125,
+0,
+0,
+0,
+0.9375001192092896,
+0,
+0.3125,
+0,
+0,
+0.9375001192092896,
+0,
+0,
+0.3125,
+0,
+0.9375001192092896,
+0,
+0,
+0,
+0,
+0
+]
+},
+"name": "vibrantColorMatrix",
+"type": "vibrantColorMatrix"
+}
+],
+"frame": [
+0,
+0,
+160,
+64
+]
+},
+{
+"allowsGroupOpacity": false,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"cornerRadius": 20,
+"frame": [
+0,
+0,
+160,
+64
+],
+"masksToBounds": true,
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "CAPortalLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"sourceLayerRenderId": 0
+}
+]
+}
+]
+}
+]
+},
+{
+"allowsGroupOpacity": false,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"sublayers": [
+{
+"allowsGroupOpacity": false,
+"bleedAmount": 0,
+"class": "CABackdropLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"filters": [
+{
+"enabled": true,
+"inputs": {
+"inputBleedAmount": 22.4,
+"inputBleedBlurRadius": 0,
+"inputBleedColorMatrixBlack": 0.125,
+"inputBleedColorMatrixSaturation": 1,
+"inputBleedColorMatrixWhite": 0.5,
+"inputBleedDarkenBlend": false,
+"inputBleedDistance0": 1,
+"inputBleedDistance1": 0,
+"inputBleedHeight": 22.4,
+"inputBleedOpacity": 0,
+"inputBlurDistance0": -32,
+"inputBlurDistance1": -1,
+"inputBlurDistance2": 0,
+"inputBlurDistance3": 0,
+"inputBlurFillBlurRadius": 8,
+"inputBlurFillDarkenOpacity": 0.6749999523162842,
+"inputBlurFillLightenOpacity": 0,
+"inputBlurFillNormalOpacity": 0,
+"inputBlurOpacity0": 0,
+"inputBlurOpacity1": 0,
+"inputBlurOpacity2": 0.5,
+"inputBlurOpacity3": 1,
+"inputBlurRadius": 5,
+"inputClamp": 1.308310866355896,
+"inputClampPreserveHue": false,
+"inputFaceColorMatrixBlack": 0.125,
+"inputFaceColorMatrixFillColor": {
+"c": [
+0.1249999925494194,
+0.1249999925494194,
+0.1249999925494194,
+0
+],
+"cs": "kCGColorSpaceExtendedSRGB"
+},
+"inputFaceColorMatrixMaxLuma": 0.6000000238418579,
+"inputFaceColorMatrixMaxLumaSDR": 0.6000000238418579,
+"inputFaceColorMatrixSaturation": 1.2999999523162842,
+"inputFaceColorMatrixWhite": 1.125,
+"inputFaceOpacity": 1,
+"inputInnerRefractionAmount": -32,
+"inputInnerRefractionHeight": 16,
+"inputKeyFillHighlightAmount": 0.4,
+"inputKeyFillHighlightAngle": 1.5707963267948966,
+"inputKeyFillHighlightColorBias": -0.25,
+"inputKeyFillHighlightEffectOffset": -0.5,
+"inputKeyFillHighlightHeight": 0.5,
+"inputKeyFillHighlightSpread": 1.3089969389957472,
+"inputKeyFillHighlightSpreadSDR": 1.3089969389957472,
+"inputMaxHeadroom": 9999,
+"inputOuterRefractionAmount": 16,
+"inputOuterRefractionHeight": 16,
+"inputRefractionDistance0": -1,
+"inputRefractionDistance1": 0,
+"inputRefractionOpacity": 0.6000000238418579,
+"inputRingShadowBlurRadius": 5,
+"inputRingShadowMask": 1,
+"inputRingShadowOffset": 8,
+"inputRingShadowOpacity": 0.05999999865889549,
+"inputRingShadowStrokeWidth": 4,
+"inputSDRGradientDistance0": 0,
+"inputSDRGradientDistance1": 0,
+"inputSDRHoldingToneEnabled": false,
+"inputSDRHoldingToneWhite": 1,
+"inputSDRShadowOpacity": 0,
+"inputShadowAmount": 0,
+"inputShadowBlurRadius": 0,
+"inputShadowColorMatrixBlack": 0,
+"inputShadowColorMatrixFillColor": {
+"c": [
+0,
+0,
+0,
+0.30000001192092896
+],
+"cs": "kCGColorSpaceExtendedSRGB"
+},
+"inputShadowColorMatrixSaturation": 1,
+"inputShadowColorMatrixWhite": 1,
+"inputShadowDistanceOffset": 0,
+"inputShadowHeight": 0,
+"inputShadowOffset": [
+0,
+8
+],
+"inputShadowOpacity": 0.03999999910593033,
+"inputShadowRadius": 4,
+"inputShadowVibrancyContribution": 0,
+"inputSourceSublayerName": "@0"
+},
+"name": "glassBackground",
+"type": "glassBackground"
+}
+],
+"frame": [
+0,
+0,
+160,
+64
+],
+"groupName": "SwiftUI:19.00.0",
+"marginWidth": 16,
+"name": "@0",
+"scale": 0.5,
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "CASDFLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"effect": "<CASDFOutputEffect: 0x7cf6b1e060>",
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "@0",
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+0,
+0
+],
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "CASDFElementLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"cornerRadius": 20,
+"frame": [
+0,
+0,
+160,
+64
+]
+}
+]
+}
+]
+}
+],
+"tracksLuma": false,
+"usesGlobalGroupNamespace": false,
+"windowServerAware": true
+},
+{
+"allowsGroupOpacity": false,
+"class": "SDFPortalLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "@1",
+"sourceLayerRenderId": 162126343210843796
+},
+{
+"allowsGroupBlending": true,
+"allowsHitTesting": false,
+"class": "CASDFLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"effect": "<CASDFKeyFillHighlightEffect: 0x7cf69e0840>",
+"filters": [
+{
+"enabled": true,
+"inputs": {
+"inputClamp": 1,
+"inputColorMatrix": [
+1.1201999187469482,
+-0.18940000236034393,
+-0.01899999938905239,
+0,
+0.14710000157356262,
+-0.056299999356269836,
+0.9870999455451965,
+-0.019099999219179153,
+0,
+0.14710000157356262,
+-0.056299999356269836,
+-0.18930000066757202,
+1.1574000120162964,
+0,
+0.14710000157356262,
+0,
+0,
+0,
+1,
+0
+]
+},
+"name": "vibrantColorMatrix",
+"type": "vibrantColorMatrix"
+}
+],
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "@2",
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "SDFPortalLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+0,
+0
+],
+"sourceLayerRenderId": 162126343210845076
+}
+]
+}
+]
+}
+]
+}
+]
+}
+],
+"view": "_NSCoreHostingView<RootView>"
+}
+],
+"view": "NSGlassEffectView"
+},
+{
+"class": "BackingLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+200,
+20,
+160,
+64
+],
+"name": "_TtCE6AppKitCSo17NSGlassEffectViewP33_92F0BB6107B916AA04C9A991F505A16412BackingLayer: NSGlassEffectView",
+"sublayers": [
+{
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "contentHolderView",
+"sublayers": [
+{
+"class": "NSViewBackingLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "NSView",
+"view": "NSView"
+}
+],
+"view": "ContentHolderView"
+},
+{
+"allowsGroupOpacity": false,
+"class": "NSViewBackingLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "_TtGC6AppKit18_NSCoreHostingViewVES_CSo17NSGlassEffectViewP10$19ca35b508RootView_",
+"sublayers": [
+{
+"allowsGroupOpacity": false,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"sublayers": [
+{
+"allowsGroupOpacity": false,
+"class": "SDFLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"sublayers": [
+{
+"allowsGroupOpacity": false,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+0,
+0
+],
+"sublayers": [
+{
+"allowsGroupOpacity": false,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"backgroundColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceExtendedSRGB"
+},
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"cornerRadius": 20,
+"filters": [
+{
+"enabled": true,
+"inputs": {
+"inputBackdropAware": true,
+"inputColorMatrix": [
+0.3125,
+0,
+0,
+0,
+0.9375001192092896,
+0,
+0.3125,
+0,
+0,
+0.9375001192092896,
+0,
+0,
+0.3125,
+0,
+0.9375001192092896,
+0,
+0,
+0,
+0,
+0
+]
+},
+"name": "vibrantColorMatrix",
+"type": "vibrantColorMatrix"
+}
+],
+"frame": [
+0,
+0,
+160,
+64
+]
+},
+{
+"allowsGroupOpacity": false,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"cornerRadius": 20,
+"frame": [
+0,
+0,
+160,
+64
+],
+"masksToBounds": true,
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "CAPortalLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"sourceLayerRenderId": 0
+}
+]
+}
+]
+}
+]
+},
+{
+"allowsGroupOpacity": false,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"sublayers": [
+{
+"allowsGroupOpacity": false,
+"bleedAmount": 0,
+"class": "CABackdropLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"filters": [
+{
+"enabled": true,
+"inputs": {
+"inputBleedAmount": 22.4,
+"inputBleedBlurRadius": 0,
+"inputBleedColorMatrixBlack": 0.125,
+"inputBleedColorMatrixSaturation": 1,
+"inputBleedColorMatrixWhite": 0.5,
+"inputBleedDarkenBlend": false,
+"inputBleedDistance0": 1,
+"inputBleedDistance1": 0,
+"inputBleedHeight": 22.4,
+"inputBleedOpacity": 0,
+"inputBlurDistance0": -32,
+"inputBlurDistance1": -1,
+"inputBlurDistance2": 0,
+"inputBlurDistance3": 0,
+"inputBlurFillBlurRadius": 8,
+"inputBlurFillDarkenOpacity": 0.6749999523162842,
+"inputBlurFillLightenOpacity": 0,
+"inputBlurFillNormalOpacity": 0.25,
+"inputBlurOpacity0": 0,
+"inputBlurOpacity1": 0,
+"inputBlurOpacity2": 0.5,
+"inputBlurOpacity3": 1,
+"inputBlurRadius": 5,
+"inputClamp": 1.308310866355896,
+"inputClampPreserveHue": false,
+"inputFaceColorMatrixBlack": 0.125,
+"inputFaceColorMatrixFillColor": {
+"c": [
+0,
+0,
+0,
+0
+],
+"cs": "kCGColorSpaceExtendedSRGB"
+},
+"inputFaceColorMatrixMaxLuma": 0.6000000238418579,
+"inputFaceColorMatrixMaxLumaSDR": 0.6000000238418579,
+"inputFaceColorMatrixSaturation": 1.2999999523162842,
+"inputFaceColorMatrixWhite": 1.125,
+"inputFaceOpacity": 1,
+"inputInnerRefractionAmount": -32,
+"inputInnerRefractionHeight": 16,
+"inputKeyFillHighlightAmount": 0.4,
+"inputKeyFillHighlightAngle": 1.5707963267948966,
+"inputKeyFillHighlightColorBias": -0.25,
+"inputKeyFillHighlightEffectOffset": -0.5,
+"inputKeyFillHighlightHeight": 0.5,
+"inputKeyFillHighlightSpread": 1.3089969389957472,
+"inputKeyFillHighlightSpreadSDR": 1.3089969389957472,
+"inputMaxHeadroom": 9999,
+"inputOuterRefractionAmount": 16,
+"inputOuterRefractionHeight": 16,
+"inputRefractionDistance0": -1,
+"inputRefractionDistance1": 0,
+"inputRefractionOpacity": 0.6000000238418579,
+"inputRingShadowBlurRadius": 5,
+"inputRingShadowMask": 1,
+"inputRingShadowOffset": 8,
+"inputRingShadowOpacity": 0.05999999865889549,
+"inputRingShadowStrokeWidth": 4,
+"inputSDRGradientDistance0": 0,
+"inputSDRGradientDistance1": 0,
+"inputSDRHoldingToneEnabled": false,
+"inputSDRHoldingToneWhite": 1,
+"inputSDRShadowOpacity": 0,
+"inputShadowAmount": 0,
+"inputShadowBlurRadius": 0,
+"inputShadowColorMatrixBlack": 0,
+"inputShadowColorMatrixFillColor": {
+"c": [
+0,
+0,
+0,
+0.30000001192092896
+],
+"cs": "kCGColorSpaceExtendedSRGB"
+},
+"inputShadowColorMatrixSaturation": 1,
+"inputShadowColorMatrixWhite": 1,
+"inputShadowDistanceOffset": 0,
+"inputShadowHeight": 0,
+"inputShadowOffset": [
+0,
+8
+],
+"inputShadowOpacity": 0.03999999910593033,
+"inputShadowRadius": 4,
+"inputShadowVibrancyContribution": 0,
+"inputSourceSublayerName": "@0"
+},
+"name": "glassBackground",
+"type": "glassBackground"
+}
+],
+"frame": [
+0,
+0,
+160,
+64
+],
+"groupName": "SwiftUI:39.00.0",
+"marginWidth": 16,
+"name": "@0",
+"scale": 0.5,
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "CASDFLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"effect": "<CASDFOutputEffect: 0x7cf6b1e3e0>",
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "@0",
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+0,
+0
+],
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "CASDFElementLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"cornerRadius": 20,
+"frame": [
+0,
+0,
+160,
+64
+]
+}
+]
+}
+]
+}
+],
+"tracksLuma": false,
+"usesGlobalGroupNamespace": false,
+"windowServerAware": true
+},
+{
+"allowsGroupBlending": true,
+"allowsHitTesting": false,
+"class": "CAChameleonLayer",
+"compositingFilter": "colorBlendMode",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "@1",
+"opacity": 0.10000000149011612
+},
+{
+"allowsGroupOpacity": false,
+"class": "SDFPortalLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "@2",
+"sourceLayerRenderId": 162126343210848596
+},
+{
+"allowsGroupBlending": true,
+"allowsHitTesting": false,
+"class": "CASDFLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"effect": "<CASDFKeyFillHighlightEffect: 0x7cf69e09c0>",
+"filters": [
+{
+"enabled": true,
+"inputs": {
+"inputClamp": 1,
+"inputColorMatrix": [
+1.1201999187469482,
+-0.18940000236034393,
+-0.01899999938905239,
+0,
+0.14710000157356262,
+-0.056299999356269836,
+0.9870999455451965,
+-0.019099999219179153,
+0,
+0.14710000157356262,
+-0.056299999356269836,
+-0.18930000066757202,
+1.1574000120162964,
+0,
+0.14710000157356262,
+0,
+0,
+0,
+1,
+0
+]
+},
+"name": "vibrantColorMatrix",
+"type": "vibrantColorMatrix"
+}
+],
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "@3",
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "SDFPortalLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+0,
+0
+],
+"sourceLayerRenderId": 162126343210849876
+}
+]
+}
+]
+}
+]
+}
+]
+}
+],
+"view": "_NSCoreHostingView<RootView>"
+}
+],
+"view": "NSGlassEffectView"
+},
+{
+"class": "BackingLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+380,
+20,
+160,
+64
+],
+"name": "_TtCE6AppKitCSo17NSGlassEffectViewP33_92F0BB6107B916AA04C9A991F505A16412BackingLayer: NSGlassEffectView",
+"sublayers": [
+{
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "contentHolderView",
+"sublayers": [
+{
+"class": "NSViewBackingLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "NSView",
+"view": "NSView"
+}
+],
+"view": "ContentHolderView"
+},
+{
+"allowsGroupOpacity": false,
+"class": "NSViewBackingLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "_TtGC6AppKit18_NSCoreHostingViewVES_CSo17NSGlassEffectViewP10$19ca35b508RootView_",
+"sublayers": [
+{
+"allowsGroupOpacity": false,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"sublayers": [
+{
+"allowsGroupOpacity": false,
+"class": "SDFLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"sublayers": [
+{
+"allowsGroupOpacity": false,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+0,
+0
+],
+"sublayers": [
+{
+"allowsGroupOpacity": false,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"backgroundColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceExtendedSRGB"
+},
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"cornerRadius": 20,
+"filters": [
+{
+"enabled": true,
+"inputs": {
+"inputBackdropAware": true,
+"inputColorMatrix": [
+0.3125,
+0,
+0,
+0,
+0.9375001192092896,
+0,
+0.3125,
+0,
+0,
+0.9375001192092896,
+0,
+0,
+0.3125,
+0,
+0.9375001192092896,
+0,
+0,
+0,
+0,
+0
+]
+},
+"name": "vibrantColorMatrix",
+"type": "vibrantColorMatrix"
+}
+],
+"frame": [
+0,
+0,
+160,
+64
+]
+},
+{
+"allowsGroupOpacity": false,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"cornerRadius": 20,
+"frame": [
+0,
+0,
+160,
+64
+],
+"masksToBounds": true,
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "CAPortalLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"sourceLayerRenderId": 0
+}
+]
+}
+]
+}
+]
+},
+{
+"allowsGroupOpacity": false,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"sublayers": [
+{
+"allowsGroupOpacity": false,
+"bleedAmount": 0,
+"class": "CABackdropLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"filters": [
+{
+"enabled": true,
+"inputs": {
+"inputBleedAmount": 22.4,
+"inputBleedBlurRadius": 0,
+"inputBleedColorMatrixBlack": 0.10000000149011612,
+"inputBleedColorMatrixSaturation": 1.5,
+"inputBleedColorMatrixWhite": 0.5,
+"inputBleedDarkenBlend": false,
+"inputBleedDistance0": 1,
+"inputBleedDistance1": 0,
+"inputBleedHeight": 22.4,
+"inputBleedOpacity": 0,
+"inputBlurDistance0": -32,
+"inputBlurDistance1": -1,
+"inputBlurDistance2": 0,
+"inputBlurDistance3": 0,
+"inputBlurFillBlurRadius": 8,
+"inputBlurFillDarkenOpacity": 0.6749999523162842,
+"inputBlurFillLightenOpacity": 0,
+"inputBlurFillNormalOpacity": 0.25,
+"inputBlurOpacity0": 0,
+"inputBlurOpacity1": 0,
+"inputBlurOpacity2": 0.5,
+"inputBlurOpacity3": 1,
+"inputBlurRadius": 5,
+"inputClamp": 1,
+"inputClampPreserveHue": false,
+"inputFaceColorMatrixBlack": 0.10000000149011612,
+"inputFaceColorMatrixFillColor": {
+"c": [
+0,
+0,
+0,
+0
+],
+"cs": "kCGColorSpaceExtendedSRGB"
+},
+"inputFaceColorMatrixMaxLuma": 1,
+"inputFaceColorMatrixMaxLumaSDR": 1,
+"inputFaceColorMatrixSaturation": 0.6000000238418579,
+"inputFaceColorMatrixWhite": 0.5,
+"inputFaceOpacity": 1,
+"inputInnerRefractionAmount": -32,
+"inputInnerRefractionHeight": 16,
+"inputKeyFillHighlightAmount": 0.4,
+"inputKeyFillHighlightAngle": 1.5707963267948966,
+"inputKeyFillHighlightColorBias": -0.25,
+"inputKeyFillHighlightEffectOffset": -0.5,
+"inputKeyFillHighlightHeight": 0,
+"inputKeyFillHighlightSpread": 1.3089969389957472,
+"inputKeyFillHighlightSpreadSDR": 1.3089969389957472,
+"inputMaxHeadroom": 9999,
+"inputOuterRefractionAmount": 16,
+"inputOuterRefractionHeight": 16,
+"inputRefractionDistance0": -1,
+"inputRefractionDistance1": 0,
+"inputRefractionOpacity": 0,
+"inputRingShadowBlurRadius": 5,
+"inputRingShadowMask": 1,
+"inputRingShadowOffset": 8,
+"inputRingShadowOpacity": 0,
+"inputRingShadowStrokeWidth": 4,
+"inputSDRGradientDistance0": 0,
+"inputSDRGradientDistance1": 0,
+"inputSDRHoldingToneEnabled": false,
+"inputSDRHoldingToneWhite": 1,
+"inputSDRShadowOpacity": 0,
+"inputShadowAmount": 0,
+"inputShadowBlurRadius": 0,
+"inputShadowColorMatrixBlack": 0,
+"inputShadowColorMatrixFillColor": {
+"c": [
+0,
+0,
+0,
+0.30000001192092896
+],
+"cs": "kCGColorSpaceExtendedSRGB"
+},
+"inputShadowColorMatrixSaturation": 1,
+"inputShadowColorMatrixWhite": 1,
+"inputShadowDistanceOffset": 0,
+"inputShadowHeight": 0,
+"inputShadowOffset": [
+1,
+0
+],
+"inputShadowOpacity": 0,
+"inputShadowRadius": 0,
+"inputShadowVibrancyContribution": 0,
+"inputSourceSublayerName": "@0"
+},
+"name": "glassBackground",
+"type": "glassBackground"
+}
+],
+"frame": [
+0,
+0,
+160,
+64
+],
+"groupName": "SwiftUI:59.00.0",
+"marginWidth": 16,
+"name": "@0",
+"scale": 0.5,
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "CASDFLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"effect": "<CASDFOutputEffect: 0x7cf6b1e600>",
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "@0",
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "CALayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+0,
+0
+],
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "CASDFElementLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"cornerRadius": 20,
+"frame": [
+0,
+0,
+160,
+64
+]
+}
+]
+}
+]
+}
+],
+"tracksLuma": false,
+"usesGlobalGroupNamespace": false,
+"windowServerAware": true
+},
+{
+"allowsGroupBlending": true,
+"allowsHitTesting": false,
+"class": "CAChameleonLayer",
+"compositingFilter": "colorBlendMode",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "@1",
+"opacity": 0.10000000149011612
+},
+{
+"allowsGroupOpacity": false,
+"class": "SDFPortalLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "@2",
+"sourceLayerRenderId": 162126343212590484
+},
+{
+"allowsGroupBlending": true,
+"allowsHitTesting": false,
+"class": "CASDFLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"effect": "<CASDFKeyFillHighlightEffect: 0x7cf69e0b40>",
+"filters": [
+{
+"enabled": true,
+"inputs": {
+"inputClamp": 1,
+"inputColorMatrix": [
+1.1201999187469482,
+-0.18940000236034393,
+-0.01899999938905239,
+0,
+0.14710000157356262,
+-0.056299999356269836,
+0.9870999455451965,
+-0.019099999219179153,
+0,
+0.14710000157356262,
+-0.056299999356269836,
+-0.18930000066757202,
+1.1574000120162964,
+0,
+0.14710000157356262,
+0,
+0,
+0,
+1,
+0
+]
+},
+"name": "vibrantColorMatrix",
+"type": "vibrantColorMatrix"
+}
+],
+"frame": [
+0,
+0,
+160,
+64
+],
+"name": "@3",
+"opacity": 0,
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "SDFPortalLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+0,
+0
+],
+"sourceLayerRenderId": 162126343212591764
+}
+]
+}
+]
+}
+]
+}
+]
+}
+],
+"view": "_NSCoreHostingView<RootView>"
+}
+],
+"view": "NSGlassEffectView"
+},
+{
+"class": "NSViewBackingLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+1130,
+20,
+150,
+60
+],
+"name": "NSView",
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "CAChameleonLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+150,
+60
+]
+}
+],
+"view": "NSView"
+},
+{
+"class": "NSViewBackingLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+1130,
+100,
+150,
+60
+],
+"name": "NSView",
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "CAChameleonLayer",
+"compositingFilter": "colorBlendMode",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+150,
+60
+]
+}
+],
+"view": "NSView"
+},
+{
+"class": "NSViewBackingLayer",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+1130,
+180,
+150,
+60
+],
+"name": "NSView",
+"sublayers": [
+{
+"allowsGroupBlending": true,
+"class": "CAChameleonLayer",
+"compositingFilter": "colorBlendMode",
+"contentsMultiplyColor": {
+"c": [
+1,
+1,
+1,
+1
+],
+"cs": "kCGColorSpaceSRGB"
+},
+"frame": [
+0,
+0,
+150,
+60
+],
+"opacity": 0.10000000149011612
+}
+],
+"view": "NSView"
+}
+]
+}

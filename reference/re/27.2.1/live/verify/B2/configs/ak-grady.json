@@ -1,0 +1,36 @@
+{
+ "mode": "dark",
+ "views": [
+  {
+   "frame": [
+    60,
+    60,
+    633,
+    48
+   ],
+   "radius": 24,
+   "variant": 3
+  },
+  {
+   "frame": [
+    60,
+    180,
+    633,
+    48
+   ],
+   "radius": 24,
+   "variant": 0
+  }
+ ],
+ "dump": "$SCRATCH/b2/cap/ak-grady.json",
+ "pattern": "grady",
+ "origin": [
+  40,
+  60
+ ],
+ "size": [
+  760,
+  300
+ ],
+ "secs": 2.3
+}

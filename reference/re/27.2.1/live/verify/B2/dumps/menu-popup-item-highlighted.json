@@ -1,0 +1,3542 @@
+[
+  {
+    "class" : "NSPopupMenuWindow",
+    "frame" : [
+      160,
+      115,
+      195,
+      224
+    ],
+    "layers" : {
+      "class" : "NSViewBackingLayer",
+      "frame" : [
+        0,
+        0,
+        195,
+        224
+      ],
+      "hidden" : false,
+      "masksToBounds" : true,
+      "name" : "NSGlassContentFrameView",
+      "opacity" : 1,
+      "sublayers" : [
+        {
+          "backgroundColor" : {
+            "color" : [
+              0,
+              0
+            ],
+            "space" : "kCGColorSpaceGenericGrayGamma2_2"
+          },
+          "class" : "CUIWindowFrameLayer",
+          "frame" : [
+            0,
+            0,
+            195,
+            224
+          ],
+          "hidden" : false,
+          "name" : "CUIWindowFrameLayer",
+          "opacity" : 1,
+          "sublayers" : [
+            {
+              "class" : "CALayer",
+              "contents" : "__NSCFType",
+              "contentsMultiplyColor" : {
+                "color" : [
+                  1,
+                  1,
+                  1,
+                  1
+                ],
+                "space" : "kCGColorSpaceSRGB"
+              },
+              "frame" : [
+                0,
+                0,
+                195,
+                224
+              ],
+              "hidden" : false,
+              "name" : "CUIWindowOverlayLayer",
+              "opacity" : 0
+            }
+          ]
+        },
+        {
+          "class" : "NSViewBackingLayer",
+          "frame" : [
+            0,
+            0,
+            195,
+            224
+          ],
+          "hidden" : false,
+          "name" : "NSView",
+          "opacity" : 1,
+          "sublayers" : [
+            {
+              "class" : "NSViewBackingLayer",
+              "frame" : [
+                0,
+                0,
+                195,
+                224
+              ],
+              "hidden" : false,
+              "name" : "NSMenuScrollView",
+              "opacity" : 1,
+              "sublayers" : [
+                {
+                  "backdrop" : {
+                    "captureOnly" : true,
+                    "groupName" : "backgroundGroup-0x0000007c2d828600",
+                    "marginWidth" : 0,
+                    "scale" : 0.5,
+                    "zoom" : 0
+                  },
+                  "class" : "CABackdropLayer",
+                  "frame" : [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "hidden" : false,
+                  "masksToBounds" : true,
+                  "name" : "CABackdropLayer: _TtCC6AppKit14NSScrollPocketP33_EC3F85FAB7755D56E669206D2B17725B12BackdropView",
+                  "opacity" : 1
+                },
+                {
+                  "class" : "NSViewBackingLayer",
+                  "frame" : [
+                    0,
+                    0,
+                    195,
+                    224
+                  ],
+                  "hidden" : false,
+                  "masksToBounds" : true,
+                  "name" : "NSClipView",
+                  "opacity" : 1,
+                  "sublayers" : [
+                    {
+                      "backgroundColor" : {
+                        "color" : [
+                          0,
+                          0
+                        ],
+                        "space" : "kCGColorSpaceGenericGrayGamma2_2"
+                      },
+                      "class" : "NSViewBackingLayer",
+                      "frame" : [
+                        0,
+                        0,
+                        195,
+                        224
+                      ],
+                      "hidden" : false,
+                      "name" : "NSTableViewBackedMenuRepresentation",
+                      "opacity" : 1,
+                      "sublayers" : [
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "frame" : [
+                            5,
+                            5,
+                            185,
+                            24
+                          ],
+                          "hidden" : false,
+                          "masksToBounds" : true,
+                          "name" : "NSRootMenuWindowBackgroundView",
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "backgroundColor" : {
+                                "color" : [
+                                  0,
+                                  0.47843137254901963,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceSRGB"
+                              },
+                              "class" : "CALayer",
+                              "cornerCurve" : "continuous",
+                              "cornerRadius" : 7,
+                              "frame" : [
+                                0,
+                                0,
+                                185,
+                                24
+                              ],
+                              "hidden" : false,
+                              "name" : "",
+                              "opacity" : 1
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "frame" : [
+                            0,
+                            5,
+                            195,
+                            24
+                          ],
+                          "hidden" : false,
+                          "masksToBounds" : true,
+                          "name" : "NSTableRowView",
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "backgroundColor" : {
+                                "color" : [
+                                  0,
+                                  0
+                                ],
+                                "space" : "kCGColorSpaceGenericGrayGamma2_2"
+                              },
+                              "class" : "CALayer",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "hidden" : false,
+                              "name" : "",
+                              "opacity" : 1
+                            },
+                            {
+                              "class" : "NSViewBackingLayer",
+                              "contents" : "NSViewBackingLayerContents",
+                              "contentsMultiplyColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceSRGB"
+                              },
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "hidden" : false,
+                              "name" : "NSContextMenuItemView",
+                              "opacity" : 1,
+                              "sublayers" : [
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    14,
+                                    4,
+                                    133,
+                                    16
+                                  ],
+                                  "hidden" : false,
+                                  "name" : "_NSMenuItemTextField",
+                                  "opacity" : 1,
+                                  "sublayers" : [
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "contents" : "NSViewBackingLayerContents",
+                                      "contentsMultiplyColor" : {
+                                        "color" : [
+                                          1,
+                                          1,
+                                          1,
+                                          1
+                                        ],
+                                        "space" : "kCGColorSpaceSRGB"
+                                      },
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        133,
+                                        16
+                                      ],
+                                      "hidden" : false,
+                                      "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                      "opacity" : 1,
+                                      "sublayers" : [
+                                        {
+                                          "class" : "ContentLayer",
+                                          "contents" : "__NSCFType",
+                                          "contentsMultiplyColor" : {
+                                            "color" : [
+                                              1,
+                                              1,
+                                              1,
+                                              1
+                                            ],
+                                            "space" : "kCGColorSpaceSRGB"
+                                          },
+                                          "frame" : [
+                                            -11.5,
+                                            -4,
+                                            119.5,
+                                            24
+                                          ],
+                                          "hidden" : false,
+                                          "masksToBounds" : true,
+                                          "name" : "",
+                                          "opacity" : 1
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    164,
+                                    4,
+                                    18,
+                                    16
+                                  ],
+                                  "hidden" : false,
+                                  "name" : "_NSMenuItemTextField",
+                                  "opacity" : 1,
+                                  "sublayers" : [
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "contents" : "NSViewBackingLayerContents",
+                                      "contentsMultiplyColor" : {
+                                        "color" : [
+                                          1,
+                                          1,
+                                          1,
+                                          1
+                                        ],
+                                        "space" : "kCGColorSpaceSRGB"
+                                      },
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        18,
+                                        16
+                                      ],
+                                      "hidden" : false,
+                                      "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                      "opacity" : 1,
+                                      "sublayers" : [
+                                        {
+                                          "class" : "ContentLayer",
+                                          "contents" : "__NSCFType",
+                                          "contentsMultiplyColor" : {
+                                            "color" : [
+                                              1,
+                                              1,
+                                              1,
+                                              1
+                                            ],
+                                            "space" : "kCGColorSpaceSRGB"
+                                          },
+                                          "frame" : [
+                                            -15,
+                                            -4,
+                                            45.5,
+                                            24
+                                          ],
+                                          "hidden" : false,
+                                          "masksToBounds" : true,
+                                          "name" : "",
+                                          "opacity" : 1
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    151,
+                                    4,
+                                    21,
+                                    16
+                                  ],
+                                  "hidden" : false,
+                                  "name" : "_NSMenuItemTextField",
+                                  "opacity" : 1,
+                                  "sublayers" : [
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "contents" : "NSViewBackingLayerContents",
+                                      "contentsMultiplyColor" : {
+                                        "color" : [
+                                          1,
+                                          1,
+                                          1,
+                                          1
+                                        ],
+                                        "space" : "kCGColorSpaceSRGB"
+                                      },
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        21,
+                                        16
+                                      ],
+                                      "hidden" : false,
+                                      "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                      "opacity" : 1,
+                                      "sublayers" : [
+                                        {
+                                          "class" : "ContentLayer",
+                                          "contents" : "__NSCFType",
+                                          "contentsMultiplyColor" : {
+                                            "color" : [
+                                              1,
+                                              1,
+                                              1,
+                                              1
+                                            ],
+                                            "space" : "kCGColorSpaceSRGB"
+                                          },
+                                          "frame" : [
+                                            -15,
+                                            -4,
+                                            45.5,
+                                            24
+                                          ],
+                                          "hidden" : false,
+                                          "masksToBounds" : true,
+                                          "name" : "",
+                                          "opacity" : 1
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "frame" : [
+                            0,
+                            29,
+                            195,
+                            24
+                          ],
+                          "hidden" : false,
+                          "masksToBounds" : true,
+                          "name" : "NSTableRowView",
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "backgroundColor" : {
+                                "color" : [
+                                  0,
+                                  0
+                                ],
+                                "space" : "kCGColorSpaceGenericGrayGamma2_2"
+                              },
+                              "class" : "CALayer",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "hidden" : false,
+                              "name" : "",
+                              "opacity" : 1
+                            },
+                            {
+                              "class" : "NSViewBackingLayer",
+                              "contents" : "NSViewBackingLayerContents",
+                              "contentsMultiplyColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceSRGB"
+                              },
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "hidden" : false,
+                              "name" : "NSContextMenuItemView",
+                              "opacity" : 1,
+                              "sublayers" : [
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    14,
+                                    4,
+                                    133,
+                                    16
+                                  ],
+                                  "hidden" : false,
+                                  "name" : "_NSMenuItemTextField",
+                                  "opacity" : 1,
+                                  "sublayers" : [
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "contents" : "NSViewBackingLayerContents",
+                                      "contentsMultiplyColor" : {
+                                        "color" : [
+                                          1,
+                                          1,
+                                          1,
+                                          1
+                                        ],
+                                        "space" : "kCGColorSpaceSRGB"
+                                      },
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        133,
+                                        16
+                                      ],
+                                      "hidden" : false,
+                                      "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                      "opacity" : 1,
+                                      "sublayers" : [
+                                        {
+                                          "class" : "ContentLayer",
+                                          "contents" : "__NSCFType",
+                                          "contentsMultiplyColor" : {
+                                            "color" : [
+                                              1,
+                                              1,
+                                              1,
+                                              1
+                                            ],
+                                            "space" : "kCGColorSpaceSRGB"
+                                          },
+                                          "frame" : [
+                                            -11.5,
+                                            -4,
+                                            83.5,
+                                            24
+                                          ],
+                                          "hidden" : false,
+                                          "masksToBounds" : true,
+                                          "name" : "",
+                                          "opacity" : 1
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "frame" : [
+                            0,
+                            53,
+                            195,
+                            24
+                          ],
+                          "hidden" : false,
+                          "masksToBounds" : true,
+                          "name" : "NSTableRowView",
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "backgroundColor" : {
+                                "color" : [
+                                  0,
+                                  0
+                                ],
+                                "space" : "kCGColorSpaceGenericGrayGamma2_2"
+                              },
+                              "class" : "CALayer",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "hidden" : false,
+                              "name" : "",
+                              "opacity" : 1
+                            },
+                            {
+                              "class" : "NSViewBackingLayer",
+                              "contents" : "NSViewBackingLayerContents",
+                              "contentsMultiplyColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceSRGB"
+                              },
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "hidden" : false,
+                              "name" : "NSContextMenuItemView",
+                              "opacity" : 1,
+                              "sublayers" : [
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    14,
+                                    4,
+                                    133,
+                                    16
+                                  ],
+                                  "hidden" : false,
+                                  "name" : "_NSMenuItemTextField",
+                                  "opacity" : 1,
+                                  "sublayers" : [
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "contents" : "NSViewBackingLayerContents",
+                                      "contentsMultiplyColor" : {
+                                        "color" : [
+                                          1,
+                                          1,
+                                          1,
+                                          1
+                                        ],
+                                        "space" : "kCGColorSpaceSRGB"
+                                      },
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        133,
+                                        16
+                                      ],
+                                      "hidden" : false,
+                                      "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                      "opacity" : 1,
+                                      "sublayers" : [
+                                        {
+                                          "class" : "ContentLayer",
+                                          "contents" : "__NSCFType",
+                                          "contentsMultiplyColor" : {
+                                            "color" : [
+                                              1,
+                                              1,
+                                              1,
+                                              1
+                                            ],
+                                            "space" : "kCGColorSpaceSRGB"
+                                          },
+                                          "frame" : [
+                                            -11.5,
+                                            -4,
+                                            77.5,
+                                            24
+                                          ],
+                                          "hidden" : false,
+                                          "masksToBounds" : true,
+                                          "name" : "",
+                                          "opacity" : 1
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "frame" : [
+                            0,
+                            77,
+                            195,
+                            11
+                          ],
+                          "hidden" : false,
+                          "masksToBounds" : true,
+                          "name" : "NSTableRowView",
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "backgroundColor" : {
+                                "color" : [
+                                  0,
+                                  0
+                                ],
+                                "space" : "kCGColorSpaceGenericGrayGamma2_2"
+                              },
+                              "class" : "CALayer",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                11
+                              ],
+                              "hidden" : false,
+                              "name" : "",
+                              "opacity" : 1
+                            },
+                            {
+                              "class" : "NSViewBackingLayer",
+                              "contents" : "NSViewBackingLayerContents",
+                              "contentsMultiplyColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceSRGB"
+                              },
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                11
+                              ],
+                              "hidden" : false,
+                              "name" : "NSContextMenuItemView",
+                              "opacity" : 1,
+                              "sublayers" : [
+                                {
+                                  "class" : "ContentLayer",
+                                  "contents" : "CATintedImage",
+                                  "contentsMultiplyColor" : {
+                                    "color" : [
+                                      1,
+                                      1,
+                                      1,
+                                      1
+                                    ],
+                                    "space" : "kCGColorSpaceSRGB"
+                                  },
+                                  "frame" : [
+                                    16,
+                                    5,
+                                    163,
+                                    1
+                                  ],
+                                  "hidden" : false,
+                                  "masksToBounds" : true,
+                                  "name" : "",
+                                  "opacity" : 1
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "frame" : [
+                            0,
+                            88,
+                            195,
+                            24
+                          ],
+                          "hidden" : false,
+                          "masksToBounds" : true,
+                          "name" : "NSTableRowView",
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "backgroundColor" : {
+                                "color" : [
+                                  0,
+                                  0
+                                ],
+                                "space" : "kCGColorSpaceGenericGrayGamma2_2"
+                              },
+                              "class" : "CALayer",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "hidden" : false,
+                              "name" : "",
+                              "opacity" : 1
+                            },
+                            {
+                              "class" : "NSViewBackingLayer",
+                              "contents" : "NSViewBackingLayerContents",
+                              "contentsMultiplyColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceSRGB"
+                              },
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "hidden" : false,
+                              "name" : "NSContextMenuItemView",
+                              "opacity" : 1,
+                              "sublayers" : [
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    14,
+                                    4,
+                                    133,
+                                    16
+                                  ],
+                                  "hidden" : false,
+                                  "name" : "_NSMenuItemTextField",
+                                  "opacity" : 1,
+                                  "sublayers" : [
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "contents" : "NSViewBackingLayerContents",
+                                      "contentsMultiplyColor" : {
+                                        "color" : [
+                                          1,
+                                          1,
+                                          1,
+                                          1
+                                        ],
+                                        "space" : "kCGColorSpaceSRGB"
+                                      },
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        133,
+                                        16
+                                      ],
+                                      "hidden" : false,
+                                      "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                      "opacity" : 1,
+                                      "sublayers" : [
+                                        {
+                                          "class" : "ContentLayer",
+                                          "contents" : "__NSCFType",
+                                          "contentsMultiplyColor" : {
+                                            "color" : [
+                                              1,
+                                              1,
+                                              1,
+                                              1
+                                            ],
+                                            "space" : "kCGColorSpaceSRGB"
+                                          },
+                                          "frame" : [
+                                            -11.5,
+                                            -4,
+                                            91.5,
+                                            24
+                                          ],
+                                          "hidden" : false,
+                                          "masksToBounds" : true,
+                                          "name" : "",
+                                          "opacity" : 1
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "frame" : [
+                            0,
+                            112,
+                            195,
+                            24
+                          ],
+                          "hidden" : false,
+                          "masksToBounds" : true,
+                          "name" : "NSTableRowView",
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "backgroundColor" : {
+                                "color" : [
+                                  0,
+                                  0
+                                ],
+                                "space" : "kCGColorSpaceGenericGrayGamma2_2"
+                              },
+                              "class" : "CALayer",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "hidden" : false,
+                              "name" : "",
+                              "opacity" : 1
+                            },
+                            {
+                              "class" : "NSViewBackingLayer",
+                              "contents" : "NSViewBackingLayerContents",
+                              "contentsMultiplyColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceSRGB"
+                              },
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "hidden" : false,
+                              "name" : "NSContextMenuItemView",
+                              "opacity" : 1,
+                              "sublayers" : [
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    14,
+                                    4,
+                                    133,
+                                    16
+                                  ],
+                                  "hidden" : false,
+                                  "name" : "_NSMenuItemTextField",
+                                  "opacity" : 1,
+                                  "sublayers" : [
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "contents" : "NSViewBackingLayerContents",
+                                      "contentsMultiplyColor" : {
+                                        "color" : [
+                                          1,
+                                          1,
+                                          1,
+                                          1
+                                        ],
+                                        "space" : "kCGColorSpaceSRGB"
+                                      },
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        133,
+                                        16
+                                      ],
+                                      "hidden" : false,
+                                      "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                      "opacity" : 1,
+                                      "sublayers" : [
+                                        {
+                                          "class" : "ContentLayer",
+                                          "contents" : "__NSCFType",
+                                          "contentsMultiplyColor" : {
+                                            "color" : [
+                                              1,
+                                              1,
+                                              1,
+                                              1
+                                            ],
+                                            "space" : "kCGColorSpaceSRGB"
+                                          },
+                                          "frame" : [
+                                            -11.5,
+                                            -4,
+                                            92,
+                                            24
+                                          ],
+                                          "hidden" : false,
+                                          "masksToBounds" : true,
+                                          "name" : "",
+                                          "opacity" : 1
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "frame" : [
+                            0,
+                            136,
+                            195,
+                            24
+                          ],
+                          "hidden" : false,
+                          "masksToBounds" : true,
+                          "name" : "NSTableRowView",
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "backgroundColor" : {
+                                "color" : [
+                                  0,
+                                  0
+                                ],
+                                "space" : "kCGColorSpaceGenericGrayGamma2_2"
+                              },
+                              "class" : "CALayer",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "hidden" : false,
+                              "name" : "",
+                              "opacity" : 1
+                            },
+                            {
+                              "class" : "NSViewBackingLayer",
+                              "contents" : "NSViewBackingLayerContents",
+                              "contentsMultiplyColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceSRGB"
+                              },
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "hidden" : false,
+                              "name" : "NSContextMenuItemView",
+                              "opacity" : 1,
+                              "sublayers" : [
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    14,
+                                    4,
+                                    133,
+                                    16
+                                  ],
+                                  "hidden" : false,
+                                  "name" : "_NSMenuItemTextField",
+                                  "opacity" : 1,
+                                  "sublayers" : [
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "contents" : "NSViewBackingLayerContents",
+                                      "contentsMultiplyColor" : {
+                                        "color" : [
+                                          1,
+                                          1,
+                                          1,
+                                          1
+                                        ],
+                                        "space" : "kCGColorSpaceSRGB"
+                                      },
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        133,
+                                        16
+                                      ],
+                                      "hidden" : false,
+                                      "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                      "opacity" : 1,
+                                      "sublayers" : [
+                                        {
+                                          "class" : "ContentLayer",
+                                          "contents" : "__NSCFType",
+                                          "contentsMultiplyColor" : {
+                                            "color" : [
+                                              1,
+                                              1,
+                                              1,
+                                              1
+                                            ],
+                                            "space" : "kCGColorSpaceSRGB"
+                                          },
+                                          "frame" : [
+                                            -11.5,
+                                            -4,
+                                            100.5,
+                                            24
+                                          ],
+                                          "hidden" : false,
+                                          "masksToBounds" : true,
+                                          "name" : "",
+                                          "opacity" : 1
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "frame" : [
+                            0,
+                            160,
+                            195,
+                            11
+                          ],
+                          "hidden" : false,
+                          "masksToBounds" : true,
+                          "name" : "NSTableRowView",
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "backgroundColor" : {
+                                "color" : [
+                                  0,
+                                  0
+                                ],
+                                "space" : "kCGColorSpaceGenericGrayGamma2_2"
+                              },
+                              "class" : "CALayer",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                11
+                              ],
+                              "hidden" : false,
+                              "name" : "",
+                              "opacity" : 1
+                            },
+                            {
+                              "class" : "NSViewBackingLayer",
+                              "contents" : "NSViewBackingLayerContents",
+                              "contentsMultiplyColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceSRGB"
+                              },
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                11
+                              ],
+                              "hidden" : false,
+                              "name" : "NSContextMenuItemView",
+                              "opacity" : 1,
+                              "sublayers" : [
+                                {
+                                  "class" : "ContentLayer",
+                                  "contents" : "CATintedImage",
+                                  "contentsMultiplyColor" : {
+                                    "color" : [
+                                      1,
+                                      1,
+                                      1,
+                                      1
+                                    ],
+                                    "space" : "kCGColorSpaceSRGB"
+                                  },
+                                  "frame" : [
+                                    16,
+                                    5,
+                                    163,
+                                    1
+                                  ],
+                                  "hidden" : false,
+                                  "masksToBounds" : true,
+                                  "name" : "",
+                                  "opacity" : 1
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "frame" : [
+                            0,
+                            171,
+                            195,
+                            24
+                          ],
+                          "hidden" : false,
+                          "masksToBounds" : true,
+                          "name" : "NSTableRowView",
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "backgroundColor" : {
+                                "color" : [
+                                  0,
+                                  0
+                                ],
+                                "space" : "kCGColorSpaceGenericGrayGamma2_2"
+                              },
+                              "class" : "CALayer",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "hidden" : false,
+                              "name" : "",
+                              "opacity" : 1
+                            },
+                            {
+                              "class" : "NSViewBackingLayer",
+                              "contents" : "NSViewBackingLayerContents",
+                              "contentsMultiplyColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceSRGB"
+                              },
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "hidden" : false,
+                              "name" : "NSContextMenuItemView",
+                              "opacity" : 1,
+                              "sublayers" : [
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    14,
+                                    4,
+                                    133,
+                                    16
+                                  ],
+                                  "hidden" : false,
+                                  "name" : "_NSMenuItemTextField",
+                                  "opacity" : 1,
+                                  "sublayers" : [
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "contents" : "NSViewBackingLayerContents",
+                                      "contentsMultiplyColor" : {
+                                        "color" : [
+                                          1,
+                                          1,
+                                          1,
+                                          1
+                                        ],
+                                        "space" : "kCGColorSpaceSRGB"
+                                      },
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        133,
+                                        16
+                                      ],
+                                      "hidden" : false,
+                                      "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                      "opacity" : 1,
+                                      "sublayers" : [
+                                        {
+                                          "class" : "ContentLayer",
+                                          "contents" : "__NSCFType",
+                                          "contentsMultiplyColor" : {
+                                            "color" : [
+                                              1,
+                                              1,
+                                              1,
+                                              1
+                                            ],
+                                            "space" : "kCGColorSpaceSRGB"
+                                          },
+                                          "frame" : [
+                                            -11.5,
+                                            -4,
+                                            88.5,
+                                            24
+                                          ],
+                                          "hidden" : false,
+                                          "masksToBounds" : true,
+                                          "name" : "",
+                                          "opacity" : 1
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "frame" : [
+                            0,
+                            195,
+                            195,
+                            24
+                          ],
+                          "hidden" : false,
+                          "masksToBounds" : true,
+                          "name" : "NSTableRowView",
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "backgroundColor" : {
+                                "color" : [
+                                  0,
+                                  0
+                                ],
+                                "space" : "kCGColorSpaceGenericGrayGamma2_2"
+                              },
+                              "class" : "CALayer",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "hidden" : false,
+                              "name" : "",
+                              "opacity" : 1
+                            },
+                            {
+                              "class" : "NSViewBackingLayer",
+                              "contents" : "NSViewBackingLayerContents",
+                              "contentsMultiplyColor" : {
+                                "color" : [
+                                  1,
+                                  1,
+                                  1,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceSRGB"
+                              },
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "hidden" : false,
+                              "name" : "NSContextMenuItemView",
+                              "opacity" : 1,
+                              "sublayers" : [
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    14,
+                                    4,
+                                    133,
+                                    16
+                                  ],
+                                  "hidden" : false,
+                                  "name" : "_NSMenuItemTextField",
+                                  "opacity" : 1,
+                                  "sublayers" : [
+                                    {
+                                      "class" : "NSViewBackingLayer",
+                                      "contents" : "NSViewBackingLayerContents",
+                                      "contentsMultiplyColor" : {
+                                        "color" : [
+                                          1,
+                                          1,
+                                          1,
+                                          1
+                                        ],
+                                        "space" : "kCGColorSpaceSRGB"
+                                      },
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        133,
+                                        16
+                                      ],
+                                      "hidden" : false,
+                                      "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                                      "opacity" : 1,
+                                      "sublayers" : [
+                                        {
+                                          "class" : "ContentLayer",
+                                          "contents" : "__NSCFType",
+                                          "contentsMultiplyColor" : {
+                                            "color" : [
+                                              1,
+                                              1,
+                                              1,
+                                              1
+                                            ],
+                                            "space" : "kCGColorSpaceSRGB"
+                                          },
+                                          "frame" : [
+                                            -11.5,
+                                            -4,
+                                            161,
+                                            24
+                                          ],
+                                          "hidden" : false,
+                                          "masksToBounds" : true,
+                                          "name" : "",
+                                          "opacity" : 1
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "class" : "NSViewBackingLayer",
+                  "frame" : [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "hidden" : false,
+                  "name" : "NSScrollPocket",
+                  "opacity" : 1,
+                  "sublayers" : [
+                    {
+                      "class" : "CALayer",
+                      "frame" : [
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "hidden" : false,
+                      "name" : "v8",
+                      "opacity" : 0
+                    },
+                    {
+                      "class" : "NSViewBackingLayer",
+                      "frame" : [
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "hidden" : true,
+                      "name" : "PocketMask",
+                      "opacity" : 0,
+                      "sublayers" : [
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "filters" : [
+                            {
+                              "inputs" : {
+                                "inputDither" : true,
+                                "inputNormalizeEdges" : false,
+                                "inputRadius" : 20
+                              },
+                              "name" : "gaussianBlur",
+                              "type" : "gaussianBlur"
+                            }
+                          ],
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            0
+                          ],
+                          "hidden" : false,
+                          "name" : "BlurContainer",
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "backgroundColor" : {
+                                "color" : [
+                                  0,
+                                  1
+                                ],
+                                "space" : "kCGColorSpaceGenericGrayGamma2_2"
+                              },
+                              "class" : "NSViewBackingLayer",
+                              "frame" : [
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "hidden" : true,
+                              "name" : "ShapeView",
+                              "opacity" : 1
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "backdrop" : {
+                        "captureOnly" : false,
+                        "groupName" : null,
+                        "marginWidth" : 0,
+                        "scale" : 1,
+                        "zoom" : 0
+                      },
+                      "class" : "CABackdropLayer",
+                      "frame" : [
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "hidden" : true,
+                      "name" : "PocketBlur",
+                      "opacity" : 0,
+                      "sublayers" : [
+                        {
+                          "class" : "CAPortalLayer",
+                          "compositingFilter" : "destIn",
+                          "filters" : [
+                            {
+                              "inputs" : {
+                                "inputColorMatrix" : [
+                                  1,
+                                  0,
+                                  0,
+                                  0,
+                                  0,
+                                  0,
+                                  1,
+                                  0,
+                                  0,
+                                  0,
+                                  0,
+                                  0,
+                                  1,
+                                  0,
+                                  0,
+                                  0,
+                                  0,
+                                  0,
+                                  1.25,
+                                  -0.25
+                                ]
+                              },
+                              "name" : "colorMatrix",
+                              "type" : "colorMatrix"
+                            }
+                          ],
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            0
+                          ],
+                          "hidden" : false,
+                          "name" : "",
+                          "opacity" : 1
+                        }
+                      ]
+                    },
+                    {
+                      "class" : "NSViewBackingLayer",
+                      "frame" : [
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "hidden" : true,
+                      "name" : "NSHardPocketView",
+                      "opacity" : 1,
+                      "sublayers" : [
+                        {
+                          "class" : "CALayer",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            0
+                          ],
+                          "hidden" : false,
+                          "name" : "v8",
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "backdrop" : {
+                                "captureOnly" : false,
+                                "groupName" : "TitlebarGroup-0x7c2d167300",
+                                "marginWidth" : 0,
+                                "scale" : 0.25,
+                                "zoom" : 0
+                              },
+                              "class" : "CABackdropLayer",
+                              "filters" : [
+                                {
+                                  "inputs" : {
+                                    "inputDither" : true,
+                                    "inputNormalizeEdges" : true,
+                                    "inputRadius" : 6
+                                  },
+                                  "name" : "gaussianBlur",
+                                  "type" : "gaussianBlur"
+                                },
+                                {
+                                  "inputs" : {
+                                    "inputColorMatrix" : [
+                                      1,
+                                      -9.9999997473787516e-05,
+                                      9.9999997473787516e-05,
+                                      0,
+                                      0.029999999329447746,
+                                      0,
+                                      1,
+                                      -0,
+                                      0,
+                                      0.029999999329447746,
+                                      -9.9999997473787516e-05,
+                                      9.9999997473787516e-05,
+                                      1,
+                                      0,
+                                      0.029999999329447746,
+                                      0,
+                                      0,
+                                      0,
+                                      1,
+                                      0
+                                    ]
+                                  },
+                                  "name" : "colorMatrix",
+                                  "type" : "colorMatrix"
+                                },
+                                {
+                                  "inputs" : {
+                                    "inputClamp" : 1,
+                                    "inputClampPreserveHue" : true
+                                  },
+                                  "name" : "sdrNormalize",
+                                  "type" : "sdrNormalize"
+                                }
+                              ],
+                              "frame" : [
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "hidden" : false,
+                              "name" : "HardPocketContentBlur",
+                              "opacity" : 1,
+                              "sublayers" : [
+                                {
+                                  "class" : "CAGradientLayer",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "hidden" : true,
+                                  "name" : "HardPocketContentBlurMask",
+                                  "opacity" : 1
+                                }
+                              ]
+                            },
+                            {
+                              "backdrop" : {
+                                "captureOnly" : false,
+                                "groupName" : null,
+                                "marginWidth" : 0,
+                                "scale" : 1,
+                                "zoom" : 0
+                              },
+                              "class" : "CABackdropLayer",
+                              "filters" : [
+                                {
+                                  "inputs" : {
+                                    "inputColorMatrix" : [
+                                      1,
+                                      -9.9999997473787516e-05,
+                                      9.9999997473787516e-05,
+                                      0,
+                                      0.029999999329447746,
+                                      0,
+                                      1,
+                                      -0,
+                                      0,
+                                      0.029999999329447746,
+                                      -9.9999997473787516e-05,
+                                      9.9999997473787516e-05,
+                                      1,
+                                      0,
+                                      0.029999999329447746,
+                                      0,
+                                      0,
+                                      0,
+                                      1,
+                                      0
+                                    ]
+                                  },
+                                  "name" : "colorMatrix",
+                                  "type" : "colorMatrix"
+                                },
+                                {
+                                  "inputs" : {
+                                    "inputClamp" : 1,
+                                    "inputClampPreserveHue" : true
+                                  },
+                                  "name" : "sdrNormalize",
+                                  "type" : "sdrNormalize"
+                                }
+                              ],
+                              "frame" : [
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "hidden" : false,
+                              "name" : "HardPocketBackgroundReplay",
+                              "opacity" : 1,
+                              "sublayers" : [
+                                {
+                                  "class" : "CAGradientLayer",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "hidden" : false,
+                                  "name" : "HardPocketBackgroundReplayMask",
+                                  "opacity" : 1
+                                }
+                              ]
+                            },
+                            {
+                              "backgroundColor" : {
+                                "color" : [
+                                  1,
+                                  0.070000000000000007
+                                ],
+                                "space" : "kCGColorSpaceGenericGray"
+                              },
+                              "class" : "CALayer",
+                              "frame" : [
+                                0,
+                                -0.5,
+                                0,
+                                0.5
+                              ],
+                              "hidden" : false,
+                              "name" : "Separator",
+                              "opacity" : 1
+                            }
+                          ]
+                        },
+                        {
+                          "backgroundColor" : {
+                            "color" : [
+                              1,
+                              1,
+                              1,
+                              0.050000000000000003
+                            ],
+                            "space" : "kCGColorSpaceSRGB"
+                          },
+                          "class" : "NSViewBackingLayer",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            1
+                          ],
+                          "hidden" : false,
+                          "name" : "_TtC6AppKitP33_EC3F85FAB7755D56E669206D2B17725B26_NSLayerBasedFillColorView",
+                          "opacity" : 1
+                        }
+                      ]
+                    },
+                    {
+                      "class" : "NSViewBackingLayer",
+                      "frame" : [
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "hidden" : true,
+                      "name" : "LuminanceAdjustment",
+                      "opacity" : 1,
+                      "sublayers" : [
+                        {
+                          "class" : "NSViewBackingLayer",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            0
+                          ],
+                          "hidden" : false,
+                          "name" : "Container",
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "class" : "NSViewBackingLayer",
+                              "frame" : [
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "hidden" : false,
+                              "name" : "BackgroundReplays",
+                              "opacity" : 0,
+                              "sublayers" : [
+                                {
+                                  "backdrop" : {
+                                    "captureOnly" : false,
+                                    "groupName" : "backgroundGroup-0x0000007c2d828600",
+                                    "marginWidth" : 0,
+                                    "scale" : 0.5,
+                                    "zoom" : 0
+                                  },
+                                  "class" : "CABackdropLayer",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "hidden" : false,
+                                  "masksToBounds" : true,
+                                  "name" : "BackgroundReplay",
+                                  "opacity" : 0.60000002384185791
+                                },
+                                {
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "hidden" : false,
+                                  "name" : "BackgroundColorReplay",
+                                  "opacity" : 0.60000002384185791
+                                }
+                              ]
+                            },
+                            {
+                              "class" : "NSViewBackingLayer",
+                              "frame" : [
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "hidden" : false,
+                              "name" : "LuminanceAdjustments",
+                              "opacity" : 0,
+                              "sublayers" : [
+                                {
+                                  "backgroundColor" : {
+                                    "color" : [
+                                      0,
+                                      1
+                                    ],
+                                    "space" : "kCGColorSpaceGenericGrayGamma2_2"
+                                  },
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "hidden" : false,
+                                  "name" : "Darkening",
+                                  "opacity" : 0
+                                },
+                                {
+                                  "backgroundColor" : {
+                                    "color" : [
+                                      1,
+                                      1
+                                    ],
+                                    "space" : "kCGColorSpaceGenericGrayGamma2_2"
+                                  },
+                                  "class" : "NSViewBackingLayer",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "hidden" : false,
+                                  "name" : "Lightening",
+                                  "opacity" : 0
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "CAPortalLayer",
+                          "compositingFilter" : "destIn",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            0
+                          ],
+                          "hidden" : false,
+                          "name" : "PocketMask",
+                          "opacity" : 1
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "class" : "NSViewBackingLayer",
+          "frame" : [
+            0,
+            224,
+            195,
+            0
+          ],
+          "hidden" : false,
+          "name" : "NSTitlebarContainerView",
+          "opacity" : 1,
+          "sublayers" : [
+            {
+              "class" : "NSViewBackingLayer",
+              "frame" : [
+                0,
+                0,
+                195,
+                0
+              ],
+              "hidden" : false,
+              "name" : "NSTitlebarBackgroundView",
+              "opacity" : 1
+            },
+            {
+              "class" : "NSViewBackingLayer",
+              "frame" : [
+                0,
+                0,
+                195,
+                0
+              ],
+              "hidden" : false,
+              "name" : "NSTitlebarView",
+              "opacity" : 1,
+              "sublayers" : [
+                {
+                  "backdrop" : {
+                    "captureOnly" : true,
+                    "groupName" : "NSTitlebarViewBackdropLayer",
+                    "marginWidth" : 0,
+                    "scale" : 1,
+                    "zoom" : 0
+                  },
+                  "class" : "CABackdropLayer",
+                  "frame" : [
+                    0,
+                    0,
+                    195,
+                    0
+                  ],
+                  "hidden" : false,
+                  "name" : "",
+                  "opacity" : 1
+                },
+                {
+                  "class" : "NSViewBackingLayer",
+                  "compositingFilter" : "plusL",
+                  "frame" : [
+                    18,
+                    -8,
+                    10,
+                    16
+                  ],
+                  "hidden" : false,
+                  "name" : "NSTextField",
+                  "opacity" : 1,
+                  "sublayers" : [
+                    {
+                      "class" : "NSViewBackingLayer",
+                      "contents" : "NSViewBackingLayerContents",
+                      "contentsMultiplyColor" : {
+                        "color" : [
+                          1,
+                          1,
+                          1,
+                          1
+                        ],
+                        "space" : "kCGColorSpaceSRGB"
+                      },
+                      "frame" : [
+                        0,
+                        0,
+                        10,
+                        16
+                      ],
+                      "hidden" : false,
+                      "name" : "_TtC6AppKitP33_72EBFCF981BE77E1C6F26FD717D0893922NSTextFieldSimpleLabel",
+                      "opacity" : 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "class" : "NSViewBackingLayer",
+              "frame" : [
+                0,
+                0,
+                195,
+                0
+              ],
+              "hidden" : false,
+              "masksToBounds" : true,
+              "name" : "_NSTitlebarDecorationView",
+              "opacity" : 1,
+              "sublayers" : [
+                {
+                  "class" : "CUIWindowFrameLayer",
+                  "frame" : [
+                    0,
+                    0,
+                    195,
+                    0
+                  ],
+                  "hidden" : false,
+                  "name" : "Decoration",
+                  "opacity" : 1,
+                  "sublayers" : [
+                    {
+                      "class" : "CAGradientLayer",
+                      "frame" : [
+                        0,
+                        0,
+                        195,
+                        22
+                      ],
+                      "hidden" : true,
+                      "name" : "CUIWindowTitlebarGradientLayer - Removed",
+                      "opacity" : 1
+                    },
+                    {
+                      "class" : "CALayer",
+                      "contents" : "__NSCFType",
+                      "contentsMultiplyColor" : {
+                        "color" : [
+                          1,
+                          1,
+                          1,
+                          1
+                        ],
+                        "space" : "kCGColorSpaceSRGB"
+                      },
+                      "frame" : [
+                        0,
+                        0,
+                        195,
+                        0
+                      ],
+                      "hidden" : true,
+                      "name" : "CUIWindowOverlayLayer - Removed",
+                      "opacity" : 0
+                    },
+                    {
+                      "class" : "CALayer",
+                      "frame" : [
+                        -1,
+                        21,
+                        196,
+                        1
+                      ],
+                      "hidden" : false,
+                      "name" : "CUIWindowSeparatorBarLayer",
+                      "opacity" : 1
+                    },
+                    {
+                      "class" : "CALayer",
+                      "contents" : "__NSCFType",
+                      "contentsMultiplyColor" : {
+                        "color" : [
+                          1,
+                          1,
+                          1,
+                          1
+                        ],
+                        "space" : "kCGColorSpaceSRGB"
+                      },
+                      "frame" : [
+                        0,
+                        0,
+                        195,
+                        0
+                      ],
+                      "hidden" : true,
+                      "name" : "CUIWindowBorderLayer",
+                      "opacity" : 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "level" : 101,
+    "views" : {
+      "class" : "NSGlassContentFrameView",
+      "frame" : [
+        0,
+        0,
+        195,
+        224
+      ],
+      "sub" : [
+        {
+          "class" : "NSView",
+          "frame" : [
+            0,
+            0,
+            195,
+            224
+          ],
+          "sub" : [
+            {
+              "class" : "NSMenuScrollView",
+              "frame" : [
+                0,
+                0,
+                195,
+                224
+              ],
+              "sub" : [
+                {
+                  "class" : "BackdropView",
+                  "frame" : [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "sub" : [
+
+                  ]
+                },
+                {
+                  "class" : "NSClipView",
+                  "frame" : [
+                    0,
+                    0,
+                    195,
+                    224
+                  ],
+                  "sub" : [
+                    {
+                      "class" : "NSTableViewBackedMenuRepresentation",
+                      "frame" : [
+                        0,
+                        0,
+                        195,
+                        224
+                      ],
+                      "sub" : [
+                        {
+                          "class" : "NSRootMenuWindowBackgroundView",
+                          "frame" : [
+                            5,
+                            5,
+                            185,
+                            24
+                          ],
+                          "sub" : [
+
+                          ]
+                        },
+                        {
+                          "class" : "NSTableRowView",
+                          "frame" : [
+                            0,
+                            5,
+                            195,
+                            24
+                          ],
+                          "sub" : [
+                            {
+                              "class" : "NSContextMenuItemView",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "sub" : [
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "frame" : [
+                                    14,
+                                    4,
+                                    133,
+                                    16
+                                  ],
+                                  "sub" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        133,
+                                        16
+                                      ],
+                                      "sub" : [
+
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "frame" : [
+                                    164,
+                                    4,
+                                    18,
+                                    16
+                                  ],
+                                  "sub" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        18,
+                                        16
+                                      ],
+                                      "sub" : [
+
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "frame" : [
+                                    151,
+                                    4,
+                                    21,
+                                    16
+                                  ],
+                                  "sub" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        21,
+                                        16
+                                      ],
+                                      "sub" : [
+
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSTableRowView",
+                          "frame" : [
+                            0,
+                            29,
+                            195,
+                            24
+                          ],
+                          "sub" : [
+                            {
+                              "class" : "NSContextMenuItemView",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "sub" : [
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "frame" : [
+                                    14,
+                                    4,
+                                    133,
+                                    16
+                                  ],
+                                  "sub" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        133,
+                                        16
+                                      ],
+                                      "sub" : [
+
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSTableRowView",
+                          "frame" : [
+                            0,
+                            53,
+                            195,
+                            24
+                          ],
+                          "sub" : [
+                            {
+                              "class" : "NSContextMenuItemView",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "sub" : [
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "frame" : [
+                                    14,
+                                    4,
+                                    133,
+                                    16
+                                  ],
+                                  "sub" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        133,
+                                        16
+                                      ],
+                                      "sub" : [
+
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSTableRowView",
+                          "frame" : [
+                            0,
+                            77,
+                            195,
+                            11
+                          ],
+                          "sub" : [
+                            {
+                              "class" : "NSContextMenuItemView",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                11
+                              ],
+                              "sub" : [
+
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSTableRowView",
+                          "frame" : [
+                            0,
+                            88,
+                            195,
+                            24
+                          ],
+                          "sub" : [
+                            {
+                              "class" : "NSContextMenuItemView",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "sub" : [
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "frame" : [
+                                    14,
+                                    4,
+                                    133,
+                                    16
+                                  ],
+                                  "sub" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        133,
+                                        16
+                                      ],
+                                      "sub" : [
+
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSTableRowView",
+                          "frame" : [
+                            0,
+                            112,
+                            195,
+                            24
+                          ],
+                          "sub" : [
+                            {
+                              "class" : "NSContextMenuItemView",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "sub" : [
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "frame" : [
+                                    14,
+                                    4,
+                                    133,
+                                    16
+                                  ],
+                                  "sub" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        133,
+                                        16
+                                      ],
+                                      "sub" : [
+
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSTableRowView",
+                          "frame" : [
+                            0,
+                            136,
+                            195,
+                            24
+                          ],
+                          "sub" : [
+                            {
+                              "class" : "NSContextMenuItemView",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "sub" : [
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "frame" : [
+                                    14,
+                                    4,
+                                    133,
+                                    16
+                                  ],
+                                  "sub" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        133,
+                                        16
+                                      ],
+                                      "sub" : [
+
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSTableRowView",
+                          "frame" : [
+                            0,
+                            160,
+                            195,
+                            11
+                          ],
+                          "sub" : [
+                            {
+                              "class" : "NSContextMenuItemView",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                11
+                              ],
+                              "sub" : [
+
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSTableRowView",
+                          "frame" : [
+                            0,
+                            171,
+                            195,
+                            24
+                          ],
+                          "sub" : [
+                            {
+                              "class" : "NSContextMenuItemView",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "sub" : [
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "frame" : [
+                                    14,
+                                    4,
+                                    133,
+                                    16
+                                  ],
+                                  "sub" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        133,
+                                        16
+                                      ],
+                                      "sub" : [
+
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "NSTableRowView",
+                          "frame" : [
+                            0,
+                            195,
+                            195,
+                            24
+                          ],
+                          "sub" : [
+                            {
+                              "class" : "NSContextMenuItemView",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                24
+                              ],
+                              "sub" : [
+                                {
+                                  "class" : "_NSMenuItemTextField",
+                                  "frame" : [
+                                    14,
+                                    4,
+                                    133,
+                                    16
+                                  ],
+                                  "sub" : [
+                                    {
+                                      "class" : "NSTextFieldSimpleLabel",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        133,
+                                        16
+                                      ],
+                                      "sub" : [
+
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "class" : "NSScrollPocket",
+                  "frame" : [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "sub" : [
+                    {
+                      "class" : "PocketMask",
+                      "frame" : [
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "sub" : [
+                        {
+                          "class" : "NSView",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            0
+                          ],
+                          "sub" : [
+                            {
+                              "class" : "NSView",
+                              "frame" : [
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "sub" : [
+
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "class" : "PocketBlur",
+                      "frame" : [
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "sub" : [
+                        {
+                          "class" : "PortalView",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            0
+                          ],
+                          "sub" : [
+
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "class" : "NSHardPocketView",
+                      "frame" : [
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "sub" : [
+                        {
+                          "class" : "_NSLayerBasedFillColorView",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            1
+                          ],
+                          "sub" : [
+
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "class" : "LuminanceAdjustment",
+                      "frame" : [
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "sub" : [
+                        {
+                          "class" : "NSView",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            0
+                          ],
+                          "sub" : [
+                            {
+                              "class" : "NSView",
+                              "frame" : [
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "sub" : [
+                                {
+                                  "class" : "BackdropView",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "sub" : [
+
+                                  ]
+                                },
+                                {
+                                  "class" : "_NSScrollViewContentBackgroundView",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "sub" : [
+
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "class" : "NSView",
+                              "frame" : [
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "sub" : [
+                                {
+                                  "class" : "NSView",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "sub" : [
+
+                                  ]
+                                },
+                                {
+                                  "class" : "NSView",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "sub" : [
+
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "PortalView",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            0
+                          ],
+                          "sub" : [
+
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "class" : "NSTitlebarContainerView",
+          "frame" : [
+            0,
+            224,
+            195,
+            0
+          ],
+          "sub" : [
+            {
+              "class" : "NSTitlebarBackgroundView",
+              "frame" : [
+                0,
+                0,
+                195,
+                0
+              ],
+              "sub" : [
+
+              ]
+            },
+            {
+              "class" : "NSTitlebarView",
+              "frame" : [
+                0,
+                0,
+                195,
+                0
+              ],
+              "sub" : [
+                {
+                  "class" : "NSView",
+                  "frame" : [
+                    0,
+                    0,
+                    195,
+                    0
+                  ],
+                  "sub" : [
+
+                  ]
+                },
+                {
+                  "class" : "NSTextField",
+                  "frame" : [
+                    18,
+                    -8,
+                    10,
+                    16
+                  ],
+                  "sub" : [
+                    {
+                      "class" : "NSTextFieldSimpleLabel",
+                      "frame" : [
+                        0,
+                        0,
+                        10,
+                        16
+                      ],
+                      "sub" : [
+
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "class" : "_NSTitlebarDecorationView",
+              "frame" : [
+                0,
+                0,
+                195,
+                0
+              ],
+              "sub" : [
+
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "class" : "_NSGlassEffectWindow",
+    "frame" : [
+      85,
+      40,
+      345,
+      374
+    ],
+    "layers" : {
+      "backgroundColor" : {
+        "color" : [
+          0,
+          0
+        ],
+        "space" : "kCGColorSpaceGenericGrayGamma2_2"
+      },
+      "class" : "NSViewBackingLayer",
+      "frame" : [
+        0,
+        0,
+        345,
+        374
+      ],
+      "hidden" : false,
+      "masksToBounds" : true,
+      "name" : "_TtC6AppKitP33_1000D58E68E3645B307D42088FFA59FB24NSGlassEffectWindowFrame",
+      "opacity" : 1,
+      "sublayers" : [
+        {
+          "class" : "BackingLayer",
+          "frame" : [
+            75,
+            75,
+            195,
+            224
+          ],
+          "hidden" : false,
+          "name" : "_TtCE6AppKitCSo17NSGlassEffectViewP33_92F0BB6107B916AA04C9A991F505A16412BackingLayer: NSGlassEffectView",
+          "opacity" : 1,
+          "sublayers" : [
+            {
+              "class" : "CALayer",
+              "frame" : [
+                0,
+                0,
+                195,
+                224
+              ],
+              "hidden" : false,
+              "name" : "contentHolderView",
+              "opacity" : 1,
+              "sublayers" : [
+                {
+                  "class" : "_NSGlassEffectWindowLayerHost",
+                  "contents" : "__NSCFType",
+                  "contentsMultiplyColor" : {
+                    "color" : [
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "space" : "kCGColorSpaceSRGB"
+                  },
+                  "frame" : [
+                    0,
+                    0,
+                    195,
+                    224
+                  ],
+                  "hidden" : false,
+                  "name" : "_NSGlassEffectWindowLayerHost: _NSGlassEffectWindowLayerHostView",
+                  "opacity" : 1
+                }
+              ]
+            },
+            {
+              "class" : "NSViewBackingLayer",
+              "frame" : [
+                0,
+                0,
+                195,
+                224
+              ],
+              "hidden" : false,
+              "name" : "_TtGC6AppKit18_NSCoreHostingViewVES_CSo17NSGlassEffectViewP10$19ca35b508RootView_",
+              "opacity" : 1,
+              "sublayers" : [
+                {
+                  "class" : "CALayer",
+                  "frame" : [
+                    0,
+                    0,
+                    195,
+                    224
+                  ],
+                  "hidden" : false,
+                  "name" : "",
+                  "opacity" : 1,
+                  "sublayers" : [
+                    {
+                      "class" : "SDFLayer",
+                      "frame" : [
+                        0,
+                        0,
+                        195,
+                        224
+                      ],
+                      "hidden" : false,
+                      "name" : "",
+                      "opacity" : 1,
+                      "sdf" : {
+                        "cornerCurve" : "circular",
+                        "cornerRadius" : 0
+                      },
+                      "sublayers" : [
+                        {
+                          "class" : "CALayer",
+                          "frame" : [
+                            0,
+                            0,
+                            0,
+                            0
+                          ],
+                          "hidden" : false,
+                          "name" : "",
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "class" : "CALayer",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                224
+                              ],
+                              "hidden" : false,
+                              "name" : "",
+                              "opacity" : 1,
+                              "sublayers" : [
+                                {
+                                  "backgroundColor" : {
+                                    "color" : [
+                                      1,
+                                      1,
+                                      1,
+                                      1
+                                    ],
+                                    "space" : "kCGColorSpaceExtendedSRGB"
+                                  },
+                                  "class" : "CALayer",
+                                  "cornerCurve" : "continuous",
+                                  "cornerRadius" : 12,
+                                  "filters" : [
+                                    {
+                                      "inputs" : {
+                                        "inputBackdropAware" : true,
+                                        "inputColorMatrix" : [
+                                          0.3125,
+                                          0,
+                                          0,
+                                          0,
+                                          0.93750011920928955,
+                                          0,
+                                          0.3125,
+                                          0,
+                                          0,
+                                          0.93750011920928955,
+                                          0,
+                                          0,
+                                          0.3125,
+                                          0,
+                                          0.93750011920928955,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0
+                                        ]
+                                      },
+                                      "name" : "vibrantColorMatrix",
+                                      "type" : "vibrantColorMatrix"
+                                    }
+                                  ],
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    195,
+                                    224
+                                  ],
+                                  "hidden" : false,
+                                  "name" : "",
+                                  "opacity" : 1
+                                },
+                                {
+                                  "class" : "CALayer",
+                                  "cornerCurve" : "continuous",
+                                  "cornerRadius" : 12,
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    195,
+                                    224
+                                  ],
+                                  "hidden" : false,
+                                  "masksToBounds" : true,
+                                  "name" : "",
+                                  "opacity" : 1,
+                                  "sublayers" : [
+                                    {
+                                      "class" : "CAPortalLayer",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        195,
+                                        224
+                                      ],
+                                      "hidden" : false,
+                                      "name" : "",
+                                      "opacity" : 1
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "class" : "CALayer",
+                          "frame" : [
+                            0,
+                            0,
+                            195,
+                            224
+                          ],
+                          "hidden" : false,
+                          "name" : "",
+                          "opacity" : 1,
+                          "sublayers" : [
+                            {
+                              "backdrop" : {
+                                "captureOnly" : false,
+                                "groupName" : "SwiftUI:5.00.0",
+                                "marginWidth" : 68.25,
+                                "scale" : 0.25,
+                                "zoom" : 0
+                              },
+                              "class" : "CABackdropLayer",
+                              "filters" : [
+                                {
+                                  "inputs" : {
+                                    "inputBleedAmount" : 68.25,
+                                    "inputBleedBlurRadius" : 68.25,
+                                    "inputBleedColorMatrixBlack" : 0.125,
+                                    "inputBleedColorMatrixSaturation" : 1,
+                                    "inputBleedColorMatrixWhite" : 0.5,
+                                    "inputBleedDarkenBlend" : false,
+                                    "inputBleedDistance0" : 1,
+                                    "inputBleedDistance1" : 0,
+                                    "inputBleedHeight" : 68.25,
+                                    "inputBleedOpacity" : 0.80000001192092896,
+                                    "inputBlurDistance0" : -97.5,
+                                    "inputBlurDistance1" : -1,
+                                    "inputBlurDistance2" : 0,
+                                    "inputBlurDistance3" : 0,
+                                    "inputBlurFillBlurRadius" : 8,
+                                    "inputBlurFillDarkenOpacity" : 0.89999997615814209,
+                                    "inputBlurFillLightenOpacity" : 0,
+                                    "inputBlurFillNormalOpacity" : 0.50711458921432495,
+                                    "inputBlurOpacity0" : 0.80000001192092896,
+                                    "inputBlurOpacity1" : 0.40000000596046448,
+                                    "inputBlurOpacity2" : 0.5,
+                                    "inputBlurOpacity3" : 1,
+                                    "inputBlurRadius" : 5,
+                                    "inputClamp" : 1.308310866355896,
+                                    "inputClampPreserveHue" : false,
+                                    "inputFaceColorMatrixBlack" : 0.125,
+                                    "inputFaceColorMatrixFillColor" : {
+                                      "color" : [
+                                        0.0017786473035812378,
+                                        0.0017786473035812378,
+                                        0.0017786473035812378,
+                                        0.0071145892143249512
+                                      ],
+                                      "space" : "kCGColorSpaceExtendedSRGB"
+                                    },
+                                    "inputFaceColorMatrixMaxLuma" : 0.34999999403953552,
+                                    "inputFaceColorMatrixMaxLumaSDR" : 0.34999999403953552,
+                                    "inputFaceColorMatrixSaturation" : 1.2999999523162842,
+                                    "inputFaceColorMatrixWhite" : 1.125,
+                                    "inputFaceOpacity" : 1,
+                                    "inputInnerRefractionAmount" : -60,
+                                    "inputInnerRefractionHeight" : 20,
+                                    "inputKeyFillHighlightAmount" : 0.40000000000000002,
+                                    "inputKeyFillHighlightAngle" : 1.5707963267948966,
+                                    "inputKeyFillHighlightColorBias" : -0.25,
+                                    "inputKeyFillHighlightEffectOffset" : -0.5,
+                                    "inputKeyFillHighlightHeight" : 0.5,
+                                    "inputKeyFillHighlightSpread" : 1.3089969389957472,
+                                    "inputKeyFillHighlightSpreadSDR" : 1.3089969389957472,
+                                    "inputMaxHeadroom" : 9999,
+                                    "inputOuterRefractionAmount" : 48.75,
+                                    "inputOuterRefractionHeight" : 39,
+                                    "inputRefractionDistance0" : -1,
+                                    "inputRefractionDistance1" : 0,
+                                    "inputRefractionOpacity" : 0.60000002384185791,
+                                    "inputRingShadowBlurRadius" : 5,
+                                    "inputRingShadowMask" : 1,
+                                    "inputRingShadowOffset" : 8,
+                                    "inputRingShadowOpacity" : 0.059999998658895493,
+                                    "inputRingShadowStrokeWidth" : 4,
+                                    "inputSDRGradientDistance0" : 0,
+                                    "inputSDRGradientDistance1" : 0,
+                                    "inputSDRHoldingToneEnabled" : false,
+                                    "inputSDRHoldingToneWhite" : 1,
+                                    "inputSDRShadowOpacity" : 0,
+                                    "inputShadowAmount" : 0,
+                                    "inputShadowBlurRadius" : 0,
+                                    "inputShadowColorMatrixBlack" : 0,
+                                    "inputShadowColorMatrixFillColor" : {
+                                      "color" : [
+                                        0,
+                                        0,
+                                        0,
+                                        0.30000001192092896
+                                      ],
+                                      "space" : "kCGColorSpaceExtendedSRGB"
+                                    },
+                                    "inputShadowColorMatrixSaturation" : 1,
+                                    "inputShadowColorMatrixWhite" : 1,
+                                    "inputShadowDistanceOffset" : 0,
+                                    "inputShadowHeight" : 0,
+                                    "inputShadowOffset" : [
+                                      0,
+                                      10
+                                    ],
+                                    "inputShadowOpacity" : 0.80000001192092896,
+                                    "inputShadowRadius" : 24,
+                                    "inputShadowVibrancyContribution" : 0,
+                                    "inputSourceSublayerName" : "@0"
+                                  },
+                                  "name" : "glassBackground",
+                                  "type" : "glassBackground"
+                                }
+                              ],
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                224
+                              ],
+                              "hidden" : false,
+                              "name" : "@0",
+                              "opacity" : 1,
+                              "sublayers" : [
+                                {
+                                  "class" : "CASDFLayer",
+                                  "effect" : {
+                                    "class" : "CASDFOutputEffect",
+                                    "maximum" : 40.315151544050735,
+                                    "minimum" : -10000
+                                  },
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    195,
+                                    224
+                                  ],
+                                  "hidden" : false,
+                                  "name" : "@0",
+                                  "opacity" : 1,
+                                  "sdf" : {
+                                    "cornerCurve" : "circular",
+                                    "cornerRadius" : 0,
+                                    "smoothness" : 8
+                                  },
+                                  "sublayers" : [
+                                    {
+                                      "class" : "CALayer",
+                                      "frame" : [
+                                        0,
+                                        0,
+                                        0,
+                                        0
+                                      ],
+                                      "hidden" : false,
+                                      "name" : "",
+                                      "opacity" : 1,
+                                      "sublayers" : [
+                                        {
+                                          "class" : "CASDFElementLayer",
+                                          "cornerCurve" : "continuous",
+                                          "cornerRadius" : 12,
+                                          "frame" : [
+                                            0,
+                                            0,
+                                            195,
+                                            224
+                                          ],
+                                          "hidden" : false,
+                                          "name" : "",
+                                          "opacity" : 1,
+                                          "sdf" : {
+                                            "cornerCurve" : "continuous",
+                                            "cornerRadius" : 12
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "class" : "SDFPortalLayer",
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                224
+                              ],
+                              "hidden" : false,
+                              "name" : "@1",
+                              "opacity" : 1,
+                              "sdf" : {
+                                "cornerCurve" : "circular",
+                                "cornerRadius" : 0
+                              }
+                            },
+                            {
+                              "class" : "CASDFLayer",
+                              "effect" : {
+                                "class" : "CASDFKeyFillHighlightEffect",
+                                "curvature" : 0.75,
+                                "diffuseAmountScale" : 0.15000000596046448,
+                                "diffuseHeightScale" : 8,
+                                "diffuseSpreadScale" : 0.64999997615814209,
+                                "fillAmount" : 0.5,
+                                "fillAngle" : 3.1415926535897931,
+                                "fillColor" : {
+                                  "color" : [
+                                    1,
+                                    1,
+                                    1,
+                                    1
+                                  ],
+                                  "space" : "kCGColorSpaceExtendedSRGB"
+                                },
+                                "fillHeight" : 1,
+                                "fillHeightOffset" : 0,
+                                "fillHeightScale" : 1,
+                                "fillSpread" : 1.5707963267948966,
+                                "fillSpreadOffset" : 0,
+                                "fillSpreadScale" : 1,
+                                "global" : false,
+                                "keyAmount" : 0.5,
+                                "keyAngle" : 0,
+                                "keyColor" : {
+                                  "color" : [
+                                    1,
+                                    1,
+                                    1,
+                                    1
+                                  ],
+                                  "space" : "kCGColorSpaceExtendedSRGB"
+                                },
+                                "keyHeight" : 1,
+                                "keyHeightOffset" : 0,
+                                "keyHeightScale" : 1,
+                                "keySpread" : 1.5707963267948966,
+                                "keySpreadOffset" : 0,
+                                "keySpreadScale" : 1
+                              },
+                              "filters" : [
+                                {
+                                  "inputs" : {
+                                    "inputClamp" : 1,
+                                    "inputColorMatrix" : [
+                                      1.1201999187469482,
+                                      -0.18940000236034393,
+                                      -0.018999999389052391,
+                                      0,
+                                      0.14710000157356262,
+                                      -0.056299999356269836,
+                                      0.98709994554519653,
+                                      -0.019099999219179153,
+                                      0,
+                                      0.14710000157356262,
+                                      -0.056299999356269836,
+                                      -0.18930000066757202,
+                                      1.1574000120162964,
+                                      0,
+                                      0.14710000157356262,
+                                      0,
+                                      0,
+                                      0,
+                                      1,
+                                      0
+                                    ]
+                                  },
+                                  "name" : "vibrantColorMatrix",
+                                  "type" : "vibrantColorMatrix"
+                                }
+                              ],
+                              "frame" : [
+                                0,
+                                0,
+                                195,
+                                224
+                              ],
+                              "hidden" : false,
+                              "name" : "@2",
+                              "opacity" : 1,
+                              "sdf" : {
+                                "cornerCurve" : "circular",
+                                "cornerRadius" : 0,
+                                "smoothness" : 8
+                              },
+                              "sublayers" : [
+                                {
+                                  "class" : "SDFPortalLayer",
+                                  "frame" : [
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                  ],
+                                  "hidden" : false,
+                                  "name" : "",
+                                  "opacity" : 1,
+                                  "sdf" : {
+                                    "cornerCurve" : "circular",
+                                    "cornerRadius" : 0
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "level" : 101,
+    "views" : {
+      "class" : "NSGlassEffectWindowFrame",
+      "frame" : [
+        0,
+        0,
+        345,
+        374
+      ],
+      "sub" : [
+        {
+          "class" : "NSGlassEffectView",
+          "frame" : [
+            75,
+            75,
+            195,
+            224
+          ],
+          "sub" : [
+            {
+              "class" : "ContentHolderView",
+              "frame" : [
+                0,
+                0,
+                195,
+                224
+              ],
+              "sub" : [
+                {
+                  "class" : "_NSGlassEffectWindowLayerHostView",
+                  "frame" : [
+                    0,
+                    0,
+                    195,
+                    224
+                  ],
+                  "sub" : [
+
+                  ]
+                }
+              ]
+            },
+            {
+              "class" : "_NSCoreHostingView<RootView>",
+              "frame" : [
+                0,
+                0,
+                195,
+                224
+              ],
+              "sub" : [
+
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+]

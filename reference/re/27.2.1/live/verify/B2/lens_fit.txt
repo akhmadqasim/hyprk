@@ -1,0 +1,30 @@
+
+view 0 capsule 520x87: dumped glassForeground inputs Ar -16 Hr 16 Or -3.30 Aa -5 Ha 6.60 Oa 0 angle 1.5708 | code (BaseSpec 0x195ef8e68..0x195ef922c) Ar -16 Hr 16 Or -3.3 Aa -5 Ha 6.6 Oa 0 angle pi/2
+   shader + dumped inputs                : all px rms  0.65 levels (n=321486); lens zone (depth 1..14 pt) rms  1.15, median |e| 0.21, p95 1.9 (n=101562)
+        depth 1..8 pt: ends (|n.x|>0.9) rms 0.33 (n=2158); top/bottom (|n.y|>0.9) rms 1.70 (n=44548)
+   same without the W/H aspect factor    : all px rms  1.00 levels (n=322132); lens zone (depth 1..14 pt) rms  1.78, median |e| 0.24, p95 2.5 (n=102208)
+        depth 1..8 pt: ends (|n.x|>0.9) rms 7.12 (n=2640); top/bottom (|n.y|>0.9) rms 1.85 (n=44548)
+   no aberration                         : all px rms  1.01 levels (n=322132); lens zone (depth 1..14 pt) rms  1.80, median |e| 0.22, p95 2.3 (n=102208)
+        depth 1..8 pt: ends (|n.x|>0.9) rms 7.19 (n=2640); top/bottom (|n.y|>0.9) rms 1.81 (n=44548)
+   no lens at all                        : all px rms  3.58 levels (n=322324); lens zone (depth 1..14 pt) rms  6.36, median |e| 0.61, p95 6.6 (n=102400)
+        depth 1..8 pt: ends (|n.x|>0.9) rms 34.51 (n=2832); top/bottom (|n.y|>0.9) rms 3.77 (n=44548)
+
+view 2 rrect:40 300x150: dumped glassForeground inputs Ar -16 Hr 16 Or -3.30 Aa -5 Ha 6.60 Oa 0 angle 1.5708 | code (BaseSpec 0x195ef8e68..0x195ef922c) Ar -16 Hr 16 Or -3.3 Aa -5 Ha 6.6 Oa 0 angle pi/2
+   shader + dumped inputs                : all px rms  0.36 levels (n=281680); lens zone (depth 1..14 pt) rms  0.81, median |e| 0.17, p95 1.8 (n=54440)
+        depth 1..8 pt: ends (|n.x|>0.9) rms 1.16 (n=6860); top/bottom (|n.y|>0.9) rms 1.11 (n=20580)
+   same without the W/H aspect factor    : all px rms  0.37 levels (n=281680); lens zone (depth 1..14 pt) rms  0.85, median |e| 0.18, p95 2.0 (n=54440)
+        depth 1..8 pt: ends (|n.x|>0.9) rms 1.27 (n=6860); top/bottom (|n.y|>0.9) rms 1.15 (n=20580)
+   no aberration                         : all px rms  0.41 levels (n=281680); lens zone (depth 1..14 pt) rms  0.92, median |e| 0.19, p95 2.0 (n=54440)
+        depth 1..8 pt: ends (|n.x|>0.9) rms 1.60 (n=6860); top/bottom (|n.y|>0.9) rms 1.16 (n=20580)
+   no lens at all                        : all px rms  1.12 levels (n=281680); lens zone (depth 1..14 pt) rms  2.55, median |e| 0.38, p95 5.9 (n=54440)
+        depth 1..8 pt: ends (|n.x|>0.9) rms 3.56 (n=6860); top/bottom (|n.y|>0.9) rms 3.57 (n=20580)
+
+view 4 capsule 200x44: dumped glassForeground inputs Ar -16 Hr 16 Or -3.30 Aa -5 Ha 6.60 Oa 0 angle 1.5708 | code (BaseSpec 0x195ef8e68..0x195ef922c) Ar -16 Hr 16 Or -3.3 Aa -5 Ha 6.6 Oa 0 angle pi/2
+   shader + dumped inputs                : all px rms  0.43 levels (n=59058); lens zone (depth 1..14 pt) rms  0.53, median |e| 0.16, p95 0.7 (n=38042)
+        depth 1..8 pt: ends (|n.x|>0.9) rms 0.54 (n=1316); top/bottom (|n.y|>0.9) rms 0.72 (n=16342)
+   same without the W/H aspect factor    : all px rms  0.85 levels (n=59368); lens zone (depth 1..14 pt) rms  1.06, median |e| 0.18, p95 1.1 (n=38352)
+        depth 1..8 pt: ends (|n.x|>0.9) rms 4.02 (n=1558); top/bottom (|n.y|>0.9) rms 0.87 (n=16342)
+   no aberration                         : all px rms  0.88 levels (n=59368); lens zone (depth 1..14 pt) rms  1.10, median |e| 0.17, p95 0.8 (n=38352)
+        depth 1..8 pt: ends (|n.x|>0.9) rms 4.09 (n=1558); top/bottom (|n.y|>0.9) rms 0.78 (n=16342)
+   no lens at all                        : all px rms  2.19 levels (n=59368); lens zone (depth 1..14 pt) rms  2.72, median |e| 0.26, p95 6.2 (n=38352)
+        depth 1..8 pt: ends (|n.x|>0.9) rms 5.81 (n=1558); top/bottom (|n.y|>0.9) rms 3.28 (n=16342)

@@ -1,0 +1,50 @@
+{
+ "mode": "dark",
+ "views": [
+  {
+   "frame": [
+    60,
+    60,
+    633,
+    48
+   ],
+   "shape": "rrect:16",
+   "base": "dock",
+   "size": "medium"
+  },
+  {
+   "frame": [
+    60,
+    180,
+    633,
+    48
+   ],
+   "shape": "rrect:16",
+   "base": "dock",
+   "size": "auto"
+  },
+  {
+   "frame": [
+    60,
+    300,
+    633,
+    84
+   ],
+   "shape": "rrect:22",
+   "base": "dock",
+   "size": "medium"
+  }
+ ],
+ "dump": "$SCRATCH/b2/cap/sd-s120.json",
+ "pattern": "solid:120,120,120",
+ "content": "none",
+ "origin": [
+  40,
+  60
+ ],
+ "size": [
+  760,
+  420
+ ],
+ "secs": 2.6
+}

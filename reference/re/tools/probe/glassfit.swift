@@ -328,7 +328,11 @@ class D: NSObject, NSApplicationDelegate {
             if let p = cfg["dump"] as? String {
                 var out: [String: Any] = ["resets": self.resets, "keyWindow": self.win.isKeyWindow, "appActive": NSApp.isActive, "screenColorSpace": scr.colorSpace?.localizedName ?? "?",
                                           "windowFrame": [self.win.frame.minX, scr.frame.height - self.win.frame.maxY, self.win.frame.width, self.win.frame.height]]
-                out["views"] = self.glasses.map { g, vc -> Any in ["config": vc, "layers": g.layer.map { dumpLayer($0) } ?? [:]] as [String: Any] }
+                out["views"] = self.glasses.map { g, vc -> Any in
+                    var pr: [String: Any] = [:]
+                    for k in ["_contentLensing", "_placesContentAboveGlass", "_variant", "_subvariant", "_interactionState", "_adaptiveAppearance", "_scrimState", "_subduedState",
+                              "_effectIsInteractive", "_useReducedShadowRadius", "_tintOpacityReduced", "_inverseMeshed"] where g.responds(to: NSSelectorFromString(k)) { pr[k] = jsonable(g.value(forKey: k)) }
+                    return ["config": vc, "props": pr, "layers": g.layer.map { dumpLayer($0) } ?? [:]] as [String: Any] }
                 let data = try! JSONSerialization.data(withJSONObject: out, options: [.prettyPrinted, .sortedKeys])
                 try! data.write(to: URL(fileURLWithPath: p))
             }

@@ -1,0 +1,590 @@
+{
+ "dark a=0.0": {
+  "n": 50,
+  "chameleon_colour": [
+   36.9,
+   46.3,
+   50.0
+  ],
+  "bare_layer_opacity1": [
+   0.32,
+   0.7
+  ],
+  "bare_layer_opacity01": [
+   0.5,
+   1.45
+  ],
+  "items": {
+   "regular": {
+    "glass_only": [
+     0.52,
+     1.52
+    ],
+    "glass_plus_chameleon": [
+     6.02,
+     19.37
+    ]
+   },
+   "sb17": {
+    "glass_only": [
+     6.39,
+     20.0
+    ],
+    "glass_plus_chameleon": [
+     0.66,
+     1.96
+    ]
+   },
+   "sb18": {
+    "glass_only": [
+     3.82,
+     12.82
+    ],
+    "glass_plus_chameleon": [
+     0.48,
+     1.25
+    ]
+   },
+   "sb17tall": {
+    "glass_only": [
+     5.58,
+     20.0
+    ],
+    "glass_plus_chameleon": [
+     0.59,
+     1.75
+    ]
+   },
+   "sb18tall": {
+    "glass_only": [
+     4.83,
+     21.0
+    ],
+    "glass_plus_chameleon": [
+     0.5,
+     1.49
+    ]
+   },
+   "regular200": {
+    "glass_only": [
+     0.5,
+     1.39
+    ],
+    "glass_plus_chameleon": [
+     5.59,
+     19.55
+    ]
+   },
+   "sb17_200": {
+    "glass_only": [
+     5.59,
+     20.0
+    ],
+    "glass_plus_chameleon": [
+     0.6,
+     1.75
+    ]
+   },
+   "sb18_200": {
+    "glass_only": [
+     4.94,
+     21.0
+    ],
+    "glass_plus_chameleon": [
+     0.59,
+     1.85
+    ]
+   }
+  }
+ },
+ "dark a=0.5": {
+  "n": 50,
+  "chameleon_colour": [
+   36.9,
+   46.3,
+   50.0
+  ],
+  "bare_layer_opacity1": [
+   0.32,
+   0.7
+  ],
+  "bare_layer_opacity01": [
+   0.5,
+   1.45
+  ],
+  "items": {
+   "regular": {
+    "glass_only": [
+     0.52,
+     1.52
+    ],
+    "glass_plus_chameleon": [
+     6.02,
+     19.37
+    ]
+   },
+   "sb17": {
+    "glass_only": [
+     6.39,
+     20.0
+    ],
+    "glass_plus_chameleon": [
+     0.67,
+     1.96
+    ]
+   },
+   "sb18": {
+    "glass_only": [
+     3.82,
+     12.82
+    ],
+    "glass_plus_chameleon": [
+     0.49,
+     1.25
+    ]
+   },
+   "sb17tall": {
+    "glass_only": [
+     5.58,
+     20.0
+    ],
+    "glass_plus_chameleon": [
+     0.59,
+     1.75
+    ]
+   },
+   "sb18tall": {
+    "glass_only": [
+     4.83,
+     21.0
+    ],
+    "glass_plus_chameleon": [
+     0.51,
+     1.49
+    ]
+   },
+   "regular200": {
+    "glass_only": [
+     0.48,
+     1.51
+    ],
+    "glass_plus_chameleon": [
+     5.29,
+     19.55
+    ]
+   },
+   "sb17_200": {
+    "glass_only": [
+     5.6,
+     20.0
+    ],
+    "glass_plus_chameleon": [
+     0.6,
+     1.75
+    ]
+   },
+   "sb18_200": {
+    "glass_only": [
+     4.95,
+     21.0
+    ],
+    "glass_plus_chameleon": [
+     0.59,
+     1.85
+    ]
+   }
+  }
+ },
+ "dark a=1.0": {
+  "n": 50,
+  "chameleon_colour": [
+   36.9,
+   46.3,
+   50.0
+  ],
+  "bare_layer_opacity1": [
+   0.32,
+   0.7
+  ],
+  "bare_layer_opacity01": [
+   0.5,
+   1.45
+  ],
+  "items": {
+   "regular": {
+    "glass_only": [
+     0.38,
+     0.97
+    ],
+    "glass_plus_chameleon": [
+     3.31,
+     13.02
+    ]
+   },
+   "sb17": {
+    "glass_only": [
+     3.47,
+     13.48
+    ],
+    "glass_plus_chameleon": [
+     0.49,
+     1.32
+    ]
+   },
+   "sb18": {
+    "glass_only": [
+     3.82,
+     12.82
+    ],
+    "glass_plus_chameleon": [
+     0.49,
+     1.38
+    ]
+   },
+   "sb17tall": {
+    "glass_only": [
+     3.86,
+     18.37
+    ],
+    "glass_plus_chameleon": [
+     0.52,
+     1.3
+    ]
+   },
+   "sb18tall": {
+    "glass_only": [
+     4.94,
+     21.0
+    ],
+    "glass_plus_chameleon": [
+     0.55,
+     1.52
+    ]
+   },
+   "regular200": {
+    "glass_only": [
+     0.38,
+     1.12
+    ],
+    "glass_plus_chameleon": [
+     3.44,
+     15.97
+    ]
+   },
+   "sb17_200": {
+    "glass_only": [
+     4.35,
+     20.57
+    ],
+    "glass_plus_chameleon": [
+     0.88,
+     3.03
+    ]
+   },
+   "sb18_200": {
+    "glass_only": [
+     5.16,
+     21.0
+    ],
+    "glass_plus_chameleon": [
+     0.78,
+     2.85
+    ]
+   }
+  }
+ },
+ "light a=0.0": {
+  "n": 50,
+  "chameleon_colour": [
+   36.9,
+   46.3,
+   50.0
+  ],
+  "bare_layer_opacity1": [
+   0.32,
+   0.7
+  ],
+  "bare_layer_opacity01": [
+   0.5,
+   1.45
+  ],
+  "items": {
+   "regular": {
+    "glass_only": [
+     0.52,
+     1.59
+    ],
+    "glass_plus_chameleon": [
+     2.96,
+     11.48
+    ]
+   },
+   "sb17": {
+    "glass_only": [
+     2.7,
+     9.86
+    ],
+    "glass_plus_chameleon": [
+     0.54,
+     1.75
+    ]
+   },
+   "sb18": {
+    "glass_only": [
+     2.64,
+     10.43
+    ],
+    "glass_plus_chameleon": [
+     0.51,
+     1.58
+    ]
+   },
+   "sb17tall": {
+    "glass_only": [
+     2.78,
+     11.62
+    ],
+    "glass_plus_chameleon": [
+     0.57,
+     1.89
+    ]
+   },
+   "sb18tall": {
+    "glass_only": [
+     2.94,
+     12.0
+    ],
+    "glass_plus_chameleon": [
+     0.55,
+     1.58
+    ]
+   },
+   "regular200": {
+    "glass_only": [
+     0.54,
+     1.56
+    ],
+    "glass_plus_chameleon": [
+     2.92,
+     11.48
+    ]
+   },
+   "sb17_200": {
+    "glass_only": [
+     2.82,
+     12.62
+    ],
+    "glass_plus_chameleon": [
+     0.6,
+     1.89
+    ]
+   },
+   "sb18_200": {
+    "glass_only": [
+     3.03,
+     12.0
+    ],
+    "glass_plus_chameleon": [
+     0.59,
+     1.58
+    ]
+   }
+  }
+ },
+ "light a=0.5": {
+  "n": 50,
+  "chameleon_colour": [
+   36.9,
+   46.3,
+   50.0
+  ],
+  "bare_layer_opacity1": [
+   0.32,
+   0.7
+  ],
+  "bare_layer_opacity01": [
+   0.5,
+   1.45
+  ],
+  "items": {
+   "regular": {
+    "glass_only": [
+     0.48,
+     1.4
+    ],
+    "glass_plus_chameleon": [
+     2.41,
+     10.41
+    ]
+   },
+   "sb17": {
+    "glass_only": [
+     2.7,
+     9.86
+    ],
+    "glass_plus_chameleon": [
+     0.54,
+     1.75
+    ]
+   },
+   "sb18": {
+    "glass_only": [
+     2.64,
+     10.43
+    ],
+    "glass_plus_chameleon": [
+     0.51,
+     1.58
+    ]
+   },
+   "sb17tall": {
+    "glass_only": [
+     2.78,
+     11.62
+    ],
+    "glass_plus_chameleon": [
+     0.57,
+     1.89
+    ]
+   },
+   "sb18tall": {
+    "glass_only": [
+     2.93,
+     12.0
+    ],
+    "glass_plus_chameleon": [
+     0.56,
+     1.58
+    ]
+   },
+   "regular200": {
+    "glass_only": [
+     0.5,
+     1.48
+    ],
+    "glass_plus_chameleon": [
+     2.43,
+     10.76
+    ]
+   },
+   "sb17_200": {
+    "glass_only": [
+     2.9,
+     12.62
+    ],
+    "glass_plus_chameleon": [
+     0.63,
+     1.89
+    ]
+   },
+   "sb18_200": {
+    "glass_only": [
+     3.04,
+     12.0
+    ],
+    "glass_plus_chameleon": [
+     0.6,
+     2.03
+    ]
+   }
+  }
+ },
+ "light a=1.0": {
+  "n": 50,
+  "chameleon_colour": [
+   36.9,
+   46.3,
+   50.0
+  ],
+  "bare_layer_opacity1": [
+   0.32,
+   0.7
+  ],
+  "bare_layer_opacity01": [
+   0.5,
+   1.45
+  ],
+  "items": {
+   "regular": {
+    "glass_only": [
+     0.38,
+     1.09
+    ],
+    "glass_plus_chameleon": [
+     1.5,
+     6.06
+    ]
+   },
+   "sb17": {
+    "glass_only": [
+     1.71,
+     7.41
+    ],
+    "glass_plus_chameleon": [
+     0.46,
+     1.22
+    ]
+   },
+   "sb18": {
+    "glass_only": [
+     2.64,
+     10.43
+    ],
+    "glass_plus_chameleon": [
+     0.52,
+     1.58
+    ]
+   },
+   "sb17tall": {
+    "glass_only": [
+     2.12,
+     10.46
+    ],
+    "glass_plus_chameleon": [
+     0.46,
+     1.27
+    ]
+   },
+   "sb18tall": {
+    "glass_only": [
+     3.03,
+     12.0
+    ],
+    "glass_plus_chameleon": [
+     0.59,
+     2.17
+    ]
+   },
+   "regular200": {
+    "glass_only": [
+     0.52,
+     1.85
+    ],
+    "glass_plus_chameleon": [
+     1.62,
+     7.91
+    ]
+   },
+   "sb17_200": {
+    "glass_only": [
+     2.46,
+     11.59
+    ],
+    "glass_plus_chameleon": [
+     0.73,
+     2.68
+    ]
+   },
+   "sb18_200": {
+    "glass_only": [
+     3.22,
+     12.0
+    ],
+    "glass_plus_chameleon": [
+     0.75,
+     2.39
+    ]
+   }
+  }
+ }
+}
