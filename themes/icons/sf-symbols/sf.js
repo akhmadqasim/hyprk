@@ -391,8 +391,9 @@ const glyphs = {
 "xmark.semibold": [32,34,32,27.5,22.5,34,[["M26.23 3.91L4.77 25.39C4.02 26.13 4 27.46 4.79 28.23C5.56 29 6.9 28.98 7.62 28.25L29.1 6.78C29.85 6.02 29.86 4.7 29.08 3.93C28.3 3.17 27.01 3.15 26.23 3.91ZM29.1 25.39L7.62 3.91C6.89 3.18 5.56 3.15 4.79 3.93C4.01 4.71 4.03 6.03 4.77 6.77L26.23 28.24C27 29 28.31 29 29.08 28.22C29.84 27.44 29.85 26.14 29.1 25.39Z"]]]
 };
 
+// "sf:<SF name>" skips the hyprk alias table (e.g. "sf:folder" = the outline folder, "folder" = folder.fill).
 function resolve(name) {
-    const s = aliases[name] || name;
+    const s = name.indexOf("sf:") === 0 ? name.slice(3) : aliases[name] || name;
     return glyphs[s + ".regular"] ? s : "";
 }
 

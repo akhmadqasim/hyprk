@@ -30,6 +30,9 @@ for (const s of Object.values(names.symbols)) {
     wanted.add(s.symbol);
     for (const e of s.extras || []) wanted.add(e.symbol);
 }
+// outline renders whose names are also hyprk aliases of a filled symbol ("folder" -> folder.fill), reachable as
+// "sf:<name>" (the Spotlight mode list draws the outline folder); only SVGs already in svg/
+for (const s of ["folder", "eject"]) wanted.add(s);
 for (const list of ["menubar", "controlcenter", "notificationcenter"])
     for (const e of names[list]) if (e.symbol && /symbol/.test(e.kind)) wanted.add(e.symbol);
 
@@ -114,8 +117,9 @@ const glyphs = {
 ${Object.entries(glyphs).map(([k, v]) => `${JSON.stringify(k)}: ${JSON.stringify(v)}`).join(",\n")}
 };
 
+// "sf:<SF name>" skips the hyprk alias table (e.g. "sf:folder" = the outline folder, "folder" = folder.fill).
 function resolve(name) {
-    const s = aliases[name] || name;
+    const s = name.indexOf("sf:") === 0 ? name.slice(3) : aliases[name] || name;
     return glyphs[s + ".regular"] ? s : "";
 }
 
