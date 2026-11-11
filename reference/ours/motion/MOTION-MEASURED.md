@@ -746,7 +746,7 @@ Not motion, same session batch:
 ## Session 20 (2026-11-12): submenu delay, banner out, Notification Center clear, Dock autohide
 
 Own headless session B (MBA 2560x1664, scale 2, light), scratch copy of the tree, private D-Bus, scratch HOME, no
-PipeWire (stand-ins for wpctl / pw-play), fresh for this batch, 46 mcap runs; quiet host (load 1.2-1.4). Per-frame
+PipeWire (stand-ins for wpctl / pw-play), fresh for this batch, 38 mcap runs; quiet host (load 1.2-1.4). Per-frame
 series in the CSV (`*-s20*`).
 
 | Motion | Mac | Before | After | Runs |
