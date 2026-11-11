@@ -398,7 +398,7 @@ ShellWindow {
                         IconImage {
                             anchors.centerIn: parent
                             implicitSize: Theme.mission.placeholderIcon
-                            source: Apps.iconUrl(Apps.appIdOf(cell.modelData), Apps.appIdOf(cell.modelData))
+                            source: Apps.iconUrl(Apps.appIdOf(cell.modelData), Apps.appIdOf(cell.modelData), Theme.iconLook)
                         }
                     }
                 }

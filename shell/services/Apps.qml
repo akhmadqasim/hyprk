@@ -186,9 +186,12 @@ Singleton {
         "settings": ["preferences-system", "org.gnome.Settings"],
     })
     // Absolute icon url: macOS icon when mapped, else the icon theme, else the generic app icon.
-    function iconUrl(name, appId) {
+    // look (Theme.iconLook: icon style, its variant, dark mode) picks the mapped icon's Dark / Clear / Tinted
+    // rendition (themes/icons/apps/<Name>-256-<style>-<mode>.png); without it, or for the Default style, the
+    // Default icon. Only the url changes with the style: images at rest are not touched.
+    function iconUrl(name, appId, look) {
         const mac = macIconFor(name, appId);
-        if (mac) return "file://" + iconDir + "/" + MacIcons.file(mac);
+        if (mac) return "file://" + iconDir + "/" + (look ? MacIcons.styled(mac, look.style, look.variant, look.dark) : MacIcons.file(mac));
         if (!name) return genericIcon;
         if (name.startsWith("/")) return "file://" + name;
         for (const n of [name].concat(themeAliases[name] || [])) {

@@ -20,8 +20,15 @@ Singleton {
     // macOS "Reduce transparency": solid tinted material instead of blurred glass.
     // Also forced on when the blurred wallpaper could not be produced (no magick).
     property bool reduceTransparency: false
-    // Appearance > Icon & widget style (default | dark | clear | tinted), see HyprK AppIconTile
+    // Appearance > Icon & widget style (default | dark | clear | tinted), see HyprK AppIconTile, and the style's
+    // own Light / Dark / Auto choice (state/appearance.json iconStyleVariant, written by Settings)
     property string iconStyle: "default"
+    property string iconStyleVariant: "auto"
+    // what the app icon lookup needs (Apps.iconUrl -> MacIcons.styled): one object, so a binding on it
+    // re-resolves the icon files only when the style, its variant or the mode changes
+    readonly property var iconLook: ({ style: iconStyle, variant: iconStyleVariant, dark: dark })
+    // style of the squircle tile under non-macOS icons: Dark + Auto is the Default style in light mode
+    readonly property string iconTileStyle: iconStyle === "dark" && iconStyleVariant === "auto" && !dark ? "default" : iconStyle
     // Settings > Appearance > Liquid Glass slider (state/appearance.json `glass`, 0 clear .. 1 tinted, 0.5 = the
     // unchanged recipe like NSGlassTintAmount unset: MAC-ANSWERS PC #67 C)
     property real glassTint: 0.5
@@ -73,10 +80,11 @@ Singleton {
         onFileChanged: reload()
         onLoaded: {
             const o = State.parse(text(), { dark: theme.dark, reduceTransparency: theme.reduceTransparency, iconStyle: theme.iconStyle,
-                                            reduceMotion: false, increaseContrast: false, accent: "multicolor", glass: 0.5 });
+                                            iconStyleVariant: theme.iconStyleVariant, reduceMotion: false, increaseContrast: false, accent: "multicolor", glass: 0.5 });
             theme.dark = o.dark;
             theme.reduceTransparency = o.reduceTransparency;
             theme.iconStyle = o.iconStyle;
+            theme.iconStyleVariant = o.iconStyleVariant;
             theme.reduceMotion = o.reduceMotion;
             theme.increaseContrast = o.increaseContrast;
             theme.accent = o.accent;

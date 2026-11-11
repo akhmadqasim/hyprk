@@ -9,10 +9,12 @@ AppIconTile {
     property string icon
     property string appId
 
-    source: Apps.iconUrl(icon, appId)
+    // the style's own rendition for macOS icons (Theme.iconLook), Default for the rest
+    source: Apps.iconUrl(icon, appId, Theme.iconLook)
     // macOS icons, and Dock folders/Trash (macOS never puts those on a tile)
     trusted: Apps.isMacIcon(icon, appId) || /^(user-trash|folder)/.test(icon)
-    style: Theme.iconStyle
+    // macOS icons carry the style in their file; only other icons get the styled tile and glyph effect
+    style: Apps.isMacIcon(icon, appId) ? "default" : Theme.iconTileStyle
     tint: Theme.color.accent
     body: Theme.appIcon.body
     inner: Theme.appIcon.inner

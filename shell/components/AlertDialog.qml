@@ -95,7 +95,7 @@ Item {
         IconImage {
             anchors.horizontalCenter: parent.horizontalCenter
             implicitSize: Theme.alert.iconSize
-            source: Apps.iconUrl(root.model ? root.model.icon : "", "")
+            source: Apps.iconUrl(root.model ? root.model.icon : "", "", Theme.iconLook)
             mipmap: true
         }
         Text {

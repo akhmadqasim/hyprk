@@ -100,7 +100,9 @@ Item {
         anchors.centerIn: parent
         size: root.size
         trusted: root.macApp !== ""
-        source: root.macApp !== "" ? "file://" + startup.iconRoot + "/" + MacIcons.file(root.macApp)
+        // Icon & widget style (appearance.json iconStyle / iconStyleVariant): the icon's own rendition
+        source: root.macApp !== "" ? "file://" + startup.iconRoot + "/"
+                                       + MacIcons.styled(root.macApp, Theme.appearance.iconStyle, Theme.appearance.iconStyleVariant, Theme.dark)
               : root.kind === "app" && root.entry.icon ? "image://icon/" + root.entry.icon : ""
     }
 
