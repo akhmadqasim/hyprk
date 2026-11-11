@@ -71,7 +71,7 @@ Item {
         function test_c_wheel_and_scroller() {
             const f = flick();
             f.contentY = 0;
-            const sc = findChild(app, "knob").parent;
+            const sc = findChild(app, "paneScroller");   // not the Liquid Glass preview's own scroller
             for (let i = 0; i < 40 && f.contentY < 463.5; i++) { mouseWheel(app, 500, 400, 0, -120); wait(20); }
             tryCompare(f, "contentY", 463.5, 2000);
             const col = column();
@@ -84,9 +84,9 @@ Item {
         function test_d_scroller_drag() {
             const f = flick();
             f.contentY = 0;
-            const sc = findChild(app, "knob").parent;
+            const sc = findChild(app, "paneScroller");   // not the Liquid Glass preview's own scroller
             sc.poke();
-            const knob = findChild(app, "knob");
+            const knob = findChild(sc, "knob");
             fuzzyCompare(knob.height, (625 - 52 - 6) * 625 / 1088.5, 0.01);   // 325.6 (Mac 325.5)
             mousePress(sc, 3, knob.height / 2);
             mouseMove(sc, 3, sc.height - knob.height / 2);

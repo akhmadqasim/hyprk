@@ -245,6 +245,7 @@ Item {
     }
     OverlayScrollbar {
         id: scroller
+        objectName: "paneScroller"
         flickable: flick
         x: parent.width - Tokens.scroller.inset - width
         y: Theme.window.toolbarHeight + Tokens.scroller.inset

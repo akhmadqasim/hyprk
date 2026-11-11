@@ -77,33 +77,16 @@ Column {
         }
     }
 
-    // Liquid Glass end buttons (liquidglass-slider-zoom4x-*.png, 4 px per pt): two rounded rectangles, the front one
-    // over the lower right. Outlined (16 x 13, "Capsule Shape On A Rectangle With A Liquid Glass Effect"): back 12.15 x
-    // 9.4 r 2.2, front 12.4 x 9.7 r 4.2 at (3, 2.7), 0.75 pt lines, the back's line shows through the front. Filled
-    // (17 x 13.5, "... On A Rectangle"): back 12.5 x 9.9 r 2.5, front 13.5 x 10.9 r 4.8 at (2.5, 2) with a 0.6 pt gap
-    // in the card colour around it; one ink for both (124 on 247 light, 157 on 37 dark). Pressed: the label colour.
-    component GlassEndIcon: Item {
-        id: ei
+    // Liquid Glass end buttons: the SF Symbols the Mac's view names (AppearancePreferencesFramework
+    // GlassStylePreviewView: capsule.on.rectangle.liquid.glass and capsule.on.rectangle with the fill variant), at the
+    // body size: their ink boxes are 16.25 x 13 and 17.1 x 13.8 pt (AX 16 x 13 and 17 x 13.5). Ink 124 on 247 light,
+    // 157 on 37 dark (liquidglass-slider-zoom4x-*.png). Pressed: the label colour.
+    component GlassEndIcon: SfSymbol {
         property bool filled
         readonly property bool down: parent && parent.pressed === true
-        readonly property color ink: down ? Theme.label : Theme.secondaryLabel
-        width: filled ? 17 : 16; height: filled ? 13.5 : 13
-        Rectangle {
-            width: ei.filled ? 12.5 : 12.15; height: ei.filled ? 9.9 : 9.4; radius: ei.filled ? 2.5 : 2.2
-            color: ei.filled ? ei.ink : "transparent"
-            border.width: ei.filled ? 0 : 0.75; border.color: ei.ink
-        }
-        Rectangle {   // the gap: the card colour under the filled front shape (also keeps a translucent ink from doubling)
-            visible: ei.filled
-            x: 2.5 - 0.6; y: 2 - 0.6; width: 13.5 + 1.2; height: 10.9 + 1.2; radius: 4.8 + 0.6
-            color: Theme.cardFill
-        }
-        Rectangle {
-            x: ei.filled ? 2.5 : 3; y: ei.filled ? 2 : 2.7
-            width: ei.filled ? 13.5 : 12.4; height: ei.filled ? 10.9 : 9.7; radius: ei.filled ? 4.8 : 4.2
-            color: ei.filled ? ei.ink : "transparent"
-            border.width: ei.filled ? 0 : 0.75; border.color: ei.ink
-        }
+        name: filled ? "capsule.on.rectangle.fill" : "capsule.on.rectangle.liquid.glass"
+        pointSize: 13
+        color: down ? Theme.label : Theme.secondaryLabel
     }
     Component { id: glassClear; GlassEndIcon { filled: false } }
     Component { id: glassTinted; GlassEndIcon { filled: true } }
@@ -150,7 +133,11 @@ Column {
                         maskEnabled: true; maskSource: previewMask
                         maskThresholdMin: 0.5; maskSpreadAtMin: 1.0
                     }
-                    Rectangle { id: previewMask; anchors.fill: parent; radius: 14; visible: false; layer.enabled: true }
+                    Rectangle { id: previewMask; anchors.fill: parent; radius: 16; visible: false; layer.enabled: true }
+                    // what the capsules see: the scrolling article and its soft top edge
+                    Item {
+                        id: articleView
+                        anchors.fill: parent
                     Rectangle { anchors.fill: parent; color: Theme.previewCard }
                     Flickable {
                         id: article
@@ -158,34 +145,85 @@ Column {
                         contentHeight: articleBody.height
                         boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
                         RubberBand { flickable: article }
-                        // 27.2.1 (appearance-{light,dark}.png, 2x): the photo fills the top 152 pt (rows 322..626), then a
-                        // text card (#E8E5E0 light, #131210 dark) with a 15 pt Semibold title whose cap top is 23.5 pt
-                        // under the card's top (row 673, so 4.5 pt of it show at rest), a 13 pt secondary subtitle and
-                        // the body, all at x 16. No Apple photo or article is shipped: the photo is the wallpaper, the
-                        // text names it; the body runs on so the preview scrolls like the Mac's.
-                        Column {
+                        // The Mac's own article: AppearancePreferencesFramework 27.2.1, GlassStylePreviewView. Text from
+                        // its Localizable.loctable (en), photos from its Assets.car (apple-park, architecture, pond,
+                        // rainbow; settings/assets/glass-preview, 804 px wide), layout from the view's code, which
+                        // reproduces the AX frames of the Mac (ax-scroll000-dark.jsonl: title y 167.9, subtitle
+                        // 190.9, text 221.9, first photo 294, heading 475.6, ...): the photo fills a 268 x 152 slot,
+                        // the text block starts 16 pt below it (padding 16, the hero's bottom padding -8, stack
+                        // spacing 8), its lines 8 pt apart; title and headings title3 (15 pt, 19 pt lines), body 13 pt
+                        // on 16 pt lines; photos 236 wide, r 16, 16 pt above and below. The card is the view's own
+                        // colour (0.912, 0.897, 0.876 light, 0.076, 0.070, 0.060 dark = Theme.previewCard).
+                        // Inferred: the 8 pt spacer at the end (the code has 32 or 8 by a state not decoded).
+                        Item {
                             id: articleBody
                             width: article.width
-                            RoundedImage {
-                                id: preview
-                                width: parent.width; height: 152; radius: 0; decodeWidth: 540
-                                path: AppState.wallpaperImage || Backend.root + "/themes/wallpapers/png/DefaultAerial.png"
+                            height: articleText.y + articleText.height + 16 + 8 + 8
+                            Rectangle { anchors.fill: parent; color: Theme.previewCard }
+                            Image {
+                                width: parent.width; height: 152
+                                source: Qt.resolvedUrl("../assets/glass-preview/apple-park.jpg")
+                                sourceSize.width: 804
+                                fillMode: Image.PreserveAspectCrop
+                                clip: true
+                                asynchronous: true
                             }
-                            Rectangle {
-                                width: parent.width; height: articleText.height + 20 + 20
-                                color: Theme.previewCard
-                                Column {
-                                    id: articleText
-                                    x: 16; y: 20; width: parent.width - 32; spacing: 3
-                                    MacText { text: P.prettyFileName(preview.path); size: 15; weight: Typography.semibold }
-                                    MacText { text: "Wallpaper"; size: 13; color: Theme.secondaryLabel }
-                                    MacText {
-                                        topPadding: 8; width: parent.width; wrapMode: Text.WordWrap; size: 13
-                                        text: "Light and shape behind every window on your desktop. Liquid Glass lets it show through toolbars, sidebars and controls, bent at their edges. Move the slider below: to the left the glass is clearer, to the right it is more tinted, so text on it stays easier to read."
+                            Column {
+                                id: articleText
+                                x: 16; y: 152 - 8 + 8 + 16; width: parent.width - 32; spacing: 8
+                                component Line: MacText {
+                                    width: parent.width; wrapMode: Text.WordWrap
+                                    lineHeightMode: Text.FixedHeight; lineHeight: size >= 15 ? 19 : 16
+                                }
+                                Item { width: parent.width; height: 19 - 4; Line { text: "Welcome to Apple Park"; size: 15; weight: Typography.semibold } }
+                                Item { width: parent.width; height: 19 + 4; Line { text: "Cupertino, California"; size: 15; color: Theme.secondaryLabel } }
+                                Line { text: "Learn about the design and history of Apple Park, and discover its unique nature and beauty." }
+                                Repeater {
+                                    model: [
+                                        { img: "architecture", h: 157.5, t: "The Architecture", b: "Apple Park was made for walking and exploring. The innovative design elements emphasize openness and connection to nature." },
+                                        { img: "pond", h: 157.5, t: "The Pond", b: "With gently lapping waves and a surrounding of trees, it\u2019s one of the most serene spots on campus." },
+                                        { img: "rainbow", h: 263.5, t: "The Rainbow", b: "One of the most iconic features of Apple Park, the Rainbow brings much joy to all who experience it." }]
+                                    Column {
+                                        id: section
+                                        required property var modelData
+                                        width: articleText.width; spacing: 8
+                                        Item {
+                                            width: parent.width; height: section.modelData.h + 32
+                                            RoundedImage {
+                                                y: 16; width: parent.width; height: section.modelData.h; radius: 16; decodeWidth: 804
+                                                source: Qt.resolvedUrl("../assets/glass-preview/" + section.modelData.img + ".jpg")
+                                            }
+                                        }
+                                        Line { text: section.modelData.t; size: 15; weight: Typography.bold }
+                                        Line { text: section.modelData.b }
                                     }
                                 }
                             }
                         }
+                    }
+                    // The view sets scrollEdgeEffectStyle(.soft, for: .top): content that has scrolled under the capsules
+                    // is softened towards the edge, so text does not stand sharp between and inside them (user report:
+                    // the title showed doubled and smeared around the capsules). Here: the card colour over the top
+                    // 52 pt (the capsule row's height in the view), fading down, once the article has left its top.
+                    // The effect is in the code; its strength and shape are inferred (no Mac shot of the preview scrolled).
+                    Rectangle {
+                        width: parent.width; height: 52
+                        opacity: Math.max(0, Math.min(1, article.contentY / 16))
+                        visible: opacity > 0
+                        gradient: Gradient {
+                            GradientStop { position: 0; color: Qt.rgba(Theme.previewCard.r, Theme.previewCard.g, Theme.previewCard.b, 0.92) }
+                            GradientStop { position: 0.6; color: Qt.rgba(Theme.previewCard.r, Theme.previewCard.g, Theme.previewCard.b, 0.7) }
+                            GradientStop { position: 1; color: Qt.rgba(Theme.previewCard.r, Theme.previewCard.g, Theme.previewCard.b, 0) }
+                        }
+                    }
+                    }
+                    // scroll indicator: 52 pt below the top (under the capsules), 16 above the bottom (the view's
+                    // contentMargins for .scrollIndicators; AX scroll bar y 51..165 of the 180)
+                    OverlayScrollbar {
+                        flickable: article
+                        x: parent.width - Tokens.scroller.inset - width
+                        y: 52
+                        height: parent.height - 52 - 16
                     }
                     // Glass toolbar capsules (liquidglass-0-mid-1-*.png, 2x): x 7.5, 88.5, 132.5; 74, 37, 128 wide; 37 tall
                     // at y 7; one LensGlass each over the article under it. Colour fitted on the copy capsule over the sky
@@ -195,17 +233,22 @@ Column {
                     // the knob lens law (Tokens lensBand / lensAmount). Blur: not measurable from the shots (the
                     // photo under the capsules is not visible without them); 1 pt at 0 to 5 pt at 1 by eye (estimate).
                     Repeater {
-                        model: [{ x: 7.5, w: 74, g: ["ios_share", "more_horiz"], t: "" }, { x: 88.5, w: 37, g: ["filter_none"], t: "" },
-                                { x: 132.5, w: 128, g: ["search"], t: "Search" }]
+                        // glyphs: the view's SF Symbols (square.and.arrow.up, ellipsis, square.on.square, magnifyingglass),
+                        // regular, 16.5 pt (ink on the Mac shot: share 14.5 wide, the three dots 15 wide and 3 tall,
+                        // the squares 17.5 x 17) and the magnifier at the body size (12 x 12); centres at 19.25 and
+                        // 54.5 pt, 18.5, and 16 pt in their capsules
+                        model: [{ x: 7.5, w: 74, g: ["square.and.arrow.up", "ellipsis"], c: [19.25, 54.5], t: "" },
+                                { x: 88.5, w: 37, g: ["square.on.square"], c: [18.5], t: "" },
+                                { x: 132.5, w: 128, g: ["magnifyingglass"], c: [16], t: "Search" }]
                         GlassButton {
                             id: cap
                             required property var modelData
                             x: modelData.x; y: 7; width: modelData.w; height: 37
                             LensGlass {
                                 anchors.fill: parent
-                                source: articleBody
+                                source: articleView
                                 clampToSource: true   // 7 pt from the article's top and right edge, bends 12.6 pt
-                                origin: Qt.point(cap.x + article.contentX, cap.y + article.contentY)
+                                origin: Qt.point(cap.x, cap.y)
                                 band: height * Tokens.control.lensBand
                                 amount: height * Tokens.control.lensAmount
                                 blur: 1 + 4 * glassPreview.tint
@@ -215,28 +258,24 @@ Column {
                                                                                               : 0.22 + 0.52 * (glassPreview.tint - 0.5))
                                 outline: Theme.dark ? 0.5 : 0.4
                             }
-                            Text { // one glyph: centred; two: at 19 and 54 pt (share, more)
-                                visible: cap.modelData.g.length === 1 && cap.modelData.t === ""
-                                anchors.centerIn: parent
-                                text: cap.modelData.g[0]; font.family: Theme.fontGlyph; font.pixelSize: 18
-                                color: Theme.dark ? "#FFFFFF" : "#1C1C1E"
-                            }
                             Repeater {
-                                model: cap.modelData.g.length === 2 ? cap.modelData.g : []
-                                Text {
+                                model: cap.modelData.g
+                                SfSymbol {
                                     required property string modelData
                                     required property int index
-                                    x: (index === 0 ? 19 : 54) - width / 2; anchors.verticalCenter: parent.verticalCenter
-                                    text: modelData; font.family: Theme.fontGlyph; font.pixelSize: 18
-                                    color: Theme.dark ? "#FFFFFF" : "#1C1C1E"
+                                    readonly property bool search: cap.modelData.t !== ""
+                                    name: modelData
+                                    pointSize: search ? 13 : 16.5
+                                    x: cap.modelData.c[index] - width / 2
+                                    y: (cap.height - height) / 2
+                                    color: search ? (Theme.dark ? "#FFFFFF" : "#3A3A3C") : (Theme.dark ? "#FFFFFF" : "#1C1C1E")
                                 }
                             }
-                            Row {
+                            Text {
                                 visible: cap.modelData.t !== ""
-                                x: 16.5 - 9; anchors.verticalCenter: parent.verticalCenter; spacing: 6
-                                Text { text: cap.modelData.g[0]; font.family: Theme.fontGlyph; font.pixelSize: 18; color: Theme.dark ? "#FFFFFF" : "#3A3A3C" }
-                                Text { text: cap.modelData.t; font: Typography.body; anchors.verticalCenter: parent.verticalCenter
-                                       color: Theme.dark ? Qt.rgba(1, 1, 1, 0.75) : Qt.rgba(0, 0, 0, 0.5) }
+                                x: 31.5; anchors.verticalCenter: parent.verticalCenter
+                                text: cap.modelData.t; font: Typography.font(13, Typography.medium)
+                                color: Theme.dark ? Qt.rgba(1, 1, 1, 0.75) : Qt.rgba(0, 0, 0, 0.5)
                             }
                         }
                     }
