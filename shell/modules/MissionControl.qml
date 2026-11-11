@@ -286,6 +286,53 @@ ShellWindow {
         onHasContentChanged: mc.maybeGo()
     }
 
+    // The Dock's band: the wallpaper too, but for the Dock's own glass (Panels.dockRects), so a real window that
+    // reaches into the band is covered there like everywhere else (it showed beside the Dock). Inside the Dock's glass
+    // the compositor still refracts what is under the Dock.
+    readonly property var dockRect: (screen && Panels.dockRects[screen.name]) || null
+    Item {
+        id: dockBand
+        y: mc.height - mc.dockZone
+        width: mc.width
+        height: mc.dockZone
+        visible: mc.dockZone > 0 && mc.dockRect !== null && mc.cover > 0
+        opacity: mc.cover
+        clip: true
+        layer.enabled: visible
+        layer.effect: MultiEffect {
+            maskEnabled: true
+            maskInverted: true
+            maskSource: dockHole
+            maskThresholdMin: 0.5
+            maskSpreadAtMin: 1
+        }
+        Rectangle { anchors.fill: parent; color: mc.m.empty }
+        Image {
+            y: -parent.y
+            width: mc.width
+            height: mc.height
+            source: Wallpaper.urlFor(mc.screen)
+            sourceSize: Wallpaper.pixelSizeOf(mc.screen)
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+            cache: true
+        }
+    }
+    Item {
+        id: dockHole
+        width: dockBand.width
+        height: dockBand.height
+        visible: false
+        layer.enabled: dockBand.visible
+        Rectangle {
+            x: mc.dockRect ? mc.dockRect.x : 0
+            y: mc.dockRect ? mc.dockRect.y - dockBand.y : 0
+            width: mc.dockRect ? mc.dockRect.w : 0
+            height: mc.dockRect ? mc.dockRect.h : 0
+            radius: mc.dockRect ? mc.dockRect.r : 0
+        }
+    }
+
     Item {
         id: keys
         focus: true

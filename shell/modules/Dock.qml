@@ -375,6 +375,10 @@ ShellWindow {
         radius: Theme.compositorGlass ? dock.m.radius : dock.m.radiusCircle
         sx: x
         sy: dock.screen.height - dock.height + y
+        // where it is on the screen, for Mission Control's cover (only while that is open)
+        readonly property var onScreen: Panels.open === "mission" && dock.screen
+            ? { x: x, y: dock.screen.height - dock.height + y, w: width, h: height, r: radius } : null
+        onOnScreenChanged: if (onScreen && dock.screen) Panels.setDockRect(dock.screen.name, onScreen)
         tint: Theme.glass.tintClear
         solidColor: Theme.glass.solidDock
         pluginLift: Theme.dock.pluginLift

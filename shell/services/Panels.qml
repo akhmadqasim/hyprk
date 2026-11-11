@@ -57,6 +57,15 @@ Singleton {
         dockZones = z;
     }
 
+    // The Dock's glass on each screen (by name) in screen coordinates, { x, y, w, h, r }: Mission Control covers the
+    // rest of the band, so a window that reaches into it does not show beside the Dock
+    property var dockRects: ({})
+    function setDockRect(name, r) {
+        const z = Object.assign({}, dockRects);
+        z[name] = r;
+        dockRects = z;
+    }
+
     // context menu (desktop, Dock): items as in lib/menus.js, action may be a function.
     // (contextX, contextY) is the screen point; with contextAbove the menu ends there (Dock).
     property var contextItems: []
