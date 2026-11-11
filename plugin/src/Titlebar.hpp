@@ -20,6 +20,12 @@ namespace lg {
     // decorations through xdg-decoration), 2 only titlebar_classes. classes force it on, exclude off.
     bool wantsTitlebar(const SParams& p, PHLWINDOW window);
 
+    // Does this window look active (lights in colour, active fill and shadow)? The focused window, unless the keyboard is
+    // on a background layer: a click on the empty desktop gives the wallpaper layer the keyboard (on demand) and
+    // activates Finder on the Mac, where the other app's windows go inactive (judge #6). Hyprland keeps the window
+    // as its focused one then, so its focus alone does not tell.
+    bool windowActive(PHLWINDOW window);
+
     class CTitlebar : public IHyprWindowDecoration {
       public:
         using ParamsFn = std::shared_ptr<const SParams> (*)();

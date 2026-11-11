@@ -93,6 +93,6 @@ ShellWindow {
         originX: x
         originY: y + Theme.menuBar.height
         items: Panels.menuShown < 0 ? []
-             : Menus.forIndex(Panels.menuShown, Apps.appIdOf(Hyprland.activeToplevel), Apps.activeAppName(), Quickshell.env("USER"))
+             : Menus.forIndex(Panels.menuShown, Apps.appIdOf(Apps.activeToplevel), Apps.activeAppName(), Quickshell.env("USER"))
     }
 }

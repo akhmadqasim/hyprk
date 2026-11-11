@@ -1,4 +1,5 @@
 #include "WindowShadow.hpp"
+#include "Titlebar.hpp"
 #include "Log.hpp"
 #include "Stats.hpp"
 
@@ -152,7 +153,7 @@ void main() {
         const double rp     = pres.roundingPower();
         const double radius = pres.rounding() > 0 ? pres.rounding() + border - border * (M_SQRT2 - 1) * std::max(2.0 - rp, 0.0) : 0;
 
-        const bool   active = window == Desktop::focusState()->window();
+        const bool   active = windowActive(window);
         if (m_rim) {
             // Q-windows-03: a 1 pt white rim just inside the frame, alpha .10 (.08 dark inactive), over the window and its
             // title bar; inside the border (part of the box) at the window's own corner

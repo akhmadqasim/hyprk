@@ -236,8 +236,14 @@ Singleton {
         return genericIcon;
     }
 
+    // The app whose menus the menu bar shows: the focused window's, or Finder while the desktop has the keyboard (a click
+    // on the empty desktop activates Finder on the Mac; Hyprland keeps its focused window then, but hands the keyboard to
+    // the wallpaper layer and deactivates the window: Background.qml sets this)
+    property string desktopFocus: ""      // the screen whose desktop has the keyboard, or ""
+    readonly property var activeToplevel: desktopFocus !== "" ? null : Hyprland.activeToplevel
+
     function activeAppName() {
-        const t = Hyprland.activeToplevel;
+        const t = root.activeToplevel;
         if (!t || !appIdOf(t)) return "Finder";
         const id = appIdOf(t);
         if (hyprkApps[id]) return hyprkApps[id].name;

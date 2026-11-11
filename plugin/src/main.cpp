@@ -17,6 +17,7 @@
 #include <hyprland/src/desktop/view/WLSurface.hpp>
 #include <hyprland/src/desktop/view/window/Window.hpp>
 #include <hyprland/src/desktop/state/ViewState.hpp>
+#include <hyprland/src/desktop/state/FocusState.hpp>
 #include <hyprland/src/event/EventBus.hpp>
 #include <hyprland/src/helpers/Color.hpp>
 #include <hyprland/src/managers/SessionLockManager.hpp>
@@ -344,6 +345,11 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
             if (bar.belongsTo(w))
                 bar.damageEntire(); // Hyprland does not damage decorations on a title change
         });
+    }));
+    // the keyboard moving between the focused window and the desktop (lg::windowActive) changes its bar and shadow
+    g_listeners.push_back(Event::bus()->m_events.input.keyboard.focus.listen([](SP<CWLSurfaceResource>) {
+        if (const auto w = Desktop::focusState()->window(); w && w->mapped())
+            g_pHyprRenderer->damageWindow(w, true);
     }));
     g_listeners.push_back(Event::bus()->m_events.input.mouse.button.listen([](IPointer::SButtonEvent e, Event::SCallbackInfo&) {
         if (e.state == WL_POINTER_BUTTON_STATE_RELEASED)

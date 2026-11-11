@@ -113,7 +113,7 @@ ShellWindow {
     Region { id: edgeRow; width: bar.width; height: 1 }
     HoverHandler { id: topHover }
 
-    readonly property string appId: Apps.appIdOf(Hyprland.activeToplevel)
+    readonly property string appId: Apps.appIdOf(Apps.activeToplevel)
     readonly property var appMenus: Menus.forApp(appId)
     // on the black full-screen strip the dark-wallpaper colours (white titles)
     readonly property bool onBlack: fullscreen && peeked

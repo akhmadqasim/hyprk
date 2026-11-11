@@ -19,6 +19,19 @@ ShellWindow {
     namespace: "hyprk-wallpaper"
     WlrLayershell.layer: WlrLayer.Background
 
+    // A click on the empty desktop activates Finder (macOS: the desktop is Finder's; the other app's windows go
+    // inactive and the menu bar shows Finder's menus, judge #6). On demand, Hyprland gives this layer the keyboard on a
+    // click and deactivates the focused window; the window takes it back when clicked.
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+    Item {
+        readonly property bool focused: Window.active
+        onFocusedChanged: {
+            const name = bg.screen ? bg.screen.name : "";
+            if (focused) Apps.desktopFocus = name;
+            else if (Apps.desktopFocus === name) Apps.desktopFocus = "";
+        }
+    }
+
     // desktop right-click: Finder desktop menu
     MouseArea {
         anchors.fill: parent

@@ -131,7 +131,7 @@ Item {
         switch (String(action).split(":")[0]) {
         case "finder": Apps.openFinder(arg); return;
         case "about-app": Panels.showAlert({
-            icon: arg === "Finder" ? "hyprk-finder" : ((Apps.entryFor(Apps.appIdOf(Hyprland.activeToplevel)) || {}).icon || ""),
+            icon: arg === "Finder" ? "hyprk-finder" : ((Apps.entryFor(Apps.appIdOf(Apps.activeToplevel)) || {}).icon || ""),
             title: arg,
             message: "",
             buttons: [{ label: "OK", isDefault: true }],

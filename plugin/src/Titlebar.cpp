@@ -2,6 +2,10 @@
 #include "Readback.hpp"
 
 #include <hyprland/src/desktop/state/FocusState.hpp>
+#include <hyprland/src/desktop/view/LayerSurface.hpp>
+#include <hyprland/src/desktop/view/WLSurface.hpp>
+#include <hyprland/src/managers/SeatManager.hpp>
+#include <hyprland/src/protocols/LayerShell.hpp>
 #include <hyprland/src/desktop/view/window/Window.hpp>
 #include <hyprland/src/desktop/view/window/WindowPresentation.hpp>
 #include <hyprland/src/desktop/view/window/WindowEffectsController.hpp>
@@ -34,6 +38,18 @@
 #include <regex>
 
 namespace lg {
+
+    bool windowActive(PHLWINDOW window) {
+        if (!window || Desktop::focusState()->window() != window)
+            return false;
+        const auto kb = g_pSeatManager->m_state.keyboardFocus.lock();
+        if (!kb)
+            return true;
+        const auto surf = Desktop::View::CWLSurface::fromResource(kb);
+        const auto ls   = surf ? Desktop::View::CLayerSurface::fromView(surf->view()) : nullptr;
+        return !ls || ls->m_layer != ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND;
+    }
+
 
     // ── which windows get a bar ─────────────────────────────────────────────
 
@@ -362,7 +378,7 @@ namespace lg {
         if (barPx.empty())
             return;
 
-        const bool  isActive = Desktop::focusState()->window() == window;
+        const bool  isActive = windowActive(window);
         const float radius   = window->presentation().rounding();
 
         const SLook look = this->look(*params, isActive, m_dark);
@@ -577,7 +593,7 @@ namespace lg {
                            R"("weight":{},"title":{},"active":{},"look":{{"active":{},"inactive":{}}}}})",
                            reinterpret_cast<uintptr_t>(window.get()), m_height, p.titlebarButton, p.titlebarGap, p.titlebarInset, layout.title.x,
                            window->presentation().rounding(), jsonString(p.titlebarFont), p.titlebarFontSize, TITLE_WEIGHT, jsonString(window->metadata().title()),
-                           Desktop::focusState()->window() == window, state(true), state(false));
+                           windowActive(window), state(true), state(false));
     }
 
     void CTitlebar::onPointerMove(const Vector2D& global) {
