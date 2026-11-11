@@ -425,8 +425,9 @@ Singleton {
         readonly property int blinkOn: 42
         // submenu (Q-menubar-23): opens 0.22 s after its row is highlighted, complete in one frame; its frame overlaps
         // the parent's right edge by 5 pt and starts 5 pt above the row, so its first row lines up with it
-        // The timer is 30 ms shorter: mapping the submenu surface adds about 2 frames (mcap: 220 showed it 14 to 15
-        // frames after the row, 190 shows it after 12 to 14, 13.2 on average, as the Mac's 13)
+        // The pause is 30 ms shorter: it ends on the 12th frame of the menu's window and the submenu's surface (mapped
+        // from the start of the delay) draws on the next, the 13th (mcap session 20: 13 frames in 4 of 6, 14 in 2; on
+        // Qt's 220 ms timer 14 to 15, on a 190 ms timer 13 to 15)
         readonly property int submenuDelay: 190
         readonly property real submenuOverlap: 5
     }

@@ -278,7 +278,9 @@ Item {
         subPending = -1;
         subIndex = -1;
     }
-    Timer { id: subTimer; interval: Theme.menu.submenuDelay; onTriggered: root.openSub(root.subPending, false) }
+    // counted in frames of this window (HyprK FrameAnim as a pause, like the blink): on Qt's timer the submenu showed
+    // 13 to 15 frames after its row (session 20, mcap), the Mac's is 13
+    FrameAnim { id: subTimer; from: 0; to: 1; duration: Theme.menu.submenuDelay; onFinished: root.openSub(root.subPending, false) }
     Loader {
         id: subLoader
         active: root.host !== null && root.visible && (root.subIndex >= 0 || root.subPending >= 0)
