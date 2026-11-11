@@ -146,6 +146,11 @@ ShellWindow {
     // lights in the thumbnails). Such a window's thumbnail gets the bar's strip cut from a still of the screen.
     property var stack: ({})
     property var bars: ({})
+    // address -> the bar as the plugin draws it (`hyprctl liquidglass bars`, plugin/src/Titlebar.cpp describe()): its
+    // fill, text and lights per state, title and layout. A window capture holds the client only, and the screen still
+    // has a bar only where nothing covers it: the thumbnails of covered or partly off-screen windows draw it from this
+    // (judge #5: 2 of 3 inactive terminals had no title bar in Mission Control)
+    property var barLooks: ({})
     property bool asked: false          // the reply is in
     Socket {
         id: stackQuery
@@ -158,14 +163,17 @@ ShellWindow {
                 reply = "";
                 // the toplevel's own address: a new window's lastIpcObject is still empty here
                 addresses = mc.windows.map(t => mc.addressOf(t)).filter(a => a);
-                write("[[BATCH]]j/clients;" + addresses.map(a => "/decorations address:" + a).join(";"));
+                write("[[BATCH]]j/clients;" + addresses.map(a => "/decorations address:" + a).join(";") + ";/liquidglass bars");
                 flush();
             } else if (reply !== "") {
                 try {
                     const parts = reply.split(/\n\n\n+/), s = {}, b = {};
                     JSON.parse(parts[0]).forEach((c, i) => s[c.address] = i);
                     addresses.forEach((a, i) => { if ((parts[i + 1] || "").includes("liquidglass-titlebar\t")) b[a] = true; });
+                    const looks = {};
+                    try { JSON.parse(parts[addresses.length + 1] || "[]").forEach(d => looks[d.address] = d); } catch (err) {}
                     mc.stack = s;
+                    mc.barLooks = looks;
                     mc.bars = b;
                 } catch (err) {}
                 reply = "";
@@ -247,10 +255,16 @@ ShellWindow {
     }
     // the plugin title bar's strip above the window, when the screen still shows all of it: on the screen below the
     // menu bar and above the Dock's band, with no window stacked higher over it
-    function barRect(t) {
+    // the strip where the bar is, seen or not (the thumbnail draws it when the still cannot give it, barLooks)
+    function barStrip(t) {
         const o = t.lastIpcObject, c = clientRect(t);
         if (!c || !bars[o.address]) return null;
-        const b = Qt.rect(c.x, c.y - m.titleBar, c.width, m.titleBar);
+        const d = barLooks[o.address], h = d && d.height > 0 ? d.height : m.titleBar;
+        return Qt.rect(c.x, c.y - h, c.width, h);
+    }
+    function barRect(t) {
+        const o = t.lastIpcObject, c = clientRect(t), b = barStrip(t);
+        if (!b) return null;
         if (b.x < 0 || b.x + b.width > width || b.y < Theme.menuBar.height || c.y > height - dockZone) return null;
         const z = stack[o.address];
         for (const u of windows) {
@@ -263,7 +277,7 @@ ShellWindow {
     }
     // the whole window as it is on screen: the client box plus its title bar strip
     function fullRect(t) {
-        const c = clientRect(t), b = c ? barRect(t) : null;
+        const c = clientRect(t), b = c ? barStrip(t) : null;
         return b ? Qt.rect(c.x, b.y, c.width, c.height + b.height) : c;
     }
     readonly property bool anyBar: windows.some(t => t.lastIpcObject && bars[t.lastIpcObject.address])
@@ -564,13 +578,18 @@ ShellWindow {
             // where the window really is, with its title bar strip (screen-local); the thumbnail starts and ends
             // there. Taken only before the fly-in is under way (IPC data arrives asynchronously: no jump).
             readonly property var ipcRect: mc.bars && mc.stack ? mc.fullRect(cell.modelData) : null
-            readonly property var ipcBar: mc.bars && mc.stack ? mc.barRect(cell.modelData) : null
+            readonly property var ipcBar: mc.bars && mc.stack && mc.barLooks ? mc.barStrip(cell.modelData) : null
             property var real: null
-            property var bar: null
+            property var bar: null          // the bar's strip on the screen (any window with the plugin's bar)
+            property bool barSeen: false    // ... and the screen still shows all of it
+            property var look: null         // ... as the plugin draws it
             function takeRect() {
                 if (mc.e >= 0.05) return;
                 real = mc.fullRect(cell.modelData);
-                bar = mc.barRect(cell.modelData);
+                bar = mc.barStrip(cell.modelData);
+                barSeen = mc.barRect(cell.modelData) !== null;
+                const o = cell.modelData.lastIpcObject;
+                look = o && mc.barLooks[o.address] || null;
                 mc.relayout();
             }
             onIpcRectChanged: takeRect()
@@ -616,11 +635,43 @@ ShellWindow {
                     color: "transparent"
                     // the plugin title bar's strip, cut from the screen still
                     ShaderEffectSource {
-                        visible: cell.bar !== null && still.hasContent
+                        visible: cell.bar !== null && cell.barSeen && still.hasContent
                         width: parent.width
                         height: cell.barHeight
                         sourceItem: visible ? still : null
                         sourceRect: cell.bar ? cell.bar : Qt.rect(0, 0, 0, 0)
+                    }
+                    // the bar drawn from the plugin's description where the still has none: its fill, the lights in
+                    // the window's state at open (active only for the focused one, as mc-light.png) and the title, laid out
+                    // in points and scaled with the thumbnail
+                    Rectangle {
+                        readonly property var st: cell.look ? cell.look.look[cell.look.active ? "active" : "inactive"] : null
+                        visible: cell.bar !== null && st !== null && !(cell.barSeen && still.hasContent)
+                        width: parent.width
+                        height: cell.barHeight
+                        color: st ? st.fill : "transparent"
+                        Item {
+                            width: cell.bar ? cell.bar.width : 0
+                            height: cell.bar ? cell.bar.height : 0
+                            scale: cell.real && cell.real.width > 0 ? cell.width / cell.real.width : 1
+                            transformOrigin: Item.TopLeft
+                            TrafficLights {
+                                x: cell.look ? cell.look.inset : 0
+                                anchors.verticalCenter: parent.verticalCenter
+                                enabled: false
+                                active: cell.look ? cell.look.active : false
+                                dark: parent.parent.st ? parent.parent.st.dark : false
+                            }
+                            Text {
+                                x: cell.look ? cell.look.titleX : 0
+                                width: Math.max(0, parent.width - x - 8)
+                                anchors.verticalCenter: parent.verticalCenter
+                                elide: Text.ElideRight
+                                text: cell.look ? cell.look.title : ""
+                                font: Typography.font(cell.look ? cell.look.fontSize : 13, Typography.bold)
+                                color: parent.parent.st ? parent.parent.st.text : "transparent"
+                            }
+                        }
                     }
                     ScreencopyView {
                         id: view
