@@ -3608,3 +3608,217 @@ tint = quantise6(mean of the wallpaper pixels under the window frame)   // encod
 - Code excerpts: `reference/re/27.2.1/decomp/QuartzCore-SkyLight-chameleon.c`, `QuartzCore-glass-blur-pyramid.c`; correction note added to `QuartzCore-glassBackground-shader.c`
 - Probes: `reference/re/tools/probe/glass3.swift` (tree / sb / blur / nat / nat3), `cham.swift`
 - Pictures: `reference/screens/27.2.1/verify/C3/` (probe windows only)
+
+
+## Lock screen (PC #73 part 1, partial: Mac shut down)
+
+Raw recordings were sent to the PC inbox as lock-raw-27.2.1.tar.
+
+# lockscreen answers (agent LOCK) — PARTIAL, stopped early (Mac shutdown)
+
+Status: only the AX dumps and the two preview stills (v-dark3.png, v-light3.png) were read. NO video frame was
+analysed, NO static RE was done. Every transition number is "not measured". Raw material is intact (nothing deleted).
+
+Source: loginwindow AX while locked (dark-ax.jsonl / light-ax.jsonl, copied to
+reference/re/27.2.1/live/lockscreen/ax-{dark,light}.jsonl; no personal data in them), frames in pt, top-left origin,
+screen 1710x1107. AX frames are identical in light and dark except the time width.
+
+- Q-03 clock: time = SwiftUI AXHostingView, AX frame x657.5 y115 w395 h185 ("09.07") / x674.5 w361 ("09.12") → centred
+  on x=855, width follows the digits (proportional, not tabular). Digit ink bbox: not measured.
+- Q-04 format: "09.07" = 24 h, leading zero, locale separator "." (en-ID), no AM/PM. 12 h: not measured.
+- Q-05 date: AX id "LargeDate", value "Wed 11 Nov" (abbreviated weekday, day, abbreviated month; locale order),
+  frame x772 y98.5 w166 h39, centred on 855, ABOVE the time and overlapping the top of the time's AX frame (115).
+  Font/size/weight: not measured.
+- Q-02 clock look (stills only, not pixel-measured): heavy rounded-looking digits, translucent/glass-like tint taking
+  the wallpaper colour (lilac on TahoeDark, near white with a cyan cast on TahoeLight). Font, size, weight: not measured.
+- Q-06 avatar: one small disc centred on x≈855, about 30 pt, centre y≈950 (estimated from a downscaled still,
+  ±3 pt). Exact diameter/border/shadow: not measured.
+- Q-07 name: NO name label was visible in the stills and none is in the AX tree (only "show all users" button,
+  AXScrollArea x227.5 y573.5 w1255 h414). Needs confirming on full-res screenshots.
+- Q-08 field: UserPasswordTextField AX x788 y997.5 w117 h18 (text area); LUIBUTTON_GO x906 y998 w30 h17.5 (arrow,
+  inside the capsule right end); LUIBUTTON_PASSWORD_HINT "(?)" x940 y998 w30 h17.5 (separate circle right of the
+  field). Capsule outer size/radius: not measured.
+- Q-09 field material: not measured.
+- Q-10 placeholder: "Enter Password" left-aligned in the field, shown at once (light still); the line under the field
+  is AXStaticText "Touch ID or Enter Password" x771.5 y1027.5 w167.5 h17, centred on 855. Arrow button present (AX).
+- Q-11 dots: typed dots are left-aligned with a caret (dark still). Sizes, caps-lock indicator: not measured.
+- Q-14 Touch ID line: text "Touch ID or Enter Password", frame above. Font/size: not measured.
+- Q-15 bottom buttons: none in the AX tree on the lock screen (no Sleep/Restart/Shut Down/Cancel/Switch User).
+- Q-16 status, right→left (AX): Wi-Fi AXMenuButton x1665 y9.5 w26 h15; battery AXImage x1625 y9 w28 h16
+  ("battery charged 100%"); keyboard "ABC" TextInputMenuButton x1559 y8 w54 h18; then
+  "Your screen is being observed" x1337 y8 w185 h18 — this one shows ONLY because we were screen-recording.
+  Gaps 12 pt; right margin 1710-1691 = 19 pt. The normal menu bar (Apple menu, app menus, clock) is not shown.
+- Q-17 keyboard item: text "ABC" + keyboard glyph, present with this account's input sources; popup: not measured.
+- Q-20/21/22 notifications / Now Playing / widgets: none visible in the stills; the desktop widgets (NC "Clock I",
+  "Status" windows) stay in the window list but are covered by the loginwindow window (layer 2004, full screen; a
+  second loginwindow window at layer 2001, 30000x30000 = shield). Not checked further.
+- Q-01 wallpaper: stills show the same Tahoe picture, not visibly blurred or dimmed. Pixel delta: not measured.
+- Q-31: layout identical in light and dark (AX); clock tint differs with the wallpaper (see Q-02).
+
+Not measured (no time): Q-12 shake (amplitude/count/duration/curve), Q-13 hint, Q-18 lock-in, Q-19 unlock,
+Q-24 saver→lock, Q-25 display sleep/wake, Q-23, Q-26..30, Q-32, Q-33, sounds, all static RE
+(loginwindow / LoginUIKit / LoginUICore constants).
+
+Remaining work for whoever continues: recordings scratchpad/lock/{dark,light,sleep,saver}.mp4 and
+{dark,light}-sc1..6.png are still there (personal data: avatar, menu bar, desktop after unlock — blank before
+saving anything to the repo). scratchpad/lockwork/tl.py builds a per-frame activity timeline (was still running
+when stopped; its .npz output may be incomplete). No PNGs were written to reference/screens/27.2.1/lockscreen/.
+
+
+## PC #73 parts 2 and 4 (not measured: Mac shut down)
+
+# G4 answers (PC #73 parts 2 and 4) — stopped early: Mac shut down
+
+State: G4 never took the screen lock, opened no apps, changed no defaults / Dock / appearance / wallpaper. Nothing to restore. No files written to the repo.
+
+| item | status | value | evidence |
+|---|---|---|---|
+| (2) rubber-band formula, return curve, momentum, scroll bar in overscroll | RAGU (not measured: Mac shut down) | only the entry points were found | AppKit exports (dyld_info -exports, offsets from the AppKit image base): `_NSElasticDeltaForReboundDelta` 0x28B7EC, `_NSReboundDeltaForElasticDelta` 0x28B1F8, `_NSElasticDeltaForTimeDelta` 0x2ADD3C, `...ForReboundDelta2` 0xAAA308, `...ForTimeDelta2` 0xAAA204, `_NSReboundDeltaForElasticDelta2` 0xAAA31C, `_NSElasticInitialPositionForZeroDelta` 0xAAA324, `_NSHyperbolicElasticDeltaForReboundDelta` 0xAAA3B8, `_NSHyperbolicReboundDeltaForElasticDelta` 0xAAA3FC; data `NSScrollingBehaviorHyperbolicCoefficientTouch` 0x13FB2C0, `...Trackpad` 0x13FB2C8; classes `_NSScrollingMomentumCalculator`, `_NSScrollingRubberbandFilter`. Not disassembled, constants not read. |
+| (4a) Control Center module expansion, Edit Controls / AirPlay button | not measured: Mac shut down | earlier values stand unverified: morph ~0.35 s; Edit Controls capsule 93.5 x 24, r 12, 16 pt below the last row; AirPlay button 26 x 26 in the Sound tile | MAC-ANSWERS (Control Center section) |
+| (4b) Quick Look open/close | not measured: Mac shut down | earlier: 0.79 -> 1 in ~0.25 s ease-out (.79 .85 .90 .93 .95 .97 .98 .98 .99 1); close ~0.18 s into the icon | MAC-ANSWERS Q-finder-26 |
+| (4c) full screen enter/exit | not measured: Mac shut down | earlier: enter ~0.42 s, exit ~0.5 s in two steps | MAC-ANSWERS R2 |
+| (4d) traffic lights glow / hover glyph timing | not measured: Mac shut down | earlier: pressed disc ~1.15x and brighter; hover delay/fade never measured | MAC-ANSWERS Q-windows-08 |
+| (4e) Cmd-Tab show delay | not measured: Mac shut down | earlier 0.19 s, quick tap < ~30 ms switches without the panel; not re-verified | MAC-ANSWERS Q-dock-22 |
+| (4f) Dock slot add/remove animation | not measured: Mac shut down | - | - |
+| (4g) long-menu scroll arrows / auto-scroll speed | not measured: Mac shut down | earlier static layout only (24 pt arrow row, 13x8 chevron, no fade); speed not measured | MAC-ANSWERS Q-menubar-26 |
+
+Next step when the Mac is back: call the exported `_NSElastic*` / `_NSHyperbolic*` functions through dlsym from a probe to tabulate the rubber-band curve, disassemble them for constants, then the live sessions.
+
+
+## Sounds per event (PC #73 part 3, static only: Mac shut down)
+
+# SND answers (PC #73 part 3) — INTERRUPTED: Mac shut down by user before any live test
+
+Nothing was triggered live; no system state was changed (volume still 31, no dmg made, screen lock never taken, Bin untouched).
+All statuses below are therefore SEBAGIAN/RAGU (static only). Prior findings: MAC-ANSWERS.md "Sounds (27.2.1)".
+
+New facts found in this session (static / read-only):
+- The system-sound name table lives in the on-disk binary /usr/sbin/systemsoundserverd (runs as root), __cstring 0x100015dc8+:
+  base dir string at file offset 0x16365 "/System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/",
+  then names in this order from 0x163ff: Grab.aif, Screen Capture.aif, Volume Mount.aif, Volume Unmount.aif, Media Keys.aif,
+  burn complete.aif, burn failed.aif, Mouse Keys ON/OFF, Sticky Keys ..., Slow Keys ..., empty trash.aif, move to trash.aif,
+  poof item off dock.aif, drag to trash.aif, InkSound*, telephony tones, payment_success/failure, dtmf-*, multiway_*, SentMessage.caf, ...
+  Shutter.aif is NOT in the table (file exists on disk but is not referenced there).
+  The ID -> name mapping function was NOT decompiled (stopped). Next step: REA open /usr/sbin/systemsoundserverd (arm64e), xrefs to 0x1000163ff etc.
+- Server log strings: "Do not start audio for actionID %u ... IsUIAudioOn: %d, IsAlertAudioOn: %d" => UI sounds gated by a UI-audio pref, alerts by an alert-audio pref
+  (kSSXPCMessageKey_Prefs_AlertAudioOn / AlertVisualOn). Unified-log subsystem to watch live: com.apple.coreaudio, process systemsoundserverd.
+- Prefs on this Mac: com.apple.sound.beep.sound = /System/Library/Sounds/Blow.aiff (alert sound is Blow here, not the stock default);
+  com.apple.sound.beep.feedback = 0 (volume feedback off); com.apple.sound.uiaudio.enabled unset; com.apple.sound.beep.flash = 0.
+- nvram: StartupMute=%00 (startup chime not muted), SystemAudioVolume=%80.
+- PowerChime.app is running (pid seen), no com.apple.PowerChime defaults domain (stock behaviour).
+- ~/.Trash is not readable from this shell (TCC), so Bin emptiness could not be checked: Empty Bin must be answered from code.
+
+| event | file | status |
+|---|---|---|
+| notification banner, default | not measured: Mac shut down | - |
+| notification banner, app sound (sound name "Glass") | /System/Library/Sounds/Glass.aiff expected; not measured: Mac shut down | RAGU |
+| alert / NSBeep | file in com.apple.sound.beep.sound (here Blow.aiff); when NSAlert plays it: not measured: Mac shut down | SEBAGIAN (pref only) |
+| Move to Bin | SystemSounds/finder/move to trash.aif | SEBAGIAN (name table in systemsoundserverd; caller/ID not traced) |
+| Empty Bin | SystemSounds/finder/empty trash.aif | SEBAGIAN (same) |
+| Dock poof | SystemSounds/dock/poof item off dock.aif (drag to trash.aif for dragging onto Bin) | SEBAGIAN (same) |
+| screenshot | SystemSounds/system/Screen Capture.aif or Grab.aif (screencapture plays ID 1393; -x silent); Shutter.aif not in table | RAGU between the two; not measured: Mac shut down |
+| volume feedback | BezelServices.loginPlugin/Contents/Resources/volume.aiff; pref beep.feedback = 0 here; stock default not verified | SEBAGIAN |
+| dmg mount/unmount | SystemSounds/system/Volume Mount.aif / Volume Unmount.aif; whether a dmg mount plays them at all: not measured: Mac shut down | RAGU |
+| charger connected | PowerChime.app/Contents/Resources/connect_power.aif | SEBAGIAN (static, earlier finding) |
+| startup chime | StartupMute=%00 => enabled; chime file is in firmware, not on the system volume (not traced) | RAGU; not measured: Mac shut down |
+
+afinfo (path | format; duration):
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/finder/move to trash.aif | Data format:     2 ch,  44100 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 2.185828 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/finder/empty trash.aif | Data format:     2 ch,  48000 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 0.824979 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/dock/poof item off dock.aif | Data format:     2 ch,  44100 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 0.336531 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/dock/drag to trash.aif | Data format:     2 ch,  48000 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 0.500583 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/system/Grab.aif | Data format:     2 ch,  44100 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 0.492744 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/system/Screen Capture.aif | Data format:     2 ch,  48000 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 0.729062 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/system/Shutter.aif | Data format:     2 ch,  44100 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 0.492744 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/system/Volume Mount.aif | Data format:     2 ch,  48000 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 1.044458 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/system/Volume Unmount.aif | Data format:     2 ch,  44100 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 0.569002 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/system/Media Keys.aif | Data format:     1 ch,  44100 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 0.382426 sec
+- /System/Library/LoginPlugins/BezelServices.loginPlugin/Contents/Resources/volume.aiff | Data format:     1 ch,  44100 Hz, lpcm (0x0000000E) 16-bit big-endian signed integer;estimated duration: 0.382426 sec
+- /System/Library/CoreServices/PowerChime.app/Contents/Resources/connect_power.aif | Data format:     2 ch,  44100 Hz, lpcm (0x0000000E) 16-bit big-endian signed integer;estimated duration: 0.903084 sec
+- /System/Library/Sounds/Blow.aiff | Data format:     2 ch,  48000 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 1.401833 sec
+- /System/Library/Sounds/Funk.aiff | Data format:     2 ch,  48000 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 2.163458 sec
+- /System/Library/Sounds/Glass.aiff | Data format:     2 ch,  48000 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 1.650083 sec
+
+
+## Rubber-band scroll constants (PC #73 part 2, static + dlsym, no live scroll)
+
+Status: SEBAGIAN (code read and the functions called in-process; no live overscroll measured because the Mac was shut down).
+Source: AppKit 27.2.1 disassembly `reference/re/27.2.1/decomp/AppKit-rubberband.asm`; probe `reference/re/tools/probe/rubberband.m` calls the private functions through dlsym (C names start with one underscore, e.g. `_NSElasticDeltaForTimeDelta`).
+
+- Stiffness `NSScrollViewRubberbandStiffness` = 20 (default, app config can override). Direction-lock stretch ratio 1, minimum delta before stretch 10 pt.
+- Classic (linear) model: `_NSElasticDeltaForReboundDelta(d) = d / max(stiffness, 1)` = d / 20, `_NSReboundDeltaForElasticDelta(e) = e · 20` (0x18A64D7EC, 0x18A64D1F8).
+- Hyperbolic model (0x18AE6C3B8 / 0x18AE6C3FC): `elastic(d, c, D) = sign(d) · D · (1 − 1/(1 + |d|·c/D))`, inverse `rebound(e, c, D) = sign(e) · D · (1/(1 − |e|/D) − 1) / c`; if D ≤ 0 it falls back to d/20. Coefficients: trackpad c = 0.075 (`NSScrollingBehaviorHyperbolicCoefficientTrackpad`), touch c = 0.55. D is presumably the visible dimension (not verified by a call site).
+- Return to rest after release (`_NSElasticDeltaForTimeDelta` → `_NSElasticDeltaForTimeDelta2` 0x18AE6C204): `x(t) = (x0 + C1·v·t) · exp(−stiffness·t / C2)` with C2 = 1.6, C1 = −0.31 (as evaluated; sign follows AppKit's velocity convention), v clamped to ±`NSScrollViewScrollVelocityMax`. With stiffness 20 that is a critically damped decay with rate 12.5 /s: x0 = 100 → 53.5 / 28.7 / 8.2 / 2.4 / 0.67 / 0.19 at 0.05 / 0.1 / 0.2 / 0.3 / 0.4 / 0.5 s.
+- Not measured: momentum deceleration rate after a flick, scroll bar during overscroll, which model (classic vs hyperbolic) Finder list and Settings use.
+
+
+## Momentum, rubber-band model, overscroll scroller, sound IDs (PC #73 parts 2-3, static + offscreen probes)
+
+# static73 (PC #73 follow-up, static RE only, AppKit 27.2.1 / 26B131) — complete
+
+## 1. Momentum (interim, probe-verified part)
+- `+[_NSScrollingMomentumCalculator allocWithZone:]` is a class cluster: app config `NSScrollBehaviorAnimationType` (NSInteger, default 0) → 0 = `_NSScrollingMomentumCatesCalculator` (default; probe: `[alloc]` returns Cates), 1 = `_NSScrollingMomentumBasCalculator`.
+- Cates (default), executed in probe ~/hyprk/reference/re/tools/probe/momentum.m: k = `NSScrollingBehaviorMomentumConstant` = 1000 (pt/s^4).
+  T = cbrt(v0 / (4k)); travel D = k·T^4 = v0·T/4; x(t) = D − k·(T − t)^4 = D·(1 − (1 − t/T)^4); v(t) = v0·(1 − t/T)^3; stop exactly at t = T.
+  Probe: v0=500 → T 0.5 s, D 62.5; v0=2000 → T 0.7937, D 396.85; v0=8000 → T 1.2599, D 2519.84 (all match formula to 6 digits).
+- Bas (non-default, UIKit-like): factor 0.998 per ms (0x3FEFEF9DB22D0E56), ln = −0.002002; v0=2000 → travel 993.0 (probe) ≈ v0/1000/(−ln 0.998)=999 minus cut-off, durationUntilStop 2.646 s.
+- Config getters called in-process (default values): NSScrollViewScrollVelocityMax 20000; NSScrollViewScrollVelocityZeroingTimeout 0.1; NSScrollViewRubberbandStiffness 20;
+  NSScrollViewRubberbandDirectionLockStretchRatio 1; NSScrollViewRubberbandMinimumRequiredDeltaBeforeStretch 10; NSScrollingBehaviorMinAcceleratedStoppableVelocity 70;
+  NSScrollingVFDReducedFPS 60; NSScrollingVFDVelocityThreshold 320; NSScrollingTouchMomentumMinimumSpeed 0.25; NSScrollingBehaviorMaxUnacceleratedVelocity 41000 (literal);
+  NSScrollViewRubberbandAmplitude 0.31; NSScrollViewRubberbandPeriod 1.6; PredominantAxisHysteresisPause 0.6 s / Distance 10 pt; NSScrollWheelMultiplier 1.
+- Cates code (0x18ACFE284 calculateDestination, 0x18ACFF1AC velocityAfterDuration:): k = decelerationRate ivar if > 0 else config (1000); per axis dest = origin + sign(v)·k·(|v|/(4k))^(4/3); v(t) = 4k·(T−t)^3.
+  If the destination passes the document edge: free phase runs until the edge is reached (time t_e), then rubber-band phase = `_NSElasticDeltaForTimeDelta2(x0 = 0, v = v(t_e), t − t_e, stiffness 20)`:
+  stretch(τ) = 0.31·v_e·τ·exp(−20·τ/1.6) (peak at τ = 0.08 s: 0.00912·v_e pt). Probe: v0 4000, edge 100 pt away → v_e ≈ 3696, peak overshoot 33.6 pt at t ≈ 0.10 s, back within 0.5 pt at 0.6 s (matches).
+  If no explicit rate, T > 2.0 s and no rubber-banding: destination is cut to x(2.0 s) (only reachable for v0 > 32000 pt/s). The flick velocity itself is not clamped by the calculator; at v0 = 20000: T = 1.71 s, travel 8550 pt (probe).
+
+## 2. Which rubber-band model — TERKONFIRMASI (code + executed filter)
+- The exported `__NSHyperbolicElasticDeltaForReboundDelta` has NO call site inside AppKit: the same maths is inlined in `-[_NSScrollingRubberbandFilter addDelta:velocity:]` (0x18ACA3D10…, ivars `_hyperbolicCoefficient` +0x90, `_clippingSize` +0x20).
+- There is no user default / app-config switch. Hyperbolic is used whenever coefficient > 0 and D > 0, otherwise linear ×/÷ 20. Filter init default c = 0.55.
+- Coefficient is set by the scrolling behaviour:
+  - trackpad gesture scroll: `-[NSScrollingBehaviorConcurrentVBL _scrollView:trackGestureScrollWithEvent:]` 0x18A66B9EC stores 0x3FB3333333333333 = 0.075 into `_hyperbolicCoefficient` and calls `setHyperbolicCoefficient:0.075` on the `_NSScrollingConcurrentEventVBL` preprocess filter; same in `-[NSScrollingBehaviorSingleThreadedVBL scrollView:scrollWheelWithEvent:]` (0x18AF29C54).
+  - direct touch / pan (`scrollView:scrollWithDelta:timestamp:startTimestamp:state:`, `NSScrollingBehaviorLegacy scrollView:panWithGestureRecognizer:`): 0.55, plus requiredMinVelocityForMomentum = NSScrollingTouchMomentumMinimumSpeed·1000 = 250 pt/s.
+- D = clip view (visible) size along the scrolled axis: width for x, height for y.
+- Formula: stretch = floor(D·(1 − 1/(1 + c·|d|/D))), d = accumulated finger delta past the edge (pt). The first 10 pt (`NSScrollViewRubberbandMinimumRequiredDeltaBeforeStretch`) give no stretch but are not lost (they stay in `_overflow`).
+- Probe (`momentum rubber 0.075 600 5 100`): D = 600, d = 15/50/100/200/300/400/500 → stretch 1/3/7/14/21/28/35 pt; model 1.12/3.73/7.41/14.63/21.69/28.57/35.29 → floor matches every sample.
+
+### 1b. Who runs the momentum for a trackpad flick (static, code read; not executed) 
+- `-[_NSScrollingConcurrentScrollWheelEventMonitor _monitorEvent:]` (0x18B0112F4) turns NSEvent phases into state events: phase MayBegin→1, Began/Changed (first)→2, Ended→3, Cancelled→4; momentumPhase Began/Changed (first)→5, momentum Ended/Cancelled→6.
+- `-[NSScrollingBehaviorConcurrentVBL scrollStateEvent:sender:]` (0x18A66D4C0): in state 1 (finger tracking) events 3/4/5/11 call `_animateMomentum` → `_animateFreeMomentum` (0x18A8FAB24), which builds `[[_momentumCalculatorClass alloc] initWithInitialOrigin:initialVelocity:documentFrame:constrainedClippingOrigin:clippingSize:tolerance:decelerationRate:shouldRoundCalculations:]` and installs a `_NSScrollingConcurrentMomentumAnimation` as the VBL preprocess filter. So after finger lift AppKit animates with its own calculator (Cates), not with the driver's momentum deltas.
+  Velocity below `_requiredMinVelocityForMomentum` (0 for trackpad, 250 pt/s for touch) is zeroed. decelerationRate comes from the scroll view's constant data (0 → config constant 1000).
+- In state 3 (momentum running) event 6 (driver momentum ended/cancelled, i.e. finger put back down): if event-velocity ≥ `NSScrollingBehaviorMinAcceleratedStoppableVelocity` (70 pt/s, only when deltas are accelerated; else 0) on either axis → stop/continue-gesture check. That is what the 70 is for.
+- `-[_NSScrollingConcurrentMomentumAnimation scrollingVBLMonitor:synchronizeForTimestamp:]` (0x18A7F38D8): every display tick t = now − start; while t < durationUntilStop the clip origin = `positionAfterDuration:t`; after that it sets destinationOrigin and sends state event 7 (stop). No per-frame decay factor: the curve is the closed form above.
+- Initial velocity = `_NS1DVelocityFilter` per axis (0x18A636364): v ← 0.2·(delta/dt) + 0.8·v (first sample: delta/dt); reset when dt > 0.2 s or the delta sign flips; samples with dt < 2 ms ignored; max allowed velocity default = DBL_MAX (no clamp set by the scrolling filter). `NSScrollViewScrollVelocityMax` 20000 is only used to clamp v inside the rubber-band return function. Deltas are NSEvent scrollingDelta (accelerated points).
+- Files: ~/hyprk/reference/re/27.2.1/decomp/AppKit-momentum.asm, AppKit-rubberband-filter.asm; probe ~/hyprk/reference/re/tools/probe/momentum.m.
+- Status item 1: formula + constants TERKONFIRMASI (calculator executed, values match code). "Trackpad flick uses this calculator" = SEBAGIAN (state machine read only, no live flick).
+
+## 3. Scroller knob during overscroll — TERKONFIRMASI (code + offscreen probe, no window)
+- Yes, the knob shrinks and stays pinned to the edge; it is not squashed by a separate animation, it is just a smaller proportion.
+- `-[NSScrollView reflectScrolledClipView:]` (0x18A464758…): stretch = `-[NSScrollView _stretchAmount]` (`_NSStretchOfClipBoundsForDocumentFrame`);
+  vertical: knobProportion = max(visibleH − |stretch.y|, 0) / documentH; horizontal: (visibleW − |stretch.x|) / documentW. value = (clipY − docY)/(docH − visibleH), clamped to 0…1 by NSScroller (so 0 at top overscroll, 1 at bottom).
+- `-[NSScrollerImp _rectForPart:metrics:]` (0x18B03C0E0): usable = scrollerLength − 2·(trackEndInset + knobEndInset) (= 600 − 6 = 594); knobLength = max(knobProportion·usable, knobMinLength); knobY = 3 + value·(usable − knobLength).
+  knobMinLength: overlay 26 pt (regular and small), legacy 20 pt; trackEndInset 3, knobEndInset 0.
+- Probe `scrollerknob.m` (visible 600, document 3000): stretch 0/10/35/100/300/590 → proportion 0.2000/0.1967/0.1883/0.1667/0.1000/0.0033 (= model), knob height 118.5/116.5/111.5/99/59/26 pt, y stays 3; at the bottom the knob's far end stays at 597 (y 485.5 h 111.5 for stretch 35).
+- With the trackpad rubber band (c 0.075, D 600) the stretch rarely passes ~40 pt, so the knob loses only ~8 pt of 118: a subtle effect.
+- Files: decomp/AppKit-scroller-overscroll.asm, tools/probe/scrollerknob.m.
+
+## 4. Sound ID → file (systemsoundserverd) — SEBAGIAN (static only, nothing played)
+- Full table decoded from the play handler's 3 jump tables: ~/hyprk/reference/re/27.2.1/decomp/systemsoundserverd-ids.txt.
+  Key IDs: 1 system/Volume Mount.aif, 2 system/Volume Unmount.aif, 3 system/Media Keys.aif, 13 finder/empty trash.aif, 14 finder/move to trash.aif,
+  15 dock/poof item off dock.aif, 16 dock/drag to trash.aif, 22/23 burn complete/failed, 24 system/Grab.aif, 1004 SentMessage.caf, 1393 system/Screen Capture.aif,
+  1394/1395 payment_success/failure.aif, 4096 (0x1000) = alert sound.
+- Screenshot: screencapture plays 1393 = **Screen Capture.aif** (settled). Grab.aif = ID 24 (unused by screencapture). Shutter.aif has no ID.
+- Move to Bin (Finder): `TMoveToTrashTask` sound = **16 dock/drag to trash.aif** (not ID 14 move to trash.aif, which has no caller in Finder or Dock).
+- Empty Bin (Finder): `TEmptyTrashTask` = 13 finder/empty trash.aif.
+- Dock: poof = 15 (two call sites); item dropped on the Dock's Bin = 16; alert = 0x1000.
+- Volume Mount.aif (ID 1) is Finder's generic "task finished" sound (copy/move/duplicate/put back/archive/mount/erase tasks, on success); Volume Unmount.aif (ID 2) has no caller in Finder/Dock. A dmg mount via DiskImageMounter/diskarbitrationd plays nothing (no sound API imported).
+- Who plays: the client (Finder, Dock, screencapture) calls AudioServicesPlaySystemSound → XPC `com.apple.audio.SystemSoundServer-OSX` → systemsoundserverd (root) plays the file. Finder only asks when its own pref (index 0x28) is on.
+- Not done: Finder pref 0x28 name, callers in other processes (AppKit/HIToolbox also import AudioServicesPlaySystemSound).
+
+## Summary
+| item | answer | status |
+|---|---|---|
+| 1 momentum formula | Cates: T = cbrt(v0/4000), x(t) = (v0·T/4)·(1 − (1 − t/T)^4), v(t) = v0·(1 − t/T)^3; k = 1000; edge bounce 0.31·v·τ·e^(−12.5τ) | TERKONFIRMASI (calculator executed) |
+| 1 trackpad flick uses it | finger lift → `_animateFreeMomentum` → calculator sampled per display tick; v0 = EMA α 0.2 of delta/dt | SEBAGIAN (code read only) |
+| 2 rubber band model | hyperbolic, c = 0.075 (trackpad) / 0.55 (touch), D = visible size on the axis, floor(), 10 pt dead zone | TERKONFIRMASI (filter executed) |
+| 3 scroller knob in overscroll | shrinks: proportion = max(visible − stretch, 0)/document, pinned to the edge, min 26 pt overlay / 20 pt legacy | TERKONFIRMASI (offscreen probe) |
+| 4 sound IDs | 1393 Screen Capture.aif; Bin move = 16 drag to trash.aif; Bin empty = 13; poof = 15; Finder task done = 1 Volume Mount.aif | SEBAGIAN (static, nothing played) |

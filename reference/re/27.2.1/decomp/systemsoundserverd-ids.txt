@@ -1,0 +1,165 @@
+# systemsoundserverd (macOS 27.2.1, 26B131, /usr/sbin/systemsoundserverd, arm64e slice): SystemSoundID -> file
+# Source: the switch in the "SystemSoundServerPlayActionID" handler (SSServerImp.cpp), 0x10000a58c..0x10000aa50.
+#   ID == 0x1000 -> alert sound (user's beep file), ID > 0x1000 -> client-created sounds (AudioServicesCreateSystemSoundID).
+#   3 jump tables: 0x1000134ec (IDs 1..40, anchor 0x10000a5e8), 0x10001358c (IDs 1200..1211, anchor 0x10000a628),
+#   0x1000135bc (IDs 1364..1396, anchor 0x10000a660) + compares for 1004, 1113, 1114, 1263, 1264, 1265.
+#   Path = snprintf("%s%s%s", "/System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/", "<dir>/", "<file>").
+#   "(none)" = the ID is inside a table range but has no file (falls to 0x10000aa6c).
+# Decoder: jump-table entries are int32 offsets from the anchor; see the python at the end of this file.
+# dec	hex	file
+    1	0x0001	system/Volume Mount.aif
+    2	0x0002	system/Volume Unmount.aif
+    3	0x0003	system/Media Keys.aif
+    4	0x0004	accessibility/Sticky Keys ON.aif
+    5	0x0005	accessibility/Sticky Keys OFF.aif
+    6	0x0006	accessibility/Sticky Keys MODIFER.aif
+    7	0x0007	accessibility/Sticky Keys Locked.aif
+    8	0x0008	accessibility/Sticky Keys Stuck.aif
+    9	0x0009	accessibility/Mouse Keys ON.aif
+   10	0x000a	accessibility/Mouse Keys OFF.aif
+   11	0x000b	accessibility/Slow Keys, 1st Key Pressed.aif
+   12	0x000c	accessibility/Slow Keys, Key Registered.aif
+   13	0x000d	finder/empty trash.aif
+   14	0x000e	finder/move to trash.aif
+   15	0x000f	dock/poof item off dock.aif
+   16	0x0010	dock/drag to trash.aif
+   17	0x0011	ink/InkSoundBecomeMouse.aif
+   18	0x0012	ink/InkSoundStroke1.aif
+   19	0x0013	ink/InkSoundStroke2.aif
+   20	0x0014	ink/InkSoundStroke3.aif
+   21	0x0015	ink/InkSoundStroke4.aif
+   22	0x0016	system/burn complete.aif
+   23	0x0017	system/burn failed.aif
+   24	0x0018	system/Grab.aif
+   25	0x0019	(none: no file, -> 0x10000aa6c)
+   26	0x001a	(none: no file, -> 0x10000aa6c)
+   27	0x001b	(none: no file, -> 0x10000aa6c)
+   28	0x001c	(none: no file, -> 0x10000aa6c)
+   29	0x001d	(none: no file, -> 0x10000aa6c)
+   30	0x001e	telephony/ringback_tone_ansi.caf
+   31	0x001f	telephony/ringback_tone_cept.caf
+   32	0x0020	telephony/busy_tone_ansi.caf
+   33	0x0021	telephony/busy_tone_cept.caf
+   34	0x0022	telephony/call_waiting_tone_ansi.caf
+   35	0x0023	telephony/call_waiting_tone_cept.caf
+   36	0x0024	telephony/end_call_tone_cept.caf
+   37	0x0025	(none: no file, -> 0x10000aa6c)
+   38	0x0026	(none: no file, -> 0x10000aa6c)
+   39	0x0027	(none: no file, -> 0x10000aa6c)
+   40	0x0028	telephony/call_waiting_tone_low_priority.caf
+ 1004	0x03ec	system/SentMessage.caf
+ 1113	0x0459	system/begin_record.caf
+ 1114	0x045a	system/end_record.caf
+ 1200	0x04b0	telephony/dtmf-0.caf
+ 1201	0x04b1	telephony/dtmf-1.caf
+ 1202	0x04b2	telephony/dtmf-2.caf
+ 1203	0x04b3	telephony/dtmf-3.caf
+ 1204	0x04b4	telephony/dtmf-4.caf
+ 1205	0x04b5	telephony/dtmf-5.caf
+ 1206	0x04b6	telephony/dtmf-6.caf
+ 1207	0x04b7	telephony/dtmf-7.caf
+ 1208	0x04b8	telephony/dtmf-8.caf
+ 1209	0x04b9	telephony/dtmf-9.caf
+ 1210	0x04ba	telephony/dtmf-star.caf
+ 1211	0x04bb	telephony/dtmf-pound.caf
+ 1263	0x04ef	facetime/multiway_join.caf
+ 1264	0x04f0	facetime/multiway_leave.caf
+ 1265	0x04f1	facetime/multiway_invitation.caf
+ 1364	0x0554	system/mic_mute.caf
+ 1365	0x0555	system/mic_unmute.caf
+ 1366	0x0556	system/mic_unmute_fail.caf
+ 1367	0x0557	system/screen_sharing_started.caf
+ 1368	0x0558	system/media_paused.caf
+ 1369	0x0559	system/media_handoff.caf
+ 1370	0x055a	(none: no file, -> 0x10000aa6c)
+ 1371	0x055b	system/head_gestures_double_nod.caf
+ 1372	0x055c	system/head_gestures_double_shake.caf
+ 1373	0x055d	system/head_gestures_partial_nod.caf
+ 1374	0x055e	system/head_gestures_partial_shake.caf
+ 1375	0x055f	(none: no file, -> 0x10000aa6c)
+ 1376	0x0560	(none: no file, -> 0x10000aa6c)
+ 1377	0x0561	(none: no file, -> 0x10000aa6c)
+ 1378	0x0562	(none: no file, -> 0x10000aa6c)
+ 1379	0x0563	(none: no file, -> 0x10000aa6c)
+ 1380	0x0564	(none: no file, -> 0x10000aa6c)
+ 1381	0x0565	(none: no file, -> 0x10000aa6c)
+ 1382	0x0566	(none: no file, -> 0x10000aa6c)
+ 1383	0x0567	(none: no file, -> 0x10000aa6c)
+ 1384	0x0568	(none: no file, -> 0x10000aa6c)
+ 1385	0x0569	(none: no file, -> 0x10000aa6c)
+ 1386	0x056a	(none: no file, -> 0x10000aa6c)
+ 1387	0x056b	(none: no file, -> 0x10000aa6c)
+ 1388	0x056c	(none: no file, -> 0x10000aa6c)
+ 1389	0x056d	(none: no file, -> 0x10000aa6c)
+ 1390	0x056e	(none: no file, -> 0x10000aa6c)
+ 1391	0x056f	(none: no file, -> 0x10000aa6c)
+ 1392	0x0570	(none: no file, -> 0x10000aa6c)
+ 1393	0x0571	system/Screen Capture.aif
+ 1394	0x0572	system/payment_success.aif
+ 1395	0x0573	system/payment_failure.aif
+ 1396	0x0574	system/acknowledgment_sent.caf
+
+# Callers found (static):
+# /usr/sbin/screencapture 0x10000ccc8 and 0x10005037c: AudioServicesSetProperty('ifdi', id 0x571, value 1) then AudioServicesPlaySystemSound(0x571 = 1393)
+#     -> system/Screen Capture.aif. The first site is skipped when the byte at 0x1000bb894 is set (silent option).
+#     Grab.aif is ID 24 (not used by screencapture); Shutter.aif has no ID at all.
+# Dock (/System/Library/CoreServices/Dock.app): AudioServicesPlaySystemSound(0xf = 15, dock/poof item off dock.aif) at 0x1001122a4 and 0x10022cdd0;
+#     AudioServicesPlaySystemSound(0x10 = 16, dock/drag to trash.aif) at 0x100051950 after a successful NSFileManager trash call (item dropped on the Dock's Bin);
+#     AudioServicesPlayAlertSound(0x1000) at 0x10003ec54.
+# Finder: every finished task calls task->soundID() (C++ vtable slot +0xe0, caller 0x1000d6384) only if Finder pref index 0x28 is on,
+#     then AudioServicesPlaySystemSoundWithCompletion(id, NULL) (wrapper 0x1001e2110; also -[TProgressWindowController removeProgressView:withSound:]).
+#     TEmptyTrashTask            -> 13  finder/empty trash.aif                     (0x1000f727c: mov w0,#0xd)
+#     TMoveToTrashTask           -> 16  dock/drag to trash.aif if something was trashed, else 0 (0x1000ea068)
+#     TCopyTask TMoveTask TDuplicateTask TPutBackTask TUndo*Task TNodeTask (base 0x1000df4d4) -> 1 system/Volume Mount.aif
+#                                    only when no error, not cancelled and the task passes a size/length check (>= 3) ; else 0
+#     TMountTask TFTPDownloadTask TArchiveTask TVolumeEraseTask -> 1 system/Volume Mount.aif on success, else 0
+#     TPBFBurnTask               -> 22 burn complete.aif / 23 burn failed.aif
+#     TPasteContentTask TTagsTask -> 1 ; TRotateTask TAliasResolutionTask -> 0 (silent)
+#     Finder's only own file: Invitation.aiff (bundle resource, AudioServicesCreateSystemSoundID at 0x1004b2de4).
+# Not found in Finder or Dock: ID 14 (finder/move to trash.aif) and ID 2 (system/Volume Unmount.aif).
+# DiskImageMounter and diskarbitrationd import no sound API (a dmg mount by itself plays nothing from them).
+# Playback process: client -> XPC "com.apple.audio.SystemSoundServer-OSX" -> systemsoundserverd (root) opens the file and plays it.
+
+# --- decoder (python3; sssd = lipo -thin arm64e) ---
+# import struct,re
+# d=open('sssd','rb').read()
+# BASE=0x100000000
+# # target address -> (file, dir) by walking the asm
+# asm={}
+# lines=open('sssd.asm').read().split('\n')
+# addr_line={}
+# for i,l in enumerate(lines):
+#     m=re.match(r'^([0-9a-f]{16})\t(.*)',l)
+#     if m: addr_line[int(m.group(1),16)]=i
+# def resolve(a):
+#     # follow from address a: adrp; add ; "name" ; b target / fallthrough to str x8,[sp,#0x10]; dir
+#     i=addr_line[a]; name=None
+#     for _ in range(12):
+#         l=lines[i]
+#         m=re.search(r'literal pool for: "(.*)"',l)
+#         if m:
+#             if name is None: name=m.group(1)
+#             else: return name,m.group(1)
+#         m=re.search(r'\tb\t0x([0-9a-f]+)',l)
+#         if m: i=addr_line[int(m.group(1),16)]; continue
+#         i+=1
+#     return name,'?'
+# def table(tbl,n,first,anchor):
+#     out=[]
+#     for k in range(n):
+#         off=struct.unpack_from('<i',d,tbl-BASE+4*k)[0]
+#         t=anchor+off
+#         out.append((first+k,t))
+#     return out
+# res=[]
+# for tbl,n,first,anchor,dflt in ((0x1000134ec,0x28,1,0x10000a5e8,0x10000a70c),(0x10001358c,0xc,0x4b0,0x10000a628,0x10000a6cc),(0x1000135bc,0x21,0x554,0x10000a660,0x10000a6ec)):
+#     for i,t in table(tbl,n,first,anchor):
+#         if t in (0x10000aa6c,): res.append((i,None,None,t)); continue
+#         try: nm,dr=resolve(t)
+#         except Exception as e: nm,dr=None,str(e)
+#         res.append((i,nm,dr,t))
+# # explicit compares
+# for i,t in ((0x3ec,0x10000aa20),(0x459,0x10000a720),(0x45a,0x10000a738),(0x4ef,0x10000a6e0),(0x4f0,0x10000aa08),(0x4f1,0x10000a700)):
+#     nm,dr=resolve(t); res.append((i,nm,dr,t))
+# for i,nm,dr,t in sorted(res):
+#     print("%5d\t0x%04x\t%s\t%s"%(i,i,(dr or '')+(nm or '(none: no file, -> 0x%x)'%t), '' ))
