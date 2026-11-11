@@ -203,6 +203,7 @@ Item {
                         // reassigned only when this app's notifications change, so the other
                         // stacks keep their cards (a drag or hover is not cut off by a new arrival)
                         property var items: []
+                        property bool confirmClear: false   // the header's x asked once (Q-panels-32)
                         function syncItems() {
                             const next = nc.itemsByApp[app] || [];
                             if (next.map(x => x.nid).join() !== items.map(x => x.nid).join()) items = next;
@@ -210,6 +211,7 @@ Item {
                         Connections {
                             target: nc
                             function onItemsByAppChanged() { grp.syncItems(); }
+                            function onShownChanged() { grp.confirmClear = false; }
                         }
                         readonly property int n: items.length
                         readonly property bool open: n > 1 && nc.expanded[app] === true
@@ -233,7 +235,7 @@ Item {
                         // the fold: 0 stacked, 1 unfolded, on the list reflow spring (lib/nc.js)
                         property real ex: 0
                         SpringCurve { id: fold; target: grp; property: "ex"; spring: NcLib.reflowSpring }
-                        onOpenChanged: fold.go(open ? 1 : 0)
+                        onOpenChanged: { fold.go(open ? 1 : 0); if (!open) confirmClear = false; }
                         // the group's share of the list: 0 -> 1 when it arrives while the panel is open (the list
                         // below is pushed down), 1 -> 0 after it was cleared (the list closes up); same spring
                         property real slot: 1
@@ -322,12 +324,14 @@ Item {
                                 glass: grp.cardY(0) >= nc.headerHeight
                                 onActivated: nc.setExpanded(grp.app, false)
                             }
+                            // the x turns into a "Clear" capsule first; a second click clears the group (Q-panels-32)
                             Pill {
-                                symbol: "xmark"
+                                symbol: grp.confirmClear ? "" : "xmark"
+                                text: grp.confirmClear ? "Clear" : ""
                                 implicitHeight: Theme.nc.pillSmall
                                 visible: grp.open
                                 glass: grp.cardY(0) >= nc.headerHeight
-                                onActivated: grp.clearAll()
+                                onActivated: if (grp.confirmClear) grp.clearAll(); else grp.confirmClear = true
                             }
                         }
 
