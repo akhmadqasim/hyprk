@@ -61,20 +61,36 @@ namespace lg {
 
     // ── decoration ──────────────────────────────────────────────────────────
 
-    // macOS 27 traffic lights (liquid-glass-re SPEC 13): two-stop vertical gradients top -> bottom,
-    // [dark][button][stop] as 0xRRGGBB + alpha. Same numbers as ui/HyprK/Tokens.qml (lights), checked by
-    // shell/tests/run.mjs
-    struct SStop {
-        uint32_t rgb;
-        float    a;
+    // macOS 27.2.1 traffic lights, the same numbers as ui/HyprK/Tokens.qml `lights` (sampled on lights-*.png, MAC-ANSWERS.md
+    // Q-windows-08/-09): fill = vertical gradient top / centre / bottom, ring = the outer 0.5 pt as a vertical gradient
+    // (stops 0, .2, .5, .8, 1): light discs have a dark coloured rim on the sides, dark discs a light arc at top and bottom.
+    // [light/dark][rest/pressed][close/minimise/zoom]
+    struct SLightColors {
+        uint32_t fill[3], ring[5];
     };
-    static constexpr SStop    LIGHT_GRADIENT[2][3][2] = {
-        {{{0xFF6D63, 1}, {0xF57269, 0.8f}}, {{0xFBB316, 0.92f}, {0xFFD134, 0.92f}}, {{0x5ACF1F, 1}, {0x79D34C, 0.73f}}},
-        {{{0xFA6A61, 1}, {0xEF6962, 1}}, {{0xFAB51A, 1}, {0xFECF34, 1}}, {{0x56C83A, 1}, {0x52C43D, 1}}},
+    static constexpr SLightColors LIGHTS[2][2][3] = {
+        {{{{0xED786B, 0xEA857B, 0xE89189}, {0xED786B, 0xB40A0A, 0xB40A0A, 0xB40A0A, 0xE89189}},
+          {{0xF2BD50, 0xF5CB59, 0xF8D562}, {0xF2BD50, 0x91210A, 0x91210A, 0x91210A, 0xF8D562}},
+          {{0x7DCD4A, 0x98D46F, 0xA9DA86}, {0x7DCD4A, 0x0A550A, 0x0A550A, 0x0A550A, 0xA9DA86}}},
+         {{{0xFF9A8B, 0xFFA898, 0xFFB6A8}, {0xFF9A8B, 0xF42319, 0xF42319, 0xF42319, 0xFFB6A8}},
+          {{0xFFF66C, 0xFFFB6B, 0xFFFF7E}, {0xFFF66C, 0xD04020, 0xD04020, 0xD04020, 0xFFFF7E}},
+          {{0xA0FF60, 0xB9FF84, 0xD2FFA7}, {0xA0FF60, 0x347F20, 0x347F20, 0x347F20, 0xD2FFA7}}}},
+        {{{{0xE87061, 0xE1675B, 0xDE6F64}, {0xF6C6BC, 0xF6C6BC, 0xD96156, 0xF5C4BA, 0xF5C4BA}},
+          {{0xF1B835, 0xF3C22D, 0xF6CF50}, {0xF6F581, 0xF6F581, 0xEABA19, 0xF5F58D, 0xF5F58D}},
+          {{0x6EC341, 0x62BD2D, 0x6DC04B}, {0xBFF69A, 0xBFF69A, 0x59B61C, 0xB8F697, 0xB8F697}}},
+         {{{0xFF9381, 0xFF9381, 0xFF9485}, {0xFEFBED, 0xFEFBED, 0xFD7B6E, 0xFEF7EC, 0xFEF7EC}},
+          {{0xFFFF8E, 0xFFFF5C, 0xFFFF7A}, {0xFBFB98, 0xFBFB98, 0xF9D623, 0xFBFBA6, 0xFBFBA6}},
+          {{0x56F66E, 0x56F66E, 0x56F66E}, {0xBFF69A, 0xBFF69A, 0x59B61C, 0xB8F697, 0xB8F697}}}},
     };
-    static constexpr uint32_t LIGHT_PRESSED[2][3] = {{0xFFAC9E, 0xFFFF70, 0xC6FF8F}, {0xFF7C68, 0xFFFF58, 0x56F66E}}; // 27.2.1, Q-windows-08
+    // non-key window (Q-windows-09)
+    static constexpr SLightColors LIGHTS_INACTIVE[2] = {{{0xEFEFF3, 0xF2F3F5, 0xF6F7F8}, {0xEAEAEE, 0xABABAE, 0xABABAE, 0xABABAE, 0xE7E7EA}},
+                                                        {{0x4C4C52, 0x4C4C52, 0x47484D}, {0xB4B4B4, 0xB4B4B4, 0x4A4B50, 0xADADAD, 0xADADAD}}};
+    static constexpr uint32_t GLYPH_RGB_DARK[3] = {0x850000, 0xAA3600, 0x005500}; // dark, Q-windows-10
     static constexpr uint32_t GLYPH_RGB[3]        = {0x9E0000, 0xBE4900, 0x097900}; // light, Q-windows-10
-    static constexpr double   GLYPH_SPRING        = 0.3; // s, critically damped
+    // glyph reveal (Q-windows-10, 60 fps): in after 0.07 s, .30 .64 .81 .90 .95 per frame; out at once, .22 .52 .77 .89 .96.
+    // Both fit 1 - exp(-(t - t0) / 25.5 ms): t0 = 0.07 + 0.0076 s in, 0.0104 s out
+    static constexpr double   GLYPH_TAU = 0.0255, GLYPH_IN_DELAY = 0.0776, GLYPH_OUT_DELAY = 0.0104;
+    static constexpr double   PRESS_GROW = 1.15; // pressed disc 16-17 pt from 14 (Q-windows-08)
     // title text on a dark bar (light bars use titlebar_text / titlebar_text_inactive): TextEdit dark renders
     // (165,164,172) active / (105,106,112) inactive on #28282E, white a.58 / a.30 (MAC-ANSWERS.md Q-windows-11)
     static constexpr SRgba                    TEXT_ON_DARK{1, 1, 1, 0.58f}, TEXT_ON_DARK_INACTIVE{1, 1, 1, 0.30f};
@@ -165,7 +181,7 @@ namespace lg {
 
     // the button's size and scale changed: drop the cached textures
     static void resetOnScale(float& cachedScale, std::shared_ptr<const SParams>& cachedParams, const std::shared_ptr<const SParams>& params, float scale,
-                             std::array<SP<Render::ITexture>, 3>& glyphs, std::array<SP<Render::ITexture>, 18>& lights) {
+                             std::array<SP<Render::ITexture>, 8>& glyphs, std::array<SP<Render::ITexture>, 18>& lights) {
         if (cachedScale == scale && cachedParams == params)
             return;
         glyphs       = {};
@@ -174,11 +190,13 @@ namespace lg {
         cachedParams = params;
     }
 
-    // 1.9 pt round-cap strokes on a 14 pt artboard (MAC-ANSWERS.md Q-windows-10): x 7 x 7, minus 7.5, plus 8 x 8
-    SP<Render::ITexture> CTitlebar::glyphTexture(int button, float scale) {
+    // 1.9 pt round-cap strokes on a 14 pt artboard (MAC-ANSWERS.md Q-windows-10): x 7 x 7, minus 7.5, plus 8 x 8 (green with
+    // Option); the green glyph is full screen: two filled triangles in a 6 x 6 pt box, pointing to the top-left and
+    // bottom-right corners. `button` 3 = the + glyph
+    SP<Render::ITexture> CTitlebar::glyphTexture(int button, bool dark, float scale) {
         const auto params = m_params();
         resetOnScale(m_glyphScale, m_glyphParams, params, scale, m_glyphs, m_lights);
-        auto& tex = m_glyphs[button];
+        auto& tex = m_glyphs[button + (dark ? 4 : 0)];
         if (!tex)
             tex = paintLight(params->titlebarButton * scale, [&](cairo_t* cr, double c, double r) {
                 const double k = 2 * r / 14.0; // artboard pt -> px
@@ -186,12 +204,24 @@ namespace lg {
                     cairo_move_to(cr, c + (x1 - 7) * k, c + (y1 - 7) * k);
                     cairo_line_to(cr, c + (x2 - 7) * k, c + (y2 - 7) * k);
                 };
+                setSource(cr, (dark ? GLYPH_RGB_DARK : GLYPH_RGB)[std::min(button, 2)], 1);
+                if (button == 2) {
+                    auto tri = [&](double x0, double y0, double x1, double y1, double x2, double y2) {
+                        cairo_move_to(cr, c + (x0 - 7) * k, c + (y0 - 7) * k);
+                        cairo_line_to(cr, c + (x1 - 7) * k, c + (y1 - 7) * k);
+                        cairo_line_to(cr, c + (x2 - 7) * k, c + (y2 - 7) * k);
+                        cairo_close_path(cr);
+                    };
+                    tri(4, 4, 8.4, 4, 4, 8.4);
+                    tri(10, 10, 5.6, 10, 10, 5.6);
+                    cairo_fill(cr);
+                    return;
+                }
                 switch (button) {
                     case 0: line(4.45, 4.45, 9.55, 9.55); line(9.55, 4.45, 4.45, 9.55); break;
                     case 1: line(4.2, 7, 9.8, 7); break;
                     default: line(3.95, 7, 10.05, 7); line(7, 3.95, 7, 10.05); break;
                 }
-                setSource(cr, GLYPH_RGB[button], 1);
                 cairo_set_line_width(cr, 1.9 * k);
                 cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
                 cairo_stroke(cr);
@@ -199,47 +229,40 @@ namespace lg {
         return tex;
     }
 
-    // fill (gradient when active, flat when inactive or pressed) and a 0.75 pt rim over it
+    // fill and the 0.5 pt ring, both vertical gradients (LIGHTS); state 0 rest, 1 inactive, 2 pressed
     SP<Render::ITexture> CTitlebar::lightTexture(int button, int state, bool dark, float scale) {
         const auto params = m_params();
         resetOnScale(m_glyphScale, m_glyphParams, params, scale, m_glyphs, m_lights);
         auto& tex = m_lights[(state * 2 + (dark ? 1 : 0)) * 3 + button];
         if (!tex)
             tex = paintLight(params->titlebarButton * scale, [&](cairo_t* cr, double c, double r) {
-                cairo_arc(cr, c, c, r, 0, 2 * M_PI);
-                if (state == 0) {
-                    const auto&      g   = LIGHT_GRADIENT[dark][button];
+                const auto& col  = state == 1 ? LIGHTS_INACTIVE[dark] : LIGHTS[dark][state == 2][button];
+                auto        grad = [&](const uint32_t* rgb, int n) {
                     cairo_pattern_t* pat = cairo_pattern_create_linear(0, c - r, 0, c + r);
-                    for (int i = 0; i < 2; ++i)
-                        cairo_pattern_add_color_stop_rgba(pat, i, ((g[i].rgb >> 16) & 0xFF) / 255.0, ((g[i].rgb >> 8) & 0xFF) / 255.0, (g[i].rgb & 0xFF) / 255.0, g[i].a);
-                    cairo_set_source(cr, pat);
-                    cairo_fill(cr);
-                    cairo_pattern_destroy(pat);
-                } else if (state == 2) {
-                    setSource(cr, LIGHT_PRESSED[dark][button], 1);
-                    cairo_fill(cr);
-                } else {
-                    if (dark)
-                        cairo_set_source_rgba(cr, 0.96, 0.96, 0.96, 0.18);
-                    else
-                        cairo_set_source_rgba(cr, 0.886, 0.886, 0.93, 0.30);
-                    cairo_fill(cr);
-                }
-                const double w = 0.75 * r / 7.0; // 0.75 pt
+                    static constexpr double AT3[] = {0, 0.5, 1}, AT5[] = {0, 0.2, 0.5, 0.8, 1};
+                    for (int i = 0; i < n; ++i)
+                        cairo_pattern_add_color_stop_rgb(pat, (n == 3 ? AT3 : AT5)[i], ((rgb[i] >> 16) & 0xFF) / 255.0, ((rgb[i] >> 8) & 0xFF) / 255.0, (rgb[i] & 0xFF) / 255.0);
+                    return pat;
+                };
+                cairo_pattern_t* fill = grad(col.fill, 3);
+                cairo_arc(cr, c, c, r, 0, 2 * M_PI);
+                cairo_set_source(cr, fill);
+                cairo_fill(cr);
+                cairo_pattern_destroy(fill);
+                const double     w    = 0.5 * r / 7.0; // 0.5 pt
+                cairo_pattern_t* ring = grad(col.ring, 5);
                 cairo_arc(cr, c, c, r - w / 2, 0, 2 * M_PI);
-                if (state == 1)
-                    cairo_set_source_rgba(cr, dark ? 1 : 0, dark ? 1 : 0, dark ? 1 : 0, 0.14);
-                else
-                    cairo_set_source_rgba(cr, 0, 0, 0, dark ? 0.12 : 0.20);
+                cairo_set_source(cr, ring);
                 cairo_set_line_width(cr, w);
                 cairo_stroke(cr);
+                cairo_pattern_destroy(ring);
             });
         return tex;
     }
 
     float CTitlebar::glyphAlpha() {
-        const double t = std::chrono::duration<double>(std::chrono::steady_clock::now() - m_hoverSince).count();
-        const double w = 2 * M_PI / GLYPH_SPRING, x = 1 - (1 + w * t) * std::exp(-w * t);
+        const double t = std::chrono::duration<double>(std::chrono::steady_clock::now() - m_hoverSince).count() - (m_hover ? GLYPH_IN_DELAY : GLYPH_OUT_DELAY);
+        const double x = t <= 0 ? 0.0 : 1 - std::exp(-t / GLYPH_TAU);
         return float(m_glyphFrom + ((m_hover ? 1.0 : 0.0) - m_glyphFrom) * x);
     }
 
@@ -318,8 +341,16 @@ namespace lg {
         for (int i = 0; i < 3; ++i) {
             const CBox b     = layout.buttons[i].copy().translate(bar.pos()).scale(scale).round();
             const int  state = m_pressed == i && m_hoverButton == i ? 2 : (isActive || m_hover) ? 0 : 1;
-            place(lightTexture(i, state, dark, scale), b, a);
-            place(glyphTexture(i, scale), b, a * glyphA);
+            // pressed: brighter and about 1.15x larger (Q-windows-08)
+            const CBox lb = state == 2 ? b.copy().scaleFromCenter(PRESS_GROW).round() : b;
+            if (const auto tex = lightTexture(i, state, dark, scale); tex && tex->ok() && a > 0.002f) {
+                CTexPassElement::SRenderData d;
+                d.tex = tex;
+                d.box = state == 2 ? lb : CBox{b.x + (b.w - tex->m_size.x) / 2, b.y + (b.h - tex->m_size.y) / 2, tex->m_size.x, tex->m_size.y}.round();
+                d.a   = a;
+                g_pHyprRenderer->addPassElement(ctx, makeUnique<CTexPassElement>(d));
+            }
+            place(glyphTexture(i == 2 && m_option ? 3 : i, dark, scale), b, a * glyphA);
         }
         if (std::abs(glyphA - (m_hover ? 1.f : 0.f)) > 0.002f)
             damageEntire(); // keep the fade going
@@ -345,6 +376,12 @@ namespace lg {
         const auto [bar, layout] = geometry(*params, window->presentation().floatingOffset());
         const bool hover         = lightsArea(layout, params->titlebarGap).translate(bar.pos()).containsPoint(global);
         const int  button        = buttonAt(layout, global.x - bar.x, global.y - bar.y, params->titlebarGap);
+        // Option turns the full-screen glyph into + (seen on the next pointer move)
+        const bool option = hover && (g_pInputManager->getModsFromAllKBs() & Input::HL_MODIFIER_ALT) == Input::HL_MODIFIER_ALT;
+        if (option != m_option) {
+            m_option = option;
+            damageEntire();
+        }
         if (hover != m_hover) {
             m_glyphFrom  = glyphAlpha();
             m_hoverSince = std::chrono::steady_clock::now();
