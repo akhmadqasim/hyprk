@@ -7,7 +7,10 @@
 #   alert                          the alert sound (NSBeep, SystemSoundID 0x1000)
 #   notification [Name|/path]      a notification that asks for a sound: the named /System/Library/Sounds sound or a
 #                                  sound file from its "sound-name" / "sound-file" hint, else the alert sound
-#   volume                         BezelServices volume.aiff (only with volumeFeedback)
+#   volume [negate]                BezelServices volume.aiff (only with volumeFeedback; "negate": Shift was held, which
+#                                  inverts the setting, as BezelServices and Control Center do). A new pop stops the
+#                                  one still playing in the same session (BezelServices playOneBeep: stops its NSSound,
+#                                  then plays it again): no overlap when pops come quickly
 #   screenshot                     ID 1393 system/Screen Capture.aif
 #   trash-move                     Finder's TMoveToTrashTask plays ID 16 dock/drag to trash.aif (not move to trash.aif,
 #                                  ID 14, which nothing in Finder or the Dock plays)
@@ -60,7 +63,8 @@ case "$ev" in
     notification)
         if [ -n "$arg" ] && [ "${arg#/}" != "$arg" ] && [ -r "$arg" ]; then f=$arg
         elif [ -z "$arg" ] || ! alertfile "$arg"; then alertfile "$alert"; fi ;;
-    volume)       [ "$fb" = true ] || exit 0; pick "misc/BezelServices-volume" ;;
+    volume)       want=$fb; [ "$arg" = negate ] && { [ "$fb" = true ] && want=false || want=true; }
+                  [ "$want" = true ] || exit 0; pick "misc/BezelServices-volume" ;;
     screenshot)   [ "$ui" = true ] || exit 0; pick "SystemSounds/system/Screen Capture" ;;
     trash-empty)  [ "$ui" = true ] || exit 0; pick "SystemSounds/finder/empty trash" ;;
     trash-move)   [ "$ui" = true ] || exit 0; pick "SystemSounds/dock/drag to trash" ;;
@@ -76,6 +80,11 @@ esac
 [ "${HYPRK_MUTE:-0}" = 1 ] && exit 0      # silent test runs
 
 case "$ev" in volume|power) vol=1 ;; esac    # NSSound, not systemsoundserverd: no alert volume
+if [ "$ev" = volume ]; then   # restart, never overlap: stop this session's previous pop (only a player of that file)
+    pidf=${XDG_RUNTIME_DIR:-/tmp}/hyprk-volume-pop-${HYPRLAND_INSTANCE_SIGNATURE:-0}.pid
+    read -r old 2>/dev/null < "$pidf" && grep -qa BezelServices-volume "/proc/$old/cmdline" 2>/dev/null && kill "$old" 2>/dev/null
+    echo $$ > "$pidf"
+fi
 if command -v pw-play >/dev/null; then
     exec pw-play --volume "$vol" "$f"
 elif command -v paplay >/dev/null; then

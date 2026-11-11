@@ -195,6 +195,24 @@ Item {
             fuzzyCompare(backend.level, 0.3 + 10 / tr.usable, 0.001);
             mouseRelease(sl, cx + 16, sl.height / 2);
             compare(releasedSpy.count, 1); compare(committedSpy.count, 1);
+            compare(sl.releaseModifiers, Qt.NoModifier);
+        }
+        // Control Center reads Shift at the release (it inverts the volume pop): the modifiers of the let-go
+        function test_slider_release_modifiers() {
+            backend.level = 0.3;
+            let tr = null; for (let i = 0; i < sl.children.length; i++) if (sl.children[i].usable !== undefined) tr = sl.children[i];
+            const k = knobOf(tr);
+            const cx = k.x + k.width / 2;
+            releasedSpy.clear();
+            mousePress(sl, cx, sl.height / 2);
+            mouseMove(sl, cx + 10, sl.height / 2);
+            mouseRelease(sl, cx + 10, sl.height / 2, Qt.LeftButton, Qt.ShiftModifier);
+            compare(releasedSpy.count, 1);
+            verify(sl.releaseModifiers & Qt.ShiftModifier);
+            sl.forceActiveFocus();
+            keyClick(Qt.Key_Left);                          // an arrow key: no modifiers
+            compare(releasedSpy.count, 2);
+            compare(sl.releaseModifiers, Qt.NoModifier);
         }
         function test_popup_keeps_binding() {
             mouseClick(pop);                 // opens the menu (a click leaves it open)

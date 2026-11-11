@@ -419,22 +419,35 @@ hl.bind("CTRL + left",  hl.dsp.focus({ workspace = "e-1" }))
 hl.bind("CTRL + right", hl.dsp.focus({ workspace = "e+1" }))
 -- volume and brightness keys as on macOS 27.2.1 (reference/re/MAC-ANSWERS.md HUD): one press = 1/16,
 -- Option+Shift (here Alt+Shift) = 1/64, clamped to 0..100 %. The shell's HUD follows the change
--- (shell/services/Hud.qml). Volume keys unmute and play the macOS volume pop (state/sound.json volumeFeedback).
+-- (shell/services/Hud.qml). The volume keys go through shell/scripts/volume-key.sh, BezelServices' state machine:
+-- the level on the Mac's 1/16 grid, unmute, ONE volume pop when the key goes up (none while it repeats), Shift
+-- inverts "Play feedback when volume is changed" (state/sound.json volumeFeedback), Option alone opens Sound settings.
 -- brightnessctl takes whole percents only, so brightness steps in raw units of max/16 (max/64);
 -- -n1 keeps the backlight on at the bottom.
-local function volumeKey(dir, n)
-    return hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ 0; wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ " .. 1 / n .. dir .. " && " .. sound .. " volume")
+local volumeKeyScript = shell .. "/scripts/volume-key.sh"
+local function volumeKey(args)
+    return hl.dsp.exec_cmd(volumeKeyScript .. " " .. args)
 end
+local soundSettings = hl.dsp.exec_cmd("HYPRK_SETTINGS_PANE=sound " .. hyprk .. "/settings/run.sh")
 local function brightnessKey(dir, n)
     return hl.dsp.exec_cmd("brightnessctl -q -n1 set $(( ($(brightnessctl max) + " .. math.floor(n / 2) .. ") / " .. n .. " ))" .. dir)
 end
 for _, k in ipairs({ { "", 16 }, { "ALT + SHIFT + ", 64 } }) do
-    hl.bind(k[1] .. "XF86AudioRaiseVolume",  volumeKey("+", k[2]),     { locked = true, repeating = true })
-    hl.bind(k[1] .. "XF86AudioLowerVolume",  volumeKey("-", k[2]),     { locked = true, repeating = true })
     hl.bind(k[1] .. "XF86MonBrightnessUp",   brightnessKey("+", k[2]), { locked = true, repeating = true })
     hl.bind(k[1] .. "XF86MonBrightnessDown", brightnessKey("-", k[2]), { locked = true, repeating = true })
 end
-hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })
+-- { modifiers, step, "shift" when Shift alone is held (it inverts the pop; with Option it is the 1/64 step) }
+for _, k in ipairs({ { "", 16, "" }, { "SHIFT + ", 16, " shift" }, { "ALT + SHIFT + ", 64, "" } }) do
+    hl.bind(k[1] .. "XF86AudioRaiseVolume", volumeKey("up " .. k[2] .. k[3]),   { locked = true, repeating = true })
+    hl.bind(k[1] .. "XF86AudioLowerVolume", volumeKey("down " .. k[2] .. k[3]), { locked = true, repeating = true })
+    hl.bind(k[1] .. "XF86AudioRaiseVolume", volumeKey("release" .. k[3]), { locked = true, release = true })
+    hl.bind(k[1] .. "XF86AudioLowerVolume", volumeKey("release" .. k[3]), { locked = true, release = true })
+end
+for _, k in ipairs({ "XF86AudioRaiseVolume", "XF86AudioLowerVolume", "XF86AudioMute" }) do
+    hl.bind("ALT + " .. k, soundSettings)   -- VSSoundPrefs: Option alone with a volume key
+end
+hl.bind("XF86AudioMute",         volumeKey("mute"),       { locked = true })   -- unmuting pops 0.08 s later
+hl.bind("SHIFT + XF86AudioMute", volumeKey("mute shift"), { locked = true })
 
 -- screenshots like macOS: Cmd+Shift+3 full screen, Cmd+Shift+4 area (needs slurp), shutter sound
 -- xdg-user-dir knows localized folders; mkdir so a fresh home works

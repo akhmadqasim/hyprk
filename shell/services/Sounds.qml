@@ -18,9 +18,10 @@ Singleton {
         Quickshell.execDetached(arg ? [script, event, arg] : [script, event]);
     }
 
-    // volume pop once the slider settles, not on every drag step
-    function volumeChanged() { volumeDebounce.restart(); }
-    Timer { id: volumeDebounce; interval: 180; onTriggered: root.play("volume") }
+    // the volume pop when a Sound slider is let go, not while it is dragged; Shift held inverts "Play feedback when
+    // volume is changed" (ControlCenter 27.2.1 playAudioVolumeFeedback(onSliderEditingChanged:) 0x1000e3814: only
+    // when editing ends, then beepFeedback != Shift). The volume keys: scripts/volume-key.sh.
+    function volumeReleased(modifiers) { play("volume", (modifiers & Qt.ShiftModifier) ? "negate" : ""); }
 
     // power connected: PowerChime's connect_power chime when a laptop goes from battery to the charger
     // (MAC-ANSWERS "Sounds": PowerChime chimeOnAttach). Desktops have no battery device: nothing changes.

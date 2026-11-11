@@ -550,6 +550,86 @@ test("relTime", () => assert.deepEqual([30e3, 300e3, 7200e3, 100000e3, 400000e3]
     rmSync(dir, { recursive: true, force: true });
 }
 
+// ---- scripts/volume-key.sh + sound.sh volume (BezelServices VolumeStateMachine, SOUNDS.md "Volume keys") ----
+{
+    const { execFileSync } = await import("node:child_process");
+    const { mkdtempSync, rmSync, writeFileSync, readFileSync: rd, existsSync, chmodSync, mkdirSync } = await import("node:fs");
+    const { tmpdir } = await import("node:os");
+    const dir = mkdtempSync(join(tmpdir(), "hyprk-volkey-"));
+    const bin = join(dir, "bin"), st = join(dir, "state"), vk = join(dir, "vk"), log = join(dir, "log"), sink = join(dir, "sink");
+    mkdirSync(bin); mkdirSync(st);
+    // a stand-in for wpctl on one fake sink: "<volume> <muted 0|1>", printed with two decimals like wpctl
+    writeFileSync(join(bin, "wpctl"), `#!/bin/sh
+export LC_ALL=C
+read v m < "${sink}"
+case "$1" in
+get-volume) if [ "$m" = 1 ]; then printf 'Volume: %.2f [MUTED]\\n' "$v"; else printf 'Volume: %.2f\\n' "$v"; fi ;;
+set-volume) echo "$3 $m" > "${sink}" ;;
+set-mute) [ "$3" = toggle ] && m=$((1 - m)) || m=$3; echo "$v $m" > "${sink}" ;;
+esac
+`);
+    chmodSync(join(bin, "wpctl"), 0o755);
+    const sh = join(here, "..", "scripts", "volume-key.sh");
+    const env = Object.assign({}, process.env, { PATH: bin + ":" + process.env.PATH, HYPRK_VOLKEY_DIR: vk, HYPRK_STATE: st,
+        HYPRK_SOUND_LOG: log, HYPRK_MUTE: "1", HYPRLAND_INSTANCE_SIGNATURE: "test-volkey", XDG_RUNTIME_DIR: dir });
+    const run = (...a) => execFileSync(sh, a, { env }).toString();
+    const near = (a, b) => assert.ok(Math.abs(a - b) < 1e-6, `${a} != ${b}`);
+    const set = (v, m) => writeFileSync(sink, `${v} ${m ? 1 : 0}\n`);
+    const vol = () => Number(rd(sink, "utf8").split(" ")[0]);
+    // pops play in the background: give them a moment to reach the log
+    const pops = () => (spawnSync("sleep", ["0.15"]), existsSync(log)) ? rd(log, "utf8").split("\n").filter(l => l.startsWith("volume ")).length : 0;
+    const fb = on => writeFileSync(join(st, "sound.json"), JSON.stringify({ volumeFeedback: on }));
+    test("volume key steps on the Mac's grid: 1/16, Option+Shift 1/64, off-grid levels snap", () => {
+        set(0.40, 0); run("up", "16"); near(vol(), 0.4375);
+        set(0.5, 0); run("down", "16"); near(vol(), 0.4375);
+        set(0.5, 0); run("up", "64"); near(vol(), 0.515625);
+        set(0.03, 0); run("down", "16"); near(vol(), 0);
+        set(0.98, 0); run("up", "16"); near(vol(), 1);
+        run("release");
+    });
+    test("volume key: no pop while down or repeating, one on release; Shift inverts the setting", () => {
+        fb(true); set(0.5, 0); const p0 = pops();
+        run("up", "16"); run("up", "16"); run("up", "16");
+        assert.equal(pops(), p0);
+        run("release"); assert.equal(pops(), p0 + 1);
+        run("release"); assert.equal(pops(), p0 + 1);         // nothing changed since the last pop
+        fb(false); run("down", "16"); run("release"); assert.equal(pops(), p0 + 1);
+        run("down", "16", "shift"); run("release", "shift"); assert.equal(pops(), p0 + 2);
+        fb(true); run("down", "16", "shift"); run("release", "shift"); assert.equal(pops(), p0 + 2);
+    });
+    test("volume key unmutes; the mute key pops only when it unmutes", () => {
+        fb(true); set(0.5, 1); run("up", "16"); assert.ok(!rd(sink, "utf8").trim().endsWith(" 1")); run("release");
+        const p0 = pops();
+        run("mute"); assert.ok(rd(sink, "utf8").trim().endsWith(" 1")); assert.equal(pops(), p0);
+        run("mute"); assert.ok(rd(sink, "utf8").trim().endsWith(" 0")); assert.equal(pops(), p0 + 1);
+    });
+    test("volume key at full volume: a pop at once while held, none more on release, the loop ends", () => {
+        fb(true); set(1, 0); const p0 = pops();
+        run("up", "16");
+        for (let i = 0; i < 50 && pops() === p0; i++) spawnSync("sleep", ["0.05"]);
+        assert.equal(pops(), p0 + 1);
+        run("release");
+        spawnSync("sleep", ["0.2"]);
+        assert.equal(pops(), p0 + 1);
+        assert.ok(!existsSync(join(vk, "repeat")));
+    });
+    test("a new volume pop stops the one still playing (BezelServices playOneBeep:), other sounds are left alone", () => {
+        fb(true);
+        writeFileSync(join(bin, "pw-play"), "#!/bin/sh\nsleep 3\n");   // a stand-in player: nothing reaches a speaker
+        chmodSync(join(bin, "pw-play"), 0o755);
+        const snd = join(here, "..", "scripts", "sound.sh");
+        const r = spawnSync("sh", ["-c", `"${snd}" volume & a=$!; sleep 0.3; "${snd}" screenshot & b=$!; "${snd}" volume & c=$!; sleep 0.3
+            kill -0 $a 2>/dev/null && echo a-alive || echo a-gone; kill -0 $b 2>/dev/null && echo b-alive; kill -0 $c 2>/dev/null && echo c-alive
+            kill $b $c 2>/dev/null`], { env: Object.assign({}, env, { HYPRK_MUTE: "0" }), encoding: "utf8" });
+        assert.deepEqual(r.stdout.trim().split("\n"), ["a-gone", "b-alive", "c-alive"]);
+    });
+    test("volume key without an output device does nothing", () => {
+        writeFileSync(join(bin, "wpctl"), "#!/bin/sh\nexit 1\n");
+        const p0 = pops(); run("up", "16"); run("release"); assert.equal(pops(), p0);
+    });
+    rmSync(dir, { recursive: true, force: true });
+}
+
 // ---- Liquid Glass motion (ui/HyprK/motion.js) ----
 const M = load("motion.js", hyprk);
 const near = (a, b, e = 1e-6) => assert.ok(Math.abs(a - b) < e, `${a} != ${b}`);

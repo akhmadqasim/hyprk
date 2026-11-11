@@ -24,8 +24,8 @@ changes apply at once. Missing file or keys fall back to the defaults.
 | `notification` | a notification that asks for a sound (`sound-name` / `sound-file` hint) arrives; others are silent (`lib/nc.js` notificationSound) | alert sound | Focus / Do Not Disturb (no banner, no sound), the app's sound setting, `suppress-sound` |
 | `alert` | critical notification, `qs ipc call sounds play alert`, an alert that sets `beep: true` (NSAlert plays no sound by itself; confirmations such as Empty Trash or Shut Down are silent) | alert sound | Focus |
 | `power` | a laptop goes from battery to the charger (UPower) | `misc/PowerChime-connect_power` | `uiSounds` |
-| `poof` | no caller: the Dock has no drag-off removal yet (Mac: Q-dock-17 "Remove" bubble, fade 0.25 s, ID 15) | `SystemSounds/dock/poof item off dock` | `uiSounds` |
-| `volume` | Control Center Sound slider settles (180 ms debounce), volume keys | `misc/BezelServices-volume` | `volumeFeedback` |
+| `poof` | an app dragged off the Dock is let go there (Mac: Q-dock-17 "Remove" bubble, fade 0.25 s, ID 15) | `SystemSounds/dock/poof item off dock` | `uiSounds` |
+| `volume` | the volume keys (`scripts/volume-key.sh`, below), the Control Center Sound slider and the Sound module's slider when let go after a change, the Settings Output volume slider when let go | `misc/BezelServices-volume` | `volumeFeedback`, inverted while Shift is held (keys and Control Center); a new pop stops the previous one |
 | `screenshot` | Cmd+Shift+3, Cmd+Shift+4 (slurp), Print | `SystemSounds/system/Screen Capture` | `uiSounds` |
 | `trash-empty` | Dock Trash right-click > Empty Trash | `SystemSounds/finder/empty trash` | `uiSounds` |
 | `trash-move`, `mount`, `unmount`, `sent` | available for other apps (Finder) | see `sound.sh` | `uiSounds` |
@@ -37,6 +37,37 @@ changes apply at once. Missing file or keys fall back to the defaults.
 - `HYPRK_MUTE=1` silences everything (set by `scripts/smoke.sh` and nested test sessions).
 - `HYPRK_SOUND_LOG=<file>` appends `<event> <file>` for each sound that would play, muted or not.
 - No startup chime: the Mac's is firmware, no file exists, so "Play sound on startup" (Settings) has nothing to play.
+
+## Volume keys and the volume pop (BezelServices, Control Center)
+
+`scripts/volume-key.sh` (Hyprland binds in `config/hypr/hyprland.lua`) follows BezelServices' `VolumeStateMachine`,
+decoded from `/System/Library/LoginPlugins/BezelServices.loginPlugin` (macOS 27.2.1 26B131, arm64e slice, Ghidra 12.2
+of the bundle extracted from the restore image, 2026-11-12):
+
+| rule | Mac evidence |
+|---|---|
+| a key press and every auto-repeat change the level, show the HUD and play nothing | `VSIncrease` / `VSDecrease` `-generateOutput:stateMachine:` (0x11ac0, 0x11cf8): `changeVolumeBy:type:`, `displayOSD`, `setSingleBeepWhenFinished:YES`; the `*Repeat` states (0x11be8, 0x11e20) the same without the flag |
+| ONE pop when the key goes up, if a step happened since the last pop | `VSStart` (0x11538): `singleBeepWhenFinished` -> `startOneBeep` (an `NSTimer` of 0 s), then `stopBeeps` clears it |
+| a step is 1/16, Option+Shift 1/64, on a grid | `-changeVolumeBy:type:` (0x10388): level rounded to 1/64 (`(int)((v + 1/128) * 64) / 64`), +-step, truncated to a multiple of the step, clamped to 0..1 |
+| at full volume a held key pops at once, then every 1 s, until the key goes up or 4 s pass without a step; the key going up then plays nothing more | `startRepeatedBeeps` (0x10214): repeating `NSTimer` 1.0 s, fire date now, started when the new level is 1.0; `beepTimeout` = now + 4 s on each step, `playOneBeep:` (0xff78) stops the timer once it has passed and always ends with `setSingleBeepWhenFinished:NO` |
+| a pop stops the one still playing, then plays (no overlap) | `playOneBeep:`: `isPlaying` -> `stop`, then `play` on the one `NSSound` of `volume.aiff` |
+| Shift held (without Control, Option, Command) inverts "Play feedback when volume is changed" for that pop | `-handleKeyEvent:shift:control:option:command:` (0x10d04) sets `negateSilentPreference`; `playOneBeep:` plays when `playVolumeKeyFeedback != negateSilentPreference` |
+| Option alone with a volume or mute key opens the Sound settings | input 9 -> `VSSoundPrefs` (0x117b8): `displaySoundPrefs` |
+| the mute key: muting is silent, unmuting pops 0.08 s later | `VSMute` (0x11f30): `startOneBeep` while still muted (the timer is 0.08 s when muted, double at 0x401d8), then `toggleMute`; no flag, so key up plays nothing |
+| no output device: nothing | `canSetVolume` NO: "Manual volume adjustment not allowed", no level change, no pop |
+
+The Control Center Sound slider (ControlCenter 27.2.1, `0x1000e3814`): `playAudioVolumeFeedback(onSliderEditingChanged:)`
+returns while editing; when editing ends it reads `NSEvent.modifierFlags` bit 17 (Shift) and calls
+`AudioVolumeFeedbackController.shared.playVolumeFeedbackSound()` when `SoundPreferences.shared.beepFeedback != Shift`.
+That controller (ControlCenter.framework in the dyld cache, 0x20a531e74) plays the same
+`BezelServices.loginPlugin/Contents/Resources/volume.aiff`. So nothing plays while dragging, one pop on let-go. Ours:
+`HyprK.Slider.releaseModifiers` -> `Sounds.volumeReleased()` (was a 180 ms debounce after the last drag step).
+
+Start latency, ours (session 19, headless session on a private PipeWire with a logging stand-in for `pw-play`, so no
+sound reached a device): virtual key up -> the player starts 26, 28, 31, 33, 40 ms (one 105 ms outlier; with auto-repeat
+still queued 30-100 ms); `sound.sh` itself 8-11 ms of that (jq 4 ms); `pw-play` reaches streaming about 11 ms later
+(earlier measurement, above). Unmute -> pop 123 ms (0.08 s by design + 43 ms). The Mac's key-up -> sound time is not
+measured: **needs the Mac** (a recording of key up and the output).
 
 ## Evidence: the alert volume scales every sound systemsoundserverd plays
 

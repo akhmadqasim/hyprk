@@ -63,9 +63,13 @@ Item {
     property var labels: (leftText !== "" ? [[leftText, 0]] : []).concat(rightText !== "" ? [[rightText, 1]] : [])
     signal moved(real value)
     signal released()
+    // the keyboard modifiers when the pointer let go (0 for the arrow keys): Control Center reads Shift here, which
+    // inverts "Play feedback when volume is changed" (ControlCenter 27.2.1 0x1000e3814: NSEvent modifierFlags bit 17)
+    property int releaseModifiers: 0
     signal committed(real value)
     function _end(dir) {
         const v = endStep > 0 ? Math.max(from, Math.min(to, value + dir * endStep)) : dir < 0 ? from : to;
+        releaseModifiers = 0;
         moved(v); released(); committed(v);
     }
     // Arrow keys (AppKit 27.2.1 -[NSSliderCell _moveInDirection:] 0x18b15eb0c): a twentieth of the range per press, or
@@ -86,6 +90,7 @@ Item {
         if (snap) v = from + Math.round((v - from) / step) * step;
         v = Math.max(Math.min(from, to), Math.min(Math.max(from, to), v));
         if (v === value) return;
+        releaseModifiers = 0;
         moved(v); released(); committed(v);
     }
     readonly property var _m: G.slider(controlSize)
@@ -275,8 +280,9 @@ Item {
                 else upd(m.x);
             }
             onPositionChanged: m => { if (pressed) upd(m.x); }
-            onReleased: {
+            onReleased: m => {
                 const v = s._dragValue;
+                s.releaseModifiers = m.modifiers;
                 s._pull = 0;
                 s._dragging = false; s._jump = false;
                 if (touched) { s.released(); s.committed(v); }

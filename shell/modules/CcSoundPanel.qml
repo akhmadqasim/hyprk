@@ -72,6 +72,7 @@ Item {
         enabled: Audio.available
         value: Audio.muted ? 0 : Audio.volume
         onMoved: v => Audio.setVolume(v)
+        onReleased: Sounds.volumeReleased(releaseModifiers)
     }
     Separator { y: Theme.cc.soundSeparator1 }
     Text {

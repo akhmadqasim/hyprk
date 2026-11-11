@@ -20,7 +20,6 @@ Singleton {
         if (!available) return;
         sink.audio.muted = false;
         sink.audio.volume = Math.max(0, Math.min(1, v));
-        Sounds.volumeChanged();
     }
 
     // output devices (Control Center's Sound module); choosing one makes it the preferred default sink, PipeWire's

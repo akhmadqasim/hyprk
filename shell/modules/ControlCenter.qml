@@ -182,6 +182,7 @@ Item {
         rightSymbol: "speaker.wave.3.fill"
         value: Audio.muted ? 0 : Audio.volume
         onMoved: v => Audio.setVolume(v)
+        onSliderReleased: mods => Sounds.volumeReleased(mods)
     }
 
     // ---------- building blocks ----------
@@ -363,6 +364,7 @@ Item {
         property string rightSymbol
         property real value: 0
         signal moved(real v)
+        signal sliderReleased(int modifiers)   // let go after a change: the modifiers at that moment
 
         width: cc.width
         height: cc.rowH
@@ -402,6 +404,7 @@ Item {
             knobShown: hover.hovered
             value: sm.value
             onMoved: v => sm.moved(v)
+            onReleased: sm.sliderReleased(releaseModifiers)
         }
     }
 
