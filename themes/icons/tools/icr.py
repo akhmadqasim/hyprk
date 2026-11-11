@@ -13,11 +13,11 @@ compute in reference/ASSETS.md "IconRendering composition"). Every tunable is Ap
   * modes (0x1cfd71dfc, 0x1cfd70f98, 0x1cfd69ffc): colour; tinted dark = grey bake, saturation, duotone to the tint,
     screened over the mitigated plate; clear and tinted light = the three masks (lighten / darken / highlights)
     applied to a plate through the lightening / highlights vibrant colour matrices and plusDarker.
-NOT Apple's, stated where used: the SDF is computed here from the baked alpha (Apple's generator and its
-smoothing were not ported), the blur is a plain Gaussian with sigma = RenderBox's radius (ASSUMED), grayscale is
-BT.709 luma (ASSUMED), IconBrightness from the chiclet's luminance limits (the limits are Apple's, the function
-was not read), and the paths not ported (see ASSETS.md: darklight compounding prevention, blurStrength /
-refraction glass, glow = nil in the defaults).
+NOT Apple's, stated where used: the distance field is computed here (Apple's is RenderBox's distance style; its
+source, the group's layers drawn solid, is Apple's), the side of the shadow ring is measured, the blur is a plain
+Gaussian with sigma = RenderBox's radius (ASSUMED), grayscale is BT.709 luma (ASSUMED), IconBrightness from the
+chiclet's luminance limits (the limits are Apple's, the function was not read), and the paths not ported (see
+ASSETS.md: darklight compounding prevention, blurStrength / refraction glass, glow = nil in the defaults).
 """
 import json, os
 import numpy as np
@@ -240,22 +240,33 @@ class Icon:
         self.phi = np.arctan2(yy - self.centre[1], xx - self.centre[0]).astype(np.float32)
         for g in groups:
             a = g["img"][..., 3]
-            g["d"], g["nrm"] = sdf(a / max(float(a.max()), 1e-6))      # the shape, whatever the group's own opacity
+            # the SDF's source is the group's layers drawn solid (0x1cfd45064), not the baked picture's alpha
+            a = g["shape"] if g.get("shape") is not None else a / max(float(a.max()), 1e-6)
+            g["d"], g["nrm"] = sdf(a)
             ys = np.nonzero(a.max(1) > 1 / 255)[0]
             g["frame"] = (float(ys[0]), float(ys[-1] + 1)) if len(ys) else (0.0, float(self.n))
 
 
+SHADOW_RING = "inside"       # side of the edge the bake's ring lies on; MEASURED (Cmd-Tab shot: inside 9.4, outside 9.6), sign of the SDF not read
+
+
 def _shadow(g, icon, sc, kind):
-    """the baked shadow image of a group (0x1cfd4589c), premultiplied RGBA; kind 'vibrant' | 'neutral'"""
+    """the baked shadow image of a group (0x1cfd4589c), premultiplied RGBA; kind 'vibrant' | 'neutral'.
+    The display list: scale, colour multiply (vibrantBrightness) or alpha multiply (black), translate by the offset,
+    blur filter, then a clip layer = the group's SDF filled by 0x1cfd39594 with inset -ringWidth, then the group.
+    0x1cfd39594 is an alpha threshold between the edge (SDF value 0.5) and the inset contour: a RING ringWidth wide
+    along the edge, not the grown shape. The filters work on the whole list, so the ring cut of the group is
+    blurred; the translate moves the ring with the picture."""
     S = P["shadow"]; u = icon.unit
     img = g["img"]
     if kind == "vibrant": src = np.concatenate([img[..., :3] * S["vibrantBrightness"], img[..., 3:]], -1)
     else: src = np.concatenate([np.zeros_like(img[..., :3]), img[..., 3:]], -1)
-    src = shift(src, S["offsetY"] * u)
-    src = gauss(src, P["blurStrengthMax"] * min(max(S["radius"][sc], 0), 1) * u)
     if S["ringWidth"] is not None:
-        src = src * np.clip(g["d"] + S["ringWidth"][sc] * u + 0.5, 0, 1)[..., None]
-    return src
+        w = S["ringWidth"][sc] * u
+        d = -g["d"] if SHADOW_RING == "outside" else g["d"]
+        src = src * (np.clip(d + 0.5, 0, 1) * np.clip(w - d + 0.5, 0, 1))[..., None]
+    src = shift(src, S["offsetY"] * u)
+    return gauss(src, P["blurStrengthMax"] * min(max(S["radius"][sc], 0), 1) * u)
 
 
 def _translucency(g, icon, sc):
@@ -306,13 +317,14 @@ def render_colour(icon, sc, pixel_unit, mode="color", px_per_point=2.0, mitigate
             bm = S["blendModeForVibrantOnDim"] if (kind == "vibrant" and bright == "dim") else S["blendMode"]
             rgb = blend(rgb, sh[..., :3] * k, sh[..., 3] * k, bm)
         tr = _translucency(g, icon, sc)
-        c = img * tr * g["opacity"]
+        c = img * np.asarray(tr)[..., None] * g["opacity"]             # (n, 1, 1): the gradient runs down the rows
         rgb = blend(rgb, c[..., :3], c[..., 3], g.get("blend", "normal"))
         if sh is not None and S["drawOverContent"] and g.get("blend", "normal") == "normal" and g["translucency"] > 0:
             amt = min(max(g["translucency"] / S["translucencyForMaxOverdraw"], 0), 1) * \
                 (S["maxNeutralOverdrawOpacity"] if g.get("shadowStyle", 0) == 3 else S["maxVibrantOverdrawOpacity"])[sc]
             k = g["opacity"] * g["shadowOpacity"] * (S["vibrantOpacity"] if kind == "vibrant" else S["neutralOpacity"])[sc]
-            clip = img[..., 3] * g["opacity"] * amt
+            # still inside the translucency clip (clipLayerWithAlpha: of 0x1cfd74eec stays set for the overdraw)
+            clip = img[..., 3] * np.asarray(tr) * g["opacity"] * amt
             rgb = blend(rgb, sh[..., :3] * (k * clip)[..., None], sh[..., 3] * k * clip, S["overdrawBlendMode"])
         if g.get("specular"):
             inside = _inside(g, colour, bright)
@@ -368,7 +380,7 @@ def render_masks(icon, sc, pixel_unit):
         if sh is not None and S["drawOverContent"] and g.get("blend", "normal") == "normal" and g["translucency"] > 0:
             amt = min(max(g["translucency"] / S["translucencyForMaxOverdraw"], 0), 1) * \
                 (S["maxNeutralOverdrawOpacity"] if g.get("shadowStyle", 0) == 3 else S["maxVibrantOverdrawOpacity"])[sc]
-            M = M * (1 - sh[..., 3:] * (k * a * g["opacity"] * amt)[..., None])
+            M = M * (1 - sh[..., 3:] * (k * a * np.asarray(tr) * g["opacity"] * amt)[..., None])
         if g.get("specular"):
             inside = _inside(g, False, "normal"); H = P["highlights"]
             for p in passes(lights("glyphsClear", sc, pixel_unit, True)):
@@ -425,10 +437,13 @@ def mitigated_plate(mode, appearance, tint=None, saturation=1.0):
     return base * (1 - f) + np.asarray(tint, np.float32) * f
 
 
-def render(icon, mode, appearance, points, px_per_point, tint=None, saturation=1.0, plate=None, mitigated=True):
+def render(icon, mode, appearance, points, px_per_point, tint=None, saturation=1.0, plate=None, mitigated=True,
+           supersample=1):
     """straight rgb (HxWx3) of the rendition inside the chiclet. mode 'color' | 'tinted' | 'clear', appearance
-    'light' | 'dark'. plate overrides the mitigated plate colour (the live glass the Dock puts under the icon)."""
-    sc = size_class(points); pixel_unit = 1 / icon.unit
+    'light' | 'dark'. plate overrides the mitigated plate colour (the live glass the Dock puts under the icon).
+    supersample k: the icon is given at k times the device resolution (px_per_point is the device's); the pixel
+    based parameters (minDistancePixels, the outline width) stay device pixels, the caller scales the result down."""
+    sc = size_class(points); pixel_unit = supersample / icon.unit; px_per_point = px_per_point * supersample
     if mode == "color":
         return render_colour(icon, sc, pixel_unit, "color", px_per_point, mitigated)
     if mode == "tinted" and appearance == "dark":

@@ -43,9 +43,12 @@ import dmp2
 APPEARANCE = {"dark": ("NSAppearanceNameDarkAqua", "UIAppearanceDark"),
               "light": ("NSAppearanceNameAqua", "UIAppearanceLight"),
               "tintable": ("ISAppearanceTintable",)}
-# Icon Composer's "automatic gradient" from one colour: lighter at the start point. The amount is not in
-# the car (IconRendering computes it); 0.3 is the best fit to Apps' pre-rendered bitmap (rms 15.7 -> 14.1).
+# Icon Composer's "automatic gradient" from one colour. groups() (what icr.py composes) builds it as
+# IconRendering does: auto_gradient(). flat() keeps the older FITTED lightening of the start point (0.3, best fit
+# to Apps' pre-rendered bitmap) because build-styles.py's fitted Dock rule was made on that picture.
 AUTO_GRADIENT = 0.3
+import json
+AUTO = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "icr-params.json")))["fills"]
 
 
 def _enc(lin):
@@ -59,6 +62,21 @@ def _lin(c):
 
 
 P3_TO_SRGB = np.array([[1.2249, -0.2247, 0.0], [-0.0420, 1.0419, 0.0], [-0.0197, -0.0786, 1.0979]])
+
+
+def auto_gradient(rgb):
+    """Icon.Fill.automaticGradient(colour) -> [(location, rgb)], IconRendering 27.2.1 0x1cfd2c2a8 with
+    ICRRenderingParameters.Fills.AutomaticGradient: Y = BT.709 luma of the components; the lightening is picked by
+    Y (<= 0.25 dim, <= 0.5 midDim, <= 0.75 midBright, else bright); c' = c + saturationBoost (c - Y); the second
+    colour is c' + l (1 - c') for l >= 0, c' + l c' for l < 0, clamped to 0..1. l > 0: that colour at location 0
+    and the given one at 1 - basePosition; l <= 0: the given one at basePosition and the changed one at 1."""
+    a = AUTO["automaticGradient"]; c = np.asarray(rgb, float)
+    y = float(c @ [0.2126, 0.7152, 0.0722])
+    l = a["dimLightening"] if y <= 0.25 else a["midDimLightening"] if y <= 0.5 else \
+        a["midBrightLightening"] if y <= 0.75 else a["brightLightening"]
+    m = c + a["saturationBoost"] * (c - y)
+    m = np.clip(m + l * (1 - m) if l >= 0 else m + l * m, 0, 1)
+    return [(0.0, m), (1.0 - a["basePosition"], c)] if l > 0 else [(a["basePosition"], c), (1.0, m)]
 
 
 class Stack:
@@ -142,8 +160,18 @@ class Stack:
             out.append(d[o + 12:o + 12 + ln].rstrip(b"\0").decode() or None); o += 12 + ln
         return out
 
-    def fill(self, name, app):
-        """COLR -> straight sRGB RGBA array, GGRA -> gradient dict, None when missing"""
+    def colour(self, cs, rgb, a=1.0):
+        """components in the car's colour space -> straight (extended) sRGB RGBA"""
+        rgb = np.asarray(rgb, float)
+        if cs == 2: rgb = _enc(np.clip(rgb, 0, None) ** 2.2)          # Gray Gamma 2.2
+        elif cs == 3 or (cs == 1 and self.extended and self.p3): rgb = _enc(P3_TO_SRGB @ _lin(rgb))   # Display P3
+        # extended sRGB: a Display P3 colour outside sRGB keeps its negative component, as in IconRendering's
+        # extended-range working space (the composite is clipped once, at the end)
+        return np.append(rgb if self.extended else np.clip(rgb, 0, 1), min(max(a, 0.0), 1.0))
+
+    def fill(self, name, app, raw=False):
+        """COLR -> straight sRGB RGBA array (raw: (colour space, rgb, alpha) as stored), GGRA -> gradient dict,
+        None when missing"""
         r = self.pick(self.byname.get(name, []), app)
         if not r: return None
         pl = C.parse_csi(r[1])["payload"]
@@ -152,19 +180,20 @@ class Stack:
         comps = struct.unpack_from("<%dd" % nc, pl, 16)
         if nc <= 2: rgb, a = np.array([comps[0]] * 3), (comps[1] if nc == 2 else 1.0)
         else: rgb, a = np.array(comps[:3]), (comps[3] if nc > 3 else 1.0)
-        if cs == 2: rgb = _enc(np.clip(rgb, 0, None) ** 2.2)          # Gray Gamma 2.2
-        elif cs == 3 or (cs == 1 and self.extended and self.p3): rgb = _enc(P3_TO_SRGB @ _lin(rgb))   # Display P3
-        # extended sRGB: a Display P3 colour outside sRGB keeps its negative component, as in IconRendering's
-        # extended-range working space (the composite is clipped once, at the end)
-        return np.append(rgb if self.extended else np.clip(rgb, 0, 1), min(max(a, 0.0), 1.0))
+        return (cs, rgb, a) if raw else self.colour(cs, rgb, a)
 
     def gradient(self, pl, app):
         nst, typ = struct.unpack_from("<II", pl, 4)
-        x0, y0, x1, y1 = struct.unpack_from("<ffff", pl, 16); o = 32; stops = []
+        x0, y0, x1, y1 = struct.unpack_from("<ffff", pl, 16); o = 32; stops = []; auto = None
         for _ in range(nst):
             loc, ln = struct.unpack_from("<fI", pl, o)
-            stops.append((loc, self.fill(pl[o + 8:o + 8 + ln].rstrip(b"\0").decode(), app))); o += 8 + ln
-        return dict(type=typ, p0=(x0, y0), p1=(x1, y1), stops=stops)
+            nm = pl[o + 8:o + 8 + ln].rstrip(b"\0").decode()
+            stops.append((loc, self.fill(nm, app))); o += 8 + ln
+            if typ == 0 and auto is None:                             # automatic gradient: IconRendering's two stops
+                raw = self.fill(nm, app, raw=True)
+                if isinstance(raw, tuple):
+                    auto = [(l, self.colour(raw[0], c, raw[2])) for l, c in auto_gradient(raw[1])]
+        return dict(type=typ, p0=(x0, y0), p1=(x1, y1), stops=stops, auto=auto)
 
     def svg(self, v):
         pl = C.parse_csi(v)["payload"]
@@ -206,7 +235,8 @@ class Stack:
                     lr = self.pick(self.byid.get((L["key"].get(2), L["key"].get(17)), []), app)
                     if lr is None: continue
                     csi = C.parse_csi(lr[1])
-                    L.update(name=self.names.get(L["key"].get(17)), fill=self.fill(F, app) if F else None, svg=None, bitmap=None)
+                    L.update(name=self.names.get(L["key"].get(17)), fill=self.fill(F, app) if F else None, fillname=F,
+                             svg=None, bitmap=None)
                     if csi["pix"] == "SVG ": L["svg"] = self.svg(lr[1])
                     else:
                         try: L["bitmap"] = self.bitmap(csi)
@@ -249,16 +279,21 @@ def render_bitmap(bm, rect, N):
     return out
 
 
-def render_fill(f, N):
-    """colour or gradient over the whole canvas -> NxN premultiplied"""
+def render_fill(f, N, rect=None, auto=False):
+    """colour or gradient -> NxN premultiplied. rect (x0, y0, x1, y1 px) is the gradient's unit square (None: the
+    canvas); auto: the automatic gradient as IconRendering builds it (else flat()'s fitted lightening)"""
     out = np.zeros((N, N, 4), np.float32)
     if not isinstance(f, dict):
         out[...] = np.append(f[:3] * f[3], f[3]); return out
-    yy, xx = (np.mgrid[0:N, 0:N].astype(np.float32) + 0.5) / N
+    rx0, ry0, rx1, ry1 = rect or (0, 0, N, N)
+    yy, xx = np.mgrid[0:N, 0:N].astype(np.float32) + 0.5
+    xx = (xx - rx0) / max(rx1 - rx0, 1e-6); yy = (yy - ry0) / max(ry1 - ry0, 1e-6)
     (x0, y0), (x1, y1) = f["p0"], f["p1"]
-    dx, dy = x1 - x0, y1 - y0
-    t = np.clip(((xx - x0) * dx + (yy - y0) * dy) / max(dx * dx + dy * dy, 1e-9), 0, 1)
+    # the vector between the points in px, so a slanted gradient keeps its angle in a non-square rect
+    dx, dy = (x1 - x0) * (rx1 - rx0), (y1 - y0) * (ry1 - ry0)
+    t = np.clip(((xx - x0) * (rx1 - rx0) * dx + (yy - y0) * (ry1 - ry0) * dy) / max(dx * dx + dy * dy, 1e-9), 0, 1)
     stops = [(l, c) for l, c in f["stops"] if c is not None and not isinstance(c, dict)]
+    if auto and f.get("auto"): stops = f["auto"]
     locs = [l for l, _ in stops]; cols = np.array([c for _, c in stops])
     if len(stops) == 1:
         top = cols[0].copy(); top[:3] += (1 - top[:3]) * AUTO_GRADIENT
@@ -266,6 +301,30 @@ def render_fill(f, N):
     cols = cols.copy(); cols[:, :3] *= cols[:, 3:4]      # stops are interpolated premultiplied (a clear stop has no hue)
     for ch in range(4): out[..., ch] = np.interp(t, locs, cols[:, ch])
     return out
+
+
+def comp(dst, src, mode="normal"):
+    """premultiplied RGBA src onto premultiplied RGBA dst with a blend mode (a layer inside its group: IconRendering
+    draws each layer with drawShape:fill:alpha:blendMode:, 0x1cfd42e9c)"""
+    if mode == "normal": return src + dst * (1 - src[..., 3:4])
+    if mode == "plusLighter": return np.minimum(dst + src, 1)
+    sa, da = src[..., 3:4], dst[..., 3:4]
+    cs = src[..., :3] / np.maximum(sa, 1e-6); cb = dst[..., :3] / np.maximum(da, 1e-6)
+    if mode == "plusDarker": b = np.maximum(cb + cs - 1, 0)
+    elif mode == "multiply": b = cb * cs
+    elif mode == "screen": b = cb + cs - cb * cs
+    elif mode == "overlay": b = np.where(cb <= 0.5, 2 * cb * cs, 1 - 2 * (1 - cb) * (1 - cs))
+    elif mode == "darken": b = np.minimum(cb, cs)
+    elif mode == "lighten": b = np.maximum(cb, cs)
+    elif mode == "colorDodge": b = np.minimum(1, cb / np.maximum(1 - cs, 1e-6))
+    elif mode == "colorBurn": b = 1 - np.minimum(1, (1 - cb) / np.maximum(cs, 1e-6))
+    elif mode == "softLight": b = (1 - 2 * cs) * cb * cb + 2 * cs * cb
+    elif mode == "hardLight": b = np.where(cs <= 0.5, 2 * cb * cs, 1 - 2 * (1 - cb) * (1 - cs))
+    elif mode == "difference": b = np.abs(cb - cs)
+    elif mode == "exclusion": b = cb + cs - 2 * cb * cs
+    else: b = cs                                                    # hue / saturation / color / luminosity: not ported
+    rgb = src[..., :3] * (1 - da) + dst[..., :3] * (1 - sa) + sa * da * b
+    return np.concatenate([rgb, sa + da - sa * da], -1)
 
 
 def over(dst, src, op=1.0):
@@ -279,6 +338,23 @@ BLEND = {0: "normal", 1: "multiply", 2: "screen", 3: "overlay", 4: "darken", 5: 
          15: "luminosity", 26: "plusDarker", 27: "plusLighter"}
 
 
+def layer_fill(L, l, N):
+    """a layer's fill as IconRendering lays it out (0x1cfd42e9c): the layer is the clip, the fill a rect. A
+    gradient's unit square is the bounding rect of what the layer draws; Icon.Fill.system is IconRendering's own
+    gradient (ICRRenderingParameters.Fills), top to bottom (GradientPlacement.default 0,0 -> 0,1) over the whole
+    canvas (supportsChicletAlignmentForSystemFills). The bounding rect is taken from the rendered alpha here."""
+    f = L["fill"]
+    if not isinstance(f, dict): return render_fill(f, N)
+    sysname = (L.get("fillname") or "").rsplit("/", 1)[-1]
+    if sysname in ("system-light", "system-dark"):
+        st = AUTO["systemDarkGradient" if sysname == "system-dark" else "systemLightGradient"]
+        return render_fill(dict(p0=(0.0, 0.0), p1=(0.0, 1.0), stops=[(x["location"], np.array(x["color"])) for x in st]), N)
+    a = l[..., 3] > 1 / 255
+    ys = np.nonzero(a.any(1))[0]; xs = np.nonzero(a.any(0))[0]
+    rect = (xs[0], ys[0], xs[-1] + 1, ys[-1] + 1) if len(ys) else None
+    return render_fill(f, N, rect, auto=True)
+
+
 def groups(tree, N):
     """the stack as IconRendering sees it: (background fill or None, [group]) with one premultiplied N x N image
     per Icon Composer group (IconRendering bakes a group into one image, FinalizedIcon.Layer) and its glass record"""
@@ -290,13 +366,16 @@ def groups(tree, N):
             # (ICRRenderingParameters.Fills.systemLightGradient / systemDarkGradient)
             if (ch.get("name") or "").endswith(("/system-light", "/system-dark")): fill = ch["name"].rsplit("/", 1)[1]
             continue
-        g = np.zeros((N, N, 4), np.float32)
+        g = np.zeros((N, N, 4), np.float32); shape = np.zeros((N, N), np.float32)
         for L in ch["layers"]:
             l = render_svg(L["svg"], L["rect"], N) if L["svg"] is not None else render_bitmap(L["bitmap"], L["rect"], N)
-            if L["fill"] is not None: l = render_fill(L["fill"], N) * l[..., 3:4]
-            g = over(g, l, L["opacity"])
+            # the group's shape for the SDF: IconRendering draws the layers again in one solid colour at alpha 1
+            # (0x1cfd45064 -> 0x1cfd42e9c with its mask flag), so a fill's or the layer's own opacity is not in it
+            shape = shape + l[..., 3] * (1 - shape)
+            if L["fill"] is not None: l = layer_fill(L, l, N) * l[..., 3:4]
+            g = comp(g, l * L["opacity"], BLEND.get(L.get("blend", 0), "normal"))
         gl = ch.get("glass") or {}
-        out.append(dict(img=g, opacity=ch["opacity"], blend=BLEND.get(ch.get("blend", 0), "normal"), name=ch["name"],
+        out.append(dict(img=g, shape=shape, opacity=ch["opacity"], blend=BLEND.get(ch.get("blend", 0), "normal"), name=ch["name"],
                         specular=gl.get("specular", False), translucency=gl.get("translucency", 0.0),
                         shadowStyle=gl.get("shadowStyle", 0), shadowOpacity=gl.get("shadowOpacity", 0.0),
                         specularPlacement=gl.get("specularPlacement", 0)))
@@ -309,10 +388,8 @@ def fill_stops(f):
     if f is None: return None
     if isinstance(f, str): return f                              # "system-light" / "system-dark": IconRendering's own
     if not isinstance(f, dict): return [(0.0, f[:3]), (1.0, f[:3])]
+    if f.get("auto"): return sorted([(l, c[:3]) for l, c in f["auto"]], key=lambda s: s[0])
     stops = [(l, c[:3]) for l, c in f["stops"] if c is not None and not isinstance(c, dict)]
-    if len(stops) == 1:
-        top = stops[0][1] + (1 - stops[0][1]) * AUTO_GRADIENT
-        return [(0.0, top), (1.0, stops[0][1])]
     return sorted(stops, key=lambda s: s[0])
 
 

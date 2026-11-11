@@ -30,7 +30,9 @@ macOS 26/27 draws every app icon as the same squircle. hyprk does the same on an
 after editing it run `node themes/icons/tools/gen-map.mjs && themes/icons/build-apple-theme.sh`.
 
 Files: `apps/<Name>-{1024,512,128}.png` (all 72 are real renditions from `Assets.car`, 1024 px only
-where Apple ships one, 15 apps), `system/` (folders, Trash, file types), `settings/` (real System
+where Apple ships one, 15 apps), `system/` (folders, Trash, file types; `GenericFolderIcon` is macOS 27's
+run-time folder, back flap + front flap from CoreTypes' `Assets.car`, sRGB, built by `tools/build-folder.py`: it
+needs no tint, the other folders are still the older `.icns` art), `settings/` (real System
 Settings pane icons, `<pane>@<64|128>-<light|dark>.png`, see `panes.json`), `sf-symbols/` (SF Symbols
 rendered on macOS 27.2.1: `svg/`, `names.json`; `sf.js` is generated from them by `tools/gen-sf.mjs` and
 used by the shell and Finder through symlinks), `tools/` (`car.py` Assets.car reader, `build-apps.py`, `build-styles.py` + `iconstack.py` + `dmp2.py` +
@@ -54,13 +56,19 @@ used by the shell and Finder through symlinks), `tools/` (`car.py` Assets.car re
      highlights masks over the plate (the mitigated version, which is what IconServices' stills are).
      TintedLight / ClearLight stay FITTED to the Mac's Dock (flat luminance ramp + `glass.py`'s fitted rim): there
      the masks act on live glass, and the port over a fixed plate fits the Dock shot worse.
-     `tools/check-styles.py`: rms against the Mac's Dock at 66 px (Dark 8-15, mean of the Dark Dock shot 11.4 -> 9.8;
-     Clear 3-9, Tinted 8-15 unchanged; Apple's own Default bitmap 6-14 on the same shots) and against the Siri / Spotlight Settings tiles
-     at 128 px (Dark 7.1 / 8.8, was 15.5 / 19.3; TintedDark 8.3 / 8.6, was 10.4 / 10.6; ClearDark 7.6 / 10.7, was
-     16.7 / 18.1; ClearLight 6.9 / 8.5 and TintedLight 7.4 / 9.7 by the port's mitigated version). Fitted or
-     assumed inside the port, each marked in `icr.py`: the SDR tone curve of the clear stills, Gaussian sigma =
-     RenderBox's blur radius, BT.709 grey bake, the automatic gradient's lightening. 256 px only: the shell draws
-     app icons at most 128 pt.
+     `tools/check-styles.py`: rms against the Mac's Dock at 66 px (Dark 5-11, mean of the Dark Dock shot 11.4 ->
+     9.8 -> 6.2 after the second pass; Clear 3-9, Tinted 8-15 unchanged; Apple's own Default bitmap 6-14 on the same
+     shots) and against the Siri / Spotlight Settings tiles at 128 px (Dark 7.1 / 7.6, TintedDark 8.3 / 8.2,
+     ClearDark 7.6 / 7.0, ClearLight 6.9 / 6.7 and TintedLight 7.4 / 8.3 by the port's mitigated version). Against
+     the Mac's Cmd-Tab (the shipped size, 8 icons) the Dark files are 4.9-18.5, mean 8.7 (was 12.4). Second pass
+     (2026-11-11, all in `reference/ASSETS.md`): the translucency gradient ran sideways in colour mode, the group
+     shadow is a blurred ring (no darkening over a group's interior), a layer's gradient spans the layer's bounds,
+     layers blend with their own blend mode inside a group, the SDF is the layers' solid shape, the automatic
+     gradient is IconRendering's. Fitted, measured or assumed inside the port, each marked in `icr.py` /
+     `iconstack.py`: the SDR tone curve of the clear stills, the side of the shadow ring, Gaussian sigma =
+     RenderBox's blur radius, BT.709 grey bake, the distance field itself. 256 px only: the shell draws app icons
+     at most 128 pt, and a render at the Dock's own size class is no closer to the Mac's Dock than the scaled
+     file (7.1 against 6.2).
    - Linux icons (`AppIconTile.qml`): the Mac's rule for icons without layers (WebStorm, Spotify in the same Mac
      shot): Dark leaves them as they are (on the dark tile), Clear / Tinted map the art's luminance L with the same
      ramp as above (`ui/HyprK/shaders/iconart.frag`, one quad over the art's own texture, built only while the

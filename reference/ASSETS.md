@@ -156,9 +156,16 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
     baked into one image (0x1cfd40bc8) with an SDF texture and a baked shadow image. Per group, in order:
     1. 0x1cfd74500: the group's shadow (0x1cfd740e8) and, with blurStrength / refraction, a backdrop blur
        (blurStrength x blurStrengthMax 64) and refraction inside the SDF.
-       Shadow image bake 0x1cfd4589c: the group's content, as it is times vibrantBrightness 0.75 ("vibrant") or
-       as black with the content's alpha ("neutral"), offset (0, 32) canvas units, blurred with radius
-       blurStrengthMax 64 x Shadow.radius 0.3 = 19.2 units, clipped to the group's SDF grown by ringWidth 16.
+       Shadow image bake 0x1cfd4589c (re-read 2026-11-11, second pass): one display list with, in this order,
+       colour multiply by vibrantBrightness 0.75 ("vibrant") or alpha multiply to black ("neutral"), translate by
+       the offset (0, 32) canvas units, blur filter of radius blurStrengthMax 64 x Shadow.radius 0.3 = 19.2 units,
+       then a clip layer and the group's own display list. The clip is the group's SDF drawn by 0x1cfd39594 with
+       inset -ringWidth: that function is an alpha threshold (`addAlphaThresholdFilterWithMinAlpha:maxAlpha:`)
+       between the SDF value of the edge (0.5) and the value at the inset, i.e. a RING ringWidth 16 wide along the
+       edge, not the shape grown by 16 (the first pass read it as that). The filters act on the whole list, so
+       the shadow is the ring cut of the group, moved down by 32 and blurred: a soft band below the group and no
+       shadow over its interior. Which side of the edge the ring lies on depends on the sign of the SDF, which was
+       not read: MEASURED on the Cmd-Tab shot, inside (rms 9.4 against 9.6 for outside, 10.9 for the grown shape).
        Draw: tint white (vibrant) or black (neutral), alpha = group opacity x shadowOpacity x 0.75 (vibrant) or
        0.375 (neutral), blend multiply (vibrant on a dim icon: normal). Style: colour mode: automatic and vibrant
        -> vibrant, neutral -> neutral, none -> nothing; tinted and clear modes: everything but none -> neutral.
@@ -169,7 +176,8 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
        contentDarkeningStrength x G + (1 - it) = 1, B' = 0 (0x1cfd75194).
        Shadow overdraw (Shadow.drawOverContent, blend mode normal groups only): the group's shadow again, clipped
        to the group's own content, alpha x min(1, t / translucencyForMaxOverdraw 0.3) x 0.5 (vibrant, automatic)
-       or 0.2 (neutral), overdrawBlendMode multiply.
+       or 0.2 (neutral), overdrawBlendMode multiply. The translucency clip of step 2 is still set while it is
+       drawn (`clipLayerWithAlpha:mode:` is not undone before it), so it fades with the same gradient.
     3. glow: `ICRRenderingParameters.glow` is nil, nothing.
     4. 0x1cfd73374 highlights (hasSpecular groups): the set from 0x1cfd8cac4 (glyphsDefault / Bright / Dim by
        IconBrightness, glyphsClear, glyphsScreened), light = defaultGlyphLight, each light drawn by the
@@ -184,6 +192,33 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
        in colour mode.
     Bake 0x1cfd40bc8: tinted and clear modes bake every group through `addGrayscaleFilterWithAmount: 1` into a
     grey image (RBColorMode 0 / RBColorSpace 16), colour mode into RBColorMode 14 / sRGB.
+  * One layer inside a group, 0x1cfd42e9c (read 2026-11-11, second pass). The layer's picture (SVG through
+    `CGContextDrawSVGDocument`, bitmap as an RBImage) is the CLIP; the fill is a rect drawn with
+    `drawShape:fill:alpha:blendMode:` = the layer's opacity and its own blend mode (the car's CGBlendMode, e.g.
+    Safari's tick marks are plusLighter at 0.6; 28 of the 72 icons have such layers). Fill kinds (0x1cfd66c3c, tag
+    in the top two bits): 0 colour, 1 automaticGradient(colour), 2 gradient, 3 system (light / dark). A gradient's
+    start and end are unit points of the BOUNDING RECT of what the layer draws (`boundingRect` of its display
+    list), not of the canvas; only Icon.Fill.system is laid over the whole canvas
+    (`supportsChicletAlignmentForSystemFills`) with `GradientPlacement.default` (0,0) -> (0,1) (0x1cfd62d1c) and
+    IconRendering's own stops (Fills.systemLightGradient / systemDarkGradient).
+  * Automatic gradient 0x1cfd2c2a8 (the car's GGRA type 0, one colour; Apps, Automator, Freeform, Time Machine,
+    Bluetooth File Exchange, Screen Sharing, VoiceOver Utility, Spotlight): Y = 0.2126 r + 0.7152 g + 0.0722 b of
+    the colour's components; lightening l = dimLightening 0.04 for Y <= 0.25, midDimLightening 0.08 for Y <= 0.5,
+    midBrightLightening 0.15 for Y <= 0.75, else brightLightening -0.05; c' = c + saturationBoost 0.2 x (c - Y);
+    second colour = c' + l (1 - c') for l >= 0, c' + l c' for l < 0, clamped to 0..1. l > 0: second colour at
+    location 0, the given one at 1 - basePosition; l <= 0: the given one at basePosition 0, the second at 1.
+    The points are the fill's own (the car's GGRA points).
+  * SDF of a group, 0x1cfd45064 -> 0x1cfd47bb4: the group's layers are drawn AGAIN through 0x1cfd42e9c with its mask
+    flag (one solid colour, alpha 1: a fill's alpha gradient or a layer's opacity is not in the shape), into a
+    texture 2 px larger than the group image (RGBA16Float above precisePixelFormatThreshold 256 px, else
+    RGB10A2), with RenderBox's distance style (`addStyle:data:` 10) and the `clampToEdges` shader, then stacked by
+    0x1cfd38d98 (clampThreshold 0.002, useAdvancedStacking); the encoded range is +-0.2 x the shorter side
+    (value 0.5 = the edge). RenderBox's distance style itself (and the smoothing, maxRelativeSmoothing 0.005) was
+    not read: the port still computes an exact Euclidean distance field, now of that solid shape.
+  * Size class, 0x1cfd6c4a8: the shorter side, in points, of the content rect from 0x1cfd6be14 (the size minus
+    floor(size x 100 / 1024) on each side when the icon carries its margin: 128 -> 104, 33 -> 27, 16 -> 14)
+    against minMedium 25 / minLarge 60 / minDisplay 256. pointUnit = canvas units per point, pixelUnit =
+    pointUnit / scale.
   * Then the chiclet highlights (0x1cfd715e0, above) and, only for the mitigated version in colour mode, the outline
     (0x1cfd71b8c -> 0x1cfd76bc0, useDynamicOpacity): inside a stroke of lineWidth 1 point (large; 0.667 medium /
     small, 1.333 display) the backdrop is mapped through a gradient map of its own luminance: white with alpha
@@ -198,8 +233,43 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
     1. lighten: inside alpha = the red mask the backdrop is replaced by lighteningVCM (0.9 / 2.5 / 2.0, headroom 1.2)
        of itself; 2. darken: plusDarker with the grey 1 - green mask, i.e. backdrop - 0.3 x darkening; 3. highlights:
        inside alpha = the blue mask, highlightsVCM (0.2 / 1.35 / 1.4, headroom 1.2).
-       The same three passes exist as CAFilters (colorMatrix + vibrantColorMatrix, compositing plusL / plusD) for
-       the live layer (`ICRIconRenderingLayer` portals), which is what the Dock shows over its real glass.
+       The same three passes exist as CAFilters for the live layer, which is what the Dock shows over its real
+       glass: see "The live layer's CAFilter passes" below.
+  * The live layer's CAFilter passes (0x1cfd69ffc builds the list, 0x1cfd6b31c sets each pass on a CALayer with
+    `setFilters:`, `setCompositingFilter:`, `setOpacity:` 1; filters built by 0x1cfd6a928 colorMatrix and
+    0x1cfd6ac24 vibrantColorMatrix; read 2026-11-11). Every pass shows the SAME picture, the icon drawn as the
+    three masks (R lighten, G = 1 - darken, B highlights, see 0x1cfd71dfc), and sits over the backdrop the system
+    provides (the Dock's glass). A colour matrix below is CAColorMatrix rows R, G, B, A x (r, g, b, a, bias).
+    Clear mode and tinted + light, ClearMode.debugMode 0, in ClearMode.passOrder (0 = lighten first, the
+    default; 1 swaps the first two):
+      1. lighten. lighteningUsesVCM true (default): filters [`kCAFilterColorMatrix` (`inputColorMatrix` R' = G' =
+         B' = 1, A' = R: white with the lighten mask as alpha; `inputPremultipliedValues`), `kCAFilterVibrantColorMatrix`
+         (`inputColorMatrix` = lighteningVCM 0.9 / 2.5 / 2.0 as BT.709 YCbCr: Y' = black + (white - black) Y, chroma x
+         saturation; `inputBackdropAware` true; `inputClamp` = headroom 1.2 when it is set; these two keys on
+         26.0 and later)], no compositing filter: where the mask is, the backdrop is replaced by the matrix of
+         itself. lighteningUsesVCM false: [colorMatrix R' = G' = B' = R, A' = A], compositingFilter `kCAFilterPlusL`
+         (RBBlendMode 27).
+      2. darken. darkeningUsesVCM false (default): filters [colorMatrix R' = G' = B' = 1 - G, A' = A],
+         compositingFilter `kCAFilterPlusD` (RBBlendMode 26): backdrop - totalDarkeningStrength 0.3 x darkening.
+         darkeningUsesVCM true: [colorMatrix R' = G' = B' = 1, A' = G, vibrantColorMatrix of darkeningVCM
+         -0.5 / 0.5 / 1.5], no compositing filter.
+      3. highlights (always last): filters [colorMatrix R' = G' = B' = 1, A' = B, vibrantColorMatrix of
+         highlightsVCM 0.2 / 1.35 / 1.4, clamp 1.2], no compositing filter.
+    debugMode 1 shows the raw picture without filters, 2 / 3 / 4 one mask through a single colorMatrix.
+    Tinted + dark: ONE pass, no filters, compositingFilter `kCAFilterScreenBlendMode` (RBBlendMode 2).
+    Colour mode and the mitigated version: one pass, no filters, no compositing filter.
+    The RenderBox twin of a VCM pass is 0x1cfd6b00c: clip to the mask, `addContentHeadroom:` headroom,
+    `addStyle:data:` 9 with (0, 0, 0, h, h, h, ...), the same colour matrix, `beginLayerWithFlags: 1` (the
+    backdrop), `drawLayerWithAlpha:`.
+    For hyprk's plugin: three quads over the Dock's composited glass under an icon, each sampling the icon's mask
+    texture and the backdrop: (1) mix(backdrop, clamp(VCM_lighten(backdrop), 0, 1.2), R), (2) max(x - (1 - G'), 0)
+    with G' as stored (already 1 - 0.3 x darkening), (3) mix(x, clamp(VCM_highlights(x), 0, 1.2), B).
+    Not read: what CoreAnimation does with values above 1 after `inputClamp` (the stills go through RenderBox's
+    style 9, measured as L / (1 + 0.27 L)), and what the Dock puts under the icon (its own glass tile).
+    Tried as a static file (2026-11-11): these three passes over the Dock tile's measured colour (192 grey for
+    ClearLight, 0,109,195 for TintedLight) against the style sheet shot: ClearLight mean 7.0 (clipped at 1) /
+    10.3 (with the stills' tone curve) against 5.8 for the fitted rule, TintedLight 23.0 / 18.8 against 11.4. The
+    fitted rule stays.
   * `simplifiedShapeAwareGradientMask` (default.metallib, the translucency mask when useSimpleMask is off): d =
     (zero - r) x scale, e = saturate(d / borderWidth), v = saturate((y - y0) / height), m = mix(mix(contour bounds,
     v), mix(opacity bounds, v), e), out = mix(1, m^2 (3 - 2 m), saturate(d + 1)).
@@ -218,6 +288,32 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
       System Settings 13.3 -> 9.4, Calculator 14.9 -> 9.5 (mean 11.4 -> 9.8); Safari (style sheet) 13.1 -> 15.4.
       Without shadows mean 10.3, without highlights 10.6, without translucency 10.9, flat 10.9. The outline makes
       no difference there.
+    - Second pass (2026-11-11), the port corrected against two more shots of the Dark style, Cmd-Tab (128 pt at
+      2x, 8 icons: the shipped size, size class large) and the Apps grid (76 pt, 15 icons). Causes found, each
+      in the port, none per icon: (1) the translucency gradient ran across the columns in colour mode (a numpy
+      broadcast: Notes' lines faded left to right, Finder's face had no fade) - this alone is the Notes
+      regression; (2) the shadow bake is a blurred ring, so there is no overdraw darkening over a group's
+      interior (Finder's face was 7 % too dark); (3) a layer's gradient spans the layer's bounds, not the canvas
+      (Safari's dial, Finder's face, Mail); (4) layer blend modes inside a group (Safari's ticks are plusLighter:
+      the Safari regression is (2) + (3) + (4)); (5) the SDF is the layers' solid shape (a white line across
+      Spotlight's lens came from the alpha of a fading fill); (6) the automatic gradient as decoded.
+      rms before -> after. Dark Dock 66 px: Finder 11.0 -> 4.7, Mail 11.1 -> 4.9, Notes 7.9 -> 7.2, System Settings
+      9.4 -> 8.4, Calculator 9.5 -> 5.6 (mean 9.8 -> 6.2; Apple's own Default bitmap scores 5.6-13.5 on the sheet);
+      style sheet Dark row Safari 15.4 -> 10.7. Cmd-Tab 258 px: TextEdit 4.6 -> 4.9, Preview 23.4 -> 18.5, Font
+      Book 16.9 -> 11.3, Finder 10.7 -> 5.3, Calculator 10.3 -> 7.5, Safari 14.2 -> 8.8, Mail 11.2 -> 6.4, System
+      Settings 7.9 -> 6.7 (mean 12.4 -> 8.7). Apps grid 152 px, 15 icons: mean 19.0 -> 16.8, none worse by more
+      than 0.4 (Freeform 19.6 -> 10.4, Safari 14.6 -> 9.0; Mail and Calendar carry a badge / today's date).
+      Settings tiles, Spotlight: Dark 8.8 -> 7.6, TintedDark 8.6 -> 8.2, ClearDark 10.7 -> 7.0, ClearLight 8.5 ->
+      6.7, TintedLight 9.7 -> 8.3; Siri unchanged (7.1 / 8.3 / 7.6 / 6.9 / 7.4).
+    - Direct render at the Dock's size (33 pt at 2x, 66 px): the 20-34 rms of the first pass was the harness,
+      not the size class: at 54 px the layers were rasterised and placed on whole pixels and the distance field
+      had no sub-pixel accuracy. Rendered at 4 x and box-filtered down (pixel parameters kept in device pixels,
+      `icr.render(supersample=)`): size class medium (what 0x1cfd6c4a8 gives for 33 pt: content 27 pt >= 25)
+      mean 7.1, large 7.2, small 6.1, against 6.2 for the 256 px file scaled down (the five Dock icons). Medium and small weaken the
+      darklights (opacity 1 / 0.9 -> 0.2) and the Mac's Dock indeed shows no dark halo around Notes' lines; small
+      also weakens the sharp highlights (1 -> 0.3) and fits best, but the decoded thresholds do not give small at
+      33 pt and how the Dock asks for its icons was not read. No Dock-size renditions are shipped: medium is not
+      better than the scaled file.
     - The Dock's TintedLight / ClearLight: the port over a fixed plate is WORSE than the old Dock fit (TintedLight
       9-15 -> 11-27, ClearLight 3-9 -> 9-14), so those two styles keep the fitted rule. Explained, not solved: the
       Dock puts the three masks on live glass (CAFilter passes on portal layers), the tiles on a plate.
@@ -230,16 +326,28 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
     - the car's sRGB-tagged fill components are used as Display P3 components (Spotlight Dark 11.5 -> 8.8).
     - the tint of the Mac's captures is 0,122,255 taken as sRGB; the TintedLight tile plate 0,122,249 needs the mix
       weight 0.9 x saturation to be 1 (saturation is the caller's; `RBColorAdd` mixes with ColorInterpolation 2).
+      Decoded since: the caller is IconFoundation's `-[CUINamedIconLayerStack _icrRenderingModeFromAppearanceVariant:
+      tintColor:]` (0x197533c1c; variant 2 = tinted, 3 = clear), which calls `+[ICRRenderingMode tintWithRed:green:
+      blue:alpha:]` (0x1cfd7cb58) with the tint's CIColor components: the colour is (r, g, b, 1) and the SATURATION
+      IS THE TINT'S ALPHA, 1 for an opaque tint. So the weight is 0.9, and the plate is explained by the colour
+      space instead: 0,122,255 as Display P3 (RBColorSpace 3) is -59,124,264 in extended sRGB, and mix(0.5 grey,
+      that, 0.9) clipped = 0,125,250. On the tiles that reading gives TintedLight 7.6 / 8.5 (the weight-1 reading
+      7.4 / 8.3, sRGB tint at weight 0.9: 12.9 / 13.3). The same P3 tint in the tinted dark duotone is worse (13.6 /
+      10.2 against 8.3 / 8.2: the Mac's white symbol 24,131,247 has no negative red), so the port keeps the sRGB
+      tint there and `check-styles.py` keeps weight 1 for the light plate; unresolved.
     Assumed: Gaussian sigma = RenderBox's blur radius; grey bake = BT.709 luma; IconBrightness = dim when the
-    chiclet's brightest stop is <= 0.2, bright when its darkest is >= 0.99; the shadow's ring clip is not offset.
-  * NOT decoded / not ported: the SDF generator (0x1cfd45064; the port computes the distance field of the baked
-    alpha itself); the automatic gradient of a one-colour fill (`Fills.AutomaticGradient` basePosition 0,
-    saturationBoost 0.2, lightening 0.04 / 0.08 / 0.15 / -0.05 by brightness; `iconstack.py` keeps its fitted 0.3);
-    the second layer path of 0x1cfd6d430 (shouldPreventDarklightCompounding, which draws darklights by reference
-    before the contents); blurStrength / refraction glass of a group (0x1cfd74500; refraction is 0 in every app
-    car, blurStrength is not in the group record); `SimulatedGlassRenderer` / `ICRSimulatedGlassChicletLayer`
-    (dimmingStrength 0.22, backdrop blur 0.0065, refraction 0.28 / 0.11); the live CAFilter path of the Dock;
-    hue / saturation / color / luminosity blend modes of a group.
+    chiclet's brightest stop is <= 0.2, bright when its darkest is >= 0.99; a layer's bounding rect = the box of
+    its rendered alpha; gradient stops interpolated on the encoded values. Measured: the side of the shadow ring.
+  * NOT decoded / not ported: RenderBox's distance style behind the SDF generator (the port's own Euclidean field
+    stands in for it); the second layer path of 0x1cfd6d430 (shouldPreventDarklightCompounding, which draws
+    darklights by reference before the contents; the flag is RBProjectVersion-dependent); blurStrength /
+    refraction glass of a group (0x1cfd74500; refraction is 0 in every app car, blurStrength is not in the group
+    record; Preview's loupe is the icon that shows it, 18.5 on the Cmd-Tab shot); `SimulatedGlassRenderer` /
+    `ICRSimulatedGlassChicletLayer` (dimmingStrength 0.22, backdrop blur 0.0065, refraction 0.28 / 0.11); how
+    the Dock chooses the size class; hue / saturation / color / luminosity blend modes; the u32 that starts each
+    fill record of TLV 0x3fc (0 on Safari's ticks, 1 elsewhere). `iconstack.flat()` (only the fitted Dock rule of
+    TintedLight / ClearLight uses it) keeps the canvas gradients and the fitted 0.3 automatic gradient it was
+    fitted on.
   * The Dock Trash's glass is not IconRendering's: Dock.app hands `s-trashempty-sdf.png` (384 px RGBA, r =
     distance with 0.5 at the edge, gb = normal) to a CoreAnimation glass background (style 2). Not built;
     `build-trash.py` is unchanged (full Trash against the Dark Dock shot rms 5.5).
@@ -251,6 +359,28 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
   in glass53/...-clear-tinted.png): live glass under the masks instead of the plate.
 - `apple-map.txt` (Linux app id or icon name -> macOS icon, ~220 names) is the single source for the shell, the Finder and the `hyprk-apple`
   theme; `apple-map.js` is generated from it (`tools/gen-map.mjs`, tested in `themes/icons/tests`).
+- The generic folder (2026-11-11): `system/GenericFolderIcon-512/-128.png` were the OLDER folder (lighter tab, gradient
+  the other way): that is what `GenericFolderIcon.icns` still holds on 27.2.1, and so do IconFoundation's `Folder` /
+  `FolderDark` iconsets (`IconFoundation.framework/Resources/Assets.car`; against Apple's renders rms 21-23 and 19-21).
+  macOS 27 composes folders at run time: CoreTypes' Info.plist declares public.folder with `ISIconPackageIdentifier`
+  com.apple.icon-package.folder, `_ISIconRecipe` class ISEmbossedFolder and `ISLayers` back-flap (conforms to
+  icon-package-attribute.tintable), paper-sheet (optional), front-flap (embossable, tintable); special folders add
+  `ISFolderIconConfiguration` { ISSymbolName } (Documents `document`, Downloads `arrow.down.circle`, Applications
+  `appstore`, Desktop `menubar.dock.rectangle`, Pictures `photo`, Music `music`, Movies `film`, Home `house.fill`,
+  Library `building.columns.fill`, Developer `hammer.fill`, Public `figure.walk.diamond`, ...). The art is in CoreTypes'
+  `Assets.car`: `FolderComponent_BackFlap` / `_PaperSheet` / `_FrontFlap`, image_16 .. image_512 at 1x and 2x (256 px
+  and up deepmap2, smaller ones in packed atlases car.py does not decode). Colour space at extraction: the flaps' CSI
+  colour space id is 1 = sRGB (the numbering of COLR records), the paper sheet 2 = Gray Gamma 2.2; the new PNGs carry
+  an sRGB chunk. `tools/build-folder.py <os root>` writes back flap + front flap (the empty generic folder), -512 from
+  the 512 px renditions as they are, -128 from the 256 px ones. Against Apple's own sRGB renders
+  (`reference/re/27.2.1/live/finder/icons-rendered/folder-generic@*`, light and dark are identical files), body rms,
+  old file -> new: 16 pt 22.6 -> 6.9, 18 pt 20.7 -> 7.0, 32 pt 23.0 -> 6.0, 48 pt 22.8 -> 3.9, 64 pt 23.9 -> 2.8
+  (-128) / 3.7 (-512), 77 pt 24.4 -> 2.1 / 2.9, with NO tint: a least-squares gain per channel is 1.00-1.05 at the top
+  and 0.96-1.00 at the bottom. Not built: tagged / accent-coloured folders and the embossed special folders.
+  IconServices makes them (`-[ISEmbossedFolder layerTreeForSize:scale:]` 0x1975b8f6c, `-[ISFolderRecipe
+  layerTreeForSize:scale:]` 0x1975b99d4, `+[IFColor folderColor]` 0x1975b8e84, `-[ISFolderIconConfiguration
+  resolvedTintColorForAppearance:]` 0x1975b4520); that code was not read, so the tint rule is unknown and the other
+  folder PNGs (Documents, Downloads, ...) are still the old art.
 - `system/<Name>-512/128.png`: 257 `CoreTypes.bundle` icons (OS `/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources`) from the
   `.icns` at real 1024 px. Trash: `TrashIcon` (empty), `FullTrashIcon`. Folders: `GenericFolderIcon`, `OpenFolderIcon`, `ApplicationsFolderIcon`,
   `DesktopFolderIcon`, `DocumentsFolderIcon`, `DownloadsFolder`, `MovieFolderIcon`, `MusicFolderIcon`, `PicturesFolderIcon`, `HomeFolderIcon`,
