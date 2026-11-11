@@ -8,7 +8,7 @@ import assert from "node:assert/strict";
 
 const icons = join(dirname(fileURLToPath(import.meta.url)), "..");
 const root = join(icons, "..", "..");
-const load = file => new Function(readFileSync(file, "utf8").replace(/^\.pragma library\s*$/m, "") + "\nreturn { lookup, file };")();
+const load = file => new Function(readFileSync(file, "utf8").replace(/^\.pragma library\s*$/m, "") + "\nreturn { lookup, file, styled };")();
 const M = load(join(icons, "apple-map.js"));
 
 test("apple-map.js is generated from apple-map.txt", () => {
@@ -36,4 +36,25 @@ test("files of mapped icons exist", () => {
         assert.ok(mac, n);
         assert.ok(existsSync(join(icons, M.file(mac))), M.file(mac));
     }
+});
+
+test("styled: icon style renditions, mode fallback, Default cases", () => {
+    assert.equal(M.styled("Safari", "default", "auto", true), "apps/Safari-512.png");
+    assert.equal(M.styled("Safari", "dark", "dark", false), "apps/Safari-256-dark-dark.png");
+    assert.equal(M.styled("Safari", "dark", "auto", true), "apps/Safari-256-dark-dark.png");
+    assert.equal(M.styled("Safari", "dark", "auto", false), "apps/Safari-512.png");     // RegularAutomatic in light mode
+    assert.equal(M.styled("Safari", "tinted", "light", true), "apps/Safari-256-tinted-light.png");
+    assert.equal(M.styled("Safari", "clear", "dark", false), "apps/Safari-256-clear-light.png"); // ClearDark not built
+    assert.equal(M.styled("@TrashIcon", "tinted", "light", false), "system/TrashIcon-512.png");
+    assert.equal(M.styled("Safari", "bogus", "auto", false), "apps/Safari-512.png");
+    assert.equal(M.styled("", "dark", "dark", true), "");
+});
+
+test("every app icon has its style renditions", () => {
+    const names = readFileSync(join(icons, "apps-sources.txt"), "utf8").split("\n")
+        .filter(l => l && !l.startsWith("#")).map(l => l.split("\t")[0]);
+    assert.ok(names.length >= 72);
+    for (const n of names)
+        for (const [style, variant] of [["dark", "dark"], ["clear", "light"], ["tinted", "light"]])
+            assert.ok(existsSync(join(icons, M.styled(n, style, variant, false))), n + " " + style);
 });

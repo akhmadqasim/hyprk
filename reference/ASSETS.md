@@ -60,6 +60,15 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
   Apple's own pre-rendered bitmaps are used. `apps-hires/` and `hires.log` were removed (their 512 px files equal `apps/*-512.png`).
   `extract.log` is the log of the old `.icns` route: its `apps/` lines are superseded by `apps-build.log`, its `system/` lines still hold.
 - No icon at all for: Notification Center, Software Update, Keychain Circle Notification.
+- Icon styles (2026-11-11, 27.2.1 IPSW `141-12228-174.dmg` OS and `141-12233-179.dmg` AppOS, apfs-fuse read-only):
+  no app car holds a Dark, Clear or Tinted bitmap. Each of the 71 layered icons has one pre-rendered Default bitmap
+  (+ its RGBW twin) and an `.iconstack` (layout 1019) per appearance (DarkAqua id 1, Aqua 8 or UIAppearanceLight 4,
+  ISAppearanceTintable 10; ids per car in `APPEARANCEKEYS`), IconGroups (layout 1020), layers as SVG (layout 9,
+  LZFSE) or deepmap2 bitmaps (compression 11, 9 apps), COLR colours and GGRA gradients; ControlCenter is a classic
+  icon without layers. Record layouts are in `themes/icons/tools/iconstack.py`. The glass parameters (TLV 0x3fd/0x3fe:
+  shadow, translucency, specular) and IconRendering's composition/tint maths (`ICRRenderingParameters`, Metal
+  shaders in `IconRendering.framework/.../default.metallib`) were not decoded. `apps/<Name>-256-<style>-<mode>.png`
+  (216 files, 2.7 MB) are flat renders of those layers, see `themes/icons/README.md` "Styles" and `apps-styles.log`.
 - `apple-map.txt` (Linux app id or icon name -> macOS icon, ~220 names) is the single source for the shell, the Finder and the `hyprk-apple`
   theme; `apple-map.js` is generated from it (`tools/gen-map.mjs`, tested in `themes/icons/tests`).
 - `system/<Name>-512/128.png`: 257 `CoreTypes.bundle` icons (OS `/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources`) from the

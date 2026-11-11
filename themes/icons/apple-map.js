@@ -443,3 +443,18 @@ function lookup(names) {
 function file(mac, px) {
     return mac ? (mac[0] === "@" ? "system/" + mac.slice(1) : "apps/" + mac) + "-" + (px || 512) + ".png" : "";
 }
+
+// Rendition of a mapped app icon for Settings > Appearance > "Icon & widget style" (state/appearance.json
+// iconStyle + iconStyleVariant, MAC-ANSWERS Q-settings-27) in light or dark mode, e.g.
+// "apps/Safari-256-tinted-light.png". tools/build-styles.py builds dark-dark, clear-light and tinted-light
+// (256 px); a mode that was not built falls back to the built one. Default (or Dark + Auto in light mode),
+// unknown styles and system icons ("@...") give the Default file.
+const styledModes = { dark: ["dark"], clear: ["light"], tinted: ["light"] };
+function styled(mac, style, variant, dark) {
+    const modes = styledModes[style];
+    if (!mac || mac[0] === "@" || !modes) return file(mac);
+    const auto = !variant || variant === "auto";
+    if (style === "dark" && auto && !dark) return file(mac);
+    const want = style === "dark" ? "dark" : auto ? (dark ? "dark" : "light") : variant;
+    return "apps/" + mac + "-256-" + style + "-" + (modes.indexOf(want) >= 0 ? want : modes[0]) + ".png";
+}
