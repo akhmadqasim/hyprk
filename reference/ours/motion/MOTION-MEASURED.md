@@ -244,3 +244,51 @@ Not adopted: CC open and the first-use stalls are worse with the basic loop, so 
 The env stays unset; a shell-side switch is one line (`//@ pragma DefaultEnv QSG_RENDER_LOOP=basic` in shell/shell.qml).
 The Finder uses the basic loop since b65ebe8 (Quick Look first frame).
 
+
+## Session 8 (2026-11-11): unlock stall, Dock drag-off, full-screen menu bar, HUD frame trace
+
+Headless MBA, mcap + a temporary GUI-thread trace in the shell (Date.now() per event, mapped to mcap's clock); per-frame
+series in the CSV (`*-s8`).
+
+Unlock (48bacc7). Order per unlock, ms from PAM success: lock surface frame (busy off) 0-8, reveal overlay first swap 34-58,
+Hyprland `openlayer` 2-7 later, release (lock surfaces destroyed in the same ms), first reveal tick 10-16 later. In 2-3 of
+30 unlocks (light 3/30, dark 2/30) the GUI thread is blocked 106-163 ms starting within 2 ms of the lock surfaces'
+destruction and ending with the overlay's queued swaps (about Qt Wayland's 100 ms frame-callback wait plus cleanup; the
+blocked call could not be sampled: ptrace and perf are not allowed for the shell's process here). A lock surface kept
+rendering through the release did not reproduce it (6 of 6 clean). With the clock started at the release, those runs
+showed 3-5 frames between lock picture and desktop. Now the clock starts on the first tick after the release; a 160 ms
+stall injected right after the release, 5 runs each: before 3 frames in the fade, +0 held 9-10 frames; after 11-12
+frames, nothing held.
+
+| Unlock, 95 % from the avatar step (+0) | Mac (B3) | Before (28 clean dark runs) | After (60 + 10 dark runs) |
+|---|---|---|---|
+| fade seen (frames between 0.1 and 0.9, clock region) | yes | 11-13; 3-5 in stalled runs | 6-16 in 70 of 70 |
+| first frame repeated | (not in the table) | 1 in most runs | 1 of 70 |
+| menu bar 5 % / 95 % | +137 / +250 | 134-153 / 252-269 | 125-142 / 244-263 |
+| Dock 95 % | +226 | 227-246 | 222-224 or 238-240 |
+| clock 95 % | ~+219 | 217-239 | 214-215 or 228-232 |
+| field 95 % | ~+219 | 211-240 | 209-210 or 224-227 |
+
+Both before and after the crossings fall in two modes one frame apart (which vsync shows the +0 frame); the date
+region is mostly wallpaper and crosses 95 % on the dim's tail (not comparable).
+
+| Motion | Mac | Measured | Status |
+|---|---|---|---|
+| Dock drag-off drop: icon + Remove bubble fade (5e3e54e) | Q-dock-17: linear 0.25 s | 2-98 % 236 ms, rms 0.013 vs linear 250 ms | matches |
+| Full screen menu bar peek in (24ec60f) | Q-menubar-33: ~0.15 s, roughly linear | linear 150 ms, rms 0.004-0.006 clean; one skipped frame in 4 of 6 runs (rms 0.027-0.030) | matches when no frame is lost |
+| Full screen menu bar peek out | ~0.17 s | linear 170 ms, rms 0.004; skipped frame in 6 of 7 runs (rms 0.024-0.028) | as above |
+| Dock click on a minimized app (77014c6) | #47 restore 0.5 s ease-in-out | changed-share 0.012 at +46 to 0.94 at +495 ms (plugin-motion genie) | restores now (before: only special:minimized shown) |
+
+Skipped frames (peek, HUD appear). During the peek fades and 6 HUD appears the shell's GUI ticks ran every 15-17 ms
+and its window swapped every frame (trace), yet mcap shows one value skipped mid-fade (peek 4-6 of 6-7 runs; HUD
+0.57 -> 0.66, 0.14 -> 0.23, 0.61 -> 0.71 in 4 of 6): the lost frame is between the shell's swap and Hyprland's
+presentation, not a stalled shell thread. Separately the HUD's GUI thread stalls 80 ms right after its first appear frame
+(5 of 5) and 160-210 ms at the start of the hide; and in every run two small steps 0.867 -> 0.895 and 0.918 -> 0.943
+(twice their neighbours) at the same places. The Glass sub-point edges are sent each frame in 1/16 pt steps (Glass.qml
+n = 17 for the HUD's 300 pt width).
+
+Dock label fill, dark (task from judge #3: grey 121 vs the Mac's 131). Over solid wallpapers with the shell's label:
+dark 34 / 121 / 184 over black / grey / white (Mac 31 / 131 / 180), light 131 / 189 / 249 (Mac 131 / 192 / 249). The
+label sits on the Dock material (12 / 107 / 175 dark here, the Mac's 12 / 108 / 176) and the fill is a linear blend
+k + dst (1 - a); the Mac's lift over its own material (+19 / +23 / +4) is not linear in dst, so no a, k reaches all three:
+least squares (now) rms 6.0, max 8.5 at grey; minimax rms 6.4, max 6.4 (37 / 125 / 186). Left as is.
