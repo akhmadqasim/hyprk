@@ -98,6 +98,19 @@ function sortEntries(entries, key, ascending, foldersFirst) {
     });
 }
 
+// List view disclosure (Q-finder-15): `expanded` maps a folder path to its raw children; each open folder's
+// children follow it, sorted by sortFn, as copies with depth = parent depth + 1 (top level has no depth).
+function flattenTree(entries, expanded, sortFn, depth) {
+    const d = depth || 0;
+    const out = [];
+    for (const e of entries) {
+        out.push(d ? Object.assign({}, e, { depth: d }) : e);
+        const kids = expanded && expanded[e.path];
+        if (e.isDir && kids) for (const k of flattenTree(sortFn ? sortFn(kids) : kids, expanded, sortFn, d + 1)) out.push(k);
+    }
+    return out;
+}
+
 function filterEntries(entries, query) {
     const q = (query || "").trim().toLowerCase();
     if (!q) return entries;

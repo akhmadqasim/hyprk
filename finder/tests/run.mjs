@@ -15,6 +15,20 @@ function test(name, fn) {
     try { fn(); pass++; } catch (e) { fail++; console.error("FAIL " + name + "\n  " + e.message); }
 }
 
+// ---- list view tree ----
+test("flattenTree", () => {
+    const top = [{ path: "/a", name: "a", isDir: true }, { path: "/b", name: "b", isDir: false }];
+    assert.deepEqual(F.flattenTree(top, {}, null).map(e => e.path), ["/a", "/b"]);
+    const exp = { "/a": [{ path: "/a/z", name: "z", isDir: true }, { path: "/a/y", name: "y", isDir: false }],
+                  "/a/z": [{ path: "/a/z/q", name: "q" }] };
+    const rows = F.flattenTree(top, exp, l => l.slice().sort((x, y) => x.name < y.name ? -1 : 1));
+    assert.deepEqual(rows.map(e => e.path), ["/a", "/a/y", "/a/z", "/a/z/q", "/b"]);
+    assert.deepEqual(rows.map(e => e.depth || 0), [0, 1, 1, 2, 0]);
+    assert.equal(top[0].depth, undefined);   // inputs are not changed
+    // a collapsed parent hides open grandchildren
+    assert.deepEqual(F.flattenTree(top, { "/a/z": exp["/a/z"] }, null).map(e => e.path), ["/a", "/b"]);
+});
+
 // ---- paths ----
 test("normalize", () => {
     assert.equal(F.normalize("/a//b/./c/"), "/a/b/c");

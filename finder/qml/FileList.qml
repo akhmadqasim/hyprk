@@ -5,7 +5,8 @@ import "lib/files.js" as Files
 // List view (Q-finder-15/16/17): a 28 pt header (dark: a solid bar, Main extends it under the toolbar), rows
 // 20 pt from 5 pt under it, inset 10 pt both sides, stripes on every second row, accent selection (grey while
 // the window is inactive). Columns Name / Date Modified / Size / Kind; the sorted header is 11 Semibold with a
-// chevron. Not here: the disclosure triangles of the Mac (folders do not expand in place); the name keeps its x.
+// chevron. Folders have a disclosure triangle at row x 1 (AX 15 x 22, ink 5 x 8.5, secondary) that opens them
+// in place; each level indents by 16 (not measured: the icon's offset from the row start, one disclosure column).
 Item {
     id: root
 
@@ -136,15 +137,32 @@ Item {
             Item {
                 width: root.widths[0]
                 height: parent.height
+                readonly property real indent: (row.modelData.depth || 0) * Theme.list.indent
+                Item {   // disclosure triangle: AX 15 x 22 at row x 1, ink 5 x 8.5 (Q-finder-15/16)
+                    visible: row.modelData.isDir === true && !root.browser.isVirtual
+                    x: parent.indent + Theme.list.disclosureX
+                    width: Theme.list.disclosureWidth
+                    height: parent.height
+                    z: 2
+                    readonly property bool open: root.browser.isExpanded(row.modelData.path)
+                    Symbol {
+                        anchors.centerIn: parent
+                        name: "chevron.small.right"
+                        size: 14
+                        rotation: parent.open ? 90 : 0
+                        color: row.selected ? Theme.color.selectedSecondaryText : Theme.color.secondaryLabel
+                    }
+                    TapHandler { onTapped: root.browser.setExpanded(row.modelData, !parent.open) }
+                }
                 FileIcon {
-                    x: Theme.list.iconX
+                    x: parent.indent + Theme.list.iconX
                     anchors.verticalCenter: parent.verticalCenter
                     entry: row.modelData
                     size: Theme.list.iconSize
                 }
                 Text {
                     visible: !row.renaming
-                    x: Theme.list.nameX
+                    x: parent.indent + Theme.list.nameX
                     width: parent.width - x - Theme.list.cellPad - (dots.visible ? dots.width + 6 : 0)
                     anchors.verticalCenter: parent.verticalCenter
                     text: row.modelData.name
@@ -161,7 +179,7 @@ Item {
                 }
                 Loader {
                     active: row.renaming
-                    x: Theme.list.nameX - 2
+                    x: parent.indent + Theme.list.nameX - 2
                     width: parent.width - x - Theme.list.cellPad
                     anchors.verticalCenter: parent.verticalCenter
                     sourceComponent: RenameField {

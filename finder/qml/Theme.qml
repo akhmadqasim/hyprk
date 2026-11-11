@@ -272,6 +272,9 @@ QtObject {
         readonly property int iconSize: 16
         readonly property int iconX: 16          // icon x 189 = row x 173 + 16 (disclosure triangle at +1)
         readonly property int nameX: 36          // name x 209
+        readonly property int disclosureX: 1     // disclosure triangle AX x 174 = row + 1, 15 wide
+        readonly property int disclosureWidth: 15
+        readonly property int indent: 16         // per level; not measured (see FileList)
         readonly property int sidePad: 10
         readonly property int rowRadius: 8
         readonly property int dateWidth: 181     // Name takes the rest: 338 in a 920 pt window

@@ -31,6 +31,7 @@ Window {
         id: fm
         path: /^(recents:|applications:|tag:)/.test(startup.path) || FileOps.isDir(startup.path) ? startup.path : FileOps.homePath()
         history: [path]
+        treeMode: win.view === "list"
         onErrorRaised: message => alert.ask(message.split("\n")[0], message.split("\n").slice(1).join("\n"), [{ text: "OK" }])
         // the inline editor held focus; hand it back so shortcuts keep working
         onRenamingPathChanged: if (!renamingPath) keys.forceActiveFocus()
@@ -202,6 +203,7 @@ Window {
         case Qt.Key_Left:
             if (alt) fm.back();
             else if (view === "columns") fm.up();
+            else if (view === "list") { for (const e of fm.selectedEntries()) fm.setExpanded(e, false); }
             else move(-1);
             break;
         case Qt.Key_Right:
@@ -212,7 +214,8 @@ Window {
                     fm.go(sel[0].path);
                     fm.click(0, Qt.NoModifier);
                 }
-            } else move(1);
+            } else if (view === "list") { for (const e of fm.selectedEntries()) fm.setExpanded(e, true); }
+            else move(1);
             break;
         case Qt.Key_Up:
             if (ctrl || alt) fm.up();

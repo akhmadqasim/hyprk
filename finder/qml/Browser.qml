@@ -31,7 +31,20 @@ QtObject {
     readonly property bool recents: path === "recents:"
     readonly property var sorted: Files.sortEntries(allEntries, recents ? "modified" : sortKey,
                                                     recents ? false : ascending, foldersFirst)
-    readonly property var entries: Files.filterEntries(sorted, query)
+    // List view: folders open in place (disclosure triangles). expanded: folder path -> its raw listing.
+    property bool treeMode: false
+    property var expanded: ({})
+    readonly property var entries: Files.flattenTree(Files.filterEntries(sorted, query), treeMode ? expanded : null,
+                                                     list => Files.sortEntries(list, sortKey, ascending, foldersFirst))
+    function isExpanded(p) { return expanded[p] !== undefined; }
+    // open or close a folder row; closing also forgets the folders opened inside it
+    function setExpanded(entry, open) {
+        if (!entry || !entry.isDir || isExpanded(entry.path) === open) return;
+        const e = Object.assign({}, expanded);
+        if (open) e[entry.path] = FileOps.list(entry.path, showHidden);
+        else for (const k in e) if (k === entry.path || k.indexOf(entry.path + "/") === 0) delete e[k];
+        expanded = e;
+    }
 
     // selection: path -> true. Always reassigned (never mutated) so bindings on it update.
     property var selected: ({})
@@ -69,6 +82,9 @@ QtObject {
         } else {
             _token++;   // drop any virtual listing still in flight
             _setEntries(FileOps.list(path, showHidden));
+            const e = {};   // re-list open folders; drop the ones that are gone
+            for (const k in expanded) if (FileOps.isDir(k)) e[k] = FileOps.list(k, showHidden);
+            expanded = e;
         }
     }
     function _setEntries(list) {
@@ -115,6 +131,7 @@ QtObject {
         cursorPath = "";
         anchorPath = "";
         allEntries = [];   // don't show the previous folder while an async listing loads
+        expanded = ({});
         reload();
     }
     function isVirtualPath(p) { return p === "recents:" || p === "applications:" || p.indexOf("tag:") === 0; }
