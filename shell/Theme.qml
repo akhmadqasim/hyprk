@@ -711,6 +711,13 @@ Singleton {
         // REA 27.2.1 side notes), fitted to the per-frame top edge: 210 ms (rms 0.016 show, 0.022 hide), starting
         // 200 ms after the pointer reaches the bottom edge and 30 ms after it leaves the Dock
         readonly property int dockSlide: 210
+        // full screen enter/exit: the Dock leaves and returns on the Space slide, 0.5 - 0.5 cos(pi t / 0.5 s) (Dock
+        // FUN_1000c60f8, MOTION-PLUGIN.md "Full screen REA"); the menu bar comes back over the same 0.5 s from the
+        // start of the exit (AppKit startMenuBarAnimation:) and leaves on enter over NSMenuBarPresentationInstance's
+        // default 0.15 s (inferred, not traced)
+        readonly property int fullscreenSlide: 500
+        readonly property int menuBarFullscreenIn: 500
+        readonly property int menuBarFullscreenOut: 150
         readonly property int dockRevealDelay: 200
         readonly property int dockHideDelay: 30
         // a click on a slider track springs the shown value to the click point, then drags follow 1:1

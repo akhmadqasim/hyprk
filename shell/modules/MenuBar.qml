@@ -28,7 +28,21 @@ ShellWindow {
     implicitHeight: Theme.menuBar.height
     color: Theme.color.menuBarFill   // opaque only under Reduce Transparency
     namespace: "hyprk-menubar"
-    WlrLayershell.layer: WlrLayer.Top
+    // full screen: Hyprland hides Top layers on a full-screen workspace at once. On enter the bar fades out over
+    // 0.15 s on Overlay; on exit it is shown again by Hyprland and fades in over 0.5 s from the start
+    // (Theme.anim.menuBarFullscreen*; the Mac's curve is not decoded: CA's default ease-in-ease-out)
+    readonly property var hyprMonitor: Hyprland.monitorFor(screen)
+    readonly property bool fullscreen: hyprMonitor && hyprMonitor.activeWorkspace ? hyprMonitor.activeWorkspace.hasFullscreen : false
+    property real fsAlpha: fullscreen ? 0 : 1
+    onFullscreenChanged: {
+        fsAnim.stop();
+        fsAnim.to = fullscreen ? 0 : 1;
+        fsAnim.duration = Theme.ms(fullscreen ? Theme.anim.menuBarFullscreenOut : Theme.anim.menuBarFullscreenIn);
+        fsAnim.start();
+    }
+    NumberAnimation { id: fsAnim; target: bar; property: "fsAlpha"; easing.type: Easing.BezierSpline; easing.bezierCurve: [0.42, 0, 0.58, 1, 1, 1] }
+    Binding { target: bar.contentItem; property: "opacity"; value: bar.fsAlpha }
+    WlrLayershell.layer: fullscreen && fsAlpha > 0 ? WlrLayer.Overlay : WlrLayer.Top
 
     readonly property string appId: Apps.appIdOf(Hyprland.activeToplevel)
     readonly property var appMenus: Menus.forApp(appId)

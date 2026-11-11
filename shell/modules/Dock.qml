@@ -91,7 +91,9 @@ ShellWindow {
     implicitHeight: Math.ceil(above + m.height + m.bottomGap)
     exclusiveZone: autohide ? 0 : Math.ceil(m.height + m.bottomGap)
     namespace: "hyprk-dock"
-    WlrLayershell.layer: WlrLayer.Top
+    // Hyprland hides Top layers on a full-screen workspace at once: while the Dock slides out for a full screen
+    // enter it sits on Overlay, so the slide is seen
+    WlrLayershell.layer: fullscreen && slide > 0 ? WlrLayer.Overlay : WlrLayer.Top
     inputMask: Region { item: hit }
 
     // the band Mission Control leaves to the Dock (it stays visible there, Q-dock-27)
@@ -176,14 +178,25 @@ ShellWindow {
         easing.type: Easing.InOutSine
         onRunningChanged: if (running) dock.settleGlass(duration + 80)
     }
-    function slideTo(v) {
+    function slideTo(v, ms) {
         slideAnim.stop();
         slideAnim.to = v;
-        slideAnim.duration = Theme.ms(Theme.anim.dockSlide);
+        slideAnim.duration = Theme.ms(ms || Theme.anim.dockSlide);
         slideAnim.start();
     }
-    onShownChanged: slideTo(shown ? 1 : 0)
+    // a full screen enter or exit moves the Dock on the Space slide (0.5 s), autohide on its own 210 ms. `shown` and
+    // `fullscreen` change in one event, in either handler order: settle once both have
+    property bool fsSeen: false
+    function follow() {
+        const fs = fullscreen !== fsSeen;
+        fsSeen = fullscreen;
+        if (slideAnim.to !== (shown ? 1 : 0) || (!slideAnim.running && slide !== (shown ? 1 : 0)))
+            slideTo(shown ? 1 : 0, fs ? Theme.anim.fullscreenSlide : 0);
+    }
+    onShownChanged: Qt.callLater(follow)
+    onFullscreenChanged: Qt.callLater(follow)
     Component.onCompleted: {
+        fsSeen = fullscreen;
         slideTo(shown ? 1 : 0);
         if (screen) Panels.setDockZone(screen.name, keepClear);
         syncSlots();
