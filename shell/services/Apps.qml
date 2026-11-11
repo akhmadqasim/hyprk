@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Hyprland
 import "../lib/search.js" as Search
 import "../lib/macicons.js" as MacIcons
@@ -72,11 +73,45 @@ Singleton {
     }
     readonly property var sortedEntries: visibleEntries.slice().sort((a, b) => a.name.localeCompare(b.name))
 
+    // Apps taken out of the Dock (dragged off, or Options > Remove from Dock), by their first candidate id:
+    // $HYPRK_STATE/dock-items.json {"removed": [...]}, written only by the shell (dock.json is the Settings app's).
+    // Keep in Dock on a running removed app puts it back. Finder cannot be removed, as on the Mac.
+    property var removed: []
+    FileView {
+        id: itemsFile
+        path: Prefs.dir + "dock-items.json"
+        watchChanges: true
+        printErrors: false
+        onFileChanged: reload()
+        onLoaded: {
+            try { const r = JSON.parse(text()).removed; root.removed = Array.isArray(r) ? r.map(String) : []; }
+            catch (e) { root.removed = []; }
+        }
+    }
+    function pinKey(id) {
+        const ids = pinnedCandidates.find(g => g.indexOf(id) !== -1);
+        return ids ? ids[0] : "";
+    }
+    function canRemove(id) { const k = pinKey(id); return k !== "" && k !== "hyprk-finder" && removed.indexOf(k) === -1; }
+    function setRemoved(list) {
+        removed = list;
+        itemsFile.setText(JSON.stringify({ removed: list }) + "\n");
+    }
+    function removeFromDock(id) { if (canRemove(id)) setRemoved(removed.concat([pinKey(id)])); }
+    // a running app that was taken out of the Dock and can be put back
+    function wasRemoved(item) {
+        for (const ids of pinnedCandidates)
+            if (removed.indexOf(ids[0]) !== -1 && (ids.indexOf(item.id) !== -1 || ids.some(i => Search.normId(i) === Search.normId(item.id))))
+                return ids[0];
+        return "";
+    }
+
     readonly property var pinned: {
         // depend on the entry list so the dock fills in once .desktop files are scanned
         if (entries.length === 0) return [];
         const out = [];
         for (const ids of pinnedCandidates) {
+            if (removed.indexOf(ids[0]) !== -1) continue;
             if (ids[0] === "hyprk-launchpad") {
                 out.push({ id: "hyprk-launchpad", name: "Apps", icon: "hyprk-launchpad", alsoIds: [], action: () => AppsView.toggle() });
                 continue;
@@ -265,10 +300,13 @@ Singleton {
                      { label: "Find…", action: () => { Panels.open = "spotlight"; } }, { sep: true },
                      { label: "Go to Folder…", disabled: true }, { label: "Connect to Server…", disabled: true }, { sep: true });
         // Options ▸ as on 27.2.1 (MAC-ANSWERS.md Q-dock-10): pinned "Remove from Dock", else "Keep in Dock", then
-        // Open at Login and Show in Finder. The Dock list is fixed and there is no login-items store, so they show disabled
+        // Open at Login and Show in Finder. Keep in Dock only puts back a pinned app that was removed (the pinned list is
+        // the built-in one minus `removed`); there is no login-items store, so the other two show disabled
         const pinned = root.pinned.some(p => p.id === item.id);
+        const back = pinned ? "" : root.wasRemoved(item);
         out.push({ label: "Options", submenu: true, items: [
-            { label: pinned ? "Remove from Dock" : "Keep in Dock", disabled: true },
+            pinned ? { label: "Remove from Dock", disabled: !root.canRemove(item.id), action: () => root.removeFromDock(item.id) }
+                   : { label: "Keep in Dock", disabled: back === "", action: () => root.setRemoved(root.removed.filter(r => r !== back)) },
             { label: "Open at Login", disabled: true },
             { label: "Show in Finder", disabled: true },
         ] });

@@ -266,6 +266,54 @@ ShellWindow {
     function tipShow(c) { tipFade.stop(); tipItem = c; tipAlpha = 1; }
     function tipHide(c) { if (tipItem === c) tipFade.restart(); }
 
+    // ---------- drag off the Dock (MAC-ANSWERS.md Q-dock-17, dock-live.json drag_remove) ----------
+    // A pinned app (not Finder) dragged past the start distance leaves its tile and follows the pointer at the Dock's
+    // art size (no lift scale). Once the pointer is out of the Dock background its slot shrinks out (the other tiles
+    // close the gap on the slot ease) and 0.25 s later a "Remove" bubble in the hover label's style shows above it;
+    // dropped then, the app is removed (Apps.removeFromDock, $HYPRK_STATE/dock-items.json), the poof sound plays
+    // (system sound 15, Dock.app's poof) and icon and bubble fade out linearly in 0.25 s. Dropped anywhere else the
+    // slot grows back. The start distance is Qt's (no Mac data); reordering by drag is not done (not measured). Icon
+    // and bubble are drawn on the label's surface, which covers the screen during the drag (it is unmapped before,
+    // so nothing is resized: growing the Dock's own surface showed one wrong Dock frame). The pointer stays with the
+    // Dock outside its window only while Hyprland holds the focus for the pressed button, which it does when a
+    // surface has the keyboard focus (InputManager.cpp, "if we are holding a pointer button"); on an empty desktop
+    // the press ends as the pointer leaves the Dock and the tile goes back.
+    property Item dragCell: null
+    property point dragPos: Qt.point(0, 0)       // the pointer, this window's coordinates
+    property point dragGrab: Qt.point(0, 0)      // the pointer inside the icon
+    property bool dragOut: false
+    property bool dragRemove: false
+    property bool dragDropped: false
+    property real dragFade: 1
+    readonly property bool removeShown: dragRemove && dragCell !== null
+    Timer { id: removeDelay; interval: Theme.ms(250); onTriggered: dock.dragRemove = dock.dragOut }
+    NumberAnimation {
+        id: dropFade
+        target: dock; property: "dragFade"; from: 1; to: 0; duration: Theme.ms(250)
+        onFinished: dock.endDrag()
+    }
+    function dragMove(c, x, y) {
+        dragPos = Qt.point(x, y);
+        const out = x < bg.x || x > bg.x + bg.width || y < bg.y || y > bg.y + bg.height;
+        if (out === dragOut) return;
+        dragOut = out;
+        c.slide(out ? 0 : 1);
+        if (out) removeDelay.restart();
+        else { removeDelay.stop(); dragRemove = false; }
+    }
+    function dragDrop(c) {
+        removeDelay.stop();
+        if (dragOut && dragRemove) {
+            dragDropped = true;
+            Sounds.play("poof");
+            Apps.removeFromDock(c.modelData.id);
+            dropFade.restart();
+        } else {
+            if (dragOut) c.slide(1);
+            endDrag();
+        }
+    }
+    function endDrag() { dragCell = null; dragOut = false; dragRemove = false; dragDropped = false; dragFade = 1; }
     // hit area: the background, plus the magnified band while magnified; hidden by autohide the bottom 2 pt of
     // the whole edge (reveals it), hidden by a full-screen window nothing
     Item {
@@ -399,7 +447,7 @@ ShellWindow {
                 // pressed: the art darkened x 0.475, no scale, on and off in one frame (Q-dock-09)
                 AppIcon {
                     id: icon
-                    visible: !cell.separator
+                    visible: !cell.separator && dock.dragCell !== cell
                     size: cell.size
                     loadSize: dock.magnification ? dock.large : dock.tile    // load once at full size, then only scale
                     x: Math.round((cell.width - width) / 2 * dock.dpr) / dock.dpr
@@ -434,7 +482,7 @@ ShellWindow {
                 }
 
                 // app name label (timing: dock.tipShow / tipHide)
-                readonly property bool tipWanted: ma.containsMouse && !separator && !leaving && !bouncing && Panels.open !== "context"
+                readonly property bool tipWanted: ma.containsMouse && !separator && !leaving && !bouncing && Panels.open !== "context" && !dock.dragCell
                 onTipWantedChanged: tipWanted ? dock.tipShow(cell) : dock.tipHide(cell)
 
                 // the whole item frame (they abut, Q-dock-05) and the band above a magnified icon, so the label
@@ -447,7 +495,30 @@ ShellWindow {
                     hoverEnabled: true
                     enabled: !cell.separator && !cell.leaving
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    // drag off (see dock.dragMove): window coordinates of the press, and whether this press dragged
+                    property point pressAt: Qt.point(0, 0)
+                    property bool dragged: false
+                    onPressed: m => {
+                        dragged = false;
+                        pressAt = mapToItem(null, m.x, m.y);
+                    }
+                    onPositionChanged: m => {
+                        if (!pressed || !(pressedButtons & Qt.LeftButton)) return;
+                        const p = mapToItem(null, m.x, m.y);
+                        if (!dragged) {
+                            if (dock.dragCell !== null || !Apps.canRemove(cell.modelData.id)
+                                || Math.hypot(p.x - pressAt.x, p.y - pressAt.y) < Qt.styleHints.startDragDistance) return;
+                            dragged = true;
+                            const i = icon.mapToItem(null, 0, 0);
+                            dock.dragGrab = Qt.point(pressAt.x - i.x, pressAt.y - i.y);
+                            dock.dragCell = cell;
+                        }
+                        dock.dragMove(cell, p.x, p.y);
+                    }
+                    onReleased: if (dragged && dock.dragCell === cell) dock.dragDrop(cell)
+                    onCanceled: if (dragged && dock.dragCell === cell) { if (dock.dragOut) cell.slide(1); dock.endDrag(); }
                     onClicked: m => {
+                        if (dragged) return;
                         if (m.button === Qt.RightButton) {
                             // menu above the icon, like the macOS Dock (its window bottom = the Dock top, Q-dock-10).
                             // Anchored to the unmagnified layout because icons shrink when the menu opens.
@@ -532,9 +603,10 @@ ShellWindow {
     ShellWindow {
         id: labelHost
         screen: dock.screen
-        visible: label.shown
+        visible: label.shown || dock.dragCell !== null
         anchors { bottom: true; left: true; right: true }
-        implicitHeight: dock.implicitHeight
+        implicitHeight: dock.dragCell !== null && dock.screen ? dock.screen.height : dock.implicitHeight
+        readonly property real off: height - dock.height     // the Dock window's top in this one
         exclusionMode: ExclusionMode.Ignore
         namespace: "hyprk-dock"   // the Dock's recipe and layer rules
         WlrLayershell.layer: WlrLayer.Top
@@ -547,10 +619,10 @@ ShellWindow {
         width: DockLayout.labelWidth(labelText.implicitWidth)
         height: 26
         x: dock.tipItem ? Math.max(0, Math.min(dock.width - width, Math.round(bg.x + dock.tipItem.x + dock.tipItem.width / 2 - width / 2))) : 0
-        y: dock.tipItem ? Math.round(bg.y + dock.tipItem.iconTop - dock.m.iconTop - 9 - height) : 0
+        y: dock.tipItem ? Math.round(labelHost.off + bg.y + dock.tipItem.iconTop - dock.m.iconTop - 9 - height) : 0
         radius: 13
         sx: x
-        sy: dock.screen.height - dock.height + y
+        sy: dock.screen.height - labelHost.height + y
         tint: Theme.glass.tintClear
         solidColor: Theme.glass.solidDock
         pluginLift: "transparent"
@@ -588,6 +660,68 @@ ShellWindow {
         y: label.y + label.height + 1
         sx: x
         sy: label.sy + y - label.y
+        radius: 0
+        shadow: false
+        pointer: true
+        tint: Theme.glass.tintClear
+        solidColor: Theme.glass.solidDock
+        pluginLift: "transparent"
+    }
+    // the dragged tile (drag off, above): the Dock's art size, where the pointer holds it
+    AppIcon {
+        id: dragIcon
+        visible: dock.dragCell !== null
+        size: dock.dragCell ? dock.dragCell.size : dock.tile
+        loadSize: dock.magnification ? dock.large : dock.tile
+        x: dock.dragPos.x - dock.dragGrab.x
+        y: labelHost.off + dock.dragPos.y - dock.dragGrab.y
+        opacity: dock.dragFade
+        icon: dock.dragCell ? dock.dragCell.modelData.icon || "" : ""
+        appId: dock.dragCell ? dock.dragCell.modelData.id || "" : ""
+    }
+    // the "Remove" bubble over a tile dragged off (Q-dock-17): the hover label's style, its bottom 9 pt above the tile
+    Glass {
+        id: removeLabel
+        visible: dock.removeShown
+        width: DockLayout.labelWidth(removeText.implicitWidth)
+        height: 26
+        x: Math.round(dragIcon.x + dragIcon.width / 2 - width / 2)
+        y: Math.round(dragIcon.y - 9 - height)
+        radius: 13
+        sx: x
+        sy: dock.screen.height - labelHost.height + y
+        tint: Theme.glass.tintClear
+        solidColor: Theme.glass.solidDock
+        pluginLift: "transparent"
+        shadow: false
+        materialize: dock.dragFade
+        ShaderEffect {
+            anchors.fill: parent
+            visible: Theme.compositorGlass && !Theme.solidMaterial
+            opacity: dock.dragFade
+            property vector4d fill: Theme.dock.labelFill
+            property size sizePt: Qt.size(width, height)
+            property real radius: 13
+            property real dpr: dock.dpr
+            fragmentShader: Qt.resolvedUrl("../shaders/plusfill.frag.qsb")
+        }
+        Text {
+            id: removeText
+            anchors.centerIn: parent
+            opacity: dock.dragFade
+            text: "Remove"
+            font: Typography.font(Theme.font.dockLabel)
+            color: Theme.dock.labelText
+        }
+    }
+    Glass {
+        visible: removeLabel.visible && Theme.compositorGlass && !Theme.solidMaterial
+        width: Theme.dock.labelPointer.width
+        height: Theme.dock.labelPointer.height
+        x: Math.round(removeLabel.x + removeLabel.width / 2) - width / 2
+        y: removeLabel.y + removeLabel.height + 1
+        sx: x
+        sy: removeLabel.sy + y - removeLabel.y
         radius: 0
         shadow: false
         pointer: true
