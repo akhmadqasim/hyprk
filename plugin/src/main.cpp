@@ -3,6 +3,7 @@
 
 #include "Config.hpp"
 #include "GlassElement.hpp"
+#include "PopupGlass.hpp"
 #include "Log.hpp"
 #include "Stats.hpp"
 #include "Titlebar.hpp"
@@ -82,11 +83,14 @@ static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext
     const bool aboveLock = layer && layer->m_ruleApplicator->aboveLock().valueOrDefault();
     const bool lockSkip  = lockscreen ? !aboveLock : (aboveLock && g_pSessionLockManager && g_pSessionLockManager->isSessionLocked());
 
+    const int  fill   = params ? lg::fillFor(*params, layer ? layer->m_namespace : std::string{}) : 0;
     const bool wanted = params && params->enabled && !popups && !ctx.m_renderingSnapshot && layer && mon && !lockSkip && layer->mapped() && layer->alphaNonZero() &&
-        lg::namespaceMatches(*params, layer->m_namespace);
+        (fill != 0 || lg::namespaceMatches(*params, layer->m_namespace));
     // no shapes = no region with require_region: the layer is left to Hyprland
     double opacity = 1;
     auto   shapes  = wanted ? shapesFor(layer, mon, *params, opacity) : std::vector<lg::SGlassShape>{};
+    for (auto& s : shapes)
+        s.fill = fill; // a fill layer's shapes are fills, not glass
     if (shapes.empty()) {
         original(thisptr, ctx, layer, mon, now, popups, lockscreen, workspaceScene);
         return;
@@ -95,6 +99,7 @@ static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext
         .shapes       = std::move(shapes),
         .smoothK      = lg::smoothKFor(*params, layer->m_namespace),
         .underlay     = lg::underlayFor(*params, layer->m_namespace),
+        .panel        = lg::panelBlurFor(*params, layer->m_namespace),
         .alpha  = float(layer->alpha()[Desktop::View::LS_ALPHA_FADE]->value() * opacity),
         .params = params,
         .recipe = &lg::recipeByName(lg::materialFor(*params, layer->m_namespace)),
@@ -243,6 +248,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     }
     if (!g_renderHook)
         lg::logOnce("could not hook IHyprRenderer::renderLayer, glass is off (plain Hyprland blur stays)");
+    lg::initPopupGlass(handle, [] { return g_params; });
 
     return {"liquidglass", "macOS 27 Liquid Glass material for layer surfaces", "hyprk", "0.1.0"};
 }
@@ -255,6 +261,7 @@ APICALL EXPORT void PLUGIN_EXIT() {
     if (g_renderHook)
         HyprlandAPI::removeFunctionHook(lg::handle(), g_renderHook);
     g_renderHook = nullptr;
+    lg::exitPopupGlass(lg::handle());
     if (g_pHyprRenderer)
         g_pHyprRenderer->context().m_pass.removeAllOfType("CLiquidGlassElement");
     lg::glassProgram().destroy();

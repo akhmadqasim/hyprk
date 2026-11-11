@@ -238,11 +238,11 @@ def row_apple(screen, g, edge_px, n_px, ppp=2):
     return np.array(out)
 
 
-def config_underlay(ns="hyprk-controlcenter"):
-    """the `underlay_blur` default of src/Config.cpp for a namespace"""
+def config_underlay(ns="hyprk-controlcenter", key="underlay_blur"):
+    """the `underlay_blur` (or `panel_blur`) default of src/Config.cpp for a namespace"""
     import re
     txt = open(os.path.join(HERE, "..", "src", "Config.cpp")).read()
-    m = re.search(r'K\("underlay_blur"\),\s*"([^"]*)"', txt)
+    m = re.search(r'K\("%s"\),\s*"([^"]*)"' % key, txt)
     for part in (m.group(1).split(",") if m else []):
         k, _, v = part.partition(":")
         if k.strip() == ns:
@@ -261,6 +261,24 @@ def stripes_check(ours):
     x = np.arange(len(gap))
     raw = np.where(((x - 3) // 8) % 2 == 0, 0.0, 0.898)  # hyprk's backdrop there: the sharp stripes under the panel's dim
     under = config_underlay()
+    panel = config_underlay(key="panel_blur")
+    if panel > 0:
+        # the plugin draws the panel blur first (GlassElement::drawPanel): one trilinear read of its full-resolution pyramid
+        # (level 0 = the screen, level 1 = the 2x2 box = Apple's scale-0.5 base) at lod(1.6 r px/pt); the tiles sample that
+        pyr = GM3.Pyramid1D(raw, 0.5)
+        Lp = apple_lod(1.6 * panel * 2)
+        def ours_level(L, screen=raw):
+            return screen * (1 - L) + pyr.sample(0) * L if L <= 1 else pyr.sample(L - 1)
+        # the gap row's stripes sit 1 px right of the tile row's model (phase 4, best fit of the row)
+        rg = np.where(((x - 4) // 8) % 2 == 0, 0.0, 0.898)
+        pg = GM3.Pyramid1D(rg, 0.5)
+        gp = pg.sample(Lp - 1)[100:500] * 255 - mac[2][100:500]
+        raw = ours_level(Lp)
+        r_g = float(np.sqrt((gp ** 2).mean()))
+        print("    CC panel blur between the tiles (radius %.2f pt): pp %.1f (Mac %.1f), row rms %.2f levels" % (
+            panel, np.ptp(raw[100:500] * 255), np.ptp(mac[2][100:500]), r_g))
+        if r_g > 1.0:
+            bad.append("CC panel blur")
     P = ours[("controlcenter", True, 64, 0.5)]
     g = dict(A.inputs("controlcenter", 64, 0.5, True), _material="controlcenter")
     o, a, m = row_ours(raw, P, edge, n, under), row_apple(gap, g, edge, n), mac[row, 8:8 + n]
@@ -275,7 +293,7 @@ def stripes_check(ours):
                     out.append(i)
                 last = sg[i]
         return out
-    print("    CC tile rounded end, centre row, depth 1..50 pt: ours (underlay %.2f pt) rms %.2f, Apple's shader on the Mac's panel blur rms %.2f (levels)" % (under, r_o, r_a))
+    print("    CC tile rounded end, centre row, depth 1..50 pt: ours (underlay %.2f pt, tiles over the panel blur) rms %.2f, Apple's shader on the Mac's panel blur rms %.2f (levels)" % (under, r_o, r_a))
     print("      Mac   %s" % " ".join("%.0f" % v for v in m[2:42]))
     print("      ours  %s" % " ".join("%.0f" % v for v in o[2:42]))
     print("      Apple %s" % " ".join("%.0f" % v for v in a[2:42]))
@@ -286,7 +304,9 @@ def stripes_check(ours):
     # depth 15 without lateral displacement (the normal is vertical), so its blur level is that of depth 15
     k = 1.6 * 2 * P["BackdropScale"]
     mm = P["InnerRefractionAmount"] * lens(15, P["InnerRefractionHeight"])
-    L = 0.5 * math.log2(4 ** apple_lod(k * P["BlurRadius"] * blur_opacity(-15 + mm, P)) + 4 ** apple_lod(k * under) - 1)
+    L = apple_lod(k * P["BlurRadius"] * blur_opacity(-15 + mm, P))
+    if under > 0:
+        L = 0.5 * math.log2(4 ** L + 4 ** apple_lod(k * under) - 1)
     pyr = GM3.Pyramid1D(raw, P["BackdropScale"])
     v = np.array([face_ours(np.array([t] * 3), P)[0] * 255 for t in pyr.sample(L)[100:400]])
     pp = float(v.max() - v.min())

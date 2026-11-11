@@ -116,7 +116,9 @@ namespace lg {
         SDecorationPositioningInfo info;
         info.policy         = DECORATION_POSITION_STICKY;
         info.edges          = DECORATION_EDGE_TOP;
-        info.priority       = 10000; // innermost: right on the window, under borders and groupbars
+        // innermost: right on the window, inside the border (Hyprland gives its border 10000 too; at equal priority the
+        // border landed between bar and client, a dark line under the bar and no rim above it, Q-windows-03)
+        info.priority       = 10001;
         info.reserved       = true;
         info.desiredExtents = {Vector2D{0.0, m_height}, Vector2D{0.0, 0.0}};
         return info;

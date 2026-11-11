@@ -101,7 +101,20 @@ namespace lg {
             if (found.empty())
                 continue;
             std::ranges::sort(found, {}, &SRect::y);
-            auto&        shape  = out[s];
+            auto& shape = out[s];
+            // the pointer marker: a hole at left + 1 in the top row of a plain rect
+            if (std::erase_if(found, [&](const SRect& a) { return a.y == shape.box.y && a.x == shape.box.x && a.w == 1; }) > 0) {
+                // the marker box hangs 1 pt below the pill (a region is a union: touching, it would merge with it); the
+                // square's centre is POINTER_OFFSET above the pill's bottom edge, the box becomes the square's bounds
+                shape.pointer    = true;
+                const double cx  = shape.box.x + shape.box.w / 2, cy = shape.box.y - 1 - POINTER_OFFSET;
+                const double h   = POINTER_SIDE * M_SQRT1_2;
+                shape.box        = {cx - h, cy - h, 2 * h, 2 * h};
+                shape.radius     = POINTER_RADIUS;
+                continue;
+            }
+            if (found.empty())
+                continue;
             const double mid    = shape.box.y + std::floor(shape.box.h / 2);
             const double centre = shape.box.x + std::floor(shape.box.w / 2);
             const auto   setMaterialize = [&shape](const SRect& a) {
@@ -126,6 +139,8 @@ namespace lg {
         }
 
         for (auto& s : out) {
+            if (s.pointer)
+                continue; // its radius is Apple's, not read from the region
             // a rasterised quarter circle reaches the edge sqrt(r) rows early (inset < 0.5px):
             // stair = r - sqrt(r)  =>  r = ((1 + sqrt(1 + 4 stair)) / 2)^2
             if (s.radius > 0) {
@@ -138,21 +153,24 @@ namespace lg {
         return out;
     }
 
-    std::vector<SGlassGroup> groupShapes(const std::vector<SGlassShape>& shapes, double smoothK) {
+    std::vector<SGlassGroup> groupShapes(const std::vector<SGlassShape>& shapes, double smoothK, double pxPerUnit) {
         const size_t        n = shapes.size();
         SDisjointSet        set(n);
         auto                find = [&](size_t i) { return set.find(i); };
         std::vector<size_t> count(n, 1);
-        if (smoothK > 0) {
+        const double        pointerK = POINTER_SMOOTH / std::max(pxPerUnit, 1e-6);
+        const bool          anyPointer = std::ranges::any_of(shapes, &SGlassShape::pointer);
+        if (smoothK > 0 || anyPointer) {
             for (size_t i = 0; i < n; ++i)
                 for (size_t j = i + 1; j < n; ++j) {
+                    const double k = shapes[i].pointer || shapes[j].pointer ? std::max(smoothK, pointerK) : smoothK;
                     const auto& a = shapes[i].box;
                     const auto& b = shapes[j].box;
                     // gap between the boxes (0 when they overlap); the smooth union reaches k
                     const double dx = std::max({0.0, b.x - a.right(), a.x - b.right()});
                     const double dy = std::max({0.0, b.y - a.bottom(), a.y - b.bottom()});
                     const size_t ri = find(i), rj = find(j);
-                    if (ri == rj || std::hypot(dx, dy) >= smoothK || count[ri] + count[rj] > MAX_GROUP)
+                    if (ri == rj || std::hypot(dx, dy) >= k || count[ri] + count[rj] > MAX_GROUP)
                         continue;
                     set.parent[ri] = rj;
                     count[rj] += count[ri];
@@ -166,7 +184,7 @@ namespace lg {
             const auto&  b    = shapes[i].box;
             if (slot[root] < 0) {
                 slot[root] = long(out.size());
-                out.push_back({{i}, b, i});
+                out.push_back({{i}, b, i, smoothK});
                 continue;
             }
             auto& g = out[slot[root]];
@@ -176,6 +194,9 @@ namespace lg {
             if (b.w * b.h > lead.w * lead.h)
                 g.lead = i;
         }
+        for (auto& g : out)
+            if (g.members.size() > 1 && std::ranges::any_of(g.members, [&](size_t i) { return shapes[i].pointer; }))
+                g.smoothK = std::max(smoothK, pointerK);
         return out;
     }
 

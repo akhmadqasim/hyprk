@@ -304,6 +304,25 @@ int main() {
         CHECK(groupShapes(many, 5).size() == 2);      // capped at MAX_GROUP
     }
 
+    // pointer marker (Dock label): a rect 1 pt below the pill with a 1x1 hole in its top row at left + 1
+    {
+        std::vector<SRect> rows = {{92, 47, 1, 1}, {94, 47, 14, 1}, {92, 48, 16, 6}};
+        auto               s    = clusterRegion(rows);
+        const double       h    = POINTER_SIDE * M_SQRT1_2;
+        // centre x 100, y = 47 - 1 - 4 = 42: the pill (bottom 46) holds the square's top half
+        CHECK(s.size() == 1 && s[0].pointer && !s[0].regularShadow && near(s[0].materialize, 1) && near(s[0].box.x, 100 - h, 1e-9) &&
+              near(s[0].box.y, 42 - h, 1e-9) && near(s[0].box.w, 2 * h, 1e-9) && near(s[0].radius, POINTER_RADIUS));
+        CHECK(!clusterRegion({{100, 50, 23, 23}})[0].pointer);
+        const auto fm = parseFillMap("a:lighter, b:darker, c:other");
+        CHECK(fm.size() == 2 && fm.at("a") == 1 && fm.at("b") == -1);
+        // pill 26 pt tall above, the pointer's box 3 pt below it: alone at the layer's k 0, one group at 25
+        std::vector<SGlassShape> lab = {{{90, 0, 60, 26}, 13}, s[0]};
+        lab[1].box = {88, 29, 23, 23};
+        CHECK(groupShapes(lab, 0).size() == 1 && near(groupShapes(lab, 0)[0].smoothK, POINTER_SMOOTH) && groupShapes(lab, 0)[0].lead == 0);
+        lab[1].pointer = false;
+        CHECK(groupShapes(lab, 0).size() == 2 && near(groupShapes(lab, 8)[0].smoothK, 8));
+    }
+
     // mipFootprint: every texel a read in the box touches at that level (bilinear + tent) is refreshed.
     // A read box starting at x 1724 (not a multiple of 128): box + 128 px left part of the level-7
     // texels on its left edge to an older frame

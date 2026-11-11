@@ -33,7 +33,7 @@ namespace lg {
             int tex, linearLight, uvTopLeft, uvBottomRight, quadSize, shapeCount, shapeBox, shapeInfo, smoothK, appearBlur, roundingPower, alpha;
             int blurRadius, blurK, baseLevel, maxLevel, underlay, refraction, refractionHeight, aberration, faceYcc;
             int blurAlpha, blurDist, outerAmount, outerHeight, outerOpacity, outerThreshold;
-            int blurFill, bleedOpacity, bleedHeight, bleedAmount, bleedLod, bleedYcc, faceFill;
+            int blurFill, bleedOpacity, bleedHeight, bleedAmount, bleedLod, bleedYcc, faceFill, fillAmount;
             int pxPerPt, keyYcc, keySpread, highlight, darkSpec;
             int shadowOpacity, shadowRadius, shadowOffset, shadowTint, shadowSaturation;
             int ringOpacity, ringOffset, ringStroke, ringRadius;
@@ -67,6 +67,7 @@ namespace lg {
             std::vector<SGlassShape>       shapes; // monitor-local logical px
             double                         smoothK = 0;          // smooth-union reach (logical px), 0 = no merging
             double                         underlay = 0;         // Apple blur radius (pt) of a layer under the glass on the Mac (CC panel)
+            double                         panel    = 0;         // Apple blur radius (pt) of a panel blur drawn first, around the shapes
             float                          alpha = 1.f;
             std::shared_ptr<const SParams> params;
             const SRecipe*                 recipe = &recipeByName("regular");
@@ -74,6 +75,7 @@ namespace lg {
             bool                           shadow = true; // windows draw their own
             std::optional<float>           roundingPower; // override params->roundingPower
             std::vector<SGlassGroup>       groups;        // filled by claimDamage()/the ctor
+            std::vector<SGlassShape>       fills;         // fill-marker shapes, moved out of `shapes` there
             std::vector<SResolved>         resolved;      // per group, from its lead shape
         };
 
@@ -100,6 +102,8 @@ namespace lg {
       private:
         void  drawFallback(Render::CRenderContext& ctx);
         bool  drawGlass(Render::CRenderContext& ctx);
+        bool  drawPanel(Render::CRenderContext& ctx, const CRegion& readRegion, int levels);
+        void  drawFills(Render::CRenderContext& ctx);
         SData m_data;
     };
 }

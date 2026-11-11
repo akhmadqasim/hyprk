@@ -46,6 +46,18 @@ namespace lg {
         // ns -> Apple blur radius (pt) of a layer that sits between the backdrop and the glass on the Mac but not here: the
         // Control Center panel blurs the desktop under its tiles (MAC-ANSWERS C2 3), hyprk's panel is a dim only
         std::unordered_map<std::string, double>      underlay;
+        // ns -> Apple blur radius (pt) of a panel blur drawn behind the layer's glass, over the box of its shapes: the Control
+        // Center panel blurs the desktop between and under its tiles (MAC-ANSWERS C2 3, REFRACTION.md "Panel blur")
+        std::unordered_map<std::string, double>      panelBlur;
+
+        // ns -> +1 plus-lighter / -1 plus-darker: every shape of that layer is a compositing fill over what lies under it,
+        // drawn before the layer's own content (Shape.hpp SGlassShape::fill)
+        std::unordered_map<std::string, int>         fillLayers;
+
+        // glass behind the xdg_popups of windows whose class matches (PopupGlass.cpp): a client's context menu
+        std::string                                  popupClasses = "^hyprk-finder$";
+        std::string                                  popupMaterial = "menu";
+        float                                        popupRadius   = 12; // Q-menubar-13: menu glass corner radius 12
 
         bool                                         fullDamage    = false; // true: redraw the whole output while glass is visible
         bool                                         stats         = false; // GPU timestamp queries, `hyprctl liquidglass`
@@ -67,7 +79,7 @@ namespace lg {
         bool                                         titlebarAutoColor = true; // take the colour of the client's top rows
 
         // compiled once per snapshot from the regex strings above (nullopt: empty or invalid)
-        std::optional<std::regex>                    windowRegex, titlebarClassesRegex, titlebarExcludeRegex;
+        std::optional<std::regex>                    popupRegex, windowRegex, titlebarClassesRegex, titlebarExcludeRegex;
     };
 
     // 0xRRGGBBAA -> rgba 0..1
@@ -90,6 +102,14 @@ namespace lg {
 
     // Apple blur radius (pt) of the layer under the glass of a namespace (`underlay_blur`), 0 = none
     double underlayFor(const SParams& p, const std::string& ns);
+
+    // `fill_layers` entry of a namespace: +1 lighter, -1 darker, 0 none
+    int fillFor(const SParams& p, const std::string& ns);
+    // "ns:lighter, ns2:darker" -> {{ns, 1}, {ns2, -1}}; other values are skipped
+    std::unordered_map<std::string, int> parseFillMap(std::string_view s);
+
+    // Apple blur radius (pt) of the panel blur behind a namespace's glass (`panel_blur`), 0 = none
+    double panelBlurFor(const SParams& p, const std::string& ns);
 
     // Hyprland side (Config.cpp, needs the compositor)
     void registerConfig(void* handle);

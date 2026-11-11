@@ -144,14 +144,19 @@ t = depth / height; the blur radius there is `BlurRadius x opacity(d + displacem
 BlurDistance0 (-0.5 D, Control Center -100), -1, 0), so the bevel reads deeper and blurrier backdrop; blur fill: two
 taps at -+ L / 4 texels of radius 8's level; edge bleed at radius 0.175 D. Over stripes this gives the concentric lens
 bands at rounded ends and the interior ripple of the real glass (reference/ours/glass/REFRACTION.md).
-Control Center: on the Mac the tiles sample the panel's own blur under them; hyprk's panel is a dim only, so
-`underlay_blur` composes that blur into the tiles' reads (`4^L - 1` adds, a radius fitted to the real tiles' contrast).
+Control Center: on the Mac the tiles sample the panel's own blur under them (MAC-ANSWERS C2 3). `panel_blur` draws it: before
+a layer's glass, the box of its shapes grown by 44.8 pt is redrawn as one trilinear read of its own full-resolution pyramid at
+Apple's radius (1.79 pt for `hyprk-controlcenter`), ramping linearly in radius from 0 at that edge to full 72 pt inside; then the
+tiles copy that and sample it, as on the Mac. Radius fitted to the Mac's gap row over 4 pt stripes (rms 0.47 levels over 400 px;
+a Gaussian fits at 1.37), edge and ramp to where it leaves the tile column (rms 2.8, 11.2 without a ramp); it comes and goes with
+the shapes' materialize and the layer's opacity (reference/ours/glass/REFRACTION.md "Panel blur"). `underlay_blur` (the older
+stand-in: the same blur composed into the tiles' reads, no pass of its own) is off by default.
 
 Light/dark: `appearance = "auto"` reads the backdrop luminance of each glass (1 pixel of a high mip,
 read back asynchronously every 6 frames) and switches with Apple's V2 hysteresis: dark below 0.1, light
 again above 0.3 (`adapt_low` / `adapt_high`).
 
-Not Apple's: the shadow tint amount and the shadow's backdrop level (6), Spotlight, the Control Center underlay
+Not Apple's: the shadow tint amount and the shadow's backdrop level (6), Spotlight, the Control Center panel blur
 (fitted to the Mac's pixels, not decoded), the pyramid base at backdrop scale 0.25 / 0.125 (ours: the 13-tap levels of
 the 0.5 base, Apple: a 4x4 / 8x8 box; the half-size base Apple uses when R > 2 is not modelled either).
 
@@ -169,7 +174,10 @@ the 0.5 base, Apple: a 4x4 / 8x8 box; the half-size base Apple uses when R > 2 i
 | `rounding_power` | 2.6 | superellipse corner (2 = circle) |
 | `appearance` | `auto` | `auto` (hysteresis on backdrop luminance), `light`, `dark` |
 | `adapt_low` / `adapt_high` | 0.1 / 0.3 | hysteresis band (SPEC 9.6, V2 light range) |
-| `underlay_blur` | `hyprk-controlcenter:2.05` | `ns:radius` (Apple blur radius, pt) of a blur the Mac has between the backdrop and that glass: the Control Center panel's. Set it to 0 once the shell blurs the panel column itself |
+| `underlay_blur` | "" | `ns:radius` (Apple blur radius, pt) of a blur composed into that glass's reads without a pass (the panel blur's older stand-in; 2.05 fitted the CC tiles) |
+| `panel_blur` | `hyprk-controlcenter:1.79` | `ns:radius`: draw that panel blur behind the layer's glass (see Materials) |
+| `fill_layers` | "" | `ns:lighter` / `ns:darker`: every shape of that layer is a plus-lighter (+65/255) or plus-darker (-57/255) fill over what lies under it, drawn before the layer's content (Cmd-Tab selection tile, Dock dots: Qt cannot blend with the compositor's glass) |
+| `popup_classes` / `popup_material` / `popup_radius` | `^hyprk-finder$` / `menu` / 12 | glass behind the xdg_popups of matching windows (see Client popups) |
 | `refraction_scale` | 1 | multiplies the recipe's refraction amount (0 = off) |
 | `aberration` | 0 | px R/B split at the edge (7 taps); 0 = off (Apple: none on background glass) |
 | `highlight` | 1 | scales the key/fill highlight mask (1 = Apple) |
@@ -277,3 +285,20 @@ ext-background-effect region (e.g. a glass sidebar: Quickshell `BackgroundEffect
 that region, with the region's corner radius; Hyprland would blur that region too, so `no_blur` matters there.
 
 Fallbacks: see `FALLBACKS.md`.
+
+## Client popups
+
+A client's context menu is an xdg_popup (Finder's PopupMenu.qml, as the Mac's NSPopupMenuWindow). For windows whose class
+matches `popup_classes`, `IHyprRenderer::renderWindow` is hooked: after Hyprland adds the window's pass elements, a glass element
+(`popup_material`, radius `popup_radius`, the popup's xdg window geometry) goes right before each popup's root surface, and
+Hyprland's own popup blur is turned off for it. Q-menubar-13: pull-down and context menu are the same window type and glass, so
+the default is the shell dropdown's `menu` recipe and shadow. A Qt popup destroys its surface on close, which leaves Hyprland's
+popup fadeout empty, so the plugin keeps the popup's last buffer and fades it with its glass over the shell menus' 185 ms
+ease-out (materialize 1 -> 0). The client draws no fill when `plugin:liquidglass:enabled` is 1.
+
+## Dock label pointer
+
+A plain rect with a 1x1 hole in its top row at left + 1, hanging 1 pt below the label pill, becomes Apple's cartouche pointer
+(Dock `ECCartoucheGlassLayerController`, MAC-ANSWERS "REA 27.2.1" 3): a square of side 16 turned 45 deg, corner radius 2.5, centred
+4 pt above the pill's bottom edge, unioned with the pill at smoothness 25 (a group with a pointer uses 25 instead of the layer's
+`spacing`). The hole is needed because a region is a union: a shape touching the pill would merge with it.

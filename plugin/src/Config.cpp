@@ -44,6 +44,7 @@ namespace lg {
             {K("shadow_tint"), &SParams::shadowTint},
             {K("ring_scale"), &SParams::ringScale},
             {K("window_radius"), &SParams::windowRadius},
+            {K("popup_radius"), &SParams::popupRadius},
             {K("titlebar_height"), &SParams::titlebarHeight},
             {K("titlebar_button"), &SParams::titlebarButton},
             {K("titlebar_gap"), &SParams::titlebarGap},
@@ -83,9 +84,16 @@ namespace lg {
             // Spotlight's mode buttons fuse with the field only while they emerge from it
             {K("spacing"), "hyprk-controlcenter:8,hyprk-dock:8,hyprk-overlay:8,hyprk-spotlight:8",
              [](SParams& p, const std::string& v) { p.spacing = parseNumberMap(v); }},
-            // the Control Center panel's own blur under its tiles, as an Apple blur radius composed with the tile's own: 2.05 pt
-            // gives the real tiles' contrast over 4 pt stripes, 7.9 levels at 15 pt deep (C2 cc-real.json; REFRACTION.md)
-            {K("underlay_blur"), "hyprk-controlcenter:2.05", [](SParams& p, const std::string& v) { p.underlay = parseNumberMap(v); }},
+            // a blur the Mac has under that glass, composed into the glass's own reads (no pass of its own); unused since the
+            // Control Center panel blur is drawn (panel_blur)
+            {K("underlay_blur"), "", [](SParams& p, const std::string& v) { p.underlay = parseNumberMap(v); }},
+            // the Control Center panel blur, drawn behind the tiles, which then sample it as on the Mac: Apple's pyramid at radius
+            // 1.79 pt fits the Mac's gap between tiles over 4 pt stripes (rms 0.47 levels, 400 px; REFRACTION.md "Panel blur")
+            {K("panel_blur"), "hyprk-controlcenter:1.79", [](SParams& p, const std::string& v) { p.panelBlur = parseNumberMap(v); }},
+            // plus-lighter / plus-darker fill layers (none by default; the shell's surfaces opt in by namespace)
+            {K("fill_layers"), "", [](SParams& p, const std::string& v) { p.fillLayers = parseFillMap(v); }},
+            {K("popup_classes"), "^hyprk-finder$", [](SParams& p, const std::string& v) { p.popupClasses = v; }},
+            {K("popup_material"), "menu", [](SParams& p, const std::string& v) { p.popupMaterial = v; }},
             {K("material"), "regular", [](SParams& p, const std::string& v) { p.defaultMaterial = v; }},
             {K("window_material"), "regular", [](SParams& p, const std::string& v) { p.windowMaterial = v; }},
             {K("appearance"), "auto", [](SParams& p, const std::string& v) { p.appearance = parseAppearance(v); }},
@@ -189,6 +197,7 @@ namespace lg {
             } catch (const std::regex_error&) { return std::nullopt; }
         };
         p->windowRegex          = compile(p->windowClasses);
+        p->popupRegex           = compile(p->popupClasses);
         p->titlebarClassesRegex = compile(p->titlebarClasses);
         p->titlebarExcludeRegex = compile(p->titlebarExclude);
         if (p->adaptLow > p->adaptHigh) // an inverted band would flip every readback

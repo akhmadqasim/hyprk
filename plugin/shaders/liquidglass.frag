@@ -22,11 +22,13 @@ uniform vec2  quadSize;             // px
 #define MAX_SHAPES 8
 uniform int   shapeCount;
 uniform vec4  shapeBox[MAX_SHAPES]; // centre x, y (quad px), half w, h
-uniform vec2  shapeInfo[MAX_SHAPES];// corner radius px, materialize 0..1
+uniform vec2  shapeInfo[MAX_SHAPES];// corner radius px (< 0: a square turned 45 deg, half side = shapeBox.zw, corner -radius), materialize 0..1
 uniform float smoothK;              // px, smoothness of the union (= GlassEffectContainer spacing), 0 = plain min
 uniform float appearBlur;           // px edge softness of fully hidden glass (materialize 0)
 uniform float roundingPower;        // 2 = circle
 uniform float alpha;                // layer fade
+uniform float fillAmount;           // > 0: fill mode (plus-lighter / plus-darker marker shapes): output amount x coverage,
+                                    // the caller's blend equation adds it to or subtracts it from the framebuffer
 uniform int   linearLight;          // 1: work in linear light like QuartzCore (sRGB decode/encode)
 
 uniform float blurRadius;           // Apple's BlurRadius, pt
@@ -105,7 +107,14 @@ SScene scene(vec2 qp) {
     for (int i = 0; i < MAX_SHAPES; i++) {
         if (i >= shapeCount)
             break;
-        vec3  b  = sdBoxN(qp - shapeBox[i].xy, shapeBox[i].zw, shapeInfo[i].x);
+        vec3  b;
+        if (shapeInfo[i].x < 0.0) {
+            // the Dock label's pointer (Shape.hpp SGlassShape::pointer): rotate into the square's frame and the normal back
+            vec2 d = qp - shapeBox[i].xy;
+            b      = sdBoxN(vec2(d.x + d.y, d.y - d.x) * 0.70710678, shapeBox[i].zw, -shapeInfo[i].x);
+            b.yz   = vec2(b.y - b.z, b.y + b.z) * 0.70710678;
+        } else
+            b = sdBoxN(qp - shapeBox[i].xy, shapeBox[i].zw, shapeInfo[i].x);
         float mi = shapeInfo[i].y;
         float k = smoothK * sat(0.5 - 0.5 * dot(res.n, b.yz));
         float h = sminH(res.d, b.x, k);
@@ -199,6 +208,13 @@ void main() {
     // hidden glass also has a soft edge (SwiftUI materialize: blur 10 pt at the hidden end)
     float fw  = max(fwidth(d), 1e-3) + (1.0 - mat) * appearBlur;
     float cov = sat(0.5 - d / fw);
+
+    if (fillAmount > 0.0) {
+        if (cov <= 0.0)
+            discard;
+        fragColor = vec4(vec3(fillAmount * cov * mat * alpha), 0.0);
+        return;
+    }
 
     // drop shadow: erfc-blurred shape, coloured by the saturated backdrop (Apple's shadow_cm)
     float sh = 0.0;

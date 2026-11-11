@@ -23,7 +23,19 @@ namespace lg {
         // centre column. The shape then takes Regular's drop shadow for its size (probe: 0.04, radius 4 pt at
         // D <= 64) instead of its layer recipe's (hyprk-overlay = menu: 0.7, radius 24 at every size)
         bool regularShadow = false;
+        // pointer marker (the Dock label's pointer): a plain rect with a 1x1 hole in its top row at x = left + 1, hanging
+        // 1 pt below the pill (its top = pill bottom + 1; touching, the region union would merge the two). The shape is
+        // then Apple's cartouche pointer (MAC-ANSWERS "REA 27.2.1" 3, Dock ECCartoucheGlassLayerController): a square of side
+        // POINTER_SIDE turned 45 deg, corner radius POINTER_RADIUS, centred on the rect's centre column POINTER_OFFSET above
+        // the pill's bottom edge; its box becomes the square's bounds, and its group unions with smoothness POINTER_SMOOTH.
+        bool pointer = false;
+        // a compositing fill instead of glass (`fill_layers`, every shape of such a layer): +1 plus-lighter (dst +
+        // FILL_LIGHTER), -1 plus-darker (dst - FILL_DARKER), per channel inside the rounded rect, over what lies there.
+        // Qt cannot blend with what the compositor drew (the Cmd-Tab selection tile, the Dock's running dots).
+        int fill = 0;
     };
+    inline constexpr double FILL_LIGHTER = 65.0 / 255.0, FILL_DARKER = 57.0 / 255.0;
+    inline constexpr double POINTER_SIDE = 16, POINTER_RADIUS = 2.5, POINTER_OFFSET = 4, POINTER_SMOOTH = 25;
 
     // Shapes drawn as one smooth-union SDF (GlassEffectContainer-like): indices into the shape list.
     // `lead` is the shape with the largest area; its size picks the size-relative recipe values,
@@ -32,6 +44,7 @@ namespace lg {
         std::vector<size_t> members;
         SRect               box; // bounding box of the members
         size_t              lead = 0;
+        double              smoothK = 0; // the union's smoothness: the layer's, POINTER_SMOOTH with a pointer
     };
     inline constexpr size_t MAX_GROUP = 8; // must match MAX_SHAPES in shaders/liquidglass.frag
 
@@ -45,8 +58,9 @@ namespace lg {
     std::vector<SGlassShape> clusterRegion(const std::vector<SRect>& rects);
 
     // Groups shapes whose boxes are closer than `smoothK` (the smooth union's reach, px; 0 = every
-    // shape alone) into one group each, at most MAX_GROUP shapes per group.
-    std::vector<SGlassGroup> groupShapes(const std::vector<SGlassShape>& shapes, double smoothK);
+    // shape alone) into one group each, at most MAX_GROUP shapes per group. A pair with a pointer shape reaches
+    // POINTER_SMOOTH x pxPerUnit instead (`smoothK` is in the boxes' units, which are pxPerUnit per pt).
+    std::vector<SGlassGroup> groupShapes(const std::vector<SGlassShape>& shapes, double smoothK, double pxPerUnit = 1);
 
     // The texture area (px) to copy or blur so that a read anywhere in `r` at mip `level` or below
     // (bilinear, plus the half-texel tent of fetchSharp) touches only texels rebuilt from fresh pixels:

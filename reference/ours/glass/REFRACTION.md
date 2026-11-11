@@ -55,8 +55,7 @@ the bevel bends was already uniform. The lens maths (quarter-circle bevel, amoun
 
 ## Not derived or not verified
 
-- **CC panel blur:** its kernel and radius are not decoded. The underlay is a single-number fit to 4 pt data. Under a
-  Gaussian panel, 8 pt stripes would show about 1.5x our contrast, and nothing on the Mac measures that.
+- **CC panel blur:** its kernel and radius are not decoded; see "Panel blur" for what is fitted and what follows from it.
 - **Pyramid base at scale 0.25 / 0.125:** ours is the 13-tap level of the 0.5 base, Apple's is a box. Apple's half-size
   base for R > 2 is not modelled. The shadow tint reads level 6 (not decoded).
 - **HUD:** no Mac capture over stripes, so only Apple's model backs it. Over flat grey the HUD body has a 114→118
@@ -64,5 +63,70 @@ the bevel bends was already uniform. The lens maths (quarter-circle bevel, amoun
 - **Not seen on screen over stripes:** Cmd-Tab (the switcher did not open in the headless session; same Dock recipe and
   code path). NC cards: the widgets drew opaque. Spotlight looked identical before and after (its field is the shell's
   dark fill).
-- **The gap between CC tiles is still sharp stripes** (Mac: the panel blur, 32 levels). That needs a shell/config change.
-  See hand-off.
+- ~~The gap between CC tiles is still sharp stripes~~: done, see "Panel blur" below.
+
+## Panel blur (Control Center, 2026-11-11, second pass)
+
+On the Mac the gap between CC tiles shows the stripes blurred and dimmed (C2 `cc-real.json`: 32 levels peak to peak at every
+slider value, mean 0.898 x in), and the tiles sample that blur. hyprk had the dim only (shell's dim layer), the gaps showed
+sharp stripes, and the tiles read a fitted `underlay_blur` (2.05) composed into their own blur.
+
+- **Kernel: Apple's pyramid, not a Gaussian.** The Mac's gap row (`cc-real-stripes-a0.5071146.png` row 150, 400 px) is a
+  trapezoid (flat tops 4 px), which a single trilinear read of Apple's pyramid reproduces and a Gaussian does not: pyramid at
+  scale 0.5, level 1.52 = **radius 1.79 pt**, rms **0.47** levels (Gaussian best fit sigma 2.6 pt: rms 1.37). One parameter,
+  fitted. Not decoded: the CC panel layer cannot be dumped from another process.
+- **Edge:** leaving the tile column the Mac's contrast grows over about 30 pt. A radius ramping linearly (as Apple's
+  BlurOpacity) from 0 at a box 44.8 pt outside the tiles' bounds to full 72 pt inside fits the first 140 px at rms 2.8
+  (no ramp 11.2). Fitted, two parameters.
+- **Mechanism (plugin `panel_blur`):** before the CC layer's glass, the grown box is redrawn from the element's own
+  full-resolution pyramid (level 0 = the screen, so the ramp's edge has no seam), then the tiles copy the framebuffer again and
+  sample the blurred panel, as on the Mac. `underlay_blur` is off. Radius and alpha follow the tiles' materialize and the
+  layer fade (CC open, gap peak to peak per frame from the first panel frame: 241 236 202 168 135 107 71 58 50 43 38 ... 28).
+- **What follows without fitting** (apple_model section 5, sharp 4 pt stripes): tile 15 pt below the top 7.7 levels (Mac 7.9;
+  underlay 2.05 gave 7.3), rounded-end row vs the Mac crop rms 1.37 (underlay 1.61; Apple's shader on the Mac's own gap 0.91),
+  lens band turning points 8 10 13 17 25 31 40 46 56 px (Mac 8 10 13 17 25 32 41 49 57).
+
+| on screen, MBA 2x, dark, 4 pt stripes | Mac | before (underlay 2.05) | after (panel blur) |
+|---|---|---|---|
+| gap between tiles, peak to peak | 32 (33 in the crop) | 229 (sharp) | 26 (interior; 33-38 near the screen edge, Mac also grows there) |
+| gap shape | trapezoid 99..131 | square wave 0..229 | trapezoid 101..127 |
+| Display tile 8 / 15 pt below top | 7.9 at 15 | 7 / 7 | 6 / 7 |
+| rounded end ripple, depth 4-20 / 20-50 pt | 10 / 7 | 6 / 5 | 9 / 6 |
+| lens band turning points (px) | 3 4 5 6 8 10 13 17 25 32 41 49 57 | 3 4 5 7 8 10 13 17 25 33 41 49 57 | 3 4 5 6 8 10 13 17 25 33 40 49 57 |
+| flat tile white / grey / black / blue | 186 / 109 / 32 / 64,80,212 | same | 186 / 109 / 32 / 64,80,212 |
+| flat gap white / grey / black / blue | 229 / 114 / 0 / 62,75,185 | same | 229 / 114 / 0 / 62,75,185 |
+| top rim over grey, px 0..5 | 233 180 134 128 124 121 | 231 179 133 127 123 120 | 231 179 133 127 123 120 |
+
+- The on-screen stripes are softer than the Mac's: the shell decodes the wallpaper at the logical size (Background.qml
+  `sourceSize` = screen size in pt), so on a 2x output a 4 pt stripe has 4 px ramps; every on-screen contrast above is lower
+  than on a sharp backdrop (the model numbers are on sharp stripes).
+- **Cost** (`stats = 1`, CC opened and closed 6 times, same session): glass per element avg 0.24 -> 0.39 ms, p95 0.33 -> 0.66
+  ms (the CC element: a panel pass over its box and a second pyramid); whole frame p95 18.1 -> 18.0-19.4 ms (noise). Nothing
+  runs at rest.
+- The phase of the stripes against the tile edge differs between the Mac crop and our screen, so row rms against the crop is
+  phase-dominated on screen (4.2 before, 4.9 after); band positions and ripple amplitude are the phase-free measures above.
+
+## Other glass checks (same session)
+
+- **Finder context menu (plugin `popup_classes`):** before, the client's translucent tint over Hyprland's popup blur; after,
+  the shell dropdown's `menu` glass behind the xdg_popup. Dark, over white: empty area 121 (Mac 120, shell dropdown 121),
+  below at 2/10/20/30 pt 214/225/239/248 (Mac dark 214/225/238/248), beside at 2/10/20 pt 229/239/249 (Mac 228/238/248, shell
+  230/240/249). Over blue: 75,90,220, the shell dropdown the same. Light over Finder's rows: 251,252,253 (Mac light over white
+  251,252,255). Submenus get it too. Close: glass and content fade together, empty-area pixel over white per frame
+  121 143 164 183 200 214 227 237 245 250 254 255 (the shell dropdown: 121 142 164 182 213 226 236 244 250 253 255).
+  Side by side, light: `popup-menu-mac-finder-shell-light.png` (Mac | Finder | shell dropdown).
+- **Cmd-Tab:** over grey 127 the switcher's top rim and body read 156 117 113 111 109 ... 107, the Dock's exactly the same
+  (Dock material, as Q-dock-19). Its body vs the Mac Dock: 107 (Mac 107); the second rim px 117 vs the Mac's 135 is the Dock
+  rim's own gap, not the switcher's.
+- **HUD body gradient over flat grey (114 -> 118):** not the glass. The HUD sits in the menu bar's contrast gradient
+  (Q-menubar-02: 128 -> 112 at the top, 30 % at 60 pt, gone by 100 pt): the backdrop beside it reads 122 at y 60 pt and 127 at
+  95 pt, and the controlCenter face gives 0.125 x 255 + 0.675 x in = 114.2 / 117.6 there, the measured 114 / 118. White 204,
+  black 32, blue 68,85,232 (Mac 68,85,232). The Mac HUD (y 44..109.5 pt) also lies in that zone; no Mac HUD capture over flat
+  grey exists to confirm the Mac's backdrop includes the gradient.
+- **Spotlight field:** REA gives Regular at size class large (D 201.3) with content lensing. Tried as a recipe: under the shell's
+  fitted veil the field read white / grey / black at mid-height 32 / 30 / 10 (Mac 65 / 36 / 6) and bottom 62 / 59 / 21 (Mac
+  127 / 64 / 17): dark Regular's max luma (0.35 at that size) flattens the backdrop to 115-122, while the Mac field rises
+  0.23 x in at mid-height and 0.5 x in at the bottom. The pixels fit a near-identity glass under a dark gradient (the old
+  Siri-branch recipe + veil: grey 6 / 37 / 71, Mac 6 / 36 / 64), so the old recipe stays; what darkens the real field on top of
+  the Regular glass is not found. The Mac shows a soft shadow under the bar (127 -> 96 at the edge) although the code says
+  excludingShadow(); ours has none.

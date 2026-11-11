@@ -108,6 +108,7 @@ namespace lg {
             .bleedLod         = loc("bleedLod"),
             .bleedYcc         = loc("bleedYcc"),
             .faceFill         = loc("faceFill"),
+            .fillAmount       = loc("fillAmount"),
             .pxPerPt          = loc("pxPerPt"),
             .keyYcc           = loc("keyYcc"),
             .keySpread        = loc("keySpread"),
@@ -158,7 +159,7 @@ namespace lg {
 
         // Box-sized backdrop copies per element (owner, monitor) and role, so the mip chain covers the glass
         // and its footprint instead of the whole output (README Performance)
-        enum eRole { SHARP };
+        enum eRole { SHARP, PANEL };
         struct SBoxFB {
             SP<Render::IFramebuffer> fb;
             uint64_t                 frame = 0;
@@ -417,13 +418,13 @@ void main() {
         // under a later layer is not final at an earlier element's turn), see README Performance. The whole extents
         // are copied (one rect), so the downsampler's taps never reach texels of an older frame; past them the
         // texture clamps to its edge (Apple's capture has a 16 pt margin and clamps too).
-        STexView backdropPyramid(Render::CRenderContext& ctx, uintptr_t owner, const Vector2D& size, const CRegion& read, int levels) {
+        STexView backdropPyramid(Render::CRenderContext& ctx, uintptr_t owner, const Vector2D& size, const CRegion& read, int levels, eRole role = SHARP) {
             const auto  mon      = ctx.m_data.pMonitor.lock();
             const auto& captures = ctx.m_backdropCaptures;
             const auto  source   = !captures.empty() && captures.back().framebuffer ? captures.back().framebuffer : ctx.m_data.currentFB;
             if (!mon)
                 return {};
-            return copyBox(owner, mon->m_id, SHARP, dynamicPointerCast<CGLFramebuffer>(source), CRegion{footprintOf(read, levels, size).getExtents()}, levels);
+            return copyBox(owner, mon->m_id, role, dynamicPointerCast<CGLFramebuffer>(source), CRegion{footprintOf(read, levels, size).getExtents()}, levels);
         }
     }
 
@@ -472,6 +473,12 @@ void main() {
     static void resolveShapes(CGlassElement::SData& data) {
         if (!data.groups.empty() || data.shapes.empty())
             return;
+        for (auto& s : data.shapes)
+            if (s.fill != 0)
+                data.fills.push_back(s);
+        std::erase_if(data.shapes, [](const SGlassShape& s) { return s.fill != 0; });
+        if (data.shapes.empty())
+            return;
         data.groups = groupShapes(data.shapes, data.smoothK);
         data.resolved.clear();
         for (size_t gi = 0; gi < data.groups.size(); ++gi)
@@ -490,6 +497,23 @@ void main() {
     // physical-px box the glass draws into plus what its shader reads
     static CBox readBox(const SRect& b, double margin, double reach, float scale) {
         return CBox{b.x - margin - reach, b.y - margin - reach, b.w + 2 * (margin + reach), b.h + 2 * (margin + reach)}.scale(scale).round();
+    }
+
+    // Control Center panel blur (panel_blur): the box of the layer's shapes grown by PANEL_OUT, its blur radius ramping from 0
+    // at that edge to the full radius PANEL_RAMP inside (linear in radius, as Apple's BlurOpacity). Both fitted to the Mac's
+    // gap row over 4 pt stripes where it leaves the tile column (C2 cc-real-stripes, 140 px: rms 2.8 levels, 11.2 without
+    // the ramp); the radius itself to the gap between the tiles (rms 0.47). REFRACTION.md "Panel blur".
+    constexpr double PANEL_OUT = 44.8, PANEL_RAMP = 72.0;
+
+    static SRect panelBoxOf(const CGlassElement::SData& data) {
+        double x1 = 1e9, y1 = 1e9, x2 = -1e9, y2 = -1e9;
+        for (const auto& s : data.shapes) {
+            x1 = std::min(x1, s.box.x);
+            y1 = std::min(y1, s.box.y);
+            x2 = std::max(x2, s.box.right());
+            y2 = std::max(y2, s.box.bottom());
+        }
+        return {x1 - PANEL_OUT, y1 - PANEL_OUT, x2 - x1 + 2 * PANEL_OUT, y2 - y1 + 2 * PANEL_OUT};
     }
 
     // Apple's lod of a filter radius in backdrop texels (glass_background_base): max(0, log2(R < 2 ? R / 2 + 1 : R))
@@ -550,6 +574,8 @@ void main() {
             return; // everything is redrawn anyway
         for (size_t i = 0; i < data.groups.size(); ++i)
             g_claims.emplace_back(readBox(data.groups[i].box, m, reachOf(*data.params, data.resolved[i]), mon->m_scale), false);
+        if (data.panel > 0 && !data.shapes.empty())
+            g_claims.emplace_back(readBox(panelBoxOf(data), 0, 8, mon->m_scale), false);
 
         // a box added now can touch glass claimed earlier this frame: repeat until stable
         for (bool grew = true; grew;) {
@@ -589,10 +615,16 @@ void main() {
     }
 
     std::optional<CBox> CGlassElement::boundingBox(Render::CRenderContext&) {
-        if (m_data.shapes.empty())
+        if (m_data.shapes.empty() && m_data.fills.empty())
             return std::nullopt;
         const double m  = margin(m_data);
         double       x1 = 1e9, y1 = 1e9, x2 = -1e9, y2 = -1e9;
+        for (const auto& s : m_data.fills) {
+            x1 = std::min(x1, s.box.x);
+            y1 = std::min(y1, s.box.y);
+            x2 = std::max(x2, s.box.right());
+            y2 = std::max(y2, s.box.bottom());
+        }
         for (const auto& s : m_data.shapes) {
             x1 = std::min(x1, s.box.x - m);
             y1 = std::min(y1, s.box.y - m);
@@ -603,12 +635,14 @@ void main() {
     }
 
     std::vector<UP<IPassElement>> CGlassElement::draw(Render::CRenderContext& ctx) {
-        if (!ctx.m_data.pMonitor || m_data.shapes.empty() || m_data.alpha <= 0.001f)
+        if (!ctx.m_data.pMonitor || (m_data.shapes.empty() && m_data.fills.empty()) || m_data.alpha <= 0.001f)
             return {};
 
         stats::begin(stats::GLASS);
         if (!glassProgram().ensure(m_data.params->shaderPath) || !drawGlass(ctx))
             drawFallback(ctx);
+        else
+            drawFills(ctx);
         stats::end(stats::GLASS);
         return {};
     }
@@ -679,6 +713,10 @@ void main() {
             return true;
         readRegion.intersect(CBox{{}, mon->m_transformedSize});
 
+        // the panel blur goes into the framebuffer first, so the shapes' own copy below samples it (the Mac's tiles sample the
+        // panel's blur); without it (a backdrop capture is open, or it failed) the underlay stands in
+        const bool panelDrawn = m_data.panel > 0 && drawPanel(ctx, readRegion, levels);
+
         // the backdrop under every shape as Apple's blur pyramid (before binding the glass shader: the build uses its own
         // program); without it there is no glass, the fallback draws Hyprland's blur
         const auto pyr = backdropPyramid(ctx, m_data.owner, mon->m_transformedSize, readRegion, levels);
@@ -730,8 +768,8 @@ void main() {
         glUniform1f(u.ringStroke, r.ringStroke * scale);
         glUniform1f(u.ringRadius, r.ringRadius * scale);
 
-        glUniform1f(u.smoothK, m_data.smoothK * scale);
         glUniform1f(u.appearBlur, 10.f * scale); // SwiftUI materialize AppearanceSettings.blurRadius
+        glUniform1f(u.fillAmount, 0.f);
 
         g_pHyprOpenGL->blend(true);
         g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -753,11 +791,13 @@ void main() {
                 const auto& s   = m_data.shapes[g.members[k]];
                 boxes[4 * k]     = (s.box.x + s.box.w / 2) * scale - quad.x;
                 boxes[4 * k + 1] = (s.box.y + s.box.h / 2) * scale - quad.y;
-                boxes[4 * k + 2] = s.box.w * scale / 2;
-                boxes[4 * k + 3] = s.box.h * scale / 2;
-                info[2 * k]      = s.radius * scale;
+                // a pointer: half its square's side, and a negative radius tells the shader to turn it by 45 deg
+                boxes[4 * k + 2] = (s.pointer ? POINTER_SIDE : s.box.w) * scale / 2;
+                boxes[4 * k + 3] = (s.pointer ? POINTER_SIDE : s.box.h) * scale / 2;
+                info[2 * k]      = (s.pointer ? -POINTER_RADIUS : s.radius) * scale;
                 info[2 * k + 1]  = s.materialize;
             }
+            glUniform1f(u.smoothK, float(g.smoothK) * scale);
             glUniform1i(u.shapeCount, int(g.members.size()));
             glUniform4fv(u.shapeBox, GLsizei(g.members.size()), boxes.data());
             glUniform2fv(u.shapeInfo, GLsizei(g.members.size()), info.data());
@@ -765,7 +805,7 @@ void main() {
             glUniform1f(u.blurRadius, res.blurRadius);
             glUniform1f(u.blurK, 1.6f * scale * res.backdropScale);
             glUniform1f(u.baseLevel, baseLevelOf(res));
-            glUniform1f(u.underlay, float(m_data.underlay));
+            glUniform1f(u.underlay, panelDrawn ? 0.f : float(m_data.underlay));
             glUniform1f(u.refraction, res.refractionAmount * p.refractionScale * scale);
             glUniform1f(u.refractionHeight, res.refractionHeight * scale);
             glUniform2f(u.blurDist, res.blurDist0 * scale, r.blurDist1 * scale);
@@ -803,5 +843,157 @@ void main() {
         tex->setTexParameter(GL_TEXTURE_MIN_FILTER, tex->minFilter);
         tex->unbind();
         return true;
+    }
+
+    bool CGlassElement::drawPanel(Render::CRenderContext& ctx, const CRegion& readRegion, int levels) {
+        const auto mon = ctx.m_data.pMonitor.lock();
+        if (!mon || !ctx.m_backdropCaptures.empty() || m_data.shapes.empty())
+            return false;
+        auto&       prog  = glassProgram();
+        const auto& u     = prog.u;
+        const auto& p     = *m_data.params;
+        const float scale = mon->m_scale;
+        const SRect pb    = panelBoxOf(m_data);
+        const CBox  quad  = readBox(pb, 0, 0, scale);
+        CRegion     damage{ctx.m_data.damage};
+        damage.intersect(quad);
+        if (damage.empty() || quad.w < 1 || quad.h < 1)
+            return true; // the framebuffer still holds it from the last frame
+
+        // materialize: the panel comes and goes with its glass
+        float mat = 0;
+        for (const auto& s : m_data.shapes)
+            mat = std::max(mat, float(s.materialize));
+
+        // a full-resolution read (backdrop scale 1: the ramp's edge reads level 0, the backdrop itself, so it has no seam);
+        // at the full radius the level equals Apple's at scale 0.5 (lod(R) = log2 R for R >= 2)
+        const float blurK = 1.6f * scale;
+        const int   lv    = std::clamp(std::max(levels, int(std::ceil(appleLod(blurK * float(m_data.panel))))), 2, MAX_LEVELS);
+        CRegion     read{readRegion};
+        read.add(readBox(pb, 0, 8, scale));
+        read.intersect(CBox{{}, mon->m_transformedSize});
+        const auto pyr = backdropPyramid(ctx, m_data.owner, mon->m_transformedSize, read, lv, PANEL);
+        if (!pyr.tex)
+            return false;
+        const auto shader = g_pHyprOpenGL->useShader(prog.shader());
+        if (!shader)
+            return false;
+
+        g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
+        pyr.tex->bind();
+        glUniform1i(u.tex, 0);
+        glUniform1f(u.maxLevel, float(lv));
+        glUniform1i(u.linearLight, p.linearLight ? 1 : 0);
+        glUniform2f(u.outerThreshold, -1.f * scale, 0.f);
+        glUniform1f(u.roundingPower, 2.f); // the grown box's corners are the offset curve of its shapes' box: circles
+        glUniform1f(u.alpha, m_data.alpha);
+        glUniform1f(u.aberration, 0.f);
+        glUniform1f(u.pxPerPt, scale);
+        glUniform1f(u.shadowTint, 0.f);
+        glUniform1f(u.shadowSaturation, 1.f);
+        glUniform1f(u.ringOpacity, 0.f);
+        glUniform2f(u.ringOffset, 0.f, 0.f);
+        glUniform1f(u.ringStroke, 0.f);
+        glUniform1f(u.ringRadius, 1.f);
+        glUniform1f(u.smoothK, 0.f);
+        glUniform1f(u.appearBlur, 0.f);
+        glUniform1f(u.fillAmount, 0.f);
+
+        shader->setUniformMatrix3fv(SHADER_PROJ, 1, GL_TRUE, g_pHyprRenderer->projectBoxToTarget(ctx, quad).getMatrix());
+        glUniform2f(u.uvTopLeft, (quad.x - pyr.box.x) / pyr.box.w, (quad.y - pyr.box.y) / pyr.box.h);
+        glUniform2f(u.uvBottomRight, (quad.x + quad.w - pyr.box.x) / pyr.box.w, (quad.y + quad.h - pyr.box.y) / pyr.box.h);
+        glUniform2f(u.quadSize, quad.w, quad.h);
+        // the shape is 1 pt larger than the quad, so every drawn pixel is fully covered and the ramp starts at the quad's edge
+        const float hw = float(quad.w) / 2.f, hh = float(quad.h) / 2.f;
+        const float box[4]  = {hw, hh, hw + scale, hh + scale};
+        const float info[2] = {float((PANEL_OUT + 1) * scale), mat};
+        glUniform1i(u.shapeCount, 1);
+        glUniform4fv(u.shapeBox, 1, box);
+        glUniform2fv(u.shapeInfo, 1, info);
+        glUniform1f(u.blurRadius, float(m_data.panel));
+        glUniform1f(u.blurK, blurK);
+        glUniform1f(u.baseLevel, 0.f);
+        glUniform1f(u.underlay, 0.f);
+        glUniform1f(u.refraction, 0.f);
+        glUniform1f(u.refractionHeight, 1.f);
+        // opacity 0 at d = -1 pt (the quad's edge) to 1 at PANEL_RAMP inside it
+        glUniform2f(u.blurDist, -float(PANEL_RAMP + 1) * scale, -1.f * scale);
+        glUniform3f(u.blurAlpha, 1.f, 0.f, 0.f);
+        glUniform1f(u.outerOpacity, 0.f);
+        glUniform1f(u.outerAmount, 0.f);
+        glUniform1f(u.outerHeight, 0.f);
+        glUniform3f(u.blurFill, 0.f, 0.f, 0.f);
+        glUniform1f(u.bleedOpacity, 0.f);
+        glUniform1f(u.bleedHeight, 0.f);
+        glUniform1f(u.bleedAmount, 0.f);
+        glUniform1f(u.bleedLod, 0.f);
+        glUniform4f(u.bleedYcc, 0.f, 1.f, 1.f, 0.f);
+        glUniform4f(u.faceYcc, 0.f, 1.f, 1.f, 1.f); // identity face: blur only
+        glUniform4f(u.faceFill, 0.f, 0.f, 0.f, 0.f);
+        glUniform3f(u.keyYcc, 0.f, 1.f, 1.f);
+        glUniform2f(u.keySpread, 1.f, 1.f);
+        glUniform3f(u.highlight, 0.f, 0.f, 0.f);
+        glUniform2f(u.darkSpec, 0.f, 1.f);
+        glUniform1f(u.shadowOpacity, 0.f);
+        glUniform1f(u.shadowRadius, 1.f);
+        glUniform2f(u.shadowOffset, 0.f, 0.f);
+
+        g_pHyprOpenGL->blend(true);
+        g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        glBindVertexArray(shader->getUniformLocation(SHADER_SHADER_VAO));
+        damage.forEachRect([&ctx](const auto& rect) {
+            g_pHyprOpenGL->scissor(ctx, &rect, ctx.m_data.transformDamage);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        });
+        glBindVertexArray(0);
+        g_pHyprOpenGL->disableScissor();
+        pyr.tex->setTexParameter(GL_TEXTURE_MIN_FILTER, pyr.tex->minFilter);
+        pyr.tex->unbind();
+        return true;
+    }
+
+    // plus-lighter / plus-darker fills (Shape.hpp SGlassShape::fill) over what the glass drew: the glass shader's fill mode
+    // outputs amount x coverage, added to or subtracted from the framebuffer by the blend equation
+    void CGlassElement::drawFills(Render::CRenderContext& ctx) {
+        const auto mon = ctx.m_data.pMonitor.lock();
+        if (!mon || m_data.fills.empty())
+            return;
+        auto&       prog  = glassProgram();
+        const auto& u     = prog.u;
+        const float scale = mon->m_scale;
+        const auto  shader = g_pHyprOpenGL->useShader(prog.shader());
+        if (!shader || u.fillAmount < 0)
+            return;
+        glUniform1f(u.roundingPower, m_data.roundingPower.value_or(m_data.params->roundingPower));
+        glUniform1f(u.alpha, m_data.alpha);
+        glUniform1f(u.smoothK, 0.f);
+        glUniform1f(u.appearBlur, 10.f * scale);
+        glUniform1i(u.shapeCount, 1);
+        glBindVertexArray(shader->getUniformLocation(SHADER_SHADER_VAO));
+        g_pHyprOpenGL->blend(true);
+        for (const auto& f : m_data.fills) {
+            const CBox quad = CBox{f.box.x, f.box.y, f.box.w, f.box.h}.scale(scale).round();
+            CRegion    damage{ctx.m_data.damage};
+            damage.intersect(quad);
+            if (damage.empty() || quad.w < 1 || quad.h < 1)
+                continue;
+            shader->setUniformMatrix3fv(SHADER_PROJ, 1, GL_TRUE, g_pHyprRenderer->projectBoxToTarget(ctx, quad).getMatrix());
+            glUniform2f(u.quadSize, quad.w, quad.h);
+            const float box[4]  = {float(quad.w) / 2.f, float(quad.h) / 2.f, float(quad.w) / 2.f, float(quad.h) / 2.f};
+            const float info[2] = {float(f.radius * scale), float(f.materialize)};
+            glUniform4fv(u.shapeBox, 1, box);
+            glUniform2fv(u.shapeInfo, 1, info);
+            glUniform1f(u.fillAmount, float(f.fill > 0 ? FILL_LIGHTER : FILL_DARKER));
+            glBlendEquation(f.fill > 0 ? GL_FUNC_ADD : GL_FUNC_REVERSE_SUBTRACT);
+            g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE);
+            damage.forEachRect([&ctx](const auto& rect) {
+                g_pHyprOpenGL->scissor(ctx, &rect, ctx.m_data.transformDamage);
+                glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            });
+        }
+        glBlendEquation(GL_FUNC_ADD);
+        g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        glBindVertexArray(0);
+        g_pHyprOpenGL->disableScissor();
     }
 }

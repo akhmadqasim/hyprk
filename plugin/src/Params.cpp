@@ -49,6 +49,27 @@ namespace lg {
         return it == p.underlay.end() ? 0.0 : std::max(it->second, 0.0);
     }
 
+    int fillFor(const SParams& p, const std::string& ns) {
+        const auto it = p.fillLayers.find(ns);
+        return it == p.fillLayers.end() ? 0 : it->second;
+    }
+
+    std::unordered_map<std::string, int> parseFillMap(std::string_view s) {
+        std::unordered_map<std::string, int> out;
+        for (const auto& [ns, mode] : parseStringMap(s)) {
+            if (mode == "lighter")
+                out[ns] = 1;
+            else if (mode == "darker")
+                out[ns] = -1;
+        }
+        return out;
+    }
+
+    double panelBlurFor(const SParams& p, const std::string& ns) {
+        const auto it = p.panelBlur.find(ns);
+        return it == p.panelBlur.end() ? 0.0 : std::max(it->second, 0.0);
+    }
+
     const std::string& materialFor(const SParams& p, const std::string& ns) {
         const auto it = p.materials.find(ns);
         return it != p.materials.end() ? it->second : p.defaultMaterial;
