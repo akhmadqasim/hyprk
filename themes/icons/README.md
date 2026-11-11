@@ -31,8 +31,11 @@ after editing it run `node themes/icons/tools/gen-map.mjs && themes/icons/build-
 
 Files: `apps/<Name>-{1024,512,128}.png` (all 72 are real renditions from `Assets.car`, 1024 px only
 where Apple ships one, 15 apps), `system/` (folders, Trash, file types; `GenericFolderIcon` is macOS 27's
-run-time folder, back flap + front flap from CoreTypes' `Assets.car`, sRGB, built by `tools/build-folder.py`: it
-needs no tint, the other folders are still the older `.icns` art), `settings/` (real System
+run-time folder, back flap + front flap from CoreTypes' `Assets.car`, sRGB, built by `tools/build-folder.py`; the
+17 special folders (Documents, Downloads, Desktop, Applications, ...) are that folder with their SF Symbol embossed
+by IconServices' recipe, same tool; none needs a tint, and the Finder tints tagged folders at run time by
+IconServices' rule (`finder/src/sysicons.cpp`). `SmartFolderIcon`, `SystemFolderIcon` and `OpenFolderIcon` are
+still the older `.icns` art, and no folder has the Mac's drop shadow), `settings/` (real System
 Settings pane icons, `<pane>@<64|128>-<light|dark>.png`, see `panes.json`), `sf-symbols/` (SF Symbols
 rendered on macOS 27.2.1: `svg/`, `names.json`; `sf.js` is generated from them by `tools/gen-sf.mjs` and
 used by the shell and Finder through symlinks), `tools/` (`car.py` Assets.car reader, `build-apps.py`, `build-styles.py` + `iconstack.py` + `dmp2.py` +

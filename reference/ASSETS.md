@@ -376,11 +376,41 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
   (`reference/re/27.2.1/live/finder/icons-rendered/folder-generic@*`, light and dark are identical files), body rms,
   old file -> new: 16 pt 22.6 -> 6.9, 18 pt 20.7 -> 7.0, 32 pt 23.0 -> 6.0, 48 pt 22.8 -> 3.9, 64 pt 23.9 -> 2.8
   (-128) / 3.7 (-512), 77 pt 24.4 -> 2.1 / 2.9, with NO tint: a least-squares gain per channel is 1.00-1.05 at the top
-  and 0.96-1.00 at the bottom. Not built: tagged / accent-coloured folders and the embossed special folders.
-  IconServices makes them (`-[ISEmbossedFolder layerTreeForSize:scale:]` 0x1975b8f6c, `-[ISFolderRecipe
-  layerTreeForSize:scale:]` 0x1975b99d4, `+[IFColor folderColor]` 0x1975b8e84, `-[ISFolderIconConfiguration
-  resolvedTintColorForAppearance:]` 0x1975b4520); that code was not read, so the tint rule is unknown and the other
-  folder PNGs (Documents, Downloads, ...) are still the old art.
+  and 0.96-1.00 at the bottom.
+- Embossed and tinted folders (2026-11-11, decoded from the 27.2.1 dyld cache; addresses and the full filter chain
+  are in the header of `tools/build-folder.py` and in `finder/src/sysicons.cpp`):
+  * Layer tree, `-[ISFolderRecipe layerTreeForSize:scale:]` 0x1975b99d4: back flap, paper sheet, front flap, an
+    emoji text layer, an "Emboss Layer" (ISEmbossedEffect) with the symbol, and an ISDropShaddowEffect on the root
+    (offset (0, -s / 2), blur 2 s, s = size / 32, black 0.5). `-[ISEmbossedFolder layerTreeForSize:scale:]`
+    0x1975b8f6c is the older one-bitmap path (IconFoundation's `Folder` asset + emboss).
+  * Tint: `-[OKLChColor adjustForFolder]` 0x1975b98e0 on the tint colour (L += 0.23 (1 - L), L above the hue's cusp
+    is pulled to cusp + 0.4 (L - cusp), C = min(1.3 C, the sRGB gamut edge)), then CIColorMonochrome
+    (`ISMonochromeTintEffect` 0x1975e2114) on the back flap and the front flap, in linear sRGB:
+    luma < 0.5 ? 2 luma colour : max(colour, 1 - 2 (1 - luma)(1 - colour)). A tag's tint is its system colour
+    (`+[IFColor systemColorFromTagColorIndex:]` 0x1975e73ac: tag 1..7 = gray, green, purple, blue, yellow, red,
+    orange). `+[IFColor folderColor]` 0x1975b8e84 is CUIDesignLibrary colour 15 and only colours the emboss
+    symbol layer, whose colour the Solarium emboss filter does not use (only its alpha). The Finder ports the tint
+    (`finder/src/sysicons.cpp`); against the Mac's orange-tagged folder crop (converted from Display P3) the front
+    flap is within 2 levels (rms 2.9 at 64 pt, 3.2 at 16 pt) with systemOrange #FF8D28. The crop also shows the
+    white paper sheet between the flaps; when IconServices adds it was not read, so it is not drawn.
+  * Emboss: the symbol (ISFolderIconConfiguration.ISSymbolName, medium scale, regular weight, font size 180 at 512)
+    centred on hintedBadgeRect (144, 110.5, 224, 224 at 512), then `ISEmbossedEffect` 0x1975df7a0: inside the glyph
+    the folder keeps 0.7 of its linear light (Apple's renders: 0.693-0.700), plus a 2 px inner shadow and a 2 px
+    white rim below. `tools/build-folder.py` builds the 17 special folders this way under their old names
+    (Applications `appstore`, Burnable `burn`, Desktop `menubar.dock.rectangle`, Developer `hammer.fill`, Documents
+    `document`, Downloads `arrow.down.circle`, Group `person.2.fill`, Home `house.fill`, Library
+    `building.columns.fill`, Movie `film`, Music `music`, Pictures `photo`, Public `figure.walk.diamond`,
+    ServerApplications `appstore.circle.fill`, Sites `globe`, Users `person.crop.circle`, Utilities
+    `wrench.and.screwdriver.fill`; glyphs from CoreGlyphs / CoreGlyphsPrivate through `bvg.py`, rasterised by
+    rsvg-convert). Against Apple's renders through the Finder's provider, body rms old art -> new at 16 / 18 / 32 /
+    48 / 64 / 77 pt: Documents 17.5 17.3 18.8 17.3 18.0 17.3 -> 10.7 9.6 7.7 2.8 2.9 3.4, Applications 17.5 17.4
+    18.9 17.2 17.8 17.2 -> 11.2 7.7 7.5 2.4 2.4 3.3; the other 15 have no Apple render or Mac crop in the repo.
+    Glyph box at 77 pt: Documents 44.5 x 56.5 px for Apple's 44.5 x 56.7, Applications 55.9 x 49.3 for 56.1 x 49.5.
+  * Assumed or not built: the blur inside CoreUI's glow / shadow filters (taken as a Gaussian, sigma = radius);
+    the rim is drawn at the file's size (512 / 128 px), Apple draws it at the rendered size; the drop shadow;
+    `SmartFolderIcon` (ISEmbossedSmartFolder), `SystemFolderIcon` (ISOverlayEmbossedFolder, bitmap `macOSText`)
+    and `OpenFolderIcon` are still the older `.icns` art; dark-appearance tint colours not checked.
+  The 34 rebuilt PNGs are 3.0 MB smaller than the old ones (system/ 23.1 -> 20.1 MB).
 - `system/<Name>-512/128.png`: 257 `CoreTypes.bundle` icons (OS `/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources`) from the
   `.icns` at real 1024 px. Trash: `TrashIcon` (empty), `FullTrashIcon`. Folders: `GenericFolderIcon`, `OpenFolderIcon`, `ApplicationsFolderIcon`,
   `DesktopFolderIcon`, `DocumentsFolderIcon`, `DownloadsFolder`, `MovieFolderIcon`, `MusicFolderIcon`, `PicturesFolderIcon`, `HomeFolderIcon`,
