@@ -1,117 +1,286 @@
-// Static menu definitions. Items: {label, shortcut, action, disabled, submenu:true, items:[...]} or {sep:true}.
-// A submenu row opens its `items` (MenuDropdown.qml); a submenu row without items shows the chevron only.
-// Shortcut glyphs use the macOS modifier symbols.
+// Static menu definitions. Items: {label, shortcut, action, disabled, icon, checked, submenu:true, items:[...]} or
+// {sep:true}. A submenu row opens its `items` (MenuDropdown.qml); a submenu row without items must be disabled.
+// Shortcut glyphs use the macOS modifier symbols. `icon` = leading SF Symbol (Q-menubar-17).
+// No row is enabled without something behind it: every enabled row has an `action` or a submenu with items.
+// Actions are names MenuDropdown.trigger() runs: plain names ("close", "settings", …) and
+//   "keys:<MODS>,<key>"  the app's own shortcut, sent to the active window (hl.dsp.send_shortcut)
+//   "finder" / "finder:<location>"  a Finder window (at "recents:", "applications:", "home" or "xdg:<XDG dir>")
+//   "about-app:<name>", "spotlight:<mode>"
 .pragma library
 
 const SEP = { sep: true };
 
+// a row that runs `action`, or shows disabled when there is none
+function row(label, shortcut, action, extra) {
+    const r = { label: label };
+    if (shortcut) r.shortcut = shortcut;
+    if (action) r.action = action;
+    else r.disabled = true;
+    return extra ? Object.assign(r, extra) : r;
+}
+// a submenu row without content: disabled
+function sub(label, extra) { return Object.assign({ label: label, submenu: true, disabled: true }, extra || {}); }
+
+// Apple menu (Q-menubar-31, -17): About [laptopcomputer: not in our symbol set], System Settings [gear], App Store
+// [appstore]; the Option alternates are not built
 function apple(user) {
     return [
-        { label: "About This Computer", action: "about" },
+        row("About This Computer", "", "about"),
         SEP,
-        { label: "System Settings…", action: "settings" },
-        { label: "App Store…", disabled: true },
+        row("System Settings…", "", "settings", { icon: "gear" }),
+        row("App Store", "", null, { icon: "appstore" }),
         SEP,
-        { label: "Recent Items", submenu: true, disabled: true },
+        sub("Recent Items"),
         SEP,
-        { label: "Force Quit…", shortcut: "⌥⌘⎋", action: "forcequit" },
+        row("Force Quit…", "⌥⌘⎋", "forcequit"),
         SEP,
-        { label: "Sleep", action: "sleep" },
-        { label: "Restart…", action: "restart" },
-        { label: "Shut Down…", action: "shutdown" },
+        row("Sleep", "", "sleep"),
+        row("Restart…", "", "restart"),
+        row("Shut Down…", "", "shutdown"),
         SEP,
-        { label: "Lock Screen", shortcut: "⌃⌘Q", action: "lock" },
-        { label: "Log Out " + (user || "") + "…", shortcut: "⇧⌘Q", action: "logout" },
+        row("Lock Screen", "⌃⌘Q", "lock"),
+        row("Log Out " + (user || "") + "…", "⇧⌘Q", "logout"),
     ];
 }
 
+// ---------- Finder (reference/re/27.2.1/live/menubar/finder-menus-ax.txt, Q-menubar-17, -31) ----------
+// The dump is Finder frontmost on the desktop with no window: that is our state when no window has focus (`win`
+// false). With a hyprk Finder window focused (`win` true) the rows the Finder has a shortcut for send it.
+// f(label, shortcut, desktopAction, windowAction, extra): null = disabled in that state
+function finderMenus(win) {
+    const f = (label, shortcut, desk, inWin, extra) => row(label, shortcut, win ? inWin : desk, extra);
+    const go = (label, shortcut, loc, keys) => f(label, shortcut, "finder:" + loc, "keys:" + keys);
+    return {
+        "File": [
+            f("New Finder Window", "⌘N", "finder", "finder"),
+            f("New Folder", "⇧⌘N", "desktop-new-folder", "keys:CTRL SHIFT,n"),
+            f("New Folder with Selection", "⌃⌘N"),
+            f("New Smart Folder", ""),
+            f("New Tab", "⌘T"),
+            f("Open", "⌘O", null, "keys:CTRL,o"),
+            sub("Open With"),
+            f("Close Window", "⌘W", null, "close"),
+            SEP,
+            f("Get Info", "⌘I"),
+            f("Rename", ""),
+            f("Compress", ""),
+            f("Duplicate", "⌘D"),
+            f("Make Alias", "⌃⌘A"),
+            f("Quick Look", "⌘Y", null, "keys:CTRL,y"),
+            SEP,
+            f("Share…", "", null, null, { icon: "square.and.arrow.up" }),
+            f("Manage Shared Folder…", "", null, null, { icon: "person.2" }),
+            SEP,
+            f("Show Original", "⌘R"),
+            f("Add to Sidebar", "⌃⌘T"),
+            SEP,
+            f("Move to Trash", "⌘⌫", null, null, { icon: "trash" }),
+            f("Eject", "⌘E", null, null, { icon: "eject" }),
+            SEP,
+            f("Tags…", "", null, null, { icon: "tag" }),
+            f("Customize Folder…", ""),
+            SEP,
+            f("Print", "⌘P"),
+        ],
+        "Edit": [
+            f("Undo", "⌘Z"),
+            f("Redo", "⇧⌘Z"),
+            SEP,
+            f("Cut", "⌘X"),
+            f("Copy", "⌘C"),
+            f("Paste", "⌘V"),
+            f("Select All", "⌘A", null, "keys:CTRL,a"),
+            SEP,
+            f("Show Clipboard", "", "spotlight:clipboard", "spotlight:clipboard"),
+            SEP,
+            f("Search", "⌘F", "spotlight", "keys:CTRL,f", { icon: "magnifyingglass" }),
+            SEP,
+            sub("AutoFill"),
+            f("Start Dictation", ""),
+            f("Emoji & Symbols", ""),
+        ],
+        "View": [
+            f("as Icons", "⌘1", null, "keys:CTRL,1", { icon: "square.grid.2x2" }),
+            f("as List", "⌘2", null, "keys:CTRL,2", { icon: "list.bullet" }),
+            f("as Columns", "⌘3", null, "keys:CTRL,3", { icon: "rectangle.split.3x1" }),
+            f("as Gallery", "⌘4", null, "keys:CTRL,4", { icon: "squares.below.rectangle" }),
+            SEP,
+            f("Use Stacks", "⌃⌘0"),
+            sub("Sort By"),
+            f("Clean Up", ""),
+            sub("Clean Up By"),
+            SEP,
+            f("Show Tab Bar", "⇧⌘T"),
+            f("Show All Tabs", "⇧⌘\\"),
+            SEP,
+            f("Hide Sidebar", "⌃⌘S"),
+            f("Hide Preview", "⇧⌘P"),
+            SEP,
+            f("Hide Toolbar", "⌥⌘T"),
+            f("Show Path Bar", "⌥⌘P", null, "keys:CTRL ALT,p"),
+            f("Show Status Bar", "⌘/"),
+            SEP,
+            f("Customize Toolbar…", ""),
+            SEP,
+            f("Show View Options", "⌘J"),
+            f("Show Preview Options", ""),
+            SEP,
+            f("Enter Full Screen", "fn F", null, "fullscreen"),
+        ],
+        "Go": [
+            f("Back", "⌘[", null, "keys:CTRL,bracketleft"),
+            f("Forward", "⌘]", null, "keys:CTRL,bracketright"),
+            f("Enclosing Folder", "⌘↑"),
+            SEP,
+            go("Recents", "⇧⌘F", "recents:", "CTRL SHIFT,f"),
+            go("Documents", "⇧⌘O", "xdg:DOCUMENTS", "CTRL SHIFT,o"),
+            go("Desktop", "⇧⌘D", "xdg:DESKTOP", "CTRL SHIFT,d"),
+            go("Downloads", "⌥⌘L", "xdg:DOWNLOAD", "CTRL ALT,l"),
+            go("Home", "⇧⌘H", "home", "CTRL SHIFT,h"),
+            f("Computer", "⇧⌘C"),
+            f("AirDrop", "⇧⌘R"),
+            f("Network", "⇧⌘K"),
+            f("iCloud Drive", "⇧⌘I"),
+            f("Shared", "⇧⌘S"),
+            go("Applications", "⇧⌘A", "applications:", "CTRL SHIFT,a"),
+            f("Utilities", "⇧⌘U"),
+            SEP,
+            sub("Recent Folders"),
+            SEP,
+            f("Go to Folder…", "⇧⌘G"),
+            f("Connect to Server…", "⌘K"),
+        ],
+        "Window": windowMenu(win, true),
+        "Help": [row("Search", ""), row("Mac User Guide", ""), row("Tips for Your Mac", "")],
+    };
+}
+
+// Window menu: the Finder's rows (finder-menus-ax.txt) or the short list of other apps
+function windowMenu(win, finder) {
+    const w = (label, shortcut, action) => row(label, shortcut, win ? action : null);
+    const top = [
+        w("Minimize", "⌘M", "minimize"),
+        w("Zoom", "", "zoom"),
+        w("Fill", "fn⌃F", "zoom"),
+        w("Center", "fn⌃C", "center"),
+        SEP,
+        sub("Move & Resize"),
+    ];
+    if (!finder) return top.concat([SEP, row("Bring All to Front", "")]);
+    return top.concat([
+        sub("Full-Screen Tile"),
+        SEP,
+        row("Bring All to Front", ""),
+        row("Cycle Through Windows", "⌘`", "cycle"),
+        row("Remove Window from Set", ""),
+        SEP,
+        row("Show Previous Tab", "⌃⇧⇥"),
+        row("Show Next Tab", "⌃⇥"),
+        row("Move Tab to New Window", ""),
+        row("Merge All Windows", ""),
+        SEP,
+        row("Show Progress Window", ""),
+    ]);
+}
+
+// other apps: the common rows send the app's Linux shortcut (Ctrl for ⌘)
 const common = {
     "Edit": [
-        { label: "Undo", shortcut: "⌘Z" }, { label: "Redo", shortcut: "⇧⌘Z" }, SEP,
-        { label: "Cut", shortcut: "⌘X" }, { label: "Copy", shortcut: "⌘C" }, { label: "Paste", shortcut: "⌘V" },
-        { label: "Select All", shortcut: "⌘A" }, SEP,
-        { label: "AutoFill", submenu: true }, { label: "Start Dictation…", disabled: true }, { label: "Emoji & Symbols", shortcut: "fn E" },
+        row("Undo", "⌘Z", "keys:CTRL,z"), row("Redo", "⇧⌘Z", "keys:CTRL SHIFT,z"), SEP,
+        row("Cut", "⌘X", "keys:CTRL,x"), row("Copy", "⌘C", "keys:CTRL,c"), row("Paste", "⌘V", "keys:CTRL,v"),
+        row("Select All", "⌘A", "keys:CTRL,a"), SEP,
+        sub("AutoFill"), row("Start Dictation", ""), row("Emoji & Symbols", ""),
     ],
     "View": [
-        { label: "Show Tab Bar", disabled: true }, { label: "Show All Tabs", disabled: true }, SEP,
-        { label: "Show Sidebar", shortcut: "⌃⌘S" }, SEP, { label: "Enter Full Screen", shortcut: "fn F", action: "fullscreen" },
+        row("Show Tab Bar", ""), row("Show All Tabs", ""), SEP,
+        row("Show Sidebar", "⌃⌘S"), SEP, row("Enter Full Screen", "fn F", "fullscreen"),
     ],
-    "Window": [
-        { label: "Minimize", shortcut: "⌘M" }, { label: "Zoom", action: "zoom" }, { label: "Fill", shortcut: "fn⌃F" },
-        { label: "Center", shortcut: "fn⌃C" }, SEP, { label: "Move & Resize", submenu: true }, SEP,
-        { label: "Bring All to Front" },
-    ],
-    "Help": [{ label: "Search", disabled: true }, SEP, { label: "Help", shortcut: "⌘?" }],
+    "Window": windowMenu(true, false),
+    "Help": [row("Search", ""), SEP, row("Help", "⌘?")],
 };
 
-function fileMenu(newLabel) {
+// File menu of other apps; open = false: no Open… action (terminals)
+function fileMenu(newLabel, newKeys, open) {
     return [
-        { label: newLabel || "New Window", shortcut: "⌘N" }, { label: "Open…", shortcut: "⌘O" }, SEP,
-        { label: "Close Window", shortcut: "⌘W", action: "close" },
+        row(newLabel || "New Window", "⌘N", "keys:" + (newKeys || "CTRL,n")), row("Open…", "⌘O", open === false ? null : "keys:CTRL,o"), SEP,
+        row("Close Window", "⌘W", "close"),
     ];
 }
-
-const finder = {
-    titles: ["File", "Edit", "View", "Go", "Window", "Help"],
-    extra: {
-        "File": [{ label: "New Finder Window", shortcut: "⌘N" }, { label: "New Folder", shortcut: "⇧⌘N" },
-                 { label: "Open", shortcut: "⌘O" }, SEP, { label: "Close Window", shortcut: "⌘W", action: "close" }, SEP,
-                 { label: "Get Info", shortcut: "⌘I" }, SEP, { label: "Find", shortcut: "⌘F", action: "spotlight" }],
-        "Go": [{ label: "Back", shortcut: "⌘[" }, { label: "Forward", shortcut: "⌘]" }, SEP,
-               { label: "Recents", shortcut: "⇧⌘F" }, { label: "Documents", shortcut: "⇧⌘O" }, { label: "Desktop", shortcut: "⇧⌘D" },
-               { label: "Downloads", shortcut: "⌥⌘L" }, { label: "Home", shortcut: "⇧⌘H" }, { label: "Applications", shortcut: "⇧⌘A", action: "apps" }],
-    },
-};
+const shell = fileMenu("New Window", "CTRL SHIFT,n", false);
 
 // app id (lowercased, last segment) -> titles + overrides
 const apps = {
     "firefox": { titles: ["File", "Edit", "View", "History", "Bookmarks", "Tools", "Window", "Help"],
-                 extra: { "File": fileMenu("New Tab"), "History": [{ label: "Show All History", shortcut: "⇧⌘H" }],
-                          "Bookmarks": [{ label: "Bookmark Current Tab…", shortcut: "⌘D" }], "Tools": [{ label: "Downloads", shortcut: "⌘J" }] } },
-    "ghostty": { titles: ["File", "Edit", "View", "Window", "Help"], extra: { "File": fileMenu("New Window") } },
-    "terminal": { titles: ["Shell", "Edit", "View", "Window", "Help"], extra: { "Shell": fileMenu("New Window") } },
-    "kitty": { titles: ["Shell", "Edit", "View", "Window", "Help"], extra: { "Shell": fileMenu("New Window") } },
-    "texteditor": { titles: ["File", "Edit", "Format", "View", "Window", "Help"], extra: { "File": fileMenu("New"), "Format": [{ label: "Font", submenu: true }, { label: "Text", submenu: true }] } },
+                 extra: { "File": fileMenu("New Tab", "CTRL,t"), "History": [row("Show All History", "⇧⌘H", "keys:CTRL SHIFT,h")],
+                          "Bookmarks": [row("Bookmark Current Tab…", "⌘D", "keys:CTRL,d")], "Tools": [row("Downloads", "⌘J", "keys:CTRL SHIFT,y")] } },
+    "ghostty": { titles: ["File", "Edit", "View", "Window", "Help"], extra: { "File": shell } },
+    "terminal": { titles: ["Shell", "Edit", "View", "Window", "Help"], extra: { "Shell": shell } },
+    "kitty": { titles: ["Shell", "Edit", "View", "Window", "Help"], extra: { "Shell": shell } },
+    "texteditor": { titles: ["File", "Edit", "Format", "View", "Window", "Help"], extra: { "File": fileMenu("New"), "Format": [sub("Font"), sub("Text")] } },
     "settings": { titles: ["Edit", "View", "Window", "Help"], extra: {} },
 };
+const finderTitles = ["File", "Edit", "View", "Go", "Window", "Help"];
 
-// Finder desktop right-click menu. Actions are names handled by MenuDropdown.
+// Finder desktop right-click menu, as on 27.2.1 with Use Stacks off (screens/27.2.1/menubar/context-light.png shows
+// it with stacks on: Group Stacks By instead of Sort By and the Clean Up rows). No Ask Siri header (no Siri) and no
+// Paste Item (the clipboard holds no file items here).
 function desktop() {
     return [
-        { label: "New Folder", action: "desktop-new-folder" }, SEP,
-        { label: "Get Info", disabled: true }, SEP,
-        { label: "Change Wallpaper…", action: "settings" },
-        { label: "Edit Widgets…", action: "widgets" }, SEP,
-        { label: "Use Stacks", disabled: true },
-        { label: "Sort By", submenu: true, disabled: true },
-        { label: "Clean Up", disabled: true },
-        { label: "Clean Up By", submenu: true, disabled: true },
-        { label: "Show View Options", disabled: true },
+        row("New Folder", "", "desktop-new-folder"), SEP,
+        row("Get Info", ""), SEP,
+        row("Change Wallpaper…", "", "settings"),
+        row("Edit Widgets…", "", "widgets"), SEP,
+        row("Use Stacks", ""),
+        sub("Sort By"),
+        row("Clean Up", ""),
+        sub("Clean Up By"),
+        row("Show View Options", ""),
     ];
 }
 
-// the bold app-name menu
-function appMenu(name) {
+// the bold app-name menu. Finder (Q-menubar-31): About | Settings… | Empty Trash… | Services | Hide, Hide Others, Show All
+function appMenu(name, appId) {
+    if (isFinder(appId))
+        return [
+            row("About Finder", "", "about-app:Finder"), SEP,
+            row("Settings…", "⌘,"), SEP,
+            row("Empty Trash…", "⇧⌘⌫", "empty-trash"), SEP,
+            sub("Services"), SEP,
+            row("Hide Finder", "⌘H"), row("Hide Others", "⌥⌘H"), row("Show All", ""),
+        ];
     return [
-        { label: "About " + name }, SEP,
-        { label: "Settings…", shortcut: "⌘," }, SEP,
-        { label: "Hide " + name, shortcut: "⌘H" }, { label: "Hide Others", shortcut: "⌥⌘H" }, SEP,
-        { label: "Quit " + name, shortcut: "⌘Q", action: "close" },
+        row("About " + name, "", "about-app:" + name), SEP,
+        row("Settings…", "⌘,"), SEP,
+        row("Hide " + name, "⌘H"), row("Hide Others", "⌥⌘H"), SEP,
+        row("Quit " + name, "⌘Q", "close"),
     ];
 }
+
+function appKey(appId) { return String(appId || "").toLowerCase().split(".").pop(); }
+// the desktop (no app) and the hyprk Finder get the Finder's menus
+function isFinder(appId) { return !appId || appKey(appId) === "hyprk-finder"; }
 
 // menu bar title index -> items: 0 Apple, 1 app name, 2.. app menus
 function forIndex(index, appId, appName, user) {
     if (index === 0) return apple(user);
-    if (index === 1) return appMenu(appName);
+    if (index === 1) return appMenu(appName, appId);
     const m = forApp(appId)[index - 2];
     return m ? m.items : [];
 }
 
 function forApp(appId) {
-    const key = String(appId || "").toLowerCase().split(".").pop();
-    const spec = apps[key] || (appId ? { titles: ["File", "Edit", "View", "Window", "Help"], extra: { "File": fileMenu() } } : finder);
+    if (isFinder(appId)) {
+        const m = finderMenus(!!appId);
+        return finderTitles.map(t => ({ title: t, items: m[t] }));
+    }
+    const spec = apps[appKey(appId)] || { titles: ["File", "Edit", "View", "Window", "Help"], extra: { "File": fileMenu() } };
     return spec.titles.map(t => ({ title: t, items: (spec.extra && spec.extra[t]) || common[t] || [] }));
+}
+
+// "keys:CTRL SHIFT,n" -> { mods: "CTRL SHIFT", key: "n" }; null for other actions
+function keysOf(action) {
+    const m = /^keys:([^,]*),(.+)$/.exec(typeof action === "string" ? action : "");
+    return m ? { mods: m[1], key: m[2] } : null;
 }
 
 // ---------- keyboard and submenu geometry (MenuDropdown.qml, MAC-ANSWERS.md Q-menubar-23, -25) ----------

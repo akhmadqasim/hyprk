@@ -889,6 +889,56 @@ test("mode buttons start inside the field, end in place", () => {
         assert.equal(f.x, 1000 - 150 + 5);
         assert.equal(f.y, 800 - 6 - 100);
     });
+
+    // ---- menu content (finder-menus-ax.txt, Q-menubar-17, -31) ----
+    const labels = list => list.map(it => it.sep ? "---" : it.label);
+    const all = [];
+    for (const app of ["", "hyprk-finder", "firefox", "com.mitchellh.ghostty", "org.gnome.TextEditor", "kitty", "some.Other"]) {
+        for (let i = 0; i < 2 + M.forApp(app).length; i++) all.push([app, i, M.forIndex(i, app, "App", "me")]);
+    }
+    all.push(["desktop", 0, M.desktop()]);
+    test("menus: no enabled row without an action or a submenu with items", () => {
+        for (const [app, i, list] of all)
+            for (const it of list)
+                if (!it.sep && !it.disabled) assert.ok(it.action || M.opens(it), `${app || "desktop"} #${i} ${it.label}`);
+    });
+    test("menus: no leading, trailing or doubled separators", () => {
+        for (const [app, i, list] of all) {
+            assert.ok(!list[0].sep && !list[list.length - 1].sep, `${app} #${i}`);
+            list.forEach((it, k) => assert.ok(!(it.sep && list[k + 1] && list[k + 1].sep), `${app} #${i} at ${k}`));
+        }
+    });
+    test("Finder File menu: the Mac's 25 rows and 6 separators in order", () => {
+        const f = M.forApp("")[0];
+        assert.equal(f.title, "File");
+        assert.deepEqual(labels(f.items), ["New Finder Window", "New Folder", "New Folder with Selection", "New Smart Folder", "New Tab",
+            "Open", "Open With", "Close Window", "---", "Get Info", "Rename", "Compress", "Duplicate", "Make Alias", "Quick Look", "---",
+            "Share…", "Manage Shared Folder…", "---", "Show Original", "Add to Sidebar", "---", "Move to Trash", "Eject", "---",
+            "Tags…", "Customize Folder…", "---", "Print"]);
+    });
+    test("Finder menus: titles, row counts and separators like the AX dump (no window open)", () => {
+        assert.deepEqual(M.forApp("").map(m => m.title), ["File", "Edit", "View", "Go", "Window", "Help"]);
+        const rows = M.forApp("").map(m => [m.items.filter(it => !it.sep).length, m.items.filter(it => it.sep).length]);
+        assert.deepEqual(rows, [[23, 6], [11, 4], [19, 7], [18, 3], [14, 4], [3, 0]]);
+        assert.deepEqual(labels(M.forIndex(1, "", "Finder", "")), ["About Finder", "---", "Settings…", "---", "Empty Trash…", "---",
+            "Services", "---", "Hide Finder", "Hide Others", "Show All"]);
+        assert.equal(M.forIndex(0, "", "Finder", "me").filter(it => !it.sep).length, 10);
+    });
+    test("Finder menus: desktop state disables window rows, a Finder window enables them with its shortcuts", () => {
+        const byLabel = (app, t, l) => M.forApp(app).find(m => m.title === t).items.find(it => it.label === l);
+        assert.ok(byLabel("", "File", "Close Window").disabled);
+        assert.equal(byLabel("hyprk-finder", "File", "Close Window").action, "close");
+        assert.ok(byLabel("", "View", "as List").disabled);
+        assert.deepEqual(M.keysOf(byLabel("hyprk-finder", "View", "as List").action), { mods: "CTRL", key: "2" });
+        assert.equal(byLabel("", "Go", "Documents").action, "finder:xdg:DOCUMENTS");
+        assert.equal(byLabel("", "View", "as Icons").icon, "square.grid.2x2");
+        assert.equal(byLabel("", "File", "Move to Trash").icon, "trash");
+    });
+    test("keysOf: only keys: actions", () => {
+        assert.deepEqual(M.keysOf("keys:CTRL SHIFT,n"), { mods: "CTRL SHIFT", key: "n" });
+        assert.equal(M.keysOf("close"), null);
+        assert.equal(M.keysOf(() => 0), null);
+    });
 }
 
 console.log(`${pass} passed, ${fail} failed`);

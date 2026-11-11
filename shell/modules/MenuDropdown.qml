@@ -87,7 +87,28 @@ Item {
             action();
             return;
         }
+        // parameterised actions (menus.js): the app's own shortcut, a Finder location, an About box, a Spotlight mode
+        const keys = Menus.keysOf(action);
+        if (keys) {
+            Hyprland.dispatch(`hl.dsp.send_shortcut({ mods = "${keys.mods}", key = "${keys.key}", window = "activewindow" })`);
+            return;
+        }
+        const arg = String(action).replace(/^[^:]*:?/, "");
+        switch (String(action).split(":")[0]) {
+        case "finder": Apps.openFinder(arg); return;
+        case "about-app": Panels.showAlert({
+            icon: arg === "Finder" ? "hyprk-finder" : ((Apps.entryFor(Apps.appIdOf(Hyprland.activeToplevel)) || {}).icon || ""),
+            title: arg,
+            message: "",
+            buttons: [{ label: "OK", isDefault: true }],
+        }); return;
+        case "spotlight": if (arg) { SpotlightState.openIn(arg); return; } break;
+        }
         switch (action) {
+        case "empty-trash": Apps.confirmEmptyTrash(); break;
+        case "minimize": Hyprland.dispatch('hl.dsp.window.move({ workspace = "special:minimized" })'); break;
+        case "center": Hyprland.dispatch("hl.dsp.window.center()"); break;
+        case "cycle": Hyprland.dispatch("hl.dsp.window.cycle_next()"); break;
         case "settings": Apps.openSettings(); break;
         case "about": Panels.showAlert({
             icon: Distro.aboutIcon,

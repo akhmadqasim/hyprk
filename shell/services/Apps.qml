@@ -229,15 +229,19 @@ Singleton {
 
     // hyprk System Settings (settings/run.sh), GNOME Settings when it is missing.
     // env: extra variables, e.g. { HYPRK_SETTINGS_PANE: "wifi" } (Spotlight pane actions)
-    function runHyprkApp(id, env) {
+    // args: passed to the app (and its fallback); "xdg:<NAME>" becomes that XDG user dir, "home" the home folder
+    function runHyprkApp(id, env, args) {
         const app = hyprkApps[id];
         const run = Quickshell.shellDir + "/../" + app.run;
-        const alts = app.fallbacks.map(c => `command -v ${c} >/dev/null && exec ${c};`).join(" ");
+        const alts = app.fallbacks.map(c => `command -v ${c} >/dev/null && exec ${c} "$@";`).join(" ");
         const vars = Object.keys(env || {}).map(k => k + "=" + env[k]);
-        Quickshell.execDetached(["env"].concat(vars, ["sh", "-c", `[ -x "${run}" ] && exec "${run}"; ${alts} exit 1`]));
+        const fix = `case "$1" in xdg:*) set -- "$(xdg-user-dir "\${1#xdg:}")";; home) set -- "$HOME";; esac;`;
+        Quickshell.execDetached(["env"].concat(vars, ["sh", "-c", `${fix} [ -x "${run}" ] && exec "${run}" "$@"; ${alts} exit 1`, "sh"], args || []));
         markLaunching(id);
     }
     function openSettings() { runHyprkApp("org.hyprk.Settings"); }
+    // a Finder window, at a location the Finder takes ("recents:", "applications:", a path, "xdg:DOCUMENTS", "home")
+    function openFinder(loc) { runHyprkApp("hyprk-finder", {}, loc ? [loc] : []); }
 
     function openTrash() { Quickshell.execDetached(["gio", "open", "trash:///"]); }
     function openFolder(item) { Quickshell.execDetached(["xdg-open", Quickshell.env("HOME") + "/" + item.folder]); }
