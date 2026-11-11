@@ -58,12 +58,14 @@ hl.config({
         layout = "dwindle",
     },
     decoration = {
-        -- MAC-ANSWERS.md Q-windows-02: 16 pt continuous corner on every window type (it spans 24 pt). Hyprland's
-        -- superellipse fitted to the alpha edge of the 27.2.1 Finder/Settings corner (finder-toolbar-light.png,
-        -- rows 0..26 pt): rounding 36, power 5.05, RMS 0.19 pt (the old 16 / 2.8 was 1.8 pt, a circle 16 is 0.74).
-        -- Clients that draw their own corner use a 16 pt circle, which lies inside this shape (0.14 pt at most).
-        rounding = 36,
-        rounding_power = 5.05,
+        -- MAC-ANSWERS.md Q-windows-02: 16 pt continuous corner on every window type (it spans 24 pt). Hyprland draws
+        -- a superellipse of radius rounding * rounding_power / 2 (WindowPresentation::rounding(), "perceived
+        -- roundness"), in logical px times the monitor scale. The fit to the Finder corner is radius 36-39.5 pt,
+        -- power 5.05-5.75 (Q-windows-02); `rounding` is an integer, so 14 x 5.39 / 2 = 37.7 pt (RMS 0.004 pt against
+        -- the two fits). Edge inset at 2x rows 0/8/16/32: Mac 35/11/4/1 px, this 34/10/4/1 (36 / 5.05 drew a 90.9 pt
+        -- radius: 103/48/32/16). Clients that draw their own 16 pt circle stay inside it to 0.27 pt.
+        rounding = 14,
+        rounding_power = 5.39,
         active_opacity = 1.0,
         inactive_opacity = 1.0,
         -- Q-windows-01: pure black, alpha measured at 2/8/16/32 pt below, beside and above a Finder window. Hyprland's
