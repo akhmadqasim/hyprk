@@ -97,7 +97,7 @@ def time_rms(t, y, mac, step, shift):
 
 def compare(t, y, mac, step=16.667):
     mac = np.asarray(mac, float)
-    r, s, n = fit_shift(t, y, mac, step, lo=-100, hi=200)
+    r, s, n = fit_shift(t, y, mac, step, lo=-100, hi=400)   # shell IPC triggers land 45..200 ms late
     return {"rms": r, "shift_ms": s, "n": n, "time_rms_ms": time_rms(t, y, mac, step, s),
             "ours_ms": durations(t, y), "mac_ms": durations(np.arange(len(mac)) * step, mac)}
 
