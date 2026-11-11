@@ -199,7 +199,7 @@ ShellWindow {
             modePanel.item.deleteSelected(); event.accepted = true; return;
         }
         // Command alone: Cmd-0 back to all results, Cmd-R / Cmd-Return reveal the file in the Finder, Cmd-, Spotlight
-        // settings (SL.commandForKey; the other commands of the Mac's table have no hyprk counterpart yet)
+        // settings (SL.commandForKey; Cmd-D / Cmd-L and Cmd-H have no hyprk counterpart yet)
         if ((event.modifiers & (Qt.MetaModifier | Qt.ControlModifier | Qt.AltModifier | Qt.ShiftModifier)) === Qt.MetaModifier) {
             const c = SL.commandForKey(event.key);
             if (c === "clear" && mode !== "") { setMode(""); event.accepted = true; return; }
@@ -215,8 +215,9 @@ ShellWindow {
                 openUrl(c === "web" ? SL.webSearchUrl(input.text) : SL.wikipediaUrl(input.text));
                 Panels.close(); event.accepted = true; return;
             }
-            // Cmd-Y Quick Look: our Finder opens on the file's folder with it selected and Quick Look up (--quicklook)
-            if (c === "quicklook" && quickLookSel()) { event.accepted = true; return; }
+            // Cmd-Y Quick Look, Cmd-I Get Info: our Finder opens on the file's folder with it selected and Quick Look
+            // (--quicklook) or its Get Info (--info) up
+            if ((c === "quicklook" || c === "info") && finderSel(c === "info" ? "--info" : "--quicklook")) { event.accepted = true; return; }
         }
         const m = SL.modeForKey(event.key, event.modifiers & Qt.MetaModifier, event.modifiers & Qt.ControlModifier, event.modifiers & Qt.AltModifier);
         if (m !== "") { setMode(m === mode ? "" : m); event.accepted = true; return; }
@@ -239,12 +240,11 @@ ShellWindow {
     }
     // a URL in the default browser; HYPRK_URL_OPENER replaces xdg-open (tests stub it: never the host's browser)
     function openUrl(url) { Quickshell.execDetached([Quickshell.env("HYPRK_URL_OPENER") || "xdg-open", url]); }
-    function quickLookSel(): bool {
+    function finderSel(option): bool {
         const r = selectedRow();
-        const f = r && r.kind === "file" ? r.file : null;
-        if (!f || !f.path || f.isDir) return false;
-        const cut = f.path.lastIndexOf("/");
-        Apps.runHyprkApp("hyprk-finder", {}, [f.path.slice(0, cut) || "/", "--select", f.path.slice(cut + 1), "--quicklook"]);
+        const args = SL.finderArgs(r && r.kind === "file" ? r.file : null, option);
+        if (args.length === 0) return false;
+        Apps.runHyprkApp("hyprk-finder", {}, args);
         Panels.close();
         return true;
     }

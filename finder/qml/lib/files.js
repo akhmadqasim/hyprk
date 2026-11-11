@@ -21,6 +21,9 @@ function parentPath(p) {
     return n.slice(0, n.lastIndexOf("/")) || "/";
 }
 
+// Get Info's subject: the first selected item, else the folder itself (the Mac's Cmd-I with nothing selected)
+function infoTarget(selection, folder) { return selection && selection.length > 0 ? selection[0].path : folder; }
+
 function joinPath(dir, name) {
     return normalize(dir + "/" + name);
 }

@@ -36,6 +36,11 @@ test("normalize", () => {
     assert.equal(F.normalize("/.."), "/");
     assert.equal(F.normalize(""), "/");
 });
+test("infoTarget", () => {
+    assert.equal(F.infoTarget([{ path: "/a/x" }, { path: "/a/y" }], "/a"), "/a/x");
+    assert.equal(F.infoTarget([], "/a"), "/a");
+    assert.equal(F.infoTarget(null, "/a"), "/a");
+});
 test("parentPath", () => {
     assert.equal(F.parentPath("/home/u/Documents"), "/home/u");
     assert.equal(F.parentPath("/home"), "/");

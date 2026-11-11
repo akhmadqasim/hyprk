@@ -61,6 +61,13 @@ function commandForKey(key) {
 // Mac's default (Google; Safari's search engine setting is not decoded), Wikipedia's search page for Cmd-K
 function webSearchUrl(q) { return "https://www.google.com/search?q=" + encodeURIComponent(String(q || "").trim()); }
 function wikipediaUrl(q) { return "https://en.wikipedia.org/wiki/Special:Search?search=" + encodeURIComponent(String(q || "").trim()); }
+// our Finder on a file's folder with the file selected and one more option (--quicklook for Cmd-Y, --info for
+// Cmd-I); [] for no file or a folder
+function finderArgs(file, option) {
+    if (!file || !file.path || file.isDir) return [];
+    const cut = file.path.lastIndexOf("/");
+    return [file.path.slice(0, cut) || "/", "--select", file.path.slice(cut + 1), option];
+}
 // Cmd-C on a result: a file's path, a calculation's answer, else the row's title
 function copyText(row) {
     if (!row) return "";

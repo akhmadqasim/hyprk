@@ -465,6 +465,10 @@ test("Command shortcuts of the bar", () => {
     assert.equal(SL.copyText({ kind: "file", title: "n", file: { path: "/a/n" } }), "/a/n");
     assert.equal(SL.copyText({ kind: "calc", title: "42" }), "42");
     assert.equal(SL.copyText(null), "");
+    assert.deepEqual(SL.finderArgs({ path: "/h/u/a b.pdf" }, "--info"), ["/h/u", "--select", "a b.pdf", "--info"]);
+    assert.deepEqual(SL.finderArgs({ path: "/x" }, "--quicklook"), ["/", "--select", "x", "--quicklook"]);
+    assert.deepEqual(SL.finderArgs({ path: "/h/u/Docs", isDir: true }, "--info"), []);
+    assert.deepEqual(SL.finderArgs(null, "--info"), []);
 });
 test("query kept 8 min after close", () => {
     assert.ok(SL.keepsQuery(1000, 1000 + 7.9 * 60e3));

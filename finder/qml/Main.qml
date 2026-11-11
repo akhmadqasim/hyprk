@@ -65,9 +65,20 @@ Window {
             if (hit) fm.selectPaths([hit.path]);
         }
         if (startup.quicklook) quickLook();
+        if (startup.info) infoTimer.start();
         if (startup.panel) panelTimer.start();
     }
     Timer { id: panelTimer; interval: 300; onTriggered: win.openPanel(startup.panel) }   // after the first layout
+    // --info (Spotlight's Cmd-I): Get Info on the selection, its popover on the item's icon (else the window's
+    // middle, for the folder itself), after the first layout like --panel
+    Timer { id: infoTimer; interval: 300; onTriggered: win.showInfo() }
+    function showInfo() {
+        const path = Files.infoTarget(fm.selectedEntries(), fm.path);
+        const i = fm.entries.findIndex(e => e.path === path);
+        const icon = i >= 0 && viewLoader.item && viewLoader.item.iconItem ? viewLoader.item.iconItem(i) : null;
+        const p = icon ? icon.mapToItem(info, icon.width / 2, icon.height) : Qt.point(info.width / 2, info.height / 3);
+        info.show(path, p.x, p.y);
+    }
     // --panel: open a panel for reference screenshots (alert2 / alert3 are sample texts and do nothing)
     function openPanel(name) {
         if (name === "alert2")

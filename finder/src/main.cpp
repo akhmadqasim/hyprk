@@ -1,7 +1,8 @@
 // hyprk Finder: an original QML file manager styled after the macOS 27 Finder.
 //
 // Usage: hyprk-finder [dir|recents:|applications:] [--view icons|list|columns|gallery] [--select name]
-//                     [--quicklook] [--dark] [--shot out.png [--delay ms]]
+//                     [--quicklook] [--info] [--dark] [--shot out.png [--delay ms]]
+// --info opens Get Info on the selection (the folder when nothing is selected): Spotlight's Cmd-I.
 // --size, --pathbar, --inactive and --panel set up reference screenshots.
 // --shot renders the window, saves a PNG and quits (works with QT_QPA_PLATFORM=offscreen).
 
@@ -87,6 +88,7 @@ int main(int argc, char *argv[])
     const QCommandLineOption viewOpt(QStringLiteral("view"), QStringLiteral("icons|list|columns|gallery"), QStringLiteral("view"), QStringLiteral("icons"));
     const QCommandLineOption selectOpt(QStringLiteral("select"), QStringLiteral("Select this item name"), QStringLiteral("name"));
     const QCommandLineOption qlOpt(QStringLiteral("quicklook"), QStringLiteral("Open Quick Look on the selection"));
+    const QCommandLineOption infoOpt(QStringLiteral("info"), QStringLiteral("Open Get Info on the selection"));
     const QCommandLineOption darkOpt(QStringLiteral("dark"), QStringLiteral("Dark appearance"));
     const QCommandLineOption shotOpt(QStringLiteral("shot"), QStringLiteral("Save a screenshot and quit"), QStringLiteral("png"));
     const QCommandLineOption delayOpt(QStringLiteral("delay"), QStringLiteral("Screenshot delay"), QStringLiteral("ms"), QStringLiteral("1200"));
@@ -95,7 +97,7 @@ int main(int argc, char *argv[])
     const QCommandLineOption pathBarOpt(QStringLiteral("pathbar"), QStringLiteral("Show the path bar"));
     const QCommandLineOption inactiveOpt(QStringLiteral("inactive"), QStringLiteral("Draw the window as inactive"));
     const QCommandLineOption panelOpt(QStringLiteral("panel"), QStringLiteral("Open alert2|alert3|sheet|popover"), QStringLiteral("name"));
-    cli.addOptions({viewOpt, selectOpt, qlOpt, darkOpt, shotOpt, delayOpt, sizeOpt, pathBarOpt, inactiveOpt, panelOpt});
+    cli.addOptions({viewOpt, selectOpt, qlOpt, infoOpt, darkOpt, shotOpt, delayOpt, sizeOpt, pathBarOpt, inactiveOpt, panelOpt});
     cli.process(app);
 
     // Without a platform theme (offscreen, bare Hyprland) Qt only searches ":/icons".
@@ -138,6 +140,7 @@ int main(int argc, char *argv[])
         {QStringLiteral("view"), cli.value(viewOpt)},
         {QStringLiteral("select"), cli.value(selectOpt)},
         {QStringLiteral("quicklook"), cli.isSet(qlOpt)},
+        {QStringLiteral("info"), cli.isSet(infoOpt)},
         {QStringLiteral("dark"), cli.isSet(darkOpt)},
         // $HYPRK_STATE, as decided by the session (config/hypr/state-dir.sh); else the checkout's state/, like Settings
         {QStringLiteral("stateDir"), qEnvironmentVariableIsEmpty("HYPRK_STATE") ? QDir::cleanPath(resourceDir("ui", FINDER_UI_DIR) + QStringLiteral("/../state"))
