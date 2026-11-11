@@ -85,7 +85,7 @@ Cost (`stats = 1`, RX 6600 class GPU, MBA 2x, the 700 x 533 pt window moved ever
 0.16-0.17 ms per draw (p95 0.18); Hyprland's shadow, timed the same way in a scratch build that wrapped its
 `drawShadowInternal`, 0.09 ms average over both windows, p95 0.18 ms (the large one). Same order; nothing is drawn at rest
 (only damaged parts are redrawn, no texture or cache). The closing fade takes the shadow with the window as before (both are
-window decorations). Not checked on screen: the shadow during the close fade, zoom and full screen exit frames.
+window decorations). The close fade, zoom and full screen frames were checked on screen later (next section).
 
 ## Inner rim (judge #3 "not possible with Hyprland's border", 2026-11-11)
 
@@ -94,3 +94,30 @@ Q-windows-03: inside the 0.5 pt black rim a 1 pt white rim, alpha .10 (.08 dark 
 Dark, blank foot (36): 2 px just inside the border 36 -> 58 active, 54 inactive (36 + .10 / .08 x 219; the Mac's TextEdit bar
 40 -> 61 is the same formula). Shadow numbers unchanged with it on. Light: invisible over white content, as on the Mac.
 
+
+## Shadow and rim in motion, other surfaces, cost (2026-11-11, plugin session 6)
+
+Headless MBA 2x, blank foot 700 x 500 pt at 290,139, light, mcap per frame (the shadow read as 1 - frame / the same frame
+without it, or against the backdrop after the close).
+
+- **Close fade: fixed (plugin-motion 96fd560).** The shadow got darker while the window faded: plugin-motion's close blur
+  averaged its 13 taps with the 1/k over trick, exact for opaque pixels only; over the translucent shadow the alpha piled up.
+  4 pt below the window over a 100 backdrop (68 at rest): window alpha .73 / .47 / .30 read 53 / 71 / 82 (1.5-2x the faded
+  shadow); now, clean session, alpha .70 / .45 / .29 / .18 / .10: 78 / 86 / 92 / 95 / 97 (rest x alpha: 77.6 / 85.6 / 90.7 /
+  94.2 / 96.8), 8 pt beside 130 / 137 / 140 / 142 (130 / 135 / 138 / 140). The rim fades in the same snapshot.
+- **Unzoom (and zoom, the same element):** frames paired by window box with a run without shadow: 8 pt beside .155-.169,
+  16 pt below .236-.248 in every mid-flight frame vs .158 / .241 at rest; no detached or missing frame (the shadow is drawn
+  from the animated box each frame). A zoomed (maximised) window keeps its shadow, as on the Mac.
+- **Full screen:** no shadow and no rim (foot at 0,34 on MBA: strip 0, first column 36 = the client), as on the Mac. The
+  shadow is dropped when the full-screen state is set, at the start of the enter animation (not compared with a Mac
+  recording: none has the shadow over the transition).
+- **Other surfaces:** layer surfaces and xdg_popups (GTK popovers and tooltips, Qt menus, Finder's context menu glass) are
+  not windows and get neither (gnome-calculator's main menu: GTK's own outline only, no box behind it); X11 override-redirect
+  windows (X menus, tooltips) and `suggestsNoBorder` windows are skipped by Hyprland's decoration pass; Quick Look has
+  `no_shadow` (its own drawn shadow stays single) and that also removes the rim. Dialogs (toplevels with a parent) get both,
+  as NSAlert / sheet windows do. Xwayland toplevels (xcalc) get shadow and rim, no title bar (the plugin cannot read
+  `_MOTIF_WM_HINTS`; Hyprland does not parse them, so `titlebar = auto` would also decorate X clients that draw their own).
+- **Cost: fixed (b819914).** The rim's quad covered the whole window to light its 1 pt edge, and the shadow's quad its
+  inside: both now skip the frame deeper than the corner radius (pixel-identical). Four foot windows, GPU per frame for all
+  shadows and rims: Control Center open/close 0.88 -> 0.40 ms (p95 1.06 -> 0.42), window drag 0.55 -> 0.31, Dock sweep 0.45
+  -> 0.17, Mission Control 0.56 -> 0.33; nothing at rest. 4K 1.5x, one window, whole output redrawn: 0.07 ms per frame.

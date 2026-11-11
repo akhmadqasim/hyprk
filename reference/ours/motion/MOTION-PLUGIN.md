@@ -21,6 +21,8 @@ pixels.
 | HUD appear | `hud-appear-fit.json` alpha track | dips 0.70 -> 0.51 -> 0.79 (~400 ms) and 0.30 -> 0.29 (~265 ms): soft rimless glass | monotonic | 0.037 / 25 ms -> 0.026 / 15..24 ms | 80fd49d |
 | HUD appear, judge #3 gap 8 | `hud-appear-fit.json` alpha track | 0.55 -> 0.76 in one frame at ~400 ms (3 of 3) | no step: .51 .56 .60 .65 .70 .75 .78 (with the Glass.qml hand-off, scratch shell copy) | 0.048-0.052 -> 0.046 / 28 ms (the rest: our s^2 glass starts slower than the Mac, .01 .03 .05 .08 vs .02 .06 .12 .18) | 016799b + shell hand-off |
 | Window close (judge #3 gap 11) | R2 TextEdit alpha 1, .71, .44, .27, .16, .09, .05, .03 | first frame 0.11-0.13 (bezier started at the close, phase-dependent), then .44 .65 .79 .88 .93 .97 1 | .28 .56 .73 .84 .91 .95 .97 .98 in 5 of 5 runs | 0.012-0.028 / 1.4-3.2 ms -> 0.006-0.010 / 0.3-0.8 ms (one run 0.020, fit shift) | this change |
+| HUD appear, session 8 (plugin trace) | `hud-appear-fit.json` alpha track | .51 -> .61 step reported after 016799b + 87022d7 | monotonic, steps <= 0.052 (neighbours .037-.050) in 5 of 8 runs; the 3 others each lost one shell frame (the opacity marker skips a value, e.g. .7418 -> .8105), a 0.093-0.101 step that is the client, not the plugin | 0.022-0.029 / 15-19 ms, 2-98 % 516-533 ms (Mac 483) | no change needed |
+| Window close, shadow (session 8) | the shadow fades with the window | shadow 1.5-2x too dark while fading (close blur over translucent pixels) | follows the window alpha (SHADOW.md) | 4 pt below: 78 / 86 / 92 vs 77.6 / 85.6 / 90.7 expected | 96fd560 |
 | Control Center open | REA spring response 0.25, critically damped | last 3.5 % pops at ~470 ms, 2-98 % 392 ms | (shell hand-off below, verified with a scratch copy) 254 ms, no pop | 0.021 / 16 ms -> 0.0045 / 1.8 ms | hand-off |
 
 ## Causes and fixes
@@ -66,6 +68,23 @@ window's blur-behind (alpha sqrt(a)), so the numbers are over flat white; Finder
 Mac has the same phase spread in its first frame, TextEdit's 0.71 is the middle. Zoom / unzoom re-measured with the
 change (foot, black, window-rect area metric): zoom 0.011-0.014 / 2.8-3.4 ms, 267 ms; unzoom 0.012 / 3.8-3.9 ms, 283 ms
 (unchanged code path). Open: one frame, unchanged.
+
+**HUD appear, session 8.** `hyprctl liquidglass trace hyprk-hud FILE` logs, per draw, the layer's 1-px rects, the opacity
+marker and the decoded box, radius, materialize and shadow flag; joined per frame with mcap (`hud-appear-s8-*` in the CSV).
+With the shell's sub-point edges the box grows in 1/16 pt steps (276.267 x 59.400 -> 306.875 x 66.000, radius = half the
+height every frame, no size-class snap: the HUD stays on one recipe), materialize stays 1, the shadow marker is decoded in
+every frame and the glass fades only by the opacity marker (= shownness^2). No frame repeats a geometry. The only steps
+above 0.052 came with a skipped marker value (a dropped qs frame under host load). Left: the tail is slower than the
+Mac's (0.95 at ~455 ms after the start vs the Mac's 0.98): the glass runs at s^2 of the shell's spring (MOTION-MEASURED
+session 7: s fits the appear better, s^2 the dismiss; shell decision), and the last 1/16 pt edge steps add 0.018-0.025 each
+(the Mac's own tail steps are 0.024-0.031).
+
+**Client minimize (session 8).** Hyprland drops `xdg_toplevel.set_minimized` and X11 iconify, and lists only FULLSCREEN and
+MAXIMIZE in `wm_capabilities`, so GTK 4 drew its yellow light disabled. plugin-motion (`Minimize.cpp`, `client_minimize`,
+default 1) re-sends the capabilities with MINIMIZE at map (with a toplevel configure: an xdg_surface configure alone left GTK
+with empty states, drawn inactive with its CSD inset) and moves a requesting window to `special:minimized`, so the genie plays
+as for the title bars, Finder and Settings. gnome-calculator: yellow light enabled, click -> special:minimized, genie ~400 ms.
+The plugin title bar's green light now enters full screen and Option-click zooms (it zoomed either way).
 
 ## Real app windows (Qt: Finder, Settings), 2026-11-11 follow-up
 

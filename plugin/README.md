@@ -217,6 +217,11 @@ A screenshot with `full_damage = 1` was pixel-identical to the default (test 202
 `test/run.sh shot NAME` writes `/mnt/code/hyprk/reference/ours/plugin-NAME.png`, `reload` swaps in a new build,
 `stop` exits and kills only this instance. Set `LG_WALLPAPER=TahoeDark` before `start` for the dark wallpaper.
 
+`hyprctl liquidglass trace NS FILE` appends, on every draw of layer NS, its 1-px region rects (marker holes), the opacity
+marker and each decoded shape (box, radius, materialize, shadow flag) to FILE; `hyprctl liquidglass trace` stops. Join it with
+an mcap capture by time (both CLOCK_MONOTONIC) to tell a plugin step from a client one (the HUD check in
+reference/ours/motion/MOTION-PLUGIN.md).
+
 ## Performance
 
 Each glass element copies the backdrop under its own boxes (the extents of what it reads, aligned to its deepest
@@ -225,13 +230,15 @@ each a quarter of the one above); an element is only drawn when something under 
 not used (until 2026-11-11 every element also ran it and copied its result: 2.5x the GPU time). A copy shared by all glass of a frame (taken once, at the first element) was tried in iteration 4:
 it was ~13 % cheaper but showed stale pixels in the real shell's Control Center, because the framebuffer
 under a later layer is not final at an earlier element's turn, so it was dropped.
-`plugin:liquidglass:stats = 1` turns on GPU timestamp queries; `hyprctl liquidglass` prints the averages
-(`hyprctl liquidglass reset` clears them). `test/bench.sh` runs the real shell on a headless 3840x2160 @ 1.5
+`plugin:liquidglass:stats = 1` turns on GPU timestamp queries; `hyprctl liquidglass` prints the averages per element and
+the sums per frame (`hyprctl liquidglass reset` clears them). `test/bench.sh` runs the real shell on a headless 3840x2160 @ 1.5
 output (the user's 4K 150 %) with Dock, Control Center and a banner over a terminal that redraws every
 frame. Result on this PC (AMD RDNA2, the RX 6600 class GPU), 6 s each, 2026-11-10:
 
 | Configuration | Glass GPU time per element (avg / p95) | Whole frame GPU (avg / p95) |
 |---|---|---|
+| test/bench.sh 4K @ 1.5, whole output redrawn (`full_damage`), 2026-11-11 session 6 | 0.13 / 0.39 ms; per frame 0.52 / 0.63 | 11.9 / 16.6 ms (plugin off 12.4 / 18.5) |
+| MBA 2x, 4 foot windows, per frame (glass / window shadow + rim), session 6 | CC open/close 0.73 / 0.40, drag 0.16 / 0.31, Dock sweep 0.14 / 0.17, Mission Control 0.20 / 0.33 ms; at rest nothing | - |
 | Apple pyramid, no Hyprland blur (current code; MBA 2560x1664 @ 2, CC open/close + HUD, 2026-11-11) | 0.17-0.22 / 0.29-0.37 ms | 20.2 / 16.9-17.0 ms |
 | Hyprland blur + sharp copy (before, same run and session) | 0.49-0.54 / 0.71-0.87 ms | 20.2-20.3 / 17.0-19.5 ms |
 | per-element copy (run 04:58, 4K bench) | 0.64 / 1.08 ms | 14.4 / 22.7 ms |

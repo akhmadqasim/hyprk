@@ -131,6 +131,13 @@ BlurOpacity0..2 carry it, no new code). Model (check_model's port of the tile ro
 
 The panel box grows from 44.8 to 54 pt outside the tiles (a few more pixels redrawn while the CC changes; nothing at rest).
 
+`apple_model` (tools/check_model.py section 5) now models this ramp instead of a uniform panel blur (efd7bd8): the gap row and
+the Display tile's row are read from the full-resolution pyramid at the ramped radius (constants read from GlassElement.cpp,
+the tile's left edge PANEL_OUT inside the box edge). Model: gap between the tiles rms 0.46 (unchanged), gap row leaving the
+tile column rms 4.35 over 140 px (checked < 5; on screen 2.27, the 1-D model has no panel corner), rounded-end centre row
+rms 1.18 (uniform blur 1.37), ripple at depth 2..28 pt 7.7 vs the Mac's 10.0 (checked within 2.5; on screen 9.0), tile 15 pt
+below its top 7.7 vs 7.9.
+
 ## Other glass checks (same session)
 
 - **Finder context menu (plugin `popup_classes`):** before, the client's translucent tint over Hyprland's popup blur; after,
