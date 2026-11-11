@@ -48,6 +48,11 @@ Item {
         // _Glass.regular's drop shadow for its size instead of the layer recipe's (plugin 53efda0)
         Region { id: shadowHole; intersection: Intersection.Subtract; width: 0; height: 1 }
         Region { id: pointerHole; intersection: Intersection.Subtract; width: 0; height: 1 }
+        // sub-point edges (plugin/README.md "Sub-point edges"): the region is whole points, so a glass that scales
+        // (HUD appear 0.9 -> 1) grew in 1 pt steps and the last one lit the final rim rows at once (HUD alpha 0.55 ->
+        // 0.76, judge #3). Rows mid - 4 (left / right) and mid - 5 (top / bottom) carry the true edges
+        Region { id: edgeX; intersection: Intersection.Subtract; width: 0; height: 1 }
+        Region { id: edgeY; intersection: Intersection.Subtract; width: 0; height: 1 }
     }
     function remeasure() { placeHole(); }
     // the shape and its marker holes from one rounded rect: corners rounded to whole points
@@ -65,6 +70,19 @@ Item {
         pointerHole.x = px + 1;
         pointerHole.y = py;
         pointerHole.width = (root.pointer && root.on && w >= 3) ? 1 : 0;
+        // each edge's offset from the region's, -0.5..0.5 pt, in n steps; the pair coded as one column i1 n + i2
+        const n = Math.min(17, Math.floor(Math.sqrt(Math.max(0, w - 3))));
+        const edges = root.on && !root.pointer && n >= 2 && h >= 12;
+        if (edges) {
+            const lv = d => Math.round((Math.max(-0.5, Math.min(0.5, d)) + 0.5) * (n - 1));
+            const base = px + Math.floor(w / 2) - Math.floor(n * n / 2);
+            edgeX.x = base + lv(q.x - px) * n + lv(e.x - (px + w));
+            edgeX.y = py + Math.floor(h / 2) - 4;
+            edgeY.x = base + lv(q.y - py) * n + lv(e.y - (py + h));
+            edgeY.y = py + Math.floor(h / 2) - 5;
+        }
+        edgeX.width = edges ? 1 : 0;
+        edgeY.width = edges ? 1 : 0;
         if (materialize >= 1 || root.pointer || !root.on || w < 4 || h < 2) {
             hole.width = 0;
             return;
