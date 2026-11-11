@@ -13,6 +13,8 @@ ShellRoot {
         implicitHeight: Theme.window.height
         minimumSize: Qt.size(Theme.window.minWidth, Theme.window.minHeight)
         color: "transparent"
+        // icons are decoded and drawn on this window's real pixel grid (controls/PaneIcon.qml)
+        Binding { target: Theme; property: "dpr"; value: win.devicePixelRatio }
 
         SettingsApp {
             anchors.fill: parent

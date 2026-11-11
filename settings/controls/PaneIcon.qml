@@ -23,11 +23,15 @@ Item {
         size: pi.size / body               // icon body = the pane icon size
         source: pi.imageSource
         style: pi.style || "default"
+        dpr: pi.dpr
     }
     // The PNG is the whole icon canvas: the tile body is 104 of 128 px (12..116), the rest is its shadow.
     // Drawn so the body is `size`, like the glyph tile; the 64 px file up to 64 device px, else the 128 px one.
     readonly property real art: size * 128 / 104
-    readonly property real artPx: Math.ceil(art * Screen.devicePixelRatio)
+    // the window's real ratio (1.6 on a fractional output, where Screen.devicePixelRatio says 2), as Finder passes
+    // its display.dpr: the art is decoded at the pixels it is drawn on
+    readonly property real dpr: Theme.dpr > 0 ? Theme.dpr : Screen.devicePixelRatio
+    readonly property real artPx: Math.ceil(art * dpr)
     // Measured on 27.2.1: style Default shows the coloured light tiles also in Dark Mode (the -default-dark files are
     // byte-identical to -default-light); dark tiles only with style Dark (the same in both appearances); Clear and
     // Tinted differ between light and dark. Tinted is rendered with the default (blue) accent, it does not follow ours.

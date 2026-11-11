@@ -20,6 +20,9 @@ QtObject {
     // stronger secondary text, and no transparency (macOS turns that on with it)
     property bool increaseContrast: false
     property bool compositorBlur: false        // set by AppState from Backend
+    // the window's real device pixel ratio (shell.qml, Quickshell); 0 = unknown: Screen.devicePixelRatio, which is the
+    // next whole number on a fractional output (2 at scale 1.6)
+    property real dpr: 0
     property bool reduceMotion: false          // set by AppState (Accessibility > Motion)
     property real glassTint: 0.5               // set by AppState (Appearance > Liquid Glass), for HyprK Tokens
     readonly property bool translucent: compositorBlur && !reduceTransparency && !increaseContrast
