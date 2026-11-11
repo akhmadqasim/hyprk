@@ -33,21 +33,58 @@ ShellWindow {
     // (Theme.anim.menuBarFullscreen*; the Mac's curve is not decoded: CA's default ease-in-ease-out)
     readonly property var hyprMonitor: Hyprland.monitorFor(screen)
     readonly property bool fullscreen: hyprMonitor && hyprMonitor.activeWorkspace ? hyprMonitor.activeWorkspace.hasFullscreen : false
+    // Full screen below the bar strip (plugin-motion fullscreen_top: the notched Air keeps the 34 pt strip, black,
+    // Q-menubar-33): the pointer at the top edge shows the titles and status items in place on the black and they go
+    // when it leaves the bar ("peek"). Whether the window is below a strip is read from its top edge once per full
+    // screen change; a true full screen (other outputs, not measured on the Mac) shows nothing.
+    property bool strip: false
+    property bool peek: false
+    readonly property bool peeking: fullscreen && strip && (peek || (Panels.open === "menu" && Panels.activeScreen === screen))
+    function readStrip() {
+        const ws = hyprMonitor ? hyprMonitor.activeWorkspace : null;
+        const w = fullscreen && ws ? ws.toplevels.values.find(t => t.lastIpcObject && t.lastIpcObject.fullscreen > 0) : null;
+        const at = w ? w.lastIpcObject.at : null;
+        strip = !!at && at[1] - hyprMonitor.y >= height - 1;
+    }
+    Connections {
+        target: bar.fullscreen ? Hyprland : null
+        function onRawEvent(event: HyprlandEvent): void { if (event.name === "fullscreen") stripRead.restart(); }
+    }
+    Timer { id: stripRead; interval: 50; onTriggered: { Hyprland.refreshToplevels(); Qt.callLater(bar.readStrip); } }
     property real fsAlpha: fullscreen ? 0 : 1
-    onFullscreenChanged: {
+    function fade(to, ms, linear) {
         fsAnim.stop();
-        fsAnim.to = fullscreen ? 0 : 1;
-        fsAnim.duration = Theme.ms(fullscreen ? Theme.anim.menuBarFullscreenOut : Theme.anim.menuBarFullscreenIn);
+        fsAnim.to = to;
+        fsAnim.duration = Theme.ms(ms);
+        fsAnim.easing.type = linear ? Easing.Linear : Easing.BezierSpline;
         fsAnim.start();
+    }
+    property bool peeked: false   // shown on the strip at least once in this full screen (white titles from then on)
+    onFullscreenChanged: {
+        peek = false;
+        peeked = false;
+        if (fullscreen) stripRead.restart(); else strip = false;
+        fade(fullscreen ? 0 : 1, fullscreen ? Theme.anim.menuBarFullscreenOut : Theme.anim.menuBarFullscreenIn, false);
+    }
+    onPeekingChanged: if (fullscreen) {
+        if (peeking) peeked = true;
+        fade(peeking ? 1 : 0, peeking ? Theme.anim.menuBarPeekIn : Theme.anim.menuBarPeekOut, true);
     }
     NumberAnimation { id: fsAnim; target: bar; property: "fsAlpha"; easing.type: Easing.BezierSpline; easing.bezierCurve: [0.42, 0, 0.58, 1, 1, 1] }
     Binding { target: bar.contentItem; property: "opacity"; value: bar.fsAlpha }
-    WlrLayershell.layer: fullscreen && fsAlpha > 0 ? WlrLayer.Overlay : WlrLayer.Top
+    // on Overlay for the whole full screen, taking input in its top 1 pt row until it shows: layer and input region
+    // are sent with a frame, and nothing is drawn once it has faded out (whether there is a strip is known later)
+    WlrLayershell.layer: fullscreen ? WlrLayer.Overlay : WlrLayer.Top
+    inputMask: fullscreen && !peeking ? edgeRow : null
+    Region { id: edgeRow; width: bar.width; height: 1 }
+    HoverHandler { onHoveredChanged: bar.peek = hovered && bar.fullscreen && bar.strip }
 
     readonly property string appId: Apps.appIdOf(Hyprland.activeToplevel)
     readonly property var appMenus: Menus.forApp(appId)
-    readonly property color fg: Theme.color.menuBarText          // titles
-    readonly property color statusFg: Theme.color.menuBarStatusText   // status glyphs and the clock
+    // on the black full-screen strip the dark-wallpaper colours (white titles)
+    readonly property bool onBlack: fullscreen && peeked
+    readonly property color fg: onBlack ? "#FFFFFF" : Theme.color.menuBarText          // titles
+    readonly property color statusFg: onBlack ? Qt.rgba(1, 1, 1, 0.9) : Theme.color.menuBarStatusText   // status glyphs and the clock
     // 12/24h and date order follow the time locale like macOS (LC_ALL > LC_TIME > LANG)
     readonly property var clockStyle: Clock.styleFor(Quickshell.env("LC_ALL") || Quickshell.env("LC_TIME") || Quickshell.env("LANG"))
 

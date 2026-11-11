@@ -727,6 +727,11 @@ Singleton {
         readonly property int fullscreenSlide: 500
         readonly property int menuBarFullscreenIn: 500
         readonly property int menuBarFullscreenOut: 150
+        // full screen on a notched output (the window below the black 34 pt strip): the pointer at the top edge shows
+        // the titles and status items in place on the black, roughly linear over 0.15 s; leaving the bar takes them
+        // away over 0.17 s; no dwell either way (Q-menubar-33, 60 fps clip)
+        readonly property int menuBarPeekIn: 150
+        readonly property int menuBarPeekOut: 170
         readonly property int dockRevealDelay: 200
         readonly property int dockHideDelay: 30
         // a click on a slider track springs the shown value to the click point, then drags follow 1:1
