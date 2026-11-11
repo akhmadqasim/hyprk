@@ -65,6 +65,41 @@ namespace motion {
         return out;
     }
 
+    double genieArea(const Rect& window, const Rect& target, double p) {
+        const auto rows = genieRows(window, target, p, 64);
+        double     a    = 0;
+        for (size_t i = 0; i + 1 < rows.size(); ++i)
+            a += (rows[i + 1].y - rows[i].y) * ((rows[i].right - rows[i].left) + (rows[i + 1].right - rows[i + 1].left)) * 0.5;
+        return std::clamp(a / std::max(1.0, window.w * window.h), 0.0, 1.0);
+    }
+
+    double easeInOut(double x) {
+        x = std::clamp(x, 0.0, 1.0);
+        // x(s) = 3(1-s)^2 s 0.42 + 3(1-s) s^2 0.58 + s^3 is monotonic: bisect s, then y(s)
+        double lo = 0, hi = 1;
+        for (int i = 0; i < 40; ++i) {
+            const double s  = (lo + hi) * 0.5;
+            const double xs = 3 * (1 - s) * (1 - s) * s * 0.42 + 3 * (1 - s) * s * s * 0.58 + s * s * s;
+            (xs < x ? lo : hi) = s;
+        }
+        const double s = (lo + hi) * 0.5;
+        return 3 * (1 - s) * s * s + s * s * s;
+    }
+
+    double genieProgress(const Rect& window, const Rect& target, double u) {
+        if (u <= 0)
+            return 0;
+        if (u >= 1)
+            return 1;
+        const double want = 1.0 - easeInOut(u);
+        double       lo = 0, hi = 1;
+        for (int i = 0; i < 24; ++i) {
+            const double p = (lo + hi) * 0.5;
+            (genieArea(window, target, p) > want ? lo : hi) = p;
+        }
+        return (lo + hi) * 0.5;
+    }
+
     Rect genieExtents(const Rect& a, const Rect& b) {
         const double x0 = std::min(a.x, b.x), y0 = std::min(a.y, b.y);
         const double x1 = std::max(a.x + a.w, b.x + b.w), y1 = std::max(a.y + a.h, b.y + b.h);

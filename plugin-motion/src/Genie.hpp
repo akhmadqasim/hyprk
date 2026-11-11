@@ -31,6 +31,19 @@ namespace motion {
     // target's bottom edge are already inside the icon and are left out.
     std::vector<Row> genieRows(const Rect& window, const Rect& target, double p, int rows);
 
+    // Share of the window's area still drawn by the mesh at progress p (1 at p = 0, 0 once inside the icon).
+    double genieArea(const Rect& window, const Rect& target, double p);
+
+    // cubic-bezier(0.42, 0, 0.58, 1) at x (0..1), the WATimingFunction ease-in-out.
+    double easeInOut(double x);
+
+    // Mesh progress p for time share u (0..1) of the genie. Measured on the Mac (MAC-ANSWERS.md Reconciliation
+    // #42 a), the share of the window that still differs from the final frame falls as ease-in-out(u) over the
+    // whole 0.5 s, so p is chosen with genieArea(p) = 1 - easeInOut(u) (bisection; the area falls monotonically).
+    // A linear p spent about 90 ms in the bend alone and about 100 ms on a neck under 1 % of the area, so only
+    // 0.27 s of the 0.5 s was visible (mcap on screen, reference/ours/motion/MOTION-MEASURED.md).
+    double genieProgress(const Rect& window, const Rect& target, double u);
+
     // Union of window and target: everything the genie can touch.
     Rect genieExtents(const Rect& window, const Rect& target);
 

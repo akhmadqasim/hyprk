@@ -26,7 +26,7 @@ namespace motion {
 
       private:
         double                                elapsed() const;
-        double                                progress() const;
+        double                                progress(const Rect& window) const;
         void                                  damage() const;
 
         PHLWINDOWREF                          m_window;

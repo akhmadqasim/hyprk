@@ -28,9 +28,11 @@ namespace motion {
         return std::chrono::duration<double>(std::chrono::steady_clock::now() - m_start).count();
     }
 
-    double CGenieTransformer::progress() const {
-        const double p = std::clamp(elapsed() / m_seconds, 0.0, 1.0);   // the Dock drives the mesh with linear time
-        return m_reverse ? 1.0 - p : p;
+    double CGenieTransformer::progress(const Rect& window) const {
+        // time share -> mesh progress so the remaining area follows the Mac's ease-in-out (Genie.hpp genieProgress);
+        // restore plays the same curve backwards (the ease is symmetric, so the shown area grows as ease-in-out too)
+        const double u = std::clamp(elapsed() / m_seconds, 0.0, 1.0);
+        return genieProgress(window, m_target, m_reverse ? 1.0 - u : u);
     }
 
     int CGenieTransformer::priority() const {
@@ -77,7 +79,7 @@ namespace motion {
         if (SOURCE.empty() || OUTPUTBX.empty())
             return in;
 
-        const auto rows = genieRows(toRect(context.currentBox), m_target, progress(), MESH_ROWS);
+        const auto rows = genieRows(toRect(context.currentBox), m_target, progress(toRect(context.currentBox)), MESH_ROWS);
 
         std::vector<SMeshRenderVertex> verts;
         verts.reserve(rows.size() * 6);

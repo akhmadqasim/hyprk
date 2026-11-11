@@ -47,6 +47,18 @@ int main() {
     for (auto& r : rh)
         CHECK(r.v >= -1e-9 && r.v <= 1 + 1e-9 && r.right >= r.left);
 
+    // the remaining area follows ease-in-out in time: 1 at u = 0, 0.5 at u = 0.5, 0 at u = 1, monotonic
+    CHECK(std::abs(easeInOut(0.5) - 0.5) < 1e-6 && easeInOut(0.1) < 0.03 && easeInOut(0.9) > 0.97);
+    CHECK(std::abs(genieArea(win, icon, 0) - 1) < 1e-9 && genieArea(win, icon, 1) < 1e-9);
+    double lastP = -1;
+    for (int i = 0; i <= 50; ++i) {
+        const double u = i / 50.0, p = genieProgress(win, icon, u);
+        CHECK(p >= lastP - 1e-6);
+        lastP = p;
+        if (i > 0 && i < 50)
+            CHECK(std::abs(genieArea(win, icon, p) - (1 - easeInOut(u))) < 0.01);
+    }
+
     auto e = genieExtents(win, icon);
     CHECK(e.x == 290 && e.y == 120 && std::abs(e.x + e.w - 990) < 1e-9 && std::abs(e.y + e.h - 818) < 1e-9);
 
