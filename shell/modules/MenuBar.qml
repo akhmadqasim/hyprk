@@ -51,7 +51,10 @@ ShellWindow {
         function onRawEvent(event: HyprlandEvent): void { if (event.name === "fullscreen") stripRead.restart(); }
     }
     Timer { id: stripRead; interval: 50; onTriggered: { Hyprland.refreshToplevels(); Qt.callLater(bar.readStrip); } }
-    property real fsAlpha: fullscreen ? 0 : 1
+    // set only by fade() (and once at start): a binding on `fullscreen` re-evaluated after the exit fade had started
+    // and drew one frame at 1 (the titles at full alpha over the window's lights in the exit's first frame)
+    property real fsAlpha: 1
+    Component.onCompleted: fsAlpha = fullscreen ? 0 : 1
     function fade(to, ms, linear) {
         fsAnim.stop();
         fsAnim.to = to;
