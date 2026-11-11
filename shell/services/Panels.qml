@@ -78,7 +78,8 @@ Singleton {
         activeScreen = screen;
         alert = a;
         open = "alert";
-        Sounds.play("alert");
+        // About This Mac and an app's About box are windows/panels on the Mac, not alerts: no beep (`silent`)
+        if (!a.silent) Sounds.play("alert");
     }
 
     // open on scr; closes only when it is already open on that same screen

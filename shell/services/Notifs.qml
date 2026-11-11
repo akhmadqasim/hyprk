@@ -53,6 +53,7 @@ Singleton {
             style: rule.style,             // none: Notification Center only, alerts: stay until dismissed
             // the sound it asks for, if any (lib/nc.js notificationSound): "" = silent
             sound: NC.notificationSound(n.hints, n.urgency === NotificationUrgency.Critical, update, rule.sounds),
+            soundArg: NC.notificationSoundArg(n.hints),
         });
     }
 
@@ -62,11 +63,11 @@ Singleton {
         history.insert(0, d);
         if (dnd) return;                       // Focus: no banner, no sound
         // Notification Center open: the notification shows there, no banner to pop up later
-        if (Panels.open === "nc") { if (d.sound) Sounds.play(d.sound); return; }
+        if (Panels.open === "nc") { if (d.sound) Sounds.play(d.sound, d.soundArg); return; }
         if (d.style !== "none")
             // Banners.qml groups these by app and shows up to three stacks
             banners = [d].concat(banners.filter(b => b.nid !== d.nid)).slice(0, 12);
-        if (d.sound) Sounds.play(d.sound);
+        if (d.sound) Sounds.play(d.sound, d.soundArg);
     }
 
     function hideBanner(id) {

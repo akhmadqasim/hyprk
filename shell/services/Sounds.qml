@@ -13,8 +13,9 @@ Singleton {
 
     readonly property string script: Quickshell.shellDir + "/scripts/sound.sh"
 
-    function play(event) {
-        Quickshell.execDetached([script, event]);
+    // event names: scripts/sound.sh; arg: a notification's sound name or file
+    function play(event, arg) {
+        Quickshell.execDetached(arg ? [script, event, arg] : [script, event]);
     }
 
     // volume pop once the slider settles, not on every drag step

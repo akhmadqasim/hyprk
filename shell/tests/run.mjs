@@ -1016,6 +1016,12 @@ test("mode buttons start inside the field, end in place", () => {
         assert.equal(N.notificationSound({ "sound-name": "x" }, false, false, false), "");
         assert.equal(N.notificationSound({ "sound-name": "x", "suppress-sound": true }, true, false, true), "");
     });
+    test("notification sound arg: the hint's sound name or file, else the alert sound", () => {
+        assert.equal(N.notificationSoundArg({}), "");
+        assert.equal(N.notificationSoundArg({ "sound-name": "Glass" }), "Glass");
+        assert.equal(N.notificationSoundArg({ "sound-file": "/a/b.oga", "sound-name": "Glass" }), "/a/b.oga");
+        assert.equal(N.notificationSoundArg({ "sound-file": "file:///a/b%20c.oga" }), "/a/b c.oga");
+    });
 }
 test("Mission Control: one Space reads Desktop, more are numbered by position", () => {
     assert.equal(ST.spaceName(0, 1), "Desktop");

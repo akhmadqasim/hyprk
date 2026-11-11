@@ -135,6 +135,7 @@ Item {
             title: arg,
             message: "",
             buttons: [{ label: "OK", isDefault: true }],
+            silent: true,
         }); return;
         case "spotlight": if (arg) { SpotlightState.openIn(arg); return; } break;
         }
@@ -149,6 +150,7 @@ Item {
             title: "About This Computer",
             message: Distro.prettyName + (Distro.kernel ? "\nLinux " + Distro.kernel : ""),
             buttons: [{ label: "More Info…", action: Apps.openSettings }, { label: "OK", isDefault: true }],
+            silent: true,
         }); break;
         case "forcequit": Hyprland.dispatch("hl.dsp.window.kill()"); break;
         case "close": Hyprland.dispatch("hl.dsp.window.close()"); break;

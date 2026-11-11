@@ -46,8 +46,12 @@ Column {
 
     readonly property string soundsDir: Backend.root + "/sounds/wav"
     property string effectsNote: ""
+    // `file` in sounds/wav (16-bit copies); the Apple original in sounds/originals plays when present (24-bit, what the
+    // shell's scripts/sound.sh plays)
     function play(file, volume) {
-        Backend.run(["pw-play", "--volume", volume.toFixed(2), file], c => {
+        Backend.run(["sh", "-c", 'o="${1%.wav}"; o="${o%/sounds/wav/*}/sounds/originals/${o#*/sounds/wav/}"; f="$1"; '
+                     + 'for e in aiff aif caf; do [ -f "$o.$e" ] && { f="$o.$e"; break; }; done; exec pw-play --volume "$2" "$f"',
+                     "sh", file, volume.toFixed(2)], c => {
             effectsNote = c === 127 ? "Sound previews need pw-play (PipeWire tools)."
                         : c !== 0 ? "That sound could not be played." : "";
         });

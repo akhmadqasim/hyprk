@@ -40,6 +40,16 @@ function notificationSound(hints, critical, update, soundsOn) {
     return h["sound-name"] || h["sound-file"] ? "notification" : "";
 }
 
+// what a "notification" sound plays: the "sound-name" hint when it names one of the 14 /System/Library/Sounds sounds
+// (a macOS app's UNNotificationSound(named:)), a "sound-file" path, else "" = the user's alert sound
+// (UNNotificationSound.default; scripts/sound.sh resolves both)
+function notificationSoundArg(hints) {
+    const h = hints || {};
+    if (typeof h["sound-file"] === "string" && h["sound-file"].charAt(0) === "/") return h["sound-file"];
+    if (typeof h["sound-file"] === "string" && h["sound-file"].indexOf("file://") === 0) return decodeURIComponent(h["sound-file"].slice(7));
+    return typeof h["sound-name"] === "string" ? h["sound-name"] : "";
+}
+
 function bannerInOpacity(p) { return Math.max(0, Math.min(1, (p - 0.3) / 0.7)); }
 function bannerInScale(p) { return 0.85 + 0.15 * Math.max(0, Math.min(1, p)); }
 // Banner out (after 4.97 s): back to the right on Spring(0.3, bounce -0.2), fading out; gone after 0.15 s (9 frames)
