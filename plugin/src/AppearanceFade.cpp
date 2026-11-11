@@ -19,6 +19,7 @@
 #include <hyprland/src/state/MonitorState.hpp>
 #include <GLES3/gl32.h>
 
+#include <algorithm>
 #include <chrono>
 #include <format>
 #include <map>
@@ -38,6 +39,10 @@ namespace lg::appearancefade {
         };
 
         int                        g_appearance = -1; // the last frame's option (-1: none seen yet)
+        Clock::time_point          g_switched;        // when the option last went light <-> dark
+        std::string                g_ackSeen;         // the last appearance_ack value seen
+        int                        g_ackAppearance = -1;
+        Clock::time_point          g_ackAt;
         std::map<uintptr_t, SFade> g_fades;           // per monitor
         int                        g_runs = 0, g_lastFrames = 0;
         double                     g_lastSeconds = 0;
@@ -80,10 +85,31 @@ namespace lg::appearancefade {
         }
     }
 
+    // the handshake: the shell answers once every shown shell window has committed a frame in the new appearance
+    // (config/hypr/hyprland.lua hyprk_appearance_ready -> appearance_ack "dark:<ms>"); a new value is noted with the
+    // time it arrived
+    static void noteAck(const SParams& p) {
+        if (p.appearanceAck == g_ackSeen)
+            return;
+        g_ackSeen       = p.appearanceAck;
+        g_ackAppearance = parseAppearance(p.appearanceAck.substr(0, p.appearanceAck.find(':')));
+        g_ackAt         = Clock::now();
+    }
+
+    static double holdFor(const SParams& p, Clock::time_point start) {
+        // an answer for this appearance that came after the switch ends the hold (at once if it came before this
+        // output's snapshot); without one the hold runs to appearance_hold
+        if (g_ackAppearance == g_appearance && g_ackAppearance > 0 && g_ackAt >= g_switched)
+            return std::clamp(std::chrono::duration<double>(g_ackAt - start).count(), 0.0, double(p.appearanceHold));
+        return p.appearanceHold;
+    }
+
     void begin(const PHLMONITOR& mon, CRenderContext&, const SParams& p) {
         if (!mon || !g_pHyprRenderer)
             return;
+        noteAck(p);
         if (g_appearance != p.appearance) {
+            g_switched = Clock::now();
             // light <-> dark only: not the first value after a load, not to or from "auto"
             const bool run = g_appearance > 0 && p.appearance > 0 && p.appearanceFade > 0 && !p.reduceMotion && !locked();
             g_appearance   = p.appearance;
@@ -108,12 +134,13 @@ namespace lg::appearancefade {
     }
 
     void lastMoment(const PHLMONITOR& mon, CRenderContext& ctx, const SParams& p) {
+        noteAck(p);
         const auto it = g_fades.find(reinterpret_cast<uintptr_t>(mon.get()));
         if (it == g_fades.end() || it->second.pending)
             return;
         auto&        f = it->second;
         const double t = std::chrono::duration<double>(Clock::now() - f.start).count();
-        const double a = appearanceSnapshotAlpha(t, p.appearanceHold, p.appearanceFade);
+        const double a = appearanceSnapshotAlpha(t, holdFor(p, f.start), p.appearanceFade);
         const auto   tex = f.fb ? f.fb->getTexture() : nullptr;
         // never over a lock surface: the snapshot shows the unlocked desktop
         if (a <= 0 || !tex || locked() || p.reduceMotion) {
@@ -137,6 +164,7 @@ namespace lg::appearancefade {
     }
 
     std::string status() {
-        return std::format("appearance fade: {} running, {} run since load, last {} frames in {:.3f} s\n", g_fades.size(), g_runs, g_lastFrames, g_lastSeconds);
+        return std::format("appearance fade: {} running, {} run since load, last {} frames in {:.3f} s, last answer \"{}\"\n", g_fades.size(), g_runs,
+                           g_lastFrames, g_lastSeconds, g_ackSeen);
     }
 }

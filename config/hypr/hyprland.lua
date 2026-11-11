@@ -317,6 +317,14 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
         end
     else print("hyprk: liquidglass not loaded: " .. tostring(err)) end
 end
+-- The appearance handshake, compositor half: the shell (shell/Theme.qml appearanceReady) calls this once every shown
+-- shell window has committed a frame in the new appearance (also once at start). The glass plugin holds the old picture
+-- of each output until then (plugin/src/AppearanceFade.cpp, at most appearance_hold = 0.5 s, Apple's coordinated
+-- notification timeout) and matches the answer on the appearance's name; the stamp makes every answer a new value.
+function hyprk_appearance_ready(appearance, ms)
+    if appearance ~= "dark" and appearance ~= "light" then return end
+    pluginConfig("liquidglass", { appearance_ack = appearance .. ":" .. tostring(ms or 0) })
+end
 -- Window motion Hyprland cannot express (plugin-motion/): the Dock genie on minimize/restore.
 -- Minimize stays "move to special:minimized"; the plugin plays the genie first.
 local motionSo = hyprk .. "/plugin-motion/build/libhyprkmotion.so"

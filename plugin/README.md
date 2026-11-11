@@ -205,9 +205,13 @@ drawn as the last element of every pass at `appearanceSnapshotAlpha(t)` (`src/Fa
 1 -> 0 over `appearance_fade` on that curve. The whole output is damaged each frame only while it runs; the copy is freed at
 the end; nothing at rest. Skipped with `reduce_motion`, for "auto", on rotated outputs and while the session is locked (a
 running fade ends at once when a lock starts: the snapshot shows the unlocked desktop).
-The hold is ours (0.15 s): there is no client acknowledgement here, Apple waits for the apps' answers, at most 0.5 s. It is
-still needed with the option sent first (b80928a): the shell's menu bar and Dock restyle 100-120 ms after the option, and with
-hold 0 they step by .33-.37 inside the fade (MOTION-PLUGIN.md "Follow-ups"). Tried on screen: a lock during the fade ends it
+The hold ends at the shell's answer, as Apple's waits for the apps' answers (at most 0.5 s, `appearance_hold`): the shell
+calls `hyprk_appearance_ready("dark" | "light", <ms>)` (config/hypr/hyprland.lua) once every shown shell window has committed
+a frame in the new appearance, which sets `appearance_ack` to "dark:<ms>"; an answer for the appearance switched to that came
+after the switch ends the hold (at once when it came before the output's snapshot); none, and the hold runs to 0.5 s. A hold is
+needed with the option sent first (b80928a): the shell's menu bar and Dock restyle 100-120 ms after the option, and with hold 0
+they step by .33-.37 inside the fade (MOTION-PLUGIN.md "Follow-ups"). With the answer (own session, 5 switches by
+`qs ipc call theme setDark`): 33 frames in 0.552 s each (fixed 0.15 s hold: 0.65 s). Tried on screen: a lock during the fade ends it
 in that frame, two outputs fade each on their own snapshot, a rotated output snaps.
 The option must reach the compositor before the first client repaints, or that client snaps before the snapshot exists:
 whoever starts the switch sends it on Hyprland's socket in the same turn (Quickshell:
@@ -272,7 +276,8 @@ boxes); nothing at rest.
 | `refraction_scale` | 1 | multiplies the recipe's refraction amount (0 = off) |
 | `aberration` | 0 | px R/B split at the edge (7 taps); 0 = off (Apple: none on background glass) |
 | `highlight` | 1 | scales the key/fill highlight mask (1 = Apple) |
-| `appearance_fade` / `appearance_hold` | 0.5 / 0.15 | s: the cross-fade after an appearance switch and the time the old picture stays whole before it (see Appearance switch); fade 0 = off |
+| `appearance_fade` / `appearance_hold` | 0.5 / 0.5 | s: the cross-fade after an appearance switch and the longest time the old picture stays whole before it (see Appearance switch); fade 0 = off |
+| `appearance_ack` | "" | the shell's answer, "dark" or "light" with ":<stamp>": ends the hold (set by `hyprk_appearance_ready`) |
 | `dither` | 1 | half a level of fixed per-pixel noise where the glass or the panel blur draws a slow gradient (see Precision); 0 = off |
 | `tint_amount` | 0.5 | Liquid Glass slider (macOS NSGlassTintAmount) 0..1, see Materials. Live: `hyprctl eval 'hl.config({ plugin = { liquidglass = { tint_amount = 0.3 } } })'` then `hyprctl liquidglass damage` (the eval fires no reload event, the damage redraws every output now) |
 | `shadow_scale` / `shadow_tint` | 1 / 0.35 | drop shadow opacity scale; 0 = black shadow, 1 = saturated backdrop colour |

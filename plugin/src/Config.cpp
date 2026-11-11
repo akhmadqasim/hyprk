@@ -108,6 +108,7 @@ namespace lg {
             {K("material"), "regular", [](SParams& p, const std::string& v) { p.defaultMaterial = v; }},
             {K("window_material"), "regular", [](SParams& p, const std::string& v) { p.windowMaterial = v; }},
             {K("appearance"), "auto", [](SParams& p, const std::string& v) { p.appearance = parseAppearance(v); }},
+            {K("appearance_ack"), "", [](SParams& p, const std::string& v) { p.appearanceAck = v; }},
             {K("shader_path"), "", [](SParams& p, const std::string& v) { p.shaderPath = v; }},
             {K("titlebar"), "auto", [](SParams& p, const std::string& v) { p.titlebar = parseTitlebarMode(v); }},
             {K("titlebar_classes"), "", [](SParams& p, const std::string& v) { p.titlebarClasses = v; }},
