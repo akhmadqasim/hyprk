@@ -417,13 +417,15 @@ ShellWindow {
                 }
 
                 // running dot, also while launching (with Reduce Motion it is the only launch feedback): 4.1 pt,
-                // its centre 5 pt below the art bottom at rest (Q-dock-07)
+                // its centre 5 pt below the art bottom at rest (Q-dock-07). On the plugin it is a fill shape on the
+                // dots surface below (dock.pluginDots); this one is the fallback
+                readonly property bool dot: cell.running || cell.launching
                 ShaderEffect {
-                    visible: cell.running || cell.launching
+                    visible: cell.dot && !dock.dotsUp
                     width: dock.m.dot
                     height: width
                     x: Math.round((cell.width - width) / 2 * dock.dpr) / dock.dpr
-                    y: dock.m.iconTop + dock.tile - dock.m.artInset + dock.m.dotBelowArt - height / 2
+                    y: dock.dotRowY - height / 2
                     property vector4d fill: Theme.dock.dot
                     property size sizePt: Qt.size(width, height)
                     property real radius: width / 2
@@ -455,6 +457,65 @@ ShellWindow {
                         else if (cell.modelData.folder) Apps.openFolder(cell.modelData);
                         else Apps.activate(cell.modelData);
                     }
+                }
+            }
+        }
+    }
+
+    // ---------- running dots on the plugin ----------
+    // The Mac blends the dots plus-darker -128/255 (light) / plus-lighter +125/255 (dark) with the Dock's glass under
+    // them (Q-dock-07: light 229/134/38 -> 101/6/0, dark 12 -> 137). Qt cannot blend with the compositor's glass, so on
+    // the plugin they are fill shapes (`fill_layers` hyprk-dock-dots:darker:128, hyprk-dock-dots-dark:lighter:125) on a
+    // surface of their own over the Dock's, created once the Dock has drawn its first frame so Hyprland stacks it
+    // above (the Switcher's fill surface does the same). A strip along the screen bottom from just above the dots
+    // (a full Dock-sized surface cost 6-9 MB anon for its buffers), same layer as the Dock, no input; it follows the
+    // slide (the dots leave through its bottom edge) and magnification from the same cell geometry. Qt draws nothing.
+    readonly property real dotRowY: m.iconTop + tile - m.artInset + m.dotBelowArt   // dot centre, in the Dock background
+    readonly property bool pluginDots: Theme.compositorGlass && !Theme.solidMaterial
+    property bool dockDrawn: false
+    Connections {
+        target: stage.Window.window
+        enabled: !dock.dockDrawn
+        function onFrameSwapped() { dock.dockDrawn = true; }
+    }
+    readonly property bool dotsUp: pluginDots && dockDrawn
+    // the namespace (fill direction) is fixed when a layer surface is created: a new surface on a mode change
+    property bool dotsRenew: false
+    Connections {
+        target: Theme
+        function onDarkChanged() { dock.dotsRenew = true; Qt.callLater(() => dock.dotsRenew = false); }
+    }
+    LazyLoader {
+        active: dock.dotsUp && !dock.dotsRenew
+        ShellWindow {
+            screen: dock.screen
+            visible: dock.visible
+            id: dots
+            anchors { bottom: true; left: true; right: true }
+            implicitHeight: Math.ceil(dock.m.height + dock.m.bottomGap - dock.dotRowY + dock.m.dot)
+            // this surface's top in the Dock window's coordinates (both end at the screen bottom)
+            readonly property real top: dock.height - height
+            exclusionMode: ExclusionMode.Ignore
+            namespace: Theme.dark ? "hyprk-dock-dots-dark" : "hyprk-dock-dots"
+            WlrLayershell.layer: dock.WlrLayershell.layer
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+            acceptsInput: false
+            glassOpacity: bg.opacity
+
+            Repeater {
+                model: cellRepeater.count
+                Glass {
+                    required property int index
+                    readonly property Item c: cellRepeater.itemAt(index)
+                    visible: c !== null && c.dot && bg.visible
+                    // whole points like every glass shape: 4 (the Mac's 4.1), centred on the tile and on the dot row.
+                    // A square region: the plugin cannot read a 2 pt radius back from a 4 pt staircase (radius 2 came
+                    // out 8 x 6 px), the circle is its `radii` hyprk-dock-dots:2.05 (config/hypr/hyprland.lua)
+                    width: Math.round(dock.m.dot)
+                    height: width
+                    radius: 0
+                    x: c ? bg.x + c.x + (c.width - width) / 2 : 0
+                    y: bg.y + dock.dotRowY - height / 2 - dots.top
                 }
             }
         }
