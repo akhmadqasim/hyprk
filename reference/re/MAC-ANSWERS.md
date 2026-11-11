@@ -3452,3 +3452,64 @@ Clear: inner refraction −min(0.65·D, 60) / min(0.36·D, 20), outer 0.2·D / 0
 - Probe: `reference/re/tools/probe/thick.swift`
 - Data: `reference/re/27.2.1/live/verify/C/` (filter inputs per variant / size / value, pixels, ramp, fit errors, real Dock)
 - Pictures: `reference/screens/27.2.1/verify/C/` (variants at 0 / 0.5 / 1 dark and light; sizes over white and stripes)
+
+
+### C2. Remaining glass items (edge bleed, light shoulder, real CC, backdrop scale, propagation)
+
+# Verify C2: the four open items of verify-C (Liquid Glass slider), macOS 27.2.1 (26B131)
+
+1. Regular glass panels > 64 pt (edge bleed) — **TERKONFIRMASI** — the bleed is not a layer: it is a step inside the same `glassBackground` fragment shader, after the face and before the shadow/rim. `out = mix(face, bleed, w)`, `w = g⁴ · BleedOpacity`, `g = 1 − Y(face)` in dark and `Y(face)` in light, `bleed = bb + (bw − bb)·Y(s) + bs·(s − Y(s))` with dark 0.125 / 0.5 / 1 and light 0.9 / 1 / 1.2. `s` is a sharp backdrop sample, moved outward by `0.35·D` at the edge and by 0 from depth `0.35·D` on. It acts over the whole interior, not only at the edge. — code: QuartzCore `default.metallib` `glass_background_base` (AIR bitcode read as LLVM IR), uniform packing `CA::OGL::GlassBackgroundFilter::render` 0x18debc058; measured: 17 backdrops × a = 0 / 0.5 / 1, dark and light, 96 / 200 / 500 pt and menu 200 pt: **rms 0.36–0.58, max 2.0** (same data without the bleed step, 200 / 500 pt: rms 2.6–8.9, max 35).
+2. Light-mode Regular ("soft shoulder") — **TERKONFIRMASI** — light Regular has `maxLuma 1` but **`maxLumaSDR 0.94`**, and the filter uses `M = MaxLumaSDR + (MaxLuma − MaxLumaSDR)·h`, `h = (min(headroom, MaxHeadroom) − 1)/(MaxHeadroom − 1)`. MaxHeadroom is 9999, so h ≈ 0 on any display and M = 0.94: light glass is luminance-limited too. The limiter also raises chroma: `k = clamp(1 − Y·(1 − M))`, luma `k·Y`, chroma `× k·(1 + 0.3·(1 − k))` (the old model had only `k`). — code: render 0x18debc4f4 (h) and 0x18debcf04 (M), 0.94 at 0x195f21600 in RegularBase.Base, shader max-luma block; measured: light Regular 64 pt **rms 0.53 / 0.53 / 0.38, max 1.6** at a = 0 / 0.5 / 1 (was 2.5 / 2.0 / 1.4, max 7.2). Dark colours improve too: rms 0.5, max 1.3 (was 2.0 / 6.8).
+3. Real Control Center panel vs slider — **TERKONFIRMASI** — tile colour does not move at all (0.00 levels over a = 0 / 0.25 / 0.507 / 0.75 / 1, four flat backdrops, two tiles). Tile colour = the controlCenter recipe (black 0.125, white 0.8, saturation 1.2) applied to the panel's dimmed backdrop (0.898·in): **rms 0.27, max 0.45** (n = 120). Over 4 pt stripes the tile contrast is 21.0 / 13.8 / 7.9 / 4.0 / 0.0 (the panel's own blur behind the tiles stays 32.0 at every value). The AppKit variant-9 probe over the same pattern, at the same depth below the tile edge, gives 20.2 / 12.9 / 7.3 / 3.5 / 0.0: **rms 0.64, max 1.3**. — code: ClearDiffusionAmount 0x195efeb9c (blur × 2a below 0.5, blur fill 2a − 1 above); measured on the real panel, driven by the coordinated notification (no relaunch).
+4. Regular backdrop scale 0.125 at a = 1 — **TERKONFIRMASI** — `GlassMaterialProvider.BackdropScalePerceptualEstimator`: the first scale of [0.125, 0.25, 0.5] whose `visibleAlias = (1 − F)·(N·exp(−π²·rf²·s²/4) + (1 − N)·exp(−π²·r²·s²/4))` is ≤ 0.05, else 0.5. At a = 1: N = 1, F = 0.5, rf = 8 → 0.0424 at s = 0.125. — code: estimate 0x195e9f9dc, visibleAlias 0x195ea0618, epsilon and buckets set in RegularBase.Base 0x195f214a0–0x195f214d4; measured: the formula predicts the scale of every dumped Regular-type view, **794 of 794** (5 values × 6 sizes, dark and light, Regular / Menu / Notification Center / Sidebar).
+5. How the value reaches running apps — **TERKONFIRMASI** — AppKit: the handler of `kSLSCoordinatedGlassAppearanceSettingsChangeNotificationName` calls `+[NSGlassEffectView _legibilityNeedsUpdate]`, which re-reads `UserDefaults.standard` float `NSGlassTintAmount` and compares it with the last applied value; if it changed, `NSGlassEffectDiffusionDidChangeNotification` → `globalEnvironmentDidChange:` → `Legibility.apply(to:)` sets `glassDiffusion = .amount(x)`. Dock: `DockCore.SystemAppearanceMonitor` re-reads `NSGlassTintAmount` on the main queue and calls `appearanceDidChange:` on its observers. — code: 0x18b4c4ee8, 0x18b317694 → 0x18b32a01c, 0x18b2b3db8; Dock 0x1001e5cec, 0x1001e61e4, 0x1001e5600; measured: `defaults write` alone, no change for 3 s; posting type 12 changes a running probe within the next 1 s sample, both ways.
+
+Restored: `defaults read -g NSGlassTintAmount` = 0.5071146, type float; `defaults read -g` identical to before. Running apps were returned to it with the same notification (checked on a running probe: 1 → 0.5071146). Control Center was never killed (pid unchanged), its panel is closed.
+
+## 1 and 2. The interior colour, complete (replaces the block in verify-C)
+Order inside the shader: backdrop sample (refracted, blurred) → blur fill → outer refraction (rim only) → face → edge bleed → shadow / ring → key highlight (rim) → clamp.
+```
+c  = backdrop behind the glass, display-encoded 0…1 (after blur and blur fill)
+Y  = 0.2126 R + 0.7152 G + 0.0722 B
+// face
+M  = maxLumaSDR                               // dark: lerp(0.6, 0.35, clamp((D−64)/40)); light: 0.94
+k  = clamp(1 − Y·(1 − M), 0, 1)
+c1 = k·Y + k·(1 + 0.3·(1 − k))·(c − Y)        // skipped when M = 1
+Y1 = luma(c1)
+f  = (black + (white − black)·Y1 + sat·(c1 − Y1))·(1 − fillA) + fillRGB·fillA
+// edge bleed (BleedOpacity = 0.8·clamp((D − 64)/96): 0 up to 64 pt, 0.8 from 160 pt)
+b  = bb + (bw − bb)·Y(s) + bs·(s − Y(s))      // dark 0.125 / 0.5 / 1, light 0.9 / 1 / 1.2
+g  = dark ? 1 − clamp(Yb(f)) : clamp(Yb(f))   // Yb = 0.2125 R + 0.7154 G + 0.0721 B
+out = f + (b − f)·g⁴·BleedOpacity
+out = clamp(out, −0.75, Clamp)                // then the display clamps to 0…1
+```
+- `s` = the backdrop itself at the panel centre. Near the edge it is read `0.35·D·(1 − √(t·(2 − t)))` further out along the outward normal, `t = clamp(depth / (0.35·D))`, so colours from just outside the panel bleed in. It is sharp (BleedBlurRadius 0), taken before blur fill and face.
+- Blend is a plain mix, the mask is the glass shape itself, and the weight is flat over the interior (12 pt inside the edge equals the centre within 1–2 levels on every backdrop).
+- Check, dark 200 pt at a = 0.5: white 122, grey 115, black 32 (model 121.5 / 115.2 / 31.9). At a = 1: white 86 (model 86.3; without bleed 76.5).
+- The slider does not touch the bleed inputs.
+
+## 3. Real Control Center
+- Each tile is controlCenter glass over a panel layer that blurs and dims the desktop (gap between tiles: 0.898·in, stripe contrast 255 → 32, same at every slider value).
+- The tile's own blur grows with depth: blur opacity runs from 0.1 at the edge to 1 at 100 pt inside (BlurOpacity 1, 0.1, 0.5, 1 over BlurDistance −100, −1, 0, 0). So a 64 pt tile is never at the full radius 4: about 0.9 at 15 pt deep, 1.5 at the centre line (at a = 0.5).
+- Above 0.5 the blur fill takes over: contrast at 0.75 is half of 0.507 (4.0 vs 7.9), 0 at 1.
+- Method: `defaults write`, then post the notification (`tools/probe/glasspost.m`), open the panel with a synthetic click over a probe window that cycles stripes / white / grey / black / blue.
+
+## 4. Backdrop scale
+- Inputs: `r = BlurRadius·BlurOpacity0` (0 up to 64 pt, 4 from 160 pt), `rf = 8` when any blur-fill opacity is > 0, `N` = blur-fill normal opacity, `F` = face fill alpha.
+- Result for Regular: ≤ 64 pt 0.5 / 0.5 / 0.5 / 0.5 / 0.125 and ≥ 160 pt 0.5 / 0.5 / 0.25 / 0.25 / 0.125 at a = 0 / 0.25 / 0.5 / 0.75 / 1.
+- Only RegularBase recipes use the estimator (the bucket array has one code reference). Clear, Dock and Control Center stay at 0.5.
+- On a display with pixel length ≤ 1/3 the buckets are 0.125, 0.25, 1/3, 0.5 (code only, not measured).
+
+## 5. Notification path
+- Sender: `SLSPostCoordinatedDistributedNotificationFenced(SLSMainConnectionID(), 12, fencePort, completion, 0.5)` with a `CAFenceHandle` port (AppKit 0x18b4c4f80). Receivers entangle their commit on the fence, so all apps switch in one frame.
+- An unentitled tool can post it: this is how the real panel was measured and how the value was restored.
+
+## Not covered
+- Sidebar glass: greys fit (within 1), colours do not (dark rms 6, max 20: measured colours are less saturated than the filter inputs predict). There is something on top of the `glassBackground` filter that this model does not have. Not one of the four items; not investigated.
+- The blur kernel itself (mip level `log2(1.6·radius·scale)` of the backdrop texture) is in the code excerpt but was not fitted against pixels.
+
+## Files
+- Code: `reference/re/27.2.1/decomp/QuartzCore-glassBackground-shader.c`, `DesignLibrary-backdrop-scale.c`, `AppKit-Dock-glass-notification.c` (and a pointer section added to `DesignLibrary-diffusion-amount.c`)
+- Data: `reference/re/27.2.1/live/verify/C2/` — `ramp-shader-model.json` (inputs, measured, model per backdrop), `ramp-fit-errors.json`, `glass_model.py` (the model), `cc-real.json`, `cc-probe-sinusoid.json`, `backdrop-scale.json`, `notification-live.log`
+- Pictures: `reference/screens/27.2.1/verify/C2/` (real CC Display + Sound tiles over stripes at five values, probe over the sinusoid, ramp sheet). No personal content; raw captures deleted.
+- Tools: `reference/re/tools/probe/thick.swift` (ramp now has 500 pt, menu 200 pt and Notification Center items; new `ccbg` and `ccsin` modes), `glasspost.m`, `air/` (metallib → LLVM IR → expressions)

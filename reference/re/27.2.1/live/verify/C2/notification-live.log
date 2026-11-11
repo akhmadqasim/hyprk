@@ -1,0 +1,29 @@
+# thick hold probe (prints once per second) while NSGlassTintAmount is written and the coordinated notification (type 12) is posted with glasspost
+# run 1: t=4 s defaults write 0 (no post) ; t=7 s post ; t=10 s write 1 + post
+hold 0 regular: N=0.5071146 fill=[0.0017786473035812378, 0.0017786473035812378, 0.0017786473035812378, 0.007114589214324951] maxLuma=0.6 blur=5 clear: N=0.01422918 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 
+hold 1 regular: N=0.5071146 fill=[0.0017786473035812378, 0.0017786473035812378, 0.0017786473035812378, 0.007114589214324951] maxLuma=0.6 blur=5 clear: N=0.01422918 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 
+hold 2 regular: N=0.5071146 fill=[0.0017786473035812378, 0.0017786473035812378, 0.0017786473035812378, 0.007114589214324951] maxLuma=0.6 blur=5 clear: N=0.01422918 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 
+hold 3 regular: N=0.5071146 fill=[0.0017786473035812378, 0.0017786473035812378, 0.0017786473035812378, 0.007114589214324951] maxLuma=0.6 blur=5 clear: N=0.01422918 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 
+hold 4 regular: N=0.5071146 fill=[0.0017786473035812378, 0.0017786473035812378, 0.0017786473035812378, 0.007114589214324951] maxLuma=0.6 blur=5 clear: N=0.01422918 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 
+hold 5 regular: N=0.5071146 fill=[0.0017786473035812378, 0.0017786473035812378, 0.0017786473035812378, 0.007114589214324951] maxLuma=0.6 blur=5 clear: N=0.01422918 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 
+hold 6 regular: N=0 fill=[0.1249999925494194, 0.1249999925494194, 0.1249999925494194, 0.0] maxLuma=0.6 blur=5 clear: N=0 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 blur=0
+hold 7 regular: N=0 fill=[0.1249999925494194, 0.1249999925494194, 0.1249999925494194, 0.0] maxLuma=0.6 blur=5 clear: N=0 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 blur=0
+hold 8 regular: N=0 fill=[0.1249999925494194, 0.1249999925494194, 0.1249999925494194, 0.0] maxLuma=0.6 blur=5 clear: N=0 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 blur=0
+hold 9 regular: N=0 fill=[0.1249999925494194, 0.1249999925494194, 0.1249999925494194, 0.0] maxLuma=0.6 blur=5 clear: N=0 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 blur=0
+hold 10 regular: N=1 fill=[0.1249999925494194, 0.1249999925494194, 0.1249999925494194, 0.5] maxLuma=0.6 blur=5 clear: N=1 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 blur=0.75
+hold 11 regular: N=1 fill=[0.1249999925494194, 0.1249999925494194, 0.1249999925494194, 0.5] maxLuma=0.6 blur=5 clear: N=1 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 blur=0.75
+hold 12 regular: N=1 fill=[0.1249999925494194, 0.1249999925494194, 0.1249999925494194, 0.5] maxLuma=0.6 blur=5 clear: N=1 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 blur=0.75
+hold 13 regular: N=1 fill=[0.1249999925494194, 0.1249999925494194, 0.1249999925494194, 0.5] maxLuma=0.6 blur=5 clear: N=1 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 blur=0.75
+t13 restore + post
+posted type 12, fence yes, completion not called
+# run 2: t=3.5 s write 1 + post ; t=6.5 s write 0.5071146 + post
+hold 0 regular: N=0.5071146 fill=[0.0017786473035812378, 0.0017786473035812378, 0.0017786473035812378, 0.007114589214324951] maxLuma=0.6 blur=5 clear: N=0.01422918 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 
+hold 1 regular: N=0.5071146 fill=[0.0017786473035812378, 0.0017786473035812378, 0.0017786473035812378, 0.007114589214324951] maxLuma=0.6 blur=5 clear: N=0.01422918 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 
+hold 2 regular: N=1 fill=[0.1249999925494194, 0.1249999925494194, 0.1249999925494194, 0.5] maxLuma=0.6 blur=5 clear: N=1 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 blur=0.75
+hold 3 regular: N=1 fill=[0.1249999925494194, 0.1249999925494194, 0.1249999925494194, 0.5] maxLuma=0.6 blur=5 clear: N=1 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 blur=0.75
+hold 4 regular: N=1 fill=[0.1249999925494194, 0.1249999925494194, 0.1249999925494194, 0.5] maxLuma=0.6 blur=5 clear: N=1 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 blur=0.75
+hold 5 regular: N=1 fill=[0.1249999925494194, 0.1249999925494194, 0.1249999925494194, 0.5] maxLuma=0.6 blur=5 clear: N=1 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 blur=0.75
+hold 6 regular: N=1 fill=[0.1249999925494194, 0.1249999925494194, 0.1249999925494194, 0.5] maxLuma=0.6 blur=5 clear: N=1 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 blur=0.75
+hold 7 regular: N=0.5071146 fill=[0.0017786473035812378, 0.0017786473035812378, 0.0017786473035812378, 0.007114589214324951] maxLuma=0.6 blur=5 clear: N=0.01422918 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 
+hold 8 regular: N=0.5071146 fill=[0.0017786473035812378, 0.0017786473035812378, 0.0017786473035812378, 0.007114589214324951] maxLuma=0.6 blur=5 clear: N=0.01422918 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 
+hold 9 regular: N=0.5071146 fill=[0.0017786473035812378, 0.0017786473035812378, 0.0017786473035812378, 0.007114589214324951] maxLuma=0.6 blur=5 clear: N=0.01422918 fill=[1.0, 1.0, 1.0, 0.0] maxLuma=1 

@@ -9,6 +9,8 @@
 //           "cols:r,g,b:r,g,b:...", "origin": [x, yTop], "size": [w, h], "secs": 8, "dump": "/path.json", "level": "normal"|"desktop",
 //           "views": [ { "frame": [x, yTop, w, h], "radius": 20, "variant": 0, "subvariant": "menu", "clear": false,
 //                        "override": { "inputBlurRadius": 0 }, "hideHighlight": false, "tint": [r,g,b,a] } ],
+//                        "kv": { "_contentLensing": true }, "contentPattern": "grad", "contentInset": 0 } ],
+//           "dumpWindowsAt": [2.5], "popupMenu": [x, yTop],
 //           "controls": [ { "kind": "glassButton"|"switch"|"slider", "frame": [x, yTop, w, h] } ] }
 // Pattern "grad": R = x px mod 256, G = y px mod 256, B = 128, drawn in the display colour space, so a captured pixel
 // gives back the source position that the glass sampled.
@@ -77,6 +79,14 @@ func dumpLayer(_ l: CALayer) -> [String: Any] {
         }
     }
     if let cf = l.compositingFilter { d["compositingFilter"] = "\(cf)" }
+    if let bc = l.backgroundColor { d["backgroundColor"] = jsonable(bc) }
+    if let bc = l.borderColor, l.borderWidth > 0 { d["border"] = [jsonable(bc), l.borderWidth] }
+    if l.cornerRadius != 0 { d["cornerRadius"] = l.cornerRadius; d["cornerCurve"] = l.cornerCurve.rawValue }
+    if l.masksToBounds { d["masksToBounds"] = true }
+    if !CATransform3DIsIdentity(l.transform) { let t = l.transform; d["transform"] = [t.m11, t.m12, t.m21, t.m22, t.m41, t.m42] }
+    if l.contents != nil { d["contents"] = "\(type(of: l.contents!))"; d["contentsMultiplyColor"] = jsonable(l.value(forKey: "contentsMultiplyColor")) }
+    if l.mask != nil { d["mask"] = dumpLayer(l.mask!) }
+    if l.shadowOpacity > 0 { d["shadow"] = [Double(l.shadowOpacity), Double(l.shadowRadius), Double(l.shadowOffset.width), Double(l.shadowOffset.height)] }
     if l.responds(to: NSSelectorFromString("effect")), let e = l.value(forKey: "effect") as? NSObject {
         var ed = props(e, stop: NSObject.self); ed["class"] = "\(type(of: e))"; d["effect"] = ed
     }
@@ -238,6 +248,14 @@ class D: NSObject, NSApplicationDelegate {
                 let tf = NSTextField(labelWithString: label); tf.font = .systemFont(ofSize: num(vc["labelSize"]) > 0 ? num(vc["labelSize"]) : 20, weight: .semibold)
                 tf.sizeToFit(); tf.frame.origin = NSPoint(x: 12, y: (f[3] - tf.frame.height) / 2); cv.addSubview(tf)
             }
+            // "contentPattern": a test pattern drawn as the glass CONTENT (to measure content lensing, glassForeground)
+            if let cp = vc["contentPattern"] as? String {
+                let ins = num(vc["contentInset"])
+                let pv = Flipped(frame: cv.bounds.insetBy(dx: ins, dy: ins)); pv.wantsLayer = true
+                pv.layer?.contents = makePattern(cp, Int(pv.frame.width * 2), Int(pv.frame.height * 2), cs); pv.layer?.contentsScale = 2
+                pv.layer?.magnificationFilter = .nearest; pv.layer?.minificationFilter = .nearest; pv.layer?.contentsGravity = .resize
+                cv.addSubview(pv)
+            }
             gv.contentView = cv
             bg.addSubview(gv)
             glasses.append((gv, vc))
@@ -273,6 +291,24 @@ class D: NSObject, NSApplicationDelegate {
                 let data = try! JSONSerialization.data(withJSONObject: dumpLayer(root), options: [.prettyPrinted, .sortedKeys])
                 try! data.write(to: URL(fileURLWithPath: p.replacingOccurrences(of: ".json", with: ".t\(i).json")))
                 print("DUMP \(i)"); fflush(stdout)
+            }
+            RunLoop.main.add(dt, forMode: .common)
+        }
+        // "dumpWindowsAt": [seconds]: dumps the layer trees of all OTHER windows of this app (an open menu is one)
+        for (i, t) in arr(cfg["dumpWindowsAt"]).enumerated() {
+            let dt = Timer(timeInterval: Double(t), repeats: false) { _ in
+                guard let p = cfg["dump"] as? String else { return }
+                var out: [Any] = []
+                for w in NSApp.windows where w !== self.win && w.isVisible {
+                    var wd: [String: Any] = ["class": "\(type(of: w))", "frame": [w.frame.minX, scr.frame.height - w.frame.maxY, w.frame.width, w.frame.height], "level": w.level.rawValue]
+                    if let fl = w.contentView?.superview?.layer ?? w.contentView?.layer { wd["layers"] = dumpLayer(fl) }
+                    func views(_ v: NSView) -> [String: Any] { ["class": "\(type(of: v))", "frame": [v.frame.minX, v.frame.minY, v.frame.width, v.frame.height], "sub": v.subviews.map { views($0) }] }
+                    if let fv = w.contentView?.superview ?? w.contentView { wd["views"] = views(fv) }
+                    out.append(wd)
+                }
+                let data = try! JSONSerialization.data(withJSONObject: out, options: [.prettyPrinted, .sortedKeys])
+                try! data.write(to: URL(fileURLWithPath: p.replacingOccurrences(of: ".json", with: ".w\(i).json")))
+                print("WDUMP \(i) n=\(out.count)"); fflush(stdout)
             }
             RunLoop.main.add(dt, forMode: .common)
         }

@@ -1,0 +1,162 @@
+{
+ "0": {
+  "backdrop_pp": 31.8,
+  "backdrop_mean": 114.8,
+  "controlCenter288": {
+   "pp": 20.2,
+   "mean": 109.5,
+   "blur": 0,
+   "N": 0,
+   "scale": 0.5
+  },
+  "controlCenter160": {
+   "pp": 20.2,
+   "mean": 109.5,
+   "blur": 0,
+   "N": 0,
+   "scale": 0.5
+  },
+  "controlCenter288x128": {
+   "pp": 20.2,
+   "mean": 109.5,
+   "blur": 0,
+   "N": 0,
+   "scale": 0.5
+  },
+  "clear160": {
+   "pp": 28.2,
+   "mean": 141.4,
+   "blur": 0,
+   "N": 0,
+   "scale": 0.5
+  }
+ },
+ "0.25": {
+  "backdrop_pp": 31.8,
+  "backdrop_mean": 114.8,
+  "controlCenter288": {
+   "pp": 9.0,
+   "mean": 109.6,
+   "blur": 2,
+   "N": 0,
+   "scale": 0.5
+  },
+  "controlCenter160": {
+   "pp": 9.0,
+   "mean": 109.6,
+   "blur": 2,
+   "N": 0,
+   "scale": 0.5
+  },
+  "controlCenter288x128": {
+   "pp": 7.0,
+   "mean": 109.5,
+   "blur": 2,
+   "N": 0,
+   "scale": 0.5
+  },
+  "clear160": {
+   "pp": 19.8,
+   "mean": 141.5,
+   "blur": 0.375,
+   "N": 0,
+   "scale": 0.5
+  }
+ },
+ "0.5071146": {
+  "backdrop_pp": 31.8,
+  "backdrop_mean": 114.8,
+  "controlCenter288": {
+   "pp": 3.0,
+   "mean": 109.5,
+   "blur": 4,
+   "N": 0.014,
+   "scale": 0.5
+  },
+  "controlCenter160": {
+   "pp": 3.0,
+   "mean": 109.5,
+   "blur": 4,
+   "N": 0.014,
+   "scale": 0.5
+  },
+  "controlCenter288x128": {
+   "pp": 1.0,
+   "mean": 109.5,
+   "blur": 4,
+   "N": 0.014,
+   "scale": 0.5
+  },
+  "clear160": {
+   "pp": 13.0,
+   "mean": 141.6,
+   "blur": 0.75,
+   "N": 0.014,
+   "scale": 0.5
+  }
+ },
+ "0.75": {
+  "backdrop_pp": 31.8,
+  "backdrop_mean": 114.8,
+  "controlCenter288": {
+   "pp": 1.0,
+   "mean": 109.5,
+   "blur": 4,
+   "N": 0.5,
+   "scale": 0.5
+  },
+  "controlCenter160": {
+   "pp": 1.0,
+   "mean": 109.5,
+   "blur": 4,
+   "N": 0.5,
+   "scale": 0.5
+  },
+  "controlCenter288x128": {
+   "pp": 1.0,
+   "mean": 109.5,
+   "blur": 4,
+   "N": 0.5,
+   "scale": 0.5
+  },
+  "clear160": {
+   "pp": 7.0,
+   "mean": 141.7,
+   "blur": 0.75,
+   "N": 0.5,
+   "scale": 0.5
+  }
+ },
+ "1": {
+  "backdrop_pp": 31.8,
+  "backdrop_mean": 114.8,
+  "controlCenter288": {
+   "pp": 0.0,
+   "mean": 110.0,
+   "blur": 4,
+   "N": 1,
+   "scale": 0.5
+  },
+  "controlCenter160": {
+   "pp": 0.0,
+   "mean": 110.0,
+   "blur": 4,
+   "N": 1,
+   "scale": 0.5
+  },
+  "controlCenter288x128": {
+   "pp": 0.0,
+   "mean": 110.0,
+   "blur": 4,
+   "N": 1,
+   "scale": 0.5
+  },
+  "clear160": {
+   "pp": 0.0,
+   "mean": 142.0,
+   "blur": 0.75,
+   "N": 1,
+   "scale": 0.5
+  }
+ }
+}

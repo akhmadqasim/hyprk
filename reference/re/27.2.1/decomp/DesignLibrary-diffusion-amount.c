@@ -146,3 +146,12 @@ void SidebarDiffusionAmount(Spec *s, Context *c) {
 // 0x195fd41b4 Clear:              ClearSpec + ClearDiffusionAmount + ApplyAccessibility ...
 // 0x195fd4ade / 0x195fd4b64 Dock: ClearSpec + DockRecipe.Phone|Other (+ AppSwitcher) + ClearDiffusionAmount ...
 // 0x195fd493a ControlCenter:      ClearSpec + IdiomModifier + ... + ClearDiffusionAmount (last)
+
+// ===================================================================================================
+// 4. Follow-ups (verify C2)
+// ===================================================================================================
+// - What the filter does with these inputs (blur fill, face, edge bleed, maxLuma / maxLumaSDR): QuartzCore-glassBackground-shader.c
+// - Why Regular glass drops to backdrop scale 0.125 at a = 1: DesignLibrary-backdrop-scale.c
+// - How a changed value reaches running apps: AppKit-Dock-glass-notification.c
+// - Light Regular: maxLuminance 1 but maxLuminanceSDR 0.94 (0x3f70a3d7 @0x195f21600 in RegularBase.Base); the
+//   filter uses the SDR value on an SDR display, so light glass is luminance-limited too.
