@@ -6,8 +6,8 @@ import "controls.js" as G
 // 0.20 s from that frame); on release it shrinks back with the travel spring while it slides. The knob travels on
 // a spring (SwiftUI response 0.47, dampingFraction 0.7) that carries it 4 % past the end and is cut after 27 frames
 // (0.46 s: the knob jumps the last 1.8 % home, PC #67 A3); the track colour cross-fades in
-// 0.24 s from the release. Click toggles on release; the knob can also be dragged across and lands on the nearer
-// end. Space toggles when it has keyboard focus.
+// 0.24 s from the release. Click toggles on release, also after a long hold; a drag flips the knob at the middle of
+// the track (see the MouseArea). Space toggles when it has keyboard focus.
 // Sizes: controlSize "regular" 54 x 24, "small" 44 x 20, "mini" 36 x 16 (Settings; default Tokens.switchSize).
 // Controlled: it shows `checked` and emits toggled(value); the caller owns the state, so
 // `checked: backend.on; onToggled: on => backend.set(on)` keeps its binding.
@@ -30,7 +30,6 @@ Item {
         response: sw.reduceMotion ? Tokens.motion.reducedResponse : Tokens.motion.switchTravelResponse
         damping: sw.reduceMotion ? 1 : Tokens.motion.switchTravelDamping
         epsilon: 0.001
-        instant: ma.dragging
         onTargetChanged: cut.restart()
     }
     Timer { id: cut; interval: Tokens.motion.switchTravelCut; onTriggered: along.snap() }
@@ -78,31 +77,52 @@ Item {
         cx: G.switchKnobX(sw._m, along.value) + sw._m.knobWidth / 2
         cy: sw.height / 2
     }
+    // Tracking as AppKit's NSSwitch 27.2.1 does it (_updateStateForDragAtPoint:isFinished:isDirectTouch: 0x18b16dbf0,
+    // _stateForDragAtPoint: 0x18b16de40, _shouldToggleForEndTrackingAtPoint: 0x18b16e0c8; there is no timer in it):
+    // - a click toggles on mouse-up when the pointer is still on the track, however long it was held (the Mac probe
+    //   probe-switch-layers-dark.jsonl: held 0.77 and 0.80 s, the state flips at the release); released off the
+    //   track without a drag across, nothing changes;
+    // - a drag does not carry the knob: the knob jumps to the other side (on the travel spring) when the pointer
+    //   crosses the middle of the track, or, when the press was on the empty half, after 0.4 of the track's width
+    //   towards the other state; from then on the middle decides, and the release takes the side shown;
+    // - dragged across and back: nothing changes and the click does not toggle either.
+    // The state itself only changes at mouse-up; until then only the knob shows the side (`shown`).
     MouseArea {
         id: ma
         anchors.fill: parent
         anchors.margins: -4
         preventStealing: true
-        property bool dragging: false
+        property bool dragging: false           // the knob was dragged to the other side at least once
+        property bool byDistance: false         // pressed on the empty half
+        property bool start: false
+        property bool shown: false
         property real pressX: 0
-        property real grabOffset: 0     // pointer minus knob centre at mouse-down
-        readonly property real range: sw._m.width - 2 * sw._m.inset - sw._m.knobWidth
-        function knobCx(a) { return G.switchKnobX(sw._m, a) + sw._m.knobWidth / 2; }
         function land() { along.target = Qt.binding(() => sw.checked ? 1 : 0); }
+        function sideAt(x) {                     // x in the track's coordinates
+            if (byDistance) return (x - pressX) * (start ? -1 : 1) > Tokens.motion.switchDragShare * sw.width ? !start : start;
+            return x >= sw.width / 2;
+        }
         onPressed: m => {
-            pressX = m.x;
-            grabOffset = m.x - 4 - knobCx(Math.max(0, Math.min(1, along.value)));
+            start = shown = sw.checked;
+            pressX = m.x - 4;
             dragging = false;
+            byDistance = false;
+            byDistance = sideAt(pressX) !== start;
             sw._press();
         }
         onPositionChanged: m => {
-            if (!dragging && Math.abs(m.x - pressX) > Tokens.motion.dragThreshold) dragging = true;
-            if (dragging) // the knob keeps the spot it was grabbed at
-                along.target = Math.max(0, Math.min(1, (m.x - 4 - grabOffset - knobCx(0)) / range));
+            const side = sideAt(m.x - 4);
+            if (side === shown) return;
+            dragging = true;
+            byDistance = false;
+            shown = side;
+            along.target = side ? 1 : 0;
         }
-        onReleased: {
-            const v = dragging ? along.value > 0.5 : !sw.checked;
-            dragging = false;           // spring on: lands from where the knob is
+        onReleased: m => {
+            const x = m.x - 4, y = m.y - 4;
+            const onTrack = x >= 0 && x <= sw.width && y >= 0 && y <= sw.height;
+            const v = !dragging && onTrack ? !start : sideAt(x);
+            dragging = false;
             sw._release();
             if (v !== sw.checked) sw.toggled(v);
             land();                     // on the caller's new state, or back if it kept the old one

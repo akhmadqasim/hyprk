@@ -294,6 +294,7 @@ QtObject {
         readonly property real sliderJumpResponse: 0.27
         readonly property real reducedResponse: 0.2   // Reduce Motion: easeInOut(0.2)-like, no growth (lens stays)
         readonly property int dragThreshold: 3        // px before a switch press becomes a drag
+        readonly property real switchDragShare: 0.4   // of the track width: NSSwitch, a drag begun on the empty half (double at 0x18b7ed840)
         // Liquid Glass (SwiftUICore 27.2, liquid-glass-re notes/round3; SPEC 9.9.4/9.9.5/10.3)
         readonly property real materializeResponse: 0.5   // GlassContainer TransitionSettings.default = Spring(duration 0.5, bounce 0.3)
         readonly property real materializeDamping: 0.7

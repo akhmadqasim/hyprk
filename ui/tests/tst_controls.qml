@@ -67,6 +67,63 @@ Item {
             compare(toggledSpy.signalArguments[0][0], true);
             compare(refusing.checked, false);
         }
+        // NSSwitch 27.2.1 (Switch.qml): click, long press, drags
+        function test_switch_long_press_toggles_on_release() {
+            backend.on = false;
+            mousePress(sw, 12, 12);
+            wait(1000);
+            compare(backend.on, false);          // nothing while held
+            mouseRelease(sw, 12, 12);
+            compare(backend.on, true);           // the Mac probe: held 0.77-0.80 s, flips at the release
+            backend.on = false;
+        }
+        function test_switch_release_off_track_keeps_state() {
+            backend.on = false;
+            mousePress(sw, 12, 12);
+            mouseMove(sw, 12, 60);
+            mouseRelease(sw, 12, 60);            // same half, below the track: no toggle
+            compare(backend.on, false);
+        }
+        function test_switch_drag_past_middle() {
+            backend.on = false;
+            mousePress(sw, 12, 12);              // on the knob's half
+            mouseMove(sw, 24, 12);
+            compare(backend.on, false);          // short of the middle (27)
+            mouseMove(sw, 30, 12);
+            compare(backend.on, false);          // the state waits for the release
+            mouseRelease(sw, 30, 12);
+            compare(backend.on, true);
+            backend.on = false;
+        }
+        function test_switch_drag_across_and_back() {
+            backend.on = false;
+            mousePress(sw, 12, 12);
+            mouseMove(sw, 40, 12);
+            mouseMove(sw, 12, 12);
+            mouseRelease(sw, 12, 12);            // back on the start side: no change, and no click toggle
+            compare(backend.on, false);
+        }
+        function test_switch_small_drag_is_a_click() {
+            backend.on = false;
+            mousePress(sw, 10, 12);
+            mouseMove(sw, 18, 12);               // 8 pt, never past the middle
+            mouseRelease(sw, 18, 12);
+            compare(backend.on, true);
+            backend.on = false;
+        }
+        function test_switch_drag_from_empty_half() {
+            backend.on = false;
+            mousePress(sw, 30, 12);              // empty half: flips after 0.4 x 54 = 21.6 pt towards "on"
+            mouseMove(sw, 45, 12);
+            mouseMove(sw, 50, 12);
+            mouseRelease(sw, 50, 60);            // released off the track, 20 pt along: still off
+            compare(backend.on, false);
+            mousePress(sw, 30, 12);
+            mouseMove(sw, 53, 12);               // 23 pt: the knob has flipped
+            mouseRelease(sw, 53, 60);
+            compare(backend.on, true);
+            backend.on = false;
+        }
         function knobOf(c) {
             for (let i = 0; i < c.children.length; i++) if (c.children[i].restW !== undefined) return c.children[i];
             return null;
