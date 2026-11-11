@@ -374,12 +374,26 @@ ShellWindow {
     // App name label: a glass capsule 26 pt tall (radius 13), text + 2 x 14 wide (at least 41), its bottom 9 pt
     // above the tile top (above the Dock background at rest), centred on the icon (lib/dock.js labelWidth).
     // Material: Liquid Glass (ECCartoucheGlassLayerController); on the plugin it gets the Dock layer's glass plus
-    // Theme.dock.labelFill. Its tail is not drawn: the tip is 2.5 pt above the Dock, inside the plugin's smooth
-    // union reach (8), so a glass tail would merge into the Dock.
+    // Theme.dock.labelFill. Tail (Q-dock-08: about 16 x 6.5 pt, rounded tip 2.5 pt above the Dock): a 5 pt round glass
+    // under the capsule that the plugin's smooth union (reach 8) joins to it with a tapering neck. The tip is inside
+    // that reach of the Dock too, so the label is on a surface of its own (same geometry and recipe as the Dock: the
+    // union is per surface), mapped only while the label shows.
     readonly property var tipItem: tipCell >= 0 && tipCell < cellRepeater.count ? cellRepeater.itemAt(tipCell) : null
+    ShellWindow {
+        id: labelHost
+        screen: dock.screen
+        visible: label.shown
+        anchors { bottom: true; left: true; right: true }
+        implicitHeight: dock.implicitHeight
+        exclusionMode: ExclusionMode.Ignore
+        namespace: "hyprk-dock"   // the Dock's recipe and layer rules
+        WlrLayershell.layer: WlrLayer.Top
+        acceptsInput: false
+
     Glass {
         id: label
-        visible: dock.tipItem !== null && dock.tipAlpha > 0 && bg.visible
+        readonly property bool shown: dock.tipItem !== null && dock.tipAlpha > 0 && bg.visible
+        visible: shown
         width: DockLayout.labelWidth(labelText.implicitWidth)
         height: 26
         x: dock.tipItem ? Math.max(0, Math.min(dock.width - width, Math.round(bg.x + dock.tipItem.x + dock.tipItem.width / 2 - width / 2))) : 0
@@ -412,5 +426,26 @@ ShellWindow {
             font: Typography.font(Theme.font.dockLabel)
             color: Theme.dock.labelText
         }
+    }
+    // the tail: a small capsule whose bottom is the tip; the smooth union fillets it to the label with a tapering neck
+    component TailPart: Glass {
+        visible: label.visible && Theme.compositorGlass && !Theme.solidMaterial
+        x: label.x + (label.width - width) / 2
+        sx: x
+        sy: label.sy + y - label.y
+        tint: Theme.glass.tintClear
+        solidColor: Theme.glass.solidDock
+        pluginLift: "transparent"
+        shadow: false
+        materialize: dock.tipAlpha
+    }
+    // one shape only: the plugin's multi-shape groups (a base bar plus a tip, or shapes overlapping the capsule)
+    // drew a detached dot or no tail at all
+    TailPart {
+        width: Theme.dock.labelTailTip
+        height: Theme.dock.labelTailTipHeight
+        radius: height / 2
+        y: label.y + label.height + Theme.dock.labelTailHeight - height
+    }
     }
 }

@@ -307,7 +307,11 @@ Singleton {
         // least squares of dst * (1 - a) + k against the Mac's label over the Dock material on black, grey 127 and
         // white (Q-dock-08 fills light 131/192/249, dark 31/131/180 against the Dock's 38/134/229, 12/108/176):
         // light a 0.382, k 108/255 (rms 1.0); dark a 0.083, k 23.5/255 (rms 5)
-        readonly property vector4d labelFill: theme.dark ? Qt.vector4d(23.5 / 255, 23.5 / 255, 23.5 / 255, 0.083) : Qt.vector4d(108 / 255, 108 / 255, 108 / 255, 0.382)
+        readonly property vector4d labelFill: theme.dark ? Qt.vector4d(23.5 / 255, 23.5 / 255, 23.5 / 255, 0.083) : Qt.vector4d(107 / 255, 107 / 255, 107 / 255, 0.382)
+        // label tail (Q-dock-08 ~16 x 6.5 pt, rounded tip): its height below the capsule and the round glass at its tip
+        readonly property real labelTailHeight: 6.5
+        readonly property real labelTailTip: 8
+        readonly property real labelTailTipHeight: 5
         readonly property color labelText: theme.dark ? Qt.rgba(244 / 255, 244 / 255, 244 / 255, 1) : Qt.rgba(37 / 255, 37 / 255, 37 / 255, 1)   // Q-dock-08
         // tint over the plugin glass: none. The plugin's dock recipe alone gives the Mac's body over white, grey and
         // black in both modes (light 229/134/38, dark 176/107/12 with the probe's max luma 0.75, MAC-ANSWERS #53)
