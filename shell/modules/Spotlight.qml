@@ -58,8 +58,21 @@ ShellWindow {
         onFinished: if (!sp.shown) sp.gone = true
     }
     property bool gone: false
+    // Apps (Spotlight's apps mode here) is an ordinary window on 27.2.1: it appears in one frame and Escape closes it
+    // in one frame (MAC-ANSWERS.md R2). With the Spotlight springs it faded in over 0.10 s and kept a 13 % tail for
+    // 0.12 s on close (mcap). The mode is taken at open: SpotlightState forgets it when Spotlight closes.
+    property bool appsCut: false
     function animate(open) {
         gone = false;
+        if (open) appsCut = mode === "apps";
+        if (appsCut) {
+            animX.snap(1);
+            animY.snap(1);
+            animAlpha.snap(open ? 1 : 0);
+            gone = !open;
+            settleGlass(50);
+            return;
+        }
         animX.spring = open ? springOpen : springClose;
         animY.spring = open ? springOpen : springClose;
         animAlpha.cutAt = open ? 0 : SpringLib.firstCrossing(springAlpha, 0, 0.001);
