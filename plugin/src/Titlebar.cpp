@@ -419,7 +419,12 @@ namespace lg {
         switch (button) {
             case 0: window->sendClose(); break;
             case 1: HyprlandAPI::invokeHyprctlCommand("dispatch", std::format(R"(hl.dsp.window.move({{ workspace = "special:minimized", window = "{}" }}))", selector)); break;
-            case 2: HyprlandAPI::invokeHyprctlCommand("dispatch", std::format(R"(hl.dsp.window.fullscreen({{ mode = "maximized", window = "{}" }}))", selector)); break;
+            // green: full screen; Option-click: zoom (the glyph is then +), Q-windows-10
+            case 2: {
+                const bool option = (g_pInputManager->getModsFromAllKBs() & Input::HL_MODIFIER_ALT) == Input::HL_MODIFIER_ALT;
+                HyprlandAPI::invokeHyprctlCommand("dispatch", std::format(R"(hl.dsp.window.fullscreen({{ mode = "{}", window = "{}" }}))", option ? "maximized" : "fullscreen", selector));
+                break;
+            }
             default: break;
         }
     }

@@ -24,6 +24,12 @@
 #include <hyprland/src/render/Renderer.hpp>
 #include <hyprland/src/state/MonitorState.hpp>
 
+#include <hyprutils/string/String.hpp>
+#include <hyprutils/string/VarList.hpp>
+
+#include <chrono>
+#include <cstdio>
+#include <format>
 #include <optional>
 
 namespace {
@@ -35,6 +41,8 @@ namespace {
     std::vector<WP<lg::CTitlebar>>        g_titlebars;
     std::vector<WP<lg::CTitlebarProbe>>   g_probes;
     SP<IPC::Socket1::SCommand>            g_statsCommand;
+    std::string                           g_trace; // `hyprctl liquidglass trace NS FILE`: that layer's region and shapes per draw
+    std::FILE*                            g_traceFile = nullptr;
 
     using renderLayerFn = void (*)(Render::IHyprRenderer*, Render::CRenderContext&, PHLLS, PHLMONITOR, const Time::steady_tp&, bool, bool, bool);
 }
@@ -96,6 +104,20 @@ static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext
     if (shapes.empty()) {
         original(thisptr, ctx, layer, mon, now, popups, lockscreen, workspaceScene);
         return;
+    }
+    if (g_traceFile && layer->m_namespace == g_trace) {
+        std::string line = std::format("trace {} t {:.2f} fade {:.4f} opacity {:.4f} rects", layer->m_namespace,
+                                       std::chrono::duration<double, std::milli>(now.time_since_epoch()).count(),
+                                       layer->alpha()[Desktop::View::LS_ALPHA_FADE]->value(), opacity);
+        if (const auto surface = layer->wlSurface())
+            for (const auto& r : surface->m_blurRegion.getRects())
+                if (r.y2 - r.y1 <= 2 || r.x2 - r.x1 <= 2)
+                    line += std::format(" {},{} {}x{}", r.x1, r.y1, r.x2 - r.x1, r.y2 - r.y1);
+        for (const auto& s : shapes)
+            line += std::format(" | box {:.3f},{:.3f} {:.3f}x{:.3f} r {:.3f} m {:.4f}{}", s.box.x, s.box.y, s.box.w, s.box.h, s.radius, s.materialize,
+                                s.regularShadow ? " shadow" : "");
+        std::fprintf(g_traceFile, "%s\n", line.c_str());
+        std::fflush(g_traceFile);
     }
     lg::CGlassElement::SData data{
         .shapes       = std::move(shapes),
@@ -234,6 +256,18 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
         .name    = "liquidglass",
         .match   = IPC::Socket1::COMMAND_MATCH_PREFIX,
         .handler = [](const IPC::Socket1::SRequest& req) -> IPC::Socket1::SResponse {
+            // `hyprctl liquidglass trace NS FILE` appends NS's region holes and shapes on every draw to FILE (a debug aid
+            // for motion steps); `trace` alone stops
+            if (const auto at = req.command.find("trace"); at != std::string::npos) {
+                if (g_traceFile)
+                    std::fclose(g_traceFile);
+                g_traceFile = nullptr;
+                Hyprutils::String::CVarList args{req.command.substr(at + 5), 0, ' ', true};
+                g_trace = args.size() >= 2 ? args[0] : "";
+                if (!g_trace.empty())
+                    g_traceFile = std::fopen(args[1].c_str(), "a");
+                return std::format("trace '{}' {}\n", g_trace, g_traceFile ? "on" : "off");
+            }
             if (req.command.contains("reset"))
                 lg::stats::reset();
             // `hyprctl liquidglass damage`: redraw every output, e.g. after hl.config() changed tint_amount through
@@ -263,6 +297,9 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
 }
 
 APICALL EXPORT void PLUGIN_EXIT() {
+    if (g_traceFile)
+        std::fclose(g_traceFile);
+    g_traceFile = nullptr;
     g_listeners.clear();
     removeAll(g_decorations);
     removeAll(g_shadows);

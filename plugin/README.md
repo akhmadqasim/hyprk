@@ -257,8 +257,10 @@ vertical gradients (close #FF6D63 -> #F57269 a0.8, minimise #FBB316 -> #FFD134 a
 a0.73; dark bars their dark stops), a 0.75 pt rim over the fill (black 0.20 / 0.12 dark), a flat translucent
 inactive fill with a 0.14 rim, flat pressed colours while the pointer stays on the pressed light, and
 1.2 pt round-cap glyphs (× − +) that fade in on hover on a 0.3 s critically damped spring. The title is
-centred in SF Pro Text 13 semibold. Close sends the client a close request, minimise moves the window to `special:minimized`, zoom
-toggles maximised, dragging the rest of the bar moves the window.
+centred in SF Pro Text 13 semibold. Close sends the client a close request, minimise moves the window to `special:minimized`
+(plugin-motion plays the genie into the Dock), the green light toggles full screen and Option-click toggles zoom (maximised), as on
+27.2.1 (Q-windows-10: Option turns the glyph into +); dragging the rest of the bar moves the window. A client's own yellow light
+(GTK header bars, Xwayland) sends set_minimized, which Hyprland drops: plugin-motion (`client_minimize`) takes it the same way.
 
 `titlebar = "auto"` (default) gives a bar to Wayland clients that bound xdg-decoration (Hyprland always
 answers server-side, so they draw none: foot, Qt apps); GTK apps with client-side decorations get none.
