@@ -663,3 +663,23 @@ Measured, not changed:
   the row at 0.0011 before the reveal (7 of 8 partial), revealing the panel at the fill surface's swap (5 of 8 partial,
   icons first) or at its afterAnimating (4 of 8). Two surfaces cannot commit together; one surface with the panel glass
   and the tile fill needs per-shape fills in the plugin.
+
+## Session 17 (2026-11-12): Cmd-Tab in one commit, full-screen title bar fade, toolbar button light, Mission Control at 1.6
+
+Own headless sessions (MBA 2560x1664), scratch copy of the tree, private D-Bus, no PipeWire, fresh sessions (A scale 2
+light, about 66 mcap runs; B scale 1.6 dark, 23; C scale 2 then 1.6, about 50; D scale 1.6 light, 8), quiet host (load
+under 1). Per-frame series in the CSV (`*-s17-*`).
+
+| Motion | Mac | Before | After | Runs |
+|---|---|---|---|---|
+| Cmd-Tab first frame (alpha over a 400 x 240 pt box round the panel; complete = the first frame over .2 is >= .95) | appears complete in one frame (REA 27.2.1 section 5) | session 16: partial in 2 of 5 (the panel's glass a frame before the tile / icons surface) | one surface; the tile is a cut in the panel's glass region filled by the plugin (`cut_fills`, 15480b6 / 58447b3): complete in 39 of 39 at scale 2 light (one capture of 40 empty) and 20 of 20 at 1.6 dark; tile 220 -> 161-167 over the light glass (Mac -57) | 40 + 20 |
+| Full screen enter, title bar (red-light ink of the lights over the top 140 pt, foot at 2x) | AppKit overlay cross-fade: after-contents in on (0, 1, 1, 1) over 0.25 s: 1 .60 .46 .36 .29 .23 .18 .14 .11 .08 .06 .04 .02 | 1 then 0 in the first frame (rms .265) | 1.03 .59 .48 .40 .33 .29 .24 .20 .15 .10 .05 .01 0 in 20 of 20 (rms .038; the ink grows with the lights' scale mid-way), 9403a76 | 8 + 20 |
+| Full screen enter, menu bar titles (contrast of the title strip) | - | judge #5: blank one frame | no blank frame in 20 of 20 at 2x (1.00 1.00 .98 .90 .78 .62 .44 .27 .16 .11); at 1.6 one blank frame in 14, the first enter after the scale change | 20 + 14 |
+| Toolbar button hover (preview share button, dark) | 23.09.23 frames 8-63: a 31-32 pt disc, +19.5 levels, in one frame | none | disc 31.5 pt, +19-20 levels, in one frame (682d515) | stills |
+| Toolbar button press, capsule mean normalised | frames 196-205: .26 .66 .84 .91 .96 .98 .99 1.0 | the press lift only | .30 .73 .87 .93 .96 .98 .99 1.0 (rms about .035) | 2 |
+| Toolbar button release | frames 251-285: 1 1 .97 .92 .85 .78 .69 .62 .53 .48 .41 .36 .31 .26 ... | - | 1 .99 .98 .96 .92 .87 .81 .74 .68 .60 .54 .47 .41 .36 ...: about 2 frames behind; the same without the hover disc, so not the disc: our capsule is brighter (184,201,217 vs the Mac's 162,171,183 at the same spot) and clips at 255 under the gain, which slows the mean's fall | 2 |
+| Banner out (left edge per frame and alpha over 400 x 110 pt) | - | session 15: the first value lost in 4 of 6 | not reproduced at 1ff1180: 6 of 6 the same series, frame 1 shown (edge 17, 63, 123, 171 pt; spring 22, 63, 112, 162); a hold of the first frame after idle (FrameClock) changed nothing and was dropped | 6 + 6 |
+| Mission Control at 1.6, Settings 1300 x 850 (it flies: scaled into the layout) | R2 enter 333 ms, exit 267 | session 16: one fitting window, no flight | enter 302-319 ms, rms .015-.024 (.09 .21 .31 .40 .48 .56 .63 vs .05 .15 .25 .37 .46 .54 .60); exit 233-235 ms, rms .028-.029, one frame ahead from the first (.26 .40 .53 .62 vs .21 .34 .47 .57); before the flight the Dock leaves at +54 ms and the window's sidebar blur changes for 4 frames, the flight starts at +150 ms | 4 + 4 |
+
+Not done: the 4-window exit (needs the Mac's 4-window recording), the article scroll physics in the preview (the
+recording shows output only, not the trackpad input), banner in's repeated first value.
