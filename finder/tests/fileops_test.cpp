@@ -123,5 +123,38 @@ int main(int argc, char **argv)
     }
 
     std::printf("%s\n", failures ? "FAILED" : "fileops tests passed");
+    // context menu names (Finder: "x copy.txt", "x.txt alias", "x.txt.zip" / "Archive.zip")
+    {
+        QTemporaryDir names;
+        const QString d = names.path();
+        CHECK(FileOps::freeName(d, QStringLiteral("Notes.txt"), false, QStringLiteral("copy")) == QStringLiteral("Notes copy.txt"));
+        QFile(d + QStringLiteral("/Notes copy.txt")).open(QIODevice::WriteOnly);
+        CHECK(FileOps::freeName(d, QStringLiteral("Notes.txt"), false, QStringLiteral("copy")) == QStringLiteral("Notes copy 2.txt"));
+        CHECK(FileOps::freeName(d, QStringLiteral("Photos.d"), true, QStringLiteral("copy")) == QStringLiteral("Photos.d copy"));
+        CHECK(FileOps::freeName(d, QStringLiteral(".bashrc"), false, QStringLiteral("copy")) == QStringLiteral(".bashrc copy"));
+        CHECK(FileOps::freeName(d, QStringLiteral("Notes.txt"), false, QStringLiteral("alias")) == QStringLiteral("Notes.txt alias"));
+        CHECK(FileOps::freeName(d, QStringLiteral("Notes.txt"), false, QStringLiteral("zip")) == QStringLiteral("Notes.txt.zip"));
+        CHECK(FileOps::freeName(d, QString(), false, QStringLiteral("zip")) == QStringLiteral("Archive.zip"));
+        QFile(d + QStringLiteral("/Archive.zip")).open(QIODevice::WriteOnly);
+        CHECK(FileOps::freeName(d, QString(), false, QStringLiteral("zip")) == QStringLiteral("Archive 2.zip"));
+        QFile(d + QStringLiteral("/a.txt")).open(QIODevice::WriteOnly);
+        CHECK(ops.makeAlias({d + QStringLiteral("/a.txt")}).isEmpty());
+        CHECK(QFileInfo(d + QStringLiteral("/a.txt alias")).isSymLink());
+        auto waitDone = [&ops] {
+            QEventLoop loop;
+            QString err = QStringLiteral("timeout");
+            QObject::connect(&ops, &FileOps::transferFinished, &loop, [&](const QString &e) { err = e; loop.quit(); });
+            QTimer::singleShot(10000, &loop, &QEventLoop::quit);
+            loop.exec();
+            return err;
+        };
+        ops.duplicate({d + QStringLiteral("/a.txt")});
+        CHECK(waitDone().isEmpty());
+        CHECK(QFileInfo(d + QStringLiteral("/a copy.txt")).isFile());
+        ops.compress({d + QStringLiteral("/a.txt")});
+        CHECK(waitDone().isEmpty());
+        CHECK(QFileInfo(d + QStringLiteral("/a.txt.zip")).size() > 0);
+    }
+
     return failures ? 1 : 0;
 }

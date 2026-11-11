@@ -7,6 +7,7 @@
 
 #include "fileops.h"
 #include "statefile.h"
+#include "clipboard.h"
 #include "sysicons.h"
 #include "thumbnails.h"
 
@@ -103,6 +104,8 @@ int main(int argc, char *argv[])
     FileOps ops;
     qmlRegisterSingletonInstance("Finder.Native", 1, 0, "FileOps", &ops);
     qmlRegisterType<StateFile>("Finder.Native", 1, 0, "StateFile");
+    Clipboard clipboard;
+    qmlRegisterSingletonInstance("Finder.Native", 1, 0, "Clipboard", &clipboard);
 
     const QString dir = cli.positionalArguments().value(0);
     const QString iconDir = resourceDir("themes/icons/system", FINDER_ICON_DIR);

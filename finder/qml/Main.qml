@@ -286,28 +286,69 @@ Window {
         if (fm.selectedCount === 1) fm.renamingPath = fm.selectedPaths()[0];
         else if (fm.selectedCount > 1) renameSheet.open(fm.selectedEntries());
     }
-    // Finder's order (Q-finder-23); Finder shows no shortcuts in context menus. Items without a Linux
-    // counterpart (Ask Siri, Open With, Get Info, Compress, Duplicate, Make Alias, Copy, Share, Quick Actions,
-    // Services) are left out.
+    // The 27.2.1 context menus (live/finder/crops/context-menu-{file,folder,background}-light.png), in the Mac's order,
+    // with its leading symbols and submenus; Finder shows no shortcuts in context menus. Rows hyprk cannot do are
+    // left out where a Mac without the feature has none (Ask Siri: Siri off; Open in New Tab: no tabs; Customise
+    // Folder…, Clean Up, Clean Up By, Show View Options, Use Groups) or shown disabled where the Mac always has the
+    // row (Share…, Quick Actions ▸ Customise…, Services ▸ No Services Apply). The tag dots follow Share….
     function contextMenu(entry, pos) {
-        const n = fm.selectedCount;
+        const sel = fm.selectedEntries();
+        const n = sel.length;
+        const paths = sel.map(e => e.path);
         const writable = !fm.isVirtual;
-        const items = entry ? [
-            { text: "Open", action: () => fm.openSelection() },
+        const one = n === 1 ? sel[0] : null;
+        const tail = [
+            { text: "Share…", icon: "square.and.arrow.up", enabled: false },
             { separator: true },
-            { text: "Move to Trash", enabled: n > 0 && fm.userFiles, action: () => fm.trashSelection() },
+            { tagRow: true, action: tag => fm.toggleTag(tag) },
             { separator: true },
-            { text: n > 1 ? "Rename\u2026" : "Rename", enabled: n > 0 && writable, action: () => win.startRename() },
-            { text: "Quick Look", action: () => win.quickLook() },
+            { text: "Quick Actions", icon: "gear", submenu: [{ text: "Customise…", enabled: false }] },
             { separator: true },
-            { tagRow: true, action: tag => fm.toggleTag(tag) }
-        ].concat(fm.isVirtual ? [{ separator: true }, { text: "Show in Enclosing Folder", action: () => {
+            { text: "Services", icon: "gear.2", submenu: [{ text: "No Services Apply", enabled: false }] }
+        ];
+        let items;
+        if (entry) {
+            const apps = one && !one.isDir ? FileOps.appsFor(one.path) : [];
+            const openWith = apps.map(a => ({ text: a.name + (a.isDefault ? " (default)" : ""),
+                                             action: () => FileOps.openWith(a.desktop, paths) }));
+            const def = openWith.length && apps[0].isDefault ? 1 : 0;
+            if (def && openWith.length > 1) openWith.splice(1, 0, { separator: true });
+            items = [
+                { text: "Open", action: () => fm.openSelection() }
+            ].concat(one && one.isDir ? [] : [
+                { text: "Open With", enabled: openWith.length > 0, submenu: openWith.length ? openWith : null }
+            ]).concat(Clipboard.files.length && one && one.isDir && writable ? [
+                { text: Clipboard.files.length > 1 ? "Paste Items" : "Paste Item", action: () => fm.drop(Clipboard.files, one.path, "copy") }
+            ] : []).concat([
+                { separator: true },
+                { text: "Move to Trash", icon: "trash", enabled: n > 0 && fm.userFiles, action: () => fm.trashSelection() },
+                { separator: true },
+                { text: "Get Info", action: () => info.show(entry.path, pos.x, pos.y) },
+                { text: n > 1 ? "Rename…" : "Rename", enabled: n > 0 && writable, action: () => win.startRename() },
+                { text: n > 1 ? "Compress " + n + " Items" : "Compress “" + entry.name + "”", enabled: writable, action: () => FileOps.compress(paths) },
+                { text: "Duplicate", enabled: writable, action: () => FileOps.duplicate(paths) },
+                { text: "Make Alias", enabled: writable, action: () => { const e = FileOps.makeAlias(paths); if (e) fm.errorRaised(e); fm.reload(); } },
+                { text: "Quick Look", action: () => win.quickLook() },
+                { text: n > 1 ? "Copy " + n + " Items" : "Copy", action: () => Clipboard.copyFiles(paths) },
+                { separator: true }
+            ]).concat(tail).concat(fm.isVirtual ? [{ separator: true }, { text: "Show in Enclosing Folder", action: () => {
                 fm.go(Files.parentPath(entry.path));
                 fm.selectPaths([entry.path]);
-            } }] : []) : [
-            { text: "New Folder", enabled: writable, action: () => fm.newFolder() },
-            { separator: true }
-        ].concat(sortItems());
+            } }] : []);
+        } else {
+            const view = (key, label) => ({ text: label, checked: win.view === key, action: () => win.view = key });
+            items = [
+                { text: "New Folder", enabled: writable, action: () => fm.newFolder() }
+            ].concat(Clipboard.files.length && writable ? [
+                { text: Clipboard.files.length > 1 ? "Paste Items" : "Paste Item", action: () => fm.drop(Clipboard.files, fm.path, "copy") }
+            ] : []).concat([
+                { separator: true },
+                { text: "Get Info", enabled: writable, action: () => info.show(fm.path, pos.x, pos.y) },
+                { separator: true },
+                { text: "View", submenu: [view("icons", "as Icons"), view("list", "as List"), view("columns", "as Columns"), view("gallery", "as Gallery")] },
+                { text: "Sort By", submenu: sortItems() }
+            ]);
+        }
         showMenu(items, pos.x, pos.y);
     }
     function sortItems() {
@@ -326,11 +367,11 @@ Window {
         { text: "Move to Trash", enabled: fm.selectedCount > 0 && fm.userFiles, action: () => fm.trashSelection() },
         { separator: true },
         { text: win.showPathBar ? "Hide Path Bar" : "Show Path Bar", shortcut: "⌥⌃P", action: () => win.showPathBar = !win.showPathBar },
-        { text: fm.showHidden ? "Hide Hidden Files" : "Show Hidden Files", shortcut: "⇧⌃.", action: () => fm.showHidden = !fm.showHidden },
-        { text: Theme.dark ? "Light Appearance" : "Dark Appearance", action: () => Theme.dark = !Theme.dark }
+        { text: fm.showHidden ? "Hide Hidden Files" : "Show Hidden Files", shortcut: "⇧⌃.", action: () => fm.showHidden = !fm.showHidden }
     ]
 
     // ---------- overlays ----------
+    InfoPopover { id: info; anchors.fill: parent; onClosed: keys.forceActiveFocus() }
     QuickLook {
         width: Math.min(parent.width - 80, 760)
         height: Math.min(parent.height - 80, 560)

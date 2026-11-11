@@ -52,6 +52,21 @@ public:
     Q_INVOKABLE QString makeFolder(const QString &dir, const QString &baseName) const;
     Q_INVOKABLE QString readText(const QString &path, int maxBytes) const;
 
+    // Context menu (MAC-ANSWERS live/finder/crops/context-menu-*.png). Names follow Finder:
+    //   Duplicate  "Notes copy.txt", "Notes copy 2.txt", folder "Photos copy"
+    //   Make Alias "Notes.txt alias", "Notes.txt alias 2" (a symlink here)
+    //   Compress   one item "Notes.txt.zip", several "Archive.zip", "Archive 2.zip"
+    static QString freeName(const QString &dir, const QString &name, bool isDir, const QString &kind);
+    // Duplicate and Compress run without blocking the UI and end in transferFinished.
+    Q_INVOKABLE void duplicate(const QStringList &paths);
+    Q_INVOKABLE void compress(const QStringList &paths);
+    // Returns an error string ("" on success).
+    Q_INVOKABLE QString makeAlias(const QStringList &paths) const;
+    // Open With: the installed apps (.desktop, MimeType=) that take this file's type, the default first:
+    // [{ name, desktop, icon, isDefault }]. openWith launches one with the files (gio launch).
+    Q_INVOKABLE QVariantList appsFor(const QString &path) const;
+    Q_INVOKABLE bool openWith(const QString &desktopFile, const QStringList &paths) const;
+
 signals:
     void directoryChanged(const QString &dir);
     void trashFinished(const QString &error);   // empty on success
@@ -59,6 +74,7 @@ signals:
     void listed(int token, const QVariantList &entries);
 
 private:
+    void runChecked(const QString &prog, const QStringList &args, const QString &workDir, const QString &failure);
     QVariantMap entry(const class QFileInfo &fi) const;
     QVariantList recents(int max) const;
     QVariantList applications() const;

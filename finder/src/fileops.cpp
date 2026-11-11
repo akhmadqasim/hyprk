@@ -447,3 +447,154 @@ QVariantList FileOps::tagged(const QString &tag) const
     }
     return out;
 }
+
+// ---------- context menu ----------
+
+QString FileOps::freeName(const QString &dir, const QString &name, bool isDir, const QString &kind)
+{
+    const QDir d(dir);
+    // "Notes.txt" -> base "Notes", ext ".txt" (folders and dot files keep the whole name)
+    const int dot = isDir ? -1 : name.lastIndexOf(QLatin1Char('.'));
+    const QString base = dot > 0 ? name.left(dot) : name;
+    const QString ext = dot > 0 ? name.mid(dot) : QString();
+    auto make = [&](int n) {
+        const QString num = n > 1 ? QStringLiteral(" %1").arg(n) : QString();
+        if (kind == QLatin1String("copy"))
+            return base + QStringLiteral(" copy") + num + ext;
+        if (kind == QLatin1String("alias"))
+            return name + QStringLiteral(" alias") + num;
+        // zip: one item keeps its full name, Archive gets numbered before the extension
+        return (name.isEmpty() ? QStringLiteral("Archive") + num : name + num) + QStringLiteral(".zip");
+    };
+    for (int n = 1;; ++n) {
+        const QString candidate = make(n);
+        if (!QFileInfo::exists(d.filePath(candidate)) && !QFileInfo(d.filePath(candidate)).isSymLink())
+            return candidate;
+    }
+}
+
+void FileOps::runChecked(const QString &prog, const QStringList &args, const QString &workDir, const QString &failure)
+{
+    auto *p = new QProcess(this);
+    p->setWorkingDirectory(workDir);
+    connect(p, &QProcess::errorOccurred, this, [this, p, prog, failure](QProcess::ProcessError e) {
+        if (e != QProcess::FailedToStart)
+            return;   // other errors also end in finished()
+        emit transferFinished(failure + QStringLiteral("\n%1 could not be started.").arg(prog));
+        p->deleteLater();
+    });
+    connect(p, &QProcess::finished, this, [this, p, failure](int code, QProcess::ExitStatus status) {
+        QString err;
+        if (status != QProcess::NormalExit || code != 0) {
+            const QString out = QString::fromUtf8(p->readAllStandardError()).trimmed().section(QLatin1Char('\n'), 0, 0);
+            err = failure + (out.isEmpty() ? QString() : QLatin1Char('\n') + out);
+        }
+        emit transferFinished(err);
+        p->deleteLater();
+    });
+    p->start(prog, args);
+}
+
+void FileOps::duplicate(const QStringList &paths)
+{
+    // cp -a src1 dst1, src2 dst2 ... in one process (distinct sources in one folder give distinct copy names)
+    QStringList pairs;
+    for (const QString &path : paths) {
+        const QFileInfo fi(path);
+        pairs << path << fi.absolutePath() + QLatin1Char('/') + freeName(fi.absolutePath(), fi.fileName(), fi.isDir(), QStringLiteral("copy"));
+    }
+    if (pairs.isEmpty())
+        return;
+    runChecked(QStringLiteral("sh"),
+               QStringList{QStringLiteral("-c"), QStringLiteral("while [ $# -gt 1 ]; do cp -a -n -- \"$1\" \"$2\" || exit 1; shift 2; done"),
+                           QStringLiteral("sh")} + pairs,
+               QFileInfo(paths.first()).absolutePath(), QStringLiteral("Some items can’t be duplicated."));
+}
+
+void FileOps::compress(const QStringList &paths)
+{
+    if (paths.isEmpty())
+        return;
+    const QFileInfo first(paths.first());
+    const QString dir = first.absolutePath();
+    const QString zip = freeName(dir, paths.size() == 1 ? first.fileName() : QString(), false, QStringLiteral("zip"));
+    QStringList names;
+    for (const QString &p : paths)
+        names << QStringLiteral("./") + QFileInfo(p).fileName();   // relative (the archive holds the items), never an option
+    // -r folders, -y store symlinks as links, -q quiet (zip takes no "--")
+    runChecked(QStringLiteral("zip"), QStringList{QStringLiteral("-r"), QStringLiteral("-y"), QStringLiteral("-q"), QStringLiteral("./") + zip} + names,
+               dir, QStringLiteral("“%1” can’t be compressed.").arg(paths.size() == 1 ? first.fileName() : QStringLiteral("Archive")));
+}
+
+QString FileOps::makeAlias(const QStringList &paths) const
+{
+    for (const QString &path : paths) {
+        const QFileInfo fi(path);
+        const QString name = freeName(fi.absolutePath(), fi.fileName(), fi.isDir(), QStringLiteral("alias"));
+        if (!QFile::link(fi.absoluteFilePath(), fi.absolutePath() + QLatin1Char('/') + name))
+            return QStringLiteral("The alias “%1” can’t be made.").arg(name);
+    }
+    return {};
+}
+
+namespace {
+struct DesktopApp { QString name, icon, desktop; QStringList mimes; };
+DesktopApp readDesktop(const QString &file)
+{
+    DesktopApp app;
+    QFile f(file);
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
+        return app;
+    bool main = false;
+    bool hidden = false;
+    while (!f.atEnd()) {
+        const QString line = QString::fromUtf8(f.readLine()).trimmed();
+        if (line.startsWith(QLatin1Char('['))) { main = line == QLatin1String("[Desktop Entry]"); continue; }
+        if (!main) continue;
+        if (line.startsWith(QLatin1String("Name="))) app.name = line.mid(5);
+        else if (line.startsWith(QLatin1String("Icon="))) app.icon = line.mid(5);
+        else if (line.startsWith(QLatin1String("MimeType="))) app.mimes = line.mid(9).split(QLatin1Char(';'), Qt::SkipEmptyParts);
+        else if (line == QLatin1String("NoDisplay=true") || line == QLatin1String("Hidden=true")) hidden = true;
+    }
+    if (hidden) app.mimes.clear();
+    app.desktop = file;
+    return app;
+}
+} // namespace
+
+QVariantList FileOps::appsFor(const QString &path) const
+{
+    const QMimeType type = m_mime.mimeTypeForFile(path);
+    QStringList wanted{type.name()};
+    wanted += type.allAncestors();
+    // the default handler, as xdg-open would pick it
+    QProcess q;
+    q.start(QStringLiteral("xdg-mime"), {QStringLiteral("query"), QStringLiteral("default"), type.name()});
+    const QString def = q.waitForFinished(1000) ? QString::fromUtf8(q.readAllStandardOutput()).trimmed() : QString();
+    QVariantList first, rest;
+    QSet<QString> seen;
+    for (const QString &dir : QStandardPaths::standardLocations(QStandardPaths::ApplicationsLocation)) {
+        for (const QFileInfo &fi : QDir(dir).entryInfoList({QStringLiteral("*.desktop")}, QDir::Files)) {
+            if (seen.contains(fi.fileName()))
+                continue;   // the first dir wins (user overrides system)
+            seen.insert(fi.fileName());
+            const DesktopApp app = readDesktop(fi.absoluteFilePath());
+            const bool takes = std::any_of(app.mimes.begin(), app.mimes.end(), [&](const QString &m) { return wanted.contains(m); });
+            if (!takes || app.name.isEmpty())
+                continue;
+            const bool isDefault = fi.fileName() == def;
+            const QVariantMap m{{QStringLiteral("name"), app.name}, {QStringLiteral("desktop"), app.desktop},
+                                {QStringLiteral("icon"), app.icon}, {QStringLiteral("isDefault"), isDefault}};
+            (isDefault ? first : rest).append(m);
+        }
+    }
+    std::sort(rest.begin(), rest.end(), [](const QVariant &a, const QVariant &b) {
+        return a.toMap().value(QStringLiteral("name")).toString().localeAwareCompare(b.toMap().value(QStringLiteral("name")).toString()) < 0;
+    });
+    return first + rest;
+}
+
+bool FileOps::openWith(const QString &desktopFile, const QStringList &paths) const
+{
+    return QProcess::startDetached(QStringLiteral("gio"), QStringList{QStringLiteral("launch"), desktopFile} + paths);
+}

@@ -5,12 +5,29 @@ import QtQuick.Controls.Basic
 // Finder menu (context menus, Group and Action pull-downs): rows 24, padding 5, r 12, the accent highlight inset
 // 5 with r 7 and white text, moving in one frame; text at x 16, or 28 when an item has a checkmark; closes with a
 // 0.2 s fade (MAC-ANSWERS.md Q-finder-24, Q-menubar-12/22/24). Drawn flat with the shared menu fill.
-// items: [{ text, shortcut, checked, enabled, action }], { separator: true }, or
-// { tagRow: true, action(tagName) } for Finder's row of tag color dots.
+// items: [{ text, shortcut, checked, enabled, action, icon, submenu }], { separator: true }, or
+// { tagRow: true, action(tagName) } for Finder's row of tag color dots. icon: a leading SF Symbol (the 27.2.1
+// context menu: icon centre x 23, its row's text x 39 instead of 16; context-menu-*-light.png); submenu: items of
+// a menu that opens to the right while the row is hovered, the row showing a chevron.
 Popup {
     id: root
 
     property var items: []
+    signal chose()   // a row ran its action (a submenu closes its parent through this)
+    onClosed: if (sub.item) sub.item.close()
+    Loader { id: sub; active: false; source: "PopupMenu.qml" }
+    Connections { target: sub.item; function onChose() { root.chose(); root.close(); } }
+    function openSub(row, list) {
+        sub.active = true;
+        const m = sub.item;
+        if (m.opened && m.items === list) return;
+        m.parent = row;
+        m.items = list;
+        m.x = row.width + root.padding - 1;
+        m.y = -root.padding;
+        m.open();
+    }
+    function closeSub() { if (sub.item) sub.item.close(); }
 
     padding: 5
     width: Math.max(200, list.implicitWidth + 2 * padding)
@@ -19,6 +36,7 @@ Popup {
     focus: true
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
     readonly property bool hasChecks: items.some(i => i.checked !== undefined)
+    readonly property bool hasIcons: items.some(i => !!i.icon)
     enter: Transition { NumberAnimation { property: "opacity"; to: 1; duration: 0 } }
     exit: Transition { NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 200; easing.type: Easing.OutQuad } }
 
@@ -42,7 +60,8 @@ Popup {
                 readonly property bool on: modelData.enabled !== false
                 width: root.width - 2 * root.padding
                 height: sep ? 11 : tagRow ? 30 : 24
-                implicitWidth: !plain ? 0 : label.implicitWidth + shortcutText.implicitWidth + 64
+                readonly property bool hasSub: !!modelData.submenu
+                implicitWidth: !plain ? 0 : label.x + label.implicitWidth + shortcutText.implicitWidth + (hasSub ? 40 : 0) + 53
 
                 Rectangle {
                     visible: it.sep
@@ -65,10 +84,34 @@ Popup {
                     color: hover.hovered ? "white" : Theme.color.label
                     font: Typography.body
                 }
+                Item {   // leading symbol; "gear.2" (Services) is two gears, as gearshape.2 has no render here
+                    visible: it.plain && !!it.modelData.icon
+                    x: 18 - 8
+                    width: 16; height: 16
+                    anchors.verticalCenter: parent.verticalCenter
+                    readonly property color ink: !it.on ? Theme.color.tertiaryLabel : hover.hovered ? "white" : Theme.color.label
+                    Symbol {
+                        visible: it.modelData.icon !== "gear.2"
+                        anchors.fill: parent
+                        name: it.modelData.icon && it.modelData.icon !== "gear.2" ? it.modelData.icon : ""
+                        color: parent.ink
+                    }
+                    Symbol { visible: it.modelData.icon === "gear.2"; x: -1; y: 0; size: 11; name: visible ? "gear" : ""; color: parent.ink }
+                    Symbol { visible: it.modelData.icon === "gear.2"; x: 8; y: 7; size: 9; name: visible ? "gear" : ""; color: parent.ink }
+                }
+                Symbol {
+                    visible: it.plain && it.hasSub
+                    anchors.right: parent.right
+                    anchors.rightMargin: 6
+                    anchors.verticalCenter: parent.verticalCenter
+                    size: 13
+                    name: visible ? "chevron.right" : ""
+                    color: !it.on ? Theme.color.tertiaryLabel : hover.hovered ? "white" : Theme.color.label
+                }
                 Text {
                     id: label
                     visible: it.plain
-                    x: root.hasChecks ? 23 : 11
+                    x: it.modelData.icon ? 34 : root.hasChecks ? 23 : 11
                     anchors.verticalCenter: parent.verticalCenter
                     text: it.modelData.text || ""
                     color: !it.on ? Theme.color.tertiaryLabel : hover.hovered ? "white" : Theme.color.label
@@ -84,7 +127,11 @@ Popup {
                     color: hover.hovered && it.on ? "white" : Theme.color.secondaryLabel
                     font: Typography.body
                 }
-                HoverHandler { id: hover; enabled: it.plain }
+                HoverHandler {
+                    id: hover
+                    enabled: it.plain
+                    onHoveredChanged: if (hovered) { if (it.hasSub && it.on) root.openSub(it, it.modelData.submenu); else root.closeSub(); }
+                }
                 Row {
                     visible: it.tagRow
                     x: 14
@@ -100,6 +147,7 @@ Popup {
                             HoverHandler { id: dotHover }
                             TapHandler {
                                 onTapped: {
+                                    root.chose();
                                     root.close();
                                     it.modelData.action(parent.modelData.name);
                                 }
@@ -108,8 +156,9 @@ Popup {
                     }
                 }
                 TapHandler {
-                    enabled: it.plain && it.on
+                    enabled: it.plain && it.on && !it.hasSub
                     onTapped: {
+                        root.chose();
                         root.close();
                         if (it.modelData.action) it.modelData.action();
                     }
