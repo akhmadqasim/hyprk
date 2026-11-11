@@ -3750,3 +3750,75 @@ Source: AppKit 27.2.1 disassembly `reference/re/27.2.1/decomp/AppKit-rubberband.
 - Hyperbolic model (0x18AE6C3B8 / 0x18AE6C3FC): `elastic(d, c, D) = sign(d) · D · (1 − 1/(1 + |d|·c/D))`, inverse `rebound(e, c, D) = sign(e) · D · (1/(1 − |e|/D) − 1) / c`; if D ≤ 0 it falls back to d/20. Coefficients: trackpad c = 0.075 (`NSScrollingBehaviorHyperbolicCoefficientTrackpad`), touch c = 0.55. D is presumably the visible dimension (not verified by a call site).
 - Return to rest after release (`_NSElasticDeltaForTimeDelta` → `_NSElasticDeltaForTimeDelta2` 0x18AE6C204): `x(t) = (x0 + C1·v·t) · exp(−stiffness·t / C2)` with C2 = 1.6, C1 = −0.31 (as evaluated; sign follows AppKit's velocity convention), v clamped to ±`NSScrollViewScrollVelocityMax`. With stiffness 20 that is a critically damped decay with rate 12.5 /s: x0 = 100 → 53.5 / 28.7 / 8.2 / 2.4 / 0.67 / 0.19 at 0.05 / 0.1 / 0.2 / 0.3 / 0.4 / 0.5 s.
 - Not measured: momentum deceleration rate after a flick, scroll bar during overscroll, which model (classic vs hyperbolic) Finder list and Settings use.
+
+
+## Momentum, rubber-band model, overscroll scroller, sound IDs (PC #73 parts 2-3, static + offscreen probes)
+
+# static73 (PC #73 follow-up, static RE only, AppKit 27.2.1 / 26B131) — complete
+
+## 1. Momentum (interim, probe-verified part)
+- `+[_NSScrollingMomentumCalculator allocWithZone:]` is a class cluster: app config `NSScrollBehaviorAnimationType` (NSInteger, default 0) → 0 = `_NSScrollingMomentumCatesCalculator` (default; probe: `[alloc]` returns Cates), 1 = `_NSScrollingMomentumBasCalculator`.
+- Cates (default), executed in probe ~/hyprk/reference/re/tools/probe/momentum.m: k = `NSScrollingBehaviorMomentumConstant` = 1000 (pt/s^4).
+  T = cbrt(v0 / (4k)); travel D = k·T^4 = v0·T/4; x(t) = D − k·(T − t)^4 = D·(1 − (1 − t/T)^4); v(t) = v0·(1 − t/T)^3; stop exactly at t = T.
+  Probe: v0=500 → T 0.5 s, D 62.5; v0=2000 → T 0.7937, D 396.85; v0=8000 → T 1.2599, D 2519.84 (all match formula to 6 digits).
+- Bas (non-default, UIKit-like): factor 0.998 per ms (0x3FEFEF9DB22D0E56), ln = −0.002002; v0=2000 → travel 993.0 (probe) ≈ v0/1000/(−ln 0.998)=999 minus cut-off, durationUntilStop 2.646 s.
+- Config getters called in-process (default values): NSScrollViewScrollVelocityMax 20000; NSScrollViewScrollVelocityZeroingTimeout 0.1; NSScrollViewRubberbandStiffness 20;
+  NSScrollViewRubberbandDirectionLockStretchRatio 1; NSScrollViewRubberbandMinimumRequiredDeltaBeforeStretch 10; NSScrollingBehaviorMinAcceleratedStoppableVelocity 70;
+  NSScrollingVFDReducedFPS 60; NSScrollingVFDVelocityThreshold 320; NSScrollingTouchMomentumMinimumSpeed 0.25; NSScrollingBehaviorMaxUnacceleratedVelocity 41000 (literal);
+  NSScrollViewRubberbandAmplitude 0.31; NSScrollViewRubberbandPeriod 1.6; PredominantAxisHysteresisPause 0.6 s / Distance 10 pt; NSScrollWheelMultiplier 1.
+- Cates code (0x18ACFE284 calculateDestination, 0x18ACFF1AC velocityAfterDuration:): k = decelerationRate ivar if > 0 else config (1000); per axis dest = origin + sign(v)·k·(|v|/(4k))^(4/3); v(t) = 4k·(T−t)^3.
+  If the destination passes the document edge: free phase runs until the edge is reached (time t_e), then rubber-band phase = `_NSElasticDeltaForTimeDelta2(x0 = 0, v = v(t_e), t − t_e, stiffness 20)`:
+  stretch(τ) = 0.31·v_e·τ·exp(−20·τ/1.6) (peak at τ = 0.08 s: 0.00912·v_e pt). Probe: v0 4000, edge 100 pt away → v_e ≈ 3696, peak overshoot 33.6 pt at t ≈ 0.10 s, back within 0.5 pt at 0.6 s (matches).
+  If no explicit rate, T > 2.0 s and no rubber-banding: destination is cut to x(2.0 s) (only reachable for v0 > 32000 pt/s). The flick velocity itself is not clamped by the calculator; at v0 = 20000: T = 1.71 s, travel 8550 pt (probe).
+
+## 2. Which rubber-band model — TERKONFIRMASI (code + executed filter)
+- The exported `__NSHyperbolicElasticDeltaForReboundDelta` has NO call site inside AppKit: the same maths is inlined in `-[_NSScrollingRubberbandFilter addDelta:velocity:]` (0x18ACA3D10…, ivars `_hyperbolicCoefficient` +0x90, `_clippingSize` +0x20).
+- There is no user default / app-config switch. Hyperbolic is used whenever coefficient > 0 and D > 0, otherwise linear ×/÷ 20. Filter init default c = 0.55.
+- Coefficient is set by the scrolling behaviour:
+  - trackpad gesture scroll: `-[NSScrollingBehaviorConcurrentVBL _scrollView:trackGestureScrollWithEvent:]` 0x18A66B9EC stores 0x3FB3333333333333 = 0.075 into `_hyperbolicCoefficient` and calls `setHyperbolicCoefficient:0.075` on the `_NSScrollingConcurrentEventVBL` preprocess filter; same in `-[NSScrollingBehaviorSingleThreadedVBL scrollView:scrollWheelWithEvent:]` (0x18AF29C54).
+  - direct touch / pan (`scrollView:scrollWithDelta:timestamp:startTimestamp:state:`, `NSScrollingBehaviorLegacy scrollView:panWithGestureRecognizer:`): 0.55, plus requiredMinVelocityForMomentum = NSScrollingTouchMomentumMinimumSpeed·1000 = 250 pt/s.
+- D = clip view (visible) size along the scrolled axis: width for x, height for y.
+- Formula: stretch = floor(D·(1 − 1/(1 + c·|d|/D))), d = accumulated finger delta past the edge (pt). The first 10 pt (`NSScrollViewRubberbandMinimumRequiredDeltaBeforeStretch`) give no stretch but are not lost (they stay in `_overflow`).
+- Probe (`momentum rubber 0.075 600 5 100`): D = 600, d = 15/50/100/200/300/400/500 → stretch 1/3/7/14/21/28/35 pt; model 1.12/3.73/7.41/14.63/21.69/28.57/35.29 → floor matches every sample.
+
+### 1b. Who runs the momentum for a trackpad flick (static, code read; not executed) 
+- `-[_NSScrollingConcurrentScrollWheelEventMonitor _monitorEvent:]` (0x18B0112F4) turns NSEvent phases into state events: phase MayBegin→1, Began/Changed (first)→2, Ended→3, Cancelled→4; momentumPhase Began/Changed (first)→5, momentum Ended/Cancelled→6.
+- `-[NSScrollingBehaviorConcurrentVBL scrollStateEvent:sender:]` (0x18A66D4C0): in state 1 (finger tracking) events 3/4/5/11 call `_animateMomentum` → `_animateFreeMomentum` (0x18A8FAB24), which builds `[[_momentumCalculatorClass alloc] initWithInitialOrigin:initialVelocity:documentFrame:constrainedClippingOrigin:clippingSize:tolerance:decelerationRate:shouldRoundCalculations:]` and installs a `_NSScrollingConcurrentMomentumAnimation` as the VBL preprocess filter. So after finger lift AppKit animates with its own calculator (Cates), not with the driver's momentum deltas.
+  Velocity below `_requiredMinVelocityForMomentum` (0 for trackpad, 250 pt/s for touch) is zeroed. decelerationRate comes from the scroll view's constant data (0 → config constant 1000).
+- In state 3 (momentum running) event 6 (driver momentum ended/cancelled, i.e. finger put back down): if event-velocity ≥ `NSScrollingBehaviorMinAcceleratedStoppableVelocity` (70 pt/s, only when deltas are accelerated; else 0) on either axis → stop/continue-gesture check. That is what the 70 is for.
+- `-[_NSScrollingConcurrentMomentumAnimation scrollingVBLMonitor:synchronizeForTimestamp:]` (0x18A7F38D8): every display tick t = now − start; while t < durationUntilStop the clip origin = `positionAfterDuration:t`; after that it sets destinationOrigin and sends state event 7 (stop). No per-frame decay factor: the curve is the closed form above.
+- Initial velocity = `_NS1DVelocityFilter` per axis (0x18A636364): v ← 0.2·(delta/dt) + 0.8·v (first sample: delta/dt); reset when dt > 0.2 s or the delta sign flips; samples with dt < 2 ms ignored; max allowed velocity default = DBL_MAX (no clamp set by the scrolling filter). `NSScrollViewScrollVelocityMax` 20000 is only used to clamp v inside the rubber-band return function. Deltas are NSEvent scrollingDelta (accelerated points).
+- Files: ~/hyprk/reference/re/27.2.1/decomp/AppKit-momentum.asm, AppKit-rubberband-filter.asm; probe ~/hyprk/reference/re/tools/probe/momentum.m.
+- Status item 1: formula + constants TERKONFIRMASI (calculator executed, values match code). "Trackpad flick uses this calculator" = SEBAGIAN (state machine read only, no live flick).
+
+## 3. Scroller knob during overscroll — TERKONFIRMASI (code + offscreen probe, no window)
+- Yes, the knob shrinks and stays pinned to the edge; it is not squashed by a separate animation, it is just a smaller proportion.
+- `-[NSScrollView reflectScrolledClipView:]` (0x18A464758…): stretch = `-[NSScrollView _stretchAmount]` (`_NSStretchOfClipBoundsForDocumentFrame`);
+  vertical: knobProportion = max(visibleH − |stretch.y|, 0) / documentH; horizontal: (visibleW − |stretch.x|) / documentW. value = (clipY − docY)/(docH − visibleH), clamped to 0…1 by NSScroller (so 0 at top overscroll, 1 at bottom).
+- `-[NSScrollerImp _rectForPart:metrics:]` (0x18B03C0E0): usable = scrollerLength − 2·(trackEndInset + knobEndInset) (= 600 − 6 = 594); knobLength = max(knobProportion·usable, knobMinLength); knobY = 3 + value·(usable − knobLength).
+  knobMinLength: overlay 26 pt (regular and small), legacy 20 pt; trackEndInset 3, knobEndInset 0.
+- Probe `scrollerknob.m` (visible 600, document 3000): stretch 0/10/35/100/300/590 → proportion 0.2000/0.1967/0.1883/0.1667/0.1000/0.0033 (= model), knob height 118.5/116.5/111.5/99/59/26 pt, y stays 3; at the bottom the knob's far end stays at 597 (y 485.5 h 111.5 for stretch 35).
+- With the trackpad rubber band (c 0.075, D 600) the stretch rarely passes ~40 pt, so the knob loses only ~8 pt of 118: a subtle effect.
+- Files: decomp/AppKit-scroller-overscroll.asm, tools/probe/scrollerknob.m.
+
+## 4. Sound ID → file (systemsoundserverd) — SEBAGIAN (static only, nothing played)
+- Full table decoded from the play handler's 3 jump tables: ~/hyprk/reference/re/27.2.1/decomp/systemsoundserverd-ids.txt.
+  Key IDs: 1 system/Volume Mount.aif, 2 system/Volume Unmount.aif, 3 system/Media Keys.aif, 13 finder/empty trash.aif, 14 finder/move to trash.aif,
+  15 dock/poof item off dock.aif, 16 dock/drag to trash.aif, 22/23 burn complete/failed, 24 system/Grab.aif, 1004 SentMessage.caf, 1393 system/Screen Capture.aif,
+  1394/1395 payment_success/failure.aif, 4096 (0x1000) = alert sound.
+- Screenshot: screencapture plays 1393 = **Screen Capture.aif** (settled). Grab.aif = ID 24 (unused by screencapture). Shutter.aif has no ID.
+- Move to Bin (Finder): `TMoveToTrashTask` sound = **16 dock/drag to trash.aif** (not ID 14 move to trash.aif, which has no caller in Finder or Dock).
+- Empty Bin (Finder): `TEmptyTrashTask` = 13 finder/empty trash.aif.
+- Dock: poof = 15 (two call sites); item dropped on the Dock's Bin = 16; alert = 0x1000.
+- Volume Mount.aif (ID 1) is Finder's generic "task finished" sound (copy/move/duplicate/put back/archive/mount/erase tasks, on success); Volume Unmount.aif (ID 2) has no caller in Finder/Dock. A dmg mount via DiskImageMounter/diskarbitrationd plays nothing (no sound API imported).
+- Who plays: the client (Finder, Dock, screencapture) calls AudioServicesPlaySystemSound → XPC `com.apple.audio.SystemSoundServer-OSX` → systemsoundserverd (root) plays the file. Finder only asks when its own pref (index 0x28) is on.
+- Not done: Finder pref 0x28 name, callers in other processes (AppKit/HIToolbox also import AudioServicesPlaySystemSound).
+
+## Summary
+| item | answer | status |
+|---|---|---|
+| 1 momentum formula | Cates: T = cbrt(v0/4000), x(t) = (v0·T/4)·(1 − (1 − t/T)^4), v(t) = v0·(1 − t/T)^3; k = 1000; edge bounce 0.31·v·τ·e^(−12.5τ) | TERKONFIRMASI (calculator executed) |
+| 1 trackpad flick uses it | finger lift → `_animateFreeMomentum` → calculator sampled per display tick; v0 = EMA α 0.2 of delta/dt | SEBAGIAN (code read only) |
+| 2 rubber band model | hyperbolic, c = 0.075 (trackpad) / 0.55 (touch), D = visible size on the axis, floor(), 10 pt dead zone | TERKONFIRMASI (filter executed) |
+| 3 scroller knob in overscroll | shrinks: proportion = max(visible − stretch, 0)/document, pinned to the edge, min 26 pt overlay / 20 pt legacy | TERKONFIRMASI (offscreen probe) |
+| 4 sound IDs | 1393 Screen Capture.aif; Bin move = 16 drag to trash.aif; Bin empty = 13; poof = 15; Finder task done = 1 Volume Mount.aif | SEBAGIAN (static, nothing played) |
