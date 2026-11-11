@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Window
 
-// In-window Liquid Glass capsule (shaders/glasslens3.frag): draws what lies under it in `source`, bent near the rim,
+// In-window Liquid Glass capsule (shaders/glasslens4.frag): draws what lies under it in `source`, bent near the rim,
 // blurred, tinted, lit and outlined. Client windows cannot sample the desktop, so this only reaches content of the same window
 // (the pressed switch / slider knob over its track, the Appearance pane's Liquid Glass preview over its article).
 // `origin` is the capsule's top-left in `source` coordinates (bound by the caller; a moving capsule or a scrolling
@@ -31,7 +31,7 @@ Item {
     property real keyFalloff: 1
     // the glassBackground filter's ring shadow (a band ringWidth pt wide inside the edge of the face moved ringOffset pt
     // down, blurred ringBlur pt, darkening the face by ringOpacity) and its key / fill highlight (fillLight 0 .. 1);
-    // both off by default (glasslens3.frag)
+    // both off by default (glasslens4.frag)
     property real ringOffset: 0
     property real ringWidth: 0
     property real ringBlur: 0
@@ -46,12 +46,18 @@ Item {
     property bool clampToSource: false
     readonly property real margin: Math.ceil(Math.abs(amount) + blur + 1)
     // a button's light (ToolbarHighlight): a disc of Tokens.toolbar.hoverDiscRadius round discCentre with discLift added,
-    // then the colour times 1 + glowGain round glowCentre (item px), flat over the disc's radius and falling linearly to
-    // 1 at Tokens.toolbar.pressReach
+    // then SwiftUI's press light round glowCentre (item px; motion.js glow*): the BigGlow square (half side glowHalf,
+    // opacity glowBig) and the LittleGlow blurred circle (radius glowRadius, opacity glowLittle, gain glowDodge,
+    // coverage table glowLut)
     property point discCentre: Qt.point(0, 0)
     property real discLift: 0
     property point glowCentre: Qt.point(0, 0)
-    property real glowGain: 0
+    property real glowHalf: 0
+    property real glowBig: 0
+    property real glowLittle: 0
+    property real glowRadius: 1
+    property real glowDodge: 1
+    property var glowLut: []
     // only draw the light the disc and the glow add (over the capsule as already drawn; give `backdrop` the opaque
     // colour under the capsule so the gain sees what is on screen)
     property bool additive: false
@@ -71,7 +77,7 @@ Item {
     ShaderEffect {
         anchors.fill: parent
         visible: g.source !== null && g.width > 0 && g.height > 0
-        fragmentShader: Qt.resolvedUrl("shaders/glasslens3.frag.qsb")
+        fragmentShader: Qt.resolvedUrl("shaders/glasslens4.frag.qsb")
         property var source: tex
         property size size: Qt.size(g.width, g.height)
         property real margin: g.margin
@@ -88,7 +94,13 @@ Item {
         property vector4d bounds: g.clampToSource && g.source
             ? Qt.vector4d(0.25 - g.origin.x, 0.25 - g.origin.y, g.source.width - g.origin.x - 0.25, g.source.height - g.origin.y - 0.25)
             : Qt.vector4d(-1e6, -1e6, 1e6, 1e6)
-        property vector4d glow: Qt.vector4d(g.glowCentre.x, g.glowCentre.y, g.glowGain, Tokens.toolbar.pressReach)
+        property vector4d glow: Qt.vector4d(g.glowCentre.x, g.glowCentre.y, g.glowHalf, g.glowDodge)
+        property vector4d glowAmt: Qt.vector4d(g.glowBig, g.glowLittle, g.glowRadius, 0)
+        function lutAt(i) { return g.glowLut[i] ?? 0; }
+        property vector4d glowLut0: Qt.vector4d(lutAt(0), lutAt(1), lutAt(2), lutAt(3))
+        property vector4d glowLut1: Qt.vector4d(lutAt(4), lutAt(5), lutAt(6), lutAt(7))
+        property vector4d glowLut2: Qt.vector4d(lutAt(8), lutAt(9), lutAt(10), lutAt(11))
+        property vector4d glowLut3: Qt.vector4d(lutAt(12), lutAt(13), lutAt(14), lutAt(15))
         property vector4d disc: Qt.vector4d(g.discCentre.x, g.discCentre.y, Tokens.toolbar.hoverDiscRadius, g.discLift)
         property real discEdge: Tokens.toolbar.hoverDiscEdge
         property real additive: g.additive ? 1 : 0

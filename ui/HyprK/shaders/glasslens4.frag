@@ -1,5 +1,5 @@
 #version 440
-// Build: /usr/lib/qt6/bin/qsb --qt6 -o glasslens3.frag.qsb glasslens3.frag
+// Build: /usr/lib/qt6/bin/qsb --qt6 -o glasslens4.frag.qsb glasslens4.frag
 // In-window Liquid Glass capsule (HyprK LensGlass): samples a texture of what lies under the capsule (a
 // ShaderEffectSource `margin` px larger on every side), bends it near the rim, blurs it, tints it, lights it and
 // draws a rim line. Units are item px (logical points). Premultiplied in and out. lens.frag plus the light terms.
@@ -12,9 +12,11 @@
 //   key.y on the bottom (both x the cube of the rim normal's vertical part), key.w on the round ends; key.z its falloff in pt)
 // - rim: the outer outlineWidth pt shows the plain sample darkened by `outline` (the face's light and gain left out)
 // - where the texture is empty the light and the rim line are drawn alone (white lit, black outline)
-// - a button's light (HyprK ToolbarHighlight): disc.w added inside a disc of radius disc.z round disc.xy (edge discEdge
-//   pt wide), then all of it times 1 + glow.z, flat over the disc's radius from glow.xy and falling linearly to 1 at
-//   glow.w; `additive`: only that light, with alpha 0, so
+// - a button's light (HyprK ToolbarHighlight): the hover disc (disc.w added inside a disc of radius disc.z round disc.xy,
+//   edge discEdge pt wide), then SwiftUI's two FlexInteraction glow layers at glow.xy (HyprK motion.js glow*):
+//   BigGlow, a square of half side glow.z, mixes the colour toward Y' = 0.05 + Y, chroma x 1.2 by glowAmt.x;
+//   LittleGlow, a blurred circle (coverage glowLut over the distance in glowAmt.z radii), toward glow.w x (Y + 1.5 x
+//   chroma) by glowAmt.y; matrix results clamped to 0..1. `additive`: only that light, with alpha 0, so
 //   it adds to the window (a translucent capsule redrawn over itself doubled its face)
 // - ring shadow (glassBackground inputRingShadow*): the face times 1 - ring.w x a band ring.y pt wide just inside the
 //   edge of the face's own shape moved ring.x pt down, blurred by ring.z pt (the filter's polynomial Gaussian edge)
@@ -41,7 +43,12 @@ layout(std140, binding = 0) uniform buf {
     vec4 tint;      // rgb + mix amount (not premultiplied)
     vec4 backdrop;  // premultiplied colour under empty texture
     vec4 bounds;    // x0, y0, x1, y1 of the source in capsule px: samples are clamped into it (edge repeat)
-    vec4 glow;      // press: centre x, y, gain at the centre, reach (pt)
+    vec4 glow;      // press light: centre x, y, BigGlow half side (pt), LittleGlow gain (1 / (1 - grey))
+    vec4 glowAmt;   // BigGlow opacity, LittleGlow opacity, LittleGlow radius (pt), unused
+    vec4 glowLut0;  // LittleGlow coverage at 0, 0.25, ..., 3.75 radii (four per vec4; ShaderEffect has no arrays)
+    vec4 glowLut1;
+    vec4 glowLut2;
+    vec4 glowLut3;
     vec4 disc;      // hover: centre x, y, radius (pt), lift
     float discEdge; // hover disc edge width (pt)
     float additive; // 1: output only the light the glow and the disc add (alpha 0: added to what is drawn already)
@@ -61,6 +68,15 @@ float gedge(float x) {
     float t = clamp(x * 0.7071, -2.0, 2.0);
     float q = t * t;
     return (((0.00295448 * q - 0.0344543) * q + 0.168213) * q - 0.560547) * t + 0.5;
+}
+float lutAt(int i) {
+    vec4 q = i < 4 ? glowLut0 : i < 8 ? glowLut1 : i < 12 ? glowLut2 : glowLut3;
+    return i >= 16 ? 0.0 : q[i % 4];
+}
+float lut(float u) {   // u in quarter radii
+    if (u >= 15.0) return 0.0;
+    int i = int(u);
+    return mix(lutAt(i), lutAt(i + 1), u - float(i));
 }
 float lobe(float c0, float spread) { return clamp((c0 - cos(spread)) / (1.0 - cos(spread)), 0.0, 1.0); }
 float schlick(float v, float a) { return v / ((1.0 / a - 2.0) * (1.0 - v) + 1.0); }
@@ -117,9 +133,20 @@ void main() {
     float line = 1.0 - smoothstep(outlineWidth - 0.5 * px, outlineWidth + 0.5 * px, in_);
     rgb = mix(rgb, raw * (1.0 - outline), line);
     vec3 unlit = rgb;
-    float rg = length(p - glow.xy);
-    rgb = min((rgb + disc.w * (1.0 - smoothstep(disc.z - 0.5 * discEdge, disc.z + 0.5 * discEdge, length(p - disc.xy))))
-              * (1.0 + glow.z * clamp(1.0 - max(0.0, rg - disc.z) / max(glow.w - disc.z, 1e-3), 0.0, 1.0)), vec3(1.0));
+    rgb = min(rgb + disc.w * (1.0 - smoothstep(disc.z - 0.5 * discEdge, disc.z + 0.5 * discEdge, length(p - disc.xy))),
+              vec3(1.0));
+    const vec3 LUMA = vec3(0.2126, 0.7152, 0.0722);
+    if (glowAmt.x > 0.0) {   // BigGlow: the square (1 pt antialiased edge)
+        vec2 dv = abs(p - glow.xy);
+        float cov = clamp(glow.z - max(dv.x, dv.y) + 0.5, 0.0, 1.0);
+        float Y = dot(rgb, LUMA);
+        rgb += glowAmt.x * cov * (clamp(vec3(0.05 + Y) + 1.2 * (rgb - Y), 0.0, 1.0) - rgb);
+    }
+    if (glowAmt.y > 0.0) {   // LittleGlow: the blurred circle
+        float m = lut(4.0 * length(p - glow.xy) / max(glowAmt.z, 1e-3));
+        float Y = dot(rgb, LUMA);
+        rgb += glowAmt.y * m * (clamp(glow.w * (vec3(Y) + 1.5 * (rgb - Y)), 0.0, 1.0) - rgb);
+    }
     // where the source is empty (a knob over a window's own glass, backdrop transparent) the light and the rim are
     // drawn on their own: white `lit` over the face, black `outline` on the rim line
     float la = clamp(lit, 0.0, 1.0) * (1.0 - line);

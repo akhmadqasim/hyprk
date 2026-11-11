@@ -50,6 +50,54 @@ function pressStretch(w, h, sx, sy, px, py) {
     return [ax - ay, ay - ax, w * kx, h * ky];
 }
 
+// The press light (FlexInteraction "glow"; GLASS-INTERACTION.md 4): GlowContainer.body 0x190c1f0c4 draws two CALayers,
+// both size x size (size = min(1.5 x the glass's shorter side, 160), updateGlow 0x190c24650), at the pointer, scaled by
+// the glow scale, clipped to the glass:
+// - FlexInteraction.BigGlow: an opaque white square under a backdrop-aware vibrantColorMatrix of
+//   _ColorMatrix.YCC(black 0.05, white 1.05, saturation 1.2, hue 0) (0x190c1f6f0; argument order from
+//   apply(blackWhite:saturation:hue:) 0x190ec5bd0's identity test): Y' = 0.05 + Y, chroma x 1.2;
+// - FlexInteraction.LittleGlow: no fill, a white shadow of its circle (kCALayerCornerRadiusAutomaticPill, shadowPathIsBounds,
+//   offset 0, opacity 1, shadowRadius size / 2) under the matrix YCC(0, 1, 1.5, 0) then a Fill of grey g
+//   (_ColorMatrix.apply(fills:) 0x190ec52a4, tag 2: diag 1 / (1 - g)): g = sRGB(pow(0.7630, 2.4)) = 0.75 dark,
+//   sRGB(pow(0.4313, 2.4)) = 0.40 light, so the colour is multiplied by 4 (dark) / 5/3 (light), saturation x 1.5.
+// Each layer mixes the colour under it toward its matrix by its opacity x coverage (Verify B's vibrantColorMatrix law).
+// Opacities and the dissipation distance: the FlexInteraction cursor set of the glass (Settings(variant:size:)
+// 0x1908b1100, automatic): under 120 pt ultraSmall (big 0.75, little 0.2625, 50 pt), then small -> large by the
+// shorter side (big 0.75 -> 0, little 0.75 -> 0.0375, 50 -> 25 pt).
+function glowSize(w, h) { return Math.min(1.5 * Math.min(w, h), 160); }
+function glowPreset(w, h) {
+    if (pressUltra(w, h)) return { big: 0.75, little: 0.2625, dissipation: 50 };
+    const t = pressT(w, h);
+    return { big: 0.75 * (1 - t), little: 0.75 + (0.0375 - 0.75) * t, dissipation: 50 - 25 * t };
+}
+function srgbEncode(l) { return l <= 0.0031308 ? 12.92 * l : 1.055 * Math.pow(l, 1 / 2.4) - 0.055; }
+function glowDodge(dark) { return 1 / (1 - srgbEncode(Math.pow(dark ? 0.7630332 : 0.4312796, 2.4))); }
+// The LittleGlow's coverage at u radii from its centre: its circle (radius 1) blurred by a Gaussian of sigma s radii
+// (the CA shadow: sigma = shadowRadius is the convention of AppKit's shadows, SHADOW.md; inferred for CALayer),
+// integrated over the disc in polar steps.
+function glowMask(u, s) {
+    const N = 48, M = 48;
+    let sum = 0;
+    for (let i = 0; i < N; i++) {
+        const rho = (i + 0.5) / N;
+        for (let j = 0; j < M; j++) {
+            const a = Math.PI * (j + 0.5) / M;   // half circle, doubled below
+            const dx = u - rho * Math.cos(a), dy = rho * Math.sin(a);
+            sum += rho * Math.exp(-(dx * dx + dy * dy) / (2 * s * s));
+        }
+    }
+    return 2 * sum * (1 / N) * (Math.PI / M) / (2 * Math.PI * s * s);
+}
+// 16 samples of glowMask at u = 0, 0.25, ..., 3.75 (the shader interpolates; 0 beyond: under 0.003 there)
+let _lut = null, _lutS = 0;
+function glowLut(s) {
+    if (_lut && _lutS === s) return _lut;
+    const out = [];
+    for (let i = 0; i < 16; i++) out.push(glowMask(i * 0.25, s));
+    _lut = out; _lutS = s;
+    return out;
+}
+
 // One step of a SwiftUI-parameterised spring (response s, dampingFraction), semi-implicit Euler
 // in <= 4 ms sub-steps. Returns [x, v].
 function springStep(x, v, target, response, damping, dt) {

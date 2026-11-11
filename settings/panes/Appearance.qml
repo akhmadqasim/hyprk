@@ -272,7 +272,12 @@ Column {
                                 discCentre: light.discCentre
                                 discLift: light.discLift
                                 glowCentre: light.glowCentre
-                                glowGain: light.glowGain
+                                glowHalf: light.glowHalf
+                                glowBig: light.glowBig
+                                glowLittle: light.glowLittle
+                                glowRadius: light.glowHalf
+                                glowDodge: light.glowDodge
+                                glowLut: light.glowLut
                             }
                             Repeater {
                                 model: cap.modelData.g
@@ -287,8 +292,8 @@ Column {
                                     color: search ? (Theme.dark ? "#FFFFFF" : "#3A3A3C") : (Theme.dark ? "#FFFFFF" : "#1C1C1E")
                                 }
                             }
-                            // hover disc and press glow of its buttons (the 23.09.23 recording: the share button); the
-                            // Search field has no reading
+                            // hover disc (the 23.09.23 recording: the share button) and SwiftUI's press light of its
+                            // buttons; the Search field has no reading
                             ToolbarHighlight {
                                 id: light
                                 anchors.fill: parent

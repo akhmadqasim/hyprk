@@ -13,7 +13,6 @@ FrameClock 1.0 FrameClock.qml
 FrameAnim 1.0 FrameAnim.qml
 FrameEase 1.0 FrameEase.qml
 PressSpring 1.0 PressSpring.qml
-PressGlow 1.0 PressGlow.qml
 ToolbarHighlight 1.0 ToolbarHighlight.qml
 Materializer 1.0 Materializer.qml
 MaterializeScale 1.0 MaterializeScale.qml
