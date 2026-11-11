@@ -171,12 +171,16 @@ ShellWindow {
                 onSwiped: { row.swipedAway = true; Notifs.hideBanners(row.app); }
 
                 // a newer notification of the same app replaces the text: quick refocus
-                onNidChanged: { refocus.restart(); row.armed = false; row.armed = true; }   // and a fresh timeout
+                onNidChanged: { refocus.restart(); row.hoveredOnce = false; row.armed = false; row.armed = true; }   // and a fresh timeout
                 FrameAnim { id: refocus; target: card; property: "contentOpacity"; from: 0.25; to: 1; duration: 260; ease: Easing.OutCubic }
             }
 
+            // hovered once: it leaves about 1 s after the pointer does (Q-panels / NC #62 "Hover pauses the timer ... it
+            // leaves ≈ 1 s after the pointer leaves"), not after a fresh full timeout
+            property bool hoveredOnce: false
+            Connections { target: card; function onHoveredChanged() { if (card.hovered) row.hoveredOnce = true; } }
             Timer {
-                interval: row.timeout > 0 ? row.timeout : Theme.notif.timeout
+                interval: row.hoveredOnce ? Theme.notif.leaveAfterHover : row.timeout > 0 ? row.timeout : Theme.notif.timeout
                 // critical and "Alerts" style stay until dismissed, like macOS alerts
                 running: row.armed && !card.hovered && !row.sticky && !row.leaving && card.swipeX === 0
                 onTriggered: Notifs.hideBanners(row.app)

@@ -467,6 +467,7 @@ Singleton {
         readonly property int marginRight: 16            // 1694 on a 1710 pt screen
         readonly property int spacing: 6                 // between cards
         readonly property int timeout: 4970              // ms a banner stays (PC #62 3a)
+        readonly property int leaveAfterHover: 1000      // ms a hovered banner stays after the pointer leaves (MAC-ANSWERS banners: ≈ 1 s)
         readonly property int maxBodyLines: 4
         readonly property int stackPeek: 8               // each plate of a collapsed stack shows 8 pt
         readonly property var plateInset: [17, 24]       // plate 1 and plate 2, per side
