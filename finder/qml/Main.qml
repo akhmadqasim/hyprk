@@ -168,6 +168,16 @@ Window {
         color: Theme.color.listHeaderFill
     }
 
+    // dark inactive window, other views: the toolbar strip lightens (Q-finder-29)
+    Rectangle {
+        visible: win.view !== "list" && Theme.dark && !Theme.active
+        x: Theme.sidebar.width
+        width: parent.width - x
+        height: Theme.toolbar.height
+        topRightRadius: win.radius
+        color: Theme.color.toolbarStripInactive
+    }
+
     // ---------- content ----------
     Item {
         id: keys
@@ -186,6 +196,7 @@ Window {
             onMoreRequested: anchor => win.popup(win.moreMenu, anchor)
             onGroupRequested: anchor => win.popup(win.sortItems(), anchor)
             onTagRequested: anchor => tagPopover.show(anchor)
+            onViewMenuRequested: anchor => win.popup(win.viewItems(), anchor)
         }
 
         // tabs (Q-finder-32): the bar shows with two or more; the track's bottom is at 80 (the gap under it was not
@@ -357,6 +368,11 @@ Window {
         menu.y = y;
         menu.open();
     }
+    // the View rows (background menu View ▸, the toolbar's collapsed view popup)
+    function viewItems() {
+        const view = (key, label) => ({ text: label, checked: win.view === key, action: () => win.view = key });
+        return [view("icons", "as Icons"), view("list", "as List"), view("columns", "as Columns"), view("gallery", "as Gallery")];
+    }
     // one item: inline; several: the Rename Finder Items sheet
     function startRename() {
         if (fm.isVirtual) return;
@@ -421,14 +437,13 @@ Window {
                 fm.selectPaths([entry.path]);
             } }] : []);
         } else {
-            const view = (key, label) => ({ text: label, checked: win.view === key, action: () => win.view = key });
             items = [
                 { text: "New Folder", enabled: writable, action: () => fm.newFolder() }
             ].concat(pasteRow(fm.path)).concat([
                 { separator: true },
                 { text: "Get Info", enabled: writable, action: () => info.show(fm.path, pos.x, pos.y) },
                 { separator: true },
-                { text: "View", submenu: [view("icons", "as Icons"), view("list", "as List"), view("columns", "as Columns"), view("gallery", "as Gallery")] },
+                { text: "View", submenu: viewItems() },
                 { text: "Use Groups", enabled: false },
                 { text: "Sort By", submenu: sortItems() }
             ]).concat(win.view === "icons" ? [   // the captured menu is the icon view's; Clean Up arranges free icons

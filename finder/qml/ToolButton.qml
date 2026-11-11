@@ -13,6 +13,9 @@ Item {
     property real hoverWidth: Theme.toolbar.hoverWidth
     property real hoverHeight: Theme.toolbar.hoverHeight
     property color hoverColor: Theme.color.toolbarHover
+    property color iconColor: Theme.color.toolbarIcon
+    property real iconDx: 0                  // glyph nudge from the centre, pt
+    property real iconDy: 0
     readonly property bool lit: enabled && (hover.hovered || tap.pressed)
     signal clicked()
 
@@ -31,12 +34,14 @@ Item {
     Symbol {
         id: glyph
         anchors.centerIn: parent
+        anchors.horizontalCenterOffset: root.iconDx
+        anchors.verticalCenterOffset: root.iconDy
         name: root.icon
         size: root.iconSize
         weight: root.iconWeight
         scale: root.iconScale
         pointSize: root.iconPointSize > 0 ? root.iconPointSize : glyph.defaultPointSize
-        color: root.enabled ? Theme.color.toolbarIcon : Theme.color.toolbarIconDisabled
+        color: root.enabled ? root.iconColor : Theme.color.toolbarIconDisabled
     }
     TapHandler {
         id: tap

@@ -16,6 +16,7 @@ Item {
     signal moreRequested(Item anchor)
     signal groupRequested(Item anchor)
     signal tagRequested(Item anchor)
+    signal viewMenuRequested(Item anchor)
     readonly property Item tagAnchor: tagButton
     readonly property Item moreAnchor: more
 
@@ -69,14 +70,18 @@ Item {
     Capsule {
         id: views
         anchors.right: group.left
-        anchors.rightMargin: Theme.toolbar.gap
+        anchors.rightMargin: Theme.toolbar.viewsGap
         y: Theme.toolbar.capsuleY
-        visible: root.width > 524
+        visible: root.width > 524 && !root.searching
+        // the segments sit 2 pt in, 39.6 apart: the glyph centres on 27.2.1 are 21.3 / 60.9 / 100.7 / 139.6 pt into the
+        // capsule (crops/toolbar-*-active.png, ink centroids; even 40.25 segments put them 1.1 pt rms off, this 0.4)
+        width: Theme.toolbar.viewsWidth
+        padding: 2
         SegmentedControl {
             id: viewSwitcher
             readonly property var modes: ["icons", "list", "columns", "gallery"]
             readonly property string iconHex: Qt.rgba(Theme.color.toolbarIcon.r, Theme.color.toolbarIcon.g, Theme.color.toolbarIcon.b, 1).toString()
-            segmentWidth: Theme.toolbar.viewsWidth / 4
+            segmentWidth: Theme.toolbar.segmentWidth
             width: implicitWidth
             height: Theme.toolbar.capsuleHeight
             iconSize: Theme.toolbar.iconSize
@@ -98,6 +103,32 @@ Item {
         }
     }
 
+    // while the search field is open the switcher collapses into a popup button, the current view's glyph and an up/down
+    // chevron, laid out like the group button (crops/search-expand-frames-light.png, in one frame: Q-finder-30)
+    Capsule {
+        id: viewPopup
+        anchors.right: group.left
+        anchors.rightMargin: Theme.toolbar.viewsGap
+        y: Theme.toolbar.capsuleY
+        padding: 3
+        visible: root.width > 524 && root.searching
+        ToolButton {
+            id: viewPopupButton
+            implicitWidth: 28
+            hoverWidth: 28
+            icon: "view." + root.view
+            onClicked: root.viewMenuRequested(viewPopupButton)
+        }
+        Symbol {
+            anchors.verticalCenter: parent.verticalCenter
+            name: "chevron.up.chevron.down"
+            weight: "semibold"
+            size: 11
+            color: Theme.color.toolbarIcon
+        }
+        Item { width: Theme.toolbar.groupWidth - 6 - 28 - 11; height: 1 }
+    }
+
     Capsule {
         id: group
         anchors.right: actions.left
@@ -111,6 +142,7 @@ Item {
             implicitWidth: 28
             hoverWidth: 28
             icon: "group"
+            iconDx: 0.7      // ink centre 556.2 pt on 27.2.1 (crops/toolbar-*-active.png), centred here 555.5
             onClicked: root.groupRequested(groupButton)
         }
         Symbol {
@@ -118,6 +150,7 @@ Item {
             name: "chevron.down"
             weight: "semibold"
             size: 11
+            transform: Translate { x: -0.4 }    // ink centre 0.4 pt left of the Row slot (same crops)
             color: Theme.color.toolbarIcon
         }
         Item { width: Theme.toolbar.groupWidth - 6 - 28 - 11; height: 1 }
@@ -160,13 +193,19 @@ Item {
         // the circle widens into a capsule in about 0.16 s, ease-out (Q-finder-30)
         Behavior on width { NumberAnimation { duration: Theme.toolbar.searchDuration; easing.type: Easing.OutCubic } }
 
+        // open: the glyph shrinks to 13 pt at the default scale, centred 17 pt in, and the text starts at 33
+        // (crops/search-expand-frames-light.png: ink 12 vs 16 pt wide closed, centre 17, "Search" ink from 33.5)
         ToolButton {
+            implicitWidth: root.searching ? 33 : Theme.toolbar.buttonWidth
+            iconDx: root.searching ? 0.5 : 0
             hoverWidth: Theme.toolbar.buttonWidth      // the whole circle lightens on hover
             hoverHeight: Theme.toolbar.capsuleHeight
             hoverColor: Theme.color.searchHover
+            iconColor: root.searching ? Theme.color.searchPlaceholder : Theme.color.searchIcon
+            iconDy: root.searching ? 0 : -0.5   // closed: ink centre 0.5 pt above the capsule's on 27.2.1 (same crops)
             icon: "magnifyingglass"
             iconWeight: "medium"       // 13 pt, .large, medium (names.json finder.toolbarGlyph, likely)
-            iconScale: "large"
+            iconScale: root.searching ? "" : "large"
             iconPointSize: 13
             onClicked: {
                 root.searching = true;
@@ -175,7 +214,7 @@ Item {
         }
         Item {
             visible: root.searching
-            width: search.width - Theme.toolbar.buttonWidth - 8
+            width: search.width - 33 - 8
             height: Theme.toolbar.capsuleHeight
             TextInput {
                 id: field
@@ -202,12 +241,14 @@ Item {
                     visible: !field.text
                     anchors.verticalCenter: parent.verticalCenter
                     text: "Search"
-                    color: Theme.color.tertiaryLabel
+                    color: Theme.color.searchPlaceholder
                     font: field.font
                 }
             }
         }
     }
+
+    FocusRing { parent: search; visible: field.activeFocus; shapeRadius: search.height / 2 }
 
     function focusSearch() {
         searching = true;

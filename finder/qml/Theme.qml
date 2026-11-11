@@ -121,9 +121,11 @@ QtObject {
         readonly property color sidebarIconInactive: theme.dark ? "#8F909B" : "#7F7F7F"
 
         // toolbar capsules: HyprK ToolbarPlatter (Tokens.toolbar, measured on 27.2.1)
-        readonly property color capsuleSelected: Tokens.toolbar.selection
+        // the view switcher's selected segment: light 229..232 on the 249..253 face (crops/toolbar-light-active.png), 220 on
+        // 240 inactive; dark as Tokens (82 on 61)
+        readonly property color capsuleSelected: theme.dark ? Tokens.toolbar.selection : Qt.rgba(0, 0, 0, 0.082)
         // inactive window: the capsule darkens 252 -> 240 | (61,62,70) -> (58,60,67) (Q-finder-29)
-        readonly property color capsuleInactive: Qt.rgba(0, 0, 0, theme.dark ? 0.05 : 0.048)
+        readonly property color capsuleInactive: theme.dark ? "#3B3B3B" : "#F0F0F0"   // flat face (Capsule.qml)
         // hover / pressed inner capsule: 242 on 252 (Search 236) | (87,89,96) on (67,69,77) (Q-finder-10)
         readonly property color toolbarHover: theme.dark ? Qt.rgba(1, 1, 1, 0.106) : Qt.rgba(0, 0, 0, 0.04)
         readonly property color searchHover: theme.dark ? Qt.rgba(1, 1, 1, 0.106) : Qt.rgba(0, 0, 0, 0.064)
@@ -133,10 +135,21 @@ QtObject {
         readonly property color quickLookInk: "#070707"
         readonly property color quickLookText: "#282828"
         readonly property color toolbarSeparator: Tokens.toolbar.separator
-        // glyphs: light 0, inactive 164 (Q-finder-29); dark not measured
-        readonly property color toolbarIcon: theme.dark ? Qt.rgba(1, 1, 1, 0.85) : theme.active ? "#000000" : "#A4A4A4"
-        // disabled: light 173 on 252, dark (113,114,122) on (61,62,70) (Q-finder-10)
-        readonly property color toolbarIconDisabled: theme.dark ? Qt.rgba(1, 1, 1, 0.27) : Qt.rgba(0, 0, 0, 0.31)
+        // glyphs: light 0, inactive 164 (Q-finder-29); dark white (the ellipsis dots and list bullets reach 255 on the 61
+        // face), inactive 111 on 60 (crops/toolbar-dark-{active,inactive}.png)
+        readonly property color toolbarIcon: theme.dark ? Qt.rgba(1, 1, 1, theme.active ? 1 : 0.26) : theme.active ? "#000000" : "#A4A4A4"
+        // disabled: light 173 on 252, dark (113,114,122) on (61,62,70) (Q-finder-10); inactive light 176 on 240, dark 98 on 60
+        readonly property color toolbarIconDisabled: theme.dark ? Qt.rgba(1, 1, 1, theme.active ? 0.27 : 0.195)
+                                                                : Qt.rgba(0, 0, 0, theme.active ? 0.31 : 0.267)
+        // the Search glyph is fainter than the others: light 74 on 249 / inactive 175 on 240, dark 236 on 61 / inactive
+        // 126 on 60 (crops/toolbar-*: the magnifying glass's darkest / lightest pixel; its ink is .70 of the black one)
+        readonly property color searchIcon: theme.dark ? Qt.rgba(1, 1, 1, theme.active ? 0.90 : 0.34)
+                                                       : Qt.rgba(0, 0, 0, theme.active ? 0.70 : 0.27)
+        // open search field: the placeholder and the magnifier 112 on 250 (crops/search-expand-frames-light.png); dark not
+        // captured, the secondary label there
+        readonly property color searchPlaceholder: theme.dark ? Tokens.secondaryLabel : Qt.rgba(0, 0, 0, 0.55)
+        // dark inactive: the toolbar strip lightens from (31,34,39) to (38,42,47) (Q-finder-29; crops/toolbar-dark-inactive)
+        readonly property color toolbarStripInactive: "#292929"
         // title (Q-finder-06): light #4C4C4C a / #BFBDBD i, dark #E9E9E9 a / #5F5F64 i
         readonly property color title: theme.dark ? (theme.active ? "#E9E9E9" : "#5F5F64") : (theme.active ? "#4C4C4C" : "#BFBDBD")
 
@@ -233,19 +246,22 @@ QtObject {
     // group 702..749.5, share/tags/action 756.5..868.5, search 875.5..912.5, gaps 7..7.5, right inset 7.5.
     readonly property QtObject toolbar: QtObject {
         readonly property int height: 52         // AXToolbar 52, capsules y 8..44
-        readonly property int capsuleHeight: 36
-        readonly property int capsuleY: 8
-        readonly property int buttonWidth: 36    // a lone button is a 36 pt circle
+        // drawn 37 tall: the edge rows of every capsule are y 15 and 88 px at 2x (icons-light.png), so 7.5..44.5 pt
+        readonly property real capsuleHeight: 37
+        readonly property real capsuleY: 7.5
+        readonly property int buttonWidth: 37    // a lone button is a circle: search 875.5..912.5 (AX, drawn the same)
         readonly property int navWidth: 74       // back/forward: one 74 x 36 capsule
         readonly property int dividerHeight: 20  // its 1 x 20 divider, hidden on hover
         readonly property real iconSize: 19.6    // ref / 1.22 (24 px)
         readonly property real gap: 7            // between capsule groups (7..7.5)
+        readonly property real viewsGap: 7.5     // views 694.5 to group 702
         readonly property real leftPad: 7.5      // sidebar edge to the back/forward capsule
         readonly property real rightPad: 7.5     // last capsule to the window edge
         readonly property real titleGap: 11.5    // capsule ends at 244.5, title ink starts at 256
-        readonly property int viewsWidth: 161    // view switcher: 4 segments of 40.25
-        readonly property real segmentInsetX: 2.4  // selected segment 35.5 x 28, r 14 (Q-finder-11)
-        readonly property real segmentInsetY: 4
+        readonly property int viewsWidth: 161    // view switcher capsule (AX: 4 segments of 40.25)
+        readonly property real segmentWidth: 39.6  // drawn: 2 pt in, glyphs 39.6 apart (Toolbar.qml)
+        readonly property real segmentInsetX: 2.8  // selected segment 34 x 28 drawn (1076..1144 px in icons-light), r 14 (Q-finder-11)
+        readonly property real segmentInsetY: 4.5   // 28 tall in the 37 capsule
         readonly property int segmentSeparator: 20   // 1 x ~20, only between two unselected segments
         readonly property int actionsWidth: 112  // share 36, tags 38, action 37 (AX)
         readonly property real groupWidth: 47.5 // group button + chevron
