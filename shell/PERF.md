@@ -1,5 +1,41 @@
 # hyprk shell performance
 
+## 2026-11-11: re-measured on the current shell, two fixes
+
+Headless `MBA` output only (2560x1664 @ 2x, `scripts/smoke.sh` with `HYPRK_HEADLESS=1`), liquidglass plugin on, own
+`HYPRK_STATE`/`XDG_CACHE_HOME`. qs restarted by hand in the same Hyprland with the environment Hyprland gave it plus
+`QSG_RENDER_TIMING=1`; startup = qs exec to `hyprk-dock` and `hyprk-menubar` both in `hyprctl layers` (30 ms poll);
+memory from `/proc/<qs>/smaps_rollup` (PSS is deflated by other sessions mapping the same files: trust anon);
+idle = `/proc/<pid>/stat` utime+stime over 30 s from t+60 s; frames = `frame rendered` lines of the timing log.
+
+| | before (HEAD 963d95b with the Panels name clash fixed) | after |
+|---|---|---|
+| startup to Dock + menu bar | 0.94 s (99 ticks) | **0.58 s** (62 ticks) |
+| qs CPU in the first 6 s | 1.41 s | 1.05 s |
+| RSS / PSS / anon at +60 s | 367 / 225 / 188 MB | **318 / 197 / 139 MB** |
+| idle CPU 30 s (qs / Hyprland) | 0 % / 0 % | 0 % / 0 % |
+| qs frames at rest | 0 per 30 s | 0 per 30 s |
+| Mission Control open, 3 windows, idle 10 s | 601 qs frames, 0.42 + 0.42 CPU-s (qs + Hyprland) | **0 frames, 0 CPU-s** |
+
+- `ui/HyprK/AppIconTile.qml`: the squircle tile is behind a `Loader` (built only for icons that get one) and its outlines
+  are shared per process (`iconshape.js` `tilePoints`). Pixels: same as before within the run-to-run noise (a same-code
+  pair differs by 2 to 30 isolated 1 px pixels plus the clock areas); with the tile forced off the Apps view differs by
+  83,587 px, so the check covers drawn tiles.
+- `modules/MissionControl.qml`: one still per window per open (`live: false`, `captureFrame()` on a reopen while loaded).
+  Mission Control 1.5 s after opening: 0 px different; after a reopen 13 px (one 1 px column). A window that animates
+  while Mission Control is open now shows its frame from the open (the Mac updates it live).
+
+Checked, not changed:
+- Overlay / Control Center / Notification Center created on first open (scratch variant): -12 MB anon, -28 MB RSS,
+  first map +3 to 10 ms, but the Notification Center photo and the Control Center artwork would decode on that first
+  open again (the empty-card frames noted below). Overlay stays eager: a menu must be complete in its first frame.
+- Apps preload (2 s after start): holds the first screen of the All view only, 18 MB anon and 0.2 CPU-s (variant without
+  it: anon 121 vs 139 MB); kept so the first open is complete.
+- At rest with a surface open (10 s): Control Center, menu, Apps, Spotlight 0 frames; Notification Center 1 frame/s
+  (analog clock seconds, 0 to 2 ms polish, render 0 ms). Qt Quick redraws the whole window per frame, so only a
+  separate surface for the clock could limit it, and that surface would have to follow the slide: not done.
+- Control Center now-playing art is decoded at its file size (no `sourceSize`); a smaller decode changes its pixels.
+
 Measured 2026-11-10 in a nested Hyprland 0.57.2 with a headless 3840x2160 output at scale 1.5
 (the target: 4K monitor at 150%), liquidglass plugin on, Finder/Settings windows closed, shell idle.
 Tool: `/proc/<pid>/stat` (utime+stime over 60 s), `/proc/<pid>/status` (RSS), `/proc/<pid>/smaps` (PSS),
