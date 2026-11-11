@@ -119,13 +119,17 @@ Row {
                         // fitted on lights-hover-{dark,light}.png over the disc model (plugin/tools/lights_model.py): the x
                         // reads 2.05 pt, the minus 2.0 x 7.9 pt, the triangles a 5.8 pt box (rms 9.6 -> 5.7, 7.9 -> 7.7,
                         // 10.0 -> 8.9 dark); + has no crop without Option and keeps the token. Pressed, the triangles are
-                        // larger: corners 4.00 / 9.10 in the 14 pt box (the press crop, plugin/tools/lights_model.py)
-                        strokeWidth: glyph.filled ? -1 : glyph.kind === "close" ? 2.05 : glyph.kind === "minimize" ? 2.0 : Tokens.lights.glyphStroke
+                        // larger: corners 4.00 / 9.10 in the 14 pt box (the press crop, plugin/tools/lights_model.py); the
+                        // pressed x is 2.21 pt from 4.42 to 9.58, the pressed minus 4.0 to 10.0 (round-capped strokes fitted
+                        // to the glyph coverage of lights-press-{close,min}-{light,dark}.png: x rms .083 -> .068 light,
+                        // .127 -> .092 dark, minus .042 -> .039 light, .087 dark unchanged)
+                        strokeWidth: glyph.filled ? -1 : glyph.kind === "close" ? (light.down ? 2.21 : 2.05) : glyph.kind === "minimize" ? 2.0 : Tokens.lights.glyphStroke
                         capStyle: ShapePath.RoundCap
                         PathSvg {
                             path: ({
-                                close: "M 4.45 4.45 L 9.55 9.55 M 9.55 4.45 L 4.45 9.55",
-                                minimize: "M 4.05 7 L 9.95 7",
+                                close: light.down ? "M 4.42 4.42 L 9.58 9.58 M 9.58 4.42 L 4.42 9.58"
+                                                  : "M 4.45 4.45 L 9.55 9.55 M 9.55 4.45 L 4.45 9.55",
+                                minimize: light.down ? "M 4 7 L 10 7" : "M 4.05 7 L 9.95 7",
                                 plus: "M 3.95 7 L 10.05 7 M 7 3.95 L 7 10.05",
                                 full: light.down ? "M 4 4 L 9.1 4 L 4 9.1 Z M 10 10 L 4.9 10 L 10 4.9 Z"
                                                  : "M 4.1 4.1 L 8.9 4.1 L 4.1 8.9 Z M 9.9 9.9 L 5.1 9.9 L 9.9 5.1 Z"

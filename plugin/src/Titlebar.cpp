@@ -231,13 +231,16 @@ namespace lg {
                     cairo_fill(cr);
                     return;
                 }
+                // pressed: x 2.21 pt from 4.42 to 9.58, minus 4.0 to 10.0 (fitted to lights-press-*-{light,dark}.png, as
+                // TrafficLights.qml)
+                const double xa = pressed ? 4.42 : 4.45, ma = pressed ? 4.0 : 4.05;
                 switch (button) {
-                    case 0: line(4.45, 4.45, 9.55, 9.55); line(9.55, 4.45, 4.45, 9.55); break;
-                    case 1: line(4.05, 7, 9.95, 7); break;
+                    case 0: line(xa, xa, 14 - xa, 14 - xa); line(14 - xa, xa, xa, 14 - xa); break;
+                    case 1: line(ma, 7, 14 - ma, 7); break;
                     default: line(3.95, 7, 10.05, 7); line(7, 3.95, 7, 10.05); break;
                 }
                 // fitted on lights-hover-*.png over the disc model: x 2.05 pt, minus 2.0 x 7.9 pt (TrafficLights.qml has the same)
-                cairo_set_line_width(cr, (button == 0 ? 2.05 : button == 1 ? 2.0 : GLYPH_STROKE) * k);
+                cairo_set_line_width(cr, (button == 0 ? (pressed ? 2.21 : 2.05) : button == 1 ? 2.0 : GLYPH_STROKE) * k);
                 cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
                 cairo_stroke(cr);
             });
