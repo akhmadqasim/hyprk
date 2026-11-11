@@ -7,12 +7,12 @@
 // symbol: the glyph in the mode list and at the left of the field; placeholder: the field text while the mode is
 // active, the mode's name (27.2.1, MAC-ANSWERS.md Q-panels-22, -24). Glyphs on the Mac: the App Store "A", the outline
 // folder ("sf:folder": plain "folder" is the hyprk alias of folder.fill), layered squares (no SVG here: bolt) and
-// doc.on.clipboard (no SVG here: clipboard).
+// doc.on.clipboard.
 const MODES = [
     { id: "apps", title: "Applications", placeholder: "Applications", symbol: "appstore" },
     { id: "files", title: "Files", placeholder: "Files", symbol: "sf:folder" },
     { id: "actions", title: "Actions", placeholder: "Actions", symbol: "bolt" },
-    { id: "clipboard", title: "Clipboard", placeholder: "Clipboard", symbol: "clipboard" },
+    { id: "clipboard", title: "Clipboard", placeholder: "Clipboard", symbol: "doc.on.clipboard" },
 ];
 function modes() { return MODES; }
 function modeInfo(id) { return MODES.find(m => m.id === id) || null; }

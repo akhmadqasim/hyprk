@@ -421,7 +421,7 @@ test("modes order", () => assert.deepEqual(SL.modes().map(m => m.id), ["apps", "
         assert.equal(SF.resolve(sym("files")), "folder");
         assert.equal(SF.resolve("folder"), "folder.fill");
         assert.equal(sym("actions"), "bolt");
-        assert.equal(sym("clipboard"), "clipboard");
+        assert.equal(sym("clipboard"), "doc.on.clipboard");
     });
     test("menus: Eject is the outline eject, every menu icon has a glyph (an SVG or a hand-drawn one)", () => {
         const src = readFileSync(join(here, "..", "lib", "menus.js"), "utf8");
