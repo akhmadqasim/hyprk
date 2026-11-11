@@ -227,14 +227,21 @@ void main() {
         const auto mon = ctx.m_data.pMonitor.lock();
         if (!mon || m_data.alpha <= 0.001f || m_data.density <= 0 || !ensureProgram())
             return {};
-        const float scale = mon->m_scale;
-        const CBox  quad  = reach().scale(scale).round();
-        CRegion     damage{ctx.m_data.damage};
+        // boxes go through the render modifiers like Hyprland's own elements: inside a transformed window (genie,
+        // close) the window is drawn into a canvas translated by -canvas origin first, and without this the rim and
+        // shadow landed one window-origin away from the window there (the genie's ghost outline and line to the Dock)
+        auto&       modif = ctx.m_data.renderModif;
+        const float scale = mon->m_scale * modif.combinedScale();
+        CBox        quadF = reach().scale(mon->m_scale);
+        modif.applyToBox(quadF);
+        const CBox quad = quadF.round();
+        CRegion    damage{ctx.m_data.damage};
         damage.intersect(quad);
         // nothing is drawn deeper inside the frame than its corner radius (the shadow stops at the frame, the rim is 1 pt):
         // leave that out, or the rim's quad shades the whole window to light its edge (0.11 ms of 0.11 per element at
         // 700 x 533 pt, 2x)
-        const CBox  body  = CBox{m_data.body}.scale(scale);
+        CBox body = CBox{m_data.body}.scale(mon->m_scale);
+        modif.applyToBox(body);
         const double inset = std::max(m_data.radius, m_data.rim) * scale + 2;
         if (body.w > 2 * inset && body.h > 2 * inset)
             damage.subtract(CBox{body.x + inset, body.y + inset, body.w - 2 * inset, body.h - 2 * inset}.round());

@@ -4,6 +4,8 @@
 #include <hyprland/src/desktop/state/FocusState.hpp>
 #include <hyprland/src/desktop/view/window/Window.hpp>
 #include <hyprland/src/desktop/view/window/WindowPresentation.hpp>
+#include <hyprland/src/desktop/view/window/WindowEffectsController.hpp>
+#include <hyprland/src/render/transformer/TransformerList.hpp>
 #include <hyprland/src/layout/LayoutManager.hpp>
 #include <hyprland/src/managers/input/InputManager.hpp>
 #include <hyprland/src/plugins/PluginAPI.hpp>
@@ -287,6 +289,34 @@ namespace lg {
         return float(m_glyphFrom + ((m_hover ? 1.0 : 0.0) - m_glyphFrom) * x);
     }
 
+    namespace {
+        // Hyprland moves a rect's box by the render modifiers but not its clip box: in a transformed window's canvas
+        // (genie, close) the fill was clipped away one canvas origin off and the bar showed the backdrop for the whole
+        // genie, then came back in one frame (6 % of the restore's changed share). This draws the rect at render time
+        // with the clip moved too; only used while the window has a transformer (no blur planning needed there)
+        class CMovedClipRect : public IPassElement {
+          public:
+            explicit CMovedClipRect(const CRectPassElement::SRectData& d) : m_data(d) {}
+            std::vector<UP<IPassElement>> draw(Render::CRenderContext& ctx) override {
+                auto d = m_data;
+                if (!d.clipBox.empty())
+                    ctx.m_data.renderModif.applyToBox(d.clipBox);
+                g_pHyprRenderer->draw(ctx, d, ctx.m_data.damage);
+                return {};
+            }
+            bool                needsLiveBlur(Render::CRenderContext&) override { return false; }
+            bool                needsPrecomputeBlur(Render::CRenderContext&) override { return false; }
+            const char*         passName() override { return "CLiquidGlassMovedClipRect"; }
+            ePassElementType    type() override { return EK_CUSTOM; }
+            std::optional<CBox> boundingBox(Render::CRenderContext& ctx) override {
+                return m_data.box.copy().scale(1.F / ctx.m_data.pMonitor->m_scale).round();
+            }
+
+          private:
+            CRectPassElement::SRectData m_data;
+        };
+    }
+
     void CTitlebar::draw(Render::CRenderContext& ctx, PHLMONITOR mon, float const& a, const Render::SWindowRenderPresentation& presentation) {
         const auto window = m_window.lock();
         const auto params = m_params();
@@ -344,7 +374,10 @@ namespace lg {
         fill.color                 = rgba(base, a * (params->titlebarGlass ? 0.55f : 1.f));
         fill.blur                  = params->titlebarGlass;
         fill.workspacePresentation = presentation;
-        g_pHyprRenderer->addPassElement(ctx, makeUnique<CRectPassElement>(fill));
+        if (!window->effects().transformers()->empty())
+            g_pHyprRenderer->addPassElement(ctx, makeUnique<CMovedClipRect>(fill));
+        else
+            g_pHyprRenderer->addPassElement(ctx, makeUnique<CRectPassElement>(fill));
 
         // traffic lights: colour when active or hovered, flat translucent otherwise, the pressed colour
         // while the pointer is still on the pressed light; glyphs fade in on hover
@@ -510,7 +543,10 @@ namespace lg {
             CProbeElement(std::shared_ptr<CAsyncReadback> read, CBox strip) : m_read(std::move(read)), m_strip(strip) {}
             std::vector<UP<IPassElement>> draw(Render::CRenderContext& ctx) override {
                 const auto src = dynamicPointerCast<Render::GL::CGLFramebuffer>(ctx.m_data.currentFB);
-                if (!src || m_read->pending())
+                // a transformed window (genie, close) is drawn into its own canvas first: the strip's monitor
+                // coordinates do not point at the window there, and a read gave the bar a wrong colour for the whole
+                // genie and up to 15 draws after it (the restore's end pop)
+                if (!src || m_read->pending() || ctx.m_data.renderingTransformedSource)
                     return {};
                 // only pixels redrawn this frame: outside the damage the buffer may hold an older frame
                 CRegion stale{m_strip};
