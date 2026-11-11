@@ -321,6 +321,26 @@ function rowTop(items, i, row, sep) {
     return y;
 }
 
+// Press, drag, release (MAC-ANSWERS.md Q-menubar-24): the row under y (from the top of the row list), -1 over a
+// separator or past either end
+function rowAt(items, y, row, sep) {
+    if (!(y >= 0)) return -1;
+    let top = 0;
+    for (let i = 0; i < items.length; i++) {
+        top += items[i].sep ? sep : row;
+        if (y < top) return items[i].sep ? -1 : i;
+    }
+    return -1;
+}
+// what the button going up over row i does: "run" an enabled row, "open" a submenu row that has items (as a click),
+// "" on a disabled row, a submenu row without items, a separator or outside the rows (the menu stays open)
+function releaseOn(items, i) {
+    const it = i >= 0 ? items[i] : null;
+    if (!selectable(it)) return "";
+    if (it.submenu) return opens(it) ? "open" : "";
+    return "run";
+}
+
 // Submenu frame in the parent's coordinate space (all in pt): x = parent right edge - overlap, y = row top - pad, so
 // its first row lines up with the parent row (Q-menubar-23). Not measured on the Mac, kept simple: when it does not
 // fit on the right it opens on the left with the same overlap; at the bottom it is shifted up to `margin` above the edge.

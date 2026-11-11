@@ -103,7 +103,15 @@ Singleton {
         activeScreen = target;
         open = name;
     }
-    function close() { open = ""; menuIndex = -1; }
+    function close() { open = ""; menuIndex = -1; pointerHeld = false; }
+    // Press, drag, release (MAC-ANSWERS.md Q-menubar-24): the button that opened a menu on a menu bar title is still
+    // down. The press's surface (the bar) keeps the pointer grab and hands the pointer's screen position to the open
+    // menu (menuPointer); the Overlay takes the keyboard only once the button is up, because a layer that turns
+    // keyboard-exclusive makes Hyprland 0.57 release every held button and drop the real release
+    // (LayerSurface.cpp takeKeyboardFocus -> releaseAllMouseButtons; InputManager.cpp onMouseButton then swallows it)
+    property bool pointerHeld: false
+    // the held pointer at (x, y) in the active screen's coordinates; release: the button went up there
+    signal menuPointer(real x, real y, bool release)
     // Left / Right in an open menu bar menu: the title with index `target` opens (MenuBar.qml MenuTitle); none past
     // either end, so the open menu stays
     signal menuStep(int target)

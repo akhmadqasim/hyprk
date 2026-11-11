@@ -282,6 +282,40 @@ Item {
         onLoaded: item.owner = root
     }
 
+    // Press, drag, release (Q-menubar-24, Overlay): the held pointer at (x, y) in this menu's window (the Overlay and the
+    // submenu surfaces share one geometry). Over a row it selects the row as hover does (a submenu row starts its
+    // delay); the deepest open submenu takes it first. True when the point is over this menu or a submenu.
+    // the row under window point (x, y): its index (-1 off the rows) or null outside this menu
+    function rowAt(x, y) {
+        const p = mapFromItem(null, x, y);
+        if (p.x < 0 || p.y < 0 || p.x >= width || p.y >= height) return null;
+        return Menus.rowAt(shownItems, p.y - list.y, Theme.menu.itemHeight, Theme.menu.separatorHeight);
+    }
+    function pointAt(x, y) {
+        if (!shown || activating) return false;
+        if (submenu && submenu.shown && submenu.pointAt(x, y)) return true;
+        const i = rowAt(x, y);
+        if (i !== null && Menus.selectable(shownItems[i])) {
+            if (hover !== i) enterRow(i, Menus.rowTop(shownItems, i, Theme.menu.itemHeight, Theme.menu.separatorHeight));
+            return true;
+        }
+        // off the enabled rows (a separator, a disabled row, outside): as leaving the row on hover
+        if (hover >= 0) leaveRow(hover);
+        return i !== null;
+    }
+    // the button went up at (x, y): true when over this menu or a submenu
+    function releaseAt(x, y) {
+        if (!shown || activating) return false;
+        if (submenu && submenu.shown && submenu.releaseAt(x, y)) return true;
+        const i = rowAt(x, y);
+        if (i === null) return false;
+        switch (Menus.releaseOn(shownItems, i)) {
+        case "open": openSub(i, false); break;
+        case "run": activate(i, shownItems[i].action); break;
+        }
+        return true;
+    }
+
     // keys from the Overlay; true when used. The deepest open submenu that has a selection takes them first.
     // text: the typed character, for type-to-select
     function key(k, text) {

@@ -1249,6 +1249,24 @@ test("Mission Control: one Space reads Desktop, more are numbered by position", 
         assert.equal(M.typeSelect(rows, " "), -1);
         assert.equal(M.typeSelect(rows, ""), -1);
     });
+    test("press, drag, release: the row under the pointer and what the release does (Q-menubar-24)", () => {
+        const rows = [{ label: "Undo", disabled: true }, { sep: true }, { label: "Sort By", submenu: true, items: [{ label: "x" }] },
+                      { label: "Services", submenu: true, disabled: true }, { label: "Zoom In", action: "zoom" }];
+        // rows 24 pt, separators 11 pt
+        assert.equal(M.rowAt(rows, -1, 24, 11), -1);
+        assert.equal(M.rowAt(rows, 0, 24, 11), 0);
+        assert.equal(M.rowAt(rows, 23.9, 24, 11), 0);
+        assert.equal(M.rowAt(rows, 24, 24, 11), -1);          // the separator
+        assert.equal(M.rowAt(rows, 35, 24, 11), 2);
+        assert.equal(M.rowAt(rows, 83 + 23, 24, 11), 4);
+        assert.equal(M.rowAt(rows, 107, 24, 11), -1);         // past the last row
+        assert.equal(M.releaseOn(rows, 0), "");               // disabled: the menu stays open
+        assert.equal(M.releaseOn(rows, 1), "");
+        assert.equal(M.releaseOn(rows, 2), "open");           // a submenu row opens as on a click
+        assert.equal(M.releaseOn(rows, 3), "");
+        assert.equal(M.releaseOn(rows, 4), "run");
+        assert.equal(M.releaseOn(rows, -1), "");
+    });
     test("keysOf: only keys: actions", () => {
         assert.deepEqual(M.keysOf("keys:CTRL SHIFT,n"), { mods: "CTRL SHIFT", key: "n" });
         assert.equal(M.keysOf("close"), null);

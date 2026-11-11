@@ -31,7 +31,8 @@ ShellWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     // the alert must get Return/Escape even when opened without a click (IPC, Dock menu); an open menu takes the keys
     // too (Q-menubar-25: arrows, Return, Esc), although the click that opened it went to the menu bar or the Dock
-    WlrLayershell.keyboardFocus: active ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    // (not while the button that opened a menu is still down: Panels.pointerHeld)
+    WlrLayershell.keyboardFocus: active && !Panels.pointerHeld ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     MouseArea {
         anchors.fill: parent
@@ -51,6 +52,21 @@ ShellWindow {
                 Panels.menuStep(Panels.menuIndex + (e.key === Qt.Key_Right ? 1 : -1));
                 e.accepted = true;
             }
+        }
+    }
+
+    // if the compositor moved the pointer here while the button was down anyway, the bar has lost the release: the
+    // menu takes the keyboard at once and works by hover and clicks
+    HoverHandler { onHoveredChanged: if (hovered && Panels.pointerHeld) Panels.pointerHeld = false }
+    // press, drag, release from a menu bar title: the bar keeps the grab and passes the pointer on (Panels.menuPointer);
+    // this layer starts under the menu bar
+    Connections {
+        target: ov.active ? Panels : null
+        function onMenuPointer(x, y, release) {
+            const m = menu.shown ? menu : context.shown ? context : null;
+            if (!m) return;
+            if (release) m.releaseAt(x, y - Theme.menuBar.height);
+            else m.pointAt(x, y - Theme.menuBar.height);
         }
     }
 

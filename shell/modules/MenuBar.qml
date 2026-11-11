@@ -168,6 +168,13 @@ ShellWindow {
         }
     }
 
+    // the menu title under window x, or null
+    function titleAt(x) {
+        const p = left.mapFromItem(null, x, height / 2);
+        const t = left.childAt(p.x, p.y);
+        return t && t.menuIndex !== undefined ? t : null;
+    }
+
     // ---------- right: status items + clock ----------
     readonly property var wifiDev: State.wifiDevice(Networking.devices.values)
     readonly property var wifiNet: wifiDev ? wifiDev.networks.values.find(n => n.connected) || null : null
@@ -280,21 +287,44 @@ ShellWindow {
             font: mt.bold ? Typography.systemBold : Typography.menuBar
         }
         Item { id: holder; anchors.fill: parent }
+        function openHere() { Panels.openMenu(mt.menuIndex, mt.mapToItem(null, 0, 0).x, bar.screen); }
+        function openIfOther() { if (Panels.open === "menu" && !mt.open && Panels.activeScreen === bar.screen) openHere(); }
         MouseArea {
             anchors.fill: parent
             hoverEnabled: true
             onPressed: {
                 if (mt.open) Panels.close();
-                else Panels.openMenu(mt.menuIndex, mt.mapToItem(null, 0, 0).x, bar.screen);
+                else {
+                    mt.openHere();
+                    Panels.pointerHeld = true;
+                }
             }
+            // press, drag, release (Q-menubar-24): this surface keeps the grab while the button is down; over the
+            // titles the menu follows the pointer as on hover, below the bar the open menu takes the position, and
+            // a release on one of its rows runs it. A release on the bar leaves the menu open (click, then click).
+            onPositionChanged: m => {
+                if (!pressed || !Panels.pointerHeld) return;
+                const p = mapToItem(null, m.x, m.y);
+                if (p.y < bar.height) {
+                    const t = bar.titleAt(p.x);
+                    if (t) t.openIfOther();
+                } else Panels.menuPointer(p.x, p.y, false);
+            }
+            onReleased: m => {
+                if (!Panels.pointerHeld) return;
+                const p = mapToItem(null, m.x, m.y);
+                Panels.pointerHeld = false;
+                if (p.y >= bar.height) Panels.menuPointer(p.x, p.y, true);
+            }
+            onCanceled: Panels.pointerHeld = false
             // macOS: while any menu is open, hovering another title switches to it
-            onEntered: if (Panels.open === "menu" && !mt.open && Panels.activeScreen === bar.screen) Panels.openMenu(mt.menuIndex, mt.mapToItem(null, 0, 0).x, bar.screen)
+            onEntered: mt.openIfOther()
         }
         Connections {   // the keyboard steps here from the neighbouring title (Q-menubar-25: opens with no row selected)
             target: Panels
             function onMenuStep(target) {
                 if (Panels.open === "menu" && Panels.activeScreen === bar.screen && target === mt.menuIndex)
-                    Panels.openMenu(mt.menuIndex, mt.mapToItem(null, 0, 0).x, bar.screen);
+                    mt.openHere();
             }
         }
     }
