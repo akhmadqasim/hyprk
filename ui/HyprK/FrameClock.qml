@@ -39,13 +39,23 @@ Item {
     // third buffer, so the first `freshHold` frames built are never seen. They do not tick: the motion starts with
     // the first frame that reaches the screen (Control Center open, mcap: hold 0 shows .02 .02 .17, hold 1 a lost or
     // repeated value in 3 of 6 opens, hold 2 the same series .06 .17 .31 .45 in 7 of 8).
+    // Frames this window already swapped since it was shown count towards that hold: a layer that drew its first
+    // frames while its owner waited (Mission Control waits for its window captures with its layer mapped) starts its
+    // motion on the next frame (mcap: two frames of e = 0 after the go, the flight 4 frames after the layer mapped)
     property double shownAt: 0
     property bool fresh: false
     property int tick0: 0
     property int freshHold: 2
+    property int hold: 0               // frames of this run that do not tick
+    property int shownSwaps: 0         // frames swapped since shown, counted up to freshHold
     Connections {
         target: fc.win
-        function onVisibleChanged() { if (fc.win.visible) fc.shownAt = Date.now(); }
+        function onVisibleChanged() { if (fc.win.visible) { fc.shownAt = Date.now(); fc.shownSwaps = 0; } }
+    }
+    Connections {
+        target: fc.win
+        enabled: fc.shownSwaps < fc.freshHold
+        function onFrameSwapped() { fc.shownSwaps++; }
     }
     function flush(): void {
         flushOnSwap = false;
@@ -54,6 +64,7 @@ Item {
     }
     function start(): void {
         fresh = !win || !win.visible || Date.now() - shownAt < 150;
+        hold = !win || !win.visible ? freshHold : Math.max(0, freshHold - shownSwaps);
         tick0 = ticks;
         ticked = false;
         swaps = 0;
@@ -67,6 +78,7 @@ Item {
     function stop(): void { running = false; }
     onWinChanged: {
         shownAt = Date.now();
+        shownSwaps = 0;
         if (running && win) win.update();
     }
 
@@ -77,7 +89,7 @@ Item {
             if (!fc.running) return;
             fc.ticks++;
             fc.built++;
-            if (fc.fresh && fc.ticks - fc.tick0 <= fc.freshHold) { fc.win.update(); return; }
+            if (fc.fresh && fc.ticks - fc.tick0 <= fc.hold) { fc.win.update(); return; }
             if (fc.ticked) fc.frame++;
             fc.ticked = true;
             // A frame the window missed (a busy GUI or render thread) is stepped over, so the motion keeps its speed

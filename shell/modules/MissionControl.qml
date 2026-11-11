@@ -307,14 +307,16 @@ ShellWindow {
     onWindowsChanged: relayout()
     onAreaChanged: relayout()
 
-    // a still of the screen for the title bar strips, taken while this layer is still clear (only with such windows)
+    // a still of the screen for the title bar strips, taken while this layer is still clear
     ScreencopyView {
         id: still
         visible: false
         width: mc.width
         height: mc.height
         constraintSize: Qt.size(mc.width, mc.height)
-        captureSource: mc.anyBar ? mc.screen : null
+        // asked at open with the window list, not once the reply says a window has a bar: the reply and the still then
+        // come in together (Settings and 3 terminals: the flight waited 23 ms more, one frame, for the still)
+        captureSource: mc.windows.length > 0 ? mc.screen : null
         live: false
         onHasContentChanged: mc.maybeGo()
     }
