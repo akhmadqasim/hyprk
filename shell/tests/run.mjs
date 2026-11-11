@@ -329,6 +329,9 @@ test("dock.json without the key keeps magnification off", () => {
         assert.ok(Math.abs(DK.bounceOffset(280, 1) - 0.96) < 1e-9);
     });
     test("dock bounce end: the bounce in progress finishes, at the next multiple of 700 ms", () => {
+        assert.deepEqual(DK.launchCaps({ a: { start: 0, end: 0 }, b: { start: 1000, end: 0 }, c: { start: 0, end: 700 } }, 120000),
+                         { due: ["a"], next: 121000 });      // the Mac's 120 s cap (_bounceDur 120000)
+        assert.deepEqual(DK.launchCaps({}, 5), { due: [], next: 0 });
         assert.equal(DK.bounceEnd(0), 700);
         assert.equal(DK.bounceEnd(1), 700);
         assert.equal(DK.bounceEnd(699), 700);
@@ -1266,6 +1269,19 @@ test("Mission Control: one Space reads Desktop, more are numbered by position", 
         assert.equal(M.releaseOn(rows, 3), "");
         assert.equal(M.releaseOn(rows, 4), "run");
         assert.equal(M.releaseOn(rows, -1), "");
+    });
+    test("app menu: Hide, Hide Others, Show All and Quit act (Q-menubar-31); Finder's Hide rows need a Finder window", () => {
+        const act = (items, l) => items.find(it => it.label === l).action;
+        const foot = M.forIndex(1, "foot", "Foot", "");
+        assert.equal(act(foot, "Hide Foot"), "hide-app");
+        assert.equal(act(foot, "Hide Others"), "hide-others");
+        assert.equal(act(foot, "Show All"), "show-all");
+        assert.equal(act(foot, "Quit Foot"), "quit-app");
+        const desk = M.forIndex(1, "", "Finder", "");
+        assert.ok(desk.find(it => it.label === "Hide Finder").disabled);
+        assert.ok(desk.find(it => it.label === "Hide Others").disabled);
+        assert.equal(act(desk, "Show All"), "show-all");
+        assert.equal(act(M.forIndex(1, "hyprk-finder", "Finder", ""), "Hide Finder"), "hide-app");
     });
     test("keysOf: only keys: actions", () => {
         assert.deepEqual(M.keysOf("keys:CTRL SHIFT,n"), { mods: "CTRL SHIFT", key: "n" });

@@ -177,6 +177,7 @@ Singleton {
     GlobalShortcut { appid: "hyprk"; name: "switcher-last"; description: "App switcher: last"; onPressed: root.switcherKey("last") }
     GlobalShortcut { appid: "hyprk"; name: "switcher-commit"; description: "App switcher: switch"; onPressed: root.switcherKey("commit") }
     GlobalShortcut { appid: "hyprk"; name: "switcher-cancel"; description: "App switcher: cancel"; onPressed: root.switcherKey("cancel") }
+    GlobalShortcut { appid: "hyprk"; name: "switcher-hide"; description: "App switcher: hide or show the selected app"; onPressed: root.switcherKey("hide") }
     GlobalShortcut { appid: "hyprk"; name: "switcher-quit"; description: "App switcher: quit the selected app"; onPressed: root.switcherKey("quit") }
 
     // fallback entry points for scripts: `qs -p shell ipc call panels toggle spotlight`

@@ -81,6 +81,14 @@ ShellWindow {
         else if (k === "commit") commit();
         else if (k === "cancel") Panels.close();
         else if (k === "quit") quit();
+        else if (k === "hide") hide();
+    }
+    // H hides the selected app, or shows it while hidden; the switcher stays open (Q-dock-22)
+    function hide() {
+        const app = apps[selected];
+        if (!app) return;
+        if (Apps.isHidden(app.windows)) Apps.showWindows(app.windows, false);
+        else Apps.hideWindows(app.windows);
     }
     // Q quits the selected app; the switcher stays open and its icon goes as the windows close (Q-dock-22).
     // Its last app quit: nothing left to switch to, so it closes (present() rule)
@@ -106,7 +114,8 @@ ShellWindow {
     function commit() {
         const app = apps[selected];
         Panels.close();
-        if (app) Apps.focusWindow(app.windows[0]);
+        if (app && Apps.isHidden(app.windows)) Apps.showWindows(app.windows, true);
+        else if (app) Apps.focusWindow(app.windows[0]);
     }
 
     Item {
@@ -120,6 +129,7 @@ ShellWindow {
             else if (e.key === Qt.Key_Escape) sw.key("cancel");
             else if (e.key === Qt.Key_Return) sw.key("commit");
             else if (e.key === Qt.Key_Q) sw.key("quit");
+            else if (e.key === Qt.Key_H) sw.key("hide");
             e.accepted = true;
         }
         Keys.onReleased: e => {

@@ -270,7 +270,89 @@ Singleton {
         focusWindow(t);
     }
 
+    // Hide (Cmd-H), Hide Others (Option-Cmd-H), Show All, as the app menu, the Dock menu and Cmd-Tab's H offer them
+    // (MAC-ANSWERS.md Q-menubar-31, Q-dock-10, Q-dock-22): the app's windows go to special:hidden, each remembering its
+    // workspace, and come back there when the app is shown or activated (a Dock click, Cmd-Tab). A hidden app keeps its
+    // one Dock dot (Q-dock-07) and stays in Cmd-Tab (Q-dock-22).
+    readonly property string hiddenWorkspace: "special:hidden"
+    property var hiddenFrom: ({})       // window address -> the workspace it was hidden from
+    function addressOf(t) { const a = String(t.address); return a.startsWith("0x") ? a : "0x" + a; }
+    function isHiddenWindow(t) { return !!t && !!t.workspace && t.workspace.name === hiddenWorkspace; }
+    // an app is hidden when every window it shows (minimized ones aside) is hidden
+    function isHidden(wins) {
+        const shown = (wins || []).filter(w => !isMinimized(w));
+        return shown.length > 0 && shown.every(isHiddenWindow);
+    }
+    function moveWindow(t, ws) {
+        Hyprland.dispatch(`hl.dsp.window.move({ workspace = "${ws}", follow = false, window = "address:${addressOf(t)}" })`);
+    }
+    function hideWindows(wins) {
+        const from = Object.assign({}, hiddenFrom);
+        for (const w of wins || []) {
+            if (isMinimized(w) || isHiddenWindow(w)) continue;
+            from[addressOf(w)] = w.workspace ? w.workspace.name : "";
+            moveWindow(w, hiddenWorkspace);
+        }
+        hiddenFrom = from;
+    }
+    // back where they were hidden from (else the focused screen's workspace); focus: the most recently used one
+    function showWindows(wins, focus) {
+        const from = Object.assign({}, hiddenFrom);
+        const m = Hyprland.focusedMonitor;
+        const here = m && m.activeWorkspace ? m.activeWorkspace.name : "";
+        const back = (wins || []).filter(isHiddenWindow);
+        for (const w of back) {
+            const ws = from[addressOf(w)] || here;
+            delete from[addressOf(w)];
+            if (ws !== "") moveWindow(w, ws);
+        }
+        hiddenFrom = from;
+        if (focus && back.length > 0) {
+            const hist = w => { const o = w.lastIpcObject; return o && o.focusHistoryID !== undefined ? o.focusHistoryID : 1e9; };
+            focusAfterMove = back.slice().sort((a, b) => hist(a) - hist(b))[0];
+        }
+    }
+    // focused once Hyprland reports it moved: a focus sent right after the move could arrive first (each dispatch is
+    // its own request) and left the app that was in front active
+    property var focusAfterMove: null
+    Connections {
+        target: root.focusAfterMove ? Hyprland : null
+        function onRawEvent(event: HyprlandEvent): void {
+            if (event.name !== "movewindowv2" || !root.focusAfterMove) return;
+            if (event.data.split(",")[0] !== root.addressOf(root.focusAfterMove).slice(2)) return;
+            const t = root.focusAfterMove;
+            root.focusAfterMove = null;
+            root.focusWindow(t);
+        }
+    }
+    // the windows of the app whose menus the bar shows (none while the desktop has the keyboard)
+    function activeAppWindows() {
+        const t = root.activeToplevel;
+        const id = t ? appIdOf(t) : "";
+        return id ? running[Search.normId(id)] || [] : [];
+    }
+    function hideActiveApp() { hideWindows(activeAppWindows()); }
+    function hideOthers() {
+        const keep = activeAppWindows();
+        for (const k in running) hideWindows(running[k].filter(w => keep.indexOf(w) < 0));
+    }
+    function showAll() { for (const k in running) showWindows(running[k], false); }
+    // Cmd-Q / Quit in the app menu: the app quits, so every one of its windows closes (Q-menubar-31 "Quit <App> ⌘Q";
+    // a Linux app has no terminate request: closing its last window ends most). Finder has no Quit (Q-menubar-31)
+    function quitActiveApp() {
+        const t = root.activeToplevel;
+        if (!t || appIdOf(t) === "hyprk-finder") return;
+        activeAppWindows().forEach(closeWindow);
+    }
+    GlobalShortcut { appid: "hyprk"; name: "hide-app"; description: "Hide the frontmost app (Cmd-H)"; onPressed: root.hideActiveApp() }
+    GlobalShortcut { appid: "hyprk"; name: "hide-others"; description: "Hide the other apps (Option-Cmd-H)"; onPressed: root.hideOthers() }
+    GlobalShortcut { appid: "hyprk"; name: "quit-app"; description: "Quit the frontmost app (Cmd-Q)"; onPressed: root.quitActiveApp() }
+
     function activate(item) {
+        if (isHidden(item.windows)) {   // a hidden app comes back where it was (Dock click, Cmd-Tab)
+            showWindows(item.windows, true);
+            return;
+        }
         if (item.windows && item.windows.length > 0) {
             // cycle through the app's windows on screen, like clicking an active Dock icon; with every window
             // minimized the most recently used one comes back (lowest focusHistoryID)
@@ -316,7 +398,8 @@ Singleton {
         if (item.folder)
             return [{ label: "Open “" + item.name + "”", action: () => root.openFolder(item) }];
         const wins = item.windows || [];
-        const out = wins.map(w => ({ label: w.title || item.name, action: () => root.isMinimized(w) ? root.restoreWindow(w) : root.focusWindow(w) }));
+        const out = wins.map(w => ({ label: w.title || item.name, action: () => root.isMinimized(w) ? root.restoreWindow(w)
+                                                                       : root.isHiddenWindow(w) ? root.showWindows(wins, true) : root.focusWindow(w) }));
         if (out.length > 0) out.push({ sep: true });
         // Finder's own rows (live/dock/dock-menus.json "Finder"); the folder rows have no feature here: disabled
         if (item.id === "hyprk-finder")
@@ -325,7 +408,7 @@ Singleton {
                      { label: "Go to Folder…", disabled: true }, { label: "Connect to Server…", disabled: true }, { sep: true });
         // and nothing else: Finder has no Options and no Quit (dock-menus.json "Finder" ends Show All Windows, Show/Hide)
         if (item.id === "hyprk-finder")
-            return out.concat([{ label: "Show All Windows", disabled: true }, { label: "Hide", disabled: true }]);
+            return out.concat([{ label: "Show All Windows", disabled: true }, root.hideRow(wins)]);
         // Options ▸ as on 27.2.1 (MAC-ANSWERS.md Q-dock-10): pinned "Remove from Dock", else "Keep in Dock", then
         // Open at Login and Show in Finder. Keep in Dock only puts back a pinned app that was removed (the pinned list is
         // the built-in one minus `removed`); there is no login-items store, so the other two show disabled
@@ -338,13 +421,19 @@ Singleton {
             { label: "Show in Finder", disabled: true },
         ] });
         out.push({ sep: true });
-        // running: Show All Windows, Hide, Quit (dock-menus.json); App Exposé and Hide do not exist here: disabled
+        // running: Show All Windows, Hide / Show, Quit (dock-menus.json); App Exposé does not exist here: disabled
         if (wins.length > 0)
-            out.push({ label: "Show All Windows", disabled: true }, { label: "Hide", disabled: true },
+            out.push({ label: "Show All Windows", disabled: true }, root.hideRow(wins),
                      { label: "Quit", action: () => wins.forEach(root.closeWindow) });
         else
             out.push({ label: "Open", action: () => root.activate(item) });
         return out;
+    }
+
+    // the Dock menu's Hide, or Show while the app is hidden (Q-dock-10 "Hide/Show"); disabled with no window to hide
+    function hideRow(wins) {
+        if (isHidden(wins)) return { label: "Show", action: () => root.showWindows(wins, true) };
+        return wins.some(w => !isMinimized(w)) ? { label: "Hide", action: () => root.hideWindows(wins) } : { label: "Hide", disabled: true };
     }
 
     function emptyTrash() {
@@ -371,7 +460,16 @@ Singleton {
             l[id] = { start: b && b.end > now ? b.end : now, end: 0 };
         }
         launching = l;
-        bounceTimer.restart();
+        armLaunchCap();
+    }
+    // stops launching at each app's cap (lib/dock.js launchCaps): one timer for the earliest
+    function armLaunchCap() {
+        const c = DockLayout.launchCaps(launching, Date.now());
+        c.due.forEach(stopLaunching);
+        if (c.next > 0) {
+            bounceTimer.interval = Math.max(1, c.next - Date.now());
+            bounceTimer.restart();
+        } else bounceTimer.stop();
     }
 
     // Launching is over (window mapped, or the cap): the bounce in progress finishes, the icon stays down.
@@ -445,7 +543,7 @@ Singleton {
 
     Timer {
         id: bounceTimer
-        interval: 6000    // stop bouncing even if no window maps (CLI apps, failed launch)
-        onTriggered: { for (const id in root.launching) root.stopLaunching(id); }
+        // stops bouncing even if no window maps (CLI apps, failed launch), at the Mac's 120 s cap
+        onTriggered: root.armLaunchCap()
     }
 }

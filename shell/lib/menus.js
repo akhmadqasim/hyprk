@@ -243,18 +243,19 @@ function appMenu(name, appId) {
     if (isFinder(appId))
         return [
             row("About Finder", "", "about-app:Finder"), SEP,
-            // with a Finder window: its Ctrl+, (the Action menu's settings rows) and Ctrl+H (hides the window); with
-            // none both stay disabled, as the Mac's AX dump shows Hide Finder with no window
+            // with a Finder window: its Ctrl+, (the Action menu's settings rows); with none Settings, Hide Finder and
+            // Hide Others stay disabled, as the Mac's AX dump shows them with no window, and Show All stays enabled
             row("Settings…", "⌘,", appId ? "keys:CTRL,comma" : null), SEP,
             row("Empty Trash…", "⇧⌘⌫", "empty-trash"), SEP,
             sub("Services"), SEP,
-            row("Hide Finder", "⌘H", appId ? "keys:CTRL,h" : null), row("Hide Others", "⌥⌘H"), row("Show All", ""),
+            row("Hide Finder", "⌘H", appId ? "hide-app" : null), row("Hide Others", "⌥⌘H", appId ? "hide-others" : null),
+            row("Show All", "", "show-all"),
         ];
     return [
         row("About " + name, "", "about-app:" + name), SEP,
         row("Settings…", "⌘,"), SEP,
-        row("Hide " + name, "⌘H"), row("Hide Others", "⌥⌘H"), SEP,
-        row("Quit " + name, "⌘Q", "close"),
+        row("Hide " + name, "⌘H", "hide-app"), row("Hide Others", "⌥⌘H", "hide-others"), row("Show All", "", "show-all"), SEP,
+        row("Quit " + name, "⌘Q", "quit-app"),
     ];
 }
 

@@ -152,6 +152,10 @@ Item {
         }); break;
         case "forcequit": Hyprland.dispatch("hl.dsp.window.kill()"); break;
         case "close": Hyprland.dispatch("hl.dsp.window.close()"); break;
+        case "hide-app": Apps.hideActiveApp(); break;
+        case "hide-others": Apps.hideOthers(); break;
+        case "show-all": Apps.showAll(); break;
+        case "quit-app": Apps.quitActiveApp(); break;
         case "fullscreen": Hyprland.dispatch("hl.dsp.window.fullscreen()"); break;
         case "zoom": Hyprland.dispatch("hl.dsp.window.fullscreen({ mode = \"maximized\" })"); break;
         case "spotlight": Panels.open = "spotlight"; break;

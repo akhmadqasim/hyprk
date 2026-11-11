@@ -383,6 +383,7 @@ hl.define_submap("hyprk-switcher", function()
     hl.bind(cmd .. " + Return", hl.dsp.global("hyprk:switcher-commit"))
     hl.bind(cmd .. " + Escape", hl.dsp.global("hyprk:switcher-cancel"))
     hl.bind(cmd .. " + Q",      hl.dsp.global("hyprk:switcher-quit"))   -- Q-dock-22: quits the selected app, stays open
+    hl.bind(cmd .. " + H",      hl.dsp.global("hyprk:switcher-hide"))   -- Q-dock-22: hides / shows the selected app
 end)
 -- Cmd let go switches. Hyprland 0.57 matches a release against the submap the key went down in (the default one, Cmd
 -- comes before Tab) and always counts the trigger's own modifier ("SUPER + Super_L"); transparent keeps the bind from
@@ -400,7 +401,11 @@ hl.bind(cmd .. " + N",       hl.dsp.global("hyprk:notificationcenter"))
 hl.bind(cmd .. " + SHIFT + C", hl.dsp.global("hyprk:controlcenter"))
 hl.bind(cmd .. " + Up",      hl.dsp.global("hyprk:missioncontrol"))   -- macOS: Ctrl+Up
 hl.bind(cmd .. " + F3",      hl.dsp.global("hyprk:missioncontrol"))   -- plain F3/Ctrl+Up stay with apps
-hl.bind(cmd .. " + Q",       hl.dsp.window.close())
+-- Cmd-Q quits the frontmost app (every window of it, Q-menubar-31 "Quit <App> ⌘Q"; Finder has none); Cmd-H hides it,
+-- Option-Cmd-H hides the others (the app menu's Hide <App> ⌘H, Hide Others ⌥⌘H): shell/services/Apps.qml
+hl.bind(cmd .. " + Q",       hl.dsp.global("hyprk:quit-app"))
+hl.bind(cmd .. " + H",       hl.dsp.global("hyprk:hide-app"))
+hl.bind(cmd .. " + ALT + H", hl.dsp.global("hyprk:hide-others"))
 hl.bind(cmd .. " + W",       hl.dsp.window.close())
 -- Cmd-M minimises into the Dock like the yellow light (MAC-ANSWERS "Minimise (Cmd-M ...)": genie into the app's icon);
 -- plugin-motion turns the move to special:minimized into the genie
