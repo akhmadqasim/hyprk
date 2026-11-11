@@ -6,6 +6,7 @@ import Quickshell.Io
 import Quickshell.Hyprland
 import qs.HyprK
 import "lib/state.js" as State
+import "lib/sun.js" as Sun
 
 // Single source of truth for every visual metric of the hyprk shell.
 // Units are logical pixels (1pt on macOS == 1 logical px here).
@@ -76,13 +77,14 @@ Singleton {
     readonly property string fontDisplay: pickFont(["SF Pro Display", "SF Pro", "System Font", ".SF NS", "Inter Display", "Inter", "Cantarell", "Sans Serif"])
 
     FileView {
+        id: appearanceFile
         path: (Quickshell.env("HYPRK_STATE") || theme.hyprkRoot + "/state") + "/appearance.json"
         watchChanges: true
         printErrors: false
         onFileChanged: reload()
         onLoaded: {
             const o = State.parse(text(), { dark: theme.dark, reduceTransparency: theme.reduceTransparency, iconStyle: theme.iconStyle,
-                                            iconStyleVariant: theme.iconStyleVariant, reduceMotion: false, increaseContrast: false, accent: "multicolor", highlight: "", glass: 0.5 });
+                                            iconStyleVariant: theme.iconStyleVariant, reduceMotion: false, increaseContrast: false, accent: "multicolor", highlight: "", glass: 0.5, mode: "" });
             theme.dark = o.dark;
             theme.reduceTransparency = o.reduceTransparency;
             theme.iconStyle = o.iconStyle;
@@ -92,7 +94,48 @@ Singleton {
             theme.accent = o.accent;
             theme.highlight = typeof o.highlight === "string" ? o.highlight : "";
             theme.glassTint = isFinite(o.glass) ? Math.min(1, Math.max(0, o.glass)) : 0.5;
+            theme.mode = typeof o.mode === "string" ? o.mode : "";
+            theme.autoSync();   // also after a wake that somebody's write follows: a timer does not count sleep
         }
+    }
+
+    // ---------- Appearance > Auto ----------
+    // Settings switches Auto only while it runs; the shell runs the same clock (lib/sun.js, the rule of
+    // settings/Parsers.js: dark while the sun at the time zone's city is below -3 degrees; light when the place is
+    // not known). One single-shot timer to the sun's next crossing, nothing polls; the zone is looked up once, the
+    // first time the mode is Auto. The answer goes into appearance.json's `dark`, which Settings and Finder read.
+    property string mode: ""            // appearance.json `mode`: "light", "dark" or "auto" ("" in a file without it)
+    property var autoPlace: null        // { lat, lon } of the zone's city
+    property bool autoReady: false      // the zone lookup has answered
+    Process {
+        id: zoneLookup
+        command: ["sh", "-c", "readlink /etc/localtime || head -n 1 /etc/timezone 2>/dev/null || echo; cat /usr/share/zoneinfo/zone1970.tab /usr/share/zoneinfo/zone.tab 2>/dev/null"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const nl = text.indexOf("\n");
+                theme.autoPlace = Sun.zoneCoords(text.slice(nl + 1), Sun.zoneName(text.slice(0, nl)));
+                theme.autoReady = true;
+                theme.autoSync();
+            }
+        }
+    }
+    Timer { id: autoTimer; onTriggered: theme.autoSync() }
+    function autoSync() {
+        autoTimer.stop();
+        if (mode !== "auto") return;
+        if (!autoReady) { zoneLookup.running = true; return; }
+        const now = Date.now();
+        const d = autoPlace ? Sun.autoDark(now, autoPlace.lat, autoPlace.lon) : false;
+        if (d !== dark) {
+            dark = d;
+            // keep every other key as it is in the file; a file that does not parse is left alone
+            try {
+                const o = JSON.parse(appearanceFile.text());
+                if (o && typeof o === "object" && o.dark !== d) { o.dark = d; appearanceFile.setText(JSON.stringify(o, null, 2) + "\n"); }
+            } catch (e) {}
+        }
+        const flip = autoPlace ? Sun.nextAutoFlip(now, autoPlace.lat, autoPlace.lon) : 0;
+        if (flip > 0) { autoTimer.interval = Math.min(flip - now + 1000, 2147483647); autoTimer.start(); }
     }
 
     // the glass plugin must use the same appearance as our labels, else dark-mode
