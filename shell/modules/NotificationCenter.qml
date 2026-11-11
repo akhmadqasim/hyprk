@@ -319,7 +319,7 @@ Item {
                         }
                         // removed once the spring has landed on 0: a timer of the spring's length fired a frame early, with
                         // the group still 0.06 pt tall, which the layout rounded up to 1 pt (a 1 pt jump at the end, mcap)
-                        function closeUp() { slotAnim.go(0); }
+                        function closeUp() { slotAnim.spring = NcLib.clearSpring; slotAnim.go(0); }
                         property bool removed: false
                         function removeIfClosed() {
                             if (!closing || slot > 0 || removed) return;

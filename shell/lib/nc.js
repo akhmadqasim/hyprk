@@ -17,6 +17,9 @@ var panelCloseCut = 0.375;
 // List reflow (stack expand/collapse, a new card pushing the list down, the list closing up after a clear): response
 // 0.2 s, ratio 1.25 (expand 1.4 pt RMS, push 1.9 pt).
 var reflowSpring = { response: 0.2, ratio: 1.25 };
+// the list closing up after a group was cleared has its own fit: response 0.22, ratio 1.25 (MAC-ANSWERS NC 3g, RMS
+// 1.9 pt; on 0.2 ours ran ahead of the Mac's series by .06-.07 in frames 3-7, rms .046, session 20)
+var clearSpring = { response: 0.22, ratio: 1.25 };
 // a cleared card blurs and fades out in place in 4-5 frames, then the list closes up
 var clearFadeMs = 70;
 // a card that arrives while the panel is open: shows 0.08 s after the list starts to move, fades in over 0.25 s
