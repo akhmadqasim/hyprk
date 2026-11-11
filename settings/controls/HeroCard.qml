@@ -4,7 +4,7 @@ import "../HyprK"
 
 // Pane header card: big tile, title, description (General, Appearance, etc.).
 // compact (27.2.1 Accessibility, accessibility-light.png): 64 tall, a 26 pt icon 10 in from the left, then the title
-// (13 semibold) and a 2-line 11 pt description ending in a "Learn more…" link (linkActivated).
+// (13 medium) and a 2-line 11 pt description ending in a "Learn more…" link (linkActivated).
 Rectangle {
     id: h
     property string glyph
@@ -28,7 +28,8 @@ Rectangle {
         PaneIcon { size: 26; glyph: h.glyph; iconId: h.iconId; tint: h.tint }
         Column {
             width: h.width - 10 - 26 - 12 - 10
-            MacText { text: h.title; weight: Typography.semibold; color: Theme.label }
+            // 13 Medium: the title's ink is 150 px at 2x on the Mac (accessibility-light.png), semibold measured 159
+            MacText { text: h.title; weight: Typography.medium; color: Theme.label }
             Text {
                 width: parent.width
                 wrapMode: Text.WordWrap

@@ -61,9 +61,24 @@ Column {
     // `minThumb` high and then the row scrolls sideways inside the card (clipped to it). macOS shows the display
     // thumbnails centred in a row, but there is no reference shot of this pane in reference/, so everything about
     // the overflow behaviour (minimum size, scrolling instead of a scaled row, gaps, padding) is guessed.
-    Card {
+    // Hero strip, not a card (Q-settings-14, displays-{light,dark}.png): full content width from the toolbar's bottom,
+    // 158 pt tall, a vertical gradient white -> #F3F3F3 (dark #1E1F24 -> #28292E), a 1 pt divider #E6E6E6 / #343539
+    // at its bottom; the next card 23 pt below it. The Mac draws a MacBook picture and the display's name; no Apple
+    // art is shipped, so the arrangement thumbnails sit in it.
+    Item {
+        width: parent.width; height: 158 - Theme.content.top + 13   // + 13: 10 spacing makes the 23 pt gap
+        Rectangle {
+            x: -Theme.content.padding; y: -Theme.content.top
+            width: parent.width + 2 * Theme.content.padding; height: 158
+            gradient: Gradient {
+                GradientStop { position: 0; color: Theme.dark ? "#1E1F24" : "#FFFFFF" }
+                GradientStop { position: 1; color: Theme.dark ? "#28292E" : "#F3F3F3" }
+            }
+            Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: 1; color: Theme.dark ? "#343539" : "#E6E6E6" }
+        }
         Item {
             id: strip
+            y: -Theme.content.top + 4
             width: parent.width; height: 150
 
             readonly property var items: pane.status === "ok" ? pane.monitors : [{ name: "", description: "Display", width: 16, height: 10 }]
@@ -88,7 +103,7 @@ Column {
             Flickable {
                 id: flick
                 anchors.fill: parent
-                clip: true                               // nothing is drawn outside the card's rectangle
+                clip: true                               // nothing is drawn outside the strip
                 contentWidth: Math.max(width, row.width + 2 * strip.pad)
                 contentHeight: height
                 flickableDirection: Flickable.HorizontalFlick

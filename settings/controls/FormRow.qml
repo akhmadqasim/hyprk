@@ -17,12 +17,16 @@ Item {
     signal clicked()
     default property alias trailing: trail.data
     width: parent ? parent.width : 0
-    implicitHeight: Math.max(Theme.content.rowHeight, texts.implicitHeight + 16, trail.childrenRect.height + 12)
+    // a row whose only control is a Switch is 37.5, others 38 (Q-settings-12)
+    readonly property bool _switchRow: trail.children.length === 1 && trail.children[0]._lift !== undefined
+                                       && trail.children[0].value === undefined
+    implicitHeight: Math.max(_switchRow ? Theme.content.switchRowHeight : Theme.content.rowHeight,
+                             texts.implicitHeight + 16, trail.childrenRect.height + 12)
     height: implicitHeight
 
-    Rectangle { // separator between rows, inset like macOS
+    Rectangle { // separator between rows: inset 10 on both sides, under the icon too (accessibility-light.png, Q-settings-12)
         visible: row.Positioner.index > 0
-        x: Theme.content.separatorInset + (icon.visible ? icon.width + 10 : 0)
+        x: Theme.content.separatorInset
         width: parent.width - x - Theme.content.separatorInset
         height: 1
         color: Theme.separator

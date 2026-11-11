@@ -96,7 +96,7 @@ Column {
             label: "Alert volume"
             implicitHeight: 40
             Slider {
-                width: 230
+                width: 248   // speaker to speaker ink 243 pt (sound-light.png: x 930..1416 px at 2x)
                 tickMarks: 7
                 value: AppState.sound.alertVolume
                 leftGlyph: "volume_mute"; rightGlyph: "volume_up"
@@ -167,9 +167,9 @@ Column {
             implicitHeight: 62
             alignTop: true
             Item {   // the slider with the Mute checkbox right-aligned under it
-                width: 230; height: 45
+                width: 248; height: 45
                 Slider {
-                    width: 230
+                    width: 248
                     tickMarks: 7
                     value: pane.vol.volume
                     enabled: pane.status === "ok"

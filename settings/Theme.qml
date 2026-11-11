@@ -147,6 +147,7 @@ QtObject {
         readonly property int headerTop: 20           // card to the next heading 30 = sectionGap + headerTop
         readonly property int cardRadius: 13          // about 13, continuous
         readonly property int rowHeight: 38           // 1-line row with a pop-up 38, with a switch 37.5
+        readonly property real switchRowHeight: 37.5  // a row whose only control is a switch (desktop-dock-light.png: 75 px pitch)
         readonly property int rowPadding: 10
         readonly property int separatorInset: 10
         readonly property int heroIcon: 56           // pane header icon, TODO verify
