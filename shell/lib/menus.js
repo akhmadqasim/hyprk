@@ -56,7 +56,7 @@ function finderMenus(win) {
             f("New Folder", "⇧⌘N", "desktop-new-folder", "keys:CTRL SHIFT,n"),
             f("New Folder with Selection", "⌃⌘N"),
             f("New Smart Folder", ""),
-            f("New Tab", "⌘T"),
+            f("New Tab", "⌘T", null, "keys:CTRL,t"),
             f("Open", "⌘O", null, "keys:CTRL,o"),
             sub("Open With"),
             f("Close Window", "⌘W", null, "close"),
@@ -243,10 +243,12 @@ function appMenu(name, appId) {
     if (isFinder(appId))
         return [
             row("About Finder", "", "about-app:Finder"), SEP,
-            row("Settings…", "⌘,"), SEP,
+            // with a Finder window: its Ctrl+, (the Action menu's settings rows) and Ctrl+H (hides the window); with
+            // none both stay disabled, as the Mac's AX dump shows Hide Finder with no window
+            row("Settings…", "⌘,", appId ? "keys:CTRL,comma" : null), SEP,
             row("Empty Trash…", "⇧⌘⌫", "empty-trash"), SEP,
             sub("Services"), SEP,
-            row("Hide Finder", "⌘H"), row("Hide Others", "⌥⌘H"), row("Show All", ""),
+            row("Hide Finder", "⌘H", appId ? "keys:CTRL,h" : null), row("Hide Others", "⌥⌘H"), row("Show All", ""),
         ];
     return [
         row("About " + name, "", "about-app:" + name), SEP,
