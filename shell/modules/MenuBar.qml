@@ -32,7 +32,13 @@ ShellWindow {
     // 0.15 s on Overlay; on exit it is shown again by Hyprland and fades in over 0.5 s from the start
     // (Theme.anim.menuBarFullscreen*; the Mac's curve is not decoded: CA's default ease-in-ease-out)
     readonly property var hyprMonitor: Hyprland.monitorFor(screen)
-    readonly property bool fullscreen: hyprMonitor && hyprMonitor.activeWorkspace ? hyprMonitor.activeWorkspace.hasFullscreen : false
+    // A real full screen only: a zoomed (maximized) window also sets the workspace's hasFullscreen, and the Mac keeps
+    // menu bar and Dock for Zoom. Hyprland reports the two apart as toplevel states (ForeignToplevelWlr.cpp:
+    // FSMODE_FULLSCREEN -> fullscreen, any other mode -> maximized), with the change, no IPC round trip.
+    readonly property bool fullscreen: {
+        const ws = hyprMonitor ? hyprMonitor.activeWorkspace : null;
+        return !!ws && ws.hasFullscreen && ws.toplevels.values.some(t => t.wayland && t.wayland.fullscreen);
+    }
     // Full screen below the bar strip (plugin-motion fullscreen_top: the notched Air keeps the 34 pt strip, black,
     // Q-menubar-33): the pointer at the top edge shows the titles and status items in place on the black and they go
     // when it leaves the bar ("peek"). Whether the window is below a strip is read from its top edge once per full

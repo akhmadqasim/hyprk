@@ -179,7 +179,13 @@ ShellWindow {
     // leaving hides it after dockHideDelay. Both slide on the Dock's cosine ease in-out over dockSlide.
     readonly property bool autohide: Prefs.dock.autohide
     readonly property var hyprMonitor: Hyprland.monitorFor(screen)
-    readonly property bool fullscreen: hyprMonitor && hyprMonitor.activeWorkspace ? hyprMonitor.activeWorkspace.hasFullscreen : false
+    // A real full screen only: a zoomed (maximized) window also sets the workspace's hasFullscreen, and the Mac keeps
+    // menu bar and Dock for Zoom. Hyprland reports the two apart as toplevel states (ForeignToplevelWlr.cpp:
+    // FSMODE_FULLSCREEN -> fullscreen, any other mode -> maximized), with the change, no IPC round trip.
+    readonly property bool fullscreen: {
+        const ws = hyprMonitor ? hyprMonitor.activeWorkspace : null;
+        return !!ws && ws.hasFullscreen && ws.toplevels.values.some(t => t.wayland && t.wayland.fullscreen);
+    }
     property bool pointerIn: false
     property bool revealed: false
     Timer { id: revealDelay; interval: Theme.anim.dockRevealDelay; onTriggered: dock.revealed = true }
