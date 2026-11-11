@@ -22,5 +22,13 @@ Singleton {
         Sounds.volumeChanged();
     }
 
+    // output devices (Control Center's Sound module); choosing one makes it the preferred default sink, PipeWire's
+    // session manager then moves the default to it
+    readonly property var outputs: State.outputSinks(Pipewire.nodes.values)
+    function setOutput(node) {
+        if (node) Pipewire.preferredDefaultAudioSink = node;
+    }
+    function name(node) { return State.deviceName(node); }
+
     PwObjectTracker { objects: root.sink ? [root.sink] : [] }
 }

@@ -352,6 +352,12 @@ test("bluetooth adapter", () => assert.equal(ST.hasBluetooth({}), true));
 test("audio not ready", () => assert.equal(ST.hasAudio(false, { audio: {} }), false));
 test("audio no sink", () => assert.equal(ST.hasAudio(true, null), false));
 test("audio ok", () => assert.equal(ST.hasAudio(true, { audio: {} }), true));
+test("outputs: device sinks only", () => assert.deepEqual(ST.outputSinks([
+    { id: 1, audio: {}, isSink: true, isStream: false }, { id: 2, audio: {}, isSink: true, isStream: true },
+    { id: 3, audio: {}, isSink: false, isStream: false }, { id: 4, audio: null, isSink: true, isStream: false },
+    { id: 5, audio: {}, isSink: true, isStream: false }]).map(n => n.id), [1, 5]));
+test("output name", () => assert.deepEqual([ST.deviceName({ description: "A", nickname: "B", name: "c" }),
+    ST.deviceName({ description: "", nickname: "B", name: "c" }), ST.deviceName({ name: "c" }), ST.deviceName(null)], ["A", "B", "c", ""]));
 test("wifi none", () => assert.equal(ST.wifiDevice([{ type: 0 }]), null));
 test("wifi found", () => assert.equal(ST.wifiDevice([{ type: 0 }, { type: 1, name: "wlan0" }]).name, "wlan0"));
 test("player none", () => assert.equal(ST.pickPlayer([]), null));

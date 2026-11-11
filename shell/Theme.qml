@@ -257,6 +257,8 @@ Singleton {
         readonly property real switcherLabel: 13    // TODO verify
         readonly property real ccTileTitle: 12      // CC toggle and slider titles: SF 12 semibold (Q-panels-06)
         readonly property real ccTileSub: 11        // CC toggle subtitle: SF 11 regular (Q-panels-06)
+        readonly property real ccModuleTitle: 13    // a CC module panel's title and headers: SF 13 bold (Q-panels-12)
+        readonly property real ccModuleRow: 13      // its rows ("MacBook Air Speakers", "Sound Settings…": cap 9 pt on the photo)
         readonly property real dockLabel: 14        // Dock app-name label: system 14 (27.2.1 DOCKLabelLayer, Q-dock-08)
         readonly property real missionTitle: 13     // Mission Control window title: SF 13 bold (Q-dock-29)
         readonly property real widgetBig: 34        // TODO verify
@@ -597,6 +599,42 @@ Singleton {
         readonly property real lensH: 20
         readonly property real overdrag: 5
         readonly property int overdragBackMs: 130
+        // a module opened from the grid (Q-panels-12): one glass panel of the tiles' family in the grid's place, 308 wide,
+        // 6 below the menu bar (top 40 on a 34 pt bar), 8 from the right edge, continuous r 16, contents 14 in; rows
+        // 32 tall, 5 in (298 wide); the hovered row a capsule +21 over grey 109 (white .144); 1 pt separators; headers
+        // SF 13 bold. Separator and header colours from the Sound module photo (JPEG, rough): the line +20 over the
+        // panel (white .11), "Output" at about .74 of the device names' white
+        readonly property real modulePanelWidth: 308
+        readonly property real modulePanelRadius: 16
+        readonly property real modulePanelInset: 14
+        readonly property real modulePanelTop: 6
+        readonly property real modulePanelRight: 8
+        readonly property color moduleHeader: Qt.rgba(1, 1, 1, 0.74)
+        readonly property color moduleSeparator: Qt.rgba(1, 1, 1, 0.11)
+        readonly property color moduleRowHover: Qt.rgba(1, 1, 1, 0.144)
+        // the Sound module (photo 2026-11-11 23.11.22, 2.003 px/pt; modules/CcSoundPanel.qml has the readings)
+        readonly property real soundTitleBaseline: 25.5
+        readonly property real soundSliderY: 46.2
+        readonly property real soundTrackX: 34.4
+        readonly property real soundTrackW: 229.2
+        readonly property real soundTrackHeight: 6
+        readonly property real soundKnobW: 20
+        readonly property real soundKnobH: 16
+        readonly property real soundGlyphLeft: 21.2       // ink centres
+        readonly property real soundGlyphRight: 280.6
+        readonly property real soundSeparator1: 64.1
+        readonly property real soundHeaderBaseline: 84.9
+        readonly property real soundRowsTop: 92.1
+        readonly property real soundRowPitch: 32
+        readonly property real soundRowInset: 5
+        readonly property real soundDisc: 26               // 25.5 - 26 on the photo, "about 26" (task note)
+        readonly property real soundDiscX: 14.5
+        readonly property real soundDeviceGlyph: 10.5      // speaker.wave.2.fill: ink 14 pt wide on the photo
+        readonly property real soundTextX: 49.4
+        readonly property real soundTextDrop: 4.7          // baseline under the row's middle
+        readonly property real soundSeparatorGap: 5.5      // last row's bottom to the separator
+        readonly property real soundFooterBaseline: 20.2   // "Sound Settings…" under that separator
+        readonly property real soundFooterHeight: 32.6     // the separator to the panel's bottom (258 with four devices)
         // Now Playing 2x2 (Q-panels-11): art 40 at (14, 14), continuous r 10, white 14 %; title at y 72;
         // buttons 30 x 30 at y 96, x 15 / 55 / 95
         readonly property int npArt: 40

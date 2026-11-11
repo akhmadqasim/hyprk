@@ -19,6 +19,10 @@ Item {
 
     property real originX: 0
     property real originY: 0
+    // 1 = the grid shown, 0 = a module panel in its place (ControlCenterWindow.morph): the grid's glass materializes
+    // out on it
+    property real gridShown: 1
+    signal moduleRequested(string name)
 
     readonly property int colW: Theme.cc.columnWidth
     readonly property int rowH: Theme.cc.tileHeight
@@ -162,8 +166,7 @@ Item {
         title: "Sound"
         trailingRoom: Theme.cc.outputRoom
         available: Audio.available
-        // the AirPlay-audio output button: on the Mac it opens the output sub-panel, which hyprk does not have,
-        // so it is present but opens nothing
+        // the AirPlay-audio output button opens the Sound module (CcSoundPanel) in the grid's place
         Rectangle {
             x: parent.width - Theme.cc.outputButtonRight - width / 2
             y: Theme.cc.trackY - height / 2
@@ -172,6 +175,7 @@ Item {
             radius: width / 2
             color: Theme.spotlight.tokenFill
             Symbol { anchors.centerIn: parent; name: "airplayaudio"; surface: "ccOutput"; size: 16; color: Theme.cc.text }
+            MouseArea { anchors.fill: parent; enabled: cc.gridShown === 1; onClicked: cc.moduleRequested("sound") }
         }
         leftSymbol: "speaker.fill"
         rightSymbol: "speaker.wave.3.fill"
@@ -199,6 +203,7 @@ Item {
             solidColor: Theme.cc.tileSolid
             pluginLift: Theme.cc.pluginLift
             shadow: false
+            materialize: cc.gridShown
         }
     }
 
@@ -326,6 +331,7 @@ Item {
         sy: cc.originY + y
         tint: Theme.cc.tileTint
         solidColor: Theme.cc.tileSolid
+        materialize: cc.gridShown
         Text {
             anchors.centerIn: parent
             text: "Edit Controls"
@@ -374,7 +380,7 @@ Item {
             size: 18
             color: Theme.cc.text
         }
-        CcSlider {
+        ControlCenterSlider {
             x: Theme.cc.trackX
             width: parent.width - Theme.cc.trackX - Theme.cc.trackRight - sm.trailingRoom
             y: Theme.cc.trackY - height / 2
@@ -385,37 +391,4 @@ Item {
         }
     }
 
-    // 27.2.1 slider module (MAC-ANSWERS.md Q-panels-08, -09) on the shared HyprK Slider: white fill over a plus-lighter
-    // T + 20 track 4 pt tall; no knob at rest, a white 18 x 14 knob while the module is hovered, pressed the shared
-    // glass lens 24 x 20 (Knob: refraction, rim, light and shadow from the Mac's pressed-knob filter and recording)
-    // centred on the fill end, which is kept half a knob inside the track ends. A press on the track sends the fill end
-    // half a knob ahead of the pointer and springs to it (about 0.2 s), a drag follows 1:1; past an end the track and
-    // fill stretch up to 5 pt and spring back in 0.13 s on release. The Sound module (CcSoundPanel) uses the same
-    // slider with its knob always shown.
-    component CcSlider: Slider {
-        trackHeight: Theme.cc.trackHeight
-        fillColor: Theme.cc.sliderFillColor
-        trackFill: Component {
-            ShaderEffect {   // track: plus-lighter T + 20 (shaders/plusfill.frag)
-                property vector4d fill: Qt.vector4d(Theme.cc.trackLift, Theme.cc.trackLift, Theme.cc.trackLift, 0)
-                property size sizePt: Qt.size(width, height)
-                property real radius: height / 2
-                property real dpr: Screen.devicePixelRatio
-                fragmentShader: Qt.resolvedUrl("../shaders/plusfill.frag.qsb")
-            }
-        }
-        knobWidth: Theme.cc.knobW
-        knobHeight: Theme.cc.knobH
-        lensWidth: Theme.cc.lensW
-        lensHeight: Theme.cc.lensH
-        lensBackdrop: "transparent"
-        fillToEnds: true
-        trackPressOffset: Theme.cc.knobW / 2
-        overdrag: Theme.cc.overdrag
-        overdragBackMs: Theme.cc.overdragBackMs
-        jumpResponse: Theme.anim.sliderJumpResponse
-        reduceMotion: A11y.reduceMotion
-        hitMargin: 10
-        activeFocusOnTab: false
-    }
 }

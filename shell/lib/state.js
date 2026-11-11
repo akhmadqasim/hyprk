@@ -64,6 +64,15 @@ function hasAudio(ready, sink) {
     return !!(ready && sink && sink.audio);
 }
 
+// Output devices for Control Center's Sound module: audio sinks that are devices, not program streams, in the
+// server's order. A node's shown name: its description, else its nickname, else its node name.
+function outputSinks(nodes) {
+    return (nodes || []).filter(n => n && n.audio && n.isSink && !n.isStream);
+}
+function deviceName(n) {
+    return n ? (n.description || n.nickname || n.name || "") : "";
+}
+
 // Wi-Fi status: available with a NetworkManager wifi device.
 // DeviceType.Wifi == 1 in Quickshell.Networking.
 function wifiDevice(devices) {
