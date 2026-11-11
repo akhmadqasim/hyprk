@@ -117,12 +117,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 width: Theme.notif.iconSize
                 height: Theme.notif.iconSize
-                readonly property string appUrl: {
-                    const entry = Apps.entryFor(card.appName) || Apps.entryFor(card.appIcon);
-                    if (card.appIcon && card.appIcon.startsWith("/")) return "file://" + card.appIcon;
-                    if (card.appIcon && card.appIcon.startsWith("file://")) return card.appIcon;
-                    return Apps.iconUrl(entry ? entry.icon : card.appIcon, entry ? entry.id : card.appName);
-                }
+                readonly property var entry: Apps.entryFor(card.appName) || Apps.entryFor(card.appIcon)
                 readonly property string imageUrl: !card.image ? "" : card.image.startsWith("/") ? "file://" + card.image : card.image
                 ClippingRectangle {
                     anchors.fill: parent
@@ -137,12 +132,17 @@ Item {
                         asynchronous: true
                     }
                 }
-                IconImage {
+                // the app icon as the Dock draws it (AppIcon: macOS icon when mapped, else the theme icon on the
+                // squircle tile), so an app the icon theme lacks still gets its own icon, not a bare generic one
+                AppIcon {
                     readonly property bool badge: iconBox.imageUrl !== ""
-                    implicitSize: badge ? Math.round(Theme.notif.iconSize * 0.47) : Theme.notif.iconSize
-                    x: badge ? iconBox.width - implicitSize + 3 : 0
-                    y: badge ? iconBox.height - implicitSize + 3 : 0
-                    source: iconBox.appUrl
+                    width: badge ? Math.round(Theme.notif.iconSize * 0.47) : Theme.notif.iconSize
+                    height: width
+                    size: width
+                    x: badge ? iconBox.width - width + 3 : 0
+                    y: badge ? iconBox.height - height + 3 : 0
+                    icon: iconBox.entry ? iconBox.entry.icon || "" : card.appIcon.replace(/^file:\/\//, "")
+                    appId: iconBox.entry ? iconBox.entry.id : card.appName
                 }
             }
 
