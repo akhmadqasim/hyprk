@@ -241,6 +241,31 @@ local glassLayers = { "dock", "overlay", "controlcenter", "notifications", "noti
 -- sends its glass shapes as ext-background-effect regions (HYPRK_GLASS=plugin) and the
 -- plugin draws Liquid Glass behind them. Without it the shell's QML glass is used.
 -- On by default; HYPRK_LIQUIDGLASS=0 forces the QML glass.
+-- Plugin keys go through pluginConfig(): a key the loaded build does not register (an older .so than this file) is
+-- left out instead of ending in Hyprland's "unknown config key" error, and the caller learns which ones were missing,
+-- so a feature that replaces one of Hyprland's (window_shadow -> decoration.shadow) only takes over when it exists.
+-- hl.plugin.load() only queues the .so: on the first parse no plugin key exists yet; Hyprland loads the plugins after
+-- it and parses this file again, and that pass sets them (an old build: Hyprland's own shadow stays on).
+local function pluginLoaded(name)
+    for _, p in ipairs(hl.get_loaded_plugins and hl.get_loaded_plugins() or {}) do
+        if p.name == name then return true end
+    end
+    return false
+end
+local function pluginConfig(plugin, opts)
+    local known, missing = {}, {}
+    for k, v in pairs(opts) do
+        if hl.get_config("plugin." .. plugin .. "." .. k) ~= nil then known[k] = v else missing[k] = true end
+    end
+    if next(known) then hl.config({ plugin = { [plugin] = known } }) end
+    if next(missing) and pluginLoaded(plugin) then
+        local names = {}
+        for k in pairs(missing) do names[#names + 1] = k end
+        table.sort(names)
+        print("hyprk: " .. plugin .. " build has no " .. table.concat(names, ", ") .. " (older than the config?)")
+    end
+    return missing
+end
 local glassSo = hyprk .. "/plugin/build/libliquidglass.so"
 local h = io.open(glassSo, "r")
 if h then h:close() end
@@ -248,7 +273,7 @@ hl.env("HYPRK_GLASS", "qml")     -- reset an inherited value; set to "plugin" on
 if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
     local ok, err = pcall(function()
         hl.plugin.load(glassSo)
-        hl.config({ plugin = { liquidglass = {
+        pluginConfig("liquidglass", {
             namespaces = "hyprk-" .. table.concat(glassLayers, ",hyprk-"),
             -- recipes per layer: the plugin's own `materials` default (plugin/src/Config.cpp) plus the
             -- volume/brightness HUD on the Control Center recipe (SystemBannerUI _Glass.controlCenter, no subvariant:
@@ -264,14 +289,17 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
                        .. "hyprk-dock-dots:darker:128,hyprk-dock-dots-dark:lighter:125",
             -- the Dock dots are circles (4.1 pt, Q-dock-07): their 4 pt square regions get this radius (clamped to 2)
             radii = "hyprk-dock-dots:2.05,hyprk-dock-dots-dark:2.05",
-        } } })
+        })
     end)
     if ok then
         hl.env("HYPRK_GLASS", "plugin")
         -- AppKit's window shadow from the plugin (plugin/src/WindowShadow.cpp: the Gaussian of the frame, blur 20 / 8 pt,
-        -- y 18 / 7, density .40 / .22 light, .70 / .45 dark), Hyprland's off; without the plugin the gradient above stays.
+        -- y 18 / 7, density .40 / .22 light, .70 / .45 dark), Hyprland's off; without the plugin, or with a build that
+        -- has no window_shadow yet, the gradient above stays on.
         -- window_rim: the 1 pt white rim inside every window, alpha .10 (.08 dark inactive) (MAC-ANSWERS Q-windows-03)
-        hl.config({ plugin = { liquidglass = { window_shadow = 1, window_rim = 1 } }, decoration = { shadow = { enabled = false } } })
+        if not pluginConfig("liquidglass", { window_shadow = 1, window_rim = 1 }).window_shadow then
+            hl.config({ decoration = { shadow = { enabled = false } } })
+        end
     else print("hyprk: liquidglass not loaded: " .. tostring(err)) end
 end
 -- Window motion Hyprland cannot express (plugin-motion/): the Dock genie on minimize/restore.
@@ -288,7 +316,7 @@ if hm then
     -- fullscreen_top: on the notched Air a full-screen window sits below the 34 pt bar strip, which stays black
     -- (MAC-ANSWERS Q-menubar-33); the MBA headless output models that Air. Other outputs keep true full screen
     -- (`hyprctl eval 'hl.config({ plugin = { hyprkmotion = { fullscreen_top = "" } } })'` for it on MBA too)
-    else hl.config({ plugin = { hyprkmotion = { genie_duration = 0.5, fullscreen_top = "MBA:34" } } }) end
+    else pluginConfig("hyprkmotion", { genie_duration = 0.5, fullscreen_top = "MBA:34" }) end
 end
 
 ---------------------------------------------------------- layer rules ----
