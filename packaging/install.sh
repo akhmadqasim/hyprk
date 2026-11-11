@@ -36,10 +36,14 @@ quickshell=v0.3.2 hyprlock=v0.9.7"
 # What an install contains. The repo is private and tracks Apple fonts, icons, cursors, sounds and wallpapers; the look
 # needs them, so they are copied (this install is for YOUR machine only: never upload or share the result).
 # Left out: reference/ (macOS screenshots, RE dumps), packaging/, the dev's state/, sounds/originals (the unconverted
-# duplicates of sounds/wav and sounds/oga) and the whole wallpaper collection (1.4 GB). Only the wallpapers in
-# SHIP_WALLPAPERS (themes/wallpapers/png, what the code uses as defaults) are copied, downscaled to WP_MAX px.
+# duplicates of sounds/wav and sounds/oga, 44 MB) except the 23 files the shell plays (SHIP_SOUNDS_RE, 6.2 MB:
+# shell/scripts/sound.sh and the Settings preview play the Apple original when it exists, else the Vorbis copy), and
+# the whole wallpaper collection (1.4 GB). Only the wallpapers in SHIP_WALLPAPERS (themes/wallpapers/png, what the code
+# uses as defaults) are copied, downscaled to WP_MAX px.
 # The same lists are mirrored in packaging/arch/PKGBUILD, fedora/hyprk.spec and nix/flake.nix.
 NOSHIP="reference packaging state themes/wallpapers sounds/originals"
+# the originals sound.sh plays: the 14 alert sounds and its event files (keep in step with its `pick` calls)
+SHIP_SOUNDS_RE="^sounds/originals/(Sounds/[^/]+$|misc/(BezelServices-volume|PowerChime-connect_power)\.|SystemSounds/(system/(Screen Capture|Volume Mount|Volume Unmount|SentMessage)|finder/empty trash|dock/(drag to trash|poof item off dock))\.)"
 SHIP_WALLPAPERS="TahoeLight.png TahoeDark.png DefaultAerial.png"
 WP_MAX=3840
 
@@ -376,14 +380,18 @@ if [ -d "$SRC/.git" ] && have git; then
     # the tracked files minus NOSHIP
     say "[files] git ls-files minus: $(echo $NOSHIP) ($(git -C "$SRC" ls-files | grep -cvE "$NOSHIP_RE") files)"
     if [ $YES = 1 ]; then
-        git -C "$SRC" ls-files -z | grep -zvE "$NOSHIP_RE" | tar -C "$SRC" --null -T - -cf - | tar -C "$PREFIX" -xf -
-    else say "[dry-run] git -C $(q "$SRC") ls-files -z | grep -zvE $(q "$NOSHIP_RE") | tar -C $(q "$SRC") --null -T - -cf - | tar -C $(q "$PREFIX") -xf -"; fi
+        { git -C "$SRC" ls-files -z | grep -zvE "$NOSHIP_RE"; git -C "$SRC" ls-files -z sounds/originals | grep -zE "$SHIP_SOUNDS_RE"; } |
+            tar -C "$SRC" --null -T - -cf - | tar -C "$PREFIX" -xf -
+    else say "[dry-run] { git -C $(q "$SRC") ls-files -z | grep -zvE $(q "$NOSHIP_RE"); git ls-files -z sounds/originals | grep -zE $(q "$SHIP_SOUNDS_RE"); } | tar -C $(q "$SRC") --null -T - -cf - | tar -C $(q "$PREFIX") -xf -"; fi
 else
     # tarball without .git: copy everything except NOSHIP
     EXC=(--exclude='*/build' --exclude=__pycache__)
     for d in $NOSHIP; do EXC+=("--exclude=./$d"); done
-    if [ $YES = 1 ]; then tar -C "$SRC" "${EXC[@]}" -cf - . | tar -C "$PREFIX" -xf -
-    else say "[dry-run] tar -C $(q "$SRC") ${EXC[*]} -cf - . | tar -C $(q "$PREFIX") -xf -"; fi
+    if [ $YES = 1 ]; then
+        tar -C "$SRC" "${EXC[@]}" -cf - . | tar -C "$PREFIX" -xf -
+        [ -d "$SRC/sounds/originals" ] && (cd "$SRC" && find sounds/originals -type f -print0 | grep -zE "$SHIP_SOUNDS_RE" |
+            tar --null -T - -cf - | tar -C "$PREFIX" -xf -)
+    else say "[dry-run] tar -C $(q "$SRC") ${EXC[*]} -cf - . | tar -C $(q "$PREFIX") -xf -, plus sounds/originals matching $(q "$SHIP_SOUNDS_RE")"; fi
 fi
 run mkdir -p "$PREFIX/bin" "$PREFIX/themes/wallpapers/png"
 [ $YES = 1 ] && date -u +"installed %Y-%m-%dT%H:%M:%SZ from $SRC" > "$PREFIX/$MARKER"
