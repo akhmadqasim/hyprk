@@ -269,7 +269,12 @@ Singleton {
         const addr = String(t.address);
         return `{ window = "address:${addr.startsWith("0x") ? addr : "0x" + addr}" }`;
     }
-    function focusWindow(t) { Hyprland.dispatch(`hl.dsp.focus(${windowSelector(t)})`); }
+    // a window Stage Manager has parked in its strip comes to the stage with its app instead (a focus would show the
+    // special workspace it sits on)
+    function focusWindow(t) {
+        if (StageManager.running && StageManager.isParked(t)) { StageManager.bringWindow(t); return; }
+        Hyprland.dispatch(`hl.dsp.focus(${windowSelector(t)})`);
+    }
     function closeWindow(t) { Hyprland.dispatch(`hl.dsp.window.close(${windowSelector(t)})`); }
 
     // minimized (yellow light, Hide, plugin-motion's client minimize): parked on special:minimized

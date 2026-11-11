@@ -1423,7 +1423,7 @@ test("Mission Control: one Space reads Desktop, more are numbered by position", 
     const bg = readFileSync(join(shellDir, "modules", "Background.qml"), "utf8");
     test("desktop asks for no keyboard at rest (hover must not activate Finder)", () =>
         assert.match(bg, /keyboardFocus: !takeKeys \? WlrKeyboardFocus\.None/));
-    test("only a click activates the desktop", () => assert.match(bg, /else bg\.activateDesktop\(\)/));
+    test("only a click activates the desktop", () => assert.match(bg, /else \{? ?bg\.activateDesktop\(\)/));
     const apps = readFileSync(join(shellDir, "services", "Apps.qml"), "utf8");
     test("Dock folders open in our Finder, never xdg-open", () =>
         assert.match(apps, /function openFolder\(item\) \{ openFinder\(/));

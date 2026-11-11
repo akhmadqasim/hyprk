@@ -127,8 +127,8 @@ Item {
     // ---------- round buttons ----------
     // Stage Manager: squares.leading.rectangle, the one Image(systemName:) of WindowManagerControlsExtension 27.2.1's
     // StageManagerToggleControl (0x100003d1c; reference/re/27.2.1/STAGE-MANAGER-27.2.1.md). On = white disc, accent
-    // glyph (Round's onIcon). Disabled until hyprk has a Stage Manager (the strip layout is not decoded yet)
-    Round { x: cc.colX(1); y: cc.rowY(2); symbol: "squares.leading.rectangle"; enabled: false }
+    // glyph (Round's onIcon). Turns Stage Manager on and off (services/StageManager.qml)
+    Round { x: cc.colX(1); y: cc.rowY(2); symbol: "squares.leading.rectangle"; on: StageManager.enabled; onActivated: StageManager.setEnabled(!StageManager.enabled) }
     Round { x: cc.colX(1) + cc.colW - cc.rowH; y: cc.rowY(2); symbol: "screen.mirror"; enabled: false }  // Screen Mirroring placeholder
     Round {
         x: cc.colX(0); y: cc.rowY(3)

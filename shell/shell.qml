@@ -52,6 +52,11 @@ ShellRoot {
         active: Panels.loaded.switcher === true
         Switcher { modelData: Panels.screen }
     }
+    // Stage Manager's strip: only while it is on (off by default: nothing loads)
+    LazyLoader {
+        active: StageManager.enabled
+        StageStrip { modelData: Panels.screen }
+    }
     LazyLoader {
         active: Panels.loaded.mission === true
         MissionControl { modelData: Panels.screen }

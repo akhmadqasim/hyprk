@@ -55,7 +55,7 @@ ShellWindow {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onClicked: m => {
             if (m.button === Qt.RightButton) Panels.openContext(Menus.desktop(), m.x, m.y, false, screen);
-            else bg.activateDesktop();
+            else { bg.activateDesktop(); StageManager.emptyStage(); }   // Stage Manager: the stage empties
         }
     }
 
