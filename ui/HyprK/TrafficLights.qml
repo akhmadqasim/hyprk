@@ -12,6 +12,9 @@ import QtQuick.Shapes
 Row {
     id: tl
     property bool active: true
+    // which of the table's halves the discs take: the app's appearance, or a title bar's own (Mission Control draws the
+    // plugin's bars of dark terminals with the dark discs, as plugin/src/Titlebar.cpp does)
+    property bool dark: Tokens.dark
     property bool zoomEnabled: true
     // Q-windows-19 (27.2.1 default): green = full screen (two-triangle glyph), Option-click = zoom
     // (the glyph turns into + while Option is held). Off: green zooms and shows +.
@@ -71,7 +74,7 @@ Row {
             width: Tokens.lights.size; height: width
 
             ShaderEffect {
-                readonly property var g: tl.glass[Tokens.dark ? "dark" : "light"][!light.lit ? 2 : light.down ? 1 : 0][index]
+                readonly property var g: tl.glass[tl.dark ? "dark" : "light"][!light.lit ? 2 : light.down ? 1 : 0][index]
                 anchors.centerIn: parent
                 width: parent.width + 2 * tl.glassMargin; height: width
                 fragmentShader: Qt.resolvedUrl("shaders/lights.frag.qsb")
