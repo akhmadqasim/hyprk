@@ -1,0 +1,128 @@
+{
+ "mode": "dark",
+ "pattern": "grad",
+ "origin": [
+  40,
+  60
+ ],
+ "size": [
+  1040,
+  640
+ ],
+ "secs": 3.2,
+ "dump": "$SCRATCH/vb/cap/a-grad-dark.json",
+ "views": [
+  {
+   "frame": [
+    30,
+    30,
+    300,
+    200
+   ],
+   "radius": 40,
+   "variant": 0
+  },
+  {
+   "frame": [
+    360,
+    30,
+    300,
+    200
+   ],
+   "radius": 40,
+   "variant": 0,
+   "clear": true
+  },
+  {
+   "frame": [
+    690,
+    30,
+    300,
+    200
+   ],
+   "radius": 40,
+   "variant": 3
+  },
+  {
+   "frame": [
+    30,
+    260,
+    300,
+    200
+   ],
+   "radius": 40,
+   "variant": 9
+  },
+  {
+   "frame": [
+    360,
+    260,
+    300,
+    200
+   ],
+   "radius": 12,
+   "variant": 0,
+   "subvariant": "menu"
+  },
+  {
+   "frame": [
+    690,
+    260,
+    200,
+    60
+   ],
+   "radius": 30,
+   "variant": 0
+  },
+  {
+   "frame": [
+    690,
+    340,
+    200,
+    36
+   ],
+   "radius": 18,
+   "variant": 0
+  },
+  {
+   "frame": [
+    690,
+    400,
+    64,
+    64
+   ],
+   "radius": 32,
+   "variant": 9
+  },
+  {
+   "frame": [
+    780,
+    400,
+    120,
+    64
+   ],
+   "radius": 32,
+   "variant": 9
+  },
+  {
+   "frame": [
+    30,
+    490,
+    600,
+    66
+   ],
+   "radius": 22,
+   "variant": 3
+  },
+  {
+   "frame": [
+    660,
+    490,
+    300,
+    120
+   ],
+   "radius": 26,
+   "variant": 10
+  }
+ ]
+}

@@ -2938,3 +2938,578 @@ Already known and not redone: Q-settings-11/12/16/17/18/25/26/27, #35.
   - Colour: light #808080 (black a.5), dark #8F9192 (white about a.5).
   - It appears on the first scroll frame and stays about 0.6 s after the last scroll event, then fades out over
     about 0.15 s (9 frames). 60 fps clip, two scrolls.
+
+
+## Notification Center glass and transitions (PC #62)
+
+# Notification Center: glass, open/close, banners, stacks (macOS 27.2.1, live)
+
+## Setup
+- **Account:** the user's own (icon & widget style Dark, glass slider 0.5).
+- **Backdrops:** a full-screen solid window from the new probe `re/tools/probe/ncbg.swift`.
+  - It sits at level -2147483600, above the desktop icons and the desktop widgets (-2147483601) and below NC (layer 23).
+  - A solid wallpaper of the same colour was set under it. The wallpaper was restored afterwards.
+  - Colours: white 255, grey 127, black 0, blue sRGB (69,83,206). The blue reads as (72,83,199) in display RGB, the
+    same way the screen shows the blue wallpaper itself.
+  - There is also a "checker N" mode (black/white checkerboard) for testing blur.
+- **Values:** display RGB from 2x `screencapture`, 3x3 px medians. Single numbers mean R = G = B.
+- **Notifications:** test notifications came from `osascript display notification` (app "Script Editor", grouped).
+  The user's real notifications were never dismissed and never saved. In the PNGs they are blanked out; the numbers
+  come only from the test stack, the widgets and the empty areas.
+- **Recordings:** 60 fps avfoundation, deleted after analysis.
+- **A change on the Mac that matters:** banners do not show while the screen is being recorded. The setting
+  Notifications > "when mirroring or sharing the display" was switched to Allow for (3), then set back to
+  "Notifications Off".
+
+## (1) Glass
+
+### 1a. Notification card (front card of a stack, and a single card)
+- **Geometry:**
+  - x 1350..1694 (**344 wide**). The top section starts at y 44 (10 below the menu bar).
+  - Gap between cards **6**. Single cards (banner style) are 75 tall with title + subtitle + body.
+  - Corner: the curve leaves the straight edge about 11 pt from the corner (profile 17, 11.5, 8.5, 7, 5.5, 4.5, 3.5,
+    2.5, 1.5, 1, 0.5, 0 at dy 0..11). That fits the continuous r ≈ 18–20 found before.
+- **Interior** (it hardly changes from top to bottom: 126 → 129 over white):
+
+| backdrop | dark | light |
+|---|---|---|
+| white 255 | **128** | **237** |
+| grey 127 | **104** | **190** |
+| black 0 | **32** | **136** |
+| blue | **(71,80,184)** | **(161,169,255)** |
+
+  - The response is **not linear**. Dark gives 32 → 104 → 128, so most of the change comes in the lower half of
+    the backdrop range. Light gives 136 → 190 → 237.
+  - Over the checker the card blurs heavily: the 10–90 % edge is about 16 pt wide (Gaussian σ ≈ 6 pt). The 0/255
+    checker comes out as only 68..116 in dark, so the backdrop contrast drops to about 19 % (strong tone compression).
+- **Rim:**
+  - **Top and bottom only:** a bright 1 pt line (2 px). Values below are outer px → inner px → body:
+
+| backdrop | dark | light |
+|---|---|---|
+| black | 68 → 53 → 35 | 161 → 151 → 137 |
+| grey | 132 → 120 → 105 | 210 → 201 → 191 |
+| white | 154 → 143 → 129 | 252 → 245 → 237, plus a 255 px just outside the card |
+| blue | (147) → (132) → (114) | — |
+
+  - **Vertical sides:** no bright rim. Instead the outermost 0.5 pt is darker than both the card and the backdrop:
+    70 over white, 44 over grey, 43 over blue, dark mode. The rim depends on angle, like the Dock.
+- **Stack plates** (collapsed group), measured on the white backdrop:
+  - plate 1 is **8 pt** high and inset **17 pt** each side (306 wide); plate 2 is **8 pt** and inset **24 pt** (292).
+  - Fill, dark: plate 1 129 / 88 / 15 / (55,63,152) over white / grey / black / blue; plate 2 130 / 86 / 14.
+  - Fill, light: plate 1 204 / 155 / 102; plate 2 199 / 148 / 94.
+  - So the plates are a darker, less opaque version of the card glass.
+  - Each plate has a bright 1 px top line (over black: 22 dark, 112 light).
+
+### 1b. Widgets
+- **Geometry:**
+  - **164 × 164**, gap 16, x 1350..1514 and 1530..1694.
+  - Corner: the curve leaves the edge about 27–30 pt from the corner, so continuous r ≈ 22–24.
+- **The widgets do not depend on light or dark appearance** (identical pixels). They follow the "Dark" icon & widget
+  style.
+- **Calendar widget:** opaque, (32,31,31) at the top to 13 at the bottom, the same over every backdrop.
+- **Batteries widget (translucent):**
+  - 65 / 39 / 13 / (20,27,103) over white / grey / black / blue, which is **13 + 0.204·in**, linear.
+  - That makes it a dark tint at about 80 % over the blurred backdrop.
+
+### 1c. "Edit Widgets" capsule and the small circle buttons
+- **"Edit Widgets":** 24 tall (capsule, r 12), about 81–87 wide, centred, near y 1010.
+  - Dark: 179 / 128 / 31 / (85,97,226). Light: 246 / 190 / 131 / (157,167,255).
+  - Over grey and black it is close to the card fill. Over white it is brighter than a card (179 vs 128 in dark).
+- **x circle next to it:** 24 tall, the same glass (178 / 128 / 32 dark).
+- **Section "Clear All" circle** (28 pt, at x 1675..1693 next to the "Notification Centre" header):
+  - Dark: 167 / 116 / 32 / (79,89,200). Light: 231 / 184 / 135.
+- **"N more notifications" capsule:**
+  - Dark: 163 / 112 / 31. Light: 224 / 178 / 129 / (151,158,244).
+
+### 1d. Section header, "No Notifications", and the column backdrop
+- **Section header** "Notification Centre": white text with a soft shadow, sitting on the column backdrop (no glass
+  of its own).
+- **"No Notifications" / date header: not measured.** It only shows when NC is empty, and that would mean clearing
+  the user's real notifications.
+- **Is there a backdrop behind the cards? Yes, and it covers only the column.**
+  - **Blur.** Over a 40 pt checker, the area between the cards and behind the section header is blurred: the 10–90 %
+    edge is 7.5 pt, so Gaussian σ ≈ 3 pt (≈ 6 px). The blur region is the column rect (x ≈ 1350..1694) and feathers
+    out over about 5–10 pt at its edges. Outside it the checker stays sharp, even 4 pt from the cards.
+    `dark-checker40-top.png` shows it.
+  - **Darkening.** It multiplies the backdrop and is the same in light and dark appearance:
+    - **×0.71** in the 6 pt gaps between cards (white → 181 dark / 189 light; grey → 91; blue → (52,59,142); black
+      stays 0);
+    - ×0.78 behind the section header row (200);
+    - ×0.80 in the 16 pt gap between the widgets (204);
+    - ×0.82 right of the column (x 1702).
+  - **The darkening is a soft shadow, not a scrim.** Going left from a card edge over white: 200 at 4 pt, 207 at 8,
+    214 at 12, 224 at 20, 235 at 30, 248 at 50, 255 at about 80 pt. Below the last widget it fades to 255 over about
+    85 pt; 20 pt below "Edit Widgets" it is back to 255. Above the first card (y 35–43) it is 0.82–0.85.
+  - With NC closed, the screen is the plain backdrop. The far wallpaper never changes with NC open.
+  - Static RE agrees: NotificationCenter.app has `NotificationBackdropLayer` (a CABackdropLayer subclass),
+    `NotificationCenterApp/NotificationCenterBlurView.swift`, `BlurMask`, `toggleBlurDebug`, `wantsSubduedGlass`.
+- **Shadow per card:** not separable from the column shadow. Every card, widget and capsule sits inside the same soft
+  shadow field described above.
+
+### 1e. Which _Glass variant or recipe
+See "Static RE" at the end. In short: cards use `_Glass.notificationCenter` (Regular base, no inactive branch) with r 20 continuous; the buttons use `_Glass.regular`; there is a column backdrop blur of 1.5·openProgress, masked, with no dim.
+
+## (2) Open/close transition (clock click; dark mode, grey backdrop, 7 cards + 2 widgets present)
+
+### 2a. Trackpad swipe
+**Not measured.** The two-finger swipe from the right edge is a WindowManager system gesture
+(`NotificationCenterSystemGesture`) that runs on multitouch input. CGEvent cannot synthesise it: we have no
+synthetic NSTouch / dock-swipe path that WindowManager accepts.
+- From RE (already in MAC-ANSWERS): the panel follows the finger 1:1 and rubber-bands above 1.
+- The release is completed by `FluidSpringAnimator`.
+
+### 2b. Open
+- **Timing:**
+  - The NC window (layer 23, full screen) is on screen **0.24 s after the synthetic click** (`winpoll` probe, 4 ms
+    polling).
+  - Motion starts in the first frame the window is visible.
+- **Curve:** x offset per frame, starting at +339 pt:
+  339, 293.5, 245, 199, 159.5, 125, 97.5, 75.5, 57.5, 44, 33.5, (frame dropped), 14.5, 11, 8, 5.5, 4.5, 3.5, 2.5, 2,
+  1.5, 1, 1, 0.5, 0.5, 0.
+  - **Best fit: a spring from rest, response 0.30 s, damping ratio 1.0 (critically damped), travel W = 386 pt, RMS
+    0.74 pt.**
+  - The code's Spring(0.3, bounce −0.2) = ratio 1.25 fits at 12.5 pt RMS.
+  - Read this as: response 0.3, **critical** damping, from x + ~386.
+- **All elements move together.**
+  - Card, section header, the other cards, Calendar and Batteries keep constant x offsets to each other in every
+    frame (header − card = 59.0 pt, calendar − card = −2.5 pt in all frames).
+  - No stagger and no parallax.
+- **No panel alpha, scale or blur.**
+  - The card glass fill is final (92–93 in video units) from the first measurable frame.
+  - Card text is full brightness from the first frame. Row spacing is constant, so there is no scale.
+  - The glass does **not** materialise late.
+- **Exception: the Calendar widget's content fades in.**
+  - The digits fade while the widget body is opaque from frame 1.
+  - Alpha against time since motion start: 0.27 @0.045 s, 0.44 @0.078, 0.63 @0.111, 0.77 @0.145, 0.87 @0.178,
+    0.95 @0.228, 0.98 @0.295. That tracks the open spring (openProgress).
+  - The Batteries widget text is full from the start. So this is per widget (probably widget content becoming
+    visible), not a panel effect.
+  - See `open-click-strip-widgets.png`.
+- **The column blur and shadow ride with the panel.** At a fixed point (x 1520) the gap pixel goes 115 → 111 → 92 →
+  87 … → 79 (video units) as the panel passes; it does not fade in separately.
+- **The rest of the desktop does not change:** no dim and no blur outside the column.
+
+### 2c. Close (second click on the clock)
+- **Timing:** motion starts about 0.08 s after the click.
+- **Curve:** offset per frame: 0, 7, 38, 83, 131.5, 178, 216.5, 250, 278.5, 300.5, 317.5, 332, 342.5, 350.5, 357,
+  then off screen.
+  - **Fit: a spring from rest, response 0.28–0.31 s, ratio 1.0–1.1, W ≈ 380–385 pt (RMS 1.2–1.3 pt).** It is the
+    same spring as the open, in reverse.
+  - It **decelerates** at the end. The older "accelerating ~0.15 s" in MAC-ANSWERS came from pixel-change share and
+    is wrong: the content leaves the screen after about 0.23 s while the spring is still running.
+- **Window lifetime:** the window is ordered out 0.375 s after motion start (0.457 s after the click), when the spring
+  is at about 99.7 %.
+- No alpha change, no stagger, no blur. Widget content does not fade out on close.
+
+## (3) Banners and in-NC changes
+
+### 3a. Banner arrives (NC closed)
+- **Final frame:** x 1350..1694, top at y 44, the same column and size as an NC card.
+- **Entry:** it slides in from the right, starting partly off screen (first visible frame at +276 pt).
+  - Card-left offsets: 276, 220.5, 178.5, (dup), 138, 111.5, 83.5, 64.5, 48.5, 37, 28, 21, (–), 12, 9, … 2.5 @+18
+    frames, 0.5 @+22.
+  - That is an ease-out of about 0.35 s. Spring fit: response ≈ 0.43, ratio ≈ 0.9 (RMS 5 pt; the start is off
+    screen).
+- **Fade and blur during entry:**
+  - Content and glass fade in: darkest px 101 → 13 over about 15 frames.
+  - The content is blurred at first and sharpens: max gradient 5 → 142 over about 0.25 s.
+  - The icon is about 0.85× size in the first sharp frames, then 1.0. So there is a small scale-up as well, about
+    0.85 → 1.
+- **Duration:** the banner stays **4.97 s**, then auto-dismisses.
+
+### 3b. Banner auto-dismiss ("into NC")
+- **Motion:** it slides back to the right. Offsets 0, 10, 51, 104, 148, 192, 230.5, 260.5, 297.5, 319.5.
+  - Fit: spring response 0.31, ratio 1.25 (RMS 2.6 pt). That is the code's NC spring (Spring 0.3, bounce −0.2).
+  - It fades and blurs out at the same time (darkest px 15 → 111) and is gone in about **0.15 s** (9 frames).
+- **No flight into the NC panel:** it just leaves to the right edge.
+- Strips: `banner-arrive-strip.png`, `banner-dismiss-strip.png`.
+
+### 3c. New notification while NC is open
+- **The list moves down 81 pt** (card 75 + gap 6).
+  - Per frame: 5, 5, 13.5, 36.5, 44, 51, 57, 62.5, 67, 70, 72.5, 74.5, 76.5, 77.5, 78.5, 79, 79.5, 80, … 81.
+  - About 0.35 s, ease-out.
+- **The new card** shows about 0.08 s after the list starts moving, at its final place.
+  - It fades in and unblurs: text 123 → 228 and sharpness 39 → 156 over about 0.25 s.
+  - It does not slide.
+
+### 3d. Expanding a stack (click the stack)
+- **At the click:** the "Show less" capsule and the x circle appear instantly (1 frame). The group header (app name)
+  fades in.
+- **Front card:** moves down 44 pt (to make room for the header).
+  - Per frame: 0, 5.5, 5.5, 20.5, 25, 29, 32, 35, 37, 39, 40, 41, 41, 42, 42.5, 43, 43, 43.5, 43.5, 43.5, 44.
+  - Fit: **spring response ≈ 0.20, ratio 1.25** (RMS 0.35 pt); about 0.35 s to settle.
+- **Hidden cards:** they unfold from the plates, sliding down from behind the front card and fading in. The cards
+  below are pushed down by the same spring.
+- **"Show" on the front card:** fades out in about 0.15 s.
+
+### 3e. Collapsing ("Show less")
+- **Header and buttons:** "Show less" and x vanish in 1 frame; the app-name header fades out in about 0.1 s.
+- **Other cards:** they move up about 47 pt in 6 frames, slide under the front card (clipped) and fade (icon min lum
+  16 → 58). They are gone after about 0.1 s.
+- **Front card:** moves up 44 pt. Per frame: 0, 2, 6.5, 12, 16.5, 25.5, 27, 30.5, 33.5, 36, 38, 39.5, 40.5, 41.5,
+  42, 42.5, 43, 43.5, 44 (about 0.3 s).
+- **List below:** follows with the same spring, starting about 0.1 s later.
+
+### 3f. Hover on a card
+- **x circle:** about 20 pt, the card glass, centred on the card's top-left corner (≈ 1354, 248). It appears and
+  disappears in **1 frame, with no fade**.
+- **"Show" capsule:**
+  - 64 × 22 pt at the card's bottom-right (x 1620..1684, y 285..307), glass.
+  - It **crossfades with the time label** ("2m ago") over about 0.3 s, symmetric in and out.
+  - In: 0.07, 0.13, 0.23, 0.32, 0.39, 0.48, 0.57, 0.64, 0.69, 0.74, 0.78, 0.82, 0.86, 0.90, 0.92, 0.95 per frame
+    (50 % at 0.1 s, 95 % at 0.27 s).
+  - The crossfade starts 1 frame after the x shows.
+- **Group:** hovering the x of a collapsed group widens it into a "Clear All" capsule.
+- Pictures: `hover-off-on-dark-grey.png`.
+
+### 3g. Clearing (x on my test group)
+- **One click cleared the whole collapsed group.** It removed only the test notifications; the real ones were never
+  touched.
+- **The card blurs and fades in place in about 0.07 s** (4–5 frames). It does not slide.
+- **The list below moves up 97 pt.** Remaining offset per frame: 97, 95.5, 71.5, 63, 51, 41, 33, 25.5, 19.5, 15,
+  11.5, 9, 6.5, 6.5, 5.5, 3, 2, 1.5, … 0 (about 0.4 s).
+  - Fit: spring response ≈ 0.22, ratio 1.25 (RMS 1.9 pt).
+  - That is the same list-reflow spring as expand/collapse: **response ≈ 0.2, ratio 1.25**.
+- **Not measured:** swiping a card away (it needs a trackpad gesture) and the clear-all confirm on the section header
+  (it would clear real notifications).
+
+## Static RE (glass variant)
+Done by a separate static agent: NotificationCenter arm64e plus the DesignLibrary dump. Excerpts are in
+`re/27.2.1/decomp/NotificationCenter-glass.c`.
+
+### Cards (single and stacked; high confidence)
+- `NotificationBackgroundModifier` (FUN_100119fe8 / FUN_10011a374):
+  `_glassEffect(_Glass.notificationCenter.forceSubdued(isObscured).mix(with: .identity, by: 1-p).surfaceSize(.medium), in: RoundedRectangle(cornerRadius: 20, style: .continuous))`.
+  - p = 1 unless Reduce Motion is on, so with normal settings the glass is never mixed out.
+- `NotificationCenterRecipe` = RegularBase + RegularDiffusionAmount + ShadowVibrancy (shadow.vibrancyContribution 1),
+  plus the accessibility conditionals.
+  - It has no WindowActiveShadow and no Inactive branch, so `forceSubdued` probably does nothing to the material.
+  - The numeric RegularBase values were not decoded.
+- The stack plates are probably the same modifier with isObscured = true (inferred).
+
+### Widgets (medium confidence)
+- NC applies no glass to widgets. It only passes `CHSGlassOptions withSubduedGlass` to the widget renderer
+  (FUN_1001560a4).
+- The recipe is not determinable: it runs in the widget renderer, outside NC; no `_Glass` imports in WidgetKit,
+  ChronoKit or ChronoUIServices. That fits the measurement that widgets ignore light/dark.
+
+### Buttons (`NotificationButtonStyle`; high confidence)
+- **Common style:** a fill of `.quaternary` while pressed, then `_glassEffect(glass, RoundedRectangle(r, .continuous))`
+  and `glassEffectTransition(.identity)`.
+- **Per button:**
+
+| Button | Height | Radius | Padding | Glass |
+|---|---|---|---|---|
+| Card hover x | 20 or 24 | h/2 | — | `.notificationCenter.forceSubdued(true)` |
+| "Show less" | 20 | 10 | 10 | `.regular` |
+| Group Clear / x | 20 | 10 | — | `.regular` |
+| "Edit Widgets" | 24 | 12 | 10 | `.regular` |
+| Clear All circle | 24 × 24 | — | — | `.regular` |
+
+- **"N more notifications":** `Material._glass(.regular)` background, height 24, padding 10.
+- **Conflict with earlier values:** MAC-ANSWERS Q-panels-32 gives 28 for "Show less" and "Clear", from AX frames that
+  probably include the hit area. The code says 20 for these two and 24 for the Clear All circle.
+
+### Column backdrop (`NotificationCenterBackground`, FUN_100139bbc)
+- **Frame:** width 376, horizontal padding 16.
+- **Layer:** `NotificationBackdropLayer`, padding −40, with one variable blur.
+  - inputRadius = **1.5 × openProgress**, or 0 with Reduce Transparency; `normalizeEdges` on.
+  - Mask: a black sublayer inset 60, corner radius 40, itself Gaussian-blurred with radius 20.
+  - **No dim, tint or colour matrix.**
+- So the column blur ramps with openProgress during open and close. That is consistent with what was seen (it arrives
+  with the panel). The measured σ ≈ 3 pt against radius 1.5 is a difference in units or behaviour that was not
+  resolved.
+- **Outside shadow** (`NotificationsListShadowBackground`):
+  - RoundedRectangle(20, continuous), black shadow at opacity 0.2 × progress, radius 30, no offset.
+  - This matches the soft fade of about 70–80 pt that was measured.
+
+### Not resolved
+- The ×0.71 / ×0.78 darkening between cards is not in the backdrop layer. It is probably overlapping card and list
+  shadows (radius 30, opacity 0.2 each).
+
+
+## NC panel spring: why code 1.25 runs as critically damped
+
+# NC panel spring: code says ratio 1.25, screen shows 1.0 (macOS 27.2.1, 26B131, arm64e)
+
+Tools: REA (Ghidra 12.1.4 provider) on the NotificationCenter arm64e slice and on raw dumps of SwiftUICore code from
+the dyld shared cache; `dyld_info -disassemble` for asm. SwiftUICore addresses are unslid cache addresses
+(0x190404000 + export offset). Excerpts: `~/hyprk/reference/re/27.2.1/decomp/NotificationCenter-spring.c`.
+
+**Answer: hypothesis 1 is right. The 1.25 is real in NotificationCenter, but SwiftUI's `interpolatingSpring` solver
+treats every damping ratio >= 1 as critically damped. Effective panel curve: ratio 1.0, response 0.30 s.**
+
+1. **Call site (unchanged from the earlier RE, now confirmed with REA).**
+   - `FUN_1001910a4` (swift_once init of `DAT_1003c1388`) calls `FUN_1001910d8(0.3 @0x1002dbd50, -0.2 @0x1002dbd58, 0)`.
+   - `FUN_1001910d8` is the inlined `Spring(duration:bounce:)` conversion and tail-calls
+     `SwiftUI.Animation.interpolatingSpring(mass:stiffness:damping:initialVelocity:)` (stub 0x1002be604):
+     - stiffness k = (2π/0.3)² = 438.649, ratio = 1/(1+bounce) = 1.25, damping c = 2·√k·1.25 = 52.360, mass 1, v0 0.
+   - Check: c / (2·√(m·k)) = 52.36 / 41.89 = 1.25. So the earlier decoding was correct, not a unit mix-up.
+   - Open and close both use it: `FUN_1001e19c4` = `withAnimation(DAT_1003c1388, completionCriteria: .logicallyComplete)`.
+
+2. **Where 1.25 becomes 1.0: SwiftUICore `SpringAnimation.animate(value:time:context:)` 0x190d236ec**
+   (Double path 0x190d234ac and AnimatablePair path 0x190d23240 build the same model).
+   ```
+   w0   = sqrt(stiffness/mass)                 // 20.944 rad/s
+   zeta = damping / (2*sqrt(mass*stiffness))   // 1.25
+   if (1.0 <= zeta) { B = w0 - v0; wd = 0 }    // critical form for ALL zeta >= 1
+   else             { wd = w0*sqrt(1-zeta^2); B = (w0*zeta - v0)/wd }
+   A = 1
+   ```
+   `SpringModel.sample(at:)` 0x190d23e28:
+   ```
+   zeta >= 1:  x(t) = 1 - (A + B*t) * exp(-w0*t)          // zeta is not used at all
+   zeta <  1:  x(t) = 1 - exp(-zeta*w0*t) * (A*cos(wd*t) + B*sin(wd*t))
+   ```
+   - There is no overdamped (two-exponential) branch. The damping value above critical is simply dropped.
+   - Panel: x(t) = 1 − (1 + 20.944·t)·e^(−20.944·t), i.e. **response 0.30 s, ratio 1.0**. Offset = W·(1 − x) on open,
+     W·x on close.
+   - End of animation: `SpringModel.duration(epsilon:)` 0x190d23bf0 scans t in 0.1 s steps for |1 − x| < 0.001
+     (epsilon 0.001 when no timing curve) -> **0.5 s**; after that the value snaps to the target (0.12 pt left).
+   - `.logicallyComplete` flag: set when `time >= 2π/sqrt(stiffness)` = **0.300 s** (context+0x19 = 1).
+
+3. **Why banners and list reflow do keep 1.25: a different SwiftUI API.**
+   - `DAT_1003c13b8` (init at 0x100190fe0): `Animation.spring(response: 0.3, dampingFraction: 1.25, blendDuration: 0)`
+     (stub 0x1002be624). Only this initialiser was re-checked; the other springs listed in the earlier notes
+     (0.35/1.25, 0.2/1) were not re-traced to their API.
+   - SwiftUICore 0x190edef7c boxes a `FluidSpringAnimation {response, dampingFraction, blendDuration}`.
+   - `FluidSpringAnimation.animate` (Double specialisation 0x190c23768) integrates numerically, no clamp:
+     ```
+     k = (2π/response)^2 (max 45000);  c = 2*sqrt(k)*dampingFraction
+     h = 1/300 s:  v += a*h/2;  x += v*h;  a = -c*v + k*(target - x);  v += a*h/2
+     ```
+     So ratio 1.25 stays overdamped there. This matches the live fits (banner dismiss, stack expand, clear group).
+   - Rule for the theme: `interpolatingSpring(mass:stiffness:damping:)` -> ratio = min(ratio, 1), response from
+     stiffness; `spring(response:dampingFraction:)` -> ratio as written.
+
+4. **Hypothesis 2 (another animation on the click path): not supported.** The only curve reaching the click open/close
+   closures is `DAT_1003c1388`. `FluidSpringAnimator` (60 Hz, own integrator) is only started from the gesture-release
+   paths `FUN_1001781b4` / `FUN_1001773d0(animated: true)`. A Reduce Motion branch inside `OpenSlideModifier` was not
+   traced (not determined), but it is not needed to explain the data.
+
+5. **Hypothesis 3 (cannot tell 1.25 from 1.0 at 60 fps): rejected.** Fit to `click-open-close-track.jsonl`
+   (testTitle x, rest 1352.5, duplicate frame i=81 dropped; t0 and W free unless noted):
+
+   | segment | model | response | W | RMS pt | max pt |
+   |---|---|---|---|---|---|
+   | open (41 fr) | ratio 1.0, response free | 0.296 | 374.7 | 0.68 | 4.0 |
+   | open | ratio 1.0, response 0.30 fixed (= SwiftUI curve) | 0.30 | 381.9 | 0.75 | 4.4 |
+   | open | ratio 1.25, response free | 0.211 | 340.0 | 1.89 | 7.2 |
+   | open | ratio 1.25, response 0.30 fixed | 0.30 | 520 (bound) | 11.9 | 26.2 |
+   | open | ratio free, response free | 0.298 | 376.0 | 0.68 | 3.9 (ratio 0.997) |
+   | close (16 fr) | ratio 1.0, response free | 0.299 | 375.9 | 0.51 | 1.2 |
+   | close | ratio 1.0, response 0.30 fixed | 0.30 | 376.2 | 0.52 | 1.2 |
+   | close | ratio 1.25, response free | 0.257 | 395.2 | 2.09 | 4.6 |
+   | close | ratio 1.25, response 0.30 fixed | 0.30 | 418.1 | 4.63 | 9.5 |
+   | close | ratio free, response free | 0.302 | 374.6 | 0.50 | 1.3 (ratio 0.987) |
+
+   - The two curves (response 0.3, W 386) differ by up to 37.7 pt (at t = 0.15 s) and by more than 5 pt from 0.033 s
+     to 0.43 s. At 60 fps with 0.5 pt resolution that is easy to tell apart.
+   - With the ratio left free the data gives 0.99–1.00. The best W is 375–382 pt, slightly under the 386 in motion.json.
+   - calLeft gives the same numbers (ratio 1.0: response 0.295, RMS 0.66; ratio 1.25 at 0.30: RMS 12.0).
+
+6. **0.24 s between click and window on screen: not determined.** What the code shows:
+   - `MainController` open `FUN_100176de0`: prepare model (`FUN_1001d3768`: isAnimating = 1, signpost begin) ->
+     `makeKeyAndOrderFront:` -> `DispatchQueue.main.async` (`FUN_1001d39d8` -> `FUN_1001fbb08` -> `FUN_1001e18b0`) ->
+     `withAnimation`. Only a plain `async` hop; no `asyncAfter`, no timer, no wait for widget snapshots in this path.
+   - NotificationCenter has three `asyncAfter` sites (0x1001926a0: 0.2 s in the widget-configuration function
+     0x1001911fc; 0x1001956a4; 0x10029fea0 in a generic helper 0x10029fbe4). None is called from the open path.
+   - So the delay comes from before "Center open requested" reaches NotificationCenter (the menu bar clock's click
+     handling and the request to NC) and/or from first-frame rendering. Neither was traced.
+
+7. **Close timing.**
+   - 0.08 s click -> motion: same situation as (6); the close path `FUN_100178444(0)` -> `FUN_1001d3ebc` has no delay.
+   - Window gone 0.375 s after motion start: the completion uses `.logicallyComplete`, which this spring raises at
+     t >= 0.300 s (item 2), not at the 0.5 s end. The remaining ~0.07 s (frame alignment, completion dispatch,
+     order-out, capture) was not traced: not determined.
+
+**For hyprk:** NC panel open/close = critically damped spring, ω0 = 2π/0.3 = 20.944 rad/s (mass 1, stiffness 438.65,
+damping 41.89), x(t) = 1 − (1 + ω0·t)·e^(−ω0·t), x only; close hides the window about 0.30–0.375 s after start.
+
+
+## Verification of motion and glass claims (PC #67)
+
+### A. Bounce and springs
+
+# Verify A (motion formulas), macOS 27.2.1 (26B131)
+
+1. Dock launch bounce — TERKONFIRMASI (height formula corrected) — pure parabola `h = H·4u(1−u)`, u = t/700 ms, drawn rounded to whole points; `H = (R−8)·0.2+6` where R is the tile RECT (35 at tilesize 33, 68 at tilesize 64 = AX tile width ≈ tilesize·17/16), not the tilesize: H = 11.4 (shows max 11) and 18.0 — code: Dock `-[Tile updateBouncing]` 0x10002d9f4 (period 350.0 = 0x43af0000 set at 0x10008e134, `1 − x²/P²` at 0x10002dbf8), `-[Tile updateRect]` 0x100012088 (6.0, 8.0, 0.2f @0x1002580c0); measured 60 fps, BounceProbe (7 bounces each): period 0.699–0.700 s; tile 33: best H 11.25–11.5, RMS 0.39 pt with R=35 (0.47 with R=33); tile 64: best H 17.85–18.2, RMS 0.47 pt with R=68 (0.78 with R=64).
+2. Dock attention bounce — TERKONFIRMASI — 2.000 s cycle; parabolic hops 500 / 326 / 212 ms at 1 / 0.5 / 0.25 × (R+1), then rest to 2 s; R = tile rect, so 36/18/9 pt at tilesize 33 and 69/34/17 at 64 (whole points) — code: same function, constants 500.0/326.0/212.0 (0x43fa0000, 0x43a30000, 0x43540000 at 0x10002dc70..dca8; 4th hop 138 ms zeroed), period 2000.0 at 0x100091524, amplitude `rectH + 1` in updateRect; measured with DockProbe `requestUserAttention(.criticalRequest)` in background, 4 full cycles each: cycle 2.000 s, peaks exactly 36/18/9 and 69/34/17, ground at 0.50 and 1.03–1.05 s; RMS 0.84 pt (tile 33) and 0.63 pt (tile 64) vs code (1.2 / 1.75 pt if tilesize+1 were used).
+3. Switch knob — TERKONFIRMASI, values corrected — API is SwiftUI, not Core Animation: `.animation(.spring(response: 0.47, dampingFraction: 0.7), value:)` (FluidSpringAnimation). Its 1/300 s integrator makes it behave like an exact spring with response 0.4624 s, ratio 0.7113; overshoot 4.16 % (0.75 pt of 18). The animation is cut after 27 frames (≈0.46 s): the knob snaps from 1.0176 to 1.0 — code: NSSwitch hosts `_NSCoreHostingView<AppKitSwitch>` (AppKit) → DesignLibrary Mac switch body fn 0x195E349C4, call at 0x195E34E78 (d0 = 0.47, d1 = 0.7; stub → SwiftUICore 0x190ee11b8); knob layer set per frame by SwiftUI DisplayList (stack trace), no CAAnimation on any layer; measured in-process at 240 Hz (27 frames, identical for on and off): RMS 0.0019 pt vs code curve, 0.043 pt vs the claimed 0.46/0.72. The old JSON series is the same curve (peak 36.75 of 18→36).
+4. Spotlight open — TERKONFIRMASI, labels corrected — `CASpringAnimation(perceptualDuration: 0.28, bounce: b)`; 0.41 and 0.32 are BOUNCE, not damping: damping ratio 0.59 and 0.68, response 0.28 s (mass 1, stiffness 503.55, damping 26.48 / 30.52). Normal open of the empty bar uses the flag-off path: scale.x AND scale.y both 1.12 → 1 with bounce 0.32 (ratio 0.68). Flag-on path (not seen live): x 1.12 → 1 bounce 0.41, y 0.95 → 1 bounce 0.32 — code: SpotlightUIInternal FUN_2adea2ff0 (fcsel at 0x2ADEA305C, y-from select at 0x2ADEA3184..94), caller 0x2ADE99894 (d0 1.12, d1 0.95, d2 0, w0 = Bool from vtable +0x460, not identified); measured 3 opens at 60 fps (bar width via edges): free fit response 0.289–0.291 s, bounce 0.315–0.317; RMS 0.22–0.30 pt (of 487) vs code 0.28/0.32, 1.44–1.54 pt vs 0.28/0.41; undershoot to 0.994; height fits 1.12 start (RMS 0.31–0.38 pt) not 0.95 (1.4–2.3 pt).
+5. HUD appear — TERKONFIRMASI — `Animation.interpolatingSpring(mass: 2, stiffness: 300, damping: 50)`; SwiftUI clamps ratio 1.0206 → 1.0, so effective: critically damped, ω = √150 = 12.247 rad/s, response 0.513 s; `p = 1 − (1+ωt)e^(−ωt)`, scale 0.9 + 0.1p, opacity p — code: SystemBannerUI 0x2AED436A4 (d0 2.0, d1 [0x2aed89048] = 300.0, d2 50.0; stub 0x2b00a1c10 → SwiftUICore 0x190d2440c interpolatingSpring), clamp `fcmp zeta, 1.0; b.pl` at SwiftUICore 0x190D23500; measured 4 appears (volume keys, 60 fps, capsule height): free-fit ω 12.27 / 12.88 / 12.29 / 13.26 (response 0.47–0.51 s), RMS 0.08–0.15 pt (of 66) with code ω; glyph alpha follows p (RMS 0.020–0.025).
+
+Notes
+- Dock: the offset is applied in whole points, which is the "flat top" seen earlier (11.4 → 11 for about 0.19 s). Launch ends at the next ground touch (7 whole bounces seen). Theme: use R = tile rect (tile·17/16), round to integer px of the logical scale.
+- Switch: other DesignLibrary spring site 0x195DF57F0 `spring(response: flag ? 0.23 : 0.46, dampingFraction: 0.75)` is a different view (Binding<Bool>), it does not fit the knob (RMS 0.26 pt). Same body also has `.animation(.easeInOut(duration: 0.2), value: InteractionState)` (press state). Ratio 0.72/response 0.46 in the claim was a fit of this curve; use 0.47/0.7 with the SwiftUI integrator, or 0.4624/0.7113 analytic, plus the cut at 0.46 s.
+- Spotlight: the window alpha fades in at the same time (first visible frame is already at about 1.06–1.09×). Which state sets the flag is not traced.
+- HUD: ratio 1.0 vs 1.0206 differ by at most 0.009 in p (0.06 pt): not measurable, the code decides. Hide and content-swap springs were not re-measured.
+- lldb cannot attach here; API attribution used stub resolution in memory + in-process swizzled stack traces.
+- Restored: Dock tilesize 33 (export/import), volume 31, hidden apps shown again, Dark mode on, test apps quit, videos and disassembly dumps deleted.
+
+Files
+- Data: ~/hyprk/reference/re/27.2.1/live/verify/A/ (dock-launch-t33/t64.json, dock-attention-t33/t64.json, switch-fit.json, switch-knob-240hz.jsonl, spotlight-open-fit.json, spotlight-open-track.json, hud-appear-fit.json, scripts/)
+- Asm: ~/hyprk/reference/re/27.2.1/decomp/DesignLibrary-switch-spring.asm, SpotlightUIInternal-open-springs.asm, SystemBannerUI-hud-spring.asm
+- Probe: ~/hyprk/reference/re/tools/probe/switchanim.swift
+- PNG: ~/hyprk/reference/screens/27.2.1/verify/A/spotlight-open-dark.png
+
+
+### B. Glass reflection and refraction
+
+# Verify B (Liquid Glass reflection / refraction), macOS 27.2.1 (26B131), 2x SDR display
+
+1. Rim model — TERKONFIRMASI, layout corrected — two separate effects, both in display-encoded values. (a) Dark specular = the glassBackground filter's KeyFillHighlight inputs: a 0.5 pt (1 px) line just OUTSIDE the edge, on the LEFT and RIGHT (angle π/2 → dir = (sin a, −cos a)), tone curve `c' = c·(1 + bias·hl·(3 − 2c))`, bias −0.25 (CC −0.3), `hl = Σ±dir schlick(saturate((cosθ − cos s)/(1 − cos s)), 0.4)`, `schlick(v,a) = v/((1/a − 2)(1 − v) + 1)`. It darkens (white 255 → 192, grey 128 → 65), black stays black. (b) Key/fill highlight = CASDFKeyFillHighlightEffect layer: key at TOP (angle 0), fill at BOTTOM (π), `dst' = dst + m·(M·dst + b − dst)` with the layer's vibrantColorMatrix (regular: R row 1.1202 −0.1894 −0.019 | +0.1471; dock dark 1.094 −0.358 −0.036 | +0.25; clear/CC 1.319 −0.048 −0.005 | +0.2), `m = spec + diffuse`: spec height 1 pt with falloff `1 − 0.75·depth/1`, diffuse band 8 pt linear, spread ×0.65, amount 0.5×0.15 = 0.075; m reaches 1.53 in the first pixel. Spreads: dark specular 75° dark, light uses SpreadSDR 106° on SDR (96° only with HDR headroom), Dock 75° on SDR (120° HDR), inactive window 120°; key/fill spread 80° up to D 96 → 90° from D 191. — code: metallib `glass_background_sdf_all_lpf` (highlight block, uniforms 0x108–0x120), uber shader `sdf_diffuse_kf_highlight` / `vibrant_color_matrix_sover`; CPU `CA::OGL::GlassBackgroundFilter::render` 0x18debc054 (sincos 0x18debca60, `cosf(SDR + (Spread − SDR)·edr)` 0x18debca94–caa0, `1/amount` and −2.0 at 0x18debcd84–90). Measured: isolated dark specular pixel-exact (5 13 21 29 37 44 … = model; 133 140 149 … on white); real rim 65/192/179 = model 64/191/178.5; light top 235 vs 233.6 (106°) / 246.4 (96°); highlight on black 56 33 11 8 6 5 4 vs model 57 33 11.4 8.4 6.5 5.0 4.0; real Dock 50 / 156 136 118 vs model 50 / 156 135.5 117.
+2. Edge refraction — TERKONFIRMASI, labels corrected — "0.36 D max 20 / −0.65 D min −60" are the CLEAR recipe's inner refraction HEIGHT and AMOUNT (not inner/outer). D = min(width, height) of the shape in pt; height and amount are pt. Profile `m = 1 − sqrt(1 − (1 − depth/H)²)`; inner: `src = p + n·A·m` (A < 0 = sample further inside, full A at the edge, 0 from depth H); outer: second sample `p + n·Ao·m(depth, Ho)` taken OUTSIDE the shape, mixed with `opacity·saturate((d + 1)/1)` → only the outermost 1 pt. Regular: H min(0.25D, 20), A max(−0.5D, −60), Ho max(0.2D, 16), Ao max(0.25D, 16), opacity 0.6, backdrop margin 0.35D. Clear: 0.36D≤20 / −0.65D≥−60, no outer. Dock variant: 0.08D / −0.18D, outer opacity 0.2 with amount 0. CC: min(0.225D, 25) / max(−2D, −80), outer 0.0357D / 0.0714D at 0.1525. — code: same shader (uniforms 0x10–0x24, 0xe0), amounts passed unscaled. Measured on a position-coded ramp (R = x, G = y): isolated inner, 240 pt circle, 98 960 px: median error 0.00 px, MAD 0.45 px, tangential 0.00; straight edges RMS 0.6 px; isolated outer exact to 1 px; real active recipes (11 shapes, colour terms off): median |error| 0.43 px.
+3. Content lensing / chromatic aberration — TERKONFIRMASI for backdrops, SEBAGIAN for Spotlight content — no chromatic aberration in regular, clear, dock, CC, NC glass: no recipe sets inputAberration*, and |R − B| ≤ 2 levels over 6 px black/white stripes and 8 px checker across the whole glass including the rim. Spotlight field over 6 px stripes: no fringe (only the coloured caret). Aberration exists only in `glassForeground` (7 taps, R at +0.78·ab, B at −0.78·ab), used by `control` (switch knob) and `focusPlatter`. Not measured: the field's content lens on text (text sits > 28 pt from the edge; another process, layers not dumpable).
+4. Light direction — TERKONFIRMASI — fixed in layer space: key top, fill bottom, dark lines left/right; no gyro, no pointer, no window-position term (the shader has only `key_fill_highlight_dir`). Measured: window at (40,60) vs (640,700): 0 px differ by > 1 level; pointer on rim/centre of plain glass and dock-variant glass: max diff 0; real Dock hover: only the label changes; Control Center hover: identical. Only interactive glass reacts: glass button hover = uniform +20 levels; press = grows ~1.5 pt per side plus a soft glow centred on the pointer (Gaussian σ ≈ 26 pt on a 140×32 button, peak ≈ +12 levels) that follows the drag. hyprk's pointer light on CC / Dock / menu bar has no counterpart on the Mac.
+5. Switch / slider knob lens — switch TERKONFIRMASI, slider SEBAGIAN — switch held: lens 50×31 pt (knob 32×20, ×1.56), D = 31; stack dumped in-process: backdrop displacementMap +7.75 (0.25D) with profile height 31 (D), glassBackground inner 3.1 / −4.65 (0.1D / −0.15D), no blur, identity face, dark specular height 1 offset −1 bias −0.3, ring shadow 0.1; glassForeground aberration 1.632 pt at −15°. Measured field (track hidden, ramps): outward `7.75·m(depth, 31) − 4.65·m(depth, 3.1)`, RMS 0.26 pt (free fit 7.75 / 31.8, RMS 0.15 pt), tangential 0.02 pt: 4.5 pt at depth 2.5 → 1.1 pt at the axis, i.e. it MINIFIES to about 0.79× (wide-angle look), with fringes only at the rim (interior R = G = B). Slider held: 25×20 (×1.25), inner 3.6 / −6 (0.18D / −0.3D), displacement amount 5 with height 0, aberration 0, ring shadow 0.4; its measured interior (ramp slope 0.70 plus an offset) is not explained by the dumped stack.
+
+Notes
+- Inactive window (not key): different recipe: no outer refraction, no shadow, key/fill highlight off, dark specular all around (spread 120°, bias −0.1875), backdrop margin 0.5. A borderless probe window that cannot become key shows this by mistake.
+- Real Dock (Dock process, not dumpable): rim and body colours match the dock matrix exactly, but its end-cap refraction fits regular geometry 0.25D / −0.5D (RMS 1.4–1.9 levels) and not the dock variant 0.08D / −0.18D (6.7–7.2). The top-edge refraction could not be separated from the highlight band.
+- Backdrop is sampled from a reduced texture: scale 0.25 for regular at D ≥ ~128, 0.5 otherwise, 1 for the knob lens.
+- A glass with every amount 0 is skipped entirely (identity); KeyFillHighlightAmount 0 disables the dark specular.
+- Menu hover and CC top-rim numbers were not obtained (synthetic pointer did not highlight the probe's popup; sampled columns hit content).
+- hyprk shader: `light_angle −50` and the white rim are wrong; use the two effects above. `aberration 1.5` should be 0 except on the pressed switch knob rim.
+- Restored: Dark mode on, Dock untouched, Spotlight and Control Center closed, probe apps exited. One Spotlight capture that showed the terminal behind was deleted, nothing personal is in the repo.
+
+Files
+- Data: ~/hyprk/reference/re/27.2.1/live/verify/B/ (glass-model-fit.json, configs/, dumps/, scripts/)
+- Code: ~/hyprk/reference/re/27.2.1/decomp/QuartzCore-glass-shaders.c (pseudo-code), QuartzCore-metallib-*.ll (raw IR), QuartzCore-GlassBackgroundFilter-render-excerpts.asm
+- Tools: ~/hyprk/reference/re/tools/probe/glassfit.swift, tools/metallib_list.py, metallib_dis.py, air_pp.py
+- PNG: ~/hyprk/reference/screens/27.2.1/verify/B/
+
+
+### C. Liquid Glass slider and thickness
+
+# Verify C: adjustable glass "thickness" (Liquid Glass slider), macOS 27.2.1 (26B131)
+
+1. Slider → who reads it, which parameters, linear? — **TERKONFIRMASI** — `NSGlassTintAmount` (Float, unset = 0.5) is read by AppKit (`NSGlassEffectView.Legibility`, 0x18b3176b0) and passed to SwiftUI as `EnvironmentValues.glassDiffusion = .amount(a)` (0x18b328f44); Dock reads it itself (`-[DockGlassMaterialEnvironment tintAmount]` 0x100177F10); DesignLibrary turns it into recipe changes. It is piecewise linear in a with the knee at 0.5 (0.5 = unchanged recipe). It changes only: blur-fill opacities, face fill colour, dark maxLuma (a < 0.5, size > 64 pt), and for Clear-type glass the blur radius. Rim, refraction, saturation, face black/white, shadow do not change. — code `RegularDiffusionAmount` 0x195f22ea0, `ClearDiffusionAmount` 0x195efeb9c, `SidebarDiffusionAmount` 0x195f2cbac; live filter inputs at a = 0, 0.25, 0.5, 0.75, 1 equal the code formulas exactly (all digits), dark and light.
+2. Per material — **TERKONFIRMASI** (Control Center real panel: SEBAGIAN) — Regular, Menu, Notification Center: same response (RegularDiffusionAmount). Sidebar: own variant. Clear, Dock, Control Center: blur only (ClearDiffusionAmount), so nothing changes over a flat colour. — recipe type strings 0x195fd4cf4 / 5602 / 5690 / 5b3c / 41b4 / 4ade / 493a; probe variants pixel + filter dump; real Dock relaunched at 0 / 0.507 / 1 over 4 pt stripes: stripe contrast 72 / 31 / 0.6, flat colours identical (177 / 109 / 17). **Correction of #53:** "the slider does not change the Dock / CC" was only true for flat backdrops. Real CC panel not re-measured over stripes (same recipe in the probe).
+3. Measured fit — **TERKONFIRMASI** for elements ≤ 64 pt; **SEBAGIAN** for panels > 64 pt and for light-mode Regular highlights — face model below fits greys within 0.6 level (dark Regular, all 5 values), colours rms 2.0 (max 7); Clear / Dock / CC rms 0.5–1.4. Panels of 200 pt: rms 4 (edge-bleed layer not modelled). Light Regular: rms 2.5, max 7 (soft shoulder near white not modelled). — 17 backdrops × 5 values, `live/verify/C/ramp-transfer.json`, `ramp-fit-errors.json`.
+4. Size dependence — **TERKONFIRMASI** — the recipe depends on the shortest side D only. Corner radius and width change nothing (160x64 r12 = r28 = 64x64 r32; 200x200 r28 = r100, all 60+ filter inputs identical). — code RegularBase.Base 0x195f20248 (ranges 64→104, 64→160, 4→24, cap −60); filter dumps at 24, 36, 64, 200, 500 pt plus the earlier 24…400 table.
+
+Restored: `defaults read -g NSGlassTintAmount` = 0.5071146 (float), `defaults read -g` identical to before, Dock prefs identical, Dock relaunched at that value.
+
+## How the value travels
+- Settings calls `NSGlassEffectView.Legibility.setSystemLegibility` (0x18b31ee4c): writes the global default, then `SLSPostCoordinatedDistributedNotificationFenced(cid, 12, fence, block, 0.5 s)`. Apps listen for `kSLSCoordinatedGlassAppearanceSettingsChangeNotificationName` (0x18b4c4d48) and re-post `NSGlassEffectDiffusionDidChangeNotification`.
+- **`defaults write` alone does not reach running apps** (probe held 15 s: no change). A newly launched app reads it. I measured by relaunching the probe (and the Dock) per value.
+- Legacy key `NSGlassDiffusionSetting` 0 / 1 = `.standard` / `.increased`; the slider removes it. Not set on this Mac.
+
+## Formulas (a = slider 0…1; u = clamp(2a), t = clamp(2a − 1))
+**Regular, Menu, Notification Center** (base at a = 0.5: blur fill radius 8, normal N₀ = 0.5, darken 0.9 dark / lighten 0.9 light; fill dark (0,0,0,0), light (1,1,1,0.2)):
+
+| | a < 0.5 | a ≥ 0.5 |
+|---|---|---|
+| blur-fill normal opacity N | 0.5·u | 0.5 + 0.5·t |
+| blur-fill darken (dark) / lighten (light) | 0.9·(0.75 + 0.25·u) | 0.9 |
+| face fill, dark | none (alpha 0) | grey k = 0.125·t, alpha 0.5·t |
+| face fill, light | white, alpha 0.2·u | white, alpha 0.2 + 0.3·t |
+| maxLuma, dark | M₀(D)·u + lerp(0.6, 0.45, s)·(1 − u) | M₀(D) |
+
+  with s = clamp((D − 64)/40), M₀(D) = lerp(0.6, 0.35, s). Light maxLuma is 1 always.
+  Measured only (not found in code): backdrop scale drops to 0.125 at a = 1 (0.5 / 0.25 otherwise).
+
+**Sidebar:** as Regular, but N = 0.25 + 0.25·u below 0.5; above 0.5 fill = black (dark) / white (light) to alpha 0.5·t (light 0.2 + 0.3·t), and dark face black 0.125 → 0.15.
+
+**Clear, Dock, Control Center** (base blur radius r₀ = 0.75 / 1.5 / 4):
+- a < 0.5: blur radius = r₀·2a (0 at a = 0: perfectly sharp).
+- a > 0.5: adds a blur fill, radius 8 (spec 16 × 0.5 backdrop scale), normal opacity 2a − 1, no darken/lighten. At 1 the backdrop is fully frosted.
+- No colour change at all.
+
+**Interior colour over a blurred backdrop c (sRGB-encoded 0…1), all materials:**
+```
+Y  = 0.2126 R + 0.7152 G + 0.0722 B
+Yl = Y − (1 − M)·Y²                       // maxLuma M
+out = black + (white − black)·Yl + sat·(Yl/Y)·(c − Y)
+out = out·(1 − fillA) + fillRGB·fillA     // before clamping
+out = clamp(out, 0, 1)
+```
+Dark Regular: black 0.125, white 1.125, sat 1.3, M 0.6 (≤ 64 pt). Check: white → 185, grey 127 → 134, black → 32 at a ≤ 0.5; 143 / 104 / 28 at 0.75; 108 / 83 / 32 at 1.
+Light Regular: black 0.4, white 1.03, sat 1.2, M 1: black backdrop → 102 / 117 / 133 / 156 / 179 for a = 0…1.
+Clear 0.125 / 1.08 / 1.06 / M 1; Dock dark 0.05 / 0.92 / 1.25 / M 0.75 + fill black 2 %; CC 0.125 / 0.8 / 1.2 / M 1.
+
+**Blur seen through the glass** (4 pt stripes, contrast relative to a = 0): Regular ≤ 64 pt 1 / 0.68 / 0.40 / 0.14 / 0; Clear 1 / 0.80 / 0.56 / 0.28 / 0; Dock 1 / 0.52 / 0.21 / 0.10 / 0; CC 1 / 0.53 / 0.21 / 0.11 / 0. Model: blurred = mix(S − darken·max(S − B, 0), B, N), B = blur 8, S = the sharp layer. Regular glass ≤ 64 pt has no centre blur of its own (BlurOpacity0/1 = 0), so the slider is its whole frost. Panels ≥ 160 pt are fully blurred at every value.
+
+## Size (D = shortest side, pt), Regular dark at a = 0.5
+| | formula | 24 | 36 | 64 | 200 | 500 |
+|---|---|---|---|---|---|---|
+| inner refraction amount / height | −min(D/2, 60) / min(D/4, 20) | −12 / 6 | −18 / 9 | −32 / 16 | −60 / 20 | −60 / 20 |
+| outer refraction amount / height | max(16, D/4) / max(16, D/5) | 16 / 16 | 16 / 16 | 16 / 16 | 50 / 40 | 125 / 100 |
+| edge bleed amount = height | 0.35·D | 8.4 | 12.6 | 22.4 | 70 | 175 |
+| bleed opacity = centre blur opacity | 0.8·clamp((D − 64)/96) | 0 | 0 | 0 | 0.8 | 0.8 |
+| maxLuma | lerp(0.6, 0.35, clamp((D − 64)/40)) | 0.6 | 0.6 | 0.6 | 0.35 | 0.35 |
+| shadow opacity / radius | 0.04 + 0.56·q / 4 + 20·q, q = clamp((D − 64)/96) | 0.04 / 4 | 0.04 / 4 | 0.04 / 4 | 0.6 / 24 | 0.6 / 24 |
+| backdrop scale / margin | 0.5 below ~160, then 0.25 / max(16, 0.35·D) | 0.5 / 16 | 0.5 / 16 | 0.5 / 16 | 0.25 / 70 | 0.25 / 175 |
+| centre over white / grey / black | measured | 182 / 131 / 31 | 184 / 133 / 32 | 185 / 134 / 32 | 122 / 115 / 32 | 122 / 115 / 32 |
+
+Constant at every size: blur radius 5, blur-fill radius 8, rim (key highlight height 0.5, amount 0.4, spread 75°), ring shadow (0.06, stroke 4, blur 5, offset 8), face black / white / saturation.
+Clear: inner refraction −min(0.65·D, 60) / min(0.36·D, 20), outer 0.2·D / 0.125·D, no bleed, no shadow; interior identical at all sizes (255 / 153 / 32).
+
+## Files
+- Code excerpt: `reference/re/27.2.1/decomp/DesignLibrary-diffusion-amount.c`
+- Probe: `reference/re/tools/probe/thick.swift`
+- Data: `reference/re/27.2.1/live/verify/C/` (filter inputs per variant / size / value, pixels, ramp, fit errors, real Dock)
+- Pictures: `reference/screens/27.2.1/verify/C/` (variants at 0 / 0.5 / 1 dark and light; sizes over white and stripes)
+
+
+### C2. Remaining glass items (edge bleed, light shoulder, real CC, backdrop scale, propagation)
+
+# Verify C2: the four open items of verify-C (Liquid Glass slider), macOS 27.2.1 (26B131)
+
+1. Regular glass panels > 64 pt (edge bleed) — **TERKONFIRMASI** — the bleed is not a layer: it is a step inside the same `glassBackground` fragment shader, after the face and before the shadow/rim. `out = mix(face, bleed, w)`, `w = g⁴ · BleedOpacity`, `g = 1 − Y(face)` in dark and `Y(face)` in light, `bleed = bb + (bw − bb)·Y(s) + bs·(s − Y(s))` with dark 0.125 / 0.5 / 1 and light 0.9 / 1 / 1.2. `s` is a sharp backdrop sample, moved outward by `0.35·D` at the edge and by 0 from depth `0.35·D` on. It acts over the whole interior, not only at the edge. — code: QuartzCore `default.metallib` `glass_background_base` (AIR bitcode read as LLVM IR), uniform packing `CA::OGL::GlassBackgroundFilter::render` 0x18debc058; measured: 17 backdrops × a = 0 / 0.5 / 1, dark and light, 96 / 200 / 500 pt and menu 200 pt: **rms 0.36–0.58, max 2.0** (same data without the bleed step, 200 / 500 pt: rms 2.6–8.9, max 35).
+2. Light-mode Regular ("soft shoulder") — **TERKONFIRMASI** — light Regular has `maxLuma 1` but **`maxLumaSDR 0.94`**, and the filter uses `M = MaxLumaSDR + (MaxLuma − MaxLumaSDR)·h`, `h = (min(headroom, MaxHeadroom) − 1)/(MaxHeadroom − 1)`. MaxHeadroom is 9999, so h ≈ 0 on any display and M = 0.94: light glass is luminance-limited too. The limiter also raises chroma: `k = clamp(1 − Y·(1 − M))`, luma `k·Y`, chroma `× k·(1 + 0.3·(1 − k))` (the old model had only `k`). — code: render 0x18debc4f4 (h) and 0x18debcf04 (M), 0.94 at 0x195f21600 in RegularBase.Base, shader max-luma block; measured: light Regular 64 pt **rms 0.53 / 0.53 / 0.38, max 1.6** at a = 0 / 0.5 / 1 (was 2.5 / 2.0 / 1.4, max 7.2). Dark colours improve too: rms 0.5, max 1.3 (was 2.0 / 6.8).
+3. Real Control Center panel vs slider — **TERKONFIRMASI** — tile colour does not move at all (0.00 levels over a = 0 / 0.25 / 0.507 / 0.75 / 1, four flat backdrops, two tiles). Tile colour = the controlCenter recipe (black 0.125, white 0.8, saturation 1.2) applied to the panel's dimmed backdrop (0.898·in): **rms 0.27, max 0.45** (n = 120). Over 4 pt stripes the tile contrast is 21.0 / 13.8 / 7.9 / 4.0 / 0.0 (the panel's own blur behind the tiles stays 32.0 at every value). The AppKit variant-9 probe over the same pattern, at the same depth below the tile edge, gives 20.2 / 12.9 / 7.3 / 3.5 / 0.0: **rms 0.64, max 1.3**. — code: ClearDiffusionAmount 0x195efeb9c (blur × 2a below 0.5, blur fill 2a − 1 above); measured on the real panel, driven by the coordinated notification (no relaunch).
+4. Regular backdrop scale 0.125 at a = 1 — **TERKONFIRMASI** — `GlassMaterialProvider.BackdropScalePerceptualEstimator`: the first scale of [0.125, 0.25, 0.5] whose `visibleAlias = (1 − F)·(N·exp(−π²·rf²·s²/4) + (1 − N)·exp(−π²·r²·s²/4))` is ≤ 0.05, else 0.5. At a = 1: N = 1, F = 0.5, rf = 8 → 0.0424 at s = 0.125. — code: estimate 0x195e9f9dc, visibleAlias 0x195ea0618, epsilon and buckets set in RegularBase.Base 0x195f214a0–0x195f214d4; measured: the formula predicts the scale of every dumped Regular-type view, **794 of 794** (5 values × 6 sizes, dark and light, Regular / Menu / Notification Center / Sidebar).
+5. How the value reaches running apps — **TERKONFIRMASI** — AppKit: the handler of `kSLSCoordinatedGlassAppearanceSettingsChangeNotificationName` calls `+[NSGlassEffectView _legibilityNeedsUpdate]`, which re-reads `UserDefaults.standard` float `NSGlassTintAmount` and compares it with the last applied value; if it changed, `NSGlassEffectDiffusionDidChangeNotification` → `globalEnvironmentDidChange:` → `Legibility.apply(to:)` sets `glassDiffusion = .amount(x)`. Dock: `DockCore.SystemAppearanceMonitor` re-reads `NSGlassTintAmount` on the main queue and calls `appearanceDidChange:` on its observers. — code: 0x18b4c4ee8, 0x18b317694 → 0x18b32a01c, 0x18b2b3db8; Dock 0x1001e5cec, 0x1001e61e4, 0x1001e5600; measured: `defaults write` alone, no change for 3 s; posting type 12 changes a running probe within the next 1 s sample, both ways.
+
+Restored: `defaults read -g NSGlassTintAmount` = 0.5071146, type float; `defaults read -g` identical to before. Running apps were returned to it with the same notification (checked on a running probe: 1 → 0.5071146). Control Center was never killed (pid unchanged), its panel is closed.
+
+## 1 and 2. The interior colour, complete (replaces the block in verify-C)
+Order inside the shader: backdrop sample (refracted, blurred) → blur fill → outer refraction (rim only) → face → edge bleed → shadow / ring → key highlight (rim) → clamp.
+```
+c  = backdrop behind the glass, display-encoded 0…1 (after blur and blur fill)
+Y  = 0.2126 R + 0.7152 G + 0.0722 B
+// face
+M  = maxLumaSDR                               // dark: lerp(0.6, 0.35, clamp((D−64)/40)); light: 0.94
+k  = clamp(1 − Y·(1 − M), 0, 1)
+c1 = k·Y + k·(1 + 0.3·(1 − k))·(c − Y)        // skipped when M = 1
+Y1 = luma(c1)
+f  = (black + (white − black)·Y1 + sat·(c1 − Y1))·(1 − fillA) + fillRGB·fillA
+// edge bleed (BleedOpacity = 0.8·clamp((D − 64)/96): 0 up to 64 pt, 0.8 from 160 pt)
+b  = bb + (bw − bb)·Y(s) + bs·(s − Y(s))      // dark 0.125 / 0.5 / 1, light 0.9 / 1 / 1.2
+g  = dark ? 1 − clamp(Yb(f)) : clamp(Yb(f))   // Yb = 0.2125 R + 0.7154 G + 0.0721 B
+out = f + (b − f)·g⁴·BleedOpacity
+out = clamp(out, −0.75, Clamp)                // then the display clamps to 0…1
+```
+- `s` = the backdrop itself at the panel centre. Near the edge it is read `0.35·D·(1 − √(t·(2 − t)))` further out along the outward normal, `t = clamp(depth / (0.35·D))`, so colours from just outside the panel bleed in. It is sharp (BleedBlurRadius 0), taken before blur fill and face.
+- Blend is a plain mix, the mask is the glass shape itself, and the weight is flat over the interior (12 pt inside the edge equals the centre within 1–2 levels on every backdrop).
+- Check, dark 200 pt at a = 0.5: white 122, grey 115, black 32 (model 121.5 / 115.2 / 31.9). At a = 1: white 86 (model 86.3; without bleed 76.5).
+- The slider does not touch the bleed inputs.
+
+## 3. Real Control Center
+- Each tile is controlCenter glass over a panel layer that blurs and dims the desktop (gap between tiles: 0.898·in, stripe contrast 255 → 32, same at every slider value).
+- The tile's own blur grows with depth: blur opacity runs from 0.1 at the edge to 1 at 100 pt inside (BlurOpacity 1, 0.1, 0.5, 1 over BlurDistance −100, −1, 0, 0). So a 64 pt tile is never at the full radius 4: about 0.9 at 15 pt deep, 1.5 at the centre line (at a = 0.5).
+- Above 0.5 the blur fill takes over: contrast at 0.75 is half of 0.507 (4.0 vs 7.9), 0 at 1.
+- Method: `defaults write`, then post the notification (`tools/probe/glasspost.m`), open the panel with a synthetic click over a probe window that cycles stripes / white / grey / black / blue.
+
+## 4. Backdrop scale
+- Inputs: `r = BlurRadius·BlurOpacity0` (0 up to 64 pt, 4 from 160 pt), `rf = 8` when any blur-fill opacity is > 0, `N` = blur-fill normal opacity, `F` = face fill alpha.
+- Result for Regular: ≤ 64 pt 0.5 / 0.5 / 0.5 / 0.5 / 0.125 and ≥ 160 pt 0.5 / 0.5 / 0.25 / 0.25 / 0.125 at a = 0 / 0.25 / 0.5 / 0.75 / 1.
+- Only RegularBase recipes use the estimator (the bucket array has one code reference). Clear, Dock and Control Center stay at 0.5.
+- On a display with pixel length ≤ 1/3 the buckets are 0.125, 0.25, 1/3, 0.5 (code only, not measured).
+
+## 5. Notification path
+- Sender: `SLSPostCoordinatedDistributedNotificationFenced(SLSMainConnectionID(), 12, fencePort, completion, 0.5)` with a `CAFenceHandle` port (AppKit 0x18b4c4f80). Receivers entangle their commit on the fence, so all apps switch in one frame.
+- An unentitled tool can post it: this is how the real panel was measured and how the value was restored.
+
+## Not covered
+- Sidebar glass: greys fit (within 1), colours do not (dark rms 6, max 20: measured colours are less saturated than the filter inputs predict). There is something on top of the `glassBackground` filter that this model does not have. Not one of the four items; not investigated.
+- The blur kernel itself (mip level `log2(1.6·radius·scale)` of the backdrop texture) is in the code excerpt but was not fitted against pixels.
+
+## Files
+- Code: `reference/re/27.2.1/decomp/QuartzCore-glassBackground-shader.c`, `DesignLibrary-backdrop-scale.c`, `AppKit-Dock-glass-notification.c` (and a pointer section added to `DesignLibrary-diffusion-amount.c`)
+- Data: `reference/re/27.2.1/live/verify/C2/` — `ramp-shader-model.json` (inputs, measured, model per backdrop), `ramp-fit-errors.json`, `glass_model.py` (the model), `cc-real.json`, `cc-probe-sinusoid.json`, `backdrop-scale.json`, `notification-live.log`
+- Pictures: `reference/screens/27.2.1/verify/C2/` (real CC Display + Sound tiles over stripes at five values, probe over the sinusoid, ramp sheet). No personal content; raw captures deleted.
+- Tools: `reference/re/tools/probe/thick.swift` (ramp now has 500 pt, menu 200 pt and Notification Center items; new `ccbg` and `ccsin` modes), `glasspost.m`, `air/` (metallib → LLVM IR → expressions)

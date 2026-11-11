@@ -1,0 +1,282 @@
+{
+ "light regular a=0": {
+  "rms": 2.52,
+  "max": 7.22,
+  "greyMaxErr": 7.22
+ },
+ "light regular a=0.5": {
+  "rms": 2.0,
+  "max": 5.54,
+  "greyMaxErr": 5.54
+ },
+ "light regular a=1": {
+  "rms": 1.44,
+  "max": 4.08,
+  "greyMaxErr": 4.08
+ },
+ "light regular200 a=0": {
+  "rms": 4.03,
+  "max": 8.75,
+  "greyMaxErr": 5.16
+ },
+ "light regular200 a=0.5": {
+  "rms": 4.58,
+  "max": 7.07,
+  "greyMaxErr": 6.39
+ },
+ "light regular200 a=1": {
+  "rms": 8.45,
+  "max": 33.52,
+  "greyMaxErr": 6.5
+ },
+ "light clear a=0": {
+  "rms": 0.49,
+  "max": 1.35,
+  "greyMaxErr": 0.44
+ },
+ "light clear a=0.5": {
+  "rms": 0.5,
+  "max": 1.38,
+  "greyMaxErr": 0.44
+ },
+ "light clear a=1": {
+  "rms": 0.57,
+  "max": 1.4,
+  "greyMaxErr": 0.44
+ },
+ "light dock a=0": {
+  "rms": 0.47,
+  "max": 1.02,
+  "greyMaxErr": 0.5
+ },
+ "light dock a=0.5": {
+  "rms": 0.49,
+  "max": 0.96,
+  "greyMaxErr": 0.5
+ },
+ "light dock a=1": {
+  "rms": 0.49,
+  "max": 0.96,
+  "greyMaxErr": 0.5
+ },
+ "light controlCenter a=0": {
+  "rms": 0.47,
+  "max": 1.49,
+  "greyMaxErr": 0.51
+ },
+ "light controlCenter a=0.5": {
+  "rms": 0.47,
+  "max": 1.49,
+  "greyMaxErr": 0.51
+ },
+ "light controlCenter a=1": {
+  "rms": 0.5,
+  "max": 1.49,
+  "greyMaxErr": 0.49
+ },
+ "light sidebar a=0": {
+  "rms": 3.17,
+  "max": 7.56,
+  "greyMaxErr": 5.68
+ },
+ "light sidebar a=0.5": {
+  "rms": 3.15,
+  "max": 7.56,
+  "greyMaxErr": 5.54
+ },
+ "light sidebar a=1": {
+  "rms": 2.14,
+  "max": 5.48,
+  "greyMaxErr": 4.08
+ },
+ "light regular96 a=0": {
+  "rms": 1.8,
+  "max": 5.16,
+  "greyMaxErr": 5.16
+ },
+ "light regular96 a=0.5": {
+  "rms": 1.63,
+  "max": 4.53,
+  "greyMaxErr": 4.53
+ },
+ "light regular96 a=1": {
+  "rms": 2.81,
+  "max": 10.52,
+  "greyMaxErr": 3.08
+ },
+ "dark regular a=0": {
+  "rms": 2.01,
+  "max": 6.8,
+  "greyMaxErr": 0.48
+ },
+ "dark regular a=0.25": {
+  "rms": 2.01,
+  "max": 6.8,
+  "greyMaxErr": 0.49
+ },
+ "dark regular a=0.5": {
+  "rms": 2.0,
+  "max": 6.8,
+  "greyMaxErr": 0.5
+ },
+ "dark regular a=0.75": {
+  "rms": 1.65,
+  "max": 5.29,
+  "greyMaxErr": 0.55
+ },
+ "dark regular a=1": {
+  "rms": 1.86,
+  "max": 7.34,
+  "greyMaxErr": 0.46
+ },
+ "dark regular200 a=0": {
+  "rms": 3.7,
+  "max": 10.34,
+  "greyMaxErr": 5.07
+ },
+ "dark regular200 a=0.25": {
+  "rms": 3.73,
+  "max": 11.18,
+  "greyMaxErr": 4.49
+ },
+ "dark regular200 a=0.5": {
+  "rms": 3.97,
+  "max": 12.03,
+  "greyMaxErr": 5.03
+ },
+ "dark regular200 a=0.75": {
+  "rms": 4.27,
+  "max": 12.26,
+  "greyMaxErr": 4.17
+ },
+ "dark regular200 a=1": {
+  "rms": 9.33,
+  "max": 35.79,
+  "greyMaxErr": 9.5
+ },
+ "dark clear a=0": {
+  "rms": 0.49,
+  "max": 1.35,
+  "greyMaxErr": 0.44
+ },
+ "dark clear a=0.25": {
+  "rms": 0.49,
+  "max": 1.35,
+  "greyMaxErr": 0.44
+ },
+ "dark clear a=0.5": {
+  "rms": 0.5,
+  "max": 1.38,
+  "greyMaxErr": 0.44
+ },
+ "dark clear a=0.75": {
+  "rms": 0.5,
+  "max": 1.38,
+  "greyMaxErr": 0.44
+ },
+ "dark clear a=1": {
+  "rms": 0.5,
+  "max": 1.38,
+  "greyMaxErr": 0.44
+ },
+ "dark dock a=0": {
+  "rms": 1.34,
+  "max": 4.45,
+  "greyMaxErr": 0.57
+ },
+ "dark dock a=0.25": {
+  "rms": 1.35,
+  "max": 4.45,
+  "greyMaxErr": 0.57
+ },
+ "dark dock a=0.5": {
+  "rms": 1.35,
+  "max": 4.45,
+  "greyMaxErr": 0.57
+ },
+ "dark dock a=0.75": {
+  "rms": 1.35,
+  "max": 4.45,
+  "greyMaxErr": 0.57
+ },
+ "dark dock a=1": {
+  "rms": 1.35,
+  "max": 4.45,
+  "greyMaxErr": 0.57
+ },
+ "dark controlCenter a=0": {
+  "rms": 0.47,
+  "max": 1.49,
+  "greyMaxErr": 0.51
+ },
+ "dark controlCenter a=0.25": {
+  "rms": 0.47,
+  "max": 1.49,
+  "greyMaxErr": 0.51
+ },
+ "dark controlCenter a=0.5": {
+  "rms": 0.47,
+  "max": 1.49,
+  "greyMaxErr": 0.51
+ },
+ "dark controlCenter a=0.75": {
+  "rms": 0.47,
+  "max": 1.49,
+  "greyMaxErr": 0.51
+ },
+ "dark controlCenter a=1": {
+  "rms": 0.47,
+  "max": 1.49,
+  "greyMaxErr": 0.51
+ },
+ "dark sidebar a=0": {
+  "rms": 5.2,
+  "max": 20.0,
+  "greyMaxErr": 0.49
+ },
+ "dark sidebar a=0.25": {
+  "rms": 5.2,
+  "max": 20.0,
+  "greyMaxErr": 0.49
+ },
+ "dark sidebar a=0.5": {
+  "rms": 5.2,
+  "max": 20.0,
+  "greyMaxErr": 0.5
+ },
+ "dark sidebar a=0.75": {
+  "rms": 4.39,
+  "max": 20.0,
+  "greyMaxErr": 0.39
+ },
+ "dark sidebar a=1": {
+  "rms": 2.89,
+  "max": 12.18,
+  "greyMaxErr": 0.55
+ },
+ "dark regular96 a=0": {
+  "rms": 2.55,
+  "max": 9.43,
+  "greyMaxErr": 1.81
+ },
+ "dark regular96 a=0.25": {
+  "rms": 2.64,
+  "max": 9.31,
+  "greyMaxErr": 1.91
+ },
+ "dark regular96 a=0.5": {
+  "rms": 2.75,
+  "max": 10.18,
+  "greyMaxErr": 1.49
+ },
+ "dark regular96 a=0.75": {
+  "rms": 2.78,
+  "max": 8.37,
+  "greyMaxErr": 1.11
+ },
+ "dark regular96 a=1": {
+  "rms": 4.41,
+  "max": 13.26,
+  "greyMaxErr": 2.13
+ }
+}
