@@ -247,7 +247,8 @@ ShellWindow {
         showDirs: true
         showHidden: false
         showDotAndDotDot: false
-        sortField: FolderListModel.Time
+        // Sort by in the stack's menu (Apps.downloads): Date Modified unless Name or Kind was chosen
+        sortField: Apps.downloads.sort === "name" ? FolderListModel.Name : Apps.downloads.sort === "kind" ? FolderListModel.Type : FolderListModel.Time
     }
     readonly property bool downloadsWatched: downloads.status === FolderListModel.Ready && String(downloads.folder) === downloadsUrl
     // the newest two, front first: {path, image}
@@ -505,7 +506,8 @@ ShellWindow {
                 readonly property real iconTop: dock.m.iconTop + dock.tile - size
 
                 // pressed: the art darkened x 0.475, no scale, on and off in one frame (Q-dock-09)
-                readonly property bool stack: cell.modelData.folder === "Downloads" && dock.downloadsStack.length > 0
+                // Display as Folder (its menu) shows the folder instead
+                readonly property bool stack: cell.modelData.folder === "Downloads" && dock.downloadsStack.length > 0 && Apps.downloads.display !== "folder"
                 AppIcon {
                     id: icon
                     visible: !cell.separator && dock.dragCell !== cell && !cell.stack

@@ -86,7 +86,16 @@ Singleton {
         onLoaded: {
             try { const r = JSON.parse(text()).removed; root.removed = Array.isArray(r) ? r.map(String) : []; }
             catch (e) { root.removed = []; }
+            try { const d = JSON.parse(text()).downloads; root.downloads = d && typeof d === "object" ? d : {}; }
+            catch (e) { root.downloads = {}; }
         }
+    }
+    // the Downloads stack's Sort by and Display as (its Dock menu, lib/dock.js downloadsMenu), in the same file
+    property var downloads: ({})
+    function writeItems() { itemsFile.setText(JSON.stringify({ removed: removed, downloads: downloads }) + "\n"); }
+    function setDownloads(change) {
+        downloads = Object.assign({}, downloads, change);
+        writeItems();
     }
     function pinKey(id) {
         const ids = pinnedCandidates.find(g => g.indexOf(id) !== -1);
@@ -95,7 +104,7 @@ Singleton {
     function canRemove(id) { const k = pinKey(id); return k !== "" && k !== "hyprk-finder" && removed.indexOf(k) === -1; }
     function setRemoved(list) {
         removed = list;
-        itemsFile.setText(JSON.stringify({ removed: list }) + "\n");
+        writeItems();
     }
     function removeFromDock(id) { if (canRemove(id)) setRemoved(removed.concat([pinKey(id)])); }
     // a running app that was taken out of the Dock and can be put back
@@ -395,6 +404,13 @@ Singleton {
         if (item.trash)
             return [{ label: "Open", action: root.openTrash },
                     { sep: true }, { label: "Empty Trash", action: root.confirmEmptyTrash }];
+        if (item.folder === "Downloads")
+            return DockLayout.downloadsMenu(downloads).map(r => r.sort !== undefined && !r.disabled ? Object.assign({ action: () => root.setDownloads({ sort: r.sort }) }, r)
+                                                           : r.display !== undefined ? Object.assign({ action: () => root.setDownloads({ display: r.display }) }, r) : r)
+                .concat([{ sep: true }, { label: "Options", submenu: true, items: [
+                             { label: "Remove from Dock", disabled: true },
+                             { label: "Show in Finder", action: () => root.openFinder("xdg:DOWNLOAD") } ] },
+                         { sep: true }, { label: "Open “" + item.name + "”", action: () => root.openFolder(item) }]);
         if (item.folder)
             return [{ label: "Open “" + item.name + "”", action: () => root.openFolder(item) }];
         const wins = item.windows || [];

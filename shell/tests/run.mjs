@@ -1283,6 +1283,14 @@ test("Mission Control: one Space reads Desktop, more are numbered by position", 
         assert.equal(act(desk, "Show All"), "show-all");
         assert.equal(act(M.forIndex(1, "hyprk-finder", "Finder", ""), "Hide Finder"), "hide-app");
     });
+    test("Downloads stack menu: the Dock's rows, headers disabled, the current choices checked (dock-menus.json)", () => {
+        const m = DK.downloadsMenu({});
+        assert.deepEqual(m.map(r => r.sep ? "---" : r.label), ["Sort by", "Name", "Date Added", "Date Modified", "Date Created", "Kind", "---",
+            "Display as", "Folder", "Stack", "---", "View content as", "Fan", "Grid", "List", "Automatic"]);
+        assert.deepEqual(m.filter(r => r.checked).map(r => r.label), ["Date Modified", "Stack"]);
+        assert.ok(m[0].disabled && m[2].disabled && !m[1].disabled);
+        assert.deepEqual(DK.downloadsMenu({ sort: "kind", display: "folder" }).filter(r => r.checked).map(r => r.label), ["Kind", "Folder"]);
+    });
     test("keysOf: only keys: actions", () => {
         assert.deepEqual(M.keysOf("keys:CTRL SHIFT,n"), { mods: "CTRL SHIFT", key: "n" });
         assert.equal(M.keysOf("close"), null);

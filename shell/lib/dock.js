@@ -131,6 +131,23 @@ function layout(cells, o) {
     return out;
 }
 
+// ---------- the Downloads stack's menu ----------
+// Rows as the 27.2.1 Dock's AX lists them (live/dock/dock-menus.json "Downloads stack"): Sort by, Display as and View
+// content as are section headers (disabled), their choices below with a check on the current one. A choice this Dock
+// cannot do stays disabled: there is no date added or created on Linux and no stack popup (Fan / Grid / List /
+// Automatic). opts: { sort: "name" | "modified" | "kind", display: "stack" | "folder" }
+const downloadsSorts = [["Name", "name"], ["Date Added", ""], ["Date Modified", "modified"], ["Date Created", ""], ["Kind", "kind"]];
+function downloadsMenu(opts) {
+    const o = opts || {};
+    const out = [{ label: "Sort by", disabled: true }];
+    for (const s of downloadsSorts) out.push({ label: s[0], checked: s[1] !== "" && s[1] === (o.sort || "modified"), sort: s[1], disabled: s[1] === "" });
+    out.push({ sep: true }, { label: "Display as", disabled: true });
+    for (const d of [["Folder", "folder"], ["Stack", "stack"]]) out.push({ label: d[0], checked: d[1] === (o.display || "stack"), display: d[1] });
+    out.push({ sep: true }, { label: "View content as", disabled: true });
+    for (const v of ["Fan", "Grid", "List", "Automatic"]) out.push({ label: v, disabled: true });
+    return out;
+}
+
 // ---------- launch bounce ----------
 // From the Dock's own code (macOS 27.2.1 Dock.app -[Tile updateBouncing] 0x10002d9f4 and
 // -[Tile updateRect] 0x100012088; MAC-ANSWERS.md "REA 27.2.1: Dock", reference/re/27.2.1/decomp/dock-bounce.c).
