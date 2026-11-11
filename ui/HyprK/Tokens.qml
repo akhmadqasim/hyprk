@@ -99,11 +99,8 @@ QtObject {
         readonly property real minLength: 18       // TODO verify (not measured; AppKit keeps the knob grabbable)
         readonly property color knob: t.dark ? Qt.rgba(1, 1, 1, 0.5) : Qt.rgba(0, 0, 0, 0.5)
         readonly property int hold: 600            // stays after the last scroll event
-        // Edge behaviour of every scroll view (Finder views and sidebar, Settings panes, popups): Qt's standard
-        // OvershootBounds with its default rebound. A mouse wheel stops at the edge (as on the Mac); flicks may overshoot
-        // and spring back; nothing can be dragged past the edge. MAC-ANSWERS.md has no scroll-view overscroll or
-        // spring-back numbers and AppKit documents no constants, so nothing here is tuned (see the judge-f report).
-        readonly property int bounds: Flickable.OvershootBounds
+        // Edges: every scroll view is StopAtBounds (a mouse wheel stops hard, as on the Mac) with a RubberBand
+        // (AppKit's trackpad stretch, return and momentum; constants in rubberband.js)
         readonly property int fade: 150            // then fades out (9 frames)
     }
 
