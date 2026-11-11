@@ -133,7 +133,7 @@ read with their comments and sorted by where the number came from. Counts are di
 
 | Verdict | Count | Where |
 |---|---|---|
-| **convert** (taken from raw P3 shot values, saturated) | 164 | `ui/` 80, `plugin/` 51 (legacy table; only its 6 glyph colours are still drawn), `finder/` 16, `themes/` 12, `settings/` 5 |
+| **convert** (taken from raw P3 shot values, saturated) | 164 | `ui/` 80, `plugin/` 51 (legacy table; only its 12 glyph colours are still drawn), `finder/` 16, `themes/` 12, `settings/` 5 |
 | **refit** (a model fitted to raw shot values) | 3 open + 1 done | open: `ui/HyprK/TrafficLights.qml:30-37`, `finder/src/sysicons.cpp:12,34-35`; done: plugin lights table (d104e6d) |
 | **already sRGB** | 128 | `ui/HyprK/Accent.qml` 78, icon tints 16, documented system colours 34 |
 | **not from shots** (hand-picked or derived, nothing to convert) | 56 | fallbacks, Qt theme derivations, free cursors, a11y tints |
