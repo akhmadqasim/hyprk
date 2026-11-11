@@ -187,6 +187,13 @@ function normalizeDock(obj) {
 
 // sound.json, shared with the shell: alertSound is a name in sounds/wav/Sounds/<name>.wav.
 const alertSounds = ["Basso", "Blow", "Bottle", "Frog", "Funk", "Glass", "Hero", "Morse", "Ping", "Pop", "Purr", "Sosumi", "Submarine", "Tink"];
+// the names 27.2.1 shows for those files (Sound.appex AlertSounds.loctable, en): the files kept their old names, so
+// the Mac's "Breeze" (settings/sound-light.png) is Blow.aiff
+const alertSoundTitles = { Basso: "Mezzo", Blow: "Breeze", Bottle: "Pebble", Frog: "Jump", Funk: "Funky", Glass: "Crystal",
+                           Hero: "Heroine", Morse: "Pong", Ping: "Sonar", Pop: "Bubble", Purr: "Pluck", Sosumi: "Sonumi",
+                           Submarine: "Submerge", Tink: "Boop" };
+// the pop-up's order: by shown name (the Mac's order is not captured)
+const alertSoundMenu = alertSounds.slice().sort((a, b) => alertSoundTitles[a].localeCompare(alertSoundTitles[b]));
 // startupSound: the Mac row "Play sound on startup" (a firmware chime there); stored only: hyprk has no startup sound
 const soundDefaults = { alertSound: "Tink", alertVolume: 0.75, uiSounds: true, volumeFeedback: false, startupSound: true };
 
@@ -371,6 +378,6 @@ if (typeof module !== "undefined")
         parseHyprOption, luaString, luaMonitor, luaInput,
         normalizeAppearance, normalizeDock, normalizeSound, mergeState, monitorMode, prettyFileName,
         gecosName, normalizeLock, normalizeInput, normalizeNotifications, parseDesktopApps,
-        appearanceDefaults, iconTints, iconStyleVariantsOf, iconStyleVariantAfter, dockDefaults, soundDefaults, alertSounds,
+        appearanceDefaults, iconTints, iconStyleVariantsOf, iconStyleVariantAfter, dockDefaults, soundDefaults, alertSounds, alertSoundTitles, alertSoundMenu,
         displaysDefaults, normalizeDisplays, parseScaleReport, sizeText, sizeKey, looksLikeChiclets, looksLikeBlock,
         looksLikeSelected, luaScalePolicy, luaScaleSet, luaScaleReport, lockDefaults, inputDefaults, notificationsDefaults, notifAppDefaults };

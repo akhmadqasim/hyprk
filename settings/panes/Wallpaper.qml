@@ -21,7 +21,15 @@ Column {
     spacing: 0
 
     readonly property string dir: Backend.root + "/themes/wallpapers"
-    readonly property string current: AppState.wallpaperImage
+    // nothing chosen yet: the picture the shell shows, its default pick (shell/scripts/wallpaper.sh: the first by
+    // path whose name has "tahoe" and the mode, else the mode, else any), as the Mac shows its default selected
+    readonly property string current: AppState.wallpaperImage || defaultPick
+    readonly property string defaultPick: {
+        const mode = Theme.dark ? "dark" : "light";
+        const all = files.slice().sort();
+        const name = f => base(f).toLowerCase();
+        return all.find(f => name(f).includes("tahoe") && name(f).includes(mode)) || all.find(f => name(f).includes(mode)) || all[0] || "";
+    }
     property string note: ""
 
     function apply(path) {

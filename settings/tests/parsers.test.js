@@ -193,3 +193,9 @@ test("appearance.json tintWindowBackground defaults on and keeps false", () => {
     assert.equal(P.normalizeAppearance({ tintWindowBackground: false }).tintWindowBackground, false);
     assert.equal(P.normalizeAppearance({ tintWindowBackground: "x" }).tintWindowBackground, true);
 });
+
+test("alert sounds show their 27.2.1 names, every file once", () => {
+    assert.equal(P.alertSoundTitles.Blow, "Breeze");
+    assert.deepEqual(P.alertSoundMenu.slice().sort(), P.alertSounds.slice().sort());
+    assert.equal(P.alertSoundTitles[P.alertSoundMenu[0]], "Boop");
+});

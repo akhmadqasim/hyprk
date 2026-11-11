@@ -73,11 +73,12 @@ Column {
             implicitHeight: 40   // row heights 40, 39, 39, 38, 38, 37 + separators (sound-light.png)
             Popup {
                 anchors.verticalCenter: parent ? parent.verticalCenter : undefined
-                model: P.alertSounds
-                currentIndex: P.alertSounds.indexOf(AppState.sound.alertSound)
+                // shown under the 27.2.1 names (Blow is "Breeze"), stored under the file names the shell plays
+                model: P.alertSoundMenu.map(n => P.alertSoundTitles[n])
+                currentIndex: P.alertSoundMenu.indexOf(AppState.sound.alertSound)
                 onActivated: i => {
-                    AppState.set("sound", { alertSound: P.alertSounds[i] });
-                    pane.play(pane.soundsDir + "/Sounds/" + P.alertSounds[i] + ".wav", AppState.sound.alertVolume);
+                    AppState.set("sound", { alertSound: P.alertSoundMenu[i] });
+                    pane.play(pane.soundsDir + "/Sounds/" + P.alertSoundMenu[i] + ".wav", AppState.sound.alertVolume);
                 }
             }
             Text { // play button after the pop-up
