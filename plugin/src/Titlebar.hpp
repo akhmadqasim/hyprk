@@ -55,10 +55,10 @@ namespace lg {
         SGeometry                geometry(const SParams& p, const Vector2D& offset) const;
         void                     act(int button);
         SP<Render::ITexture>     titleTexture(const std::shared_ptr<const SParams>& params, const std::string& title, bool active, bool dark, float scale, double maxWidth);
-        SP<Render::ITexture>     glyphTexture(int button, bool dark, float scale);
+        SP<Render::ITexture>     glyphTexture(int button, bool pressed, bool dark, float scale);
         // one light (fill, rim) for a state: 0 active, 1 inactive, 2 pressed
         SP<Render::ITexture>     lightTexture(int button, int state, bool dark, float scale);
-        float                    glyphAlpha(); // hover glyphs fade on a 0.3 s critically damped spring
+        float                    glyphAlpha(); // hover glyphs: 70 ms delay + OutCubic 133 ms in, OutQuad 117 ms out (Tokens.lights)
 
         PHLWINDOWREF             m_window;
         ParamsFn                 m_params;
@@ -86,7 +86,7 @@ namespace lg {
             bool                           dark = false;
             SP<Render::ITexture>           tex;
         } m_title;
-        std::array<SP<Render::ITexture>, 8> m_glyphs; // close, minimise, full screen, zoom (+, with Option); light, dark
+        std::array<SP<Render::ITexture>, 16> m_glyphs; // close, minimise, full screen, zoom (+, with Option); light, dark; rest, pressed
         std::array<SP<Render::ITexture>, 18> m_lights; // [state][dark][button]
         float                               m_glyphScale = 0;
         std::shared_ptr<const SParams>      m_glyphParams;

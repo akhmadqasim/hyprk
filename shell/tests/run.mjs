@@ -520,42 +520,80 @@ test("mode buttons start inside the field, end in place", () => {
     test("Switch never writes checked", () => assert.ok(!/\bsw\.checked\s*=[^=]/.test(qml("Switch.qml"))));
     test("Popup never writes currentIndex", () => assert.ok(!/currentIndex\s*=[^=]/.test(qml("Popup.qml"))));
     test("Slider never writes value", () => assert.ok(!/\bs\.value\s*=[^=]/.test(qml("Slider.qml"))));
-    // the plugin title bar draws the same traffic lights (plugin/src/Titlebar.cpp)
-    test("traffic lights: plugin colours match Tokens.lights", () => {
+    // the plugin title bar draws the same traffic lights (plugin/src/Titlebar.cpp): every colour exact, timings within 1 ms
+    test("traffic lights: plugin colours and timing match Tokens.lights", () => {
         const cpp = readFileSync(join(here, "..", "..", "plugin", "src", "Titlebar.cpp"), "utf8");
         const tokens = qml("Tokens.qml");
-        const hex = c => c.toLowerCase();
-        const toHex = (r, g, b) => [r, g, b].map(x => Math.round(x * 255).toString(16).padStart(2, "0")).join("");
-        // QML colour -> [rrggbb, alpha]
-        const parse = c => {
+        const lightsQml = tokens.slice(tokens.indexOf("property QtObject lights:"), tokens.indexOf("property QtObject frame:"));
+        // QML colour -> [rrggbb, r, g, b, a] (transparent = alpha 0)
+        const qcol = c => {
             c = c.trim();
+            if (c === '"transparent"') return { a: 0 };
             let m = c.match(/^"#([0-9A-Fa-f]{6})"$/);
-            if (m) return [hex(m[1]), 1];
+            if (m) return { hex: m[1].toLowerCase(), a: 1 };
             m = c.match(/^Qt\.rgba\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)$/);
-            return [toHex(+m[1], +m[2], +m[3]), +m[4]];
+            assert.ok(m, "colour " + c);
+            return { rgb: [+m[1], +m[2], +m[3]], a: +m[4] };
         };
-        const sets = {};
-        for (const k of ["close", "minimize", "zoom"]) {
-            const m = tokens.match(new RegExp(k + "Set: t\\.dark \\? \\[(.*)\\]\\s*:\\s*\\[(.*)\\]"));
-            const split = s => s.match(/"#[0-9A-Fa-f]{6}"|Qt\.rgba\([^)]*\)/g).map(parse);
-            sets[k] = { dark: split(m[1]), light: split(m[2]) };
-        }
-        const grad = [...cpp.match(/LIGHT_GRADIENT\[2\]\[3\]\[2\] = \{([\s\S]*?)\};/)[1].matchAll(/\{0x([0-9A-F]{6}), ([\d.]+)f?\}/g)]
-            .map(m => [hex(m[1]), +m[2]]);
-        const pressed = [...cpp.match(/LIGHT_PRESSED\[2\]\[3\] = \{([^;]*)\};/)[1].matchAll(/0x([0-9A-F]{6})/g)].map(m => hex(m[1]));
-        const glyph = [...cpp.match(/GLYPH_RGB\[3\]\s*= \{([^;]*)\};/)[1].matchAll(/0x([0-9A-F]{6})/g)].map(m => hex(m[1]));
-        ["light", "dark"].forEach((mode, d) => ["close", "minimize", "zoom"].forEach((k, b) => {
-            const t = sets[k][mode];
-            for (const stop of [0, 1]) {
-                const [rgb, a] = grad[(d * 3 + b) * 2 + stop];
-                assert.equal(rgb, t[stop][0], `${mode} ${k} stop ${stop}`);
-                near(a, t[stop][1], 0.006);
-            }
-            assert.equal(pressed[d * 3 + b], t[2][0], `${mode} ${k} pressed`);
-            if (mode === "light") assert.equal(glyph[b], t[3][0], `${k} glyph`);
+        const qlist = s => s.match(/"#[0-9A-Fa-f]{6}"|"transparent"|Qt\.rgba\([^)]*\)/g).map(qcol);
+        // { fill: [..], ring: [..], glyph: c, glow: c } from one QML object literal (without its press: part)
+        const qset = s => ({
+            fill: qlist(s.match(/fill: \[([^\]]*)\]/)[1]).map(c => c.hex),
+            ring: qlist(s.match(/ring: \[([^\]]*)\]/)[1]).map(c => c.hex),
+            glyph: qcol(s.match(/glyph: ("[^"]*"|Qt\.rgba\([^)]*\))/)[1]),
+            glow: qcol(s.match(/glow: ("[^"]*"|Qt\.rgba\([^)]*\))/)[1]),
+        });
+        const qbutton = k => {
+            const m = lightsQml.match(new RegExp("property var " + k + ": t\\.dark\\s*\\?\\s*(\\{[\\s\\S]*?)\\n\\s*:\\s*(\\{[\\s\\S]*?)\\n\\s*(?://|readonly|\\})"));
+            assert.ok(m, "Tokens.lights." + k);
+            const part = s => {
+                const i = s.indexOf("press:");
+                return i < 0 ? [qset(s)] : [qset(s.slice(0, i)), qset(s.slice(i))];
+            };
+            return { dark: part(m[1]), light: part(m[2]) };
+        };
+        // C++ tables: {{fill x3}, {ring x5}, glyph, {r, g, b, a}} in source order
+        const centries = body => [...body.matchAll(/\{\{([^}]*)\}, \{([^}]*)\}, (0x[0-9A-F]+|0), \{([^}]*)\}\}/g)].map(m => ({
+            fill: m[1].match(/0x[0-9A-F]{6}/g).map(h => h.slice(2).toLowerCase()),
+            ring: m[2].match(/0x[0-9A-F]{6}/g).map(h => h.slice(2).toLowerCase()),
+            glyph: +m[3],
+            glow: m[4].split(",").map(x => parseFloat(x)),
         }));
-        assert.match(cpp, /GLYPH_SPRING\s*= 0\.3;/);
-        assert.match(tokens, /glyphResponse: 0\.3\b/);
+        const lights = centries(cpp.match(/SLightColors LIGHTS\[2\]\[2\]\[3\] = \{([\s\S]*?)\n    \};/)[1]);
+        const inactive = centries(cpp.match(/SLightColors LIGHTS_INACTIVE\[2\] = \{([\s\S]*?)\n    \};/)[1]);
+        assert.equal(lights.length, 12);
+        assert.equal(inactive.length, 2);
+        const same = (q, c, what) => {
+            assert.deepEqual(c.fill, q.fill, what + " fill");
+            assert.deepEqual(c.ring, q.ring, what + " ring");
+            assert.equal(c.glyph, q.glyph.a ? parseInt(q.glyph.hex, 16) : 0, what + " glyph");
+            if (!q.glow.a) assert.deepEqual(c.glow, [0, 0, 0, 0], what + " glow");
+            else assert.deepEqual(c.glow, [...q.glow.rgb, q.glow.a], what + " glow");
+        };
+        ["light", "dark"].forEach((mode, d) => {
+            ["close", "minimize", "zoom"].forEach((k, b) => {
+                const q = qbutton(k)[mode];
+                assert.equal(q.length, 2, `${mode} ${k} has a press state`);
+                [0, 1].forEach(p => same(q[p], lights[(d * 2 + p) * 3 + b], `${mode} ${k} ${p ? "press" : "rest"}`));
+            });
+            same(qbutton("inactive")[mode][0], inactive[d], `${mode} inactive`);
+        });
+        // constants and the glyph reveal: 70 ms delay + OutCubic 133 ms in, OutQuad 117 ms out on both sides
+        const tok = n => +lightsQml.match(new RegExp("property (?:int|real) " + n + ": ([\\d.]+)"))[1];
+        const con = n => +cpp.match(new RegExp("\\b" + n + " = ([\\d.]+)"))[1];
+        near(con("RIM_WIDTH"), tok("rimWidth"), 1e-9);
+        near(con("GLYPH_STROKE"), tok("glyphStroke"), 1e-9);
+        near(con("PRESS_GROW"), tok("pressedScale"), 1e-9);
+        near(con("GLYPH_DELAY") * 1000, tok("glyphDelay"), 1);
+        near(con("GLYPH_IN") * 1000, tok("glyphIn"), 1);
+        near(con("GLYPH_OUT") * 1000, tok("glyphOut"), 1);
+        const tlq = qml("TrafficLights.qml");
+        assert.match(tlq, /anchors\.margins: -1\b/); // the 1 pt glow
+        near(con("GLOW_WIDTH"), 1, 1e-9);
+        assert.match(tlq, /easing\.type: tl\._glyphs \? Easing\.OutCubic : Easing\.OutQuad/);
+        const ga = cpp.slice(cpp.indexOf("float CTitlebar::glyphAlpha()"), cpp.indexOf("void CTitlebar::draw("));
+        assert.match(ga, /\(t - GLYPH_DELAY\) \/ GLYPH_IN : t \/ GLYPH_OUT/);
+        assert.match(ga, /m_hover \? 1 - \(1 - u\) \* \(1 - u\) \* \(1 - u\) : 1 - \(1 - u\) \* \(1 - u\);/);
     });
 }
 
