@@ -517,8 +517,8 @@ ShellWindow {
         }
     }
     // the pointer marker: centred on the pill, 1 pt below it (touching, the region union would merge it into the pill).
-    // Gone when the label starts to fade: the plugin draws the pointer at full material whatever the pill's materialize
-    // (and the layer's opacity), so kept through the fade it stood alone for 300 ms and then popped off (mcap)
+    // It stays through the label's fade-out: the plugin fades the pointer with the pill (8199aad, 5e9aff0; mcap over
+    // grey, dark: pointer region 267 ms, rms 0.019 against the Mac's label series, no step)
     Glass {
         visible: label.visible && Theme.compositorGlass && !Theme.solidMaterial
         width: Theme.dock.labelPointer.width
