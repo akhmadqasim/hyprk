@@ -1778,6 +1778,101 @@
    "panes": [
     "battery"
    ]
+  },
+  "doc.on.doc.fill": {
+   "symbol": "document.on.document.fill",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "document.on.document.fill.regular.svg",
+    "document.on.document.fill.medium.svg",
+    "document.on.document.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Spotlight result copy button (shell/modules/Spotlight.qml). Decoded from CoreGlyphs' BVG blob with tools/bvg.py (no Mac render): validated on 73 Mac-rendered symbols x 3 weights, IoU median 0.9997, min 0.989."
+  },
+  "markup": {
+   "symbol": "pencil.tip.crop.circle",
+   "surface": "finder",
+   "surfaces": [
+    "finder"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "finder": "sure"
+   },
+   "private": false,
+   "variants": [
+    "pencil.tip.crop.circle.regular.svg",
+    "pencil.tip.crop.circle.medium.svg",
+    "pencil.tip.crop.circle.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Quick Look Markup button (name_aliases: markup -> pencil.tip.crop.circle). Decoded from CoreGlyphs' BVG blob with tools/bvg.py (no Mac render): validated on 73 Mac-rendered symbols x 3 weights, IoU median 0.9997, min 0.989."
+  },
+  "printer": {
+   "symbol": "printer",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "printer.regular.svg",
+    "printer.medium.svg",
+    "printer.semibold.svg"
+   ],
+   "extras": [],
+   "note": "File > Print menu item icon. Decoded from CoreGlyphs' BVG blob with tools/bvg.py (no Mac render): validated on 73 Mac-rendered symbols x 3 weights, IoU median 0.9997, min 0.989."
+  },
+  "rotate.left": {
+   "symbol": "rotate.left",
+   "surface": "finder",
+   "surfaces": [
+    "finder"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "finder": "sure"
+   },
+   "private": false,
+   "variants": [
+    "rotate.left.regular.svg",
+    "rotate.left.medium.svg",
+    "rotate.left.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Quick Look rotate button. Decoded from CoreGlyphs' BVG blob with tools/bvg.py (no Mac render): validated on 73 Mac-rendered symbols x 3 weights, IoU median 0.9997, min 0.989."
+  },
+  "doc.on.clipboard": {
+   "symbol": "document.on.clipboard",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "document.on.clipboard.regular.svg",
+    "document.on.clipboard.medium.svg",
+    "document.on.clipboard.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Spotlight clipboard mode on the Mac (doc.on.clipboard). Decoded from CoreGlyphs' BVG blob with tools/bvg.py (no Mac render): validated on 73 Mac-rendered symbols x 3 weights, IoU median 0.9997, min 0.989."
   }
  },
  "skipped": {
@@ -30447,6 +30542,504 @@
     0,
     0
    ]
+  },
+  "document.on.document.fill.regular.svg": {
+   "symbol": "document.on.document.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    41,
+    48
+   ],
+   "alignmentRect": [
+    0.0,
+    12.0,
+    40.0,
+    22.5
+   ],
+   "baselineY": 34.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.0,
+    3.5,
+    34.5,
+    41.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 37.627
+  },
+  "document.on.document.fill.medium.svg": {
+   "symbol": "document.on.document.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    41,
+    49
+   ],
+   "alignmentRect": [
+    0.0,
+    12.5,
+    40.5,
+    22.5
+   ],
+   "baselineY": 35.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    1.5,
+    3.5,
+    35.0,
+    42.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 38.258
+  },
+  "document.on.document.fill.semibold.svg": {
+   "symbol": "document.on.document.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    41,
+    49
+   ],
+   "alignmentRect": [
+    0.0,
+    12.5,
+    41.0,
+    22.5
+   ],
+   "baselineY": 35.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    1.5,
+    3.5,
+    35.5,
+    42.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 37.977
+  },
+  "pencil.tip.crop.circle.regular.svg": {
+   "symbol": "pencil.tip.crop.circle",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    37.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    32.0,
+    32.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.469
+  },
+  "pencil.tip.crop.circle.medium.svg": {
+   "symbol": "pencil.tip.crop.circle",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    32.5,
+    32.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.264
+  },
+  "pencil.tip.crop.circle.semibold.svg": {
+   "symbol": "pencil.tip.crop.circle",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    33.0,
+    33.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.108
+  },
+  "printer.regular.svg": {
+   "symbol": "printer",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    44,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    43.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    35.5,
+    34.0
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 34.311
+  },
+  "printer.medium.svg": {
+   "symbol": "printer",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    44,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    9.5,
+    44.0,
+    22.5
+   ],
+   "baselineY": 32.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    36.0,
+    34.5
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 35.124
+  },
+  "printer.semibold.svg": {
+   "symbol": "printer",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    45,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    9.5,
+    44.0,
+    22.5
+   ],
+   "baselineY": 32.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    36.5,
+    35.0
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 34.983
+  },
+  "rotate.left.regular.svg": {
+   "symbol": "rotate.left",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    36,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    12.5,
+    31.5,
+    22.5
+   ],
+   "baselineY": 35.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    31.5,
+    34.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 37.993
+  },
+  "rotate.left.medium.svg": {
+   "symbol": "rotate.left",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    36,
+    42
+   ],
+   "alignmentRect": [
+    0.0,
+    13.0,
+    32.5,
+    22.5
+   ],
+   "baselineY": 35.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    32.0,
+    35.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 38.596
+  },
+  "rotate.left.semibold.svg": {
+   "symbol": "rotate.left",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    37,
+    43
+   ],
+   "alignmentRect": [
+    0.0,
+    13.5,
+    32.5,
+    22.5
+   ],
+   "baselineY": 36.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    32.5,
+    36.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 39.294
+  },
+  "document.on.clipboard.regular.svg": {
+   "symbol": "document.on.clipboard",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    40,
+    46
+   ],
+   "alignmentRect": [
+    0.0,
+    12.0,
+    40.0,
+    22.5
+   ],
+   "baselineY": 34.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    32.0,
+    39.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 37.764
+  },
+  "document.on.clipboard.medium.svg": {
+   "symbol": "document.on.clipboard",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    41,
+    46
+   ],
+   "alignmentRect": [
+    0.0,
+    12.0,
+    40.5,
+    22.5
+   ],
+   "baselineY": 34.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    32.5,
+    40.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 37.539
+  },
+  "document.on.clipboard.semibold.svg": {
+   "symbol": "document.on.clipboard",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    41,
+    47
+   ],
+   "alignmentRect": [
+    0.0,
+    13.0,
+    41.0,
+    22.5
+   ],
+   "baselineY": 35.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    33.0,
+    40.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 38.369
   }
  },
  "menubar": [

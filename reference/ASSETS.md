@@ -114,15 +114,25 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
   Each facet has 3 vector renditions (layout 1022, blob `DWAR` + `BVG `, 300-800 bytes, rendition key attribute 26 = 1, 4, 9, apparently the
   light/regular/black weight masters, plus a transform and per-layer names like `p0.34`/`p0.68` for the hierarchical colour layers) and many
   small pre-rasterised GA8 bitmaps (11-112 px, 1x/2x, in `ZZZZPackedAsset` atlases compressed as deepmap2/`dmp2`, not decoded here).
-  BVG is not decoded. `car.py bvg <car> <outdir> <names>` dumps the raw blobs; `sf-symbols/bvg-samples/` has 16 symbols x 3 masters for a decoder.
-  Read so far (2026-11-11, not enough to draw): after `BVG ` 01 a flags byte (low nibble = width of the next fields, 1 or 2
-  bytes), the blob size, the end offset, a section count (5) and count + 1 offsets. Sections: 0 a short bit-packed header,
-  1 the transform as text (`matrix(0.00634765 0 0 0.00634765 tx ty)`, 0.00634765 = 13/2048), 2 the symbol name, 3 the outline:
-  u16 0, the segment count (Z counted, M not: checkmark 13, minus 7), u16 the point count (29, 15), then a bit-packed stream
-  of about 11 bits per coordinate (the two halves of minus.w1 repeat at a nibble offset), 4 a second stream of unknown use;
-  then a tail that is identical across the three weights (scene/bytecode). Names in this car: the shell's `doc.on.doc.fill` is
-  `document.on.document.fill` (name_aliases), Quick Look's `markup` is `pencil.tip.crop.circle`; `printer`, `rotate.left` as is.
-  No public decoder exists (searched 2026-11-11: sfsym and the MCP servers render through AppKit's CUINamedVectorGlyph on a Mac).
+  BVG is decoded (2026-11-11): `themes/icons/tools/bvg.py <car> <outdir> <names> [weights]` writes AppKit-like 32 pt
+  SVGs + names.json metadata. Checked against the 73 Mac-rendered symbols x 3 weights in `sf-symbols/svg/`: IoU median
+  0.9997, min 0.989, alpha rms <= 1.6/255. Format (CoreUI 27.2.1: CSIBVGPathDecoder::createDecodedPath 0x18f2e5484,
+  CSIBVGNibbleReader 0x18f2e5d44/5b70/5bdc, consumeFlag 0x18f2e5d98, decodeGenericValue 0x18f2e5e34,
+  CommandByte::resolvedSVGCommand 0x18f2e60f4, CSIBVGNumericListDecoder 0x18f2e58cc):
+  container `BVG `, u8 version 1, u8 flags (low nibble w = 1 or 2 = width of every offset/index), size, end offset,
+  u8 section count n, n+1 section offsets; sections form a storage table (strings such as `matrix(13/2048 ...)`, the
+  name, layer tags; path data starting `00 00`; numeric lists starting `00 xx`); atoms < 89 are the predefined
+  strings `_CSIBVGPredefinedStrings`, >= 89 are section (index - 89). Nibbles high first. Path: u8 0, u16 segment
+  and point counts, then command bytes (0x7X = Z; high nibble 0 L/M, 1 C, 2 S, 3 Q, 4 T, 5 H, 6 V, 8.. relative;
+  bits 0-1 set-count width, bit 2 odd count, bit 3 compact integers), flag bytes (signs, width class, pair count),
+  compact pairs with kIntegerLargeBits [8,10,12,14] / kIntegerSmallBits [4,6,8,10], or generic decimal values
+  (integerWidths [4,8,12,32], decimalWidths [12,16,28,40], halfNibbleDecimalWidths [10,14,26,38], exponentWidths
+  [8,12]). Coordinates are font units, mapped to 13 pt by the matrix. The tail holds classes (monochrome-N /
+  multicolor / hierarchical layers, `-sfsymbols-clear-behind` knockouts) and the node tree. Weights blend the three
+  masters (attr 26 = 1/4/9) as W4 + u(W1-W4) + v(W9-W4): regular (0.182, 0), medium (0.148, 0.165), semibold
+  (0.123, 0.291) (fitted, identical to 3 decimals on 10 symbols). The AppKit canvas uses TLV 0x3fa margins (u32 7,
+  u32 13, 8 floats; the first float not identified). Decoded so far into `sf-symbols/svg/`: document.on.document.fill,
+  pencil.tip.crop.circle, printer, rotate.left, document.on.clipboard (names.json notes say "decoded from BVG").
   Copied tables (binary plists, from CoreGlyphs and `private/` from CoreGlyphsPrivate): `symbol_order.plist` (names in SF Symbols app order),
   `name_availability.plist` (name -> release year), `symbol_search.plist` (name -> search terms), `symbol_categories.plist` and
   `categories.plist`, `name_aliases.strings` (old name -> current name), `nofill_to_fill.strings`, `legacy_flippable.plist`,
@@ -138,4 +148,4 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
 
 ## What failed or was skipped (summary)
 
-SF Symbols (BVG vector format not decoded), `.madesktop` wallpapers, arrow cursor from CursorAsset, Xcursor packaging, static SF font instances.
+`.madesktop` wallpapers, arrow cursor from CursorAsset, Xcursor packaging, static SF font instances.
