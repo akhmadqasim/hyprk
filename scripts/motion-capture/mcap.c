@@ -12,11 +12,18 @@
 // JSON counts them in "long_intervals" (an interval over 1.5 periods: a frame the capture missed, or a frame
 // the output did not redraw).
 //
-// Usage: mcap -o PREFIX -g X,Y,W,H [-O OUTPUT] [-k STEP] [-t SECONDS] [-p PRE] [-- trigger command...]
+// Usage: mcap -o PREFIX -g X,Y,W,H [-O OUTPUT] [-k STEP] [-t SECONDS] [-p PRE] [-H] [-- trigger command...]
 //   -g   region in output-local logical px (the buffer is in physical px)
 //   -k   keep every STEP-th physical pixel in x and y (default 2 = 1 sample per logical px at 2x)
 //   -t   stop SECONDS after the trigger (default 1.5)
-//   -p   frames captured before the trigger runs (default 2; the first is the "before" reference)
+//   -p   frames captured before the trigger runs (default 2; the first is the "before" reference). They are asked
+//        for with `copy` (answered at once); the frames after the trigger with `copy_with_damage` (answered when the
+//        output is redrawn). Hyprland 0.57.2 answers every region request at once with full damage (a new screenshare
+//        session per request, hypr-dev patches/hyprland-0.57.2-screencopy-session-leak.patch); with the patch a
+//        `copy_with_damage` on a still screen waits, as the protocol says
+//   -H   allow the host display. Without it mcap refuses to run when WAYLAND_DISPLAY is unset or wayland-0: the
+//        test session's socket has to be named, a capture of the host desktop is never what a measurement wants
+//   the display in use is printed on stderr.
 //   the trigger is ONE string run through /bin/sh -c; its start time (CLOCK_MONOTONIC) is written as t0.
 // Output: PREFIX.json {w,h,format,t0_ns,frames} and PREFIX.raw (frames of h rows x w px x 3 bytes RGB) and
 //   PREFIX.csv (frame, present_ns, received_ns). Analyse with mcap.py.
@@ -119,18 +126,28 @@ int main(int argc, char **argv) {
     const char *prefix = NULL, *oname = NULL;
     int gx = 0, gy = 0, gw = 0, gh = 0, step = 2, pre = 2;
     double secs = 1.5;
-    int opt;
-    while ((opt = getopt(argc, argv, "o:g:O:k:t:p:")) != -1) {
+    int opt, host = 0;
+    while ((opt = getopt(argc, argv, "o:g:O:k:t:p:H")) != -1) {
         if (opt == 'o') prefix = optarg;
         else if (opt == 'g') sscanf(optarg, "%d,%d,%d,%d", &gx, &gy, &gw, &gh);
         else if (opt == 'O') oname = optarg;
         else if (opt == 'k') step = atoi(optarg);
         else if (opt == 't') secs = atof(optarg);
         else if (opt == 'p') pre = atoi(optarg);
+        else if (opt == 'H') host = 1;
     }
     if (!prefix || gw <= 0 || gh <= 0 || step < 1) { fprintf(stderr, "usage: see header of mcap.c\n"); return 2; }
+    const char *dname = getenv("WAYLAND_DISPLAY");
+    if (!dname || !*dname) dname = "wayland-0";   // libwayland's default
+    const char *dbase = strrchr(dname, '/') ? strrchr(dname, '/') + 1 : dname;
+    if (!host && !getenv("WAYLAND_SOCKET") && !strcmp(dbase, "wayland-0")) {
+        fprintf(stderr, "mcap: WAYLAND_DISPLAY is %s (the host session). Set it to the test session's socket, or pass -H "
+                        "to capture the host on purpose\n", getenv("WAYLAND_DISPLAY") ? dname : "unset, so wayland-0");
+        return 2;
+    }
     struct wl_display *dpy = wl_display_connect(NULL);
-    if (!dpy) { fprintf(stderr, "mcap: no wayland display\n"); return 1; }
+    if (!dpy) { fprintf(stderr, "mcap: no wayland display (%s)\n", dname); return 1; }
+    fprintf(stderr, "mcap: display %s\n", getenv("WAYLAND_SOCKET") ? "from WAYLAND_SOCKET" : dname);
     struct wl_registry *reg = wl_display_get_registry(dpy);
     wl_registry_add_listener(reg, &reg_l, NULL);
     wl_display_roundtrip(dpy);
@@ -197,7 +214,7 @@ int main(int argc, char **argv) {
         const int last = now_ns() >= stop;
         if (!last) {
             fr.use = 1 - cur;
-            REQUEST(0);
+            REQUEST(n < pre);   // the frames before the trigger do not wait for damage
             // the copy request leaves in the buffer_done handler: run it now
             while (!fr.sent && !fr.failed && wl_display_roundtrip(dpy) >= 0) {}
             wl_display_flush(dpy);
