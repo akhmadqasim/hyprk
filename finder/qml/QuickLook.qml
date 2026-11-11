@@ -91,11 +91,18 @@ Window {
     // client misses a vsync. With the basic render loop (main.cpp) each frameSwapped is one frame on screen: mcap, 3
     // opens of which the first cold, 0.79 shows once, .79 .85 .90 .93 .96 .97 .98 .99 1.0 1 (Mac .79 .85 .90 .93 .95
     // .97 .98 .98 .99 1), first visible 109-110 ms after the Space trigger (a selection change: 77-94 ms).
+    // The first frame's commit can reach Hyprland after the request, so the window is not listed yet: then it would stay
+    // where new_float_force_onscreen put it (89 pt up on the MBA output, in 4 of 5 reopens). Up to 10 more frames try.
     property int _step: -1
+    property int _placeTries: 0
     onFrameSwapped: {
         if (_warm) {
+            if (!Hypr.moveWindow(ql.title, Screen.virtualX, Screen.virtualY) && ++_placeTries < 10) {
+                ql.update();
+                return;
+            }
             _warm = false;
-            Hypr.moveWindow(ql.title, Screen.virtualX, Screen.virtualY);
+            _placeTries = 0;
             panel.visible = true;
             _step = Tokens.reduceMotion ? -1 : 0;
             return;

@@ -50,7 +50,7 @@ QVariantList Hypr::windows() const
     return list;
 }
 
-void Hypr::moveWindow(const QString &title, double x, double y) const
+bool Hypr::moveWindow(const QString &title, double x, double y) const
 {
     const qint64 pid = QCoreApplication::applicationPid();
     const QJsonArray all = QJsonDocument::fromJson(request("j/clients")).array();
@@ -60,12 +60,13 @@ void Hypr::moveWindow(const QString &title, double x, double y) const
             continue;
         const QJsonArray at = c.value(QLatin1String("at")).toArray();
         if (at.at(0).toDouble() == x && at.at(1).toDouble() == y)
-            return;
+            return true;
         const QString address = c.value(QLatin1String("address")).toString();
         request(QStringLiteral("dispatch hl.dsp.window.move({ x = %1, y = %2, window = \"address:%3\" })")
                     .arg(qRound(x)).arg(qRound(y)).arg(address).toUtf8());
-        return;
+        return true;
     }
+    return false;
 }
 
 bool Hypr::minimizeWindow(const QString &title) const
