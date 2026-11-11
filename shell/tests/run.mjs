@@ -705,6 +705,20 @@ test("press damping by size", () => {
     near(M.pressDamping(300, 120), 0.4875);
     near(M.pressDamping(160, 400), 0.6);
 });
+test("press stretch: SwiftUI applyScale rule, input from ResolvedLocalGesture (inside / past the edge)", () => {
+    near(M.pressStretchThreshold(78, 37), 60000);
+    near(M.pressStretchThreshold(140, 64), 60000);
+    near(M.pressStretchThreshold(300, 200), 70000);
+    near(M.flexStretch(0, 0, 60000), 0);
+    near(M.flexStretch(30, 30, 60000), 30 / 240000);              // inside: a quarter weight
+    near(M.flexStretch(-130, -30, 60000), -(100 / 60000 + 30 / 240000)); // 100 pt past the left edge
+    const s = M.pressStretch(78, 37, 48, 18, 178, 18);            // press at 48, dragged 100 pt past the right edge
+    const k = 100 / 60000 + 30 / 240000;
+    near(s[0], k); near(s[1], -k); near(s[2], 78 * k); near(s[3], 0);
+    const v = M.pressStretch(78, 37, 40, 10, 40, -40);            // straight up, 40 pt past the top
+    const kv = 40 / 60000 + 10 / 240000;
+    near(v[0], -kv); near(v[1], kv); near(v[2], 0); near(v[3], -37 * kv);
+});
 test("spring settles at target, overshoots at damping 0.7", () => {
     let x = 0, v = 0, peak = 0;
     for (let i = 0; i < 120; i++) { [x, v] = M.springStep(x, v, 1, 0.5, 0.7, 1 / 60); peak = Math.max(peak, x); }

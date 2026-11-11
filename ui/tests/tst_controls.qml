@@ -51,6 +51,7 @@ Item {
         centres: [18.5, 55.5]
     }
     PressSpring { id: capLift; w: 78; h: 37 }
+    GlassButton { id: flexBtn; x: 300; y: 150; width: 78; height: 37 }
 
     SignalSpy { id: toggledSpy; target: refusing; signalName: "toggled" }
     SignalSpy { id: movedSpy; target: sl; signalName: "moved" }
@@ -227,6 +228,18 @@ Item {
             for (let t = 0; t < 600; t += 10) { wait(10); min = Math.min(min, capLift.scale); }
             verify(min > 0.9995, "no undershoot after the release: " + min);
             tryCompare(capLift, "scale", 1, 1000);
+        }
+        // FlexInteraction drag stretch (applyScale): a drag inside the pressed glass stretches it along the drag by
+        // |d| / (4 * 60000) and shifts it toward the pointer by width * k; nothing at rest
+        function test_press_drag_stretch() {
+            compare(flexBtn.transform[1].x, 0);
+            mousePress(flexBtn, 10, 18);
+            mouseMove(flexBtn, 70, 18, -1, Qt.LeftButton);
+            const k = 60 / 240000;
+            tryVerify(() => Math.abs(flexBtn.transform[1].x - 78 * k) < 0.002, 2000);
+            verify(flexBtn.transform[0].xScale > flexBtn.transform[0].yScale, "stretched along x");
+            mouseRelease(flexBtn, 70, 18);
+            tryVerify(() => flexBtn.transform[1].x === 0, 1000);
         }
         // FlexInteraction glow: the press light follows the pointer and dims beyond 50 pt from where the press began
         function test_press_light_follows_pointer() {

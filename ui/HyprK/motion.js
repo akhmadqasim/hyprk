@@ -30,6 +30,26 @@ function pressScale(w, h) {
 }
 function pressDamping(w, h) { return pressUltra(w, h) ? 0.629 : 0.375 + 0.225 * pressT(w, h); }
 
+// The drag stretch (applyScale 0x190c225cc, its input from ResolvedLocalGesture.value 0x190c20ae4): per axis, d = the
+// pointer's travel from the press point and di = the same travel with the pointer clamped into the glass (0 .. size),
+// k = (|d| - |di|) / thr + |di| / (4 thr); the axis grows by k, the other shrinks by k, and the glass shifts by
+// size * k toward the pointer. thr = scaleDistanceThreshold (cursor): 60000 under 120 pt (small / ultraSmall), then
+// 60000 -> 70000 (small -> large) by the same t. Tiny by design on the Mac: 100 pt past the edge = +0.17 %.
+function pressStretchThreshold(w, h) { return pressUltra(w, h) ? 60000 : 60000 + 10000 * pressT(w, h); }
+function flexStretch(d, di, thr) {
+    if (d === 0 || thr <= 0) return 0;
+    const a = Math.abs(di);
+    return Math.sign(d) * ((Math.abs(d) - a) / thr + a / (4 * thr));
+}
+// [scaleX, scaleY, shiftX, shiftY] added to the lift for a press at (sx, sy) with the pointer at (px, py), in pt
+function pressStretch(w, h, sx, sy, px, py) {
+    const thr = pressStretchThreshold(w, h);
+    const kx = flexStretch(px - sx, Math.max(0, Math.min(w, px)) - sx, thr);
+    const ky = flexStretch(py - sy, Math.max(0, Math.min(h, py)) - sy, thr);
+    const ax = Math.abs(kx), ay = Math.abs(ky);
+    return [ax - ay, ay - ax, w * kx, h * ky];
+}
+
 // One step of a SwiftUI-parameterised spring (response s, dampingFraction), semi-implicit Euler
 // in <= 4 ms sub-steps. Returns [x, v].
 function springStep(x, v, target, response, damping, dt) {

@@ -380,7 +380,9 @@ QtObject {
         readonly property real pressResponse: 0.25        // FlexInteraction press lift (SPEC 10.3)
         // the lift's way back after the release: measured on the 23.09.23 recording (preview share capsule, frames 252-275
         // and 361-399, passthrough index): no overshoot, a critically damped fit of response 0.21 s (rms .033; the press
-        // spring 0.25 / 0.629 gives .079). Which spring the code uses on release is not decoded (GLASS-INTERACTION.md)
+        // spring 0.25 / 0.629 gives .079). The code (updateEffect 0x190c220d4) animates the release on the same
+        // scaleSpringResponse / Damping as the press (the tracking pair only with the pulse gate): the measured settle
+        // is kept, the difference is not explained by SwiftUI's code (GLASS-INTERACTION.md 3)
         readonly property real pressReleaseResponse: 0.21
         readonly property real pressReleaseDamping: 1
         // the press light follows the pointer (FlexCoreInteractionModifier.Value.updateGlow 0x190c24650): its centre on a
@@ -390,6 +392,5 @@ QtObject {
         readonly property real pressGlowDissipation: 50
         readonly property real pressGlowFar: 0.5
         readonly property real pressGlowFarResponse: 0.5
-        readonly property real pressSquish: 0.06          // drag past a slider end stretches x, squeezes y (by eye)
     }
 }
