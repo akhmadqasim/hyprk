@@ -58,6 +58,7 @@ QtObject {
         Theme.sidebar.size = appearance.sidebarIconSize;
         Theme.accentName = appearance.accent;
         Theme.tintWindow = appearance.tintWindowBackground;
+        Theme.glassTint = isFinite(appearance.glass) ? Math.min(1, Math.max(0, appearance.glass)) : 0.5;
     }
 
     Component.onCompleted: {

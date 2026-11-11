@@ -21,6 +21,7 @@ QtObject {
     property bool increaseContrast: false
     property bool compositorBlur: false        // set by AppState from Backend
     property bool reduceMotion: false          // set by AppState (Accessibility > Motion)
+    property real glassTint: 0.5               // set by AppState (Appearance > Liquid Glass), for HyprK Tokens
     readonly property bool translucent: compositorBlur && !reduceTransparency && !increaseContrast
     // Appearance > Theme > Color (state/appearance.json "accent"), set by AppState. Colours: HyprK Accent
     // (measured on 27.2.1). Under Multicolor each app uses its own accent; System Settings has none
@@ -35,6 +36,7 @@ QtObject {
     Component.onCompleted: {
         Tokens.dark = Qt.binding(() => theme.dark);
         Tokens.reduceMotion = Qt.binding(() => theme.reduceMotion);
+        Tokens.glassTint = Qt.binding(() => theme.glassTint);
         Tokens.reduceTransparency = Qt.binding(() => theme.reduceTransparency);
         Tokens.increaseContrast = Qt.binding(() => theme.increaseContrast);
         Accent.name = Qt.binding(() => theme.accentName);

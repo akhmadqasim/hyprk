@@ -18,6 +18,9 @@ QtObject {
     property bool windowActive: true
     // size of a Switch that sets none: Settings uses mini switches (36 x 16, Q-settings-16)
     property string switchSize: "regular"
+    // Settings > Appearance > Liquid Glass (NSGlassTintAmount, 0 clear .. 1 tinted, 0.5 = unchanged recipe). Apps
+    // that read appearance.json `glass` bind it; glass-faced controls (ToolbarPlatter) follow it
+    property real glassTint: 0.5
     // controlAccentColor of the user's accent (Accent.qml; each app's Theme sets Accent.name)
     property color accent: Accent.color
     property string fontText: "Sans Serif"
@@ -143,7 +146,16 @@ QtObject {
         readonly property color reliefMid: "#F8F8F8"
         readonly property color reliefLow: "#FCFCFC"
         readonly property color reliefEdge: t.dark ? Qt.rgba(1, 1, 1, 0.27) : Qt.rgba(0, 0, 0, 0.07)
-        readonly property color reliefSide: t.dark ? Qt.rgba(0, 0, 0, 0.9) : Qt.rgba(0, 0, 0, 0.18)   // over the edge
+        readonly property color reliefSide: t.dark ? Qt.rgba(0, 0, 0, 0.9) : Qt.rgba(0, 0, 0, 0.22)   // over the edge
+        // the side darkening around the middle of the round ends: full within reliefSideFlat pt of the middle, then a
+        // Gaussian fall-off. Edge pixel down the left end: light (appearance-light.png) 191 at the middle, 199-206 at
+        // 1-2 pt, 214-232 at 3 pt, the 237 edge from 4 pt; dark (appearance-dark.png) 11-25 from 12.75 pt above to
+        // 12.75 pt below the middle, 46 at 13.75, the lit 54-60 from 14.75 pt
+        readonly property real reliefSideFlat: t.dark ? 11.5 : 0
+        readonly property real reliefSideSigma: t.dark ? 1.5 : 3
+        // dark face with the Liquid Glass slider (MAC-ANSWERS Appearance 2: #3C3E40 at 0, #4B4E52 at 1, 60..61 at
+        // 0.5 on the 31 window): unchanged below 0.5, white .13 -> .21 above (Regular face, knee at 0.5)
+        readonly property real reliefDarkFaceAlpha: 0.13 + 0.08 * Math.max(0, Math.min(1, 2 * t.glassTint - 1))
     }
 
     // ---------- alerts, sheets, popovers (AlertPanel, Sheet, Popover; geometry in panels.js) ----------
