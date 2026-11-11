@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Shapes
-import QtQuick.Effects
 import "iconshape.js" as IconShape
 
 // One app icon, drawn the macOS 26 way. Plain QtQuick (no Quickshell imports) so the
@@ -59,6 +58,11 @@ Item {
     readonly property bool _dark: style === "dark"
     readonly property bool _clear: style === "clear"
     readonly property bool _tinted: style === "tinted"
+    // Clear and Tinted: a flat tile and the art mapped by its luminance (shaders/iconstyle.frag), the rule read from
+    // the Mac's ClearLight / TintedLight Dock for icons without layers (WebStorm, Spotify; themes/icons/README.md).
+    // The Mac's dark appearance has no other files for these styles (the Apple renditions fall back to the light
+    // ones), so the same is drawn in both appearances
+    readonly property bool _mapped: _clear || _tinted
 
     // built only for icons that get a tile (most icons are trusted or already squircles and never draw one);
     // the outlines are shared by every tile (IconShape.tilePoints)
@@ -69,8 +73,29 @@ Item {
         width: root.size * root.body
         height: width
 
+        sourceComponent: root._mapped ? flatTile : fullTile
+    }
+    // Clear / Tinted tile: flat, the colour of the Apple renditions' tile (build-styles.py): Tinted sRGB 0,109,195,
+    // Clear white at alpha 0.20 (the Mac's glass tile over the Dock: 176 -> 192)
+    Component {
+        id: flatTile
+        Item { Shape {
+            width: 100
+            height: 100
+            scale: tile.width / 100
+            transformOrigin: Item.TopLeft
+            preferredRendererType: Shape.CurveRenderer
+            ShapePath {
+                strokeColor: "transparent"
+                fillColor: root._clear ? Qt.rgba(1, 1, 1, 0.20) : Qt.rgba(0, 109 / 255, 195 / 255, 1)
+                PathPolyline { path: IconShape.tilePoints(0) }
+            }
+        } }
+    }
+    Component {
+        id: fullTile
         // an Item the Loader sizes, with the 100 x 100 outline scaled inside it (a Loader resizes its item)
-        sourceComponent: Item { Shape {
+        Item { Shape {
             width: 100
             height: 100
             scale: tile.width / 100
@@ -147,7 +172,7 @@ Item {
         id: art
         readonly property var f: root.trusted || !root._info ? { scale: 1, dx: 0, dy: 0 }
             : IconShape.fit(root._info, root.tiled ? root.body * root.inner : root.body, root.tiled ? 1.6 : 1.25)
-        visible: root.ready
+        visible: root.ready && !root._mapped     // Clear / Tinted: drawn by the glyph below from this texture
         width: root.size * f.scale
         height: width
         x: (root.size - width) / 2 + f.dx * root.size
@@ -158,9 +183,20 @@ Item {
         asynchronous: true
         smooth: true
         mipmap: true
-        // Clear and Tinted styles show the art as a monochrome glyph, like macOS 26
-        layer.enabled: root._clear || root._tinted
-        layer.effect: MultiEffect { saturation: -1.0; brightness: root._tinted ? 0.35 : 0.08 }
+    }
+    // the art through the Clear / Tinted ramp: one quad sampling the art's own texture (no offscreen layer); built
+    // only while one of those styles is on
+    Loader {
+        active: root._mapped && root.ready
+        x: art.x
+        y: art.y
+        width: art.width
+        height: art.height
+        sourceComponent: ShaderEffect {
+            property Item source: art
+            property real clear: root._clear ? 1 : 0
+            fragmentShader: Qt.resolvedUrl("shaders/iconstyle.frag.qsb")
+        }
     }
 
     // ---------- one-time shape analysis ----------

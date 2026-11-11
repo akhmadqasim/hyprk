@@ -48,9 +48,12 @@ used by the shell and Finder through symlinks), `tools/` (`car.py` Assets.car re
      tile colour and glyph ramp fitted to the Mac's ClearLight / TintedLight Dock (blue accent). Rms against the
      Mac's Dock at 66 px: `tools/check-styles.py` (Dark 6-15, Clear 3-9, Tinted 8-15; Apple's own Default
      bitmap scores 6-14 on the same shots). 256 px only: the shell draws app icons at most 128 pt.
-   - Linux icons on the generated tile (`AppIconTile.qml`): tile colours per style and a monochrome glyph.
-     The Mac's rule for icons without layers (WebStorm, Spotify in the same Mac shot): Dark leaves them as
-     they are, Clear / Tinted map their luminance with the same ramp as above.
+   - Linux icons (`AppIconTile.qml`): the Mac's rule for icons without layers (WebStorm, Spotify in the same Mac
+     shot): Dark leaves them as they are (on the dark tile), Clear / Tinted map the art's luminance L with the same
+     ramp as above (`ui/HyprK/shaders/iconstyle.frag`, one quad over the art's own texture, built only while the
+     style is on): Tinted rgb (-84 + 198 L, 83 + 158 L, 189 + 66 L) on a flat sRGB 0,109,195 tile, Clear white at
+     alpha (182 + 72 L - 176) / 79 on a flat white 0.20 tile. Same in dark appearance (the Apple renditions have no
+     dark files either). Icons that already are squircles are mapped whole, as the Mac maps WebStorm's.
 
 Used by the Dock, Apps (Launchpad), Cmd+Tab, Spotlight (`AppIcon.qml`), Finder's Applications
 view and Settings' app lists (`AppIconTile.qml` in the shared HyprK module, `ui/HyprK`).
