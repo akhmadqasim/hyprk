@@ -1,158 +1,328 @@
 import QtQuick
-import HyprK
+import QtQuick.Window
 import QtQuick.Controls.Basic
+import QtQuick.Shapes
+import HyprK
 import Finder.Native
 import "lib/files.js" as Files
 
-// Quick Look panel: images and text inline, everything else as a large icon with info.
-Rectangle {
-    id: root
+// Quick Look, as on 27.2.1 (MAC-ANSWERS.md Q-finder-26, live/finder/crops/quicklook-*-light.png, 2x): a floating panel
+// window of its own, not a sheet. Radius 20; a 38 pt title bar with close and full-screen discs (14 pt boxes at (11,12)
+// and (31,12)), the file name in 13 Bold from x 52, Markup / Rotate / Share buttons (34x26) and an "Open with <app>"
+// capsule (139x26 for Preview) 7 pt from the right edge; the content inset 5 left, right and bottom. Frame grey 136
+// (opaque, neutral). Opens at 0.79 scale in the screen centre and grows to 1 in 0.25 s ease-out (.79 .85 .90 .93 .95
+// .97 .98 .98 .99 1 = OutQuint), no fade; closes by shrinking into the file's icon in about 0.18 s (curve not measured:
+// InOutQuad). Standard window shadow (config/hypr/hyprland.lua Q-windows-01).
+//
+// The window covers the monitor and is transparent (finder/hyprland-rules.lua: no compositor shadow, border, blur or
+// animation, no focus, pinned above): the panel and its shadow are drawn here, so the zoom can leave the panel's rect
+// and land on an icon in the Finder window. Its input region is the panel; Finder keeps the keyboard.
+Window {
+    id: ql
 
-    property var entry: null
-    // Q-finder-26: opens at 0.79 scale, centred, growing to 1 in 0.25 s ease-out (per frame .79 .85 .90 .93 .95 .97
-    // .98 .98 .99 1 = OutQuint), no fade; closes by shrinking into the file's icon in about 0.18 s (curve not
-    // measured: InOutQuad). closeTo: the icon's centre in the parent (Main passes the last press on an item).
-    property point closeTo: Qt.point(x + width / 2, y + height / 2)
-    property var cur: null   // the entry shown, kept while the close animation runs
-    readonly property bool open: cur !== null
-    readonly property bool isImage: open && Files.isImage(cur)
-    readonly property bool isText: open && !isImage && Files.isText(cur)
-    readonly property string text: isText ? FileOps.readText(cur.path, 65536) : ""
+    property var entry: null            // the item to show; null closes
+    property Window finder: null        // the Finder window holding the icons
+    property var iconRect: path => null // the item's icon in `finder` (window coordinates) or null
     signal closeRequested()
 
+    property var cur: null              // the entry shown, kept while the close animation runs
+    readonly property bool isImage: cur !== null && Files.isImage(cur)
+    readonly property bool isText: cur !== null && !isImage && Files.isText(cur)
+    readonly property string text: isText ? FileOps.readText(cur.path, 65536) : ""
+    readonly property var apps: cur !== null && !cur.isDir ? FileOps.appsFor(cur.path) : []
+    readonly property string appName: apps.length && apps[0].isDefault ? apps[0].name : ""
+    property bool full: false           // the green disc: the panel fills the screen
+    property int turns: 0               // Rotate (left), in quarter turns; the file is not changed
+
+    title: "Quick Look"                 // matched by finder/hyprland-rules.lua
+    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowDoesNotAcceptFocus
+    color: "transparent"
+    visible: false
+    Component.onCompleted: { width = Screen.width; height = Screen.height; }
+
+    // ---------- size (Q-finder-26: 1463 x 951 for a 1600 x 1000 image on a 1710 x 1107 screen, centred) ----------
+    readonly property real fit: 0.856   // 1463 / 1710 (951 / 1107 = 0.859): the panel's share of the screen
+    readonly property real barH: 38
+    readonly property real inset: 5
+    readonly property real maxW: Math.min(Screen.width * fit, width)
+    readonly property real maxH: Math.min(Screen.height * fit, height)
+    // natural image size in pt (1 px = 1 pt, as a 72 dpi image on the Mac), turned with Rotate
+    readonly property real natW: (turns % 2 ? img.implicitHeight : img.implicitWidth) || 1
+    readonly property real natH: (turns % 2 ? img.implicitWidth : img.implicitHeight) || 1
+    readonly property real contentW: {
+        if (!isImage) return 760 - 2 * inset;   // not measured on the Mac: the old panel's size
+        const w = Math.min(natW, maxW - 2 * inset);
+        return w * natH / natW > maxH - barH - inset ? (maxH - barH - inset) * natW / natH : w;
+    }
+    readonly property real contentH: isImage ? contentW * natH / natW : 560 - barH - inset
+    // a narrow image still gets a title bar that holds its controls: 52 + a 120 pt title + 16 + 266 to the right
+    // edge (a layout need, not a Mac value)
+    readonly property real panelW: full ? width : Math.round(Math.max(contentW + 2 * inset, 52 + 120 + 16 + 266))
+    readonly property real panelH: full ? height : Math.round(contentH + barH + inset)
+
+    // ---------- open / close ----------
+    property int _warm: 0
     onEntryChanged: {
         if (entry) {
+            const was = cur;
             closeAnim.stop();
+            turns = 0;
             cur = entry;
-            zoom.xScale = zoom.yScale = 1; shift.x = shift.y = 0;
-            if (!Tokens.reduceMotion) openAnim.restart();
+            if (was && visible && !closing) return;   // arrow keys: the panel shows the next item in place
+            full = false;
+            zoom.xScale = zoom.yScale = Tokens.reduceMotion ? 1 : 0.79;
+            shift.x = shift.y = 0;
+            _warm = 3;
+            panel.visible = false;
+            visible = true;
+            Hypr.setInputRect(ql, Qt.rect(panel.x, panel.y, panel.width, panel.height));
         } else if (cur) {
-            if (Tokens.reduceMotion) cur = null; else closeAnim.restart();
+            _step = -1;
+            if (Tokens.reduceMotion) { hideNow(); return; }
+            aimAtIcon();
+            closeAnim.restart();
         }
     }
-    transform: [
-        Scale { id: zoom; origin.x: root.width / 2; origin.y: root.height / 2 },
-        Translate { id: shift }
-    ]
-    NumberAnimation { id: openAnim; target: zoom; properties: "xScale,yScale"; from: 0.79; to: 1; duration: 250; easing.type: Easing.OutQuint }
+    onPanelWChanged: if (visible) Hypr.setInputRect(ql, Qt.rect(panel.x, panel.y, panel.width, panel.height))
+    onPanelHChanged: if (visible) Hypr.setInputRect(ql, Qt.rect(panel.x, panel.y, panel.width, panel.height))
+    // A new window's first buffers reach the screen late: drawn with the panel in its first frame, 0.79 stayed up for
+    // three compositor frames (mcap) while a timed curve ran on. So the window maps empty and the panel appears once
+    // three frames went through; then the curve steps once per swapped frame (frame k shows time k / refresh rate), so every
+    // frame on screen is the next sample of the Mac's series even when the client misses a vsync.
+    property int _step: -1
+    property bool _hold: false
+    onFrameSwapped: {
+        if (_warm > 0) {
+            if (--_warm > 0) { ql.update(); return; }
+            panel.visible = true;
+            _step = Tokens.reduceMotion ? -1 : 0;
+            _hold = true;
+            return;
+        }
+        if (_step < 0) return;
+        // the first panel frame never reached the screen in 10 of 10 mcap runs (superseded at once): draw 0.79 twice
+        if (_hold) { _hold = false; ql.update(); return; }
+        _step++;
+        const x = Math.min(1, _step * 1000 / Math.max(30, Screen.refreshRate || 60) / 250);
+        zoom.xScale = zoom.yScale = 0.79 + 0.21 * (1 - Math.pow(1 - x, 5));   // OutQuint
+        if (x >= 1) _step = -1;
+    }
+    function hideNow() { visible = false; cur = null; full = false; }
+    readonly property bool closing: closeAnim.running
+
+    // Where the selected item's icon is, in this window: Hyprland knows both windows' places (a Wayland client does
+    // not). Without it (other compositors) the panel shrinks in place.
+    property real _toScale: 0.1
+    function aimAtIcon() {
+        const r = finder && cur ? iconRect(cur.path) : null;
+        const wins = r ? Hypr.windows() : [];
+        const me = wins.find(w => w.title === ql.title);
+        const fw = wins.find(w => w.title !== ql.title && w.title === finder.title);
+        const cx = panel.x + panel.width / 2, cy = panel.y + panel.height / 2;
+        if (me && fw) {
+            closeX.to = fw.x + r.x + r.width / 2 - me.x - cx;
+            closeY.to = fw.y + r.y + r.height / 2 - me.y - cy;
+            _toScale = Math.max(r.width, r.height) / panel.width;
+        } else {
+            closeX.to = shift.x;
+            closeY.to = shift.y;
+            _toScale = 64 / panel.width;
+        }
+    }
     ParallelAnimation {
         id: closeAnim
-        NumberAnimation { target: zoom; properties: "xScale,yScale"; to: 64 / Math.max(64, root.width); duration: 180; easing.type: Easing.InOutQuad }
-        NumberAnimation { target: shift; property: "x"; to: root.closeTo.x - (root.x + root.width / 2); duration: 180; easing.type: Easing.InOutQuad }
-        NumberAnimation { target: shift; property: "y"; to: root.closeTo.y - (root.y + root.height / 2); duration: 180; easing.type: Easing.InOutQuad }
-        onFinished: root.cur = null
-    }
-
-    visible: open
-    radius: 16
-    color: Theme.color.previewPanel
-    border.width: 1
-    border.color: Theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0, 0, 0, 0.14)
-
-    // swallow clicks so they don't reach the views below
-    MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons; onWheel: wheel => wheel.accepted = true }
-
-    Item {
-        id: bar
-        width: parent.width
-        height: 44
-        Rectangle {
-            x: 12
-            anchors.verticalCenter: parent.verticalCenter
-            width: 26; height: 26; radius: 13
-            color: closeTap.pressed ? Theme.color.capsuleSelected : "transparent"
-            Symbol { anchors.centerIn: parent; name: "xmark"; size: 14; color: Theme.color.toolbarIcon }
-            TapHandler { id: closeTap; onTapped: root.closeRequested() }
-        }
-        TextLabel {
-            anchors.centerIn: parent
-            width: parent.width - 200
-            horizontalAlignment: Text.AlignHCenter
-            elide: Text.ElideMiddle
-            text: root.open ? root.cur.name : ""
-            color: Theme.color.label
-            size: Theme.font.preview
-            weight: Typography.semibold
-        }
-        Rectangle {
-            anchors.right: parent.right
-            anchors.rightMargin: 12
-            anchors.verticalCenter: parent.verticalCenter
-            width: openLabel.implicitWidth + 24; height: 26; radius: 13
-            color: openTap.pressed ? Theme.color.capsuleSelected : Theme.color.capsule
-            border.width: 1
-            border.color: Theme.color.capsuleBorder
-            Text {
-                id: openLabel
-                anchors.centerIn: parent
-                text: "Open"
-                color: Theme.color.label
-                font: Typography.font(Theme.font.preview)
-            }
-            TapHandler { id: openTap; onTapped: if (root.open) FileOps.open(root.cur.path) }
-        }
+        NumberAnimation { target: zoom; properties: "xScale,yScale"; to: ql._toScale; duration: 180; easing.type: Easing.InOutQuad }
+        NumberAnimation { id: closeX; target: shift; property: "x"; duration: 180; easing.type: Easing.InOutQuad }
+        NumberAnimation { id: closeY; target: shift; property: "y"; duration: 180; easing.type: Easing.InOutQuad }
+        onFinished: ql.hideNow()
     }
 
     Item {
-        anchors.fill: parent
-        anchors.topMargin: bar.height
-        anchors.margins: 12
-        clip: true
+        id: panel
+        x: Math.round((ql.width - width) / 2)
+        y: Math.round((ql.height - height) / 2)
+        width: ql.panelW
+        height: ql.panelH
+        transform: [
+            Scale { id: zoom; origin.x: panel.width / 2; origin.y: panel.height / 2 },
+            Translate { id: shift }
+        ]
 
-        Image {
-            anchors.fill: parent
-            visible: root.isImage
-            source: root.isImage ? Files.fileUrl(root.cur.path) : ""
-            fillMode: Image.PreserveAspectFit
-            asynchronous: true
-            sourceSize: Qt.size(width * 2, height * 2)
-        }
-
-        ScrollView {
-            id: textScroll
-            anchors.fill: parent
-            visible: root.isText
-            Component.onCompleted: contentItem.boundsBehavior = Flickable.StopAtBounds   // the wheel stops at the edge
-            TextArea {
-                readOnly: true
-                text: root.text
-                wrapMode: TextEdit.Wrap
-                color: Theme.color.label
-                font.family: Theme.fontMono
-                font.pixelSize: 12
-                background: Rectangle { color: Theme.color.window; radius: 8 }
-                padding: 12
+        // window shadow: Hyprland's falloff a (1 - d / 52)^4 outside the box, y 12, black a .281 light / .494 dark
+        // (config/hypr/hyprland.lua, the Q-windows-01 fit): the box itself, then one 1 pt ring per point of distance
+        // (rings, not stacked fills, so each pixel is drawn about once)
+        Item {
+            visible: !ql.full
+            readonly property real a: Tokens.dark ? 0.494 : 0.281
+            y: 12
+            width: panel.width
+            height: panel.height
+            Rectangle { anchors.fill: parent; radius: 20; color: Qt.rgba(0, 0, 0, parent.a) }
+            Repeater {
+                model: 52
+                Rectangle {
+                    required property int index
+                    x: -index - 1; y: -index - 1
+                    width: panel.width + 2 * index + 2; height: panel.height + 2 * index + 2
+                    radius: 21 + index
+                    color: "transparent"
+                    border.width: 1
+                    border.color: Qt.rgba(0, 0, 0, parent.a * Math.pow(1 - (index + 0.5) / 52, 4))
+                }
             }
         }
-        RubberBand { flickable: root.isText ? textScroll.contentItem : null }   // trackpad stretch at the ends
 
-        Column {
-            visible: root.open && !root.isImage && !root.isText
-            anchors.centerIn: parent
-            spacing: 10
-            FileIcon {
-                anchors.horizontalCenter: parent.horizontalCenter
-                entry: root.cur || ({ name: "", isDir: false, mime: "" })
-                size: 160
+        Rectangle {
+            id: frame
+            anchors.fill: parent
+            radius: ql.full ? 0 : 20
+            color: Theme.color.quickLookFrame
+        }
+
+        Item {
+            id: bar
+            width: parent.width
+            height: ql.barH
+
+            // close and full-screen: dark 12 pt discs with the glyph cut out in the frame colour (crop: ink 12-23.5 pt)
+            Rectangle {
+                x: 12; y: 13; width: 12; height: 12; radius: 6
+                color: Theme.color.quickLookInk
+                Rectangle { anchors.centerIn: parent; width: 6.5; height: 1.6; radius: 0.8; rotation: 45; color: frame.color }
+                Rectangle { anchors.centerIn: parent; width: 6.5; height: 1.6; radius: 0.8; rotation: -45; color: frame.color }
+                TapHandler { margin: 1; onTapped: ql.closeRequested() }
+            }
+            Rectangle {
+                x: 32; y: 13; width: 12; height: 12; radius: 6
+                color: Theme.color.quickLookInk
+                Rectangle { anchors.centerIn: parent; width: 7.5; height: 2.6; rotation: -45; color: frame.color }
+                TapHandler { margin: 1; onTapped: ql.full = !ql.full }
             }
             TextLabel {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: root.open ? root.cur.name : ""
-                color: Theme.color.label
-                size: 17
-                weight: Typography.semibold
+                id: titleText
+                x: 52
+                anchors.verticalCenter: parent.verticalCenter
+                width: Math.max(0, (ql.isImage ? markupBtn.x : shareBtn.x) - x - 16)
+                elide: Text.ElideMiddle
+                text: ql.cur ? ql.cur.name : ""
+                color: Theme.color.quickLookText
+                size: 13
+                weight: Typography.bold
             }
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: root.open ? root.cur.kind + " – " + Files.formatSize(root.cur.size, root.cur.isDir) : ""
-                color: Theme.color.secondaryLabel
-                font: Typography.font(Theme.font.preview)
+            // glyph centres left of the capsule (Preview: capsule at W - 144): Share 25, Rotate 64, Markup 105
+            QuickLookButton { id: markupBtn; x: capsule.x - 105 - 17; icon: "markup"; iconSize: 16; enabled: false; visible: ql.isImage }
+            QuickLookButton { x: capsule.x - 64 - 17; icon: "rotate.left"; iconSize: 18; visible: ql.isImage; onClicked: ql.turns = (ql.turns + 3) % 4 }
+            QuickLookButton { id: shareBtn; x: capsule.x - 25 - 17; icon: "square.and.arrow.up"; iconSize: 18; onClicked: if (ql.cur) FileOps.open(ql.cur.path) }
+            Rectangle {
+                id: capsule
+                anchors.right: parent.right
+                anchors.rightMargin: 7
+                y: 6
+                width: openLabel.implicitWidth + 26; height: 26; radius: 13
+                color: Qt.rgba(0, 0, 0, openTap.pressed ? 0.2 : 0.125)   // 119 on the 136 frame
+                Text {
+                    id: openLabel
+                    anchors.centerIn: parent
+                    text: ql.appName ? "Open with " + ql.appName : "Open"
+                    color: Theme.color.quickLookText
+                    font: Typography.font(13)
+                }
+                TapHandler { id: openTap; onTapped: if (ql.cur) FileOps.open(ql.cur.path) }
             }
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: root.open ? "Modified " + Files.formatDate(root.cur.modified) : ""
-                color: Theme.color.secondaryLabel
-                font: Typography.font(Theme.font.preview)
+        }
+
+        Item {
+            id: content
+            x: ql.inset
+            y: ql.barH
+            width: parent.width - 2 * ql.inset
+            height: parent.height - ql.barH - ql.inset
+            clip: true
+
+            Image {
+                id: img
+                anchors.centerIn: parent
+                width: ql.turns % 2 ? parent.height : parent.width
+                height: ql.turns % 2 ? parent.width : parent.height
+                rotation: -90 * ql.turns
+                visible: ql.isImage
+                // loaded before the first frame, so the panel opens with its picture and at its size
+                asynchronous: false
+                source: ql.isImage ? Files.fileUrl(ql.cur.path) : ""
+                fillMode: Image.PreserveAspectFit
+                sourceSize: Qt.size(Screen.width * 2, Screen.height * 2)
+            }
+
+            ScrollView {
+                id: textScroll
+                anchors.fill: parent
+                visible: ql.isText
+                Component.onCompleted: contentItem.boundsBehavior = Flickable.StopAtBounds   // the wheel stops at the edge
+                TextArea {
+                    readOnly: true
+                    text: ql.text
+                    wrapMode: TextEdit.Wrap
+                    color: Theme.color.label
+                    font.family: Theme.fontMono
+                    font.pixelSize: 12
+                    background: Rectangle { color: Theme.color.window; radius: 15 }   // concentric with the 20 pt frame
+                    padding: 12
+                }
+            }
+            RubberBand { flickable: ql.isText ? textScroll.contentItem : null }   // trackpad stretch at the ends
+
+            // rounded content corners (crop: the picture's corner curve spans about 12 pt; 15 = concentric with the
+            // 20 pt frame at the 5 pt inset), drawn as frame-coloured corner pieces instead of a mask layer
+            Repeater {
+                model: ql.full ? 0 : 4
+                Shape {
+                    required property int index
+                    readonly property real r: 15
+                    width: r; height: r
+                    x: index % 2 ? content.width - r : 0
+                    y: index > 1 ? content.height - r : 0
+                    z: 2
+                    rotation: [0, 90, 270, 180][index]
+                    preferredRendererType: Shape.CurveRenderer
+                    ShapePath {
+                        strokeWidth: -1
+                        fillColor: frame.color
+                        startX: 0; startY: 0
+                        PathLine { x: 15; y: 0 }
+                        PathArc { x: 0; y: 15; radiusX: 15; radiusY: 15; direction: PathArc.Counterclockwise }
+                        PathLine { x: 0; y: 0 }
+                    }
+                }
+            }
+
+            Column {
+                visible: ql.cur !== null && !ql.isImage && !ql.isText
+                anchors.centerIn: parent
+                spacing: 10
+                FileIcon {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    entry: ql.cur || ({ name: "", isDir: false, mime: "" })
+                    size: 160
+                }
+                TextLabel {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: ql.cur ? ql.cur.name : ""
+                    color: Theme.color.quickLookText
+                    size: 17
+                    weight: Typography.semibold
+                }
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: ql.cur ? ql.cur.kind + " – " + Files.formatSize(ql.cur.size, ql.cur.isDir) : ""
+                    color: Theme.color.quickLookInk
+                    font: Typography.font(Theme.font.preview)
+                }
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: ql.cur ? "Modified " + Files.formatDate(ql.cur.modified) : ""
+                    color: Theme.color.quickLookInk
+                    font: Typography.font(Theme.font.preview)
+                }
             }
         }
     }

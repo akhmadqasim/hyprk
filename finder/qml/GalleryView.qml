@@ -13,6 +13,7 @@ Item {
     readonly property int columns: 1
 
     function ensureVisible(i) { strip.positionViewAtIndex(i, ListView.Contain); }
+    function iconItem(i) { const t = strip.itemAtIndex(i); return t ? t.iconItem : null; }
 
     readonly property var focused: {
         const i = browser.cursor >= 0 ? browser.cursor : 0;
@@ -80,7 +81,9 @@ Item {
                 visible: thumb.selected
                 color: Theme.color.galleryPlate
             }
+            readonly property Item iconItem: thumbIcon
             FileIcon {
+                id: thumbIcon
                 anchors.centerIn: parent
                 entry: thumb.modelData
                 size: Theme.gallery.thumb

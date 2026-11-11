@@ -1,6 +1,7 @@
 import QtQuick
 import HyprK
 import QtQuick.Controls.Basic
+import Finder.Native
 
 // Finder menu (context menus, Group and Action pull-downs): rows 24, padding 5, r 12, the accent highlight inset
 // 5 with r 7 and white text, moving in one frame; text at x 16, or 28 when an item has a checkmark; closes with a
@@ -9,8 +10,14 @@ import QtQuick.Controls.Basic
 // { tagRow: true, action(tagName) } for Finder's row of tag color dots. icon: a leading SF Symbol (the 27.2.1
 // context menu: icon centre x 23, its row's text x 39 instead of 16; context-menu-*-light.png); submenu: items of
 // a menu that opens to the right while the row is hovered, the row showing a chevron.
+// A popup surface of its own (xdg_popup), as the Mac's NSPopupMenuWindow: it may leave the Finder window, and the
+// compositor's popup grab closes it on a click anywhere outside (an in-window popup only saw clicks inside Finder).
+// The live menu is "menu" glass (Q-menubar-13); where Hyprland blurs behind popups (decoration.blur.popups) the fill is
+// the translucent tint that glass measures to over flat backdrops, else the opaque shared menu fill.
 Popup {
     id: root
+    popupType: Popup.Window
+    readonly property bool blurred: Hypr.option("decoration:blur:popups", 0) === 1
 
     property var items: []
     signal chose()   // a row ran its action (a submenu closes its parent through this)
@@ -42,7 +49,7 @@ Popup {
 
     background: Rectangle {
         radius: Tokens.control.menuRadius
-        color: Tokens.control.menuFill
+        color: root.blurred ? Theme.color.menuGlassFill : Tokens.control.menuFill
         border.width: 1
         border.color: Tokens.control.menuStroke
     }

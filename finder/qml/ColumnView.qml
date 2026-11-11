@@ -21,6 +21,12 @@ Item {
         if (current && current.list) current.list.positionViewAtIndex(i, ListView.Contain);
     }
 
+    function iconItem(i) {
+        const current = strip.itemAtIndex(root.dirs.length - 1);
+        const row = current && current.list ? current.list.itemAtIndex(i) : null;
+        return row ? row.iconItem : null;
+    }
+
     readonly property string home: FileOps.homePath()
     readonly property var dirs: {
         const p = browser.path;
@@ -99,7 +105,9 @@ Item {
                         radius: Theme.list.rowRadius
                         color: row.accent ? Theme.color.listSelection : Theme.color.listSelectionInactive
                     }
+                    readonly property Item iconItem: colIcon
                     FileIcon {
+                        id: colIcon
                         x: Theme.columns.iconX
                         anchors.verticalCenter: parent.verticalCenter
                         entry: row.modelData

@@ -127,9 +127,11 @@ QtObject {
         // hover / pressed inner capsule: 242 on 252 (Search 236) | (87,89,96) on (67,69,77) (Q-finder-10)
         readonly property color toolbarHover: theme.dark ? Qt.rgba(1, 1, 1, 0.106) : Qt.rgba(0, 0, 0, 0.04)
         readonly property color searchHover: theme.dark ? Qt.rgba(1, 1, 1, 0.106) : Qt.rgba(0, 0, 0, 0.064)
-        // Quick Look's Open button (not a toolbar platter)
-        readonly property color capsule: theme.dark ? Qt.rgba(1, 1, 1, 0.08) : "#FAFAFA"
-        readonly property color capsuleBorder: theme.dark ? Qt.rgba(1, 1, 1, 0.12) : Qt.rgba(0, 0, 0, 0.07)
+        // Quick Look panel (live/finder/crops/quicklook-titlebar-light.png, 2x): frame 136 (134-138 top to bottom), discs
+        // and button glyphs 6-8, title and "Open with" text 36-41 at the stroke cores. Dark: not measured, so the same
+        readonly property color quickLookFrame: "#888888"
+        readonly property color quickLookInk: "#070707"
+        readonly property color quickLookText: "#282828"
         readonly property color toolbarSeparator: Tokens.toolbar.separator
         // glyphs: light 0, inactive 164 (Q-finder-29); dark not measured
         readonly property color toolbarIcon: theme.dark ? Qt.rgba(1, 1, 1, 0.85) : theme.active ? "#000000" : "#A4A4A4"
@@ -166,7 +168,10 @@ QtObject {
         readonly property color folderFront: "#71B9E4"   // ref (113,185,228)
         readonly property color folderTop: "#81C6EE"     // ref (129,198,238)
 
-        readonly property color previewPanel: theme.dark ? Qt.rgba(0.15, 0.15, 0.16, 0.97) : Qt.rgba(0.97, 0.97, 0.97, 0.98)
+        // context menu over Hyprland's popup blur: the 27.2.1 menu glass's empty-area pixel over flat backdrops
+        // (MAC-ANSWERS.md Q-menubar-13: light over white 251,252,255 / over black 137,137,138; dark 120,120,121 /
+        // 33,34,44) solved per channel for fill c and alpha a (over black c a, over white c a + 255 (1 - a))
+        readonly property color menuGlassFill: theme.dark ? Qt.rgba(50 / 255, 51 / 255, 63 / 255, 0.67) : Qt.rgba(248 / 255, 250 / 255, 1, 0.55)
         readonly property color fieldBg: theme.dark ? Qt.rgba(1, 1, 1, 0.08) : "#FFFFFF"
         // rename field ring: 3 pt accent a.5 outside, 0.5 pt darker inner edge (114,158,244) (Q-finder-27)
         readonly property color focusRing: Accent.focusRing

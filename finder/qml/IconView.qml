@@ -27,6 +27,8 @@ GridView {
     highlightFollowsCurrentItem: false
 
     function ensureVisible(i) { positionViewAtIndex(i, GridView.Contain); }
+    // the icon of entry i, when its delegate exists (Quick Look closes into it)
+    function iconItem(i) { const c = itemAtIndex(i); return c ? c.iconItem : null; }
 
     OverlayScrollbar {
         parent: grid
@@ -90,6 +92,7 @@ GridView {
         readonly property bool renaming: grid.browser.renamingPath === modelData.path
         width: grid.cellWidth
         height: grid.cellHeight
+        readonly property Item iconItem: icon
 
         Rectangle {   // selection plate 72 x 72, r 7; also the folder drop target (Q-finder-13, -28)
             anchors.centerIn: icon

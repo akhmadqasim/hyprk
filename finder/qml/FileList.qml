@@ -15,6 +15,7 @@ Item {
     readonly property int columns: 1
 
     function ensureVisible(i) { list.positionViewAtIndex(i, ListView.Contain); }
+    function iconItem(i) { const r = list.itemAtIndex(i); return r ? r.iconItem : null; }
 
     readonly property var widths: Files.listColumns(width, Theme.list.sidePad, Theme.list.dateWidth, Theme.list.sizeWidth, Theme.list.kindWidth)
     readonly property var cols: [
@@ -133,6 +134,7 @@ Item {
             width: list.width
             height: Theme.list.rowHeight
             radius: Theme.list.rowRadius
+            readonly property Item iconItem: rowIcon
             color: selected ? Theme.color.listSelection : index % 2 ? Theme.color.listAlternate : "transparent"
 
             Item {
@@ -156,6 +158,7 @@ Item {
                     TapHandler { onTapped: root.browser.setExpanded(row.modelData, !parent.open) }
                 }
                 FileIcon {
+                    id: rowIcon
                     x: parent.indent + Theme.list.iconX
                     anchors.verticalCenter: parent.verticalCenter
                     entry: row.modelData

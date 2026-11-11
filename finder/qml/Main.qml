@@ -22,9 +22,6 @@ Window {
     property string view: ["icons", "list", "columns", "gallery"].indexOf(startup.view) !== -1 ? startup.view : "icons"
     property bool showPathBar: startup.pathBar
     property var quickLookEntry: null
-    // last left press in the window (Quick Look closes into the item there); a passive PointHandler sees every press
-    property point lastPress: Qt.point(width / 2, height / 2)
-    PointHandler { acceptedButtons: Qt.LeftButton | Qt.RightButton; onActiveChanged: if (active) win.lastPress = point.scenePosition }
     // a zoomed (maximized) window keeps its corners and rims on macOS; only full screen drops them. (Hyprland
     // also reports a floating window as maximized to Qt.)
     readonly property bool fullScreen: visibility === Window.FullScreen
@@ -208,7 +205,7 @@ Window {
             if (fm.selectedCount === 1 && !fm.isVirtual) fm.renamingPath = fm.selectedPaths()[0];
             break;
         case Qt.Key_Delete: fm.trashSelection(); break;
-        case Qt.Key_Backspace: if (ctrl) fm.trashSelection(); break;
+        case Qt.Key_Backspace: if (ctrl && !shift && !alt) fm.trashSelection(); break;
         case Qt.Key_Left:
             if (alt) fm.back();
             else if (view === "columns") fm.up();
@@ -275,6 +272,12 @@ Window {
     Shortcut { sequence: "Ctrl+Alt+P"; onActivated: win.showPathBar = !win.showPathBar }
     Shortcut { sequence: "Ctrl+W"; onActivated: win.close() }
     Shortcut { sequence: "Ctrl+Y"; onActivated: win.quickLook() }
+    // Finder > Empty Trash… ⇧⌘⌫, and Empty Trash ⌥⇧⌘⌫ without the question (Q-menubar-31); the alert's words are
+    // the shell's (shell/services/Apps.qml confirmEmptyTrash)
+    Shortcut { sequence: "Ctrl+Shift+Backspace"; onActivated: alert.ask("Are you sure you want to permanently erase the items in the Trash?",
+                                                                        "You can\u2019t undo this action.",
+                                                                        [{ text: "Empty Trash", action: () => FileOps.emptyTrash() }, { text: "Cancel", cancel: true }]) }
+    Shortcut { sequence: "Ctrl+Alt+Shift+Backspace"; onActivated: FileOps.emptyTrash() }
 
     // ---------- menus ----------
     PopupMenu { id: menu }
@@ -283,10 +286,12 @@ Window {
         const p = anchor.mapToItem(null, 0, anchor.height + 6);
         showMenu(items, p.x, p.y);
     }
+    // the menu is its own popup surface: it opens at the pointer and may leave the window; the compositor keeps it on
+    // the screen (xdg_positioner slide / flip)
     function showMenu(items, x, y) {
         menu.items = items;
-        menu.x = Math.min(x, win.width - menu.width - 8);
-        menu.y = Math.min(y, win.height - menu.implicitHeight - 8);
+        menu.x = x;
+        menu.y = y;
         menu.open();
     }
     // one item: inline; several: the Rename Finder Items sheet
@@ -299,7 +304,7 @@ Window {
     // with its leading symbols and submenus; Finder shows no shortcuts in context menus. Rows hyprk cannot do are
     // left out where a Mac without the feature has none (Ask Siri: Siri off; Open in New Tab: no tabs; Customise
     // Folder…, Clean Up, Clean Up By, Show View Options, Use Groups) or shown disabled where the Mac always has the
-    // row (Share…, Quick Actions ▸ Customise…, Services ▸ No Services Apply). The tag dots follow Share….
+    // row (Quick Actions ▸ Customise…, Services ▸ No Services Apply). The tag dots follow Share….
     function contextMenu(entry, pos) {
         const sel = fm.selectedEntries();
         const n = sel.length;
@@ -307,7 +312,8 @@ Window {
         const writable = !fm.isVirtual;
         const one = n === 1 ? sel[0] : null;
         const tail = [
-            { text: "Share…", icon: "square.and.arrow.up", enabled: false },
+            // no share sheet on Linux: Share… does what the toolbar's Share does (FALLBACKS.md)
+            { text: "Share…", icon: "square.and.arrow.up", action: () => fm.openSelection() },
             { separator: true },
             { tagRow: true, action: tag => fm.toggleTag(tag) },
             { separator: true },
@@ -381,12 +387,15 @@ Window {
 
     // ---------- overlays ----------
     InfoPopover { id: info; anchors.fill: parent; onClosed: keys.forceActiveFocus() }
+    // Quick Look: a window of its own (QuickLook.qml); it closes into the item's icon in the current view
     QuickLook {
-        width: Math.min(parent.width - 80, 760)
-        height: Math.min(parent.height - 80, 560)
-        anchors.centerIn: parent
         entry: win.quickLookEntry
-        closeTo: win.lastPress
+        finder: win
+        iconRect: path => {
+            const i = fm.entries.findIndex(e => e.path === path);
+            const icon = i >= 0 && viewLoader.item && viewLoader.item.iconItem ? viewLoader.item.iconItem(i) : null;
+            return icon && icon.visible ? icon.mapToItem(null, 0, 0, icon.width, icon.height) : null;
+        }
         onCloseRequested: win.quickLookEntry = null
     }
 
