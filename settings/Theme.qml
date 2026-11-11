@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import "HyprK"
+import "HyprK/chameleon.js" as Ch
 
 // Every metric and color of the Settings app lives here, as a layer over the shared HyprK Tokens
 // (ui/HyprK): it feeds Tokens this app's appearance and keeps only what is Settings' own.
@@ -25,6 +26,10 @@ QtObject {
     // (measured on 27.2.1). Under Multicolor each app uses its own accent; System Settings has none
     // (accent-colors.json multicolor.appsWithoutAccentKey), so it is Blue #007AFF.
     property string accentName: "multicolor"
+    // sidebar chameleon tint (MAC-ANSWERS.md C3.1): the wallpaper's mean colour (SettingsApp's WallpaperTint), on
+    // while Appearance > "Tint window background with wallpaper color" is on (AppState)
+    property var chameleon: null
+    property bool tintWindow: true
     readonly property color accent: Accent.color
 
     Component.onCompleted: {
@@ -114,7 +119,11 @@ QtObject {
         // transparency) it is flat.
         // 27.2.1 sampled over Tahoe: #ECEDEE light, #232634 dark (Q-settings-01); window not key: flat #F2F2F2 / #24262B
         readonly property color _rgb: !theme.windowActive ? (theme.dark ? "#24262B" : "#F2F2F2") : (theme.dark ? "#232634" : "#ECEDEE")
-        readonly property color fill: theme.translucent && theme.windowActive ? Qt.alpha(_rgb, 0.88) : _rgb
+        // key window: + the chameleon layer (10 % dark / 5 % light colour blend of the wallpaper mean); the Mac's
+        // inactive sidebar is flat, so none there
+        readonly property var _ch: theme.windowActive && theme.tintWindow ? Ch.apply(_rgb, theme.chameleon, theme.dark) : null
+        readonly property color _tinted: _ch ? Qt.rgba(_ch.r, _ch.g, _ch.b, 1) : _rgb
+        readonly property color fill: theme.translucent && theme.windowActive ? Qt.alpha(_tinted, 0.88) : _tinted
         // 0.5 pt divider on the right: #D3D4D5 / #3F424D
         readonly property real strokeWidth: 0.5
         readonly property color stroke: theme.increaseContrast ? (theme.dark ? Qt.rgba(1, 1, 1, 0.4) : Qt.rgba(0, 0, 0, 0.4))

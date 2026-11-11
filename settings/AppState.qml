@@ -57,6 +57,7 @@ QtObject {
         Theme.reduceMotion = appearance.reduceMotion === true;
         Theme.sidebar.size = appearance.sidebarIconSize;
         Theme.accentName = appearance.accent;
+        Theme.tintWindow = appearance.tintWindowBackground;
     }
 
     Component.onCompleted: {

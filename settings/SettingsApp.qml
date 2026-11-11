@@ -6,6 +6,11 @@ import "Panes.js" as Panes
 // The whole System Settings UI. Hosts (main.qml for `qml`, shell.qml for
 // Quickshell) give it a window and handle the window signals.
 Item {
+    // wallpaper mean for the sidebar chameleon tint (computed once per wallpaper)
+    WallpaperTint {
+        path: AppState.wallpaperImage || Backend.root + "/themes/wallpapers/png/DefaultAerial.png"
+        onTintChanged: Theme.chameleon = tint
+    }
     id: app
     // the account row, the Family row and the group break after them (27.2.1: the first pane row's top at y 188,
     // 90 below the list top; *-light.png have both rows blanked flat, so the Family row's look is not measured)
