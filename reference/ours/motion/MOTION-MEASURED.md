@@ -683,3 +683,41 @@ under 1). Per-frame series in the CSV (`*-s17-*`).
 
 Not done: the 4-window exit (needs the Mac's 4-window recording), the article scroll physics in the preview (the
 recording shows output only, not the trackpad input), banner in's repeated first value.
+
+## Session 18 (2026-11-12): Mission Control without the hold, toolbar press, unlock, banner in, appearance hold
+
+Own headless sessions (MBA 2560x1664), scratch copy of the tree, private D-Bus, scratch HOME, fresh sessions (E scale 2
+light, 32 mcap runs; F scale 1.6 light, 33; G scale 2, about 40 trials; H scale 2 with the PAM test double, 21; B scale 2
+dark, recording comparisons), quiet host (load under 1). Per-frame series in the CSV (`mission-*-s18-*`). Metric:
+`alpha` over the whole output at `-k 4`, `mcap.py compare` against the R2 series; "first" = the trigger to the first frame
+over .01.
+
+| Motion | Mac | Before | After | Runs |
+|---|---|---|---|---|
+| Mission Control enter, Settings 740 x 625, scale 2 light (3850098) | R2 enter, 333 ms | judge #6: a .24 hold for 4-5 frames, flight from +138-150 ms | flight from +100-105 ms (2 frames after the layer maps), .11 .23 .32 .40 .49 .55, 300-319 ms, rms .016-.023, time rms 6.4-8.4 ms; one value skipped in 1 of 8 | 8 |
+| Same, exit | R2 exit (.21 .34 .47 ...) | judge #6: .59 first frame, 183-200 ms (not reproduced here) | .26 .40 .53 .64 .70 .75, 236-252 ms, rms .010-.012, time rms 2.9-3.6 ms | 8 |
+| Settings + 3 terminals (one partly off-screen), scale 2, enter | R2 | judge #6: 331-352 ms; session A before 3850098: .013 then -.00 for 4 frames, flight at +151 | .01 at +67-71 (layer map), flight from +117-121 (+104 in 1 of 8), 317-337 ms, rms .027-.041 | 8 |
+| Same, exit | R2 | judge #6: first frame .51, 200-300 ms | .20 .39 .56 .70 .79 .85, 186-203 ms, rms .062-.075 (front-loaded; see below) | 8 |
+| 1 window (fits, no flight), scale 1.6 | R2 | judge #6: enter .14 hold, exit .70 first | enter .41 .45 .50 .56 (first frame = the cover's hand-over: the thumbnail differs from the window by 0.6 levels mean over the window, the only change besides the bars), 333-335 ms, rms .057; exit .55 .72 .79, 202-219 ms, rms .113-.115 | 8 |
+| 4 windows, scale 1.6 | R2 | - | enter .03 .10 .31 .41 .52, 317-336 ms, rms .039-.064; exit .20 .38 .55 .67, 183-203 ms, rms .051-.078, 3 of 8 with a skipped value | 8 |
+| Toolbar press (preview share button, dark, `ToolbarHighlight`) (d607ae2) | 23.09.23 frames 196-205 | rms about .035 | .22 .63 .81 .89 .94 .98 .99 1, rms .007 | 2 |
+| Toolbar release | frames 251-285 | about 2 frames behind (our capsule clipped at 255) | rms .010, time rms 4.3 ms, 533 vs 550 ms | 2 |
+| Unlock (Return with the test double), per region from the clock's first changed frame | B3: clock 95 % ~+219, Dock 95 % ~+222, bar 20 % ~+163, 95 % ~+250, wallpaper 50 % ~+140 | judge #6: about one frame early | clock 95 % +233, Dock +233, bar 20 % +151, 95 % +250, wallpaper 50 % +151 (first change +89-90 ms after Return), 3 of 3 the same: within a frame either side, no change made | 3 |
+| Banner in (`notifs test`, 390 x 110 pt box) | - | session 15 / judge #6: the first value twice in 4 of 6 | .02 .07 .13 .21 .29 .39 .47 .54 in 6 of 6 (FrameClock as committed), and 6 of 6 with the FrameClock before 3850098 (start +148-196 there, +149-151 now): not reproduced | 12 |
+| Appearance switch, shortcut, Settings open, scale 2 | AppKit: hold until the apps answer (at most 0.5 s), then 0.5 s | judge #6: 1 of 20 with a 690 ms hold, the pane 5 frames behind | `hyprctl liquidglass fade`: 20 of 20 hold + fade 0.634-0.651 s; per region (pane, menu bar, wallpaper): 10 of 10 start together at +171-204 ms, spread .002: not reproduced | 30 |
+
+Mission Control, the hold: after the window captures (+28-40 ms from `present()`) the flight waited two more frames:
+FrameClock held the first two frames of every window shown less than 150 ms before (a new layer is presented from about
+its third buffer), and Mission Control's layer had already swapped those while it waited for its captures (`MCDBG` trace:
+the go at +33 ms, then two swaps at e = 0). FrameClock now counts the frames a window swapped since it was shown and holds
+only the rest. With windows that have the plugin's title bar the still of the screen was asked only after the
+compositor's reply (+47 ms): it is now asked at open. Left: with 4 windows the reply to the batch request comes 16 ms
+after the last capture (+44 ms, the compositor busy with 5 screencopies), so the flight starts 3 frames after the layer
+maps.
+
+Mission Control exit with 4 windows: our share metric runs ahead of R2's (.20 .39 .56 against .21 .34 .47). Tried (2 runs
+each, scale 2): the flight on its own spring with `e` kept for the menu bar strip and the Spaces bar, exit response /
+kick 0.25 / 0 rms .055-.059, 0.30 / 0 .034-.050, 0.30 / 5 .035, 0.35 / 5 .016-.017; enter 0.28 instead of 0.33 .053
+(worse). 0.35 / 5 breaks the single window (its window moves a few points into the layout at 2x: rms .009-.011 ->
+.040-.048), and the decoded ExposeSpringResponse is 0.25 for both; no single spring fits both cases, so nothing was
+changed: R2's window count is not recorded and the Mac's 4-window recording decides it.
