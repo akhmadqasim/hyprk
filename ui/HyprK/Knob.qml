@@ -5,9 +5,11 @@ import QtQuick.Effects
 // radius 12 y 3, black a.10 radius 2 y 1). Not glass at rest. While pressed (`lift` 0 .. 1) it grows by `grow`
 // around its centre and cross-fades into a clear lens: the white fill's opacity is 1 - lift (Mac: 0.51 at half
 // growth, "SDF layer opacity = growth progress"). With `lensSource` set (the track, an item at 0,0 of the knob's
-// parent) the lens is a LensGlass that bends the track in near its rim (switch-press-strip-light.png; Tokens
-// lensBand / lensAmount / lensOutline) over `lensBackdrop`; without it a light rim with a thin dark outline fades
-// in and the track shows through unbent.
+// parent) the lens is a LensGlass that magnifies the track next to its rim, lights it and outlines it (Tokens
+// knobLens*: the Mac's pressed-knob glass filter and the 2026-11-11 recording) over `lensBackdrop`, with a shadow
+// 8 pt under it; without it a light rim with a thin dark outline fades in and the track shows through unbent.
+// One knob for every slider and switch (Settings, Finder, Control Center); the sizes are the caller's: restW x restH
+// at rest, liftW x liftH fully pressed (default x grow).
 // Reduce Motion: no growth. Reduce Transparency: the fill stays white.
 // Place it with cx / cy (its centre in the parent).
 Item {
@@ -15,6 +17,8 @@ Item {
     property real restW: 20
     property real restH: 16
     property real grow: Tokens.motion.switchLift
+    property real liftW: restW * grow
+    property real liftH: restH * grow
     property real lift: 0
     property bool reduceMotion: Tokens.reduceMotion
     property real cx: 0
@@ -22,11 +26,11 @@ Item {
     property Item lensSource: null
     property color lensBackdrop: Tokens.control.lensBackdrop
 
-    readonly property real _s: 1 + (grow - 1) * (reduceMotion ? 0 : lift)
+    readonly property real _l: reduceMotion ? 0 : lift
     readonly property real _fill: Tokens.reduceTransparency ? 1 : Math.min(1, 1 - lift)
     readonly property bool _lens: lensSource !== null && lift > 0 && _fill < 1
-    width: restW * _s
-    height: restH * _s
+    width: restW + (liftW - restW) * _l
+    height: restH + (liftH - restH) * _l
     x: cx - width / 2
     y: cy - height / 2
 
@@ -41,16 +45,37 @@ Item {
         blur: 2; offset.y: 1
         color: Qt.alpha(Tokens.control.knobShadow, Tokens.control.knobShadow.a * (1 - 0.7 * k.lift))
     }
+    RectangularShadow {   // the lens's shadow (Tokens.control.knobLensShadow*)
+        visible: k._lens
+        anchors.fill: body; radius: body.radius
+        blur: Tokens.control.knobLensShadowBlur; spread: Tokens.control.knobLensShadowSpread
+        offset.y: Tokens.control.knobLensShadowY
+        color: Qt.alpha(Tokens.control.knobLensShadow, Tokens.control.knobLensShadow.a * Math.max(0, Math.min(1, k.lift)))
+    }
+    // the rim line lies outside the lens's own shape (MAC-ANSWERS rim model; the recording: the face is 25 x 20,
+    // the dark line 1 pt outside it), so the glass is drawn that much larger
     Loader {
         anchors.fill: parent
+        anchors.margins: -Tokens.control.knobLensOutlineWidth
         active: k._lens
         sourceComponent: LensGlass {
             source: k.lensSource
-            origin: Qt.point(k.x, k.y)
+            origin: Qt.point(k.x - Tokens.control.knobLensOutlineWidth, k.y - Tokens.control.knobLensOutlineWidth)
             opacity: Math.min(1, k.lift)
-            band: Math.min(k.width, k.height) * Tokens.control.lensBand
-            amount: Math.min(k.width, k.height) * Tokens.control.lensAmount
-            outline: Tokens.control.lensOutline
+            band: Math.min(k.width, k.height) * Tokens.control.knobLensBand
+            amount: Math.min(k.width, k.height) * Tokens.control.knobLensAmount
+            gain: Tokens.control.knobLensGain
+            haze: Tokens.control.knobLensHaze
+            diffuseTop: Tokens.control.knobLensDiffuseTop
+            diffuseTopDepth: Tokens.control.knobLensDiffuseTopDepth
+            diffuseBottom: Tokens.control.knobLensDiffuseBottom
+            diffuseBottomDepth: Tokens.control.knobLensDiffuseBottomDepth
+            keyTop: Tokens.control.knobLensKeyTop
+            keyBottom: Tokens.control.knobLensKeyBottom
+            keyEnds: Tokens.control.knobLensKeyEnds
+            keyFalloff: Tokens.control.knobLensKeyFalloff
+            outline: Tokens.control.knobLensOutline
+            outlineWidth: Tokens.control.knobLensOutlineWidth
             backdrop: k.lensBackdrop
         }
     }

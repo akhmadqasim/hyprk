@@ -91,6 +91,46 @@ QtObject {
         readonly property real lensOutline: 0.4
         // what the lens shows outside the track: the Settings card (Q-settings-11: #F7F7F7 / #25262B)
         readonly property color lensBackdrop: t.dark ? "#25262B" : "#F7F7F7"
+        // the pressed knob's lens (Knob; Slider, Switch and Control Center share it). Refraction: the glassBackground
+        // filter of the pressed knob (live/controls/controls-press-light.json pressedKnobGlassFilter, a 50 x 31 lens:
+        // inputInnerRefractionHeight 3.1 = 0.1 D, inputInnerRefractionAmount -4.65 = -0.15 D, D = the lens height):
+        // the content is magnified next to the rim (Mac recording 2026-11-11 23.09.23, Settings > Appearance, dark,
+        // knob held still, frames 2678-2693: the fill reads 20 px tall 1.5 pt inside the round end against 14 px
+        // outside, the tick under the track is stretched to 3 pt at the bottom rim).
+        // Light, fitted on the same frames over the card (32), the grey track (49.5) and the fill (45,124,255) as
+        // sample x gain, then white mixed in: gain .85; the face reads 50 2-4 pt under the top, 57 on the track at the
+        // middle, 40-46 1-4 pt over the bottom and 47 just over the bottom key light -> white .05 everywhere, .06 at the
+        // top edge fading out 12 pt down, .04 at the bottom edge fading out 4 pt up. Key light just inside the rim
+        // line peaking +21 at the top (71 over 50) and +13 at the bottom, +3 on the round ends, falling off over about
+        // 0.9 pt (on the round ends the top / bottom light falls with the cube of the normal's vertical part: +5 there).
+        // Rim: 1 pt outside the face reading 15-22 over 32 and 52 over the fill (116): the plain sample x .55.
+        // Light: not in the recording; the 0.5 pt black .4 line of switch-press-strip-light.png and the same light terms.
+        readonly property real knobLensBand: 0.1
+        readonly property real knobLensAmount: -0.15
+        readonly property real knobLensGain: 0.85
+        readonly property real knobLensHaze: 0.05
+        readonly property real knobLensDiffuseTop: 0.06
+        readonly property real knobLensDiffuseTopDepth: 12
+        readonly property real knobLensDiffuseBottom: 0.04
+        readonly property real knobLensDiffuseBottomDepth: 4
+        readonly property real knobLensKeyTop: 0.135
+        readonly property real knobLensKeyBottom: 0.083
+        readonly property real knobLensKeyEnds: 0.02
+        readonly property real knobLensKeyFalloff: 0.9
+        readonly property real knobLensOutline: t.dark ? 0.45 : 0.4
+        readonly property real knobLensOutlineWidth: t.dark ? 1 : 0.5
+        // under the lens: the lens shape 8 pt down, 1 pt wider (filter inputRingShadowOffset 8, StrokeWidth 4: 2 pt
+        // outside the shape, half of it at full strength), blurred 2 pt (filter BlurRadius 3; the recording fades over
+        // about 11 px), opacity .1 in light (filter); dark, the recording: the card 32 -> 26 from the bottom rim for
+        // 13 px, back to 31 by 24 px (black .19)
+        readonly property color knobLensShadow: t.dark ? Qt.rgba(0, 0, 0, 0.19) : Qt.rgba(0, 0, 0, 0.10)
+        readonly property real knobLensShadowY: 8
+        readonly property real knobLensShadowSpread: 1
+        readonly property real knobLensShadowBlur: 2
+        // the slider fill while its knob is held: light black .098 (controls-press-light.json: a black layer over the
+        // fill whose alpha follows the lens, .0859 at .916), dark white about .098 (the recording: the fill (16,112,255)
+        // -> (45,125,255) with the lens)
+        readonly property color sliderPressOverlay: t.dark ? Qt.rgba(1, 1, 1, 0.098) : Qt.rgba(0, 0, 0, 0.098)
         // Applications window selection (shell); not a control fill
         readonly property color fill: t.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.08)
         readonly property color menuFill: t.dark ? "#2C2C2E" : "#F6F6F6"   // TODO verify (the live menu is glass)
@@ -292,11 +332,17 @@ QtObject {
         readonly property int switchTrackFade: 240
         // pressed knob: grows x1.56 (32 x 20 -> 50 x 31, mini 21 x 13 -> 33 x 20) into a clear lens
         readonly property real switchLift: 1.56
-        // slider knob: 20 x 16 -> 25 x 20 (x1.25), glass in 0.17 s (0.02 s delay + 0.15 s), back in 0.15 s
+        // slider knob: 20 x 16 -> 25 x 20 (x1.25). Lens share (SDFLayer opacity) per 60 Hz frame from the first frame
+        // that moves, press and release alike (controls-press-light.json, press-hold and drag; the release starts at
+        // .088 instead of .061, a phase): .061 .219 .405 .579 .725 .837 .916 .968 .998 1 = cubic bezier
+        // (0.275, 0.240, 0.437, 0.912) over 144 ms (rms .0003). The first change comes 35 ms after mouse-down and
+        // after mouse-up alike, so it is the probe's input latency, not a delay of the press. The knob's frame grows on
+        // the same curve (24.6 x 19.7 at .916). The Mac recording 23.09.23 (dark) gives the same series by eye.
         readonly property real sliderLift: 1.25
-        readonly property int sliderLiftDelay: 20
-        readonly property int sliderLiftDuration: 150
-        readonly property int sliderLiftRelease: 150
+        readonly property int sliderLiftDelay: 0
+        readonly property int sliderLiftDuration: 144
+        readonly property int sliderLiftRelease: 144
+        readonly property var sliderLiftCurve: [0.275, 0.240, 0.437, 0.912, 1, 1]
         // track click: the knob runs to the click point, ease-out, no overshoot: 50 % at 0.07 s, 90 % at 0.18 s
         // after it starts (a critically damped spring of 0.27 s; the 0.066 s start delay is not drawn)
         readonly property real sliderJumpResponse: 0.27

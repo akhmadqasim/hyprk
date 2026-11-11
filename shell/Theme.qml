@@ -585,23 +585,16 @@ Singleton {
         readonly property real editH: 24
         readonly property real editGap: 16
         readonly property real trackLift: 20 / 255
-        // knob: none at rest, white 18 x 14 on hover with its right edge at the fill end; pressed, a clear lens about
-        // 24 x 20 centred on the fill end, in about 3 frames (Q-panels-08, -09). Lens pixels over grey 127 (sound
-        // slider drag frame): a dark 1 pt rim (~40 on a 106 module), the fill seen through it 213..235 and the module
-        // 109..125, so a light grey .15 wash over the shadow, a light top edge (+30), a soft shadow below (85..93 next to it) and the fill
-        // band about 1 pt thicker inside. Past an end the track and fill stretch up to about 5 pt and spring back in
+        // knob: none at rest, white 18 x 14 while the module is hovered; pressed, the shared HyprK Knob lens about
+        // 24 x 20 centred on the fill end (Q-panels-08, -09; cc-sound-slider-rest-hover-drag-overdrag-dark-grey127.png:
+        // hover knob 35 x 28 px at 2x). The lens's look and timing are the shared ones (Tokens.control.knobLens*,
+        // Tokens.motion.sliderLiftCurve): Q-panels-09 saw it "within about 3 frames" by eye, the 120 Hz layer samples of
+        // the Settings slider give 144 ms. Past an end the track and fill stretch up to about 5 pt and spring back in
         // 0.13 s
         readonly property real knobW: 18
         readonly property real knobH: 14
         readonly property real lensW: 24
         readonly property real lensH: 20
-        readonly property color lensWash: Qt.rgba(0.75, 0.75, 0.75, 0.15)
-        readonly property color lensRim: Qt.rgba(0, 0, 0, 0.6)
-        readonly property color lensTopEdge: Qt.rgba(1, 1, 1, 0.25)
-        readonly property real lensBand: 5               // the fill band inside the lens (track 4)
-        readonly property color knobShadow: Qt.rgba(0, 0, 0, 0.12)
-        readonly property color lensShadow: Qt.rgba(0, 0, 0, 0.15)
-        readonly property int lensMs: 50
         readonly property real overdrag: 5
         readonly property int overdragBackMs: 130
         // Now Playing 2x2 (Q-panels-11): art 40 at (14, 14), continuous r 10, white 14 %; title at y 72;

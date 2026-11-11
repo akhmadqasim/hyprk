@@ -343,26 +343,11 @@ Item {
         property string rightSymbol
         property real value: 0
         signal moved(real v)
-        // shown fill: springs to a clicked point, follows 1:1 while dragging (Reduce motion: instant)
-        property bool dragging: false
-        Spring { id: shownValue; target: sm.value; response: Theme.anim.sliderJumpResponse }
-        readonly property real shown: dragging || A11y.reduceMotion ? sm.value : shownValue.value
-        // stretch past an end in pt (< 0 = the left end): `pull` while dragging, eased back on release, one value
-        // per frame of the window (HyprK FrameEase)
-        property real pull: 0
-        readonly property real over: overEase.value
-        FrameEase {
-            id: overEase
-            goal: sm.pull
-            animate: !trackMa.pressed && !A11y.reduceMotion
-            duration: Theme.cc.overdragBackMs
-            ease: Easing.OutCubic
-        }
 
         width: cc.width
         height: cc.rowH
         radius: Theme.cc.sliderRadius
-        interactive: false                       // the track below takes the input
+        interactive: false                       // the slider below takes the input
         HoverHandler { id: hover; enabled: sm.available }
 
         Text {
@@ -389,118 +374,48 @@ Item {
             size: 18
             color: Theme.cc.text
         }
-        Item {
-            id: track
+        CcSlider {
             x: Theme.cc.trackX
             width: parent.width - Theme.cc.trackX - Theme.cc.trackRight - sm.trailingRoom
             y: Theme.cc.trackY - height / 2
-            height: Theme.cc.trackHeight
-            readonly property real fillW: width * Math.max(0, Math.min(1, sm.shown))
-            // track: plus-lighter T + 20 (shaders/plusfill.frag), stretched past an end
-            ShaderEffect {
-                x: Math.min(0, sm.over)
-                width: parent.width + Math.abs(sm.over)
-                height: parent.height
+            enabled: sm.available
+            knobShown: hover.hovered
+            value: sm.value
+            onMoved: v => sm.moved(v)
+        }
+    }
+
+    // 27.2.1 slider module (MAC-ANSWERS.md Q-panels-08, -09) on the shared HyprK Slider: white fill over a plus-lighter
+    // T + 20 track 4 pt tall; no knob at rest, a white 18 x 14 knob while the module is hovered, pressed the shared
+    // glass lens 24 x 20 (Knob: refraction, rim, light and shadow from the Mac's pressed-knob filter and recording)
+    // centred on the fill end, which is kept half a knob inside the track ends. A press on the track sends the fill end
+    // half a knob ahead of the pointer and springs to it (about 0.2 s), a drag follows 1:1; past an end the track and
+    // fill stretch up to 5 pt and spring back in 0.13 s on release. The Sound module (CcSoundPanel) uses the same
+    // slider with its knob always shown.
+    component CcSlider: Slider {
+        trackHeight: Theme.cc.trackHeight
+        fillColor: Theme.cc.sliderFillColor
+        trackFill: Component {
+            ShaderEffect {   // track: plus-lighter T + 20 (shaders/plusfill.frag)
                 property vector4d fill: Qt.vector4d(Theme.cc.trackLift, Theme.cc.trackLift, Theme.cc.trackLift, 0)
                 property size sizePt: Qt.size(width, height)
                 property real radius: height / 2
                 property real dpr: Screen.devicePixelRatio
                 fragmentShader: Qt.resolvedUrl("../shaders/plusfill.frag.qsb")
             }
-            Rectangle {
-                x: Math.min(0, sm.over)
-                width: track.fillW + Math.abs(sm.over)
-                height: parent.height
-                radius: height / 2
-                color: Theme.cc.sliderFillColor
-            }
-            Item {
-                id: knob
-                visible: hover.hovered || trackMa.pressed
-                readonly property real lift: liftEase.value
-                FrameEase { id: liftEase; goal: trackMa.pressed ? 1 : 0; duration: Theme.cc.lensMs }
-                // Knob and lens share one centre, the fill end, kept half a knob inside the track ends (the Mac's drag
-                // frame: lens 23.5 pt centred on the fill end; its overdrag frame: lens centre 8 pt before the track
-                // end, cc-sound-slider-rest-hover-drag-overdrag-dark-grey127.png). The lens grows around that centre.
-                // Before, the knob had its right edge on the fill end and the lens was centred on it, so a press moved
-                // the knob 9 pt to the right and the release moved it back (user report). The hover knob's place under
-                // the fill is not visible in the Mac frames (white on white): centred is inferred from the lens.
-                readonly property real cx: Math.max(Theme.cc.knobW / 2, Math.min(track.width - Theme.cc.knobW / 2, track.fillW)) + sm.over
-                width: Theme.cc.knobW + (Theme.cc.lensW - Theme.cc.knobW) * lift
-                height: Theme.cc.knobH + (Theme.cc.lensH - Theme.cc.knobH) * lift
-                x: cx - width / 2
-                y: (track.height - height) / 2
-                RectangularShadow {
-                    anchors.fill: parent
-                    radius: parent.height / 2
-                    blur: 3 + 3 * knob.lift
-                    offset.y: 1 + knob.lift
-                    color: knob.lift > 0 ? Theme.cc.lensShadow : Theme.cc.knobShadow
-                }
-                Rectangle {
-                    anchors.fill: parent
-                    radius: height / 2
-                    color: Theme.cc.sliderFillColor
-                    opacity: 1 - knob.lift
-                }
-                Item {
-                    anchors.fill: parent
-                    opacity: knob.lift
-                    visible: opacity > 0
-                    Rectangle {
-                        x: 1
-                        width: Math.max(0, Math.min(parent.width - 2, track.fillW + Math.max(0, sm.over) - knob.x - 1))   // up to the fill end
-                        height: Theme.cc.lensBand
-                        anchors.verticalCenter: parent.verticalCenter
-                        radius: height / 2
-                        color: Theme.cc.sliderFillColor
-                    }
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: height / 2
-                        color: Theme.cc.lensWash
-                        border.width: 1
-                        border.color: Theme.cc.lensRim
-                    }
-                    Rectangle {
-                        x: parent.height / 2
-                        width: parent.width - parent.height
-                        y: 1
-                        height: 1
-                        color: Theme.cc.lensTopEdge
-                    }
-                }
-            }
-            MouseArea {
-                id: trackMa
-                anchors.fill: parent
-                anchors.topMargin: -10
-                anchors.bottomMargin: -10
-                enabled: sm.available
-                // A press on the knob grabs it where it was hit: nothing moves and no value is written until the
-                // pointer moves. A press on the track sends the fill end half a knob ahead of the pointer (Q-panels-09)
-                // and keeps that offset. Past an end: a damped stretch
-                property real grab: -Theme.cc.knobW / 2   // pointer minus fill end
-                function update(mx) {
-                    const v = (mx - grab) / track.width, c = Math.max(0, Math.min(1, v));
-                    const past = (v - c) * track.width;
-                    sm.pull = Math.sign(past) * Theme.cc.overdrag * (1 - Math.exp(-Math.abs(past) / 30));
-                    sm.moved(c);
-                }
-                onPressedChanged: {
-                    if (!pressed) {
-                        sm.pull = 0;
-                        if (sm.dragging) shownValue.snap();   // a click keeps springing to its point
-                        sm.dragging = false;
-                    }
-                }
-                onPressed: m => {
-                    const onKnob = hover.hovered && Math.abs(m.x - knob.cx) <= Theme.cc.knobW / 2;
-                    grab = onKnob ? m.x - track.fillW : -Theme.cc.knobW / 2;
-                    if (!onKnob) update(m.x);
-                }
-                onPositionChanged: m => { if (pressed) { sm.dragging = true; update(m.x); } }
-            }
         }
+        knobWidth: Theme.cc.knobW
+        knobHeight: Theme.cc.knobH
+        lensWidth: Theme.cc.lensW
+        lensHeight: Theme.cc.lensH
+        lensBackdrop: "transparent"
+        fillToEnds: true
+        trackPressOffset: Theme.cc.knobW / 2
+        overdrag: Theme.cc.overdrag
+        overdragBackMs: Theme.cc.overdragBackMs
+        jumpResponse: Theme.anim.sliderJumpResponse
+        reduceMotion: A11y.reduceMotion
+        hitMargin: 10
+        activeFocusOnTab: false
     }
 }
