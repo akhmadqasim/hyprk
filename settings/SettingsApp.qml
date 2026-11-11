@@ -262,8 +262,8 @@ Item {
         ToolbarPlatter { // back / forward share one 74 x 36 capsule with a 1 x 20 divider (27.2.1)
             id: nav
             relief: true   // the platter's own shading and edge (Tokens.toolbar.relief*, settings/appearance-*.png)
-            x: 7.5; anchors.verticalCenter: parent.verticalCenter   // settings-toolbar-dark.png: sidebar line px 463, capsule 479..626
-            width: Tokens.toolbar.navWidth; height: Tokens.toolbar.platterHeight
+            x: 7.5; anchors.verticalCenter: parent.verticalCenter; anchors.alignWhenCentered: false   // settings-toolbar-dark.png: sidebar line px 463, capsule 479..626
+            width: Tokens.toolbar.navWidth; height: Tokens.toolbar.reliefHeight   // light: 37 pt, edge rows 15 / 88 px
             Rectangle { anchors.centerIn: parent; width: 1; height: Tokens.toolbar.dividerHeight; color: Tokens.toolbar.separator }
             Row {
                 anchors.fill: parent

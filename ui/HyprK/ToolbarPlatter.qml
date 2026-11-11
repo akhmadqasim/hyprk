@@ -6,9 +6,11 @@ import QtQuick.Effects
 Item {
     id: p
     property real radius: height / 2
-    // the 27.2.1 platter's shading (Tokens.toolbar.relief*): light, an opaque face 253 / 248 / 252 top to bottom (the
-    // translucent face let the drop shadow darken its lower half to 246); a 1 px edge, dark on the sides (light 191,
-    // dark 11) and lit at the top and bottom in dark. Off: the flat look (the Finder tab bar track uses it)
+    // the 27.2.1 platter's shading (Tokens.toolbar.relief*): light, an opaque face inside the edge (the translucent
+    // face let the drop shadow darken its lower half to 246) with a lit row under the top and over the bottom edge, a
+    // darker band at a quarter of the height and darker round ends below it; a 1 px edge, dark on the sides (light
+    // 191, dark 11) and lit at the top and bottom in dark. The light shape is Tokens.toolbar.reliefHeight tall (37 pt:
+    // its edge rows lie outside the 36 pt face). Off: the flat look (the Finder tab bar track uses it)
     property bool relief: false
     // the relief's side darkening at dy pt from the middle (Tokens.toolbar.reliefSide*)
     function sideMaskAt(dy: real): color {
@@ -23,6 +25,9 @@ Item {
         return Qt.rgba(1, 1, 1, 0.5 - Math.sin(Math.asin(1 - 2 * a) / 3));
     }
     function glowAt(i: int): color { return Qt.rgba(1, 1, 1, Tokens.toolbar.reliefGlow[i] ?? 0); }
+    // light: the face's shade at d pt from a round end, as a stop of the face's horizontal gradient
+    function endPos(i: int): real { return Math.min(0.5, Tokens.toolbar.reliefEnd[i][0] / Math.max(1, width - 1)); }
+    function endColor(i: int): color { const v = Tokens.toolbar.reliefEnd[i][1] / 255; return Qt.rgba(v, v, v, 1); }
 
     implicitHeight: Tokens.toolbar.platterHeight
 
@@ -41,14 +46,46 @@ Item {
         border.width: p.relief ? 0 : 1
         border.color: Tokens.toolbar.rim
     }
-    Rectangle {
+    // light face, inside the edge. Two layers, so it needs no shader: across, the lower half's shade towards the
+    // round ends (Tokens.toolbar.reliefEnd); over it, top to bottom, the lit row, the band and the lit row above the
+    // bottom edge, see-through below the band (rows of a 36 pt face, Tokens.toolbar.reliefRows)
+    Item {
         visible: p.relief && !Tokens.dark
-        anchors.fill: parent
-        radius: p.radius
-        gradient: Gradient {
-            GradientStop { position: 0.08; color: Tokens.toolbar.reliefTop }
-            GradientStop { position: 0.36; color: Tokens.toolbar.reliefMid }
-            GradientStop { position: 0.62; color: Tokens.toolbar.reliefLow }
+        anchors.fill: parent; anchors.margins: 0.5
+        Rectangle {
+            anchors.fill: parent
+            radius: height / 2 - Math.max(0, p.height / 2 - p.radius)
+            gradient: Gradient {
+                orientation: Gradient.Horizontal
+                GradientStop { position: p.endPos(0); color: p.endColor(0) }
+                GradientStop { position: p.endPos(1); color: p.endColor(1) }
+                GradientStop { position: p.endPos(2); color: p.endColor(2) }
+                GradientStop { position: p.endPos(3); color: p.endColor(3) }
+                GradientStop { position: p.endPos(4); color: p.endColor(4) }
+                GradientStop { position: p.endPos(5); color: p.endColor(5) }
+                GradientStop { position: 1 - p.endPos(5); color: p.endColor(5) }
+                GradientStop { position: 1 - p.endPos(4); color: p.endColor(4) }
+                GradientStop { position: 1 - p.endPos(3); color: p.endColor(3) }
+                GradientStop { position: 1 - p.endPos(2); color: p.endColor(2) }
+                GradientStop { position: 1 - p.endPos(1); color: p.endColor(1) }
+                GradientStop { position: 1 - p.endPos(0); color: p.endColor(0) }
+            }
+        }
+        Rectangle {
+            anchors.fill: parent
+            radius: height / 2 - Math.max(0, p.height / 2 - p.radius)
+            gradient: Gradient {
+                GradientStop { position: 0.007; color: "#FFFFFF" }
+                GradientStop { position: 0.021; color: "#FFFFFF" }
+                GradientStop { position: 0.035; color: Tokens.toolbar.reliefTop }
+                GradientStop { position: 0.062; color: Tokens.toolbar.reliefTop }
+                GradientStop { position: 0.188; color: Tokens.toolbar.reliefMid }
+                GradientStop { position: 0.368; color: Tokens.toolbar.reliefMid }
+                GradientStop { position: 0.535; color: Qt.alpha(Tokens.toolbar.reliefMid, 0) }
+                GradientStop { position: 0.965; color: Qt.alpha(Tokens.toolbar.reliefTop, 0) }
+                GradientStop { position: 0.979; color: "#FFFFFF" }
+                GradientStop { position: 0.993; color: "#FFFFFF" }
+            }
         }
     }
     Rectangle {   // the 1 px edge (0.5 pt)

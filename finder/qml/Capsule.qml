@@ -5,7 +5,7 @@ import HyprK
 // the Finder is a plain Qt window, so it draws the measured look: HyprK ToolbarPlatter with its relief shading).
 // Measured on screens/27.2.1/finder/icons-{light,dark}.png (2x, every capsule the same): light, a 37 pt tall shape
 // (edge rows y 15 / 88 px, 234 / 231, sides 191) whose face has 1 pt lit rows under the top and over the bottom edge
-// (255) and a 249 band at a quarter of the height; dark, 36 pt (edge rows 16 / 87, lit 107..111, sides 11) over a
+// (255) and a 249 band at a quarter of the height (the platter's light relief draws that); dark, 36 pt (edge rows 16 / 87, lit 107..111, sides 11) over a
 // face lit towards both edges (90, 72 .. 61 in the middle .. 71, 89). The face below follows those columns.
 Item {
     id: root
@@ -25,12 +25,12 @@ Item {
         anchors.bottomMargin: root.inset
         relief: true
     }
-    Rectangle {   // the face inside the 1 px edge: opaque in light, a white lift over the dark face
-        visible: Theme.active
+    Rectangle {   // dark: a white lift over the face inside the 1 px edge (light: the platter's own relief face)
+        visible: Theme.active && Theme.dark
         anchors.fill: platter
         anchors.margins: 0.5
         radius: height / 2
-        gradient: Theme.dark ? darkFace : lightFace
+        gradient: darkFace
     }
     // inactive window (Q-finder-29, crops/toolbar-{light,dark}-inactive.png): the shading goes, a flat 37 pt capsule in
     // both appearances, light face 240 with a 213 edge and 191 sides, dark (58,60,67) with a 26 edge and 20 sides (drawn
@@ -66,19 +66,6 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
     }
 
-    Gradient {   // y 16..87 px (rows centred at (y - 16 + .5) / 72)
-        id: lightFace
-        GradientStop { position: 0.007; color: "#FFFFFF" }
-        GradientStop { position: 0.021; color: "#FFFFFF" }
-        GradientStop { position: 0.035; color: "#FDFDFD" }
-        GradientStop { position: 0.062; color: "#FDFDFD" }
-        GradientStop { position: 0.188; color: "#F9F9F9" }
-        GradientStop { position: 0.368; color: "#F9F9F9" }
-        GradientStop { position: 0.535; color: "#FDFDFD" }
-        GradientStop { position: 0.965; color: "#FDFDFD" }
-        GradientStop { position: 0.979; color: "#FFFFFF" }
-        GradientStop { position: 0.993; color: "#FFFFFF" }
-    }
     Gradient {   // y 17..86 px over the 59 face: white (v - 59) / 196
         id: darkFace
         GradientStop { position: 0.007; color: Qt.rgba(1, 1, 1, 0.158) }

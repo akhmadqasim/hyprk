@@ -138,16 +138,20 @@ QtObject {
         readonly property real shadowOffsetY: 8
         readonly property color selection: t.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.07)   // selected segment 81 on 61 | 231 on 250
         readonly property color separator: t.dark ? Qt.rgba(1, 1, 1, 0.27) : Qt.rgba(0, 0, 0, 0.20)   // 113 on 61 | 200 on 252
-        // ToolbarPlatter.relief: the platter's own shading, measured down the middle of the Settings back/forward and the
-        // Finder toolbar capsules (settings/appearance-{light,dark}.png x 600, finder-toolbar-*.png x 400, 2x): light
-        // 253 under the top edge, 248..249 at a third of the height, 252..253 over the lower half (opaque: the light
-        // toolbar is 255); the edge 1 px: 191 on the sides, 235..239 top, 231..236 bottom; dark sides 11, top and bottom
-        // 110 then 89 over the 60..61 face
+        // ToolbarPlatter.relief: the platter's own shading, measured on the Settings back/forward and the Finder toolbar
+        // capsules (settings/appearance-{light,dark}.png, finder/icons-{light,dark}.png, 2x). Light: the shape is 37 pt
+        // tall, its edge rows (235 top, 231 bottom, 191 on the sides) outside a 36 pt face (rows 16..87 px); the face
+        // down the middle: 255 255 (the lit row), 253, 249 from 0.19 to 0.37 of the height, 253 from 0.535, 255 255;
+        // at the round ends the lower half stays darker (reliefEnd: [pt from the end, level], rows 58-70 px of five
+        // capsules: 248-249 at 0.5-3.5 pt, 249-250 at 4.5-6.5, 250-251 at 8.5, 251-252 at 10.5, 252 at 12.5, 253 from
+        // 14.5-16.5). Dark: 36 pt, sides 11, top and bottom 110 then 89 over the 60..61 face
+        readonly property real reliefHeight: t.dark ? platterHeight : platterHeight + 1
         readonly property color reliefTop: "#FDFDFD"
-        readonly property color reliefMid: "#F8F8F8"
-        readonly property color reliefLow: "#FCFCFC"
-        readonly property color reliefEdge: t.dark ? Qt.rgba(1, 1, 1, 0.27) : Qt.rgba(0, 0, 0, 0.07)
-        readonly property color reliefSide: t.dark ? Qt.rgba(0, 0, 0, 0.9) : Qt.rgba(0, 0, 0, 0.22)   // over the edge
+        readonly property color reliefMid: "#F9F9F9"
+        readonly property var reliefEnd: [[0, 248], [4, 249], [7.5, 250], [9.5, 251], [11.5, 252], [15, 253]]
+        // light: the edge lies on the window (255) since the face is inside it: 235 = black .08, the sides' 190 = .19 more
+        readonly property color reliefEdge: t.dark ? Qt.rgba(1, 1, 1, 0.27) : Qt.rgba(0, 0, 0, 0.08)
+        readonly property color reliefSide: t.dark ? Qt.rgba(0, 0, 0, 0.9) : Qt.rgba(0, 0, 0, 0.19)   // over the edge
         // the side darkening around the middle of the round ends: full within reliefSideFlat pt of the middle, then a
         // Gaussian fall-off. Edge pixel down the left end: light (appearance-light.png) 191 at the middle, 199-206 at
         // 1-2 pt, 214-232 at 3 pt, the 237 edge from 4 pt; dark (appearance-dark.png) 11-25 from 12.75 pt above to
