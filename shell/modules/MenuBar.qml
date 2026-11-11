@@ -251,6 +251,7 @@ ShellWindow {
     SystemClock {
         id: clock
         precision: SystemClock.Minutes
+        onDateChanged: Theme.autoCheck()   // Appearance > Auto after a sleep or a clock change (Theme.autoCheck)
     }
 
     // ---------- inline components ----------

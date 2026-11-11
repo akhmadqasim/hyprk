@@ -1018,6 +1018,18 @@ test("mode buttons start inside the field, end in place", () => {
         assert.equal(N.notificationSoundArg({ "sound-file": "file:///a/b%20c.oga" }), "/a/b c.oga");
     });
 }
+test("appearance handshake: a window answers after the second swap that follows a frame built after the switch", () => {
+    const H = load("handshake.js");
+    const run = events => { let st = 0, updates = 0, done = 0; for (const e of events) { const r = H.step(st, e); st = r.stage; updates += r.update; done += r.done; } return [st, updates, done]; };
+    assert.deepEqual(run(["begin"]), [1, 1, 0]);
+    assert.deepEqual(run(["begin", "swapped"]), [1, 1, 0]);                       // the frame before: built before the switch
+    assert.deepEqual(run(["begin", "built", "swapped"]), [3, 2, 0]);               // may still be the frame before: one more
+    assert.deepEqual(run(["begin", "built", "swapped", "built", "swapped"]), [0, 2, 1]);
+    assert.deepEqual(run(["begin", "built", "swapped", "swapped"]), [0, 2, 1]);
+    assert.deepEqual(run(["built", "swapped", "swapped"]), [0, 0, 0]);             // idle: nothing
+    assert.deepEqual(run(["begin", "built", "swapped", "begin", "built", "swapped", "swapped"]), [0, 4, 1]);   // a second switch starts over
+});
+
 test("Mission Control layout reproduces the Mac's frames (mission-control.json)", () => {
     const E = load("expose.js");
     const d = JSON.parse(readFileSync(join(here, "..", "..", "reference", "re", "27.2.1", "live", "dock", "mission-control.json"), "utf8"));

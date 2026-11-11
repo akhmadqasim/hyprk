@@ -126,6 +126,9 @@ Item {
     Round {
         x: cc.colX(0); y: cc.rowY(3)
         symbol: "appearance.darkmode"
+        // on in dark: the whole disc opaque white with a black glyph (MAC-ANSWERS Control Center section 1, Q-panels-01)
+        on: Theme.dark
+        onIcon: "#000000"
         onActivated: Theme.dark = !Theme.dark
     }
     Round {
@@ -259,6 +262,7 @@ Item {
         id: rb
         property string symbol
         property bool on: false
+        property color onIcon: Theme.cc.toggleOnIcon   // the glyph on the white disc: the accent (Stage Manager), black for Dark Mode
         signal activated()
         width: cc.rowH
         height: cc.rowH
@@ -275,7 +279,7 @@ Item {
             surface: "ccRound"
             opacity: rb.enabled ? 1 : Theme.color.disabledOpacity
             size: Theme.cc.buttonGlyph
-            color: rb.on ? Theme.cc.toggleOnIcon : Theme.cc.toggleOffIcon
+            color: rb.on ? rb.onIcon : Theme.cc.toggleOffIcon
         }
         onClicked: activated()
     }

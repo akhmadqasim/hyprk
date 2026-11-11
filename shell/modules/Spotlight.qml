@@ -417,7 +417,8 @@ ShellWindow {
                 anchors.verticalCenter: parent.verticalCenter
                 font: Typography.font(Theme.spotlight.inputSize)
                 color: Theme.spotlight.text
-                selectionColor: Theme.color.accent
+                selectionColor: Theme.color.textSelection   // selectedTextBackgroundColor: follows Appearance > Text highlight colour
+                selectedTextColor: Theme.spotlight.text      // the text keeps its colour
                 clip: true
                 // caret: white, 2 x 26 (its soft multicolour halo is not drawn)
                 cursorDelegate: Rectangle { width: 2; height: 26; radius: 1; color: Theme.spotlight.text; visible: input.cursorVisible }

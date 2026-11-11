@@ -95,18 +95,28 @@ Singleton {
             theme.highlight = typeof o.highlight === "string" ? o.highlight : "";
             theme.glassTint = isFinite(o.glass) ? Math.min(1, Math.max(0, o.glass)) : 0.5;
             theme.mode = typeof o.mode === "string" ? o.mode : "";
-            theme.autoSync();   // also after a wake that somebody's write follows: a timer does not count sleep
+            theme.autoSync();
         }
     }
 
     // ---------- Appearance > Auto ----------
     // Settings switches Auto only while it runs; the shell runs the same clock (lib/sun.js, the rule of
     // settings/Parsers.js: dark while the sun at the time zone's city is below -3 degrees; light when the place is
-    // not known). One single-shot timer to the sun's next crossing, nothing polls; the zone is looked up once, the
-    // first time the mode is Auto. The answer goes into appearance.json's `dark`, which Settings and Finder read.
+    // not known). One single-shot timer to the sun's next crossing; the zone is looked up once, the first time the mode
+    // is Auto. The answer goes into appearance.json's `dark`, which Settings and Finder read.
+    // A timer does not count a sleep and does not see the clock being set: the menu bar clock's own minute tick calls
+    // autoCheck() (no timer of its own), which runs the rule again when the crossing's time has passed or the sun's
+    // answer is no longer the appearance shown, so a wake past a crossing or a clock change is corrected within a
+    // minute.
     property string mode: ""            // appearance.json `mode`: "light", "dark" or "auto" ("" in a file without it)
     property var autoPlace: null        // { lat, lon } of the zone's city
     property bool autoReady: false      // the zone lookup has answered
+    property double autoFlipAt: 0       // wall-clock ms of the crossing the timer waits for, 0 = none
+    function autoCheck() {
+        if (mode !== "auto" || !autoReady) return;
+        const now = Date.now();
+        if ((autoFlipAt > 0 && now >= autoFlipAt) || (autoPlace ? Sun.autoDark(now, autoPlace.lat, autoPlace.lon) : false) !== dark) autoSync();
+    }
     Process {
         id: zoneLookup
         command: ["sh", "-c", "readlink /etc/localtime || head -n 1 /etc/timezone 2>/dev/null || echo; cat /usr/share/zoneinfo/zone1970.tab /usr/share/zoneinfo/zone.tab 2>/dev/null"]
@@ -122,6 +132,7 @@ Singleton {
     Timer { id: autoTimer; onTriggered: theme.autoSync() }
     function autoSync() {
         autoTimer.stop();
+        autoFlipAt = 0;
         if (mode !== "auto") return;
         if (!autoReady) { zoneLookup.running = true; return; }
         const now = Date.now();
@@ -135,7 +146,7 @@ Singleton {
             } catch (e) {}
         }
         const flip = autoPlace ? Sun.nextAutoFlip(now, autoPlace.lat, autoPlace.lon) : 0;
-        if (flip > 0) { autoTimer.interval = Math.min(flip - now + 1000, 2147483647); autoTimer.start(); }
+        if (flip > 0) { autoFlipAt = flip + 1000; autoTimer.interval = Math.min(flip - now + 1000, 2147483647); autoTimer.start(); }
     }
 
     // the glass plugin must use the same appearance as our labels, else dark-mode
@@ -164,7 +175,37 @@ Singleton {
     function syncWindowChrome() {
         Hyprland.dispatch(`function() if hyprk_appearance then hyprk_appearance(${dark}) end end`);
     }
-    onDarkChanged: { syncPluginAppearance(); syncWindowChrome(); }
+    onDarkChanged: { syncPluginAppearance(); syncWindowChrome(); appearanceSwitched(); }
+    // ---------- appearance handshake (the shell's half) ----------
+    // The plugin holds the old picture of every output for a fixed 0.15 s before it cross-fades (appearance_hold): on a
+    // loaded host the shell's restyled frames landed 234 to 526 ms after the switch, inside the fade. AppKit waits for
+    // the apps' answers instead (at most 0.5 s). The shell's answer: after a switch every shown ShellWindow reports
+    // when it has committed a frame built after it (components/AppearanceAck.qml); when the last one has, or 0.4 s
+    // have passed, or no window is shown, one message goes to the compositor on Hyprland's socket:
+    //     hyprk_appearance_ready("dark" | "light", serial)
+    // a Lua global the session's config may define (the glass plugin's side: end the hold); `serial` is a ms time
+    // stamp, so no two messages are alike. Where the function does not exist nothing happens. Sent with the plugin
+    // only, once per change of `dark` (also the one that reads the saved appearance at start; not after a config
+    // reload, where the option is sent again and the look is not new).
+    property int appearanceEpoch: 0        // counts the switches; AppearanceAck follows it
+    property int appearanceWaiting: 0      // windows that have not answered this switch yet
+    function appearanceWait() { appearanceWaiting++; }
+    function appearanceDone(epoch) {
+        if (epoch !== appearanceEpoch || appearanceWaiting <= 0) return;
+        if (--appearanceWaiting === 0) appearanceReady();
+    }
+    function appearanceSwitched() {
+        appearanceWaiting = 0;
+        appearanceEpoch++;                 // every shown window calls appearanceWait() from this change
+        if (appearanceWaiting === 0) appearanceReady(); else appearanceWatchdog.restart();
+    }
+    function appearanceReady() {
+        appearanceWatchdog.stop();
+        appearanceWaiting = 0;
+        if (!compositorGlass) return;
+        Hyprland.dispatch(`function() if hyprk_appearance_ready then hyprk_appearance_ready("${dark ? "dark" : "light"}", ${Date.now()}) end end`);
+    }
+    Timer { id: appearanceWatchdog; interval: 400; onTriggered: theme.appearanceReady() }   // a window that draws no frame
     onCompositorGlassChanged: { syncPluginAppearance(); syncPluginGlass(); }
     onGlassTintChanged: syncPluginGlass()
     // a config reload (Hyprland reloads by itself when a config file changes) puts every plugin option back to the

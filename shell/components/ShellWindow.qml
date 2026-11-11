@@ -95,6 +95,8 @@ PanelWindow {
         }
     }
 
+    AppearanceAck {}   // answers Theme's appearance handshake for this window
+
     color: "transparent"
     WlrLayershell.namespace: namespace
     BackgroundEffect.blurRegion: Theme.compositorGlass && !glassDropped ? glassUnion : null
