@@ -148,6 +148,24 @@ the exit "in two steps" with a 0.15 s hold. Not explained by the code read; poss
 mixing the cosine slide, the cross-fade and the window, or a wait between the Dock's reply and the animation. A
 60 fps per-frame recording of a full screen exit on the Mac would settle it.
 
+## Full screen strip and first frames (judge #4 gap 2)
+
+- Exit frame 1: not a box at 0,0. The window box was at 0,34, but the plugin title bar is a decoration above the box and
+  comes back with the exit, so it was drawn over the strip (the lights over the menu bar titles). The transition now starts
+  from the frame including the title bar: on exit the box starts one bar height lower (bar at 34, strip stays black), on
+  enter it starts with the bar's rows (the bar vanishes in that frame, the outline no longer jumps by 28 pt). Qt windows
+  (Finder, Settings) have no decoration and are unchanged.
+- Strip: black in the first enter frame before (120 -> 0 in one frame), gone in the first exit frame. It now cross-fades
+  over 0.5 s on the Dock's Space cosine `0.5 - 0.5 cos(pi t / 0.5)` both ways (the strip is part of the full-screen Space,
+  which slides on that curve; the duration and curve are decoded, a fade in place of the slide is ours). A full-screen
+  window that closes, a workspace switch or Reduce Motion snap it. No cost outside full screen (one map lookup per frame).
+- Measured, headless MBA 2x, window edges per frame (left / right / top over a green backdrop, `-k 4`; Settings also from a
+  0.5 pt row band): foot enter 0.005-0.006 vs the R2 series (2-98 % 367-369 ms), exit 0.003-0.004 vs (0.25,0,0,1) 0.5 s
+  (383-400 ms); Finder enter 0.006-0.007, exit 0.006-0.007 (2 pt samples); Settings 0.002-0.004 / 0.002-0.003 (row band).
+  Top edge never above 34 pt in any frame (was 0 in exit frame 1 for foot). Strip over white vs the cosine: rms 0.001
+  (enter) and 0.003 (exit), no held frame.
+- Still inferred: the menu bar's 0.15 s on enter, and what the notch strip itself does during the Mac's transition.
+
 ## Not derived from Apple data
 
 - Inferred, not traced: the menu bar's enter timing (0.15 s default above).

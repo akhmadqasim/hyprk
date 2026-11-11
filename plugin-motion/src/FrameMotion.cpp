@@ -16,7 +16,9 @@
 #include <hyprland/src/managers/fullscreen/FullscreenController.hpp>
 #include <hyprland/src/output/Monitor.hpp>
 
+#include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <cstdlib>
 #include <string>
 #include <optional>
@@ -39,6 +41,21 @@ namespace motion::frame {
         std::vector<CHyprSignalListener>                            g_listeners;
         std::vector<SRun>                                           g_runs;
         std::unordered_map<uintptr_t, Fullscreen::eFullscreenMode> g_modes; // last internal mode seen per window
+        std::unordered_map<uintptr_t, SBoxExtents>                 g_reserved; // decoration extents (title bar) outside full screen
+
+        // The black strip's opacity per monitor. It comes and goes with the transition instead of in its first frame:
+        // the strip belongs to the full-screen Space, which the Dock slides in and out on a 0.5 s cosine
+        // (MOTION-PLUGIN.md "Full screen REA", FUN_1000c60f8). hyprk does not slide the desktop, so the strip
+        // cross-fades on that curve (timing decoded, the fade instead of a slide is ours).
+        constexpr double STRIP_DURATION = 0.5;
+        struct SStrip {
+            PHLMONITORREF     monitor;
+            double            from = 0, to = 0;
+            clock::time_point start;
+            bool              animateNext = false; // set by a fullscreen event: the next change of `to` fades
+            bool              running     = false;
+        };
+        std::unordered_map<MONITORID, SStrip> g_strips;
 
         bool enabled() {
             static auto P = CConfigValue<Config::INTEGER>("plugin:hyprkmotion:frames");
@@ -99,26 +116,83 @@ namespace motion::frame {
                 if (static_cast<Desktop::View::CGeometricMovableAnimated*>(w.get()) != self)
                     continue;
                 const auto mon = w->m_monitor.lock();
-                if (mon && box == mon->logicalBox() && Fullscreen::controller()->getFullscreenModes(w).internal == Fullscreen::FSMODE_FULLSCREEN)
+                const auto mode = Fullscreen::controller()->getFullscreenModes(w).internal;
+                if (mon && box == mon->logicalBox() && mode == Fullscreen::FSMODE_FULLSCREEN) {
                     if (const double inset = topInset(mon); inset > 0)
                         out = {box.x, box.y + inset, box.w, box.h - inset};
+                } else if (mode == Fullscreen::FSMODE_NONE)
+                    g_reserved[rc<uintptr_t>(w.get())] = w->getFullWindowReservedArea();
                 break;
             }
             rc<setBox_t>(g_setBoxHook->m_original)(self, out);
         }
 
+        double stripAlpha(const SStrip& s, clock::time_point now) {
+            if (!s.running)
+                return s.to;
+            const double x = std::clamp(std::chrono::duration<double>(now - s.start).count() / STRIP_DURATION, 0.0, 1.0);
+            return s.from + (s.to - s.from) * (0.5 - 0.5 * std::cos(M_PI * x));
+        }
+
         // the strip itself: black under everything of the full-screen workspace (the wallpaper still draws there; the menu
         // bar is a top layer, which Hyprland hides over full screen). Overlay layers (HUD, Control Center) stay above.
         void blackStrip(const Event::SRenderStageEvent& e) {
-            if (e.stage != RENDER_PRE_WINDOWS || !e.context || !e.monitor || !Fullscreen::controller()->hasFullscreen(e.monitor, true))
+            if (e.stage != RENDER_PRE_WINDOWS || !e.context || !e.monitor)
                 return;
+            const bool full = Fullscreen::controller()->hasFullscreen(e.monitor, true);
+            const auto it   = g_strips.find(e.monitor->m_id);
+            if (!full && it == g_strips.end())
+                return; // at rest outside full screen: nothing
             const double inset = topInset(e.monitor);
-            if (inset <= 0)
+            if (inset <= 0) {
+                if (it != g_strips.end())
+                    g_strips.erase(it);
                 return;
-            CRectPassElement::SRectData data;
-            data.box   = CBox{0, 0, e.monitor->m_transformedSize.x, inset * e.monitor->m_scale}.round();
-            data.color = CHyprColor(0, 0, 0, 1);
-            g_pHyprRenderer->addPassElement(e.context->get(), makeUnique<CRectPassElement>(data));
+            }
+            auto&        s      = it != g_strips.end() ? it->second : g_strips[e.monitor->m_id];
+            const auto   now    = clock::now();
+            const double target = full ? 1.0 : 0.0;
+            s.monitor           = e.monitor;
+            if (target != s.to) {
+                const auto mv   = moveConfig();
+                const bool fade = s.animateNext && enabled() && mv && mv->pValues && mv->pValues->internalEnabled != 0;
+                s.from          = fade ? stripAlpha(s, now) : target;
+                s.to            = target;
+                s.start         = now;
+                s.running       = fade;
+                if (fade && Animation::mgr())
+                    Animation::mgr()->requestTick();
+            }
+            s.animateNext      = false;
+            const double alpha = stripAlpha(s, now);
+            if (alpha > 0) {
+                CRectPassElement::SRectData data;
+                data.box   = CBox{0, 0, e.monitor->m_transformedSize.x, inset * e.monitor->m_scale}.round();
+                data.color = CHyprColor(0, 0, 0, alpha);
+                g_pHyprRenderer->addPassElement(e.context->get(), makeUnique<CRectPassElement>(data));
+            }
+            if (!s.running && s.to == 0)
+                g_strips.erase(e.monitor->m_id);
+        }
+
+        // The frame a transition starts from includes the title bar (a decoration above the window box, hidden in full
+        // screen): on exit the box starts below it, so the bar is not drawn over the strip in the first frame (judge #4:
+        // the lights over the menu bar titles); on enter it starts with the bar's rows, which vanish in that frame.
+        void startFrom(const PHLWINDOW& w, bool enter, const SBoxExtents& ext) {
+            auto& pos  = w->positionAnimation();
+            auto& size = w->sizeAnimation();
+            if (!pos || !size || (ext.topLeft == Vector2D{} && ext.bottomRight == Vector2D{}))
+                return;
+            const double   k        = enter ? -1 : 1;
+            const Vector2D posGoal  = pos->goal(), sizeGoal = size->goal();
+            const Vector2D posFrom  = pos->value() + ext.topLeft * k;
+            const Vector2D sizeFrom = size->value() - (ext.topLeft + ext.bottomRight) * k;
+            if (sizeFrom.x < 1 || sizeFrom.y < 1)
+                return;
+            pos->setValueAndWarp(posFrom);
+            size->setValueAndWarp(sizeFrom);
+            *pos  = posGoal;
+            *size = sizeGoal;
         }
 
         // Fired after the layout set the new goals (FullscreenController::setWindowFullscreenModeInternal), so the
@@ -141,6 +215,11 @@ namespace motion::frame {
                 kind = eKind::UNZOOM;
             // zoom (none -> maximized) keeps windowsMove: its bezier already matches the Mac (MOTION-MEASURED.md)
 
+            if (const auto mon = w->m_monitor.lock(); mon && (to == Fullscreen::FSMODE_FULLSCREEN) != (from == Fullscreen::FSMODE_FULLSCREEN) && topInset(mon) > 0) {
+                g_strips[mon->m_id].animateNext = true;
+                g_strips[mon->m_id].monitor     = mon;
+            }
+
             // windowsMove off = Reduce Motion (hyprland.lua hyprk_motion): no motion at all, as before
             const auto mv = moveConfig();
             if (!kind || !enabled() || !mv || !mv->pValues || mv->pValues->internalEnabled == 0 || w->m_ruleApplicator->noAnim().valueOrDefault())
@@ -149,6 +228,11 @@ namespace motion::frame {
             auto& size = w->sizeAnimation();
             if (!pos || !size || (!pos->isBeingAnimated() && !size->isBeingAnimated()))
                 return;
+
+            if (*kind == eKind::FULLSCREEN_EXIT)
+                startFrom(w, false, w->getFullWindowReservedArea());
+            else if (*kind == eKind::FULLSCREEN_ENTER && g_reserved.contains(key))
+                startFrom(w, true, g_reserved[key]);
 
             auto cfg             = makeShared<SAnimationPropertyConfig>();
             cfg->internalBezier  = "linear";
@@ -185,6 +269,7 @@ namespace motion::frame {
         g_listeners.push_back(Event::bus()->m_events.window.close.listen([](PHLWINDOW w) {
             finishFor(w);
             g_modes.erase(rc<uintptr_t>(w.get()));
+            g_reserved.erase(rc<uintptr_t>(w.get()));
         }));
     }
 
@@ -197,14 +282,28 @@ namespace motion::frame {
         g_runs.clear();
         g_listeners.clear();
         g_modes.clear();
+        g_reserved.clear();
+        g_strips.clear();
     }
 
     // runs right after Hyprland's animation tick (about 1 kHz while anything animates): sets the speed the next tick
     // reads, so the shown share is at most ~1 ms behind the curve. No work when nothing runs.
     void tick() {
-        if (g_runs.empty())
+        if (g_runs.empty() && g_strips.empty())
             return;
-        const auto now = clock::now();
+        const auto now       = clock::now();
+        bool       stripRuns = false;
+        for (auto& [id, s] : g_strips) {
+            if (!s.running)
+                continue;
+            const auto mon = s.monitor.lock();
+            if (std::chrono::duration<double>(now - s.start).count() >= STRIP_DURATION)
+                s.running = false; // this damage draws the end value
+            else
+                stripRuns = true;
+            if (mon)
+                g_pHyprRenderer->damageBox(CBox{mon->m_position.x, mon->m_position.y, mon->m_size.x, topInset(mon)});
+        }
         for (auto& r : g_runs) {
             const auto w = r.window.lock();
             if (!w)
@@ -223,7 +322,7 @@ namespace motion::frame {
                 finish(r);
         }
         std::erase_if(g_runs, [](const SRun& r) { return r.window.expired(); });
-        if (!g_runs.empty() && Animation::mgr())
+        if ((!g_runs.empty() || stripRuns) && Animation::mgr())
             Animation::mgr()->requestTick();
     }
 }
