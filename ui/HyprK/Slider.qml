@@ -12,6 +12,7 @@ import "controls.js" as G
 // otherwise centred under that knob position).
 // Controlled: it shows `value` and emits moved(value) while dragged and committed(value) once on mouse-up or an end
 // button click (for settings written only on release, like NSGlassTintAmount); the caller owns the state.
+// A press on the knob that never moves it emits nothing (no moved, released or committed): only the lens shows.
 Item {
     id: s
     property real from: 0
@@ -168,6 +169,7 @@ Item {
             anchors.bottomMargin: s.tickMarks > 1 ? -8 : 0
             preventStealing: true
             property real grabOffset: 0    // pointer minus knob centre when the knob was hit
+            property bool touched: false   // this press changed the value (a track press always does)
             function upd(mx) {
                 let f = Math.max(0, Math.min(1, (mx - grabOffset - s._m.knobWidth / 2) / track.usable));
                 if (s.onlyTicks && s.tickMarks > 1)
@@ -176,6 +178,7 @@ Item {
                 if (s._dragging && v === s._dragValue) return;
                 s._dragValue = v;
                 s._dragging = true;
+                touched = true;
                 s.moved(v);
                 if (s._jump && !pos.moving) s._jump = false;   // nothing to spring to
             }
@@ -183,11 +186,16 @@ Item {
                 const onKnob = Math.abs(m.x - track.knobCx) <= s._m.knobWidth / 2;
                 grabOffset = onKnob ? m.x - track.knobCx : 0;
                 s._jump = !onKnob;
+                touched = false;
                 if (onKnob) { s._dragValue = s.value; s._dragging = true; }   // a plain click on the knob changes nothing
                 else upd(m.x);
             }
             onPositionChanged: m => { if (pressed) upd(m.x); }
-            onReleased: { const v = s._dragValue; s._dragging = false; s._jump = false; s.released(); s.committed(v); }
+            onReleased: {
+                const v = s._dragValue;
+                s._dragging = false; s._jump = false;
+                if (touched) { s.released(); s.committed(v); }
+            }
             onCanceled: { s._dragging = false; s._jump = false; }
         }
     }

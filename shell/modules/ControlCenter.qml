@@ -409,11 +409,16 @@ Item {
                 visible: hover.hovered || trackMa.pressed
                 property real lift: trackMa.pressed ? 1 : 0
                 Behavior on lift { NumberAnimation { duration: Theme.cc.lensMs } }
-                readonly property real end: track.fillW + Math.max(0, sm.over)
+                // Knob and lens share one centre, the fill end, kept half a knob inside the track ends (the Mac's drag
+                // frame: lens 23.5 pt centred on the fill end; its overdrag frame: lens centre 8 pt before the track
+                // end, cc-sound-slider-rest-hover-drag-overdrag-dark-grey127.png). The lens grows around that centre.
+                // Before, the knob had its right edge on the fill end and the lens was centred on it, so a press moved
+                // the knob 9 pt to the right and the release moved it back (user report). The hover knob's place under
+                // the fill is not visible in the Mac frames (white on white): centred is inferred from the lens.
+                readonly property real cx: Math.max(Theme.cc.knobW / 2, Math.min(track.width - Theme.cc.knobW / 2, track.fillW)) + sm.over
                 width: Theme.cc.knobW + (Theme.cc.lensW - Theme.cc.knobW) * lift
                 height: Theme.cc.knobH + (Theme.cc.lensH - Theme.cc.knobH) * lift
-                // knob: right edge on the fill end; lens: centred on it
-                x: Math.max(-width * lift / 2, end - Theme.cc.knobW * (1 - lift) - width * lift / 2)
+                x: cx - width / 2
                 y: (track.height - height) / 2
                 RectangularShadow {
                     anchors.fill: parent
@@ -434,7 +439,7 @@ Item {
                     visible: opacity > 0
                     Rectangle {
                         x: 1
-                        width: parent.width / 2 - 1
+                        width: Math.max(0, Math.min(parent.width - 2, track.fillW + Math.max(0, sm.over) - knob.x - 1))   // up to the fill end
                         height: Theme.cc.lensBand
                         anchors.verticalCenter: parent.verticalCenter
                         radius: height / 2
@@ -462,9 +467,12 @@ Item {
                 anchors.topMargin: -10
                 anchors.bottomMargin: -10
                 enabled: sm.available
-                // the fill end runs half a knob ahead of the pointer; past an end: a damped stretch
+                // A press on the knob grabs it where it was hit: nothing moves and no value is written until the
+                // pointer moves. A press on the track sends the fill end half a knob ahead of the pointer (Q-panels-09)
+                // and keeps that offset. Past an end: a damped stretch
+                property real grab: -Theme.cc.knobW / 2   // pointer minus fill end
                 function update(mx) {
-                    const v = (mx + Theme.cc.knobW / 2) / track.width, c = Math.max(0, Math.min(1, v));
+                    const v = (mx - grab) / track.width, c = Math.max(0, Math.min(1, v));
                     const past = (v - c) * track.width;
                     sm.over = Math.sign(past) * Theme.cc.overdrag * (1 - Math.exp(-Math.abs(past) / 30));
                     sm.moved(c);
@@ -476,7 +484,11 @@ Item {
                         sm.dragging = false;
                     }
                 }
-                onPressed: m => update(m.x)
+                onPressed: m => {
+                    const onKnob = hover.hovered && Math.abs(m.x - knob.cx) <= Theme.cc.knobW / 2;
+                    grab = onKnob ? m.x - track.fillW : -Theme.cc.knobW / 2;
+                    if (!onKnob) update(m.x);
+                }
                 onPositionChanged: m => { if (pressed) { sm.dragging = true; update(m.x); } }
             }
         }

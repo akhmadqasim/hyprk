@@ -46,6 +46,9 @@ Item {
     }
 
     SignalSpy { id: toggledSpy; target: refusing; signalName: "toggled" }
+    SignalSpy { id: movedSpy; target: sl; signalName: "moved" }
+    SignalSpy { id: releasedSpy; target: sl; signalName: "released" }
+    SignalSpy { id: committedSpy; target: sl; signalName: "committed" }
 
     TestCase {
         name: "HyprKControls"
@@ -113,6 +116,28 @@ Item {
             compare(k.height, 20);
             mouseRelease(sl, cx, sl.height / 2);
             tryCompare(k, "width", 20, 1000);
+        }
+        // user report: pressing a slider's knob without moving must not move it or write a value
+        function test_slider_press_without_move() {
+            backend.level = 0.3;
+            let tr = null; for (let i = 0; i < sl.children.length; i++) if (sl.children[i].usable !== undefined) tr = sl.children[i];
+            const k = knobOf(tr);
+            const cx = k.x + k.width / 2;
+            movedSpy.clear(); releasedSpy.clear(); committedSpy.clear();
+            mousePress(sl, cx + 6, sl.height / 2);          // off-centre, still on the 20 pt knob
+            tryCompare(k, "width", 25, 1000);
+            fuzzyCompare(k.x + k.width / 2, cx, 0.01);      // grown around its centre
+            compare(backend.level, 0.3);
+            mouseRelease(sl, cx + 6, sl.height / 2);
+            compare(movedSpy.count, 0); compare(releasedSpy.count, 0); compare(committedSpy.count, 0);
+            compare(backend.level, 0.3);
+            tryCompare(k, "width", 20, 1000);
+            fuzzyCompare(k.x + k.width / 2, cx, 0.01);
+            mousePress(sl, cx + 6, sl.height / 2);          // and a real drag keeps the grab offset
+            mouseMove(sl, cx + 16, sl.height / 2);
+            fuzzyCompare(backend.level, 0.3 + 10 / tr.usable, 0.001);
+            mouseRelease(sl, cx + 16, sl.height / 2);
+            compare(releasedSpy.count, 1); compare(committedSpy.count, 1);
         }
         function test_popup_keeps_binding() {
             mouseClick(pop);                 // opens the menu (a click leaves it open)
