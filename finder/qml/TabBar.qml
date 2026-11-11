@@ -28,7 +28,7 @@ Item {
         height: root.height
         radius: height / 2
         color: Theme.dark ? "#38383F" : "#E8E8E8"
-        border.width: 1
+        border.width: 0.5   // 1 px rows y 104 / 159 at 2x
         border.color: Theme.dark ? "#48484E" : "#DCDCDC"
 
         Row {
@@ -50,6 +50,14 @@ Item {
                         visible: tab.sel || hover.hovered
                         color: tab.sel ? (Theme.dark ? "#3D3D45" : root.lightInactive ? "#F0F0F0" : "#FDFDFD")
                                        : (Theme.dark ? "#424249" : "#DCDCDC")
+                        // the selected tab's lit edges, active (crops/tabbar-*, its 48 px rows): light 255 255 254 / 254
+                        // 255 255 over 253, dark 119 93 72 69 .. 62 .. 69 72 90 111 over 62
+                        Rectangle {
+                            visible: tab.sel && Theme.active
+                            anchors.fill: parent
+                            radius: height / 2
+                            gradient: Theme.dark ? darkLit : lightLit
+                        }
                     }
                     TextLabel {
                         anchors.centerIn: parent
@@ -81,17 +89,43 @@ Item {
         }
     }
 
+    Gradient {
+        id: darkLit
+        GradientStop { position: 0.010; color: Qt.rgba(1, 1, 1, 0.295) }
+        GradientStop { position: 0.031; color: Qt.rgba(1, 1, 1, 0.161) }
+        GradientStop { position: 0.052; color: Qt.rgba(1, 1, 1, 0.052) }
+        GradientStop { position: 0.073; color: Qt.rgba(1, 1, 1, 0.036) }
+        GradientStop { position: 0.115; color: Qt.rgba(1, 1, 1, 0.021) }
+        GradientStop { position: 0.177; color: Qt.rgba(1, 1, 1, 0.010) }
+        GradientStop { position: 0.281; color: Qt.rgba(1, 1, 1, 0.000) }
+        GradientStop { position: 0.719; color: Qt.rgba(1, 1, 1, 0.000) }
+        GradientStop { position: 0.802; color: Qt.rgba(1, 1, 1, 0.010) }
+        GradientStop { position: 0.865; color: Qt.rgba(1, 1, 1, 0.016) }
+        GradientStop { position: 0.906; color: Qt.rgba(1, 1, 1, 0.026) }
+        GradientStop { position: 0.927; color: Qt.rgba(1, 1, 1, 0.036) }
+        GradientStop { position: 0.948; color: Qt.rgba(1, 1, 1, 0.052) }
+        GradientStop { position: 0.969; color: Qt.rgba(1, 1, 1, 0.145) }
+        GradientStop { position: 0.990; color: Qt.rgba(1, 1, 1, 0.254) }
+    }
+    Gradient {
+        id: lightLit
+        GradientStop { position: 0.010; color: Qt.rgba(1, 1, 1, 1.0) }
+        GradientStop { position: 0.031; color: Qt.rgba(1, 1, 1, 1.0) }
+        GradientStop { position: 0.052; color: Qt.rgba(1, 1, 1, 0.5) }
+        GradientStop { position: 0.073; color: Qt.rgba(1, 1, 1, 0.0) }
+        GradientStop { position: 0.927; color: Qt.rgba(1, 1, 1, 0.0) }
+        GradientStop { position: 0.948; color: Qt.rgba(1, 1, 1, 0.5) }
+        GradientStop { position: 0.969; color: Qt.rgba(1, 1, 1, 1.0) }
+        GradientStop { position: 0.990; color: Qt.rgba(1, 1, 1, 1.0) }
+    }
+
     Item {
         id: plus
         anchors.right: parent.right
         width: 28; height: 28
-        ToolbarPlatter { anchors.fill: parent }
-        Rectangle {   // inactive window: the platter darkens like the toolbar capsules (Q-finder-29)
-            anchors.fill: parent
-            radius: height / 2
-            visible: !Theme.active
-            color: Theme.color.capsuleInactive
-        }
+        // drawn like the toolbar capsules (crops/tabbar-*: sides 192 / 11, lit top, the 248 band; inactive flat 240), 29 pt
+        // across (x 1467..1524 px at 2x)
+        Capsule { anchors.centerIn: parent; width: 29; height: 29 }
         Symbol {
             anchors.centerIn: parent
             size: 14   // glyph 10 pt like the crop's
