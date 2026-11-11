@@ -10,5 +10,5 @@ Image {
     width: Files.tagDotsWidth(tags.length)
     height: 10
     sourceSize: Qt.size(2 * width, 2 * height)
-    source: visible ? Files.tagDotsUrl(tags, Theme.color.tagColors, ring.toString(), 0) : ""
+    source: visible ? Files.tagDotsUrl(tags, Theme.color.tagDotColors, ring.toString(), 0) : ""
 }

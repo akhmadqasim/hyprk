@@ -216,6 +216,15 @@ QtObject {
             for (const t of tags) m[t.name] = t.color;
             return m;
         }
+        // The tag dots in front of a name (icon, list and column views) are paler than the system colours: the dot fills
+        // of icons-light.png / icons-dark.png (list and column shots: the same values), Display P3 converted to sRGB
+        // (COLOUR-P3-AUDIT.md): light Red 236,107,104, Orange 242,168,98, Yellow 248,216,87, Green 125,208,131,
+        // Blue 84,158,248, Purple 198,97,224, Gray 165,165,168; dark 237,114,111, 242,172,104, 250,223,89,
+        // 126,216,131, 87,164,248, 210,101,237, 173,173,177. The sidebar's and the context menu's tag dots were not
+        // seen on the Mac (no Tags section, no favourite tags on that account): they keep tagColors
+        readonly property var tagDotColors: theme.dark
+            ? ({ Red: "#FF686A", Orange: "#FEA85A", Yellow: "#FFDE33", Green: "#5ADB79", Blue: "#33A6FF", Purple: "#E25DF4", Gray: "#ADADB1" })
+            : ({ Red: "#FE6063", Orange: "#FFA453", Yellow: "#FED732", Green: "#5DD37A", Blue: "#32A0FF", Purple: "#D559E7", Gray: "#A5A5A8" })
         // What tints a tagged folder: the tag's system colour (IconServices systemColorFromTagColorIndex), light
         // appearance. Red, Green, Blue, Purple: macOS 27's values as measured elsewhere in this repo; Orange: checked
         // on the Mac's tagged folder crop (sysicons.cpp); Yellow and Gray: Apple's published palette, not measured.
