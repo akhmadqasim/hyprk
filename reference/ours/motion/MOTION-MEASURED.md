@@ -364,3 +364,77 @@ after a lock surface's last frame.
 Left open: Spotlight open (blur 25 -> 0 and the frame clock), Control Center open and the other Qt-animated panels still
 run on the 16 ms timer; moving a panel to FrameSpring is the fix that worked for Mission Control, the HUD and the peek.
 The HUD's appear fits the Mac worse than its dismiss (slow start); the 84 ms gap in 1 of 8 appears was not traced.
+
+## Session 11 (2026-11-11): every shell motion on the frame clock, Spotlight open blur, zoom, Mission Control band
+
+Headless MBA 2560x1664 at 2x, own state, mcap from 088840a, small regions (240 x 240 pt and less; Mission Control full
+screen at k 4). "Before" is the tree at 7176610 in a second headless session on the same host, measured the same day
+with the same commands. 8 runs per row unless said. Per-frame series of the last run of each row: `motion-measured.csv`
+(`*-s11-after-run*`). Other headless sessions ran on the host: at times the compositor's own presentation times were
+uneven (intervals of 11 to 33 ms instead of 16.7; column "gap runs" = runs with an interval over 25 ms). A run with
+such a gap steps over a value on purpose (FrameClock keeps the speed), so those runs are counted apart.
+
+What changed (e87f6b0, 2ba6758, 24c14cd): `ui/HyprK/FrameClock.qml` (moved from the shell), `FrameAnim` (a
+NumberAnimation's members on the clock), `FrameEase` (what a Behavior did), `SpringCurve` evaluated in closed form on
+the clock, HyprK `Spring` stepped on it, `ShellWindow`'s glass settle on it. Three things the first port showed:
+
+- Qt polishes a window's items before `afterAnimating`. Quickshell sends the blur region (glass shapes, the opacity
+  marker) from the content item's polish, so a value set in the tick reached the compositor one frame after the
+  content. The clock now polishes the content item in the tick's frame (`ensurePolished`), or when the frame before
+  has been swapped if that one is still on its way (after idle Qt builds two frames back to back, 1 ms apart, and
+  from then on a frame is built while the one before waits for its frame callback). Control Center close without
+  this: .07 .22 .25 .43 (the glass one frame ahead of the content); with it .07 .22 .40 .54.
+- An effect created in the tick is not polished for that frame: Spotlight's close blur layer, switched on by the
+  first blur value, showed one empty frame (the bar gone, then back at .22). It is switched on before the first frame.
+- One value read by two windows (Control Center panel and its dim window; Cmd-Tab panel and its fill surface) reaches
+  the second window a frame late or not, by turns. Each window now runs the same curve on its own frames.
+- A window shown less than 150 ms ago does not tick for its first two frames: the compositor presents a new layer
+  from about its third buffer (session 4). Hold 0: .02 .02 .17; hold 1: three different starts in 6 opens; hold 2:
+  .06 .17 .31 .45 in 7 of 8.
+- The step over a missed frame is read from the tick's phase against the earliest phase of the run (2ba6758), not
+  from the gaps between frameSwapped signals: those jitter by half an interval on the GUI thread and skipped values
+  although every frame was shown.
+
+| Motion | Mac | Before: runs with a lost or repeated value, 2-98 % | After: same series in, 2-98 % | rms vs Mac (value / time) | Gap runs (after) |
+|---|---|---|---|---|---|
+| Control Center open | REA spring 0.25, critical | 4 of 8 (.20 missing), 233-251 ms | 7 of 8 (.06 .18 .32 .45 .58 .69 .77 .83; one run starts .10), 248-250 ms | 0.0029-0.0042 / 0.6-2.4 ms vs the spring (session 7: 0.005 / 1.2 ms in 4 of 5) | 0 of 8 |
+| Control Center close | same spring | 8 of 8 lost one, 233 ms | 8 of 8 (.07 .22 .40 .54 .66 .75 .82 .87), 233-234 ms | 0.012-0.013 / 3.4 ms vs the spring (the region holds the dim too) | 0 of 8 |
+| Spotlight open (no blur, e87f6b0) | REA open spring | 5 of 8 lost one, 117-135 ms | 8 of 8 (.06 .20 .37 .56 .72 .86 .97), 133 ms | - | 0 of 8 |
+| Spotlight open with the content blur 25 -> 0 (1f3ea25) | REA: blurRadius spring reversed | no blur | 10 of 10 and 8 of 8 (.05 .18 .34 .51 .67 .81 .92 .95, then the blur resolving to .99), 250 ms | bar width vs the open spring from the 4th visible frame, 1 px steps: 0.0023-0.0024 in 10 of 10 (before, no blur: 0.0015-0.0043 in 4) | 0 of 18 |
+| Spotlight close | REA close springs | repeated .06 in 5 of 8, lost one in 4 of 8, 100-135 ms | 8 of 8 (.07 .22 .40 .59 .75 .88 .98), 133 ms | no Mac track | 0 of 8 |
+| Spotlight mode list | Q-panels-26 share series, 167 ms | no two alike in 8 (repeats and lost values) | 8 of 8 quiet (.34 .34 .45 .60 .82; the first step is the panel's glass and shadow appearing, as before), 100 ms | 0.072-0.076 / 8 ms (before 0.058-0.106); share-of-change over the list region, not the edge reading of session 2 | 5 of 8 in the last run |
+| Notification Center open | spring 0.3 | 1 of 8 lost one, 350-370 ms | 7 of 8 quiet (one lost a value), 383 ms | not re-fitted (alpha over the cards, not the edge) | 4 of 8 in the last run |
+| Notification Center close | nc/motion.json | 4 of 8 lost one, 183-200 ms | 8 of 8 quiet (.07 .18 .31 .44 .57 .67 .76 .83 .88 .93), 200 ms | as above | 6 of 8 in the last run (2 with a repeated value) |
+| Banner in | nc/motion.json | 3 of 8 lost one, 2 of 8 a repeated first value | 6 of 8 quiet (2 with the first value .03 twice) | not re-fitted | 7 of 8 in the last run |
+| Menu fade (close) | 0.18-0.2 s | 8 of 8 lost one, 150 ms | 8 of 8 quiet (.16 .31 .45 .58 .69 .79 .86 .92 .97), 166-172 ms | - | 11 of 16 after 2ba6758: every lost value at a gap |
+| Menu blink | off 4, on 3 frames | off 4 / on 3 in 5 of 8 (session 2) | counted in frames by construction; not captured | - | - |
+| Dock hover label fade (magnification off) | cosine 0.292 s, #42 c | 0 of 8, 264-270 ms | 8 of 8 quiet (.02 .04 .08 .14 .21 .30 .38 .47 .55 .64 .72 .79 .85 .91 .95 .98), 262-284 ms; label on its own namespace | 0.013-0.015 / 3.8-4.4 ms in 5 clean runs (session 5: 0.011 / 4.4 ms) | 3 of 8 in the last run |
+| Dock magnification in | cosine 147 ms | icon top non-monotone and repeated in 6 of 6 (45.5 44 43 44.5 pt) | 5 of 6 the same rising series (29.5 37 44.5 49 50 pt) | not fitted (the region holds the label) | 0 of 6 |
+| Dock launch bounce | H 18 pt, P 0.70 s | works | works, symmetric per frame in 3 of 3 | not re-fitted (region clipped at 9 pt) | - |
+| Cmd-Tab dismiss | #42 b, 200 ms | not measured here | 5 of 8 the same (.12 .15 .20 .28 .36 .46 .57 .69 .79 .87 .94 .98), 3 differ in one value by at most .03, 200-250 ms | 0.033-0.042 / 9-16 ms over an app window, whose return to the active look adds a first step of .10 (session 5 over the wallpaper: 0.009) | 0 of 8 |
+| HUD appear (already on the clock) | hud-appear-fit, 483 ms | - | quiet: 7 of 8 the same, 518-533 ms | not re-fitted | 8 of 8 in the last run |
+| Mission Control exit, one Settings window (ad4599e) | R2 exit series, 267 ms | session 10, 2 terminals: 277-281 ms, 0.029-0.035 | 8 of 8 (.21 .36 .47 .57 .64 .71 .76 .80), 266-270 ms | 0.0105-0.0109 / 5 ms | 1 of 8 |
+| Mission Control enter, same | R2 enter series, 333 ms | session 10: 318-322 ms, 0.026-0.028 | 7 of 8 (.10 .22 .33 .43 .52 .59 .65), 350 ms | 0.0077-0.0095 / 4.3 ms | 0 of 8 |
+| Unzoom, menu bar band / Dock band (7326d90) | 267 ms in all | 417 / 467 ms (bar and Dock came back as after a full screen) | 184 / 250 ms (window rect 317 ms) | - | 0 of 6 |
+| Appearance switch from Settings (b80928a) | AppKit cross-fade 0.5 s (plugin 911cbe1) | Settings first, shell 146-1063 ms later | sidebar, menu bar and Dock: one ramp .02 .05 .10 .15 .22 .30 ... over 400-420 ms, both directions, no step before it | - | 0 of 12 |
+
+Scale 1.6 (same session, once): Control Center open / close, Spotlight open / close, Notification Center close and the
+menu fade show the same values as at 2x in the runs without gaps (NC close and the menu fade 8 of 8); Control Center
+and Spotlight had gap runs in 5 of 8, and the unmodified tree at 1.6 had them in 12 of 16 with no two runs alike. The
+menu fade's second value reads .42 at 1.6 (.30 at 2x, 8 of 8): not traced. Appearance switch at 1.6: Settings sidebar
+and menu bar the same ramp; the Dock region was not read cleanly.
+
+qs CPU at rest over 30 s: 4 ticks before, 1 after (both idle, no panel open).
+
+Left on Qt's timer: the banner list's ListView transitions (`displaced`, `move`: a ViewTransition takes Qt animations
+only), RubberBand's snap back, the lock's minute change and field shake, HyprK Switch / Slider's own NumberAnimations
+(the shell does not use those controls; Settings and Finder have one window each, where Qt animates per frame).
+Not re-measured: NC push and clear, banner out, Dock autohide, slot grow / shrink, drag-off, submenu delay, menu blink,
+Apps, HUD dismiss, full-screen peek, lock.
+
+Open: (1) frame gaps. With the motion tied to frames, a compositor frame that comes late is visible as one stepped-over
+value; in a quiet phase a row is 8 of 8, in a loaded one most runs have a gap, and in three back-to-back comparisons
+the unmodified tree's session showed none while this one did (Control Center close 0 of 14 against 9 of 14; NC close 0
+of 16 against 11 of 16). The GUI thread's ticks were then 26-30 ms apart although the tick itself took under 6 ms;
+what delays the frame callback there is not traced. (2) Inside the Dock's glass Mission Control still shows the real
+window under the Dock.
