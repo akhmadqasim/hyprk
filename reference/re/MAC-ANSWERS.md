@@ -3683,3 +3683,58 @@ State: G4 never took the screen lock, opened no apps, changed no defaults / Dock
 | (4g) long-menu scroll arrows / auto-scroll speed | not measured: Mac shut down | earlier static layout only (24 pt arrow row, 13x8 chevron, no fade); speed not measured | MAC-ANSWERS Q-menubar-26 |
 
 Next step when the Mac is back: call the exported `_NSElastic*` / `_NSHyperbolic*` functions through dlsym from a probe to tabulate the rubber-band curve, disassemble them for constants, then the live sessions.
+
+
+## Sounds per event (PC #73 part 3, static only: Mac shut down)
+
+# SND answers (PC #73 part 3) — INTERRUPTED: Mac shut down by user before any live test
+
+Nothing was triggered live; no system state was changed (volume still 31, no dmg made, screen lock never taken, Bin untouched).
+All statuses below are therefore SEBAGIAN/RAGU (static only). Prior findings: MAC-ANSWERS.md "Sounds (27.2.1)".
+
+New facts found in this session (static / read-only):
+- The system-sound name table lives in the on-disk binary /usr/sbin/systemsoundserverd (runs as root), __cstring 0x100015dc8+:
+  base dir string at file offset 0x16365 "/System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/",
+  then names in this order from 0x163ff: Grab.aif, Screen Capture.aif, Volume Mount.aif, Volume Unmount.aif, Media Keys.aif,
+  burn complete.aif, burn failed.aif, Mouse Keys ON/OFF, Sticky Keys ..., Slow Keys ..., empty trash.aif, move to trash.aif,
+  poof item off dock.aif, drag to trash.aif, InkSound*, telephony tones, payment_success/failure, dtmf-*, multiway_*, SentMessage.caf, ...
+  Shutter.aif is NOT in the table (file exists on disk but is not referenced there).
+  The ID -> name mapping function was NOT decompiled (stopped). Next step: REA open /usr/sbin/systemsoundserverd (arm64e), xrefs to 0x1000163ff etc.
+- Server log strings: "Do not start audio for actionID %u ... IsUIAudioOn: %d, IsAlertAudioOn: %d" => UI sounds gated by a UI-audio pref, alerts by an alert-audio pref
+  (kSSXPCMessageKey_Prefs_AlertAudioOn / AlertVisualOn). Unified-log subsystem to watch live: com.apple.coreaudio, process systemsoundserverd.
+- Prefs on this Mac: com.apple.sound.beep.sound = /System/Library/Sounds/Blow.aiff (alert sound is Blow here, not the stock default);
+  com.apple.sound.beep.feedback = 0 (volume feedback off); com.apple.sound.uiaudio.enabled unset; com.apple.sound.beep.flash = 0.
+- nvram: StartupMute=%00 (startup chime not muted), SystemAudioVolume=%80.
+- PowerChime.app is running (pid seen), no com.apple.PowerChime defaults domain (stock behaviour).
+- ~/.Trash is not readable from this shell (TCC), so Bin emptiness could not be checked: Empty Bin must be answered from code.
+
+| event | file | status |
+|---|---|---|
+| notification banner, default | not measured: Mac shut down | - |
+| notification banner, app sound (sound name "Glass") | /System/Library/Sounds/Glass.aiff expected; not measured: Mac shut down | RAGU |
+| alert / NSBeep | file in com.apple.sound.beep.sound (here Blow.aiff); when NSAlert plays it: not measured: Mac shut down | SEBAGIAN (pref only) |
+| Move to Bin | SystemSounds/finder/move to trash.aif | SEBAGIAN (name table in systemsoundserverd; caller/ID not traced) |
+| Empty Bin | SystemSounds/finder/empty trash.aif | SEBAGIAN (same) |
+| Dock poof | SystemSounds/dock/poof item off dock.aif (drag to trash.aif for dragging onto Bin) | SEBAGIAN (same) |
+| screenshot | SystemSounds/system/Screen Capture.aif or Grab.aif (screencapture plays ID 1393; -x silent); Shutter.aif not in table | RAGU between the two; not measured: Mac shut down |
+| volume feedback | BezelServices.loginPlugin/Contents/Resources/volume.aiff; pref beep.feedback = 0 here; stock default not verified | SEBAGIAN |
+| dmg mount/unmount | SystemSounds/system/Volume Mount.aif / Volume Unmount.aif; whether a dmg mount plays them at all: not measured: Mac shut down | RAGU |
+| charger connected | PowerChime.app/Contents/Resources/connect_power.aif | SEBAGIAN (static, earlier finding) |
+| startup chime | StartupMute=%00 => enabled; chime file is in firmware, not on the system volume (not traced) | RAGU; not measured: Mac shut down |
+
+afinfo (path | format; duration):
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/finder/move to trash.aif | Data format:     2 ch,  44100 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 2.185828 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/finder/empty trash.aif | Data format:     2 ch,  48000 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 0.824979 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/dock/poof item off dock.aif | Data format:     2 ch,  44100 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 0.336531 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/dock/drag to trash.aif | Data format:     2 ch,  48000 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 0.500583 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/system/Grab.aif | Data format:     2 ch,  44100 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 0.492744 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/system/Screen Capture.aif | Data format:     2 ch,  48000 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 0.729062 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/system/Shutter.aif | Data format:     2 ch,  44100 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 0.492744 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/system/Volume Mount.aif | Data format:     2 ch,  48000 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 1.044458 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/system/Volume Unmount.aif | Data format:     2 ch,  44100 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 0.569002 sec
+- /System/Library/Components/CoreAudio.component/Contents/SharedSupport/SystemSounds/system/Media Keys.aif | Data format:     1 ch,  44100 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 0.382426 sec
+- /System/Library/LoginPlugins/BezelServices.loginPlugin/Contents/Resources/volume.aiff | Data format:     1 ch,  44100 Hz, lpcm (0x0000000E) 16-bit big-endian signed integer;estimated duration: 0.382426 sec
+- /System/Library/CoreServices/PowerChime.app/Contents/Resources/connect_power.aif | Data format:     2 ch,  44100 Hz, lpcm (0x0000000E) 16-bit big-endian signed integer;estimated duration: 0.903084 sec
+- /System/Library/Sounds/Blow.aiff | Data format:     2 ch,  48000 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 1.401833 sec
+- /System/Library/Sounds/Funk.aiff | Data format:     2 ch,  48000 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 2.163458 sec
+- /System/Library/Sounds/Glass.aiff | Data format:     2 ch,  48000 Hz, lpcm (0x0000000E) 24-bit big-endian signed integer;estimated duration: 1.650083 sec
