@@ -410,9 +410,18 @@ Item {
                             readonly property int year: clock.date.getFullYear()
                             readonly property int mon: clock.date.getMonth()
                             readonly property int today: clock.date.getDate()
-                            readonly property int lead: (new Date(year, mon, 1).getDay() + 6) % 7   // weeks start on Monday
+                            // The week starts where the region's does, as on the Mac (it follows the Region setting: the
+                            // reference Mac, en_GB with region Indonesia, starts on Sunday, nc/widgets-light-white.png).
+                            // Here: the locale of LC_TIME / LANG (Qt.locale(); en_US: Sunday, en_GB / de_DE: Monday).
+                            // Qt's firstDayOfWeek is 1 = Monday .. 7 = Sunday, JS getDay() 0 = Sunday .. 6 = Saturday.
+                            readonly property var loc: Qt.locale()
+                            readonly property int first: loc.firstDayOfWeek % 7
+                            readonly property int lead: (new Date(year, mon, 1).getDay() - first + 7) % 7
                             readonly property int days: new Date(year, mon + 1, 0).getDate()
-                            readonly property var dayNames: ["M", "T", "W", "T", "F", "S", "S"]
+                            // narrow names from the locale (S M T W T F S), in column order
+                            readonly property var dayNames: [0, 1, 2, 3, 4, 5, 6].map(c => loc.dayName((first + c) % 7, Locale.NarrowFormat))
+                            // the locale's weekend (days not in weekDays) is grey like the header row (Mac crop: Sat, Sun)
+                            function weekend(column) { return loc.weekDays.indexOf((first + column) % 7 || 7) === -1; }
                             columns: 7
                             columnSpacing: Theme.nc.monthGap
                             rowSpacing: Theme.nc.monthGap / 2
@@ -436,7 +445,8 @@ Item {
                                         anchors.centerIn: parent
                                         text: parent.isHeader ? month.dayNames[parent.index] : parent.day > 0 ? parent.day : ""
                                         font: Typography.font(Theme.font.widgetMonth, parent.isHeader ? Typography.semibold : Typography.regular)
-                                        color: parent.isToday ? Theme.nc.onImage : parent.isHeader ? Theme.nc.widgetSecondary : Theme.nc.widgetLabel
+                                        color: parent.isToday ? Theme.nc.onImage
+                                             : parent.isHeader || month.weekend(parent.index % 7) ? Theme.nc.widgetSecondary : Theme.nc.widgetLabel
                                     }
                                 }
                             }
