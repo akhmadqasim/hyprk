@@ -271,6 +271,24 @@ ShellWindow {
             width: Theme.spotlight.barW
             height: Theme.spotlight.barH
             readonly property real fullHeight: sp.calcCard ? Theme.spotlight.calcBarH : Theme.spotlight.barH
+            // the soft shadow below, outside the capsule only (one quad; Reduce Transparency keeps it, as the Mac's
+            // shadow is not part of the glass)
+            ShaderEffect {
+                readonly property real m: Theme.spotlight.shadowDrop + 3 * Theme.spotlight.shadowSigma
+                x: -m
+                y: -m
+                width: parent.width + 2 * m
+                height: bar.fullHeight + 2 * m
+                property size quad: Qt.size(width, height)
+                property size box: Qt.size(bar.width, bar.fullHeight)
+                property real margin: m
+                property real radius: Theme.spotlight.barRadius
+                property real drop: Theme.spotlight.shadowDrop
+                property real sigma: Theme.spotlight.shadowSigma
+                property real strength: Theme.spotlight.shadowStrength
+                property real aa: 1 / (sp.screen ? sp.screen.devicePixelRatio : 2)
+                fragmentShader: Qt.resolvedUrl("../shaders/islandshadow.frag.qsb")
+            }
             Glass {
                 width: parent.width
                 height: bar.fullHeight

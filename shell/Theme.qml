@@ -539,6 +539,13 @@ Singleton {
         readonly property real showResultsW: 148
         readonly property real showResultsH: 44
         readonly property real barRadius: 43.5
+        // the soft shadow under the capsule, outside its shape only (shaders/islandshadow.frag): Gaussian of the capsule
+        // moved down 18, fitted to panels/spotlight-empty-light.png down the bar's middle (bg 254: 172 / 175 / 178 / 185
+        // / 192 / 200 / 216 / 237 at 0 / 2 / 4 / 8 / 12 / 16 / 24 / 36 pt below, 237 -> 254 over 24 pt above): black
+        // .39, sigma 19, rms .002; dark (bg 33: 14 .. 28 below, 28 above): .72, sigma 22, rms .010
+        readonly property real shadowStrength: theme.dark ? 0.72 : 0.39
+        readonly property real shadowSigma: theme.dark ? 22 : 19
+        readonly property real shadowDrop: 18
         readonly property real barTop: 0.227             // bar top at 22.7 % of the screen height
         readonly property int gap: 10
         readonly property real inputSize: 22             // query and placeholder: SF 22 regular
