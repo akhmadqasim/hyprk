@@ -93,12 +93,12 @@ Singleton {
     }
     // the Liquid Glass slider for the plugin (its live-updatable 0..1 option; Mac: NSGlassTintAmount, a running app
     // re-reads it on the coordinated notification, MAC-ANSWERS PC #67 C2 item 5)
-    // HANDOFF H4: the plugin option is not final. Set pluginGlassOption to its name (expected "tint_amount") and
-    // check the command below against the plugin's README; empty = nothing is sent.
-    readonly property string pluginGlassOption: ""
+    // plugin option tint_amount (plugin/README.md, commit 2821fa0); the eval fires no reload event, so the plugin
+    // is told to redraw its glass afterwards
+    readonly property string pluginGlassOption: "tint_amount"
     function syncPluginGlass() {
         if (!compositorGlass || pluginGlassOption === "") return;
-        Quickshell.execDetached(["hyprctl", "eval", `hl.config({ plugin = { liquidglass = { ${pluginGlassOption} = ${glassTint.toFixed(4)} } } })`]);
+        Quickshell.execDetached(["sh", "-c", `hyprctl eval 'hl.config({ plugin = { liquidglass = { ${pluginGlassOption} = ${glassTint.toFixed(4)} } } })' && hyprctl liquidglass damage`]);
     }
     // window shadow and rim densities differ in light and dark (config/hypr/hyprland.lua hyprk_appearance)
     function syncWindowChrome() {

@@ -6,6 +6,6 @@
   "reduceMotion": false,
   "accent": "multicolor",
   "sidebarIconSize": "medium",
-  "glass": 1,
+  "glass": 0.5,
   "iconStyle": "default"
 }
