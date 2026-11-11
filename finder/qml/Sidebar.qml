@@ -54,7 +54,7 @@ Rectangle {
         id: flick
         contentHeight: column.height + 16
         clip: true
-        boundsBehavior: Flickable.StopAtBounds
+        boundsBehavior: Tokens.scroller.bounds
 
         Column {
             id: column

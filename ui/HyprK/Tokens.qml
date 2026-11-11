@@ -99,6 +99,11 @@ QtObject {
         readonly property real minLength: 18       // TODO verify (not measured; AppKit keeps the knob grabbable)
         readonly property color knob: t.dark ? Qt.rgba(1, 1, 1, 0.5) : Qt.rgba(0, 0, 0, 0.5)
         readonly property int hold: 600            // stays after the last scroll event
+        // Edge behaviour of every scroll view (Finder views and sidebar, Settings panes, popups): Qt's standard
+        // OvershootBounds with its default rebound. A mouse wheel stops at the edge (as on the Mac); flicks may overshoot
+        // and spring back; nothing can be dragged past the edge. MAC-ANSWERS.md has no scroll-view overscroll or
+        // spring-back numbers and AppKit documents no constants, so nothing here is tuned (see the judge-f report).
+        readonly property int bounds: Flickable.OvershootBounds
         readonly property int fade: 150            // then fades out (9 frames)
     }
 
@@ -202,8 +207,8 @@ QtObject {
         // Q-windows-09, non-key window (lights-inactive-*.png): dark #4C4C52 -> #47484D, light grey arcs at the top
         // (#B4B4B4) and bottom (#ADADAD); light #EFEFF3 -> #F6F7F8, ring #EAEAEE at the top, #ABABAE on the sides
         readonly property var inactive: t.dark
-            ? { fill: ["#4C4C52", "#4C4C52", "#47484D"], ring: ["#B4B4B4", "#B4B4B4", "#4A4B50", "#ADADAD", "#ADADAD"], glow: "transparent" }
-            : { fill: ["#EFEFF3", "#F2F3F5", "#F6F7F8"], ring: ["#EAEAEE", "#ABABAE", "#ABABAE", "#ABABAE", "#E7E7EA"], glow: "transparent" }
+            ? { fill: ["#4C4C52", "#4C4C52", "#47484D"], ring: ["#B4B4B4", "#B4B4B4", "#4A4B50", "#ADADAD", "#ADADAD"], glyph: "transparent", glow: "transparent" }
+            : { fill: ["#EFEFF3", "#F2F3F5", "#F6F7F8"], ring: ["#EAEAEE", "#ABABAE", "#ABABAE", "#ABABAE", "#E7E7EA"], glyph: "transparent", glow: "transparent" }
     }
 
     // ---------- window frame (MAC-ANSWERS.md Q-windows-02, -03) ----------

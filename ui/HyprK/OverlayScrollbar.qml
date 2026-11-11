@@ -11,6 +11,9 @@ Item {
     width: Tokens.scroller.width
     readonly property real _ratio: flickable && flickable.contentHeight > 0 ? Math.min(1, flickable.height / flickable.contentHeight) : 1
     readonly property real _range: flickable ? flickable.contentHeight - flickable.height : 0
+    // past an edge (rubber band) the knob shortens by the overshoot share and stays at that edge
+    readonly property real _over: !flickable ? 0 : flickable.contentY < 0 ? -flickable.contentY
+                                 : Math.max(0, flickable.contentY - Math.max(0, _range))
     visible: opacity > 0 && _ratio < 1
     opacity: 0
 
@@ -30,7 +33,7 @@ Item {
         id: knob
         objectName: "knob"
         width: parent.width
-        height: Math.max(Tokens.scroller.minLength, sb.height * sb._ratio)
+        height: Math.max(Tokens.scroller.minLength, sb.height * sb._ratio * (1 - Math.min(1, sb._over / Math.max(1, sb.flickable ? sb.flickable.height : 1))))
         y: sb._range > 0 ? (sb.height - height) * Math.max(0, Math.min(1, sb.flickable.contentY / sb._range)) : 0
         radius: width / 2
         color: Tokens.scroller.knob

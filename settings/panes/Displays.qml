@@ -92,7 +92,7 @@ Column {
                 contentWidth: Math.max(width, row.width + 2 * strip.pad)
                 contentHeight: height
                 flickableDirection: Flickable.HorizontalFlick
-                boundsBehavior: Flickable.StopAtBounds
+                boundsBehavior: Tokens.scroller.bounds
 
                 // keep the selected display in view when it changes (arrow keys, a new first selection)
                 function reveal() {

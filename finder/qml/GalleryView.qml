@@ -61,7 +61,7 @@ Item {
         leftMargin: Theme.gallery.pad
         rightMargin: 10
         model: root.browser.entries
-        boundsBehavior: Flickable.StopAtBounds
+        boundsBehavior: Tokens.scroller.bounds
         currentIndex: root.browser.cursor
         highlightFollowsCurrentItem: false
         onCurrentIndexChanged: if (currentIndex >= 0) positionViewAtIndex(currentIndex, ListView.Contain)

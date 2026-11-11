@@ -97,7 +97,7 @@ Item {
         topMargin: Theme.list.firstRowGap
         clip: true
         model: root.browser.entries
-        boundsBehavior: Flickable.StopAtBounds
+        boundsBehavior: Tokens.scroller.bounds
         currentIndex: root.browser.cursor
         highlightFollowsCurrentItem: false
 
