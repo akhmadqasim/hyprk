@@ -3608,3 +3608,78 @@ tint = quantise6(mean of the wallpaper pixels under the window frame)   // encod
 - Code excerpts: `reference/re/27.2.1/decomp/QuartzCore-SkyLight-chameleon.c`, `QuartzCore-glass-blur-pyramid.c`; correction note added to `QuartzCore-glassBackground-shader.c`
 - Probes: `reference/re/tools/probe/glass3.swift` (tree / sb / blur / nat / nat3), `cham.swift`
 - Pictures: `reference/screens/27.2.1/verify/C3/` (probe windows only)
+
+
+## Lock screen (PC #73 part 1, partial: Mac shut down)
+
+Raw recordings were sent to the PC inbox as lock-raw-27.2.1.tar.
+
+# lockscreen answers (agent LOCK) — PARTIAL, stopped early (Mac shutdown)
+
+Status: only the AX dumps and the two preview stills (v-dark3.png, v-light3.png) were read. NO video frame was
+analysed, NO static RE was done. Every transition number is "not measured". Raw material is intact (nothing deleted).
+
+Source: loginwindow AX while locked (dark-ax.jsonl / light-ax.jsonl, copied to
+reference/re/27.2.1/live/lockscreen/ax-{dark,light}.jsonl; no personal data in them), frames in pt, top-left origin,
+screen 1710x1107. AX frames are identical in light and dark except the time width.
+
+- Q-03 clock: time = SwiftUI AXHostingView, AX frame x657.5 y115 w395 h185 ("09.07") / x674.5 w361 ("09.12") → centred
+  on x=855, width follows the digits (proportional, not tabular). Digit ink bbox: not measured.
+- Q-04 format: "09.07" = 24 h, leading zero, locale separator "." (en-ID), no AM/PM. 12 h: not measured.
+- Q-05 date: AX id "LargeDate", value "Wed 11 Nov" (abbreviated weekday, day, abbreviated month; locale order),
+  frame x772 y98.5 w166 h39, centred on 855, ABOVE the time and overlapping the top of the time's AX frame (115).
+  Font/size/weight: not measured.
+- Q-02 clock look (stills only, not pixel-measured): heavy rounded-looking digits, translucent/glass-like tint taking
+  the wallpaper colour (lilac on TahoeDark, near white with a cyan cast on TahoeLight). Font, size, weight: not measured.
+- Q-06 avatar: one small disc centred on x≈855, about 30 pt, centre y≈950 (estimated from a downscaled still,
+  ±3 pt). Exact diameter/border/shadow: not measured.
+- Q-07 name: NO name label was visible in the stills and none is in the AX tree (only "show all users" button,
+  AXScrollArea x227.5 y573.5 w1255 h414). Needs confirming on full-res screenshots.
+- Q-08 field: UserPasswordTextField AX x788 y997.5 w117 h18 (text area); LUIBUTTON_GO x906 y998 w30 h17.5 (arrow,
+  inside the capsule right end); LUIBUTTON_PASSWORD_HINT "(?)" x940 y998 w30 h17.5 (separate circle right of the
+  field). Capsule outer size/radius: not measured.
+- Q-09 field material: not measured.
+- Q-10 placeholder: "Enter Password" left-aligned in the field, shown at once (light still); the line under the field
+  is AXStaticText "Touch ID or Enter Password" x771.5 y1027.5 w167.5 h17, centred on 855. Arrow button present (AX).
+- Q-11 dots: typed dots are left-aligned with a caret (dark still). Sizes, caps-lock indicator: not measured.
+- Q-14 Touch ID line: text "Touch ID or Enter Password", frame above. Font/size: not measured.
+- Q-15 bottom buttons: none in the AX tree on the lock screen (no Sleep/Restart/Shut Down/Cancel/Switch User).
+- Q-16 status, right→left (AX): Wi-Fi AXMenuButton x1665 y9.5 w26 h15; battery AXImage x1625 y9 w28 h16
+  ("battery charged 100%"); keyboard "ABC" TextInputMenuButton x1559 y8 w54 h18; then
+  "Your screen is being observed" x1337 y8 w185 h18 — this one shows ONLY because we were screen-recording.
+  Gaps 12 pt; right margin 1710-1691 = 19 pt. The normal menu bar (Apple menu, app menus, clock) is not shown.
+- Q-17 keyboard item: text "ABC" + keyboard glyph, present with this account's input sources; popup: not measured.
+- Q-20/21/22 notifications / Now Playing / widgets: none visible in the stills; the desktop widgets (NC "Clock I",
+  "Status" windows) stay in the window list but are covered by the loginwindow window (layer 2004, full screen; a
+  second loginwindow window at layer 2001, 30000x30000 = shield). Not checked further.
+- Q-01 wallpaper: stills show the same Tahoe picture, not visibly blurred or dimmed. Pixel delta: not measured.
+- Q-31: layout identical in light and dark (AX); clock tint differs with the wallpaper (see Q-02).
+
+Not measured (no time): Q-12 shake (amplitude/count/duration/curve), Q-13 hint, Q-18 lock-in, Q-19 unlock,
+Q-24 saver→lock, Q-25 display sleep/wake, Q-23, Q-26..30, Q-32, Q-33, sounds, all static RE
+(loginwindow / LoginUIKit / LoginUICore constants).
+
+Remaining work for whoever continues: recordings scratchpad/lock/{dark,light,sleep,saver}.mp4 and
+{dark,light}-sc1..6.png are still there (personal data: avatar, menu bar, desktop after unlock — blank before
+saving anything to the repo). scratchpad/lockwork/tl.py builds a per-frame activity timeline (was still running
+when stopped; its .npz output may be incomplete). No PNGs were written to reference/screens/27.2.1/lockscreen/.
+
+
+## PC #73 parts 2 and 4 (not measured: Mac shut down)
+
+# G4 answers (PC #73 parts 2 and 4) — stopped early: Mac shut down
+
+State: G4 never took the screen lock, opened no apps, changed no defaults / Dock / appearance / wallpaper. Nothing to restore. No files written to the repo.
+
+| item | status | value | evidence |
+|---|---|---|---|
+| (2) rubber-band formula, return curve, momentum, scroll bar in overscroll | RAGU (not measured: Mac shut down) | only the entry points were found | AppKit exports (dyld_info -exports, offsets from the AppKit image base): `_NSElasticDeltaForReboundDelta` 0x28B7EC, `_NSReboundDeltaForElasticDelta` 0x28B1F8, `_NSElasticDeltaForTimeDelta` 0x2ADD3C, `...ForReboundDelta2` 0xAAA308, `...ForTimeDelta2` 0xAAA204, `_NSReboundDeltaForElasticDelta2` 0xAAA31C, `_NSElasticInitialPositionForZeroDelta` 0xAAA324, `_NSHyperbolicElasticDeltaForReboundDelta` 0xAAA3B8, `_NSHyperbolicReboundDeltaForElasticDelta` 0xAAA3FC; data `NSScrollingBehaviorHyperbolicCoefficientTouch` 0x13FB2C0, `...Trackpad` 0x13FB2C8; classes `_NSScrollingMomentumCalculator`, `_NSScrollingRubberbandFilter`. Not disassembled, constants not read. |
+| (4a) Control Center module expansion, Edit Controls / AirPlay button | not measured: Mac shut down | earlier values stand unverified: morph ~0.35 s; Edit Controls capsule 93.5 x 24, r 12, 16 pt below the last row; AirPlay button 26 x 26 in the Sound tile | MAC-ANSWERS (Control Center section) |
+| (4b) Quick Look open/close | not measured: Mac shut down | earlier: 0.79 -> 1 in ~0.25 s ease-out (.79 .85 .90 .93 .95 .97 .98 .98 .99 1); close ~0.18 s into the icon | MAC-ANSWERS Q-finder-26 |
+| (4c) full screen enter/exit | not measured: Mac shut down | earlier: enter ~0.42 s, exit ~0.5 s in two steps | MAC-ANSWERS R2 |
+| (4d) traffic lights glow / hover glyph timing | not measured: Mac shut down | earlier: pressed disc ~1.15x and brighter; hover delay/fade never measured | MAC-ANSWERS Q-windows-08 |
+| (4e) Cmd-Tab show delay | not measured: Mac shut down | earlier 0.19 s, quick tap < ~30 ms switches without the panel; not re-verified | MAC-ANSWERS Q-dock-22 |
+| (4f) Dock slot add/remove animation | not measured: Mac shut down | - | - |
+| (4g) long-menu scroll arrows / auto-scroll speed | not measured: Mac shut down | earlier static layout only (24 pt arrow row, 13x8 chevron, no fade); speed not measured | MAC-ANSWERS Q-menubar-26 |
+
+Next step when the Mac is back: call the exported `_NSElastic*` / `_NSHyperbolic*` functions through dlsym from a probe to tabulate the rubber-band curve, disassemble them for constants, then the live sessions.

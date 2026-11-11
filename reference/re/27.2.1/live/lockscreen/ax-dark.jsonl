@@ -1,0 +1,16 @@
+{"d":0,"role":"AXApplication","title":"loginwindow"}
+{"d":1,"frame":[0,0,1710,1107],"id":"login","role":"AXWindow","sub":"AXUnknown","title":"Login"}
+{"d":2,"desc":"Wi-Fi Networks","enabled":"1","frame":[1665,9.5,26,15],"id":"WiFiMenuButton","role":"AXMenuButton"}
+{"d":2,"desc":"battery charged 100%","enabled":"1","frame":[1625,9,28,16],"role":"AXImage"}
+{"d":2,"desc":"keyboard","enabled":"0","frame":[1559,8,54,18],"id":"TextInputMenuButton","role":"AXButton","title":"ABC"}
+{"d":2,"enabled":"1","frame":[1337,8,185,18],"role":"AXStaticText","value":"Your screen is being observed"}
+{"d":2,"enabled":"1","frame":[772,98.5,166,39],"id":"LargeDate","role":"AXStaticText","value":"Wed 11 Nov"}
+{"d":2,"frame":[657.5,115,395,185],"role":"AXGroup","sub":"AXHostingView"}
+{"d":3,"enabled":"1","frame":[657.5,115,395,185],"role":"AXStaticText","value":"09.07"}
+{"d":2,"frame":[227.5,573.5,1255,414],"role":"AXScrollArea"}
+{"d":3,"desc":"show all users","enabled":"1","frame":[227.5,573.5,1255,414],"role":"AXButton","title":"show all users"}
+{"d":3,"enabled":"0","frame":[226.5,969.5,1257,19],"role":"AXScrollBar","value":"0"}
+{"d":2,"enabled":"0","frame":[788,997.5,117,18],"id":"UserPasswordTextField","role":"AXTextField","sub":"AXSecureTextField","value":""}
+{"d":2,"desc":"login","enabled":"0","frame":[906,998,30,17.5],"id":"LUIBUTTON_GO","role":"AXButton"}
+{"d":2,"desc":"password hint","enabled":"0","frame":[940,998,30,17.5],"id":"LUIBUTTON_PASSWORD_HINT","role":"AXButton"}
+{"d":2,"enabled":"1","frame":[771.5,1027.5,167.5,17],"role":"AXStaticText","value":"Touch ID or Enter Password"}
