@@ -450,9 +450,12 @@ A plain rect with a 1x1 hole in its top row at left + 1, hanging 1 pt below the 
 `spacing`). The hole is needed because a region is a union: a shape touching the pill would merge with it.
 The pointer has no materialize hole of its own: it takes the materialize of the largest other shape of its group (the pill),
 so pill and pointer fade as one shape; the layer's opacity covers both (one draw). Alone in a group it stays at 1.
-The shell draws the label's fill (`Theme.dock.labelFill`, k + c (1 - a)) over the pill rect only, so the plugin applies the same
-fill to a pointer group outside its plain shapes (dark k 23.5 / 255 a 0.083, light 107 / 255 a 0.382): over black the pointer
-read 14 under a 35 pill, now 36 (Mac: one shape, 31).
+The label is a layer of its own (`hyprk-dock-label`, material `regular`, config/hypr/hyprland.lua) and needs no fill there:
+Regular at that size over the wallpaper is the Mac's label (32 / 134 / 185 dark, 133 / 195 / 253 light against 31 / 131 / 180
+and 131 / 192 / 249). The shell no longer draws one (`Theme.dock.labelFill` was removed in 2210b40). The plugin still has the
+old fill for a pointer group on the Dock's own recipe (a label drawn on the `hyprk-dock` namespace, as before the move):
+k + c (1 - a) with dark k 23.5 / 255 a 0.083, light 107 / 255 a 0.382 outside its plain shapes (GlassElement.cpp,
+`pointerFill`); over black that pointer read 14 under a 35 pill, with the fill 36 (Mac: one shape, 31).
 Shape check (judge #4 gap 14, "base 14.5 pt vs 16"; 2026-11-11): the shader's union and a Python reference of the decoded
 one (16 pt square turned 45 deg, r 2.5, centre 4 above the pill's bottom, QuartzCore's normal-aware smooth min at 25) are the
 same curve: width 16.2 / 12.1 / 8.2 / 4.1 pt at 0.75 / 1.75 / 3.25 / 5.25 pt below the pill, tip 6.3 (14.1 at 1.2 pt: the

@@ -68,6 +68,14 @@ TABLE = {
         None,  # as the first
     ],
 }
+# Pressed zoom, checked 2026-11-11 (report: centre of the disc 10-22 levels off the crop). Light: the body is not the
+# cause, a fit that masks only the glyph's own pixels instead of the 8.8 pt box gives T 127,255,48 M 160,255,98
+# B 243,255,200 (this table: 129,255,52 / 160,255,98 / 241,255,198). The difference is the glyph on top (Titlebar.cpp,
+# TrafficLights.qml): mean of the central 4 x 4 pt, crop 64,211,35, model + glyph 74,203,51; the crop's triangles are
+# larger (least squares: corners 4.00 / 9.10 against 4.1 / 8.9 in the 14 pt box, the gap on the row through the centre
+# 2.03 pt against 2.29) and their ink reads 0,174,0 through the same conversion (token #00A700). Dark: the value the
+# report compares with (12,135,2) is the centre of lights-hover-dark.png, the rest disc with its glyph; no crop shows
+# a pressed dark zoom disc, so that row stays as derived.
 # residuals of the fit over the disc and 3 pt around it, sRGB levels (crop vs model at the crop's sub-pixel position):
 # dark           0  rms 3.97  max 27  body rms 2.36  (crop disc offset 0.00 0.00 pt, radius +0.00)
 # dark           1  rms 6.58  max 44  body rms 6.74  (crop disc offset 0.00 0.00 pt, radius +0.00)

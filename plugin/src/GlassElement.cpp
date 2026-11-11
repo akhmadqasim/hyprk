@@ -915,9 +915,10 @@ void main() {
             glUniform4f(u.faceYcc, res.ycc.black, res.ycc.white, res.ycc.saturation, res.maxLuma);
             glUniform3f(u.blurAlpha, res.blurAlpha[0], res.blurAlpha[1], res.blurAlpha[2]);
             glUniform4f(u.faceFill, res.fill.r, res.fill.g, res.fill.b, res.fill.a);
-            // the Dock label's fill on its pointer: the shell draws Theme.dock.labelFill (k + c (1 - a), fitted to
-            // Q-dock-08: dark k 23.5 / 255 a 0.083, light 107 / 255 0.382) over the pill only, so the pointer read
-            // darker than the pill (over black 14 vs 35; on the Mac one shape, 31). Same fill outside the pill.
+            // the Dock label's fill on its pointer: while the label was on the Dock's namespace the shell drew a fill
+            // (k + c (1 - a), fitted to Q-dock-08: dark k 23.5 / 255 a 0.083, light 107 / 255 0.382; its
+            // Theme.dock.labelFill is gone since 2210b40) over the pill only, so the pointer read darker than the
+            // pill (over black 14 vs 35; on the Mac one shape, 31). Same fill outside the pill.
             // Only on the Dock recipe (the label on the Dock's namespace). On its own namespace with Apple's label recipe
             // (hyprk-dock-label: regular, hyprland.lua) the label needs no fill: Regular at that size over the wallpaper
             // is the Mac's label (32 / 134 / 185 dark, 133 / 195 / 253 light vs 31 / 131 / 180 and 131 / 192 / 249).
