@@ -18,8 +18,8 @@ The shell lock never engages on load or reload, only on one of these requests.
 
 | Wanted | Fallback |
 |---|---|
-| Blurred, dimmed wallpaper | Blurred once per wallpaper by `shell/modules/lock/lock-wallpaper.sh` (ImageMagick) into `~/.cache/hyprk/lock-*.png` at a quarter of the screen size, 16 bit, scaled up smoothly; no live blur. No ImageMagick or no file yet: the sharp wallpaper under the stronger solid dim. No wallpaper at all: a plain fill. |
-| Glass password field, notification and Now Playing cards | `LockGlass.qml`: face tint, top-lit rim and the regular-glass drop shadow over the already blurred backdrop. Never the compositor plugin (session lock surfaces are not layer surfaces), so the lock looks the same with or without `plugin/`. |
+| Wallpaper | The sharp desktop wallpaper drawn like the desktop's (same pixmap), dimmed 0.95 dark / 0.90 light, as on 27.2.1 (no blur, no zoom). No wallpaper at all: a plain fill. |
+| Vibrant clock, date, field and labels | `LockPlus.qml` + `lockplus.frag`: plus-lighter ink (backdrop + a constant), the clock with its top highlight and rim. Needs Qt shader effects (any GPU path Quickshell runs on). The clock font `.SF Soft Numeric` comes from `themes/fonts/ADTNumeric.ttc`; without it SF Pro Semibold. Notification and Now Playing cards keep `LockGlass.qml` (never the compositor plugin). |
 | Reduce Transparency / Increase Contrast | sharp wallpaper under a solid dim, opaque field and cards. |
 | Reduce Motion | lock-in and unlock become 150 ms cross-fades with no travel; a wrong password fades the dots instead of shaking. |
 | Lock-in from the desktop, unlock revealing the desktop | Hyprland draws nothing under a lock surface, so both run in `hyprk-lock` overlay layer surfaces (`LockOverlay.qml`, no compositor layer animation): "in" fades the lock over the live desktop with the keyboard grabbed, then the session lock engages with the same picture; "out" appears under the lock, the lock is released once every screen has shown a frame, then it animates away and is click-through. If an overlay never maps, a guard locks (or releases) after a short timeout anyway. |
