@@ -150,6 +150,12 @@ QtObject {
         readonly property int popoverRadius: 20
         readonly property color popoverFill: t.control.menuFill                     // glass live; flat like the menus
         readonly property color popoverStroke: t.control.menuStroke
+        // glass rim (MAC-ANSWERS.md PC #67 B): the dark specular line darkens white 255 -> 192 (black a .25) on the
+        // sides; the key highlight lifts the first px at the top (m up to 1.53 with offset +0.147: about white a .45
+        // over the light fill, .25 dark) and an 8 pt diffuse band at amount 0.075
+        readonly property color popoverRim: Qt.rgba(0, 0, 0, t.dark ? 0.5 : 0.25)
+        readonly property color popoverKey: Qt.rgba(1, 1, 1, t.dark ? 0.25 : 0.45)
+        readonly property color popoverDiffuse: Qt.rgba(1, 1, 1, 0.075)
         // motion (LIVE-27.2.1.md): alert grows from 4 % to a 1.15 peak at 0.2 s (in-quad), settles by 0.37 s
         // (out-quad), dismiss = 0.1 s fade; sheet in 0.27 s, out 0.25 s, near-linear, size constant; popover a
         // spring from 12.5 % (response 0.25, damping 0.9) from the arrow, close = fade 0.15..0.2 s

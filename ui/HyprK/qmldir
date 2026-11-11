@@ -25,6 +25,7 @@ FocusRing 1.0 FocusRing.qml
 Popup 1.0 Popup.qml
 SearchField 1.0 SearchField.qml
 TrafficLights 1.0 TrafficLights.qml
+PanelShadow 1.0 PanelShadow.qml
 AppIconTile 1.0 AppIconTile.qml
 AlertPanel 1.0 AlertPanel.qml
 Sheet 1.0 Sheet.qml

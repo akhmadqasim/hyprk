@@ -29,6 +29,7 @@ Item {
     }
     MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons; onWheel: w => w.accepted = true }
 
+    PanelShadow { visible: !root.bare; x: card.x; y: card.y; width: card.width; height: card.height; cornerRadius: card.radius }
     Rectangle {
         id: card
         readonly property var r: P.sheetRect(root.width, root.height, root.cardWidth, root.cardHeight)

@@ -65,6 +65,7 @@ Item {
     }
     Component.onCompleted: if (shown) { opacity = 1; forceActiveFocus(); }
 
+    PanelShadow { anchors.fill: parent; cornerRadius: Tokens.panel.alertRadius }
     Rectangle {
         anchors.fill: parent
         radius: Tokens.panel.alertRadius
