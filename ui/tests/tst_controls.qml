@@ -51,6 +51,9 @@ Item {
         centres: [18.5, 55.5]
     }
     PressSpring { id: capLift; w: 78; h: 37 }
+    // a toolbar capsule (back / forward): the light lifts its source
+    Rectangle { id: navCap; x: 20; y: 150; width: 74; height: 37 }
+    ToolbarHighlight { id: navLight; x: 20; y: 150; width: 74; height: 37; source: navCap; centres: [18.5, 55.5] }
     GlassButton { id: flexBtn; x: 300; y: 150; width: 78; height: 37 }
     GlassButton { id: pairBtn; x: 300; y: 200; width: 74; height: 37; segments: [37, 37] }
 
@@ -254,6 +257,25 @@ Item {
             mousePress(pairBtn, 60, 18);
             tryVerify(() => Math.abs(pairBtn.transform[1].origin.x) < 0.001 && pairBtn.transform[1].xScale > 1.016, 2000);
             mouseRelease(pairBtn, 60, 18);
+        }
+        // toolbar capsule (ToolbarHighlight with a source): the pressed button lifts by its own 37 pt (2.5 pt), only its
+        // outer end moves (1.25 pt), the capsule and the light share the transform; back to identity after the release
+        function test_toolbar_capsule_press_lift() {
+            compare(navCap.transform.length, 2);
+            compare(navCap.transform[0].xScale, 1);
+            mousePress(navLight, 10, 18);
+            tryVerify(() => Math.abs(navCap.transform[0].yScale - 39.5 / 37) < 0.001, 2000);
+            const t = navCap.transform[0];
+            const left = t.origin.x - t.origin.x * t.xScale, right = t.origin.x + (74 - t.origin.x) * t.xScale - 74;
+            verify(Math.abs(left + 1.25) < 0.02, "left end out 1.25 pt: " + left);
+            verify(Math.abs(right) < 0.001, "right end stays: " + right);
+            compare(navLight.transform[0], navCap.transform[0]);
+            mouseRelease(navLight, 10, 18);
+            tryVerify(() => navCap.transform[0].yScale === 1 && navCap.transform[0].xScale === 1, 1500);
+            mousePress(navLight, 60, 18);
+            tryVerify(() => Math.abs(navCap.transform[0].origin.x) < 0.001 && navCap.transform[0].xScale > 1.016, 2000);
+            mouseRelease(navLight, 60, 18);
+            tryVerify(() => navCap.transform[0].xScale === 1, 1500);
         }
         // pressed knob lens: light uses the Mac's B2 model (ring shadow 8 down, 4 wide, blur 3, .4; fill light), dark keeps
         // the recording's fit (no ring, no fill light)
