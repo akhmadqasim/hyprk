@@ -61,7 +61,7 @@ Window {
     readonly property real panelH: full ? height : Math.round(contentH + barH + inset)
 
     // ---------- open / close ----------
-    property int _warm: 0
+    property bool _warm: false
     onEntryChanged: {
         if (entry) {
             const was = cur;
@@ -72,7 +72,7 @@ Window {
             full = false;
             zoom.xScale = zoom.yScale = Tokens.reduceMotion ? 1 : 0.79;
             shift.x = shift.y = 0;
-            _warm = 3;
+            _warm = true;
             panel.visible = false;
             visible = true;
             Hypr.setInputRect(ql, Qt.rect(panel.x, panel.y, panel.width, panel.height));
@@ -85,25 +85,22 @@ Window {
     }
     onPanelWChanged: if (visible) Hypr.setInputRect(ql, Qt.rect(panel.x, panel.y, panel.width, panel.height))
     onPanelHChanged: if (visible) Hypr.setInputRect(ql, Qt.rect(panel.x, panel.y, panel.width, panel.height))
-    // A new window's first buffers reach the screen late: drawn with the panel in its first frame, 0.79 stayed up for
-    // three compositor frames (mcap) while a timed curve ran on. So the window maps empty and the panel appears once
-    // three frames went through; then the curve steps once per swapped frame (frame k shows time k / refresh rate), so every
-    // frame on screen is the next sample of the Mac's series even when the client misses a vsync.
+    // The window maps empty: at its first swapped frame it is moved to the screen's origin (finder/hyprland-rules.lua;
+    // Hypr.moveWindow), and the panel appears in the next frame. Then the curve steps once per swapped frame (frame k
+    // shows time k / refresh rate), so every frame on screen is the next sample of the Mac's series even when the
+    // client misses a vsync. With the basic render loop (main.cpp) each frameSwapped is one frame on screen: mcap, 3
+    // opens of which the first cold, 0.79 shows once, .79 .85 .90 .93 .96 .97 .98 .99 1.0 1 (Mac .79 .85 .90 .93 .95
+    // .97 .98 .98 .99 1), first visible 109-110 ms after the Space trigger (a selection change: 77-94 ms).
     property int _step: -1
-    property bool _hold: false
     onFrameSwapped: {
-        if (_warm > 0) {
-            // mapped now: put the window on the screen's origin (finder/hyprland-rules.lua; Hypr.moveWindow)
-            if (_warm === 3) Hypr.moveWindow(ql.title, Screen.virtualX, Screen.virtualY);
-            if (--_warm > 0) { ql.update(); return; }
+        if (_warm) {
+            _warm = false;
+            Hypr.moveWindow(ql.title, Screen.virtualX, Screen.virtualY);
             panel.visible = true;
             _step = Tokens.reduceMotion ? -1 : 0;
-            _hold = true;
             return;
         }
         if (_step < 0) return;
-        // the first panel frame never reached the screen in 10 of 10 mcap runs (superseded at once): draw 0.79 twice
-        if (_hold) { _hold = false; ql.update(); return; }
         _step++;
         const x = Math.min(1, _step * 1000 / Math.max(30, Screen.refreshRate || 60) / 250);
         zoom.xScale = zoom.yScale = 0.79 + 0.21 * (1 - Math.pow(1 - x, 5));   // OutQuint

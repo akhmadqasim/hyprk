@@ -69,6 +69,12 @@ int main(int argc, char *argv[])
 {
     // Our controls (menus, fields) are styled by hand on top of the Basic style.
     qputenv("QT_QUICK_CONTROLS_STYLE", "Basic");
+    // The basic (GUI thread) render loop: with the threaded one a new window's first frames reach the GUI thread's
+    // frameSwapped in a batch, so Quick Look's 0.79 frame stayed up 3 frames on its first open and the curve skipped
+    // a step (mcap, reference/ours/motion/MOTION-MEASURED.md); basic shows every step once and 1-2 frames sooner.
+    // QSG_RENDER_LOOP set by the caller wins.
+    if (qEnvironmentVariableIsEmpty("QSG_RENDER_LOOP"))
+        qputenv("QSG_RENDER_LOOP", "basic");
     QGuiApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("Finder"));
     app.setOrganizationName(QStringLiteral("hyprk"));
