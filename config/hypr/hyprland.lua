@@ -149,9 +149,10 @@ end
 --     Safari closes in one frame on the Mac; hyprk does not special-case browsers.
 --   Zoom / frame changes (windowsMove): MAC-ANSWERS.md R2 (27.2.1) Window > Zoom 0.33 s ease-in-out, share per frame
 --     0.01 0.01 0.03 0.05 0.07 0.10 0.14 0.20 0.26 0.33 0.41 0.49 0.58 0.69 0.79 0.87 0.93 0.98 1.0: bezier "zoom"
---     over 0.29 s (RMS 0.006). Unzoom is an ease-out over the same time (bezier (0.3,0.2),(0.4,0.9), RMS 0.006),
---     full screen 0.42 s in / 0.5 s out with a Space slide: Hyprland has one windowsMove leaf for all of them, so
---     they use the zoom curve.
+--     over 0.29 s (RMS 0.006). Unzoom, full screen enter (0.4 s) and the two-step full screen exit (0.15 s to 0.47,
+--     0.15 s hold, 0.3 s) do not fit one windowsMove leaf: plugin-motion (FrameMotion) plays the Mac's per-frame
+--     series on these same animations (plugin:hyprkmotion:frames = 0 leaves them on the zoom curve). With
+--     windowsMove off (Reduce Motion) none of them animate.
 --   Window dim (fadeDim): off. With windowsIn off, Hyprland showed a new window dimmed to about 50 % and faded
 --     the dim out over 0.3 s (seen frame by frame in a test session); macOS never dims windows.
 --   App menus (fadePopups): open in one frame, fade out in about 0.2 s ease-out, like the measured menu bar menus.
