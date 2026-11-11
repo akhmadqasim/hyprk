@@ -19,11 +19,14 @@ Item {
     // text: only real text/* types, which is what thumbnails.cpp can render (not json, scripts...)
     readonly property bool isText: (entry.mime || "").indexOf("text/") === 0
     // 27.2.1 (Q-finder-31, live/finder/icons-live): a text file is a Quick Look thumbnail at 64 pt (txt-thumb) but the
-    // lined text-document icon in the 16 pt list (txt@16pt-list); below 32 pt it takes the NSWorkspace render
-    // (icons-rendered/doc-txt@16/18/32pt, light = dark byte for byte), copied to icons/
+    // lined text-document icon in the 16 pt list (txt@16pt-list); below 32 pt, and wherever there is no thumbnail
+    // (an empty file, a failed render), it takes the NSWorkspace render (icons-rendered/doc-txt@16..77pt, light = dark
+    // byte for byte), copied to icons/, never the blank generic page
     readonly property bool smallText: isText && size < 32
     readonly property bool wantsThumb: entry.size > 0 && (kind === "image" || kind === "pdf" || kind === "video"
                                                           || (isText && !smallText))
+    readonly property bool textIcon: isText   // the plain icon only shows while there is no thumbnail
+    readonly property int textIconPt: [16, 18, 32, 48, 64, 77].find(s => size <= s) || 77
     // share of the box a thumbnail fills; the icon grid passes less because its box includes
     // the macOS PNGs' padding (ref: 68 px thumbnails in a 77 px icon)
     property real thumbScale: 0.94
@@ -115,7 +118,7 @@ Item {
         readonly property string sysSource: root.sysFailed ? "" : Theme.sysIcon(root.sysName, root.px, root.kind === "folder",
                                                                                      root.kind === "folder" && Files.hasTags(root.entry) ? Theme.color.tagColors[root.entry.tags[0]] : "")
         onStatusChanged: if (status === Image.Error && sysSource) root.sysFailed = true
-        source: root.smallText ? Qt.resolvedUrl("icons/doc-txt@" + (root.size <= 16 ? 16 : root.size <= 18 ? 18 : 32) + "pt.png")
+        source: root.textIcon ? Qt.resolvedUrl("icons/doc-txt@" + root.textIconPt + "pt.png")
              : sysSource
              || (root.kind === "folder"
                  ? Icons.folder(Theme.color.folderBack.toString(), Theme.color.folderFront.toString(), Theme.color.folderTop.toString())
@@ -128,7 +131,7 @@ Item {
             sourceSize: parent.sourceSize
         }
         TextLabel {
-            visible: root.kind !== "folder" && root.kind !== "app" && root.size >= 32 && !root.smallText
+            visible: root.kind !== "folder" && root.kind !== "app" && root.size >= 32 && !root.textIcon
             anchors.horizontalCenter: parent.horizontalCenter
             y: root.size * 0.70
             text: Files.badge(root.entry)
