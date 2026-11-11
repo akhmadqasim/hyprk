@@ -165,9 +165,9 @@ ShellWindow {
         Image {
             width: mc.width
             height: mc.height
-            source: Wallpaper.url
+            source: Wallpaper.urlFor(mc.screen)
             // the desktop's decoded pixmap (Background.qml: same url and sourceSize, cached): no decode on open
-            sourceSize: Qt.size(Wallpaper.pixelWidth, Wallpaper.pixelHeight)
+            sourceSize: Wallpaper.pixelSizeOf(mc.screen)
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
             cache: true

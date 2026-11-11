@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Usage: wallpaper.sh <width> <height> <blur-sigma> [dark] [pixel-width pixel-height]
 # Prints three lines: WALL=<path> (at the pixel size: the desktop shows it 1:1 on the output's pixels),
-# BLUR=<path or empty> (at the logical size) and LUMA=<menu bar strip luminance>.
+# BLUR=<path or empty> (at the logical size) and LUMA=<menu bar strip luminance>, after SRC=<picture it was cut from>.
+# HYPRK_WALL_ONLY=1: only SRC and WALL (another screen's cut at its own pixel size, services/Wallpaper.qml).
 # Picks a wallpaper from themes/wallpapers (assets agent), falls back to a
 # generated gradient. The blurred copy is the QML glass material backdrop.
 set -u
@@ -44,6 +45,8 @@ blur="$CACHE/blur-$key.png"
 if [ ! -f "$wall" ]; then
     magick "$src" -resize "${PW}x${PH}^" -gravity center -extent "${PW}x${PH}" "$wall" 2>/dev/null || wall=$src
 fi
+echo "SRC=$src"
+if [ "${HYPRK_WALL_ONLY:-0}" = 1 ]; then echo "WALL=$wall"; exit 0; fi   # another screen's cut: no blur, no luma
 if [ ! -f "$blur" ]; then
     # downscale, blur, upscale: cheap large-radius gaussian; slightly brighter and
     # desaturated so glass reads as near-neutral frost (macOS 27 Dock)

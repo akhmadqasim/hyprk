@@ -32,11 +32,11 @@ ShellWindow {
         id: wallImage
         z: -1
         anchors.fill: parent
-        source: Wallpaper.url
-        // decoded at the output's pixel size (Wallpaper.pixelWidth/Height, the size wallpaper.sh cuts it to), shown
+        source: Wallpaper.urlFor(screen)
+        // decoded at this output's pixel size (the size wallpaper.sh cuts it to, per distinct screen size), shown
         // 1:1: at the logical size a 2x output upscaled it and 4 pt stripes had 4 px ramps (0 7 20 77 177 234 248
         // 255), so the glass sampled a softer backdrop than the Mac's. Costs 4 bytes per pixel more (PERF.md)
-        sourceSize: Qt.size(Wallpaper.pixelWidth, Wallpaper.pixelHeight)
+        sourceSize: Wallpaper.pixelSizeOf(screen)
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
         cache: true   // one decoded copy, shared with Mission Control's backdrop (same url and sourceSize)

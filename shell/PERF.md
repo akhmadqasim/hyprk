@@ -72,6 +72,10 @@ by Qt's font engines = 35 MB RSS for one 7.8 MB file). A bare one-window Quicksh
   to that size): the logical-size decode was upscaled on a 2x output, so the glass sampled a softer backdrop than the Mac's
   (CC gap over 4 pt stripes 26 levels, Mac 32; now 31). Cost on the MBA output (2560x1664@2, default wallpaper): +8.3 MB
   anon / +8.4 MB RSS at rest. One decoded copy: Mission Control's backdrop shares it (same url and sourceSize, cached).
+  Other screens (2026-11-11 later): each distinct pixel size gets its own cut (`wallpaper.sh` with `HYPRK_WALL_ONLY`,
+  no blur or luma) and one decoded copy shared by every screen of that size; before, every screen decoded the
+  primary's size and scaled it. Headless MBA + a 1920x1080 @1 output: that output now matches its cut 1:1 (0.01 % of
+  pixels > 1 level off, cursor) instead of the primary's cut scaled (0.48 %); cost one 1920x1080 RGBA copy (8.3 MB).
 - **On-demand surfaces** (`shell.qml` `LazyLoader`): Spotlight (with its Apps panel, `spotlight/AppsPanel.qml`),
   Cmd+Tab switcher and Mission Control (and their delegates, icon textures and live window captures) exist only while open.
   Their open logic also runs on creation (`opened()`); Spotlight's IPC moved to `Panels`.

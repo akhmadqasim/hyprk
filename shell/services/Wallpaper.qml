@@ -25,6 +25,68 @@ Singleton {
     readonly property int pixelWidth: Math.round(width * dpr)
     readonly property int pixelHeight: Math.round(height * dpr)
 
+    // ---------- other screens ----------
+    // A screen whose pixel size differs from the primary's gets its own cut at its own pixel size (wallpaper.sh with
+    // HYPRK_WALL_ONLY: no blur, no luma), so it is shown 1:1 like the primary's; screens of the same size share one
+    // file and one decoded pixmap (the pixmap cache key is url + sourceSize). Until a cut is ready the screen shows the
+    // primary's file scaled. The blurred copy and the glass stay the primary's (as before).
+    function pixelSizeOf(scr) {
+        return scr ? Qt.size(Math.round(scr.width * scr.devicePixelRatio), Math.round(scr.height * scr.devicePixelRatio))
+                   : Qt.size(pixelWidth, pixelHeight);
+    }
+    function urlFor(scr) {
+        const s = pixelSizeOf(scr);
+        if (s.width === pixelWidth && s.height === pixelHeight) return url;
+        const f = cuts[s.width + "x" + s.height];
+        return f ? "file://" + f : url;
+    }
+    property var cuts: ({})           // "PWxPH" -> file, for pixel sizes other than the primary's
+    // the distinct pixel sizes of the other screens ("PWxPH x WxH", logical size for the script's crop arguments)
+    readonly property var otherSizes: {
+        const out = [];
+        for (const scr of Quickshell.screens) {
+            const s = pixelSizeOf(scr), k = s.width + "x" + s.height;
+            if ((s.width !== pixelWidth || s.height !== pixelHeight) && !out.some(o => o.key === k))
+                out.push({ key: k, pw: s.width, ph: s.height, w: scr.width, h: scr.height });
+        }
+        return out;
+    }
+    onOtherSizesChanged: Qt.callLater(cutOthers)
+    property var _queue: []
+    function cutOthers() {
+        if (!wallpaper) return;
+        const keep = {};
+        for (const o of otherSizes) if (cuts[o.key]) keep[o.key] = cuts[o.key];
+        cuts = keep;
+        _queue = otherSizes.slice();
+        if (!other.running) _next();
+    }
+    function _next() {
+        if (_queue.length === 0) return;
+        other.size = _queue.shift();
+        other.running = true;
+    }
+    Process {
+        id: other
+        property var size: null
+        environment: ({ HYPRK_WALLPAPER: root.wallpaperSource, HYPRK_WALL_ONLY: "1" })
+        command: size ? [Quickshell.shellDir + "/scripts/wallpaper.sh", String(size.w), String(size.h), "0",
+                         Theme.dark ? "dark" : "light", String(size.pw), String(size.ph)] : ["true"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const line = text.split("\n").find(l => l.startsWith("WALL="));
+                if (line && other.size) {
+                    const c = Object.assign({}, root.cuts);
+                    c[other.size.key] = line.slice(5);
+                    root.cuts = c;
+                }
+                Qt.callLater(root._next);
+            }
+        }
+    }
+    // the picture the primary's cut came from (the chosen file, or the script's default pick for the mode)
+    property string wallpaperSource: ""
+
     function refresh() {
         proc.running = false;
         proc.running = true;
@@ -53,11 +115,13 @@ Singleton {
             onStreamFinished: {
                 for (const line of text.split("\n")) {
                     if (line.startsWith("WALL=")) root.wallpaper = line.slice(5);
+                    else if (line.startsWith("SRC=")) root.wallpaperSource = line.slice(4);
                     else if (line.startsWith("BLUR=")) root.blurred = line.slice(5);
                     else if (line.startsWith("LUMA=")) root.topLuma = parseFloat(line.slice(5)) || 0.3;
                 }
                 Theme.menuBarOnLight = root.topLuma > Theme.menuBarLumaThreshold;
                 Theme.blurAvailable = root.blurred !== "";
+                root.cutOthers();
             }
         }
     }
