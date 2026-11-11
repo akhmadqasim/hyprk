@@ -873,6 +873,19 @@ test("mode buttons start inside the field, end in place", () => {
             assert.ok(worst < 0.0025, `v0 ${v0}: worst ${worst}`);
         }
     });
+    test("spring settleTime: the early stop gives the full 10 s scan's answer", () => {
+        const full = (s, v0, tol) => { let last = 0; for (let i = 0; i <= 10000; i++) if (Math.abs(SP.value(s, v0, i / 1000) - 1) >= tol) last = i / 1000; return last + 0.001; };
+        for (const r of [0.125, 0.28, 0.45, 0.71]) for (const z of [0.3, 0.59, 0.95, 1, 1.25]) for (const v0 of [0, -3, 10]) {
+            const s = { response: r, ratio: z };
+            assert.ok(Math.abs(SP.settleTime(s, v0, 0.001) - full(s, v0, 0.001)) < 1e-9, `${r} ${z} ${v0}`);
+        }
+    });
+    test("spring plan: a run from rest is fitted once and scaled to any distance", () => {
+        const s = { response: 0.37, ratio: 0.93 }, a = SP.plan(s, 0, 10, 0, 0), b = SP.plan(s, 5, -95, 0, 0);
+        assert.equal(a.curve, b.curve, "same fitted curve object");
+        assert.equal(a.duration, b.duration);
+        assert.ok(Math.abs((b.to - 5) / -100 - a.to / 10) < 1e-12, "same landing share of the distance");
+    });
     test("spring curve: Apple notations", () => {
         // SwiftUI clamps Spring(duration:bounce:) and interpolatingSpring to critical (MAC-ANSWERS "NC panel spring")
         const b = SP.fromBounce(0.25, -0.027), k = (2 * Math.PI / 0.25) ** 2;
