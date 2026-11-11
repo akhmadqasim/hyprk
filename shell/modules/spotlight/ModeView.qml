@@ -18,6 +18,7 @@ Item {
     property string query: ""
     signal done()                           // an item was opened: close Spotlight
     signal editFinished()                   // quick key editor closed: host gives the query field its focus back
+    signal back()                           // "Not Now" on the Clipboard question: back to the plain bar
 
     property int selected: 0
     property string editingKey: ""          // action id whose quick key is being edited
@@ -55,6 +56,11 @@ Item {
     function move(dy) {
         if (items.length === 0) return;
         selected = Math.max(0, Math.min(items.length - 1, selected + dy));
+    }
+    // Clipboard: delete the selected item (host: Cmd-Delete)
+    function deleteSelected() {
+        const it = items[selected];
+        if (mode === "clipboard" && it) Clipboard.remove(it);
     }
     function accept() {
         const it = items[selected];
@@ -109,14 +115,18 @@ Item {
         Text {
             anchors.centerIn: parent
             visible: !view.clipboardOff && view.items.length === 0
-            text: view.mode === "clipboard" ? (Clipboard.available ? "Nothing copied yet" : "Clipboard history needs wl-clipboard")
+            // "No Items" / "No Results": SpotlightUIShared 27.2.1 Localizable
+            text: view.mode === "clipboard" ? (Clipboard.available ? (view.query.trim() ? "No Results" : "No Items") : "Clipboard history needs wl-clipboard")
                 : view.mode === "files" && !view.query.trim() ? "No Recent Files"
                 : view.mode === "files" && FileSearch.searching ? "Searching…" : "No Results"
             font: Typography.font(Theme.spotlight.rowTitle)
             color: Theme.spotlight.secondary
         }
 
-        // Clipboard off: macOS asks once before keeping anything (texts not seen on the Mac)
+        // Clipboard off: macOS asks before it keeps anything. Texts from SpotlightUIInternal 27.2.1's
+        // PasteboardFTEViewController and Localizable.loctable (en): the title, the message (its "Spotlight Settings"
+        // link is plain text here), "Allow" and "Not Now". Allow keeps 8 hours, the Mac's default timeout. Layout: not
+        // seen on the Mac (this account had history on)
         Column {
             anchors.centerIn: parent
             visible: view.clipboardOff
@@ -126,7 +136,7 @@ Item {
             Text {
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
-                text: "Clipboard History"
+                text: "Allow search results from Clipboard"
                 font: Typography.font(Theme.spotlight.rowTitle, Typography.semibold)
                 color: Theme.spotlight.text
             }
@@ -135,26 +145,36 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.WordWrap
                 text: Clipboard.available
-                    ? "Spotlight can keep the text and images you copy, so you can find them again. Items are stored on this computer and deleted after 8 hours."
+                    ? "Spotlight can search and display items you’ve copied to your clipboard. Personal and sensitive information may appear in search results. You can manage Clipboard Search at any time in Spotlight Settings."
                     : "Clipboard history needs wl-clipboard (wl-paste and wl-copy)."
                 font: Typography.font(13)
                 color: Theme.spotlight.secondary
             }
-            Rectangle {
+            Row {
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: Clipboard.available
-                width: turnOn.implicitWidth + 28
-                height: 28
-                radius: height / 2
-                color: Theme.color.accent
-                Text {
-                    id: turnOn
-                    anchors.centerIn: parent
-                    text: "Turn On"
-                    font: Typography.font(13, Typography.medium)
-                    color: Theme.color.textOnAccent
+                spacing: 8
+                Repeater {
+                    model: [{ t: "Not Now", allow: false }, { t: "Allow", allow: true }]
+                    Rectangle {
+                        required property var modelData
+                        width: label.implicitWidth + 28
+                        height: 28
+                        radius: height / 2
+                        color: modelData.allow ? Theme.color.accent : Theme.spotlight.tokenFill
+                        Text {
+                            id: label
+                            anchors.centerIn: parent
+                            text: parent.modelData.t
+                            font: Typography.font(13, Typography.medium)
+                            color: parent.modelData.allow ? Theme.color.textOnAccent : Theme.spotlight.text
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: parent.modelData.allow ? SpotlightState.setClipboardHistory("8h") : view.back()
+                        }
+                    }
                 }
-                MouseArea { anchors.fill: parent; onClicked: SpotlightState.setClipboardHistory("8h") }
             }
         }
 
@@ -180,15 +200,15 @@ Item {
                 readonly property var d: modelData
                 readonly property bool isImage: String(d.mime || "").startsWith("image/")
                 title: (view.mode === "files" ? d.name : view.mode === "clipboard" && d.mime ? SL.clipTitle(d) : d.title) || ""
-                subtitle: (view.mode === "files" ? d.dir : view.mode === "actions" ? d.subtitle : "") || ""
+                subtitle: (view.mode === "files" ? d.dir : view.mode === "actions" ? d.subtitle
+                    : view.mode === "clipboard" && d.mime ? SL.clipSubtitle(d, Date.now()) : "") || ""
                 image: view.mode === "clipboard" && isImage && d.file ? d.file : ""
                 symbol: view.mode === "clipboard" ? (isImage ? "photo" : "doc") : view.mode === "actions" ? (d.symbol || "bolt") : "doc"
                 themeIcon: view.mode === "files" && d.path ? SL.fileIcon(d.path, d.isDir, d.mime) : ""
                 appIcon: view.mode === "actions" ? (d.appIcon || "") : ""
                 appId: view.mode === "actions" ? (d.appId || "") : ""
                 badge: view.mode === "actions"
-                accessory: view.mode === "clipboard" ? SL.relTime(d.ts, Date.now())
-                    : view.mode === "actions" ? SL.quickKeyLabel(SpotlightState.quickKeys, d.id, rr.selected) : ""
+                accessory: view.mode === "actions" ? SL.quickKeyLabel(SpotlightState.quickKeys, d.id, rr.selected) : ""
                 onClicked: { view.selected = index; view.accept(); }
                 onAccessoryClicked: { view.selected = index; view.editingKey = d.id; }
 

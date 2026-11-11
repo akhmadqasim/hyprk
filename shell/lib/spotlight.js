@@ -25,6 +25,37 @@ function modeForKey(key, meta, ctrl, alt) {
     return i >= 0 && i < MODES.length ? MODES[i].id : "";
 }
 
+// ---------- reopening, holding Command ----------
+// The query survives a close for 8 minutes: SearchViewController.startClearTimer, logged as "clearing for 8 min
+// timer" (SpotlightUIInternal 27.2.1, 0x2adf66460); MAC-ANSWERS.md R2: "Reopening soon keeps the last query".
+const KEEP_QUERY_MS = 8 * 60e3;
+function keepsQuery(closedAt, now) { return closedAt > 0 && now - closedAt < KEEP_QUERY_MS; }
+// Holding Command shows the browse modes with their shortcuts: SearchViewController's commandKeyMonitor starts
+// commandKeyHintTimer, 0.35 s (SpotlightUIInternal 27.2.1, 0x2adf7cf18). Ctrl counts too for nested sessions,
+// where the host keeps Super. Qt key codes: Control, Meta, Super_L, Super_R.
+const HINT_HOLD_MS = 350;
+function isHintKey(key) { return key === 0x01000021 || key === 0x01000022 || key === 0x01000053 || key === 0x01000054; }
+
+// Command shortcuts of the bar: KeyboardHandlingBackdropView.KeyboardShortcut (SpotlightUIInternal 27.2.1,
+// sub_2adf2fdbc). Only with Command alone (deviceIndependentFlags == 0x100000): key codes 18-21 (1-4) pick a browse
+// mode, 29 (0) clears it; characters Return / "\n" and r reveal the selected item, i Get Info, b web search, d and l
+// the dictionary result, y Quick Look, k the Wikipedia result, "," Spotlight settings, h Spotlight help.
+// key: Qt key code; returns "" when it is not one of them.
+function commandForKey(key) {
+    switch (key) {
+    case 0x30: return "clear";
+    case 0x01000004: case 0x01000005: case 0x52: return "reveal";      // Return, Enter, R
+    case 0x49: return "info";
+    case 0x42: return "web";
+    case 0x44: case 0x4c: return "dictionary";
+    case 0x59: return "quicklook";
+    case 0x4b: return "wikipedia";
+    case 0x2c: return "settings";
+    case 0x48: return "help";
+    }
+    return "";
+}
+
 // ---------- files ----------
 // recently-used.xbel -> [{path, mime, modified}] newest first, file:// only, deduped
 function parseXbel(text, limit) {
@@ -211,6 +242,13 @@ function clipTitle(item) {
     if (item.mime.startsWith("image/")) return "Image";
     const t = String(item.text || "").replace(/\s+/g, " ").trim();
     return t.length > 120 ? t.slice(0, 120) + "…" : t || "Empty Text";
+}
+// a Clipboard row's second line: "Text · Copied yesterday" (MAC-ANSWERS.md Q-panels-25, the Mac's own wording for a
+// day-old text; the other ages reuse relTime, lower-cased)
+function clipSubtitle(item, now) {
+    const kind = String(item.mime || "").startsWith("image/") ? "Image" : "Text";
+    const r = relTime(item.ts, now);
+    return r ? kind + " · Copied " + r.charAt(0).toLowerCase() + r.slice(1) : kind;
 }
 // "Just now", "5 min ago", "3 hr ago", "Yesterday", "4 days ago"
 function relTime(ts, now) {

@@ -154,11 +154,20 @@ ShellWindow {
     }
 
     // the mode list: once the pointer really moved into the bar while the field is empty (components/
-    // PointerGate.qml: the layer maps under a resting pointer); it stays after the pointer leaves
+    // PointerGate.qml: the layer maps under a resting pointer); it stays after the pointer leaves. Holding Command
+    // (or Ctrl) alone for 0.35 s shows it too, while the key is held (SL.HINT_HOLD_MS, commandKeyHintTimer)
     PointerGate { id: hoverGate }
     property bool modeListArmed: false
+    property bool hintHeld: false
+    Timer { id: hintHold; interval: SL.HINT_HOLD_MS; onTriggered: sp.hintHeld = sp.mode === "" && input.text === "" }
+    function hintKey(event, down) {
+        if (event.isAutoRepeat) return;
+        if (down && SL.isHintKey(event.key)) { hintHold.restart(); return; }
+        hintHold.stop();
+        hintHeld = false;
+    }
     readonly property string below: mode === "apps" ? "apps" : mode !== "" ? "list"
-        : rows.length > 0 ? "results" : modeListArmed && query === "" ? "modes" : ""
+        : rows.length > 0 ? "results" : (modeListArmed || hintHeld) && query === "" ? "modes" : ""
     // unfolds downward in about 0.18 s, ease-in-out (Q-panels-26); gone at once when text is typed
     // one value per frame of this window (HyprK FrameEase), the glass re-measured with each
     readonly property real unfold: unfoldEase.value
@@ -182,6 +191,21 @@ ShellWindow {
     // query field keys without a dedicated handler: Super/Ctrl/Alt+1..4 pick a mode; Left/Right move in the Apps
     // grid (they do not cycle modes on the Mac); Backspace on an empty field drops the category token
     function handleKey(event) {
+        hintKey(event, true);
+        // Clipboard: Cmd-Delete on an empty field deletes the selected item (the Mac has a per-item delete,
+        // com.apple.spotlight.delete.pasteboard.item; its key is not decoded)
+        if (mode === "clipboard" && input.text === "" && (event.modifiers & (Qt.MetaModifier | Qt.ControlModifier))
+                && (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete)) {
+            modePanel.item.deleteSelected(); event.accepted = true; return;
+        }
+        // Command alone: Cmd-0 back to all results, Cmd-R / Cmd-Return reveal the file in the Finder, Cmd-, Spotlight
+        // settings (SL.commandForKey; the other commands of the Mac's table have no hyprk counterpart yet)
+        if ((event.modifiers & (Qt.MetaModifier | Qt.ControlModifier | Qt.AltModifier | Qt.ShiftModifier)) === Qt.MetaModifier) {
+            const c = SL.commandForKey(event.key);
+            if (c === "clear" && mode !== "") { setMode(""); event.accepted = true; return; }
+            if (c === "reveal" && revealSel()) { event.accepted = true; return; }
+            if (c === "settings") { SpotlightActions.openPane("spotlight"); Panels.close(); event.accepted = true; return; }
+        }
         const m = SL.modeForKey(event.key, event.modifiers & Qt.MetaModifier, event.modifiers & Qt.ControlModifier, event.modifiers & Qt.AltModifier);
         if (m !== "") { setMode(m === mode ? "" : m); event.accepted = true; return; }
         if (event.key === Qt.Key_Backspace && input.text === "" && category !== "") { category = ""; event.accepted = true; return; }
@@ -192,6 +216,15 @@ ShellWindow {
         if (mode === "apps") modePanel.item.move(0, dir);
         else if (mode !== "") modePanel.item.move(dir);
         else step(dir);
+    }
+    // the selected file's folder in the Finder (all results or Files); false when the selection is no file
+    function revealSel(): bool {
+        const f = mode === "files" && modePanel.item ? modePanel.item.items[modePanel.item.selected]
+            : mode === "" && rows[selected] && rows[selected].kind === "file" ? rows[selected].file : null;
+        if (!f || !f.path) return false;
+        Apps.openFinder(f.isDir ? f.path : f.path.slice(0, f.path.lastIndexOf("/")) || "/");
+        Panels.close();
+        return true;
     }
     function acceptSel() { if (mode !== "") modePanel.item.accept(); else accept(); }
     function escapeKey() {
@@ -207,23 +240,35 @@ ShellWindow {
         input.text = Panels.spotlightQuery;
         Panels.spotlightQuery = "";
     }
-    function present() { if (!firstFrame) animate(true); takeQuery(); input.forceActiveFocus(); FileSearch.loadRecents(); }
+    function present() {
+        if (!firstFrame) animate(true);
+        takeQuery();
+        input.forceActiveFocus();
+        if (selectOnShow) { input.selectAll(); selectOnShow = false; }
+        FileSearch.loadRecents();
+    }
     Component.onCompleted: { if (shown) present(); else gone = true; }
     // reopened after it went: map again from the start values, empty; the springs start at once (mapping a loaded
     // window takes about a frame, waiting for its first frame as on creation cost 2 more, mcap)
+    // closed less than 8 minutes ago: the query is still there, selected (SL.keepsQuery)
+    property real closedAt: 0
+    property bool selectOnShow: false
     function rearm() {
         animX.snap(1.12);
         animY.snap(1.12);
         animAlpha.snap(0);
         animBlur.snap(0);
-        input.text = "";
+        selectOnShow = SL.keepsQuery(closedAt, Date.now());
+        if (!selectOnShow) input.text = "";
         category = "";
         selected = 0;
         showAll = false;
         modeListArmed = false;
+        hintHeld = false;
         hoverGate.reset();
     }
     onShownChanged: {
+        if (!shown) { closedAt = Date.now(); hintHold.stop(); hintHeld = false; }
         if (shown && gone) rearm();
         shown ? present() : animate(false);       // present(): also reopened while still fading out
     }
@@ -431,6 +476,7 @@ ShellWindow {
                 Keys.onTabPressed: sp.moveSel(1)
                 // the mode keys and the Apps grid's arrows first, then AppKit's text keys (HyprK keybindings.js)
                 Keys.onPressed: event => { sp.handleKey(event); if (!event.accepted) KeyBindings.handle(event, input); }
+                Keys.onReleased: event => sp.hintKey(event, false)
 
                 Text {
                     visible: input.text === "" && sp.category === ""
@@ -616,6 +662,7 @@ ShellWindow {
                     query: sp.query
                     onDone: Panels.close()
                     onEditFinished: input.forceActiveFocus()
+                    onBack: sp.setMode("")
                 }
             }
         }

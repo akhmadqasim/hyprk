@@ -5,10 +5,13 @@ import Quickshell
 import Quickshell.Io
 import "../lib/spotlight.js" as SL
 
-// Clipboard history for Spotlight (Cmd+4). Off until the user turns it on
-// (SpotlightState.clipboardHistory), like macOS 26. Backend: cliphist when installed,
-// else scripts/clipboard.sh (files in $XDG_STATE_HOME/hyprk/clipboard, 200 items,
-// expired by the retention setting). Both need wl-paste/wl-copy (wl-clipboard).
+// Clipboard history for Spotlight (Cmd+4). Off until the user allows it (SpotlightState.clipboardHistory), like
+// macOS 27.2.1: SPUISPasteboardHistoryDefaultsManager reads PasteboardHistoryEnabled as a plain bool (false unless
+// set) and PasteboardHistoryTimeout as 1800 / 28800 / 604800 s, anything else 28800 (SpotlightUIServices
+// 0x21324e31c; reference/re/27.2.1/SPOTLIGHT-27.2.1.md). Backend: cliphist when installed, else scripts/clipboard.sh
+// (files in $XDG_STATE_HOME/hyprk/clipboard, the session's own state, 200 items, expired by the retention setting).
+// Both need wl-paste/wl-copy (wl-clipboard). Copies a password manager marks secret are never stored
+// (clipboard.sh secret(): the KDE hint, the concealed / transient types; cliphist runs behind `clipboard.sh gate`).
 // Created by shell.qml only while history is on, or when Spotlight's Clipboard view opens.
 Singleton {
     id: root
@@ -43,12 +46,12 @@ Singleton {
     // cliphist needs a second watcher for images; each is its own Process so stopping kills it.
     Process {
         running: root.shouldWatch && root.cliphist
-        command: ["wl-paste", "--type", "image", "--watch", "cliphist", "store"]
+        command: ["wl-paste", "--type", "image", "--watch", root.script, "gate", "cliphist", "store"]
     }
     Process {
         id: watcher
         running: root.shouldWatch
-        command: root.cliphist ? ["wl-paste", "--watch", "cliphist", "store"] : [root.script, "watch", String(root.cap)]
+        command: root.cliphist ? ["wl-paste", "--watch", root.script, "gate", "cliphist", "store"] : [root.script, "watch", String(root.cap)]
         stdout: SplitParser {
             onRead: line => {
                 const it = SL.parseClipLine(line, false);
@@ -102,6 +105,13 @@ Singleton {
     function copy(item) {
         if (cliphist) Quickshell.execDetached(["sh", "-c", 'cliphist decode "$1" | wl-copy', "sh", item.id]);
         else Quickshell.execDetached([script, "copy", item.file]);
+    }
+    // one item (Spotlight: Cmd-Delete on the selected row; the Mac has a per-item delete command,
+    // com.apple.spotlight.delete.pasteboard.item)
+    function remove(item) {
+        if (cliphist) Quickshell.execDetached(["sh", "-c", 'printf "%s\t\n" "$1" | cliphist delete', "sh", item.id]);
+        else Quickshell.execDetached([script, "delete", item.file]);
+        setItems(items.filter(i => i.id !== item.id));
     }
     function clear() {
         Quickshell.execDetached(cliphist ? ["cliphist", "wipe"] : [script, "clear"]);

@@ -8,10 +8,15 @@
 #   clipboard.sh list <maxAgeMin>     all items, newest first; deletes items older than maxAgeMin (0 = keep)
 #   clipboard.sh prune <maxAgeMin>    delete items older than maxAgeMin
 #   clipboard.sh copy <file>          put an item back on the clipboard
+#   clipboard.sh delete <file>        delete one item
+#   clipboard.sh gate <cmd...>        run <cmd> on stdin unless the copy is secret (cliphist: wl-paste --watch ... gate cliphist store)
 #   clipboard.sh clear                delete the history
 #
-# Skipped: empty data, password-manager copies (wl-paste sets CLIPBOARD_STATE=sensitive),
-# non-image binary data, items over 20 MB.
+# Skipped: empty data, secret copies, non-image binary data, items over 20 MB. Secret = what a password manager marks:
+# wl-paste's CLIPBOARD_STATE=sensitive, the KDE hint x-kde-passwordManagerHint = "secret" (KeePassXC, Bitwarden ...),
+# or the nspasteboard.org types org.nspasteboard.ConcealedType / TransientType, the ones CoreFoundation 27.2.1 knows
+# (the only images of the 27.2.1 dyld cache with those strings). Tests set HYPRK_CLIP_TYPES / HYPRK_CLIP_HINT instead
+# of asking wl-paste.
 set -u
 shopt -s nullglob
 DIR=${HYPRK_CLIP_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/hyprk/clipboard}
@@ -19,6 +24,20 @@ MAX_BYTES=$((20 * 1024 * 1024))
 
 mimeof() {   # file -> mime from the extension
     case "$1" in *.txt) echo text/plain ;; *) echo "image/${1##*.}" ;; esac
+}
+secret() {   # 0 when the source marked the current copy secret (see the header)
+    case "${CLIPBOARD_STATE:-data}" in sensitive) return 0 ;; esac
+    local types hint nl=$'\n'
+    if [ -n "${HYPRK_CLIP_TYPES+x}" ]; then types=$HYPRK_CLIP_TYPES
+    else types=$(timeout 2 wl-paste --list-types 2>/dev/null) || return 1; fi
+    case "$nl$types$nl" in
+        *"${nl}org.nspasteboard.ConcealedType$nl"*|*"${nl}org.nspasteboard.TransientType$nl"*) return 0 ;;
+        *"${nl}x-kde-passwordManagerHint$nl"*)
+            if [ -n "${HYPRK_CLIP_HINT+x}" ]; then hint=$HYPRK_CLIP_HINT
+            else hint=$(timeout 2 wl-paste --no-newline --type x-kde-passwordManagerHint 2>/dev/null); fi
+            [ "$hint" = secret ] && return 0 ;;
+    esac
+    return 1
 }
 emit() {   # file (bash builtins only: list runs this for up to 200 items)
     local f=$1 p=""
@@ -32,7 +51,8 @@ watch)
     exec wl-paste --watch "$0" store "${2:-200}"
     ;;
 store)
-    case "${CLIPBOARD_STATE:-data}" in sensitive|clear|nil) cat >/dev/null; exit 0 ;; esac
+    case "${CLIPBOARD_STATE:-data}" in clear|nil) cat >/dev/null; exit 0 ;; esac
+    if secret; then cat >/dev/null; exit 0; fi
     mkdir -p "$DIR"
     tmp=$(mktemp "$DIR/.in.XXXXXX") || exit 1
     head -c $((MAX_BYTES + 1)) >"$tmp"
@@ -69,8 +89,17 @@ copy)
     f=${2:?file}
     exec wl-copy --type "$(mimeof "$f")" <"$f"
     ;;
+delete)
+    f=${2:?file}
+    case "${f##*/}" in [0-9]*_*) [ "$(dirname "$f")" -ef "$DIR" ] && rm -f "$f" ;; esac
+    ;;
+gate)
+    shift
+    if secret; then cat >/dev/null; exit 0; fi
+    exec "$@"
+    ;;
 clear)
     rm -f "$DIR"/[0-9]*_*
     ;;
-*) echo "usage: $0 watch|store|list|copy|clear" >&2; exit 2 ;;
+*) echo "usage: $0 watch|store|list|prune|copy|delete|gate|clear" >&2; exit 2 ;;
 esac

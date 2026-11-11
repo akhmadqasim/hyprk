@@ -457,6 +457,18 @@ test("modes order", () => assert.deepEqual(SL.modes().map(m => m.id), ["apps", "
 }
 test("mode key super+2", () => assert.equal(SL.modeForKey(0x32, true, false, false), "files"));
 test("mode key ctrl+4", () => assert.equal(SL.modeForKey(0x34, false, true, false), "clipboard"));
+test("Command shortcuts of the bar", () => {
+    assert.deepEqual([0x30, 0x01000004, 0x52, 0x59, 0x2c, 0x41].map(SL.commandForKey), ["clear", "reveal", "reveal", "quicklook", "settings", ""]);
+});
+test("query kept 8 min after close", () => {
+    assert.ok(SL.keepsQuery(1000, 1000 + 7.9 * 60e3));
+    assert.ok(!SL.keepsQuery(1000, 1000 + 8 * 60e3));
+    assert.ok(!SL.keepsQuery(0, 5));
+});
+test("hint keys: Command and Ctrl alone", () => {
+    assert.ok(SL.isHintKey(0x01000022) && SL.isHintKey(0x01000053) && SL.isHintKey(0x01000021));
+    assert.ok(!SL.isHintKey(0x01000023) && !SL.isHintKey(0x41));
+});
 test("mode key alt+1", () => assert.equal(SL.modeForKey(0x31, false, false, true), "apps"));
 test("mode key plain digit", () => assert.equal(SL.modeForKey(0x31, false, false, false), ""));
 test("mode key 5", () => assert.equal(SL.modeForKey(0x35, true, false, false), ""));
@@ -532,6 +544,12 @@ test("pruneClips", () => assert.deepEqual(SL.pruneClips([{ ts: 1000 }, { ts: 900
 test("filterClips", () => assert.equal(SL.filterClips([{ text: "Hello", mime: "text/plain" }, { text: "", mime: "image/png" }], "image").length, 1));
 test("clipTitle collapses", () => assert.equal(SL.clipTitle({ mime: "text/plain", text: "  a \n b " }), "a b"));
 test("clipTitle image", () => assert.equal(SL.clipTitle({ mime: "image/png" }), "Image"));
+test("clipSubtitle", () => {
+    const now = 10 * 86400e3;
+    assert.equal(SL.clipSubtitle({ mime: "text/plain", ts: now - 30 * 3600e3 }, now), "Text · Copied yesterday");
+    assert.equal(SL.clipSubtitle({ mime: "image/png", ts: now - 5 * 60e3 }, now), "Image · Copied 5 min ago");
+    assert.equal(SL.clipSubtitle({ mime: "text/plain", ts: 0 }, now), "Text");
+});
 test("relTime", () => assert.deepEqual([30e3, 300e3, 7200e3, 100000e3, 400000e3].map(d => SL.relTime(1e9 - d, 1e9)),
     ["Just now", "5 min ago", "2 hr ago", "Yesterday", "4 days ago"]));
 
@@ -543,7 +561,8 @@ test("relTime", () => assert.deepEqual([30e3, 300e3, 7200e3, 100000e3, 400000e3]
     const { tmpdir } = await import("node:os");
     const dir = mkdtempSync(join(tmpdir(), "hyprk-clip-"));
     const sh = join(here, "..", "scripts", "clipboard.sh");
-    const run = (args, input, env) => execFileSync(sh, args, { input: input || "", env: Object.assign({}, process.env, { HYPRK_CLIP_DIR: dir }, env || {}) }).toString();
+    // never the real clipboard: no display, and the offered types come from HYPRK_CLIP_TYPES (none by default)
+    const run = (args, input, env) => execFileSync(sh, args, { input: input || "", env: Object.assign({}, process.env, { HYPRK_CLIP_DIR: dir, WAYLAND_DISPLAY: "", HYPRK_CLIP_TYPES: "" }, env || {}) }).toString();
     run(["store", "3", "0"], "first");
     run(["store", "3", "0"], "second");
     run(["store", "3", "0"], "first");                       // duplicate moves to the top
@@ -552,6 +571,26 @@ test("relTime", () => assert.deepEqual([30e3, 300e3, 7200e3, 100000e3, 400000e3]
     const lines = run(["list", "0"]).trim().split("\n").map(l => SL.parseClipLine(l));
     test("clip store dedup + order", () => assert.deepEqual(lines.map(i => i.text.trim()), ["first", "second"]));
     test("clip store skips sensitive", () => assert.ok(!lines.some(i => i.text.includes("secret"))));
+    // what password managers set: the KDE hint "secret", the nspasteboard.org concealed / transient types
+    const types = t => ({ HYPRK_CLIP_TYPES: "text/plain;charset=utf-8\n" + t + "\ntext/plain" });
+    run(["store", "9", "0"], "kde-secret", Object.assign(types("x-kde-passwordManagerHint"), { HYPRK_CLIP_HINT: "secret" }));
+    run(["store", "9", "0"], "concealed", types("org.nspasteboard.ConcealedType"));
+    run(["store", "9", "0"], "transient", types("org.nspasteboard.TransientType"));
+    run(["store", "9", "0"], "kde-plain", Object.assign(types("x-kde-passwordManagerHint"), { HYPRK_CLIP_HINT: "public" }));
+    const texts = run(["list", "0"]).trim().split("\n").map(l => SL.parseClipLine(l).text.trim());
+    test("clip store skips secret hints", () => assert.deepEqual(texts.filter(t => /secret|concealed|transient/.test(t)), []));
+    test("clip store keeps a non-secret hint", () => assert.ok(texts.includes("kde-plain")));
+    test("clip gate drops secret", () => assert.equal(run(["gate", "cat"], "pw", types("org.nspasteboard.ConcealedType")), ""));
+    test("clip gate passes", () => assert.equal(run(["gate", "cat"], "hello"), "hello"));
+    const victim = run(["list", "0"]).trim().split("\n").map(l => SL.parseClipLine(l)).find(i => i.text.trim() === "kde-plain");
+    run(["delete", victim.file]);
+    test("clip delete one", () => assert.ok(!run(["list", "0"]).includes("kde-plain")));
+    run(["delete", "/etc/passwd"]);
+    test("clip delete only inside the store", () => assert.ok(readFileSync("/etc/passwd", "utf8").length > 0));
+    run(["clear"]);
+    run(["store", "3", "0"], "first");
+    run(["store", "3", "0"], "second");
+    run(["store", "3", "0"], "first");
     for (const n of ["3", "4", "5"]) run(["store", "3", "0"], "item" + n);
     test("clip store cap", () => assert.equal(run(["list", "0"]).trim().split("\n").length, 3));
     run(["clear"]);
