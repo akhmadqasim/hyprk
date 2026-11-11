@@ -172,7 +172,7 @@ QtObject {
         : theme.dark ? Qt.rgba(1, 1, 1, 0.55) : Qt.rgba(0, 0, 0, 0.51) // ref #7D7C7B
     readonly property color tertiaryLabel: Tokens.tertiaryLabel
     readonly property color controlFill: Tokens.control.pushFill
-    readonly property color previewStrip: theme.dark ? "#2C2C2E" : "#ECEAE7"        // Liquid Glass preview title, ref
+    readonly property color previewCard: theme.dark ? "#131210" : "#E8E5E0"         // Liquid Glass preview text card (appearance-*.png)
     readonly property color shadow: Qt.rgba(0, 0, 0, theme.dark ? 0.55 : 0.28)
 
     // Pane icon tile colors (System Settings palette), TODO verify all

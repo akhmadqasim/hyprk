@@ -50,14 +50,21 @@ Column {
     component MiniWindow: Item {
         property bool darkWin
         anchors.fill: parent
-        Rectangle { // wallpaper
-            anchors.fill: parent; radius: 6
+        // the wallpaper art in each thumbnail (27.2.1 appearance-light.png shows the Mac's wallpaper, darker in Dark);
+        // here the user's wallpaper, else hyprk's default; one small decode shared by every thumbnail
+        Rectangle { // until the wallpaper thumbnail loads (or without one)
+            width: 67; height: 44; radius: 6
             gradient: Gradient {
                 orientation: Gradient.Horizontal
-                GradientStop { position: 0; color: darkWin ? "#1B2A6B" : "#8DB6F2" }
-                GradientStop { position: 1; color: darkWin ? "#3A2E8F" : "#3D6BD8" }
+                GradientStop { position: 0; color: "#8DB6F2" }
+                GradientStop { position: 1; color: "#3D6BD8" }
             }
         }
+        RoundedImage {
+            width: 67; height: 44; radius: 6; decodeWidth: 140
+            path: AppState.wallpaperImage || Backend.root + "/themes/wallpapers/png/DefaultAerial.png"
+        }
+        Rectangle { width: 67; height: 44; radius: 6; visible: darkWin; color: Qt.rgba(0.02, 0.03, 0.12, 0.55) }
         Rectangle { x: 6; y: 8; width: parent.width - 12; height: 6; radius: 2; color: darkWin ? "#2E57D6" : "#3F7BF0" }
         Rectangle {
             x: parent.width * 0.3; y: parent.height * 0.5; width: parent.width * 0.62; height: parent.height * 0.42; radius: 4
@@ -132,18 +139,23 @@ Column {
                     }
                     RoundedImage {
                         id: preview
-                        anchors.fill: parent; radius: 14; decodeWidth: 540
+                        width: parent.width; height: 98 + 14; radius: 14; decodeWidth: 540
                         path: AppState.wallpaperImage || Backend.root + "/themes/wallpapers/png/DefaultAerial.png"
                     }
-                    Rectangle { // ref: a document title strip under the photo
-                        anchors.bottom: parent.bottom
-                        width: parent.width; height: 30   // ref: a slim strip
+                    // 27.2.1 (appearance-light.png): the photo fills the top 98 pt, a text card the rest (#E8E5E0 light,
+                    // #131210 dark) with a 15 pt Semibold title 25 pt under its top, a 13 pt secondary subtitle and a body
+                    // line cut by the bottom edge, all at x 16. No Apple photo or article is shipped: the photo is the
+                    // wallpaper, the text names it.
+                    Rectangle {
+                        y: 98
+                        width: parent.width; height: parent.height - 98
                         bottomLeftRadius: 14; bottomRightRadius: 14
-                        color: Theme.previewStrip
-                        MacText {
-                            x: 14; anchors.verticalCenter: parent.verticalCenter
-                            text: P.prettyFileName(preview.path)
-                            weight: Typography.semibold
+                        color: Theme.previewCard
+                        Column {
+                            x: 16; y: 14; width: parent.width - 32; spacing: 3
+                            MacText { text: P.prettyFileName(preview.path); size: 15; weight: Typography.semibold }
+                            MacText { text: "Wallpaper"; size: 13; color: Theme.secondaryLabel }
+                            MacText { topPadding: 8; width: parent.width; elide: Text.ElideRight; text: "Light and shape behind every window on your desktop."; size: 13 }
                         }
                     }
                     Row {
@@ -321,9 +333,16 @@ Column {
                                 anchors.fill: parent; radius: 7
                                 // Tinted shows the chosen tint (iconstyle-tinted-red-auto-light.png)
                                 color: modelData.t === "Tinted" && AppState.appearance.iconTint ? Accent.swatch(AppState.appearance.iconTint) : modelData.c
+                                // sun behind a translucent cloud (27.2.1 appearance-light.png tiles): sun 11 pt at
+                                // centre (20, 12.5), cloud over the lower left; sampled sun #F9C416 / #EDB609 / #E0E1E1 / #96DEFF
+                                Rectangle {
+                                    x: 14.5; y: 7; width: 11; height: 11; radius: 5.5
+                                    color: ({ Default: "#F9C416", Dark: "#EDB609", Clear: "#E0E1E1", Tinted: "#96DEFF" })[modelData.t]
+                                }
                                 Text {
-                                    anchors.centerIn: parent; text: "cloud"; font.family: Theme.fontGlyph; font.pixelSize: 17
-                                    color: modelData.t === "Dark" ? "#3C88F5" : "white"
+                                    x: 2.5; y: 6; text: "cloud"; font.family: Theme.fontGlyph; font.pixelSize: 21
+                                    color: modelData.t === "Dark" ? Qt.rgba(0.85, 0.85, 0.86, 0.8) : modelData.t === "Clear" ? Qt.rgba(0.86, 0.86, 0.87, 0.85)
+                                         : Qt.rgba(1, 1, 1, 0.62)
                                 }
                             }
                         }
