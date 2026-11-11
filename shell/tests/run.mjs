@@ -1429,5 +1429,57 @@ test("Mission Control: one Space reads Desktop, more are numbered by position", 
         assert.match(apps, /function openFolder\(item\) \{ openFinder\(/));
 }
 
+// ---- Stage Manager (lib/stage.js, decoded from WindowManager 27.2.1) ----
+{
+    const SM = load("stage.js");
+    // 1470 x 956 "looks like" (MacBook Air), 24 pt menu bar: 932 available
+    test("stage rows: 932 pt gives round(902 / 190) = 5 rows of 150.4", () => {
+        const r = SM.rowCount(932, 956); assert.equal(r.rows, 5); assert.ok(Math.abs(r.itemHeight - 150.4) < 1e-9);
+    });
+    test("stage item height clamps to the maximum", () => assert.equal(SM.rowCount(800, 956).itemHeight, 160));
+    test("stage rows: tall screen gives the maximum 6", () => assert.equal(SM.rowCount(2000, 2000).rows, 6));
+    test("stage rows: short screen keeps 4 and the minimum height", () => {
+        const r = SM.rowCount(400, 450); assert.equal(r.rows, 4); assert.equal(r.itemHeight, 96);
+    });
+    test("stage row scale is item over display height", () => assert.ok(Math.abs(SM.rowCount(932, 956).scale - 150.4 / 956) < 1e-12));
+    test("pile window scale clamps height to 96..160", () => {
+        assert.ok(Math.abs(SM.windowScale(400, 300, 0.1, 1470, 956) * 300 - 96) < 1e-9);
+        assert.ok(Math.abs(SM.windowScale(1200, 900, 0.5, 1470, 956) * 900 - 160) < 1e-9);
+    });
+    test("pile window width capped at the widest pile", () => {
+        const s = SM.windowScale(3000, 400, 160 / 956, 1470, 956);
+        assert.ok(Math.abs(3000 * s - SM.pileMaxWidth(1470, 956)) < 1e-9);
+    });
+    test("stage frame insets the strip side only (all windows)", () => {
+        const i = Math.floor(246 * 0.66) + 32;
+        assert.deepEqual(SM.stageFrame({ x: 0, y: 24, w: 1470, h: 932 }, 246, false, true), { x: i, y: 24, w: 1470 - i, h: 932 });
+    });
+    test("stage frame with the strip hidden: 4 pt", () => assert.equal(SM.stageFrame({ x: 0, y: 0, w: 100, h: 100 }, 246, true, true).x, 4));
+    test("strip column centred, 30 pt apart, 16 pt in", () =>
+        assert.deepEqual(SM.stripLayout({ x: 0, y: 0, w: 300, h: 600 }, [100, 100]), [{ x: 16, y: 185 }, { x: 16, y: 315 }]));
+    test("pile hover grows by 16 pt", () => assert.equal(SM.interactionScale(160, "hover"), 176 / 160));
+    let m = SM.activate(SM.empty(), "a");
+    test("first app goes on stage", () => assert.deepEqual(m, { stage: "a", strip: [] }));
+    m = SM.activate(SM.activate(m, "b"), "c");
+    test("stage app goes to the top of the strip", () => assert.deepEqual(m, { stage: "c", strip: ["b", "a"] }));
+    test("switching to a pile takes it off the strip", () => assert.deepEqual(SM.activate(m, "a"), { stage: "a", strip: ["c", "b"] }));
+    test("a new window of the stage app joins the stage", () => assert.equal(SM.activate(m, "c"), m));
+    test("desktop click empties the stage", () => assert.deepEqual(SM.emptyStage(m), { stage: "", strip: ["c", "b", "a"] }));
+    test("closing the stage app leaves an empty stage", () => assert.deepEqual(SM.gone(m, "c"), { stage: "", strip: ["b", "a"] }));
+    test("closing a strip app drops its pile", () => assert.deepEqual(SM.gone(m, "b"), { stage: "c", strip: ["a"] }));
+    test("the strip shows one pile per row, least recent drop off", () => {
+        let k = SM.empty();
+        for (const a of ["1", "2", "3", "4", "5", "6"]) k = SM.activate(k, a);
+        assert.deepEqual(SM.visible(k, 4), ["5", "4", "3", "2"]);
+    });
+    test("reconcile keeps order, adds parked unknowns, drops dead apps", () =>
+        assert.deepEqual(SM.reconcile({ stage: "x", strip: ["a", "dead", "b"] }, ["a", "b", "c", "x"], ["c", "a"]), { stage: "x", strip: ["a", "b", "c"] }));
+    test("a window in the strip's side moves to the stage edge", () => {
+        assert.equal(SM.insetX({ x: 10, w: 500 }, { x: 194, w: 1276 }), 194);
+        assert.equal(SM.insetX({ x: 300, w: 500 }, { x: 194, w: 1276 }), null);
+    });
+    test("strip occluded past 30 pt", () => { assert.ok(SM.occludes({ x: 200 }, 262)); assert.ok(!SM.occludes({ x: 240 }, 262)); });
+}
+
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
