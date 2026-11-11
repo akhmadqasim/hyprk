@@ -413,7 +413,10 @@ Singleton {
     // a Finder window, at a location the Finder takes ("recents:", "applications:", a path, "xdg:DOCUMENTS", "home")
     function openFinder(loc) { runHyprkApp("hyprk-finder", {}, loc ? [loc] : []); }
 
-    function openTrash() { Quickshell.execDetached(["gio", "open", "trash:///"]); }
+    // the Trash in our Finder (its files folder, the freedesktop Trash; was gio open trash:///, the host's file manager)
+    function openTrash() {
+        openFinder((Quickshell.env("XDG_DATA_HOME") || Quickshell.env("HOME") + "/.local/share") + "/Trash/files");
+    }
     // a Dock folder opens in our Finder (never the host's file manager through xdg-open, judge #7)
     function openFolder(item) { openFinder(Quickshell.env("HOME") + "/" + item.folder); }
 

@@ -469,7 +469,9 @@ ShellWindow {
                 readonly property bool launching: Apps.isLaunching(modelData.id) && !running
                 // a window appeared: launching is over, the bounce in progress still lands (Apps.stopLaunching)
                 readonly property bool launchDone: running && Apps.isLaunching(modelData.id)
-                onLaunchDoneChanged: if (launchDone) Apps.stopLaunching(modelData.id)
+                // after this change settles: stopLaunching rewrites Apps.launching, which launchDone reads (the
+                // binding loop warning); an arrow per call, so two cells in one turn do not coalesce
+                onLaunchDoneChanged: if (launchDone) { const id = modelData.id; Qt.callLater(() => Apps.stopLaunching(id)); }
                 // an urgent window asks for attention until it is focused
                 readonly property bool urgent: (modelData.windows || []).some(w => w && w.urgent)
                 onUrgentChanged: if (!separator) Apps.markAttention(modelData.id, urgent)
