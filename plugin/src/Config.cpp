@@ -40,6 +40,7 @@ namespace lg {
             {K("adapt_high"), &SParams::adaptHigh},
             {K("highlight"), &SParams::highlight},
             {K("tint_amount"), &SParams::tintAmount},
+            {K("dither"), &SParams::dither},
             {K("appearance_fade"), &SParams::appearanceFade},
             {K("appearance_hold"), &SParams::appearanceHold},
             {K("shadow_scale"), &SParams::shadowScale},

@@ -27,6 +27,7 @@ uniform float smoothK;              // px, smoothness of the union (= GlassEffec
 uniform float appearBlur;           // px edge softness of fully hidden glass (materialize 0)
 uniform float roundingPower;        // <= 0: Apple's continuous corner; >= 1: Lp superellipse (2 = circle)
 uniform float alpha;                // layer fade
+uniform float ditherAmount;         // 1 = half a level of noise on slow gradients at the 8 bit write, 0 = off
 uniform float fillAmount;           // > 0: fill mode (plus-lighter / plus-darker marker shapes): output amount x coverage,
                                     // the caller's blend equation adds it to or subtracts it from the framebuffer
 uniform int   linearLight;          // 1: work in linear light like QuartzCore (sRGB decode/encode)
@@ -375,5 +376,18 @@ void main() {
         c         = vec4(base * (1.0 + darkSpec.x * line * (3.0 - 2.0 * clamp(base, 0.0, 1.0))), 1.0);
     }
 
+    // The target has 8 bits. Where the glass has smoothed a slow gradient (a blurred wallpaper), plain rounding draws it
+    // as 1-level bands many px wide; half a level of fixed per-pixel noise before the write turns them into grain, as
+    // the unblurred wallpaper has. Ours, not Apple's (no dither term in QuartzCore's glass shaders; the Mac composes
+    // into a deeper buffer). The gate is the backdrop itself: none where it is flat (its deepest level does not change
+    // at all), none where it has detail (its level 2, 4 px texels so the wallpaper's grain does not count, changes by
+    // more than a level in about 3 px: stripes, text, edges). Flat and striped backdrops keep their exact values.
+    if (ditherAmount > 0.0) {
+        float slope  = fwidth(dot(fetch(qp, 2.0), vec3(1.0 / 3.0))) * 255.0;      // levels per px
+        float any    = fwidth(dot(fetch(qp, maxLevel), vec3(1.0 / 3.0))) * 255.0; // 0 on a flat backdrop only
+        float dither = ditherAmount * sat(any / 1e-5) * (1.0 - smoothstep(0.15, 0.4, slope));
+        float noise  = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715)))) - 0.5; // interleaved gradient noise
+        c.rgb       += noise * dither * c.a / 255.0;
+    }
     fragColor = c * alpha;
 }

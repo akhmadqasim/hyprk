@@ -10,6 +10,7 @@
 #include <hyprland/src/render/gl/GLFramebuffer.hpp>
 
 #include <GLES3/gl32.h>
+#include <drm_fourcc.h>
 
 #include <chrono>
 #include <cmath>
@@ -86,6 +87,7 @@ namespace lg {
             .appearBlur       = loc("appearBlur"),
             .roundingPower    = loc("roundingPower"),
             .alpha            = loc("alpha"),
+            .ditherAmount     = loc("ditherAmount"),
             .blurRadius       = loc("blurRadius"),
             .blurK            = loc("blurK"),
             .baseLevel        = loc("baseLevel"),
@@ -164,6 +166,7 @@ namespace lg {
         struct SBoxFB {
             SP<Render::IFramebuffer> fb;
             uint64_t                 frame = 0;
+            bool                     deep  = false; // 16 bit unorm storage (copyBox)
         };
         std::map<std::tuple<uintptr_t, MONITORID, int>, SBoxFB> g_boxes;
 
@@ -375,9 +378,44 @@ void main() {
             if (!slot.fb)
                 slot.fb = g_pHyprRenderer->createFB("liquidglass-backdrop");
             auto& fb = slot.fb;
-            // same format as the source: a blit between float and unorm buffers is invalid
-            if ((fb->m_size != box.size() || fb->m_drmFormat != src->m_drmFormat || !fb->isAllocated()) && !fb->alloc(box.w, box.h, src->m_drmFormat))
-                return {};
+            // same format as the source (a blit between float and unorm buffers is invalid), except that an 8 bit
+            // source gets a 16 bit pyramid: every level is an average, and stored in 8 bits again each one lost up
+            // to half a level, which showed as flat facets and 1-level contour lines wherever the glass or the panel
+            // blur smooths a slow gradient (user report 2026-11-11). 16 bit unorm (EXT_texture_norm16) holds every
+            // 8 bit value exactly (x 257), so a flat backdrop reads as it did; 10 bit unorm and half floats do not
+            // (tile over white 187 for 186, rim rows over grey 122 119 for 123 120). Hyprland's table has no such
+            // format, so its texture is given that storage after the alloc. Twice the memory of the copy; 8 bit
+            // where the extension is missing or the framebuffer refuses it.
+            const bool  fmt8 = src->m_drmFormat == DRM_FORMAT_ABGR8888 || src->m_drmFormat == DRM_FORMAT_XBGR8888 || src->m_drmFormat == DRM_FORMAT_ARGB8888 ||
+                src->m_drmFormat == DRM_FORMAT_XRGB8888;
+            static bool deepOk = [] {
+                const char* ext = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+                return ext && std::strstr(ext, "GL_EXT_texture_norm16");
+            }();
+            const bool wantDeep = fmt8 && deepOk;
+            auto&      isDeep   = slot.deep;
+            if (fb->m_size != box.size() || fb->m_drmFormat != src->m_drmFormat || !fb->isAllocated() || isDeep != wantDeep) {
+                if (!fb->alloc(box.w, box.h, src->m_drmFormat))
+                    return {};
+                isDeep = false;
+                if (wantDeep) {
+                    const auto fbo = dynamicPointerCast<CGLFramebuffer>(fb);
+                    const auto t   = fb->getTexture();
+                    if (fbo && t) {
+                        CFramebufferBindingGuard guard{g_pHyprRenderer->glBackend()};
+                        while (glGetError() != GL_NO_ERROR) {}
+                        t->bind();
+                        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16_EXT, box.w, box.h, 0, GL_RGBA, GL_UNSIGNED_SHORT, nullptr);
+                        g_pHyprOpenGL->bindFramebuffer(GL_FRAMEBUFFER, fbo->getFBID());
+                        isDeep = glGetError() == GL_NO_ERROR && glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
+                        if (!isDeep) {
+                            deepOk = false;
+                            if (!fb->alloc(box.w, box.h, src->m_drmFormat))
+                                return {};
+                        }
+                    }
+                }
+            }
             const auto dst = dynamicPointerCast<CGLFramebuffer>(fb);
             const auto tex = fb->getTexture();
             if (!dst || !tex)
@@ -395,7 +433,9 @@ void main() {
                     glBlitFramebuffer(r.x1, r.y1, r.x2, r.y2, r.x1 - ox, r.y1 - oy, r.x2 - ox, r.y2 - oy, GL_COLOR_BUFFER_BIT, GL_NEAREST);
                 });
                 if (glGetError() != GL_NO_ERROR) {
-                    fb.reset(); // reallocate next time
+                    if (isDeep)
+                        deepOk = false; // this driver does not blit into the deep format: 8 bit from the next frame on
+                    fb.reset();         // reallocate next time
                     return {};
                 }
             }
@@ -764,6 +804,7 @@ void main() {
         glUniform2f(u.outerThreshold, -1.f * scale, 0.f);
         glUniform1f(u.roundingPower, m_data.roundingPower.value_or(p.roundingPower));
         glUniform1f(u.alpha, m_data.alpha);
+        glUniform1f(u.ditherAmount, m_data.params->dither);
         glUniform1f(u.aberration, p.aberration * scale);
         glUniform1f(u.pxPerPt, scale);
         glUniform1f(u.shadowTint, r.shadowBlack ? 0.f : p.shadowTint);
@@ -906,6 +947,7 @@ void main() {
         glUniform2f(u.outerThreshold, -1.f * scale, 0.f);
         glUniform1f(u.roundingPower, 2.f); // the grown box's corners are the offset curve of its shapes' box: circles
         glUniform1f(u.alpha, m_data.alpha);
+        glUniform1f(u.ditherAmount, m_data.params->dither);
         glUniform1f(u.aberration, 0.f);
         glUniform1f(u.pxPerPt, scale);
         glUniform1f(u.shadowTint, 0.f);
@@ -988,6 +1030,7 @@ void main() {
             return;
         glUniform1f(u.roundingPower, m_data.roundingPower.value_or(m_data.params->roundingPower));
         glUniform1f(u.alpha, m_data.alpha);
+        glUniform1f(u.ditherAmount, 0.f); // fills read no backdrop
         glUniform1f(u.smoothK, 0.f);
         glUniform1f(u.appearBlur, 10.f * scale);
         glUniform1i(u.shapeCount, 1);

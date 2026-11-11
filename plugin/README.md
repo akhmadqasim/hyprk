@@ -214,6 +214,38 @@ Measured (mcap, MBA, Finder + Settings + Dock, option then state file, both dire
 decoded curve rms 0.001-0.002 (Finder, Settings; 6 runs at scale 2, 2 at 1.6) and 0.004 (Dock), monotonic, 2-98 % 384-405 ms,
 the fade starting 162-180 ms after the switch command; `reduce_motion`: done in 94 ms, no fade.
 
+## Precision (banding)
+
+User report 2026-11-11: around the open Control Center the blurred backdrop showed steps "like an 8-bit transition". Three
+causes, measured over the Tahoe wallpaper (MBA 2x; a row is "banded" when equal values run for tens of px):
+1. The blur pyramid was 8 bit: every level is an average and lost up to half a level again, which drew flat facets (the
+   triangles of a bilinear read between texels one level apart). The copies now have 16 bit unorm storage
+   (`EXT_texture_norm16`, exact for every 8 bit value, so flat backdrops read as before; 10 bit unorm and half floats moved
+   flat numbers by a level). 8 bit where the extension or the framebuffer refuses it.
+2. The write is 8 bit: a wallpaper carries its own grain (65-70 one-level steps per 100 px), the blur removes it, and
+   plain rounding draws the smooth result as contour lines. The shader now adds half a level of fixed interleaved-gradient
+   noise before the write (`dither`). **Ours, not Apple's**: QuartzCore's glass shaders have no dither term; the Mac composes
+   into a deeper buffer. It is gated on the backdrop itself: off where the backdrop is flat (its deepest level does not
+   change) and off where it has detail (level 2 changes by more than a level in about 3 px), so flat and striped backdrops
+   keep their values.
+3. Not the plugin: the shell's dim layer under the Control Center is an 8 bit alpha ramp of 10 %; its contour rings and
+   blocky steps are there with the plugin disabled (hand-off to the shell).
+
+| longest run of equal values / one-level steps per 100 px (blue) | wallpaper alone | before | after |
+|---|---|---|---|
+| panel blur between the Sound tile and Edit Controls | 3 px / 72 | 140 px / 0 | 19 px / 56 |
+| Sound tile interior | 7 px / 65 | 59 px / 2.7 | 19 px / 44 |
+| menu body | | 347 px / 0.8 | 9 px / 80 |
+| Dock body between icons | | 55 px / 2.5 | 4 px / 83 |
+| Sound tile, scale 1.6 (dither off / on) | | 54 px / 5.4 | 42 px / 35 |
+
+Flat backdrops, after = before: CC tile 186 / 109 / 32 (sd 0), rim over grey 231 179 133 127 123 120, over white 255 247 207
+202, over black 123 84 50 45. Over 4 pt stripes the deeper pyramid (not the dither: same with `dither = 0`) moved three
+numbers by one level: gap between tiles peak to peak 32 -> 31 (99..130, Mac 99..131), tile row 8 pt below its top 8 -> 7
+(15 pt: 8), rim row 4 px across the corners 31 -> 32. GPU, Control Center opened and closed 6 times (`stats`): glass per
+frame avg 0.87 -> 1.16 ms, p95 1.13 -> 1.62 ms; the backdrop copies take twice the memory (8 bytes per px of the glass
+boxes); nothing at rest.
+
 ## Config keys (`plugin:liquidglass:<key>`; lengths in logical px)
 
 | Key | Default | Meaning |
@@ -236,6 +268,7 @@ the fade starting 162-180 ms after the switch command; `reduce_motion`: done in 
 | `aberration` | 0 | px R/B split at the edge (7 taps); 0 = off (Apple: none on background glass) |
 | `highlight` | 1 | scales the key/fill highlight mask (1 = Apple) |
 | `appearance_fade` / `appearance_hold` | 0.5 / 0.15 | s: the cross-fade after an appearance switch and the time the old picture stays whole before it (see Appearance switch); fade 0 = off |
+| `dither` | 1 | half a level of fixed per-pixel noise where the glass or the panel blur draws a slow gradient (see Precision); 0 = off |
 | `tint_amount` | 0.5 | Liquid Glass slider (macOS NSGlassTintAmount) 0..1, see Materials. Live: `hyprctl eval 'hl.config({ plugin = { liquidglass = { tint_amount = 0.3 } } })'` then `hyprctl liquidglass damage` (the eval fires no reload event, the damage redraws every output now) |
 | `shadow_scale` / `shadow_tint` | 1 / 0.35 | drop shadow opacity scale; 0 = black shadow, 1 = saturated backdrop colour |
 | `ring_scale` | 1 | ring shadow opacity scale |

@@ -37,6 +37,7 @@ namespace lg {
         float                                        highlight = 1; // scales the key/fill highlight (1 = Apple)
         float                                        appearanceFade = 0.5f; // s, the snapshot's fade after an appearance switch (0 = off)
         float                                        appearanceHold = 0.15f; // s at full opacity before it (ours: there is no client acknowledgement here)
+        float                                        dither = 1; // noise of half a level where the glass draws a slow gradient (0 = off)
         float                                        tintAmount = 0.5f; // Liquid Glass slider (NSGlassTintAmount) 0..1, 0.5 = the recipes as is
         float                                        shadowScale = 1, shadowTint = 0.35f, ringScale = 1;
 
