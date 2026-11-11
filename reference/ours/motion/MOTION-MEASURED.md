@@ -189,8 +189,9 @@ ControlCenterWindow.qml (removed again) printed, per event of the panel's QQuick
 - Not changed: the basic loop renders every window of the shell on the GUI thread one after another (Dock, menu bar,
   panels, the lock), a global change whose cost was not measured; the first buffer still carries fade 0 there too.
   A shell-side fix would start the spring inside a frame (on the window's `afterAnimating`, so its first tick is the
-  render loop's); the earlier tries (start on the first swapped frame, one frame ahead) did not do that and are not
-  repeated here.
+  render loop's). Tried after this note: `go()` from the window's first `afterAnimating` (inside the frame): the
+  first tick still came between frames (fade 0.0611 right after the swap of the fade-0 frame) and 0.0611 was synced
+  twice again; reverted. The earlier tries (start on the first swapped frame, one frame ahead) were not repeated.
 
 Cmd-Tab fill one commit late (hand-off d, 1 in 3 dismisses here): Quickshell sends a layer's ext-background-effect
 region (with the glassOpacity marker) from the GUI thread at the window's polish (`BackgroundEffect::onWindowPolished`,
