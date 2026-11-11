@@ -360,7 +360,7 @@ hl.layer_rule({
 hl.layer_rule({
     -- the shell animates these itself
     name = "hyprk-no-anim",
-    match = { namespace = "^hyprk-(overlay|controlcenter|spotlight|switcher|mission|notifications|notificationcenter|dock|dock-label|dock-dots|dock-dots-dark|menubar|wallpaper|hud)$" },
+    match = { namespace = "^hyprk-(overlay|controlcenter|spotlight|switcher|mission|notifications|notificationcenter|dock|dock-label|dock-dots|dock-dots-dark|menubar|wallpaper|hud|stage-strip|stage-edge|stage-flight)$" },
     no_anim = true,
 })
 
