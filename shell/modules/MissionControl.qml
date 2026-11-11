@@ -169,9 +169,20 @@ ShellWindow {
                 try {
                     const parts = reply.split(/\n\n\n+/), s = {}, b = {};
                     JSON.parse(parts[0]).forEach((c, i) => s[c.address] = i);
-                    addresses.forEach((a, i) => { if ((parts[i + 1] || "").includes("liquidglass-titlebar\t")) b[a] = true; });
-                    const looks = {};
-                    try { JSON.parse(parts[addresses.length + 1] || "[]").forEach(d => looks[d.address] = d); } catch (err) {}
+                    // a window has a bar when the plugin describes one (`liquidglass bars` lists only bars that are
+                    // drawn: height > 0 and the window decorated). The decoration alone is attached to every window,
+                    // also to those that draw their own title bar (Settings, the Finder), whose thumbnail then had a
+                    // 32 pt strip of wallpaper glass above it (judge #5). Without that command (an older plugin) the
+                    // decoration decides, as before.
+                    let looks = null;
+                    try {
+                        const l = JSON.parse(parts[addresses.length + 1] || "");
+                        if (Array.isArray(l)) { looks = {}; l.forEach(d => looks[d.address] = d); }
+                    } catch (err) {}
+                    addresses.forEach((a, i) => {
+                        if ((parts[i + 1] || "").includes("liquidglass-titlebar\t") && (!looks || looks[a])) b[a] = true;
+                    });
+                    looks = looks || {};
                     mc.stack = s;
                     mc.barLooks = looks;
                     mc.bars = b;
