@@ -21,7 +21,8 @@ namespace lg {
 
     class CMacShadowDecoration : public IHyprWindowDecoration {
       public:
-        CMacShadowDecoration(PHLWINDOW window, std::shared_ptr<const SParams> (*params)());
+        // rim: the 1 pt white rim inside the frame (Q-windows-03, `window_rim`) instead of the shadow
+        CMacShadowDecoration(PHLWINDOW window, std::shared_ptr<const SParams> (*params)(), bool rim = false);
         ~CMacShadowDecoration() override = default;
 
         SDecorationPositioningInfo getPositioningInfo() override;
@@ -41,6 +42,7 @@ namespace lg {
 
         PHLWINDOWREF m_window;
         ParamsFn     m_params;
+        bool         m_rim      = false;
         bool         m_reported = false; // extents reported while on
     };
 
@@ -51,6 +53,7 @@ namespace lg {
             double radius = 0, roundingPower = 2;
             double sigma = 0, offsetY = 0, density = 0; // logical px
             float  alpha = 1;
+            double rim   = 0; // > 0: a white rim this wide (logical px) inside `body`, alpha `density`
         };
         explicit CMacShadowElement(const SData& data) : m_data(data) {}
         std::vector<UP<IPassElement>> draw(Render::CRenderContext& ctx) override;

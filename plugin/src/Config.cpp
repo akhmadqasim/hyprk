@@ -64,6 +64,7 @@ namespace lg {
             {K("titlebar_text_inactive"), 0x00000040, [](SParams& p, long long v) { p.titlebarTextInactive = rgbaFromHex(v); }},
             {K("stats"), 0, [](SParams& p, long long v) { p.stats = v != 0; }},
             {K("window_shadow"), 0, [](SParams& p, long long v) { p.windowShadow = v != 0; }},
+            {K("window_rim"), 0, [](SParams& p, long long v) { p.windowRim = v != 0; }},
             {K("reduce_motion"), 0, [](SParams& p, long long v) { p.reduceMotion = v != 0; }},
             {K("require_region"), 1, [](SParams& p, long long v) { p.requireRegion = v != 0; }},
         };

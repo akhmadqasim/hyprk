@@ -269,8 +269,9 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
     if ok then
         hl.env("HYPRK_GLASS", "plugin")
         -- AppKit's window shadow from the plugin (plugin/src/WindowShadow.cpp: the Gaussian of the frame, blur 20 / 8 pt,
-        -- y 18 / 7, density .40 / .22 light, .70 / .45 dark), Hyprland's off; without the plugin the gradient above stays
-        hl.config({ plugin = { liquidglass = { window_shadow = 1 } }, decoration = { shadow = { enabled = false } } })
+        -- y 18 / 7, density .40 / .22 light, .70 / .45 dark), Hyprland's off; without the plugin the gradient above stays.
+        -- window_rim: the 1 pt white rim inside every window, alpha .10 (.08 dark inactive) (MAC-ANSWERS Q-windows-03)
+        hl.config({ plugin = { liquidglass = { window_shadow = 1, window_rim = 1 } }, decoration = { shadow = { enabled = false } } })
     else print("hyprk: liquidglass not loaded: " .. tostring(err)) end
 end
 -- Window motion Hyprland cannot express (plugin-motion/): the Dock genie on minimize/restore.

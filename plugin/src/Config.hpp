@@ -62,6 +62,7 @@ namespace lg {
         bool                                         fullDamage    = false; // true: redraw the whole output while glass is visible
         bool                                         stats         = false; // GPU timestamp queries, `hyprctl liquidglass`
         bool                                         windowShadow  = false; // AppKit's window shadow (WindowShadow.hpp) instead of Hyprland's
+        bool                                         windowRim     = false; // the 1 pt white rim inside every window (Q-windows-03)
         bool                                         linearLight   = false; // 1: shader in linear light (recipes are tuned for 0, see README)
         bool                                         requireRegion = true;  // no blur region -> no glass
         std::string                                  shaderPath;

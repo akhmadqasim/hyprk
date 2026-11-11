@@ -133,6 +133,9 @@ static void addWindowDecorations(PHLWINDOW window) {
     auto shadow = makeShared<lg::CMacShadowDecoration>(window, [] { return g_params; });
     g_shadows.emplace_back(shadow);
     HyprlandAPI::addWindowDecoration(lg::handle(), window, std::move(shadow));
+    auto rim = makeShared<lg::CMacShadowDecoration>(window, [] { return g_params; }, true);
+    g_shadows.emplace_back(rim);
+    HyprlandAPI::addWindowDecoration(lg::handle(), window, std::move(rim));
     // the title bar reserves no space until it decides the window wants one
     auto bar = makeShared<lg::CTitlebar>(window, [] { return g_params; });
     g_titlebars.emplace_back(bar);

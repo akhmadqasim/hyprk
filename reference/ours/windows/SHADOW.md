@@ -87,3 +87,10 @@ Cost (`stats = 1`, RX 6600 class GPU, MBA 2x, the 700 x 533 pt window moved ever
 (only damaged parts are redrawn, no texture or cache). The closing fade takes the shadow with the window as before (both are
 window decorations). Not checked on screen: the shadow during the close fade, zoom and full screen exit frames.
 
+## Inner rim (judge #3 "not possible with Hyprland's border", 2026-11-11)
+
+Q-windows-03: inside the 0.5 pt black rim a 1 pt white rim, alpha .10 (.08 dark inactive), on every edge. The plugin draws it
+(`window_rim = 1`, same element and shader as the shadow, decoration layer OVER, inside the border at the window's corner).
+Dark, blank foot (36): 2 px just inside the border 36 -> 58 active, 54 inactive (36 + .10 / .08 x 219; the Mac's TextEdit bar
+40 -> 61 is the same formula). Shadow numbers unchanged with it on. Light: invisible over white content, as on the Mac.
+

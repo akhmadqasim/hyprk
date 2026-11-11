@@ -32,6 +32,7 @@ uniform vec4  body;          // window frame: centre, half size (quad px)
 uniform float radius;        // its corner radius (px)
 uniform float roundingPower;
 uniform float alpha;
+uniform float rimWidth;      // > 0: a white rim of this width (px) just inside the frame instead of the shadow
 out vec4 fragColor;
 
 float erfA(float x) {
@@ -51,6 +52,11 @@ void main() {
     vec2  m  = max(q, 0.0);
     float c  = (m.x > 0.0 || m.y > 0.0) ? pow(pow(m.x, roundingPower) + pow(m.y, roundingPower), 1.0 / roundingPower) : 0.0;
     float d  = c + min(max(q.x, q.y), 0.0) - radius;
+    if (rimWidth > 0.0) {
+        float r = density * clamp(0.5 - d, 0.0, 1.0) * clamp(d + rimWidth + 0.5, 0.0, 1.0) * alpha;
+        fragColor = vec4(r, r, r, r);
+        return;
+    }
     float a  = density * gx * gy * clamp(d + 0.5, 0.0, 1.0) * alpha;
     fragColor = vec4(0.0, 0.0, 0.0, a);
 }
@@ -59,7 +65,7 @@ void main() {
         struct SShadowProgram {
             SP<CShader> shader;
             bool        tried = false;
-            int         quadSize = -1, rect = -1, sigma = -1, density = -1, body = -1, radius = -1, roundingPower = -1, alpha = -1;
+            int         quadSize = -1, rect = -1, sigma = -1, density = -1, body = -1, radius = -1, roundingPower = -1, alpha = -1, rimWidth = -1;
         } g_prog;
 
         bool ensureProgram() {
@@ -83,6 +89,7 @@ void main() {
             g_prog.radius        = loc("radius");
             g_prog.roundingPower = loc("roundingPower");
             g_prog.alpha         = loc("alpha");
+            g_prog.rimWidth      = loc("rimWidth");
             g_prog.shader        = shader;
             return true;
         }
@@ -102,10 +109,11 @@ void main() {
 
     // ── decoration ──────────────────────────────────────────────────────────
 
-    CMacShadowDecoration::CMacShadowDecoration(PHLWINDOW window, std::shared_ptr<const SParams> (*params)()) : IHyprWindowDecoration(window), m_window(window), m_params(params) {}
+    CMacShadowDecoration::CMacShadowDecoration(PHLWINDOW window, std::shared_ptr<const SParams> (*params)(), bool rim) :
+        IHyprWindowDecoration(window), m_window(window), m_params(params), m_rim(rim) {}
 
     bool CMacShadowDecoration::wanted(const PHLWINDOW& window, const std::shared_ptr<const SParams>& p) const {
-        return window && p && p->enabled && p->windowShadow && validMapped(window) && window->m_ruleApplicator->decorate().valueOrDefault() &&
+        return window && p && p->enabled && (m_rim ? p->windowRim : p->windowShadow) && validMapped(window) && window->m_ruleApplicator->decorate().valueOrDefault() &&
             !window->m_ruleApplicator->noShadow().valueOrDefault() && Fullscreen::controller()->getFullscreenModes(window).internal != Fullscreen::FSMODE_FULLSCREEN;
     }
 
@@ -114,7 +122,7 @@ void main() {
         info.policy = DECORATION_POSITION_ABSOLUTE;
         info.edges  = DECORATION_EDGE_BOTTOM | DECORATION_EDGE_LEFT | DECORATION_EDGE_RIGHT | DECORATION_EDGE_TOP;
         const auto p = m_params();
-        m_reported   = p && p->enabled && p->windowShadow;
+        m_reported   = p && p->enabled && p->windowShadow && !m_rim; // the rim stays inside the window
         // what the shadow covers, so a move or close damages it
         if (m_reported)
             info.desiredExtents = {{REACH, REACH - REACH_Y}, {REACH, REACH + REACH_Y}};
@@ -128,7 +136,7 @@ void main() {
         const auto p      = m_params();
         if (!mon || !wanted(window, p))
             return;
-        if (!m_reported) {
+        if (!m_reported && !m_rim) {
             g_pDecorationPositioner->repositionDeco(this); // the key was switched on: report the extents
             return;
         }
@@ -145,6 +153,19 @@ void main() {
         const double radius = pres.rounding() > 0 ? pres.rounding() + border - border * (M_SQRT2 - 1) * std::max(2.0 - rp, 0.0) : 0;
 
         const bool   active = window == Desktop::focusState()->window();
+        if (m_rim) {
+            // Q-windows-03: a 1 pt white rim just inside the frame, alpha .10 (.08 dark inactive), over the window and its
+            // title bar; inside the border (part of the box) at the window's own corner
+            g_pHyprRenderer->addPassElement(ctx, makeUnique<CMacShadowElement>(CMacShadowElement::SData{
+                                                     .body          = {body.x + border, body.y + border, body.w - 2 * border, body.h - 2 * border},
+                                                     .radius        = pres.rounding(),
+                                                     .roundingPower = rp,
+                                                     .density       = (!active && p->appearance == 2) ? 0.08 : 0.10,
+                                                     .alpha         = a,
+                                                     .rim           = 1,
+                                                 }));
+            return;
+        }
         const auto   s      = macShadow(active, p->appearance == 2);
         g_pHyprRenderer->addPassElement(ctx, makeUnique<CMacShadowElement>(CMacShadowElement::SData{
                                                  .body          = body,
@@ -178,7 +199,7 @@ void main() {
     }
 
     eDecorationLayer CMacShadowDecoration::getDecorationLayer() {
-        return DECORATION_LAYER_BOTTOM;
+        return m_rim ? DECORATION_LAYER_OVER : DECORATION_LAYER_BOTTOM;
     }
 
     uint64_t CMacShadowDecoration::getDecorationFlags() {
@@ -186,12 +207,14 @@ void main() {
     }
 
     std::string CMacShadowDecoration::getDisplayName() {
-        return "liquidglass shadow";
+        return m_rim ? "liquidglass rim" : "liquidglass shadow";
     }
 
     // ── element ─────────────────────────────────────────────────────────────
 
     CBox CMacShadowElement::reach() const {
+        if (m_data.rim > 0)
+            return m_data.body;
         const double r = 3 * m_data.sigma;
         return {m_data.body.x - r, m_data.body.y + m_data.offsetY - r, m_data.body.w + 2 * r, m_data.body.h + 2 * r};
     }
@@ -229,6 +252,7 @@ void main() {
         glUniform1f(g_prog.radius, float(m_data.radius * scale));
         glUniform1f(g_prog.roundingPower, float(m_data.roundingPower));
         glUniform1f(g_prog.alpha, m_data.alpha);
+        glUniform1f(g_prog.rimWidth, float(m_data.rim * scale));
         g_pHyprOpenGL->blend(true);
         g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         glBindVertexArray(shader->getUniformLocation(SHADER_SHADER_VAO));
