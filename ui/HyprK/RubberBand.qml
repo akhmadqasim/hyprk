@@ -22,7 +22,7 @@ MouseArea {
     property Flickable flickable
     property real coefficient: RB.C_TRACKPAD
     readonly property bool animating: seq.running
-    readonly property bool stretched: !!flickable && (_over(1) !== 0 || _over(2) !== 0)
+    function stretched() { return !!flickable && (_over(1) !== 0 || _over(2) !== 0); }   // a function: no binding per frame
 
     parent: flickable
     anchors.fill: parent
