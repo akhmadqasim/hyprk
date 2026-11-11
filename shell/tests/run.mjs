@@ -667,9 +667,29 @@ test("mode buttons start inside the field, end in place", () => {
     const d = new Date(2026, 10, 10, 16, 5);
     test("lock clock 12h has no AM/PM", () => assert.equal(LK.time(d, false), "4:05"));
     test("lock clock 24h", () => assert.equal(LK.time(d, true), "16:05"));
+    test("lock clock 24h leading zero, locale separator (09.07)", () => assert.equal(LK.time(new Date(2026, 10, 11, 9, 7), true, "."), "09.07"));
+    test("lock clock separator from the locale", () => {
+        assert.equal(LK.timeSep("en_ID.UTF-8"), "."); assert.equal(LK.timeSep("id_ID"), ".");
+        assert.equal(LK.timeSep("en_US.UTF-8"), ":"); assert.equal(LK.timeSep(""), ":");
+    });
     test("lock clock midnight 12h", () => assert.equal(LK.time(new Date(2026, 10, 10, 0, 7), false), "12:07"));
-    test("lock date month first", () => assert.equal(LK.date(d, true), "Tuesday, November 10"));
-    test("lock date day first", () => assert.equal(LK.date(d, false), "Tuesday 10 November"));
+    test("lock date day first (Wed 11 Nov)", () => assert.equal(LK.date(new Date(2026, 10, 11, 9, 7), false), "Wed 11 Nov"));
+    test("lock date month first", () => assert.equal(LK.date(d, true), "Tue Nov 10"));
+    test("lock minute change: only the changed digit", () => {
+        assert.deepEqual(LK.changed("09.11", "09.12"), [false, false, false, false, true]);
+        assert.deepEqual(LK.changed("09.59", "10.00"), [true, true, false, true, true]);
+        assert.deepEqual(LK.changed("9:59", "10:00"), [true, true, true, true, true]);
+        assert.deepEqual(LK.changed("09.07", "09.07"), [false, false, false, false, false]);
+    });
+    test("lock field: dots at 15.5 + 8.25 i, caret 12 in when empty, after the last dot", () => {
+        near(LK.dotX(0), 15.5); near(LK.dotX(3), 15.5 + 3 * 8.25);
+        near(LK.caretX(0), 12); near(LK.caretX(1), 23);
+        assert.ok(LK.caretX(5) > LK.dotX(4) + 5, "caret right of the last dot");
+    });
+    test("lock field: dots fit before the arrow ring", () => {
+        const n = LK.dotsFit(131, 2);
+        assert.ok(LK.caretX(n) + 2 <= 131 && LK.caretX(n + 1) + 2 > 131, "n " + n);
+    });
     test("full name from GECOS", () => assert.equal(LK.fullName("aq:x:1000:1000:Akhmad Qasim,,,:/home/aq:/bin/bash\n", "aq"), "Akhmad Qasim"));
     test("full name falls back to login", () => assert.equal(LK.fullName("aq:x:1000:1000::/home/aq:/bin/bash", "aq"), "aq"));
     test("initials", () => { assert.equal(LK.initials("Akhmad Qasim"), "AQ"); assert.equal(LK.initials("alto"), "A"); assert.equal(LK.initials("A B C"), "AC"); assert.equal(LK.initials(""), ""); });
@@ -681,12 +701,25 @@ test("mode buttons start inside the field, end in place", () => {
     const devs = JSON.stringify({ keyboards: [{ name: "virt", layout: "us", main: false }, { name: "kb", layout: "us,de(neo)", active_layout_index: 1, active_keymap: "German (Neo 2)", capsLock: true, main: true }] });
     test("keyboard: main one, layouts, caps", () => { const k = LK.keyboard(devs); assert.deepEqual(k.layouts, ["us", "de(neo)"]); assert.equal(k.index, 1); assert.equal(k.capsLock, true); });
     test("keyboard: layout label", () => assert.equal(LK.layoutLabel(LK.keyboard(devs)), "DE"));
+    test("keyboard: US is ABC", () => assert.equal(LK.layoutLabel({ layouts: ["us"], index: 0 }), "ABC"));
     test("keyboard: bad json", () => assert.equal(LK.keyboard("{"), null));
-    test("shake starts and ends at rest", () => { assert.equal(LK.shake(0, 14, 3, 1.6), 0); assert.equal(LK.shake(1, 14, 3, 1.6), 0); });
-    test("shake stays within amplitude and decays", () => {
-        let peak = 0, late = 0;
-        for (let t = 0; t <= 1; t += 0.01) { const v = Math.abs(LK.shake(t, 14, 3, 1.6)); peak = Math.max(peak, v); if (t > 0.7) late = Math.max(late, v); }
-        assert.ok(peak <= 14 && peak > 8, "peak " + peak); assert.ok(late < peak / 3, "late " + late);
+    test("shake starts and ends at rest, 400 ms", () => { assert.equal(LK.shake(0), 0); assert.equal(LK.shake(0.4), 0); assert.equal(LK.shake(0.5), 0); });
+    test("shake: first move left, 7.5 Hz, amplitude 14 / 8.25 / 6.75", () => {
+        near(LK.shake(1 / 30), -14); near(LK.shake(3 / 30), 14); near(LK.shake(5 / 30), -14);
+        near(LK.shake(7 / 30), 8.25); near(LK.shake(9 / 30), -8.25); near(LK.shake(11 / 30), 6.75);
+    });
+    test("shake matches the Mac's per-frame offsets (rms < 1 pt)", () => {
+        const mac = [0, -8.5, -14, -11, -1.5, 8.5, 14, 11, 1.5, -8.5, -14, -11, -1.5, 5.5, 9, 6.5, 1, -5, -7.5, -6, -1, 4.5, 6.5, 5, 1, 0];
+        let se = 0;      // frame i of the Mac's second attempt is t = i / 60 s
+        mac.forEach((v, i) => { const e = LK.shake(i / 60) - v; se += e * e; });
+        assert.ok(Math.sqrt(se / mac.length) < 1, "rms " + Math.sqrt(se / mac.length));
+    });
+    test("shake keyframes: 12 quarter waves, 400 ms, peaks of the curve", () => {
+        const k = LK.shakeKeys();
+        assert.equal(k.length, 12);
+        assert.equal(k.reduce((a, x) => a + x.ms, 0), 400);
+        assert.deepEqual(k.filter(x => x.out).map(x => x.to), [-14, 14, -14, 8.25, -8.25, 6.75].map(v => v));
+        assert.ok(k.filter(x => !x.out).every(x => x.to === 0));
     });
 }
 

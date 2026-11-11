@@ -51,17 +51,20 @@ Singleton {
     property string buffer: ""             // typed password, only while locked
     property bool busy: false              // PAM is checking
     property int failures: 0
-    property int failTick: 0               // +1 per wrong password; surfaces shake on change
-    property int failedDots: 0             // length of the wrong password (its dots shake, then fade)
-    property int activity: 0               // +1 per key; the caret blinks for a while after it
-    property string message: ""            // under the field: wrong password, PAM error, or the hint
+    property int failTick: 0               // +1 per wrong password; the field shakes on change
+    // length of the last wrong password: its dots stay, shown selected, until the next key (27.2.1 B2).
+    // Only the count is kept, never the characters.
+    property int selected: 0
+    property int activity: 0               // +1 per key; the caret stays on 0.6 s after it
+    property string message: ""            // a PAM error or the lockout text (the Mac shows no wrong-password text)
+    property bool showHint: false          // the "?" button shows the password hint in the line
+    readonly property string line: showHint ? hint : message !== "" ? message : LockTheme.lineText
     property var kb: null                  // L.keyboard(): layouts, index, capsLock
     readonly property bool capsLock: kb ? kb.capsLock : false
-    readonly property string layoutLabel: kb && kb.layouts.length > 1 ? L.layoutLabel(kb) : ""
+    readonly property string layoutLabel: kb ? L.layoutLabel(kb) : ""
     property string userName: Quickshell.env("USER") || ""
     readonly property string userLogin: Quickshell.env("USER") || ""
     readonly property string home: Quickshell.env("HOME") || ""
-    property string blurred: ""            // cached blurred backdrop (lock-wallpaper.sh), "" = none
     readonly property double since: persist.since
     readonly property string hint: (Prefs.lock && Prefs.lock.hint) ? String(Prefs.lock.hint) : LockTheme.hintFallback
 
@@ -75,12 +78,11 @@ Singleton {
         if (phase !== "") return phase;
         const fm = Hyprland.focusedMonitor;
         persist.screen = fm ? fm.name : (Panels.screen ? Panels.screen.name : "");
-        buffer = ""; message = ""; failures = 0; busy = false;
+        buffer = ""; message = ""; failures = 0; busy = false; selected = 0; showHint = false;
         persist.since = Date.now();
         // no hot reload while the lock is up (a save in shell/ by an editor or agent)
         persist.watchFiles = Quickshell.watchFiles;
         Quickshell.watchFiles = false;
-        if (blurred === "") makeBlur();
         readKeyboard();
         phase = "in";
         inGuard.restart();
@@ -100,6 +102,7 @@ Singleton {
         if (phase !== "locked" || busy || buffer === "") return;
         busy = true;
         message = "";
+        showHint = false;
         pending = buffer;
         if (!pam.start()) { pending = null; busy = false; fail(""); }
     }
@@ -107,10 +110,13 @@ Singleton {
 
     function fail(text: string): void {
         failures++;
-        failedDots = buffer.length;
+        selected = buffer.length;
         buffer = "";
-        message = text !== "" ? text : failures >= LockTheme.hintAfterFailures ? hint : LockTheme.wrongText;
+        message = text;
         failTick++;
+    }
+    function toggleHint(): void {
+        if (phase === "locked" && !busy) showHint = !showHint;
     }
 
     function unlockNow(): void {
@@ -139,7 +145,7 @@ Singleton {
         if (phase !== "out") return;
         finishGuard.stop();
         persist.locked = false;
-        buffer = ""; message = ""; failures = 0; busy = false; kb = null; released = false;
+        buffer = ""; message = ""; failures = 0; busy = false; kb = null; released = false; selected = 0; showHint = false;
         phase = "";
         Quickshell.watchFiles = persist.watchFiles;
     }
@@ -156,14 +162,16 @@ Singleton {
     function key(event): bool {
         if (phase !== "locked") return false;
         activity++;
+        showHint = false;
         const ctrl = (event.modifiers & Qt.ControlModifier) !== 0;
         const alt = (event.modifiers & Qt.AltModifier) !== 0;     // Ctrl+Alt can be AltGr: still text
         const meta = (event.modifiers & Qt.MetaModifier) !== 0;
         switch (event.key) {
         case Qt.Key_Return: case Qt.Key_Enter: submit(); return true;
-        case Qt.Key_Escape: if (!busy) buffer = ""; return true;
+        case Qt.Key_Escape: if (!busy) { buffer = ""; selected = 0; } return true;
         case Qt.Key_Backspace:
-            if (!busy) buffer = ctrl ? "" : buffer.slice(0, -1);
+            // with the wrong password selected, Backspace deletes the selection
+            if (!busy) { buffer = ctrl ? "" : buffer.slice(0, -1); selected = 0; }
             return true;
         case Qt.Key_CapsLock: return true;      // state is read on release
         case Qt.Key_Space:
@@ -171,13 +179,15 @@ Singleton {
             if (ctrl) { nextLayout(); return true; }
             break;
         case Qt.Key_U:
-            if (ctrl) { if (!busy) buffer = ""; return true; }
+            if (ctrl) { if (!busy) { buffer = ""; selected = 0; } return true; }
             break;
         }
         if ((ctrl && !alt) || meta || busy) return true;
         const t = event.text;
-        if (t && t.length > 0 && t.charCodeAt(0) >= 32 && t.charCodeAt(0) !== 127 && buffer.length < 512)
+        if (t && t.length > 0 && t.charCodeAt(0) >= 32 && t.charCodeAt(0) !== 127 && buffer.length < 512) {
+            selected = 0;           // the next key replaces the selected wrong password
             buffer += t;
+        }
         return true;
     }
     // Caps Lock: read the state on release and once more a moment later (Hyprland may apply the
@@ -242,29 +252,6 @@ Singleton {
         stdout: StdioCollector { onStreamFinished: root.avatar = text.trim() }
     }
 
-    // blurred backdrop, made once per wallpaper ahead of time (cached on disk by lock-wallpaper.sh)
-    function makeBlur(): void {
-        if (!Wallpaper.wallpaper) return;
-        blurProc.running = false;
-        blurProc.running = true;
-    }
-    Process {
-        id: blurProc
-        command: [Quickshell.shellDir + "/modules/lock/lock-wallpaper.sh", Wallpaper.wallpaper,
-                  String(Wallpaper.width), String(Wallpaper.height), String(LockTheme.blurScale),
-                  String(LockTheme.blurSigma), String(LockTheme.saturation)]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const line = text.split("\n").find(l => l.startsWith("LOCK="));
-                root.blurred = line ? line.slice(5) : "";
-            }
-        }
-    }
-    Connections {
-        target: Wallpaper
-        function onWallpaperChanged() { root.makeBlur(); }
-    }
-
     function fallback(): void {
         console.warn("hyprk lock: no session lock, falling back to hyprlock");
         const script = Quickshell.shellDir + "/../lockscreen/hyprk-lock.sh";
@@ -310,7 +297,6 @@ Singleton {
 
     Component.onCompleted: {
         Power.locker = root;
-        makeBlur();
         if (testMode) console.warn("hyprk lock: TEST MODE, PAM service from", Quickshell.env("HYPRK_LOCK_PAMDIR"));
     }
 

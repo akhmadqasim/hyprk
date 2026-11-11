@@ -6,9 +6,9 @@ import qs.HyprK
 import qs.components
 import "../../lib/state.js" as State
 
-// Status items at the top right of the lock screen, right to left: battery (laptops only), Wi-Fi,
-// input source (only with more than one keyboard layout; a click switches to the next one).
-// Same services and glyphs as the menu bar; waiting for Q-lockscreen-16 / -17.
+// Status items at the top right of the lock screen (LOCKSCREEN-27.2.1.md A7), right to left: Wi-Fi (26 pt),
+// battery (28 pt, laptops only), the input source ("ABC" + keyboard glyph, 54 pt; a click switches to the next
+// layout). Right margin 19, gaps 12, y 8 to 25, white, no background. Same services and glyphs as the menu bar.
 Row {
     id: s
     property bool interactive: false
@@ -17,11 +17,22 @@ Row {
 
     layoutDirection: Qt.RightToLeft
     spacing: LockTheme.statusGap
+    height: LockTheme.statusRowHeight
 
     Item {
+        width: LockTheme.wifiWidth
+        height: s.height
+        Symbol {
+            anchors.centerIn: parent
+            name: s.wifiDev && s.wifiDev.connected ? "wifi" : "wifi.slash"
+            size: LockTheme.statusGlyph
+            color: LockTheme.statusColor
+        }
+    }
+    Item {
         visible: s.laptop
-        width: LockTheme.statusBox
-        height: LockTheme.statusBox
+        width: LockTheme.batteryWidth
+        height: s.height
         BatteryIcon {   // the 26 x 14 bitmap macOS draws, as in the menu bar
             anchors.centerIn: parent
             level: UPower.displayDevice.percentage
@@ -30,35 +41,25 @@ Row {
         }
     }
     Item {
-        width: LockTheme.statusBox
-        height: LockTheme.statusBox
-        Symbol {
-            anchors.centerIn: parent
-            name: s.wifiDev && s.wifiDev.connected ? "wifi" : "wifi.slash"
-            size: LockTheme.statusGlyph
-            color: LockTheme.statusColor
-            opacity: s.wifiDev && s.wifiDev.connected ? 1 : 0.5
-        }
-    }
-    Item {
         visible: Lock.layoutLabel !== ""
-        width: Math.max(LockTheme.statusBox, label.implicitWidth + 10)
-        height: LockTheme.statusBox
-        Rectangle {
+        width: Math.max(LockTheme.inputWidth, input.implicitWidth)
+        height: s.height
+        Row {
+            id: input
             anchors.centerIn: parent
-            width: label.implicitWidth + 8
-            height: LockTheme.statusGlyph
-            radius: 4
-            color: "transparent"
-            border.width: 1.2
-            border.color: LockTheme.statusColor
-        }
-        Text {
-            id: label
-            anchors.centerIn: parent
-            text: Lock.layoutLabel
-            font: Typography.font(LockTheme.layoutTextSize, Typography.semibold)
-            color: LockTheme.statusColor
+            spacing: 4
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: Lock.layoutLabel
+                font: Typography.font(LockTheme.inputTextSize, Typography.medium)
+                color: LockTheme.statusColor
+            }
+            Symbol {
+                anchors.verticalCenter: parent.verticalCenter
+                name: "keyboard"
+                size: LockTheme.statusGlyph
+                color: LockTheme.statusColor
+            }
         }
         MouseArea { anchors.fill: parent; enabled: s.interactive; onClicked: Lock.nextLayout() }
     }

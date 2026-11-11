@@ -4,138 +4,215 @@ import qs
 import qs.HyprK
 import "lock.js" as L
 
-// Glass capsule with placeholder, typed dots, caret, Caps Lock glyph and return arrow.
-// Shows Lock.buffer; keys are handled by the lock surface (Lock.key). Shakes on a wrong password.
+// The 27.2.1 password field (LOCKSCREEN-27.2.1.md A5, B2, B6): a 161 x 28.5 capsule with the placeholder, the
+// typed dots, the caret, the Caps Lock glyph or the return arrow ring, and the "?" hint button 5 pt to its right.
+// All of it is vibrant ink (LockPlus). Shows Lock.buffer's length only; keys go through the lock surface
+// (Lock.key). A wrong password shakes this whole item (capsule, arrow and "?"), the avatar and the line under
+// it stay; the dots stay, shown selected, until the next key.
 Item {
     id: f
     property bool interactive: false
 
-    width: LockTheme.fieldWidth
+    width: LockTheme.fieldWidth + LockTheme.hintGap + LockTheme.hintDisc
     height: LockTheme.fieldHeight
 
     readonly property int typed: Lock.buffer.length
-    // dots of a wrong password stay while the field shakes, then fade (Reduce Motion: they only fade)
-    property int ghost: 0
-    property real ghostOpacity: 0
-    property real shakeT: 0
-    readonly property real offset: L.shake(shakeT, LockTheme.shakeAmplitude, LockTheme.shakeCycles, LockTheme.shakeDecay)
-    readonly property int shown: typed > 0 ? typed : ghost
-    readonly property real arrowRoom: LockTheme.arrowSize + 8
-    readonly property int fit: Math.max(1, Math.floor((width - 2 * LockTheme.fieldPadding - arrowRoom) / (LockTheme.dotSize + LockTheme.dotSpacing)))
+    readonly property int selected: typed === 0 ? Lock.selected : 0
+    readonly property int shown: typed > 0 ? typed : selected
+    readonly property real arrowLeft: LockTheme.fieldWidth - LockTheme.arrowRight - LockTheme.arrowSize
+    readonly property int fit: L.dotsFit(arrowLeft, LockTheme.caretWidth)
+    readonly property real dim: Lock.busy ? LockTheme.busyDim : 1
 
+    // ---------- wrong password: shake (keyframes of lock.js shake(), exact sine quarter arcs) ----------
+    property real shakeX: 0
+    readonly property var keys: L.shakeKeys()
+    transform: Translate { x: f.shakeX }
+    component Quarter: NumberAnimation {
+        required property int k
+        target: f; property: "shakeX"
+        to: f.keys[k].to; duration: f.keys[k].ms
+        easing.type: f.keys[k].out ? Easing.OutSine : Easing.InSine
+    }
+    SequentialAnimation {
+        id: shake
+        Quarter { k: 0 } Quarter { k: 1 } Quarter { k: 2 } Quarter { k: 3 }
+        Quarter { k: 4 } Quarter { k: 5 } Quarter { k: 6 } Quarter { k: 7 }
+        Quarter { k: 8 } Quarter { k: 9 } Quarter { k: 10 } Quarter { k: 11 }
+        ScriptAction { script: f.shakeX = 0 }
+    }
     Connections {
         target: Lock
         enabled: f.interactive
-        function onFailTickChanged() {
-            f.ghost = Lock.failedDots;
-            f.ghostOpacity = 1;
-            fail.restart();
-        }
+        function onFailTickChanged() { if (!LockTheme.reduceMotion) shake.restart(); f.wake(); }
         function onActivityChanged() { f.wake(); }
     }
-    SequentialAnimation {
-        id: fail
-        NumberAnimation {
-            target: f; property: "shakeT"; from: 0; to: 1
-            duration: LockTheme.reduceMotion ? 0 : LockTheme.shakeDuration
-        }
-        NumberAnimation { target: f; property: "ghostOpacity"; to: 0; duration: LockTheme.failFade }
-        ScriptAction { script: { f.shakeT = 0; f.ghost = 0; } }
+
+    // ---------- caret: 0.6 s on / 0.4 s off while idle, on for 0.6 s after every key ----------
+    property bool caretOn: true
+    function wake() { caretOn = true; blink.restart(); }
+    Timer {
+        id: blink
+        running: f.interactive && !Lock.busy
+        interval: f.caretOn ? LockTheme.caretOn : LockTheme.caretOff
+        onTriggered: { f.caretOn = !f.caretOn; restart(); }
     }
 
-    // caret: blinks for caretBlinkFor ms after the last key or show, then stays on (no idle redraws)
-    property bool caretOn: true
-    function wake() { caretOn = true; blinking.restart(); blinkStop.restart(); }
-    Timer { id: blinking; interval: LockTheme.caretBlink; repeat: true; onTriggered: f.caretOn = !f.caretOn }
-    Timer { id: blinkStop; interval: LockTheme.caretBlinkFor; onTriggered: { blinking.stop(); f.caretOn = true; } }
-    Component.onCompleted: if (interactive) wake()
-
-    Item {
-        id: face
-        width: f.width
-        height: f.height
-        x: f.offset
-
-        LockGlass { anchors.fill: parent }
-
+    // ---------- capsule ----------
+    LockPlus {
+        width: LockTheme.fieldWidth
+        height: LockTheme.fieldHeight
+        lift: LockTheme.fieldLift
+        Rectangle { anchors.fill: parent; radius: height / 2; color: "white"; antialiasing: true }
+    }
+    // wrong password: the dots come back selected
+    LockPlus {
+        visible: f.selected > 0
+        x: L.caretX(0) - 4
+        width: Math.min(L.caretX(Math.min(f.selected, f.fit)) + 4, f.arrowLeft - 2) - x
+        height: LockTheme.caretHeight + 2
+        anchors.verticalCenter: parent.verticalCenter
+        lift: LockTheme.selectLift
+        Rectangle { anchors.fill: parent; radius: 3; color: "white" }
+    }
+    LockPlus {
+        visible: f.shown === 0
+        width: LockTheme.fieldWidth
+        height: LockTheme.fieldHeight
+        lift: LockTheme.placeholderLift
         Text {
-            anchors.centerIn: parent
-            visible: f.shown === 0
+            x: LockTheme.placeholderX
+            anchors.verticalCenter: parent.verticalCenter
             text: LockTheme.placeholder
             font: Typography.font(LockTheme.placeholderSize)
-            color: LockTheme.placeholderColor
+            color: "white"
         }
-
-        // typed dots, centred; only the last ones that fit
-        Row {
-            id: dots
-            anchors.centerIn: parent
-            anchors.horizontalCenterOffset: -f.arrowRoom / 2 + LockTheme.fieldPadding / 2
-            spacing: LockTheme.dotSpacing
-            opacity: f.typed > 0 ? 1 : f.ghostOpacity
-            visible: f.shown > 0
-            Repeater {
-                model: Math.min(f.shown, f.fit)
-                Rectangle {
-                    width: LockTheme.dotSize
-                    height: LockTheme.dotSize
-                    radius: width / 2
-                    color: LockTheme.dotColor
-                }
+    }
+    // dots, caret, Caps Lock glyph
+    LockPlus {
+        width: LockTheme.fieldWidth
+        height: LockTheme.fieldHeight
+        lift: LockTheme.inkLift
+        opacity: f.dim
+        Repeater {
+            model: Math.min(f.shown, f.fit)
+            Rectangle {
+                required property int index
+                x: L.dotX(index)
+                anchors.verticalCenter: parent.verticalCenter
+                width: LockTheme.dotSize
+                height: LockTheme.dotSize
+                radius: width / 2
+                color: "white"
             }
         }
-
         Rectangle {
-            visible: f.interactive && !Lock.busy && f.caretOn && (f.typed > 0 || f.ghost === 0)
+            visible: f.interactive && !Lock.busy && f.selected === 0 && f.caretOn
+            x: L.caretX(Math.min(f.typed, f.fit))
+            anchors.verticalCenter: parent.verticalCenter
             width: LockTheme.caretWidth
             height: LockTheme.caretHeight
             radius: 1
-            color: LockTheme.dotColor
-            anchors.verticalCenter: parent.verticalCenter
-            x: f.typed > 0 ? dots.x + dots.width + LockTheme.dotSpacing : LockTheme.fieldPadding
+            color: "white"
         }
-
-        // Caps Lock: the ⇪ glyph at the right, left of the arrow
-        Text {
-            visible: Lock.capsLock
+        // Caps Lock: a filled up-arrow over a bar, in the arrow's place, only with an empty field
+        Shape {
+            visible: Lock.capsLock && f.shown === 0
+            x: LockTheme.capsX
             anchors.verticalCenter: parent.verticalCenter
-            anchors.right: arrow.left
-            anchors.rightMargin: 4
-            text: "⇪"
-            font: Typography.font(LockTheme.capsSize)
-            color: LockTheme.placeholderColor
+            width: LockTheme.capsSize
+            height: LockTheme.capsSize
+            preferredRendererType: Shape.CurveRenderer
+            ShapePath {
+                readonly property real s: LockTheme.capsSize
+                fillColor: "white"
+                strokeColor: "transparent"
+                startX: s * 0.5; startY: 0
+                PathLine { x: capsPath.s; y: capsPath.s * 0.5 }
+                PathLine { x: capsPath.s * 0.74; y: capsPath.s * 0.5 }
+                PathLine { x: capsPath.s * 0.74; y: capsPath.s * 0.72 }
+                PathLine { x: capsPath.s * 0.26; y: capsPath.s * 0.72 }
+                PathLine { x: capsPath.s * 0.26; y: capsPath.s * 0.5 }
+                PathLine { x: 0; y: capsPath.s * 0.5 }
+                PathLine { x: capsPath.s * 0.5; y: 0 }
+                PathMove { x: capsPath.s * 0.26; y: capsPath.s * 0.82 }
+                PathLine { x: capsPath.s * 0.74; y: capsPath.s * 0.82 }
+                PathLine { x: capsPath.s * 0.74; y: capsPath.s }
+                PathLine { x: capsPath.s * 0.26; y: capsPath.s }
+                PathLine { x: capsPath.s * 0.26; y: capsPath.s * 0.82 }
+                id: capsPath
+            }
         }
+    }
+    // return arrow: a 22 pt ring with an arrow, only when there is text
+    LockPlus {
+        id: arrow
+        visible: f.shown > 0
+        x: f.arrowLeft
+        anchors.verticalCenter: parent.verticalCenter
+        width: LockTheme.arrowSize
+        height: LockTheme.arrowSize
+        lift: LockTheme.ringLift
+        opacity: f.dim
+        Rectangle {
+            anchors.fill: parent
+            radius: width / 2
+            color: "transparent"
+            border.width: LockTheme.ringStroke
+            border.color: "white"
+        }
+        Shape {
+            anchors.fill: parent
+            preferredRendererType: Shape.CurveRenderer
+            ShapePath {
+                id: arrowPath
+                readonly property real s: LockTheme.arrowSize
+                strokeColor: "white"
+                strokeWidth: 1.8
+                fillColor: "transparent"
+                capStyle: ShapePath.RoundCap
+                joinStyle: ShapePath.RoundJoin
+                startX: s * 0.27; startY: s * 0.5
+                PathLine { x: arrowPath.s * 0.72; y: arrowPath.s * 0.5 }
+                PathMove { x: arrowPath.s * 0.53; y: arrowPath.s * 0.31 }
+                PathLine { x: arrowPath.s * 0.72; y: arrowPath.s * 0.5 }
+                PathLine { x: arrowPath.s * 0.53; y: arrowPath.s * 0.69 }
+            }
+        }
+        MouseArea { anchors.fill: parent; enabled: f.interactive; onClicked: Lock.submit() }
+    }
 
-        // return arrow in a disc
-        Item {
-            id: arrow
+    // ---------- "?" hint button ----------
+    Item {
+        id: hint
+        x: LockTheme.fieldWidth + LockTheme.hintGap
+        anchors.verticalCenter: parent.verticalCenter
+        width: LockTheme.hintDisc
+        height: LockTheme.hintDisc
+        LockPlus {
+            anchors.fill: parent
+            lift: LockTheme.hintDiscLift
+            Rectangle { anchors.fill: parent; radius: width / 2; color: "white" }
+        }
+        LockPlus {
+            anchors.centerIn: parent
             width: LockTheme.arrowSize
             height: LockTheme.arrowSize
-            anchors.right: parent.right
-            anchors.rightMargin: (parent.height - height) / 2
-            anchors.verticalCenter: parent.verticalCenter
-            visible: f.typed > 0
-            opacity: Lock.busy ? 0.45 : 1
-            Rectangle { anchors.fill: parent; radius: width / 2; color: "transparent"; border.width: 1.5; border.color: LockTheme.arrowFill }
-            Shape {
+            lift: LockTheme.hintInkLift
+            opacity: f.dim
+            Rectangle {
                 anchors.fill: parent
-                preferredRendererType: Shape.CurveRenderer
-                ShapePath {
-                    strokeColor: LockTheme.arrowFill
-                    strokeWidth: 1.6
-                    fillColor: "transparent"
-                    capStyle: ShapePath.RoundCap
-                    joinStyle: ShapePath.RoundJoin
-                    readonly property real s: LockTheme.arrowSize
-                    startX: s * 0.28; startY: s * 0.5
-                    PathLine { x: arrowPath.s * 0.72; y: arrowPath.s * 0.5 }
-                    PathMove { x: arrowPath.s * 0.52; y: arrowPath.s * 0.31 }
-                    PathLine { x: arrowPath.s * 0.72; y: arrowPath.s * 0.5 }
-                    PathLine { x: arrowPath.s * 0.52; y: arrowPath.s * 0.69 }
-                    id: arrowPath
-                }
+                radius: width / 2
+                color: "transparent"
+                border.width: LockTheme.ringStroke
+                border.color: "white"
             }
-            MouseArea { anchors.fill: parent; anchors.margins: -4; enabled: f.interactive; onClicked: Lock.submit() }
+            Text {
+                anchors.centerIn: parent
+                text: "?"
+                font: Typography.font(LockTheme.hintGlyphSize, Typography.semibold)
+                color: "white"
+            }
         }
+        MouseArea { anchors.fill: parent; enabled: f.interactive; onClicked: Lock.toggleHint() }
     }
 }

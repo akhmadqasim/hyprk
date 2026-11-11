@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Widgets
 import qs
@@ -8,180 +7,219 @@ import qs.services
 import "lock.js" as L
 import "../../lib/clock.js" as Clock
 
-// What one screen of the lock shows. Used by the session lock surface (static, interactive) and by
-// the lock-in / unlock overlays (animated through `backdrop`, `ui` and `leave`).
-//   primary: this screen has the user, the field, status items and the notification column;
-//            the other screens show wallpaper, date and clock only.
+// What one screen of the lock shows (LOCKSCREEN-27.2.1.md A): the sharp wallpaper slightly dimmed, the date
+// and the clock; on the primary screen also the status items, the avatar, the field with its "?" button and the
+// line under it. Used by the session lock surface (static, interactive) and by the lock-in / unlock overlays,
+// which animate the opacities below (LockOverlay.qml):
+//   wall  the wallpaper layer (it covers the desktop, the Dock and the windows)
+//   bar   a copy of the wallpaper's top strip over the menu bar (the menu bar has its own, faster curve)
+//   dim   the dimming over all of it
+//   ui    clock, date, field and "?"
+//   user  avatar, the line under the field and the status items (they go in one frame on unlock)
 Item {
     id: c
     property bool primary: true
     property bool interactive: false
-    property real backdrop: 1      // blurred wallpaper + dim
-    property real ui: 1            // clock, date, user, field, items
-    property real leave: 0         // 0..1 unlock: clock rises, user group drops, both fade and grow
+    property real wall: 1
+    property real bar: 1
+    property real dim: 1
+    property real ui: 1
+    property real user: 1
 
-    readonly property var clockStyle: Clock.styleFor(Quickshell.env("LC_ALL") || Quickshell.env("LC_TIME") || Quickshell.env("LANG"))
+    readonly property string locale: Quickshell.env("LC_ALL") || Quickshell.env("LC_TIME") || Quickshell.env("LANG") || ""
+    readonly property var clockStyle: Clock.styleFor(locale)
+    readonly property string timeSep: L.timeSep(locale)
     SystemClock { id: clock; precision: SystemClock.Minutes }   // fires once a minute, on the minute
 
-    // ---------- backdrop ----------
-    Item {
+    // ---------- backdrop: the desktop wallpaper exactly as the desktop draws it (Background.qml) ----------
+    component Wall: Image {
+        source: Wallpaper.url
+        sourceSize: Qt.size(c.width, c.height)
+        fillMode: Image.PreserveAspectCrop
+        cache: true               // the same pixmap as the desktop's and every lock surface's
+        asynchronous: false
+    }
+    Rectangle {
         anchors.fill: parent
-        opacity: c.backdrop
+        visible: Wallpaper.wallpaper === "" && opacity > 0
+        opacity: c.wall
+        color: LockTheme.fallbackFill
+    }
+    Wall {
+        width: c.width
+        height: c.height
+        visible: Wallpaper.wallpaper !== "" && opacity > 0
+        opacity: c.wall
+    }
+    Item {
+        width: c.width
+        height: Theme.menuBar.height
+        clip: true
+        visible: Wallpaper.wallpaper !== "" && c.bar > 0 && c.wall < 1
+        opacity: c.bar
+        Wall { width: c.width; height: c.height }
+    }
+    Rectangle {
+        anchors.fill: parent
         visible: opacity > 0
-        Rectangle { anchors.fill: parent; color: LockTheme.fallbackFill }
-        // blurred: a small cached copy (lock-wallpaper.sh), scaled up smoothly
-        Image {
-            anchors.fill: parent
-            visible: !LockTheme.solid && Lock.blurred !== ""
-            source: visible ? "file://" + Lock.blurred : ""
-            fillMode: Image.PreserveAspectCrop
-            smooth: true
-            cache: true            // shared by every screen and the overlays; 1/16 of a screen
-            asynchronous: false    // tiny: decoded before the first frame, so no flash of the fill
-        }
-        // Reduce Transparency, or no blurred copy yet: the sharp wallpaper under a solid dim
-        Image {
-            anchors.fill: parent
-            visible: (LockTheme.solid || Lock.blurred === "") && Wallpaper.wallpaper !== ""
-            source: visible ? Wallpaper.url : ""
-            sourceSize: Qt.size(width, height)
-            fillMode: Image.PreserveAspectCrop
-            cache: false
-            asynchronous: false
-        }
-        Rectangle {
-            anchors.fill: parent
-            color: LockTheme.solid || Lock.blurred === "" ? LockTheme.dimSolid : LockTheme.dim
-        }
+        opacity: c.dim
+        color: LockTheme.dim
     }
 
     // ---------- date and clock ----------
-    Item {
-        anchors.fill: parent
-        opacity: c.ui * (1 - c.leave)
+    LockPlus {
+        id: date
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: LockTheme.dateBaseline - dateFm.ascent
+        width: dateText.implicitWidth
+        height: dateText.implicitHeight
+        lift: LockTheme.dateLift
         visible: opacity > 0
-        transform: [
-            Translate { y: -c.leave * LockTheme.unlockClockRise },
-            Scale { origin.x: c.width / 2; origin.y: LockTheme.clockTop; xScale: 1 + c.leave * LockTheme.unlockScale; yScale: xScale }
-        ]
+        opacity: c.ui
+        FontMetrics { id: dateFm; font: LockTheme.dateFont }
         Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: LockTheme.dateTop
+            id: dateText
             text: L.date(clock.date, c.clockStyle.monthFirst)
-            font: Typography.font(LockTheme.dateSize, Typography.medium)
-            color: LockTheme.dateColor
-        }
-        Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: LockTheme.clockTop
-            text: L.time(clock.date, c.clockStyle.use24h)
-            font.family: LockTheme.clockFont
-            font.pixelSize: LockTheme.clockSize
-            font.weight: LockTheme.clockWeight
-            color: LockTheme.clockColor
+            font: LockTheme.dateFont
+            color: "white"
         }
     }
+    LockClock {
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: LockTheme.clockBaseline - baselineOffset
+        text: L.time(clock.date, c.clockStyle.use24h, c.timeSep)
+        animate: c.interactive
+        visible: opacity > 0
+        opacity: c.ui
+    }
 
-    // ---------- status items and notifications (primary screen) ----------
+    // ---------- primary screen: status items, notifications, avatar, field, line ----------
     Loader {
         active: c.primary
         anchors.fill: parent
-        opacity: c.ui * (1 - c.leave)
-        visible: opacity > 0
         sourceComponent: Item {
+            id: prim
             LockStatus {
                 interactive: c.interactive
                 anchors.right: parent.right
                 anchors.rightMargin: LockTheme.statusRight
                 y: LockTheme.statusTop
+                visible: opacity > 0
+                opacity: c.user
             }
             LockFeed {
                 interactive: c.interactive
                 anchors.right: parent.right
                 anchors.rightMargin: LockTheme.notifRight
                 y: LockTheme.notifTop
+                visible: opacity > 0
+                opacity: c.user
             }
-        }
-    }
-
-    // ---------- user, field, hint (primary screen) ----------
-    Loader {
-        active: c.primary
-        anchors.fill: parent
-        opacity: c.ui * (1 - c.leave)
-        visible: opacity > 0
-        sourceComponent: Item {
-            id: user
-            transform: [
-                Translate { y: c.leave * LockTheme.unlockUserDrop },
-                Scale { origin.x: c.width / 2; origin.y: c.height - LockTheme.fieldBottom; xScale: 1 + c.leave * LockTheme.unlockScale; yScale: xScale }
-            ]
 
             // avatar: ~/.face, the AccountsService icon, else initials on a grey disc
-            Item {
+            ClippingRectangle {
                 id: avatar
                 width: LockTheme.avatarSize
                 height: LockTheme.avatarSize
+                radius: width / 2
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: parent.height - LockTheme.avatarBottom - height
-                RectangularShadow {
+                color: "transparent"
+                visible: opacity > 0
+                opacity: c.user
+                Rectangle {
                     anchors.fill: parent
-                    radius: width / 2
-                    blur: LockTheme.avatarShadowBlur
-                    color: LockTheme.avatarShadow
-                }
-                ClippingRectangle {
-                    anchors.fill: parent
-                    radius: width / 2
-                    color: "transparent"
-                    Rectangle {
-                        anchors.fill: parent
-                        visible: photo.status !== Image.Ready
-                        gradient: Gradient {
-                            GradientStop { position: 0; color: LockTheme.avatarTop }
-                            GradientStop { position: 1; color: LockTheme.avatarBottomColor }
-                        }
-                    }
-                    Text {
-                        anchors.centerIn: parent
-                        visible: photo.status !== Image.Ready
-                        text: L.initials(Lock.userName)
-                        font: Typography.font(Math.max(1, avatar.width * 0.4), Typography.semibold)
-                        color: "white"
-                    }
-                    Image {
-                        id: photo
-                        anchors.fill: parent
-                        source: Lock.avatar !== "" ? "file://" + Lock.avatar : ""
-                        sourceSize: Qt.size(width * 2, height * 2)
-                        fillMode: Image.PreserveAspectCrop
-                        cache: false
+                    visible: photo.status !== Image.Ready
+                    gradient: Gradient {
+                        GradientStop { position: 0; color: LockTheme.avatarTop }
+                        GradientStop { position: 1; color: LockTheme.avatarBottomColor }
                     }
                 }
-            }
-
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                y: parent.height - LockTheme.nameBottom - height
-                text: Lock.userName
-                font: Typography.font(LockTheme.nameSize)
-                color: LockTheme.nameColor
+                Text {
+                    anchors.centerIn: parent
+                    visible: photo.status !== Image.Ready
+                    text: L.initials(Lock.userName)
+                    font: Typography.font(Math.max(1, avatar.width * 0.4), Typography.semibold)
+                    color: "white"
+                }
+                Image {
+                    id: photo
+                    anchors.fill: parent
+                    source: Lock.avatar !== "" ? "file://" + Lock.avatar : ""
+                    sourceSize: Qt.size(width * 2, height * 2)
+                    fillMode: Image.PreserveAspectCrop
+                    cache: false
+                }
             }
 
             PasswordField {
                 id: field
                 interactive: c.interactive
-                anchors.horizontalCenter: parent.horizontalCenter
+                // the capsule's centre is 0.5 right of the screen centre; the "?" hangs off its right end
+                x: Math.round((parent.width - LockTheme.fieldWidth) / 2 + LockTheme.fieldNudge)
                 y: parent.height - LockTheme.fieldBottom - height
+                visible: opacity > 0
+                opacity: c.ui
             }
 
-            Text {
+            // line under the field; ~1 s after Return a spinner takes its place until PAM answers
+            property bool spin: false
+            Timer {
+                running: Lock.busy
+                interval: LockTheme.spinnerAfter
+                onTriggered: prim.spin = true
+            }
+            Connections {
+                target: Lock
+                function onBusyChanged() { if (!Lock.busy) prim.spin = false; }
+            }
+            LockPlus {
+                id: line
+                visible: !prim.spin && opacity > 0
                 anchors.horizontalCenter: parent.horizontalCenter
-                y: field.y + field.height + LockTheme.hintGap
-                visible: text !== ""
-                text: Lock.message
-                font: Typography.font(LockTheme.hintSize)
-                color: LockTheme.hintColor
+                // SF Pro's cap height is 1443 / 2048 em (OS/2 sCapHeight)
+                y: field.y + field.height + LockTheme.lineCapTop - (lineFm.ascent - LockTheme.lineSize * 1443 / 2048)
+                width: lineText.implicitWidth
+                height: lineText.implicitHeight
+                lift: LockTheme.lineLift
+                opacity: c.user
+                FontMetrics { id: lineFm; font: lineText.font }
+                Text {
+                    id: lineText
+                    text: Lock.line
+                    font: Typography.font(LockTheme.lineSize, LockTheme.lineWght)
+                    color: "white"
+                }
+            }
+            Item {
+                visible: prim.spin
+                anchors.horizontalCenter: parent.horizontalCenter
+                y: line.y + line.height / 2 - height / 2
+                width: LockTheme.spinnerSize
+                height: LockTheme.spinnerSize
+                opacity: c.user
+                LockPlus {
+                    id: spinner
+                    anchors.fill: parent
+                    lift: LockTheme.lineLift
+                    Repeater {
+                        model: 8
+                        Rectangle {
+                            required property int index
+                            x: spinner.width / 2 - width / 2
+                            width: 1.8
+                            height: spinner.height * 0.28
+                            radius: width / 2
+                            color: "white"
+                            opacity: 1 - index / 9
+                            transform: Rotation { origin.x: 0.9; origin.y: spinner.height / 2; angle: -index * 45 }
+                        }
+                    }
+                    RotationAnimator on rotation {
+                        running: prim.spin
+                        from: 0; to: 360; duration: 1000; loops: Animation.Infinite
+                    }
+                }
             }
         }
     }
