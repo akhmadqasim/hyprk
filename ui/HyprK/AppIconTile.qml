@@ -24,6 +24,9 @@ Item {
     property color tint: "#007AFF"        // tinted style colour
     property real body: 0.8047            // icon body: 824 of 1024 (100/1024 inset per side, SPEC.md)
     property real inner: 0.70             // art body inside a tile
+    // keep the decoded art in Qt's pixmap cache (shared by every Image of the same file and size); false for files
+    // that are dropped as a whole set, so they are freed with the last Image instead of lingering in the cache
+    property bool cache: true
 
     readonly property var info: _info
     readonly property bool tiled: !trusted && _info !== null && !_info.squircle
@@ -181,6 +184,7 @@ Item {
         fillMode: Image.PreserveAspectFit
         source: root.ready ? root.source : ""     // load once, at the final scale
         asynchronous: true
+        cache: root.cache
         smooth: true
         mipmap: true
     }
