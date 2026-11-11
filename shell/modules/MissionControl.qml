@@ -42,6 +42,10 @@ ShellWindow {
         // exit: 0.35 ran 2-98 % 301 ms (two windows at one place) / 400 ms (one window) against the Mac's 267; 0.31
         // gives 250-283 / 351-367 ms (mcap, alpha vs the R2 exit series)
         readonly property var exposeExit: SpringLib.fromResponse(0.31, 1)
+        // the Mac's exit track starts at 0.21 in its first frame, which a spring from rest cannot do (S-shaped start):
+        // a critically damped spring fits it at rms 0.0043 with response 0.355 and a start velocity of 10 x the
+        // distance per second (rms 0.0079 from rest, the first 46 ms then missing)
+        readonly property real exitKick: 10
         readonly property var barExit: SpringLib.fromResponse(0.125, 1)    // SpacesBarExitSpringResponse
         // collapsed Spaces bar: labelled pills, guessed (no 27.2.1 screenshot of it yet, Q-dock-31)
         readonly property int barHeight: 44
@@ -69,6 +73,7 @@ ShellWindow {
     SpringCurve { id: barAnim; target: mc; property: "bar"; spring: mc.m.expose }
     function go() {
         anim.spring = shown ? m.expose : m.exposeExit;
+        anim.kick = shown ? 0 : m.exitKick;
         anim.go(shown ? 1 : 0);
         barAnim.spring = shown ? m.expose : m.barExit;
         barAnim.go(shown ? 1 : 0);

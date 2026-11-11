@@ -15,6 +15,8 @@ NumberAnimation {
 
     property var spring: SpringLib.fromResponse(0.5, 1)
     property real cutAt: 0
+    // a run that starts from rest leaves with this velocity, in fractions of the distance per second (0: from rest)
+    property real kick: 0
     property real goal: 0                 // the value of the last go()
     readonly property bool landed: !running
 
@@ -29,7 +31,7 @@ NumberAnimation {
         if (running && _plan) {
             const t = (now - _t0) / 1000 * _plan.duration / Math.max(1, duration);   // spring time
             v = SpringLib.velocityAt(_planSpring, _plan, _from, t);
-        }
+        } else v = kick * (to - cur);
         stop();
         goal = to;
         if (cur === to && v === 0) return;
