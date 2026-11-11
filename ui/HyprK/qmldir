@@ -30,4 +30,4 @@ AlertPanel 1.0 AlertPanel.qml
 Sheet 1.0 Sheet.qml
 Popover 1.0 Popover.qml
 Motion 1.0 motion.js
-Panels 1.0 panels.js
+PanelLayout 1.0 panels.js

@@ -2,7 +2,7 @@ import QtQuick
 import Finder.Native
 import HyprK
 import "lib/files.js" as Files
-import "../../ui/HyprK/panels.js" as Panels
+import "../../ui/HyprK/panels.js" as PanelLayout
 
 // Finder window: frameless, client-side traffic lights, flush full-height sidebar, unified toolbar.
 Window {
@@ -333,7 +333,7 @@ Window {
     AlertPanel {
         id: alert
         x: (win.width - width) / 2
-        y: Panels.alertTop(win.height, height)
+        y: PanelLayout.alertTop(win.height, height)
         icon: startup.hasAppIcons ? Files.fileUrl(startup.iconRoot + "/apps/Finder-512.png") : ""
         property var actions: []
         function ask(title, message, buttons) {
