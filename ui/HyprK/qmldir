@@ -26,9 +26,11 @@ Popup 1.0 Popup.qml
 SearchField 1.0 SearchField.qml
 TrafficLights 1.0 TrafficLights.qml
 PanelShadow 1.0 PanelShadow.qml
+WallpaperTint 1.0 WallpaperTint.qml
 AppIconTile 1.0 AppIconTile.qml
 AlertPanel 1.0 AlertPanel.qml
 Sheet 1.0 Sheet.qml
 Popover 1.0 Popover.qml
 Motion 1.0 motion.js
 PanelLayout 1.0 panels.js
+Chameleon 1.0 chameleon.js
