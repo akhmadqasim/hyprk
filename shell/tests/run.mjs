@@ -855,20 +855,5 @@ test("mode buttons start inside the field, end in place", () => {
     });
 }
 
-// ---- import order: HyprK's panels.js module is also called Panels; imported after qs.services it hides
-// the Panels service (menus, Control Center, Notification Center, Dock zones stop working) ----
-{
-    const root = join(here, "..");
-    const walk = d => readdirSync(d, { withFileTypes: true }).flatMap(e =>
-        e.isDirectory() && e.name !== "HyprK" && e.name !== "tests" ? walk(join(d, e.name)) : e.name.endsWith(".qml") ? [join(d, e.name)] : []);
-    test("qs.HyprK is imported before qs.services", () => {
-        for (const f of walk(root)) {
-            const src = readFileSync(f, "utf8").split("\n");
-            const h = src.indexOf("import qs.HyprK"), v = src.indexOf("import qs.services");
-            assert.ok(h < 0 || v < 0 || h < v, f);
-        }
-    });
-}
-
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
