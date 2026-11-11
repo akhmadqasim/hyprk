@@ -297,7 +297,31 @@ hl.layer_rule({
 -- SUPER plays the role of Command.
 local cmd = "SUPER"
 hl.bind(cmd .. " + space",   hl.dsp.global("hyprk:spotlight"))
-hl.bind(cmd .. " + Tab",     hl.dsp.global("hyprk:switcher"))
+-- Cmd-Tab: the switcher takes no keyboard focus, so the windows stay active under it as on the Mac (shell/services/
+-- Panels.qml switcherSubmap): Cmd+Tab enters the submap "hyprk-switcher" and opens it; inside, the keys reach the shell as
+-- global shortcuts and releasing Cmd switches. The shell resets the submap when the switcher closes.
+hl.bind(cmd .. " + Tab", function()
+    hl.dispatch(hl.dsp.submap("hyprk-switcher"))
+    hl.dispatch(hl.dsp.global("hyprk:switcher"))
+end)
+hl.define_submap("hyprk-switcher", function()
+    for _, k in ipairs({ "Tab", "grave", "Right" }) do hl.bind(cmd .. " + " .. k, hl.dsp.global("hyprk:switcher-next"), { repeating = true }) end
+    for _, k in ipairs({ "SHIFT + Tab", "Left" }) do hl.bind(cmd .. " + " .. k, hl.dsp.global("hyprk:switcher-prev"), { repeating = true }) end
+    hl.bind(cmd .. " + Home",   hl.dsp.global("hyprk:switcher-first"))
+    hl.bind(cmd .. " + End",    hl.dsp.global("hyprk:switcher-last"))
+    hl.bind(cmd .. " + Return", hl.dsp.global("hyprk:switcher-commit"))
+    hl.bind(cmd .. " + Escape", hl.dsp.global("hyprk:switcher-cancel"))
+end)
+-- Cmd let go switches. Hyprland 0.57 matches a release against the submap the key went down in (the default one, Cmd
+-- comes before Tab) and always counts the trigger's own modifier ("SUPER + Super_L"); transparent keeps the bind from
+-- being shadowed by the Tab binds pressed meanwhile, non_consuming lets the client see the release. A release bind sends
+-- a global shortcut as "released", which the shell does not act on, so the commit goes out from a timer, outside the
+-- bind, as press + release. With the switcher closed the shell ignores it (Switcher.qml listens only while shown).
+for _, k in ipairs({ "Super_L", "Super_R" }) do
+    hl.bind(cmd .. " + " .. k, function()
+        hl.timer(function() hl.dispatch(hl.dsp.global("hyprk:switcher-commit")) end, { timeout = 1, type = "oneshot" })
+    end, { release = true, transparent = true, non_consuming = true, submap_universal = true })
+end
 hl.bind(cmd .. " + F4",      hl.dsp.global("hyprk:apps"))   -- Apps: Spotlight's Applications mode (shell/services/AppsView.qml)
 hl.bind(cmd .. " + A",       hl.dsp.global("hyprk:apps"))
 hl.bind(cmd .. " + N",       hl.dsp.global("hyprk:notificationcenter"))
@@ -351,14 +375,18 @@ hl.bind("Print",               hl.dsp.exec_cmd("grim " .. shotFile .. " && " .. 
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 
 ------------------------------------------------------------ windows ----
--- rules shipped by the other hyprk apps (optional)
+hl.window_rule({ name = "suppress-maximize", match = { class = ".*" }, suppress_event = "maximize" })
+-- macOS has no tiling: every window floats, opens centered
+hl.window_rule({ name = "macos-float", match = { class = ".*" }, float = true })
+-- max_size keeps big windows inside the work area (below the 30pt menu bar, above the ~84pt Dock zone);
+-- new_float_force_onscreen = 2 (default) then fits them fully. It clamps the window the moment the rule applies, so a
+-- later rule's larger max_size cannot undo it: Finder's Quick Look (a transparent window over the whole monitor,
+-- finder/hyprland-rules.lua) is left out by its title.
+hl.window_rule({ name = "macos-max-size", match = { class = ".*", title = "negative:^(Quick Look)$" }, max_size = "monitor_w-40 monitor_h-130" })
+-- rules shipped by the other hyprk apps (optional), after the catch-all rules above so an app's own rule wins (a later
+-- rule sets the same property last)
 for _, f in ipairs({ hyprk .. "/settings/hyprland-rules.lua", hyprk .. "/finder/hyprland-rules.lua",
                      state .. "/accessibility.lua" }) do   -- Settings > Accessibility choices, also without the shell
     local h = io.open(f, "r")
     if h then h:close(); dofile(f) end
 end
-hl.window_rule({ name = "suppress-maximize", match = { class = ".*" }, suppress_event = "maximize" })
--- macOS has no tiling: every window floats, opens centered
--- max_size keeps big windows inside the work area (below the 30pt menu bar, above the
--- ~84pt Dock zone); new_float_force_onscreen = 2 (default) then fits them fully.
-hl.window_rule({ name = "macos-float", match = { class = ".*" }, float = true, max_size = "monitor_w-40 monitor_h-130" })
