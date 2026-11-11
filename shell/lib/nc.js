@@ -30,6 +30,16 @@ var hoverSpring = { response: 0.37, ratio: 1.0 };
 // Content and glass fade in and the card grows from 0.85 as it comes.
 var bannerInSpring = { response: 0.43, ratio: 0.9 };
 var bannerInTravel = 462;
+// Sound of an arriving notification: a banner sounds only when the notification asks for a sound (freedesktop
+// "sound-name" / "sound-file" hints, like a macOS app's UNNotificationSound) or is critical; never for updates,
+// apps whose sounds are off in Settings, or "suppress-sound". "" | "notification" | "alert"
+function notificationSound(hints, critical, update, soundsOn) {
+    const h = hints || {};
+    if (update || !soundsOn || h["suppress-sound"] === true) return "";
+    if (critical) return "alert";
+    return h["sound-name"] || h["sound-file"] ? "notification" : "";
+}
+
 function bannerInOpacity(p) { return Math.max(0, Math.min(1, (p - 0.3) / 0.7)); }
 function bannerInScale(p) { return 0.85 + 0.15 * Math.max(0, Math.min(1, p)); }
 // Banner out (after 4.97 s): back to the right on Spring(0.3, bounce -0.2), fading out; gone after 0.15 s (9 frames)

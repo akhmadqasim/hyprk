@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.UPower
 
 // System sounds. All playback goes through scripts/sound.sh, which reads
 // state/sound.json (alertSound, alertVolume, uiSounds, volumeFeedback) so the
@@ -19,6 +20,15 @@ Singleton {
     // volume pop once the slider settles, not on every drag step
     function volumeChanged() { volumeDebounce.restart(); }
     Timer { id: volumeDebounce; interval: 180; onTriggered: root.play("volume") }
+
+    // power connected: PowerChime's connect_power chime when a laptop goes from battery to the charger
+    // (MAC-ANSWERS "Sounds": PowerChime chimeOnAttach). Desktops have no battery device: nothing changes.
+    readonly property bool onPower: UPower.displayDevice.isLaptopBattery && UPower.displayDevice.state !== UPowerDeviceState.Discharging
+    property bool wasOnPower: onPower
+    onOnPowerChanged: {
+        if (onPower && !wasOnPower && UPower.displayDevice.ready) play("power");
+        wasOnPower = onPower;
+    }
 
     IpcHandler {
         target: "sounds"

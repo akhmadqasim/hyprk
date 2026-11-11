@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Notifications
 import "../lib/state.js" as State
+import "../lib/nc.js" as NC
 
 // Own org.freedesktop.Notifications server. Keeps a history for the
 // Notification Center and a short list of live banners.
@@ -50,8 +51,8 @@ Singleton {
             timeout: n.expireTimeout > 0 ? n.expireTimeout : 0,
             critical: n.urgency === NotificationUrgency.Critical,
             style: rule.style,             // none: Notification Center only, alerts: stay until dismissed
-            // updates (progress etc.) and apps that ask for silence don't chime
-            silent: update || !rule.sounds || n.hints["suppress-sound"] === true,
+            // the sound it asks for, if any (lib/nc.js notificationSound): "" = silent
+            sound: NC.notificationSound(n.hints, n.urgency === NotificationUrgency.Critical, update, rule.sounds),
         });
     }
 
@@ -61,11 +62,11 @@ Singleton {
         history.insert(0, d);
         if (dnd) return;                       // Focus: no banner, no sound
         // Notification Center open: the notification shows there, no banner to pop up later
-        if (Panels.open === "nc") { if (!d.silent) Sounds.play(d.critical ? "alert" : "notification"); return; }
+        if (Panels.open === "nc") { if (d.sound) Sounds.play(d.sound); return; }
         if (d.style !== "none")
             // Banners.qml groups these by app and shows up to three stacks
             banners = [d].concat(banners.filter(b => b.nid !== d.nid)).slice(0, 12);
-        if (!d.silent) Sounds.play(d.critical ? "alert" : "notification");
+        if (d.sound) Sounds.play(d.sound);
     }
 
     function hideBanner(id) {
@@ -140,7 +141,7 @@ Singleton {
         function test(summary: string, body: string): void { testApp("Messages", summary, body); }
         function testApp(app: string, summary: string, body: string): void {
             root.push({ nid: ++root.testId, appName: app, appIcon: "", image: "", summary: summary,
-                        body: body, time: Date.now(), timeout: 0, critical: false, style: "banners", silent: true });
+                        body: body, time: Date.now(), timeout: 0, critical: false, style: "banners", sound: "" });
         }
         function clear(): void { root.clearAll(); }
         // drive a Notification Center stack from scripts (tests): unfold/fold, clear

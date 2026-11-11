@@ -858,6 +858,18 @@ test("mode buttons start inside the field, end in place", () => {
     });
 }
 
+{
+    const N = load("nc.js");
+    test("notification sound: only when asked for, critical = alert, never updates or suppressed", () => {
+        assert.equal(N.notificationSound({}, false, false, true), "");
+        assert.equal(N.notificationSound({ "sound-name": "message-new-instant" }, false, false, true), "notification");
+        assert.equal(N.notificationSound({ "sound-file": "/x.oga" }, false, false, true), "notification");
+        assert.equal(N.notificationSound({}, true, false, true), "alert");
+        assert.equal(N.notificationSound({ "sound-name": "x" }, false, true, true), "");
+        assert.equal(N.notificationSound({ "sound-name": "x" }, false, false, false), "");
+        assert.equal(N.notificationSound({ "sound-name": "x", "suppress-sound": true }, true, false, true), "");
+    });
+}
 test("Mission Control: one Space reads Desktop, more are numbered by position", () => {
     assert.equal(ST.spaceName(0, 1), "Desktop");
     assert.equal(ST.spaceName(1, 3), "Desktop 2");
