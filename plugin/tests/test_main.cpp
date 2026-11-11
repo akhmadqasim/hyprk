@@ -95,10 +95,12 @@ int main() {
     {
         const auto& reg = recipeByName("regular");
         auto        r   = resolveMaterial(reg, 40, true);
-        CHECK(near(r.refractionHeight, 10, 1e-4) && near(r.refractionAmount, -20, 1e-4) && near(r.blurRadius, 2)); // hyprk blur floor 2 (JUDGE-r2)
+        CHECK(near(r.refractionHeight, 10, 1e-4) && near(r.refractionAmount, -20, 1e-4) && near(r.blurRadius, 5) &&
+              near(r.blurAlpha[0], 0) && near(r.blurAlpha[2], 0.5, 1e-6) && near(r.blurDist0, -20, 1e-4)); // Apple BlurRadius 5, BlurOpacity0 0.8 q
         CHECK(near(r.outerHeight, 16, 1e-5) && near(r.outerAmount, 16, 1e-5) && near(r.outerOpacity, 0.6, 1e-6)); // outer max(0.2 D, 16) / max(0.25 D, 16)
-        r = resolveMaterial(reg, 200, true); // clamps: height 20, amount -60, blur 4
-        CHECK(near(r.refractionHeight, 20, 1e-4) && near(r.refractionAmount, -60, 1e-4) && near(r.blurRadius, 4, 1e-4) && near(r.outerHeight, 40, 1e-4) &&
+        r = resolveMaterial(reg, 200, true); // clamps: height 20, amount -60; blur 5 x opacity 0.8 / 0.4 / 0.5 over -100 / -1 / 0
+        CHECK(near(r.refractionHeight, 20, 1e-4) && near(r.refractionAmount, -60, 1e-4) && near(r.blurRadius, 5, 1e-4) && near(r.blurAlpha[0], 0.8, 1e-6) &&
+              near(r.blurAlpha[1], 0.4, 1e-6) && near(r.blurDist0, -100, 1e-4) && near(r.outerHeight, 40, 1e-4) &&
               near(r.outerAmount, 50, 1e-4));
         // face: dark max luma lerp(0.6, 0.35) over D 64 -> 104, light maxLumaSDR 0.94; edge bleed 0.8 / 0.5 x q
         CHECK(near(resolveMaterial(reg, 24, true).maxLuma, 0.6, 1e-6) && near(resolveMaterial(reg, 96, true).maxLuma, 0.4, 1e-6) &&
@@ -149,7 +151,8 @@ int main() {
                   near(r.darkBias, -0.3, 1e-6) && near(r.darkSpread, 75) && near(r.keyYcc.white, 1.4666, 1e-4) && near(r.maxLuma, 1) && near(r.bleedOpacity, 0));
         }
         CHECK(near(resolveMaterial(cc, 60, true).refractionAmount, -80, 1e-4) && near(resolveMaterial(cc, 30, true).blurAlpha[0], 1, 1e-6) &&
-              near(resolveMaterial(cc, 30, true, 0.25).blurAlpha[0], 0.5, 1e-6) && near(resolveMaterial(cc, 30, true, 0.75).blurFill.normal, 0.5, 1e-6) &&
+              near(resolveMaterial(cc, 30, true, 0.25).blurRadius, 2, 1e-6) &&
+              near(resolveMaterial(cc, 30, true, 0.25).blurAlpha[0], 1, 1e-6) && near(resolveMaterial(cc, 30, true).blurDist0, -100, 1e-4) && near(resolveMaterial(cc, 30, true, 0.75).blurFill.normal, 0.5, 1e-6) &&
               near(resolveMaterial(cc, 30, true, 0.75).ycc.white, 0.8, 1e-6));
         r = resolveMaterial(recipeByName("clear"), 64, false, 0);
         CHECK(near(r.refractionHeight, 20, 1e-4) && near(r.refractionAmount, -41.6, 1e-4) && near(r.blurRadius, 0) && near(r.outerOpacity, 0) && !hasShadow(recipeByName("clear")));

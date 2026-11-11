@@ -44,6 +44,11 @@ namespace lg {
         return p.reduceMotion || it == p.spacing.end() ? 0.0 : std::max(it->second, 0.0);
     }
 
+    double underlayFor(const SParams& p, const std::string& ns) {
+        const auto it = p.underlay.find(ns);
+        return it == p.underlay.end() ? 0.0 : std::max(it->second, 0.0);
+    }
+
     const std::string& materialFor(const SParams& p, const std::string& ns) {
         const auto it = p.materials.find(ns);
         return it != p.materials.end() ? it->second : p.defaultMaterial;

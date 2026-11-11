@@ -86,13 +86,15 @@ namespace lg {
             .appearBlur       = loc("appearBlur"),
             .roundingPower    = loc("roundingPower"),
             .alpha            = loc("alpha"),
-            .blurLod          = loc("blurLod"),
+            .blurRadius       = loc("blurRadius"),
+            .blurK            = loc("blurK"),
+            .baseLevel        = loc("baseLevel"),
+            .maxLevel         = loc("maxLevel"),
+            .underlay         = loc("underlay"),
             .refraction       = loc("refraction"),
             .refractionHeight = loc("refractionHeight"),
             .aberration       = loc("aberration"),
             .faceYcc          = loc("faceYcc"),
-            .sharpTex         = loc("sharpTex"),
-            .sharpUv          = loc("sharpUv"),
             .blurAlpha        = loc("blurAlpha"),
             .blurDist         = loc("blurDist"),
             .outerAmount      = loc("outerAmount"),
@@ -122,9 +124,8 @@ namespace lg {
             .ringRadius       = loc("ringRadius"),
         };
         // the sampler and the quad mapping are the minimum a custom shader must keep
-        // (sharpUv too when the shader reads sharpTex: the two textures hold different parts of the output)
-        if (u.tex < 0 || u.uvTopLeft < 0 || u.uvBottomRight < 0 || u.quadSize < 0 || u.shapeCount < 0 || u.shapeBox < 0 || (u.sharpTex >= 0 && u.sharpUv < 0)) {
-            fail("shader lacks the required uniforms tex/uvTopLeft/uvBottomRight/quadSize/shapeCount/shapeBox (and sharpUv with sharpTex)");
+        if (u.tex < 0 || u.uvTopLeft < 0 || u.uvBottomRight < 0 || u.quadSize < 0 || u.shapeCount < 0 || u.shapeBox < 0) {
+            fail("shader lacks the required uniforms tex/uvTopLeft/uvBottomRight/quadSize/shapeCount/shapeBox");
             return false;
         }
 
@@ -157,7 +158,7 @@ namespace lg {
 
         // Box-sized backdrop copies per element (owner, monitor) and role, so the mip chain covers the glass
         // and its footprint instead of the whole output (README Performance)
-        enum eRole { SHARP, BLUR };
+        enum eRole { SHARP };
         struct SBoxFB {
             SP<Render::IFramebuffer> fb;
             uint64_t                 frame = 0;
@@ -219,7 +220,128 @@ namespace lg {
     // ── unblurred backdrop copy (variable blur, edge bleed) ──────────────────
 
     namespace {
-        constexpr int SHARP_LEVELS = 7; // the shader reads the sharp copy up to lod 6 (variable blur) + its 4-tap tent
+        constexpr int MAX_LEVELS   = 7; // deepest pyramid level (128 px texels): wide edge-bleed blurs of big panels
+        constexpr int SHADOW_LEVEL = 6; // the drop shadow's tint reads a wide blur of the backdrop
+
+        // Apple's variable-blur downsampler (QuartzCore variable_blur_downsample_frag, MAC-ANSWERS C3 2): level i + 1 is
+        // level i through 13 bilinear taps, halved. One attribute-less triangle per level into the copy's own texture.
+        constexpr const char* DOWN_VERT = R"(#version 300 es
+void main() {
+    vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2));
+    gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
+})";
+        constexpr const char* DOWN_FRAG = R"(#version 300 es
+precision highp float;
+uniform sampler2D src;   // level i only (base = max = i)
+uniform vec2 texel;      // 1 / size of level i
+out vec4 fragColor;
+void main() {
+    vec2 uv = gl_FragCoord.xy * 2.0 * texel; // centre of the destination texel in level i
+    vec2 a = 1.960085 * texel, b = 3.920676 * texel;
+    vec4 c = 0.105497 * texture(src, uv);
+    c += 0.090186 * (texture(src, uv + vec2(a.x, 0.0)) + texture(src, uv - vec2(a.x, 0.0)) + texture(src, uv + vec2(0.0, a.y)) + texture(src, uv - vec2(0.0, a.y)));
+    c += 0.077098 * (texture(src, uv + a) + texture(src, uv - a) + texture(src, uv + vec2(a.x, -a.y)) + texture(src, uv + vec2(-a.x, a.y)));
+    c += 0.056341 * (texture(src, uv + vec2(b.x, 0.0)) + texture(src, uv - vec2(b.x, 0.0)) + texture(src, uv + vec2(0.0, b.y)) + texture(src, uv - vec2(0.0, b.y)));
+    fragColor = c;
+})";
+
+        struct SDownsampler {
+            GLuint prog = 0, vao = 0, fbo = 0;
+            GLint  texel = -1;
+            bool   failed = false;
+
+            static GLuint compile(GLenum type, const char* src) {
+                const GLuint sh = glCreateShader(type);
+                glShaderSource(sh, 1, &src, nullptr);
+                glCompileShader(sh);
+                GLint ok = 0;
+                glGetShaderiv(sh, GL_COMPILE_STATUS, &ok);
+                if (!ok) {
+                    glDeleteShader(sh);
+                    return 0;
+                }
+                return sh;
+            }
+
+            bool ensure() {
+                if (prog || failed)
+                    return prog != 0;
+                const GLuint vs = compile(GL_VERTEX_SHADER, DOWN_VERT), fs = compile(GL_FRAGMENT_SHADER, DOWN_FRAG);
+                GLint        ok = 0;
+                if (vs && fs) {
+                    prog = glCreateProgram();
+                    glAttachShader(prog, vs);
+                    glAttachShader(prog, fs);
+                    glLinkProgram(prog);
+                    glGetProgramiv(prog, GL_LINK_STATUS, &ok);
+                }
+                if (vs)
+                    glDeleteShader(vs);
+                if (fs)
+                    glDeleteShader(fs);
+                if (!ok) {
+                    if (prog)
+                        glDeleteProgram(prog);
+                    prog   = 0;
+                    failed = true;
+                    logOnce("blur pyramid shader failed, box mips instead");
+                    return false;
+                }
+                texel = glGetUniformLocation(prog, "texel");
+                GLint prev = 0;
+                glGetIntegerv(GL_CURRENT_PROGRAM, &prev);
+                glUseProgram(prog);
+                glUniform1i(glGetUniformLocation(prog, "src"), 1); // the copy sits on unit 1 while it is built
+                glUseProgram(prev);
+                glGenVertexArrays(1, &vao);
+                glGenFramebuffers(1, &fbo);
+                return true;
+            }
+
+            void release() {
+                if (prog)
+                    glDeleteProgram(prog);
+                if (vao)
+                    glDeleteVertexArrays(1, &vao);
+                if (fbo) {
+                    g_pHyprOpenGL->onFramebufferDeleted(fbo);
+                    glDeleteFramebuffers(1, &fbo);
+                }
+                *this = {};
+            }
+        };
+        SDownsampler g_down;
+
+        // Levels 2..levels of the texture bound on unit 1 (size w x h at level 0) from level 1 by Apple's downsampler;
+        // level 1 stays the 2x2 box glGenerateMipmap made (Apple's backdrop at scale 0.5)
+        void buildPyramid(GLuint tex, int w, int h, int levels) {
+            if (levels < 2 || !g_down.ensure())
+                return;
+            CFramebufferBindingGuard guard{g_pHyprRenderer->glBackend()};
+            GLint prevProg = 0, prevVao = 0;
+            glGetIntegerv(GL_CURRENT_PROGRAM, &prevProg);
+            glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &prevVao);
+            const bool blend = g_pHyprOpenGL->blendEnabled();
+            g_pHyprOpenGL->blend(false);
+            g_pHyprOpenGL->bindFramebuffer(GL_DRAW_FRAMEBUFFER, g_down.fbo);
+            glUseProgram(g_down.prog);
+            glBindVertexArray(g_down.vao);
+            for (int l = 2; l <= levels; ++l) {
+                const int sw = std::max(1, w >> (l - 1)), shh = std::max(1, h >> (l - 1));
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, l - 1);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, l - 1);
+                glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, l);
+                g_pHyprOpenGL->setViewport(0, 0, std::max(1, w >> l), std::max(1, h >> l));
+                glUniform2f(g_down.texel, 1.f / sw, 1.f / shh);
+                glDrawArrays(GL_TRIANGLES, 0, 3);
+            }
+            glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, levels);
+            glBindVertexArray(prevVao);
+            glUseProgram(prevProg);
+            g_pHyprOpenGL->blend(blend);
+        }
 
         // the area to refresh so that reads in `read` up to mip `level` see no texel of an older frame
         CRegion footprintOf(const CRegion& read, int level, const Vector2D& size) {
@@ -249,7 +371,7 @@ namespace lg {
             auto& slot = g_boxes[{owner, mon, role}];
             slot.frame = g_frame;
             if (!slot.fb)
-                slot.fb = g_pHyprRenderer->createFB(role == SHARP ? "liquidglass-sharp" : "liquidglass-blur");
+                slot.fb = g_pHyprRenderer->createFB("liquidglass-backdrop");
             auto& fb = slot.fb;
             // same format as the source: a blit between float and unorm buffers is invalid
             if ((fb->m_size != box.size() || fb->m_drmFormat != src->m_drmFormat || !fb->isAllocated()) && !fb->alloc(box.w, box.h, src->m_drmFormat))
@@ -277,29 +399,36 @@ namespace lg {
             }
             g_pHyprOpenGL->setActiveTexture(GL_TEXTURE1);
             tex->bind();
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, levels);
-            glGenerateMipmap(GL_TEXTURE_2D);
+            glGenerateMipmap(GL_TEXTURE_2D); // every level exists; 2.. are replaced by Apple's downsampler
             tex->setTexParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            tex->setTexParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            tex->setTexParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            buildPyramid(tex->m_texID, int(box.w), int(box.h), levels);
             tex->unbind();
             g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
             return {tex, box};
         }
 
-        // The unblurred backdrop of one glass element, copied from what Hyprland blurs (the backdrop capture
-        // when a scope is open, else the framebuffer being rendered). Per element, at its own turn in the
+        // The backdrop of one glass element as Apple's blur pyramid, copied from what Hyprland blurs (the backdrop
+        // capture when a scope is open, else the framebuffer being rendered). Per element, at its own turn in the
         // pass: a copy shared across the frame showed stale pixels in the real shell (the framebuffer
-        // under a later layer is not final at an earlier element's turn), see README Performance.
-        STexView sharpBackdrop(Render::CRenderContext& ctx, uintptr_t owner, const Vector2D& size, const CRegion& read) {
+        // under a later layer is not final at an earlier element's turn), see README Performance. The whole extents
+        // are copied (one rect), so the downsampler's taps never reach texels of an older frame; past them the
+        // texture clamps to its edge (Apple's capture has a 16 pt margin and clamps too).
+        STexView backdropPyramid(Render::CRenderContext& ctx, uintptr_t owner, const Vector2D& size, const CRegion& read, int levels) {
             const auto  mon      = ctx.m_data.pMonitor.lock();
             const auto& captures = ctx.m_backdropCaptures;
             const auto  source   = !captures.empty() && captures.back().framebuffer ? captures.back().framebuffer : ctx.m_data.currentFB;
             if (!mon)
                 return {};
-            return copyBox(owner, mon->m_id, SHARP, dynamicPointerCast<CGLFramebuffer>(source), footprintOf(read, SHARP_LEVELS, size), SHARP_LEVELS);
+            return copyBox(owner, mon->m_id, SHARP, dynamicPointerCast<CGLFramebuffer>(source), CRegion{footprintOf(read, levels, size).getExtents()}, levels);
         }
     }
 
     void releaseGlState() {
+        g_down.release();
         g_boxes.clear();
         g_luma.clear();
         if (g_readFbo)
@@ -363,9 +492,47 @@ namespace lg {
         return CBox{b.x - margin - reach, b.y - margin - reach, b.w + 2 * (margin + reach), b.h + 2 * (margin + reach)}.scale(scale).round();
     }
 
-    // mip levels over Hyprland's blur
-    static float blurLodOf(const SParams& p, const SResolved& res) {
-        return p.blurLod + p.blurLodScale * std::log2(1.f + res.blurRadius);
+    // Apple's lod of a filter radius in backdrop texels (glass_background_base): max(0, log2(R < 2 ? R / 2 + 1 : R))
+    static float appleLod(float R) {
+        return std::max(0.f, std::log2(R < 2 ? R * 0.5f + 1 : R));
+    }
+
+    // pyramid level of the backdrop at Apple's scale s (level log2(1 / s): our level 1 is the 2x2 box of the output)
+    static float baseLevelOf(const SResolved& res) {
+        return std::log2(1.f / std::max(res.backdropScale, 0.0625f));
+    }
+
+    // level of the edge-bleed sample: radius 0.5 x BleedBlurRadius = 0.175 D (C3 3)
+    static float bleedLevelOf(const SResolved& res, float scale) {
+        return baseLevelOf(res) + appleLod(1.6f * 0.5f * res.bleedAmount * scale * res.backdropScale);
+    }
+
+    // level whose texel covers about half the shape: the light/dark readback reads one texel of it at the centre
+    static int lumaLevel(const CBox& box) {
+        return std::max(0, int(std::floor(std::log2(std::max(1.0, std::min(box.w, box.h) * 0.5)))));
+    }
+
+    // shader blurLevel(): level of radius r read through a backdrop already blurred with radius `under`
+    static float blurLevelOf(const SResolved& res, float r, float under, float scale) {
+        const float k = 1.6f * scale * res.backdropScale;
+        float       L = appleLod(k * r);
+        if (under > 0)
+            L = 0.5f * std::log2(std::exp2(2 * L) + std::exp2(2 * appleLod(k * under)) - 1);
+        return baseLevelOf(res) + L;
+    }
+
+    // deepest level the shader reads for this material: the face blur (radius x opacity <= 1, with the underlay), the blur
+    // fill (radius 8), the bleed, the shadow tint (a trilinear read at L touches floor(L) and ceil(L))
+    static int levelsFor(const SResolved& res, double underlay, bool shadow, float scale) {
+        const bool bf  = res.blurFill.lighten > 0 || res.blurFill.darken > 0 || res.blurFill.normal > 0;
+        float      lvl = blurLevelOf(res, res.blurRadius, float(underlay), scale);
+        if (bf)
+            lvl = std::max(lvl, blurLevelOf(res, 8.f, float(underlay), scale));
+        if (res.bleedOpacity > 0)
+            lvl = std::max(lvl, bleedLevelOf(res, scale));
+        if (shadow)
+            lvl = std::max(lvl, float(SHADOW_LEVEL));
+        return std::clamp(int(std::ceil(lvl)), 2, MAX_LEVELS);
     }
 
     static double reachOf(const SParams& p, const SResolved& res) {
@@ -491,8 +658,8 @@ namespace lg {
             SResolved res;
         };
         std::vector<SQuad> quads;
-        CRegion            blurDamage;
-        float              maxLod = 0;
+        CRegion            readRegion;
+        int                levels = 2;
         for (size_t i = 0; i < m_data.groups.size(); ++i) {
             const auto& g    = m_data.groups[i];
             const CBox  quad = readBox(g.box, m, 0, scale);
@@ -503,43 +670,25 @@ namespace lg {
             if (damage.empty())
                 continue;
             quads.push_back({i, quad, std::move(damage), m_data.resolved[i]});
-            blurDamage.add(readBox(g.box, m, reachOf(p, m_data.resolved[i]), scale));
-            maxLod = std::max(maxLod, blurLodOf(p, m_data.resolved[i]) + 2.f); // the shadow reads blurLod + 2
+            readRegion.add(readBox(g.box, m, reachOf(p, m_data.resolved[i]), scale));
+            levels = std::max(levels, levelsFor(resolveGroup(m_data, i, false, p.tintAmount), m_data.underlay, m_data.shadow && hasShadow(r), scale));
+            if (p.appearance == 0) // the light/dark readback averages the whole shape: one texel of a level about its size
+                levels = std::max(levels, std::min(lumaLevel(quad), MAX_LEVELS));
         }
         if (quads.empty())
             return true;
-        blurDamage.intersect(CBox{{}, mon->m_transformedSize});
+        readRegion.intersect(CBox{{}, mon->m_transformedSize});
 
-        // one blur + one mip chain (the blur pyramid the per-pixel LOD reads) for all shapes. Hyprland
-        // refreshes only the region it is given, so it gets every texel the deepest read touches
-        const int     blurLevels = std::clamp(int(std::ceil(maxLod)), 0, 12);
-        const CRegion blurRead   = footprintOf(blurDamage, blurLevels, mon->m_transformedSize);
-        const auto    blurredFB  = g_pHyprRenderer->blurMainFramebuffer(ctx, 1.f, blurRead);
-        const auto    fullTex    = blurredFB ? blurredFB->getTexture() : nullptr;
-        if (!fullTex || fullTex->m_size.x <= 0 || fullTex->m_size.y <= 0)
+        // the backdrop under every shape as Apple's blur pyramid (before binding the glass shader: the build uses its own
+        // program); without it there is no glass, the fallback draws Hyprland's blur
+        const auto pyr = backdropPyramid(ctx, m_data.owner, mon->m_transformedSize, readRegion, levels);
+        if (!pyr.tex)
             return false;
-        // the blurred region into a box-sized texture: its mips cost the glass, not the output
-        auto blur = copyBox(m_data.owner, mon->m_id, BLUR, dynamicPointerCast<CGLFramebuffer>(blurredFB), blurRead, blurLevels);
-        const bool boxed = blur.tex != nullptr;
-        if (!boxed) // the whole blurred output then, mipmapped below
-            blur = {fullTex, CBox{{}, fullTex->m_size}};
-        const auto& tex = blur.tex;
+        const auto& tex = pyr.tex;
 
-        // before touching the texture state, so a failure leaves it as Hyprland set it
         const auto shader = g_pHyprOpenGL->useShader(prog.shader());
         if (!shader)
             return false;
-
-        // without the copy, the blurred texture stands in: variable blur and bleed then stay blurred
-        auto sharp = sharpBackdrop(ctx, m_data.owner, mon->m_transformedSize, blurDamage);
-        if (!sharp.tex)
-            sharp = blur;
-
-        g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
-        tex->bind();
-        if (!boxed)
-            glGenerateMipmap(GL_TEXTURE_2D);
-        tex->setTexParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
         // light/dark per shape: forced, or the hysteresis state from earlier readbacks
         std::vector<bool> dark(quads.size(), p.appearance == 2);
@@ -555,10 +704,8 @@ namespace lg {
                 }
                 l.seen = g_frame;
                 collectLuma(l, p);
-                const auto& box   = quads[q].box;
-                // a box copy has fresh mips up to blurLevels only
-                const int   level = std::clamp(int(std::floor(std::log2(std::max(1.0, std::min(box.w, box.h) * 0.5)))), 0, boxed ? blurLevels : 12);
-                requestLuma(l, tex->m_texID, level, int((s.box.x + s.box.w / 2) * scale - blur.box.x) >> level, int((s.box.y + s.box.h / 2) * scale - blur.box.y) >> level);
+                const int   level = std::min(lumaLevel(quads[q].box), levels);
+                requestLuma(l, tex->m_texID, level, int((s.box.x + s.box.w / 2) * scale - pyr.box.x) >> level, int((s.box.y + s.box.h / 2) * scale - pyr.box.y) >> level);
                 dark[q] = l.dark;
             }
         }
@@ -568,7 +715,7 @@ namespace lg {
 
         // per-element uniforms
         glUniform1i(u.tex, 0);
-        glUniform1i(u.sharpTex, 1);
+        glUniform1f(u.maxLevel, float(levels));
         glUniform1i(u.linearLight, p.linearLight ? 1 : 0);
         // the outer layer fades in over the outermost 1 pt (RefractionDistance0 / 1 = -1 / 0)
         glUniform2f(u.outerThreshold, -1.f * scale, 0.f);
@@ -588,9 +735,6 @@ namespace lg {
 
         g_pHyprOpenGL->blend(true);
         g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        g_pHyprOpenGL->setActiveTexture(GL_TEXTURE1);
-        sharp.tex->bind();
-        g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
         glBindVertexArray(shader->getUniformLocation(SHADER_SHADER_VAO));
 
         for (size_t q = 0; q < quads.size(); ++q) {
@@ -599,11 +743,9 @@ namespace lg {
             const auto  res                        = resolveGroup(m_data, index, dark[q], p.tintAmount);
 
             shader->setUniformMatrix3fv(SHADER_PROJ, 1, GL_TRUE, g_pHyprRenderer->projectBoxToTarget(ctx, quad).getMatrix());
-            // quad corners in each texture's uv (the textures hold different parts of the output)
-            glUniform2f(u.uvTopLeft, (quad.x - blur.box.x) / blur.box.w, (quad.y - blur.box.y) / blur.box.h);
-            glUniform2f(u.uvBottomRight, (quad.x + quad.w - blur.box.x) / blur.box.w, (quad.y + quad.h - blur.box.y) / blur.box.h);
-            glUniform4f(u.sharpUv, (quad.x - sharp.box.x) / sharp.box.w, (quad.y - sharp.box.y) / sharp.box.h, (quad.x + quad.w - sharp.box.x) / sharp.box.w,
-                        (quad.y + quad.h - sharp.box.y) / sharp.box.h);
+            // quad corners in the copy's uv (it holds a part of the output)
+            glUniform2f(u.uvTopLeft, (quad.x - pyr.box.x) / pyr.box.w, (quad.y - pyr.box.y) / pyr.box.h);
+            glUniform2f(u.uvBottomRight, (quad.x + quad.w - pyr.box.x) / pyr.box.w, (quad.y + quad.h - pyr.box.y) / pyr.box.h);
             glUniform2f(u.quadSize, quad.w, quad.h);
             std::array<float, 4 * MAX_GROUP> boxes{};
             std::array<float, 2 * MAX_GROUP> info{};
@@ -619,7 +761,11 @@ namespace lg {
             glUniform1i(u.shapeCount, int(g.members.size()));
             glUniform4fv(u.shapeBox, GLsizei(g.members.size()), boxes.data());
             glUniform2fv(u.shapeInfo, GLsizei(g.members.size()), info.data());
-            glUniform1f(u.blurLod, blurLodOf(p, res));
+            // Apple's blur (C3 2): R = 1.6 x radius x backdrop texels per pt, level log2(1 / scale) + lod(R)
+            glUniform1f(u.blurRadius, res.blurRadius);
+            glUniform1f(u.blurK, 1.6f * scale * res.backdropScale);
+            glUniform1f(u.baseLevel, baseLevelOf(res));
+            glUniform1f(u.underlay, float(m_data.underlay));
             glUniform1f(u.refraction, res.refractionAmount * p.refractionScale * scale);
             glUniform1f(u.refractionHeight, res.refractionHeight * scale);
             glUniform2f(u.blurDist, res.blurDist0 * scale, r.blurDist1 * scale);
@@ -630,11 +776,8 @@ namespace lg {
             glUniform1f(u.bleedOpacity, res.bleedOpacity);
             glUniform1f(u.bleedHeight, res.bleedHeight * scale);
             glUniform1f(u.bleedAmount, res.bleedAmount * p.refractionScale * scale);
-            // the bleed sample is blurred: radius 0.175 D, Gaussian sigma 0.35 D = bleedAmount (MAC-ANSWERS PC #67 C3 3), read
-            // as one tap of the sharp copy's mips (box chain + trilinear: sigma ~0.41 x 2^L px), never sharper than
-            // Apple's backdrop scale, capped by the levels the copy has (lod 6 = sigma ~26 px)
-            const float bleedSigma = res.bleedAmount * float(scale) / 0.41f;
-            glUniform1f(u.bleedLod, std::clamp(std::log2(std::max(bleedSigma, 1.f)), -std::log2(res.backdropScale), float(SHARP_LEVELS - 1)));
+            // the bleed sample is blurred with radius 0.175 D (MAC-ANSWERS PC #67 C3 3), capped by the levels the copy has
+            glUniform1f(u.bleedLod, std::min(bleedLevelOf(res, scale), float(levels)));
             glUniform4f(u.bleedYcc, res.bleed.black, res.bleed.white, res.bleed.saturation, res.bleedLighten ? 1.f : 0.f);
             glUniform4f(u.faceYcc, res.ycc.black, res.ycc.white, res.ycc.saturation, res.maxLuma);
             glUniform3f(u.blurAlpha, res.blurAlpha[0], res.blurAlpha[1], res.blurAlpha[2]);
@@ -656,8 +799,6 @@ namespace lg {
 
         glBindVertexArray(0);
         g_pHyprOpenGL->disableScissor();
-        g_pHyprOpenGL->setActiveTexture(GL_TEXTURE1);
-        sharp.tex->unbind();
         g_pHyprOpenGL->setActiveTexture(GL_TEXTURE0);
         tex->setTexParameter(GL_TEXTURE_MIN_FILTER, tex->minFilter);
         tex->unbind();

@@ -17,14 +17,14 @@ int main() {
                 for (const double a : As) {
                     const auto& r   = recipeByName(m);
                     const auto  x   = resolveMaterial(r, D, dark, a);
-                    const auto  mid = resolveMaterial(r, D, dark, 0.5);
-                    std::printf("%s\n{\"material\":\"%s\",\"dark\":%s,\"D\":%g,\"a\":%g,\"inputs\":{", first ? "" : ",", m, dark ? "true" : "false", D, a);
+                                        std::printf("%s\n{\"material\":\"%s\",\"dark\":%s,\"D\":%g,\"a\":%g,\"inputs\":{", first ? "" : ",", m, dark ? "true" : "false", D, a);
                     first = false;
                     std::printf("\"InnerRefractionAmount\":%g,\"InnerRefractionHeight\":%g,\"OuterRefractionAmount\":%g,\"OuterRefractionHeight\":%g,"
                                 "\"RefractionOpacity\":%g,",
                                 x.refractionAmount, x.refractionHeight, x.outerAmount, x.outerHeight, x.outerOpacity);
-                    std::printf("\"BlurFillLightenOpacity\":%g,\"BlurFillDarkenOpacity\":%g,\"BlurFillNormalOpacity\":%g,\"BlurRadiusRel\":%g,", x.blurFill.lighten,
-                                x.blurFill.darken, x.blurFill.normal, mid.blurRadius > 0 ? x.blurRadius / mid.blurRadius : x.blurAlpha[0] / mid.blurAlpha[0]);
+                    std::printf("\"BlurFillLightenOpacity\":%g,\"BlurFillDarkenOpacity\":%g,\"BlurFillNormalOpacity\":%g,\"BlurRadius\":%g,\"BlurOpacity0\":%g,"
+                                "\"BlurOpacity1\":%g,\"BlurOpacity2\":%g,\"BlurDistance0\":%g,",
+                                x.blurFill.lighten, x.blurFill.darken, x.blurFill.normal, x.blurRadius, x.blurAlpha[0], x.blurAlpha[1], x.blurAlpha[2], x.blurDist0);
                     std::printf("\"FaceColorMatrixBlack\":%g,\"FaceColorMatrixWhite\":%g,\"FaceColorMatrixSaturation\":%g,\"Fill\":[%g,%g,%g,%g],\"MaxLuma\":%g,",
                                 x.ycc.black, x.ycc.white, x.ycc.saturation, x.fill.r, x.fill.g, x.fill.b, x.fill.a, x.maxLuma);
                     std::printf("\"BleedOpacity\":%g,\"BleedAmount\":%g,\"BleedHeight\":%g,\"BleedColorMatrixBlack\":%g,\"BleedColorMatrixWhite\":%g,"

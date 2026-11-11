@@ -94,6 +94,7 @@ static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext
     lg::CGlassElement::SData data{
         .shapes       = std::move(shapes),
         .smoothK      = lg::smoothKFor(*params, layer->m_namespace),
+        .underlay     = lg::underlayFor(*params, layer->m_namespace),
         .alpha  = float(layer->alpha()[Desktop::View::LS_ALPHA_FADE]->value() * opacity),
         .params = params,
         .recipe = &lg::recipeByName(lg::materialFor(*params, layer->m_namespace)),

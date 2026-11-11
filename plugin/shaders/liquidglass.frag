@@ -4,18 +4,18 @@
 // verified on the Mac (reference/re/27.2.1/decomp/QuartzCore-glassBackground-shader.c, QuartzCore-glass-shaders.c;
 // MAC-ANSWERS PC #67 B, C2): quarter-circle refraction profile, outer refraction in the last 1 pt, max luma with its
 // chroma boost, YCC face + fill, edge bleed, dark specular line outside the left/right edges, key/fill highlight.
-// The blur is hyprk's own (Hyprland's blur + mips of a sharp copy). Values come from src/Material.cpp, resolved per
-// shape on the CPU (light or dark side chosen there, with hysteresis; Liquid Glass slider). The face and rim maths is
+// The blur is Apple's (MAC-ANSWERS C3 2): `tex` is a copy of the backdrop whose level 1 is the 2x2 box (Apple's backdrop
+// at scale 0.5) and every deeper level the 13-tap downsample of the one above; each read is one trilinear tap at
+// log2(1 / scale) + lod(1.6 r texels-per-pt), r = BlurRadius x opacity(d + displacement). Values come from
+// src/Material.cpp, resolved per shape on the CPU (light or dark side chosen there, with hysteresis; Liquid Glass slider). The face and rim maths is
 // ported line by line in tools/check_model.py (face_ours, rim_rows): change both together.
 precision highp float;
 
 in vec2 v_texcoord;                 // 0..1 across the drawn quad (glass box + shadow margin)
 
-uniform sampler2D tex;              // Hyprland's blurred backdrop, mipmapped by the plugin
-uniform sampler2D sharpTex;         // unblurred backdrop copy, mipmapped (its own part of the output)
+uniform sampler2D tex;              // the backdrop pyramid (see above), its own part of the output
 uniform vec2  uvTopLeft;            // quad corners in tex uv
 uniform vec2  uvBottomRight;
-uniform vec4  sharpUv;              // quad corners in sharpTex uv: top-left xy, bottom-right zw
 uniform vec2  quadSize;             // px
 // Glass shapes of this quad, drawn as one smooth-union SDF (GlassEffectContainer-like merging).
 // A single shape is the plain case (smoothK has no effect then).
@@ -29,9 +29,13 @@ uniform float roundingPower;        // 2 = circle
 uniform float alpha;                // layer fade
 uniform int   linearLight;          // 1: work in linear light like QuartzCore (sRGB decode/encode)
 
-uniform float blurLod;              // extra mip blur on the face
-uniform vec3  blurAlpha;            // variable blur: alpha0..2
-uniform vec2  blurDist;             // variable blur: dist0, dist1 (px, < 0 inside); dist2 = 0
+uniform float blurRadius;           // Apple's BlurRadius, pt
+uniform vec3  blurAlpha;            // BlurOpacity0..2 (BlurOpacity3 = 1 outside)
+uniform vec2  blurDist;             // BlurDistance0, 1 (px, < 0 inside); BlurDistance2 = 3 = 0
+uniform float blurK;                // 1.6 x texels of Apple's backdrop per pt (R = blurK r)
+uniform float baseLevel;            // level of Apple's backdrop in tex: log2(1 / scale)
+uniform float maxLevel;             // deepest level the copy holds
+uniform float underlay;             // Apple blur radius (pt) of a layer the Mac has under this glass (CC panel), 0 = none
 uniform float refraction;           // px displacement at the very edge (- = sample inward, Apple's sign)
 uniform float refractionHeight;     // px depth of the bevel
 uniform float outerAmount;          // outer refraction layer (px, + = outward)
@@ -39,11 +43,11 @@ uniform float outerHeight;
 uniform float outerOpacity;
 uniform vec2  outerThreshold;       // band (px of d) over which the outer layer fades in: -1 pt .. 0
 uniform float aberration;           // px R/B split at the edge (Apple: none on background glass)
-uniform vec3  blurFill;             // lighten, darken, normal (wider blur: blurLod + 1.5)
+uniform vec3  blurFill;             // lighten, darken, normal (blur fill radius 8)
 uniform float bleedOpacity;         // edge bleed: mix(face, bleed, g^4 opacity) over the whole interior
 uniform float bleedHeight;          // px
 uniform float bleedAmount;          // px, + = outward
-uniform float bleedLod;             // Apple's backdrop scale as a mip level of the sharp copy
+uniform float bleedLod;             // level of the bleed sample's blur (0.175 D)
 uniform vec4  bleedYcc;             // black, white, saturation, 1 = weight by Y(face) (light), 0 = by 1 - Y(face) (dark)
 
 uniform vec4  faceYcc;              // black, white, saturation, max luma
@@ -139,29 +143,9 @@ vec3 decode(vec3 c) { return linearLight == 0 ? c : srgbToLinear(c); }
 
 vec3 encode(vec3 c) { return linearLight == 0 ? c : linearToSrgb(c); }
 
+// one trilinear tap of the pyramid at quad px `quadPx`
 vec3 fetch(vec2 quadPx, float lod) {
-    vec4 s = textureLod(tex, mix(uvTopLeft, uvBottomRight, quadPx / quadSize), lod);
-    return decode(s.rgb / max(s.a, 1e-4));
-}
-
-// Deep mips of the sharp copy are box filtered; a 4-tap tent over half a texel of the chosen
-// level smooths the blocky steps trilinear filtering leaves at lod > 1.
-vec3 fetchSharp(vec2 quadPx, float lod) {
-    vec2 uv = mix(sharpUv.xy, sharpUv.zw, quadPx / quadSize);
-    vec4 s;
-    if (lod < 1.0)
-        s = textureLod(sharpTex, uv, lod);
-    else {
-        vec2 o = 0.5 * exp2(lod) / vec2(textureSize(sharpTex, 0));
-        s = 0.25 * (textureLod(sharpTex, uv + vec2(o.x, o.y), lod) + textureLod(sharpTex, uv + vec2(-o.x, o.y), lod) +
-                    textureLod(sharpTex, uv + vec2(o.x, -o.y), lod) + textureLod(sharpTex, uv + vec2(-o.x, -o.y), lod));
-    }
-    return decode(s.rgb / max(s.a, 1e-4));
-}
-
-// single tap of the sharp copy (edge bleed, the backdrop under the dark specular line)
-vec3 fetchSharp1(vec2 quadPx, float lod) {
-    vec4 s = textureLod(sharpTex, mix(sharpUv.xy, sharpUv.zw, quadPx / quadSize), lod);
+    vec4 s = textureLod(tex, mix(uvTopLeft, uvBottomRight, quadPx / quadSize), min(lod, maxLevel));
     return decode(s.rgb / max(s.a, 1e-4));
 }
 
@@ -176,22 +160,31 @@ vec3 ycc(vec3 c, vec3 k) {
     return vec3(k.x + (k.y - k.x) * Y) + k.z * (c - vec3(Y));
 }
 
-// variable blur by edge distance: 1 = full blur, 0 = sharp backdrop (SPEC step 4.2)
-float blurAmount(float dEff) {
+// BlurOpacity0..3 interpolated linearly over BlurDistance0..3 at dEff = d + displacement (px, < 0 inside)
+float blurOpacity(float dEff) {
+    if (dEff >= 0.0)
+        return 1.0; // BlurOpacity3 at BlurDistance2 = 3 = 0
     float r1 = sat((dEff - blurDist.x) / (blurDist.y - blurDist.x));
     float r2 = sat((dEff - blurDist.y) / max(-blurDist.y, 1e-3));
-    return sat(blurAlpha.x - blurAlpha.y * r1 - blurAlpha.z * r2);
+    return blurAlpha.x + (blurAlpha.y - blurAlpha.x) * r1 + (blurAlpha.z - blurAlpha.y) * r2;
 }
 
-// Approximation of a per-pixel blur radius: deeper mips of the sharp copy as b grows (no ghosting),
-// handing over to Hyprland's smoother blur over the last fifth
-vec3 sampleFace(vec2 pos, float b) {
-    if (b >= 0.999)
-        return fetch(pos, blurLod);
-    vec3 sharp = fetchSharp(pos, 6.0 * b);
-    if (b <= 0.8)
-        return sharp;
-    return mix(sharp, fetch(pos, blurLod), (b - 0.8) * 5.0);
+// Apple's lod of a filter radius in backdrop texels: max(0, log2(R < 2 ? R / 2 + 1 : R))
+float appleLod(float R) {
+    return max(0.0, log2(R < 2.0 ? R * 0.5 + 1.0 : R));
+}
+
+// level of a blur of radius r (pt) read through a backdrop already blurred with radius `under`: the two blurs add
+// like variances, sigma ~ 2^level, so 4^L - 1 = (4^Lr - 1) + (4^Lu - 1) (both 0 at level 0)
+float blurLevel(float r, float under) {
+    float L = appleLod(blurK * r);
+    if (under > 0.0)
+        L = 0.5 * log2(exp2(2.0 * L) + exp2(2.0 * appleLod(blurK * under)) - 1.0);
+    return baseLevel + L;
+}
+
+vec3 sampleFace(vec2 pos, float r, float under) {
+    return fetch(pos, blurLevel(r, under));
 }
 
 void main() {
@@ -228,7 +221,7 @@ void main() {
 
     vec4 shadow = vec4(0.0);
     if (sh > 0.0)
-        shadow = vec4(encode(ycc(fetch(qp, blurLod + 2.0), vec3(0.0, 1.0, shadowSaturation)) * shadowTint) * sh, sh);
+        shadow = vec4(encode(ycc(fetch(qp, maxLevel), vec3(0.0, 1.0, shadowSaturation)) * shadowTint) * sh, sh);
 
     vec4 face = vec4(0.0);
     if (cov > 0.0) {
@@ -239,7 +232,8 @@ void main() {
         float bev = bevel(depth, refractionHeight);
         float m   = refraction * bev * mat;
         vec2  pR  = qp + n * m;
-        float b   = blurAmount(d - abs(m)) * mat; // Apple: dEff = d + m with an inward (negative) m
+        float r   = blurRadius * blurOpacity(d - abs(m)) * mat; // Apple: dEff = d + m with an inward (negative) m
+        float und = underlay * mat;
 
         vec3 col;
         if (aberration * bev * mat > 0.05) {
@@ -248,23 +242,26 @@ void main() {
             vec3 acc = vec3(0.0);
             for (int i = 0; i < 3; i++) {
                 float t = 1.0 - float(i) / 3.0;
-                vec3  s = sampleFace(pR + t * A, b);
+                vec3  s = sampleFace(pR + t * A, r, und);
                 acc.r += t * s.r;
                 acc.g += (1.0 - t) * s.g;
             }
             for (int i = 0; i < 4; i++) {
                 float t = float(i) / 3.0;
-                vec3  s = sampleFace(pR - t * A, b);
+                vec3  s = sampleFace(pR - t * A, r, und);
                 acc.g += (1.0 - t) * s.g;
                 acc.b += t * s.b;
             }
             col = acc * vec3(0.5, 1.0 / 3.0, 0.5);
         } else
-            col = sampleFace(pR, b);
+            col = sampleFace(pR, r, und);
 
-        // blur fill: lighten/darken against a wider blur (SPEC step 4.4)
+        // blur fill (radius 8): two taps at -+ L / 4 backdrop texels (diagonal) of its level L, at the unrefracted pixel
         if (dot(blurFill, vec3(1.0)) > 0.0) {
-            vec3 bf = fetch(qp, blurLod + 1.5);
+            float Lf = appleLod(blurK * 8.0);
+            vec2  o  = vec2(0.25 * Lf * exp2(baseLevel));
+            float lf = blurLevel(8.0, und);
+            vec3  bf = 0.5 * (fetch(qp - o, lf) + fetch(qp + o, lf));
             vec3 filled = mix(blurFill.y * min(col, bf) + blurFill.x * max(col, bf) + (1.0 - blurFill.x - blurFill.y) * col, bf, blurFill.z);
             col         = mix(col, filled, mat);
         }
@@ -272,7 +269,7 @@ void main() {
         // outer refraction: a second sample from outside the shape, mixed into the outermost 1 pt
         if (outerOpacity > 0.0 && d > outerThreshold.x) {
             float mo = outerAmount * bevel(depth, outerHeight) * mat;
-            vec3  so = sampleFace(qp + n * mo, blurAmount(d) * mat);
+            vec3  so = sampleFace(qp + n * mo, blurRadius * blurOpacity(d + mo) * mat, und);
             col      = mix(col, so, sat((d - outerThreshold.x) / (outerThreshold.y - outerThreshold.x)) * outerOpacity * mat);
         }
 
@@ -293,7 +290,7 @@ void main() {
             float g  = bleedYcc.w > 0.5 ? Yf : 1.0 - Yf;
             float w  = g * g * g * g * bleedOpacity * mat;
             if (w > 0.002)
-                col = mix(col, ycc(fetchSharp1(qp + n * bleedAmount * bevel(depth, bleedHeight), bleedLod), bleedYcc.xyz), w);
+                col = mix(col, ycc(fetch(qp + n * bleedAmount * bevel(depth, bleedHeight), bleedLod), bleedYcc.xyz), w);
         }
 
         // key/fill highlight layer (CASDFKeyFillHighlightEffect: key at the top, fill at the bottom, same strength), a
@@ -326,7 +323,7 @@ void main() {
 
     // the dark specular line, a tone curve on what lies there (backdrop under the shadow): c (1 + bias h (3 - 2 c))
     if (line > 0.0) {
-        vec3 base = c.rgb + encode(fetchSharp1(qp, 0.0)) * (1.0 - c.a);
+        vec3 base = c.rgb + encode(fetch(qp, 0.0)) * (1.0 - c.a);
         c         = vec4(base * (1.0 + darkSpec.x * line * (3.0 - 2.0 * clamp(base, 0.0, 1.0))), 1.0);
     }
 

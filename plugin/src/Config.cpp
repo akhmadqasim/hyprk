@@ -34,8 +34,6 @@ namespace lg {
         const SFloatKey FLOATS[] = {
             {K("default_radius"), &SParams::defaultRadius},
             {K("rounding_power"), &SParams::roundingPower},
-            {K("blur_lod"), &SParams::blurLod},
-            {K("blur_lod_scale"), &SParams::blurLodScale},
             {K("refraction_scale"), &SParams::refractionScale},
             {K("aberration"), &SParams::aberration},
             {K("adapt_low"), &SParams::adaptLow},
@@ -85,6 +83,9 @@ namespace lg {
             // Spotlight's mode buttons fuse with the field only while they emerge from it
             {K("spacing"), "hyprk-controlcenter:8,hyprk-dock:8,hyprk-overlay:8,hyprk-spotlight:8",
              [](SParams& p, const std::string& v) { p.spacing = parseNumberMap(v); }},
+            // the Control Center panel's own blur under its tiles, as an Apple blur radius composed with the tile's own: 2.05 pt
+            // gives the real tiles' contrast over 4 pt stripes, 7.9 levels at 15 pt deep (C2 cc-real.json; REFRACTION.md)
+            {K("underlay_blur"), "hyprk-controlcenter:2.05", [](SParams& p, const std::string& v) { p.underlay = parseNumberMap(v); }},
             {K("material"), "regular", [](SParams& p, const std::string& v) { p.defaultMaterial = v; }},
             {K("window_material"), "regular", [](SParams& p, const std::string& v) { p.windowMaterial = v; }},
             {K("appearance"), "auto", [](SParams& p, const std::string& v) { p.appearance = parseAppearance(v); }},
@@ -97,7 +98,7 @@ namespace lg {
         };
         // keys of the first iteration, still accepted so existing configs load; they do nothing now
         // (the recipes in Material.cpp set face colour, tint and saturation)
-        const char* const LEGACY_FLOATS[] = {K("saturation"), K("brightness_light"), K("brightness_dark"), K("blur_edge_distance"), K("edge_blur_lod"),
+        const char* const LEGACY_FLOATS[] = {K("blur_lod"), K("blur_lod_scale"), K("saturation"), K("brightness_light"), K("brightness_dark"), K("blur_edge_distance"), K("edge_blur_lod"),
                                              K("refraction"), K("refraction_height"), K("adapt_threshold"), K("adapt_softness"), K("shadow_opacity"),
                                              K("shadow_radius"), K("shadow_offset_y"), K("ring_opacity"), K("ring_width"),
                                              // by-eye rim of the second iteration, replaced by the 27.2.1 rim (Material.cpp)

@@ -65,17 +65,14 @@ namespace lg {
         // height = max(outerHeightN * D, outerMin), amount = max(outerAmountN * D, outerMin)
         float outerHeightN = 0, outerAmountN = 0, outerMin = 0, outerOpacity = 0;
 
-        // blur of the face: hyprk's own kernel (Hyprland's blur + mips of a sharp copy, see README "Blur"), not
-        // Apple's mip-of-a-scaled-backdrop. radius lerp(blurLo, blurHi) over D in [blurD0, blurD1] feeds the mip level.
-        float blurD0 = 64, blurD1 = 160, blurLo = 0, blurHi = 4;
-        // variable blur: radius x (alpha0 - alpha1 ramp(d, dist0, dist1) - alpha2 ramp(d, dist1, 0)),
-        // d < 0 inside. dist0 = dist0N * D + dist0Fixed
+        // blur of the face, Apple's (glassBackground, MAC-ANSWERS C3 2): BlurRadius r in pt, read per pixel as one trilinear
+        // tap of the backdrop pyramid at lod(1.6 x r x op x texels per pt), op = BlurOpacity0..2 interpolated over
+        // BlurDistance0 (= dist0N D + dist0Fixed), BlurDistance1 (-1) and 0 at the pixel's d + displacement (d < 0 inside)
+        float                blurRadius = 0;
         float                blurDist0N = -0.5f, blurDist0Fixed = 0, blurDist1 = -1;
-        std::array<float, 3> blurAlpha  = {1, 0.5f, 0.5f};
-        // alpha0 and alpha1 x lerp(0, 1) over D in [blurAlphaD0, blurAlphaD1] (equal: always full)
+        std::array<float, 3> blurAlpha  = {1, 0.5f, 0.5f}; // BlurOpacity0, 1, 2
+        // BlurOpacity0 and 1 x lerp(0, 1) over D in [blurAlphaD0, blurAlphaD1] (equal: always full)
         float blurAlphaD0 = 0, blurAlphaD1 = 0;
-        // Apple's BlurRadius, only for the backdrop scale estimator (Regular family)
-        float appleBlurRadius = 5;
 
         // drop shadow: opacity and Gaussian radius lerp over D (shadowD0 == shadowD1: always the high end),
         // the dark side has its own top opacity. Regular: 0.04 + 0.56 q dark (Mac dumps by size), light 0.04 -> 0.4
@@ -102,9 +99,9 @@ namespace lg {
     struct SResolved { // pt unless noted
         float refractionHeight = 0, refractionAmount = 0;
         float outerHeight = 0, outerAmount = 0, outerOpacity = 0;
-        float blurRadius   = 0; // hyprk blur units (mip level input)
+        float blurRadius   = 0; // Apple's BlurRadius, pt (after the slider)
         float blurDist0    = 0;
-        std::array<float, 3> blurAlpha = {1, 0.5f, 0.5f};
+        std::array<float, 3> blurAlpha = {1, 0.5f, 0.5f}; // BlurOpacity0..2
         SYcc      ycc;
         SRgba     fill;
         SBlurFill blurFill;

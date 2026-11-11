@@ -29,7 +29,6 @@ namespace lg {
         float                                        defaultRadius   = -1;   // < 0: infer from the client's blur region
         float                                        roundingPower   = 2.6f; // Apple's continuous corner is close to 2.6-3
 
-        float                                        blurLod = 0, blurLodScale = 0.6f; // extra mip blur: blurLod + scale*log2(1 + recipe radius)
         float                                        refractionScale = 1, aberration = 0; // Apple: no aberration on background glass
 
         int                                          appearance = 0;                   // 0 auto, 1 light, 2 dark
@@ -44,6 +43,9 @@ namespace lg {
         // shapes fuse when the gap is below k / 2 and reach toward each other below k.
         std::unordered_map<std::string, double>      spacing;
         bool                                         reduceMotion = false; // no merging
+        // ns -> Apple blur radius (pt) of a layer that sits between the backdrop and the glass on the Mac but not here: the
+        // Control Center panel blurs the desktop under its tiles (MAC-ANSWERS C2 3), hyprk's panel is a dim only
+        std::unordered_map<std::string, double>      underlay;
 
         bool                                         fullDamage    = false; // true: redraw the whole output while glass is visible
         bool                                         stats         = false; // GPU timestamp queries, `hyprctl liquidglass`
@@ -85,6 +87,9 @@ namespace lg {
 
     // smooth-union smoothness k (logical px) for a namespace: its spacing, 0 with reduce_motion
     double smoothKFor(const SParams& p, const std::string& ns);
+
+    // Apple blur radius (pt) of the layer under the glass of a namespace (`underlay_blur`), 0 = none
+    double underlayFor(const SParams& p, const std::string& ns);
 
     // Hyprland side (Config.cpp, needs the compositor)
     void registerConfig(void* handle);

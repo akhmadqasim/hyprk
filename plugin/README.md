@@ -48,8 +48,10 @@ Check a value: `hyprctl getoption plugin:liquidglass:refraction_scale`.
 3. The surface itself should be transparent where the glass is (draw only content, or a light tint on top).
    Hyprland's own blur for that layer is switched off while the glass draws, so they never stack.
 
-The backdrop is Hyprland's own blur (`decoration.blur.*`, so size/passes/vibrancy there set the base frost),
-mipmapped by the plugin for the extra per-pixel blur. Recommended base: `blur = { size = 10, passes = 3 }`.
+The backdrop is Apple's blur pyramid (MAC-ANSWERS C3 2), built by the plugin from a copy of what lies under the glass:
+level 1 is the 2x2 box (Apple's backdrop at scale 0.5), every deeper level the one above through Apple's 13-tap
+downsampler; each read is one trilinear tap at `log2(1 / scale) + lod(1.6 r texels-per-pt)`. Hyprland's
+`decoration.blur.*` no longer feeds the glass (it still blurs layers without glass).
 
 ## Motion (materialize, merging)
 
@@ -137,15 +139,21 @@ Liquid Glass slider (`tint_amount`, NSGlassTintAmount, 0.5 = the recipes as is),
 blur fill of normal opacity 2a - 1 above, colours unchanged. Rim, refraction, saturation and shadow never change.
 Spotlight is not changed (not in the model).
 
-Variable blur needs the unblurred backdrop: the plugin copies the framebuffer being rendered (one blit +
-mip chain per glass element) and mixes it with Hyprland's blur by Apple's per-pixel blur amount.
+Blur and refraction per pixel, as glass_background_base: the inner refraction reads `p + n x amount x (1 - sqrt(t (2 - t)))`,
+t = depth / height; the blur radius there is `BlurRadius x opacity(d + displacement)` (BlurOpacity0..2 over
+BlurDistance0 (-0.5 D, Control Center -100), -1, 0), so the bevel reads deeper and blurrier backdrop; blur fill: two
+taps at -+ L / 4 texels of radius 8's level; edge bleed at radius 0.175 D. Over stripes this gives the concentric lens
+bands at rounded ends and the interior ripple of the real glass (reference/ours/glass/REFRACTION.md).
+Control Center: on the Mac the tiles sample the panel's own blur under them; hyprk's panel is a dim only, so
+`underlay_blur` composes that blur into the tiles' reads (`4^L - 1` adds, a radius fitted to the real tiles' contrast).
 
 Light/dark: `appearance = "auto"` reads the backdrop luminance of each glass (1 pixel of a high mip,
 read back asynchronously every 6 frames) and switches with Apple's V2 hysteresis: dark below 0.1, light
 again above 0.3 (`adapt_low` / `adapt_high`).
 
-Not Apple's: the blur kernel (Hyprland's blur + mips of a sharp copy; how Apple's radius maps to mip levels,
-`blur_lod_scale`, and the blur opacities by depth, JUDGE-r2 / r4), the shadow tint amount, Spotlight.
+Not Apple's: the shadow tint amount and the shadow's backdrop level (6), Spotlight, the Control Center underlay
+(fitted to the Mac's pixels, not decoded), the pyramid base at backdrop scale 0.25 / 0.125 (ours: the 13-tap levels of
+the 0.5 base, Apple: a 4x4 / 8x8 box; the half-size base Apple uses when R > 2 is not modelled either).
 
 ## Config keys (`plugin:liquidglass:<key>`; lengths in logical px)
 
@@ -161,7 +169,7 @@ Not Apple's: the blur kernel (Hyprland's blur + mips of a sharp copy; how Apple'
 | `rounding_power` | 2.6 | superellipse corner (2 = circle) |
 | `appearance` | `auto` | `auto` (hysteresis on backdrop luminance), `light`, `dark` |
 | `adapt_low` / `adapt_high` | 0.1 / 0.3 | hysteresis band (SPEC 9.6, V2 light range) |
-| `blur_lod` / `blur_lod_scale` | 0 / 0.6 | extra mip blur = `blur_lod + scale * log2(1 + recipe blur radius)` |
+| `underlay_blur` | `hyprk-controlcenter:2.05` | `ns:radius` (Apple blur radius, pt) of a blur the Mac has between the backdrop and that glass: the Control Center panel's. Set it to 0 once the shell blurs the panel column itself |
 | `refraction_scale` | 1 | multiplies the recipe's refraction amount (0 = off) |
 | `aberration` | 0 | px R/B split at the edge (7 taps); 0 = off (Apple: none on background glass) |
 | `highlight` | 1 | scales the key/fill highlight mask (1 = Apple) |
@@ -176,7 +184,7 @@ Not Apple's: the blur kernel (Hyprland's blur + mips of a sharp copy; how Apple'
 | `window_classes` | "" | regex: windows whose class matches get glass behind them |
 | `window_radius` | -1 | window glass radius; < 0 = the window's rounding |
 
-Keys of earlier iterations (`saturation`, `tint_light`, `tint_dark`, `brightness_*`, `refraction`, `shadow_opacity`, `light_angle`, `rim`, `lift`, `inner_shadow`, `pointer_light`, `pointer_light_radius`, `pointer_light_namespaces`, ...)
+Keys of earlier iterations (`blur_lod`, `blur_lod_scale`, `saturation`, `tint_light`, `tint_dark`, `brightness_*`, `refraction`, `shadow_opacity`, `light_angle`, `rim`, `lift`, `inner_shadow`, `pointer_light`, `pointer_light_radius`, `pointer_light_namespaces`, ...)
 are still accepted so old configs load, but do nothing. They will be removed once config/hypr/hyprland.lua no longer sets them.
 
 Damage: when any part of a glass is damaged, the plugin adds the whole glass box plus what its shader
@@ -193,9 +201,10 @@ A screenshot with `full_damage = 1` was pixel-identical to the default (test 202
 
 ## Performance
 
-Each glass element copies the unblurred backdrop under its own boxes (plus the mip footprint) at its
-turn in the pass and rebuilds that copy's mip chain; an element is only drawn when something under it was
-damaged. A copy shared by all glass of a frame (taken once, at the first element) was tried in iteration 4:
+Each glass element copies the backdrop under its own boxes (the extents of what it reads, aligned to its deepest
+level) at its turn in the pass and builds Apple's pyramid on it (a box level, then one 13-tap pass per level,
+each a quarter of the one above); an element is only drawn when something under it was damaged. Hyprland's blur is
+not used (until 2026-11-11 every element also ran it and copied its result: 2.5x the GPU time). A copy shared by all glass of a frame (taken once, at the first element) was tried in iteration 4:
 it was ~13 % cheaper but showed stale pixels in the real shell's Control Center, because the framebuffer
 under a later layer is not final at an earlier element's turn, so it was dropped.
 `plugin:liquidglass:stats = 1` turns on GPU timestamp queries; `hyprctl liquidglass` prints the averages
@@ -205,7 +214,9 @@ frame. Result on this PC (AMD RDNA2, the RX 6600 class GPU), 6 s each, 2026-11-1
 
 | Configuration | Glass GPU time per element (avg / p95) | Whole frame GPU (avg / p95) |
 |---|---|---|
-| per-element copy (current code, run 04:58) | 0.64 / 1.08 ms | 14.4 / 22.7 ms |
+| Apple pyramid, no Hyprland blur (current code; MBA 2560x1664 @ 2, CC open/close + HUD, 2026-11-11) | 0.17-0.22 / 0.29-0.37 ms | 20.2 / 16.9-17.0 ms |
+| Hyprland blur + sharp copy (before, same run and session) | 0.49-0.54 / 0.71-0.87 ms | 20.2-20.3 / 17.0-19.5 ms |
+| per-element copy (run 04:58, 4K bench) | 0.64 / 1.08 ms | 14.4 / 22.7 ms |
 | plugin disabled, same run | - | 15.8 / 22.3 ms |
 | shared copy (iteration 4, dropped; earlier, quieter run) | 0.56 / 0.78 ms | 11.1 / 16.3 ms |
 | old per-element copy of all glass boxes (iteration 3; earlier run) | 0.64 / 0.93 ms | 11.2 / 16.6 ms |

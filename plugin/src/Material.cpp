@@ -24,7 +24,7 @@ namespace lg {
             .outerAmountN = 0.25f,
             .outerMin     = 16,
             .outerOpacity = 0.6f,
-            .blurD0 = 48, .blurD1 = 160, .blurLo = 2, .blurHi = 4,
+            .blurRadius = 5,
             .blurAlpha = {0.8f, 0.4f, 0.5f},
             .blurAlphaD0 = 64, .blurAlphaD1 = 160,
             .ringOffsetY = 8, .ringStroke = 4, .ringRadius = 5, .ringOpacity = 0.06f,
@@ -43,7 +43,7 @@ namespace lg {
             .refractionAmountN = -0.65f,
             .outerHeightN      = 0.125f,
             .outerAmountN      = 0.2f,
-            .blurLo = 0.75f, .blurHi = 0.75f, // constant
+            .blurRadius        = 0.75f,
             LG_NO_SHADOW,
         };
 
@@ -63,7 +63,7 @@ namespace lg {
             .refractionAmountN   = -0.18f,
             .refractionAmountMin = -1e6f,
             .outerOpacity        = 0.2f,
-            .blurLo = 1.5f, .blurHi = 1.5f, // constant
+            .blurRadius          = 1.5f,
             LG_NO_SHADOW,
             .sizeD = SIZE_MEDIUM,
         };
@@ -71,9 +71,9 @@ namespace lg {
         // Control Center (= the volume/brightness HUD, SystemBannerUI _Glass.controlCenter), light and dark alike:
         // face (0.125, 0.8, 1.2), no fill; inner min(0.225 D, 25) / max(-2 D, -80); outer 0.0357 D / 0.0714 D at
         // 0.1525; rim -0.3 at 75 deg. Over the Electric Blue wallpaper (69, 83, 206) the HUD gives (68, 85, 232) on the
-        // Mac. Blur: Apple's radius 4 with opacities 1 / 0.1 / 0.5 over distances -100 / -1 / 0 rides on the CC panel's
-        // own blur, which hyprk does not have (its CC panel is a dim only); Hyprland's blur stands in for both (JUDGE-r4),
-        // the variable blur softens toward the middle.
+        // Mac. Blur: Apple's radius 4 with opacities 1 / 0.1 / 0.5 over distances -100 / -1 / 0 (about 0.9 pt at 15 pt
+        // deep, 1.5 at the middle of a 64 pt tile). On the Mac the CC tiles sample the panel's own blur under them; hyprk's
+        // panel is a dim only, so the `underlay_blur` key adds that blur to the tiles' reads (REFRACTION.md).
         constexpr SFace   CONTROLCENTER_FACE = {.ycc = {0.125f, 0.8f, 1.2f}, .keyYcc = CLEAR_KEY, .darkBias = -0.3f};
         constexpr SRecipe CONTROLCENTER      = {
                  .name                = "controlcenter",
@@ -87,7 +87,7 @@ namespace lg {
                  .outerHeightN        = 0.0357f,
                  .outerAmountN        = 0.0714f,
                  .outerOpacity        = 0.1525f,
-                 .blurLo = 0, .blurHi = 0,
+                 .blurRadius          = 4,
                  .blurDist0N = 0, .blurDist0Fixed = -100,
                  .blurAlpha = {1, 0.1f, 0.5f},
                  LG_NO_SHADOW,
@@ -107,9 +107,9 @@ namespace lg {
             .outerHeightN        = 0.4f,
             .outerAmountN        = 0.4f,
             .outerOpacity        = 1.0f,
-            .blurLo = 6, .blurHi = 6, // constant: Apple 8 x 0.75
+            .blurRadius          = 6, // 8 x 0.75 (NOTES.md); full from 1 pt inside, sharp at the edge
             .blurDist0N = 0, .blurDist0Fixed = -60, .blurDist1 = -1,
-            .blurAlpha = {1, 0, 1},
+            .blurAlpha = {1, 1, 0},
             LG_NO_SHADOW,
         };
 #undef LG_NO_SHADOW
@@ -195,7 +195,7 @@ namespace lg {
             .outerHeight      = float(std::max(r.outerHeightN * D, double(r.outerMin))),
             .outerAmount      = float(std::max(r.outerAmountN * D, double(r.outerMin))),
             .outerOpacity     = r.outerOpacity,
-            .blurRadius       = float(clampedLinear(D, r.blurD0, r.blurD1, r.blurLo, r.blurHi)),
+            .blurRadius       = r.blurRadius,
             // never shallower than dist1, or the first ramp would run backwards
             .blurDist0     = float(std::min(r.blurDist0N * D + r.blurDist0Fixed, double(r.blurDist1) - 0.5)),
             .blurAlpha     = {r.blurAlpha[0] * ramp, r.blurAlpha[1] * ramp, r.blurAlpha[2]},
@@ -249,16 +249,13 @@ namespace lg {
             }
             const auto& bf    = res.blurFill;
             const bool  fills = bf.lighten > 0 || bf.darken > 0 || bf.normal > 0;
-            res.backdropScale = backdropScale(r.appleBlurRadius * res.blurAlpha[0], fills ? 8 : 0, bf.normal, res.fill.a);
+            res.backdropScale = backdropScale(r.blurRadius * res.blurAlpha[0], fills ? 8 : 0, bf.normal, res.fill.a);
         } else if (r.family == eFamily::CLEAR) {
-            // ClearDiffusionAmount (0x195efeb9c): below 0.5 the blur radius x 2a (sharp at 0), above a blur fill of
-            // radius 8 with normal opacity 2a - 1
-            if (a < 0.5) {
-                const float b = float(2 * a);
-                res.blurRadius *= b;
-                for (auto& x : res.blurAlpha)
-                    x *= b;
-            } else if (a > 0.5)
+            // ClearDiffusionAmount (0x195efeb9c): below 0.5 the blur radius x 2a (sharp at 0; the opacities stay), above a
+            // blur fill of radius 8 with normal opacity 2a - 1
+            if (a < 0.5)
+                res.blurRadius *= float(2 * a);
+            else if (a > 0.5)
                 res.blurFill = {0, 0, float(2 * a - 1)};
         }
         return res;

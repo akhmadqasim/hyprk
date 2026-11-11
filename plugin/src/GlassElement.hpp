@@ -31,8 +31,8 @@ namespace lg {
 
         struct SUniforms {
             int tex, linearLight, uvTopLeft, uvBottomRight, quadSize, shapeCount, shapeBox, shapeInfo, smoothK, appearBlur, roundingPower, alpha;
-            int blurLod, refraction, refractionHeight, aberration, faceYcc;
-            int sharpTex, sharpUv, blurAlpha, blurDist, outerAmount, outerHeight, outerOpacity, outerThreshold;
+            int blurRadius, blurK, baseLevel, maxLevel, underlay, refraction, refractionHeight, aberration, faceYcc;
+            int blurAlpha, blurDist, outerAmount, outerHeight, outerOpacity, outerThreshold;
             int blurFill, bleedOpacity, bleedHeight, bleedAmount, bleedLod, bleedYcc, faceFill;
             int pxPerPt, keyYcc, keySpread, highlight, darkSpec;
             int shadowOpacity, shadowRadius, shadowOffset, shadowTint, shadowSaturation;
@@ -66,6 +66,7 @@ namespace lg {
         struct SData {
             std::vector<SGlassShape>       shapes; // monitor-local logical px
             double                         smoothK = 0;          // smooth-union reach (logical px), 0 = no merging
+            double                         underlay = 0;         // Apple blur radius (pt) of a layer under the glass on the Mac (CC panel)
             float                          alpha = 1.f;
             std::shared_ptr<const SParams> params;
             const SRecipe*                 recipe = &recipeByName("regular");
