@@ -48,11 +48,71 @@ pt larger until the spring lands on exactly 1, when it snaps (the measured "rims
 max channel change 185). A scratch copy of `shell/components/Glass.qml` that sets the shape rect from rounded mapped
 edges removed the pop (hand-off below).
 
+## Real app windows (Qt: Finder, Settings), 2026-11-11 follow-up
+
+Judge #2 measured "zoom of a Finder window 300 ms, rms 0.031 / 13 ms" (alpha metric). Reproduced with the real
+Finder (`finder/build/hyprk-finder` on a scratch tree) and Settings (`settings/run.sh`), each alone on the workspace,
+over a black backdrop. Metric `area`: the window rect per frame (edges of non-black samples), area share between the
+first and the last frame, so the client's content does not enter the number (the alpha metric reads a stretched or
+cropped picture as motion). Per-frame values: `motion-plugin.csv`, metric `area`.
+
+| Motion | Mac (R2) | Before | After | Note |
+|---|---|---|---|---|
+| Finder zoom | 267 ms | 0.006-0.009 / 1.8-2.5 ms, 267 ms | same | timing was never off; alpha metric 0.011-0.012 on black |
+| Finder unzoom | 267 ms | 0.122 / 38 ms, 300 ms; alpha 0.031 / 12 ms, 317 ms (= judge's numbers) | 0.005-0.007 / 1.7-1.8 ms, 267 ms; alpha 0.004-0.005 | config `render.expand_undersized_textures = false` |
+| Settings unzoom | 267 ms | 0.058 / 16 ms | 0.007 / 2.0 ms | same |
+| Settings zoom | 267 ms | 0.007 / 1.8 ms | 0.006 / 1.5 ms | |
+| Finder / Settings full screen enter | 350 ms (2-98 %) | 0.008 / 4.3 ms, 367 ms (Settings) | 0.007-0.008 / 2.8-4.0 ms, 350 ms | |
+| foot (control) zoom / unzoom | 267 ms | 0.007 / 2.1 ms, 0.007 / 1.7 ms | same | foot is not affected |
+
+Cause: not the client's commit timing. Wayland trace + a probe build of the plugin: Finder acks the shrink configure
+at once and commits correct-size buffers (1872x1188 at 2x) 2 and 12 ms after it; acked, reported and buffer sizes
+all agree from 8 ms on. Hyprland's `calculateUVForSurface` then sees a frame larger than the acked size and, with
+`render:expand_undersized_textures` on (default), draws the buffer 1:1 and stretches its last row and column over
+the rest ("expand edges"). Qt clients take that path because they set a fractional-scale viewport destination;
+foot (integer buffer scale) is "scale unaware" and is stretched. On screen: for the first 120-180 ms of an unzoom the
+new layout sat in the top-left corner with a white L of smeared edge pixels and the sidebar's bottom row dragged
+down. The same artefact shows with both hyprk plugins unloaded. With the option off the buffer is stretched to the
+animated frame, as for every other client. Growing frames (zoom, enter) are unchanged: Hyprland crops the new,
+larger buffer to the frame (not configurable), so the final layout is revealed from the top-left; AppKit relayouts
+every frame instead (live resize), which a compositor-driven animation cannot do without sending a configure per
+frame (not done).
+
+## Full screen REA (27.2.1 dyld cache and Dock, 2026-11-11)
+
+Decoded (addresses unslid; AppKit from the dyld cache, Dock arm64e; work files were in scratch, removed):
+- `NSFullScreenTransitionDuration`: read only by `__NSFullScreenTransitionDuration` (0x18a6a3de8), default 0.5 s
+  (`fmov d0,#0.5` 0x18a6a3e48), used only when the Dock's reply is NaN (0x18ae665d8 enter, 0x18ae2d3ac exit).
+- Dock replies 0.5 s to both requests (enter FUN_100130044, exit FUN_10011fa54; 2.5 s with `slow`); Split View
+  tiles 0.25 s.
+- AppKit `_NSFullScreenTransitionOverlayWindow`, enter (0x18a7a49ac / block 0x18a7a4e74) and exit (0x18a7a5160 /
+  0x18a7a5408) alike: the window frame goes from start to target on `functionWithControlPoints(0.25, 0, 0, 1)` over
+  the full duration (0x18a7a4f0c, 0x18a7a54a8); the after-contents layer fades in on (0, 1, 1, 1) over half of it
+  (0x18a7a5034, 0x18a7a5678). Reduce Motion: linear opacity cross-fade over the duration.
+- Dock Space slide (FUN_1000c27c8 from 0x10018b3bc enter and 0x10018c7dc exit, duration 0.5, flag 1): tick
+  FUN_1000c60f8 eases `p = 0.5 - 0.5 cos(pi t / T)`; outgoing desktop and the full-screen Space move together
+  (FUN_1000c52e0, offset p x (screen width + gap)).
+- Dock bar: each slide frame (FUN_1000c4df8 -> FUN_1000c5c70) interpolates the per-Space Dock visibility linearly
+  by that same p, so the Dock leaves and returns on the 0.5 s cosine.
+- Menu bar on exit: `_doSucceededToExitFullScreen` calls `startMenuBarAnimation:` with the Dock's 0.5 s
+  (0x18ae2ca54..5c), at the start of the transition. On enter AppKit only sets the presentation options;
+  `+[NSMenuBarPresentationInstance _transitionDuration]` defaults to 0.15 s (0x18b00a964, constant 0x18b7eea18).
+- `WASpaceFrameAnimation` (vtable 0x1002cccf0) is only built from FUN_1001cfefc, no caller on the full-screen paths
+  found: most likely Split View (medium confidence).
+
+Checks: (0.25, 0, 0, 1) over 0.5 s at 60 Hz is 0.01 0.03 0.09 0.20 0.33 0.45 0.54 0.61 0.67 0.72 0.76 0.79 ...;
+the R2 enter recording is 0.01 0.03 0.07 0.14 0.24 0.33 0.45 0.59 0.67 0.72 0.77 0.81 ..., the same curve within
+1-2 frames in the middle. Enter keeps the recorded series. Exit had no series: it now plays the decoded curve
+(c65308a). Settings exit (area): vs the decoded curve 0.168 / 148 ms -> 0.014 / 7.8 ms (2-98 % 366 vs 383 ms);
+vs the old R2 anchors (0.47 at 150 ms, held to 300 ms) 0.044 -> 0.25.
+**Conflict, not settled:** no hold or second phase exists in AppKit or Dock code, yet the R2 recording describes
+the exit "in two steps" with a 0.15 s hold. Not explained by the code read; possibly the share-of-change metric
+mixing the cosine slide, the cross-fade and the window, or a wait between the Dock's reply and the animation. A
+60 fps per-frame recording of a full screen exit on the Mac would settle it.
+
 ## Not derived from Apple data
 
-- Full screen exit: only the R2 description exists (0.15 s to 0.47, 0.15 s hold, 0.3 s); the curve inside each
-  step is not in the data. Both steps use ease-in-out (0.42, 0, 0.58, 1). What moves in each step on the Mac
-  (window, Space, desktop) is not recorded either; here the window does both steps.
+- Inferred, not traced: the menu bar's enter timing (0.15 s default above).
 - The Space slide (desktop out to the left, black Space in from the right): a black Space sliding in behind the
   window over a still desktop was built and measured; it made the match worse (enter 0.056 / 41 ms, exit 0.16 vs
   0.033 / 17 ms and 0.048 without), because the Mac's desktop moves away instead of being covered. It was removed.
@@ -63,5 +123,10 @@ edges removed the pop (hand-off below).
 ## Remaining
 
 - Full screen enter frame 1: the menu bar, Dock and title bar vanish at once (0.10 of the change in one frame, Mac
-  0.01); exit frame 1 shows them at once (0.12). Hyprland hides the top layers for a fullscreen workspace.
+  0.01); exit frame 1 shows them at once (0.12). Hyprland hides the top layers for a fullscreen workspace
+  (`CLayerSurface::isHiddenByFullscreen`, binary) and the shell hides the Dock on `hasFullscreen`
+  (`shell/modules/Dock.qml` `shown`). Decoded targets for the shell (hand-off): Dock out/in on the Space slide's
+  0.5 s cosine `0.5 - 0.5 cos(pi t / 0.5)`; menu bar out on enter over 0.15 s (default, inferred), back on exit over
+  0.5 s starting with the transition. Both need the layers to stay drawn while they fade: a shell-side fade before
+  the fullscreen state lands, or a plugin hook on `isHiddenByFullscreen` for the length of the run (not done).
 - The full-screen window covers the menu-bar strip; on the notched Mac it sits below a black 34 pt strip (Q-menubar-33).
