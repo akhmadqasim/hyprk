@@ -21,6 +21,9 @@ Item {
     property color tint: Theme.glass.tint
     property color solidColor: Theme.glass.solid
     property bool shadow: true
+    // the Dock label's pointer marker: a 1x1 hole at (left + 1, top) that the plugin turns into Apple's pointer shape
+    // (plugin/README.md "Dock label pointer"); the materialize and shadow holes are left out, the plugin reads neither
+    property bool pointer: false
     // tint drawn on top of the plugin's glass (the plugin owns blur, rim, shadow)
     // default: none, the plugin's recipes carry Apple's probe values themselves (a dark-mode veil made dark menus
     // read 62 over white instead of the Mac's 120)
@@ -44,6 +47,7 @@ Item {
         // shadow: false: a 1x1 hole one row below the middle row, centre column; the plugin then gives this shape
         // _Glass.regular's drop shadow for its size instead of the layer recipe's (plugin 53efda0)
         Region { id: shadowHole; intersection: Intersection.Subtract; width: 0; height: 1 }
+        Region { id: pointerHole; intersection: Intersection.Subtract; width: 0; height: 1 }
     }
     function remeasure() { placeHole(); }
     // the shape and its marker holes from one rounded rect: corners rounded to whole points
@@ -57,8 +61,11 @@ Item {
         shape.height = Math.max(0, h);
         shadowHole.x = px + Math.floor(w / 2);
         shadowHole.y = py + Math.floor(h / 2) + 1;
-        shadowHole.width = (!root.shadow && root.on && w >= 4 && h >= 3) ? 1 : 0;
-        if (materialize >= 1 || !root.on || w < 4 || h < 2) {
+        shadowHole.width = (!root.shadow && !root.pointer && root.on && w >= 4 && h >= 3) ? 1 : 0;
+        pointerHole.x = px + 1;
+        pointerHole.y = py;
+        pointerHole.width = (root.pointer && root.on && w >= 3) ? 1 : 0;
+        if (materialize >= 1 || root.pointer || !root.on || w < 4 || h < 2) {
             hole.width = 0;
             return;
         }
@@ -72,6 +79,7 @@ Item {
     onXChanged: placeHole()
     onYChanged: placeHole()
     onShadowChanged: placeHole()
+    onPointerChanged: placeHole()
     onWidthChanged: placeHole()
     onHeightChanged: placeHole()
     // re-measure every frame for a while (call when this glass starts to move or scale)
