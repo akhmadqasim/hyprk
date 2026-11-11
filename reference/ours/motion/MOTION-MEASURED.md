@@ -438,3 +438,95 @@ the unmodified tree's session showed none while this one did (Control Center clo
 of 16 against 10 of 16). The GUI thread's ticks were then 26-30 ms apart although the tick itself took under 6 ms;
 what delays the frame callback there is not traced. (2) Inside the Dock's glass Mission Control still shows the real
 window under the Dock.
+
+## Session 12 (2026-11-11): the frame gaps are the compositor's, not the port's; old against new back to back
+
+Question from session 11: under load the tree on the frame clock showed runs with a presentation interval over 25 ms
+where the tree at 7176610 showed none (Control Center close 12 of 20 against 0 of 20). Answer: that comparison measured
+two compositor instances, not two trees. With both trees captured at the same time, in sessions of the same age and
+with the trees swapped between the sessions, the gap runs are the same within the sampling noise. No piece of the port
+was dropped and `FrameClock` is unchanged.
+
+Method. Two own headless sessions (MBA 2560x1664), each Hyprland started by its own command and each shell restarted
+the same way; `old` = shell/ and ui/ of 7176610, `new` = HEAD, both on the same plugin build. A row is captured in
+both sessions at the same moment (mcap, one reference frame, region 240 x 240 pt or the surface), then the trees are
+swapped between the sessions and the row is run again: 10 + 10 runs per tree. A run counts as a gap run when an
+interval between two presented frames inside the motion is over 25 ms (second number: over 31 ms, a whole missed
+refresh); frames = presented frames from the first value over .01 to the first at .985 or more. Load: busy loops, at
+first on the whole machine, then (the user was working on the host) the sessions and 6 loops at nice 19 pinned to
+cores 12-15. The regions hold more than session 11's (the dim, the menu bar title), so the values differ from that
+table; old and new are read from the same regions.
+
+| Motion | scale 2, quiet: old | new | scale 2, pinned load: old | new | scale 1.6, pinned, no loops: old | new | scale 1.6, pinned load: old | new |
+|---|---|---|---|---|---|---|---|---|
+| Control Center open | 4 / 1 of 20, 15.2 frames | 5 / 1 of 20, 15.6 | 14 / 9 of 20, 12.6 | 12 / 8 of 20, 14.4 | 9 / 9 of 20, 13.6 | 11 / 7 of 20, 14.6 | 18 / 17 of 20, 9.5 | 20 / 20 of 20, 10.3 |
+| Control Center close | 0 / 0 of 20, 14.9 | 0 / 0 of 20, 14.9 | 5 / 5 of 20, 14.0 | 7 / 6 of 20, 14.0 | 4 / 3 of 20, 13.8 | 6 / 6 of 20, 13.2 | 19 / 18 of 20, 9.3 | 20 / 20 of 20, 9.7 |
+| Notification Center open | 0 / 0 of 20, 20.6 | 0 / 0 of 20, 22.3 | 7 / 5 of 20, 19.9 | 11 / 7 of 20, 20.2 | 15 / 12 of 20, 19.1 | 15 / 12 of 20, 20.0 | 20 / 20 of 20, 12.3 | 20 / 18 of 20, 12.4 |
+| Notification Center close | 0 / 0 of 20, 9.6 | 0 / 0 of 20, 10.0 | 11 / 8 of 20, 8.3 | 5 / 3 of 20, 9.8 | 8 / 6 of 20, 8.4 | 12 / 9 of 20, 8.5 | 17 / 16 of 20, 6.2 | 20 / 20 of 20, 6.3 |
+| Menu fade | 0 / 0 of 20, 9.8 | 0 / 0 of 20, 9.9 | 0 / 0 of 20, 9.8 | 2 / 1 of 20, 9.8 | 1 / 1 of 20, 9.7 | 1 / 0 of 20, 9.3 | 16 / 15 of 20, 8.0 | 14 / 9 of 20, 8.7 |
+| HUD appear | 3 / 2 of 20, 33.0 | 5 / 0 of 20, 33.6 | 7 / 2 of 20, 32.6 | 4 / 2 of 20, 32.6 | 9 / 6 of 20, 34.1 | 6 / 5 of 20, 34.0 | 20 / 19 of 20, 27.7 | 20 / 20 of 20, 26.4 |
+| Banner in | 0 / 0 of 20, 19.6 | 5 / 2 of 20, 18.8 | 7 / 3 of 20, 19.9 | 8 / 5 of 20, 17.8 | 2 / 1 of 20, 20.2 | 5 / 4 of 20, 18.4 | 19 / 19 of 20, 16.9 | 19 / 19 of 20, 15.0 |
+| All seven (140 runs per tree) | 7 / 3 | 15 / 3 | 51 / 32 | 49 / 32 | 48 / 38 | 56 / 43 | 129 / 124 | 133 / 126 |
+
+(cells: runs with an interval over 25 ms / over 31 ms, of the runs, mean frames per run.) Whole machine, 18 loops on 16
+cores, scale 2 (stopped half way at the user's request): 76 of 82 old, 78 of 82 new, frames per run 7.5-25.2 old against
+7.4-25.9 new. Whole machine, 24 loops, Control Center close, three sessions with the trees rotated through all of
+them: 10.7 frames per run old, 10.2 new. The quiet columns were taken in sessions 20 to 60 minutes old, which adds gaps
+of its own (below); the five gap runs of new's banner and HUD rows at scale 2 fell while a test suite ran on the
+host. In sessions a few minutes old on a quiet host: 0 gap runs in 70 (7 rows x 5 runs x 2 trees), the same series in
+4-5 of 5 runs for new in Control Center open / close, menu fade, HUD appear, banner in (old: 2-4 of 5); per-frame
+series in the CSV (`*-s12-new-run*`, `*-s12-old-run*`).
+
+What the gaps are (second method, the shell's own Wayland trace, WAYLAND_DEBUG=client plus qt.scenegraph.time.renderloop,
+both trees under the pinned load, 5 closes each): the panel surface's commits are 20 to 45 ms apart in both trees and
+mcap's long intervals of the same runs are 31 to 59 ms, so a gap is a refresh at which that surface had no new buffer,
+not a frame the capture missed. The commit follows the frame callback that released it by 1-7 ms on the frame clock
+(typically 3-4) and by 0-5 ms in the old tree (typically 2): the tick sits between the callback and the commit, but it
+is 1-2 ms of a 16.7 ms period. The callbacks themselves come 20 to 45 ms apart: the time goes between a commit and the
+compositor's next frame, inside Hyprland. Tried against it and dropped: running the next frame's tick when the frame
+before has been swapped, so that nothing but the scene sync is left after the callback. Under 24 loops it showed 8.5
+frames per run against 10.2 for HEAD and 10.7 for the old tree (three sessions, trees rotated).
+
+Why two sessions differ: a compositor that has run for a while costs more per frame. Same tree (HEAD), same quiet host,
+captured at the same moment, Control Center close: a Hyprland 65 minutes old (about 2,000 captures, a dozen shell
+restarts, scale switches, the load tests) 7 of 8 gap runs and 1,445 ms of compositor CPU per run; one started a minute
+before 0 of 8, the same series in 8 of 8, 258 ms per run. For four Control Center open / close without any capture:
+4,000-4,750 ms of main-thread CPU against 1,100-2,000 ms, with 7,392 minor page faults against 0, the same number of
+syscalls and of frames (255 against 265), and the pango thread at 130 ms against 10 ms. It stays with both plugins
+unloaded (4,670 against 1,510 ms), so it is in Hyprland 0.57 or aquamarine's headless backend, not in liquidglass,
+hyprkmotion or the shell (the shell's CPU was lower in the old session). Not found: what makes it grow. Tried on a
+fresh session without effect: 80 Control Center toggles, 500 captures, 30 HUD + banner + menu rounds, 3 scale round
+trips, 3 shell restarts. Not tried: an hour of plain uptime, the load tests themselves. perf is not usable on this host
+(perf_event_paranoid 4) and gdb cannot attach (ptrace_scope 1). Session 11's "old" session was the younger one.
+Not from the scheduler: sessions started from one command share an autogroup, but a compositor alone in its group, two
+sharing one, and one set to nice 19 gave the same counts under 10, 18 and 24 loops.
+
+Consequence for measuring: compare trees only at the same time in sessions of the same age, swap the trees, and start
+new sessions for a long batch.
+
+Other rows, old against new at the same time, scale 2, quiet, sessions a few minutes old (8 runs each unless said):
+
+| Motion | old | new |
+|---|---|---|
+| HUD dismiss | 20.5 frames, 314-333 ms; the last step jumps .975 -> 1 | 16.9 frames, 252-267 ms to .985, no jump at the end (.19 .37 .51 .62 .70 .76 .81 .85 .88 .90 .92 .94 .95 .96 .97; old .19 .36 .51 .61 .68 .74 .79 .84 .86 .89) |
+| Banner out | 7 frames, 100 ms, .27 .55 .75 .89 .95 .98 .99 in 7 of 8 | 8 frames, 116-117 ms, .28 .56 .55 .76 .89 .95 .98 .99 in 6 of 8: the second value twice. In a second batch of 3: .28 .56 .77 .89 .95 .98 .99. Open: where the repeated frame comes from (the leave spring ticked 9 times, .0167 to .15 s, the first three within 6 ms: Qt builds them back to back after idle) |
+| Notification Center push (a second app's card while the panel is open) | 26 frames, 416-437 ms, 2 of 8 the same series | 27 frames, 419-450 ms, 6 of 8 the same series (.15 .29 .42 .52 .64 .69 .76 .80 .82 .85 .89 .91) |
+| Notification Center clear all, Apps open / close (`apps open`, read on the bar and on the panel) | one frame, 16 of 16 | one frame, 16 of 16 |
+
+Not measured: Dock autohide, slot grow / shrink, drag-off, submenu delay, bar peek, lock / unlock, and the motions left
+on Qt's timer (RubberBand, the lock's minute change and shake, Switch / Slider).
+
+Traced:
+
+- Menu fade at scale 1.6, "second value .42": not reproduced. A region inside the menu body reads .14 .28 .41 .53 .64 .74
+  .83 .90 .95 at scale 2 (5 of 6) and .14 .27 .40 .52 .63 .73 .82 .89 .95 at 1.6 (6 of 6). `mcap.py sub()` took every
+  output for 2x until aa90d3e, so a sub-rectangle at 1.6 was 1.25 times off; which reading session 11 used is not noted.
+- The 1x1 Control Center tile "64 x 63 pt": not a rounding at 1.6. Qt's ellipse region leaves the top row of a full
+  circle empty, so the plugin decoded the round buttons as box 64 x 63, r 31.5, one point down, at scale 2 as well
+  (`hyprctl liquidglass trace hyprk-controlcenter`). Glass now adds two cells in that row (83a7288): 64 x 64, r 32 at
+  both scales; on screen the Display button's rim spans 126 -> 128 px vertically at scale 2 (130 horizontally) and
+  101 -> 103 px at 1.6 (102 horizontally).
+- Appearance switch: on the shell's shortcut (`hyprk:appearance-*`) the bindings take 8-20 ms and all four windows have
+  built their restyled frame within 10-24 ms (6 switches, quiet host; no image is reloaded, the render pass of those
+  frames reads 0 ms). The 234-526 ms of MOTION-PLUGIN's loaded runs were taken while this session's whole-machine loops
+  ran: the same stall as the gaps above, not a step of the restyle.
