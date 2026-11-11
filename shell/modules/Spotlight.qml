@@ -147,7 +147,8 @@ ShellWindow {
     // unfolds downward in about 0.18 s, ease-in-out (Q-panels-26); gone at once when text is typed
     property real unfold: below === "modes" ? 1 : 0
     Behavior on unfold {
-        enabled: sp.below === "modes" && !A11y.reduceMotion
+        // not on `below`: unfold's own binding could run before this one, and the list then came in one frame (mcap)
+        enabled: sp.query === "" && sp.mode === "" && !A11y.reduceMotion
         NumberAnimation { duration: Theme.spotlight.unfoldMs; easing.type: Easing.InOutSine }
     }
     onBelowChanged: settleGlass(Theme.spotlight.unfoldMs + 50)
