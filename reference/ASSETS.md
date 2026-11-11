@@ -314,6 +314,18 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
 - Not extracted: the standard arrow at normal size is not in HIServices. It is in `SkyLight.framework/Versions/A/Resources/CursorAsset` (16 MB Mach-O, raw pixel data in `__TEXT.__const`, no PNG/PDF signature, format not reverse engineered). Use `default-pointer-*.png` from accessibility as the arrow.
 - No Xcursor theme was built. Hotspots are in the `info.plist` files.
 
+## settings/assets/ and shell/assets/
+
+- `settings/assets/glass-preview/{apple-park,architecture,pond,rainbow}.jpg`: the four photos of the Appearance pane's
+  Liquid Glass preview, from `AppearancePreferencesFramework.framework` 27.2.1 `Assets.car` (GlassStylePreviewView),
+  804 px wide JPEGs, Display P3 converted to sRGB (commit 6bb37d8).
+- `settings/controls/sfpaths.js`: SF Symbols outlines used by Settings only, decoded from SF Pro: the preview's
+  `square.and.arrow.up`, `ellipsis`, `square.on.square`, `magnifyingglass`, `capsule.on.rectangle.liquid.glass`,
+  `capsule.on.rectangle.fill`, and `chevron.backward` / `chevron.forward` of the toolbar (commit 7ee8a39). Not registered in the theme's
+  symbol set under `themes/icons/`: that folder was being rebuilt when this was written.
+- `shell/assets/sRGB.icc`: not Apple's. LittleCMS's built-in sRGB profile (588 bytes, written with PIL
+  `ImageCms.createProfile("sRGB")`), used by `shell/scripts/wallpaper.sh` to convert profiled wallpapers to sRGB.
+
 ## What failed or was skipped (summary)
 
 `.madesktop` wallpapers, arrow cursor from CursorAsset, Xcursor packaging, static SF font instances.
