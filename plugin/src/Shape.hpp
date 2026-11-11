@@ -56,6 +56,14 @@ namespace lg {
     // round(m * (w - 3)). It arrives as two 1 px tall rects of the same cluster 1 px apart and sets
     // SGlassShape::materialize = m; shapes without one stay at 1. The same kind of gap one row lower
     // (y = top + floor(h / 2) + 1, x = left + floor(w / 2)) sets SGlassShape::regularShadow.
+    // Sub-point edges (Glass.qml, for glass that scales): a region is whole logical px, so a shape scaling about its
+    // centre grew in 1 pt steps per edge (HUD appear: the last step lit the final rim rows in one frame, alpha 0.55 ->
+    // 0.76). Two more 1x1 holes carry where the true edges lie: row mid - FRACTION_ROW_X for left / right, row mid -
+    // FRACTION_ROW_Y for top / bottom, at x = centre - floor(n^2 / 2) + i1 n + i2 (centre = left + floor(w / 2), n =
+    // fractionLevels(w)), i = round((d + 0.5)(n - 1)), d = true edge - region edge in [-0.5, 0.5]. Both or none; only
+    // for shapes at least FRACTION_MIN_H tall. The box then takes the true edges.
+    inline constexpr int FRACTION_ROW_X = 4, FRACTION_ROW_Y = 5, FRACTION_MIN_H = 12, FRACTION_MAX_LEVELS = 17;
+    int fractionLevels(double w);
     std::vector<SGlassShape> clusterRegion(const std::vector<SRect>& rects);
 
     // A pointer shape has no materialize hole (its marker is a hole of its own): it takes the materialize of the largest

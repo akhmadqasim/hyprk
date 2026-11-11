@@ -70,6 +70,14 @@ x = left + 1 + round(m (w - 3)) (shell/components/Glass.qml `materialize`). Shap
 The older window-wide opacity marker (1x1 rect in the surface's bottom row, x = opacity x (W - 1)) is still
 read and still fades the whole layer.
 
+Sub-point edges: a region is whole logical px, so glass that scales (HUD appear 0.9 -> 1, Control Center modules) grew in
+1 pt steps per edge, and the last step lit the final rim rows in one frame (HUD alpha 0.55 -> 0.76, judge #3). Two more
+1x1 holes carry the true edges: row mid - 4 for left / right, row mid - 5 for top / bottom, at
+x = centre - floor(n^2 / 2) + i1 n + i2 with centre = left + floor(w / 2), n = min(17, floor(sqrt(w - 3))),
+i = round((d + 0.5)(n - 1)) and d = true edge - region edge in [-0.5, 0.5] (1/16 pt steps on wide shapes). Both rows or
+none, shapes at least 12 pt tall; a capsule or circle then takes half its true size as radius. Without them the box stays
+whole points.
+
 Merging: SwiftUI passes `GlassEffectContainer(spacing:)` (default 8 pt) straight to `CASDFLayer.smoothness`,
 and QuartzCore unions the element SDFs with a normal-aware polynomial smooth min: `k' = k (0.5 - 0.5 nA.nB)`,
 `h = sat(0.5 + 0.5 (dB - dA) / k')`, `d = mix(dB, dA, h) - k' h (1 - h)`, `n = mix(nB, nA, h)` (facing edges

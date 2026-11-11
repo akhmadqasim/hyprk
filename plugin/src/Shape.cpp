@@ -41,6 +41,17 @@ namespace lg {
         }
     }
 
+    // a rasterised quarter circle reaches the edge sqrt(r) rows early (inset < 0.5px):
+    // stair = r - sqrt(r)  =>  r = ((1 + sqrt(1 + 4 stair)) / 2)^2
+    static double stairRadius(double stair) {
+        const double root = (1.0 + std::sqrt(1.0 + 4.0 * std::max(stair, 0.0))) / 2.0;
+        return stair > 0 ? root * root : stair;
+    }
+
+    int fractionLevels(double w) {
+        return std::clamp(int(std::floor(std::sqrt(std::max(w - 3, 0.0)))), 0, FRACTION_MAX_LEVELS);
+    }
+
     std::vector<SGlassShape> clusterRegion(const std::vector<SRect>& rects) {
         const size_t n = rects.size();
         SDisjointSet set(n);
@@ -100,6 +111,7 @@ namespace lg {
                     holes[slot[find(i)]].push_back({a.x, y, a.w, 1});
             }
         }
+        std::vector<char> roundEnds(out.size(), 0); // a capsule or circle with sub-point edges: radius = half its true size
         for (size_t s = 0; s < out.size(); ++s) {
             auto& found = holes[s];
             if (found.empty())
@@ -121,6 +133,29 @@ namespace lg {
                 continue;
             const double mid    = shape.box.y + std::floor(shape.box.h / 2);
             const double centre = shape.box.x + std::floor(shape.box.w / 2);
+            // sub-point edges (Shape.hpp FRACTION_*): read and taken out before the marker holes, applied after them
+            const int    n      = fractionLevels(shape.box.w);
+            double       edge[4] = {0, 0, 0, 0}; // left, right, top, bottom: true edge - region edge
+            int          edges   = 0;
+            if (n >= 2 && shape.box.h >= FRACTION_MIN_H) {
+                const double base = centre - std::floor(n * n / 2.0);
+                std::erase_if(found, [&](const SRect& a) {
+                    const int axis = a.y == mid - FRACTION_ROW_X ? 0 : a.y == mid - FRACTION_ROW_Y ? 1 : -1;
+                    const int code = int(a.right() - base);
+                    if (axis < 0 || code < 0 || code >= n * n)
+                        return false;
+                    edge[2 * axis]     = double(code / n) / (n - 1) - 0.5;
+                    edge[2 * axis + 1] = double(code % n) / (n - 1) - 0.5;
+                    edges |= 1 << axis;
+                    return true;
+                });
+            }
+            const auto applyEdges = [&] {
+                if (edges != 3)
+                    return;
+                roundEnds[s] = shape.radius >= 0 && stairRadius(shape.radius) >= std::min(shape.box.w, shape.box.h) / 2 - 0.5;
+                shape.box = {shape.box.x + edge[0], shape.box.y + edge[2], shape.box.w + edge[1] - edge[0], shape.box.h + edge[3] - edge[2]};
+            };
             const auto   setMaterialize = [&shape](const SRect& a) {
                 if (shape.box.w > 3)
                     shape.materialize = std::clamp((a.right() - shape.box.x - 1) / (shape.box.w - 3), 0.0, 1.0);
@@ -140,18 +175,16 @@ namespace lg {
                 else
                     setMaterialize(found[0]);
             }
+            applyEdges();
         }
 
-        for (auto& s : out) {
+        for (size_t i = 0; i < out.size(); ++i) {
+            auto& s = out[i];
             if (s.pointer)
                 continue; // its radius is Apple's, not read from the region
-            // a rasterised quarter circle reaches the edge sqrt(r) rows early (inset < 0.5px):
-            // stair = r - sqrt(r)  =>  r = ((1 + sqrt(1 + 4 stair)) / 2)^2
-            if (s.radius > 0) {
-                const double root = (1.0 + std::sqrt(1.0 + 4.0 * s.radius)) / 2.0;
-                s.radius          = root * root;
-            }
-            s.radius = std::clamp(s.radius, 0.0, std::min(s.box.w, s.box.h) / 2.0);
+            if (s.radius > 0)
+                s.radius = stairRadius(s.radius);
+            s.radius = roundEnds[i] ? std::min(s.box.w, s.box.h) / 2.0 : std::clamp(s.radius, 0.0, std::min(s.box.w, s.box.h) / 2.0);
         }
 
         return out;

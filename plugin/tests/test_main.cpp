@@ -301,6 +301,48 @@ int main() {
         CHECK(s.size() == 1 && !s[0].regularShadow && near(s[0].materialize, 90.0 / 117.0));
     }
 
+    // sub-point edges (HUD appear: a capsule scaled about its centre, region 303 x 64 at 965,45, true edges 964.7 / 1268.2 /
+    // 44.6 / 109.4): two more holes, rows mid - 4 (left / right) and mid - 5 (top / bottom), with a shadow hole and a
+    // materialize hole; a lone code row is ignored, and a capsule's radius follows its true height
+    {
+        const double x = 965, y = 45, w = 303, h = 64, mid = y + 32, centre = x + 151;
+        const int    n = fractionLevels(w); // 17
+        CHECK(n == 17);
+        auto q      = [](double d, int levels = 17) { return int(std::lround((d + 0.5) * (levels - 1))); };
+        auto holeAt = [](std::vector<SRect>& rows, double ry, double hx) {
+            for (size_t i = 0; i < rows.size(); ++i)
+                if (rows[i].y == ry && rows[i].x < hx && rows[i].right() > hx + 1) {
+                    const SRect r = rows[i];
+                    rows[i].w     = hx - r.x;
+                    rows.push_back({hx + 1, r.y, r.right() - hx - 1, 1});
+                    return;
+                }
+        };
+        const double base = centre - std::floor(n * n / 2.0);
+        auto         rows = roundedRows(x, y, w, h, 32);
+        holeAt(rows, mid - FRACTION_ROW_X, base + q(-0.3) * n + q(0.2));
+        holeAt(rows, mid - FRACTION_ROW_Y, base + q(-0.4) * n + q(0.4));
+        holeAt(rows, mid + 1, centre);                    // shadow
+        holeAt(rows, mid, x + 1 + std::round(0.6 * (w - 3))); // materialize 0.6
+        auto s = clusterRegion(rows);
+        CHECK(s.size() == 1 && s[0].regularShadow && near(s[0].materialize, std::round(0.6 * 300) / 300));
+        CHECK(near(s[0].box.x, x - 0.3125, 1e-9) && near(s[0].box.right(), x + w + 0.1875, 1e-9));
+        CHECK(near(s[0].box.y, y - 0.375, 1e-9) && near(s[0].box.bottom(), y + h + 0.375, 1e-9));
+        CHECK(near(s[0].radius, s[0].box.h / 2, 1e-9));
+        // only the x row: ignored, the box stays whole points
+        rows = roundedRows(x, y, w, h, 32);
+        holeAt(rows, mid - FRACTION_ROW_X, base + q(-0.3) * n + q(0.2));
+        s = clusterRegion(rows);
+        CHECK(s.size() == 1 && near(s[0].box.x, x) && near(s[0].box.w, w) && near(s[0].materialize, 1) && !s[0].regularShadow);
+        // a plain card keeps its read radius
+        rows = roundedRows(0, 0, 200, 100, 16);
+        const int n2 = fractionLevels(200);
+        holeAt(rows, 50 - FRACTION_ROW_X, 100 - std::floor(n2 * n2 / 2.0) + q(0.5, n2) * n2 + q(0.5, n2));
+        holeAt(rows, 50 - FRACTION_ROW_Y, 100 - std::floor(n2 * n2 / 2.0) + q(-0.5, n2) * n2 + q(-0.5, n2));
+        s = clusterRegion(rows);
+        CHECK(s.size() == 1 && near(s[0].box.x, 0.5) && near(s[0].box.w, 200) && near(s[0].box.y, -0.5) && std::abs(s[0].radius - 16) <= 3);
+    }
+
     // groups: shapes closer than k share one smooth-union group, lead = largest area
     {
         std::vector<SGlassShape> s = {{{0, 0, 64, 64}, 16}, {{76, 0, 64, 64}, 16}, {{0, 76, 140, 64}, 16}, {{400, 0, 20, 20}, 4}};
