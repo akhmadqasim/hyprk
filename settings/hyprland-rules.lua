@@ -10,8 +10,8 @@ local function settingsRule(name, match)
         match       = match,
         float       = true,
         center      = true,
-        size        = "745 630",
-        min_size    = "680 420",
+        size        = "740 625",   -- the Mac's window (MAC-ANSWERS Q-settings-03); 745 x 630 put the content on half points
+        min_size    = "740 470",   -- Theme.window.minWidth / minHeight: the width is fixed
         -- corner, rim and shadow: the global window chrome in config/hypr/hyprland.lua (MAC-ANSWERS.md
         -- Q-windows-01..03); the app's own 16 pt corner lies inside the compositor's.
         -- blur stays on: the translucent sidebar is the glass.
