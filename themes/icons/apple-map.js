@@ -227,6 +227,8 @@ const exact = {
     "screenshot": "Screenshot",
     "user-trash": "@TrashIcon",
     "user-trash-full": "@FullTrashIcon",
+    "dock-trash": "@DockTrash",
+    "dock-trash-full": "@DockTrashFull",
     "folder-download": "@DownloadsFolder"
 };
 const bySegment = {
@@ -417,6 +419,8 @@ const bySegment = {
     "reminders": "Reminders",
     "user-trash": "@TrashIcon",
     "user-trash-full": "@FullTrashIcon",
+    "dock-trash": "@DockTrash",
+    "dock-trash-full": "@DockTrashFull",
     "folder-download": "@DownloadsFolder"
 };
 
@@ -439,8 +443,12 @@ function lookup(names) {
     return "";
 }
 
+// The Dock's own Trash (Dock.app's bitmaps, tools/build-trash.py): 256 px, one file per icon style
+const dockArt = { "@DockTrash": true, "@DockTrashFull": true };
+
 // File of a mapped icon relative to themes/icons, e.g. "apps/Safari-512.png"
 function file(mac, px) {
+    if (dockArt[mac]) return "system/" + mac.slice(1) + "-256.png";
     return mac ? (mac[0] === "@" ? "system/" + mac.slice(1) : "apps/" + mac) + "-" + (px || 512) + ".png" : "";
 }
 
@@ -449,13 +457,21 @@ function file(mac, px) {
 // "apps/Safari-256-tinted-light.png". tools/build-styles.py builds dark-dark, clear-light / -dark and
 // tinted-light / -dark (256 px); a mode that was not built falls back to the built one. Default (or Dark + Auto
 // in light mode), unknown styles and system icons ("@...") give the Default file: the Mac's Dark-style Dock keeps
-// the Downloads stack and the Trash in colour (reference/screens/27.2.1/dock/dock-dark.png).
+// the Downloads stack in colour (reference/screens/27.2.1/dock/dock-dark.png).
+// The Dock's Trash follows the style as Dock.app picks its bitmaps (27.2.1, function 0x1000090ac): the full Trash
+// has a Clear and a Tinted bitmap per mode; Dark, and the empty Trash in every style, are the plain light or dark
+// one ("system/DockTrashFull-256-clear-dark.png", "system/DockTrash-256-dark-dark.png").
 const styledModes = { dark: ["dark"], clear: ["light", "dark"], tinted: ["light", "dark"] };
 function styled(mac, style, variant, dark) {
     const modes = styledModes[style];
-    if (!mac || mac[0] === "@" || !modes) return file(mac);
+    if (!mac || (mac[0] === "@" && !dockArt[mac]) || !modes) return file(mac);
     const auto = !variant || variant === "auto";
     if (style === "dark" && auto && !dark) return file(mac);
     const want = style === "dark" ? "dark" : auto ? (dark ? "dark" : "light") : variant;
+    if (dockArt[mac]) {
+        const mode = want === "dark" ? "dark" : "light";
+        if (mac === "@DockTrashFull" && style !== "dark") return "system/DockTrashFull-256-" + style + "-" + mode + ".png";
+        return mode === "dark" ? "system/" + mac.slice(1) + "-256-dark-dark.png" : file(mac);
+    }
     return "apps/" + mac + "-256-" + style + "-" + (modes.indexOf(want) >= 0 ? want : modes[0]) + ".png";
 }

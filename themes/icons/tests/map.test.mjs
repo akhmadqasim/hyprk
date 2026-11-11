@@ -52,6 +52,23 @@ test("styled: icon style renditions, mode fallback, Default cases", () => {
     assert.equal(M.styled("", "dark", "dark", true), "");
 });
 
+test("the Dock's Trash follows the icon style as Dock.app picks it", () => {
+    assert.equal(M.lookup("dock-trash"), "@DockTrash");
+    assert.equal(M.file("@DockTrashFull"), "system/DockTrashFull-256.png");
+    assert.equal(M.styled("@DockTrash", "default", "auto", true), "system/DockTrash-256.png");
+    assert.equal(M.styled("@DockTrash", "dark", "auto", true), "system/DockTrash-256-dark-dark.png");
+    assert.equal(M.styled("@DockTrash", "dark", "auto", false), "system/DockTrash-256.png");
+    assert.equal(M.styled("@DockTrash", "clear", "auto", true), "system/DockTrash-256-dark-dark.png");   // no Clear empty Trash
+    assert.equal(M.styled("@DockTrash", "tinted", "light", true), "system/DockTrash-256.png");
+    assert.equal(M.styled("@DockTrashFull", "dark", "dark", false), "system/DockTrashFull-256-dark-dark.png");
+    assert.equal(M.styled("@DockTrashFull", "clear", "light", true), "system/DockTrashFull-256-clear-light.png");
+    assert.equal(M.styled("@DockTrashFull", "tinted", "auto", true), "system/DockTrashFull-256-tinted-dark.png");
+    for (const mac of ["@DockTrash", "@DockTrashFull"])
+        for (const style of ["default", "dark", "clear", "tinted"])
+            for (const variant of ["light", "dark"])
+                assert.ok(existsSync(join(icons, M.styled(mac, style, variant, false))), mac + " " + style + " " + variant);
+});
+
 test("every app icon has its style renditions", () => {
     const names = readFileSync(join(icons, "apps-sources.txt"), "utf8").split("\n")
         .filter(l => l && !l.startsWith("#")).map(l => l.split("\t")[0]);

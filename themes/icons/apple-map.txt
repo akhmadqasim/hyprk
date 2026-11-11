@@ -281,4 +281,8 @@ screenshot Screenshot
 # --- System icons (themes/icons/system) ---
 user-trash @TrashIcon
 user-trash-full @FullTrashIcon
+# the Dock's own Trash art (Dock.app; per icon style, tools/build-trash.py). shell/components/AppIcon.qml asks for
+# these when the Dock asks for user-trash / user-trash-full; everything else keeps the CoreTypes icons above
+dock-trash @DockTrash
+dock-trash-full @DockTrashFull
 folder-download @DownloadsFolder
