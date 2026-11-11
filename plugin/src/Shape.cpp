@@ -77,7 +77,14 @@ namespace lg {
                     shape.radius = stair;
             }
         }
-        // materialize (middle row) and shadow (row below) holes: two 1 px tall rects of one cluster with exactly 1 px between them
+        // materialize (middle row) and shadow (row below, centre column) holes: two 1 px tall rects of one cluster with
+        // exactly 1 px between them. The shell places the holes from the item geometry it measured, Quickshell builds the
+        // shape from the geometry at commit; while the shape scales these can differ by a row (HUD appear: the shadow
+        // hole landed on the box's middle row and read as materialize 0.5 for one frame, a soft rimless capsule). So the
+        // holes are told apart by their structure, not by the exact row: of two hole rows the upper one is materialize;
+        // a lone hole at the centre column is the shadow marker (that column does not move while the shape scales about
+        // its centre; a materialize hole passes it only around m = 0.5), anywhere else it is materialize.
+        std::vector<std::vector<SRect>> holes(out.size()); // per shape: the left part of each hole row
         for (size_t i = 0; i < n; ++i) {
             const auto& a = rects[i];
             if (a.h != 1 || a.w <= 0)
@@ -86,12 +93,35 @@ namespace lg {
                 const auto& b = rects[j];
                 if (j == i || b.h != 1 || b.y != a.y || b.x != a.right() + 1 || find(i) != find(j) || slot[find(i)] < 0)
                     continue;
-                auto&        shape = out[slot[find(i)]];
-                const double mid   = shape.box.y + std::floor(shape.box.h / 2);
-                if (a.y == mid && shape.box.w > 3)
+                holes[slot[find(i)]].push_back(a);
+            }
+        }
+        for (size_t s = 0; s < out.size(); ++s) {
+            auto& found = holes[s];
+            if (found.empty())
+                continue;
+            std::ranges::sort(found, {}, &SRect::y);
+            auto&        shape  = out[s];
+            const double mid    = shape.box.y + std::floor(shape.box.h / 2);
+            const double centre = shape.box.x + std::floor(shape.box.w / 2);
+            const auto   setMaterialize = [&shape](const SRect& a) {
+                if (shape.box.w > 3)
                     shape.materialize = std::clamp((a.right() - shape.box.x - 1) / (shape.box.w - 3), 0.0, 1.0);
-                else if (a.y == mid + 1)
+            };
+            // rows within 2 of where the shell meant them (a row of scale motion per frame at most)
+            std::erase_if(found, [&](const SRect& a) { return std::abs(a.y - mid) > 2 && std::abs(a.y - (mid + 1)) > 2; });
+            if (found.size() >= 2) {
+                for (size_t k = 0; k + 1 < found.size(); ++k)
+                    if (found[k + 1].y == found[k].y + 1) {
+                        setMaterialize(found[k]);
+                        shape.regularShadow = true;
+                        break;
+                    }
+            } else if (found.size() == 1) {
+                if (std::abs(found[0].right() - centre) <= 2)
                     shape.regularShadow = true;
+                else
+                    setMaterialize(found[0]);
             }
         }
 

@@ -230,10 +230,10 @@ int main() {
     {
         auto rows = roundedRows(100, 50, 103, 40, 12);
         CHECK(near(clusterRegion(rows)[0].materialize, 1));
-        auto& mid = rows[20];                        // y 70, full width 100..203
-        const double hx = 100 + 1 + 25;              // m = 25 / 100
+        const SRect  mid = rows[20];                 // y 70, full width 100..203
+        const double hx  = 100 + 1 + 25;             // m = 25 / 100
+        rows[20].w       = hx - mid.x;
         rows.push_back({hx + 1, mid.y, mid.right() - hx - 1, 1});
-        mid.w = hx - mid.x;
         auto shapes = clusterRegion(rows);
         CHECK(shapes.size() == 1 && near(shapes[0].materialize, 0.25) && near(shapes[0].box.w, 103));
         CHECK(std::abs(shapes[0].radius - 12) <= 3);
@@ -249,9 +249,9 @@ int main() {
         auto rows = roundedRows(300, 500, 120, 24, 12); // a 120 x 24 capsule
         CHECK(!clusterRegion(rows)[0].regularShadow);
         auto split = [&](size_t row, double hx) {
-            auto& r = rows[row];
+            const SRect r = rows[row]; // push_back may move the rows
+            rows[row].w   = hx - r.x;
             rows.push_back({hx + 1, r.y, r.right() - hx - 1, 1});
-            r.w = hx - r.x;
         };
         split(13, 360); // y 513
         auto marked = clusterRegion(rows);
@@ -259,6 +259,35 @@ int main() {
         split(12, 300 + 1 + 39); // y 512: materialize hole at m = 39 / 117
         marked = clusterRegion(rows);
         CHECK(marked.size() == 1 && marked[0].regularShadow && near(marked[0].materialize, 39.0 / 117.0));
+    }
+
+    // holes a row off (the shell measured the scaling shape a frame apart from Quickshell's commit): a lone hole at the
+    // centre column is the shadow marker even on the middle row (HUD appear read it as materialize 0.5), two hole rows
+    // are materialize above shadow wherever they sit, a lone hole elsewhere is materialize
+    {
+        auto base  = roundedRows(300, 500, 120, 24, 12); // mid = 512, centre column 360
+        auto split = [](std::vector<SRect>& rows, size_t row, double hx) {
+            const SRect r = rows[row]; // push_back may move the rows
+            rows[row].w   = hx - r.x;
+            rows.push_back({hx + 1, r.y, r.right() - hx - 1, 1});
+        };
+        auto rows = base;
+        split(rows, 12, 360); // shadow hole on the middle row
+        auto s = clusterRegion(rows);
+        CHECK(s.size() == 1 && s[0].regularShadow && near(s[0].materialize, 1));
+        rows = base;
+        split(rows, 14, 361); // one row and one column further
+        s = clusterRegion(rows);
+        CHECK(s.size() == 1 && s[0].regularShadow && near(s[0].materialize, 1));
+        rows = base;
+        split(rows, 11, 300 + 1 + 39); // both one row up
+        split(rows, 12, 360);
+        s = clusterRegion(rows);
+        CHECK(s.size() == 1 && s[0].regularShadow && near(s[0].materialize, 39.0 / 117.0));
+        rows = base;
+        split(rows, 13, 300 + 1 + 90); // lone materialize hole one row down
+        s = clusterRegion(rows);
+        CHECK(s.size() == 1 && !s[0].regularShadow && near(s[0].materialize, 90.0 / 117.0));
     }
 
     // groups: shapes closer than k share one smooth-union group, lead = largest area
