@@ -255,6 +255,8 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
                      .. "hyprk-spotlight:spotlight,hyprk-hud:controlcenter,hyprk-switcher:dock,"
                      -- banners and Notification Center cards: _Glass.notificationCenter (MAC-ANSWERS PC #62)
                      .. "hyprk-notifications:notificationcenter,hyprk-notificationcenter:notificationcenter",
+            -- Cmd-Tab selection tile (shell/modules/Switcher.qml): plus-darker in light, plus-lighter in dark (Q-dock-20/21)
+            fill_layers = "hyprk-switcher-fill:darker,hyprk-switcher-fill-dark:lighter",
         } } })
     end)
     if ok then hl.env("HYPRK_GLASS", "plugin") else print("hyprk: liquidglass not loaded: " .. tostring(err)) end
