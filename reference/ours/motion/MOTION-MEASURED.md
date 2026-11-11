@@ -742,3 +742,21 @@ Not motion, same session batch:
   for 2560 x 1664; grim to PPM 28 ms).
 - Not measured this session (budget): lock-in, banner out, NC push / clear, Dock autohide and slot grow / shrink,
   drag-off, submenu, bar peek; sessions 8-18 carry their last numbers.
+
+## Session 20 (2026-11-12): submenu delay, banner out, Notification Center clear, Dock autohide
+
+Own headless session B (MBA 2560x1664, scale 2, light), scratch copy of the tree, private D-Bus, scratch HOME, no
+PipeWire (stand-ins for wpctl / pw-play), fresh for this batch, 46 mcap runs; quiet host (load 1.2-1.4). Per-frame
+series in the CSV (`*-s20*`).
+
+| Motion | Mac | Before | After | Runs |
+|---|---|---|---|---|
+| Submenu open delay (Dock menu, Options ▸, pointer moved onto the row; alpha of the submenu region, frames from the row's highlight) | Q-menubar-23: 13 frames (0.22 s), complete in one frame | 216-250 ms, 13 / 15 / 13 / 14 / 15 / 13 frames (190 ms Qt Timer) | the delay counted in frames of the menu's window (FrameAnim, cc68dc6): 13 frames in 4 of 6, 14 in 2 (216.7-233.6 ms); complete in one frame (.01 the frame before: the empty mapped surface) | 6 + 6 |
+| Banner out (one banner, default timeout; mean change over a 420 x 140 pt box) | - | session 15: 2nd value lost or repeated in 4 of 6 | 1 .86 .57 .32 .16 .08 .04 .02 .01 in 6 of 6 (one .02 tail twin), longest interval 18-20 ms: not reproduced | 6 |
+| NC list closing up after a group is cleared (calendar edge offset, normalised, 62.8 pt) | MAC-ANSWERS NC 3g: 97 95.5 71.5 63 51 41 33 25.5 19.5 15 11.5 9 6.5 6.5 5.5 3 2 1.5 0 (fit 0.22 / 1.25) | reflow spring 0.2 / 1.25: .89 .73 .59 .46 .35 .27 .21 .16 ..., rms .046 | clear spring 0.22 / 1.25 (d075e73): .92 .78 .64 .49 .38 .32 .25 .19 ..., rms .024, 6 of 6 the same, no lost value | 6 + 6 |
+| Dock autohide show (top edge above the screen bottom, 48 pt tile) | Q-dock-16: starts ~0.23 s after the edge; 1105 1100 1094 ... 1055 = .04 .13 .25 .38 .46 .58 .71 .81 .90 .96 1 of the 52 pt Dock | - | starts 211-219 ms, .01 .06 .12 .22 .34 .46 .58 .70 .81 .89 .96 .99 1 in 4 of 4 (the Mac's series one frame in: within a frame); not changed | 4 |
+| Dock autohide hide | Q-dock-16: starts ~0.05 s after leaving, 0.17 s | - | starts 43-48 ms, 200-203 ms, .98 .93 .87 .76 .65 .53 .40 .29 .18 .10 .03 0 in 3 of 4; 1 of 4 loses .98 and draws .93 twice (no capture gap); not traced | 4 |
+
+Not measured this session (budget): lock-in, Notification Center push (arrival), slot grow / shrink, drag-off, bar peek
+(needs a full-screen window under the strip), Spotlight mode list (session 19: first value twice in 6 of 6, not fixed).
+Scale 1.6 and dark were not run.
