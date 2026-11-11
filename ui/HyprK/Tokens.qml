@@ -134,6 +134,16 @@ QtObject {
         readonly property real shadowOffsetY: 8
         readonly property color selection: t.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.07)   // selected segment 81 on 61 | 231 on 250
         readonly property color separator: t.dark ? Qt.rgba(1, 1, 1, 0.27) : Qt.rgba(0, 0, 0, 0.20)   // 113 on 61 | 200 on 252
+        // ToolbarPlatter.relief: the platter's own shading, measured down the middle of the Settings back/forward and the
+        // Finder toolbar capsules (settings/appearance-{light,dark}.png x 600, finder-toolbar-*.png x 400, 2x): light
+        // 253 under the top edge, 248..249 at a third of the height, 252..253 over the lower half (opaque: the light
+        // toolbar is 255); the edge 1 px: 191 on the sides, 235..239 top, 231..236 bottom; dark sides 11, top and bottom
+        // 110 then 89 over the 60..61 face
+        readonly property color reliefTop: "#FDFDFD"
+        readonly property color reliefMid: "#F8F8F8"
+        readonly property color reliefLow: "#FCFCFC"
+        readonly property color reliefEdge: t.dark ? Qt.rgba(1, 1, 1, 0.27) : Qt.rgba(0, 0, 0, 0.07)
+        readonly property color reliefSide: t.dark ? Qt.rgba(0, 0, 0, 0.9) : Qt.rgba(0, 0, 0, 0.18)   // over the edge
     }
 
     // ---------- alerts, sheets, popovers (AlertPanel, Sheet, Popover; geometry in panels.js) ----------

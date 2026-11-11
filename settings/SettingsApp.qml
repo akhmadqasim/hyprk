@@ -260,6 +260,7 @@ Item {
         MouseArea { anchors.fill: parent; onPressed: app.moveRequested(); onDoubleClicked: app.zoomRequested() }
         ToolbarPlatter { // back / forward share one 74 x 36 capsule with a 1 x 20 divider (27.2.1)
             id: nav
+            relief: true   // the platter's own shading and edge (Tokens.toolbar.relief*, settings/appearance-*.png)
             x: 8; anchors.verticalCenter: parent.verticalCenter   // 8 pt after the sidebar (27.2.1 Settings shot)
             width: Tokens.toolbar.navWidth; height: Tokens.toolbar.platterHeight
             Rectangle { anchors.centerIn: parent; width: 1; height: Tokens.toolbar.dividerHeight; color: Tokens.toolbar.separator }
