@@ -721,3 +721,24 @@ kick 0.25 / 0 rms .055-.059, 0.30 / 0 .034-.050, 0.30 / 5 .035, 0.35 / 5 .016-.0
 (worse). 0.35 / 5 breaks the single window (its window moves a few points into the layout at 2x: rms .009-.011 ->
 .040-.048), and the decoded ExposeSpringResponse is 0.25 for both; no single spring fits both cases, so nothing was
 changed: R2's window count is not recorded and the Mac's 4-window recording decides it.
+
+## Session 19 (2026-11-12): Spotlight mode list and Notification Center re-measured; volume pop and shutter latency
+
+Own headless sessions (MBA 2560x1664, scale 2, light), private D-Bus, scratch HOME, a private PipeWire with one null
+sink and a logging stand-in for `pw-play` (no sound reached a device), quiet host (load 0.8). Fresh session (s3) for the
+motion runs, 14 mcap runs. Per-frame series in the CSV (`*-s19-*`).
+
+| Motion | Mac | Measured | Verdict | Runs |
+|---|---|---|---|---|
+| Spotlight mode list unfold (pointer moved into the bar, region 520 x 240 pt under it), bottom edge of the changed rows as a share of the final extent | Q-panels-26: .04 .11 .22 .36 .51 .66 .78 .87 .94 .98 1 | .26 .26 .35 .46 .60 .74 .87 .98 1 in 6 of 6 (the edge includes the panel's shadow, so the shares are high by about .1 at the start); first visible +26-31 ms; the first value is drawn twice in 6 of 6, after that the steps (21, 26, 30, 31, 29, 26 pt) follow the Mac's ease-in-out and end about 2 frames sooner | first frame repeated, the rest within the metric's shadow error; not changed (the repeat is the list glass appearing, session 11) | 6 |
+| Notification Center open (`panels toggle nc`), leading edge offset in pt | nc/motion.json click_open 339 293.5 245 199 159.5 125 97.5 75.5 57.5 44 33.5 ... | 331 283 236 193 156 125 100 80 64 52 39 30 23 17 13 in 4 of 4, no repeated or lost value, first frame +98-144 ms after the IPC | rms 6.5 pt (1.7 % of 386), matches | 4 |
+| Notification Center close | click_close 0 7 38 83 131.5 178 216.5 250 278.5 300.5 317.5 332 342.5 350.5 357 | 0 19 59 106 152 195 232 263 288 308 324 336 346 353 359 363 366 368 in 4 of 4 | rms 12.8 pt (3.3 %) at the same frame; the model spring (0.3 / 1.0, the Mac's fit 0.28 / 1.1 or 0.31 / 1.0) sampled half a frame later gives the Mac's series within 3-5 pt: ours shows each frame the curve one interval in (FrameAnim), the Mac's capture sits half a frame earlier. Within a frame: not changed | 4 |
+
+Not motion, same session batch:
+
+- Volume key up -> the pop's player starts 26-40 ms (one 105 ms outlier; 30-100 ms while auto-repeats are still
+  queued), `sound.sh` 8-11 ms of it; unmute -> pop 123 ms (0.08 s by design). No Mac number (needs the Mac).
+- Screenshot shutter: Cmd-Shift-3 -> player 23 ms (before e840d59: after grim's PNG encode, which takes 1.47-1.52 s
+  for 2560 x 1664; grim to PPM 28 ms).
+- Not measured this session (budget): lock-in, banner out, NC push / clear, Dock autohide and slot grow / shrink,
+  drag-off, submenu, bar peek; sessions 8-18 carry their last numbers.
