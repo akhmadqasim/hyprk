@@ -192,7 +192,12 @@ Item {
         height: width
         x: (root.size - width) / 2 + f.dx * root.size
         y: (root.size - height) / 2 + f.dy * root.size
-        sourceSize: Qt.size(Math.ceil(root.loadSize * f.scale), Math.ceil(root.loadSize * f.scale))
+        // in device pixels: Qt decodes a local file at sourceSize as given, not times the device pixel ratio, so a
+        // logical size gave a 64 px decode drawn at 128 px on a 2x screen (Laplacian energy 0.37 of an ideal
+        // downscale; 0.78 decoded at 2x, as without any sourceSize). Screen.devicePixelRatio is 2 on fractional
+        // outputs too (1.6 measured), so those decode at 2x and scale down
+        readonly property real px: Math.ceil(root.loadSize * f.scale * Math.max(1, Screen.devicePixelRatio))
+        sourceSize: Qt.size(px, px)
         fillMode: Image.PreserveAspectFit
         source: root.ready ? root.source : ""     // load once, at the final scale
         asynchronous: true
