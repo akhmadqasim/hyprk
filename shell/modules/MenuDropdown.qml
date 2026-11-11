@@ -13,7 +13,7 @@ import "../lib/menus.js" as Menus
 // solid accent selection inset 5, radius 7 (Q-menubar-12); text at x 16, 30 when some row has a state
 // (`checked`: true or "mixed"), 40 / 51 for rows with an `icon` (Q-menubar-15..17); key column right-aligned
 // at W - 18.5 with modifiers 3 pt before it (Q-menubar-18). No minimum width (Q-menubar-19).
-// Motion: appears complete at once, a chosen row blinks once (off 67 ms, on 50 ms) and then the menu runs
+// Motion: appears complete at once, a chosen row blinks once (off 4 frames, on 3) and then the menu runs
 // the item and fades out in 0.2 s ease-out, as on Esc (Q-menubar-23, -24). The selection jumps from row to
 // row in one frame, no glide (MAC-ANSWERS "No animation: the highlight moves within 1 frame").
 // Submenus (Q-menubar-23): a row with `submenu: true` and `items` opens them 0.22 s after it is highlighted (at once on
@@ -143,11 +143,18 @@ Item {
         activating = true;
         hover = i;
         pendingAction = action;
-        blinkOff = true;
-        blinkOffTimer.start();
+        blink.start();
     }
-    Timer { id: blinkOffTimer; interval: Theme.menu.blinkOff; onTriggered: { root.blinkOff = false; blinkOnTimer.start(); } }
-    Timer { id: blinkOnTimer; interval: Theme.menu.blinkOn; onTriggered: { root.activating = false; root.trigger(root.pendingAction); } }
+    // one animation on the render clock, so the blink lasts whole frames whatever the click's phase (two Timers
+    // gave 3 to 5 frames per half, mcap); the pauses end between frames: off 4 frames, on 3
+    SequentialAnimation {
+        id: blink
+        PropertyAction { target: root; property: "blinkOff"; value: true }
+        PauseAnimation { duration: Theme.menu.blinkOff }
+        PropertyAction { target: root; property: "blinkOff"; value: false }
+        PauseAnimation { duration: Theme.menu.blinkOn }
+        ScriptAction { script: { root.activating = false; root.trigger(root.pendingAction); } }
+    }
 
     Glass {
         anchors.fill: parent
@@ -196,8 +203,7 @@ Item {
             fade = 1;
             if (selectFirst) selectRow(Menus.step(shownItems, -1, 1));
         } else {
-            blinkOffTimer.stop();
-            blinkOnTimer.stop();
+            blink.stop();
             subTimer.stop();
             activating = false;
             blinkOff = false;

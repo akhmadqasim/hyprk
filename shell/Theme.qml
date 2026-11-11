@@ -284,12 +284,15 @@ Singleton {
         readonly property real chevronField: 32
         readonly property real trailing: 17
         readonly property real separatorInset: 16        // line x 16..W-16, at row y 5..6 (Q-menubar-20)
-        // activation: highlight off 4 frames, on 3, then the menu fades (Q-menubar-24)
-        readonly property int blinkOff: 67
-        readonly property int blinkOn: 50
+        // activation: highlight off 4 frames, on 3, then the menu fades (Q-menubar-24); the pauses end half a frame
+        // before the frame they change on (MenuDropdown's blink runs on the render clock)
+        readonly property int blinkOff: 58
+        readonly property int blinkOn: 42
         // submenu (Q-menubar-23): opens 0.22 s after its row is highlighted, complete in one frame; its frame overlaps
         // the parent's right edge by 5 pt and starts 5 pt above the row, so its first row lines up with it
-        readonly property int submenuDelay: 220
+        // The timer is 30 ms shorter: mapping the submenu surface adds about 2 frames (mcap: 220 showed it 14 to 15
+        // frames after the row, 190 shows it after 12 to 14, 13.2 on average, as the Mac's 13)
+        readonly property int submenuDelay: 190
         readonly property real submenuOverlap: 5
     }
 
@@ -683,8 +686,10 @@ Singleton {
         readonly property int easing: Easing.OutCubic
 
         // Liquid Glass motion (materialize, press, Reduce motion crossfade): Tokens.motion
-        // a menu opens at once and fades out in about 0.2 s, ease-out (measured on macOS 27.2.1)
-        readonly property int menuFadeOut: theme.ms(200)
+        // a menu opens at once and fades out in about 0.2 s, ease-out (Q-menubar-24 row series: OutQuad 194 ms, rms
+        // 0.010). On screen the glass trails its opacity, so 185 ms here lands on that series (mcap: rms 0.025 at
+        // 200 ms, 0.015 at 185)
+        readonly property int menuFadeOut: theme.ms(185)
         // a growing or shrinking glass (Spotlight results): SwiftUI .snappy, bounce 0.15 (by eye)
         readonly property real resizeResponse: 0.5
         readonly property real resizeDamping: 0.85
