@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import Quickshell.Widgets
+import Quickshell.Io
 import qs
 import qs.components
 import qs.HyprK
@@ -20,9 +21,12 @@ import "../lib/state.js" as State
 // Motion (WindowManager.framework preferences, "REA 27.2.1" section 5): one critically damped spring, response
 // 0.25 s, for enter and exit (ExposeSpring*); the Spaces bar leaves on its own one, response 0.125 s
 // (SpacesBarExitSpringResponse). Each is one exact NumberAnimation (components/SpringCurve.qml).
-// How: this layer draws the plain wallpaper over everything but the Dock's band (Panels.dockZones) at opacity
-// `e`, so the real windows and the menu bar (with its top dimming) fade out under it while the thumbnails,
-// which start exactly over the real windows, fly to their places: no cross-fade of the windows.
+// How: this layer draws the plain wallpaper over everything but the Dock's band (Panels.dockZones) and the thumbnails,
+// which start exactly over the real windows, fly to their places. The wallpaper is opaque over the windows for the
+// whole flight (it reaches 1 in the first 6 % of `e` and leaves in the last 6 %), so only the geometry moves, as the
+// Mac's windows do; only the menu bar strip (with its top dimming) fades with `e`. Fading all of it with `e` cross-faded
+// the real windows with the wallpaper under the flying thumbnails: the screen ran ahead of the spring early and lagged
+// it at the end, so the code's 0.25 response measured too slow and had been stretched to fit (MOTION-MEASURED.md).
 // Reduce motion: the same springs within 0.15 s as a dissolve, no flight.
 ShellWindow {
     id: mc
@@ -34,18 +38,20 @@ ShellWindow {
 
     // Numbers that are ours (no Theme.qml tokens yet; Q-dock-27..31 will answer the guessed ones)
     readonly property QtObject m: QtObject {
-        // ExposeSpringResponse is 0.25 in code, but on screen the Mac's enter/exit tracks (R2) fit critically damped
-        // responses 0.395 / 0.300 while ours, measured the same way (mcap, share of the total pixel change), ran at
-        // 0.285 / 0.220 with 0.25: the screen runs about 1.37x slower than the code value in both directions, so
-        // 0.35 here (MOTION-MEASURED.md: enter rms 0.060 -> see there, exit likewise)
-        readonly property var expose: SpringLib.fromResponse(0.35, 1)
-        // exit: 0.35 ran 2-98 % 301 ms (two windows at one place) / 400 ms (one window) against the Mac's 267; 0.31
-        // gives 250-283 / 351-367 ms (mcap, alpha vs the R2 exit series)
-        readonly property var exposeExit: SpringLib.fromResponse(0.31, 1)
+        // Exit: ExposeSpringResponse 0.25 (the code value) with the Mac track's start velocity (exitKick) measures like
+        // the R2 exit series with the wallpaper opaque over the windows (one Finder window, mcap: 2-98 % 267 ms vs 267,
+        // rms 0.009-0.011 / 3-5 ms). Enter: the R2 enter series (333 ms) is slower than 0.25 (250 ms on screen); 0.33
+        // measures 333-336 ms. The share-of-change metric depends on the windows (2 overlapping windows run long, 4 small
+        // ones short), MOTION-MEASURED.md session 7
+        readonly property var expose: SpringLib.fromResponse(0.33, 1)
+        readonly property var exposeExit: SpringLib.fromResponse(0.25, 1)
         // the Mac's exit track starts at 0.21 in its first frame, which a spring from rest cannot do (S-shaped start):
-        // a critically damped spring fits it at rms 0.0043 with response 0.355 and a start velocity of 10 x the
-        // distance per second (rms 0.0079 from rest, the first 46 ms then missing)
+        // a critically damped spring fits it with a start velocity of 10 x the distance per second
         readonly property real exitKick: 10
+        // the wallpaper reaches full opacity over the windows within this share of `e` (and leaves within it on exit)
+        readonly property real coverEnd: 0.06
+        // the strip that fades with `e`: the menu bar and the wallpaper's top dimming under it (Background.qml topDim)
+        readonly property int stripHeight: 100
         readonly property var barExit: SpringLib.fromResponse(0.125, 1)    // SpacesBarExitSpringResponse
         // collapsed Spaces bar: labelled pills, guessed (no 27.2.1 screenshot of it yet, Q-dock-31)
         readonly property int barHeight: 44
@@ -101,6 +107,32 @@ ShellWindow {
     property var spaces: []
     Binding on spaces { value: Hyprland.workspaces.values.filter(w => w.id > 0).sort((a, b) => a.id - b.id); when: mc.shown; restoreMode: Binding.RestoreNone }
 
+    // Stacking order (address -> index, higher is on top): Hyprland lists its clients bottom to top (a raise moves a
+    // window to the end; focusing one does not raise it, so focusHistoryID is not the stacking order: a Settings window
+    // over a focused Finder flew back under it and jumped on top when the layer went, a 6 % step, mcap). Asked once per
+    // open on the compositor's request socket; the reply is in before the thumbnails' first captures.
+    property var stack: ({})
+    Socket {
+        id: stackQuery
+        path: Quickshell.env("XDG_RUNTIME_DIR") + "/hypr/" + Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE") + "/.socket.sock"
+        property string reply: ""
+        parser: SplitParser { splitMarker: ""; onRead: data => stackQuery.reply += data }
+        onConnectionStateChanged: {
+            if (connected) {
+                reply = "";
+                write("j/clients");
+                flush();
+            } else if (reply !== "") {
+                try {
+                    const s = {};
+                    JSON.parse(reply).forEach((c, i) => s[c.address] = i);
+                    mc.stack = s;
+                } catch (err) {}
+                reply = "";
+            }
+        }
+    }
+
     function centreOf(t) {
         const o = t.lastIpcObject;
         return o && o.at && o.size ? { x: o.at[0] + o.size[0] / 2, y: o.at[1] + o.size[1] / 2 } : { x: 0, y: 0 };
@@ -116,12 +148,14 @@ ShellWindow {
     }
 
     // the window exists only while open (shell.qml LazyLoader)
-    // The motion starts once every thumbnail has its first frame (at most m.gateMs): until then the
-    // thumbnails sit, invisible, exactly over their windows. Started earlier, a capture that comes
-    // in late would pop up away from its window while the window already fades out.
+    // The motion starts once every thumbnail has its first frame (at most m.gateMs) and the window has presented a
+    // frame with them: until then the thumbnails sit, invisible, exactly over their windows. Started earlier, a capture
+    // that comes in late would pop up away from its window, and the first frame of the flight paid the thumbnails'
+    // first upload (a repeated or late first frame, mcap).
     property bool pending: false
     function present() {
         Hyprland.refreshToplevels();
+        stackQuery.connected = true;
         keys.forceActiveFocus();
         pending = true;
         gate.restart();
@@ -135,9 +169,18 @@ ShellWindow {
         }
         pending = false;
         gate.stop();
-        go();
+        armed = true;
     }
-    Timer { id: gate; interval: mc.m.gateMs; onTriggered: { mc.pending = false; mc.go(); } }
+    property bool armed: false
+    Connections {
+        target: keys.Window.window   // the QQuickWindow (Quickshell's window object has no frameSwapped)
+        function onFrameSwapped() {
+            if (!mc.armed) return;
+            mc.armed = false;
+            if (mc.shown) mc.go();
+        }
+    }
+    Timer { id: gate; interval: mc.m.gateMs; onTriggered: { mc.pending = false; mc.armed = true; } }
     // onShownChanged also fires while the bindings are set up on creation: present() once, when complete
     property bool completed: false
     Component.onCompleted: { completed = true; present(); }
@@ -155,22 +198,31 @@ ShellWindow {
         Keys.onEscapePressed: Panels.close()
     }
 
-    // the plain wallpaper, as the wallpaper layer draws it (Background.qml), over everything below but the Dock
-    Rectangle {
-        width: parent.width
-        height: parent.height - mc.dockZone
-        clip: true
-        color: mc.m.empty
-        opacity: mc.e
-        Image {
+    // the plain wallpaper, as the wallpaper layer draws it (Background.qml), over everything below but the Dock: the
+    // top strip fades with `e`, the rest is opaque while anything flies (Reduce Motion: all of it fades, a dissolve)
+    readonly property real cover: A11y.reduceMotion ? e : Math.min(1, e / m.coverEnd)
+    Repeater {
+        model: [{ y: 0, h: mc.m.stripHeight, strip: true },
+                { y: mc.m.stripHeight, h: mc.height - mc.dockZone - mc.m.stripHeight, strip: false }]
+        delegate: Rectangle {
+            required property var modelData
+            y: modelData.y
             width: mc.width
-            height: mc.height
-            source: Wallpaper.urlFor(mc.screen)
-            // the desktop's decoded pixmap (Background.qml: same url and sourceSize, cached): no decode on open
-            sourceSize: Wallpaper.pixelSizeOf(mc.screen)
-            fillMode: Image.PreserveAspectCrop
-            asynchronous: true
-            cache: true
+            height: Math.max(0, modelData.h)
+            clip: true
+            color: mc.m.empty
+            opacity: modelData.strip ? mc.e : mc.cover
+            Image {
+                y: -parent.y
+                width: mc.width
+                height: mc.height
+                source: Wallpaper.urlFor(mc.screen)
+                // the desktop's decoded pixmap and texture (Background.qml: same url and sourceSize, cached): no decode
+                sourceSize: Wallpaper.pixelSizeOf(mc.screen)
+                fillMode: Image.PreserveAspectCrop
+                asynchronous: true
+                cache: true
+            }
         }
     }
     MouseArea { width: parent.width; height: parent.height - mc.dockZone; onClicked: Panels.close() }
@@ -305,10 +357,13 @@ ShellWindow {
             id: cell
             required property var modelData
             required property int index
-            // stacked like the real windows (most recently focused on top), so where windows overlap the thumbnails
-            // land in the same order and nothing changes when the layer goes (two windows at one place showed the
-            // back one on top, a 5 % snap at the end of the exit, mcap)
-            z: -(modelData.lastIpcObject && modelData.lastIpcObject.focusHistoryID !== undefined ? modelData.lastIpcObject.focusHistoryID : 0)
+            // stacked like the real windows (mc.stack; most recently focused on top until it is in), so where windows
+            // overlap the thumbnails land in the same order and nothing changes when the layer goes
+            z: {
+                const o = modelData.lastIpcObject;
+                if (o && mc.stack[o.address] !== undefined) return mc.stack[o.address];
+                return -1000 - (o && o.focusHistoryID !== undefined ? o.focusHistoryID : 0);
+            }
             // a short last row is centered
             readonly property int row: Math.floor(index / mc.cols)
             readonly property int inRow: Math.min(mc.cols, mc.windows.length - row * mc.cols)
@@ -376,13 +431,8 @@ ShellWindow {
                         // is taken when the source is set (creation, on open) and again on a reopen while still loaded
                         live: false
                         Connections { target: mc; function onShownChanged() { if (mc.shown) view.captureFrame(); } }
-                        // on exit the windows get their focus back and redraw active; one more still once they have,
-                        // so the thumbnails land with the look of the real windows (the open's still was inactive:
-                        // traffic lights and sidebar changed in one frame when the layer went, a 3 % snap, mcap).
-                        // Taken in the tail (5 % of the flight left, ~190 ms in): a capture holds qs's next frame, and
-                        // 100 ms in it repeated a frame mid-flight (0.61 0.61, mcap); in the tail the repeat is < 1 %
-                        readonly property bool tail: !mc.shown && mc.e > 0 && mc.e < 0.05
-                        onTailChanged: if (tail) view.captureFrame()
+                        // No second still on exit (one was taken in the tail for the windows' active look): the capture
+                        // held qs's frames there, a 0.96 plateau for 2-4 frames (mcap); the look changes when the layer goes
                         // fit the cell but never grow past Theme.mission.maxScale of the real window
                         readonly property real dpr: mc.screen ? mc.screen.devicePixelRatio : 1
                         readonly property real maxW: cell.width
