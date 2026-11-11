@@ -287,6 +287,14 @@ int main() {
         split(rows, 12, 360);
         s = clusterRegion(rows);
         CHECK(s.size() == 1 && s[0].regularShadow && near(s[0].materialize, 39.0 / 117.0));
+        // both holes in one column (m about 0.5): pixman hands the two rows over as one 2 px band with a 1 x 2 gap
+        rows = base;
+        rows[12].h = 2;
+        rows.erase(rows.begin() + 13);
+        split(rows, 12, 360);
+        rows.back().h = 2;
+        s = clusterRegion(rows);
+        CHECK(s.size() == 1 && s[0].regularShadow && near(s[0].materialize, 59.0 / 117.0));
         rows = base;
         split(rows, 13, 300 + 1 + 90); // lone materialize hole one row down
         s = clusterRegion(rows);

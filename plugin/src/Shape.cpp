@@ -84,16 +84,20 @@ namespace lg {
         // holes are told apart by their structure, not by the exact row: of two hole rows the upper one is materialize;
         // a lone hole at the centre column is the shadow marker (that column does not move while the shape scales about
         // its centre; a materialize hole passes it only around m = 0.5), anywhere else it is materialize.
+        // A region arrives as bands of equal rows (pixman), so when the materialize hole passes the shadow hole's column (m
+        // about 0.5) the two rows are one band, 2 px tall, split by a 1 x 2 gap: that is both holes, one row each (read as no
+        // hole it gave one frame of full material in the middle of the Dock label's fade).
         std::vector<std::vector<SRect>> holes(out.size()); // per shape: the left part of each hole row
         for (size_t i = 0; i < n; ++i) {
             const auto& a = rects[i];
-            if (a.h != 1 || a.w <= 0)
+            if ((a.h != 1 && a.h != 2) || a.w <= 0)
                 continue;
             for (size_t j = 0; j < n; ++j) {
                 const auto& b = rects[j];
-                if (j == i || b.h != 1 || b.y != a.y || b.x != a.right() + 1 || find(i) != find(j) || slot[find(i)] < 0)
+                if (j == i || b.h != a.h || b.y != a.y || b.x != a.right() + 1 || find(i) != find(j) || slot[find(i)] < 0)
                     continue;
-                holes[slot[find(i)]].push_back(a);
+                for (double y = a.y; y < a.bottom(); ++y)
+                    holes[slot[find(i)]].push_back({a.x, y, a.w, 1});
             }
         }
         for (size_t s = 0; s < out.size(); ++s) {
