@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import qs
 import qs.HyprK
 import qs.components
@@ -11,6 +12,7 @@ import "../../lib/spotlight.js" as SL
 Item {
     id: list
     signal picked(string mode)
+    readonly property bool nested: Quickshell.env("HYPRK_NESTED") === "1"
 
     Repeater {
         model: SL.modes()
@@ -39,7 +41,9 @@ Item {
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.spotlight.shortcutRight
                 anchors.verticalCenter: parent.verticalCenter
-                text: "⌘" + (row.index + 1)
+                // the key that works here: in a nested session (HYPRK_NESTED, dist/try-nested.sh) the host keeps Super and
+                // Ctrl+1..4 are Hyprland's Space binds, so only Option (Alt) + 1..4 reach Spotlight (SPOTLIGHT-27.2.1.md 6)
+                text: (list.nested ? "⌥" : "⌘") + (row.index + 1)
                 font: Typography.font(Theme.spotlight.shortcutSize)
                 color: Theme.spotlight.shortcut
             }

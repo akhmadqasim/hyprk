@@ -45,6 +45,8 @@ Tombol lain (ada di kedua mode, kecuali yang pakai Super):
 - Super+Shift+3: screenshot layar penuh. Super+Shift+4: screenshot area (butuh `slurp`). Print juga bisa.
 - Tombol volume dan brightness jalan di komputer yang punya tombol itu.
 - Semua jendela mengambang dan muncul di tengah, seperti macOS.
+- Spotlight: Alt+1..4 pilih mode (Applications, Files, Actions, Clipboard). Di Mac ini Cmd+1..4. Di nested hanya Alt yang sampai (Super milik GNOME, Ctrl+1..4 pindah Space), jadi daftar mode di Spotlight menulis ⌥1..⌥4. Di login session tertulis ⌘1..⌘4 dan Super+1..4 jalan.
+- Stage Manager: tombol di Control Center (kotak dengan strip di kiri), atau System Settings > Desktop & Dock > Stage Manager. Default mati.
 
 Ukuran jendela nested ditentukan GNOME. Tarik pinggir jendela untuk mengubah, hyprk ikut.
 
