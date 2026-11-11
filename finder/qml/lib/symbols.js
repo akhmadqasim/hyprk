@@ -58,11 +58,6 @@ const table = {
     "xmark.circle": [F(circle(12, 12, 9)), { d: "M8.8 8.8L15.2 15.2M15.2 8.8L8.8 15.2", fill: false, w: 1.7, knock: true }],
     "minus": [S("M5 12H19", 2.6)],
     "zoom": [F("M6 8.5V18H15.5Z"), F("M18 15.5V6H8.5Z")],
-    // Quick Look title bar (no SVG here): traced from live/finder/crops/quicklook-titlebar-light.png (2x), the glyph
-    // box 24 = the 34 x 26 button's 14 pt ink height. Markup = pencil.tip.crop.circle, Rotate = rotate.left.
-    "markup": [S(circle(12, 12, 9.2), 1.5), S("M8.6 19.8L12 9.5L15.4 19.8", 1.5), F("M10.6 13.8L12 9.3L13.4 13.8Z")],
-    "rotate.left": [S(rr(3.5, 9.5, 11, 11, 1.8), 1.6), S("M10.5 4.8H14.2A4.3 4.3 0 0 1 18.5 9.1V10.5", 1.6),
-                    F("M11.4 2.4L7.6 4.8L11.4 7.2Z")],
     "eye": [S("M2.5 12C5 7.5 8.3 5.5 12 5.5S19 7.5 21.5 12C19 16.5 15.7 18.5 12 18.5S5 16.5 2.5 12Z"), S(circle(12, 12, 3.2))],
     "plus": [S("M12 5V19M5 12H19", 1.8)],
     "arrow.up.down": [S("M8 19V5M4.5 8.5L8 5L11.5 8.5M16 5V19M12.5 15.5L16 19L19.5 15.5", 1.5)],

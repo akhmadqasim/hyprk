@@ -95,20 +95,16 @@ Popup {
                     color: hover.hovered ? "white" : Theme.color.label
                     font: Typography.body
                 }
-                Item {   // leading symbol; "gear.2" (Services) is two gears, as gearshape.2 has no render here
+                Symbol {   // leading symbol: 10.4 pt (ink of trash / share / gearshape 20x23 / 18x23 / 22x22 px in
+                    // crops/context-menu-file-light.png, 2x; at 14 pt they were 26x31 / 24x30 / 30x30)
                     visible: it.plain && !!it.modelData.icon
                     x: 18 - 8
-                    width: 16; height: 16
+                    size: 16
+                    pointSize: 10.4
+                    weight: "medium"
                     anchors.verticalCenter: parent.verticalCenter
-                    readonly property color ink: !it.on ? Theme.color.tertiaryLabel : hover.hovered ? "white" : Theme.color.label
-                    Symbol {
-                        visible: it.modelData.icon !== "gear.2"
-                        anchors.fill: parent
-                        name: it.modelData.icon && it.modelData.icon !== "gear.2" ? it.modelData.icon : ""
-                        color: parent.ink
-                    }
-                    Symbol { visible: it.modelData.icon === "gear.2"; x: -1; y: 0; size: 11; name: visible ? "gear" : ""; color: parent.ink }
-                    Symbol { visible: it.modelData.icon === "gear.2"; x: 8; y: 7; size: 9; name: visible ? "gear" : ""; color: parent.ink }
+                    name: it.modelData.icon || ""
+                    color: !it.on ? Theme.color.tertiaryLabel : hover.hovered ? "white" : Theme.color.label
                 }
                 Symbol {
                     visible: it.plain && it.hasSub

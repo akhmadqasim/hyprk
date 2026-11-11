@@ -385,9 +385,9 @@ Window {
             { text: "Customize Folder…", icon: "tag", enabled: false },
             { separator: true }
         ] : []).concat([
-            { text: "Quick Actions", icon: "gear", submenu: [{ text: "Customise…", enabled: false }] },
+            { text: "Quick Actions", icon: "gearshape", submenu: [{ text: "Customise…", enabled: false }] },
             { separator: true },
-            { text: "Services", icon: "gear.2", submenu: [{ text: "No Services Apply", enabled: false }] }
+            { text: "Services", icon: "gearshape.2", submenu: [{ text: "No Services Apply", enabled: false }] }
         ]);
         let items;
         if (entry) {

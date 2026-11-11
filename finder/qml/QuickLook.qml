@@ -208,10 +208,11 @@ Window {
                 size: 13
                 weight: Typography.bold
             }
-            // glyph centres left of the capsule (Preview: capsule at W - 144): Share 25, Rotate 64, Markup 105
-            QuickLookButton { id: markupBtn; x: capsule.x - 105 - 17; icon: "markup"; iconSize: 16; enabled: false; visible: ql.isImage }
-            QuickLookButton { x: capsule.x - 64 - 17; icon: "rotate.left"; iconSize: 18; visible: ql.isImage; onClicked: ql.turns = (ql.turns + 3) % 4 }
-            QuickLookButton { id: shareBtn; x: capsule.x - 25 - 17; icon: "square.and.arrow.up"; iconSize: 18; onClicked: if (ql.cur) FileOps.open(ql.cur.path) }
+            // the real SF symbols at 15 (ink 26x26 / 26x28 / 23x29 px like the crop's); their ink centres left of the
+            // capsule (Preview: capsule at W - 144): Share 24, Rotate 62.75, Markup 104.25 (box offsets 23.25 / 63.75 / 103.5)
+            QuickLookButton { id: markupBtn; x: capsule.x - 103.5 - 17; icon: "markup"; iconSize: 15; enabled: false; visible: ql.isImage }
+            QuickLookButton { x: capsule.x - 63.75 - 17; icon: "rotate.left"; iconSize: 15; visible: ql.isImage; onClicked: ql.turns = (ql.turns + 3) % 4 }
+            QuickLookButton { id: shareBtn; x: capsule.x - 23.25 - 17; icon: "square.and.arrow.up"; iconSize: 15; onClicked: if (ql.cur) FileOps.open(ql.cur.path) }
             Rectangle {
                 id: capsule
                 anchors.right: parent.right

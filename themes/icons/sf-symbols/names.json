@@ -1873,6 +1873,63 @@
    ],
    "extras": [],
    "note": "Spotlight clipboard mode on the Mac (doc.on.clipboard). Decoded from CoreGlyphs' BVG blob with tools/bvg.py (no Mac render): validated on 73 Mac-rendered symbols x 3 weights, IoU median 0.9997, min 0.989."
+  },
+  "gearshape": {
+   "symbol": "gearshape",
+   "surface": "finder",
+   "surfaces": [
+    "finder"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "finder": "sure"
+   },
+   "private": false,
+   "variants": [
+    "gearshape.regular.svg",
+    "gearshape.medium.svg",
+    "gearshape.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Finder context menu Quick Actions row (crops/context-menu-*-light.png, a gear with rounded teeth and a hole). Decoded from CoreGlyphs' BVG blob with tools/bvg.py (no Mac render): validated on 73 Mac-rendered symbols x 3 weights, IoU median 0.9997, min 0.989."
+  },
+  "gearshape.2": {
+   "symbol": "gearshape.2",
+   "surface": "finder",
+   "surfaces": [
+    "finder"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "finder": "sure"
+   },
+   "private": false,
+   "variants": [
+    "gearshape.2.regular.svg",
+    "gearshape.2.medium.svg",
+    "gearshape.2.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Finder context menu Services row (crops/context-menu-*-light.png, two gears). Decoded from CoreGlyphs' BVG blob with tools/bvg.py (no Mac render): validated on 73 Mac-rendered symbols x 3 weights, IoU median 0.9997, min 0.989."
+  },
+  "chevron.up.chevron.down": {
+   "symbol": "chevron.up.chevron.down",
+   "surface": "finder",
+   "surfaces": [
+    "finder"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "finder": "sure"
+   },
+   "private": false,
+   "variants": [
+    "chevron.up.chevron.down.regular.svg",
+    "chevron.up.chevron.down.medium.svg",
+    "chevron.up.chevron.down.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Finder toolbar: the view switcher collapsed into a popup button while the search field is open (crops/search-expand-frames-light.png, the up/down chevrons after the grid glyph). Decoded from CoreGlyphs' BVG blob with tools/bvg.py (no Mac render): validated on 73 Mac-rendered symbols x 3 weights, IoU median 0.9997, min 0.989."
   }
  },
  "skipped": {
@@ -31040,6 +31097,294 @@
     0
    ],
    "fontBaselineY": 38.369
+  },
+  "gearshape.regular.svg": {
+   "symbol": "gearshape",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    40,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    39.5,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    33.5,
+    33.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.704
+  },
+  "gearshape.medium.svg": {
+   "symbol": "gearshape",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    40,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    40.0,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    34.0,
+    34.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.451
+  },
+  "gearshape.semibold.svg": {
+   "symbol": "gearshape",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    41,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    9.5,
+    40.0,
+    22.5
+   ],
+   "baselineY": 32.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    34.5,
+    34.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 35.259
+  },
+  "gearshape.2.regular.svg": {
+   "symbol": "gearshape.2",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    49,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    10.0,
+    48.5,
+    22.5
+   ],
+   "baselineY": 32.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    43.0,
+    34.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 35.379
+  },
+  "gearshape.2.medium.svg": {
+   "symbol": "gearshape.2",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    50,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    9.5,
+    49.0,
+    22.5
+   ],
+   "baselineY": 32.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    43.5,
+    34.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 35.213
+  },
+  "gearshape.2.semibold.svg": {
+   "symbol": "gearshape.2",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    50,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    9.5,
+    49.5,
+    22.5
+   ],
+   "baselineY": 32.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    44.0,
+    35.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 35.086
+  },
+  "chevron.up.chevron.down.regular.svg": {
+   "symbol": "chevron.up.chevron.down",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    29,
+    37
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    29.0,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    21.0,
+    30.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.348
+  },
+  "chevron.up.chevron.down.medium.svg": {
+   "symbol": "chevron.up.chevron.down",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    30,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    30.0,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    22.0,
+    31.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.735
+  },
+  "chevron.up.chevron.down.semibold.svg": {
+   "symbol": "chevron.up.chevron.down",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    31,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    31.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    23.0,
+    32.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.268
   }
  },
  "menubar": [
