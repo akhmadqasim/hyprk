@@ -208,3 +208,20 @@ first rows, there is no panel blur under the HUD); Dock top between the icons 15
 menu 142 / 16, 129 / 1, 112 / 1 (Regular at that size is fully blurred, as C2 says).
 
 Hand-off (shell): the 1x1 Control Center tiles are 64 x 63 pt in the region (Mac: circle, d 64).
+
+## Control Center across the Liquid Glass slider (2026-11-11, plugin edd5073)
+
+On screen, MBA 2x, dark, 4 pt stripes on the 2 px grid (the Mac crop's trapezoid, flat tops 4 px), slider tile, peak to peak:
+
+| slider | 0 | 0.25 | 0.507 | 0.75 | 1 |
+|---|---|---|---|---|---|
+| tile 15 pt below its top, ours | 22 | 15 | 8 | 4 | 0 |
+| Mac real Display tile (C2 `cc-real.json`) | 21.0 | 13.8 | 7.9 | 4.0 | 0.0 |
+| Apple's pyramid on the Mac's gap row (check_model's port) | 21.6 | 14.2 | 8.6 | 4.5 | 0.5 |
+| tile 32 pt below its top (centre), ours | 22 | 11 | 4 | 2 | 0 |
+| Mac probe 288 x 64 at depth 32 | 20.2 | 9.0 | 3.0 | 1.0 | 0.0 |
+| gap between tiles, ours (Mac 32.0-32.5 at every value) | 33 | 33 | 32 | 32 | 32 |
+| tile mean / gap mean, ours (Mac 109.0-109.3 / 114.6-114.9) | 109.2 / 114.4 | 109.0 / 114.4 | 109.0 / 114.2 | 109.1 / 114.2 | 109.0 / 114.2 |
+
+With the stripes 1 px off that grid (odd phase) the gap's tops are pointed instead of flat and the tile reads 18 / 12 / 8 / 4 / 0
+at 15 pt: the 2 x 2 base level averages across the stripe edges. The Mac's capture has the flat-top phase.
