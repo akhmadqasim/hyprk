@@ -103,7 +103,8 @@ Item {
             anchors.bottom: parent.bottom; anchors.bottomMargin: 8
             x: Theme.sidebar.rowMargin; width: parent.width - 2 * Theme.sidebar.rowMargin
             clip: true
-            boundsBehavior: Tokens.scroller.bounds
+            boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
+            RubberBand { flickable: list }
             model: app.visiblePanes
             // Keep the selected pane visible (deep links, back/forward). Rows have fixed
             // heights, so the row's y is computed instead of waiting for delegates; the
@@ -222,7 +223,8 @@ Item {
         anchors.top: parent.top; anchors.bottom: parent.bottom
         clip: true
         contentHeight: pane.y + pane.height + Theme.content.padding   // bottom margin 20
-        boundsBehavior: Tokens.scroller.bounds
+        boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
+        RubberBand { flickable: flick }
         Loader {
             id: pane
             x: Math.max(Theme.content.padding, (flick.width - width) / 2)

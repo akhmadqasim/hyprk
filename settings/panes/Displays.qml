@@ -92,7 +92,8 @@ Column {
                 contentWidth: Math.max(width, row.width + 2 * strip.pad)
                 contentHeight: height
                 flickableDirection: Flickable.HorizontalFlick
-                boundsBehavior: Tokens.scroller.bounds
+                boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
+                RubberBand { flickable: flick }
 
                 // keep the selected display in view when it changes (arrow keys, a new first selection)
                 function reveal() {
