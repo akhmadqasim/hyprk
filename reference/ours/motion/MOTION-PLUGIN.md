@@ -321,3 +321,34 @@ Shadow during the genie on the Mac. No recording is in the repo (the #42 videos 
   (area0 21426 cells against 15000 for the window), so the shadow does not vanish in the first frame.
 - Not decoded: whether CoreAnimation bends the layer's shadow with the mesh or draws it from the warped content. Ours bends
   it with the window (fddd07a), unchanged.
+
+## Follow-ups (2026-11-11, session 10)
+
+**Genie window-rect reading at 1.6 (286-359 ms): the reading, not the motion.** `mcap.py sub()` mapped a logical rectangle
+to samples with 2 / step, i.e. it assumed a 2x output; at 1.6 the rectangle landed 1.25x further out and larger, mostly off
+the window. foot over grey, 3 minimises and 3 restores at 1.6: whole region 383-402 ms; window rect by the old mapping
+282-286 ms; by the real one (samples / region width) 348-352 ms (2x foot 350-366, Mac 367). Fixed in `mcap.py`.
+
+**Appearance cross-fade leftovers** (own headless session, `HYPRK_LOCK_TEST=1`):
+- Lock during a fade: the fade ends in the frame the lock lands (19 frames / 0.317 s instead of 39 / 0.65), `liquidglass
+  fade` shows 0 running at the first poll with `hyprctl locked` true, and the lock screen right after against 1.5 s later
+  differs by rms 0.53 levels, no pixel over 12: no trace of the snapshot. The shell's lock call takes about 340 ms to lock
+  (its own fade in), so a lock asked for at the switch lands mid-fade.
+- Two outputs (MBA 2x + a headless 1920x1080 at 1): one fade per output (2 running), both blend (screenshots in a row: X2
+  .21 .25 .29 .32 .., MBA .19 .68 .83 .93 .98). No per-frame series for the second output: mcap got no damage frames from it.
+- Rotated output (transform 1): skipped as coded (1 running, the rotated output snaps), nothing drawn wrong on it.
+- The 0.15 s hold is still needed. A real click on the Dark / Light thumbnail in Settings (vptr), mcap of the full output:
+
+| | Settings pane | menu bar | Dock |
+|---|---|---|---|
+| hold 0.15, scale 2 (2 runs) and 1.6 (4 runs): rms vs the curve | 0.0005-0.0015 | 0.0008-0.0014 in 3 runs; late in 2 (234 and 491 ms, below); 0.013 in one | 0.0023-0.0035 in 4 runs; 0.10 in the two disturbed 1.6 runs |
+| hold 0, scale 2 (6 runs) | 0.0007-0.0009 | old look for 100-117 ms after the first fade frame, then a step of .33-.37 | .13 -> .50 / .61 -> .77 / .94 -> .63, not monotonic |
+| hold 0, scale 1.6 (4 runs, host load 13-18) | 0.002-0.006 | changes 337-526 ms after the click, step .83-1.0 | not monotonic |
+
+  Settings repaints in the first frame; the shell (menu bar, Dock content) follows 100-120 ms after the option on a quiet
+  host, so 0.15 s covers it with one frame to spare and 0 does not. Fade start 154-172 ms after the click, 2-98 % 384-405 ms.
+- Not covered by any hold: with the host loaded (load average 13-18, other headless sessions) the shell restyled 234-505 ms
+  after the click in 7 of 16 runs (2 of 6 with the hold, all 4 at 1.6 without it; and 458-969 ms when the switch came through `hyprctl` with two outputs), a step of up to
+  1.0 in the menu bar inside or after the fade. Apple waits for the apps' answers for up to 0.5 s; here nothing answers.
+  If it shows on a real session: the shell could send a second option when it has restyled and the plugin hold until then
+  (at most 0.5 s). Not built: on a quiet host the fixed hold is enough.

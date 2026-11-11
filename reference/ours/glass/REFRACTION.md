@@ -225,3 +225,31 @@ On screen, MBA 2x, dark, 4 pt stripes on the 2 px grid (the Mac crop's trapezoid
 
 With the stripes 1 px off that grid (odd phase) the gap's tops are pointed instead of flat and the tile reads 18 / 12 / 8 / 4 / 0
 at 15 pt: the 2 x 2 base level averages across the stripe edges. The Mac's capture has the flat-top phase.
+
+## Corner contour at a fractional scale (2026-11-11, `plugin/tools/contour.py`)
+
+Open point of 295e523: "at 1.6 the first rim row sits 1 px low 21-26 pt from the end", and the contour reading existed for
+2x only. `contour.py SHOT --box X,Y,W,H --r R --scale S` reads the top edge per column at any scale against the port of
+`supercircle_sdf` (box and radius as `hyprctl liquidglass trace` prints them). Three readings:
+
+- `peak` (check_model step 7's reading of the Mac crop: brightest row minus the coverage of the row above). Slider tile at
+  1.6, grey 127, 11..46 pt from the end: rms 0.16 / 0.17 px (left / right), flat middle 0.00; 2x2 tile 0.20 / 0.20.
+- The "1 px low" is this reading, not a pixel: 21-26 pt from the end the edge is at 560.4..560.9 px (curve: 560.39..560.90),
+  so the first row is 10-60 % covered and the next one is the brightest. Read with the rim's own profile (`profile`), the
+  edge 21..46 pt from the end is on the curve within 0.11 px (rms 0.05).
+- `cover` (shot with `highlight = 0, shadow_scale = 0, ring_scale = 0` over white: a pixel is coverage x body + (1 -
+  coverage) x backdrop, no rim model; right at any sub-pixel box position, which `peak` is not: banner top at 70.4 px and
+  Dock top at 1521.6 px read 0.4 / 0.6 px high with it).
+
+| top edge vs the curve, `cover`, rms px left / right (max) | 1.6, 0.45..1.92 r from the end | 1.6, 0.88..1.92 r | 2x, 0.45..1.92 r | 2x, 0.88..1.92 r |
+|---|---|---|---|---|
+| CC slider tile 292 x 64, r 24 | 0.23 / 0.19 (0.74) | 0.08 / 0.02 | 0.25 / 0.23 (0.73) | 0.08 / 0.02 |
+| CC 2x2 tile 140 x 140, r 32 | 0.24 / 0.23 (0.66) | 0.05 / 0.06 | 0.29 / 0.29 (0.83) | 0.07 / 0.07 |
+| banner 344 x 57, r 20 | 0.05 / 0.06 (0.21) | 0.01 / 0.01 | 0.07 / 0.07 (0.26) | 0.02 / 0.02 |
+| Dock 524 x 84 (2x: 623 x 84), r 31 | 0.08 / 0.08 (0.26) | 0.01 / 0.01 | 0.11 / 0.11 (0.36) | 0.01 / 0.01 |
+
+Flat middle 0.00..+0.02 px everywhere (first row coverage 0.60 at 70.4, 0.40 at 1521.6 and 73.6, as the box says). 1.6 is no
+worse than 2x in px. The steep part of the two Control Center tiles reads 0.4-0.7 px outside the curve at both scales: the
+dark specular line just outside the edge (bias -0.3) darkens the backdrop there, and at the tile's contrast over white (43
+levels, Dock 80, banner 133) it counts as coverage; it is not a displaced edge (same at 2x, where the Mac's contour fits
+0.16). No shader change.

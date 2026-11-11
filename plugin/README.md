@@ -205,7 +205,10 @@ drawn as the last element of every pass at `appearanceSnapshotAlpha(t)` (`src/Fa
 1 -> 0 over `appearance_fade` on that curve. The whole output is damaged each frame only while it runs; the copy is freed at
 the end; nothing at rest. Skipped with `reduce_motion`, for "auto", on rotated outputs and while the session is locked (a
 running fade ends at once when a lock starts: the snapshot shows the unlocked desktop).
-The hold is ours (0.15 s): there is no client acknowledgement here, Apple waits for the apps' answers, at most 0.5 s.
+The hold is ours (0.15 s): there is no client acknowledgement here, Apple waits for the apps' answers, at most 0.5 s. It is
+still needed with the option sent first (b80928a): the shell's menu bar and Dock restyle 100-120 ms after the option, and with
+hold 0 they step by .33-.37 inside the fade (MOTION-PLUGIN.md "Follow-ups"). Tried on screen: a lock during the fade ends it
+in that frame, two outputs fade each on their own snapshot, a rotated output snaps.
 The option must reach the compositor before the first client repaints, or that client snaps before the snapshot exists:
 whoever starts the switch sends it on Hyprland's socket in the same turn (Quickshell:
 `Hyprland.dispatch('function() hl.config({ plugin = { liquidglass = { appearance = "light" } } }) end')`), not through a
@@ -302,6 +305,10 @@ A screenshot with `full_damage = 1` was pixel-identical to the default (test 202
 marker and each decoded shape (box, radius, materialize, shadow flag) to FILE; `hyprctl liquidglass trace` stops. Join it with
 an mcap capture by time (both CLOCK_MONOTONIC) to tell a plugin step from a client one (the HUD check in
 reference/ours/motion/MOTION-PLUGIN.md).
+
+`tools/contour.py SHOT --box X,Y,W,H --r R --scale S [--method peak|profile|cover]` reads a shape's top edge near its corners
+against the corner curve at any output scale (box and radius from the trace; numbers at 1.6 and 2 in
+reference/ours/glass/REFRACTION.md "Corner contour at a fractional scale").
 
 ## Performance
 

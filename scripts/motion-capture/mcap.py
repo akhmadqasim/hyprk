@@ -34,7 +34,9 @@ def sub(meta, frames, rect):
     if not rect:
         return frames
     x, y, w, h = rect
-    k = 2 / meta["step"]   # samples per logical px (2x output)
+    # samples per logical px: from the captured region, so any output scale (2 / step assumed a 2x output: at 1.6 the
+    # rectangle landed 1.25x further out and larger, off the window; older captures without "region" were 2x)
+    k = meta["w"] / meta["region"][2] if meta.get("region") else 2 / meta["step"]
     return frames[:, int(y * k):int((y + h) * k), int(x * k):int((x + w) * k)]
 
 
