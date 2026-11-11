@@ -107,6 +107,9 @@ ShellWindow {
         barAnim.go(shown ? 1 : 0);
     }
     readonly property real travel: A11y.reduceMotion ? 0 : 1 - e         // 1 = at the real window rect
+    // hover ring and title only once the windows fly: shown while the captures were awaited, the title capsule appeared
+    // over the real window 3-4 frames before anything moved (.27 of the screen's change before the flight, mcap)
+    readonly property bool hoverable: shown && !pending && e > 0
     // by value, not anim.running: the window must not blink off between `shown` turning false and the
     // exit animation starting
     visible: shown || e > 0
@@ -120,7 +123,11 @@ ShellWindow {
     inputMask: Region { x: 0; y: 0; width: mc.width; height: mc.height - mc.dockZone }
     namespace: "hyprk-mission"
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    // The keyboard is taken only once the wallpaper covers the windows: taken at open, the focused window went to its
+    // inactive look (grey lights, grey selection) for the 4-5 frames before the flight while the
+    // thumbnails still waited for their captures (judge #5, B-mc-enter-inactive-flash-1.6.png). On the Mac the focused
+    // window keeps its active look in Mission Control (screens/27.2.1/dock/mc-light.png: te-small.txt in colour)
+    WlrLayershell.keyboardFocus: shown && cover >= 1 ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     // frozen while closing, so the windows fly back to where they were. Ordered top to bottom, then
     // left to right by where they are, so each fills the nearest cell (short flights).
@@ -207,6 +214,7 @@ ShellWindow {
     function maybeGo() {
         if (!pending || !asked || thumbs.count < windows.length) return;
         if (anyBar && !still.hasContent) return;
+        if (!wallReady) return;
         for (let i = 0; i < thumbs.count; i++) {
             const c = thumbs.itemAt(i);
             if (c && !c.ready) return;
@@ -342,6 +350,12 @@ ShellWindow {
     // the plain wallpaper, as the wallpaper layer draws it (Background.qml), over everything below but the Dock: the
     // top strip fades with `e`, the rest is opaque while anything flies (Reduce Motion: all of it fades, a dissolve)
     readonly property real cover: A11y.reduceMotion ? e : Math.min(1, e / m.coverEnd)
+    // the cover's picture is decoded (asynchronous; the desktop's pixmap is shared, but the first frame after creation
+    // drew the cover's plain colour alone: the first frame of the flight was the wallpaper under a 21 % blue veil,
+    // .86 of the screen changed for one frame, mcap). The flight waits for it like for the captures (gate at most)
+    property int wallsReady: 0
+    readonly property bool wallReady: !Wallpaper.urlFor(screen) || wallsReady >= 2
+    onWallReadyChanged: maybeGo()
     Repeater {
         model: [{ y: 0, h: mc.m.stripHeight, strip: true },
                 { y: mc.m.stripHeight, h: mc.height - mc.dockZone - mc.m.stripHeight, strip: false }]
@@ -351,10 +365,11 @@ ShellWindow {
             width: mc.width
             height: Math.max(0, modelData.h)
             clip: true
-            color: mc.m.empty
+            color: Wallpaper.urlFor(mc.screen) ? "transparent" : mc.m.empty   // under a picture it only showed alone
             opacity: modelData.strip ? mc.e : mc.cover
             Image {
                 y: -parent.y
+                onStatusChanged: if (status === Image.Ready) mc.wallsReady++
                 width: mc.width
                 height: mc.height
                 source: Wallpaper.urlFor(mc.screen)
@@ -636,7 +651,7 @@ ShellWindow {
                 // hover: an accent ring 4.5 pt wide, 1 pt outside the window frame, no scale (Q-dock-30); only while
                 // open (on exit it went away only when the layer unmapped, a pop after the windows landed, mcap)
                 Rectangle {
-                    visible: wma.containsMouse && mc.shown
+                    visible: wma.containsMouse && mc.hoverable
                     anchors.fill: parent
                     anchors.margins: -5.5
                     radius: Theme.mission.thumbRadius + 5.5
@@ -647,7 +662,7 @@ ShellWindow {
             }
             // title on hover, centred on the window (Q-dock-29)
             Rectangle {
-                visible: wma.containsMouse && mc.shown
+                visible: wma.containsMouse && mc.hoverable
                 anchors.centerIn: parent
                 width: Math.min(cell.width, title.implicitWidth + Theme.mission.titlePadding * 2)
                 height: Theme.mission.titleHeight
