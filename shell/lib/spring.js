@@ -53,12 +53,17 @@ function _d4(s, v0, t) {
     return -k * d2 - c * d3;
 }
 
-// time after which the motion stays within tol of 1 (scanned in 1 ms steps, up to 10 s)
+// time after which the motion stays within tol of 1 (scanned in 1 ms steps, up to 10 s). The scan stops once the
+// motion can no longer leave the band: 0.2 s inside it and, underdamped, the decay envelope (1 + |b|) e^(-zwt)
+// below tol (the full 10 s scan took ~7 ms in the QML engine, a 60 Hz frame's budget, mcap)
 function settleTime(s, v0, tol) {
+    const w = 2 * Math.PI / s.response, z = s.ratio;
+    const amp = z < 1 ? 1 + Math.abs((v0 - z * w) / (w * Math.sqrt(1 - z * z))) : 0;
     let last = 0;
     for (let i = 0; i <= 10000; i++) {
         const t = i / 1000;
         if (Math.abs(value(s, v0, t) - 1) >= tol) last = t;
+        else if (t - last > 0.2 && (z >= 1 || amp * Math.exp(-z * w * t) < tol)) break;
     }
     return last + 0.001;
 }
@@ -125,11 +130,19 @@ function curve(s, v0, T, tol) {
 // Everything a NumberAnimation needs to run `s` from `from` to `to` (initial velocity `velocity` in
 // value units per second), cut at `cutAt` seconds or at its settle time (within 0.001 of the distance):
 // { duration (ms), curve, to } where `to` is where the spring really is at the cut.
+// A run from rest only depends on the spring and the cut, so it is fitted once per process (the fit costs ~10 ms in
+// the QML engine: a SpringCurve started with a new card held the Notification Center list for a frame, mcap).
+const _rest = {};
 function plan(s, from, to, velocity, cutAt) {
     const d = to - from, v0 = d !== 0 ? (velocity || 0) / d : 0;
-    const T = cutAt > 0 ? cutAt : settleTime(s, v0, 0.001);
-    const xT = value(s, v0, T);
-    return { duration: Math.round(T * 1000), curve: curve(s, v0, T), to: from + d * xT, seconds: T, v0: v0 };
+    const key = v0 === 0 ? s.response + "/" + s.ratio + "/" + (cutAt > 0 ? cutAt : 0) : "";
+    let r = key ? _rest[key] : undefined;
+    if (!r) {
+        const T = cutAt > 0 ? cutAt : settleTime(s, v0, 0.001);
+        r = { T: T, xT: value(s, v0, T), curve: curve(s, v0, T) };
+        if (key) _rest[key] = r;
+    }
+    return { duration: Math.round(r.T * 1000), curve: r.curve, to: from + d * r.xT, seconds: r.T, v0: v0 };
 }
 // velocity (value units per second) of a running plan `p` (from `from`) `t` seconds after its start
 function velocityAt(s, p, from, t) {
