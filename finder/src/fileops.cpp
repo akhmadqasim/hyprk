@@ -510,8 +510,12 @@ void FileOps::runChecked(const QString &prog, const QStringList &args, const QSt
             const QString out = QString::fromUtf8(p->readAllStandardError()).trimmed().section(QLatin1Char('\n'), 0, 0);
             err = failure + (out.isEmpty() ? QString() : QLatin1Char('\n') + out);
         }
-        // a finished Finder task plays system sound 1, Volume Mount.aif (sound.sh "task-done": copy, move, duplicate,
-        // archive; static REA only, not heard on the Mac)
+        // a finished Finder task plays system sound 1, Volume Mount.aif (sound.sh "task-done"), after EVERY successful
+        // copy, move, duplicate or compress, however short and whether or not progress showed: 27.2.1 Finder
+        // TTask::HandleCompletedNotification lambda 0x1000d6384 plays this->soundID() when the FinderSounds pref is on
+        // (regID 0x28, default true); TNodeTask 0x1000df4d4 returns 1 unless error, cancel, stage < Starting or no
+        // items, TArchiveTask 0x1002b915c unless error. The only time constant (1 s) keeps a progress view up and
+        // delays the sound to its removal, never skips it (removeProgressView:withSound: 0x1005a0cdc). Static only.
         if (err.isEmpty())
             playSound(QStringLiteral("task-done"));
         emit transferFinished(err);
