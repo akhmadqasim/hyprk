@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import qs
@@ -37,17 +38,23 @@ ShellWindow {
     // - close (FUN_2adea36c8, FUN_2ade9ef14 flag 1): scale.x 1 -> 1.12 and scale.y 1 -> 0.95 on Spring(0.45, 0.05),
     //   alpha 1 -> 0 on Spring(0.28, 0.41). The window is unloaded when the alpha first reaches 0 (0.12 s); it
     //   would only swing back to 0.01 after that.
-    // Not done: the open's contentBlurRadius 25 -> 0 on Spring(0.51, 0.05) (no cheap compositor blur of a
-    // layer's content; an offscreen QML blur would also miss the plugin glass), and transform.translation.y
-    // (its start value is not read). The scale anchor is not read: the search field's centre.
-    // The window is created on open: the springs start on its first frame (alpha 0), else creating the surface
-    // eats their first frames. Reduce motion: no scale (Theme.travel), the fade stays.
+    //   The close also blurs the content, contentBlurRadius 0 -> 25 pt on Spring(0.51, 0.05) (FUN_2ade9ef14 flag 1):
+    //   a QML blur of the stage, on only while closing (the plugin glass is not blurred, it dematerializes).
+    // Not done: the open's contentBlurRadius 25 -> 0 (the open matches the Mac's scale track without it, and a
+    // full-screen layer for its 0.5 s spring), and transform.translation.y (its start value is not read). The scale
+    // anchor is not read: the search field's centre.
+    // The window is kept loaded but unmapped after the shell has started (shell.qml): created on open it showed its
+    // first frame ~90 ms after the call. The springs start on the first frame after it maps (alpha 0), else mapping
+    // eats their first frames. Reduce motion: no scale (Theme.travel), no blur, the fade stays.
     property real scaleX: 1.12
     property real scaleY: 1.12
     property real alpha: 0
     readonly property var springOpen: SpringLib.fromBounce(0.28, 0.32)
     readonly property var springClose: SpringLib.fromBounce(0.45, 0.05)
     readonly property var springAlpha: SpringLib.fromBounce(0.28, 0.41)
+    property real blurRadius: 0
+    readonly property var springBlur: SpringLib.fromBounce(0.51, 0.05)
+    SpringCurve { id: animBlur; target: sp; property: "blurRadius"; spring: sp.springBlur }
     SpringCurve { id: animX; target: sp; property: "scaleX" }
     SpringCurve { id: animY; target: sp; property: "scaleY" }
     SpringCurve {
@@ -69,10 +76,13 @@ ShellWindow {
             animX.snap(1);
             animY.snap(1);
             animAlpha.snap(open ? 1 : 0);
+            animBlur.snap(0);
             gone = !open;
             settleGlass(50);
             return;
         }
+        if (open || A11y.reduceMotion) animBlur.snap(0);
+        else animBlur.go(25);
         animX.spring = open ? springOpen : springClose;
         animY.spring = open ? springOpen : springClose;
         animAlpha.cutAt = open ? 0 : SpringLib.firstCrossing(springAlpha, 0, 0.001);
@@ -177,8 +187,25 @@ ShellWindow {
         Panels.spotlightQuery = "";
     }
     function present() { if (!firstFrame) animate(true); takeQuery(); input.forceActiveFocus(); FileSearch.loadRecents(); }
-    Component.onCompleted: present()
-    onShownChanged: shown ? present() : animate(false)       // present(): also reopened while still fading out
+    Component.onCompleted: { if (shown) present(); else gone = true; }
+    // reopened after it went: map again from the start values, empty; the springs start at once (mapping a loaded
+    // window takes about a frame, waiting for its first frame as on creation cost 2 more, mcap)
+    function rearm() {
+        animX.snap(1.12);
+        animY.snap(1.12);
+        animAlpha.snap(0);
+        animBlur.snap(0);
+        input.text = "";
+        category = "";
+        selected = 0;
+        showAll = false;
+        modeListArmed = false;
+        hoverGate.reset();
+    }
+    onShownChanged: {
+        if (shown && gone) rearm();
+        shown ? present() : animate(false);       // present(): also reopened while still fading out
+    }
     onModeChanged: category = ""
     Connections {
         target: Panels
@@ -219,6 +246,13 @@ ShellWindow {
         id: stage
         anchors.fill: parent
         opacity: sp.alpha
+        // the close's content blur (0 -> 25 pt); MultiEffect's blur reaches blurMax px at blur 1
+        layer.enabled: sp.blurRadius > 0.05
+        layer.effect: MultiEffect {
+            blurEnabled: true
+            blurMax: 64
+            blur: Math.min(1, sp.blurRadius * (sp.screen ? sp.screen.devicePixelRatio : 2) / 64)
+        }
         readonly property real barX: Math.round((width - Theme.spotlight.barW) / 2)
         readonly property real barY: Math.round(height * Theme.spotlight.barTop)
         transform: Scale {

@@ -40,8 +40,12 @@ ShellRoot {
 
     // Rarely used full-screen surfaces exist only while open (and while they dematerialize after
     // closing, Panels.loaded), so their windows, delegates and textures cost nothing at idle (PERF.md).
+    // Spotlight is the exception: loaded (unmapped, empty) from 2 s after start, so it maps on open instead of being
+    // created then (first frame ~90 ms after the call when created; PERF.md has its memory)
+    property bool spotlightWarm: false
+    Timer { interval: 2000; running: true; onTriggered: spotlightWarm = true }
     LazyLoader {
-        active: Panels.loaded.spotlight === true
+        active: Panels.loaded.spotlight === true || spotlightWarm
         Spotlight { modelData: Panels.screen }
     }
     LazyLoader {

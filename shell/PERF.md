@@ -1,5 +1,14 @@
 # hyprk shell performance
 
+## 2026-11-11 (later): Spotlight kept loaded, unmapped
+
+Same session setup as below. `shell.qml` keeps Spotlight loaded from 2 s after start (the window is unmapped: no
+surface, no frames, 0 CPU ticks over 20 s at rest), so an open maps it instead of creating it, and the springs start
+at once. Spotlight shortcut (`hyprctl dispatch hl.dsp.global`) to the first visible frame (mcap, alpha > 0.02):
+created on open 63-113 ms, loaded 46-60 ms after the first open (111 ms on the first). qs memory after restart, before
+any open: anon 140.0 -> 141.8 MB (+1.9 MB), RSS 402 -> 418 MB (shared file pages of the effects plugin). After three
+opens both are at anon ~151 MB.
+
 ## 2026-11-11: re-measured on the current shell, two fixes
 
 Headless `MBA` output only (2560x1664 @ 2x, `scripts/smoke.sh` with `HYPRK_HEADLESS=1`), liquidglass plugin on, own
