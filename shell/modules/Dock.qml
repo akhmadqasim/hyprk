@@ -24,6 +24,13 @@ ShellWindow {
 
     required property var modelData
     screen: modelData
+    // Empty desktop: Hyprland keeps the pointer with a layer surface outside its input region only while some
+    // surface has keyboard focus, so a tile dragged up off the Dock lost the pointer at the Dock's edge and went
+    // back (judge #4). With no window on the workspace the Dock takes the focus on a press; with windows it never
+    // does (a Dock click must not make the front window inactive). An empty workspace can be unknown to Quickshell
+    // (focusedWorkspace null). Test hook: qs ipc call dock emptyDesktop
+    readonly property bool emptyDesktop: !Hyprland.focusedWorkspace || Hyprland.focusedWorkspace.toplevels.values.length === 0
+    WlrLayershell.keyboardFocus: emptyDesktop ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
     // ---------- items ----------
     readonly property var others: [{ id: "hyprk-downloads", name: "Downloads", icon: "folder-download", folder: "Downloads" },
@@ -337,6 +344,7 @@ ShellWindow {
         enabled: dock.primaryDock
         function bounce(id: string): void { Apps.markLaunching(id); }
         function attention(id: string, on: bool): void { Apps.markAttention(id, on); }
+        function emptyDesktop(): bool { return dock.emptyDesktop; }
     }
 
     // whole logical px, like the compositor glass region, so tint and glass edges line up
