@@ -55,7 +55,16 @@ ShellWindow {
     property real blurRadius: 0
     property bool blurOn: false
     readonly property var springBlur: SpringLib.fromBounce(0.51, 0.05)
-    SpringCurve { id: animBlur; target: sp; property: "blurRadius"; spring: sp.springBlur }
+    SpringCurve {
+        id: animBlur
+        target: sp; property: "blurRadius"; spring: sp.springBlur
+        onFinished: if (goal === 0) sp.openBlur = false
+    }
+    // The open's content blur 25 -> 0 (REA section 4: the same blurRadius spring as the close, reversed). The bar's
+    // content is drawn once into a texture of the bar's own size and that is blurred (stage below), not the
+    // full-screen stage layer the close uses; the texture goes when the blur has landed or the content changes.
+    property bool openBlur: false
+    function dropOpenBlur(): void { if (openBlur && query !== "") { openBlur = false; animBlur.snap(0); } }
     SpringCurve { id: animX; target: sp; property: "scaleX" }
     SpringCurve { id: animY; target: sp; property: "scaleY"; settlesGlass: true }   // steps after animX: the glass is re-measured once both moved
     SpringCurve {
@@ -78,13 +87,16 @@ ShellWindow {
             animY.snap(1);
             animAlpha.snap(open ? 1 : 0);
             blurOn = false;
+            openBlur = false;
             animBlur.snap(0);
             gone = !open;
             settleGlass(50);
             return;
         }
         blurOn = !open && !A11y.reduceMotion;
-        if (!blurOn) animBlur.snap(0);
+        openBlur = open && !A11y.reduceMotion;
+        if (openBlur) { animBlur.snap(25); animBlur.go(0); }
+        else if (!blurOn) animBlur.snap(0);
         else animBlur.go(25);
         animX.spring = open ? springOpen : springClose;
         animY.spring = open ? springOpen : springClose;
@@ -220,7 +232,7 @@ ShellWindow {
         target: Panels
         function onSpotlightQueryChanged() { sp.takeQuery(); }
     }
-    onQueryChanged: { selected = 0; showAll = false; }
+    onQueryChanged: { selected = 0; showAll = false; dropOpenBlur(); }
     // rows fill in after the query changed (streamed files, late actions): the selection
     // follows its row by key, so Return never opens a row that slid under the index
     function rowKey(r) {
@@ -271,6 +283,34 @@ ShellWindow {
             origin.y: stage.barY + Theme.spotlight.barH / 2
             xScale: 1 + Theme.travel(sp.scaleX - 1)
             yScale: 1 + Theme.travel(sp.scaleY - 1)
+        }
+
+        // the open blur: the bar as one still texture (device pixels, 32 pt of room for the blur), blurred
+        ShaderEffectSource {
+            id: barStill
+            readonly property real pad: 32
+            x: bar.x - pad
+            y: bar.y - pad
+            width: bar.width + 2 * pad
+            height: bar.fullHeight + 2 * pad
+            visible: false
+            sourceItem: sp.openBlur ? bar : null
+            sourceRect: Qt.rect(-pad, -pad, width, height)
+            live: false
+            onSourceItemChanged: if (sourceItem) scheduleUpdate()
+            hideSource: sp.openBlur
+        }
+        MultiEffect {
+            visible: sp.openBlur
+            x: barStill.x
+            y: barStill.y
+            width: barStill.width
+            height: barStill.height
+            source: barStill
+            autoPaddingEnabled: false
+            blurEnabled: true
+            blurMax: 64
+            blur: Math.min(1, sp.blurRadius * (sp.screen ? sp.screen.devicePixelRatio : 2) / 64)
         }
 
         // ---------- the search capsule ----------
