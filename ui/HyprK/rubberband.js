@@ -7,6 +7,9 @@
 // Positions are in content coordinates (contentY grows downwards). An overshoot is the signed distance past an
 // edge: < 0 before the start, > 0 after the end. Velocities are in pt/s. Time is in seconds.
 
+// every live RubberBand (RubberBand.qml registers itself), so an outer one can pass a gesture to a nested one
+var bands = [];
+
 // NSScrollViewRubberbandStiffness, ...MinimumRequiredDeltaBeforeStretch (AppKit defaults); the first 10 pt of pull
 // past the edge give no stretch but count (they stay in the filter's _overflow)
 var STIFFNESS = 20;

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Shapes
+import QtQuick.Effects
 import ".."
 import "../controls"
 import "../HyprK"
@@ -130,52 +131,102 @@ Column {
             implicitHeight: 233   // 1 + 232: preview 268 x 180 at 10 below the row, slider row 13 under it, 13 to the end
             Column {
                 spacing: 13
-                Rectangle { // preview: wallpaper with glass controls on top
-                    width: 268; height: 180; radius: 14; clip: true
-                    gradient: Gradient {
-                        GradientStop { position: 0; color: "#8EC5F0" }
-                        GradientStop { position: 0.55; color: "#5C9A55" }
-                        GradientStop { position: 1; color: "#2F5A2E" }
+                Item { // preview: an article scrolling under glass toolbar capsules (Q-settings-26: a scroll view 268 x 180)
+                    id: glassPreview
+                    width: 268; height: 180
+                    // the Mac draws the preview's capsules with the stored value only (it changes once on mouse-up)
+                    readonly property real tint: AppState.appearance.glass
+                    // rounded corners for the scrolling article (Rectangle.clip only clips to the bounding box)
+                    layer.enabled: true
+                    layer.effect: MultiEffect {
+                        maskEnabled: true; maskSource: previewMask
+                        maskThresholdMin: 0.5; maskSpreadAtMin: 1.0
                     }
-                    RoundedImage {
-                        id: preview
-                        width: parent.width; height: 98 + 14; radius: 14; decodeWidth: 540
-                        path: AppState.wallpaperImage || Backend.root + "/themes/wallpapers/png/DefaultAerial.png"
-                    }
-                    // 27.2.1 (appearance-light.png): the photo fills the top 98 pt, a text card the rest (#E8E5E0 light,
-                    // #131210 dark) with a 15 pt Semibold title 25 pt under its top, a 13 pt secondary subtitle and a body
-                    // line cut by the bottom edge, all at x 16. No Apple photo or article is shipped: the photo is the
-                    // wallpaper, the text names it.
-                    Rectangle {
-                        y: 98
-                        width: parent.width; height: parent.height - 98
-                        bottomLeftRadius: 14; bottomRightRadius: 14
-                        color: Theme.previewCard
+                    Rectangle { id: previewMask; anchors.fill: parent; radius: 14; visible: false; layer.enabled: true }
+                    Rectangle { anchors.fill: parent; color: Theme.previewCard }
+                    Flickable {
+                        id: article
+                        anchors.fill: parent
+                        contentHeight: articleBody.height
+                        boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
+                        RubberBand { flickable: article }
+                        // 27.2.1 (appearance-light.png): the photo fills the top 98 pt, then a text card (#E8E5E0 light,
+                        // #131210 dark) with a 15 pt Semibold title 25 pt under its top, a 13 pt secondary subtitle and
+                        // the body, all at x 16. No Apple photo or article is shipped: the photo is the wallpaper, the
+                        // text names it; the body runs on so the preview scrolls like the Mac's.
                         Column {
-                            x: 16; y: 14; width: parent.width - 32; spacing: 3
-                            MacText { text: P.prettyFileName(preview.path); size: 15; weight: Typography.semibold }
-                            MacText { text: "Wallpaper"; size: 13; color: Theme.secondaryLabel }
-                            MacText { topPadding: 8; width: parent.width; elide: Text.ElideRight; text: "Light and shape behind every window on your desktop."; size: 13 }
+                            id: articleBody
+                            width: article.width
+                            RoundedImage {
+                                id: preview
+                                width: parent.width; height: 98; radius: 0; decodeWidth: 540
+                                path: AppState.wallpaperImage || Backend.root + "/themes/wallpapers/png/DefaultAerial.png"
+                            }
+                            Rectangle {
+                                width: parent.width; height: articleText.height + 14 + 20
+                                color: Theme.previewCard
+                                Column {
+                                    id: articleText
+                                    x: 16; y: 14; width: parent.width - 32; spacing: 3
+                                    MacText { text: P.prettyFileName(preview.path); size: 15; weight: Typography.semibold }
+                                    MacText { text: "Wallpaper"; size: 13; color: Theme.secondaryLabel }
+                                    MacText {
+                                        topPadding: 8; width: parent.width; wrapMode: Text.WordWrap; size: 13
+                                        text: "Light and shape behind every window on your desktop. Liquid Glass lets it show through toolbars, sidebars and controls, bent at their edges. Move the slider below: to the left the glass is clearer, to the right it is more tinted, so text on it stays easier to read."
+                                    }
+                                }
+                            }
                         }
                     }
-                    Row {
-                        x: 8; y: 8; spacing: 6
-                        Repeater {
-                            model: [{ w: 72, g: "ios_share  more_horiz", t: "" }, { w: 36, g: "filter_none", t: "" }, { w: 136, g: "search", t: "Search" }]
-                            Rectangle {
-                                required property var modelData
-                                width: modelData.w; height: 36; radius: 18
-                                // 0 = clearer, 1 = frosted: lighter in light mode, greyer in dark (PC #60 section 2;
-                                // the Mac's Search capsule light #E1DBCB -> #E6E5E2, dark #989590 -> #5A5A57 over its
-                                // photo). Follows the stored value, so it changes once on mouse-up, not while dragging.
-                                color: Theme.dark ? Qt.rgba(0.30, 0.30, 0.29, 0.25 + 0.6 * AppState.appearance.glass)
-                                                  : Qt.rgba(1, 1, 1, 0.18 + 0.6 * AppState.appearance.glass)
-                                border.color: Qt.rgba(1, 1, 1, Theme.dark ? 0.35 : 0.7)
-                                Row {
-                                    x: 10; anchors.verticalCenter: parent.verticalCenter; spacing: 5
-                                    Text { text: modelData.g; font.family: Theme.fontGlyph; font.pixelSize: 18; color: "#1C1C1E" }
-                                    Text { text: modelData.t; font: Typography.body; color: "#3A3A3C"; anchors.verticalCenter: parent.verticalCenter }
+                    // Glass toolbar capsules (liquidglass-0-mid-1-*.png, 2x): x 7.5, 88.5, 132.5; 74, 37, 128 wide; 37 tall
+                    // at y 7; one LensGlass each over the article under it. Colour fitted on the copy capsule over the sky
+                    // (161,192,223): light 0 / .5 / 1 -> (186,218,252), (200,225,251), (219,234,251) = the sample x1.14
+                    // mixed with white .00 / .22 / .48; dark (136,164,192), (135,162,190), (84,97,111) = x0.85 mixed
+                    // with #1E1E1E 0 / 0 / .5. Rim line black a.4 light (159 -> 97), a.5 dark (158 -> 81). Refraction:
+                    // the knob lens law (Tokens lensBand / lensAmount). Blur: not measurable from the shots (the
+                    // photo under the capsules is not visible without them); 1 pt at 0 to 5 pt at 1 by eye (estimate).
+                    Repeater {
+                        model: [{ x: 7.5, w: 74, g: ["ios_share", "more_horiz"], t: "" }, { x: 88.5, w: 37, g: ["filter_none"], t: "" },
+                                { x: 132.5, w: 128, g: ["search"], t: "Search" }]
+                        GlassButton {
+                            id: cap
+                            required property var modelData
+                            x: modelData.x; y: 7; width: modelData.w; height: 37
+                            LensGlass {
+                                anchors.fill: parent
+                                source: articleBody
+                                origin: Qt.point(cap.x + article.contentX, cap.y + article.contentY)
+                                band: height * Tokens.control.lensBand
+                                amount: height * Tokens.control.lensAmount
+                                blur: 1 + 4 * glassPreview.tint
+                                gain: Theme.dark ? 0.85 : 1.14
+                                tint: Theme.dark ? Qt.rgba(0.118, 0.118, 0.118, Math.max(0, glassPreview.tint - 0.5))
+                                                 : Qt.rgba(1, 1, 1, glassPreview.tint <= 0.5 ? 0.44 * glassPreview.tint
+                                                                                              : 0.22 + 0.52 * (glassPreview.tint - 0.5))
+                                outline: Theme.dark ? 0.5 : 0.4
+                            }
+                            Text { // one glyph: centred; two: at 19 and 54 pt (share, more)
+                                visible: cap.modelData.g.length === 1 && cap.modelData.t === ""
+                                anchors.centerIn: parent
+                                text: cap.modelData.g[0]; font.family: Theme.fontGlyph; font.pixelSize: 18
+                                color: Theme.dark ? "#FFFFFF" : "#1C1C1E"
+                            }
+                            Repeater {
+                                model: cap.modelData.g.length === 2 ? cap.modelData.g : []
+                                Text {
+                                    required property string modelData
+                                    required property int index
+                                    x: (index === 0 ? 19 : 54) - width / 2; anchors.verticalCenter: parent.verticalCenter
+                                    text: modelData; font.family: Theme.fontGlyph; font.pixelSize: 18
+                                    color: Theme.dark ? "#FFFFFF" : "#1C1C1E"
                                 }
+                            }
+                            Row {
+                                visible: cap.modelData.t !== ""
+                                x: 16.5 - 9; anchors.verticalCenter: parent.verticalCenter; spacing: 6
+                                Text { text: cap.modelData.g[0]; font.family: Theme.fontGlyph; font.pixelSize: 18; color: Theme.dark ? "#FFFFFF" : "#3A3A3C" }
+                                Text { text: cap.modelData.t; font: Typography.body; anchors.verticalCenter: parent.verticalCenter
+                                       color: Theme.dark ? Qt.rgba(1, 1, 1, 0.75) : Qt.rgba(0, 0, 0, 0.5) }
                             }
                         }
                     }

@@ -15,7 +15,8 @@ import "rubberband.js" as RB
 //  - on lift a stretch returns by _NSElasticDeltaForTimeDelta (critically damped exp(-12.5 t)); otherwise the
 //    content coasts on AppKit's Cates momentum quartic and, hitting an edge, bounces out by its velocity there and
 //    returns the same way. Each is one SequentialAnimation of NumberAnimations with spline easings fitted once.
-// A gesture mostly along an axis this view cannot scroll is passed on (nested views: Finder columns, Displays).
+// A gesture mostly along an axis this view cannot scroll is passed on (nested views: Finder columns, Displays), and
+// so is one that starts over a nested Flickable that can scroll along it (it has its own RubberBand).
 // The overlay takes no buttons and no hover; nothing runs at rest.
 MouseArea {
     id: rb
@@ -49,13 +50,31 @@ MouseArea {
     function _dim(a) { return _x(a) ? flickable.width : flickable.height; }
     function _over(a) { const p = _pos(a), lo = _lo(a), hi = _hi(a); return p < lo ? p - lo : p > hi ? p - hi : 0; }
     // QQuickFlickable::xflick() / yflick()
-    function _can(a) {
-        const f = flickable, d = f.flickableDirection;
+    function _can(a) { return _canOf(flickable, a); }
+    function _canOf(f, a) {
+        const d = f.flickableDirection;
         const c = _x(a) ? f.contentWidth : f.contentHeight, s = _x(a) ? f.width : f.height;
         if ((d & Flickable.AutoFlickIfNeeded) && c > s) return true;
         if (d === Flickable.AutoFlickDirection) return Math.floor(c) !== Math.floor(s);
         return !!(d & (_x(a) ? Flickable.HorizontalFlick : Flickable.VerticalFlick));
     }
+
+    // a nested Flickable with its own RubberBand under (x, y) that can scroll along `a`, else null: AppKit sends a
+    // scroll to the innermost scroll view under the pointer (the Appearance pane's Liquid Glass preview in the pane)
+    function _innerAt(x, y, a) {
+        for (const r of RB.bands) {
+            const f = r.flickable;
+            if (r === rb || !f || !f.visible || !_canOf(f, a)) continue;
+            let i = f.parent;
+            while (i && i !== flickable) i = i.parent;
+            if (!i) continue;
+            const p = rb.mapToItem(f, x, y);
+            if (p.x >= 0 && p.y >= 0 && p.x < f.width && p.y < f.height) return f;
+        }
+        return null;
+    }
+    Component.onCompleted: RB.bands.push(rb)
+    Component.onDestruction: { const i = RB.bands.indexOf(rb); if (i >= 0) RB.bands.splice(i, 1); }
 
     function _begin() { seq.stop(); _gesture = true; _axis = 0; _pull = 0; _v = 0; _t = Date.now(); _first = true; }
 
@@ -111,7 +130,7 @@ MouseArea {
         if (_axis === 0) {
             if (dx === 0 && dy === 0) return;
             const a = Math.abs(dx) > Math.abs(dy) ? 1 : 2;
-            _axis = _can(a) ? a : -1;
+            _axis = _can(a) && !_innerAt(w.x, w.y, a) ? a : -1;
             if (_axis < 0) { w.accepted = false; return; }
         }
         const d = -(_x(_axis) ? dx : dy);
