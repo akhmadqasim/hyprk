@@ -128,9 +128,9 @@ int main() {
 
         const auto& mn = recipeByName("menu");
         r              = resolveMaterial(mn, 24, false);
-        CHECK(near(r.ycc.white, 1.03, 1e-6) && near(r.fill.a, 0.2, 1e-6) && near(r.blurFill.lighten, 0.9, 1e-6) && near(r.shadowOpacity, 0.7, 1e-6) &&
+        CHECK(near(r.ycc.white, 1.03, 1e-6) && near(r.fill.a, 0.2, 1e-6) && near(r.blurFill.lighten, 0.9, 1e-6) && near(r.shadowOpacity, 0.32, 1e-6) &&
               near(r.shadowRadius, 24, 1e-5) && near(r.shadowOffsetY, 10));
-        CHECK(near(resolveMaterial(mn, 24, true).shadowOpacity, 0.8, 1e-6));
+        CHECK(near(resolveMaterial(mn, 24, true).shadowOpacity, 0.36, 1e-6)); // fitted to Q-menubar-28 (Material.cpp)
 
         // Notification Center: Regular, max luma of the column's D (>= 104), rim = 1.23 x the key band, no diffuse
         const auto& nc = recipeByName("notificationcenter");

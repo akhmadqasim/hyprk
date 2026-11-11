@@ -109,14 +109,18 @@ namespace lg {
         };
 #undef LG_NO_SHADOW
 
-        // regular.menu: Regular + the glass menu shadow, the same at every size (dumps: 0.7 light, 0.8 dark, radius 24,
-        // y 10). The shell draws alerts in the same layer (hyprk-overlay:menu), so they get this one too.
+        // regular.menu: Regular + the glass menu shadow, the same at every size. Mac dumps: opacity 0.7 light / 0.8 dark,
+        // radius 24, y 10; through this shader (erfc edge, shadow_tint 0.35) those inputs give twice the Mac's ink, so the
+        // opacity is fitted to the Mac's pixels over white (Q-menubar-28, below and beside at 2..40 pt): radius 24 and y
+        // 10 come out of the free fit unchanged, opacity 0.32 light (rms 0.3 level) / 0.36 dark (rms 0.2): below at
+        // 2/10/20 pt 219/228/240 light, 214/225/238 dark (Mac the same). The shell draws alerts in the same layer
+        // (hyprk-overlay:menu), so they get this one too.
         constexpr SRecipe MENU = [] {
             SRecipe r         = REGULAR;
             r.name            = "menu";
             r.shadowD0        = r.shadowD1 = 0;
-            r.shadowOpacityLo = r.shadowOpacityHi = 0.7f;
-            r.shadowOpacityHiDark                 = 0.8f;
+            r.shadowOpacityLo = r.shadowOpacityHi = 0.32f;
+            r.shadowOpacityHiDark                 = 0.36f;
             r.shadowRadiusLo                      = r.shadowRadius;
             r.shadowOffsetY                       = 10;
             return r;

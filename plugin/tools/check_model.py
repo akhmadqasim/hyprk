@@ -40,7 +40,8 @@ PORTED = ["InnerRefractionAmount", "InnerRefractionHeight", "OuterRefractionAmou
           "BleedDarkenBlend", "KeyFillHighlightColorBias", "KeyFillHighlightSpreadDeg", "ShadowOpacity", "ShadowRadius", "ShadowOffset",
           "RingShadowOpacity", "BlurRadiusRel"]
 # measured on the real surfaces, so the plugin follows them instead of the AppKit probe (reasons in Material.cpp)
-DEVIATIONS = {("dock", "InnerRefractionAmount"): "real Dock end caps fit Regular's geometry (MAC-ANSWERS PC #67 B notes)",
+DEVIATIONS = {("menu", "ShadowOpacity"): "dumped 0.7 / 0.8 give twice the Mac's ink through our shadow; fitted to Q-menubar-28 pixels",
+              ("dock", "InnerRefractionAmount"): "real Dock end caps fit Regular's geometry (MAC-ANSWERS PC #67 B notes)",
               ("dock", "InnerRefractionHeight"): "same",
               ("notificationcenter", "MaxLuma"): "real NC reads the column's D (minimumDistanceOfLargestArea), Mac PC #62 pixels"}
 W709 = np.array([.2126, .7152, .0722])
