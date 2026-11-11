@@ -144,10 +144,11 @@ Item {
     Capsule {
         x: cc.colX(1); y: cc.rowY(3)
         symbol: "moon"
-        title: "Focus"
+        // on (Q-panels-02): the mode's name becomes the title, "On" the subtitle, the moon in the mode's colour
+        title: on ? "Do Not Disturb" : "Focus"
         on: Notifs.dnd
-        onAccent: Theme.color.indigo
-        subtitle: on ? "Do Not Disturb" : ""
+        onAccent: Theme.cc.focusOnIcon
+        subtitle: on ? "On" : ""
         onToggled: Notifs.dnd = !Notifs.dnd
     }
 
@@ -240,24 +241,37 @@ Item {
                 color: cap.on ? cap.onAccent : Theme.cc.capsuleOffIcon
             }
         }
+        // title and subtitle wrap to two lines at most; three lines in all sit on Theme.cc.threeLineBaselines
+        readonly property bool _three: capTitle.lineCount + (cap.subtitle !== "" ? capSub.lineCount : 0) >= 3
+        readonly property var _b: Theme.cc.threeLineBaselines
         Text {
             id: capTitle
             x: Theme.cc.textX
             width: parent.width - x - Theme.cc.textRight
             anchors.baseline: parent.top
-            anchors.baselineOffset: cap.subtitle !== "" ? Theme.cc.titleBaseline : (parent.height + capTitle.font.pixelSize * 0.7) / 2
+            anchors.baselineOffset: cap._three ? cap._b[0]
+                                  : cap.subtitle !== "" ? Theme.cc.titleBaseline : (parent.height + capTitle.font.pixelSize * 0.7) / 2
             text: cap.title
+            wrapMode: Text.Wrap
+            maximumLineCount: 2
+            lineHeightMode: Text.FixedHeight
+            lineHeight: cap._b[1] - cap._b[0]
             elide: Text.ElideRight
             font: Typography.font(Theme.font.ccTileTitle, Typography.semibold)
             color: Theme.cc.title
         }
         PlusText {
+            id: capSub
             x: Theme.cc.textX
             width: capTitle.width
             visible: text !== ""
             anchors.baseline: parent.top
-            anchors.baselineOffset: Theme.cc.subtitleBaseline
+            anchors.baselineOffset: !cap._three ? Theme.cc.subtitleBaseline : capTitle.lineCount > 1 ? cap._b[2] : cap._b[1]
             text: cap.subtitle
+            wrapMode: Text.Wrap
+            maximumLineCount: 2
+            lineHeightMode: Text.FixedHeight
+            lineHeight: cap._b[2] - cap._b[1]
         }
         interactive: available
         onClicked: toggled()

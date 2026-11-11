@@ -542,6 +542,9 @@ Singleton {
         readonly property color toggleOnBg: "#FFFFFF"
         readonly property color toggleOnIcon: Tokens.accent   // follows the accent (Blue under Multicolor), not measured
         readonly property color toggleOffIcon: "#FFFFFF"
+        // Focus on: the moon in the Do Not Disturb mode's colour, not the accent (Q-panels-02: (119,131,254) Display P3
+        // at the most saturated pixel = (116,131,255) sRGB); Control Center reads the same in both appearances (Q-panels-01)
+        readonly property color focusOnIcon: Qt.rgba(116 / 255, 131 / 255, 1, 1)
         // capsule toggles when off: white at 25 % over the tile, white glyph (MAC-ANSWERS #53: 203 / 146 / 88
         // over a 186 / 109 / 32 tile, all glyphs 255)
         readonly property color capsuleOffBg: Qt.rgba(1, 1, 1, 0.25)
@@ -560,6 +563,10 @@ Singleton {
         readonly property int textRight: 10
         readonly property real titleBaseline: 27.5
         readonly property real subtitleBaseline: 44
+        // three lines (Mac photo 2026-11-11 23.11.21, 1.9 px/pt: AirDrop "Contacts Only" wraps; tile top 430.5 px,
+        // baselines 473 / 498 / 524 px): 22.4, 35.5, 49.2 (13.1 title to subtitle, 13.7 between subtitle lines). A title
+        // that wraps (Focus on: "Do Not Disturb", Q-panels-02) takes the first two of these: not measured, inferred
+        readonly property var threeLineBaselines: [22.4, 35.5, 49.2]
         // labels over the tile T (#53): title = white at 85 % (245/233/221 over 186/109/32); subtitle = plus-lighter
         // T + 140 (255/249/172), drawn by shaders/plustext.frag; slider titles and glyphs 255
         readonly property color title: Qt.rgba(1, 1, 1, 0.85)
