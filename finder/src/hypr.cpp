@@ -1,5 +1,7 @@
 #include "hypr.h"
 
+#include <algorithm>
+
 #include <QCoreApplication>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -82,6 +84,33 @@ bool Hypr::minimizeWindow(const QString &title) const
         return true;
     }
     return false;
+}
+
+QVariantMap Hypr::workArea(double x, double y) const
+{
+    const QJsonArray all = QJsonDocument::fromJson(request("j/monitors")).array();
+    for (const QJsonValue &v : all) {
+        const QJsonObject m = v.toObject();
+        const double scale = m.value(QLatin1String("scale")).toDouble(1);
+        if (scale <= 0)
+            continue;
+        const bool turned = m.value(QLatin1String("transform")).toInt() % 2 == 1;
+        const double mx = m.value(QLatin1String("x")).toDouble(), my = m.value(QLatin1String("y")).toDouble();
+        double mw = m.value(QLatin1String("width")).toDouble() / scale, mh = m.value(QLatin1String("height")).toDouble() / scale;
+        if (turned)
+            std::swap(mw, mh);
+        if (x < mx || y < my || x >= mx + mw || y >= my + mh)
+            continue;
+        const QJsonArray r = m.value(QLatin1String("reserved")).toArray();   // left, top, right, bottom
+        const double l = r.at(0).toDouble(), t = r.at(1).toDouble(), rr = r.at(2).toDouble(), b = r.at(3).toDouble();
+        return QVariantMap{
+            {QStringLiteral("x"), mx + l},
+            {QStringLiteral("y"), my + t},
+            {QStringLiteral("width"), std::max(0.0, mw - l - rr)},
+            {QStringLiteral("height"), std::max(0.0, mh - t - b)},
+        };
+    }
+    return {};
 }
 
 int Hypr::option(const QString &name, int fallback) const
