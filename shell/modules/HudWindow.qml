@@ -20,7 +20,7 @@ import "../lib/hud.js" as HudLib
 // - hide: spring(response 0.48669, dampingFraction 1) to 0, and the window goes at 0.48669 s (the dismissal
 //   completion's asyncAfter), where the spring stands at 0.986;
 // - the content (bar fill, volume <-> brightness crossfade) moves on spring(response 0.2, dampingFraction 0.85).
-// The glass is drawn at opacity^2 and the content at opacity. SystemBannerUI (BannerSlider.body 0x2aed61dd8, cache
+// The glass is drawn at opacity^2 while hiding (at opacity while appearing, below) and the content at opacity. SystemBannerUI (BannerSlider.body 0x2aed61dd8, cache
 // address) puts one .opacity(opacity) on the content and wraps it in
 // _glassEffect(.controlCenter.mix(with: .identity, by: 1 - opacity)): the content fades with the spring, the glass
 // with the mix, read here as a second factor (inferred; the Mac's dismiss recording fits s^2 at rms 0.017). Content at
@@ -50,7 +50,11 @@ ShellWindow {
 
     // 0 hidden .. 1 shown: the spring and the content's opacity; scale 0.9 + 0.1 x (Reduce motion: no scale, Theme.travel)
     property real shownness: 0
-    readonly property real glassAlpha: shownness * shownness
+    // appearing: the glass at the opacity (verify/A hud-appear-fit.json: the Mac's appear alpha fits progress^1 at
+    // rms .0097 / .0173 against progress^2 at .012 / .013, and its 2-98 % is 483 ms; ours with the glass at opacity^2
+    // took 515-533 ms); hiding: at opacity^2 (the dismiss recording fits s^2 at rms 0.017)
+    property bool hiding: false
+    readonly property real glassAlpha: hiding ? shownness * shownness : shownness
     property bool mapped: false
     visible: mapped
     glassOpacity: glassAlpha
@@ -72,6 +76,7 @@ ShellWindow {
         }
     }
     function begin() {
+        hiding = false;
         motion.spring = mo.appear;
         motion.cutAt = 0;
         motion.go(1);
@@ -79,6 +84,7 @@ ShellWindow {
     function disappear() {
         delay.stop();
         if (shownness <= 0) { motion.stop(); mapped = false; return; }
+        hiding = true;
         motion.spring = mo.hide;
         motion.cutAt = mo.hideSeconds;
         motion.go(0);
