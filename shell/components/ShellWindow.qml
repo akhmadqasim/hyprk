@@ -106,7 +106,12 @@ PanelWindow {
 
     Region {
         id: glassUnion
-        regions: Array.from(win.glassRegions).concat([opacityMarker])
+        // cuts (Glass.cut) after every shape, so they subtract from the whole union
+        regions: {
+            const all = Array.from(win.glassRegions);
+            return all.filter(r => r.intersection !== Intersection.Subtract)
+                .concat(all.filter(r => r.intersection === Intersection.Subtract), [opacityMarker]);
+        }
     }
     // always in the list (only x changes per frame); width 0 = no marker = opacity 1
     Region {

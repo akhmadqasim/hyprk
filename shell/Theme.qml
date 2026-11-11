@@ -780,8 +780,8 @@ Singleton {
         readonly property int radius: 58
         // selection: a 120 x 120 squircle on a 128 icon (circle-equivalent 34), flat. The Mac blends it plus-darker
         // -57 levels (light) / plus-lighter +65 (dark) with the glass under it (cmdtab-*.png: panel 41,134,220 -> tile
-        // 0,78,161; 26,61,179 -> 90,124,240). With the plugin the tile is that fill (a Glass shape on the
-        // hyprk-switcher-fill surface, 2db3868); `selection` is only the QML fallback without the plugin, a plain
+        // 0,78,161; 26,61,179 -> 90,124,240). With the plugin the tile is that fill (a cut in the panel's glass
+        // region, `cut_fills`); `selection` is only the QML fallback without the plugin, a plain
         // alpha: black 0.30 takes 57 off a 190 backdrop (light glass), white 0.33 adds 65 to a 60 one (dark glass)
         readonly property real selectionSize: 120
         readonly property int selectionRadius: 34

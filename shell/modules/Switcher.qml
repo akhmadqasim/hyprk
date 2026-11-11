@@ -90,15 +90,6 @@ ShellWindow {
         revealTimer.restart();
         keys.forceActiveFocus();
     }
-    // the fill surface (below) is created once this one has drawn its first frame, so Hyprland stacks it above (layers
-    // stack in creation order; created with this window it went under the panel and its fill darkened the panel's
-    // backdrop: -37 instead of -57). Both are mapped empty long before the reveal (Theme.switcher.showDelay)
-    property bool fillReady: false
-    Connections {
-        target: keys.Window.window   // this surface's QQuickWindow
-        enabled: !sw.fillReady
-        function onFrameSwapped() { sw.fillReady = true; }
-    }
     Component.onCompleted: present()
     onShownChanged: if (shown) present()
 
@@ -126,6 +117,13 @@ ShellWindow {
         }
     }
 
+    MouseArea { anchors.fill: parent; hoverEnabled: true; onPressed: Panels.close(); onPositionChanged: mouse => sw.notePointer(this, mouse.x, mouse.y) }
+
+    // The panel's glass, the selection tile, the icons and the name on one surface, so the first frame that shows the
+    // panel shows all of it (two surfaces committed apart: the glass came a frame before the icons in 2 of 5 opens). On the
+    // plugin the tile is a cut in the panel's glass region that the plugin fills plus-darker (light) / plus-lighter (dark)
+    // over the glass (`cut_fills`, plugin/README.md "Cuts"), as the Mac blends it (Q-dock-20/21, cmdtab-*.png: 41,134,220
+    // -> 0,78,161 light; 26,61,179 -> 90,124,240 dark): Qt cannot blend with the compositor's glass.
     Item {
         id: panel
         readonly property int n: Math.max(1, sw.apps.length)
@@ -148,102 +146,67 @@ ShellWindow {
             solidColor: Theme.glass.solidDock
             pluginLift: Theme.dock.pluginLift
             materialize: 1
+            subPointEdges: false   // whole points; the tile's cut crosses the marker rows
         }
-    }
 
-    // The selection tile, icons and names: a second surface over the panel's, same geometry. On the plugin the tile's
-    // shape is a plus-darker (light) / plus-lighter (dark) fill over the glass under it (`fill_layers`, plugin/README.md),
-    // as the Mac blends it (Q-dock-20/21, cmdtab-*.png: 41,134,220 -> 0,78,161 light; 26,61,179 -> 90,124,240 dark):
-    // Qt cannot blend with the compositor's glass. It lives and is mapped only with the switcher (shell.qml LazyLoader),
-    // and takes the pointer (it is on top); the keyboard stays with the panel's surface.
-    LazyLoader {
-        active: sw.fillReady
-        ShellWindow {
-            id: fillHost
-            screen: sw.screen
-            visible: sw.visible
-            anchors { top: true; left: true; right: true; bottom: true }
-            exclusionMode: ExclusionMode.Ignore
-            namespace: Theme.dark ? "hyprk-switcher-fill-dark" : "hyprk-switcher-fill"
-            WlrLayershell.layer: WlrLayer.Overlay
-            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-            acceptsInput: sw.shown
-            // the same fade on this window's own frames: the panel's value, stepped in the panel's frame, reached this
-            // window a frame late or not, by turns (mcap: repeated and uneven values in most dismisses)
-            readonly property real fade: fillEase.value
-            FrameEase {
-                id: fillEase
-                goal: fadeEase.goal
-                animate: goal < value
-                duration: fadeEase.duration
-                curve: fadeEase.curve
-            }
-            glassOpacity: fade
-            glassDropped: sw.glassDropped
+        // the selection tile: 120 on a 128 icon, centred on the selected one; one cut on the plugin, else a flat colour
+        Glass {
+            id: tile
+            width: Theme.switcher.selectionSize * panel.icon / Theme.switcher.iconSize
+            height: width
+            x: Theme.switcher.padding + sw.selected * panel.pitch + (panel.icon - width) / 2
+            y: Theme.switcher.padding + (panel.icon - height) / 2
+            radius: Theme.switcher.selectionRadius * panel.icon / Theme.switcher.iconSize
+            cut: true
+            visible: Theme.compositorGlass && sw.apps.length > 0
+        }
+        Rectangle {
+            x: tile.x
+            y: tile.y
+            width: tile.width
+            height: tile.height
+            radius: tile.radius
+            color: Theme.switcher.selection
+            visible: !Theme.compositorGlass && sw.apps.length > 0
+        }
 
-            MouseArea { anchors.fill: parent; hoverEnabled: true; onPressed: Panels.close(); onPositionChanged: mouse => sw.notePointer(this, mouse.x, mouse.y) }
-
-            Item {
-                x: panel.x
-                y: panel.y
-                width: panel.width
-                height: panel.height
-                opacity: fillHost.fade
-
-                Row {
-                    x: Theme.switcher.padding
-                    y: Theme.switcher.padding
-                    spacing: Theme.switcher.gap
-                    Repeater {
-                        model: sw.apps
-                        delegate: Item {
-                            id: c
-                            required property var modelData
-                            required property int index
-                            width: panel.icon
-                            height: panel.icon
-                            // the selection tile: 120 on a 128 icon, centred on it; a fill shape on the plugin, else a flat colour
-                            Glass {
-                                id: tile
-                                anchors.centerIn: parent
-                                width: Theme.switcher.selectionSize * panel.icon / Theme.switcher.iconSize
-                                height: width
-                                radius: Theme.switcher.selectionRadius * panel.icon / Theme.switcher.iconSize
-                                visible: Theme.compositorGlass && c.index === sw.selected
-                            }
-                            Rectangle {
-                                anchors.fill: tile
-                                radius: tile.radius
-                                color: Theme.switcher.selection
-                                visible: !Theme.compositorGlass && c.index === sw.selected
-                            }
-                            AppIcon {
-                                anchors.centerIn: parent
-                                size: panel.icon
-                                icon: c.modelData.icon
-                                appId: c.modelData.id
-                            }
-                            // the selected app's name under its icon, in the bottom padding
-                            Text {
-                                visible: c.index === sw.selected
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                y: parent.height + Theme.switcher.labelTop
-                                width: panel.pitch * 1.6
-                                horizontalAlignment: Text.AlignHCenter
-                                elide: Text.ElideRight
-                                text: c.modelData.name
-                                font: Typography.headline
-                                color: Theme.color.label
-                            }
-                            MouseArea {
-                                anchors.fill: parent
-                                anchors.margins: -Theme.switcher.gap / 2
-                                hoverEnabled: true
-                                onEntered: if (sw.notePointer(this, mouseX, mouseY)) sw.selected = c.index
-                                onPositionChanged: mouse => { if (sw.notePointer(this, mouse.x, mouse.y)) sw.selected = c.index; }
-                                onClicked: sw.commit()
-                            }
-                        }
+        Row {
+            x: Theme.switcher.padding
+            y: Theme.switcher.padding
+            spacing: Theme.switcher.gap
+            Repeater {
+                model: sw.apps
+                delegate: Item {
+                    id: c
+                    required property var modelData
+                    required property int index
+                    width: panel.icon
+                    height: panel.icon
+                    AppIcon {
+                        anchors.centerIn: parent
+                        size: panel.icon
+                        icon: c.modelData.icon
+                        appId: c.modelData.id
+                    }
+                    // the selected app's name under its icon, in the bottom padding
+                    Text {
+                        visible: c.index === sw.selected
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        y: parent.height + Theme.switcher.labelTop
+                        width: panel.pitch * 1.6
+                        horizontalAlignment: Text.AlignHCenter
+                        elide: Text.ElideRight
+                        text: c.modelData.name
+                        font: Typography.headline
+                        color: Theme.color.label
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        anchors.margins: -Theme.switcher.gap / 2
+                        hoverEnabled: true
+                        onEntered: if (sw.notePointer(this, mouseX, mouseY)) sw.selected = c.index
+                        onPositionChanged: mouse => { if (sw.notePointer(this, mouse.x, mouse.y)) sw.selected = c.index; }
+                        onClicked: sw.commit()
                     }
                 }
             }

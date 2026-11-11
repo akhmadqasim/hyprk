@@ -24,6 +24,13 @@ Item {
     // the Dock label's pointer marker: a 1x1 hole at (left + 1, top) that the plugin turns into Apple's pointer shape
     // (plugin/README.md "Dock label pointer"); the materialize and shadow holes are left out, the plugin reads neither
     property bool pointer: false
+    // a cut: this shape is subtracted from the window's glass region instead of added, and the plugin draws a plus-lighter /
+    // plus-darker fill of its rounded rect over the glass under it, in the same commit as that glass (`cut_fills`,
+    // plugin/README.md "Cuts"; Cmd-Tab's selection tile). No marker holes: a cut carries none
+    property bool cut: false
+    // sub-point edge markers (see placeHole); off for a glass that never sits between points and has a cut across its
+    // middle rows (the markers would fall into the cut)
+    property bool subPointEdges: true
     // tint drawn on top of the plugin's glass (the plugin owns blur, rim, shadow)
     // default: none, the plugin's recipes carry Apple's probe values themselves (a dark-mode veil made dark menus
     // read 62 over white instead of the Mac's 120)
@@ -42,6 +49,7 @@ Item {
     Region {
         id: shape
         radius: root.radius
+        intersection: root.cut ? Intersection.Subtract : Intersection.Combine
         // materialize < 1: a 1 px hole in the middle row, x = left + 1 + round(m (w - 3))
         Region { id: hole; intersection: Intersection.Subtract; width: 0; height: 1 }
         // shadow: false: a 1x1 hole one row below the middle row, centre column; the plugin then gives this shape
@@ -70,16 +78,16 @@ Item {
         shape.height = Math.max(0, h);
         shadowHole.x = px + Math.floor(w / 2);
         shadowHole.y = py + Math.floor(h / 2) + 1;
-        shadowHole.width = (!root.shadow && !root.pointer && root.on && w >= 4 && h >= 3) ? 1 : 0;
+        shadowHole.width = (!root.shadow && !root.pointer && !root.cut && root.on && w >= 4 && h >= 3) ? 1 : 0;
         topRow.x = px + Math.floor(w / 2) - 1;
         topRow.y = py;
-        topRow.width = (root.on && w === h && w >= 8 && Math.round(root.radius) * 2 === w) ? 2 : 0;
+        topRow.width = (root.on && !root.cut && w === h && w >= 8 && Math.round(root.radius) * 2 === w) ? 2 : 0;
         pointerHole.x = px + 1;
         pointerHole.y = py;
         pointerHole.width = (root.pointer && root.on && w >= 3) ? 1 : 0;
         // each edge's offset from the region's, -0.5..0.5 pt, in n steps; the pair coded as one column i1 n + i2
         const n = Math.min(17, Math.floor(Math.sqrt(Math.max(0, w - 3))));
-        const edges = root.on && !root.pointer && n >= 2 && h >= 12;
+        const edges = root.on && !root.pointer && !root.cut && root.subPointEdges && n >= 2 && h >= 12;
         if (edges) {
             const lv = d => Math.round((Math.max(-0.5, Math.min(0.5, d)) + 0.5) * (n - 1));
             const base = px + Math.floor(w / 2) - Math.floor(n * n / 2);
@@ -90,7 +98,7 @@ Item {
         }
         edgeX.width = edges ? 1 : 0;
         edgeY.width = edges ? 1 : 0;
-        if (materialize >= 1 || root.pointer || !root.on || w < 4 || h < 2) {
+        if (materialize >= 1 || root.pointer || root.cut || !root.on || w < 4 || h < 2) {
             hole.width = 0;
             return;
         }
@@ -105,6 +113,8 @@ Item {
     onYChanged: placeHole()
     onShadowChanged: placeHole()
     onPointerChanged: placeHole()
+    onCutChanged: placeHole()
+    onSubPointEdgesChanged: placeHole()
     onWidthChanged: placeHole()
     onHeightChanged: placeHole()
     // re-measure every frame for a while (call when this glass starts to move or scale)

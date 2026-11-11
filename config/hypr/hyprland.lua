@@ -291,10 +291,12 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
                      .. "hyprk-spotlight:spotlight,hyprk-hud:controlcenter,hyprk-switcher:dock,"
                      -- banners and Notification Center cards: _Glass.notificationCenter (MAC-ANSWERS PC #62)
                      .. "hyprk-notifications:notificationcenter,hyprk-notificationcenter:notificationcenter",
-            -- Cmd-Tab selection tile (shell/modules/Switcher.qml): plus-darker in light, plus-lighter in dark (Q-dock-20/21);
             -- Dock running dots (shell/modules/Dock.qml): plus-darker -128 / plus-lighter +125 (Q-dock-07)
-            fill_layers = "hyprk-switcher-fill:darker,hyprk-switcher-fill-dark:lighter,"
-                       .. "hyprk-dock-dots:darker:128,hyprk-dock-dots-dark:lighter:125",
+            fill_layers = "hyprk-dock-dots:darker:128,hyprk-dock-dots-dark:lighter:125",
+            -- Cmd-Tab selection tile (shell/modules/Switcher.qml), a cut in the panel's own glass region: plus-darker in
+            -- light, plus-lighter in dark (Q-dock-20/21)
+            cut_fills = "hyprk-switcher:darker",
+            cut_fills_dark = "hyprk-switcher:lighter",
             -- the Dock dots are circles (4.1 pt, Q-dock-07): their 4 pt square regions get this radius (clamped to 2)
             radii = "hyprk-dock-dots:2.05,hyprk-dock-dots-dark:2.05",
         })
@@ -358,7 +360,7 @@ hl.layer_rule({
 hl.layer_rule({
     -- the shell animates these itself
     name = "hyprk-no-anim",
-    match = { namespace = "^hyprk-(overlay|controlcenter|spotlight|switcher|switcher-fill|switcher-fill-dark|mission|notifications|notificationcenter|dock|dock-label|dock-dots|dock-dots-dark|menubar|wallpaper|hud)$" },
+    match = { namespace = "^hyprk-(overlay|controlcenter|spotlight|switcher|mission|notifications|notificationcenter|dock|dock-label|dock-dots|dock-dots-dark|menubar|wallpaper|hud)$" },
     no_anim = true,
 })
 
