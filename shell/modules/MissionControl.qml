@@ -295,6 +295,10 @@ ShellWindow {
             id: cell
             required property var modelData
             required property int index
+            // stacked like the real windows (most recently focused on top), so where windows overlap the thumbnails
+            // land in the same order and nothing changes when the layer goes (two windows at one place showed the
+            // back one on top, a 5 % snap at the end of the exit, mcap)
+            z: -(modelData.lastIpcObject && modelData.lastIpcObject.focusHistoryID !== undefined ? modelData.lastIpcObject.focusHistoryID : 0)
             // a short last row is centered
             readonly property int row: Math.floor(index / mc.cols)
             readonly property int inRow: Math.min(mc.cols, mc.windows.length - row * mc.cols)
@@ -362,6 +366,10 @@ ShellWindow {
                         // is taken when the source is set (creation, on open) and again on a reopen while still loaded
                         live: false
                         Connections { target: mc; function onShownChanged() { if (mc.shown) view.captureFrame(); } }
+                        // on exit the windows get their focus back and redraw active; one more still once they have,
+                        // so the thumbnails land with the look of the real windows (the open's still was inactive:
+                        // traffic lights and sidebar changed in one frame when the layer went, a 3 % snap, mcap)
+                        Timer { running: !mc.shown && mc.e > 0; interval: 100; onTriggered: view.captureFrame() }
                         // fit the cell but never grow past Theme.mission.maxScale of the real window
                         readonly property real dpr: mc.screen ? mc.screen.devicePixelRatio : 1
                         readonly property real maxW: cell.width
