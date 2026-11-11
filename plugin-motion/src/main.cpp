@@ -1,11 +1,12 @@
 // hyprk motion: macOS window motion Hyprland's animation config cannot express.
 // Today: the Dock genie for minimize/restore (Dock.app WAGenieAnimation, SPEC.md 11.3), and unzoom / full screen
 // enter and exit timing with the full-screen Space (FrameMotion.hpp).
-// Minimize stays "move to special:minimized" (plugin/src/Titlebar.cpp); this plugin delays
+// Minimize stays "move to special:minimized" (plugin/src/Titlebar.cpp, and client requests: Minimize.hpp); this plugin delays
 // that move by the genie duration and warps the live window into the Dock meanwhile.
 #include "Close.hpp"
 #include "FrameMotion.hpp"
 #include "GenieTransformer.hpp"
+#include "Minimize.hpp"
 
 #include <hyprland/src/config/ConfigValue.hpp>
 #include <hyprland/src/config/values/ConfigValues.hpp>
@@ -239,6 +240,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
         HyprlandAPI::addNotification(handle, "[hyprkmotion] close hooks missing: no close blur / null-buffer snapshot fix", CHyprColor{1.0, 0.6, 0.2, 1.0}, 6000);
 
     motion::frame::init(handle);
+    motion::minimize::init(handle);
 
     g_listeners.push_back(Event::bus()->m_events.tick.listen([] {
         onTick();
@@ -255,6 +257,7 @@ APICALL EXPORT void PLUGIN_EXIT() {
     for (auto& a : pending)
         endAnim(a, eEnd::NOW);   // pending minimizes still happen; no transformer may outlive the .so
     g_listeners.clear();
+    motion::minimize::exit();
     motion::frame::exit();
     motion::close::exit();
     if (g_moveHook)
