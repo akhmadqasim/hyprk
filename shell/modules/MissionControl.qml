@@ -9,6 +9,7 @@ import qs.components
 import qs.HyprK
 import qs.services
 import "../lib/spring.js" as SpringLib
+import "../lib/state.js" as State
 
 // Mission Control (Super+Up): live thumbnails of the windows on the current Space laid out
 // without overlap, the Spaces bar at the top. Click a window to focus it, a Space to switch,
@@ -186,6 +187,7 @@ ShellWindow {
                 delegate: Rectangle {
                     id: pill
                     required property var modelData
+                    required property int index
                     readonly property bool current: modelData === Hyprland.focusedWorkspace
                     width: label.implicitWidth + mc.m.pillPadding * 2
                     height: mc.m.pillHeight
@@ -194,7 +196,7 @@ ShellWindow {
                     Text {
                         id: label
                         anchors.centerIn: parent
-                        text: "Desktop " + pill.modelData.id
+                        text: State.spaceName(pill.index, mc.spaces.length)
                         font: Typography.font(mc.m.labelSize, pill.current ? Typography.semibold : Typography.medium)
                         color: Theme.mission.text
                     }
@@ -220,6 +222,7 @@ ShellWindow {
                 delegate: Column {
                     id: sp
                     required property var modelData
+                    required property int index
                     readonly property bool current: modelData === Hyprland.focusedWorkspace
                     spacing: Theme.mission.spaceLabelGap
 
@@ -248,7 +251,7 @@ ShellWindow {
                     }
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
-                        text: "Desktop " + sp.modelData.id
+                        text: State.spaceName(sp.index, mc.spaces.length)
                         font: Typography.font(Theme.mission.labelSize, sp.current ? Typography.semibold : Typography.regular)
                         color: Theme.mission.text
                     }

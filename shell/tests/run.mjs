@@ -858,6 +858,11 @@ test("mode buttons start inside the field, end in place", () => {
     });
 }
 
+test("Mission Control: one Space reads Desktop, more are numbered by position", () => {
+    assert.equal(ST.spaceName(0, 1), "Desktop");
+    assert.equal(ST.spaceName(1, 3), "Desktop 2");
+});
+
 // ---- menus: keyboard steps and submenu frames (MenuDropdown.qml, Q-menubar-23, -25) ----
 {
     const M = load("menus.js");

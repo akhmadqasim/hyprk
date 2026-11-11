@@ -24,6 +24,12 @@ function parse(text, defaults) {
 // 2 by default as before). `size` absent = the Mac's built-in tilesize 64 (MAC-ANSWERS.md Q-dock-02); parse() keeps
 // only keys that have a default. The recent apps section is on by default, like macOS (`show-recents` absent = 1,
 // Q-dock-14).
+// Mission Control Space name: "Desktop" while there is only one, else "Desktop <position>" (27.2.1,
+// screens/27.2.1/dock/mc-light.png)
+function spaceName(index, count) {
+    return count > 1 ? "Desktop " + (index + 1) : "Desktop";
+}
+
 function dockDefaults() {
     return { autohide: false, magnification: false, size: 64, magnifiedSize: 128, showRecents: true };
 }
