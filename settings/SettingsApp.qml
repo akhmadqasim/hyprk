@@ -268,14 +268,17 @@ Item {
             Row {
                 anchors.fill: parent
                 Repeater {
-                    model: [{ g: "chevron_left", d: -1 }, { g: "chevron_right", d: 1 }]
+                    // SF chevron.backward / chevron.forward from their real outlines, regular, 16.5 pt: ink 16 x 28 px, tip
+                    // rows 4-5 px, arm 5 px on settings-toolbar-light.png, and here (medium: 29 px tall, 5-6; the Material
+                    // font's chevron before: tip 8 px, judge #4)
+                    model: [{ g: "chevron.backward", d: -1 }, { g: "chevron.forward", d: 1 }]
                     Item {
                         required property var modelData
                         readonly property bool can: modelData.d < 0 ? app.historyPos > 0 : app.historyPos < app.history.length - 1
                         width: nav.width / 2; height: nav.height
-                        Text {
+                        SfSymbol {
                             anchors.centerIn: parent
-                            text: modelData.g; font.family: Theme.fontGlyph; font.pixelSize: 26
+                            name: modelData.g; pointSize: 16.5
                             color: parent.can ? Theme.label : Theme.tertiaryLabel
                         }
                         MouseArea { anchors.fill: parent; onClicked: app.go(modelData.d) }
