@@ -62,3 +62,23 @@ same formula from the same table (`lights_model.py check` compares them): the pl
 
 Not from Apple data: the dark pressed zoom (its crop shows the rest disc): the rest disc times the close / minimise press
 gains. Not verified on screen: Option hover (+ glyph), the press spring, GTK client-side lights (drawn by the theme).
+
+## Colour space of the crops (2026-11-11)
+
+The `lights-*.png` crops carry the Mac display's values (Display P3) with the profile embedded ("Display"): close at rest is
+226,103,91 in the file and 244,93,84 in sRGB; yellow 243,191,0 -> 253,188,0; the green leaves the sRGB gamut (clipped). The
+table was fitted to the raw values and drawn as sRGB. `lights_model.py load()` now converts each crop through its profile
+(relative colorimetric, clipped) before the fit, and the table was refitted (body colours moved by up to 18 levels for
+close, 64 for minimise, 80 for zoom in the clipped channel). The dark pressed zoom entry is again the new rest row x 1.205
+(no crop of that press).
+
+| interior vs the Mac crop in sRGB, rms levels | close | minimise | zoom |
+|---|---|---|---|
+| dark rest, plugin title bar on screen (foot, MBA 2x), old table | 12.7 | 19.3 | 38.0 |
+| same, new table | 3.0 | 4.0 | 8.9 |
+| fit, whole disc: dark rest / light rest | 4.1 / 5.4 | 4.7 / 5.7 | 8.4 / 6.8 |
+| the raw crop against its sRGB version (what the old fit could not see): dark / light | 12.4 / 10.5 | 21.1 / 18.5 | 38.5 / 16.0 |
+
+Light, pressed and inactive states: refitted the same way, not re-read on screen (foot keeps a dark bar in light mode).
+Hand-off (ui/): `ui/HyprK/TrafficLights.qml` still holds the old table: paste the second block of
+`plugin/tools/lights_model.py emit` (then `lights_model.py check` matches again).
