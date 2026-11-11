@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import "Parsers.js" as P
+import "HyprK"
 import "panes/accessibility/A11y.js" as A11y
 
 // Shared state files state/<key>.json, also read by the shell. Each key below is a
@@ -37,7 +38,14 @@ QtObject {
         // option changes and cross-fades for 0.5 s (plugin 911cbe1, AppKit's NSGlobalPreferenceTransition), which only
         // hides the switch if no surface has drawn the other appearance yet; then the shell (its global, shell/Theme.qml:
         // the state file reached it 146 to 1063 ms later), then this window.
-        const next = _normalize[key](Object.assign({}, app[key], patch));
+        let next = _normalize[key](Object.assign({}, app[key], patch));
+        // Auto: light or dark is the sun's answer, never the caller's (Parsers.js autoDark; light without a location,
+        // as SLSAppearanceThemeForEnvironment returns light when no heuristic can be used)
+        if (key === "appearance" && next.mode === "auto" && _autoReady) {
+            const dark = _sunDark(Date.now());
+            patch = Object.assign({}, patch, { dark: dark });
+            next = _normalize[key](Object.assign({}, next, { dark: dark }));
+        }
         if (key === "appearance" && next.dark !== app.appearance.dark) {
             const a = next.dark ? "dark" : "light";
             Backend.hyprDispatch(`function() hl.config({ plugin = { liquidglass = { appearance = "${a}" } } }) end`);
@@ -49,6 +57,25 @@ QtObject {
         _flush.restart();
     }
     function setWallpaper(p) { set("wallpaper", { path: p }); }
+
+    // Appearance > Auto (Parsers.js "Appearance > Auto"): the place is the system time zone's city, read once; one
+    // single-shot timer runs to the sun's next -3 degree crossing, nothing polls. null: no zone or no coordinates.
+    property var autoPlace: null
+    property bool _autoReady: false   // the zone lookup has answered
+    function _sunDark(ms) { return autoPlace ? P.autoDark(ms, autoPlace.lat, autoPlace.lon) : false; }
+    // also called when the window becomes key: a timer does not count the time the computer slept
+    function autoSync() {
+        _autoTimer.stop();
+        if (appearance.mode !== "auto" || !_autoReady) return;
+        const now = Date.now();
+        if (_sunDark(now) !== appearance.dark) set("appearance", {});
+        const flip = autoPlace ? P.nextAutoFlip(now, autoPlace.lat, autoPlace.lon) : 0;
+        if (flip > 0) { _autoTimer.interval = Math.min(flip - now + 1000, 2147483647); _autoTimer.start(); }
+    }
+    property Timer _autoTimer: Timer { onTriggered: app.autoSync() }
+    readonly property string _mode: appearance.mode
+    on_ModeChanged: autoSync()
+    on_AutoReadyChanged: autoSync()
 
     // Unsaved local changes per key. External edits that arrive meanwhile are
     // merged under them, so neither side is lost.
@@ -75,6 +102,7 @@ QtObject {
         Theme.accentName = appearance.accent;
         Theme.tintWindow = appearance.tintWindowBackground;
         Theme.glassTint = isFinite(appearance.glass) ? Math.min(1, Math.max(0, appearance.glass)) : 0.5;
+        Accent.highlight = appearance.highlight;   // selectedTextBackgroundColor: "" follows the accent
     }
 
     Component.onCompleted: {
@@ -84,6 +112,9 @@ QtObject {
             const k = key;
             Backend.watch(path(k), text => app[k] = P.mergeState(text, app._patches[k], app._normalize[k]));
         }
+        // the zone's coordinates: zone1970.tab, else zone.tab (it also lists the older per-country zones)
+        Backend.run(["sh", "-c", "readlink /etc/localtime || head -n 1 /etc/timezone 2>/dev/null || echo; cat /usr/share/zoneinfo/zone1970.tab /usr/share/zoneinfo/zone.tab 2>/dev/null"],
+                    (c, out) => { const nl = out.indexOf("\n"); app.autoPlace = P.zoneCoords(out.slice(nl + 1), P.zoneName(out.slice(0, nl))); app._autoReady = true; });
         // Skip peripheral batteries (mouse, headset): their scope is "Device".
         Backend.run(["sh", "-c", "for d in /sys/class/power_supply/*; do [ \"$(cat $d/scope 2>/dev/null)\" = Device ] || cat $d/type 2>/dev/null; done"],
                     (c, out) => app.hasBattery = P.hasBattery(out));

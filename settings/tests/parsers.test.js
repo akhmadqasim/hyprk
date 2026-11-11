@@ -199,3 +199,55 @@ test("alert sounds show their 27.2.1 names, every file once", () => {
     assert.deepEqual(P.alertSoundMenu.slice().sort(), P.alertSounds.slice().sort());
     assert.equal(P.alertSoundTitles[P.alertSoundMenu[0]], "Boop");
 });
+
+test("appearance.json highlight: Automatic or one of AppKit's eight keys", () => {
+    assert.equal(P.normalizeAppearance({}).highlight, "");
+    assert.equal(P.normalizeAppearance({ highlight: "purple" }).highlight, "purple");
+    assert.equal(P.normalizeAppearance({ highlight: "multicolor" }).highlight, "");
+    assert.equal(P.normalizeAppearance({ highlight: "Brown" }).highlight, "");
+    assert.deepEqual(P.highlightNames, ["", "blue", "purple", "pink", "red", "orange", "yellow", "green", "graphite"]);
+});
+
+test("Auto keeps the stored sun answer, Light and Dark derive it", () => {
+    assert.equal(P.normalizeAppearance({ mode: "auto", dark: true }).dark, true);
+    assert.equal(P.normalizeAppearance({ mode: "auto" }).dark, false);
+    assert.equal(P.normalizeAppearance({ mode: "light", dark: true }).dark, false);
+    assert.equal(P.normalizeAppearance({ mode: "dark", dark: false }).dark, true);
+});
+
+test("time zone name and coordinates from /etc/localtime and zone1970.tab", () => {
+    const tab = "# comment\nID\t-0610+10648\tAsia/Jakarta\tJava, Sumatra\nUS\t+340308-1181434\tAmerica/Los_Angeles\tPacific\nGB,GG\t+513030-0000731\tEurope/London\n";
+    assert.equal(P.zoneName("/usr/share/zoneinfo/Asia/Jakarta\n"), "Asia/Jakarta");
+    assert.equal(P.zoneName("/var/db/timezone/zoneinfo/Europe/London"), "Europe/London");
+    assert.equal(P.zoneName("../usr/share/zoneinfo/posix/Asia/Jakarta"), "Asia/Jakarta");
+    assert.equal(P.zoneName("Asia/Makassar\n"), "Asia/Makassar");
+    assert.equal(P.zoneName("America/Argentina/Buenos_Aires"), "America/Argentina/Buenos_Aires");
+    assert.equal(P.zoneName("# tzdb timezone descriptions"), "");
+    assert.equal(P.zoneName(""), "");
+    const j = P.zoneCoords(tab, "Asia/Jakarta");
+    assert.ok(Math.abs(j.lat + 6.1667) < 1e-3 && Math.abs(j.lon - 106.8) < 1e-9);
+    const la = P.zoneCoords(tab, "America/Los_Angeles");
+    assert.ok(Math.abs(la.lat - 34.0522) < 1e-3 && Math.abs(la.lon + 118.2428) < 1e-3);
+    assert.equal(P.zoneCoords(tab, "UTC"), null);
+    assert.equal(P.zoneCoords("", "Asia/Jakarta"), null);
+});
+
+test("Auto is dark while the sun is below -3 degrees at the zone's city", () => {
+    const lon = { lat: 51.50833, lon: -0.12528 };
+    // London, 21 June 2026: sunrise 03:43 UTC and sunset 20:21 UTC are the -0.833 degree crossings
+    assert.ok(Math.abs(P.sunAltitude(Date.parse("2026-06-21T03:43:00Z"), lon.lat, lon.lon) + 0.833) < 0.1);
+    assert.ok(Math.abs(P.sunAltitude(Date.parse("2026-06-21T20:21:30Z"), lon.lat, lon.lon) + 0.833) < 0.1);
+    assert.equal(P.autoDark(Date.parse("2026-06-21T12:00:00Z"), lon.lat, lon.lon), false);
+    assert.equal(P.autoDark(Date.parse("2026-06-21T20:30:00Z"), lon.lat, lon.lon), false);   // set, but above -3
+    assert.equal(P.autoDark(Date.parse("2026-06-21T23:30:00Z"), lon.lat, lon.lon), true);
+    // the next change is the -3 degree crossing, to the second, and the answer differs on its two sides
+    const t0 = Date.parse("2026-06-21T12:00:00Z");
+    const flip = P.nextAutoFlip(t0, lon.lat, lon.lon);
+    assert.ok(flip > Date.parse("2026-06-21T20:21:30Z") && flip < Date.parse("2026-06-21T21:10:00Z"));
+    assert.equal(P.autoDark(flip - 2000, lon.lat, lon.lon), false);
+    assert.equal(P.autoDark(flip + 1000, lon.lat, lon.lon), true);
+    assert.ok(Math.abs(P.sunAltitude(flip, lon.lat, lon.lon) + 3) < 0.01);
+    // polar day: no change within two days
+    assert.equal(P.nextAutoFlip(t0, 78.22, 15.65), 0);
+    assert.equal(P.autoDark(t0, 78.22, 15.65), false);
+});

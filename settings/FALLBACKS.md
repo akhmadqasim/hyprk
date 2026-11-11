@@ -82,12 +82,18 @@ is the same colour, opaque.
 | Asset | Preferred | Fallback |
 |---|---|---|
 | UI font | `themes/fonts/SFNS.ttf` loaded with FontLoader (weights through the `wght` axis) | Inter, then Cantarell, then Noto Sans (`Theme.pickFont`) |
+| Glyphs in rows and the toolbar | SF Symbols outlines in `controls/sfpaths.js` (drawn by `controls/SfSymbol.qml`; add names with `scripts/sfpaths.py`) | none: a name that is not in the table draws nothing |
 | Pane icons | `themes/icons/settings/<pane id>@<64\|128>-<default\|dark\|clear\|tinted>-<light\|dark>.png` (all 23 panes, picked by the icon style and appearance) | colored rounded tile + Material Icons glyph (`fonts-material-design-icons-iconfont`, already installed) |
 | Wallpaper thumbnails | freedesktop `~/.cache/thumbnails/large` (made by `scripts/thumbs.sh`) | the full image |
 
 ## Files written for other parts of hyprk
 
 They go to `$HYPRK_STATE` (`Backend.stateDir`, set once by `config/hypr/start.sh`/`run.sh`: `<root>/state` if writable, else `~/.local/state/hyprk`; plain `qml` has no env and uses `<root>/state`).
+
+`appearance.json`: `mode` is light / dark / auto and `dark` is what is shown now. With Auto, `dark` is the sun's
+answer (dark while the sun is below -3 degrees at the system time zone's city, `Parsers.js` autoDark: the rule of
+macOS 27.2.1 without Location Services); Settings sets it when it starts, when Auto is chosen and at each crossing
+while it runs. Nothing changes it while Settings is closed. `highlight` is the text highlight colour ("" = Automatic).
 
 Settings writes these; the readers belong to the shell/config agents. As of this commit
 `appearance.json`, `dock.json`, `sound.json` and `wallpaper.json` have readers or are

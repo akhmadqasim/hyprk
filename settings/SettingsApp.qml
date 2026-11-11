@@ -19,6 +19,7 @@ Item {
     Binding { target: Theme; property: "windowActive"; value: app.windowActive }
     Binding { target: Tokens; property: "windowActive"; value: app.windowActive }
     onSnapshotPathChanged: if (snapshotPath !== "") windowActive = true
+    onWindowActiveChanged: if (windowActive) AppState.autoSync()   // Appearance > Auto after a sleep
     property string currentId: "appearance"
     // Non-empty: render once, save a PNG here and quit (reference comparisons).
     property string snapshotPath: ""
@@ -190,11 +191,8 @@ Item {
                     GradientStop { position: 0; color: "#A8A8AE" }
                     GradientStop { position: 1; color: "#7C7C82" }
                 }
-                Text {
-                    anchors.centerIn: parent
-                    text: "person"; font.family: Theme.fontGlyph; font.pixelSize: parent.width * 0.7
-                    color: "white"
-                }
+                // person.fill; the Mac's own avatar is blanked on every shot, so its glyph and size are not measured
+                SfSymbol { anchors.centerIn: parent; name: "person.fill"; pointSize: parent.width * 0.55; color: "white" }
             }
             Column {
                 anchors.left: avatar.right; anchors.leftMargin: 9; anchors.verticalCenter: avatar.verticalCenter
