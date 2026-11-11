@@ -8,3 +8,11 @@ wayland-scanner client-header "$here/wlr-screencopy-unstable-v1.xml" "$out/wlr-s
 wayland-scanner private-code "$here/wlr-screencopy-unstable-v1.xml" "$out/wlr-screencopy-unstable-v1-protocol.c"
 cc -O2 -Wall -I"$out" -o "$out/mcap" "$here/mcap.c" "$out/wlr-screencopy-unstable-v1-protocol.c" $(pkg-config --cflags --libs wayland-client)
 echo "$out/mcap"
+# fscroll (finger scrolls, see fscroll.c) needs the virtual-pointer protocol from the Hyprland source tree
+vp=${VPTR_XML:-$here/../../../hypr-dev/src/Hyprland/protocols/wlr-virtual-pointer-unstable-v1.xml}
+if [ -f "$vp" ]; then
+    wayland-scanner client-header "$vp" "$out/wlr-virtual-pointer-unstable-v1-client-protocol.h"
+    wayland-scanner private-code "$vp" "$out/wlr-virtual-pointer-unstable-v1-protocol.c"
+    cc -O2 -Wall -I"$out" -o "$out/fscroll" "$here/fscroll.c" "$out/wlr-virtual-pointer-unstable-v1-protocol.c" $(pkg-config --cflags --libs wayland-client) -lm
+    echo "$out/fscroll"
+fi
