@@ -353,6 +353,19 @@ Singleton {
         if (!t || appIdOf(t) === "hyprk-finder") return;
         activeAppWindows().forEach(closeWindow);
     }
+    // Cmd-` (Window > Cycle Through Windows ⌘`, menus.js): the next window of the frontmost app, not of every app; Shift
+    // goes the other way. The app's shown windows (not minimized or hidden) in a fixed order, from the focused one on,
+    // so pressing it again visits each of them
+    function cycleAppWindows(dir) {
+        const t = root.activeToplevel;
+        const wins = activeAppWindows().filter(w => !isMinimized(w) && !isHiddenWindow(w));
+        if (!t || wins.length < 2) return;
+        const order = wins.slice().sort((a, b) => addressOf(a) < addressOf(b) ? -1 : 1);
+        const i = order.indexOf(t);
+        focusWindow(order[(i + (dir < 0 ? -1 : 1) + order.length) % order.length]);
+    }
+    GlobalShortcut { appid: "hyprk"; name: "cycle-windows"; description: "Next window of the frontmost app (Cmd-`)"; onPressed: root.cycleAppWindows(1) }
+    GlobalShortcut { appid: "hyprk"; name: "cycle-windows-back"; description: "Previous window of the frontmost app (Shift-Cmd-`)"; onPressed: root.cycleAppWindows(-1) }
     GlobalShortcut { appid: "hyprk"; name: "hide-app"; description: "Hide the frontmost app (Cmd-H)"; onPressed: root.hideActiveApp() }
     GlobalShortcut { appid: "hyprk"; name: "hide-others"; description: "Hide the other apps (Option-Cmd-H)"; onPressed: root.hideOthers() }
     GlobalShortcut { appid: "hyprk"; name: "quit-app"; description: "Quit the frontmost app (Cmd-Q)"; onPressed: root.quitActiveApp() }

@@ -142,7 +142,7 @@ Item {
         case "empty-trash": Apps.confirmEmptyTrash(); break;
         case "minimize": Hyprland.dispatch('hl.dsp.window.move({ workspace = "special:minimized" })'); break;
         case "center": Hyprland.dispatch("hl.dsp.window.center()"); break;
-        case "cycle": Hyprland.dispatch("hl.dsp.window.cycle_next()"); break;
+        case "cycle": Apps.cycleAppWindows(1); break;
         case "settings": Apps.openSettings(); break;
         case "about": Panels.showAlert({
             icon: Distro.aboutIcon,
