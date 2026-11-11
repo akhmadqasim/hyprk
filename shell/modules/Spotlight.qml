@@ -29,8 +29,11 @@ ShellWindow {
     readonly property bool shown: Panels.open === "spotlight"
     // MAC-ANSWERS.md "REA 27.2.1" section 4 (SpotlightUIInternal, CASpringAnimation(perceptualDuration:bounce:)),
     // each on one exact spring (components/SpringCurve.qml):
-    // - open (FUN_2adea2ff0, FUN_2ade9ef14 flag 0): transform.scale.x 1.12 -> 1 on Spring(0.28, 0.41),
-    //   scale.y 0.95 -> 1 on Spring(0.28, 0.32), window alpha 0 -> 1 on Spring(0.28, 0.41);
+    // - open (FUN_2adea2ff0, FUN_2ade9ef14 flag 0): transform.scale.x AND scale.y 1.12 -> 1 on Spring(0.28,
+    //   bounce 0.32) (ratio 0.68), the path the empty bar takes live (PC #67 A4, verify/A/spotlight-open-fit.json:
+    //   RMS 0.22-0.30 pt of 487; height fits a 1.12 start, not 0.95; undershoot to 0.994). The other branch of
+    //   FUN_2adea2ff0 (x on bounce 0.41, y 0.95 -> 1) is not seen live. Window alpha 0 -> 1 on Spring(0.28, 0.41)
+    //   (REA, not re-measured);
     // - close (FUN_2adea36c8, FUN_2ade9ef14 flag 1): scale.x 1 -> 1.12 and scale.y 1 -> 0.95 on Spring(0.45, 0.05),
     //   alpha 1 -> 0 on Spring(0.28, 0.41). The window is unloaded when the alpha first reaches 0 (0.12 s); it
     //   would only swing back to 0.01 after that.
@@ -40,10 +43,9 @@ ShellWindow {
     // The window is created on open: the springs start on its first frame (alpha 0), else creating the surface
     // eats their first frames. Reduce motion: no scale (Theme.travel), the fade stays.
     property real scaleX: 1.12
-    property real scaleY: 0.95
+    property real scaleY: 1.12
     property real alpha: 0
-    readonly property var springOpenX: SpringLib.fromBounce(0.28, 0.41)
-    readonly property var springOpenY: SpringLib.fromBounce(0.28, 0.32)
+    readonly property var springOpen: SpringLib.fromBounce(0.28, 0.32)
     readonly property var springClose: SpringLib.fromBounce(0.45, 0.05)
     readonly property var springAlpha: SpringLib.fromBounce(0.28, 0.41)
     SpringCurve { id: animX; target: sp; property: "scaleX" }
@@ -58,8 +60,8 @@ ShellWindow {
     property bool gone: false
     function animate(open) {
         gone = false;
-        animX.spring = open ? springOpenX : springClose;
-        animY.spring = open ? springOpenY : springClose;
+        animX.spring = open ? springOpen : springClose;
+        animY.spring = open ? springOpen : springClose;
         animAlpha.cutAt = open ? 0 : SpringLib.firstCrossing(springAlpha, 0, 0.001);
         animX.go(open ? 1 : 1.12);
         animY.go(open ? 1 : 0.95);

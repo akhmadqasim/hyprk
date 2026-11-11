@@ -723,8 +723,8 @@ test("mode buttons start inside the field, end in place", () => {
         "HUD hide spring(0.48669, 1), cut at 0.48669 s": [SP.fromResponse(0.48669, 1), 0.48669],
         "HUD content spring(0.2, 0.85)": [SP.fromResponse(0.2, 0.85)],
         "Control Center Spring(0.25, -0.027)": [SP.fromBounce(0.25, -0.027)],
-        "Spotlight open x / alpha Spring(0.28, 0.41)": [SP.fromBounce(0.28, 0.41)],
-        "Spotlight open y Spring(0.28, 0.32)": [SP.fromBounce(0.28, 0.32)],
+        "Spotlight open alpha Spring(0.28, 0.41)": [SP.fromBounce(0.28, 0.41)],
+        "Spotlight open x and y Spring(0.28, 0.32)": [SP.fromBounce(0.28, 0.32)],
         "Spotlight close Spring(0.45, 0.05)": [SP.fromBounce(0.45, 0.05)],
     };
     for (const [name, [s, cut]] of Object.entries(springs))
