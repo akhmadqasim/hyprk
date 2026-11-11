@@ -26,18 +26,20 @@ def _gtk(s, **own):
                 tl_close=s['tl_close'], tl_min=s['tl_min'], tl_max=s['tl_max'], tl_off=s['tl_off'], accent_fg='#ffffff', **own)
 
 
-# Window chrome measured on 27.2.1 (reference/re/MAC-ANSWERS.md Q-windows; same numbers as ui/HyprK/Tokens.qml):
-#   tl_*_down  pressed disc fill beside the glyph (Q-windows-08; dark zoom did not change in its crop: CoreUI #56F66E)
+# Window chrome measured on 27.2.1 (reference/re/MAC-ANSWERS.md Q-windows). The shots hold Display P3 values, so the
+# tl_*_down and glyph_* colours are the Q-windows readings converted to sRGB (reference/ours/COLOUR-P3-AUDIT.md 3.1):
+#   tl_*_down  pressed disc fill beside the glyph (Q-windows-08; dark zoom did not change in its crop: CoreUI #56F66E,
+#              kept as it is: the colour space of that CoreUI value is not settled, audit 3.6)
 #   glyph_*    hover glyph colour (Q-windows-10)
 #   title_*    toolbar title, Finder (Q-windows-12); doc_title_* the 32 pt document title bar, TextEdit (Q-windows-11)
 #   frame_rim  the 1 pt inner white rim (Q-windows-03); the compositor draws the outer black one
 CHROME = {
-    'light': dict(tl_close_down='#FFAC9E', tl_min_down='#FFFF70', tl_max_down='#C6FF8F',
-                  glyph_close='#9E0000', glyph_min='#BE4900', glyph_max='#097900',
+    'light': dict(tl_close_down='#FFA79A', tl_min_down='#FFFF50', tl_max_down='#B6FF7F',
+                  glyph_close='#AD0000', glyph_min='#CE3E00', glyph_max='#007B00',
                   title_fg='#3A3B39', title_backdrop='#818480', doc_title_fg='rgba(0,0,0,0.70)', doc_title_backdrop='rgba(0,0,0,0.25)',
                   frame_rim='rgba(255,255,255,0.10)', frame_rim_backdrop='rgba(255,255,255,0.10)'),
-    'dark': dict(tl_close_down='#FF7C68', tl_min_down='#FFFF58', tl_max_down='#56F66E',
-                 glyph_close='#850000', glyph_min='#AA3600', glyph_max='#005500',
+    'dark': dict(tl_close_down='#FF7260', tl_min_down='#FFFF18', tl_max_down='#56F66E',
+                 glyph_close='#920000', glyph_min='#B92800', glyph_max='#005700',
                  title_fg='#ECECEB', title_backdrop='#757367', doc_title_fg='rgba(255,255,255,0.58)', doc_title_backdrop='rgba(255,255,255,0.30)',
                  frame_rim='rgba(255,255,255,0.10)', frame_rim_backdrop='rgba(255,255,255,0.08)'),
 }

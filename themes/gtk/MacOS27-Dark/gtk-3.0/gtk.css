@@ -45,12 +45,12 @@
 @define-color mac_knob #FFFFFF;
 @define-color mac_knob_shadow rgba(0,0,0,0.45);
 @define-color mac_menu_ring rgba(255,255,255,0.14);
-@define-color mac_tl_close_down #FF7C68;
-@define-color mac_tl_min_down #FFFF58;
+@define-color mac_tl_close_down #FF7260;
+@define-color mac_tl_min_down #FFFF18;
 @define-color mac_tl_max_down #56F66E;
-@define-color mac_glyph_close #850000;
-@define-color mac_glyph_min #AA3600;
-@define-color mac_glyph_max #005500;
+@define-color mac_glyph_close #920000;
+@define-color mac_glyph_min #B92800;
+@define-color mac_glyph_max #005700;
 @define-color mac_title_fg #ECECEB;
 @define-color mac_title_backdrop #757367;
 @define-color mac_doc_title_fg rgba(255,255,255,0.58);
