@@ -36,6 +36,9 @@ Item {
         radius: root.radius
         // materialize < 1: a 1 px hole in the middle row, x = left + 1 + round(m (w - 3))
         Region { id: hole; intersection: Intersection.Subtract; width: 0; height: 1 }
+        // shadow: false: a 1x1 hole one row below the middle row, centre column; the plugin then gives this shape
+        // _Glass.regular's drop shadow for its size instead of the layer recipe's (plugin 53efda0)
+        Region { id: shadowHole; intersection: Intersection.Subtract; width: 0; height: 1 }
     }
     function remeasure() {
         shape.item = null;
@@ -46,6 +49,9 @@ Item {
     function placeHole() {
         const p = root.mapToItem(null, 0, 0), e = root.mapToItem(null, root.width, root.height);
         const w = Math.ceil(e.x - p.x), h = Math.ceil(e.y - p.y);
+        shadowHole.x = Math.floor(p.x) + Math.floor(w / 2);
+        shadowHole.y = Math.floor(p.y) + Math.floor(h / 2) + 1;
+        shadowHole.width = (!root.shadow && shape.item && w >= 4 && h >= 3) ? 1 : 0;
         if (materialize >= 1 || !shape.item || w < 4 || h < 2) {
             hole.width = 0;
             return;
@@ -57,6 +63,7 @@ Item {
     // a materializing glass also changes scale (ControlCenter Module): re-measure, not just the hole
     onMaterializeChanged: if (Theme.compositorGlass) remeasure()
     onVisibleChanged: placeHole()
+    onShadowChanged: placeHole()
     onWidthChanged: placeHole()
     onHeightChanged: placeHole()
     // re-measure every frame for a while (call when this glass starts to move or scale)
