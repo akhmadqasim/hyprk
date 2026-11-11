@@ -89,6 +89,7 @@ ShellWindow {
             // "Edit Widgets" the Mac's backdrop is back to 1
             height: nc.y + nc.height - Theme.nc.editGap - Theme.nc.pillHeight + Theme.nc.backdropOutset
             blur: Theme.nc.backdropBlur
+            radius: Theme.nc.backdropRadius
             color: Theme.nc.backdropDim
             transform: Translate { x: nc.slideX }
         }
