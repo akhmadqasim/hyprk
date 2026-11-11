@@ -136,17 +136,14 @@ ShellWindow {
     readonly property real glyphScale: m.glyphSize / 32
     property var glyphs: ({})
     function addGlyph(name, text, baselineY, left) {
-        let paths = HudLib.svgPaths(text);
+        // paths from the left: speaker body, then its waves from the inside out
+        const paths = HudLib.svgPaths(text).sort((a, b) => a.maxX - b.maxX);
         const g = Object.assign({}, glyphs);
         g[name] = { paths: paths, baselineY: baselineY, left: left };
-        // speaker.wave.1.fill is not extracted: speaker.wave.2.fill without its outer wave
-        if (name === "speaker.wave.2.fill")
-            g["speaker.wave.1.fill"] = { paths: HudLib.withoutOuterWave(paths), baselineY: baselineY, left: left };
         glyphs = g;
     }
     Repeater {
         model: [
-            { name: "speaker.wave.2.fill", baselineY: 28.5, sun: false },
             { name: "speaker.wave.3.fill", baselineY: 30, sun: false },
             { name: "speaker.slash.fill", baselineY: 30.5, sun: false },
             { name: "sun.max.fill", baselineY: 31.5, sun: true }
@@ -164,9 +161,37 @@ ShellWindow {
 
     readonly property var dashList: HudLib.dashes(m.barLength, m.dashes, m.dashGap)
 
+    // one SF Symbol of win.glyphs, with an opacity per path
+    component Glyph: Item {
+        id: glyph
+        property string name
+        property var ops: []          // opacity per path (default 1)
+        readonly property var g: win.glyphs[name]
+        visible: !!g && opacity > 0
+        x: g ? g.left : 0
+        y: g ? win.m.glyphBaseline - g.baselineY * win.glyphScale : 0
+        Repeater {
+            model: glyph.g ? glyph.g.paths : []
+            Shape {
+                required property var modelData
+                required property int index
+                opacity: glyph.ops[index] ?? 1
+                visible: opacity > 0
+                preferredRendererType: Shape.CurveRenderer
+                transform: Scale { xScale: win.glyphScale; yScale: win.glyphScale }
+                ShapePath {
+                    fillColor: Qt.rgba(1, 1, 1, modelData.opacity)
+                    fillRule: ShapePath.WindingFill
+                    strokeColor: "transparent"
+                    strokeWidth: 0
+                    PathSvg { path: modelData.d }
+                }
+            }
+        }
+    }
     // one glyph + bar; volume and brightness each have one so they can crossfade
     component Layer: Item {
-        id: layer
+        id: lay
         property bool active
         property string symbol
         property real level
@@ -176,30 +201,52 @@ ShellWindow {
         // crossfade only while the HUD is on screen; a fresh HUD starts with the right layer
         onActiveChanged: if (win.shownness > 0) crossfade.go(active ? 1 : 0); else crossfade.snap(active ? 1 : 0)
         onLevelChanged: if (win.mapped) fill.go(level * win.m.barLength); else fill.snap(level * win.m.barLength)
-        function snap() { crossfade.snap(active ? 1 : 0); fill.snap(level * win.m.barLength); }
+        function snap() { crossfade.snap(active ? 1 : 0); fill.snap(level * win.m.barLength); glyphGo(false); }
         property real fillLength: 0
-        SpringCurve { id: crossfade; target: layer; property: "opacity"; spring: win.mo.content }
-        SpringCurve { id: fill; target: layer; property: "fillLength"; spring: win.mo.content }
+        SpringCurve { id: crossfade; target: lay; property: "opacity"; spring: win.mo.content }
+        SpringCurve { id: fill; target: lay; property: "fillLength"; spring: win.mo.content }
 
-        Item {
-            readonly property var g: win.glyphs[layer.symbol]
-            visible: !!g
-            x: g ? g.left : 0
-            y: g ? win.m.glyphBaseline - g.baselineY * win.glyphScale : 0
-            Repeater {
-                model: parent.g ? parent.g.paths : []
-                Shape {
-                    required property var modelData
-                    preferredRendererType: Shape.CurveRenderer
-                    transform: Scale { xScale: win.glyphScale; yScale: win.glyphScale }
-                    ShapePath {
-                        fillColor: Qt.rgba(1, 1, 1, modelData.opacity)
-                        fillRule: ShapePath.WindingFill
-                        strokeColor: "transparent"
-                        strokeWidth: 0
-                        PathSvg { path: modelData.d }
-                    }
+        // Glyph. Volume: speaker.wave.1 / .2 / .3 are one drawing, speaker.wave.3.fill with 1, 2 or 3 of its waves
+        // (the same paths on the same baseline: wave.2's body and waves are wave.3's 1.53 units higher on a canvas
+        // whose baseline is 1.5 higher), and speaker.slash.fill. A change of symbol fades only what differs, on the
+        // content spring: a wave fades in or out, the slash cross-fades with the whole speaker. Mac: SystemBannerUI
+        // swaps Image(systemName:) inside the value's withAnimation(spring 0.2 / 0.85) with no symbol effect (REA 1),
+        // and the recording shows the HUD's glyphs cross-fading in about 3 frames with both visible (volume <->
+        // brightness); that the same fade runs between wave counts, layer by layer, is inferred (no recording of it).
+        readonly property bool volume: symbol !== "sun.max.fill"
+        // opacities [speaker, wave 1, wave 2, wave 3, slash]: shown = from + (to - from) x mix
+        property var glyphFrom: [1, 0, 0, 0, 0]
+        property var glyphTo: [1, 0, 0, 0, 0]
+        property real glyphMix: 1
+        function glyphOp(k) { return glyphFrom[k] + (glyphTo[k] - glyphFrom[k]) * glyphMix; }
+        function glyphGo(animated) {
+            if (!volume) return;
+            const cur = [0, 1, 2, 3, 4].map(glyphOp);
+            const slash = symbol === "speaker.slash.fill";
+            const waves = symbol === "speaker.wave.1.fill" ? 1 : symbol === "speaker.wave.2.fill" ? 2 : symbol === "speaker.wave.3.fill" ? 3 : 0;
+            // muted: the speaker fades out with the waves it had
+            const to = slash ? [0, glyphTo[1], glyphTo[2], glyphTo[3], 1] : [1, waves >= 1 ? 1 : 0, waves >= 2 ? 1 : 0, waves >= 3 ? 1 : 0, 0];
+            glyphFade.snap(animated ? 0 : 1);
+            glyphFrom = animated ? cur : to;
+            glyphTo = to;
+            if (animated) glyphFade.go(1);
+        }
+        onSymbolChanged: glyphGo(win.mapped && win.shownness > 0 && opacity > 0)
+        SpringCurve { id: glyphFade; target: lay; property: "glyphMix"; spring: win.mo.content }
+
+        Loader {
+            active: !lay.volume
+            sourceComponent: Glyph { name: "sun.max.fill" }
+        }
+        Loader {
+            active: lay.volume
+            sourceComponent: Item {
+                Glyph {
+                    name: "speaker.wave.3.fill"
+                    opacity: lay.glyphOp(0)
+                    ops: [1, lay.glyphOp(1), lay.glyphOp(2), lay.glyphOp(3)]
                 }
+                Glyph { name: "speaker.slash.fill"; opacity: lay.glyphOp(4) }
             }
         }
 
@@ -207,7 +254,7 @@ ShellWindow {
         // filled part: the same dashes clipped at the level, so it can stop inside a dash
         Item {
             x: win.m.barX
-            width: Math.max(0, layer.fillLength)
+            width: Math.max(0, lay.fillLength)
             height: parent.height
             clip: true
             Bar { x: 0; color: win.m.fill; width: win.m.barLength }
