@@ -187,7 +187,8 @@ function normalizeDock(obj) {
 
 // sound.json, shared with the shell: alertSound is a name in sounds/wav/Sounds/<name>.wav.
 const alertSounds = ["Basso", "Blow", "Bottle", "Frog", "Funk", "Glass", "Hero", "Morse", "Ping", "Pop", "Purr", "Sosumi", "Submarine", "Tink"];
-const soundDefaults = { alertSound: "Tink", alertVolume: 0.75, uiSounds: true, volumeFeedback: false };
+// startupSound: the Mac row "Play sound on startup" (a firmware chime there); stored only: hyprk has no startup sound
+const soundDefaults = { alertSound: "Tink", alertVolume: 0.75, uiSounds: true, volumeFeedback: false, startupSound: true };
 
 function normalizeSound(obj) {
     const o = Object.assign({}, soundDefaults, (obj && typeof obj === "object") ? obj : {});
@@ -196,6 +197,7 @@ function normalizeSound(obj) {
     o.alertVolume = isFinite(v) ? Math.min(1, Math.max(0, v)) : soundDefaults.alertVolume;
     o.uiSounds = !!o.uiSounds;
     o.volumeFeedback = !!o.volumeFeedback;
+    o.startupSound = o.startupSound !== false;
     return o;
 }
 

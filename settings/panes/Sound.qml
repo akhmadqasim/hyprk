@@ -101,7 +101,7 @@ Column {
                 onReleased: pane.play(pane.soundsDir + "/Sounds/" + AppState.sound.alertSound + ".wav", AppState.sound.alertVolume)
             }
         }
-        FormRow { label: "Play sound on startup"; LocalSwitch { checked: true } }
+        FormRow { label: "Play sound on startup"; Switch { checked: AppState.sound.startupSound; onToggled: on => AppState.set("sound", { startupSound: on }) } }   // stored (sound.json); no startup sound exists to play
         FormRow { label: "Play user interface sound effects"; Switch { checked: AppState.sound.uiSounds; onToggled: on => AppState.set("sound", { uiSounds: on }) } }
         FormRow { label: "Play feedback when volume is changed"; Switch { checked: AppState.sound.volumeFeedback; onToggled: on => AppState.set("sound", { volumeFeedback: on }) } }
     }
