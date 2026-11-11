@@ -78,8 +78,9 @@ Column {
             visible: pane.current !== null && pane.radioOn
             label: pane.current ? pane.current.ssid : ""
             sublabel: "Connected"
-            Text { text: pane.current && pane.current.secure ? "lock" : ""; font.family: Theme.fontGlyph; font.pixelSize: 14; color: Theme.secondaryLabel }
-            Text { text: "wifi"; font.family: Theme.fontGlyph; font.pixelSize: 16; color: Theme.label }
+            // lock.fill and wifi at the body size (no Mac shot of this pane: sizes and colours are not measured)
+            SfSymbol { visible: pane.current !== null && pane.current.secure; anchors.verticalCenter: parent ? parent.verticalCenter : undefined; name: "lock.fill"; color: Theme.secondaryLabel }
+            SfSymbol { anchors.verticalCenter: parent ? parent.verticalCenter : undefined; name: "wifi"; color: Theme.label }
             Button { text: "Details…" }
         }
     }
@@ -104,10 +105,11 @@ Column {
                 required property var modelData
                 label: modelData.ssid
                 onClicked: pane.join(modelData.ssid)
-                Text { text: modelData.secure ? "lock" : ""; font.family: Theme.fontGlyph; font.pixelSize: 14; color: Theme.secondaryLabel }
-                Text {
-                    text: modelData.signal > 66 ? "wifi" : modelData.signal > 33 ? "wifi_2_bar" : "wifi_1_bar"
-                    font.family: Theme.fontGlyph; font.pixelSize: 16; color: Theme.label
+                SfSymbol { visible: modelData.secure; anchors.verticalCenter: parent ? parent.verticalCenter : undefined; name: "lock.fill"; color: Theme.secondaryLabel }
+                SfSymbol {   // the variable symbol's 2 and 1 bar states (CoreGlyphs wifi at 0.5 and 0.2)
+                    anchors.verticalCenter: parent ? parent.verticalCenter : undefined
+                    name: modelData.signal > 66 ? "wifi" : modelData.signal > 33 ? "wifi.var-50" : "wifi.var-20"
+                    color: Theme.label
                 }
             }
         }

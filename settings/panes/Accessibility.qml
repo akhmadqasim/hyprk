@@ -86,10 +86,13 @@ Column {
                     glyph: modelData.glyph; tint: Theme.tile.blue
                     label: modelData.title
                     onClicked: pane.page = modelData.id
-                    Text {
+                    // chevron.forward semibold 10.5 pt: fitted on accessibility-{light,dark}.png (alpha rms .026 /
+                    // .031; regular and medium, 10 to 13 pt: .041 and up). Ink 5.5 x 9.4 pt, centre 13.4 pt from the
+                    // card's edge on the Mac (x 706.6 of 740); 183 on 247 light, 92 on 37 dark = tertiaryLabel
+                    Item {   // the ink's right edge 10.5 pt inside the card (px 1419 of 1480), on whole pixels
                         anchors.verticalCenter: parent.verticalCenter
-                        text: "chevron_right"; font.family: Theme.fontGlyph; font.pixelSize: 18
-                        color: Theme.tertiaryLabel
+                        width: 6; height: 10
+                        SfSymbol { name: "chevron.forward"; weight: "semibold"; pointSize: 10.5; color: Theme.tertiaryLabel }
                     }
                 }
             }
@@ -103,10 +106,10 @@ Column {
         Row {
             id: back
             anchors.verticalCenter: parent.verticalCenter
-            Text {
+            Item { // the back link is hyprk's (the Mac navigates with the toolbar's back button): size not from a Mac shot
                 anchors.verticalCenter: parent.verticalCenter
-                text: "chevron_left"; font.family: Theme.fontGlyph; font.pixelSize: 22
-                color: Theme.accent
+                width: 22; height: 22
+                SfSymbol { anchors.centerIn: parent; name: "chevron.backward"; weight: "semibold"; pointSize: 13; color: Theme.accent }
             }
             Text {
                 anchors.verticalCenter: parent.verticalCenter

@@ -256,9 +256,9 @@ Column {
                 label: P.sizeText(modelData.w, modelData.h) + (modelData.isDefault ? " (Default)" : "")
                 dim: !pane.canPick
                 onClicked: pane.pick(modelData)
-                Text {
+                SfSymbol {   // checkmark at the body size (this list is not on a Mac shot: the size is not measured)
                     visible: P.sizeKey(modelData) === pane.selected
-                    text: "check"; font.family: Theme.fontGlyph; font.pixelSize: 18; color: Theme.accent
+                    name: "checkmark"; pointSize: 13; color: Theme.accent
                 }
             }
         }
