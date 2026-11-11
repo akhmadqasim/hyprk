@@ -456,6 +456,16 @@ Singleton {
         readonly property real trackY: 42
         readonly property real glyphLeft: 23
         readonly property real glyphRight: 24.25
+        // Sound's AirPlay-audio output button inside the slider (Q-panels-04; read from screens/27.2.1/panels/
+        // controlcenter-light.png: a 26 pt circle, white ~20 %, centred 26 pt from the right edge, the slider's end
+        // glyph and track 37 pt further left)
+        readonly property real outputButton: 26
+        readonly property real outputButtonRight: 26
+        readonly property real outputRoom: 37
+        // "Edit Controls": capsule 93.5 x 24 (r 12), centred, 16 below the last row (Q-panels-04, -05)
+        readonly property real editW: 93.5
+        readonly property real editH: 24
+        readonly property real editGap: 16
         readonly property real trackLift: 20 / 255
         // knob: none at rest, white 18 x 14 on hover with its right edge at the fill end; pressed, a clear lens about
         // 24 x 20 centred on the fill end, in about 3 frames (Q-panels-08, -09). Lens pixels over grey 127 (sound

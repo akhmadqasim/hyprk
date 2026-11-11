@@ -27,7 +27,7 @@ Item {
     function rowY(r) { return r * (rowH + gap); }
 
     width: Theme.cc.width
-    height: rowY(6) - gap
+    height: rowY(6) - gap + Theme.cc.editGap + Theme.cc.editH
 
     readonly property var wifiDev: State.wifiDevice(Networking.devices.values)
     readonly property var wifiNet: wifiDev ? wifiDev.networks.values.find(n => n.connected) || null : null
@@ -157,7 +157,19 @@ Item {
     SliderModule {
         y: cc.rowY(5)
         title: "Sound"
+        trailingRoom: Theme.cc.outputRoom
         available: Audio.available
+        // the AirPlay-audio output button: on the Mac it opens the output sub-panel, which hyprk does not have,
+        // so it is present but opens nothing
+        Rectangle {
+            x: parent.width - Theme.cc.outputButtonRight - width / 2
+            y: Theme.cc.trackY - height / 2
+            width: Theme.cc.outputButton
+            height: width
+            radius: width / 2
+            color: Theme.spotlight.tokenFill
+            Symbol { anchors.centerIn: parent; name: "airplayaudio"; surface: "ccOutput"; size: 16; color: Theme.cc.text }
+        }
         leftSymbol: "speaker.fill"
         rightSymbol: "speaker.wave.3.fill"
         value: Audio.muted ? 0 : Audio.volume
@@ -298,8 +310,29 @@ Item {
     // fill to the point (about 0.2 s), a drag
     // follows 1:1; past an end the track and fill stretch up to about 5 pt and spring back in 0.13 s on release.
     // The module itself does not move. Not built: the hover chevron (no sub-panels) and Sound's AirPlay button.
+    // "Edit Controls" (the Mac's edit mode is not built: present, opens nothing)
+    Glass {
+        id: editControls
+        width: Theme.cc.editW
+        height: Theme.cc.editH
+        radius: height / 2
+        x: Math.round((cc.width - width) / 2)
+        y: cc.rowY(6) - cc.gap + Theme.cc.editGap
+        sx: cc.originX + x
+        sy: cc.originY + y
+        tint: Theme.cc.tileTint
+        solidColor: Theme.cc.tileSolid
+        Text {
+            anchors.centerIn: parent
+            text: "Edit Controls"
+            font: Typography.font(12)     // size not measured: 12 by eye against the 24 pt capsule
+            color: Theme.cc.text
+        }
+    }
+
     component SliderModule: Module {
         id: sm
+        property real trailingRoom: 0     // room at the right end for a button (Sound's output button)
         property string title
         property bool available: true
         property string leftSymbol
@@ -339,7 +372,7 @@ Item {
             color: Theme.cc.text
         }
         Symbol {
-            x: parent.width - Theme.cc.glyphRight - width / 2
+            x: parent.width - Theme.cc.glyphRight - sm.trailingRoom - width / 2
             y: Theme.cc.trackY - height / 2
             name: sm.rightSymbol
             surface: "ccSlider"
@@ -349,7 +382,7 @@ Item {
         Item {
             id: track
             x: Theme.cc.trackX
-            width: parent.width - Theme.cc.trackX - Theme.cc.trackRight
+            width: parent.width - Theme.cc.trackX - Theme.cc.trackRight - sm.trailingRoom
             y: Theme.cc.trackY - height / 2
             height: Theme.cc.trackHeight
             readonly property real fillW: width * Math.max(0, Math.min(1, sm.shown))
