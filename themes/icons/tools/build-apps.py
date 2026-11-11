@@ -1,8 +1,8 @@
 #!/usr/bin/env python3 -I
-"""Build themes/icons/apps/<Name>-{1024,512,128}.png from the app icons in Assets.car.
+"""Build themes/icons/apps/<Name>-{1024,512,256,128}.png from the app icons in Assets.car.
 
 Per app the best real source wins: a pre-rendered 1024 px bitmap, else the pre-rendered 512 px
-(= 256@2x) bitmap. 512 and 128 are Lanczos-downsampled from it (premultiplied alpha). An app with
+(= 256@2x) bitmap. 512, 256 and 128 are Lanczos-downsampled from it (premultiplied alpha). An app with
 no usable rendition keeps its files (upscaled from the 256 px .icns, listed in the log).
 macOS 27 also stores the app icons as layers (.iconstack, SVG, gradients) for the Icon Composer
 renderer; those are not rendered here, the pre-rendered bitmaps are Apple's own render.
@@ -51,8 +51,8 @@ for line in open(os.path.join(icons, "apps-sources.txt")):
         log.append(f"upscaled {name}: no pre-rendered bitmap for {stem} in {app}"); continue
     out = f"{icons}/apps/{name}"
     if im.size[0] >= 1024: im.save(f"{out}-1024.png", optimize=True)
-    down(im, 512).save(f"{out}-512.png", optimize=True)
-    down(im, 128).save(f"{out}-128.png", optimize=True)
+    for n in (512, 256, 128):       # 256: AppIconTile picks the smallest file at or above the drawn size
+        down(im, n).save(f"{out}-{n}.png", optimize=True)
     log.append(f"real {r['w']} {name} <- {app} :: {r['name'][:48]} ({r['pix'].strip()})")
 open(os.path.join(icons, "apps-build.log"), "w").write("\n".join(log) + "\n")
 print("\n".join(l for l in log if not l.startswith("real")) or "all real")

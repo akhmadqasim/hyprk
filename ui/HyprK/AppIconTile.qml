@@ -27,6 +27,10 @@ Item {
     // keep the decoded art in Qt's pixmap cache (shared by every Image of the same file and size); false for files
     // that are dropped as a whole set, so they are freed with the last Image instead of lingering in the cache
     property bool cache: true
+    // the window's device pixel ratio when it is known (Quickshell: QsWindow.window.devicePixelRatio); 0 = the
+    // screen's, which is the next integer on a fractional output (2 at 1.6). Only picks the file to load: the drawing
+    // itself finds the device pixel grid in the shader
+    property real dpr: 0
 
     readonly property var info: _info
     readonly property bool tiled: !trusted && _info !== null && !_info.squircle
@@ -182,37 +186,60 @@ Item {
 
     // ---------- art ----------
     // Plain Image, not IconImage: IconImage reloads whenever its size changes (the magnifying
-    // Dock would reload every icon every frame). Loaded once at loadSize * scale, then scaled.
+    // Dock would reload every icon every frame). Loaded once for loadSize, then drawn by the shader below.
+    // The Image itself is never shown: Qt's bilinear / mipmap draw is soft (Laplacian energy 0.40-0.81 of a Lanczos
+    // downscale, 0.62 on a fractional output), so shaders/iconstyle.frag resamples the texture in one pass on the
+    // device pixel grid. No mipmaps: the texture is at most 4x the drawn size.
     Image {
         id: art
         readonly property var f: root.trusted || !root._info ? { scale: 1, dx: 0, dy: 0 }
             : IconShape.fit(root._info, root.tiled ? root.body * root.inner : root.body, root.tiled ? 1.6 : 1.25)
-        visible: root.ready && !root._mapped     // Clear / Tinted: drawn by the glyph below from this texture
+        visible: false
         width: root.size * f.scale
         height: width
         x: (root.size - width) / 2 + f.dx * root.size
         y: (root.size - height) / 2 + f.dy * root.size
-        // in device pixels: Qt decodes a local file at sourceSize as given, not times the device pixel ratio, so a
-        // logical size gave a 64 px decode drawn at 128 px on a 2x screen (Laplacian energy 0.37 of an ideal
-        // downscale; 0.78 decoded at 2x, as without any sourceSize). Screen.devicePixelRatio is 2 on fractional
-        // outputs too (1.6 measured), so those decode at 2x and scale down
-        readonly property real px: Math.ceil(root.loadSize * f.scale * Math.max(1, Screen.devicePixelRatio))
-        sourceSize: Qt.size(px, px)
+        // largest drawn size in device pixels (root.dpr: the window's real ratio when the app knows it)
+        readonly property real ratio: Math.max(1, root.dpr > 0 ? root.dpr : Screen.devicePixelRatio)
+        readonly property real exact: root.loadSize * f.scale * ratio
+        readonly property real px: Math.ceil(exact - 0.01)
+        // macOS icon files carry their size in the name (themes/icons: apps 128 / 256 / 512, system 128 / 512, style
+        // renditions 256). The 128 px file when it is drawn 1:1 or at 2/3 and less (just above the drawn size it
+        // keeps 0.83-0.92 of the detail: 128 drawn at 102), else 256 up to 256 px (0.93-1.01), else 512. Decoded as
+        // it is, or halved a whole number of times (an exact 2x2 average) while it is 4x the size or more.
+        // Anything else is decoded at px by Qt
+        readonly property var named: /^(.*\/(apps|system)\/[^\/]+)-(128|256|512|1024)(-[a-z]+-[a-z]+)?\.png$/.exec(root._key)
+        readonly property int fileSize: {
+            if (!named) return 0;
+            if (named[4] || named[3] !== "512") return Number(named[3]);
+            if (Math.abs(128 - exact) < 0.5 || 128 >= 1.5 * exact) return 128;
+            return exact <= 256.5 && named[2] === "apps" ? 256 : 512;
+        }
+        readonly property int decode: {
+            let d = fileSize;
+            while (d >= 4 * px && d > 16) d /= 2;
+            return d;
+        }
+        sourceSize: fileSize > 0 ? (decode === fileSize ? undefined : Qt.size(decode, decode)) : Qt.size(px, px)
         fillMode: Image.PreserveAspectFit
-        source: root.ready ? root.source : ""     // load once, at the final scale
+        source: !root.ready ? ""     // load once, at the final scale
+              : fileSize > 0 && !named[4] && fileSize !== Number(named[3]) ? named[1] + "-" + fileSize + ".png" : root.source
         asynchronous: true
         cache: root.cache
         smooth: true
-        mipmap: true
     }
-    // the art through the Clear / Tinted ramp: one quad sampling the art's own texture (no offscreen layer); built
-    // only while one of those styles is on
+    // off while the size animates (Dock magnification), so the icon does not step by device pixels
+    property bool _still: true
+    onSizeChanged: { if (_still) _still = false; settle.restart(); }
+    Timer { id: settle; interval: 150; onTriggered: root._still = true }
+    // the art, resampled (and in Clear / Tinted mapped through the ramp): one quad sampling the art's own texture
+    // (no offscreen layer), over the rows and columns the art covers
     Loader {
-        active: root._mapped && root.ready
-        x: art.x
-        y: art.y
-        width: art.width
-        height: art.height
+        active: root.ready && art.status === Image.Ready
+        x: art.x + (art.width - art.paintedWidth) / 2
+        y: art.y + (art.height - art.paintedHeight) / 2
+        width: art.paintedWidth
+        height: art.paintedHeight
         sourceComponent: ShaderEffect {
             property Item source: art
             property real clear: root._clear ? 1 : 0
@@ -221,6 +248,9 @@ Item {
             readonly property real tileSize: root.size * root.body
             property real tileTop: (art.y - (root.size - tileSize) / 2) / Math.max(1, tileSize)
             property real tileSpan: art.height / Math.max(1, tileSize)
+            property real plain: root._mapped ? 0 : 1
+            property real snap: root._still ? 1 : 0
+            property size texSize: Qt.size(art.implicitWidth, art.implicitHeight)
             fragmentShader: Qt.resolvedUrl("shaders/iconstyle.frag.qsb")
         }
     }

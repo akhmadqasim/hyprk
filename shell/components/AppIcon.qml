@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import qs
 import qs.HyprK
 import qs.services
@@ -21,6 +22,8 @@ AppIconTile {
     // a Dark / Clear / Tinted rendition is not cached: a style switch drops the whole set, and Qt's cache only frees
     // unreferenced images a quarter every 30 s (cycling 4 styles x 2 modes left +38 MB, still +14 MB 90 s later)
     cache: !/-256-(dark|clear|tinted)-(dark|light)\.png$/.test(String(source))
+    // the window's real device pixel ratio (1.6 where Screen.devicePixelRatio says 2), to load the right file size
+    dpr: QsWindow.window ? QsWindow.window.devicePixelRatio : 0
     body: Theme.appIcon.body
     inner: Theme.appIcon.inner
 }
