@@ -220,6 +220,25 @@ void FileOps::trash(const QStringList &paths)
     p->start(QStringLiteral("gio"), QStringList{QStringLiteral("trash"), QStringLiteral("--")} + paths);
 }
 
+void FileOps::emptyTrash()
+{
+    auto *p = new QProcess(this);
+    const QString headline = QStringLiteral("The Trash can\u2019t be emptied.");
+    connect(p, &QProcess::errorOccurred, this, [this, p, headline](QProcess::ProcessError e) {
+        if (e != QProcess::FailedToStart)
+            return;
+        emit trashEmptied(headline + QStringLiteral("\ngio is not installed."));
+        p->deleteLater();
+    });
+    connect(p, &QProcess::finished, this, [this, p, headline](int code, QProcess::ExitStatus status) {
+        const QString out = QString::fromUtf8(p->readAllStandardError()).trimmed().section(QLatin1Char('\n'), 0, 0);
+        emit trashEmptied(status == QProcess::NormalExit && code == 0 ? QString()
+                                                                       : headline + QLatin1Char('\n') + out.section(QStringLiteral(": "), -1));
+        p->deleteLater();
+    });
+    p->start(QStringLiteral("gio"), {QStringLiteral("trash"), QStringLiteral("--empty")});
+}
+
 bool FileOps::sameDevice(const QString &a, const QString &b) const
 {
     struct stat sa, sb;

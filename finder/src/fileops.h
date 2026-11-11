@@ -42,6 +42,8 @@ public:
     Q_INVOKABLE bool launchApp(const QString &desktopFile) const;
     // Runs `gio trash` without blocking the UI; trashFinished reports the outcome.
     Q_INVOKABLE void trash(const QStringList &paths);
+    // Empty Trash (Finder > Empty Trash…, ⇧⌘⌫): `gio trash --empty` without blocking the UI; trashEmptied reports it.
+    Q_INVOKABLE void emptyTrash();
     Q_INVOKABLE QString rename(const QString &path, const QString &newName) const;
     // Drag and drop into a folder: op "move" | "copy" | "link" (symlink, Finder's alias).
     // Never overwrites; runs mv/cp/ln without blocking the UI, transferFinished reports the outcome.
@@ -74,6 +76,7 @@ public:
 signals:
     void directoryChanged(const QString &dir);
     void trashFinished(const QString &error);   // empty on success
+    void trashEmptied(const QString &error);    // empty on success
     void transferFinished(const QString &error);   // empty on success
     void listed(int token, const QVariantList &entries);
 

@@ -238,7 +238,15 @@ QtObject {
         function onListed(token, list) { if (token === b._token) b._setEntries(list); }
         function onTrashFinished(error) {
             if (error) b.errorRaised(error);
-            else FileOps.playSound("trash-move");   // Finder's "move to trash" sound (shell/scripts/sound.sh)
+            // Finder's TMoveToTrashTask plays system sound 16 (dock/drag to trash.aif; MAC-ANSWERS.md "Sound ID ->
+            // file"); sound.sh event "trash-move" is the Move to Trash event (its file mapping lives in sound.sh)
+            else FileOps.playSound("trash-move");
+            b.reload();
+        }
+        // TEmptyTrashTask: system sound 13, finder/empty trash.aif (sound.sh "trash-empty")
+        function onTrashEmptied(error) {
+            if (error) b.errorRaised(error);
+            else FileOps.playSound("trash-empty");
             b.reload();
         }
         function onTransferFinished(error) {
