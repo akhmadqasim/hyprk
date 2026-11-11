@@ -806,15 +806,8 @@ Singleton {
 
     // ---------- alert dialog ----------
     readonly property QtObject alert: QtObject {
-        readonly property int width: 260                 // measured on macOS 27.2.1 (reference/re/LIVE-27.2.1.md)
+        // size and layout: HyprK panels.js alertLayout (shared with the apps' AlertPanel)
         readonly property int radius: 26                 // SPEC.md 7: alert window corner radius 26
-        readonly property int padding: 20                // measured
-        readonly property int iconSize: 64               // TODO verify
-        readonly property int spacing: 10                // measured (title to message)
-        readonly property int buttonHeight: 28           // capsule buttons, measured
-        readonly property int buttonGap: 8               // measured
-        readonly property real titleSize: 13             // measured: SF bold 13
-        readonly property real messageSize: 13           // measured: SF regular 13 (was 11)
         // pop on show (measured from a 60 fps recording): scale popFrom -> popPeak in popRise ms
         // (ease-in), back to 1 in popSettle ms; the peak is read from the moving outline, which includes
         // the shadow, so it is approximate
@@ -823,9 +816,11 @@ Singleton {
         readonly property int popRise: 200
         readonly property int popSettle: 170
         readonly property int fadeOut: theme.ms(100)     // dismiss: fade only
-        readonly property color buttonBg: theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0, 0, 0, 0.06)
-        readonly property real pressedOpacity: 0.75
-        readonly property real verticalBias: 1 / 3       // centre of the alert sits at 1/3 of the height
+        // the plain button: two layers a .047 + a .03 (Q-settings-15: white in dark, black in light), together a .0756:
+        // 71 on the 55 dark body as measured (Q-panels-33), 236 on white (#ECECEC). Pressed: one more a .098 layer
+        // (dark 71 -> 89 measured; black in light, Q-settings-15)
+        readonly property color buttonBg: theme.dark ? Qt.rgba(1, 1, 1, 0.0756) : Qt.rgba(0, 0, 0, 0.0756)
+        readonly property color buttonPressed: theme.dark ? Qt.rgba(1, 1, 1, 0.098) : Qt.rgba(0, 0, 0, 0.098)
     }
 
     // ---------- mission control ----------

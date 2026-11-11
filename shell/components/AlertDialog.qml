@@ -3,9 +3,10 @@ import Quickshell.Widgets
 import qs
 import qs.HyprK
 import qs.services
+import "../HyprK/panels.js" as P
 
-// macOS-style alert: glass card (Theme.alert.radius), app icon, bold title, message,
-// capsule buttons. Model: { icon, title, message, buttons: [{ label, action, isDefault, isCancel }] }.
+// macOS-style alert: regular glass (Theme.alert.radius), icon, bold title and message left-aligned,
+// capsule buttons (layout below). Model: { icon, title, message, buttons: [{ label, action, isDefault, isCancel }] }.
 // Enter runs the default button, Escape the cancel button.
 // Motion as measured on macOS 27.2.1 (reference/re/LIVE-27.2.1.md, live/video-motion-2.json): the alert
 // grows from its centre from about 4 %, easing in to an overshoot at 0.2 s, and settles by 0.37 s;
@@ -41,9 +42,21 @@ Item {
     property real originX: 0
     property real originY: 0
     readonly property var buttons: model && model.buttons ? model.buttons : [{ label: "OK", isDefault: true }]
-
-    width: Theme.alert.width
-    height: col.implicitHeight + Theme.alert.padding * 2
+    // the layout's order: the default first (P.alertLayout: 2 side by side with it on the right, 3 stacked default,
+    // third, second), the others as given
+    readonly property var ordered: {
+        const d = buttons.findIndex(b => b.isDefault);
+        return d < 0 ? buttons : [buttons[d]].concat(buttons.filter((b, i) => i !== d));
+    }
+    readonly property bool hasIcon: !!(model && model.icon)
+    // NSAlert on macOS 27.2.1, the Empty Trash alert itself (re/27.2.1/live/panels/panels-alert2-dark.json frames,
+    // screens/27.2.1/panels/alert-{dark,light}.png; MAC-ANSWERS Q-panels-33): 260 wide, 64 pt icon at (20, 20),
+    // bold 13 title and regular 13 message left-aligned in 220 pt, 110 x 28 capsules 16 pt from the edges. The same
+    // layout as the apps' AlertPanel (HyprK panels.js). Before: everything centred, buttons sharing the width
+    readonly property var layout: P.alertLayout(ordered.length, hasIcon, titleText.implicitHeight,
+                                                messageText.text !== "" ? messageText.implicitHeight : 0)
+    width: layout.width
+    height: layout.height
 
     function press(b) {
         Panels.close();
@@ -77,6 +90,8 @@ Item {
     Keys.onReturnPressed: pressDefault()
     Keys.onEnterPressed: pressDefault()
 
+    // regular glass, r 26 (LIVE-27.2.1: Alert = regular; the plugin's hyprk-overlay recipe is regular + the menu
+    // shadow). No tint of our own: tintStrong only reached the QML fallback
     Glass {
         anchors.fill: parent
         radius: Theme.alert.radius
@@ -87,60 +102,68 @@ Item {
     }
     MouseArea { anchors.fill: parent }
 
-    Column {
-        id: col
+    Item {
+        anchors.fill: parent
         opacity: root.fade
         enabled: root.shown
-        x: Theme.alert.padding
-        y: Theme.alert.padding
-        width: parent.width - Theme.alert.padding * 2
-        spacing: Theme.alert.spacing
 
         IconImage {
-            anchors.horizontalCenter: parent.horizontalCenter
-            implicitSize: Theme.alert.iconSize
-            source: Apps.iconUrl(root.model ? root.model.icon : "", "", Theme.iconLook)
+            visible: !!root.layout.icon
+            x: visible ? root.layout.icon.x : 0
+            y: visible ? root.layout.icon.y : 0
+            implicitSize: P.alert.icon
+            source: root.hasIcon ? Apps.iconUrl(root.model.icon, "", Theme.iconLook) : ""
             mipmap: true
         }
         Text {
-            width: parent.width
-            horizontalAlignment: Text.AlignHCenter
+            id: titleText
+            x: root.layout.title.x
+            y: root.layout.title.y
+            width: P.alert.textWidth
             wrapMode: Text.Wrap
             text: root.model ? root.model.title : ""
-            // Bold 13 (LIVE-27.2.1.md alert metrics) = the headline style, real Bold on the wght axis (Typography)
+            // Bold 13 (".SFNS-Bold 13.0" in the dump) = the headline style, real Bold on the wght axis (Typography)
             font: Typography.headline
             color: Theme.color.label
         }
         Text {
-            width: parent.width
+            id: messageText
             visible: text !== ""
-            horizontalAlignment: Text.AlignHCenter
+            x: P.alert.padding
+            y: root.layout.message ? root.layout.message.y : 0
+            width: P.alert.textWidth
             wrapMode: Text.Wrap
             text: root.model && root.model.message ? root.model.message : ""
-            font: Typography.message   // messageFont 13 (measured)
+            font: Typography.message   // ".SFNS-Regular 13.0"
             color: Theme.color.label
         }
-        Row {
-            width: parent.width
-            spacing: Theme.alert.buttonGap
-            Repeater {
-                model: root.buttons
-                delegate: Rectangle {
-                    id: btn
-                    required property var modelData
-                    width: (col.width - Theme.alert.buttonGap * (root.buttons.length - 1)) / root.buttons.length
-                    height: Theme.alert.buttonHeight
-                    radius: height / 2
-                    color: modelData.isDefault ? Theme.color.accent : Theme.alert.buttonBg
-                    opacity: bma.pressed ? Theme.alert.pressedOpacity : 1
-                    Text {
-                        anchors.centerIn: parent
-                        text: btn.modelData.label
-                        font: Typography.font(13, Typography.medium)   // 13 measured, Medium by eye
-                        color: btn.modelData.isDefault ? Theme.color.textOnAccent : Theme.color.label
-                    }
-                    MouseArea { id: bma; anchors.fill: parent; onClicked: root.press(btn.modelData) }
+        Repeater {
+            model: root.ordered
+            delegate: Rectangle {
+                id: btn
+                required property var modelData
+                required property int index
+                readonly property var r: root.layout.buttons[index] || { x: 0, y: 0, width: 0, height: 0 }
+                x: r.x; y: r.y; width: r.width; height: r.height
+                radius: height / 2
+                color: modelData.isDefault ? Tokens.panel.defaultFill : Theme.alert.buttonBg
+                // pressed: one more layer, instant (Q-panels-33: 71 -> 89 in dark; Q-settings-15: black a .098)
+                Rectangle {
+                    anchors.fill: parent
+                    radius: parent.radius
+                    visible: bma.pressed && bma.containsMouse
+                    color: Theme.alert.buttonPressed
                 }
+                Text {
+                    anchors.centerIn: parent
+                    width: parent.width - 16
+                    horizontalAlignment: Text.AlignHCenter
+                    elide: Text.ElideRight
+                    text: btn.modelData.label
+                    font: Typography.body   // 13 regular, the default too (Q-panels-33)
+                    color: btn.modelData.isDefault ? Theme.color.textOnAccent : Theme.color.label
+                }
+                MouseArea { id: bma; anchors.fill: parent; onClicked: root.press(btn.modelData) }
             }
         }
     }

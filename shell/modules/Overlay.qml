@@ -6,6 +6,7 @@ import qs
 import qs.components
 import qs.services
 import "../lib/menus.js" as Menus
+import "../HyprK/panels.js" as P
 
 // Transparent click-catcher below the menu bar that hosts the pull-down
 // menus, context menus and alerts. Clicking outside closes. Control Center and
@@ -72,7 +73,9 @@ ShellWindow {
         shown: Panels.open === "alert" && Panels.activeScreen === ov.modelData
         model: Panels.alert
         x: (ov.width - width) / 2
-        y: (ov.height - height) * Theme.alert.verticalBias
+        // its top at 0.26 of the screen less a quarter of its height (Q-panels-33, HyprK panels.js alertTop); this
+        // layer starts under the menu bar
+        y: P.alertTop(ov.height + Theme.menuBar.height, height) - Theme.menuBar.height
         originX: x
         originY: y + Theme.menuBar.height
     }

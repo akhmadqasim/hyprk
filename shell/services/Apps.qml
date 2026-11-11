@@ -345,7 +345,8 @@ Singleton {
     // Finder-style confirmation before erasing
     function confirmEmptyTrash() {
         Panels.showAlert({
-            icon: "user-trash-full",
+            // the 27.2.1 alert shows a folder (screens/27.2.1/panels/alert-{dark,light}.png), not the Trash
+            icon: appleIcons ? iconDir + "/system/GenericFolderIcon-512.png" : "folder",
             title: "Are you sure you want to permanently erase the items in the Trash?",
             message: "You can’t undo this action.",
             buttons: [{ label: "Cancel", isCancel: true }, { label: "Empty Trash", isDefault: true, action: root.emptyTrash }],
