@@ -12,7 +12,7 @@ import "../lib/hud.js" as HudLib
 // Volume / brightness HUD (macOS 27.2.1, MAC-ANSWERS.md "REA 27.2.1" section 1, SystemBannerUI): a glass
 // capsule at the top right, 10 pt below the menu bar, on the Control Center recipe (layer hyprk-hud), with an
 // SF Symbol and a bar of 16 dashes.
-// Motion (exact springs, lib/spring.js via components/SpringCurve.qml): one progress `shownness` drives scale
+// Motion (exact springs, lib/spring.js): one progress `shownness` drives scale
 // 0.9 -> 1 and opacity 0 -> 1 (BannerContentController: _scaleFactor 0.9, _opacity 0).
 // - appear: interpolatingSpring(mass 2, stiffness 300, damping 50) (response 0.513 s, ratio 1.021, which SwiftUI
 //   clamps to critical: lib/spring.js fromPhysics), also when a
@@ -20,8 +20,12 @@ import "../lib/hud.js" as HudLib
 // - hide: spring(response 0.48669, dampingFraction 1) to 0, and the window goes at 0.48669 s (the dismissal
 //   completion's asyncAfter), where the spring stands at 0.986;
 // - the content (bar fill, volume <-> brightness crossfade) moves on spring(response 0.2, dampingFraction 0.85).
-// The glass fades by mixing towards identity by 1 - opacity under an .opacity(opacity) view, so it is drawn at
-// opacity^2 (the recording's alpha fits opacity^2, RMS 0.017; the reason is an inference) and the content at opacity.
+// The glass is drawn at opacity^2 and the content at opacity. SystemBannerUI (BannerSlider.body 0x2aed61dd8, cache
+// address) puts one .opacity(opacity) on the content and wraps it in
+// _glassEffect(.controlCenter.mix(with: .identity, by: 1 - opacity)): the content fades with the spring, the glass
+// with the mix, read here as a second factor (inferred; the Mac's dismiss recording fits s^2 at rms 0.017). Content at
+// opacity^2 as well was tried: dismiss 222-233 ms on screen against the Mac's 283 (content at opacity: 282-291).
+// One value per frame of this window (components/FrameSpring).
 // Tokens and state: services/Hud.qml. The window is unmapped while hidden and nothing animates then.
 ShellWindow {
     id: win
@@ -44,7 +48,7 @@ ShellWindow {
     implicitHeight: Math.ceil(m.height) + 1
     acceptsInput: false                 // never takes clicks
 
-    // 0 hidden .. 1 shown: opacity of the content; scale 0.9 + 0.1 x (Reduce motion: no scale, Theme.travel)
+    // 0 hidden .. 1 shown: the spring and the content's opacity; scale 0.9 + 0.1 x (Reduce motion: no scale, Theme.travel)
     property real shownness: 0
     readonly property real glassAlpha: shownness * shownness
     property bool mapped: false
@@ -71,7 +75,6 @@ ShellWindow {
         motion.spring = mo.appear;
         motion.cutAt = 0;
         motion.go(1);
-        settleGlass(motion.duration + 50);
     }
     function disappear() {
         delay.stop();
@@ -79,11 +82,12 @@ ShellWindow {
         motion.spring = mo.hide;
         motion.cutAt = mo.hideSeconds;
         motion.go(0);
-        settleGlass(motion.duration + 50);
     }
+    // the glass follows the scale, re-measured in the frame that draws it (settleGlass() runs on Qt's 16 ms timer)
+    onShownnessChanged: glassMoved()
 
     Timer { id: delay; interval: win.mo.showDelay; onTriggered: win.begin() }
-    SpringCurve {
+    FrameSpring {
         id: motion
         target: win
         property: "shownness"

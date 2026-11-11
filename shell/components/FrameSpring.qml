@@ -17,7 +17,10 @@ FrameClock {
     // a run that starts from rest leaves with this velocity, in fractions of the distance per second (0: from rest)
     property real kick: 0
     property real goal: 0
+    // > 0: the run ends this many seconds in, where the spring really is (the property does not jump to `to`)
+    property real cutAt: 0
     readonly property bool landed: !running
+    signal finished()
 
     property var _spring: null
     property real _from: 0
@@ -45,10 +48,13 @@ FrameClock {
         target[property] = to;
     }
     onTick: {
-        const s = SpringLib.state(_spring, _v0, _at);
-        if (Math.abs(s[0] - 1) < 0.001 && Math.abs(s[1]) < 0.05) {
-            stop();
-            target[property] = goal;
-        } else target[property] = _from + (goal - _from) * s[0];
+        const cut = cutAt > 0 && _at >= cutAt;
+        const s = SpringLib.state(_spring, _v0, cut ? cutAt : _at);
+        const done = !cut && Math.abs(s[0] - 1) < 0.001 && Math.abs(s[1]) < 0.05;
+        target[property] = done ? goal : _from + (goal - _from) * s[0];
+        if (!cut && !done) return;
+        stop();
+        // not from inside the window's own frame: a handler may unmap or unload it
+        Qt.callLater(finished);
     }
 }

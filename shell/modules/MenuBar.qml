@@ -47,40 +47,40 @@ ShellWindow {
     readonly property bool strip: !!fsWindow && !!fsWindow.lastIpcObject.at && fsWindow.lastIpcObject.at[1] - hyprMonitor.y >= height - 1
     readonly property bool peek: topHover.hovered && fullscreen && strip
     readonly property bool peeking: fullscreen && strip && (peek || (Panels.open === "menu" && Panels.activeScreen === screen))
-    function askStrip() { stripRead.left = 4; stripRead.interval = 50; stripRead.restart(); }
+    function askStrip() { stripRead.tries = 4; stripRead.interval = 50; stripRead.restart(); }
     Connections {
         target: bar.fullscreen ? Hyprland : null
         function onRawEvent(event: HyprlandEvent): void { if (event.name === "fullscreen") bar.askStrip(); }
     }
     Timer {
         id: stripRead
-        property int left: 0
-        onTriggered: { Hyprland.refreshToplevels(); if (--left > 0) { interval = 250; restart(); } }
+        property int tries: 0     // not `left`: that is the title row's id, and `--left` threw (the read ran once)
+        onTriggered: { Hyprland.refreshToplevels(); if (--tries > 0) { interval = 250; restart(); } }
     }
     // set only by fade() (and once at start): a binding on `fullscreen` re-evaluated after the exit fade had started
     // and drew one frame at 1 (the titles at full alpha over the window's lights in the exit's first frame)
     property real fsAlpha: 1
     Component.onCompleted: fsAlpha = fullscreen ? 0 : 1
-    // The peek's linear fades run on the wall clock, one value per frame (FrameAnimation, like the lock overlay): a
-    // NumberAnimation's first frame repeated the start value (judge #4: 6 of 6) and a held frame delayed the rest
-    property double fadeT0: 0
+    // The peek's linear fades take one value per frame of this window (FrameClock, like the lock overlay): a
+    // NumberAnimation's first frame repeated the start value (judge #4: 6 of 6), and a FrameAnimation ticked by Qt's
+    // 16 ms timer lost one value in most fades (.20 -> .40, MOTION-MEASURED sessions 9 and 10)
     property real fadeFrom: 0
     property real fadeTo: 0
     property int fadeMs: 1
-    FrameAnimation {
+    FrameClock {
         id: fadeClock
-        onTriggered: {
-            const p = Math.min(1, (Date.now() - bar.fadeT0 + bar.fadeLead) / bar.fadeMs);
+        onTick: {
+            // the first tick's frame is one interval into the fade: the frame before it shows the start value
+            const p = Math.min(1, (elapsed + interval) / bar.fadeMs);
             bar.fsAlpha = bar.fadeFrom + (bar.fadeTo - bar.fadeFrom) * p;
             if (p >= 1) stop();
         }
     }
-    readonly property int fadeLead: 8   // a frame is on screen about this long after the GUI computes it (LockTheme.frameLead)
     function fade(to, ms, linear) {
         fsAnim.stop();
         fadeClock.stop();
         if (linear) {
-            fadeFrom = fsAlpha; fadeTo = to; fadeMs = Math.max(1, Theme.ms(ms)); fadeT0 = Date.now();
+            fadeFrom = fsAlpha; fadeTo = to; fadeMs = Math.max(1, Theme.ms(ms));
             fadeClock.start();
             return;
         }
