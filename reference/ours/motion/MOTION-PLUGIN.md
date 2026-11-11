@@ -275,3 +275,49 @@ Not covered, hand-offs:
   the shell writes): after the fade, a snap.
 - Not tried on screen: a lock during a fade (sessions are never locked in tests; by code the fade ends when a lock starts),
   two outputs, a rotated output (skipped by code).
+
+## Genie follow-up (2026-11-11, plugin d104e6d, plugin-motion unchanged)
+
+Method: mcap of the whole output below the bar (-k 4), minimise = move to `special:minimized`, restore = move back; share of
+samples that differ from the first frame (restore) or no longer differ from the last (minimise), against the Mac's TextEdit
+1300 x 900 series (#42), time shift fitted. Two readings of every capture: the whole region (as the Mac's, window + shadow +
+neck) and the window's rect alone. 5 runs each, grey 127, the window alone on its workspace. 2-98 % of the Mac series by
+the same function: 367 ms (the "383" quoted before counts one frame more).
+
+| MBA, 5 runs each | whole region: rms / 2-98 % ms, minimise | restore | window rect: rms / 2-98 %, minimise | restore |
+|---|---|---|---|---|
+| foot, dark, 2x | .018-.019 / 400 | .020 / 400-401 | .015 / 350 | .017-.018 / 350-366 |
+| GNOME Calculator, dark, 2x | .025-.026 / 416-417 | .027 / 417 | .032 / 383 | .035-.036 / 383-384 |
+| Finder, dark, 2x | .027 / 400 | .028-.029 / 400 | .020 / 367 | .022 / 383-384 |
+| Settings, dark, 2x | .026 / 416-417 | .028 / 416-417 | .026 / 383-400 | .029 / 383-384 |
+| foot, light, 2x | .019-.020 / 400-405 | .020-.022 / 397-400 | .013 / 367-371 | .014-.015 / 364-367 |
+| Calculator, light, 2x | .025-.026 / 417-419 | .027-.031 / 400-434 | .027-.029 / 384-388 | .029-.033 / 382-403 |
+| Finder, light, 2x | .027-.029 / 400-403 | .030-.031 / 400-421 | .017-.019 / 383-385 | .020 / 382-398 |
+| Settings, light, 2x | .023-.029 / 402-420 | .029 / 417-419 | .019-.025 / 381-400 | .025-.026 / 383-386 |
+| all four, light and dark, scale 1.6 (whole region) | .016-.022 / 396-436 | .018-.024 / 391-421 | | |
+
+- Dark is no longer worse than light (restore .020-.029 dark, .020-.031 light; the .041-.043 of before fddd07a's follow-up
+  was not reproduced in 20 dark restores).
+- The whole-region 2-98 % is 30-50 ms longer than the Mac's 367 ms; read on the window's rect it is the Mac's (350-384 ms on
+  foot, Finder, Settings; Calculator 383-403). The difference is the shadow halo: it is warped with the window (fddd07a), and
+  its side lobes outside the rect reach their final values only in the last frames, when the mesh is the identity.
+- The window-rect reading at scale 1.6 came out at 286-359 ms and rms .042-.066 for every app; not explained (the same
+  captures read .016-.024 / 391-436 on the whole region), so it is not in the table.
+- By eye (frames 4 / 10 / 16 / 22 / 26 / 28 of a restore per app, dark, 2x): no outline beside the window, no line to the
+  Dock. End pop: the largest single step of the window-rect share after 0.9 is .023-.045 at 2x (Mac series: .033), up to
+  .071 once at 1.6 (Finder, dark). Frames longer than 25 ms: 0 at 2x dark, 0-6 per run in light and at 1.6.
+
+Shadow during the genie on the Mac. No recording is in the repo (the #42 videos stayed on the Mac). From the binaries:
+- Dock 27.2.1 warps the real window: `CGSSetWindowWarp` in the genie step (0x100026bf0, the function with cos / log / acos at
+  0x100026228) and again when it ends (0x100026f9c, with `CGSOrderWindow`, `CGSReleaseWindow` and `CGSClearWindowTags` of tag
+  bit 34). The Dock's only shadow call (`CGSWindowSetShadowProperties`, 0x1002213d4) is a Swift helper for its own windows;
+  the genie path sets no shadow property and not the no-shadow tag (bit 3).
+- SkyLight 27.2.1: `CGXWindow::set_mesh_warp` 0x1829f7550 stores the mesh; `WS::Updater::defenestrator::
+  ca_window_prep_ingestion_phase` (call at 0x182797894) takes `CGXWindow::frame_mesh()` and, independently of it, the shadow
+  (`CGXWindowIsShadowed` = shadow enabled and tag bit 3 clear, `wants_efficient_ca_shadow` / `wants_inefficient_ca_shadow`,
+  `WSWindowShadowCurrentPropertiesPtr`), then `WSCAMeshFromWSMesh` (a `CAMutableMeshTransform`). No branch drops the shadow
+  for a warped window.
+- The #42 small-window series agrees: minimise starts 1.0 .992 .975 although the shadow is 30 % of the changed area there
+  (area0 21426 cells against 15000 for the window), so the shadow does not vanish in the first frame.
+- Not decoded: whether CoreAnimation bends the layer's shadow with the mesh or draws it from the warped content. Ours bends
+  it with the window (fddd07a), unchanged.
