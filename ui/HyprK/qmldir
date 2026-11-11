@@ -20,6 +20,7 @@ SegmentedControl 1.0 SegmentedControl.qml
 ToolbarPlatter 1.0 ToolbarPlatter.qml
 Slider 1.0 Slider.qml
 OverlayScrollbar 1.0 OverlayScrollbar.qml
+RubberBand 1.0 RubberBand.qml
 Knob 1.0 Knob.qml
 FocusRing 1.0 FocusRing.qml
 Popup 1.0 Popup.qml
@@ -34,3 +35,4 @@ Popover 1.0 Popover.qml
 Motion 1.0 motion.js
 PanelLayout 1.0 panels.js
 Chameleon 1.0 chameleon.js
+RubberBandMath 1.0 rubberband.js
