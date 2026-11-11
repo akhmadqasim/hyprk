@@ -34,7 +34,7 @@ Item {
     // ---------- backdrop: the desktop wallpaper exactly as the desktop draws it (Background.qml) ----------
     component Wall: Image {
         source: Wallpaper.url
-        sourceSize: Qt.size(c.width, c.height)
+        sourceSize: Qt.size(Wallpaper.pixelWidth, Wallpaper.pixelHeight)
         fillMode: Image.PreserveAspectCrop
         cache: true               // the same pixmap as the desktop's and every lock surface's
         asynchronous: false
