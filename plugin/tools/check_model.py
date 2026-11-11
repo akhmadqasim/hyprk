@@ -250,6 +250,13 @@ def config_underlay(ns="hyprk-controlcenter", key="underlay_blur"):
     return 0.0
 
 
+def panel_const(name):
+    """a constexpr double of src/GlassElement.cpp (the panel blur's ramp)"""
+    import re
+    txt = open(os.path.join(HERE, "..", "src", "GlassElement.cpp")).read()
+    return float(re.search(r"\b%s = ([0-9.]+)" % name, txt).group(1))
+
+
 def stripes_check(ours):
     from PIL import Image
     print("\n5. refraction and blur over 4 pt black/white stripes (2x px)")
@@ -264,21 +271,31 @@ def stripes_check(ours):
     panel = config_underlay(key="panel_blur")
     if panel > 0:
         # the plugin draws the panel blur first (GlassElement::drawPanel): one trilinear read of its full-resolution pyramid
-        # (level 0 = the screen, level 1 = the 2x2 box = Apple's scale-0.5 base) at lod(1.6 r px/pt); the tiles sample that
-        pyr = GM3.Pyramid1D(raw, 0.5)
-        Lp = apple_lod(1.6 * panel * 2)
-        def ours_level(L, screen=raw):
-            return screen * (1 - L) + pyr.sample(0) * L if L <= 1 else pyr.sample(L - 1)
+        # (level 0 = the screen, level 1 = the 2x2 box = Apple's scale-0.5 base) at lod(1.6 r px/pt), r ramping with the
+        # depth inside the panel box (the tiles' box grown by PANEL_OUT): 0 at its edge, PANEL_KNEE_OPACITY x at PANEL_KNEE,
+        # full from PANEL_RAMP (constants read from GlassElement.cpp). The crop's tile is the column's left tile, so the
+        # box edge is PANEL_OUT left of it and both rows ramp horizontally; the tiles sample that row
+        out, ramp, knee, knee_op = (panel_const(k) for k in ("PANEL_OUT", "PANEL_RAMP", "PANEL_KNEE", "PANEL_KNEE_OPACITY"))
+        def panel_row(screen):
+            pyr = GM3.Pyramid1D(screen, 0.5)
+            levels = [screen] + [pyr.sample(l) for l in range(8)]  # full-resolution levels 0..8
+            depth = out + (x + 0.5 - edge) / 2
+            f = np.interp(depth, [0, knee, ramp], [0, knee_op, 1])
+            L = np.array([apple_lod(1.6 * panel * fi * 2) for fi in f])
+            l0 = np.minimum(np.floor(L).astype(int), len(levels) - 2)
+            stack = np.array(levels)
+            return stack[l0, x] * (1 - (L - l0)) + stack[l0 + 1, x] * (L - l0)
         # the gap row's stripes sit 1 px right of the tile row's model (phase 4, best fit of the row)
-        rg = np.where(((x - 4) // 8) % 2 == 0, 0.0, 0.898)
-        pg = GM3.Pyramid1D(rg, 0.5)
-        gp = pg.sample(Lp - 1)[100:500] * 255 - mac[2][100:500]
-        raw = ours_level(Lp)
-        r_g = float(np.sqrt((gp ** 2).mean()))
-        print("    CC panel blur between the tiles (radius %.2f pt): pp %.1f (Mac %.1f), row rms %.2f levels" % (
-            panel, np.ptp(raw[100:500] * 255), np.ptp(mac[2][100:500]), r_g))
+        gp = panel_row(np.where(((x - 4) // 8) % 2 == 0, 0.0, 0.898)) * 255 - mac[2]
+        raw = panel_row(raw)
+        r_g, r_e = float(np.sqrt((gp[100:500] ** 2).mean())), float(np.sqrt((gp[:140] ** 2).mean()))
+        print("    CC panel blur (radius %.2f pt, ramp %g / %g @ %g / %g pt): gap row between the tiles pp %.1f (Mac %.1f), rms %.2f "
+              "levels; where it leaves the tile column (140 px) rms %.2f" % (panel, out, knee, knee_op, ramp, np.ptp(raw[100:500] * 255),
+                                                                           np.ptp(mac[2][100:500]), r_g, r_e))
         if r_g > 1.0:
             bad.append("CC panel blur")
+        if r_e > 5.0:  # 1-D model of the ramp, 4.35; on screen 2.27 (REFRACTION.md "Rounded-end ripple")
+            bad.append("CC panel blur ramp")
     P = ours[("controlcenter", True, 64, 0.5)]
     g = dict(A.inputs("controlcenter", 64, 0.5, True), _material="controlcenter")
     o, a, m = row_ours(raw, P, edge, n, under), row_apple(gap, g, edge, n), mac[row, 8:8 + n]
@@ -300,6 +317,12 @@ def stripes_check(ours):
     print("      lens band extrema (px from the edge): Mac %s, ours %s" % (ext(m), ext(o)))
     if r_o > 2.5 or r_o > r_a + 1.0:
         bad.append("CC rounded end")
+    # ripple of the rounded end, depth 2..28 pt (the lens reads up to 80 pt inside, within the panel ramp)
+    d = slice(4, 56)
+    print("    CC tile rounded end, depth 2..28 pt: peak to peak ours %.1f (%.0f..%.0f), Mac %.1f (%.0f..%.0f)" % (
+        np.ptp(o[d]), o[d].min(), o[d].max(), np.ptp(m[d]), m[d].min(), m[d].max()))
+    if abs(np.ptp(o[d]) - np.ptp(m[d])) > 2.5:
+        bad.append("CC rounded-end ripple")
     # interior contrast 15 pt below the top edge (C2 cc-real.json: 7.9 peak to peak at a = 0.507): a row there reads at
     # depth 15 without lateral displacement (the normal is vertical), so its blur level is that of depth 15
     k = 1.6 * 2 * P["BackdropScale"]
