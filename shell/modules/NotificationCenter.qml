@@ -29,6 +29,7 @@ Item {
 
     readonly property int headerHeight: Theme.nc.headerHeight
     readonly property int cardGap: Theme.notif.spacing
+    property real firstSlot: 1   // slot of the first notification group (the gap under it opens and closes with it)
     property var expanded: ({})       // appName -> bool
     property string photo: ""
     readonly property string wallpaperDir: Quickshell.shellDir + "/../themes/wallpapers/png"
@@ -189,12 +190,14 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true
                     visible: groupModel.count > 0
-                    spacing: nc.cardGap
+                    // the gaps are the groups' top margins, so they open and close with the arriving or cleared group
+                    spacing: 0
                 Repeater {
                     model: groupModel
                     delegate: Item {
                         id: grp
                         required property string app
+                        required property int index
                         // reassigned only when this app's notifications change, so the other
                         // stacks keep their cards (a drag or hover is not cut off by a new arrival)
                         property var items: []
@@ -250,10 +253,16 @@ Item {
                         }
                         readonly property real liveHeight: closedHeight + (openHeight - closedHeight) * ex
                         Layout.fillWidth: true
-                        Layout.preferredHeight: Math.max(0, liveHeight * slot)
-                        Layout.bottomMargin: -nc.cardGap * (1 - slot)
+                        // whole points: the layout rounds sizes up, so a group 0.06 pt tall still took 1 pt and the list
+                        // jumped 2 pt when the cleared group went (mcap)
+                        Layout.preferredHeight: Math.max(0, Math.floor(liveHeight * slot))
+                        // the gap above this group grows and shrinks with it, and with the first group when that one
+                        // arrives or goes. A negative margin under a group of height 0 was clamped by the layout, so
+                        // the gap jumped 6 pt when a group was inserted or removed (mcap)
+                        Layout.topMargin: index === 0 ? 0 : Math.round(nc.cardGap * slot * (index === 1 ? nc.firstSlot : 1))
+                        onIndexChanged: if (index === 0) nc.firstSlot = slot
                         onLiveHeightChanged: nc.settle()
-                        onSlotChanged: nc.settle()
+                        onSlotChanged: { nc.settle(); if (index === 0) nc.firstSlot = slot; removeIfClosed(); }
 
                         // clear the whole stack: fade out in place, then the list closes up, then remove for real
                         property bool closing: false
@@ -270,12 +279,15 @@ Item {
                             NumberAnimation { target: grp; property: "shade"; to: 0; duration: Theme.ms(NcLib.clearFadeMs) }
                             ScriptAction { script: grp.closeUp() }
                         }
-                        function closeUp() {
-                            slotAnim.go(0);
-                            removeLater.interval = slotAnim.duration;
-                            removeLater.start();
+                        // removed once the spring has landed on 0: a timer of the spring's length fired a frame early, with
+                        // the group still 0.06 pt tall, which the layout rounded up to 1 pt (a 1 pt jump at the end, mcap)
+                        function closeUp() { slotAnim.go(0); }
+                        property bool removed: false
+                        function removeIfClosed() {
+                            if (!closing || slot > 0 || removed) return;
+                            removed = true;
+                            Qt.callLater(() => grp.clearing.forEach(id => Notifs.dismiss(id)));
                         }
-                        Timer { id: removeLater; onTriggered: grp.clearing.forEach(id => Notifs.dismiss(id)) }
                         Connections {
                             target: nc
                             function onClearStack(app) { if (app === grp.app) grp.clearAll(); }
@@ -346,7 +358,7 @@ Item {
                                 // stacked behind the first card its glass region would merge into one box
                                 glass: grp.shade > 0 && (front || grp.ex > 0.05) && nc.fits(c, nc.layoutTick + y)
                                 contentOpacity: Math.min(1, reveal)
-                                stacked: front && grp.ex < 0.05 ? Math.min(grp.n - 1, 2) : 0
+                                stacked: front && grp.ex < 0.05 ? Math.max(0, Math.min(grp.n - 1, 2)) : 0
                                 swipeable: front || grp.open
                                 buttonHost: nc.buttonHost
                                 sx: nc.originX + nc.slideX + x
@@ -358,7 +370,9 @@ Item {
                                     Notifs.invokeDefault(nid);
                                     Panels.close();
                                 }
-                                onClosed: grp.n > 1 && !grp.open ? grp.clearAll() : swipeAway()
+                                // the close button: a single card or a collapsed stack fades in place and the list closes
+                                // up (PC #62 3g); it used to slide out first, which held the list ~0.32 s (mcap)
+                                onClosed: grp.open ? swipeAway() : grp.clearAll()
                                 onSwiped: grp.open ? Notifs.dismiss(nid) : grp.clearAll()
                             }
                         }
