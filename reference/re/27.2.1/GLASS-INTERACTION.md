@@ -123,14 +123,14 @@ grows ×1.56 on easeInEaseOut 0.2 s; slider: ×1.25 on the 144 ms bezier, MOTION
 - released (phase < 0): both opacities → 0 and the glow scale → **4** on response 0.5 (it grows while it fades).
 - the glow's **position** = the gesture location, on a critically damped spring of response **0.15 s**
   (0x190c24988: 0x3fc3333… = 0.15, damping slot 1.0).
-- `GlowContainer.body`: two CALayers, `FlexInteraction.BigGlow` (white, a backdrop-aware `vibrantColorMatrix` from
-  `_ColorMatrix.YCC(0.05, 1.05, 1.2, 0)`) and `FlexInteraction.LittleGlow` (white, its own YCC matrix (…, 1, 1.5) and a
-  grey level `pow(0.43 dark / 0.765 light, 2.4)`); opacity, frame, scale and position modifiers. The YCC argument order
-  and the little glow's shape (gradient type and stops) were not decoded (objc selectors of the stubs unresolved).
+- `GlowContainer.body`: two CALayers, `FlexInteraction.BigGlow` and `FlexInteraction.LittleGlow`; fully decoded in
+  round 3 (section 8 below: shapes, matrices, the grey level is 0.75 dark / 0.40 light, not 0.43 / 0.765).
 
-Against the recording (measured in session 14/17, `Tokens.toolbar.pressRise` / `pressFall`): the capsule's mean
+Against the recording (measured in session 14/17, the former `Tokens.toolbar.pressRise` / `pressFall`): the capsule's mean
 brightness rises like a critically damped spring of 0.1 s (rms .019) and falls like one of 0.5 s one frame later
-(rms .017): the decoded big-glow springs. The recording has no frames where the pointer moves while a glass button is
+(rms .017): the decoded big-glow springs. The fitted profile (gain 0.41 in the recording, 0.35 on screen, flat over the
+16 pt hover disc, linear to 0 at 66 pt: ratios 1.43 1.38 1.41 1.41 / 1.37 at 18 pt, 1.34 at 22-26, 1.30 at 30, 1.27 at 34,
+1.24 at 38, 1.13 at 50) was replaced in round 3 by the decoded layers (section 8). The recording has no frames where the pointer moves while a glass button is
 held, so the follow (0.15 s) is code-only.
 
 ## 5. When does a control change its value (press and hold)
@@ -177,22 +177,154 @@ track**: there the value changes on mouse-down. A press on the slider's knob wit
   0x100145fa8) are not named.
 - vibrantColorMatrix: `_ColorMatrix.YCC` builds its matrix through `_ColorMatrix.apply(blackWhite:saturation:hue:)`
   (YCC.colorMatrix getter 0x190ec51e8, then `zapAndQuantize`), so `YCC(0.05, 1.05, 1.2, 0)` reads black .05, white 1.05,
-  saturation 1.2, hue 0 by that signature (the argument order inferred from the callee's labels, not traced through the
-  initializer). BigGlow / LittleGlow as two layers: not built.
+  saturation 1.2, hue 0; round 3 confirmed the order (YCC.colorMatrix passes s0..s2, d3 straight to
+  `apply(blackWhite:saturation:hue:)` 0x190ec5bd0, whose identity test is black = 0, white = 1, saturation = 1, hue = 0).
+  Built in round 3 (section 8).
 
 ## 7. What hyprk does with it (ui/HyprK)
 
 - `motion.js pressScale / pressDamping / pressLift`: the automatic cursor rule above (longer side, ultraSmall below 120,
   small → large over the shorter side 80 … 160). `PressSpring` releases on the measured 0.21 s critically damped spring.
-- `ToolbarHighlight`: the press light's centre follows the pointer (0.15 s, damping 1), halves beyond 50 pt from the
-  press point (0.5 s); its rise / fall tables already are the decoded big-glow springs.
+- `ToolbarHighlight`: the press light is the decoded BigGlow + LittleGlow pair (round 3, section 8), light and dark; with a
+  `source` it also lifts the toolbar capsule (round 3, section 9).
 - `motion.js pressStretch` / `GlassButton`: the decoded drag stretch (round 2); `GlassButton.segments`: the pressed button
   of a merged capsule lifts by its own size, only its outer end moves (Appearance preview: left end 1.25 pt, right end 0;
   the Mac 1.555 / 0.35).
-- Knob lens, light: the B2 model (ring shadow + key / fill light, `glasslens3.frag`); dark keeps the recording fit.
-- Not built: the glow's growth to ×4 on release (our light is a gain profile, not a
-  layer; the measured fall table already covers its brightness), per-button lift inside a merged capsule (the
-  Appearance preview's `GlassButton` is the whole capsule: the right edge grows 1.25 pt where the Mac's grows 0.35).
+- Knob lens, light: the B2 model (ring shadow + key / fill light, `glasslens4.frag` since round 3); dark keeps the
+  recording fit.
+- Not built: the union blend of merged glass (the far end's 0.35 pt; section 9).
+
+## 8. Round 3: the press light as the code draws it (built)
+
+Decoded (SwiftUICore 27.2.1; objc stubs resolved by disassembling each `objc_msgSend$sel` stub, e.g. 0x1980038a0 =
+`setName:`):
+- `GlowContainer` = `{ colorScheme environment (0x10), bigOpacity +0x10, littleOpacity +0x18, size +0x20, x +0x28,
+  y +0x30, scale +0x38 }`; `updateGlow` 0x190c24650 writes its output in that order (springs at state +0xb0 big opacity,
+  +0xd0 little opacity, +0x130 scale, +0xf0 / +0x110 position; every `FluidSpringAnimation.animate` gets damping 1.0).
+- `GlowContainer.body` 0x190c1f0c4: `ZStack { Color.clear; layer.opacity().frame(size, size).scaleEffect(scale, anchor:
+  .center).position(x, y) }` for both layers (closures 0x190c1f670 BigGlow, 0x190c1f904 LittleGlow), clipped to the glass
+  shape (`EffectModifier.body` 0x190c1fe58 `clipShape(effectiveClipShape)`), hit testing off.
+- BigGlow (0x190c1f670): `backgroundColor` = gray 1 alpha 1 (opaque white square, no corner radius); `filters` =
+  `[vibrantColorMatrix]` with `inputBackdropAware` = YES and `inputColorMatrix` = `_ColorMatrix.YCC(0.05, 1.05, 1.2, 0)`
+  (floats 0x3d4ccccd, 0x3f866666, 0x3f99999a at 0x190c1f6f0).
+- LittleGlow (0x190c1f904): `allowsHitTesting` NO, `cornerRadius` = `kCALayerCornerRadiusAutomaticPill`, `cornerCurve`
+  circular, `shadowPathIsBounds` YES, `shadowOffset` (0, 0), `shadowOpacity` 1, `shadowRadius` = size x 0.5,
+  `shadowColor` gray 1 (white); no background colour, so only its shadow (a blurred circle) is drawn. Matrix:
+  `YCC(0, 1, 1.5, 0)` then `apply(fills: [Fill(g, g, g, 1), tag 2])`, g = `powf(dark ? 0.7630332 : 0.4312796, 2.4)`
+  (0x190c1fa18; ColorScheme 1 = dark). `apply(fills:)` 0x190ec52a4 converts the fill to sRGB (12.92 / 1.055 x^(1/2.4) -
+  0.055) and, for tag 2, multiplies the matrix by diag(1 / (1 - c)) (0x190ec5384): g = 0.750 dark, 0.400 light, so the
+  LittleGlow is a colour dodge x4 (dark) / x5/3 (light) with saturation x1.5.
+- `_ColorMatrix.YCC.colorMatrix` 0x190ec51e8 -> `apply(blackWhite:saturation:hue:)` 0x190ec5bd0 -> M = yccToRgb x S x BW
+  x rgbToYcc (BT.709 tables at 0x1913e49a0: Y .2126 .7152 .0722, Cb -.1146 -.3854 .5 +.5, Cr .5 -.4542 -.0458 +.5;
+  back 1 0 1.5748 -.7874 / 1 -.1873 -.4681 +.3277 / 1 1.8556 0 -.9278); BW = Y' = black + (white - black) Y
+  (0x190ec5eb8, flag 1), S = chroma x saturation (0x190ec5df0); then `zapAndQuantize(1e-12, 1e-4)`.
+- Per layer: colour := colour + opacity x coverage x (clamp(M x colour) - colour) (Verify B's vibrantColorMatrix law).
+- updateGlow springs (decoded): big opacity -> bigGlowOpacity on 0.1 s while active, -> 0 on 0.5 s released; little
+  opacity -> littleGlowOpacity on 0.1 s, or x0.5 with the scale -> 2 on 0.5 s beyond `littleGlowDissipationDistance`;
+  released: little -> 0, scale -> 4, both 0.5 s; position 0.15 s; all damping 1. Opacities per size from the cursor set
+  (`Settings(variant:size:)`, re-read at 0x1908b11f4..0x1908b1244: max(w, h) < 120 -> ultraSmall, cursor littleGlow
+  0.2625 at +0xa0, big stays 0.75).
+
+Unknown: the CA shadow's blur convention (built as sigma = shadowRadius, the convention AppKit's shadows follow in
+SHADOW.md; sigma = shadowRadius / 2 fits the recording better, see below), whether the vibrantColorMatrix runs on
+values above 1 before the display clips (built clamped to 0..1).
+
+Built (e73a0d3): `motion.js glowPreset / glowSize / glowDodge / glowMask / glowLut`, `ToolbarHighlight` (springs as
+above, light and dark), `LensGlass` / `glasslens4.frag` (uniforms glow, glowAmt, glowLut0..3; glasslens3 removed),
+`PressGlow` and the fitted `Tokens.toolbar.press*` removed. Hover disc unchanged (AppKit's, measured).
+
+Against the 23.09.23 recording (dark, the preview's share button, 37 x 37 entry -> ultraSmall), press ratio per ring
+(frame 220 / frame 196): **the decoded light is weaker**. rms against the measured ratios (0, 4, 8, 12, 18, 22, 26, 30,
+34, 38, 50 pt): fitted gain .015 -> decoded .236 (sigma = R; .193 with sigma = R / 2). On screen (nested session, MBA 2x,
+Settings > Appearance, dark, held 0.35 s): +15..18 levels over the hover state at the pointer, the recording about +55.
+With littleGlowOpacity 0.75 (the `small` set) the model gives rms .131 (sigma = R) / .076 (sigma = R / 2). The BigGlow's
+square edge at 27.75 pt matches the recording's 0.04 drop between 26 and 30 pt. So either the preview's buttons do not
+take the automatic ultraSmall set (their variant is set in SwiftUI's button style code, `GlassButtonStyle` 0x19a6d2654 /
+`ApplyGlassButtonConfiguration`, not traced) or the CA layer path differs; needs the Mac (below). Light mode: +4..8 levels
+at the pointer on the preview's light glass.
+
+Where the light goes: glass buttons with a ToolbarHighlight (Settings back / forward, Finder capsules with `lights`,
+the Appearance preview). Not built: Control Center tiles (their glass is the compositor's; the light needs the backdrop the
+plugin samples: a plugin feature, not done). Slider knob and switch thumb: none, by the code (`MacLinearSliderKnob` and
+`MacSolariumSwitch` hold no `flexState`, no GlowContainer).
+
+## 9. Round 3: toolbar capsules lift (built), the union blend (not decoded)
+
+ToolbarHighlight with a `source` applies `PressSpring`'s lift and `pressStretch` to the capsule and to itself (7867571):
+the pressed button's span runs halfway to its neighbours' centres; a whole-capsule button scales about its centre, the
+first / last button about the far end with `1 + segW x lift / 2 / width` (as `GlassButton.segments`). Settings back /
+forward: left end out 1.25 pt, right end still, the capsule 2.5 pt taller (nested session, back pressed: edge columns
+16 -> 12 px left, 161 -> 161 right, rows 8..79 -> 5..82).
+
+Union of merged glass: the per-fragment SDF (`compute_sdf_with_mode` in the metallib, modes rect / supercircle / texture)
+holds no smooth-min; merged shapes come in as an SDF texture composed elsewhere (CASDFLayer / the GlassEffectContainer
+spacing path in QuartzCore, function not found this round). The 0.35 pt at the far end stays undrawn.
+
+## 10. Round 3: shadows from the code
+
+The glassBackground filter's drop shadow (metallib `glass_background_base`, IR lines with uniforms 11..15, 22..26, 40, 41;
+CPU `CA::OGL::GlassBackgroundFilter::render` 0x18debc058):
+`shadow = (shadow_cm(blurred backdrop at uv + displacement) x contribution + fill.rgb, mix(fill.a, 1, contribution))
+x ShadowOpacity x a x g(d_s / ShadowRadius)`, d_s = the shape's SDF at p + offset, g = the filter's polynomial
+0.5 erfc (Gaussian sigma = radius / sqrt 2), the displacement `ShadowAmount - ShadowAmount sqrt((2 - t) t)`, t =
+saturate(-(d + ShadowDistanceOffset) / ShadowHeight) (it moves where the shadow samples the backdrop, not the edge).
+CPU: shadow_inv_radius = 1 / ShadowRadius (0x18debced4), face opacity = FillColor.a + SDRShadowOpacity x (1 - HDR
+fraction) (0x18debc550), contribution = ShadowVibrancyContribution. Every dumped recipe fills black at 0.3 (control:
+1.0): **ink = 0.3 x ShadowOpacity**. A press does not change the inputs: `regular+_interactionState=1` and `=2` dump the
+same shadow as `regular` at every size (glass-params-*.json); the lift scales the whole glass layer, so its shadow grows
+with it (`PlatformGlassInteractionState` applied as the layer's transform: inferred, not traced).
+
+| surface (recipe, D) | appearance | drop shadow (opacity, radius, y; ink) | ring shadow (op / y / blur / width) | kind | press | hyprk before -> now |
+|---|---|---|---|---|---|---|
+| toolbar capsule, glass button (regular, 36-37) | light / dark | .04, 4, 8; ink .012 | .06 / 8 / 5 / 4 | filter | same, scaled with the lift | QML RectangularShadow .012, blur 4, y 8 (decoded); ring not drawn |
+| regular glass, D 96 / 128 / 160 | light | .16 / .28 / .40, r 10.67 / 17.33 / 24, y 8; ink .048 / .084 / .12 | .06 / 8 / 5 / 4 | filter | same | plugin ink x .65 -> x .3 (0.46 x before) |
+| same | dark | .227 / .413 / .60; ink .068 / .124 / .18 | same | filter | same | same change |
+| CC tile, HUD (controlCenter) | both | none (op 0) | none | - | - | none (unchanged) |
+| Dock (dock), Clear | both | none | none | - | - | none |
+| menu (regular.menu, any D) | light / dark | .7 / .8, 24, y 10; ink .21 / .24 | .06 / 8 / 5 / 4 | filter | - | fitted .32 / .36 (ink .208 / .234) -> decoded .7 / .8; on screen 1-2 levels lighter |
+| banner, NC card (notificationCenter, D 166) | light / dark | .4 / .6, 24, y 8, vibrancy 1 (tinted) | .06 / 8 / 5 / 4 | filter | - | kept the fit to the PC #62 gaps (ink .088 / .137 = 0.3 x .2925 / .455); decoded would be .12 / .18 |
+| window glass (regular.window) | light / dark | .7 / .8, 24, y 10 | .06 / 8 / 5 / 4 | filter | - | windows use AppKit's window shadow (plugin WindowShadow, SHADOW.md, unchanged) |
+| inactive window (regular.window+inactiveApp) | light | .55, 16, y 4 | 0 | filter | - | same |
+| slider knob, switch thumb at rest | both | DesignLibrary knob: black .10 r 12 y 3 + .10 r 2 y 1 (Q-16, measured) | - | CA layer | - | unchanged |
+| switch thumb pressed (control lens, live/controls) | light | .001 (none), 8, y 7, fill 1 | .10 / 8 / 3 / 4 | filter | the lens is the press | ring as RectangularShadow .10 y 8 (light), .19 dark (fitted) |
+| slider knob pressed (B2) | light | - | .40 / 8 / 3 / 4 | filter | - | glasslens4 ring model (B2 fit, rms .56) |
+| Spotlight panel | both | AppKit active window shadow .40 / .70, y 18, blur 20 (black, full opacity) | - | window | - | unchanged (shadowBlack) |
+
+Built: 83329b6 (plugin: ink = opacity x mix(fill, 1, vibrancy), colour black or backdrop-tinted, `shadow_tint` removed,
+menu decoded). Menu shadow on screen, nested session over the Settings window: beside the menu at mid height 148 / 221
+221 224 226 228 230 -> 145 / 222 223 225 227 229 231; below 167 175 176 177 -> 169 177 177 178; the menu's inside identical.
+Not re-measured against Mac crops: regular glass of D 96..160 (no Mac crop of its shadow; the change halves its ink).
+
+## 11. Round 3: release spring
+
+`GlassContainer.MakeAnimatableInteractionState.updateValue` 0x190bb782c reads the current `Transaction`: when it carries
+an `Animation` (or `TracksVelocity`) and the four `AnimatableAttribute<AnimatableFloatingPoint>` (scale x / y,
+translation x / y) are not made yet (flag +0x24), it makes them (`makeAnimatable(oldState:)` 0x190bb7b40, defaults scale
+1, translation 0, anchor 0.5 / 0.5) and from then on the container re-animates FlexInteraction's per-frame values with that
+transaction's animation; without an animation the values pass through. So the release on screen = FlexInteraction's
+spring (0.25 / 0.629, `updateEffect`) further animated by whatever animation the release's transaction carries. That
+animation comes from the caller (the gesture end / button action), not from this code: **not decoded**. The measured
+critically damped 0.21 s settle (rms .033) stays in `PressSpring`.
+
+## 12. Round 3: verification
+
+- Scenegraph timing (QSG_RENDER_TIMING, Settings, three presses with drags): CPU render 0.10 ms mean (max 16 on one frame),
+  renderer 0.03 ms mean; GPU ms of `glasslens4.frag` not measured (QML has no GPU timer here); the light only renders while lit.
+- Not done this round: knob lens over stripes / at the track ends / at 1.6, the dark ring against frames 2678-2693, the
+  drag-stretch frame ranges, `hyprctl liquidglass trace` (stats off in the session), the knob / thumb press from
+  DesignLibrary code.
+
+## 13. Round 3: refraction constants still fitted (task list, nothing changed)
+
+| where | constant | status | what the code says |
+|---|---|---|---|
+| `Tokens.control.lensBand` / `lensAmount` (0.5 / 0.34 x height, the preview capsules) | fitted to the switch strip | the preview's buttons are Regular: inner H min(0.25 D, 20), A max(-0.5 D, -60) (inward), outer max(0.2 D, 16) / max(0.25 D, 16) at 0.6 over the outer 1 pt (Verify B 2): opposite sign to ours |
+| `glasslens4.frag` refraction profile | `amount (1 - depth / band)^2` | the filter's `edge()`: `amount (1 - sqrt(1 - (1 - t)^2))`, t = depth / H (metallib, Verify B 2) |
+| `knobLensBand` / `knobLensAmount` (0.1 / -0.15 D) | decoded inner term only | the switch lens also has the displacement map +0.25 D over height D (Verify B 5: field 7.75 m(depth, 31) - 4.65 m(depth, 3.1), rms 0.26 pt): not built |
+| plugin `panel_blur` ramp (54 / 36 @ 0.15 / 72 pt) and radius 1.79 pt | fitted (REFRACTION.md) | the CC panel layer is not dumpable |
+| plugin `underlay_blur` (off) | fitted | - |
+| plugin Dock pointer fill (k + c (1 - a), Q-dock-08) | fitted | - |
+| plugin rim, NC key band x1.23 | fitted to Mac pixels | - |
 
 ## Needs the Mac
 
@@ -204,3 +336,9 @@ track**: there the value changes on mouse-down. A press on the slider's knob wit
 5. A glass button pressed in light mode (the press light) and the shadow under a pressed glass button (does it scale
    with the lift).
 3. One `defaults read` of `FlexiGlass*` overrides on the Mac (to rule out tuning overrides).
+6. (round 3) The preview's share button held still 1 s, dark AND light, 60 fps, plus one `defaults` / AX dump of the
+   preview glass buttons' interaction variant if reachable: which cursor set they take (the decoded light is 3x weaker than
+   the recording with the automatic ultraSmall set).
+7. (round 3) A Regular glass panel of D >= 96 over white (e.g. a SwiftUI sheet or a large glass button) to check the
+   0.3 x ShadowOpacity ink below and beside it at 2 / 8 / 16 / 32 pt.
+8. (round 3) A CALayer probe with shadowRadius 20 over white to read CA's shadow sigma (= radius or radius / 2).
