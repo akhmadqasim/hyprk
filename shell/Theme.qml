@@ -140,10 +140,8 @@ Singleton {
         if (d !== dark) {
             dark = d;
             // keep every other key as it is in the file; a file that does not parse is left alone
-            try {
-                const o = JSON.parse(appearanceFile.text());
-                if (o && typeof o === "object" && o.dark !== d) { o.dark = d; appearanceFile.setText(JSON.stringify(o, null, 2) + "\n"); }
-            } catch (e) {}
+            const t = State.appearanceText(appearanceFile.text(), d, "auto");
+            if (t !== "") appearanceFile.setText(t);
         }
         const flip = autoPlace ? Sun.nextAutoFlip(now, autoPlace.lat, autoPlace.lon) : 0;
         if (flip > 0) { autoFlipAt = flip + 1000; autoTimer.interval = Math.min(flip - now + 1000, 2147483647); autoTimer.start(); }
@@ -158,27 +156,24 @@ Singleton {
         if (!compositorGlass) return;
         Hyprland.dispatch(`function() hl.config({ plugin = { liquidglass = { appearance = "${dark ? "dark" : "light"}" } } }) end`);
     }
-    // Settings (or anything else that switches the appearance) says so here before it writes appearance.json: the
-    // file's change arrived 146 to 1063 ms after Settings had switched, past the plugin's 0.5 s cross-fade
-    GlobalShortcut { appid: "hyprk"; name: "appearance-dark"; description: "Dark appearance"; onPressed: theme.setAppearance(true, false) }
-    GlobalShortcut { appid: "hyprk"; name: "appearance-light"; description: "Light appearance"; onPressed: theme.setAppearance(false, false) }
-    // Every path that switches the appearance writes appearance.json, so Settings, the Finder and GTK follow (judge
-    // #5: `theme setDark` and these shortcuts changed the shell only). Only `dark` is written, every other key is kept;
-    // a file that does not parse is left alone. manual (the IPC, Control Center's Dark Mode button): also the mode,
-    // as choosing Light or Dark in Settings does, so Auto does not switch it back at the next minute. The shortcuts are
-    // what Settings sends before it writes the file itself (in Auto too), so they keep the mode.
-    function setAppearance(d: bool, manual: bool): void {
+    // Two pairs of global shortcuts. hyprk:appearance-dark / -light are a manual switch (as `qs ipc call theme setDark`,
+    // Control Center's Dark Mode button, Spotlight): the shell switches and writes `dark` and `mode` together, so
+    // Settings, the Finder and GTK follow (judge #5: the shortcut wrote mode light with dark true and Settings stayed
+    // Light on a dark desktop). hyprk:appearance-follow-dark / -light are Settings' own: it says so before it writes
+    // appearance.json itself (the file's change arrived 146 to 1063 ms after Settings had switched, past the plugin's
+    // 0.5 s cross-fade), so the shell only follows and leaves the file to Settings (two writers raced: the shell's
+    // stale mode could land after Settings' write and undo Auto).
+    GlobalShortcut { appid: "hyprk"; name: "appearance-dark"; description: "Dark appearance"; onPressed: theme.setAppearance(true) }
+    GlobalShortcut { appid: "hyprk"; name: "appearance-light"; description: "Light appearance"; onPressed: theme.setAppearance(false) }
+    GlobalShortcut { appid: "hyprk"; name: "appearance-follow-dark"; description: "Dark appearance (sent by Settings)"; onPressed: theme.dark = true }
+    GlobalShortcut { appid: "hyprk"; name: "appearance-follow-light"; description: "Light appearance (sent by Settings)"; onPressed: theme.dark = false }
+    // a manual switch: the appearance and the file's `dark` and `mode` (lib/state.js appearanceText), every other key
+    // kept; choosing Light or Dark ends Auto, as in Settings
+    function setAppearance(d: bool): void {
         dark = d;
-        const m = manual && mode !== "" ? (d ? "dark" : "light") : mode;
-        mode = m;
-        try {
-            const o = JSON.parse(appearanceFile.text());
-            if (o && typeof o === "object" && (o.dark !== d || (manual && "mode" in o && o.mode !== m))) {
-                o.dark = d;
-                if (manual && "mode" in o) o.mode = m;
-                appearanceFile.setText(JSON.stringify(o, null, 2) + "\n");
-            }
-        } catch (e) {}
+        mode = d ? "dark" : "light";
+        const t = State.appearanceText(appearanceFile.text(), d, mode);
+        if (t !== "") appearanceFile.setText(t);
     }
     // the Liquid Glass slider for the plugin (its live-updatable 0..1 option; Mac: NSGlassTintAmount, a running app
     // re-reads it on the coordinated notification, MAC-ANSWERS PC #67 C2 item 5)
@@ -254,8 +249,8 @@ Singleton {
 
     IpcHandler {
         target: "theme"
-        function toggle(): void { theme.setAppearance(!theme.dark, true); }
-        function setDark(on: bool): void { theme.setAppearance(on, true); }
+        function toggle(): void { theme.setAppearance(!theme.dark); }
+        function setDark(on: bool): void { theme.setAppearance(on); }
         function toggleTransparency(): void { theme.reduceTransparency = !theme.reduceTransparency; }
         function fonts(): string { return theme.fontText + " / " + theme.fontDisplay; }
         function material(): string { return theme.compositorGlass ? "plugin" : theme.solidMaterial ? "solid" : "qml"; }

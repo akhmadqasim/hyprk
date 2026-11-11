@@ -49,7 +49,7 @@ QtObject {
         if (key === "appearance" && next.dark !== app.appearance.dark) {
             const a = next.dark ? "dark" : "light";
             Backend.hyprDispatch(`function() hl.config({ plugin = { liquidglass = { appearance = "${a}" } } }) end`);
-            Backend.hyprDispatch(`hl.dsp.global("hyprk:appearance-${a}")`);
+            Backend.hyprDispatch(`hl.dsp.global("hyprk:appearance-follow-${a}")`);
         }
         app[key] = next;
         _patches[key] = Object.assign(_patches[key] || {}, patch);

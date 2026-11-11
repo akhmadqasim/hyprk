@@ -1036,6 +1036,28 @@ test("appearance handshake: a window answers after the second swap that follows 
     assert.deepEqual(run(["begin", "built", "swapped", "begin", "built", "swapped", "swapped"]), [0, 4, 1]);   // a second switch starts over
 });
 
+test("appearance.json from a shell switch: dark and mode agree as Settings reads them, other keys kept", () => {
+    const P = createRequire(import.meta.url)(join(here, "..", "..", "settings", "Parsers.js"));
+    for (const d of [true, false]) {
+        const base = JSON.stringify({ mode: d ? "light" : "dark", dark: !d, glass: 0.3, accent: "red" });
+        const o = JSON.parse(ST.appearanceText(base, d, "light"));       // a manual switch: mode follows dark
+        assert.equal(o.mode, d ? "dark" : "light");
+        assert.equal(o.dark, d);
+        assert.equal(o.glass, 0.3); assert.equal(o.accent, "red");
+        assert.equal(P.normalizeAppearance(o).dark, d);                    // Settings shows the same appearance
+    }
+    // the judge #5 file (shortcut wrote mode light, dark true) is put right by the next manual switch
+    assert.equal(JSON.parse(ST.appearanceText(JSON.stringify({ mode: "light", dark: true }), true, "light")).mode, "dark");
+    // Auto: the sun's answer goes into dark and the mode stays auto; Settings keeps it
+    const a = JSON.parse(ST.appearanceText(JSON.stringify({ mode: "auto", dark: false }), true, "auto"));
+    assert.deepEqual([a.mode, a.dark, P.normalizeAppearance(a).dark], ["auto", true, true]);
+    // a manual switch ends Auto
+    assert.equal(JSON.parse(ST.appearanceText(JSON.stringify({ mode: "auto", dark: false }), true, "dark")).mode, "dark");
+    assert.equal(ST.appearanceText(JSON.stringify({ mode: "dark", dark: true, glass: 1 }), true, "dark"), "");   // nothing to write
+    assert.equal(ST.appearanceText("{ broken", true, "dark"), "");                                               // left alone
+    assert.deepEqual(JSON.parse(ST.appearanceText("", false, "light")), { dark: false, mode: "light" });        // no file yet
+});
+
 test("Mission Control layout reproduces the Mac's frames (mission-control.json)", () => {
     const E = load("expose.js");
     const d = JSON.parse(readFileSync(join(here, "..", "..", "reference", "re", "27.2.1", "live", "dock", "mission-control.json"), "utf8"));

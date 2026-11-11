@@ -111,3 +111,23 @@ function luaInput(input) {
     const delay = Math.round(Math.min(2000, Math.max(100, Number(input && input.repeatDelay) || 600)));
     return `hl.config({ input = { repeat_rate = ${rate}, repeat_delay = ${delay} } })`;
 }
+
+// appearance.json after an appearance switch from the shell: `dark` and `mode` always agree, as Settings reads them
+// (settings/Parsers.js normalizeAppearance: mode "light" / "dark" decides `dark`, mode "auto" keeps it). mode is "light"
+// or "dark" for a manual switch (IPC, shortcuts, Control Center, Spotlight), "auto" when the sun rule switched. Every
+// other key is kept; a missing or empty file starts from {}. Returns the new text, or "" when nothing changes or the
+// file does not parse (left alone).
+function appearanceText(text, dark, mode) {
+    let o;
+    try {
+        o = (text || "").trim() === "" ? {} : JSON.parse(text);
+    } catch (e) {
+        return "";
+    }
+    if (!o || typeof o !== "object" || Array.isArray(o)) return "";
+    if (mode !== "auto") mode = dark ? "dark" : "light";
+    if (o.dark === dark && o.mode === mode) return "";
+    o.dark = dark;
+    o.mode = mode;
+    return JSON.stringify(o, null, 2) + "\n";
+}
