@@ -1240,6 +1240,15 @@ test("Mission Control: one Space reads Desktop, more are numbered by position", 
         assert.equal(byLabel("", "View", "as Icons").icon, "square.grid.2x2");
         assert.equal(byLabel("", "File", "Move to Trash").icon, "trash");
     });
+    test("menu type-to-select: the first enabled row starting with the letter, any case (Q-menubar-25)", () => {
+        const rows = [{ label: "Undo", disabled: true }, { sep: true }, { label: "Sort By", submenu: true, items: [{ label: "x" }] },
+                      { label: "show all" }, { label: "Zoom In" }];
+        assert.equal(M.typeSelect(rows, "s"), 2);
+        assert.equal(M.typeSelect(rows, "Z"), 4);
+        assert.equal(M.typeSelect(rows, "u"), -1);           // only a disabled row starts with it
+        assert.equal(M.typeSelect(rows, " "), -1);
+        assert.equal(M.typeSelect(rows, ""), -1);
+    });
     test("keysOf: only keys: actions", () => {
         assert.deepEqual(M.keysOf("keys:CTRL SHIFT,n"), { mods: "CTRL SHIFT", key: "n" });
         assert.equal(M.keysOf("close"), null);

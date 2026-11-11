@@ -42,10 +42,15 @@ ShellWindow {
         anchors.fill: parent
         focus: true
         Keys.onEscapePressed: Panels.close()
-        // arrows and Return go to the open menu (and on to its submenu, MenuDropdown.key)
+        // arrows, Return and typed letters go to the open menu (and on to its submenu, MenuDropdown.key); Left / Right
+        // that the menu does not take move to the previous / next menu bar title (Q-menubar-25)
         Keys.onPressed: e => {
             const m = menu.shown ? menu : context.shown ? context : null;
-            if (m && m.key(e.key)) e.accepted = true;
+            if (m && m.key(e.key, e.text)) e.accepted = true;
+            else if (m === menu && (e.key === Qt.Key_Left || e.key === Qt.Key_Right)) {
+                Panels.menuStep(Panels.menuIndex + (e.key === Qt.Key_Right ? 1 : -1));
+                e.accepted = true;
+            }
         }
     }
 

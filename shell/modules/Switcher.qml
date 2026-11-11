@@ -80,7 +80,16 @@ ShellWindow {
         else if (k === "last") selected = n - 1;
         else if (k === "commit") commit();
         else if (k === "cancel") Panels.close();
+        else if (k === "quit") quit();
     }
+    // Q quits the selected app; the switcher stays open and its icon goes as the windows close (Q-dock-22).
+    // Its last app quit: nothing left to switch to, so it closes (present() rule)
+    function quit() {
+        const app = apps[selected];
+        if (!app) return;
+        (app.windows || []).forEach(Apps.closeWindow);
+    }
+    onLiveAppsChanged: if (shown && selected >= liveApps.length) selected = Math.max(0, liveApps.length - 1)
 
     // the window exists only while open or dematerializing (shell.qml LazyLoader)
     function present() {
@@ -110,6 +119,7 @@ ShellWindow {
             else if (e.key === Qt.Key_End) sw.key("last");
             else if (e.key === Qt.Key_Escape) sw.key("cancel");
             else if (e.key === Qt.Key_Return) sw.key("commit");
+            else if (e.key === Qt.Key_Q) sw.key("quit");
             e.accepted = true;
         }
         Keys.onReleased: e => {

@@ -283,9 +283,10 @@ Item {
     }
 
     // keys from the Overlay; true when used. The deepest open submenu that has a selection takes them first.
-    function key(k) {
+    // text: the typed character, for type-to-select
+    function key(k, text) {
         const sub = subIndex >= 0 ? submenu : null;
-        if (sub && sub.hover >= 0 && sub.key(k)) return true;
+        if (sub && sub.hover >= 0 && sub.key(k, text)) return true;
         if (sub && k === Qt.Key_Left) {
             closeSub();
             return true;
@@ -301,6 +302,11 @@ Item {
         }
         if ((k === Qt.Key_Return || k === Qt.Key_Enter) && Menus.selectable(it) && !it.submenu) {
             activate(hover, it.action);
+            return true;
+        }
+        const typed = Menus.typeSelect(shownItems, text);
+        if (typed >= 0) {
+            selectRow(typed);
             return true;
         }
         return false;

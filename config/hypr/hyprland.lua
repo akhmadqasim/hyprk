@@ -382,6 +382,7 @@ hl.define_submap("hyprk-switcher", function()
     hl.bind(cmd .. " + End",    hl.dsp.global("hyprk:switcher-last"))
     hl.bind(cmd .. " + Return", hl.dsp.global("hyprk:switcher-commit"))
     hl.bind(cmd .. " + Escape", hl.dsp.global("hyprk:switcher-cancel"))
+    hl.bind(cmd .. " + Q",      hl.dsp.global("hyprk:switcher-quit"))   -- Q-dock-22: quits the selected app, stays open
 end)
 -- Cmd let go switches. Hyprland 0.57 matches a release against the submap the key went down in (the default one, Cmd
 -- comes before Tab) and always counts the trigger's own modifier ("SUPER + Super_L"); transparent keeps the bind from

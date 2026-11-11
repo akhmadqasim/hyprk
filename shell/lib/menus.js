@@ -301,6 +301,16 @@ function step(items, from, dir) {
     return from;
 }
 
+// type-to-select (Q-menubar-25: "z" -> Zoom In, "s" -> Sort By): the first selectable row whose label starts with the
+// typed character, any case; -1 when none does
+function typeSelect(items, ch) {
+    const c = String(ch || "").toLocaleLowerCase();
+    if (c.length !== 1 || c.trim() === "") return -1;
+    for (let i = 0; i < items.length; i++)
+        if (selectable(items[i]) && String(items[i].label || "").toLocaleLowerCase().startsWith(c)) return i;
+    return -1;
+}
+
 // a submenu row that has something to open
 function opens(it) { return selectable(it) && it.submenu === true && Array.isArray(it.items) && it.items.length > 0; }
 

@@ -290,6 +290,13 @@ ShellWindow {
             // macOS: while any menu is open, hovering another title switches to it
             onEntered: if (Panels.open === "menu" && !mt.open && Panels.activeScreen === bar.screen) Panels.openMenu(mt.menuIndex, mt.mapToItem(null, 0, 0).x, bar.screen)
         }
+        Connections {   // the keyboard steps here from the neighbouring title (Q-menubar-25: opens with no row selected)
+            target: Panels
+            function onMenuStep(target) {
+                if (Panels.open === "menu" && Panels.activeScreen === bar.screen && target === mt.menuIndex)
+                    Panels.openMenu(mt.menuIndex, mt.mapToItem(null, 0, 0).x, bar.screen);
+            }
+        }
     }
 
     // open state of a title or status item. No glass (MENUBAR-REA-27.2.1.md): a capsule of the

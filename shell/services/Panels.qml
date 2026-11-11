@@ -104,6 +104,9 @@ Singleton {
         open = name;
     }
     function close() { open = ""; menuIndex = -1; }
+    // Left / Right in an open menu bar menu: the title with index `target` opens (MenuBar.qml MenuTitle); none past
+    // either end, so the open menu stays
+    signal menuStep(int target)
     function openMenu(index, x, scr) { activeScreen = scr || screen; menuX = x; menuIndex = index; open = "menu"; }
 
     // Surfaces created on open (shell.qml LazyLoader) stay loaded while they dematerialize: closing
@@ -166,6 +169,7 @@ Singleton {
     GlobalShortcut { appid: "hyprk"; name: "switcher-last"; description: "App switcher: last"; onPressed: root.switcherKey("last") }
     GlobalShortcut { appid: "hyprk"; name: "switcher-commit"; description: "App switcher: switch"; onPressed: root.switcherKey("commit") }
     GlobalShortcut { appid: "hyprk"; name: "switcher-cancel"; description: "App switcher: cancel"; onPressed: root.switcherKey("cancel") }
+    GlobalShortcut { appid: "hyprk"; name: "switcher-quit"; description: "App switcher: quit the selected app"; onPressed: root.switcherKey("quit") }
 
     // fallback entry points for scripts: `qs -p shell ipc call panels toggle spotlight`
     IpcHandler {
