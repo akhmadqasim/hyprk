@@ -3,6 +3,7 @@ import Finder.Native
 import HyprK
 import "lib/files.js" as Files
 import "../../ui/HyprK/panels.js" as PanelLayout
+import "../../settings/Parsers.js" as P   // appearance.json normalization, shared with Settings
 
 // Finder window: frameless, client-side traffic lights, flush full-height sidebar, unified toolbar.
 Window {
@@ -36,8 +37,14 @@ Window {
         dragSession: dnd
     }
 
+    // The system appearance (state/appearance.json, written by Settings and the shell), followed live through
+    // inotify (StateFile) like Settings' AppState. --dark forces dark for reference screenshots.
+    StateFile { id: appearanceFile; path: startup.stateDir + "/appearance.json" }
+    readonly property var appearance: P.mergeState(appearanceFile.text, null, P.normalizeAppearance)
+
     Component.onCompleted: {
-        Theme.dark = startup.dark;
+        Theme.dark = Qt.binding(() => startup.dark || win.appearance.dark);
+        Theme.appearance = Qt.binding(() => win.appearance);
         Theme.blur = startup.blur;
         Theme.hasSysIcons = startup.hasSysIcons;
         Theme.active = Qt.binding(() => win.active && !startup.inactive);

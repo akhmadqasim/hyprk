@@ -16,9 +16,17 @@ QtObject {
     property bool dark: false
     // the window is key (set by Main: Window.active, or --inactive for screenshots); inactive colours follow
     property bool active: true
-    // the Finder has no Reduce motion / transparency / contrast settings of its own yet
+    // normalized state/appearance.json (Main.qml follows the file): accent, sidebar icon size, accessibility
+    property var appearance: ({})
+    readonly property string sidebarSize: appearance.sidebarIconSize || "medium"
+    // Appearance > "Tint window background with wallpaper color" (default on, as on the Mac)
+    readonly property bool tintWindow: appearance.tintWindowBackground !== false
     Component.onCompleted: {
         Tokens.dark = Qt.binding(() => theme.dark);
+        Tokens.reduceTransparency = Qt.binding(() => theme.appearance.reduceTransparency === true);
+        Tokens.increaseContrast = Qt.binding(() => theme.appearance.increaseContrast === true);
+        Tokens.reduceMotion = Qt.binding(() => theme.appearance.reduceMotion === true);
+        Accent.name = Qt.binding(() => theme.appearance.accent || "multicolor");
         Tokens.fontText = Qt.binding(() => theme.fontText);
         Tokens.windowActive = Qt.binding(() => theme.active);
     }
@@ -60,7 +68,9 @@ QtObject {
     // Text sizes in pt; the fonts themselves come from HyprK Typography (TextLabel, or font: Typography.font(pt)).
     readonly property QtObject font: QtObject {
         readonly property real title: 15           // toolbar title: Typography.toolbarTitle, 15 Semibold (Q-finder-06)
-        readonly property real sidebarItem: 13     // Q-finder-07: 13 Regular, the selected row 13 Semibold
+        // Q-finder-07: 13 Regular, the selected row 13 Semibold (medium); small / large 11 / 15 as every AppKit
+        // source list at that Sidebar icon size (Q-settings-01, measured in System Settings)
+        readonly property real sidebarItem: theme.sidebar.fontSize
         readonly property real sidebarHeader: 11   // Q-finder-07: 11 Semibold
         readonly property real label: 12           // icon label: 12 Regular, line pitch 16 (Q-finder-14)
         readonly property real list: 13            // list and column rows: 13 Regular (Q-finder-15)
@@ -191,12 +201,17 @@ QtObject {
         // everything right of it (toolbar capsules, title, grid) 4 pt left of the AX frames: the drawn width is 159
         readonly property int width: 159
         readonly property int top: 52            // Q-finder-04: first row (Recents) at y 52, right under the toolbar
-        readonly property int rowHeight: 32      // Q-finder-04
+        // Appearance > Sidebar icon size: medium measured in the Finder (Q-finder-04/07); small and large take the
+        // System Settings source list's steps at the same setting (Q-settings-01: rows 24/32/40, tiles 14/20/26,
+        // text 11/13/15, label x -3.5/0/+2.5 from medium). The Finder itself was only captured at medium.
+        readonly property int _i: Math.max(0, ["small", "medium", "large"].indexOf(theme.sidebarSize))
+        readonly property int rowHeight: [24, 32, 40][_i]   // Q-finder-04 (medium)
         readonly property int rowInset: 10       // selection x 10..153 (143 wide)
         readonly property int rowRadius: 8       // about 8
-        readonly property int iconSize: 20       // 13 pt .large symbols, ink 16..18
-        readonly property real iconX: 19         // icon centre x 29
-        readonly property int textX: 45          // AX text x 45 (ink 46.5)
+        readonly property int iconSize: [14, 20, 26][_i]    // medium: 13 pt .large symbols, ink 16..18
+        readonly property real iconX: 29 - iconSize / 2     // icon centre x 29
+        readonly property real textX: [41.5, 45, 47.5][_i]  // AX text x 45 (ink 46.5) at medium
+        readonly property int fontSize: [11, 13, 15][_i]
         readonly property int headerHeight: 19   // Q-finder-04: header rows 19
         readonly property int headerX: 15        // header text x 15 (ink 16.5)
         readonly property int sectionGap: 13     // 13 pt empty before each header row

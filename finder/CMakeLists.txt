@@ -7,7 +7,7 @@ set(CMAKE_AUTOMOC ON)
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Gui Qml Quick)
 
-add_executable(hyprk-finder src/main.cpp src/fileops.cpp src/fileops.h src/thumbnails.cpp src/thumbnails.h src/sysicons.cpp src/sysicons.h)
+add_executable(hyprk-finder src/main.cpp src/fileops.cpp src/fileops.h src/thumbnails.cpp src/thumbnails.h src/sysicons.cpp src/sysicons.h src/statefile.cpp src/statefile.h)
 target_link_libraries(hyprk-finder PRIVATE Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick)
 # QML is loaded from the source tree so UI changes need no rebuild.
 target_compile_definitions(hyprk-finder PRIVATE

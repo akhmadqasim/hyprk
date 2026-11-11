@@ -6,6 +6,7 @@
 // --shot renders the window, saves a PNG and quits (works with QT_QPA_PLATFORM=offscreen).
 
 #include "fileops.h"
+#include "statefile.h"
 #include "sysicons.h"
 #include "thumbnails.h"
 
@@ -101,6 +102,7 @@ int main(int argc, char *argv[])
 
     FileOps ops;
     qmlRegisterSingletonInstance("Finder.Native", 1, 0, "FileOps", &ops);
+    qmlRegisterType<StateFile>("Finder.Native", 1, 0, "StateFile");
 
     const QString dir = cli.positionalArguments().value(0);
     const QString iconDir = resourceDir("themes/icons/system", FINDER_ICON_DIR);
@@ -116,6 +118,9 @@ int main(int argc, char *argv[])
         {QStringLiteral("select"), cli.value(selectOpt)},
         {QStringLiteral("quicklook"), cli.isSet(qlOpt)},
         {QStringLiteral("dark"), cli.isSet(darkOpt)},
+        // $HYPRK_STATE, as decided by the session (config/hypr/state-dir.sh); else the checkout's state/, like Settings
+        {QStringLiteral("stateDir"), qEnvironmentVariableIsEmpty("HYPRK_STATE") ? QDir::cleanPath(resourceDir("ui", FINDER_UI_DIR) + QStringLiteral("/../state"))
+                                                                               : qEnvironmentVariable("HYPRK_STATE")},
         {QStringLiteral("size"), cli.value(sizeOpt)},
         {QStringLiteral("pathBar"), cli.isSet(pathBarOpt)},
         {QStringLiteral("inactive"), cli.isSet(inactiveOpt)},
