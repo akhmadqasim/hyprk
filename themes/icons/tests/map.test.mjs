@@ -44,7 +44,9 @@ test("styled: icon style renditions, mode fallback, Default cases", () => {
     assert.equal(M.styled("Safari", "dark", "auto", true), "apps/Safari-256-dark-dark.png");
     assert.equal(M.styled("Safari", "dark", "auto", false), "apps/Safari-512.png");     // RegularAutomatic in light mode
     assert.equal(M.styled("Safari", "tinted", "light", true), "apps/Safari-256-tinted-light.png");
-    assert.equal(M.styled("Safari", "clear", "dark", false), "apps/Safari-256-clear-light.png"); // ClearDark not built
+    assert.equal(M.styled("Safari", "clear", "dark", false), "apps/Safari-256-clear-dark.png");
+    assert.equal(M.styled("Safari", "tinted", "auto", true), "apps/Safari-256-tinted-dark.png");
+    assert.equal(M.styled("Safari", "clear", "auto", false), "apps/Safari-256-clear-light.png");
     assert.equal(M.styled("@TrashIcon", "tinted", "light", false), "system/TrashIcon-512.png");
     assert.equal(M.styled("Safari", "bogus", "auto", false), "apps/Safari-512.png");
     assert.equal(M.styled("", "dark", "dark", true), "");
@@ -55,6 +57,6 @@ test("every app icon has its style renditions", () => {
         .filter(l => l && !l.startsWith("#")).map(l => l.split("\t")[0]);
     assert.ok(names.length >= 72);
     for (const n of names)
-        for (const [style, variant] of [["dark", "dark"], ["clear", "light"], ["tinted", "light"]])
+        for (const [style, variant] of [["dark", "dark"], ["clear", "light"], ["clear", "dark"], ["tinted", "light"], ["tinted", "dark"]])
             assert.ok(existsSync(join(icons, M.styled(n, style, variant, false))), n + " " + style);
 });

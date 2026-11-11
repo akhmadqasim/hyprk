@@ -65,10 +65,35 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
   (+ its RGBW twin) and an `.iconstack` (layout 1019) per appearance (DarkAqua id 1, Aqua 8 or UIAppearanceLight 4,
   ISAppearanceTintable 10; ids per car in `APPEARANCEKEYS`), IconGroups (layout 1020), layers as SVG (layout 9,
   LZFSE) or deepmap2 bitmaps (compression 11, 9 apps), COLR colours and GGRA gradients; ControlCenter is a classic
-  icon without layers. Record layouts are in `themes/icons/tools/iconstack.py`. The glass parameters (TLV 0x3fd/0x3fe:
-  shadow, translucency, specular) and IconRendering's composition/tint maths (`ICRRenderingParameters`, Metal
-  shaders in `IconRendering.framework/.../default.metallib`) were not decoded. `apps/<Name>-256-<style>-<mode>.png`
-  (216 files, 2.7 MB) are flat renders of those layers, see `themes/icons/README.md` "Styles" and `apps-styles.log`.
+  icon without layers. Record layouts are in `themes/icons/tools/iconstack.py`. Deepmap2 bitmaps are stored
+  B, G, R, A (fixed 2026-11-11 in `dmp2.py`: Preview, Siri, Image Capture, Grapher, ColorSync came out with red and
+  blue swapped; Preview vs its own Default bitmap rms 86.5 -> 5.9). `apps/<Name>-256-<style>-<mode>.png` (360 files,
+  5.4 MB): see `themes/icons/README.md` "Styles", `tools/build-styles.py` and `apps-styles.log`.
+- IconRendering (27.2.1, read 2026-11-11): `IconRendering.framework/Versions/A/Resources/default.metallib` holds the
+  kernels as AIR bitcode (14 modules, `llvm-dis` 21 reads them after cutting at the `0x0B17C0DE` wrappers;
+  `binary.metallib` is the AGX build of the same): `glassHighlight` (the specular edge, ported in
+  `themes/icons/tools/glass.py`), `glow`, `shapeAwareGradientMask`, `simplifiedShapeAwareGradientMask`, `sdfFill`,
+  `clampToEdges`, `clampedPlusL` (min(1, a + b) on rgb, saturate on alpha, then max with b). All work on an SDF
+  texture (r = distance, gb = normal). The renderer and its tunables are Swift: `ipsw swift-dump <DSC> IconRendering`
+  gives `ICRRenderingParameters` with every field name and type (Highlights with 10 HighlightsSets of keySharp /
+  keyDiffuse / fillSharp / fillDiffuse / dark / rim HighlightSettings, Shadow, ChicletShadow, TranslucencyEffect,
+  ContourGradients, ClearMode with VCM black/white/saturation, SimulatedChiclet, Fills). Its `default` is built by
+  the once-initialiser at 0x1cfd87b8c (0x363-byte struct; Highlights by 0x1cfd8cd9c, 0x3ef1 bytes, not walked).
+  Read from it: systemLightGradient white 1.0 -> 0.961 (245/255), systemDarkGradient 31/255 -> 15/255 (the Dark
+  tiles measure 31 -> 15); ContourGradients light/dark tint start 0.15 end 0, light clear 0.10 / 0, dark clear
+  0.12 / 0, fake glass 0.88 / 0.75; glyphTranslucency strength 1, upper opacity 1; Shadow box radius 0.3,
+  vibrant opacity 0.75, neutral 0.375, vibrantBrightness 0.75; mitigated tints (Reduce Transparency) light tint
+  0.5,0.5,.. factor 0.9, dark clear 0.17. How the renderer maps the HighlightSettings onto the kernel inputs was
+  not decoded, so `glass.py`'s inputs are fitted (see there).
+- Icon Composer group glass in the car: TLV 0x3fd per child 20 bytes, by the `CUINamedIconLayerGroup` ivars
+  (hasSpecular, translucency, shadowStyle, shadowOpacity, blurStrength...) probably u32 specular, f32 translucency,
+  u32 shadow style, f32 shadow opacity, f32 blur (Notes: 1, 0.5, 0, 0.5, 0 and 1, 0, 2, 0.4, 0; tintable 1, 0.3, 3,
+  0.6, 0): field order not confirmed in CoreUI's reader. TLV 0x3fe (12 bytes per child) was all zero in the cars read.
+- Settings pane tiles as ground truth: per style the chiclet is the same on every symbol pane (spread <= 3/255):
+  Dark 31 -> 15 grey, TintedLight flat 0,122,249, TintedDark grey 25 + accent x (0.15 top -> 0 bottom), ClearLight
+  opaque 125, ClearDark opaque 43, each with a thin top/bottom specular edge. White symbols map to 167,240,255 /
+  24,134,253 / 249 / 237 (TintedLight / TintedDark / ClearLight / ClearDark). The Dock does not draw TintedLight like
+  these tiles (its tile is 0,109,195 in glass53/...-clear-tinted.png).
 - `apple-map.txt` (Linux app id or icon name -> macOS icon, ~220 names) is the single source for the shell, the Finder and the `hyprk-apple`
   theme; `apple-map.js` is generated from it (`tools/gen-map.mjs`, tested in `themes/icons/tests`).
 - `system/<Name>-512/128.png`: 257 `CoreTypes.bundle` icons (OS `/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources`) from the

@@ -15,12 +15,13 @@ Record layouts (all little endian, found by reading the cars; field names are ou
       u32 ?, i32 x, i32 y, i32 w, i32 h (1024 canvas units; 0,0,0,0 = whole canvas), u32 ?, f32 opacity,
       u32 keylen, keylen bytes of (u16 attribute, u16 value) rendition-key pairs (1 element, 2 part, 17 name id)
   CSI TLV 0x3fc fills: u32 count, u32 0, then per child u32 ?, u32 ?, u32 len, name[len] (COLR or GGRA name, "" = own colours)
-  CSI TLV 0x3fd / 0x3fe: per-child glass parameters (shadow, translucency, specular), not decoded
+  CSI TLV 0x3fd / 0x3fe: per-child glass parameters (shadow, translucency, specular): reference/ASSETS.md, not used
   COLR "RLOC": u32 1, u32 colour space (1 sRGB, 2 Gray Gamma 2.2, 3 Display P3, 4 extended sRGB, 6 extended gray), u32 n, n doubles
   GGRA "ARGG": u32 stops, u32 type (1 linear, 0 = one colour, Icon Composer "automatic gradient"), u32 0,
       f32 x0 y0 x1 y1 (unit square), then per stop f32 location, u32 len, colour name[len]
 
-What this renders is the FLAT composite: no Liquid Glass (specular rim, layer shadows, translucency).
+What this renders is the FLAT composite: no Liquid Glass (layer shadows, translucency; build-styles.py adds the
+chiclet's specular edge with glass.py).
 Against Apple's own pre-rendered Default bitmaps the flat render of the Aqua stack is rms 2-15 (512 px).
 
   iconstack.py <Assets.car> <icon name> <dark|light|tintable>     # prints the decoded tree

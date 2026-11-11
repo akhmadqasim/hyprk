@@ -4,7 +4,10 @@ A Python port of the decoder in carfile-go (github.com/devcxm/carfile-go, codec/
 Copyright (c) 2026 devcxm); only what the macOS 27.2.1 app icon layers use: methods 1 raw, 2 default
 (YCoCg-R residuals + row predictors), 3 lossless, 4 palette, pixel formats 2 (gray+alpha), 4 (8-bit, 4
 components) and 20 (16-bit, 4 components), LZFSE segments (liblzfse through car.py). Output: rows of
-`components` bytes per pixel (format 20 is reduced to 8 bits), in the stored order.
+`components` bytes per pixel (format 20 is reduced to 8 bits); 4 components come out as RGBA. CoreUI stores them
+as B, G, R, A (ARGB little endian): the colour transform's first channel is blue (carfile-go calls it red). Read
+the other way, Preview / Siri / Image Capture / Grapher layers came out with red and blue swapped (rms vs Apple's
+own Default bitmap at 256 px: Preview 86.5 -> 5.9, Siri 66.7 -> 11.5, Image Capture 65.0 -> 19.9).
 """
 import struct
 import numpy as np
@@ -76,16 +79,21 @@ def _default(data, width, layout):
     green = t + cg
     blue = t - np.trunc(co / 2).astype(np.int32)
     red = blue + co
-    if bpc == 1:
-        px = [red & 0xFF, green & 0xFF, blue & 0xFF]
-    else:   # 16-bit (0..512 = 0..1): keep 8 bits, in the order carfile-go writes them (B, G, R)
+    if bpc == 1:   # stored B, G, R: carfile-go's "red" is blue
+        px = [blue & 0xFF, green & 0xFF, red & 0xFF]
+    else:   # 16-bit (0..512 = 0..1): keep 8 bits, in the order carfile-go writes them (B, G, R of its names = R, G, B)
         px = [np.clip(blue, 0, 511) * 255 // 511, np.clip(green, 0, 511) * 255 // 511, np.clip(red, 0, 511) * 255 // 511]
     out = np.dstack([c.astype(np.uint8) for c in px] + ([alpha] if has_alpha else []))
     return out
 
 
+def _rgba(a):
+    """stored B, G, R, A -> R, G, B, A (4 components only)"""
+    return a[..., [2, 1, 0, 3]] if a.shape[-1] == 4 else a
+
+
 def decode(src):
-    """bytes after the CELM header -> HxWxC uint8 array"""
+    """bytes after the CELM header -> HxWxC uint8 array (4 components as RGBA)"""
     if src[:4] == b"KCBC":
         parts, o = [], 0
         while o < len(src):
@@ -99,13 +107,13 @@ def decode(src):
     w, h = struct.unpack_from("<HH", src, 24)
     layout = LAYOUT[fmt]; comps, bpc, _ = layout
     if method == 1:
-        return np.frombuffer(src, np.uint8, w * h * comps * bpc, 28).reshape(h, w, comps * bpc)[..., ::bpc]
+        return _rgba(np.frombuffer(src, np.uint8, w * h * comps * bpc, 28).reshape(h, w, comps * bpc)[..., ::bpc])
     desc = struct.unpack_from("<I", src, 28)[0]; payload = src[32:end]
     if method == 2:
         return np.concatenate([_default(d, w, layout) for d in _segments(payload, desc)], 0)
     if method == 3:
         raw = b"".join(_segments(payload, desc))
-        return np.frombuffer(raw, np.uint8).reshape(-1, w, comps * bpc)[..., ::bpc]
+        return _rgba(np.frombuffer(raw, np.uint8).reshape(-1, w, comps * bpc)[..., ::bpc])
     if method == 4:
         count, pcomps = desc & 0xFFFF, desc >> 16
         stride = comps * bpc
@@ -119,5 +127,5 @@ def decode(src):
         idx = data[n * sep * bpc:n * sep * bpc + n]
         px = pal[idx].copy()
         for c in range(sep): px[:, (pcomps + c) * bpc:(pcomps + c + 1) * bpc] = planes[c].reshape(n, bpc)
-        return px.reshape(h, w, stride)[..., ::bpc]
+        return _rgba(px.reshape(h, w, stride)[..., ::bpc])
     raise ValueError(f"dmp2 method {method}")

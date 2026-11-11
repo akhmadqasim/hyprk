@@ -446,10 +446,11 @@ function file(mac, px) {
 
 // Rendition of a mapped app icon for Settings > Appearance > "Icon & widget style" (state/appearance.json
 // iconStyle + iconStyleVariant, MAC-ANSWERS Q-settings-27) in light or dark mode, e.g.
-// "apps/Safari-256-tinted-light.png". tools/build-styles.py builds dark-dark, clear-light and tinted-light
-// (256 px); a mode that was not built falls back to the built one. Default (or Dark + Auto in light mode),
-// unknown styles and system icons ("@...") give the Default file.
-const styledModes = { dark: ["dark"], clear: ["light"], tinted: ["light"] };
+// "apps/Safari-256-tinted-light.png". tools/build-styles.py builds dark-dark, clear-light / -dark and
+// tinted-light / -dark (256 px); a mode that was not built falls back to the built one. Default (or Dark + Auto
+// in light mode), unknown styles and system icons ("@...") give the Default file: the Mac's Dark-style Dock keeps
+// the Downloads stack and the Trash in colour (reference/screens/27.2.1/dock/dock-dark.png).
+const styledModes = { dark: ["dark"], clear: ["light", "dark"], tinted: ["light", "dark"] };
 function styled(mac, style, variant, dark) {
     const modes = styledModes[style];
     if (!mac || mac[0] === "@" || !modes) return file(mac);

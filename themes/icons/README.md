@@ -34,20 +34,26 @@ where Apple ships one, 15 apps), `system/` (folders, Trash, file types), `settin
 Settings pane icons, `<pane>@<64|128>-<light|dark>.png`, see `panes.json`), `sf-symbols/` (SF Symbols
 rendered on macOS 27.2.1: `svg/`, `names.json`; `sf.js` is generated from them by `tools/gen-sf.mjs` and
 used by the shell and Finder through symlinks), `tools/` (`car.py` Assets.car reader, `build-apps.py`, `build-styles.py` + `iconstack.py` + `dmp2.py` +
-`check-styles.py` for the styles, `gen-map.mjs`, `gen-sf.mjs`).
+`check-styles.py` + `glass.py` for the styles, `gen-map.mjs`, `gen-sf.mjs`).
 3. **Styles** (Settings > Appearance > Icon & widget style, `iconStyle` + `iconStyleVariant` in
    `state/appearance.json`): `default`, `dark`, `clear`, `tinted`.
    - macOS icons: their own renditions `apps/<Name>-256-<style>-<mode>.png` (`dark-dark`, `clear-light`,
-     `tinted-light`), picked by `styled()` in `apple-map.js` (shell `Apps.iconUrl(..., Theme.iconLook)`, Finder
-     `FileIcon.qml`). Dark + Auto in light mode is the Default icon; Clear / Tinted Dark fall back to Light.
+     `clear-dark`, `tinted-light`, `tinted-dark`), picked by `styled()` in `apple-map.js` (shell
+     `Apps.iconUrl(..., Theme.iconLook)`, Finder `FileIcon.qml`). Dark + Auto in light mode is the Default icon.
+     System icons (Downloads, Trash, folders) keep their Default file: the Mac's Dark-style Dock shows them in
+     colour too (`reference/screens/27.2.1/dock/dock-dark.png`; no Mac shot of them in Clear / Tinted).
      macOS 27.2.1 keeps no bitmap for these styles: each app's `Assets.car` has the Default bitmap plus the
      Icon Composer layers (`*.iconstack`, groups, SVG and deepmap2 bitmap layers, fills per appearance:
      DarkAqua, Aqua, ISAppearanceTintable), which IconRendering composes at run time.
-     `tools/build-styles.py` (with `iconstack.py`, `dmp2.py`) renders those layers flat (no Liquid Glass pass):
-     Dark = the DarkAqua layers as they are; Clear / Tinted = the tintable layers mapped by luminance with a
-     tile colour and glyph ramp fitted to the Mac's ClearLight / TintedLight Dock (blue accent). Rms against the
-     Mac's Dock at 66 px: `tools/check-styles.py` (Dark 6-15, Clear 3-9, Tinted 8-15; Apple's own Default
-     bitmap scores 6-14 on the same shots). 256 px only: the shell draws app icons at most 128 pt.
+     `tools/build-styles.py` (with `iconstack.py`, `dmp2.py`, `glass.py`) renders those layers and adds the
+     chiclet's specular edge with Apple's own `glassHighlight` kernel (IconRendering's `default.metallib`), its
+     inputs fitted to the Mac-rendered Settings tiles (`settings/`: the chiclet is identical in all 21 symbol
+     panes per style). Dark = the DarkAqua layers; Clear / Tinted = the tintable layers' luminance mapped linearly
+     onto the style (light: fitted to the Mac's ClearLight / TintedLight Dock; dark: the Settings tiles' TintedDark /
+     ClearDark, no Mac Dock shot exists). Per-layer glass (translucency, blur, layer shadows, glyph specular) is not
+     reproduced. `tools/check-styles.py`: rms against the Mac's Dock at 66 px (Dark 6-15, Clear 3-9, Tinted 8-15;
+     Apple's own Default bitmap 6-14 on the same shots) and against the Siri / Spotlight Settings tiles at 128 px
+     (Dark 16-19, TintedDark 10-11, ClearDark 17-18). 256 px only: the shell draws app icons at most 128 pt.
    - Linux icons (`AppIconTile.qml`): the Mac's rule for icons without layers (WebStorm, Spotify in the same Mac
      shot): Dark leaves them as they are (on the dark tile), Clear / Tinted map the art's luminance L with the same
      ramp as above (`ui/HyprK/shaders/iconstyle.frag`, one quad over the art's own texture, built only while the

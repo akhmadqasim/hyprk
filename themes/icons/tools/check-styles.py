@@ -1,7 +1,12 @@
 #!/usr/bin/env python3 -I
 """Compare the built app icon styles (build-styles.py) with the Mac's Dock shots, at the Mac's 66 px tiles.
 
-  check-styles.py [<out-dir for side-by-side crops>]
+  check-styles.py [<out-dir for side-by-side crops> [<os-volume-root>]]
+
+With the OS volume also the Settings pane tiles (themes/icons/settings, IconServices on 27.2.1, 128 px): Siri and
+Spotlight are layered app icons (SiriPreferenceExtension / SpotlightPreferenceExtension.appex Assets.car), built
+here with build-styles.render at 128 px and compared per style over the opaque tile (the light Clear / Tinted
+files follow the Mac's Dock, which draws them unlike the tiles, so those two are not compared there).
 
 Shots (macOS 27.2.1, 2x, Dock tilesize 33): reference/screens/27.2.1/dock/dock-dark.png (icon style Dark) and
 glass53/dock-dark-white-iconstyles-dark-default-clear-tinted.png (rows Dark / Default / ClearLight / TintedLight,
@@ -91,6 +96,24 @@ if __name__ == "__main__":
             line.append(f"{style} {r:5.1f}")
             tiles.append(np.concatenate([a, b], 1))
         print("  ".join(line))
+    if len(sys.argv) > 2:
+        import importlib.util
+        sys.path.insert(0, here)
+        spec = importlib.util.spec_from_file_location("bs", f"{here}/build-styles.py")
+        bs = importlib.util.module_from_spec(spec); spec.loader.exec_module(bs)
+        ext = f"{sys.argv[2]}/System/Library/ExtensionKit/Extensions"
+        print("Settings pane tiles (128 px, rms over the opaque tile):")
+        for pane, appex, stem in (("siri", "SiriPreferenceExtension", "AppIconSiri"),
+                                  ("spotlight", "SpotlightPreferenceExtension", "AppIcon")):
+            st = f"{icons}/settings/{pane}@128"
+            r = bs.render(bs.IS.Stack(f"{ext}/{appex}.appex/Contents/Resources/Assets.car"), stem,
+                          Image.open(f"{st}-default-light.png"), 128)
+            line = [f"  {pane:16s}"]
+            for style in ("dark-dark", "tinted-dark", "clear-dark"):
+                ref = np.asarray(Image.open(f"{st}-{style}.png").convert("RGBA")).astype(np.float32) / 255
+                m = ref[..., 3] > 0.995
+                line.append(f"{style} {np.sqrt((((r[style][0] - ref[..., :3])[m] * 255) ** 2).mean()):5.1f}")
+            print("  ".join(line))
     if out:
         os.makedirs(out, exist_ok=True)
         grid = np.concatenate([np.concatenate(tiles[i:i + 5], 1) for i in range(0, len(tiles), 5)], 0)
