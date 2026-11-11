@@ -358,6 +358,13 @@ test("outputs: device sinks only", () => assert.deepEqual(ST.outputSinks([
     { id: 5, audio: {}, isSink: true, isStream: false }]).map(n => n.id), [1, 5]));
 test("output name", () => assert.deepEqual([ST.deviceName({ description: "A", nickname: "B", name: "c" }),
     ST.deviceName({ description: "", nickname: "B", name: "c" }), ST.deviceName({ name: "c" }), ST.deviceName(null)], ["A", "B", "c", ""]));
+test("output glyph: built-in is the computer", () => assert.deepEqual([
+    ST.deviceSymbol({ "device.form-factor": "internal" }, true), ST.deviceSymbol({ "device.form-factor": "internal" }, false),
+    ST.deviceSymbol({ "device.bus": "pci", "node.name": "alsa_output.pci-0000_00_1f.3.analog-stereo" }, true),
+    ST.deviceSymbol({ "device.bus": "pci", "node.name": "alsa_output.pci-0000_01_00.1.hdmi-stereo" }, true),
+    ST.deviceSymbol({ "device.bus": "usb", "node.name": "alsa_output.usb-x.analog-stereo" }, true),
+    ST.deviceSymbol(null, true)],
+    ["laptopcomputer", "desktopcomputer", "laptopcomputer", "speaker.wave.2.fill", "speaker.wave.2.fill", "speaker.wave.2.fill"]));
 test("wifi none", () => assert.equal(ST.wifiDevice([{ type: 0 }]), null));
 test("wifi found", () => assert.equal(ST.wifiDevice([{ type: 0 }, { type: 1, name: "wlan0" }]).name, "wlan0"));
 test("player none", () => assert.equal(ST.pickPlayer([]), null));

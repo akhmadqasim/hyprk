@@ -14,8 +14,8 @@ import qs.services
 // .74 of the device names (JPEG); device rows 32 tall from 92 (Q-panels-12: 298 wide, hovered capsule +21 over grey),
 // a 26 pt disc from x 14.5 (selected: white with the accent glyph; else white .25, as the grid's off circles, white
 // glyph), the name from x 49.4, 13 regular; "Sound Settings…" baseline 20.2 under the last separator, the panel
-// ends 32.6 under it. The device glyph is speaker.wave.2.fill for every device (the Mac draws the device's own kind:
-// laptopcomputer for the built-in speakers, the Apple TV logo; PipeWire does not say which kind a sink is).
+// ends 32.6 under it. The device glyph is the device's kind (Audio.symbol, lib/state.js deviceSymbol: the computer for
+// built-in outputs, else speaker.wave.2.fill; the Mac's TV and HomePod glyphs are not decoded here).
 Item {
     id: p
     property real originX: 0
@@ -89,6 +89,7 @@ Item {
             required property int index
             y: Theme.cc.soundRowsTop + index * Theme.cc.soundRowPitch
             label: Audio.name(modelData)
+            symbol: Audio.symbol(modelData)
             selected: modelData === Audio.sink
             onActivated: Audio.setOutput(modelData)
         }
@@ -112,6 +113,7 @@ Item {
     component Row_: Item {
         id: r
         property string label
+        property string symbol: "speaker.wave.2.fill"
         property bool selected: false
         property bool disc: true
         signal activated()
@@ -133,7 +135,7 @@ Item {
             color: r.selected ? Theme.cc.toggleOnBg : Theme.cc.capsuleOffBg
             Symbol {
                 anchors.centerIn: parent
-                name: "speaker.wave.2.fill"; size: 18; pointSize: Theme.cc.soundDeviceGlyph
+                name: r.symbol; size: 18; pointSize: Theme.cc.soundDeviceGlyph
                 color: r.selected ? Theme.cc.toggleOnIcon : Theme.cc.toggleOffIcon
             }
         }

@@ -72,6 +72,19 @@ function outputSinks(nodes) {
 function deviceName(n) {
     return n ? (n.description || n.nickname || n.name || "") : "";
 }
+// The glyph of an output in Control Center's Sound module. The Mac draws the device's kind: AVRouting 27.2.1
+// (AVOutputDeviceGetDeviceTypeAndSubTypeFromRouteDescriptor, 0x1b45f9610) reads an endpoint's model as one of the
+// symbols hifispeaker.fill, hifispeakertwo, tv, tvandhifispeaker, mediastick, tv.and.mediabox, laptopcomputer,
+// desktopcomputer, and the user's photo shows the laptop for the built-in speakers. PipeWire says only whether a
+// sink is built in (device.form-factor "internal", or an analog output on the PCI bus): that is the computer,
+// laptopcomputer with a battery, else desktopcomputer. Anything else keeps the speaker (the Mac's TV and HomePod
+// glyphs are not in sf-symbols: CoreGlyphs' Assets.car is not on this disk).
+function deviceSymbol(props, laptop) {
+    const p = props || {};
+    const internal = p["device.form-factor"] === "internal"
+        || (p["device.bus"] === "pci" && /analog/i.test(p["node.name"] || "") && !/hdmi|displayport/i.test(p["node.name"] || ""));
+    return internal ? (laptop ? "laptopcomputer" : "desktopcomputer") : "speaker.wave.2.fill";
+}
 
 // Wi-Fi status: available with a NetworkManager wifi device.
 // DeviceType.Wifi == 1 in Quickshell.Networking.

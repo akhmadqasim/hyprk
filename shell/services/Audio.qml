@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.Pipewire
+import Quickshell.Services.UPower
 import "../lib/state.js" as State
 
 // Default output volume via PipeWire. `available` is false without PipeWire
@@ -29,6 +30,9 @@ Singleton {
         if (node) Pipewire.preferredDefaultAudioSink = node;
     }
     function name(node) { return State.deviceName(node); }
+    // the device's kind as a glyph (lib/state.js deviceSymbol); a node's properties are there while it is tracked
+    readonly property bool laptop: UPower.displayDevice.isLaptopBattery
+    function symbol(node) { return State.deviceSymbol(node ? node.properties : null, laptop); }
 
-    PwObjectTracker { objects: root.sink ? [root.sink] : [] }
+    PwObjectTracker { objects: (root.sink ? [root.sink] : []).concat(root.outputs) }
 }

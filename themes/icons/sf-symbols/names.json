@@ -2676,11 +2676,13 @@
    "symbol": "desktopcomputer",
    "surface": "settings",
    "surfaces": [
-    "settings"
+    "settings",
+    "shell"
    ],
    "confidence": "sure",
    "confidenceBySurface": {
-    "settings": "sure"
+    "settings": "sure",
+    "shell": "sure"
    },
    "private": false,
    "variants": [
@@ -2689,17 +2691,19 @@
     "desktopcomputer.semibold.svg"
    ],
    "extras": [],
-   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render). Shell (2026-11-12): Control Center's Sound module, the built-in output's glyph (AVRouting's endpoint models; the user's photo)."
   },
   "laptopcomputer": {
    "symbol": "laptopcomputer",
    "surface": "settings",
    "surfaces": [
-    "settings"
+    "settings",
+    "shell"
    ],
    "confidence": "sure",
    "confidenceBySurface": {
-    "settings": "sure"
+    "settings": "sure",
+    "shell": "sure"
    },
    "private": false,
    "variants": [
@@ -2708,7 +2712,7 @@
     "laptopcomputer.semibold.svg"
    ],
    "extras": [],
-   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render). Shell (2026-11-12): Control Center's Sound module, the built-in output's glyph (AVRouting's endpoint models; the user's photo)."
   }
  },
  "skipped": {
