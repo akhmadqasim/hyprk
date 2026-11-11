@@ -15,15 +15,20 @@ function materializeScale(dim, v, reduce) {
     return reduce ? 1 : 1 + (1 - v) * (hiddenScale(dim) - 1);
 }
 
-// Interactive press (FlexInteraction cursor presets, SPEC 10.3): smaller side < 120 pt is
-// ultraSmall (lift 2.5 pt, damping 0.629); from 120 small -> large over 40 pt (lift 2.25 -> 2,
-// damping 0.375 -> 0.6). The lift becomes a scale (min + lift) / min; spring response 0.25 s.
-function pressT(w, h) { return Math.max(0, Math.min(1, (Math.min(w, h) - 120) / 40)); }
+// Interactive press, SwiftUI FlexInteraction (SwiftUICore 27.2.1, reference/re/27.2.1/GLASS-INTERACTION.md):
+// Settings(variant: .automatic, size:) 0x1908b1100 takes the cursor ParameterSet of `small` when the LONGER side is under
+// 120 pt, with the ultraSmall changes (lift 2.5 pt, spring damping 0.629); from 120 it blends small -> large by
+// t = clamp((shorter side - 80) / (160 - 80)) (associatedDimension 80 / 160): lift 2.25 -> 2, damping 0.375 -> 0.6;
+// response 0.25 s throughout. applyScale 0x190c225cc turns the lift into a uniform scale (longer + lift) / longer, so
+// the longer side grows by `lift` pt.
+function pressT(w, h) { return Math.max(0, Math.min(1, (Math.min(w, h) - 80) / 80)); }
+function pressUltra(w, h) { return Math.max(w, h) < 120; }
+function pressLift(w, h) { return pressUltra(w, h) ? 2.5 : 2.25 - 0.25 * pressT(w, h); }
 function pressScale(w, h) {
-    const m = Math.max(Math.min(w, h), 1);
-    return (m + (m < 120 ? 2.5 : 2.25 - 0.25 * pressT(w, h))) / m;
+    const m = Math.max(Math.max(w, h), 1);
+    return (m + pressLift(w, h)) / m;
 }
-function pressDamping(w, h) { return Math.min(w, h) < 120 ? 0.629 : 0.375 + 0.225 * pressT(w, h); }
+function pressDamping(w, h) { return pressUltra(w, h) ? 0.629 : 0.375 + 0.225 * pressT(w, h); }
 
 // One step of a SwiftUI-parameterised spring (response s, dampingFraction), semi-implicit Euler
 // in <= 4 ms sub-steps. Returns [x, v].

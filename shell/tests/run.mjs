@@ -649,14 +649,21 @@ test("materialize scale: hidden, shown, reduce motion", () => {
     near(M.materializeScale(640, 1, false), 1);
     near(M.materializeScale(640, 0, true), 1);
 });
-test("press lift: ultraSmall 2.5 pt below 120", () => near(M.pressScale(54, 54), 56.5 / 54));
-test("press lift: small 2.25 at 120, large 2 from 160", () => {
-    near(M.pressScale(120, 300), 122.25 / 120);
-    near(M.pressScale(200, 300), 202 / 200);
+test("press lift: the longer side grows 2.5 pt while it is under 120 (ultraSmall)", () => {
+    near(M.pressScale(54, 54), 56.5 / 54);
+    near(M.pressScale(78, 37), 80.5 / 78);   // the Liquid Glass preview capsule: 1.25 pt per side (recording: 1.25-1.57)
+});
+test("press lift: from 120 small -> large over the shorter side 80 .. 160", () => {
+    near(M.pressScale(300, 80), 302.25 / 300);
+    near(M.pressScale(300, 120), 302.125 / 300);
+    near(M.pressScale(300, 200), 302 / 300);
 });
 test("press damping by size", () => {
     near(M.pressDamping(64, 64), 0.629);
-    near(M.pressDamping(120, 120), 0.375);
+    near(M.pressDamping(110, 64), 0.629);    // the longer side decides ultraSmall, not the shorter
+    near(M.pressDamping(130, 64), 0.375);
+    near(M.pressDamping(300, 64), 0.375);
+    near(M.pressDamping(300, 120), 0.4875);
     near(M.pressDamping(160, 400), 0.6);
 });
 test("spring settles at target, overshoots at damping 0.7", () => {

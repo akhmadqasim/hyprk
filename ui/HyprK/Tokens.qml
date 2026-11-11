@@ -378,6 +378,18 @@ QtObject {
         readonly property real materializeDamping: 0.7
         readonly property real crossfade: 0.15            // Reduce motion: FadeIn/FadeOut 0.15 s (SPEC 9.9.5)
         readonly property real pressResponse: 0.25        // FlexInteraction press lift (SPEC 10.3)
+        // the lift's way back after the release: measured on the 23.09.23 recording (preview share capsule, frames 252-275
+        // and 361-399, passthrough index): no overshoot, a critically damped fit of response 0.21 s (rms .033; the press
+        // spring 0.25 / 0.629 gives .079). Which spring the code uses on release is not decoded (GLASS-INTERACTION.md)
+        readonly property real pressReleaseResponse: 0.21
+        readonly property real pressReleaseDamping: 1
+        // the press light follows the pointer (FlexCoreInteractionModifier.Value.updateGlow 0x190c24650): its centre on a
+        // critically damped spring of response 0.15 s; once the pointer is more than 50 pt (littleGlowDissipationDistance)
+        // from where the press began, the little glow's opacity halves on a spring of 0.5 s
+        readonly property real pressGlowFollow: 0.15
+        readonly property real pressGlowDissipation: 50
+        readonly property real pressGlowFar: 0.5
+        readonly property real pressGlowFarResponse: 0.5
         readonly property real pressSquish: 0.06          // drag past a slider end stretches x, squeezes y (by eye)
     }
 }

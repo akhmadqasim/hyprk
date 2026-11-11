@@ -45,6 +45,13 @@ Item {
         onMoved: v => backend.level = v
     }
 
+    ToolbarHighlight {
+        id: light
+        x: 20; y: 100; width: 200; height: 37
+        centres: [18.5, 55.5]
+    }
+    PressSpring { id: capLift; w: 78; h: 37 }
+
     SignalSpy { id: toggledSpy; target: refusing; signalName: "toggled" }
     SignalSpy { id: movedSpy; target: sl; signalName: "moved" }
     SignalSpy { id: releasedSpy; target: sl; signalName: "released" }
@@ -198,6 +205,44 @@ Item {
             compare(sl.releaseModifiers, Qt.NoModifier);
         }
         // Control Center reads Shift at the release (it inverts the volume pop): the modifiers of the let-go
+        // macOS (the 23.09.23 recording, frames 2622-2645): a press on the slider's track moves the knob and the value
+        // on mouse-DOWN, not at the release; the release only commits
+        function test_slider_track_press_changes_on_press() {
+            backend.level = 0.1;
+            let tr = null; for (let i = 0; i < sl.children.length; i++) if (sl.children[i].usable !== undefined) tr = sl.children[i];
+            movedSpy.clear(); committedSpy.clear();
+            mousePress(sl, sl.width - 20, sl.height / 2);
+            verify(movedSpy.count >= 1, "moved on press");
+            verify(backend.level > 0.8, "value on press " + backend.level);
+            compare(committedSpy.count, 0);
+            mouseRelease(sl, sl.width - 20, sl.height / 2);
+            compare(committedSpy.count, 1);
+        }
+        // FlexInteraction lift: the longer side grows 2.5 pt below 120 pt (GLASS-INTERACTION.md), released without overshoot
+        function test_press_lift_by_longer_side() {
+            capLift.pressed = true;
+            tryVerify(() => Math.abs(capLift.scale - 80.5 / 78) < 0.0005 && !capLift.moving, 2000);
+            capLift.pressed = false;
+            let min = 2;
+            for (let t = 0; t < 600; t += 10) { wait(10); min = Math.min(min, capLift.scale); }
+            verify(min > 0.9995, "no undershoot after the release: " + min);
+            tryCompare(capLift, "scale", 1, 1000);
+        }
+        // FlexInteraction glow: the press light follows the pointer and dims beyond 50 pt from where the press began
+        function test_press_light_follows_pointer() {
+            Tokens.dark = true;
+            mousePress(light, 18, 18);
+            tryVerify(() => light.glowGain > 0.3, 1000);
+            fuzzyCompare(light.glowCentre.x, 18, 1);
+            mouseMove(light, 60, 18);
+            tryVerify(() => Math.abs(light.glowCentre.x - 60) < 1, 1000);
+            const near = light.glowGain;
+            mouseMove(light, 120, 18);                       // 102 pt from the press
+            tryVerify(() => Math.abs(light.glowGain - near / 2) < 0.01, 2000);
+            mouseRelease(light, 120, 18);
+            tryCompare(light, "glowGain", 0, 2000);
+            Tokens.dark = false;
+        }
         function test_slider_release_modifiers() {
             backend.level = 0.3;
             let tr = null; for (let i = 0; i < sl.children.length; i++) if (sl.children[i].usable !== undefined) tr = sl.children[i];
