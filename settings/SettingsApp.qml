@@ -8,7 +8,7 @@ import "Panes.js" as Panes
 Item {
     // wallpaper mean for the sidebar chameleon tint (computed once per wallpaper)
     WallpaperTint {
-        path: AppState.wallpaperImage || Backend.root + "/themes/wallpapers/png/DefaultAerial.png"
+        path: AppState.desktopPicture(Theme.dark)
         onTintChanged: Theme.chameleon = tint
     }
     id: app

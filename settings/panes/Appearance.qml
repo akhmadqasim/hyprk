@@ -52,7 +52,7 @@ Column {
         property bool darkWin
         anchors.fill: parent
         // the wallpaper art in each thumbnail (27.2.1 appearance-light.png shows the Mac's wallpaper, darker in Dark);
-        // here the user's wallpaper, else hyprk's default; one small decode shared by every thumbnail
+        // here the user's wallpaper, else the shell's default pair (AppState.desktopPicture)
         Rectangle { // until the wallpaper thumbnail loads (or without one)
             width: 67; height: 44; radius: 6
             gradient: Gradient {
@@ -63,9 +63,10 @@ Column {
         }
         RoundedImage {
             width: 67; height: 44; radius: 6; decodeWidth: 140
-            path: AppState.wallpaperImage || Backend.root + "/themes/wallpapers/png/DefaultAerial.png"
+            path: AppState.desktopPicture(darkWin)
         }
-        Rectangle { width: 67; height: 44; radius: 6; visible: darkWin; color: Qt.rgba(0.02, 0.03, 0.12, 0.55) }
+        // a chosen picture has one look: darkened for the Dark thumbnail (the default is a light / dark pair)
+        Rectangle { width: 67; height: 44; radius: 6; visible: darkWin && AppState.wallpaperImage !== ""; color: Qt.rgba(0.02, 0.03, 0.12, 0.55) }
         Rectangle { x: 6; y: 8; width: parent.width - 12; height: 6; radius: 2; color: darkWin ? "#2E57D6" : "#3F7BF0" }
         Rectangle {
             x: parent.width * 0.3; y: parent.height * 0.5; width: parent.width * 0.62; height: parent.height * 0.42; radius: 4
