@@ -132,7 +132,8 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
   masters (attr 26 = 1/4/9) as W4 + u(W1-W4) + v(W9-W4): regular (0.182, 0), medium (0.148, 0.165), semibold
   (0.123, 0.291) (fitted, identical to 3 decimals on 10 symbols). The AppKit canvas uses TLV 0x3fa margins (u32 7,
   u32 13, 8 floats; the first float not identified). Decoded so far into `sf-symbols/svg/`: document.on.document.fill,
-  pencil.tip.crop.circle, printer, rotate.left, document.on.clipboard (names.json notes say "decoded from BVG").
+  pencil.tip.crop.circle, printer, rotate.left, document.on.clipboard, gearshape, gearshape.2, chevron.up.chevron.down
+  (names.json notes say "decoded from BVG").
   Copied tables (binary plists, from CoreGlyphs and `private/` from CoreGlyphsPrivate): `symbol_order.plist` (names in SF Symbols app order),
   `name_availability.plist` (name -> release year), `symbol_search.plist` (name -> search terms), `symbol_categories.plist` and
   `categories.plist`, `name_aliases.strings` (old name -> current name), `nofill_to_fill.strings`, `legacy_flippable.plist`,
