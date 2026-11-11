@@ -35,6 +35,13 @@ QtObject {
         Tokens.increaseContrast = Qt.binding(() => theme.appearance.increaseContrast === true);
         Tokens.reduceMotion = Qt.binding(() => theme.appearance.reduceMotion === true);
         Accent.name = Qt.binding(() => theme.appearance.accent || "multicolor");
+        // Appearance > Text highlight colour ("" = Automatic: follows the accent). AppKit's highlight key decides
+        // selectedTextBackgroundColor and selectedControlColor only (reference/re/27.2.1/live/accent-colors.json:
+        // highlightColor.tests, e.g. accent Purple + highlight Blue -> #B3D7FF / #3F638B; the two colours are equal
+        // in all 9 accents), so here it reaches the text selections (Theme.color.textSelection / Accent.selectedText:
+        // rename field, search field, rename sheet, tag field, Quick Look text). Selected icons and rows are
+        // selectedContentBackgroundColor, a colour of the accent: they do not follow it.
+        Accent.highlight = Qt.binding(() => theme.appearance.highlight || "");
         Tokens.fontText = Qt.binding(() => theme.fontText);
         Tokens.windowActive = Qt.binding(() => theme.active);
     }

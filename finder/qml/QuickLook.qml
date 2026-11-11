@@ -280,6 +280,8 @@ Window {
                     text: ql.text
                     wrapMode: TextEdit.Wrap
                     color: Theme.color.label
+                    selectionColor: Theme.color.textSelection   // was the Qt palette's highlight
+                    selectedTextColor: Theme.color.label
                     font.family: Theme.fontMono
                     font.pixelSize: 12
                     background: Rectangle { color: Theme.color.window; radius: 15 }   // concentric with the 20 pt frame
