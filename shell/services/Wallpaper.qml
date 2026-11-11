@@ -104,6 +104,21 @@ Singleton {
         function onDarkChanged() { root.refresh(); }
     }
 
+    // The other appearance's cut, made once after each refresh so that a light <-> dark switch finds it in the cache:
+    // a cut of the 2560 x 1664 picture took over 0.5 s, past the compositor's hold (the first switch after a scale
+    // change faded, then the wallpaper stepped). Same script and arguments with the other mode; its output is not read.
+    function prefetchOther() {
+        if (proc.running || prefetch.running) return;
+        prefetch.mode = Theme.dark ? "light" : "dark";
+        prefetch.running = true;
+    }
+    Process {
+        id: prefetch
+        property string mode: "light"
+        environment: ({ HYPRK_WALLPAPER: root.chosen })
+        command: [Quickshell.shellDir + "/scripts/wallpaper.sh", String(root.width), String(root.height), String(Theme.glass.blurRadius), mode, String(root.pixelWidth), String(root.pixelHeight)]
+    }
+
     // state/wallpaper.json path (Settings > Wallpaper) wins over the default pick
     readonly property string chosen: Prefs.wallpaper.path || ""
     // later: the Process `environment` binding reads `chosen` too and may not have updated yet, so the
@@ -126,6 +141,7 @@ Singleton {
                 Theme.blurAvailable = root.blurred !== "";
                 root.busy = proc.running;
                 root.cutOthers();
+                root.prefetchOther();
             }
         }
         // a script that wrote nothing (or a run replaced by the next refresh) leaves busy to its exit

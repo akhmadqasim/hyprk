@@ -49,7 +49,9 @@ key=$(printf '%s %s %s %s %s' "$src" "$(stat -c %Y "$src" 2>/dev/null)" "${W}x${
 wall="$CACHE/wall-$key.png"
 blur="$CACHE/blur-$key.png"
 if [ ! -f "$wall" ]; then
-    magick "$src" "${conv[@]}" -resize "${PW}x${PH}^" -gravity center -extent "${PW}x${PH}" "$wall" 2>/dev/null || wall=$src
+    # written under a temporary name and moved: Wallpaper.qml's prefetch of the other appearance may cut the same file
+    t="$CACHE/tmp-$$-wall-$key.png"
+    if magick "$src" "${conv[@]}" -resize "${PW}x${PH}^" -gravity center -extent "${PW}x${PH}" "$t" 2>/dev/null; then mv "$t" "$wall"; else rm -f "$t"; wall=$src; fi
 fi
 echo "SRC=$src"
 if [ "${HYPRK_WALL_ONLY:-0}" = 1 ]; then echo "WALL=$wall"; exit 0; fi   # another screen's cut: no blur, no luma
@@ -58,10 +60,17 @@ if [ ! -f "$blur" ]; then
     # desaturated so glass reads as near-neutral frost (macOS 27 Dock)
     # (shaders/menupill.frag undoes this -modulate: keep the two in step)
     # from the logical size, so the blur is the same at any output scale
-    magick "$wall" -resize "${W}x${H}!" -resize 25% -blur "0x$(( SIGMA / 4 + 1 ))" -modulate 106,92 -resize "${W}x${H}!" "$blur" 2>/dev/null || blur=""
+    t="$CACHE/tmp-$$-blur-$key.png"
+    if magick "$wall" -resize "${W}x${H}!" -resize 25% -blur "0x$(( SIGMA / 4 + 1 ))" -modulate 106,92 -resize "${W}x${H}!" "$t" 2>/dev/null; then mv "$t" "$blur"; else rm -f "$t"; blur=""; fi
 fi
-# mean luminance (0..1) of the menu bar strip, so the shell can pick white or dark menu bar text
-luma=$(magick "$wall" -crop "${PW}x$(( PH / 30 + 1 ))+0+0" -colorspace Gray -resize 1x1\! -format "%[fx:mean]" info: 2>/dev/null || echo 0.3)
+# mean luminance (0..1) of the menu bar strip, so the shell can pick white or dark menu bar text; kept next to the cut
+# (decoding the 2560 x 1664 cut for it took most of a cached run: the appearance switch waits for this script)
+lumaf="$CACHE/luma-$key.txt"
+luma=$(cat "$lumaf" 2>/dev/null)
+if [ -z "$luma" ]; then
+    luma=$(magick "$wall" -crop "${PW}x$(( PH / 30 + 1 ))+0+0" -colorspace Gray -resize 1x1\! -format "%[fx:mean]" info: 2>/dev/null)
+    if [ -n "$luma" ]; then printf '%s\n' "$luma" > "$lumaf.$$" && mv "$lumaf.$$" "$lumaf"; else luma=0.3; fi
+fi
 echo "WALL=$wall"
 echo "BLUR=$blur"
 echo "LUMA=$luma"
