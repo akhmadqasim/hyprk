@@ -10,9 +10,10 @@ const panes = [
     { id: "general", title: "General", glyph: "settings", tint: "gray", file: "General", group: 2 },
     { id: "accessibility", title: "Accessibility", glyph: "accessibility_new", tint: "blue", file: "Accessibility", group: 2 },
     { id: "appearance", title: "Appearance", glyph: "contrast", tint: "black", file: "Appearance", group: 2 },
-    { id: "controlcenter", title: "Control Center", glyph: "toggle_on", tint: "gray", file: "ControlCenter", group: 2 },
     { id: "dock", title: "Desktop & Dock", glyph: "call_to_action", tint: "black", file: "Dock", group: 2 },
     { id: "displays", title: "Displays", glyph: "light_mode", tint: "blue", file: "Displays", group: 2 },
+    // 27.2.1 names this pane Menu Bar and lists it after Displays (settings/desktop-dock-light.png); id kept for links
+    { id: "controlcenter", title: "Menu Bar", glyph: "toggle_on", tint: "gray", file: "ControlCenter", group: 2 },
     { id: "siri", title: "Siri", glyph: "graphic_eq", tint: "purple", file: "Siri", group: 2 },
     { id: "spotlight", title: "Spotlight", glyph: "search", tint: "gray", file: "Spotlight", group: 2 },
     { id: "wallpaper", title: "Wallpaper", glyph: "filter_vintage", tint: "teal", file: "Wallpaper", group: 2 },
