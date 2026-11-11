@@ -21,6 +21,10 @@ Singleton {
     property var activeScreen: screen
     property int menuIndex: -1          // index of the open menu bar title (0 = Apple)
     property real menuX: 0              // screen x of the open menu title
+    // screen whose menu bar titles the pointer is over (MenuBar), or null: that screen's Overlay maps early, empty
+    // and without input, so the click shows the menu in the same frame as the title pill (mapping it on the click
+    // put the menu one frame behind the pill, mcap)
+    property var warmScreen: null
 
     // Moving across the menu bar titles with a menu open (MAC-ANSWERS.md R2, 60 fps recording of the
     // 27.2.1 Finder): the title pill jumps to the new title in one frame, and the open menu is swapped

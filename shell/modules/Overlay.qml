@@ -20,7 +20,7 @@ ShellWindow {
     readonly property bool active: ["menu", "context", "alert"].indexOf(Panels.open) !== -1
                                    && Panels.activeScreen === modelData
     // stays mapped while a menu or alert animates out, taking no input then
-    visible: active || menu.visible || context.visible || alert.visible
+    visible: active || menu.visible || context.visible || alert.visible || Panels.warmScreen === modelData
     acceptsInput: active
 
     anchors { top: true; left: true; right: true; bottom: true }

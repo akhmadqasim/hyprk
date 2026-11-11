@@ -44,6 +44,13 @@ ShellWindow {
         anchors.leftMargin: Theme.menuBar.leftMargin
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.menuBar.titleSpacing
+        // the Overlay maps while the pointer is over the titles (Panels.warmScreen)
+        HoverHandler {
+            onHoveredChanged: {
+                if (hovered) Panels.warmScreen = bar.modelData;
+                else if (Panels.warmScreen === bar.modelData) Panels.warmScreen = null;
+            }
+        }
 
         MenuTitle {
             menuIndex: 0
