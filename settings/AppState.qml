@@ -13,6 +13,7 @@ QtObject {
 
     property var appearance: P.normalizeAppearance({})
     property var dock: P.normalizeDock({})
+    property var stagemanager: P.normalizeStageManager({})          // Stage Manager on / off (shared with the shell)
     property var sound: P.normalizeSound({})
     property var lock: P.normalizeLock({})
     property var input: P.normalizeInput({})
@@ -30,7 +31,7 @@ QtObject {
     }
 
     readonly property var _normalize: ({
-        appearance: P.normalizeAppearance, dock: P.normalizeDock, sound: P.normalizeSound,
+        appearance: P.normalizeAppearance, dock: P.normalizeDock, stagemanager: P.normalizeStageManager, sound: P.normalizeSound,
         lock: P.normalizeLock, input: P.normalizeInput, notifications: P.normalizeNotifications,
         accessibility: A11y.normalize, displays: P.normalizeDisplays,
         wallpaper: o => o

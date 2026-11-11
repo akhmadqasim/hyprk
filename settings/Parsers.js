@@ -258,6 +258,16 @@ function normalizeDock(obj) {
     return o;
 }
 
+// stagemanager.json, shared with the shell (services/StageManager.qml): com.apple.WindowManager GloballyEnabled
+// (default off) and AutoHide (default off; WindowManager.framework 0x1d2a7a5ec / 0x1d2a7a608, 27.2.1)
+const stageManagerDefaults = { enabled: false, autoHide: false };
+function normalizeStageManager(obj) {
+    const o = Object.assign({}, stageManagerDefaults, (obj && typeof obj === "object") ? obj : {});
+    o.enabled = o.enabled === true;
+    o.autoHide = o.autoHide === true;
+    return o;
+}
+
 // sound.json, shared with the shell: alertSound is a name in sounds/wav/Sounds/<name>.wav.
 const alertSounds = ["Basso", "Blow", "Bottle", "Frog", "Funk", "Glass", "Hero", "Morse", "Ping", "Pop", "Purr", "Sosumi", "Submarine", "Tink"];
 // the names 27.2.1 shows for those files (Sound.appex AlertSounds.loctable, en): the files kept their old names, so
@@ -449,7 +459,7 @@ if (typeof module !== "undefined")
     module.exports = { splitTerse, parseNmcliDevices, wifiDevice, parseNmcliWifi, parseWpctlSinks, parseWpctlSources, parseWpctlVolume,
         parseBluetoothShow, parseBluetoothDevices, parseHyprMonitors, hasBattery,
         parseHyprOption, luaString, luaMonitor, luaInput,
-        normalizeAppearance, normalizeDock, normalizeSound, mergeState, monitorMode, prettyFileName,
+        normalizeAppearance, normalizeDock, normalizeStageManager, normalizeSound, mergeState, monitorMode, prettyFileName,
         gecosName, normalizeLock, normalizeInput, normalizeNotifications, parseDesktopApps,
         appearanceDefaults, iconTints, highlightNames, zoneCoords, zoneName, sunAltitude, autoDark, nextAutoFlip, iconStyleVariantsOf, iconStyleVariantAfter, dockDefaults, soundDefaults, alertSounds, alertSoundTitles, alertSoundMenu,
         displaysDefaults, normalizeDisplays, parseScaleReport, sizeText, sizeKey, looksLikeChiclets, looksLikeBlock,

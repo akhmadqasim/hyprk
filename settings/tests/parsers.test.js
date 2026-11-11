@@ -251,3 +251,10 @@ test("Auto is dark while the sun is below -3 degrees at the zone's city", () => 
     assert.equal(P.nextAutoFlip(t0, 78.22, 15.65), 0);
     assert.equal(P.autoDark(t0, 78.22, 15.65), false);
 });
+
+test("stagemanager.json: off by default, only booleans, unknown keys kept", () => {
+    const P = require("../Parsers.js");
+    assert.deepEqual(P.normalizeStageManager({}), { enabled: false, autoHide: false });
+    assert.deepEqual(P.normalizeStageManager({ enabled: "yes", x: 1 }), { enabled: false, autoHide: false, x: 1 });
+    assert.equal(P.normalizeStageManager({ enabled: true }).enabled, true);
+});

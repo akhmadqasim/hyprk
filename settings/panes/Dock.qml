@@ -74,7 +74,7 @@ Column {
             Checkbox { property bool on: false; checked: on; onToggled: v => on = v; text: "In Stage Manager"; anchors.verticalCenter: parent.verticalCenter }
         }
         FormRow { label: "Click wallpaper to show desktop"; sublabel: "Click wallpaper to move windows out of the way, revealing your desktop items and widgets."; LocalPopup { model: ["Always", "Only in Stage Manager"]; currentIndex: 1 } }
-        FormRow { label: "Stage Manager"; sublabel: "Arranges your recent windows into a single strip for reduced clutter and quick access."; LocalSwitch {} }
+        FormRow { label: "Stage Manager"; sublabel: "Arranges your recent windows into a single strip for reduced clutter and quick access."; Switch { checked: AppState.stagemanager.enabled; onToggled: on => AppState.set("stagemanager", { enabled: on }) } }
     }
 
     Card {
