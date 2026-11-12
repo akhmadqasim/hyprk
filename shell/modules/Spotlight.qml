@@ -118,9 +118,15 @@ ShellWindow {
         settleGlass(Math.max(animX.duration, animY.duration, animAlpha.duration) + 50);   // the glass follows the scale
     }
     property bool firstFrame: true
+    // the open starts once the window's swaps pause (4 ms without one), not on the first swap: a remapped window swaps its first two frames back to back (2 ms
+    // apart), and a run started on the first swap counted the second as its first tick's (HyprK FrameClock built /
+    // swaps), so it sent the second tick's glass region before the first tick's frame was committed: the reopen's first
+    // frame drew the first tick's content in the second tick's glass (liquidglass trace: 1.069 / .45 twice, content of
+    // the first tick; mcap 1.069 1.069 1.046), and a queued second swap restarted the springs (1.090 1.043)
+    Timer { id: firstSwapQuiet; interval: 4; onTriggered: { sp.firstFrame = false; if (sp.shown) sp.animate(true); } }
     Connections {
         target: sp.firstFrame ? sp.contentItem.Window.window : null
-        function onFrameSwapped() { sp.firstFrame = false; if (sp.shown) sp.animate(true); }
+        function onFrameSwapped() { if (sp.firstFrame) firstSwapQuiet.restart(); }
     }
     visible: shown || !gone
     lingerAs: "spotlight"
@@ -297,6 +303,7 @@ ShellWindow {
     property bool selectOnShow: false
     function rearm() {
         firstFrame = true;
+        firstSwapQuiet.stop();
         animX.snap(1.12);
         animY.snap(1.12);
         animAlpha.snap(0);
