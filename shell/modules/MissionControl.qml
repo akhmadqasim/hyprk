@@ -155,6 +155,14 @@ ShellWindow {
         function onVisibleChanged() { if (!pickProbe.Window.window.visible) mc.focusPicked(); }
     }
     Item { id: pickProbe }
+    // a Dock activation while open (Apps.leaveMission): its window is picked as a thumbnail click would pick it
+    Connections {
+        target: Apps
+        function onMissionPick(win) {
+            if (!mc.shown || !win || mc.windows.indexOf(win) === -1) return;
+            mc.pickSwaps = 0; mc.pickedWindow = win; mc.flyTop = win;
+        }
+    }
 
     // frozen while closing, so the windows fly back to where they were. Ordered top to bottom, then
     // left to right by where they are, so each fills the nearest cell (short flights).

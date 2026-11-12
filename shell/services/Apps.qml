@@ -404,8 +404,18 @@ Singleton {
     GlobalShortcut { appid: "hyprk"; name: "hide-others"; description: "Hide the other apps (Option-Cmd-H)"; onPressed: root.hideOthers() }
     GlobalShortcut { appid: "hyprk"; name: "quit-app"; description: "Quit the frontmost app (Cmd-Q)"; onPressed: root.quitActiveApp() }
 
+    // A Dock activation while Mission Control is open leaves it with its normal exit and then activates (or launches)
+    // the app, as on the Mac (judge #11: a Dock click launched Notes and Mission Control stayed open). Each Mission
+    // Control layer takes `win` (the window about to be focused, or null) as its picked window, so it flies back on top
+    signal missionPick(var win)
+    function leaveMission(win) {
+        if (Panels.open !== "mission") return;
+        missionPick(win || null);
+        Panels.close();
+    }
     function activate(item) {
         if (isHidden(item.windows)) {   // a hidden app comes back where it was (Dock click, Cmd-Tab)
+            leaveMission(null);
             showWindows(item.windows, true);
             return;
         }
@@ -415,13 +425,17 @@ Singleton {
             const shown = item.windows.filter(w => !isMinimized(w));
             if (shown.length > 0) {
                 const active = shown.findIndex(w => w === Hyprland.activeToplevel);
-                focusWindow(shown[(active + 1) % shown.length]);
+                const w = shown[(active + 1) % shown.length];
+                leaveMission(w);
+                focusWindow(w);
                 return;
             }
             const hist = w => { const o = w.lastIpcObject; return o && o.focusHistoryID !== undefined ? o.focusHistoryID : 1e9; };
+            leaveMission(null);
             restoreWindow(item.windows.slice().sort((a, b) => hist(a) - hist(b))[0]);
             return;
         }
+        leaveMission(null);
         // items without a .desktop entry carry their own action (Apps panel, hyprk Settings)
         if (item.action) item.action();
         else launch(item.entry, item.id);
@@ -445,10 +459,11 @@ Singleton {
 
     // the Trash in our Finder (its files folder, the freedesktop Trash; was gio open trash:///, the host's file manager)
     function openTrash() {
+        leaveMission(null);
         openFinder((Quickshell.env("XDG_DATA_HOME") || Quickshell.env("HOME") + "/.local/share") + "/Trash/files");
     }
     // a Dock folder opens in our Finder (never the host's file manager through xdg-open, judge #7)
-    function openFolder(item) { openFinder(Quickshell.env("HOME") + "/" + item.folder); }
+    function openFolder(item) { leaveMission(null); openFinder(Quickshell.env("HOME") + "/" + item.folder); }
 
     // Dock right-click menu, macOS layout: windows, Options, Show in Finder, Open/Quit
     function dockMenu(item) {

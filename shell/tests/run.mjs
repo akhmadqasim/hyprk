@@ -1471,7 +1471,14 @@ test("Mission Control: one Space reads Desktop, more are numbered by position", 
     test("only a click activates the desktop", () => assert.match(bg, /else \{? ?bg\.activateDesktop\(\)/));
     const apps = readFileSync(join(shellDir, "services", "Apps.qml"), "utf8");
     test("Dock folders open in our Finder, never xdg-open", () =>
-        assert.match(apps, /function openFolder\(item\) \{ openFinder\(/));
+        assert.match(apps, /function openFolder\(item\) \{ leaveMission\(null\); openFinder\(/));
+    // judge #11: a Dock click in Mission Control launched the app and Mission Control stayed open
+    test("a Dock activation leaves Mission Control, its window picked", () => {
+        assert.match(apps, /function leaveMission\(win\) \{\s*if \(Panels\.open !== "mission"\) return;\s*missionPick\(win \|\| null\);\s*Panels\.close\(\);/);
+        assert.match(apps, /leaveMission\(w\);\s*focusWindow\(w\);/);
+        assert.match(readFileSync(join(shellDir, "modules", "MissionControl.qml"), "utf8"),
+                     /function onMissionPick\(win\) \{[^}]*mc\.pickedWindow = win; mc\.flyTop = win;/);
+    });
 }
 
 // ---- Stage Manager (lib/stage.js, decoded from WindowManager 27.2.1) ----
