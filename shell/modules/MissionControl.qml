@@ -643,6 +643,9 @@ ShellWindow {
                 property var bar: null          // the bar's strip on the screen (any window with the plugin's bar)
                 property bool barSeen: false    // ... and the screen still shows all of it
                 property var look: null         // ... as the plugin draws it
+                // the picked window once its still is taken again in the active look: its bar is then drawn from the
+                // plugin's description in the active look too (the screen still's strip is the look at open)
+                property bool repicked: false
                 function takeRect() {
                     if (mc.e >= 0.05) return;
                     real = mc.fullRect(cell.modelData);
@@ -695,7 +698,7 @@ ShellWindow {
                         color: "transparent"
                         // the plugin title bar's strip, cut from the screen still
                         ShaderEffectSource {
-                            visible: cell.bar !== null && cell.barSeen && still.hasContent
+                            visible: cell.bar !== null && cell.barSeen && still.hasContent && !(cell.repicked && cell.look)
                             width: parent.width
                             height: cell.barHeight
                             sourceItem: visible ? still : null
@@ -705,8 +708,9 @@ ShellWindow {
                         // the window's state at open (active only for the focused one, as mc-light.png) and the title, laid out
                         // in points and scaled with the thumbnail
                         Rectangle {
-                            readonly property var st: cell.look ? cell.look.look[cell.look.active ? "active" : "inactive"] : null
-                            visible: cell.bar !== null && st !== null && !(cell.barSeen && still.hasContent)
+                            readonly property bool active: cell.look ? cell.look.active || cell.repicked : false
+                            readonly property var st: cell.look ? cell.look.look[active ? "active" : "inactive"] : null
+                            visible: cell.bar !== null && st !== null && (!(cell.barSeen && still.hasContent) || cell.repicked)
                             width: parent.width
                             height: cell.barHeight
                             color: st ? st.fill : "transparent"
@@ -719,7 +723,7 @@ ShellWindow {
                                     x: cell.look ? cell.look.inset : 0
                                     anchors.verticalCenter: parent.verticalCenter
                                     enabled: false
-                                    active: cell.look ? cell.look.active : false
+                                    active: parent.parent.active
                                     dark: parent.parent.st ? parent.parent.st.dark : false
                                 }
                                 Text {
@@ -741,9 +745,9 @@ ShellWindow {
                             // for as long as Mission Control stayed open (reference/PERF-2026-11-10.md item 2). The still
                             // is taken when the source is set (creation, on open) and again on a reopen while still loaded
                             live: false
-                            Connections { target: mc; function onShownChanged() { if (mc.shown) view.captureFrame(); } }
+                            Connections { target: mc; function onShownChanged() { if (mc.shown) { cell.repicked = false; view.captureFrame(); } } }
                             Connections { target: mc; function onRefocused(win) { if (win === cell.modelData) reshot.restart(); } }
-                            Timer { id: reshot; interval: 50; onTriggered: view.captureFrame() }
+                            Timer { id: reshot; interval: 50; onTriggered: { view.captureFrame(); cell.repicked = true; } }
                             // No second still on exit (one was taken in the tail for the windows' active look): the capture
                             // held qs's frames there, a 0.96 plateau for 2-4 frames (mcap); the look changes when the layer goes
                             constraintSize: Qt.size(cell.width, Math.max(1, cell.height - cell.barHeight))
