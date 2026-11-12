@@ -134,13 +134,16 @@ Item {
                 }
                 // the app icon as the Dock draws it (AppIcon: macOS icon when mapped, else the theme icon on the
                 // squircle tile), so an app the icon theme lacks still gets its own icon, not a bare generic one
+                // the Mac's icon is the squircle itself 32 x 32 at 13 from the card edge (Q-panels-28,
+                // banner-dark-black.png: squircle 31.5 pt), so the tile is drawn 32 / body (40) around the box's
+                // centre; at 32 its transparent margin left a 26 pt squircle at 16
                 AppIcon {
                     readonly property bool badge: iconBox.imageUrl !== ""
-                    width: badge ? Math.round(Theme.notif.iconSize * 0.47) : Theme.notif.iconSize
+                    width: badge ? Math.round(Theme.notif.iconSize * 0.47) : Math.round(Theme.notif.iconSize / Theme.appIcon.body)
                     height: width
                     size: width
-                    x: badge ? iconBox.width - width + 3 : 0
-                    y: badge ? iconBox.height - height + 3 : 0
+                    x: badge ? iconBox.width - width + 3 : (iconBox.width - width) / 2
+                    y: badge ? iconBox.height - height + 3 : (iconBox.height - height) / 2
                     icon: iconBox.entry ? iconBox.entry.icon || "" : card.appIcon.replace(/^file:\/\//, "")
                     appId: iconBox.entry ? iconBox.entry.id : card.appName
                 }
