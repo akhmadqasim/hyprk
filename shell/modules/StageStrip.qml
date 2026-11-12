@@ -242,6 +242,9 @@ ShellWindow {
     onReadyChanged: if (preparing && ready >= flights.length) armed = true
     function launch() {
         if (!preparing) return;
+        // flying before preparing ends: the flight layer's loader (active: flying || preparing) must not drop for a
+        // moment, or the layer and its pictures were made again and the stage stood empty for 1-2 frames
+        if (flights.length > 0) { flightAnim.snap(0); flying = true; }
         preparing = false;
         flightGate.stop();
         armed = false;
@@ -249,8 +252,6 @@ ShellWindow {
         request = null;
         StageManager.commit(r.m, r.out, flights.length > 0);
         if (flights.length === 0) { StageManager.land(r.inc); landingKeys = []; return; }
-        flying = true;
-        flightAnim.snap(0);
         flightAnim.go(1);
     }
     LazyLoader {
@@ -261,9 +262,9 @@ ShellWindow {
             exclusionMode: ExclusionMode.Ignore
             color: "transparent"
             WlrLayershell.layer: WlrLayer.Overlay
-            // a namespace hyprland.lua already exempts from Hyprland's layer fade (hyprk-no-anim): a layer of its own
-            // faded in over 0.1 s and the flight showed the wallpaper through (hand-off: add hyprk-stage-* to the rule)
-            WlrLayershell.namespace: "hyprk-mission"
+            // exempt from Hyprland's layer fade by hyprland.lua's hyprk-no-anim rule (a faded layer showed the wallpaper
+            // through the flight for 0.1 s)
+            WlrLayershell.namespace: "hyprk-stage-flight"
             mask: Region {}
             Item {
                 id: flightRoot
