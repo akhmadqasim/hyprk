@@ -128,6 +128,24 @@ ShellWindow {
     // thumbnails still waited for their captures (judge #5, B-mc-enter-inactive-flash-1.6.png). On the Mac the focused
     // window keeps its active look in Mission Control (screens/27.2.1/dock/mc-light.png: te-small.txt in colour)
     WlrLayershell.keyboardFocus: shown && cover >= 1 ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    // A picked window is focused again once the layer has dropped the keyboard: Hyprland refuses a window focus while
+    // an exclusive layer holds the keys (FocusState rawWindowFocus) and on that commit refocuses its last window, so the
+    // focus sent with the click was lost and the window active before Mission Control came back (follow_mouse 1 hid
+    // this by focusing the window under the pointer). Two swaps: the first can be of a frame begun before the click.
+    property var pickedWindow: null
+    property int pickSwaps: 0
+    function focusPicked() {
+        const t = pickedWindow;
+        pickedWindow = null;
+        if (t) Apps.focusWindow(t);
+    }
+    Connections {
+        target: pickProbe.Window.window   // the QQuickWindow (QsWindow.window has no frameSwapped)
+        enabled: mc.pickedWindow !== null
+        function onFrameSwapped() { if (++mc.pickSwaps >= 2) mc.focusPicked(); }
+        function onVisibleChanged() { if (!pickProbe.Window.window.visible) mc.focusPicked(); }
+    }
+    Item { id: pickProbe }
 
     // frozen while closing, so the windows fly back to where they were. Ordered top to bottom, then
     // left to right by where they are, so each fills the nearest cell (short flights).
@@ -746,7 +764,7 @@ ShellWindow {
                 id: wma
                 anchors.fill: parent
                 hoverEnabled: true
-                onClicked: { Panels.close(); Apps.focusWindow(cell.modelData); }
+                onClicked: { mc.pickSwaps = 0; mc.pickedWindow = cell.modelData; Panels.close(); Apps.focusWindow(cell.modelData); }
             }
         }
     }
