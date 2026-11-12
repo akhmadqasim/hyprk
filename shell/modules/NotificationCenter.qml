@@ -206,7 +206,7 @@ Item {
                     spacing: Theme.nc.pillGap
                     Text {
                         Layout.fillWidth: true
-                        Layout.leftMargin: 4
+                        Layout.leftMargin: 1   // text frame at x 1351, the cards' edge at 1350 (Q-panels-32)
                         text: "Notification Center"
                         elide: Text.ElideRight
                         font: Typography.font(17, Typography.bold)
