@@ -26,6 +26,8 @@ int main(int argc, char **argv) {
     while (fgets(line, sizeof line, stdin)) {
         if (line[0] == 'b') { zwlr_virtual_pointer_v1_button(p, ms(), BTN_LEFT, 1); zwlr_virtual_pointer_v1_frame(p); wl_display_flush(dpy);
             zwlr_virtual_pointer_v1_button(p, ms(), BTN_LEFT, 0); zwlr_virtual_pointer_v1_frame(p); wl_display_roundtrip(dpy); continue; }
+        if (line[0] == 'r') { zwlr_virtual_pointer_v1_button(p, ms(), BTN_RIGHT, 1); zwlr_virtual_pointer_v1_frame(p); wl_display_flush(dpy);
+            zwlr_virtual_pointer_v1_button(p, ms(), BTN_RIGHT, 0); zwlr_virtual_pointer_v1_frame(p); wl_display_roundtrip(dpy); continue; }
         if (line[0] == 'd' || line[0] == 'u') { zwlr_virtual_pointer_v1_button(p, ms(), BTN_LEFT, line[0] == 'd'); zwlr_virtual_pointer_v1_frame(p); wl_display_roundtrip(dpy); continue; }
         if (sscanf(line, "%lf %lf %d", &x, &y, &d) != 3) continue;
         zwlr_virtual_pointer_v1_motion_absolute(p, ms(), (uint32_t)x, (uint32_t)y, W, H);
