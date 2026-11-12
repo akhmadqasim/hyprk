@@ -114,9 +114,15 @@ hl.config({
     render = { expand_undersized_textures = false },
     input = {
         kb_layout = "us",
-        follow_mouse = 1,
+        -- Focus is click-only on the Mac: the frontmost app changes on a click in a window, the Dock or Cmd-Tab, never
+        -- on hover (judge #8: with 1, a hover over a window took the keyboard from the desktop, so the menu bar left
+        -- Finder). 2 keeps the pointer focus on the window under the pointer (a background window scrolls without
+        -- being focused) and moves the keyboard on a click (the mouse:272 bind below covers the click Hyprland skips).
+        follow_mouse = 2,
         touchpad = { natural_scroll = true },   -- macOS default
     },
+    -- the Mac never moves the pointer when a window is focused (Dock click, Cmd-Tab, the click bind below)
+    cursor = { no_warps = true },
     dwindle = { preserve_split = true },
 })
 
@@ -407,6 +413,21 @@ hl.bind(cmd .. " + F3",      hl.dsp.global("hyprk:missioncontrol"))   -- plain F
 hl.bind(cmd .. " + Q",       hl.dsp.global("hyprk:quit-app"))
 hl.bind(cmd .. " + H",       hl.dsp.global("hyprk:hide-app"))
 hl.bind(cmd .. " + ALT + H", hl.dsp.global("hyprk:hide-others"))
+-- A click in the focused window while a layer holds the keyboard (the desktop after a desktop click, Dock or panels on
+-- demand) gives the window the keyboard back: Hyprland refocuses on a press only when the window under the pointer is
+-- not its focused window (InputManager::processMouseDownNormal), and follow_mouse 2 no longer does it on hover.
+-- A layer taking keys under the pointer (a menu, the Dock, Control Center) keeps the click; an exclusive one blocks the
+-- focus anyway.
+hl.bind("mouse:272", function()
+    local w, c = hl.get_active_window(), hl.get_cursor_pos()
+    if not w or not c or not w.mapped then return end
+    if c.x < w.at.x or c.y < w.at.y or c.x >= w.at.x + w.size.x or c.y >= w.at.y + w.size.y then return end
+    for _, l in ipairs(hl.get_layers() or {}) do
+        if l.mapped and l.layer >= 2 and l.keyboard_interactivity ~= 0
+            and c.x >= l.x and c.y >= l.y and c.x < l.x + l.w and c.y < l.y + l.h then return end
+    end
+    hl.dispatch(hl.dsp.focus({ window = "address:" .. w.address }))
+end, { non_consuming = true })
 -- Cmd-` cycles the frontmost app's windows (Window > Cycle Through Windows ⌘`), Shift-Cmd-` backwards
 hl.bind(cmd .. " + grave",   hl.dsp.global("hyprk:cycle-windows"))
 hl.bind(cmd .. " + SHIFT + grave", hl.dsp.global("hyprk:cycle-windows-back"))

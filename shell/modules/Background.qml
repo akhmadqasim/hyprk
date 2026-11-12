@@ -24,16 +24,35 @@ ShellWindow {
     // takes the keyboard on mere hover under follow_mouse (InputManager::mouseMoveUnified, a layer with interactivity
     // != NONE under the pointer gets rawSurfaceFocus), so the layer asks for no keyboard at rest. On a click it asks
     // exclusively (Hyprland hands it the keyboard at once: LayerSurface::onCommit takeKeyboardFocus, after the button is
-    // up so no release is swallowed), then on demand once it has it, so the window can take it back (click, or
-    // follow_mouse over it); when it loses the keyboard it asks for none again.
+    // up so no release is swallowed), then on demand once it has it, so the window can take it back (a
+    // click); when it loses the keyboard it asks for none again.
+    // A shell panel taking the keys (a menu opened from the menu bar, Spotlight, Cmd-Tab, Mission Control) leaves Finder
+    // frontmost, as a click on the Mac's menu bar never changes the frontmost app (judge #8: the click on "File" after a
+    // desktop click opened the last app's menu): the desktop keeps Apps.desktopFocus and takes the keyboard back when
+    // the panel closes (Hyprland hands it to the last window then: LayerSurface::onCommit refocusLastWindow), unless
+    // something activated a window meanwhile (Apps.focusWindow clears desktopFocus).
     property bool takeKeys: false     // the desktop wants or holds the keyboard
     property bool grabbing: false     // exclusive until the keyboard arrives
+    property bool reclaim: false      // a panel has the keys while Finder stays frontmost
     WlrLayershell.keyboardFocus: !takeKeys ? WlrKeyboardFocus.None
                                : grabbing ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand
     function activateDesktop() { grabbing = true; takeKeys = true; }
     Connections {
         target: Apps
         function onDesktopRequested(name) { if (bg.screen && bg.screen.name === name) bg.activateDesktop(); }
+    }
+    Connections {
+        target: Panels
+        enabled: bg.reclaim
+        function onOpenChanged() {
+            if (Panels.open !== "") return;
+            // after the closing handler has run (a menu row or Cmd-Tab may focus a window right after closing)
+            Qt.callLater(() => {
+                if (!bg.reclaim || Panels.open !== "") return;
+                bg.reclaim = false;
+                if (bg.screen && Apps.desktopFocus === bg.screen.name) bg.activateDesktop();
+            });
+        }
     }
     Item {
         readonly property bool focused: Window.active
@@ -42,12 +61,19 @@ ShellWindow {
             if (focused) {
                 Apps.desktopFocus = name;
                 bg.grabbing = false;
+                commitKick.visible = !commitKick.visible;
             } else {
-                if (Apps.desktopFocus === name) Apps.desktopFocus = "";
+                if (Apps.desktopFocus === name && Panels.open !== "") bg.reclaim = true;
+                else if (Apps.desktopFocus === name) Apps.desktopFocus = "";
                 if (!bg.grabbing) bg.takeKeys = false;
             }
         }
     }
+
+    // A frame for the keyboard mode: a still wallpaper draws (and commits) nothing, so the switch from exclusive back
+    // to on demand waited for the next repaint and Hyprland kept the layer in its exclusive list, refusing every window
+    // focus (a click in a window after a desktop click left the keyboard on the desktop)
+    Rectangle { id: commitKick; width: 1; height: 1; color: "#01000000" }
 
     // desktop click: Finder takes the keyboard (above); right-click: Finder desktop menu
     MouseArea {
