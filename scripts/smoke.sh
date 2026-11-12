@@ -15,9 +15,14 @@
 #                     The session gets its own dbus-daemon (no service directories, so nothing is activated; socket
 #                     in $HYPRK_STATE/run), never the caller's bus; stopped at teardown, left running with HYPRK_KEEP=1.
 #                     HYPRK_BUS_ADDRESS=addr uses that bus instead. NO_AT_BRIDGE=1 and GTK_A11Y=none for all of it
+#
+#   scripts/smoke.sh --stop SIG   stop a session this script started and left running (HYPRK_KEEP=1): only an instance
+#                     whose runtime dir carries the smoke.pid marker written at start, matching its lock file. The
+#                     private bus is not stopped by it: kill the bus pid the start printed
 set -u
 HYPRK_ROOT=${HYPRK_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}
 export HYPRK_ROOT
+[ "${1:-}" = --stop ] && STOP_SIG=${2:-}
 OUT=${1:-$HYPRK_ROOT/reference/ours/smoke-$(date +%Y%m%d-%H%M%S).png}
 shift || true
 [ "${1:-}" = "--" ] && shift
@@ -30,6 +35,51 @@ HYPRK_DEV=${HYPRK_DEV:-$HYPRK_ROOT/../hypr-dev}   # source-built prefix, optiona
 command -v Hyprland >/dev/null || { echo "smoke: Hyprland not in PATH (dev env not ready)"; exit 2; }
 command -v qs >/dev/null || command -v quickshell >/dev/null || { echo "smoke: quickshell not in PATH"; exit 2; }
 [ -n "${WAYLAND_DISPLAY:-}" ] || { echo "smoke: needs a host Wayland session"; exit 2; }
+
+# the session's processes: the pid in the lock file and its descendants (Hyprland 0.57 runs the compositor in a forked
+# child of the pid it was started as, and that child has hung after the exit dispatch in most runs)
+descendants() {
+    local p
+    for p in $(pgrep -P "$1" 2>/dev/null); do echo "$p"; descendants "$p"; done
+}
+# exit dispatch to that instance, up to 3 s for its Hyprland processes to go, then SIGTERM, then SIGKILL; then its
+# runtime dir and its shells' quickshell by-pid / by-id entries. Only pids under the lock file's pid are touched
+stop_instance() {
+    local sig=$1 dir=$XDG_RUNTIME_DIR/hypr/$1 lock hyp=() qs=() p t
+    lock=$(head -n1 "$dir/hyprland.lock" 2>/dev/null)
+    [ -n "$lock" ] || return 0
+    for p in "$lock" $(descendants "$lock"); do
+        case "$(cat /proc/"$p"/comm 2>/dev/null)" in
+            Hyprland) hyp+=("$p") ;;
+            qs|quickshell) qs+=("$p") ;;
+        esac
+    done
+    HYPRLAND_INSTANCE_SIGNATURE=$sig hyprctl -i "$sig" dispatch 'hl.dsp.exit()' >/dev/null 2>&1
+    alive() { for p in "${hyp[@]}"; do kill -0 "$p" 2>/dev/null && return 0; done; return 1; }
+    for _ in $(seq 1 30); do alive || break; sleep 0.1; done
+    if alive; then
+        for p in "${hyp[@]}"; do kill -TERM "$p" 2>/dev/null; done
+        for _ in $(seq 1 10); do alive || break; sleep 0.1; done
+        for p in "${hyp[@]}"; do kill -KILL "$p" 2>/dev/null; done
+    fi
+    for p in "${qs[@]}"; do
+        kill -KILL "$p" 2>/dev/null
+        t=$(readlink "$XDG_RUNTIME_DIR/quickshell/by-pid/$p" 2>/dev/null)
+        case "$t" in "$XDG_RUNTIME_DIR"/quickshell/by-id/?*) rm -rf "$t" ;; esac
+        rm -f "$XDG_RUNTIME_DIR/quickshell/by-pid/$p"
+    done
+    rm -rf "$dir"
+}
+if [ "${STOP_SIG+set}" = set ]; then
+    d=$XDG_RUNTIME_DIR/hypr/$STOP_SIG
+    case "$STOP_SIG" in ""|*/*|.*) echo "smoke: --stop needs an instance signature"; exit 2 ;; esac
+    if [ ! -f "$d/smoke.pid" ] || [ "$(cat "$d/smoke.pid")" != "$(head -n1 "$d/hyprland.lock" 2>/dev/null)" ]; then
+        echo "smoke: $STOP_SIG was not started by smoke.sh (no matching $d/smoke.pid), not stopped"; exit 2
+    fi
+    stop_instance "$STOP_SIG"
+    echo "smoke: stopped $STOP_SIG"
+    exit 0
+fi
 
 LOGDIR=${XDG_CACHE_HOME:-$HOME/.cache}/hyprk/logs
 mkdir -p "$LOGDIR" "$(dirname "$OUT")"
@@ -74,15 +124,11 @@ HPID=$!
 echo "smoke: Hyprland pid $HPID, log $LOG"
 
 cleanup() {
-    # Hyprland 0.57 can leave a child behind after exit; remember ours to kill only those
-    local kids
-    kids=$(pgrep -P "$HPID" 2>/dev/null)
     if [ -n "${SIG:-}" ]; then
-        HYPRLAND_INSTANCE_SIGNATURE=$SIG hyprctl dispatch 'hl.dsp.exit()' >/dev/null 2>&1
+        stop_instance "$SIG"
+    else
+        kill -9 "$HPID" 2>/dev/null
     fi
-    for _ in $(seq 1 50); do kill -0 "$HPID" 2>/dev/null || break; sleep 0.1; done
-    kill -9 "$HPID" 2>/dev/null
-    for k in $kids; do kill -9 "$k" 2>/dev/null; done
     stop_bus
 }
 stop_bus() {
@@ -106,6 +152,7 @@ for _ in $(seq 1 100); do
 done
 [ -n "$SIG" ] || { echo "smoke: no instance found"; cleanup; exit 1; }
 export HYPRLAND_INSTANCE_SIGNATURE=$SIG
+echo "$HPID" >"$XDG_RUNTIME_DIR/hypr/$SIG/smoke.pid"   # marks the instance as this script's, for --stop
 echo "smoke: instance $SIG on $NESTED"
 
 if [ "${HYPRK_HEADLESS:-0}" = 1 ]; then
