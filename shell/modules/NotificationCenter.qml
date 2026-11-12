@@ -348,8 +348,13 @@ Item {
                                 font: Typography.font(15, Typography.semibold)
                                 color: Theme.color.label
                             }
+                            // while the x asks "Clear", Show less is a 20 pt circle with chevron.up
+                            // (NotificationCenter 27.2.1 sub_1000700d8: Image(systemName: "chevron.up") in a 20 x 20
+                            // frame when its Bool binding is set, else Text("Show less"); Q-panels-32: it shrinks to a
+                            // circle while the x reads "Clear")
                             Pill {
-                                text: "Show less"
+                                text: grp.confirmClear ? "" : "Show less"
+                                symbol: grp.confirmClear ? "chevron.up" : ""
                                 implicitHeight: Theme.nc.pillSmall
                                 visible: grp.open
                                 glass: grp.cardY(0) >= nc.headerHeight
