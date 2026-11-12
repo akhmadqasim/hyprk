@@ -57,6 +57,8 @@ ShellWindow {
     readonly property var springBlur: SpringLib.fromBounce(0.51, 0.05)
     SpringCurve {
         id: animBlur
+        freshHold: 0
+        firstAt: sp.firstAt
         target: sp; property: "blurRadius"; spring: sp.springBlur
         onFinished: if (goal === 0) sp.openBlur = false
     }
@@ -65,11 +67,19 @@ ShellWindow {
     // full-screen stage layer the close uses; the texture goes when the blur has landed or the content changes.
     property bool openBlur: false
     function dropOpenBlur(): void { if (openBlur && query !== "") { openBlur = false; animBlur.snap(0); } }
-    SpringCurve { id: animX; target: sp; property: "scaleX" }
-    SpringCurve { id: animY; target: sp; property: "scaleY"; settlesGlass: true }   // steps after animX: the glass is re-measured once both moved
+    // Every open starts after a swapped frame of the window (firstFrame below), so the springs take no fresh-layer
+    // hold: with it a reopen drew the start frame and the first tick at the same scale (mcap 1.112 1.112 1.096, the
+    // bar's left glass edge on its centre row). The open's first frame shows the springs 38.7 ms in: the Mac's first
+    // visible frame (spotlight-open-fit.json, bounce 0.32 fitted at t0 -0.0387 s, first visible sx 1.0877); the close
+    // starts one interval in
+    property real firstAt: 0
+    SpringCurve { id: animX; target: sp; property: "scaleX"; freshHold: 0; firstAt: sp.firstAt }
+    SpringCurve { id: animY; target: sp; property: "scaleY"; settlesGlass: true; freshHold: 0; firstAt: sp.firstAt }   // steps after animX: the glass is re-measured once both moved
     SpringCurve {
         id: animAlpha
         target: sp
+        freshHold: 0
+        firstAt: sp.firstAt
         property: "alpha"
         spring: sp.springAlpha
         onFinished: if (!sp.shown) sp.gone = true
@@ -81,6 +91,7 @@ ShellWindow {
     property bool appsCut: false
     function animate(open) {
         gone = false;
+        firstAt = open ? 0.0387 : 0;
         if (open) appsCut = mode === "apps";
         if (appsCut) {
             animX.snap(1);
@@ -279,12 +290,13 @@ ShellWindow {
         FileSearch.loadRecents();
     }
     Component.onCompleted: { if (shown) present(); else gone = true; }
-    // reopened after it went: map again from the start values, empty; the springs start at once (mapping a loaded
-    // window takes about a frame, waiting for its first frame as on creation cost 2 more, mcap)
+    // reopened after it went: map again from the start values, empty; the springs start on the window's first swapped
+    // frame, as on creation (they started at once and the fresh-layer hold showed the start scale twice, mcap)
     // closed less than 8 minutes ago: the query is still there, selected (SL.keepsQuery)
     property real closedAt: 0
     property bool selectOnShow: false
     function rearm() {
+        firstFrame = true;
         animX.snap(1.12);
         animY.snap(1.12);
         animAlpha.snap(0);

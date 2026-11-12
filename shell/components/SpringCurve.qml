@@ -31,6 +31,11 @@ Item {
     property real goal: 0                 // the value of the last go()
     property real duration: 0
     property bool settlesGlass: false
+    // frames of a newly shown window that do not tick (HyprK FrameClock.freshHold); 0 where the run already waited
+    // for a swapped frame of its window
+    property alias freshHold: clock.freshHold
+    // spring seconds the run's first frame shows (0: one refresh interval in); the next run of go() takes it
+    property real firstAt: 0
     readonly property bool running: clock.running
     readonly property bool landed: !running
     signal finished()
@@ -40,6 +45,7 @@ Item {
     property real _v0: 0          // start velocity in distances per second
     property real _end: 0         // spring seconds at which the run ends
     property real _rate: 1        // spring seconds per real second
+    property real _first: 0       // firstAt of this run
 
     function _set(v: real): void {
         target[property] = v;
@@ -61,6 +67,7 @@ Item {
         _end = cutAt > 0 ? cutAt : (flying ? SpringLib.settleTime(_spring, _v0, 0.001) : SpringLib.settleSeconds(_spring, _v0));
         duration = Theme.ms(Math.round(_end * 1000));
         _rate = duration > 0 ? _end * 1000 / duration : 1;
+        _first = firstAt;
         clock.start();
     }
     // jump without motion
@@ -74,7 +81,7 @@ Item {
     HK.FrameClock {
         id: clock
         watchdog: true
-        readonly property real at: (elapsed + interval) / 1000 * a._rate
+        readonly property real at: (elapsed / 1000 + (a._first > 0 ? a._first : interval / 1000)) * a._rate
         onTick: {
             const end = at >= a._end;
             if (end && a.cutAt <= 0) a._set(a.goal);
