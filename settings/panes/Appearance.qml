@@ -320,6 +320,10 @@ Column {
                     leftIcon: glassClear; rightIcon: glassTinted
                     endStep: 0.1
                     tickMarks: 3
+                    // the fill runs to value x the track, the knob stays half a knob inside the ends (the 23.09.23
+                    // recording, knob held: at 0 no fill shows in the lens, at 1 the fill reaches the track's end, at
+                    // 0.07-0.09 the fill end is within 1.5 px of the lens centre; a fill to the knob's centre was 10 pt off)
+                    fillToEnds: true
                     onMoved: v => glassPreview.dragTint = v
                     onReleased: Qt.callLater(() => glassPreview.dragTint = -1)
                     onCommitted: v => { AppState.set("appearance", { glass: Math.round(v * 1000) / 1000 }); glassPreview.dragTint = -1; }

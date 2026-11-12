@@ -67,6 +67,8 @@ Item {
             mouseClick(left);
             fuzzyCompare(AppState.appearance.glass, 0.4, 1e-9);
             fuzzyCompare(AppState._patches.appearance.glass, 0.4, 1e-9);
+            // the fill runs to the value x the track (the 23.09.23 recording, knob held at both ends)
+            verify(sl.fillToEnds);
         }
         // the highlight pop-up writes appearance.highlight ("" = Automatic) and the text selection colour follows:
         // Purple #DFC5E0 light (accent-colors.json highlightKeys), Automatic = the accent's (Multicolor: Blue #B3D7FF)
