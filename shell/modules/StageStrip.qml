@@ -52,7 +52,18 @@ ShellWindow {
         out.forEach((p, i) => { p.x = at[i].x; p.y = at[i].y; });
         return out;
     }
-    readonly property var piles: pilesFor(StageManager.model, [])
+    // the windows flying into the strip count as parked (they are off the stage, not yet on special:stage): without
+    // them their pile had no size during the flight and the piles below moved 24 pt and back (judge #8b)
+    readonly property var flyingOut: flights.filter(x => !x.landing).map(x => x.t)
+    readonly property var pilesNow: pilesFor(StageManager.model, flyingOut)
+    // a new array only when a pile really changed: the Repeater makes every pile again on a new array, and a new pile
+    // stands empty until its stills are taken (a frame or more)
+    property var piles: []
+    property string pilesSig: ""
+    onPilesNowChanged: {
+        const sig = JSON.stringify(pilesNow.map(p => [p.key, p.x, p.y, p.w, p.h, p.wins.map(w => [StageManager.addressOf(w.t), w.w, w.h])]));
+        if (sig !== pilesSig) { pilesSig = sig; piles = pilesNow; }
+    }
     function pileOf(k) { return piles.find(p => p.key === k) || null; }
 
     // ---------- hiding ----------
@@ -149,6 +160,8 @@ ShellWindow {
                         captureSource: thumb.modelData.t.wayland
                         live: false
                         constraintSize: Qt.size(width, height)
+                        onHasContentChanged: if (hasContent) strip.thumbIn(thumb.modelData.t, 1)
+                        Component.onDestruction: if (hasContent) strip.thumbIn(thumb.modelData.t, -1)
                     }
                     // the windows behind the front one: 10 % darker per step (LeftStripStackDepthStepValue 0.1,
                     // 0x1002bc880; inferred: what the value darkens is not traced)
@@ -182,7 +195,7 @@ ShellWindow {
     property var request: null       // { m, out, inc } waiting for the flight's pictures
     property int ready: 0
     property real f: 0
-    Component.onCompleted: StageManager.animator = true
+    Component.onCompleted: { StageManager.animator = true; pilesNowChanged(); }
     Component.onDestruction: {
         StageManager.animator = false;
         // never leave a window off the screen or parked mid-flight
@@ -203,10 +216,28 @@ ShellWindow {
     }
     // the pictures stay over the windows that came back while Hyprland fades them in (WINDOW_ALPHA_MOVE_FROM_WORKSPACE,
     // about 140 ms measured; ours)
-    Timer { id: settle; interval: 160; onTriggered: { strip.flying = false; strip.flights = []; } }
+    Timer { id: settle; interval: 160; onTriggered: { strip.settling = true; settleCap.restart(); strip.endFlight(false); } }
+    // ... and over the piles they landed in until the pile's own still is in (judge #8b: the new pile stood empty, or
+    // black, for 130-430 ms after the flight); at most 1 s more (ours)
+    Timer { id: settleCap; interval: 1000; onTriggered: strip.endFlight(true) }
+    property bool settling: false
+    property var thumbsIn: ({})          // window address -> pile stills of it that have content
+    function thumbIn(t, n) {
+        const a = StageManager.addressOf(t);
+        thumbsIn[a] = (thumbsIn[a] || 0) + n;
+        if (settling) endFlight(false);
+    }
+    function endFlight(force) {
+        if (!force && flights.some(x => !x.landing && !(thumbsIn[StageManager.addressOf(x.t)] > 0))) return;
+        settling = false;
+        settleCap.stop();
+        flying = false;
+        flights = [];
+    }
     Connections {
         target: StageManager
         function onSwitchRequested(m, outgoing, incoming) {
+            if (strip.settling) strip.endFlight(true);
             if (strip.flying || strip.preparing) { StageManager.commit(m, outgoing, false); StageManager.land(incoming); return; }
             const sx = strip.screen ? strip.screen.x : 0, sy = strip.screen ? strip.screen.y : 0;
             const real = t => { const o = t.lastIpcObject; return o && o.at && o.size ? { x: o.at[0] - sx, y: o.at[1] - sy, w: o.size[0], h: o.size[1] } : null; };
@@ -238,8 +269,10 @@ ShellWindow {
     Timer { id: flightGate; interval: 400; onTriggered: strip.launch() }
     // ... and the flight layer has shown them over the windows (one swap after the last one came in): parked
     // before that, a window was gone for a frame and its own fade showed
-    property bool armed: false
-    onReadyChanged: if (preparing && ready >= flights.length) armed = true
+    // two swaps: the first can be of a frame begun before the last picture came in, and then the window left the stage
+    // before Hyprland showed its picture (an empty stage frame, 1 of 3 pile clicks at 34 ms)
+    property int armed: 0
+    onReadyChanged: if (preparing && ready >= flights.length && armed === 0) armed = 2
     function launch() {
         if (!preparing) return;
         // flying before preparing ends: the flight layer's loader (active: flying || preparing) must not drop for a
@@ -247,7 +280,7 @@ ShellWindow {
         if (flights.length > 0) { flightAnim.snap(0); flying = true; }
         preparing = false;
         flightGate.stop();
-        armed = false;
+        armed = 0;
         const r = request;
         request = null;
         StageManager.commit(r.m, r.out, flights.length > 0);
@@ -270,7 +303,11 @@ ShellWindow {
                 id: flightRoot
                 Connections {
                     target: flightRoot.Window.window
-                    function onFrameSwapped() { if (strip.armed) { strip.armed = false; strip.launch(); } }
+                    function onFrameSwapped() {
+                        if (strip.armed <= 0) return;
+                        if (--strip.armed === 0) strip.launch();
+                        else flightRoot.Window.window.update();   // nothing else changes: ask for the second frame
+                    }
                 }
             }
             Repeater {
