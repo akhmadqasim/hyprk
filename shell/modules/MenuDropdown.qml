@@ -194,7 +194,13 @@ Item {
     FrameAnim { id: blinkOffWait; to: 1; from: 0; duration: Theme.menu.blinkOff; onFinished: { root.blinkOff = false; blinkOnWait.start(); } }
     FrameAnim { id: blinkOnWait; to: 1; from: 0; duration: Theme.menu.blinkOn; onFinished: { root.activating = false; root.trigger(root.pendingAction); } }
 
+    // a submenu is moved to its row when it opens (MenuSubmenu.frame follows its new size): the glass is placed from
+    // its window position, so it is placed again in the same frame. Before, it followed on the next settle tick and the
+    // first frame drew the labels at the new place with the glass still at the old one (trace: 354,34 then 610,674)
+    onXChanged: menuGlass.remeasure()
+    onYChanged: menuGlass.remeasure()
     Glass {
+        id: menuGlass
         anchors.fill: parent
         radius: Theme.menu.radius
         sx: root.originX
