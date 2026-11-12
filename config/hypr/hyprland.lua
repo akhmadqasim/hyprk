@@ -305,6 +305,11 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
             cut_fills_dark = "hyprk-switcher:lighter",
             -- the Dock dots are circles (4.1 pt, Q-dock-07): their 4 pt square regions get this radius (clamped to 2)
             radii = "hyprk-dock-dots:2.05,hyprk-dock-dots-dark:2.05",
+            -- the Dock, its dots and its hover label drawn over Mission Control's layer (an overlay over the Dock's top
+            -- layer) while it is mapped: the Dock stays visible and works in Mission Control (Q-dock-27); keep in sync
+            -- with Config.cpp
+            draw_over = "hyprk-dock:hyprk-mission,hyprk-dock-dots:hyprk-mission,hyprk-dock-dots-dark:hyprk-mission,"
+                     .. "hyprk-dock-label:hyprk-mission",
         })
         -- the saved Liquid Glass slider and appearance, so the first frame after a start or a config reload is right:
         -- a reload put tint_amount back to 0.5 and appearance to auto until the shell sent them again (0d59d9e). The
