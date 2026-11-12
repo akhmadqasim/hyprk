@@ -351,9 +351,11 @@ ShellWindow {
         onHasContentChanged: mc.maybeGo()
     }
 
-    // The Dock's band: the wallpaper too, but for the Dock's own glass (Panels.dockRects), so a real window that
-    // reaches into the band is covered there like everywhere else (it showed beside the Dock). Inside the Dock's glass
-    // the compositor still refracts what is under the Dock.
+    // The Dock's band: the wallpaper too, so a real window that reaches into the band is covered there like everywhere
+    // else (it showed beside the Dock). The plugin draws the Dock over this layer while it is mapped (`draw_over`), so
+    // the Dock's glass refracts this band and the thumbnails flying past, the same picture as the real windows when the
+    // layer goes (with the band cut out of the Dock's glass, it refracted the wallpaper, then the windows: a step in
+    // the exit's last frame, dark 14.17 levels, mcap).
     readonly property var dockRect: (screen && Panels.dockRects[screen.name]) || null
     Item {
         id: dockBand
@@ -363,14 +365,6 @@ ShellWindow {
         visible: mc.dockZone > 0 && mc.dockRect !== null && mc.cover > 0
         opacity: mc.cover
         clip: true
-        layer.enabled: visible
-        layer.effect: MultiEffect {
-            maskEnabled: true
-            maskInverted: true
-            maskSource: dockHole
-            maskThresholdMin: 0.5
-            maskSpreadAtMin: 1
-        }
         Rectangle { anchors.fill: parent; color: mc.m.empty }
         Image {
             y: -parent.y
@@ -383,21 +377,6 @@ ShellWindow {
             cache: true
         }
     }
-    Item {
-        id: dockHole
-        width: dockBand.width
-        height: dockBand.height
-        visible: false
-        layer.enabled: dockBand.visible
-        Rectangle {
-            x: mc.dockRect ? mc.dockRect.x : 0
-            y: mc.dockRect ? mc.dockRect.y - dockBand.y : 0
-            width: mc.dockRect ? mc.dockRect.w : 0
-            height: mc.dockRect ? mc.dockRect.h : 0
-            radius: mc.dockRect ? mc.dockRect.r : 0
-        }
-    }
-
     Item {
         id: keys
         focus: true
@@ -597,22 +576,12 @@ ShellWindow {
     }
 
     // windows. They fly under the Dock, as the Mac's windows always are (Q-dock-27: the Dock stays visible in Mission
-    // Control): the thumbnails are cut out where the Dock's glass is, which shows the Dock layer under this one. Drawn
-    // over it, a window flying back into the Dock's band covered the Dock's icons for the whole exit and the Dock came
-    // back in its last frame (judge #10, mcap). The cut is on whenever the Dock has a band, so the layer's texture
-    // is not set up in the flight's first frame.
+    // Control): the plugin draws the Dock over this layer while it is mapped (`draw_over`), so the Dock's icons stay over
+    // a window flying back into the Dock's band (judge #10) and its glass refracts the thumbnail.
     Item {
         id: flight
         width: mc.width
         height: mc.height
-        layer.enabled: mc.dockZone > 0 && mc.dockRect !== null
-        layer.effect: MultiEffect {
-            maskEnabled: true
-            maskInverted: true
-            maskSource: flightHole
-            maskThresholdMin: 0.5
-            maskSpreadAtMin: 1
-        }
         Repeater {
             id: thumbs
             model: mc.windows
@@ -802,20 +771,6 @@ ShellWindow {
                     onClicked: { mc.pickSwaps = 0; mc.pickedWindow = cell.modelData; mc.flyTop = cell.modelData; Panels.close(); Apps.focusWindow(cell.modelData); }
                 }
             }
-        }
-    }
-    Item {
-        id: flightHole
-        width: mc.width
-        height: mc.height
-        visible: false
-        layer.enabled: flight.layer.enabled
-        Rectangle {
-            x: mc.dockRect ? mc.dockRect.x : 0
-            y: mc.dockRect ? mc.dockRect.y : 0
-            width: mc.dockRect ? mc.dockRect.w : 0
-            height: mc.dockRect ? mc.dockRect.h : 0
-            radius: mc.dockRect ? mc.dockRect.r : 0
         }
     }
 }

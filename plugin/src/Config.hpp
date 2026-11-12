@@ -62,10 +62,9 @@ namespace lg {
         // (Shape.hpp cutShapes). The shell sends the glass and the fill in one commit of one surface (Cmd-Tab's selection tile)
         std::unordered_map<std::string, double>      cutFills, cutFillsDark;
 
-        // ns -> other namespace: while a layer `other` is mapped on the output, the glass of `ns` samples the output's background
-        // layers (the wallpaper), not the windows under it (the Dock while Mission Control is open: the Mac's Dock sits over
-        // Mission Control's backdrop)
-        std::unordered_map<std::string, std::string> wallpaperUnder;
+        // ns -> other namespace: while a layer `other` is mapped on the output, the layer `ns` is drawn right after it instead of
+        // in its own place, so its glass refracts what `other` draws (the Dock over Mission Control's backdrop and thumbnails)
+        std::unordered_map<std::string, std::string> drawOver;
 
         // Textures from the shell (README): a layer surface whose buffer is not drawn but handed to the glass.
         // iconMasks: glass ns -> the ns of a layer holding the Dock icons' clear-mode masks (IconRendering's lighten / darken /

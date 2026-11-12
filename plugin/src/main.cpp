@@ -115,32 +115,8 @@ static bool isMaskLayer(const lg::SParams& p, const std::string& ns) {
     return std::ranges::any_of(p.iconMasks, [&ns](const auto& kv) { return kv.second == ns; });
 }
 
-// `wallpaper_under`: the output's background layers again, inside what the glass of `data` reads, so that glass samples the
-// wallpaper and not the windows under it. One textured quad per background layer, clipped to that region.
-static void addWallpaperUnder(Render::CRenderContext& ctx, const PHLMONITOR& mon, const lg::CGlassElement::SData& data, const std::string& other) {
-    if (!layerOn(mon, other))
-        return;
-    const CRegion region = lg::CGlassElement::readRegionOf(mon, data);
-    if (region.empty())
-        return;
-    for (const auto& l : mon->m_layerSurfaceLayers[0]) {
-        const auto ls      = l.lock();
-        const auto surface = ls && ls->mapped() ? ls->wlSurface() : nullptr;
-        const auto res     = surface ? surface->resource() : nullptr;
-        if (!res || !res->m_current.texture)
-            continue;
-        CTexPassElement::SRenderData tex;
-        tex.tex        = res->m_current.texture;
-        tex.box        = CBox{ls->position(Desktop::View::IGeometric::GEOMETRIC_CURRENT) - mon->m_position, ls->size(Desktop::View::IGeometric::GEOMETRIC_CURRENT)}
-                             .scale(mon->m_scale)
-                             .round();
-        tex.clipRegion = region;
-        g_pHyprRenderer->currentPass(ctx).add(makeUnique<CTexPassElement>(std::move(tex)));
-    }
-}
-
-static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext& ctx, PHLLS layer, PHLMONITOR mon, const Time::steady_tp& now, bool popups, bool lockscreen,
-                          bool workspaceScene) {
+static void renderLayerNow(Render::IHyprRenderer* thisptr, Render::CRenderContext& ctx, PHLLS layer, PHLMONITOR mon, const Time::steady_tp& now, bool popups, bool lockscreen,
+                           bool workspaceScene) {
     const auto original = rc<renderLayerFn>(g_renderHook->m_original);
     const auto params   = g_params;
 
@@ -222,14 +198,39 @@ static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext
                 data.auxKind = lg::CGlassElement::SData::eAux::MASKS;
         }
     lg::CGlassElement::claimDamage(ctx, data);
-    if (const auto it = params->wallpaperUnder.find(layer->m_namespace); it != params->wallpaperUnder.end())
-        addWallpaperUnder(ctx, mon, data, it->second);
     g_pHyprRenderer->currentPass(ctx).add(makeUnique<lg::CGlassElement>(std::move(data)));
 
     std::optional<SBlurSuppression> suppress;
     if (const auto surface = layer->wlSurface())
         suppress.emplace(surface);
     original(thisptr, ctx, layer, mon, now, popups, lockscreen, workspaceScene);
+}
+
+// `draw_over`: while a layer of the partner namespace is mapped on the output, the layer is left out of its own place and drawn
+// right after the partner, so its glass reads what the partner drew. Only a monitor's plain layer pass: not popups, the lock
+// screen or a layer's fade-out snapshot, where both are drawn (or left out) in their own places.
+static bool reorders(Render::CRenderContext& ctx, bool popups, bool lockscreen) {
+    return !popups && !lockscreen && !ctx.m_renderingSnapshot;
+}
+
+static void hkRenderLayer(Render::IHyprRenderer* thisptr, Render::CRenderContext& ctx, PHLLS layer, PHLMONITOR mon, const Time::steady_tp& now, bool popups, bool lockscreen,
+                          bool workspaceScene) {
+    const auto params = g_params;
+    if (!params || params->drawOver.empty() || !layer || !mon || !reorders(ctx, popups, lockscreen)) {
+        renderLayerNow(thisptr, ctx, layer, mon, now, popups, lockscreen, workspaceScene);
+        return;
+    }
+    if (const auto it = params->drawOver.find(layer->m_namespace); it != params->drawOver.end() && layerOn(mon, it->second))
+        return; // drawn after its partner
+    renderLayerNow(thisptr, ctx, layer, mon, now, popups, lockscreen, workspaceScene);
+    if (!layer->mapped())
+        return;
+    // in their own order (the Dock, then its dots over its glass)
+    for (const auto& level : mon->m_layerSurfaceLayers)
+        for (const auto& l : level)
+            if (const auto over = l.lock(); over && over != layer && over->mapped())
+                if (const auto it = params->drawOver.find(over->m_namespace); it != params->drawOver.end() && it->second == layer->m_namespace)
+                    renderLayerNow(thisptr, ctx, over, mon, now, popups, lockscreen, workspaceScene);
 }
 
 static void* findRenderLayer() {

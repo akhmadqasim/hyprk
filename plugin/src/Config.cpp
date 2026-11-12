@@ -99,9 +99,9 @@ namespace lg {
             // fills cut into a layer's own glass region, light / dark appearance (same syntax; none by default)
             {K("cut_fills"), "", [](SParams& p, const std::string& v) { p.cutFills = parseFillMap(v); }},
             {K("cut_fills_dark"), "", [](SParams& p, const std::string& v) { p.cutFillsDark = parseFillMap(v); }},
-            // the Dock's glass over Mission Control's backdrop: the shell's Mission Control layer covers the windows with the
-            // wallpaper, but it sits above the Dock, whose glass would still refract the real window under it
-            {K("wallpaper_under"), "hyprk-dock:hyprk-mission", [](SParams& p, const std::string& v) { p.wallpaperUnder = parseStringMap(v); }},
+            // the Dock over Mission Control: the shell's Mission Control layer (overlay) is above the Dock (top), and a layer
+            // rule cannot order them the other way; drawn after it, the Dock's glass refracts what Mission Control draws
+            {K("draw_over"), "hyprk-dock:hyprk-mission,hyprk-dock-dots:hyprk-mission,hyprk-dock-dots-dark:hyprk-mission", [](SParams& p, const std::string& v) { p.drawOver = parseStringMap(v); }},
             // textures handed over as layer surfaces (README "Textures from the shell"); off until the shell maps them
             {K("icon_masks"), "", [](SParams& p, const std::string& v) { p.iconMasks = parseStringMap(v); }},
             {K("sdf_layers"), "", [](SParams& p, const std::string& v) { p.sdfLayers = parseSdfMap(v); }},
