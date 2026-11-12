@@ -180,6 +180,26 @@ Singleton {
         _unpinnedBefore = runningUnpinned;
     }
 
+    // Cmd-Tab order (lib/dock.js activationOrder, switcherApps): the running apps' ids by last activation, most
+    // recent first. Every activation ends in a new frontmost app (a window focus from a click, the Dock, Cmd-Tab or
+    // Mission Control; a desktop click makes Finder frontmost), so the history follows the frontmost app; it is also
+    // checked when the Dock items change (a new window's app is listed after its focus arrived).
+    property var activationHistory: []
+    function frontItemId() {
+        if (desktopFocus !== "") return "hyprk-finder";
+        const t = Hyprland.activeToplevel;
+        if (!t) return "";
+        const it = dockItems.find(i => (i.windows || []).indexOf(t) !== -1);
+        return it ? it.id : "";
+    }
+    function noteActivation() {
+        const ids = dockItems.filter(i => (i.windows || []).length > 0 || i.id === "hyprk-finder").map(i => i.id);
+        activationHistory = DockLayout.activationOrder(activationHistory, ids, frontItemId());
+    }
+    onDockItemsChanged: noteActivation()
+    onDesktopFocusChanged: noteActivation()
+    Connections { target: Hyprland; function onActiveToplevelChanged() { root.noteActivation(); } }
+
     // Launch bounce state, kept here (not in the Dock's delegates, which are rebuilt when the model changes) so a
     // bounce is never cut short: id -> { start (ms), end }. end is 0 while the app is launching; stopLaunching()
     // sets it to the end of the bounce in progress (lib/dock.js bounceEnd) and the Dock lets the icon land there.

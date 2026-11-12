@@ -21,11 +21,11 @@ ShellWindow {
     screen: modelData
 
     readonly property bool shown: Panels.open === "switcher"
-    // one entry per running app, most recently focused first is not tracked by Hyprland IPC,
-    // so keep the active app first and the rest in dock order
-    // Finder always, first while the desktop has the keyboard (lib/dock.js switcherApps)
+    // one entry per running app, most recently used first (Apps.activationHistory), Finder always, first while the
+    // desktop has the keyboard (lib/dock.js switcherApps)
     readonly property var liveApps: DockLayout.switcherApps(Apps.dockItems, Apps.desktopFocus !== "",
-                                                            i => (i.windows || []).indexOf(Hyprland.activeToplevel) !== -1)
+                                                            i => (i.windows || []).indexOf(Hyprland.activeToplevel) !== -1,
+                                                            Apps.activationHistory)
     // frozen while dematerializing, so the row does not reorder when the chosen app takes focus
     property var apps: []
     Binding on apps { value: sw.liveApps; when: sw.shown; restoreMode: Binding.RestoreNone }

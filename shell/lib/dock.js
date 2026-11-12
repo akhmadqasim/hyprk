@@ -324,11 +324,27 @@ function labelWidth(textWidth) {
 
 // ---------- Cmd-Tab ----------
 // The switcher's apps: every Dock item with a window, plus Finder always (its Dock dot never goes, the desktop is
-// Finder's: cmdtab-light.png lists it with no Finder window); the frontmost first (Finder while the desktop has the
-// keyboard), the rest in Dock order. `isActive(item)` tells whether the item owns the focused window.
-function switcherApps(items, desktopFocused, isActive) {
-    const running = items.filter(i => (i.windows || []).length > 0 || i.id === "hyprk-finder");
+// Finder's: cmdtab-light.png lists it with no Finder window), most recently used first (Q-dock-22: "Order is MRU
+// (active app first, the previous one selected)"): `history` is the app ids by last activation (activationOrder), an
+// app not in it goes after them in Dock order. The frontmost stays first (Finder while the desktop has the keyboard)
+// even before its activation reached the history. `isActive(item)` tells whether the item owns the focused window.
+function switcherApps(items, desktopFocused, isActive, history) {
+    const h = history || [];
+    const rank = i => { const r = h.indexOf(i.id); return r === -1 ? h.length : r; };
+    const running = items.filter(i => (i.windows || []).length > 0 || i.id === "hyprk-finder")
+        .map((i, n) => ({ i, n })).sort((a, b) => rank(a.i) - rank(b.i) || a.n - b.n).map(x => x.i);
     const front = desktopFocused ? running.findIndex(i => i.id === "hyprk-finder") : running.findIndex(isActive);
     if (front > 0) running.unshift(running.splice(front, 1)[0]);
     return running;
+}
+
+// The activation history after the running apps are `runningIds` (in Dock order) and `frontId` is frontmost ("" for
+// none): apps that quit leave it, an app that started running goes last (launch order for apps never activated), the
+// frontmost goes first. Returns `history` itself when nothing changed.
+function activationOrder(history, runningIds, frontId) {
+    const h = history.filter(id => runningIds.indexOf(id) !== -1);
+    for (const id of runningIds) if (h.indexOf(id) === -1) h.push(id);
+    const f = h.indexOf(frontId);
+    if (f > 0) h.unshift(h.splice(f, 1)[0]);
+    return h.length === history.length && h.every((id, n) => id === history[n]) ? history : h;
 }

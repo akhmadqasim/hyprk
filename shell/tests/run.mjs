@@ -1445,6 +1445,21 @@ test("Mission Control: one Space reads Desktop, more are numbered by position", 
     test("switcher lists a windowless Finder", () => assert.deepEqual(DK.switcherApps([F, P, A, B], false, i => i === B).map(i => i.id), ["b", "hyprk-finder", "a"]));
     test("switcher puts Finder first while the desktop has the keyboard", () => assert.deepEqual(DK.switcherApps([A, F, B], true, i => i === A).map(i => i.id), ["hyprk-finder", "a", "b"]));
     test("switcher keeps Dock order with no frontmost", () => assert.deepEqual(DK.switcherApps([F, A, B], false, () => false).map(i => i.id), ["hyprk-finder", "a", "b"]));
+    test("switcher lists apps most recently used first (judge #9)", () => assert.deepEqual(DK.switcherApps([F, A, B, { id: "s", windows: ["ws"] }], false, i => i.id === "s", ["s", "a", "hyprk-finder", "b"]).map(i => i.id), ["s", "a", "hyprk-finder", "b"]));
+    test("switcher puts apps not in the history after it, in Dock order", () => assert.deepEqual(DK.switcherApps([F, A, B], false, i => i === B, ["b"]).map(i => i.id), ["b", "hyprk-finder", "a"]));
+    test("switcher keeps the frontmost first before its activation is noted", () => assert.deepEqual(DK.switcherApps([F, A, B], false, i => i === B, ["a", "hyprk-finder", "b"]).map(i => i.id), ["b", "a", "hyprk-finder"]));
+    test("activation history: launch order, then activation moves an app first", () => {
+        let h = DK.activationOrder([], ["hyprk-finder"], "hyprk-finder");
+        h = DK.activationOrder(h, ["s", "hyprk-finder", "a"], "");
+        assert.deepEqual(h, ["hyprk-finder", "s", "a"]);
+        h = DK.activationOrder(h, ["s", "hyprk-finder", "a", "b"], "a");
+        assert.deepEqual(h, ["a", "hyprk-finder", "s", "b"]);
+        h = DK.activationOrder(h, ["s", "hyprk-finder", "a", "b"], "s");
+        assert.deepEqual(h, ["s", "a", "hyprk-finder", "b"]);
+        const same = DK.activationOrder(h, ["s", "hyprk-finder", "a", "b"], "s");
+        assert.equal(same, h);
+        assert.deepEqual(DK.activationOrder(h, ["s", "hyprk-finder", "b"], "b"), ["b", "s", "hyprk-finder"]);
+    });
 }
 
 // ---- desktop focus and folders (judge #7) ----
