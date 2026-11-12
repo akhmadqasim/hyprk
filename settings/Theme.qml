@@ -115,16 +115,15 @@ QtObject {
         readonly property int accountHeight: 46      // Apple Account row (the button 141.5 x 38 at x 16)
         readonly property int accountAvatar: 38
         // 27.2.1 System Settings sidebar over a plain desktop: (37,38,38) dark, (237,237,237) light
-        // (reference/screens/27.2.1/settings-toolbar-{dark,light}.png; Finder's reads 38 / 237). Over compositor
-        // blur it is 88 % opaque so the desktop only softly shows through; otherwise (no blur, Reduce
-        // transparency) it is flat.
+        // (reference/screens/27.2.1/settings-toolbar-{dark,light}.png; Finder's reads 38 / 237)
         // 27.2.1 sampled over Tahoe: #ECEDEE light, #232634 dark (Q-settings-01); window not key: flat #F2F2F2 / #24262B
         readonly property color _rgb: !theme.windowActive ? (theme.dark ? "#24262B" : "#F2F2F2") : (theme.dark ? "#232634" : "#ECEDEE")
-        // key window: + the chameleon layer (10 % dark / 5 % light colour blend of the wallpaper mean); the Mac's
-        // inactive sidebar is flat, so none there
-        readonly property var _ch: theme.windowActive && theme.tintWindow ? Ch.apply(_rgb, theme.chameleon, theme.dark) : null
-        readonly property color _tinted: _ch ? Qt.rgba(_ch.r, _ch.g, _ch.b, 1) : _rgb
-        readonly property color fill: theme.translucent && theme.windowActive ? Qt.alpha(_tinted, 0.88) : _tinted
+        // key window, light: + the chameleon layer (5 % colour blend of the wallpaper mean). Dark takes the measured
+        // colour as it is: it already holds TahoeDark's tint (as the Finder sidebar does). The inactive sidebar is flat.
+        // Opaque also over compositor blur: the Mac's fill is uniform from x 6 to 200 (Q-settings-01), while 88 %
+        // over the blurred TahoeDark read (34..39, 38..40, 68..77) here, light 222..234 (appearance-*.png vs ours)
+        readonly property var _ch: theme.windowActive && theme.tintWindow && !theme.dark ? Ch.apply(_rgb, theme.chameleon, false) : null
+        readonly property color fill: _ch ? Qt.rgba(_ch.r, _ch.g, _ch.b, 1) : _rgb
         // 0.5 pt divider on the right: #D3D4D5 / #3F424D
         readonly property real strokeWidth: 0.5
         readonly property color stroke: theme.increaseContrast ? (theme.dark ? Qt.rgba(1, 1, 1, 0.4) : Qt.rgba(0, 0, 0, 0.4))
@@ -170,7 +169,9 @@ QtObject {
         : theme.dark ? Qt.rgba(1, 1, 1, 0.046) : Qt.rgba(0, 0, 0, 0.05)
     // toolbar title #4C4C4C / #E8E8E9 (Q-settings-13); scroll-edge hairline at y 52, 0.5 pt, #E5E5E5 on white /
     // #2E2F33 on #1E1F24 (PC #60 section 5, appearance-scroll-010-*.png; was #DEDEDE / #34353A from Q-settings-04)
-    readonly property color toolbarTitle: theme.dark ? "#E8E8E9" : "#4C4C4C"
+    // window not key: #BDBDBD / #5C5D5E (Q-settings-06, desktop-dock-inactive-*.png read 189 / 91..93)
+    readonly property color toolbarTitle: !theme.windowActive ? (theme.dark ? "#5C5D5E" : "#BDBDBD")
+        : theme.dark ? "#E8E8E9" : "#4C4C4C"
     readonly property color scrollEdge: theme.dark ? "#2E2F33" : "#E5E5E5"
     // content under the 52 pt toolbar strip: HyprK ScrollEdge (AppKit's scroll pocket, blurred and veiled)
     readonly property color label: theme.dark ? Qt.rgba(1, 1, 1, 0.85) : Qt.rgba(0, 0, 0, 0.85)
