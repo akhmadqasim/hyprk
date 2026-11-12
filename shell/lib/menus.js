@@ -342,6 +342,31 @@ function releaseOn(items, i) {
     return "run";
 }
 
+// Moving towards an open submenu (AppKit 27.2.1, -[NSMenuTrackingSession _trackMovedDraggedEventHandler:] 0x18a9af79c
+// with _beginPredictiveTrackingAtPoint: 0x18a9b0488): when the pointer leaves the submenu's row, that point is the apex.
+// A later point p keeps the submenu (the row under p is not taken) while it lies in the cone from the apex to the
+// submenu's near edge, its top and bottom corners widened by 15 degrees each (atan2 x 180 / pi), and p is past the apex
+// towards the submenu. Window coordinates, y down (AppKit's y up gives the same test). sub = { x, y, width, height }.
+const CONE_DEG = 15;
+function towardSubmenu(apex, p, sub) {
+    const deg = (dy, dx) => Math.atan2(dy, dx) * 180 / Math.PI;
+    const top = sub.y, bottom = sub.y + sub.height;
+    // the near vertical edge: the submenu's right edge when it starts left of p, else its left edge
+    const edge = sub.x < p.x ? sub.x + sub.width : sub.x;
+    if (edge >= p.x) {                       // submenu to the right: p must be right of the apex
+        if (!(p.x > apex.x)) return false;
+        const a = deg(p.y - apex.y, p.x - apex.x);
+        return a >= deg(top - apex.y, edge - apex.x) - CONE_DEG && a <= deg(bottom - apex.y, edge - apex.x) + CONE_DEG;
+    }
+    if (!(p.x < apex.x)) return false;       // submenu to the left
+    const a = deg(apex.y - p.y, apex.x - p.x);
+    return a <= deg(apex.y - top, apex.x - edge) + CONE_DEG && a >= deg(apex.y - bottom, apex.x - edge) - CONE_DEG;
+}
+// how long it may last (same function): a one-shot 0.5 s timer from the first point in the cone ends it
+// (CFRunLoopTimer, _cancelPredictiveTracking); resting on one row (moves of 3 pt or less, |dx| + |dy|) for 0.4 s ends
+// it; 1.0 s after the row under the pointer last changed ends it
+function predictTimes() { return { ms: 500, restMs: 400, restPt: 3, rowMs: 1000 }; }
+
 // Submenu frame in the parent's coordinate space (all in pt): x = parent right edge - overlap, y = row top - pad, so
 // its first row lines up with the parent row (Q-menubar-23). Not measured on the Mac, kept simple: when it does not
 // fit on the right it opens on the left with the same overlap; at the bottom it is shifted up to `margin` above the edge.

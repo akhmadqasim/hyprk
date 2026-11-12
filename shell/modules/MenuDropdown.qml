@@ -208,6 +208,8 @@ Item {
     property int hover: -1
     property real hoverY: 0
     function enterRow(i, y) {
+        // heading for the open submenu: a row reached on the way waits for the next pointer move to tell (pointerMoved)
+        if (predicting && i !== subIndex) { notePredictRow(i); return; }
         // another row: an open submenu goes in the same frame; a submenu row starts the open delay
         if (i !== subIndex) {
             closeSub();
@@ -224,6 +226,8 @@ Item {
     // The row of an open submenu stays highlighted (the pointer went into the submenu); leaving a row whose delay is
     // still running cancels it
     function leaveRow(i) {
+        if (i === subIndex && submenu && submenu.shown && !activating) beginPredict(lastPt);
+        if (predicting && i === predictRow) predictRow = -1;      // left the row it would take
         Qt.callLater(() => {
             if (!root.shown || root.activating || root.hover !== i || root.subIndex === i) return;
             root.hover = -1;
@@ -254,12 +258,71 @@ Item {
     }
     function selectRow(i) {
         if (i < 0) return;
+        endPredict(false);
         enterRow(i, Menus.rowTop(shownItems, i, Theme.menu.itemHeight, Theme.menu.separatorHeight));
         if (subPending === i) {   // a key highlights a submenu row without the hover delay: Right or Return opens it
             subTimer.stop();
             subPending = -1;
         }
     }
+
+    // ---------- moving towards an open submenu ----------
+    // AppKit's predictive tracking (-[NSMenuTrackingSession _trackMovedDraggedEventHandler:] 0x18a9af79c,
+    // _beginPredictiveTrackingAtPoint: 0x18a9b0488): leaving the submenu's row starts it at that point; while the
+    // pointer stays in the cone towards the submenu (Menus.towardSubmenu) the rows it crosses are not taken. It ends
+    // when the pointer leaves the cone, 0.5 s after its first point in the cone, after a 0.4 s rest on one row (moves of
+    // 3 pt or less) or 1.0 s after the row under it last changed; then the row under the pointer is taken. Where AppKit
+    // starts it (leaving the row) is read from the begin point and the row test, not from its caller (not traced).
+    property point lastPt: Qt.point(-1, -1)     // the pointer in window coordinates (the submenu shares them)
+    property bool predicting: false
+    property point apex: Qt.point(0, 0)
+    property int predictRow: -1                // the row under the pointer while predicting (-1: none)
+    readonly property var predictT: Menus.predictTimes()
+    function beginPredict(p) {
+        if (p.x < 0) return;
+        predicting = true;
+        apex = p;
+        predictRow = -1;
+        predictEnd.stop();
+        predictRest.stop();
+        predictRowTimer.restart();
+    }
+    function predictKeeps(p) {
+        const m = submenu;
+        if (!m || !m.shown) return false;
+        if (!Menus.towardSubmenu(apex, p, { x: m.x, y: m.y, width: m.width, height: m.height })) return false;
+        if (!predictEnd.running) predictEnd.start();
+        return true;
+    }
+    function notePredictRow(i) {
+        if (i === predictRow) return;
+        predictRow = i;
+        predictRowTimer.restart();
+        predictRest.restart();
+    }
+    function endPredict(take) {
+        if (!predicting) return;
+        predicting = false;
+        predictEnd.stop();
+        predictRest.stop();
+        predictRowTimer.stop();
+        const i = predictRow;
+        predictRow = -1;
+        if (take && i >= 0 && i !== subIndex) enterRow(i, Menus.rowTop(shownItems, i, Theme.menu.itemHeight, Theme.menu.separatorHeight));
+    }
+    // a pointer move over the rows, in window coordinates
+    function pointerMoved(p) {
+        const moved = Math.abs(p.x - lastPt.x) + Math.abs(p.y - lastPt.y);
+        lastPt = p;
+        if (!predicting) return;
+        if (!predictKeeps(p)) { endPredict(true); return; }
+        if (moved > predictT.restPt) predictRest.restart();
+    }
+    // the pointer reached the submenu: it takes over
+    onHoverChanged: if (hover >= 0 && parentMenu) parentMenu.endPredict(false)
+    Timer { id: predictEnd; interval: root.predictT.ms; onTriggered: root.endPredict(true) }
+    Timer { id: predictRest; interval: root.predictT.restMs; onTriggered: root.endPredict(true) }
+    Timer { id: predictRowTimer; interval: root.predictT.rowMs; onTriggered: root.endPredict(true) }
 
     // ---------- submenu ----------
     property int subIndex: -1          // row whose submenu is open
@@ -274,6 +337,7 @@ Item {
         subIndex = i;
     }
     function closeSub() {
+        endPredict(false);
         subTimer.stop();
         subPending = -1;
         subIndex = -1;
@@ -299,8 +363,10 @@ Item {
     }
     function pointAt(x, y) {
         if (!shown || activating) return false;
-        if (submenu && submenu.shown && submenu.pointAt(x, y)) return true;
+        if (submenu && submenu.shown && submenu.pointAt(x, y)) { endPredict(false); return true; }
         const i = rowAt(x, y);
+        pointerMoved(Qt.point(x, y));
+        if (i !== null && i !== hover && hover === subIndex && subIndex >= 0) beginPredict(lastPt);
         if (i !== null && Menus.selectable(shownItems[i])) {
             if (hover !== i) enterRow(i, Menus.rowTop(shownItems, i, Theme.menu.itemHeight, Theme.menu.separatorHeight));
             return true;
@@ -460,6 +526,7 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     enabled: root.shown && !root.activating
+                    onPositionChanged: mouse => root.pointerMoved(mapToItem(null, mouse.x, mouse.y))
                     onClicked: {
                         if (!row.enabled) return;
                         if (row.modelData.submenu) root.openSub(row.index, false);   // a click opens it at once

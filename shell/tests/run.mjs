@@ -1238,6 +1238,26 @@ test("Mission Control layout reproduces the Mac's frames (mission-control.json)"
         });
     }
 });
+test("towardSubmenu: AppKit's cone, 15 degrees past the near edge's corners", () => {
+    const MN = load("menus.js");
+    const sub = { x: 200, y: 100, width: 150, height: 120 };            // to the right of the apex
+    const apex = { x: 180, y: 150 };
+    assert.ok(MN.towardSubmenu(apex, { x: 190, y: 150 }, sub));          // straight at it
+    assert.ok(MN.towardSubmenu(apex, { x: 190, y: 160 }, sub));          // down-right, inside the cone
+    assert.ok(!MN.towardSubmenu(apex, { x: 170, y: 150 }, sub));         // back past the apex
+    assert.ok(!MN.towardSubmenu(apex, { x: 180.5, y: 200 }, sub));       // straight down: outside (89.4 deg)
+    // the bottom corner is at atan2(70, 20) = 74.05 deg, +15 = 89.05: 88 deg in, 89.5 out
+    const at = d => ({ x: apex.x + Math.cos(d * Math.PI / 180) * 10, y: apex.y + Math.sin(d * Math.PI / 180) * 10 });
+    assert.ok(MN.towardSubmenu(apex, at(88), sub));
+    assert.ok(!MN.towardSubmenu(apex, at(89.5), sub));
+    // the top corner at atan2(-50, 20) = -68.2 deg, -15 = -83.2
+    assert.ok(MN.towardSubmenu(apex, at(-83), sub));
+    assert.ok(!MN.towardSubmenu(apex, at(-84), sub));
+    // a submenu on the left (mirror)
+    const left = { x: 0, y: 100, width: 150, height: 120 }, a2 = { x: 170, y: 150 };
+    assert.ok(MN.towardSubmenu(a2, { x: 160, y: 155 }, left));
+    assert.ok(!MN.towardSubmenu(a2, { x: 175, y: 150 }, left));
+});
 test("Mission Control: one Space reads Desktop, more are numbered by position", () => {
     assert.equal(ST.spaceName(0, 1), "Desktop");
     assert.equal(ST.spaceName(1, 3), "Desktop 2");
