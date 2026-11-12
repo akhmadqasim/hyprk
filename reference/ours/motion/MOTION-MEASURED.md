@@ -760,3 +760,8 @@ series in the CSV (`*-s20*`).
 Not measured this session (budget): lock-in, Notification Center push (arrival), slot grow / shrink, drag-off, bar peek
 (needs a full-screen window under the strip), Spotlight mode list (session 19: first value twice in 6 of 6, not fixed).
 Scale 1.6 and dark were not run.
+
+## Spotlight open: the agreed measure (2026-11-12, re16)
+
+Measure (both sides): over an opaque black window (foot, background 000000) under the bar, `liquidglass trace hyprk-spotlight` box width / 520 pt per draw, and in the same mcap (-g 340,170,600,130 -k 2) the glass edge (first non-zero sample left of centre x 640 on rows y 222-232) and the content scale (brightness-weighted centroid of the "Search or Ask" text, x 402-590, about 640, against its rest).
+Result, headless scale 2: 4 of 5 reopens glass 1.088 1.069 1.050 1.031 1.019 1.008 1.000 / text 1.085-1.093 1.061-1.071 1.049 1.028 1.015 1.004 .998 (Mac 1.088 1.068 1.050 1.033 1.019 1.009 1.002); 1 reopen and the first open after a shell start glass 1.069 1.069 with text 1.091 1.061 (the first tick's region never drawn, trace agrees), and 9 of 9 traced reopens after a shell restart the same. Cause not fixed: Hyprland's ext-background-effect (protocols/BackgroundEffect.cpp) copies the last region received when a commit is applied, not the one pending at the commit, so the second tick's region (sent at the first frame's swap) lands with the first frame when that commit waits; deferring the second region by one swap in HyprK FrameClock did not help (8 of 8 still 1.069 1.069).
