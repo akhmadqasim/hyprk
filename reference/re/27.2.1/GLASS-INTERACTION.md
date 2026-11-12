@@ -185,7 +185,8 @@ track**: there the value changes on mouse-down. A press on the slider's knob wit
 
 - `motion.js pressScale / pressDamping / pressLift`: the automatic cursor rule above (longer side, ultraSmall below 120,
   small → large over the shorter side 80 … 160). `PressSpring` releases on the measured 0.21 s critically damped spring.
-- `ToolbarHighlight`: the press light is the decoded BigGlow + LittleGlow pair (round 3, section 8), light and dark; with a
+- `ToolbarHighlight`: the press light is the decoded BigGlow + LittleGlow pair (round 3, section 8), light and dark, its
+  matrices unclamped and the ultraSmall LittleGlow's opacity and blur fitted to the recording (round 4, section 14); with a
   `source` it also lifts the toolbar capsule (round 3, section 9).
 - `motion.js pressStretch` / `GlassButton`: the decoded drag stretch (round 2); `GlassButton.segments`: the pressed button
   of a merged capsule lifts by its own size, only its outer end moves (Appearance preview: left end 1.25 pt, right end 0;
@@ -227,7 +228,8 @@ Decoded (SwiftUICore 27.2.1; objc stubs resolved by disassembling each `objc_msg
 
 Unknown: the CA shadow's blur convention (built as sigma = shadowRadius, the convention AppKit's shadows follow in
 SHADOW.md; sigma = shadowRadius / 2 fits the recording better, see below), whether the vibrantColorMatrix runs on
-values above 1 before the display clips (built clamped to 0..1).
+values above 1 before the display clips (built clamped to 0..1). Both settled against the recording in round 4
+(section 14): unclamped; the blur fitted.
 
 Built (e73a0d3): `motion.js glowPreset / glowSize / glowDodge / glowMask / glowLut`, `ToolbarHighlight` (springs as
 above, light and dark), `LensGlass` / `glasslens4.frag` (uniforms glow, glowAmt, glowLut0..3; glasslens3 removed),
@@ -326,6 +328,48 @@ critically damped 0.21 s settle (rms .033) stays in `PressSpring`.
 | plugin Dock pointer fill (k + c (1 - a), Q-dock-08) | fitted | - |
 | plugin rim, NC key band x1.23 | fitted to Mac pixels | - |
 
+## 14. Round 4: the press light against the recording (built, partly fitted)
+
+Cause of the 3x gap (measured, the 23.09.23 recording, not decoded): the layers' colour matrices are **not clamped**.
+At the pointer the hovered capsule goes from R 155 G 169 B 180 (frame 196) to 215 243 255 (frame 220). Mixing toward a
+clamped LittleGlow (x4 dodge -> white) by any amount a moves R and B together (R .608 + .392 a, B .706 + .294 a): B can
+only reach 1 with R at 1. The unclamped dodge 4 x (Y + 1.5 chroma) = (2.33, 2.66, 2.92) mixed in by a = .136 / .145 /
+>= .133 gives all three channels: the layers composite in extended range and the display clips once (CA renders
+window content in an extended-range format on this P3 panel: inferred from this, not traced in QuartzCore).
+
+What the variant search found (time-boxed, not settled): `GlassButtonStyle.makeBody` 0x19a6d2654 builds a
+`DesignLibraryBorderedButtonStyle(isProminent:)` 0x19b47ba50 with the `Glass` in the environment and the
+`ApplyGlassButtonConfiguration` input flag; the glass and its interaction are made inside DesignLibrary (no local symbols
+in the cache), so the cursor set the preview's buttons take is still unknown. `ipsw dyld xref --imports` finds no caller
+of `_Glass.interactive(_:variant:)` 0x190e82614 / `(_:variant:sources:)` 0x190e82828 / `(_:configuration:)` 0x190e82a30.
+The CA shadow sigma convention was not decoded either.
+
+Fit (scratch `pfit.py`, the share button 37 pt = 71 px, glow centre the pointer tip, rings around it, glyph, cursor and the
+recorder's click circle masked; frames 196 -> 220 and a second press 314 -> 330), ring = rms of the red press ratio over
+the rings 4..50 pt (the old metric), pixel = rms over all capsule pixels and channels, in levels:
+
+| model | ring 1st / 2nd | pixel 1st / 2nd |
+|---|---|---|
+| decoded, clamped, ultraSmall (e73a0d3) | .235 / .241 | 45.8 / 45.8 |
+| decoded, unclamped, ultraSmall, sigma = R | .068 / .073 | 14.5 / 14.5 |
+| decoded, unclamped, small set (little .75), sigma = R | .258 | 31.7 |
+| linear-light mixing variants (matrix on linear or encoded) | .052 ... .30 | 8.9 ... 37 |
+| old flat gain fit (.41) | .017 / .012 | 8.9 / 8.5 |
+| **built: unclamped, little .475, sigma = 1.3 R (fitted)** | **.015 / .012** | **5.7 / 5.6** |
+
+Built (ui/HyprK `motion.js` glowLittleUltra / glowSigma, `glasslens4.frag`): BigGlow and LittleGlow as decoded with the
+matrices unclamped and one clip after both; the ultraSmall LittleGlow opacity and its blur (sigma 1.3 x the radius;
+the coverage table now spans 0..5 radii) are **fitted**. On screen the opacity is 0.405 = 0.475 x 0.854, the same
+recording-to-screen factor as the old fit (0.41 in the recording, 0.35 on screen: the recording darkens mid-tones more
+than highlights). Light mode: the decoded dodge (5/3) on the same fitted opacity and blur (no recording).
+
+On screen (headless session, scale 2, Settings > Appearance, dark, held 0.6 s, R G B added over the hover state):
+preview share button at 4 pt from the pointer +20 +19 +18 (e73a0d3) -> +60 +60 +49, at 30 pt +8 +7 +7 -> +33 +39 +44;
+red press ratio by ring 1.11 1.14 1.10 1.17 ... 1.03 -> 1.33 1.36 1.36 1.40 1.31 1.29 1.22 1.20 1.17 1.12 (recording
+1.42 1.41 1.39 1.39 1.35 1.30 1.27 1.24 1.22 1.13 before the screen factor). Settings back button (dark toolbar
+capsule): +28 -> +41 at 6 pt, +11 -> +13 at 24 pt. Light, preview share button: +6 -> +12 (R) at 8 pt, +2 -> +11 at
+30 pt (the light glass is near white, the dodge clips).
+
 ## Needs the Mac
 
 1. A glass button held while the pointer moves 0 → 80 pt across it (60 fps, dark and light): the light's track, the
@@ -336,9 +380,10 @@ critically damped 0.21 s settle (rms .033) stays in `PressSpring`.
 5. A glass button pressed in light mode (the press light) and the shadow under a pressed glass button (does it scale
    with the lift).
 3. One `defaults read` of `FlexiGlass*` overrides on the Mac (to rule out tuning overrides).
-6. (round 3) The preview's share button held still 1 s, dark AND light, 60 fps, plus one `defaults` / AX dump of the
-   preview glass buttons' interaction variant if reachable: which cursor set they take (the decoded light is 3x weaker than
-   the recording with the automatic ultraSmall set).
+6. (round 3, round 4) The preview's share button held still 1 s, dark AND light, 60 fps, plus one `defaults` / AX dump
+   of the preview glass buttons' interaction variant if reachable: which cursor set they take. Round 4 found the
+   unclamped matrices (most of the 3x) and fitted the rest (LittleGlow .475, sigma 1.3 R); the light-mode press is
+   untested against a Mac. A CALayer probe (8) settles the sigma; a press over a flat grey backdrop settles the opacity.
 7. (round 3) A Regular glass panel of D >= 96 over white (e.g. a SwiftUI sheet or a large glass button) to check the
    0.3 x ShadowOpacity ink below and beside it at 2 / 8 / 16 / 32 pt.
 8. (round 3) A CALayer probe with shadowRadius 20 over white to read CA's shadow sigma (= radius or radius / 2).
