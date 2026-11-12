@@ -67,6 +67,10 @@ PanelWindow {
     }
     FrameClock {
         id: clock
+        // "in": no fresh-layer hold. The run starts only after a frame of this window was swapped (frameState below),
+        // and with the hold the frame built at the start and the first held tick drew the same value twice (mcap, 6 of
+        // 6). "out" keeps it (the unlock's timing is measured with it)
+        freshHold: w.entering ? 0 : 2
         onTick: {
             if (!w.entering) w.userGone = true;
             w.t = Math.min(w.to, w.from + elapsed * (w.to - w.from) / w.duration);
@@ -88,7 +92,9 @@ PanelWindow {
         function onFrameSwapped() {
             if (w.frameState !== 2) return;
             w.frameState = 0;
-            if (w.entering) w.run(LockTheme.trackStart, LockTheme.inEnd, LockTheme.lockIn);
+            // "in": the frames before are warm (nothing visible changes), they stand for the Mac's last unchanged frame
+            // (-17), so the first tick shows +0
+            if (w.entering) w.run(0, LockTheme.inEnd, Math.round(LockTheme.lockIn * LockTheme.inEnd / (LockTheme.inEnd - LockTheme.trackStart)));
             else Lock.overlayReady();
         }
     }
