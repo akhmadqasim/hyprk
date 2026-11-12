@@ -401,6 +401,31 @@ red press ratio by ring 1.11 1.14 1.10 1.17 ... 1.03 -> 1.33 1.36 1.36 1.40 1.31
 capsule): +28 -> +41 at 6 pt, +11 -> +13 at 24 pt. Light, preview share button: +6 -> +12 (R) at 8 pt, +2 -> +11 at
 30 pt (the light glass is near white, the dodge clips).
 
+## 15. Round 5: the label under the press light (measured, nothing changed)
+
+Measured from the 23.09.23 recording (dark, the preview's share button; Display P3 converted with `p3_to_srgb()`,
+COLOUR-P3-AUDIT.md): the brightest pixel of the arrow's stem per row above the box (9 rows, averaged) against the
+disc 6..12 pt left of the stem at the same rows (54 px). Frames 178-196 and 308-314 are the hover, 204-228 and 320-338
+the press peak (both presses give the same numbers):
+
+| state | glyph R G B | disc beside it R G B | glyph - disc |
+|---|---|---|---|
+| hover (frames 178-196, 308-314) | 244 249 253 | 165 179 189 | +79 +70 +64 |
+| press, 2 frames in (198 / 316) | 254 254 255 / 255 255 255 | 205 228 239 / 220 245 255 | +49 +26 +16 / +35 +10 0 |
+| press peak (204-228, 320-338) | 255 255 255 | 229 250 255 | +26 +5 0 |
+
+So the Mac does **not** darken the label, blend it or keep the light off it: the glyph stays white (it only rises from
+the hover's 244 249 253 to 255, the press light lies over it too and clips) and the disc beside it rises to 229 250 255.
+At the peak the glyph is 5 levels over the disc in green and 0 in blue; it stays visible only through red (+26): the
+disc keeps the backdrop's blue tint (the sky), i.e. the light under the glyph is a tinted dodge, not a white wash.
+The difference to ours is therefore the disc, not the label: judge #8b's held reading has our disc at about 250 in all
+channels with the glyph 4 levels over it. Nothing changed: the recording gives no rule for the glyph other than
+"#FFFFFF, drawn over the light", which is what SfSymbol already does; making the light keep the backdrop's chroma
+(red at 229 where green and blue clip) is a change to the fitted press light (section 14), not built.
+Not reproduced: in the round 5 headless session (scale 2, dark, Settings > Appearance, vptr press held 2-3 s at the
+glyph) the preview's share button showed no press light at all (hover and held shots identical but for the cursor);
+ours at hover: glyph 224 227 232 over disc 185 195 205 (+39 +32 +26, sRGB, 2 px per pt).
+
 ## Needs the Mac
 
 1. A glass button held while the pointer moves 0 → 80 pt across it (60 fps, dark and light): the light's track, the
