@@ -438,6 +438,15 @@ Not reproduced: in the round 5 headless session (scale 2, dark, Settings > Appea
 glyph) the preview's share button showed no press light at all (hover and held shots identical but for the cursor);
 ours at hover: glyph 224 227 232 over disc 185 195 205 (+39 +32 +26, sRGB, 2 px per pt).
 
+## 16. The held slider knob's lens at scale 1.6 (measured, nothing changed)
+
+0bc76d1 refitted the dark held knob at scale 2 and left 1.6 unchecked. Headless session (dark, Settings > Appearance, the
+Liquid Glass slider knob held with vptr at its centre, 0.8 s, grim), the same column 6 pt right of the lens centre read
+bilinearly in pt every 0.5 pt at both scales: rows -14..+3 pt (below that the pointer covers the lens) differ by rms 3.61
+levels, max 16.8 (at the lens's top rim, -10 pt: 23.7 at 1.6 against 21.7 at 2 in the 2 pt samples), so the fit carries to
+1.6 within the resampling. The held-minus-rest change agrees too (face -191..-203 at both). The bottom terms stay
+unchecked (pointer), and 1.6 was not compared with a recording (the 23.09.23 video is 1.92 px/pt).
+
 ## Needs the Mac
 
 1. A glass button held while the pointer moves 0 → 80 pt across it (60 fps, dark and light): the light's track, the
