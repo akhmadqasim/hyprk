@@ -20,8 +20,9 @@ Item {
     default property alias trailing: trail.data
     width: parent ? parent.width : 0
     // a row whose only control is a Switch is 37.5, others 38 (Q-settings-12)
-    readonly property bool _switchRow: trail.children.length === 1 && trail.children[0]._lift !== undefined
-                                       && trail.children[0].value === undefined
+    // (trail's first child is the value Text, so the control is children[1])
+    readonly property bool _switchRow: row.value === "" && trail.children.length === 2
+                                       && trail.children[1]._lift !== undefined && trail.children[1].value === undefined
     implicitHeight: Math.max(_switchRow ? Theme.content.switchRowHeight : Theme.content.rowHeight,
                              texts.implicitHeight + 16, trail.childrenRect.height + 12)
     height: implicitHeight
