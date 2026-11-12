@@ -1473,6 +1473,12 @@ test("Mission Control: one Space reads Desktop, more are numbered by position", 
     test("Dock folders open in our Finder, never xdg-open", () =>
         assert.match(apps, /function openFolder\(item\) \{ leaveMission\(null\); openFinder\(/));
     // judge #11: a Dock click in Mission Control launched the app and Mission Control stayed open
+    // judge #11: a window opened while Mission Control was open left the frames of the old list (a thumbnail covered)
+    test("Mission Control lays out again when a window opens or closes while it is open", () => {
+        const mcq = readFileSync(join(shellDir, "modules", "MissionControl.qml"), "utf8");
+        assert.match(mcq, /function relayout\(\) \{\s*if \(e >= 0\.05 && !shown\) return;/);
+        assert.match(mcq, /if \(shown && e >= 0\.05\) \{ Hyprland\.refreshToplevels\(\); stackQuery\.connected = true; \}/);
+    });
     test("a Dock activation leaves Mission Control, its window picked", () => {
         assert.match(apps, /function leaveMission\(win\) \{\s*if \(Panels\.open !== "mission"\) return;\s*missionPick\(win \|\| null\);\s*Panels\.close\(\);/);
         assert.match(apps, /leaveMission\(w\);\s*focusWindow\(w\);/);

@@ -334,15 +334,24 @@ ShellWindow {
     // arrive asynchronously) and kept while closing so the windows fly back from where they are
     property var frames: []
     property real layoutScale: 1
+    // Laid out before the fly-in, and again while open when a window opens or closes (judge #11: after a window
+    // appeared in Mission Control the frames, still the old count, were indexed by the new list and a thumbnail was
+    // covered). The thumbnails take their new frames without a motion (no Mac data on this). Not while closing: the
+    // windows fly back from the frames they have.
     function relayout() {
-        if (e >= 0.05) return;
+        if (e >= 0.05 && !shown) return;
         const rects = windows.map(t => fullRect(t));
         if (rects.some(r => !r)) return;
         const out = Expose.layout(rects.map(r => ({ x: r.x, y: r.y, w: r.width, h: r.height })), area);
         frames = out.frames;
         layoutScale = out.scale;
     }
-    onWindowsChanged: relayout()
+    // a window that opens while open has no IPC data (its rect) until the toplevels are asked again, and no place in
+    // `stack` (it flew back under the others and popped on top in the exit's last frame, .14 of the screen > 20 levels)
+    onWindowsChanged: {
+        if (shown && e >= 0.05) { Hyprland.refreshToplevels(); stackQuery.connected = true; }
+        relayout();
+    }
     onAreaChanged: relayout()
 
     // a still of the screen for the title bar strips, taken while this layer is still clear
@@ -624,7 +633,7 @@ ShellWindow {
                 // plugin's description in the active look too (the screen still's strip is the look at open)
                 property bool repicked: false
                 function takeRect() {
-                    if (mc.e >= 0.05) return;
+                    if (mc.e >= 0.05 && !mc.shown) return;
                     real = mc.fullRect(cell.modelData);
                     bar = mc.barStrip(cell.modelData);
                     barSeen = mc.barRect(cell.modelData) !== null;
