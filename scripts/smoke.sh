@@ -11,7 +11,10 @@
 #   HYPRK_HEADLESS=1  add a 2560x1664@2x "MBA" output and shoot that (MacBook Air-like). No host window is
 #                     opened: AQ_WAYLAND_NO_OUTPUT=1 (hypr-dev aquamarine patch) keeps the Wayland backend
 #                     connected for the GPU allocator but creates no WAYLAND-1. HYPRK_HOST_WINDOW=1 keeps the
-#                     window; with an unpatched aquamarine it is removed right after start (a short flash)
+#                     window; with an unpatched aquamarine it is removed right after start (a short flash).
+#                     The session gets its own dbus-daemon (no service directories, so nothing is activated; socket
+#                     in $HYPRK_STATE/run), never the caller's bus; stopped at teardown, left running with HYPRK_KEEP=1.
+#                     HYPRK_BUS_ADDRESS=addr uses that bus instead. NO_AT_BRIDGE=1 and GTK_A11Y=none for all of it
 set -u
 HYPRK_ROOT=${HYPRK_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}
 export HYPRK_ROOT
@@ -36,6 +39,34 @@ if [ "${HYPRK_HEADLESS:-0}" = 1 ]; then
     export HYPRK_PRIMARY=MBA
     # no WAYLAND-1 host window at all (needs aquamarine-0.16.0-wayland-no-output.patch, see hypr-dev README)
     [ "${HYPRK_HOST_WINDOW:-0}" = 1 ] || export AQ_WAYLAND_NO_OUTPUT=1
+    # a private session bus: the caller's DBUS_SESSION_BUS_ADDRESS is never passed through
+    export NO_AT_BRIDGE=1 GTK_A11Y=none
+    if [ -n "${HYPRK_BUS_ADDRESS:-}" ]; then
+        export DBUS_SESSION_BUS_ADDRESS=$HYPRK_BUS_ADDRESS
+    else
+        . "$HYPRK_ROOT/config/hypr/state-dir.sh"   # HYPRK_STATE
+        mkdir -p "$HYPRK_STATE/run" && chmod 700 "$HYPRK_STATE/run"
+        BUSDIR=$(mktemp -d "$HYPRK_STATE/run/bus.XXXXXX") || { echo "smoke: no bus dir"; exit 2; }
+        cat >"$BUSDIR/session.conf" <<CONF
+<!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-Bus Bus Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
+<busconfig>
+  <type>session</type>
+  <listen>unix:path=$BUSDIR/bus</listen>
+  <auth>EXTERNAL</auth>
+  <policy context="default">
+    <allow send_destination="*" eavesdrop="true"/>
+    <allow eavesdrop="true"/>
+    <allow own="*"/>
+  </policy>
+</busconfig>
+CONF
+        BUSINFO=$(dbus-daemon --config-file="$BUSDIR/session.conf" --fork --print-address=1 --print-pid=1) \
+            || { echo "smoke: dbus-daemon failed"; exit 2; }
+        DBUS_SESSION_BUS_ADDRESS=$(sed -n 1p <<<"$BUSINFO"); BUSPID=$(sed -n 2p <<<"$BUSINFO")
+        export DBUS_SESSION_BUS_ADDRESS
+        echo "smoke: private bus pid $BUSPID at $DBUS_SESSION_BUS_ADDRESS"
+    fi
 fi
 export HYPRK_MUTE=${HYPRK_MUTE:-1}     # no sounds from test sessions unless HYPRK_MUTE=0
 "$HYPRK_ROOT/config/hypr/start.sh" >"$LOG" 2>&1 &
@@ -52,6 +83,12 @@ cleanup() {
     for _ in $(seq 1 50); do kill -0 "$HPID" 2>/dev/null || break; sleep 0.1; done
     kill -9 "$HPID" 2>/dev/null
     for k in $kids; do kill -9 "$k" 2>/dev/null; done
+    stop_bus
+}
+stop_bus() {
+    [ -n "${BUSPID:-}" ] || return 0
+    kill "$BUSPID" 2>/dev/null
+    rm -rf "$BUSDIR"
 }
 
 # find the instance signature and nested wayland socket from the lock file
@@ -64,7 +101,7 @@ for _ in $(seq 1 100); do
         fi
     done
     [ -n "$SIG" ] && [ -n "$NESTED" ] && break
-    kill -0 "$HPID" 2>/dev/null || { echo "smoke: Hyprland exited early"; tail -n 30 "$LOG"; exit 1; }
+    kill -0 "$HPID" 2>/dev/null || { echo "smoke: Hyprland exited early"; tail -n 30 "$LOG"; stop_bus; exit 1; }
     sleep 0.2
 done
 [ -n "$SIG" ] || { echo "smoke: no instance found"; cleanup; exit 1; }
@@ -103,7 +140,7 @@ WAYLAND_DISPLAY=$NESTED grim "${SHOT_ARGS[@]}" "$OUT" && echo "smoke: screenshot
 rc=$?
 
 if [ "${HYPRK_KEEP:-0}" = 1 ]; then
-    echo "export HYPRLAND_INSTANCE_SIGNATURE=$SIG WAYLAND_DISPLAY=$NESTED  # pid $HPID"
+    echo "export HYPRLAND_INSTANCE_SIGNATURE=$SIG WAYLAND_DISPLAY=$NESTED${DBUS_SESSION_BUS_ADDRESS:+ DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS}  # pid $HPID${BUSPID:+, bus pid $BUSPID}"
     exit $rc
 fi
 cleanup
