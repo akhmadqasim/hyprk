@@ -297,6 +297,19 @@ menu decoded). Menu shadow on screen, nested session over the Settings window: b
 221 224 226 228 230 -> 145 / 222 223 225 227 229 231; below 167 175 176 177 -> 169 177 177 178; the menu's inside identical.
 Not re-measured against Mac crops: regular glass of D 96..160 (no Mac crop of its shadow; the change halves its ink).
 
+Round 4, measured against a Mac crop (`screens/27.2.1/verify/C/tint-0.5-dark-sizes-regular-white.png`, 1 px = 1 pt,
+dark, the probe's Regular 500 x 500 r 28 over white, its dump: ShadowOpacity 0.6, radius 24, y 8, fill black 0.3; greys,
+so no P3 conversion): the drop shadow below (3..19 pt), above (3..19 pt) and right of it (3..29 pt) against
+255 (1 - k x 0.6 x 0.5 erfc(d_s / 24)): k = 0.3 (the decode, 83329b6) rms **0.76** levels, k = 0.65 (before) rms 15.3,
+free fit k = 0.31 (rms 0.64). Below the glass at 3 / 9 / 18 pt: Mac 226 / 232 / 242, decoded 227 / 233 / 242, before
+194 / 208 / 227. So the decoded ink holds at D >= 160 in dark (same inputs as D 160); the D 96..160 opacities are the
+dump's lerp, the ink law the same. Light: no Mac crop of a Regular glass of D > 64 over white (the variant shots are
+150 x 64, opacity 0.04). Ours = the decode (the plugin's shader is the same formula; computed, not rendered).
+Which hyprk surfaces draw Regular's shadow at D 96..160: none at present. Control Center and the HUD take the
+controlCenter recipe (no shadow), banners and Notification Center cards the notificationCenter recipe (own fitted
+shadow), Spotlight AppKit's window shadow, menus and alerts the menu recipe; Regular's shadow by size reaches only the
+Dock label and the Notification Center pills (D under 64: opacity 0.04, radius 4, ink 0.012).
+
 ## 11. Round 3: release spring
 
 `GlassContainer.MakeAnimatableInteractionState.updateValue` 0x190bb782c reads the current `Transaction`: when it carries
@@ -384,6 +397,6 @@ capsule): +28 -> +41 at 6 pt, +11 -> +13 at 24 pt. Light, preview share button: 
    of the preview glass buttons' interaction variant if reachable: which cursor set they take. Round 4 found the
    unclamped matrices (most of the 3x) and fitted the rest (LittleGlow .475, sigma 1.3 R); the light-mode press is
    untested against a Mac. A CALayer probe (8) settles the sigma; a press over a flat grey backdrop settles the opacity.
-7. (round 3) A Regular glass panel of D >= 96 over white (e.g. a SwiftUI sheet or a large glass button) to check the
-   0.3 x ShadowOpacity ink below and beside it at 2 / 8 / 16 / 32 pt.
+7. (round 3, round 4) A Regular glass panel of D 96..160 over white, LIGHT mode, to check the 0.3 x ShadowOpacity ink
+   below and beside it at 2 / 8 / 16 / 32 pt (dark at D 500 agrees, rms 0.76 levels: section 10).
 8. (round 3) A CALayer probe with shadowRadius 20 over white to read CA's shadow sigma (= radius or radius / 2).
