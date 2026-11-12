@@ -328,6 +328,24 @@ critically damped 0.21 s settle (rms .033) stays in `PressSpring`.
 - Not done this round: knob lens over stripes / at the track ends / at 1.6, the dark ring against frames 2678-2693, the
   drag-stretch frame ranges, `hyprctl liquidglass trace` (stats off in the session), the knob / thumb press from
   DesignLibrary code.
+- Round 4, the held slider knob (measured; headless, a scratch scene with 4 pt black / white stripes and sliders at 0,
+  0.5 and 1, plus Settings > Appearance; dark and light, scale 2 and 1.6):
+  - against the recording, dark, frame 2685 (knob held at 0.515, 1.92 px/pt) and ours (2 px/pt), vertical profile a
+    quarter of the lens right of its centre: rim 22-23 on a 32 background (x0.70), ours 21 on 39 (x0.54); top highlight
+    peak +32 over the background, ours +39; face above the track +15..+20, ours +10..+17; the track seen through the
+    lens +4..+7 over the track beside it, ours +1..+5. Close; the darker rim is the one difference over 5 levels (not
+    changed: the video softens a 1 pt line).
+  - over stripes: the lens shows `lensBackdrop` (a flat colour) and the track only: the stripes vanish under it (std
+    across the lens above the track 1.0 dark / 1.6 light against 127.5 beside it). Ours is right only over a flat
+    background equal to `lensBackdrop` (every slider in hyprk sits on one); the Mac's clear lens would show the stripes.
+    Not changed (the lens would need the window's content under the slider; no Mac shot of a held slider over stripes).
+  - at the track ends (fixed, e1a0411): the Liquid Glass slider drew the fill to the knob's centre, so the held lens
+    showed a 10 pt blue fill at 0 and grey from the centre at 1; the recording (frames 2228-2244 at 0, 2494-2518 at 1,
+    2204-2212 at 0.07-0.09) shows the fill running to value x track with the knob clamped half a knob inside: now
+    `fillToEnds`. Other Settings sliders keep the fill to the knob's centre (no Mac recording of them held at an end).
+  - scale 1.6: the same picture as at 2 (the fill band inside the lens at the same row and height as beside it, 20.0 /
+    5.6 pt dark, 19.4 / 5.6 light; the stripes hidden the same way).
+  - light: the B2 ring / fill model draws as built (bright rim top and bottom); no light recording of a held knob.
 
 ## 13. Round 3: refraction constants still fitted (task list, nothing changed)
 
@@ -389,7 +407,9 @@ capsule): +28 -> +41 at 6 pt, +11 -> +13 at 24 pt. Light, preview share button: 
    halving at 50 pt, and the stretch, if any (it would show `applyScale`'s input).
 2. The same capsule pressed on its right button: which edges grow (per-button lift and its anchor); a press held while
    the pointer leaves the glass (does the lift stay, i.e. is the stretch past the edge ever visible).
-4. The held slider knob in dark over 4 pt stripes and a gradient (the ring / fill model is only measured in light).
+4. The held slider knob in dark over 4 pt stripes and a gradient (the ring / fill model is only measured in light; round
+   4: hyprk's lens hides a non-flat backdrop, a Mac shot would say how much of the stripes the Mac's lens shows), and a
+   Settings slider other than Liquid Glass held at both ends (does its fill run to value x track too).
 5. A glass button pressed in light mode (the press light) and the shadow under a pressed glass button (does it scale
    with the lift).
 3. One `defaults read` of `FlexiGlass*` overrides on the Mac (to rule out tuning overrides).
