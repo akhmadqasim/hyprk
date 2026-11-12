@@ -141,8 +141,13 @@ ShellWindow {
     function focusPicked() {
         const t = pickedWindow;
         pickedWindow = null;
-        if (t) Apps.focusWindow(t);
+        if (t) { Apps.focusWindow(t); refocused(t); }
     }
+    // the picked window's thumbnail is a still from the open, in its look then (inactive unless it was focused): it
+    // took its active look only when the layer went, a step in the exit's last frame (.038 of the screen > 20 levels,
+    // dark, mcap). On the Mac the picked window looks active while it flies back. Its still is taken again once the
+    // client has had a frame to redraw for the focus sent above (one window, early in the flight)
+    signal refocused(var win)
     Connections {
         target: pickProbe.Window.window   // the QQuickWindow (QsWindow.window has no frameSwapped)
         enabled: mc.pickedWindow !== null
@@ -737,6 +742,8 @@ ShellWindow {
                             // is taken when the source is set (creation, on open) and again on a reopen while still loaded
                             live: false
                             Connections { target: mc; function onShownChanged() { if (mc.shown) view.captureFrame(); } }
+                            Connections { target: mc; function onRefocused(win) { if (win === cell.modelData) reshot.restart(); } }
+                            Timer { id: reshot; interval: 50; onTriggered: view.captureFrame() }
                             // No second still on exit (one was taken in the tail for the windows' active look): the capture
                             // held qs's frames there, a 0.96 plateau for 2-4 frames (mcap); the look changes when the layer goes
                             constraintSize: Qt.size(cell.width, Math.max(1, cell.height - cell.barHeight))
