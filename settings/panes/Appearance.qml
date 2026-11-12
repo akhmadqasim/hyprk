@@ -275,7 +275,7 @@ Column {
                                 glowHalf: light.glowHalf
                                 glowBig: light.glowBig
                                 glowLittle: light.glowLittle
-                                glowRadius: light.glowHalf
+                                glowRadius: light.glowRadius
                                 glowDodge: light.glowDodge
                                 glowLut: light.glowLut
                             }

@@ -15,8 +15,9 @@
 // - a button's light (HyprK ToolbarHighlight): the hover disc (disc.w added inside a disc of radius disc.z round disc.xy,
 //   edge discEdge pt wide), then SwiftUI's two FlexInteraction glow layers at glow.xy (HyprK motion.js glow*):
 //   BigGlow, a square of half side glow.z, mixes the colour toward Y' = 0.05 + Y, chroma x 1.2 by glowAmt.x;
-//   LittleGlow, a blurred circle (coverage glowLut over the distance in glowAmt.z radii), toward glow.w x (Y + 1.5 x
-//   chroma) by glowAmt.y; matrix results clamped to 0..1. `additive`: only that light, with alpha 0, so
+//   LittleGlow, a blurred circle (coverage glowLut, indexed by 4 x the distance / glowAmt.z), toward glow.w x (Y + 1.5 x
+//   chroma) by glowAmt.y; the matrix results are not clamped (extended range, as CA composites them: HyprK motion.js),
+//   the colour is clipped to 0..1 once after both layers. `additive`: only that light, with alpha 0, so
 //   it adds to the window (a translucent capsule redrawn over itself doubled its face)
 // - ring shadow (glassBackground inputRingShadow*): the face times 1 - ring.w x a band ring.y pt wide just inside the
 //   edge of the face's own shape moved ring.x pt down, blurred by ring.z pt (the filter's polynomial Gaussian edge)
@@ -44,7 +45,7 @@ layout(std140, binding = 0) uniform buf {
     vec4 backdrop;  // premultiplied colour under empty texture
     vec4 bounds;    // x0, y0, x1, y1 of the source in capsule px: samples are clamped into it (edge repeat)
     vec4 glow;      // press light: centre x, y, BigGlow half side (pt), LittleGlow gain (1 / (1 - grey))
-    vec4 glowAmt;   // BigGlow opacity, LittleGlow opacity, LittleGlow radius (pt), unused
+    vec4 glowAmt;   // BigGlow opacity, LittleGlow opacity, LittleGlow table radius (pt: 4 table steps), unused
     vec4 glowLut0;  // LittleGlow coverage at 0, 0.25, ..., 3.75 radii (four per vec4; ShaderEffect has no arrays)
     vec4 glowLut1;
     vec4 glowLut2;
@@ -140,13 +141,14 @@ void main() {
         vec2 dv = abs(p - glow.xy);
         float cov = clamp(glow.z - max(dv.x, dv.y) + 0.5, 0.0, 1.0);
         float Y = dot(rgb, LUMA);
-        rgb += glowAmt.x * cov * (clamp(vec3(0.05 + Y) + 1.2 * (rgb - Y), 0.0, 1.0) - rgb);
+        rgb += glowAmt.x * cov * (vec3(0.05 + Y) + 1.2 * (rgb - Y) - rgb);
     }
     if (glowAmt.y > 0.0) {   // LittleGlow: the blurred circle
         float m = lut(4.0 * length(p - glow.xy) / max(glowAmt.z, 1e-3));
         float Y = dot(rgb, LUMA);
-        rgb += glowAmt.y * m * (clamp(glow.w * (vec3(Y) + 1.5 * (rgb - Y)), 0.0, 1.0) - rgb);
+        rgb += glowAmt.y * m * (glow.w * (vec3(Y) + 1.5 * (rgb - Y)) - rgb);
     }
+    rgb = clamp(rgb, 0.0, 1.0);
     // where the source is empty (a knob over a window's own glass, backdrop transparent) the light and the rim are
     // drawn on their own: white `lit` over the face, black `outline` on the rim line
     float la = clamp(lit, 0.0, 1.0) * (1.0 - line);

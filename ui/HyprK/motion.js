@@ -60,21 +60,33 @@ function pressStretch(w, h, sx, sy, px, py) {
 //   offset 0, opacity 1, shadowRadius size / 2) under the matrix YCC(0, 1, 1.5, 0) then a Fill of grey g
 //   (_ColorMatrix.apply(fills:) 0x190ec52a4, tag 2: diag 1 / (1 - g)): g = sRGB(pow(0.7630, 2.4)) = 0.75 dark,
 //   sRGB(pow(0.4313, 2.4)) = 0.40 light, so the colour is multiplied by 4 (dark) / 5/3 (light), saturation x 1.5.
-// Each layer mixes the colour under it toward its matrix by its opacity x coverage (Verify B's vibrantColorMatrix law).
+// Each layer mixes the colour under it toward its matrix by its opacity x coverage (Verify B's vibrantColorMatrix law),
+// the matrices NOT clamped: the layers composite in extended range and the display clips once at the end (measured,
+// the 23.09.23 recording: R 155 G 169 B 180 -> 215 243 255 at the pointer can only come from an unclamped x4 dodge
+// mixed in by ~0.14; a clamped one mixes toward white and cannot reach B 255 while R stays at 215).
 // Opacities and the dissipation distance: the FlexInteraction cursor set of the glass (Settings(variant:size:)
-// 0x1908b1100, automatic): under 120 pt ultraSmall (big 0.75, little 0.2625, 50 pt), then small -> large by the
-// shorter side (big 0.75 -> 0, little 0.75 -> 0.0375, 50 -> 25 pt).
+// 0x1908b1100, automatic): under 120 pt ultraSmall (big 0.75, little 0.2625 decoded, 50 pt), then small -> large by
+// the shorter side (big 0.75 -> 0, little 0.75 -> 0.0375, 50 -> 25 pt).
+// FITTED (dark, the 23.09.23 recording, two presses, frames 196 -> 220 and 314 -> 330, the preview's 37 pt share
+// button): the ultraSmall LittleGlow opacity 0.475 (decoded 0.2625) and its blur glowSigma = 1.3 radii (the CA shadow
+// convention is not decoded; 1 was assumed). Press-ratio rms over the rings 4..50 pt .015 / .012, pixel rms 5.7 / 5.6
+// levels (decoded unclamped .068 / 14.5, decoded clamped as e73a0d3 .235 / 45.8, the old flat gain fit .017 / 8.9).
+// On screen 0.405 = 0.475 x 0.854: the recording darkens mid-tones more than highlights, which inflates a press ratio
+// (GLASS-INTERACTION.md 4: the old flat fit's 0.41 in the recording was 0.35 on screen; the same factor here).
+// The light / dark difference stays the decoded one (glowDodge); light mode has no recording.
+const glowLittleUltra = 0.405;   // fitted, see above
+const glowSigma = 1.3;           // fitted, see above
 function glowSize(w, h) { return Math.min(1.5 * Math.min(w, h), 160); }
 function glowPreset(w, h) {
-    if (pressUltra(w, h)) return { big: 0.75, little: 0.2625, dissipation: 50 };
+    if (pressUltra(w, h)) return { big: 0.75, little: glowLittleUltra, dissipation: 50 };
     const t = pressT(w, h);
     return { big: 0.75 * (1 - t), little: 0.75 + (0.0375 - 0.75) * t, dissipation: 50 - 25 * t };
 }
 function srgbEncode(l) { return l <= 0.0031308 ? 12.92 * l : 1.055 * Math.pow(l, 1 / 2.4) - 0.055; }
 function glowDodge(dark) { return 1 / (1 - srgbEncode(Math.pow(dark ? 0.7630332 : 0.4312796, 2.4))); }
 // The LittleGlow's coverage at u radii from its centre: its circle (radius 1) blurred by a Gaussian of sigma s radii
-// (the CA shadow: sigma = shadowRadius is the convention of AppKit's shadows, SHADOW.md; inferred for CALayer),
-// integrated over the disc in polar steps.
+// (the CA shadow, shadowRadius = the radius; the sigma per radius is fitted, glowSigma), integrated over the disc in
+// polar steps.
 function glowMask(u, s) {
     const N = 48, M = 48;
     let sum = 0;
@@ -88,13 +100,16 @@ function glowMask(u, s) {
     }
     return 2 * sum * (1 / N) * (Math.PI / M) / (2 * Math.PI * s * s);
 }
-// 16 samples of glowMask at u = 0, 0.25, ..., 3.75 (the shader interpolates; 0 beyond: under 0.003 there)
-let _lut = null, _lutS = 0;
-function glowLut(s) {
-    if (_lut && _lutS === s) return _lut;
+// 16 samples of glowMask(u, glowSigma) at u = 0, 1/3, ..., 5 radii (the shader interpolates and draws nothing past the
+// last; under 0.01 there). The shader indexes the table in quarters of its radius uniform: pass glowLutRadius(radius).
+const glowLutStep = 1 / 3;
+function glowLutRadius(r) { return 4 * glowLutStep * r; }
+let _lut = null;
+function glowLut() {
+    if (_lut) return _lut;
     const out = [];
-    for (let i = 0; i < 16; i++) out.push(glowMask(i * 0.25, s));
-    _lut = out; _lutS = s;
+    for (let i = 0; i < 16; i++) out.push(glowMask(i * glowLutStep, glowSigma));
+    _lut = out;
     return out;
 }
 

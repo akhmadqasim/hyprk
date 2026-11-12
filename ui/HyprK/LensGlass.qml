@@ -47,8 +47,8 @@ Item {
     readonly property real margin: Math.ceil(Math.abs(amount) + blur + 1)
     // a button's light (ToolbarHighlight): a disc of Tokens.toolbar.hoverDiscRadius round discCentre with discLift added,
     // then SwiftUI's press light round glowCentre (item px; motion.js glow*): the BigGlow square (half side glowHalf,
-    // opacity glowBig) and the LittleGlow blurred circle (radius glowRadius, opacity glowLittle, gain glowDodge,
-    // coverage table glowLut)
+    // opacity glowBig) and the LittleGlow blurred circle (opacity glowLittle, gain glowDodge, coverage table glowLut
+    // indexed in quarters of glowRadius: motion.js glowLutRadius)
     property point discCentre: Qt.point(0, 0)
     property real discLift: 0
     property point glowCentre: Qt.point(0, 0)

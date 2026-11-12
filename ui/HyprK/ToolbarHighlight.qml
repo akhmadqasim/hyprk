@@ -51,7 +51,8 @@ Item {
     readonly property real glowBig: bigOp.value
     readonly property real glowLittle: littleOp.value
     readonly property real glowDodge: Motion.glowDodge(Tokens.dark)
-    readonly property var glowLut: Motion.glowLut(1)
+    readonly property var glowLut: Motion.glowLut()
+    readonly property real glowRadius: Motion.glowLutRadius(glowHalf)
     readonly property bool lit: discLift > 0 || glowBig > 0.002 || glowLittle > 0.002
 
     // ---- the press lift (with `source`) ----
@@ -110,7 +111,7 @@ Item {
             glowHalf: h.glowHalf
             glowBig: h.glowBig
             glowLittle: h.glowLittle
-            glowRadius: h.glowHalf
+            glowRadius: h.glowRadius
             glowDodge: h.glowDodge
             glowLut: h.glowLut
             additive: true

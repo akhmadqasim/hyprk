@@ -294,32 +294,34 @@ Item {
             Tokens.dark = was;
         }
         // FlexInteraction glow (updateGlow 0x190c24650, GlowContainer.body 0x190c1f0c4): a 37 x 37 button (ultraSmall)
-        // lights BigGlow 0.75 and LittleGlow 0.2625, both 55.5 pt; the light follows the pointer; beyond 50 pt from the
-        // press LittleGlow halves and the glow doubles; released, both fade while the glow grows to x4. Light and dark.
+        // lights BigGlow 0.75 and LittleGlow 0.405 (fitted to the recording; decoded 0.2625), both 55.5 pt; the light
+        // follows the pointer; beyond 50 pt from the press LittleGlow halves and the glow doubles; released, both fade while the glow grows to x4. Light and dark.
         function test_press_light_follows_pointer() {
             for (const dark of [true, false]) {
                 Tokens.dark = dark;
                 fuzzyCompare(light.glowDodge, dark ? 4 : 5 / 3, 1e-4);
                 mousePress(light, 18, 18);
-                tryVerify(() => Math.abs(light.glowBig - 0.75) < 0.005 && Math.abs(light.glowLittle - 0.2625) < 0.005, 1000);
+                tryVerify(() => Math.abs(light.glowBig - 0.75) < 0.005 && Math.abs(light.glowLittle - 0.405) < 0.005, 1000);
                 tryVerify(() => Math.abs(light.glowHalf - 55.5 / 2) < 0.2, 1000);
                 fuzzyCompare(light.glowCentre.x, 18, 1);
                 mouseMove(light, 60, 18);
                 tryVerify(() => Math.abs(light.glowCentre.x - 60) < 1, 1000);
                 mouseMove(light, 120, 18);                       // 102 pt from the press
-                tryVerify(() => Math.abs(light.glowLittle - 0.13125) < 0.003 && Math.abs(light.glowHalf - 55.5) < 0.3, 2000);
+                tryVerify(() => Math.abs(light.glowLittle - 0.2025) < 0.003 && Math.abs(light.glowHalf - 55.5) < 0.3, 2000);
                 fuzzyCompare(light.glowBig, 0.75, 0.005);
                 mouseRelease(light, 120, 18);
                 tryVerify(() => light.glowBig === 0 && light.glowLittle === 0 && Math.abs(light.glowHalf - 111) < 0.5, 3000);
             }
             Tokens.dark = false;
         }
-        // the LittleGlow's coverage: its circle blurred by sigma = its radius (centre 1 - e^-1/2), nothing past 4 radii
+        // the LittleGlow's coverage: its circle blurred by sigma = 1.3 radii (fitted; centre 1 - e^(-1 / (2 x 1.3^2))),
+        // the table over 0..5 radii, indexed in quarters of glowRadius (4/3 of the glow's radius); nothing past 5 radii
         function test_press_light_mask() {
             const lut = light.glowLut;
             compare(lut.length, 16);
-            fuzzyCompare(lut[0], 1 - Math.exp(-0.5), 0.002);
-            verify(lut[15] < 0.003 && lut[4] < lut[0] && lut[8] < lut[4]);
+            fuzzyCompare(lut[0], 1 - Math.exp(-1 / (2 * 1.3 * 1.3)), 0.002);
+            verify(lut[15] < 0.001 && lut[4] < lut[0] && lut[8] < lut[4]);
+            fuzzyCompare(light.glowRadius, light.glowHalf * 4 / 3, 1e-6);
         }
         function test_slider_release_modifiers() {
             backend.level = 0.3;
