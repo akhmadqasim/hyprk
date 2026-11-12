@@ -178,3 +178,11 @@ show again, full screen hides the strip, the strip hides when a stage window rea
 0.15 s rest at the left edge. Off: nothing loaded, nothing listening. Limits: a window moved by dragging is only seen
 at the next window event (Hyprland sends none for a floating move); title bars of the plugin are not in the pictures
 (as in Mission Control).
+
+Checked 2026-11-12 (round 2, headless, foot with 3 app ids): the strip, edge and flight layers have their own
+namespaces (hyprk-stage-strip / -edge / -flight, all in hyprland.lua's hyprk-no-anim rule): the strip maps in one frame,
+the flight shows no layer fade and no empty stage frame (8 of 8 clicks at scale 2 dark, 3 of 3 at 1.6 dark; a flight
+used to remake its layer at launch and showed the stage empty for 1-2 frames in about 1 click of 6). Mission Control
+with Stage Manager on enters and exits; the strip hides under it and comes back. Mission Control shows only the stage's
+windows (the parked ones live on special:stage): whether the Mac's Mission Control shows the strip apps' windows too is
+not decoded, so nothing was changed. Needs the Mac: Mission Control opened with Stage Manager on and 3 apps (a still).
