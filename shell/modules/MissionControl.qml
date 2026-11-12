@@ -134,6 +134,10 @@ ShellWindow {
     // this by focusing the window under the pointer). Two swaps: the first can be of a frame begun before the click.
     property var pickedWindow: null
     property int pickSwaps: 0
+    // the picked window's thumbnail flies back on top of the others from the exit's first frame, as on the Mac (its
+    // stack index is the one from the open: Settings picked under footA flew under it and popped on top when the layer
+    // went, judge #10). Kept until the layer goes or reopens.
+    property var flyTop: null
     function focusPicked() {
         const t = pickedWindow;
         pickedWindow = null;
@@ -241,8 +245,11 @@ ShellWindow {
     function present() {
         Hyprland.refreshToplevels();
         asked = false;
+        flyTop = null;
         stackQuery.connected = true;
-        if (e === 0 && still.captureSource) still.captureFrame();
+        // on creation the still is taken when its source is set (ScreencopyView::createContext); asking then warned
+        // "Cannot capture frame, as no recording context is ready" (judge #9)
+        if (completed && e === 0 && still.captureSource) still.captureFrame();
         keys.forceActiveFocus();
         pending = true;
         gate.restart();
@@ -272,7 +279,7 @@ ShellWindow {
     Timer { id: gate; interval: mc.m.gateMs; onTriggered: { mc.pending = false; mc.armed = true; } }
     // onShownChanged also fires while the bindings are set up on creation: present() once, when complete
     property bool completed: false
-    Component.onCompleted: { completed = true; present(); }
+    Component.onCompleted: { present(); completed = true; }
     onShownChanged: if (completed) shown ? present() : go()
 
     // ---------- layout (lib/expose.js): one uniform scale, the windows near where they are ----------
@@ -584,188 +591,220 @@ ShellWindow {
         ws.activate();
     }
 
-    // windows
-    Repeater {
-        id: thumbs
-        model: mc.windows
-        delegate: Item {
-            id: cell
-            required property var modelData
-            required property int index
-            // stacked like the real windows (mc.stack; most recently focused on top until it is in), so where windows
-            // overlap the thumbnails land in the same order and nothing changes when the layer goes
-            z: {
-                const o = modelData.lastIpcObject;
-                if (o && mc.stack[o.address] !== undefined) return mc.stack[o.address];
-                return -1000 - (o && o.focusHistoryID !== undefined ? o.focusHistoryID : 0);
-            }
-            // where the layout puts the whole window (title bar strip included)
-            readonly property var frame: mc.frames[index] || null
-            x: frame ? frame.x : 0
-            y: frame ? frame.y : 0
-            width: frame ? frame.w : 0
-            height: frame ? frame.h : 0
+    // windows. They fly under the Dock, as the Mac's windows always are (Q-dock-27: the Dock stays visible in Mission
+    // Control): the thumbnails are cut out where the Dock's glass is, which shows the Dock layer under this one. Drawn
+    // over it, a window flying back into the Dock's band covered the Dock's icons for the whole exit and the Dock came
+    // back in its last frame (judge #10, mcap). The cut is on whenever the Dock has a band, so the layer's texture
+    // is not set up in the flight's first frame.
+    Item {
+        id: flight
+        width: mc.width
+        height: mc.height
+        layer.enabled: mc.dockZone > 0 && mc.dockRect !== null
+        layer.effect: MultiEffect {
+            maskEnabled: true
+            maskInverted: true
+            maskSource: flightHole
+            maskThresholdMin: 0.5
+            maskSpreadAtMin: 1
+        }
+        Repeater {
+            id: thumbs
+            model: mc.windows
+            delegate: Item {
+                id: cell
+                required property var modelData
+                required property int index
+                // stacked like the real windows (mc.stack; most recently focused on top until it is in), so where windows
+                // overlap the thumbnails land in the same order and nothing changes when the layer goes
+                z: {
+                    if (mc.flyTop === modelData) return 1e6;
+                    const o = modelData.lastIpcObject;
+                    if (o && mc.stack[o.address] !== undefined) return mc.stack[o.address];
+                    return -1000 - (o && o.focusHistoryID !== undefined ? o.focusHistoryID : 0);
+                }
+                // where the layout puts the whole window (title bar strip included)
+                readonly property var frame: mc.frames[index] || null
+                x: frame ? frame.x : 0
+                y: frame ? frame.y : 0
+                width: frame ? frame.w : 0
+                height: frame ? frame.h : 0
 
-            // where the window really is, with its title bar strip (screen-local); the thumbnail starts and ends
-            // there. Taken only before the fly-in is under way (IPC data arrives asynchronously: no jump).
-            readonly property var ipcRect: mc.bars && mc.stack ? mc.fullRect(cell.modelData) : null
-            readonly property var ipcBar: mc.bars && mc.stack && mc.barLooks ? mc.barStrip(cell.modelData) : null
-            property var real: null
-            property var bar: null          // the bar's strip on the screen (any window with the plugin's bar)
-            property bool barSeen: false    // ... and the screen still shows all of it
-            property var look: null         // ... as the plugin draws it
-            function takeRect() {
-                if (mc.e >= 0.05) return;
-                real = mc.fullRect(cell.modelData);
-                bar = mc.barStrip(cell.modelData);
-                barSeen = mc.barRect(cell.modelData) !== null;
-                const o = cell.modelData.lastIpcObject;
-                look = o && mc.barLooks[o.address] || null;
-                mc.relayout();
-            }
-            onIpcRectChanged: takeRect()
-            onIpcBarChanged: takeRect()
-            readonly property real fly: real && width > 0 ? mc.travel : 0
-            // its capture is in (or there is nothing to fly from)
-            readonly property bool ready: view.hasContent || !real
-            onReadyChanged: mc.maybeGo()
-            Component.onCompleted: { takeRect(); mc.maybeGo(); }
-            // the bar strip's height in the thumbnail
-            readonly property real barHeight: bar && real ? bar.height * width / real.width : 0
-            Item {
-                id: thumb
-                anchors.fill: parent
-                // While the captures of this open are awaited the thumbnail is drawn at an opacity too low to change a
-                // pixel (the real window shows through): its textures are uploaded before the flight, and a stale
-                // picture from the last open neither shows nor gets into the screen still.
-                opacity: mc.pending ? 0.002 : cell.real && !A11y.reduceMotion ? 1 : mc.e
-                transform: [
-                    Scale {
-                        xScale: 1 + cell.fly * (cell.real ? cell.real.width / thumb.width - 1 : 0)
-                        yScale: 1 + cell.fly * (cell.real ? cell.real.height / thumb.height - 1 : 0)
-                    },
-                    Translate {
-                        x: cell.fly * (cell.real ? cell.real.x - cell.x : 0)
-                        y: cell.fly * (cell.real ? cell.real.y - cell.y : 0)
-                    }
-                ]
-                // window shadow: it takes over from the real window's own shadow as the wallpaper covers that
-                // (mc.cover), so the window keeps a shadow through the flight; radius and offset as the glass
-                // shadow, guessed for here
-                RectangularShadow {
-                    anchors.fill: parent
-                    radius: Theme.mission.thumbRadius
-                    blur: Theme.glass.shadowRadius
-                    offset.y: Theme.glass.shadowYOffset
-                    color: Theme.glass.shadow
-                    opacity: mc.cover
+                // where the window really is, with its title bar strip (screen-local); the thumbnail starts and ends
+                // there. Taken only before the fly-in is under way (IPC data arrives asynchronously: no jump).
+                readonly property var ipcRect: mc.bars && mc.stack ? mc.fullRect(cell.modelData) : null
+                readonly property var ipcBar: mc.bars && mc.stack && mc.barLooks ? mc.barStrip(cell.modelData) : null
+                property var real: null
+                property var bar: null          // the bar's strip on the screen (any window with the plugin's bar)
+                property bool barSeen: false    // ... and the screen still shows all of it
+                property var look: null         // ... as the plugin draws it
+                function takeRect() {
+                    if (mc.e >= 0.05) return;
+                    real = mc.fullRect(cell.modelData);
+                    bar = mc.barStrip(cell.modelData);
+                    barSeen = mc.barRect(cell.modelData) !== null;
+                    const o = cell.modelData.lastIpcObject;
+                    look = o && mc.barLooks[o.address] || null;
+                    mc.relayout();
                 }
-                ClippingRectangle {
+                onIpcRectChanged: takeRect()
+                onIpcBarChanged: takeRect()
+                readonly property real fly: real && width > 0 ? mc.travel : 0
+                // its capture is in (or there is nothing to fly from)
+                readonly property bool ready: view.hasContent || !real
+                onReadyChanged: mc.maybeGo()
+                Component.onCompleted: { takeRect(); mc.maybeGo(); }
+                // the bar strip's height in the thumbnail
+                readonly property real barHeight: bar && real ? bar.height * width / real.width : 0
+                Item {
+                    id: thumb
                     anchors.fill: parent
-                    radius: Theme.mission.thumbRadius
-                    color: "transparent"
-                    // the plugin title bar's strip, cut from the screen still
-                    ShaderEffectSource {
-                        visible: cell.bar !== null && cell.barSeen && still.hasContent
-                        width: parent.width
-                        height: cell.barHeight
-                        sourceItem: visible ? still : null
-                        sourceRect: cell.bar ? cell.bar : Qt.rect(0, 0, 0, 0)
-                    }
-                    // the bar drawn from the plugin's description where the still has none: its fill, the lights in
-                    // the window's state at open (active only for the focused one, as mc-light.png) and the title, laid out
-                    // in points and scaled with the thumbnail
-                    Rectangle {
-                        readonly property var st: cell.look ? cell.look.look[cell.look.active ? "active" : "inactive"] : null
-                        visible: cell.bar !== null && st !== null && !(cell.barSeen && still.hasContent)
-                        width: parent.width
-                        height: cell.barHeight
-                        color: st ? st.fill : "transparent"
-                        Item {
-                            width: cell.bar ? cell.bar.width : 0
-                            height: cell.bar ? cell.bar.height : 0
-                            scale: cell.real && cell.real.width > 0 ? cell.width / cell.real.width : 1
-                            transformOrigin: Item.TopLeft
-                            TrafficLights {
-                                x: cell.look ? cell.look.inset : 0
-                                anchors.verticalCenter: parent.verticalCenter
-                                enabled: false
-                                active: cell.look ? cell.look.active : false
-                                dark: parent.parent.st ? parent.parent.st.dark : false
-                            }
-                            Text {
-                                x: cell.look ? cell.look.titleX : 0
-                                width: Math.max(0, parent.width - x - 8)
-                                anchors.verticalCenter: parent.verticalCenter
-                                elide: Text.ElideRight
-                                text: cell.look ? cell.look.title : ""
-                                font: Typography.font(cell.look ? cell.look.fontSize : 13, Typography.bold)
-                                color: parent.parent.st ? parent.parent.st.text : "transparent"
-                            }
+                    // While the captures of this open are awaited the thumbnail is drawn at an opacity too low to change a
+                    // pixel (the real window shows through): its textures are uploaded before the flight, and a stale
+                    // picture from the last open neither shows nor gets into the screen still.
+                    opacity: mc.pending ? 0.002 : cell.real && !A11y.reduceMotion ? 1 : mc.e
+                    transform: [
+                        Scale {
+                            xScale: 1 + cell.fly * (cell.real ? cell.real.width / thumb.width - 1 : 0)
+                            yScale: 1 + cell.fly * (cell.real ? cell.real.height / thumb.height - 1 : 0)
+                        },
+                        Translate {
+                            x: cell.fly * (cell.real ? cell.real.x - cell.x : 0)
+                            y: cell.fly * (cell.real ? cell.real.y - cell.y : 0)
                         }
-                    }
-                    ScreencopyView {
-                        id: view
-                        y: cell.barHeight
-                        captureSource: cell.modelData.wayland
-                        // one still per open, not a live feed: live, every window was captured and redrawn at 60 fps
-                        // for as long as Mission Control stayed open (reference/PERF-2026-11-10.md item 2). The still
-                        // is taken when the source is set (creation, on open) and again on a reopen while still loaded
-                        live: false
-                        Connections { target: mc; function onShownChanged() { if (mc.shown) view.captureFrame(); } }
-                        // No second still on exit (one was taken in the tail for the windows' active look): the capture
-                        // held qs's frames there, a 0.96 plateau for 2-4 frames (mcap); the look changes when the layer goes
-                        constraintSize: Qt.size(cell.width, Math.max(1, cell.height - cell.barHeight))
-                    }
-                    // fallback while no frame is available: app icon on a plain card
-                    Rectangle {
+                    ]
+                    // window shadow: it takes over from the real window's own shadow as the wallpaper covers that
+                    // (mc.cover), so the window keeps a shadow through the flight; radius and offset as the glass
+                    // shadow, guessed for here
+                    RectangularShadow {
                         anchors.fill: parent
-                        // not while the first captures are awaited: the card flashed over the window for a frame (mcap)
-                        visible: !view.hasContent && !mc.pending && mc.e > 0
-                        color: Theme.glass.solid
-                        IconImage {
-                            anchors.centerIn: parent
-                            implicitSize: Theme.mission.placeholderIcon
-                            source: Apps.iconUrl(Apps.appIdOf(cell.modelData), Apps.appIdOf(cell.modelData), Theme.iconLook)
+                        radius: Theme.mission.thumbRadius
+                        blur: Theme.glass.shadowRadius
+                        offset.y: Theme.glass.shadowYOffset
+                        color: Theme.glass.shadow
+                        opacity: mc.cover
+                    }
+                    ClippingRectangle {
+                        anchors.fill: parent
+                        radius: Theme.mission.thumbRadius
+                        color: "transparent"
+                        // the plugin title bar's strip, cut from the screen still
+                        ShaderEffectSource {
+                            visible: cell.bar !== null && cell.barSeen && still.hasContent
+                            width: parent.width
+                            height: cell.barHeight
+                            sourceItem: visible ? still : null
+                            sourceRect: cell.bar ? cell.bar : Qt.rect(0, 0, 0, 0)
+                        }
+                        // the bar drawn from the plugin's description where the still has none: its fill, the lights in
+                        // the window's state at open (active only for the focused one, as mc-light.png) and the title, laid out
+                        // in points and scaled with the thumbnail
+                        Rectangle {
+                            readonly property var st: cell.look ? cell.look.look[cell.look.active ? "active" : "inactive"] : null
+                            visible: cell.bar !== null && st !== null && !(cell.barSeen && still.hasContent)
+                            width: parent.width
+                            height: cell.barHeight
+                            color: st ? st.fill : "transparent"
+                            Item {
+                                width: cell.bar ? cell.bar.width : 0
+                                height: cell.bar ? cell.bar.height : 0
+                                scale: cell.real && cell.real.width > 0 ? cell.width / cell.real.width : 1
+                                transformOrigin: Item.TopLeft
+                                TrafficLights {
+                                    x: cell.look ? cell.look.inset : 0
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    enabled: false
+                                    active: cell.look ? cell.look.active : false
+                                    dark: parent.parent.st ? parent.parent.st.dark : false
+                                }
+                                Text {
+                                    x: cell.look ? cell.look.titleX : 0
+                                    width: Math.max(0, parent.width - x - 8)
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    elide: Text.ElideRight
+                                    text: cell.look ? cell.look.title : ""
+                                    font: Typography.font(cell.look ? cell.look.fontSize : 13, Typography.bold)
+                                    color: parent.parent.st ? parent.parent.st.text : "transparent"
+                                }
+                            }
+                        }
+                        ScreencopyView {
+                            id: view
+                            y: cell.barHeight
+                            captureSource: cell.modelData.wayland
+                            // one still per open, not a live feed: live, every window was captured and redrawn at 60 fps
+                            // for as long as Mission Control stayed open (reference/PERF-2026-11-10.md item 2). The still
+                            // is taken when the source is set (creation, on open) and again on a reopen while still loaded
+                            live: false
+                            Connections { target: mc; function onShownChanged() { if (mc.shown) view.captureFrame(); } }
+                            // No second still on exit (one was taken in the tail for the windows' active look): the capture
+                            // held qs's frames there, a 0.96 plateau for 2-4 frames (mcap); the look changes when the layer goes
+                            constraintSize: Qt.size(cell.width, Math.max(1, cell.height - cell.barHeight))
+                        }
+                        // fallback while no frame is available: app icon on a plain card
+                        Rectangle {
+                            anchors.fill: parent
+                            // not while the first captures are awaited: the card flashed over the window for a frame (mcap)
+                            visible: !view.hasContent && !mc.pending && mc.e > 0
+                            color: Theme.glass.solid
+                            IconImage {
+                                anchors.centerIn: parent
+                                implicitSize: Theme.mission.placeholderIcon
+                                source: Apps.iconUrl(Apps.appIdOf(cell.modelData), Apps.appIdOf(cell.modelData), Theme.iconLook)
+                            }
                         }
                     }
+                    // hover: an accent ring 4.5 pt wide, 1 pt outside the window frame, no scale (Q-dock-30); only while
+                    // open (on exit it went away only when the layer unmapped, a pop after the windows landed, mcap)
+                    Rectangle {
+                        visible: wma.containsMouse && mc.hoverable
+                        anchors.fill: parent
+                        anchors.margins: -5.5
+                        radius: Theme.mission.thumbRadius + 5.5
+                        color: "transparent"
+                        border.width: 4.5
+                        border.color: Theme.color.accent
+                    }
                 }
-                // hover: an accent ring 4.5 pt wide, 1 pt outside the window frame, no scale (Q-dock-30); only while
-                // open (on exit it went away only when the layer unmapped, a pop after the windows landed, mcap)
+                // title on hover, centred on the window (Q-dock-29)
                 Rectangle {
                     visible: wma.containsMouse && mc.hoverable
-                    anchors.fill: parent
-                    anchors.margins: -5.5
-                    radius: Theme.mission.thumbRadius + 5.5
-                    color: "transparent"
-                    border.width: 4.5
-                    border.color: Theme.color.accent
-                }
-            }
-            // title on hover, centred on the window (Q-dock-29)
-            Rectangle {
-                visible: wma.containsMouse && mc.hoverable
-                anchors.centerIn: parent
-                width: Math.min(cell.width, title.implicitWidth + Theme.mission.titlePadding * 2)
-                height: Theme.mission.titleHeight
-                radius: height / 2
-                color: Theme.mission.titleFill
-                Text {
-                    id: title
                     anchors.centerIn: parent
-                    width: Math.min(implicitWidth, cell.width - Theme.mission.titlePadding * 2)
-                    elide: Text.ElideRight
-                    text: cell.modelData.title
-                    font: Typography.font(Theme.font.missionTitle, Typography.bold)
-                    color: Theme.mission.titleText
+                    width: Math.min(cell.width, title.implicitWidth + Theme.mission.titlePadding * 2)
+                    height: Theme.mission.titleHeight
+                    radius: height / 2
+                    color: Theme.mission.titleFill
+                    Text {
+                        id: title
+                        anchors.centerIn: parent
+                        width: Math.min(implicitWidth, cell.width - Theme.mission.titlePadding * 2)
+                        elide: Text.ElideRight
+                        text: cell.modelData.title
+                        font: Typography.font(Theme.font.missionTitle, Typography.bold)
+                        color: Theme.mission.titleText
+                    }
+                }
+                MouseArea {
+                    id: wma
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: { mc.pickSwaps = 0; mc.pickedWindow = cell.modelData; mc.flyTop = cell.modelData; Panels.close(); Apps.focusWindow(cell.modelData); }
                 }
             }
-            MouseArea {
-                id: wma
-                anchors.fill: parent
-                hoverEnabled: true
-                onClicked: { mc.pickSwaps = 0; mc.pickedWindow = cell.modelData; Panels.close(); Apps.focusWindow(cell.modelData); }
-            }
+        }
+    }
+    Item {
+        id: flightHole
+        width: mc.width
+        height: mc.height
+        visible: false
+        layer.enabled: flight.layer.enabled
+        Rectangle {
+            x: mc.dockRect ? mc.dockRect.x : 0
+            y: mc.dockRect ? mc.dockRect.y : 0
+            width: mc.dockRect ? mc.dockRect.w : 0
+            height: mc.dockRect ? mc.dockRect.h : 0
+            radius: mc.dockRect ? mc.dockRect.r : 0
         }
     }
 }
