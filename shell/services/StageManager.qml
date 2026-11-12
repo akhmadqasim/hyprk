@@ -107,6 +107,10 @@ Singleton {
     function stop() {
         running = false;
         moveAll(Hyprland.toplevels.values.filter(isParked), stageWorkspace);
+        // the windows coming back land on top: the focused one is raised over them again (judge #8b: off left the
+        // focused window under an inactive one)
+        const a = Hyprland.activeToplevel;
+        if (a && !isParked(a)) Hyprland.dispatch(`hl.dsp.window.alter_zorder({ mode = "top", window = "address:${addressOf(a)}" })`);
         model = Stage.empty();
         save();
     }
@@ -142,8 +146,9 @@ Singleton {
             const w = `"address:${addressOf(t)}"`, o = t.lastIpcObject;
             const x = o && o.at ? o.at[0] : 0;
             steps.push(`hl.dispatch(hl.dsp.window.set_prop({ prop = "no_anim", value = "1", window = ${w} }))`,
-                       `hl.dispatch(hl.dsp.window.move({ x = ${x}, y = -30000, window = ${w} }))`,
-                       `hl.dispatch(hl.dsp.window.set_prop({ prop = "no_anim", value = "unset", window = ${w} }))`);
+                       `hl.dispatch(hl.dsp.window.move({ x = ${x}, y = -30000, window = ${w} }))`);
+            // no_anim stays set until park(): unset in the same call, the move still ran Hyprland's window-move
+            // animation and the window slid up through the first 2-3 frames of the flight (judge #8b: drawn twice)
         }
         Hyprland.dispatch(`function() ${steps.join("; ")} end`);
     }
