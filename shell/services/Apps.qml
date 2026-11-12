@@ -275,6 +275,10 @@ Singleton {
         desktopFocus = "";   // the window's app becomes frontmost (a desktop waiting behind a panel stays out)
         if (StageManager.running && StageManager.isParked(t)) { StageManager.bringWindow(t); return; }
         Hyprland.dispatch(`hl.dsp.focus(${windowSelector(t)})`);
+        // Hyprland's focus dispatcher raises no floating window (only a click on it does: InputManager
+        // processMouseDownNormal), so a Cmd-Tab commit or a Mission Control pick left the app's window behind the
+        // others; activating an app on the Mac brings its window to the front
+        Hyprland.dispatch(`hl.dsp.window.alter_zorder({ mode = "top", window = "address:${addressOf(t)}" })`);
     }
     function closeWindow(t) { Hyprland.dispatch(`hl.dsp.window.close(${windowSelector(t)})`); }
 
