@@ -290,7 +290,9 @@ Item {
             Tokens.dark = true;
             compare(Tokens.control.knobLensRingOpacity, 0);
             compare(Tokens.control.knobLensFillLight, 0);
-            compare(Tokens.control.knobLensKeyTop, 0.135);
+            compare(Tokens.control.knobLensKeyTop, 0.092);
+            compare(Tokens.control.knobLensOutline, 0.45);
+            compare(Tokens.control.knobLensGain, 0.702);
             Tokens.dark = was;
         }
         // FlexInteraction glow (updateGlow 0x190c24650, GlowContainer.body 0x190c1f0c4): a 37 x 37 button (ultraSmall)

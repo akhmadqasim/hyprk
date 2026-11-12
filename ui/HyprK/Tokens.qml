@@ -112,15 +112,26 @@ QtObject {
         // middle); none of the dark terms. Dark keeps the recording's fit above (the ring and fill model is not
         // measured in dark: the recording's lens bottom rises 44 -> 60 over 4 px, frames 2684-2686, which the
         // bottom key light already draws)
+        // Dark refit 2026-11-12, fitted to the recording (frame 2685): a vertical profile through the lens 6 pt right of
+        // its centre (rows 446-478), levels over the background beside the lens, against this shader's terms over the
+        // recording's own background column (32 card, 50 track), drawn at 2 px/pt and resampled to the recording's
+        // 1.92 px/pt (native pixel box x a linear resample kernel; the lens position fitted too): gain .85 -> .702,
+        // haze .05 -> .091, top diffuse .06 -> .043 (rms 3.48 -> 2.14 levels with the top key light at .128); the top
+        // key light then set from our own capture (resampled to 1.92 px/pt the same way) to the recording's +33 peak:
+        // .135 -> .092 (.128 drew +39, .08 +31); model rms 2.37, capture against recording 3.02 -> 2.12 levels (0-14 pt,
+        // the lens position aligned). Gain and haze trade off (two background levels only: .658 / .099 fits within .1
+        // level). The rim line stays .45: our capture resampled reads x0.71 of the background, the recording x0.72 (the
+        // x0.54 of GLASS-INTERACTION section 12 was our 2 px/pt capture against the resampled video); .24-.31 read
+        // x0.82-0.87. Not refitted: bottom diffuse, bottom key light, round ends (the pointer covers the lens bottom)
         readonly property real knobLensBand: 0.1
         readonly property real knobLensAmount: -0.15
-        readonly property real knobLensGain: t.dark ? 0.85 : 1
-        readonly property real knobLensHaze: t.dark ? 0.05 : 0.1
-        readonly property real knobLensDiffuseTop: t.dark ? 0.06 : 0
+        readonly property real knobLensGain: t.dark ? 0.702 : 1
+        readonly property real knobLensHaze: t.dark ? 0.091 : 0.1
+        readonly property real knobLensDiffuseTop: t.dark ? 0.043 : 0
         readonly property real knobLensDiffuseTopDepth: 12
         readonly property real knobLensDiffuseBottom: t.dark ? 0.04 : 0
         readonly property real knobLensDiffuseBottomDepth: 4
-        readonly property real knobLensKeyTop: t.dark ? 0.135 : 0
+        readonly property real knobLensKeyTop: t.dark ? 0.092 : 0
         readonly property real knobLensKeyBottom: t.dark ? 0.083 : 0
         readonly property real knobLensKeyEnds: t.dark ? 0.02 : 0
         readonly property real knobLensKeyFalloff: 0.9

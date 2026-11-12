@@ -335,6 +335,18 @@ critically damped 0.21 s settle (rms .033) stays in `PressSpring`.
     peak +32 over the background, ours +39; face above the track +15..+20, ours +10..+17; the track seen through the
     lens +4..+7 over the track beside it, ours +1..+5. Close; the darker rim is the one difference over 5 levels (not
     changed: the video softens a 1 pt line).
+  - dark refit 2026-11-12 (fitted to the recording, frame 2685; ui/HyprK/Tokens.qml knobLens*): the same column (6 pt
+    right of the lens centre), our capture box-resampled to the recording's 1.92 px/pt before comparing (the video is
+    a 2x screen scaled to 1.92 px/pt, so a 1 pt line is softened in it but not in a 2 px/pt capture). Resampled, the
+    old constants read rim x0.71 (recording x0.72), peak +38 (+33), face +11..+15 (+16..+20), track through the lens
+    +2..+4 (+4..+7): the rim was not darker, only the face was. Fit of the shader's terms over the recording's own
+    background column (32 card, 50 track): gain .85 -> .702, haze .05 -> .091, top diffuse .06 -> .043; top key light
+    .135 -> .092 to the +33 peak in our resampled capture; rim line .45 kept. Model rms 3.48 -> 2.37 levels; our
+    capture against the recording (0-14 pt, lens position aligned, +0.375 pt) 3.02 -> 2.12; after: rim x0.71, peak
+    +33, face +13..+16, track +2..+4. The face and track still read 2-4 levels low beside the lens because our card
+    is 38 (`lensBackdrop` #25262B) where the recording's is 32: at 32 the fitted model reads face +16..+21, track
+    +4..+7. Gain and haze trade off (.658 / .099 fits as well). Not refitted: bottom diffuse, bottom key light, the
+    round ends (the pointer covers the lens bottom); light mode unchanged (no light recording).
   - over stripes: the lens shows `lensBackdrop` (a flat colour) and the track only: the stripes vanish under it (std
     across the lens above the track 1.0 dark / 1.6 light against 127.5 beside it). Ours is right only over a flat
     background equal to `lensBackdrop` (every slider in hyprk sits on one); the Mac's clear lens would show the stripes.
