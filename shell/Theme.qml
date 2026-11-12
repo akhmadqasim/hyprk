@@ -446,6 +446,11 @@ Singleton {
         // pill with a hole at its top-left + 1 becomes Apple's pointer (a 16 pt square turned 45 deg, corner 2.5, centre
         // 4 pt above the pill's bottom, union smoothness 25: Dock ECCartoucheGlassLayerController, REA 27.2.1 3)
         readonly property size labelPointer: Qt.size(16, 7)
+        // Dock menu placement (Q-dock-10, live/dock/dock-menus.json geometry): its window x = icon centre - 40, its
+        // bottom = the Dock background top, the body inset 13 in it. So the body starts 27 left of the icon centre
+        // and reaches to the right, its bottom 13 above the Dock. The tail at the icon centre needs the plugin (open)
+        readonly property real menuLeft: 40
+        readonly property real menuInset: 13
         readonly property color labelText: theme.dark ? Qt.rgba(244 / 255, 244 / 255, 244 / 255, 1) : Qt.rgba(37 / 255, 37 / 255, 37 / 255, 1)   // Q-dock-08
         // tint over the plugin glass: none. The plugin's dock recipe alone gives the Mac's body over white, grey and
         // black in both modes (light 229/134/38, dark 176/107/12 with the probe's max luma 0.75, MAC-ANSWERS #53)

@@ -78,12 +78,13 @@ ShellWindow {
         items: Panels.contextItems
         // AppKit popUp at a point (MAC-ANSWERS.md Q-menubar-27): x = point, top = point - 5 so the first row
         // starts at the pointer; at the right edge it flips to the left of the point, at the bottom it is
-        // shifted up to 6 pt above the edge. Above the Dock it is centred on the point and ends there.
-        readonly property real px: Panels.contextAbove ? Panels.contextX - width / 2
+        // shifted up to 6 pt above the edge. Above the Dock (the point is the icon centre and the Dock top): the
+        // body starts menuLeft - menuInset left of the point and ends menuInset above it (Q-dock-10).
+        readonly property real px: Panels.contextAbove ? Panels.contextX - Theme.dock.menuLeft + Theme.dock.menuInset
                                  : Panels.contextX + width > ov.width - Theme.menu.screenMargin ? Panels.contextX - width : Panels.contextX
         x: Math.max(Theme.menu.screenMargin, Math.min(ov.width - width - Theme.menu.screenMargin, px))
         y: Math.max(0, Math.min(ov.height - height - Theme.menu.screenMargin,
-                                Panels.contextY - Theme.menuBar.height - (Panels.contextAbove ? height : Theme.menu.padding)))
+                                Panels.contextY - Theme.menuBar.height - (Panels.contextAbove ? height + Theme.dock.menuInset : Theme.menu.padding)))
         originX: x
         originY: y + Theme.menuBar.height
     }
