@@ -14,3 +14,10 @@ Transparency / Increase Contrast / Reduce Motion off, Stage Manager off and desk
 - `screens/27.2.1/panels/spotlight-light-white-{empty,results}.png`, `spotlight-light-white-open-close.mov`
 - TextEdit window 0,29 1440x851 pt behind. In light mode the field reads dark over the white window (see the stills).
   The results for "text" list only the app and Settings items, nothing personal.
+
+## R3.3 More Space scaled mode: done
+- `screens/27.2.1/scaled/more-space-{dock,menu,settings}.png`, `more-space-spotlight-close.mov`
+- Mode: 1920x1243 pt, 3840x2486 px backing (2x), panel 2880x1864, 60 Hz. Display put back to 1440x932 afterwards.
+- Note on "default": Displays labels **1710x1107 as "Default"** on this 15" MacBook Air. Rounds 2 and 3 use 1440x932,
+  the unscaled 2x mode (1 pt = 2 panel px), as the brief asked ("2x, no scaled mode"). Round 1 was at 1710x1107 (Apple's
+  Default, which is a scaled mode on this panel).
