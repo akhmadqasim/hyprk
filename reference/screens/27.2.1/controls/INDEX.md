@@ -95,3 +95,14 @@ Slider positions from AX. Volume restored to 81 (unmuted) and brightness to 0.60
 | slider-icon-ends-cc-sound-{light,dark}.mov | Control Centre > Sound (180 pt slider), region slider −50 / +60 pt | speaker glyphs at both ends while the lens is pulled past them | both | Control Centre |
 | slider-icon-ends-cc-display-{light,dark}.mov | Control Centre > Display brightness (217 pt slider, 1170,415) | sun glyphs at both ends | both | Control Centre |
 | slider-icon-ends-settings-sound-{light,dark}.mov | Settings > Sound > Output volume (830,617 205 pt, 9 ticks), region slider −60 / +60 pt | speaker glyphs at both ends; the Mute box ticks at 0 | both | window |
+
+## Round 7 (R7.3b): fast press-drag on glass buttons
+Clips `screencapture -x -C -v -V 5 -R …` (pointer shown, 60 fps time base, VFR). Gesture: mouse down, 0.15 s, then twice:
+drag out in 0.1 s, 0.35 s outside, back in 0.1 s, 0.35 s inside; release inside (preview, Back) or after a last drag
+out, outside the tile (Control Centre, so nothing was toggled or opened).
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| glass-press-drag-fast-preview-{light,dark}.mov | region 780,300 292x200; Settings > Appearance preview, share glyph 818,336, out = +10,+70 pt | pressed glow on the share capsule; the drag also scrolls the article | both | article photo |
+| glass-press-drag-fast-back-{light,dark}.mov | region 520,195 240x120; Finder (dummy folder `hyprk-r7/sub`), Back 586,227, out = +15,+70; first move out 0.15 s after down (the history menu did not open) | pressed pill inside, normal outside | both | window |
+| glass-press-drag-fast-cc-{light,dark}.mov | region tile −70,−60 140x170; Control Centre Screen Mirroring tile (1362,193 64x64, centre 1394,225… measured 1394,253), out = −40,+70; release outside | round glass tile pressed: it fills bright / lit; Wi-Fi tile not used (it shows the network name) | both | Control Centre |

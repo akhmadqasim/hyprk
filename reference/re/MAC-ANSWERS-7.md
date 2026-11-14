@@ -49,3 +49,14 @@ Transparency / Increase Contrast / Reduce Motion off, Stage Manager off and desk
 - Settings > Sound > Output volume: the end glyphs are static (no scale), the lens stops at the ends (no visible
   stretch); at 0 the "Mute" checkbox ticks on.
 - Volume back to 81 unmuted, brightness back to 0.606 (it was at 0.606 before; automatic brightness is on).
+
+## R7.3b Fast press-drag on glass buttons: done
+- `screens/27.2.1/controls/glass-press-drag-fast-{preview,back,cc}-{light,dark}.mov`
+- Answer: **no stretch toward the pointer and no bounce on release** in any of the three:
+  - preview capsule (share): the pressed glow appears under the pointer; when the pointer leaves, the glow fades; the
+    capsule shape does not deform. (The drag also scrolls the article, the preview being a scroll view.)
+  - Finder Back: pressed pill inside, normal look outside, pressed again on return; moving out within 0.15 s stops the
+    history menu from opening. Release inside navigated back.
+  - Control Centre round tile (Screen Mirroring, used instead of Wi-Fi whose tile shows the network name): on press the
+    tile lights up (bright fill); it stays lit while the pointer is dragged out and back; size and shape unchanged.
+    Released outside the tile: nothing opened.
