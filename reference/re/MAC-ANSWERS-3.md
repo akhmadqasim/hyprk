@@ -38,3 +38,10 @@ Times are clip pts. Keystrokes come from `osascript` so their exact moments are 
   The panel then collapses to the bare pill: light from 3.80 s to 4.02 s (starts about 0.25 s after the field empties,
   about 0.22 s long); dark at about 4.45 to 4.52 s (about 0.6 s after the field empties; the 4.5 s frame shows a smaller
   empty panel shrinking under the pill). After that, only the bare pill until the clip ends (1 s later and more).
+
+## R3.4 Volume HUD appear and fade: done
+- `screens/27.2.1/panels/hud-volume-appear-grey-dark.mov`
+- HUD: a capsule in the top-right corner under the menu bar (in the clip at about x 1123..1430, y 39..104 pt on screen),
+  speaker glyph + 16-segment level. First HUD frame at 0.600 s, then continuous frames to 1.383 s, a pause, changes again
+  1.567 s to 2.083 s (the fade), static after 2.083 s. So it is on screen about 1.0 s after the press, and the fade lasts
+  about 0.5 s. `output volume` 81 -> 88 for one step (16 steps total), restored to 81.

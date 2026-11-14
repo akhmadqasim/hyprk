@@ -83,3 +83,8 @@ y 575 pt (clip px y 950..1200, x 320..1360): the "te" results there include brow
 | spotlight-pill-hover-dark.mov | same | same | dark | dark TextEdit |
 | spotlight-pill-clear-light.mov | Spotlight already open; clip 5.5 s; "te" typed about 0.5 s, then 3 Backspaces 0.35 s apart from about 2.0 s (the first one removes the autocomplete "rminal — Open"), pointer at 20,900 | results panel, then the field goes empty and the panel collapses to the bare pill | light | white TextEdit |
 | spotlight-pill-clear-dark.mov | same | same | dark | dark TextEdit |
+
+## Round 3 (R3.4): volume HUD appear and fade
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| hud-volume-appear-grey-dark.mov | `screencapture -x -v -V 4.5 -R 960,29,480,200` (2x, H.264 60 fps time base, VFR), display 1440x932 | one Volume Up key press (synthetic NX_KEYTYPE_SOUND_UP system-defined event, the same path as the F12 key) at about 0.5 s, volume 81 -> 88 (one step), then the HUD fades; volume set back to 81 after | dark | grey 127 |
