@@ -145,11 +145,11 @@ apps (Finder, Safari, System Settings, TextEdit); 16, 32, 64 (= 32@2x), 128 and 
   first result "Calculator"; cut above the second row because the further rows are the user's files),
   `pixel-columns.txt`.
 - Seen (light mode, query "calculator"): the bar and the list panel are both **dark grey glass even in light mode
-  over a white wallpaper**, with a vertical gradient (lighter toward the bottom of each). The list panel starts ≈ 12 pt
-  below the bar; its top edge is a bright 1 px rim (≈ 160 over white / ≈ 116 over grey at the centre column) on a
-  ≈ 120 / ≈ 68 body; the selected first row is a lighter rounded plate (≈ 142–148 over white, ≈ 84–86 over grey) with
-  a bright top hairline. Over grey everything is darker by the backdrop difference (≈ 50–60 levels), i.e. the panel
-  is translucent, not an opaque fill.
+  over a white wallpaper**, each with a vertical gradient (darker at the top). The list panel starts ≈ 10 pt below
+  the bar. Over the grey-127 wallpaper the same pixels are ≈ 50–60 levels darker than over white, so both panels are
+  translucent glass, not opaque fills. The selected first row is a lighter rounded plate. The raw columns (centre and
+  left inside edge, every 2 pt) are in `pixel-columns.txt`; the centre column crosses an app chip, so read the rim
+  values from the x = 60 px column.
 
 ## R9.8 gradientOvalization and key-highlight spread: system surfaces not done; own-process sweep done
 - Dock, Cmd-Tab switcher, Control Centre modules: not done, same attach error (Dock, ControlCenter); nothing else
