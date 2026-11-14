@@ -118,3 +118,8 @@ about 1080..1425 x 42..117). Module: Wi-Fi menu bar item clicked, full screen st
 |---|---|---|---|---|
 | shadow-banner-{grey,white}-{dark,light}.png | region above | resting notification banner and its shadow | both | grey 127 / white |
 | shadow-module-{grey,white}-{dark,light}.png | crop above | Wi-Fi module and its shadow | both | grey 127 / white |
+
+## Round 5 (R5.3): emoji in a banner
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| emoji-in-banner-{light,dark}.png | `display notification "Emoji test 😀👍🏽🇮🇩 in the body" with title "hyprk 🇮🇩" subtitle "Round 5 👍🏽"`, region pt 1040,30 400x130, 1.6 s after posting | emoji in title, subtitle and body (colour emoji, skin tone modifier, flag) | both | TahoeLight / TahoeDark |

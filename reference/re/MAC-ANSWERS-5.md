@@ -31,3 +31,8 @@ pts 0 in the file. Check: `afplay` of Pop.aiff and `osascript beep` land in the 
 - "White" is a solid white desktop picture (not a window), so the menu bar strip and the shots are over pure white.
   The banner comes from `display notification` (app icon = Script Editor). Both surfaces show a soft, wide, low-contrast
   shadow mostly below the shape; over grey 127 it is barely visible, over white it is clear.
+
+## R5.3 Emoji in text: done
+- `screens/27.2.1/panels/emoji-in-banner-{light,dark}.png`, `screens/27.2.1/finder/emoji-in-name-{light,dark}.png`
+- Colour emoji render inline at the text size in all three banner lines and in the Finder list (selected row keeps
+  the colour emoji; no monochrome fallback). Skin tone (👍🏽) and flag (🇮🇩) sequences render as single glyphs.

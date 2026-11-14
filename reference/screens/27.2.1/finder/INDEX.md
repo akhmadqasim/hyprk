@@ -22,3 +22,12 @@ copied from below Bin. The gaps are not real; the real sidebar has 32 pt rows th
 More crops (toolbar hover states, sidebar, context menus, rename field, drag feedback, Quick Look, tabs, path
 and status bar, icons) are in `reference/re/27.2.1/live/finder/crops/`; numbers are in
 `reference/re/27.2.1/live/finder/finder-measurements.json`.
+
+## Round 5 (R5.3, R5.4)
+Display 1440x932 pt (2x), wallpaper TahoeLight / TahoeDark, other apps hidden. Finder windows on dummy folders in
+~/Pictures (removed afterwards); sidebar and path bar hidden (they show personal names). Window shots
+`screencapture -x -o -l<id>` (no shadow).
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| emoji-in-name-{light,dark}.png | window 400,200 640x360 pt, list view, "Report 😀👍🏽🇮🇩.txt" selected | emoji inside file names in the list ("Photo 🌅.png", "Report 😀👍🏽🇮🇩.txt") | both | window |
