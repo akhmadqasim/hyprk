@@ -61,3 +61,16 @@ previous one. 00 = top, 11 = end (content 268x1257.5 pt, so the last step is par
 |---|---|---|---|---|
 | preview-article-scroll-{00..11}-light.png | window shot, crop above | the article under the toolbar capsules, 100 pt apart | light | article (page colour) |
 | preview-article-scroll-{00..11}-dark.png | same | same | dark | article (page colour) |
+
+## Round 3 (R3.8a): Appearance pop-up buttons up close
+Display 1440x932 pt (2x), Settings relaunched per mode, window at 350,29 (740x625 pt) so every menu fits on screen,
+content scrolled 250 pt so the three pop-ups are in view (frames from an AX dump). Region shots `screencapture -x -R`.
+rest = pointer 120 pt below; hover = pointer on the button centre 0.8 s; pressed = 30 ms after a synthetic mouse down
+(the menu is not drawn yet; it opens on mouse down); open = 1 s into the hold, crop = the menu window (CGWindowList layer
+101) united with the button, +8 pt. The mouse up landed on the checked item, so no value changed.
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| control-text-highlight-colour-{rest,hover,pressed,open}-{light,dark}.png | button 927,537 133x24 pt, crop ±24/16 pt; menu 840,458 318x422 | "Text highlight colour" (Automatic): Automatic ✓, Blue, Purple, Pink, Red, Orange, Yellow, Green, Graphite, Choose Colour… | both | window / TahoeLight, TahoeDark |
+| control-folder-colour-{rest,hover,pressed,open}-{light,dark}.png | button 927,439.5 133x24; menu 840,360 296x422 | "Folder colour" (Automatic, shown with icon style Dark): Automatic ✓, Red … Graphite, Choose Colour… | both | same |
+| control-sidebar-icon-size-{rest,hover,pressed,open}-{light,dark}.png | button 964,536 96x24; menu 877,432 246x232 | "Sidebar icon size" (Medium): Small, Medium ✓, Large | both | same |

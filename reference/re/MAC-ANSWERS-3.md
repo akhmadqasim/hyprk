@@ -85,3 +85,10 @@ Times are clip pts. Keystrokes come from `osascript` so their exact moments are 
   Vertical positions (top dump, screen y): hero 296.0, title 478.9, subtitle 501.9, intro 532.9, image 604.9, heading
   786.6, body 813.6, image 901.9, heading 1083.0, body 1110.0, image 1182.5, heading 1469.6, body 1496.6.
   Text is English (UK spelling "emphasise") because the system language is English (UK).
+
+## R3.8a Appearance pop-ups up close: done
+- `screens/27.2.1/settings/appearance/control-{text-highlight-colour,folder-colour,sidebar-icon-size}-{rest,hover,pressed,open}-{light,dark}.png`
+- Appearance has 3 pop-up buttons (AX): Text highlight colour, Folder colour, Sidebar icon size. "Accent colour" is the
+  row of colour swatches, not a pop-up. Pop-up sizes: 133x24 pt (with colour dot), 96x24 pt (Sidebar icon size).
+- Menu windows (CGWindowList, layer 101, owner "Appearance"): 318x422, 296x422, 246x232 pt incl. shadow margin. The
+  menu opens with the checked item over the button. "pressed" was taken 30 ms after mouse down, before the menu draws.
