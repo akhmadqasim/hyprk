@@ -5,6 +5,7 @@
 #include "Config.hpp"
 #include "GlassElement.hpp"
 #include "PopupGlass.hpp"
+#include "RegionQueue.hpp"
 #include "Log.hpp"
 #include "Stats.hpp"
 #include "Titlebar.hpp"
@@ -71,6 +72,15 @@ struct SBlurSuppression {
     }
 };
 
+// a layer's blur region as sent with its applied buffer, tracking the surface from its first draw
+static CRegion appliedRegionOf(const SP<Desktop::View::CWLSurface>& surface) {
+    const auto res = surface->resource();
+    if (!res)
+        return surface->m_blurRegion;
+    lg::trackRegions(res);
+    return lg::appliedRegion(res.get()).value_or(surface->m_blurRegion);
+}
+
 // opacity: the shell's glass opacity marker (1 without one)
 static std::vector<lg::SGlassShape> shapesFor(const PHLLS& layer, const PHLMONITOR& mon, const lg::SParams& p, double& opacity) {
     const auto pos  = layer->position(Desktop::View::IGeometric::GEOMETRIC_CURRENT);
@@ -79,9 +89,11 @@ static std::vector<lg::SGlassShape> shapesFor(const PHLLS& layer, const PHLMONIT
 
     std::vector<lg::SGlassShape> shapes;
     const auto                   surface = layer->wlSurface();
-    if (surface && surface->m_hasBackgroundEffect && !surface->m_blurRegion.empty())
-        // the client's ext-background-effect region (Quickshell BackgroundEffect.blurRegion)
-        shapes = lg::shapesFromRegion(surface->m_blurRegion, off.x, off.y, &opacity, size, lg::cutFillFor(p, layer->m_namespace));
+    // the client's ext-background-effect region (Quickshell BackgroundEffect.blurRegion), the one sent with the buffer
+    // on screen (RegionQueue.hpp: Hyprland's own copy can be a frame ahead)
+    const CRegion region = surface ? appliedRegionOf(surface) : CRegion{};
+    if (surface && surface->m_hasBackgroundEffect && !region.empty())
+        shapes = lg::shapesFromRegion(region, off.x, off.y, &opacity, size, lg::cutFillFor(p, layer->m_namespace));
     else if (!p.requireRegion)
         shapes.push_back({{off.x, off.y, size.x, size.y}, 0});
 
@@ -171,12 +183,12 @@ static void renderLayerNow(Render::IHyprRenderer* thisptr, Render::CRenderContex
                                        std::chrono::duration<double, std::milli>(now.time_since_epoch()).count(),
                                        layer->alpha()[Desktop::View::LS_ALPHA_FADE]->value(), opacity);
         if (const auto surface = layer->wlSurface())
-            for (const auto& r : surface->m_blurRegion.getRects())
+            for (const auto& r : appliedRegionOf(surface).getRects())
                 if (r.y2 - r.y1 <= 2 || r.x2 - r.x1 <= 2)
                     line += std::format(" {},{} {}x{}", r.x1, r.y1, r.x2 - r.x1, r.y2 - r.y1);
         for (const auto& s : shapes)
-            line += std::format(" | box {:.3f},{:.3f} {:.3f}x{:.3f} r {:.3f} m {:.4f}{}", s.box.x, s.box.y, s.box.w, s.box.h, s.radius, s.materialize,
-                                s.regularShadow ? " shadow" : "");
+            line += std::format(" | box {:.3f},{:.3f} {:.3f}x{:.3f} r {:.3f} m {:.4f}{}{}", s.box.x, s.box.y, s.box.w, s.box.h, s.radius, s.materialize,
+                                s.regularShadow ? " shadow" : "", s.tail >= 0 ? std::format(" tail {:.3f}", lg::tailTip(s.tail, s.box.w)) : "");
         std::fprintf(g_traceFile, "%s\n", line.c_str());
         std::fflush(g_traceFile);
     }
@@ -329,6 +341,11 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
             default: break;
         }
     }));
+    // track a layer's blur regions from its map, before its first motion's frames are queued (RegionQueue.hpp)
+    g_listeners.push_back(Event::bus()->m_events.layer.opened.listen([](PHLLS ls) {
+        if (const auto surface = ls ? ls->wlSurface() : nullptr)
+            lg::trackRegions(surface->resource());
+    }));
     g_listeners.push_back(Event::bus()->m_events.layer.closed.listen([](PHLLS ls) { lg::forgetOwner(reinterpret_cast<uintptr_t>(ls.get())); }));
     g_listeners.push_back(Event::bus()->m_events.window.close.listen([](PHLWINDOW w) { lg::forgetOwner(reinterpret_cast<uintptr_t>(w.get())); }));
     g_listeners.push_back(Event::bus()->m_events.config.reloaded.listen([] {
@@ -425,6 +442,7 @@ APICALL EXPORT void PLUGIN_EXIT() {
         std::fclose(g_traceFile);
     g_traceFile = nullptr;
     g_listeners.clear();
+    lg::clearRegionQueues();
     removeAll(g_decorations);
     removeAll(g_shadows);
     removeAll(g_titlebars);

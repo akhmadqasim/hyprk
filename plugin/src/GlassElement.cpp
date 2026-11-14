@@ -111,6 +111,7 @@ namespace lg {
             .bleedYcc         = loc("bleedYcc"),
             .faceFill         = loc("faceFill"),
             .pointerFill      = loc("pointerFill"),
+            .tail             = loc("tail"),
             .fillAmount       = loc("fillAmount"),
             .pxPerPt          = loc("pxPerPt"),
             .keyYcc           = loc("keyYcc"),
@@ -684,10 +685,11 @@ void main() {
             y2 = std::max(y2, s.box.bottom());
         }
         for (const auto& s : m_data.shapes) {
-            x1 = std::min(x1, s.box.x - m);
-            y1 = std::min(y1, s.box.y - m);
-            x2 = std::max(x2, s.box.right() + m);
-            y2 = std::max(y2, s.box.bottom() + m);
+            const auto b = shapeBounds(s); // with a tail under the box
+            x1 = std::min(x1, b.x - m);
+            y1 = std::min(y1, b.y - m);
+            x2 = std::max(x2, b.right() + m);
+            y2 = std::max(y2, b.bottom() + m);
         }
         return CBox{x1, y1, x2 - x1, y2 - y1};
     }
@@ -869,8 +871,14 @@ void main() {
             glUniform2f(u.quadSize, quad.w, quad.h);
             std::array<float, 4 * MAX_GROUP> boxes{};
             std::array<float, 2 * MAX_GROUP> info{};
+            // the member whose bottom edge carries a tail (one per group) and the tip's x in quad px
+            float tailMember = -1.f, tailX = 0.f;
             for (size_t k = 0; k < g.members.size(); ++k) {
                 const auto& s   = m_data.shapes[g.members[k]];
+                if (s.tail >= 0 && !s.pointer && tailMember < 0) {
+                    tailMember = float(k);
+                    tailX      = float((s.box.x + tailTip(s.tail, s.box.w)) * scale - quad.x);
+                }
                 boxes[4 * k]     = (s.box.x + s.box.w / 2) * scale - quad.x;
                 boxes[4 * k + 1] = (s.box.y + s.box.h / 2) * scale - quad.y;
                 // a pointer: half its square's side, and a negative radius tells the shader to turn it by 45 deg
@@ -890,6 +898,7 @@ void main() {
             glUniform1i(u.shapeCount, m_data.auxKind == eAux::SDF ? 0 : int(g.members.size()));
             glUniform4fv(u.shapeBox, GLsizei(g.members.size()), boxes.data());
             glUniform2fv(u.shapeInfo, GLsizei(g.members.size()), info.data());
+            glUniform2f(u.tail, tailMember, tailX);
             // Apple's blur (C3 2): R = 1.6 x radius x backdrop texels per pt, level log2(1 / scale) + lod(R)
             glUniform1f(u.blurRadius, res.blurRadius);
             glUniform1f(u.blurK, 1.6f * scale * res.backdropScale);
@@ -1024,6 +1033,7 @@ void main() {
         const float box[4]  = {hw, hh, hw + scale, hh + scale};
         const float info[2] = {float((PANEL_OUT + 1) * scale), mat};
         glUniform1i(u.shapeCount, 1);
+        glUniform2f(u.tail, -1.f, 0.f); // no tail on these
         glUniform4fv(u.shapeBox, 1, box);
         glUniform2fv(u.shapeInfo, 1, info);
         glUniform1f(u.blurRadius, float(m_data.panel));
@@ -1091,6 +1101,7 @@ void main() {
         glUniform1f(u.smoothK, 0.f);
         glUniform1f(u.appearBlur, 10.f * scale);
         glUniform1i(u.shapeCount, 1);
+        glUniform2f(u.tail, -1.f, 0.f); // no tail on these
         glBindVertexArray(shader->getUniformLocation(SHADER_SHADER_VAO));
         g_pHyprOpenGL->blend(true);
         for (const auto& f : m_data.fills) {

@@ -34,7 +34,7 @@ namespace lg {
             int tex, linearLight, uvTopLeft, uvBottomRight, quadSize, shapeCount, shapeBox, shapeInfo, smoothK, appearBlur, roundingPower, alpha, ditherAmount;
             int blurRadius, blurK, baseLevel, maxLevel, underlay, refraction, refractionHeight, aberration, faceYcc;
             int blurAlpha, blurDist, outerAmount, outerHeight, outerOpacity, outerThreshold;
-            int blurFill, bleedOpacity, bleedHeight, bleedAmount, bleedLod, bleedYcc, faceFill, pointerFill, fillAmount;
+            int blurFill, bleedOpacity, bleedHeight, bleedAmount, bleedLod, bleedYcc, faceFill, pointerFill, tail, fillAmount;
             int pxPerPt, keyYcc, keySpread, highlight, darkSpec;
             int shadowOpacity, shadowRadius, shadowOffset, shadowTint, shadowSaturation;
             int ringOpacity, ringOffset, ringStroke, ringRadius;

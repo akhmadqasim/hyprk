@@ -23,6 +23,7 @@ uniform vec2  quadSize;             // px
 uniform int   shapeCount;
 uniform vec4  shapeBox[MAX_SHAPES]; // centre x, y (quad px), half w, h
 uniform vec2  shapeInfo[MAX_SHAPES];// corner radius px (< 0: a square turned 45 deg, half side = shapeBox.zw, corner -radius), materialize 0..1
+uniform vec2  tail;                 // x: the member whose bottom edge carries the Dock menu's tail (< 0: none), y: its tip x (quad px)
 uniform float smoothK;              // px, smoothness of the union (= GlassEffectContainer spacing), 0 = plain min
 uniform float appearBlur;           // px edge softness of fully hidden glass (materialize 0)
 uniform float roundingPower;        // <= 0: Apple's continuous corner; >= 1: Lp superellipse (2 = circle)
@@ -129,6 +130,53 @@ vec3 sdBoxN(vec2 p, vec2 half_, float radius) {
     return vec3(max(q.x, q.y) - r, q.x > q.y ? vec2(s.x, 0.0) : vec2(0.0, s.y));
 }
 
+// A rounded box whose bottom edge carries the Dock menu's tail (Shape.hpp SGlassShape::tail; CoreUI 27.2.1
+// __pathForRoundedRectWithAnchor 0x18f2fcfbc): a 23.5 pt base, 13 pt out of the body, the tip rounded with 0.42 x 13 and
+// the base with fillets of 0.60 x 13, base corners 0.08 x 13 inside the base's ends. One outline with the body (a CGPath
+// mask on the Mac): outside, the distance to the body or the tail's curve; inside, the body edge under the tail is no
+// boundary. p relative to the box centre, tip = the tip's x relative to it. Mirrors sdBoxTail() in src/Shape.cpp.
+vec3 sdBoxTail(vec2 p, vec2 half_, float radius, float tip) {
+    float H  = 13.0 * pxPerPt, c = 11.75 * pxPerPt - 0.08 * H, rt = 0.42 * H, rf = 0.60 * H;
+    float L  = length(vec2(H, c));
+    vec2  nS = vec2(H, c) / L;                   // the side's outward normal (v, u)
+    float cS = c * nS.x;                         // side line: dot(q, nS) = cS
+    float ctY = H - rt * L / c;                  // tip circle centre (0, ctY)
+    float vF = (rf + cS - rf * nS.y) / nS.x;     // fillet circle centre (vF, rf), its foot on the edge (vF, 0)
+    vec2  pf = vec2(vF, rf) - rf * nS, pt = vec2(0.0, ctY) + rt * nS;
+    float sv = p.x < tip ? -1.0 : 1.0;
+    vec2  q  = vec2(abs(p.x - tip), p.y - half_.y); // v along the edge, u out of the body
+    vec3  a  = sdBoxN(p, half_, radius);
+    // the curve: tip arc, side, fillet arc, each where it is the nearest part
+    float dc = 1e4; vec2 nc = vec2(0.0, 1.0);
+    vec2  e  = q - vec2(0.0, ctY);
+    float le = length(e);
+    if (e.x * nS.y - e.y * nS.x <= 0.0 && abs(le - rt) < dc) { dc = abs(le - rt); nc = le > 0.0 ? e / le : vec2(0.0, 1.0); }
+    vec2  sd = pt - pf;
+    float t  = sat(dot(q - pf, sd) / dot(sd, sd));
+    float ds = length(q - pf - t * sd);
+    if (ds < dc) { dc = ds; nc = nS; }
+    vec2  f  = q - vec2(vF, rf);
+    float lf = length(f);
+    if (f.x <= 0.0 && -f.x * nS.y + f.y * nS.x <= 0.0 && abs(lf - rf) < dc) { dc = abs(lf - rf); nc = lf > 0.0 ? -f / lf : vec2(0.0, -1.0); }
+    nc.x *= sv;
+    // inside the tail: the tip-rounded wedge, or a fillet's corner (edge, side, fillet circle)
+    float er = e.x * nS.y - e.y * nS.x < 0.0 ? le : dot(e, nS);
+    bool  inTail = q.y >= 0.0 && (er < rt || (q.y <= pf.y && q.x <= vF && dot(q, nS) >= cS && lf >= rf));
+    if (a.x >= 0.0 && !inTail)
+        return a.x <= dc ? a : vec3(dc, nc);
+    // inside: the nearest boundary is the curve, the edge beyond the fillet's foot, or the body's other sides (the
+    // body with its bottom moved far down)
+    vec3 rem = vec3(-a.x, a.yz);
+    if (q.x < vF) {
+        float grow = 2048.0 * pxPerPt;
+        vec3  far  = sdBoxN(p - vec2(0.0, grow), half_ + vec2(0.0, grow), radius);
+        vec2  toE  = vec2(vF - q.x, -q.y);
+        float dE   = length(toE);
+        rem = dE < -far.x ? vec3(dE, vec2(sv * toE.x, toE.y) / max(dE, 1e-6)) : vec3(-far.x, far.yz);
+    }
+    return dc < rem.x ? vec3(-dc, nc) : vec3(-rem.x, rem.yz);
+}
+
 // blend weight of the polynomial smooth min: d = mix(a, b, h) - k h (1 - h) (k <= 0: hard min)
 float sminH(float a, float b, float k) {
     return k > 1e-4 ? sat(0.5 + 0.5 * (a - b) / k) : step(b, a);
@@ -151,7 +199,9 @@ SScene scene(vec2 qp) {
             vec2 d = qp - shapeBox[i].xy;
             b      = sdBoxN(vec2(d.x + d.y, d.y - d.x) * 0.70710678, shapeBox[i].zw, -shapeInfo[i].x);
             b.yz   = vec2(b.y - b.z, b.y + b.z) * 0.70710678;
-        } else
+        } else if (float(i) == tail.x)
+            b = sdBoxTail(qp - shapeBox[i].xy, shapeBox[i].zw, shapeInfo[i].x, tail.y - shapeBox[i].x);
+        else
             b = sdBoxN(qp - shapeBox[i].xy, shapeBox[i].zw, shapeInfo[i].x);
         float mi = shapeInfo[i].y;
         float k = smoothK * sat(0.5 - 0.5 * dot(res.n, b.yz));

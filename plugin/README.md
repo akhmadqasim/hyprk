@@ -424,6 +424,9 @@ Hyprland's own popup blur is turned off for it. Q-menubar-13: pull-down and cont
 the default is the shell dropdown's `menu` recipe and shadow. A Qt popup destroys its surface on close, which leaves Hyprland's
 popup fadeout empty, so the plugin keeps the popup's last buffer and fades it with its glass over the shell menus' 185 ms
 ease-out (materialize 1 -> 0). The client draws no fill when `plugin:liquidglass:enabled` is 1.
+A layer surface's popup gets no glass here (layers have no class). The shell's own text field menus (Spotlight, the
+Emoji picker) avoid that shell-side: they open as in-window popups on a hyprk-overlay layer of their own
+(shell/components/TextMenuHost.qml), whose Glass shapes take the `menu` recipe like the menu bar's menus.
 
 ## Textures from the shell (icon masks, SDF shapes)
 
@@ -497,3 +500,21 @@ light 0.05 / 0.06. A reading at 50 % of the pill's contrast over black is wider 
 brighter than the pill's body (dark: rim 85-99, body 39), so a 20 % covered pixel already passes: dark 17.8 / 12.9 / 8.6 /
 4.6 (2x) and 18.1 / 13.5 / 8.7 / 4.8 (1.6), light 16.9 / 12.4 / 8.2 / 4.2 and 16.9 / 12.4 / 8.2 / 4.3. Nothing changed in
 the shape; no Mac capture of the label exists to read the same way (Q-dock-08 "about 16 wide x 6.5 tall").
+
+## Dock menu tail
+
+The Dock's right-click menu is AppKit's popover-framed menu, its window mask CoreUI's menu path (GAPS-REA-dock.md 1,
+`reference/re/27.2.1/decomp/Dock-gaps.c`): a body of radius 12 whose bottom edge carries a tail 23.5 wide at its base and 13
+out of the body, the tip rounded with 0.42 x 13 = 5.46, the base with fillets of 0.60 x 13 = 7.8, the base corners
+0.08 x 13 inside the base's ends, the tip at the anchor clamped 11.75 in from each end. One outline, so one surface, rim and
+shadow. Marker: a 1x1 hole in the shape's own region 3 rows above its bottom (`TAIL_ROW`, shapes at least 24 pt tall), at
+x = left + round(tip x from the shape's true left edge) (`Glass.tail`, shell/modules/Overlay.qml sets it for a menu opened
+above the Dock; the desktop's has none). `sdBoxTail` (shader and `Shape.cpp`) is the exact distance to that outline: outside,
+to the body or the tail's curve; inside, the body edge under the tail is no boundary (no seam in the rim or refraction). A
+plugin older than this drops the hole with the other stray marker rows and draws the plain menu (checked: same box, m 1).
+Derived from the decode, not read from a Mac picture: the fillets meet the edge 14.39 from the tip, the rounded tip ends
+9.87 under the body (3.13 above the Dock top with the shell's 13 pt inset). Measured on screen (headless 2x, Finder's menu,
+the rim's steepest step per pixel row, 0.5 pt grid): width 24.0 / 22.0 / 20.0 / 18.0 / 16.0 / 13.0 / 9.5 / 5.5 at
+0.2 / 0.7 / 1.2 / 2.2 / 3.2 / 5.2 / 7.2 / 9.2 pt under the body (outline 25.2 / 22.3 / 20.4 / 17.9 / 16.1 / 12.8 / 9.5 / 5.2),
+tip 9.7..10.2, centre 0.1..0.4 pt left of the anchor; dark and light the same, the QML fallback within 0.5 of it.
+Not checked: scale 1.6, a Mac capture (none in reference/screens).

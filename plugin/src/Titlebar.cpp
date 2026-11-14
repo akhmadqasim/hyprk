@@ -115,7 +115,12 @@ namespace lg {
     // GLYPH_IN, out at once as an OutQuad over GLYPH_OUT (s), the same curves as the QML Behavior in TrafficLights.qml
     static constexpr double   GLYPH_STROKE = 1.9;
     static constexpr double   GLYPH_DELAY = 0.070, GLYPH_IN = 0.133, GLYPH_OUT = 0.117;
-    static constexpr double   PRESS_GROW = 1.15; // Tokens.lights.pressedScale: pressed disc 16 pt from 14 (Q-windows-08)
+    // The press: a held light lifts to (size + 2) / size and stretches toward the pointer on the windowControl spring,
+    // lg::CLightPress (LightPress.hpp, the decode; Tokens.lights.lift* has the same numbers). The pressed textures are
+    // drawn at that lifted density, so the settled pressed disc is sharp; the rest textures at 1.
+    static double pressDensity(const SParams& p, int state) {
+        return state == 2 ? lights::liftScale(p.titlebarButton, p.titlebarButton) : 1.0;
+    }
     // title text on a dark bar (light bars use titlebar_text / titlebar_text_inactive): TextEdit dark renders
     // (165,164,172) active / (105,106,112) inactive on #28282E, white a.58 / a.30 (MAC-ANSWERS.md Q-windows-11)
     static constexpr SRgba                    TEXT_ON_DARK{1, 1, 1, 0.58f}, TEXT_ON_DARK_INACTIVE{1, 1, 1, 0.30f};
@@ -225,7 +230,7 @@ namespace lg {
         resetOnScale(m_glyphScale, m_glyphParams, params, scale, m_glyphs, m_lights);
         auto& tex = m_glyphs[button + (dark ? 4 : 0) + (pressed ? 8 : 0)];
         if (!tex)
-            tex = paintLight(params->titlebarButton * scale, [&](cairo_t* cr, double c, double r) {
+            tex = paintLight(params->titlebarButton * scale * pressDensity(*params, pressed ? 2 : 0), [&](cairo_t* cr, double c, double r) {
                 const double k = 2 * r / 14.0; // artboard pt -> px
                 auto line = [&](double x1, double y1, double x2, double y2) {
                     cairo_move_to(cr, c + (x1 - 7) * k, c + (y1 - 7) * k);
@@ -264,8 +269,9 @@ namespace lg {
     }
 
     // the glass disc of lights_model.py, computed per pixel (once per state and scale): body, rim, antialiased edge, over
-    // the glow; the texture is GLASS_MARGIN pt larger all round and a pressed disc is drawn at its own radius (sharp, not
-    // a scaled texture); state 0 rest, 1 inactive, 2 pressed
+    // the glow; the texture is GLASS_MARGIN pt larger all round. The whole light scales with the press (the Mac scales
+    // the control), so a pressed texture is the same 14 pt artboard at the lifted density; state 0 rest, 1 inactive,
+    // 2 pressed
     SP<Render::ITexture> CTitlebar::lightTexture(int button, int state, bool dark, float scale) {
         const auto params = m_params();
         resetOnScale(m_glyphScale, m_glyphParams, params, scale, m_glyphs, m_lights);
@@ -273,9 +279,10 @@ namespace lg {
         if (tex)
             return tex;
         const auto&      g    = GLASS[dark][state == 2 ? 1 : state == 1 ? 2 : 0][button];
-        const double     ppt  = params->titlebarButton * scale / 14.0;        // device px per pt of the 14 pt artboard
-        const double     R    = 7.0 * (state == 2 ? PRESS_GROW : 1.0);        // pt
-        const int        px   = std::max(2, 2 * int(std::ceil((7.0 * PRESS_GROW + GLASS_MARGIN) * ppt)));
+        // device px per pt of the 14 pt artboard
+        const double     ppt  = params->titlebarButton * scale / 14.0 * pressDensity(*params, state);
+        const double     R    = 7.0; // pt
+        const int        px   = std::max(2, 2 * int(std::ceil((R + GLASS_MARGIN) * ppt)));
         cairo_surface_t* surf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, px, px);
         cairo_surface_flush(surf);
         auto*      data   = cairo_image_surface_get_data(surf);
@@ -404,26 +411,42 @@ namespace lg {
         // while the pointer is still on the pressed light; glyphs fade in on hover
         const auto  layout = geometry(*params, {}).layout; // size only; positions come from `bar`
         const float glyphA = glyphAlpha();
+        // the press springs: stepped by the time since the last frame (at most 50 ms, as ui/HyprK Spring.qml)
+        const auto now     = std::chrono::steady_clock::now();
+        const double dt    = std::clamp(std::chrono::duration<double>(now - m_pressStep).count(), 0.0, 0.05);
+        m_pressStep        = now;
+        bool pressMoving   = false;
+        for (auto& p : m_press) {
+            p.step(dt);
+            if (params->reduceMotion)
+                p.snap(); // Reduce Motion: the lift without the spring
+            pressMoving = pressMoving || p.moving() || p.active();
+        }
         for (int i = 0; i < 3; ++i) {
             const CBox b     = layout.buttons[i].copy().translate(bar.pos()).scale(scale).round();
+            // the colour: pressed while the pointer is on the pressed light (Q-windows-08: brighter, a stronger glow)
             const int  state = m_pressed == i && m_hoverButton == i ? 2 : (isActive || m_hover) ? 0 : 1;
-            // pressed: brighter, with a stronger glow, and 1.15x larger, glyph included (Q-windows-08)
-            const double grow = state == 2 ? PRESS_GROW : 1.0;
-            auto         put  = [&](const SP<Render::ITexture>& tex, float alpha, double grow) {
+            // the size: the light's press (lift + stretch about its centre, then the shift), disc and glyph together
+            const auto&  pr  = m_press[i];
+            const bool   at1 = !pr.moving() && !pr.active();
+            const double cx  = b.x + b.w / 2 + pr.shiftX() * scale, cy = b.y + b.h / 2 + pr.shiftY() * scale;
+            auto         put = [&](const SP<Render::ITexture>& tex, float alpha, double density) {
                 if (!tex || !tex->ok() || alpha <= 0.002f)
                     return;
-                const double w = tex->m_size.x * grow, h = tex->m_size.y * grow;
+                const double w = tex->m_size.x * pr.scaleX() / density, h = tex->m_size.y * pr.scaleY() / density;
                 CTexPassElement::SRenderData d;
                 d.tex = tex;
-                d.box = CBox{b.x + (b.w - w) / 2, b.y + (b.h - h) / 2, w, h}.round();
-                d.a   = alpha;
+                d.box = CBox{cx - w / 2, cy - h / 2, w, h};
+                if (at1)
+                    d.box.round(); // whole px at rest; a moving light is placed to the sub-pixel
+                d.a = alpha;
                 g_pHyprRenderer->addPassElement(ctx, makeUnique<CTexPassElement>(d));
             };
-            put(lightTexture(i, state, dark, scale), a, 1.0); // a pressed disc is painted at its own size
-            put(glyphTexture(i == 2 && m_option ? 3 : i, state == 2, dark, scale), a * glyphA, grow);
+            put(lightTexture(i, state, dark, scale), a, pressDensity(*params, state));
+            put(glyphTexture(i == 2 && m_option ? 3 : i, state == 2, dark, scale), a * glyphA, pressDensity(*params, state));
         }
-        if (std::abs(glyphA - (m_hover ? 1.f : 0.f)) > 0.002f)
-            damageEntire(); // keep the fade going
+        if (std::abs(glyphA - (m_hover ? 1.f : 0.f)) > 0.002f || pressMoving)
+            damageEntire(); // keep the fade, the press springs and the press's idle timeout going
 
         m_last = {.bar    = barGlobal().translate(presentation.floatingOffset),
                   .window = CBox{window->positionAnimation()->value(), window->sizeAnimation()->value()},
@@ -626,6 +649,13 @@ namespace lg {
             if (m_pressed >= 0)
                 damageEntire();
         }
+        // a held light follows the pointer wherever it goes (maximumMovement greatestFiniteMagnitude: no cancel by
+        // distance); its colour still needs the pointer on it, as above
+        if (m_pressed >= 0 && m_press[m_pressed].active()) {
+            const CBox& lb = layout.buttons[m_pressed];
+            m_press[m_pressed].move(global.x - bar.x - lb.x, global.y - bar.y - lb.y);
+            damageEntire();
+        }
     }
 
     void CTitlebar::act(int button) {
@@ -664,9 +694,10 @@ namespace lg {
                 Desktop::focusState()->rawWindowFocus(window, Desktop::FOCUS_REASON_CLICK);
             // a double-click on the bar zooms, again to restore (Q-windows-21: AppleActionOnDoubleClick "Maximize", the
             // Zoom default; the same toggle as Option-click on green). The second press does not start a move. The
-            // interval is the 400 ms Qt uses for the Finder toolbar's double-click (the Mac's is not in the repo)
+            // interval is the Mac's stock 0.5 s (IOHIDSystem HIDClickTime 500,000,000 ns, the 9th of the Mouse pane's 11
+            // stops; reference/re/27.2.1/SOUND-REA-27.2.1.md section 4). It was Qt's 400 ms
             const auto now = std::chrono::steady_clock::now();
-            if (hit < 0 && now - m_barPressAt < std::chrono::milliseconds(400)) {
+            if (hit < 0 && now - m_barPressAt < std::chrono::milliseconds(500)) {
                 m_barPressAt = {};
                 m_pressed    = -1;
                 HyprlandAPI::invokeHyprctlCommand("dispatch", std::format(R"(hl.dsp.window.fullscreen({{ mode = "maximized", window = "address:0x{:x}" }}))",
@@ -675,8 +706,13 @@ namespace lg {
             }
             m_barPressAt = hit < 0 ? now : std::chrono::steady_clock::time_point{};
             m_pressed = hit;
-            if (hit >= 0)
+            if (hit >= 0) {
+                // the lift starts at mouse-down (LongPressComponentV3, minimumDuration 0), in the light's own pt
+                const CBox& lb = layout.buttons[hit];
+                m_press[hit].press(lb.w, lb.h, pos.x - bar.x - lb.x, pos.y - bar.y - lb.y);
+                m_pressStep = now;
                 damageEntire(); // pressed colour
+            }
             if (hit < 0) { // the rest of the bar moves the window, from the first motion (onPointerMove)
                 m_dragArmed = true;
                 m_armedAt   = pos;
@@ -696,6 +732,14 @@ namespace lg {
     }
 
     void CTitlebar::onButtonRelease() {
+        // the press ends at mouse-up wherever the pointer is; the springs take the light back (draw steps them)
+        bool held = false;
+        for (auto& p : m_press) {
+            held = held || p.active();
+            p.release();
+        }
+        if (held)
+            damageEntire();
         m_dragArmed = false;
         if (!m_dragging)
             return;

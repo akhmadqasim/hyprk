@@ -22,3 +22,6 @@ Not handled (documented gaps): HDR "holding tone", the foreground content lensin
 luminance-weighted edge-bleed factor (`bleed_darken`, not recovered: we weight by depth only), and the
 dark specular layer (not decoded). The shader runs in gamma space, Apple's in linear: decoded colour values
 are applied as-is, which is why some recipes are tuned (README).
+
+Title-bar light press (LightPress.cpp, the FlexInteraction windowControl lift and stretch): with `reduce_motion` the
+light takes the lifted size at once, without the spring (the Mac's Reduce Motion path for it was not found).

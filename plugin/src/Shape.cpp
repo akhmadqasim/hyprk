@@ -179,6 +179,16 @@ namespace lg {
                 shape.radius     = POINTER_RADIUS;
                 continue;
             }
+            // the tail marker (SGlassShape::tail): a hole TAIL_ROW rows above the bottom, its x from the true left edge
+            if (shape.box.h >= TAIL_MIN_H) {
+                const double row = shape.box.bottom() - TAIL_ROW;
+                std::erase_if(found, [&](const SRect& a) {
+                    if (a.y != row)
+                        return false;
+                    shape.tail = a.right() - shape.box.x;
+                    return true;
+                });
+            }
             if (found.empty())
                 continue;
             const double mid    = shape.box.y + std::floor(shape.box.h / 2);
@@ -270,8 +280,8 @@ namespace lg {
             for (size_t i = 0; i < n; ++i)
                 for (size_t j = i + 1; j < n; ++j) {
                     const double k = shapes[i].pointer || shapes[j].pointer ? std::max(smoothK, pointerK) : smoothK;
-                    const auto& a = shapes[i].box;
-                    const auto& b = shapes[j].box;
+                    const auto  a = shapeBounds(shapes[i]);
+                    const auto  b = shapeBounds(shapes[j]);
                     // gap between the boxes (0 when they overlap); the smooth union reaches k
                     const double dx = std::max({0.0, b.x - a.right(), a.x - b.right()});
                     const double dy = std::max({0.0, b.y - a.bottom(), a.y - b.bottom()});
@@ -287,7 +297,7 @@ namespace lg {
         std::vector<long>        slot(n, -1);
         for (size_t i = 0; i < n; ++i) {
             const size_t root = find(i);
-            const auto&  b    = shapes[i].box;
+            const auto   b    = shapeBounds(shapes[i]); // a tail draws below its box
             if (slot[root] < 0) {
                 slot[root] = long(out.size());
                 out.push_back({{i}, b, i, smoothK});
@@ -355,6 +365,123 @@ namespace lg {
         const double mx = std::max(qx, 0.0), my = std::max(qy, 0.0);
         const double c  = (mx > 0 || my > 0) ? std::pow(std::pow(mx, power) + std::pow(my, power), 1.0 / power) : 0.0;
         return c + std::min(std::max(qx, qy), 0.0) - radius;
+    }
+
+    namespace {
+        // the tail in its own frame: v = |x - tip x| along the edge, u = depth out of the body (0 on the edge line), px.
+        // Side line from the base corner (c, 0) to the tip corner (0, H); the tip arc (radius rt) and the fillets (rf) are
+        // the circles CGPath addArc(tangent1End:tangent2End:radius:) puts into those corners.
+        struct STailGeo {
+            double H, c, rt, rf;
+            double nx, ny;   // the side's outward normal
+            double cS;       // dot(base corner, n): the side line is dot(q, n) = cS
+            double ctY;      // the tip circle's centre (0, ctY)
+            double vF;       // the fillet circle's centre (vF, rf); it touches the edge line at (vF, 0)
+            double pfX, pfY; // the fillet's tangent point on the side
+            double ptX, ptY; // the tip arc's tangent point on the side
+        };
+        STailGeo tailGeo(double unit) {
+            STailGeo g;
+            g.H            = TAIL_HEIGHT * unit;
+            g.c            = TAIL_WIDTH / 2 * unit - TAIL_BASE_IN * g.H;
+            g.rt           = TAIL_TIP * g.H;
+            g.rf           = TAIL_FILLET * g.H;
+            const double L = std::hypot(g.H, g.c);
+            g.nx           = g.H / L;
+            g.ny           = g.c / L;
+            g.cS           = g.c * g.nx;
+            g.ctY          = g.H - g.rt * L / g.c; // the circle touching both sides: rt / sin(half angle) from the corner
+            g.vF           = (g.rf + g.cS - g.rf * g.ny) / g.nx;
+            g.pfX          = g.vF - g.rf * g.nx;
+            g.pfY          = g.rf - g.rf * g.ny;
+            g.ptX          = g.rt * g.nx;
+            g.ptY          = g.ctY + g.rt * g.ny;
+            return g;
+        }
+    }
+
+    double tailFootHalf() {
+        return tailGeo(1).vF;
+    }
+
+    double tailTip(double tail, double w) {
+        const double h = TAIL_WIDTH / 2;
+        return w < TAIL_WIDTH ? w / 2 : std::clamp(tail, h, w - h);
+    }
+
+    SRect shapeBounds(const SGlassShape& s) {
+        if (s.tail < 0)
+            return s.box;
+        const double tip = s.box.x + tailTip(s.tail, s.box.w), half = tailFootHalf();
+        const double x1 = std::min(s.box.x, tip - half), x2 = std::max(s.box.right(), tip + half);
+        return {x1, s.box.y, x2 - x1, s.box.h + TAIL_HEIGHT};
+    }
+
+    SDist sdBoxTail(double px, double py, double halfW, double halfH, double radius, double tip, double unit) {
+        const auto   g    = tailGeo(unit);
+        const auto   body = [&](double x, double y, double grow) { return sdRoundedBox(x, y - grow, halfW, halfH + grow, radius, 0); };
+        const auto   grad = [&](double x, double y, double grow) {
+            const double e = 1e-3 * unit, gx = body(x + e, y, grow) - body(x - e, y, grow), gy = body(x, y + e, grow) - body(x, y - e, grow);
+            const double l = std::max(std::hypot(gx, gy), 1e-12);
+            return std::pair{gx / l, gy / l};
+        };
+        const double sv = px < tip ? -1.0 : 1.0, v = std::abs(px - tip), u = py - halfH;
+        const double a  = body(px, py, 0);
+        // the curve: the tip arc, the side, the fillet arc (each only where it is the nearest part)
+        double dc = 1e30, nv = 0, nu = 1;
+        {
+            const double ex = v, ey = u - g.ctY, len = std::hypot(ex, ey);
+            if (ex * g.ny - ey * g.nx <= 0 && std::abs(len - g.rt) < dc) {
+                dc = std::abs(len - g.rt);
+                nv = len > 0 ? ex / len : 0, nu = len > 0 ? ey / len : 1;
+            }
+        }
+        {
+            const double sx = g.ptX - g.pfX, sy = g.ptY - g.pfY;
+            const double t = std::clamp(((v - g.pfX) * sx + (u - g.pfY) * sy) / (sx * sx + sy * sy), 0.0, 1.0);
+            const double d = std::hypot(v - g.pfX - t * sx, u - g.pfY - t * sy);
+            if (d < dc)
+                dc = d, nv = g.nx, nu = g.ny;
+        }
+        {
+            const double ex = v - g.vF, ey = u - g.rf, len = std::hypot(ex, ey);
+            if (ex <= 0 && -ex * g.ny + ey * g.nx <= 0 && std::abs(len - g.rf) < dc) {
+                dc = std::abs(len - g.rf);
+                nv = len > 0 ? -ex / len : 0, nu = len > 0 ? -ey / len : -1;
+            }
+        }
+        // inside the tail: the tip-rounded wedge, or a fillet's corner between the edge, the side and the fillet circle
+        const double wx = v, wy = u - g.ctY;
+        const double eroded = wx * g.ny - wy * g.nx < 0 ? std::hypot(wx, wy) : wx * g.nx + wy * g.ny;
+        const bool   inTail = u >= 0 && (eroded < g.rt || (u <= g.pfY && v <= g.vF && v * g.nx + u * g.ny >= g.cS && std::hypot(v - g.vF, u - g.rf) >= g.rf));
+        if (a >= 0 && !inTail) {
+            if (a <= dc) {
+                const auto [gx, gy] = grad(px, py, 0);
+                return {a, gx, gy};
+            }
+            return {dc, sv * nv, nu};
+        }
+        // inside: the body's edge under the tail is no boundary any more; the nearest boundary is the curve, the edge
+        // beyond the fillet's foot (vF, 0), or the body's other sides (the body with its bottom moved far down)
+        double rem = -a, rv = 0, ru = 0;
+        bool   fromBody = true;
+        if (v < g.vF) {
+            const double grow = 2048 * unit, far = -body(px, py, grow), dE = std::hypot(g.vF - v, u);
+            if (dE < far)
+                rem = dE, rv = (g.vF - v) / std::max(dE, 1e-12), ru = -u / std::max(dE, 1e-12), fromBody = false;
+            else {
+                rem = far;
+                const auto [gx, gy] = grad(px, py, grow);
+                return dc < rem ? SDist{-dc, sv * nv, nu} : SDist{-rem, gx, gy};
+            }
+        }
+        if (dc < rem)
+            return {-dc, sv * nv, nu};
+        if (fromBody) {
+            const auto [gx, gy] = grad(px, py, 0);
+            return {-rem, gx, gy};
+        }
+        return {-rem, sv * rv, ru};
     }
 
     double bevel(double depth, double height) {

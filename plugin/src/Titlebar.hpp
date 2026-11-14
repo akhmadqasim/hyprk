@@ -5,6 +5,7 @@
 // draw one themselves (server-side decorations), e.g. foot and Qt apps.
 
 #include "Config.hpp"
+#include "LightPress.hpp"
 #include "TitlebarLayout.hpp"
 
 #include <hyprland/src/render/decorations/IHyprWindowDecoration.hpp>
@@ -91,6 +92,10 @@ namespace lg {
         bool                     m_hover   = false;
         int                      m_hoverButton = -1; // light under the pointer
         int                      m_pressed = -1;
+        // the lift and stretch of each light from mouse-down to mouse-up (FlexInteraction windowControl, LightPress.hpp),
+        // stepped in draw() while it moves; m_pressStep = the last step
+        std::array<CLightPress, 3>            m_press;
+        std::chrono::steady_clock::time_point m_pressStep{};
         float                    m_glyphFrom = 0; // glyph alpha when the hover last changed
         bool                     m_option    = false; // Option held while hovering: the green glyph is +
         std::chrono::steady_clock::time_point m_hoverSince{};

@@ -2,6 +2,7 @@
 #include "Config.hpp"
 #include "Material.hpp"
 #include "Fade.hpp"
+#include "LightPress.hpp"
 #include "Shape.hpp"
 #include "TitlebarLayout.hpp"
 
@@ -464,6 +465,66 @@ int main() {
         CHECK(groupShapes(lab, 0).size() == 2 && near(groupShapes(lab, 8)[0].smoothK, 8));
     }
 
+    // tail marker (Dock menu): a 1x1 hole TAIL_ROW rows above the bottom at left + the tip's x; read with the menu's
+    // materialize hole and its sub-point edges, it leaves them alone
+    {
+        auto rows = roundedRows(400, 300, 200, 120, 12);
+        const auto split = [&](double x, double y) {
+            for (size_t i = 0; i < rows.size(); ++i)
+                if (rows[i].y == y && rows[i].x < x && rows[i].right() > x + 1) {
+                    const auto r = rows[i];
+                    rows[i]      = {r.x, y, x - r.x, 1};
+                    rows.push_back({x + 1, y, r.right() - x - 1, 1});
+                    return;
+                }
+        };
+        split(400 + 27, 300 + 120 - TAIL_ROW);
+        auto s = clusterRegion(rows);
+        CHECK(s.size() == 1 && near(s[0].tail, 27) && near(s[0].materialize, 1) && !s[0].regularShadow && near(s[0].box.h, 120) && std::abs(s[0].radius - 12) <= 1);
+        split(400 + 1 + std::round(0.4 * 197), 300 + 60); // materialize 0.4 still read
+        s = clusterRegion(rows);
+        CHECK(s.size() == 1 && near(s[0].tail, 27) && std::abs(s[0].materialize - 0.4) < 0.01);
+        CHECK(clusterRegion(roundedRows(400, 300, 200, 120, 12))[0].tail < 0);
+        // the clamp: 11.75 from either end, centred on a shape narrower than the tail
+        CHECK(near(tailTip(5, 200), TAIL_WIDTH / 2) && near(tailTip(199, 200), 200 - TAIL_WIDTH / 2) && near(tailTip(3, 20), 10) && near(tailTip(27, 200), 27));
+        // bounds: the tail's 13 under the box; grouped with it
+        const auto b = shapeBounds(s[0]);
+        CHECK(near(b.x, 400) && near(b.w, 200) && near(b.h, 120 + TAIL_HEIGHT));
+        CHECK(groupShapes(s, 0).size() == 1 && near(groupShapes(s, 0)[0].box.h, 133));
+        // the fillets touch the edge 14.39 pt either side of the tip
+        CHECK(std::abs(tailFootHalf() - 14.39) < 0.01);
+    }
+    // the tail's outline (CoreUI __pathForRoundedRectWithAnchor): 1 px per pt and 2
+    for (const double unit : {1.0, 2.0}) {
+        const double hw = 100 * unit, hh = 60 * unit, r = 12 * unit, tip = -73 * unit; // the tip 27 pt from the left
+        const auto   d  = [&](double x, double y) { return sdBoxTail(x, y, hw, hh, r, tip, unit).d; };
+        // the tip: the arc's apex 13 - 0.42 x 13 / sin(half angle) + 0.42 x 13 = 9.873 pt out of the body
+        const double L = std::hypot(13.0, 11.75 - 0.08 * 13), apex = 13 - 0.42 * 13 * L / (11.75 - 0.08 * 13) + 0.42 * 13;
+        CHECK(std::abs(apex - 9.873) < 0.001);
+        CHECK(std::abs(d(tip, hh + apex * unit)) < 1e-6 * unit && d(tip, hh + (apex - 0.1) * unit) < 0 && d(tip, hh + (apex + 0.1) * unit) > 0);
+        // below the tip, outside: the way to the apex
+        CHECK(std::abs(d(tip, hh + (apex + 20) * unit) - 20 * unit) < 1e-6 * unit);
+        // the fillet's foot on the edge line (the left one, 12.6 pt from the body's end, sits where the continuous corner
+        // already bends), and outside a foot the plain body edge
+        CHECK(std::abs(d(tip + tailFootHalf() * unit, hh)) < 1e-3 * unit && d(tip, hh) < -8 * unit && d(tip + 12 * unit, hh) < 0);
+        CHECK(std::abs(d(tip + 30 * unit, hh + 3 * unit) - 3 * unit) < 1e-6 * unit);
+        // one surface: no seam where the body's edge was, the field goes on smoothly across it
+        const double up = d(tip, hh - 0.01 * unit), down = d(tip, hh + 0.01 * unit);
+        CHECK(up < -8 * unit && std::abs(up - down) < 0.05 * unit);
+        // half its width 1 pt under the body: the straight side's 10.71 - 13 / 10.71 ... = 9.89 plus the fillet, under 11.75
+        double half1 = 0;
+        for (double x = 0; x < 20 * unit; x += 0.01 * unit)
+            if (d(tip + x, hh + 1 * unit) < 0) half1 = x;
+        CHECK(half1 > 9.9 * unit && half1 < 11.75 * unit);
+        // far inside and far outside the tail: the plain box
+        CHECK(std::abs(d(50 * unit, 0) - sdRoundedBox(50 * unit, 0, hw, hh, r, 0)) < 1e-9 && std::abs(d(80 * unit, hh + 5 * unit) - 5 * unit) < 1e-6);
+        // the normal at the tip points down (out), on a side out and down
+        const auto at = sdBoxTail(tip, hh + apex * unit, hw, hh, r, tip, unit);
+        CHECK(std::abs(at.nx) < 1e-6 && near(at.ny, 1, 1e-6));
+        const auto side = sdBoxTail(tip + 4 * unit, hh + 6 * unit, hw, hh, r, tip, unit);
+        CHECK(side.nx > 0.7 && side.ny > 0.6);
+    }
+
     // mipFootprint: every texel a read in the box touches at that level (bilinear + tent) is refreshed.
     // A read box starting at x 1724 (not a multiple of 128): box + 128 px left part of the level-7
     // texels on its left edge to an older frame
@@ -485,6 +546,60 @@ int main() {
         }
         const auto edge = mipFootprint({0, 0, 50, 50}, 7, 100, 80); // clipped to the texture
         CHECK(near(edge.x, 0) && near(edge.w, 100) && near(edge.h, 80));
+    }
+
+
+    // the title-bar light press (FlexInteraction windowControl, LightPress.hpp): lift 2 pt on a 14 pt light, the
+    // 0.355 s / 0.4 spring (overshoot e^(-pi z / sqrt(1 - z^2)) = 25.4 % at pi / wd = 0.194 s), the same spring back with
+    // its undershoot, the drag stretch, the 2 s idle end
+    {
+        CHECK(near(lights::liftScale(14, 14), 16.0 / 14));
+        CHECK(near(lights::liftScale(14, 20), 22.0 / 20));
+        // analytic underdamped step response against the stepped spring, every 1/60 s
+        const double z = lights::SPRING_DAMPING, w0 = 2 * M_PI / lights::SPRING_RESPONSE, wd = w0 * std::sqrt(1 - z * z);
+        const auto   exact = [&](double t) { return 1 - std::exp(-z * w0 * t) * (std::cos(wd * t) + z / std::sqrt(1 - z * z) * std::sin(wd * t)); };
+        CLightPress p;
+        p.press(14, 14, 7, 7);
+        const double L    = 2.0 / 14;
+        double       peak = 0, peakT = 0, worst = 0;
+        for (int f = 1; f <= 60; ++f) {
+            p.step(1.0 / 60);
+            const double u = (p.scaleX() - 1) / L;
+            worst          = std::max(worst, std::abs(u - exact(f / 60.0)));
+            if (u > peak)
+                peak = u, peakT = f / 60.0;
+            CHECK(near(p.scaleX(), p.scaleY()) && near(p.shiftX(), 0)); // no travel: a uniform lift about the centre
+        }
+        CHECK(worst < 0.01);                                   // the 4 ms substeps follow the closed form
+        CHECK(near(peak, 1.254, 0.01) && near(peakT, 0.2, 0.02)); // the bounce: 1.179 (16.5 pt) at 0.19-0.2 s
+        for (int f = 0; f < 60; ++f)
+            p.step(1.0 / 60);
+        CHECK(p.active() && !p.moving() && near(p.scaleX(), 16.0 / 14)); // settled, still held
+        p.release();
+        double low = 9;
+        for (int f = 0; f < 120; ++f) {
+            p.step(1.0 / 60);
+            low = std::min(low, p.scaleX());
+        }
+        CHECK(near(low, 1 - 0.254 * L, 0.003));                // undershoot to 13.5 pt on the way back
+        CHECK(!p.moving() && near(p.scaleX(), 1) && near(p.shiftX(), 0)); // nothing runs at rest
+        // drag: 50 pt right of a press at the centre: k = 43 / 3825.649 + 7 / (4 x 3825.649)
+        p.press(14, 14, 7, 7);
+        p.move(57, 7);
+        p.snap();
+        const double k = 43 / lights::STRETCH_DISTANCE + 7 / (4 * lights::STRETCH_DISTANCE);
+        CHECK(near(p.scaleX(), 16.0 / 14 + k) && near(p.scaleY(), 16.0 / 14 - k) && near(p.shiftX(), 14 * k) && near(p.shiftY(), 0));
+        p.move(-43, 7); // left: the shift turns, the scale is the same
+        p.snap();
+        CHECK(near(p.scaleX(), 16.0 / 14 + k) && near(p.shiftX(), -14 * k));
+        // idle: no pointer event for 2 s ends the gesture though the button is still down
+        for (int f = 0; f < 119; ++f)
+            p.step(1.0 / 60);
+        CHECK(p.active());
+        p.step(2.0 / 60);
+        CHECK(!p.active());
+        p.release(); // the mouse-up after it changes nothing
+        CHECK(!p.active());
     }
 
     std::printf(g_fail ? "%d failures\n" : "all tests passed\n", g_fail);

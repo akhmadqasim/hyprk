@@ -29,6 +29,14 @@ namespace lg {
         // POINTER_SIDE turned 45 deg, corner radius POINTER_RADIUS, centred on the rect's centre column POINTER_OFFSET above
         // the pill's bottom edge; its box becomes the square's bounds, and its group unions with smoothness POINTER_SMOOTH.
         bool pointer = false;
+        // tail marker (the Dock menu's tail, AppKit _NSPopupMenuWindowPopoverFrame -> CoreUI __CUICreateMenuPath, GAPS-REA-dock
+        // 1): a 1x1 hole in the shape's region TAIL_ROW rows above its bottom, at x = left + round(tip x from the shape's
+        // true left edge). The shape's bottom edge then carries the tail: TAIL_WIDTH wide at its base, TAIL_HEIGHT out of
+        // the body, tip rounded TAIL_TIP x height, base fillets TAIL_FILLET x height, the tip at that x clamped to
+        // [TAIL_WIDTH / 2, w - TAIL_WIDTH / 2] (centred on a shape narrower than TAIL_WIDTH). Value: the tip's x from the
+        // box's left edge, < 0 = none. Only on shapes at least TAIL_MIN_H tall (the row stays clear of the middle-row
+        // markers); a plugin without it drops the hole with the other stray marker rows, so the menu stays plain.
+        double tail = -1;
         // a compositing fill instead of glass (`fill_layers`, every shape of such a layer): the signed amount per channel
         // (0..1) inside the rounded rect, over what lies there: > 0 plus-lighter (dst + fill), < 0 plus-darker
         // (dst - |fill|), 0 = glass. Qt cannot blend with what the compositor drew (the Cmd-Tab selection tile, the Dock's
@@ -37,6 +45,26 @@ namespace lg {
     };
     inline constexpr double FILL_LIGHTER = 65.0 / 255.0, FILL_DARKER = 57.0 / 255.0;
     inline constexpr double POINTER_SIDE = 16, POINTER_RADIUS = 2.5, POINTER_OFFSET = 4, POINTER_SMOOTH = 25;
+    // CoreUI 27.2.1 __CUICreateMenuPath 0x18f272ce4: arrow width 23.5 (double at 0x18f3287a8), height 13 (fmov #13 at
+    // 0x18f272dd8); __pathForRoundedRectWithAnchor 0x18f2fcfbc: tip arc radius 0.42 h (0x18f2fd3d4), base fillet radius
+    // 0.60 h (0x18f2fd3c4), base corners at +-(W/2 - 0.08 h) on the body edge (0x18f2fd3f0). In pt.
+    inline constexpr double TAIL_WIDTH = 23.5, TAIL_HEIGHT = 13, TAIL_TIP = 0.42, TAIL_FILLET = 0.60, TAIL_BASE_IN = 0.08;
+    inline constexpr int    TAIL_ROW = 3, TAIL_MIN_H = 24;
+    // where the tail's fillets meet the body edge, from the tip's x (pt): +-(this). The fillet circle (radius 0.6 h) touches
+    // the edge line and the side from the base corner (W/2 - 0.08 h, 0) to the tip (0, h): 14.39 pt.
+    double tailFootHalf();
+    // the box a shape draws into: its box, and with a tail the tail's TAIL_HEIGHT under the bottom edge and its fillets'
+    // reach along it
+    SRect shapeBounds(const SGlassShape& s);
+    // the tip's x from the box's left edge after Apple's clamp (__CUICreateNewPopoverPathWithArrowPosition 0x18f272e24)
+    double tailTip(double tail, double w);
+    // signed distance (and outward normal) of a rounded box whose bottom edge carries the tail, p relative to the box
+    // centre, `tip` = the tip's x relative to the box centre, `unit` = px per pt. Mirrors sdBoxTail() in
+    // shaders/liquidglass.frag. Negative inside.
+    struct SDist {
+        double d, nx, ny;
+    };
+    SDist sdBoxTail(double px, double py, double halfW, double halfH, double radius, double tip, double unit);
 
     // Shapes drawn as one smooth-union SDF (GlassEffectContainer-like): indices into the shape list.
     // `lead` is the shape with the largest area; its size picks the size-relative recipe values,
