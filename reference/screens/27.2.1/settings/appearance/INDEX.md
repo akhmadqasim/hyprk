@@ -74,3 +74,16 @@ rest = pointer 120 pt below; hover = pointer on the button centre 0.8 s; pressed
 | control-text-highlight-colour-{rest,hover,pressed,open}-{light,dark}.png | button 927,537 133x24 pt, crop ±24/16 pt; menu 840,458 318x422 | "Text highlight colour" (Automatic): Automatic ✓, Blue, Purple, Pink, Red, Orange, Yellow, Green, Graphite, Choose Colour… | both | window / TahoeLight, TahoeDark |
 | control-folder-colour-{rest,hover,pressed,open}-{light,dark}.png | button 927,439.5 133x24; menu 840,360 296x422 | "Folder colour" (Automatic, shown with icon style Dark): Automatic ✓, Red … Graphite, Choose Colour… | both | same |
 | control-sidebar-icon-size-{rest,hover,pressed,open}-{light,dark}.png | button 964,536 96x24; menu 877,432 246x232 | "Sidebar icon size" (Medium): Small, Medium ✓, Large | both | same |
+
+## Round 7 (R7.1b): Liquid Glass preview capsules, hold and tap
+Display 1440x932 pt (2x), Settings relaunched per mode, window 350,150, Appearance at scroll 0, other apps hidden. Crop
+rect (screen pt) **780,300 292x200** = the preview (scroll area 792,311 268x180) plus a 12 pt margin. The capsules are
+not AX elements; targets from pixels: share glyph 818,336 (share / more capsule 800..873 x 318..354), search capsule
+centre 987,336 (925..1052). Clips `screencapture -x -C -v -V 6.5 -R 780,300,292,200`: pointer on target at about 0.8 s,
+mouse down, 2 s hold while tracing a 14x10 pt rectangle, release, 1 s, then a quick tap (80 ms).
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| preview-hold-shine-share-{light,dark}.mov | clip above, target share | hold (moving) then tap on the share part of the share / more capsule | both | article photo |
+| preview-hold-shine-search-{light,dark}.mov | clip above, target search capsule | hold (moving) then tap on the search capsule | both | article photo |
+| preview-hold-shine-held-{light,dark}.png | `screencapture -x -R` same rect, 0.9 s into the share hold | share held: bright glow inside the capsule around the pressed glyph | both | article photo |

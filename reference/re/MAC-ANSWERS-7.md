@@ -12,3 +12,14 @@ Transparency / Increase Contrast / Reduce Motion off, Stage Manager off and desk
   pointer while it moves inside the held button.
 - Dock-style glass capsule: the Dock has no pressable glass capsule (items are icons; the Dock background is not a
   button), so none was recorded.
+
+## R7.1b Liquid Glass preview capsules, hold and tap: done
+- `screens/27.2.1/settings/appearance/preview-hold-shine-{share,search}-{light,dark}.mov`, `preview-hold-shine-held-{light,dark}.png`
+- Crop rect 780,300 292x200 pt (screen). Targets: share glyph 818,336, search capsule 987,336 (found from pixels; the
+  preview's capsules have no AX elements).
+- Seen: on press the pressed part of the capsule lights up: a soft white glow (light) / a lit, brighter disc (dark)
+  centred under the pointer, inside the capsule shape, and it follows the pointer while held. The capsule keeps its
+  size (no visible stretch with this small movement). Release fades the glow. The quick tap shows a short flash of the
+  same glow.
+- Side effect: the preview is a scroll view, so the held drag also scrolled the article a few points (visible in the
+  clips: the photo shifts, and the search glyph hides when the search capsule's placeholder state changes).
