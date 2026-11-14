@@ -40,3 +40,29 @@ Mouse: no mouse is connected, so the Mouse pane does not exist (its URL opens Ke
 | battery-{00..01}-light.png | 2 | 740x639.5 |
 | keyboard-{00..02}-light.png | 3 | 740x876.5 |
 | trackpad-{00..00}-light.png | 1 | 740x371.5 |
+
+Dark (same method; the end-of-pane test was widened to every AX element in the content area after the Network pane, whose rows have no static text, stopped at its first step):
+
+| files | stills |
+|---|---|
+| general-{00..02}-dark.png | 3 |
+| accessibility-{00..03}-dark.png | 4 |
+| appearance-{00..04}-dark.png | 5 |
+| siri-{00..02}-dark.png | 3 |
+| control-center-{00..05}-dark.png | 6 |
+| desktop-dock-{00..04}-dark.png | 5 |
+| displays-{00..01}-dark.png | 2 |
+| spotlight-{00..02}-dark.png | 3 |
+| wallpaper-{00..04}-dark.png | 5 |
+| notifications-{00..06}-dark.png | 7 |
+| sound-{00..01}-dark.png | 2 |
+| focus-{00..01}-dark.png | 2 |
+| lock-screen-{00..00}-dark.png | 1 |
+| privacy-security-{00..05}-dark.png | 6 |
+| wifi-{00..02}-dark.png | 3 |
+| bluetooth-{00..01}-dark.png | 2 |
+| network-{00..01}-dark.png | 2 |
+| vpn-{00..00}-dark.png | 1 |
+| battery-{00..01}-dark.png | 2 |
+| keyboard-{00..02}-dark.png | 3 |
+| trackpad-{00..00}-dark.png | 1 |

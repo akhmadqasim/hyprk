@@ -112,3 +112,5 @@ Times are clip pts. Keystrokes come from `osascript` so their exact moments are 
   At 1 row (32 pt) the account name sits under the field: it shows only as a faint blur through the glass.
 - Privacy edits (see INDEX): account / Family rows filled below the field, blurred above it, left as is under the field.
   The clip was re-encoded (60 fps CFR) after the edit; the raw clip had VFR timing.
+- Dark: done for the same 21 panes (`{pane}-{NN}-dark.png`, `ax-{pane}-dark.jsonl`), same privacy edits. Wi-Fi in dark
+  lists more networks (all blurred). Step counts match light except where the network list differed.
