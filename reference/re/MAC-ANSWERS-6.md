@@ -19,3 +19,11 @@ Transparency / Increase Contrast / Reduce Motion off, Stage Manager off and desk
 - Frame changes (pts): light/grey: 0.483 to 1.250 s (appear), pause, 1.433 to 1.967 s (fade). Dark/blue: 0.483 to
   1.283 s, pause, 1.483 to 2.000 s. Same timing as round 3 (dark/grey): fade starts about 1.0 s after the first frame
   and lasts about 0.5 s.
+
+## R6.3 Segmented control drag: done (Finder view switcher)
+- `screens/27.2.1/controls/segmented-drag-{light,dark}.mov`
+- Control: Finder toolbar view switcher (the Appearance Light/Dark/Auto choice is not a segmented control).
+- Answer: **no lens.** On mouse down the selected segment's pill darkens (pressed). While dragging, the pill stays on
+  the original segment until the pointer is over the next segment, then the pressed pill **jumps** to that segment
+  (no sliding, no glass lens, no magnification). On release the selection is committed (view changes to list).
+  Same in light and dark.

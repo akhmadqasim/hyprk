@@ -45,3 +45,14 @@ changes), not re-encoded.
 | popup-menu-open-close-dark.mov | `screencapture -x -C -v -V 4.5 -R 800,550,400,382` (pointer shown, 2x, H.264 60 fps time base, VFR), display 1440x932, Settings window at 350,150 | System Settings > Appearance > "Text highlight colour" pop-up (Automatic): pointer glides in, click at 994,670 pt opens the menu (Automatic ✓ over the button, Blue … Green, scroll chevron), 1.2 s later click on "Automatic" (same item, no setting change), menu closes, pointer leaves | dark | TahoeDark |
 | popup-menu-open-close-light.mov | same, 6 s clip, 1.5 s with the menu open | same | light | TahoeLight |
 | switch-press-strip-dark.png | frames from `switch-held-stripes-dark.mov` (round 2, not a new probe run), crop px 150,60 115x80 of each frame, 10 cells labelled frame # and pts | press and hold: rest (0 s), then every 2nd frame (1/30 s) from 0.900 s to 1.150 s while the knob grows into the lens; 1.150 s is the last change before the release at 2.000 s | dark | stripes / window |
+
+## Round 6 (R6.3): segmented control, press and drag
+Settings > Appearance's Light / Dark / Auto are thumbnail buttons, not a segmented control (and a drag there would
+switch the system appearance), so the Finder toolbar view switcher (AXRadioGroup of 4 AXSegment radio buttons,
+714,207 162x38 pt; segments 40.5 pt) was used, in a Finder window on a dummy folder (150,200 1240x400 pt so the
+switcher is not collapsed into a pop-up). Clip `screencapture -x -C -v -V 4.5 -R 690,195,220,62` (pointer shown).
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| segmented-drag-light.mov | mouse down on "icon view" (735,227) at about 0.8 s, held 0.5 s, dragged to "list view" (776,227) over 1.5 s, held 0.5 s, released | pressed segment, drag, selection change to list view | light | window / TahoeLight |
+| segmented-drag-dark.mov | same | same | dark | window / TahoeDark |
