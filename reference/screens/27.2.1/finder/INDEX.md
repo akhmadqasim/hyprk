@@ -33,3 +33,9 @@ Display 1440x932 pt (2x), wallpaper TahoeLight / TahoeDark, other apps hidden. F
 | emoji-in-name-{light,dark}.png | window 400,200 640x360 pt, list view, "Report 😀👍🏽🇮🇩.txt" selected | emoji inside file names in the list ("Photo 🌅.png", "Report 😀👍🏽🇮🇩.txt") | both | window |
 | scrolled-under-toolbar-icon-{light,dark}.png | window 400,150 740x500 pt, icon view arranged by name, folder of 40 coloured 256x192 PNGs + 20 text files; scrolled to the top, then one 36 pt wheel step | the first icon row passing under the toolbar (scroll edge effect) | both | window |
 | scrolled-under-toolbar-list-{light,dark}.png | same window, list view, same scroll | rows (with coloured thumbnails) passing under the toolbar and the column header | both | window |
+
+## Round 6 (R6.5): emoji in a file name, list with columns and a menu
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| emoji-secondary-list-{light,dark}.png | window shot `-o -l`, Finder 300,200 840x320 pt, list view, sidebar and path bar hidden | "Trip 😀👍🏽🇮🇩.txt" with Date Modified / Size / Kind columns | both | window |
+| emoji-secondary-menu-{light,dark}.png | right-click on the TextEdit window title (document = the dummy file), full screen still, crop = the menu window 393,125 344x328 pt (CGWindowList, incl. shadow) | the title path menu: file name with emoji (highlighted), its folders; the home folder and computer name rows are blurred | both | TextEdit window / Tahoe |

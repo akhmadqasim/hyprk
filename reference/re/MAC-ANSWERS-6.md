@@ -37,3 +37,10 @@ Transparency / Increase Contrast / Reduce Motion off, Stage Manager off and desk
   all three to their colours with glyphs (red ×, yellow −, green zoom) while the window stays inactive; pressing the
   close button darkens it (pressed state); release over it closes the window **without** activating the app first
   (Calculator stayed frontmost).
+
+## R6.5 Emoji in a file name, list and menu: done
+- `screens/27.2.1/finder/emoji-secondary-{list,menu}-{light,dark}.png`
+- Menu: the window title path menu (right-click / Cmd-click on the document title) instead of Open Recent (Open Recent
+  lists the user's real documents). Blurred: the home folder name and the computer name.
+- Emoji keep full colour in the list row (secondary columns stay grey text) and in the menu, including the highlighted
+  (selected, accent-filled) menu row; no monochrome fallback.
