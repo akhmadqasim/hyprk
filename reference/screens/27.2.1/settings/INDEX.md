@@ -53,3 +53,14 @@ the rows are found per frame by matching against frame 0 (60 fps CFR re-encode, 
 | sidebar-scrolled-2-{light,dark}.png | scrolled 64 pt | Family row under the field | both | same |
 | sidebar-scrolled-5-{light,dark}.png | scrolled 160 pt | Wi-Fi … Bluetooth gone, Network row under the field, scroller shown | both | same |
 | sidebar-scroll-{light,dark}.mov | `screencapture -x -v -V 7 -R 350,150,232,625` (pointer shown), then redacted and re-encoded at 60 fps CFR | from the top, 180 wheel events of 4 pt every 16 ms down (to the end), 0.4 s pause, 180 of 4 pt back up | both | same |
+
+## Round 6 (R6.1): dark window over flat colours
+Display 1440x932 pt (2x), dark, desktop picture = solid colour 2880x1864, other apps hidden. System Settings relaunched,
+Appearance pane, window 350,150 740x625 (default), pointer outside. Window shot `screencapture -x -o -l<id>` (1480x1250 px).
+Apple Account / Family rows filled with the sidebar colour.
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| window-dark-flat-red.png | window shot | whole window | dark | RGB 255,0,0 |
+| window-dark-flat-green.png | same | same | dark | RGB 0,160,0 |
+| window-dark-flat-navy.png | same | same | dark | RGB 0,0,128 |
