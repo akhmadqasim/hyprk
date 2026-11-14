@@ -37,3 +37,15 @@ Layout numbers: `reference/re/27.2.1/live/settings/appearance/layout.json`.
 |---|---|
 | probe-switches-{light,dark}.png | own probe (`tools/probe/switches.swift`): NSSwitch regular, small, mini; off left, on right (window not key in these shots: grey traffic lights) |
 | scroller-overlay-visible-dark.png | frame from a 60 fps clip (video colours, nv12): right edge of the pane while the overlay scroller is shown, 6 pt knob |
+
+## Round 2 (G1.1): flat grey backdrop
+Display at the default 1440x932 pt (2880x1864 px, 2x). Desktop picture = solid RGB 127,127,127 (2880x1864). Window shot
+`screencapture -x -o -l<id>` (no shadow), 740x625 pt. Pointer moved off the window. NSGlassTintAmount 0.5088. Accent
+Multicolour, icon style Dark. Apple Account / Family rows filled with the sidebar colour (privacy).
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| liquidglass-flat-grey-light.png | window, -o -l | Appearance pane, scroll 0, Liquid Glass preview | light | grey 127 |
+| liquidglass-flat-grey-dark.png | window, -o -l | same | dark | grey 127 |
+| liquidglass-flat-grey-capsules-light.png | crop of the window shot, px x 884..1420, y 322..422 | share / more capsule, copy circle, search capsule at 2x | light | grey 127 |
+| liquidglass-flat-grey-capsules-dark.png | same crop | same | dark | grey 127 |

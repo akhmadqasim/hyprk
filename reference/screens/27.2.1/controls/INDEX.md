@@ -20,3 +20,21 @@ Data is in `reference/re/27.2.1/live/controls/`:
 - `focus-*.json`: the focus ring mask bounds.
 - `controls-press-light.json`: 120 Hz presentation-layer series for switch, slider, segmented, push and checkbox
   presses, plus the pressed-knob glass filter.
+
+## Round 2 (G1.2, G1.3): held controls over stripes
+Display at the default 1440x932 pt (2x). Desktop picture = 2880x1864 PNG of 8 px (4 pt) black / white vertical stripes;
+all other apps hidden. Real System Settings (Desktop & Dock pane, window at 350,150 pt) and Control Centre. Presses are
+synthetic CGEvents (mouse down, hold, up) with the pointer on the control. Stills: `screencapture -x -R` (region, 2x).
+Clips: `screencapture -x -v -V 4 -R` (H.264, 60 fps time base, variable frame rate: frames only when the screen
+changes), not re-encoded.
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| switch-held-stripes-light.png | region 940,560 200x100 pt, 0.6 s into the hold | "Show suggested and recent apps in Dock" switch (on), knob held = glass lens; the switch above is idle for comparison; right 50 pt = desktop stripes | light | stripes |
+| switch-held-stripes-dark.png | same | same | dark | stripes |
+| switch-held-stripes-light.mov | same region, 3.4 s | idle 1 s, press, 1 s hold, release (the switch turns off; it was clicked back on after the clip) | light | stripes |
+| switch-held-stripes-dark.mov | same | same | dark | stripes |
+| slider-held-settings-light.png | region 590,230 130x80 pt, 0.8 s into the hold | Desktop & Dock > Dock Size slider, knob held (lens over the track, no drag) | light | stripes (window content under the knob) |
+| slider-held-settings-dark.png | same | same (extra) | dark | stripes (window content under the knob) |
+| slider-held-cc-light.png | region 1140,450 290x80 pt, 0.8 s into the hold | Control Centre Sound module, knob held | light | stripes |
+| slider-released-cc-light.png | same region, 0.3 s after release | the same knob just after release (lens still shown) | light | stripes |
