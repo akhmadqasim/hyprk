@@ -118,3 +118,58 @@ apps (Finder, Safari, System Settings, TextEdit); 16, 32, 64 (= 32@2x), 128 and 
   the folder's content (document previews; blurred in the crops) and does not change with style.
 - **Finder sidebar glyphs** do not change with the icon style (pixel diff 0 between RegularLight and RegularDark in the
   same mode); they are accent-tinted template symbols that change only with light/dark mode.
+
+## R9.6 Control Centre Sound knob held, layer tree: not done (attach blocked); AX + pixels given
+- Not done: `lldb -p <ControlCenter pid>` → `error: attach failed: attach failed (Not allowed to attach to process.
+  Look in the console messages (Console.app), near the debugserver entries, when the attach failed. …)`. SIP is enabled
+  and was not changed (`glass-r9/attach-errors.txt`). No CA debug tool reads another process's layer tree with SIP on.
+  The closest in-process reproduction is round 8's held SwiftUI `Slider` (`glass-r8/`, MAC-ANSWERS-8 "SwiftUI Slider
+  knob while held"); the Control Centre slider is not the same view, so treat that only as a reference.
+- Files (`re/27.2.1/live/glass-r9/`): `cc-sound-{idle,held}-{dark,light}.png` (Sound module only, rect 1130,y
+  300x72 pt, light over TahoeLight, dark over TahoeDark), `ax-cc-sound-module-held-{dark,light}.jsonl`,
+  `pixel-columns.txt` (columns through the knob over the white fill and the track).
+- AX: slider `controlcenter-volume-slider` 180x14 pt; **while held an `AXValueIndicator` 22.5x17.5 pt appears** (the
+  lens; there is none at rest), centred on the knob position. Module 292x64 pt.
+- Pixels (held, value 0.38, both modes alike): the lens has a **dark 1 px rim** (≈ 60–75 grey) with a brighter inner
+  top band (≈ 150–160) fading down (≈ 116 at the vertical centre, dark), a lighter band just inside the bottom rim
+  (≈ 140–153) and a soft dark shadow under it. **The white fill continues inside the lens up to the knob centre**,
+  dimmed from top to bottom (228 → 206 over the lens height in the column 5 pt left of centre; 243 → 224 at 10 pt
+  left); right of the centre only the darker track shows through. The "Sound" title shifts and a ">" chevron shows
+  while the pointer is over the module.
+- Volume was 38 at the start (not 64) and is 38 after (pressed exactly on the knob, no drag); not changed.
+
+## R9.7 Spotlight results list top edge: not done (no layer access, no AX); pixels given
+- Not done: the panel belongs to the `Siri` process; lldb attach is denied as above, and its AX tree exposes only the
+  menu bar (no window, no list elements), so there are no frames either.
+- Files: `spotlight-top-light-over-{white,grey}.png` (screen rect 460,205 520x218 pt: search bar, app chips and the
+  first result "Calculator"; cut above the second row because the further rows are the user's files),
+  `pixel-columns.txt`.
+- Seen (light mode, query "calculator"): the bar and the list panel are both **dark grey glass even in light mode
+  over a white wallpaper**, with a vertical gradient (lighter toward the bottom of each). The list panel starts ≈ 12 pt
+  below the bar; its top edge is a bright 1 px rim (≈ 160 over white / ≈ 116 over grey at the centre column) on a
+  ≈ 120 / ≈ 68 body; the selected first row is a lighter rounded plate (≈ 142–148 over white, ≈ 84–86 over grey) with
+  a bright top hairline. Over grey everything is darker by the backdrop difference (≈ 50–60 levels), i.e. the panel
+  is translucent, not an opaque fill.
+
+## R9.8 gradientOvalization and key-highlight spread: system surfaces not done; own-process sweep done
+- Dock, Cmd-Tab switcher, Control Centre modules: not done, same attach error (Dock, ControlCenter); nothing else
+  exposes their CA properties.
+- Own process: `re/tools/probe/glassr9.swift` (copy of glassr8 with a 65–190 pt sweep that also logs every
+  `CASDFLayer` effect) → `glass-r9/log-{dark,light}-sweep.json`, `cap-{dark,light}-sweep.png`. SwiftUI
+  `.glassEffect(.regular, in:)` rounded rects, capsules and circles, backdrop grey 128.
+- **gradientOvalization = 0.5 for every shape in the sweep** (all have min side ≥ 65 pt), as in round 8 (> 64 pt).
+- **Key and fill highlight spread grow with the smaller side** (identical in dark and light; `keySpread` =
+  `fillSpread`):
+
+  | shape (pt) | min side | spread |
+  |---|---|---|
+  | 65x65 r16, 70 circle, 80x80 r20, 160x65 capsule, 190x80 capsule | 65–80 | 1.396263 (80.00°) |
+  | 100x100 r24, 500x100 r30 | 100 | 1.403536 (80.42°) |
+  | 120x120 r28 | 120 | 1.439897 (82.50°) |
+  | 140 circle | 140 | 1.476258 (84.58°) |
+  | 150x150 r24 | 150 | 1.494438 (85.63°) |
+  | 190x190 r32, 300x190 r24 | 190 | 1.567160 (89.79°) |
+
+  Exact fit: **spread = 80° + (min(W,H) − 96) × 10°/96, clamped to [80°, 90°]** (80° up to 96 pt, 90° from 192 pt
+  on; slope 0.104167 °/pt = 0.0018181 rad/pt, residual 0). Round 8's "80° for ≤ 64 pt, 90° for large" are the two
+  ends of this ramp. Other highlight inputs unchanged (amount 0.5, diffuseSpreadScale 0.65).

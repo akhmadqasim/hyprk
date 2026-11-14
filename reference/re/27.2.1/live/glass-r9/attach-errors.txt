@@ -1,0 +1,5 @@
+csrutil status: System Integrity Protection status: enabled. (not changed)
+lldb --batch -p <pid> -o "process detach" (Xcode lldb, user session):
+ControlCenter: error: attach failed: attach failed (Not allowed to attach to process.  Look in the console messages (Console.app), near the debugserver entries, when the attach failed.  The subsystem that denied the attach permission will likely have logged an informative message about why it was denied.)
+Dock: error: attach failed: attach failed (Not allowed to attach to process.  Look in the console messages (Console.app), near the debugserver entries, when the attach failed.  The subsystem that denied the attach permission will likely have logged an informative message about why it was denied.)
+Spotlight UI (process "Siri" while the panel is open): AX exposes only the menu bar, the panel has no AX window/elements.

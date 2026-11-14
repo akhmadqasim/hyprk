@@ -1,0 +1,1184 @@
+{
+  "elements" : [
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 16,
+      "inWindow" : [
+        10,
+        565,
+        65,
+        65
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 20,
+      "inWindow" : [
+        350,
+        550,
+        80,
+        80
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 24,
+      "inWindow" : [
+        690,
+        530,
+        100,
+        100
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 28,
+      "inWindow" : [
+        1030,
+        510,
+        120,
+        120
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 24,
+      "inWindow" : [
+        10,
+        270,
+        150,
+        150
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 32,
+      "inWindow" : [
+        350,
+        230,
+        190,
+        190
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 32.5,
+      "inWindow" : [
+        690,
+        355,
+        160,
+        65
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 40,
+      "inWindow" : [
+        1030,
+        340,
+        190,
+        80
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "circular",
+      "cornerRadius" : 35,
+      "inWindow" : [
+        10,
+        140,
+        70,
+        70
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "circular",
+      "cornerRadius" : 70,
+      "inWindow" : [
+        350,
+        70,
+        140,
+        140
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 30,
+      "inWindow" : [
+        690,
+        110,
+        500,
+        100
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 24,
+      "inWindow" : [
+        860,
+        30,
+        300,
+        190
+      ],
+      "oval" : 0.5
+    }
+  ],
+  "sdfLayers" : [
+    {
+      "inWindow" : [
+        10,
+        565,
+        65,
+        65
+      ],
+      "name" : "@0",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFOutputEffect",
+          "maximum" : 8.8903576685517134,
+          "minimum" : -10000
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        10,
+        565,
+        65,
+        65
+      ],
+      "name" : "@2",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFKeyFillHighlightEffect",
+          "curvature" : 0.75,
+          "diffuseAmountScale" : 0.15000000596046448,
+          "diffuseHeightScale" : 8,
+          "diffuseSpreadScale" : 0.64999997615814209,
+          "fillAmount" : 0.5,
+          "fillAngle" : 3.1415926535897931,
+          "fillColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "fillHeight" : 1,
+          "fillHeightOffset" : 0,
+          "fillHeightScale" : 1,
+          "fillSpread" : 1.3962634015954636,
+          "fillSpreadOffset" : 0,
+          "fillSpreadScale" : 1,
+          "global" : false,
+          "keyAmount" : 0.5,
+          "keyAngle" : 0,
+          "keyColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "keyHeight" : 1,
+          "keyHeightOffset" : 0,
+          "keyHeightScale" : 1,
+          "keySpread" : 1.3962634015954636,
+          "keySpreadOffset" : 0,
+          "keySpreadScale" : 1
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        350,
+        550,
+        80,
+        80
+      ],
+      "name" : "@0",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFOutputEffect",
+          "maximum" : 9.1080503475952685,
+          "minimum" : -10000
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        350,
+        550,
+        80,
+        80
+      ],
+      "name" : "@2",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFKeyFillHighlightEffect",
+          "curvature" : 0.75,
+          "diffuseAmountScale" : 0.15000000596046448,
+          "diffuseHeightScale" : 8,
+          "diffuseSpreadScale" : 0.64999997615814209,
+          "fillAmount" : 0.5,
+          "fillAngle" : 3.1415926535897931,
+          "fillColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "fillHeight" : 1,
+          "fillHeightOffset" : 0,
+          "fillHeightScale" : 1,
+          "fillSpread" : 1.3962634015954636,
+          "fillSpreadOffset" : 0,
+          "fillSpreadScale" : 1,
+          "global" : false,
+          "keyAmount" : 0.5,
+          "keyAngle" : 0,
+          "keyColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "keyHeight" : 1,
+          "keyHeightOffset" : 0,
+          "keyHeightScale" : 1,
+          "keySpread" : 1.3962634015954636,
+          "keySpreadOffset" : 0,
+          "keySpreadScale" : 1
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        690,
+        530,
+        100,
+        100
+      ],
+      "name" : "@0",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFOutputEffect",
+          "maximum" : 16.513942886822743,
+          "minimum" : -10000
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        690,
+        530,
+        100,
+        100
+      ],
+      "name" : "@2",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFKeyFillHighlightEffect",
+          "curvature" : 0.75,
+          "diffuseAmountScale" : 0.15000000596046448,
+          "diffuseHeightScale" : 8,
+          "diffuseSpreadScale" : 0.64999997615814209,
+          "fillAmount" : 0.5,
+          "fillAngle" : 3.1415926535897931,
+          "fillColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "fillHeight" : 1,
+          "fillHeightOffset" : 0,
+          "fillHeightScale" : 1,
+          "fillSpread" : 1.4035356068121065,
+          "fillSpreadOffset" : 0,
+          "fillSpreadScale" : 1,
+          "global" : false,
+          "keyAmount" : 0.5,
+          "keyAngle" : 0,
+          "keyColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "keyHeight" : 1,
+          "keyHeightOffset" : 0,
+          "keyHeightScale" : 1,
+          "keySpread" : 1.4035356068121065,
+          "keySpreadOffset" : 0,
+          "keySpreadScale" : 1
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        1030,
+        510,
+        120,
+        120
+      ],
+      "name" : "@0",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFOutputEffect",
+          "maximum" : 24.32773964674125,
+          "minimum" : -10000
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        1030,
+        510,
+        120,
+        120
+      ],
+      "name" : "@2",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFKeyFillHighlightEffect",
+          "curvature" : 0.75,
+          "diffuseAmountScale" : 0.15000000596046448,
+          "diffuseHeightScale" : 8,
+          "diffuseSpreadScale" : 0.64999997615814209,
+          "fillAmount" : 0.5,
+          "fillAngle" : 3.1415926535897931,
+          "fillColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "fillHeight" : 1,
+          "fillHeightOffset" : 0,
+          "fillHeightScale" : 1,
+          "fillSpread" : 1.4398966328953218,
+          "fillSpreadOffset" : 0,
+          "fillSpreadScale" : 1,
+          "global" : false,
+          "keyAmount" : 0.5,
+          "keyAngle" : 0,
+          "keyColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "keyHeight" : 1,
+          "keyHeightOffset" : 0,
+          "keyHeightScale" : 1,
+          "keySpread" : 1.4398966328953218,
+          "keySpreadOffset" : 0,
+          "keySpreadScale" : 1
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        10,
+        270,
+        150,
+        150
+      ],
+      "name" : "@0",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFOutputEffect",
+          "maximum" : 36.243672883490525,
+          "minimum" : -10000
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        10,
+        270,
+        150,
+        150
+      ],
+      "name" : "@2",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFKeyFillHighlightEffect",
+          "curvature" : 0.75,
+          "diffuseAmountScale" : 0.15000000596046448,
+          "diffuseHeightScale" : 8,
+          "diffuseSpreadScale" : 0.64999997615814209,
+          "fillAmount" : 0.5,
+          "fillAngle" : 3.1415926535897931,
+          "fillColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "fillHeight" : 1,
+          "fillHeightOffset" : 0,
+          "fillHeightScale" : 1,
+          "fillSpread" : 1.4944381720201447,
+          "fillSpreadOffset" : 0,
+          "fillSpreadScale" : 1,
+          "global" : false,
+          "keyAmount" : 0.5,
+          "keyAngle" : 0,
+          "keyColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "keyHeight" : 1,
+          "keyHeightOffset" : 0,
+          "keyHeightScale" : 1,
+          "keySpread" : 1.4944381720201447,
+          "keySpreadOffset" : 0,
+          "keySpreadScale" : 1
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        350,
+        230,
+        190,
+        190
+      ],
+      "name" : "@0",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFOutputEffect",
+          "maximum" : 39.830303088101473,
+          "minimum" : -10000
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        350,
+        230,
+        190,
+        190
+      ],
+      "name" : "@2",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFKeyFillHighlightEffect",
+          "curvature" : 0.75,
+          "diffuseAmountScale" : 0.15000000596046448,
+          "diffuseHeightScale" : 8,
+          "diffuseSpreadScale" : 0.64999997615814209,
+          "fillAmount" : 0.5,
+          "fillAngle" : 3.1415926535897931,
+          "fillColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "fillHeight" : 1,
+          "fillHeightOffset" : 0,
+          "fillHeightScale" : 1,
+          "fillSpread" : 1.567160224186575,
+          "fillSpreadOffset" : 0,
+          "fillSpreadScale" : 1,
+          "global" : false,
+          "keyAmount" : 0.5,
+          "keyAngle" : 0,
+          "keyColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "keyHeight" : 1,
+          "keyHeightOffset" : 0,
+          "keyHeightScale" : 1,
+          "keySpread" : 1.567160224186575,
+          "keySpreadOffset" : 0,
+          "keySpreadScale" : 1
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        690,
+        355,
+        160,
+        65
+      ],
+      "name" : "@0",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFOutputEffect",
+          "maximum" : 8.8903576685517134,
+          "minimum" : -10000
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        690,
+        355,
+        160,
+        65
+      ],
+      "name" : "@2",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFKeyFillHighlightEffect",
+          "curvature" : 0.75,
+          "diffuseAmountScale" : 0.15000000596046448,
+          "diffuseHeightScale" : 8,
+          "diffuseSpreadScale" : 0.64999997615814209,
+          "fillAmount" : 0.5,
+          "fillAngle" : 3.1415926535897931,
+          "fillColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "fillHeight" : 1,
+          "fillHeightOffset" : 0,
+          "fillHeightScale" : 1,
+          "fillSpread" : 1.3962634015954636,
+          "fillSpreadOffset" : 0,
+          "fillSpreadScale" : 1,
+          "global" : false,
+          "keyAmount" : 0.5,
+          "keyAngle" : 0,
+          "keyColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "keyHeight" : 1,
+          "keyHeightOffset" : 0,
+          "keyHeightScale" : 1,
+          "keySpread" : 1.3962634015954636,
+          "keySpreadOffset" : 0,
+          "keySpreadScale" : 1
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        1030,
+        340,
+        190,
+        80
+      ],
+      "name" : "@0",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFOutputEffect",
+          "maximum" : 9.1080503475952685,
+          "minimum" : -10000
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        1030,
+        340,
+        190,
+        80
+      ],
+      "name" : "@2",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFKeyFillHighlightEffect",
+          "curvature" : 0.75,
+          "diffuseAmountScale" : 0.15000000596046448,
+          "diffuseHeightScale" : 8,
+          "diffuseSpreadScale" : 0.64999997615814209,
+          "fillAmount" : 0.5,
+          "fillAngle" : 3.1415926535897931,
+          "fillColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "fillHeight" : 1,
+          "fillHeightOffset" : 0,
+          "fillHeightScale" : 1,
+          "fillSpread" : 1.3962634015954636,
+          "fillSpreadOffset" : 0,
+          "fillSpreadScale" : 1,
+          "global" : false,
+          "keyAmount" : 0.5,
+          "keyAngle" : 0,
+          "keyColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "keyHeight" : 1,
+          "keyHeightOffset" : 0,
+          "keyHeightScale" : 1,
+          "keySpread" : 1.3962634015954636,
+          "keySpreadOffset" : 0,
+          "keySpreadScale" : 1
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        10,
+        140,
+        70,
+        70
+      ],
+      "name" : "@0",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFOutputEffect",
+          "maximum" : 8.8903576685517134,
+          "minimum" : -10000
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        10,
+        140,
+        70,
+        70
+      ],
+      "name" : "@2",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFKeyFillHighlightEffect",
+          "curvature" : 0.75,
+          "diffuseAmountScale" : 0.15000000596046448,
+          "diffuseHeightScale" : 8,
+          "diffuseSpreadScale" : 0.64999997615814209,
+          "fillAmount" : 0.5,
+          "fillAngle" : 3.1415926535897931,
+          "fillColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "fillHeight" : 1,
+          "fillHeightOffset" : 0,
+          "fillHeightScale" : 1,
+          "fillSpread" : 1.3962634015954636,
+          "fillSpreadOffset" : 0,
+          "fillSpreadScale" : 1,
+          "global" : false,
+          "keyAmount" : 0.5,
+          "keyAngle" : 0,
+          "keyColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "keyHeight" : 1,
+          "keyHeightOffset" : 0,
+          "keyHeightScale" : 1,
+          "keySpread" : 1.3962634015954636,
+          "keySpreadOffset" : 0,
+          "keySpreadScale" : 1
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        350,
+        70,
+        140,
+        140
+      ],
+      "name" : "@0",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFOutputEffect",
+          "maximum" : 32.461413657278314,
+          "minimum" : -10000
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        350,
+        70,
+        140,
+        140
+      ],
+      "name" : "@2",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFKeyFillHighlightEffect",
+          "curvature" : 0.75,
+          "diffuseAmountScale" : 0.15000000596046448,
+          "diffuseHeightScale" : 8,
+          "diffuseSpreadScale" : 0.64999997615814209,
+          "fillAmount" : 0.5,
+          "fillAngle" : 3.1415926535897931,
+          "fillColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "fillHeight" : 1,
+          "fillHeightOffset" : 0,
+          "fillHeightScale" : 1,
+          "fillSpread" : 1.476257658978537,
+          "fillSpreadOffset" : 0,
+          "fillSpreadScale" : 1,
+          "global" : false,
+          "keyAmount" : 0.5,
+          "keyAngle" : 0,
+          "keyColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "keyHeight" : 1,
+          "keyHeightOffset" : 0,
+          "keyHeightScale" : 1,
+          "keySpread" : 1.476257658978537,
+          "keySpreadOffset" : 0,
+          "keySpreadScale" : 1
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        690,
+        110,
+        500,
+        100
+      ],
+      "name" : "@0",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFOutputEffect",
+          "maximum" : 16.513942886822743,
+          "minimum" : -10000
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        690,
+        110,
+        500,
+        100
+      ],
+      "name" : "@2",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFKeyFillHighlightEffect",
+          "curvature" : 0.75,
+          "diffuseAmountScale" : 0.15000000596046448,
+          "diffuseHeightScale" : 8,
+          "diffuseSpreadScale" : 0.64999997615814209,
+          "fillAmount" : 0.5,
+          "fillAngle" : 3.1415926535897931,
+          "fillColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "fillHeight" : 1,
+          "fillHeightOffset" : 0,
+          "fillHeightScale" : 1,
+          "fillSpread" : 1.4035356068121065,
+          "fillSpreadOffset" : 0,
+          "fillSpreadScale" : 1,
+          "global" : false,
+          "keyAmount" : 0.5,
+          "keyAngle" : 0,
+          "keyColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "keyHeight" : 1,
+          "keyHeightOffset" : 0,
+          "keyHeightScale" : 1,
+          "keySpread" : 1.4035356068121065,
+          "keySpreadOffset" : 0,
+          "keySpreadScale" : 1
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        860,
+        30,
+        300,
+        190
+      ],
+      "name" : "@0",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFOutputEffect",
+          "maximum" : 39.830303088101473,
+          "minimum" : -10000
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    },
+    {
+      "inWindow" : [
+        860,
+        30,
+        300,
+        190
+      ],
+      "name" : "@2",
+      "props" : {
+        "_class" : "CASDFLayer",
+        "effect" : {
+          "_class" : "CASDFKeyFillHighlightEffect",
+          "curvature" : 0.75,
+          "diffuseAmountScale" : 0.15000000596046448,
+          "diffuseHeightScale" : 8,
+          "diffuseSpreadScale" : 0.64999997615814209,
+          "fillAmount" : 0.5,
+          "fillAngle" : 3.1415926535897931,
+          "fillColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "fillHeight" : 1,
+          "fillHeightOffset" : 0,
+          "fillHeightScale" : 1,
+          "fillSpread" : 1.567160224186575,
+          "fillSpreadOffset" : 0,
+          "fillSpreadScale" : 1,
+          "global" : false,
+          "keyAmount" : 0.5,
+          "keyAngle" : 0,
+          "keyColor" : {
+            "c" : [
+              1,
+              1,
+              1,
+              1
+            ],
+            "space" : "kCGColorSpaceExtendedSRGB"
+          },
+          "keyHeight" : 1,
+          "keyHeightOffset" : 0,
+          "keyHeightScale" : 1,
+          "keySpread" : 1.567160224186575,
+          "keySpreadOffset" : 0,
+          "keySpreadScale" : 1
+        },
+        "effectOffset" : 0,
+        "experimentalCulling" : false,
+        "gaussianRadius" : 0,
+        "mergeElements" : false,
+        "smoothness" : 8
+      }
+    }
+  ],
+  "sizes" : [
+    [
+      65,
+      65,
+      16,
+      0
+    ],
+    [
+      80,
+      80,
+      20,
+      0
+    ],
+    [
+      100,
+      100,
+      24,
+      0
+    ],
+    [
+      120,
+      120,
+      28,
+      0
+    ],
+    [
+      150,
+      150,
+      24,
+      0
+    ],
+    [
+      190,
+      190,
+      32,
+      0
+    ],
+    [
+      160,
+      65,
+      0,
+      1
+    ],
+    [
+      190,
+      80,
+      0,
+      1
+    ],
+    [
+      70,
+      70,
+      0,
+      2
+    ],
+    [
+      140,
+      140,
+      0,
+      2
+    ],
+    [
+      500,
+      100,
+      30,
+      0
+    ],
+    [
+      300,
+      190,
+      24,
+      0
+    ]
+  ]
+}

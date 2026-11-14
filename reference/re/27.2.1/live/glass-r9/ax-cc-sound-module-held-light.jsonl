@@ -1,0 +1,7 @@
+{"depth": 2, "enabled": true, "frame": [1134, 449, 292, 64], "identifier": "module-Sound", "path": "0/0/12", "role": "AXGroup"}
+{"depth": 3, "enabled": true, "frame": [1168, 484, 180, 14], "path": "0/0/12/0", "role": "AXGroup"}
+{"depth": 4, "description": "Volume Lower", "enabled": true, "frame": [1150.5, 484.5, 9.5, 13.5], "path": "0/0/12/0/0", "role": "AXButton"}
+{"depth": 4, "description": "sound volume", "enabled": true, "frame": [1168, 484, 180, 14], "identifier": "controlcenter-volume-slider", "path": "0/0/12/0/1", "role": "AXSlider", "value": 0.3750000298023224}
+{"depth": 5, "enabled": true, "frame": [1227, 482.5, 22.5, 17.5], "path": "0/0/12/0/1/0", "role": "AXValueIndicator"}
+{"depth": 4, "description": "Volume Higher", "enabled": true, "frame": [1354.5, 483.5, 21, 15.5], "path": "0/0/12/0/2", "role": "AXButton"}
+{"depth": 3, "description": "Airplay Audio", "enabled": true, "frame": [1386, 478, 26, 26], "identifier": "controlcenter-airplay", "path": "0/0/12/1", "role": "AXCheckBox", "subrole": "AXToggle", "value": 0}
