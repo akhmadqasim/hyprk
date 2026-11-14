@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Play a macOS system sound for an event. Used by the shell (QML), the Finder and Hyprland binds, so all honor the same
 # settings in state/sound.json:
-#   alertSound (one of the 14 /System/Library/Sounds names, default "Tink"), alertVolume (0..1, default 0.75),
+#   alertSound (one of the 14 /System/Library/Sounds names, default "Tink"), alertVolume (0..1, default 1),
 #   uiSounds (bool, default true), volumeFeedback (bool, default false, as the Settings app shows it)
 # Usage: sound.sh <event> [arg]
 #   alert                          the alert sound (NSBeep, SystemSoundID 0x1000)
@@ -39,9 +39,9 @@ SND=$ROOT/sounds
 STATE=${HYPRK_STATE:-$ROOT/state}/sound.json
 ALERTS=" Basso Blow Bottle Frog Funk Glass Hero Morse Ping Pop Purr Sosumi Submarine Tink "
 
-alert="Tink"; vol=0.75; ui=true; fb=false
+alert="Tink"; vol=1; ui=true; fb=false
 if [ -r "$STATE" ] && command -v jq >/dev/null; then
-    IFS=$'\t' read -r alert vol ui fb < <(jq -r '[(if (.alertSound | type) == "string" and .alertSound != "" then .alertSound else "Tink" end), (if (.alertVolume | type) == "number" then .alertVolume else 0.75 end), (if .uiSounds == false then "false" else "true" end), (if .volumeFeedback == true then "true" else "false" end)] | @tsv' "$STATE" 2>/dev/null || printf 'Tink\t0.75\ttrue\tfalse\n')
+    IFS=$'\t' read -r alert vol ui fb < <(jq -r '[(if (.alertSound | type) == "string" and .alertSound != "" then .alertSound else "Tink" end), (if (.alertVolume | type) == "number" then .alertVolume else 1 end), (if .uiSounds == false then "false" else "true" end), (if .volumeFeedback == true then "true" else "false" end)] | @tsv' "$STATE" 2>/dev/null || printf 'Tink\t1\ttrue\tfalse\n')
 fi
 case "$ALERTS" in *" $alert "*) ;; *) alert=Tink ;; esac
 
@@ -79,6 +79,11 @@ esac
 [ -n "${HYPRK_SOUND_LOG:-}" ] && printf '%s %s\n' "$ev" "$f" >> "$HYPRK_SOUND_LOG"
 [ "${HYPRK_MUTE:-0}" = 1 ] && exit 0      # silent test runs
 
+# The Alert volume slider s is not the gain: Settings stores exp(s - 1) (0 when s is 0) in com.apple.sound.beep.volume
+# (Sound.appex -[AppleSound_SoundSettings setAlertSoundVolume:] 0x100007f98) and systemsoundserverd multiplies that
+# into its mixer's linear input gain (reference/re/27.2.1/SOUND-REA-27.2.1.md section 1): -6.5 dB at s = .25, -4.3 at
+# .5, -2.2 at .75. It was the slider itself as a linear gain (-12 / -6 / -2.5 dB). The stock value is s = 1.
+vol=$(LC_ALL=C awk -v s="$vol" 'BEGIN { s = s < 0 ? 0 : s > 1 ? 1 : s; printf "%.4f", s == 0 ? 0 : exp(s - 1) }')
 case "$ev" in volume|power) vol=1 ;; esac    # NSSound, not systemsoundserverd: no alert volume
 if [ "$ev" = volume ]; then   # restart, never overlap: stop this session's previous pop (only a player of that file)
     pidf=${XDG_RUNTIME_DIR:-/tmp}/hyprk-volume-pop-${HYPRLAND_INSTANCE_SIGNATURE:-0}.pid

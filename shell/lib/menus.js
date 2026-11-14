@@ -5,10 +5,20 @@
 // Actions are names MenuDropdown.trigger() runs: plain names ("close", "settings", …) and
 //   "keys:<MODS>,<key>"  the app's own shortcut, sent to the active window (hl.dsp.send_shortcut)
 //   "finder" / "finder:<location>"  a Finder window (at "recents:", "applications:", "home" or "xdg:<XDG dir>")
-//   "about-app:<name>", "spotlight:<mode>"
+//   "about-app:<name>", "spotlight:<mode>", "emoji" (Emoji & Symbols, modules/EmojiPicker.qml)
 .pragma library
 
 const SEP = { sep: true };
+
+// The images AppKit 27.2.1 gives the Edit menu's three appends (reference/re/27.2.1/MENUS-REA-27.2.1.md "Edit menu
+// icons"): AutoFill = +[NSMenuItem _standardAutoFillMenuItem] (0x18aa1103c) sets the private symbol
+// "rectangle.and.pencil.and.ellipsis" with _setActionImage: and _setImageVisibility:; Start Dictation and Emoji &
+// Symbols get the automatic image of their action from AppKit's table (cstrings 0x1e28a55a0..: startDictation: ->
+// "microphone", orderFrontCharacterPalette: -> "emoji.face.grinning"); Q-menubar-17 saw all three drawn. The three
+// glyphs are decoded from the 27.2.1 CoreGlyphs / CoreGlyphsPrivate BVG data (themes/icons/sf-symbols/names.json,
+// tools/add-sf.py; reference/re/27.2.1/ICONS-REA-27.2.1.md part 1).
+const editIcons = { autofill: { icon: "rectangle.and.pencil.and.ellipsis" }, dictation: { icon: "microphone" },
+                    emoji: { icon: "emoji.face.grinning" } };
 
 // a row that runs `action`, or shows disabled when there is none
 function row(label, shortcut, action, extra) {
@@ -21,11 +31,30 @@ function row(label, shortcut, action, extra) {
 // a submenu row without content: disabled
 function sub(label, extra) { return Object.assign({ label: label, submenu: true, disabled: true }, extra || {}); }
 
-// Apple menu (Q-menubar-31, -17): About [laptopcomputer: not in our symbol set], System Settings [gear], App Store
-// [appstore]; the Option alternates are not built
+// Finder's Sort By and Clean Up By submenus (27.2.1 Finder.app). Sort By = Base.lproj/ArrangeByMenu.nib outlet
+// sortByMenu (TArrangeByMenuController): None ⌃⌥⌘0, separator, Snap to Grid, separator, Name ⌃⌥⌘1, Kind ⌃⌥⌘2, [Shared By,
+// Last Modified By: shared iCloud items only], Date Last Opened ⌃⌥⌘3, Date Added ⌃⌥⌘4, Date Modified ⌃⌥⌘5, Date Created,
+// Size ⌃⌥⌘6, Tags ⌃⌥⌘7. Clean Up By = -[TContextMenu addViewSpecificStuffToMenu:...] 0x10042098c, the six titles of the
+// table at 0x100b267a8: N220 Name, N224 Kind, N221 Date Modified, N222 Date Created, N223 Size, N225 Tags. The desktop has
+// no icon layout of its own here, so every row is disabled; `keys` = with the nib's key equivalents (menu bar), without
+// (context menus: TArrangeByMenuController removeCommandKeyEquivalents)
+function sortByRows(keys) {
+    const k = c => keys ? "⌃⌥⌘" + c : "";
+    return [row("None", k("0")), SEP, row("Snap to Grid", ""), SEP, row("Name", k("1")), row("Kind", k("2")),
+            row("Date Last Opened", k("3")), row("Date Added", k("4")), row("Date Modified", k("5")), row("Date Created", ""),
+            row("Size", k("6")), row("Tags", k("7"))];
+}
+function cleanUpByRows() {
+    return ["Name", "Kind", "Date Modified", "Date Created", "Size", "Tags"].map(l => row(l, ""));
+}
+
+// Apple menu (Q-menubar-31, -17; labels: AppKit.framework/Resources/Menus.loctable "About This Mac",
+// "System Settings...", "App Store", "Recent Items", "Force Quit...", "Sleep", "Restart...", "Shut Down...", "Lock Screen",
+// "Log Out %@..."; AppKit builds this menu, not the app): About [laptopcomputer, decoded from CoreGlyphs], System
+// Settings [gear], App Store [appstore]; the Option alternates are not built
 function apple(user) {
     return [
-        row("About This Computer", "", "about"),
+        row("About This Mac", "", "about", { icon: "laptopcomputer" }),
         SEP,
         row("System Settings…", "", "settings", { icon: "gear" }),
         row("App Store", "", null, { icon: "appstore" }),
@@ -95,9 +124,10 @@ function finderMenus(win) {
             SEP,
             f("Search", "⌘F", "spotlight", "keys:CTRL,f", { icon: "magnifyingglass" }),
             SEP,
-            sub("AutoFill"),
-            f("Start Dictation", ""),
-            f("Emoji & Symbols", ""),
+            // AppKit's three appends with their 27.2.1 images (editIcons, top of this file)
+            sub("AutoFill", editIcons.autofill),
+            f("Start Dictation", "", null, null, editIcons.dictation),
+            f("Emoji & Symbols", "", "emoji", "emoji", editIcons.emoji),
         ],
         "View": [
             f("as Icons", "⌘1", null, "keys:CTRL,1", { icon: "square.grid.2x2" }),
@@ -106,9 +136,9 @@ function finderMenus(win) {
             f("as Gallery", "⌘4", null, "keys:CTRL,4", { icon: "squares.below.rectangle" }),
             SEP,
             f("Use Stacks", "⌃⌘0"),
-            sub("Sort By"),
+            { label: "Sort By", submenu: true, items: sortByRows(true) },
             f("Clean Up", ""),
-            sub("Clean Up By"),
+            { label: "Clean Up By", submenu: true, items: cleanUpByRows() },
             SEP,
             f("Show Tab Bar", "⇧⌘T"),
             f("Show All Tabs", "⇧⌘\\"),
@@ -155,20 +185,21 @@ function finderMenus(win) {
     };
 }
 
-// Window menu: the Finder's rows (finder-menus-ax.txt) or the short list of other apps
+// Window menu: the rows AppKit puts in every app's Window menu (labels: AppKit.framework/Resources/
+// MenuCommands.loctable "Minimize", "Zoom", "Fill", "Center", "Move & Resize", "Full Screen Tile", "Bring All to Front",
+// "Cycle Through Windows", "Remove Window from Set", "Show Previous Tab", "Show Next Tab", "Move Tab to New Window",
+// "Merge All Windows"), in the order and with the keys of the Finder's Window menu (finder-menus-ax.txt); the Finder
+// adds Show Progress Window. The open-window list after it: windowList (forIndex adds it).
 function windowMenu(win, finder) {
     const w = (label, shortcut, action) => row(label, shortcut, win ? action : null);
-    const top = [
+    return [
         w("Minimize", "⌘M", "minimize"),
         w("Zoom", "", "zoom"),
         w("Fill", "fn⌃F", "zoom"),
         w("Center", "fn⌃C", "center"),
         SEP,
         sub("Move & Resize"),
-    ];
-    if (!finder) return top.concat([SEP, row("Bring All to Front", "")]);
-    return top.concat([
-        sub("Full-Screen Tile"),
+        sub("Full Screen Tile"),
         SEP,
         row("Bring All to Front", ""),
         row("Cycle Through Windows", "⌘`", "cycle"),
@@ -178,26 +209,51 @@ function windowMenu(win, finder) {
         row("Show Next Tab", "⌃⇥"),
         row("Move Tab to New Window", ""),
         row("Merge All Windows", ""),
-        SEP,
-        row("Show Progress Window", ""),
-    ]);
+    ].concat(finder ? [SEP, row("Show Progress Window", "")] : []);
 }
 
-// other apps: the common rows send the app's Linux shortcut (Ctrl for ⌘)
+// other apps: the rows AppKit gives every app (the app's own rows are not known here), sending the app's Linux
+// shortcut (Ctrl for ⌘). Edit: the standard rows, then the three AppKit appends (finder-menus-ax.txt Edit tail). View:
+// AppKit's tab and full-screen rows (MenuCommands.loctable "Show Tab Bar", "Show All Tabs", "Enter Full Screen", keys as
+// in the Finder's View menu). Help: the search field row and "<App> Help" (helpMenu(), the app template's row).
 const common = {
     "Edit": [
         row("Undo", "⌘Z", "keys:CTRL,z"), row("Redo", "⇧⌘Z", "keys:CTRL SHIFT,z"), SEP,
         row("Cut", "⌘X", "keys:CTRL,x"), row("Copy", "⌘C", "keys:CTRL,c"), row("Paste", "⌘V", "keys:CTRL,v"),
         row("Select All", "⌘A", "keys:CTRL,a"), SEP,
-        sub("AutoFill"), row("Start Dictation", ""), row("Emoji & Symbols", ""),
+        sub("AutoFill", editIcons.autofill), row("Start Dictation", "", null, editIcons.dictation),
+        row("Emoji & Symbols", "", "emoji", editIcons.emoji),
     ],
     "View": [
-        row("Show Tab Bar", ""), row("Show All Tabs", ""), SEP,
-        row("Show Sidebar", "⌃⌘S"), SEP, row("Enter Full Screen", "fn F", "fullscreen"),
+        row("Show Tab Bar", "⇧⌘T"), row("Show All Tabs", "⇧⌘\\"), SEP,
+        row("Enter Full Screen", "fn F", "fullscreen"),
     ],
     "Window": windowMenu(true, false),
-    "Help": [row("Search", ""), SEP, row("Help", "⌘?")],
 };
+// Help of other apps: AppKit's search field (drawn as a plain row, disabled) and the app's "<App> Help ⌘?" (no help
+// book here: disabled)
+function helpMenu(name) { return [row("Search", ""), row((name || "App") + " Help", "⌘?")]; }
+
+// System Settings (27.2.1 System Settings.app, SettingsApp/SettingsAppCommands.swift, decoded with Ghidra 12.1.4:
+// FUN_10002bca8 is the Commands body). View: CommandGroup(before: .toolbar) FUN_10002cf84 = Back ⌘[ (label 0x10002df80),
+// Forward ⌘] (0x10002e170), Divider, Search ⌘F with Image(systemName: "magnifyingglass") (0x10002e46c / 0x10002e650),
+// Divider; CommandGroup(after: .toolbar) FUN_10002e704 adds the pane list (not built here). Back, Forward and Search act
+// in our Settings window through its own Ctrl shortcuts; with no Settings window focused they stay disabled.
+function settingsView() {
+    return [
+        row("Back", "⌘[", "keys:CTRL,bracketleft"),
+        row("Forward", "⌘]", "keys:CTRL,bracketright"), SEP,
+        row("Search", "⌘F", "keys:CTRL,f", { icon: "magnifyingglass" }),
+    ];
+}
+// Help: AppKit's search field, then CommandGroup(after: .help) HelpMenu FUN_100066b04: "Mac User Guide" with
+// Image(systemName: "book.pages") (0x1000676a8 / 0x10006798c; decoded from CoreGlyphs), Divider,
+// "User Manual", "macOS Support", "<model> Specifications" (0x100067f60), "Hardware Support" (0x100068504). They open
+// Apple web pages: disabled here.
+function settingsHelp() {
+    return [row("Search", ""), row("Mac User Guide", "", null, { icon: "book.pages" }), SEP, row("User Manual", ""), row("macOS Support", ""),
+            row("Mac Specifications", ""), row("Hardware Support", "")];
+}
 
 // File menu of other apps; open = false: no Open… action (terminals)
 function fileMenu(newLabel, newKeys, open) {
@@ -217,7 +273,7 @@ const apps = {
     "terminal": { titles: ["Shell", "Edit", "View", "Window", "Help"], extra: { "Shell": shell } },
     "kitty": { titles: ["Shell", "Edit", "View", "Window", "Help"], extra: { "Shell": shell } },
     "texteditor": { titles: ["File", "Edit", "Format", "View", "Window", "Help"], extra: { "File": fileMenu("New"), "Format": [sub("Font"), sub("Text")] } },
-    "settings": { titles: ["Edit", "View", "Window", "Help"], extra: {} },
+    "settings": { titles: ["Edit", "View", "Window", "Help"], extra: { "View": settingsView(), "Help": settingsHelp() } },
 };
 const finderTitles = ["File", "Edit", "View", "Go", "Window", "Help"];
 
@@ -227,13 +283,14 @@ const finderTitles = ["File", "Edit", "View", "Go", "Window", "Help"];
 function desktop() {
     return [
         row("New Folder", "", "desktop-new-folder"), SEP,
-        row("Get Info", ""), SEP,
+        // no separator between Get Info and Change Wallpaper… (context-{light,dark}.png)
+        row("Get Info", ""),
         row("Change Wallpaper…", "", "settings"),
         row("Edit Widgets…", "", "widgets"), SEP,
         row("Use Stacks", ""),
-        sub("Sort By"),
+        { label: "Sort By", submenu: true, items: sortByRows(false) },
         row("Clean Up", ""),
-        sub("Clean Up By"),
+        { label: "Clean Up By", submenu: true, items: cleanUpByRows() },
         row("Show View Options", ""),
     ];
 }
@@ -243,41 +300,67 @@ function appMenu(name, appId) {
     if (isFinder(appId))
         return [
             row("About Finder", "", "about-app:Finder"), SEP,
-            // with a Finder window: its Ctrl+, (the Action menu's settings rows); with none Settings, Hide Finder and
-            // Hide Others stay disabled, as the Mac's AX dump shows them with no window, and Show All stays enabled
-            row("Settings…", "⌘,", appId ? "keys:CTRL,comma" : null), SEP,
+            // Settings…: our Finder has no settings window, so the row stays disabled (FALLBACKS.md). With no Finder
+            // window Hide Finder and Hide Others are disabled, as the Mac's AX dump shows them, and Show All stays enabled
+            row("Settings…", "⌘,"), SEP,
             row("Empty Trash…", "⇧⌘⌫", "empty-trash"), SEP,
             sub("Services"), SEP,
             row("Hide Finder", "⌘H", appId ? "hide-app" : null), row("Hide Others", "⌥⌘H", appId ? "hide-others" : null),
             row("Show All", "", "show-all"),
         ];
+    // other apps: the app template's rows (Finder's app menu without its Empty Trash, plus Quit): About, Settings…,
+    // Services ▸ (AppKit fills it; none here), Hide, Hide Others, Show All, Quit. System Settings replaces the Settings
+    // group with nothing (CommandGroup(replacing: .appSettings), FUN_10002bca8; its only row is Apple-internal).
+    const settings = appKey(appId) === "settings" ? [] : [row("Settings…", "⌘,"), SEP];
     return [
         row("About " + name, "", "about-app:" + name), SEP,
-        row("Settings…", "⌘,"), SEP,
+    ].concat(settings, [
+        sub("Services"), SEP,
         row("Hide " + name, "⌘H", "hide-app"), row("Hide Others", "⌥⌘H", "hide-others"), row("Show All", "", "show-all"), SEP,
         row("Quit " + name, "⌘Q", "quit-app"),
-    ];
+    ]);
 }
 
 function appKey(appId) { return String(appId || "").toLowerCase().split(".").pop(); }
 // the desktop (no app) and the hyprk Finder get the Finder's menus
 function isFinder(appId) { return !appId || appKey(appId) === "hyprk-finder"; }
 
-// menu bar title index -> items: 0 Apple, 1 app name, 2.. app menus
-function forIndex(index, appId, appName, user) {
+// menu bar title index -> items: 0 Apple, 1 app name, 2.. app menus. windows: the app's windows for the Window menu's
+// list (windowList)
+function forIndex(index, appId, appName, user, windows) {
     if (index === 0) return apple(user);
     if (index === 1) return appMenu(appName, appId);
-    const m = forApp(appId)[index - 2];
-    return m ? m.items : [];
+    const m = forApp(appId, appName)[index - 2];
+    if (!m) return [];
+    return m.title === "Window" ? m.items.concat(windowList(windows)) : m.items;
 }
 
-function forApp(appId) {
+// The Window menu's tail: AppKit lists the app's windows after a separator, one row per window titled as the window
+// (-[NSApplication(NSWindowsMenu_Private) _addWindowsMenu:enabled:] 0x18a558ab0, one entry per window from
+// -[NSWindow(NSWindow_Theme) _createWindowsMenuEntryWithTitle:enabled:] 0x18a5590b0, a tabbed window's tabs as their
+// own rows), with a mark on the key window (checkmark) and on a minimised one (NSMenuItemDiamond: the AX dump's
+// "◆ Applications", finder-menus-ax.txt) or one with unsaved changes (NSMenuItemBullet: not known here). Choosing a
+// row brings that window forward. wins: [{ title, key, minimized, action }]
+function windowList(wins) {
+    const list = (wins || []).filter(w => w);
+    if (list.length === 0) return [];
+    return [SEP].concat(list.map(w => {
+        const r = { label: w.title || "Untitled" };   // "Untitled" for a window with no title: GUESS
+        if (w.action) r.action = w.action; else r.disabled = true;
+        if (w.key) r.checked = true;
+        else if (w.minimized) r.checked = "diamond";
+        return r;
+    }));
+}
+
+function forApp(appId, appName) {
     if (isFinder(appId)) {
         const m = finderMenus(!!appId);
         return finderTitles.map(t => ({ title: t, items: m[t] }));
     }
     const spec = apps[appKey(appId)] || { titles: ["File", "Edit", "View", "Window", "Help"], extra: { "File": fileMenu() } };
-    return spec.titles.map(t => ({ title: t, items: (spec.extra && spec.extra[t]) || common[t] || [] }));
+    const help = helpMenu(appName);
+    return spec.titles.map(t => ({ title: t, items: (spec.extra && spec.extra[t]) || (t === "Help" ? help : common[t]) || [] }));
 }
 
 // "keys:CTRL SHIFT,n" -> { mods: "CTRL SHIFT", key: "n" }; null for other actions
@@ -310,6 +393,17 @@ function typeSelect(items, ch) {
     for (let i = 0; i < items.length; i++)
         if (selectable(items[i]) && String(items[i].label || "").toLocaleLowerCase().startsWith(c)) return i;
     return -1;
+}
+
+// What every row keeps after its label's advance, in pt. AppKit reserves the submenu column for the whole menu, as it
+// does the key column: once any row has a submenu, every row ends `sub` before the edge, not only the chevron rows;
+// otherwise a row ends `plain` before it. 48 fits three Mac menus with a submenu row (label advances from SF Pro 13):
+// desktop menu 198.5 wide with "Change Wallpaper…" (longest, no submenu) ending 48.4 before the edge
+// (menubar/context-dark.png: ink 419 px, edge 518 px, the ellipsis' right bearing 1.1 pt); Dock menus Notes 111
+// ("Options ▸" longest) and Calculator 174 ("Show All Windows" longest, an "Options ▸" row) (live/dock/dock-menus.json)
+function rowEnd(items, plain, sub) {
+    for (const it of items || []) if (it && !it.sep && it.submenu) return sub;
+    return plain;
 }
 
 // a submenu row that has something to open

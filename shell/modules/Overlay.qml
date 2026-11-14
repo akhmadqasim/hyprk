@@ -87,6 +87,10 @@ ShellWindow {
                                 Panels.contextY - Theme.menuBar.height - (Panels.contextAbove ? height + Theme.dock.menuInset : Theme.menu.padding)))
         originX: x
         originY: y + Theme.menuBar.height
+        // above the Dock its bottom edge carries the tail, the tip at the icon centre and on the Dock top (Theme.dock
+        // menuInset = the tail's 13 pt height; GAPS-REA-dock.md 1: only a menu opened at a rect has one, so the
+        // desktop's has none)
+        tailX: Panels.contextAbove ? Panels.contextX - x : -1
     }
 
     // ---------- alert ----------
@@ -115,6 +119,10 @@ ShellWindow {
         originX: x
         originY: y + Theme.menuBar.height
         items: Panels.menuShown < 0 ? []
-             : Menus.forIndex(Panels.menuShown, Apps.appIdOf(Apps.activeToplevel), Apps.activeAppName(), Quickshell.env("USER"))
+             : Menus.forIndex(Panels.menuShown, Apps.appIdOf(Apps.activeToplevel), Apps.activeAppName(), Quickshell.env("USER"),
+                              // the Window menu's window list (menus.js windowList): the key window checked, minimised ◆
+                              Apps.activeAppWindows().map(w => ({ title: w.title, key: w === Apps.activeToplevel,
+                                                                  minimized: Apps.isMinimized(w),
+                                                                  action: () => Apps.isMinimized(w) ? Apps.restoreWindow(w) : Apps.focusWindow(w) })))
     }
 }

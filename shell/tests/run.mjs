@@ -111,6 +111,7 @@ test("state null", () => assert.equal(ST.parse('{"dark":null}', defs).dark, fals
 
 // ---- Dock (lib/dock.js, dock defaults in lib/state.js) ----
 const DK = load("dock.js");
+const DS = load("dockstack.js");
 // slots (Dock.qml ListModel): the edits keep every staying slot, keep leaving ones in place, end in `keys` order
 {
     const applyEdits = (cur, ops) => {
@@ -292,9 +293,23 @@ test("dock.json without the key keeps magnification off", () => {
         assert.equal(DK.pushRecent([{ id: "x" }, { id: "y" }, { id: "z" }], { id: "n" }, 3).length, 3);
     });
     test("dock label: text + 2 x 14, at least 41 (DOCKLabelLayer, Q-dock-08)", () => {
-        assert.equal(DK.labelWidth(39.5), 67.5);   // "Finder"
+        assert.equal(DK.labelWidth(41.2), 68);     // ceil(text) + 2 x 13 ("Finder" on the Mac: 67.5 measured)
         assert.equal(DK.labelWidth(5), 41);
-        assert.equal(DK.labelWidth(900), 628);
+        assert.equal(DK.labelWidth(900), 626);
+    });
+    test("dock menu tail: CoreUI's 23.5 x 13 arrow, tip r 0.42 h, fillets 0.6 h, clamped W/2 in (GAPS-REA-dock 1)", () => {
+        assert.equal(DK.menuTailTip(27, 200), 27);
+        assert.equal(DK.menuTailTip(3, 200), 11.75);
+        assert.equal(DK.menuTailTip(199, 200), 188.25);
+        assert.equal(DK.menuTailTip(3, 20), 10);
+        const g = DK.menuTailGeometry();
+        assert.ok(Math.abs(g.vF - 14.39) < 0.01);                 // the fillets meet the edge 14.39 either side
+        assert.ok(Math.abs(g.ctY + g.rt - 9.873) < 0.001);        // the rounded tip 9.87 under the edge
+        const p = DK.menuTailPath(27, 100, 0, false);
+        assert.ok(p.startsWith("M 12.61 100 A 7.8 7.8 0 0 1 ") && p.endsWith(" 41.39 100"));
+        assert.ok(/A 5\.46 5\.46 0 0 0 31\.214 107\.885 L/.test(p));
+        const f = DK.menuTailPath(27, 100, 0, true);
+        assert.ok(f.startsWith("M 12.61 98 L 12.61 100 ") && f.endsWith(" L 41.39 98 Z"));
     });
     test("dock label fade and autohide slide: cosine in-out fits of the Mac's per-frame data", () => {
         const cos = x => 0.5 - 0.5 * Math.cos(Math.PI * Math.min(1, Math.max(0, x)));
@@ -391,7 +406,7 @@ test("notif sounds off", () => assert.equal(ST.notifRule(np, ["org.gnome.Nautilu
 test("notif bad style", () => assert.equal(ST.notifRule(np, ["x"]).style, "banners"));
 test("lua input", () => assert.equal(ST.luaInput({ repeatRate: 30, repeatDelay: 250 }), "hl.config({ input = { repeat_rate = 30, repeat_delay = 250 } })"));
 test("lua input clamps", () => assert.equal(ST.luaInput({ repeatRate: 999, repeatDelay: 5 }), "hl.config({ input = { repeat_rate = 100, repeat_delay = 100 } })"));
-test("lua input defaults", () => assert.equal(ST.luaInput({}), "hl.config({ input = { repeat_rate = 25, repeat_delay = 600 } })"));
+test("lua input defaults", () => assert.equal(ST.luaInput({}), "hl.config({ input = { repeat_rate = 12, repeat_delay = 500 } })"));
 
 
 // ---- icon shape (macOS 26 squircle tile) ----
@@ -608,7 +623,7 @@ test("relTime", () => assert.deepEqual([30e3, 300e3, 7200e3, 100000e3, 400000e3]
     rmSync(dir, { recursive: true, force: true });
 }
 
-// ---- scripts/volume-key.sh + sound.sh volume (BezelServices VolumeStateMachine, SOUNDS.md "Volume keys") ----
+// ---- scripts/volume-key.sh + sound.sh volume (Control Center hot keys 27.2.1, SOUNDS.md "Volume keys") ----
 {
     const { execFileSync } = await import("node:child_process");
     const { mkdtempSync, rmSync, writeFileSync, readFileSync: rd, existsSync, chmodSync, mkdirSync } = await import("node:fs");
@@ -643,35 +658,28 @@ esac
         set(0.5, 0); run("up", "64"); near(vol(), 0.515625);
         set(0.03, 0); run("down", "16"); near(vol(), 0);
         set(0.98, 0); run("up", "16"); near(vol(), 1);
-        run("release");
     });
-    test("volume key: no pop while down or repeating, one on release; Shift inverts the setting", () => {
+    test("volume key: a pop on the press and on every repeat step, none on release; Shift inverts the setting", () => {
         fb(true); set(0.5, 0); const p0 = pops();
-        run("up", "16"); run("up", "16"); run("up", "16");
-        assert.equal(pops(), p0);
-        run("release"); assert.equal(pops(), p0 + 1);
-        run("release"); assert.equal(pops(), p0 + 1);         // nothing changed since the last pop
-        fb(false); run("down", "16"); run("release"); assert.equal(pops(), p0 + 1);
-        run("down", "16", "shift"); run("release", "shift"); assert.equal(pops(), p0 + 2);
-        fb(true); run("down", "16", "shift"); run("release", "shift"); assert.equal(pops(), p0 + 2);
+        run("up", "16"); assert.equal(pops(), p0 + 1);
+        run("up", "16"); run("up", "16"); assert.equal(pops(), p0 + 3);
+        run("release"); assert.equal(pops(), p0 + 3);
+        fb(false); run("down", "16"); assert.equal(pops(), p0 + 3);
+        run("down", "16", "shift"); assert.equal(pops(), p0 + 4);
+        fb(true); run("down", "16", "shift"); assert.equal(pops(), p0 + 4);
     });
     test("volume key unmutes; the mute key pops only when it unmutes", () => {
-        fb(true); set(0.5, 1); run("up", "16"); assert.ok(!rd(sink, "utf8").trim().endsWith(" 1")); run("release");
+        fb(true); set(0.5, 1); run("up", "16"); assert.ok(!rd(sink, "utf8").trim().endsWith(" 1"));
         const p0 = pops();
         run("mute"); assert.ok(rd(sink, "utf8").trim().endsWith(" 1")); assert.equal(pops(), p0);
         run("mute"); assert.ok(rd(sink, "utf8").trim().endsWith(" 0")); assert.equal(pops(), p0 + 1);
     });
-    test("volume key at full volume: a pop at once while held, none more on release, the loop ends", () => {
+    test("volume key at full and at zero volume: every step still pops (the Mac's gate runs on every step)", () => {
         fb(true); set(1, 0); const p0 = pops();
-        run("up", "16");
-        for (let i = 0; i < 50 && pops() === p0; i++) spawnSync("sleep", ["0.05"]);
-        assert.equal(pops(), p0 + 1);
-        run("release");
-        spawnSync("sleep", ["0.2"]);
-        assert.equal(pops(), p0 + 1);
-        assert.ok(!existsSync(join(vk, "repeat")));
+        run("up", "16"); run("up", "16"); near(vol(), 1); assert.equal(pops(), p0 + 2);
+        set(0, 0); run("down", "16"); near(vol(), 0); assert.equal(pops(), p0 + 3);
     });
-    test("a new volume pop stops the one still playing (BezelServices playOneBeep:), other sounds are left alone", () => {
+    test("a new volume pop stops the one still playing (AudioVolumeFeedbackController 0x20a531cec), other sounds are left alone", () => {
         fb(true);
         writeFileSync(join(bin, "pw-play"), "#!/bin/sh\nsleep 3\n");   // a stand-in player: nothing reaches a speaker
         chmodSync(join(bin, "pw-play"), 0o755);
@@ -683,7 +691,7 @@ esac
     });
     test("volume key without an output device does nothing", () => {
         writeFileSync(join(bin, "wpctl"), "#!/bin/sh\nexit 1\n");
-        const p0 = pops(); run("up", "16"); run("release"); assert.equal(pops(), p0);
+        const p0 = pops(); run("up", "16"); assert.equal(pops(), p0);
     });
     rmSync(dir, { recursive: true, force: true });
 }
@@ -706,6 +714,15 @@ test("press lift: from 120 small -> large over the shorter side 80 .. 160", () =
     near(M.pressScale(300, 80), 302.25 / 300);
     near(M.pressScale(300, 120), 302.125 / 300);
     near(M.pressScale(300, 200), 302 / 300);
+});
+test("toolbar platter press: the glass interaction layer (live/glass-params, state 1 alpha .1, state 2 .05)", () => {
+    // dark: the Mac's hover-panel capsule face (65 over the lit strip) pressed -> 84 (Mac panel 85..88)
+    near(Math.round(255 * M.platterPress(65 / 255, true, 0.1)), 84);
+    // the 89 hover disc -> 106 (Mac 110)
+    near(Math.round(255 * M.platterPress(89 / 255, true, 0.1)), 106);
+    // light: 0.3125 c - 0.25, a white face darkens by 0.1 x (1 - 0.0625) (no Mac capture: unverified)
+    near(M.platterPress(1, false, 0.1), 1 - 0.1 * 0.9375);
+    near(M.platterPress(0.5, true, 0), 0.5);
 });
 test("press damping by size", () => {
     near(M.pressDamping(64, 64), 0.629);
@@ -785,7 +802,14 @@ test("mode buttons start inside the field, end in place", () => {
         const tok = n => +lightsQml.match(new RegExp("property (?:int|real) " + n + ": ([\\d.]+)"))[1];
         const con = n => +cpp.match(new RegExp("\\b" + n + " = ([\\d.]+)"))[1];
         near(con("GLYPH_STROKE"), tok("glyphStroke"), 1e-9);
-        near(con("PRESS_GROW"), tok("pressedScale"), 1e-9);
+        // the press: the plugin's lg::lights constants (LightPress.hpp) are Tokens.lights.lift* (FlexInteraction windowControl)
+        const lp = readFileSync(join(here, "..", "..", "plugin", "src", "LightPress.hpp"), "utf8");
+        const lpc = n => +lp.match(new RegExp("\\b" + n + "\\s*= ([\\d.]+)"))[1];
+        near(lpc("LIFT_POINTS"), tok("liftPoints"), 1e-9);
+        near(lpc("STRETCH_DISTANCE"), tok("stretchDistance"), 1e-9);
+        near(lpc("SPRING_RESPONSE"), tok("liftResponse"), 1e-9);
+        near(lpc("SPRING_DAMPING"), tok("liftDamping"), 1e-9);
+        near(lpc("IDLE_TIMEOUT") * 1000, tok("idleTimeout"), 1e-6);
         near(con("GLYPH_DELAY") * 1000, tok("glyphDelay"), 1);
         near(con("GLYPH_IN") * 1000, tok("glyphIn"), 1);
         near(con("GLYPH_OUT") * 1000, tok("glyphOut"), 1);
@@ -1283,6 +1307,12 @@ test("Mission Control: one Space reads Desktop, more are numbered by position", 
         assert.ok(!M.opens(items[5]) && !M.opens(items[0]) && !M.opens({ label: "F", submenu: true, disabled: true, items: [{}] }));
     });
     test("rowTop: rows 24, separators 11", () => assert.equal(M.rowTop(items, 3, 24, 11), 24 + 11 + 24));
+    test("rowEnd: a submenu row reserves the chevron column for every row (desktop menu)", () => {
+        assert.equal(M.rowEnd(items, 17, 48), 48);
+        assert.equal(M.rowEnd([{ label: "Open" }, { sep: true }, { label: "Empty Bin" }], 17, 48), 17);
+        assert.equal(M.rowEnd(M.desktop(), 17, 48), 48);
+        assert.equal(M.rowEnd([], 17, 48), 17);
+    });
     const base = { menuX: 100, menuY: 40, menuW: 200, rowTop: 5 + 59, subW: 150, subH: 100, areaW: 1280, areaH: 800, overlap: 5, pad: 5, margin: 6 };
     test("submenu frame: parent right edge - 5, row top - 5 (first rows level)", () => {
         const f = M.submenuFrame(base);
@@ -1320,6 +1350,95 @@ test("Mission Control: one Space reads Desktop, more are numbered by position", 
             "Open", "Open With", "Close Window", "---", "Get Info", "Rename", "Compress", "Duplicate", "Make Alias", "Quick Look", "---",
             "Share…", "Manage Shared Folder…", "---", "Show Original", "Add to Sidebar", "---", "Move to Trash", "Eject", "---",
             "Tags…", "Customize Folder…", "---", "Print"]);
+    });
+    // every menu's rows pinned to the decoded 27.2.1 lists (reference/re/27.2.1/MENUS-REA-27.2.1.md)
+    const deep = list => list.map(it => it.sep ? "---" : it.items ? [it.label, deep(it.items)] : it.label);
+    const sortBy = ["None", "---", "Snap to Grid", "---", "Name", "Kind", "Date Last Opened", "Date Added", "Date Modified",
+        "Date Created", "Size", "Tags"];
+    const cleanUpBy = ["Name", "Kind", "Date Modified", "Date Created", "Size", "Tags"];
+    const appKitWindow = ["Minimize", "Zoom", "Fill", "Center", "---", "Move & Resize", "Full Screen Tile", "---",
+        "Bring All to Front", "Cycle Through Windows", "Remove Window from Set", "---", "Show Previous Tab", "Show Next Tab",
+        "Move Tab to New Window", "Merge All Windows"];
+    const appKitEdit = ["Undo", "Redo", "---", "Cut", "Copy", "Paste", "Select All", "---", "AutoFill", "Start Dictation",
+        "Emoji & Symbols"];
+    test("menus pinned: Apple menu (AppKit Menus.loctable, Q-menubar-31)", () => {
+        assert.deepEqual(labels(M.forIndex(0, "", "Finder", "me")), ["About This Mac", "---", "System Settings…", "App Store", "---",
+            "Recent Items", "---", "Force Quit…", "---", "Sleep", "Restart…", "Shut Down…", "---", "Lock Screen", "Log Out me…"]);
+    });
+    test("menus pinned: Finder Edit, View, Go, Window, Help (finder-menus-ax.txt, ArrangeByMenu.nib)", () => {
+        const m = {};
+        for (const x of M.forApp("")) m[x.title] = deep(x.items);
+        assert.deepEqual(m["Edit"], ["Undo", "Redo", "---", "Cut", "Copy", "Paste", "Select All", "---", "Show Clipboard", "---",
+            "Search", "---", "AutoFill", "Start Dictation", "Emoji & Symbols"]);
+        assert.deepEqual(m["View"], ["as Icons", "as List", "as Columns", "as Gallery", "---", "Use Stacks", ["Sort By", sortBy],
+            "Clean Up", ["Clean Up By", cleanUpBy], "---", "Show Tab Bar", "Show All Tabs", "---", "Hide Sidebar", "Hide Preview",
+            "---", "Hide Toolbar", "Show Path Bar", "Show Status Bar", "---", "Customize Toolbar…", "---", "Show View Options",
+            "Show Preview Options", "---", "Enter Full Screen"]);
+        assert.deepEqual(m["Go"], ["Back", "Forward", "Enclosing Folder", "---", "Recents", "Documents", "Desktop", "Downloads",
+            "Home", "Computer", "AirDrop", "Network", "iCloud Drive", "Shared", "Applications", "Utilities", "---",
+            "Recent Folders", "---", "Go to Folder…", "Connect to Server…"]);
+        assert.deepEqual(m["Window"], appKitWindow.concat(["---", "Show Progress Window"]));
+        assert.deepEqual(m["Help"], ["Search", "Mac User Guide", "Tips for Your Mac"]);
+        // the menu bar's Sort By carries the nib's key equivalents
+        const sb = M.forApp("")[2].items.find(it => it.label === "Sort By").items;
+        assert.deepEqual(sb.filter(it => it.shortcut).map(it => it.label + " " + it.shortcut), ["None ⌃⌥⌘0", "Name ⌃⌥⌘1",
+            "Kind ⌃⌥⌘2", "Date Last Opened ⌃⌥⌘3", "Date Added ⌃⌥⌘4", "Date Modified ⌃⌥⌘5", "Size ⌃⌥⌘6", "Tags ⌃⌥⌘7"]);
+    });
+    test("menus pinned: other apps get AppKit's rows only (MenuCommands.loctable), Help is <App> Help", () => {
+        assert.deepEqual(labels(M.forIndex(1, "some.Other", "Foo", "")), ["About Foo", "---", "Settings…", "---", "Services", "---",
+            "Hide Foo", "Hide Others", "Show All", "---", "Quit Foo"]);
+        const m = {};
+        for (const x of M.forApp("some.Other", "Foo")) m[x.title] = labels(x.items);
+        assert.deepEqual(Object.keys(m), ["File", "Edit", "View", "Window", "Help"]);
+        assert.deepEqual(m["Edit"], appKitEdit);
+        assert.deepEqual(m["View"], ["Show Tab Bar", "Show All Tabs", "---", "Enter Full Screen"]);
+        assert.deepEqual(m["Window"], appKitWindow);
+        assert.deepEqual(m["Help"], ["Search", "Foo Help"]);
+    });
+    test("menus pinned: System Settings (SettingsAppCommands decoded: no Settings…, Back/Forward/Search, HelpMenu)", () => {
+        assert.deepEqual(labels(M.forIndex(1, "org.hyprk.Settings", "System Settings", "")), ["About System Settings", "---",
+            "Services", "---", "Hide System Settings", "Hide Others", "Show All", "---", "Quit System Settings"]);
+        const m = {};
+        for (const x of M.forApp("org.hyprk.Settings", "System Settings")) m[x.title] = x.items;
+        assert.deepEqual(labels(m["View"]), ["Back", "Forward", "---", "Search"]);
+        assert.deepEqual(m["View"].map(it => it.shortcut || ""), ["⌘[", "⌘]", "", "⌘F"]);
+        assert.equal(m["View"][3].icon, "magnifyingglass");
+        assert.deepEqual(labels(m["Help"]), ["Search", "Mac User Guide", "---", "User Manual", "macOS Support",
+            "Mac Specifications", "Hardware Support"]);
+        assert.deepEqual(labels(m["Edit"]), appKitEdit);
+    });
+    test("menus pinned: desktop menu (context-{light,dark}.png, ArrangeByMenu.nib, Clean Up By table)", () => {
+        assert.deepEqual(deep(M.desktop()), ["New Folder", "---", "Get Info", "Change Wallpaper…", "Edit Widgets…", "---",
+            "Use Stacks", ["Sort By", sortBy], "Clean Up", ["Clean Up By", cleanUpBy], "Show View Options"]);
+        // no key equivalents in Finder's context menus
+        assert.ok(M.desktop().find(it => it.label === "Sort By").items.every(it => !it.shortcut));
+    });
+    test("menus pinned: the Dock's own menu (DockMenus.plist \"dock\")", () => {
+        assert.deepEqual(deep(DK.dockOwnMenu({})), ["Turn Hiding On", "Turn Magnification On",
+            ["Position on Screen", ["Left", "Bottom", "Right"]], ["Minimize Using", ["Genie Effect", "Scale Effect"]], "---",
+            "Dock Settings…"]);
+        assert.deepEqual(DK.dockOwnMenu({ autohide: true, magnification: true }).slice(0, 2).map(r => r.label),
+            ["Turn Hiding Off", "Turn Magnification Off"]);
+        assert.deepEqual(DK.dockOwnMenu({ minimizeEffect: "scale" })[3].items.filter(r => r.checked).map(r => r.label), ["Scale Effect"]);
+    });
+    test("menus pinned: the Window menu lists the app's windows (AppKit _addWindowsMenu:enabled:, AX \"◆ Applications\")", () => {
+        const fn = () => 0;
+        const wins = [{ title: "Applications", key: true, action: fn }, { title: "Utilities", minimized: true, action: fn }];
+        const w = M.forIndex(6, "hyprk-finder", "Finder", "", wins);
+        assert.deepEqual(labels(w).slice(-3), ["---", "Applications", "Utilities"]);
+        assert.deepEqual(w.slice(-2).map(r => r.checked), [true, "diamond"]);
+        assert.deepEqual(labels(M.forIndex(6, "hyprk-finder", "Finder", "", [])), labels(M.forIndex(6, "hyprk-finder", "Finder", "")));
+        assert.equal(labels(M.forIndex(5, "some.Other", "Foo", "", wins)).slice(-1)[0], "Utilities");   // File Edit View Window
+        assert.ok(!labels(M.forIndex(4, "some.Other", "Foo", "", wins)).includes("Utilities"));          // only the Window menu
+    });
+    test("menus pinned: the Edit appends' 27.2.1 images (AppKit image table, glyphs decoded from CoreGlyphs)", () => {
+        const edit = M.forApp("")[1].items;
+        assert.equal(edit.find(it => it.label === "Emoji & Symbols").icon, "emoji.face.grinning");
+        assert.equal(edit.find(it => it.label === "AutoFill").icon, "rectangle.and.pencil.and.ellipsis");
+        assert.equal(edit.find(it => it.label === "Start Dictation").icon, "microphone");
+        assert.equal(M.forIndex(0, "", "Finder", "me")[0].icon, "laptopcomputer");
+        const other = M.forApp("some.Other", "Foo")[1].items;
+        assert.equal(other.find(it => it.label === "Emoji & Symbols").icon, "emoji.face.grinning");
     });
     test("Finder menus: titles, row counts and separators like the AX dump (no window open)", () => {
         assert.deepEqual(M.forApp("").map(m => m.title), ["File", "Edit", "View", "Go", "Window", "Help"]);
@@ -1383,14 +1502,52 @@ test("Mission Control: one Space reads Desktop, more are numbered by position", 
         const m = DK.downloadsMenu({});
         assert.deepEqual(m.map(r => r.sep ? "---" : r.label), ["Sort by", "Name", "Date Added", "Date Modified", "Date Created", "Kind", "---",
             "Display as", "Folder", "Stack", "---", "View content as", "Fan", "Grid", "List", "Automatic"]);
-        assert.deepEqual(m.filter(r => r.checked).map(r => r.label), ["Date Modified", "Stack"]);
+        assert.deepEqual(m.filter(r => r.checked).map(r => r.label), ["Date Modified", "Stack", "Automatic"]);
+        assert.ok(!m.find(r => r.label === "Fan").disabled);
         assert.ok(m[0].disabled && m[2].disabled && !m[1].disabled);
-        assert.deepEqual(DK.downloadsMenu({ sort: "kind", display: "folder" }).filter(r => r.checked).map(r => r.label), ["Kind", "Folder"]);
+        assert.deepEqual(DK.downloadsMenu({ sort: "kind", display: "folder", view: "grid" }).filter(r => r.checked).map(r => r.label), ["Kind", "Folder", "Grid"]);
     });
     test("keysOf: only keys: actions", () => {
         assert.deepEqual(M.keysOf("keys:CTRL SHIFT,n"), { mods: "CTRL SHIFT", key: "n" });
         assert.equal(M.keysOf("close"), null);
         assert.equal(M.keysOf(() => 0), null);
+    });
+}
+
+// ---- text field context menu (ui/HyprK/textmenu.js: -[NSTextView menuForEvent:], NSTextViewContextMenu.nib 27.2.1) ----
+{
+    const T = load("textmenu.js", hyprk);
+    const deep = list => list.map(it => it.sep ? "---" : it.items ? [it.label, deep(it.items)] : it.label);
+    const spelling = ["Spelling and Grammar", ["Show Spelling and Grammar", "Check Document Now", "---",
+        "Check Spelling While Typing", "Check Grammar with Spelling", "Correct Spelling Automatically"]];
+    const substTail = ["Show Substitutions", "---", "Smart Copy/Paste", "Smart Quotes", "Smart Dashes", "Smart Links",
+        "Data Detectors", "Text Replacement"];
+    const transforms = ["Transformations", ["Make Upper Case", "Make Lower Case", "Capitalize"]];
+    const speech = ["Speech", ["Start Speaking", "Stop Speaking"]];
+    test("text menu: every row keeps the submenu column (48) when a row has a submenu, else 17", () => {
+        assert.equal(T.rowEnd(T.rows({ selected: "", editable: true, canPaste: false })), 48);
+        assert.equal(T.rowEnd(T.rows({ selected: "", editable: true }).find(r => r.items).items), 17);
+        assert.equal(T.rowEnd([]), 17);
+    });
+    test("text menu: an editable field with a selection", () => {
+        assert.deepEqual(deep(T.rows({ selected: "word", editable: true, canPaste: true })), ["Look Up \u201Cword\u201D",
+            "Translate \u201Cword\u201D", "Search With Google", "---", "Cut", "Copy", "Paste", "Paste and Match Style", "---",
+            "Share", "---", spelling, ["Substitutions", ["Replace Quotes", "Replace Dashes", "Add Links", "Replace Text", "---"]
+                .concat(substTail)], transforms, speech]);
+    });
+    test("text menu: no selection (no Reveal, Search or Share rows; Cut and Copy off), and no Select All ever", () => {
+        const r = T.rows({ selected: "", editable: true, canPaste: false });
+        assert.deepEqual(deep(r), ["Cut", "Copy", "Paste", "Paste and Match Style", "---", spelling,
+            ["Substitutions", substTail], transforms, speech]);
+        assert.deepEqual(r.slice(0, 4).map(x => !!x.disabled), [true, true, true, true]);
+        assert.ok(!JSON.stringify(r).includes("Select All") && !JSON.stringify(r).includes("Font"));
+    });
+    test("text menu: read-only field loses Transformations; long selections are cut with …; secure fields have none", () => {
+        assert.ok(!deep(T.rows({ selected: "a", editable: false })).some(x => Array.isArray(x) && x[0] === "Transformations"));
+        assert.equal(T.rows({ selected: "x".repeat(40) })[0].label, "Look Up \u201C" + "x".repeat(30) + "\u2026\u201D");
+        assert.deepEqual(T.rows({ selected: "a", secure: true }), []);
+        assert.equal(T.transform("capitalize", "hello wORLD"), "Hello World");
+        assert.equal(T.transform("upper", "abc"), "ABC");
     });
 }
 
@@ -1538,6 +1695,269 @@ test("Mission Control: one Space reads Desktop, more are numbered by position", 
     });
     test("strip occluded past 30 pt", () => { assert.ok(SM.occludes({ x: 200 }, 262)); assert.ok(!SM.occludes({ x: 240 }, 262)); });
 }
+
+// ---- the Dock's Downloads stack (lib/dockstack.js, MOTION-REA-27.2.1.md section 3, GAPS-REA-dock.md section 4) ----
+test("stack pile: newest 3, front 116/128 bottom-aligned, each behind 12 smaller and 18 higher, centred", () => {
+    assert.deepEqual(DS.pile(128, 5), [{ x: 6, y: 12, size: 116 }, { x: 12, y: 6, size: 104 }, { x: 18, y: 0, size: 92 }]);
+    assert.deepEqual(DS.pile(128, 1), [{ x: 6, y: 12, size: 116 }]);
+    assert.equal(DS.pile(64, 0).length, 0);
+    const p = DS.pile(64, 2);
+    assert.equal(p[0].y + p[0].size, 64);               // front bottom on the tile bottom
+    assert.equal(p[0].y + p[0].size - (p[1].y + p[1].size), 9);   // 18/128 of 64
+});
+test("stack stage: 0.8 of the screen less menu bar and Dock", () => assert.deepEqual(DS.stage(1280, 832, 34, 89), { w: 1024, h: 567 }));
+test("stack view: Automatic is Fan up to stage height / 64 items, else Grid; a choice wins", () => {
+    assert.equal(DS.view("automatic", 8, 567), "fan");
+    assert.equal(DS.view("automatic", 9, 567), "grid");      // 567 / 64 = 8.86
+    assert.equal(DS.view(undefined, 2, 567), "fan");
+    assert.equal(DS.view("grid", 2, 567), "grid");
+    assert.equal(DS.view("list", 40, 567), "list");
+});
+test("stack fan slots: Open in Finder after the items, N More in Finder when they do not fit", () => {
+    assert.deepEqual(DS.fanSlots(5, 567), { items: 5, extra: "Open in Finder" });
+    assert.deepEqual(DS.fanSlots(12, 567), { items: 7, extra: "5 More in Finder" });
+});
+test("stack fan: 3000 pt circle, pitch 64, rotation -asin(y / 3000), the frame 24 below the tile (y up, decoded)", () => {
+    const a = DS.fanItem(64, 0);
+    assert.deepEqual([a.y, a.dx, a.up], [64, 1, 72]);       // 2 x 32 + 32 - 24: t + 8 above the icon bottom
+    const b = DS.fanItem(64, 10);        // y 704: dx 3000 - int(2916.2) = 84
+    assert.deepEqual([b.y, b.dx, b.up], [704, 84, 712]);
+    assert.equal(DS.fanItem(33, 0).up, 16 + 16 + 32 - 24);
+    assert.ok(Math.abs(b.angle - Math.atan(704 / 2916) * 180 / Math.PI) < 1e-9);
+    assert.ok(Math.abs(b.angle - 13.57) < 0.01);
+    // Q-dock-12 (tile 33, 11 files + Open in Finder): the rotated 64 box grows 65.5 -> 78.3 pt bottom to top
+    const box = i => { const r = DS.fanItem(33, i).angle * Math.PI / 180; return 64 * (Math.cos(r) + Math.sin(r)); };
+    assert.ok(Math.abs(box(0) - 65.5) < 1 && Math.abs(box(11) - 78.3) < 1);
+});
+test("stack fan motion: starts in the collapsed frames, lands on the layout", () => {
+    assert.equal(DS.collapsedUp(64, 0), 29);      // s 3: frame {3, 0, 58, 58}, centre 29
+    assert.equal(DS.collapsedUp(64, 7), 32 + 9);  // past the 3rd: the 3rd
+    assert.equal(DS.collapsedUp(30, 1), 16);
+    const s = DS.fanAt(64, 4, 0), e = DS.fanAt(64, 4, 1), f = DS.fanItem(64, 4);
+    assert.ok(Math.abs(s.up - 41) < 1e-9 && Math.abs(s.dx) < 0.05 && s.angle === 0);
+    assert.ok(Math.abs(e.dx - f.dx) < 1e-9 && Math.abs(e.up - f.up) < 1e-9 && e.angle === f.angle);
+    const m = DS.fanAt(64, 4, 0.5);
+    assert.ok(m.up > s.up && m.up < e.up && m.dx > 0 && m.dx < e.dx);
+});
+test("stack fan item size: 64 at rest (the only _itemSize write), from the pile's frame while opening", () => {
+    assert.equal(DS.fanSize(64, 0, 1), 64);
+    assert.equal(DS.fanSize(64, 9, 1), 64);
+    assert.equal(DS.fanSize(64, 0, 0), 58);       // s 3: 64 - 2 x 3
+    assert.equal(DS.fanSize(64, 2, 0), 46);
+    assert.equal(DS.fanSize(64, 7, 0), 46);       // past the 3rd: the 3rd
+    assert.equal(DS.fanSize(33, 1, 0), 25);       // s 2: 33 - 2 x 2 x 2
+    assert.equal(DS.fanSize(64, 0, 0.5), 61);
+    // Q-dock-12 (tile 33, 12 slots): AX frames 65.5 -> 78.3 are the turned 64 box (65.0 -> 78.0 here); tops step 64.6
+    const box = i => DS.fanBox(64, DS.fanItem(33, i).angle);
+    assert.ok(Math.abs(box(0) - 65.5) < 0.6 && Math.abs(box(11) - 78.3) < 0.6);
+    const top = i => DS.fanItem(33, i).up + box(i) / 2;
+    assert.ok(Math.abs((top(11) - top(0)) / 11 - 64.6) < 0.05);
+});
+test("stack fan curves: CA's table (default 0.25 0.1 0.25 1, easeInEaseOut 0.42 0 0.58 1), linear label fade", () => {
+    assert.equal(DS.caTiming("default", 0), 0);
+    assert.equal(DS.caTiming("default", 1), 1);
+    assert.ok(Math.abs(DS.caTiming("easeInEaseOut", 0.5) - 0.5) < 1e-9);        // symmetric
+    assert.ok(Math.abs(DS.caTiming("default", 0.5) - 0.8024) < 1e-3);           // front-loaded
+    assert.ok(Math.abs(DS.caTiming("easeInEaseOut", 0.25) - 0.1291) < 1e-3);
+    assert.equal(DS.caTiming("linear", 0.3), 0.3);
+    const o = DS.fanChannels(125, 250, false), c = DS.fanChannels(125, 250, true);
+    assert.ok(Math.abs(o.pos - 0.5) < 1e-9 && Math.abs(o.labelOpacity - 0.5) < 1e-9 && o.turn > 0.8 && o.size === o.turn);
+    assert.ok(Math.abs(c.pos - 0.5) < 1e-9 && Math.abs(c.turn - (1 - o.turn)) < 1e-12 && c.labelScale === c.pos);
+    assert.deepEqual(DS.fanChannels(0, 250, false), { pos: 0, turn: 0, size: 0, labelScale: 0, labelOpacity: 0 });
+    assert.deepEqual(DS.fanChannels(300, 250, true), { pos: 0, turn: 0, size: 0, labelScale: 0, labelOpacity: 0 });
+    // the rotation on its own progress: at p = 0.5 with the default curve's 0.80 the item is turned 80 %
+    assert.ok(Math.abs(DS.fanAt(64, 4, 0.5, o.turn).angle - DS.fanItem(64, 4).angle * o.turn) < 1e-12);
+});
+test("stack fan close: the first 3 stay, the rest fade over 0.1 s from d - 0.05 s; Folder: from d/3 over 2d/3", () => {
+    assert.equal(DS.fanCloseOpacity(2, 260, 250, false), 1);
+    assert.equal(DS.fanCloseOpacity(3, 200, 250, false), 1);
+    assert.equal(DS.fanCloseOpacity(3, 250, 250, false), 0.5);
+    assert.equal(DS.fanCloseOpacity(3, 300, 250, false), 0);
+    assert.equal(DS.fanCloseOpacity(0, 250 / 3, 250, true), 1);
+    assert.ok(Math.abs(DS.fanCloseOpacity(0, 250 * 2 / 3, 250, true) - 0.5) < 1e-9);
+});
+test("stack fan label: text + 2 x 13, text at most 500", () => {
+    assert.equal(DS.fanLabelWidth(80.2), 107);
+    assert.equal(DS.fanLabelWidth(800), 526);
+});
+test("stack grid: 11 files + Open in Finder = 4 x 3 cells of 128, 546 x 438 with the title (Q-dock-12)", () => {
+    const g = DS.gridSize(12, 1368, 816, true);
+    assert.deepEqual([g.cols, g.rows, g.cell, g.icon, g.width, g.height, g.scroll], [4, 3, 128, 100, 546, 438, false]);
+    assert.deepEqual([DS.gridSize(11, 1368, 816, true).cols, DS.gridSize(11, 1368, 816, true).rows], [4, 3]);
+    // 3 cells: 2 columns, 2 rows, remainder 1 < 2 rows: one row of 3
+    assert.deepEqual([DS.gridSize(3, 1368, 816, false).cols, DS.gridSize(3, 1368, 816, false).height], [3, 172]);
+    // 6 cells: ceil(sqrt 6) = 3, rows 2, remainder 0
+    assert.deepEqual([DS.gridSize(6, 1368, 816, true).cols, DS.gridSize(6, 1368, 816, true).rows], [3, 2]);
+    // 5 cells: 3 columns, 2 rows, remainder 2 is not below 2 rows: stays 3 x 2
+    assert.deepEqual([DS.gridSize(5, 1368, 816, true).cols, DS.gridSize(5, 1368, 816, true).rows], [3, 2]);
+    // 7 cells: 3 x 3, remainder 1 < 3 rows: 4 columns, 2 rows
+    assert.deepEqual([DS.gridSize(7, 1368, 816, true).cols, DS.gridSize(7, 1368, 816, true).rows], [4, 2]);
+});
+test("stack grid: more cells than the stage holds scroll", () => {
+    const g = DS.gridSize(41, 1024, 567, true);      // fits int(6.56 x 3.63) = 23: 5 x 5, remainder 3 < 5: 6 x 4
+    assert.deepEqual([g.cols, g.rows, g.cell, g.width, g.height, g.allRows, g.scroll], [6, 4, 128, 802, 566, 7, true]);
+});
+test("stack grid place: centred on the tile, 30 pt inside the screen, 11 above the icon top (5 magnified)", () => {
+    assert.deepEqual(DS.gridPlace(1000, 0, 1280, 546, 438, 743, false), { x: 704, y: 294 });
+    assert.deepEqual(DS.gridPlace(640, 0, 1280, 546, 438, 743, true), { x: 367, y: 300 });
+    assert.equal(DS.gridPlace(100, 0, 1280, 546, 438, 743, false).x, 30);
+    // Q-dock-12 at tile 33 (screen 1710 wide, icon top 1055 + 7 = 1062): the Mac's AX group y 613
+    assert.equal(DS.gridPlace(1168, 0, 1710, 546, 438, 1062, false).y, 613);
+    assert.equal(DS.tailX(1250, 704, 546, 26, 24), 546 - 38);
+    assert.equal(DS.gridCell(5, 4, 128).x, 128);
+    assert.equal(DS.gridCell(5, 4, 128).y, 128);
+});
+
+// ---- Emoji & Symbols picker (lib/emoji.js, lib/emojidata.js) ----
+const EM = load("emoji.js"), EMD = load("emojidata.js");
+const emSecs = EMD.sections();
+test("emoji data: the Mac's 8 sections, Smileys first rows as emoji-picker-dark.png", () => {
+    assert.deepEqual(emSecs.map(s => s.id), ["smileys", "animals", "food", "activity", "travel", "objects", "symbols", "flags"]);
+    const firstRows = emSecs[0].items.slice(0, 48).map(i => i[0]).join("");
+    assert.equal(firstRows, "😀😃😄😁😆🥹😅😂🤣🥲☺️😊😇🙂🙃😉😌😍🥰😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🥸🤩🥳🙂‍↕️😏😒🙂‍↔️😞😔😟😕🙁☹️😣😖😫");
+    assert.equal(emSecs[1].items[0][0], "🐶");
+    assert.equal(emSecs[7].items[0][0], "🏳️");
+    // no skin-tone variants, no duplicates
+    const all = emSecs.flatMap(s => s.items.map(i => i[0]));
+    assert.ok(!all.some(e => /[\u{1F3FB}-\u{1F3FF}]/u.test(e)));
+    assert.equal(new Set(all).size, all.length);
+});
+test("emoji layout: sections start on a new row, padding cells are empty", () => {
+    const secs = [{ items: [["a", "a"], ["b", "b"], ["c", "c"]] }, { items: [["d", "d"]] }];
+    const l = EM.layout(secs, 2);
+    assert.deepEqual(l.cells.map(c => c.e), ["a", "b", "c", "", "d", ""]);
+    assert.deepEqual([l.rows, l.starts], [3, [0, 2]]);
+    assert.equal(EM.sectionAtRow(l.starts, 0), 0);
+    assert.equal(EM.sectionAtRow(l.starts, 1), 0);
+    assert.equal(EM.sectionAtRow(l.starts, 2), 1);
+});
+test("emoji move: arrows step over padding, Up / Down land on a shorter row's last emoji", () => {
+    const l = EM.layout([{ items: [["a"], ["b"], ["c"], ["d"], ["e"]] }, { items: [["f"], ["g"], ["h"]] }], 3);
+    // cells: a b c / d e _ / f g h
+    const c = l.cells;
+    assert.equal(EM.move(c, 3, -1, "right"), 0);
+    assert.equal(EM.move(c, 3, 4, "right"), 6);       // e -> f, over the padding
+    assert.equal(EM.move(c, 3, 6, "left"), 4);
+    assert.equal(EM.move(c, 3, 2, "down"), 4);        // c -> e (row 2 has no 3rd)
+    assert.equal(EM.move(c, 3, 8, "up"), 4);          // h -> e
+    assert.equal(EM.move(c, 3, 0, "up"), 0);          // stays at the top
+    assert.equal(EM.move(c, 3, 7, "down"), 7);        // stays at the bottom
+    assert.equal(EM.move(c, 3, 0, "left"), 0);
+});
+test("emoji search: name start beats a keyword, every word must match, data order breaks ties", () => {
+    const r = EM.search(emSecs, "grinning", 5).map(i => i[0]);
+    assert.equal(r[0], "😀");                         // "grinning face": the name starts with it
+    assert.ok(EM.search(emSecs, "joy", 3).some(i => i[0] === "😂"));   // keyword (Apple short name)
+    assert.equal(EM.search(emSecs, "thumbs up")[0][0], "👍");
+    assert.equal(EM.search(emSecs, "red heart")[0][0], "❤️");
+    assert.equal(EM.search(emSecs, "flag indonesia")[0][0], "🇮🇩");
+    assert.equal(EM.search(emSecs, "zzqx").length, 0);
+    assert.equal(EM.search(emSecs, "  ").length, 0);
+    assert.equal(EM.search(emSecs, "face", 7).length, 7);
+});
+test("emoji frequently used: counted, most used first, ties by recency, capped", () => {
+    let st = {};
+    st = EM.recordUse(st, "😀", 1);
+    st = EM.recordUse(st, "👍", 2);
+    st = EM.recordUse(st, "👍", 3);
+    st = EM.recordUse(st, "🎉", 4);
+    const known = EM.names(emSecs);
+    assert.deepEqual(EM.frequent(st, 3, known).map(i => i[0]), ["👍", "🎉", "😀"]);
+    assert.equal(EM.frequent(st, 1, known)[0][1], "thumbs up");
+    assert.deepEqual(EM.frequent({ "x-not-an-emoji": [9, 9] }, 3, known), []);
+    let big = {};
+    for (let i = 0; i < 10; i++) big = EM.recordUse(big, String(i), i, 5);
+    assert.equal(Object.keys(big).length, 5);
+    assert.ok(big["9"] && !big["0"]);
+    assert.deepEqual(EM.parseState('{"used":{"😀":[2,5]}}'), { "😀": [2, 5] });
+    assert.deepEqual(EM.parseState("{broken"), {});
+});
+test("emoji category bar: dark takes .inverse for face, dog and ball (UIKitCore 0x1ac1b58a4), light the outlines", () => {
+    const names = d => EM.tabs(d).map(t => t.symbol);
+    assert.deepEqual(names(true), ["clock", "emoji.face.grinning.inverse", "emoji.dog.face.inverse", "emoji.apple",
+        "emoji.soccer.ball.inverse", "emoji.automobile", "lightbulb", "emoji.heart", "flag", "chevron.right"]);
+    assert.deepEqual(names(false).slice(1, 5), ["emoji.face.grinning", "emoji.dog.face", "emoji.apple", "emoji.soccer.ball"]);
+    assert.ok(EM.tabs(true).every(t => t.selected === t.symbol));
+});
+test("emoji paste key: Ctrl+V, terminals Ctrl+Shift+V", () => {
+    assert.equal(EM.pasteMods("org.gnome.TextEditor"), "CTRL");
+    assert.equal(EM.pasteMods("firefox"), "CTRL");
+    assert.equal(EM.pasteMods("com.mitchellh.ghostty"), "CTRL SHIFT");
+    assert.equal(EM.pasteMods("foot"), "CTRL SHIFT");
+    assert.equal(EM.pasteMods("org.gnome.Ptyxis"), "CTRL SHIFT");
+    assert.equal(EM.pasteMods(""), "CTRL");
+});
+test("emoji popover place: below the point with the arrow on it, above when there is no room, clamped", () => {
+    const g = { w: 320, h: 445, arrowH: 10.5, arrowW: 26, radius: 20, margin: 8 };
+    const p = EM.place(640, 100, 1280, 832, g);
+    assert.deepEqual([p.x, p.y, p.below, p.arrowX], [480, 111, true, 160]);
+    const q = EM.place(640, 700, 1280, 832, g);
+    assert.equal(q.below, false);
+    assert.equal(q.y, 245);                           // 700 - 10.5 - 445, rounded
+    const e = EM.place(5, 100, 1280, 832, g);
+    assert.deepEqual([e.x, e.arrowX], [8, 33]);    // arrow kept out of the 20 pt corner
+});
+test("emoji popover outline: the arrow carries the inner rim, d x sqrt 2 under the outline's tip", () => {
+    const tipY = path => Math.min(...path.match(/-?\d+(\.\d+)?/g).map(Number).filter((v, i) => i % 2 === 1));
+    const o = EM.popoverPath(320, 445, 20, 160, 13, 10.5, 0), r = EM.popoverPath(320, 445, 20, 160, 13, 10.5, 0.75);
+    assert.ok(o.startsWith("M 20 0 L 147 0 Q 148.1 0 148.8 -1.4 L 156.7 -8.9 Q 160 -12.1 163.3 -8.9"));
+    assert.ok(Math.abs((tipY(r) - tipY(o)) - 0.75 * Math.SQRT2) < 0.002);
+    assert.ok(r.includes("L 147 0.75") && r.includes("A 19.25 19.25 0 0 1 319.25 20"));
+    assert.ok(o.endsWith("Z") && r.endsWith("Z"));
+});
+
+// ---- status item modules (lib/statusmodule.js, STATUS-REA-27.2.1.md) ----
+const SMD = load("statusmodule.js");
+test("status module: left edge on the item's left edge, flipped to its right edge at the screen edge", () => {
+    assert.equal(SMD.placeX(900, 22, 308, 1280), 900);
+    assert.equal(SMD.placeX(1100, 22, 308, 1280), 1100 + 22 - 308);
+    assert.equal(SMD.placeX(10, 22, 308, 200), 0);
+});
+test("status module metrics: 308 wide, text at 14 + 26 + 8, rows 32", () => {
+    const m = SMD.metrics();
+    assert.deepEqual([m.width, m.inset, m.disc, m.textX, m.rowH, m.titleH], [308, 14, 26, 48, 32, 28]);
+});
+test("wifi rows: Known Network singular, other networks under a disclosure, off shows header and settings", () => {
+    const nets = [{ name: "Home", known: true, connected: true, strength: 0.9, secure: true },
+                  { name: "Cafe", known: false, connected: false, strength: 0.5, secure: false },
+                  { name: "Neighbour", known: false, connected: false, strength: 0.7, secure: true },
+                  { name: "", known: false, connected: false, strength: 0.2, secure: false }];
+    const r = SMD.wifiRows({ available: true, on: true, networks: nets, otherExpanded: false });
+    assert.deepEqual(r.map(x => x.title || x.type), ["Wi‑Fi", "divider", "Known Network", "Home", "divider",
+                                                    "Other Networks", "divider", "Wi‑Fi Settings…"]);
+    assert.equal(r[3].on, true);
+    const e = SMD.wifiRows({ available: true, on: true, networks: nets, otherExpanded: true });
+    const other = e.filter(x => x.type === "toggle" && !x.on);
+    assert.deepEqual(other.map(x => [x.title, x.enabled]), [["Neighbour", false], ["Cafe", true]]);
+    const two = SMD.wifiRows({ available: true, on: true, otherExpanded: false,
+                               networks: [nets[0], { name: "Work", known: true, connected: false, strength: 1 }] });
+    assert.ok(two.some(x => x.title === "Known Networks"));
+    const off = SMD.wifiRows({ available: true, on: false, networks: nets });
+    assert.deepEqual(off.map(x => x.type), ["header", "divider", "footer"]);
+    assert.equal(off[0].on, false);
+});
+test("battery rows: percent in the header, state line, energy label disabled, settings", () => {
+    const r = SMD.batteryRows({ percent: 0.734, state: "discharging", minutesToFull: 0, showPercentInBar: false });
+    assert.equal(r[0].accessory, "text");
+    assert.equal(r[0].text, "73%");
+    assert.deepEqual(r.filter(x => x.type === "label").map(x => [x.title, x.enabled]),
+                     [["Power Source: Battery", true], ["No Apps Using Significant Energy", false]]);
+    assert.equal(r[r.length - 1].title, "Battery Settings…");
+    assert.equal(SMD.batteryRows({ percent: 1, showPercentInBar: true })[0].accessory, "");
+    assert.equal(SMD.batteryState("full", 0), "Fully Charged");
+    assert.equal(SMD.batteryState("charging", 95), "1:35 until fully charged");
+    assert.equal(SMD.batteryState("charging", 700), "More than 10 hours until fully charged");
+    assert.equal(SMD.batteryState("other", 0), "Power Source: Power Adapter");
+});
+test("focus rows and layout: dividers between sections, heights add up", () => {
+    const r = SMD.focusRows({ dnd: true });
+    assert.equal(r[2].title, "Do Not Disturb");
+    assert.equal(r[2].on, true);
+    const l = SMD.layout(r);
+    assert.deepEqual(l.rows.map(x => x.y), [0, 40, 46, 78, 84]);
+    assert.equal(l.height, 40 + 6 + 32 + 6 + 32.6);
+    assert.equal(SMD.layout([{ type: "divider" }, { type: "divider" }, { type: "footer" }]).rows.length, 1);
+});
 
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

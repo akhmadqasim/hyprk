@@ -83,10 +83,12 @@ Singleton {
     readonly property vector3d selectLift: Qt.vector3d(0.20, 0.20, 0.32)   // wrong password: the dots shown selected
     readonly property real arrowSize: 22                // ring, 2 pt stroke, arrow inside; centre 15 from the right end
     readonly property real arrowRight: 4
+    readonly property real arrowPointSize: 22           // arrow.right.circle regular: ring 22 pt, stroke 1.8
     readonly property real ringStroke: 2
     readonly property vector3d ringLift: dark ? Qt.vector3d(0.22, 0.22, 0.23) : Qt.vector3d(0.17, 0.18, 0.22)
     readonly property real capsSize: 12.5               // filled up-arrow, centre 137.25 from the left edge
     readonly property real capsX: 131
+    readonly property real capsPointSize: 12             // capslock.fill medium: ink 12.5 x 12.5 pt
     // "?" hint button: 29 pt disc 5 pt right of the capsule, 22 pt ring and "?" inside
     readonly property real hintDisc: 29
     readonly property real hintGap: 5

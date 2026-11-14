@@ -27,6 +27,7 @@ Slider {
     lensWidth: Theme.cc.lensW
     lensHeight: Theme.cc.lensH
     lensBackdrop: "transparent"
+    lensGain: Theme.cc.lensGain
     fillToEnds: true
     trackPressOffset: Theme.cc.knobW / 2
     overdrag: Theme.cc.overdrag

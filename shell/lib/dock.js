@@ -134,8 +134,9 @@ function layout(cells, o) {
 // ---------- the Downloads stack's menu ----------
 // Rows as the 27.2.1 Dock's AX lists them (live/dock/dock-menus.json "Downloads stack"): Sort by, Display as and View
 // content as are section headers (disabled), their choices below with a check on the current one. A choice this Dock
-// cannot do stays disabled: there is no date added or created on Linux and no stack popup (Fan / Grid / List /
-// Automatic). opts: { sort: "name" | "modified" | "kind", display: "stack" | "folder" }
+// cannot do stays disabled: there is no date added or created on Linux. View content as picks the stack popup
+// (lib/dockstack.js view, modules/DockStack.qml). opts: { sort: "name" | "modified" | "kind", display: "stack" |
+// "folder", view: "fan" | "grid" | "list" | "automatic" }
 const downloadsSorts = [["Name", "name"], ["Date Added", ""], ["Date Modified", "modified"], ["Date Created", ""], ["Kind", "kind"]];
 function downloadsMenu(opts) {
     const o = opts || {};
@@ -144,8 +145,32 @@ function downloadsMenu(opts) {
     out.push({ sep: true }, { label: "Display as", disabled: true });
     for (const d of [["Folder", "folder"], ["Stack", "stack"]]) out.push({ label: d[0], checked: d[1] === (o.display || "stack"), display: d[1] });
     out.push({ sep: true }, { label: "View content as", disabled: true });
-    for (const v of ["Fan", "Grid", "List", "Automatic"]) out.push({ label: v, disabled: true });
+    for (const v of [["Fan", "fan"], ["Grid", "grid"], ["List", "list"], ["Automatic", "automatic"]])
+        out.push({ label: v[0], checked: v[1] === (o.view || "automatic"), view: v[1] });
     return out;
+}
+
+// ---------- the Dock's own menu (right click on the separator) ----------
+// Dock.app/Contents/Resources/DockMenus.plist "dock" (27.2.1), titles from en.lproj/DockMenus.strings: TURN_HIDING_ON |
+// TURN_HIDING_OFF and TURN_MAG_ON | TURN_MAG_OFF (one of each pair, by the current setting), POSITION_ON_SCREEN ▸ LEFT,
+// BOTTOM, RIGHT, MINIMIZE_USING ▸ GENIE_EFFECT, SCALE_EFFECT, a separator, DOCK_SETTINGS. No separator between the
+// first four rows in the plist. `cmd` names what the row does (shell/services/Apps.qml dockSeparatorMenu). This Dock is
+// only at the bottom (Left and Right disabled) and the shell draws no minimize effect (both disabled, the choice
+// checked). d: dock.json ({ autohide, magnification, minimizeEffect })
+function dockOwnMenu(d) {
+    const o = d || {};
+    const effect = o.minimizeEffect === "scale" ? "scale" : "genie";
+    return [
+        { label: o.autohide ? "Turn Hiding Off" : "Turn Hiding On", cmd: "hiding" },
+        { label: o.magnification ? "Turn Magnification Off" : "Turn Magnification On", cmd: "magnification" },
+        { label: "Position on Screen", submenu: true, items: [
+            { label: "Left", disabled: true }, { label: "Bottom", checked: true, cmd: "none" }, { label: "Right", disabled: true }] },
+        { label: "Minimize Using", submenu: true, items: [
+            { label: "Genie Effect", checked: effect === "genie", disabled: true },
+            { label: "Scale Effect", checked: effect === "scale", disabled: true }] },
+        { sep: true },
+        { label: "Dock Settings…", cmd: "settings" },
+    ];
 }
 
 // ---------- launch bounce ----------
@@ -316,10 +341,13 @@ function pushRecent(recent, item, max) {
 
 // ---------- label ----------
 // App name label (27.2.1 DOCKLabelLayer / ECCartoucheGlassLayerController; MAC-ANSWERS.md "REA 27.2.1: Dock"
-// section 3 and Q-dock-08): a glass capsule 26 pt tall (radius 13), text + 2 x 14 wide, at least 15 + 2 x 13 = 41
-// wide (text at most 600, middle-truncated), its bottom 9 pt above the Dock background (the tail's tip 2.5).
+// section 3 and Q-dock-08): a glass capsule 26 pt tall (radius 13), the text's width rounded up + 2 x 13 wide, at
+// least 15 + 2 x 13 = 41 wide (text at most 600, middle-truncated), its bottom 9 pt above the Dock background (the
+// tail's tip 2.5). The pad is 13, not the 14 that Q-dock-08 took from one label ("Finder" 67.5): -[ECCartoucheGlass
+// LayerController setContentLayer:] pad = max(radius 13, 13), layer width = text + 2 pad, and the text width is
+// ceil(CTLineGetTypographicBounds) (reference/re/27.2.1/GAPS-REA-dock.md section 2). Ours measured 70..71 for "Finder".
 function labelWidth(textWidth) {
-    return Math.max(41, Math.min(600, textWidth) + 28);
+    return Math.max(41, Math.ceil(Math.min(600, textWidth)) + 26);
 }
 
 // ---------- Cmd-Tab ----------
@@ -347,4 +375,43 @@ function activationOrder(history, runningIds, frontId) {
     const f = h.indexOf(frontId);
     if (f > 0) h.unshift(h.splice(f, 1)[0]);
     return h.length === history.length && h.every((id, n) => id === history[n]) ? history : h;
+}
+
+// ---------- Dock menu tail ----------
+// The Dock's right-click menu is AppKit's popover-framed menu (DockHelper _popUpMenuRelativeToRect:, AppKit
+// _NSPopupMenuWindowPopoverFrame), its mask CoreUI's menu path (reference/re/27.2.1/GAPS-REA-dock.md 1,
+// decomp/Dock-gaps.c): __CUICreateMenuPath 0x18f272ce4 arrow width 23.5 (double at 0x18f3287a8), height 13 (fmov #13 at
+// 0x18f272dd8); __pathForRoundedRectWithAnchor 0x18f2fcfbc: base corners at +-(W/2 - 0.08 h) on the edge (0x18f2fd3f0),
+// tip arc radius 0.42 h (0x18f2fd3d4), base fillets 0.60 h (0x18f2fd3c4), the tip at the anchor clamped W/2 in from
+// each end, centred on an edge shorter than W (__CUICreateNewPopoverPathWithArrowPosition 0x18f272e24).
+// The plugin draws the same outline (plugin/src/Shape.cpp sdBoxTail); this is the QML glass's copy.
+const menuTail = { width: 23.5, height: 13, tip: 0.42, fillet: 0.60, baseIn: 0.08 };
+// the tip's x from the body's left edge
+function menuTailTip(at, w) {
+    const h = menuTail.width / 2;
+    return w < menuTail.width ? w / 2 : Math.max(h, Math.min(w - h, at));
+}
+// the tail's frame: v along the edge from the tip, u out of the body. Side from the base corner (c, 0) to (0, H), its
+// outward normal (nx, ny); the tip circle centre (0, ctY); the fillet circle centre (vF, rf), its foot on the edge (vF, 0)
+function menuTailGeometry() {
+    const H = menuTail.height, c = menuTail.width / 2 - menuTail.baseIn * H;
+    const rt = menuTail.tip * H, rf = menuTail.fillet * H, L = Math.hypot(H, c);
+    const nx = H / L, ny = c / L, cS = c * nx;
+    return { H, c, rt, rf, nx, ny, ctY: H - rt * L / c, vF: (rf + cS - rf * ny) / nx };
+}
+// SVG path of the tail under an edge at y = bottom, tip at x = tx, offset `off` into the shape (< 0: outside).
+// closed: the fill, reaching 2 pt up into the body to cover its bottom rim; open: the curve alone (rim, hairline)
+function menuTailPath(tx, bottom, off, closed) {
+    const g = menuTailGeometry(), rt = g.rt - off, rf = g.rf + off;
+    const pfx = g.vF - rf * g.nx, pfy = g.rf - rf * g.ny, ptx = rt * g.nx, pty = g.ctY + rt * g.ny;
+    const n = v => Math.round(v * 1000) / 1000;
+    const P = (x, y) => n(x) + " " + n(y);
+    let s = closed ? "M " + P(tx - g.vF, bottom - 2) + " L " + P(tx - g.vF, bottom - off) : "M " + P(tx - g.vF, bottom - off);
+    s += " A " + n(rf) + " " + n(rf) + " 0 0 1 " + P(tx - pfx, bottom + pfy);
+    s += " L " + P(tx - ptx, bottom + pty);
+    s += " A " + n(rt) + " " + n(rt) + " 0 0 0 " + P(tx + ptx, bottom + pty);
+    s += " L " + P(tx + pfx, bottom + pfy);
+    s += " A " + n(rf) + " " + n(rf) + " 0 0 1 " + P(tx + g.vF, bottom - off);
+    if (closed) s += " L " + P(tx + g.vF, bottom - 2) + " Z";
+    return s;
 }

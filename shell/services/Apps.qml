@@ -90,7 +90,7 @@ Singleton {
             catch (e) { root.downloads = {}; }
         }
     }
-    // the Downloads stack's Sort by and Display as (its Dock menu, lib/dock.js downloadsMenu), in the same file
+    // the Downloads stack's Sort by, Display as and View content as (its Dock menu, lib/dock.js downloadsMenu), in the same file
     property var downloads: ({})
     function writeItems() { itemsFile.setText(JSON.stringify({ removed: removed, downloads: downloads }) + "\n"); }
     function setDownloads(change) {
@@ -465,14 +465,33 @@ Singleton {
     // a Dock folder opens in our Finder (never the host's file manager through xdg-open, judge #7)
     function openFolder(item) { leaveMission(null); openFinder(Quickshell.env("HOME") + "/" + item.folder); }
 
+    // The Dock's own menu (right click on the separator): lib/dock.js dockOwnMenu (DockMenus.plist "dock") with actions
+    function dockSeparatorMenu() {
+        const d = Prefs.dock;
+        const run = {
+            hiding: () => Prefs.setDock({ autohide: !d.autohide }),
+            magnification: () => Prefs.setDock({ magnification: !d.magnification }),
+            none: () => {},
+            settings: () => root.runHyprkApp("org.hyprk.Settings", { HYPRK_SETTINGS_PANE: "dock" }),
+        };
+        const wire = r => r.sep ? r : Object.assign({}, r, r.cmd ? { action: run[r.cmd] } : {}, r.items ? { items: r.items.map(wire) } : {});
+        return DockLayout.dockOwnMenu(d).map(wire);
+    }
+
+    // The Downloads stack's sort / display / view rows with their actions (lib/dock.js downloadsMenu)
+    function downloadsOptions() {
+        return DockLayout.downloadsMenu(downloads).map(r => r.sort !== undefined && !r.disabled ? Object.assign({ action: () => root.setDownloads({ sort: r.sort }) }, r)
+                                                       : r.display !== undefined ? Object.assign({ action: () => root.setDownloads({ display: r.display }) }, r)
+                                                       : r.view !== undefined ? Object.assign({ action: () => root.setDownloads({ view: r.view }) }, r) : r);
+    }
+
     // Dock right-click menu, macOS layout: windows, Options, Show in Finder, Open/Quit
     function dockMenu(item) {
         if (item.trash)
             return [{ label: "Open", action: root.openTrash },
                     { sep: true }, { label: "Empty Trash", action: root.confirmEmptyTrash }];
         if (item.folder === "Downloads")
-            return DockLayout.downloadsMenu(downloads).map(r => r.sort !== undefined && !r.disabled ? Object.assign({ action: () => root.setDownloads({ sort: r.sort }) }, r)
-                                                           : r.display !== undefined ? Object.assign({ action: () => root.setDownloads({ display: r.display }) }, r) : r)
+            return root.downloadsOptions()
                 .concat([{ sep: true }, { label: "Options", submenu: true, items: [
                              { label: "Remove from Dock", disabled: true },
                              { label: "Show in Finder", action: () => root.openFinder("xdg:DOWNLOAD") } ] },

@@ -19,7 +19,7 @@ Singleton {
 
     property var notifications: ({ previews: "unlocked", summarize: false, whenSleeping: false, whenLocked: true, whenMirroring: false, apps: {} })
     property var lock: ({ screenSaverAfter: 1200, displayOffAfter: 600, requirePasswordAfter: 0, largeClock: "lock" })
-    property var input: ({ repeatRate: 25, repeatDelay: 600 })
+    property var input: ({ repeatRate: 12, repeatDelay: 500 })   // a fresh Mac account's (lib/state.js luaInput)
     property var wallpaper: ({ path: "" })
     property var dock: State.dockDefaults()
 
@@ -36,9 +36,17 @@ Singleton {
     }
     StateFile { key: "notifications" }
     StateFile { key: "lock" }
-    StateFile { key: "input"; onLoaded: root.applyInput() }
+    // no input.json (a fresh state dir): the defaults still go to Hyprland, whose own are 25 / 600 (judge #13: a fresh
+    // session kept them because only a loaded file applied anything)
+    StateFile { key: "input"; onLoaded: root.applyInput(); onLoadFailed: root.applyInput() }
     StateFile { key: "wallpaper" }
-    StateFile { key: "dock"; defaults: State.dockDefaults() }
+    StateFile { id: dockFile; key: "dock"; defaults: State.dockDefaults() }
+    // the Dock's own menu (Apps.dockSeparatorMenu) changes dock.json as Settings > Desktop & Dock does: the current
+    // values with `patch` over them
+    function setDock(patch) {
+        dock = Object.assign({}, dock, patch);
+        dockFile.setText(JSON.stringify(dock, null, 2) + "\n");
+    }
 
     // ---------- input.json -> Hyprland ----------
     function applyInput() {

@@ -38,23 +38,30 @@ changes apply at once. Missing file or keys fall back to the defaults.
 - `HYPRK_SOUND_LOG=<file>` appends `<event> <file>` for each sound that would play, muted or not.
 - No startup chime: the Mac's is firmware, no file exists, so "Play sound on startup" (Settings) has nothing to play.
 
-## Volume keys and the volume pop (BezelServices, Control Center)
+## Volume keys and the volume pop (Control Center)
 
-`scripts/volume-key.sh` (Hyprland binds in `config/hypr/hyprland.lua`) follows BezelServices' `VolumeStateMachine`,
-decoded from `/System/Library/LoginPlugins/BezelServices.loginPlugin` (macOS 27.2.1 26B131, arm64e slice, Ghidra 12.2
-of the bundle extracted from the restore image, 2026-11-12):
+`scripts/volume-key.sh` (Hyprland binds in `config/hypr/hyprland.lua`) follows Control Center's hot key path, decoded
+from ControlCenter.framework in the 27.2.1 dyld cache (`reference/re/27.2.1/SOUND-REA-27.2.1.md` section 2,
+2026-11-14). Until then it followed BezelServices' `VolumeStateMachine` (one pop when the key goes up, 1 s pops at full
+volume, 0.08 s before the unmute pop): that code is in the bundle but does not run, `-[BezelServicesTask
+handleCGSEvent:]` returns at once while the feature flag ControlCenter/Bezel is on, and 27.2.1 ships it FeatureComplete.
 
 | rule | Mac evidence |
 |---|---|
-| a key press and every auto-repeat change the level, show the HUD and play nothing | `VSIncrease` / `VSDecrease` `-generateOutput:stateMachine:` (0x11ac0, 0x11cf8): `changeVolumeBy:type:`, `displayOSD`, `setSingleBeepWhenFinished:YES`; the `*Repeat` states (0x11be8, 0x11e20) the same without the flag |
-| ONE pop when the key goes up, if a step happened since the last pop | `VSStart` (0x11538): `singleBeepWhenFinished` -> `startOneBeep` (an `NSTimer` of 0 s), then `stopBeeps` clears it |
-| a step is 1/16, Option+Shift 1/64, on a grid | `-changeVolumeBy:type:` (0x10388): level rounded to 1/64 (`(int)((v + 1/128) * 64) / 64`), +-step, truncated to a multiple of the step, clamped to 0..1 |
-| at full volume a held key pops at once, then every 1 s, until the key goes up or 4 s pass without a step; the key going up then plays nothing more | `startRepeatedBeeps` (0x10214): repeating `NSTimer` 1.0 s, fire date now, started when the new level is 1.0; `beepTimeout` = now + 4 s on each step, `playOneBeep:` (0xff78) stops the timer once it has passed and always ends with `setSingleBeepWhenFinished:NO` |
-| a pop stops the one still playing, then plays (no overlap) | `playOneBeep:`: `isPlaying` -> `stop`, then `play` on the one `NSSound` of `volume.aiff` |
-| Shift held (without Control, Option, Command) inverts "Play feedback when volume is changed" for that pop | `-handleKeyEvent:shift:control:option:command:` (0x10d04) sets `negateSilentPreference`; `playOneBeep:` plays when `playVolumeKeyFeedback != negateSilentPreference` |
-| Option alone with a volume or mute key opens the Sound settings | input 9 -> `VSSoundPrefs` (0x117b8): `displaySoundPrefs` |
-| the mute key: muting is silent, unmuting pops 0.08 s later | `VSMute` (0x11f30): `startOneBeep` while still muted (the timer is 0.08 s when muted, double at 0x401d8), then `toggleMute`; no flag, so key up plays nothing |
-| no output device: nothing | `canSetVolume` NO: "Manual volume adjustment not allowed", no level change, no pop |
+| a key press changes the level, shows the HUD and pops at once | `HotKeys.registerBezelHotKeys(with:)` 0x20a57cc34: the keyDown observer calls `perform` 0x20a59567c, no timer before it |
+| a held key repeats the step and the pop at the keyboard's repeat rate | the same observer starts an `NSTimer` at `NXKeyRepeatThreshold`, interval `NXKeyRepeatInterval`; each tick calls `perform` |
+| the key going up plays nothing | the keyUp observer 0x20a57d690 only invalidates the timer |
+| a step is 1/16, Option+Shift 1/64, on a grid | 0x20a595548 and the grid step 0x20a595d28 (the same grid as BezelServices) |
+| the pop plays on every step, also at 0 and at full volume | volume step 0x20a595dac ends in the feedback gate 0x20a596298 whatever the level |
+| a pop stops the one still playing, then plays (no overlap) | `AudioVolumeFeedbackController` block 0x20a531cec: `stop` on the previous `AVAudioPlayer`, `play` on a new one |
+| Shift held alone inverts "Play feedback when volume is changed" for that pop | the gate plays when `playVolumeKeyFeedback != shift` |
+| Option alone with a volume or mute key opens the Sound settings | BezelServices input 9 -> `VSSoundPrefs` (not re-read on the Control Center path) |
+| the mute key: muting is silent, unmuting pops at once | 0x20a595bf0: the gate runs only when it was muted, no timer |
+| no output device: nothing | `canSetVolume` NO |
+
+Alert volume: the slider position s is stored as exp(s - 1) (0 at 0) and that is the linear gain of every sound
+systemsoundserverd plays (section 1 of the same file); `sound.sh` and the Settings preview apply it. Not the volume
+pop and the power chime, which are not systemsoundserverd's. The stock position is 1.
 
 The Control Center Sound slider (ControlCenter 27.2.1, `0x1000e3814`): `playAudioVolumeFeedback(onSliderEditingChanged:)`
 returns while editing; when editing ends it reads `NSEvent.modifierFlags` bit 17 (Shift) and calls
@@ -107,11 +114,11 @@ Mac: the loudness of a UI sound at two Alert volume settings (a recording of the
 
 ## Open (2026-11-12, session 19)
 
-- **Needs the Mac:** key-up -> sound start time of the volume pop and the shutter (ours 26-40 ms and 23 ms to the
-  player); the loudness of a UI sound at two Alert volume settings (the binary says it scales); the double-click
-  interval (the plugin's title-bar double-click uses Qt's 400 ms).
-- **Not decoded yet:** whether Settings > Sound's Output volume slider inverts the pop with Shift (Sound.appex; ours
-  plays on let-go when the switch is on, without Shift); the Control Center feedback controller's own throttle
-  (ControlCenter.framework 0x20a532114 compares a stored date with now before it plays).
-- Volume keys and the Hyprland binds: a press that changes nothing (already at 0 going down) still sets the key-up pop,
-  as `VSDecrease` does (it sets the flag whatever the level).
+- **Needs the Mac:** the measured output latency of the volume pop and the shutter (the designed delay is 0 on both,
+  SOUND-REA-27.2.1.md section 2; ours 26-40 ms and 23 ms to the player); the stock key repeat values (kernel defaults
+  500 ms, then 83.3 ms).
+- **Decoded 2026-11-14 (SOUND-REA-27.2.1.md):** the Settings Output slider takes no Shift and plays 30 ms after the
+  last let-go (ours: at once); the Control Center throttle's interval is 0 s; the double-click interval is 0.5 s
+  (plugin title bar and Finder now 500 ms, were 400).
+- Not played yet: the Dock's drop-on-Trash sound (ID 16: no file drop reaches the Dock, Finder's drag is in-window only,
+  reference/GAPS-dock-lock-sound.md item 4) and the IDs listed in SOUND-REA-27.2.1.md section 5.

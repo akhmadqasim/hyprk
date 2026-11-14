@@ -31,7 +31,12 @@ Item {
     readonly property int cardGap: Theme.notif.spacing
     property real firstSlot: 1   // slot of the first notification group (the gap under it opens and closes with it)
     property var expanded: ({})       // appName -> bool
-    property string photo: ""
+    // the candidates in order (up to 20 from ~/Pictures, then a wallpaper); an image Qt cannot decode moves to the
+    // next one, as the Mac's Photos widget only shows pictures it could load (judge-95-16: an undecodable file left an
+    // empty card). With none left the card shows the session's wallpaper, its own fallback
+    property var photos: []
+    property int photoPick: 0
+    readonly property string photo: photoPick < photos.length ? photos[photoPick] : ""
     readonly property string wallpaperDir: Quickshell.shellDir + "/../themes/wallpapers/png"
     // folder name as the caption, like a Photos memory; a loose file in ~/Pictures gets the generic title
     readonly property string photoTitle: {
@@ -41,8 +46,8 @@ Item {
     Process {
         // a photo from ~/Pictures (no screenshots), else one of the macOS wallpapers; once per shell start
         running: true
-        command: ["sh", "-c", 'd="$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures")"; p=$(find "$d" -maxdepth 2 -type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \\) -not -ipath "*screenshot*" 2>/dev/null | head -n1); [ -n "$p" ] || p=$(ls "$0"/*.png 2>/dev/null | grep -vi tahoe | head -n1); echo "$p"', nc.wallpaperDir]
-        stdout: StdioCollector { onStreamFinished: nc.photo = text.trim() }
+        command: ["sh", "-c", 'd="$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures")"; find "$d" -maxdepth 2 -type f \\( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \\) -not -ipath "*screenshot*" 2>/dev/null | head -n20; ls "$0"/*.png 2>/dev/null | grep -vi tahoe | head -n1', nc.wallpaperDir]
+        stdout: StdioCollector { onStreamFinished: { nc.photoPick = 0; nc.photos = text.split("\n").filter(l => l !== ""); } }
     }
 
     // plugin glass shapes follow moving items only while the window re-measures
@@ -196,10 +201,12 @@ Item {
                 width: nc.width
                 spacing: Theme.nc.spacing
 
-                // section heading over the groups (Q-panels-32: "Notification Centre", about SF 17 bold, a "Clear All"
-                // glass circle with an xmark at the right edge; 24 pt in the code, MAC-ANSWERS NC button table). Its x
-                // turns into a "Clear All" capsule first and a second click clears every group, as a group's x does
-                // (the section's own confirm was not measured on the Mac)
+                // section heading over the groups, decoded from NotificationCenter 27.2.1 (ExpandedHistoryHeaderView,
+                // reference/re/27.2.1/GAPS-REA-panels.md section 1): the title is system 18 semibold in a 20 pt frame
+                // (FUN_100190e98; it was 17 bold, Q-panels-32's guess) and the button is NotificationsConfirmCloseButton:
+                // a 20 pt glass circle, radius 10, with an xmark (style FUN_100147278: height 20; the 1 px/pt overview
+                // reads 20), not the widget editor's 24 pt button that MAC-ANSWERS' table gave. Its x turns into a
+                // "Clear All" capsule first and a second click clears every group, as a group's x does
                 RowLayout {
                     Layout.fillWidth: true
                     visible: groupModel.count > 0
@@ -209,13 +216,15 @@ Item {
                         Layout.leftMargin: 1   // text frame at x 1351, the cards' edge at 1350 (Q-panels-32)
                         text: "Notification Center"
                         elide: Text.ElideRight
-                        font: Typography.font(17, Typography.bold)
+                        font: Typography.font(18, Typography.semibold)
+                        Layout.preferredHeight: 20
+                        verticalAlignment: Text.AlignVCenter
                         color: Theme.color.label
                     }
                     Pill {
                         symbol: nc.confirmClearAll ? "" : "xmark"
                         text: nc.confirmClearAll ? "Clear All" : ""
-                        implicitHeight: 24
+                        implicitHeight: Theme.nc.pillSmall
                         onActivated: if (nc.confirmClearAll) nc.clearEverything(); else nc.confirmClearAll = true
                     }
                 }
@@ -569,6 +578,7 @@ Item {
                             sourceSize.width: Wallpaper.thumbWidth * 2
                             fillMode: Image.PreserveAspectCrop
                             asynchronous: true
+                            onStatusChanged: if (status === Image.Error && nc.photo) nc.photoPick++
                         }
                         Rectangle {
                             anchors.fill: parent
@@ -660,6 +670,8 @@ Item {
             color: Theme.color.label
         }
         Symbol { visible: !!pill.symbol; anchors.centerIn: parent; name: pill.symbol || "xmark"; surface: "nc"; size: 12; color: Theme.color.label }
-        MouseArea { id: pma; anchors.fill: parent; hoverEnabled: true; onClicked: pill.activated() }
+        // the click area is 4 pt larger on every side than the glass (NotificationButtonStyle.makeBody FUN_10006ba4c:
+        // contentShape = the shape inset by -4, so a 20 pt button takes clicks over 28, the AX size of Q-panels-32)
+        MouseArea { id: pma; anchors.fill: parent; anchors.margins: -4; hoverEnabled: true; onClicked: pill.activated() }
     }
 }

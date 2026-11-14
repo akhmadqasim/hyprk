@@ -29,6 +29,7 @@ ShellRoot {
                 Dock { modelData: perScreen.modelData }
                 Overlay { modelData: perScreen.modelData }
                 ControlCenterWindow { modelData: perScreen.modelData }
+                StatusModuleWindow { modelData: perScreen.modelData }
                 NotificationCenterWindow { modelData: perScreen.modelData }
             }
         }
@@ -60,5 +61,9 @@ ShellRoot {
     LazyLoader {
         active: Panels.loaded.mission === true
         MissionControl { modelData: Panels.screen }
+    }
+    LazyLoader {
+        active: Panels.loaded.emoji === true
+        EmojiPicker { modelData: Panels.screen }
     }
 }

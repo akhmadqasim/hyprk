@@ -1,6 +1,6 @@
 import QtQuick
-import QtQuick.Shapes
 import qs
+import qs.components
 import qs.HyprK
 import "lock.js" as L
 
@@ -108,33 +108,18 @@ Item {
             radius: 1
             color: "white"
         }
-        // Caps Lock: a filled up-arrow over a bar, in the arrow's place, only with an empty field
-        Shape {
+        // Caps Lock: capslock.fill (AppKit's NSSecureTextField indicator) in the arrow's place, only with an empty
+        // field; 12 pt medium: ink 25 x 25 px as on field-light-capslock-empty.png (regular 24.5 x 24.75), its ink
+        // centre at capsX + capsSize / 2 (the symbol's ink is centred on its layout anchor within 0.1 pt)
+        Symbol {
             visible: Lock.capsLock && f.shown === 0
-            x: LockTheme.capsX
+            x: LockTheme.capsX + (LockTheme.capsSize - width) / 2
             anchors.verticalCenter: parent.verticalCenter
-            width: LockTheme.capsSize
-            height: LockTheme.capsSize
-            preferredRendererType: Shape.CurveRenderer
-            ShapePath {
-                readonly property real s: LockTheme.capsSize
-                fillColor: "white"
-                strokeColor: "transparent"
-                startX: s * 0.5; startY: 0
-                PathLine { x: capsPath.s; y: capsPath.s * 0.5 }
-                PathLine { x: capsPath.s * 0.74; y: capsPath.s * 0.5 }
-                PathLine { x: capsPath.s * 0.74; y: capsPath.s * 0.72 }
-                PathLine { x: capsPath.s * 0.26; y: capsPath.s * 0.72 }
-                PathLine { x: capsPath.s * 0.26; y: capsPath.s * 0.5 }
-                PathLine { x: 0; y: capsPath.s * 0.5 }
-                PathLine { x: capsPath.s * 0.5; y: 0 }
-                PathMove { x: capsPath.s * 0.26; y: capsPath.s * 0.82 }
-                PathLine { x: capsPath.s * 0.74; y: capsPath.s * 0.82 }
-                PathLine { x: capsPath.s * 0.74; y: capsPath.s }
-                PathLine { x: capsPath.s * 0.26; y: capsPath.s }
-                PathLine { x: capsPath.s * 0.26; y: capsPath.s * 0.82 }
-                id: capsPath
-            }
+            size: LockTheme.capsSize
+            pointSize: LockTheme.capsPointSize
+            weight: "medium"
+            name: "capslock.fill"
+            color: "white"
         }
     }
     // return arrow: a 22 pt ring with an arrow, only when there is text
@@ -147,30 +132,14 @@ Item {
         height: LockTheme.arrowSize
         lift: LockTheme.ringLift
         opacity: f.dim
-        Rectangle {
+        // arrow.right.circle, regular 22 pt (named by its look: ring 44 x 44 px with a 3.7 px stroke on
+        // field-dark-1char.png, the symbol's 44 x 44 / 3.6 px; LoginUICore's symbol name was not found)
+        Symbol {
             anchors.fill: parent
-            radius: width / 2
-            color: "transparent"
-            border.width: LockTheme.ringStroke
-            border.color: "white"
-        }
-        Shape {
-            anchors.fill: parent
-            preferredRendererType: Shape.CurveRenderer
-            ShapePath {
-                id: arrowPath
-                readonly property real s: LockTheme.arrowSize
-                strokeColor: "white"
-                strokeWidth: 1.8
-                fillColor: "transparent"
-                capStyle: ShapePath.RoundCap
-                joinStyle: ShapePath.RoundJoin
-                startX: s * 0.27; startY: s * 0.5
-                PathLine { x: arrowPath.s * 0.72; y: arrowPath.s * 0.5 }
-                PathMove { x: arrowPath.s * 0.53; y: arrowPath.s * 0.31 }
-                PathLine { x: arrowPath.s * 0.72; y: arrowPath.s * 0.5 }
-                PathLine { x: arrowPath.s * 0.53; y: arrowPath.s * 0.69 }
-            }
+            size: LockTheme.arrowSize
+            pointSize: LockTheme.arrowPointSize
+            name: "arrow.right.circle"
+            color: "white"
         }
         MouseArea { anchors.fill: parent; enabled: f.interactive; onClicked: Lock.submit() }
     }

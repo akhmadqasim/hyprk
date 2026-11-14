@@ -178,7 +178,7 @@ ShellWindow {
     // ---------- right: status items + clock ----------
     readonly property var wifiDev: State.wifiDevice(Networking.devices.values)
     readonly property var wifiNet: wifiDev ? wifiDev.networks.values.find(n => n.connected) || null : null
-    readonly property bool laptop: State.hasBattery(UPower.devices.values)
+    readonly property bool laptop: State.hasBattery(UPower.devices.values) || Quickshell.env("HYPRK_STATUS_STUB") === "1"
 
     Row {
         anchors.right: parent.right
@@ -187,15 +187,21 @@ ShellWindow {
         spacing: Theme.menuBar.statusSpacing
 
         // Battery: hidden on desktops (no system battery)
+        // A click opens its ControlCenter module under the item (STATUS-REA-27.2.1.md; StatusModuleWindow.qml)
         StatusItem {
             visible: bar.laptop
             hPad: 0   // the battery glyph fills its item (Q-menubar-09)
             contentWidth: batteryRow.implicitWidth
+            active: bar.moduleOpen("battery")
+            onClicked: openModule("battery")
             Row {
                 id: batteryRow
                 anchors.centerIn: parent
                 spacing: 4
                 Text {
+                    // the Mac hides the percentage by default (Q-menubar-29: no BatteryShowPercentage key, no text
+                    // drawn); the Battery module's header shows it instead (STATUS-REA, BatteryView)
+                    visible: false
                     anchors.verticalCenter: parent.verticalCenter
                     text: Math.round(UPower.displayDevice.percentage * 100) + "%"
                     color: bar.statusFg
@@ -220,13 +226,15 @@ ShellWindow {
                 color: bar.statusFg
                 opacity: bar.wifiDev && bar.wifiDev.connected ? 1 : 0.5
             }
-            onClicked: Panels.toggle("cc", bar.screen)
+            active: bar.moduleOpen("wifi")
+            onClicked: openModule("wifi")
         }
         // Focus: shown only while Do Not Disturb is on, like macOS
         StatusItem {
             visible: Notifs.dnd
             Symbol { anchors.centerIn: parent; name: "moon"; surface: "menubar"; size: Theme.menuBar.statusIconSize - 1; color: bar.statusFg }
-            onClicked: Panels.toggle("cc", bar.screen)
+            active: bar.moduleOpen("focus")
+            onClicked: openModule("focus")
         }
         // Spotlight: -[SPUISpotlightMenuItem _handleStatusItemPress:] (0x2ade56b60, an NSPressGestureRecognizer): opens on
         // mouse-down; a click while it is open closes it on mouse-up; a press held 1.0 s (the NSTimer, 0x2ade56bcc)
@@ -412,9 +420,12 @@ ShellWindow {
         }
     }
 
+    function moduleOpen(name) { return Panels.open === name && Panels.activeScreen === bar.screen; }
+
     component StatusItem: Item {
         id: si
         property bool active: false
+        function openModule(name) { const p = mapToItem(null, 0, 0); Panels.toggleStatus(name, p.x, width, bar.screen); }
         property real contentWidth: Theme.menuBar.statusIconSize
         property real hPad: Theme.menuBar.statusHPadding
         default property alias content: sholder.data

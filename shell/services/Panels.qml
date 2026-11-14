@@ -8,6 +8,8 @@ import "../lib/menus.js" as Menus
 
 // Which transient surface is open. Only one at a time, like macOS.
 // Values: "" | "menu" | "context" | "alert" | "cc" | "nc" | "spotlight" | "switcher" | "mission"
+// | "stack" (the Dock's Downloads fan or grid, on activeScreen: Dock.qml openStack, DockStack.qml)
+// | "emoji" (Emoji & Symbols, EmojiPicker.qml)
 Singleton {
     id: root
 
@@ -108,6 +110,13 @@ Singleton {
         open = name;
     }
     function close() { open = ""; menuIndex = -1; pointerHeld = false; }
+    // A status item's module ("wifi", "battery", "focus": StatusModuleWindow) hangs under the item that opened it:
+    // x and width of that item on its screen
+    property var statusAnchor: ({ x: 0, w: 0 })
+    function toggleStatus(name, x, w, scr) {
+        if (!(open === name && activeScreen === (scr || screen))) statusAnchor = { x: x, w: w };
+        toggle(name, scr);
+    }
     // Press, drag, release (MAC-ANSWERS.md Q-menubar-24): the button that opened a menu on a menu bar title is still
     // down. The press's surface (the bar) keeps the pointer grab and hands the pointer's screen position to the open
     // menu (menuPointer); the Overlay takes the keyboard only once the button is up, because a layer that turns
@@ -124,7 +133,7 @@ Singleton {
     // Surfaces created on open (shell.qml LazyLoader) stay loaded while they dematerialize: closing
     // one holds it until its window releases it (ShellWindow.lingerAs), at most 1.5 s. The loaders
     // read only `loaded`, set here after `held`, so they never see a closed surface unheld.
-    readonly property var lazySurfaces: ["spotlight", "switcher", "mission"]
+    readonly property var lazySurfaces: ["spotlight", "switcher", "mission", "emoji"]
     property var loaded: ({})           // name -> true while open or held
     property var held: ({})
     property string previous: ""
@@ -164,6 +173,8 @@ Singleton {
     GlobalShortcut { appid: "hyprk"; name: "notificationcenter"; description: "Notification Center"; onPressed: root.toggle("nc") }
     GlobalShortcut { appid: "hyprk"; name: "switcher"; description: "App switcher"; onPressed: root.open = "switcher" }
     GlobalShortcut { appid: "hyprk"; name: "missioncontrol"; description: "Mission Control"; onPressed: root.toggle("mission") }
+    // Edit > Emoji & Symbols, Ctrl-Cmd-Space (modules/EmojiPicker.qml)
+    GlobalShortcut { appid: "hyprk"; name: "emoji"; description: "Emoji & Symbols"; onPressed: root.toggle("emoji") }
 
     // Cmd-Tab without taking the keyboard (the Mac's windows stay active under it): when the Cmd+Tab bind also enters
     // the Hyprland submap "hyprk-switcher", its binds send these and the switcher takes no keyboard focus

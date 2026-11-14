@@ -29,6 +29,8 @@ Item {
     property bool shown: false
     property real originX: 0       // screen position of this item, for the glass backdrop
     property real originY: 0
+    // the Dock menu's tail: the tip's x from this menu's left edge on its bottom edge (Overlay: the icon centre), < 0 none
+    property real tailX: -1
     property var host: null        // the window this menu is in (Overlay or a submenu surface), for submenus
     // a submenu's parent menu: closing with the parent (Esc, a chosen row) fades, a move to another parent row hides
     // the submenu in one frame (read when it closes, not bound: the two change in the same event)
@@ -94,16 +96,18 @@ Item {
     }
     readonly property real keyLeft: width - Theme.menu.keyRight - keyWidth
     // width: the label column (plain text x + widest label; the row icons do not widen it) + the shortcut columns,
-    // and no row cut short: icon rows, chevron rows and plain rows end with their own trailing field
+    // and no row cut short: every row ends `end` before the edge, the submenu column's 48 for all rows of a menu
+    // with a submenu row (Menus.rowEnd: AppKit reserves that column, desktop menu 198.5 pt on context-dark.png)
     readonly property real contentWidth: {
         const base = hasState ? Theme.menu.stateTextX : Theme.menu.textX;
+        const end = Menus.rowEnd(shownItems, Theme.menu.trailing, Theme.menu.submenuTrailing);
         let w = 0, label = 0, keys = false;
         for (const it of shownItems) {
             if (it.sep) continue;
             const lw = metrics.advanceWidth(it.label || "");
             keys = keys || !!it.shortcut;
             label = Math.max(label, base + lw);
-            w = Math.max(w, textXOf(it) + lw + (it.submenu ? Theme.menu.shortcutGap + Theme.menu.chevronField : Theme.menu.trailing));
+            w = Math.max(w, textXOf(it) + lw + end);
         }
         if (keys) w = Math.max(w, label + Theme.menu.columnGap + (modsWidth > 0 ? modsWidth + Theme.menu.modifierGap : 0)
                                   + keyWidth + Theme.menu.keyRight);
@@ -140,6 +144,7 @@ Item {
         }
         switch (action) {
         case "empty-trash": Apps.confirmEmptyTrash(); break;
+        case "emoji": Panels.toggle("emoji"); break;
         case "minimize": Hyprland.dispatch('hl.dsp.window.move({ workspace = "special:minimized" })'); break;
         case "center": Hyprland.dispatch("hl.dsp.window.center()"); break;
         case "cycle": Apps.cycleAppWindows(1); break;
@@ -208,6 +213,7 @@ Item {
         tint: Theme.glass.tintStrong
         solidColor: Theme.reduceTransparency ? Theme.color.menuSolid : Theme.glass.solid
         materialize: root.fade
+        tail: root.tailX
     }
 
     // selection: one inset pill that jumps to the hovered row
@@ -479,6 +485,16 @@ Item {
                     width: 8.5
                     height: 2
                     radius: 1
+                    color: row.ink
+                }
+                Rectangle {   // a minimised window in the Window menu's list (NSMenuItemDiamond, "◆" in the AX dump); its
+                    // size was not measured on the Mac: a 5 pt square turned 45° (GUESS)
+                    visible: row.modelData.checked === "diamond"
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: Theme.menu.checkX - width / 2
+                    width: 5
+                    height: 5
+                    rotation: 45
                     color: row.ink
                 }
                 Symbol {

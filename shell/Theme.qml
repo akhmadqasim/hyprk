@@ -405,8 +405,8 @@ Singleton {
         readonly property real stateIconX: 36
         readonly property real stateIconTextX: 51
         readonly property real checkX: 18.25
-        // key column right edge W - 18.5, modifiers end 3 pt left of it; chevron centred at W - 23.25 in a
-        // 32 pt trailing field; a plain row ends ~17 pt before the edge (single "A" menu 41 wide)
+        // key column right edge W - 18.5, modifiers end 3 pt left of it; chevron centred at W - 23.25; a
+        // plain row ends ~17 pt before the edge (single "A" menu 41 wide)
         readonly property real keyRight: 18.5
         readonly property real modifierGap: 3
         // AppKit lays the shortcut out as columns per menu: width = state/text x + widest label + 43.5 + widest
@@ -416,7 +416,8 @@ Singleton {
         readonly property real columnGap: 43.5
         readonly property real modifierSpacing: 3.5
         readonly property real chevronX: 23.25
-        readonly property real chevronField: 32
+        // every row of a menu with a submenu row ends 48 pt before the edge, the chevron in that column (Menus.rowEnd)
+        readonly property real submenuTrailing: 48
         readonly property real trailing: 17
         readonly property real separatorInset: 16        // line x 16..W-16, at row y 5..6 (Q-menubar-20)
         // activation: highlight off 4 frames, on 3, then the menu fades (Q-menubar-24); the pauses end half a frame
@@ -448,13 +449,59 @@ Singleton {
         readonly property size labelPointer: Qt.size(16, 7)
         // Dock menu placement (Q-dock-10, live/dock/dock-menus.json geometry): its window x = icon centre - 40, its
         // bottom = the Dock background top, the body inset 13 in it. So the body starts 27 left of the icon centre
-        // and reaches to the right, its bottom 13 above the Dock. The tail at the icon centre needs the plugin (open)
+        // and reaches to the right, its bottom 13 above the Dock. That 13 is the tail's height (CoreUI's menu path,
+        // GAPS-REA-dock.md 1): Glass.tail draws it under the body, its tip at the icon centre (lib/dock.js menuTail)
         readonly property real menuLeft: 40
         readonly property real menuInset: 13
         readonly property color labelText: theme.dark ? Qt.rgba(244 / 255, 244 / 255, 244 / 255, 1) : Qt.rgba(37 / 255, 37 / 255, 37 / 255, 1)   // Q-dock-08
         // tint over the plugin glass: none. The plugin's dock recipe alone gives the Mac's body over white, grey and
         // black in both modes (light 229/134/38, dark 176/107/12 with the probe's max luma 0.75, MAC-ANSWERS #53)
         readonly property color pluginLift: "transparent"
+
+        // Downloads stack (modules/DockStack.qml; layout math in lib/dockstack.js). Sources: reference/re/27.2.1/
+        // MOTION-REA-27.2.1.md section 3, GAPS-REA-dock.md section 4, MAC-ANSWERS.md Q-dock-12
+        readonly property QtObject stack: QtObject {
+            // the pile's items drawn in their decoded boxes (lib/dockstack.js pile). A picture's thumbnail is fitted to
+            // 0.895 of its box: dock-dark.png, the photo behind the ZIP is 48 px wide at tile 66 px, its box 104/128 of
+            // the tile. The ZIP page (themes/icons/system/ZipDocument-154.png, face 132 of 154 px) is drawn so its face is
+            // 58 px tall at tile 66 px as in dock-dark.png / dock-light.png: 58 / (116/128 x 66) = 0.970 of the box
+            readonly property real photoFit: 48 / (104 / 128 * 66)
+            readonly property real zipScale: 58 / (116 / 128 * 66) * 154 / 132
+            // open / close: the CATransaction default 0.25 s (+[CATransaction animationDuration] QuartzCore 0x18dd0a9b8
+            // `fmov d8, #0.25`; of the Dock's 36 setAnimationDuration: calls none is on the stack paths or their
+            // callers except Shift slow motion, 5 s: MOTION-REA Round 3, R3.1). Fan position: kCAMediaTimingFunction-
+            // EaseInEaseOut (0x100064300); its rotation / size and the whole grid are implicit animations, CA's
+            // "default" curve (0.25, 0.1, 0.25, 1) (QuartzCore table 0x18e119380, _CALayerCreateImplicitAnimation)
+            readonly property int duration: 250
+            readonly property var gridCurve: [0.25, 0.1, 0.25, 1, 1, 1]
+            // fan labels (-[DOCKStackFanItemLayer layoutSublayers] 0x100042d78, _setText: 0x100042474): glass pill radius 13
+            // (26 tall, as the hover label's cartouche), its right-centre 5 pt left of the 64 pt item box, SF 13
+            readonly property real fanItem: 64
+            readonly property real fanLabelGap: 5
+            readonly property real fanLabelHeight: 26
+            readonly property real itemFont: 13       // +[DOCKStackExpandedItemLayer itemFont] 0x10001f894: UI font 13
+            // grid (-[DOCKStackGridLayer layout] 0x10001bfb8, ECCartoucheGlassLayerController size 2): radius 26 (Mac shot
+            // "about 28" by eye), tail a 24 pt square turned 45 deg, corner 5, centre 5 above the body, in a 12 pt band;
+            // non-glass radius 5 is the Mac's own fallback for a missing glass (not used: our fallback is the QML glass)
+            readonly property real gridRadius: 26
+            readonly property real gridTailBand: 12
+            readonly property real gridTail: 24
+            readonly property real gridTailCorner: 5
+            readonly property real gridTailOffset: 5
+            // grid cell (-[DOCKStackGridItemLayer layoutSublayers] 0x10001f44c): icon cell - 28 at (14, 6 from the top),
+            // the name in the bottom 22
+            readonly property real gridInset: 14
+            readonly property real gridNameHeight: 22
+            // grid frame: grid 17 from the sides, 30 from the top with the title (AX: group 895,613, scroll area
+            // 912,643, live/dock/dock-live.json); the title's AX frame 7 below the top, 19 tall
+            readonly property real gridSide: 17
+            readonly property real gridTop: 30
+            readonly property real titleTop: 7
+            readonly property real titleHeight: 19
+            readonly property real titleFont: 15        // guessed: a 19 pt AX line fits SF 15 bold (not measured)
+            // the tile's chevron while a stack is open (Q-dock-12 "its tile shows a chevron"): size and weight guessed
+            readonly property real chevron: 0.42        // of the tile
+        }
     }
 
     // ---------- notifications ----------
@@ -624,6 +671,11 @@ Singleton {
         readonly property real knobH: 14
         readonly property real lensW: 24
         readonly property real lensH: 20
+        // the held lens's sample gain in dark: the white fill reads 254 outside the lens and 222 inside it (mean of rows
+        // 356-362 between the lens's left rim and the fill end, frame 3 of the dark grey127 picture above); the shared
+        // Settings fit (Tokens knobLensGain .702, haze .091) drew 187: gain (222 - .091 x 255) / (.909 x 254) = .86
+        // (GLASS-HIG.md round 2). Light: no Mac frame of the held CC knob, the shared value
+        readonly property real lensGain: theme.dark ? 0.86 : Tokens.control.knobLensGain
         readonly property real overdrag: 5
         readonly property int overdragBackMs: 130
         // a module opened from the grid (Q-panels-12): one glass panel of the tiles' family in the grid's place, 308 wide,
@@ -823,6 +875,58 @@ Singleton {
         // (dark 71 -> 89 measured; black in light, Q-settings-15)
         readonly property color buttonBg: theme.dark ? Qt.rgba(1, 1, 1, 0.0756) : Qt.rgba(0, 0, 0, 0.0756)
         readonly property color buttonPressed: theme.dark ? Qt.rgba(1, 1, 1, 0.098) : Qt.rgba(0, 0, 0, 0.098)
+    }
+
+    // ---------- Emoji & Symbols picker (modules/EmojiPicker.qml) ----------
+    // Measured on reference/screens/27.2.1/panels/emoji-picker-dark.png (2 px per pt, body top-left at 72, 89 px).
+    // Points from the body's top-left. No light shot: the light colours are guessed.
+    readonly property QtObject emoji: QtObject {
+        readonly property real width: 320               // body 72..711 px
+        readonly property real height: 445              // body 89..978 px
+        readonly property real radius: 20               // corner profile fits r 40 px
+        readonly property real arrowHeight: 10.5        // tip at 68 px, body top 89
+        readonly property real arrowWidth: 26           // base 366..418 px, tip on the body's centre
+        readonly property real margin: 8                // from the screen edges (the NSPopover's, HyprK panels.js)
+        readonly property color fill: theme.dark ? "#1F1F1F" : "#F6F6F6"   // 31 31 31 measured; light guessed
+        readonly property color rimOuter: theme.dark ? Qt.rgba(0, 0, 0, 0.68) : Qt.rgba(0, 0, 0, 0.18)   // 1 px a 173
+        readonly property color rimInner: theme.dark ? Qt.rgba(1, 1, 1, 0.12) : Qt.rgba(1, 1, 1, 0.6)    // 56 on 31
+        // search field: inside the 3 pt focus ring 86..697 x 105..172 px; text at 150 px (28.5 in), 13 pt
+        readonly property real searchX: 10.5
+        readonly property real searchY: 10.75
+        readonly property real searchW: 299
+        readonly property real searchH: 27.5
+        readonly property real searchTextX: 28.5
+        readonly property real searchGlyphX: 15         // magnifier ink 111..135 px, centre 15 pt in the field
+        // grid: 6 columns, emoji centres 137.5, 239, 340.5, 442, 542.5, 644 px (pitch 50.67 = 304 / 6), rows 88 px
+        readonly property int cols: 6
+        readonly property real side: 8
+        readonly property real cellH: 44
+        readonly property real gridTop: 47.25           // first row's top: its centre at 227.5 px = 69.25 pt
+        readonly property real glyphSize: 32.8          // yellow ink 54 px wide on the Mac shot in all 18 faces of rows 1-3;
+                                                        // at 31.6 ours measured 52 px (judge #13: 51-52 against 54)
+        readonly property real glyphOffsetY: 1          // centred on its line box the face sat 1 pt above the Mac's
+        readonly property real highlightW: 56           // 83..194 px
+        readonly property real highlightH: 41           // 187..268 px
+        readonly property real highlightRadius: 20
+        readonly property color highlight: theme.dark ? Qt.rgba(1, 1, 1, 0.28) : Qt.rgba(0, 0, 0, 0.10)   // 86..102 on 31
+        // category bar: hairline at 889 px, 45 tall, content scrolls under it (blurred emoji show through)
+        readonly property real barTop: 400
+        readonly property real barCenterY: 22.25        // icons 921..946 px
+        readonly property real tabX: 23.75              // first tab's centre (119.5 px)
+        readonly property real tabPitch: 31.75          // 63.5 px
+        readonly property real chevronX: 303            // 678 px
+        readonly property real tabCircle: 24            // the selected tab's disc 159..207 px
+        readonly property real tabGlyph: 16             // glyph box; ink 13 pt tall (921..946 px)
+        // SF Symbols at 13 pt regular (alpha rms on the shot: clock .068, the selected face .018, apple .076, car .047,
+        // lightbulb .048, heart .081, flag .070; 12.5 and 13.5 pt fit worse); the ">" chevron semibold (.071)
+        readonly property real tabPointSize: 13
+        readonly property string chevronWeight: "semibold"
+        readonly property color tabSelected: theme.dark ? Qt.rgba(1, 1, 1, 0.33) : Qt.rgba(0, 0, 0, 0.12)   // 113 on 42
+        readonly property color tabColor: theme.dark ? "#FFFFFF" : Qt.rgba(0, 0, 0, 0.85)               // 255 measured
+        readonly property color barHairline: theme.dark ? Qt.rgba(1, 1, 1, 0.07) : Qt.rgba(0, 0, 0, 0.08)   // 48 on 32
+        readonly property color barFill: theme.dark ? Qt.rgba(1, 1, 1, 0.04) : Qt.rgba(1, 1, 1, 0.5)      // 40 where nothing is behind
+        readonly property real underOpacity: 0.45       // blurred emoji under the bar / field (eyeballed on the shot)
+        readonly property int recents: 18               // Frequently Used: 3 rows (guessed)
     }
 
     // ---------- mission control ----------

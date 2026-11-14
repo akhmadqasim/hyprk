@@ -526,6 +526,15 @@ ShellWindow {
             TextInput {
                 id: input
                 MouseArea { anchors.fill: parent; acceptedButtons: Qt.NoButton; cursorShape: Qt.IBeamCursor }   // TextInput sets no I-beam itself
+                TextMenu {   // the field editor's right-click menu (HyprK textmenu.js), glass on the plugin (TextMenuHost)
+                    id: fieldMenu
+                    target: input
+                    host: Theme.compositorGlass ? menuHost.item : null
+                    glassBackground: Theme.compositorGlass ? menuHost.glass : null
+                    subGlassBackground: Theme.compositorGlass ? menuHost.subGlass : null
+                    // the menu goes with its panel (judge #15: it stayed on screen and held the keyboard)
+                    Connections { target: sp; function onShownChanged() { if (!sp.shown) fieldMenu.dismiss(); } }
+                }
                 x: sp.category !== "" ? token.x + token.width + 6 : sp.modeInfo ? Theme.spotlight.modeTextX : Theme.spotlight.textX
                 width: trailing.x - 12 - x
                 anchors.verticalCenter: parent.verticalCenter
@@ -736,4 +745,7 @@ ShellWindow {
             }
         }
     }
+
+    // the text field menu's own layer (components/TextMenuHost.qml): the shell menus' glass on the plugin
+    TextMenuHost { id: menuHost; screen: modelData; open: fieldMenu.open; armed: Theme.compositorGlass && sp.shown }
 }

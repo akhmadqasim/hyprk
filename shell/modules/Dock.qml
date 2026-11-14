@@ -9,6 +9,7 @@ import qs.components
 import qs.HyprK
 import qs.services
 import "../lib/dock.js" as DockLayout
+import "../lib/dockstack.js" as DockStackLayout
 import "../lib/state.js" as State
 
 // Floating glass Dock as on macOS 27.2.1 (MAC-ANSWERS.md Q-dock and "REA 27.2.1: Dock"): pinned apps, the recent
@@ -195,7 +196,7 @@ ShellWindow {
         else { revealDelay.stop(); hideDelay.restart(); }
     }
     // a Dock menu (opened above an icon) keeps it up
-    readonly property bool shown: !fullscreen && (!autohide || revealed || (Panels.open === "context" && Panels.contextAbove && Panels.activeScreen === dock.screen))
+    readonly property bool shown: !fullscreen && (!autohide || revealed || stackOpen || (Panels.open === "context" && Panels.contextAbove && Panels.activeScreen === dock.screen))
     // 0 = hidden below the screen edge, 1 = in place; it also slides in when the shell starts
     property real slide: 0
     // every Dock motion below takes one value per frame of its window (HyprK FrameAnim)
@@ -235,11 +236,15 @@ ShellWindow {
     readonly property real restY: height - m.height - m.bottomGap
 
     // ---------- Downloads: a stack of its newest items ----------
-    // Display as Stack (the Dock's default for Downloads): the tile shows the newest item's icon, the next one behind
-    // it (Q-dock-12; dock-dark.png / dock-light.png: a ZIP document over a landscape photo's thumbnail, both centred,
-    // not rotated, the photo 24 pt wide in the 33 pt tile; the same in light and dark under the Dark icon style, so
-    // not styled). An empty folder shows the folder. Watched by FolderListModel (a directory watch, no polling).
-    // Not seen on the Mac: a third item and more, the Clear and Tinted styles.
+    // Display as Stack (the Dock's default for Downloads): the tile shows the newest 3 items piled as the 27.2.1 Dock
+    // draws them (lib/dockstack.js pile: front 116/128 of the tile bottom-aligned, each one behind 12/128 smaller and
+    // 18/128 higher, centred, no rotation; MOTION-REA-27.2.1.md 3.2), each item drawn in its box by StackArt.qml.
+    // Against dock-dark.png at tile 33 (a ZIP over a landscape photo, the same under the Dark icon style in both
+    // modes; measured in a test session at scale 2): the photo 24 pt wide as on the Mac, its centre about 1.5 pt
+    // higher; the ZIP's face 29 pt tall as on the Mac but 2 pt lower and 2.5 pt wider (our ZIP art is wider, and the
+    // Mac's face reaches 2 pt above the decoded front box, so its art or the tile mapping differs: not resolved).
+    // An empty folder shows the folder. Watched by FolderListModel (a directory watch, no polling).
+    // Not seen on the Mac: the Clear and Tinted styles.
     readonly property string downloadsUrl: "file://" + Quickshell.env("HOME") + "/Downloads"
     FolderListModel {
         id: downloads
@@ -251,19 +256,93 @@ ShellWindow {
         sortField: Apps.downloads.sort === "name" ? FolderListModel.Name : Apps.downloads.sort === "kind" ? FolderListModel.Type : FolderListModel.Time
     }
     readonly property bool downloadsWatched: downloads.status === FolderListModel.Ready && String(downloads.folder) === downloadsUrl
-    // the newest two, front first: {path, image}
-    readonly property var downloadsStack: {
+    // The document page of a file (themes/icons/system/<doc>-154.png): the Mac's renders for .zip / .pdf / .txt (text
+    // included), IconServices' composition (themes/icons/tools/build-docs.py, ICONS-REA-27.2.1.md part 2) by the type's
+    // ISDocumentIconConfiguration symbol for the rest, without the text (StackArt draws it). By extension only: the
+    // folder model has no MIME type. Same table as Finder's Files.macDocKind
+    function docArt(path) {
+        const e = ((/\.([^./]+)$/.exec(path) || ["", ""])[1]).toLowerCase();
+        if (e === "zip") return "ZipDocument";
+        if (e === "pdf") return "PdfDocument";
+        if (e === "txt" || e === "text") return "TextDocument";
+        if (e === "docx") return "JustifyDocument";
+        if (e === "xlsx" || e === "csv") return "TableDocument";
+        if (e === "pptx") return "ChartDocument";
+        if (e === "html" || e === "htm") return "CodeDocument";
+        if (/^(mp3|m4a|aac|wav|aif|aiff|flac|ogg|opus|caf)$/.test(e)) return "AudioDocument";
+        if (/^(mp4|m4v|mov|avi|mkv|webm|mpg|mpeg|3gp)$/.test(e)) return "VideoDocument";
+        if (/^(heic|heif|tif|tiff|bmp|svg|ico|avif)$/.test(e)) return "ImageDocument";
+        if (/^(log|md|markdown|json|xml|yaml|yml|toml|ini|conf|css|js|mjs|ts|py|sh|c|h|cpp|hpp|rs|go|java|swift|qml|ics|tsv|sql)$/.test(e))
+            return "TxtfillDocument";
+        return "";
+    }
+    // the first `n` items in the stack's order: {path, name, dir, image, zip, doc, ext}
+    function downloadsItems(n) {
         const out = [];
         if (!downloadsWatched) return out;
-        for (let i = 0; i < Math.min(2, downloads.count); i++) {
+        for (let i = 0; i < Math.min(n, downloads.count); i++) {
             const path = String(downloads.get(i, "filePath")), dir = downloads.get(i, "fileIsDir");
-            out.push({ path: path, dir: dir, image: !dir && /\.(png|jpe?g|gif|webp|bmp|tiff?)$/i.test(path) });
+            out.push({ path: path, name: String(downloads.get(i, "fileName")), dir: dir,
+                       image: !dir && /\.(png|jpe?g|gif|webp|bmp|tiff?)$/i.test(path), zip: !dir && /\.zip$/i.test(path),
+                       // the 27.2.1 page for this type (docArt) and, on the composed pages, the extension text
+                       doc: dir ? "" : docArt(path),
+                       ext: dir ? "" : (/\.([^./]+)$/.exec(path) || ["", ""])[1].toUpperCase() });
         }
         return out;
     }
-    readonly property real stackPhoto: 24 / 33     // a picture's long side in the tile (dock-dark.png: 48 px at tile 66 px)
-    readonly property real stackIcon: 0.92         // a document icon's box in the tile (the ZIP page 59 px tall at tile 66,
-                                                   // the page is 496 / 512 of its icon)
+    // the pile: the newest three, front first (_maxNumberOfCollapsedItems 3)
+    readonly property var downloadsStack: { downloads.count; return downloadsItems(3); }
+
+    // ---------- Downloads: the stack's popup ----------
+    // A click on the tile opens the fan or the grid (DockStack.qml) by "View content as" (Apps.downloads.view,
+    // Automatic unless chosen: lib/dockstack.js view), List as a menu above the tile. Panels.open "stack" while it is
+    // open, so it is the only popup; the tile shows a chevron then (Q-dock-12). The popup stays loaded through its
+    // close motion (stackLive).
+    readonly property bool stackOpen: Panels.open === "stack" && Panels.activeScreen === dock.screen
+    property bool stackLive: false
+    property var stackArgs: null
+    onStackOpenChanged: if (!stackOpen && A11y.reduceMotion) stackLive = false
+    function openStack(c) {
+        if (stackOpen) { Panels.close(); return; }
+        const files = downloadsItems(500);
+        const cx = (dock.width - dock.restGeom.baseWidth) / 2 + c.baseCenter;
+        const top = dock.screen.height - dock.height + dock.restY;
+        const st = DockStackLayout.stage(dock.screen.width, dock.screen.height, Theme.menuBar.height, m.height);
+        const v = DockStackLayout.view(Apps.downloads.view, files.length, st.h);
+        if (v === "list") {
+            const rows = files.map(f => ({ label: f.name, action: () => f.dir ? Apps.openFinder(f.path) : Quickshell.execDetached(["xdg-open", f.path]) }));
+            if (rows.length > 0) rows.push({ sep: true });
+            // DockMenus.plist "directorylist": the files, separator, Options ▸ (the sort / display / view rows only), Open
+            // in Finder
+            rows.push({ label: "Options", submenu: true, items: Apps.downloadsOptions() },
+                      { label: "Open in Finder", action: () => Apps.openFolder(c.modelData) });
+            Panels.openContext(rows, cx, top, true, dock.screen);
+            return;
+        }
+        stackArgs = { view: v, files: files, title: c.modelData.name || "", folderMode: Apps.downloads.display === "folder",
+                      tileCX: cx, tileBottom: top + m.iconTop + tile, dockTop: top, stage: st };
+        stackLive = true;
+        Panels.activeScreen = dock.screen;
+        Panels.open = "stack";
+    }
+    LazyLoader {
+        active: dock.stackLive && dock.stackArgs !== null
+        DockStack {
+            host: dock
+            view: dock.stackArgs.view
+            files: dock.stackArgs.files
+            title: dock.stackArgs.title
+            folderMode: dock.stackArgs.folderMode
+            tile: dock.tile
+            tileCX: dock.stackArgs.tileCX
+            tileBottom: dock.stackArgs.tileBottom
+            dockTop: dock.stackArgs.dockTop
+            magnification: dock.magnification
+            stageSize: dock.stackArgs.stage
+            open: dock.stackOpen
+            onStackDone: if (!dock.stackOpen) dock.stackLive = false
+        }
+    }
 
     // ---------- Trash: full can while the XDG trash has files ----------
     // Watched by FolderListModel (a directory watch, no polling). A missing folder (nothing trashed
@@ -301,7 +380,7 @@ ShellWindow {
     // follow the pointer directly. Entering and leaving the Dock ramp `fish` 0 <-> 1 on the Dock's cosine ease
     // in-out over lib/dock.js fishDuration (147 ms for 64 -> 128). The layout is recomputed only while magnified.
     property real focusX: 0
-    readonly property real fishTarget: magnification && pointerIn && shown && Panels.open !== "context" ? 1 : 0
+    readonly property real fishTarget: magnification && pointerIn && shown && Panels.open !== "context" && !stackOpen ? 1 : 0
     property real fish: 0
     FrameAnim { id: fishAnim; target: dock; property: "fish"; ease: Easing.InOutSine }
     onFishTargetChanged: {
@@ -498,6 +577,16 @@ ShellWindow {
                     property real dpr: dock.dpr
                     fragmentShader: Qt.resolvedUrl("../shaders/plusfill.frag.qsb")
                 }
+                // the Dock's own menu on a right click on the separator (Dock.app DockMenus.plist "dock",
+                // Apps.dockSeparatorMenu), above the Dock like the item menus
+                MouseArea {
+                    anchors.fill: parent
+                    enabled: cell.separator
+                    visible: cell.separator
+                    acceptedButtons: Qt.RightButton
+                    onClicked: Panels.openContext(Apps.dockSeparatorMenu(), (dock.width - dock.geom.baseWidth) / 2 + cell.baseCenter,
+                                                  dock.screen.height - dock.height + dock.restY, true, dock.screen)
+                }
 
                 // height above the rest position: the attention bounce, else the launch bounce
                 readonly property real bounceT: A11y.reduceMotion || separator ? -1 : Apps.bounceTime(modelData.id, dock.now)
@@ -512,7 +601,7 @@ ShellWindow {
                 readonly property bool stack: cell.modelData.folder === "Downloads" && dock.downloadsStack.length > 0 && Apps.downloads.display !== "folder"
                 AppIcon {
                     id: icon
-                    visible: !cell.separator && dock.dragCell !== cell && !cell.stack
+                    visible: !cell.separator && dock.dragCell !== cell && !cell.stack && !(dock.stackOpen && cell.modelData.folder === "Downloads")
                     size: cell.size
                     loadSize: dock.magnification ? dock.large : dock.tile    // load once at full size, then only scale
                     x: Math.round((cell.width - width) / 2 * dock.dpr) / dock.dpr
@@ -530,7 +619,7 @@ ShellWindow {
                 }
 
                 Item {
-                    visible: cell.stack && dock.dragCell !== cell
+                    visible: cell.stack && dock.dragCell !== cell && !dock.stackOpen
                     width: cell.size
                     height: cell.size
                     x: icon.x
@@ -542,36 +631,36 @@ ShellWindow {
                         property real k: 0.475
                         fragmentShader: Qt.resolvedUrl("../shaders/darken.frag.qsb")
                     }
+                    // back first, so the newest is drawn on top. The model is only the count, so a size change
+                    // (magnification) moves and scales the items instead of recreating them (and reloading their art)
                     Repeater {
-                        model: cell.stack ? dock.downloadsStack.slice().reverse() : []
-                        Item {
-                            required property var modelData
-                            anchors.fill: parent
-                            // a picture: its own thumbnail, fitted to stackPhoto of the tile
-                            Image {
-                                visible: modelData.image
-                                anchors.centerIn: parent
-                                width: parent.width * dock.stackPhoto
-                                height: width
-                                fillMode: Image.PreserveAspectFit
-                                source: modelData.image ? "file://" + modelData.path : ""
-                                sourceSize: Qt.size(Math.ceil(width * dock.dpr), Math.ceil(width * dock.dpr))
-                                asynchronous: true
-                                cache: false
-                                smooth: true
-                            }
-                            // anything else: the macOS document or folder icon
-                            AppIconTile {
-                                visible: !modelData.image
-                                anchors.centerIn: parent
-                                size: parent.width * dock.stackIcon
-                                trusted: true
-                                dpr: dock.dpr
-                                source: modelData.image ? "" : "file://" + Apps.iconDir + "/system/"
-                                        + (modelData.dir ? "GenericFolderIcon" : "GenericDocumentIcon") + "-512.png"
-                            }
+                        id: pileRep
+                        readonly property int n: cell.stack ? Math.min(3, dock.downloadsStack.length) : 0
+                        readonly property var boxes: DockStackLayout.pile(cell.size, n)
+                        readonly property var big: DockStackLayout.pile(dock.magnification ? dock.large : dock.tile, n)
+                        model: n
+                        StackArt {
+                            required property int index
+                            readonly property int k: pileRep.n - 1 - index
+                            readonly property var box: pileRep.boxes[k] || ({ x: 0, y: 0, size: 0 })
+                            x: box.x
+                            y: box.y
+                            size: box.size
+                            loadSize: (pileRep.big[k] || box).size   // load once at the magnified size, then only scale (as AppIcon)
+                            file: dock.downloadsStack[k] || ({})
+                            dpr: dock.dpr
                         }
                     }
+                }
+                // while its stack is open the tile shows a chevron (Q-dock-12; its size, weight and colour are guessed)
+                Symbol {
+                    visible: cell.modelData.folder === "Downloads" && dock.stackOpen
+                    x: icon.x + (cell.size - width) / 2
+                    y: icon.y + (cell.size - height) / 2
+                    size: cell.size * Theme.dock.stack.chevron
+                    name: "chevron.down"
+                    weight: "semibold"
+                    color: Theme.dock.labelText
                 }
 
                 // running dot, also while launching (with Reduce Motion it is the only launch feedback): 4.1 pt,
@@ -593,7 +682,7 @@ ShellWindow {
                 }
 
                 // app name label (timing: dock.tipShow / tipHide)
-                readonly property bool tipWanted: ma.containsMouse && !separator && !leaving && !bouncing && Panels.open !== "context" && !dock.dragCell
+                readonly property bool tipWanted: ma.containsMouse && !separator && !leaving && !bouncing && Panels.open !== "context" && !dock.stackOpen && !dock.dragCell
                 onTipWantedChanged: tipWanted ? dock.tipShow(cell) : dock.tipHide(cell)
 
                 // the whole item frame (they abut, Q-dock-05) and the band above a magnified icon, so the label
@@ -636,6 +725,7 @@ ShellWindow {
                             const x = (dock.width - dock.geom.baseWidth) / 2 + cell.baseCenter;
                             Panels.openContext(Apps.dockMenu(cell.modelData), x, dock.screen.height - dock.height + dock.restY, true, dock.screen);
                         } else if (cell.modelData.trash) Apps.openTrash();
+                        else if (cell.modelData.folder === "Downloads") dock.openStack(cell);
                         else if (cell.modelData.folder) Apps.openFolder(cell.modelData);
                         else Apps.activate(cell.modelData);
                     }
@@ -703,7 +793,7 @@ ShellWindow {
         }
     }
 
-    // App name label: a glass capsule 26 pt tall (radius 13), text + 2 x 14 wide (at least 41), its bottom 9 pt
+    // App name label: a glass capsule 26 pt tall (radius 13), ceil(text) + 2 x 13 wide (at least 41), its bottom 9 pt
     // above the tile top (above the Dock background at rest), centred on the icon (lib/dock.js labelWidth).
     // Material: Liquid Glass (ECCartoucheGlassLayerController); on the plugin the label's own recipe (namespace
     // hyprk-dock-label below). Pointer (Q-dock-08: about 16 x 6.5 pt, rounded tip 2.5 pt above the Dock): a marker rect
