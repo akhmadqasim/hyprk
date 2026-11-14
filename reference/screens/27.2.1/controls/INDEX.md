@@ -56,3 +56,15 @@ switcher is not collapsed into a pop-up). Clip `screencapture -x -C -v -V 4.5 -R
 |---|---|---|---|---|
 | segmented-drag-light.mov | mouse down on "icon view" (735,227) at about 0.8 s, held 0.5 s, dragged to "list view" (776,227) over 1.5 s, held 0.5 s, released | pressed segment, drag, selection change to list view | light | window / TahoeLight |
 | segmented-drag-dark.mov | same | same | dark | window / TahoeDark |
+
+## Round 7 (R7.1): hold shine on glass toolbar buttons
+Display 1440x932 pt (2x), wallpaper TahoeLight / TahoeDark, other apps hidden. Clips `screencapture -x -C -v -V 4.5 -R …`
+(pointer shown, H.264 60 fps time base, VFR). Synthetic CGEvents: pointer onto the button, mouse down, then while held
+the pointer traces a 14x10 pt rectangle inside the button (0.3 + 0.4 + 0.3 + 0.4 + 0.3 s ≈ 1.7 s + 0.2 s still ≈ 2 s),
+then mouse up on the button centre.
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| hold-shine-finder-{light,dark}.mov | region 520,195 240x64 pt; Finder window 400,200 740x360 on a dummy folder `hyprk-r7/sub` (Back enabled), Back segment centre 586,227 | Back pressed and held: after about 0.5 s the Back history menu opens under it ("hyprk-r7"); release over the button | both | window / Tahoe |
+| hold-shine-held-{light,dark}.png | `screencapture -x -R` same region, 0.9 s into the hold | held Back segment (pressed pill), history menu starting to appear | both | same |
+| hold-shine-settings-{light,dark}.mov | region 560,150 240x60 pt; System Settings 350,150, Appearance then Desktop & Dock (so Back is enabled), Go Back 608,176 | same gesture; the history menu opens under the button too | both | same |
