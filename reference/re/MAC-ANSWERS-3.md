@@ -92,3 +92,13 @@ Times are clip pts. Keystrokes come from `osascript` so their exact moments are 
   row of colour swatches, not a pop-up. Pop-up sizes: 133x24 pt (with colour dot), 96x24 pt (Sidebar icon size).
 - Menu windows (CGWindowList, layer 101, owner "Appearance"): 318x422, 296x422, 246x232 pt incl. shadow margin. The
   menu opens with the checked item over the button. "pressed" was taken 30 ms after mouse down, before the menu draws.
+
+## R3.8b Settings panes: light done (dark next)
+- `screens/27.2.1/settings/panes/{pane}-{NN}-light.png` for 21 panes, AX dumps at the top:
+  `re/27.2.1/live/settings/panes/ax-{pane}-light.jsonl` (one JSON object per element, depth-first; role, subrole, title,
+  value, description, help, identifier, enabled, selected, frame [x,y,w,h] screen pt, contentSize for scroll areas).
+  Step counts and content sizes are in `screens/27.2.1/settings/panes/INDEX.md`.
+- Pane names: "Control Center" is called **Menu Bar** in 27.2.1 (URL `com.apple.ControlCenter-Settings.extension`);
+  "Apple Intelligence & Siri" shows as **Siri** here. Mouse: not present (no mouse connected), not captured.
+- Blurred / filled: sidebar Apple Account + Family rows; Wi-Fi network and hotspot names; Bluetooth device names and the
+  "discoverable as" line; VPN configuration names; Sound AirPlay device names. Same strings "[redacted]" in the AX dumps.
