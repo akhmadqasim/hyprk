@@ -65,3 +65,21 @@ Display 1440x932 pt (2x), light, desktop grey 127 (hidden by the window). Behind
 | spotlight-light-white-empty.png | full screen `screencapture -x`, 1.5 s after Cmd-Space | empty "Search or Ask" field (it renders dark over the white window) | light | white TextEdit window |
 | spotlight-light-white-results.png | full screen, 2 s after typing "text" | field "textEdit — Open" + results panel (TextEdit, Text, Text replacements, Text size …; no files listed) | light | white TextEdit window |
 | spotlight-light-white-open-close.mov | `screencapture -x -v -V 3.5 -R 300,100,840,600`, 2.78 s | Cmd-Space at about 0.5 s, Esc about 1.5 s later | light | white TextEdit window |
+
+## Round 3 (R3.2b): Spotlight pill idle / hover / clear
+Display 1440x932 pt (2x). Behind: one empty TextEdit document at 0,29 1440x851 pt (white in light, dark grey in dark
+mode), other apps hidden. Spotlight opened with Cmd-Space (System Events keystroke). Pointer parked at 20,900 pt (bottom
+left, not a hot corner). Clips `screencapture -x -v -R 300,100,840,600` (H.264, 60 fps time base, VFR). The idle and
+hover clips are untouched; the clear clips were re-encoded (x264 crf 12, same timestamps) to blur the result rows below
+y 575 pt (clip px y 950..1200, x 320..1360): the "te" results there include browsing history.
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| spotlight-pill-idle-light.mov | clip 3.3 s, Cmd-Space at about 0.3 s, pointer never moves | open animation, then the bare pill only | light | white TextEdit |
+| spotlight-pill-idle-dark.mov | same | same | dark | dark TextEdit |
+| spotlight-pill-idle-light.png | full screen `screencapture -x` right after the idle clip | bare pill: "Search or Ask" + mic, nothing below | light | white TextEdit |
+| spotlight-pill-idle-dark.png | same | same | dark | dark TextEdit |
+| spotlight-pill-hover-light.mov | Spotlight already open; clip 4.5 s; pointer glides from 20,900 to the bar centre 720,248 (starts about 0.6 s, 15 steps, about 0.7 s), rests about 1.3 s, glides back to 20,900 | mode list appears under the pill as soon as the pointer starts moving, stays after it leaves | light | white TextEdit |
+| spotlight-pill-hover-dark.mov | same | same | dark | dark TextEdit |
+| spotlight-pill-clear-light.mov | Spotlight already open; clip 5.5 s; "te" typed about 0.5 s, then 3 Backspaces 0.35 s apart from about 2.0 s (the first one removes the autocomplete "rminal — Open"), pointer at 20,900 | results panel, then the field goes empty and the panel collapses to the bare pill | light | white TextEdit |
+| spotlight-pill-clear-dark.mov | same | same | dark | dark TextEdit |
