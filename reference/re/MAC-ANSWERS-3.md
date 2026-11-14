@@ -45,3 +45,16 @@ Times are clip pts. Keystrokes come from `osascript` so their exact moments are 
   speaker glyph + 16-segment level. First HUD frame at 0.600 s, then continuous frames to 1.383 s, a pause, changes again
   1.567 s to 2.083 s (the fade), static after 2.083 s. So it is on screen about 1.0 s after the press, and the fade lasts
   about 0.5 s. `output volume` 81 -> 88 for one step (16 steps total), restored to 81.
+
+## R3.5 Pop-up button menu open, choose, close: done
+- `screens/27.2.1/controls/popup-menu-open-close-{dark,light}.mov` (pointer included, `-C`)
+- Settings > Appearance > Text highlight colour (value Automatic, re-chosen, so nothing changed). The menu opens with the
+  checked item over the button. Note: after switching Light/Dark, System Settings stopped reacting to synthetic clicks
+  until it was relaunched, so it was relaunched before each clip. In the light clip the button shows its pressed state
+  for a few frames before the menu appears.
+
+## R3.6 Held switch strip, dark: done (frames from the round 2 clip)
+- `screens/27.2.1/controls/switch-press-strip-dark.png`, built from `switch-held-stripes-dark.mov` frames (no new probe
+  run). Press lands at 0.900 s (first change), the knob grows into the lens until 1.150 s (about 0.25 s), then static
+  until the release at 2.000 s. The clip is 60 fps VFR, so every frame from 0.900 to 1.150 s is present (1/60 s apart);
+  the strip uses every 2nd one.
