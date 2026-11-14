@@ -13,3 +13,16 @@ Transparency / Increase Contrast / Reduce Motion off, Stage Manager off and desk
   - light: press at **0.417 s**, settles about 0.92 s (one tiny change at 1.30 s); second animation **2.533 to about
     3.23 s** (starts 2.12 s after the press); drag out at 3.517 s.
   So the idle end of the hold bounce starts about **2.1 s** after mouse down and lasts about 0.65 s.
+
+## R4.2 Wi-Fi hover, Focus with DND on: Wi-Fi done; Focus done with Driving instead of Do Not Disturb
+- `screens/27.2.1/panels/module-wifi-hover-{row,toggle}-{light,dark}.png`
+  - Row hover: a full-width rounded highlight behind the row (Known Network row in the shots).
+  - Toggle: hovering the Wi-Fi switch (and the header row) shows **no** visible change.
+  - AX (ControlCenter): header text "Wi‑Fi" 967,43 34x16; switch AXCheckBox 1193,39 54x24 (`wifi-header`); network
+    rows are AXCheckBox 280x32 (`wifi-network-<name>`, value 1 = connected); scroll area 953,78 308x152; "Wi‑Fi
+    Settings…" button 967,241 280x22.
+- `screens/27.2.1/panels/module-focus-driving-on-{light,dark}.png`: **not with Do Not Disturb**. A Focus (Driving) was
+  already on, synced from the user's iPhone ("Share across devices" is on). Switching to Do Not Disturb on the Mac would
+  change the Focus on the phone too, so it was left alone. The shot shows the "on" state the PC wanted to see: header
+  "Focus" + "On" (secondary text, 967,52.5), the active row's icon disc filled/tinted. Rows are AXCheckBox 280x32 at
+  y 78, 110, 142, 174, 206, 238; "Focus Settings…" 967,274. If the exact DND look is needed, ask the user to turn DND on.

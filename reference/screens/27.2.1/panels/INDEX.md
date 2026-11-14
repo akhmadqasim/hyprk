@@ -88,3 +88,15 @@ y 575 pt (clip px y 950..1200, x 320..1360): the "te" results there include brow
 | file | how taken | content | mode | backdrop |
 |---|---|---|---|---|
 | hud-volume-appear-grey-dark.mov | `screencapture -x -v -V 4.5 -R 960,29,480,200` (2x, H.264 60 fps time base, VFR), display 1440x932 | one Volume Up key press (synthetic NX_KEYTYPE_SOUND_UP system-defined event, the same path as the F12 key) at about 0.5 s, volume 81 -> 88 (one step), then the HUD fades; volume set back to 81 after | dark | grey 127 |
+
+## Round 4 (R4.2): Wi-Fi module hover, Focus module with a Focus on
+Display 1440x932 pt (2x), wallpaper TahoeLight / TahoeDark, other apps hidden. Module opened by a synthetic click on the
+menu bar item, pointer moved with CGEvents, full-screen `screencapture -x` 0.9 s later, cropped to pt 930,25 360x254
+(Wi-Fi). Network names blurred: each `wifi-network-*` checkbox (AX, ControlCenter process), from 30 to 190 pt into the row.
+Note: `screencapture` stills do not draw the pointer.
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| module-wifi-hover-row-{light,dark}.png | pointer on the Known Network row centre (1107,181) | row hover highlight (full-width rounded fill) | both | TahoeLight / TahoeDark |
+| module-wifi-hover-toggle-{light,dark}.png | pointer on the Wi-Fi switch (1220,51) | no visible hover change on the switch or the header row | both | same |
+| module-focus-driving-on-{light,dark}.png | region 930,25 360x290 pt | Focus module with **Driving** on (header "Focus / On", Driving icon filled); stands in for "Do Not Disturb on", see MAC-ANSWERS-4 | both | same |
