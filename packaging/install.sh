@@ -12,6 +12,9 @@
 #                        PREFIX/dev/prefix. auto = only when the distro package is missing or too old.
 #   --assets DIR         copy more of your own extracted assets (typically the rest of the wallpapers) from DIR,
 #                        laid out like the repo (DIR/themes/fonts, DIR/sounds/oga ...). Never downloaded, never shipped.
+#   --keep-src           keep PREFIX/dev/src after a source build (default: each source tree is deleted as soon as
+#                        it is installed; the Hyprland and Quickshell build trees are about 3 GB each, and nothing
+#                        reads them afterwards: the plugin builds against PREFIX/dev/prefix)
 #   --no-deps            do not install distro packages (print them only)
 #   --no-session         do not install /usr/share/wayland-sessions/hyprk.desktop (the only step that needs sudo
 #                        besides the package manager)
@@ -49,7 +52,7 @@ WP_MAX=3840
 
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 SRC=${HYPRK_SRC:-$(cd "$HERE/.." && pwd)}
-YES=0 UNINSTALL=0 FROM_SOURCE=auto ASSETS='' NO_DEPS=0 NO_SESSION=0 PRINT_DEPS=0
+YES=0 UNINSTALL=0 FROM_SOURCE=auto ASSETS='' NO_DEPS=0 NO_SESSION=0 PRINT_DEPS=0 KEEP_SRC=0
 PREFIX=${XDG_DATA_HOME:-$HOME/.local/share}/hyprk
 while [ $# -gt 0 ]; do
     case $1 in
@@ -58,6 +61,7 @@ while [ $# -gt 0 ]; do
         --prefix) PREFIX=${2:?--prefix needs a dir}; shift ;;
         --from-source) FROM_SOURCE=${2:?}; shift; case $FROM_SOURCE in auto|yes|no) ;; *) echo "--from-source: auto|yes|no" >&2; exit 2 ;; esac ;;
         --assets) ASSETS=$(cd "${2:?--assets needs a dir}" && pwd); shift ;;
+        --keep-src) KEEP_SRC=1 ;;
         --no-deps) NO_DEPS=1 ;;
         --no-session) NO_SESSION=1 ;;
         --print-deps) PRINT_DEPS=1 ;;
@@ -342,8 +346,10 @@ build_one() {   # build_one REPO [extra cmake args...]
         run cmake -S "$s" -B "$s/build" -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$P" \
             -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_RPATH="$P/lib" -DBUILD_TESTING=OFF -Wno-dev "$@"
         run cmake --build "$s/build" -j"${J:-$(nproc)}"
-        run cmake --install "$s/build"
+        run cmake --install "$s/build" --strip   # symbol tables only: plugins resolve through .dynsym (nm -D)
     fi
+    # the tree is not read again (later builds and the plugin use $P), and a later --from-source run clones it anew
+    [ $KEEP_SRC = 1 ] || run rm -rf -- "$s"
 }
 GCC_MAJOR=$( (g++ -dumpversion 2>/dev/null || echo 0) | cut -d. -f1)
 step "2. source build into $P"
@@ -368,6 +374,7 @@ else
     fi
     [ $BUILD_QS = 1 ] && build_one quickshell -DINSTALL_QMLDIR="$P/lib/qt6/qml" -DVENDOR_CPPTRACE=ON \
         -DDISTRIBUTOR="hyprk packaging/install.sh (source build)"
+    [ $KEEP_SRC = 1 ] || run rmdir --ignore-fail-on-non-empty "$DEV/src"
     say "Note: Quickshell uses private Qt API. Re-run this installer after every Qt update (--from-source yes)."
 fi
 

@@ -25,7 +25,9 @@ ${XDG_DATA_HOME:-~/.local/share}/hyprk/     HYPRK_ROOT: tracked repo files incl.
   bin/hyprk-try                              nested try: runs dist/try-nested.sh
   bin/hyprk-rebuild-plugin                   rebuild liquidglass after a Hyprland update
   dev/env.sh                                 HYPRK_DEV/env.sh, sourced by dist/lib/env.sh (no-op with distro packages)
-  dev/prefix/, dev/src/                      only with a source build (Hyprland stack, hyprlock, Quickshell)
+  dev/prefix/                                only with a source build (Hyprland stack, hyprlock, Quickshell), stripped;
+                                             the source and build trees (dev/src, about 6 GB) are deleted once
+                                             installed unless --keep-src
   finder/build/hyprk-finder, plugin/build/libliquidglass.so
   state/                                     shell + settings state, created on first start by config/hypr/state-dir.sh
                                              (the prefix is writable); a reinstall never touches it
