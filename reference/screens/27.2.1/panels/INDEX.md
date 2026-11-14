@@ -100,3 +100,9 @@ Note: `screencapture` stills do not draw the pointer.
 | module-wifi-hover-row-{light,dark}.png | pointer on the Known Network row centre (1107,181) | row hover highlight (full-width rounded fill) | both | TahoeLight / TahoeDark |
 | module-wifi-hover-toggle-{light,dark}.png | pointer on the Wi-Fi switch (1220,51) | no visible hover change on the switch or the header row | both | same |
 | module-focus-driving-on-{light,dark}.png | region 930,25 360x290 pt | Focus module with **Driving** on (header "Focus / On", Driving icon filled); stands in for "Do Not Disturb on", see MAC-ANSWERS-4 | both | same |
+
+## Round 4 (R4.4): Spotlight mode list in dark, white window vs grey desktop
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| spotlight-modelist-white-dark.png | full screen `screencapture -x`; Cmd-Space, pointer moved 10 small steps near the bottom-left corner, still 1.2 s later | pill + mode list (Applications ⌘1, Files ⌘2, Actions ⌘3, Clipboard ⌘4) | dark | Preview window 0,29 1440x903 showing an all-white 2880x1600 PNG (image area white, Preview's dark chrome around it) |
+| spotlight-modelist-grey-dark.png | same | same | dark | desktop RGB 127 grey, apps hidden |

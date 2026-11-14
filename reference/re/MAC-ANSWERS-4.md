@@ -31,3 +31,9 @@ Transparency / Increase Contrast / Reduce Motion off, Stage Manager off and desk
 - `screens/27.2.1/dock/stack-fan-more-dark.png`, `stack-fan-more-close-dark.mov`
 - 14 entries in the folder, the fan shows 9 + a top slot "5 More in Finder" (label capsule + round arrow button in the
   icon column). Close clip: frames change from 0.017 s to 1.033 s (pts), static after.
+
+## R4.4 Spotlight mode list, dark, white vs grey: done
+- `screens/27.2.1/panels/spotlight-modelist-{white,grey}-dark.png`
+- White backdrop = a white PNG shown in Preview filling the screen (Spotlight and the list sit fully over white).
+  In dark mode over white, the pill is black at the top grading to grey; the list panel is light grey with dark-grey
+  fill at the top. Over grey 127 both read as darker greys.
