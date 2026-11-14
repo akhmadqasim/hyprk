@@ -37,3 +37,19 @@ is 740x625 pt (1480x1250 px).
 
 Data: `reference/re/27.2.1/live/settings/ax-*.jsonl` (AX frames in global points; the window's top-left is 484,232;
 the account name is redacted).
+
+## Round 3 (R3.9): sidebar scrolled under the search field
+Display 1440x932 pt (2x), Settings relaunched per mode, window 350,150 740x625, Appearance selected, wallpaper
+TahoeLight / TahoeDark. Search field 360,211 212x28 pt; sidebar scroll area 350,248 232x527 pt, content 232x1215 pt.
+Rows: Apple Account 46 pt, then 32 pt rows. Scrolled with synthetic wheel events (pixel units = pt) over 466,600.
+Stills: window `screencapture -x -o -l`, cropped to the sidebar = window px 0,0 464x1250 (pt 350,150 232x625).
+Privacy: the Apple Account and Family rows are filled with the sidebar colour where they are below the search field,
+left untouched under the field (the glass blurs them beyond reading), heavily blurred where they are above it. In the clip
+the rows are found per frame by matching against frame 0 (60 fps CFR re-encode, x264 crf 12).
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| sidebar-scrolled-1-{light,dark}.png | crop above, sidebar scrolled 32 pt | account row half under the search field | both | TahoeLight / TahoeDark |
+| sidebar-scrolled-2-{light,dark}.png | scrolled 64 pt | Family row under the field | both | same |
+| sidebar-scrolled-5-{light,dark}.png | scrolled 160 pt | Wi-Fi … Bluetooth gone, Network row under the field, scroller shown | both | same |
+| sidebar-scroll-{light,dark}.mov | `screencapture -x -v -V 7 -R 350,150,232,625` (pointer shown), then redacted and re-encoded at 60 fps CFR | from the top, 180 wheel events of 4 pt every 16 ms down (to the end), 0.4 s pause, 180 of 4 pt back up | both | same |

@@ -102,3 +102,13 @@ Times are clip pts. Keystrokes come from `osascript` so their exact moments are 
   "Apple Intelligence & Siri" shows as **Siri** here. Mouse: not present (no mouse connected), not captured.
 - Blurred / filled: sidebar Apple Account + Family rows; Wi-Fi network and hotspot names; Bluetooth device names and the
   "discoverable as" line; VPN configuration names; Sound AirPlay device names. Same strings "[redacted]" in the AX dumps.
+
+## R3.9 Sidebar scrolled under the search field: done
+- `screens/27.2.1/settings/sidebar-scrolled-{1,2,5}-{light,dark}.png` (crop = window px 0,0 464x1250, i.e. the whole
+  sidebar column), `sidebar-scroll-{light,dark}.mov`, AX `re/27.2.1/live/settings/ax-sidebar-scrolled-2-{light,dark}.jsonl`
+  (window root + every sidebar element: search field, outline rows and cells, buttons; frames in screen pt).
+- Geometry: search field 360,211 212x28 pt (window-relative 10,61); the sidebar scroll area starts at y 248 (window 98),
+  so rows scroll up behind the field and the area above it (traffic-light strip). Row pitch 32 pt, account row 46 pt.
+  At 1 row (32 pt) the account name sits under the field: it shows only as a faint blur through the glass.
+- Privacy edits (see INDEX): account / Family rows filled below the field, blurred above it, left as is under the field.
+  The clip was re-encoded (60 fps CFR) after the edit; the raw clip had VFR timing.
