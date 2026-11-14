@@ -1,0 +1,22 @@
+{
+ "FXPreferredViewStyle": "glyv",
+ "PreviewPaneGalleryWidth": 240.0,
+ "PreviewPaneWidth": 240.0,
+ "ShowPathbar": true,
+ "ShowSidebar": true,
+ "ShowStatusBar": false,
+ "StandardViewSettings.GalleryViewSettings": {
+  "arrangeBy": "name",
+  "iconSize": 48.0,
+  "showIconPreview": true,
+  "viewOptionsVersion": 1
+ },
+ "StandardViewOptions.GalleryViewOptions (written by Finder after Hide/Show Preview; absent before)": {
+  "ShowPreviewPane": true,
+  "ShowTitles": false
+ },
+ "StandardViewOptions.GalleryViewOptions while preview hidden": {
+  "ShowPreviewPane": false,
+  "ShowTitles": false
+ }
+}

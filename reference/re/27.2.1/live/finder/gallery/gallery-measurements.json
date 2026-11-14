@@ -1,0 +1,294 @@
+{
+ "source": "Finder 27.2.1 (26B131), Gallery view, dummy folder of 8 items, window 1000x700 pt at 200,100 (display 1440x932 @2x) and 1400x900 pt at 150,60 (display 1710x1107, still 2x). AX = from AX frames; px = measured on the 2x window shots.",
+ "window_1000x700": {
+  "sidebar_ax": [
+   200,
+   152,
+   159,
+   648
+  ],
+  "sidebar_splitter_x": 358.5,
+  "gallery_scroll_area_ax": [
+   359,
+   152,
+   601,
+   620
+  ],
+  "preview_frame_ax": [
+   391,
+   184,
+   537,
+   497
+  ],
+  "preview_inset_pt": 32,
+  "strip_section_ax": [
+   364,
+   713,
+   467,
+   54
+  ],
+  "thumb_frame_ax_first": [
+   367,
+   716,
+   48,
+   48
+  ],
+  "thumb_pitch_pt": 59,
+  "thumb_gap_pt": 11,
+  "path_bar_ax": [
+   364,
+   771,
+   587,
+   30
+  ],
+  "path_item_height_pt": 28,
+  "inspector_scroll_ax": [
+   960,
+   152,
+   240,
+   578
+  ],
+  "inspector_width_pt": 240,
+  "inspector_separator_x_pt": 960,
+  "inspector_bottom_bar_pt": [
+   960,
+   730,
+   240,
+   70
+  ],
+  "quick_action_buttons_ax": {
+   "Rotate Left": [
+    972,
+    744,
+    64,
+    42
+   ],
+   "Markup": [
+    1057,
+    745,
+    46,
+    41
+   ],
+   "More…": [
+    1135,
+    745,
+    42,
+    41
+   ]
+  }
+ },
+ "window_1400x900": {
+  "gallery_scroll_area_ax": [
+   309,
+   112,
+   1001,
+   820
+  ],
+  "preview_frame_ax": [
+   341,
+   144,
+   937,
+   697
+  ],
+  "strip_section_ax": [
+   314,
+   873,
+   467,
+   54
+  ],
+  "inspector_scroll_ax": [
+   1310,
+   112,
+   240,
+   778
+  ],
+  "inspector_width_pt": 240
+ },
+ "min_window_width_with_inspector_pt": 715,
+ "inspector_rows_ax_1000x700_jpg": {
+  "icon": [
+   969,
+   171,
+   50,
+   50
+  ],
+  "name": [
+   1028,
+   176.5,
+   162,
+   20
+  ],
+  "sizeAndKind": [
+   1027,
+   198.5,
+   164,
+   18
+  ],
+  "Information": [
+   969,
+   239,
+   75.5,
+   18
+  ],
+  "Show More": [
+   1126,
+   241,
+   65,
+   16
+  ],
+  "row_groups": [
+   [
+    970,
+    261,
+    220,
+    22
+   ],
+   [
+    970,
+    284,
+    220,
+    22
+   ],
+   [
+    970,
+    307,
+    220,
+    22
+   ]
+  ],
+  "row_pitch_pt": 23,
+  "Tags": [
+   969,
+   339,
+   32,
+   18
+  ],
+  "tag_field_scroll": [
+   970,
+   362,
+   220,
+   33
+  ],
+  "tag_text_field": [
+   969,
+   361,
+   222,
+   35
+  ]
+ },
+ "fonts_ax": {
+  "note": "AX AXForegroundColor is resolved in the dark appearance in both modes (white with alpha 0.847 / 0.549 even in light), so only the alpha tells label (0.847) from secondaryLabel (0.549); take colours from pixels",
+  "name": "not exposed (AXStaticText without AXAttributedStringForRange); px estimate below",
+  "sizeAndKind": "SF Regular 13, secondary label",
+  "Information / Tags header": "SF Semibold 13, label",
+  "row titles (Created, Modified, Dimensions)": "SF Medium 11, secondary label",
+  "row values": "SF Medium 11, label",
+  "status bar": "SF Regular 11, secondary label",
+  "window title": "SF Semibold 15",
+  "sidebar items / headers": "SF Regular 13 / SF Semibold 11",
+  "txt preview": "Menlo Regular 11"
+ },
+ "fonts_px_estimate": {
+  "name": "about 16 pt (ink width 71 pt for 'Alpine.jpg'; AX does not expose the attributed string)",
+  "Show More": "11 pt regular, accent colour (darkest ink px 43,102,211 light)",
+  "quick action labels": "11 pt regular (ink widths: More… 34 pt, Markup 38 pt, Rotate Left 56.5 pt)",
+  "quick action glyphs": "about 14x14 pt ink, label baseline about 26 pt below glyph top"
+ },
+ "selected_thumb_plate_px": {
+  "shape": "square plate 54x54 pt = thumb frame outset 3 pt on all sides, drawn behind the thumbnail (visible as a 3 pt ring around square thumbs, fully visible around landscape images)",
+  "corner_radius_pt": 7.0,
+  "corner_fit": "circular arc fit on 2x pixels, r = 14 px (dark fit error 0.15)",
+  "fill_light": [
+   189,
+   189,
+   189
+  ],
+  "fill_dark": [
+   86,
+   86,
+   90
+  ],
+  "background_light": [
+   255,
+   255,
+   255
+  ],
+  "background_dark": [
+   30,
+   31,
+   36
+  ],
+  "glass": false,
+  "border": false,
+  "shadow": false
+ },
+ "preview_image_px": {
+  "fit": "aspect fit centred in the preview frame",
+  "corner_radius_pt_approx": 6,
+  "hairline_border": "1 px, darker than the image in light, lighter in dark"
+ },
+ "inspector_colours_px": {
+  "light": {
+   "column": [
+    235,
+    237,
+    238
+   ],
+   "separator": [
+    204,
+    211,
+    223
+   ],
+   "bottom_bar": [
+    255,
+    255,
+    255
+   ],
+   "quick_action_ink": [
+    128,
+    128,
+    128
+   ]
+  },
+  "dark": {
+   "column": [
+    35,
+    37,
+    53
+   ],
+   "separator": [
+    64,
+    73,
+    94
+   ],
+   "bottom_bar": [
+    30,
+    31,
+    36
+   ],
+   "quick_action_ink": [
+    142,
+    143,
+    145
+   ]
+  },
+  "note": "column colour is a translucent material tinted by the wallpaper (it shows blurred strip content when the strip runs under it in a narrow window)"
+ },
+ "content_background_px": {
+  "light": [
+   255,
+   255,
+   255
+  ],
+  "dark": [
+   30,
+   31,
+   36
+  ],
+  "path_bar_dark": [
+   39,
+   40,
+   46
+  ]
+ }
+}
