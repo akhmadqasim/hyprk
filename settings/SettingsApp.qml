@@ -2,6 +2,7 @@ import QtQuick
 import "controls"
 import "HyprK"
 import "Panes.js" as Panes
+import "Parsers.js" as Parsers
 
 // The whole System Settings UI. Hosts (main.qml for `qml`, shell.qml for
 // Quickshell) give it a window and handle the window signals.
@@ -15,7 +16,9 @@ Item {
     // the account row, the Family row and the group break after them (27.2.1: the first pane row's top at y 188,
     // 90 below the list top; *-light.png have both rows blanked flat, so the Family row's look is not measured)
     readonly property int accountHeight: Theme.sidebar.accountHeight + Theme.sidebar.rowHeight + Theme.sidebar.groupGap
-    property bool windowActive: Window.active   // forced on for snapshots
+    property bool windowActive: Window.active || keepActive   // forced on for snapshots
+    // the host keeps the key look (settings/shell.qml: Emoji & Symbols open over this window)
+    property bool keepActive: false
     Binding { target: Theme; property: "windowActive"; value: app.windowActive }
     Binding { target: Tokens; property: "windowActive"; value: app.windowActive }
     onSnapshotPathChanged: if (snapshotPath !== "") windowActive = true
@@ -46,6 +49,10 @@ Item {
         currentId = history[n];
     }
     Component.onCompleted: { history = [currentId]; historyPos = 0; }
+    // View > Back ⌘[, Forward ⌘], Search ⌘F (System Settings.app SettingsAppCommands, shell/lib/menus.js settingsView)
+    Shortcut { sequence: "Ctrl+["; onActivated: app.go(-1) }
+    Shortcut { sequence: "Ctrl+]"; onActivated: app.go(1) }
+    Shortcut { sequence: "Ctrl+F"; onActivated: search.focusField() }
     Timer {
         running: app.snapshotPath !== ""; interval: 4000
         onTriggered: app.grabToImage(r => { r.saveToFile(app.snapshotPath); Qt.quit(); })
@@ -81,9 +88,8 @@ Item {
         color: Theme.sidebar.fill
         Rectangle { anchors.right: parent.right; width: Theme.sidebar.strokeWidth; height: parent.height; color: Theme.sidebar.stroke }
 
-        MouseArea { // dragging the empty top of the sidebar moves the window
+        TitleArea { // dragging the empty top of the sidebar moves the window, a double-click zooms it
             width: parent.width; height: Theme.window.toolbarHeight
-            onPressed: app.moveRequested()
         }
         TrafficLights {
             x: Theme.lights.left
@@ -251,19 +257,33 @@ Item {
         height: parent.height - y - Tokens.scroller.inset
     }
 
+    // The title bar and toolbar's empty space: a press moves the window (xdg move), a second press within the Mac's 0.5 s
+    // zooms it (Parsers.isDoubleClick; MouseArea.onDoubleClicked used Qt's 400 ms and never fired after the move grab)
+    component TitleArea: MouseArea {
+        property var last: null
+        onPressed: mouse => {
+            const p = mapToItem(null, mouse.x, mouse.y), now = { t: Date.now(), x: p.x, y: p.y };
+            if (Parsers.isDoubleClick(last, now)) { last = null; app.zoomRequested(); return; }
+            last = now;
+            app.moveRequested();
+        }
+    }
+
     // ---------- toolbar ----------
     // no fill and no glass: only the back/forward capsule is drawn (macOS 27.2.1, MAC-ANSWERS.md Q9.2)
     Item {
         id: toolbar
         anchors.left: sidebar.right; anchors.right: parent.right
         height: Theme.window.toolbarHeight
-        MouseArea { anchors.fill: parent; onPressed: app.moveRequested(); onDoubleClicked: app.zoomRequested() }
+        TitleArea { anchors.fill: parent }
         ToolbarPlatter { // back / forward share one 74 x 36 capsule with a 1 x 20 divider (27.2.1)
             id: nav
             relief: true   // the platter's own shading and edge (Tokens.toolbar.relief*, settings/appearance-*.png)
             x: 7.5; anchors.verticalCenter: parent.verticalCenter; anchors.alignWhenCentered: false   // settings-toolbar-dark.png: sidebar line px 463, capsule 479..626
             width: Tokens.toolbar.navWidth; height: Tokens.toolbar.reliefHeight   // light: 37 pt, edge rows 15 / 88 px
-            Rectangle { anchors.centerIn: parent; width: 1; height: Tokens.toolbar.dividerHeight; color: Tokens.toolbar.separator }
+            // the divider hides while either half is hovered or pressed (toolbar-backforward-rest-hover-press-dark.png)
+            Rectangle { anchors.centerIn: parent; width: 1; height: Tokens.toolbar.dividerHeight; color: Tokens.toolbar.separator
+                        visible: !navLight.hovered && !navLight.pressed }
             Row {
                 anchors.fill: parent
                 Repeater {
@@ -285,17 +305,25 @@ Item {
                 }
             }
         }
-        ToolbarHighlight {   // hover and press light of back / forward (dark)
+        ToolbarHighlight {   // hover and press light of back / forward (an AppKit platter: no glow, no lift)
+            id: navLight
             x: nav.x; y: nav.y; width: nav.width; height: nav.height
             source: nav
             backdrop: Theme.windowBg
             centres: [nav.width / 4, nav.width * 3 / 4]
+            disabled: [app.historyPos <= 0, app.historyPos >= app.history.length - 1]   // no light on a disabled half (Q-finder-10)
         }
         MacText {
             anchors.left: nav.right; anchors.leftMargin: 13; anchors.verticalCenter: parent.verticalCenter
             text: app.current.title
             font: Typography.toolbarTitle   // 15 Semibold, measured on 27.2.1 (was 16 Bold)
             color: Theme.toolbarTitle
+        }
+        HoverHandler { id: toolbarHover }
+        Rectangle {   // dark: the strip and the capsule lighten while the pointer is in the toolbar (Theme.toolbarHoverWash)
+            anchors.fill: parent
+            visible: toolbarHover.hovered && Theme.dark
+            color: Theme.toolbarHoverWash
         }
     }
 

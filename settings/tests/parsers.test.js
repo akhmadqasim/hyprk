@@ -258,3 +258,13 @@ test("stagemanager.json: off by default, only booleans, unknown keys kept", () =
     assert.deepEqual(P.normalizeStageManager({ enabled: "yes", x: 1 }), { enabled: false, autoHide: false, x: 1 });
     assert.equal(P.normalizeStageManager({ enabled: true }).enabled, true);
 });
+
+test("title bar double-click: the Mac's 0.5 s and 5 pt (Settings toolbar zoom)", () => {
+    const a = { t: 1000, x: 100, y: 20 };
+    assert.equal(P.isDoubleClick(a, { t: 1450, x: 102, y: 21 }), true);    // 450 ms: Qt's 400 missed it
+    assert.equal(P.isDoubleClick(a, { t: 1500, x: 100, y: 20 }), true);
+    assert.equal(P.isDoubleClick(a, { t: 1501, x: 100, y: 20 }), false);
+    assert.equal(P.isDoubleClick(a, { t: 1150, x: 106, y: 20 }), false);   // moved too far
+    assert.equal(P.isDoubleClick(null, a), false);
+    assert.equal(P.isDoubleClick(a, { t: 900, x: 100, y: 20 }), false);
+});

@@ -160,8 +160,12 @@ QtObject {
     property bool windowActive: true
     // window background: #FFFFFF / #1E1F24 (dark is wallpaper-tinted on the Mac; #202127 in the probe) (Q-settings-11)
     readonly property color windowBg: theme.dark ? "#1E1F24" : "#FFFFFF"
-    // cards: solid, no stroke, no shadow: #F7F7F7 / #25262B
-    readonly property color cardFill: theme.dark ? "#25262B" : "#F7F7F7"
+    // cards: the content's primary colour at 3 %, no stroke, no shadow. 27.2.1: a grouped Form section is DesignLibrary
+    // MacGroupBox (body 0x195de9758), filled with SeximalShapeStyle = Color.primary at opacity 0.03 (resolve
+    // 0x195f89be4, the double 0x3f9eb851eb851eb8; reference/re/27.2.1/GAPS-REA-windows.md 1d). Over the window
+    // background that is the measured #F7F7F7 / #25262B (255 x .97 = 247; (30,31,36) + 3 % white = (37,38,43)); they
+    // were written as those opaque colours, which is the same pixel here and wrong over any other background
+    readonly property color cardFill: theme.dark ? Qt.rgba(1, 1, 1, 0.03) : Qt.rgba(0, 0, 0, 0.03)
     readonly property color cardStroke: theme.increaseContrast ? (theme.dark ? Qt.rgba(1, 1, 1, 0.45) : Qt.rgba(0, 0, 0, 0.45))
         : "transparent"
     // row separator: #EBEBEB on #F7F7F7, #2F3035 on #25262B (2 px at 2x in desktop-dock-*.png)
@@ -173,6 +177,10 @@ QtObject {
     readonly property color toolbarTitle: !theme.windowActive ? (theme.dark ? "#5C5D5E" : "#BDBDBD")
         : theme.dark ? "#E8E8E9" : "#4C4C4C"
     readonly property color scrollEdge: theme.dark ? "#2E2F33" : "#E5E5E5"
+    // dark: the whole toolbar strip, capsule included, lightens while the pointer is in it
+    // (settings/toolbar-backforward-rest-hover-press-dark.png: strip 31 -> 39, capsule 61 -> 68, white at 8 / 224 =
+    // 7 / 194 = .036 over both; Finder the same, MAC-ANSWERS Q-finder-10 "Dark only"). Light: none (Q-finder-10)
+    readonly property color toolbarHoverWash: theme.dark ? Qt.rgba(1, 1, 1, 0.036) : "transparent"
     // content under the 52 pt toolbar strip: HyprK ScrollEdge (AppKit's scroll pocket, blurred and veiled)
     readonly property color label: theme.dark ? Qt.rgba(1, 1, 1, 0.85) : Qt.rgba(0, 0, 0, 0.85)
     readonly property color secondaryLabel: theme.increaseContrast ? (theme.dark ? Qt.rgba(1, 1, 1, 0.75) : Qt.rgba(0, 0, 0, 0.7))

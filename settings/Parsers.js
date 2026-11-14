@@ -278,7 +278,8 @@ const alertSoundTitles = { Basso: "Mezzo", Blow: "Breeze", Bottle: "Pebble", Fro
 // the pop-up's order: by shown name (the Mac's order is not captured)
 const alertSoundMenu = alertSounds.slice().sort((a, b) => alertSoundTitles[a].localeCompare(alertSoundTitles[b]));
 // startupSound: the Mac row "Play sound on startup" (a firmware chime there); stored only: hyprk has no startup sound
-const soundDefaults = { alertSound: "Tink", alertVolume: 0.75, uiSounds: true, volumeFeedback: false, startupSound: true };
+// alertVolume: the slider position; the Mac's stock value is 1 (AudioToolbox 0x1adcf0628, SOUND-REA-27.2.1.md section 1)
+const soundDefaults = { alertSound: "Tink", alertVolume: 1, uiSounds: true, volumeFeedback: false, startupSound: true };
 
 function normalizeSound(obj) {
     const o = Object.assign({}, soundDefaults, (obj && typeof obj === "object") ? obj : {});
@@ -303,7 +304,8 @@ function normalizeLock(obj) {
 
 // input.json: keyboard repeat applied with `hyprctl eval` (see luaInput); the
 // shell config can re-apply it at startup.
-const inputDefaults = { repeatRate: 25, repeatDelay: 600 };
+// defaults: a fresh Mac account's (83 ms, 500 ms: IOHIDKeyboardFilter's constructor; shell/lib/state.js luaInput has the source)
+const inputDefaults = { repeatRate: 12, repeatDelay: 500 };
 function normalizeInput(obj) {
     const o = Object.assign({}, inputDefaults, (obj && typeof obj === "object") ? obj : {});
     o.repeatRate = clamp(o.repeatRate, 1, 100, inputDefaults.repeatRate);
@@ -455,8 +457,20 @@ function monitorMode(m) {
     return m.width + "x" + m.height + "@" + m.refreshRate;
 }
 
+// A press on the title bar / toolbar's empty space that completes a double-click: within the Mac's double-click
+// interval of the previous press (NSEvent.doubleClickInterval, 0.5 s: finder/src/main.cpp sets the same for Finder;
+// Quickshell keeps Qt's 400 ms, so a 450 ms double-click did not count) and at most 5 pt from it (Qt's
+// mouseDoubleClickDistance; the Mac's distance not measured: GUESS). prev / now: { t: ms, x, y }; prev null = none.
+function isDoubleClick(prev, now, intervalMs, distance) {
+    if (!prev || !now) return false;
+    const dt = now.t - prev.t;
+    return dt >= 0 && dt <= (intervalMs === undefined ? 500 : intervalMs)
+        && Math.abs(now.x - prev.x) <= (distance === undefined ? 5 : distance)
+        && Math.abs(now.y - prev.y) <= (distance === undefined ? 5 : distance);
+}
+
 if (typeof module !== "undefined")
-    module.exports = { splitTerse, parseNmcliDevices, wifiDevice, parseNmcliWifi, parseWpctlSinks, parseWpctlSources, parseWpctlVolume,
+    module.exports = { splitTerse, isDoubleClick, parseNmcliDevices, wifiDevice, parseNmcliWifi, parseWpctlSinks, parseWpctlSources, parseWpctlVolume,
         parseBluetoothShow, parseBluetoothDevices, parseHyprMonitors, hasBattery,
         parseHyprOption, luaString, luaMonitor, luaInput,
         normalizeAppearance, normalizeDock, normalizeStageManager, normalizeSound, mergeState, monitorMode, prettyFileName,

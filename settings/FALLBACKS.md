@@ -109,3 +109,8 @@ Settings writes these; the readers belong to the shell/config agents. As of this
 planned; `displays.json` is read by `config/hypr/scale-policy.lua` (Hyprland start and hotplug); **`notifications.json`, `lock.json` and `input.json` have no reader yet**, so those
 panes only store the choice until the shell (notification server, hypridle glue, login
 config) reads them.
+
+Text field menu (HyprK `TextMenu`: search field, Live Speech phrase): with the liquidglass plugin (HYPRK_GLASS=plugin,
+`popup_classes` lists org.hyprk.Settings in config/hypr/hyprland.lua) the plugin draws the menu glass behind it and the
+menu draws no fill; without the plugin, or with Reduce Transparency / Increase Contrast, the opaque menu fill and stroke.
+Zoom (toolbar double-click, Option-click on the green light): Hyprland's maximized mode; outside Hyprland the xdg request.

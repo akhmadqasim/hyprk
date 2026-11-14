@@ -46,11 +46,30 @@ Column {
 
     readonly property string soundsDir: Backend.root + "/sounds/wav"
     property string effectsNote: ""
+    // A slider's let-go preview plays 30 ms after the last let-go, earlier requests are dropped (Sound.appex:
+    // cancelPreviousPerformRequests, then performSelector:afterDelay: 0.03, const 0x10002daa8;
+    // reference/re/27.2.1/SOUND-REA-27.2.1.md). volume -1: the alert volume as stored when the timer fires.
+    Timer {
+        id: letGo
+        property string file: ""
+        property real volume: 1
+        interval: 30
+        function play(f, v) { file = f; volume = v; restart(); }
+        onTriggered: pane.play(file, volume < 0 ? AppState.sound.alertVolume : volume)
+    }
     // `file` in sounds/wav (16-bit copies); the Apple original in sounds/originals plays when present (24-bit, what the
     // shell's scripts/sound.sh plays)
+    // volume: the Alert volume slider position; the gain is exp(s - 1), 0 at 0, as the Mac stores it (Sound.appex
+    // setAlertSoundVolume: 0x100007f98; the shell's scripts/sound.sh applies the same curve)
     function play(file, volume) {
+        volume = volume <= 0 ? 0 : Math.exp(Math.min(1, volume) - 1);
+        // a new preview stops the one still playing (Sound.appex stops the alert before it plays the next,
+        // reference/re/27.2.1/SOUND-REA-27.2.1.md section 1): the pid file names this pane's last pw-play only
         Backend.run(["sh", "-c", 'o="${1%.wav}"; o="${o%/sounds/wav/*}/sounds/originals/${o#*/sounds/wav/}"; f="$1"; '
-                     + 'for e in aiff aif caf; do [ -f "$o.$e" ] && { f="$o.$e"; break; }; done; exec pw-play --volume "$2" "$f"',
+                     + 'for e in aiff aif caf; do [ -f "$o.$e" ] && { f="$o.$e"; break; }; done; '
+                     + 'p="${XDG_RUNTIME_DIR:-/tmp}/hyprk-settings-preview.pid"; read -r old 2>/dev/null < "$p" && '
+                     + 'grep -qa pw-play "/proc/$old/cmdline" 2>/dev/null && kill "$old" 2>/dev/null; echo $$ > "$p"; '
+                     + 'exec pw-play --volume "$2" "$f"',
                      "sh", file, volume.toFixed(2)], c => {
             effectsNote = c === 127 ? "Sound previews need pw-play (PipeWire tools)."
                         : c !== 0 ? "That sound could not be played." : "";
@@ -107,8 +126,8 @@ Column {
                 value: AppState.sound.alertVolume
                 leftGlyph: "speaker.fill"; rightGlyph: "speaker.wave.3.fill"; rightGlyphSize: 12.7
                 onMoved: v => AppState.set("sound", { alertVolume: Math.round(v * 100) / 100 })
-                // macOS plays the alert once you let go of the knob
-                onReleased: pane.play(pane.soundsDir + "/Sounds/" + AppState.sound.alertSound + ".wav", AppState.sound.alertVolume)
+                // macOS plays the alert once you let go of the knob, 30 ms later (see letGo)
+                onReleased: letGo.play(pane.soundsDir + "/Sounds/" + AppState.sound.alertSound + ".wav", -1)
             }
         }
         FormRow { label: "Play sound on startup"; Switch { checked: AppState.sound.startupSound; onToggled: on => AppState.set("sound", { startupSound: on }) } }   // stored (sound.json); no startup sound exists to play
@@ -181,7 +200,7 @@ Column {
                     enabled: pane.status === "ok"
                     leftGlyph: "speaker.fill"; rightGlyph: "speaker.wave.3.fill"; rightGlyphSize: 12.7
                     onMoved: v => { pane.dragging = true; pane.setVolume(v); dragRelease.restart(); }
-                    onReleased: if (AppState.sound.volumeFeedback) pane.play(pane.soundsDir + "/misc/BezelServices-volume.wav", 1)
+                    onReleased: if (AppState.sound.volumeFeedback) letGo.play(pane.soundsDir + "/misc/BezelServices-volume.wav", 1)
                     Timer { id: dragRelease; interval: 600; onTriggered: pane.dragging = false }
                 }
                 Checkbox { // Mute: a checkbox right-aligned under the slider (sound-light.png)

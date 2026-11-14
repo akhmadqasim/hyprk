@@ -233,15 +233,16 @@ Column {
                     }
                     // Glass toolbar capsules (liquidglass-0-mid-1-*.png, 2x): x 7.5, 88.5, 132.5; 74, 37, 128 wide; 37 tall
                     // at y 7; one LensGlass each over the article under it. Colour fitted on the copy capsule over the sky
-                    // (161,192,223): light 0 / .5 / 1 -> (186,218,252), (200,225,251), (219,234,251) = the sample x1.14
-                    // mixed with white .00 / .22 / .48; dark (136,164,192), (135,162,190), (84,97,111) = x0.85 mixed
-                    // with #1E1E1E 0 / 0 / .5. Rim line black a.4 light (159 -> 97), a.5 dark (158 -> 81). Refraction:
-                    // the knob lens law (Tokens lensBand / lensAmount). Dark gain 0.79, not the shots' 0.85: in the
+                    // (161,192,223): light 0 / .5 / 1 -> (186,218,252), (200,225,251), (219,234,251); dark (136,164,192),
+                    // (135,162,190), (84,97,111); since round 3 (GLASS-HIG.md) the decoded Regular face draws it (Tokens
+                    // regularFace*), not a fitted gain. Rim line black a.4 light (159 -> 97), a.5 dark (158 -> 81). Refraction:
+                    // the Regular recipe (Tokens regular*: inner, outer; GLASS-HIG.md, was the switch strip's fitted law). Until round 3: dark gain 0.79, not the shots' 0.85: in the
                     // 23.09.23 recording (dark, slider at 0.5) the share capsule's face over the same photo is 0.86 of
                     // ours where the photo itself is 0.93 (the recording's darker mid-tones), so 0.85 x 0.93 (judge #6:
                     // the rest capsule too bright, the press clipped it to white). Blur: the recording's face is smooth
                     // (luminance std 4.3, column range 13.5 levels); 3 pt gave 8.8 / 25, 16 pt 5.8 / 17 (larger blurs
                     // only add the 17-tap ring's noise): 16 pt at 0.5 on the earlier law's shape (1 + 4 x tint, by eye).
+                    // Since round 2 (GLASS-HIG.md) the frost is the decoded blur fill instead (Tokens regularFill*).
                     Repeater {
                         // glyphs: the view's SF Symbols (square.and.arrow.up, ellipsis, square.on.square, magnifyingglass),
                         // regular, 16.5 pt (ink on the Mac shot: share 14.5 wide, the three dots 15 wide and 3 tall,
@@ -259,15 +260,32 @@ Column {
                             LensGlass {
                                 anchors.fill: parent
                                 source: articleView
-                                clampToSource: true   // 7 pt from the article's top and right edge, bends 12.6 pt
+                                clampToSource: true   // 7 pt from the article's top and right edge, bends 18.5 pt in, 16 out
+                                // the blur fill sees the Settings card around the article (round 3: with it the face matches
+                                // the Mac's middle panel within 2-5 levels in light and dark; with the edge repeat in the
+                                // blur too, dark read 20 levels light); the sharp samples keep the edge repeat (the rim)
+                                fillBackdropOutside: true
+                                backdrop: Tokens.control.lensBackdrop
                                 origin: Qt.point(cap.x, cap.y)
-                                band: height * Tokens.control.lensBand
-                                amount: height * Tokens.control.lensAmount
-                                blur: (1 + 4 * glassPreview.tint) * 16 / 3
-                                gain: Theme.dark ? 0.79 : 1.14
-                                tint: Theme.dark ? Qt.rgba(0.118, 0.118, 0.118, Math.max(0, glassPreview.tint - 0.5))
-                                                 : Qt.rgba(1, 1, 1, glassPreview.tint <= 0.5 ? 0.44 * glassPreview.tint
-                                                                                              : 0.22 + 0.52 * (glassPreview.tint - 0.5))
+                                band: Tokens.control.regularInnerBand(height)
+                                amount: Tokens.control.regularInnerAmount(height)
+                                outerBand: Tokens.control.regularOuterBand(height)
+                                outerAmount: Tokens.control.regularOuterAmount(height)
+                                outerOpacity: Tokens.control.regularOuterOpacity
+                                rimBias: Tokens.control.regularRimBias
+                                rimSpread: Tokens.control.regularRimSpread
+                                fillLight: Tokens.control.regularFillLight
+                                rimFace: Tokens.control.regularRimFace
+                                fillSigma: Tokens.control.regularFillSigma
+                                fillNormal: Tokens.control.regularFillNormal(glassPreview.tint)
+                                fillDarken: Theme.dark ? Tokens.control.regularFillMix(glassPreview.tint) : 0
+                                fillLighten: Theme.dark ? 0 : Tokens.control.regularFillMix(glassPreview.tint)
+                                // the decoded Regular face (Tokens regularFace*; round 3, was gain 1.14 / 0.79 and a fitted mix)
+                                faceBlack: Tokens.control.regularFaceBlack
+                                faceWhite: Tokens.control.regularFaceWhite
+                                faceSat: Tokens.control.regularFaceSat
+                                faceMaxLuma: Tokens.control.regularFaceMaxLuma
+                                tint: Tokens.control.regularFaceFill(glassPreview.tint)
                                 outline: Theme.dark ? 0.5 : 0.4
                                 discCentre: light.discCentre
                                 discLift: light.discLift

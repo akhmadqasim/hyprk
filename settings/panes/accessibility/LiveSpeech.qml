@@ -24,6 +24,7 @@ Column {
                 opacity: page.can ? 1 : 0.4
                 TextInput {
                     id: phrase
+                    TextMenu { target: phrase }   // the field editor's right-click menu (HyprK textmenu.js)
                     anchors.fill: parent; anchors.leftMargin: 8; anchors.rightMargin: 8
                     verticalAlignment: TextInput.AlignVCenter
                     enabled: page.can; clip: true
