@@ -24,6 +24,7 @@
 #include <QQuickImageProvider>
 #include <QQuickWindow>
 #include <QStandardPaths>
+#include <QStyleHints>
 #include <QTimer>
 
 namespace {
@@ -78,6 +79,9 @@ int main(int argc, char *argv[])
     if (qEnvironmentVariableIsEmpty("QSG_RENDER_LOOP"))
         qputenv("QSG_RENDER_LOOP", "basic");
     QGuiApplication app(argc, argv);
+    // double-click as on the Mac: 0.5 s, the stock HIDClickTime (reference/re/27.2.1/SOUND-REA-27.2.1.md section 4);
+    // Qt's own default is 400 ms
+    QGuiApplication::styleHints()->setMouseDoubleClickInterval(500);
     app.setApplicationName(QStringLiteral("Finder"));
     app.setOrganizationName(QStringLiteral("hyprk"));
     app.setDesktopFileName(QStringLiteral("hyprk-finder"));

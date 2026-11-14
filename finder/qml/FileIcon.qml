@@ -25,8 +25,19 @@ Item {
     readonly property bool smallText: isText && size < 32
     readonly property bool wantsThumb: entry.size > 0 && (kind === "image" || kind === "pdf" || kind === "video"
                                                           || (isText && !smallText))
-    readonly property bool textIcon: isText   // the plain icon only shows while there is no thumbnail
     readonly property int textIconPt: [16, 18, 32, 48, 64, 77].find(s => size <= s) || 77
+    // a ZIP archive is the Mac's own icon too (icons-rendered/doc-zip@16..77pt, light = dark byte for byte, Q-finder-31):
+    // the page with its zipper and "ZIP". It was the blank generic page with a drawn zipper and a text badge. Other
+    // archive types (tar, 7z ...) have no Mac render in reference/ and keep the drawn one
+    readonly property bool zipIcon: docKind === "zip"
+    // the 27.2.1 document icon for this type (Files.macDocKind; the plain icon only shows while there is no
+    // thumbnail): the Mac's renders for .txt, .zip and .pdf (icons-rendered doc-txt / doc-zip / doc-pdf@16..77pt),
+    // IconServices' composition rebuilt by themes/icons/tools/build-docs.py for docx, xlsx / csv, pptx, html, audio,
+    // video, images and other text (reference/re/27.2.1/ICONS-REA-27.2.1.md part 2); "" = the generic page
+    readonly property string docKind: Files.macDocKind(entry)
+    readonly property string macDoc: docKind !== "" ? "doc-" + docKind : ""
+    // the extension text over the composed pages (their art leaves it out: IconServices takes it from each file)
+    readonly property var docText: macDoc !== "" && !Files.macDocHasText(docKind) ? Files.docText(size) : null
     // share of the box a thumbnail fills; the icon grid passes less because its box includes
     // the macOS PNGs' padding (ref: 68 px thumbnails in a 77 px icon)
     property real thumbScale: 0.94
@@ -142,11 +153,11 @@ Item {
         trusted: true
         dpr: root.dpr
         // a system icon at the size picked above; the text icon and the drawn SVG fallbacks at the drawn size
-        decodeSize: sysSource !== "" && !root.textIcon ? Math.ceil(root.size) : 0
+        decodeSize: sysSource !== "" && root.macDoc === "" ? Math.ceil(root.size) : 0
         readonly property string sysSource: root.sysFailed ? "" : Theme.sysIcon(root.sysName, root.sysPx,
                                                                                      root.kind === "folder" && Files.hasTags(root.entry) ? Theme.color.tagFolderColors[root.entry.tags[0]] : "")
         onStatusChanged: if (status === Image.Error && sysSource) root.sysFailed = true
-        source: root.textIcon ? Qt.resolvedUrl("icons/doc-txt@" + root.textIconPt + "pt.png")
+        source: root.macDoc !== "" ? Qt.resolvedUrl("icons/" + root.macDoc + "@" + root.textIconPt + "pt.png")
              : sysSource
              || (root.kind === "folder"
                  ? Icons.folder(Theme.color.folderBack.toString(), Theme.color.folderFront.toString(), Theme.color.folderTop.toString())
@@ -160,12 +171,29 @@ Item {
         }
         Image {
             anchors.fill: parent
-            visible: root.kind === "archive"
+            visible: root.kind === "archive" && !root.zipIcon
             source: visible ? Icons.zipper() : ""
             sourceSize: Qt.size(root.px, root.px)
         }
+        // the extension on a composed page: the system font, regular, centred on the text rect, glyph bottom on its
+        // bottom, scaled to the rect width - 6 when wider (Files.docText); ink 182 grey, measured on the Mac's renders
+        // (CUIDesignLibrary colour 17, the same in light and dark)
         TextLabel {
-            visible: root.kind !== "folder" && root.kind !== "app" && root.size >= 32 && !root.textIcon
+            id: docLabel
+            visible: root.docText !== null && text !== ""
+            readonly property real fit: root.docText && implicitWidth + 6 > root.docText.w ? (root.docText.w - 6) / implicitWidth : 1
+            x: root.docText ? root.docText.x + (root.docText.w - implicitWidth) / 2 : 0
+            y: root.docText ? root.docText.baseline - baselineOffset : 0
+            scale: fit
+            transformOrigin: Item.Bottom
+            text: Files.docTextFor(root.entry)
+            color: Qt.rgba(182 / 255, 182 / 255, 182 / 255, 1)
+            size: root.docText ? root.docText.size : 10
+            weight: Typography.regular
+        }
+        // the generic page (no Mac render of it in reference/): the older drawn badge
+        TextLabel {
+            visible: root.kind !== "folder" && root.kind !== "app" && root.size >= 32 && root.macDoc === ""
             anchors.horizontalCenter: parent.horizontalCenter
             y: root.size * 0.70
             text: Files.badge(root.entry)

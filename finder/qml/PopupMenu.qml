@@ -100,10 +100,10 @@ Popup {
                 readonly property bool lit: hover.hovered || root.subRow === it
                 implicitWidth: !plain ? 0 : label.x + label.implicitWidth + shortcutText.implicitWidth + (hasSub ? 40 : 0) + 53
 
-                Rectangle {
+                Rectangle {   // inset 16 pt from the menu's edges on both sides (MAC-ANSWERS.md Q-menubar-20: line 16..W-16.5)
                     visible: it.sep
                     anchors.centerIn: parent
-                    width: parent.width - 20
+                    width: parent.width - 22
                     height: 1
                     color: Theme.color.separator
                 }
@@ -113,13 +113,15 @@ Popup {
                     radius: 7
                     color: Theme.color.accent
                 }
-                Text {
+                SfSymbol {   // the menu state image: checkmark semibold 10.7 pt, ink 8.5 pt into the highlight, as the
+                    // shared HyprK Popup (fitted on popup-menu-open-{light,dark}.png; no Finder context menu shot with a check)
                     visible: it.plain && !!it.modelData.checked
-                    x: 8
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: "✓"
+                    x: 8.5
+                    y: (parent.height - height) / 2 + 0.5
+                    name: "checkmark"
+                    weight: "semibold"
+                    pointSize: 10.7
                     color: it.lit ? "white" : Theme.color.label
-                    font: Typography.body
                 }
                 Symbol {   // leading symbol: 10.4 pt (ink of trash / share / gearshape 20x23 / 18x23 / 22x22 px in
                     // crops/context-menu-file-light.png, 2x; at 14 pt they were 26x31 / 24x30 / 30x30)
@@ -132,10 +134,10 @@ Popup {
                     name: it.modelData.icon || ""
                     color: !it.on ? Theme.color.tertiaryLabel : it.lit ? "white" : Theme.color.label
                 }
-                Symbol {
+                Symbol {   // chevron centred at W - 23.25 (Q-menubar-23): the row ends at W - 5, the 13 pt box's centre 6.5 in
                     visible: it.plain && it.hasSub
                     anchors.right: parent.right
-                    anchors.rightMargin: 6
+                    anchors.rightMargin: 11.75
                     anchors.verticalCenter: parent.verticalCenter
                     size: 13
                     name: visible ? "chevron.right" : ""

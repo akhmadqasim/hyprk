@@ -190,6 +190,65 @@ function iconClass(entry) {
     return "document";
 }
 
+// ---------- macOS 27.2.1 document icons (reference/re/27.2.1/ICONS-REA-27.2.1.md part 2) ----------
+// IconServices composes a document icon at run time (-[ISDocumentRecipe layerTreeForSize:scale:] 0x1975ef824): the
+// page, the type's symbol or background, the extension text, the page fold. themes/icons/tools/build-docs.py builds
+// the art without the text (icons/doc-<kind>@<pt>pt.png); docText() places the text the way IconServices does.
+// Kinds: the ISDocumentIconConfiguration.ISSymbolName of the type (or of the first type it conforms to with icons) in
+// CoreTypes.bundle's Info.plist; "txtfill" = public.text's UTTypeIconBackgroundName txt-fill. Linux has MIME types,
+// not UTIs: the extension picks the type where the Mac declares one, the MIME top level otherwise (every Mac audio,
+// movie and image type conforms to public.audio / public.movie / public.image). "txt", "zip" and "pdf" are the Mac's
+// own renders (live/finder/icons-rendered), text included.
+const docByExt = {
+    txt: "txt", text: "txt", zip: "zip", pdf: "pdf",
+    docx: "justify", xlsx: "table", csv: "table", pptx: "chart", html: "code", htm: "code",
+};
+function macDocKind(entry) {
+    if (entry.isDir) return "";
+    const m = entry.mime || "", ext = splitName(entry.name || "", false).ext.toLowerCase();
+    if (m === "application/x-desktop") return "";
+    if (docByExt[ext]) return docByExt[ext];
+    if (m.indexOf("audio/") === 0) return "audio";
+    if (m.indexOf("video/") === 0) return "video";
+    if (m.indexOf("image/") === 0) return "image";
+    if (isText(entry)) return "txtfill";
+    return "";
+}
+// the art holds its own text (the Mac's renders)
+function macDocHasText(kind) { return kind === "txt" || kind === "zip" || kind === "pdf"; }
+
+// ISHintedRect / ISHintedFloat (-[ISHintedRect hintedRectForSize:options:] 0x1975f9fd4, options 5): the first entry
+// >= s, linear from the one before, scaled by s / edge outside the table; rects rounded to 0.5, floats not
+function hinted(table, s, half) {
+    const keys = Object.keys(table).map(Number).sort((a, b) => a - b);
+    const at = k => [].concat(table[k]);
+    let r;
+    if (s <= keys[0]) r = at(keys[0]).map(v => v * s / keys[0]);
+    else if (s >= keys[keys.length - 1]) r = at(keys[keys.length - 1]).map(v => v * s / keys[keys.length - 1]);
+    else {
+        const i = keys.findIndex(k => k >= s), a = keys[i - 1], b = keys[i], f = (s - a) / (b - a);
+        r = at(a).map((v, j) => v + (at(b)[j] - v) * f);
+    }
+    return half ? r.map(v => Math.round(v * 2) / 2) : r;
+}
+// the macOS branch of ISDocumentRecipe's tables (points; x, y from the bottom of the paper rect)
+const docPaper = { 16: [3, 1, 10, 14], 32: [5, 2, 22, 28], 128: [23, 9, 82, 110], 256: [46, 18, 166, 220], 512: [92, 37, 327, 438] };
+const docTextRect = { 32: [1, 1, 20, 1], 128: [9, 8, 64, 17], 256: [16, 17, 132, 33], 512: [33, 31, 261, 60] };
+const docTextFont = { 128: 16.5, 256: 33, 512: 60 };
+// The extension text of a document icon `s` pt big: null at 32 pt and below (the recipe adds no text layer), else
+// { x, w: the text rect from the icon's left, baseline: from the icon's top, size: font pt }. The text is the system
+// font, regular (CTFontCreateUIFontForLanguage kCTFontUIFontSystem), centred on the rect, its glyph bottom on the
+// rect's bottom, scaled to w - 6 when wider (-[IFGraphicsContext drawText:fontName:fontSize:inRect:] 0x19753d5d0);
+// colour CUIDesignLibrary 17, measured 182 grey on the Mac's renders (Theme / the caller)
+function docText(s) {
+    if (s <= 32) return null;
+    const p = hinted(docPaper, s, true), t = hinted(docTextRect, s, true);
+    return { x: p[0] + t[0], w: t[2], baseline: s - (p[1] + t[1]), size: hinted(docTextFont, s, false)[0] };
+}
+// the text: UTTypeIconText, else the file's own extension, uppercased (-[ISRecordResourceProvider
+// _findTextResourceWithIconDictionary:] 0x1975cd2c4)
+function docTextFor(entry) { return splitName(entry.name || "", !!entry.isDir).ext.toUpperCase(); }
+
 // Short uppercase badge printed on the generic document icon ("ZIP", "PDF").
 function badge(entry) {
     const ext = splitName(entry.name, entry.isDir).ext;
@@ -293,4 +352,37 @@ function formatDate(ms, nowMs) {
     if (diff === 0) return "Today at " + time;
     if (diff === 1) return "Yesterday at " + time;
     return d.getDate() + " " + months[d.getMonth()] + " " + d.getFullYear() + " at " + time;
+}
+
+// Sidebar right-click menu (Finder 27.2.1, -[TContextMenu configureForSidebar:...] 0x1004204cc builds context 8 from the
+// command table FUN_10081f3f0 at 0x100c15450: the rows whose context mask has bit 8, in table order; separators are
+// table rows too and _setCondensesSeparators: drops leading, trailing and doubled ones). The context-8 rows: Open
+// (titled "Open in New Tab" in a browser window: N151.1, the ⌥ alternate "Open in New Window" N151.3 not built), Open
+// With, Screen Share, Show in Enclosing Folder (N162), Show "x" (file providers), Download Now, Remove Download, —,
+// Eject "x" (N57), —, Erase / Format, —, Encrypt "x"…, Remove from Sidebar (N169.2), Delete Tag "x" (TG16_V2), backups,
+// —, Get Info (N165), Manage Storage…, Back Up Now, Change Wallpaper…, Edit Widgets…, Rename "x" (cmdRenameInSidebar:
+// N169.6), Add to Dock (N169.13), search slices, —, Share (N166), Manage Shared…, —, tags, —, plug-ins. Which rows
+// stay for which kind of item is Finder's validation (hidden when invalid: TContextMenuItem showMeAnyway); it was not
+// decoded per kind, so the per-kind lists below are GUESS from what each command applies to. No icons: none of these
+// rows has the table's image flag (+0x2c). The tag colour row is left out as in the item menu (Main.qml contextMenu).
+// kind: "folder" (a Favorites folder), "virtual" (Recents, Shared, iCloud Drive, AirDrop), "trash",
+// "volume", "tag"; opens: the row goes somewhere (Open in New Tab), real: a folder on disk (Show in Enclosing Folder,
+// Get Info; Applications is the virtual "applications:" here). Rows: { text, id, enabled } or { separator: true }.
+// ids: newtab enclosing info.
+function sidebarMenu(kind, name, opens, real) {
+    const sep = { separator: true };
+    const row = (text, id, enabled) => ({ text: text, id: id || "", enabled: !!enabled });
+    const q = "“" + name + "”";
+    const tab = row("Open in New Tab", "newtab", opens);
+    if (kind === "tag")
+        return [tab, sep, row("Remove from Sidebar"), row("Delete Tag " + q), sep, row("Rename " + q)];
+    if (kind === "volume")
+        return [tab, sep, row("Eject " + q), sep, row("Get Info", "info", real), row("Rename " + q)];
+    if (kind === "trash")
+        return [tab];
+    if (kind === "virtual")
+        return [tab, sep, row("Remove from Sidebar")];
+    // Favorites folder: the system folders cannot be renamed, so no Rename row (validateRenameInSidebar: GUESS)
+    return [tab, row("Show in Enclosing Folder", "enclosing", real), sep, row("Remove from Sidebar"), sep,
+            row("Get Info", "info", real), row("Add to Dock"), sep, row("Share")];
 }

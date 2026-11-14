@@ -43,6 +43,7 @@ Rectangle {
     TextInput {
         id: input
         MouseArea { anchors.fill: parent; acceptedButtons: Qt.NoButton; cursorShape: Qt.IBeamCursor }   // TextInput sets no I-beam itself
+        TextMenu { id: textMenu; target: input }   // the field editor's right-click menu (HyprK textmenu.js)
         anchors.fill: parent
         anchors.leftMargin: 2
         anchors.rightMargin: 2
@@ -59,7 +60,7 @@ Rectangle {
         Keys.onReturnPressed: root.finish(true)
         Keys.onEnterPressed: root.finish(true)
         Keys.onEscapePressed: root.finish(false)
-        onActiveFocusChanged: if (!activeFocus) root.finish(true)
+        onActiveFocusChanged: if (!activeFocus && !textMenu.open) root.finish(true)   // the menu keeps the edit going
         Component.onCompleted: {
             forceActiveFocus();
             select(0, Files.splitName(root.entry.name, root.entry.isDir).base.length);

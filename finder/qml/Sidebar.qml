@@ -12,6 +12,8 @@ Rectangle {
 
     required property var browser
     property var volumes: []
+    // a right click on a row: Main.qml sidebarMenu() shows Finder's sidebar menu (files.js sidebarMenu) at the pointer
+    signal contextMenuRequested(var item, string kind, point pos)
 
     color: Theme.blur ? Theme.color.sidebarGlass : Theme.color.sidebarSolid
     property var collapsed: ({})   // header -> true: the section's rows are hidden (click the header)
@@ -34,18 +36,18 @@ Rectangle {
             { label: "Shared", icon: "shared", path: "" }
         ] },
         { header: "Favorites", items: [
-            { label: "Applications", icon: "applications", path: "applications:" },
-            { label: "Desktop", icon: "desktop", path: FileOps.standardPath("desktop") },
-            { label: "Documents", icon: "doc", path: FileOps.standardPath("documents") },
-            { label: "Downloads", icon: "download", path: FileOps.standardPath("downloads") }
+            { label: "Applications", icon: "applications", path: "applications:", kind: "folder" },
+            { label: "Desktop", icon: "desktop", path: FileOps.standardPath("desktop"), kind: "folder" },
+            { label: "Documents", icon: "doc", path: FileOps.standardPath("documents"), kind: "folder" },
+            { label: "Downloads", icon: "download", path: FileOps.standardPath("downloads"), kind: "folder" }
         ] },
         // Locations icons are grey, not the accent (Q-finder-08)
         { header: "Locations", items: [
             { label: "iCloud Drive", icon: "icloud", path: "", grey: true },
             { label: "AirDrop", icon: "airdrop", path: "", grey: true }
-        ].concat(volumes.map(v => ({ label: v.name, icon: "drive", path: v.path, grey: true })))
-         .concat([{ label: "Trash", icon: "trash", path: FileOps.standardPath("trash"), drop: "trash:", grey: true }]) },
-        { header: "Tags", items: Theme.color.tags.slice(0, 5).map(t => ({ label: t.name, dot: t.color, path: "tag:" + t.name })) }
+        ].concat(volumes.map(v => ({ label: v.name, icon: "drive", path: v.path, grey: true, kind: "volume" })))
+         .concat([{ label: "Trash", icon: "trash", path: FileOps.standardPath("trash"), drop: "trash:", grey: true, kind: "trash" }]) },
+        { header: "Tags", items: Theme.color.tags.slice(0, 5).map(t => ({ label: t.name, dot: t.color, path: "tag:" + t.name, kind: "tag" })) }
     ]
 
     Flickable {
@@ -157,6 +159,13 @@ Rectangle {
                             }
                             TapHandler {
                                 onTapped: if (row.modelData.path) root.browser.go(row.modelData.path)
+                            }
+                            TapHandler {   // the row's context menu; the row does not get selected (Finder draws a ring)
+                                acceptedButtons: Qt.RightButton
+                                onTapped: (ev, button) => {
+                                    const p = row.mapToItem(null, ev.position.x, ev.position.y);
+                                    root.contextMenuRequested(row.modelData, row.modelData.kind || "virtual", Qt.point(p.x, p.y));
+                                }
                             }
                             FolderDrop {   // real folders and the Trash take drops; virtual rows do not
                                 id: drop

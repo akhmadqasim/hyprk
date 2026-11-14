@@ -74,6 +74,7 @@ Popover {
             }
             TextInput {
                 id: input
+                TextMenu { target: input }   // the field editor's right-click menu (HyprK textmenu.js)
                 width: 60
                 height: parent.height
                 verticalAlignment: TextInput.AlignVCenter

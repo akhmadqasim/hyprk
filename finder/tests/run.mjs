@@ -172,6 +172,30 @@ test("iconClass", () => {
     assert.equal(F.iconClass({ mime: "application/octet-stream" }), "document");
     assert.equal(F.iconClass({}), "document");
 });
+test("macDocKind and docText: the 27.2.1 document icons (ICONS-REA-27.2.1.md part 2)", () => {
+    const k = (name, mime) => F.macDocKind({ name, mime });
+    assert.equal(k("a.txt", "text/plain"), "txt");
+    assert.equal(k("a.zip", "application/zip"), "zip");
+    assert.equal(k("a.pdf", "application/pdf"), "pdf");
+    assert.equal(k("a.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"), "justify");
+    assert.equal(k("a.csv", "text/csv"), "table");
+    assert.equal(k("a.xlsx", ""), "table");
+    assert.equal(k("a.pptx", ""), "chart");
+    assert.equal(k("a.html", "text/html"), "code");
+    assert.equal(k("a.mp3", "audio/mpeg"), "audio");
+    assert.equal(k("a.mkv", "video/x-matroska"), "video");
+    assert.equal(k("a.heic", "image/heif"), "image");
+    assert.equal(k("a.json", "application/json"), "txtfill");
+    assert.equal(k("a.md", "text/markdown"), "txtfill");
+    assert.equal(k("a.bin", "application/octet-stream"), "");
+    assert.equal(F.macDocKind({ isDir: true, name: "x.zip" }), "");
+    assert.ok(F.macDocHasText("pdf") && !F.macDocHasText("audio"));
+    assert.equal(F.docText(32), null);           // no text layer at 32 pt and below
+    // 64 pt: paper (11, 4.5) + text rect (3.5, 3.5, 34.5) (a third of the way from the 32 to the 128 entry, to 0.5)
+    assert.deepEqual(F.docText(64), { x: 14.5, w: 34.5, baseline: 56, size: 8.25 });
+    assert.deepEqual(F.docText(128), { x: 32, w: 64, baseline: 111, size: 16.5 });
+    assert.equal(F.docTextFor({ name: "song.flac" }), "FLAC");
+});
 test("badge", () => {
     assert.equal(F.badge({ name: "x.zip" }), "ZIP");
     assert.equal(F.badge({ name: "x.verylong" }), "");
@@ -203,6 +227,58 @@ test("formatDateLong", () => {
     assert.equal(F.formatDateLong(new Date(2026, 10, 9, 14, 30).getTime(), now), "Yesterday, 14:30");
     assert.equal(F.formatDateLong(new Date(2026, 2, 5, 9, 12).getTime(), now), "5 March 2026 at 09:12");
 });
+
+// ---- menus in Main.qml, pinned to the decoded 27.2.1 Finder (reference/re/27.2.1/MENUS-REA-27.2.1.md) ----
+{
+    const main = readFileSync(join(here, "..", "qml", "Main.qml"), "utf8");
+    const body = name => main.slice(main.indexOf("function " + name + "("), main.indexOf("\n    }\n", main.indexOf("function " + name + "(")));
+    const texts = code => [...code.matchAll(/(?:sortBy\("\w+", |off\(|text: )"([^"]+)"/g)].map(m => m[1]);
+    test("Finder Sort By: ArrangeByMenu.nib sortByMenu rows, no key equivalents", () => {
+        assert.deepEqual(texts(body("sortItems")), ["None", "Snap to Grid", "Name", "Kind", "Date Last Opened", "Date Added",
+            "Date Modified", "Date Created", "Size", "Tags"]);
+        assert.ok(!/shortcut/.test(body("sortItems")));
+    });
+    test("Finder context menus: item and background rows in the Mac's order (crops/context-menu-*-light.png)", () => {
+        const code = body("contextMenu");
+        const tail = texts(code.slice(0, code.indexOf("let items")));
+        const item = texts(code.slice(code.indexOf("if (entry)"), code.indexOf("} else {")));
+        const bg = texts(code.slice(code.indexOf("} else {")));
+        assert.deepEqual(tail, ["Share…", "Customize Folder…", "Quick Actions", "Customise…", "Services", "No Services Apply"]);
+        assert.deepEqual(item, ["Open in New Tab", "New Folder with Selection (", "Open", "Open With", "Move to Trash", "Get Info", "Duplicate", "Make Alias",
+            "Quick Look", "Copy", "Show in Enclosing Folder"]);
+        assert.deepEqual(bg, ["New Folder", "Get Info", "View", "Use Groups", "Sort By", "Clean Up", "Clean Up By",
+            "Show View Options"]);
+        // Clean Up By: the six titles of the table at 0x100b267a8
+        assert.match(main, /\["Name", "Kind", "Date Modified", "Date Created", "Size", "Tags"\]/);
+    });
+    test("Finder group button: ArrangeByMenu.nib arrangeByMenu (FIArrangeByPopUp mouseDown:), no key equivalents", () => {
+        const g = body("groupItems");
+        assert.deepEqual([...g.matchAll(/"([^"]+)"/g)].map(m => m[1]), ["None", "Name", "Kind", "Application", "Date Last Opened",
+            "Date Added", "Date Modified", "Date Created", "Size", "Tags"]);
+        assert.ok(!/shortcut/.test(g));
+        assert.match(main, /onGroupRequested: anchor => win\.popup\(win\.groupItems\(\), anchor\)/);
+    });
+    test("Finder sidebar menus: context 8 rows of the command table (configureForSidebar 0x1004204cc)", () => {
+        const t = rows => rows.map(r => r.separator ? "---" : r.text);
+        assert.deepEqual(t(F.sidebarMenu("folder", "Documents", true, true)), ["Open in New Tab", "Show in Enclosing Folder", "---",
+            "Remove from Sidebar", "---", "Get Info", "Add to Dock", "---", "Share"]);
+        assert.deepEqual(t(F.sidebarMenu("volume", "USB", true, true)), ["Open in New Tab", "---", "Eject \u201CUSB\u201D", "---",
+            "Get Info", "Rename \u201CUSB\u201D"]);
+        assert.deepEqual(t(F.sidebarMenu("tag", "Red", true, false)), ["Open in New Tab", "---", "Remove from Sidebar",
+            "Delete Tag \u201CRed\u201D", "---", "Rename \u201CRed\u201D"]);
+        // only the rows hyprk can do act: Open in New Tab, Show in Enclosing Folder, Get Info
+        const on = F.sidebarMenu("folder", "Documents", true, true).filter(r => r.enabled).map(r => r.id);
+        assert.deepEqual(on, ["newtab", "enclosing", "info"]);
+        assert.deepEqual(F.sidebarMenu("folder", "Applications", true, false).filter(r => r.enabled).map(r => r.id), ["newtab"]);
+        assert.match(main, /onContextMenuRequested: \(item, kind, pos\) => win\.sidebarMenu\(item, kind, pos\)/);
+    });
+    test("Finder menus: no rows the Mac does not have", () => {
+        for (const l of ["Show Hidden Files", "Hide Hidden Files", "Keep Folders on Top", "Sort by Name", "Sort by Kind"])
+            assert.ok(!main.includes('"' + l + '"'), l);
+        // the toolbar's Action button shows the context menu (populateActionMenu:contextMenuDelegate: 0x1004208c8)
+        assert.match(body("actionMenu"), /contextMenu\(/);
+    });
+}
 
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

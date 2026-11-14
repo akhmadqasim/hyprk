@@ -54,7 +54,8 @@ Window {
         Theme.appearance = Qt.binding(() => win.appearance);
         Theme.blur = startup.blur;
         Theme.hasSysIcons = startup.hasSysIcons;
-        Theme.active = Qt.binding(() => win.active && !startup.inactive);
+        // Emoji & Symbols open over this window keeps the key look, as the Mac's palette (Hypr.emojiOver)
+        Theme.active = Qt.binding(() => (win.active || (Hypr.emojiOver !== "" && Hypr.emojiOver === win.title)) && !startup.inactive);
         Qt.callLater(applyStartup);
         keys.forceActiveFocus();
     }
@@ -156,6 +157,7 @@ Window {
         topLeftRadius: win.radius
         bottomLeftRadius: win.radius
         browser: fm
+        onContextMenuRequested: (item, kind, pos) => win.sidebarMenu(item, kind, pos)
     }
 
     TrafficLights {
@@ -165,7 +167,7 @@ Window {
         fullScreenButton: true   // green = full screen, Option-click = zoom (MAC-ANSWERS.md Q-windows-19)
         onCloseClicked: win.close()
         onMinimizeClicked: win.minimize()
-        onZoomClicked: win.visibility === Window.Maximized ? win.showNormal() : win.showMaximized()
+        onZoomClicked: win.zoom()
         onFullScreenClicked: win.visibility === Window.FullScreen ? win.showNormal() : win.showFullScreen()
     }
 
@@ -210,13 +212,14 @@ Window {
 
         Toolbar {
             id: toolbar
+            z: 2   // over the icon grid, which runs under it
             width: parent.width
             browser: fm
             window: win
             view: win.view
             onViewRequested: v => win.setView(v)
-            onMoreRequested: anchor => win.popup(win.moreMenu, anchor)
-            onGroupRequested: anchor => win.popup(win.sortItems(), anchor)
+            onMoreRequested: anchor => win.actionMenu(anchor)
+            onGroupRequested: anchor => win.popup(win.groupItems(), anchor)
             onTagRequested: anchor => tagPopover.show(anchor)
             onViewMenuRequested: anchor => win.popup(win.viewItems(), anchor)
         }
@@ -237,16 +240,31 @@ Window {
             onNewTabRequested: win.newTab(FileOps.homePath())
         }
 
+        // icon view without tabs: the grid runs under the toolbar and scrolls through AppKit's scroll pocket, as a
+        // Finder scroll view under a unified toolbar does (TOOLBAR-REA-27.2.1.md 1: -[NSToolbarView
+        // _scrollPocketElementStyle] 0x18ad147cc returns the ThinFilm style for every toolbar; MAC-ANSWERS Q-windows-14:
+        // the icons blur under the strip). List and gallery keep their hard strip (Q-finder-17), columns are not measured.
+        readonly property bool underToolbar: win.view === "icons" && !tabBar.visible
         Loader {
             id: viewLoader
-            anchors.top: tabBar.visible ? tabBar.bottom : toolbar.bottom
+            anchors.top: tabBar.visible ? tabBar.bottom : keys.underToolbar ? parent.top : toolbar.bottom
             anchors.topMargin: tabBar.visible ? 4 : 0
             anchors.bottom: pathBar.visible ? pathBar.top : parent.bottom
             anchors.bottomMargin: 0
             width: parent.width
             sourceComponent: ({ icons: iconView, list: listView, columns: columnView, gallery: galleryView })[win.view]
         }
-        Component { id: iconView; IconView { browser: fm; onContextMenu: (e, p) => win.contextMenu(e, p) } }
+        Component { id: iconView; IconView { browser: fm; topInset: keys.underToolbar ? Theme.toolbar.height : 0
+                                              onContextMenu: (e, p) => win.contextMenu(e, p) } }
+        ScrollEdge {
+            z: 1
+            active: keys.underToolbar && viewLoader.item !== null && viewLoader.item.contentY > -viewLoader.item.topMargin + 0.5
+            source: active ? viewLoader.item : null
+            width: parent.width; height: Theme.toolbar.height
+            dark: Theme.dark
+            windowColor: Theme.color.window
+            cornerRadius: win.fullScreen ? 0 : win.radius
+        }
         Component { id: listView; FileList { browser: fm; onContextMenu: (e, p) => win.contextMenu(e, p) } }
         Component { id: columnView; ColumnView { browser: fm; onContextMenu: (e, p) => win.contextMenu(e, p) } }
         Component { id: galleryView; GalleryView { browser: fm; onContextMenu: (e, p) => win.contextMenu(e, p); onTagRequested: anchor => tagPopover.show(anchor) } }
@@ -364,9 +382,13 @@ Window {
     // Settings… (Cmd-,) and Hide Finder (Cmd-H), sent by the shell's app menu (shell/lib/menus.js): Finder's
     // settings have no window here, the nearest real ones are View > Show Path Bar / hidden files (the Action menu);
     // Hide = the window leaves the screen as on minimize (special:minimized, the Dock brings it back)
-    Shortcut { sequence: "Ctrl+,"; onActivated: win.popup(win.moreMenu, toolbar.moreAnchor) }
     Shortcut { sequence: "Ctrl+H"; onActivated: win.minimize() }
     function minimize() { if (!Hypr.minimizeWindow(win.title)) win.showMinimized(); }
+    // Zoom (Option-click on the green light, a double-click on the toolbar's empty space): Hyprland's maximized mode, as
+    // the shell's Window > Zoom; the session suppresses the xdg maximize request, so showMaximized is only the fallback
+    function zoom() {
+        if (!Hypr.zoomWindow(win.title)) win.visibility === Window.Maximized ? win.showNormal() : win.showMaximized();
+    }
     Shortcut { sequence: "Ctrl+Y"; onActivated: win.quickLook() }
     // Finder > Empty Trash… ⇧⌘⌫, and Empty Trash ⌥⇧⌘⌫ without the question (Q-menubar-31); the alert's words are
     // the shell's (shell/services/Apps.qml confirmEmptyTrash)
@@ -474,31 +496,63 @@ Window {
                 { text: "Sort By", submenu: sortItems() }
             ]).concat(win.view === "icons" ? [   // the captured menu is the icon view's; Clean Up arranges free icons
                 { text: "Clean Up", enabled: false },
-                { text: "Clean Up By", enabled: false, submenu: [] }
+                // Clean Up By: -[TContextMenu addViewSpecificStuffToMenu:...] 0x10042098c, titles N220 N224 N221 N222 N223
+                // N225 (table 0x100b267a8); this icon view has no free layout to arrange: the rows are disabled
+                { text: "Clean Up By", submenu: ["Name", "Kind", "Date Modified", "Date Created", "Size", "Tags"]
+                      .map(t => ({ text: t, enabled: false })) }
             ] : []).concat([
                 { text: "Show View Options", enabled: false }
             ]);
         }
         showMenu(items, pos.x, pos.y);
     }
+    // Sort By (27.2.1 Finder.app Base.lproj/ArrangeByMenu.nib, outlet sortByMenu): None, separator, Snap to Grid (icon
+    // view), separator, Name, Kind, Date Last Opened, Date Added, Date Modified, Date Created, Size, Tags; Shared By and
+    // Last Modified By only show for shared iCloud items. No key equivalents in Finder's context menus
+    // (TArrangeByMenuController removeCommandKeyEquivalents). The orders this browser has no data or code for (None,
+    // Snap to Grid, last opened, added, created, tags) stay disabled.
     function sortItems() {
         const sortBy = (key, label) => ({ text: label, checked: fm.sortKey === key,
                                           action: () => { fm.sortKey = key; fm.ascending = key === "name"; } });
-        return [
-            sortBy("name", "Sort by Name"), sortBy("kind", "Sort by Kind"),
-            sortBy("modified", "Sort by Date Modified"), sortBy("size", "Sort by Size"),
-            { separator: true },
-            { text: "Keep Folders on Top", checked: fm.foldersFirst, action: () => fm.foldersFirst = !fm.foldersFirst }
-        ];
+        const off = label => ({ text: label, checked: false, enabled: false });
+        return [off("None"), { separator: true }]
+            .concat(win.view === "icons" ? [off("Snap to Grid"), { separator: true }] : [])
+            .concat([sortBy("name", "Name"), sortBy("kind", "Kind"), off("Date Last Opened"), off("Date Added"),
+                     sortBy("modified", "Date Modified"), off("Date Created"), sortBy("size", "Size"), off("Tags")]);
     }
-    readonly property var moreMenu: [
-        { text: "New Folder", shortcut: "⇧⌃N", enabled: !fm.isVirtual, action: () => fm.newFolder() },
-        { text: fm.selectedCount > 1 ? "Rename\u2026" : "Rename", enabled: fm.selectedCount > 0 && !fm.isVirtual, action: () => win.startRename() },
-        { text: "Move to Trash", enabled: fm.selectedCount > 0 && fm.userFiles, action: () => fm.trashSelection() },
-        { separator: true },
-        { text: win.showPathBar ? "Hide Path Bar" : "Show Path Bar", shortcut: "⌥⌃P", action: () => win.showPathBar = !win.showPathBar },
-        { text: fm.showHidden ? "Hide Hidden Files" : "Show Hidden Files", shortcut: "⇧⌃.", action: () => fm.showHidden = !fm.showHidden }
-    ]
+    // The toolbar's group button: Group By, the nib's other menu (ArrangeByMenu.nib, outlet arrangeByMenu): None ⌃⌘0,
+    // separator, [Volume], Name, Kind, Application, [Application Category, Shared By, Last Modified By], Date Last
+    // Opened, Date Added, Date Modified, Date Created, Size, Tags (bracketed rows are hidden by bindings for a plain
+    // folder). -[FIArrangeByPopUp mouseDown:] and -[TArrangementToolbarItem menuNeedsUpdate:] pick arrangeByMenu, or
+    // sortByMenu when ⌥ is held or cmdArrange: is not valid (⌥ not built: the button's signal has no modifiers), and the
+    // toolbar item strips the key equivalents (initWithItemIdentifier:... sends removeCommandKeyEquivalents). This
+    // browser has no groups, so None is checked and the other orders are disabled.
+    function groupItems() {
+        const off = label => ({ text: label, checked: false, enabled: false });
+        return [{ text: "None", checked: true, enabled: false }, { separator: true }]
+            .concat(["Name", "Kind", "Application", "Date Last Opened", "Date Added", "Date Modified", "Date Created", "Size",
+                     "Tags"].map(off));
+    }
+    // Sidebar row menu (files.js sidebarMenu: Finder 27.2.1 configureForSidebar, context 8): Open in New Tab, Show in
+    // Enclosing Folder and Get Info act; the rest have no function here and show disabled (FALLBACKS.md)
+    function sidebarMenu(item, kind, pos) {
+        const real = kind !== "virtual" && item.path !== "" && !fm.isVirtualPath(item.path);
+        const act = {
+            newtab: () => win.newTab(item.path),
+            enclosing: () => { fm.go(Files.parentPath(item.path)); fm.selectPaths([item.path]); },
+            info: () => info.show(item.path, pos.x, pos.y)
+        };
+        showMenu(Files.sidebarMenu(kind, item.label, item.path !== "", real)
+                     .map(r => r.separator ? r : { text: r.text, enabled: r.enabled, action: act[r.id] }), pos.x, pos.y);
+    }
+    // The toolbar's Action button (•••): Finder fills its menu with the context menu of the selection, or of the window
+    // when nothing is selected (Finder 27.2.1 -[TContextMenu populateActionMenu:contextMenuDelegate:]; Toolbar.nib's
+    // "Action" NSMenu is empty). Path Bar and hidden files stay on View > Show Path Bar ⌥⌘P and ⇧⌘. (Shortcuts above).
+    function actionMenu(anchor) {
+        const sel = fm.selectedEntries();
+        const p = anchor.mapToItem(null, 0, anchor.height + 6);
+        contextMenu(sel.length ? sel[0] : null, p);
+    }
 
     // ---------- overlays ----------
     InfoPopover { id: info; anchors.fill: parent; onClosed: keys.forceActiveFocus() }

@@ -4,6 +4,7 @@
 #include <QRectF>
 #include <QVariant>
 
+class QLocalSocket;
 class QWindow;
 
 // The few compositor facts a Wayland client cannot get from Qt: where Hyprland placed this process's windows
@@ -14,8 +15,15 @@ class QWindow;
 class Hypr : public QObject
 {
     Q_OBJECT
+    // The title of this process's window that the Emoji & Symbols picker (the shell's hyprk-emoji layer) was opened
+    // over, empty when it is closed or over another app. The picker takes the keyboard, so Qt reports that window
+    // inactive; the Mac's character palette leaves the app key (Main.qml keeps the active look while this names the
+    // window). From Hyprland's event socket (.socket2.sock: openlayer / closelayer>>hyprk-emoji) and its active window
+    // at that moment, which the layer does not change. Outside Hyprland, or with no event socket, it stays empty.
+    Q_PROPERTY(QString emojiOver READ emojiOver NOTIFY emojiOverChanged)
 public:
-    using QObject::QObject;
+    explicit Hypr(QObject *parent = nullptr);
+    QString emojiOver() const { return m_emojiOver; }
     // This process's mapped windows: [{ title, x, y, width, height }] in global layout px (= logical px)
     Q_INVOKABLE QVariantList windows() const;
     // `hyprctl getoption name` as an int (bools are 0/1); `fallback` without Hyprland or for an unknown option
@@ -28,6 +36,10 @@ public:
     // Minimizes this process's window titled `title` the hyprk way (special:minimized, where the shell's Minimize and
     // the Dock genie put windows): Hyprland ignores xdg_toplevel.set_minimized. False outside Hyprland.
     Q_INVOKABLE bool minimizeWindow(const QString &title) const;
+    // Zooms (or unzooms) this process's window titled `title` the hyprk way, as the shell's Window > Zoom: Hyprland's
+    // maximized mode (config/hypr/hyprland.lua suppresses xdg_toplevel.set_maximized for every window, so
+    // QWindow::showMaximized does nothing). False outside Hyprland.
+    Q_INVOKABLE bool zoomWindow(const QString &title) const;
     // The work area of the monitor that holds the global point (x, y): the monitor less what layers reserve (the menu
     // bar above, the Dock below), { x, y, width, height } in global layout px. Empty outside Hyprland. Quick Look keeps its
     // panel inside it (it reached under the Dock: judge #5).
@@ -36,6 +48,13 @@ public:
     // reach the windows below. An empty rect clears the mask (whole window).
     Q_INVOKABLE void setInputRect(QWindow *window, const QRectF &r) const;
 
+signals:
+    void emojiOverChanged();
+
 private:
     QByteArray request(const QByteArray &cmd) const;
+    void onEvents();
+    QLocalSocket *m_events = nullptr;
+    QByteArray m_pending;
+    QString m_emojiOver;
 };

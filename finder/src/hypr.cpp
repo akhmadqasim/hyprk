@@ -10,6 +10,40 @@
 #include <QRegion>
 #include <QWindow>
 
+Hypr::Hypr(QObject *parent) : QObject(parent)
+{
+    const QByteArray sig = qgetenv("HYPRLAND_INSTANCE_SIGNATURE");
+    const QByteArray run = qgetenv("XDG_RUNTIME_DIR");
+    if (sig.isEmpty() || run.isEmpty())
+        return;
+    m_events = new QLocalSocket(this);
+    connect(m_events, &QLocalSocket::readyRead, this, &Hypr::onEvents);
+    m_events->connectToServer(QString::fromLocal8Bit(run + "/hypr/" + sig + "/.socket2.sock"));
+}
+
+void Hypr::onEvents()
+{
+    m_pending += m_events->readAll();
+    qsizetype nl;
+    while ((nl = m_pending.indexOf('\n')) >= 0) {
+        const QByteArray line = m_pending.left(nl);
+        m_pending.remove(0, nl + 1);
+        QString over = m_emojiOver;
+        if (line == "closelayer>>hyprk-emoji") {
+            over.clear();
+        } else if (line == "openlayer>>hyprk-emoji") {
+            const QJsonObject w = QJsonDocument::fromJson(request("j/activewindow")).object();
+            over = w.value(QLatin1String("pid")).toInteger() == QCoreApplication::applicationPid()
+                       ? w.value(QLatin1String("title")).toString()
+                       : QString();
+        }
+        if (over != m_emojiOver) {
+            m_emojiOver = over;
+            emit emojiOverChanged();
+        }
+    }
+}
+
 QByteArray Hypr::request(const QByteArray &cmd) const
 {
     const QByteArray sig = qgetenv("HYPRLAND_INSTANCE_SIGNATURE");
@@ -80,6 +114,22 @@ bool Hypr::minimizeWindow(const QString &title) const
         if (c.value(QLatin1String("pid")).toInteger() != pid || c.value(QLatin1String("title")).toString() != title)
             continue;
         request(QStringLiteral("dispatch hl.dsp.window.move({ workspace = \"special:minimized\", window = \"address:%1\" })")
+                    .arg(c.value(QLatin1String("address")).toString()).toUtf8());
+        return true;
+    }
+    return false;
+}
+
+bool Hypr::zoomWindow(const QString &title) const
+{
+    const qint64 pid = QCoreApplication::applicationPid();
+    const QJsonArray all = QJsonDocument::fromJson(request("j/clients")).array();
+    for (const QJsonValue &v : all) {
+        const QJsonObject c = v.toObject();
+        if (c.value(QLatin1String("pid")).toInteger() != pid || c.value(QLatin1String("title")).toString() != title)
+            continue;
+        // the same dispatch as the shell's Window > Zoom (shell/modules/MenuDropdown.qml "zoom"), toggling
+        request(QStringLiteral("dispatch hl.dsp.window.fullscreen({ mode = \"maximized\", window = \"address:%1\" })")
                     .arg(c.value(QLatin1String("address")).toString()).toUtf8());
         return true;
     }

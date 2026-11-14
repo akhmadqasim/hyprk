@@ -10,13 +10,16 @@ GridView {
 
     required property var browser
     signal contextMenu(var entry, point pos)
+    // the grid starts this far under its top edge: Main.qml lets it run under the toolbar (the scroll pocket,
+    // HyprK ScrollEdge), so the first row stays 10 pt under the toolbar at rest
+    property real topInset: 0
 
     readonly property int columns: Files.gridColumns(width, Theme.grid.cellWidth, Theme.grid.sidePad)
 
     model: browser.entries
     leftMargin: Theme.grid.sidePad
     rightMargin: Theme.grid.sidePad
-    topMargin: Theme.grid.top
+    topMargin: Theme.grid.top + topInset
     cellWidth: Theme.grid.cellWidth
     cellHeight: Theme.grid.cellHeight
     interactive: false     // wheel still scrolls; drags make a rubber band instead of flicking
@@ -59,8 +62,8 @@ GridView {
         parent: grid
         flickable: grid
         x: grid.width - width - Tokens.scroller.inset
-        y: Tokens.scroller.inset
-        height: grid.height - 2 * Tokens.scroller.inset
+        y: grid.topInset + Tokens.scroller.inset
+        height: grid.height - grid.topInset - 2 * Tokens.scroller.inset
     }
 
     // empty space: click clears, drag selects with a rubber band
@@ -171,6 +174,7 @@ GridView {
         }
         Loader {
             active: cell.renaming
+            z: 1   // over the cell's EntryMouseArea: the field takes its own presses (right click: its text menu)
             anchors.horizontalCenter: parent.horizontalCenter
             y: label.y - 1
             width: Theme.grid.labelWidth

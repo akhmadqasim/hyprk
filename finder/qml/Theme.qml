@@ -44,6 +44,8 @@ QtObject {
         Accent.highlight = Qt.binding(() => theme.appearance.highlight || "");
         Tokens.fontText = Qt.binding(() => theme.fontText);
         Tokens.windowActive = Qt.binding(() => theme.active);
+        // the plugin's popup glass (popup_classes ^hyprk-finder), as PopupMenu.glass: TextMenu then draws no fill
+        Tokens.popupGlass = Hypr.option("plugin:liquidglass:enabled", 0) === 1;
     }
     // No compositor blur behind the window (plain GNOME, offscreen) -> solid sidebar.
     // Set HYPRK_BLUR=1 (Hyprland with a blur windowrule) to get the translucent sidebar.
@@ -143,6 +145,10 @@ QtObject {
         readonly property color capsuleInactive: theme.dark ? "#3B3B3B" : "#F0F0F0"   // flat face (Capsule.qml)
         // hover / pressed inner capsule: 242 on 252 (Search 236) | (87,89,96) on (67,69,77) (Q-finder-10)
         readonly property color toolbarHover: theme.dark ? Qt.rgba(1, 1, 1, 0.106) : Qt.rgba(0, 0, 0, 0.04)
+        // dark: the whole toolbar strip lightens while the pointer is anywhere in it, (32,33,39) -> (39,41,47) (Q-finder-10:
+        // white at 7..8 / 216..223 = .031..037; the Mac Settings panel toolbar-backforward-rest-hover-press-dark.png
+        // reads .036 over the strip and the capsule alike). Light: none ("Dark only")
+        readonly property color toolbarHoverWash: theme.dark ? Qt.rgba(1, 1, 1, 0.034) : "transparent"
         readonly property color searchHover: theme.dark ? Qt.rgba(1, 1, 1, 0.106) : Qt.rgba(0, 0, 0, 0.064)
         // Quick Look panel (live/finder/crops/quicklook-titlebar-light.png, 2x): frame 136 (134-138 top to bottom), discs
         // and button glyphs 6-8, title and "Open with" text 36-41 at the stroke cores. Dark: not measured, so the same

@@ -1,6 +1,6 @@
 // Finder glyphs as SVG data URLs, so they render with any Qt Quick backend (software included).
 // Real SF Symbols from macOS 27.2.1 (sf.js, names mapped through themes/icons/sf-symbols/names.json);
-// the original glyphs on a 24x24 grid below only for names without an SVG ("zoom").
+// the original glyphs on a 24x24 grid below only for names without an SVG (none left in use).
 // Parts: S = stroked path, F = filled path.
 .pragma library
 .import "sf.js" as SF
@@ -57,7 +57,6 @@ const table = {
     "xmark": [S("M6 6L18 18M18 6L6 18", 2.0)],
     "xmark.circle": [F(circle(12, 12, 9)), { d: "M8.8 8.8L15.2 15.2M15.2 8.8L8.8 15.2", fill: false, w: 1.7, knock: true }],
     "minus": [S("M5 12H19", 2.6)],
-    "zoom": [F("M6 8.5V18H15.5Z"), F("M18 15.5V6H8.5Z")],
     "eye": [S("M2.5 12C5 7.5 8.3 5.5 12 5.5S19 7.5 21.5 12C19 16.5 15.7 18.5 12 18.5S5 16.5 2.5 12Z"), S(circle(12, 12, 3.2))],
     "plus": [S("M12 5V19M5 12H19", 1.8)],
     "arrow.up.down": [S("M8 19V5M4.5 8.5L8 5L11.5 8.5M16 5V19M12.5 15.5L16 19L19.5 15.5", 1.5)],

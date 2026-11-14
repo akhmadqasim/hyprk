@@ -41,6 +41,7 @@ Sheet {
         FocusRing { visible: field.activeFocus }
         TextInput {
             id: field
+            TextMenu { target: field }   // the field editor's right-click menu (HyprK textmenu.js)
             anchors.fill: parent
             anchors.leftMargin: 6
             anchors.rightMargin: 6

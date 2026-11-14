@@ -16,6 +16,14 @@ Item {
 
     // hover and press light of its buttons (HyprK ToolbarHighlight, dark): for capsules of plain buttons
     property bool lights: false
+    // the HyprK light is drawn (then it, not the buttons' own pill, shows hover and press: its HoverHandler sits over the
+    // buttons and they never see the hover, judge-95-16 `09`: the divider stayed on hover, and on press the pill and
+    // the light both lit the button, disc 121 on a 87 capsule)
+    readonly property bool lightsOn: lights && Theme.active
+    // it draws the hover disc too (dark: Tokens.toolbar.hoverLift; light has none, the buttons' pill shows hover there)
+    readonly property bool lightHovers: lightsOn && Tokens.toolbar.hoverLift > 0
+    // a button of this capsule is hovered or pressed (the back / forward divider hides then, Q-finder-10)
+    readonly property bool lit: (lightsOn && (light.hovered || light.pressed)) || Array.from(row.children).some(c => !!c.lit)
     implicitWidth: row.implicitWidth + 2 * padding
     implicitHeight: Theme.toolbar.capsuleHeight
 
@@ -73,11 +81,14 @@ Item {
     }
     }
     ToolbarHighlight {
-        visible: root.lights && Theme.active
+        id: light
+        visible: root.lightsOn
         anchors.fill: parent
         source: body
         backdrop: Theme.color.window
-        centres: Array.from(row.children).filter(c => c.visible && c.width > 2).map(c => row.x + c.x + c.width / 2)
+        readonly property var buttons: Array.from(row.children).filter(c => c.visible && c.width > 2)
+        centres: buttons.map(c => row.x + c.x + c.width / 2)
+        disabled: buttons.map(c => !c.enabled)   // a disabled button gets no hover or press light (Q-finder-10)
     }
 
     Gradient {   // y 17..86 px over the 59 face: white (v - 59) / 196

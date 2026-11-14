@@ -22,10 +22,13 @@ Item {
 
     height: Theme.toolbar.height
 
-    // window drag / double-click zoom on empty toolbar space
+    // window drag / double-click zoom on empty toolbar space. The double tap counts within the style hint's interval, set
+    // to the Mac's 0.5 s in main.cpp (NSEvent.doubleClickInterval); the zoom is Main.zoom (Hyprland's maximized mode:
+    // showMaximized asks for xdg maximize, which the session suppresses, so a double-click did nothing: judge-95-14)
     TapHandler {
-        onDoubleTapped: root.window.visibility === Window.Maximized ? root.window.showNormal() : root.window.showMaximized()
+        onDoubleTapped: root.window.zoom()
     }
+    HoverHandler { id: stripHover }
     DragHandler {
         target: null
         onActiveChanged: if (active) root.window.startSystemMove()
@@ -43,11 +46,11 @@ Item {
             enabled: root.browser.canGoBack
             onClicked: root.browser.back()
         }
-        // the divider hides while either half is hovered (Q-finder-10)
+        // the divider hides while either half is hovered or pressed (Q-finder-10); a disabled half lights nothing
         Rectangle {
             width: 1; height: Theme.toolbar.dividerHeight; anchors.verticalCenter: parent.verticalCenter
             color: Theme.color.toolbarSeparator
-            opacity: backButton.lit || forwardButton.lit ? 0 : 1
+            opacity: nav.lit ? 0 : 1
         }
         ToolButton {
             id: forwardButton
@@ -249,6 +252,9 @@ Item {
                     font: field.font
                 }
             }
+            // the field editor's right-click menu (HyprK textmenu.js), as the other Finder fields; an NSSearchField's
+            // editor is the same NSTextView (MENUS-REA "Text field context menu")
+            TextMenu { target: field }
         }
     }
 
@@ -257,5 +263,12 @@ Item {
     function focusSearch() {
         searching = true;
         field.forceActiveFocus();
+    }
+
+    Rectangle {   // dark: the whole strip lightens while the pointer is in it (Theme.color.toolbarHoverWash, Q-finder-10)
+        anchors.fill: parent
+        z: 10
+        visible: stripHover.hovered && Theme.dark && Theme.active
+        color: Theme.color.toolbarHoverWash
     }
 }
