@@ -58,3 +58,30 @@ Times are clip pts. Keystrokes come from `osascript` so their exact moments are 
   run). Press lands at 0.900 s (first change), the knob grows into the lens until 1.150 s (about 0.25 s), then static
   until the release at 2.000 s. The clip is 60 fps VFR, so every frame from 0.900 to 1.150 s is present (1/60 s apart);
   the strip uses every 2nd one.
+
+## R3.7 Liquid Glass preview article: done (a, b, c)
+- a) `screens/27.2.1/settings/appearance/preview-article-scroll-{00..11}-{light,dark}.png`: crop = window px 884,322
+  536x360 = the scroll area (screen pt 792,311 268x180). 100 pt wheel steps; 12 stills per mode (00 top, 11 end).
+- b) `re/27.2.1/live/settings/appearance/ax-preview-article-{top,end}-{light,dark}.jsonl`: one JSON object per AX
+  element (depth-first, `path` = child indices), every attribute that has a value, plus `frame` [x,y,w,h] in screen pt.
+  Scroll area: frame 792,311 268x180, **AXContentSize 268 x 1257.5**. A vertical AXScrollBar (overlay, 1042,362 19x114)
+  is present. The first image's frame at the top is y 296.0 (and 297.8 in an earlier dump), 15 pt above the scroll area
+  top, so the hero image is slightly taller / offset (stretch or parallax); at the end it is at y -780.
+- c) Content in reading order (AX values verbatim; sizes in pt from the top dump, x relative to the scroll area):
+  1. Image "Apple Park": x 0, 268 x 178.5 (full width hero)
+  2. Text "Welcome to Apple Park" (x 16, 165.5 x 19, bold title)
+  3. Text "Cupertino, California" (141 x 19, secondary)
+  4. Text "Learn about the design and history of Apple Park, and discover its unique nature and beauty." (230.5 x 48)
+  5. Image "The Architecture" (x 16, 236 x 157.5, rounded)
+  6. Text "The Architecture" (123.5 x 19)
+  7. Text "Apple Park was made for walking and exploring. The innovative design elements emphasise openness and
+     connection to nature." (229.5 x 64)
+  8. Image "The Pond" (236 x 157.5)
+  9. Text "The Pond" (69 x 19)
+  10. Text "With gently lapping waves and a surrounding of trees, it’s one of the most serene spots on campus." (217 x 48)
+  11. Image "The Rainbow" (236 x 263.5)
+  12. Text "The Rainbow" (94.5 x 19)
+  13. Text "One of the most iconic features of Apple Park, the Rainbow brings much joy to all who experience it." (230 x 48)
+  Vertical positions (top dump, screen y): hero 296.0, title 478.9, subtitle 501.9, intro 532.9, image 604.9, heading
+  786.6, body 813.6, image 901.9, heading 1083.0, body 1110.0, image 1182.5, heading 1469.6, body 1496.6.
+  Text is English (UK spelling "emphasise") because the system language is English (UK).

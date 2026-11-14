@@ -49,3 +49,15 @@ Multicolour, icon style Dark. Apple Account / Family rows filled with the sideba
 | liquidglass-flat-grey-dark.png | window, -o -l | same | dark | grey 127 |
 | liquidglass-flat-grey-capsules-light.png | crop of the window shot, px x 884..1420, y 322..422 | share / more capsule, copy circle, search capsule at 2x | light | grey 127 |
 | liquidglass-flat-grey-capsules-dark.png | same crop | same | dark | grey 127 |
+
+## Round 3 (R3.7): Liquid Glass preview article, scrolled
+Display 1440x932 pt (2x), Settings relaunched in each mode, window at 350,150 (740x625 pt), wallpaper TahoeLight /
+TahoeDark. Window shot `screencapture -x -o -l<id>`, cropped to the preview scroll area: window px **884,322 536x360**
+(= screen pt 792,311 268x180, the AXScrollArea frame). Steps: one synthetic scroll-wheel event of -100 px (pixel units,
+no momentum) with the pointer over the preview (926,400 pt), still 1 s after each step; stopped when a still matched the
+previous one. 00 = top, 11 = end (content 268x1257.5 pt, so the last step is partial).
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| preview-article-scroll-{00..11}-light.png | window shot, crop above | the article under the toolbar capsules, 100 pt apart | light | article (page colour) |
+| preview-article-scroll-{00..11}-dark.png | same | same | dark | article (page colour) |
