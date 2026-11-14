@@ -275,7 +275,8 @@ local function pluginConfig(plugin, opts)
     end
     return missing
 end
-local glassSo = hyprk .. "/plugin/build/libliquidglass.so"
+-- HYPRK_GLASS_SO: a plugin build elsewhere (a test session next to a running preview that loads plugin/build)
+local glassSo = os.getenv("HYPRK_GLASS_SO") or (hyprk .. "/plugin/build/libliquidglass.so")
 local h = io.open(glassSo, "r")
 if h then h:close() end
 hl.env("HYPRK_GLASS", "qml")     -- reset an inherited value; set to "plugin" only after a good load
@@ -310,6 +311,9 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
             -- with Config.cpp
             draw_over = "hyprk-dock:hyprk-mission,hyprk-dock-dots:hyprk-mission,hyprk-dock-dots-dark:hyprk-mission,"
                      .. "hyprk-dock-label:hyprk-mission",
+            -- menu glass behind the client popups (plugin/README.md "Client popups"): Finder's menus and the HyprK text
+            -- field menu (ui/HyprK/TextMenu.qml) in Finder and System Settings; Q-menubar-13: every NSMenu is this glass
+            popup_classes = "^(hyprk-finder|org\\.hyprk\\.Settings)$",
         })
         -- the saved Liquid Glass slider and appearance, so the first frame after a start or a config reload is right:
         -- a reload put tint_amount back to 0.5 and appearance to auto until the shell sent them again (0d59d9e). The
@@ -361,7 +365,7 @@ end
 -- ignore_alpha keeps fully transparent parts (shadows, click catchers) unblurred.
 -- Namespaces (set in shell/modules/*.qml via WlrLayershell.namespace):
 --   hyprk-menubar hyprk-dock hyprk-overlay hyprk-controlcenter hyprk-notifications hyprk-notificationcenter
---   hyprk-spotlight hyprk-switcher hyprk-mission hyprk-hud hyprk-wallpaper
+--   hyprk-spotlight hyprk-switcher hyprk-mission hyprk-hud hyprk-wallpaper hyprk-emoji
 hl.layer_rule({
     name = "hyprk-glass-blur",
     match = { namespace = "^hyprk-(" .. table.concat(glassLayers, "|") .. ")$" },
@@ -371,7 +375,7 @@ hl.layer_rule({
 hl.layer_rule({
     -- the shell animates these itself
     name = "hyprk-no-anim",
-    match = { namespace = "^hyprk-(overlay|controlcenter|spotlight|switcher|mission|notifications|notificationcenter|dock|dock-label|dock-dots|dock-dots-dark|menubar|wallpaper|hud|stage-strip|stage-edge|stage-flight)$" },
+    match = { namespace = "^hyprk-(overlay|controlcenter|spotlight|switcher|mission|emoji|notifications|notificationcenter|dock|dock-label|dock-dots|dock-dots-dark|menubar|wallpaper|hud|stage-strip|stage-edge|stage-flight)$" },
     no_anim = true,
 })
 
@@ -379,6 +383,9 @@ hl.layer_rule({
 -- SUPER plays the role of Command.
 local cmd = "SUPER"
 hl.bind(cmd .. " + space",   hl.dsp.global("hyprk:spotlight"))
+-- Ctrl-Cmd-Space: Edit > Emoji & Symbols (shell/modules/EmojiPicker.qml). The Mac's Globe key has no Linux keysym on
+-- PC keyboards (Apple keyboards send fn inside the keyboard), so it is not bound
+hl.bind("CTRL + " .. cmd .. " + space", hl.dsp.global("hyprk:emoji"))
 -- Cmd-Tab: the switcher takes no keyboard focus, so the windows stay active under it as on the Mac (shell/services/
 -- Panels.qml switcherSubmap): Cmd+Tab enters the submap "hyprk-switcher" and opens it; inside, the keys reach the shell as
 -- global shortcuts and releasing Cmd switches. The shell resets the submap when the switcher closes.
@@ -468,9 +475,10 @@ hl.bind("CTRL + left",  hl.dsp.focus({ workspace = "e-1" }))
 hl.bind("CTRL + right", hl.dsp.focus({ workspace = "e+1" }))
 -- volume and brightness keys as on macOS 27.2.1 (reference/re/MAC-ANSWERS.md HUD): one press = 1/16,
 -- Option+Shift (here Alt+Shift) = 1/64, clamped to 0..100 %. The shell's HUD follows the change
--- (shell/services/Hud.qml). The volume keys go through shell/scripts/volume-key.sh, BezelServices' state machine:
--- the level on the Mac's 1/16 grid, unmute, ONE volume pop when the key goes up (none while it repeats), Shift
--- inverts "Play feedback when volume is changed" (state/sound.json volumeFeedback), Option alone opens Sound settings.
+-- (shell/services/Hud.qml). The volume keys go through shell/scripts/volume-key.sh, Control Center's hot key path
+-- (reference/re/27.2.1/SOUND-REA-27.2.1.md section 2): the level on the Mac's 1/16 grid, unmute, a volume pop on the
+-- press and on every repeat step (none when the key goes up), Shift inverts "Play feedback when volume is changed"
+-- (state/sound.json volumeFeedback), Option alone opens Sound settings.
 -- brightnessctl takes whole percents only, so brightness steps in raw units of max/16 (max/64);
 -- -n1 keeps the backlight on at the bottom.
 local volumeKeyScript = shell .. "/scripts/volume-key.sh"
@@ -489,13 +497,11 @@ end
 for _, k in ipairs({ { "", 16, "" }, { "SHIFT + ", 16, " shift" }, { "ALT + SHIFT + ", 64, "" } }) do
     hl.bind(k[1] .. "XF86AudioRaiseVolume", volumeKey("up " .. k[2] .. k[3]),   { locked = true, repeating = true })
     hl.bind(k[1] .. "XF86AudioLowerVolume", volumeKey("down " .. k[2] .. k[3]), { locked = true, repeating = true })
-    hl.bind(k[1] .. "XF86AudioRaiseVolume", volumeKey("release" .. k[3]), { locked = true, release = true })
-    hl.bind(k[1] .. "XF86AudioLowerVolume", volumeKey("release" .. k[3]), { locked = true, release = true })
 end
 for _, k in ipairs({ "XF86AudioRaiseVolume", "XF86AudioLowerVolume", "XF86AudioMute" }) do
     hl.bind("ALT + " .. k, soundSettings)   -- VSSoundPrefs: Option alone with a volume key
 end
-hl.bind("XF86AudioMute",         volumeKey("mute"),       { locked = true })   -- unmuting pops 0.08 s later
+hl.bind("XF86AudioMute",         volumeKey("mute"),       { locked = true })   -- unmuting pops at once
 hl.bind("SHIFT + XF86AudioMute", volumeKey("mute shift"), { locked = true })
 
 -- screenshots like macOS: Cmd+Shift+3 full screen, Cmd+Shift+4 area (needs slurp), shutter sound
