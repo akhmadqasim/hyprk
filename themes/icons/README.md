@@ -40,7 +40,7 @@ Settings pane icons, `<pane>@<64|128>-<light|dark>.png`, see `panes.json`; plus 
 `tools/build-graphic.py` from Apple's graphic icon configurations, listed in `settings/graphic.json`: the 24 pt row
 tiles `<id>@48-...` and 8 more pane icons, see `reference/ASSETS.md` "Graphic icons built offline"), `sf-symbols/` (SF Symbols
 rendered on macOS 27.2.1: `svg/`, `names.json`; `sf.js` is generated from them by `tools/gen-sf.mjs` and
-used by the shell and Finder through symlinks), `tools/` (`car.py` Assets.car reader, `bvg.py` SF Symbol outlines, `add-sf.py` to register more of them, `build-graphic.py`, `build-apps.py`, `build-styles.py` + `iconstack.py` + `dmp2.py` +
+used by the shell and Finder through symlinks), `tools/` (`car.py` Assets.car reader, `bvg.py` SF Symbol outlines, `add-sf.py` to register more of them, `build-docs.py` for the 27.2.1 document icons IconServices composes (`finder/qml/icons/doc-*`, `system/*Document-154.png`; reference/re/27.2.1/ICONS-REA-27.2.1.md), `build-graphic.py`, `build-apps.py`, `build-styles.py` + `iconstack.py` + `dmp2.py` +
 `check-styles.py` + `glass.py` for the styles, `gen-map.mjs`, `gen-sf.mjs`).
 3. **Styles** (Settings > Appearance > Icon & widget style, `iconStyle` + `iconStyleVariant` in
    `state/appearance.json`): `default`, `dark`, `clear`, `tinted`.

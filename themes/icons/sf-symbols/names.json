@@ -2712,7 +2712,7 @@
     "laptopcomputer.semibold.svg"
    ],
    "extras": [],
-   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render). Shell (2026-11-12): Control Center's Sound module, the built-in output's glyph (AVRouting's endpoint models; the user's photo)."
+   "note": "Settings (2026-11-11): row / pane tile symbol or control glyph. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render). Shell (2026-11-12): Control Center's Sound module, the built-in output's glyph (AVRouting's endpoint models; the user's photo). Shell: the Apple menu About This Mac row (AppKit, MENUS-REA-27.2.1 Apple menu)."
   },
   "hifispeaker.fill": {
    "symbol": "hifispeaker.fill",
@@ -2922,6 +2922,310 @@
    ],
    "extras": [],
    "note": "Control Center Stage Manager button (WindowManagerControlsExtension 27.2.1 StageManagerToggleControl: Image(systemName:) at 0x100003d1c). Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "emoji.face.grinning": {
+   "symbol": "emoji.face.grinning",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": true,
+   "variants": [
+    "emoji.face.grinning.regular.svg",
+    "emoji.face.grinning.medium.svg",
+    "emoji.face.grinning.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Emoji & Symbols popover category bar: CharacterPicker 27.2.1 CPKCategoryData sfSymbolName (dyld cache strings: clock, emoji.face.grinning, emoji.dog.face, emoji.apple, emoji.soccer.ball, emoji.automobile, lightbulb, emoji.heart, flag). Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "emoji.face.grinning.inverse": {
+   "symbol": "emoji.face.grinning.inverse",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": true,
+   "variants": [
+    "emoji.face.grinning.inverse.regular.svg",
+    "emoji.face.grinning.inverse.medium.svg",
+    "emoji.face.grinning.inverse.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Emoji & Symbols popover category bar: CharacterPicker 27.2.1 CPKCategoryData sfSymbolName (dyld cache strings: clock, emoji.face.grinning, emoji.dog.face, emoji.apple, emoji.soccer.ball, emoji.automobile, lightbulb, emoji.heart, flag). Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "emoji.dog.face": {
+   "symbol": "emoji.dog.face",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": true,
+   "variants": [
+    "emoji.dog.face.regular.svg",
+    "emoji.dog.face.medium.svg",
+    "emoji.dog.face.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Emoji & Symbols popover category bar: CharacterPicker 27.2.1 CPKCategoryData sfSymbolName (dyld cache strings: clock, emoji.face.grinning, emoji.dog.face, emoji.apple, emoji.soccer.ball, emoji.automobile, lightbulb, emoji.heart, flag). Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "emoji.apple": {
+   "symbol": "emoji.apple",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": true,
+   "variants": [
+    "emoji.apple.regular.svg",
+    "emoji.apple.medium.svg",
+    "emoji.apple.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Emoji & Symbols popover category bar: CharacterPicker 27.2.1 CPKCategoryData sfSymbolName (dyld cache strings: clock, emoji.face.grinning, emoji.dog.face, emoji.apple, emoji.soccer.ball, emoji.automobile, lightbulb, emoji.heart, flag). Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "emoji.soccer.ball": {
+   "symbol": "emoji.soccer.ball",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": true,
+   "variants": [
+    "emoji.soccer.ball.regular.svg",
+    "emoji.soccer.ball.medium.svg",
+    "emoji.soccer.ball.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Emoji & Symbols popover category bar: CharacterPicker 27.2.1 CPKCategoryData sfSymbolName (dyld cache strings: clock, emoji.face.grinning, emoji.dog.face, emoji.apple, emoji.soccer.ball, emoji.automobile, lightbulb, emoji.heart, flag). Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "emoji.automobile": {
+   "symbol": "emoji.automobile",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": true,
+   "variants": [
+    "emoji.automobile.regular.svg",
+    "emoji.automobile.medium.svg",
+    "emoji.automobile.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Emoji & Symbols popover category bar: CharacterPicker 27.2.1 CPKCategoryData sfSymbolName (dyld cache strings: clock, emoji.face.grinning, emoji.dog.face, emoji.apple, emoji.soccer.ball, emoji.automobile, lightbulb, emoji.heart, flag). Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "lightbulb": {
+   "symbol": "lightbulb",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "lightbulb.regular.svg",
+    "lightbulb.medium.svg",
+    "lightbulb.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Emoji & Symbols popover category bar: CharacterPicker 27.2.1 CPKCategoryData sfSymbolName (dyld cache strings: clock, emoji.face.grinning, emoji.dog.face, emoji.apple, emoji.soccer.ball, emoji.automobile, lightbulb, emoji.heart, flag). Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "emoji.heart": {
+   "symbol": "emoji.heart",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": true,
+   "variants": [
+    "emoji.heart.regular.svg",
+    "emoji.heart.medium.svg",
+    "emoji.heart.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Emoji & Symbols popover category bar: CharacterPicker 27.2.1 CPKCategoryData sfSymbolName (dyld cache strings: clock, emoji.face.grinning, emoji.dog.face, emoji.apple, emoji.soccer.ball, emoji.automobile, lightbulb, emoji.heart, flag). Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "flag": {
+   "symbol": "flag",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "flag.regular.svg",
+    "flag.medium.svg",
+    "flag.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Emoji & Symbols popover category bar: CharacterPicker 27.2.1 CPKCategoryData sfSymbolName (dyld cache strings: clock, emoji.face.grinning, emoji.dog.face, emoji.apple, emoji.soccer.ball, emoji.automobile, lightbulb, emoji.heart, flag). Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "emoji.dog.face.inverse": {
+   "symbol": "emoji.dog.face.inverse",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": true,
+   "variants": [
+    "emoji.dog.face.inverse.regular.svg",
+    "emoji.dog.face.inverse.medium.svg",
+    "emoji.dog.face.inverse.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Emoji & Symbols popover, the selected tab (UIKit 27.2.1's emoji keyboard pairs emoji.dog.face / emoji.soccer.ball with their .inverse; the Mac shot's selected face is emoji.face.grinning.inverse). Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "emoji.soccer.ball.inverse": {
+   "symbol": "emoji.soccer.ball.inverse",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": true,
+   "variants": [
+    "emoji.soccer.ball.inverse.regular.svg",
+    "emoji.soccer.ball.inverse.medium.svg",
+    "emoji.soccer.ball.inverse.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Emoji & Symbols popover, the selected tab (UIKit 27.2.1's emoji keyboard pairs emoji.dog.face / emoji.soccer.ball with their .inverse; the Mac shot's selected face is emoji.face.grinning.inverse). Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "capslock.fill": {
+   "symbol": "capslock.fill",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "capslock.fill.regular.svg",
+    "capslock.fill.medium.svg",
+    "capslock.fill.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Lock screen password field's Caps Lock indicator: AppKit 27.2.1 NSSecureTextField draws capslock.fill (dyld cache string next to NSSecureTextFieldShowIndicators). Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "arrow.right.circle": {
+   "symbol": "arrow.right.circle",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "guess",
+   "confidenceBySurface": {
+    "shell": "guess"
+   },
+   "private": false,
+   "variants": [
+    "arrow.right.circle.regular.svg",
+    "arrow.right.circle.medium.svg",
+    "arrow.right.circle.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Lock screen password field's return button. Named by its look (ring 22 pt, stroke 3.7 px on reference/screens/27.2.1/lock/field-dark-1char.png); LoginUICore's symbol name not found. Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "rectangle.and.pencil.and.ellipsis": {
+   "symbol": "rectangle.and.pencil.and.ellipsis",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "rectangle.and.pencil.and.ellipsis.regular.svg",
+    "rectangle.and.pencil.and.ellipsis.medium.svg",
+    "rectangle.and.pencil.and.ellipsis.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Menu row images: AppKit 27.2.1 (reference/re/27.2.1/MENUS-REA-27.2.1.md 'Edit menu icons', Apple menu, Settings Help). Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "microphone": {
+   "symbol": "microphone",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "microphone.regular.svg",
+    "microphone.medium.svg",
+    "microphone.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Menu row images: AppKit 27.2.1 (reference/re/27.2.1/MENUS-REA-27.2.1.md 'Edit menu icons', Apple menu, Settings Help). Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "book.pages": {
+   "symbol": "book.pages",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "book.pages.regular.svg",
+    "book.pages.medium.svg",
+    "book.pages.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Menu row images: AppKit 27.2.1 (reference/re/27.2.1/MENUS-REA-27.2.1.md 'Edit menu icons', Apple menu, Settings Help). Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
   }
  },
  "skipped": {
@@ -37519,6 +37823,1563 @@
     0
    ],
    "fontBaselineY": 31.554
+  },
+  "emoji.face.grinning.regular.svg": {
+   "symbol": "emoji.face.grinning",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    37.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    32.0,
+    32.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.469
+  },
+  "emoji.face.grinning.medium.svg": {
+   "symbol": "emoji.face.grinning",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    32.5,
+    32.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.257
+  },
+  "emoji.face.grinning.semibold.svg": {
+   "symbol": "emoji.face.grinning",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    33.0,
+    33.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.097
+  },
+  "emoji.face.grinning.inverse.regular.svg": {
+   "symbol": "emoji.face.grinning.inverse",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    37.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    32.0,
+    32.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.469
+  },
+  "emoji.face.grinning.inverse.medium.svg": {
+   "symbol": "emoji.face.grinning.inverse",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    32.5,
+    32.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.264
+  },
+  "emoji.face.grinning.inverse.semibold.svg": {
+   "symbol": "emoji.face.grinning.inverse",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    33.0,
+    33.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.108
+  },
+  "emoji.dog.face.regular.svg": {
+   "symbol": "emoji.dog.face",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    45,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    44.5,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.5,
+    3.0,
+    39.5,
+    35.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 32.918
+  },
+  "emoji.dog.face.medium.svg": {
+   "symbol": "emoji.dog.face",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    45,
+    42
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    45.0,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.5,
+    3.0,
+    40.0,
+    36.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.499
+  },
+  "emoji.dog.face.semibold.svg": {
+   "symbol": "emoji.dog.face",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    46,
+    43
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    45.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.5,
+    3.5,
+    40.5,
+    36.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.182
+  },
+  "emoji.apple.regular.svg": {
+   "symbol": "emoji.apple",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    40,
+    42
+   ],
+   "alignmentRect": [
+    0.0,
+    11.0,
+    39.0,
+    22.5
+   ],
+   "baselineY": 33.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    33.5,
+    36.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 36.736
+  },
+  "emoji.apple.medium.svg": {
+   "symbol": "emoji.apple",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    40,
+    42
+   ],
+   "alignmentRect": [
+    0.0,
+    11.0,
+    39.5,
+    22.5
+   ],
+   "baselineY": 33.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    34.0,
+    36.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 36.473
+  },
+  "emoji.apple.semibold.svg": {
+   "symbol": "emoji.apple",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    40,
+    43
+   ],
+   "alignmentRect": [
+    0.0,
+    11.5,
+    39.5,
+    22.5
+   ],
+   "baselineY": 34.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    34.0,
+    36.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 37.273
+  },
+  "emoji.soccer.ball.regular.svg": {
+   "symbol": "emoji.soccer.ball",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    37.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    32.0,
+    32.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.469
+  },
+  "emoji.soccer.ball.medium.svg": {
+   "symbol": "emoji.soccer.ball",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    32.5,
+    32.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.257
+  },
+  "emoji.soccer.ball.semibold.svg": {
+   "symbol": "emoji.soccer.ball",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    33.0,
+    33.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.097
+  },
+  "emoji.automobile.regular.svg": {
+   "symbol": "emoji.automobile",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    50,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    49.5,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    44.0,
+    32.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 32.879
+  },
+  "emoji.automobile.medium.svg": {
+   "symbol": "emoji.automobile",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    50,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    7.0,
+    50.0,
+    22.5
+   ],
+   "baselineY": 29.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    44.0,
+    33.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 32.845
+  },
+  "emoji.automobile.semibold.svg": {
+   "symbol": "emoji.automobile",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    50,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    7.0,
+    50.0,
+    22.5
+   ],
+   "baselineY": 29.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    44.5,
+    33.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 32.819
+  },
+  "lightbulb.regular.svg": {
+   "symbol": "lightbulb",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    29,
+    43
+   ],
+   "alignmentRect": [
+    0.0,
+    11.0,
+    29.0,
+    22.5
+   ],
+   "baselineY": 33.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    21.0,
+    36.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 36.707
+  },
+  "lightbulb.medium.svg": {
+   "symbol": "lightbulb",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    30,
+    44
+   ],
+   "alignmentRect": [
+    0.0,
+    11.5,
+    29.5,
+    22.5
+   ],
+   "baselineY": 34.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    21.5,
+    37.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 37.268
+  },
+  "lightbulb.semibold.svg": {
+   "symbol": "lightbulb",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    30,
+    44
+   ],
+   "alignmentRect": [
+    0.0,
+    11.5,
+    30.0,
+    22.5
+   ],
+   "baselineY": 34.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    22.0,
+    38.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 36.934
+  },
+  "emoji.heart.regular.svg": {
+   "symbol": "emoji.heart",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    37.5,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    31.5,
+    31.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.313
+  },
+  "emoji.heart.medium.svg": {
+   "symbol": "emoji.heart",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    37.5,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    32.0,
+    32.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.121
+  },
+  "emoji.heart.semibold.svg": {
+   "symbol": "emoji.heart",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    32.5,
+    32.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.976
+  },
+  "flag.regular.svg": {
+   "symbol": "flag",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    37,
+    37
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    36.0,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    5.0,
+    3.0,
+    28.0,
+    31.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.05
+  },
+  "flag.medium.svg": {
+   "symbol": "flag",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    37,
+    37
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    36.5,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    5.0,
+    3.0,
+    28.5,
+    31.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 32.902
+  },
+  "flag.semibold.svg": {
+   "symbol": "flag",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    37,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    36.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.5,
+    3.5,
+    28.5,
+    31.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.791
+  },
+  "emoji.dog.face.inverse.regular.svg": {
+   "symbol": "emoji.dog.face.inverse",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    45,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    7.0,
+    44.5,
+    22.5
+   ],
+   "baselineY": 29.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.0,
+    3.0,
+    40.5,
+    34.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 32.631
+  },
+  "emoji.dog.face.inverse.medium.svg": {
+   "symbol": "emoji.dog.face.inverse",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    45,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    45.0,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.0,
+    3.5,
+    41.0,
+    34.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.253
+  },
+  "emoji.dog.face.inverse.semibold.svg": {
+   "symbol": "emoji.dog.face.inverse",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    46,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    7.5,
+    45.0,
+    22.5
+   ],
+   "baselineY": 30.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.0,
+    3.0,
+    41.5,
+    35.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 32.967
+  },
+  "emoji.soccer.ball.inverse.regular.svg": {
+   "symbol": "emoji.soccer.ball.inverse",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    37.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    31.5,
+    31.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.864
+  },
+  "emoji.soccer.ball.inverse.medium.svg": {
+   "symbol": "emoji.soccer.ball.inverse",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    38.0,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    31.5,
+    31.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.656
+  },
+  "emoji.soccer.ball.inverse.semibold.svg": {
+   "symbol": "emoji.soccer.ball.inverse",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    38.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    32.0,
+    32.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.499
+  },
+  "capslock.fill.regular.svg": {
+   "symbol": "capslock.fill",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    40,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    39.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    33.0,
+    33.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 33.811
+  },
+  "capslock.fill.medium.svg": {
+   "symbol": "capslock.fill",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    40,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    9.0,
+    40.0,
+    22.5
+   ],
+   "baselineY": 31.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    33.5,
+    33.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.374
+  },
+  "capslock.fill.semibold.svg": {
+   "symbol": "capslock.fill",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    40,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    40.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    34.0,
+    34.0
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 34.042
+  },
+  "arrow.right.circle.regular.svg": {
+   "symbol": "arrow.right.circle",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    38
+   ],
+   "alignmentRect": [
+    0.0,
+    8.0,
+    37.5,
+    22.5
+   ],
+   "baselineY": 30.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    32.0,
+    32.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 33.469
+  },
+  "arrow.right.circle.medium.svg": {
+   "symbol": "arrow.right.circle",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.0,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    32.5,
+    32.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.264
+  },
+  "arrow.right.circle.semibold.svg": {
+   "symbol": "arrow.right.circle",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    39,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    8.5,
+    38.5,
+    22.5
+   ],
+   "baselineY": 31.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    33.0,
+    33.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 34.108
+  },
+  "rectangle.and.pencil.and.ellipsis.regular.svg": {
+   "symbol": "rectangle.and.pencil.and.ellipsis",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    53,
+    39
+   ],
+   "alignmentRect": [
+    0.0,
+    10.5,
+    48.0,
+    22.5
+   ],
+   "baselineY": 33.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    49.0,
+    32.5
+   ],
+   "paths": 5,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 35.852
+  },
+  "rectangle.and.pencil.and.ellipsis.medium.svg": {
+   "symbol": "rectangle.and.pencil.and.ellipsis",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    55,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    11.0,
+    50.0,
+    22.5
+   ],
+   "baselineY": 33.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    50.5,
+    33.5
+   ],
+   "paths": 5,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 36.674
+  },
+  "rectangle.and.pencil.and.ellipsis.semibold.svg": {
+   "symbol": "rectangle.and.pencil.and.ellipsis",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    56,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    11.0,
+    51.0,
+    22.5
+   ],
+   "baselineY": 33.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    51.5,
+    34.0
+   ],
+   "paths": 5,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 36.54
+  },
+  "microphone.regular.svg": {
+   "symbol": "microphone",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    32,
+    40
+   ],
+   "alignmentRect": [
+    0.0,
+    10.0,
+    32.0,
+    22.5
+   ],
+   "baselineY": 32.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.5,
+    3.5,
+    22.5,
+    33.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 35.781
+  },
+  "microphone.medium.svg": {
+   "symbol": "microphone",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    33,
+    41
+   ],
+   "alignmentRect": [
+    0.0,
+    10.5,
+    33.5,
+    22.5
+   ],
+   "baselineY": 33.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.5,
+    3.5,
+    24.0,
+    34.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 36.221
+  },
+  "microphone.semibold.svg": {
+   "symbol": "microphone",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    34,
+    42
+   ],
+   "alignmentRect": [
+    0.0,
+    11.0,
+    34.0,
+    22.5
+   ],
+   "baselineY": 33.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.5,
+    3.5,
+    25.0,
+    35.5
+   ],
+   "paths": 1,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0
+   ],
+   "fontBaselineY": 36.794
+  },
+  "book.pages.regular.svg": {
+   "symbol": "book.pages",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    37,
+    46
+   ],
+   "alignmentRect": [
+    0.0,
+    13.0,
+    36.5,
+    22.5
+   ],
+   "baselineY": 35.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    2.0,
+    3.5,
+    30.5,
+    39.5
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 38.531
+  },
+  "book.pages.medium.svg": {
+   "symbol": "book.pages",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    37,
+    46
+   ],
+   "alignmentRect": [
+    0.0,
+    12.5,
+    37.5,
+    22.5
+   ],
+   "baselineY": 35.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    1.5,
+    3.0,
+    31.5,
+    40.0
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 38.204
+  },
+  "book.pages.semibold.svg": {
+   "symbol": "book.pages",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    38,
+    47
+   ],
+   "alignmentRect": [
+    0.0,
+    13.5,
+    38.0,
+    22.5
+   ],
+   "baselineY": 36.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    1.5,
+    3.5,
+    32.5,
+    40.5
+   ],
+   "paths": 3,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0,
+    0
+   ],
+   "fontBaselineY": 38.956
   }
  },
  "menubar": [

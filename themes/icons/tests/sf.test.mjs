@@ -28,7 +28,7 @@ test("shell and Finder import the same file", () => {
 test("every hand-drawn glyph has a real symbol, except the known ones", () => {
     const missing = [...handDrawn("shell/components/symbols.js"), ...handDrawn("finder/qml/lib/symbols.js")]
         .filter(n => !SF.resolve(n));
-    assert.deepEqual([...new Set(missing)].sort(), ["distro", "zoom"]);
+    assert.deepEqual([...new Set(missing)].sort(), ["distro"]);
 });
 
 test("names map through names.json", () => {
@@ -87,4 +87,33 @@ test("url tints template paths and keeps multicolor colours", () => {
 
 test("surface sizes from names.json", () => {
     assert.deepEqual(SF.surfaces, { menubar: 15, ccToggle: 18, ccRound: 24, ccMedia: 17, ccPlay: 24, ccSlider: 16, ccOutput: 13, nc: 13 });
+});
+
+test("the emoji picker's category bar and the lock screen field draw decoded symbols", () => {
+    // UIKitCore 27.2.1 emojiCategoryImageName:forRenderConfig: names: light the outlines, dark .inverse for the face,
+    // dog and ball; the ">" (chevron.right)
+    const strip = f => readFileSync(join(root, f), "utf8").replace(/^\.pragma library\s*$/m, "");
+    const EM = new Function(strip("shell/lib/emoji.js") + "\nreturn { tabs };")();
+    const tabs = EM.tabs(false);
+    assert.deepEqual(tabs.map(t => t.symbol), ["clock", "emoji.face.grinning", "emoji.dog.face", "emoji.apple",
+        "emoji.soccer.ball", "emoji.automobile", "lightbulb", "emoji.heart", "flag", "chevron.right"]);
+    for (const t of tabs.concat(EM.tabs(true))) {
+        assert.ok(SF.resolve(t.symbol), t.symbol);
+        assert.ok(SF.resolve(t.selected), t.selected);
+        assert.ok(!t.parts, t.id + " has no hand-drawn parts");
+    }
+    assert.equal(EM.tabs(true)[1].selected, "emoji.face.grinning.inverse");
+    assert.equal(EM.tabs(true)[2].symbol, "emoji.dog.face.inverse");
+    assert.equal(EM.tabs(true)[4].symbol, "emoji.soccer.ball.inverse");
+    // private symbols (CoreGlyphsPrivate) in all three weights
+    for (const n of ["emoji.face.grinning.inverse", "emoji.dog.face", "emoji.automobile", "capslock.fill", "arrow.right.circle"])
+        for (const w of ["regular", "medium", "semibold"]) assert.ok(SF.glyphs[n + "." + w], n + "." + w);
+    const names = JSON.parse(readFileSync(join(icons, "sf-symbols", "names.json"), "utf8"));
+    assert.equal(names.symbols["emoji.dog.face"].private, true);
+    assert.equal(names.symbols["lightbulb"].private, false);
+    assert.equal(names.symbols["arrow.right.circle"].confidence, "guess");
+    // the lock screen's Caps Lock glyph and return button are symbols now, not paths
+    const field = readFileSync(join(root, "shell/modules/lock/PasswordField.qml"), "utf8");
+    assert.ok(field.includes('name: "capslock.fill"') && field.includes('name: "arrow.right.circle"'));
+    assert.ok(!/PathLine|ShapePath/.test(field));
 });
