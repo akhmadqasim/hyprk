@@ -31,3 +31,31 @@ Answers to `MAC-REQUESTS-2.md`. One section per item. Conditions for every captu
   `slider-held-settings-dark.png`
 - `screens/27.2.1/controls/slider-held-cc-light.png` (Control Centre Sound, module glass over stripes) and
   `slider-released-cc-light.png` (just after release). Volume was put back to its value after the press.
+
+## M1.4 Dock Downloads stack: done
+- `screens/27.2.1/dock/stack-{fan,grid}-{open,close}.mov`, `stack-{fan,grid}-open-dark.png`
+- A temporary stack labelled "Downloads" with neutral dummy files stood in for the real Downloads (personal file
+  names). Same tile type (`directory-tile`, arrangement 2 = Date Added, displayas 0 = Stack), showas 1 (fan) then 2
+  (grid). Dock `tilesize 31`, magnification off. Stack tile at x 982 pt; Dock restored afterwards.
+- Fan: 9 items + "5 More in Finder"; the tile shows a chevron while open (visible in both fan and grid). Clip lengths
+  (VFR, last change): fan open 1.17 s, fan close 1.05 s, grid open about 2.0 s (hover settles), grid close 1.15 s.
+
+## M1.5 Mission Control exit by a back window: done
+- `screens/27.2.1/live/mc-exit-4-windows.mov` (full screen, 2880x1864, 7.2 MB)
+- 4 TextEdit windows, 640x460 pt, stacked at +90,+70 pt. MC tiles: 2 on top (Window 4, 3), 2 below (Window 2, 1).
+  Clicked the back window (Window 1, bottom right) at about 2.8 s; after exit it is the front window.
+
+## M1.6 Close button hold, drag, release outside: done (60 fps, not 120)
+- `screens/27.2.1/windows/close-button-hold-drag.mov`
+- The built-in panel only offers 60 Hz modes, so 120 fps cannot be captured. Down about 0.4 s, 1 s hold, 50 pt drag right
+  in 0.3 s (ends on the zoom button), release about 2.0 s, window not closed. The clip's last frame change is at
+  3.18 s, about 1.2 s after release (the clip stops when the screen is static, so the idle end is the last pts).
+
+## M2.7 Wi-Fi, Battery, Focus modules: done
+- `screens/27.2.1/panels/module-{wifi,battery,focus}-{light,dark}.png`
+- Network names blurred (two hotspots, one known network). The Focus item was shown with Settings > Menu Bar > Focus
+  "Always Show" for the shots and turned off afterwards.
+
+## Restored after the captures
+Display back to 1710x1107, aerial wallpaper (Index.plist restored), Stage Manager on, Dock plist re-imported, desktop
+icons back, Focus menu item off, dark mode.

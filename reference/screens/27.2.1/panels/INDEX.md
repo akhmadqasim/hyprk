@@ -39,3 +39,19 @@ Notification Center (it holds the user's notifications). The numbers are in `ref
 | `banner-dark-black.png` | The same over black. |
 | `banner-4line-dark.png` | 4-line body, max 4 lines then "…". |
 | `banner-4line-hover-dark.png` | Hover: close button on the top-left corner, ">" at the top right, "Show" action capsule. |
+
+## Round 2 (M2.7): menu bar status modules
+Display 1440x932 pt (2x). Wallpaper TahoeLight / TahoeDark. Opened by a synthetic click on the menu bar item, full-screen
+`screencapture -x`, then cropped around the panel (px x 1888..2543 or 1810..2465, from y 40: a strip of the menu bar is
+included). The Focus item was set to "Always Show" for the shots and turned off again.
+Blurred for privacy: the two Personal Hotspot names and the known network name in the Wi-Fi module (3 x Gaussian 14 px
+over each name; the icons, signal / 4G / battery glyphs and lock are untouched).
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| module-wifi-light.png | full screen, crop 1888,40 655x586 px | Wi-Fi module: header + switch, Personal Hotspots (2), Known Network (1, connected, lock), Other Networks >, Wi-Fi Settings… | light | TahoeLight |
+| module-wifi-dark.png | same | same | dark | TahoeDark |
+| module-battery-light.png | full screen, crop 1810,40 655x505 px | Battery module: 100 %, Power Source, Fully Charged, Energy Mode (Low Power), Using Significant Energy (1 app), Battery Settings… | light | TahoeLight |
+| module-battery-dark.png | same | same | dark | TahoeDark |
+| module-focus-light.png | full screen, crop 1888,40 655x600 px | Focus module: 6 focus rows (Do Not Disturb, Work, Sleep, Mindfulness, Reduce Interruptions, Driving), none on, Focus Settings… | light | TahoeLight |
+| module-focus-dark.png | same | same | dark | TahoeDark |
