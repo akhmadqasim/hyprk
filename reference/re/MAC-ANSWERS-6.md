@@ -13,3 +13,9 @@ Transparency / Increase Contrast / Reduce Motion off, Stage Manager off and desk
 | red 255,0,0 | 53,34,32 | 46,38,37 | 41,31,31 |
 | green 0,160,0 | 35,43,32 | 39,43,38 | 31,36,30 |
 | navy 0,0,128 | 35,35,53 | 35,35,42 | 28,29,35 |
+
+## R6.2 Volume HUD, light/grey and dark/blue: done
+- `screens/27.2.1/panels/hud-volume-appear-{grey-light,blue-dark}.mov`
+- Frame changes (pts): light/grey: 0.483 to 1.250 s (appear), pause, 1.433 to 1.967 s (fade). Dark/blue: 0.483 to
+  1.283 s, pause, 1.483 to 2.000 s. Same timing as round 3 (dark/grey): fade starts about 1.0 s after the first frame
+  and lasts about 0.5 s.
