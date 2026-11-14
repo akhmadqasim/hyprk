@@ -27,3 +27,13 @@ Transparency / Increase Contrast / Reduce Motion off, Stage Manager off and desk
   the original segment until the pointer is over the next segment, then the pressed pill **jumps** to that segment
   (no sliding, no glass lens, no magnification). On release the selection is committed (view changes to list).
   Same in light and dark.
+
+## R6.4 Disabled zoom press and inactive close press: done
+- `screens/27.2.1/windows/lights-{zoom-disabled,inactive}-press-dark.mov`
+- Disabled zoom (Calculator): the green button is a plain grey disc. On hover the red and yellow show their glyphs, the
+  grey disc gets **no glyph**; pressing and holding it shows no visible change (no darken, no bounce); release does
+  nothing.
+- Inactive window (TextEdit behind key Calculator): all three lights are grey. Moving the pointer onto the group turns
+  all three to their colours with glyphs (red ×, yellow −, green zoom) while the window stays inactive; pressing the
+  close button darkens it (pressed state); release over it closes the window **without** activating the app first
+  (Calculator stayed frontmost).

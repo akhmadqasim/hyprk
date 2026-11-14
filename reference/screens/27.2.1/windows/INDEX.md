@@ -24,3 +24,11 @@ Clips `screencapture -x -v -V 4 -R 440,60,560,500` (H.264, 60 fps time base, VFR
 |---|---|---|---|---|
 | close-button-hold-still-dark.mov | `screencapture -x -v -V 7 -R 476,286,200,80` (2x, H.264 60 fps time base, VFR, pointer shown), display 1440x932 | TextEdit window at 500,300 640x460, pointer resting on the close button (516,316) 1.5 s before the clip; synthetic mouse down, 3 s with no pointer move, then a drag out (+80,+60 pt in 0.3 s) and the mouse up outside; the window stays open | dark | TahoeDark |
 | close-button-hold-still-light.mov | same | same | light | TahoeLight |
+
+## Round 6 (R6.4): disabled zoom button and inactive window close button
+Display 1440x932 (2x), dark, TahoeDark. Clips `screencapture -x -C -v -V 4 -R …` (pointer shown, 60 fps time base, VFR).
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| lights-zoom-disabled-press-dark.mov | region 900,295 120x50 pt; Calculator (key, its zoom button is disabled: AXZoomButton enabled = false, 964,318); pointer onto the green button at about 1.1 s, mouse down at about 1.7 s held 1.5 s, up, pointer away | hover glyphs, disabled green disc pressed | dark | window / TahoeDark |
+| lights-inactive-press-dark.mov | region 290,185 120x50 pt; TextEdit window (300,200 500x360) behind the key Calculator window; pointer onto its close button (316,216) at about 1.1 s, mouse down 0.8 s, up on the button | inactive (grey) lights, hover, press, the window closes on release | dark | window / TahoeDark |
