@@ -36,3 +36,8 @@ pts 0 in the file. Check: `afplay` of Pop.aiff and `osascript beep` land in the 
 - `screens/27.2.1/panels/emoji-in-banner-{light,dark}.png`, `screens/27.2.1/finder/emoji-in-name-{light,dark}.png`
 - Colour emoji render inline at the text size in all three banner lines and in the Finder list (selected row keeps
   the colour emoji; no monochrome fallback). Skin tone (👍🏽) and flag (🇮🇩) sequences render as single glyphs.
+
+## R5.4 Finder scrolled under the toolbar: done
+- `screens/27.2.1/finder/scrolled-under-toolbar-{icon,list}-{light,dark}.png` (window 740x500 pt, 1480x1000 px)
+- Dummy folder of coloured images so the toolbar's backdrop shows colour. Scrolled 36 pt from the top with one wheel
+  event. Sidebar and path bar hidden (they show the account's name).

@@ -31,3 +31,5 @@ Display 1440x932 pt (2x), wallpaper TahoeLight / TahoeDark, other apps hidden. F
 | file | how taken | content | mode | backdrop |
 |---|---|---|---|---|
 | emoji-in-name-{light,dark}.png | window 400,200 640x360 pt, list view, "Report 😀👍🏽🇮🇩.txt" selected | emoji inside file names in the list ("Photo 🌅.png", "Report 😀👍🏽🇮🇩.txt") | both | window |
+| scrolled-under-toolbar-icon-{light,dark}.png | window 400,150 740x500 pt, icon view arranged by name, folder of 40 coloured 256x192 PNGs + 20 text files; scrolled to the top, then one 36 pt wheel step | the first icon row passing under the toolbar (scroll edge effect) | both | window |
+| scrolled-under-toolbar-list-{light,dark}.png | same window, list view, same scroll | rows (with coloured thumbnails) passing under the toolbar and the column header | both | window |
