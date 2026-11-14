@@ -31,3 +31,12 @@ Clips: `screencapture -x -v -R` (H.264, 60 fps time base, VFR: frames only while
 | stack-grid-open.mov | region 480,300 960x632 pt, 2.0 s | grid opens: titled "Downloads" panel 5x3 + "Open in Finder", pointer arrow down to the chevron | dark | TahoeDark |
 | stack-grid-close.mov | same region, 1.15 s | grid closes | dark | TahoeDark |
 | stack-grid-open-dark.png | same region | grid fully open | dark | TahoeDark |
+
+## Round 4 (R4.3): fan with the "More in Finder" slot
+Same set-up as round 2 (temporary "Downloads" stack of 13 neutral files + 1 folder, removed afterwards), display
+1440x932, dark, TahoeDark, stack tile at 982,905 pt.
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| stack-fan-more-dark.png | `screencapture -x -R 700,30,560,902`, 1.5 s after opening | fan with 9 items + "5 More in Finder" (arrow disc) on top; tile shows the chevron | dark | TahoeDark |
+| stack-fan-more-close-dark.mov | same region, `-v -V 2.5`; click on the chevron at about 0.4 s | fan closes; changes 0.017 to 1.033 s | dark | TahoeDark |

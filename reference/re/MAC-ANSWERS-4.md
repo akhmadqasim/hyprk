@@ -26,3 +26,8 @@ Transparency / Increase Contrast / Reduce Motion off, Stage Manager off and desk
   change the Focus on the phone too, so it was left alone. The shot shows the "on" state the PC wanted to see: header
   "Focus" + "On" (secondary text, 967,52.5), the active row's icon disc filled/tinted. Rows are AXCheckBox 280x32 at
   y 78, 110, 142, 174, 206, 238; "Focus Settings…" 967,274. If the exact DND look is needed, ask the user to turn DND on.
+
+## R4.3 Fan with "More in Finder": done
+- `screens/27.2.1/dock/stack-fan-more-dark.png`, `stack-fan-more-close-dark.mov`
+- 14 entries in the folder, the fan shows 9 + a top slot "5 More in Finder" (label capsule + round arrow button in the
+  icon column). Close clip: frames change from 0.017 s to 1.033 s (pts), static after.
