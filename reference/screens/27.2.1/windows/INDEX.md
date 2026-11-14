@@ -18,3 +18,9 @@ Clips `screencapture -x -v -V 4 -R 440,60,560,500` (H.264, 60 fps time base, VFR
 | alert-appear-dismiss-grey-light.mov | same, 2.27 s | same | light | grey 127 |
 | alert-shown-grey-dark.png | `screencapture -x -R`, same region, alert at rest | still of the alert (window 410x384 incl. shadow at 515,109) | dark | grey 127 |
 | alert-shown-grey-light.png | same | same | light | grey 127 |
+
+## Round 4 (R4.1): close button held 3 s, pointer still
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| close-button-hold-still-dark.mov | `screencapture -x -v -V 7 -R 476,286,200,80` (2x, H.264 60 fps time base, VFR, pointer shown), display 1440x932 | TextEdit window at 500,300 640x460, pointer resting on the close button (516,316) 1.5 s before the clip; synthetic mouse down, 3 s with no pointer move, then a drag out (+80,+60 pt in 0.3 s) and the mouse up outside; the window stays open | dark | TahoeDark |
+| close-button-hold-still-light.mov | same | same | light | TahoeLight |
