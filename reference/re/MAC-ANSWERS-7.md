@@ -39,3 +39,13 @@ Transparency / Increase Contrast / Reduce Motion off, Stage Manager off and desk
 - Seen: **no stretch toward the pointer and no bounce.** While the pointer is inside, the segment shows the pressed pill
   (darker in light, lighter in dark); the moment it leaves, the pill returns to the normal selected look (classic
   track-inside highlight); on return it is pressed again. Release inside keeps the selection (no change).
+
+## R7.4 Slider icons at the ends: done
+- `screens/27.2.1/controls/slider-icon-ends-{cc-sound,cc-display,settings-sound}-{light,dark}.mov`
+- Control Centre (Sound and Display): while the lens is pulled past an end, the lens/track stretches toward the pointer
+  (rubber band, a few pt) and the **glyph at that end grows slightly** (about 10–15 %: the low speaker at 0, the small
+  sun at 0, the big sun at max); the max speaker glyph shows little or no change. On release the glyph returns to its
+  size and the lens shrinks back to the knob.
+- Settings > Sound > Output volume: the end glyphs are static (no scale), the lens stops at the ends (no visible
+  stretch); at 0 the "Mute" checkbox ticks on.
+- Volume back to 81 unmuted, brightness back to 0.606 (it was at 0.606 before; automatic brightness is on).

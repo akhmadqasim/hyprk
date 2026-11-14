@@ -84,3 +84,14 @@ Dock size and volume were changed by these gestures and restored (Dock plist re-
 | file | how taken | content | mode | backdrop |
 |---|---|---|---|---|
 | button-press-drag-fast-{light,dark}.mov | `screencapture -x -C -v -V 5 -R 645,197,220,120` (pointer shown); Finder window 150,200 1240x400 on a dummy folder, toolbar view switcher, selected "icon view" segment 735,227; mouse down, 0.4 s, then twice: drag to +20,+70 pt in 0.1 s, 0.35 s outside, back in 0.1 s, 0.45 s inside; release on the segment (no view change) | pressed look inside, normal look while outside, pressed again on return | both | window |
+
+## Round 7 (R7.4): slider icons at the ends
+Clips `screencapture -x -C -v -V 6.5 -R …` (pointer shown, 60 fps time base, VFR). Gesture: grab the knob, 0.3 s, drag
+to 45 pt past the max end in 0.5 s, hold 0.8 s, drag to 45 pt past the min end in 0.8 s, hold 0.8 s, release there.
+Slider positions from AX. Volume restored to 81 (unmuted) and brightness to 0.606 (DisplayServices) after each clip.
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| slider-icon-ends-cc-sound-{light,dark}.mov | Control Centre > Sound (180 pt slider), region slider −50 / +60 pt | speaker glyphs at both ends while the lens is pulled past them | both | Control Centre |
+| slider-icon-ends-cc-display-{light,dark}.mov | Control Centre > Display brightness (217 pt slider, 1170,415) | sun glyphs at both ends | both | Control Centre |
+| slider-icon-ends-settings-sound-{light,dark}.mov | Settings > Sound > Output volume (830,617 205 pt, 9 ticks), region slider −60 / +60 pt | speaker glyphs at both ends; the Mute box ticks at 0 | both | window |
