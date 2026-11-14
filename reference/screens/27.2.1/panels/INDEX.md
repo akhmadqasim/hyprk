@@ -55,3 +55,13 @@ over each name; the icons, signal / 4G / battery glyphs and lock are untouched).
 | module-battery-dark.png | same | same | dark | TahoeDark |
 | module-focus-light.png | full screen, crop 1888,40 655x600 px | Focus module: 6 focus rows (Do Not Disturb, Work, Sleep, Mindfulness, Reduce Interruptions, Driving), none on, Focus Settings… | light | TahoeLight |
 | module-focus-dark.png | same | same | dark | TahoeDark |
+
+## Round 3 (R3.2): Spotlight in light mode over a white window
+Display 1440x932 pt (2x), light, desktop grey 127 (hidden by the window). Behind: one empty TextEdit document resized to
+0,29 1440x851 pt (the Dock limits the height), other apps hidden. Spotlight opened with Cmd-Space, closed with Esc.
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| spotlight-light-white-empty.png | full screen `screencapture -x`, 1.5 s after Cmd-Space | empty "Search or Ask" field (it renders dark over the white window) | light | white TextEdit window |
+| spotlight-light-white-results.png | full screen, 2 s after typing "text" | field "textEdit — Open" + results panel (TextEdit, Text, Text replacements, Text size …; no files listed) | light | white TextEdit window |
+| spotlight-light-white-open-close.mov | `screencapture -x -v -V 3.5 -R 300,100,840,600`, 2.78 s | Cmd-Space at about 0.5 s, Esc about 1.5 s later | light | white TextEdit window |
