@@ -32,3 +32,10 @@ Transparency / Increase Contrast / Reduce Motion off, Stage Manager off and desk
   settles; on release it shrinks back to the small knob. Settings and Control Centre behave alike.
 - The Control Centre slider sits about 28 pt lower in dark than in light here (layout shift from the modules above);
   positions were read from AX each time. Dock size and volume restored after.
+
+## R7.3 Button pressed and dragged fast out and back: done
+- `screens/27.2.1/controls/button-press-drag-fast-{light,dark}.mov` (Finder toolbar view switcher segment; the Back
+  buttons were not used because holding them opens the history menu)
+- Seen: **no stretch toward the pointer and no bounce.** While the pointer is inside, the segment shows the pressed pill
+  (darker in light, lighter in dark); the moment it leaves, the pill returns to the normal selected look (classic
+  track-inside highlight); on return it is pressed again. Release inside keeps the selection (no change).

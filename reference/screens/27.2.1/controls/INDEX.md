@@ -79,3 +79,8 @@ knob, mouse down, 0.25 s, then 3 fast swings (each 0.18 s between the two turn p
 | slider-fast-drag-settings-{light,dark}.mov | region 580,225 260x80 pt; Settings > Desktop & Dock > Size (slider 612,250 200x34, track y 275), knob 645,275; swings between x 640 and 780; fling to x 600 (the min end) | knob turns into the glass lens and lags the pointer on each swing; fling to Small | both | window |
 | slider-fast-drag-cc-{light,dark}.mov | region 1130,(slider y − 33) 260x70 pt; Control Centre > Sound (slider 1168,456 or 1168,484 180x14 in light / dark), knob at 81 %; swings between x 1200 and 1320; fling to x 1380 (past max) | same, Control Centre slider; fling to 100 % and past | both | Control Centre / Tahoe |
 Dock size and volume were changed by these gestures and restored (Dock plist re-imported, tilesize 31; volume 81).
+
+## Round 7 (R7.3): glass button pressed, pointer dragged fast out and back
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| button-press-drag-fast-{light,dark}.mov | `screencapture -x -C -v -V 5 -R 645,197,220,120` (pointer shown); Finder window 150,200 1240x400 on a dummy folder, toolbar view switcher, selected "icon view" segment 735,227; mouse down, 0.4 s, then twice: drag to +20,+70 pt in 0.1 s, 0.35 s outside, back in 0.1 s, 0.45 s inside; release on the segment (no view change) | pressed look inside, normal look while outside, pressed again on return | both | window |
