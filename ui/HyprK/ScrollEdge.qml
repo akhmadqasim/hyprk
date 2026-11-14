@@ -1,16 +1,21 @@
 import QtQuick
 
-// AppKit 27.2.1's scroll pocket: the strip under a window toolbar where scrolled content passes (NSScrollPocket,
-// reference/re/27.2.1/live/toolbar/toolbar-unified-{light,dark}.json). Layer 1 (a variableBlur) pulls the content
-// towards a 16 pt blur of itself, lighten / darken / normal at .6 / .4 / .25 (light) and .4 / .6 / 0 (dark), then
-// saturation x1.25 (its colour matrix: 1.197 on red = 0.2126 (1 - 1.25) + 1.25); layer 2 (opacity .5 light / .6
-// dark, its colour matrix cut off in the dump) reads as a flat pocket colour laid over that. Fitted on the Mac's
-// appearance-scroll-250-{light,dark}.png (ICC converted) with our own frame of the same scroll as the input, over the
-// preview photo under the 52 pt band: the effect is even over the band (a per-row fit gives layer 1 at 1 and layer 2
-// within .5-.6 in every row), blur sigma 8 pt (16 pt radius). The pocket colour: over plain window and card the Mac's
-// band reads 255 / 255 in light (window 255, card 247) and (39,40,45) / (41,42,48) in dark (window (30,31,36), card
-// (37,38,43)): white at .55 in light, (42,42,47) at .6 in dark (the dump's opacity; the colour solved at it). rms over
-// the photo: light 118.6 -> 10.8 levels, dark 53.3 -> 8.9 (model).
+// AppKit 27.2.1's scroll pocket under a window toolbar: the "ThinFilm" pocket a toolbar's scroll view gets
+// (NSScrollPocket builder sub_18b45e6d8, -[NSToolbarView _scrollPocketElementStyle] 0x18ad147cc = 2; decode in
+// reference/re/27.2.1/TOOLBAR-REA-27.2.1.md 1, layer dump live/toolbar/toolbar-unified-{light,dark}.json). Bottom to top:
+// - ThinFilmBackgroundReplay: the background behind the scrolled content replayed over it at opacity 0.6 dark / 0.5
+//   light (dump), its saturation 1.25 - 0.25 / opacity (0x18b45ed94: .833 / .75, bias 0). The background's colour is
+//   not in the dump: solved from the Mac's band over plain window / card (appearance-scroll-250-*.png, earlier fit:
+//   dark window (30,31,36) -> (39,40,45), card (37,38,43) -> (41,42,48): (46,46,50); light 255 / 247 -> 255: white).
+// - ThinFilmContentBlurFill: a variableBlur of inputRadius 2 pt (+0.5 x clamp((h - 52) / 38), 0x18b45efd0) times the
+//   mask's red ramp R (1 at the band's top easing to 0.25 at its bottom, 0x18b45f070, mask 1 x 256 built by
+//   0x18b495384), with the blur fill (radius 16, darken / lighten / normal .6 / .4 / 0 dark, .4 / .6 / .25 light:
+//   0x18b45ed44), then saturation x1.25 and a clamp. CA's radius convention is not decoded: sigma = radius fits the Mac
+//   (the variable blur 2 pt -> 0.5 pt, the fill 16 pt) better than sigma = radius / 2.
+// FITTED: the replay opacity. Mac-to-Mac over the preview photo (appearance-scroll-000 rows 250..302 pt as the input,
+// appearance-scroll-250 as the target, x 450..695 pt, no colour conversion): rms dark 6.4 at the dumped 0.6, 3.0 at
+// 0.7; light 9.4 at 0.5, 6.8 at 0.55 (the old even-blur model: 9.2 / 10.8). The opacity and the unknown background
+// colour trade off; TOOLBAR-REA-27.2.1.md 1.
 // Put it over the band, with `source` the scrolled item (a sibling under it, not a parent); it draws only while
 // `active`. Reduce Transparency: the plain window colour (the caller's veil is not needed then).
 Item {
@@ -19,13 +24,15 @@ Item {
     property bool active: true
     property bool dark: Tokens.dark
     property color windowColor: "white"
-    property real sigma: 8
+    property real sigma: 16
     property real lighten: dark ? 0.4 : 0.6
     property real darken: dark ? 0.6 : 0.4
     property real normal: dark ? 0 : 0.25
     property real saturation: 1.25
-    property real veil: dark ? 0.6 : 0.55
-    property color veilColor: dark ? Qt.rgba(42 / 255, 42 / 255, 47 / 255, 1) : "white"
+    property real veil: dark ? 0.7 : 0.55     // FITTED (dump 0.6 / 0.5), see above
+    property color veilColor: dark ? Qt.rgba(46 / 255, 46 / 255, 50 / 255, 1) : "white"
+    readonly property real replaySat: Math.max(0, 1.25 - 0.25 / (dark ? 0.6 : 0.5))   // from the dumped opacity
+    readonly property real radius: 2 + 0.5 * Math.max(0, Math.min(1, (height - 52) / 38))
     property real cornerRadius: 0      // the top-right corner (a window corner the band reaches)
     readonly property real margin: Math.ceil(2.5 * sigma)
     visible: active && source !== null
@@ -68,6 +75,8 @@ Item {
         property real saturation: e.saturation
         property real veil: e.veil
         property real cornerRadius: e.cornerRadius
+        property real radius: e.radius
+        property real replaySat: e.replaySat
         property vector4d windowColor: Qt.vector4d(e.windowColor.r, e.windowColor.g, e.windowColor.b, 1)
         property vector4d veilColor: Qt.vector4d(e.veilColor.r, e.veilColor.g, e.veilColor.b, 1)
         // the content's own edges: sampling stops there (the source's top is the band's top)

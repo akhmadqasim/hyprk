@@ -51,9 +51,12 @@ Item {
         centres: [18.5, 55.5]
     }
     PressSpring { id: capLift; w: 78; h: 37 }
-    // a toolbar capsule (back / forward): the light lifts its source
+    // a SwiftUI glass capsule with a source (platter off): the light lifts its source
     Rectangle { id: navCap; x: 20; y: 150; width: 74; height: 37 }
-    ToolbarHighlight { id: navLight; x: 20; y: 150; width: 74; height: 37; source: navCap; centres: [18.5, 55.5] }
+    ToolbarHighlight { id: navLight; x: 20; y: 150; width: 74; height: 37; source: navCap; platter: false; centres: [18.5, 55.5] }
+    // an AppKit toolbar platter (back / forward): no lift, no glow, the interaction layer while pressed
+    Rectangle { id: platCap; x: 240; y: 240; width: 74; height: 37 }
+    ToolbarHighlight { id: platLight; x: 240; y: 240; width: 74; height: 37; source: platCap; centres: [18.5, 55.5] }
     GlassButton { id: flexBtn; x: 300; y: 150; width: 78; height: 37 }
     GlassButton { id: pairBtn; x: 300; y: 200; width: 74; height: 37; segments: [37, 37] }
 
@@ -276,6 +279,35 @@ Item {
             tryVerify(() => Math.abs(navCap.transform[0].origin.x) < 0.001 && navCap.transform[0].xScale > 1.016, 2000);
             mouseRelease(navLight, 60, 18);
             tryVerify(() => navCap.transform[0].xScale === 1, 1500);
+        }
+        // AppKit toolbar platter (TOOLBAR-REA-27.2.1.md 2): pressed, the interaction layer rises to alpha 0.1; no glow, no
+        // lift (the Mac's pressed capsule keeps its 146 px); back to 0 after the release
+        function test_toolbar_platter_press() {
+            verify(platLight.platter);
+            compare(platCap.transform.length, 0);
+            mousePress(platLight, 10, 18);
+            verify(platLight.pressed);
+            tryVerify(() => Math.abs(platLight.platterPress - 0.1) < 0.002, 3000);
+            compare(platLight.glowBig, 0);
+            compare(platLight.glowLittle, 0);
+            mouseRelease(platLight, 10, 18);
+            tryVerify(() => platLight.platterPress === 0, 3000);
+        }
+        // a disabled button (Q-finder-10 "Disabled: no hover") gets no press light; its enabled neighbour still does
+        function test_toolbar_platter_disabled_half() {
+            platLight.disabled = [false, true];
+            verify(!platLight.off(10));
+            verify(platLight.off(60));
+            mousePress(platLight, 60, 18);
+            verify(!platLight.pressed);
+            wait(150);
+            compare(platLight.platterPress, 0);
+            mouseRelease(platLight, 60, 18);
+            mousePress(platLight, 10, 18);
+            verify(platLight.pressed);
+            mouseRelease(platLight, 10, 18);
+            platLight.disabled = [];
+            tryVerify(() => platLight.platterPress === 0, 3000);
         }
         // pressed knob lens: light uses the Mac's B2 model (ring shadow 8 down, 4 wide, blur 3, .4; fill light), dark keeps
         // the recording's fit (no ring, no fill light)

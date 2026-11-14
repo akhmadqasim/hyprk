@@ -13,10 +13,51 @@ Item {
     property point origin: Qt.point(0, 0)
     property real band: Math.min(width, height) / 2
     property real amount: 0
+    // the glassBackground filter's other two geometry terms (glasslens4.frag, MAC-ANSWERS Verify B 2 / B 5): the
+    // backdrop's displacementMap (amount pt outward at the rim over dispBand pt, the same quarter-circle law; the held
+    // switch's +0.25 D over D) and the Regular recipe's outer refraction (a sample outerAmount pt further out over
+    // outerBand pt, mixed in by outerOpacity over the outermost 1 pt). All 0 by default
+    property real dispAmount: 0
+    property real dispBand: 1
+    property real outerAmount: 0
+    property real outerBand: 1
+    property real outerOpacity: 0
     property real blur: 0
+    // the glassBackground filter's blur fill (glasslens4.frag blurFill; MAC-ANSWERS verify C / C2, decomp
+    // QuartzCore-glassBackground-shader.c): the sharp sample mixed with the backdrop blurred by a Gaussian of fillSigma pt,
+    // first lightened / darkened toward it (fillLighten, fillDarken), then mixed toward it by fillNormal. 0: off.
+    // Needs a mipmapped texture, made only when on
+    property real fillSigma: 0
+    property real fillNormal: 0
+    property real fillDarken: 0
+    property real fillLighten: 0
+    // true: the rim's dark specular darkens the faced sample (the face* matrix and fill when set, else the decoded dark
+    // Regular face), not the plain sample (glasslens4.frag; GLASS-HIG.md rounds 2 and 4)
+    property bool rimFace: false
+    // the glassForeground filter's chromatic aberration (the held switch, MAC-ANSWERS Verify B 5: inputAberrationAmount
+    // 1.632 pt, inputAberrationAngle -15 deg, inputEdgeStart -6.2; live/verify/B/dumps/switch-knob-held.json): the
+    // glass re-read per channel along an offset that follows the rim normal through the swapped displacement matrix
+    // (decoded from glass_foreground_base, glasslens4.frag), faded out aberrationEdge pt inside the rim. 0: none.
+    // Until 2026-11-14 a fixed offset on the rim line only (GLASS-HIG.md round 3)
+    property real aberration: 0
+    property real aberrationAngle: -15
+    property real aberrationEdge: 6.2
+    // the filter's face colour matrix instead of gain / tint-only (MAC-ANSWERS verify C / C2: black, white, saturation,
+    // maxLuma; faceWhite 0: off). The fill colour stays `tint`
+    property real faceBlack: 0
+    property real faceWhite: 0
+    property real faceSat: 1
+    property real faceMaxLuma: 1
     property real gain: 1
     property real outline: 0
     property real outlineWidth: 0.5   // pt
+    // the filter's dark specular on the rim line instead of the flat `outline` (glasslens4.frag; 0: off): its tone
+    // curve bias (-0.25) and lobe spread in degrees (106 light, 75 dark on SDR: MAC-ANSWERS Verify B 1)
+    property real rimBias: 0
+    property real rimSpread: 106
+    // KeyFillHighlightAmount: the lobes' Schlick parameter (the CPU passes 1 / amount - 2: MAC-ANSWERS Verify B 1,
+    // 0x18debcd84; Regular 0.4, the held switch and slider 0.5 = linear lobes)
+    property real rimAmount: 0.4
     // light (white mixed in): everywhere (haze), from the top edge fading out over diffuseTopDepth pt and from the
     // bottom edge over diffuseBottomDepth pt, and a key band just inside the rim line (keyTop on the top edge,
     // keyBottom on the bottom, keyEnds on the round ends, keyFalloff pt deep). The rim line shows the plain sample.
@@ -44,7 +85,11 @@ Item {
     // leaves its track). The Liquid Glass preview's capsules sit 7 pt from the article's top and right edge and bend
     // 12 pt: unclamped their top and right end were cut away (user report). Edge repeat itself is inferred, not measured
     property bool clampToSource: false
-    readonly property real margin: Math.ceil(Math.abs(amount) + blur + 1)
+    // with clampToSource: the blur fill still reads `backdrop` beyond the source's edge (only the sharp samples repeat
+    // the edge). The Appearance preview: its capsules' face fits the Mac only with the card around the article in
+    // the blur, its rim only with the edge repeat (GLASS-HIG.md round 3)
+    property bool fillBackdropOutside: false
+    readonly property real margin: Math.ceil(Math.abs(amount) + Math.abs(dispAmount) + Math.abs(outerAmount) + Math.max(blur, 2.25 * fillSigma) + 1)
     // a button's light (ToolbarHighlight): a disc of Tokens.toolbar.hoverDiscRadius round discCentre with discLift added,
     // then SwiftUI's press light round glowCentre (item px; motion.js glow*): the BigGlow square (half side glowHalf,
     // opacity glowBig) and the LittleGlow blurred circle (opacity glowLittle, gain glowDodge, coverage table glowLut
@@ -58,6 +103,9 @@ Item {
     property real glowRadius: 1
     property real glowDodge: 1
     property var glowLut: []
+    // an AppKit toolbar platter's pressed interaction layer (ToolbarHighlight.platterPress, motion.js platterPress):
+    // the whole face mixed toward 0.3125 c + 0.9375 (dark) / - 0.25 (light) by this alpha
+    property real platterPress: 0
     // only draw the light the disc and the glow add (over the capsule as already drawn; give `backdrop` the opaque
     // colour under the capsule so the gain sees what is on screen)
     property bool additive: false
@@ -69,6 +117,7 @@ Item {
         hideSource: false
         visible: false
         smooth: true
+        mipmap: g.fillSigma > 0
         sourceRect: Qt.rect(g.origin.x - g.margin, g.origin.y - g.margin, g.width + 2 * g.margin, g.height + 2 * g.margin)
         // at least 2 px per point: the rim minifies, a 1x texture smears the bent edges
         readonly property real k: Math.max(2, Screen.devicePixelRatio)
@@ -84,6 +133,13 @@ Item {
         property real band: Math.max(0.01, g.band)
         property real amount: g.amount
         property real blur: g.blur
+        property vector4d refr2: Qt.vector4d(g.dispAmount, Math.max(0.01, g.dispBand), g.outerAmount, Math.max(0.01, g.outerBand))
+        property real outerOpacity: g.outerOpacity
+        property vector4d rimSpec: Qt.vector4d(g.rimBias, Math.cos(g.rimSpread * Math.PI / 180), g.rimFace ? (g.faceWhite > 0 ? 2 : 1) : 0, g.rimAmount)
+        property vector4d aberr: Qt.vector4d(g.aberration, g.aberrationAngle * Math.PI / 180, g.aberrationEdge, 0)
+        property vector4d face: Qt.vector4d(g.faceBlack, g.faceWhite, g.faceSat, g.faceMaxLuma)
+        property real fillOut: g.fillBackdropOutside ? 1 : 0
+        property vector4d bfill: Qt.vector4d(g.fillSigma, g.fillNormal, g.fillDarken, g.fillLighten)
         property real gain: g.gain
         property real outline: g.outline
         property real outlineWidth: g.outlineWidth
@@ -106,6 +162,7 @@ Item {
         property real additive: g.additive ? 1 : 0
         property vector4d ring: Qt.vector4d(g.ringOffset, g.ringWidth, g.ringBlur, g.ringOpacity)
         property real fillLight: g.fillLight
+        property vector4d platter: Qt.vector4d(g.platterPress, 0.3125, Tokens.dark ? 0.9375 : -0.25, 0)
         property vector4d backdrop: Qt.vector4d(g.backdrop.r * g.backdrop.a, g.backdrop.g * g.backdrop.a,
                                                 g.backdrop.b * g.backdrop.a, g.backdrop.a)
     }

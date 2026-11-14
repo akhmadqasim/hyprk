@@ -21,6 +21,10 @@ QtObject {
     // Settings > Appearance > Liquid Glass (NSGlassTintAmount, 0 clear .. 1 tinted, 0.5 = unchanged recipe). Apps
     // that read appearance.json `glass` bind it; glass-faced controls (ToolbarPlatter) follow it
     property real glassTint: 0.5
+    // the compositor draws the menu glass behind this app's popup windows (liquidglass plugin, its class in
+    // popup_classes: plugin/README.md "Client popups"); set by the app (Finder: Hypr.option, Settings: HYPRK_GLASS).
+    // Then a menu in its own popup window (TextMenu) draws no fill, as Finder's PopupMenu
+    property bool popupGlass: false
     // controlAccentColor of the user's accent (Accent.qml; each app's Theme sets Accent.name)
     property color accent: Accent.color
     property string fontText: "Sans Serif"
@@ -82,12 +86,57 @@ QtObject {
         readonly property color knob: "#FFFFFF"
         // knob shadows: black a.10 radius 12 y 3, black a.10 radius 2 y 1 (Q-16)
         readonly property color knobShadow: Qt.rgba(0, 0, 0, 0.10)
-        // pressed knob lens (LensGlass), fitted to switch-press-strip-light.png (peak frame, 50 x 31 lens over the
-        // 54 x 24 track): the track reads 17.5 pt tall inside and its end 16 pt from the centre (18 real) ->
-        // refraction band = half the lens height, offset at the rim 0.34 x the lens height; a 0.5 pt rim line
-        // (249 -> 164 on white, 96 -> 35 on the track: black about a.4)
-        readonly property real lensBand: 0.5
-        readonly property real lensAmount: 0.34
+        // Regular glass refraction (the Appearance preview's glass buttons, LensGlass), D = the shorter side in pt: inner
+        // height min(0.25 D, 20), amount max(-0.5 D, -60) (sample further inside: the rim magnifies), outer height
+        // max(0.2 D, 16), amount max(0.25 D, 16) at opacity 0.6 over the outermost 1 pt (MAC-ANSWERS Verify B 2: the
+        // RegularBase recipe, ramp-measured median error 0.43 px over 11 shapes). Replaced 2026-11-14 the switch strip's
+        // fitted band 0.5 D / +0.34 D, which had the opposite sign (it shrank the content toward the rim; GLASS-HIG.md)
+        function regularInnerBand(d) { return Math.min(0.25 * d, 20); }
+        function regularInnerAmount(d) { return Math.max(-0.5 * d, -60); }
+        function regularOuterBand(d) { return Math.max(0.2 * d, 16); }
+        function regularOuterAmount(d) { return Math.max(0.25 * d, 16); }
+        readonly property real regularOuterOpacity: 0.6
+        // its frost (MAC-ANSWERS verify C, Regular <= 64 pt, a = the Liquid Glass slider 0..1, u = clamp(2a),
+        // t = clamp(2a - 1)): no centre blur of its own; a blur fill of radius 8 (sigma 2.0 x radius = 16 pt:
+        // QuartzCore-glass-blur-pyramid.c, measured 1.93..2.04), normal opacity 0.5 u below 0.5, 0.5 + 0.5 t above;
+        // darken (dark) / lighten (light) 0.9 (0.75 + 0.25 u) below 0.5, 0.9 above (LensGlass fillSigma / fillNormal /
+        // fillDarken / fillLighten). Replaced 2026-11-14 a 17-tap ring blur of (1 + 4a) 16 / 3 pt (GLASS-HIG.md round 2)
+        readonly property real regularFillSigma: 16
+        function regularFillNormal(a) { return a < 0.5 ? Math.max(0, a) : Math.min(1, 0.5 + 0.5 * (2 * a - 1)); }
+        function regularFillMix(a) { return 0.9 * (a < 0.5 ? 0.75 + 0.25 * Math.max(0, 2 * a) : 1); }
+        // its rim and light (MAC-ANSWERS Verify B 1, decoded, pixel-checked there): the dark specular on the rim line,
+        // bias -0.25, spread 106 deg light / 75 deg dark on SDR (LensGlass rimBias / rimSpread), and the key / fill
+        // highlight (LensGlass fillLight 1: the B2 model, key at the top, fill at the bottom, 80 deg up to D 96).
+        // Mac check (liquidglass-0-mid-1-light.png, share capsule, 2x): rim 202 at the top over 223 (model 201), 117 on
+        // the left end over 184 (model 112), then 255 just inside the top; the flat black .4 line read 113 / 118
+        readonly property real regularRimBias: -0.25
+        readonly property real regularRimSpread: t.dark ? 75 : 106
+        // the key / fill highlight in dark: the Mac's dark shot (liquidglass-0-mid-1-dark.png, share capsule top) reads
+        // only +10 over the face in the first 2 px; the B2 model drew +36 over 4 px there, so dark leaves it off (as the
+        // knob's dark fit does). The dark round end reads x0.50 on the Mac against the decoded curve's x0.70 (not settled)
+        readonly property real regularFillLight: t.dark ? 0 : 1
+        // the rim in dark: the Mac's dark round end (liquidglass-0-mid-1-dark.png, share capsule, row through its centre)
+        // reads 202 -> 101; the tone curve over the plain sample gives 130 (we drew 141), over the decoded dark Regular
+        // face of it (verify C: 202 -> 170; the filter darkens the rim after the face, verify C2 order) 99. Light keeps the
+        // plain sample: there the face first would give 160 against the Mac's 135 (plain: 130). GLASS-HIG.md round 2.
+        // Round 4: with the decoded light face (regularFace*) the face first draws the light top rim 214 / 217 (Mac
+        // 211 / 210; plain 191 / 197), as the decode orders it; the light round end then reads 170 (Mac 139, not settled)
+        readonly property bool regularRimFace: true
+        // its face (LensGlass face*, MAC-ANSWERS verify C formulas, C2 1-2 shoulder): black, white, saturation, maxLuma
+        // (dark 0.6 at D <= 64; light maxLumaSDR 0.94) and the fill colour by the slider a (u = clamp(2a), t =
+        // clamp(2a - 1)): light white at 0.2 u below 0.5, 0.2 + 0.3 t above; dark none below 0.5, grey 0.125 t at 0.5 t
+        // above. Replaced 2026-11-14 the fitted gain (light 1.14, dark 0.79) and white / #1E1E1E mixes, which clipped the
+        // light sky to white (face 251 where the Mac reads 236-241: GLASS-HIG.md round 3)
+        readonly property real regularFaceBlack: t.dark ? 0.125 : 0.4
+        readonly property real regularFaceWhite: t.dark ? 1.125 : 1.03
+        readonly property real regularFaceSat: t.dark ? 1.3 : 1.2
+        readonly property real regularFaceMaxLuma: t.dark ? 0.6 : 0.94
+        function regularFaceFill(a) {
+            const u = Math.max(0, Math.min(1, 2 * a)), v = Math.max(0, Math.min(1, 2 * a - 1));
+            return t.dark ? Qt.rgba(0.125 * v, 0.125 * v, 0.125 * v, 0.5 * v)
+                          : Qt.rgba(1, 1, 1, a < 0.5 ? 0.2 * u : 0.2 + 0.3 * v);
+        }
+        // a 0.5 pt rim line (switch-press-strip-light.png: 249 -> 164 on white, 96 -> 35 on the track: black about a.4)
         readonly property real lensOutline: 0.4
         // what the lens shows outside the track: the Settings card (Q-settings-11: #F7F7F7 / #25262B)
         readonly property color lensBackdrop: t.dark ? "#25262B" : "#F7F7F7"
@@ -122,15 +171,52 @@ QtObject {
         // the lens position aligned). Gain and haze trade off (two background levels only: .658 / .099 fits within .1
         // level). The rim line stays .45: our capture resampled reads x0.71 of the background, the recording x0.72 (the
         // x0.54 of GLASS-INTERACTION section 12 was our 2 px/pt capture against the resampled video); .24-.31 read
-        // x0.82-0.87. Not refitted: bottom diffuse, bottom key light, round ends (the pointer covers the lens bottom)
+        // x0.82-0.87. Not refitted: bottom key light, round ends.
+        // Bottom diffuse refitted 2026-11-14 (GLASS-INTERACTION section 17): the recording's column 6 pt right of the
+        // lens centre (x 694) shows the lens bottom clear of the pointer; under the track the face rises +13.5 -> +18.2
+        // over 4 pt where ours stayed flat at +10: .04 over 4 pt -> .03 over 9 pt (rms 2.17 -> 1.71 levels, backdrop-
+        // corrected; .025 over 11 pt reaches the track: 1.80)
+        // The switch's lens (D = the lens height, 31): the inner term above plus the backdrop's displacementMap +0.25 D
+        // over a height of D (MAC-ANSWERS Verify B 5: the dumped stack, field measured on ramps as
+        // 7.75 m(depth, 31) - 4.65 m(depth, 3.1), rms 0.26 pt): the rim samples 4 pt OUTWARD and the middle shows the
+        // backdrop at about 0.79 x (wide angle). The slider's lens (25 x 20) has its own inner term, 3.6 / -6 = 0.18 D /
+        // -0.3 D, and a zero displacement map (Verify B 5 / B2 item 1). Until 2026-11-14 both used the switch's inner
+        // term only (GLASS-HIG.md: the switch then magnified its rim where the Mac shrinks it; the slider's fill read
+        // 18.2 px tall 1.5 pt inside the round end, the 23.09.23 recording 20, the decoded slider term 20.2)
         readonly property real knobLensBand: 0.1
         readonly property real knobLensAmount: -0.15
+        readonly property real knobLensDisp: 0.25
+        readonly property real knobLensDispBand: 1
+        // the held switch's rim fringes: glassForeground aberration 1.632 pt (Verify B 5; the slider's is 0), the
+        // decoded per-normal offset (LensGlass aberration; GLASS-HIG.md rounds 2 and 3)
+        readonly property real knobLensAberration: 1.632
+        // the held switch's own glassBackground (live/verify/B/dumps/switch-knob-held.json, a light probe), where it
+        // differs from the slider's (slider-knob-held.json) whose B2 light model the knobLens* light terms are: face
+        // black 0 (slider 0.1: knobLensHaze), ring shadow 0.1 (slider 0.4), the KeyFillHighlight's dark specular on
+        // the rim (bias -0.3, spread SDR 120 deg; MAC-ANSWERS Verify B 1 law, glasslens4.frag rimSpec) instead of the
+        // flat black .4 line, and no lens shadow (inputShadowOpacity 0.001). Until 2026-11-14 the switch took the
+        // slider's terms: its interior read the track 31 levels darker in blue, shaded (B std 13 vs the Mac's 4.8), the
+        // rim 170 / 163 against 201 / 195 (GLASS-HIG.md round 3). Dark: no Mac capture of the held switch, unchanged
+        readonly property real switchLensHaze: t.dark ? knobLensHaze : 0
+        readonly property real switchLensRingOpacity: t.dark ? knobLensRingOpacity : 0.1
+        readonly property real switchLensRimBias: t.dark ? 0 : -0.3
+        readonly property real switchLensRimSpread: 120
+        readonly property color switchLensShadow: t.dark ? knobLensShadow : "transparent"
+        // the dark specular's height 1 (inputKeyFillHighlightHeight 1, EffectOffset -1; the slider's Regular-like 0.5):
+        // a 1 pt rim line outside the face, 2 px in the strip (196 / 195 at the top); the lens then reads 1.36 x the
+        // track's height (Mac 1.35, the 0.5 pt line 1.27)
+        readonly property real switchLensOutlineWidth: 1
+        // under the light lens the strip's last frame reads 252 -> 247 at the rim, 238 from 3.5 to 7 pt below, back to
+        // 247 by 12 pt: the knob's rest shadows kept whole, not faded (Knob restShadowHeld). Dark: unchanged
+        readonly property real switchRestShadowHeld: t.dark ? 0.3 : 1
+        readonly property real sliderLensBand: 0.18
+        readonly property real sliderLensAmount: -0.3
         readonly property real knobLensGain: t.dark ? 0.702 : 1
         readonly property real knobLensHaze: t.dark ? 0.091 : 0.1
         readonly property real knobLensDiffuseTop: t.dark ? 0.043 : 0
         readonly property real knobLensDiffuseTopDepth: 12
-        readonly property real knobLensDiffuseBottom: t.dark ? 0.04 : 0
-        readonly property real knobLensDiffuseBottomDepth: 4
+        readonly property real knobLensDiffuseBottom: t.dark ? 0.03 : 0
+        readonly property real knobLensDiffuseBottomDepth: 9
         readonly property real knobLensKeyTop: t.dark ? 0.092 : 0
         readonly property real knobLensKeyBottom: t.dark ? 0.083 : 0
         readonly property real knobLensKeyEnds: t.dark ? 0.02 : 0
@@ -302,8 +388,18 @@ QtObject {
         readonly property int glyphOut: 117
         // Q-windows-10: glyph strokes about 1.9 pt (x 7 x 7, minus 7.5 wide, + 8 x 8, full screen 6 x 6)
         readonly property real glyphStroke: 1.9
-        // Q-windows-08: a pressed disc grows to 16 pt (32 px of 28 at 2x) and gets brighter, with a glow
-        readonly property real pressedScale: 1.15
+        // The press (reference/re/27.2.1/LIGHTS-REA-27.2.1.md): SwiftUI FlexInteraction, variant windowControl
+        // (DesignLibrary MacWindowControlElement.body sub_195e39790; preset FlexInteraction.Settings.windowControl
+        // 0x1908b1bb4). From mouse-down to mouse-up the light (disc and glyph) lifts by liftPoints on its longer side
+        // (16 pt from 14, Q-windows-08 saw 16-17 pt) and stretches toward a dragged pointer (k per axis from
+        // stretchDistance), all on one spring, press and release alike: response 0.355 s, damping fraction 0.4, the bounce
+        // (to 1.18 at 0.19 s, back to 0.96 after the release). The gesture ends after idleTimeout ms without pointer
+        // events (GestureComponent.idleTimeout 2 s; what it does is inferred). plugin/src/LightPress.hpp has the same.
+        readonly property real liftPoints: 2
+        readonly property real liftResponse: 0.355
+        readonly property real liftDamping: 0.4
+        readonly property real stretchDistance: 3825.649
+        readonly property int idleTimeout: 2000
         // The Mac shots hold Display P3 numbers: every value below is the sampled one converted to sRGB (p3_to_srgb of
         // reference/ours/COLOUR-P3-AUDIT.md; before, the raw numbers were shown as sRGB, close red 232,112,97 for 250,103,90).
         // Per button, sampled on lights-{rest,hover,press-*}-{light,dark}.png: fill top / centre / bottom (Q-windows-08),

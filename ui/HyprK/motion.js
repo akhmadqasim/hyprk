@@ -113,6 +113,24 @@ function glowLut() {
     return out;
 }
 
+// AppKit's toolbar item-group platter (NSToolbarPlatterView: one NSGlassEffectView over the whole capsule,
+// -[NSToolbarPlatterView initWithFrame:] 0x18af2584c) does not show SwiftUI's press glow or lift on the Mac
+// (settings/toolbar-backforward-rest-hover-press-dark.png: the pressed capsule is 146 px wide as at rest, +16 levels
+// evenly end to end). Its pressed look is the glass material's interaction layer, read from the live glass dump
+// (live/glass-params-{dark,light}.json, `regular+_interactionState=1` / `=2`, layer "0:CALayer", backdrop-aware
+// vibrantColorMatrix over the whole glass shape): rgb' = 0.3125 rgb + 0.9375 (dark) / - 0.25 (light), alpha 0.1 in
+// state 1, 0.05 in state 2, 0 at rest. Composited as c + a (clamp(M c) - c) (GLASS-INTERACTION.md 8, Verify B).
+// State 1 is taken as the press: it gives 84..88 on the Mac panel's capsule (Mac 85..88), state 2 gives 78
+// (TOOLBAR-REA-27.2.1.md). Which AppKit state maps to 1 is inferred from that fit, not traced.
+const platterPressAlpha = 0.1;
+const platterRolloverAlpha = 0.05;   // state 2, decoded; not drawn (the Mac's hover capsule reads no overlay)
+function platterMatrix(dark) { return { slope: 0.3125, bias: dark ? 0.9375 : -0.25 }; }
+function platterPress(c, dark, a) {   // one channel 0..1
+    const m = platterMatrix(dark);
+    const t = Math.min(1, Math.max(0, m.slope * c + m.bias));
+    return c + a * (t - c);
+}
+
 // One step of a SwiftUI-parameterised spring (response s, dampingFraction), semi-implicit Euler
 // in <= 4 ms sub-steps. Returns [x, v].
 function springStep(x, v, target, response, damping, dt) {

@@ -73,6 +73,13 @@ Item {
         grow: Tokens.motion.switchLift
         lift: sw._lift
         lensSource: track
+        lensHaze: Tokens.control.switchLensHaze
+        lensRingOpacity: Tokens.control.switchLensRingOpacity
+        lensRimBias: Tokens.control.switchLensRimBias
+        lensRimSpread: Tokens.control.switchLensRimSpread
+        lensShadow: Tokens.control.switchLensShadow
+        lensOutlineWidth: Tokens.control.switchLensOutlineWidth
+        restShadowHeld: Tokens.control.switchRestShadowHeld
         reduceMotion: sw.reduceMotion
         cx: G.switchKnobX(sw._m, along.value) + sw._m.knobWidth / 2
         cy: sw.height / 2

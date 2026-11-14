@@ -17,12 +17,28 @@ import "motion.js" as Motion
 // (GlassContainer.InteractionStorage per Entry.StableID), so the pressed one grows by its own size and only its outer
 // end moves; the capsule's height grows with it; a drag while held stretches it (sub-point on a Mac-sized capsule).
 // Nothing runs at rest (the spring sleeps; the transforms are identity).
+// `platter` (default: with a `source`): an AppKit toolbar item-group platter (Settings back / forward, Finder's
+// capsules), not a SwiftUI glass button. The Mac shows neither the glow nor the lift there: pressed, the whole capsule
+// lightens evenly by the glass material's interaction layer (motion.js platterPress, TOOLBAR-REA-27.2.1.md 2:
+// settings/toolbar-backforward-rest-hover-press-dark.png, the pressed capsule 85..88 end to end, 146 px wide as at
+// rest). Without `platter` (the Appearance preview's SwiftUI glass buttons) the FlexInteraction glow and lift stay.
 Item {
     id: h
     property var centres: []           // the buttons' centres, x in this item; y = height / 2
+    // per centre, true for a disabled button: it gets neither the hover disc nor the press light, as on the Mac
+    // (MAC-ANSWERS Q-finder-10 "Disabled: no hover"; judge-95-16 `09` held a disabled Forward: the capsule lit and the
+    // divider stayed)
+    property var disabled: []
+    function off(x: real): bool {
+        let best = -1;
+        for (let i = 0; i < centres.length; i++) if (best < 0 || Math.abs(centres[i] - x) < Math.abs(centres[best] - x)) best = i;
+        return best >= 0 && !!disabled[best];
+    }
     property Item source: null
     property color backdrop: "black"   // the opaque colour under the capsule (the window's), with `source`
-    readonly property bool hovered: hover.hovered
+    readonly property bool hovered: hover.hovered && !off(hover.point.position.x)
+    readonly property bool pressed: press.active && !off(pressX)
+    property bool platter: source !== null
     function nearest(x: real): real {
         let best = centres.length > 0 ? centres[0] : width / 2;
         for (const c of centres) if (Math.abs(c - x) < Math.abs(best - x)) best = c;
@@ -42,9 +58,15 @@ Item {
     readonly property var _glowSet: Motion.glowPreset(_segW, height)
     readonly property bool _far: press.active && Math.hypot(_pointer.x - pressAt.x, _pointer.y - pressAt.y) > _glowSet.dissipation
     readonly property real _glowFast: press.active && !_far ? Tokens.motion.pressGlowRise : Tokens.motion.pressGlowFarResponse
-    Spring { id: bigOp; target: press.active ? h._glowSet.big : 0; damping: 1; epsilon: 0.002
+    // the platter's interaction layer: alpha 0.1 while pressed (state 1). Its timing is not decoded: GUESS, the press
+    // glow's far spring (critically damped 0.5 s), which at 80 ms is still a quarter in, as MAC-ANSWERS Q-finder-10
+    // saw ("pressed looks the same as hover at 80 ms")
+    Spring { id: platterOp; target: h.platter && h.pressed ? Motion.platterPressAlpha : 0; damping: 1; epsilon: 0.001
+             response: Tokens.motion.pressGlowFarResponse }
+    readonly property real platterPress: platterOp.value
+    Spring { id: bigOp; target: h.pressed && !h.platter ? h._glowSet.big : 0; damping: 1; epsilon: 0.002
              response: press.active ? Tokens.motion.pressGlowRise : Tokens.motion.pressGlowFarResponse }
-    Spring { id: littleOp; target: press.active ? h._glowSet.little * (h._far ? 0.5 : 1) : 0; damping: 1; epsilon: 0.002
+    Spring { id: littleOp; target: h.pressed && !h.platter ? h._glowSet.little * (h._far ? 0.5 : 1) : 0; damping: 1; epsilon: 0.002
              response: h._glowFast }
     Spring { id: glowScale; target: press.active ? (h._far ? 2 : 1) : 4; damping: 1; epsilon: 0.01; response: h._glowFast }
     readonly property real glowHalf: Motion.glowSize(_segW, height) * glowScale.value / 2
@@ -53,10 +75,10 @@ Item {
     readonly property real glowDodge: Motion.glowDodge(Tokens.dark)
     readonly property var glowLut: Motion.glowLut()
     readonly property real glowRadius: Motion.glowLutRadius(glowHalf)
-    readonly property bool lit: discLift > 0 || glowBig > 0.002 || glowLittle > 0.002
+    readonly property bool lit: discLift > 0 || glowBig > 0.002 || glowLittle > 0.002 || platterPress > 0.001
 
     // ---- the press lift (with `source`) ----
-    property bool lifts: source !== null
+    property bool lifts: source !== null && !platter
     // the pressed button's span [from, to] in this item's x: halfway to its neighbours' centres, the capsule's ends outside
     readonly property var _span: {
         if (centres.length < 2) return [0, width];
@@ -114,6 +136,7 @@ Item {
             glowRadius: h.glowRadius
             glowDodge: h.glowDodge
             glowLut: h.glowLut
+            platterPress: h.platterPress
             additive: true
             backdrop: h.backdrop
         }

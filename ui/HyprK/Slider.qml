@@ -52,6 +52,7 @@ Item {
     property real lensWidth: knobWidth * Tokens.motion.sliderLift
     property real lensHeight: knobHeight * Tokens.motion.sliderLift
     property color lensBackdrop: Tokens.control.lensBackdrop
+    property real lensGain: Tokens.control.knobLensGain   // the held lens's sample gain (Knob lensGain)
     property bool knobShown: true
     property bool fillToEnds: false
     property real trackPressOffset: 0
@@ -229,6 +230,11 @@ Item {
             lift: s._lift
             lensSource: bar
             lensBackdrop: s.lensBackdrop
+            lensBand: Tokens.control.sliderLensBand
+            lensAmount: Tokens.control.sliderLensAmount
+            lensDisp: 0
+            lensAberration: 0
+            lensGain: s.lensGain
             reduceMotion: s.reduceMotion
             cx: track.knobCx
             cy: track.height / 2

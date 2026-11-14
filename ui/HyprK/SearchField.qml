@@ -8,6 +8,8 @@ Rectangle {
     id: sf
     property alias text: input.text
     readonly property bool inputFocus: input.activeFocus
+    // View > Search ⌘F (System Settings' menu): the field takes the keyboard
+    function focusField() { input.forceActiveFocus(); input.selectAll(); }
     implicitHeight: Tokens.control.searchHeight
     radius: Tokens.control.searchRadius
     color: Tokens.control.searchFill
@@ -23,6 +25,7 @@ Rectangle {
     TextInput {
         id: input
         MouseArea { anchors.fill: parent; acceptedButtons: Qt.NoButton; cursorShape: Qt.IBeamCursor }   // TextInput sets no I-beam itself
+        TextMenu { target: input }   // the field editor's right-click menu (textmenu.js)
         anchors.left: parent.left; anchors.leftMargin: 28.5
         anchors.right: parent.right; anchors.rightMargin: 10
         anchors.verticalCenter: parent.verticalCenter
