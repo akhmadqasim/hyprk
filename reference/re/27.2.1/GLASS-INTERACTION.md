@@ -359,7 +359,7 @@ critically damped 0.21 s settle (rms .033) stays in `PressSpring`.
     5.6 pt dark, 19.4 / 5.6 light; the stripes hidden the same way).
   - light: the B2 ring / fill model draws as built (bright rim top and bottom); no light recording of a held knob.
 
-## 13. Round 3: refraction constants still fitted (task list, nothing changed)
+## 13. Round 3: refraction constants still fitted (task list, nothing changed; built in section 19)
 
 | where | constant | status | what the code says |
 |---|---|---|---|
@@ -446,6 +446,67 @@ bilinearly in pt every 0.5 pt at both scales: rows -14..+3 pt (below that the po
 levels, max 16.8 (at the lens's top rim, -10 pt: 23.7 at 1.6 against 21.7 at 2 in the 2 pt samples), so the fit carries to
 1.6 within the resampling. The held-minus-rest change agrees too (face -191..-203 at both). The bottom terms stay
 unchecked (pointer), and 1.6 was not compared with a recording (the 23.09.23 video is 1.92 px/pt).
+
+## 17. The held knob's lower highlight (judge #7 item 6, measured, bottom diffuse refitted)
+
+Judge #7's Mac numbers (149 / 124 / 171 "on 132", x1.13 / .94 / 1.30) are `vert meas` of live/verify/B2
+`slider_fit.txt`: a probe slider over a **vertical ramp** (backdrop value = capture row, 124 at the lens top to 164 at
+its bottom; 132 is the centre of the x ramp). Against the backdrop at the same row the B2 Mac reads x1.18 at the top,
+x.87 in the middle, x1.07 at the bottom: the x1.30 is the ramp, not a highlight. The B2 probe was in dark mode (config
+`mode: dark`), and its decoded model (0.1 + 0.9 c, ring .4, key / fill) reads the face of the 23.09.23 recording about
+3-6 levels too bright on the 32 card, so dark keeps the recording's fit.
+
+The recording's frame 2685 (frames 2684 and 2686 identical) shows the lens bottom clear of the pointer at x 694 (6 pt
+right of the centre; rims at rows 450.3 and 490.5). Ours: headless session, dark, scale 2, Settings > Appearance, knob
+held with vptr (cursor hidden with `cursor:invisible`), the capture box-resampled to 1.92 px/pt, the same column,
+rows normalised between the two rim minima (ours 19.8 pt apart), backdrop = the column 17 pt right of the lens.
+Levels over that backdrop (ours on card 38 / track 59, the recording 32 / 50; "corr" moves ours to the recording's
+backdrop with the fit's slope gain (1 - haze) - 1 = -.362):
+
+| pt | -9 | -8 | -7 | -6 | -5 | -4 | -3 | -2 | 0 | +2 | +3 | +4 | +5 | +6 | +7 | +8 | +9 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Mac | +21.8 | +26.1 | +20.8 | +18.8 | +17.5 | +14.7 | +10.7 | +7.7 | +4.0 | +4.0 | +9.0 | +13.5 | +15.6 | +16.6 | +18.2 | +20.9 | +24.9 |
+| ours before | +24.7 | +23.4 | +18.4 | +16.5 | +14.6 | +13.7 | +11.1 | +4.8 | +3.0 | +2.0 | +4.3 | +10.0 | +10.0 | +10.0 | +11.9 | +17.8 | +23.9 |
+| ours after | +24.7 | +23.4 | +18.4 | +16.5 | +14.6 | +13.7 | +11.1 | +4.8 | +3.0 | +2.0 | +5.0 | +11.0 | +12.0 | +13.5 | +15.4 | +20.4 | +24.6 |
+
+As ratios (ours / Mac): top x1.62 / x1.81 at -8, middle (track) x1.05 / x1.08, under the track x1.26-1.31 before,
+x1.29-1.41 after / x1.44-1.59, bottom x1.63 before, 1.65 after / x1.80 (the ratios carry the 38-vs-32 card).
+Rms over -9..+9 pt (19 rows): raw 3.38 -> 2.40 levels (max -6.6 at +6 -> -3.9 at +3); backdrop-corrected 2.17 -> 1.71
+(the bottom rows -3.0 / -4.0 / -3.8 at +5..+7 -> -1.0 / -0.5 / -0.3; the largest is +5.1 at the top rim, -9, unchanged).
+So the Mac has no extra bright band in dark: its face rises steadily from the track to the bottom rim as it does to
+the top, which ours did not (flat +10 under the track). Fitted (not decoded), to this frame: `knobLensDiffuseBottom`
+.04 over 4 pt -> .03 over 9 pt (dark only); .025 over 11 pt reaches the track (corr 1.80). The top terms, key lights
+and the rim are unchanged.
+
+Checks: knob at rest, dark, scale 2: identical pixels before / after. Light, held: identical before / after (the term is
+0 in light); ours there over card 247 / track 223, column +6 pt: face 249 -> 223 down to the track, track 199 -> 181 ->
+187 (the ring), 209 -> 233 under it, key 242 at the bottom rim; no Mac light recording to compare. Scale 1.6, dark,
+the same pipeline: corrected rms 3.76 -> 3.69, rows +4..+7 -3.0 / -3.7 / -2.5 -> -0.7 / -0.7 / +1.2; the rim rows
+(-9: -13.4, +8: +6.9) are the 1.6 -> 1.92 resample, as in section 16. Not checked: other columns (left of the centre
+the fill and the tick run through the lens), the CC Sound slider (no Mac frame of it held), the judge's stripe set-up.
+
+## 18. Toolbar platters: corrected (2026-11-14, TOOLBAR-REA-27.2.1.md 2)
+
+Sections 7, 8 and 9 put SwiftUI's press glow and lift on AppKit's toolbar capsules (Settings back / forward, Finder's
+capsules). The Mac does not show either there: `settings/toolbar-backforward-rest-hover-press-dark.png` keeps the
+capsule 146 px wide when pressed (no lift) and lightens it evenly, 85..88 end to end (no BigGlow square, no LittleGlow
+gradient), where ours drew a hard square edge 27 pt from the pointer (the user's "boxy, 8-bit"). The toolbar capsule is
+one `NSGlassEffectView` (`-[NSToolbarPlatterView initWithFrame:]` 0x18af2584c), and its pressed look matches the glass
+material's interaction layer from the live dump (`glass-params-*.json`, `_interactionState` 1: vibrantColorMatrix
+0.3125 rgb + 0.9375 dark / - 0.25 light at alpha 0.1 over the whole shape; state 2 = rollover at 0.05, set so by
+`-[NSTabBarViewButton setHasMouseOverHighlight:animated:]` 0x18aeacee4). Built: `ToolbarHighlight.platter` (default with
+a `source`): that layer only, no glow, no lift (`motion.js platterPress`). Still SwiftUI's glow and lift: the Appearance
+preview's glass buttons (section 14, recording-verified). Not traced: what sets the platter's state while a button is
+held, and why the platter shows no FlexInteraction glow; the layer's timing is a GUESS (0.5 s critically damped).
+
+## 19. Controls' refraction against Apple's HIG pictures (2026-11-14, GLASS-HIG.md)
+
+The section 13 task list, built from the decodes: `glasslens4.frag` takes the filter's quarter-circle profile, the
+switch lens its displacement map (+0.25 D over D: the rim samples 4 pt outward, the middle 0.79 x; it magnified
+before), the slider lens its own 0.18 D / -0.3 D (the recording's fill reads 20 px 1.5 pt inside the end: 18.2 ->
+20.2), the Appearance preview buttons the Regular recipe (inner and outer; the fitted +0.34 D had the wrong sign)
+and the dark specular rim (Verify B 1). The HIG's iOS pictures (`reference/hig/`) agree on the direction of each
+effect and on the light (top and bottom, not top-left). Measurements, before / after and the open items there.
 
 ## Needs the Mac
 
