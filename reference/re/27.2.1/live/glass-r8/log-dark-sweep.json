@@ -1,0 +1,262 @@
+{
+  "elements" : [
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 12,
+      "inWindow" : [
+        10,
+        574,
+        300,
+        56
+      ],
+      "oval" : 0
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 12,
+      "inWindow" : [
+        340,
+        567,
+        300,
+        63
+      ],
+      "oval" : 0
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 12,
+      "inWindow" : [
+        670,
+        566,
+        300,
+        64
+      ],
+      "oval" : 0
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 12,
+      "inWindow" : [
+        1000,
+        565,
+        300,
+        65
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 12,
+      "inWindow" : [
+        10,
+        400,
+        300,
+        80
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 12,
+      "inWindow" : [
+        340,
+        380,
+        300,
+        100
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 12,
+      "inWindow" : [
+        670,
+        360,
+        300,
+        120
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 12,
+      "inWindow" : [
+        1000,
+        416,
+        64,
+        64
+      ],
+      "oval" : 0
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 12,
+      "inWindow" : [
+        10,
+        265,
+        65,
+        65
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 12,
+      "inWindow" : [
+        340,
+        250,
+        80,
+        80
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 20,
+      "inWindow" : [
+        670,
+        230,
+        100,
+        100
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 12,
+      "inWindow" : [
+        1000,
+        30,
+        64,
+        300
+      ],
+      "oval" : 0
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 50,
+      "inWindow" : [
+        10,
+        80,
+        300,
+        100
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "circular",
+      "cornerRadius" : 0,
+      "inWindow" : [
+        340,
+        80,
+        300,
+        100
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 24,
+      "inWindow" : [
+        670,
+        90,
+        500,
+        90
+      ],
+      "oval" : 0.5
+    },
+    {
+      "cornerCurve" : "continuous",
+      "cornerRadius" : 22,
+      "inWindow" : [
+        1000,
+        93,
+        520,
+        87
+      ],
+      "oval" : 0.5
+    }
+  ],
+  "sizes" : [
+    [
+      300,
+      56,
+      12
+    ],
+    [
+      300,
+      63,
+      12
+    ],
+    [
+      300,
+      64,
+      12
+    ],
+    [
+      300,
+      65,
+      12
+    ],
+    [
+      300,
+      80,
+      12
+    ],
+    [
+      300,
+      100,
+      12
+    ],
+    [
+      300,
+      120,
+      12
+    ],
+    [
+      64,
+      64,
+      12
+    ],
+    [
+      65,
+      65,
+      12
+    ],
+    [
+      80,
+      80,
+      12
+    ],
+    [
+      100,
+      100,
+      20
+    ],
+    [
+      64,
+      300,
+      12
+    ],
+    [
+      300,
+      100,
+      50
+    ],
+    [
+      300,
+      100,
+      0
+    ],
+    [
+      500,
+      90,
+      24
+    ],
+    [
+      520,
+      87,
+      22
+    ]
+  ]
+}
