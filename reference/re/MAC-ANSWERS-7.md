@@ -23,3 +23,12 @@ Transparency / Increase Contrast / Reduce Motion off, Stage Manager off and desk
   same glow.
 - Side effect: the preview is a scroll view, so the held drag also scrolled the article a few points (visible in the
   clips: the photo shifts, and the search glyph hides when the search capsule's placeholder state changes).
+
+## R7.2 Slider knob elasticity: done (Settings Dock Size, Control Centre Sound)
+- `screens/27.2.1/controls/slider-fast-drag-{settings,cc}-{light,dark}.mov`
+- Seen: on grab the knob becomes the glass lens; during fast swings the lens **lags behind the pointer** (the pointer
+  leads by up to about 30–40 pt at the turn points, then the lens catches up), i.e. a spring follow, not a rigid
+  attachment; the fill follows the lens, not the pointer. On the fling to the end the lens arrives after the pointer and
+  settles; on release it shrinks back to the small knob. Settings and Control Centre behave alike.
+- The Control Centre slider sits about 28 pt lower in dark than in light here (layout shift from the modules above);
+  positions were read from AX each time. Dock size and volume restored after.

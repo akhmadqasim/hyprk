@@ -68,3 +68,14 @@ then mouse up on the button centre.
 | hold-shine-finder-{light,dark}.mov | region 520,195 240x64 pt; Finder window 400,200 740x360 on a dummy folder `hyprk-r7/sub` (Back enabled), Back segment centre 586,227 | Back pressed and held: after about 0.5 s the Back history menu opens under it ("hyprk-r7"); release over the button | both | window / Tahoe |
 | hold-shine-held-{light,dark}.png | `screencapture -x -R` same region, 0.9 s into the hold | held Back segment (pressed pill), history menu starting to appear | both | same |
 | hold-shine-settings-{light,dark}.mov | region 560,150 240x60 pt; System Settings 350,150, Appearance then Desktop & Dock (so Back is enabled), Go Back 608,176 | same gesture; the history menu opens under the button too | both | same |
+
+## Round 7 (R7.2): slider knob elasticity, fast drags
+Clips `screencapture -x -C -v -V 5 -R …` (pointer shown, 60 fps time base, VFR). Synthetic gesture: pointer onto the
+knob, mouse down, 0.25 s, then 3 fast swings (each 0.18 s between the two turn points, linear CGEvent drags at 120 Hz),
+0.3 s pause, a fling to past the max end in about 0.1 s, mouse up there.
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| slider-fast-drag-settings-{light,dark}.mov | region 580,225 260x80 pt; Settings > Desktop & Dock > Size (slider 612,250 200x34, track y 275), knob 645,275; swings between x 640 and 780; fling to x 600 (the min end) | knob turns into the glass lens and lags the pointer on each swing; fling to Small | both | window |
+| slider-fast-drag-cc-{light,dark}.mov | region 1130,(slider y − 33) 260x70 pt; Control Centre > Sound (slider 1168,456 or 1168,484 180x14 in light / dark), knob at 81 %; swings between x 1200 and 1320; fling to x 1380 (past max) | same, Control Centre slider; fling to 100 % and past | both | Control Centre / Tahoe |
+Dock size and volume were changed by these gestures and restored (Dock plist re-imported, tilesize 31; volume 81).
