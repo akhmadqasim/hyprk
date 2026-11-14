@@ -37,3 +37,9 @@ Transparency / Increase Contrast / Reduce Motion off, Stage Manager off and desk
 - White backdrop = a white PNG shown in Preview filling the screen (Spotlight and the list sit fully over white).
   In dark mode over white, the pill is black at the top grading to grey; the list panel is light grey with dark-grey
   fill at the top. Over grey 127 both read as darker greys.
+
+## R4.5 Mission Control, 4 windows: entered still and Esc exit: done
+- `screens/27.2.1/live/mc-4-windows-entered.png`, `mc-exit-esc.mov` (full screen, 2.9 MB)
+- At 0.5 s after entering, the layout is already in its final positions (tiles at about 20,110 / 552,110 / 372,498 /
+  904,498 pt, 520 pt wide). Esc exits with the previous front window (Window 4) still in front. The clip keeps changing
+  until its end because of the live CPU / RAM menu bar items (not part of the animation).
