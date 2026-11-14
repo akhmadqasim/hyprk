@@ -25,3 +25,9 @@ pts 0 in the file. Check: `afplay` of Pop.aiff and `osascript beep` land in the 
   while the ScreenCaptureKit stream runs, **no screenshot file is written** (none on the Desktop or anywhere in the home
   folder) and no flash / floating thumbnail is drawn, so there was nothing to delete. The sound file is
   `…/SystemSounds/system/Shutter.aif` (also `Screen Capture.aif`, `Grab.aif`).
+
+## R5.2 Shadows, banner and Wi-Fi module, grey and white: done
+- `screens/27.2.1/panels/shadow-{banner,module}-{grey,white}-{dark,light}.png`
+- "White" is a solid white desktop picture (not a window), so the menu bar strip and the shots are over pure white.
+  The banner comes from `display notification` (app icon = Script Editor). Both surfaces show a soft, wide, low-contrast
+  shadow mostly below the shape; over grey 127 it is barely visible, over white it is clear.

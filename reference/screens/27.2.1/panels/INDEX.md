@@ -106,3 +106,15 @@ Note: `screencapture` stills do not draw the pointer.
 |---|---|---|---|---|
 | spotlight-modelist-white-dark.png | full screen `screencapture -x`; Cmd-Space, pointer moved 10 small steps near the bottom-left corner, still 1.2 s later | pill + mode list (Applications ⌘1, Files ⌘2, Actions ⌘3, Clipboard ⌘4) | dark | Preview window 0,29 1440x903 showing an all-white 2880x1600 PNG (image area white, Preview's dark chrome around it) |
 | spotlight-modelist-grey-dark.png | same | same | dark | desktop RGB 127 grey, apps hidden |
+
+## Round 5 (R5.2): shadows of a banner and of the Wi-Fi module, grey vs white
+Display 1440x932 pt (2x). Desktop picture = solid RGB 127 grey or solid white (2880x1864), Finder front, all apps
+hidden, desktop icons hidden. Banner: `osascript -e 'display notification "Shadow test banner" with title "hyprk"
+subtitle "Round 5"'` (shown as Script Editor), still 1.6 s after posting (resting), region pt 1040,30 400x130 (banner
+about 1080..1425 x 42..117). Module: Wi-Fi menu bar item clicked, full screen still 1.6 s later, crop pt 900,30
+400x290; the network name is blurred (AX frame of the `wifi-network-*` row).
+
+| file | how taken | content | mode | backdrop |
+|---|---|---|---|---|
+| shadow-banner-{grey,white}-{dark,light}.png | region above | resting notification banner and its shadow | both | grey 127 / white |
+| shadow-module-{grey,white}-{dark,light}.png | crop above | Wi-Fi module and its shadow | both | grey 127 / white |
