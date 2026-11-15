@@ -68,3 +68,40 @@ Stage Manager off, desktop icons hidden; frames are screen points. Items are pus
     while the chosen app comes forward.
   - **Quick tap** (Cmd down, Tab, Cmd up 150 ms after Cmd down): **no panel at all**; the previous app is activated
     directly (`cmdtab-quick-tap-*`: no changed frame in the panel area).
+
+## R17.3 Spotlight stills: done
+- `spotlight-<state>-<background>-<mode>.png`, crops of full-screen shots (window rect + 30 pt), for three
+  backgrounds: `wallpaper-dark` (Tahoe Dark, nothing else on screen), `white-light` (a white TextEdit window 1200x800
+  behind, light mode) and `white-dark` (the same window, dark mode). States: `idle`, `typed` (query "calc"),
+  `modelist` (the four-row list that appears when the pointer moves), `mode-files`, `mode-actions`, `mode-clipboard`.
+  Detail crops at 2x of the bar's lower half/rim and the top result row: `spotlight-typed-bar-and-top-row-*.png`
+  (520x163 pt from the window's top-left).
+- Blurred: result rows below the top hit in `typed`, the file grid in `mode-files`, the clipboard row in
+  `mode-clipboard`. The Applications mode is the Apps grid: see R17.1.
+- The UI's window (owner "Siri" in the window list, layer 23; **its AX tree is not reachable**, only the menu bar
+  comes back), frames in pt on the 1440x932 screen:
+
+| state | window frame |
+|---|---|
+| idle (bar only) | 336,349 520x137 |
+| mode list | 336,349 520x311 |
+| typed, results | 336,349 520x507 |
+| Actions, Clipboard | 336,295 520x587 (the bar moves **54 pt up**) |
+| Files, Applications | 174,295 844x617 (wider panel, bar stays 520 wide and centred) |
+
+  The bar is 520 pt wide and centred on the screen (x 336..856); its top is the window's top edge. The bar and the
+  panel below it are two separate rounded shapes with a gap of about 8 pt.
+- What the stills show:
+  - **idle**: "Search or Ask" placeholder with the caret at the left, mic glyph at the right. Over the white window the
+    bar is a **dark pill** (black at the top grading to mid grey at the bottom); over the dark wallpaper it is a dark
+    glass with the wallpaper colour coming through.
+  - **typed**: the query with the inline completion highlighted ("calc" + selected "ulator — Open"), the top hit's
+    icon at the bar's right end. Panel below: rows about 41 pt apart; top row = app icon, name, and at the right a
+    small hint "Search Calculator" with a `tab` key cap.
+  - **mode list**: four rows (Applications ⌘1, Files ⌘2, Actions ⌘3, Clipboard ⌘4): glyph, name, shortcut right
+    aligned.
+  - **a mode**: the bar shows the mode's glyph + name as the placeholder and a "…" button at the right; Files has a
+    row of filter chips (Preview, Microsoft Word, PDF, TextEdit, Music …) over a 7-column grid of file tiles with a
+    "Recents" section; Actions is a list with section headers ("Suggestions", "Books" …), 2-line rows and a small
+    button-like hint at the right of each row; Clipboard is a list of entries (time, kind) with an action at the right.
+- Modes were opened with ⌘1..⌘4 after the mode list was showing; Escape twice closes.
