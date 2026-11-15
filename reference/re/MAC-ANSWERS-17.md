@@ -89,8 +89,8 @@ Stage Manager off, desktop icons hidden; frames are screen points. Items are pus
 | Actions, Clipboard | 336,295 520x587 (the bar moves **54 pt up**) |
 | Files, Applications | 174,295 844x617 (wider panel, bar stays 520 wide and centred) |
 
-  The bar is 520 pt wide and centred on the screen (x 336..856); its top is the window's top edge. The bar and the
-  panel below it are two separate rounded shapes with a gap of about 8 pt.
+  The bar is 520 pt wide and centred on the screen (x 336..856); its top is the window's top edge. The bar is
+  **86 pt tall** (y 349.5 to 435.5); the panel below is a separate rounded shape that starts **11 pt** under it (see R17.5).
 - What the stills show:
   - **idle**: "Search or Ask" placeholder with the caret at the left, mic glyph at the right. Over the white window the
     bar is a **dark pill** (black at the top grading to mid grey at the bottom); over the dark wallpaper it is a dark
@@ -105,3 +105,55 @@ Stage Manager off, desktop icons hidden; frames are screen points. Items are pus
     "Recents" section; Actions is a list with section headers ("Suggestions", "Books" …), 2-line rows and a small
     button-like hint at the right of each row; Clipboard is a list of entries (time, kind) with an action at the right.
 - Modes were opened with ⌘1..⌘4 after the mode list was showing; Escape twice closes.
+
+## R17.5 Spotlight list top edge over a black/white step: done
+- `spotlight-list-top-edge-step-{dark,light}.png`: **raw, unmodified 2x crop** (region 300,330 600x190 pt) of a
+  full-screen shot with results open (query "calc"). Behind: a Quick Look window showing an image whose left half is
+  pure black and right half pure white; the vertical step is at **x = 720 pt** (screen centre), so the list's top edge
+  (horizontal) crosses it. Dark and light mode.
+- Frames (px edges on the 2x shot, identical in dark and light):
+  - bar: x 336 to 856 (520 pt), **y 349.5 to 435.5 (86 pt)**;
+  - **list: x 338.5 to 853.5 (515 pt wide, 2.5 pt narrower than the bar on each side), top edge y = 446.5** (11 pt
+    below the bar's bottom edge); the window continues to y 856, the list's bottom is cut by the window there.
+  - Window frame from the window list: 336,349 520x507.
+
+## R17.1 Apps (the Applications mode of the Spotlight panel): done, with limits
+- In 27.2.1 the Apps grid is the **Applications mode of the Spotlight panel** (same bar, mode glyph + "Applications"
+  as placeholder). Files: `apps-rest-{dark,light}.png`, `apps-typed-cal-{dark,light}.png` (stills, window rect + 30
+  pt), `apps-open-close-{dark,light}.mov`, `apps-scroll-{dark,light}.mov` (ScreenCaptureKit recorder, 60 fps, region
+  130,250 940x682 pt), `apps-hover-press-{dark,light}.mov` (region 534,556 120x110 pt around one icon).
+- **Privacy**: third-party app cells are blurred in the stills; in the open/close and scroll clips the **whole grid
+  area is blurred** (motion and timing remain visible, the bar and chips stay sharp). The hover/press clip shows one
+  Apple app cell (Calculator) unblurred.
+- **Limits**: the panel's AX tree is not reachable, so sizes are from pixels (±1-2 pt). Opening from a **Dock icon
+  was not captured**: there is no Apps tile in this Dock; a tile for `/System/Applications/Apps.app` was added
+  temporarily, but neither a synthetic click on it nor `open -a Apps` brought the panel up in this session (the Dock
+  was restored). "From the key" here is ⌘Space then ⌘1. Trackpad scrolling by hand was not recorded (the scroll clip
+  uses synthetic pixel-wheel and line-wheel events).
+- **Geometry at rest** (window 174,295 844x617; values relative to the window's top-left):
+  - bar 520x86 centred (x 162..682, y 0..86), panel starts 11 pt below it and is the full 844 pt wide;
+  - **category chips** row at y ≈ 128: Utilities, Developer Tools, Social, Productivity, Entertainment, Creativity,
+    Information & Reading, … (scrolls sideways, last chip cut off at the right edge); chips are small capsules with
+    11 pt text;
+  - **7 columns**, icon centres x ≈ 76, 191, 304, 419, 532, 646, 761 (**pitch ≈ 114 pt**); icons **≈ 64 pt**; label
+    one line, centred, about 11 pt, its centre ≈ 47 pt below the icon centre, long names truncated with "…";
+  - first row (y ≈ 197) is a row of **recent/suggested apps** with a hairline separator under it (y ≈ 263); the
+    alphabetical grid follows with rows at y ≈ 314, 414, 515, 614 (**row pitch ≈ 100 pt**); it **scrolls vertically**
+    (no pages), the bottom row is clipped by the panel edge.
+  - Background: glass over the wallpaper (dark blue tint in dark mode over Tahoe Dark, lighter blue-grey in light
+    mode over Tahoe Light), with a rim like the bar's.
+- **Search**: typing filters the grid in place ("cal" → Calculator, Calendar, left-aligned from the first column);
+  the bar shows the query with the inline completion ("cal — Open" with the completion highlighted); the chip row
+  disappears while a query is typed (`apps-typed-cal-*`).
+- **Open / close** (light clip, epoch-based key times on the recorder clock):
+
+| key | time | what |
+|---|---|---|
+| ⌘Space | 1.139 s | bar appears from 1.350 to 1.450 s (starts ≈ 210 ms after the key, ≈ 100 ms long) |
+| ⌘1 | 2.521 s | bar switches to "Applications" and moves 54 pt up; the grid panel grows in from **2.917 to 3.133 s (≈ 215 ms**, starting ≈ 400 ms after the key) |
+| Escape | 4.906 s | the grid panel goes away from 5.083 to 5.300 s (≈ 215 ms), leaving the plain bar |
+| Escape | 6.303 s | the bar goes away from 6.483 to 6.550 s (≈ 70 ms) |
+
+  The dark open/close clip stopped early (92 frames); use the light one for timing.
+- **Hover and press**, **scroll**: clips only; they were not analysed per frame in this round. In the press clip the
+  mouse goes down on Calculator for 0.9 s and is released on it, which launches the app (it was quit again).
