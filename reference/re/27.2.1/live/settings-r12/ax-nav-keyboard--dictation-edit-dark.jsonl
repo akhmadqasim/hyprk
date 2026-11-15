@@ -1,0 +1,562 @@
+{"depth": 0, "frame": [350, 150, 740, 625], "identifier": "Main", "path": "0", "role": "AXWindow", "subrole": "AXStandardWindow", "title": "Keyboard"}
+{"depth": 1, "frame": [350, 150, 740, 625], "path": "0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 2, "frame": [350, 150, 740, 625], "identifier": "Main, SidebarNavigationSplitView", "path": "0/0/0", "role": "AXSplitGroup"}
+{"depth": 3, "frame": [350, 150, 232, 625], "path": "0/0/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"contentSize": [232, 1234], "depth": 4, "frame": [350, 248, 232, 527], "path": "0/0/0/0/0", "role": "AXScrollArea"}
+{"depth": 5, "description": "Sidebar", "enabled": true, "frame": [350, 248, 232, 527], "identifier": "com.apple.settings.sidebar.collectionView", "path": "0/0/0/0/0/0", "role": "AXOutline"}
+{"depth": 6, "frame": [350, 248, 232, 0], "path": "0/0/0/0/0/0/0", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 248, 212, 0], "path": "0/0/0/0/0/0/0/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 248, 216, 0], "path": "0/0/0/0/0/0/0/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 248, 232, 46], "path": "0/0/0/0/0/0/1", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 248, 212, 46], "path": "0/0/0/0/0/0/1/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [366, 252, 141.5, 38], "identifier": "[redacted]", "path": "0/0/0/0/0/0/1/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 294, 232, 32], "path": "0/0/0/0/0/0/2", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 294, 212, 32], "path": "0/0/0/0/0/0/2/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [367, 299.5, 80, 21], "identifier": "[redacted]", "path": "0/0/0/0/0/0/2/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 339, 232, 0], "path": "0/0/0/0/0/0/3", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 339, 212, 0], "path": "0/0/0/0/0/0/3/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 339, 216, 0], "path": "0/0/0/0/0/0/3/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 339, 232, 32], "path": "0/0/0/0/0/0/4", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 339, 212, 32], "path": "0/0/0/0/0/0/4/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Wi-Fi", "enabled": true, "frame": [367, 343, 61.5, 24], "identifier": "com.apple.settings.wifi", "path": "0/0/0/0/0/0/4/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 371, 232, 32], "path": "0/0/0/0/0/0/5", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 371, 212, 32], "path": "0/0/0/0/0/0/5/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Bluetooth", "enabled": true, "frame": [367, 375, 88, 24], "identifier": "com.apple.settings.bluetooth", "path": "0/0/0/0/0/0/5/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 403, 232, 32], "path": "0/0/0/0/0/0/6", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 403, 212, 32], "path": "0/0/0/0/0/0/6/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Network", "enabled": true, "frame": [367, 407, 80, 24], "identifier": "com.apple.settings.network", "path": "0/0/0/0/0/0/6/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 435, 232, 32], "path": "0/0/0/0/0/0/7", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 435, 212, 32], "path": "0/0/0/0/0/0/7/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "VPN", "enabled": true, "frame": [367, 439, 55.5, 24], "identifier": "com.apple.settings.vpn", "path": "0/0/0/0/0/0/7/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 467, 232, 32], "path": "0/0/0/0/0/0/8", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 467, 212, 32], "path": "0/0/0/0/0/0/8/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Battery", "enabled": true, "frame": [367, 471, 73.5, 24], "identifier": "com.apple.settings.battery", "path": "0/0/0/0/0/0/8/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 512, 232, 0], "path": "0/0/0/0/0/0/9", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 512, 212, 0], "path": "0/0/0/0/0/0/9/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 512, 216, 0], "path": "0/0/0/0/0/0/9/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 512, 232, 32], "path": "0/0/0/0/0/0/10", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 512, 212, 32], "path": "0/0/0/0/0/0/10/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "General", "enabled": true, "frame": [367, 516, 76.5, 24], "identifier": "com.apple.settings.general", "path": "0/0/0/0/0/0/10/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 544, 232, 32], "path": "0/0/0/0/0/0/11", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 544, 212, 32], "path": "0/0/0/0/0/0/11/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Accessibility", "enabled": true, "frame": [367, 548, 105, 24], "identifier": "com.apple.settings.accessibility", "path": "0/0/0/0/0/0/11/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 576, 232, 32], "path": "0/0/0/0/0/0/12", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 576, 212, 32], "path": "0/0/0/0/0/0/12/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Appearance", "enabled": true, "frame": [367, 580, 102, 24], "identifier": "com.apple.settings.appearance", "path": "0/0/0/0/0/0/12/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 608, 232, 32], "path": "0/0/0/0/0/0/13", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 608, 212, 32], "path": "0/0/0/0/0/0/13/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Desktop & Dock", "enabled": true, "frame": [367, 612, 127, 24], "identifier": "com.apple.settings.desktopAndDock", "path": "0/0/0/0/0/0/13/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 640, 232, 32], "path": "0/0/0/0/0/0/14", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 640, 212, 32], "path": "0/0/0/0/0/0/14/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Displays", "enabled": true, "frame": [367, 644, 80, 24], "identifier": "com.apple.settings.displayAndBrightness", "path": "0/0/0/0/0/0/14/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 672, 232, 32], "path": "0/0/0/0/0/0/15", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 672, 212, 32], "path": "0/0/0/0/0/0/15/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Menu Bar", "enabled": true, "frame": [367, 676, 87, 24], "identifier": "com.apple.settings.controlCenter", "path": "0/0/0/0/0/0/15/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 704, 232, 32], "path": "0/0/0/0/0/0/16", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 704, 212, 32], "path": "0/0/0/0/0/0/16/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Siri", "enabled": true, "frame": [367, 708, 48.5, 24], "identifier": "com.apple.settings.siri", "path": "0/0/0/0/0/0/16/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 736, 232, 32], "path": "0/0/0/0/0/0/17", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 736, 212, 32], "path": "0/0/0/0/0/0/17/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Spotlight", "enabled": true, "frame": [367, 740, 84, 24], "identifier": "com.apple.settings.search", "path": "0/0/0/0/0/0/17/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 768, 232, 32], "path": "0/0/0/0/0/0/18", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 768, 212, 32], "path": "0/0/0/0/0/0/18/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Wallpaper", "enabled": true, "frame": [367, 772, 89.5, 24], "identifier": "com.apple.settings.wallpaper", "path": "0/0/0/0/0/0/18/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 813, 232, 19], "path": "0/0/0/0/0/0/19", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 813, 212, 19], "path": "0/0/0/0/0/0/19/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 813, 216, 0], "path": "0/0/0/0/0/0/19/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 813, 232, 32], "path": "0/0/0/0/0/0/20", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 813, 212, 32], "path": "0/0/0/0/0/0/20/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Notifications", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "com.apple.settings.notifications", "path": "0/0/0/0/0/0/20/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 864, 232, 32], "path": "0/0/0/0/0/0/21", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 864, 212, 32], "path": "0/0/0/0/0/0/21/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Sound", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "com.apple.settings.sounds", "path": "0/0/0/0/0/0/21/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 896, 232, 32], "path": "0/0/0/0/0/0/22", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 896, 212, 32], "path": "0/0/0/0/0/0/22/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Focus", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "com.apple.settings.focus", "path": "0/0/0/0/0/0/22/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 928, 232, 32], "path": "0/0/0/0/0/0/23", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 928, 212, 32], "path": "0/0/0/0/0/0/23/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Screen Time", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "com.apple.settings.screenTime", "path": "0/0/0/0/0/0/23/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 973, 232, 19], "path": "0/0/0/0/0/0/24", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 973, 212, 19], "path": "0/0/0/0/0/0/24/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 973, 216, 0], "path": "0/0/0/0/0/0/24/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 973, 232, 32], "path": "0/0/0/0/0/0/25", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 973, 212, 32], "path": "0/0/0/0/0/0/25/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Lock Screen", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "com.apple.settings.lockScreen", "path": "0/0/0/0/0/0/25/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1005, 232, 32], "path": "0/0/0/0/0/0/26", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1005, 212, 32], "path": "0/0/0/0/0/0/26/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Privacy & Security", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "com.apple.settings.privacyAndSecurity", "path": "0/0/0/0/0/0/26/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1037, 232, 32], "path": "0/0/0/0/0/0/27", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1037, 212, 32], "path": "0/0/0/0/0/0/27/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Touch ID & Password", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "com.apple.settings.passcodeAndBiometrics", "path": "0/0/0/0/0/0/27/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1088, 232, 32], "path": "0/0/0/0/0/0/28", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1088, 212, 32], "path": "0/0/0/0/0/0/28/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Users & Groups", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "com.apple.settings.usersAndGroups", "path": "0/0/0/0/0/0/28/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1133, 232, 19], "path": "0/0/0/0/0/0/29", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1133, 212, 19], "path": "0/0/0/0/0/0/29/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 1133, 216, 19], "path": "0/0/0/0/0/0/29/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 1152, 232, 32], "path": "0/0/0/0/0/0/30", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1152, 212, 32], "path": "0/0/0/0/0/0/30/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Game Center", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "com.apple.settings.gameCenter", "path": "0/0/0/0/0/0/30/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1184, 232, 32], "path": "0/0/0/0/0/0/31", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1184, 212, 32], "path": "0/0/0/0/0/0/31/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "iCloud", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "com.apple.settings.iCloud", "path": "0/0/0/0/0/0/31/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1216, 232, 32], "path": "0/0/0/0/0/0/32", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1216, 212, 32], "path": "0/0/0/0/0/0/32/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Internet Accounts", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "com.apple.settings.internetAccounts", "path": "0/0/0/0/0/0/32/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1248, 232, 32], "path": "0/0/0/0/0/0/33", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1248, 212, 32], "path": "0/0/0/0/0/0/33/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Wallet & Apple Pay", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "com.apple.settings.walletAndApplePay", "path": "0/0/0/0/0/0/33/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1293, 232, 19], "path": "0/0/0/0/0/0/34", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1293, 212, 19], "path": "0/0/0/0/0/0/34/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 1312, 216, 0], "path": "0/0/0/0/0/0/34/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 1312, 232, 32], "path": "0/0/0/0/0/0/35", "role": "AXRow", "selected": true, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1312, 212, 32], "path": "0/0/0/0/0/0/35/0", "role": "AXCell", "selected": true}
+{"depth": 8, "description": "Keyboard", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "com.apple.settings.keyboard", "path": "0/0/0/0/0/0/35/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1344, 232, 32], "path": "0/0/0/0/0/0/36", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1344, 212, 32], "path": "0/0/0/0/0/0/36/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Trackpad", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "com.apple.settings.trackpad", "path": "0/0/0/0/0/0/36/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1376, 232, 32], "path": "0/0/0/0/0/0/37", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1376, 212, 32], "path": "0/0/0/0/0/0/37/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Printers & Scanners", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "com.apple.settings.printerAndScanner", "path": "0/0/0/0/0/0/37/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1421, 232, 19], "path": "0/0/0/0/0/0/38", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1421, 212, 19], "path": "0/0/0/0/0/0/38/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 1440, 216, 0], "path": "0/0/0/0/0/0/38/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 1440, 232, 32], "path": "0/0/0/0/0/0/39", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1440, 212, 32], "path": "0/0/0/0/0/0/39/0", "role": "AXCell", "selected": false}
+{"depth": 8, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "org.gpgtools.gpgpreferences", "path": "0/0/0/0/0/0/39/0/0", "role": "AXButton"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/0/0/0/0/0/39/0/0/0", "role": "AXStaticText", "value": "GPG Suite"}
+{"depth": 6, "frame": [360, 248, 212, 1234], "identifier": "ListColumn", "path": "0/0/0/0/0/0/40", "role": "AXColumn", "selected": false}
+{"depth": 5, "enabled": true, "frame": [564, 247, 19, 529], "path": "0/0/0/0/0/1", "role": "AXScrollBar", "value": 0}
+{"depth": 6, "frame": [573, 251, 6, 244], "path": "0/0/0/0/0/1/0", "role": "AXValueIndicator", "value": 0}
+{"depth": 6, "frame": [565, 248, 0, 0], "path": "0/0/0/0/0/1/1", "role": "AXButton", "subrole": "AXIncrementArrow"}
+{"depth": 6, "frame": [565, 248, 0, 0], "path": "0/0/0/0/0/1/2", "role": "AXButton", "subrole": "AXDecrementArrow"}
+{"depth": 6, "frame": [573, 495.5, 6, 276.5], "path": "0/0/0/0/0/1/3", "role": "AXButton", "subrole": "AXIncrementPage"}
+{"depth": 6, "frame": [573, 251, 6, 0], "path": "0/0/0/0/0/1/4", "role": "AXButton", "subrole": "AXDecrementPage"}
+{"depth": 3, "frame": [360, 211, 212, 28], "path": "0/0/0/1", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 4, "enabled": true, "frame": [360, 211, 212, 28], "path": "0/0/0/1/0", "placeholder": "Search", "role": "AXTextField", "subrole": "AXSearchField", "value": ""}
+{"depth": 5, "description": "Search", "enabled": true, "frame": [363, 211.5, 25, 28], "path": "0/0/0/1/0/0", "role": "AXButton", "title": ""}
+{"contentSize": [0, 0], "depth": 3, "enabled": false, "frame": [581.5, 202, 0.5, 573], "path": "0/0/0/2", "role": "AXSplitter", "selected": false, "value": 231.5}
+{"depth": 3, "frame": [350, 150, 740, 625], "path": "0/0/0/3", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 4, "frame": [350, 150, 740, 625], "path": "0/0/0/3/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"contentSize": [740, 876.5], "depth": 5, "frame": [582, 202, 508, 573], "path": "0/0/0/3/0/0", "role": "AXScrollArea"}
+{"depth": 6, "enabled": true, "frame": [602, 214, 468, 75], "path": "0/0/0/3/0/0/0", "role": "AXGroup"}
+{"depth": 7, "description": "Key repeat rate", "enabled": true, "frame": [612, 248, 214, 16], "path": "0/0/0/3/0/0/0/0", "role": "AXSlider", "value": 6}
+{"depth": 8, "enabled": true, "frame": [778.5, 248, 20, 16], "path": "0/0/0/3/0/0/0/0/0", "role": "AXValueIndicator"}
+{"depth": 7, "description": "Delay until repeat", "enabled": true, "frame": [846, 248, 214, 16], "path": "0/0/0/3/0/0/0/1", "role": "AXSlider", "value": 4}
+{"depth": 8, "enabled": true, "frame": [962.5, 248, 20, 16], "path": "0/0/0/3/0/0/0/1/0", "role": "AXValueIndicator"}
+{"depth": 6, "enabled": true, "frame": [602, 299, 468, 262], "path": "0/0/0/3/0/0/1", "role": "AXGroup"}
+{"depth": 7, "enabled": true, "frame": [612, 309.075439453125, 234, 16], "path": "0/0/0/3/0/0/1/0", "role": "AXStaticText", "value": "Adjust keyboard brightness in low light"}
+{"depth": 7, "enabled": true, "frame": [1024, 309.5, 36, 16], "path": "0/0/0/3/0/0/1/1", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 7, "enabled": true, "frame": [612, 346.575439453125, 125.5, 16], "path": "0/0/0/3/0/0/1/2", "role": "AXStaticText", "value": "Keyboard brightness"}
+{"depth": 7, "description": "Reduce Brightness", "enabled": true, "frame": [815, 349, 19, 11], "path": "0/0/0/3/0/0/1/3", "role": "AXButton"}
+{"depth": 7, "enabled": true, "frame": [839.5, 346.5, 192.5, 16], "path": "0/0/0/3/0/0/1/4", "role": "AXSlider", "value": 0.4858057200908661}
+{"depth": 8, "enabled": true, "frame": [923.5, 346.5, 20, 16], "path": "0/0/0/3/0/0/1/4/0", "role": "AXValueIndicator"}
+{"depth": 7, "description": "Increase Brightness", "enabled": true, "frame": [1037.5, 349, 21, 11], "path": "0/0/0/3/0/0/1/5", "role": "AXButton"}
+{"depth": 7, "enabled": true, "frame": [612, 383.575439453125, 257, 16], "path": "0/0/0/3/0/0/1/6", "role": "AXStaticText", "value": "Turn keyboard backlight off after inactivity"}
+{"depth": 7, "enabled": true, "frame": [906.5, 380, 153.5, 24], "path": "0/0/0/3/0/0/1/7", "role": "AXPopUpButton", "value": "After 30 Seconds"}
+{"depth": 7, "enabled": true, "frame": [612, 421.825439453125, 93, 16], "path": "0/0/0/3/0/0/1/8", "role": "AXStaticText", "value": "Press 🌐︎ key to"}
+{"depth": 7, "enabled": true, "frame": [874.5, 418, 185.5, 24], "path": "0/0/0/3/0/0/1/9", "role": "AXPopUpButton", "value": "Show Emoji & Symbols"}
+{"depth": 7, "enabled": true, "frame": [612, 460.075439453125, 123.5, 16], "path": "0/0/0/3/0/0/1/10", "role": "AXStaticText", "value": "Keyboard navigation"}
+{"depth": 7, "enabled": true, "frame": [612, 478.075439453125, 402, 28], "path": "0/0/0/3/0/0/1/11", "role": "AXStaticText", "value": "Use keyboard navigation to move focus between controls. Press the Tab key to move focus forwards and Shift Tab to move focus backwards."}
+{"depth": 7, "enabled": true, "frame": [1024, 460.5, 36, 16], "path": "0/0/0/3/0/0/1/12", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 7, "description": "Keyboard Shortcuts…", "enabled": true, "frame": [905.5, 527, 154.5, 24], "path": "0/0/0/3/0/0/1/13", "role": "AXButton"}
+{"depth": 6, "description": "Text Input", "enabled": true, "frame": [612, 591.075439453125, 63, 16], "path": "0/0/0/3/0/0/2", "role": "AXHeading"}
+{"depth": 6, "enabled": true, "frame": [602, 617, 468, 89], "path": "0/0/0/3/0/0/3", "role": "AXGroup"}
+{"depth": 7, "enabled": true, "frame": [612, 631.075439453125, 84, 16], "path": "0/0/0/3/0/0/3/0", "role": "AXStaticText", "value": "Input Sources"}
+{"depth": 7, "enabled": true, "frame": [967.5, 631.075439453125, 26.5, 16], "path": "0/0/0/3/0/0/3/1", "role": "AXStaticText", "value": "ABC"}
+{"depth": 7, "description": "Edit…", "enabled": true, "frame": [1002, 627, 58, 24], "path": "0/0/0/3/0/0/3/2", "role": "AXButton"}
+{"depth": 7, "description": "Text Replacements…", "enabled": true, "frame": [911, 672, 149, 24], "path": "0/0/0/3/0/0/3/3", "role": "AXButton"}
+{"depth": 6, "description": "Dictation", "enabled": true, "frame": [612, 736.075439453125, 57.5, 16], "path": "0/0/0/3/0/0/4", "role": "AXHeading"}
+{"depth": 6, "enabled": true, "frame": [602, 762, 468, 252.5], "path": "0/0/0/3/0/0/5", "role": "AXGroup"}
+{"depth": 7, "description": "Microphone", "enabled": true, "frame": [615, 775.5, 15, 22], "identifier": "mic.fill", "path": "0/0/0/3/0/0/5/0", "role": "AXImage"}
+{"depth": 7, "enabled": true, "frame": [639.5, 772.075439453125, 374.5, 26], "path": "0/0/0/3/0/0/5/1", "role": "AXStaticText", "value": "Use Dictation wherever you can type text. To start dictating, use the shortcut or select Start Dictation from the Edit menu."}
+{"depth": 7, "enabled": true, "frame": [639.5, 806.075439453125, 369.5, 26], "path": "0/0/0/3/0/0/5/2", "role": "AXStaticText", "value": "Dictation processes many voice inputs on your Mac. Information will be sent to Apple in some cases."}
+{"depth": 7, "enabled": true, "frame": [1024, 769.5, 36, 16], "path": "0/0/0/3/0/0/5/3", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 7, "enabled": true, "frame": [612, 857.075439453125, 66.5, 16], "path": "0/0/0/3/0/0/5/4", "role": "AXStaticText", "value": "Languages"}
+{"depth": 7, "enabled": true, "frame": [711.5, 857.075439453125, 282.5, 16], "path": "0/0/0/3/0/0/5/5", "role": "AXStaticText", "value": "English ([redacted]) and [redacted]n ([redacted])"}
+{"depth": 7, "description": "Edit…", "enabled": true, "frame": [1002, 853, 58, 24], "path": "0/0/0/3/0/0/5/6", "role": "AXButton"}
+{"depth": 7, "enabled": true, "frame": [612, 898.075439453125, 116.5, 16], "path": "0/0/0/3/0/0/5/7", "role": "AXStaticText", "value": "Microphone source"}
+{"depth": 7, "enabled": true, "frame": [785.5, 894.5, 274.5, 24], "path": "0/0/0/3/0/0/5/8", "role": "AXPopUpButton", "value": "Automatic (MacBook Air Microphone)"}
+{"depth": 7, "enabled": true, "frame": [612, 939.325439453125, 52.5, 16], "path": "0/0/0/3/0/0/5/9", "role": "AXStaticText", "value": "Shortcut"}
+{"depth": 7, "enabled": true, "frame": [962, 935.5, 98, 24], "path": "0/0/0/3/0/0/5/10", "role": "AXPopUpButton", "value": "Press 🎤︎"}
+{"depth": 7, "description": "About Ask Siri, Dictation & Privacy…", "enabled": true, "frame": [819, 980.5, 241, 24], "path": "0/0/0/3/0/0/5/11", "role": "AXButton"}
+{"depth": 6, "description": "Set Up Keyboard…", "enabled": true, "frame": [901, 1034.5, 137, 24], "path": "0/0/0/3/0/0/6", "role": "AXButton"}
+{"depth": 6, "description": "Help", "enabled": true, "frame": [1046, 1034.5, 24, 24], "path": "0/0/0/3/0/0/7", "role": "AXButton"}
+{"depth": 6, "enabled": true, "frame": [1072, 201, 19, 575], "path": "0/0/0/3/0/0/8", "role": "AXScrollBar", "value": 0}
+{"depth": 7, "frame": [1081, 205, 6, 381.5], "path": "0/0/0/3/0/0/8/0", "role": "AXValueIndicator", "value": 0}
+{"depth": 7, "frame": [1073, 202, 0, 0], "path": "0/0/0/3/0/0/8/1", "role": "AXButton", "subrole": "AXIncrementArrow"}
+{"depth": 7, "frame": [1073, 202, 0, 0], "path": "0/0/0/3/0/0/8/2", "role": "AXButton", "subrole": "AXDecrementArrow"}
+{"depth": 7, "frame": [1081, 587, 6, 185], "path": "0/0/0/3/0/0/8/3", "role": "AXButton", "subrole": "AXIncrementPage"}
+{"depth": 7, "frame": [1081, 205, 6, 0], "path": "0/0/0/3/0/0/8/4", "role": "AXButton", "subrole": "AXDecrementPage"}
+{"depth": 1, "frame": [350, 150, 740, 52], "path": "0/1", "role": "AXToolbar"}
+{"depth": 2, "frame": [586, 150, 81, 52], "path": "0/1/0", "role": "AXGroup"}
+{"depth": 3, "enabled": true, "frame": [590, 158, 73, 36], "path": "0/1/0/0", "role": "AXGroup"}
+{"depth": 4, "description": "Go Back", "enabled": true, "frame": [590, 158, 36, 36], "help": "Go Back", "identifier": "chevron.backward", "path": "0/1/0/0/0", "role": "AXButton", "subrole": "AXSegment"}
+{"depth": 4, "description": "Go Forward", "enabled": false, "frame": [626, 158, 37, 36], "help": "Go Forward", "identifier": "chevron.forward", "path": "0/1/0/0/1", "role": "AXMenuButton", "subrole": "AXSegment"}
+{"depth": 1, "enabled": false, "frame": [368, 168, 16, 16], "path": "0/2", "role": "AXButton", "subrole": "AXCloseButton"}
+{"depth": 1, "enabled": true, "frame": [414, 168, 16, 16], "path": "0/3", "role": "AXButton", "subrole": "AXZoomButton"}
+{"depth": 2, "frame": [415, 169, 14, 14], "path": "0/3/0", "role": "AXGroup"}
+{"depth": 1, "enabled": true, "frame": [391, 168, 16, 16], "path": "0/4", "role": "AXButton", "subrole": "AXMinimizeButton"}
+{"depth": 1, "enabled": true, "frame": [667, 150, 411, 52], "path": "0/5", "role": "AXStaticText", "value": "Keyboard"}
+{"depth": 1, "frame": [510, 261, 420, 403], "path": "0/6", "role": "AXSheet"}
+{"depth": 2, "enabled": false, "frame": [839, 619, 72, 26], "identifier": "_NS:26", "path": "0/6/0", "role": "AXButton", "title": "OK"}
+{"depth": 2, "enabled": true, "frame": [757, 619, 72, 26], "identifier": "_NS:118", "path": "0/6/1", "role": "AXButton", "title": "Cancel"}
+{"contentSize": [378, 2900], "depth": 2, "frame": [530, 313, 380, 277], "identifier": "_NS:125", "path": "0/6/2", "role": "AXScrollArea"}
+{"depth": 3, "description": "Voices", "enabled": true, "frame": [530, 313, 380, 2902], "identifier": "_NS:72", "path": "0/6/2/0", "role": "AXTable"}
+{"depth": 4, "frame": [531, 314, 378, 30], "path": "0/6/2/0/0", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 314, 378, 30], "path": "0/6/2/0/0/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 320, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/0/0/0", "role": "AXStaticText", "value": "English"}
+{"depth": 4, "frame": [531, 344, 378, 20], "path": "0/6/2/0/1", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 345, 366, 18], "path": "0/6/2/0/1/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 346, 55, 18], "identifier": "_NS:11", "path": "0/6/2/0/1/0/0", "role": "AXStaticText", "value": "Australia"}
+{"depth": 6, "enabled": true, "frame": [541, 346, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/1/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 364, 378, 20], "path": "0/6/2/0/2", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 365, 366, 18], "path": "0/6/2/0/2/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 366, 48, 18], "identifier": "_NS:11", "path": "0/6/2/0/2/0/0", "role": "AXStaticText", "value": "Canada"}
+{"depth": 6, "enabled": true, "frame": [541, 366, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/2/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 384, 378, 20], "path": "0/6/2/0/3", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 385, 366, 18], "path": "0/6/2/0/3/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 386, 31.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/3/0/0", "role": "AXStaticText", "value": "India"}
+{"depth": 6, "enabled": true, "frame": [541, 386, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/3/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 404, 378, 20], "path": "0/6/2/0/4", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 405, 366, 18], "path": "0/6/2/0/4/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 406, 60.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/4/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 6, "enabled": true, "frame": [541, 406, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/4/0/1", "role": "AXCheckBox", "title": "", "value": 1}
+{"depth": 4, "frame": [531, 424, 378, 20], "path": "0/6/2/0/5", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 425, 366, 18], "path": "0/6/2/0/5/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 426, 43.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/5/0/0", "role": "AXStaticText", "value": "Ireland"}
+{"depth": 6, "enabled": true, "frame": [541, 426, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/5/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 444, 378, 20], "path": "0/6/2/0/6", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 445, 366, 18], "path": "0/6/2/0/6/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 446, 81.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/6/0/0", "role": "AXStaticText", "value": "New Zealand"}
+{"depth": 6, "enabled": true, "frame": [541, 446, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/6/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 464, 378, 20], "path": "0/6/2/0/7", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 465, 366, 18], "path": "0/6/2/0/7/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 466, 68, 18], "identifier": "_NS:11", "path": "0/6/2/0/7/0/0", "role": "AXStaticText", "value": "Philippines"}
+{"depth": 6, "enabled": true, "frame": [541, 466, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/7/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 484, 378, 20], "path": "0/6/2/0/8", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 485, 366, 18], "path": "0/6/2/0/8/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 486, 78.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/8/0/0", "role": "AXStaticText", "value": "Saudi Arabia"}
+{"depth": 6, "enabled": true, "frame": [541, 486, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/8/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 504, 378, 20], "path": "0/6/2/0/9", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 505, 366, 18], "path": "0/6/2/0/9/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 506, 63.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/9/0/0", "role": "AXStaticText", "value": "Singapore"}
+{"depth": 6, "enabled": true, "frame": [541, 506, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/9/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 524, 378, 20], "path": "0/6/2/0/10", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 525, 366, 18], "path": "0/6/2/0/10/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 526, 77, 18], "identifier": "_NS:11", "path": "0/6/2/0/10/0/0", "role": "AXStaticText", "value": "South Africa"}
+{"depth": 6, "enabled": true, "frame": [541, 526, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/10/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 544, 378, 20], "path": "0/6/2/0/11", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 545, 366, 18], "path": "0/6/2/0/11/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 546, 130.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/11/0/0", "role": "AXStaticText", "value": "United Arab Emirates"}
+{"depth": 6, "enabled": true, "frame": [541, 546, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/11/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 564, 378, 20], "path": "0/6/2/0/12", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 565, 366, 18], "path": "0/6/2/0/12/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 566, 99.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/12/0/0", "role": "AXStaticText", "value": "United Kingdom"}
+{"depth": 6, "enabled": true, "frame": [541, 566, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/12/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 584, 378, 20], "path": "0/6/2/0/13", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 585, 366, 18], "path": "0/6/2/0/13/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 586, 84.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/13/0/0", "role": "AXStaticText", "value": "United States"}
+{"depth": 6, "enabled": true, "frame": [541, 586, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/13/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 624, 378, 30], "path": "0/6/2/0/14", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 624, 378, 30], "path": "0/6/2/0/14/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 630, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/14/0/0", "role": "AXStaticText", "value": "Arabic"}
+{"depth": 4, "frame": [531, 654, 378, 20], "path": "0/6/2/0/15", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 655, 366, 18], "path": "0/6/2/0/15/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 656, 78.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/15/0/0", "role": "AXStaticText", "value": "Saudi Arabia"}
+{"depth": 6, "enabled": true, "frame": [541, 656, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/15/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 694, 378, 30], "path": "0/6/2/0/16", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 694, 378, 30], "path": "0/6/2/0/16/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 700, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/16/0/0", "role": "AXStaticText", "value": "Catalan"}
+{"depth": 4, "frame": [531, 724, 378, 20], "path": "0/6/2/0/17", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 725, 366, 18], "path": "0/6/2/0/17/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 726, 36, 18], "identifier": "_NS:11", "path": "0/6/2/0/17/0/0", "role": "AXStaticText", "value": "Spain"}
+{"depth": 6, "enabled": true, "frame": [541, 726, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/17/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 764, 378, 30], "path": "0/6/2/0/18", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 764, 378, 30], "path": "0/6/2/0/18/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 770, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/18/0/0", "role": "AXStaticText", "value": "Chinese (Cantonese)"}
+{"depth": 4, "frame": [531, 794, 378, 20], "path": "0/6/2/0/19", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 795, 366, 18], "path": "0/6/2/0/19/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 796, 95, 18], "identifier": "_NS:11", "path": "0/6/2/0/19/0/0", "role": "AXStaticText", "value": "China mainland"}
+{"depth": 6, "enabled": true, "frame": [541, 796, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/19/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 814, 378, 20], "path": "0/6/2/0/20", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 815, 366, 18], "path": "0/6/2/0/20/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 816, 69.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/20/0/0", "role": "AXStaticText", "value": "Hong Kong"}
+{"depth": 6, "enabled": true, "frame": [541, 816, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/20/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 854, 378, 30], "path": "0/6/2/0/21", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 854, 378, 30], "path": "0/6/2/0/21/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 860, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/21/0/0", "role": "AXStaticText", "value": "Chinese (Mandarin)"}
+{"depth": 4, "frame": [531, 884, 378, 20], "path": "0/6/2/0/22", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 885, 366, 18], "path": "0/6/2/0/22/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 886, 95, 18], "identifier": "_NS:11", "path": "0/6/2/0/22/0/0", "role": "AXStaticText", "value": "China mainland"}
+{"depth": 6, "enabled": true, "frame": [541, 886, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/22/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 904, 378, 20], "path": "0/6/2/0/23", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 905, 366, 18], "path": "0/6/2/0/23/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 906, 43.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/23/0/0", "role": "AXStaticText", "value": "Taiwan"}
+{"depth": 6, "enabled": true, "frame": [541, 906, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/23/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 944, 378, 30], "path": "0/6/2/0/24", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 944, 378, 30], "path": "0/6/2/0/24/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 950, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/24/0/0", "role": "AXStaticText", "value": "Chinese (Shanghainese)"}
+{"depth": 4, "frame": [531, 974, 378, 20], "path": "0/6/2/0/25", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 975, 366, 18], "path": "0/6/2/0/25/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 976, 95, 18], "identifier": "_NS:11", "path": "0/6/2/0/25/0/0", "role": "AXStaticText", "value": "China mainland"}
+{"depth": 6, "enabled": true, "frame": [541, 976, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/25/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1014, 378, 30], "path": "0/6/2/0/26", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 1014, 378, 30], "path": "0/6/2/0/26/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 1020, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/26/0/0", "role": "AXStaticText", "value": "Croatian"}
+{"depth": 4, "frame": [531, 1044, 378, 20], "path": "0/6/2/0/27", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1045, 366, 18], "path": "0/6/2/0/27/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1046, 45.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/27/0/0", "role": "AXStaticText", "value": "Croatia"}
+{"depth": 6, "enabled": true, "frame": [541, 1046, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/27/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1084, 378, 30], "path": "0/6/2/0/28", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 1084, 378, 30], "path": "0/6/2/0/28/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 1090, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/28/0/0", "role": "AXStaticText", "value": "Czech"}
+{"depth": 4, "frame": [531, 1114, 378, 20], "path": "0/6/2/0/29", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1115, 366, 18], "path": "0/6/2/0/29/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1116, 50.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/29/0/0", "role": "AXStaticText", "value": "Czechia"}
+{"depth": 6, "enabled": true, "frame": [541, 1116, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/29/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1154, 378, 30], "path": "0/6/2/0/30", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 1154, 378, 30], "path": "0/6/2/0/30/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 1160, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/30/0/0", "role": "AXStaticText", "value": "Danish"}
+{"depth": 4, "frame": [531, 1184, 378, 20], "path": "0/6/2/0/31", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1185, 366, 18], "path": "0/6/2/0/31/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1186, 56.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/31/0/0", "role": "AXStaticText", "value": "Denmark"}
+{"depth": 6, "enabled": true, "frame": [541, 1186, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/31/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1224, 378, 30], "path": "0/6/2/0/32", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 1224, 378, 30], "path": "0/6/2/0/32/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 1230, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/32/0/0", "role": "AXStaticText", "value": "Dutch"}
+{"depth": 4, "frame": [531, 1254, 378, 20], "path": "0/6/2/0/33", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1255, 366, 18], "path": "0/6/2/0/33/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1256, 51, 18], "identifier": "_NS:11", "path": "0/6/2/0/33/0/0", "role": "AXStaticText", "value": "Belgium"}
+{"depth": 6, "enabled": true, "frame": [541, 1256, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/33/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1274, 378, 20], "path": "0/6/2/0/34", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1275, 366, 18], "path": "0/6/2/0/34/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1276, 76, 18], "identifier": "_NS:11", "path": "0/6/2/0/34/0/0", "role": "AXStaticText", "value": "Netherlands"}
+{"depth": 6, "enabled": true, "frame": [541, 1276, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/34/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1314, 378, 30], "path": "0/6/2/0/35", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 1314, 378, 30], "path": "0/6/2/0/35/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 1320, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/35/0/0", "role": "AXStaticText", "value": "Finnish"}
+{"depth": 4, "frame": [531, 1344, 378, 20], "path": "0/6/2/0/36", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1345, 366, 18], "path": "0/6/2/0/36/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1346, 46, 18], "identifier": "_NS:11", "path": "0/6/2/0/36/0/0", "role": "AXStaticText", "value": "Finland"}
+{"depth": 6, "enabled": true, "frame": [541, 1346, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/36/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1384, 378, 30], "path": "0/6/2/0/37", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 1384, 378, 30], "path": "0/6/2/0/37/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 1390, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/37/0/0", "role": "AXStaticText", "value": "French"}
+{"depth": 4, "frame": [531, 1414, 378, 20], "path": "0/6/2/0/38", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1415, 366, 18], "path": "0/6/2/0/38/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1416, 51, 18], "identifier": "_NS:11", "path": "0/6/2/0/38/0/0", "role": "AXStaticText", "value": "Belgium"}
+{"depth": 6, "enabled": true, "frame": [541, 1416, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/38/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1434, 378, 20], "path": "0/6/2/0/39", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1435, 366, 18], "path": "0/6/2/0/39/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1436, 48, 18], "identifier": "_NS:11", "path": "0/6/2/0/39/0/0", "role": "AXStaticText", "value": "Canada"}
+{"depth": 6, "enabled": true, "frame": [541, 1436, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/39/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1454, 378, 20], "path": "0/6/2/0/40", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1455, 366, 18], "path": "0/6/2/0/40/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1456, 43.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/40/0/0", "role": "AXStaticText", "value": "France"}
+{"depth": 6, "enabled": true, "frame": [541, 1456, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/40/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1474, 378, 20], "path": "0/6/2/0/41", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1475, 366, 18], "path": "0/6/2/0/41/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1476, 73, 18], "identifier": "_NS:11", "path": "0/6/2/0/41/0/0", "role": "AXStaticText", "value": "Switzerland"}
+{"depth": 6, "enabled": true, "frame": [541, 1476, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/41/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1514, 378, 30], "path": "0/6/2/0/42", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 1514, 378, 30], "path": "0/6/2/0/42/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 1520, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/42/0/0", "role": "AXStaticText", "value": "German"}
+{"depth": 4, "frame": [531, 1544, 378, 20], "path": "0/6/2/0/43", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1545, 366, 18], "path": "0/6/2/0/43/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1546, 44.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/43/0/0", "role": "AXStaticText", "value": "Austria"}
+{"depth": 6, "enabled": true, "frame": [541, 1546, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/43/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1564, 378, 20], "path": "0/6/2/0/44", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1565, 366, 18], "path": "0/6/2/0/44/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1566, 57, 18], "identifier": "_NS:11", "path": "0/6/2/0/44/0/0", "role": "AXStaticText", "value": "Germany"}
+{"depth": 6, "enabled": true, "frame": [541, 1566, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/44/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1584, 378, 20], "path": "0/6/2/0/45", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1585, 366, 18], "path": "0/6/2/0/45/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1586, 73, 18], "identifier": "_NS:11", "path": "0/6/2/0/45/0/0", "role": "AXStaticText", "value": "Switzerland"}
+{"depth": 6, "enabled": true, "frame": [541, 1586, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/45/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1624, 378, 30], "path": "0/6/2/0/46", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 1624, 378, 30], "path": "0/6/2/0/46/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 1630, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/46/0/0", "role": "AXStaticText", "value": "Greek"}
+{"depth": 4, "frame": [531, 1654, 378, 20], "path": "0/6/2/0/47", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1655, 366, 18], "path": "0/6/2/0/47/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1656, 46, 18], "identifier": "_NS:11", "path": "0/6/2/0/47/0/0", "role": "AXStaticText", "value": "Greece"}
+{"depth": 6, "enabled": true, "frame": [541, 1656, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/47/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1694, 378, 30], "path": "0/6/2/0/48", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 1694, 378, 30], "path": "0/6/2/0/48/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 1700, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/48/0/0", "role": "AXStaticText", "value": "Hebrew"}
+{"depth": 4, "frame": [531, 1724, 378, 20], "path": "0/6/2/0/49", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1725, 366, 18], "path": "0/6/2/0/49/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1726, 35, 18], "identifier": "_NS:11", "path": "0/6/2/0/49/0/0", "role": "AXStaticText", "value": "Israel"}
+{"depth": 6, "enabled": true, "frame": [541, 1726, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/49/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1764, 378, 30], "path": "0/6/2/0/50", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 1764, 378, 30], "path": "0/6/2/0/50/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 1770, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/50/0/0", "role": "AXStaticText", "value": "Hindi"}
+{"depth": 4, "frame": [531, 1794, 378, 20], "path": "0/6/2/0/51", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1795, 366, 18], "path": "0/6/2/0/51/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1796, 31.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/51/0/0", "role": "AXStaticText", "value": "India"}
+{"depth": 6, "enabled": true, "frame": [541, 1796, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/51/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1834, 378, 30], "path": "0/6/2/0/52", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 1834, 378, 30], "path": "0/6/2/0/52/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 1840, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/52/0/0", "role": "AXStaticText", "value": "Hungarian"}
+{"depth": 4, "frame": [531, 1864, 378, 20], "path": "0/6/2/0/53", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1865, 366, 18], "path": "0/6/2/0/53/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1866, 53.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/53/0/0", "role": "AXStaticText", "value": "Hungary"}
+{"depth": 6, "enabled": true, "frame": [541, 1866, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/53/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 1904, 378, 30], "path": "0/6/2/0/54", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 1904, 378, 30], "path": "0/6/2/0/54/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 1910, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/54/0/0", "role": "AXStaticText", "value": "[redacted]n"}
+{"depth": 4, "frame": [531, 1934, 378, 20], "path": "0/6/2/0/55", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 1935, 366, 18], "path": "0/6/2/0/55/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 1936, 60.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/55/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 6, "enabled": true, "frame": [541, 1936, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/55/0/1", "role": "AXCheckBox", "title": "", "value": 1}
+{"depth": 4, "frame": [531, 1974, 378, 30], "path": "0/6/2/0/56", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 1974, 378, 30], "path": "0/6/2/0/56/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 1980, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/56/0/0", "role": "AXStaticText", "value": "Italian"}
+{"depth": 4, "frame": [531, 2004, 378, 20], "path": "0/6/2/0/57", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2005, 366, 18], "path": "0/6/2/0/57/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2006, 27.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/57/0/0", "role": "AXStaticText", "value": "Italy"}
+{"depth": 6, "enabled": true, "frame": [541, 2006, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/57/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2024, 378, 20], "path": "0/6/2/0/58", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2025, 366, 18], "path": "0/6/2/0/58/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2026, 73, 18], "identifier": "_NS:11", "path": "0/6/2/0/58/0/0", "role": "AXStaticText", "value": "Switzerland"}
+{"depth": 6, "enabled": true, "frame": [541, 2026, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/58/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2064, 378, 30], "path": "0/6/2/0/59", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 2064, 378, 30], "path": "0/6/2/0/59/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 2070, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/59/0/0", "role": "AXStaticText", "value": "Japanese"}
+{"depth": 4, "frame": [531, 2094, 378, 20], "path": "0/6/2/0/60", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2095, 366, 18], "path": "0/6/2/0/60/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2096, 38.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/60/0/0", "role": "AXStaticText", "value": "Japan"}
+{"depth": 6, "enabled": true, "frame": [541, 2096, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/60/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2134, 378, 30], "path": "0/6/2/0/61", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 2134, 378, 30], "path": "0/6/2/0/61/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 2140, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/61/0/0", "role": "AXStaticText", "value": "Korean"}
+{"depth": 4, "frame": [531, 2164, 378, 20], "path": "0/6/2/0/62", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2165, 366, 18], "path": "0/6/2/0/62/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2166, 76, 18], "identifier": "_NS:11", "path": "0/6/2/0/62/0/0", "role": "AXStaticText", "value": "South Korea"}
+{"depth": 6, "enabled": true, "frame": [541, 2166, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/62/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2204, 378, 30], "path": "0/6/2/0/63", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 2204, 378, 30], "path": "0/6/2/0/63/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 2210, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/63/0/0", "role": "AXStaticText", "value": "Malay"}
+{"depth": 4, "frame": [531, 2234, 378, 20], "path": "0/6/2/0/64", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2235, 366, 18], "path": "0/6/2/0/64/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2236, 54.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/64/0/0", "role": "AXStaticText", "value": "Malaysia"}
+{"depth": 6, "enabled": true, "frame": [541, 2236, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/64/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2274, 378, 30], "path": "0/6/2/0/65", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 2274, 378, 30], "path": "0/6/2/0/65/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 2280, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/65/0/0", "role": "AXStaticText", "value": "Norwegian Bokmål"}
+{"depth": 4, "frame": [531, 2304, 378, 20], "path": "0/6/2/0/66", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2305, 366, 18], "path": "0/6/2/0/66/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2306, 48, 18], "identifier": "_NS:11", "path": "0/6/2/0/66/0/0", "role": "AXStaticText", "value": "Norway"}
+{"depth": 6, "enabled": true, "frame": [541, 2306, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/66/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2344, 378, 30], "path": "0/6/2/0/67", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 2344, 378, 30], "path": "0/6/2/0/67/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 2350, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/67/0/0", "role": "AXStaticText", "value": "Polish"}
+{"depth": 4, "frame": [531, 2374, 378, 20], "path": "0/6/2/0/68", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2375, 366, 18], "path": "0/6/2/0/68/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2376, 43.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/68/0/0", "role": "AXStaticText", "value": "Poland"}
+{"depth": 6, "enabled": true, "frame": [541, 2376, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/68/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2414, 378, 30], "path": "0/6/2/0/69", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 2414, 378, 30], "path": "0/6/2/0/69/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 2420, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/69/0/0", "role": "AXStaticText", "value": "Portuguese"}
+{"depth": 4, "frame": [531, 2444, 378, 20], "path": "0/6/2/0/70", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2445, 366, 18], "path": "0/6/2/0/70/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2446, 36, 18], "identifier": "_NS:11", "path": "0/6/2/0/70/0/0", "role": "AXStaticText", "value": "Brazil"}
+{"depth": 6, "enabled": true, "frame": [541, 2446, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/70/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2464, 378, 20], "path": "0/6/2/0/71", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2465, 366, 18], "path": "0/6/2/0/71/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2466, 53, 18], "identifier": "_NS:11", "path": "0/6/2/0/71/0/0", "role": "AXStaticText", "value": "Portugal"}
+{"depth": 6, "enabled": true, "frame": [541, 2466, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/71/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2504, 378, 30], "path": "0/6/2/0/72", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 2504, 378, 30], "path": "0/6/2/0/72/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 2510, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/72/0/0", "role": "AXStaticText", "value": "Romanian"}
+{"depth": 4, "frame": [531, 2534, 378, 20], "path": "0/6/2/0/73", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2535, 366, 18], "path": "0/6/2/0/73/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2536, 54, 18], "identifier": "_NS:11", "path": "0/6/2/0/73/0/0", "role": "AXStaticText", "value": "Romania"}
+{"depth": 6, "enabled": true, "frame": [541, 2536, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/73/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2574, 378, 30], "path": "0/6/2/0/74", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 2574, 378, 30], "path": "0/6/2/0/74/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 2580, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/74/0/0", "role": "AXStaticText", "value": "Russian"}
+{"depth": 4, "frame": [531, 2604, 378, 20], "path": "0/6/2/0/75", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2605, 366, 18], "path": "0/6/2/0/75/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2606, 41.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/75/0/0", "role": "AXStaticText", "value": "Russia"}
+{"depth": 6, "enabled": true, "frame": [541, 2606, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/75/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2644, 378, 30], "path": "0/6/2/0/76", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 2644, 378, 30], "path": "0/6/2/0/76/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 2650, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/76/0/0", "role": "AXStaticText", "value": "Slovak"}
+{"depth": 4, "frame": [531, 2674, 378, 20], "path": "0/6/2/0/77", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2675, 366, 18], "path": "0/6/2/0/77/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2676, 52, 18], "identifier": "_NS:11", "path": "0/6/2/0/77/0/0", "role": "AXStaticText", "value": "Slovakia"}
+{"depth": 6, "enabled": true, "frame": [541, 2676, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/77/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2714, 378, 30], "path": "0/6/2/0/78", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 2714, 378, 30], "path": "0/6/2/0/78/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 2720, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/78/0/0", "role": "AXStaticText", "value": "Spanish"}
+{"depth": 4, "frame": [531, 2744, 378, 20], "path": "0/6/2/0/79", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2745, 366, 18], "path": "0/6/2/0/79/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2746, 33, 18], "identifier": "_NS:11", "path": "0/6/2/0/79/0/0", "role": "AXStaticText", "value": "Chile"}
+{"depth": 6, "enabled": true, "frame": [541, 2746, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/79/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2764, 378, 20], "path": "0/6/2/0/80", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2765, 366, 18], "path": "0/6/2/0/80/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2766, 59.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/80/0/0", "role": "AXStaticText", "value": "Colombia"}
+{"depth": 6, "enabled": true, "frame": [541, 2766, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/80/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2784, 378, 20], "path": "0/6/2/0/81", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2785, 366, 18], "path": "0/6/2/0/81/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2786, 85, 18], "identifier": "_NS:11", "path": "0/6/2/0/81/0/0", "role": "AXStaticText", "value": "Latin America"}
+{"depth": 6, "enabled": true, "frame": [541, 2786, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/81/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2804, 378, 20], "path": "0/6/2/0/82", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2805, 366, 18], "path": "0/6/2/0/82/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2806, 45.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/82/0/0", "role": "AXStaticText", "value": "Mexico"}
+{"depth": 6, "enabled": true, "frame": [541, 2806, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/82/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2824, 378, 20], "path": "0/6/2/0/83", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2825, 366, 18], "path": "0/6/2/0/83/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2826, 36, 18], "identifier": "_NS:11", "path": "0/6/2/0/83/0/0", "role": "AXStaticText", "value": "Spain"}
+{"depth": 6, "enabled": true, "frame": [541, 2826, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/83/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2844, 378, 20], "path": "0/6/2/0/84", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2845, 366, 18], "path": "0/6/2/0/84/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2846, 84.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/84/0/0", "role": "AXStaticText", "value": "United States"}
+{"depth": 6, "enabled": true, "frame": [541, 2846, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/84/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2884, 378, 30], "path": "0/6/2/0/85", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 2884, 378, 30], "path": "0/6/2/0/85/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 2890, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/85/0/0", "role": "AXStaticText", "value": "Swedish"}
+{"depth": 4, "frame": [531, 2914, 378, 20], "path": "0/6/2/0/86", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2915, 366, 18], "path": "0/6/2/0/86/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2916, 50.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/86/0/0", "role": "AXStaticText", "value": "Sweden"}
+{"depth": 6, "enabled": true, "frame": [541, 2916, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/86/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 2954, 378, 30], "path": "0/6/2/0/87", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 2954, 378, 30], "path": "0/6/2/0/87/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 2960, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/87/0/0", "role": "AXStaticText", "value": "Thai"}
+{"depth": 4, "frame": [531, 2984, 378, 20], "path": "0/6/2/0/88", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 2985, 366, 18], "path": "0/6/2/0/88/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 2986, 54, 18], "identifier": "_NS:11", "path": "0/6/2/0/88/0/0", "role": "AXStaticText", "value": "Thailand"}
+{"depth": 6, "enabled": true, "frame": [541, 2986, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/88/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 3024, 378, 30], "path": "0/6/2/0/89", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 3024, 378, 30], "path": "0/6/2/0/89/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 3030, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/89/0/0", "role": "AXStaticText", "value": "Turkish"}
+{"depth": 4, "frame": [531, 3054, 378, 20], "path": "0/6/2/0/90", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 3055, 366, 18], "path": "0/6/2/0/90/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 3056, 46, 18], "identifier": "_NS:11", "path": "0/6/2/0/90/0/0", "role": "AXStaticText", "value": "Türkiye"}
+{"depth": 6, "enabled": true, "frame": [541, 3056, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/90/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 3094, 378, 30], "path": "0/6/2/0/91", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 3094, 378, 30], "path": "0/6/2/0/91/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 3100, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/91/0/0", "role": "AXStaticText", "value": "Ukrainian"}
+{"depth": 4, "frame": [531, 3124, 378, 20], "path": "0/6/2/0/92", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 3125, 366, 18], "path": "0/6/2/0/92/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 3126, 48.5, 18], "identifier": "_NS:11", "path": "0/6/2/0/92/0/0", "role": "AXStaticText", "value": "Ukraine"}
+{"depth": 6, "enabled": true, "frame": [541, 3126, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/92/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 3164, 378, 30], "path": "0/6/2/0/93", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [531, 3164, 378, 30], "path": "0/6/2/0/93/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [540, 3170, 360, 18], "identifier": "_NS:9", "path": "0/6/2/0/93/0/0", "role": "AXStaticText", "value": "Vietnamese"}
+{"depth": 4, "frame": [531, 3194, 378, 20], "path": "0/6/2/0/94", "role": "AXRow", "selected": false, "subrole": "AXTableRow"}
+{"depth": 5, "enabled": true, "frame": [537, 3195, 366, 18], "path": "0/6/2/0/94/0", "role": "AXCell", "selected": false}
+{"depth": 6, "enabled": true, "frame": [563, 3196, 52, 18], "identifier": "_NS:11", "path": "0/6/2/0/94/0/0", "role": "AXStaticText", "value": "Vietnam"}
+{"depth": 6, "enabled": true, "frame": [541, 3196, 18, 18], "identifier": "_SPEECHOBJECTS_VOICE_CHECKBOX", "path": "0/6/2/0/94/0/1", "role": "AXCheckBox", "title": "", "value": 0}
+{"depth": 4, "frame": [531, 314, 378, 2900], "identifier": "title", "path": "0/6/2/0/95", "role": "AXColumn", "selected": false}
+{"depth": 3, "enabled": true, "frame": [891, 313, 19, 277], "identifier": "_NS:133", "path": "0/6/2/1", "role": "AXScrollBar", "value": 0}
+{"depth": 4, "frame": [900, 317, 6, 26], "path": "0/6/2/1/0", "role": "AXValueIndicator", "value": 0}
+{"depth": 4, "frame": [892, 314, 0, 0], "path": "0/6/2/1/1", "role": "AXButton", "subrole": "AXIncrementArrow"}
+{"depth": 4, "frame": [892, 314, 0, 0], "path": "0/6/2/1/2", "role": "AXButton", "subrole": "AXDecrementArrow"}
+{"depth": 4, "frame": [900, 343, 6, 243], "path": "0/6/2/1/3", "role": "AXButton", "subrole": "AXIncrementPage"}
+{"depth": 4, "frame": [900, 317, 6, 0], "path": "0/6/2/1/4", "role": "AXButton", "subrole": "AXDecrementPage"}
+{"depth": 2, "enabled": true, "frame": [738, 280, 173, 26], "identifier": "_NS:38", "path": "0/6/3", "placeholder": "Search", "role": "AXTextField", "subrole": "AXSearchField", "value": ""}
+{"depth": 3, "description": "search", "enabled": true, "frame": [742, 282, 21, 24], "path": "0/6/3/0", "role": "AXButton", "title": ""}
+{"depth": 2, "enabled": true, "frame": [529, 282, 110, 18], "identifier": "_NS:136", "path": "0/6/4", "role": "AXStaticText", "value": "Select languages:"}
+{"depth": 2, "enabled": true, "frame": [529, 597, 382, 16], "identifier": "_NS:66", "path": "0/6/5", "role": "AXStaticText", "value": ""}

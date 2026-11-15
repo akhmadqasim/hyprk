@@ -1,0 +1,3451 @@
+{
+ "wifi": {
+  "title": "Wi-Fi",
+  "rows": [
+   {
+    "role": "AXLink",
+    "subrole": null,
+    "label": "Learn More…",
+    "value": null,
+    "identifier": "help:anchor=mchlp1180%20bookID=com.apple.machelp",
+    "size": [
+     68.1,
+     14
+    ],
+    "enabled": false,
+    "kind": "link (Help Viewer / web)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Details…",
+    "value": null,
+    "identifier": "wifi-current-network-details",
+    "size": [
+     76,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Other…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     68,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": null,
+    "identifier": null,
+    "size": [
+     70,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": null,
+    "identifier": null,
+    "size": [
+     83.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Advanced…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     94.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "bluetooth": {
+  "title": "Bluetooth",
+  "rows": [
+   {
+    "role": "AXLink",
+    "subrole": null,
+    "label": "Learn more…",
+    "value": null,
+    "identifier": "help:anchor=blth1004",
+    "size": [
+     73.5,
+     15
+    ],
+    "enabled": false,
+    "kind": "link (Help Viewer / web)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "network": {
+  "title": "Network",
+  "rows": [
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Wi-Fi",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "VPN",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Firewall",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "<interface>",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 4
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Thunderbolt Bridge",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "<interface>",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXMenuButton",
+    "subrole": null,
+    "label": "More",
+    "value": null,
+    "identifier": null,
+    "size": [
+     61.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "vpn": {
+  "title": "VPN",
+  "rows": [
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "About VPNs & Privacy…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     167.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXMenuButton",
+    "subrole": null,
+    "label": "Add",
+    "value": null,
+    "identifier": "plus",
+    "size": [
+     61,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "battery": {
+  "title": "Battery",
+  "rows": [
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": null,
+    "identifier": "low_power_mode",
+    "size": [
+     83.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Options…",
+    "value": null,
+    "identifier": "options",
+    "size": [
+     82,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": "help_button",
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "general": {
+  "title": "General",
+  "rows": [
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "",
+    "value": null,
+    "identifier": "com.apple.systempreferences.general.featureDescription",
+    "size": [
+     468,
+     164
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "About",
+    "value": null,
+    "identifier": "com.apple.systempreferences.general.about",
+    "size": [
+     468,
+     48
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Software Update",
+    "value": null,
+    "identifier": "com.apple.systempreferences.general.softwareUpdate",
+    "size": [
+     468,
+     48
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Storage",
+    "value": null,
+    "identifier": "com.apple.systempreferences.general.storage",
+    "size": [
+     468,
+     48
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "AppleCare & Warranty",
+    "value": null,
+    "identifier": "com.apple.systempreferences.general.appleCareAndWarranty",
+    "size": [
+     468,
+     48
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "AirDrop & Continuity",
+    "value": null,
+    "identifier": "com.apple.systempreferences.general.airDropAndHandoff",
+    "size": [
+     468,
+     48
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "AutoFill & Passwords",
+    "value": null,
+    "identifier": "com.apple.systempreferences.general.passwords",
+    "size": [
+     468,
+     48
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Date & Time",
+    "value": null,
+    "identifier": "com.apple.systempreferences.general.dateAndTime",
+    "size": [
+     468,
+     48
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Language & Region",
+    "value": null,
+    "identifier": "com.apple.systempreferences.general.languageAndRegion",
+    "size": [
+     468,
+     48
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Login Items & Extensions",
+    "value": null,
+    "identifier": "com.apple.systempreferences.general.loginItems",
+    "size": [
+     468,
+     48
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Sharing",
+    "value": null,
+    "identifier": "com.apple.systempreferences.general.sharing",
+    "size": [
+     468,
+     48
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Startup Disk",
+    "value": null,
+    "identifier": "com.apple.systempreferences.general.startupDisk",
+    "size": [
+     468,
+     48
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Time Machine",
+    "value": null,
+    "identifier": "com.apple.systempreferences.general.timeMachine",
+    "size": [
+     468,
+     48
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Device Management",
+    "value": null,
+    "identifier": "com.apple.systempreferences.general.deviceManagement",
+    "size": [
+     468,
+     48
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Transfer or Reset",
+    "value": null,
+    "identifier": "com.apple.systempreferences.general.transferOrReset",
+    "size": [
+     468,
+     48
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   }
+  ]
+ },
+ "accessibility": {
+  "title": "Accessibility",
+  "rows": [
+   {
+    "role": "AXLink",
+    "subrole": null,
+    "label": " Learn more…",
+    "value": null,
+    "identifier": "help:anchor=mh35884%20bookID=com.apple.machelp",
+    "size": [
+     71.2,
+     14
+    ],
+    "enabled": false,
+    "kind": "link (Help Viewer / web)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "VoiceOver",
+    "value": null,
+    "identifier": "AX_FEATURE_VOICEOVER",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Zoom",
+    "value": null,
+    "identifier": "AX_FEATURE_ZOOM",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Hover Text",
+    "value": null,
+    "identifier": "AX_FEATURE_HOVERTEXT",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Display",
+    "value": null,
+    "identifier": "AX_FEATURE_DISPLAY",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Motion",
+    "value": null,
+    "identifier": "AX_FEATURE_MOTION",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Read & Speak",
+    "value": null,
+    "identifier": "AX_FEATURE_SPOKENCONTENT",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Audio Descriptions",
+    "value": null,
+    "identifier": "AX_FEATURE_DESCRIPTIONS",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Voice Control",
+    "value": null,
+    "identifier": "AX_FEATURE_VOICECONTROL",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Keyboard",
+    "value": null,
+    "identifier": "AX_FEATURE_KEYBOARD",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Pointer Control",
+    "value": null,
+    "identifier": "AX_FEATURE_POINTERCONTROL",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Switch Control",
+    "value": null,
+    "identifier": "AX_FEATURE_SWITCHCONTROL",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Hearing Devices",
+    "value": null,
+    "identifier": "AX_FEATURE_HEARINGAIDS",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Audio",
+    "value": null,
+    "identifier": "AX_FEATURE_AUDIO",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "RTT",
+    "value": null,
+    "identifier": "AX_FEATURE_RTT",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Subtitles and Captioning",
+    "value": null,
+    "identifier": "AX_FEATURE_CAPTIONS",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Live Captions",
+    "value": null,
+    "identifier": "AX_FEATURE_SYSTEMTRANSCRIPTION",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Name Recognition",
+    "value": null,
+    "identifier": "AX_FEATURE_NAMERECOGNITION",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Live Speech",
+    "value": null,
+    "identifier": "AX_FEATURE_LIVESPEECH",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Personal Voice",
+    "value": null,
+    "identifier": "AX_FEATURE_PERSONALVOICE",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Vocal Shortcuts",
+    "value": null,
+    "identifier": "AX_FEATURE_AVS",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Siri",
+    "value": null,
+    "identifier": "AX_FEATURE_SIRI",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Shortcut",
+    "value": null,
+    "identifier": "AX_FEATURE_SHORTCUT",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "appearance": {
+  "title": "Appearance",
+  "rows": [
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Automatic",
+    "identifier": "HighlightColorPicker",
+    "size": [
+     133,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "Folder colour",
+    "value": "Automatic",
+    "identifier": null,
+    "size": [
+     133,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Medium",
+    "identifier": "SidebarIconSizePicker",
+    "size": [
+     96,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "More in Accessibility Settings…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     212.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "desktopAndDock": {
+  "title": "Desktop & Dock",
+  "rows": [
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Bottom",
+    "identifier": "position",
+    "size": [
+     92,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Genie Effect",
+    "identifier": "minimize-windows",
+    "size": [
+     122.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Zoom",
+    "identifier": "double-click",
+    "size": [
+     82.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Always",
+    "identifier": "click-wallpaper-to-reveal-desktop",
+    "size": [
+     90,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "All at Once",
+    "identifier": "show-windows-from-application",
+    "size": [
+     114,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Automatically",
+    "identifier": "widget-style",
+    "size": [
+     129.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Safari",
+    "identifier": "default-web-browser",
+    "size": [
+     106.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "In Full Screen",
+    "identifier": "prefer-tabs",
+    "size": [
+     129.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Shortcuts…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     93.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Hot Corners…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     108,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "displayAndBrightness": {
+  "title": "Displays",
+  "rows": [
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Colour LCD",
+    "identifier": "profileSection",
+    "size": [
+     117,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Ask What to Show",
+    "identifier": "tvDisplayModesSection",
+    "size": [
+     158,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Advanced…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     94.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Night Shift…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     99,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "controlCenter": {
+  "title": "Menu Bar",
+  "rows": [
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "In Full Screen Only",
+    "identifier": "autohide-menubar",
+    "size": [
+     160.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "10",
+    "identifier": "recents",
+    "size": [
+     62,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Add Controls…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     113.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Clock Options…",
+    "value": null,
+    "identifier": "controlcenter-clock-id",
+    "size": [
+     120,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Battery Options…",
+    "value": null,
+    "identifier": "controlcenter-battery-id",
+    "size": [
+     129.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Always Show",
+    "identifier": "controlcenter-focus-id",
+    "size": [
+     126.5,
+     24
+    ],
+    "enabled": false,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Show When Active",
+    "identifier": "controlcenter-screenMirroring-id",
+    "size": [
+     160.5,
+     24
+    ],
+    "enabled": false,
+    "kind": "pop-up menu",
+    "count": 4
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "Show in Menu Bar",
+    "value": "Icon",
+    "identifier": "controlcenter-userSwitcher-id",
+    "size": [
+     73.5,
+     24
+    ],
+    "enabled": false,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Show When Active",
+    "identifier": "controlcenter-timer-id",
+    "size": [
+     160.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Reset Control Centre…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     161.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "siri": {
+  "title": "Siri",
+  "rows": [
+   {
+    "role": "AXLink",
+    "subrole": null,
+    "label": "Learn more…",
+    "value": null,
+    "identifier": "help://com.apple.helpviewer?bookid=com.apple.machelp&topicid=mac88e1mkh19",
+    "size": [
+     68.1,
+     14
+    ],
+    "enabled": false,
+    "kind": "link (Help Viewer / web)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Requests",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     36
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Language",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     36
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Voice",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     36
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Responses",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     36
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXLink",
+    "subrole": null,
+    "label": "About Siri, Dictation & Privacy…",
+    "value": null,
+    "identifier": "https://siri.privacy",
+    "size": [
+     152.6,
+     13
+    ],
+    "enabled": false,
+    "kind": "link (Help Viewer / web)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Opens To",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     36
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Keep Conversations",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     36
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Preview",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     36
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "ChatGPT",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     36
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Excluded Apps",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     36
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXLink",
+    "subrole": null,
+    "label": "About Apple Intelligence & Privacy…",
+    "value": null,
+    "identifier": "https://ai.privacy",
+    "size": [
+     173.9,
+     13
+    ],
+    "enabled": false,
+    "kind": "link (Help Viewer / web)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Suggestions",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     36
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   }
+  ]
+ },
+ "search": {
+  "title": "Spotlight",
+  "rows": [
+   {
+    "role": "AXLink",
+    "subrole": null,
+    "label": "About Search & Privacy…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     438,
+     28
+    ],
+    "enabled": true,
+    "kind": "link (Help Viewer / web)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Reset Quick Keys…",
+    "value": null,
+    "identifier": "Action Aliases",
+    "size": [
+     139.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Delete Search History…",
+    "value": null,
+    "identifier": "Search history deletion",
+    "size": [
+     165.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXLink",
+    "subrole": null,
+    "label": "About Search & Privacy…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     420,
+     28
+    ],
+    "enabled": true,
+    "kind": "link (Help Viewer / web)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Info",
+    "value": null,
+    "identifier": "Files",
+    "size": [
+     13,
+     13
+    ],
+    "enabled": true,
+    "kind": "button (may open a sheet/popover)",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "8 hours",
+    "identifier": "Results from Clipboard",
+    "size": [
+     93.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Search Privacy…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     123.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "wallpaper": {
+  "title": "Wallpaper",
+  "rows": [
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Fill Screen",
+    "identifier": null,
+    "size": [
+     110.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Screen Saver…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     113.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Clock Appearance…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     145.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXMenuButton",
+    "subrole": null,
+    "label": "Picture",
+    "value": null,
+    "identifier": ";",
+    "size": [
+     107.5,
+     71
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "notifications": {
+  "title": "Notifications",
+  "rows": [
+   {
+    "role": "AXLink",
+    "subrole": null,
+    "label": "Learn more…",
+    "value": null,
+    "identifier": "help:anchor=mchl205da693%20bookID=com.apple.machelp",
+    "size": [
+     68.1,
+     14
+    ],
+    "enabled": false,
+    "kind": "link (Help Viewer / web)",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": null,
+    "identifier": "show-previews",
+    "size": [
+     143,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": null,
+    "identifier": "allow-when-sharing",
+    "size": [
+     147,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Allow notifications from iPhone",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     36
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Summarise notifications",
+    "value": null,
+    "identifier": "summarize-previews",
+    "size": [
+     468,
+     36
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "<app>",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 33
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "sounds": {
+  "title": "Sound",
+  "rows": [
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Breeze",
+    "identifier": "AlertSoundPicker",
+    "size": [
+     89.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "<device>",
+    "identifier": "AlertDevicePicker",
+    "size": [
+     184,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXRadioButton",
+    "subrole": "AXTabButton",
+    "label": "Output",
+    "value": null,
+    "identifier": null,
+    "size": [
+     224,
+     24
+    ],
+    "enabled": true,
+    "kind": "tab (switches content in place)",
+    "count": 1
+   },
+   {
+    "role": "AXRadioButton",
+    "subrole": "AXTabButton",
+    "label": "Input",
+    "value": null,
+    "identifier": null,
+    "size": [
+     224,
+     24
+    ],
+    "enabled": true,
+    "kind": "tab (switches content in place)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "focus": {
+  "title": "Focus",
+  "rows": [
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Do Not Disturb",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "<focus>",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 5
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Add Focus…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     98.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Focus status",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     68
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "screenTime": {
+  "title": "Screen Time",
+  "rows": [
+   {
+    "role": "AXLink",
+    "subrole": null,
+    "label": "Learn more…",
+    "value": null,
+    "identifier": "help://com.apple.helpviewer?bookid=com.apple.machelp&topicid=mchlfafa9773",
+    "size": [
+     68.1,
+     14
+    ],
+    "enabled": false,
+    "kind": "link (Help Viewer / web)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Apps & Websites",
+    "value": null,
+    "identifier": "ScreenTime.AppsAndWebsitesRow",
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Allowed Contacts",
+    "value": null,
+    "identifier": "communication-limits-row",
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Always Allowed",
+    "value": null,
+    "identifier": "alwaysAllowedRow",
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Screen Time Schedule",
+    "value": null,
+    "identifier": "schedule-navigation-row",
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Time Allowances",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Content & Privacy Restrictions",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Communication Safety",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Passcode & Management",
+    "value": null,
+    "identifier": "ManageScreenTimeRow",
+    "size": [
+     468,
+     48
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "lockScreen": {
+  "title": "Lock Screen",
+  "rows": [
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "For 10 minutes",
+    "identifier": null,
+    "size": [
+     137,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Never",
+    "identifier": null,
+    "size": [
+     83.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Immediately",
+    "identifier": null,
+    "size": [
+     121,
+     24
+    ],
+    "enabled": false,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Set…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     55,
+     24
+    ],
+    "enabled": false,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Accessibility Options…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     161,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "privacyAndSecurity": {
+  "title": "Privacy & Security",
+  "rows": [
+   {
+    "role": "AXLink",
+    "subrole": null,
+    "label": "Learn more…",
+    "value": null,
+    "identifier": "help:anchor=mchl0b8771e8%20bookID=com.apple.machelp",
+    "size": [
+     68.1,
+     14
+    ],
+    "enabled": false,
+    "kind": "link (Help Viewer / web)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Location Services",
+    "value": null,
+    "identifier": "Location Services_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Calendars",
+    "value": null,
+    "identifier": "Calendars_Navigator",
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Contacts",
+    "value": null,
+    "identifier": "Contacts_Navigator",
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Files & Folders",
+    "value": null,
+    "identifier": "Files & Folders_Navigator",
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Full Disk Access",
+    "value": null,
+    "identifier": "Full Disk Access_Navigator",
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Home",
+    "value": null,
+    "identifier": "Home_Navigator",
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Media & Apple Music",
+    "value": null,
+    "identifier": "Media & Apple Music_Navigator",
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Passkeys Access for Web Browsers",
+    "value": null,
+    "identifier": "Passkeys Access for Web Browsers_Navigator",
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Photos",
+    "value": null,
+    "identifier": "Photos_Navigator",
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Reminders",
+    "value": null,
+    "identifier": "Reminders_Navigator",
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "App Management",
+    "value": null,
+    "identifier": "App Management_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Automation",
+    "value": null,
+    "identifier": "Automation_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Bluetooth",
+    "value": null,
+    "identifier": "Bluetooth_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Camera",
+    "value": null,
+    "identifier": "Camera_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Developer Tools",
+    "value": null,
+    "identifier": "Developer Tools_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Device Control and Data Access",
+    "value": null,
+    "identifier": "Device Control and Data Access_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Focus",
+    "value": null,
+    "identifier": "Focus_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Input Monitoring",
+    "value": null,
+    "identifier": "Input Monitoring_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Local Network",
+    "value": null,
+    "identifier": "Local Network_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Microphone",
+    "value": null,
+    "identifier": "Microphone_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Motion & Fitness",
+    "value": null,
+    "identifier": "Motion & Fitness_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Remote Desktop",
+    "value": null,
+    "identifier": "Remote Desktop_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Screen & System Audio Recording",
+    "value": null,
+    "identifier": "Screen & System Audio Recording_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Speech Recognition",
+    "value": null,
+    "identifier": "Speech Recognition_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Sensitive Content Warning",
+    "value": null,
+    "identifier": "Sensitive Content Warning_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Blocked Contacts",
+    "value": null,
+    "identifier": "Blocked Contacts_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Analytics & Improvements",
+    "value": null,
+    "identifier": "Analytics & Improvements_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Apple Advertising",
+    "value": null,
+    "identifier": "Apple Advertising_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Apple Intelligence Report",
+    "value": null,
+    "identifier": "Apple Intelligence Report_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": null,
+    "identifier": null,
+    "size": [
+     237,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "FileVault",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Accessories",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Background Security Improvements",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Lockdown Mode",
+    "value": null,
+    "identifier": "Lockdown Mode_Navigator",
+    "size": [
+     468,
+     42
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Advanced…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     94.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "passcodeAndBiometrics": {
+  "title": "Touch ID & Password",
+  "rows": [
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Change…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     81,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXLink",
+    "subrole": null,
+    "label": "About Touch ID & Privacy…",
+    "value": null,
+    "identifier": "privacySplash://",
+    "size": [
+     141.2,
+     14
+    ],
+    "enabled": false,
+    "kind": "link (Help Viewer / web)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "usersAndGroups": {
+  "title": "Users & Groups",
+  "rows": [
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Add Group…",
+    "value": null,
+    "identifier": "AddGroupButton",
+    "size": [
+     99.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Add User…",
+    "value": null,
+    "identifier": "AddUserButton",
+    "size": [
+     90,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": null,
+    "identifier": "AutomaticallyLoginAsPicker",
+    "size": [
+     67,
+     24
+    ],
+    "enabled": false,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Edit…",
+    "value": null,
+    "identifier": "EditNetworkAccountServerButton",
+    "size": [
+     58,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "gameCenter": {
+  "title": "Game Center",
+  "rows": [
+   {
+    "role": "AXLink",
+    "subrole": null,
+    "label": "See how your data is managed…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     195.5,
+     16
+    ],
+    "enabled": true,
+    "kind": "link (Help Viewer / web)",
+    "count": 1
+   }
+  ]
+ },
+ "iCloud": {
+  "title": "iCloud",
+  "rows": [
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Manage…",
+    "value": null,
+    "identifier": "openManageStorage",
+    "size": [
+     83,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Hide My Email, 21 Addresses",
+    "value": null,
+    "identifier": "six-pack-card-Hide My Email",
+    "size": [
+     144,
+     49.5
+    ],
+    "enabled": true,
+    "kind": "button (may open a sheet/popover)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Advanced Data Protection",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     36
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Data Access on iCloud.com",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     36
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "internetAccounts": {
+  "title": "Internet Accounts",
+  "rows": [
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "<account>",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     80
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "<account>",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     52
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 2
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Add Account…",
+    "value": null,
+    "identifier": "AddAccountButton",
+    "size": [
+     112.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "walletAndApplePay": {
+  "title": "Wallet & Apple Pay",
+  "rows": [
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Add Card…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     91.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "AutoFill Cards",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     36
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": null,
+    "identifier": null,
+    "size": [
+     321.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": null,
+    "identifier": null,
+    "size": [
+     176.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXLink",
+    "subrole": null,
+    "label": "iCloud Settings",
+    "value": null,
+    "identifier": null,
+    "size": [
+     73.6,
+     13
+    ],
+    "enabled": false,
+    "kind": "link (Help Viewer / web)",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": null,
+    "identifier": null,
+    "size": [
+     165,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "See how your data is managed…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     219.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "keyboard": {
+  "title": "Keyboard",
+  "rows": [
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "After 30 Seconds",
+    "identifier": null,
+    "size": [
+     153.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Show Emoji & Symbols",
+    "identifier": null,
+    "size": [
+     185.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Keyboard Shortcuts…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     154.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Edit…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     58,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Text Replacements…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     149,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Edit…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     58,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "<device>",
+    "identifier": null,
+    "size": [
+     274.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Press 🎤︎",
+    "identifier": null,
+    "size": [
+     98,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "About Ask Siri, Dictation & Privacy…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     241,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Set Up Keyboard…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     137,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "trackpad": {
+  "title": "Trackpad",
+  "rows": [
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Force Click with One Finger",
+    "identifier": "LookUpDataDetectorOptions",
+    "size": [
+     214.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": "Click with Two Fingers",
+    "identifier": "SecondaryClickOptions",
+    "size": [
+     183,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Set Up Bluetooth Trackpad…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     197.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ },
+ "printerAndScanner": {
+  "title": "Printers & Scanners",
+  "rows": [
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": null,
+    "identifier": null,
+    "size": [
+     152.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXPopUpButton",
+    "subrole": null,
+    "label": "",
+    "value": null,
+    "identifier": "DefaultPaperSizeOption",
+    "size": [
+     64.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "pop-up menu",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "<printer>",
+    "value": null,
+    "identifier": null,
+    "size": [
+     468,
+     51
+    ],
+    "enabled": true,
+    "kind": "full-width row (opens a sub-pane or sheet)",
+    "count": 2
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Add Printer, Scanner or Fax…",
+    "value": null,
+    "identifier": null,
+    "size": [
+     199.5,
+     24
+    ],
+    "enabled": true,
+    "kind": "button with ellipsis (opens a sheet or sub-pane)",
+    "count": 1
+   },
+   {
+    "role": "AXButton",
+    "subrole": null,
+    "label": "Help",
+    "value": null,
+    "identifier": null,
+    "size": [
+     24,
+     24
+    ],
+    "enabled": true,
+    "kind": "help button (Help Viewer)",
+    "count": 1
+   }
+  ]
+ }
+}
