@@ -12,3 +12,10 @@ The 5 sizes in Displays, left to right: Larger Text, 1280x828?, 1440x932, Defaul
 | more-space-menu.png | full screen 1.2 s after a click on "File", crop px 0,0 780x1480 | Finder File menu open (menu bar strip included) | dark | TahoeDark |
 | more-space-settings.png | window `screencapture -x -o -l` (1480x1250 px) | System Settings > Appearance with cards; Apple Account / Family rows filled with the sidebar colour | dark | TahoeDark |
 | more-space-spotlight-close.mov | `screencapture -x -v -V 2.5 -R 560,100,800,400`, 1.22 s (last change) | Spotlight open (empty pill), Esc at about 0.5 s, close animation | dark | TahoeDark |
+
+## Round 16: ScreenCaptureKit frames in More Space and Larger Text
+| file | how | content |
+|---|---|---|
+| more-space-{dock,menu,finder,settings}-sck.png | `SCScreenshotManager.captureImage`, 2880x1864, `scalesToFit` off, in the 1920x1243 mode; crops of that frame (1.5 px per pt) | Dock strip, File menu, Finder list window, Settings Appearance window; dark |
+| larger-text-{dock,menu,finder,settings}-sck.png | same call in the 1024x663 mode: the 2048x1326 frame comes back unscaled; crops (2 px per pt) | same four |
+| {more-space,larger-text}-{finder,settings}-ax.jsonl | AX dump of the window | frames in pt |
