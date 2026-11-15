@@ -194,7 +194,7 @@ caller found by grep in shell/, finder/, settings/, config/.
 | empty Bin | finder/empty trash.aif, ID 13 | Finder TEmptyTrashTask, Dock menu | yes |
 | Dock poof | dock/poof item off dock.aif, ID 15 | Dock, item removed | yes |
 | Finder task done | system/Volume Mount.aif, ID 1 | Finder copy, move, duplicate, put back, archive, mount, erase | yes (`task-done`) |
-| volume key pop | BezelServices.loginPlugin/Contents/Resources/volume.aiff | ControlCenter.framework, each step | yes, wrong timing (key up) |
+| volume key pop | BezelServices.loginPlugin/Contents/Resources/volume.aiff | ControlCenter.framework, each step | yes, at once on every step (fixed 2026-11-14; was on key up) |
 | CC Sound slider let-go | volume.aiff | ControlCenter.app 0x1000e3814 | yes |
 | Settings Output slider let-go | volume.aiff (NSSound) | Sound.appex, 30 ms after let-go | fixed 2026-11-14 (was: no 30 ms) |
 | charger connected | PowerChime.app/Contents/Resources/connect_power.aif | PowerChime | yes (`power`) |
@@ -225,3 +225,223 @@ does not have; not listed one by one.
 - Whether a user override of `ControlCenter/Bezel` exists on the user's Mac (/Library/Preferences/FeatureFlags): not
   readable from here.
 - Callers of the accessibility, Media Keys, record, mic and screen sharing sound IDs: not traced.
+
+## 6. Live check in a headless session (2026-11-14)
+
+Session `scripts/smoke.sh` with `HYPRK_AUDIO_STUB=1` (the stub sink: no `wpctl`, no PipeWire write; the machine's
+volume untouched by it), `HYPRK_SOUND_LOG` (now `<event> <file> vol=<gain>`, the gain `pw-play` would get) and the
+default `HYPRK_MUTE=1`, so nothing played. Events fired through the bind's own command run by Hyprland
+(`hyprctl dispatch hl.dsp.exec_cmd`), the IPC, the private bus (`org.freedesktop.Notifications.Notify`) or the virtual
+pointer.
+
+| event | trigger here | logged file, gain | Mac rule | result |
+|---|---|---|---|---|
+| volume key up / down x3, mute, unmute, Shift+up, Option+Shift up (feedback on) | volume-key.sh, the binds' commands | 5 pops: up, up, down, unmute, up 64; none on mute, none on Shift+up; `misc/BezelServices-volume.aiff`, vol=1; stub level 0.25 -> 0.3125 -> 0.375 -> 0.3125 -> muted -> 0.3125 -> 0.375 -> 0.390625 | every step pops at once, muting is silent, Shift inverts, 1/16 and 1/64 grid; NSSound, no alert volume (section 2) | match |
+| feedback off, Shift+up | same | 1 pop | Shift inverts the setting | match |
+| CC Sound slider dragged 1060 -> 1030 pt, released | vptr | nothing during the drag, 1 pop after release, vol=1 | one pop on let-go (0x1000e3814) | match |
+| alert | `qs ipc call sounds play alert` | `Sounds/Tink.aiff` vol=1.0000; with alertSound Funk, alertVolume 0.25: `Funk.aiff` vol=0.4724 | alert sound, gain exp(s - 1) = 0.472 (section 1) | match |
+| notification with `sound-name` Glass / `sound-file` Hero.aiff / `sound-name` default | Notify on the session bus | `Glass.aiff`, `Hero.aiff`, `Tink.aiff` (the alert sound), vol=1.0000 | the named sound, the file, the default sound | match |
+| notification without a sound hint / with `suppress-sound` | same | nothing | silent | match |
+| critical notification | same | `alert` `Tink.aiff` | SOUNDS.md: alert sound | match (hyprk's choice, no Mac rule decoded) |
+| screenshot (the Print / Cmd+Shift+3 bind's command) | exec_cmd | `SystemSounds/system/Screen Capture.aif` vol=1.0000 before grim writes; nothing with uiSounds off | ID 1393, before the file is written, gated by UI sounds, scaled by the alert volume | match |
+| app dragged off the Dock (Launchpad, held 1.2 s 265 pt above, released) | vptr | `SystemSounds/dock/poof item off dock.aif` vol=1.0000 | ID 15 | match |
+| Empty Trash (Dock menu, confirmed) | `qs ipc call panels confirmEmptyTrash`, click | nothing, the Trash not emptied | ID 13 after the erase | not testable here: `gio trash --empty` fails without gvfs on the session's private bus ("trash:: Operation not supported"), and the sound plays only after it succeeds (`services/Apps.qml` emptyTrash). The file and gain are covered by `shell/tests` ("sound log carries the gain") |
+| lock / unlock | not fired (the lock screen needs the user's password to leave) | (static) no `Sounds` call in `shell/modules/lock` | the Mac plays nothing on lock / unlock (no ID for it, section 5) | match (by code) |
+| Finder copy / move to Trash | not fired (no keyboard injection here) | (static) `finder/src/fileops.cpp` task-done, `finder/qml/Browser.qml` trash-move / trash-empty | IDs 1, 16, 13 | covered by the Finder's own tests, not live |
+
+No mismatch found. Fixed in the docs: the volume key row above (stale), SOUNDS.md's `alertVolume` default (0.75 there,
+1 in `sound.sh`, `settings/Parsers.js` and the Mac). Not checked: output latency (needs the Mac), the power chime (no
+UPower battery in the session).
+
+## 7. Round R5.1 (timing with system audio), 2026-11-14
+
+Mac clips `reference/screens/27.2.1/sound/` (INDEX.md), method in MAC-ANSWERS-5.md R5.1: ScreenCaptureKit with
+`SCRecordingOutput`, video and system audio from one stream on one host clock, both from pts 0. Read on the PC with
+ffmpeg 6: the audio track's edit list (media time 2264 samples, the AAC priming) is applied, so audio pts are the
+writer's. Onset = first sample above -50 dBFS on either channel; the file's position = cross-correlation with the
+sound file decoded at 48 kHz; level = least-squares gain against the file at that lag, per channel; HUD = first frame
+whose pixels differ from the frame before by more than 4 levels (crop x 2200..2880, y 40..280 px). Scripts in the
+agent's scratch (`onset.py`, `scan.py`, `keytime.py`, `hudt.py`), not in the repo.
+
+| clip | sound found | where | above -50 dBFS | level vs the file | picture |
+|---|---|---|---|---|---|
+| volume-pop.mov | `volume.aiff` (correlation .999) | file sample 0 at 1.2320 s (the -50 dB onset 1.2297 is AAC pre-echo) | 1.2297-1.2565 s, 26.8 ms (file 24.4) | -0.13 dB on both channels (mono file to both, no pan law) | menu bar Control Center pill 1.1833 s; first HUD frame 1.2500 (glyph and dashes faint, up to 11 levels); 1.2667 clearer |
+| screenshot.mov | **`Blow.aiff`, the account's alert sound** (correlation 1.000), not the shutter | file sample 0 at 1.0929 s (keystroke "about 1.0 s") | 1.1019-1.9365 s, 834.6 ms (file 834.7) | 0.00 dB on both channels (gain 1.000) | nothing drawn |
+
+- **Pop against the HUD:** the pop is in the output 18 ms before the HUD's first frame (35 ms before the clearer frame
+  at 1.2667; MAC-ANSWERS-5's 37 ms is 1.230 to 1.267) and 49 ms after the Control Center pill. R3.4 put the first HUD
+  frame 18 ms after the appear spring's start, so the pop and the spring start coincide here (1.232 s; inferred, one
+  clip). Control Center calls play with no timer (section 2), so the 49 ms is the pill-to-sound time of its
+  `AVAudioPlayer` path (inferred; the key's own time is not in the clip).
+- **Pop level:** the file's level (-0.13 dB): no alert volume on the pop, as `sound.sh` does (vol=1). Confirmed.
+- **Alert level:** Blow at alert volume 100 plays at gain 1.000 = exp(1 - 1), section 1's curve at its stock point (the
+  other points not measured). The output volume (81) is not in the capture (the gain is exactly 1; inferred:
+  ScreenCaptureKit takes the mix before the device volume).
+- **Screenshot:** Cmd-Shift-3 from System Events while the stream ran wrote no file and played the alert sound
+  (NSBeep; the account's `com.apple.sound.beep.sound` is Blow, MAC-ANSWERS.md:3705) instead of the shutter, so the
+  shutter's offset and level are still **not measured**. The file stays Screen Capture.aif: screencapture plays ID
+  1393 (`decomp/systemsoundserverd-ids.txt:97-105`); Shutter.aif (the same bytes as Grab.aif, ID 24) has no ID.
+  MAC-ANSWERS-5's "Shutter.aif" names a file in the folder, not a match.
+- **Empty Trash, Move to Trash, Dock poof** were not filmed. hyprk fires the Mac's files: `trash-empty` ->
+  `finder/empty trash.aif` (ID 13; `shell/services/Apps.qml:541` after the erase, `finder/qml/Browser.qml:267`),
+  `trash-move` -> `dock/drag to trash.aif` (ID 16, Finder TMoveToTrashTask, `finder/qml/Browser.qml:261`; `move to
+  trash.aif` is ID 14, which nothing in Finder or the Dock plays), `poof` -> `dock/poof item off dock.aif` (ID 15,
+  `shell/modules/Dock.qml:443`). No mapping changed.
+- **"Play feedback when volume is changed"** is off on this account (R5.1; `com.apple.sound.beep.feedback` = 0 with the
+  setting untouched, MAC-ANSWERS.md:564). hyprk is off by default already (`shell/scripts/sound.sh:43`,
+  `settings/Parsers.js:282`). The stock default is not decoded: Sound.appex `-[AppleSound_SoundSettings
+  playVolumeKeyFeedback]` reads that key, but the Ghidra project `gh-sound-gaps` was saved by Ghidra 12.2 and REA
+  accepts only 12.1.x, so it was not decompiled this time.
+
+Ours, headless session (scale 2, stub sink, `HYPRK_MUTE=1`, `HYPRK_SOUND_LOG`; nothing played). `keytime.py` runs
+`volume-key.sh` and stamps on CLOCK_MONOTONIC (mcap's clock) the stub sink's rename (where `wpctl set-volume` returns on
+the real path) and the log line (where `sound.sh` would exec `pw-play`) via inotify; mcap `-g 960,0,320,120 -k 2` gives
+the pill and the HUD's first frame. "Pop out" = the player + 11 ms (`pw-play` to streaming, session 19, private
+PipeWire: an estimate, not measured here).
+
+| from the key, ms | before (3 runs) | after: pop 60 ms after the level (10 runs) | Mac |
+|---|---|---|---|
+| level set (stub) | 8.1-8.5 | 8.1-8.9 | - |
+| player | 15.5-16.1 | 77.8-79.5 (one 110.1) | - |
+| pill | 31.1-32.6 | 25.8-34.6 | - |
+| HUD first frame | 114.6-115.9 | 114.0-117.9 (3 runs 127, 133, 148) | - |
+| pill -> HUD first frame | 83.3-83.5 | 83.2-85.0 (3 runs 100-117) | 66.7 |
+| pill -> pop out | about -5 | about 56-64 | 48.7 |
+| pop out -> HUD first frame | about 88 | about 25-29 | 18.0 |
+
+- Changed: `shell/scripts/volume-key.sh` `pop()` waits 60 ms before `sound.sh volume` (keys and the unmute pop). 60 sits
+  between the two Mac relations (49 ms after the pill needs about 53, 18 ms before the HUD about 70).
+- Stub artefact: the stub's file watch shows the pill 17-26 ms after the write (5 runs without any pop: 15-31). On the
+  real path the HUD follows PipeWire's param event instead; that latency is not measured (no PipeWire here). Both the
+  pop and the HUD start from the same level change, so only the difference between the two notifications moves the
+  offset: if PipeWire is a frame faster, the pop lands about 10 ms before the HUD's first frame and 73 ms after the pill.
+- HUD (not changed here, HUD owner): pill -> first frame is 83 ms against the Mac's 67, one frame longer, in 7 of 10
+  runs and 4 of 5 without a pop (the outliers are the HUD's own, not the pop's). One clip on the Mac side.
+- Not the pop's: the Mac shows the HUD on every key step, also at 0 and at full volume (section 2,
+  `HUDActionDelegate.showVolume` before the gate); ours shows it only when the level or mute changes
+  (`shell/services/Hud.qml` audioChanged), so at full volume a key pops without a HUD.
+  **FIXED 2026-11-15 (after judge #22):** `volume-key.sh` rewrites `hud-step` in its folder for a step that leaves the
+  level and mute as they were (up at 1, down at 0), and `services/Hud.qml` shows the HUD for it; a level change still
+  shows through the sink, so its timing is unchanged. Headless (stub sink, mcap 960,0 320 x 120 pt, 4 runs each): up at
+  full volume, pill 30-49 ms and HUD first frame 99-116 ms after the key (before: no HUD); a step at mid level, pill
+  32-47 (one 97) and HUD 97-116 (one 180). Test: shell/tests "volume key step that leaves the level as it was".
+- **Round J20** (judge #20, MOTION-AUDIT.md "HUD", "Round J20"): the HUD's first frames were held invisible (a content
+  curve fitted about the wrong anchor), so "first frame" above was the HUD's fourth or fifth. With them drawn, the pop at
+  60 ms came out 20 ms after the first frame. The Mac's pop starts with the HUD's appear spring (t0 from the content
+  alpha 1.2285 + 3 ms, file sample 0 at 1.2320). Now `showDelay` 42 (one frame more) and the pop **44 ms** after the
+  level: 12 runs, pill -> pop out mean 45.8 (Mac 48.7), pop out -> first frame mean 13.5 (Mac 18), pill -> first frame
+  59.4 (Mac 66.7). The 60 ms row in the table above is superseded.
+
+Still needs the Mac: the shutter (a screenshot that is taken while recording, e.g. `screencapture` from Terminal), Empty
+Trash once the Trash holds only a dummy item, the Dock poof with a real drag, the key's own time (a hardware key press
+on the same clock) to tie the pill to the key.
+
+
+## 8. Round 10 (MAC-ANSWERS-10.md R10.2), 2026-11-15
+
+- **Screenshot**: the sound is `system/Screen Capture.aif` (correlation 0.997), which is what hyprk plays (ID 1393), and
+  no white flash. It starts 222 / 247 ms after the key on the Mac. Section 2 found no timer between the capture and the
+  play call, so that time is the way from the key to the screencapture process, not a designed delay; hyprk plays it at
+  the bind. Not changed (not measured on ours this round). The floating thumbnail (+482 / +647 ms) is not built.
+- **Dock, Options > Remove from Dock**: the Mac plays `dock/poof item off dock.aif` within the frame of the first visual
+  change and draws no cloud. Ours removed the item silently from the menu (the poof played only for a drag off the Dock):
+  **fixed**, `shell/services/Apps.qml` plays `poof` with the removal. Not heard or timed here (audio stub).
+- Empty Trash: not recorded on the Mac (its Trash held the user's items).
+
+## 9. Round 11 (MAC-ANSWERS-11.md R11.4), 2026-11-15
+
+Volume HUD on single key steps, measured per frame from `panels/hud-volume-steps-{light,dark}.mov` (MOTION-REA
+"Round R11.4-R11.7"). Section 8's reading holds for the bar: one continuous fill on spring 0.2 / 0.85 on every step
+(40 steps, rms .014 of a step), nothing else moving, no changed frame on a press at full or at 0 (the HUD only stays
+up; it fades about 1.07 s after the last press). New: the wave count changes in one frame (3 at 11-16, 2 at 6-10, 1 at
+1-5, the slash at 0), and the bounce at the ends plays layer by layer, 0.05 s apart, peak 1.25 and trough 0.90 (speaker
+then waves at full; slash then speaker at 0). No sound data in this round.
+
+
+## 10. After judge #23: output latency and the poof, measured (2026-11-15)
+
+Headless session (scale 2, stub sink, `HYPRK_MUTE=1`, `HYPRK_SOUND_LOG`; nothing played, the real sink untouched). Two
+live checks in `scripts/motion-capture/`:
+
+- `player-latency.py SCRATCH`: a private PipeWire (own daemon and WirePlumber in a scratch runtime dir, one null sink,
+  hardware monitors off, quantum 64). From the exec of `pw-play --volume 1 <file>` to the file's sample 0 in the sink's
+  input: **median 12.0-12.1 ms** for volume.aiff (20 runs, 11.9-51.9), poof (12 runs) and Screen Capture.aif (12 runs);
+  about 1 run in 5 takes 25-50 ms. The old estimate was 11. A real device's period and hardware delay come after this
+  point and are the sink's, not hyprk's.
+- `sound-timing.py [key|shot|poof]`: the sound log's append, the stub sink's rename and mcap's frames on one clock
+  (CLOCK_MONOTONIC), "out" = the log + 12 ms.
+
+| event | ours before | ours now | Mac | clip |
+|---|---|---|---|---|
+| pill -> pop out | not re-measured since #21 (51) | 42-59, mean **50.8-51.1** (2 x 10 runs) | 48.7 | volume-pop.mov |
+| pop out -> first HUD frame | 21-38 (#21) | 15-45, mean **25.8-28.8** | 18.0 | volume-pop.mov |
+| pill -> first HUD frame | 59-78 | 67-103, mean **76.6-79.9** | 66.7 | volume-pop.mov |
+| key -> first HUD frame | 97-116 | 97-130, mean **103-107** | 112-127 filmed, about 90-105 less the 22-24 ms capture path | volume-key-hud-timing.mov (R10.3) |
+| key -> HUD at 50 % / 90 % (mean pixel change against 0.6 s) | not measured | **263-298** (mean 269-274) / **413-447** (mean 419-424) | 277-293 / 440-445 filmed | the same |
+| screenshot sound after the key | **27-64, mean 38** (played at the bind) | **226-255, mean 232-240** | 222 / 247 | screenshot-thumbnail.mov (R10.2 a) |
+| Remove from Dock: poof against the removal's first frame | not measured | **+4..+6 ms** (the same frame) | +15 (the same frame) | dock-remove-menu-poof-sound.mov (R10.2 c) |
+| Remove from Dock: the Dock closes the gap | **150 ms** (rms .143 against the clip) | **233 ms** to the last moving frame (slot 250 ms) | 250 ms, cosine ease in-out (rms .018) | the same |
+| Remove from Dock: cloud | none | none (0 px) | none | the same |
+
+- **Screenshot (fixed):** `config/hypr/hyprland.lua` `shutterDelay` 0.197 s before `sound.sh screenshot`; grim still
+  starts at the bind. The Mac's 222 / 247 ms is the key's way to screencapture (section 8), copied as measured.
+- **Remove from Dock (fixed):** read from the clip per frame (the Dock's right edge, 32 px of travel): the gap closes on
+  the Dock's cosine ease in-out over 250 ms, starting 5 ms before the first changed frame. Ours shrank the slot in 150 ms
+  (the quit-time shrink, MAC-ANSWERS.md:91). `shell/lib/dock.js slotDuration(entering, removed)`: 250 for the menu's
+  removal (`Apps.menuRemoved`), 150 kept for an app that quits. Our menu blinks the chosen row first (off 4 frames, on
+  3: 85 ms from the click); the clip chose the item through AX and shows no blink, so the click-to-removal time is not
+  comparable. The menu's fade-out: ours 250 ms, the clip about 183 ms (not changed: one clip, the menu owner's).
+- **Key path:** nothing changed. Every relation is within one 60 Hz frame of the Mac's; the pill's time in a stub session
+  is the file watch's (section 7), so pill -> HUD carries that artefact.
+
+Still needs the Mac: see "Still needs the Mac" in section 7 (Empty Trash, a real drag-off poof, a hardware key on the
+recording clock), plus a clicked (not AX) Remove from Dock with the pointer visible, for the blink and the click time.
+
+## 11. Round 16: Remove from Dock by a real click, drag-off by hand (2026-11-15)
+
+`dock-remove-menu-real-click.mov` read per frame (pts) and per sample; frame 0 = the first frame with the row's
+highlight off (4.533 s; mouse up logged at 4.48 +-20 ms):
+
+| | Mac | ours before | ours now (`menu-blink.py dock`, `sound-timing.py poof`) |
+|---|---|---|---|
+| highlight off / on | 4 / 4 frames | 4 / 3-4 | 4 / 4 (14 runs) |
+| first fading frame | 8th, the fade 1.6-1.7 frames in | 7th-8th, 1 frame in | 8th, 2 in |
+| fade | CA default over 242 ms (rms .0056), last changing frame the 20th | CA default 236 | the same; plain menu rms .009 against the Mac's 13 frames, gone in the 20th |
+| parent menu and submenu | fade in the same frame | parent 2 frames early | within 1 frame |
+| Dock's first moving frame | the 22nd (367 ms after frame 0, about 420 after the up) | the 7th-8th (118 ms after the click) | the 22nd in 7 of 8, 23rd once (372 ms after the click) |
+| poof | first sample 4.895-4.91, in the Dock's first moving frame (audible 4.926) | +3 ms | -13 ms (the same frame) |
+| cloud | none | none | none |
+
+- "Fade about 190 ms" (MAC-ANSWERS-16) is the visible part: the first fading frame is already 1.7 frames into a
+  242 ms curve. So the fade was right; "250 against 183" (section 10) is closed.
+- Changed: `MenuDropdown.qml` an item with `afterFade: true` runs `Theme.menu.afterFadePause` (16 ms) after the top
+  menu's fade ends (`Apps.qml` Remove from Dock); the fade after a blink leads by 2 frames (`FrameAnim.lead`); a
+  menu above the Dock blinks on for 4 frames (`Theme.menu.blinkOnDock`, `Overlay.qml`); the parent window draws
+  frames during a submenu's blink (`keepPace`).
+- AppKit's menus (desktop menu > New Folder): off 4, on 3, fade from the 7th, rms .032 against R3.5's curve (lead 2;
+  with lead 1 the fade ran .75 frame behind).
+- **Drag-off by hand** (`dock-drag-off-hand.mov`): the icon and "Remove" fade in place from 6.100 to 6.350 s, linear
+  (.05 .11 .17 .23 .30 .38 .46 .54 .60 .67 .73 .79 .84 .89 .93 1), about 250 ms; sound from 6.131 s, 31 ms after the
+  first fading frame and about 57 after the logged release; no cloud, no fly-back, the gap already closed. Ours
+  (`Dock.qml dragDrop`): poof at the drop, linear 250 ms fade in place, slot closed during the drag: the same, not
+  changed and not re-run live this round.
+
+Open: a heavy item stalls the fade's start (desktop menu > Edit Widgets...: `trigger()` takes 40-49 ms, highlight on
+for 4-6 frames); whether AppKit's menus also run the item after the fade is not filmed; the chosen row's own colour
+bends towards the glass colour during the fade (its highlight fades over glass that is still there, rms .117 on that
+row), where the Mac's goes straight.
+
+## 12. After judge #25: the poof against the picture, by cross-correlation (2026-11-15)
+
+Section 11's "first sample 4.895-4.91" was wrong: that is the AAC's pre-echo. `poof item off dock.aif` (48 kHz mono,
+its first 0.25 s) cross-correlated with each clip's audio:
+
+| clip | picture | file's first sample | r | ours before | ours now |
+|---|---|---|---|---|---|
+| `dock-remove-menu-real-click.mov` | Dock's first moving frame 4.900 s | 4.920 s, **+20 ms** (1 % of the peak 4.926) | .999 | -10..-13 | +19..+29 (`sound-timing.py poof`) |
+| `dock-drag-off-hand.mov` | first fading frame 6.100 s, gone 6.350 s | 6.128 s, **+28 ms** | .999 | no fade at all; sound about -10 | +28..+31, fade 250 ms (`dock-drag-off.py`) |
+
+`Apps.qml poofAfterMove` (30 ms after the removal runs, a frame before the Dock draws it), used by the menu's item
+and by `Dock.qml dragDrop`. The drag-off's icon and "Remove" bubble had vanished in the drop's frame (the removed
+tile's cell was destroyed under them): `Dock.dragInfo` keeps what they show; the fade is 260 ms (the Mac's 16
+frames are a line of 15.6).

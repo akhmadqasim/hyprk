@@ -19,6 +19,7 @@ Singleton {
     property string open: ""
     // query handed to Spotlight when it opens (IPC `spotlight search`)
     property string spotlightQuery: ""
+    property int spotlightEmptied: 0     // counts `spotlight empty` IPC calls (Spotlight clears its field)
     // screen whose Overlay shows menus / context menus / CC / NC (menus open where they were clicked)
     property var activeScreen: screen
     property int menuIndex: -1          // index of the open menu bar title (0 = Apple)
@@ -152,6 +153,7 @@ Singleton {
     Timer { id: holdTimeout; interval: 1500; onTriggered: { root.held = ({}); root.updateLoaded(); } }
 
     onOpenChanged: {
+        if (open === "switcher") switcherAt = Date.now();
         // the switcher's keys came from the compositor's submap: leave it with the switcher
         if (open !== "switcher" && submap === switcherSubmap) Hyprland.dispatch('hl.dsp.submap("reset")');
         if (open !== "menu") {
@@ -185,6 +187,7 @@ Singleton {
         target: Hyprland
         function onRawEvent(e) { if (e.name === "submap") root.submap = e.data; }
     }
+    property real switcherAt: 0         // ms, when the switcher's key arrived: its show delay counts from here
     signal switcherKey(string key)      // "next" | "prev" | "first" | "last" | "commit" | "cancel"
     GlobalShortcut { appid: "hyprk"; name: "switcher-next"; description: "App switcher: next"; onPressed: root.switcherKey("next") }
     GlobalShortcut { appid: "hyprk"; name: "switcher-prev"; description: "App switcher: previous"; onPressed: root.switcherKey("prev") }
@@ -212,6 +215,12 @@ Singleton {
         function search(q: string): void {
             root.open = "spotlight";
             root.spotlightQuery = q;      // Spotlight picks it up on creation or live
+        }
+        // `qs ipc call spotlight empty`: open Spotlight with an empty field (a reopen within 8 minutes keeps the last
+        // query: scripted shots of the bare bar and the mode list, scripts/motion-capture/spotlight-edge.py)
+        function empty(): void {
+            root.open = "spotlight";
+            root.spotlightEmptied++;
         }
     }
 }

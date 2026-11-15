@@ -18,6 +18,13 @@ PanelWindow {
     // opacity, so it is sent as a 1x1 marker in the bottom row of the region, x = opacity x (width - 1),
     // committed with the same frame (plugin/src/Shape.hpp takeOpacityMarker). 1 sends no marker.
     property real glassOpacity: 1
+    // A window animation that scales and blurs the whole window, glass and shadow included (AppKit's alert PopIn and Cancel
+    // ScaleDownAndOut, re/27.2.1/MOTION-AUDIT.md "Alert, Round R3.1"): the plugin scales the glass's drop shadow radius and
+    // offset by glassShadowSize (a 1x1 marker in the top row, x = size / 2 x (width - 1)) and blurs its edge by glassSoften
+    // pt (a 1x1 marker in the left column, y = soften / 16 x (height - 1)); plugin/src/Shape.hpp takeShadowSizeMarker /
+    // takeSoftenMarker. 1 / 0 send no marker.
+    property real glassShadowSize: 1
+    property real glassSoften: 0
     // Liquid Glass materialize progress of this window's glass: 0 = the untouched backdrop,
     // 1 = the full material. The plugin ramps lensing, blur, tint, rim and shadow with it instead
     // of fading alpha (Glass.qml sends it per shape as a 1 px hole, plugin/src/Shape.hpp).
@@ -110,7 +117,7 @@ PanelWindow {
         regions: {
             const all = Array.from(win.glassRegions);
             return all.filter(r => r.intersection !== Intersection.Subtract)
-                .concat(all.filter(r => r.intersection === Intersection.Subtract), [opacityMarker]);
+                .concat(all.filter(r => r.intersection === Intersection.Subtract), [opacityMarker, shadowSizeMarker, softenMarker]);
         }
     }
     // always in the list (only x changes per frame); width 0 = no marker = opacity 1
@@ -119,6 +126,20 @@ PanelWindow {
         x: Math.round(Math.max(0, win.glassOpacity) * (win.width - 1))
         y: win.height - 1
         width: win.glassOpacity < 1 ? 1 : 0
+        height: 1
+    }
+    Region {
+        id: shadowSizeMarker
+        x: Math.max(1, Math.round(Math.max(0, Math.min(2, win.glassShadowSize)) / 2 * (win.width - 1)))
+        y: 0
+        width: win.glassShadowSize !== 1 ? 1 : 0
+        height: 1
+    }
+    Region {
+        id: softenMarker
+        x: 0
+        y: Math.max(1, Math.min(win.height - 2, Math.round(Math.min(16, win.glassSoften) / 16 * (win.height - 1))))
+        width: win.glassSoften > 0 ? 1 : 0
         height: 1
     }
 }

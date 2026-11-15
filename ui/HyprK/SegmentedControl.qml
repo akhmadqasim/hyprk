@@ -1,5 +1,6 @@
 import QtQuick
 import "controls.js" as G
+import "pixel.js" as Pixel
 
 // macOS 27.2.1 segmented control, select-one (MAC-ANSWERS.md Q-settings-22): push-fill track (24 r6; small 20 r5,
 // mini 16 r4, large 28 r14) with a full-height accent segment and white text for the selection. Not glass.
@@ -7,8 +8,12 @@ import "controls.js" as G
 // view switcher too, Q-finder-11). Separators 1 x 14 sit only between two unselected segments.
 // model: array of strings, or of objects { text, glyph, icon } (glyph = an SF Symbol name in sfpaths.js,
 // icon = an image url; either may go with or without text).
-// Mouse: the segment under the pointer gets a black a.098 layer while pressed; release on a segment activates it,
-// so a press can be dragged to another segment (NSSegmentedControl tracking). Keyboard: Left/Right move the
+// Mouse (NSSegmentedControl tracking, measured on the Finder view switcher, R6.3 controls/segmented-drag-*.mov): the
+// selected segment gets `pressOverlay` while pressed; a press dragged onto another segment shows that one in the plain
+// selected colour (no overlay, the pressed segment's separators hidden) and the selected one plain again, in one frame;
+// release on a segment activates it. No lens, no slide. Settings' SwiftUI segmented Picker is an NSSegmentedControl
+// too, so it tracks the same way (its tracked look is inferred from the Finder clip, not measured). `hoverOverlay`
+// (default none) lights the selected segment under the pointer. Keyboard: Left/Right move the
 // selection one segment when it has focus; the focus ring goes around the selected segment only.
 // Controlled: it shows `currentIndex` and emits activated(index); the caller owns the state.
 // The Finder toolbar overrides the colours, radii and insets (a glass capsule with an inner pill).
@@ -36,8 +41,15 @@ Item {
     property color separatorColor: Tokens.control.segmentSeparator
     property bool separatorFade: true      // false = separators stay visible next to the selected segment
     property real separatorHeight: Math.round(height * 7 / 12)   // 14 in 24 (Q-22); other sizes scaled, not measured
+    // the layer over the selected segment while it is pressed (Q-settings-22: black a.098) and while it is hovered
+    // (none by default; the Finder sets both, measured)
+    property color pressOverlay: Tokens.control.pressOverlay
+    property color hoverOverlay: "transparent"
     readonly property int count: model ? model.length : 0
     readonly property int pressedIndex: ma.pressed && ma.containsMouse ? ma.indexAt(ma.mouseX) : -1
+    readonly property int hoveredIndex: ma.containsMouse && !ma.pressed ? ma.indexAt(ma.mouseX) : -1
+    // from mouse-down to mouse-up, wherever the pointer is (the Finder's capsule lifts meanwhile)
+    readonly property bool held: ma.pressed
     signal activated(int index)
 
     implicitHeight: _m.height
@@ -99,7 +111,15 @@ Item {
         opacity: sc.enabled ? 1 : Tokens.control.disabledOpacity
         FocusRing { visible: sc.activeFocus }
     }
-    Rectangle { // pressed segment: black a.098 (an unselected one also gets the push fill again)
+    Rectangle { // hovered selected segment (R6.3: one frame, light 224 -> 213, dark 70 -> 87 before the toolbar wash)
+        objectName: "hovered"
+        visible: sc.hoveredIndex >= 0 && sc.hoveredIndex === sc.currentIndex && sc.hoverOverlay.a > 0 && pill.visible
+        x: pill.x; y: pill.y; width: pill.width; height: pill.height
+        radius: sc.selectionRadius
+        color: sc.hoverOverlay
+    }
+    Rectangle { // pressed segment: the selected one gets pressOverlay; a press dragged onto another segment shows that
+                // one in the plain selected colour (R6.3: light 227 against the selected 226, dark 78 against 77)
         objectName: "pressed"
         visible: sc.pressedIndex >= 0
         x: visible ? sc._xs[sc.pressedIndex] + sc.selectionInsetX : 0
@@ -107,19 +127,25 @@ Item {
         width: visible ? sc._wl[sc.pressedIndex] - 2 * sc.selectionInsetX : 0
         height: sc.height - 2 * sc.selectionInset
         radius: sc.selectionRadius
-        color: sc.pressedIndex === sc.currentIndex ? "transparent" : Tokens.control.pushFill
-        Rectangle { anchors.fill: parent; radius: parent.radius; color: Tokens.control.pressOverlay }
+        color: sc.pressedIndex === sc.currentIndex ? "transparent" : sc.selectionColor
+        Rectangle {
+            objectName: "pressedOverlay"
+            visible: sc.pressedIndex === sc.currentIndex
+            anchors.fill: parent; radius: parent.radius; color: sc.pressOverlay
+        }
     }
-    Repeater { // separators at the inner boundaries, only between two unselected segments
+    Repeater { // separators at the inner boundaries, only between two unselected (and not pressed) segments
         model: Math.max(0, sc.count - 1)
         Rectangle {
             required property int index
             readonly property int b: index + 1      // boundary between segment b-1 and b
-            readonly property bool touches: pill.visible && (sc.currentIndex === b - 1 || sc.currentIndex === b)
+            readonly property bool touches: (pill.visible && (sc.currentIndex === b - 1 || sc.currentIndex === b))
+                                            || (sc.pressedIndex >= 0 && (sc.pressedIndex === b - 1 || sc.pressedIndex === b))
             objectName: "separator" + b
             visible: sc._drawn(b)
-            x: sc._xs[b] - sc.separatorSpacing / 2 - 0.5          // centred in its gap
-            width: 1
+            x: sc._xs[b] - sc.separatorSpacing / 2 - width / 2    // centred in its gap
+            width: Pixel.stroke(1, Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio))          // exact, antialiased at a fractional scale (pixel.js)
+            antialiasing: Pixel.soft(Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio))
             height: sc.separatorHeight
             anchors.verticalCenter: parent.verticalCenter
             color: sc.separatorColor
@@ -134,6 +160,8 @@ Item {
             required property int index
             readonly property var entry: sc._entry(index)
             readonly property bool selected: index === sc.currentIndex
+            // drawn selected: the selection, or the segment a press is tracking (its label takes the selected colour)
+            readonly property bool lookSelected: selected || index === sc.pressedIndex
             readonly property real contentW: content.implicitWidth
             x: sc._xs[index]
             width: sc._wl[index] || 0
@@ -155,14 +183,14 @@ Item {
                     visible: !!seg.entry.glyph
                     name: seg.entry.glyph || ""
                     pointSize: 13              // the text's size; no caller and no Mac sample yet
-                    color: seg.selected ? sc.selectedLabelColor : Tokens.label
+                    color: seg.lookSelected ? sc.selectedLabelColor : Tokens.label
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
                     visible: text !== ""
                     text: seg.entry.text || ""
                     font: Typography.control
-                    color: !sc.enabled ? Tokens.control.disabledText : seg.selected ? sc.selectedLabelColor : Tokens.label
+                    color: !sc.enabled ? Tokens.control.disabledText : seg.lookSelected ? sc.selectedLabelColor : Tokens.label
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
@@ -181,6 +209,7 @@ Item {
         id: ma
         anchors.fill: parent
         preventStealing: true
+        hoverEnabled: sc.hoverOverlay.a > 0
         function indexAt(x) {
             if (sc.count <= 0 || sc.width <= 0) return -1;
             for (let i = sc.count - 1; i > 0; i--) if (x >= sc._xs[i] - (sc._drawn(i) ? sc.separatorSpacing / 2 : 0)) return i;

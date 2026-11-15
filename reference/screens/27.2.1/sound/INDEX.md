@@ -17,3 +17,6 @@ dark, TahoeDark, apps hidden. Output volume 81 (restored after each press), aler
 | dock-remove-menu-real-click.mov | `screc` (ScreenCaptureKit screen + system audio, 60 fps) region 1000,580 500x527; HID right-click, HID click on Options > Remove from Dock | blink, menu fade, tile removed, poof sound (round 16) | dark | user wallpaper |
 | volume-key-f12-hand-feedback.mov | `screc` region 1290,24 420x120; the user pressed F12 once; feedback sound on for the take | pop and HUD after a hardware key | dark | user wallpaper |
 | dock-drag-off-hand.mov | `screc` region 850,720 600x387 (cropped); the user dragged a dummy folder tile off the Dock with the trackpad | "Remove" label, release, icon fades, poof sound | dark | user wallpaper |
+
+PC check (2026-11-14, SOUND-REA-27.2.1.md section 7): the sound in screenshot.mov is `Sounds/Blow.aiff`, the account's alert
+sound (cross-correlation 1.000, gain 1.000), not the shutter: no screenshot was taken, so the shutter is still not recorded.

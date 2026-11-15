@@ -3,11 +3,13 @@
 #include <algorithm>
 
 #include <QCoreApplication>
+#include <QGuiApplication>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLocalSocket>
 #include <QRegion>
+#include <QTimer>
 #include <QWindow>
 
 Hypr::Hypr(QObject *parent) : QObject(parent)
@@ -16,6 +18,10 @@ Hypr::Hypr(QObject *parent) : QObject(parent)
     const QByteArray run = qgetenv("XDG_RUNTIME_DIR");
     if (sig.isEmpty() || run.isEmpty())
         return;
+    m_pickTimeout = new QTimer(this);
+    m_pickTimeout->setSingleShot(true);
+    m_pickTimeout->setInterval(1000);
+    connect(m_pickTimeout, &QTimer::timeout, this, [this] { setPicked({}, {}); });
     m_events = new QLocalSocket(this);
     connect(m_events, &QLocalSocket::readyRead, this, &Hypr::onEvents);
     m_events->connectToServer(QString::fromLocal8Bit(run + "/hypr/" + sig + "/.socket2.sock"));
@@ -28,6 +34,36 @@ void Hypr::onEvents()
     while ((nl = m_pending.indexOf('\n')) >= 0) {
         const QByteArray line = m_pending.left(nl);
         m_pending.remove(0, nl + 1);
+        if (line.startsWith("custom>>hyprk-pick,")) {
+            QByteArray addr = line.mid(19).toLower();
+            if (addr.startsWith("0x"))
+                addr.remove(0, 2);
+            QString title;
+            const qint64 pid = QCoreApplication::applicationPid();
+            const QJsonArray all = QJsonDocument::fromJson(request("j/clients")).array();
+            for (const QJsonValue &v : all) {
+                const QJsonObject c = v.toObject();
+                QByteArray a = c.value(QLatin1String("address")).toString().toLatin1().toLower();
+                if (a.startsWith("0x"))
+                    a.remove(0, 2);
+                if (a == addr && c.value(QLatin1String("pid")).toInteger() == pid)
+                    title = c.value(QLatin1String("title")).toString();
+            }
+            setPicked(title, title.isEmpty() ? QByteArray() : addr);
+            continue;
+        }
+        if (line.startsWith("activewindowv2>>") && !m_picked.isEmpty()) {
+            QByteArray addr = line.mid(16).toLower();
+            if (addr.startsWith("0x"))
+                addr.remove(0, 2);
+            // the layer's keyboard release first refocuses the window that was key before Mission Control (an
+            // activewindowv2 for it right after the pick): only a change after the picked window was active ends it
+            if (addr == m_pickedAddress)
+                m_pickedSeen = true;
+            else if (m_pickedSeen)
+                setPicked({}, {});
+            continue;
+        }
         QString over = m_emojiOver;
         if (line == "closelayer>>hyprk-emoji") {
             over.clear();
@@ -41,6 +77,18 @@ void Hypr::onEvents()
             m_emojiOver = over;
             emit emojiOverChanged();
         }
+    }
+}
+
+void Hypr::setPicked(const QString &title, const QByteArray &address)
+{
+    m_pickedAddress = address;
+    m_pickedSeen = false;
+    if (!title.isEmpty())
+        m_pickTimeout->start();
+    if (title != m_picked) {
+        m_picked = title;
+        emit pickedChanged();
     }
 }
 
@@ -86,6 +134,27 @@ QVariantList Hypr::windows() const
     return list;
 }
 
+bool Hypr::resizeWindow(const QString &title, int width, int height) const
+{
+    const qint64 pid = QCoreApplication::applicationPid();
+    const QJsonArray all = QJsonDocument::fromJson(request("j/clients")).array();
+    for (const QJsonValue &v : all) {
+        const QJsonObject c = v.toObject();
+        if (c.value(QLatin1String("pid")).toInteger() != pid || c.value(QLatin1String("title")).toString() != title)
+            continue;
+        if (c.value(QLatin1String("fullscreen")).toInt() != 0)
+            return false;
+        const QJsonArray size = c.value(QLatin1String("size")).toArray();
+        if (size.at(0).toInt() == width && size.at(1).toInt() == height)
+            return true;
+        const QString address = c.value(QLatin1String("address")).toString();
+        request(QStringLiteral("dispatch hl.dsp.window.resize({ x = %1, y = %2, exact = true, window = \"address:%3\" })")
+                    .arg(width).arg(height).arg(address).toUtf8());
+        return true;
+    }
+    return false;
+}
+
 bool Hypr::moveWindow(const QString &title, double x, double y) const
 {
     const qint64 pid = QCoreApplication::applicationPid();
@@ -103,6 +172,14 @@ bool Hypr::moveWindow(const QString &title, double x, double y) const
         return true;
     }
     return false;
+}
+
+void Hypr::setLights(const QRectF &r) const
+{
+    const QString cls = QGuiApplication::desktopFileName();
+    if (cls.isEmpty())
+        return;
+    request(QStringLiteral("liquidglass lights %1 %2 %3 %4 %5").arg(cls).arg(r.x()).arg(r.y()).arg(r.width()).arg(r.height()).toUtf8());
 }
 
 bool Hypr::minimizeWindow(const QString &title) const

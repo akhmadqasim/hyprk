@@ -31,12 +31,12 @@ namespace lg {
         void         destroy();
 
         struct SUniforms {
-            int tex, linearLight, uvTopLeft, uvBottomRight, quadSize, shapeCount, shapeBox, shapeInfo, smoothK, appearBlur, roundingPower, alpha, ditherAmount;
+            int tex, linearLight, uvTopLeft, uvBottomRight, quadSize, shapeCount, shapeBox, shapeInfo, shapeOval, smoothK, appearBlur, edgeBlur, roundingPower, alpha, ditherAmount;
             int blurRadius, blurK, baseLevel, maxLevel, underlay, refraction, refractionHeight, aberration, faceYcc;
             int blurAlpha, blurDist, outerAmount, outerHeight, outerOpacity, outerThreshold;
             int blurFill, bleedOpacity, bleedHeight, bleedAmount, bleedLod, bleedYcc, faceFill, pointerFill, tail, fillAmount;
-            int pxPerPt, keyYcc, keySpread, highlight, darkSpec;
-            int shadowOpacity, shadowRadius, shadowOffset, shadowTint, shadowSaturation;
+            int pxPerPt, keyYcc, keySpread, highlight, darkSpec, darkTone;
+            int shadowOpacity, shadowRadius, shadowOffset, shadowTint, shadowSaturation, priorCount, priorBox, priorInfo, clampFace, outerSeen, seenCount, keyTop;
             int ringOpacity, ringOffset, ringStroke, ringRadius;
             int aux, maskRect, maskLighten, maskHighlights, sdfRect, sdfRange;
         } u{};
@@ -53,7 +53,9 @@ namespace lg {
     // glass shapes of a client's ext-background-effect region (surface-local), moved by (ox, oy).
     // With `opacity`, the opacity marker (takeOpacityMarker) of a surface of `size` is read into it.
     // cutFill != 0: the region's cuts (Shape.hpp cutShapes) are added as fills of that signed amount
-    std::vector<SGlassShape> shapesFromRegion(const CRegion& region, double ox, double oy, double* opacity = nullptr, const Vector2D& size = {}, double cutFill = 0);
+    // With `shadowSize` / `soften`, the whole-window markers (Shape.hpp takeShadowSizeMarker / takeSoftenMarker) too
+    std::vector<SGlassShape> shapesFromRegion(const CRegion& region, double ox, double oy, double* opacity = nullptr, const Vector2D& size = {}, double cutFill = 0,
+                                              double* shadowSize = nullptr, double* soften = nullptr);
 
     // once per monitor frame: ages the per-surface light/dark state
     void onFrame();
@@ -76,6 +78,10 @@ namespace lg {
             const SRecipe*                 recipe = &recipeByName("regular");
             uintptr_t                      owner  = 0;    // layer/window identity, keys the light/dark state
             bool                           shadow = true; // windows draw their own
+            // whole-window markers (Shape.hpp takeShadowSizeMarker / takeSoftenMarker): the drop shadow's radius and offset x
+            // shadowSize, the glass edge blurred by `soften` pt
+            double                         shadowSize = 1;
+            double                         soften     = 0;
             std::optional<float>           roundingPower; // override params->roundingPower
             // a texture the client hands over as a layer surface of its own (README "Textures from the shell")
             enum class eAux { NONE, MASKS, SDF };

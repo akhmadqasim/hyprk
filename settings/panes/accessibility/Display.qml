@@ -2,139 +2,93 @@ import QtQuick
 import "../.."
 import "../../controls"
 import "../../HyprK"
-import "A11y.js" as A
+import "parts"
 
-// Accessibility > Display (macOS 27: Display, Text, Pointer, Color Filters).
-// Works: Invert colors, Display contrast and Color filters (Hyprland screen shader,
-// config/hypr/shaders/a11y-filter.frag), Increase contrast and Reduce transparency
-// (appearance.json, shell + Settings themes, window borders), Pointer size
-// (hyprctl setcursor). Pointer colors and text sizes have no backend yet.
-Column {
+import "A11y.js" as A
+// Accessibility > Display (ax-acc-display-00..03). Works: Invert colors, Display contrast and Color filters (Hyprland
+// screen shader, config/hypr/shaders/a11y-filter.frag), Increase contrast and Reduce transparency (appearance.json:
+// shell and Settings themes, window borders), Pointer size (hyprctl setcursor); Differentiate without color is saved.
+// The other controls keep their own state. The pencils are the Mac's own picture (settings/assets/accessibility).
+AxPage {
     id: page
-    property var ctl
-    property var info
-    spacing: Theme.content.sectionGap
     readonly property var a: ctl.a
     readonly property var ap: ctl.ap
-
     readonly property var filterNames: ["Grayscale", "Red/Green filter (Protanopia)", "Green/Red filter (Deuteranopia)", "Blue/Yellow filter (Tritanopia)", "Color Tint"]
-    readonly property var tints: [["Red", "#FF8080"], ["Orange", "#FFB070"], ["Yellow", "#FFE680"], ["Green", "#90E090"], ["Blue", "#80B0FF"], ["Purple", "#C090F0"], ["Pink", "#FF90C0"]]
 
     Card {
-        title: "Display"
-        FormRow {
-            label: "Invert colors"
-            sublabel: "Smart inverts lightness but keeps colors; Classic inverts every color."
-            Popup {
-                anchors.verticalCenter: parent.verticalCenter
-                visible: page.a.invertColors
-                model: ["Smart", "Classic"]
-                currentIndex: page.a.invertMode === "classic" ? 1 : 0
-                onActivated: i => page.ctl.set({ invertMode: i === 1 ? "classic" : "smart" })
-            }
-            Switch { checked: page.a.invertColors; onToggled: on => page.ctl.set({ invertColors: on }) }
-        }
-        FormRow {
-            label: "Increase contrast"
-            sublabel: "Make borders, separators and secondary text darker, and turn off transparency."
-            Switch { checked: page.ap.increaseContrast; onToggled: on => page.ctl.setAppearance({ increaseContrast: on }) }
-        }
-        FormRow {
-            label: "Reduce transparency"
-            sublabel: "Improves contrast by reducing transparency in windows, menus and the Dock."
-            Switch { checked: page.ap.reduceTransparency || page.ap.increaseContrast; enabled: !page.ap.increaseContrast
-                        onToggled: on => page.ctl.setAppearance({ reduceTransparency: on }) }
-        }
-        FormRow {
-            label: "Differentiate without color"
-            sublabel: "Use shapes in addition to or instead of color to convey status."
-            Switch { checked: page.a.differentiateWithoutColor; onToggled: on => page.ctl.set({ differentiateWithoutColor: on }) }
-        }
-        FormRow {
-            label: "Display contrast"
-            Slider {
-                width: 220; leftText: "Normal"; rightText: "Maximum"
-                value: page.a.displayContrast
-                onReleased: page.ctl.set({ displayContrast: Math.round(_dragValue * 100) / 100 })
-            }
-        }
+        AxRow { h: 37.5; labelY: 9.9; label: "Invert colors"
+                Switch { checked: page.a.invertColors; onToggled: on => page.ctl.set({ invertColors: on }) } }
+        AxRow { h: 37.5; labelY: 9.9; label: "Invert colors mode"
+                AxRadio { enabled: page.a.invertColors; model: ["Smart", "Classic"]
+                          currentIndex: page.a.invertMode === "classic" ? 1 : 0
+                          onActivated: i => page.ctl.set({ invertMode: i === 1 ? "classic" : "smart" }) } }
+        AxRow { h: 37.5; labelY: 9.9; label: "Increase contrast"
+                Switch { checked: page.ap.increaseContrast; onToggled: on => page.ctl.setAppearance({ increaseContrast: on }) } }
+        AxRow { h: 37.5; labelY: 9.9; label: "Reduce transparency"
+                Switch { checked: page.ap.reduceTransparency || page.ap.increaseContrast; enabled: !page.ap.increaseContrast
+                         onToggled: on => page.ctl.setAppearance({ reduceTransparency: on }) } }
+        AxRow { h: 37.5; labelY: 9.9; label: "Show borders"; LocalSwitch {} }
+        AxRow { h: 37.5; labelY: 9.9; label: "Differentiate without color"
+                Switch { checked: page.a.differentiateWithoutColor; onToggled: on => page.ctl.set({ differentiateWithoutColor: on }) } }
+        AxRow { h: 67; labelY: 9.9; label: "Dim flashing lights"; subWidth: 366
+                sub: "Video content that depicts repeated flashing or strobing lights will be automatically dimmed."
+                LocalSwitch {} }
+        AxRow { h: 37.5; labelY: 9.9; label: "Show window title icons"; LocalSwitch {} }
+        AxRow { h: 50; labelY: 9.9; ctlY: 24.5; label: "Display contrast"
+                Slider { width: 246.5; leftText: "Normal"; rightText: "Maximum"; tickMarks: 7
+                         value: page.a.displayContrast
+                         onReleased: page.ctl.set({ displayContrast: Math.round(_dragValue * 100) / 100 }) } }
     }
-
     Card {
         title: "Text"
-        FormRow {
-            label: "Text size"; dim: true
-            sublabel: "Apps choose their own text size on Linux."
-            Button { text: "Edit…"; enabled: false }
-        }
+        AxRow { h: 66.8; ctlY: 33; spacing: 12; label: "Text size"; subWidth: 290
+                sub: "Set your preferred reading size for supported apps and system features."
+                Text { text: "Custom"; font: Typography.body; color: Theme.secondaryLabel }
+                Item { width: 6; height: 10; SfSymbol { name: "chevron.forward"; weight: "semibold"; pointSize: 10.5; color: Theme.tertiaryLabel } } }
+        AxRow { h: 67; labelY: 10; label: "Menu bar size"; subWidth: 285
+                sub: "Some apps or system features may need a log-out for the changes to menu bar font size to take effect."
+                AxRadio { model: ["Default", "Large"] } }
+        AxRow { h: 36.7; label: "Prefer horizontal text"; LocalSwitch {} }
     }
-
     Card {
         title: "Pointer"
-        FormRow {
-            label: "Shake mouse pointer to locate"; dim: true
-            sublabel: "Hyprland can't enlarge the pointer on shake yet."
-            Switch { enabled: false }
-        }
-        FormRow {
-            label: "Pointer size"
-            Slider {
-                width: 220; leftText: "Normal"; rightText: "Large"
-                value: (page.a.pointerSize - 1) / 3
-                onReleased: page.ctl.set({ pointerSize: Math.round((1 + _dragValue * 3) * 4) / 4 })
-            }
-        }
-        FormRow {
-            label: "Pointer outline color"; dim: true
-            Rectangle { width: 38; height: 22; radius: 6; color: "#FFFFFF"; border.color: Theme.separator; opacity: 0.5 }
-        }
-        FormRow {
-            label: "Pointer fill color"; dim: true
-            sublabel: "Needs a recolored cursor theme, not available yet."
-            Rectangle { width: 38; height: 22; radius: 6; color: "#000000"; border.color: Theme.separator; opacity: 0.5 }
-        }
+        AxRow { h: 53; labelY: 9.8; label: "Shake mouse pointer to locate"
+                sub: "Quickly move the mouse pointer back and forth to make it bigger."
+                LocalSwitch { checked: true } }
+        AxRow { h: 50; labelY: 9.8; ctlY: 24.5; label: "Pointer size"
+                Slider { width: 246.5; leftText: "Normal"; rightText: "Large"; tickMarks: 7
+                         value: (page.a.pointerSize - 1) / 3
+                         onReleased: page.ctl.set({ pointerSize: Math.round((1 + _dragValue * 3) * 4) / 4 }) } }
     }
-    PaneFooter { help: false; Button { text: "Reset Colors"; enabled: false } }
-
+    Card {
+        // a well opens the Colors panel (R14.4, controls/ColorPanel.qml); a second click on the open well closes it
+        AxRow { h: 45; labelY: 9.8; ctlY: 22; label: "Pointer outline color"
+                AxColorWell { id: outline; objectName: "pointerOutlineWell"; value: "#FFFFFF"; active: colors.well === outline
+                              onClicked: active ? colors.close() : colors.open(outline) } }
+        AxRow { h: 45; labelY: 9.8; ctlY: 22; label: "Pointer fill color"
+                AxColorWell { id: fill; objectName: "pointerFillWell"; value: "#000000"; active: colors.well === fill
+                              onClicked: active ? colors.close() : colors.open(fill) } }
+        AxRow { h: 44; ctlY: 22; Button { text: "Reset Colors"; onClicked: { colors.close(); outline.value = "#FFFFFF"; fill.value = "#000000"; } } }
+    }
     Card {
         title: "Color Filters"
-        FormRow {
-            label: "Color filters"
-            sublabel: "Filters change how the whole screen looks, for color blindness or easier reading."
-            Switch { checked: page.a.colorFilters; onToggled: on => page.ctl.set({ colorFilters: on }) }
+        Item {
+            width: parent.width; height: 140.8
+            Image { x: 59; y: 10; width: 350; height: 130; source: "../../assets/accessibility/color-filters.png"; smooth: true }
         }
-        FormRow {
-            label: "Filter type"; dim: !page.a.colorFilters
-            Popup {
-                enabled: page.a.colorFilters
-                model: page.filterNames
-                currentIndex: Math.max(0, A.filterTypes.indexOf(page.a.filterType))
-                onActivated: i => page.ctl.set({ filterType: A.filterTypes[i] })
-            }
-        }
-        FormRow {
-            label: "Intensity"; dim: !page.a.colorFilters
-            Slider {
-                width: 220; enabled: page.a.colorFilters
-                value: page.a.filterIntensity
-                onReleased: page.ctl.set({ filterIntensity: Math.round(_dragValue * 100) / 100 })
-            }
-        }
-        FormRow {
-            visible: page.a.filterType === "tint"
-            label: "Tint"; dim: !page.a.colorFilters
-            Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
-                width: 38; height: 22; radius: 6; color: page.a.tintColor; border.color: Theme.separator
-            }
-            Popup {
-                enabled: page.a.colorFilters
-                model: page.tints.map(t => t[0])
-                currentIndex: Math.max(0, page.tints.findIndex(t => t[1].toLowerCase() === String(page.a.tintColor).toLowerCase()))
-                onActivated: i => page.ctl.set({ tintColor: page.tints[i][1] })
-            }
-        }
+        AxRow { h: 37.5; label: "Color filters"
+                Switch { checked: page.a.colorFilters; onToggled: on => page.ctl.set({ colorFilters: on }) } }
+        AxRow { h: 37.2; ctlY: 18.2; label: "Filter type"
+                Popup { model: page.filterNames
+                        currentIndex: Math.max(0, A.filterTypes.indexOf(page.a.filterType))
+                        onActivated: i => page.ctl.set({ filterType: A.filterTypes[i] }) } }
     }
-    InlineNote { text: page.ctl.hyprNote }
+    Card {
+        AxRow { h: 50; labelY: 10.1; ctlY: 24.5; label: "Intensity"
+                Slider { width: 246.5; leftText: "Low"; rightText: "High"; tickMarks: 7
+                         value: page.a.filterIntensity
+                         onReleased: page.ctl.set({ filterIntensity: Math.round(_dragValue * 100) / 100 }) } }
+    }
     PaneFooter {}
+    ColorPanel { id: colors; objectName: "colors" }
 }

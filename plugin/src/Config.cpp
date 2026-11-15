@@ -63,7 +63,7 @@ namespace lg {
             {K("titlebar_color"), 0xF3F1EFFF, [](SParams& p, long long v) { p.titlebarColor = rgbaFromHex(v); }},
             {K("titlebar_color_inactive"), 0xF6F5F4FF, [](SParams& p, long long v) { p.titlebarColorInactive = rgbaFromHex(v); }},
             {K("titlebar_text"), 0x000000B3, [](SParams& p, long long v) { p.titlebarText = rgbaFromHex(v); }},
-            {K("titlebar_text_inactive"), 0x00000040, [](SParams& p, long long v) { p.titlebarTextInactive = rgbaFromHex(v); }},
+            {K("titlebar_text_inactive"), 0x00000048, [](SParams& p, long long v) { p.titlebarTextInactive = rgbaFromHex(v); }},
             {K("stats"), 0, [](SParams& p, long long v) { p.stats = v != 0; }},
             {K("window_shadow"), 0, [](SParams& p, long long v) { p.windowShadow = v != 0; }},
             {K("window_rim"), 0, [](SParams& p, long long v) { p.windowRim = v != 0; }},
@@ -82,7 +82,7 @@ namespace lg {
             {K("radii"), "", [](SParams& p, const std::string& v) { p.radii = parseNumberMap(v); }},
             {K("materials"),
              "hyprk-dock:dock,hyprk-controlcenter:controlcenter,hyprk-overlay:menu,hyprk-spotlight:spotlight,"
-             "hyprk-notifications:notificationcenter,hyprk-notificationcenter:notificationcenter",
+             "hyprk-notifications:notificationbanner,hyprk-notificationcenter:notificationcenter",
              [](SParams& p, const std::string& v) { p.materials = parseStringMap(v); }},
             // SwiftUI's default spacing 8 (Spacing.defaultValue): CC tiles 12 apart stay separate at rest,
             // Spotlight's mode buttons fuse with the field only while they emerge from it

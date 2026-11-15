@@ -161,13 +161,17 @@ function layout(key, pointSize, box, clip) {
 }
 
 // data: URL of glyph \`key\` in \`color\` (opaque CSS colour; apply alpha as opacity) over viewBox vb.
-function url(key, color, vb) {
+// \`only\` >= 0: that path alone (a symbol effect by layer draws one image per path).
+function url(key, color, vb, only) {
     const g = glyphs[key];
     if (!g) return "";
     let body = "";
-    for (const p of g[6])
+    for (let i = 0; i < g[6].length; i++) {
+        const p = g[6][i];
+        if (only >= 0 && i !== only) continue;
         body += '<path d="' + p[0] + '" fill="' + (p[2] || color) + '"'
               + (p.length > 1 && p[1] !== 1 ? ' fill-opacity="' + p[1] + '"' : "") + "/>";
+    }
     const v = vb.map(n => Math.round(n * 1000) / 1000).join(" ");
     return "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + v + '">' + body + "</svg>");
 }

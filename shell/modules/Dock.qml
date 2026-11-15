@@ -84,11 +84,16 @@ ShellWindow {
     }
 
     // ---------- geometry ----------
-    readonly property int tile: DockLayout.fitTile(State.dockTile(Prefs.dock), items.length - separators, separators, screen ? screen.width : 1920)
+    // > 0 while a separator is dragged: the Dock's desiredTileSize, shown live and written on release (lib/dock.js
+    // resizeTile)
+    property int resizeTile: 0
+    readonly property int tile: DockLayout.fitTile(resizeTile > 0 ? resizeTile : State.dockTile(Prefs.dock), items.length - separators, separators, screen ? screen.width : 1920)
     readonly property var m: DockLayout.metrics(tile)
     // magnified size: the Magnification slider's ratio to the Size slider (state/dock.json, default 96/48 = 2)
     readonly property int large: Math.round(tile * State.magnifyRatio(Prefs.dock))
-    readonly property real dpr: screen && screen.devicePixelRatio > 0 ? screen.devicePixelRatio : 1
+    // the window's ratio: the screen's says 2 on a 1.6 output, which snapped the tiles to half points (0.8 px), not
+    // to device pixels (SCALING-AUDIT.md)
+    readonly property real dpr: devicePixelRatio > 0 ? devicePixelRatio : screen && screen.devicePixelRatio > 0 ? screen.devicePixelRatio : 1
     // Magnification is off by default, like macOS (state/dock.json `magnification`, Settings >
     // Desktop & Dock > Magnification). Off: hovering only shows the app name, nothing moves.
     readonly property bool magnification: Prefs.dock.magnification === true
@@ -96,8 +101,22 @@ ShellWindow {
     readonly property real above: Math.max((magnification ? large - tile : 0) + labelRoom, DockLayout.attentionHeight(tile))
 
     anchors { bottom: true; left: true; right: true }
-    implicitHeight: Math.ceil(above + m.height + m.bottomGap)
-    exclusiveZone: autohide ? 0 : Math.ceil(m.height + m.bottomGap)
+    // The surface always has one height, enough for the largest Dock (128): a separator drag is measured in this
+    // surface, which must not resize under the pointer. Growing it on hover (as before) left Qt with the pointer's
+    // old surface position until the next motion: the area lost its hover, the cursor went back to the arrow and a
+    // press without a move first landed 128 pt above the separator (JUDGE-95-23 claim 2). The part above the Dock
+    // is outside the input mask (`hit`)
+    readonly property real resizeHeight: {
+        const mm = DockLayout.metrics(128);
+        const up = Math.max((magnification ? Math.round(128 * State.magnifyRatio(Prefs.dock)) - 128 : 0) + labelRoom, DockLayout.attentionHeight(128));
+        return Math.ceil(up + mm.height + mm.bottomGap);
+    }
+    implicitHeight: Math.max(resizeHeight, Math.ceil(above + m.height + m.bottomGap))
+    exclusiveZone: autohide ? 0 : Math.ceil(zoneM.height + zoneM.bottomGap)
+    // the zone follows the saved size, not a separator drag in progress: a new zone per frame made Hyprland lay the
+    // screen out again on every frame of the drag (dock-plate-sync.py: the Dock stood still for 3-7 frames near the
+    // end of the drag, 2-3 with the zone held); it takes the new size once, on the release
+    readonly property var zoneM: DockLayout.metrics(DockLayout.fitTile(State.dockTile(Prefs.dock), items.length - separators, separators, screen ? screen.width : 1920))
     namespace: "hyprk-dock"
     // Hyprland hides Top layers on a full-screen workspace at once: while the Dock slides out for a full screen
     // enter it sits on Overlay, so the slide is seen
@@ -380,7 +399,7 @@ ShellWindow {
     // follow the pointer directly. Entering and leaving the Dock ramp `fish` 0 <-> 1 on the Dock's cosine ease
     // in-out over lib/dock.js fishDuration (147 ms for 64 -> 128). The layout is recomputed only while magnified.
     property real focusX: 0
-    readonly property real fishTarget: magnification && pointerIn && shown && Panels.open !== "context" && !stackOpen ? 1 : 0
+    readonly property real fishTarget: magnification && pointerIn && shown && resizeTile === 0 && Panels.open !== "context" && !stackOpen ? 1 : 0
     property real fish: 0
     FrameAnim { id: fishAnim; target: dock; property: "fish"; ease: Easing.InOutSine }
     onFishTargetChanged: {
@@ -422,7 +441,12 @@ ShellWindow {
     property bool dragRemove: false
     property bool dragDropped: false
     property real dragFade: 1
-    readonly property bool removeShown: dragRemove && dragCell !== null
+    // what the dragged icon shows, kept apart from its cell: the removal destroys the cell (its slot is already
+    // closed), and the icon and "Remove" then fade for 0.25 s without it (they vanished in the drop's frame:
+    // dock-drag-off.py; Mac dock-drag-off-hand.mov, 16 fading frames)
+    property var dragInfo: null
+    readonly property bool dragging: dragCell !== null || dragDropped
+    readonly property bool removeShown: dragRemove && dragging
     Timer { id: removeDelay; interval: Theme.ms(250); onTriggered: dock.dragRemove = dock.dragOut }
     // (dropFade sits in the label's window below, which draws the icon and the bubble)
     function dragMove(c, x, y) {
@@ -438,7 +462,7 @@ ShellWindow {
         removeDelay.stop();
         if (dragOut && dragRemove) {
             dragDropped = true;
-            Sounds.play("poof");
+            Apps.poofSoon();                 // behind the first fading frame, as the menu's removal (Apps.qml)
             Apps.removeFromDock(c.modelData.id);
             dropFade.restart();
         } else {
@@ -446,14 +470,16 @@ ShellWindow {
             endDrag();
         }
     }
-    function endDrag() { dragCell = null; dragOut = false; dragRemove = false; dragDropped = false; dragFade = 1; }
+    function endDrag() { dragCell = null; dragInfo = null; dragOut = false; dragRemove = false; dragDropped = false; dragFade = 1; }
     // hit area: the background, plus the magnified band while magnified; hidden by autohide the bottom 2 pt of
     // the whole edge (reveals it), hidden by a full-screen window nothing
     Item {
         id: hit
-        x: dock.shown ? bg.x : 0
-        width: dock.shown ? bg.width : dock.autohide && !dock.fullscreen ? dock.width : 0
-        y: !dock.shown ? dock.height - 2 : dock.fish > 0 ? dock.restY - (dock.large - dock.tile) : dock.restY
+        // the whole surface during a separator drag: the pointer leaves the background on the way up, and on an empty
+        // desktop Hyprland ends the press when it leaves the input region
+        x: dock.resizeTile > 0 ? 0 : dock.shown ? bg.x : 0
+        width: dock.resizeTile > 0 ? dock.width : dock.shown ? bg.width : dock.autohide && !dock.fullscreen ? dock.width : 0
+        y: dock.resizeTile > 0 ? 0 : !dock.shown ? dock.height - 2 : dock.fish > 0 ? dock.restY - (dock.large - dock.tile) : dock.restY
         height: dock.height - y
     }
 
@@ -461,6 +487,15 @@ ShellWindow {
     HoverHandler {
         onPointChanged: if (hovered && dock.magnification) dock.focusX = point.position.x - (dock.width - dock.geom.baseWidth) / 2
         onHoveredChanged: dock.pointerIn = hovered
+    }
+
+    // the resize cursor for the whole of a separator drag: the Dock grows under the pointer, which is soon over a tile
+    MouseArea {
+        anchors.fill: parent
+        z: 10
+        visible: dock.resizeTile > 0
+        acceptedButtons: Qt.NoButton
+        cursorShape: Qt.SizeVerCursor
     }
 
     // test hooks: `qs ipc call dock bounce <dock item id>` bounces that icon as if it were launching,
@@ -533,7 +568,7 @@ ShellWindow {
                         return;
                     }
                     slotAnim.to = to;
-                    slotAnim.duration = Theme.ms(DockLayout.slotDuration(to > grow)) * Math.abs(to - grow);
+                    slotAnim.duration = Theme.ms(DockLayout.slotDuration(to > grow, Apps.menuRemoved !== "" && Apps.menuRemoved === modelData.id)) * Math.abs(to - grow);
                     slotAnim.start();
                 }
                 onLeavingChanged: slide(leaving ? 0 : 1)
@@ -564,15 +599,19 @@ ShellWindow {
                 width: dock.geom.w[index] || 0
                 height: dock.m.height
 
-                // separator: 1 pt from the background top + 6 to the bottom - 6, square ends (Q-dock-06)
+                // separator: 1 pt from the background top + 6 to the bottom - 6, square ends (Q-dock-06). At a
+                // fractional scale the item is one device pixel larger on every side (`pad`, shaders/plusfill.frag):
+                // the line's far edge falls inside a pixel there and its antialiasing ramp needs that pixel (1.5: [1]
+                // before, [1, .5] now, the Mac's More Space downsample; SCALING-AUDIT.md R3.3). 0 at 1x and 2x
                 ShaderEffect {
                     visible: cell.separator
-                    x: Math.round((cell.width - width) / 2 * dock.dpr) / dock.dpr
-                    y: dock.m.sepInset
-                    width: dock.m.sepWidth
-                    height: cell.height - dock.m.sepInset * 2
+                    property real pad: Pixel.soft(dock.dpr) ? 1 / dock.dpr : 0
+                    x: Math.round((cell.width - dock.m.sepWidth) / 2 * dock.dpr) / dock.dpr - pad
+                    y: dock.m.sepInset - pad
+                    width: dock.m.sepWidth + 2 * pad
+                    height: cell.height - dock.m.sepInset * 2 + 2 * pad
                     property vector4d fill: Theme.dock.separator
-                    property size sizePt: Qt.size(width, height)
+                    property size sizePt: Qt.size(dock.m.sepWidth, cell.height - dock.m.sepInset * 2)
                     property real radius: 0
                     property real dpr: dock.dpr
                     fragmentShader: Qt.resolvedUrl("../shaders/plusfill.frag.qsb")
@@ -586,6 +625,33 @@ ShellWindow {
                     acceptedButtons: Qt.RightButton
                     onClicked: Panels.openContext(Apps.dockSeparatorMenu(), (dock.width - dock.geom.baseWidth) / 2 + cell.baseCenter,
                                                   dock.screen.height - dock.height + dock.restY, true, dock.screen)
+                }
+
+                // drag a separator up or down: the Dock grows or shrinks (lib/dock.js resizeTile / resizeArea have
+                // the Dock's code). The travel is measured from the screen's bottom edge, which the surface keeps
+                MouseArea {
+                    readonly property var area: DockLayout.resizeArea(cell.width, cell.height)
+                    x: area.x; y: area.y; width: area.width; height: area.height
+                    enabled: cell.separator
+                    visible: cell.separator
+                    acceptedButtons: Qt.LeftButton
+                    cursorShape: Qt.SizeVerCursor
+                    preventStealing: true
+                    hoverEnabled: true
+                    property real pressUp: 0
+                    property int pressTile: 0
+                    function up(m) { return dock.height - mapToItem(null, m.x, m.y).y; }
+                    onPressed: m => { pressUp = up(m); pressTile = dock.tile; dock.resizeTile = dock.tile; }
+                    onPositionChanged: m => {
+                        if (pressed) dock.resizeTile = DockLayout.resizeTile(pressTile, up(m) - pressUp, (m.modifiers & Qt.AltModifier) !== 0);
+                    }
+                    // the release writes `tilesize`; a press the compositor ended (the pointer left the surface) too
+                    function done() {
+                        if (dock.resizeTile > 0 && dock.resizeTile !== State.dockTile(Prefs.dock)) Prefs.setDock({ size: dock.resizeTile });
+                        dock.resizeTile = 0;
+                    }
+                    onReleased: done()
+                    onCanceled: done()
                 }
 
                 // height above the rest position: the attention bounce, else the launch bounce
@@ -619,7 +685,9 @@ ShellWindow {
                 }
 
                 Item {
-                    visible: cell.stack && dock.dragCell !== cell && !dock.stackOpen
+                    // hidden while the popup lives: on the Mac the fan's items fly back into the tile and become the
+                    // pile, the tile is empty through the close (stack-fan-close.mov, stack-grid-close.mov)
+                    visible: cell.stack && dock.dragCell !== cell && !dock.stackOpen && !dock.stackLive
                     width: cell.size
                     height: cell.size
                     x: icon.x
@@ -652,15 +720,40 @@ ShellWindow {
                         }
                     }
                 }
-                // while its stack is open the tile shows a chevron (Q-dock-12; its size, weight and colour are guessed)
-                Symbol {
+                // while its stack is open the tile shows a dark plate with a white chevron (measured on
+                // stack-fan-open-dark.png / stack-grid-open-dark.png: Theme.dock.stack.chevron*). It goes at the close's
+                // first frame; the tile then stays empty until the flying items land (stack-fan-close.mov)
+                Rectangle {
                     visible: cell.modelData.folder === "Downloads" && dock.stackOpen
+                    width: cell.size * Theme.dock.stack.chevronPlate
+                    height: width
                     x: icon.x + (cell.size - width) / 2
                     y: icon.y + (cell.size - height) / 2
-                    size: cell.size * Theme.dock.stack.chevron
-                    name: "chevron.down"
-                    weight: "semibold"
-                    color: Theme.dock.labelText
+                    radius: cell.size * Theme.dock.stack.chevronPlateRadius
+                    gradient: Gradient {
+                        GradientStop { position: 0; color: Theme.dock.stack.chevronPlateTop }
+                        GradientStop { position: 1; color: Theme.dock.stack.chevronPlateBottom }
+                    }
+                    Canvas {
+                        anchors.fill: parent
+                        readonly property real k: cell.size
+                        onKChanged: requestPaint()
+                        onPaint: {
+                            const c = getContext("2d"), s = Theme.dock.stack, sw = k * s.chevronStroke;
+                            const hw = (k * s.chevronWidth - sw) / 2, hh = (k * s.chevronHeight - sw) / 2;
+                            const cx = width / 2, cy = height / 2 + k * s.chevronDrop;
+                            c.reset();
+                            c.strokeStyle = "white";
+                            c.lineWidth = sw;
+                            c.lineCap = "round";
+                            c.lineJoin = "round";
+                            c.beginPath();
+                            c.moveTo(cx - hw, cy - hh);
+                            c.lineTo(cx, cy + hh);
+                            c.lineTo(cx + hw, cy - hh);
+                            c.stroke();
+                        }
+                    }
                 }
 
                 // running dot, also while launching (with Reduce Motion it is the only launch feedback): 4.1 pt,
@@ -678,6 +771,7 @@ ShellWindow {
                     property size sizePt: Qt.size(width, height)
                     property real radius: width / 2
                     property real dpr: dock.dpr
+                    property real pad: 0   // the shader's optional uniform (no Qt warning)
                     fragmentShader: Qt.resolvedUrl("../shaders/plusfill.frag.qsb")
                 }
 
@@ -694,6 +788,9 @@ ShellWindow {
                     height: cell.height - y
                     hoverEnabled: true
                     enabled: !cell.separator && !cell.leaving
+                    // not over a separator: this area lies above its resize area, and Qt Quick takes the cursor from the
+                    // topmost visible area under the pointer, disabled or not (the arrow instead of resize up-down)
+                    visible: !cell.separator
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
                     // drag off (see dock.dragMove): window coordinates of the press, and whether this press dragged
                     property point pressAt: Qt.point(0, 0)
@@ -711,6 +808,7 @@ ShellWindow {
                             dragged = true;
                             const i = icon.mapToItem(null, 0, 0);
                             dock.dragGrab = Qt.point(pressAt.x - i.x, pressAt.y - i.y);
+                            dock.dragInfo = { icon: cell.modelData.icon || "", appId: cell.modelData.id || "", size: cell.size };
                             dock.dragCell = cell;
                         }
                         dock.dragMove(cell, p.x, p.y);
@@ -804,9 +902,9 @@ ShellWindow {
     ShellWindow {
         id: labelHost
         screen: dock.screen
-        visible: label.shown || dock.dragCell !== null
+        visible: label.shown || dock.dragging
         anchors { bottom: true; left: true; right: true }
-        implicitHeight: dock.dragCell !== null && dock.screen ? dock.screen.height : dock.implicitHeight
+        implicitHeight: dock.dragging && dock.screen ? dock.screen.height : dock.implicitHeight
         readonly property real off: height - dock.height     // the Dock window's top in this one
         exclusionMode: ExclusionMode.Ignore
         // Apple's label glass from the plugin (Regular recipe at this size, plugin bbd615a; dark over black / grey /
@@ -819,7 +917,9 @@ ShellWindow {
                 duration: Theme.ms(dock.autohide ? Theme.anim.dockSlide : 300) }
     FrameAnim {
         id: dropFade
-        target: dock; property: "dragFade"; from: 1; to: 0; duration: Theme.ms(250)
+        // 260 ms: the Mac's 16 frames (.98 .91 .87 .78 ... .08 0, dock-drag-off-hand.mov) are a line of 15.6 frames;
+        // with 250 the icon was gone a frame early (233 ms after the first fading frame, Mac 250)
+        target: dock; property: "dragFade"; from: 1; to: 0; duration: Theme.ms(260)
         onFinished: dock.endDrag()
     }
 
@@ -871,14 +971,14 @@ ShellWindow {
     // the dragged tile (drag off, above): the Dock's art size, where the pointer holds it
     AppIcon {
         id: dragIcon
-        visible: dock.dragCell !== null
-        size: dock.dragCell ? dock.dragCell.size : dock.tile
+        visible: dock.dragging && dock.dragInfo !== null
+        size: dock.dragInfo ? dock.dragInfo.size : dock.tile
         loadSize: dock.magnification ? dock.large : dock.tile
         x: dock.dragPos.x - dock.dragGrab.x
         y: labelHost.off + dock.dragPos.y - dock.dragGrab.y
         opacity: dock.dragFade
-        icon: dock.dragCell ? dock.dragCell.modelData.icon || "" : ""
-        appId: dock.dragCell ? dock.dragCell.modelData.id || "" : ""
+        icon: dock.dragInfo ? dock.dragInfo.icon : ""
+        appId: dock.dragInfo ? dock.dragInfo.appId : ""
     }
     // the "Remove" bubble over a tile dragged off (Q-dock-17): the hover label's style, its bottom 9 pt above the tile
     Glass {

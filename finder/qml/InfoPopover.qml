@@ -28,7 +28,11 @@ Popover {
             Column {
                 anchors.verticalCenter: parent.verticalCenter
                 width: col.width - 58
-                TextLabel { width: parent.width; elide: Text.ElideMiddle; text: root.entry ? root.entry.name : ""; size: 13; weight: Typography.semibold }
+                TextLabel {   // emoji at alpha 1 in the .85 label (OPEN-FIXES.md 16)
+                    width: parent.width; elide: Text.ElideMiddle; size: 13; weight: Typography.semibold
+                    text: EmojiText.opaque(root.entry ? root.entry.name : "", color)
+                    textFormat: EmojiText.has(root.entry ? root.entry.name : "") ? Text.StyledText : Text.PlainText
+                }
                 TextLabel {
                     width: parent.width; elide: Text.ElideRight; size: 11; color: Theme.color.secondaryLabel
                     text: !root.entry ? "" : root.entry.kind + (root.entry.isDir ? "" : " – " + Files.formatSize(root.entry.size, false))
@@ -38,7 +42,8 @@ Popover {
         InfoRows { width: col.width; entry: root.entry }
         TextLabel {
             width: col.width; elide: Text.ElideMiddle; size: 11; color: Theme.color.secondaryLabel
-            text: root.entry ? "Where: " + Files.parentPath(root.entry.path) : ""
+            text: EmojiText.opaque(root.entry ? "Where: " + Files.parentPath(root.entry.path) : "", color)
+            textFormat: EmojiText.has(root.entry ? Files.parentPath(root.entry.path) : "") ? Text.StyledText : Text.PlainText
         }
     }
 }

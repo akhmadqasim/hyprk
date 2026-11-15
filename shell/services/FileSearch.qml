@@ -44,7 +44,7 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: {
                 const ok = new Set(text.split("\n"));
-                root.recents = root.xbelRows.filter(r => ok.has(r.path)).slice(0, 20).map(r =>
+                root.recents = root.xbelRows.filter(r => ok.has(r.path)).map(r =>   // all 60: the Files grid scrolls (r17: about a dozen rows)
                     Object.assign(SL.fileRow(r.path + (r.mime === "inode/directory" ? "/" : ""), root.home), { mime: r.mime }));
             }
         }

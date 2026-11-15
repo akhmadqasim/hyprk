@@ -36,7 +36,7 @@ Item {
     // empty card). With none left the card shows the session's wallpaper, its own fallback
     property var photos: []
     property int photoPick: 0
-    readonly property string photo: photoPick < photos.length ? photos[photoPick] : ""
+    readonly property string photo: NcLib.photoAt(photos, photoPick)
     readonly property string wallpaperDir: Quickshell.shellDir + "/../themes/wallpapers/png"
     // folder name as the caption, like a Photos memory; a loose file in ~/Pictures gets the generic title
     readonly property string photoTitle: {
@@ -524,7 +524,8 @@ Item {
                             width: parent.width
                             topPadding: Theme.nc.upNextGap
                             wrapMode: Text.WordWrap
-                            text: "No more events today"
+                            // CalendarWidget 27.2.1 Localizable "No Events Today" (no calendar source: never any events)
+                            text: "No Events Today"
                             font: Typography.font(Theme.font.widgetSmall + 1, Typography.medium)
                             color: Theme.nc.widgetSecondary
                         }
@@ -578,7 +579,7 @@ Item {
                             sourceSize.width: Wallpaper.thumbWidth * 2
                             fillMode: Image.PreserveAspectCrop
                             asynchronous: true
-                            onStatusChanged: if (status === Image.Error && nc.photo) nc.photoPick++
+                            onStatusChanged: if (status === Image.Error && nc.photo) nc.photoPick = NcLib.photoNextPick(nc.photos, nc.photoPick)
                         }
                         Rectangle {
                             anchors.fill: parent

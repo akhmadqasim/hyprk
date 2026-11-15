@@ -59,7 +59,8 @@ Item {
                     }
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
-                        text: modelData.name
+                        text: EmojiText.opaque(modelData.name, color)   // emoji at alpha 1 (OPEN-FIXES.md 16)
+                        textFormat: EmojiText.has(modelData.name) ? Text.StyledText : Text.PlainText
                         color: Theme.color.secondaryLabel
                         font: Typography.font(Theme.font.pathBar)
                         TapHandler { onTapped: if (modelData.path) root.browser.go(modelData.path) }

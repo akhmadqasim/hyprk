@@ -34,7 +34,9 @@ Popover {
         width: parent.width
         horizontalAlignment: Text.AlignHCenter
         elide: Text.ElideMiddle
-        text: "Assign tags to " + (root.entries.length === 1 ? "“" + root.entries[0].name + "”" : root.entries.length + " items")
+        readonly property string plain: "Assign tags to " + (root.entries.length === 1 ? "“" + root.entries[0].name + "”" : root.entries.length + " items")
+        text: EmojiText.opaque(plain, color)   // emoji at alpha 1 (OPEN-FIXES.md 16)
+        textFormat: EmojiText.has(plain) ? Text.StyledText : Text.PlainText
         font: Typography.font(12)
         color: Tokens.secondaryLabel
     }

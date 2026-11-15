@@ -148,6 +148,7 @@ const DS = load("dockstack.js");
         assert.deepEqual(DK.slotKeys([{ id: "a" }, { id: "b" }, { id: "a" }]), ["a", "b", "a#2"]);
         assert.equal(DK.slotDuration(true), 250);
         assert.equal(DK.slotDuration(false), 150);
+        assert.equal(DK.slotDuration(false, true), 250);   // Dock menu > Remove from Dock (R10.2 c)
         const cells = ["tile", "tile", "tile"], full = DK.layout(cells, { tile: 64, large: 64, fish: 0, focus: 0, dpr: 2 });
         const half = DK.layout(cells, { tile: 64, large: 64, fish: 0, focus: 0, dpr: 2, grow: [1, 0.5, 1] });
         const close = (a, b, e) => assert.ok(Math.abs(a - b) <= e, `${a} != ${b}`);
@@ -211,6 +212,20 @@ test("dock.json without the key keeps magnification off", () => {
         assert.equal(DK.fitTile(64, 17, 2, 1710), 64);
         const t = DK.fitTile(64, 17, 2, 1000);
         assert.ok(t < 64 && lay(t, 0, 0).baseWidth <= 1000 && lay(t + 1, 0, 0).baseWidth > 1000);
+    });
+    test("dock resize by the separator: Dock 0x1000830f4 (travel, 16..128, Option cuts to 16s) and its 12 pt area", () => {
+        assert.equal(DK.resizeTile(64, 0, false), 64);
+        assert.equal(DK.resizeTile(64, 10.9, false), 74);       // truncated, as (int)
+        assert.equal(DK.resizeTile(64, -10.5, false), 53);
+        assert.equal(DK.resizeTile(64, 500, false), 128);
+        assert.equal(DK.resizeTile(64, -500, false), 16);
+        assert.equal(DK.resizeTile(64, 15, true), 64);          // 79 -> 64
+        assert.equal(DK.resizeTile(64, 16, true), 80);
+        assert.equal(DK.resizeTile(33, 0, true), 32);
+        assert.equal(DK.resizeTile(64, -500, true), 16);
+        assert.deepEqual(DK.resizeArea(16, 80), { x: 2, y: 4, width: 12, height: 72 });
+        // what the release writes is a size Settings and the Dock read back unchanged
+        for (const t of [16, 53, 128]) assert.equal(ST.dockTile({ size: DK.resizeTile(t, 0, false) }), t);
     });
     test("dock off: pointer moves nothing", () => {
         const rest = lay(64, 0, 0);
@@ -459,8 +474,25 @@ test("modes order", () => assert.deepEqual(SL.modes().map(m => m.id), ["apps", "
     test("spotlight modes: Files is the outline folder", () => {
         assert.equal(SF.resolve(sym("files")), "folder");
         assert.equal(SF.resolve("folder"), "folder.fill");
-        assert.equal(sym("actions"), "bolt");
-        assert.equal(sym("clipboard"), "doc.on.clipboard");
+        // r17 spotlight-modelist-*: two stacked rounded squares and two outline documents, both with an outline here
+        assert.equal(SF.resolve(sym("actions")), "app.2.stack.3d");
+        assert.equal(SF.resolve(sym("clipboard")), "document.on.document");
+    });
+    test("spotlight Files grid: five equal chips, kinds of the recent files, the scroll knob", () => {
+        assert.ok(Math.abs(SL.filesChipWidth(844) - 154.4) < 0.01);
+        assert.equal(SL.fileKind(true, ""), "Folders");
+        assert.equal(SL.fileKind(false, "application/pdf"), "PDF");
+        assert.equal(SL.fileKind(false, "application/x-unknown"), "");
+        const f = [{ mime: "image/png" }, { mime: "application/pdf" }, { mime: "application/pdf" }, { isDir: true }, { mime: "x/y" }];
+        assert.deepEqual(SL.fileChips(f, 5), ["PDF", "Images", "Folders"]);
+        assert.deepEqual(SL.fileChips(f, 1), ["PDF"]);
+        // the Mac's results list: 410 tall, knob from 40.5; a list as long as the view has none
+        assert.deepEqual(SL.scrollKnob(410, 410, 0, 40.5), [0, 0]);
+        const [y, len] = SL.scrollKnob(410, 992, 0, 40.5);
+        assert.equal(y, 40.5);
+        assert.ok(Math.abs(len - 136) < 0.5);
+        const end = SL.scrollKnob(410, 992, 582, 40.5);
+        assert.ok(Math.abs(end[0] + end[1] - (410 - 40.5)) < 0.01);
     });
     test("menus: Eject is the outline eject, every menu icon has a glyph (an SVG or a hand-drawn one)", () => {
         const src = readFileSync(join(here, "..", "lib", "menus.js"), "utf8");
@@ -489,10 +521,18 @@ test("query kept 8 min after close", () => {
     assert.ok(SL.keepsQuery(1000, 1000 + 7.9 * 60e3));
     assert.ok(!SL.keepsQuery(1000, 1000 + 8 * 60e3));
     assert.ok(!SL.keepsQuery(0, 5));
+    assert.ok(SL.keepsQuery(1000, 1000 + 8 * 60e3 - 1));   // KEEP_QUERY_MS 480000, exclusive
 });
-test("hint keys: Command and Ctrl alone", () => {
-    assert.ok(SL.isHintKey(0x01000022) && SL.isHintKey(0x01000053) && SL.isHintKey(0x01000021));
-    assert.ok(!SL.isHintKey(0x01000023) && !SL.isHintKey(0x41));
+// SPOTLIGHT: the Command hold's hint target is not traced and no Mac capture shows a mode list, so none is built
+test("no Command-hold mode hint in spotlight.js", () => assert.equal(SL.isHintKey, undefined));
+test("spotlight: the top hit's inline completion (r17 typed still)", () => {
+    assert.equal(SL.completion("calc", "Calculator"), "ulator \u2014 Open");
+    assert.equal(SL.completion("CALC", "Calculator"), "ulator \u2014 Open");
+    assert.equal(SL.completion("Calculator", "Calculator"), " \u2014 Open");
+    assert.equal(SL.completion("alc", "Calculator"), "");
+    assert.equal(SL.completion("", "Calculator"), "");
+    assert.equal(SL.completion("calculators", "Calculator"), "");
+    assert.equal(SL.completion("", "", true), " \u2014 Open");   // Applications: the action alone
 });
 test("mode key alt+1", () => assert.equal(SL.modeForKey(0x31, false, false, true), "apps"));
 test("mode key plain digit", () => assert.equal(SL.modeForKey(0x31, false, false, false), ""));
@@ -623,6 +663,22 @@ test("relTime", () => assert.deepEqual([30e3, 300e3, 7200e3, 100000e3, 400000e3]
     rmSync(dir, { recursive: true, force: true });
 }
 
+// ---- the stub sink of test sessions (lib/state.js; services/Audio.qml, scripts/volume-key.sh) ----
+test("stub sink: parse and format", () => {
+    assert.deepEqual(ST.parseStubSink("0.437500 1\n"), { volume: 0.4375, muted: true });
+    assert.deepEqual(ST.parseStubSink("Volume: x"), { volume: 0.5, muted: false });
+    assert.deepEqual(ST.parseStubSink(""), { volume: 0.5, muted: false });
+    assert.deepEqual(ST.parseStubSink("1.7 0"), { volume: 1, muted: false });
+    assert.equal(ST.formatStubSink(0.25, false), "0.250000 0\n");
+    assert.equal(ST.formatStubSink(-1, true), "0.000000 1\n");
+    assert.deepEqual(ST.parseStubSink(ST.formatStubSink(0.6875, true)), { volume: 0.6875, muted: true });
+});
+test("stub sink folder: volume-key.sh's per-instance folder, HYPRK_VOLKEY_DIR wins", () => {
+    assert.equal(ST.volkeyDir("", "/run/user/1000", "abc"), "/run/user/1000/hyprk-volkey-abc");
+    assert.equal(ST.volkeyDir("/x", "/run/user/1000", "abc"), "/x");
+    assert.equal(ST.volkeyDir(undefined, undefined, undefined), "/tmp/hyprk-volkey-0");
+});
+
 // ---- scripts/volume-key.sh + sound.sh volume (Control Center hot keys 27.2.1, SOUNDS.md "Volume keys") ----
 {
     const { execFileSync } = await import("node:child_process");
@@ -644,7 +700,8 @@ esac
     chmodSync(join(bin, "wpctl"), 0o755);
     const sh = join(here, "..", "scripts", "volume-key.sh");
     const env = Object.assign({}, process.env, { PATH: bin + ":" + process.env.PATH, HYPRK_VOLKEY_DIR: vk, HYPRK_STATE: st,
-        HYPRK_SOUND_LOG: log, HYPRK_MUTE: "1", HYPRLAND_INSTANCE_SIGNATURE: "test-volkey", XDG_RUNTIME_DIR: dir });
+        HYPRK_SOUND_LOG: log, HYPRK_MUTE: "1", HYPRLAND_INSTANCE_SIGNATURE: "test-volkey", XDG_RUNTIME_DIR: dir,
+        HYPRK_AUDIO_STUB: "0", HYPRK_STATUS_STUB: "0" });
     const run = (...a) => execFileSync(sh, a, { env }).toString();
     const near = (a, b) => assert.ok(Math.abs(a - b) < 1e-6, `${a} != ${b}`);
     const set = (v, m) => writeFileSync(sink, `${v} ${m ? 1 : 0}\n`);
@@ -679,6 +736,17 @@ esac
         run("up", "16"); run("up", "16"); near(vol(), 1); assert.equal(pops(), p0 + 2);
         set(0, 0); run("down", "16"); near(vol(), 0); assert.equal(pops(), p0 + 3);
     });
+    test("volume key step that leaves the level as it was tells the HUD (showVolume on every step, 0x20a595dac)", () => {
+        const f = join(vk, "hud-step"), stamp = () => existsSync(f) ? rd(f, "utf8") : "";
+        rmSync(f, { force: true });
+        set(0.5, 0); run("up", "16"); assert.equal(stamp(), "", "a level change shows through the sink, no stamp");
+        set(1, 1); run("up", "16"); assert.equal(stamp(), "", "unmuting is a change");
+        set(1, 0); run("up", "16"); const a = stamp(); assert.match(a, /^\d+ \d+\n$/);
+        set(0, 0); run("down", "64"); const b = stamp(); assert.ok(b && b !== a, "a new line on every such step");
+        const hud = rd(join(here, "..", "services", "Hud.qml"), "utf8");
+        assert.match(hud, /Audio\.stubDir \+ "\/hud-step"/);
+        assert.match(hud, /: > \\"\$1\/hud-step\\"/, "emptied at start");
+    });
     test("a new volume pop stops the one still playing (AudioVolumeFeedbackController 0x20a531cec), other sounds are left alone", () => {
         fb(true);
         writeFileSync(join(bin, "pw-play"), "#!/bin/sh\nsleep 3\n");   // a stand-in player: nothing reaches a speaker
@@ -689,11 +757,75 @@ esac
             kill $b $c 2>/dev/null`], { env: Object.assign({}, env, { HYPRK_MUTE: "0" }), encoding: "utf8" });
         assert.deepEqual(r.stdout.trim().split("\n"), ["a-gone", "b-alive", "c-alive"]);
     });
+    test("stub sink (HYPRK_AUDIO_STUB=1): volume keys step the file, wpctl is never called", () => {
+        writeFileSync(join(bin, "wpctl"), `#!/bin/sh\necho called >> "${dir}/wpctl-called"\nexit 1\n`);
+        const senv = Object.assign({}, env, { HYPRK_AUDIO_STUB: "1" });
+        const srun = (...a) => execFileSync(sh, a, { env: senv }).toString();
+        rmSync(join(vk, "stub-sink"), { force: true });
+        srun("up", "16");                                   // from the stub's start value 0.5
+        near(ST.parseStubSink(rd(join(vk, "stub-sink"), "utf8")).volume, 0.5625);
+        srun("mute"); assert.equal(ST.parseStubSink(rd(join(vk, "stub-sink"), "utf8")).muted, true);
+        srun("down", "16");                                 // unmutes, steps down
+        const s = ST.parseStubSink(rd(join(vk, "stub-sink"), "utf8"));
+        near(s.volume, 0.5); assert.equal(s.muted, false);
+        srun("up", "16", "shift"); srun("mute", "shift");
+        const s2 = ST.parseStubSink(rd(join(vk, "stub-sink"), "utf8"));
+        near(s2.volume, 0.5625); assert.equal(s2.muted, true);
+        assert.ok(!existsSync(join(dir, "wpctl-called")));
+        const senv2 = Object.assign({}, env, { HYPRK_STATUS_STUB: "1" });
+        execFileSync(sh, ["mute"], { env: senv2 });
+        assert.equal(ST.parseStubSink(rd(join(vk, "stub-sink"), "utf8")).muted, false);
+        assert.ok(!existsSync(join(dir, "wpctl-called")));
+    });
+    test("sound log carries the gain: alert volume exp(s - 1) for systemsoundserverd sounds, 1 for the volume pop", () => {
+        writeFileSync(join(st, "sound.json"), JSON.stringify({ alertVolume: 0.5, volumeFeedback: true }));
+        const snd = join(here, "..", "scripts", "sound.sh");
+        rmSync(log, { force: true });
+        for (const e of ["alert", "screenshot", "trash-empty", "volume"]) execFileSync(snd, [e], { env });
+        const lines = rd(log, "utf8").trim().split("\n");
+        const gain = e => Number(lines.find(l => l.startsWith(e + " ")).match(/ vol=([0-9.]+)$/)[1]);
+        near(gain("alert"), 0.6065); near(gain("screenshot"), 0.6065); near(gain("trash-empty"), 0.6065);
+        near(gain("volume"), 1);
+        assert.ok(lines.find(l => l.startsWith("screenshot ")).includes("system/Screen Capture."));
+        assert.ok(lines.find(l => l.startsWith("trash-empty ")).includes("finder/empty trash."));
+    });
     test("volume key without an output device does nothing", () => {
         writeFileSync(join(bin, "wpctl"), "#!/bin/sh\nexit 1\n");
         const p0 = pops(); run("up", "16"); assert.equal(pops(), p0);
     });
     rmSync(dir, { recursive: true, force: true });
+}
+
+// ---- lines on the device pixel grid (ui/HyprK/pixel.js, SCALING-AUDIT.md) ----
+{
+    const PX = load("pixel.js", hyprk);
+    // pixel centres a line from y covers when the rasteriser fills centres inside [y, y + t) (no antialiasing)
+    const covered = (y, t) => { let n = 0; for (let k = Math.floor(y) - 1; k < y + t + 1; k++) if (k + 0.5 >= y && k + 0.5 < y + t) n++; return n; };
+    test("pixel line: 1 pt at 1.6 is 2 px, 0.5 pt is 1 px; 2x and 1x unchanged", () => {
+        assert.equal(PX.line(1, 1.6) * 1.6, 2);
+        assert.equal(PX.line(0.5, 1.6) * 1.6, 1);
+        assert.equal(PX.line(1, 2), 1); assert.equal(PX.line(0.5, 2), 0.5);
+        assert.equal(PX.line(1, 1), 1); assert.equal(PX.line(0.5, 1), 1);
+        assert.equal(PX.line(1, 0), 1);
+        assert.equal(PX.line(1, 1.25) * 1.25, 1); assert.equal(PX.line(0.5, 1.5) * 1.5, 1);
+    });
+    test("pixel whole: a window keeps its size in points at every scale, as the Mac's (R16.3: 625 pt at 1.5)", () => {
+        for (const r of [1, 1.25, 1.5, 1.6, 2]) {
+            assert.equal(PX.whole(625, r), 625);   // was 626 at 1.5 and 624 at 1.25 (judge #23 to round 16)
+            assert.equal(PX.whole(594, r), 594);
+        }
+    });
+    test("pixel line: the same number of device pixels wherever it lands (1 pt at 1.6 drew 1 or 2 before)", () => {
+        const before = new Set(), after = new Set(), hair = new Set();
+        for (let pt = 0; pt < 40; pt += 0.25) {
+            before.add(covered(pt * 1.6, 1.6));
+            after.add(covered(pt * 1.6, PX.line(1, 1.6) * 1.6));
+            hair.add(covered(pt * 1.6, PX.line(0.5, 1.6) * 1.6));
+        }
+        assert.deepEqual([...before].sort(), [1, 2]);
+        assert.deepEqual([...after], [2]);
+        assert.deepEqual([...hair], [1]);
+    });
 }
 
 // ---- Liquid Glass motion (ui/HyprK/motion.js) ----
@@ -706,6 +838,71 @@ test("materialize scale: hidden, shown, reduce motion", () => {
     near(M.materializeScale(640, 1, false), 1);
     near(M.materializeScale(640, 0, true), 1);
 });
+test("liquidLens set (Settings 0x1908b139c): t = 0 under 37 pt, the large set from 70", () => {
+    const a = M.liquidLensSet(25, 20);
+    assert.deepEqual([a.norm, a.pts, a.minScale, a.maxScale, a.response, a.damping], [2000, 2.5, 0.9, 1.1, 0.444, 0.56]);
+    const b = M.liquidLensSet(80, 70);
+    near(b.norm, 2500); near(b.pts, 25); near(b.minScale, 0.75); near(b.maxScale, 1.15); near(b.response, 0.5); near(b.damping, 1);
+    // movementScaleRange: (dim -+ pts) / dim inside [min, max]
+    assert.deepEqual(M.movementRange(25, a), [0.9, 1.1]);
+    near(M.movementRange(20, a)[0], 0.9); near(M.movementRange(20, a)[1], 1.1);
+    near(M.movementRange(50, a)[0], 0.95); near(M.movementRange(50, a)[1], 1.05);
+});
+test("softClamp (0x190c24b74): unchanged inside, edge + k tanh(0.55 (x - edge) / k) outside", () => {
+    near(M.softClamp(1.05, 0.9, 1.1), 1.05);
+    const k = 0.2 / 3;
+    near(M.softClamp(1.2, 0.9, 1.1), 1.1 + k * Math.tanh(0.55 * 0.1 / k));
+    near(M.softClamp(0.5, 0.9, 1.1), 0.9 + k * Math.tanh(0.55 * -0.4 / k));
+    assert.ok(M.softClamp(100, 0.9, 1.1) < 1.1 + k + 1e-9);
+    assert.ok(M.softClamp(-100, 0.9, 1.1) > 0.9 - k - 1e-9);
+});
+test("applyMovement (0x190c22a70): speeding up widens and flattens, the leading edge stays; slowing down narrows", () => {
+    const set = M.liquidLensSet(25, 20);
+    assert.deepEqual(M.movementScale(0, 0, 500, 0, 25, 20, set), [1, 1, 0, 0]);
+    const up = M.movementScale(1000, 0, 800, 0, 25, 20, set);       // m = 0.5: 1 + 0.5 x 0.1
+    near(up[0], 1.05); near(up[1], 0.95); near(up[2], -25 * 0.05 / 2); near(up[3], 0);
+    near(25 / 2 * up[0] + up[2], 12.5);                              // the right (leading) edge did not move
+    const left = M.movementScale(1000, 0, -800, 0, 25, 20, set);
+    near(left[2], 25 * 0.05 / 2);                                    // going left: the left edge stays
+    const down = M.movementScale(-1000, 0, 800, 0, 25, 20, set);
+    near(down[0], 0.95); near(down[1], 1.05);
+    const hard = M.movementScale(-1e6, 0, 0, 0, 25, 20, set);         // a stop: soft-clamped, at most k past the edge
+    assert.ok(hard[0] > 0.9 - 0.2 / 3 - 1e-9 && hard[0] < 0.9);
+});
+test("movement source (VelocityIntegrator, EMA 0.3, |v| change): speeding up > 0 either way, a stop < 0", () => {
+    let st = M.movementStart();
+    st = M.movementSample(st, 0, 0, 0);
+    assert.deepEqual(st.acc, [0, 0]);
+    st = M.movementSample(st, 0, 0, 0.001);                          // under 2.5 ms: dropped
+    near(st.t, 0);
+    st = M.movementSample(st, 10, 0, 0.01);                          // p 0.3 x 10 = 3 -> v 300, a 30000 (first values as they are)
+    near(st.vel[0], 300); near(st.acc[0], 30000);
+    st = M.movementSample(st, 20, 0, 0.02);                          // p 3 + 0.3 (20 - 3) = 8.1 -> v 510 -> .7 x 300 + .3 x 510 = 363
+    near(st.vel[0], 363); near(st.acc[0], 0.7 * 30000 + 0.3 * (363 - 300) / 0.01);
+    let l = M.movementStart();
+    for (let i = 0; i < 6; i++) l = M.movementSample(l, -10 * i, 0, i / 60);
+    assert.ok(l.acc[0] > 0 && l.vel[0] < 0, "speeding up to the left: a > 0, v < 0");
+    for (let i = 6; i < 12; i++) l = M.movementSample(l, -50, 0, i / 60);
+    assert.ok(l.acc[0] < 0, "stopped: a < 0 (four samples late: three EMA stages)");
+});
+test("symbol bounce (SF Symbols .bounce, R7.4): 1 -> peak 0.217 s -> trough 0.433 s -> 1 at 0.583 s", () => {
+    near(M.symbolBounce(0, 1.27, 0.89), 1);
+    near(M.symbolBounce(0.21667, 1.27, 0.89), 1.27);
+    near(M.symbolBounce(0.43333, 1.27, 0.89), 0.89);
+    near(M.symbolBounce(0.58333, 1.27, 0.89), 1);
+    near(M.symbolBounce(0.108335, 1.27, 0.89), 1.135);               // smoothstep: half way at the middle
+    near(M.symbolBounce(1, 1.27, 0.89), 1);
+    assert.deepEqual(M.symbolBounceAmp("speaker.fill"), [1.27, 0.89]);
+    // several layers: each layer 1.25 / 0.90, 0.05 s after the one before, in the outline data's path order
+    assert.deepEqual(M.symbolBounceAmp("sun.max.fill"), [1.25, 0.90]);
+    assert.deepEqual(M.symbolBounceAmp("capsule.on.rectangle.fill"), [1.25, 0.90]);
+    assert.deepEqual(M.symbolBounceLayerOf("speaker.wave.3.fill"), [3, 2, 1, 0]);   // waves from the outside in, speaker
+    assert.deepEqual(M.symbolBounceLayerOf("sun.min.fill"), [1, 0]);                 // rays, disc
+    assert.deepEqual(M.symbolBounceLayerOf("capsule.on.rectangle.liquid.glass"), [1, 0, 1]);
+    assert.deepEqual(M.symbolBounceLayerOf("speaker.fill"), [0]);
+    assert.deepEqual([M.symbolBounceLayers("speaker.wave.3.fill"), M.symbolBounceLayers("sun.max.fill"), M.symbolBounceLayers("speaker.fill")], [4, 2, 1]);
+    assert.deepEqual(M.symbolBounceAmp("other"), [1.27, 0.89]);
+});
 test("press lift: the longer side grows 2.5 pt while it is under 120 (ultraSmall)", () => {
     near(M.pressScale(54, 54), 56.5 / 54);
     near(M.pressScale(78, 37), 80.5 / 78);   // the Liquid Glass preview capsule: 1.25 pt per side (recording: 1.25-1.57)
@@ -715,7 +912,7 @@ test("press lift: from 120 small -> large over the shorter side 80 .. 160", () =
     near(M.pressScale(300, 120), 302.125 / 300);
     near(M.pressScale(300, 200), 302 / 300);
 });
-test("toolbar platter press: the glass interaction layer (live/glass-params, state 1 alpha .1, state 2 .05)", () => {
+test("toolbar platter interaction layer (decoded; the history-menu-open look, not drawn since R7.1)", () => {
     // dark: the Mac's hover-panel capsule face (65 over the lit strip) pressed -> 84 (Mac panel 85..88)
     near(Math.round(255 * M.platterPress(65 / 255, true, 0.1)), 84);
     // the 89 hover disc -> 106 (Mac 110)
@@ -809,6 +1006,8 @@ test("mode buttons start inside the field, end in place", () => {
         near(lpc("STRETCH_DISTANCE"), tok("stretchDistance"), 1e-9);
         near(lpc("SPRING_RESPONSE"), tok("liftResponse"), 1e-9);
         near(lpc("SPRING_DAMPING"), tok("liftDamping"), 1e-9);
+        near(lpc("LEAVE_FADE"), tok("leaveFade"), 1e-9);
+        near(lpc("LEAVE_FADE_DELAY") * 1000, tok("leaveFadeDelay"), 1e-6);
         near(lpc("IDLE_TIMEOUT") * 1000, tok("idleTimeout"), 1e-6);
         near(con("GLYPH_DELAY") * 1000, tok("glyphDelay"), 1);
         near(con("GLYPH_IN") * 1000, tok("glyphIn"), 1);
@@ -947,6 +1146,15 @@ test("mode buttons start inside the field, end in place", () => {
         assert.equal(p.length, 3);
         assert.equal(p[1].opacity, 0.3);
         assert.equal(p[0].maxX, 39.8);
+        assert.deepEqual([p[2].minX, p[2].minY, p[2].maxY], [5, 14.3, 31]);
+        assert.deepEqual(H.inkCentre(p), { x: (5 + 39.8) / 2, y: (14.3 + 31) / 2 });
+    });
+    test("hud: the glyph bounces when the level arrives at 0 or 1, not when it stays (SymbolEffectState.update)", () => {
+        assert.ok(H.bouncesAt(0.9375, 1) && H.bouncesAt(0.0625, 0) && H.bouncesAt(-1, 1));
+        assert.ok(!H.bouncesAt(1, 1) && !H.bouncesAt(0, 0) && !H.bouncesAt(0.5, 0.5625) && !H.bouncesAt(1, 0.9375));
+        const win = readFileSync(join(here, "..", "modules", "HudWindow.qml"), "utf8");
+        assert.match(win, /HudLib\.bouncesAt\(seenLevel, level\)/);
+        assert.match(win, /hit && active && win\.mapped && win\.shownness > 0\) bounce\.play\(\)/);
     });
     test("hud: wave.1 drops the outer wave", () => {
         const p = H.withoutOuterWave(H.svgPaths(svg));
@@ -1005,6 +1213,18 @@ test("mode buttons start inside the field, end in place", () => {
 // ---- exact springs as BezierSpline curves (lib/spring.js, components/SpringCurve.qml) ----
 {
     const SP = load("spring.js");
+    test("spring: a measured track plays as it is (Mission Control exit, R10.1)", () => {
+        const edge = [68, 53, 42, 32, 24, 16, 11, 7, 4, 2, 0];   // 68 pt bar in the clip's display mode (R11.7)
+        const tr = SP.fromTrack(edge.map(v => 1 - v / 68), 1 / 60);
+        for (let k = 0; k < edge.length; k++) assert.ok(Math.abs(68 * (1 - SP.state(tr, 0, k / 60)[0]) - edge[k]) < 1e-9);
+        assert.ok(Math.abs(68 * (1 - SP.state(tr, 0, 1.5 / 60)[0]) - 47.5) < 1e-9, "straight between frames");
+        assert.deepEqual(SP.state(tr, 0, 0.5), [1, 0]);
+        const mc = readFileSync(join(here, "..", "modules", "MissionControl.qml"), "utf8");
+        assert.match(mc, /barExit: SpringLib\.fromTrack\(\[68, 53, 42, 32, 24, 16, 11, 7, 4, 2, 0\]/);
+        const bar = readFileSync(join(here, "..", "modules", "MenuBar.qml"), "utf8");
+        assert.match(bar, /fromTrack\(\[0, 0\.23, 0\.42, 0\.58, 0\.72, 0\.80, 0\.86, 0\.90, 0\.90, 0\.93, 0\.94, 0\.97,/);
+        assert.match(bar, /fullscreen \|\| mcLeaving \? WlrLayer\.Overlay : WlrLayer\.Top/);
+    });
     const src = n => readFileSync(join(here, "..", n), "utf8");
     // evaluate a BezierSpline list at time fraction f, as Qt does (find the segment, solve x for the parameter)
     const evalSpline = (c, f) => {
@@ -1115,6 +1335,15 @@ test("mode buttons start inside the field, end in place", () => {
         for (const re of [/fromBounce\(0\.28, 0\.41\)/, /fromBounce\(0\.28, 0\.32\)/, /fromBounce\(0\.45, 0\.05\)/]) assert.match(sl, re);
         assert.ok(!/slideCurve/.test(src("modules/NotificationCenter.qml")), "no hand-fitted NC curve left");
     });
+    test("hud: hold 1.000 s whatever the show delay, content at the spring value, scaled about the top anchor", () => {
+        // MOTION-AUDIT.md "HUD", "Round J20": hideAfter - showDelay = 1024 held .984-1.018 (mean 1.000) on screen
+        const hud = src("services/Hud.qml"), win = src("modules/HudWindow.qml");
+        const num = re => Number(hud.match(re)[1]);
+        assert.equal(num(/hideAfter: (\d+)/) - num(/showDelay: (\d+)/), 1024);
+        assert.equal(num(/anchorAbove: (\d+)/), 10);
+        assert.match(win, /transformOrigin: Item\.Top/);
+        assert.match(win, /opacity: win\.shownness\n/);
+    });
 }
 
 // ---- Notification Center motion and layout (lib/nc.js, Theme; MAC-ANSWERS PC #62 and "NC panel spring") ----
@@ -1123,6 +1352,14 @@ test("mode buttons start inside the field, end in place", () => {
     const ncSrc = readFileSync(join(shell, "lib", "nc.js"), "utf8").replace(/^\.pragma library\s*$/m, "");
     const NC = new Function(ncSrc + "\nreturn {" + [...ncSrc.matchAll(/^(?:var|function) (\w+)/gm)].map(m => m[1]).join(",") + "};")();
     const SPL = load("spring.js");
+    test("NC photo widget skips an undecodable candidate, else the wallpaper", () => {
+        // the widget's Image moves on with photoNextPick on Image.Error; "" means Wallpaper.url
+        const walk = (list, broken) => { let k = 0; while (NC.photoAt(list, k) && broken.includes(NC.photoAt(list, k))) k = NC.photoNextPick(list, k); return NC.photoAt(list, k); };
+        assert.equal(walk(["/p/a.png", "/p/b.png", "/w/x.png"], ["/p/a.png"]), "/p/b.png");
+        assert.equal(walk(["/p/a.png", "/p/b.png"], ["/p/a.png", "/p/b.png"]), "");
+        assert.equal(walk([], []), "");
+        assert.equal(NC.photoNextPick(["/p/a.png"], 5), 1);
+    });
     // Mac tracks (pt per 60 fps frame, motion.json): open from the first visible frame, close from motion start
     const open = [339, 293.5, 245, 199, 159.5, 125, 97.5, 75.5, 57.5, 44, 33.5, null, 14.5, 11, 8, 5.5, 4.5, 3.5, 2.5, 2, 1.5, 1, 1, 0.5, 0.5, 0];
     const close = [0, 7, 38, 83, 131.5, 178, 216.5, 250, 278.5, 300.5, 317.5, 332, 342.5, 350.5, 357];
@@ -1261,6 +1498,48 @@ test("Mission Control layout reproduces the Mac's frames (mission-control.json)"
             assert.ok(dev <= 1.01, name + " window " + i + ": " + dev.toFixed(2) + " pt off");
         });
     }
+});
+test("Mission Control: the Spaces bar expands on the decoded (1.0, 0.38) spring, the windows make room (R18.1)", () => {
+    const E = load("expose.js"), SP = load("spring.js");
+    // live/r18/mc-spaces-bar-expand-dark.mov, per 60 Hz frame from 2.117 s: the top row's top edge less 39.5 pt (the
+    // bar's own edge reads 86.5 95.5 95.5 in frames 2-4, one frame ahead and then repeated)
+    const mac = [70.5, 77.5, 86, 95.5, 104.5, 113, 120.5, 127.5, 133, 138, 142, 145.5, 148, 150.5, 152.5, 154, 155, 156, 157, 157.5, 158];
+    const s = SP.fromResponse(0.38, 1), t0 = 0.0155;        // 2.117 s is 15.5 ms into the spring (start 2.101 s)
+    const rms = Math.sqrt(mac.reduce((a, v, k) => a + (68 + 92 * SP.value(s, 0, t0 + k / 60) - v) ** 2, 0) / mac.length);
+    assert.ok(rms < 0.35, "rms " + rms.toFixed(2) + " pt");
+    const mc = readFileSync(join(here, "..", "modules", "MissionControl.qml"), "utf8");
+    assert.match(mc, /barGrow: SpringLib\.fromResponse\(0\.38, 1\)/);
+    assert.match(mc, /barExpand: 92\b/);
+    assert.match(mc, /height: mc\.m\.barHeight \+ grow \* mc\.m\.barExpand/);
+    // the stills: the top row moves down 92 pt at its size, the window lower down stays
+    const scr = { x: 0, y: 0, w: 1440, h: 932 };
+    const wins = [{ x: 18, y: 108, w: 548, h: 402 }, { x: 1212, y: 108, w: 210, h: 370 }, { x: 578, y: 393, w: 622, h: 476 }];
+    const a = E.layout(wins, E.usableArea(scr, 0, 68)).frames, b = E.layout(wins, E.usableArea(scr, 0, 160)).frames;
+    for (const i of [0, 1]) {
+        assert.ok(Math.abs(b[i].y - a[i].y - 92) < 0.5 && Math.abs(b[i].w - a[i].w) < 0.01 && Math.abs(b[i].x - a[i].x) < 0.5, "window " + i);
+    }
+    assert.ok(Math.abs(b[2].y - a[2].y) < 1.5 && Math.abs(b[2].h - a[2].h) < 1.5, "the lower window stays");
+    const m = E.between(a[0], b[0], 0.5);
+    assert.ok(Math.abs(m.y - (a[0].y + b[0].y) / 2) < 1e-9 && m.w === a[0].w);
+    assert.equal(E.between(a[0], b[0], 0), a[0]);
+    assert.equal(E.between(a[0], null, 0.5), a[0]);
+});
+test("Control Center slider module: lighter under the pointer, the lens's module level from the wallpaper (R18.3)", () => {
+    const theme = readFileSync(join(here, "..", "Theme.qml"), "utf8");
+    const cc = readFileSync(join(here, "..", "modules", "ControlCenter.qml"), "utf8");
+    const sl = readFileSync(join(here, "..", "modules", "ControlCenterSlider.qml"), "utf8");
+    assert.match(theme, /sliderHoverLift: 7 \/ 255/);          // Mac 50 -> 57, 186 -> 193, 24 -> 31
+    assert.match(theme, /sliderHeldGain: 0\.035/);              // 57 -> 59, 193 -> 200
+    assert.match(theme, /lensW: 22\.5\b[\s\S]*?lensH: 17\.5\b/);
+    assert.match(theme, /lensDy: 0\.25\b/);
+    assert.match(theme, /knobShadowScale: 0\.75\b/);
+    // the module's level over the Mac's four wallpapers: 50, 106, 186 and blue's luma
+    const level = y => 0.125 + 0.604 * y;
+    assert.match(theme, /lensEmptyBase: 0\.125\b[\s\S]*?lensEmptySlope: 0\.604\b/);
+    for (const [wall, mod] of [[30.3, 50], [127, 106], [255, 186]]) assert.ok(Math.abs(255 * level(wall / 255) - mod) < 3);
+    assert.match(cc, /visible: hover\.hovered \|\| smSlider\.pressed/);
+    assert.match(cc, /Theme\.cc\.sliderHoverLift \+ \(smSlider\.pressed \? Theme\.cc\.sliderHeldGain \* smSlider\.moduleLevel : 0\)/);
+    assert.match(sl, /moduleLevel: Theme\.cc\.lensEmptyBase \+ Theme\.cc\.lensEmptySlope \* Wallpaper\.topLuma/);
 });
 test("towardSubmenu: AppKit's cone, 15 degrees past the near edge's corners", () => {
     const MN = load("menus.js");
@@ -1717,12 +1996,14 @@ test("stack fan slots: Open in Finder after the items, N More in Finder when the
     assert.deepEqual(DS.fanSlots(5, 567), { items: 5, extra: "Open in Finder" });
     assert.deepEqual(DS.fanSlots(12, 567), { items: 7, extra: "5 More in Finder" });
 });
-test("stack fan: 3000 pt circle, pitch 64, rotation -asin(y / 3000), the frame 24 below the tile (y up, decoded)", () => {
+test("stack fan: 3000 pt circle, pitch 64, rotation -asin(y / 3000), the frame 24 above the tile (measured)", () => {
     const a = DS.fanItem(64, 0);
-    assert.deepEqual([a.y, a.dx, a.up], [64, 1, 72]);       // 2 x 32 + 32 - 24: t + 8 above the icon bottom
+    assert.deepEqual([a.y, a.dx, a.up], [64, 1, 120]);      // 2 x 32 + 32 + 24: t + 56 above the icon bottom
     const b = DS.fanItem(64, 10);        // y 704: dx 3000 - int(2916.2) = 84
-    assert.deepEqual([b.y, b.dx, b.up], [704, 84, 712]);
-    assert.equal(DS.fanItem(33, 0).up, 16 + 16 + 32 - 24);
+    assert.deepEqual([b.y, b.dx, b.up], [704, 84, 760]);
+    assert.equal(DS.fanItem(33, 0).up, 16 + 16 + 32 + 24);
+    // stack-fan-open.mov (tile 31, icon box bottom 921 pt, x 982): slot 0 centre measured 85 above the box bottom, dx 1
+    assert.ok(Math.abs(DS.fanItem(31, 0).up - 85) <= 1.5 && DS.fanItem(31, 0).dx === 1);
     assert.ok(Math.abs(b.angle - Math.atan(704 / 2916) * 180 / Math.PI) < 1e-9);
     assert.ok(Math.abs(b.angle - 13.57) < 0.01);
     // Q-dock-12 (tile 33, 11 files + Open in Finder): the rotated 64 box grows 65.5 -> 78.3 pt bottom to top
@@ -1732,12 +2013,29 @@ test("stack fan: 3000 pt circle, pitch 64, rotation -asin(y / 3000), the frame 2
 test("stack fan motion: starts in the collapsed frames, lands on the layout", () => {
     assert.equal(DS.collapsedUp(64, 0), 29);      // s 3: frame {3, 0, 58, 58}, centre 29
     assert.equal(DS.collapsedUp(64, 7), 32 + 9);  // past the 3rd: the 3rd
-    assert.equal(DS.collapsedUp(30, 1), 16);
+    assert.equal(DS.collapsedUp(30, 1), 17);      // DockBar.tileSize 30 + 2 x tileInset 1 = 32: s 2
+    assert.equal(DS.collapsedUp(29, 1), 15.5);    // tileSize 31: s 1
     const s = DS.fanAt(64, 4, 0), e = DS.fanAt(64, 4, 1), f = DS.fanItem(64, 4);
     assert.ok(Math.abs(s.up - 41) < 1e-9 && Math.abs(s.dx) < 0.05 && s.angle === 0);
     assert.ok(Math.abs(e.dx - f.dx) < 1e-9 && Math.abs(e.up - f.up) < 1e-9 && e.angle === f.angle);
     const m = DS.fanAt(64, 4, 0.5);
     assert.ok(m.up > s.up && m.up < e.up && m.dx > 0 && m.dx < e.dx);
+});
+test("stack collapsed step: s from DockBar.tileSize = tile + 2 x tileInset (MOTION-REA Round 6)", () => {
+    // tileInset 1 up to 47, 2 up to 127, 3 above; s 1 / 2 / 3 for tileSize < 32 / < 48 / larger
+    assert.equal(DS.collapsedStep(29), 1);        // tileSize 31
+    assert.equal(DS.collapsedStep(30), 2);        // tileSize 32
+    assert.equal(DS.collapsedStep(31), 2);        // tileSize 33: the R4.1 recording's tile (s 1 read before)
+    assert.equal(DS.collapsedStep(45), 2);        // tileSize 47
+    assert.equal(DS.collapsedStep(46), 3);        // tileSize 48
+    assert.equal(DS.collapsedStep(47), 3);        // tileInset 1: 49
+    assert.equal(DS.collapsedStep(48), 3);        // tileInset 2: 52
+    assert.equal(DS.collapsedStep(128), 3);       // tileInset 3: 134
+    // tile 31: items 0 / 1 collapse to centres 13.5 / 17.5 above the tile bottom (s 2), 27 / 23 pt wide
+    assert.equal(DS.collapsedUp(31, 0), 13.5);
+    assert.equal(DS.collapsedUp(31, 1), 17.5);
+    assert.equal(DS.collapsedUp(31, 2), 21.5);
+    assert.equal(DS.collapsedUp(31, -1), 13.5);   // clamped to item 0
 });
 test("stack fan item size: 64 at rest (the only _itemSize write), from the pile's frame while opening", () => {
     assert.equal(DS.fanSize(64, 0, 1), 64);
@@ -1746,6 +2044,10 @@ test("stack fan item size: 64 at rest (the only _itemSize write), from the pile'
     assert.equal(DS.fanSize(64, 2, 0), 46);
     assert.equal(DS.fanSize(64, 7, 0), 46);       // past the 3rd: the 3rd
     assert.equal(DS.fanSize(33, 1, 0), 25);       // s 2: 33 - 2 x 2 x 2
+    // tile 31 (stack-fan-more-close-dark.mov): tileSize 33, s 2: item 0 ends at 27 (measured 27.4), item 1 at 23
+    assert.equal(DS.fanSize(31, 0, 0), 27);
+    assert.equal(DS.fanSize(31, 1, 0), 23);
+    assert.equal(DS.fanSize(46, 0, 0), 40);       // tileSize 48: s 3
     assert.equal(DS.fanSize(64, 0, 0.5), 61);
     // Q-dock-12 (tile 33, 12 slots): AX frames 65.5 -> 78.3 are the turned 64 box (65.0 -> 78.0 here); tops step 64.6
     const box = i => DS.fanBox(64, DS.fanItem(33, i).angle);
@@ -1761,9 +2063,10 @@ test("stack fan curves: CA's table (default 0.25 0.1 0.25 1, easeInEaseOut 0.42 
     assert.ok(Math.abs(DS.caTiming("easeInEaseOut", 0.25) - 0.1291) < 1e-3);
     assert.equal(DS.caTiming("linear", 0.3), 0.3);
     const o = DS.fanChannels(125, 250, false), c = DS.fanChannels(125, 250, true);
-    assert.ok(Math.abs(o.pos - 0.5) < 1e-9 && Math.abs(o.labelOpacity - 0.5) < 1e-9 && o.turn > 0.8 && o.size === o.turn);
-    assert.ok(Math.abs(c.pos - 0.5) < 1e-9 && Math.abs(c.turn - (1 - o.turn)) < 1e-12 && c.labelScale === c.pos);
-    assert.deepEqual(DS.fanChannels(0, 250, false), { pos: 0, turn: 0, size: 0, labelScale: 0, labelOpacity: 0 });
+    // size: 64 all through the open (measured, Round 4), the close shrinks on "default"
+    assert.ok(Math.abs(o.pos - 0.5) < 1e-9 && Math.abs(o.labelOpacity - 0.5) < 1e-9 && o.turn > 0.8 && o.size === 1);
+    assert.ok(Math.abs(c.pos - 0.5) < 1e-9 && Math.abs(c.turn - (1 - o.turn)) < 1e-12 && c.labelScale === c.pos && c.size === c.turn);
+    assert.deepEqual(DS.fanChannels(0, 250, false), { pos: 0, turn: 0, size: 1, labelScale: 0, labelOpacity: 0 });
     assert.deepEqual(DS.fanChannels(300, 250, true), { pos: 0, turn: 0, size: 0, labelScale: 0, labelOpacity: 0 });
     // the rotation on its own progress: at p = 0.5 with the default curve's 0.80 the item is turned 80 %
     assert.ok(Math.abs(DS.fanAt(64, 4, 0.5, o.turn).angle - DS.fanItem(64, 4).angle * o.turn) < 1e-12);
@@ -1913,11 +2216,16 @@ test("status module: left edge on the item's left edge, flipped to its right edg
     assert.equal(SMD.placeX(1100, 22, 308, 1280), 1100 + 22 - 308);
     assert.equal(SMD.placeX(10, 22, 308, 200), 0);
 });
-test("status module metrics: 308 wide, text at 14 + 26 + 8, rows 32", () => {
+test("status module metrics: the Mac shots' sizes (308 wide, header 42, rows 32, titles 22, footer 34)", () => {
     const m = SMD.metrics();
-    assert.deepEqual([m.width, m.inset, m.disc, m.textX, m.rowH, m.titleH], [308, 14, 26, 48, 32, 28]);
+    assert.deepEqual([m.width, m.inset, m.disc, m.textX, m.rowH, m.titleH, m.labelH, m.headerH, m.footerH, m.listInset],
+                     [308, 14, 26, 48, 32, 22, 18, 42, 34, 5]);
+    assert.deepEqual([m.headerBaseline, m.titleBaseline, m.labelBaseline, m.rowBaseline, m.footerBaseline, m.switchCentre],
+                     [26, 15.5, 8.5, 5, 21, 21]);
+    assert.deepEqual([m.top, m.pillInset, m.hoverInset, m.hoverRadius, m.headerSubBaseline, m.subtitleBaseline],
+                     [1, 1, 7, 10, 19, 34]);
 });
-test("wifi rows: Known Network singular, other networks under a disclosure, off shows header and settings", () => {
+test("wifi rows: Known Network singular with a lock, other networks under a disclosure, off shows header and settings", () => {
     const nets = [{ name: "Home", known: true, connected: true, strength: 0.9, secure: true },
                   { name: "Cafe", known: false, connected: false, strength: 0.5, secure: false },
                   { name: "Neighbour", known: false, connected: false, strength: 0.7, secure: true },
@@ -1926,37 +2234,147 @@ test("wifi rows: Known Network singular, other networks under a disclosure, off 
     assert.deepEqual(r.map(x => x.title || x.type), ["Wi‑Fi", "divider", "Known Network", "Home", "divider",
                                                     "Other Networks", "divider", "Wi‑Fi Settings…"]);
     assert.equal(r[3].on, true);
+    assert.equal(r[3].lock, true);
     const e = SMD.wifiRows({ available: true, on: true, networks: nets, otherExpanded: true });
     const other = e.filter(x => x.type === "toggle" && !x.on);
-    assert.deepEqual(other.map(x => [x.title, x.enabled]), [["Neighbour", false], ["Cafe", true]]);
+    assert.deepEqual(other.map(x => [x.title, x.enabled, x.lock]), [["Neighbour", false, true], ["Cafe", true, false]]);
     const two = SMD.wifiRows({ available: true, on: true, otherExpanded: false,
                                networks: [nets[0], { name: "Work", known: true, connected: false, strength: 1 }] });
     assert.ok(two.some(x => x.title === "Known Networks"));
     const off = SMD.wifiRows({ available: true, on: false, networks: nets });
     assert.deepEqual(off.map(x => x.type), ["header", "divider", "footer"]);
     assert.equal(off[0].on, false);
+    // the Mac shot's layout without its Personal Hotspots group: line 42, title 48, row 70, lines 107 / 140, footer 141
+    const l = SMD.layout(r);
+    assert.deepEqual(l.rows.map(x => x.y + (x.lineY || 0)), [0, 42, 48, 70, 107, 113, 140, 141]);
+    assert.equal(l.height, 175);
 });
-test("battery rows: percent in the header, state line, energy label disabled, settings", () => {
+test("battery rows: percent in the header, power source and charge lines, Energy Mode disabled, settings", () => {
     const r = SMD.batteryRows({ percent: 0.734, state: "discharging", minutesToFull: 0, showPercentInBar: false });
     assert.equal(r[0].accessory, "text");
     assert.equal(r[0].text, "73%");
-    assert.deepEqual(r.filter(x => x.type === "label").map(x => [x.title, x.enabled]),
-                     [["Power Source: Battery", true], ["No Apps Using Significant Energy", false]]);
+    assert.deepEqual(r.filter(x => x.type === "label").map(x => x.title), ["Power Source: Battery"]);
+    assert.deepEqual(r.filter(x => x.type === "title").map(x => x.title), ["Energy Mode"]);
+    assert.deepEqual(r.filter(x => x.type === "toggle").map(x => [x.title, x.symbol, x.enabled]),
+                     [["Low Power", "battery.25percent", false]]);
+    assert.equal(r.find(x => x.type === "note").title, "No Apps Using Significant Energy");
     assert.equal(r[r.length - 1].title, "Battery Settings…");
     assert.equal(SMD.batteryRows({ percent: 1, showPercentInBar: true })[0].accessory, "");
-    assert.equal(SMD.batteryState("full", 0), "Fully Charged");
-    assert.equal(SMD.batteryState("charging", 95), "1:35 until fully charged");
-    assert.equal(SMD.batteryState("charging", 700), "More than 10 hours until fully charged");
-    assert.equal(SMD.batteryState("other", 0), "Power Source: Power Adapter");
+    assert.deepEqual(SMD.batteryLines("full", 0), ["Power Source: Power Adapter", "Fully Charged"]);
+    assert.deepEqual(SMD.batteryLines("charging", 95), ["Power Source: Power Adapter", "1:35 until fully charged"]);
+    assert.deepEqual(SMD.batteryLines("charging", 700), ["Power Source: Power Adapter", "More than 10 hours until fully charged"]);
+    assert.deepEqual(SMD.batteryLines("pending", 0), ["Power Source: Power Adapter", "Charging On Hold"]);
+    assert.deepEqual(SMD.batteryLines("other", 0), ["Power Source: Power Adapter"]);
+    // the Mac shot (full): lines under the header at 42 / 60, line 78, Energy Mode 84, Low Power 106, line 143
+    const l = SMD.layout(SMD.batteryRows({ percent: 1, state: "full", showPercentInBar: false }));
+    assert.deepEqual(l.rows.map(x => x.y + (x.lineY || 0)), [0, 42, 60, 78, 84, 106, 143, 149, 176, 177]);
+    assert.equal(l.height, 211);
 });
-test("focus rows and layout: dividers between sections, heights add up", () => {
-    const r = SMD.focusRows({ dnd: true });
-    assert.equal(r[2].title, "Do Not Disturb");
-    assert.equal(r[2].on, true);
+test("focus rows and layout: the Mac's six modes, only Do Not Disturb live, the shot's 280 pt", () => {
+    const r = SMD.focusRows({ dnd: false });
+    assert.deepEqual(r.filter(x => x.type === "toggle").map(x => [x.title, x.symbol, x.enabled, x.on]),
+                     [["Do Not Disturb", "moon.fill", true, false], ["Work", "person.lanyardcard.fill", false, false],
+                      ["Sleep", "bed.double.fill", false, false], ["Mindfulness", "apple.mindfulness", false, false],
+                      ["Reduce Interruptions", "_gm", false, false], ["Driving", "car.fill", false, false]]);
     const l = SMD.layout(r);
-    assert.deepEqual(l.rows.map(x => x.y), [0, 40, 46, 78, 84]);
-    assert.equal(l.height, 40 + 6 + 32 + 6 + 32.6);
+    // M: line 42, rows from 48 every 32, line 245, footer from 246, bottom 280
+    assert.deepEqual(l.rows.map(x => x.y + (x.lineY || 0)), [0, 42, 48, 80, 112, 144, 176, 208, 245, 246]);
+    assert.equal(l.height, 280);
+    assert.equal(r[0].subtitle, "");
+    assert.equal(l.rows[l.rows.length - 1].baseline, 21);
+    // M (R4.2, a Focus on): "On" under the title, no line above "Focus Settings…", its button 4 under the last row, 273
+    const on = SMD.layout(SMD.focusRows({ dnd: true }));
+    assert.equal(on.rows[0].subtitle, "On");
+    assert.deepEqual(on.rows.filter(x => x.type === "toggle").map(x => x.on), [true, false, false, false, false, false]);
+    assert.deepEqual(on.rows.map(x => x.type).slice(-2), ["toggle", "footer"]);
+    assert.deepEqual([on.rows[on.rows.length - 1].y, on.rows[on.rows.length - 1].baseline, on.height], [240, 20, 273]);
     assert.equal(SMD.layout([{ type: "divider" }, { type: "divider" }, { type: "footer" }]).rows.length, 1);
+    assert.equal(SMD.layout([{ type: "header" }, { type: "divider" }]).rows.length, 1);
+});
+
+// ---- hardware-bound items and brightness backends (lib/hardware.js, scripts/brightness.sh) ----
+const HW = load("hardware.js");
+test("HYPRK_HW decides an item, else what the machine has", () => {
+    assert.deepEqual(HW.overrides("wifi=0, bluetooth=1,bogus,battery=2"), { wifi: false, bluetooth: true });
+    assert.deepEqual(HW.overrides(undefined), {});
+    assert.equal(HW.present("wifi", true, { wifi: false }), false);
+    assert.equal(HW.present("wifi", false, { wifi: true }), true);
+    assert.equal(HW.present("wifi", false, {}), false);
+    assert.equal(HW.present("bluetooth", {}, {}), true);
+});
+test("AirDrop needs Wi-Fi and Bluetooth", () => {
+    assert.deepEqual([[1, 1], [1, 0], [0, 1], [0, 0]].map(p => HW.hasAirdrop(p[0], p[1])), [true, false, false, false]);
+});
+test("Control Center grid: all three connectivity modules = the Mac's layout", () => {
+    const l = HW.ccLayout({ wifi: true, bluetooth: true, airdrop: true });
+    assert.deepEqual([l.wifi, l.bluetooth, l.airdrop].map(c => [c.c, c.r]), [[0, 0], [0, 1], [0, 2]]);
+    assert.deepEqual([l.nowPlaying, l.stage, l.dark, l.focus].map(c => [c.c, c.r, c.span]), [[1, 0, 1], [1, 2, 1], [0, 3, 1], [1, 3, 1]]);
+    assert.equal(l.rows, 4);
+});
+test("Control Center grid: a hidden module's cell is taken, no hole in any case", () => {
+    // every cell of the rows above the sliders is covered exactly once (Now Playing is two rows high)
+    for (const h of [[1, 1, 1], [0, 1, 0], [1, 0, 0], [0, 0, 0], [1, 1, 0], [0, 1, 1]]) {
+        const l = HW.ccLayout({ wifi: !!h[0], bluetooth: !!h[1], airdrop: !!h[2] });
+        const used = {};
+        const put = (c, rows) => { for (let r = c.r; r < c.r + rows; r++) for (let k = c.c; k < c.c + c.span; k++) { assert.ok(!used[k + "," + r], "overlap " + h); used[k + "," + r] = 1; } };
+        for (const n of ["wifi", "bluetooth", "airdrop"]) { assert.equal(l[n] !== null, !!h[["wifi", "bluetooth", "airdrop"].indexOf(n)]); if (l[n]) put(l[n], 1); }
+        put(l.nowPlaying, 2); put(l.stage, 1); put(l.dark, 1); put(l.focus, 1);
+        assert.equal(Object.keys(used).length, l.rows * 2, "hole " + h);
+    }
+    // no Wi-Fi (so no AirDrop), Bluetooth there: this PC
+    const pc = HW.ccLayout({ wifi: false, bluetooth: true, airdrop: false });
+    assert.deepEqual([pc.wifi, pc.airdrop, pc.bluetooth.r, pc.dark.r, pc.focus.r, pc.stage.r, pc.rows], [null, null, 0, 1, 2, 2, 3]);
+    assert.equal(HW.ccLayout({}).focus.span, 2);
+});
+test("brightness probe: a backlight wins, DDC monitors listed, nothing = no control", () => {
+    assert.deepEqual(HW.parseProbe("ddc 7 25 100\nddc 8 30 100\n"), { mode: "ddc", value: 0.25, ddc: [{ bus: 7, max: 100 }, { bus: 8, max: 100 }] });
+    assert.deepEqual(HW.parseProbe("backlight 480 960\nddc 7 25 100\n"), { mode: "backlight", value: 0.5, ddc: [] });
+    assert.deepEqual(HW.parseProbe(""), { mode: "", value: 1, ddc: [] });
+    assert.deepEqual(HW.parseProbe("ddc x 1 2\nddc 7 5 0\nnoise\n"), { mode: "", value: 1, ddc: [] });
+});
+test("brightness levels: floor 0.01, 4 decimals, key steps on the 1/16 and 1/64 grid", () => {
+    assert.deepEqual([HW.level(0), HW.level(2), HW.level(0.123456), HW.level(NaN)], [0.01, 1, 0.1235, 1]);
+    assert.equal(HW.stepLevel(0.8, 1, 16), 0.875);
+    assert.equal(HW.stepLevel(0.875, -1, 64), 0.8594);
+    assert.equal(HW.stepLevel(1, 1, 16), 1);
+    assert.equal(HW.stepLevel(0.01, -1, 16), 0.01);
+});
+test("brightness.json: parse, and equal states are not written again", () => {
+    assert.deepEqual(HW.parseState('{"value":0.4,"available":true,"source":"ddc","probe":2}'), { value: 0.4, available: true, source: "ddc", probe: 2 });
+    assert.deepEqual(HW.parseState("not json"), { value: null, available: false, source: "", probe: 0 });
+    assert.deepEqual(HW.parseState('{"value":"x"}').value, null);
+    assert.ok(HW.sameState(HW.parseState('{"value":0.4,"available":true,"source":"ddc","probe":2}'), { value: 0.4, available: true, source: "ddc", probe: 2 }));
+    assert.ok(!HW.sameState(HW.parseState('{"value":0.4}'), { value: 0.4, available: true, source: "ddc", probe: 0 }));
+    assert.ok(!HW.sameState(null, {}));
+});
+test("scripts/brightness.sh with a fake ddcutil: probe skips sleeping monitors, set writes VCP 10 to each", () => {
+    const tmp = spawnSync("mktemp", ["-d"], { encoding: "utf8" }).stdout.trim();
+    try {
+        // a brightnessctl that fails first in PATH: no backlight, also on a laptop
+        spawnSync("sh", ["-c", 'mkdir "$0/bin" "$0/ddc" && printf "#!/bin/sh\\nexit 1\\n" > "$0/bin/brightnessctl" && chmod +x "$0/bin/brightnessctl"', tmp]);
+        const env = Object.assign({}, process.env, { PATH: tmp + "/bin:" + process.env.PATH, FAKE_DDC_DIR: tmp + "/ddc",
+                                                     HYPRK_DDCUTIL: join(here, "fake-ddcutil.sh") });
+        const run = (...a) => spawnSync(join(here, "..", "scripts", "brightness.sh"), a, { encoding: "utf8", env });
+        assert.equal(run("probe").stdout, "ddc 7 25 100\nddc 8 25 100\n");
+        spawnSync("touch", [tmp + "/ddc/asleep"]);
+        assert.equal(run("probe").stdout, "");                       // "Invalid display": no brightness control
+        spawnSync("rm", [tmp + "/ddc/asleep"]);
+        assert.equal(run("set", "0.6", "7:100", "8:100").status, 0);
+        assert.equal(readFileSync(tmp + "/ddc/writes", "utf8"), "7 60\n8 60\n");
+        run("set", "0", "7:100");                                    // never 0: the floor is 1
+        assert.equal(readFileSync(tmp + "/ddc/level-7", "utf8"), "1\n");
+        assert.equal(HW.parseProbe(run("probe").stdout).value, 0.01);
+        assert.equal(run("bogus").status, 2);
+    } finally { spawnSync("rm", ["-rf", tmp]); }
+});
+test("the real `ddcutil detect` of two sleeping monitors (this PC, 2026-11-15) gives no display", () => {
+    const out = "Invalid display\n   I2C bus:          /dev/i2c-7\n   DRM connector:    card1-DP-1\n   Monitor:          LEN:N27p:UMA1\n\n"
+              + "Invalid display\n   I2C bus:          /dev/i2c-8\n   DRM connector:    card1-DP-2\n   Monitor:          LEN:N27p:UMA2\n\n";
+    const awk = '/^[^ \\t]/ { ok = ($1 == "Display") } ok && /I2C bus:/ { n = $NF; sub(/.*i2c-/, "", n); print n }';
+    assert.equal(spawnSync("awk", [awk], { input: out, encoding: "utf8" }).stdout, "");
+    assert.equal(spawnSync("awk", [awk], { input: out.replace("Invalid display", "Display 1"), encoding: "utf8" }).stdout, "7\n");
+    // the same program is the one in the script
+    assert.ok(readFileSync(join(here, "..", "scripts", "brightness.sh"), "utf8").includes(awk));
 });
 
 console.log(`${pass} passed, ${fail} failed`);

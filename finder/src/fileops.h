@@ -1,11 +1,13 @@
 #pragma once
 
 #include <QFileSystemWatcher>
+#include <QHash>
 #include <QJsonObject>
 #include <QMimeDatabase>
 #include <QMutex>
 #include <QThreadPool>
 #include <QObject>
+#include <QSize>
 #include <QVariantList>
 
 // Native helpers the QML UI cannot do on its own: directory listing with mime data,
@@ -56,6 +58,9 @@ public:
     // { pages, width, height (pt, first page) } of a PDF for Quick Look, from `pdfinfo`; pages 0 when it cannot be
     // read. Blocking (10-20 ms)
     Q_INVOKABLE QVariantMap pdfInfo(const QString &path) const;
+    // An image's pixel size from its header (QImageReader, no decode), for the gallery's Dimensions row; an invalid
+    // size when it cannot be read
+    Q_INVOKABLE QSize imageSize(const QString &path) const;
 
     // Context menu (MAC-ANSWERS live/finder/crops/context-menu-*.png). Names follow Finder:
     //   Duplicate  "Notes copy.txt", "Notes copy 2.txt", folder "Photos copy"
@@ -91,6 +96,7 @@ private:
     QVariantList applications() const;
     QVariantList tagged(const QString &tag) const;
     QJsonObject tagIndex() const;
+    qint64 lastUsed(const QString &path) const;
     void moveTagKeys(const QStringList &from, const QString &to) const;
     void moveTagKeysInto(const QStringList &from, const QString &destDir) const;
     void saveTagIndex(const QJsonObject &index) const;
@@ -99,6 +105,10 @@ private:
     mutable QMutex m_tagMutex;
     mutable QJsonObject m_tagIndex;
     mutable bool m_tagIndexLoaded = false;
+    mutable QMutex m_usedMutex;              // lastUsed: recently-used.xbel, re-read when the file changes
+    mutable QHash<QString, qint64> m_used;
+    mutable qint64 m_usedStamp = -2;
+    mutable qint64 m_usedSize = -1;
     QMimeDatabase m_mime;
     QString m_soundScript;
 };

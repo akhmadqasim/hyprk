@@ -194,6 +194,14 @@ int main() {
         // rim: dark specular 75 deg dark / 106 light, key spread 80 -> 90 over D 96 -> 191, key amount 0.5, diffuse 0.075
         CHECK(near(resolveMaterial(reg, 64, true).darkSpread, 75) && near(resolveMaterial(reg, 64, false).darkSpread, 106) &&
               near(resolveMaterial(reg, 191, true).keySpread, 90, 1e-4) && near(resolveMaterial(reg, 64, true).diffuseAmount, 0.075, 1e-6));
+        // gradientOvalization (MAC-ANSWERS-8.md R8.1 sweep): 300 x 64 -> 0, 300 x 65 -> 0.5, 64 x 64 -> 0, 65 x 65 -> 0.5,
+        // 64 x 300 -> 0, 640 x 260 -> 0.5, capsules 640 x 56 -> 0
+        CHECK(gradientOvalization(300, 64) == 0.f && near(gradientOvalization(300, 65), 0.5) && gradientOvalization(64, 64) == 0.f &&
+              near(gradientOvalization(65, 65), 0.5) && gradientOvalization(64, 300) == 0.f && near(gradientOvalization(640, 260), 0.5) &&
+              gradientOvalization(640, 56) == 0.f);
+        // ... on SwiftUI / AppKit glass only: the Mac's Dock, Cmd-Tab and Control Center modules keep a flat rim
+        CHECK(recipeByName("menu").ovalize && recipeByName("spotlight").ovalize && recipeByName("notificationbanner").ovalize &&
+              recipeByName("regular").ovalize && !recipeByName("dock").ovalize && !recipeByName("controlcenter").ovalize);
         // shadow by size: 0.04 + 0.56 q dark, light to 0.4, radius 4 + 20 q, y 8
         r = resolveMaterial(reg, 24, true);
         CHECK(near(r.shadowOpacity, 0.04, 1e-6) && near(r.shadowRadius, 4, 1e-5) && near(r.shadowOffsetY, 8));
@@ -209,6 +217,33 @@ int main() {
               near(r.shadowRadius, 24, 1e-5) && near(r.shadowOffsetY, 10));
         CHECK(near(resolveMaterial(mn, 24, true).shadowOpacity, 0.8, 1e-6)); // the Mac dump (Q-menubar-28 pixels agree, Material.cpp)
 
+        // the dark side line of the cards and the banner (R18.2): the decoded tone with the dump's bias -0.25, its luma
+        // limited to 0.278 (knee 4), dark only; Regular (alert, menus) keeps the fitted -0.278 and no limiter
+        CHECK(near(resolveMaterial(recipeByName("notificationcenter"), 75, true).darkToneCap, 0.278, 1e-6) &&
+              near(resolveMaterial(recipeByName("notificationbanner"), 75, true).darkToneCap, 0.278, 1e-6) &&
+              near(resolveMaterial(recipeByName("notificationbanner"), 75, true).darkToneKnee, 4, 1e-6) &&
+              near(resolveMaterial(recipeByName("notificationbanner"), 75, true).darkBias, -0.25, 1e-6) &&
+              near(resolveMaterial(recipeByName("notificationcenter"), 75, false).darkToneCap, 0) &&
+              near(resolveMaterial(recipeByName("notificationcenter"), 75, false).darkBias, -0.25, 1e-6) &&
+              near(resolveMaterial(recipeByName("regular"), 75, true).darkBias, -0.278, 1e-6) &&
+              near(resolveMaterial(recipeByName("regular"), 75, true).darkToneCap, 0) && near(resolveMaterial(recipeByName("menu"), 75, true).darkToneCap, 0));
+        {
+            // the line at full strength over the Mac's backdrops (levels): grey 99.5 -> 44.5, white 200 -> 70.4 and
+            // 233.5 -> 71.5, blue (57,65,156) -> (20,24,86), pure blue 224 -> 154 (159 at strength 0.93)
+            const auto tone = [](double r, double g, double b) {
+                double c[3] = {r / 255, g / 255, b / 255}, y = 0;
+                const double w[3] = {0.2126, 0.7152, 0.0722};
+                for (int i = 0; i < 3; i++) {
+                    c[i] *= 1 - 0.25 * (3 - 2 * c[i]);
+                    y    += w[i] * c[i];
+                }
+                const double k = std::pow(1 + std::pow(y / 0.278, 4.0), -0.25);
+                return std::array<double, 3>{255 * c[0] * k, 255 * c[1] * k, 255 * c[2] * k};
+            };
+            CHECK(near(tone(99.5, 99.5, 99.5)[0], 44.5, 2) && near(tone(200, 200, 200)[0], 70.4, 2) && near(tone(233.5, 233.5, 233.5)[0], 71.5, 2));
+            CHECK(near(tone(57, 65, 156)[0], 20, 1.5) && near(tone(57, 65, 156)[1], 24, 1.5) && near(tone(57, 65, 156)[2], 86, 1.5));
+            CHECK(near(tone(0, 0, 224)[2], 154.5, 1.5) && near(tone(0, 0, 224)[0], 0));
+        }
         // Notification Center: Regular at size class medium (D 166 at any card size), rim = 1.23 x the key band, no diffuse
         const auto& nc = recipeByName("notificationcenter");
         CHECK(std::string{nc.name} == "notificationcenter" && hasShadow(nc) && near(resolveMaterial(nc, 75, true).maxLuma, 0.35, 1e-6) &&
@@ -242,6 +277,16 @@ int main() {
         // blur from 60 pt inside the edge; the slider changes nothing
         const auto& sp = recipeByName("spotlight");
         CHECK(std::string{sp.name} == "spotlight" && hasShadow(sp) && sp.shadowBlack && near(sp.ringOpacity, 0));
+        // the shell's bottom veil in the plugin, on a face clamped first (SPOTLIGHT-27.2.1.md "Judge #20"); no other recipe
+        CHECK(sp.clampBeforeFill && near(resolveMaterial(sp, 214, true).fill.a, 0.205f, 1e-6) && near(resolveMaterial(sp, 87, false).fill.a, 0.205f, 1e-6) &&
+              near(resolveMaterial(sp, 87, false).fill.r, 0) && !recipeByName("regular").clampBeforeFill && !recipeByName("menu").clampBeforeFill &&
+              !recipeByName("controlcenter").clampBeforeFill && !recipeByName("notificationbanner").clampBeforeFill);
+        // round 17 (R17.5): the list's outer refraction sample sees the bar above it under the shell's veil, and the top
+        // line is the shell's (keyTop 0); no other recipe
+        CHECK(sp.outerSeesPrior && near(sp.keyTop, 0) && near(sp.priorVeil[0], 0.975f, 1e-6) && near(sp.priorVeil[2], 0.517f, 1e-6) &&
+              near(resolveMaterial(sp, 410, true).outerAmount, 164, 1e-3) && near(resolveMaterial(sp, 214, true).outerAmount, 85.6f, 1e-3));
+        for (const char* n : {"regular", "menu", "dock", "controlcenter", "clear", "notificationcenter", "notificationbanner"})
+            CHECK(!recipeByName(n).outerSeesPrior && near(recipeByName(n).keyTop, 1));
         CHECK(near(resolveMaterial(sp, 86, false).shadowOpacity, 0.4, 1e-6) && near(resolveMaterial(sp, 86, true).shadowOpacity, 0.7, 1e-6) &&
               near(resolveMaterial(sp, 86, true).shadowOffsetY, 18) && near(resolveMaterial(sp, 30, false).shadowRadius, 28.284, 1e-3));
         r = resolveMaterial(sp, 60, false);
@@ -304,6 +349,22 @@ int main() {
         // a glass shape touching the bottom edge is not a marker
         std::vector<SRect> wide = {{0, 700, 200, 20}};
         CHECK(near(takeOpacityMarker(wide, 1280, 720), 1) && wide.size() == 1);
+    }
+
+    // whole-window markers: shadow size in the top row (x = size / 2 (w - 1)), soften in the left column (y = pt / 16 (h - 1))
+    {
+        std::vector<SRect> rects = {{100, 100, 260, 234}, {640, 0, 1, 1}, {0, 36, 1, 1}, {639, 719, 1, 1}};
+        CHECK(near(takeShadowSizeMarker(rects, 1280, 720), 2.0 * 640 / 1279) && rects.size() == 3);
+        CHECK(near(takeSoftenMarker(rects, 1280, 720), 16.0 * 36 / 719) && rects.size() == 2);
+        CHECK(near(takeOpacityMarker(rects, 1280, 720), 639.0 / 1279.0) && rects.size() == 1);
+        // none left: 1 and 0
+        CHECK(near(takeShadowSizeMarker(rects, 1280, 720), 1) && near(takeSoftenMarker(rects, 1280, 720), 0) && rects.size() == 1);
+        // the opacity marker (bottom row, left column at opacity 0) is not a soften marker
+        std::vector<SRect> bottom = {{0, 719, 1, 1}};
+        CHECK(near(takeSoftenMarker(bottom, 1280, 720), 0) && bottom.size() == 1);
+        // a glass shape touching the top edge is not a marker
+        std::vector<SRect> wide = {{0, 0, 200, 20}};
+        CHECK(near(takeShadowSizeMarker(wide, 1280, 720), 1) && near(takeSoftenMarker(wide, 1280, 720), 0) && wide.size() == 1);
     }
 
     // materialize hole: 1x1 gap in the middle row, x = left + 1 + round(m (w - 3))
@@ -418,6 +479,25 @@ int main() {
         holeAt(rows, 50 - FRACTION_ROW_Y, 100 - std::floor(n2 * n2 / 2.0) + q(-0.5, n2) * n2 + q(-0.5, n2));
         s = clusterRegion(rows);
         CHECK(s.size() == 1 && near(s[0].box.x, 0.5) && near(s[0].box.w, 200) && near(s[0].box.y, -0.5) && std::abs(s[0].radius - 16) <= 3);
+        // even n (the alert, 260 pt: 16 levels) has no code for 0: a resting glass keeps its whole-point box (it sat
+        // 1 / 30 pt right and down, GLASS-HIG.md round 9), a moving edge reads inside the shell's rounding bin
+        rows = roundedRows(510, 158, 260, 234, 26);
+        const int    n3 = fractionLevels(260);
+        const double b3 = 640 - std::floor(n3 * n3 / 2.0);
+        holeAt(rows, 275 - FRACTION_ROW_X, b3 + q(0, n3) * n3 + q(0, n3));
+        holeAt(rows, 275 - FRACTION_ROW_Y, b3 + q(0, n3) * n3 + q(0.3, n3));
+        s = clusterRegion(rows);
+        CHECK(n3 == 16 && s.size() == 1 && near(s[0].box.x, 510) && near(s[0].box.w, 260) && near(s[0].box.y, 158) &&
+              std::abs(s[0].box.bottom() - 392.3) < 1.0 / 15);
+        double worstBin = 0, worstZero = 0;
+        for (int lv = 3; lv <= FRACTION_MAX_LEVELS; ++lv)
+            for (int k = -500; k <= 500; ++k) {
+                const double d = k / 1000.0, got = fractionEdge(q(d, lv), lv);
+                worstBin       = std::max(worstBin, std::abs(got - d) * (lv - 1)); // in bins
+                if (k == 0 || std::abs(k) == 500)
+                    worstZero = std::max(worstZero, std::abs(got - d));
+            }
+        CHECK(worstBin <= 1 + 1e-9 && worstZero < 1e-12);
     }
 
     // groups: shapes closer than k share one smooth-union group, lead = largest area
@@ -550,12 +630,12 @@ int main() {
 
 
     // the title-bar light press (FlexInteraction windowControl, LightPress.hpp): lift 2 pt on a 14 pt light, the
-    // 0.355 s / 0.4 spring (overshoot e^(-pi z / sqrt(1 - z^2)) = 25.4 % at pi / wd = 0.194 s), the same spring back with
-    // its undershoot, the drag stretch, the 2 s idle end
+    // measured 0.31 s / 0.5 spring, the same spring back with its undershoot, the drag stretch, the 2.1 s idle end
     {
         CHECK(near(lights::liftScale(14, 14), 16.0 / 14));
         CHECK(near(lights::liftScale(14, 20), 22.0 / 20));
         // analytic underdamped step response against the stepped spring, every 1/60 s
+        // the measured spring (0.31 s / 0.5: overshoot e^(-pi z / sqrt(1 - z^2)) = 16.3 % at pi / wd = 0.179 s)
         const double z = lights::SPRING_DAMPING, w0 = 2 * M_PI / lights::SPRING_RESPONSE, wd = w0 * std::sqrt(1 - z * z);
         const auto   exact = [&](double t) { return 1 - std::exp(-z * w0 * t) * (std::cos(wd * t) + z / std::sqrt(1 - z * z) * std::sin(wd * t)); };
         CLightPress p;
@@ -571,7 +651,7 @@ int main() {
             CHECK(near(p.scaleX(), p.scaleY()) && near(p.shiftX(), 0)); // no travel: a uniform lift about the centre
         }
         CHECK(worst < 0.01);                                   // the 4 ms substeps follow the closed form
-        CHECK(near(peak, 1.254, 0.01) && near(peakT, 0.2, 0.02)); // the bounce: 1.179 (16.5 pt) at 0.19-0.2 s
+        CHECK(near(peak, 1.163, 0.01) && near(peakT, 0.18, 0.02)); // the bounce: 16.33 pt at about 0.18 s (measured)
         for (int f = 0; f < 60; ++f)
             p.step(1.0 / 60);
         CHECK(p.active() && !p.moving() && near(p.scaleX(), 16.0 / 14)); // settled, still held
@@ -581,7 +661,7 @@ int main() {
             p.step(1.0 / 60);
             low = std::min(low, p.scaleX());
         }
-        CHECK(near(low, 1 - 0.254 * L, 0.003));                // undershoot to 13.5 pt on the way back
+        CHECK(near(low, 1 - 0.163 * L, 0.003));                // the same spring back: undershoot to 13.67 pt (Mac 13.48-13.74)
         CHECK(!p.moving() && near(p.scaleX(), 1) && near(p.shiftX(), 0)); // nothing runs at rest
         // drag: 50 pt right of a press at the centre: k = 43 / 3825.649 + 7 / (4 x 3825.649)
         p.press(14, 14, 7, 7);
@@ -592,14 +672,32 @@ int main() {
         p.move(-43, 7); // left: the shift turns, the scale is the same
         p.snap();
         CHECK(near(p.scaleX(), 16.0 / 14 + k) && near(p.shiftX(), -14 * k));
-        // idle: no pointer event for 2 s ends the gesture though the button is still down
-        for (int f = 0; f < 119; ++f)
+        // idle: no pointer event for 2.1 s (measured) ends the gesture though the button is still down
+        for (int f = 0; f < 125; ++f)
             p.step(1.0 / 60);
         CHECK(p.active());
         p.step(2.0 / 60);
         CHECK(!p.active());
         p.release(); // the mouse-up after it changes nothing
         CHECK(!p.active());
+        // an inactive window's light (R6.4): the lift in one frame, held still; the way back still springs
+        CLightPress q;
+        q.press(14, 14, 7, 7, true);
+        CHECK(near(q.scaleX(), 16.0 / 14) && near(q.scaleY(), 16.0 / 14) && !q.moving());
+        q.step(1.0 / 60);
+        CHECK(near(q.scaleX(), 16.0 / 14));
+        q.release();
+        q.step(1.0 / 60);
+        CHECK(q.scaleX() > 1.12 && q.moving());               // one frame after the release: still about 15.9 pt
+        double qlow = 9;
+        for (int f = 0; f < 120; ++f) {
+            q.step(1.0 / 60);
+            qlow = std::min(qlow, q.scaleX());
+        }
+        CHECK(near(qlow, 1 - 0.163 * L, 0.003) && near(q.scaleX(), 1));
+        q.press(14, 14, 7, 7); // a later press on the key window springs again
+        q.step(1.0 / 60);
+        CHECK(q.scaleX() < 1.05);
     }
 
     std::printf(g_fail ? "%d failures\n" : "all tests passed\n", g_fail);

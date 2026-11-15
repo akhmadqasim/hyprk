@@ -96,7 +96,11 @@ namespace lg {
         // stepped in draw() while it moves; m_pressStep = the last step
         std::array<CLightPress, 3>            m_press;
         std::chrono::steady_clock::time_point m_pressStep{};
+        // how pressed each light's colour looks, 0..1, and its velocity: 1 in one frame when drawn pressed, back to 0 on
+        // a critically damped spring (lights::LEAVE_FADE) when the pointer leaves the held light, at once otherwise
+        std::array<double, 3> m_pressMix{}, m_pressMixV{}, m_leaveWait{};
         float                    m_glyphFrom = 0; // glyph alpha when the hover last changed
+        bool                     m_glyphInstant = false; // the hover began on an inactive window: glyphs in full at once
         bool                     m_option    = false; // Option held while hovering: the green glyph is +
         std::chrono::steady_clock::time_point m_hoverSince{};
         bool                     m_dragging = false;

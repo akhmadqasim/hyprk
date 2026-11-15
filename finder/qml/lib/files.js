@@ -131,15 +131,15 @@ function splitName(name, isDir) {
     return { base: name.slice(0, dot), ext: name.slice(dot + 1) };
 }
 
-// Returns "" when newName is acceptable, else a user-facing message.
+// Returns "" when newName is acceptable, else a user-facing message: Finder's own (LocalizableMerged.strings RN5,
+// RN31, NE74, RN17). The empty-name line has no Mac string (what Finder does was not checked).
 // existing: names already in the folder; original: the item's current name.
 function validateName(newName, existing, original) {
     if (newName === original) return "";
     if (newName.trim() === "") return "Please enter a name.";
-    if (newName === "." || newName === "..") return "The name “" + newName + "” is reserved.";
-    if (newName.indexOf("/") !== -1) return "Names can’t contain “/”.";
-    if (newName.indexOf("\0") !== -1) return "Names can’t contain a null character.";
-    if (utf8Length(newName) > 255) return "The name is too long.";
+    if (newName === "." || newName === "..") return "The name “" + newName + "” can’t be used because it’s reserved by the system.";
+    if (newName.indexOf("/") !== -1 || newName.indexOf("\0") !== -1) return "The name “" + newName + "” can’t be used.";
+    if (utf8Length(newName) > 255) return "The name “" + newName + "” can’t be used because it’s too long.";
     const lower = newName.toLowerCase();
     for (const n of existing || []) {
         if (n === original) continue;
@@ -386,3 +386,23 @@ function sidebarMenu(kind, name, opens, real) {
     return [tab, row("Show in Enclosing Folder", "enclosing", real), sep, row("Remove from Sidebar"), sep,
             row("Get Info", "info", real), row("Add to Dock"), sep, row("Share")];
 }
+
+// ---- gallery (MAC-ANSWERS-9 R9.2-R9.3) ----
+// The strip's new contentX after the selection moves to `index`: it jumps (no animation) by the least amount that
+// keeps the selected plate `margin` pt inside the visible strip (`view` pt wide), clamped to [minX, maxX]. Plates
+// start at content x index * pitch (the ListView's leftMargin holds the 5 pt inset). Mac clip, 316 pt strip: steps
+// 46, 59, 56 pt going right; going left nothing until the plate nears the left edge.
+function galleryScroll(contentX, index, view, minX, maxX, pitch, plate, margin) {
+    const left = index * pitch, right = left + plate;
+    let x = contentX;
+    if (right + margin > x + view) x = right + margin - view;
+    if (left - margin < x) x = left - margin;
+    return Math.max(minX, Math.min(Math.max(minX, maxX), x));
+}
+// "Show More" sits on the Information row for images and PDFs; a folder or a text file has none (R9.2)
+function galleryShowMore(entry) {
+    if (!entry || entry.isDir) return false;
+    return isImage(entry) || iconClass(entry) === "pdf";
+}
+// The Dimensions row value, "1600×1067"; "" without a size
+function formatDimensions(w, h) { return w > 0 && h > 0 ? w + "×" + h : ""; }

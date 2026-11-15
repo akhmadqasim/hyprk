@@ -82,13 +82,19 @@ Column {
     // GlassStylePreviewView: capsule.on.rectangle.liquid.glass and capsule.on.rectangle with the fill variant), at the
     // body size: their ink boxes are 16.25 x 13 and 17.1 x 13.8 pt (AX 16 x 13 and 17 x 13.5). Ink 124 on 247 light,
     // 157 on 37 dark (liquidglass-slider-zoom4x-*.png). Pressed: the label colour.
+    // A drag that brings the knob onto an end bounces that end's glyph (SF Symbols .bounce by layer: the capsule, then
+    // the rectangle 0.05 s later, 1.25 / 0.90 about the ink centre; the 23.09.23 recording frames 2228-2262 at 0 and
+    // 2488-2527 at 1, INTERACTIVE-GLASS-REA.md 8). The end buttons' clicks do not track, so they do not bounce it.
     component GlassEndIcon: SfSymbol {
         property bool filled
         readonly property bool down: parent && parent.pressed === true
         name: filled ? "capsule.on.rectangle.fill" : "capsule.on.rectangle.liquid.glass"
         pointSize: 13
         color: down ? Theme.label : Theme.secondaryLabel
+        layerScales: (filled ? glassTintedBounce : glassClearBounce).scales
     }
+    SymbolBounce { id: glassClearBounce; objectName: "glassClearBounce"; name: "capsule.on.rectangle.liquid.glass" }
+    SymbolBounce { id: glassTintedBounce; objectName: "glassTintedBounce"; name: "capsule.on.rectangle.fill" }
     Component { id: glassClear; GlassEndIcon { filled: false } }
     Component { id: glassTinted; GlassEndIcon { filled: true } }
 
@@ -133,6 +139,20 @@ Column {
                     // which NSGlassTintAmount gets on mouse-up
                     property real dragTint: -1
                     readonly property real tint: dragTint >= 0 ? dragTint : AppState.appearance.glass
+                    // The view's appear sequence (GlassStylePreviewView's .task, APPEARANCE-PREVIEW-REA.md): photoOpacity
+                    // starts at 0 and is set to 1 after 0.08 s, shown through .opacity on the whole clipped preview with
+                    // .animation(.spring(response: 0.7, dampingFraction: 0.65), value: photoOpacity); after 1.3 s
+                    // demoScrollOffset = -52 (the article slides up under the capsules), after 3.5 s back to 0. Reduce
+                    // Motion: photoOpacity 1 at once and no demo. Once per view (the code skips it when photoOpacity != 0).
+                    opacity: fadeIn.value
+                    Spring { id: fadeIn; response: 0.7; damping: 0.65; target: 0 }
+                    Timer { id: fadeTimer; interval: 80; onTriggered: fadeIn.target = 1 }
+                    Timer { id: demoDown; interval: 1300; onTriggered: demoOffset.target = -52 }
+                    Timer { id: demoBack; interval: 3500; onTriggered: demoOffset.target = 0 }
+                    Component.onCompleted: {
+                        if (Theme.reduceMotion) { fadeIn.target = 1; fadeIn.snap(); return; }
+                        fadeTimer.start(); demoDown.start(); demoBack.start();
+                    }
                     // rounded corners for the scrolling article (Rectangle.clip only clips to the bounding box)
                     layer.enabled: true
                     layer.effect: MultiEffect {
@@ -145,34 +165,54 @@ Column {
                         id: articleView
                         anchors.fill: parent
                     Rectangle { anchors.fill: parent; color: Theme.previewCard }
+                    // ._scrollInputForwardingBehavior(.never, axes: .vertical) on the preview: a vertical wheel the article
+                    // cannot use (at its top or end) stops here. Before, it scrolled the whole pane once the article
+                    // reached its end. Under the Flickable, so it only gets what the Flickable leaves
+                    MouseArea {
+                        anchors.fill: parent
+                        acceptedButtons: Qt.NoButton
+                        onWheel: w => w.accepted = Math.abs(w.angleDelta.y) + Math.abs(w.pixelDelta.y) >= Math.abs(w.angleDelta.x) + Math.abs(w.pixelDelta.x)
+                    }
                     Flickable {
                         id: article
                         anchors.fill: parent
                         contentHeight: articleBody.height
                         boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
+                        acceptedButtons: Qt.NoButton   // the Mac's preview scrolls by wheel / trackpad only, not by a mouse drag
                         RubberBand { flickable: article }
-                        // The Mac's own article: AppearancePreferencesFramework 27.2.1, GlassStylePreviewView. Text from
-                        // its Localizable.loctable (en), photos from its Assets.car (apple-park, architecture, pond,
-                        // rainbow; settings/assets/glass-preview, 804 px wide), layout from the view's code, which
-                        // reproduces the AX frames of the Mac (ax-scroll000-dark.jsonl: title y 167.9, subtitle
-                        // 190.9, text 221.9, first photo 294, heading 475.6, ...): the photo fills a 268 x 152 slot,
-                        // the text block starts 16 pt below it (padding 16, the hero's bottom padding -8, stack
-                        // spacing 8), its lines 8 pt apart; title and headings title3 (15 pt, 19 pt lines), body 13 pt
-                        // on 16 pt lines; photos 236 wide, r 16, 16 pt above and below. The card is the view's own
-                        // colour (0.912, 0.897, 0.876 light, 0.076, 0.070, 0.060 dark = Theme.previewCard).
-                        // Inferred: the 8 pt spacer at the end (the code has 32 or 8 by a state not decoded).
+                        // The Mac's own article: AppearancePreferencesFramework 27.2.1, GlassStylePreviewView
+                        // (reference/re/27.2.1/APPEARANCE-PREVIEW-REA.md has the chain and addresses). Text from its
+                        // Localizable.loctable ("en"; the Mac in the R3.7 shots runs en_GB, hence "emphasise" there),
+                        // photos from its Assets.car (settings/assets/glass-preview at the Mac's 2x size), layout from
+                        // the view's code, checked on the R3.7 AX dumps (ax-preview-article-{top,end}-*.jsonl: content
+                        // 268 x 1257.5; title y 167.9, subtitle 190.9, text 221.9, photos 294 / 590.5 / 871, headings
+                        // 475.6 / 772 / 1158.6, last line ends 1233.6): the hero fills a 268 x 152 frame and is clipped
+                        // to it, then padding(.bottom, -8); the text VStack (default spacing 8) has padding 16; title and
+                        // headings title3 (15 pt, 19 pt lines), body 13 pt on 16 pt lines; photos 236 wide, r 16,
+                        // padding(.vertical, 16). The end: Spacer().frame(height: ORLocked ? 32 : 8) at 0 spacing, so
+                        // 16 + 8 below the last line (1257.5; was 16 + 8 + 8 = 1265.5). ORLocked is false on the Mac (no
+                        // extra view in the AX dumps). The card is the view's own colour (Theme.previewCard).
                         Item {
                             id: articleBody
                             width: article.width
-                            height: articleText.y + articleText.height + 16 + 8 + 8
+                            height: articleText.y + articleText.height + 16 + 8
+                            // the view's appear demo: .offset(y: demoScrollOffset) on the article, animated by
+                            // .spring(response: 2, dampingFraction: 0.82); -52 at 1.3 s, 0 at 3.5 s (the Timers on glassPreview)
+                            transform: Translate { y: demoOffset.value }
+                            Spring { id: demoOffset; response: 2.0; damping: 0.82; epsilon: 0.3; target: 0 }
                             Rectangle { anchors.fill: parent; color: Theme.previewCard }
-                            Image {
+                            // hero: Image("apple-park").resizable().aspectRatio(contentMode: .fill).frame(268, 152)
+                            // .clipShape(Rectangle()): 1620 x 1080 filled to 268 x 178.5, centred, at -13.5 (AX end
+                            // dumps; -27.2 px fitted on preview-article-scroll-00-light.png)
+                            Item {
                                 width: parent.width; height: 152
-                                source: Qt.resolvedUrl("../assets/glass-preview/apple-park.jpg")
-                                sourceSize.width: 804
-                                fillMode: Image.PreserveAspectCrop
                                 clip: true
-                                asynchronous: true
+                                Image {
+                                    y: -13.5; width: parent.width; height: 178.5
+                                    source: Qt.resolvedUrl("../assets/glass-preview/apple-park.jpg")
+                                    sourceSize.width: 536
+                                    asynchronous: true
+                                }
                             }
                             Column {
                                 id: articleText
@@ -186,9 +226,10 @@ Column {
                                 Line { text: "Learn about the design and history of Apple Park, and discover its unique nature and beauty." }
                                 Repeater {
                                     model: [
-                                        { img: "architecture", h: 157.5, t: "The Architecture", b: "Apple Park was made for walking and exploring. The innovative design elements emphasize openness and connection to nature." },
-                                        { img: "pond", h: 157.5, t: "The Pond", b: "With gently lapping waves and a surrounding of trees, it\u2019s one of the most serene spots on campus." },
-                                        { img: "rainbow", h: 263.5, t: "The Rainbow", b: "One of the most iconic features of Apple Park, the Rainbow brings much joy to all who experience it." }]
+                                        { img: "architecture.jpg", h: 157.5, t: "The Architecture", b: "Apple Park was made for walking and exploring. The innovative design elements emphasize openness and connection to nature." },
+                                        { img: "pond.jpg", h: 157.5, t: "The Pond", b: "With gently lapping waves and a surrounding of trees, it\u2019s one of the most serene spots on campus." },
+                                        // a PNG: the catalog's rainbow.png has a transparent 1-3 px rim the card shows through
+                                        { img: "rainbow.png", h: 263.5, t: "The Rainbow", b: "One of the most iconic features of Apple Park, the Rainbow brings much joy to all who experience it." }]
                                     Column {
                                         id: section
                                         required property var modelData
@@ -196,8 +237,8 @@ Column {
                                         Item {
                                             width: parent.width; height: section.modelData.h + 32
                                             RoundedImage {
-                                                y: 16; width: parent.width; height: section.modelData.h; radius: 16; decodeWidth: 804
-                                                source: Qt.resolvedUrl("../assets/glass-preview/" + section.modelData.img + ".jpg")
+                                                y: 16; width: parent.width; height: section.modelData.h; radius: 16; decodeWidth: 472
+                                                source: Qt.resolvedUrl("../assets/glass-preview/" + section.modelData.img)
                                             }
                                         }
                                         Line { text: section.modelData.t; size: 15; weight: Typography.bold }
@@ -276,6 +317,7 @@ Column {
                                 rimSpread: Tokens.control.regularRimSpread
                                 fillLight: Tokens.control.regularFillLight
                                 rimFace: Tokens.control.regularRimFace
+                                rimStroke: Tokens.control.regularRimStroke
                                 fillSigma: Tokens.control.regularFillSigma
                                 fillNormal: Tokens.control.regularFillNormal(glassPreview.tint)
                                 fillDarken: Theme.dark ? Tokens.control.regularFillMix(glassPreview.tint) : 0
@@ -310,12 +352,16 @@ Column {
                                     color: search ? (Theme.dark ? "#FFFFFF" : "#3A3A3C") : (Theme.dark ? "#FFFFFF" : "#1C1C1E")
                                 }
                             }
-                            // hover disc (the 23.09.23 recording: the share button) and SwiftUI's press light of its
-                            // buttons; the Search field has no reading
+                            // hover disc (the buttons' interaction fill, light and dark: Tokens.toolbar.glassButtonFill)
+                            // and SwiftUI's press light of its buttons. The Search capsule takes the press light too and
+                            // no hover disc (preview-hold-shine-search-{dark,light}.mov, capsule mean held - rest: dark
+                            // +35 / +40 / +43, light +17 / +18 / +14, in one frame; hovered after the release 0 / 0 / 0;
+                            // INTERACTIVE-GLASS-REA.md 8)
                             ToolbarHighlight {
                                 id: light
                                 anchors.fill: parent
-                                enabled: cap.modelData.t === ""
+                                hoverFill: cap.modelData.t === "" ? Tokens.toolbar.glassButtonFill : 0
+                                littleOpacity: cap.modelData.t === "" ? -1 : 0.405
                                 centres: cap.modelData.c
                             }
                             Text {
@@ -343,6 +389,7 @@ Column {
                     // 0.07-0.09 the fill end is within 1.5 px of the lens centre; a fill to the knob's centre was 10 pt off)
                     fillToEnds: true
                     onMoved: v => glassPreview.dragTint = v
+                    onEndReached: end => (end < 0 ? glassClearBounce : glassTintedBounce).play()
                     onReleased: Qt.callLater(() => glassPreview.dragTint = -1)
                     onCommitted: v => { AppState.set("appearance", { glass: Math.round(v * 1000) / 1000 }); glassPreview.dragTint = -1; }
                 }
@@ -430,10 +477,11 @@ Column {
             }
         }
         // AppleHighlightColor: Automatic (key absent: selectedTextBackgroundColor follows the accent) or one of AppKit's
-        // eight highlight keys; here appearance.highlight ("" = Automatic), read by Accent.selectedText. The swatch
-        // and the menu dots are the keys' catalog colours (System controlAccent<Name>Color = the accent swatches;
-        // accent-colors.json highlightKeys), Automatic's is NSMulticolorHighlight. Not offered: "Choose Color..."
-        // (no colour panel). The open menu's dots are not on a Mac shot (popup-menu-open-*.png is another pop-up).
+        // eight highlight keys; here appearance.highlight ("" = Automatic), read by Accent.selectedText. Menu (R3.8a
+        // control-text-highlight-colour-open-*.png): Automatic, a separator, Blue ... Graphite, a separator, Choose
+        // Colour…; the dots are the highlight colours themselves (selectedTextBackground, Accent.table text: light
+        // blue #BAD6FB on the shot = #B3D7FF before Display P3, dark #476288 / #3F638B, graphite #E0E0E0 / #696969),
+        // Automatic's NSMulticolorHighlight. Not offered: "Choose Colour…" (no colour panel), so no second separator.
         FormRow {
             id: hlRow
             label: "Text highlight color"
@@ -441,12 +489,15 @@ Column {
             readonly property int index: Math.max(0, P.highlightNames.indexOf(AppState.appearance.highlight))
             Popup {
                 objectName: "highlightPopup"
-                model: P.highlightNames.map(n => n ? n.charAt(0).toUpperCase() + n.slice(1) : "Automatic")
+                // R13.2 popups.json: Automatic, the eight colours, then "Choose Colour…" after a second separator. No colour
+                // panel here: that item leaves the choice as it was (settings/FALLBACKS.md "Pop-up menus")
+                model: P.highlightNames.map(n => n ? n.charAt(0).toUpperCase() + n.slice(1) : "Automatic").concat(["Choose Color…"])
                 // the current colour's dot sits inside the button (appearance-light.png: 16 pt, 12 pt from the button's
                 // left edge, 8 pt before the text). Automatic: AppKit's NSMulticolorHighlight
-                dots: P.highlightNames.map(n => n ? Accent.swatch(n) : Accent.multicolorHighlightDot)
+                dots: P.highlightNames.map(n => n ? Accent.table[n].text[Theme.dark ? 1 : 0] : Accent.multicolorHighlightDot).concat([""])
+                separators: [0, 8]
                 currentIndex: hlRow.index
-                onActivated: i => AppState.set("appearance", { highlight: P.highlightNames[i] })
+                onActivated: i => { if (i < P.highlightNames.length) AppState.set("appearance", { highlight: P.highlightNames[i] }); }
             }
         }
     }
@@ -470,9 +521,7 @@ Column {
                     anchors.right: parent.right
                     spacing: 13
                     Repeater {
-                        // tile and sun colours: sampled on appearance-*.png (Display P3 numbers) and converted to sRGB
-                        // (reference/ours/COLOUR-P3-AUDIT.md: 60,136,245 -> 0,138,253; 249,196,22 -> 255,193,0)
-                        model: [{ t: "Default", c: "#008AFD" }, { t: "Dark", c: "#171717" }, { t: "Clear", c: "#7D7D7D" }, { t: "Tinted", c: "#007AF9" }]
+                        model: [{ t: "Default" }, { t: "Dark" }, { t: "Clear" }, { t: "Tinted" }]
                         Choice {
                             required property var modelData
                             w: 29; h: 29; r: 7; gap: 1.5   // AX 38 x 52 with the caption; tile 29, ring gap 1.5
@@ -483,22 +532,30 @@ Column {
                                 iconStyle: modelData.t.toLowerCase(),
                                 iconStyleVariant: P.iconStyleVariantAfter(styleRow.style, AppState.appearance.iconStyleVariant, modelData.t.toLowerCase())
                             })
-                            Rectangle {   // Wi-Fi tile body per style (#35)
-                                anchors.fill: parent; radius: 7
-                                // Tinted shows the chosen tint (iconstyle-tinted-red-auto-light.png)
-                                color: modelData.t === "Tinted" && AppState.appearance.iconTint ? Accent.swatch(AppState.appearance.iconTint) : modelData.c
-                                // sun behind a translucent cloud (27.2.1 appearance-light.png tiles): sun 11 pt at
-                                // centre (20, 12.5), cloud over the lower left; sampled sun #F9C416 / #EDB609 / #E0E1E1 / #96DEFF
-                                Rectangle {
-                                    x: 14.5; y: 7; width: 11; height: 11; radius: 5.5
-                                    color: ({ Default: "#FFC100", Dark: "#F7B300", Clear: "#E0E1E1", Tinted: "#7EE0FF" })[modelData.t]
-                                }
-                                SfSymbol {   // cloud.fill, fitted on appearance-light.png's tiles (the Mac's is the Weather
-                                    // icon's own cloud): ink 39 px wide, left edge 9 px and bottom 44 px in the 58 px tile
-                                    x: 4.1; y: 9; name: "cloud.fill"; pointSize: 16.6
-                                    color: modelData.t === "Dark" ? Qt.rgba(0.85, 0.85, 0.86, 0.8) : modelData.t === "Clear" ? Qt.rgba(0.86, 0.86, 0.87, 0.85)
-                                         : Qt.rgba(1, 1, 1, 0.62)
-                                }
+                            // The tile is the Weather app's icon in that style (Appearance.appex IconStyleRow: ISIcon(
+                            // bundleIdentifier: "com.apple.weather") through an ISImageDescriptor, in an
+                            // AsyncIconImage), 36 pt with its 29 pt body on the tile (fitted on iconstyle-*-light.png:
+                            // 72 px, rms 10-16 levels; R11.6 dark-mode stills, read as sRGB: 5-12). Default and Dark never change; Clear and Tinted show the mode
+                            // of the radios (iconstyle-dark-light.png: Dark + Always in light mode shows the dark
+                            // Clear and Tinted; Auto = the system's), Tinted in the chosen colour (Automatic = the
+                            // accent; iconstyle-tinted-red-auto-light.png). Files: settings/assets/icon-style
+                            // (themes/icons/tools/build-style-tiles.py, IconRendering's composition; reference/ASSETS.md)
+                            Image {
+                                // With Default selected the two are the light ones, in dark mode too (R11.6
+                                // icon-style-tiles-default-selected-dark.png: Clear a grey 128 tile, Tinted the
+                                // accent's; Default has no mode, the next style starts as Light)
+                                readonly property bool darkTile: styleRow.style !== "default"
+                                    && (AppState.appearance.iconStyleVariant === "dark"
+                                        || (AppState.appearance.iconStyleVariant === "auto" && Theme.dark))
+                                readonly property string tint: AppState.appearance.iconTint
+                                    || (Accent.table[AppState.appearance.accent] ? AppState.appearance.accent : "blue")
+                                readonly property string file: modelData.t === "Default" ? "default" : modelData.t === "Dark" ? "dark"
+                                    : (modelData.t === "Clear" ? "clear" : "tinted-" + tint) + (darkTile ? "-dark" : "-light")
+                                anchors.centerIn: parent
+                                width: 36; height: 36
+                                source: "../assets/icon-style/" + file + ".png"
+                                sourceSize: Qt.size(144, 144)
+                                smooth: true; mipmap: true
                             }
                         }
                     }
@@ -522,7 +579,9 @@ Column {
             }
         }
         // AppleIconAppearanceTintColor: Automatic | Red ... Graphite (with colour dots) | Choose Colour… (PC #60
-        // section 3); here appearance.iconTint ("" = Automatic). The custom colour popover is not drawn.
+        // section 3); here appearance.iconTint ("" = Automatic). The custom colour popover is not drawn, so the menu
+        // (R3.8a control-folder-colour-open-*.png) has its separator after Automatic only. The dot is the button's own
+        // (control-folder-colour-rest-*.png: one 16 pt dot inside the 133 pt button; a second one beside it is gone)
         FormRow {
             id: tintRow
             label: AppState.appearance.iconStyle === "tinted" ? "Icon, widget & folder color" : "Folder color"
@@ -530,12 +589,13 @@ Column {
             readonly property var names: ["Automatic", "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Pink", "Graphite"]
             readonly property int index: Math.max(0, P.iconTints.indexOf(AppState.appearance.iconTint))
             function dot(i) { return i === 0 ? Theme.accent : Accent.swatch(P.iconTints[i]); }
-            Rectangle { width: 16; height: 16; radius: 8; color: tintRow.dot(tintRow.index); anchors.verticalCenter: parent ? parent.verticalCenter : undefined }
             Popup {
-                model: tintRow.names
-                dots: tintRow.names.map((n, i) => tintRow.dot(i))
+                objectName: "folderColorPopup"
+                model: tintRow.names.concat(["Choose Color…"])   // R13.2 popups.json; no colour panel here
+                dots: tintRow.names.map((n, i) => tintRow.dot(i)).concat([""])
+                separators: [0, 8]
                 currentIndex: tintRow.index
-                onActivated: i => AppState.set("appearance", { iconTint: P.iconTints[i] })
+                onActivated: i => { if (i < P.iconTints.length) AppState.set("appearance", { iconTint: P.iconTints[i] }); }
             }
         }
     }
@@ -545,7 +605,7 @@ Column {
         FormRow {
             label: "Sidebar icon size"
             implicitHeight: 37.5
-            StatePopup { stateKey: "appearance"; field: "sidebarIconSize"; choices: [["Small", "small"], ["Medium", "medium"], ["Large", "large"]] }
+            StatePopup { objectName: "sidebarIconSizePopup"; stateKey: "appearance"; field: "sidebarIconSize"; choices: [["Small", "small"], ["Medium", "medium"], ["Large", "large"]] }
         }
         FormRow { label: "Tint window background with wallpaper color"; implicitHeight: 37.5; Switch { checked: AppState.appearance.tintWindowBackground; onToggled: on => AppState.set("appearance", { tintWindowBackground: on }) } }   // 1 + 36.5, mini switch; read by Finder and Settings sidebars
     }
@@ -577,8 +637,9 @@ Column {
     }
     Card {
         RadioGroup { implicitHeight: 105; label: "Show scroll bars"; options: ["Automatically based on mouse or trackpad", "When scrolling", "Always"] }
-        RadioGroup { implicitHeight: 84; separator: true; label: "Click in the scroll bar to"; options: ["Jump to the next page", "Jump to the spot that's clicked"] }
+        RadioGroup { implicitHeight: 84; separator: true; label: "Click in the scroll bar to"; options: ["Jump to the next page", "Jump to the spot that\u2019s clicked"] }
     }
 
-    PaneFooter { Button { text: "More in Accessibility Settings…" } }
+    // Appearance.appex AccessibilitySettingsSection: opens x-apple.systempreferences:com.apple.Accessibility-Settings.extension?Seeing_Display
+    PaneFooter { Button { text: "More in Accessibility Settings…"; onClicked: AppState.navigate("accessibility", "display") } }
 }

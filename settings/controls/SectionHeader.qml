@@ -6,5 +6,6 @@ import "../HyprK"
 MacText {
     leftPadding: Theme.content.rowPadding
     topPadding: Theme.content.headerTop
-    font: Typography.headline   // 13 Bold
+    property bool regular: false
+    font: regular ? Typography.body : Typography.headline   // 13 Bold; 13 Regular where the Mac's heading is (Card.titleRegular)
 }

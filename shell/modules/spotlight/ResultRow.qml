@@ -21,6 +21,10 @@ Item {
     property string appId
     property string themeIcon
     property string symbol: "doc"
+    // the top hit's "Search <App>" + tab key cap at the right (r17 spotlight-typed-*.png, pt of the panel: text SF 11
+    // ending at 458.5, baseline 47.5, plus-lighter +65; the cap 467 .. 493.5 x 34 .. 52, r 5.5, plus-lighter +35, "tab"
+    // SF 11 +125 with its baseline at 47). On the Mac Tab then searches inside that app; here it is the hint alone
+    property string hint
     signal clicked()
     signal accessoryClicked()
 
@@ -70,8 +74,9 @@ Item {
 
     Column {
         x: Theme.spotlight.rowTextX
-        width: acc.x - 12 - x
+        width: (row.hint !== "" ? hintBox.x - 110 : acc.x) - 12 - x
         anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -1   // r17 spotlight-typed-*: the title's ink 1 pt above the row's middle
         Text {
             width: parent.width
             text: row.title
@@ -83,7 +88,9 @@ Item {
         Text {
             width: parent.width
             visible: row.subtitle !== ""
-            text: row.subtitle
+            // a file's folder path in the .42 grey keeps its emoji at alpha 1 (R6.5, OPEN-FIXES.md 16)
+            text: EmojiText.opaque(row.subtitle, color)
+            textFormat: EmojiText.has(row.subtitle) ? Text.StyledText : Text.PlainText
             elide: Text.ElideMiddle
             maximumLineCount: 1
             font: Typography.font(Theme.spotlight.rowSub)
@@ -117,6 +124,54 @@ Item {
             anchors.margins: -4
             enabled: row.badge
             onClicked: row.accessoryClicked()
+        }
+    }
+
+    Item {
+        id: hintBox
+        visible: row.hint !== ""
+        anchors.right: parent.right
+        anchors.rightMargin: Theme.spotlight.hintRight
+        y: (parent.height - height) / 2
+        width: tabText.implicitWidth + 2 * Theme.spotlight.hintCapPad
+        height: Theme.spotlight.hintCapH
+        ShaderEffect {
+            anchors.fill: parent
+            property vector4d fill: Qt.vector4d(Theme.spotlight.separatorLift, Theme.spotlight.separatorLift, Theme.spotlight.separatorLift, 0)
+            property size sizePt: Qt.size(width, height)
+            property real radius: Theme.spotlight.hintCapRadius
+            property real dpr: (QsWindow.window ? QsWindow.window.devicePixelRatio : Screen.devicePixelRatio)
+            property real pad: 0
+            fragmentShader: Qt.resolvedUrl("../../shaders/plusfill.frag.qsb")
+        }
+        Text {
+            id: tabText
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.baseline: parent.top
+            anchors.baselineOffset: Theme.spotlight.hintCapBaseline
+            text: "tab"
+            font: Typography.font(Theme.spotlight.hintSize)
+            color: "#FFFFFF"
+            layer.enabled: visible
+            layer.effect: ShaderEffect {
+                property real lift: Theme.spotlight.hintCapTextLift
+                fragmentShader: Qt.resolvedUrl("../../shaders/plustext.frag.qsb")
+            }
+        }
+    }
+    Text {
+        visible: row.hint !== ""
+        anchors.right: hintBox.left
+        anchors.rightMargin: Theme.spotlight.hintGap
+        anchors.baseline: hintBox.top
+        anchors.baselineOffset: Theme.spotlight.hintCapBaseline + 0.5
+        text: row.hint
+        font: Typography.font(Theme.spotlight.hintSize)
+        color: "#FFFFFF"
+        layer.enabled: visible
+        layer.effect: ShaderEffect {
+            property real lift: Theme.spotlight.hintLift
+            fragmentShader: Qt.resolvedUrl("../../shaders/plustext.frag.qsb")
         }
     }
 

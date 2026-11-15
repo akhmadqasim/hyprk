@@ -7,16 +7,17 @@ import Finder.Native
 // Finder menu (context menus, Group and Action pull-downs): rows 24, padding 5, r 12, the accent highlight inset
 // 5 with r 7 and white text, moving in one frame; text at x 16, or 28 when an item has a checkmark; closes with a
 // 0.2 s fade (MAC-ANSWERS.md Q-finder-24, Q-menubar-12/22/24). Drawn flat with the shared menu fill.
-// items: [{ text, shortcut, checked, enabled, action, icon, submenu }], { separator: true }, or
-// { tagRow: true, action(tagName) } for Finder's row of tag color dots. icon: a leading SF Symbol (the 27.2.1
+// items: [{ text, shortcut, checked, enabled, action, icon, submenu }] or { separator: true } (no tag-dot row: Main.qml
+// contextMenu). icon: a leading SF Symbol (the 27.2.1
 // context menu: icon centre x 23, its row's text x 39 instead of 16; context-menu-*-light.png); submenu: items of
 // a menu that opens to the right while the row is hovered, the row showing a chevron.
 // A popup surface of its own (xdg_popup), as the Mac's NSPopupMenuWindow: it may leave the Finder window, and the
 // compositor's popup grab closes it on a click anywhere outside (an in-window popup only saw clicks inside Finder).
 // The live menu is "menu" glass (Q-menubar-13). With the liquidglass plugin (plugin/README.md "Client popups", option
 // popup_classes) the compositor draws that glass, radius 12, and its shadow behind this popup surface, so the menu draws
-// no fill, as the shell's MenuDropdown over its glass; closing is then Hyprland's popup fadeout (fadePopupsOut, 0.2 s),
-// which dematerializes the glass with the content. Without the plugin: the opaque shared menu fill and a 0.2 s fade.
+// no fill, as the shell's MenuDropdown over its glass; closing is then the plugin's fade of the popup's last frame and
+// its glass (CA default over 236 ms, plugin/src/PopupGlass.cpp; Hyprland's fadePopupsOut is cancelled for it).
+// Without the plugin: the opaque shared menu fill and a 0.2 s fade.
 Popup {
     id: root
     popupType: Popup.Window
@@ -25,6 +26,10 @@ Popup {
     property var items: []
     signal chose()   // a row ran its action (a submenu closes its parent through this)
     onClosed: closeSub()
+    // a press that closes the menu (the press outside) is not a click that opens it again (ui/HyprK/Popup.qml
+    // _closing): set while it hides, cleared once that press is handled; Toolbar's ••• reads it on its press
+    property bool closing: false
+    onAboutToHide: { closing = true; Qt.callLater(() => closing = false); }
     Loader { id: sub; active: false; source: "PopupMenu.qml" }
     Connections { target: sub.item; function onChose() { root.chose(); root.close(); } }
     // Q-menubar-23 (Finder's context menus behave the same, Q-finder-24): the submenu appears about 0.22 s after its row
@@ -90,11 +95,10 @@ Popup {
                 id: it
                 required property var modelData
                 readonly property bool sep: !!modelData.separator
-                readonly property bool tagRow: !!modelData.tagRow
-                readonly property bool plain: !sep && !tagRow
+                readonly property bool plain: !sep
                 readonly property bool on: modelData.enabled !== false
                 width: root.width - 2 * root.padding
-                height: sep ? 11 : tagRow ? 30 : 24
+                height: sep ? 11 : 24
                 readonly property bool hasSub: !!modelData.submenu
                 // highlighted while hovered, and while its submenu is open (the pointer in the submenu leaves this row)
                 readonly property bool lit: hover.hovered || root.subRow === it
@@ -104,7 +108,8 @@ Popup {
                     visible: it.sep
                     anchors.centerIn: parent
                     width: parent.width - 22
-                    height: 1
+                    height: Pixel.stroke(1, Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio))   // exact, antialiased at a fractional scale like the Mac's downsample (HyprK pixel.js)
+                    antialiasing: Pixel.soft(Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio))
                     color: Theme.color.separator
                 }
                 Rectangle {
@@ -148,7 +153,10 @@ Popup {
                     visible: it.plain
                     x: it.modelData.icon ? 34 : root.hasChecks ? 23 : 11
                     anchors.verticalCenter: parent.verticalCenter
-                    text: it.modelData.text || ""
+                    // a file name in an item ("Compress “Trip 😀.txt”") keeps its emoji at alpha 1, also on the
+                    // highlighted row (R6.5 emoji-secondary-menu-*.png, OPEN-FIXES.md 16)
+                    text: EmojiText.opaque(it.modelData.text || "", color)
+                    textFormat: EmojiText.has(it.modelData.text || "") ? Text.StyledText : Text.PlainText
                     color: !it.on ? Theme.color.tertiaryLabel : it.lit ? "white" : Theme.color.label
                     font: Typography.body
                 }
@@ -166,29 +174,6 @@ Popup {
                     id: hover
                     enabled: it.plain
                     onHoveredChanged: if (hovered) { if (it.hasSub && it.on) root.openSub(it, it.modelData.submenu); else root.closeSub(); }
-                }
-                Row {
-                    visible: it.tagRow
-                    x: 14
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 9
-                    Repeater {
-                        model: it.tagRow ? Theme.color.tags : []
-                        Rectangle {
-                            required property var modelData
-                            width: 15; height: 15; radius: 7.5
-                            color: modelData.color
-                            scale: dotHover.hovered ? 1.2 : 1
-                            HoverHandler { id: dotHover }
-                            TapHandler {
-                                onTapped: {
-                                    root.chose();
-                                    root.close();
-                                    it.modelData.action(parent.modelData.name);
-                                }
-                            }
-                        }
-                    }
                 }
                 TapHandler {
                     enabled: it.plain && it.on && !it.hasSub

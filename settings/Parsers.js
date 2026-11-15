@@ -91,12 +91,80 @@ function parseHyprMonitors(text) {
         name: String(m.name || ""),
         description: String(m.description || m.name || "Display"),
         model: String(m.model || ""),
+        id: m.id | 0, x: m.x | 0, y: m.y | 0,
+        mirrorOf: m.mirrorOf === undefined || m.mirrorOf === null || String(m.mirrorOf) === "none" ? "" : String(m.mirrorOf),
         width: m.width | 0, height: m.height | 0,
         refreshRate: Math.round((+m.refreshRate || 0) * 100) / 100,
         scale: +m.scale || 1,
         focused: !!m.focused,
         modes: Array.isArray(m.availableModes) ? m.availableModes : []
     }));
+}
+
+// ---------- several displays (Displays pane) ----------
+// The names under the thumbnails: the model, else the description. Displays with the same name get " (1)", " (2)" in
+// output order, as the Mac numbers two displays of one model.
+function displayNames(monitors) {
+    const base = monitors.map(m => m.model || m.description || m.name || "Display");
+    const count = {}, seen = {};
+    for (const b of base) count[b] = (count[b] || 0) + 1;
+    return base.map(b => count[b] > 1 ? b + " (" + (seen[b] = (seen[b] || 0) + 1) + ")" : b);
+}
+// "Use as" of a display (DisplaysExt: "Main display", "Extended display", "Mirror for <name>"): Hyprland has no main
+// display, so it is the one at the layout's origin (the first one when none is there)
+function mainDisplay(monitors) {
+    const i = monitors.findIndex(m => m.x === 0 && m.y === 0 && !m.mirrorOf);
+    return i >= 0 ? i : 0;
+}
+function displayRole(monitors, index) {
+    const m = monitors[index];
+    if (!m) return "";
+    if (m.mirrorOf) {
+        const names = displayNames(monitors);
+        const t = monitors.findIndex(o => o.name === m.mirrorOf || String(o.id) === m.mirrorOf);
+        return "Mirror for " + (t >= 0 ? names[t] : m.mirrorOf);
+    }
+    return index === mainDisplay(monitors) ? "Main display" : "Extended display";
+}
+// Arrange…: each display's rectangle in a w x h box, at its place in Hyprland's layout (x, y and the size in layout
+// units: pixels over the scale), scaled to fit and centred. -> [{ x, y, w, h }] in output order.
+function arrangement(monitors, w, h) {
+    if (!monitors.length) return [];
+    const r = monitors.map(m => ({ x: m.x, y: m.y, w: m.width / (m.scale || 1), h: m.height / (m.scale || 1) }));
+    const x0 = Math.min.apply(null, r.map(a => a.x)), y0 = Math.min.apply(null, r.map(a => a.y));
+    const x1 = Math.max.apply(null, r.map(a => a.x + a.w)), y1 = Math.max.apply(null, r.map(a => a.y + a.h));
+    const k = Math.min(w / Math.max(1, x1 - x0), h / Math.max(1, y1 - y0));
+    const ox = (w - (x1 - x0) * k) / 2, oy = (h - (y1 - y0) * k) / 2;
+    return r.map(a => ({ x: ox + (a.x - x0) * k, y: oy + (a.y - y0) * k, w: a.w * k, h: a.h * k }));
+}
+
+// ---------- absent hardware ----------
+// settings/scripts/hardware.sh "key=0|1" lines -> what this computer has. A key the script did not print (it could not
+// run: the plain `qml` tool) keeps its default: everything there but a battery, so nothing is hidden by mistake.
+// env: HYPRK_HW "wifi=0,bluetooth=1" (tests), which wins. airdrop needs both radios, as on the Mac.
+const hardwareDefaults = { wifi: true, bluetooth: true, battery: false, trackpad: true, mouse: true, keyboardBacklight: true, ambientLight: true };
+function parseHardware(text, env) {
+    const o = Object.assign({}, hardwareDefaults);
+    for (const src of [String(text || "").split("\n"), String(env || "").split(",")])
+        for (const part of src) {
+            const m = /^\s*([A-Za-z]+)\s*=\s*([01])\s*$/.exec(part);
+            if (m && o[m[1]] !== undefined) o[m[1]] = m[2] === "1";
+        }
+    o.airdrop = o.wifi && o.bluetooth;
+    return o;
+}
+
+// brightness.json: written by the shell's services/Brightness.qml (value 0..1, available, source "backlight" | "ddc"
+// | "stub" | ""); Settings writes `value` (the Displays slider) and raises `probe` to ask the shell to look at the
+// hardware again. No file (no shell running) = not available: the slider is disabled.
+const brightnessDefaults = { value: 1, available: false, source: "", probe: 0 };
+function normalizeBrightness(obj) {
+    const o = Object.assign({}, brightnessDefaults, (obj && typeof obj === "object") ? obj : {});
+    o.value = typeof o.value === "number" && isFinite(o.value) ? Math.round(Math.max(0, Math.min(1, o.value)) * 10000) / 10000 : 1;
+    o.available = o.available === true;
+    o.source = typeof o.source === "string" ? o.source : "";
+    o.probe = typeof o.probe === "number" && isFinite(o.probe) ? o.probe : 0;
+    return o;
 }
 
 // hyprctl getoption <name> -j -> {"option": ..., "int": 25, "set": false}
@@ -469,12 +537,115 @@ function isDoubleClick(prev, now, intervalMs, distance) {
         && Math.abs(now.y - prev.y) <= (distance === undefined ? 5 : distance);
 }
 
+// ---------- General > About, Storage, Software Update (this computer's own facts, read-only) ----------
+// A byte count as the Mac prints it (NSByteCountFormatter, file style: decimal units, up to 2 decimals from GB up,
+// 1 for MB, none below, trailing zeros dropped: "245.11 GB", "17 GB"); the decimal point of the app's US English
+function byteCount(bytes) {
+    const b = Math.max(0, Number(bytes) || 0);
+    const u = [["TB", 1e12, 2], ["GB", 1e9, 2], ["MB", 1e6, 1], ["KB", 1e3, 0]];
+    for (const [name, size, digits] of u)
+        if (b >= size) return (b / size).toFixed(digits).replace(/\.?0+$/, "") + " " + name;
+    return b === 0 ? "Zero KB" : Math.round(b) + " bytes";
+}
+// A display's EDID (hex): { name: the monitor name descriptor (0xFC) or "", inches: the diagonal from the image size
+// in mm of the first detailed timing, else from the cm of the header; 0 when the EDID has none }
+function parseEdid(hex) {
+    const b = [];
+    for (let i = 0; i + 1 < (hex || "").length; i += 2) b.push(parseInt(hex.substr(i, 2), 16));
+    if (b.length < 128 || b[0] !== 0 || b[1] !== 0xff) return { name: "", inches: 0 };
+    let name = "", w = 0, h = 0;
+    for (let o = 54; o <= 108; o += 18) {
+        if (b[o] === 0 && b[o + 1] === 0 && b[o + 3] === 0xfc)
+            name = String.fromCharCode.apply(null, b.slice(o + 5, o + 18)).split("\n")[0].trim();
+        else if (!w && (b[o] || b[o + 1])) { w = b[o + 12] | (b[o + 14] >> 4) << 8; h = b[o + 13] | (b[o + 14] & 15) << 8; }
+    }
+    if (!w || !h) { w = b[21] * 10; h = b[22] * 10; }
+    return { name: name, inches: w && h ? Math.sqrt(w * w + h * h) / 25.4 : 0 };
+}
+// settings/scripts/sysinfo.sh's key=value lines ->
+// { model, vendor, host, chip, memory ("32 GB"), osName, osLabel, osVersion, osPretty, osLogo,
+//   displays: [{ name, size }], diskName, avail, size (bytes), autoUpdates ("On" | "Off" | "") }
+function parseSysInfo(text) {
+    const kv = {}, displays = [];
+    for (const l of lines(text)) {
+        const i = l.indexOf("=");
+        if (i < 0) continue;
+        const k = l.slice(0, i), v = l.slice(i + 1).trim().replace(/^"(.*)"$/, "$1");
+        if (k === "display") {
+            // <connector> <WxH of the preferred mode> <EDID hex>
+            const p = v.split(" "), e = parseEdid(p[2] || ""), m = /^(\d+)x(\d+)/.exec(p[1] || "");
+            const px = m ? "(" + m[1] + " × " + m[2] + ")" : "";
+            const inch = e.inches >= 1 ? e.inches.toFixed(1).replace(/\.0$/, "") + "-inch" : "";
+            displays.push({ name: e.name || p[0] || "", size: (inch + " " + px).trim() });
+        } else kv[k] = v;
+    }
+    const gib = Number(kv.memBytes) > 0 ? Number(kv.memBytes) / 1073741824
+        : Number(kv.memTotalKb) > 0 ? Math.ceil(Number(kv.memTotalKb) / 1048576) : 0;   // MemTotal leaves the kernel's own out
+    // VERSION="26.04.1 LTS (Resolute Raccoon)": the number and the release's name, as "macOS Golden Gate" / "Version 27.2.1"
+    const ver = kv["os.VERSION"] || "", num = /^[0-9][0-9.]*/.exec(ver), rel = /\(([^)]+)\)/.exec(ver);
+    const name = kv["os.NAME"] || "";
+    const d = /^(\d+) (\d+)$/.exec(kv.disk || "");
+    const auto = /Unattended-Upgrade\s+"(\d+)"/.exec(kv.autoUpdates || "");
+    return {
+        model: kv.model || "", vendor: kv.vendor || "", host: kv.prettyHost || kv.host || "", chip: (kv.chip || "").replace(/\s+/g, " "),
+        memory: gib > 0 ? Math.round(gib) + " GB" : "",
+        osName: name, osLabel: rel && name ? name + " " + rel[1] : name,
+        osVersion: num ? num[0] : (kv["os.VERSION_ID"] || ""), osPretty: kv["os.PRETTY_NAME"] || name, osLogo: kv["os.LOGO"] || "",
+        displays: displays, diskName: kv.diskLabel || "",
+        avail: d ? Number(d[1]) : 0, size: d ? Number(d[2]) : 0,
+        autoUpdates: auto ? (auto[1] !== "0" ? "On" : "Off") : ""
+    };
+}
+// The Storage bar (27.2.1 live/settings-r15/ax-storage-00-dark.jsonl, ax-storage-calculating-*.jsonl: 448 pt; a part
+// per sized category, the largest first, each its share of the disk wide and drawn 1 pt short of the next (30.08 of
+// 245.11 GB: 54 pt, the next at 55; 0.51 GB: 1 pt; 0.11 GB: no part); then, while a category is still being sized,
+// one grey "Calculating…" part up to the available space; when all are sized, System Data and the system's own part;
+// the available space last, to the bar's end. The legend names the coloured parts at least 1.5 pt wide and System
+// Data (Music, 1 pt, and macOS are not in the Mac's).
+// cats: [{ id, name }] (the coloured ones), sizes: { id: bytes } (missing = not sized yet), system: bytes or undefined
+// -> { parts: [{ id, name, x, width, bytes, legend }], rest: { x, width, bytes } (Calculating… or System Data),
+//      system: { x, width, bytes }, free: { x, width, bytes }, pending }
+function storageBar(cats, sizes, system, avail, size, width) {
+    const used = Math.max(0, size - avail), per = size > 0 ? width / size : 0;
+    const pending = system === undefined || cats.some(c => sizes[c.id] === undefined);
+    const sized = cats.filter(c => sizes[c.id] > 0).map(c => ({ id: c.id, name: c.name, bytes: Number(sizes[c.id]) }))
+        .sort((a, b) => b.bytes - a.bytes);
+    const freeX = used * per;
+    let x = 0, sum = 0;
+    const parts = [];
+    for (const c of sized) {
+        const w = Math.round(c.bytes * per * 2) / 2;
+        if (c.bytes * per < 0.5 || x + w > freeX) continue;
+        const drawn = Math.max(1, w - 1);
+        parts.push({ id: c.id, name: c.name, x: x, width: drawn, bytes: c.bytes, legend: drawn >= 1.5 });
+        x += drawn + 1; sum += c.bytes;
+    }
+    const sys = pending ? 0 : Math.min(Math.max(0, Number(system) || 0), Math.max(0, used - sum));
+    const sysW = Math.min(Math.round(sys * per * 2) / 2, Math.max(0, freeX - x));
+    const sysX = freeX - sysW;
+    return { parts: parts,
+             rest: { x: x, width: Math.max(0, sysX - x - 1), bytes: Math.max(0, used - sum - sys) },
+             system: { x: sysX, width: Math.max(0, sysW - 1), bytes: sys },
+             free: { x: freeX, width: Math.max(0, width - freeX), bytes: Math.max(0, avail) }, pending: pending };
+}
+// storage.sh <category> list: "bytes<TAB>path" lines -> [{ name, path, bytes }], the largest first
+function parseStorageList(text) {
+    const out = [];
+    for (const l of lines(text)) {
+        const m = /^(\d+)\t(.+)$/.exec(l);
+        if (m) out.push({ name: m[2].replace(/\/+$/, "").replace(/^.*\//, "") || m[2], path: m[2], bytes: Number(m[1]) });
+    }
+    return out.sort((a, b) => b.bytes - a.bytes);
+}
+
 if (typeof module !== "undefined")
     module.exports = { splitTerse, isDoubleClick, parseNmcliDevices, wifiDevice, parseNmcliWifi, parseWpctlSinks, parseWpctlSources, parseWpctlVolume,
         parseBluetoothShow, parseBluetoothDevices, parseHyprMonitors, hasBattery,
+        displayNames, mainDisplay, displayRole, arrangement, hardwareDefaults, parseHardware, brightnessDefaults, normalizeBrightness,
         parseHyprOption, luaString, luaMonitor, luaInput,
         normalizeAppearance, normalizeDock, normalizeStageManager, normalizeSound, mergeState, monitorMode, prettyFileName,
         gecosName, normalizeLock, normalizeInput, normalizeNotifications, parseDesktopApps,
         appearanceDefaults, iconTints, highlightNames, zoneCoords, zoneName, sunAltitude, autoDark, nextAutoFlip, iconStyleVariantsOf, iconStyleVariantAfter, dockDefaults, soundDefaults, alertSounds, alertSoundTitles, alertSoundMenu,
         displaysDefaults, normalizeDisplays, parseScaleReport, sizeText, sizeKey, looksLikeChiclets, looksLikeBlock,
-        looksLikeSelected, luaScalePolicy, luaScaleSet, luaScaleReport, lockDefaults, inputDefaults, notificationsDefaults, notifAppDefaults };
+        looksLikeSelected, luaScalePolicy, luaScaleSet, luaScaleReport, lockDefaults, inputDefaults, notificationsDefaults, notifAppDefaults,
+        byteCount, parseEdid, parseSysInfo, storageBar, parseStorageList };

@@ -17,6 +17,8 @@ Window {
         // --pane=<id>, --snapshot=<file.png>
         currentId: Qt.application.arguments.find(a => a.startsWith("--pane="))?.slice(7) ?? "appearance"
         snapshotPath: Qt.application.arguments.find(a => a.startsWith("--snapshot="))?.slice(11) ?? ""
+        startSub: Qt.application.arguments.find(a => a.startsWith("--sub="))?.slice(6) ?? ""
+        snapshotScroll: Number(Qt.application.arguments.find(a => a.startsWith("--scroll="))?.slice(9) ?? 0)
         windowActive: win.active
         onCloseRequested: Qt.quit()
         onMinimizeRequested: win.showMinimized()

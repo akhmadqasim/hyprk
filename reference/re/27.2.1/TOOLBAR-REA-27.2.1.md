@@ -95,10 +95,26 @@ and the decode above (every toolbar gets the ThinFilm style). Not done: list vie
 Q-finder-17), columns and gallery (no Mac capture of them scrolled), and the band colour over plain Finder content
 (the Settings-solved background is used: GUESS for Finder). A Mac capture of Finder's icon view scrolled 100+ pt,
 dark and light, would settle it.
+Update (R5.4, GLASS-HIG.md 15): the band over plain Finder content is measured ((31,31,36) -> (39.3,39.4,45.1) dark,
+255 light) and the dark background re-solved at 0.7 to (43,43.5,48.5); Finder draws the separator line while scrolled;
+both blurs read the band's own rect only. The Mac's list view is not a hard strip: rows show through the header at
+about 10 % (not built). The 36 pt shots put icon tops only 1 pt under the band: a deeper scroll is still wanted.
 
-## 2. (B) Holding a toolbar button: the platter's interaction layer, not SwiftUI's glow
+## 2. (B) Holding a toolbar button: SwiftUI's FlexInteraction lift and glow on the whole platter
 
-### What the Mac shows (measured, `settings/toolbar-backforward-rest-hover-press-dark.png`, 2 px/pt)
+**Corrected 2026-11-14 (round 7, INTERACTIVE-GLASS-REA.md 6, 1b).** The "no lift, an even 0.1 layer" below was read
+off a still whose pressed panel already had the Back button's history menu open (the menu's top shows at the bottom of
+the third panel). The round 7 clips (`controls/hold-shine-{settings,finder}-{dark,light}.mov`, 60 Hz) show the press
+before the menu opens (about 0.3 s after the press): the capsule lifts about its centre (rims −3 / +3 px left / right,
+−1 / +1..2 px top / bottom: +3 x +1.5 pt; the decoded ultraSmall lift on one 74 x 36 glass is +2.5 x +1.2) and the
+light falls off from the pointer over the whole capsule (dark, held − hover: +37 / +25 / +21 / +15 at 9-15 / 18-21 /
+30-33 / 48-51 pt), the face going to 255 in light. Once the menu opens the lift ends and the capsule stays lit about
+evenly (+19, `hold-shine-settings-dark.mov` 1.383 s): that is what the still caught. So the platter's one interactive
+NSGlassEffectView (decoded below) shows FlexInteraction on the whole capsule as one entry; the "Not decoded" question
+"why no glow or lift" is void. Built: `ToolbarHighlight` `platter` = one entry (lift and glow by the whole capsule), no
+even layer; ours has no history menu, so the menu-open look is not drawn. The text below is kept as it was written.
+
+### What the Mac shows (measured, `settings/toolbar-backforward-rest-hover-press-dark.png`, 2 px/pt; the pressed panel has the history menu open)
 - The capsule is 146 px wide (x 16..162, 20..166, 24..170 in the three panels): **no lift** while pressed.
 - Row 52 px through the capsule: rest 62; hover 69 with a 89 disc (the strip under it 32 -> 40); pressed **85..88 end
   to end** with a 110 disc: no square, no gradient (the SwiftUI BigGlow would leave a hard edge 27 pt from the pointer,

@@ -40,8 +40,9 @@ namespace lg {
         }
     }
 
-    void CLightPress::press(double w, double h, double x, double y) {
+    void CLightPress::press(double w, double h, double x, double y, bool snap) {
         m_active = true;
+        m_snap   = snap;
         m_w = w, m_h = h, m_x0 = m_x = x, m_y0 = m_y = y, m_idle = 0;
         retarget();
     }
@@ -55,6 +56,7 @@ namespace lg {
 
     void CLightPress::release() {
         m_active = false;
+        m_snap   = false;
         retarget();
     }
 
@@ -72,6 +74,8 @@ namespace lg {
         m_sy.target     = l - kx + ky;
         m_tx.target     = m_w * (dx > 0 ? kx : -kx);
         m_ty.target     = m_h * (dy > 0 ? ky : -ky);
+        if (m_snap)
+            snap();
     }
 
     void CLightPress::step(double dt) {

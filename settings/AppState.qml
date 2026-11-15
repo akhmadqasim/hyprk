@@ -11,6 +11,9 @@ import "panes/accessibility/A11y.js" as A11y
 QtObject {
     id: app
 
+    // a pane asks the window for another pane, or a pane's sub-pane (SettingsApp.open)
+    signal navigate(string pane, string sub)
+
     property var appearance: P.normalizeAppearance({})
     property var dock: P.normalizeDock({})
     property var stagemanager: P.normalizeStageManager({})          // Stage Manager on / off (shared with the shell)
@@ -20,6 +23,19 @@ QtObject {
     property var notifications: P.normalizeNotifications({})
     property var accessibility: A11y.normalize({})              // panes/accessibility/A11y.js
     property var displays: P.normalizeDisplays({})                // looks-like size per output (Displays pane)
+    // the display brightness, owned by the shell (services/Brightness.qml): Displays' slider shows `value`, writes it
+    // back, and is disabled while `available` is false
+    property var brightness: P.normalizeBrightness({})
+    // The shell's file has been read. Nothing is written to brightness.json before that: a write carries `value`,
+    // and the default one (1) would reach the hardware as a level this app never chose.
+    property bool brightnessLoaded: false
+    property bool _probeWanted: false
+    // ask the shell to look at the hardware again (a monitor that slept when it started answers DDC now)
+    function askBrightnessProbe() {
+        if (!brightnessLoaded) { _probeWanted = true; return; }
+        _probeWanted = false;
+        set("brightness", { probe: brightness.probe + 1 });
+    }
     property var wallpaper: ({})                                  // {path, ...}
     readonly property string wallpaperImage: String(wallpaper.path || "")
     // the desktop picture for an appearance: the chosen one, else the shell's default pick (shell/scripts/wallpaper.sh:
@@ -33,12 +49,25 @@ QtObject {
     readonly property var _normalize: ({
         appearance: P.normalizeAppearance, dock: P.normalizeDock, stagemanager: P.normalizeStageManager, sound: P.normalizeSound,
         lock: P.normalizeLock, input: P.normalizeInput, notifications: P.normalizeNotifications,
-        accessibility: A11y.normalize, displays: P.normalizeDisplays,
+        accessibility: A11y.normalize, displays: P.normalizeDisplays, brightness: P.normalizeBrightness,
         wallpaper: o => o
     })
     function path(key) { return Backend.stateDir + "/" + key + ".json"; }
 
     property bool hasBattery: false
+    // What this computer has (Parsers.parseHardware: wifi, bluetooth, battery, trackpad, mouse, keyboardBacklight,
+    // ambientLight, airdrop). Panes, rows and controls of absent hardware are hidden (FALLBACKS.md "Absent hardware"). Read at
+    // start and again whenever the window becomes key, so a dongle plugged in shows its pane without a restart.
+    property var hw: P.parseHardware("", "")
+    function refreshHardware() {
+        const env = Backend._info ? Backend._info.hwEnv : "";
+        // the Battery / Energy pane swap follows the same answer (was its own read of /sys/class/power_supply)
+        Backend.run([Backend.root + "/settings/scripts/hardware.sh"], (c, out) => {
+            const h = P.parseHardware(c === 0 ? out : "", env);
+            if (JSON.stringify(h) !== JSON.stringify(app.hw)) app.hw = h;
+            app.hasBattery = h.battery;
+        });
+    }
     property string userName: "User"
 
     function set(key, patch) {
@@ -46,6 +75,7 @@ QtObject {
         // option changes and cross-fades for 0.5 s (plugin 911cbe1, AppKit's NSGlobalPreferenceTransition), which only
         // hides the switch if no surface has drawn the other appearance yet; then the shell (its global, shell/Theme.qml:
         // the state file reached it 146 to 1063 ms later), then this window.
+        if (key === "brightness" && !brightnessLoaded) return;
         let next = _normalize[key](Object.assign({}, app[key], patch));
         // Auto: light or dark is the sun's answer, never the caller's (Parsers.js autoDark; light without a location,
         // as SLSAppearanceThemeForEnvironment returns light when no heuristic can be used)
@@ -61,6 +91,10 @@ QtObject {
         }
         app[key] = next;
         _patches[key] = Object.assign(_patches[key] || {}, patch);
+        // brightness is written while the slider is dragged: every `brightnessThrottle` ms during the drag, not once
+        // after it (a restarted timer would only fire when the pointer rests)
+        // (its own timer and file: the other keys' pending writes keep their own delay)
+        if (key === "brightness") { if (!_brightnessFlush.running) _brightnessFlush.start(); return; }
         _flush.interval = key === "appearance" ? appearanceDebounce : debounce;
         _flush.restart();
     }
@@ -92,12 +126,24 @@ QtObject {
     // mouse-up (MAC-ANSWERS Appearance 2); with 250 ms the glass changed 260-270 ms late (user report)
     property int debounce: 250
     property int appearanceDebounce: 16
+    property int brightnessThrottle: 50
     property var _patches: ({})
     property Timer _flush: Timer {
         interval: app.debounce
         onTriggered: {
             for (const key in app._patches) Backend.writeFile(app.path(key), JSON.stringify(app[key], null, 2) + "\n");
             app._patches = {};
+        }
+    }
+
+    property Timer _brightnessFlush: Timer {
+        interval: app.brightnessThrottle
+        onTriggered: {
+            if (app._patches.brightness === undefined) return;
+            Backend.writeFile(app.path("brightness"), JSON.stringify(app.brightness, null, 2) + "\n");
+            const p = Object.assign({}, app._patches);
+            delete p.brightness;
+            app._patches = p;
         }
     }
 
@@ -109,6 +155,8 @@ QtObject {
         Theme.sidebar.size = appearance.sidebarIconSize;
         Theme.accentName = appearance.accent;
         Theme.tintWindow = appearance.tintWindowBackground;
+        Theme.iconStyle = appearance.iconStyle || "default";
+        Theme.iconStyleVariant = appearance.iconStyleVariant || "auto";
         Theme.glassTint = isFinite(appearance.glass) ? Math.min(1, Math.max(0, appearance.glass)) : 0.5;
         Accent.highlight = appearance.highlight;   // selectedTextBackgroundColor: "" follows the accent
     }
@@ -118,7 +166,10 @@ QtObject {
         // The shell (or `qs ipc`) may change these files too; follow it.
         for (const key in _normalize) {
             const k = key;
-            Backend.watch(path(k), text => app[k] = P.mergeState(text, app._patches[k], app._normalize[k]));
+            Backend.watch(path(k), text => {
+                app[k] = P.mergeState(text, app._patches[k], app._normalize[k]);
+                if (k === "brightness" && String(text).trim() !== "") { app.brightnessLoaded = true; if (app._probeWanted) app.askBrightnessProbe(); }
+            });
         }
         // the zone's coordinates: zone1970.tab, else zone.tab (it also lists the older per-country zones)
         Backend.run(["sh", "-c", "readlink /etc/localtime || head -n 1 /etc/timezone 2>/dev/null || echo; cat /usr/share/zoneinfo/zone1970.tab /usr/share/zoneinfo/zone.tab 2>/dev/null"],
@@ -129,9 +180,8 @@ QtObject {
         Backend.run(["sh", "-c", "for f in \"$0\"/* \"$0\"/png/*; do case \"$f\" in *.jpg|*.jpeg|*.png|*.webp) echo \"$f\";; esac; done",
                      Backend.root + "/themes/wallpapers"],
                     (c, out) => { const p = out.split("\n").filter(f => f !== ""); if (p.length) Backend.makeThumbs(p, () => {}); });
-        // Skip peripheral batteries (mouse, headset): their scope is "Device".
-        Backend.run(["sh", "-c", "for d in /sys/class/power_supply/*; do [ \"$(cat $d/scope 2>/dev/null)\" = Device ] || cat $d/type 2>/dev/null; done"],
-                    (c, out) => app.hasBattery = P.hasBattery(out));
+        // peripheral batteries (mouse, headset: scope "Device") are not this computer's (scripts/hardware.sh)
+        refreshHardware();
         // Full name from /etc/passwd, found by home dir (works under both runtimes;
         // users not in /etc/passwd, e.g. LDAP, show their home folder's name).
         Backend.readText("/etc/passwd", t => app.userName = P.gecosName(t, Backend.home));

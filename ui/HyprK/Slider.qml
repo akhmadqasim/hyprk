@@ -53,6 +53,17 @@ Item {
     property real lensHeight: knobHeight * Tokens.motion.sliderLift
     property color lensBackdrop: Tokens.control.lensBackdrop
     property real lensGain: Tokens.control.knobLensGain   // the held lens's sample gain (Knob lensGain)
+    // the held lens: the decoded held-slider-knob stack (Knob lensDecoded) and the dump's dark specular rim in stroke
+    // mode (lensRimDecoded); both fit System Settings > Desktop & Dock > Size held (slider-held-settings-{light,dark}.png,
+    // GLASS-HIG.md round 7). The Control Center keeps its flat rim line (lensRimDecoded false)
+    property bool lensDecoded: true    // Knob lensDecoded
+    property real lensRingOpacity: Tokens.control.sliderLensRingOpacity   // Knob lensDecodedRing
+    property bool lensRimDecoded: true
+    property real lensEmptyLevel: 0    // Knob lensEmptyLevel
+    // the press layer over the fill while the knob is held (the Control Center has none in light: Theme.cc)
+    property color pressOverlay: Tokens.control.sliderPressOverlay
+    property real lensDy: 0            // the held knob's centre below the track's centre, pt (at full lift)
+    property real knobShadowScale: 1   // Knob shadowScale
     property bool knobShown: true
     property bool fillToEnds: false
     property real trackPressOffset: 0
@@ -68,6 +79,11 @@ Item {
     // inverts "Play feedback when volume is changed" (ControlCenter 27.2.1 0x1000e3814: NSEvent modifierFlags bit 17)
     property int releaseModifiers: 0
     signal committed(real value)
+    // a drag (or a track press) brought the value onto an end: -1 `from`, 1 `to`. Once per arrival: holding there or
+    // pulling further does not repeat it (DesignLibrarySlider.body onChange closure 0x19abe679c: only while tracking,
+    // value == 0 -> minimumValueLabelSeed += 1, == 1 -> maximumValueLabelSeed += 1; the labels' .symbolEffect(.bounce,
+    // value: seed), LabeledSlider.body 0x19a9e7c0c). The end buttons and the keys do not track: no signal
+    signal endReached(int end)
     function _end(dir) {
         const v = endStep > 0 ? Math.max(from, Math.min(to, value + dir * endStep)) : dir < 0 ? from : to;
         releaseModifiers = 0;
@@ -209,7 +225,7 @@ Item {
                 Rectangle { // held: the press layer over the fill
                     visible: s._lift > 0
                     anchors.fill: parent; radius: parent.radius
-                    color: Qt.alpha(Tokens.control.sliderPressOverlay, Tokens.control.sliderPressOverlay.a * s._lift)
+                    color: Qt.alpha(s.pressOverlay, s.pressOverlay.a * s._lift)
                 }
             }
             Repeater {
@@ -227,7 +243,9 @@ Item {
             visible: s.knobShown || s._dragging || s._lift > 0
             restW: s.knobWidth; restH: s.knobHeight
             liftW: s.lensWidth; liftH: s.lensHeight
+            shadowScale: s.knobShadowScale
             lift: s._lift
+            pressed: s._dragging   // the lens is elastic while held (Knob, FlexInteraction liquidLens)
             lensSource: bar
             lensBackdrop: s.lensBackdrop
             lensBand: Tokens.control.sliderLensBand
@@ -235,9 +253,16 @@ Item {
             lensDisp: 0
             lensAberration: 0
             lensGain: s.lensGain
+            lensDecoded: s.lensDecoded
+            lensDecodedRing: s.lensRingOpacity
+            lensEmptyLevel: s.lensEmptyLevel
+            lensRimBias: s.lensRimDecoded ? Tokens.control.sliderLensRimBias : 0
+            lensRimSpread: Tokens.control.sliderLensRimSpread
+            lensRimStroke: s.lensRimDecoded
+            lensOutlineWidth: s.lensRimDecoded ? Tokens.control.sliderLensOutlineWidth : Tokens.control.knobLensOutlineWidth
             reduceMotion: s.reduceMotion
             cx: track.knobCx
-            cy: track.height / 2
+            cy: track.height / 2 + s.lensDy * Math.max(0, Math.min(1, s._lift))
             FocusRing { visible: s.activeFocus; shapeRadius: parent.height / 2 }   // a capsule round the knob (focus-rings-light.png)
         }
         Repeater {
@@ -270,10 +295,13 @@ Item {
                     f = Math.round(f * (s.tickMarks - 1)) / (s.tickMarks - 1);
                 const v = s.from + f * (s.to - s.from);
                 if (s._dragging && v === s._dragValue) return;
+                const prev = s._dragging ? s._dragValue : s.value;   // onChange: only a change onto the end
+                const arrived = v === prev ? 0 : f === 0 ? -1 : f === 1 ? 1 : 0;
                 s._dragValue = v;
                 s._dragging = true;
                 touched = true;
                 s.moved(v);
+                if (arrived !== 0) s.endReached(arrived);
                 if (s._jump && !pos.moving) s._jump = false;   // nothing to spring to
             }
             onPressed: m => {

@@ -16,6 +16,8 @@ Item {
     readonly property real unit: pointSize / (glyph && glyph.pt ? glyph.pt : 32)   // "pt": outlines kept at another size
     readonly property real advance: glyph ? (glyph.a ? glyph.a[1] : glyph.rect[2]) * unit : 0   // width of the layout frame
     readonly property real bearing: glyph && glyph.a ? (glyph.rect[0] - glyph.a[0]) * unit : 0  // frame's left edge to the ink
+    // a scale per path about the centre of the ink box: the SF Symbols bounce by layer (SymbolBounce.scales)
+    property var layerScales: []
     implicitWidth: glyph ? glyph.rect[2] * unit : 0
     implicitHeight: glyph ? glyph.rect[3] * unit : 0
     Repeater {
@@ -23,9 +25,11 @@ Item {
         Shape {
             required property string modelData
             required property int index
+            readonly property real s: g.layerScales[index] ?? 1
             opacity: g.glyph.o ? g.glyph.o[index] : 1   // variable symbols (wifi.var-50): the dimmed layers
             preferredRendererType: Shape.CurveRenderer
-            transform: [Translate { x: -g.glyph.rect[0]; y: -g.glyph.rect[1] }, Scale { xScale: g.unit; yScale: g.unit }]
+            transform: [Translate { x: -g.glyph.rect[0]; y: -g.glyph.rect[1] }, Scale { xScale: g.unit; yScale: g.unit },
+                        Scale { origin.x: g.width / 2; origin.y: g.height / 2; xScale: s; yScale: s }]
             ShapePath {
                 fillColor: g.color
                 strokeColor: "transparent"

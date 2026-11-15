@@ -5,14 +5,17 @@
 
 // ---------- modes ----------
 // symbol: the glyph in the mode list and at the left of the field; placeholder: the field text while the mode is
-// active, the mode's name (27.2.1, MAC-ANSWERS.md Q-panels-22, -24). Glyphs on the Mac: the App Store "A", the outline
-// folder ("sf:folder": plain "folder" is the hyprk alias of folder.fill), layered squares (no SVG here: bolt) and
-// doc.on.clipboard.
+// active, the mode's name (27.2.1, MAC-ANSWERS.md Q-panels-22, -24). Glyphs on the Mac (r17 spotlight-modelist-*.png):
+// the App Store "A", the outline folder ("sf:folder": plain "folder" is the hyprk alias of folder.fill), two stacked
+// rounded squares = the private symbol app.2.stack.3d (its .fill is named in SpotlightUIServices 27.2.1, 0x21325b7ac;
+// the public square.2.layers.3d has pointed corners, the still has round ones) and two outline documents =
+// document.on.document (named in SpotlightUIShared, 0x22f1ba010). Both decoded from CoreGlyphs(Private) 27.2.1 with
+// themes/icons/tools/add-sf.py.
 const MODES = [
     { id: "apps", title: "Applications", placeholder: "Applications", symbol: "appstore" },
     { id: "files", title: "Files", placeholder: "Files", symbol: "sf:folder" },
-    { id: "actions", title: "Actions", placeholder: "Actions", symbol: "bolt" },
-    { id: "clipboard", title: "Clipboard", placeholder: "Clipboard", symbol: "doc.on.clipboard" },
+    { id: "actions", title: "Actions", placeholder: "Actions", symbol: "app.2.stack.3d" },
+    { id: "clipboard", title: "Clipboard", placeholder: "Clipboard", symbol: "document.on.document" },
 ];
 function modes() { return MODES; }
 function modeInfo(id) { return MODES.find(m => m.id === id) || null; }
@@ -25,16 +28,25 @@ function modeForKey(key, meta, ctrl, alt) {
     return i >= 0 && i < MODES.length ? MODES[i].id : "";
 }
 
-// ---------- reopening, holding Command ----------
+// ---------- inline completion ----------
+// The top hit completes the query in the field (27.2.1, r17 spotlight-typed-*.png: "calc" then "ulator — Open" on the
+// completion pill): the rest of the name when the name begins with what is typed (case ignored), then what Return does.
+// "" when the query is empty, ends in a space the name does not have, or the name does not begin with it.
+// actionOnly (Applications, apps-typed-cal-*.png: "cal" then " — Open"): the action without the name's rest.
+function completion(query, name, actionOnly) {
+    if (actionOnly) return " \u2014 Open";
+    if (!query || !name || name.length < query.length) return "";
+    if (name.slice(0, query.length).toLowerCase() !== query.toLowerCase()) return "";
+    return name.slice(query.length) + " \u2014 Open";
+}
+
+// ---------- reopening ----------
 // The query survives a close for 8 minutes: SearchViewController.startClearTimer, logged as "clearing for 8 min
 // timer" (SpotlightUIInternal 27.2.1, 0x2adf66460); MAC-ANSWERS.md R2: "Reopening soon keeps the last query".
+// (Holding Command: SearchViewController's commandKeyHintTimer, 0.35 s, 0x2adf7cf18, shows shortcut indicators
+// whose target is not traced; no Mac capture shows the mode list on a Command hold, so hyprk shows nothing.)
 const KEEP_QUERY_MS = 8 * 60e3;
 function keepsQuery(closedAt, now) { return closedAt > 0 && now - closedAt < KEEP_QUERY_MS; }
-// Holding Command shows the browse modes with their shortcuts: SearchViewController's commandKeyMonitor starts
-// commandKeyHintTimer, 0.35 s (SpotlightUIInternal 27.2.1, 0x2adf7cf18). Ctrl counts too for nested sessions,
-// where the host keeps Super. Qt key codes: Control, Meta, Super_L, Super_R.
-const HINT_HOLD_MS = 350;
-function isHintKey(key) { return key === 0x01000021 || key === 0x01000022 || key === 0x01000053 || key === 0x01000054; }
 
 // Command shortcuts of the bar: KeyboardHandlingBackdropView.KeyboardShortcut (SpotlightUIInternal 27.2.1,
 // sub_2adf2fdbc). Only with Command alone (deviceIndependentFlags == 0x100000): key codes 18-21 (1-4) pick a browse
@@ -131,6 +143,61 @@ function fileIcon(path, isDir, mime) {
     const dot = path.lastIndexOf(".");
     const ext = dot > path.lastIndexOf("/") ? path.slice(dot + 1).toLowerCase() : "";
     return EXT_ICONS[ext] || "text-x-generic";
+}
+
+// ---------- Files grid (Cmd-2) ----------
+// The Files mode is the Apps panel's 844 x 520 grid (MAC-ANSWERS-17.md R17.3, r17 spotlight-mode-files-*.png; pt,
+// panel-local, read off the 2x stills, the tiles are blurred there so +-2):
+//   chips: 5 capsules 26 tall at y 20, x 20 .. 824, gap 8, all one width (154.4), fill +12, text SF 15 plus-lighter +125;
+//   7 columns, centres 77 + 115 n (as Apps); a first row of files with icon centres at y 100 (icon box 60 from 70);
+//   the header "Recents" at x 20, middle y 211; then rows with icon centres at 270, 395, 520 (pitch 125: the names
+//   take two lines); the scroll knob 6 wide, 3 from the right edge, from y 102 (the grid scrolls under the chips).
+// A query or a chip drops the chips, the first row and the header (as Apps does; not in the Mac's captures).
+const FILES = {
+    chips: 5, chipTop: 20, chipHeight: 26, chipGap: 8, inset: 20,
+    topRow: 70, headerCY: 211, gridTop: 240, rowPitch: 125, plainTop: 20, labelLines: 2,
+    viewTop: 62, knobInset: 40.5, knobWidth: 6, knobRight: 3,
+};
+function filesGrid() { return FILES; }
+function filesChipWidth(panelWidth) { return (panelWidth - 2 * FILES.inset - (FILES.chips - 1) * FILES.chipGap) / FILES.chips; }
+
+// what a Files chip filters by: the file's kind, from its MIME type ("" = no chip). The Mac's chips mix kinds (PDF,
+// Music) and the apps that open the recent files (Preview, Microsoft Word, TextEdit); which it picks is not decoded,
+// here they are the kinds of the recent files, most frequent first
+function fileKind(isDir, mime) {
+    if (isDir) return "Folders";
+    const m = String(mime || "");
+    if (m === "application/pdf") return "PDF";
+    const major = m.split("/")[0];
+    if (major === "image") return "Images";
+    if (major === "audio") return "Music";
+    if (major === "video") return "Movies";
+    if (major === "text") return "Text";
+    if (/zip|x-tar|x-7z|x-xz|gzip|x-rar|x-bzip/.test(m)) return "Archives";
+    if (/presentation|powerpoint/.test(m)) return "Presentations";
+    if (/spreadsheet|excel/.test(m)) return "Spreadsheets";
+    if (/wordprocessing|msword|opendocument\.text|rtf/.test(m)) return "Documents";
+    return "";
+}
+function fileChips(files, n) {
+    const count = {}, order = [];
+    for (const f of files || []) {
+        const k = fileKind(f.isDir, f.mime);
+        if (!k) continue;
+        if (!(k in count)) { count[k] = 0; order.push(k); }
+        count[k]++;
+    }
+    return order.map((k, i) => [k, i]).sort((a, b) => count[b[0]] - count[a[0]] || a[1] - b[1]).slice(0, n).map(x => x[0]);
+}
+
+// the overlay scroll knob of a list or grid: [y, length] in a track from `inset` to `view - inset` (r17
+// spotlight-typed-*.png: 136 pt long from 40.5 in the 410 results panel), at least 26 long
+function scrollKnob(view, content, offset, inset) {
+    const track = view - 2 * inset;
+    if (!(content > view) || track <= 0) return [0, 0];
+    const len = Math.max(26, track * view / content);
+    const at = Math.max(0, Math.min(1, offset / (content - view)));
+    return [inset + (track - len) * at, len];
 }
 
 // a streamed line still belongs to the current query (lines of a killed search may arrive late)

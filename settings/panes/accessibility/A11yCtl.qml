@@ -15,8 +15,6 @@ QtObject {
 
     // "ok" | "missing" (not in Hyprland, or no process support) | "failed"
     property string hyprStatus: "ok"
-    readonly property string hyprNote: hyprStatus === "ok" ? ""
-        : "Saved, but Hyprland isn't reachable here, so the change applies at the next login."
 
     // Tools found on this system (checked once)
     property bool hasOrca: false

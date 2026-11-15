@@ -4,7 +4,7 @@ import "panels.js" as P
 
 // NSPopover as on macOS 27.2.1 (LIVE-27.2.1.md, MAC-ANSWERS.md Q-windows-17, Q-finder-25): radius 20, a 9 pt
 // arrow on the anchor's centre, content inset 13. Opens with a spring from 12.5 % (response 0.25 s, damping 0.9)
-// growing out of the arrow tip; closes with a 0.18 s fade, no scale. The live popover is regular glass; drawn
+// growing out of the arrow tip; closes with a 0.128 s fade on CA's default curve, no scale (Tokens.panel). The live popover is regular glass; drawn
 // flat with the menu fill. Fill the window with it and call openAt(anchorItem); children go into `body` at the
 // inset, and bodyWidth / bodyHeight size it. Escape or a click outside closes it.
 Item {
@@ -41,7 +41,7 @@ Item {
     MouseArea { anchors.fill: parent; enabled: root.shown; acceptedButtons: Qt.AllButtons; onPressed: root.close() }
 
     Spring { id: grow; target: 1; response: Tokens.panel.popoverResponse; damping: Tokens.panel.popoverDamping; epsilon: 0.001 }
-    NumberAnimation { id: fade; target: body; property: "opacity"; to: 0; duration: Tokens.panel.popoverFadeOut; easing.type: Easing.OutQuad }
+    FrameAnim { id: fade; target: body; property: "opacity"; to: 0; duration: Tokens.panel.popoverFadeOut; curve: Tokens.panel.popoverFadeCurve }
 
     Item {
         id: body

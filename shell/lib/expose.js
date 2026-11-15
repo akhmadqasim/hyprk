@@ -143,3 +143,11 @@ function layout(rects, area) {
     const out = _layout(rects.map(r => [r.x, r.y, r.w, r.h]), [area.x, area.y, area.w, area.h]);
     return { scale: out.scale, frames: out.rects.map(r => ({ x: r[0], y: r[1], w: r[2], h: r[3] })) };
 }
+
+// a frame between two layouts of the same window (a, b: { x, y, w, h } or null; g 0 .. 1): the Spaces bar expanding
+// (MissionControl.qml, R18.1)
+function between(a, b, g) {
+    if (!a || !b || g <= 0) return a;
+    if (g >= 1) return b;
+    return { x: a.x + (b.x - a.x) * g, y: a.y + (b.y - a.y) * g, w: a.w + (b.w - a.w) * g, h: a.h + (b.h - a.h) * g };
+}

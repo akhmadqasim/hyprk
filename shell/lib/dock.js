@@ -64,6 +64,25 @@ function fitTile(tile, items, separators, room) {
     return 16;
 }
 
+// ---------- resize by the separator ----------
+// Dock 27.2.1 -[DockBarMouseEventHandler _handleResizeDockEvent:type:] 0x1000830f4 (REA, Ghidra 12.1.4): the press
+// keeps the pointer and the tile size; a drag sets desiredTileSize = start size + the pointer's travel away from the
+// screen edge (up, for the bottom Dock), clamped to 16..128 and truncated to a whole size; with Option held
+// (kCGEventFlagMaskAlternate) it is cut to a multiple of 16: (int)(size x 0.0625) x 16. The release writes `tilesize`
+// (FUN_100080dcc, CFPreferencesSetAppValue).
+function resizeTile(start, travel, snap) {
+    let t = Math.trunc(Math.min(128, Math.max(16, start + travel)));
+    if (snap) t = Math.trunc(t * 0.0625) * 16;
+    return t;
+}
+// The resize area over a separator (either one), -[DockBar updateWithContext:showDockWindow:transaction:]
+// 0x10007549c at 0x100077948 (bottom Dock): 12 pt wide about the separator's centre, the Dock background's height
+// less 8 pt, from 4 pt under its top. In it the cursor is CoreCursor 0x20 (resize up-down; 0x1c left-right for a
+// side Dock). Cell coordinates.
+function resizeArea(cellWidth, barHeight) {
+    return { x: cellWidth / 2 - 6, y: 4, width: 12, height: barHeight - 8 };
+}
+
 // ---------- magnification ----------
 // From the Dock's own code (27.2.1 Dock FUN_1000118d4 and the edge mapping at 0x100011b68, MAC-ANSWERS.md
 // "REA 27.2.1: Dock" section 2): with tile T, large size L and the pointer at c (clamped to the bar),
@@ -293,7 +312,10 @@ function sections(pinned, runningUnpinned, recent, showRecents, others) {
 // (MAC-ANSWERS.md Q-dock launch bounce notes), both on the Dock's cosine ease in-out (DockFloatAnimatedProperty).
 // Dock.qml keeps one ListModel row per slot so a delegate survives every change of the items (running windows,
 // recents); a removed slot stays, `leaving`, where it was until its shrink ends.
-const slotGrowMs = 250, slotShrinkMs = 150;
+// A tile taken out with the Dock menu's Options > Remove from Dock closes its gap in 0.25 s on the same ease (R10.2 c,
+// screens/27.2.1/sound/dock-remove-menu-poof-sound.mov: the Dock's right edge per frame against the cosine ease in-out,
+// best fit 250 ms, rms .018 at 1 px of 32; 150 ms fits with rms .143).
+const slotGrowMs = 250, slotShrinkMs = 150, slotRemoveMs = 250;
 // one key per item: its id, made unique ("#2", "#3") if an id repeats
 function slotKeys(items) {
     const seen = {};
@@ -332,7 +354,7 @@ function slotEdits(cur, keys) {
     }
     return { ops: ops, slots: s };
 }
-function slotDuration(entering) { return entering ? slotGrowMs : slotShrinkMs; }
+function slotDuration(entering, removed) { return entering ? slotGrowMs : removed ? slotRemoveMs : slotShrinkMs; }
 
 // the recent list after app `id` stopped running: it goes first, kept unique, at most `max`
 function pushRecent(recent, item, max) {

@@ -22,7 +22,9 @@ GridView {
     topMargin: Theme.grid.top + topInset
     cellWidth: Theme.grid.cellWidth
     cellHeight: Theme.grid.cellHeight
-    interactive: false     // wheel still scrolls; drags make a rubber band instead of flicking
+    // no mouse-drag scrolling: a drag makes a rubber-band selection. Not `interactive: false`: QQuickFlickable::wheelEvent
+    // then drops the mouse wheel too (Qt 6.10), and the grid did not scroll by wheel at all
+    acceptedButtons: Qt.NoButton
     boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
     RubberBand { flickable: grid }
     clip: true
@@ -162,8 +164,10 @@ GridView {
             y: icon.y + icon.height + Theme.grid.labelGap
             width: grid.labelLayoutWidth
             horizontalAlignment: Text.AlignHCenter
-            text: Files.hasTags(cell.modelData) ? Files.styledName(cell.modelData, Theme.color.tagDotColors) : cell.labelPlain
-            textFormat: Files.hasTags(cell.modelData) ? Text.StyledText : Text.PlainText
+            // colour emoji at alpha 1 in the .85 label (R6.5, OPEN-FIXES.md 16): StyledText only for tags or emoji
+            text: Files.hasTags(cell.modelData) ? EmojiText.wrap(Files.styledName(cell.modelData, Theme.color.tagDotColors), color)
+                                                : EmojiText.opaque(cell.labelPlain, color)
+            textFormat: Files.hasTags(cell.modelData) || EmojiText.has(cell.labelPlain) ? Text.StyledText : Text.PlainText
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             maximumLineCount: 2
             elide: Text.ElideRight

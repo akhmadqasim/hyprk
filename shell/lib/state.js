@@ -64,6 +64,22 @@ function hasAudio(ready, sink) {
     return !!(ready && sink && sink.audio);
 }
 
+// The stub sink of headless test sessions (HYPRK_AUDIO_STUB=1 or HYPRK_STATUS_STUB=1, services/Audio.qml and
+// scripts/volume-key.sh): one line "<volume 0..1> <muted 0|1>" in the volume key folder. A missing or unreadable file
+// is the stub's start value, half volume, not muted (made up: any level away from the ends works for the slider).
+function parseStubSink(text) {
+    const a = String(text || "").trim().split(/\s+/);
+    const v = Number(a[0]);
+    return { volume: a[0] !== "" && isFinite(v) ? Math.max(0, Math.min(1, v)) : 0.5, muted: a[1] === "1" };
+}
+function formatStubSink(volume, muted) {
+    return Math.max(0, Math.min(1, Number(volume) || 0)).toFixed(6) + " " + (muted ? 1 : 0) + "\n";
+}
+// the folder volume-key.sh keeps per Hyprland instance (HYPRK_VOLKEY_DIR overrides it)
+function volkeyDir(override, runtimeDir, signature) {
+    return override || ((runtimeDir || "/tmp") + "/hyprk-volkey-" + (signature || "0"));
+}
+
 // Output devices for Control Center's Sound module: audio sinks that are devices, not program streams, in the
 // server's order. A node's shown name: its description, else its nickname, else its node name.
 function outputSinks(nodes) {

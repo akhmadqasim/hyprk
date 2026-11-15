@@ -157,7 +157,8 @@ Item {
                         property vector4d fill: Qt.vector4d(Theme.spotlight.chipLift, Theme.spotlight.chipLift, Theme.spotlight.chipLift, 0)
                         property size sizePt: Qt.size(width, height)
                         property real radius: height / 2
-                        property real dpr: Screen.devicePixelRatio
+                        property real dpr: (QsWindow.window ? QsWindow.window.devicePixelRatio : Screen.devicePixelRatio)
+                        property real pad: 0   // the shader's optional uniform (no Qt warning)
                         fragmentShader: Qt.resolvedUrl("../../shaders/plusfill.frag.qsb")
                     }
                     Text {
@@ -182,16 +183,19 @@ Item {
                 }
             }
             // 1 pt separator at y 168, x 20..824, plus-lighter +35
+            // exact at a fractional scale: one device pixel of `pad` on every side there (as ModeView's separator)
             ShaderEffect {
                 visible: panel.browsing
-                x: panel.m.inset - grid.x
-                y: panel.m.separatorY
-                width: panel.m.width - 2 * panel.m.inset
-                height: 1
+                readonly property real lineW: panel.m.width - 2 * panel.m.inset
+                property real dpr: (QsWindow.window ? QsWindow.window.devicePixelRatio : Screen.devicePixelRatio)
+                property real pad: Pixel.soft(dpr) ? 1 / dpr : 0
+                x: panel.m.inset - grid.x - pad
+                y: panel.m.separatorY - pad
+                width: lineW + 2 * pad
+                height: Pixel.stroke(1, dpr) + 2 * pad
                 property vector4d fill: Qt.vector4d(Theme.spotlight.separatorLift, Theme.spotlight.separatorLift, Theme.spotlight.separatorLift, 0)
-                property size sizePt: Qt.size(width, height)
+                property size sizePt: Qt.size(lineW, Pixel.stroke(1, dpr))
                 property real radius: 0
-                property real dpr: Screen.devicePixelRatio
                 fragmentShader: Qt.resolvedUrl("../../shaders/plusfill.frag.qsb")
             }
         }

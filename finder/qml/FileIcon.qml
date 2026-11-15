@@ -41,6 +41,8 @@ Item {
     // share of the box a thumbnail fills; the icon grid passes less because its box includes
     // the macOS PNGs' padding (ref: 68 px thumbnails in a 77 px icon)
     property real thumbScale: 0.94
+    // the soft shadow under a thumbnail; the Gallery strip has none (R9.1 stills: only the 1 px hairline there)
+    property bool thumbShadow: true
     property bool thumbFailed: false
     property bool sysFailed: false   // a PNG missing from themes/icons/system -> drawn icon
     onEntryChanged: { thumbFailed = false; sysFailed = false; }
@@ -88,12 +90,14 @@ Item {
         readonly property real radius: Math.max(width, height) * 0.06
         // soft shadow: two offset rounded layers (no blur effects, they need a GPU layer)
         Rectangle {
+            visible: root.thumbShadow
             x: -2; y: -1
             width: parent.width + 4; height: parent.height + 4
             radius: parent.radius + 2
             color: Qt.rgba(0, 0, 0, 0.05)
         }
         Rectangle {
+            visible: root.thumbShadow
             x: -1; y: 0
             width: parent.width + 2; height: parent.height + 2
             radius: parent.radius + 1

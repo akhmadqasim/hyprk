@@ -19,11 +19,12 @@ Item {
         : Files.isImage(entry) ? [{ icon: "rotate.left", text: "Rotate Left" }, { icon: "markup", text: "Markup" }, { icon: "ellipsis", text: "More\u2026" }]
         : Files.iconClass(entry) === "pdf" ? [{ icon: "markup", text: "Markup" }, { icon: "ellipsis", text: "More\u2026" }]
         : [{ icon: "ellipsis", text: "More\u2026" }]
-    readonly property color ink: Theme.dark ? Qt.rgba(153 / 255, 153 / 255, 155 / 255, 1) : Qt.rgba(129 / 255, 129 / 255, 129 / 255, 1)
-    readonly property color text: Theme.dark ? Qt.rgba(142 / 255, 142 / 255, 145 / 255, 1) : Qt.rgba(129 / 255, 129 / 255, 129 / 255, 1)
+    // the gallery sets both to R9.3's single grey, (128) light / (142,143,145) dark, glyph and label alike
+    property color ink: Theme.dark ? Qt.rgba(153 / 255, 153 / 255, 155 / 255, 1) : Qt.rgba(129 / 255, 129 / 255, 129 / 255, 1)
+    property color text: Theme.dark ? Qt.rgba(142 / 255, 142 / 255, 145 / 255, 1) : Qt.rgba(129 / 255, 129 / 255, 129 / 255, 1)
 
     Rectangle { anchors.fill: parent; color: Theme.color.window }
-    Rectangle { visible: root.line; width: parent.width; height: 0.5; color: Theme.color.pathBarLine }
+    Rectangle { visible: root.line; width: parent.width; height: Pixel.stroke(0.5, Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio)); antialiasing: Pixel.soft(Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio)); color: Theme.color.pathBarLine }
     Row {
         anchors.horizontalCenter: parent.horizontalCenter
         Repeater {

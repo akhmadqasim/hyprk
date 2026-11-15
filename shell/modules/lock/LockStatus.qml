@@ -4,6 +4,7 @@ import Quickshell.Networking
 import qs
 import qs.HyprK
 import qs.components
+import qs.services
 import "../../lib/state.js" as State
 
 // Status items at the top right of the lock screen (LOCKSCREEN-27.2.1.md A7), right to left: Wi-Fi (26 pt),
@@ -13,13 +14,14 @@ Row {
     id: s
     property bool interactive: false
     readonly property var wifiDev: State.wifiDevice(Networking.devices.values)
-    readonly property bool laptop: State.hasBattery(UPower.devices.values)
+    readonly property bool laptop: Hardware.battery
 
     layoutDirection: Qt.RightToLeft
     spacing: LockTheme.statusGap
     height: LockTheme.statusRowHeight
 
     Item {
+        visible: Hardware.wifi   // no Wi-Fi adapter: not drawn, as in the menu bar
         width: LockTheme.wifiWidth
         height: s.height
         Symbol {

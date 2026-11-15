@@ -52,6 +52,24 @@ function alertLayout(count, hasIcon, titleH, messageH) {
 // a quarter of its own height (Q-panels-33: top = 289.5 - h/4 on a 1113 pt screen), never above 0.
 function alertTop(areaH, h) { return Math.max(0, Math.round(areaH * 0.26 - h / 4)); }
 
+// App-modal alert motion, decoded from AppKit 27.2.1 (re/27.2.1/MOTION-AUDIT.md "Alert, Round R3.1"). Appear: NSAlert
+// orders its panel front with NSWindowTransformAnimationPopIn, an NSAnimation whose linear progress v (0..1 over
+// Tokens.panel.alertPopIn ms) gives window alpha = v and a scale about the centre of 1.2 (0.2 + 0.8 v / 0.6)^3 up to
+// v = 0.6, then 1 + 0.2 cos(0.2 pi u) (1 - u)^1.5 with u = (v - 0.6) / 0.4 (amount = 0.2; the R3.1 clips over grey fit
+// it at rms .0019 dark / .0009 light).
+function alertPopScale(v, amount) {
+    if (v <= 0.6) return Math.pow(0.2 + 0.8 * Math.max(0, v) / 0.6, 3) * (1 + amount);
+    var u = Math.min(1, (v - 0.6) / 0.4);
+    return 1 + amount * Math.cos(0.2 * Math.PI * u) * Math.pow(1 - u, 1.5);
+}
+// Dismiss with the Cancel button (Esc): NSWindowTransformAnimationScaleDownAndOut, a CASpringAnimation of perceptual
+// duration d (bounce 0, so critically damped at w = 2 pi / d) started at initial velocity v0: progress p at `ms` ms,
+// alpha = 1 - p, scale = 1 - (1 - 0.98) p. Any other button: no order-out animation, gone at once.
+function alertCancelProgress(ms, d, v0) {
+    var t = Math.max(0, ms) / 1000, w = 2 * Math.PI / d;
+    return Math.min(1, 1 - Math.exp(-w * t) * (1 + (w - v0) * t));
+}
+
 // Sheets are centred on the parent window, titlebar included (Q-panels-34).
 function sheetRect(parentW, parentH, w, h) {
     return { x: Math.round((parentW - w) / 2), y: Math.round((parentH - h) / 2), width: w, height: h };

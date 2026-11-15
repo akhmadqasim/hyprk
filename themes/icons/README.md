@@ -47,8 +47,12 @@ used by the shell and Finder through symlinks), `tools/` (`car.py` Assets.car re
    - macOS icons: their own renditions `apps/<Name>-256-<style>-<mode>.png` (`dark-dark`, `clear-light`,
      `clear-dark`, `tinted-light`, `tinted-dark`), picked by `styled()` in `apple-map.js` (shell
      `Apps.iconUrl(..., Theme.iconLook)`, Finder `FileIcon.qml`). Dark + Auto in light mode is the Default icon.
-     System icons (Downloads, Trash, folders) keep their Default file: the Mac's Dark-style Dock shows them in
-     colour too (`reference/screens/27.2.1/dock/dock-dark.png`; no Mac shot of them in Clear / Tinted).
+     Folders, special folders and documents keep their one file in every style and mode: IconServices and the real
+     Finder give the same pixels (MAC-ANSWERS-9 R9.5), and the Downloads stack shows its contents. The Dock's Trash
+     follows the style like an app (`system/DockTrash*`, below); CoreTypes' Trash (`user-trash`) has a dark file,
+     `system/TrashIcon-512-dark.png` / `FullTrashIcon-512-dark.png`, picked by the mode alone. Finder's sidebar glyphs
+     do not change with the style. The Mac's own pairing: Default = RegularLight (light icons in both modes), Dark +
+     Always = RegularDark, Dark + Auto = RegularAutomatic (dark icons only in dark mode).
      macOS 27.2.1 keeps no bitmap for these styles: each app's `Assets.car` has the Default bitmap plus the
      Icon Composer layers (`*.iconstack`, groups, SVG and deepmap2 bitmap layers, fills per appearance:
      DarkAqua, Aqua, ISAppearanceTintable), which IconRendering composes at run time.

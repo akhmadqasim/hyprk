@@ -80,3 +80,84 @@ test("hyprctl eval snippets for scale-policy.lua", () => {
     assert.equal(P.luaScaleReport("/opt/hyprk", "/tmp/r.json"), 'dofile("/opt/hyprk/config/hypr/scale-policy.lua").report("/tmp/r.json")');
     assert.equal(P.sizeText(1920, 1080), "1920 × 1080");
 });
+
+// ---------- several displays, brightness state, absent hardware (2026-11-15) ----------
+const mons = P.parseHyprMonitors(fs.readFileSync(path.join(__dirname, "fixtures", "hyprctl-monitors.json"), "utf8"));
+// this PC's real session: two Lenovo N27p side by side (DP-1, DP-2), 2560x1440 at 1x
+const twins = P.parseHyprMonitors(JSON.stringify([
+    { id: 0, name: "DP-1", description: "Lenovo Group Limited N27p UMA11762", model: "N27p", width: 2560, height: 1440, x: 0, y: 0, scale: 1, focused: true, mirrorOf: "none" },
+    { id: 1, name: "DP-2", description: "Lenovo Group Limited N27p UMA79344", model: "N27p", width: 2560, height: 1440, x: 2560, y: 0, scale: 1, mirrorOf: "none" }]));
+
+test("monitors keep their place in the layout", () => {
+    assert.deepEqual(mons.map(m => [m.id, m.x, m.y, m.mirrorOf]), [[0, 0, 0, ""], [1, 2560, 0, ""]]);
+});
+
+test("display names: the model, else the description; two of one model are numbered", () => {
+    assert.deepEqual(P.displayNames(mons), ["DELL U2720Q", "Generic 24"]);
+    assert.deepEqual(P.displayNames(twins), ["N27p (1)", "N27p (2)"]);
+    assert.deepEqual(P.displayNames([]), []);
+});
+
+test("Use as: the display at the origin is the main one, the others extend, a mirror names its source", () => {
+    assert.deepEqual([0, 1].map(i => P.displayRole(twins, i)), ["Main display", "Extended display"]);
+    const mirrored = twins.map((m, i) => i === 1 ? Object.assign({}, m, { mirrorOf: "DP-1" }) : m);
+    assert.equal(P.displayRole(mirrored, 1), "Mirror for N27p (1)");
+    assert.equal(P.mainDisplay([{ x: 100, y: 0 }, { x: 0, y: 0 }]), 1);
+    assert.equal(P.mainDisplay([{ x: 5, y: 5 }]), 0);
+    assert.equal(P.displayRole(twins, 9), "");
+});
+
+test("Arrange: the layout scaled into the box and centred", () => {
+    assert.deepEqual(P.arrangement(twins, 430, 200),
+                     [{ x: 0, y: 39.53125, w: 215, h: 120.9375 }, { x: 215, y: 39.53125, w: 215, h: 120.9375 }]);
+    // sizes are in layout units: a 4K display at 1.5 is 2560 wide beside a 1920 one
+    const r = P.arrangement(mons, 448, 144);
+    assert.deepEqual(r.map(a => Math.round(a.w)), [256, 192]);
+    assert.equal(Math.round(r[1].x), 256);
+    assert.deepEqual(P.arrangement([], 10, 10), []);
+});
+
+test("brightness.json: the shell's state, clamped; no file = not available", () => {
+    assert.deepEqual(P.normalizeBrightness(null), { value: 1, available: false, source: "", probe: 0 });
+    assert.deepEqual(P.normalizeBrightness({ value: 0.25, available: true, source: "ddc", probe: 2 }), { value: 0.25, available: true, source: "ddc", probe: 2 });
+    assert.deepEqual(P.normalizeBrightness({ value: 7, available: "yes", source: 3, probe: "x" }), { value: 1, available: false, source: "", probe: 0 });
+    // a slider move over the shell's file keeps what the shell decided
+    assert.deepEqual(P.mergeState('{"value":0.6,"available":true,"source":"stub","probe":1}', { value: 0.31237 }, P.normalizeBrightness),
+                     { value: 0.3124, available: true, source: "stub", probe: 1 });
+    assert.equal(P.mergeState("", null, P.normalizeBrightness).available, false);
+});
+
+test("hardware.sh lines: each item hidden and shown; HYPRK_HW wins; no answer hides nothing", () => {
+    const none = P.parseHardware("wifi=0\nbluetooth=0\nbattery=0\ntrackpad=0\nmouse=0\nkeyboardBacklight=0\nambientLight=0\n", "");
+    assert.deepEqual(none, { wifi: false, bluetooth: false, battery: false, trackpad: false, mouse: false, keyboardBacklight: false, ambientLight: false, airdrop: false });
+    const all = P.parseHardware("wifi=1\nbluetooth=1\nbattery=1\ntrackpad=1\nmouse=1\nkeyboardBacklight=1\nambientLight=1\n", "");
+    assert.deepEqual(all, { wifi: true, bluetooth: true, battery: true, trackpad: true, mouse: true, keyboardBacklight: true, ambientLight: true, airdrop: true });
+    // this PC: Bluetooth and a mouse only. AirDrop needs Wi-Fi too
+    const pc = P.parseHardware("wifi=0\nbluetooth=1\nbattery=0\ntrackpad=0\nmouse=1\nkeyboardBacklight=0\nambientLight=0\n", "");
+    assert.deepEqual([pc.wifi, pc.bluetooth, pc.airdrop, pc.trackpad, pc.mouse], [false, true, false, false, true]);
+    assert.deepEqual(P.parseHardware("wifi=0\n", "wifi=1,trackpad=0,bogus=1").wifi, true);
+    assert.equal(P.parseHardware("wifi=0\n", "wifi=1,trackpad=0").trackpad, false);
+    assert.deepEqual(P.parseHardware("", ""), Object.assign({}, P.hardwareDefaults, { airdrop: true }));
+});
+
+test("the sidebar lists a pane only with its hardware", () => {
+    const Panes = new Function(fs.readFileSync(path.join(__dirname, "..", "Panes.js"), "utf8") + "; return { panes, visible };")();
+    const ids = hw => Panes.visible(false, "", hw).map(p => p.id);
+    const all = P.parseHardware("", "");
+    for (const [key, id] of [["wifi", "wifi"], ["bluetooth", "bluetooth"], ["trackpad", "trackpad"], ["mouse", "mouse"]]) {
+        assert.ok(ids(all).includes(id), id + " shown");
+        const without = ids(Object.assign({}, all, { [key]: false }));
+        assert.ok(!without.includes(id), id + " hidden");
+        assert.equal(without.length, ids(all).length - 1);        // nothing else goes
+    }
+    assert.deepEqual(ids(undefined), ids(all));
+    assert.ok(Panes.visible(true, "", all).some(p => p.id === "battery") && !ids(all).includes("battery"));
+    // the list closes up: Bluetooth is first without Wi-Fi
+    assert.equal(ids(Object.assign({}, all, { wifi: false }))[0], "bluetooth");
+});
+
+test("scripts/hardware.sh prints every key once as 0 or 1", () => {
+    const out = require("node:child_process").spawnSync(path.join(__dirname, "..", "scripts", "hardware.sh"), { encoding: "utf8" }).stdout;
+    assert.deepEqual(out.trim().split("\n").map(l => l.replace(/=[01]$/, "")),
+                     ["wifi", "bluetooth", "battery", "trackpad", "mouse", "keyboardBacklight", "ambientLight"]);
+});

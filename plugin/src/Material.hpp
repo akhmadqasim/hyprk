@@ -85,12 +85,31 @@ namespace lg {
         // blurred backdrop, mix(0.3, 1, v)) x ShadowOpacity x the erfc edge, i.e. it darkens by 0.3 x ShadowOpacity x edge
         // (v = 0: black; v = 1, Notification Center from D 96: tinted by the backdrop)
         float shadowFill = 0.3f, shadowVibrancy = 0;
-        // a black shadow at full ShadowOpacity (AppKit's window shadow, not the glass filter's)
+        // a black shadow at full ShadowOpacity (AppKit's window shadow, not the glass filter's). The window has one shadow
+        // of all its shapes together: the shader adds the masks of the groups drawn before (GlassElement.cpp `prior`)
         bool shadowBlack = false;
+        // the face clamped to 1 before the fill, so the fill darkens what the screen shows and the key/fill highlight
+        // after it still has room over a white backdrop (Spotlight, SPOTLIGHT-27.2.1.md "Judge #20")
+        bool clampBeforeFill = false;
+        // Spotlight's list (MAC-ANSWERS-17.md R17.5, SPOTLIGHT-27.2.1.md "Round 17"): the outer refraction sample leaves
+        // along the ovalized normal and sees the shapes drawn before it in the window (the bar) as they show: their face
+        // under the shell's black veil (Theme.spotlight.bar*Tint as on the QML glass: top, middle, bottom)
+        bool                 outerSeesPrior = false;
+        std::array<float, 3> priorVeil      = {0, 0, 0};
+        // clampBeforeFill only: the amount of the key (top) lobe drawn on the face. 0 = the shell draws the top line over
+        // its veil (Spotlight: shell/shaders/spotrim.frag)
+        float keyTop = 1;
 
         // key/fill highlight (CASDFKeyFillHighlightEffect): key amount, diffuse band amount (Apple 0.5 and 0.5 x 0.15)
         // and a scale of the whole mask (1 = Apple; Notification Center 1.23, its measured rim)
         float keyAmount = 0.5f, diffuseAmount = 0.075f, keyScale = 1;
+        // The dark specular's line in the dark appearance, when Cap > 0: the decoded tone t = c (1 + bias (3 - 2 c)) per
+        // channel, its luma Y then limited to Cap through a soft knee, t (1 + (Y / Cap)^Knee)^(-1 / Knee). 0 = the
+        // decoded tone alone. Mac pixels, not decoded (Material.cpp NOTIFICATIONCENTER)
+        float darkToneCap = 0, darkToneKnee = 4;
+        // the highlight's normal ovalized on shapes over 64 pt (gradientOvalization below; SwiftUI / AppKit glass, R8.1).
+        // false: always the plain SDF normal, as the Mac's Dock and Cmd-Tab (Dock.app) and Control Center modules draw it
+        bool ovalize = true;
 
         // size class (GlassMaterialProvider.Size, SwiftUI _Glass.SurfaceSize, MAC-ANSWERS PC #67 B2 3 and notes): every
         // size-dependent input reads this fixed D instead of the shape's shortest side. 0 = automatic (the shape's own,
@@ -125,10 +144,17 @@ namespace lg {
         SYcc  keyYcc;
         float keyAmount = 0.5f, diffuseAmount = 0.075f, keyScale = 1;
         float darkBias = -0.25f, darkSpread = 75;
+        float darkToneCap = 0, darkToneKnee = 4; // SRecipe::darkTone*, dark appearance only
     };
 
     // false when the recipe never draws a drop shadow (Clear, Dock, Control Center)
     bool hasShadow(const SRecipe& r);
+
+    // CASDFElementLayer.gradientOvalization of a w x h pt rounded rect (MAC-ANSWERS-8.md R8.1, a live sweep of SwiftUI and
+    // AppKit glass): 0.5 when the shorter side is over 64 pt, else 0 (300 x 64 -> 0, 300 x 65 -> 0.5). The key/fill
+    // highlight's normal is mixed by it toward the direction from the shape's centre (liquidglass.frag shapeOval)
+    constexpr double OVALIZATION_MIN_SIDE = 64, OVALIZATION = 0.5;
+    float gradientOvalization(double w, double h);
 
     // tint = Liquid Glass slider (NSGlassTintAmount) 0..1, 0.5 = the recipe as is
     SResolved resolveMaterial(const SRecipe& r, double D, bool dark, double tint = 0.5);

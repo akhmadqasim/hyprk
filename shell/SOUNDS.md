@@ -13,7 +13,7 @@ changes apply at once. Missing file or keys fall back to the defaults.
 | key | type | default | meaning |
 |---|---|---|---|
 | `alertSound` | string | `"Tink"` | file name (no extension) in `sounds/originals/Sounds/` (or `oga`): Basso, Blow, Bottle, Frog, Funk, Glass, Hero, Morse, Ping, Pop, Purr, Sosumi, Submarine, Tink |
-| `alertVolume` | number 0..1 | `0.75` | volume for every sound systemsoundserverd would play (alert, notification, UI sounds); not the volume feedback and the power chime, which BezelServices and PowerChime play with NSSound (at 1) |
+| `alertVolume` | number 0..1 | `1` (the Mac's stock position) | volume for every sound systemsoundserverd would play (alert, notification, UI sounds); not the volume feedback and the power chime, which BezelServices and PowerChime play with NSSound (at 1) |
 | `uiSounds` | bool | `true` | "Play user interface sound effects": screenshot, trash, mount |
 | `volumeFeedback` | bool | `false` | "Play feedback when volume is changed" |
 
@@ -25,8 +25,8 @@ changes apply at once. Missing file or keys fall back to the defaults.
 | `alert` | critical notification, `qs ipc call sounds play alert`, an alert that sets `beep: true` (NSAlert plays no sound by itself; confirmations such as Empty Trash or Shut Down are silent) | alert sound | Focus |
 | `power` | a laptop goes from battery to the charger (UPower) | `misc/PowerChime-connect_power` | `uiSounds` |
 | `poof` | an app dragged off the Dock is let go there (Mac: Q-dock-17 "Remove" bubble, fade 0.25 s, ID 15) | `SystemSounds/dock/poof item off dock` | `uiSounds` |
-| `volume` | the volume keys (`scripts/volume-key.sh`, below), the Control Center Sound slider and the Sound module's slider when let go after a change, the Settings Output volume slider when let go | `misc/BezelServices-volume` | `volumeFeedback`, inverted while Shift is held (keys and Control Center); a new pop stops the previous one |
-| `screenshot` | Cmd+Shift+3, Cmd+Shift+4 (slurp), Print: as the screen is taken (screencapture 27.2.1 `FUN_10000cc88` plays ID 0x571 before writing the file; the only property it sets is CompletePlaybackIfAppDies `ifdi` = 1, so it stays a UI sound); ours starts with grim, 23 ms after the key (was after the PNG encode, ~1.5 s) | `SystemSounds/system/Screen Capture` | `uiSounds` |
+| `volume` | the volume keys (`scripts/volume-key.sh`, below), the Control Center Sound slider and the Sound module's slider when let go after a change, the Settings Output volume slider when let go | `misc/BezelServices-volume` | `volumeFeedback`, inverted while Shift is held (keys and Control Center); a new pop stops the previous one; from the keys the player starts 44 ms after the level is set (Mac R5.1: the pop 18 ms before the HUD's first frame, below) |
+| `screenshot` | Cmd+Shift+3, Cmd+Shift+4 (slurp), Print: as the screen is taken (screencapture 27.2.1 `FUN_10000cc88` plays ID 0x571 before writing the file; the only property it sets is CompletePlaybackIfAppDies `ifdi` = 1, so it stays a UI sound); ours is out 232-240 ms after the key, the Mac's 222 / 247 (R10.2 a; `hyprland.lua shutterDelay`, SOUND-REA section 10; it was 38 ms, at the bind), grim itself starts at the key | `SystemSounds/system/Screen Capture` | `uiSounds` |
 | `trash-empty` | Dock Trash right-click > Empty Trash | `SystemSounds/finder/empty trash` | `uiSounds` |
 | `trash-move`, `mount`, `unmount`, `sent` | available for other apps (Finder) | see `sound.sh` | `uiSounds` |
 
@@ -35,7 +35,11 @@ changes apply at once. Missing file or keys fall back to the defaults.
 - Player: `pw-play`, then `paplay`, else silent.
 - Unknown `alertSound` name: Tink. Missing sound file: silent.
 - `HYPRK_MUTE=1` silences everything (set by `scripts/smoke.sh` and nested test sessions).
-- `HYPRK_SOUND_LOG=<file>` appends `<event> <file>` for each sound that would play, muted or not.
+- `HYPRK_SOUND_LOG=<file>` appends `<event> <file> vol=<gain>` for each sound that would play, muted or not (the gain
+  `pw-play` gets: exp(s - 1) of the Alert volume, 1 for the volume pop and the power chime).
+- `HYPRK_AUDIO_STUB=1` (or `HYPRK_STATUS_STUB=1`, test sessions): the volume keys, the Control Center sliders and the
+  HUD work on a made-up sink in `$XDG_RUNTIME_DIR/hyprk-volkey-<instance>/stub-sink`; `wpctl` is never called
+  (`services/Audio.qml`, `scripts/volume-key.sh`). A live check of every event with it: SOUND-REA-27.2.1.md section 6.
 - No startup chime: the Mac's is firmware, no file exists, so "Play sound on startup" (Settings) has nothing to play.
 
 ## Volume keys and the volume pop (Control Center)
@@ -48,7 +52,7 @@ handleCGSEvent:]` returns at once while the feature flag ControlCenter/Bezel is 
 
 | rule | Mac evidence |
 |---|---|
-| a key press changes the level, shows the HUD and pops at once | `HotKeys.registerBezelHotKeys(with:)` 0x20a57cc34: the keyDown observer calls `perform` 0x20a59567c, no timer before it |
+| a key press changes the level, shows the HUD and pops at once (in code; the sound reaches the output 49 ms after the menu bar pill, "Pop against the HUD" below) | `HotKeys.registerBezelHotKeys(with:)` 0x20a57cc34: the keyDown observer calls `perform` 0x20a59567c, no timer before it |
 | a held key repeats the step and the pop at the keyboard's repeat rate | the same observer starts an `NSTimer` at `NXKeyRepeatThreshold`, interval `NXKeyRepeatInterval`; each tick calls `perform` |
 | the key going up plays nothing | the keyUp observer 0x20a57d690 only invalidates the timer |
 | a step is 1/16, Option+Shift 1/64, on a grid | 0x20a595548 and the grid step 0x20a595d28 (the same grid as BezelServices) |
@@ -70,11 +74,21 @@ That controller (ControlCenter.framework in the dyld cache, 0x20a531e74) plays t
 `BezelServices.loginPlugin/Contents/Resources/volume.aiff`. So nothing plays while dragging, one pop on let-go. Ours:
 `HyprK.Slider.releaseModifiers` -> `Sounds.volumeReleased()` (was a 180 ms debounce after the last drag step).
 
-Start latency, ours (session 19, headless session on a private PipeWire with a logging stand-in for `pw-play`, so no
-sound reached a device): virtual key up -> the player starts 26, 28, 31, 33, 40 ms (one 105 ms outlier; with auto-repeat
-still queued 30-100 ms); `sound.sh` itself 8-11 ms of that (jq 4 ms); `pw-play` reaches streaming about 11 ms later
-(earlier measurement, above). Unmute -> pop 123 ms (0.08 s by design + 43 ms). The Mac's key-up -> sound time is not
-measured: **needs the Mac** (a recording of key up and the output).
+Pop against the HUD (Mac R5.1, screen and system audio on one clock, SOUND-REA-27.2.1.md section 7): the pop is in the
+output 49 ms after the menu bar's Control Center pill and 18 ms before the HUD's first frame, at the file's level
+(-0.13 dB). Control Center calls play at once, so that is its player's start-up. Ours played 5 ms before the pill and
+88 ms before the HUD (player 16 ms after the key, `pw-play` streaming about 11 ms later, session 19), so
+`volume-key.sh` started the player 60 ms after the level was set (25-29 ms before what then was the HUD's first frame).
+Since judge #20 the HUD draws its faint first frames and starts one frame later (MOTION-AUDIT.md "HUD", "Round J20"), and
+the player starts 44 ms after the level: pop out 45.8 ms after the pill (Mac 48.7) and 13.5 ms before the HUD's first
+frame (Mac 18), means of 12 runs (headless, stub sink). The unmute pop goes the same way.
+The Control Center and Settings sliders keep their own timing (no HUD there; the Mac's slider pop is not filmed).
+Not measured here: `wpctl` and PipeWire's own latency on the real path (both the pop and the HUD wait for the same level
+change, so the offset between them does not depend on it) and the device's output latency.
+
+Earlier start latency (session 19, a private PipeWire with a logging stand-in for `pw-play`): key -> the player 26-40
+ms with the real `wpctl` (one 105 ms outlier; with auto-repeat still queued 30-100 ms); `sound.sh` itself 8-11 ms of
+that (jq 4 ms).
 
 ## Evidence: the alert volume scales every sound systemsoundserverd plays
 
@@ -114,9 +128,10 @@ Mac: the loudness of a UI sound at two Alert volume settings (a recording of the
 
 ## Open (2026-11-12, session 19)
 
-- **Needs the Mac:** the measured output latency of the volume pop and the shutter (the designed delay is 0 on both,
-  SOUND-REA-27.2.1.md section 2; ours 26-40 ms and 23 ms to the player); the stock key repeat values (kernel defaults
-  500 ms, then 83.3 ms).
+- **Measured 2026-11-14 (R5.1):** the volume pop against the HUD (above). **Still needs the Mac:** the shutter (R5.1's
+  screenshot clip holds the alert sound Blow, not the shutter: Cmd-Shift-3 took no screenshot while the recording ran),
+  Empty Trash and the Dock poof (not filmed: the user's Trash holds real items, a synthetic drag-off flies back); the
+  stock key repeat values (kernel defaults 500 ms, then 83.3 ms).
 - **Decoded 2026-11-14 (SOUND-REA-27.2.1.md):** the Settings Output slider takes no Shift and plays 30 ms after the
   last let-go (ours: at once); the Control Center throttle's interval is 0 s; the double-click interval is 0.5 s
   (plugin title bar and Finder now 500 ms, were 400).

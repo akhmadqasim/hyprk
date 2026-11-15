@@ -394,13 +394,15 @@ Window {
                 }
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: ql.cur ? ql.cur.kind + " – " + Files.formatSize(ql.cur.size, ql.cur.isDir) : ""
+                    // QuickLook.framework PlugIns.loctable (Generic Information): "%1$@ - %2$@", "Last modified %@",
+                    // "Today %@" / "Yesterday %@", "%1$@ at %2$@"
+                    text: ql.cur ? ql.cur.kind + " - " + Files.formatSize(ql.cur.size, ql.cur.isDir) : ""
                     color: Theme.color.quickLookInk
                     font: Typography.font(Theme.font.preview)
                 }
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: ql.cur ? "Modified " + Files.formatDate(ql.cur.modified) : ""
+                    text: ql.cur ? "Last modified " + Files.formatDate(ql.cur.modified).replace(/^(Today|Yesterday) at /, "$1 ") : ""
                     color: Theme.color.quickLookInk
                     font: Typography.font(Theme.font.preview)
                 }

@@ -59,12 +59,11 @@ QtObject {
     readonly property var selectedVisible: entries.filter(e => selected[e.path] === true)
     readonly property int selectedCount: selectedVisible.length
 
-    // Desktop and Documents carry Finder's " — Local" suffix (not synced to iCloud)
+    // only the folder name (MAC-ANSWERS.md Q-finder-06); Finder's " — Local" (NE84) is for iCloud Desktop & Documents
     readonly property string title: path === "recents:" ? "Recents"
         : path === "applications:" ? "Applications"
         : path.indexOf("tag:") === 0 ? path.slice(4)
         : path === FileOps.homePath() ? Files.baseName(path)
-        : path === FileOps.standardPath("documents") || path === FileOps.standardPath("desktop") ? Files.title(path) + " \u2014 Local"
         : Files.title(path, trashPath)
 
     signal errorRaised(string message)

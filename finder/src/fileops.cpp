@@ -1,9 +1,11 @@
 #include "fileops.h"
 
+#include <QDateTime>
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
+#include <QImageReader>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QMutexLocker>
@@ -59,7 +61,9 @@ QVariantMap FileOps::entry(const QFileInfo &fi) const
         {QStringLiteral("modified"), fi.lastModified().toMSecsSinceEpoch()},
         // gallery / column preview "Information" rows; -1 when the filesystem has no birth time
         {QStringLiteral("created"), fi.birthTime().isValid() ? fi.birthTime().toMSecsSinceEpoch() : qint64(-1)},
-        {QStringLiteral("opened"), fi.lastRead().toMSecsSinceEpoch()},
+        // "Last opened": macOS's last-used date is set when an app opens the file, so new files have none (R9.2).
+        // The freedesktop counterpart is the file's recently-used.xbel record; -1 (no row) without one. Not atime
+        {QStringLiteral("opened"), fi.isDir() ? qint64(-1) : lastUsed(fi.absoluteFilePath())},
         {QStringLiteral("mime"), mt.name()},
         {QStringLiteral("kind"), fi.isDir() ? QStringLiteral("Folder") : mt.comment()},
         {QStringLiteral("hidden"), fi.isHidden()},
@@ -83,6 +87,44 @@ QVariantList FileOps::list(const QString &dir, bool showHidden) const
 }
 
 QVariantMap FileOps::info(const QString &path) const { return entry(QFileInfo(path)); }
+
+qint64 FileOps::lastUsed(const QString &path) const
+{
+    const QString file = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation)
+        + QStringLiteral("/recently-used.xbel");
+    const QFileInfo xi(file);
+    const qint64 stamp = xi.exists() ? xi.lastModified().toMSecsSinceEpoch() : -1;
+    QMutexLocker lock(&m_usedMutex);
+    if (stamp != m_usedStamp || xi.size() != m_usedSize) {
+        m_usedStamp = stamp;
+        m_usedSize = xi.size();
+        m_used.clear();
+        QFile f(file);
+        if (f.open(QIODevice::ReadOnly)) {
+            QXmlStreamReader xml(&f);
+            while (!xml.atEnd()) {
+                if (xml.readNext() != QXmlStreamReader::StartElement || xml.name() != QLatin1String("bookmark"))
+                    continue;
+                const auto attrs = xml.attributes();
+                const QUrl url(attrs.value(QLatin1String("href")).toString());
+                if (!url.isLocalFile())
+                    continue;
+                // the later of the record's modified / visited (both set by GLib and KDE when a file is opened)
+                qint64 ms = -1;
+                for (const char *key : {"modified", "visited"}) {
+                    const QDateTime t = QDateTime::fromString(attrs.value(QLatin1String(key)).toString(), Qt::ISODateWithMs);
+                    if (t.isValid())
+                        ms = std::max(ms, t.toMSecsSinceEpoch());
+                }
+                if (ms >= 0) {
+                    qint64 &v = m_used[QFileInfo(url.toLocalFile()).absoluteFilePath()];
+                    v = std::max(v, ms);
+                }
+            }
+        }
+    }
+    return m_used.value(path, -1);
+}
 
 QVariantList FileOps::recents(int max) const
 {
@@ -331,6 +373,16 @@ QString FileOps::readText(const QString &path, int maxBytes) const
     if (!f.open(QIODevice::ReadOnly))
         return {};
     return QString::fromUtf8(f.read(maxBytes));
+}
+
+QSize FileOps::imageSize(const QString &path) const
+{
+    QImageReader r(path);
+    r.setAutoTransform(true);          // an EXIF-rotated photo reports its shown size
+    QSize s = r.size();
+    if (s.isValid() && (r.transformation() & QImageIOHandler::TransformationRotate90))
+        s.transpose();
+    return s;
 }
 
 QVariantMap FileOps::pdfInfo(const QString &path) const

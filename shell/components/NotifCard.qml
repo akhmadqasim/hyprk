@@ -37,6 +37,8 @@ Item {
     // Liquid Glass materialize of this card's glass (banners: follows the slide), times the window's
     property real materialize: 1
     property bool swipeable: true
+    // the time label: Notification Center only, a banner has none (MAC-ANSWERS.md Q-panels-28, banner-dark-black.png)
+    property bool showTime: true
     readonly property bool hovered: hoverH.hovered || closeMa.containsMouse
     readonly property real swipeX: slide.x
     // 0 time label .. 1 "Show" capsule (hover over a collapsed stack), one spring both ways
@@ -87,7 +89,9 @@ Item {
                 Rectangle {
                     x: Theme.notif.plateInset[parent.index] + Theme.notif.radius / 2
                     width: card.width - x * 2
-                    height: 1
+                    readonly property real dpr: QsWindow.window ? QsWindow.window.devicePixelRatio : Screen.devicePixelRatio
+                    height: Pixel.stroke(1, dpr)   // exact, antialiased at a fractional scale like the Mac's downsample (HyprK pixel.js)
+                    antialiasing: Pixel.soft(dpr)
                     color: Theme.notif.plateLine
                 }
             }
@@ -163,12 +167,15 @@ Item {
                     spacing: 6
                     Text {
                         Layout.fillWidth: true
-                        text: card.summary || card.appName
+                        // emoji at alpha 1 in the .85 label (R5.3 banner, R6.5; OPEN-FIXES.md 16)
+                        text: EmojiText.opaque(card.summary || card.appName, color)
+                        textFormat: EmojiText.has(card.summary || card.appName) ? Text.StyledText : Text.PlainText
                         elide: Text.ElideRight
                         font: Typography.font(13, Typography.semibold)   // TODO verify (not measured)
                         color: Theme.color.label
                     }
                     Text {
+                        visible: card.showTime
                         text: Clock.relative(card.time, Notifs.now)
                         font: Typography.subheadline   // 11 ("2m ago" is 38 pt wide on the Mac)
                         color: Theme.color.secondaryLabel
@@ -178,8 +185,8 @@ Item {
                 Text {
                     width: parent.width
                     visible: text !== ""
-                    text: card.body
-                    textFormat: Text.PlainText
+                    text: EmojiText.opaque(card.body, color)
+                    textFormat: EmojiText.has(card.body) ? Text.StyledText : Text.PlainText
                     wrapMode: Text.Wrap
                     maximumLineCount: Theme.notif.maxBodyLines
                     elide: Text.ElideRight

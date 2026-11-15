@@ -2,31 +2,34 @@ import QtQuick
 import "../.."
 import "../../controls"
 import "../../HyprK"
+import "parts"
 
-// Accessibility > Pointer Control. Mouse and trackpad speeds live in their panes;
-// alternate control methods have no Linux backend here.
-Column {
-    id: page
-    property var ctl
-    property var info
-    spacing: Theme.content.sectionGap
-
+// Accessibility > Pointer Control (ax-acc-pointer-control-00). No backend here (the mouse and trackpad speeds live in
+// their panes): the controls keep their own state.
+AxPage {
     Card {
         title: "Mouse & Trackpad"
-        FormRow {
-            label: "Double-click speed"; dim: true
-            Slider { width: 220; enabled: false; leftText: "Slow"; rightText: "Fast"; value: 0.5 }
-        }
-        FormRow { label: "Spring-loading"; dim: true; Switch { enabled: false } }
-        FormRow { label: "Ignore built-in trackpad when mouse or wireless trackpad is present"; dim: true; Switch { enabled: false } }
+        AxRow { h: 40.25; ctlY: 19.5; label: "Double-click speed"
+                AxSlider { width: 245; leftGlyph: "tortoise.fill"; rightGlyph: "hare.fill"; glyphSize: 13; tickMarks: 11; value: 0.8 } }
+        AxRow { h: 37.5; labelY: 10.25; label: "Spring-loading"; LocalSwitch { checked: true } }
+        AxRow { h: 40.25; ctlY: 19.25; label: "Spring-loading speed"
+                AxSlider { width: 245; leftGlyph: "tortoise.fill"; rightGlyph: "hare.fill"; glyphSize: 13; tickMarks: 7; value: 0.8333 } }
+        AxRow { h: 52; label: "Ignore built-in trackpad when mouse or wireless trackpad is present"; labelWidth: 352; LocalSwitch {} }
     }
-    PaneFooter { help: false; Button { text: "Trackpad Options…" } Button { text: "Mouse Options…" } }
+    Row {
+        anchors.right: parent.right
+        spacing: 10
+        Button { text: "Trackpad Options…" }
+        Button { text: "Mouse Options…" }
+    }
     Card {
         title: "Alternate Control Methods"
-        FormRow { label: "Mouse Keys"; dim: true; sublabel: "Move the pointer with the keyboard."; Switch { enabled: false } }
-        FormRow { label: "Alternate pointer actions"; dim: true; sublabel: "Use a keyboard key, a switch or a facial expression to click."; Switch { enabled: false } }
-        FormRow { label: "Head pointer"; dim: true; sublabel: "Move the pointer with your head, tracked by the camera."; Switch { enabled: false } }
+        AxRow { h: 67; info: true; label: "Mouse Keys"; subWidth: 327.5
+                sub: "Allows the pointer to be controlled using the keyboard keys or number pad."; LocalSwitch {} }
+        AxRow { h: 67; info: true; label: "Alternate pointer actions"; subWidth: 340
+                sub: "Allows a switch or facial expression to be used instead of mouse buttons or pointer actions like left-click and right-click."; LocalSwitch {} }
+        AxRow { h: 66; info: true; label: "Head pointer"; subWidth: 362
+                sub: "Allows the pointer to be controlled using the movement of your head captured by the camera."; LocalSwitch {} }
     }
-    InlineNote { text: "These need a Hyprland pointer helper that isn't available yet." }
     PaneFooter {}
 }

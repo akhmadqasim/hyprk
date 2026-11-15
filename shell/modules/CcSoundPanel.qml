@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import qs
 import qs.components
 import qs.HyprK
@@ -52,12 +53,16 @@ Item {
         y: Theme.cc.soundSliderY - height / 2
         name: "speaker.fill"; surface: "ccSlider"; size: 18
         color: Theme.cc.text
+        layerScales: lowBounce.scales   // bounces when a drag reaches 0 (Slider.endReached, as the grid module)
+        SymbolBounce { id: lowBounce; name: "speaker.fill"; reduceMotion: A11y.reduceMotion }
     }
     Symbol {
         x: Theme.cc.soundGlyphRight - width / 2
         y: Theme.cc.soundSliderY - height / 2
         name: "speaker.wave.3.fill"; surface: "ccSlider"; size: 18
         color: Theme.cc.text
+        layerScales: highBounce.scales   // by layer: the speaker, then its waves from the inside out
+        SymbolBounce { id: highBounce; name: "speaker.wave.3.fill"; reduceMotion: A11y.reduceMotion }
     }
     ControlCenterSlider {
         id: slider
@@ -74,6 +79,7 @@ Item {
         value: Audio.muted ? 0 : Audio.volume
         onMoved: v => Audio.setVolume(v)
         onReleased: Sounds.volumeReleased(releaseModifiers)
+        onEndReached: end => (end < 0 ? lowBounce : highBounce).play()
     }
     Separator { y: Theme.cc.soundSeparator1 }
     Text {
@@ -92,7 +98,7 @@ Item {
             y: Theme.cc.soundRowsTop + index * Theme.cc.soundRowPitch
             label: Audio.name(modelData)
             symbol: Audio.symbol(modelData)
-            selected: modelData === Audio.sink
+            selected: modelData === Audio.current
             onActivated: Audio.setOutput(modelData)
         }
     }
@@ -108,7 +114,9 @@ Item {
     component Separator: Rectangle {
         x: Theme.cc.modulePanelInset
         width: p.width - 2 * Theme.cc.modulePanelInset
-        height: 1
+        readonly property real dpr: QsWindow.window ? QsWindow.window.devicePixelRatio : Screen.devicePixelRatio
+        height: Pixel.stroke(1, dpr)   // exact, antialiased at a fractional scale like the Mac's downsample (HyprK pixel.js)
+        antialiasing: Pixel.soft(dpr)
         color: Theme.cc.moduleSeparator
     }
     // a device row (or the footer link): hover capsule, disc, name

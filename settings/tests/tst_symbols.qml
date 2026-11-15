@@ -20,7 +20,9 @@ Item {
                           "square.and.arrow.up", "ellipsis", "capsule.on.rectangle.fill", "capsule.on.rectangle.liquid.glass",
                           "person.2.fill", "cloud.fill", "play.circle", "info.circle", "bluetooth.slash", "moon.fill",
                           "bed.double.fill", "person.lanyardcard.fill", "speaker.fill", "speaker.wave.3.fill", "sun.min.fill",
-                          "sun.max.fill", "chevron.up.chevron.down.semibold"];
+                          "sun.max.fill", "chevron.up.chevron.down.semibold",
+                          // the Accessibility sub-panes (panes/accessibility/parts)
+                          "plus", "minus", "clock", "chevron.down", "chevron.up", "ellipsis.circle", "tortoise.fill", "hare.fill"];
             for (const n of used) {
                 const w = n.endsWith(".semibold") ? "semibold" : "regular";
                 const g = Sf.get(w === "semibold" ? n.slice(0, -9) : n, w);

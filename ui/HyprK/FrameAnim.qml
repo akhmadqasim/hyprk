@@ -24,6 +24,10 @@ Item {
     property var curve: null
     property real value: 0
     property bool settlesGlass: false
+    // frame k shows the curve (k + lead) intervals in. 2 for a motion whose first frame the Mac shows that far in (a
+    // menu's fade after its item blinked: the first fading frame is 1.9 frames into the curve in AppKit's menus,
+    // 1.6-1.7 in the Dock's, MAC-ANSWERS-16.md R16.1)
+    property real lead: 1
     readonly property bool running: clock.running
     signal finished()
 
@@ -57,7 +61,7 @@ Item {
         id: clock
         watchdog: true
         onTick: {
-            let p = (elapsed + interval) / a.duration;
+            let p = (elapsed + a.lead * interval) / a.duration;
             if (p > 0.98) p = 1;   // a run of n frames must not take n + 1 for a rounding error
             a._set(p >= 1 ? a.to : a._from + (a.to - a._from) * a._eased(p));
             if (p < 1) return;

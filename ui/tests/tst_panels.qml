@@ -66,6 +66,30 @@ TestCase {
         keyClick(Qt.Key_Return);
         compare(hits, [1, 0]);
     }
+    // AppKit 27.2.1 PopIn / ScaleDownAndOut (re/27.2.1/MOTION-AUDIT.md "Alert, Round R3.1")
+    function test_alert_motion_curves() {
+        fuzzyCompare(P.alertPopScale(0, 0.2), 0.0096, 1e-6);
+        fuzzyCompare(P.alertPopScale(0.6, 0.2), 1.2, 1e-9);     // peak at 0.24 s
+        fuzzyCompare(P.alertPopScale(0.8, 0.2), 1 + 0.2 * Math.cos(0.1 * Math.PI) * Math.pow(0.5, 1.5), 1e-9);
+        fuzzyCompare(P.alertPopScale(1, 0.2), 1, 1e-9);
+        // first frame of the Cancel spring: alpha .76 (the dark R3.1 clip's one dismiss frame: .78)
+        fuzzyCompare(1 - P.alertCancelProgress(1000 / 60, 0.1812, 13), 0.764, 0.002);
+        verify(P.alertCancelProgress(250, 0.1812, 13) > 0.998);
+    }
+    function test_alert_dismiss_kinds() {
+        const a = createTemporaryObject(alertC, host);
+        a.activated.connect(i => { a.shown = false; });
+        a.shown = true;
+        keyClick(Qt.Key_Return);           // default button: no order-out animation
+        compare(a.opacity, 0);
+        a.shown = true;
+        tryCompare(a, "opacity", 1, 1000);
+        keyClick(Qt.Key_Escape);           // Cancel: the spring, still on screen in the next frames
+        compare(a.opacity, 1);
+        wait(40);
+        verify(a.opacity > 0 && a.opacity < 1 && a.pop < 1 && a.pop >= 0.98);
+        tryCompare(a, "opacity", 0, 1000);
+    }
     function test_sheet_card_centred() {
         const s = createTemporaryObject(sheetC, host);
         compare([s.card.x, s.card.y], [180, 166]);

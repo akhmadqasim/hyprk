@@ -191,7 +191,8 @@ Rectangle {
     // soft edge between sidebar and content (27.2.1: one 0.5 pt step at x 325 px, 211 between 237 and 255)
     Rectangle {
         anchors.right: parent.right
-        width: 0.5
+        width: Pixel.stroke(0.5, Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio))   // exact, antialiased at a fractional scale like the Mac's downsample (HyprK pixel.js)
+        antialiasing: Pixel.soft(Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio))
         height: parent.height
         color: Theme.color.separator
     }

@@ -12,5 +12,5 @@ Column {
         FormRow { label: "Double-click speed"; Slider { width: 200; value: 0.6 } }
         FormRow { label: "Scrolling speed"; Slider { width: 200; value: 0.4 } }
     }
-    PaneFooter { Button { text: "Advanced…" } }
+    PaneFooter { helpAnchor: "mh29222"; Button { text: "Advanced…" } }   // MouseExtension.appex: "Mouse settings"
 }

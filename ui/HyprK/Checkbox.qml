@@ -40,7 +40,12 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         radius: cb.radio ? width / 2 : cb._m.radius
         readonly property color fill: cb._on ? Tokens.control.checkboxOn : Tokens.control.trackOff
-        color: Qt.alpha(fill, fill.a * (cb.enabled ? 1 : Tokens.control.disabledOpacity))
+        // a disabled radio that is on is grey, not the accent (27.2.1 Accessibility > Display "Smart" / "Classic",
+        // live/settings-r12/acc-display-00-*.png: 229 on the 247 card light, 53 on 37 dark = black / white a.073; its
+        // dot 170 / 103, the disabled text colour)
+        readonly property color offFill: Tokens.dark ? Qt.rgba(1, 1, 1, 0.073) : Qt.rgba(0, 0, 0, 0.073)
+        color: cb.radio && cb._on && !cb.enabled ? offFill
+             : Qt.alpha(fill, fill.a * (cb.enabled ? 1 : Tokens.control.disabledOpacity))
         Rectangle {
             visible: cb.pressed
             anchors.fill: parent; radius: parent.radius

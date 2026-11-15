@@ -12,8 +12,8 @@ import qs.services
 import "../lib/state.js" as State
 
 // Control Center, macOS 26/27 layout: no panel, separate clear-glass modules
-// on a 2-column grid. Missing hardware or services dim the module and show
-// "Not Available" instead of breaking the layout.
+// on a 2-column grid. A module whose hardware is absent (Wi-Fi, Bluetooth, AirDrop without both) is not drawn and
+// the modules under it move up (services/Hardware.qml, lib/hardware.js ccLayout: the user's choice of 2026-11-15).
 Item {
     id: cc
 
@@ -31,7 +31,9 @@ Item {
     function rowY(r) { return r * (rowH + gap); }
 
     width: Theme.cc.width
-    height: rowY(6) - gap + Theme.cc.editGap + Theme.cc.editH
+    // where each module sits: the Mac's grid, or closed up around the modules that are hidden
+    readonly property var lay: Hardware.ccLayout
+    height: rowY(lay.rows + 2) - gap + Theme.cc.editGap + Theme.cc.editH
 
     readonly property var wifiDev: State.wifiDevice(Networking.devices.values)
     readonly property var wifiNet: wifiDev ? wifiDev.networks.values.find(n => n.connected) || null : null
@@ -41,7 +43,9 @@ Item {
 
     // ---------- connectivity ----------
     Capsule {
-        x: cc.colX(0); y: cc.rowY(0)
+        objectName: "ccWifi"
+        visible: cc.lay.wifi !== null
+        x: cc.colX(0); y: cc.rowY(cc.lay.wifi ? cc.lay.wifi.r : 0)
         symbol: "wifi"
         title: "Wi-Fi"
         available: cc.wifiDev !== null
@@ -50,7 +54,9 @@ Item {
         onToggled: Networking.wifiEnabled = !Networking.wifiEnabled
     }
     Capsule {
-        x: cc.colX(0); y: cc.rowY(1)
+        objectName: "ccBluetooth"
+        visible: cc.lay.bluetooth !== null
+        x: cc.colX(0); y: cc.rowY(cc.lay.bluetooth ? cc.lay.bluetooth.r : 0)
         symbol: "bluetooth"
         title: "Bluetooth"
         available: State.hasBluetooth(cc.btAdapter)
@@ -59,7 +65,9 @@ Item {
         onToggled: cc.btAdapter.enabled = !cc.btAdapter.enabled
     }
     Capsule {
-        x: cc.colX(0); y: cc.rowY(2)
+        objectName: "ccAirdrop"
+        visible: cc.lay.airdrop !== null
+        x: cc.colX(0); y: cc.rowY(cc.lay.airdrop ? cc.lay.airdrop.r : 0)
         symbol: "airdrop"
         title: "AirDrop"
         on: cc.airdrop                       // placeholder, no backend yet
@@ -128,10 +136,10 @@ Item {
     // Stage Manager: squares.leading.rectangle, the one Image(systemName:) of WindowManagerControlsExtension 27.2.1's
     // StageManagerToggleControl (0x100003d1c; reference/re/27.2.1/STAGE-MANAGER-27.2.1.md). On = white disc, accent
     // glyph (Round's onIcon). Turns Stage Manager on and off (services/StageManager.qml)
-    Round { x: cc.colX(1); y: cc.rowY(2); symbol: "squares.leading.rectangle"; on: StageManager.enabled; onActivated: StageManager.setEnabled(!StageManager.enabled) }
-    Round { x: cc.colX(1) + cc.colW - cc.rowH; y: cc.rowY(2); symbol: "screen.mirror"; enabled: false }  // Screen Mirroring placeholder
+    Round { x: cc.colX(cc.lay.stage.c); y: cc.rowY(cc.lay.stage.r); symbol: "squares.leading.rectangle"; on: StageManager.enabled; onActivated: StageManager.setEnabled(!StageManager.enabled) }
+    Round { x: cc.colX(cc.lay.stage.c) + cc.colW - cc.rowH; y: cc.rowY(cc.lay.stage.r); symbol: "screen.mirror"; enabled: false }  // Screen Mirroring placeholder
     Round {
-        x: cc.colX(0); y: cc.rowY(3)
+        x: cc.colX(cc.lay.dark.c); y: cc.rowY(cc.lay.dark.r)
         symbol: "appearance.darkmode"
         // on in dark: the whole disc opaque white with a black glyph (MAC-ANSWERS Control Center section 1, Q-panels-01)
         on: Theme.dark
@@ -139,13 +147,15 @@ Item {
         onActivated: Theme.setAppearance(!Theme.dark)
     }
     Round {
-        x: cc.colX(0) + cc.colW - cc.rowH; y: cc.rowY(3)
+        x: cc.colX(cc.lay.dark.c) + cc.colW - cc.rowH; y: cc.rowY(cc.lay.dark.r)
         symbol: "display"
         on: Theme.reduceTransparency
         onActivated: Theme.reduceTransparency = !Theme.reduceTransparency
     }
     Capsule {
-        x: cc.colX(1); y: cc.rowY(3)
+        objectName: "ccFocus"
+        x: cc.colX(cc.lay.focus.c); y: cc.rowY(cc.lay.focus.r)
+        width: cc.lay.focus.span === 2 ? cc.width : cc.colW   // alone in its row: both columns, as the sliders
         symbol: "moon"
         // on (Q-panels-02): the mode's name becomes the title, "On" the subtitle, the moon in the mode's colour
         title: on ? "Do Not Disturb" : "Focus"
@@ -157,7 +167,7 @@ Item {
 
     // ---------- sliders ----------
     SliderModule {
-        y: cc.rowY(4)
+        y: cc.rowY(cc.lay.rows)
         title: "Display"
         available: Brightness.available
         leftSymbol: "sun.min.fill"
@@ -166,7 +176,7 @@ Item {
         onMoved: v => Brightness.set(v)
     }
     SliderModule {
-        y: cc.rowY(5)
+        y: cc.rowY(cc.lay.rows + 1)
         title: "Sound"
         trailingRoom: Theme.cc.outputRoom
         available: Audio.available
@@ -336,7 +346,8 @@ Item {
     // wash, a dark rim, a light top edge, a shadow and a thicker fill band; no live refraction). A click springs the
     // fill to the point (about 0.2 s), a drag
     // follows 1:1; past an end the track and fill stretch up to about 5 pt and spring back in 0.13 s on release.
-    // The module itself does not move. Not built: the hover chevron (no sub-panels) and Sound's AirPlay button.
+    // The module does not move with the stretch; held, it lifts as a pressed button (SliderModule `pressed`).
+    // Not built: the hover chevron (no sub-panels) and Sound's AirPlay button.
     // "Edit Controls" (the Mac's edit mode is not built: present, opens nothing)
     Glass {
         id: editControls
@@ -344,7 +355,7 @@ Item {
         height: Theme.cc.editH
         radius: height / 2
         x: Math.round((cc.width - width) / 2)
-        y: cc.rowY(6) - cc.gap + Theme.cc.editGap
+        y: cc.rowY(cc.lay.rows + 2) - cc.gap + Theme.cc.editGap
         sx: cc.originX + x
         sy: cc.originY + y
         tint: Theme.cc.tileTint
@@ -373,7 +384,27 @@ Item {
         height: cc.rowH
         radius: Theme.cc.sliderRadius
         interactive: false                       // the slider below takes the input
+        // held, the module lifts as a pressed glass button: the dark grey127 frames 3 and 4 (held, dragged past the end)
+        // are 588.5 px wide against 583 at rest and on hover (+2.75 pt, scale 1.009; the title and the AirPlay button
+        // move out with it); GlassButton's press lift for 292 x 64 is +2.25 pt (motion.js pressLift)
+        pressed: smSlider.pressed
         HoverHandler { id: hover; enabled: sm.available }
+        // The module's glass is lighter under the pointer (MAC-ANSWERS-18.md R18.3, live/r18/cc-sound-*-{idle,hover,
+        // held}.png): +7 levels on every pixel of it but the white ones while hovered (dark 50 -> 57 and the track 70 ->
+        // 77, over blue 24 -> 31 in red and green, light over white 186 -> 193), added (plus lighter), not a white veil;
+        // held, about 3.5 % of the glass's own level more (dark 57 -> 59; over white up to +10 round the pointer and +1
+        // at 100 pt: drawn flat, from the level the wallpaper's luma gives, Theme.cc.sliderHeldGain)
+        ShaderEffect {
+            anchors.fill: parent
+            visible: hover.hovered || smSlider.pressed
+            readonly property real lift: Theme.cc.sliderHoverLift + (smSlider.pressed ? Theme.cc.sliderHeldGain * smSlider.moduleLevel : 0)
+            property vector4d fill: Qt.vector4d(lift, lift, lift, 0)
+            property size sizePt: Qt.size(width, height)
+            property real radius: sm.radius
+            property real dpr: QsWindow.window ? QsWindow.window.devicePixelRatio : Screen.devicePixelRatio
+            property real pad: 0
+            fragmentShader: Qt.resolvedUrl("../shaders/plusfill.frag.qsb")
+        }
 
         Text {
             x: Theme.cc.sliderTitleX
@@ -383,6 +414,9 @@ Item {
             font: Typography.font(Theme.font.ccTileTitle, Typography.semibold)
             color: Theme.cc.text
         }
+        // the end glyphs bounce when a drag brings the value onto their end (HyprK Slider.endReached, SymbolBounce:
+        // SwiftUI's minimum / maximum value labels with .symbolEffect(.bounce); R7.4 slider-icon-ends-cc-*.mov), by
+        // layer about the glyph's ink centre: the sun's disc, then its rays; the speaker, then its waves
         Symbol {
             x: Theme.cc.glyphLeft - width / 2
             y: Theme.cc.trackY - height / 2
@@ -390,6 +424,8 @@ Item {
             surface: "ccSlider"
             size: 18
             color: Theme.cc.text
+            layerScales: leftBounce.scales
+            SymbolBounce { id: leftBounce; name: sm.leftSymbol; reduceMotion: A11y.reduceMotion }
         }
         Symbol {
             x: parent.width - Theme.cc.glyphRight - sm.trailingRoom - width / 2
@@ -398,8 +434,11 @@ Item {
             surface: "ccSlider"
             size: 18
             color: Theme.cc.text
+            layerScales: rightBounce.scales
+            SymbolBounce { id: rightBounce; name: sm.rightSymbol; reduceMotion: A11y.reduceMotion }
         }
         ControlCenterSlider {
+            id: smSlider
             x: Theme.cc.trackX
             width: parent.width - Theme.cc.trackX - Theme.cc.trackRight - sm.trailingRoom
             y: Theme.cc.trackY - height / 2
@@ -408,6 +447,7 @@ Item {
             value: sm.value
             onMoved: v => sm.moved(v)
             onReleased: sm.sliderReleased(releaseModifiers)
+            onEndReached: end => (end < 0 ? leftBounce : rightBounce).play()
         }
     }
 

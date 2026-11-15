@@ -12,6 +12,7 @@ Item {
     required property var window
     property string view: "icons"
     property bool searching: false
+    property bool menuUp: false   // Main.qml's menu is up or this press is closing it
     signal viewRequested(string view)
     signal moreRequested(Item anchor)
     signal groupRequested(Item anchor)
@@ -26,7 +27,16 @@ Item {
     // to the Mac's 0.5 s in main.cpp (NSEvent.doubleClickInterval); the zoom is Main.zoom (Hyprland's maximized mode:
     // showMaximized asks for xdg maximize, which the session suppresses, so a double-click did nothing: judge-95-14)
     TapHandler {
-        onDoubleTapped: root.window.zoom()
+        // not on a capsule: two quick clicks on a button are two clicks (this handler sees them too, and a second
+        // click on Group within the double-click time zoomed the window and left the menu up, live)
+        onDoubleTapped: {
+            const p = point.position;
+            for (let i = 0; i < root.children.length; i++) {
+                const c = root.children[i];
+                if (c.visible && c.lightHovers !== undefined && p.x >= c.x && p.x <= c.x + c.width && p.y >= c.y && p.y <= c.y + c.height) return;
+            }
+            root.window.zoom();
+        }
     }
     HoverHandler { id: stripHover }
     DragHandler {
@@ -48,7 +58,7 @@ Item {
         }
         // the divider hides while either half is hovered or pressed (Q-finder-10); a disabled half lights nothing
         Rectangle {
-            width: 1; height: Theme.toolbar.dividerHeight; anchors.verticalCenter: parent.verticalCenter
+            width: Pixel.stroke(1, Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio)); antialiasing: Pixel.soft(Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio)); height: Theme.toolbar.dividerHeight; anchors.verticalCenter: parent.verticalCenter
             color: Theme.color.toolbarSeparator
             opacity: nav.lit ? 0 : 1
         }
@@ -81,6 +91,12 @@ Item {
         // capsule (crops/toolbar-*-active.png, ink centroids; even 40.25 segments put them 1.1 pt rms off, this 0.4)
         width: Theme.toolbar.viewsWidth
         padding: 2
+        // the whole capsule lifts while the switcher is held (viewsLift below)
+        transform: Scale {
+            origin.x: views.width / 2; origin.y: views.height / 2
+            xScale: 1 + Theme.toolbar.viewsLift / Math.max(views.width, 1) * viewsLift.value
+            yScale: xScale
+        }
         SegmentedControl {
             id: viewSwitcher
             readonly property var modes: ["icons", "list", "columns", "gallery"]
@@ -100,10 +116,32 @@ Item {
             selectionRadius: height / 2 - Theme.toolbar.segmentInsetY
             trackColor: "transparent"
             selectionColor: Theme.color.capsuleSelected
+            // the selected segment hovered / pressed, each in one frame (R6.3 controls/segmented-drag-*.mov, pill interior
+            // left of the glyph, green, two sampling boxes): light 223.4 -> 212.2 / 202.8 = black .049-.050 / .091-.092;
+            // dark, over the plain selected + toolbar wash 77.1, 93.2-93.9 / 99.0-99.1 = white .090-.094 / .123-.124
+            // (before the wash 70.0 -> 87.8). On screen: light .049 / .091, dark .095 / .119. A press dragged onto another
+            // segment: SegmentedControl draws it in the plain selected colour
+            hoverOverlay: Theme.dark ? Qt.rgba(1, 1, 1, 0.090) : Qt.rgba(0, 0, 0, 0.049)
+            pressOverlay: Theme.dark ? Qt.rgba(1, 1, 1, 0.123) : Qt.rgba(0, 0, 0, 0.091)
             model: modes.map(m => ({ icon: Symbols.url("view." + m, iconHex, "white") }))
             currentIndex: modes.indexOf(root.view)
             onActivated: i => root.viewRequested(modes[i])
             Accessible.name: "View"
+        }
+    }
+    // The view switcher's capsule lifts from mouse-down to mouse-up (R6.3, controls/segmented-drag-{light,dark}.mov at 2x,
+    // edge half-crossings on rows 56-70 px): 322.0 -> 326.2 px wide, Theme.toolbar.viewsLift, uniform (the top and bottom
+    // edges move 0.5 px); 35-47 % of it in the first frame, settled in about 50 ms. The rim stays where it settles
+    // within 0.1 px through the press (the 4-11 % "overshoot" of the half-crossings is the edge blurring while it
+    // scales), so a critically damped spring: response 0.065 s, damping 0.96 fits both clips (rms 1.7 % of the lift;
+    // FlexInteraction's 0.25 s / 0.375 for 161 x 37 pt, motion.js pressDamping, 7.7 % and a 28 % bounce the Mac lacks).
+    // Mouse-up: back in one frame (326.1 -> 322.0). Reduce Motion: no lift
+    Spring { id: viewsLift; response: 0.065; damping: 0.96 }
+    Connections {
+        target: viewSwitcher
+        function onHeldChanged() {
+            viewsLift.target = viewSwitcher.held && !Tokens.reduceMotion ? 1 : 0;
+            if (!viewSwitcher.held) viewsLift.snap();
         }
     }
 
@@ -122,7 +160,11 @@ Item {
             implicitWidth: 28
             hoverWidth: 28
             icon: "view." + root.view
-            onClicked: root.viewMenuRequested(viewPopupButton)
+            hitRight: viewPopup.width - 6 - width      // the chevron opens the menu too
+            // with its menu up a click closes it and does not reopen it (the ⋯ button's inMenu below; judge #21)
+            property bool inMenu: false
+            onDownChanged: if (down) inMenu = root.menuUp
+            onClicked: if (!inMenu) root.viewMenuRequested(viewPopupButton)
         }
         Symbol {
             anchors.verticalCenter: parent.verticalCenter
@@ -149,7 +191,11 @@ Item {
             hoverWidth: 28
             icon: "group"
             iconDx: 0.7      // ink centre 556.2 pt on 27.2.1 (crops/toolbar-*-active.png), centred here 555.5
-            onClicked: root.groupRequested(groupButton)
+            hitRight: group.width - 6 - width          // the chevron opens the menu too
+            // with its menu up a click closes it and does not reopen it (the ⋯ button's inMenu below; judge #21)
+            property bool inMenu: false
+            onDownChanged: if (down) inMenu = root.menuUp
+            onClicked: if (!inMenu) root.groupRequested(groupButton)
         }
         Symbol {
             anchors.verticalCenter: parent.verticalCenter
@@ -187,7 +233,11 @@ Item {
             id: more
             implicitWidth: Theme.toolbar.actionsWidth - 36.5 - 38
             icon: "ellipsis"
-            onClicked: root.moreRequested(more)
+            // a pull-down's button clicked with its menu up closes the menu and does not reopen it (ui/HyprK/Popup.qml
+            // inMenu): decided on the press, which the menu's close-on-press-outside sees first
+            property bool inMenu: false
+            onDownChanged: if (down) inMenu = root.menuUp
+            onClicked: if (!inMenu) root.moreRequested(more)
         }
     }
 
@@ -199,14 +249,25 @@ Item {
         width: root.searching ? Theme.toolbar.searchWidth : Theme.toolbar.capsuleHeight
         // the circle widens into a capsule in about 0.16 s, ease-out (Q-finder-30)
         Behavior on width { NumberAnimation { duration: Theme.toolbar.searchDuration; easing.type: Easing.OutCubic } }
+        // held (closed): the disc and its glyph grow to 40 pt in the press frame, about the centre (R11.5)
+        scale: root.searching ? 1 : 1 + (Theme.toolbar.searchPressScale - 1) * searchButton.held
 
         // open: the glyph shrinks to 13 pt at the default scale, centred 17 pt in, and the text starts at 33
         // (crops/search-expand-frames-light.png: ink 12 vs 16 pt wide closed, centre 17, "Search" ink from 33.5)
         ToolButton {
+            id: searchButton
+            pressLook: !root.searching
+            pressColor: Theme.color.searchPress
+            pressIconColor: Theme.color.searchPressIcon
+            pressRim: Theme.color.searchPressRim
+            pressRimSide: Theme.color.searchPressRimSide
+            releaseMs: Theme.toolbar.searchReleaseMs
             implicitWidth: root.searching ? 33 : Theme.toolbar.buttonWidth
             iconDx: root.searching ? 0.5 : 0
             hoverWidth: Theme.toolbar.buttonWidth      // the whole circle lightens on hover
-            hoverHeight: Theme.toolbar.capsuleHeight
+            // the capsule's own height (dark, active: 36 pt, Capsule.inset): the held disc is the capsule grown by
+            // searchPressScale, not a 37 pt one (it stood 40 pt tall on a 36 pt capsule, x1.11, live)
+            hoverHeight: Theme.toolbar.capsuleHeight - 2 * search.inset
             hoverColor: Theme.color.searchHover
             iconColor: root.searching ? Theme.color.searchPlaceholder : Theme.color.searchIcon
             iconDy: root.searching ? 0 : -0.5   // closed: ink centre 0.5 pt above the capsule's on 27.2.1 (same crops)
@@ -266,9 +327,12 @@ Item {
     }
 
     Rectangle {   // dark: the whole strip lightens while the pointer is in it (Theme.color.toolbarHoverWash, Q-finder-10)
+        // and under a sheet, where the window is not key: finder/sheet-dark.png reads the strip (27,28,32) over the
+        // content's (25,26,29) through the veil, the washed (39,39,44) before it (System Settings' strip does the
+        // same, SettingsApp.qml); ours read (24,25,29), the content's tone
         anchors.fill: parent
         z: 10
-        visible: stripHover.hovered && Theme.dark && Theme.active
+        visible: Theme.dark && (Theme.sheet || (stripHover.hovered && Theme.active))
         color: Theme.color.toolbarHoverWash
     }
 }

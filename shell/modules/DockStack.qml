@@ -17,7 +17,8 @@ import "../HyprK/motion.js" as Motion
 //        more cells than the stage holds scroll.
 // A click on an item opens it (a folder in our Finder, a file with xdg-open, like Spotlight's files); a click anywhere
 // else or Esc closes it. Motion: fan, every item along its arc at once (no stagger), the position ease-in-out, the
-// turn and the size on CA's default curve, the label's scale ease-in-out and its opacity linear; grid, a zoom out of
+// turn on CA's default curve, the size 64 all through the open and shrinking on "default" in the close (measured,
+// MOTION-REA Round 4), the label's scale ease-in-out and its opacity linear; grid, a zoom out of
 // the tile's centre with the opacity, CA's default curve. Both 0.25 s, the CATransaction default (MOTION-REA Round 3).
 // Reduce Motion: shown and hidden at once (both animators, axReduceMotion). Glass: on the plugin the namespace of the
 // Dock's hover label (hyprk-dock-label, Apple's Regular recipe, the cartouche's material: the label and the grid bubble
@@ -50,7 +51,8 @@ ShellWindow {
     WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     acceptsInput: open
 
-    readonly property real dpr: screen && screen.devicePixelRatio > 0 ? screen.devicePixelRatio : 1
+    // the window's ratio (the screen's says 2 on a 1.6 output: SCALING-AUDIT.md)
+    readonly property real dpr: devicePixelRatio > 0 ? devicePixelRatio : screen && screen.devicePixelRatio > 0 ? screen.devicePixelRatio : 1
     readonly property bool fan: view === "fan"
     readonly property int duration: Theme.dock.stack.duration
 
@@ -313,6 +315,7 @@ ShellWindow {
                         file: cellItem.modelData
                         size: win.g.icon
                         dpr: win.dpr
+                        finderLook: "grid"   // the "Open in Finder" cell: a ring, not the fan's disc (StackArt)
                     }
                     Text {
                         x: 1
@@ -343,7 +346,8 @@ ShellWindow {
                 x: flick.x
                 y: modelData
                 width: flick.width
-                height: 1
+                height: Pixel.stroke(1, win.dpr)   // exact, antialiased at a fractional scale like the Mac's downsample (HyprK pixel.js, SCALING-AUDIT R3.3)
+                antialiasing: Pixel.soft(win.dpr)
                 color: Theme.color.separator
             }
         }

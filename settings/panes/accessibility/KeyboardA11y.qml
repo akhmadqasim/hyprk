@@ -2,43 +2,31 @@ import QtQuick
 import "../.."
 import "../../controls"
 import "../../HyprK"
+import "parts"
 
-// Accessibility > Keyboard. Hyprland (xkbcommon) has no Sticky Keys or Slow Keys,
-// so those rows are disabled with a note instead of pretending.
-Column {
-    id: page
-    property var ctl
-    property var info
-    spacing: Theme.content.sectionGap
-
+// Accessibility > Keyboard (ax-acc-keyboard-00). No backend in Hyprland / xkbcommon for these: the switches keep their
+// own state. Keyboard Settings… opens the Keyboard pane.
+AxPage {
     Card {
-        FormRow {
-            label: "Full Keyboard Access"; dim: true
-            sublabel: "Use the keyboard to move between controls. GTK and Qt apps already do this with Tab."
-            Switch { enabled: false }
-        }
+        AxRow { h: 184; info: true; label: "Full Keyboard Access"; subWidth: 372
+                sub: "Full Keyboard Access allows the computer to be controlled with a keyboard. Use keyboard shortcuts to navigate through all controls and perform actions."
+                sub2Y: 75
+                sub2: "• To show help: Tab H\n• To move forward: Tab\n• To move backward: ⇧ Tab\n• To activate: Space\n• To move inside groups: ↑, ↓, ← and →\n• To move to next item: ⌃ Tab\n• To move to previous item: ⌃ ⇧ Tab"
+                LocalSwitch {} }
+        AxRow { h: 48; ctlY: 22; subWidth: 230.5; sub: "Additional keyboard shortcuts can be set in Keyboard settings."
+                Button { text: "Keyboard Settings…"; onClicked: AppState.navigate("keyboard", "") } }
     }
     Card {
-        title: "Physical Keyboard"
-        FormRow {
-            label: "Sticky Keys"; dim: true
-            sublabel: "Press modifier keys one at a time for shortcuts."
-            Switch { enabled: false }
-        }
-        FormRow {
-            label: "Slow Keys"; dim: true
-            sublabel: "Add a delay between when a key is pressed and when it's accepted."
-            Switch { enabled: false }
-        }
+        AxRow { h: 67; info: true; label: "Sticky Keys"; subWidth: 361.5
+                sub: "Sticky Keys allows modifier keys to be set without having to hold the key down."; LocalSwitch {} }
+        AxRow { h: 66; info: true; label: "Slow Keys"; subWidth: 366
+                sub: "Slow Keys adjusts the amount of time between when a key is pressed and when it is activated."; LocalSwitch {} }
     }
-    InlineNote { text: "Hyprland doesn't support Sticky Keys or Slow Keys yet. Key repeat is in Keyboard settings." }
     Card {
-        title: "Accessibility Keyboard"
-        FormRow {
-            label: "Accessibility Keyboard"; dim: true
-            sublabel: "An onscreen keyboard needs a Wayland input-method keyboard such as wvkbd."
-            Switch { enabled: false }
-        }
+        AxRow { h: 67; info: true; label: "Accessibility Keyboard"; subWidth: 347.5
+                sub: "The Accessibility Keyboard lets you type and interact with macOS without using a hardware keyboard."; LocalSwitch {} }
+        AxRow { h: 48; ctlY: 22; subWidth: 328; sub: "The Panel Editor allows you to customize the panels shown by Accessibility Keyboard."
+                Button { text: "Panel Editor…" } }
     }
-    PaneFooter { Button { text: "Keyboard Settings…" } }
+    PaneFooter {}
 }

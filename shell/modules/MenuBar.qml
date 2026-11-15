@@ -13,6 +13,7 @@ import qs.services
 import "../lib/menus.js" as Menus
 import "../lib/clock.js" as Clock
 import "../lib/state.js" as State
+import "../lib/spring.js" as SpringLib
 
 // macOS 27 menu bar: no background and no glass of its own. It always shows the desktop picture (windows
 // stay below it), with text coloured for the wallpaper behind it, not for the appearance
@@ -105,10 +106,26 @@ ShellWindow {
         fade(peeking ? 1 : 0, peeking ? Theme.anim.menuBarPeekIn : Theme.anim.menuBarPeekOut, true);
     }
     FrameAnim { id: fsAnim; target: bar; property: "fsAlpha"; curve: [0.42, 0, 0.58, 1, 1, 1] }
-    Binding { target: bar.contentItem; property: "opacity"; value: bar.fsAlpha }
+    Binding { target: bar.contentItem; property: "opacity"; value: bar.fsAlpha * bar.mcAlpha }
+    // Mission Control's exit (MAC-ANSWERS-10.md R10.1, mc-exit-menubar-flat-grey.mov): the menu bar's titles are drawn
+    // ABOVE the Spaces bar, which slides up solid under them, and fade in from the first exit frame: alpha .23 .42 .58
+    // .72 .80 .86 .90 .90 .93 .94 .97 per 60 Hz frame, .98 two frames on, 1 at about 250 ms (frames 47-57, 59, 62;
+    // the frames between interpolated). So while Mission Control's window leaves, this bar sits above it (Overlay,
+    // re-stacked over the older window) and its content plays that track; before, it lay under the window and showed
+    // only where the Spaces bar had left (titles 0 for 5 frames, then .34 .62 .68, MOTION-REA Round J22).
+    property real mcAlpha: 1
+    readonly property bool mcShown: Panels.open === "mission"
+    readonly property bool mcLeaving: !mcShown && !!Panels.loaded.mission
+    onMcShownChanged: if (!mcShown && !A11y.reduceMotion) { mcFade.snap(0); mcFade.go(1); }
+    FrameSpring {
+        id: mcFade
+        target: bar
+        property: "mcAlpha"
+        spring: SpringLib.fromTrack([0, 0.23, 0.42, 0.58, 0.72, 0.80, 0.86, 0.90, 0.90, 0.93, 0.94, 0.97, 0.975, 0.98, 0.987, 0.993, 1], 1 / 60)
+    }
     // on Overlay for the whole full screen, taking input in its top 1 pt row until it shows: layer and input region
     // are sent with a frame, and nothing is drawn once it has faded out (whether there is a strip is known later)
-    WlrLayershell.layer: fullscreen ? WlrLayer.Overlay : WlrLayer.Top
+    WlrLayershell.layer: fullscreen || mcLeaving ? WlrLayer.Overlay : WlrLayer.Top
     inputMask: fullscreen && !peeking ? edgeRow : null
     Region { id: edgeRow; width: bar.width; height: 1 }
     HoverHandler { id: topHover }
@@ -178,7 +195,7 @@ ShellWindow {
     // ---------- right: status items + clock ----------
     readonly property var wifiDev: State.wifiDevice(Networking.devices.values)
     readonly property var wifiNet: wifiDev ? wifiDev.networks.values.find(n => n.connected) || null : null
-    readonly property bool laptop: State.hasBattery(UPower.devices.values) || Quickshell.env("HYPRK_STATUS_STUB") === "1"
+    readonly property bool laptop: Hardware.battery
 
     Row {
         anchors.right: parent.right
@@ -215,8 +232,10 @@ ShellWindow {
                 }
             }
         }
-        // Wi-Fi: always shown like macOS; slashed and dimmed when off or absent
+        // Wi-Fi: hidden without a Wi-Fi adapter (services/Hardware.qml, the user's choice of 2026-11-15), the items
+        // beside it close up; with one, as macOS: slashed and dimmed when off
         StatusItem {
+            visible: Hardware.wifi
             Symbol {
                 anchors.centerIn: parent
                 name: bar.wifiDev && bar.wifiDev.connected ? "wifi" : "wifi.slash"

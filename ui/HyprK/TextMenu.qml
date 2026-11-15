@@ -8,7 +8,8 @@ import "textmenu.js" as TextMenuRows
 // Range:granularity: then setSelectedRange:), so Look Up / Cut / Copy act on it.
 // Look: the shared menu metrics (MAC-ANSWERS.md Q-menubar-12/19/20/22/23): rows 24, padding 5, radius 12, text at x 16
 // (x 11 in the row), accent highlight inset 5 with radius 7 and white text, separators 11 pt with the line 16 pt in,
-// light black a.10 / dark white a.14, disabled rows tertiary, chevron for a submenu that opens 0.22 s after its row
+// light black a.10 / dark white a.14, disabled rows tertiary (plain alphas, not vibrant, on 27.2.1: VIBRANCY-REA.md),
+// chevron for a submenu that opens 0.22 s after its row
 // lights, 5 pt over the menu. Width: every row ends 48 pt before the edge, the submenu column AppKit keeps for all rows
 // once one row has a submenu (shell/lib/menus.js rowEnd; this menu always has Spelling and Grammar ▸), else 17.
 // Its own popup window (Popup.Window), so it may leave the field's window; Qt falls back to an in-window popup where the

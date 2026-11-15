@@ -51,6 +51,7 @@ base; the frame is square so this equals midY). In a y-up layer tree -24 is down
 the Dock (0x1000eaa84) is on a DesignLibrary view, not the stack layers, but the root's flip and the stack window's
 origin were not traced. Read as down, the first item's bottom is 24 pt inside the tile, which a test session showed
 overlapping the Dock. Not settled: `fanShift = +24` stays GUESS (comment updated in `shell/lib/dockstack.js`).
+**Settled (Round 4, MOTION-REA R4.1, Mac recording)**: +24, up on screen; every slot measured within about 2 pt.
 
 Changed: `shell/lib/dockstack.js` `fanSize(tile, i, p)`, `fanBox(side, angle)`; `shell/modules/DockStack.qml` fan item
 `scale` = fanSize / 64 and the label's reach from the item's half size; tests in `shell/tests/run.mjs`
@@ -109,5 +110,7 @@ inputDefaults, `shell/services/Prefs.qml`). Hyprland takes whole repeats per sec
 ## Still unknown
 - The fan's -24 direction (root layer flip / window origin), the hover plate's stock default, the implicit bounds
   curve during the fan open.
+  **Measured (MOTION-REA Round 4, R4.1)**: the 24 is up; the open shows no bounds growth (64 from the first frame);
+  the close shrinks on "default" 0.25 s.
 - Which Mac framework draws the emoji popover's category bar; light-mode glyphs on the Mac.
 - Whether any process reads a KeyRepeat key that is absent and pushes a non-default value.

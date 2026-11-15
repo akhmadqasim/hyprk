@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import QtCore
+import "lib/macicons.js" as MacIcons
 
 // Runs commands and reads/writes/watches state files.
 // Under Quickshell: processes (QsProcess.qml) and inotify (QsWatch.qml).
@@ -55,6 +56,15 @@ QtObject {
         return _info ? _info.iconPath(icon) : "";
     }
 
+    // An app's icon as the shell and Finder draw it: the mapped macOS icon (themes/icons/apple-map.txt, `mac` names it
+    // directly) in the rendition of the Icon & widget style (look: { style, variant, dark }, iconStyle /
+    // iconStyleVariant of appearance.json and the window mode; MacIcons.styled), else the icon theme's
+    function appIconUrl(icon, appId, look, mac) {
+        const m = mac || (_info && !_info.appleIcons ? "" : MacIcons.lookup([appId || "", icon || ""]));
+        if (m) return "file://" + root + "/themes/icons/" + (look ? MacIcons.styled(m, look.style, look.variant, look.dark) : MacIcons.file(m));
+        return iconUrl(icon);
+    }
+
     // Long-running command: onLine(text) per stdout line, onEnd(code) when it stops
     // (127 = can't run). Returns the process (destroyed with `owner`) or null.
     function stream(owner, argv, onLine, onEnd) {
@@ -85,12 +95,6 @@ QtObject {
     // support), "failed" (tool ran and failed) or "ok".
     function status(code) {
         return code === 127 ? "missing" : code !== 0 ? "failed" : "ok";
-    }
-    // The calm line panes show for those states ("" when ok).
-    function statusNote(status, tool, what) {
-        return status === "missing" ? tool + " is not available, so " + what + " can't be managed here."
-             : status === "failed" ? tool + " is not responding right now. Try again in a moment."
-             : "";
     }
 
     // freedesktop thumbnail spec: ~/.cache/thumbnails/large/<md5 of file URI>.png
@@ -125,6 +129,44 @@ QtObject {
         x.onreadystatechange = () => { if (x.readyState === XMLHttpRequest.DONE) cb(x.responseText || ""); };
         x.open("GET", "file://" + path);
         x.send();
+    }
+
+    // This computer's facts for General > About, Storage and Software Update: cb(text), the key=value lines of
+    // settings/scripts/sysinfo.sh (Parsers.parseSysInfo). Read-only. Under the plain `qml` tool (no processes) the
+    // files that can be read are put in the same lines; displays and the disk need the script.
+    function sysInfo(cb) {
+        if (canRun) { run([root + "/settings/scripts/sysinfo.sh"], (c, out) => cb(c === 0 ? out : "")); return; }
+        const files = [["/sys/class/dmi/id/product_name", t => "model=" + t.trim()],
+                       ["/sys/class/dmi/id/sys_vendor", t => "vendor=" + t.trim()],
+                       ["/proc/sys/kernel/hostname", t => "host=" + t.trim()],
+                       ["/proc/cpuinfo", t => "chip=" + ((/^model name\s*:\s*(.*)$/m.exec(t) || [])[1] || "")],
+                       ["/proc/meminfo", t => "memTotalKb=" + ((/^MemTotal:\s*(\d+)/m.exec(t) || [])[1] || "")],
+                       ["/etc/os-release", t => t.replace(/^(NAME|VERSION|VERSION_ID|PRETTY_NAME|LOGO)=/gm, "os.$1=")]];
+        const out = [];
+        let left = files.length;
+        for (const f of files)
+            _xhrRead(f[0], t => { out.push(f[1](t)); if (--left === 0) cb(out.join("\n")); });
+    }
+
+    // General > Storage: the size of each category on the system volume (settings/scripts/storage.sh: du at idle
+    // priority, one category after another, off the UI thread as every Backend.run). storageSizes fills as they
+    // arrive: { id: bytes }, -1 for a category this computer does not have; a missing id is still being sized. A scan
+    // that is running is not started again, and the last sizes stay until the new ones replace them.
+    property var storageSizes: ({})
+    property bool storageBusy: false
+    function storageScan(ids) {
+        if (storageBusy || !canRun) return;
+        storageBusy = true;
+        const next = i => {
+            if (i >= ids.length) { storageBusy = false; return; }
+            run([root + "/settings/scripts/storage.sh", ids[i]], (c, out) => {
+                const s = Object.assign({}, storageSizes), t = out.trim();
+                s[ids[i]] = c !== 0 || t === "-" ? -1 : (parseInt(t) || 0);
+                storageSizes = s;
+                next(i + 1);
+            });
+        };
+        next(0);
     }
 
     // cb(text) now and whenever the file changes ("" when missing).

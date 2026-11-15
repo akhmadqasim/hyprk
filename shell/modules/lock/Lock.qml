@@ -57,8 +57,8 @@ Singleton {
     property int selected: 0
     property int activity: 0               // +1 per key; the caret stays on 0.6 s after it
     property string message: ""            // a PAM error or the lockout text (the Mac shows no wrong-password text)
-    property bool showHint: false          // the "?" button shows the password hint in the line
-    readonly property string line: showHint ? hint : message !== "" ? message : LockTheme.lineText
+    property bool showHint: false          // the "?" button shows the password hint in the line (none set: it does nothing)
+    readonly property string line: showHint && hint !== "" ? hint : message !== "" ? message : LockTheme.lineText
     property var kb: null                  // L.keyboard(): layouts, index, capsLock
     readonly property bool capsLock: kb ? kb.capsLock : false
     readonly property string layoutLabel: kb ? L.layoutLabel(kb) : ""
@@ -66,7 +66,7 @@ Singleton {
     readonly property string userLogin: Quickshell.env("USER") || ""
     readonly property string home: Quickshell.env("HOME") || ""
     readonly property double since: persist.since
-    readonly property string hint: (Prefs.lock && Prefs.lock.hint) ? String(Prefs.lock.hint) : LockTheme.hintFallback
+    readonly property string hint: (Prefs.lock && Prefs.lock.hint) ? String(Prefs.lock.hint) : ""
 
     // HYPRK_LOCK_TEST=1 with HYPRK_LOCK_PAMDIR: PAM reads its "login" service from that directory
     // instead of /etc/pam.d (the headless test session points it at a test double). Never set in a
@@ -116,7 +116,7 @@ Singleton {
         failTick++;
     }
     function toggleHint(): void {
-        if (phase === "locked" && !busy) showHint = !showHint;
+        if (phase === "locked" && !busy && hint !== "") showHint = !showHint;
     }
 
     function unlockNow(): void {

@@ -12,7 +12,9 @@ import "../lib/dock.js" as DockLayout
 // app. Tab / Shift+Tab cycle while Super is held, releasing Super switches.
 // Motion (27.2.1 Dock -[ASAppSwitcher exit:immediately:], MAC-ANSWERS.md "REA 27.2.1" section 5 and Reconciliation
 // (#42) b): it appears complete in one frame (no fade, no scale, no glass materialize) and on releasing Cmd fades
-// out in a CATransaction with kCAMediaTimingFunctionEaseInEaseOut over the default 0.25 s (measured fit 0.236 s).
+// out in a CATransaction with kCAMediaTimingFunctionEaseInEaseOut over the default 0.25 s (measured fit 0.236 s;
+// R17.2 cmdtab-appear-release-*.mov per frame: ease-in-out over 0.246 / 0.242 s, rms 0.3 / 0.5 %). Escape removes it
+// in one frame, no fade (R17.2 cmdtab-step-cancel-dark.mov: Escape at 3.599 s, nothing at 3.600 s, no frame in between).
 // Material: the Dock's (Q-dock-19: pixel-identical), the plugin's `dock` recipe (config/hypr/hyprland.lua).
 ShellWindow {
     id: sw
@@ -36,17 +38,19 @@ ShellWindow {
     PointerGate { id: hoverGate }
     function notePointer(item, mx, my) { return hoverGate.note(item, mx, my); }
 
-    // 1 = shown. Jumps to 1 Theme.switcher.showDelay after open (Q-dock-22), fades to 0 on close (then the window is
+    // 1 = shown. Jumps to 1 Theme.switcher.showDelay after the key (R17.2), fades to 0 on close (then the window is
     // unloaded). Before that the surface is mapped but empty: it already holds the keyboard, so releasing Cmd during
     // the delay switches to the selected (previous) app without the panel ever showing (quick tap).
     property bool revealed: false
-    Timer { id: revealTimer; interval: Theme.switcher.showDelay; onTriggered: sw.revealed = true }
+    // closed with Escape: gone in the next frame; a release fades
+    property bool cancelled: false
+    Timer { id: revealTimer; onTriggered: sw.revealed = true }
     // one value per frame of this window (HyprK FrameEase)
     readonly property real fade: fadeEase.value
     FrameEase {
         id: fadeEase
         goal: sw.shown && sw.revealed && sw.liveApps.length > 0 ? 1 : 0
-        animate: goal < value                    // fading in is a jump
+        animate: goal < value && !sw.cancelled   // fading in is a jump, and so is Escape (R17.2)
         duration: Theme.ms(250)
         curve: [0.42, 0, 0.58, 1, 1, 1]
     }
@@ -77,7 +81,7 @@ ShellWindow {
         else if (k === "first") selected = 0;
         else if (k === "last") selected = n - 1;
         else if (k === "commit") commit();
-        else if (k === "cancel") Panels.close();
+        else if (k === "cancel") { cancelled = true; Panels.close(); }
         else if (k === "quit") quit();
         else if (k === "hide") hide();
     }
@@ -102,6 +106,9 @@ ShellWindow {
         if (liveApps.length === 0) { Qt.callLater(Panels.close); return; }   // not during construction
         selected = liveApps.length > 1 ? 1 : 0;
         revealed = false;
+        cancelled = false;
+        // from the key press: this window is loaded on it, which takes a few frames the first time
+        revealTimer.interval = Math.max(1, Theme.switcher.showDelay - Theme.switcher.showLag - (Date.now() - Panels.switcherAt));
         revealTimer.restart();
         keys.forceActiveFocus();
     }
@@ -216,8 +223,10 @@ ShellWindow {
                         horizontalAlignment: Text.AlignHCenter
                         elide: Text.ElideRight
                         text: c.modelData.name
-                        font: Typography.headline
-                        color: Theme.color.label
+                        // the light grade in dark too: the Mac's stems are 3.7 px at 2x in both (live/r17/cmdtab-*.png,
+                        // scripts/motion-capture/cmd-tab.py); the dark grade of the text sample (581 at 13 pt) drew 4.1
+                        font: Typography.font(13, Typography.semibold, 490)
+                        color: Theme.switcher.labelColor
                     }
                     MouseArea {
                         anchors.fill: parent

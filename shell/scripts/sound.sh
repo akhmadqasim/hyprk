@@ -30,8 +30,9 @@
 # play at 1 (the output volume only). uiSounds gates the UI sounds only.
 # Files: the Apple originals (sounds/originals, 24-bit PCM, same start latency in pw-play as the Vorbis copies:
 # ~11 ms to streaming for both); an install without them falls back to the Vorbis copies in sounds/oga.
-# HYPRK_MUTE=1 silences everything (nested test sessions at night). HYPRK_SOUND_LOG=<file>: append "<event> <file>"
-# for every sound that would play (also when muted), to check the wiring without hearing it.
+# HYPRK_MUTE=1 silences everything (nested test sessions at night). HYPRK_SOUND_LOG=<file>: append
+# "<event> <file> vol=<gain>" for every sound that would play (also when muted), the gain pw-play gets, to check the
+# wiring and the volume curve without hearing it.
 # Plays with pw-play, falls back to paplay, stays silent when neither exists or a file is missing.
 set -u
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
@@ -76,8 +77,6 @@ case "$ev" in
     *) echo "usage: sound.sh <event> [arg]" >&2; exit 2 ;;
 esac
 [ -f "$f" ] || exit 0
-[ -n "${HYPRK_SOUND_LOG:-}" ] && printf '%s %s\n' "$ev" "$f" >> "$HYPRK_SOUND_LOG"
-[ "${HYPRK_MUTE:-0}" = 1 ] && exit 0      # silent test runs
 
 # The Alert volume slider s is not the gain: Settings stores exp(s - 1) (0 when s is 0) in com.apple.sound.beep.volume
 # (Sound.appex -[AppleSound_SoundSettings setAlertSoundVolume:] 0x100007f98) and systemsoundserverd multiplies that
@@ -85,6 +84,8 @@ esac
 # .5, -2.2 at .75. It was the slider itself as a linear gain (-12 / -6 / -2.5 dB). The stock value is s = 1.
 vol=$(LC_ALL=C awk -v s="$vol" 'BEGIN { s = s < 0 ? 0 : s > 1 ? 1 : s; printf "%.4f", s == 0 ? 0 : exp(s - 1) }')
 case "$ev" in volume|power) vol=1 ;; esac    # NSSound, not systemsoundserverd: no alert volume
+[ -n "${HYPRK_SOUND_LOG:-}" ] && printf '%s %s vol=%s\n' "$ev" "$f" "$vol" >> "$HYPRK_SOUND_LOG"
+[ "${HYPRK_MUTE:-0}" = 1 ] && exit 0      # silent test runs
 if [ "$ev" = volume ]; then   # restart, never overlap: stop this session's previous pop (only a player of that file)
     pidf=${XDG_RUNTIME_DIR:-/tmp}/hyprk-volume-pop-${HYPRLAND_INSTANCE_SIGNATURE:-0}.pid
     read -r old 2>/dev/null < "$pidf" && grep -qa BezelServices-volume "/proc/$old/cmdline" 2>/dev/null && kill "$old" 2>/dev/null

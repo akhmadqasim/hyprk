@@ -189,7 +189,7 @@ end
 --     windowsMove off (Reduce Motion) none of them animate.
 --   Window dim (fadeDim): off. With windowsIn off, Hyprland showed a new window dimmed to about 50 % and faded
 --     the dim out over 0.3 s (seen frame by frame in a test session); macOS never dims windows.
---   App menus (fadePopups): open in one frame, fade out in about 0.2 s ease-out, like the measured menu bar menus.
+--   App menus (fadePopups): open in one frame, fade out on the CA default curve over 236 ms, like the shell's menus.
 --   global: the fallback for leaves set nowhere else (zoomFactor, monitorAdded); not measured, kept at 0.2 s so
 --     nothing silently takes the old 0.5 s.
 --   Spaces: Dock's spring was not recovered (SPEC 11.6) and the Spaces switch is not measured on 27.2.1 yet;
@@ -210,7 +210,12 @@ hl.animation({ leaf = "layersOut",   enabled = true, speed = 2.5, bezier = "macE
 hl.animation({ leaf = "border",      enabled = false })
 hl.animation({ leaf = "fadeDim",     enabled = false })
 hl.animation({ leaf = "fadePopupsIn",  enabled = false })
-hl.animation({ leaf = "fadePopupsOut", enabled = true, speed = 2, bezier = "macOut" })
+-- app menus close like the shell's menus: CoreAnimation "default" (macEase) over 236 ms, the probe's window alpha
+-- (reference/re/27.2.1/live/menu-motion-*.json, rms .0004; macOut over 0.2 s was .077: 35 % gone in the first frame).
+-- The popup_classes apps (Finder, Settings) do not use this: the liquidglass plugin fades their menus itself on the
+-- same curve and cancels this fadeout, which only blurred over its fade (plugin/src/PopupGlass.cpp). It stays for the
+-- other apps' popups. reference/re/27.2.1/MOTION-AUDIT.md
+hl.animation({ leaf = "fadePopupsOut", enabled = true, speed = 2.36, bezier = "macEase" })
 
 -- Global so Settings > Accessibility (state/accessibility.lua via `hyprctl eval`, same Lua state)
 -- can switch it: hyprk_motion(true) = Reduce Motion.
@@ -296,8 +301,9 @@ if h and os.getenv("HYPRK_LIQUIDGLASS") ~= "0" then
             -- floats above the Dock and samples the wallpaper, not the Dock's glass. A fit of the recipe, no shell fill.
             materials = "hyprk-dock:dock,hyprk-dock-label:regular,hyprk-controlcenter:controlcenter,hyprk-overlay:menu,"
                      .. "hyprk-spotlight:spotlight,hyprk-hud:controlcenter,hyprk-switcher:dock,"
-                     -- banners and Notification Center cards: _Glass.notificationCenter (MAC-ANSWERS PC #62)
-                     .. "hyprk-notifications:notificationcenter,hyprk-notificationcenter:notificationcenter",
+                     -- banners and Notification Center cards: _Glass.notificationCenter (MAC-ANSWERS PC #62); banners
+                     -- with the decoded shadow 0.4 / 0.6, the cards with the gap fit (GLASS-HIG.md 15)
+                     .. "hyprk-notifications:notificationbanner,hyprk-notificationcenter:notificationcenter",
             -- Dock running dots (shell/modules/Dock.qml): plus-darker -128 / plus-lighter +125 (Q-dock-07)
             fill_layers = "hyprk-dock-dots:darker:128,hyprk-dock-dots-dark:lighter:125",
             -- Cmd-Tab selection tile (shell/modules/Switcher.qml), a cut in the panel's own glass region: plus-darker in
@@ -479,19 +485,16 @@ hl.bind("CTRL + right", hl.dsp.focus({ workspace = "e+1" }))
 -- (reference/re/27.2.1/SOUND-REA-27.2.1.md section 2): the level on the Mac's 1/16 grid, unmute, a volume pop on the
 -- press and on every repeat step (none when the key goes up), Shift inverts "Play feedback when volume is changed"
 -- (state/sound.json volumeFeedback), Option alone opens Sound settings.
--- brightnessctl takes whole percents only, so brightness steps in raw units of max/16 (max/64);
--- -n1 keeps the backlight on at the bottom.
+-- The brightness keys go to the shell (services/Brightness.qml: hyprk:brightness-up / -down, -fine for 1/64), which
+-- steps the backlight (brightnessctl) or the external monitors (DDC/CI) and shows the HUD.
 local volumeKeyScript = shell .. "/scripts/volume-key.sh"
 local function volumeKey(args)
     return hl.dsp.exec_cmd(volumeKeyScript .. " " .. args)
 end
 local soundSettings = hl.dsp.exec_cmd("HYPRK_SETTINGS_PANE=sound " .. hyprk .. "/settings/run.sh")
-local function brightnessKey(dir, n)
-    return hl.dsp.exec_cmd("brightnessctl -q -n1 set $(( ($(brightnessctl max) + " .. math.floor(n / 2) .. ") / " .. n .. " ))" .. dir)
-end
-for _, k in ipairs({ { "", 16 }, { "ALT + SHIFT + ", 64 } }) do
-    hl.bind(k[1] .. "XF86MonBrightnessUp",   brightnessKey("+", k[2]), { locked = true, repeating = true })
-    hl.bind(k[1] .. "XF86MonBrightnessDown", brightnessKey("-", k[2]), { locked = true, repeating = true })
+for _, k in ipairs({ { "", "" }, { "ALT + SHIFT + ", "-fine" } }) do
+    hl.bind(k[1] .. "XF86MonBrightnessUp",   hl.dsp.global("hyprk:brightness-up" .. k[2]),   { locked = true, repeating = true })
+    hl.bind(k[1] .. "XF86MonBrightnessDown", hl.dsp.global("hyprk:brightness-down" .. k[2]), { locked = true, repeating = true })
 end
 -- { modifiers, step, "shift" when Shift alone is held (it inverts the pop; with Option it is the 1/64 step) }
 for _, k in ipairs({ { "", 16, "" }, { "SHIFT + ", 16, " shift" }, { "ALT + SHIFT + ", 64, "" } }) do
@@ -510,7 +513,11 @@ hl.bind("SHIFT + XF86AudioMute", volumeKey("mute shift"), { locked = true })
 -- 0x571 (FUN_10000cc88) before it writes the image, and grim spends ~1.5 s encoding a 2560x1664 PNG after its ~30 ms
 -- capture (session 19), so the sound starts with grim instead of after it
 local shotFile = '"$(d=$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures"); mkdir -p "$d"; echo "$d")/Screenshot $(date "+%Y-%m-%d at %H.%M.%S").png"'
-local shutter = "{ " .. sound .. " screenshot & } ; "
+-- The Mac's sound starts 222 / 247 ms after the key (R10.2 a, screens/27.2.1/sound/screenshot-thumbnail.mov, two runs:
+-- the key reaching screencapture, no timer in it). Ours was out 27-64 ms after the bind (scripts/motion-capture/
+-- sound-timing.py shot: Hyprland's exec, sound.sh and pw-play's 11 ms), so the player waits 197 ms: 235 in the middle.
+local shutterDelay = "0.197"
+local shutter = "{ { sleep " .. shutterDelay .. "; exec " .. sound .. " screenshot; } & } ; "
 hl.bind(cmd .. " + SHIFT + 3", hl.dsp.exec_cmd(shutter .. "grim " .. shotFile))
 hl.bind(cmd .. " + SHIFT + 4", hl.dsp.exec_cmd("command -v slurp >/dev/null && g=$(slurp) && { " .. shutter .. "grim -g \"$g\" " .. shotFile .. "; }"))
 hl.bind("Print",               hl.dsp.exec_cmd(shutter .. "grim " .. shotFile))

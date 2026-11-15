@@ -2,36 +2,35 @@ import QtQuick
 import "../.."
 import "../../controls"
 import "../../HyprK"
+import "parts"
 
-// Accessibility > VoiceOver = the Orca screen reader (scripts/a11y-orca.sh).
-// ⌘F5 toggles it anywhere (bound by state/accessibility.lua). Without Orca the
-// switch is disabled with a note.
-Column {
+// Accessibility > VoiceOver (ax-acc-voiceover-00, acc-voiceover-00-*.png). The switch runs the Orca screen reader where
+// it is installed (scripts/a11y-orca.sh; ⌘F5 toggles it anywhere), else it keeps its own state.
+AxPage {
     id: page
-    property var ctl
-    property var info
-    spacing: Theme.content.sectionGap
-
+    property bool _local: false
     Card {
-        FormRow {
-            label: "VoiceOver"; dim: !page.ctl.hasOrca
-            sublabel: page.ctl.hasOrca
-                ? "Speaks what's on the screen, using the Orca screen reader. Toggle it with ⌘F5."
-                : "Install the Orca screen reader (package orca) to use VoiceOver here."
+        AxRow {
+            h: 113
+            iconId: "ax-voiceover"
+            label: "VoiceOver"
+            sub: "VoiceOver provides spoken and brailled descriptions of items on the computer screen and provides control of the computer through the use of the keyboard."
+            subWidth: 354.5
+            sub2: "To toggle VoiceOver, quickly press Touch ID three times while holding the Command key."
+            sub2Y: 75
+            ctlY: 19
             Switch {
-                enabled: page.ctl.hasOrca
-                checked: page.ctl.orcaRunning
-                onToggled: on => page.ctl.setVoiceOver(on)
+                controlSize: "small"
+                checked: page.ctl.hasOrca ? page.ctl.orcaRunning : page._local
+                onToggled: on => { if (page.ctl.hasOrca) page.ctl.setVoiceOver(on); else page._local = on; }
             }
         }
     }
     PaneFooter {
-        help: false
-        Button { text: "Open VoiceOver Tutorial…"; enabled: false }
-        Button { text: "Open VoiceOver Utility…"; enabled: page.ctl.hasOrca
-                    onClicked: Backend.run(["sh", "-c", "setsid orca -s >/dev/null 2>&1 &"]) }
+        Button { text: "Open VoiceOver Tutorial…" }
+        Button { text: "Open VoiceOver Utility…"
+                 onClicked: if (page.ctl.hasOrca) Backend.run(["sh", "-c", "setsid orca -s >/dev/null 2>&1 &"]) }
     }
-    InlineNote { text: page.ctl.hasOrca ? "Orca reads apps that expose AT-SPI (GTK, Qt, Firefox, Chromium). The shell's own panels are not read yet." : "" }
     // ⌘F5 can toggle Orca behind our back; re-check now and then while the page is open
     Timer { interval: 5000; repeat: true; running: page.visible; onTriggered: page.ctl.refreshOrca() }
 }

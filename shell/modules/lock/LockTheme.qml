@@ -105,8 +105,8 @@ Singleton {
     readonly property vector3d lineLift: dark ? Qt.vector3d(0.54, 0.58, 0.66) : Qt.vector3d(0.53, 0.62, 0.66)
     readonly property real spinnerSize: 15
     readonly property int spinnerAfter: 970             // B2: the spinner replaces the line ~1 s after Return
-    readonly property string hintFallback: "Check Caps Lock and the keyboard layout"
-    readonly property string lockoutText: "Too many attempts"          // PAM gave up (MaxTries), not seen on the Mac
+    // PAM gave up (MaxTries): loginwindow 27.2.1 RATE_LIMIT_LOCKED_OUT (the lockout itself was not recorded on the Mac)
+    readonly property string lockoutText: "Your account is locked."
 
     // ---------- status items, top right (A7) ----------
     readonly property real statusTop: 8                 // items y 8 to 25 (centre 16.5)

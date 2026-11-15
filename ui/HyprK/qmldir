@@ -29,6 +29,7 @@ Knob 1.0 Knob.qml
 LensGlass 1.0 LensGlass.qml
 FocusRing 1.0 FocusRing.qml
 SfSymbol 1.0 SfSymbol.qml
+SymbolBounce 1.0 SymbolBounce.qml
 Popup 1.0 Popup.qml
 SearchField 1.0 SearchField.qml
 TrafficLights 1.0 TrafficLights.qml
@@ -39,9 +40,11 @@ AlertPanel 1.0 AlertPanel.qml
 Sheet 1.0 Sheet.qml
 Popover 1.0 Popover.qml
 Motion 1.0 motion.js
+Pixel 1.0 pixel.js
 PanelLayout 1.0 panels.js
 Chameleon 1.0 chameleon.js
 RubberBandMath 1.0 rubberband.js
 KeyBindings 1.0 keybindings.js
+EmojiText 1.0 emojitext.js
 ScrollEdge 1.0 ScrollEdge.qml
 TextMenu 1.0 TextMenu.qml

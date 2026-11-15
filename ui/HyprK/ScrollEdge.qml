@@ -15,9 +15,20 @@ import QtQuick
 // FITTED: the replay opacity. Mac-to-Mac over the preview photo (appearance-scroll-000 rows 250..302 pt as the input,
 // appearance-scroll-250 as the target, x 450..695 pt, no colour conversion): rms dark 6.4 at the dumped 0.6, 3.0 at
 // 0.7; light 9.4 at 0.5, 6.8 at 0.55 (the old even-blur model: 9.2 / 10.8). The opacity and the unknown background
-// colour trade off; TOOLBAR-REA-27.2.1.md 1.
+// colour trade off; TOOLBAR-REA-27.2.1.md 1. The dark background was solved at the dumped 0.6; at the fitted 0.7 it is
+// (43,43.5,48.5): least squares over the two Settings points above and Finder's band over its plain content
+// (finder/scrolled-under-toolbar-icon-dark.png, (31,31,36) -> (39.3,39.4,45.1)), rms 0.3 levels (the old (46,46,50)
+// at 0.7 gave (41.5,41.5,46.3), 2 levels light). GLASS-HIG.md round 10.
+// FITTED: light `normal` 0.7 (dump 0.25). With both blurs reading only the band (as below), the dumped 0.25 left the
+// Mac's light pocket too clear at its bottom: Finder's thumbnail tops 1 pt inside the band (rim (229,125,122)) show
+// G 247 on the Mac (finder/scrolled-under-toolbar-icon-light.png row 103 px), 236 in the model; the grey icon shadow
+// above them 255 on the Mac, 250 in the model. A least-squares sweep over that strip and the Settings photo above
+// (appearance-scroll-000/-250-light) picks 0.7: strip rms 4.7 -> 2.2 levels, photo 5.1 -> 4.1 (per 13 pt row
+// 6.2 5.8 4.8 4.7 4.1 4.5 5.0 5.4 -> 3.5 3.1 4.5 4.7 3.9 3.7 3.8 5.0). Dark keeps the dump: its strip already
+// matches within 1 level (row 103 (64.2,49.0,54.4) Mac, (65.1,50.1,54.5) model). GLASS-HIG.md §15.
 // Put it over the band, with `source` the scrolled item (a sibling under it, not a parent); it draws only while
-// `active`. Reduce Transparency: the plain window colour (the caller's veil is not needed then).
+// `active`. Reduce Transparency: the plain window colour (the caller's veil is not needed then). Another pocket style
+// sets the blend itself: lighten 0, darken 0, normal 1 is a plain `sigma` blur under the veil (Finder's list header).
 Item {
     id: e
     property Item source
@@ -27,19 +38,20 @@ Item {
     property real sigma: 16
     property real lighten: dark ? 0.4 : 0.6
     property real darken: dark ? 0.6 : 0.4
-    property real normal: dark ? 0 : 0.25
+    property real normal: dark ? 0 : 0.7          // FITTED light (dump 0.25), see above
     property real saturation: 1.25
     property real veil: dark ? 0.7 : 0.55     // FITTED (dump 0.6 / 0.5), see above
-    property color veilColor: dark ? Qt.rgba(46 / 255, 46 / 255, 50 / 255, 1) : "white"
-    readonly property real replaySat: Math.max(0, 1.25 - 0.25 / (dark ? 0.6 : 0.5))   // from the dumped opacity
-    readonly property real radius: 2 + 0.5 * Math.max(0, Math.min(1, (height - 52) / 38))
+    property color veilColor: dark ? Qt.rgba(43 / 255, 43.5 / 255, 48.5 / 255, 1) : "white"
+    property real replaySat: Math.max(0, 1.25 - 0.25 / (dark ? 0.6 : 0.5))   // from the dumped opacity
+    property real radius: 2 + 0.5 * Math.max(0, Math.min(1, (height - 52) / 38))
     property real cornerRadius: 0      // the top-right corner (a window corner the band reaches)
-    readonly property real margin: Math.ceil(2.5 * sigma)
     visible: active && source !== null
 
-    // the band's rect in the source's coordinates
+    // the band's rect in the source's coordinates. The textures hold the band only: both blurs read nothing outside it
+    // (CA's backdrop captures its own bounds), and a margin let the coarse texture's filtering reach across the band's
+    // edge (its texel straddling the bottom edge put 34 % of the thumbnail under the line into the fill blur's last row)
     readonly property point _o: source ? mapToItem(source, 0, 0) : Qt.point(0, 0)
-    readonly property rect _rect: Qt.rect(_o.x - margin, _o.y - margin, width + 2 * margin, height + 2 * margin)
+    readonly property rect _rect: Qt.rect(_o.x, _o.y, width, height)
 
     ShaderEffectSource {
         id: sharp
@@ -57,6 +69,7 @@ Item {
         hideSource: false
         visible: false
         smooth: true
+        mipmap: true      // the fill blur reads it at about its tap spacing (scrolledge.frag tapLod)
         sourceRect: e._rect
         textureSize: Qt.size(Math.ceil(e._rect.width / 2), Math.ceil(e._rect.height / 2))
     }
@@ -67,7 +80,6 @@ Item {
         property var sharp: sharp
         property var soft: soft
         property size size: Qt.size(e.width, e.height)
-        property real margin: e.margin
         property real sigma: e.sigma
         property real lighten: e.lighten
         property real darken: e.darken

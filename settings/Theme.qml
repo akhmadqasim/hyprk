@@ -15,6 +15,11 @@ QtObject {
 
     // ---------- appearance (driven by AppState from state/appearance.json) ----------
     property bool dark: false
+    // Icon & widget style (appearance.json iconStyle / iconStyleVariant, set by AppState) with the mode: what
+    // Backend.appIconUrl needs to pick an app icon's rendition (RegularLight / RegularDark / RegularAutomatic ...)
+    property string iconStyle: "default"
+    property string iconStyleVariant: "auto"
+    readonly property var iconLook: ({ style: iconStyle, variant: iconStyleVariant, dark: dark })
     property bool reduceTransparency: false
     // Accessibility > Display > Increase contrast: darker borders and separators,
     // stronger secondary text, and no transparency (macOS turns that on with it)
@@ -30,8 +35,9 @@ QtObject {
     // (measured on 27.2.1). Under Multicolor each app uses its own accent; System Settings has none
     // (accent-colors.json multicolor.appsWithoutAccentKey), so it is Blue #007AFF.
     property string accentName: "multicolor"
-    // sidebar chameleon tint (MAC-ANSWERS.md C3.1): the wallpaper's mean colour (SettingsApp's WallpaperTint), on
-    // while Appearance > "Tint window background with wallpaper color" is on (AppState)
+    // chameleon tint (MAC-ANSWERS.md C3.1) of the sidebar and the dark window background: the mean colour of the
+    // wallpaper under the window (SettingsApp's WallpaperTint), on while Appearance > "Tint window background with
+    // wallpaper color" is on (AppState)
     property var chameleon: null
     property bool tintWindow: true
     readonly property color accent: Accent.color
@@ -117,12 +123,20 @@ QtObject {
         // 27.2.1 System Settings sidebar over a plain desktop: (37,38,38) dark, (237,237,237) light
         // (reference/screens/27.2.1/settings-toolbar-{dark,light}.png; Finder's reads 38 / 237)
         // 27.2.1 sampled over Tahoe: #ECEDEE light, #232634 dark (Q-settings-01); window not key: flat #F2F2F2 / #24262B
-        readonly property color _rgb: !theme.windowActive ? (theme.dark ? "#24262B" : "#F2F2F2") : (theme.dark ? "#232634" : "#ECEDEE")
-        // key window, light: + the chameleon layer (5 % colour blend of the wallpaper mean). Dark takes the measured
-        // colour as it is: it already holds TahoeDark's tint (as the Finder sidebar does). The inactive sidebar is flat.
+        readonly property color _rgb: !theme.windowActive ? (theme.dark ? "#24262B" : "#F2F2F2") : (theme.dark ? "#232634" : "#EDEDED")
+        // key window: + the chameleon layer, a colour blend of the mean c of the desktop under the window (chameleon.js)
+        // at 0.05 light / 0.10 dark, over (OPEN-FIXES 12, R6.1):
+        // - light: a neutral #EDEDED. Mac 237 over flat grey 127 (appearance/liquidglass-flat-grey-light.png), (236,237,238)
+        //   over TahoeLight (panes/*-light.png); ours 237.0 / (236.5,237.1,237.9). #ECEDEE, the Tahoe reading, counted
+        //   Tahoe's tint twice under the blend: (236.0,237.0,237.9) / (235.5,237.1,238.8).
+        // - dark: 35.20 + 0.04253 c per channel, the base follows the desktop too (fit on flat red, green, navy, grey 127:
+        //   window-dark-flat-*.png, liquidglass-flat-grey-dark.png, rms 1.06; TahoeDark (35.0,36.7,51.2), Mac (35,37,52)).
+        //   #232634 (the TahoeDark reading) while the mean is unknown or the tint is off.
+        // The inactive sidebar is flat (measured over Tahoe only).
         // Opaque also over compositor blur: the Mac's fill is uniform from x 6 to 200 (Q-settings-01), while 88 %
         // over the blurred TahoeDark read (34..39, 38..40, 68..77) here, light 222..234 (appearance-*.png vs ours)
-        readonly property var _ch: theme.windowActive && theme.tintWindow && !theme.dark ? Ch.apply(_rgb, theme.chameleon, false) : null
+        readonly property var _ch: theme.windowActive && theme._chOn
+            ? Ch.apply(theme.dark ? theme._follow(theme.chameleon, 35.20, 10.85) : _rgb, theme.chameleon, theme.dark) : null
         readonly property color fill: _ch ? Qt.rgba(_ch.r, _ch.g, _ch.b, 1) : _rgb
         // 0.5 pt divider on the right: #D3D4D5 / #3F424D
         readonly property real strokeWidth: 0.5
@@ -150,7 +164,7 @@ QtObject {
         readonly property real switchRowHeight: 37.5  // a row whose only control is a switch (desktop-dock-light.png: 75 px pitch)
         readonly property int rowPadding: 10
         readonly property int separatorInset: 10
-        readonly property int heroIcon: 56           // pane header icon, TODO verify
+        readonly property int heroIcon: 50           // pane header tile: 50 pt (general-00-light.png, R3.8b: ink 922..1021 px)
     }
 
     // controls and their motion: Tokens.control, Tokens.motion (HyprK Switch, Slider, Popup, Button)
@@ -158,8 +172,19 @@ QtObject {
     // ---------- colors ----------
     // the window is key (SettingsApp sets it; snapshots force it on)
     property bool windowActive: true
-    // window background: #FFFFFF / #1E1F24 (dark is wallpaper-tinted on the Mac; #202127 in the probe) (Q-settings-11)
-    readonly property color windowBg: theme.dark ? "#1E1F24" : "#FFFFFF"
+    // the chameleon colour is known and "Tint window background with wallpaper color" is on
+    readonly property bool _chOn: theme.tintWindow && !!theme.chameleon
+    // base + k x c per channel (c: the chameleon colour, 0..1; base, k in 0..255 levels) as {r, g, b} in 0..1
+    function _follow(c, base, k) { return { r: (base + k * c.r) / 255, g: (base + k * c.g) / 255, b: (base + k * c.b) / 255 }; }
+    // window background: #FFFFFF light, also over grey 127 and not key (liquidglass-flat-grey-light.png,
+    // desktop-dock-inactive-light-*.png: 255, cards 247), so no tint in light. Dark key window: 28.24 + 0.0525 c per
+    // channel, a 5.25 % blend of the desktop's mean under the window over grey 29.8 (OPEN-FIXES 12, R6.1: flat red,
+    // green, navy, grey 127, rms 0.23; TahoeDark (30.4,31.0,36.5), Mac (30.5,31,36.5)); #1E1F24 (the TahoeDark
+    // reading, Q-settings-11) while the mean is unknown or the tint is off. Dark, not key: flat #1D1E20, measured over
+    // TahoeDark only (desktop-dock-inactive-dark-iconDark.png (29,30,32), its cards (36,37,39) = this + cardFill)
+    readonly property var _win: theme._chOn ? theme._follow(theme.chameleon, 28.24, 13.39) : null
+    readonly property color windowBg: !theme.dark ? "#FFFFFF" : !theme.windowActive ? "#1D1E20"
+        : _win ? Qt.rgba(_win.r, _win.g, _win.b, 1) : "#1E1F24"
     // cards: the content's primary colour at 3 %, no stroke, no shadow. 27.2.1: a grouped Form section is DesignLibrary
     // MacGroupBox (body 0x195de9758), filled with SeximalShapeStyle = Color.primary at opacity 0.03 (resolve
     // 0x195f89be4, the double 0x3f9eb851eb851eb8; reference/re/27.2.1/GAPS-REA-windows.md 1d). Over the window
@@ -176,7 +201,11 @@ QtObject {
     // window not key: #BDBDBD / #5C5D5E (Q-settings-06, desktop-dock-inactive-*.png read 189 / 91..93)
     readonly property color toolbarTitle: !theme.windowActive ? (theme.dark ? "#5C5D5E" : "#BDBDBD")
         : theme.dark ? "#E8E8E9" : "#4C4C4C"
-    readonly property color scrollEdge: theme.dark ? "#2E2F33" : "#E5E5E5"
+    // an alpha line, not a solid colour: black .10 / white .07 (TOOLBAR-REA §1 separator, as Finder's) fits both readings,
+    // #E5E5E5 over white and 222 over the #F7F7F7 card; #2E2F33 over #1E1F24 and (52,53,58) over the #25262B card
+    // (settings/scroll-edge-keyboard-*.png row 104)
+    readonly property color scrollEdge: theme.dark ? Qt.rgba(1, 1, 1, theme.increaseContrast ? 0.65 : 0.07)
+        : Qt.rgba(0, 0, 0, theme.increaseContrast ? 0.65 : 0.10)
     // dark: the whole toolbar strip, capsule included, lightens while the pointer is in it
     // (settings/toolbar-backforward-rest-hover-press-dark.png: strip 31 -> 39, capsule 61 -> 68, white at 8 / 224 =
     // 7 / 194 = .036 over both; Finder the same, MAC-ANSWERS Q-finder-10 "Dark only"). Light: none (Q-finder-10)

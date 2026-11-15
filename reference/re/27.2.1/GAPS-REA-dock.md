@@ -129,6 +129,8 @@ Fan, `-[DOCKStackFanLayer layout]` 0x100072030. Confirmed:
   (0x100258428): x offset = 3000 - sqrt(3000^2 - y^2), tilt = -atan(y / (3000 - x)) = -asin(y / 3000).
 - `expandedFrameForStage:` 0x100071ec0: viewable items = floor(stage height / 64); the fan's frame is 24 pt below
   the tile centre line (`- 24.0`). Inferred reading of the y term; not cross-checked.
+  **Measured (MOTION-REA Round 4, R4.1, stack-fan-open.mov)**: the fan sits 24 pt ABOVE (slot i centre int(t/2) + 32 +
+  64 i + 24 above the icon box bottom, pitch 64.0); `shell/lib/dockstack.js` `fanShift` = +24.
 - Item size for the fan: not found (setter of `_itemSize` for the fan not traced). Mac measured step 64.6.
 
 hyprk: there is no stack popup in the shell (`shell/lib/dock.js` line 137 says so), so nothing to change yet.
@@ -148,3 +150,20 @@ hyprk: there is no stack popup in the shell (`shell/lib/dock.js` line 137 says s
 `~/Downloads/macos/re-work/gaps-dock/rea/dock-all/functions`): Evidence
 `ev_5599a397b84ddf92807651f4d4156f588fd24bd03d148b3574f024043133b5e5`. It holds every Dock address cited above
 (0x1000716a0, 0x1000518f4, 0x10001b4d4, 0x100072030, 0x100186bdc, 0x100186fc0, ...).
+
+## Resize by the separator (REA, Dock 27.2.1, Ghidra 12.1.4 pseudocode; static, not run)
+
+- `-[DockBarMouseEventHandler _handleResizeDockEvent:type:]` 0x1000830f4. Mouse down (event types 1, 3, 25): keeps
+  the pointer location and `tileSize`, stops magnification (`stopFishing`), `setFShowLabels:0`. Drag (6, 7, 27):
+  bottom Dock `desired = startTile - (y - y0)` (CG y grows down: up is larger), side Docks the same along x; clamped
+  to **16..128** as float, then `(int)`; `setDesiredTileSize:` and a relayout, so the Dock follows live. With
+  `kCGEventFlagMaskAlternate` (Option, 0x80000) the size is cut to a multiple of 16: `(int)(size * 0.0625) * 16`.
+  Mouse up (2, 4, 26): labels back, magnification restarts when the pointer is in the bar, and FUN_100080dcc writes
+  `tilesize` with `CFPreferencesSetAppValue(com.apple.dock)`.
+- Resize area, `-[DockBar updateWithContext:showDockWindow:transaction:]` 0x10007549c (0x100077948): over
+  `separatorTile` or `recentSeparatorTile`, unless the flag at DAT_100329c30 is set (not decoded; `size-immutable`
+  is the likely source). Bottom Dock: x within **6 pt either side of the separator's centre (12 pt)**, y from 4 pt
+  under the bar's top for `distanceBottom + tileSize + distanceTop - 8`. `setFMouseInResizeArea:`; in it
+  `_CoreCursorSet(conn, 0x20)` (resize up-down; 0x1c left-right for a side Dock), 0 on leaving.
+- Ours: `shell/lib/dock.js` resizeTile / resizeArea, the separator MouseArea in `shell/modules/Dock.qml`; the release
+  writes `size` to `$HYPRK_STATE/dock.json` (Prefs.setDock), the key Settings' Size slider writes.

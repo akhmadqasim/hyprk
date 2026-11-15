@@ -118,7 +118,8 @@ Item {
                         x: Theme.columns.textX
                         width: parent.width - x - 22 - (dots.visible ? dots.width + 6 : 0)
                         anchors.verticalCenter: parent.verticalCenter
-                        text: row.modelData.name
+                        text: EmojiText.opaque(row.modelData.name, color)   // emoji at alpha 1 (OPEN-FIXES.md 16)
+                        textFormat: EmojiText.has(row.modelData.name) ? Text.StyledText : Text.PlainText
                         elide: Text.ElideMiddle
                         color: row.accent ? Theme.color.selectedText : Theme.color.label
                         font: Typography.body
@@ -181,7 +182,8 @@ Item {
             }
             Rectangle {   // 1 pt divider, no grip
                 anchors.right: parent.right
-                width: 1
+                width: Pixel.stroke(1, Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio))   // exact, antialiased at a fractional scale like the Mac's downsample (HyprK pixel.js)
+                antialiasing: Pixel.soft(Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio))
                 height: parent.height
                 color: Theme.color.columnDivider
             }

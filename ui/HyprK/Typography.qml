@@ -54,10 +54,11 @@ QtObject {
     function qtWeight(w) { return !isSF ? w : w > 550 ? Font.DemiBold : w > 450 ? Font.Medium : Font.Normal; }
 
     // SF Pro at `pt` with wght `w` (400 Regular, 510 Medium, 590 Semibold, 700 Bold)
-    function font(pt, w) {
+    // `grad`: the grade, when the text is not the dark sample's (the Cmd-Tab name: shell/modules/Switcher.qml)
+    function font(pt, w, grad) {
         const wght = w || 400;
         const f = { family: family, pixelSize: pt, weight: qtWeight(wght), letterSpacing: letterSpacing(pt) };
-        if (isSF) f.variableAxes = { "wght": wght, "opsz": opsz(pt), "GRAD": grade(pt) };
+        if (isSF) f.variableAxes = { "wght": wght, "opsz": opsz(pt), "GRAD": grad !== undefined ? grad : grade(pt) };
         return Qt.font(f);
     }
 

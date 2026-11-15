@@ -9,7 +9,8 @@ import "../lib/nc.js" as NcLib
 
 // Notification banners, top-right below the menu bar, in the Notification Center card column (macOS 27.2.1, PC #62 3a/3b,
 // lib/nc.js):
-// - one banner per app; more from the same app stack behind it (plates below)
+// - one banner per app; a newer one from the same app replaces it in the same slot, no plates behind it (MAC-ANSWERS.md
+//   Q-panels-30: "no visible stack while showing"); no time label (Q-panels-28)
 // - slide in from the right (spring 0.43 s, ratio 0.9, from 462 pt out) while fading in and growing from 0.85; the
 //   glass materializes with the fade. One progress value (`enter`) drives offset, opacity and scale
 // - expire after Theme.notif.timeout (4.97 s) unless hovered, then slide back out to the right on Spring(0.3, -0.2),
@@ -110,11 +111,10 @@ ShellWindow {
             required property double time
             required property int timeout
             required property bool sticky
-            required property int stack
             required property bool leaving
 
             width: Theme.notif.width
-            height: card.height + Math.min(stack - 1, 2) * Theme.notif.stackPeek
+            height: card.height
             property bool swipedAway: false
             property bool armed: true
 
@@ -157,7 +157,7 @@ ShellWindow {
                 summary: row.summary
                 body: row.body
                 time: row.time
-                stacked: row.stack - 1
+                showTime: false
                 swipeable: !row.leaving
                 opacity: row.fade
                 materialize: row.fade
@@ -170,9 +170,8 @@ ShellWindow {
                 onClosed: Notifs.dismissBanners(row.app)
                 onSwiped: { row.swipedAway = true; Notifs.hideBanners(row.app); }
 
-                // a newer notification of the same app replaces the text: quick refocus
-                onNidChanged: { refocus.restart(); row.hoveredOnce = false; row.armed = false; row.armed = true; }   // and a fresh timeout
-                FrameAnim { id: refocus; target: card; property: "contentOpacity"; from: 0.25; to: 1; duration: 260; ease: Easing.OutCubic }
+                // a newer notification of the same app replaces the text in place (Q-panels-30), with a fresh timeout
+                onNidChanged: { row.hoveredOnce = false; row.armed = false; row.armed = true; }
             }
 
             // hovered once: it leaves about 1 s after the pointer does (Q-panels / NC #62 "Hover pauses the timer ... it

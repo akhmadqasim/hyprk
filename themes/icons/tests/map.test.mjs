@@ -69,6 +69,16 @@ test("the Dock's Trash follows the icon style as Dock.app picks it", () => {
                 assert.ok(existsSync(join(icons, M.styled(mac, style, variant, false))), mac + " " + style + " " + variant);
 });
 
+test("folders and documents keep one rendition; CoreTypes' Trash follows the mode (R9.5)", () => {
+    for (const style of ["default", "dark", "clear", "tinted"])
+        for (const variant of ["light", "dark", "auto"])
+            for (const dark of [false, true]) {
+                assert.equal(M.styled("@GenericFolderIcon", style, variant, dark), "system/GenericFolderIcon-512.png");
+                assert.equal(M.styled("@TrashIcon", style, variant, dark), dark ? "system/TrashIcon-512-dark.png" : "system/TrashIcon-512.png");
+                assert.ok(existsSync(join(icons, M.styled("@FullTrashIcon", style, variant, dark))));
+            }
+});
+
 test("every app icon has its style renditions", () => {
     const names = readFileSync(join(icons, "apps-sources.txt"), "utf8").split("\n")
         .filter(l => l && !l.startsWith("#")).map(l => l.split("\t")[0]);

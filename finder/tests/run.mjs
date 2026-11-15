@@ -1,6 +1,8 @@
 // Node tests for finder/qml/lib/files.js (a QML ".pragma library" file).
 // Usage: node finder/tests/run.mjs
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync, mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
@@ -243,7 +245,7 @@ test("formatDateLong", () => {
         const tail = texts(code.slice(0, code.indexOf("let items")));
         const item = texts(code.slice(code.indexOf("if (entry)"), code.indexOf("} else {")));
         const bg = texts(code.slice(code.indexOf("} else {")));
-        assert.deepEqual(tail, ["Share…", "Customize Folder…", "Quick Actions", "Customise…", "Services", "No Services Apply"]);
+        assert.deepEqual(tail, ["Share…", "Customize Folder…", "Quick Actions", "Customize…", "Services", "No Services Apply"]);   // en (US) N274
         assert.deepEqual(item, ["Open in New Tab", "New Folder with Selection (", "Open", "Open With", "Move to Trash", "Get Info", "Duplicate", "Make Alias",
             "Quick Look", "Copy", "Show in Enclosing Folder"]);
         assert.deepEqual(bg, ["New Folder", "Get Info", "View", "Use Groups", "Sort By", "Clean Up", "Clean Up By",
@@ -278,6 +280,69 @@ test("formatDateLong", () => {
         // the toolbar's Action button shows the context menu (populateActionMenu:contextMenuDelegate: 0x1004208c8)
         assert.match(body("actionMenu"), /contextMenu\(/);
     });
+}
+
+// ---- gallery strip scroll (MAC-ANSWERS-9 R9.3, keyboard-scroll-timing.txt) ----
+test("galleryScroll: the Mac's steps in a 316 pt strip", () => {
+    // 8 items, pitch 59, plate 54, 5 pt insets: content 467, contentX from -5 to 467 + 5 - 316
+    const step = (x, i) => F.galleryScroll(x, i, 316, -5, 156, 59, 54, 8);
+    let x = -5;
+    for (let i = 1; i <= 4; i++) x = step(x, i);
+    assert.equal(x, -5);                       // plates 0-4 fit: no scroll
+    x = step(x, 5); assert.equal(x + 5, 46);   // Mac: strip shift 46, 105, then the end (161 = 156 + 5)
+    x = step(x, 6); assert.equal(x + 5, 105);
+    x = step(x, 7); assert.equal(x + 5, 161);
+    for (const i of [6, 5, 4, 3]) x = step(x, i);
+    assert.equal(x + 5, 161);                  // going back: nothing until the plate nears the left edge
+    x = step(x, 2); assert.equal(x + 5, 115);  // Mac: 161 -> 115
+    x = step(x, 0); assert.equal(x, -5);
+});
+test("galleryShowMore and formatDimensions", () => {
+    assert.equal(F.galleryShowMore({ name: "a.jpg", mime: "image/jpeg" }), true);
+    assert.equal(F.galleryShowMore({ name: "b.pdf", mime: "application/pdf" }), true);
+    assert.equal(F.galleryShowMore({ name: "n.txt", mime: "text/plain" }), false);
+    assert.equal(F.galleryShowMore({ name: "P", isDir: true }), false);
+    assert.equal(F.formatDimensions(1600, 1067), "1600\u00d71067");
+    assert.equal(F.formatDimensions(-1, -1), "");
+});
+
+// ---- mouse wheel (the icon view had `interactive: false`, which also drops the wheel in Qt 6.10) ----
+test("no view switches its Flickable off (interactive: false drops the mouse wheel too)", () => {
+    for (const f of readdirSync(join(here, "..", "qml")).filter(f => f.endsWith(".qml")))
+        assert.doesNotMatch(readFileSync(join(here, "..", "qml", f), "utf8"), /^\s*interactive:\s*false/m, f);
+});
+// the built app, offscreen: one real wheel notch over every scroll view with more content than room must move it
+// (main.cpp wheelTest). The gallery strip as the Mac (MAC-ANSWERS-11 R11.2): a vertical notch does not move it, a
+// horizontal or Shift notch moves it 10 pt in the same frame, over the strip and over the preview.
+// Needs finder/build/hyprk-finder (finder/run.sh --build-only)
+{
+    const bin = join(here, "..", "build", "hyprk-finder");
+    const dir = mkdtempSync(join(tmpdir(), "hyprk-finder-wheel-"));
+    for (let i = 0; i < 150; i++) writeFileSync(join(dir, `file-${String(i).padStart(3, "0")}.txt`), "");
+    for (const view of ["icons", "list", "columns", "gallery"]) {
+        test("mouse wheel scrolls the " + view + " view", () => {
+            assert.ok(existsSync(bin), "build the Finder first: finder/run.sh --build-only");
+            const r = spawnSync(bin, [dir, "--view", view, "--size", "900x600", "--wheel-test", "--delay", "1500"], {
+                encoding: "utf8", timeout: 30000,
+                env: { ...process.env, QT_QPA_PLATFORM: "offscreen", HOME: dir, XDG_CACHE_HOME: join(dir, ".cache"),
+                       HYPRK_STATE: join(dir, ".state") },
+            });
+            assert.equal(r.status, 0, "exit " + r.status + "\n" + r.stdout);
+            const lines = r.stdout.split("\n").filter(l => l.startsWith("wheel "));
+            assert.ok(lines.length >= 2 && lines.every(l => l.startsWith("wheel ok ")), r.stdout);   // sidebar + the view
+            if (view === "gallery") {
+                for (const where of ["strip", "preview"]) {
+                    for (const v of ["vertical", "vertical-up"])
+                        assert.match(r.stdout, new RegExp(`wheel ok galleryStrip ${where} ${v} contentX (-?[\\d.]+) -> \\1 -> \\1\\n`));
+                    assert.match(r.stdout, new RegExp(`wheel ok galleryStrip ${where} horizontal contentX -5\\.0 -> 5\\.0 -> 5\\.0\\n`));
+                    assert.match(r.stdout, new RegExp(`wheel ok galleryStrip ${where} horizontal-back contentX 5\\.0 -> -5\\.0 -> -5\\.0\\n`));
+                    assert.match(r.stdout, new RegExp(`wheel ok galleryStrip ${where} shift-vertical contentX -5\\.0 -> 5\\.0 -> 5\\.0\\n`));
+                    assert.match(r.stdout, new RegExp(`wheel ok galleryStrip ${where} shift-vertical-back contentX 5\\.0 -> -5\\.0 -> -5\\.0\\n`));
+                }
+            }
+        });
+    }
+    rmSync(dir, { recursive: true, force: true });
 }
 
 console.log(`${pass} passed, ${fail} failed`);

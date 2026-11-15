@@ -17,6 +17,12 @@ QtObject {
     property bool dark: false
     // the window is key (set by Main: Window.active, or --inactive for screenshots); inactive colours follow
     property bool active: true
+    // a sheet is on the window: the window stays main (title, toolbar, minimise and zoom as they were) but is not key,
+    // and the sidebar's text, headers, icons and selection take the inactive look (finder/sheet-{light,dark}.png under
+    // the veil: icons (151,152,152) / (68,69,75) = #7F7F7F / #8F909B veiled, no accent left; "Recents" 145.5 /
+    // (70,70,75) = #717171 / #92939B; the "Favourites" header 165.5; the title still #4C4C4C, 133). Set by Main
+    property bool sheet: false
+    readonly property bool sidebarKey: active && !sheet
     // normalized state/appearance.json (Main.qml follows the file): accent, sidebar icon size, accessibility
     property var appearance: ({})
     readonly property string sidebarSize: appearance.sidebarIconSize || "medium"
@@ -122,19 +128,22 @@ QtObject {
         // and (36,38,55) / (36,38,54) active / inactive (crops/sidebar-top-dark-*), while the 10 % layer on top made it
         // (36,37,62); so dark takes the measured colour as it is
         readonly property color sidebarSolid: theme.dark ? "#242637" : theme.chameleonOf(theme.active ? "#EDEDEE" : "#F2F2F3")
+        // the gallery inspector's column with nothing coloured behind it (MAC-ANSWERS-11 R11.1: 236,237,238 light,
+        // 36,37,53 dark over the Tahoe wallpapers); light is the sidebar's colour, dark the measured one
+        readonly property color galleryPane: theme.dark ? Qt.rgba(36 / 255, 37 / 255, 53 / 255, 1) : sidebarSolid
         // over compositor blur: the sidebar glass fill colour (LIVE-27.2.1.md Sidebar, glass-table-dark.txt)
         readonly property color sidebarGlass: theme.chameleonOf(theme.dark ? Qt.rgba(0.15, 0.15, 0.15, 0.75) : Qt.rgba(0.87, 0.88, 0.91, 0.7))
-        readonly property color sidebarSelection: theme.dark ? (theme.active ? "#414354" : "#323443")
-                                                             : (theme.active ? "#D7D7D8" : "#E7E7E8")
+        readonly property color sidebarSelection: theme.dark ? (theme.sidebarKey ? "#414354" : "#323443")
+                                                             : (theme.sidebarKey ? "#D7D7D8" : "#E7E7E8")
         // drop target pill, white text: Q-finder-09 (47,110,237) is a Display P3 reading, #0070F5 in sRGB
         readonly property color sidebarDrop: "#0070F5"
-        readonly property color sidebarText: theme.dark ? (theme.active ? "#FFFFFF" : "#92939B") : (theme.active ? "#000000" : "#717171")
-        readonly property color sidebarHeader: theme.dark ? Qt.rgba(1, 1, 1, theme.active ? 0.35 : 0.23)
-                                                          : Qt.rgba(0, 0, 0, theme.active ? 0.43 : 0.30)
+        readonly property color sidebarText: theme.dark ? (theme.sidebarKey ? "#FFFFFF" : "#92939B") : (theme.sidebarKey ? "#000000" : "#717171")
+        readonly property color sidebarHeader: theme.dark ? Qt.rgba(1, 1, 1, theme.sidebarKey ? 0.35 : 0.23)
+                                                          : Qt.rgba(0, 0, 0, theme.sidebarKey ? 0.43 : 0.30)
         // Recents, Shared and Favourites: accent; Locations: grey; all grey while inactive. Blue: Q-finder-08 reads
         // (30,152,255) dark / (0,107,239) light in Display P3 = #009BFF / #006DF8 in sRGB
-        readonly property color sidebarIconAccent: !theme.active ? sidebarIconInactive : blueAccent ? (theme.dark ? "#009BFF" : "#006DF8") : accent
-        readonly property color sidebarIconGrey: !theme.active ? sidebarIconInactive : theme.dark ? "#B5B5C3" : "#7B7B80"
+        readonly property color sidebarIconAccent: !theme.sidebarKey ? sidebarIconInactive : blueAccent ? (theme.dark ? "#009BFF" : "#006DF8") : accent
+        readonly property color sidebarIconGrey: !theme.sidebarKey ? sidebarIconInactive : theme.dark ? "#B5B5C3" : "#7B7B80"
         readonly property color sidebarIconInactive: theme.dark ? "#8F909B" : "#7F7F7F"
 
         // toolbar capsules: HyprK ToolbarPlatter (Tokens.toolbar, measured on 27.2.1)
@@ -150,6 +159,17 @@ QtObject {
         // reads .036 over the strip and the capsule alike). Light: none ("Dark only")
         readonly property color toolbarHoverWash: theme.dark ? Qt.rgba(1, 1, 1, 0.034) : "transparent"
         readonly property color searchHover: theme.dark ? Qt.rgba(1, 1, 1, 0.106) : Qt.rgba(0, 0, 0, 0.064)
+        // held Search disc (R11.5 controls/finder-search-button-held-{light,dark}.png): light 255, dark a neutral 58-59
+        // (darker than the hover's 87,88,96); the glyph light 83 (unchanged), dark 255
+        // dark: drawn 52, it reads 58.9 under the strip's hover wash (toolbarHoverWash, on whenever the pointer holds the
+        // button in an active window; drawn 58 it read 65 live)
+        readonly property color searchPress: theme.dark ? "#343434" : "#FFFFFF"
+        readonly property color searchPressIcon: theme.dark ? "#FFFFFF" : Qt.rgba(0, 0, 0, 0.70)
+        // the held disc's edge in light (R11.5 finder-search-button-held-light.png, the 80 px disc on the 253 strip):
+        // top row 243, bottom 240, sides 226 with 234 inside; without it the white disc had no edge at all (ours read
+        // 254 there, search-press.py could not find the disc). Dark: the grey disc on the dark strip needs none
+        readonly property color searchPressRim: theme.dark ? "transparent" : "#F2F2F2"
+        readonly property color searchPressRimSide: theme.dark ? "transparent" : "#E2E2E2"
         // Quick Look panel (live/finder/crops/quicklook-titlebar-light.png, 2x): frame 136 (134-138 top to bottom), discs
         // and button glyphs 6-8, title and "Open with" text 36-41 at the stroke cores. Dark: not measured, so the same
         readonly property color quickLookFrame: "#888888"
@@ -191,7 +211,7 @@ QtObject {
         readonly property color listHeaderLine: theme.dark ? "#424248" : "#E5E5E5"
         readonly property color listHeaderSorted: theme.dark ? "#FFFFFF" : "#4C4C4C"
         readonly property color columnDivider: theme.dark ? "#393939" : "#E5E5E5"       // Q-finder-19
-        readonly property color galleryPlate: theme.dark ? "#57585C" : "#BDBDBD"        // Q-finder-20
+        readonly property color galleryPlate: theme.dark ? "#56565A" : "#BDBDBD"        // R9.3: (86,86,90) / 189
         readonly property color pathBarLine: theme.dark ? "#424349" : "#E1E1E1"         // Q-finder-22
         // drag selection rectangle: not measured
         readonly property color rubberBand: theme.dark ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(0, 0, 0, 0.08)
@@ -298,6 +318,9 @@ QtObject {
         readonly property real rightPad: 7.5     // last capsule to the window edge
         readonly property real titleGap: 11.5    // capsule ends at 244.5, title ink starts at 256
         readonly property int viewsWidth: 161    // view switcher capsule (AX: 4 segments of 40.25)
+        // its lift while held, pt on the width (R6.3: +4.14 / +4.26 px light / dark at 2x; FlexInteraction's decoded
+        // 2.25 for this size, motion.js pressLift, would be +4.5 px)
+        readonly property real viewsLift: 2.1
         readonly property real segmentWidth: 39.6  // drawn: 2 pt in, glyphs 39.6 apart (Toolbar.qml)
         readonly property real segmentInsetX: 2.8  // selected segment 34 x 28 drawn (1076..1144 px in icons-light), r 14 (Q-finder-11)
         readonly property real segmentInsetY: 4.5   // 28 tall in the 37 capsule
@@ -308,6 +331,11 @@ QtObject {
         readonly property int hoverWidth: 30     // 30 on back/forward and Action, 35.5 on view segments
         readonly property int searchWidth: 241   // expanded search capsule (Q-finder-30)
         readonly property int searchDuration: 160    // 0.15..0.17 s, ease-out
+        // held Search disc: 37 -> 40 pt, in the press frame (R11.5 stills: 72-73 -> 78-79 px across; clips: light 72 -> 78,
+        // dark 70 -> 74). After the release it shrinks 1/3, 1/2, 2/3 in the first three frames (light clip, the last
+        // frames before it ends; the settle is not recorded): 150 ms ease-out here gives .30, .53, .70
+        readonly property real searchPressScale: 40 / 37
+        readonly property int searchReleaseMs: 150
     }
 
     // Icon view (Q-finder-12/13/14): 64 pt icons in 112 x 112 cells, grid 10 pt under the toolbar and 10 pt into
@@ -364,19 +392,31 @@ QtObject {
         readonly property int previewImage: 219  // preview 219 x 259
     }
 
-    // Gallery view (Q-finder-20): preview 443 x 357 at content (32, 32), strip of 48 pt thumbnails at pitch 59,
-    // selected plate 54 r 7, info pane about 240 wide on the right in the sidebar material.
+    // Gallery view (MAC-ANSWERS-9 R9.2-R9.4, AX at 1000x700 and 1400x900): the preview frame is the gallery area
+    // inset 32 pt left / right / top; the strip of 48 pt thumbs (pitch 59) sits 5 pt in from the area's left and
+    // bottom edges, left-aligned, 32 pt under the frame; the selected thumb on a flat 54 pt plate, r 7 (R9.3); the
+    // inspector is 240 pt (PreviewPaneGalleryWidth) with a 70 pt quick-action bar at its foot.
     readonly property QtObject gallery: QtObject {
-        readonly property int pad: 32
-        readonly property int thumb: 48
+        readonly property int pad: 32            // preview frame inset (left, right, top) and frame-to-strip gap
+        readonly property int thumb: 48          // GalleryViewSettings iconSize
         readonly property int pitch: 59
-        readonly property int plate: 54
+        readonly property int plate: 54          // thumb outset 3 pt
         readonly property int plateRadius: 7
-        readonly property real stripBottom: 7.5  // strip bottom 7.5 pt above the path bar line
-        readonly property int stageGap: 35       // preview box bottom (84 + 357) to the strip (476)
-        readonly property int paneWidth: 240
+        readonly property int stripInset: 5      // strip section from the area's left and bottom edges
+        readonly property int scrollMargin: 8    // keyboard: the plate stays this far inside the visible strip
+        readonly property int wheelStep: 10      // R11.2: a horizontal (or Shift) wheel notch, one frame
+        readonly property int previewRadius: 6   // the preview's corners (px fit on the 2x stills)
+        readonly property int paneWidth: 240     // PreviewPaneGalleryWidth
         readonly property int paneIcon: 50
-        readonly property int infoPitch: 23      // Created / Modified / Last opened rows
+        readonly property int barHeight: 70      // quick-action bar under the inspector
+        // the inspector's material (MAC-ANSWERS-11 R11.1 / R11.3, shaders/inspector.frag): two blurred copies of
+        // what is behind the column, sigma in pt, each with a gain for luminance (x) and for colour (y); a least
+        // squares fit on gallery-715x715-{first-jpg,flat-red}-*.png, rms 0.9 light / 1.1 dark of 255 over the column, 2.4 / 3.1 on R11.1's table
+        readonly property int paneBlurNear: 10
+        readonly property int paneBlurFar: 80
+        readonly property point paneNearGain: theme.dark ? Qt.point(0.237, 0.277) : Qt.point(0.234, 0.403)
+        readonly property point paneFarGain: theme.dark ? Qt.point(0.175, 0.695) : Qt.point(0.084, 0.672)
+        readonly property int infoPitch: 23      // Information rows
     }
 
     // Path bar (Q-finder-22): 1 pt top line, 28 tall, no fill; 16 pt icons, 11 pt text, items from x 6.

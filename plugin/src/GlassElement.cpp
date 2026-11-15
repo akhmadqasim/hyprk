@@ -83,8 +83,10 @@ namespace lg {
             .shapeCount       = loc("shapeCount"),
             .shapeBox         = loc("shapeBox"),
             .shapeInfo        = loc("shapeInfo"),
+            .shapeOval        = loc("shapeOval"),
             .smoothK          = loc("smoothK"),
             .appearBlur       = loc("appearBlur"),
+            .edgeBlur         = loc("edgeBlur"),
             .roundingPower    = loc("roundingPower"),
             .alpha            = loc("alpha"),
             .ditherAmount     = loc("ditherAmount"),
@@ -118,11 +120,19 @@ namespace lg {
             .keySpread        = loc("keySpread"),
             .highlight        = loc("highlight"),
             .darkSpec         = loc("darkSpec"),
+            .darkTone         = loc("darkTone"),
             .shadowOpacity    = loc("shadowOpacity"),
             .shadowRadius     = loc("shadowRadius"),
             .shadowOffset     = loc("shadowOffset"),
             .shadowTint       = loc("shadowTint"),
             .shadowSaturation = loc("shadowSaturation"),
+            .priorCount       = loc("priorCount"),
+            .priorBox         = loc("priorBox"),
+            .priorInfo        = loc("priorInfo"),
+            .clampFace        = loc("clampFace"),
+            .outerSeen        = loc("outerSeen"),
+            .seenCount        = loc("seenCount"),
+            .keyTop           = loc("keyTop"),
             .ringOpacity      = loc("ringOpacity"),
             .ringOffset       = loc("ringOffset"),
             .ringStroke       = loc("ringStroke"),
@@ -485,12 +495,17 @@ void main() {
         g_readFbo = 0;
     }
 
-    std::vector<SGlassShape> shapesFromRegion(const CRegion& region, double ox, double oy, double* opacity, const Vector2D& size, double cutFill) {
+    std::vector<SGlassShape> shapesFromRegion(const CRegion& region, double ox, double oy, double* opacity, const Vector2D& size, double cutFill, double* shadowSize,
+                                              double* soften) {
         std::vector<SRect> rects;
         for (const auto& r : region.getRects())
             rects.push_back({double(r.x1), double(r.y1), double(r.x2 - r.x1), double(r.y2 - r.y1)});
         if (opacity)
             *opacity = takeOpacityMarker(rects, size.x, size.y);
+        if (shadowSize)
+            *shadowSize = takeShadowSizeMarker(rects, size.x, size.y);
+        if (soften)
+            *soften = takeSoftenMarker(rects, size.x, size.y);
         auto shapes = clusterRegion(rects);
         if (cutFill != 0)
             for (auto& c : cutShapes(rects)) {
@@ -547,7 +562,7 @@ void main() {
 
     double CGlassElement::margin(const SData& data) {
         const auto& r = *data.recipe;
-        return (data.shadow && hasShadow(r) ? 2.0 * r.shadowRadius + std::abs(r.shadowOffsetY) : 0.0) + 2.0;
+        return (data.shadow && hasShadow(r) ? (2.0 * r.shadowRadius + std::abs(r.shadowOffsetY)) * std::max(data.shadowSize, 1.0) : 0.0) + 2.0 + 3.0 * data.soften;
     }
 
     // physical-px box the glass draws into plus what its shader reads
@@ -837,6 +852,9 @@ void main() {
         glUniform1f(u.ringRadius, r.ringRadius * scale);
 
         glUniform1f(u.appearBlur, 10.f * scale); // SwiftUI materialize AppearanceSettings.blurRadius
+        // soften (the alert's Cancel blur, 5 p pt): a Gaussian of sigma soften pt as the linear edge ramp of the same slope at
+        // the edge, sigma x sqrt(2 pi) wide
+        glUniform1f(u.edgeBlur, float(m_data.soften * std::sqrt(2.0 * M_PI)) * scale);
         glUniform1f(u.fillAmount, 0.f);
 
         // the client's texture for this element (icon masks or an SDF shape) on unit 1
@@ -858,6 +876,20 @@ void main() {
         g_pHyprOpenGL->blend(true);
         g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         glBindVertexArray(shader->getUniformLocation(SHADER_SHADER_VAO));
+        glUniform1f(u.clampFace, r.clampBeforeFill ? 1.f : 0.f);
+        glUniform4f(u.outerSeen, r.outerSeesPrior ? 1.f : 0.f, r.priorVeil[0], r.priorVeil[1], r.priorVeil[2]);
+        glUniform1f(u.keyTop, r.keyTop);
+
+        // a group inside another group's box (a card inside the grown Spotlight bar) casts no shadow on it
+        const auto inner = [&](size_t gi) {
+            const auto& lb = m_data.shapes[m_data.groups[gi].lead].box;
+            return std::ranges::any_of(m_data.groups, [&](const SGlassGroup& o) {
+                return &o != &m_data.groups[gi] && o.box.x <= lb.x && o.box.y <= lb.y && o.box.right() >= lb.right() && o.box.bottom() >= lb.bottom();
+            });
+        };
+        // AppKit's window shadow is one shadow of the whole window: a group that casts it (the layer's own black shadow,
+        // not Regular's by the shadow marker) composes with the groups drawn before it (lower index, the order of `quads`)
+        const auto windowShadow = [&](size_t gi) { return r.shadowBlack && m_data.shadow && !inner(gi) && !m_data.shapes[m_data.groups[gi].lead].regularShadow; };
 
         for (size_t q = 0; q < quads.size(); ++q) {
             const auto& [index, quad, damage, geo] = quads[q];
@@ -871,6 +903,7 @@ void main() {
             glUniform2f(u.quadSize, quad.w, quad.h);
             std::array<float, 4 * MAX_GROUP> boxes{};
             std::array<float, 2 * MAX_GROUP> info{};
+            std::array<float, MAX_GROUP>     oval{};
             // the member whose bottom edge carries a tail (one per group) and the tip's x in quad px
             float tailMember = -1.f, tailX = 0.f;
             for (size_t k = 0; k < g.members.size(); ++k) {
@@ -879,6 +912,10 @@ void main() {
                     tailMember = float(k);
                     tailX      = float((s.box.x + tailTip(s.tail, s.box.w)) * scale - quad.x);
                 }
+                // the key/fill highlight's normal bends toward the shape's centre on a rounded rect over 64 pt
+                // (MAC-ANSWERS-8.md R8.1: in QuartzCore's supercircle SDF only); the pointer square and the tail's
+                // outline (a path on the Mac) keep the plain SDF normal, as the Dock and Control Center recipes do
+                oval[k] = !r.ovalize || s.pointer || float(k) == tailMember ? 0.f : gradientOvalization(s.box.w, s.box.h);
                 boxes[4 * k]     = (s.box.x + s.box.w / 2) * scale - quad.x;
                 boxes[4 * k + 1] = (s.box.y + s.box.h / 2) * scale - quad.y;
                 // a pointer: half its square's side, and a negative radius tells the shader to turn it by 45 deg
@@ -898,6 +935,7 @@ void main() {
             glUniform1i(u.shapeCount, m_data.auxKind == eAux::SDF ? 0 : int(g.members.size()));
             glUniform4fv(u.shapeBox, GLsizei(g.members.size()), boxes.data());
             glUniform2fv(u.shapeInfo, GLsizei(g.members.size()), info.data());
+            glUniform1fv(u.shapeOval, GLsizei(g.members.size()), oval.data());
             glUniform2f(u.tail, tailMember, tailX);
             // Apple's blur (C3 2): R = 1.6 x radius x backdrop texels per pt, level log2(1 / scale) + lod(R)
             glUniform1f(u.blurRadius, res.blurRadius);
@@ -935,19 +973,60 @@ void main() {
             glUniform2f(u.keySpread, std::cos(keyRad), std::cos(0.65f * keyRad)); // diffuse: 0.65 x the spread
             glUniform3f(u.highlight, p.highlight * res.keyScale, res.keyAmount, res.diffuseAmount);
             glUniform2f(u.darkSpec, res.darkBias, std::cos(res.darkSpread * float(M_PI / 180.0)));
-            // a group inside another group's box (a card inside the grown Spotlight bar) casts no shadow on it
-            const auto& lb    = m_data.shapes[g.lead].box;
-            const bool  inner = std::ranges::any_of(m_data.groups, [&](const SGlassGroup& o) {
-                return &o != &g && o.box.x <= lb.x && o.box.y <= lb.y && o.box.right() >= lb.right() && o.box.bottom() >= lb.bottom();
-            });
+            glUniform3f(u.darkTone, res.darkToneCap, res.darkToneKnee, 0.f);
             // the filter's shadow (SRecipe::shadowFill): alpha mix(fill, 1, v) x ShadowOpacity, colour v x (1 - fill) x the
             // blurred backdrop (premultiplied); AppKit's black window shadow (shadowBlack) at full opacity
             const float vib    = r.shadowBlack ? 0.f : res.shadowVibrancy;
             const float shAlpha = r.shadowBlack ? 1.f : res.shadowFill + (1.f - res.shadowFill) * vib;
-            glUniform1f(u.shadowOpacity, m_data.shadow && !inner ? res.shadowOpacity * shAlpha * p.shadowScale : 0.f);
+            glUniform1f(u.shadowOpacity, m_data.shadow && !inner(index) ? res.shadowOpacity * shAlpha * p.shadowScale : 0.f);
+            // the window shadow's earlier groups (shader `prior*`): their shapes in this quad's px, corner radius,
+            // materialize and group, so the shader adds their masks to this one's and leaves their glass alone. Spotlight's
+            // bar and list (10 pt apart, spacing 8: two groups) each drew a shadow over the other's, so the gap between
+            // them read (1 - 0.7 m_bar)(1 - 0.7 m_list) instead of the Mac's 1 - 0.7 min(1, m_bar + m_list): 104 -> 120 over
+            // white for the Mac's 95 -> 104 (SPOTLIGHT-27.2.1.md "Judge #20"). 0 for every other recipe
+            std::array<float, 4 * MAX_GROUP> priorBox{};
+            std::array<float, 3 * MAX_GROUP> priorInfo{};
+            int                              priors = 0;
+            // then (outerSeesPrior, shader `seenCount`) the groups drawn after it too: the window's other glass as this
+            // group's outer refraction sample sees it
+            int earlier = 0;
+            if (windowShadow(index))
+                for (size_t jj = 0; jj < (r.outerSeesPrior ? m_data.groups.size() : index); ++jj) {
+                    // earlier groups first (the shadow's), then the later ones
+                    const size_t j = jj < index ? jj : m_data.groups.size() - 1 - (jj - index);
+                    if (j == index || !windowShadow(j))
+                        continue;
+                    // seen: only glass that lies above this group (the list sees the bar; the bar's rows are the same
+                    // with and without the list under it: r17 spotlight-idle-* against -modelist-*)
+                    if (j > index && m_data.groups[j].box.bottom() > g.box.y)
+                        continue;
+                    for (const size_t si : m_data.groups[j].members) {
+                        const auto& s = m_data.shapes[si];
+                        if (s.pointer || s.tail >= 0 || priors >= int(MAX_GROUP))
+                            continue;
+                        priorBox[4 * priors]     = (s.box.x + s.box.w / 2) * scale - quad.x;
+                        priorBox[4 * priors + 1] = (s.box.y + s.box.h / 2) * scale - quad.y;
+                        priorBox[4 * priors + 2] = s.box.w * scale / 2;
+                        priorBox[4 * priors + 3] = s.box.h * scale / 2;
+                        priorInfo[3 * priors]     = s.radius * scale;
+                        priorInfo[3 * priors + 1] = s.materialize;
+                        priorInfo[3 * priors + 2] = float(j);
+                        ++priors;
+                        if (j < index)
+                            ++earlier;
+                    }
+                }
+            glUniform1i(u.priorCount, earlier);
+            glUniform1i(u.seenCount, r.outerSeesPrior ? priors : 0);
+            if (priors > 0) {
+                glUniform4fv(u.priorBox, priors, priorBox.data());
+                glUniform3fv(u.priorInfo, priors, priorInfo.data());
+            }
             glUniform1f(u.shadowTint, vib * (1.f - res.shadowFill) / std::max(shAlpha, 1e-6f));
-            glUniform1f(u.shadowRadius, res.shadowRadius * scale);
-            glUniform2f(u.shadowOffset, 0.f, res.shadowOffsetY * scale);
+            // the whole window scales on the Mac, its shadow with it (shadowSize: the alert's PopIn / ScaleDownAndOut)
+            const float shSize = float(m_data.shadowSize);
+            glUniform1f(u.shadowRadius, res.shadowRadius * shSize * scale);
+            glUniform2f(u.shadowOffset, 0.f, res.shadowOffsetY * shSize * scale);
 
             damage.forEachRect([&ctx](const auto& rect) {
                 g_pHyprOpenGL->scissor(ctx, &rect, ctx.m_data.transformDamage);
@@ -1020,6 +1099,7 @@ void main() {
         glUniform1f(u.ringRadius, 1.f);
         glUniform1f(u.smoothK, 0.f);
         glUniform1f(u.appearBlur, 0.f);
+        glUniform1f(u.edgeBlur, 0.f);
         glUniform1f(u.fillAmount, 0.f);
         glUniform4f(u.maskRect, 0.f, 0.f, 0.f, 0.f);
         glUniform4f(u.sdfRect, 0.f, 0.f, 0.f, 0.f);
@@ -1036,6 +1116,7 @@ void main() {
         glUniform2f(u.tail, -1.f, 0.f); // no tail on these
         glUniform4fv(u.shapeBox, 1, box);
         glUniform2fv(u.shapeInfo, 1, info);
+        glUniform1f(u.shapeOval, 0.f);
         glUniform1f(u.blurRadius, float(m_data.panel));
         glUniform1f(u.blurK, blurK);
         glUniform1f(u.baseLevel, 0.f);
@@ -1063,9 +1144,15 @@ void main() {
         glUniform2f(u.keySpread, 1.f, 1.f);
         glUniform3f(u.highlight, 0.f, 0.f, 0.f);
         glUniform2f(u.darkSpec, 0.f, 1.f);
+        glUniform3f(u.darkTone, 0.f, 4.f, 0.f);
         glUniform1f(u.shadowOpacity, 0.f);
         glUniform1f(u.shadowRadius, 1.f);
         glUniform2f(u.shadowOffset, 0.f, 0.f);
+        glUniform1i(u.priorCount, 0);
+        glUniform1i(u.seenCount, 0);
+        glUniform1f(u.clampFace, 0.f);
+        glUniform4f(u.outerSeen, 0.f, 0.f, 0.f, 0.f);
+        glUniform1f(u.keyTop, 1.f);
 
         g_pHyprOpenGL->blend(true);
         g_pHyprOpenGL->blendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -1100,6 +1187,7 @@ void main() {
         glUniform4f(u.sdfRect, 0.f, 0.f, 0.f, 0.f);
         glUniform1f(u.smoothK, 0.f);
         glUniform1f(u.appearBlur, 10.f * scale);
+        glUniform1f(u.edgeBlur, 0.f);
         glUniform1i(u.shapeCount, 1);
         glUniform2f(u.tail, -1.f, 0.f); // no tail on these
         glBindVertexArray(shader->getUniformLocation(SHADER_SHADER_VAO));

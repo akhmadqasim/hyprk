@@ -7,6 +7,8 @@ import "../HyprK/chameleon.js" as Ch
 Item {
     width: 100; height: 100
     WallpaperTint { id: wt }
+    // the part under a 740 x 625 window centred on a 1280 x 832 screen (Settings, OPEN-FIXES 12)
+    WallpaperTint { id: wr; screenSize: Qt.size(1280, 832); windowSize: Qt.size(740, 625) }
     TestCase {
         name: "Chameleon"
         when: windowShown
@@ -38,6 +40,18 @@ Item {
             tryVerify(() => wt.tint !== null, 5000);
             verify(wt.tint.b > wt.tint.r);   // a blue wallpaper averages blue
             compare(Math.round(wt.tint.b * 63), wt.tint.b * 63);   // 6-bit steps
+        }
+        function test_meanUnderWindow() {
+            wt.path = Qt.resolvedUrl("../../themes/wallpapers/png/Mac Blue.png");
+            wr.path = wt.path;   // the same 64 px copy from the pixmap cache
+            tryVerify(() => wr.tint !== null && wt.tint !== null, 5000);
+            // the exact 6-bit means (PIL, area-averaged): whole (30,39,58), centre (29,34,57); the centre is less green
+            const s = [wr.tint.r, wr.tint.g, wr.tint.b].map(v => Math.round(v * 63));
+            [29, 34, 57].forEach((e, i) => verify(Math.abs(s[i] - e) <= 1, "channel " + i + ": " + s[i] + " for " + e));
+            verify(Math.round(wt.tint.g * 63) - s[1] >= 4);
+            // a new screen size gives a new mean from the decoded copy
+            wr.screenSize = Qt.size(740, 625);
+            tryVerify(() => Math.round(wr.tint.g * 63) >= 38, 2000);   // the window covers the screen: about the whole
         }
     }
 }

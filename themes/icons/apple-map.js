@@ -461,8 +461,14 @@ function file(mac, px) {
 // The Dock's Trash follows the style as Dock.app picks its bitmaps (27.2.1, function 0x1000090ac): the full Trash
 // has a Clear and a Tinted bitmap per mode; Dark, and the empty Trash in every style, are the plain light or dark
 // one ("system/DockTrashFull-256-clear-dark.png", "system/DockTrash-256-dark-dark.png").
+// Folders, documents and the other system icons have one rendition (MAC-ANSWERS-9 R9.5: IconServices and the real
+// Finder give the same pixels in every style and mode). CoreTypes' Trash is the exception: NSWorkspace draws a dark
+// grey bin under darkAqua and the plain one under aqua, also on an account set to RegularDark, so it follows the
+// mode, not the icon style ("system/TrashIcon-512-dark.png", icons-r9/nsworkspace-darkaqua).
+const modeArt = { "@TrashIcon": true, "@FullTrashIcon": true };
 const styledModes = { dark: ["dark"], clear: ["light", "dark"], tinted: ["light", "dark"] };
 function styled(mac, style, variant, dark) {
+    if (modeArt[mac]) return dark ? "system/" + mac.slice(1) + "-512-dark.png" : file(mac);
     const modes = styledModes[style];
     if (!mac || (mac[0] === "@" && !dockArt[mac]) || !modes) return file(mac);
     const auto = !variant || variant === "auto";

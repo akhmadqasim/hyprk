@@ -67,18 +67,31 @@ Item {
         color: Qt.rgba(off.r + (on.r - off.r) * sw._on, off.g + (on.g - off.g) * sw._on, off.b + (on.b - off.b) * sw._on,
                        (off.a + (on.a - off.a) * sw._on) * (sw.enabled ? 1 : Tokens.control.disabledOpacity))
         FocusRing { visible: sw.activeFocus }
+        // held: the press layer over the track, as the slider's fill (Tokens.control.sliderPressOverlay); the lens sees
+        // it. switch-held-stripes-light.png: the held track 246 -> 225 blue outside the lens (x0.915), dark 124 -> 138
+        // green (white about .11); the unheld switch above keeps the plain colour (GLASS-HIG.md round 7)
+        Rectangle {
+            visible: sw._lift > 0
+            anchors.fill: parent; radius: parent.radius
+            color: Qt.alpha(Tokens.control.sliderPressOverlay, Tokens.control.sliderPressOverlay.a * Math.max(0, Math.min(1, sw._lift)))
+        }
     }
     Knob {
         restW: sw._m.knobWidth; restH: sw._m.knobHeight
         grow: Tokens.motion.switchLift
         lift: sw._lift
+        pressed: sw._held   // the lens is elastic while held (Knob; switch knob sub_195e36f74)
         lensSource: track
-        lensHaze: Tokens.control.switchLensHaze
-        lensRingOpacity: Tokens.control.switchLensRingOpacity
+        // the decoded stack with the switch's own dump values in both modes (switch-knob-held.json: face black 0, ring
+        // shadow 0.1, the dark specular rim): GLASS-HIG.md round 7, switch-held-stripes-{light,dark}.png
+        lensDecoded: true
+        lensFillInside: true
+        lensDecodedHaze: Tokens.control.switchLensHaze
+        lensDecodedRing: Tokens.control.switchLensRingOpacity
         lensRimBias: Tokens.control.switchLensRimBias
         lensRimSpread: Tokens.control.switchLensRimSpread
-        lensShadow: Tokens.control.switchLensShadow
         lensOutlineWidth: Tokens.control.switchLensOutlineWidth
+        lensRimStroke: true   // the dump's KeyFillHighlight height 1, offset -1: the stroke mode (LensGlass rimStroke)
         restShadowHeld: Tokens.control.switchRestShadowHeld
         reduceMotion: sw.reduceMotion
         cx: G.switchKnobX(sw._m, along.value) + sw._m.knobWidth / 2

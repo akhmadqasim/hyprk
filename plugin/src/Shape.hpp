@@ -92,6 +92,12 @@ namespace lg {
     // for shapes at least FRACTION_MIN_H tall. The box then takes the true edges.
     inline constexpr int FRACTION_ROW_X = 4, FRACTION_ROW_Y = 5, FRACTION_MIN_H = 12, FRACTION_MAX_LEVELS = 17;
     int fractionLevels(double w);
+    // the edge offset of code i of n levels. Odd n: i / (n - 1) - 0.5. Even n has no code for 0 (the shell rounds 0 to
+    // n / 2, which i / (n - 1) - 0.5 read as +0.5 / (n - 1): every resting glass with an even n sat 1 / (2 (n - 1)) pt right
+    // and down, the 260 pt alert 1 / 30 pt, its dark side line 58 instead of 53, GLASS-HIG.md round 9), so codes n / 2 - 1
+    // and n / 2 both read 0 and the rest step by 1 / (n - 2) to +-0.5: exact at rest and at the ends, inside the shell's
+    // rounding bin everywhere
+    double fractionEdge(int i, int n);
     std::vector<SGlassShape> clusterRegion(const std::vector<SRect>& rects);
 
     // Cuts (`cut_fills`): the holes of 2 px or more across in a region's bands (a region subtracted from a glass shape,
@@ -118,6 +124,15 @@ namespace lg {
     // edge of the surface, opacity = x / (surfaceW - 1). It lets the shell fade the compositor glass with
     // its content, in the same commit. Removes the marker from rects; returns 1 when there is none.
     double takeOpacityMarker(std::vector<SRect>& rects, double surfaceW, double surfaceH);
+
+    // Whole-window markers (hyprk ShellWindow.glassShadowSize / glassSoften) for a surface whose content scales and blurs as
+    // one window, as an AppKit window animation does (the alert's PopIn and Cancel ScaleDownAndOut, MOTION-AUDIT.md "Alert,
+    // Round R3.1"). Shadow size: a 1x1 rect in the TOP row, size = SHADOW_SIZE_MAX x / (surfaceW - 1): the glass's drop
+    // shadow radius and offset scale by it. Soften: a 1x1 rect in the LEFT column below the top row, blur = SOFTEN_MAX_PT
+    // y / (surfaceH - 1) pt: the glass's edge takes that Gaussian blur. Both removed from rects; 1 / 0 without one.
+    inline constexpr double SHADOW_SIZE_MAX = 2, SOFTEN_MAX_PT = 16;
+    double takeShadowSizeMarker(std::vector<SRect>& rects, double surfaceW, double surfaceH);
+    double takeSoftenMarker(std::vector<SRect>& rects, double surfaceW, double surfaceH);
 
     // Corner radius from a region's top left staircase: `stair` rows until it reaches the left edge and the `cells` it
     // leaves out above that row. A Quickshell (Qt ellipse) corner of a whole radius is recognised exactly; anything

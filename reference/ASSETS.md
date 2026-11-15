@@ -28,10 +28,10 @@ From OS `/System/Library/Fonts` (copied unchanged to `themes/fonts/`):
 - `NewYork.ttf`, `NewYorkItalic.ttf` = New York.
 - Also copied: SFCamera, SFArabic*, SFArmenian*, SFGeorgian*, SFHebrew*, SFIndia (script-specific SF fonts).
 - `themes/fonts/named/` copies with the name table rewritten (family "SF Pro", "SF Mono", "SF Pro Rounded", "SF Compact", "SF Compact Rounded", "New York") because the originals are named "System Font" / ".SF NS", which fontconfig and apps hide. File names: `SF-Pro.ttf`, `SF-Mono.ttf`, etc. Glyph data unchanged.
-- `themes/fonts/named/AppleColorEmoji.ttf` (82.1 MB, sha256 `c3c590a164f5318e28b2ebb48b2584e30eb5165bf7c0b5b3a117a6e8883d9fa8`) = Apple Color Emoji, rebuilt as CBDT/CBLC (the Noto Color Emoji format). NOT from the IPSW: made from the user's Mac copy (macOS 27.2.1, `Apple Color Emoji.ttc`, 192,120,460 bytes, sha256 `12bc8221a908c5bcf05f0fce940d3c3f6e9d09d8d806ffe31a969b4ac9be8f9e`), which is kept outside git at `/mnt/code/hyprk-assets/fonts/Apple Color Emoji.ttc` (sbix + AAT `morx`, over the GitHub 100 MB limit, no LFS).
+- `themes/fonts/named/AppleColorEmoji.ttf` (64.8 MB, sha256 `2ea5fd5b807ec861640217c80320176b597745cedb2f6cf282682f9cdd25759c`) = Apple Color Emoji, rebuilt as CBDT/CBLC (the Noto Color Emoji format). NOT from the IPSW: made from the user's Mac copy (macOS 27.2.1, `Apple Color Emoji.ttc`, 192,120,460 bytes, sha256 `12bc8221a908c5bcf05f0fce940d3c3f6e9d09d8d806ffe31a969b4ac9be8f9e`), which is kept outside git at `/mnt/code/hyprk-assets/fonts/Apple Color Emoji.ttc` (sbix + AAT `morx`, over the GitHub 100 MB limit, no LFS).
   Rebuild: `python3 -I themes/fonts/tools/build-apple-color-emoji.py "/mnt/code/hyprk-assets/fonts/Apple Color Emoji.ttc" emoji-test.txt` with Unicode's `https://www.unicode.org/Public/17.0.0/emoji/emoji-test.txt` (sha256 `1d8a944f...acda`, 5,225 sequences); same inputs give the same bytes. Needs fontTools, Pillow and HarfBuzz via PyGObject (`gir1.2-harfbuzz-0.0`).
-  What the script does: strikes 20, 26, 32, 40, 52, 96 ppem with Apple's PNG bytes unchanged (48, 64, 160 dropped for size); ~540 bitmaps Apple left out of some small strikes are downscaled from the next larger strike, and the 108 `flip` glyphs (people facing right) are mirrored, because FreeType draws neither (with the sbix font they were blank). Sequences: HarfBuzz shapes every emoji-test sequence with the original `morx`, the result becomes GSUB `ccmp` (3,618 ligatures, FE0F optional as in Noto; 396 mixed skin tone pairs that Apple draws as two overlapping halves get a placeholder glyph split into the two halves, which the original GDEF/GPOS positions). The script then shapes all 5,225 sequences again on the new font and stops unless glyphs and positions match morx exactly (they do). Only face 0 ("Apple Color Emoji") is kept, with the vertical metrics of the second face ".Apple Color Emoji UI" (773/-169 per 800, the same proportions as SF Pro), so a line with emoji is as tall as an SF Pro line. glyf/loca/sbix/morx/feat/trak/bgcl are dropped.
-  Why CBDT: Qt 6.10.2 with FreeType 2.14.2 gets the metrics of the sbix font wrong (13 px "Hello 😀" gave a 342 px line, baseline 260 px down; dropping glyf, hhea or strike changes did not help). With CBDT, Qt Quick (distance field and NativeRendering, DPR 1 and 2) and pango give the same line height and baseline as text without emoji. Qt sizes a colour strike by pixelSize / (CBLC ascender - descender), so each strike's line is ppem + 1 px: exactly ppem would make Qt skip the DPR scaling at pixel sizes equal to a strike (20, 26, 32, 40, 52, 96 px drew half-size emoji at DPR 2). Left over: at exactly 97 px with a DPR other than 1 the emoji are still drawn half size, and in Qt the art is 1-5% under 1 em.
+  What the script does: strikes 40, 52, 96 ppem with Apple's PNG bytes unchanged (20, 26, 32 dropped since 2026-11-14: Qt picked the 20 px strike for 13 px text and upscaled it at 2x; 48, 64, 160 dropped for size); ~650 bitmaps Apple left out of some small strikes are downscaled from the next larger strike, and the 108 `flip` glyphs (people facing right) are mirrored, because FreeType draws neither (with the sbix font they were blank). Sequences: HarfBuzz shapes every emoji-test sequence with the original `morx`, the result becomes GSUB `ccmp` (3,618 ligatures, FE0F optional as in Noto; 396 mixed skin tone pairs that Apple draws as two overlapping halves get a placeholder glyph split into the two halves, which the original GDEF/GPOS positions). The script then shapes all 5,225 sequences again on the new font and stops unless glyphs and positions match morx exactly (they do). Only face 0 ("Apple Color Emoji") is kept, with the vertical metrics of the second face ".Apple Color Emoji UI" (773/-169 per 800, the same proportions as SF Pro), so a line with emoji is as tall as an SF Pro line. glyf/loca/sbix/morx/feat/trak/bgcl are dropped.
+  Why CBDT: Qt 6.10.2 with FreeType 2.14.2 gets the metrics of the sbix font wrong (13 px "Hello 😀" gave a 342 px line, baseline 260 px down; dropping glyf, hhea or strike changes did not help). With CBDT, Qt Quick (distance field and NativeRendering, DPR 1 and 2) and pango give the same line height and baseline as text without emoji. Qt sizes a colour strike by pixelSize / (CBLC ascender - descender), so each strike's line is ppem + 1 px: exactly ppem would make Qt skip the DPR scaling at pixel sizes equal to a strike (20, 26, 32, 40, 52, 96 px drew half-size emoji at DPR 2). Since 2026-11-14 (R5.3, `reference/re/27.2.1/EMOJI-TEXT.md`) each strike's line is ppem / 1.3 instead (31, 40, 74 px), so Qt draws the emoji 1.3 x the text size as CoreText does in UI text; the bitmaps are centred on the cap height (0.36 x the text size above the baseline) and carry the UI face's `trak` + 1 px as advance (half before the art). The half-size case is now at exactly 31, 40 and 74 px. pango/HarfBuzz keep the hmtx advance (1 em). Same rebuild command; the output is 64.8 MB.
   It lives in `named/` (not the top dir) because `dist/lib/env.sh`, `themes/*/install.sh` and `hypr-env.sh` only scan `named/`; `config/fontconfig/fonts.conf` scans both. `config/fontconfig/emoji.conf` puts it ahead of Noto Color Emoji.
 - Not done: static instances (Display/Text/Bold...). Use fontTools `instancer` if an app can't use variable fonts. Fonts are Apple licensed, for local use only.
 
@@ -515,6 +515,11 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
   (rule and what is not Apple's in its header). Its glass layer (`s-trashempty-sdf.png`, 384 px, zero / one value
   distance -128 / 128, padding 152, glass background style 2) is not built. Dock.app has no per-style art for folders
   or stacks (only `s-pileArrow*`), so the Downloads stack stays as it is.
+- CoreTypes' Trash in dark mode (2026-11-15): `system/TrashIcon-512-dark.png` and `system/FullTrashIcon-512-dark.png`
+  are the Mac's NSWorkspace renders under darkAqua (`re/27.2.1/live/icons-r9/nsworkspace-darkaqua/trash-{empty,full}-512.png`,
+  MAC-ANSWERS-9 R9.5) copied as they are; the aqua renders are byte-identical to the existing light files. They follow
+  the mode, not the icon style (`apple-map.js` `styled()`). R9.5 also confirms that folders, special folders, the tagged
+  folder, documents and aliases have one rendition in every style and mode, so no other system icon has a dark file.
 - App icon sizes: `apps/<Name>-256.png` (Lanczos from the 1024 / 512, `tools/build-apps.py`) joins 128 and 512 so
   `ui/HyprK/AppIconTile.qml` can load the smallest file at or above the drawn size; its shader
   (`ui/HyprK/shaders/iconart.frag`) resamples in one Lanczos-3 pass on the device pixel grid.
@@ -528,15 +533,36 @@ decodes raw, gzip and lzfse/KCBC bitmaps; needs python3-pil, numpy and liblzfse)
 
 ## settings/assets/ and shell/assets/
 
-- `settings/assets/glass-preview/{apple-park,architecture,pond,rainbow}.jpg`: the four photos of the Appearance pane's
-  Liquid Glass preview, from `AppearancePreferencesFramework.framework` 27.2.1 `Assets.car` (GlassStylePreviewView),
-  804 px wide JPEGs, Display P3 converted to sRGB (commit 6bb37d8).
+- `settings/assets/icon-style/*.png` (20 files, 144 px = 36 pt at 4x, 184 KB): the tiles of Settings > Appearance >
+  "Icon & widget style" = the Weather app's icon per style, as Appearance.appex draws them (`ISIcon(bundleIdentifier:
+  "com.apple.weather")`). `default.png` is Apple's bitmap (`themes/icons/apps/Weather-1024.png` scaled); `dark.png`,
+  `clear-{light,dark}.png` and `tinted-<accent>-{light,dark}.png` (blue, purple, pink, red, orange, yellow, green,
+  graphite; tint = that accent's colour in `ui/HyprK/Accent.qml`) are the mitigated renditions composed by
+  `themes/icons/tools/build-style-tiles.py <os-volume-root>` (icr.py, from Weather.app's `Assets.car` layers on the
+  27.2.1 OS volume `141-12228-174.dmg`, apfs-fuse read-only). Against `iconstyle-*-light.png`: rms 10-16 levels at 72 px.
+  R11.6 (`icon-style-tiles-{default,dark}-selected-dark.png`; the stills are Display P3, compared as sRGB, body 54 px):
+  default 11.7 (Apple's own bitmap, so about the floor of this comparison), dark 5.6, clear-light 10.6, clear-dark 11.3,
+  tinted-blue-dark 4.7, tinted-blue-light 17.4 -> **12.1** after a fitted per-channel map (the Mac's plate is the
+  accent itself, (0,125,255); the decoded mix gave (12,120,237)); the map is the last step of the build script. The
+  other accents' light tiles were not captured in this round and are unchanged.
+- `settings/assets/glass-preview/{apple-park,architecture,pond}.jpg` and `rainbow.png`: the four photos of the
+  Appearance pane's Liquid Glass preview, from `AppearancePreferencesFramework.framework` 27.2.1 `Assets.car`
+  (GlassStylePreviewView; 1x renditions: `apple-park.heic` 1620x1080, `architecture.heic` 1616x1080, `pond.heic`
+  1620x1080, all HEIF with a Display P3 profile, and `rainbow.png` 1614x1803, deepmap2, colour space id 1 = sRGB, with
+  a transparent 1-3 px rim). Since 2026-11-14 at the Mac's 2x size: 536x357 (hero, 268 pt) and 472 px wide (236 pt),
+  HEIF via heif-convert, P3 -> sRGB, Lanczos, JPEG q95 4:2:0; the rainbow decoded with `themes/icons/tools/dmp2.py`
+  and kept as PNG for its alpha rim. Chain and checks in `reference/re/27.2.1/APPEARANCE-PREVIEW-REA.md`
+  (before: 804 px wide JPEGs, commit 6bb37d8).
 - `settings/controls/sfpaths.js`: SF Symbols outlines used by Settings only, decoded from SF Pro: the preview's
   `square.and.arrow.up`, `ellipsis`, `square.on.square`, `magnifyingglass`, `capsule.on.rectangle.liquid.glass`,
   `capsule.on.rectangle.fill`, and `chevron.backward` / `chevron.forward` of the toolbar (commit 7ee8a39). Not registered in the theme's
   symbol set under `themes/icons/`: that folder was being rebuilt when this was written.
 - `shell/assets/sRGB.icc`: not Apple's. LittleCMS's built-in sRGB profile (588 bytes, written with PIL
   `ImageCms.createProfile("sRGB")`), used by `shell/scripts/wallpaper.sh` to convert profiled wallpapers to sRGB.
+- `settings/assets/accessibility/color-filters.png` (700x260, the card colour keyed out) and `captions-preview.jpg`
+  (936x200): not extracted assets. Cut at 2x from the Mac stills `re/27.2.1/live/settings-r12/acc-display-03-light.png`
+  (px 622,591) and `acc-subtitles-and-captioning-00-light.png` (px 504,128) for Accessibility > Display > Color Filters
+  and Subtitles and Captioning; the preview has the first style's caption baked in.
 
 ## What failed or was skipped (summary)
 

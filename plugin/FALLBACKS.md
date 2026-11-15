@@ -25,3 +25,8 @@ are applied as-is, which is why some recipes are tuned (README).
 
 Title-bar light press (LightPress.cpp, the FlexInteraction windowControl lift and stretch): with `reduce_motion` the
 light takes the lifted size at once, without the spring (the Mac's Reduce Motion path for it was not found).
+
+Client traffic lights (ClientLights.cpp): if `CInputManager::processMouseDownNormal` is not found or cannot be hooked,
+one log line, and a press on a client's own lights in an inactive window activates and raises it as in plain Hyprland.
+A client that never sends `liquidglass lights` (or a reloaded plugin until the client sends it again, which Finder and
+Settings do whenever their window turns inactive) gets the same plain behaviour.

@@ -15,17 +15,22 @@
 
 #include <QCommandLineParser>
 #include <QDir>
+#include <QEventLoop>
 #include <QFontDatabase>
 #include <QGuiApplication>
 #include <QIcon>
 #include <QQmlPropertyMap>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QPointingDevice>
 #include <QQuickImageProvider>
+#include <QQuickItem>
 #include <QQuickWindow>
 #include <QStandardPaths>
 #include <QStyleHints>
 #include <QTimer>
+#include <QWheelEvent>
+#include <cstdio>
 
 namespace {
 
@@ -66,6 +71,101 @@ void loadFonts()
     QGuiApplication::setFont(font);
 }
 
+// --wheel-test (finder/tests/run.mjs): one mouse-wheel notch, built as the Wayland QPA builds it (no scroll phase,
+// angle delta only), over the middle of every scroll view on screen that has more content than room. Each must move
+// vertically. The gallery strip is the Mac's (MAC-ANSWERS-11 R11.2): over the strip and over the preview a vertical
+// notch leaves it where it is, a horizontal notch and Shift + a vertical one move it 10 pt, at once (read back with
+// no event loop turn in between, so nothing animates). Prints one line per check; the exit code is 0 when all passed
+// and there was at least one, else 3.
+void collectFlickables(QQuickItem *item, QList<QQuickItem *> &out)
+{
+    if (!item->isVisible())
+        return;
+    if (item->inherits("QQuickFlickable"))
+        out.append(item);
+    for (QQuickItem *c : item->childItems())
+        collectFlickables(c, out);
+}
+
+void sendWheel(QQuickWindow *win, const QPointF &p, const QPoint &angle, Qt::KeyboardModifiers mods, ulong ts)
+{
+    QWheelEvent ev(p, win->mapToGlobal(p.toPoint()), QPoint(), angle, Qt::NoButton, mods, Qt::NoScrollPhase,
+                   false, Qt::MouseEventNotSynthesized, QPointingDevice::primaryPointingDevice());
+    ev.setTimestamp(ts);
+    QCoreApplication::sendEvent(win, &ev);
+}
+
+void spin(int ms)
+{
+    QEventLoop loop;
+    QTimer::singleShot(ms, &loop, &QEventLoop::quit);
+    loop.exec();
+}
+
+int wheelTest(QQuickWindow *win)
+{
+    QList<QQuickItem *> views;
+    collectFlickables(win->contentItem(), views);
+    int tested = 0, failed = 0;
+    ulong ts = 1000;
+    for (QQuickItem *f : std::as_const(views)) {
+        const bool vertical = f->property("contentHeight").toReal() + f->property("topMargin").toReal() + f->property("bottomMargin").toReal() > f->height() + 1;
+        const bool horizontal = f->property("contentWidth").toReal() + f->property("leftMargin").toReal() + f->property("rightMargin").toReal() > f->width() + 1;
+        const bool strip = f->objectName() == QLatin1String("galleryStrip");
+        if (f->width() < 2 || f->height() < 2 || !(vertical || (horizontal && strip)))
+            continue;
+        if (strip) {
+            // its left part (the inspector covers the middle), and the preview 200 pt above it
+            const struct { const char *where; QPointF at; } places[] = {
+                {"strip", f->mapToScene(QPointF(40, f->height() / 2))},
+                {"preview", f->mapToScene(QPointF(40, -200))},
+            };
+            const struct { const char *what; QPoint angle; Qt::KeyboardModifiers mods; qreal move; } notches[] = {
+                {"vertical", QPoint(0, -120), Qt::NoModifier, 0},
+                {"vertical-up", QPoint(0, 120), Qt::NoModifier, 0},
+                {"horizontal", QPoint(-120, 0), Qt::NoModifier, 10},
+                {"horizontal-back", QPoint(120, 0), Qt::NoModifier, -10},
+                {"shift-vertical", QPoint(0, -120), Qt::ShiftModifier, 10},
+                {"shift-vertical-back", QPoint(0, 120), Qt::ShiftModifier, -10},
+            };
+            for (const auto &place : places) {
+                for (const auto &n : notches) {
+                    const qreal before = f->property("contentX").toReal();
+                    sendWheel(win, place.at, n.angle, n.mods, ts += 100);
+                    const qreal now = f->property("contentX").toReal();     // the same frame
+                    spin(300);
+                    const qreal after = f->property("contentX").toReal();   // and nothing follows
+                    const bool ok = qAbs(now - before - n.move) < 0.01 && qAbs(after - now) < 0.01;
+                    ++tested;
+                    failed += !ok;
+                    std::printf("wheel %s galleryStrip %s %s contentX %.1f -> %.1f -> %.1f\n", ok ? "ok" : "FAIL", place.where, n.what, before, now, after);
+                }
+            }
+            continue;
+        }
+        const char *prop = "contentY";
+        const qreal before = f->property(prop).toReal();
+        const QPointF p = f->mapToScene(QPointF(f->width() / 2, f->height() / 2));
+        // not a view scrolled out of sight (a column left of the column strip's visible part)
+        bool onScreen = true;
+        for (QQuickItem *a = f->parentItem(); a && onScreen; a = a->parentItem())
+            onScreen = !(a->clip() || a->inherits("QQuickFlickable")) || a->contains(a->mapFromScene(p));
+        if (!onScreen)
+            continue;
+        sendWheel(win, p, QPoint(0, -120), Qt::NoModifier, ts += 100);
+        spin(500);
+        const qreal after = f->property(prop).toReal();
+        const bool ok = after > before;
+        ++tested;
+        failed += !ok;
+        const QByteArray name = (f->objectName().isEmpty() ? QString::fromLatin1(f->metaObject()->className()) : f->objectName()).toUtf8();
+        std::printf("wheel %s %s %s %.1f -> %.1f\n", ok ? "ok" : "FAIL", name.constData(), prop, before, after);
+        f->setProperty(prop, before);
+    }
+    std::fflush(stdout);
+    return tested > 0 && failed == 0 ? 0 : 3;
+}
+
 } // namespace
 
 int main(int argc, char *argv[])
@@ -100,8 +200,11 @@ int main(int argc, char *argv[])
     const QCommandLineOption sizeOpt(QStringLiteral("size"), QStringLiteral("Window size"), QStringLiteral("WxH"));
     const QCommandLineOption pathBarOpt(QStringLiteral("pathbar"), QStringLiteral("Show the path bar"));
     const QCommandLineOption inactiveOpt(QStringLiteral("inactive"), QStringLiteral("Draw the window as inactive"));
+    const QCommandLineOption noPreviewOpt(QStringLiteral("hide-preview"), QStringLiteral("Gallery: View > Hide Preview"));
     const QCommandLineOption panelOpt(QStringLiteral("panel"), QStringLiteral("Open alert2|alert3|sheet|popover"), QStringLiteral("name"));
-    cli.addOptions({viewOpt, selectOpt, qlOpt, infoOpt, darkOpt, shotOpt, delayOpt, sizeOpt, pathBarOpt, inactiveOpt, panelOpt});
+    const QCommandLineOption wheelOpt(QStringLiteral("wheel-test"), QStringLiteral("Test: wheel every scroll view, print the result and quit"));
+    cli.addOption(wheelOpt);
+    cli.addOptions({viewOpt, selectOpt, qlOpt, infoOpt, darkOpt, shotOpt, delayOpt, sizeOpt, pathBarOpt, inactiveOpt, panelOpt, noPreviewOpt});
     cli.process(app);
 
     // Without a platform theme (offscreen, bare Hyprland) Qt only searches ":/icons".
@@ -152,6 +255,7 @@ int main(int argc, char *argv[])
         {QStringLiteral("size"), cli.value(sizeOpt)},
         {QStringLiteral("pathBar"), cli.isSet(pathBarOpt)},
         {QStringLiteral("inactive"), cli.isSet(inactiveOpt)},
+        {QStringLiteral("hidePreview"), cli.isSet(noPreviewOpt)},
         {QStringLiteral("panel"), cli.value(panelOpt)},
         // Set by the hyprk session when Hyprland blurs behind this window.
         {QStringLiteral("blur"), qgetenv("HYPRK_BLUR") == "1"},
@@ -175,6 +279,12 @@ int main(int argc, char *argv[])
         QObject::connect(win, &QQuickWindow::frameSwapped, &app, update);
     }
 
+    if (cli.isSet(wheelOpt)) {
+        QTimer::singleShot(cli.value(delayOpt).toInt(), &app, [&engine] {
+            auto *win = engine.rootObjects().isEmpty() ? nullptr : qobject_cast<QQuickWindow *>(engine.rootObjects().first());
+            QCoreApplication::exit(win ? wheelTest(win) : 2);
+        });
+    }
     if (cli.isSet(shotOpt)) {
         const QString out = cli.value(shotOpt);
         QTimer::singleShot(cli.value(delayOpt).toInt(), &app, [&engine, out] {

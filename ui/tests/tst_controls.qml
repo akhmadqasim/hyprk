@@ -54,7 +54,7 @@ Item {
     // a SwiftUI glass capsule with a source (platter off): the light lifts its source
     Rectangle { id: navCap; x: 20; y: 150; width: 74; height: 37 }
     ToolbarHighlight { id: navLight; x: 20; y: 150; width: 74; height: 37; source: navCap; platter: false; centres: [18.5, 55.5] }
-    // an AppKit toolbar platter (back / forward): no lift, no glow, the interaction layer while pressed
+    // an AppKit toolbar platter (back / forward): one glass, lifted about its centre and lit as one FlexInteraction entry
     Rectangle { id: platCap; x: 240; y: 240; width: 74; height: 37 }
     ToolbarHighlight { id: platLight; x: 240; y: 240; width: 74; height: 37; source: platCap; centres: [18.5, 55.5] }
     GlassButton { id: flexBtn; x: 300; y: 150; width: 78; height: 37 }
@@ -64,6 +64,10 @@ Item {
     SignalSpy { id: movedSpy; target: sl; signalName: "moved" }
     SignalSpy { id: releasedSpy; target: sl; signalName: "released" }
     SignalSpy { id: committedSpy; target: sl; signalName: "committed" }
+    SignalSpy { id: endSpy; target: sl; signalName: "endReached" }
+    SymbolBounce { id: bounce; name: "speaker.fill"; reduceMotion: false }
+    SymbolBounce { id: waveBounce; name: "speaker.wave.3.fill"; reduceMotion: false }
+    SfSymbol { id: layeredGlyph; x: 400; y: 300; name: "capsule.on.rectangle.fill"; layerScales: [1, 1.25] }
 
     TestCase {
         name: "HyprKControls"
@@ -212,6 +216,90 @@ Item {
             compare(releasedSpy.count, 1); compare(committedSpy.count, 1);
             compare(sl.releaseModifiers, Qt.NoModifier);
         }
+        // the held lens is elastic (Knob, FlexInteraction liquidLens driven by acceleration): a fast drag widens it
+        // and flattens it, the shape changes the knob's geometry, and it springs back after the release; a press
+        // without motion leaves it 25 x 20
+        function test_slider_lens_elastic_on_fast_drag() {
+            backend.level = 0.2;
+            let tr = null; for (let i = 0; i < sl.children.length; i++) if (sl.children[i].usable !== undefined) tr = sl.children[i];
+            const k = knobOf(tr);
+            const cx = k.x + k.width / 2;
+            mousePress(sl, cx, sl.height / 2);
+            tryCompare(k, "width", 25, 1000);
+            compare(k.deformation[0], 1);
+            let maxW = 0, minH = 99;
+            for (let i = 1; i <= 8; i++) {
+                mouseMove(sl, cx + 12 * i, sl.height / 2);
+                wait(16);
+                maxW = Math.max(maxW, k.width); minH = Math.min(minH, k.height);
+            }
+            for (let t = 0; t < 200; t += 16) { wait(16); maxW = Math.max(maxW, k.width); minH = Math.min(minH, k.height); }
+            verify(maxW > 26, "wider while speeding up: " + maxW);
+            verify(minH < 19.5, "flatter: " + minH);
+            verify(maxW < 25 * 1.2, "soft-clamped (1.167 plus the spring's overshoot): " + maxW);
+            mouseRelease(sl, cx + 96, sl.height / 2);
+            tryVerify(() => k.deformation[0] === 1 && k.deformation[2] === 0, 3000);
+        }
+        // the end glyphs' trigger: once per arrival on an end while dragging, not again while held there or pulled further
+        function test_slider_end_reached_once() {
+            backend.level = 0.5;
+            let tr = null; for (let i = 0; i < sl.children.length; i++) if (sl.children[i].usable !== undefined) tr = sl.children[i];
+            const k = knobOf(tr);
+            const cx = k.x + k.width / 2;
+            endSpy.clear();
+            mousePress(sl, cx, sl.height / 2);
+            mouseMove(sl, cx - 40, sl.height / 2);
+            compare(endSpy.count, 0);
+            mouseMove(sl, -30, sl.height / 2);
+            compare(endSpy.count, 1); compare(endSpy.signalArguments[0][0], -1);
+            mouseMove(sl, -60, sl.height / 2);
+            compare(endSpy.count, 1);
+            mouseMove(sl, 60, sl.height / 2);
+            mouseMove(sl, sl.width + 40, sl.height / 2);
+            compare(endSpy.count, 2); compare(endSpy.signalArguments[1][0], 1);
+            mouseRelease(sl, sl.width + 40, sl.height / 2);
+        }
+        // SF Symbols .bounce: up to 1.27 at 0.217 s, down to 0.89 at 0.433 s, back to 1 by 0.583 s
+        function test_symbol_bounce_runs_once() {
+            compare(bounce.value, 1);
+            bounce.play();
+            let peak = 1, low = 1;
+            for (let t = 0; t < 800; t += 10) { wait(10); peak = Math.max(peak, bounce.value); low = Math.min(low, bounce.value); }
+            verify(peak > 1.25 && peak <= 1.2701, "peak " + peak);
+            verify(low < 0.91 && low >= 0.8899, "trough " + low);
+            compare(bounce.value, 1);
+            verify(!bounce.running);
+        }
+        // a symbol of several layers bounces by layer: every path's scale, in the outline's path order (the speaker is
+        // the last path and moves first, the outer wave the first path and moves 0.15 s later), 1.25 / 0.90 each
+        function test_symbol_bounce_by_layer() {
+            compare(waveBounce.layers, 4);
+            fuzzyCompare(waveBounce.stagger, 0.05, 1e-9);
+            compare(waveBounce.scales, [1, 1, 1, 1]);
+            compare(bounce.scales, [1]);
+            waveBounce.play();
+            let peak = [1, 1, 1, 1], low = [1, 1, 1, 1], led = false;
+            for (let t = 0; t < 1000; t += 8) {
+                wait(8);
+                const sc = waveBounce.scales;
+                if (sc[3] > 1.05 && sc[0] < sc[3] - 0.03) led = true;
+                for (let k = 0; k < 4; k++) { peak[k] = Math.max(peak[k], sc[k]); low[k] = Math.min(low[k], sc[k]); }
+            }
+            verify(led, "the speaker leads the outer wave");
+            for (let k = 0; k < 4; k++) {
+                verify(peak[k] > 1.22 && peak[k] <= 1.2501, "peak " + k + " " + peak[k]);
+                verify(low[k] < 0.93 && low[k] >= 0.8999, "trough " + k + " " + low[k]);
+            }
+            compare(waveBounce.scales, [1, 1, 1, 1]);
+            verify(!waveBounce.running);
+            // SfSymbol draws each path at its scale about the ink box's centre
+            const shapes = []; for (const c of layeredGlyph.children) if (c.s !== undefined) shapes.push(c);
+            compare(shapes.length, 2);
+            compare(shapes[0].s, 1); compare(shapes[1].s, 1.25);
+            const m = shapes[1].mapToItem(layeredGlyph, layeredGlyph.glyph.rect[0] + layeredGlyph.glyph.rect[2] / 2,
+                                          layeredGlyph.glyph.rect[1] + layeredGlyph.glyph.rect[3] / 2);
+            fuzzyCompare(m.x, layeredGlyph.width / 2, 0.01); fuzzyCompare(m.y, layeredGlyph.height / 2, 0.01);
+        }
         // Control Center reads Shift at the release (it inverts the volume pop): the modifiers of the let-go
         // macOS (the 23.09.23 recording, frames 2622-2645): a press on the slider's track moves the knob and the value
         // on mouse-DOWN, not at the release; the release only commits
@@ -280,20 +368,25 @@ Item {
             mouseRelease(navLight, 60, 18);
             tryVerify(() => navCap.transform[0].xScale === 1, 1500);
         }
-        // AppKit toolbar platter (TOOLBAR-REA-27.2.1.md 2): pressed, the interaction layer rises to alpha 0.1; no glow, no
-        // lift (the Mac's pressed capsule keeps its 146 px); back to 0 after the release
+        // AppKit toolbar platter (one NSGlassEffectView over the capsule; R7.1 hold-shine-{settings,finder}-*.mov,
+        // INTERACTIVE-GLASS-REA.md 1): pressed, the whole 74 x 37 capsule is one entry: it lifts about its centre by
+        // (74 + 2.5) / 74 (both ends move 1.25 pt; Mac rims -3 / +3 px) and the glow is the ultraSmall preset sized by it
         function test_toolbar_platter_press() {
             verify(platLight.platter);
-            compare(platCap.transform.length, 0);
+            compare(platCap.transform.length, 2);
             mousePress(platLight, 10, 18);
             verify(platLight.pressed);
-            tryVerify(() => Math.abs(platLight.platterPress - 0.1) < 0.002, 3000);
-            compare(platLight.glowBig, 0);
-            compare(platLight.glowLittle, 0);
+            tryVerify(() => Math.abs(platCap.transform[0].xScale - 76.5 / 74) < 0.001, 2000);
+            const t = platCap.transform[0];
+            compare(t.origin.x, 37);
+            compare(t.xScale, t.yScale);
+            tryVerify(() => Math.abs(platLight.glowBig - 0.75) < 0.01, 2000);
+            verify(platLight.glowLittle > 0.3, "LittleGlow: " + platLight.glowLittle);
+            compare(platLight.glowHalf, 1.5 * 37 / 2);
             mouseRelease(platLight, 10, 18);
-            tryVerify(() => platLight.platterPress === 0, 3000);
+            tryVerify(() => platLight.glowBig === 0 && platCap.transform[0].xScale === 1, 3000);
         }
-        // a disabled button (Q-finder-10 "Disabled: no hover") gets no press light; its enabled neighbour still does
+        // a disabled button (Q-finder-10 "Disabled: no hover") gets no press light and no lift; its enabled neighbour does
         function test_toolbar_platter_disabled_half() {
             platLight.disabled = [false, true];
             verify(!platLight.off(10));
@@ -301,13 +394,14 @@ Item {
             mousePress(platLight, 60, 18);
             verify(!platLight.pressed);
             wait(150);
-            compare(platLight.platterPress, 0);
+            compare(platLight.glowBig, 0);
+            compare(platCap.transform[0].xScale, 1);
             mouseRelease(platLight, 60, 18);
             mousePress(platLight, 10, 18);
             verify(platLight.pressed);
             mouseRelease(platLight, 10, 18);
             platLight.disabled = [];
-            tryVerify(() => platLight.platterPress === 0, 3000);
+            tryVerify(() => platLight.glowBig === 0 && platCap.transform[0].xScale === 1, 3000);
         }
         // pressed knob lens: light uses the Mac's B2 model (ring shadow 8 down, 4 wide, blur 3, .4; fill light), dark keeps
         // the recording's fit (no ring, no fill light)
@@ -374,14 +468,39 @@ Item {
             compare(sl.releaseModifiers, Qt.NoModifier);
         }
         function test_popup_keeps_binding() {
-            mouseClick(pop);                 // opens the menu (a click leaves it open)
+            const menu = findChild(pop, "menu");
+            verify(menu);
+            backend.index = 0;
+            mouseClick(pop);                // opens the menu 3 frames after the press (a click leaves it open)
+            verify(!menu.opened);
+            tryVerify(() => menu.opened);
             // the menu is lifted so the current row sits on the button (5 px padding cancels the 5 px lift)
             const row = Tokens.control.menuItemHeight;
             mouseClick(root, pop.x + pop.width - 30, pop.y - pop.currentIndex * row + 2 * row + row / 2);
-            compare(backend.index, 2);
+            compare(backend.index, 0);       // the chosen row blinks first (off 4 frames, on 3), then the value goes
+            tryCompare(backend, "index", 2);
             compare(pop.currentIndex, 2);
+            tryVerify(() => !menu.visible);  // faded out
             backend.index = 1;
             compare(pop.currentIndex, 1);
+        }
+        // a click (press and release at once, a touchpad tap) on the button over the open menu is a click on its checked
+        // row: it blinks and closes, and the next click opens the menu again (a closed menu kept the clicks of a pointer
+        // that did not move: the liquidglass plugin's popup unmap hook; with the menu up the button takes them as a menu
+        // click, Popup's inMenu)
+        function test_popup_click_on_checked_row_then_reopen() {
+            const menu = findChild(pop, "menu");
+            backend.index = 1;
+            mouseClick(pop);
+            tryVerify(() => menu.opened);
+            mouseClick(pop);                 // the checked row sits on the button
+            tryVerify(() => !menu.visible);
+            compare(backend.index, 1);
+            mouseClick(pop);
+            tryVerify(() => menu.opened);
+            mouseClick(root, 5, 5);          // outside: closes
+            tryVerify(() => !menu.visible);
+            compare(backend.index, 1);
         }
         // -[NSSliderCell _moveInDirection:]: a twentieth per arrow, Page Up / Down to the ends, no Home / End, no modifiers
         function test_slider_arrow_keys() {

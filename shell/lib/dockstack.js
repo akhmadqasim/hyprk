@@ -42,41 +42,48 @@ function fanSlots(count, stageH) {
     return { items: count, extra: "Open in Finder" };
 }
 // -[DOCKStackFanLayer layout] 0x100072030 on the frame of -expandedFrameForStage: 0x100071ec0 (the tile's frame moved
-// 24 down, the -24 at 0x100071f98). Slot i: arc height y = int(t/2) + 32 + 64 i, x offset dx = 3000 - int(sqrt(3000^2 -
+// 24 off, the 24 at 0x100071f98: up on screen, measured, see below). Slot i: arc height y = int(t/2) + 32 + 64 i, x offset dx = 3000 - int(sqrt(3000^2 -
 // y^2)) to the right, rotation atan(y / (3000 - dx)) (the code's -atan, CA's y-up, so clockwise on screen); the code
-// places the centre at (x0 + dx, x0 + y) of that frame, x0 = int(t/2). So the centre is int(t/2) + y - 24 above the
+// places the centre at (x0 + dx, x0 + y) of that frame, x0 = int(t/2). So the centre is int(t/2) + y + 24 above the
 // tile's bottom. The frame's reference layer is the tile's imageLayer (the icon box, t x t: see below). Inferred, not
 // read: the item anchor (taken as the centre: no setAnchorPoint: on the fan item layer, the Dock's two calls are the
 // grid cell 0x10001f638 and the fan label 0x100042668). Returns {dx, up (centre above the tile bottom), angle
 // (degrees, clockwise), y}.
-// The 24 is DOWN on screen (MOTION-REA-27.2.1.md Round 3, R3.3): the frame (asm 0x100071f68..0x100071f9c) is the
-// imageLayer's bounds size centred on its frame converted to the root (convertRect:toLayer:nil), y = trunc(...) - 24.
-// The Dock's stack layer tree is y up: -[DOCKStackGridLayer _expandedFrameWithSize:forStage:relativeToLayer:withEdge:]
-// 0x10001bc58 places the grid for a bottom Dock at y = edge + 11 without subtracting its height (asm 0x10001bdec..
-// 0x10001bee8; for a right Dock it does subtract the width: x = edge - W - 11), and expandUsingHandler: passes as the
-// bottom Dock's edge the imageLayer's frame y + height (0x10001a2bc), its top in y up. The Mac's AX grid frame
-// (Q-dock-12, live/dock/dock-live.json: group 895,613 546 x 438, bottom 1051) is 11 above the icon box top at tile 33
-// (bg top 1055 + (47 - 33) / 2 = 1062, live/dock/dock-geometry.json): y up and edge = icon top, both confirmed. The
-// only setGeometryFlipped: in the Dock (0x1000eacd8) is a DesignLibrary view. So the fan's first centre is t + 8
-// above the icon box bottom (2 int(t/2) + 32 - 24): its bottom 24 pt below the icon top, over the tile's chevron.
+// The 24 is UP on screen, measured (MOTION-REA-27.2.1.md Round 4, R4.1: reference/screens/27.2.1/dock/
+// stack-fan-open.mov, tile 31 at x 982, 9 items + "5 More in Finder"): every one of the 10 slots of the settled fan
+// sits on int(t/2) + y + 24 above the icon box bottom to about 1 pt (first centre 85 measured, 86 here), the
+// first item's box wholly above the Dock, the tile's chevron plate free below it. Round 3 (R3.3) had read the
+// frame's y - 24 (asm 0x100071f68..0x100071f9c) as down in a y-up tree; the recording says the fan's frame is
+// above the tile, so that reading was wrong (the conversion to the fan's layer was not read).
 const fanRadius = 3000;
-const fanShift = -24;
+const fanShift = 24;
 function fanItem(tile, i) {
     const half = Math.floor(tile / 2);
     const y = half + 32 + 64 * i;
     const dx = fanRadius - Math.trunc(Math.sqrt(fanRadius * fanRadius - y * y));
     return { dx: dx, up: half + y + fanShift, angle: Math.atan(y / (fanRadius - dx)) * 180 / Math.PI, y: y };
 }
-// -[DOCKStack getCollapsedLayoutFrames:count:] 0x100067df4, where the fan's items start and end: s = 1 / 2 / 3 for a
-// tile < 32 / < 48 / larger; frame i = {s(i+1), 3si, W - 2s(i+1), H - 2s(i+1)} (CG, y up); items past the 3rd use the
-// 3rd. Returns its centre above the tile bottom (x: the tile centre).
+// -[DOCKStack getCollapsedLayoutFrames:count:] 0x100067df4, where the fan's items start and end: s = 1 / 2 / 3 for
+// DockBar.tileSize < 32 / < 48 / larger (0x100067e88..0x100067ebc); frame i = {s(i+1), 3si, W - 2s(i+1), H - 2s(i+1)}
+// (CG, y up), W x H the tile's imageLayer bounds; items past the 3rd use the 3rd. DockBar.tileSize is NOT the icon box:
+// sub_100078598 (called with -desiredTileSize, the `tilesize` pref, before -setTileSize: at 0x10001164c) returns
+// desired + 2 x tileInset (fmadd at 0x10007876c), tileInset = 1 for desired <= 47 (0x1000786a8..0x100078710), 2 up to
+// 127 (0x100078640, 0x100078684), 3 above (0x1000785d4, 0x1000785fc); the imageLayer (-[DOCKTileLayer
+// layoutImageLayer] 0x10000c524 -> _computeLayoutFrameFromBounds: 0x10007fa38, set at 0x10008015c) is the tile bounds
+// less 2 x tileInset, so W = the pref = our `tile` (the icon box). So at tile 31 tileSize is 33 and s = 2, not 1:
+// items 0 / 1 end at 27 / 23 (MOTION-REA Round 6).
+function collapsedStep(tile) {
+    const t = tile + 2 * (tile <= 47 ? 1 : tile <= 127 ? 2 : 3);
+    return t < 32 ? 1 : t < 48 ? 2 : 3;
+}
+// Returns item i's collapsed centre above the tile bottom (x: the tile centre).
 function collapsedUp(tile, i) {
-    const s = tile < 32 ? 1 : tile < 48 ? 2 : 3, j = Math.min(Math.max(0, i), 2);
+    const s = collapsedStep(tile), j = Math.min(Math.max(0, i), 2);
     return tile / 2 + s * (2 * j - 1);
 }
 // One fan item at progress p (0 = in the pile, 1 = in place), already eased by the caller. -[DOCKStackFanAnimator
 // expand:] 0x100063c2c: the position follows CGPathAddArc (0x100064984: centre the first item + (3000, 0), radius 3000
-// at 0x100258428, start angle pi at 0x100258108, clockwise) on the same 3000 pt circle (centre int(t/2) - 24 above the
+// at 0x100258428, start angle pi at 0x100258108, clockwise) on the same 3000 pt circle (centre int(t/2) + 24 above the
 // tile bottom, 3000 right of the tile centre), the rotation goes from 0 to the layout angle. At p = 1 it is fanItem.
 // `q`: the rotation's own progress (fanChannels .turn; it is an implicit animation, not the position's keyframe
 // animation), p when left out. Returns {dx, up, angle}.
@@ -117,7 +124,10 @@ function caTiming(name, t) {
 function fanChannels(ms, d, closing) {
     const t = d > 0 ? Math.max(0, Math.min(1, ms / d)) : 1;
     const f = (name) => closing ? 1 - caTiming(name, t) : caTiming(name, t);
-    return { pos: f("easeInEaseOut"), turn: f("default"), size: f("default"), labelScale: f("easeInEaseOut"),
+    // size: measured (MOTION-REA Round 4, R4.1), the open keeps every item at 64 from its first frame (the folder 117 px
+    // wide at 2x in every frame of stack-fan-open.mov while it rises), the close shrinks it on "default" over d (rms
+    // 0.01 of the fitted way); so on the open the implicit bounds animation does not show, size = 1 throughout
+    return { pos: f("easeInEaseOut"), turn: f("default"), size: closing ? f("default") : 1, labelScale: f("easeInEaseOut"),
              labelOpacity: f("linear") };
 }
 // The item's side at progress p (same p as fanAt). At rest every fan item is 64 x 64: DOCKStackExpandedLayer's
@@ -134,11 +144,15 @@ function fanChannels(ms, d, closing) {
 // same transaction, so the side grows from the pile's tile - 2s(j+1) (getCollapsedLayoutFrames 0x100067df4, j at most 2)
 // to 64. -collapse: 0x100064d90 sets the collapsed size back with actions on (line 342). The bounds change is an
 // implicit animation, so CA's "default" curve over the transaction's duration, not the position's ease-in-out: the
-// caller passes fanChannels().size as p.
+// caller passes fanChannels().size as p. Measured (MOTION-REA Round 4, R4.1): the open's growth does not show (64 from
+// the first frame, fanChannels gives 1); the close's shrink does, on "default" over 0.25 s from the position's start.
+// The close's end side at tile 31 (stack-fan-more-close-dark.mov): item 0's folder body 50 px wide at the end against
+// 117 px at 64 pt, so 27.4 pt (s = 2 here: 27; the old s = 1 read gave 29); item 1 fitted about 20.5-21.6 (23 here: its
+// page is behind the folder at the end, the least sure of the two).
 // The Mac's "65.5 -> 78.3" (Q-dock-12) is the AX frame of the rotated 64 square: fanBox below. Its 64.6 step is the
 // frames' top edges (64 + half the box growth per slot), so it confirms the constant size.
 function fanSize(tile, i, p) {
-    const s = tile < 32 ? 1 : tile < 48 ? 2 : 3, j = Math.min(Math.max(0, i), 2);
+    const s = collapsedStep(tile), j = Math.min(Math.max(0, i), 2);
     const pile = Math.max(1, tile - 2 * s * (j + 1));
     return pile + (64 - pile) * Math.max(0, Math.min(1, p));
 }

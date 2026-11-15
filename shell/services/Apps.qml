@@ -106,6 +106,18 @@ Singleton {
         removed = list;
         writeItems();
     }
+    // the item the Dock menu's Remove from Dock took out last: its slot closes in 0.25 s (lib/dock.js slotDuration)
+    property string menuRemoved: ""
+    // The poof of the menu's removal starts after the Dock's first moving frame, not with it: the file
+    // (`poof item off dock.aif`, cross-correlated with dock-remove-menu-real-click.mov's audio, r .999) has its first
+    // sample at 4.920 s on the clip, 20 ms after that frame (4.900 s; over 1 % of its peak from 4.926, "4.929" in
+    // MAC-ANSWERS-16.md). The clip's faint 4.895-4.915 s is the AAC's pre-echo, not the file. Ours ran the sound with
+    // the removal: its first sample 10-13 ms before the frame. The pause is from the removal (a frame before the Dock
+    // draws it) to sound.sh; `sound-timing.py poof` reads +20 with it
+    // The drag-off's poof is as late against its first fading frame (dock-drag-off-hand.mov: that frame 6.100 s,
+    // the file's first sample 6.128 s, +28; `dock-drag-off.py`)
+    Timer { id: poofAfterMove; interval: 30; onTriggered: Sounds.play("poof") }
+    function poofSoon() { poofAfterMove.restart(); }
     function removeFromDock(id) { if (canRemove(id)) setRemoved(removed.concat([pinKey(id)])); }
     // a running app that was taken out of the Dock and can be put back
     function wasRemoved(item) {
@@ -516,7 +528,12 @@ Singleton {
         const pinned = root.pinned.some(p => p.id === item.id);
         const back = pinned ? "" : root.wasRemoved(item);
         out.push({ label: "Options", submenu: true, items: [
-            pinned ? { label: "Remove from Dock", disabled: !root.canRemove(item.id), action: () => root.removeFromDock(item.id) }
+            // the menu's removal plays the poof too, in the frame the Dock starts to move, and draws no cloud. By a
+            // real click that is after the menu has faded out (`afterFade`, MenuDropdown: MAC-ANSWERS-16.md R16.1,
+            // dock-remove-menu-real-click.mov, the Dock's first moving frame 4.900 s, 367 ms after the row's
+            // highlight went off, and the sound a frame behind it: `poofAfterMove` below); R10.2 c pressed the item
+            // through AX, which skips the blink and runs it with the fade's first frame
+            pinned ? { label: "Remove from Dock", disabled: !root.canRemove(item.id), afterFade: true, action: () => { root.menuRemoved = item.id; root.removeFromDock(item.id); poofAfterMove.restart(); } }
                    : { label: "Keep in Dock", disabled: back === "", action: () => root.setRemoved(root.removed.filter(r => r !== back)) },
             { label: "Open at Login", disabled: true },
             { label: "Show in Finder", disabled: true },

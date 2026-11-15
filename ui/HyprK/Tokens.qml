@@ -25,6 +25,9 @@ QtObject {
     // popup_classes: plugin/README.md "Client popups"); set by the app (Finder: Hypr.option, Settings: HYPRK_GLASS).
     // Then a menu in its own popup window (TextMenu) draws no fill, as Finder's PopupMenu
     property bool popupGlass: false
+    // the app window's real device pixel ratio (Settings: its FloatingWindow, Finder: windowInfo.dpr); 0 = unknown, use
+    // Screen.devicePixelRatio, which says 2 on a 1.6 output (pixel.js ratio)
+    property real dpr: 0
     // controlAccentColor of the user's accent (Accent.qml; each app's Theme sets Accent.name)
     property color accent: Accent.color
     property string fontText: "Sans Serif"
@@ -111,17 +114,24 @@ QtObject {
         // the left end over 184 (model 112), then 255 just inside the top; the flat black .4 line read 113 / 118
         readonly property real regularRimBias: -0.25
         readonly property real regularRimSpread: t.dark ? 75 : 106
-        // the key / fill highlight in dark: the Mac's dark shot (liquidglass-0-mid-1-dark.png, share capsule top) reads
-        // only +10 over the face in the first 2 px; the B2 model drew +36 over 4 px there, so dark leaves it off (as the
-        // knob's dark fit does). The dark round end reads x0.50 on the Mac against the decoded curve's x0.70 (not settled)
-        readonly property real regularFillLight: t.dark ? 0 : 1
+        // the key / fill highlight in both modes (round 5; dark had it off since the Mac's dark top reads only +10 over
+        // the face in the first 2 px against the model's +36): that +10 is the highlight less the Settings card the outer
+        // sample sees 16 pt above (rimStroke + fillBackdropOutside); dark top 172 178 173 over 165, Mac 174 175 168 over
+        // 164 (GLASS-HIG.md round 5)
+        readonly property real regularFillLight: 1
         // the rim in dark: the Mac's dark round end (liquidglass-0-mid-1-dark.png, share capsule, row through its centre)
         // reads 202 -> 101; the tone curve over the plain sample gives 130 (we drew 141), over the decoded dark Regular
         // face of it (verify C: 202 -> 170; the filter darkens the rim after the face, verify C2 order) 99. Light keeps the
         // plain sample: there the face first would give 160 against the Mac's 135 (plain: 130). GLASS-HIG.md round 2.
         // Round 4: with the decoded light face (regularFace*) the face first draws the light top rim 214 / 217 (Mac
         // 211 / 210; plain 191 / 197), as the decode orders it; the light round end then reads 170 (Mac 139, not settled)
-        readonly property bool regularRimFace: true
+        // Round 5: the decoded stroke mode (regularRimStroke, LensGlass rimStroke): the line is the pixel outside the
+        // glass and tones the plain backdrop there: light top 211 (Mac 211), end 136 (139), dark top line pixel 232 =
+        // the backdrop (Mac 232: no lobe at 75 deg). The dark round end still needs the dark face, mixed in by the lobe
+        // (fitted: 102 against the Mac's 105, plain 136; round 11: at 0.75 of the lobe, glasslens4.frag); light keeps the
+        // plain backdrop (with the face: 162)
+        readonly property bool regularRimFace: t.dark
+        readonly property bool regularRimStroke: true
         // its face (LensGlass face*, MAC-ANSWERS verify C formulas, C2 1-2 shoulder): black, white, saturation, maxLuma
         // (dark 0.6 at D <= 64; light maxLumaSDR 0.94) and the fill colour by the slider a (u = clamp(2a), t =
         // clamp(2a - 1)): light white at 0.2 u below 0.5, 0.2 + 0.3 t above; dark none below 0.5, grey 0.125 t at 0.5 t
@@ -190,25 +200,49 @@ QtObject {
         // the held switch's rim fringes: glassForeground aberration 1.632 pt (Verify B 5; the slider's is 0), the
         // decoded per-normal offset (LensGlass aberration; GLASS-HIG.md rounds 2 and 3)
         readonly property real knobLensAberration: 1.632
+        // its edge opacity: 1 at the knob layer's edge, 0 this far in (pt). The dump's EdgeStart -6.2 read as 0 at the edge
+        // and 1 from 6.2 pt in (round 6) drew fringes across the track's end inside the lens, which
+        // switch-held-stripes-light.png shows clean, its fringes only in the outer 2-2.5 pt: 2 fits their extent and strength (GLASS-HIG.md round 7)
+        readonly property real knobLensAberrationEdge: 2
         // the held switch's own glassBackground (live/verify/B/dumps/switch-knob-held.json, a light probe), where it
         // differs from the slider's (slider-knob-held.json) whose B2 light model the knobLens* light terms are: face
         // black 0 (slider 0.1: knobLensHaze), ring shadow 0.1 (slider 0.4), the KeyFillHighlight's dark specular on
         // the rim (bias -0.3, spread SDR 120 deg; MAC-ANSWERS Verify B 1 law, glasslens4.frag rimSpec) instead of the
         // flat black .4 line, and no lens shadow (inputShadowOpacity 0.001). Until 2026-11-14 the switch took the
         // slider's terms: its interior read the track 31 levels darker in blue, shaded (B std 13 vs the Mac's 4.8), the
-        // rim 170 / 163 against 201 / 195 (GLASS-HIG.md round 3). Dark: no Mac capture of the held switch, unchanged
-        readonly property real switchLensHaze: t.dark ? knobLensHaze : 0
-        readonly property real switchLensRingOpacity: t.dark ? knobLensRingOpacity : 0.1
-        readonly property real switchLensRimBias: t.dark ? 0 : -0.3
+        // rim 170 / 163 against 201 / 195 (GLASS-HIG.md round 3). Dark (switch-held-stripes-dark.png, round 7): the same
+        // dump fits; the lens keeps the card at 42 -> 45-48 (face black 0, not the recording's fitted gain .702 / haze
+        // .091), the track 125 -> 120 at the middle (ring 0.1), the rim 20 at the top and 9 at the ends (bias -0.3: 21 / 8)
+        readonly property real switchLensHaze: 0
+        readonly property real switchLensRingOpacity: 0.1
+        readonly property real switchLensRimBias: -0.3
         readonly property real switchLensRimSpread: 120
-        readonly property color switchLensShadow: t.dark ? knobLensShadow : "transparent"
         // the dark specular's height 1 (inputKeyFillHighlightHeight 1, EffectOffset -1; the slider's Regular-like 0.5):
         // a 1 pt rim line outside the face, 2 px in the strip (196 / 195 at the top); the lens then reads 1.36 x the
         // track's height (Mac 1.35, the 0.5 pt line 1.27)
         readonly property real switchLensOutlineWidth: 1
         // under the light lens the strip's last frame reads 252 -> 247 at the rim, 238 from 3.5 to 7 pt below, back to
-        // 247 by 12 pt: the knob's rest shadows kept whole, not faded (Knob restShadowHeld). Dark: unchanged
-        readonly property real switchRestShadowHeld: t.dark ? 0.3 : 1
+        // 247 by 12 pt; switch-held-stripes-light.png 247 -> 234 from 4 to 5 pt below, dark 42 -> 40: the decoded ring
+        // shadow (0.1, 4-8 pt under the lens, Knob ringshadow.frag) with the rest shadows faded to 0.3 as on the slider.
+        // Rounds 3-6 kept the large rest shadow whole instead (darkest right under the rim, GLASS-HIG.md round 7)
+        readonly property real switchRestShadowHeld: 0.3
+        // the held slider knob's rim (live/verify/B/dumps/slider-knob-held.json, the same KeyFillHighlight as the switch:
+        // height 1, EffectOffset -1 = stroke mode, ColorBias -0.3, SpreadSDR 120 deg, Amount 0.5): a 1 pt line outside the
+        // 25 x 20 face, the tone curve over the backdrop. Measured on slider-held-settings-{light,dark}.png (2x, Desktop &
+        // Dock > Size held): top 195 over the card 247 (model 194), dark 20 over 42 (model 21), round ends 135 over the
+        // track 222, 10-15 over 42 (GLASS-HIG.md round 7). Until round 7 a flat black .4 line of 0.5 pt (light, 163) and
+        // .45 of 1 pt (dark)
+        readonly property real sliderLensRimBias: -0.3
+        readonly property real sliderLensRimSpread: 120
+        readonly property real sliderLensOutlineWidth: 1
+        // the decoded stack's ring shadow opacity, by the colour scheme: DesignLibrary ControlSliderRecipe.SliderSpecModifier
+        // (decomp/DesignLibrary-recipes.c FUN_195f04360, cache 0x195f03360) writes Spec 0x4b8 = environment.colorScheme
+        // == .dark ? 0.4 : 0.15 (GLASS-HIG.md section 19). Dark: the dump's 0.4 (the track 62 -> 66 under the face 81 at
+        // the lens's middle, x0.81 = 1 - 0.4 x 0.495; the card under the lens 42 -> 34). Light: the earlier fit to the
+        // same shot was 0.14 (track 210 under the face 225, card 247 -> 229); 0.15 gives 208 and 229 (computed, not
+        // re-shot). MAC-ANSWERS-8.md R8.2 dumped 0.4 / 0.15 on the held SwiftUI slider; over pure white our lens's centre
+        // column is the Mac's within rms 0.93 dark (205 at the middle) and 1.0 light (GLASS-HIG.md 20)
+        readonly property real sliderLensRingOpacity: t.dark ? 0.4 : 0.15
         readonly property real sliderLensBand: 0.18
         readonly property real sliderLensAmount: -0.3
         readonly property real knobLensGain: t.dark ? 0.702 : 1
@@ -328,6 +362,16 @@ QtObject {
         readonly property real hoverDiscRadius: 15.9
         readonly property real hoverDiscEdge: 1.6
         readonly property real hoverLift: t.dark ? 19.5 / 255 : 0
+        // A SwiftUI glass button's interaction fill (the Appearance preview's MacGlassButton capsules): DesignLibrary
+        // MacButtonGlassInteractionFill, a ShapeStyle filled in the button's border shape under its label; resolve(in:)
+        // 0x195e04f60 (witness 0x195e04fe8) gives Color.clear for InteractionState idle / disabled, .quinary for
+        // rollover and .quaternary for pressed / deeplyPressed (decoded). The level's colour on this glass is measured on
+        // preview-hold-shine-share-{light,dark}.mov (R7.1b, hover frames 25-38 against frame 10, the disc 8-14 pt from
+        // the share glyph): light -21 / -22 / -24 on (217, 231, 246), black .097 over it on every channel; dark +20 /
+        // +18 / +16 on (140, 156, 170), the +19.5 above (23.09.23 recording). Held, the disc shows no step beyond the
+        // rollover's under the press light in either clip (dark 9-13 pt +75..80 against ours +77 with +19.5 kept), so
+        // the same value is kept while pressed. > 0: added; < 0: black at that alpha over the glass
+        readonly property real glassButtonFill: t.dark ? 19.5 / 255 : -0.097
     }
 
     // ---------- alerts, sheets, popovers (AlertPanel, Sheet, Popover; geometry in panels.js) ----------
@@ -347,7 +391,21 @@ QtObject {
         readonly property color defaultFill: Accent.name === "multicolor" || Accent.name === "blue" ? "#007AFF" : t.accent
         readonly property int sheetRadius: 16                                       // continuous r 16 (fit 17.9)
         readonly property color sheetFill: t.dark ? "#22232F" : "#FFFFFF"           // windowBackground (34,35,47) | 255
-        readonly property color sheetDim: Qt.rgba(0, 0, 0, 0.2)                    // whole parent ~20 % darker
+        // the parent under a sheet fades towards a grey, it is not darkened by 20 % black: out = 0.396 in + 103 (light),
+        // 0.39 in + 12.3 (dark), a veil of #AAAAAA at 60.4 % / #141414 at 61 %. System Settings (R12.3 / R13) and
+        // TextEdit's save sheet alike (R17.4 alert-{light,dark}.png: white 255 -> 204, the title 88 -> 138, the
+        // document's black text -> 102; dark bar 39 -> 27, white text -> 112). Nothing is blurred
+        // The dark veil is not neutral: per channel the offsets are 12.3 / 13.4 / 15.0 (Settings pane (30,31,36) ->
+        // (24,26,29), card (53,54,59) -> (33,34,38); TextEdit R17.4 bar (39,39,44) -> (27,28,32), document 30 ->
+        // (24,25,26)), a veil of (20,22,24.5). It was #141414: blue 3 low (toolbar 27 against 32 with the tint lost).
+        // Light is neutral (255 -> 204, (236,237,238) -> (197,197,198))
+        readonly property color sheetDim: t.dark ? Qt.rgba(20 / 255, 22 / 255, 24.5 / 255, 0.61) : Qt.rgba(170 / 255, 170 / 255, 170 / 255, 0.604)
+        // the card's shadow over the veil: a Gaussian of sigma 19.6 pt, 23.6 pt down (drawn 21.5), black at 21.9 % light /
+        // 45 % dark (settings-r13 dest-controlCenter--clock-options-*.png; R17.4's card reads the same: 180 at the right
+        // edge of 204 light, 20 of 25 dark)
+        readonly property real sheetShadowSigma: 19.6
+        readonly property real sheetShadowOffsetY: 21.5
+        readonly property real sheetShadowDensity: t.dark ? 0.45 : 0.219
         readonly property int popoverRadius: 20
         readonly property color popoverFill: t.control.menuFill                     // glass live; flat like the menus
         readonly property color popoverStroke: t.control.menuStroke
@@ -357,20 +415,40 @@ QtObject {
         readonly property color popoverRim: Qt.rgba(0, 0, 0, t.dark ? 0.5 : 0.25)
         readonly property color popoverKey: Qt.rgba(1, 1, 1, t.dark ? 0.25 : 0.45)
         readonly property color popoverDiffuse: Qt.rgba(1, 1, 1, 0.075)
-        // motion (LIVE-27.2.1.md): alert grows from 4 % to a 1.15 peak at 0.2 s (in-quad), settles by 0.37 s
-        // (out-quad), dismiss = 0.1 s fade; sheet in 0.27 s, out 0.25 s, near-linear, size constant; popover a
-        // spring from 12.5 % (response 0.25, damping 0.9) from the arrow, close = fade 0.15..0.2 s
-        readonly property real alertPopFrom: 0.04
-        readonly property real alertPopPeak: 1.15
-        readonly property int alertPopRise: 200
-        readonly property int alertPopSettle: 170
-        readonly property int alertFadeOut: 100
+        // motion (LIVE-27.2.1.md; per-frame fits to re/27.2.1/live/video-motion-{1,2}.json in
+        // re/27.2.1/MOTION-AUDIT.md): alert = AppKit's PopIn and ScaleDownAndOut (AppKit 27.2.1, MOTION-AUDIT.md
+        // "Alert, Round R3.1"; curves in panels.js alertPopScale / alertCancelProgress): appear 0.4 s linear, alpha = v,
+        // scale amount 0.2; Cancel = spring 0.1812 s, bounce 0, initial velocity 13, scale to 0.98, alpha 1 - p, run for
+        // 0.25 s; other buttons hide at once (was in-quad / out-quad 214 / 180 ms to 1.17 at alpha 1 and a 154 ms
+        // out-cubic fade for every button); sheet in 0.27 s, out 0.25 s, linear, size constant;
+        // popover a spring from 12.5 % (response 0.25, damping 0.9) from the arrow, close = fade on CoreAnimation's
+        // "default" curve (0.25, 0.1, 0.25, 1) over 128 ms (remaining .853 .593 .348 .176 .076 .036 .021 .010 .004 0:
+        // rms .009; the out-quad 180 ms before it .090, measured on screen .085-.092)
+        readonly property int alertPopIn: 400                 // PopIn NSAnimation 0.4 s
+        readonly property real alertPopAmount: 0.2           // _scaleAmount for PopIn
+        readonly property int alertCancelOut: 250            // ScaleDownAndOut NSAnimation 0.25 s (Solarium)
+        readonly property real alertCancelDuration: 0.1812   // initWithPerceptualDuration: 0.1812 bounce: 0
+        readonly property real alertCancelVelocity: 13       // setInitialVelocity: 13
+        readonly property real alertCancelScale: 0.98        // _scaleAmount 0.98: 1 -> 0.98
+        readonly property var popoverFadeCurve: [0.25, 0.1, 0.25, 1, 1, 1]
+        // R17.4 alert-{,dismiss-}light.mov, the veil's level per frame: linear at 230 levels / s in (0.26 s for the 59;
+        // its first 50 ms are not on screen, the first drawn frame is already at 20 %) and 226 / s out (0.26 s)
         readonly property int sheetIn: 270
         readonly property int sheetOut: 250
         readonly property real popoverFrom: 0.125
         readonly property real popoverResponse: 0.25
         readonly property real popoverDamping: 0.9
-        readonly property int popoverFadeOut: 180
+        readonly property int popoverFadeOut: 128
+        // a menu (pop-up button, NSMenu) closes on the same curve over 236 ms: the Mac menu probe's alpha fits it at
+        // rms .0004 (MOTION-AUDIT.md item 2; the shell's Theme menuFadeOut and Hyprland's fadePopupsOut use the same)
+        readonly property int menuFadeOut: 236
+        // pop-up button menu (R3.5, controls/popup-menu-open-close-{light,dark}.mov, 60 fps; ui/HyprK/Popup.qml): the
+        // pressed look shows 3 (dark) / 4 (light) frames before the menu; a chosen item's highlight is off 4 frames and
+        // on 3 (the menu bar's blink, shell Theme.menu.blinkOff / blinkOn), then the fade, CA default 232 / 234 ms (rms
+        // .002). Pauses counted in frames (FrameAnim): 58 ms ends with the 4th frame, 42 ms with the 3rd
+        readonly property int menuOpenDelay: 42
+        readonly property int menuBlinkOff: 58
+        readonly property int menuBlinkOn: 42
     }
 
     // ---------- traffic lights (SPEC 13; the plugin title bar has the same numbers in
@@ -392,14 +470,29 @@ QtObject {
         // (DesignLibrary MacWindowControlElement.body sub_195e39790; preset FlexInteraction.Settings.windowControl
         // 0x1908b1bb4). From mouse-down to mouse-up the light (disc and glyph) lifts by liftPoints on its longer side
         // (16 pt from 14, Q-windows-08 saw 16-17 pt) and stretches toward a dragged pointer (k per axis from
-        // stretchDistance), all on one spring, press and release alike: response 0.355 s, damping fraction 0.4, the bounce
-        // (to 1.18 at 0.19 s, back to 0.96 after the release). The gesture ends after idleTimeout ms without pointer
+        // stretchDistance), all on one spring, press and release alike: decoded response 0.355 s, damping fraction 0.4
+        // (to 1.18 at 0.19 s, back to 0.96 after the release; the values below are the measured ones). The gesture ends after idleTimeout ms without pointer
         // events (GestureComponent.idleTimeout 2 s; what it does is inferred). plugin/src/LightPress.hpp has the same.
+        // Measured on three Mac 60 fps recordings (LIGHTS-REA sections 8 and 9: windows/close-button-hold-drag.mov,
+        // close-button-hold-still-{dark,light}.mov; disc width and height per frame): one spring for the press, the
+        // release and the idle end, as decoded, but response 0.31 s / damping 0.5 (12 series, rms 0.096 pt; the decoded
+        // 0.355 / 0.4 gives 0.126 and starts late): 16.33 pt at 0.18 s on the press, 13.67 on the way back.
+        // idleTimeout: a still hold ends 2.10 s (dark) / 2.12 s (light) after the press, first moving frame to first
+        // moving frame (the decoded constant is 2 s); the size springs back, the pressed colour stays while the pointer
+        // is on the button.
         readonly property real liftPoints: 2
-        readonly property real liftResponse: 0.355
-        readonly property real liftDamping: 0.4
+        readonly property real liftResponse: 0.31
+        readonly property real liftDamping: 0.5
         readonly property real stretchDistance: 3825.649
-        readonly property int idleTimeout: 2000
+        readonly property int idleTimeout: 2100
+        // leaving the button while it is held: the pressed colour (disc and glyph) fades back to the rest colour as a
+        // critically damped spring of this response, starting 84-102 ms after the drag starts (close-button-hold-still-
+        // {dark,light}.mov: rms 0.009 of the way; CA default 0.5 s gives 0.012). Taking the pressed colour (mouse-down,
+        // coming back onto the button) is one frame
+        readonly property real leaveFade: 0.5
+        // ... and it starts this long after the pointer is off the disc: the cursor drawn in the clips leaves the 7 pt
+        // disc at 3.283 s (dark) / about 3.53 s (light), the fitted fade starts at 3.369 / 3.601 s: 86 / 70 ms
+        readonly property int leaveFadeDelay: 80
         // The Mac shots hold Display P3 numbers: every value below is the sampled one converted to sRGB (p3_to_srgb of
         // reference/ours/COLOUR-P3-AUDIT.md; before, the raw numbers were shown as sRGB, close red 232,112,97 for 250,103,90).
         // Per button, sampled on lights-{rest,hover,press-*}-{light,dark}.png: fill top / centre / bottom (Q-windows-08),
@@ -423,6 +516,7 @@ QtObject {
                 press: { fill: ["#56F66E", "#56F66E", "#56F66E"], ring: ["#AFF88E", "#AFF88E", "#23B900", "#A6F88B", "#A6F88B"], glyph: "#005700", glow: "transparent" } }
             : { fill: ["#5FD02A", "#86D660", "#9BDC7B"], ring: ["#5FD02A", "#005700", "#005700", "#005700", "#9BDC7B"], glyph: "#007B00", glow: Qt.rgba(0, 0.336, 0, 0.05),
                 press: { fill: ["#7DFF3A", "#A4FF71", "#C6FF9C"], ring: ["#7DFF3A", "#008100", "#008100", "#008100", "#C6FF9C"], glyph: "#00AE00", glow: Qt.rgba(0, 0.508, 0, 0.22) } }
+        // (The discs are drawn from TrafficLights.glass; in dark the inactive one is a white veil, alpha .17, R16.4.)
         // Q-windows-09, non-key window (lights-inactive-*.png): dark #4C4C52 -> #47484D, light grey arcs at the top
         // (#B4B4B4) and bottom (#ADADAD); light #EFEFF3 -> #F6F7F8, ring #EAEAEE at the top, #ABABAE on the sides
         readonly property var inactive: t.dark

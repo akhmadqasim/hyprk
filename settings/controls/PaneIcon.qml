@@ -14,6 +14,7 @@ Item {
     property string iconId
     property string imageSource          // e.g. an app icon; wins over iconId
     property color tint: Theme.tile.blue
+    readonly property bool macIcon: /\/themes\/icons\/(apps|system)\/[^\/]+\.png$/.test(imageSource)
     width: size; height: size
 
     // app icons: the shared macOS 26 tile (HyprK AppIconTile)
@@ -22,14 +23,18 @@ Item {
         anchors.centerIn: parent
         size: pi.size / body               // icon body = the pane icon size
         source: pi.imageSource
-        style: pi.style || "default"
+        // a macOS icon carries the style in its file (Backend.appIconUrl): drawn as it is, as the shell's AppIcon
+        trusted: pi.macIcon
+        style: pi.macIcon ? "default" : pi.style || "default"
         dpr: pi.dpr
     }
     // The PNG is the whole icon canvas: the tile body is 104 of 128 px (12..116), the rest is its shadow.
     // Drawn so the body is `size`, like the glyph tile; the 64 px file up to 64 device px, else the 128 px one.
     // A row icon is drawn as the Mac draws it, a 24 pt icon for the 20 pt tile (accessibility-light.png: tile body
     // 40 px, image 48 px), so at 2x its file lands on whole pixels.
-    readonly property real art: Panes.isRowIcon(iconId) ? size * 1.2 : size * 128 / 104
+    // A crop icon (Panes.cropIcons) is the Mac's own tile with its shadow, cut from a row at 2x.
+    readonly property bool crop: Panes.isCropIcon(iconId)
+    readonly property real art: crop ? size * Panes.cropScale(iconId) : Panes.isRowIcon(iconId) ? size * 1.2 : size * 128 / 104
     // the window's real ratio (1.6 on a fractional output, where Screen.devicePixelRatio says 2), as Finder passes
     // its display.dpr: the art is decoded at the pixels it is drawn on
     readonly property real dpr: Theme.dpr > 0 ? Theme.dpr : Screen.devicePixelRatio
@@ -46,10 +51,12 @@ Item {
         anchors.centerIn: parent
         width: pi.art; height: pi.art
         visible: status === Image.Ready
-        source: pi.imageSource === "" && Panes.hasRealIcon(pi.iconId)
+        source: pi.imageSource !== "" ? ""
+            : pi.crop ? "file://" + Backend.root + "/themes/icons/settings/crops/" + pi.iconId + "-" + (Theme.dark ? "dark" : "light") + ".png"
+            : Panes.hasRealIcon(pi.iconId)
             ? "file://" + Backend.root + "/themes/icons/settings/" + pi.iconId + "@" + Panes.iconPx(pi.iconId, pi.artPx)
               + "-" + pi.style + "-" + (pi.darkArt ? "dark" : "light") + ".png" : ""
-        sourceSize: Qt.size(pi.artPx, pi.artPx)   // scaled once when decoded, cached per size
+        sourceSize: pi.crop ? undefined : Qt.size(pi.artPx, pi.artPx)   // scaled once when decoded, cached per size
         smooth: true
     }
     // Icon & widget style (Appearance pane): default = colored tile, dark = black tile with

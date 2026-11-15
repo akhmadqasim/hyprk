@@ -6,7 +6,10 @@
 //                        MAC-ANSWERS.md Q-dock-06, Q-dock-07)
 //   fill = (k, k, k, a)  is dst * (1 - a) + k (the Dock label fill over the Dock glass, Q-dock-08)
 // Shape: a rounded rect of `sizePt` with corner `radius` (pt; a capsule when radius >= half the height),
-// anti-aliased over one device pixel (`dpr`).
+// anti-aliased over one device pixel (`dpr`). `pad` (pt, optional, 0 when the item does not set it): the item is that
+// much larger than the shape on every side, so the ramp outside the shape has pixels to land on. Without it a shape
+// edge that falls inside a pixel is cut at the item's edge: a 1 pt line at scale 1.5 drew [1] where the Mac's
+// downsample gives [1, .5] (SCALING-AUDIT.md, round R3.3).
 layout(location = 0) in vec2 qt_TexCoord0;
 layout(location = 0) out vec4 fragColor;
 layout(std140, binding = 0) uniform buf {
@@ -16,12 +19,13 @@ layout(std140, binding = 0) uniform buf {
     vec2 sizePt;
     float radius;
     float dpr;
+    float pad;
 };
 
 void main() {
     vec2 h = sizePt * 0.5;
     float r = min(radius, min(h.x, h.y));
-    vec2 q = abs(qt_TexCoord0 * sizePt - h) - (h - vec2(r));
+    vec2 q = abs(qt_TexCoord0 * (sizePt + 2.0 * pad) - pad - h) - (h - vec2(r));
     float dist = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
     fragColor = fill * clamp(0.5 - dist * dpr, 0.0, 1.0) * qt_Opacity;
 }

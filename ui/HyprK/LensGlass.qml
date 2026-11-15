@@ -34,14 +34,30 @@ Item {
     // true: the rim's dark specular darkens the faced sample (the face* matrix and fill when set, else the decoded dark
     // Regular face), not the plain sample (glasslens4.frag; GLASS-HIG.md rounds 2 and 4)
     property bool rimFace: false
+    // true: the decoded stroke mode (QuartzCore-glass-shaders.c step 4, KeyFillHighlightEffectOffset = -height): the
+    // dark specular is the pixel just outside the glass shape and tones the plain backdrop there; the outer outlineWidth
+    // pt of this item is that line and the glass (refraction, outer mix, face) is the item inset by it. With
+    // fillBackdropOutside the outer sample also reads `backdrop` beyond the source (GLASS-HIG.md round 5)
+    property bool rimStroke: false
     // the glassForeground filter's chromatic aberration (the held switch, MAC-ANSWERS Verify B 5: inputAberrationAmount
     // 1.632 pt, inputAberrationAngle -15 deg, inputEdgeStart -6.2; live/verify/B/dumps/switch-knob-held.json): the
     // glass re-read per channel along an offset that follows the rim normal through the swapped displacement matrix
-    // (decoded from glass_foreground_base, glasslens4.frag), faded out aberrationEdge pt inside the rim. 0: none.
+    // (decoded from glass_foreground_base, glasslens4.frag), full at the item's edge and gone aberrationEdge pt in
+    // (GLASS-HIG.md round 7; round 6 had it the other way round). 0: none.
     // Until 2026-11-14 a fixed offset on the rim line only (GLASS-HIG.md round 3)
     property real aberration: 0
     property real aberrationAngle: -15
     property real aberrationEdge: 6.2
+    // where `source` is empty (backdrop transparent: a knob over a window's own glass), the backdrop level (0..1) the
+    // glass's ring shadow, key / fill highlight and dark specular line are drawn for as plain layers (glasslens4.frag
+    // eRing / eLight / eLine). 0: the white lit and black `outline` only (GLASS-HIG.md round 7)
+    property real emptyLevel: 0
+    // the glass's own content (glasslens4.frag gfill): a layer of this colour in the glass shape UNDER the glass, so the
+    // refraction bends it with the backdrop (the held switch knob's white fill: switch-held-stripes-*.mov show it inset
+    // about 4 pt from the growing lens's ends, the rim region sampling the track outside it; GLASS-HIG.md round 8).
+    // strength 0 .. 1 scales the glass's terms (refraction, light, ring shadow, rim tone, aberration): the growth
+    property color glassFill: "transparent"
+    property real strength: 1
     // the filter's face colour matrix instead of gain / tint-only (MAC-ANSWERS verify C / C2: black, white, saturation,
     // maxLuma; faceWhite 0: off). The fill colour stays `tint`
     property real faceBlack: 0
@@ -72,7 +88,8 @@ Item {
     property real keyFalloff: 1
     // the glassBackground filter's ring shadow (a band ringWidth pt wide inside the edge of the face moved ringOffset pt
     // down, blurred ringBlur pt, darkening the face by ringOpacity) and its key / fill highlight (fillLight 0 .. 1);
-    // both off by default (glasslens4.frag)
+    // both off by default (glasslens4.frag). The highlight reads the plain capsule normal: QuartzCore ovalizes it only on
+    // shapes whose shorter side is over 64 pt (MAC-ANSWERS-8.md R8.1), and every LensGlass is a capsule of at most 37 pt
     property real ringOffset: 0
     property real ringWidth: 0
     property real ringBlur: 0
@@ -90,10 +107,12 @@ Item {
     // the blur, its rim only with the edge repeat (GLASS-HIG.md round 3)
     property bool fillBackdropOutside: false
     readonly property real margin: Math.ceil(Math.abs(amount) + Math.abs(dispAmount) + Math.abs(outerAmount) + Math.max(blur, 2.25 * fillSigma) + 1)
-    // a button's light (ToolbarHighlight): a disc of Tokens.toolbar.hoverDiscRadius round discCentre with discLift added,
-    // then SwiftUI's press light round glowCentre (item px; motion.js glow*): the BigGlow square (half side glowHalf,
-    // opacity glowBig) and the LittleGlow blurred circle (opacity glowLittle, gain glowDodge, coverage table glowLut
-    // indexed in quarters of glowRadius: motion.js glowLutRadius)
+    // a button's light (ToolbarHighlight): a disc of Tokens.toolbar.hoverDiscRadius round discCentre with discLift added
+    // (< 0: black at -discLift over it, a glass button's interaction fill in light),
+    // then SwiftUI's press light round glowCentre (item px; motion.js glow*): the BigGlow over the whole glass (opacity
+    // glowBig; the code's square edge does not show on the Mac, INTERACTIVE-GLASS-REA.md 1, so glowHalf is unused) and
+    // the LittleGlow blurred circle (opacity glowLittle, gain glowDodge, coverage table glowLut indexed in quarters of
+    // glowRadius: motion.js glowLutRadius)
     property point discCentre: Qt.point(0, 0)
     property real discLift: 0
     property point glowCentre: Qt.point(0, 0)
@@ -103,8 +122,9 @@ Item {
     property real glowRadius: 1
     property real glowDodge: 1
     property var glowLut: []
-    // an AppKit toolbar platter's pressed interaction layer (ToolbarHighlight.platterPress, motion.js platterPress):
-    // the whole face mixed toward 0.3125 c + 0.9375 (dark) / - 0.25 (light) by this alpha
+    // an AppKit toolbar platter's interaction layer (motion.js platterPress): the whole face mixed toward 0.3125 c +
+    // 0.9375 (dark) / - 0.25 (light) by this alpha. The Mac shows it once a held Back's history menu is open (round 7,
+    // TOOLBAR-REA-27.2.1.md 2); ours opens no such menu, so nothing sets it now
     property real platterPress: 0
     // only draw the light the disc and the glow add (over the capsule as already drawn; give `backdrop` the opaque
     // colour under the capsule so the gain sees what is on screen)
@@ -135,10 +155,13 @@ Item {
         property real blur: g.blur
         property vector4d refr2: Qt.vector4d(g.dispAmount, Math.max(0.01, g.dispBand), g.outerAmount, Math.max(0.01, g.outerBand))
         property real outerOpacity: g.outerOpacity
-        property vector4d rimSpec: Qt.vector4d(g.rimBias, Math.cos(g.rimSpread * Math.PI / 180), g.rimFace ? (g.faceWhite > 0 ? 2 : 1) : 0, g.rimAmount)
-        property vector4d aberr: Qt.vector4d(g.aberration, g.aberrationAngle * Math.PI / 180, g.aberrationEdge, 0)
+        property vector4d rimSpec: Qt.vector4d(g.rimBias, Math.cos(g.rimSpread * Math.PI / 180), g.rimStroke ? (g.rimFace && g.faceWhite > 0 ? 4 : 3) : g.rimFace ? (g.faceWhite > 0 ? 2 : 1) : 0, g.rimAmount)
+        property vector4d aberr: Qt.vector4d(g.aberration, g.aberrationAngle * Math.PI / 180, g.aberrationEdge, g.emptyLevel)
         property vector4d face: Qt.vector4d(g.faceBlack, g.faceWhite, g.faceSat, g.faceMaxLuma)
         property real fillOut: g.fillBackdropOutside ? 1 : 0
+        property vector4d gfill: Qt.vector4d(g.glassFill.r * g.glassFill.a, g.glassFill.g * g.glassFill.a,
+                                             g.glassFill.b * g.glassFill.a, g.glassFill.a)
+        property real fxs: Math.max(0, Math.min(1, g.strength))
         property vector4d bfill: Qt.vector4d(g.fillSigma, g.fillNormal, g.fillDarken, g.fillLighten)
         property real gain: g.gain
         property real outline: g.outline

@@ -53,7 +53,8 @@ function pressStretch(w, h, sx, sy, px, py) {
 // The press light (FlexInteraction "glow"; GLASS-INTERACTION.md 4): GlowContainer.body 0x190c1f0c4 draws two CALayers,
 // both size x size (size = min(1.5 x the glass's shorter side, 160), updateGlow 0x190c24650), at the pointer, scaled by
 // the glow scale, clipped to the glass:
-// - FlexInteraction.BigGlow: an opaque white square under a backdrop-aware vibrantColorMatrix of
+// - FlexInteraction.BigGlow: an opaque white square (by the code; its edge does not show on the Mac, so glasslens4.frag
+//   draws it over the whole glass: INTERACTIVE-GLASS-REA.md 1) under a backdrop-aware vibrantColorMatrix of
 //   _ColorMatrix.YCC(black 0.05, white 1.05, saturation 1.2, hue 0) (0x190c1f6f0; argument order from
 //   apply(blackWhite:saturation:hue:) 0x190ec5bd0's identity test): Y' = 0.05 + Y, chroma x 1.2;
 // - FlexInteraction.LittleGlow: no fill, a white shadow of its circle (kCALayerCornerRadiusAutomaticPill, shadowPathIsBounds,
@@ -130,6 +131,113 @@ function platterPress(c, dark, a) {   // one channel 0..1
     const t = Math.min(1, Math.max(0, m.slope * c + m.bias));
     return c + a * (t - c);
 }
+
+// The pressed slider / switch knob's lens: FlexInteraction `liquidLens` with sources [.movement] while pressed
+// (DesignLibrary knob sub_195e18154, switch sub_195e36f74; INTERACTIVE-GLASS-REA.md 2). The lens is deformed by the
+// knob's ACCELERATION, not by its speed or the pointer.
+// Parameter set, Settings liquidLens branch 0x1908b139c: t = clamp((shorter side - 37) / 33) (0xc042800000000000,
+// 0x4040800000000000); normalisation 2000 + 500 t, movement points 2.5 + 22.5 t, scale 0.9 - 0.15 t .. 1.1 + 0.05 t,
+// spring response 0.444 + 0.056 t, damping 0.56 + 0.44 t (tables 0x191393f50..f80). Every knob lens of ours has t = 0.
+function liquidLensSet(w, h) {
+    const t = clamp01((Math.min(w, h) - 37) / 33);
+    return { norm: 2000 + 500 * t, pts: 2.5 + 22.5 * t, minScale: 0.9 - 0.15 * t, maxScale: 1.1 + 0.05 * t,
+             response: 0.444 + 0.056 * t, damping: 0.56 + 0.44 * t };
+}
+// ParameterSet.movementScaleRange 0x1908b1ec0: the scale range of one axis of size dim
+function movementRange(dim, set) {
+    const d = Math.max(dim, 1e-6);
+    return [Math.max(set.minScale, (d - set.pts) / d), Math.min(set.maxScale, (d + set.pts) / d)];
+}
+// CGFloat.softClamp(in:) 0x190c24b74: unchanged inside [lo, hi]; outside edge + k tanh(0.55 (x - edge) / k),
+// k = (hi - lo) / 3 (fmov 3 at 0x190c24b88, 0.55 = 0x3fe199999999999a), so at most hi + k / lo - k
+function softClamp(x, lo, hi) {
+    if (x >= lo && x <= hi) return x;
+    const k = (hi - lo) / 3;
+    if (k <= 0) return Math.max(lo, Math.min(hi, x));
+    const e = x > hi ? hi : lo;
+    return e + k * Math.tanh(0.55 * (x - e) / k);
+}
+// applyMovement 0x190c22a70: [scale x, scale y, offset x, offset y] of a w x h view for the movement (acceleration
+// ax, ay; velocity vx, vy, pt/s). Per axis (x shown, y swaps the axes): m = ax / norm; a = softClamp(1 + m (hi_x - 1));
+// scale x += a - 1, offset x += w (1 - a) / 2 sign(vx) (the leading edge stays, the tail moves); scale y +=
+// softClamp(1 + m (lo_y - 1)) - 1. Scaled about the view's centre, then offset
+function movementScale(ax, ay, vx, vy, w, h, set) {
+    const rx = movementRange(w, set), ry = movementRange(h, set);
+    const out = [1, 1, 0, 0];
+    const sgn = v => (v < 0 || Object.is(v, -0)) ? -1 : 1;   // copysign(1, v)
+    const mx = ax / set.norm, my = ay / set.norm;
+    if (mx !== 0 && isFinite(mx)) {
+        const a = softClamp(1 + mx * (rx[1] - 1), rx[0], rx[1]);
+        out[0] += a - 1;
+        out[2] += w * (1 - a) / 2 * sgn(vx);
+        out[1] += softClamp(1 + mx * (ry[0] - 1), ry[0], ry[1]) - 1;
+    }
+    if (my !== 0 && isFinite(my)) {
+        const a = softClamp(1 + my * (ry[1] - 1), ry[0], ry[1]);
+        out[1] += a - 1;
+        out[3] += h * (1 - a) / 2 * sgn(vy);
+        out[0] += softClamp(1 + my * (rx[0] - 1), rx[0], rx[1]) - 1;
+    }
+    return out;
+}
+// The movement source (ResolvedMovement.updateValue 0x190c2128c: the view's position and the graph time into
+// VelocityIntegrator<AnimatablePair> addSample(_:timestamp:) 0x190c15eb0; set up by setupIntegrator 0x190c21010):
+// a sample less than 2.5 ms after the last is dropped (+0x20 = 0x3f647ae147ae147b); the position goes through an
+// EMAFilter (+0x48), the velocity (filtered position - the last one) / dt through a second (+0x70), and the
+// acceleration (|v| - |v last|) / dt per axis (the integrator's magnitude closure 0x190c2127c is fabs; the
+// window-average flag +0x28 is off) through a third (+0x98); each EMAFilter.update (0x19091c308) is
+// value = (1 - 0.3) value + 0.3 x (0x3fd3333333333333 at 0x190c210c4), the first sample taken as it is. So speeding
+// up gives a > 0 whichever way the knob goes, slowing down (or the stop at an end) a < 0. Outputs Movement
+// { acceleration, velocity } (0x190c21344 / 0x190c21350); reset when the source goes inactive (0x190c214e0).
+function movementStart() { return { t: NaN, p: null, v: null, a: null, vel: [0, 0], acc: [0, 0] }; }
+function _ema(prev, x) { return prev === null ? x.slice() : [0.7 * prev[0] + 0.3 * x[0], 0.7 * prev[1] + 0.3 * x[1]]; }
+function movementSample(st, x, y, t) {
+    if (!isNaN(st.t) && t - st.t < 0.0025) return st;
+    const p = _ema(st.p, [x, y]);
+    if (isNaN(st.t)) return { t: t, p: p, v: null, a: null, vel: [0, 0], acc: [0, 0] };
+    const dt = t - st.t;
+    const v = _ema(st.v, [(p[0] - st.p[0]) / dt, (p[1] - st.p[1]) / dt]);
+    const last = st.v || [0, 0];
+    const a = _ema(st.a, [(Math.abs(v[0]) - Math.abs(last[0])) / dt, (Math.abs(v[1]) - Math.abs(last[1])) / dt]);
+    return { t: t, p: p, v: v, a: a, vel: v, acc: a };
+}
+
+// SF Symbols `.bounce` (default options) on a slider's end glyph (INTERACTIVE-GLASS-REA.md 3, 8): the scale about the
+// symbol's ink centre at t s after the trigger. Segment times decoded (RenderBox bounce_keyframes 0x196b18c14: 0.21667,
+// 0.21667, 0.15 s); the peak / trough and the in-segment ease (smoothstep) fitted on the R7.4 clips frame by frame
+// (slider-icon-ends-cc-{sound,display}-dark.mov): speaker.fill (one layer) 1.27 / 0.89 (rms 0.015).
+// A symbol of several layers bounces BY LAYER: every layer runs the same curve about the symbol's centre, each
+// symbolBounceStagger after the one before (edges read per frame, sub-pixel: sun.max.fill disc 1.24 / 0.907 with its
+// peak at +0.21 s, rays 1.26 / 0.89 0.05 s later; sun.min.fill 1.247 / 0.91 and 1.25 / 0.89, 0.05 s; speaker.wave.3
+// .fill's outer wave 1.26 / 0.92 about 0.12-0.16 s after the speaker; Settings > Appearance's capsule.on.rectangle
+// glyphs 1.24-1.26 / 0.90, the capsule first and the rectangle 0.05 s later, the 23.09.23 recording). The whole-glyph
+// 1.21-1.23 / 0.86-0.87 fitted before were the layers' envelope.
+// The raw keyframes 1.109 / 0.909 are not these scales (their meaning was not decoded)
+const symbolBounceTimes = [0.21667, 0.43333, 0.58333];
+function symbolBounce(t, peak, trough) {
+    if (!(t > 0) || t >= symbolBounceTimes[2]) return 1;
+    const k = [[0, 1], [symbolBounceTimes[0], peak], [symbolBounceTimes[1], trough], [symbolBounceTimes[2], 1]];
+    for (let i = 1; i < k.length; i++) {
+        if (t <= k[i][0]) {
+            const s = (t - k[i - 1][0]) / (k[i][0] - k[i - 1][0]);
+            return k[i - 1][1] + (k[i][1] - k[i - 1][1]) * s * s * (3 - 2 * s);
+        }
+    }
+    return 1;
+}
+const symbolBounceStagger = 0.05;
+const _bounceLayerAmp = [1.25, 0.90];
+const _bounceAmp = { "speaker.fill": [1.27, 0.89] };
+// the layer of each path, in the path order of the symbol's outline data (sf.js / sfpaths.js); layer 0 moves first
+const _bounceLayers = { "speaker.wave.3.fill": [3, 2, 1, 0],            // paths: waves from the outside in, speaker
+                        "sun.min.fill": [1, 0], "sun.max.fill": [1, 0],  // rays, disc
+                        "capsule.on.rectangle.fill": [1, 0],             // rectangle, capsule
+                        "capsule.on.rectangle.liquid.glass": [1, 0, 1] };   // rectangle, capsule, the rectangle seen in it
+// [layer, ...] per path; [0] for a one-layer symbol
+function symbolBounceLayerOf(name) { return _bounceLayers[name] || [0]; }
+function symbolBounceLayers(name) { return Math.max.apply(null, symbolBounceLayerOf(name)) + 1; }
+// [peak, trough] of each layer; a symbol not measured takes speaker.fill's (one layer)
+function symbolBounceAmp(name) { return _bounceAmp[name] || (_bounceLayers[name] ? _bounceLayerAmp : _bounceAmp["speaker.fill"]); }
 
 // One step of a SwiftUI-parameterised spring (response s, dampingFraction), semi-implicit Euler
 // in <= 4 ms sub-steps. Returns [x, v].

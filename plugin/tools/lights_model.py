@@ -12,6 +12,12 @@ colours clipped, so M can be below 0):
           mix(body, rimC, e(d) * |u / rho|^n)   (axis "u": the sides)
           d = pt inside the edge, e = e0 up to 0.25 pt, e1 at 0.75 pt, 0 from 1.25 pt, linear between
   glow  : glowC with alpha g0 * 0.5 * erfc((|p - (0, GLOW_DY)| - R) / (GLOW_SIGMA * sqrt 2)), under the disc
+  veil  : a state in VEIL is not an opaque disc but a white layer over whatever is behind it; its T, M, B and rimC
+          are that layer's alpha x 255 (grey triples), so the same formula gives the alpha: out = bg + (255 - bg) *
+          col / 255. The dark inactive disc: (76,76.5,82) over a (39,40,47) bar in lights-inactive-dark.png and
+          (72.7,74.6,75.3) over (35,38,39) in lights-system-settings-active-dark-srgb.png (R16.4, Finder's window
+          behind) are both white at alpha .17 in the centre; as an opaque grey it kept the first crop's blue cast
+          on every bar (78,79,86).
 The same formula is drawn by plugin/src/Titlebar.cpp (per pixel into a texture) and ui/HyprK/shaders/lights.frag.
 
   lights_model.py fit      fit every state to the crops, print the table and the residuals (rms, max per state)
@@ -48,7 +54,7 @@ TABLE = {
         ((153, 245, 52), (-2, 227, -34), (163, 241, 123), 0.6, "v", 1.5, (143, 255, 132), 0.70, 0.67, (0, 0, 0), 0.000),  # no Mac crop of this press (lights-press-zoom-dark.png shows the rest disc): rest x the close / minimise gains
     ],
     "darkInactive": [
-        ((81, 82, 89), (78, 79, 86), (67, 68, 74), 1.3, "v", 3.0, (243, 243, 238), 0.60, 0.24, (0, 0, 0), 0.000),
+        ((50, 50, 50), (47, 47, 47), (33, 33, 33), 1.3, "v", 3.0, (238, 238, 238), 0.60, 0.24, (0, 0, 0), 0.000),  # VEIL: alpha x 255 of a white layer (was the opaque (81,82,89) (78,79,86) (67,68,74), rim (243,243,238))
         None,  # as the first
         None,  # as the first
     ],
@@ -82,7 +88,9 @@ TABLE = {
 # dark           2  rms 7.34  max 44  body rms 7.35  (crop disc offset 0.00 0.00 pt, radius +0.00)
 # darkPress      0  rms 5.83  max 39  body rms 3.18  (crop disc offset 0.00 0.00 pt, radius +0.05)
 # darkPress      1  rms 9.39  max 51  body rms 8.24  (crop disc offset 0.00 0.00 pt, radius +0.00)
-# darkInactive   0  rms 2.72  max 23  body rms 0.67  (crop disc offset 0.00 0.00 pt, radius +0.00)
+# darkInactive   0  rms 3.25  max 26  body rms 0.73  (as alpha x 255; crop disc offset 0.00 0.00 pt, radius +0.00)
+#   the same row against R16.4's second still (lights-system-settings-active-dark-srgb.png, Finder's inactive lights
+#   over (35,38,39)): see LIGHTS-REA section 12
 # light          0  rms 4.85  max 49  body rms 1.65  (crop disc offset 0.00 0.00 pt, radius +0.00)
 # light          1  rms 4.97  max 49  body rms 1.44  (crop disc offset 0.00 0.00 pt, radius +0.00)
 # light          2  rms 5.79  max 43  body rms 2.20  (crop disc offset 0.00 0.00 pt, radius +0.00)
@@ -90,6 +98,9 @@ TABLE = {
 # lightPress     1  rms 9.43  max 73  body rms 6.42  (crop disc offset 0.00 0.00 pt, radius +0.05)
 # lightPress     2  rms 8.82  max 56  body rms 2.09  (crop disc offset 0.00 0.00 pt, radius +0.05)
 # lightInactive  0  rms 2.90  max 19  body rms 1.02  (crop disc offset 0.00 0.00 pt, radius -0.05)
+
+
+VEIL = {"darkInactive"}          # states drawn as a white layer (see "veil" above)
 
 
 def body(u, v, T, M, B, sg):
@@ -115,13 +126,16 @@ def glow_a(x, y, R, g0):
     return g0 * 0.5 * _erfc((np.hypot(x, y - GLOW_DY) - R) / (GLOW_SIGMA * math.sqrt(2)))
 
 
-def render(p, R, x, y, bg, px):
+def render(p, R, x, y, bg, px, veil=False):
     """x, y: pt from the disc centre (arrays); px: pt per device pixel; returns sRGB bytes over bg"""
     T, M, B, sg, axis, n, rimC, e0, e1, glowC, g0 = p
     u, v = x / R, y / R
     col = body(u, v, T, M, B, sg)
     w = rim_w(u, v, R, axis, n, e0, e1)[..., None]
     col = np.clip(col * (1 - w) + np.asarray(rimC, float) * w, 0, 255)
+    if veil:
+        al = col.mean(axis=-1, keepdims=True) / 255
+        col = np.asarray(bg, float) * (1 - al) + 255 * al
     cov = np.clip((R - np.hypot(x, y)) / px + 0.5, 0, 1)[..., None]
     out = np.asarray(bg, float) * np.ones_like(col)
     if g0 > 0:
@@ -175,10 +189,12 @@ def censored(X, y):
     return c
 
 
-def fit_one(img, btn, pressed, glyph, dark):
-    x, y, I = grid(img, btn)
-    bg = img[2, 100] if not dark else img[40, 100]
+def fit_one(img, btn, pressed, glyph, dark, veil=False):
     bg = np.array([np.median(img[50:62, 4 * 20:4 * 20 + 6, c]) for c in range(3)])
+    if veil:   # the crop as the white layer's alpha x 255, one grey value per pixel
+        al = np.clip((img - bg) / (255 - bg), 0, 1).mean(axis=2, keepdims=True) * 255
+        img, bg = al * np.ones(3), np.zeros(3)
+    x, y, I = grid(img, btn)
     R = RADIUS * (PRESS if pressed else 1)
     u, v = x / R, y / R
     rho = np.hypot(u, v)
@@ -263,7 +279,7 @@ def cmd_fit(sheet=None):
             if "Inactive" in name and b:
                 print("        None,  # as the first")
                 continue
-            p, rms, mx, rin, off, (I, pred, m) = fit_one(load(crops[b]), b, pressed, glyph, dark)
+            p, rms, mx, rin, off, (I, pred, m) = fit_one(load(crops[b]), b, pressed, glyph, dark, name in VEIL)
             res.append((name, b, rms, mx, rin, off[0], off[1], off[2]))
             tiles.append(np.hstack([I, pred]))
             print("        %s," % fmt_py(p))
@@ -290,9 +306,9 @@ CPP = os.path.join(ROOT, "plugin", "src", "Titlebar.cpp")
 QML = os.path.join(ROOT, "ui", "HyprK", "TrafficLights.qml")
 
 
-def flat(r):
+def flat(r, veil=False):
     T, M, B, sg, axis, n, rimC, e0, e1, glowC, g0 = r
-    return [*T, *M, *B, sg, 0 if axis == "v" else 1, n, *rimC, e0, e1, *glowC, g0]
+    return [*T, *M, *B, sg, 0 if axis == "v" else 1, n, *rimC, e0, e1, *glowC, g0, 1 if veil else 0]
 
 
 def num(x):
@@ -306,7 +322,7 @@ def emit_cpp():
     for mode in ("light", "dark"):
         out.append("        {")
         for k in KEYS[mode]:
-            out.append("            {" + ", ".join("{" + ", ".join(num(x) for x in flat(r)) + "}" for r in t[k]) + "},")
+            out.append("            {" + ", ".join("{" + ", ".join(num(x) for x in flat(r, k in VEIL)) + "}" for r in t[k]) + "},")
         out.append("        },")
     out.append("    };")
     return "\n".join(out)
@@ -319,7 +335,7 @@ def emit_qml():
     for mode in ("light", "dark"):
         out.append("        %s: [" % mode)
         for k in KEYS[mode]:
-            out.append("            [" + ", ".join("[" + ", ".join(num(x) for x in flat(r)) + "]" for r in t[k]) + "],")
+            out.append("            [" + ", ".join("[" + ", ".join(num(x) for x in flat(r, k in VEIL)) + "]" for r in t[k]) + "],")
         out.append("        ],")
     out.append("    })")
     return "\n".join(out)
@@ -356,7 +372,7 @@ def cmd_render(out, scale):
                 x = (xs + 0.5) * px - (16 + PITCH * b)
                 y = (ys + 0.5) * px - 16
                 m = np.hypot(x, y) < R + 4
-                img[m] = render(t[k][b], R, x[m], y[m], bg, px)
+                img[m] = render(t[k][b], R, x[m], y[m], bg, px, k in VEIL)
             rows.append(img)
     Image.fromarray(np.clip(np.vstack(rows), 0, 255).round().astype(np.uint8)).save(out)
 

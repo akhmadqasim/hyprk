@@ -6,6 +6,9 @@
 //   body = M + (T - M) clamp((V0 - v) / (V0 + 1)) + (B - M) clamp((v - V0) / (1 - V0)) exp(-(u / sg)^2)
 //   rim  = mix(body, rimC, e(d) |axis / rho|^n), e = e0 up to 0.25 pt inside the edge, e1 at 0.75 pt, 0 from 1.25 pt
 //   glow = glowC, alpha g0 erfc-shadow of the disc, GLOW_DY lower, under the disc
+//   veil 1: the result is the alpha of a white layer instead of a colour (the dark inactive disc)
+//   veil in (0, 1): the disc is a layer that lets that share of the window through, less in the rim (through x (1 - w));
+//   its colours are what it reads over white (the light inactive disc)
 layout(location = 0) in vec2 qt_TexCoord0;
 layout(location = 0) out vec4 fragColor;
 layout(std140, binding = 0) uniform buf {
@@ -18,7 +21,8 @@ layout(std140, binding = 0) uniform buf {
     vec4 colM;
     vec4 colB;      // rgb, a = sg
     vec4 rim;       // rgb, a = n
-    vec4 rimE;      // e0, e1, axis (0 top/bottom, 1 sides), unused
+    vec4 rimE;      // e0, e1, axis (0 top/bottom, 1 sides), veil (1: the colours are a white layer's alpha; between 0
+                    // and 1: the share of the window that shows through the disc)
     vec4 glow;      // rgb, a = g0
 };
 
@@ -48,5 +52,15 @@ void main() {
     float e = d <= 0.25 ? rimE.x : d <= 0.75 ? mix(rimE.x, rimE.y, (d - 0.25) / 0.5) : max(0.0, rimE.y * (1.25 - d) / 0.5);
     float w = e * pow(abs((rimE.z > 0.5 ? uv.x : uv.y) / rho), rim.a);
     vec3 col = clamp(mix(body, rim.rgb, w), 0.0, 1.0);
+    if (rimE.w > 0.0 && rimE.w < 0.995) {     // a layer over the window: col over white, col - t (1 - bg) over bg
+        float t = rimE.w * (1.0 - clamp(w, 0.0, 1.0));
+        fragColor = vec4(max(col - t, 0.0) * cov, (1.0 - t) * cov) * qt_Opacity;
+        return;
+    }
+    if (rimE.w > 0.5) {     // a veil: white at alpha col (lights_model.py VEIL), no glow
+        float al = (col.r + col.g + col.b) / 3.0 * cov;
+        fragColor = vec4(al) * qt_Opacity;
+        return;
+    }
     fragColor = vec4(col * cov + glow.rgb * ga * (1.0 - cov), cov + (1.0 - cov) * ga) * qt_Opacity;
 }

@@ -10,7 +10,7 @@ const path = require("node:path");
 const root = path.join(__dirname, "..");
 const icons = path.join(root, "..", "themes", "icons", "settings");
 // Panes.js is a QML .js library (no exports): evaluate it and pick what the test needs
-const P = new Function(fs.readFileSync(path.join(root, "Panes.js"), "utf8") + "; return { panes, rowIcons, extraIcons, hasRealIcon, iconPx, isRowIcon };")();
+const P = new Function(fs.readFileSync(path.join(root, "Panes.js"), "utf8") + "; return { panes, rowIcons, extraIcons, hasRealIcon, iconPx, isRowIcon, cropIcons, isCropIcon, cropScale };")();
 const styles = ["default-light", "default-dark", "dark-light", "dark-dark", "clear-light", "clear-dark", "tinted-light", "tinted-dark"];
 const graphic = JSON.parse(fs.readFileSync(path.join(icons, "graphic.json"), "utf8"));
 const built = Object.assign({}, graphic.icons, graphic.stacks, graphic.bitmaps);
@@ -22,6 +22,23 @@ test("row icons: one 48 px file per style, listed in graphic.json", () => {
         assert.equal(P.iconPx(id, 50), 48);
     }
     for (const [id, e] of Object.entries(built)) if (e.sizes.length === 1 && e.sizes[0] === 48) assert.ok(P.isRowIcon(id), id);
+});
+
+test("crop icons (R14.3): the Mac's own tile, light and dark, at the size Panes.js names", () => {
+    const crops = path.join(icons, "crops");
+    const size = f => fs.readFileSync(f).readUInt32BE(16);          // PNG IHDR width
+    const ids = Object.keys(P.cropIcons);
+    assert.equal(ids.length, 27);
+    for (const id of ids) {
+        for (const m of ["light", "dark"]) {
+            const f = path.join(crops, `${id}-${m}.png`);
+            assert.ok(fs.existsSync(f), `${id} ${m}`);
+            assert.equal(size(f), P.cropIcons[id][0], `${id} ${m} px`);
+        }
+        assert.ok(P.isCropIcon(id) && P.hasRealIcon(id) && !P.isRowIcon(id), id);
+    }
+    assert.equal(P.cropScale("privacy-camera" in P.cropIcons ? "privacy-camera" : "privacy-bluetooth"), 1.2);
+    assert.deepEqual(fs.readdirSync(crops).sort(), ids.flatMap(id => [`${id}-dark.png`, `${id}-light.png`]).sort());
 });
 
 test("pane icons: 64 and 128 px per style", () => {
@@ -41,11 +58,14 @@ test("every iconId in the panes is a known icon; no Material font left in settin
             if (f.isDirectory()) walk(p); else if (/\.(qml|js)$/.test(f.name)) files.push(p);
         }
     })(root);
+    // rows the Mac has whose tile is not extracted from it yet: drawn as a plain coloured tile (settings/FALLBACKS.md)
+    const notExtracted = ["ax-rtt",   // Accessibility > RTT (R12.1)
+        "general-devicemanagement"];   // R13: General's Device Management
     for (const f of files) {
         const src = fs.readFileSync(f, "utf8");
         assert.ok(!/fontGlyph|font\.family:\s*"Material/.test(src), `${path.relative(root, f)} still asks for the glyph font`);
         for (const m of src.matchAll(/\b(?:iconId|icon): (?:[^;\n]*? )?"([a-z0-9-]+)"/g))
-            if (/iconId|icon: "/.test(m[0]) && !/glyph/.test(m[0])) assert.ok(P.hasRealIcon(m[1]), `${path.relative(root, f)}: ${m[1]}`);
+            if (/iconId|icon: "/.test(m[0]) && !/glyph/.test(m[0])) assert.ok(P.hasRealIcon(m[1]) || notExtracted.includes(m[1]), `${path.relative(root, f)}: ${m[1]}`);
     }
     const ui = path.join(root, "../ui/HyprK");           // the shared controls draw SF Symbols too (SfSymbol)
     for (const f of fs.readdirSync(ui).filter(f => /\.(qml|js)$/.test(f)))

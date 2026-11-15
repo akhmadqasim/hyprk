@@ -4,7 +4,7 @@ import "../controls"
 import "../HyprK"
 import "../Parsers.js" as P
 
-// Functional via bluetoothctl. No controller -> "Bluetooth Unavailable" like macOS.
+// Functional via bluetoothctl. No bluetoothctl or no controller: the Bluetooth switch is disabled.
 Column {
     id: pane
     spacing: Theme.content.sectionGap
@@ -13,7 +13,6 @@ Column {
     property var ctl: P.parseBluetoothShow("")
     property var devices: []
     property var connected: []
-    property string note: ""
 
     function refresh() {
         Backend.run(["timeout", "4", "bluetoothctl", "show"], (code, out) => {
@@ -25,9 +24,8 @@ Column {
             Backend.run(["timeout", "4", "bluetoothctl", "devices", "Connected"], (c, o) => connected = P.parseBluetoothDevices(o).map(d => d.mac));
         });
     }
-    function cmd(args, failMsg) {
-        note = "";
-        Backend.run(["timeout", "15"].concat(["bluetoothctl"], args), c => { if (c !== 0) note = failMsg; refresh(); });
+    function cmd(args) {
+        Backend.run(["timeout", "15"].concat(["bluetoothctl"], args), () => refresh());
     }
     Component.onCompleted: refresh()
     // BlueZ property changes (power, connect, pairing) arrive as D-Bus signals.
@@ -39,29 +37,39 @@ Column {
         onChanged: pane.refresh()
     }
 
-    Unavailable {
-        visible: pane.status === "nocontroller" || pane.status === "missing"
-        symbol: "bluetooth.slash"
-        title: "Bluetooth Unavailable"
-        text: pane.status === "missing" ? "BlueZ (bluetoothctl) is not installed." : "No Bluetooth controller was found. Connect a Bluetooth adapter to use wireless devices."
-    }
-
+    // 27.2.1 (R3.8b bluetooth-{00..01}-light.png, ax-bluetooth-light.jsonl): the hero line with the switch at its top,
+    // then the "discoverable as" line on a card of its own (blurred on the shot), then My Devices
     Card {
-        visible: pane.status === "ok" || pane.status === "loading"
         FormRow {
             iconId: "bluetooth"
+            iconSize: 26
             label: "Bluetooth"
-            sublabel: pane.ctl.powered ? "Now discoverable as “" + pane.ctl.name + "”." : ""
-            Switch { checked: pane.ctl.powered; enabled: pane.status === "ok"; onToggled: on => { pane.ctl = Object.assign({}, pane.ctl, { powered: on }); pane.cmd(["power", on ? "on" : "off"], "Bluetooth could not be turned " + (on ? "on." : "off.")); } }
+            sublabel: "Connect to accessories you can use for activities such as streaming music, typing and gaming."
+            sublink: "Learn more…"
+            helpAnchor: "blth1004"   // ax-bluetooth-light.jsonl
+            Switch { checked: pane.ctl.powered; enabled: pane.status === "ok"; onToggled: on => { pane.ctl = Object.assign({}, pane.ctl, { powered: on }); pane.cmd(["power", on ? "on" : "off"]); } }
         }
     }
-
-    InlineNote { text: pane.note }
+    Card {
+        visible: pane.ctl.powered
+        // Bluetooth.appex now_discoverable_as_mac: one secondary line on the shot (blurred there, its ink ~11 pt tall
+        // across most of the card), so the 11 pt subheadline, 10 in, centred in a 38 pt card
+        Item {
+            width: parent.width; height: 38
+            Text {
+                x: Theme.content.rowPadding; width: parent.width - 2 * x; anchors.verticalCenter: parent.verticalCenter
+                wrapMode: Text.WordWrap
+                text: "This Mac is discoverable as “" + pane.ctl.name + "” while Bluetooth Settings is open."
+                font: Typography.subheadline
+                color: Theme.secondaryLabel
+            }
+        }
+    }
 
     Card {
         visible: pane.status === "ok" && pane.ctl.powered
         title: "My Devices"
-        FormRow { visible: pane.devices.length === 0; label: "No paired devices"; dim: true }
+        FormRow { visible: pane.devices.length === 0; label: "No Bluetooth Devices"; dim: true }   // Bluetooth.appex empty_connected_paired_devices
         Repeater {
             model: pane.devices
             FormRow {
@@ -74,7 +82,7 @@ Column {
                 sublabel: isOn ? "Connected" : "Not Connected"
                 Button {
                     text: dev.isOn ? "Disconnect" : "Connect"
-                    onClicked: pane.cmd([dev.isOn ? "disconnect" : "connect", modelData.mac], "Couldn't reach “" + modelData.name + "”. Make sure it's turned on and nearby.")
+                    onClicked: pane.cmd([dev.isOn ? "disconnect" : "connect", modelData.mac])
                 }
             }
         }

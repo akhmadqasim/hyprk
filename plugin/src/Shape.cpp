@@ -83,6 +83,15 @@ namespace lg {
         return std::clamp(int(std::floor(std::sqrt(std::max(w - 3, 0.0)))), 0, FRACTION_MAX_LEVELS);
     }
 
+    double fractionEdge(int i, int n) {
+        if (n % 2)
+            return double(i) / (n - 1) - 0.5;
+        if (n < 4)
+            return 0; // two levels: only the rounding bins either side of 0
+        const int half = n / 2;
+        return (i >= half ? i - half : i - (half - 1)) * 0.5 / (half - 1);
+    }
+
     std::vector<SGlassShape> clusterRegion(const std::vector<SRect>& rects) {
         const size_t n = rects.size();
         SDisjointSet set(n);
@@ -204,8 +213,8 @@ namespace lg {
                     const int code = int(a.right() - base);
                     if (axis < 0 || code < 0 || code >= n * n)
                         return false;
-                    edge[2 * axis]     = double(code / n) / (n - 1) - 0.5;
-                    edge[2 * axis + 1] = double(code % n) / (n - 1) - 0.5;
+                    edge[2 * axis]     = fractionEdge(code / n, n);
+                    edge[2 * axis + 1] = fractionEdge(code % n, n);
                     edges |= 1 << axis;
                     return true;
                 });
@@ -339,6 +348,29 @@ namespace lg {
         const double opacity = std::clamp(it->x / (surfaceW - 1), 0.0, 1.0);
         rects.erase(it);
         return opacity;
+    }
+
+    double takeShadowSizeMarker(std::vector<SRect>& rects, double surfaceW, double surfaceH) {
+        if (surfaceW <= 1 || surfaceH <= 2)
+            return 1;
+        const auto it = std::ranges::find_if(rects, [&](const SRect& r) { return r.w <= 1 && r.h <= 1 && r.y < 0.5; });
+        if (it == rects.end())
+            return 1;
+        const double size = std::clamp(SHADOW_SIZE_MAX * it->x / (surfaceW - 1), 0.0, SHADOW_SIZE_MAX);
+        rects.erase(it);
+        return size;
+    }
+
+    double takeSoftenMarker(std::vector<SRect>& rects, double surfaceW, double surfaceH) {
+        if (surfaceW <= 1 || surfaceH <= 2)
+            return 0;
+        // not the top row (shadow size) nor the bottom row (opacity)
+        const auto it = std::ranges::find_if(rects, [&](const SRect& r) { return r.w <= 1 && r.h <= 1 && r.x < 0.5 && r.y >= 0.5 && r.bottom() < surfaceH - 0.5; });
+        if (it == rects.end())
+            return 0;
+        const double blur = std::clamp(SOFTEN_MAX_PT * it->y / (surfaceH - 1), 0.0, SOFTEN_MAX_PT);
+        rects.erase(it);
+        return blur;
     }
 
     double sdRoundedBox(double px, double py, double halfW, double halfH, double radius, double power) {

@@ -130,7 +130,7 @@ ShellWindow {
     Component.onCompleted: if (shown) start()
 
     Spring { id: grow; target: 1; response: Tokens.panel.popoverResponse; damping: Tokens.panel.popoverDamping; epsilon: 0.001 }
-    NumberAnimation { id: fade; target: card; property: "opacity"; to: 0; duration: Tokens.panel.popoverFadeOut; easing.type: Easing.OutQuad }
+    FrameAnim { id: fade; target: card; property: "opacity"; to: 0; duration: Tokens.panel.popoverFadeOut; curve: Tokens.panel.popoverFadeCurve }   // the popover close (Tokens.panel)
 
     visible: shown || card.opacity > 0
     lingerAs: "emoji"
@@ -258,6 +258,7 @@ ShellWindow {
                     // the face's centre on the cell's (Mac shot: 😃 ink 110..167 px in a row centred at 138.5); centred
                     // on its line box it sat 1 pt high
                     anchors.verticalCenterOffset: win.m.glyphOffsetY
+                    anchors.horizontalCenterOffset: win.m.glyphOffsetX
                     text: cell.modelData.e
                     font.family: "Apple Color Emoji"
                     font.pixelSize: win.m.glyphSize
@@ -368,7 +369,7 @@ ShellWindow {
                 bottomRightRadius: win.m.radius
                 color: win.m.barFill
             }
-            Rectangle { width: parent.width; height: 0.5; color: win.m.barHairline }
+            Rectangle { width: parent.width; height: Pixel.stroke(0.5, QsWindow.window ? QsWindow.window.devicePixelRatio : Screen.devicePixelRatio); antialiasing: Pixel.soft(QsWindow.window ? QsWindow.window.devicePixelRatio : Screen.devicePixelRatio); color: win.m.barHairline }
 
             Repeater {
                 model: win.tabs

@@ -1294,6 +1294,8 @@ with `.symbolVariant(.fill)`. x is:
 
 Agrees: wave.1 at 3/16, wave.2 at 7/16, slash when muted.
 - No symbol effect is applied to the HUD glyph; SystemBannerUI imports no SymbolEffect API.
+  (PC correction 2026-11-15: wrong. `SliderBannerImageView.body` applies `.symbolEffect(BounceSymbolEffect(), value:
+  valueLabelSeed)`; the seed steps when the value arrives at 0 or 1. 27.2.1/MOTION-REA-27.2.1.md "Round K1".)
 - The Control Center Sound module and the menu bar extra use a different rule (ControlCenter `FUN_1005542f8`):
   `speaker.wave.3.fill` with `variableValue` 0.01 / 0.34 / 1.0 at the same 0.333 / 0.667 thresholds,
   `speaker.slash.fill` under `muteVolumeEpsilon`, and `headphones` / `headphones.slash` for headphones.

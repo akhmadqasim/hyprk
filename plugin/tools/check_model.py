@@ -8,7 +8,7 @@
 #   3. Face colour: a line-by-line port of the shader's interior (face_ours below, keep it in step with
 #      shaders/liquidglass.frag) over the Mac's 17 flat backdrops, against the Mac's measured centre pixels
 #      (ramp-shader-model.json) and against glass_model.py (the Mac's model) on the whole grid.
-#   4. Rim rows against the Mac's.
+#   4. Rim rows against the Mac's; 4b the rim along a straight edge with the ovalized normal (R8.1) against the Mac probe.
 #   5. Refraction and blur over 4 pt stripes: a port of the shader's sampling (row_ours below: lens displacement, blur
 #      opacity at d + displacement, Apple's lod, the underlay composition; keep it in step with shaders/liquidglass.frag)
 #      on Apple's blur pyramid (C3 glass_model.Pyramid1D, the kernel the plugin builds) against the real Control Center
@@ -53,7 +53,12 @@ PORTED = ["InnerRefractionAmount", "InnerRefractionHeight", "OuterRefractionAmou
           "BleedDarkenBlend", "KeyFillHighlightColorBias", "KeyFillHighlightSpreadDeg", "ShadowOpacity", "ShadowRadius", "ShadowOffset",
           "RingShadowOpacity", "BlurRadius", "BlurOpacity0", "BlurOpacity1", "BlurOpacity2", "BlurDistance0"]
 # measured on the real surfaces, so the plugin follows them instead of the AppKit probe (reasons in Material.cpp)
-DEVIATIONS = {("notificationcenter", "ShadowOpacity"): "fitted to the PC #62 gaps between cards (181 dark / 189 light over white)"}
+_DARK_RIM = "dark -0.278: the Mac's dark alert / menu side line 47 over grey 127 (GLASS-HIG.md round 11)"
+# (the Notification Center card and the banner draw that line with the dump's own -0.25 and limit its luma in dark,
+# SRecipe::darkTone*, MAC-ANSWERS-18.md R18.2: the limiter is not an input of Apple's filter, so nothing here checks
+# it; scripts/motion-capture/nc-side-line.py does, live)
+DEVIATIONS = {("notificationcenter", "ShadowOpacity"): "fitted to the PC #62 gaps between cards (181 dark / 189 light over white)",
+              ("regular", "KeyFillHighlightColorBias"): _DARK_RIM, ("menu", "KeyFillHighlightColorBias"): _DARK_RIM}
 W709 = np.array([.2126, .7152, .0722])
 WB = np.array([.2125, .7154, .0721])
 
@@ -126,6 +131,8 @@ def face_ours(c, P):
     Y1 = col @ W709
     f = P["FaceColorMatrixBlack"] + (P["FaceColorMatrixWhite"] - P["FaceColorMatrixBlack"]) * Y1 + P["FaceColorMatrixSaturation"] * (col - Y1)
     fa = P["Fill"][3]
+    if P.get("ClampBeforeFill"):  # SRecipe::clampBeforeFill (Spotlight, not in the model): the face clamped to 1 first
+        f = np.minimum(f, 1)
     f = f * (1 - fa) + np.array(P["Fill"][:3]) * fa
     if P["BleedOpacity"] > 0:  # edge bleed over the whole interior, weight g^4
         Yb = c @ W709
@@ -140,14 +147,36 @@ def schlick(v, amount):
     return 0.0 if amount <= 0 else v / ((1 / amount - 2) * (1 - v) + 1)
 
 
-def rim_rows(dst, P, n, px_per_pt=2):
+def gradient_ovalization(w, h):
+    """Material.cpp gradientOvalization: 0.5 on a shape whose shorter side is over 64 pt, else 0 (MAC-ANSWERS-8.md R8.1)."""
+    return 0.5 if min(w, h) > 64 else 0.0
+
+
+def oval_cos(u, hw, hh, oval):
+    """n . (0, 1) of the key/fill highlight's normal on a straight top / bottom edge, u pt from the shape's centre
+    (liquidglass.frag scene() nk): normalize(mix((0, 1), normalize(x, y W / H), oval)); at the edge y W / H = hw."""
+    u = np.asarray(u, float)
+    r = np.stack([u, np.full_like(u, hw)], 1)
+    r /= np.linalg.norm(r, axis=1)[:, None]
+    n = (1 - oval) * np.array([0.0, 1.0]) + oval * r
+    return n[:, 1] / np.linalg.norm(n, axis=1)
+
+
+def lobe(c, cs):
+    return np.clip((c - cs) / (1 - cs), 0, 1)
+
+
+def rim_rows(dst, P, n, px_per_pt=2, c=1.0):
     """Top rows of a flat body dst (0..1, the face colour) under the key/fill highlight (shaders/liquidglass.frag rim
-    block, part 2): spec 1 pt, 1 - 0.75 depth; diffuse 8 pt linear at 0.65 x the spread; mix toward keyYcc(dst)."""
+    block, part 2): spec 1 pt, 1 - 0.75 depth; diffuse 8 pt linear at 0.65 x the spread; mix toward keyYcc(dst).
+    c: n . dir of the highlight's normal (1 on a straight edge without ovalization, oval_cos() with it).
+    A ClampBeforeFill recipe (Spotlight, no case here) takes its key (top) lobe on the face before the clamp and the fill,
+    x SRecipe::keyTop (0 on Spotlight since round 17: the shell draws that line over its veil, shaders/spotrim.frag)."""
     out = []
     for i in range(n):
         depth = (i + 0.5) / px_per_pt  # pixel centre, pt
         cs, cd = math.cos(math.radians(P["KeySpreadDeg"])), math.cos(math.radians(0.65 * P["KeySpreadDeg"]))
-        lk, ld = (1 - cs) / (1 - cs), (1 - cd) / (1 - cd)  # top edge: n . dir = 1
+        lk, ld = float(lobe(c, cs)), float(lobe(c, cd))
         spec = (1 - 0.75 * depth if depth < 1 else 0) * lk
         diff = max(0.0, 1 - depth / 8) * ld
         m = P["KeyScale"] * (schlick(spec, P["KeyAmount"]) + schlick(diff, P["DiffuseAmount"]))
@@ -495,6 +524,58 @@ def corner_check(ours, dump):
     return bad
 
 
+def oval_check(ours):
+    """4b. The key/fill rim along a straight edge (MAC-ANSWERS-8.md R8.1, live/glass-r8): the shader's lobe on the
+    ovalized normal (oval_cos, the size rule gradient_ovalization, our KeySpreadDeg) against the Mac probe's stock
+    captures, a 640 x 56 capsule (0: flat) and a 640 x 260 r24 panel (0.5), top and bottom, three rows each, every 2 pt
+    of the straight part. As rim_fit.py: dst of each row solved from the probe's oval-0 capture, the highlight layer's
+    vibrantColorMatrix from its dump (the probe's glass is not one of our recipes; this checks the normal and the lobe)."""
+    from PIL import Image
+    d = os.path.join(ROOT, "reference", "re", "27.2.1", "live", "glass-r8")
+    print("\n4b. key/fill rim along x (gradientOvalization), ours vs the Mac probe's captures: rms / max levels, centre / end")
+    bad = []
+    for mode in ("dark", "light"):
+        load = lambda s: np.asarray(Image.open(os.path.join(d, "cap-%s%s.png" % (mode, s))).convert("RGB"), float).mean(2)
+        stock, flat = load(""), load("-oval0")
+        cms = []
+
+        def find(o):
+            for f in o.get("filters", []):
+                if f.get("name") == "vibrantColorMatrix":
+                    cms.append(f["inputs"]["inputColorMatrix"])
+            for s in o.get("sublayers", []):
+                find(s)
+        find(json.load(open(os.path.join(d, "tree-%s.json" % mode)))["layers"])
+        slope, bias = sum(cms[0][0:3]), cms[0][4]
+        # x0 px, W, top px, H, radius pt (window px incl. the 64 px title bar, 2x); spread: ours at that size
+        for name, x0, W, top, H, R, D in (("capsule 640 x 56", 80, 640, 144, 56, 28, 64), ("panel 640 x 260 r24", 80, 640, 324, 260, 24, 200)):
+            P = ours.get(("regular", True, D, 0.5))
+            if P is None:
+                continue
+            cs, cd = math.cos(math.radians(P["KeySpreadDeg"])), math.cos(math.radians(0.65 * P["KeySpreadDeg"]))
+            xs = np.arange(x0 + int(R * 3.2), x0 + W * 2 - int(R * 3.2), 4)
+            c = oval_cos((xs + 0.5 - (x0 + W)) / 2, W / 2, H / 2, gradient_ovalization(W, H))
+            errs, ce = [], []
+            for rows in ([top, top + 1, top + 2], [top + H * 2 - 1, top + H * 2 - 2, top + H * 2 - 3]):
+                for k, row in enumerate(rows):
+                    depth = (k + 0.5) / 2
+                    mask = lambda cc: schlick(np.where(depth < 1, 1 - 0.75 * depth, 0) * lobe(cc, cs), 0.5) + \
+                        schlick(max(0.0, 1 - depth / 8) * lobe(cc, cd), 0.075)
+                    m1 = mask(1.0)
+                    dst = (flat[row, xs].mean() / 255 - m1 * bias) / (1 + m1 * (slope - 1))
+                    pred = 255 * (dst + mask(c) * (slope * dst + bias - dst))
+                    errs.append(stock[row, xs] - pred)
+                    if k == 0 and not ce:
+                        ce = [stock[row, xs][len(xs) // 2], pred[len(xs) // 2], stock[row, xs][0], pred[0]]
+            e = np.concatenate(errs)
+            rms, mx = float(np.sqrt((e ** 2).mean())), float(np.abs(e).max())
+            print("    %-5s %-20s oval %.1f  rms %.2f / max %.2f   top row: Mac %.0f / %.0f, ours %.1f / %.1f" % (
+                mode, name, gradient_ovalization(W, H), rms, mx, ce[0], ce[2], ce[1], ce[3]))
+            if mx > 3:
+                bad.append("oval %s %s" % (mode, name))
+    return bad
+
+
 def load_dump(arg):
     txt = open(arg).read() if arg.endswith(".json") else subprocess.run([arg], capture_output=True, text=True, check=True).stdout
     return {(e["material"], e["dark"], e["D"], e["a"]): e["inputs"] for e in json.loads(txt)}
@@ -606,6 +687,7 @@ def main():
         print("    %-44s ours %-26s Mac %-24s max %.1f" % (label, " ".join("%.0f" % x for x in rows), " ".join(str(x) for x in mac), e))
         if e > 2.0:
             rim_bad.append(label)
+    rim_bad += oval_check(ours)
     stripe_bad = stripes_check(ours) + slider_check(ours) + corner_check(ours, args.dump)
     if args.strict and (not ok or param_bad or face_bad or grid_bad or rim_bad or stripe_bad):
         print("\nFAIL: reference %s, %d inputs differ, face off vs Mac: %s, vs model: %s, rim: %s, stripes: %s" % ("ok" if ok else "differs", param_bad, face_bad, grid_bad, rim_bad, stripe_bad))

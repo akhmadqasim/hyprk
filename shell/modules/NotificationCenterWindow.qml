@@ -80,11 +80,16 @@ ShellWindow {
         color: "transparent"
         mask: Region {}
         RectangularShadow {
-            // the 376 pt column frame: 16 pt either side of the cards (its right edge on the screen edge), from the
-            // menu bar to 16 pt below the last widget
+            // the 376 pt column frame: 16 pt either side of the cards, its right edge on the screen edge, from the
+            // menu bar to 16 pt below the last widget. The feather is there on the right too: the Mac's dim over white
+            // above the cards (nc/overview-redacted-dark-white.png row 5) is 207 until 62 pt from the screen edge, then
+            // 210 213 217 220 at 42 32 23 17 pt (a Gaussian edge of sigma 26.5 pt, 1 pt inside the screen edge; the
+            // left side's is 27.3), and the pixels outside a card are the same left and right (stack-dark-grey.png
+            // 99.5 / 99.5, white 200 / 200). The frame used to run 50 pt past the screen edge: flat to the edge, the
+            // card's right outside 96 against 102 on the left over grey 127, 192 / 206 over white
             x: parent.width - Theme.nc.width - Theme.nc.marginRight - Theme.nc.backdropOutset
             y: 0
-            width: Theme.nc.width + Theme.nc.marginRight + Theme.nc.backdropOutset + Theme.nc.backdropBlur
+            width: Theme.nc.width + Theme.nc.marginRight + Theme.nc.backdropOutset
             // to 16 pt below the last widget: it fades out over about 55 pt there (Mac about 85) and 20 pt below
             // "Edit Widgets" the Mac's backdrop is back to 1
             height: nc.y + nc.height - Theme.nc.editGap - Theme.nc.pillHeight + Theme.nc.backdropOutset

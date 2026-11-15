@@ -162,6 +162,8 @@ Item {
 
         // ---------- SegmentedControl ----------
         function segX(c, i) { return c._xs[i] + c._wl[i] / 2; }
+        // segment delegate i (the items the segments' Repeater made, in order)
+        function segs(c, i) { return c.children.filter(k => k.hasOwnProperty("lookSelected"))[i]; }
 
         function test_segmented_keeps_binding() {
             mouseClick(seg, segX(seg, 2), seg.height / 2);
@@ -241,6 +243,47 @@ Item {
             compare(p.x, seg._xs[1]);
             mouseRelease(seg, segX(seg, 1), seg.height / 2);
             verify(!p.visible);
+        }
+        // R6.3 (Finder view switcher): the pressed selected segment takes pressOverlay; dragged onto another segment, that
+        // one shows the plain selected colour with the selected label, its separators hide; release commits
+        function test_segmented_drag_tracks_selected_look() {
+            const p = findChild(seg, "pressed"), o = findChild(seg, "pressedOverlay");
+            mousePress(seg, segX(seg, 0), seg.height / 2);
+            verify(seg.held);
+            compare(seg.pressedIndex, 0);
+            compare(p.color, Qt.rgba(0, 0, 0, 0));           // over the pill: only the overlay
+            verify(o.visible);
+            compare(o.color, seg.pressOverlay);
+            compare(seg.pressOverlay, Tokens.control.pressOverlay);
+            verify(findChild(seg, "separator2").opacity === 1);
+            mouseMove(seg, segX(seg, 1), seg.height / 2);
+            compare(seg.pressedIndex, 1);
+            compare(p.color, seg.selectionColor);            // the plain selected colour, not darker
+            verify(!o.visible);
+            compare(p.x, seg._xs[1]);
+            compare(findChild(seg, "separator2").opacity, 0);  // the dragged-to segment's separators hide
+            verify(segs(seg, 1).lookSelected && !segs(seg, 1).selected);
+            mouseRelease(seg, segX(seg, 1), seg.height / 2);
+            verify(!seg.held);
+            compare(backend.index, 1);
+            verify(!p.visible);
+        }
+        function test_segmented_hover_overlay() {
+            const h = findChild(seg, "hovered");
+            mouseMove(seg, segX(seg, 0), seg.height / 2);
+            verify(!h.visible);                              // none by default
+            seg.hoverOverlay = Qt.rgba(0, 0, 0, 0.049);
+            mouseMove(seg, segX(seg, 0) + 1, seg.height / 2);
+            verify(h.visible);
+            compare(h.x, findChild(seg, "pill").x);
+            mouseMove(seg, segX(seg, 1), seg.height / 2);    // over an unselected segment: nothing (not in the clip)
+            verify(!h.visible);
+            mouseMove(seg, segX(seg, 0), seg.height / 2);
+            mousePress(seg, segX(seg, 0), seg.height / 2);   // pressed: the press overlay instead
+            verify(!h.visible);
+            mouseRelease(seg, segX(seg, 0), seg.height / 2);
+            seg.hoverOverlay = "transparent";
+            mouseMove(root, 390, 290);
         }
         function test_segmented_icon_defaults_and_options() {
             const img = findChild(iconSeg, "icon");

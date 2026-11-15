@@ -87,7 +87,9 @@ Sheet {
         height: 40
         verticalAlignment: Text.AlignVCenter
         elide: Text.ElideMiddle
-        text: "Example: " + (root.entries.length ? root.newName(root.entries[0].name) : "")
+        readonly property string plain: "Example: " + (root.entries.length ? root.newName(root.entries[0].name) : "")
+        text: EmojiText.opaque(plain, color)   // emoji at alpha 1 (OPEN-FIXES.md 16)
+        textFormat: EmojiText.has(plain) ? Text.StyledText : Text.PlainText
         font: Typography.body
         color: Tokens.label
     }

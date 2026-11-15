@@ -14,8 +14,9 @@ import "../lib/menus.js" as Menus
 // (`checked`: true or "mixed"), 40 / 51 for rows with an `icon` (Q-menubar-15..17); key column = the widest key ink,
 // right edge W - 18.5, each key centred by its ink; modifiers one glyph at a time 3.5 pt apart, ending 3 pt before
 // it (Q-menubar-18). Width: AppKit's columns (Theme.menu.columnGap); no minimum width (Q-menubar-19).
-// Motion: appears complete at once, a chosen row blinks once (off 4 frames, on 3) and then the menu runs
-// the item and fades out in 0.2 s ease-out, as on Esc (Q-menubar-23, -24). The selection jumps from row to
+// Motion: appears complete at once, a chosen row blinks once (off 4 frames, on 3; on 4 in a menu above the Dock) and
+// then the menu runs the item and fades out on CA default over 236 ms, as on Esc (Q-menubar-23, -24; R16.1: an
+// `afterFade` item, the Dock's Remove from Dock, runs when the fade has ended). The selection jumps from row to
 // row in one frame, no glide (MAC-ANSWERS "No animation: the highlight moves within 1 frame").
 // Submenus (Q-menubar-23): a row with `submenu: true` and `items` opens them 0.22 s after it is highlighted (at once on
 // a click, Right or Return), on its own surface (MenuSubmenu.qml) overlapping this menu's right edge by 5 pt with its
@@ -45,7 +46,14 @@ Item {
     // 1 while shown, then down to 0 on close: glass materialize and content opacity
     property real fade: 0
     visible: shown || fade > 0
-    FrameAnim { id: fadeOut; target: root; property: "fade"; to: 0; duration: Theme.anim.menuFadeOut; ease: Easing.OutQuad }
+    FrameAnim {
+        id: fadeOut; target: root; property: "fade"; to: 0; duration: Theme.anim.menuFadeOut; curve: Theme.anim.menuFadeCurve
+        lead: root.blinked ? 2 : 1      // after a chosen item's blink the Mac's first fading frame is 1.6-1.9 frames in
+        onFinished: if (root.afterFade) afterFadePause.restart()
+    }
+    // the Dock's first moving frame is the 2nd after the menu's last fading one (R16.1: 4.867 and 4.900 s). A Timer:
+    // the menu's window may be unmapped by now and draws no frames to count
+    Timer { id: afterFadePause; interval: Theme.menu.afterFadePause; onTriggered: root.runAfterFade() }
     Component.onCompleted: { latchItems(); if (shown) fade = 1; }
 
     // ---------- columns ----------
@@ -118,7 +126,29 @@ Item {
 
     signal triggered()
 
-    function trigger(action) {
+    // An item with `afterFade: true` runs when the menu has faded out, not when the fade starts: the Dock's Remove
+    // from Dock by a real click (MAC-ANSWERS-16.md R16.1, sound/dock-remove-menu-real-click.mov: blink, the fade's 14
+    // frames, and the Dock's first moving frame and the poof 22 frames after the highlight went off). Only that item is
+    // filmed; every other item runs with the fade's start as before.
+    // It waits in the top menu: a submenu is unloaded when its parent's fade ends, which may be a frame before its own.
+    property var afterFade: null
+    readonly property alias fading: fadeOut.running
+    function runAfterFade() {
+        afterFadePause.stop();
+        const a = afterFade;
+        afterFade = null;
+        if (typeof a === "function") a();
+    }
+    function trigger(action, late) {
+        if (late && typeof action === "function") {
+            let top = root;
+            while (top.parentMenu) top = top.parentMenu;
+            top.afterFade = action;
+            Panels.close();
+            triggered();
+            if (!top.fading) top.runAfterFade();    // nothing fades (closed another way): run it now
+            return;
+        }
         Panels.close();
         triggered();
         if (typeof action === "function") {
@@ -149,10 +179,12 @@ Item {
         case "center": Hyprland.dispatch("hl.dsp.window.center()"); break;
         case "cycle": Apps.cycleAppWindows(1); break;
         case "settings": Apps.openSettings(); break;
+        // the Mac's About window has no "About This ..." text (it heads with the model name, then the OS line); the
+        // alert heads with the OS name instead of an invented title (EXTRAS-AUDIT.md)
         case "about": Panels.showAlert({
             icon: Distro.aboutIcon,
-            title: "About This Computer",
-            message: Distro.prettyName + (Distro.kernel ? "\nLinux " + Distro.kernel : ""),
+            title: Distro.prettyName || "Linux",
+            message: Distro.kernel ? "Linux " + Distro.kernel : "",
             buttons: [{ label: "More Info…", action: Apps.openSettings }, { label: "OK", isDefault: true }],
         }); break;
         case "forcequit": Hyprland.dispatch("hl.dsp.window.kill()"); break;
@@ -181,13 +213,25 @@ Item {
     property bool activating: false
     property bool blinkOff: false
     property var pendingAction
+    property bool pendingLate: false
     function activate(i, action) {
         if (activating) return;
         activating = true;
         hover = i;
         pendingAction = action;
+        pendingLate = !!(shownItems[i] && shownItems[i].afterFade);
         blink.start();
+        for (let m = parentMenu; m; m = m.parentMenu) m.keepPace();
     }
+    // A submenu's item blinks: this menu's window draws frames for the length of the blink too. A window that has been
+    // drawing shows a value two frames after its tick, one that starts from idle after one, so the parent's fade began
+    // two frames before the submenu's (mcap, Dock menu > Options > Remove from Dock: parent from 123 ms, submenu from
+    // 154); the Mac's two menus fade in the same frame (R16.1)
+    function keepPace() { pace.duration = Theme.menu.blinkOff + blinkOnMs + 100; pace.restart(); }
+    FrameAnim { id: pace; from: 0; to: 1 }
+    // the highlight's second half: 3 frames in AppKit's menus (Q-menubar-24, R3.5), 4 in the Dock's own (R16.1: off
+    // 4.533-4.600, on 4.600-4.667, one clip); a submenu blinks as its parent
+    property int blinkOnMs: parentMenu ? parentMenu.blinkOnMs : Theme.menu.blinkOn
     // counted in frames of this window (HyprK FrameAnim used as a pause: 58 ms ends with the 4th frame, 42 ms with
     // the 3rd), so the blink is off 4 frames and on 3 whatever the click's phase (two Timers gave 3 to 5 frames per
     // half, and a SequentialAnimation on Qt's 16 ms timer 4 / 3 in 5 of 8 runs, mcap)
@@ -197,7 +241,10 @@ Item {
         function stop(): void { blinkOffWait.stop(); blinkOnWait.stop(); }
     }
     FrameAnim { id: blinkOffWait; to: 1; from: 0; duration: Theme.menu.blinkOff; onFinished: { root.blinkOff = false; blinkOnWait.start(); } }
-    FrameAnim { id: blinkOnWait; to: 1; from: 0; duration: Theme.menu.blinkOn; onFinished: { root.activating = false; root.trigger(root.pendingAction); } }
+    FrameAnim { id: blinkOnWait; to: 1; from: 0; duration: root.blinkOnMs; onFinished: { root.activating = false; root.markBlinked(); root.trigger(root.pendingAction, root.pendingLate); } }
+    // this fade follows a blink (this menu's or its submenu's): FrameAnim lead 2
+    property bool blinked: false
+    function markBlinked() { for (let m = root; m; m = m.parentMenu) m.blinked = true; }
 
     // a submenu is moved to its row when it opens (MenuSubmenu.frame follows its new size): the glass is placed from
     // its window position, so it is placed again in the same frame. Before, it followed on the next settle tick and the
@@ -254,6 +301,8 @@ Item {
             hover = -1;
             closeSub();
             fadeOut.stop();
+            runAfterFade();     // reopened before the fade ended: the waiting item runs now
+            blinked = false;
             fade = 1;
             if (selectFirst) selectRow(Menus.step(shownItems, -1, 1));
         } else {
@@ -265,6 +314,7 @@ Item {
             else {
                 fadeOut.stop();
                 fade = 0;
+                runAfterFade();
             }
         }
     }
@@ -456,7 +506,10 @@ Item {
                 readonly property bool enabled: !modelData.sep && !modelData.disabled
                 readonly property bool hovered: ma.containsMouse && enabled
                 readonly property bool selected: root.hover === index && !root.blinkOff
-                // label, check, icon and chevron share the row colour; shortcuts are tertiary unless selected
+                // label, check, icon and chevron share the row colour; shortcuts are tertiary unless selected.
+                // Not vibrant on 27.2.1: the Mac's disabled text and shortcuts are a plain alpha over any backdrop
+                // (black .26 / white .25, separators .10 / .14: the same alpha on every channel over white, grey and
+                // Tahoe; reference/re/27.2.1/VIBRANCY-REA.md), so Tokens' alphas are the Mac's
                 readonly property color ink: !enabled ? Theme.color.tertiaryLabel : selected ? Theme.color.menuSelectionText : Theme.color.label
                 onHoveredChanged: if (!root.activating) hovered ? root.enterRow(index, y) : root.leaveRow(index)
                 width: list.width
@@ -467,7 +520,8 @@ Item {
                     x: Theme.menu.separatorInset
                     y: Math.floor((parent.height - 1) / 2)
                     width: parent.width - Theme.menu.separatorInset * 2
-                    height: 1
+                    height: Pixel.stroke(1, QsWindow.window ? QsWindow.window.devicePixelRatio : Screen.devicePixelRatio)   // exact, antialiased at a fractional scale like the Mac's downsample (HyprK pixel.js, SCALING-AUDIT R3.3)
+                    antialiasing: Pixel.soft(QsWindow.window ? QsWindow.window.devicePixelRatio : Screen.devicePixelRatio)
                     color: Theme.color.menuSeparator
                 }
                 Symbol {   // checkmark, centred in the state column

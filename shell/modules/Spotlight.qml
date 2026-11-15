@@ -13,11 +13,13 @@ import "../lib/appsgrid.js" as AG
 import "spotlight"
 
 // Spotlight (Super+Space), macOS 27.2.1 (MAC-ANSWERS.md Q-panels-14..-26): two glass shapes, a 520 x 87 search
-// capsule at 22.7 % of the screen height and, 10 below it, one panel:
+// capsule centred at 26.65 % of the screen height (Theme.spotlight.barCentre) and, 10 below it, one panel:
 // - results (520 wide, r 37, rows of 62, at most 410 tall) once text is typed;
-// - the mode list (520 x 214) that unfolds while the field is empty and the pointer has entered the bar;
+// - the mode list (520 x 214) once the pointer moves anywhere while the field is empty (MAC-ANSWERS-3.md R3.2b);
+// with a resting pointer and an empty field only the bar shows;
 // - a mode (Cmd+1..4 or the list): Applications = the Apps panel (844 x 520, AppsPanel.qml, also the Dock's
-//   "Apps"), Files / Actions / Clipboard = a 520 x 490 list (ModeView.qml).
+//   "Apps"), Files = the same panel with file tiles (FilesPanel.qml), Actions / Clipboard = a 520 x 490 list
+//   (ModeView.qml).
 // No magnifier: the left of the field is empty, or holds the mode glyph; the right holds a mic (no action: hyprk
 // has no dictation), the top hit's icon once text is typed, or "..." in a mode. Esc: the first returns to the
 // plain "Search or Ask" bar (leaves the mode, clears the query), the second closes.
@@ -33,16 +35,18 @@ ShellWindow {
     // - open (FUN_2adea2ff0, FUN_2ade9ef14 flag 0): transform.scale.x AND scale.y 1.12 -> 1 on Spring(0.28,
     //   bounce 0.32) (ratio 0.68), the path the empty bar takes live (PC #67 A4, verify/A/spotlight-open-fit.json:
     //   RMS 0.22-0.30 pt of 487; height fits a 1.12 start, not 0.95; undershoot to 0.994). The other branch of
-    //   FUN_2adea2ff0 (x on bounce 0.41, y 0.95 -> 1) is not seen live. Window alpha 0 -> 1 on Spring(0.28, 0.41)
-    //   (REA, not re-measured);
-    // - close (FUN_2adea36c8, FUN_2ade9ef14 flag 1): scale.x 1 -> 1.12 and scale.y 1 -> 0.95 on Spring(0.45, 0.05),
-    //   alpha 1 -> 0 on Spring(0.28, 0.41). The window is unloaded when the alpha first reaches 0 (0.12 s); it
-    //   would only swing back to 0.01 after that.
-    //   The close also blurs the content, contentBlurRadius 0 -> 25 pt on Spring(0.51, 0.05) (FUN_2ade9ef14 flag 1):
-    //   a QML blur of the stage, on only while closing (the plugin glass is not blurred, it dematerializes).
-    // Not done: the open's contentBlurRadius 25 -> 0 (the open matches the Mac's scale track without it, and a
-    // full-screen layer for its 0.5 s spring), and transform.translation.y (its start value is not read). The scale
-    // anchor is not read: the search field's centre.
+    //   FUN_2adea2ff0 (x on bounce 0.41, y 0.95 -> 1) is not seen live. Window alpha 0 -> 1 on Spring(0.28, 0.41);
+    //   R3.2 (spotlight-light-white-open-close.mov, pts) agrees: width 1.096 1.075 1.054 1.037 1.021 1.010 per frame,
+    //   ours 1.091 1.069 1.050 1.033 1.017 1.008 (SPOTLIGHT-27.2.1.md "Round R3.2"). No blur on the open: the edge stays 12-13 pt wide from the first
+    //   frame (that clip and spotlight-pill-idle-light.mov), so the decoded contentBlurRadius 25 -> 0 is not drawn;
+    // - close (FUN_2adea36c8, FUN_2ade9ef14 flag 1): scale.x 1 -> 1.12 and scale.y 1 -> 0.95 on Spring(0.45, 0.05)
+    //   (decoded). The decoded alpha (Spring(0.28, 0.41), 7 frames here) and contentBlurRadius 0 -> 25 (Spring(0.51,
+    //   0.05)) are far slower than the Mac draws them: alpha .325 then .051 then gone, edge 20 then 36 pt
+    //   (spotlight-light-white-open-close.mov 2.100 / 2.117 s; scaled/more-space-spotlight-close.mov one frame at
+    //   .30), so both run on a critically damped 0.045 s spring (.325 / .052 one and two frames in). The blur is a
+    //   QML blur of the stage, on only while closing (the plugin glass is not blurred, it dematerializes).
+    // Not done: transform.translation.y (its start value is not read). The scale anchor is not read: the search
+    // field's centre.
     // The window is kept loaded but unmapped after the shell has started (shell.qml): created on open it showed its
     // first frame ~90 ms after the call. The springs start on the first frame after it maps (alpha 0), else mapping
     // eats their first frames. Reduce motion: no scale (Theme.travel), no blur, the fade stays.
@@ -52,21 +56,15 @@ ShellWindow {
     readonly property var springOpen: SpringLib.fromBounce(0.28, 0.32)
     readonly property var springClose: SpringLib.fromBounce(0.45, 0.05)
     readonly property var springAlpha: SpringLib.fromBounce(0.28, 0.41)
+    readonly property var springCloseFade: SpringLib.fromResponse(0.045, 1)
     property real blurRadius: 0
     property bool blurOn: false
-    readonly property var springBlur: SpringLib.fromBounce(0.51, 0.05)
     SpringCurve {
         id: animBlur
         freshHold: 0
         firstAt: sp.firstAt
-        target: sp; property: "blurRadius"; spring: sp.springBlur
-        onFinished: if (goal === 0) sp.openBlur = false
+        target: sp; property: "blurRadius"; spring: sp.springCloseFade
     }
-    // The open's content blur 25 -> 0 (REA section 4: the same blurRadius spring as the close, reversed). The bar's
-    // content is drawn once into a texture of the bar's own size and that is blurred (stage below), not the
-    // full-screen stage layer the close uses; the texture goes when the blur has landed or the content changes.
-    property bool openBlur: false
-    function dropOpenBlur(): void { if (openBlur && query !== "") { openBlur = false; animBlur.snap(0); } }
     // Every open starts after a swapped frame of the window (firstFrame below), so the springs take no fresh-layer
     // hold: with it a reopen drew the start frame and the first tick at the same scale (mcap 1.112 1.112 1.096, the
     // bar's left glass edge on its centre row). The open's first frame shows the springs 38.7 ms in: the Mac's first
@@ -79,14 +77,18 @@ ShellWindow {
         id: animAlpha
         target: sp
         freshHold: 0
-        firstAt: sp.firstAt
+        // the open's alpha is 11 ms further in than its scale: the Mac's first frames read .375 .568 .736 .865 .963,
+        // the decoded spring at 50.0 / 49.9 / 50.1 ms + k frames (spotlight-light-white-open-close.mov; the scale's
+        // first frame stays at 38.7 ms: width within 3.5 pt per frame)
+        firstAt: sp.firstAt > 0 ? 0.050 : 0
         property: "alpha"
         spring: sp.springAlpha
         onFinished: if (!sp.shown) sp.gone = true
     }
     property bool gone: false
-    // Apps (Spotlight's apps mode here) is an ordinary window on 27.2.1: it appears in one frame and Escape closes it
-    // in one frame (MAC-ANSWERS.md R2). With the Spotlight springs it faded in over 0.10 s and kept a 13 % tail for
+    // Apps (Spotlight's apps mode here) opened straight in the mode (the Dock's Apps, Go > Applications): it appears
+    // in one frame and Escape closes it in one frame (MAC-ANSWERS.md R2; round 17 could not capture this open: no Apps
+    // tile on its Dock). Cmd-1 from the open bar grows the panel instead (panelMotion, R17.1). With the Spotlight springs it faded in over 0.10 s and kept a 13 % tail for
     // 0.12 s on close (mcap). The mode is taken at open: SpotlightState forgets it when Spotlight closes.
     property bool appsCut: false
     function animate(open) {
@@ -98,20 +100,17 @@ ShellWindow {
             animY.snap(1);
             animAlpha.snap(open ? 1 : 0);
             blurOn = false;
-            openBlur = false;
             animBlur.snap(0);
             gone = !open;
             settleGlass(50);
             return;
         }
         blurOn = !open && !A11y.reduceMotion;
-        openBlur = open && !A11y.reduceMotion;
-        if (openBlur) { animBlur.snap(25); animBlur.go(0); }
-        else if (!blurOn) animBlur.snap(0);
+        if (!blurOn) animBlur.snap(0);
         else animBlur.go(25);
         animX.spring = open ? springOpen : springClose;
         animY.spring = open ? springOpen : springClose;
-        animAlpha.cutAt = open ? 0 : SpringLib.firstCrossing(springAlpha, 0, 0.001);
+        animAlpha.spring = open ? springAlpha : springCloseFade;
         animX.go(open ? 1 : 1.12);
         animY.go(open ? 1 : 0.95);
         animAlpha.go(open ? 1 : 0);
@@ -157,6 +156,15 @@ ShellWindow {
     readonly property bool quickKeyHit: SL.quickKeyAction(SpotlightState.quickKeys, query) !== ""
     readonly property var files: mode === "" ? FileSearch.results.slice(0, 3) : []
     Binding { target: FileSearch; property: "query"; value: sp.mode === "" || sp.mode === "files" ? sp.query : "" }
+    // the inline completion: the top hit is an app whose name begins with the query, the caret at its end, the first
+    // row selected (r17 spotlight-typed-*.png)
+    // In Applications the pill holds the action alone (apps-typed-cal-*.png: "cal" + " — Open", the first hit on its plate)
+    readonly property string completionRest: {
+        if (input.cursorPosition !== input.text.length || input.selectedText !== "") return "";
+        if (mode === "" && selected === 0 && rows.length > 0 && rows[0].kind === "app") return SL.completion(input.text, rows[0].title);
+        const it = mode === "apps" ? modePanel.item : null;
+        return it && input.text.trim() !== "" && it.apps.length > 0 && it.selected <= 0 ? SL.completion("", "", true) : "";
+    }
     // rows: {kind: "calc"|"app"|"action"|"file", ...}; 27.2.1 has no section headers (Q-panels-20)
     readonly property var rows: {
         if (mode !== "" || query.trim() === "" || calcCard) return [];
@@ -164,40 +172,112 @@ ShellWindow {
         const addActions = () => { for (const a of actions) r.push({ kind: "action", title: a.title, subtitle: a.subtitle || "", action: a }); };
         if (quickKeyHit) addActions();      // a typed quick key puts its action on top
         if (calcValue !== null) r.push({ kind: "calc", title: Search.formatNumber(calcValue), subtitle: query.trim() + " =" });
-        for (const a of apps) r.push({ kind: "app", title: a.name, subtitle: "Application", entry: a, icon: a.icon });
+        // app rows: the name alone (spotlight-light-white-results.png, spotlight-pill-clear-*.mov: "TextEdit",
+        // "Terminal", no "Application" line)
+        for (const a of apps) r.push({ kind: "app", title: a.name, subtitle: "", entry: a, icon: a.icon });
         if (!quickKeyHit) addActions();
         for (const f of files) r.push({ kind: "file", title: f.name, subtitle: f.dir, file: f });
         return r;
     }
 
-    // the mode list: once the pointer really moved into the bar while the field is empty (components/
-    // PointerGate.qml: the layer maps under a resting pointer); it stays after the pointer leaves. Holding Command
-    // (or Ctrl) alone for 0.35 s shows it too, while the key is held (SL.HINT_HOLD_MS, commandKeyHintTimer)
+    // the mode list: once the pointer really moves while Spotlight is open and the field is empty, anywhere on the
+    // screen, not only over the bar; never without a move (a layer mapped under a resting pointer gets an enter and
+    // a motion at that point: components/PointerGate.qml). It stays when the pointer leaves, until text is typed
+    // (MAC-ANSWERS-3.md R3.2b: spotlight-pill-idle-*.mov no list with the pointer parked, spotlight-pill-hover-*.mov
+    // the list as the pointer starts to move far from the bar, still there 1.5 s after it left). Holding Command
+    // does not show it: the decoded commandKeyHintTimer (0.35 s) shows shortcut indicators whose target is not traced
+    // (SPOTLIGHT-27.2.1.md 3.1), and no Mac capture shows the list on a Command hold.
     PointerGate { id: hoverGate }
     property bool modeListArmed: false
-    property bool hintHeld: false
-    Timer { id: hintHold; interval: SL.HINT_HOLD_MS; onTriggered: sp.hintHeld = sp.mode === "" && input.text === "" }
-    function hintKey(event, down) {
-        if (event.isAutoRepeat) return;
-        if (down && SL.isHintKey(event.key)) { hintHold.restart(); return; }
-        hintHold.stop();
-        hintHeld = false;
+    function noteMotion(item, x, y): void {
+        if (hoverGate.note(item, x, y) && shown && mode === "" && input.text === "") modeListArmed = true;
     }
-    readonly property string below: mode === "apps" ? "apps" : mode !== "" ? "list"
-        : rows.length > 0 ? "results" : (modeListArmed || hintHeld) && query === "" ? "modes" : ""
-    // unfolds downward in about 0.18 s, ease-in-out (Q-panels-26); gone at once when text is typed
-    // one value per frame of this window (HyprK FrameEase), the glass re-measured with each
-    readonly property real unfold: unfoldEase.value
-    FrameEase {
-        id: unfoldEase
-        goal: sp.below === "modes" ? 1 : 0
-        // read when the goal changes: query and mode change before `below` does
-        animate: sp.query === "" && sp.mode === "" && !A11y.reduceMotion
-        duration: Theme.spotlight.unfoldMs
-        ease: Easing.InOutSine
-        settlesGlass: true
+    readonly property string below: mode === "apps" ? "apps" : mode === "files" ? "files" : mode !== "" ? "list"
+        : rows.length > 0 ? "results" : modeListArmed && query === "" ? "modes" : ""
+    // the panel's own state: `below`, or "gone" while the emptied results panel collapses into its anchor
+    // (Theme.spotlight.panelAnchorY: the mode list grows out of it, the results panel goes back into it when the
+    // field is cleared, R3.2b clear clip: its rows go first, then the empty glass shrinks, fades and blurs). Typing
+    // over the list, a list mode: the panel changes in one frame, as before (Q-panels-26, MAC-ANSWERS.md R2); Apps from
+    // the bar grows and collapses (MAC-ANSWERS-17.md R17.1, panelMotion).
+    property string panelKind: ""
+    property real goneH: 0
+    property bool goneWide: false
+    property real panelSx: 1
+    property real panelSy: 1
+    property real panelAlpha: 1
+    property real panelBlur: 0
+    SpringCurve { id: pScaleX; target: sp; property: "panelSx"; freshHold: 0 }
+    SpringCurve { id: pScaleY; target: sp; property: "panelSy"; freshHold: 0; settlesGlass: true }   // after pScaleX
+    SpringCurve { id: pFade; target: sp; property: "panelAlpha"; freshHold: 0; spring: Theme.spotlight.listFadeSpring }
+    SpringCurve { id: pBlur; target: sp; property: "panelBlur"; freshHold: 0; onFinished: if (goal === 0) sp.panelLayer = false }
+    // the blur's layer, switched on in the handler that starts the motion, before its first frame: switched on by the
+    // first blur value (the springs step after the frame's polish) it drew one empty frame (mcap: the collapse's
+    // first frame had no panel)
+    property bool panelLayer: false
+    FrameAnim {
+        id: pFadeOut
+        target: sp
+        property: "panelAlpha"
+        to: 0
+        duration: Theme.spotlight.collapseFadeMs
+        onRunningChanged: if (!running && sp.panelKind === "gone") sp.panelSettle("")
     }
-    onBelowChanged: settleGlass(50)
+    function panelSettle(kind): void {
+        panelKind = kind;
+        pFadeOut.stop(); pScaleX.snap(1); pScaleY.snap(1); pFade.snap(1); pBlur.snap(0);
+        panelLayer = false;
+    }
+    function panelMotion(): void {
+        const was = panelKind;
+        const moving = shown && !A11y.reduceMotion;
+        if (below === "modes" && was !== "modes" && shown) {
+            panelKind = "modes";
+            pFadeOut.stop();
+            const s = Theme.spotlight;
+            pScaleX.spring = s.listSpring; pScaleY.spring = s.listSpring; pBlur.spring = s.listSpring;
+            pFade.spring = s.listFadeSpring; pFade.firstAt = 0;
+            pScaleX.firstAt = 0; pScaleY.firstAt = 0;
+            panelLayer = moving;
+            pScaleX.snap(s.listFromX); pScaleY.snap(s.listFromY); pFade.snap(0); pBlur.snap(moving ? s.panelBlur : 0);
+            pScaleX.go(1); pScaleY.go(1); pFade.go(1); pBlur.go(0);
+            return;
+        }
+        // Applications from the bar (MAC-ANSWERS-17.md R17.1, apps-open-close-light.mov): the bar takes the mode in one
+        // frame and the Apps panel grows out of the same anchor as the mode list, faster (Theme.spotlight.apps*). Opened
+        // straight in the mode (the Dock's Apps, appsCut) it is there in one frame, as before
+        if (below === "apps" && was !== "apps" && shown && !appsCut) {
+            panelKind = "apps";
+            pFadeOut.stop();
+            const s = Theme.spotlight;
+            pScaleX.spring = s.appsSpring; pScaleY.spring = s.appsSpring; pBlur.spring = s.appsSpring;
+            pFade.spring = s.appsFadeSpring; pFade.firstAt = s.appsFadeFirstAt;
+            pScaleX.firstAt = s.appsFirstAt; pScaleY.firstAt = s.appsFirstAt;
+            panelLayer = moving;
+            pScaleX.snap(s.appsFromX); pScaleY.snap(s.appsFromY); pFade.snap(0); pBlur.snap(moving ? s.panelBlur : 0);
+            pScaleX.go(1); pScaleY.go(1); pFade.go(1); pBlur.go(0);
+            return;
+        }
+        // the emptied results panel, and the Apps panel on Escape (its grid goes in one frame, then the empty panel
+        // collapses: apps-open-close-light.mov 5.083 s, 5.217 .. 5.300 s)
+        if (below === "" && (was === "results" || was === "apps") && shown) {
+            goneH = panel.height;
+            goneWide = was === "apps";
+            panelKind = "gone";
+            const s = Theme.spotlight;
+            pFadeOut.duration = goneWide ? s.appsCollapseFadeMs : s.collapseFadeMs;
+            const cs = goneWide ? s.appsCollapseSpring : s.collapseSpring;
+            pScaleX.firstAt = 0; pScaleY.firstAt = 0;
+            pScaleX.spring = cs; pScaleY.spring = cs; pBlur.spring = cs;
+            panelLayer = moving;
+            pScaleX.go(goneWide ? s.appsCollapseToX : s.collapseToX); pScaleY.go(goneWide ? s.appsCollapseToY : s.collapseToY);
+            pBlur.go(moving ? s.panelBlur : 0);
+            pFade.stop(); pFadeOut.from = panelAlpha; pFadeOut.start();
+            return;
+        }
+        if (below === "" && was === "gone") return;
+        panelSettle(below);
+    }
+    onBelowChanged: { panelMotion(); settleGlass(50); }
 
     function setMode(m) {
         SpotlightState.mode = m;
@@ -208,7 +288,6 @@ ShellWindow {
     // query field keys without a dedicated handler: Super/Ctrl/Alt+1..4 pick a mode; Left/Right move in the Apps
     // grid (they do not cycle modes on the Mac); Backspace on an empty field drops the category token
     function handleKey(event) {
-        hintKey(event, true);
         // Clipboard: Cmd-Delete on an empty field deletes the selected item (the Mac has a per-item delete,
         // com.apple.spotlight.delete.pasteboard.item; its key is not decoded)
         if (mode === "clipboard" && input.text === "" && (event.modifiers & (Qt.MetaModifier | Qt.ControlModifier))
@@ -240,10 +319,10 @@ ShellWindow {
         if (m !== "") { setMode(m === mode ? "" : m); event.accepted = true; return; }
         if (event.key === Qt.Key_Backspace && input.text === "" && category !== "") { category = ""; event.accepted = true; return; }
         const dir = event.key === Qt.Key_Right ? 1 : event.key === Qt.Key_Left ? -1 : 0;
-        if (dir !== 0 && mode === "apps" && input.text === "") { modePanel.item.move(dir, 0); event.accepted = true; }
+        if (dir !== 0 && (mode === "apps" || mode === "files") && input.text === "") { modePanel.item.move(dir, 0); event.accepted = true; }
     }
     function moveSel(dir) {
-        if (mode === "apps") modePanel.item.move(0, dir);
+        if (mode === "apps" || mode === "files") modePanel.item.move(0, dir);
         else if (mode !== "") modePanel.item.move(dir);
         else step(dir);
     }
@@ -314,11 +393,11 @@ ShellWindow {
         selected = 0;
         showAll = false;
         modeListArmed = false;
-        hintHeld = false;
         hoverGate.reset();
+        panelSettle(below);
     }
     onShownChanged: {
-        if (!shown) { closedAt = Date.now(); hintHold.stop(); hintHeld = false; }
+        if (!shown) closedAt = Date.now();
         if (shown && gone) rearm();
         shown ? present() : animate(false);       // present(): also reopened while still fading out
     }
@@ -326,8 +405,9 @@ ShellWindow {
     Connections {
         target: Panels
         function onSpotlightQueryChanged() { sp.takeQuery(); }
+        function onSpotlightEmptiedChanged() { input.text = ""; sp.selectOnShow = false; }
     }
-    onQueryChanged: { selected = 0; showAll = false; dropOpenBlur(); }
+    onQueryChanged: { selected = 0; showAll = false; }
     // rows fill in after the query changed (streamed files, late actions): the selection
     // follows its row by key, so Return never opens a row that slid under the index
     function rowKey(r) {
@@ -358,6 +438,9 @@ ShellWindow {
     MouseArea {
         id: outside
         anchors.fill: parent
+        // a move anywhere on the screen shows the mode list (noteMotion)
+        hoverEnabled: true
+        onPositionChanged: mouse => sp.noteMotion(this, mouse.x, mouse.y)
         property bool onItem: false
         function isItem(m) {
             const r = sp.screen ? Panels.spotlightItems[sp.screen.name] : null;
@@ -388,10 +471,10 @@ ShellWindow {
         layer.effect: MultiEffect {
             blurEnabled: true
             blurMax: 64
-            blur: Math.min(1, sp.blurRadius * (sp.screen ? sp.screen.devicePixelRatio : 2) / 64)
+            blur: Math.min(1, sp.blurRadius * (sp.devicePixelRatio > 0 ? sp.devicePixelRatio : 2) / 64)
         }
         readonly property real barX: Math.round((width - Theme.spotlight.barW) / 2)
-        readonly property real barY: Math.round(height * Theme.spotlight.barTop)
+        readonly property real barY: Math.round(height * Theme.spotlight.barCentre - Theme.spotlight.barH / 2)
         transform: Scale {
             origin.x: stage.width / 2
             origin.y: stage.barY + Theme.spotlight.barH / 2
@@ -399,33 +482,6 @@ ShellWindow {
             yScale: 1 + Theme.travel(sp.scaleY - 1)
         }
 
-        // the open blur: the bar as one still texture (device pixels, 32 pt of room for the blur), blurred
-        ShaderEffectSource {
-            id: barStill
-            readonly property real pad: 32
-            x: bar.x - pad
-            y: bar.y - pad
-            width: bar.width + 2 * pad
-            height: bar.fullHeight + 2 * pad
-            visible: false
-            sourceItem: sp.openBlur ? bar : null
-            sourceRect: Qt.rect(-pad, -pad, width, height)
-            live: false
-            onSourceItemChanged: if (sourceItem) scheduleUpdate()
-            hideSource: sp.openBlur
-        }
-        MultiEffect {
-            visible: sp.openBlur
-            x: barStill.x
-            y: barStill.y
-            width: barStill.width
-            height: barStill.height
-            source: barStill
-            autoPaddingEnabled: false
-            blurEnabled: true
-            blurMax: 64
-            blur: Math.min(1, sp.blurRadius * (sp.screen ? sp.screen.devicePixelRatio : 2) / 64)
-        }
 
         // ---------- the search capsule ----------
         Item {
@@ -450,14 +506,27 @@ ShellWindow {
                 radius: Theme.spotlight.barRadius
                 gradient: Gradient {
                     GradientStop { position: 0; color: Theme.spotlight.barTopTint }
+                    GradientStop { position: 0.14; color: Theme.spotlight.barUpperTint }
                     GradientStop { position: 0.5; color: Theme.spotlight.barMidTint }
+                    GradientStop { position: 0.87; color: Theme.spotlight.barLowerTint }
                     GradientStop { position: 1; color: Theme.spotlight.barBottomTint }
                 }
+            }
+            // the light rim on the top and bottom edges, over the veil (Theme.spotlight.barRim*, shaders/spotrim.frag)
+            ShaderEffect {
+                width: parent.width
+                height: bar.fullHeight
+                property size size: Qt.size(width, height)
+                property real radius: Theme.spotlight.barRadius
+                property point fall: Qt.point(Theme.spotlight.barRimFall, Theme.spotlight.barRimBottomFall)
+                property vector3d rimTop: Theme.spotlight.barRimTop
+                property vector3d rimBottom: Theme.spotlight.barRimBottom
+                fragmentShader: Qt.resolvedUrl("../shaders/spotrim.frag.qsb")
             }
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
-                onPositionChanged: mouse => { if (hoverGate.note(this, mouse.x, mouse.y) && sp.mode === "" && input.text === "") sp.modeListArmed = true; }
+                onPositionChanged: mouse => sp.noteMotion(this, mouse.x, mouse.y)
             }
             Symbol {
                 id: modeGlyph
@@ -497,15 +566,18 @@ ShellWindow {
                 height: 28
                 Symbol {
                     anchors.right: parent.right
+                    anchors.rightMargin: -Theme.spotlight.micBoxPad   // the glyph's box is wider than its ink
                     anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: -1.75                // ink 61.5 .. 82.5 of the bar's 87
                     visible: sp.mode === "" && sp.apps.length === 0
-                    name: "mic.fill"
+                    name: "microphone"                // the outline mic (r17 spotlight-idle-*: ink 14.5 x 21)
                     size: Theme.spotlight.micSize
                     color: Theme.spotlight.placeholder
                 }
                 AppIcon {
                     anchors.centerIn: parent
-                    width: 28 / Theme.appIcon.body       // the top hit's icon art is about 28
+                    anchors.verticalCenterOffset: -1.5
+                    width: Theme.spotlight.barIcon / Theme.appIcon.body   // the top hit's icon art
                     height: width
                     visible: sp.mode === "" && (sp.apps.length > 0 || sp.calcCard)
                     size: width
@@ -523,6 +595,21 @@ ShellWindow {
                     color: Theme.spotlight.placeholder
                 }
             }
+            // the caret's halo, added over the bar (shaders/caretglow.frag); with the caret, never with the completion
+            ShaderEffect {
+                id: caretGlow
+                visible: input.cursorVisible && sp.completionRest === "" && input.selectedText === ""
+                readonly property rect cr: input.cursorRectangle
+                width: 2 + 12 * Theme.spotlight.caretGlowSigma
+                height: 26 + 12 * Theme.spotlight.caretGlowSigma
+                x: input.x + cr.x + 1 - width / 2
+                y: input.y + cr.y + cr.height / 2 - height / 2
+                property size size: Qt.size(width, height)
+                property point caret: Qt.point(2, 26)
+                property real sigma: Theme.spotlight.caretGlowSigma
+                property real gain: Theme.spotlight.caretGlowGain
+                fragmentShader: Qt.resolvedUrl("../shaders/caretglow.frag.qsb")
+            }
             TextInput {
                 id: input
                 MouseArea { anchors.fill: parent; acceptedButtons: Qt.NoButton; cursorShape: Qt.IBeamCursor }   // TextInput sets no I-beam itself
@@ -538,13 +625,14 @@ ShellWindow {
                 x: sp.category !== "" ? token.x + token.width + 6 : sp.modeInfo ? Theme.spotlight.modeTextX : Theme.spotlight.textX
                 width: trailing.x - 12 - x
                 anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: Theme.spotlight.textDY
                 font: Typography.font(Theme.spotlight.inputSize)
                 color: Theme.spotlight.text
                 selectionColor: Theme.color.textSelection   // selectedTextBackgroundColor: follows Appearance > Text highlight colour
                 selectedTextColor: Theme.spotlight.text      // the text keeps its colour
                 clip: true
-                // caret: white, 2 x 26 (its soft multicolour halo is not drawn)
-                cursorDelegate: Rectangle { width: 2; height: 26; radius: 1; color: Theme.spotlight.text; visible: input.cursorVisible }
+                // caret: white, 2 x 26; its halo is caretGlow
+                cursorDelegate: Rectangle { width: 2; height: 26; radius: 1; color: Theme.spotlight.text; visible: input.cursorVisible && sp.completionRest === "" }
                 onTextChanged: { sp.query = text; if (text !== "") sp.modeListArmed = false; }
                 Keys.onEscapePressed: sp.escapeKey()
                 Keys.onReturnPressed: sp.acceptSel()
@@ -554,7 +642,6 @@ ShellWindow {
                 Keys.onTabPressed: sp.moveSel(1)
                 // the mode keys and the Apps grid's arrows first, then AppKit's text keys (HyprK keybindings.js)
                 Keys.onPressed: event => { sp.handleKey(event); if (!event.accepted) KeyBindings.handle(event, input); }
-                Keys.onReleased: event => sp.hintKey(event, false)
 
                 Text {
                     visible: input.text === "" && sp.category === ""
@@ -562,6 +649,25 @@ ShellWindow {
                     text: sp.modeInfo ? sp.modeInfo.placeholder : "Search or Ask"
                     font: input.font
                     color: Theme.spotlight.placeholder
+                }
+                // the top hit's inline completion (r17 spotlight-typed-*: "calc" + "ulator — Open"): the rest of an app's
+                // name the query begins, and what Return does, grey on the completion pill from the end of the typed
+                // text; the caret is not drawn then
+                Rectangle {
+                    visible: sp.completionRest !== ""
+                    x: input.contentWidth
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: appCompletion.implicitWidth + Theme.spotlight.completionPadRight
+                    height: Theme.spotlight.completionH
+                    radius: Theme.spotlight.completionRadius
+                    color: Theme.spotlight.completionFill
+                    Text {
+                        id: appCompletion
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: sp.completionRest
+                        font: input.font
+                        color: Theme.spotlight.completionRestText
+                    }
                 }
                 // the answer inline after the query, on the completion pill (Q-panels-16, -21)
                 Rectangle {
@@ -647,42 +753,78 @@ ShellWindow {
         // ---------- the panel under it ----------
         Item {
             id: panel
-            visible: sp.below !== "" && height > 0.5
-            readonly property bool wide: sp.below === "apps"
+            readonly property string kind: sp.panelKind
+            visible: kind !== "" && height > 0.5
+            readonly property bool wide: kind === "apps" || kind === "files" || (kind === "gone" && sp.goneWide)
             width: wide ? AG.metrics().width : Theme.spotlight.barW
             x: Math.round((stage.width - width) / 2)
             y: bar.y + bar.height + Theme.spotlight.gap
             readonly property real resultsH: Math.min(Theme.spotlight.resultsMax, results.contentHeight + 2 * Theme.spotlight.pillInset)
             // results grow and shrink on a spring (kept from before; the Mac's results motion is not measured)
             Spring { id: grow; target: panel.resultsH; response: Theme.anim.resizeResponse; damping: Theme.anim.resizeDamping; epsilon: 0.3; settlesGlass: true }
-            height: sp.below === "apps" ? AG.metrics().height
-                  : sp.below === "list" ? Theme.spotlight.listPanelH
-                  : sp.below === "modes" ? Theme.spotlight.modeListH * sp.unfold
-                  : sp.below === "results" ? (A11y.reduceMotion ? resultsH : grow.value) : 0
+            height: kind === "apps" || kind === "files" ? AG.metrics().height
+                  : kind === "list" ? Theme.spotlight.listPanelH
+                  : kind === "modes" ? Theme.spotlight.modeListH
+                  : kind === "results" ? (A11y.reduceMotion ? resultsH : grow.value)
+                  : kind === "gone" ? sp.goneH : 0
             clip: true
+            // the grow / collapse about the anchor (sp.panelMotion); Reduce motion: no scale, no blur, the fade stays
+            transform: Scale {
+                origin.x: panel.width / 2
+                // the Apps panel grows and collapses about its top edge (Theme.spotlight.appsAnchorY), the lists about a
+                // point 20 under it
+                origin.y: panel.wide ? Theme.spotlight.appsAnchorY : Theme.spotlight.panelAnchorY
+                xScale: 1 + Theme.travel(sp.panelSx - 1)
+                yScale: 1 + Theme.travel(sp.panelSy - 1)
+            }
             Glass {
                 anchors.fill: parent
                 radius: panel.wide ? Theme.spotlight.appsRadius : Theme.spotlight.panelRadius
                 sx: panel.x
                 sy: panel.y
                 tint: Theme.glass.tintStrong
+                // the plugin's Liquid Glass materialize (plugin/README.md "Motion"): the glass appears and goes with the
+                // panel's opacity instead of fading as a layer
+                materialize: sp.panelAlpha
             }
-            Rectangle {
-                width: parent.width
-                height: sp.below === "modes" ? Theme.spotlight.modeListH : parent.height
-                radius: panel.wide ? Theme.spotlight.appsRadius : Theme.spotlight.panelRadius
-                gradient: Gradient {
-                    GradientStop { position: 0; color: Theme.spotlight.panelTopVeil }
-                    GradientStop { position: 1; color: Theme.spotlight.panelBottomVeil }
+            // clicks on the panel never close Spotlight; a move over it counts like one anywhere (noteMotion)
+            MouseArea { anchors.fill: parent; hoverEnabled: true; onPositionChanged: mouse => sp.noteMotion(this, mouse.x, mouse.y) }
+            Item {
+                id: panelBody
+                anchors.fill: parent
+                opacity: sp.panelAlpha
+                layer.enabled: sp.panelLayer
+                layer.effect: MultiEffect {
+                    blurEnabled: true
+                    blurMax: 64
+                    blur: Math.min(1, sp.panelBlur * (sp.devicePixelRatio > 0 ? sp.devicePixelRatio : 2) / 64)
                 }
-            }
-            MouseArea { anchors.fill: parent }   // clicks on the panel never close Spotlight
-
-            ModeList {
-                visible: sp.below === "modes"
-                width: parent.width
-                height: Theme.spotlight.modeListH
-                onPicked: m => sp.setMode(m)
+                Rectangle {
+                    anchors.fill: parent
+                    radius: panel.wide ? Theme.spotlight.appsRadius : Theme.spotlight.panelRadius
+                    gradient: Gradient {
+                        GradientStop { position: 0; color: Theme.spotlight.panelTopVeil }
+                        GradientStop { position: 0.11; color: Theme.spotlight.panelUpperVeil }
+                        GradientStop { position: 0.5; color: Theme.spotlight.panelMidVeil }
+                        GradientStop { position: 1; color: Theme.spotlight.panelBottomVeil }
+                    }
+                }
+                // the light line under the panel's top edge, over the veil (Theme.spotlight.panelRimTop)
+                ShaderEffect {
+                    anchors.fill: parent
+                    property size size: Qt.size(width, height)
+                    property real radius: panel.wide ? Theme.spotlight.appsRadius : Theme.spotlight.panelRadius
+                    property point fall: Qt.point(Theme.spotlight.rimFall, 0)
+                    property vector3d rimTop: Theme.spotlight.panelRimTop
+                    property vector3d rimBottom: Qt.vector3d(0, 1, 0)
+                    fragmentShader: Qt.resolvedUrl("../shaders/spotrim.frag.qsb")
+                }
+                ModeList {
+                    visible: panel.kind === "modes"
+                    width: parent.width
+                    height: Theme.spotlight.modeListH
+                    onPicked: m => sp.setMode(m)
+                }
             }
 
             ListView {
@@ -713,8 +855,21 @@ ShellWindow {
                     themeIcon: k === "file" ? SL.fileIcon(d.path, d.isDir, d.mime) : ""
                     accessory: k === "action" ? SL.quickKeyLabel(SpotlightState.quickKeys, d.id, false) : ""
                     badge: accessory !== ""
+                    hint: index === 0 && k === "app" ? "Search " + modelData.title : ""
                     onClicked: { sp.selected = index; sp.accept(); }
                 }
+            }
+
+            // the results list's scroll knob (Theme.spotlight.scrollKnob), there whenever the list is longer than the panel
+            Rectangle {
+                readonly property var k: SL.scrollKnob(panel.height, results.contentHeight + 2 * Theme.spotlight.pillInset, results.contentY - results.originY, SL.filesGrid().knobInset)
+                visible: sp.below === "results" && panel.kind === "results" && k[1] > 0
+                x: panel.width - SL.filesGrid().knobRight - width
+                y: k[0]
+                width: SL.filesGrid().knobWidth
+                height: k[1]
+                radius: width / 2
+                color: Theme.spotlight.scrollKnob
             }
 
             Loader {
@@ -722,11 +877,21 @@ ShellWindow {
                 active: sp.mode !== ""
                 width: parent.width
                 height: parent.height
-                sourceComponent: sp.mode === "apps" ? appsComp : listComp
+                opacity: sp.panelAlpha       // the Apps panel's grow (panelMotion); 1 at rest
+                sourceComponent: sp.mode === "apps" ? appsComp : sp.mode === "files" ? filesComp : listComp
             }
             Component {
                 id: appsComp
                 AppsPanel {
+                    query: sp.query
+                    category: sp.category
+                    onPickCategory: name => { sp.category = name; input.forceActiveFocus(); }
+                    onDone: Panels.close()
+                }
+            }
+            Component {
+                id: filesComp
+                FilesPanel {
                     query: sp.query
                     category: sp.category
                     onPickCategory: name => { sp.category = name; input.forceActiveFocus(); }

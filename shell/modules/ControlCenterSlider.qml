@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import qs
 import qs.HyprK
 import qs.services
@@ -18,7 +19,8 @@ Slider {
             property vector4d fill: Qt.vector4d(Theme.cc.trackLift, Theme.cc.trackLift, Theme.cc.trackLift, 0)
             property size sizePt: Qt.size(width, height)
             property real radius: height / 2
-            property real dpr: Screen.devicePixelRatio
+            property real dpr: QsWindow.window ? QsWindow.window.devicePixelRatio : Screen.devicePixelRatio
+            property real pad: 0   // the shader's optional uniform: declared, or Qt warns once per item
             fragmentShader: Qt.resolvedUrl("../shaders/plusfill.frag.qsb")
         }
     }
@@ -28,6 +30,16 @@ Slider {
     lensHeight: Theme.cc.lensH
     lensBackdrop: "transparent"
     lensGain: Theme.cc.lensGain
+    lensDecoded: Theme.cc.lensDecoded
+    lensRingOpacity: Theme.cc.lensRingOpacity
+    lensRimDecoded: Theme.cc.lensRimDecoded
+    // the module glass's level under the lens (Theme.cc.lensEmpty*): from the wallpaper's luma behind the menu bar
+    // (the nearest the shell knows; a window under the Control Center is not seen) and the held module's lift
+    readonly property real moduleLevel: Theme.cc.lensEmptyBase + Theme.cc.lensEmptySlope * Wallpaper.topLuma
+    lensEmptyLevel: Math.min(0.95, moduleLevel * (1 + Theme.cc.sliderHeldGain) + Theme.cc.sliderHoverLift)
+    pressOverlay: Theme.cc.pressOverlay
+    lensDy: Theme.cc.lensDy
+    knobShadowScale: Theme.cc.knobShadowScale
     fillToEnds: true
     trackPressOffset: Theme.cc.knobW / 2
     overdrag: Theme.cc.overdrag

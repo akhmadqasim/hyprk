@@ -86,9 +86,20 @@ blur (the variable-blur amount, so the backdrop goes from sharp to frosted), blu
 the backdrop unchanged; layer alpha stays 1. The shell drives `m` with its open/close springs.
 
 Channel: a 1x1 **hole** in the shape's own region, in its middle row (y = top + floor(h / 2)), at
-x = left + 1 + round(m (w - 3)) (shell/components/Glass.qml `materialize`). Shapes without a hole are at 1.
-The older window-wide opacity marker (1x1 rect in the surface's bottom row, x = opacity x (W - 1)) is still
-read and still fades the whole layer.
+x = left + 1 + round(m (w - 3)) (shell/components/Glass.qml `materialize`). Shapes without a hole are at 1, so the
+shell sends no shape at all for a glass too small to carry a hole the plugin reads (under 4 x 2, or under 9 wide when the
+lone hole would sit within 2 columns of the centre) while m < 0.5 (the alert's first PopIn frames drew 6 x 4 pt of
+opaque glass). The older window-wide opacity marker (1x1 rect in the surface's bottom row, x = opacity x (W - 1)) is
+still read and still fades the whole layer: the alert uses it as AppKit's window alpha (shell/modules/Overlay.qml
+`glassOpacity`), its glass at full material.
+
+Whole-window scale and blur (an AppKit window animation that scales and blurs the window with its shadow: the alert's
+PopIn and Cancel ScaleDownAndOut, re/27.2.1/MOTION-AUDIT.md "Alert, Round R3.1"): two more window-wide 1x1 rects
+(shell/components/ShellWindow.qml `glassShadowSize` / `glassSoften`, Shape.hpp takeShadowSizeMarker / takeSoftenMarker).
+Top row, x = size / 2 x (W - 1): every shape's drop shadow radius and offset times that size (the shape itself already
+follows the scaled item). Left column below the top row, y = sigma / 16 x (H - 1): the glass edge as blurred by a
+Gaussian of that sigma (pt), drawn as a linear coverage ramp of the same slope (sigma sqrt(2 pi) wide); the rim and
+the shadow are not blurred. Without them: 1 and 0.
 
 Sub-point edges: a region is whole logical px, so glass that scales (HUD appear 0.9 -> 1, Control Center modules) grew in
 1 pt steps per edge, and the last step lit the final rim rows in one frame (HUD alpha 0.55 -> 0.76, judge #3). Two more
@@ -96,7 +107,11 @@ Sub-point edges: a region is whole logical px, so glass that scales (HUD appear 
 x = centre - floor(n^2 / 2) + i1 n + i2 with centre = left + floor(w / 2), n = min(17, floor(sqrt(w - 3))),
 i = round((d + 0.5)(n - 1)) and d = true edge - region edge in [-0.5, 0.5] (1/16 pt steps on wide shapes). Both rows or
 none, shapes at least 12 pt tall; a capsule or circle then takes half its true size as radius. Without them the box stays
-whole points.
+whole points. An even n has no code for d = 0 (the shell rounds it to n / 2): codes n / 2 - 1 and n / 2 both read 0 and the
+others step by 1 / (n - 2) out to -+0.5 (`fractionEdge`), so a glass at rest is on whole points and every code reads inside
+the shell's rounding bin. Read as i / (n - 1) - 0.5, every resting glass with an even n (7-11, 19-27, 39-51, 67-83,
+103-123, 147-171, 199-227 and 259-291 pt wide) sat 1 / (2 (n - 1)) pt right and down: the alert (260 pt, n 16) and the menus (202-262 pt) 1/30-1/26 pt, which weakened the side line on the
+left and top and spilled it into the next pixel on the right and bottom (reference/re/27.2.1/GLASS-HIG.md round 9).
 
 Merging: SwiftUI passes `GlassEffectContainer(spacing:)` (default 8 pt) straight to `CASDFLayer.smoothness`,
 and QuartzCore unions the element SDFs with a normal-aware polynomial smooth min: `k' = k (0.5 - 0.5 nA.nB)`,
@@ -142,7 +157,7 @@ and the rim rows; run it after any change here.
 | `clear` | 0.125, 1.08, 1.06 | none | min(0.36 D, 20) / max(-0.65 D, -60) | none | none | |
 | `dock` | 0.15, 0.9, 1.25 / 0.05, 0.92, 1.25 + black 2 %, max luma 0.75 | | as regular (the real Dock's end caps; the probe variant has 0.08 D / -0.18 D) | 0 / 0 / 0.2 | none | `hyprk-dock` |
 | `controlcenter` | 0.125, 0.8, 1.2 both | none | min(0.225 D, 25) / max(-2 D, -80) | 0.0357 D / 0.0714 D / 0.1525 | none | `hyprk-controlcenter`, `hyprk-hud` |
-| `spotlight` | 0.1, 1.0, 1.25 (SiriRecipe branch A, reference/re/NOTES.md; not in the verified model) | none | 0.4 D / -0.72 D | 0.4 D / 0.4 D / 1.0 | AppKit's active window shadow, black: 0.40 light / 0.70 dark, sigma 20 (radius 20 sqrt 2), y 18 (fitted to the Mac's bar, = shadowParameters); a shape inside another group's box casts none | `hyprk-spotlight` |
+| `spotlight` | 0.1, 1.0, 1.25 (SiriRecipe branch A, reference/re/NOTES.md; not in the verified model) | black 0.205 on the face clamped to 1 first (the shell's bottom veil, moved before the rim: SPOTLIGHT-27.2.1.md "Judge #20") | 0.4 D / -0.72 D | 0.4 D / 0.4 D / 1.0 | AppKit's active window shadow, black: 0.40 light / 0.70 dark, sigma 20 (radius 20 sqrt 2), y 18 (fitted to the Mac's bar, = shadowParameters), one shadow of all the layer's groups (masks add: `1 - o min(1, sum)`, never over another group's glass); a shape inside another group's box casts none | `hyprk-spotlight` |
 
 q = clamp((D - 64) / 96). Face (all in display-encoded values): max luma `k = clamp(1 - Y (1 - M))`, luma `k Y`,
 chroma `x k (1 + 0.3 (1 - k))` (skipped at M = 1); then `black + (white - black) Y + sat (c - Y)` and the fill.
@@ -153,11 +168,18 @@ mip of Apple's backdrop scale (perceptual estimator: 0.5 / 0.25 / 0.125). Blur f
 lighten 0.9 light / darken 0.9 dark, normal 0.5.
 
 Rim, two effects: (1) dark specular, the glass filter's KeyFillHighlight inputs: a 0.5 pt line just outside the
-left and right edges, `c (1 + bias h (3 - 2 c))`, bias -0.25 (Control Center -0.3), lobes through
-`v / ((1 / 0.4 - 2)(1 - v) + 1)`, spread 75 deg (dark, Dock, Clear, CC) / 106 deg (light Regular); (2) the key/fill
+left and right edges, `c (1 + bias h (3 - 2 c))`, bias -0.25 (Control Center -0.3; dark Regular -0.278, a fit to the
+Mac's dark alert and menu side line, GLASS-HIG.md round 11; the Notification Center card and the banner take
+the dump's -0.25 and, in dark, limit the toned luma to 0.278 through a knee, `t (1 + (Y / 0.278)^4)^(-1/4)`: GLASS-HIG.md
+"Round 18"), two opposite lobes along x each
+through `v / ((1 / 0.4 - 2)(1 - v) + 1)` and summed (h = v+ + v-), spread 75 deg (dark, Dock, Clear, CC) / 106 deg
+(light Regular: both lobes reach the top and bottom, h 0.31 there; GLASS-HIG.md round 9); (2) the key/fill
 highlight layer top and bottom: a mix toward the layer's vibrantColorMatrix (as YCC per recipe) by spec 1 pt
 (`1 - 0.75 depth`) + diffuse 8 pt linear at 0.65 x the spread, amounts 0.5 and 0.075; spread 80 deg up to D 96,
-90 from D 191. Notification Center: the key band alone x 1.23 (the real NC card's rows, not decoded).
+90 from D 191. On a shape whose shorter side is over 64 pt the lobes read the SDF normal mixed halfway toward
+`normalize(x, y W / H)` from the shape's centre (QuartzCore gradientOvalization 0.5, MAC-ANSWERS-8.md R8.1), so a long
+straight rim is brightest at its middle; not on the dock and controlcenter recipes, whose Mac rims are flat (GLASS-HIG.md
+20). Notification Center: the key band alone x 1.23 (the real NC card's rows, not decoded).
 No chromatic aberration (`aberration` 0: Apple has it only on glassForeground, the pressed switch knob).
 
 Liquid Glass slider (`tint_amount`, NSGlassTintAmount, 0.5 = the recipes as is), piecewise linear with the knee at
@@ -234,7 +256,11 @@ causes, measured over the Tahoe wallpaper (MBA 2x; a row is "banded" when equal 
    noise before the write (`dither`). **Ours, not Apple's**: QuartzCore's glass shaders have no dither term; the Mac composes
    into a deeper buffer. It is gated on the backdrop itself: off where the backdrop is flat (its deepest level does not
    change) and off where it has detail (level 2 changes by more than a level in about 3 px), so flat and striped backdrops
-   keep their values.
+   keep their values. While a glass fades (layer alpha < 1: the shell's opacity marker or a layer fade; or materialize < 1)
+   the same noise goes on the blended result instead, on every backdrop and not scaled by alpha, so the mean follows the
+   alpha: the HUD's interior over grey 127 (9.3 levels at full) stepped 0 / .108 / .216 against a smoothly growing marker
+   (0 up to alpha .04, .108 from .07 to .13; rms .021 against alpha over 67 frames), now rms .0022, max .007
+   (GLASS-HIG.md round 9). At rest nothing changes.
 3. Not the plugin: the shell's dim layer under the Control Center is an 8 bit alpha ramp of 10 %; its contour rings and
    blocky steps are there with the plugin disabled (hand-off to the shell).
 
@@ -376,7 +402,7 @@ own) prevents one, `titlebar = "classes"` only uses the regex, `"off"` disables 
 | `titlebar_height` / `titlebar_button` / `titlebar_gap` / `titlebar_inset` | 32 / 14 / 9 / 9 pt (SPEC: bar 32, buttons 14, gap 9; inset: MAC-ANSWERS Q-windows-07, TextEdit and Terminal discs at x 9, 32, 55 on 27.2.1 (was 15 from an older screenshot); toolbar windows use 19) |
 | `titlebar_font` / `titlebar_font_size` | `SF Pro Text` / 13 |
 | `titlebar_color` / `titlebar_color_inactive` | `0xF3F1EFFF` / `0xF6F5F4FF` |
-| `titlebar_text` / `titlebar_text_inactive` | `0x000000B3` / `0x00000040` (TextEdit #4C4C4C / #BEBEBE on white, Q-windows-11) |
+| `titlebar_text` / `titlebar_text_inactive` | `0x000000B3` / `0x00000048` (TextEdit #4C4C4C on white, Q-windows-11; inactive (183,183,183), R17.4 inactive-titlebar-light.png. R17.4 reads the active title 88, not 76: not changed, LIGHTS-REA section 13) |
 | `titlebar_auto_color` | 1 |
 | `titlebar_glass` | 0 |
 
@@ -394,6 +420,16 @@ top corners, so the two read as one shape.
 `button`, `gap`, `inset`, `titleX` (pt), `font`, `fontSize`, `weight`, `title`, `active` and `look.active` /
 `look.inactive` = `{fill, dark, text}` (colours as `#AARRGGBB`, `dark` = the discs and text of a dark bar). Mission
 Control draws the bar from it in the thumbnails (a window capture holds the client only, the bar is a decoration).
+
+**Lights a client draws itself** (`src/ClientLights.cpp`). Finder and System Settings draw their own traffic lights
+(ui/HyprK/TrafficLights.qml), so Hyprland focused and raised their window on any press there
+(`InputManager::processMouseDownNormal`) before the client saw it; on the Mac a press or a close on a light of an
+inactive window does not activate the app (R6.4, `reference/re/27.2.1/LIGHTS-REA-27.2.1.md` section 10). A client
+tells the plugin where its lights are, per window class, in window-local logical px: `hyprctl liquidglass lights
+<class> <x> <y> <w> <h>` (w or h <= 0 removes it; finder/src/hypr.cpp `setLights`, settings/SettingsApp.qml). A hook
+on `processMouseDownNormal` then takes a plain left press (no Shift / Ctrl / Super) inside that rect on the window's
+own surface, when the window is not the focused one and not full screen: the keybinds see it as before and the client
+gets the button, without the refocus and the raise. Everything else goes to Hyprland's own function.
 
 **Full screen enter.** Hyprland draws no decoration for a full-screen window, so the bar went in one frame. AppKit's
 `_NSFullScreenTransitionOverlayWindow` fades the after-contents in on (0, 1, 1, 1) over half the 0.5 s transition, over the
@@ -422,8 +458,9 @@ matches `popup_classes`, `IHyprRenderer::renderWindow` is hooked: after Hyprland
 (`popup_material`, radius `popup_radius`, the popup's xdg window geometry) goes right before each popup's root surface, and
 Hyprland's own popup blur is turned off for it. Q-menubar-13: pull-down and context menu are the same window type and glass, so
 the default is the shell dropdown's `menu` recipe and shadow. A Qt popup destroys its surface on close, which leaves Hyprland's
-popup fadeout empty, so the plugin keeps the popup's last buffer and fades it with its glass over the shell menus' 185 ms
-ease-out (materialize 1 -> 0). The client draws no fill when `plugin:liquidglass:enabled` is 1.
+popup fadeout empty (with `decoration:blur:popups` it still drew a blur over the menu while it faded), so the plugin cancels
+that fadeout, keeps the popup's last buffer and fades buffer and glass at one alpha on the Mac menu probe's CoreAnimation
+default curve over 236 ms, the first frame without the popup one refresh in (MOTION-AUDIT.md). The client draws no fill when `plugin:liquidglass:enabled` is 1.
 A layer surface's popup gets no glass here (layers have no class). The shell's own text field menus (Spotlight, the
 Emoji picker) avoid that shell-side: they open as in-window popups on a hyprk-overlay layer of their own
 (shell/components/TextMenuHost.qml), whose Glass shapes take the `menu` recipe like the menu bar's menus.

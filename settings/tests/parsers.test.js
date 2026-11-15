@@ -268,3 +268,58 @@ test("title bar double-click: the Mac's 0.5 s and 5 pt (Settings toolbar zoom)",
     assert.equal(P.isDoubleClick(null, a), false);
     assert.equal(P.isDoubleClick(a, { t: 900, x: 100, y: 20 }), false);
 });
+
+// ---------- General > About, Storage, Software Update (round 15) ----------
+test("sysinfo.sh: this computer's facts", () => {
+    const i = P.parseSysInfo(fx("sysinfo-desktop.txt"));
+    assert.equal(i.model, "H410M S2H");
+    assert.equal(i.host, "studio");
+    assert.equal(i.chip, "Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz");
+    assert.equal(i.memory, "32 GB");                       // the online memory blocks, not MemTotal (31.3 GiB)
+    assert.deepEqual([i.osName, i.osLabel, i.osVersion, i.osPretty, i.osLogo],
+        ["Ubuntu", "Ubuntu Resolute Raccoon", "26.04.1", "Ubuntu 26.04.1 LTS", "ubuntu-logo"]);
+    assert.deepEqual(i.displays, [{ name: "N27p", size: "27-inch (3840 × 2160)" }]);
+    assert.ok(i.size > i.avail && i.avail > 0);
+    assert.equal(i.autoUpdates, "On");
+});
+
+test("sysinfo: missing facts stay empty, MemTotal rounds up, pretty host name wins", () => {
+    const e = P.parseSysInfo("");
+    assert.deepEqual([e.model, e.host, e.memory, e.osLabel, e.osVersion, e.autoUpdates, e.size], ["", "", "", "", "", "", 0]);
+    assert.deepEqual(e.displays, []);
+    const i = P.parseSysInfo('host=pc\nprettyHost="My PC"\nmemTotalKb=16185072\nos.NAME="Arch Linux"\nos.VERSION_ID=rolling\ndisplay=eDP-1 1920x1080 \ndisk=5 10\nautoUpdates=APT::Periodic::Unattended-Upgrade "0";');
+    assert.deepEqual([i.host, i.memory, i.osLabel, i.osVersion, i.autoUpdates, i.avail, i.size], ["My PC", "16 GB", "Arch Linux", "rolling", "Off", 5, 10]);
+    assert.deepEqual(i.displays, [{ name: "eDP-1", size: "(1920 × 1080)" }]);   // no EDID: the connector, no inches
+});
+
+test("byte counts as the Mac prints them", () => {
+    assert.deepEqual([245.11e9, 17e9, 111.4e6, 512.72e6, 3.4e6, 2e12, 4096, 0].map(P.byteCount),
+        ["245.11 GB", "17 GB", "111.4 MB", "512.7 MB", "3.4 MB", "2 TB", "4 KB", "Zero KB"]);
+});
+
+test("storage bar: the Mac's parts from the Mac's sizes (ax-storage-00-dark.jsonl)", () => {
+    const G = 1e9, cats = ["applications", "developer", "documents", "icloud", "mail", "music", "photos"].map(id => ({ id, name: id }));
+    const sizes = { applications: 30.08 * G, developer: 1.42 * G, documents: 17 * G, icloud: 0.1114 * G, mail: 1.44 * G, music: 0.5127 * G, photos: 3.44 * G };
+    const b = P.storageBar(cats, sizes, 30.81 * G, 51.79 * G, 245.11 * G, 448);
+    assert.deepEqual(b.parts.map(p => [p.id, p.x, p.width, p.legend]), [["applications", 0, 54, true], ["documents", 55, 30, true],
+        ["photos", 86, 5.5, true], ["mail", 92.5, 1.5, true], ["developer", 95, 1.5, true], ["music", 97.5, 1, false]]);
+    assert.equal(b.pending, false);
+    assert.equal(b.rest.x, 99.5);                                   // System Data: AX 361.5 - 262
+    assert.ok(Math.abs(b.rest.width - 197.5) < 1.5 && Math.abs(b.system.x - 298) < 1.5 && Math.abs(b.system.width - 55) < 1);
+    assert.ok(Math.abs(b.free.x - 354) < 1 && Math.abs(b.free.x + b.free.width - 448) < 1e-9);
+    // while a category is being sized: the known parts, then one part up to the available space, no system part
+    const c = P.storageBar(cats, { documents: 17 * G }, undefined, 53.27 * G, 245.11 * G, 448);
+    assert.equal(c.pending, true);
+    assert.deepEqual(c.parts.map(p => [p.id, p.x, p.width]), [["documents", 0, 30]]);
+    assert.equal(c.system.width, 0);
+    assert.ok(Math.abs(c.rest.x - 31) < 1e-9 && Math.abs(c.rest.x + c.rest.width + 1 - c.free.x) < 1e-9);
+    // nothing known, an empty disk, more counted than used
+    assert.equal(P.storageBar(cats, {}, undefined, 0, 0, 448).free.width, 448);
+    const o = P.storageBar([{ id: "a", name: "a" }], { a: 900 }, 500, 500, 1000, 100);
+    assert.ok(o.parts.length === 0 && o.system.x + o.system.width <= o.free.x && o.rest.bytes >= 0);
+});
+
+test("storage.sh list: folders, the largest first", () => {
+    assert.deepEqual(P.parseStorageList("10\t/opt\n300\t/var/lib/snapd/snaps\nnoise\n0\t/home/u/My Apps/\n"),
+        [{ name: "snaps", path: "/var/lib/snapd/snaps", bytes: 300 }, { name: "opt", path: "/opt", bytes: 10 }, { name: "My Apps", path: "/home/u/My Apps/", bytes: 0 }]);
+});

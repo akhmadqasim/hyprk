@@ -18,7 +18,9 @@ CBDT (the Noto Color Emoji format) is laid out correctly by Qt and by pango, so 
   mixed skin tone pairs that Apple draws as two overlapping halves; the original GDEF/GPOS positions them).
   At the end every sequence is shaped again on the new font and must give the same glyphs and positions.
 - Metrics: the ".Apple Color Emoji UI" face (773/-169 per 800 em, the same proportions as SF Pro's 1980/-432 per
-  2048), so a line with emoji is as tall as an SF Pro line. Bitmaps sit on the baseline, 1 em square, as in sbix.
+  2048), so a line with emoji is as tall as an SF Pro line. In Qt the emoji are drawn as CoreText draws them in UI
+  text (reference/re/27.2.1/EMOJI-TEXT.md): 1.3 x the text size, centred on the cap height, with the UI face's
+  tracking. pango/HarfBuzz keep the hmtx advance (1 em).
 - One face, family "Apple Color Emoji" (the name table of face 0). No glyf/loca: FreeType must see a bitmap-only font.
 
 Needs fontTools, Pillow and HarfBuzz through PyGObject (Ubuntu: python3-fonttools python3-pil gir1.2-harfbuzz-0.0).
@@ -41,6 +43,14 @@ from gi.repository import HarfBuzz as hb  # noqa: E402
 
 FE0F = 0xFE0F
 DROP = ("sbix", "glyf", "loca", "morx", "feat", "trak", "bgcl", "cntr")
+# Emoji in UI text on macOS 27.2.1 (screens/27.2.1/panels/emoji-in-banner-*.png and finder/emoji-in-name-*.png, 2x,
+# 13 pt SF Pro; reference/re/27.2.1/EMOJI-TEXT.md):
+# - EM_SCALE: emoji pitch 38-39 px = em x (1 + UI face trak 112/800 at 17 pt) -> em 16.9 pt = 1.3 x 13 pt
+#   (grinning face ink 29-31 px, the art is 0.92-0.95 of its strike)
+# - CENTRE: the emoji box's centre 0.36 x the text size above the baseline, the middle of the cap height
+#   (grinning face ink rows 296-324 and 'R' 301-319, baseline 320; banner 117-147 and 'E' 123-141, baseline 142)
+EM_SCALE = 1.3
+CENTRE = 0.36
 
 
 def hb_font(path, index=0):
@@ -84,7 +94,10 @@ def main():
     ap.add_argument("src")
     ap.add_argument("emoji_test")
     ap.add_argument("out", nargs="?", default=os.path.join(os.path.dirname(__file__), "..", "named", "AppleColorEmoji.ttf"))
-    ap.add_argument("--strikes", default="20,26,32,40,52,96")
+    # Qt picks the smallest strike whose line is >= the pixel size (logical, before the device pixel ratio). With the
+    # 20/26/32 strikes 13 px text took the 20 px strike, upscaled to 34 px at 2x (soft); 40 is the smallest strike that
+    # is downscaled at 2x for text up to 17 px (macOS draws a 32/40 px strike there)
+    ap.add_argument("--strikes", default="40,52,96")
     args = ap.parse_args()
     keep = sorted(int(x) for x in args.strikes.split(","))
 
@@ -178,8 +191,26 @@ def main():
     cblc.version = cbdt.version = 3.0
     cblc.strikes, cbdt.strikeData = [], []
     asc_ui, desc_ui = ui["hhea"].ascent, ui["hhea"].descent
+    trak = sorted(ui["trak"].horizData[0.0].items())  # (point size, font units), the UI face's normal track
+
+    def tracking(pt):  # linear between the table's sizes, flat outside (as AAT trak)
+        if pt <= trak[0][0]:
+            return trak[0][1]
+        for (a, va), (b, vb) in zip(trak, trak[1:]):
+            if pt <= b:
+                return va + (vb - va) * (pt - a) / (b - a)
+        return trak[-1][1]
+
     filled = 0
     for ppem in keep:
+        # line: the text size in strike pixels (Qt scales the strike by pixelSize / line), so the emoji em is
+        # EM_SCALE x the text size. track: the UI face's at ppem / 2 pt, where the strike is drawn 1:1 at 2x
+        # (40: 5.5 px), + 1 px because Qt also gives emoji SF Pro's letterSpacing (Typography, -0.25 px at 13 px) and
+        # whole-pixel advances: Finder "Report 😀👍🏽🇮🇩.txt" pitches 37/36 px with 6, 37/38 with 7, 38/39 with 8
+        # against the Mac's 38/38. shift: the 1 em box moves from the baseline to centre on CENTRE x the text size
+        line = round(ppem / EM_SCALE)
+        track = round(tracking(ppem / 2) * ppem / upem) + 1
+        shift = round(CENTRE * line + ppem / 2) - ppem
         glyphs = {}
         for name in order:
             data = image(ppem, name)
@@ -192,8 +223,11 @@ def main():
             g0 = sbix[max(sbix)].glyphs[name]
             ox = round(g0.originOffsetX * ppem / max(sbix)) if g0.graphicType == "png " else 0
             oy = round(g0.originOffsetY * ppem / max(sbix)) if g0.graphicType == "png " else 0
-            m.width, m.height, m.BearingX, m.BearingY = w, h, ox, oy + h
+            m.width, m.height, m.BearingX, m.BearingY = w, h, ox, oy + h + shift
             m.Advance = round(font["hmtx"][name][0] * ppem / upem)
+            if m.Advance:  # tracking, half before the art: the banner's gaps 't' -> 😀 and 🇮🇩 -> 'i' are then the Mac's 12 / 14 px
+                m.Advance += track
+                m.BearingX += track // 2
             bm = C_B_D_T_.cbdt_bitmap_format_17(None, font)
             bm.metrics, bm.imageData = m, data
             glyphs[name] = bm
@@ -204,14 +238,13 @@ def main():
         bst = strike.bitmapSizeTable
         for d in ("hori", "vert"):
             # Qt 6.10 picks the smallest strike whose line (ascender - descender) is >= the pixel size and scales it by
-            # pixelSize / line, so the line must be about 1 em (the bitmap height) or every emoji comes out too small.
-            # It is ppem + 1, not ppem: when the pixel size equals the line exactly Qt skips the scaling, also the
-            # device pixel ratio, and at DPR 2 the emoji are drawn half size above the baseline. ppem + 1 moves that
-            # to the odd sizes 21, 27, 33, 41, 53, 97 px (and draws the art 1-5% under 1 em). Ascender: the UI face's,
-            # at or under SF Pro's, so a line with emoji keeps the height and baseline of an SF Pro line.
+            # pixelSize / line, so line = ppem / EM_SCALE draws the emoji EM_SCALE x the text size. When the pixel
+            # size equals the line exactly Qt skips the scaling, also the device pixel ratio (emoji half size at
+            # DPR 2): that is now at 31, 40 and 74 px only. Ascender: the UI face's proportion of the line, so the
+            # scaled line (0.82 / 0.18 of the text size) stays under SF Pro's 0.97 / 0.21: same line height and baseline
             lm = E_B_L_C_.SbitLineMetrics()
-            lm.ascender = round(asc_ui * ppem / upem)
-            lm.descender = lm.ascender - (ppem + 1)
+            lm.ascender = round(asc_ui * line / (asc_ui - desc_ui))
+            lm.descender = lm.ascender - line
             lm.widthMax = max(glyphs[n].metrics.width for n in names)
             for f in ("caretSlopeNumerator", "caretSlopeDenominator", "caretOffset", "minOriginSB", "minAdvanceSB",
                       "maxBeforeBL", "minAfterBL", "pad1", "pad2"):
@@ -221,7 +254,7 @@ def main():
         strike.indexSubTables = [sub]
         cblc.strikes.append(strike)
         cbdt.strikeData.append(glyphs)
-        print(f"strike {ppem}: {len(names)} bitmaps, {sum(len(g.imageData) for g in glyphs.values()) / 1e6:.1f} MB")
+        print(f"strike {ppem}: line {line}, track {track}, shift {shift}, {len(names)} bitmaps, {sum(len(g.imageData) for g in glyphs.values()) / 1e6:.1f} MB")
     print(f"bitmaps made (downscaled from a larger strike or mirrored): {filled}")
 
     for tag in DROP:

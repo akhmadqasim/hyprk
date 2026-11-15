@@ -2,6 +2,7 @@
 // (and optionally windows) for Hyprland 0.57.2. See README.md and FALLBACKS.md.
 
 #include "AppearanceFade.hpp"
+#include "ClientLights.hpp"
 #include "Config.hpp"
 #include "GlassElement.hpp"
 #include "PopupGlass.hpp"
@@ -82,7 +83,8 @@ static CRegion appliedRegionOf(const SP<Desktop::View::CWLSurface>& surface) {
 }
 
 // opacity: the shell's glass opacity marker (1 without one)
-static std::vector<lg::SGlassShape> shapesFor(const PHLLS& layer, const PHLMONITOR& mon, const lg::SParams& p, double& opacity) {
+// shadowSize / soften: its whole-window markers (1 / 0 without them)
+static std::vector<lg::SGlassShape> shapesFor(const PHLLS& layer, const PHLMONITOR& mon, const lg::SParams& p, double& opacity, double& shadowSize, double& soften) {
     const auto pos  = layer->position(Desktop::View::IGeometric::GEOMETRIC_CURRENT);
     const auto size = layer->size(Desktop::View::IGeometric::GEOMETRIC_CURRENT);
     const auto off  = pos - mon->m_position;
@@ -93,7 +95,7 @@ static std::vector<lg::SGlassShape> shapesFor(const PHLLS& layer, const PHLMONIT
     // on screen (RegionQueue.hpp: Hyprland's own copy can be a frame ahead)
     const CRegion region = surface ? appliedRegionOf(surface) : CRegion{};
     if (surface && surface->m_hasBackgroundEffect && !region.empty())
-        shapes = lg::shapesFromRegion(region, off.x, off.y, &opacity, size, lg::cutFillFor(p, layer->m_namespace));
+        shapes = lg::shapesFromRegion(region, off.x, off.y, &opacity, size, lg::cutFillFor(p, layer->m_namespace), &shadowSize, &soften);
     else if (!p.requireRegion)
         shapes.push_back({{off.x, off.y, size.x, size.y}, 0});
 
@@ -169,8 +171,8 @@ static void renderLayerNow(Render::IHyprRenderer* thisptr, Render::CRenderContex
     const double fill  = params ? lg::fillFor(*params, layer ? layer->m_namespace : std::string{}) : 0;
     const bool wanted = live && (fill != 0 || lg::namespaceMatches(*params, layer->m_namespace));
     // no shapes = no region with require_region: the layer is left to Hyprland
-    double opacity = 1;
-    auto   shapes  = wanted ? shapesFor(layer, mon, *params, opacity) : std::vector<lg::SGlassShape>{};
+    double opacity = 1, shadowSize = 1, soften = 0;
+    auto   shapes  = wanted ? shapesFor(layer, mon, *params, opacity, shadowSize, soften) : std::vector<lg::SGlassShape>{};
     if (fill != 0)
         for (auto& s : shapes)
             s.fill = fill; // a fill layer's shapes are fills, not glass
@@ -201,6 +203,8 @@ static void renderLayerNow(Render::IHyprRenderer* thisptr, Render::CRenderContex
         .params = params,
         .recipe = &lg::recipeByName(lg::materialFor(*params, layer->m_namespace)),
         .owner  = reinterpret_cast<uintptr_t>(layer.get()),
+        .shadowSize = shadowSize,
+        .soften     = soften,
     };
     // the icons' clear-mode masks for this glass, when the shell has mapped their layer on this output
     if (const auto it = params->iconMasks.find(layer->m_namespace); it != params->iconMasks.end())
@@ -384,6 +388,9 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
         .name    = "liquidglass",
         .match   = IPC::Socket1::COMMAND_MATCH_PREFIX,
         .handler = [](const IPC::Socket1::SRequest& req) -> IPC::Socket1::SResponse {
+            // `hyprctl liquidglass lights CLASS X Y W H`: the rect of a client's own traffic lights (ClientLights.hpp)
+            if (const auto at = req.command.find(" lights "); at != std::string::npos)
+                return lg::clientLightsCommand(req.command.substr(at + 8));
             // `hyprctl liquidglass trace NS FILE` appends NS's region holes and shapes on every draw to FILE (a debug aid
             // for motion steps); `trace` alone stops
             if (req.command.find("fade") != std::string::npos)
@@ -432,6 +439,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     if (!g_renderHook)
         lg::logOnce("could not hook IHyprRenderer::renderLayer, glass is off (plain Hyprland blur stays)");
     lg::initPopupGlass(handle, [] { return g_params; });
+    lg::initClientLights(handle);
 
     return {"liquidglass", "macOS 27 Liquid Glass material for layer surfaces", "hyprk", "0.1.0"};
 }
@@ -451,6 +459,7 @@ APICALL EXPORT void PLUGIN_EXIT() {
         HyprlandAPI::removeFunctionHook(lg::handle(), g_renderHook);
     g_renderHook = nullptr;
     lg::exitPopupGlass(lg::handle());
+    lg::exitClientLights(lg::handle());
     if (g_pHyprRenderer)
         g_pHyprRenderer->context().m_pass.removeAllOfType("CLiquidGlassElement"), g_pHyprRenderer->context().m_pass.removeAllOfType("CMacShadowElement");
     lg::glassProgram().destroy();

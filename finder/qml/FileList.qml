@@ -7,14 +7,24 @@ import "lib/files.js" as Files
 // the window is inactive). Columns Name / Date Modified / Size / Kind; the sorted header is 11 Semibold with a
 // chevron. Folders have a disclosure triangle at row x 1 (AX 15 x 22, ink 5 x 8.5, secondary) that opens them
 // in place; each level indents by 16 (not measured: the icon's offset from the row start, one disclosure column).
+// The rows scroll under the header, and under the toolbar when Main lets the view run under it (`topInset`): the Mac's
+// list shows them there through a pocket, about 12 % and blurred (finder/scrolled-under-toolbar-list-*.png, R5.4).
 Item {
     id: root
 
     required property var browser
     signal contextMenu(var entry, point pos)
     readonly property int columns: 1
+    property real topInset: 0          // the toolbar strip above the header (Main: its height when the list runs under it)
+    property real cornerRadius: 0      // the window's top-right corner, which the pocket reaches with `topInset`
+    readonly property real pocketHeight: topInset + Theme.list.headerHeight   // the header's bottom
 
-    function ensureVisible(i) { list.positionViewAtIndex(i, ListView.Contain); }
+    function ensureVisible(i) {
+        list.positionViewAtIndex(i, ListView.Contain);
+        // the view runs under the header: a row it covers comes down to just under it
+        const y = i * Theme.list.rowHeight;
+        if (y < list.contentY + pocketHeight) list.contentY = Math.max(-list.topMargin, y - pocketHeight);
+    }
     function iconItem(i) { const r = list.itemAtIndex(i); return r ? r.iconItem : null; }
 
     readonly property var widths: Files.listColumns(width, Theme.list.sidePad, Theme.list.dateWidth, Theme.list.sizeWidth, Theme.list.kindWidth)
@@ -25,14 +35,48 @@ Item {
         { key: "kind", title: "Kind" }
     ]
 
+    // the rows under the header and the toolbar: FITTED to R5.4 (scrolled 36 pt, Image 01's thumbnail under the header,
+    // the 13 pt thumbnail column x 28..39 pt, rows 38..79 pt): a plain blur, sigma 5.5 pt, under a veil of .88 white /
+    // .86 (39.1,40.3,45.3), saturation 1.25: rms 0.72 light / 0.67 dark levels over the column (the bump G 243 / R 54.5
+    // at 59 pt, the spill to 45 pt above the header). The dark veil gives the Mac's plain base (38,39,44) over the
+    // window. The decoded ThinFilm would show the row sharp at about 30 % there; the header's own pocket style is not
+    // decoded (GLASS-HIG.md §15). Shown while a row is under the header, like the icon view's.
+    ScrollEdge {
+        id: pocket
+        z: 1
+        active: list.contentY > -list.topMargin + 0.5
+        source: active ? list : null
+        width: parent.width
+        height: root.pocketHeight
+        dark: Theme.dark
+        windowColor: Theme.color.window
+        cornerRadius: root.cornerRadius
+        sigma: 5.5
+        lighten: 0; darken: 0; normal: 1     // out = the fill blur alone
+        saturation: 1.25
+        veil: Theme.dark ? 0.86 : 0.88
+        veilColor: Theme.dark ? Qt.rgba(39.1 / 255, 40.3 / 255, 45.3 / 255, 1) : "white"
+        replaySat: 1
+    }
+    MouseArea {   // the header and the strip above it take the clicks: a row under them is not hit
+        z: 1
+        width: parent.width
+        height: root.pocketHeight
+        acceptedButtons: Qt.AllButtons
+    }
     Rectangle {
+        z: 2
+        visible: !pocket.visible      // dark: the solid bar at rest; the pocket replaces it while rows are under it
+        y: root.topInset
         width: parent.width
         height: Theme.list.headerHeight
         color: Theme.color.listHeaderFill
     }
     Row {
         id: header
+        z: 2
         x: Theme.list.sidePad
+        y: root.topInset
         height: Theme.list.headerHeight
         Repeater {
             model: root.cols
@@ -46,7 +90,7 @@ Item {
                 Rectangle {   // 1 x 16 separator at the column's left edge
                     visible: h.index > 0
                     x: -1
-                    width: 1; height: Theme.list.headerSeparator
+                    width: Pixel.stroke(1, Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio)); antialiasing: Pixel.soft(Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio)); height: Theme.list.headerSeparator
                     anchors.verticalCenter: parent.verticalCenter
                     color: Theme.color.listHeaderSeparator
                 }
@@ -84,19 +128,20 @@ Item {
         }
     }
     Rectangle {   // 1 pt bottom line at y 79
-        y: Theme.list.headerHeight - 1
+        z: 2
+        y: root.pocketHeight - height
         width: parent.width
-        height: 1
+        height: Pixel.stroke(1, Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio))   // exact, antialiased at a fractional scale like the Mac's downsample (HyprK pixel.js)
+        antialiasing: Pixel.soft(Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio))
         color: Theme.color.listHeaderLine
     }
 
     ListView {
         id: list
         anchors.fill: parent
-        anchors.topMargin: header.height
         anchors.leftMargin: Theme.list.sidePad
         anchors.rightMargin: Theme.list.sidePad
-        topMargin: Theme.list.firstRowGap
+        topMargin: root.pocketHeight + Theme.list.firstRowGap
         clip: true
         model: root.browser.entries
         boundsBehavior: Flickable.StopAtBounds        // a mouse wheel stops at the edge; trackpad: RubberBand
@@ -169,7 +214,9 @@ Item {
                     x: parent.indent + Theme.list.nameX
                     width: parent.width - x - Theme.list.cellPad - (dots.visible ? dots.width + 6 : 0)
                     anchors.verticalCenter: parent.verticalCenter
-                    text: row.modelData.name
+                    // colour emoji at alpha 1 in the .85 label (R6.5, OPEN-FIXES.md 16; plain names stay PlainText)
+                    text: EmojiText.opaque(row.modelData.name, color)
+                    textFormat: EmojiText.has(row.modelData.name) ? Text.StyledText : Text.PlainText
                     elide: Text.ElideMiddle
                     color: row.selected ? Theme.color.selectedText : Theme.color.label
                     font: Typography.body
@@ -234,9 +281,10 @@ Item {
         }
     }
     OverlayScrollbar {
+        z: 3
         flickable: list
         x: root.width - width - Tokens.scroller.inset
-        y: list.y + Tokens.scroller.inset
-        height: list.height - 2 * Tokens.scroller.inset
+        y: root.pocketHeight + Tokens.scroller.inset
+        height: list.height - root.pocketHeight - 2 * Tokens.scroller.inset
     }
 }

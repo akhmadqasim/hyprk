@@ -144,7 +144,7 @@ function finderMenus(win) {
             f("Show All Tabs", "⇧⌘\\"),
             SEP,
             f("Hide Sidebar", "⌃⌘S"),
-            f("Hide Preview", "⇧⌘P"),
+            f("Hide Preview", "⇧⌘P", null, "keys:CTRL SHIFT,p"),
             SEP,
             f("Hide Toolbar", "⌥⌘T"),
             f("Show Path Bar", "⌥⌘P", null, "keys:CTRL ALT,p"),

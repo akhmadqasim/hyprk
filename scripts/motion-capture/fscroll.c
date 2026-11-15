@@ -5,6 +5,9 @@
 // usage: fscroll W H, then stdin lines (global logical px in a W x H layout box):
 //   "m x y"  move the pointer      "v dy" / "h dx"  one finger scroll frame (surface px, + = content up / left)
 //   "s"      fingers lifted (axis_stop on both axes)      "z ms"  sleep
+//   "n dy"   one wheel frame as a NESTED session gets it from its host window (aquamarine's Wayland backend:
+//            axis value only, no discrete step, no value120; dy 15 per notch, + = content up)
+//   "w n"    n mouse-wheel notches (axis_source wheel, 15 px and 1 discrete step each, + = content up)
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,6 +42,11 @@ int main(int argc, char **argv) {
             zwlr_virtual_pointer_v1_axis(p, ms(), line[0] == 'v' ? WL_POINTER_AXIS_VERTICAL_SCROLL : WL_POINTER_AXIS_HORIZONTAL_SCROLL,
                                          wl_fixed_from_double(a));
             zwlr_virtual_pointer_v1_axis_source(p, WL_POINTER_AXIS_SOURCE_FINGER);
+        } else if (line[0] == 'n' && sscanf(line + 1, "%lf", &a) == 1) {
+            zwlr_virtual_pointer_v1_axis(p, ms(), WL_POINTER_AXIS_VERTICAL_SCROLL, wl_fixed_from_double(a));
+        } else if (line[0] == 'w' && sscanf(line + 1, "%lf", &a) == 1) {
+            zwlr_virtual_pointer_v1_axis_source(p, WL_POINTER_AXIS_SOURCE_WHEEL);
+            zwlr_virtual_pointer_v1_axis_discrete(p, ms(), WL_POINTER_AXIS_VERTICAL_SCROLL, wl_fixed_from_double(15 * a), (int32_t)a);
         } else if (line[0] == 's') {
             zwlr_virtual_pointer_v1_axis_source(p, WL_POINTER_AXIS_SOURCE_FINGER);
             zwlr_virtual_pointer_v1_axis_stop(p, ms(), WL_POINTER_AXIS_VERTICAL_SCROLL);

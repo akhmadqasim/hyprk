@@ -24,6 +24,29 @@ Item {
     property string renderingMode: ""            // "" = AppKit's default, "hierarchical", "multicolor"
     property real variableValue: -1              // 0..1: level (wifi, speaker.wave.3.fill); < 0 = none
 
+    // A scale per path of the glyph (sf.js path order), about the glyph's ink centre: the SF Symbols bounce by layer
+    // (HyprK SymbolBounce.scales). Empty, or all 1: the glyph is one image, as always.
+    property var layerScales: []
+    readonly property bool layered: {
+        if (!box) return false;
+        for (let i = 0; i < layerScales.length; i++) if (layerScales[i] !== 1) return true;
+        return false;
+    }
+    // ink centre in the image's coordinates (the bounds of the paths' points, control points included)
+    readonly property point inkCentre: {
+        if (!box) return Qt.point(0, 0);
+        let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+        for (const p of SF.glyphs[key][6]) {
+            const n = p[0].match(/-?\d+(?:\.\d+)?/g) || [];
+            for (let i = 0; i + 1 < n.length; i += 2) {
+                const x = parseFloat(n[i]), y = parseFloat(n[i + 1]);
+                x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+            }
+        }
+        const k = box.w / box.vb[2];
+        return Qt.point(((x0 + x1) / 2 - box.vb[0]) * k, ((y0 + y1) / 2 - box.vb[1]) * k);
+    }
+
     readonly property string key: Symbols.handDrawnOnly(name) ? "" : SF.pick(name, weight, renderingMode, variableValue)
     readonly property var box: key ? SF.layout(key, pointSize, size, false) : null
     // glyph units (points at 32 pt, SVG coordinates) -> item coordinates: x = origin.x + gx * unit
@@ -34,16 +57,33 @@ Item {
     implicitHeight: size
 
     Image {
-        visible: root.box !== null
+        visible: root.box !== null && !root.layered
         x: root.box ? root.box.x : 0
         y: root.box ? root.box.y : 0
         width: root.box ? root.box.w : 0
         height: root.box ? root.box.h : 0
-        // rendered at device pixels: Qt applies the devicePixelRatio itself only to URLs ending in "svg"
+        // rendered at device pixels: Qt applies the devicePixelRatio itself only to URLs ending in "svg". On a 1.6
+        // output Screen.devicePixelRatio says 2: the glyph is rasterised at 2x and drawn at 0.8, the Mac's own path for a
+        // scaled mode (render at 2x, downsample); at the window's 1.6 it read 3 % softer (SCALING-AUDIT.md, glyphs)
         sourceSize: Qt.size(Math.ceil(width * Screen.devicePixelRatio), Math.ceil(height * Screen.devicePixelRatio))
         source: root.box ? SF.url(root.key, Qt.rgba(root.color.r, root.color.g, root.color.b, 1).toString(), root.box.vb) : ""
         opacity: root.color.a                    // Qt SVG ignores #AARRGGBB
         smooth: true
+    }
+
+    // the same picture, one image per path (the same rasteriser, so nothing changes when the bounce starts or ends)
+    Repeater {
+        model: root.layered ? SF.glyphs[root.key][6].length : 0
+        Image {
+            required property int index
+            readonly property real s: root.layerScales[index] ?? 1
+            x: root.box.x; y: root.box.y; width: root.box.w; height: root.box.h
+            sourceSize: Qt.size(Math.ceil(width * Screen.devicePixelRatio), Math.ceil(height * Screen.devicePixelRatio))
+            source: SF.url(root.key, Qt.rgba(root.color.r, root.color.g, root.color.b, 1).toString(), root.box.vb, index)
+            opacity: root.color.a
+            smooth: true
+            transform: Scale { origin.x: root.inkCentre.x; origin.y: root.inkCentre.y; xScale: s; yScale: s }
+        }
     }
 
     Loader {

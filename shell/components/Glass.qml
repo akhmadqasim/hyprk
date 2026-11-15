@@ -53,9 +53,12 @@ Item {
     // pop at ~470 ms, mcap). It follows this item's own geometry like Region { item } did, and moving parents through
     // glassMoved() (ShellWindow.settleGlass).
     readonly property bool on: root.visible && Theme.compositorGlass
+    // the corner radius in window points: a glass inside a Scale transform keeps its shape, as the Mac's window
+    // transform scales the corners with the rest (an alert at 4 % drew a 26 pt circle round a 10 pt body; MOTION-AUDIT.md)
+    property real _regionScale: 1
     Region {
         id: shape
-        radius: root.radius
+        radius: root.radius * root._regionScale
         intersection: root.cut ? Intersection.Subtract : Intersection.Combine
         // materialize < 1: a 1 px hole in the middle row, x = left + 1 + round(m (w - 3))
         Region { id: hole; intersection: Intersection.Subtract; width: 0; height: 1 }
@@ -80,6 +83,7 @@ Item {
         const q = root.mapToItem(null, 0, 0), e = root.mapToItem(null, root.width, root.height);
         const px = Math.round(q.x), py = Math.round(q.y);
         const w = root.on ? Math.round(e.x) - px : 0, h = root.on ? Math.round(e.y) - py : 0;
+        root._regionScale = root.width > 0 && e.x > q.x ? (e.x - q.x) / root.width : 1;
         shape.x = px;
         shape.y = py;
         shape.width = Math.max(0, w);
@@ -89,7 +93,7 @@ Item {
         shadowHole.width = (!root.shadow && !root.pointer && !root.cut && root.on && w >= 4 && h >= 3) ? 1 : 0;
         topRow.x = px + Math.floor(w / 2) - 1;
         topRow.y = py;
-        topRow.width = (root.on && !root.cut && w === h && w >= 8 && Math.round(root.radius) * 2 === w) ? 2 : 0;
+        topRow.width = (root.on && !root.cut && w === h && w >= 8 && Math.round(root.radius * root._regionScale) * 2 === w) ? 2 : 0;
         pointerHole.x = px + 1;
         pointerHole.y = py;
         pointerHole.width = (root.pointer && root.on && w >= 3) ? 1 : 0;
@@ -113,11 +117,35 @@ Item {
         }
         edgeX.width = edges ? 1 : 0;
         edgeY.width = edges ? 1 : 0;
-        if (materialize >= 1 || root.pointer || root.cut || !root.on || w < 4 || h < 2) {
-            hole.width = 0;
+        hole.width = 0;
+        if (materialize >= 1 || root.pointer || root.cut || !root.on)
+            return;
+        let hx = -1;
+        if (w >= 4 && h >= 2) {
+            hx = px + 1 + Math.round(Math.max(0, materialize) * (w - 3));
+            const c = px + Math.floor(w / 2);
+            // a lone hole within 2 columns of the centre reads as the shadow marker (plugin Shape.cpp, `liquidglass trace`):
+            // at m about 0.5 a shape with its shadow (no shadow hole) drew one frame of full material without shadow (alert
+            // PopIn at v = 0.5, mcap: alpha .47 .94 .56, 3 of 3 runs). Moved just outside that band: m off by <= 3 / (w - 3).
+            // It must stay inside the row (left + 1 .. right - 2), or the plugin sees an edge notch, no hole
+            if (shadowHole.width === 0 && Math.abs(hx - c) <= 2) {
+                const inRow = x => x >= px + 1 && x <= px + w - 2;
+                const near = hx < c ? c - 3 : c + 3, far = hx < c ? c + 3 : c - 3;
+                hx = inRow(near) ? near : inRow(far) ? far : -1;
+            }
+        }
+        if (hx < 0) {
+            // too small to carry a hole the plugin reads (under 4 x 2, or under 9 wide with the shadow on): without one it
+            // takes m = 1, so the alert's PopIn drew a frame of opaque glass at its start (6 x 4 pt at v .04, and 2 x 2 at
+            // the screen's edge on the overlay's first, unsized commit; `liquidglass trace`, JUDGE-95-20). The nearer of
+            // the two looks it can show: none below m 0.5, the full material above
+            if (materialize < 0.5) {
+                shape.width = 0;
+                shape.height = 0;
+            }
             return;
         }
-        hole.x = px + 1 + Math.round(Math.max(0, materialize) * (w - 3));
+        hole.x = hx;
         hole.y = py + Math.floor(h / 2);
         hole.width = 1;
     }

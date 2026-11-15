@@ -90,22 +90,23 @@ namespace lg {
     // specular rim (dark: arcs at top and bottom; light: a dark rim on the sides) and in light a soft coloured shadow
     // below; flat gradients read as plain discs (user report). One row per disc:
     // T, M, B (sRGB bytes, M may be below 0: the crops clip P3), sg, rim axis (0 top/bottom, 1 sides), rim power, rim colour,
-    // e0, e1, glow colour, g0. ui/HyprK/shaders/lights.frag draws the same formula for the QML title bars.
+    // e0, e1, glow colour, g0, veil (1: a white layer over the bar, the colours are its alpha x 255: the dark inactive
+    // disc, MAC-ANSWERS-16.md R16.4). ui/HyprK/shaders/lights.frag draws the same formula for the QML title bars.
     struct SLightGlass {
-        float T[3], M[3], B[3], sg, axis, n, rimC[3], e0, e1, glowC[3], g0;
+        float T[3], M[3], B[3], sg, axis, n, rimC[3], e0, e1, glowC[3], g0, veil;
     };
     // [light/dark][rest/pressed/inactive][close/minimise/zoom]
     // generated: plugin/tools/lights_model.py emit (check: lights_model.py check)
     static constexpr SLightGlass GLASS[2][3][3] = {
         {
-            {{254, 110, 99, 251, 112, 103, 246, 157, 149, 1.3, 1, 2.5, 184, 2, 0, 1, 0.2, 249, 22, 0, 0.14}, {251, 183, 54, 253, 193, 44, 257, 222, 87, 1, 1, 2, 155, 71, 0, 1, 0.25, 245, 119, 0, 0.135}, {89, 207, 33, 112, 209, 68, 180, 229, 155, 2, 1, 1.5, 26, 105, 3, 1, 0.25, 45, 160, 0, 0.137}},
-            {{255, 151, 135, 255, 157, 142, 255, 205, 193, 1.3, 1, 3, 255, 65, 57, 1, 0.5, 252, 20, 0, 0.175}, {255, 257, 80, 255, 253, 64, 255, 256, 124, 1, 1, 3, 254, 133, 0, 1, 0.3, 242, 123, 0, 0.208}, {129, 255, 52, 160, 255, 98, 241, 255, 198, 4, 1, 2, 61, 201, 31, 1, 0.45, 44, 157, 0, 0.187}},
-            {{248, 248, 252, 239, 240, 242, 249, 250, 252, 0.5, 1, 1.5, 51, 50, 59, 0.4, 0.1, 0, 0, 0, 0}, {248, 248, 252, 239, 240, 242, 249, 250, 252, 0.5, 1, 1.5, 51, 50, 59, 0.4, 0.1, 0, 0, 0, 0}, {248, 248, 252, 239, 240, 242, 249, 250, 252, 0.5, 1, 1.5, 51, 50, 59, 0.4, 0.1, 0, 0, 0, 0}},
+            {{254, 110, 99, 251, 112, 103, 246, 157, 149, 1.3, 1, 2.5, 184, 2, 0, 1, 0.2, 249, 22, 0, 0.14, 0}, {251, 183, 54, 253, 193, 44, 257, 222, 87, 1, 1, 2, 155, 71, 0, 1, 0.25, 245, 119, 0, 0.135, 0}, {89, 207, 33, 112, 209, 68, 180, 229, 155, 2, 1, 1.5, 26, 105, 3, 1, 0.25, 45, 160, 0, 0.137, 0}},
+            {{255, 151, 135, 255, 157, 142, 255, 205, 193, 1.3, 1, 3, 255, 65, 57, 1, 0.5, 252, 20, 0, 0.175, 0}, {255, 257, 80, 255, 253, 64, 255, 256, 124, 1, 1, 3, 254, 133, 0, 1, 0.3, 242, 123, 0, 0.208, 0}, {129, 255, 52, 160, 255, 98, 241, 255, 198, 4, 1, 2, 61, 201, 31, 1, 0.45, 44, 157, 0, 0.187, 0}},
+            {{248, 248, 252, 239, 240, 242, 249, 250, 252, 0.5, 1, 1.5, 51, 50, 59, 0.4, 0.1, 0, 0, 0, 0, 0}, {248, 248, 252, 239, 240, 242, 249, 250, 252, 0.5, 1, 1.5, 51, 50, 59, 0.4, 0.1, 0, 0, 0, 0, 0}, {248, 248, 252, 239, 240, 242, 249, 250, 252, 0.5, 1, 1.5, 51, 50, 59, 0.4, 0.1, 0, 0, 0, 0, 0}},
         },
         {
-            {{252, 113, 105, 244, 81, 70, 236, 118, 114, 0.6, 0, 2.5, 255, 209, 200, 0.9, 0.36, 0, 0, 0, 0}, {249, 179, 22, 252, 182, -35, 257, 222, 84, 0.6, 0, 3, 255, 255, 118, 1, 0.4, 0, 0, 0, 0}, {127, 203, 43, -2, 188, -28, 135, 200, 102, 0.6, 0, 1.5, 143, 255, 132, 1, 0.45, 0, 0, 0, 0}},
-            {{255, 154, 139, 255, 117, 100, 255, 154, 145, 0.5, 0, 3, 255, 255, 244, 0.7, 0.67, 0, 0, 0, 0}, {255, 244, 8, 255, 249, -15, 255, 289, 113, 0.5, 0, 3, 254, 250, 162, 0.9, 0.72, 0, 0, 0, 0}, {153, 245, 52, -2, 227, -34, 163, 241, 123, 0.6, 0, 1.5, 143, 255, 132, 0.7, 0.67, 0, 0, 0, 0}},
-            {{81, 82, 89, 78, 79, 86, 67, 68, 74, 1.3, 0, 3, 243, 243, 238, 0.6, 0.24, 0, 0, 0, 0}, {81, 82, 89, 78, 79, 86, 67, 68, 74, 1.3, 0, 3, 243, 243, 238, 0.6, 0.24, 0, 0, 0, 0}, {81, 82, 89, 78, 79, 86, 67, 68, 74, 1.3, 0, 3, 243, 243, 238, 0.6, 0.24, 0, 0, 0, 0}},
+            {{252, 113, 105, 244, 81, 70, 236, 118, 114, 0.6, 0, 2.5, 255, 209, 200, 0.9, 0.36, 0, 0, 0, 0, 0}, {249, 179, 22, 252, 182, -35, 257, 222, 84, 0.6, 0, 3, 255, 255, 118, 1, 0.4, 0, 0, 0, 0, 0}, {127, 203, 43, -2, 188, -28, 135, 200, 102, 0.6, 0, 1.5, 143, 255, 132, 1, 0.45, 0, 0, 0, 0, 0}},
+            {{255, 154, 139, 255, 117, 100, 255, 154, 145, 0.5, 0, 3, 255, 255, 244, 0.7, 0.67, 0, 0, 0, 0, 0}, {255, 244, 8, 255, 249, -15, 255, 289, 113, 0.5, 0, 3, 254, 250, 162, 0.9, 0.72, 0, 0, 0, 0, 0}, {153, 245, 52, -2, 227, -34, 163, 241, 123, 0.6, 0, 1.5, 143, 255, 132, 0.7, 0.67, 0, 0, 0, 0, 0}},
+            {{50, 50, 50, 47, 47, 47, 33, 33, 33, 1.3, 0, 3, 238, 238, 238, 0.6, 0.24, 0, 0, 0, 0, 1}, {50, 50, 50, 47, 47, 47, 33, 33, 33, 1.3, 0, 3, 238, 238, 238, 0.6, 0.24, 0, 0, 0, 0, 1}, {50, 50, 50, 47, 47, 47, 33, 33, 33, 1.3, 0, 3, 238, 238, 238, 0.6, 0.24, 0, 0, 0, 0, 1}},
         },
     };
     static constexpr double V0 = -0.35, GLOW_DY = 0.75, GLOW_SIGMA = 1; // lights_model.py
@@ -116,7 +117,7 @@ namespace lg {
     static constexpr double   GLYPH_STROKE = 1.9;
     static constexpr double   GLYPH_DELAY = 0.070, GLYPH_IN = 0.133, GLYPH_OUT = 0.117;
     // The press: a held light lifts to (size + 2) / size and stretches toward the pointer on the windowControl spring,
-    // lg::CLightPress (LightPress.hpp, the decode; Tokens.lights.lift* has the same numbers). The pressed textures are
+    // lg::CLightPress (LightPress.hpp, the decode with the measured spring; Tokens.lights.lift* has the same numbers). The pressed textures are
     // drawn at that lifted density, so the settled pressed disc is sharp; the rest textures at 1.
     static double pressDensity(const SParams& p, int state) {
         return state == 2 ? lights::liftScale(p.titlebarButton, p.titlebarButton) : 1.0;
@@ -305,6 +306,14 @@ namespace lg {
                 const double e  = d <= 0.25 ? g.e0 : d <= 0.75 ? mix(g.e0, g.e1, (d - 0.25) / 0.5) : std::max(0.0, g.e1 * (1.25 - d) / 0.5);
                 const double w  = e * std::pow(std::abs((g.axis > 0.5 ? u : v) / std::max(rho, 1e-6)), g.n);
                 const double oa = cov + (1 - cov) * ga;
+                if (g.veil > 0.5) { // white at the alpha the formula gives, premultiplied
+                    double al = 0;
+                    for (int c = 0; c < 3; ++c)
+                        al += std::clamp(mix(g.M[c] + (g.T[c] - g.M[c]) * a + (g.B[c] - g.M[c]) * b, g.rimC[c], w), 0.0, 255.0) / 3.0;
+                    const uint32_t q = uint32_t(std::lround(al * cov));
+                    row[i]           = q << 24 | q << 16 | q << 8 | q;
+                    continue;
+                }
                 uint32_t     out = uint32_t(std::lround(oa * 255)) << 24;
                 for (int c = 0; c < 3; ++c) {
                     const double body = g.M[c] + (g.T[c] - g.M[c]) * a + (g.B[c] - g.M[c]) * b;
@@ -320,8 +329,11 @@ namespace lg {
         return tex;
     }
 
-    // Tokens.lights glyph reveal: in = GLYPH_DELAY, then OutCubic over GLYPH_IN; out = OutQuad over GLYPH_OUT
+    // Tokens.lights glyph reveal: in = GLYPH_DELAY, then OutCubic over GLYPH_IN; out = OutQuad over GLYPH_OUT. A hover
+    // that began on an inactive window shows them in full at once (R6.4: no wait, no fade; LIGHTS-REA section 10)
     float CTitlebar::glyphAlpha() {
+        if (m_hover && m_glyphInstant)
+            return 1.f;
         const double t = std::chrono::duration<double>(std::chrono::steady_clock::now() - m_hoverSince).count();
         const double u = std::clamp(m_hover ? (t - GLYPH_DELAY) / GLYPH_IN : t / GLYPH_OUT, 0.0, 1.0);
         const double x = m_hover ? 1 - (1 - u) * (1 - u) * (1 - u) : 1 - (1 - u) * (1 - u);
@@ -442,8 +454,30 @@ namespace lg {
                 d.a = alpha;
                 g_pHyprRenderer->addPassElement(ctx, makeUnique<CTexPassElement>(d));
             };
-            put(lightTexture(i, state, dark, scale), a, pressDensity(*params, state));
-            put(glyphTexture(i == 2 && m_option ? 3 : i, state == 2, dark, scale), a * glyphA, pressDensity(*params, state));
+            // the pressed look leaves on a fade LEAVE_FADE_DELAY after the pointer leaves the held light (LightPress.hpp
+            // LEAVE_FADE, measured); taken in one frame, and dropped at once on mouse-up
+            double& mix = m_pressMix[i];
+            if (state == 2 || m_pressed != i || params->reduceMotion)
+                mix = state == 2 ? 1 : 0, m_pressMixV[i] = 0, m_leaveWait[i] = 0;
+            else if ((m_leaveWait[i] += dt) < lights::LEAVE_FADE_DELAY)
+                pressMoving = true; // held in the pressed look until the delay is over
+            else {
+                lights::springStep(mix, m_pressMixV[i], 0, lights::LEAVE_FADE, 1, dt);
+                if (mix < 0.002 && std::abs(m_pressMixV[i]) < 0.02)
+                    mix = 0, m_pressMixV[i] = 0;
+            }
+            const int  glyph = i == 2 && m_option ? 3 : i;
+            if (state != 2 && mix > 0) {
+                // the rest look, then the pressed one over it at the remaining share
+                put(lightTexture(i, state, dark, scale), a, pressDensity(*params, state));
+                put(glyphTexture(glyph, false, dark, scale), a * glyphA, pressDensity(*params, state));
+                put(lightTexture(i, 2, dark, scale), a * (float)mix, pressDensity(*params, 2));
+                put(glyphTexture(glyph, true, dark, scale), a * glyphA * (float)mix, pressDensity(*params, 2));
+                pressMoving = true;
+            } else {
+                put(lightTexture(i, state, dark, scale), a, pressDensity(*params, state));
+                put(glyphTexture(glyph, state == 2, dark, scale), a * glyphA, pressDensity(*params, state));
+            }
         }
         if (std::abs(glyphA - (m_hover ? 1.f : 0.f)) > 0.002f || pressMoving)
             damageEntire(); // keep the fade, the press springs and the press's idle timeout going
@@ -639,9 +673,10 @@ namespace lg {
             damageEntire();
         }
         if (hover != m_hover) {
-            m_glyphFrom  = glyphAlpha();
-            m_hoverSince = std::chrono::steady_clock::now();
-            m_hover      = hover;
+            m_glyphFrom    = glyphAlpha();
+            m_hoverSince   = std::chrono::steady_clock::now();
+            m_hover        = hover;
+            m_glyphInstant = hover && !windowActive(window);
             damageEntire();
         }
         if (button != m_hoverButton) {
@@ -690,7 +725,11 @@ namespace lg {
         const int  hit           = buttonAt(layout, pos.x - bar.x, pos.y - bar.y, params->titlebarGap);
 
         if (e.state == WL_POINTER_BUTTON_STATE_PRESSED) {
-            if (!Desktop::focusState()->isWindowActive(window))
+            // a light acts on an inactive window without activating it (R6.4: TextEdit closed behind the key Calculator,
+            // which stayed frontmost); the rest of the bar focuses it. This hook runs before Hyprland's own refocus
+            // (InputManager::processMouseDownNormal returns once a decoration took the button)
+            const bool wasActive = windowActive(window);
+            if (hit < 0 && !Desktop::focusState()->isWindowActive(window))
                 Desktop::focusState()->rawWindowFocus(window, Desktop::FOCUS_REASON_CLICK);
             // a double-click on the bar zooms, again to restore (Q-windows-21: AppleActionOnDoubleClick "Maximize", the
             // Zoom default; the same toggle as Option-click on green). The second press does not start a move. The
@@ -707,9 +746,10 @@ namespace lg {
             m_barPressAt = hit < 0 ? now : std::chrono::steady_clock::time_point{};
             m_pressed = hit;
             if (hit >= 0) {
-                // the lift starts at mouse-down (LongPressComponentV3, minimumDuration 0), in the light's own pt
+                // the lift starts at mouse-down (LongPressComponentV3, minimumDuration 0), in the light's own pt; on an
+                // inactive window in one frame (R6.4, ui/HyprK/TrafficLights.qml snapLift)
                 const CBox& lb = layout.buttons[hit];
-                m_press[hit].press(lb.w, lb.h, pos.x - bar.x - lb.x, pos.y - bar.y - lb.y);
+                m_press[hit].press(lb.w, lb.h, pos.x - bar.x - lb.x, pos.y - bar.y - lb.y, !wasActive || m_glyphInstant);
                 m_pressStep = now;
                 damageEntire(); // pressed colour
             }

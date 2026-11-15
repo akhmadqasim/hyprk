@@ -2,18 +2,38 @@ import QtQuick
 import Finder.Native
 import HyprK
 import "lib/files.js" as Files
+import "lib/macicons.js" as MacIcons
 import "../../ui/HyprK/panels.js" as PanelLayout
 import "../../settings/Parsers.js" as P   // appearance.json normalization, shared with Settings
 
 // Finder window: frameless, client-side traffic lights, flush full-height sidebar, unified toolbar.
 Window {
     id: win
+    // the window's real device pixel ratio (main.cpp windowInfo) for HyprK's lines and textures (pixel.js)
+    Binding { target: Tokens; property: "dpr"; value: windowInfo.dpr }
 
     readonly property var startSize: /^\d+x\d+$/.test(startup.size) ? startup.size.split("x").map(Number) : [Theme.win.width, Theme.win.height]
     width: startSize[0]
     height: startSize[1]
     minimumWidth: Theme.win.minWidth
     minimumHeight: Theme.win.minHeight
+    // At a fractional scale the window takes the nearest size on whole device pixels (HyprK pixel.js whole: 594 pt is
+    // 742.5 px at 1.25, and the compositor then resamples every row of the window), asked of Hyprland, which sizes a
+    // floating window; 0.3 s after the last change, so a resize by hand is left alone until it ends. Whole scales:
+    // nothing happens.
+    Timer {
+        id: fitPixels
+        interval: 300
+        onTriggered: {
+            const r = windowInfo.dpr;
+            if (!Pixel.soft(r) || win.fullScreen) return;
+            const w = Pixel.whole(Math.round(win.width), r), h = Pixel.whole(Math.round(win.height), r);
+            if (w !== win.width || h !== win.height) Hypr.resizeWindow(win.title, w, h);
+        }
+    }
+    onWidthChanged: fitPixels.restart()
+    onHeightChanged: fitPixels.restart()
+    Connections { target: windowInfo; function onValueChanged(key, value) { if (key === "dpr") fitPixels.restart(); } }
     visible: true
     title: fm.title
     color: "transparent"
@@ -21,6 +41,9 @@ Window {
 
     property string view: ["icons", "list", "columns", "gallery"].indexOf(startup.view) !== -1 ? startup.view : "icons"
     property bool showPathBar: startup.pathBar
+    // View > Hide / Show Preview ⇧⌘P in the gallery (R9.4: Finder keeps it per view style, GalleryViewOptions
+    // ShowPreviewPane, default shown); this session only, as the path bar
+    property bool showPreview: !startup.hidePreview
     property var quickLookEntry: null
     // a zoomed (maximized) window keeps its corners and rims on macOS; only full screen drops them. (Hyprland
     // also reports a floating window as maximized to Qt.)
@@ -54,8 +77,10 @@ Window {
         Theme.appearance = Qt.binding(() => win.appearance);
         Theme.blur = startup.blur;
         Theme.hasSysIcons = startup.hasSysIcons;
-        // Emoji & Symbols open over this window keeps the key look, as the Mac's palette (Hypr.emojiOver)
-        Theme.active = Qt.binding(() => (win.active || (Hypr.emojiOver !== "" && Hypr.emojiOver === win.title)) && !startup.inactive);
+        // Emoji & Symbols open over this window keeps the key look, as the Mac's palette (Hypr.emojiOver); Mission
+        // Control's pick gives it at the click, before the focus (Hypr.picked, MOTION-REA Round 6 R6.1)
+        Theme.active = Qt.binding(() => (win.active || (Hypr.emojiOver !== "" && Hypr.emojiOver === win.title)
+                                         || (Hypr.picked !== "" && Hypr.picked === win.title)) && !startup.inactive);
         Qt.callLater(applyStartup);
         keys.forceActiveFocus();
     }
@@ -160,9 +185,16 @@ Window {
         onContextMenuRequested: (item, kind, pos) => win.sidebarMenu(item, kind, pos)
     }
 
+    readonly property Item windowLights: lights   // for the sheet: they stay above its veil
     TrafficLights {
+        id: lights
         x: Theme.lights.x
         y: Theme.lights.y
+        // the plugin learns where they are, so a press on them in an inactive window does not activate it (R6.4;
+        // plugin/src/ClientLights.hpp). Again whenever the window turns inactive: a plugin reload forgets it
+        function report() { const p = lights.mapToItem(null, 0, 0); Hypr.setLights(Qt.rect(p.x, p.y, lights.width, lights.height)); }
+        Component.onCompleted: Qt.callLater(report)
+        Connections { target: win; function onActiveChanged() { if (!win.active) lights.report(); } }
         active: Theme.active
         fullScreenButton: true   // green = full screen, Option-click = zoom (MAC-ANSWERS.md Q-windows-19)
         onCloseClicked: win.close()
@@ -187,7 +219,8 @@ Window {
         x: Theme.sidebar.width
         y: Theme.toolbar.height
         width: parent.width - x
-        height: 0.5
+        height: Pixel.stroke(0.5, Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio))   // exact, antialiased at a fractional scale like the Mac's downsample (HyprK pixel.js)
+        antialiasing: Pixel.soft(Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio))
         z: 1
         color: Theme.dark ? "#2F2F34" : "#E5E5E5"
     }
@@ -218,6 +251,7 @@ Window {
             window: win
             view: win.view
             onViewRequested: v => win.setView(v)
+            menuUp: menu.visible || menu.closing
             onMoreRequested: anchor => win.actionMenu(anchor)
             onGroupRequested: anchor => win.popup(win.groupItems(), anchor)
             onTagRequested: anchor => tagPopover.show(anchor)
@@ -243,13 +277,16 @@ Window {
         // icon view without tabs: the grid runs under the toolbar and scrolls through AppKit's scroll pocket, as a
         // Finder scroll view under a unified toolbar does (TOOLBAR-REA-27.2.1.md 1: -[NSToolbarView
         // _scrollPocketElementStyle] 0x18ad147cc returns the ThinFilm style for every toolbar; MAC-ANSWERS Q-windows-14:
-        // the icons blur under the strip). List and gallery keep their hard strip (Q-finder-17), columns are not measured.
+        // the icons blur under the strip). The list runs under it too, through its own pocket over the toolbar and the
+        // header (FileList, R5.4); the gallery keeps its hard strip (Q-finder-17), columns are not measured.
         readonly property bool underToolbar: win.view === "icons" && !tabBar.visible
+        readonly property bool listUnder: win.view === "list" && !tabBar.visible
         Loader {
             id: viewLoader
-            anchors.top: tabBar.visible ? tabBar.bottom : keys.underToolbar ? parent.top : toolbar.bottom
+            anchors.top: tabBar.visible ? tabBar.bottom : keys.underToolbar || keys.listUnder ? parent.top : toolbar.bottom
             anchors.topMargin: tabBar.visible ? 4 : 0
-            anchors.bottom: pathBar.visible ? pathBar.top : parent.bottom
+            // the gallery's inspector runs down past the path bar to the window's foot (R9.2)
+            anchors.bottom: pathBar.visible && win.view !== "gallery" ? pathBar.top : parent.bottom
             anchors.bottomMargin: 0
             width: parent.width
             sourceComponent: ({ icons: iconView, list: listView, columns: columnView, gallery: galleryView })[win.view]
@@ -257,6 +294,7 @@ Window {
         Component { id: iconView; IconView { browser: fm; topInset: keys.underToolbar ? Theme.toolbar.height : 0
                                               onContextMenu: (e, p) => win.contextMenu(e, p) } }
         ScrollEdge {
+            id: pocket
             z: 1
             active: keys.underToolbar && viewLoader.item !== null && viewLoader.item.contentY > -viewLoader.item.topMargin + 0.5
             source: active ? viewLoader.item : null
@@ -265,16 +303,36 @@ Window {
             windowColor: Theme.color.window
             cornerRadius: win.fullScreen ? 0 : win.radius
         }
-        Component { id: listView; FileList { browser: fm; onContextMenu: (e, p) => win.contextMenu(e, p) } }
+        // the pocket's edge: a 0.5 pt line at the toolbar's bottom while the grid is scrolled under it, black .10 / white
+        // .07 over whatever lies there (AppKit separator 0x18b463018 / 0x18b462f78, .65 with Increase Contrast; Mac
+        // finder/scrolled-under-toolbar-icon-*.png row 104 px: 228 over 254, (47,47,51) over (31,31,36), and 201 / 225
+        // over the red thumbnail's 223: an alpha line, not a colour). GLASS-HIG.md round 10.
+        Rectangle {
+            z: 1
+            visible: pocket.visible
+            y: Theme.toolbar.height
+            width: parent.width
+            height: Pixel.stroke(0.5, Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio))
+            antialiasing: Pixel.soft(Pixel.ratio(Tokens.dpr, Screen.devicePixelRatio))
+            color: Theme.dark ? Qt.rgba(1, 1, 1, Tokens.increaseContrast ? 0.65 : 0.07)
+                              : Qt.rgba(0, 0, 0, Tokens.increaseContrast ? 0.65 : 0.10)
+        }
+        Component { id: listView; FileList { browser: fm; topInset: keys.listUnder ? Theme.toolbar.height : 0
+                                             cornerRadius: keys.listUnder && !win.fullScreen ? win.radius : 0
+                                             onContextMenu: (e, p) => win.contextMenu(e, p) } }
         Component { id: columnView; ColumnView { browser: fm; onContextMenu: (e, p) => win.contextMenu(e, p) } }
-        Component { id: galleryView; GalleryView { browser: fm; onContextMenu: (e, p) => win.contextMenu(e, p); onTagRequested: anchor => tagPopover.show(anchor) } }
+        Component { id: galleryView; GalleryView { browser: fm; showPreview: win.showPreview
+                                                   // AX: the area (152..772) and the path list (771..801) share 1 pt
+                                                   bottomInset: pathBar.visible ? pathBar.height - 1 : 0
+                                                   onContextMenu: (e, p) => win.contextMenu(e, p); onTagRequested: anchor => tagPopover.show(anchor) } }
 
 
         PathBar {
             id: pathBar
             visible: win.showPathBar
             anchors.bottom: parent.bottom
-            width: parent.width
+            // gallery: under the gallery area only (AX path 364,771 587x30 beside the 240 pt inspector)
+            width: parent.width - (win.view === "gallery" && win.showPreview ? Theme.gallery.paneWidth : 0)
             browser: fm
         }
 
@@ -363,6 +421,12 @@ Window {
     Shortcut { sequence: "Ctrl+2"; onActivated: win.setView("list") }
     Shortcut { sequence: "Ctrl+3"; onActivated: win.setView("columns") }
     Shortcut { sequence: "Ctrl+4"; onActivated: win.setView("gallery") }
+    // the mouse's side buttons go back and forward (the user's choice, 2026-11-15; macOS does not map them)
+    TapHandler {
+        parent: win.contentItem
+        acceptedButtons: Qt.BackButton | Qt.ForwardButton
+        onTapped: (point, button) => button === Qt.BackButton ? fm.back() : fm.forward()
+    }
     Shortcut { sequence: "Ctrl+["; onActivated: fm.back() }
     Shortcut { sequence: "Ctrl+]"; onActivated: fm.forward() }
     Shortcut { sequence: "Ctrl+A"; onActivated: fm.selectAll() }
@@ -377,6 +441,7 @@ Window {
     Shortcut { sequence: "Ctrl+Shift+F"; onActivated: fm.go("recents:") }
     Shortcut { sequence: "Ctrl+Shift+."; onActivated: fm.showHidden = !fm.showHidden }
     Shortcut { sequence: "Ctrl+Alt+P"; onActivated: win.showPathBar = !win.showPathBar }
+    Shortcut { sequence: "Ctrl+Shift+P"; enabled: win.view === "gallery"; onActivated: win.showPreview = !win.showPreview }
     Shortcut { sequence: "Ctrl+W"; onActivated: win.tabs.length > 1 ? win.closeTab(win.tabIndex) : win.close() }
     Shortcut { sequence: "Ctrl+T"; onActivated: win.newTab(FileOps.homePath()) }
     // Settings… (Cmd-,) and Hide Finder (Cmd-H), sent by the shell's app menu (shell/lib/menus.js): Finder's
@@ -432,7 +497,7 @@ Window {
     // Actions, Services); Finder shows no shortcuts in context menus. Not here: the Ask Siri header (deferred) and the
     // tag dots row (the Mac lists favourite tags there and the captured account has none). Rows Finder cannot do here
     // stay as the Mac shows them, disabled: Customize Folder…, Use Groups, Clean Up, Clean Up By, Show View Options,
-    // Quick Actions ▸ Customise…, Services ▸ No Services Apply. Paste Item only with files on the clipboard.
+    // Quick Actions ▸ Customize…, Services ▸ No Services Apply. Paste Item only with files on the clipboard.
     function contextMenu(entry, pos) {
         const sel = fm.selectedEntries();
         const n = sel.length;
@@ -449,7 +514,7 @@ Window {
             { text: "Customize Folder…", icon: "tag", enabled: false },
             { separator: true }
         ] : []).concat([
-            { text: "Quick Actions", icon: "gearshape", submenu: [{ text: "Customise…", enabled: false }] },
+            { text: "Quick Actions", icon: "gearshape", submenu: [{ text: "Customize…", enabled: false }] },   // N270, N274
             { separator: true },
             { text: "Services", icon: "gearshape.2", submenu: [{ text: "No Services Apply", enabled: false }] }
         ]);
@@ -573,7 +638,9 @@ Window {
         id: alert
         x: (win.width - width) / 2
         y: PanelLayout.alertTop(win.height, height)
-        icon: startup.hasAppIcons ? Files.fileUrl(startup.iconRoot + "/apps/Finder-512.png") : ""
+        // Finder's own icon in the style's rendition (Icon & widget style, as FileIcon's app icons)
+        icon: startup.hasAppIcons ? Files.fileUrl(startup.iconRoot + "/" + MacIcons.styled("Finder", Theme.appearance.iconStyle,
+                                                                                          Theme.appearance.iconStyleVariant, Theme.dark)) : ""
         property var actions: []
         function ask(title, message, buttons) {
             alert.title = title;
@@ -600,7 +667,9 @@ Window {
         id: renameSheet
         anchors.fill: parent
         z: 3
+        lights: win.windowLights
         browser: fm
+        Binding { target: Theme; property: "sheet"; value: renameSheet.shown }
         onShownChanged: if (!shown) keys.forceActiveFocus()
     }
 

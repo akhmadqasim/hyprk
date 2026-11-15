@@ -61,3 +61,8 @@ var bannerOutTravel = 449;
 var bannerOutCut = 0.15;
 function bannerOutOpacity(p) { const q = 1 - Math.max(0, Math.min(1, p)); return q * q * q; }
 var bannerTimeoutMs = 4970;
+
+// Photos widget candidates (NotificationCenter.qml): the list in order, an undecodable image moves to the next one,
+// past the end it stops on "" and the card shows the session wallpaper
+function photoAt(photos, pick) { return photos && pick >= 0 && pick < photos.length ? photos[pick] : ""; }
+function photoNextPick(photos, pick) { return Math.min(pick + 1, photos ? photos.length : 0); }

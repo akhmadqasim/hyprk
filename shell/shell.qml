@@ -15,6 +15,9 @@ ShellRoot {
     readonly property bool clipboardHistory: SpotlightState.clipboardHistory !== "off" && Clipboard.enabled
     readonly property QtObject lockScreen: Lock   // lock screen (modules/lock): IPC target `lock`, Power.lock
     readonly property QtObject appsView: AppsView // registers hyprk:apps (Cmd+F4) and the `apps` IPC target
+    // the brightness keys (hyprk:brightness-*), the `brightness` IPC target and state/brightness.json for Settings
+    readonly property QtObject brightness: Brightness
+    readonly property QtObject hardware: Hardware // the `hardware` IPC target
     // A11y (re-applies state/accessibility.lua, syncs the plugin's reduce_motion) starts with the
     // Dock, whose Materializer reads A11y.reduceMotion
 

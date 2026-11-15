@@ -28,6 +28,16 @@ ShellWindow {
     margins.top: Theme.menuBar.height
     exclusionMode: ExclusionMode.Ignore
     namespace: "hyprk-overlay"
+    // the alert scales and blurs as a whole window, its drop shadow with it (ShellWindow glassShadowSize / glassSoften)
+    glassShadowSize: alert.visible ? alert.pop : 1
+    glassSoften: alert.visible ? alert.soften : 0
+    // and fades as a window: its glass at full material under the layer's opacity marker (= AppKit's window alpha v / 1 - p),
+    // while no menu shares the layer (a menu opened during the Cancel fade: the alert's glass materializes instead).
+    // Materialize drew the small alert with a soft edge (1 - m) 10 pt wide and in 1 / (w - 3) steps: light, footprint
+    // reach / scale 128-147 pt above its centre at s .07-.18 (Mac 116-120), alpha .13-.17 at v .04-.08 (MOTION-AUDIT.md
+    // "Alert, Round R3.1")
+    readonly property bool alertAlone: alert.visible && !menu.visible && !context.visible
+    glassOpacity: alertAlone ? alert.fade : 1
     WlrLayershell.layer: WlrLayer.Overlay
     // the alert must get Return/Escape even when opened without a click (IPC, Dock menu); an open menu takes the keys
     // too (Q-menubar-25: arrows, Return, Esc), although the click that opened it went to the menu bar or the Dock
@@ -91,6 +101,7 @@ ShellWindow {
         // menuInset = the tail's 13 pt height; GAPS-REA-dock.md 1: only a menu opened at a rect has one, so the
         // desktop's has none)
         tailX: Panels.contextAbove ? Panels.contextX - x : -1
+        blinkOnMs: Panels.contextAbove ? Theme.menu.blinkOnDock : Theme.menu.blinkOn
     }
 
     // ---------- alert ----------
@@ -104,6 +115,7 @@ ShellWindow {
         y: P.alertTop(ov.height + Theme.menuBar.height, height) - Theme.menuBar.height
         originX: x
         originY: y + Theme.menuBar.height
+        windowAlpha: ov.alertAlone
     }
 
     // ---------- menu ----------

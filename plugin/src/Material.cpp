@@ -15,11 +15,14 @@ namespace lg {
         // 0.5 (light) / 0.8 (dark) x q, colour (0.9, 1, 1.2) lighten-weighted / (0.125, 0.5, 1). Refraction inner
         // min(0.25 D, 20) / max(-0.5 D, -60), outer max(0.2 D, 16) / max(0.25 D, 16) at 0.6. Dark specular -0.25 at
         // 75 deg (dark) / 106 deg (light, SpreadSDR). Ring shadow (8, 4, 5, 0.06).
+        // Dark bias -0.278: a fit, not the dump's -0.25 (GLASS-HIG.md rounds 9 and 11): over grey 127 the Mac's dark
+        // alert and menus read their side line 47 over 112-113 (alert-shown-grey-dark.png, menu-probe-popup-over-grey-dark
+        // .png), -0.25 drew 53, -0.278 46; the NC card line 67 -> 63 (Mac 54), the banner 82 -> 78 (Mac 67)
         constexpr SRecipe REGULAR = {
             .name         = "regular",
             .family       = eFamily::REGULAR,
             .light        = {.ycc = {0.4f, 1.03f, 1.2f}, .fill = {1, 1, 1, 0.2f}, .bleed = {0.9f, 1.f, 1.2f}, .blurFill = {0.9f, 0, 0.5f}, .darkSpread = 106},
-            .dark         = {.ycc = {0.125f, 1.125f, 1.3f}, .fill = {}, .bleed = {0.125f, 0.5f, 1.f}, .blurFill = {0, 0.9f, 0.5f}, .darkSpread = 75},
+            .dark         = {.ycc = {0.125f, 1.125f, 1.3f}, .fill = {}, .bleed = {0.125f, 0.5f, 1.f}, .blurFill = {0, 0.9f, 0.5f}, .darkBias = -0.278f, .darkSpread = 75},
             .outerHeightN = 0.2f,
             .outerAmountN = 0.25f,
             .outerMin     = 16,
@@ -65,7 +68,12 @@ namespace lg {
             .outerOpacity        = 0.2f,
             .blurRadius          = 1.5f,
             LG_NO_SHADOW,
-            .sizeD = SIZE_MEDIUM,
+            // Dock.app's glass is not ovalized (MAC-ANSWERS-8.md R8.1 is SwiftUI / AppKit glass): the Mac's Dock top rim
+            // over black reads 104 from 25 pt (its corner's end) to 229 pt from its left end (glass53/dock-dark-black.png
+            // row 10; at 0.5 it would fall to about 70 near the end), Cmd-Tab's top rim is as bright over the wallpaper
+            // 100 pt from its end as mid-way (cmdtab-dark.png: +54 / +48); GLASS-HIG.md 20
+            .ovalize = false,
+            .sizeD   = SIZE_MEDIUM,
         };
 
         // Control Center (= the volume/brightness HUD, SystemBannerUI _Glass.controlCenter), light and dark alike:
@@ -91,15 +99,25 @@ namespace lg {
                  .blurDist0N = 0, .blurDist0Fixed = -100,
                  .blurAlpha = {1, 0.1f, 0.5f},
                  LG_NO_SHADOW,
+                 // the modules' glass is not ovalized: the Mac's Now Playing tile (130 pt) keeps its bottom rim flat over
+                 // the straight part, 231 / 179 over grey, 123 / 84 over black (glass53/cc-*-{grey127,black}.png rows 129 /
+                 // 128, 0-20 pt from the middle); at 0.5 ours read 224 / 175 there 15 pt out
+                 .ovalize = false,
         };
 
         // Spotlight = SiriRecipe.SiriModifier branch A (reference/re/NOTES.md); not in the Mac's verified model, so the
-        // slider is not applied (eFamily::FIXED)
+        // slider is not applied (eFamily::FIXED).
+        // Fill: black 0.205, the shell's old bottom veil (Theme.spotlight.panelBottomVeil) moved in front of the key/fill
+        // highlight, on a face clamped to 1 first (clampBeforeFill): over white the face is about 1.11, so the highlight
+        // was clamped away and the list's bottom rim read 203 flat (Mac 220 / 231 on its last two rows); the shell's veils
+        // on the plugin path are the rest, 1 - (1 - v) / 0.795 (SPOTLIGHT-27.2.1.md "Judge #20"). The key (top) lobe
+        // went on the face before the clamp and the fill (judge #21); since round 17 it is not drawn here at all
+        // (keyTop 0): the top line lies over the shell's veil and the shell draws it (SPOTLIGHT-27.2.1.md "Round 17")
         constexpr SRecipe SPOTLIGHT = {
             .name                = "spotlight",
             .family              = eFamily::FIXED,
-            .light               = {.ycc = {0.1f, 1.0f, 1.25f}, .blurFill = {0.4f, 0.75f, 0.5f}},
-            .dark                = {.ycc = {0.1f, 1.0f, 1.25f}, .blurFill = {0, 0.75f, 0.5f}},
+            .light               = {.ycc = {0.1f, 1.0f, 1.25f}, .fill = {0, 0, 0, 0.205f}, .blurFill = {0.4f, 0.75f, 0.5f}},
+            .dark                = {.ycc = {0.1f, 1.0f, 1.25f}, .fill = {0, 0, 0, 0.205f}, .blurFill = {0, 0.75f, 0.5f}},
             .refractionHeightN   = 0.4f,
             .refractionHeightMax = 1e6f,
             .refractionAmountN   = -0.72f,
@@ -115,7 +133,10 @@ namespace lg {
             // light 0.404 / y 18 / sigma 20 (rms 0.002), dark 0.71 / 19 / 19 (rms 0.011), i.e. shadowParameters active
             // (0.40 / 0.70, y 18, blur 20, SHADOW.md); black. The shader's edge is 0.5 erfc(d / radius): radius 20 sqrt 2
             .shadowD0 = 1, .shadowD1 = 1, .shadowOpacityLo = 0.4f, .shadowOpacityHi = 0.4f, .shadowOpacityHiDark = 0.7f,
-            .shadowRadiusLo = 28.284f, .shadowRadius = 28.284f, .shadowOffsetY = 18, .shadowBlack = true,
+            .shadowRadiusLo = 28.284f, .shadowRadius = 28.284f, .shadowOffsetY = 18, .shadowBlack = true, .clampBeforeFill = true,
+            // R17.5 (spotlight-list-top-edge-step-*.png, the r17 stills): the list's first rows are the outer sample
+            // (weights .75 / .25 at 2x, as decoded) of the backdrop with the bar in it, plus the shell's light line
+            .outerSeesPrior = true, .priorVeil = {0.975f, 0.754f, 0.517f}, .keyTop = 0,
         };
 #undef LG_NO_SHADOW
 
@@ -145,6 +166,20 @@ namespace lg {
         // 0.18 / 0.12, too dark: the cards' D is not decoded).
         // Rim: the real NC card's top / bottom line (outer px -> inner px -> body, dark: 68 -> 53 -> 35 over black)
         // is the 1 pt key band alone at 1.23 x Regular's (mask 1.0 and 0.54 in the two px): not decoded, Mac pixels.
+        // Dark side line (the dark specular at full strength, straight rows of a 3-line card / the banner; line pixel
+        // against the pixel outside it): the Mac's card 99.5 -> 44.5 over grey 127 and 200 -> 70.4 over white
+        // (nc/stack-dark-{grey,white}.png), the banner 116.5 -> 50 and 233.5 -> 71.5 (panels/shadow-banner-{grey,white}
+        // -dark.png), 0 over black, (57,65,156) -> (20,24,86) over blue; MAC-ANSWERS-18.md R18.2 (live/r18, a two-line
+        // card: the middle row, strength 0.93): banner 233 -> 79 over white and (0,0,224) -> (0,0,159) over pure blue,
+        // card 203 -> 78 and (0,0,193) -> (0,0,126). The blues are the DECODED tone with the dump's own bias -0.25,
+        // c (1 + bias (3 - 2 c)) per channel: (20.6, 24.5, 86.8), 158.8, 125.9, the same as the light appearance draws
+        // (banner 240 -> 176, (0,0,231) -> (0,0,166)); so is grey 99.5 (44.3). Only a light backdrop is darker than
+        // that tone (white: 165 decoded, 71.5 on the Mac): the toned luma saturates near 0.28. So: the decoded tone,
+        // then its luma Y limited through a soft knee, x (1 + (Y / 0.278)^4)^(-1/4), fitted on the six grey-axis
+        // points (residuals -1.8 -1.1 1.4 -1.2 2.3 0.5 levels). The limiter is Mac pixels, not decoded. (Until round 18
+        // a luma curve Y (0.5493 - 0.2602 Y) with chroma x 0.62: 4 off over white on a two-line card, 16 over pure
+        // blue.) Alert and menus keep the fitted -0.278 without the limiter: their Mac line is known over grey 127 only
+        // (GLASS-HIG.md 18)
         constexpr SRecipe NOTIFICATIONCENTER = [] {
             SRecipe r       = REGULAR;
             r.name          = "notificationcenter";
@@ -156,10 +191,24 @@ namespace lg {
             r.shadowRadiusLo                      = r.shadowRadius;
             r.keyScale      = 1.23f;
             r.diffuseAmount = 0;
+            r.dark.darkBias = -0.25f;
+            r.darkToneCap   = 0.278f;
+            r.darkToneKnee  = 4;
             return r;
         }();
 
-        constexpr std::array RECIPES = {REGULAR, CLEAR, DOCK, CONTROLCENTER, MENU, SPOTLIGHT, NOTIFICATIONCENTER};
+        // banners (hyprk-notifications): _Glass.notificationCenter with Regular's decoded shadow at D 166, 0.4 light /
+        // 0.6 dark (r 24, y 8, vibrancy 1): Mac R5.2 shadow-banner-{grey,white}-*.png solved over grey 127 and white,
+        // darkening .124 / .185, sigma 16.9 pt, y 7.6 pt (GLASS-HIG.md 15); the cards keep the gap fit above
+        constexpr SRecipe NOTIFICATIONBANNER = [] {
+            SRecipe r             = NOTIFICATIONCENTER;
+            r.name                = "notificationbanner";
+            r.shadowOpacityLo     = r.shadowOpacityHi = 0.4f;
+            r.shadowOpacityHiDark = 0.6f;
+            return r;
+        }();
+
+        constexpr std::array RECIPES = {REGULAR, CLEAR, DOCK, CONTROLCENTER, MENU, SPOTLIGHT, NOTIFICATIONCENTER, NOTIFICATIONBANNER};
     }
 
     const SRecipe& recipeByName(std::string_view name) {
@@ -223,6 +272,8 @@ namespace lg {
             .keyScale      = r.keyScale,
             .darkBias      = f.darkBias,
             .darkSpread    = f.darkSpread,
+            .darkToneCap   = dark ? r.darkToneCap : 0,
+            .darkToneKnee  = r.darkToneKnee,
         };
 
         if (r.family == eFamily::REGULAR) {
@@ -271,6 +322,10 @@ namespace lg {
 
     bool hasShadow(const SRecipe& r) {
         return r.shadowOpacityLo > 0 || r.shadowOpacityHi > 0 || r.shadowOpacityHiDark > 0;
+    }
+
+    float gradientOvalization(double w, double h) {
+        return std::min(w, h) > OVALIZATION_MIN_SIDE ? float(OVALIZATION) : 0.f;
     }
 
     bool hysteresisDark(bool wasDark, double luminance, double low, double high) {

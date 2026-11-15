@@ -27,8 +27,20 @@ function fromPhysics(mass, stiffness, damping) {
     return { response: 2 * Math.PI * Math.sqrt(mass / stiffness), ratio: Math.min(1, damping / (2 * Math.sqrt(stiffness * mass))) };
 }
 
+// A measured track played as it is, where no spring fits: `values` = the progress 0 .. 1 at 0, step, 2 step, ...
+// seconds (the first 0, the last 1), straight lines between. state() reads it; v0 does not apply.
+function fromTrack(values, step) {
+    return { response: (values.length - 1) * step, ratio: 1, track: values, step: step };
+}
+
 // [x, x'] at time t (seconds) of the normalised spring
 function state(s, v0, t) {
+    if (s.track) {
+        const u = Math.max(0, t) / s.step, n = s.track.length - 1;
+        if (u >= n) return [1, 0];
+        const i = Math.floor(u), a = s.track[i], b = s.track[i + 1];
+        return [a + (b - a) * (u - i), (b - a) / s.step];
+    }
     const w = 2 * Math.PI / s.response, z = s.ratio;
     if (Math.abs(z - 1) < 1e-6) {
         const b = v0 - w, e = Math.exp(-w * t);

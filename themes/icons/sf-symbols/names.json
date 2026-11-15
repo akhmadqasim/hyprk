@@ -3226,6 +3226,44 @@
    ],
    "extras": [],
    "note": "Menu row images: AppKit 27.2.1 (reference/re/27.2.1/MENUS-REA-27.2.1.md 'Edit menu icons', Apple menu, Settings Help). Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "app.2.stack.3d": {
+   "symbol": "app.2.stack.3d",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": true,
+   "variants": [
+    "app.2.stack.3d.regular.svg",
+    "app.2.stack.3d.medium.svg",
+    "app.2.stack.3d.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Spotlight mode list and bar (r17 spotlight-modelist-*). Decoded from CoreGlyphsPrivate's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
+  },
+  "document.on.document": {
+   "symbol": "document.on.document",
+   "surface": "shell",
+   "surfaces": [
+    "shell"
+   ],
+   "confidence": "sure",
+   "confidenceBySurface": {
+    "shell": "sure"
+   },
+   "private": false,
+   "variants": [
+    "document.on.document.regular.svg",
+    "document.on.document.medium.svg",
+    "document.on.document.semibold.svg"
+   ],
+   "extras": [],
+   "note": "Spotlight mode list and bar (r17 spotlight-modelist-*). Decoded from CoreGlyphs's BVG blob with tools/bvg.py (27.2.1, no Mac render)."
   }
  },
  "skipped": {
@@ -39380,6 +39418,204 @@
     0
    ],
    "fontBaselineY": 38.956
+  },
+  "app.2.stack.3d.regular.svg": {
+   "symbol": "app.2.stack.3d",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    40,
+    44
+   ],
+   "alignmentRect": [
+    0.0,
+    11.0,
+    40.0,
+    22.5
+   ],
+   "baselineY": 33.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    33.5,
+    37.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 36.79
+  },
+  "app.2.stack.3d.medium.svg": {
+   "symbol": "app.2.stack.3d",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    41,
+    44
+   ],
+   "alignmentRect": [
+    0.0,
+    11.0,
+    40.5,
+    22.5
+   ],
+   "baselineY": 33.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.0,
+    34.5,
+    38.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 36.518
+  },
+  "app.2.stack.3d.semibold.svg": {
+   "symbol": "app.2.stack.3d",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    41,
+    45
+   ],
+   "alignmentRect": [
+    0.0,
+    11.5,
+    41.0,
+    22.5
+   ],
+   "baselineY": 34.0,
+   "capHeight": 22.5,
+   "glyphRect": [
+    3.0,
+    3.5,
+    35.0,
+    38.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 37.312
+  },
+  "document.on.document.regular.svg": {
+   "symbol": "document.on.document",
+   "weight": "regular",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    40,
+    46
+   ],
+   "alignmentRect": [
+    0.0,
+    12.0,
+    40.0,
+    22.5
+   ],
+   "baselineY": 34.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    32.0,
+    39.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 37.764
+  },
+  "document.on.document.medium.svg": {
+   "symbol": "document.on.document",
+   "weight": "medium",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    41,
+    46
+   ],
+   "alignmentRect": [
+    0.0,
+    12.0,
+    40.5,
+    22.5
+   ],
+   "baselineY": 34.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.0,
+    32.5,
+    40.0
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 37.539
+  },
+  "document.on.document.semibold.svg": {
+   "symbol": "document.on.document",
+   "weight": "semibold",
+   "mode": "mono",
+   "pointSize": 32,
+   "size": [
+    41,
+    47
+   ],
+   "alignmentRect": [
+    0.0,
+    13.0,
+    41.0,
+    22.5
+   ],
+   "baselineY": 35.5,
+   "capHeight": 22.5,
+   "glyphRect": [
+    4.0,
+    3.5,
+    33.0,
+    40.5
+   ],
+   "paths": 2,
+   "fillOpacities": [
+    1.0
+   ],
+   "hierarchyLevels": [
+    0,
+    0
+   ],
+   "fontBaselineY": 38.369
   }
  },
  "menubar": [

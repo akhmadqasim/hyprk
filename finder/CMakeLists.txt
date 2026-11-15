@@ -18,4 +18,4 @@ target_compile_definitions(hyprk-finder PRIVATE
 
 # Logic tests for the native helpers (not built by default): cmake --build build --target finder-tests
 add_executable(finder-tests EXCLUDE_FROM_ALL tests/fileops_test.cpp src/fileops.cpp src/fileops.h)
-target_link_libraries(finder-tests PRIVATE Qt6::Core)
+target_link_libraries(finder-tests PRIVATE Qt6::Core Qt6::Gui)

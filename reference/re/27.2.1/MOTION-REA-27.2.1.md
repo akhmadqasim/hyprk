@@ -282,6 +282,9 @@ Mission Control shows the stage only).
 
 ## Note from the PC session (2026-11-14): `exitKick` stays
 
+**Superseded by Round 4, R4.2**: measured on the windows themselves (mc-exit-4-windows.mov) the exit is the decoded
+spring from rest; `exitKick` is now 0.
+
 Round 2 proposes `MissionControl.qml` `m.exitKick` 10 -> 0 because the code starts the windows at velocity 0. Not
 applied. The Mac's own recording (R2 exit, MOTION-MEASURED.md lines 93 and 416) reads .21 .36 .47 .57 .64 .71 .76 .80
 (our series with the kick, which fits it at rms .0105). The decoded spring from rest, response 0.25, taken from its
@@ -352,6 +355,9 @@ Measured (same session, `mcap -k 2`, top edge of the panel, p = linear in it): o
 
 ## R3.3 The fan's -24 is down
 
+**Wrong, superseded by Round 4, R4.1**: the Mac recording puts every fan slot int(t/2) + y + 24 above the icon box
+bottom (the 24 is up); `fanShift` is now +24.
+
 The Dock's stack layers are y up: (1) the grid's place adds 11 to the edge for a bottom Dock without subtracting the
 panel height, but subtracts the width for a right Dock (x = edge - W - 11, 0x10001be8c), so the frame origin is the
 minimum corner with y growing up; (2) the edge passed is imageLayer y + height, its top in y up; (3) the Mac's AX grid
@@ -400,3 +406,419 @@ and when it turns key).
 2. Why `expand:`'s end point and `layout` differ by 48 - 2s (R3.1 last paragraph).
 3. The fan item anchor (centre, inferred) and the AppKit transaction around the click (could hold a duration; none
    seen in the Dock's own code).
+
+# Round 4: Mac recordings (2026-11-14)
+
+Measured on the PC from the Mac's round 2 clips (MAC-ANSWERS-2.md M1.4, M1.5): `screens/27.2.1/dock/stack-{fan,grid}-
+{open,close}.mov`, `stack-{fan,grid}-open-dark.png`, `screens/27.2.1/live/mc-exit-4-windows.mov`. H.264, 60 fps time
+base, variable frame rate: every frame was extracted with its pts (`ffmpeg -vsync passthrough -frame_pts 1`, file
+name = pts in 1/60 s) and times are taken from the pts, never the frame index (a frame missing from a run means the
+screen did not change, or one dropped frame: grid open has no frame at 0.450 s). 2 px per pt. Curves fitted by least
+squares over the start time (`fit.py`: CA's named curves from QuartzCore's table, critically damped and under-damped
+springs). Ours: the headless session (scale 2, 1280 x 832 pt), `mcap -k 2` (fan, 1 sample per pt) and `-k 4` (Mission
+Control, full output), `long_intervals` 0 in every run, the same metrics as on the Mac clips. Scratch scripts and
+frames: the session's scratch dir (`agent-m2`), not kept. Marks: **measured** (from the clip, numbers given),
+**inferred** (reason given).
+
+## R4.1 Downloads stack, fan and grid
+
+Stage: Dock tile 31 pt, stack tile centre x 982, icon box bottom 921 pt (from the Pages icon's box next to it and the
+chevron plate: 919.75-921), 13 files + 1 folder, Date Added. Fan: 9 items + "5 More in Finder".
+
+| What | Mac (measured) | Ours before | Ours after | Mark |
+|---|---|---|---|---|
+| Fan slot heights | label pill centres of slots 0-6 at 83.7, 147.7, 211.9, 275.8, 339.8, 404.0, 468.2 pt above the icon box bottom: pitch **64.0**, slot 0 = int(t/2) + 47 + 24 - 2.2 (the 2.2 is within the box-bottom estimate). Every one of the 10 slots, its 64 box turned by the decoded angle, overlays the art (rotated boxes drawn on f00054) | `fanShift` -24: slot 0 at 38 pt, rms **46.9 pt** (peak 52) over the 10 slots, the first item over the tile | `fanShift` +24: rms **2.2 pt** over slots 0-6 (a constant offset, the box-bottom estimate); slots 7-9 not read (pills merged in the profile) | measured; settles R3.3 (the -24 is up on screen, not down) |
+| Fan x offset | slot 0 centre x 983 (dx 1), the column leans right as decoded (3000 pt circle) | same formula | unchanged | measured |
+| Fan open: position | item 0 (the folder) bottom 1794 -> 1661 px over 14 frames from 0.417 s: **ease-in-out 0.25 s, rms 0.012**, start 30 ms before the first moving frame (default 0.25: 0.031; spring 0.25: 0.039) | ease-in-out 0.25 | ours captured: item 0 rms **0.0047** to ease-in-out 0.25 (start 64 ms after the synthetic click) | measured; confirms R3.1 |
+| Fan open: item size | **64 from the first frame**: folder art 117 px (58.5 pt) wide in every frame 0.417 -> 0.633 s; at the first frame item 0 is centred on the tile at full size | grew from the pile's side on "default" (at 47 ms into the open: about 39 pt) | 64 throughout (`fanChannels().size` = 1 while opening) | measured (the decoded implicit bounds animation does not show) |
+| Fan open: stagger | none: item 0 and the top slot reach .5 / .95 in the same frames | none | none | measured; confirms R3.1 |
+| Fan close: position | item 1 (Data.json) centre: **ease-in-out 0.25 s, rms 0.0025**, start about 50 ms after the last still frame | ease-in-out | unchanged | measured |
+| Fan close: item size | item 1 page width 86 -> 78, 70, 61, 53, 47, 42 px: side = 64 - 43.5 x default(t / 0.25) with the same start (the ratio (64 - side) / default(t) is 43.7 43.3 43.6 44.0 43.3 43.2): **"default" 0.25 s**, to about **20.5 pt** (item 0 about 27) | "default" to the pile side (27 for item 1 at tile 31) | unchanged curve; end side not changed (see GAPS) | measured |
+| Fan close: tile | the chevron plate goes at the close's first frame; the tile stays **empty** until the items land; the hover label shows at once (pointer on the tile) | the pile showed at once under the flying items | pile hidden while the popup lives (`Dock.qml` `!dock.stackLive`) | measured |
+| Grid open | panel left and top edges: p from the left edge .135 .371 .509 .630 .728 .804 .862 .907 .941 .966 .984 .995 1, from the top edge the same within .01 (so scale and position share one curve and grow from the tile centre): **CA "default" 0.25 s, rms 0.0115** (ease-in-out 0.024) | "default" 0.25 from the tile centre | ours captured: top edge rms **0.0012** to "default" 0.25 (start 64 ms after the click) | measured; confirms R3.2 |
+| Grid close | p .080 .199 .356 .497 .620 .719 .808 .860 .905, then gone (opacity): **"default" 0.25 s, rms 0.006** | same | same | measured |
+| Grid place | panel left 644.5 pt (decoded x = 982 - 674/2 = 645), top 438 (decoded 890 - 11 - 438 = 441; the diff edge includes the glass rim) | decoded | unchanged | measured, within 3 pt |
+| Tile while open | a dark plate **25 x 25 pt** (0.806 of the tile), corner about 5.6, centred on the icon box; over the Dock glass (10,16,88) it reads (47,50,87) at the top to (22,24,45) at the bottom = grey 86 at alpha .49 to grey 27 at alpha .70. A white chevron, ink **9.75 x 5.25 pt**, stroke about 1.1 pt, 0.4 pt below the plate centre. The same in the grid clip | an SF chevron.down 0.42 of the tile, semibold, no plate (guessed) | the plate and a drawn chevron (`Theme.dock.stack.chevron*`, `Dock.qml`) | measured (dark only) |
+| The "N More in Finder" / "Open in Finder" slot | a 57 pt circle, 1 pt black rim, dark see-through fill (24,43,140) over (31,55,164), an arrowshape.turn.up.right.fill-like arrow about 31 x 24 pt, (148,166,255) | the Finder icon | unchanged (the symbol outline is not in `themes/icons/sf-symbols`) | measured; not built |
+| Hover label at the press | gone at mouse-down (grid clip 0.35 s: tile pressed, no label) | stays until the popup opens, then fades | unchanged | measured; not built |
+
+Ours after, on screen (headless, tile about 62 pt, light): the first item's box wholly above the Dock, the label pills
+clear of it, the plate and chevron on the tile (`ours/fan3-open`, `ours/fan3-close`).
+
+## R4.2 Mission Control exit, the back window clicked (4 windows)
+
+Mac: 4 TextEdit windows 640 x 460 pt at +90,+70; Mission Control tiles Window 4 / 3 on top, 2 / 1 below. The pointer
+clicks Window 1 (bottom right, the back window). Ours: 4 foot windows 700 x 500 pt at (80,70) +80,+50, Window 4 in
+front; Mission Control from `qs ipc call panels toggle mission`, a vptr click on Window 1's tile, `mcap -k 4` of the
+whole output.
+
+| What | Mac (measured) | Ours before | Ours after | Mark |
+|---|---|---|---|---|
+| Window path | Window 4's top-left corner (x, 46 -> 616 px) and Window 1's bottom edge (1735 -> 1639 px) per frame from the first exit frame (2.983 s): W4 .070 .200 .351 .491 .618 .709 .786 .849 .881 .919 .940, W1 .062 .208 .354 .500 .625 .708 .792 .854 .896 .917 .938. The decoded (1.0, 0.25) spring from rest is .067 .205 .358 .499 .619 .715 .791 .848 .890 .921 .944: **rms .0079 (W4), .0049 (W1)**, start at the first exit frame. Same curve for both windows (no stagger, no distance term) | `exitKick` 10: .176 .349 .500 .624 .722 .796 ...: rms **.093 / .089** frame-aligned (peak .15) | `exitKick` 0; captured (Window 1's right edge, 629 -> 509.5 px): .067 .201 .360 .502 .619 .711 .787 .845 .887 .921 .946 .962, rms **.0081 / .0060** against the Mac's two series | measured; the R2 ".21 first frame" was the share-of-change metric, not the windows' way (the note "exitKick stays" is superseded) |
+| Layer order | the clicked window is on top from the first exit frame and flies over the others; the others keep their order (4 over 3 over 2); after the exit Window 1 is in front | the same (R3.5) | the same | measured |
+| Key look of the clicked window | coloured lights from the 2nd frame after the exit starts (3.017 s, 33 ms) | lights coloured at 105 ms (frame 8; Window 4 keeps its coloured lights until then) | Round 5, R5.2: 2 frames, Window 4 grey in the same frame | measured; fixed in Round 5 |
+| Spaces bar ("Desktop" label, +) | region change .41 .74 .96 (label), .44 .58 .71 .81 .92 .98 (+): the bar slides up, so a fixed region saturates early; its own way is in R4.4 (about 0.2 s, opaque) | label region .18 .33 .43 .55 .65 .75 .81 .86 .90 .95 | see R4.4 | measured (corrected in R4.4) |
+| Menu bar | fades in .04 .12 .20 .29 .37 .53 .63 .75 .83 .90 .94 .96 (about 0.2 s, slow start) | .21 .38 .50 .65 .75 .81 .86 .90 .92 .94 (with `e`) | unchanged | measured; ours starts faster |
+| Desktop widgets (clock) | fade in with the exit .32 .40 .52 .62 .72 .79 .85 .89 .92 .94 | none built | - | measured |
+| Wallpaper | no visible dimming change during the exit (the shield is the plain wallpaper) | - | - | measured by eye |
+
+plugin-motion has no Mission Control path (the exit is `shell/modules/MissionControl.qml` alone); nothing there changed.
+
+## Round 4 not found / left (GAPS)
+1. Fan close end side: about 27 / 20.5 pt for items 0 / 1 at tile 31, against the decode's 29 / 27 (s = 1). s = 3 (25 /
+   19) fits better, as if `getCollapsedLayoutFrames:` read the tile in pixels (62 at 2x). Not changed: one clip, one
+   tile size.
+2. The "More in Finder" slot art (R4.1): not built, its symbol outline is missing.
+3. Hover label hidden at mouse-down on the stack tile (Mac) vs ours at the open.
+4. Mission Control: the picked window's key look at 33 ms (Mac) vs 105 ms (ours); the menu bar's slower fade-in;
+   desktop widgets. (The Spaces bar: R4.4.)
+5. The open latency: ours starts 64 ms after the synthetic click (the popup window's first frame); the Mac's click
+   time is not in the clip (synthetic click, no pointer press frame in the fan clip).
+
+## R4.3 "More in Finder" slot and the fan close end (Mac round 4, R4.3)
+
+`dock/stack-fan-more-dark.png`, `dock/stack-fan-more-close-dark.mov` (same stack, tile 31, 9 items + "5 More in Finder",
+the close clicked on the chevron at about 0.4 s).
+
+| What | Mac (measured) | Ours | Mark |
+|---|---|---|---|
+| Close: item 1 (Data.json) page width per frame | 86 px at rest; 81 75 66 58 51 45 40 37 ... 29 px at 0.60-0.68 s, then **33 px** at 0.70 s when the tile's own pile takes over (a one-frame jump) | - | measured |
+| Close end side | page 29 px = **21.6 pt** box for item 1 (page / box 86 / 128 px); the round 4 clip's curve fit gave 20.5, item 0 about 27. The pile's own back item is 104/128 x 31 = 25.2 pt (page 33.9 px, measured 33) | decode: item i ends at tile - 2s(i+1), s = 1 at tile 31: 29 / 27 | measured; s = 2 (27 / 23) is the nearest of the decode's three steps; not changed (no reason found why tile 31 would take s = 2) |
+| Hand-over to the pile | the fan's items land, then the pile (normal sizes) replaces them in one frame | the pile shows when the popup is gone (`!dock.stackLive`), the same one-frame swap | measured |
+| "More in Finder" slot art | fan: a 57 pt circle, 1 pt black rim, a dark see-through fill, arrow (148,166,255); grid ("Open in Finder" cell): the same arrow and circle drawn as a light ring with no fill, arrow (190,204,255) over the glass bubble. So the art depends on what is under it (vibrant), not one fixed picture | the Finder icon | measured; not built (the vibrant recipe is not known, the arrow outline is not in `themes/icons/sf-symbols`) |
+
+## R4.4 Mission Control exit by Esc (Mac round 4, R4.5)
+
+`live/mc-exit-esc.mov`, 4 windows (Window 4 in front), Esc at about 0.43 s; `live/mc-4-windows-entered.png` (tiles at
+about 20,110 / 552,110 / 372,498 / 904,498 pt, 520 pt wide, 0.5 s after entering). Ours: the same 4 foot windows, `qs
+ipc call panels close` (the Esc key's handler is `Panels.close()`, MissionControl.qml line 406, the same path),
+`mcap -k 4`.
+
+| What | Mac (measured) | Ours before | Ours after | Mark |
+|---|---|---|---|---|
+| Window path | Window 4's top-left x .070 .204 .354 .501 .617 .702 .789 .849 .891 .919 .933; Window 1's bottom .083 .208 .354 .500 .625 .708 .792 .854 .896 .917 .938: the same (1.0, 0.25) spring from rest as the click exit (R4.2) | kick 10 (R4.2) | Window 1's right edge .067 .201 .360 .502 .619 .711 .787 .845 .887 .921 .946 (starts 36 ms after the ipc call) | measured |
+| Order | Window 4 (the window in front before) stays in front through the exit; the others keep their order | same | same | measured |
+| Spaces bar | the whole bar (69 pt) **slides up opaque**, the "Desktop" pill keeps its ink up to the top edge; bar bottom edge 136 -> 106 (twice: a repeated frame) 84 64 46 30 15 8 4 px: .22 .38 .53 .66 .78 .89 .94 .97, starting with the windows. The windows' spring (0.25) fits it at rms .043 (best: ease-out 0.20 s, .029); the decoded `SpacesBarExitSpringResponse` 0.125 at .103 | slid up and **faded** (`opacity: mc.bar`) on the 0.125 spring | slides opaque on the windows' exit spring (`MissionControl.qml` `barExit` 0.25, `opacity` 1 while it leaves); pill bottom per frame .09 .23 .41 .55 .67 .78 .87 of the bar height | measured |
+| Menu bar | fades in .04 .12 .20 .29 .37 .53 .63 .75 .83 .91 .95 .97 (the same as the click exit) | with `e` | unchanged | measured; gap |
+| Desktop widget (clock) | fades in .34 .43 .55 .64 .74 .81 .87 .91 .94 .96 | none | - | measured |
+
+Seen on ours in both exits (click and Esc), not on the Mac: in the top 100 pt strip the real windows show at their
+end place while their thumbnails still fly (a "ghost" of Window 4 at the top), because the strip (menu bar + top
+dimming, `m.stripHeight`) fades with `e` and uncovers the real windows sooner than `coverEnd`. Fixed in Round 5, R5.1.
+
+## Round 4 GAPS (added)
+6. The ghost windows in the top strip during an exit (R4.4). **Fixed in Round 5, R5.1.**
+7. The "More in Finder" / "Open in Finder" slot art: vibrant, two looks measured (R4.3).
+8. The fan close end side: 21.6 pt measured for item 1 at tile 31 (decode s = 1 gives 27).
+
+# Round 5 (2026-11-14): the exit ghost and the picked window's key look
+
+Ours only, against the Round 4 Mac clips. Headless session, scale 2, light, 4 foot windows 700 x 500 at (80,70)
++80,+50 (Window 4 in front), `mcap -k 4` of the whole output; click exit = vptr click on Window 1's tile, Esc exit = `qs
+ipc call panels close` (the Esc handler's `Panels.close()`).
+
+## R5.1 Ghost windows in the top strip
+
+| What | Value | Mark |
+|---|---|---|
+| Cause | `MissionControl.qml`: the wallpaper cover over the windows was two bands, the top `stripHeight` (100 pt) at opacity `e`, the rest at `cover` (opaque until e < `coverEnd` .06). The strip let the menu bar and the desktop's top dimming fade in, but real windows reach into 34..100 pt (Window 4's bar at y 70), so they showed through at their end place while their thumbnails still flew. Not plugin-motion (it has no Mission Control path) and not an early map: the real windows stay mapped under the layer the whole time | found (code + frames) |
+| Fix | the band at opacity `e` is the menu bar's own height (`Theme.menuBar.height`, 34): no window can be there. Below it the cover is opaque as elsewhere, and the desktop's top dimming (Background.qml `topDim`, the same shader on the same cached wallpaper) is drawn over the cover at (1 - e) x cover (`stripDim`), so the band changes as when the desktop showed through, without the windows | changed |
+| Check | top 160 pt of every frame of both exits: no window but the flying thumbnails (before: a second Window 4 at y 70 from the 2nd frame to the end). The band 34..100 pt right of the windows changes by 0.3-0.5 levels per frame in the tail as before, plus one step of 1.4 levels (mean; up to 7 at y 34) in the frame the cover goes (e < .06): `stripDim` is slightly darker than the desktop there (cause not found: the shader, image and text colour are the same) | measured |
+
+## R5.2 The picked window's key look (click exit)
+
+| What | Value | Mark |
+|---|---|---|
+| Mac (R4.2 clip, red close-light clusters per frame) | f179 first exit frame (hover ring gone, no motion); f180 Window 4 still coloured; **f181: Window 4 grey and Window 1 coloured in the same frame**, 2 frames after the first exit frame | measured |
+| Ours before | Window 1 coloured at 105 ms (frame 6-7); Window 4 coloured through the whole flight. The chain: the focus waits 2 frame swaps (the layer must drop the keyboard first), then a 50 ms timer re-captures the window (`reshot`), then the bar is redrawn in the active look | measured + read |
+| Fix | the bar (drawn from the plugin's description, not from the client) takes the active look for the picked window, and the inactive look for every other window, from the first frame swapped after the click (`mc.pickLook`, cell `barActive` / `barInactive`); the focus and the content re-capture are unchanged | changed |
+| Ours after | Window 4's lights grey and Window 1's coloured **in the same frame, 2 frames after the first changed frame** (55.8 ms after the click; motion starts in our first changed frame, one frame earlier than the Mac's) | measured |
+
+## Round 5 left
+1. The 1.4-level step in the dim band when the cover goes (R5.1).
+2. Apps without the plugin's bar (QML title bars): their key look still waits for the client's redraw and the re-capture.
+   Round 6 R6.1: Settings matches the Mac, Finder 4 frames.
+
+# Round 6 (2026-11-14): QML title bars' key look on a pick, the "More in Finder" slot, the fan close end
+
+Headless session (scale 2, dark, 1280 x 832 pt), Finder (936 x 594 at 172,92) and System Settings (740 x 625 at
+270,76), `mcap -k 4` of 1280 x 580 pt from the vptr click; per frame the red / green light clusters of every title bar
+(R > 200, G 60..130 for the close light). Marks as before.
+
+## R6.1 Mission Control click exit: apps that draw their own title bar
+
+| What | Value | Mark |
+|---|---|---|
+| Cause | Finder and Settings draw their lights in the client; their thumbnail is a still. Before: the key look came from the focus (sent 2 swaps after the click, once the layer drops the keyboard) and the 50 ms `reshot`: about 105 ms (Round 5 left 2) | read + measured |
+| Path | at the click Mission Control sends `custom>>hyprk-pick,<address>` on Hyprland's event socket (`hl.dsp.event`, `Actions::event`, ConfigActions.cpp 1320). Finder (`finder/src/hypr.cpp` `Hypr::picked`, `Main.qml` `Theme.active`) and Settings (`settings/shell.qml` `win.picked` -> `keepActive`) take the key look for that window at once, until another window is made active after it (the layer's release first refocuses the old key window: that first `activewindowv2` is ignored) or 1 s. The picked thumbnail is live from the click and the old key window's still is taken again at the click (`MissionControl.qml` `hintPick`, `picked`, `keyAtOpen`, `view.live`) | changed |
+| Why at the click | the toplevel capture after the first frame is a copy without ignore_damage: a still asked for after the client's redraw waits for its next damage. Asked at the first or second swap (after Finder's redraw, 8 ms after the event in its render-loop log): +4 frames; asked at the click: in time | measured |
+| Settings picked, Finder key before | Settings coloured and Finder grey **in the same frame, 2 frames after the first exit frame** (38.7 ms after the click); Mac f181: the same | measured |
+| Finder picked, Settings key before | Finder coloured **4 frames** after the first exit frame (89 ms; before about 105 ms). Finder redraws 8 ms after the event, but its capture comes in late (cause not found: the request is in flight before the redraw as for Settings) | measured; gap |
+
+## R6.2 The "N More in Finder" / "Open in Finder" slot art
+
+| What | Mac (measured, stack-fan-more-dark.png, stack-grid-*) | Ours |
+|---|---|---|
+| Fan | disc 56 pt (0.875 of the 64 box), 1 pt black rim outside, white ring at alpha .15 inside, see-through blurred fill | same; ring (59,74,158) vs Mac (57,72,151); fill not blurred (no backdrop blur) |
+| Grid | ring 64 pt (0.64 of the 100 pt icon box), stroke 2.33 pt, no fill, no rim | same; profile 220 223 223 223 182 vs 216 221 221 221 184 |
+| Arrow | arrowshape.turn.up.right.fill, adds about +124 to what is under it: fan (148,166,255), grid (207,222,255) | traced from the grid PNG (the symbol is not on disk; overlap .991), drawn additive: (148,166,255), (207,221,255) |
+| Files | | `shell/modules/StackArt.qml` (the `finder` slot), `shell/modules/DockStack.qml` 318; checked offscreen at scale 2 and in the session (grid "Open in Finder" cell) |
+
+## R6.3 Fan close end size
+
+`-[DOCKStack getCollapsedLayoutFrames:count:]` 0x100067df4 takes s from `DockBar.tileSize`, which is the `tilesize`
+pref + 2 x tileInset (sub_100078598, fmadd 0x10007876c; tileInset 1 up to 47, 2 up to 127, 3 above, 0x1000785d4..
+0x100078710), while W is the imageLayer = tile bounds - 2 x tileInset = the pref (0x10007fa38, set at 0x10008015c).
+At tile 31 tileSize is 33, so s = 2: items 0 / 1 end at **27 / 23 pt** (before 29 / 27). Mac: about 27.4 / 20.5..21.6.
+Built: `shell/lib/dockstack.js` `collapsedStep` (lines 66-79), used by `collapsedUp` and `fanSize`; tests in
+`shell/tests/run.mjs` (collapsedUp(30, 1) = 17, tiles 29 / 31 / 46). Confirmed (code), item 1 still 1.4-2.5 pt over the
+Mac (its page sits behind the folder at the end: the least sure reading).
+
+## Round 6 left
+1. Finder picked: key look 4 frames after the first exit frame (Mac 2); Settings matches.
+2. The fan slot's fill is not blurred; the fan disc sits +5, +3 pt off the decoded slot centre; the close's 3rd-4th
+   frames show a rounded-square outline on the Mac (not built).
+3. Fan close item 1 end: 23 pt against about 21 on the Mac.
+
+# Round J22 (2026-11-15): the Mission Control menu bar on exit, re-measured
+
+Mac clips `live/mc-exit-4-windows.mov` (click) and `live/mc-exit-esc.mov` (Esc), real frame times, decoded at a quarter
+size in grey. Alpha = least squares of (frame - the frame before the exit) on (last - before), over the pixels of the
+menu titles (x 50..420 pt, y 4..22 pt) that change by more than 15 levels; status items (x 960..1400 pt) alike.
+
+| What | Value | Mark |
+|---|---|---|
+| Mac menu titles, from the first exit frame | click .054 .174 .313 .450 .578 .670 .732 .801 .867 .902 .932 .957; Esc .052 .179 .313 .448 .576 .667 .733 .806 .865 .903 .931 .961; status items within .01 | measured |
+| Fit | a critical spring of response **0.27** started with the windows' (first frame 16 ms in): rms .008 in both clips; the windows' 0.25: .036 (a frame ahead mid-way). The R4.2 / R4.4 rows' ".04 .12 .20 .29 .37 .53" took another region and do not hold | measured |
+| How it shows | the titles show dimly **through the Spaces bar** while the bar still covers them (Esc clip, 33 ms in: crisp, dim titles inside the bar) | seen |
+| Ours | the menu bar is not seen through our Spaces bar (opaque pre-blurred wallpaper): titles 0 for 5 frames, then .34 .62 .68 .73 .77 .79 as the bar slides off (mcap, 3 runs) | measured |
+| Tried | a separate 0.27 spring for the wallpaper band over the menu bar: no change on screen (the bar covers the band until it has left) and a FrameClock TypeError (the spring outlived the window). Reverted | not changed |
+
+Open (needs the Mac): what draws over what while the bar leaves (is the menu bar above the Spaces bar at alpha, or seen
+through a translucent bar), and the bar's own alpha per frame over a flat wallpaper.
+
+
+# Round K1 (2026-11-15): the HUD glyph's bounce, Mission Control exit after R10.1
+
+## Volume / brightness HUD: what moves on a step (decoded)
+
+User report: on the Mac a volume step is not only a bounce at full volume, every step moves the bar. Source: SystemBannerUI
+from the 27.2.1 dyld cache, read on the PC (`ipsw dyld macho -w` for the Swift types, `ipsw dyld disass --cache <DSC>.a2s`
+for the whole `__text` 0x2aed42dd8-0x2aed88fe8; excerpts in `decomp/SystemBannerUI-hud-symbol-effect.asm`). `ipsw dyld
+extract` still fails on this cache, so REA's Ghidra provider had no image to open; every function below was short enough
+to read as disassembly. No Mac clip shows two steps in one HUD or a step onto an end (volume-pop.mov and
+volume-key-hud-timing.mov are one step each from 38 / 81 %), so nothing here is measured on the Mac.
+
+| What | Value | Mark |
+|---|---|---|
+| Types | `SystemBannerContentController { _sliderCurrentValue: Double?; _symbolEffectState: SymbolEffectState }`, `SymbolEffectState { valueLabelSeed: UInt32; previousValue: Double? }`, `SliderBannerImageView { image; variant; isInflated: Bool }`, `TickedSliderTrack { width; showTicks; value }`, `TickedTrackMask { tickCount; tickWidth; tickProgress }` (Animatable, data = tickProgress) | decoded |
+| Glyph view body 0x2aed644bc | `Image.symbolVariant(...)` `.symbolEffect(BounceSymbolEffect(), options: .default, value: valueLabelSeed)` (`_DiscreteSymbolEffectModifier<UInt32>`), font 26 pt (21 reduced; 0x2aed43ad0 / 0x2aed43ae0), `.scaleEffect(isInflated ? 1.1 : 1, anchor: .trailing)` (0x3ff199999999999a), white, `.animation(_, value: isInflated)` | decoded |
+| The seed, 0x2aed4af5c | `update(value)`: nothing when value == previousValue; else previousValue = value and, when value is exactly 0 or 1, valueLabelSeed += 1. Called on every content set (0x2aed4adf0, after `sliderCurrentValue = nil`) and from the slider drag (0x2aed4ba6c, (v - min) / (max - min)) | decoded |
+| So | the glyph **bounces once when the level arrives at 0 or at 1** from another level; a step that leaves it there (up at full) changes nothing; a HUD that is not on screen yet makes its glyph view with the new seed, so no bounce (inferred from the discrete effect's rule, not seen) | decoded / inferred |
+| isInflated in the HUD | false: BannerSlider's HStack closure 0x2aed62950 stores 0 in the variant and isInflated fields (0x2aed62c3c, 0x2aed62c94). The 1.1 scale belongs to the other variants | decoded |
+| Bar | fill = `UnevenRoundedRectangle` `.frame(width: max(value x width, 0), height: 4)`, trailing radius 2 only when value == 1 (0x2aed665fc-0x2aed666c8), masked by the ticks: 15 rects at width x i / 16, each `tickWidth x tickProgress` wide (0x2aed66984); tickProgress = showTicks && isEnabled ? 1 : 0 (0x2aed66314). It moves inside the content's `withAnimation(spring(response: 0.2, dampingFraction: 0.85))` (0x2aed4c4c0, as before): one continuous fill per step, no per-dash effect | decoded |
+| Capsule | no pulse on a step: the content closure only sets the content (0x2aed4b564), then 0x2aed49f8c re-runs the appear spring to scale 1 / opacity 1 | decoded |
+| Correction | MAC-ANSWERS.md "REA 27.2.1" section 1 and "SF Symbol effects" say SystemBannerUI has no symbol effect: wrong for the slider banners (the body above imports Symbols' BounceSymbolEffect) | |
+
+Ours before (mcap 60 fps, IPC steps 13/16 -> 14/16 -> 15/16 -> 16/16 -> 16/16): the fill moves 13.4 pt per step over
+about 115 ms on the 0.2 / 0.85 spring (the Mac's), the glyph never moves. After (`shell/modules/HudWindow.qml` Layer:
+`HudLib.bouncesAt`, HyprK `SymbolBounce`, about the ink centre of the glyph at that end; `shell/lib/hud.js` inkCentre /
+bouncesAt): the step onto 16/16 bounces the speaker, ink height x 1.00 -> 1.23 at +0.2 s -> 1.0 at +0.35 s (the wave that
+fades in at the same time widens the ink, so the trough is not read here; the curve is INTERACTIVE-GLASS-REA.md 3's, its
+peak / trough measured on the Control Center glyphs: speaker.wave.3.fill 1.21 / 0.87); the repeated step at 16/16 does
+nothing; a fresh HUD does not bounce. The slash glyph (arrival at 0) takes speaker.fill's amplitude (not measured).
+
+Needs the Mac: a clip of two or more volume steps in one HUD ending on full (and on 0), to check the bounce's start, its
+per-layer delay and that nothing else moves per step.
+
+## Mission Control exit (R10.1 applied)
+
+| What | Mac (mc-exit-menubar-flat-grey.mov) | Ours before (Round J22) | Ours after (mcap, 3 runs) |
+|---|---|---|---|
+| Order | titles above the Spaces bar, the bar solid | menu bar under the bar | titles above the bar from the first exit frame |
+| Bar's bottom edge / its height, per frame | .77 .61 .46 .35 .23 .16 .10 .06 .03 0 (53 42 32 24 16 11 7 4 2 0 of 69 pt) | the 0.25 critical spring: .93 .80 .64 .50 .38 .29 .21 .15 .11 .08 | .77 .61 .47 .34 .23 .16 .10 .06 .03 0 (57 45 34.5 25.5 17 12 7.5 4.5 2 0 of our 74 pt band) |
+| Title alpha per frame | .23 .42 .58 .72 .80 .86 .90 .90 .93 .94 .97, .98, 1 at 250 ms | 0 x5, then .34 .62 .68 .73 .77 .79 | .26 .44 .60 .73 .80 .86 .90 .90 .93 .94 .97 .98 .98 .99 .99 1 (rms .010) |
+
+How: `shell/lib/spring.js` `fromTrack` (a measured track played as it is; no spring from rest starts with its largest
+step); `MissionControl.qml` `barExit` = that track, and the menu bar band's cover drops at once on the way out (the
+desktop shows where the bar has left, R10.1); `MenuBar.qml` goes to the Overlay layer while Mission Control's window
+leaves (`mcLeaving`: re-stacked above the older window) and its content plays the title track on a FrameSpring of its
+own window (the J22 try put the spring in Mission Control's window, which is destroyed after the exit). No change in the
+menu bar rows after the fade (the layer going back to Top shows no frame difference). Left: our band is 74 pt tall, the
+Mac's edge reads 69 pt at 1440 x 932 (not changed: the 74 is Q-dock-31's); with "Show menu bar background" on, the
+bar's background would be above the Spaces bar for those frames (the Mac's is under it; off by default).
+
+## Round R11.4-R11.7 (MAC-ANSWERS-11.md, measured from the clips and stills; 2026-11-15)
+
+### Volume HUD, single steps (R11.4, `panels/hud-volume-steps-{light,dark}.mov`)
+
+Measured here per frame (not from the Mac's summary): fill = white coverage of the bar row; glyph = each connected layer's
+box. 40 steps (both clips).
+
+| What | Mac clip | Ours before | Ours after (mcap 60 fps, IPC steps) |
+|---|---|---|---|
+| Fill per step | slides one dash on spring 0.2 / 0.85: fit over 40 steps rms .014 of a step (0.16 / 1.0: .018; 0.18 / 0.85: .022); about 7 frames. The summary's "ease-out up, linear down" is the 1 pt dash gap, crossed first going up and last going down | the same spring, rms .009 | unchanged |
+| Dashes, capsule | nothing moves | nothing | unchanged |
+| Wave count | in ONE frame, 1-2 frames before the fill moves (3 -> 2 at 10/16, 2 -> 1 at 5/16, slash at 0) | fade on the 0.2 / 0.85 spring, 4-6 frames, slash cross-faded | one frame, in the frame the fill starts |
+| Glyph at 0 | `speaker.slash.fill` (the summary's "speaker without waves" is wrong: frame 312 shows the slash) | slash | slash |
+| Bounce at full | BY LAYER about the symbol's centre: speaker 45 -> 56 px (1.24) at +0.19 s, trough 40 (.89); wave 1, 2, 3 the same curve 0.04 / 0.10 / 0.16 s later (wave 3 49 -> 61 px at +0.35 s, trough 44, rest at +0.67 s) | all layers together, 1.21 / 0.87, done at +0.58 s | speaker 45 -> 56 at +0.22 s, wave 3 49 -> 61 at +0.35 s, trough 44-45, rest at +0.70 s |
+| Bounce at 0 | slash 47 -> 59 px (1.255) at +0.18 s, trough 43; the speaker 30 -> 38 (1.27), trough 27, 0.05 s later; rest at +0.62-0.66 s | together, 48 -> 60, trough 42 | slash 48 -> 60, the speaker 0.05 s later (31 -> 38, trough 28) |
+| Extra press at full / at 0 | no changed frame; the HUD stays, fades about 1.07 s after the last press | the same | unchanged |
+
+Model fitted over 3 bounces (dark full, dark 0, light full): the INTERACTIVE-GLASS-REA.md 3 curve per layer, peak 1.25,
+trough 0.90, 0.05 s per layer: rms .013-.016 of scale (all layers together at 1.21 / 0.87: .044-.063). The later layers
+end a little early on the Mac (wave 3 at +0.67 s, the model +0.73). Code: `Hud.motion.bounceStagger` / `bounceAmp`,
+HyprK `SymbolBounce` `layers` / `stagger` / `at(k)`, `HudWindow.qml` Glyph `scales` (per path, about the ink centre).
+This corrects "Round K1": the decoded `.symbolEffect(.bounce)` is right, its by-layer playback was not known.
+Left: the Mac's glyph swap leads the fill by 1-2 frames, ours by 0; the Control Center sliders' end glyphs still bounce
+as one piece (measured there as a whole, 1.21 / 0.87: likely the same layered motion, not re-measured); the sun's bounce
+is not recorded.
+
+### Finder toolbar Search button (R11.5, `controls/finder-search-button-*`)
+
+| What | Mac | Ours before | Ours after |
+|---|---|---|---|
+| Hover | one frame; light 253 -> 235-238, dark (87,88,96) = Q-finder-10's value | one frame; light 249 -> 233, dark +20 | unchanged |
+| Held | one frame: disc 72-73 -> 78-79 px (37 -> 40 pt, stills; clips light 72 -> 78, dark 70 -> 74), light 255, dark neutral 58-59, glyph grows with it, dark glyph 255 | the hover pill, no growth | one frame: 88 -> 91 px on the visible side (+1.5 pt per side), light 255, dark #3A3A3A, glyph scaled, dark glyph white |
+| Held, pointer dragged off | dark: a bright disc (73,83,144) against rest (50,57,90), fading to (62,70,115) in 0.4 s, still 74 px. The summary read this as the release | - | not drawn |
+| Release | only the clips' last 3-4 frames: 78 -> 76 -> 74 px (1/3, 1/2, 2/3 of the way), end not recorded | at once | 150 ms ease-out: .30 .53 .70 .83 |
+
+Code: `finder/qml/ToolButton.qml` `pressLook` / `held`, `Toolbar.qml` (the Search capsule's scale), `Theme.qml`
+`searchPress*`. `ui/HyprK/ToolbarHighlight.qml` not changed: the Mac's Search press shows no bouncy lift (the full size is
+there in the press frame) and no pointer glow while the pointer is inside. Ours measured in light only.
+
+### Icon & widget style tiles (R11.6)
+
+See reference/ASSETS.md and SETTINGS-UI-AUDIT.md. With Default selected the Clear
+and Tinted tiles are the light ones in dark mode too (`Appearance.qml` darkTile). The stills are Display P3; read as
+sRGB: default 11.7 (Apple's bitmap), dark 5.6, clear 10.6 / 11.3, tinted blue dark 4.7, tinted blue light 17.4 -> 12.1.
+
+### Mission Control Spaces bar (R11.7)
+
+Stills: bar rows 0..147 at 1710x1107 = **74 pt**, rows 0..135 at 1440x932 = **68 pt**, expanded edge after row 319 =
+160 pt (1440x932). Ours: 74 pt (mcap: edge after row 147), the default mode's value, unchanged. R10.1's clip was taken
+at 1440x932, its last still frame has the edge at 68.0 pt, so its track is a share of 68: .78 .62 .47 .35 .24 .16 .10
+.06 .03 0 (was / 69: .77 .61 .46 .35 .23 .16 .10 .06 .03 0); `MissionControl.qml` `barExit` now divides by 68. The
+"Left" note above (69 against 74) is closed: 68 and 74 are the two display modes. Not applied: the expanded bar
+(Mac inset + 132 = 166, the Space's frame from inset + 10; ours about 142 from y 16), because our windows do not make
+room and how the Mac's do was not captured.
+
+
+# Round K2 (2026-11-15): the sliders' end glyphs bounce by layer
+
+Re-measured per frame, sub-pixel (INTERACTIVE-GLASS-REA.md 8: R7.4 Control Center clips, the 23.09.23 recording for
+Settings > Appearance). The Mac: nothing moves on the glyphs while the knob is dragged; a drag onto an end bounces that
+end's glyph once, by layer about the symbol's ink centre, 1.25 / 0.90 (speaker.fill, one layer: 1.27 / 0.89), peak
++0.217 s, trough +0.433 s, each layer 0.05 s after the one before (sun: disc, rays; speaker: speaker, waves from the
+inside out; capsule.on.rectangle: capsule, rectangle). A slam and a slow drag are the same. Appearance's two glyphs
+bounce too (frames 2228-2262 and 2488-2527): "static" in Round K1 / section 6.3 was wrong.
+
+| | Mac | ours before | ours after |
+|---|---|---|---|
+| CC Sound, speaker.wave.3.fill | by layer, outer wave 1.26 / 0.92, 0.11-0.16 s after the speaker | one piece 1.21 / 0.87 | by layer, 1.25 / 0.90, 0.05 s per layer |
+| CC Sound, speaker.fill | 1.27 / 0.89 | 1.27 / 0.89 (27 -> 34 -> 24 px) | unchanged |
+| CC Display, sun.max.fill | disc 1.24 / 0.907, rays 1.26 / 0.89 +0.05 s | one piece 1.23 / 0.86; no motion at all without a backlight (slider disabled) | disc 1.253 / 0.907, rays 1.264 / 0.893 +0.05 s (backlight stub) |
+| CC Display, sun.min.fill | disc 1.247 / 0.91, rays 1.25 / 0.89 +0.05 s | as above | by layer (ink height 30 -> 38 -> 28 px) |
+| Appearance, both capsule glyphs | capsule 1.23-1.26 / 0.90, rectangle the same 0.05 s later | none | capsule then rectangle, 1.23-1.25 / 0.85-0.88 read at 1 px = 0.07 |
+
+The "Left" of Round R11.4 (the Control Center glyphs bounce as one piece; the sun not measured) is closed for the Control
+Center. The HUD's sun still bounces as one piece (now 1.25 / 0.90): no HUD brightness clip holds an arrival at an end.
+
+# Round J24 (2026-11-15): the picked window's key look, Finder (judge #24 "MC pick in Finder +4 frames")
+
+`scripts/motion-capture/mc-pick.py` (headless, scale 2, dark; Finder 936 x 594 and System Settings 740 x 625; a vptr
+click on the thumbnail after the pointer has rested on it 0.5 s; mcap of 1280 x 620 pt; the red close lights, each with
+its yellow neighbour, given to the window whose flight path they lie on). Frames are counted from the first changed frame.
+
+| What | Value | Mark |
+|---|---|---|
+| Mac, re-read (`mc-exit-4-windows.mov`, frames by pts) | 2.983 s: the hover ring gone (11,862 px changed at half size, rows 68..874), Window 4's light where it was, the top 68 rows unchanged; 3.000 s: the flight's first step (.07); 3.017 s: Window 4 grey and Window 1 coloured, flight .20. So the key look comes 2 frames after the first changed frame and in the flight's **second** frame | measured |
+| Ours before | Finder picked: +4 +4 +5 (R6.1's gap), by click phase: first exit frame 6 ms after the click -> +4, 18-20 ms after -> +1..+3. Settings picked: +2 +2 +3. Motion in the first changed frame | measured |
+| Cause | not a capture waiting for damage: `CToplevelExportFrame::shareFrame` copies at the next monitor frame with or without `ignore_damage` (Hyprland 0.57.2 ToplevelExport.cpp), so R6.1's "copy without ignore_damage waits" does not hold. Finder commits the look 5-11 ms after `hyprk-pick` (WAYLAND_DEBUG against the click's time; a second commit one frame callback later only recolours the sidebar icons), the copy lands at the compositor's next frame, the layer draws it one frame later. A click early in a refresh misses the first compositor frame: 4 frames. Four extra captures, one per swap, changed nothing (each takes a frame to come back and a frame to draw) | measured + read |
+| Fix 1 | the look ahead of the click: `hyprk-pick` is sent when the pointer comes to rest on a thumbnail of an app that draws its own title bar (the window is under the cover; `hyprk-pick,0x0` takes it back when the pointer leaves or Mission Control closes without a pick), and 100 ms later a second capture context takes a still of the window in that look (`keyStill`). The live view starts only when that still shows | changed |
+| Fix 2 | when it shows: `pickLook` is the flight past .13 of its way (between the (1.0, 0.25) spring's first two steps, .067 and .205), not a count of swaps. Counted in swaps the look came one frame early in a third of the runs (a swap of a frame begun before the click; two `afterAnimating` in the frame the layer gives up the keyboard) | changed |
+| Fix 3 | a thumbnail click hides the ring and the title at once and starts the exit (windows and Spaces bar) one frame later, as the Mac's 2.983 s frame (`picking`, `pick()`, `leaveForPick()`; a 50 ms timer in case no frame is drawn) | changed |
+| Ours after | Finder picked, Settings key: **+2 in 10 of 10** (33 ms). Settings picked, Finder key: **+2 in 10 of 10**. The old key window greys at +1 (Finder picked) or +1..+2 (Settings picked); Mac +2. First frame 10,899-13,176 px changed (the ring), the next 104,000-108,000 (the flight) | measured |
+| Esc exit | unchanged: `mc-exit.py` bar rms .007, titles .002 | measured |
+
+Left: a click sooner than 100 ms after the pointer reaches the thumbnail has no still and falls back to the live view
+(the old 4-5 frames; not measured again). The still is as old as the hover (a window that changes under a resting
+pointer shows the hover's picture until the live view's first frame, 2-3 frames into the flight). A press held on the
+thumbnail: the Mac's ring may go at the press, not captured (OPEN-FIXES M2). The Spaces bar's expanded height (166):
+not changed, OPEN-FIXES 29 / M1.
+
+## Round 17: Cmd-Tab and the window sheet (MAC-ANSWERS-17.md R17.2 / R17.4, measured from the clips and stills; 2026-11-15)
+
+### Cmd-Tab (`live/r17/cmdtab-*.mov`, `cmdtab-{7..10}apps-*.png`)
+
+| | Mac (measured here) | ours before | ours now (`scripts/motion-capture/cmd-tab.py`) |
+|---|---|---|---|
+| appear | complete in one frame, 180 ms after Tab (step clip: Tab 1.137 s, panel 1.317 s) | one frame, **245 ms** (190 ms timer started after the window's load, then 4 frames) | one frame, **180-195 ms** (`Theme.switcher.showDelay` 180 from the key, `Panels.switcherAt`, less `showLag` 60) |
+| step | plate and name on the next icon in one frame | one frame | one frame |
+| Escape | gone in one frame (nothing at 3.600 s, Escape at 3.599 s; no frame in between) | **faded over 0.25 s** like a release | one frame (`Switcher.cancelled`) |
+| release | share left per frame 97.8 92.7 86.3 78.4 68.0 56.9 45.4 33.8 23.8 14.7 8.5 3.4 1.0 0 (dark; light the same): ease-in-out over **0.246 / 0.242 s**, rms 0.3 / 0.5 % | ease-in-out 0.25 s | unchanged: fit 0.244-0.254 s, rms against the Mac's frames 0.5-1.8 % |
+| quick tap | no changed frame | no panel | no panel (commit 60 ms after the key: 0 levels) |
+
+The section's "fades out over about 200 ms, ease-in" is the visible part of the same curve: an ease-in fit of its 14
+frames has rms 2.5-3.0 %, the ease-in-out over 0.246 s 0.3 %. Nothing changed there (decode: `-[ASAppSwitcher
+exit:immediately:]`, default CATransaction 0.25 s).
+
+Geometry, the same reading of `cmdtab-7apps-*.png` and of ours (px at 2x, ours / Mac): panel 980 x 176 pt at the screen
+centre (the stills: 980, 1114, 1248 pt for 7, 8, 9 apps = 134 N + 42, and 1372 for 10 = the screen less 34 pt each
+side, icons shrunk; so 444 for 3 and 846 for 6; the section's "133.5 N + 42, height 175, radius about 40, plate 119
+r 28" are the same shapes read to +-1 pt), panel top / left edge 0 / 0, corner on the diagonal 33 / 33, plate left and
+top 8 / 8 (120 pt on the 128 pt cell), plate corner 28 / 27, plate fill against the panel -57 / -57 light, +63 / +64
+dark. **None of that changed.** The name did: SF 13 **semibold** (stems 3.6 px, the Mac's 3.7; bold was 1.04 x as wide), its ink
+2.5 pt below the 128 pt cell (rows 310..328 px below the panel's top, the Mac's 309..328; it sat 5 px low), dark
+white .95 (247, the Mac's 246; labelColor's .85 read 233), no shadow in either (the rows under the Mac's text are the
+panel's). Left: the dark name's stems read 4.1 px against 3.7 (light text on dark, Qt's coverage).
+
+### Window sheet (`live/r17/alert-{,dismiss-}{light,dark}.mov`)
+
+The veil's level at a white point of the document, per frame (video levels, 255 -> 196): in, last unchanged frame
+1.200 s, then 243 at 1.350 s and 3.6 levels a frame to 197 at 1.550 s: linear at 230 levels / s, **0.26 s for the
+whole 59**; its first 50 ms are not on screen (the first drawn frame is at 20 %), which is the section's "about 220 ms".
+Out: 196 at 1.083 s, 202 at 1.100 s, 251 at 1.317 s, 255 at 1.367 s: linear at 226 levels / s, **0.26 s**. Ours:
+`Tokens.panel.sheetIn` 270, `sheetOut` 250, linear (LIVE-27.2.1.md had 0.27 / 0.25): within one frame, not changed. The
+card is there from the first frame and fades with the veil; no scale. What the veil is: GLASS-HIG section 23.
+
+
+# Round R18.1 (2026-11-15): Mission Control's Spaces bar expanding (MAC-ANSWERS-18.md)
+
+`live/r18/mc-spaces-bar-expand-dark.mov` (60 fps, variable frame rate, 1440x932 mode, one Desktop, three windows) and
+the two stills, measured again here (the bar's bottom edge at x = 110 pt; the top edge of the top-left window on the
+same columns; the Space's ring, its name and the "+" on every frame).
+
+| | Mac | ours before | ours after (`scripts/motion-capture/mc-bar.py`, 3 runs) |
+|---|---|---|---|
+| bar height | 68 -> 160 pt (+92; inset + 40 -> inset + 132) | 74, no change of the band (the content cross-faded in 250 ms, about 142 pt) | 74 -> 166 (+92) |
+| curve | critically damped spring, response 0.3775 fitted free (ratio 1.02); the decoded (1.0, **0.38**) of `SingleSpaceTransitionModifier` fits at rms 0.22 pt | OutCubic 250 ms | (1.0, 0.38), rms 0.31 pt against the Mac's frames |
+| start | spring from 2.101 s, pointer in at 2.03 s (71 ms); first moved frame 2.117 s (about 85 ms) | at once | first moved frame 81-82 ms after the pointer enters |
+| after the pointer leaves | stays expanded until Mission Control closes | collapsed again | stays (edge the same 1.5 s later) |
+| windows | the layout again under the taller bar: top row +92 pt at its size, 39.5 pt under the edge in every frame; the lower window stays (top 393.5 -> 393, bottom the same) | did not move | top row +92.0, 39.5 pt under the edge in every frame |
+
+The file's table has the bar at 86.5 and 95.5 in the frames at 2.133 and 2.150 s and no frame at 2.167: the bar's edge
+is one frame ahead of the windows in those two frames and repeats in the third (86.5 95.5 95.5 against the windows'
+77.5 86 95.5). The window track is the clean one: 70.5 77.5 86 95.5 104.5 113 120.5 127.5 133 138 142 145.5 148 150.5
+152.5 154 155 156 157 157.5 158 158.5 158.5 159 ... 160. Against the bar's own readings the same spring is rms 2.6 pt
+(1.8 fitted free at response 0.41), all of it in those two frames.
+
+The windows: `lib/expose.js` with the bar 92 pt taller (`usableArea` y = bar + 40: 108 -> 200) reproduces the two
+stills from the windows' rest frames: the top row +92.3 at the same size and x, the lower window within 0.6 pt
+(`shell/tests/run.mjs`). Each thumbnail goes from its frame in the one layout to its frame in the other by the bar's
+growth (one behaviour for all, as the mode transitions).
+
+In the bar (stills at 2x): the Space is the screen at 92 pt of height (141 x 92) inside a 3 pt ring in the accent
+colour ((86,151,245) dark; outer 147 x 98, radius about 7.5) from y 38 = inset + 10, with the Desktop's windows in it;
+its name 11 pt, centred on y 145.25; "+" centred on y 91.5 (34 at rest). Ring and name ride down 95.5 pt with the bar
+(the ring's bottom 58.5 68.5 78.5 86.5 94.5 102.5 against the edge 86 95.5 104.5 113 120.5 127.5) and fade in with
+the growth (ring blue 53 66 85 99 127 ... 165 of 165); the pill's fill is gone in the first frame after the pointer
+enters, its 13 pt name rides down too and is gone by .8 of the way. On the way out the expanded bar slides up whole
+(160 -> 132 -> 101 -> 57 in the clip's last frames).
+
+Built: `shell/modules/MissionControl.qml` (`m.barExpand` 92, `m.barGrow`, `m.growDelay` 72 ms + one frame,
+`framesExpanded`, the Space with small copies of the window thumbnails), `shell/lib/expose.js` `between()`. Ours keeps
+the default mode's inset (74 -> 166; everything in the bar 6 pt lower than the 1440x932 stills). Removed with it: the
+Space's 1.03 hover scale (not on the Mac's frames) and the 3 pt white border. Not captured: more than one Desktop
+(spacing 18 pt kept from before, a guess), light mode, a full-screen Space; the light ring colour.
+

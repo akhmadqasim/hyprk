@@ -8,8 +8,8 @@ import "../../lib/spotlight.js" as SL
 
 // Spotlight list modes in their 520 x 490 glass panel (macOS 27.2.1, MAC-ANSWERS.md Q-panels-25): Files (recents,
 // then search), Actions (with quick keys), Clipboard (history, only after the user turned it on). A header at
-// x 20 (Actions "Suggestions", Files "Recents"), a 1 pt separator at y 43.5, rows of 62 from y 44.5. The Mac's
-// Files view is the 844 grid of the Apps panel; here it stays a list. Applications is AppsPanel.qml.
+// x 20 (Actions "Suggestions"), a 1 pt separator at y 43.5, rows of 62 from y 44.5. Files is the 844 grid of
+// FilesPanel.qml since judge #25 (the files branch here is no longer reached); Applications is AppsPanel.qml.
 // The host (Spotlight.qml) forwards keys: move(dy), accept(). It also feeds FileSearch.query.
 Item {
     id: view
@@ -91,16 +91,21 @@ Item {
         color: Theme.color.accent
         MouseArea { anchors.fill: parent; anchors.margins: -4; onClicked: Clipboard.clear() }
     }
+    // 1 pt, exact at a fractional scale: the item is one device pixel larger on every side there (`pad`,
+    // shaders/plusfill.frag) so the antialiasing ramp of an edge inside a pixel is drawn; 0 at 1x / 2x (as the Dock
+    // separator, SCALING-AUDIT.md R3.3)
     ShaderEffect {
         visible: view.heading !== ""
-        x: Theme.spotlight.headerX
-        y: Theme.spotlight.headerSepY - 0.5
-        width: parent.width - 2 * Theme.spotlight.headerX
-        height: 1
+        readonly property real lineW: parent.width - 2 * Theme.spotlight.headerX
+        property real dpr: (QsWindow.window ? QsWindow.window.devicePixelRatio : Screen.devicePixelRatio)
+        property real pad: Pixel.soft(dpr) ? 1 / dpr : 0
+        x: Theme.spotlight.headerX - pad
+        y: Theme.spotlight.headerSepY - 0.5 - pad
+        width: lineW + 2 * pad
+        height: Pixel.stroke(1, dpr) + 2 * pad
         property vector4d fill: Qt.vector4d(Theme.spotlight.separatorLift, Theme.spotlight.separatorLift, Theme.spotlight.separatorLift, 0)
-        property size sizePt: Qt.size(width, height)
+        property size sizePt: Qt.size(lineW, Pixel.stroke(1, dpr))
         property real radius: 0
-        property real dpr: Screen.devicePixelRatio
         fragmentShader: Qt.resolvedUrl("../../shaders/plusfill.frag.qsb")
     }
 
