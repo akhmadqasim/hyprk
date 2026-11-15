@@ -1,0 +1,260 @@
+{"depth": 0, "frame": [350, 150, 740, 625], "identifier": "Main", "path": "0", "role": "AXWindow", "subrole": "AXStandardWindow", "title": "Location Services"}
+{"depth": 1, "frame": [350, 150, 740, 625], "path": "0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 2, "frame": [350, 150, 740, 625], "identifier": "Main, SidebarNavigationSplitView", "path": "0/0/0", "role": "AXSplitGroup"}
+{"depth": 3, "frame": [350, 150, 232, 625], "path": "0/0/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"contentSize": [232, 1234], "depth": 4, "frame": [350, 248, 232, 527], "path": "0/0/0/0/0", "role": "AXScrollArea"}
+{"depth": 5, "description": "Sidebar", "enabled": true, "frame": [350, 248, 232, 527], "identifier": "com.apple.settings.sidebar.collectionView", "path": "0/0/0/0/0/0", "role": "AXOutline"}
+{"depth": 6, "frame": [350, 248, 232, 0], "path": "0/0/0/0/0/0/0", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 248, 212, 0], "path": "0/0/0/0/0/0/0/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 248, 216, 0], "path": "0/0/0/0/0/0/0/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 248, 232, 46], "path": "0/0/0/0/0/0/1", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 248, 212, 46], "path": "0/0/0/0/0/0/1/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [366, 252, 141.5, 38], "identifier": "[redacted]", "path": "0/0/0/0/0/0/1/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 294, 232, 32], "path": "0/0/0/0/0/0/2", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 294, 212, 32], "path": "0/0/0/0/0/0/2/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [367, 299.5, 80, 21], "identifier": "[redacted]", "path": "0/0/0/0/0/0/2/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 339, 232, 0], "path": "0/0/0/0/0/0/3", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 339, 212, 0], "path": "0/0/0/0/0/0/3/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 339, 216, 0], "path": "0/0/0/0/0/0/3/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 339, 232, 32], "path": "0/0/0/0/0/0/4", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 339, 212, 32], "path": "0/0/0/0/0/0/4/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Wi-Fi", "enabled": true, "frame": [367, 343, 61.5, 24], "identifier": "com.apple.settings.wifi", "path": "0/0/0/0/0/0/4/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 371, 232, 32], "path": "0/0/0/0/0/0/5", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 371, 212, 32], "path": "0/0/0/0/0/0/5/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Bluetooth", "enabled": true, "frame": [367, 375, 88, 24], "identifier": "com.apple.settings.bluetooth", "path": "0/0/0/0/0/0/5/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 403, 232, 32], "path": "0/0/0/0/0/0/6", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 403, 212, 32], "path": "0/0/0/0/0/0/6/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Network", "enabled": true, "frame": [367, 407, 80, 24], "identifier": "com.apple.settings.network", "path": "0/0/0/0/0/0/6/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 435, 232, 32], "path": "0/0/0/0/0/0/7", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 435, 212, 32], "path": "0/0/0/0/0/0/7/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "VPN", "enabled": true, "frame": [367, 439, 55.5, 24], "identifier": "com.apple.settings.vpn", "path": "0/0/0/0/0/0/7/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 467, 232, 32], "path": "0/0/0/0/0/0/8", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 467, 212, 32], "path": "0/0/0/0/0/0/8/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Battery", "enabled": true, "frame": [367, 471, 73.5, 24], "identifier": "com.apple.settings.battery", "path": "0/0/0/0/0/0/8/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 512, 232, 0], "path": "0/0/0/0/0/0/9", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 512, 212, 0], "path": "0/0/0/0/0/0/9/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 512, 216, 0], "path": "0/0/0/0/0/0/9/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 512, 232, 32], "path": "0/0/0/0/0/0/10", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 512, 212, 32], "path": "0/0/0/0/0/0/10/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "General", "enabled": true, "frame": [367, 516, 76.5, 24], "identifier": "com.apple.settings.general", "path": "0/0/0/0/0/0/10/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 544, 232, 32], "path": "0/0/0/0/0/0/11", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 544, 212, 32], "path": "0/0/0/0/0/0/11/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Accessibility", "enabled": true, "frame": [367, 548, 105, 24], "identifier": "com.apple.settings.accessibility", "path": "0/0/0/0/0/0/11/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 576, 232, 32], "path": "0/0/0/0/0/0/12", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 576, 212, 32], "path": "0/0/0/0/0/0/12/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Appearance", "enabled": true, "frame": [367, 580, 102, 24], "identifier": "com.apple.settings.appearance", "path": "0/0/0/0/0/0/12/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 608, 232, 32], "path": "0/0/0/0/0/0/13", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 608, 212, 32], "path": "0/0/0/0/0/0/13/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Desktop & Dock", "enabled": true, "frame": [367, 612, 127, 24], "identifier": "com.apple.settings.desktopAndDock", "path": "0/0/0/0/0/0/13/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 640, 232, 32], "path": "0/0/0/0/0/0/14", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 640, 212, 32], "path": "0/0/0/0/0/0/14/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Displays", "enabled": true, "frame": [367, 644, 80, 24], "identifier": "com.apple.settings.displayAndBrightness", "path": "0/0/0/0/0/0/14/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 672, 232, 32], "path": "0/0/0/0/0/0/15", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 672, 212, 32], "path": "0/0/0/0/0/0/15/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Menu Bar", "enabled": true, "frame": [367, 676, 87, 24], "identifier": "com.apple.settings.controlCenter", "path": "0/0/0/0/0/0/15/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 704, 232, 32], "path": "0/0/0/0/0/0/16", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 704, 212, 32], "path": "0/0/0/0/0/0/16/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Siri", "enabled": true, "frame": [367, 708, 48.5, 24], "identifier": "com.apple.settings.siri", "path": "0/0/0/0/0/0/16/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 736, 232, 32], "path": "0/0/0/0/0/0/17", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 736, 212, 32], "path": "0/0/0/0/0/0/17/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Spotlight", "enabled": true, "frame": [367, 740, 84, 24], "identifier": "com.apple.settings.search", "path": "0/0/0/0/0/0/17/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 768, 232, 32], "path": "0/0/0/0/0/0/18", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 768, 212, 32], "path": "0/0/0/0/0/0/18/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Wallpaper", "enabled": true, "frame": [367, 772, 89.5, 24], "identifier": "com.apple.settings.wallpaper", "path": "0/0/0/0/0/0/18/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 813, 232, 19], "path": "0/0/0/0/0/0/19", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 813, 212, 0], "path": "0/0/0/0/0/0/19/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 813, 216, 0], "path": "0/0/0/0/0/0/19/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 813, 232, 32], "path": "0/0/0/0/0/0/20", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 832, 212, 32], "path": "0/0/0/0/0/0/20/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/20/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 864, 232, 32], "path": "0/0/0/0/0/0/21", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 864, 212, 32], "path": "0/0/0/0/0/0/21/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/21/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 896, 232, 32], "path": "0/0/0/0/0/0/22", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 896, 212, 32], "path": "0/0/0/0/0/0/22/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/22/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 928, 232, 32], "path": "0/0/0/0/0/0/23", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 928, 212, 32], "path": "0/0/0/0/0/0/23/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/23/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 973, 232, 19], "path": "0/0/0/0/0/0/24", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 973, 212, 19], "path": "0/0/0/0/0/0/24/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 973, 216, 19], "path": "0/0/0/0/0/0/24/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 992, 232, 32], "path": "0/0/0/0/0/0/25", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 992, 212, 32], "path": "0/0/0/0/0/0/25/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/25/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1024, 232, 32], "path": "0/0/0/0/0/0/26", "role": "AXRow", "selected": true, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1024, 212, 32], "path": "0/0/0/0/0/0/26/0", "role": "AXCell", "selected": true}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/26/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1056, 232, 32], "path": "0/0/0/0/0/0/27", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1056, 212, 32], "path": "0/0/0/0/0/0/27/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/27/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1088, 232, 32], "path": "0/0/0/0/0/0/28", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1088, 212, 32], "path": "0/0/0/0/0/0/28/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/28/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1133, 232, 19], "path": "0/0/0/0/0/0/29", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1133, 212, 19], "path": "0/0/0/0/0/0/29/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 1133, 216, 0], "path": "0/0/0/0/0/0/29/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 1133, 232, 32], "path": "0/0/0/0/0/0/30", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1133, 212, 32], "path": "0/0/0/0/0/0/30/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/30/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1165, 232, 32], "path": "0/0/0/0/0/0/31", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1165, 212, 32], "path": "0/0/0/0/0/0/31/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/31/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1197, 232, 32], "path": "0/0/0/0/0/0/32", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1197, 212, 32], "path": "0/0/0/0/0/0/32/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/32/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1229, 232, 32], "path": "0/0/0/0/0/0/33", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1248, 212, 32], "path": "0/0/0/0/0/0/33/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/33/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1293, 232, 19], "path": "0/0/0/0/0/0/34", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1293, 212, 19], "path": "0/0/0/0/0/0/34/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 1293, 216, 19], "path": "0/0/0/0/0/0/34/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 1312, 232, 32], "path": "0/0/0/0/0/0/35", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1312, 212, 32], "path": "0/0/0/0/0/0/35/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/35/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1344, 232, 32], "path": "0/0/0/0/0/0/36", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1344, 212, 32], "path": "0/0/0/0/0/0/36/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/36/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1376, 232, 32], "path": "0/0/0/0/0/0/37", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1376, 212, 32], "path": "0/0/0/0/0/0/37/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/37/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1421, 232, 19], "path": "0/0/0/0/0/0/38", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1421, 212, 19], "path": "0/0/0/0/0/0/38/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 1421, 216, 19], "path": "0/0/0/0/0/0/38/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 1440, 232, 32], "path": "0/0/0/0/0/0/39", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1440, 212, 32], "path": "0/0/0/0/0/0/39/0", "role": "AXCell", "selected": false}
+{"depth": 8, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "org.gpgtools.gpgpreferences", "path": "0/0/0/0/0/0/39/0/0", "role": "AXButton"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/0/0/0/0/0/39/0/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 6, "frame": [360, 248, 212, 1234], "identifier": "ListColumn", "path": "0/0/0/0/0/0/40", "role": "AXColumn", "selected": false}
+{"depth": 5, "enabled": true, "frame": [564, 247, 19, 529], "path": "0/0/0/0/0/1", "role": "AXScrollBar", "value": 0}
+{"depth": 6, "frame": [573, 251, 6, 244], "path": "0/0/0/0/0/1/0", "role": "AXValueIndicator", "value": 0}
+{"depth": 6, "frame": [565, 248, 0, 0], "path": "0/0/0/0/0/1/1", "role": "AXButton", "subrole": "AXIncrementArrow"}
+{"depth": 6, "frame": [565, 248, 0, 0], "path": "0/0/0/0/0/1/2", "role": "AXButton", "subrole": "AXDecrementArrow"}
+{"depth": 6, "frame": [573, 495.5, 6, 276.5], "path": "0/0/0/0/0/1/3", "role": "AXButton", "subrole": "AXIncrementPage"}
+{"depth": 6, "frame": [573, 251, 6, 0], "path": "0/0/0/0/0/1/4", "role": "AXButton", "subrole": "AXDecrementPage"}
+{"depth": 3, "frame": [360, 211, 212, 28], "path": "0/0/0/1", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 4, "enabled": true, "frame": [360, 211, 212, 28], "path": "0/0/0/1/0", "placeholder": "Search", "role": "AXTextField", "subrole": "AXSearchField", "value": ""}
+{"depth": 5, "description": "Search", "enabled": true, "frame": [363, 211.5, 25, 28], "path": "0/0/0/1/0/0", "role": "AXButton", "title": ""}
+{"contentSize": [0, 0], "depth": 3, "enabled": false, "frame": [581.5, 202, 0.5, 573], "path": "0/0/0/2", "role": "AXSplitter", "selected": false, "value": 231.5}
+{"depth": 3, "frame": [350, 150, 740, 625], "path": "0/0/0/3", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 4, "frame": [350, 150, 740, 625], "path": "0/0/0/3/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"contentSize": [740, 1227], "depth": 5, "frame": [582, 202, 508, 573], "path": "0/0/0/3/0/0", "role": "AXScrollArea"}
+{"depth": 6, "enabled": true, "frame": [602, 214, 468, 1195], "path": "0/0/0/3/0/0/0", "role": "AXGroup"}
+{"depth": 7, "enabled": true, "frame": [612, 223.88427734375, 107.5, 16], "path": "0/0/0/3/0/0/0/0", "role": "AXStaticText", "value": "Location Services"}
+{"depth": 7, "enabled": true, "frame": [612, 241.88427734375, 363, 14], "path": "0/0/0/3/0/0/0/1", "role": "AXStaticText", "value": "Allow the applications and services below to determine your location."}
+{"depth": 7, "enabled": true, "frame": [1016, 223, 44, 20], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/2", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 7, "enabled": true, "frame": [610, 276, 86.5, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/3", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 282, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/4", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 7, "enabled": true, "frame": [610, 319, 96.5, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/5", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 325, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/6", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 7, "enabled": true, "frame": [610, 362, 79, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/7", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 368, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/8", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 7, "enabled": true, "frame": [610, 405, 129.5, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/9", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 411, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/10", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 7, "enabled": true, "frame": [610, 448, 254, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/11", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 454, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/12", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 7, "enabled": true, "frame": [610, 491, 69, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/13", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 497, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/14", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 7, "enabled": true, "frame": [610, 534, 80, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/15", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 540, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/16", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 7, "enabled": true, "frame": [610, 577, 195, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/17", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 583, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/18", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 7, "enabled": true, "frame": [610, 620, 68, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/19", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 626, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/20", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 7, "enabled": true, "frame": [610, 663, 65, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/21", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 669, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/22", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 7, "enabled": true, "frame": [610, 706, 212.5, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/23", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 712, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/24", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 7, "enabled": true, "frame": [610, 749, 152, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/25", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 755, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/26", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 7, "enabled": true, "frame": [610, 792, 74.5, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/27", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 798, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/28", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 7, "enabled": true, "frame": [610, 835, 96.5, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/29", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 841, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/30", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 7, "enabled": true, "frame": [610, 878, 67, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/31", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 884, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/32", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 7, "enabled": true, "frame": [610, 921, 91, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/33", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 927, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/34", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 7, "enabled": true, "frame": [610, 964, 51.5, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/35", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "description": "Location Services", "enabled": true, "frame": [670.5, 969.5, 13, 13], "identifier": "Siri_Recent", "path": "0/0/0/3/0/0/0/36", "role": "AXImage"}
+{"depth": 7, "enabled": true, "frame": [1024, 970, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/37", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 7, "enabled": true, "frame": [610, 1007, 75.5, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/38", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 1013, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/39", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 7, "enabled": true, "frame": [610, 1050, 63.5, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/40", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 1056, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/41", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 7, "enabled": true, "frame": [610, 1093, 73.5, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/42", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 1099, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/43", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 7, "enabled": true, "frame": [610, 1136, 49, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/44", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 1142, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/45", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 7, "enabled": true, "frame": [610, 1179, 113.5, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/46", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 1185, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/47", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 7, "enabled": true, "frame": [610, 1222, 83, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/48", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 1228, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/49", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 7, "enabled": true, "frame": [610, 1265, 95, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/50", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [1024, 1271, 36, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/51", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 7, "enabled": true, "frame": [610, 1309, 24, 24], "path": "0/0/0/3/0/0/0/52", "role": "AXImage"}
+{"depth": 7, "enabled": true, "frame": [640, 1312.88427734375, 100.5, 16], "path": "0/0/0/3/0/0/0/53", "role": "AXStaticText", "value": "System Services"}
+{"depth": 7, "description": "Location Services", "enabled": true, "frame": [749.5, 1314.5, 13, 13], "identifier": "location.fill", "path": "0/0/0/3/0/0/0/54", "role": "AXImage"}
+{"depth": 7, "description": "Details…", "enabled": true, "frame": [984, 1309, 76, 24], "path": "0/0/0/3/0/0/0/55", "role": "AXButton"}
+{"depth": 7, "description": "Location Services", "enabled": true, "frame": [613, 1355, 13, 13], "identifier": "location.fill", "path": "0/0/0/3/0/0/0/56", "role": "AXImage"}
+{"depth": 7, "enabled": true, "frame": [635.5, 1354.88427734375, 367.5, 13], "path": "0/0/0/3/0/0/0/57", "role": "AXStaticText", "value": "Indicates an application that has used your location within the last 24 hours."}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [818.5, 1375, 241.5, 24], "path": "0/0/0/3/0/0/0/58", "role": "AXButton"}
+{"depth": 6, "enabled": true, "frame": [1072, 201, 19, 567.5], "path": "0/0/0/3/0/0/1", "role": "AXScrollBar", "value": 0}
+{"depth": 7, "frame": [1081, 205, 6, 273], "path": "0/0/0/3/0/0/1/0", "role": "AXValueIndicator", "value": 0}
+{"depth": 7, "frame": [1073, 202, 0, 0], "path": "0/0/0/3/0/0/1/1", "role": "AXButton", "subrole": "AXIncrementArrow"}
+{"depth": 7, "frame": [1073, 202, 0, 0], "path": "0/0/0/3/0/0/1/2", "role": "AXButton", "subrole": "AXDecrementArrow"}
+{"depth": 7, "frame": [1081, 478.5, 6, 286], "path": "0/0/0/3/0/0/1/3", "role": "AXButton", "subrole": "AXIncrementPage"}
+{"depth": 7, "frame": [1081, 205, 6, 0], "path": "0/0/0/3/0/0/1/4", "role": "AXButton", "subrole": "AXDecrementPage"}
+{"depth": 1, "frame": [350, 150, 740, 52], "path": "0/1", "role": "AXToolbar"}
+{"depth": 2, "frame": [586, 150, 81, 52], "path": "0/1/0", "role": "AXGroup"}
+{"depth": 3, "enabled": true, "frame": [590, 158, 73, 36], "path": "0/1/0/0", "role": "AXGroup"}
+{"depth": 4, "description": "Go Back", "enabled": true, "frame": [590, 158, 36, 36], "help": "Go Back", "identifier": "chevron.backward", "path": "0/1/0/0/0", "role": "AXButton", "subrole": "AXSegment"}
+{"depth": 4, "description": "Go Forward", "enabled": false, "frame": [626, 158, 37, 36], "help": "Go Forward", "identifier": "chevron.forward", "path": "0/1/0/0/1", "role": "AXMenuButton", "subrole": "AXSegment"}
+{"depth": 1, "enabled": false, "frame": [368, 168, 16, 16], "path": "0/2", "role": "AXButton", "subrole": "AXCloseButton"}
+{"depth": 1, "enabled": true, "frame": [414, 168, 16, 16], "path": "0/3", "role": "AXButton", "subrole": "AXZoomButton"}
+{"depth": 2, "frame": [415, 169, 14, 14], "path": "0/3/0", "role": "AXGroup"}
+{"depth": 3, "frame": [415, 169, 14, 14], "path": "0/3/0/0", "role": "AXGroup"}
+{"depth": 1, "enabled": true, "frame": [391, 168, 16, 16], "path": "0/4", "role": "AXButton", "subrole": "AXMinimizeButton"}
+{"depth": 1, "enabled": true, "frame": [667, 150, 411, 52], "path": "0/5", "role": "AXStaticText", "value": "Location Services"}
+{"depth": 1, "frame": [485, 202, 470, 533], "path": "0/6", "role": "AXSheet"}
+{"depth": 2, "frame": [485, 202, 470, 533], "path": "0/6/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"contentSize": [470, 484], "depth": 3, "frame": [485, 202, 470, 468], "path": "0/6/0/0", "role": "AXScrollArea"}
+{"depth": 4, "description": "[redacted]", "enabled": true, "frame": [515, 222, 295.5, 16], "path": "0/6/0/0/0", "role": "AXHeading"}
+{"depth": 4, "enabled": true, "frame": [505, 248, 430, 356], "path": "0/6/0/0/1", "role": "AXGroup"}
+{"depth": 5, "enabled": true, "frame": [515, 258, 190.5, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 5, "enabled": true, "frame": [889, 260, 36, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/1", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 5, "enabled": true, "frame": [515, 297, 133.5, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/2", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 5, "description": "Location Services", "enabled": true, "frame": [657.5, 298.5, 13, 13], "identifier": "[redacted]_Recent", "path": "0/6/0/0/1/3", "role": "AXImage"}
+{"depth": 5, "enabled": true, "frame": [889, 299, 36, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/4", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 5, "enabled": true, "frame": [515, 336, 106.5, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/5", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 5, "description": "Location Services", "enabled": true, "frame": [630.5, 337.5, 13, 13], "identifier": "[redacted]_Recent", "path": "0/6/0/0/1/6", "role": "AXImage"}
+{"depth": 5, "enabled": true, "frame": [889, 338, 36, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/7", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 5, "enabled": true, "frame": [515, 375, 133.5, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/8", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 5, "description": "Location Services", "enabled": true, "frame": [657.5, 376.5, 13, 13], "identifier": "[redacted]_Recent", "path": "0/6/0/0/1/9", "role": "AXImage"}
+{"depth": 5, "enabled": true, "frame": [889, 377, 36, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/10", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 5, "enabled": true, "frame": [515, 418, 190.5, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/11", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 5, "description": "Location Services", "enabled": true, "frame": [714.5, 419.5, 13, 13], "identifier": "[redacted]_Recent", "path": "0/6/0/0/1/12", "role": "AXImage"}
+{"depth": 5, "enabled": true, "frame": [805, 420, 36, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/13", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 5, "description": "Details…", "enabled": true, "frame": [849, 414, 76, 24], "path": "0/6/0/0/1/14", "role": "AXButton"}
+{"depth": 5, "enabled": true, "frame": [515, 459, 77, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/15", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 5, "description": "Location Services", "enabled": true, "frame": [601, 460.5, 13, 13], "identifier": "[redacted]_Recent", "path": "0/6/0/0/1/16", "role": "AXImage"}
+{"depth": 5, "enabled": true, "frame": [889, 461, 36, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/17", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 5, "enabled": true, "frame": [515, 498, 36, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/18", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 5, "description": "Location Services", "enabled": true, "frame": [560, 499.5, 13, 13], "identifier": "[redacted]_Recent", "path": "0/6/0/0/1/19", "role": "AXImage"}
+{"depth": 5, "enabled": true, "frame": [889, 500, 36, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/20", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 5, "enabled": true, "frame": [515, 537, 148, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/21", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 5, "description": "Location Services", "enabled": true, "frame": [672, 538.5, 13, 13], "identifier": "[redacted]_Recent", "path": "0/6/0/0/1/22", "role": "AXImage"}
+{"depth": 5, "enabled": true, "frame": [889, 539, 36, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/23", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 5, "enabled": true, "frame": [515, 576, 84.5, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/24", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 5, "description": "Location Services", "enabled": true, "frame": [608.5, 577.5, 13, 13], "identifier": "[redacted]_Recent", "path": "0/6/0/0/1/25", "role": "AXImage"}
+{"depth": 5, "enabled": true, "frame": [889, 578, 36, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/26", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 4, "enabled": true, "frame": [505, 614, 430, 52], "path": "0/6/0/0/2", "role": "AXGroup"}
+{"depth": 5, "enabled": true, "frame": [515, 624, 364, 32], "path": "0/6/0/0/2/0", "role": "AXStaticText", "value": "Show location icon in Control Centre when System Services request your location"}
+{"depth": 5, "enabled": true, "frame": [889, 626, 36, 16], "identifier": "[redacted]", "path": "0/6/0/0/2/1", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 4, "enabled": true, "frame": [937, 208.5, 19, 462.5], "path": "0/6/0/0/3", "role": "AXScrollBar", "value": 0}
+{"depth": 5, "frame": [946, 212.5, 6, 439], "path": "0/6/0/0/3/0", "role": "AXValueIndicator", "value": 0}
+{"depth": 5, "frame": [938, 209.5, 0, 0], "path": "0/6/0/0/3/1", "role": "AXButton", "subrole": "AXIncrementArrow"}
+{"depth": 5, "frame": [938, 209.5, 0, 0], "path": "0/6/0/0/3/2", "role": "AXButton", "subrole": "AXDecrementArrow"}
+{"depth": 5, "frame": [946, 652, 6, 15], "path": "0/6/0/0/3/3", "role": "AXButton", "subrole": "AXIncrementPage"}
+{"depth": 5, "frame": [946, 212.5, 6, 0], "path": "0/6/0/0/3/4", "role": "AXButton", "subrole": "AXDecrementPage"}
+{"depth": 3, "description": "Done", "enabled": true, "frame": [871, 691, 64, 24], "path": "0/6/0/1", "role": "AXButton"}

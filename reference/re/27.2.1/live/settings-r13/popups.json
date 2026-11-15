@@ -1,0 +1,4396 @@
+{
+ "network": [
+  {
+   "label": null,
+   "value": null,
+   "identifier": "ellipsis",
+   "role": "AXMenuButton",
+   "button_frame": [
+    974.5,
+    731,
+    61.5,
+    24
+   ],
+   "menu_frame": [
+    969,
+    576,
+    229,
+    152
+   ],
+   "items": [
+    {
+     "title": "Add Service…",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      969,
+      581,
+      229,
+      24
+     ]
+    },
+    {
+     "title": "Add VPN Configuration",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": true,
+     "frame": [
+      969,
+      605,
+      229,
+      24
+     ]
+    },
+    {
+     "title": "L2TP over IPSec…",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      0,
+      932,
+      0,
+      0
+     ]
+    },
+    {
+     "title": "Cisco IPSec…",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      0,
+      932,
+      0,
+      0
+     ]
+    },
+    {
+     "title": "IKEv2…",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      0,
+      932,
+      0,
+      0
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      969,
+      629,
+      229,
+      11
+     ]
+    },
+    {
+     "title": "Manage Virtual Interfaces…",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      969,
+      640,
+      229,
+      24
+     ]
+    },
+    {
+     "title": "Set Service Order…",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      969,
+      664,
+      229,
+      24
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      969,
+      688,
+      229,
+      11
+     ]
+    },
+    {
+     "title": "Locations",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": true,
+     "frame": [
+      969,
+      699,
+      229,
+      24
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      0,
+      932,
+      0,
+      0
+     ]
+    },
+    {
+     "title": "Automatic",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      0,
+      932,
+      0,
+      0
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      0,
+      932,
+      0,
+      0
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      0,
+      932,
+      0,
+      0
+     ]
+    },
+    {
+     "title": "Edit Locations…",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      0,
+      932,
+      0,
+      0
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-network-00-dark.png"
+  }
+ ],
+ "battery": [
+  {
+   "label": "Low Power Mode",
+   "value": "Never",
+   "identifier": "low_power_mode",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    976.5,
+    220.5,
+    83.5,
+    24
+   ],
+   "menu_frame": [
+    964,
+    216,
+    185,
+    106
+   ],
+   "items": [
+    {
+     "title": "Never",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      964,
+      221,
+      185,
+      24
+     ]
+    },
+    {
+     "title": "Always",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      964,
+      245,
+      185,
+      24
+     ]
+    },
+    {
+     "title": "Only on Battery",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      964,
+      269,
+      185,
+      24
+     ]
+    },
+    {
+     "title": "Only on Power Adapter",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      964,
+      293,
+      185,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-battery-00-dark.png"
+  }
+ ],
+ "appearance": [
+  {
+   "label": "Text highlight colour",
+   "value": "Automatic",
+   "identifier": "HighlightColorPicker",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    927,
+    658,
+    133,
+    24
+   ],
+   "menu_frame": [
+    915,
+    653,
+    168,
+    222
+   ],
+   "items": [
+    {
+     "title": "Automatic",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      658,
+      168,
+      24
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      915,
+      682,
+      168,
+      11
+     ]
+    },
+    {
+     "title": "Blue",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      693,
+      168,
+      24
+     ]
+    },
+    {
+     "title": "Purple",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      717,
+      168,
+      24
+     ]
+    },
+    {
+     "title": "Pink",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      741,
+      168,
+      24
+     ]
+    },
+    {
+     "title": "Red",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      765,
+      168,
+      24
+     ]
+    },
+    {
+     "title": "Orange",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      789,
+      168,
+      24
+     ]
+    },
+    {
+     "title": "Yellow",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      813,
+      168,
+      24
+     ]
+    },
+    {
+     "title": "Green",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      837,
+      168,
+      24
+     ]
+    },
+    {
+     "title": "Graphite",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      861,
+      168,
+      24
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      915,
+      885,
+      168,
+      11
+     ]
+    },
+    {
+     "title": "Choose Colour…",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      896,
+      168,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-appearance-00-dark.png"
+  },
+  {
+   "label": "Folder colour",
+   "value": "Automatic",
+   "identifier": null,
+   "role": "AXPopUpButton",
+   "button_frame": [
+    927,
+    530.5,
+    133,
+    24
+   ],
+   "menu_frame": [
+    915,
+    526,
+    146,
+    272
+   ],
+   "items": [
+    {
+     "title": "Automatic",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      531,
+      146,
+      24
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      915,
+      555,
+      146,
+      11
+     ]
+    },
+    {
+     "title": "Red",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      566,
+      146,
+      24
+     ]
+    },
+    {
+     "title": "Orange",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      590,
+      146,
+      24
+     ]
+    },
+    {
+     "title": "Yellow",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      614,
+      146,
+      24
+     ]
+    },
+    {
+     "title": "Green",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      638,
+      146,
+      24
+     ]
+    },
+    {
+     "title": "Blue",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      662,
+      146,
+      24
+     ]
+    },
+    {
+     "title": "Purple",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      686,
+      146,
+      24
+     ]
+    },
+    {
+     "title": "Pink",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      710,
+      146,
+      24
+     ]
+    },
+    {
+     "title": "Graphite",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      734,
+      146,
+      24
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      915,
+      758,
+      146,
+      11
+     ]
+    },
+    {
+     "title": "Choose Colour…",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      915,
+      769,
+      146,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-appearance-01-dark.png"
+  },
+  {
+   "label": "Sidebar icon size",
+   "value": "Medium",
+   "identifier": "SidebarIconSizePicker",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    964,
+    627,
+    96,
+    24
+   ],
+   "menu_frame": [
+    952,
+    598,
+    96,
+    82
+   ],
+   "items": [
+    {
+     "title": "Small",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      952,
+      603,
+      96,
+      24
+     ]
+    },
+    {
+     "title": "Medium",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      952,
+      627,
+      96,
+      24
+     ]
+    },
+    {
+     "title": "Large",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      952,
+      651,
+      96,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-appearance-02-dark.png"
+  }
+ ],
+ "desktopAndDock": [
+  {
+   "label": "Dock position on screen",
+   "value": "Bottom",
+   "identifier": "position",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    968,
+    325,
+    92,
+    24
+   ],
+   "menu_frame": [
+    956,
+    297,
+    92,
+    82
+   ],
+   "items": [
+    {
+     "title": "Left",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      956,
+      302,
+      92,
+      24
+     ]
+    },
+    {
+     "title": "Bottom",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      956,
+      326,
+      92,
+      24
+     ]
+    },
+    {
+     "title": "Right",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      956,
+      350,
+      92,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-desktopAndDock-00-dark.png"
+  },
+  {
+   "label": "Minimised window animation",
+   "value": "Genie Effect",
+   "identifier": "minimize-windows",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    937.5,
+    363.5,
+    122.5,
+    24
+   ],
+   "menu_frame": [
+    925,
+    359,
+    123,
+    58
+   ],
+   "items": [
+    {
+     "title": "Genie Effect",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      925,
+      364,
+      123,
+      24
+     ]
+    },
+    {
+     "title": "Scale Effect",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      925,
+      388,
+      123,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-desktopAndDock-01-dark.png"
+  },
+  {
+   "label": "Window title bar double-click action",
+   "value": "Zoom",
+   "identifier": "double-click",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    977.5,
+    401.5,
+    82.5,
+    24
+   ],
+   "menu_frame": [
+    965,
+    373,
+    106,
+    117
+   ],
+   "items": [
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      965,
+      378,
+      106,
+      24
+     ]
+    },
+    {
+     "title": "Fill",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      965,
+      378,
+      106,
+      24
+     ]
+    },
+    {
+     "title": "Zoom",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      965,
+      402,
+      106,
+      24
+     ]
+    },
+    {
+     "title": "Minimise",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      965,
+      426,
+      106,
+      24
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      965,
+      450,
+      106,
+      11
+     ]
+    },
+    {
+     "title": "No Action",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      965,
+      461,
+      106,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-desktopAndDock-02-dark.png"
+  },
+  {
+   "label": "Click wallpaper to show desktop",
+   "value": "Always",
+   "identifier": "click-wallpaper-to-reveal-desktop",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    970,
+    729,
+    90,
+    24
+   ],
+   "menu_frame": [
+    958,
+    724,
+    184,
+    58
+   ],
+   "items": [
+    {
+     "title": "Always",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      958,
+      729,
+      184,
+      24
+     ]
+    },
+    {
+     "title": "Only in Stage Manager",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      958,
+      753,
+      184,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-desktopAndDock-03-dark.png"
+  },
+  {
+   "label": "Show windows from an application",
+   "value": "All at Once",
+   "identifier": "show-windows-from-application",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    946,
+    629.5,
+    114,
+    24
+   ],
+   "menu_frame": [
+    934,
+    625,
+    131,
+    58
+   ],
+   "items": [
+    {
+     "title": "All at Once",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      934,
+      630,
+      131,
+      24
+     ]
+    },
+    {
+     "title": "One at a Time",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      934,
+      654,
+      131,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-desktopAndDock-04-dark.png"
+  },
+  {
+   "label": "Dim widgets on desktop",
+   "value": "Automatically",
+   "identifier": "widget-style",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    930.5,
+    480,
+    129.5,
+    24
+   ],
+   "menu_frame": [
+    918,
+    476,
+    130,
+    82
+   ],
+   "items": [
+    {
+     "title": "Automatically",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      918,
+      481,
+      130,
+      24
+     ]
+    },
+    {
+     "title": "Always",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      918,
+      505,
+      130,
+      24
+     ]
+    },
+    {
+     "title": "Never",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      918,
+      529,
+      130,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-desktopAndDock-05-dark.png"
+  },
+  {
+   "label": "Default web browser",
+   "value": "Safari",
+   "identifier": "default-web-browser",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    953.5,
+    527.5,
+    106.5,
+    24
+   ],
+   "menu_frame": [
+    941,
+    523,
+    107,
+    34
+   ],
+   "items": [
+    {
+     "title": "Safari",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      528,
+      107,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-desktopAndDock-06-dark.png"
+  },
+  {
+   "label": "Prefer tabs when opening documents",
+   "value": "In Full Screen",
+   "identifier": "prefer-tabs",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    930.5,
+    620.5,
+    129.5,
+    24
+   ],
+   "menu_frame": [
+    918,
+    568,
+    130,
+    82
+   ],
+   "items": [
+    {
+     "title": "Never",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      918,
+      573,
+      130,
+      24
+     ]
+    },
+    {
+     "title": "Always",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      918,
+      597,
+      130,
+      24
+     ]
+    },
+    {
+     "title": "In Full Screen",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      918,
+      621,
+      130,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-desktopAndDock-07-dark.png"
+  }
+ ],
+ "displayAndBrightness": [
+  {
+   "label": null,
+   "value": null,
+   "identifier": "plus",
+   "role": "AXMenuButton",
+   "button_frame": [
+    1009,
+    321,
+    61,
+    24
+   ],
+   "menu_frame": [
+    1004,
+    353,
+    175,
+    82
+   ],
+   "items": [
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      1004,
+      358,
+      175,
+      24
+     ]
+    },
+    {
+     "title": "Mirror or extend to",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      1004,
+      358,
+      175,
+      24
+     ]
+    },
+    {
+     "title": "[redacted]",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      1004,
+      382,
+      175,
+      24
+     ]
+    },
+    {
+     "title": "[redacted]",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      1004,
+      406,
+      175,
+      24
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      1004,
+      353,
+      0,
+      0
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-displayAndBrightness-00-dark.png"
+  },
+  {
+   "label": "Colour profile",
+   "value": "Colour LCD",
+   "identifier": "profileSection",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    943,
+    660,
+    117,
+    24
+   ],
+   "menu_frame": [
+    931,
+    439,
+    383,
+    285
+   ],
+   "items": [
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      931,
+      444,
+      383,
+      24
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      931,
+      444,
+      383,
+      24
+     ]
+    },
+    {
+     "title": "ACES CG Linear (Academy Color Encoding System AP1)",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      931,
+      444,
+      383,
+      24
+     ]
+    },
+    {
+     "title": "Adobe RGB (1998)",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      931,
+      468,
+      383,
+      24
+     ]
+    },
+    {
+     "title": "SMPTE RP 431-2-2007 DCI (P3)",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      931,
+      492,
+      383,
+      24
+     ]
+    },
+    {
+     "title": "Display P3",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      931,
+      516,
+      383,
+      24
+     ]
+    },
+    {
+     "title": "Generic RGB Profile",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      931,
+      540,
+      383,
+      24
+     ]
+    },
+    {
+     "title": "Rec. ITU-R BT.2020-1",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      931,
+      564,
+      383,
+      24
+     ]
+    },
+    {
+     "title": "Rec. ITU-R BT.709-5",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      931,
+      588,
+      383,
+      24
+     ]
+    },
+    {
+     "title": "ROMM RGB: ISO 22028-2:2013",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      931,
+      612,
+      383,
+      24
+     ]
+    },
+    {
+     "title": "sRGB IEC61966-2.1",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      931,
+      636,
+      383,
+      24
+     ]
+    },
+    {
+     "title": "Colour LCD",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      931,
+      660,
+      383,
+      24
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      931,
+      684,
+      383,
+      11
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      931,
+      695,
+      383,
+      24
+     ]
+    },
+    {
+     "title": "Customise…",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      931,
+      695,
+      383,
+      24
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      931,
+      439,
+      0,
+      0
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-displayAndBrightness-01-dark.png"
+  },
+  {
+   "label": "When connected to TV",
+   "value": "Ask What to Show",
+   "identifier": "tvDisplayModesSection",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    902,
+    717.5,
+    158,
+    24
+   ],
+   "menu_frame": [
+    890,
+    713,
+    196,
+    106
+   ],
+   "items": [
+    {
+     "title": "Ask What to Show",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      890,
+      718,
+      196,
+      24
+     ]
+    },
+    {
+     "title": "Mirror Entire Screen",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      890,
+      742,
+      196,
+      24
+     ]
+    },
+    {
+     "title": "Choose Window or App",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      890,
+      766,
+      196,
+      24
+     ]
+    },
+    {
+     "title": "Use as Extended Display",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      890,
+      790,
+      196,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-displayAndBrightness-02-dark.png"
+  }
+ ],
+ "controlCenter": [
+  {
+   "label": "Automatically hide and show the menu bar",
+   "value": "In Full Screen Only",
+   "identifier": "autohide-menubar",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    899.5,
+    220.5,
+    160.5,
+    24
+   ],
+   "menu_frame": [
+    887,
+    168,
+    161,
+    106
+   ],
+   "items": [
+    {
+     "title": "Always",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      887,
+      173,
+      161,
+      24
+     ]
+    },
+    {
+     "title": "On Desktop Only",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      887,
+      197,
+      161,
+      24
+     ]
+    },
+    {
+     "title": "In Full Screen Only",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      887,
+      221,
+      161,
+      24
+     ]
+    },
+    {
+     "title": "Never",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      887,
+      245,
+      161,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-controlCenter-00-dark.png"
+  },
+  {
+   "label": "Recent documents, applications and servers",
+   "value": "10",
+   "identifier": "recents",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    998,
+    296,
+    62,
+    24
+   ],
+   "menu_frame": [
+    986,
+    244,
+    79,
+    178
+   ],
+   "items": [
+    {
+     "title": "None",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      986,
+      249,
+      79,
+      24
+     ]
+    },
+    {
+     "title": "5",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      986,
+      273,
+      79,
+      24
+     ]
+    },
+    {
+     "title": "10",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      986,
+      297,
+      79,
+      24
+     ]
+    },
+    {
+     "title": "15",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      986,
+      321,
+      79,
+      24
+     ]
+    },
+    {
+     "title": "20",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      986,
+      345,
+      79,
+      24
+     ]
+    },
+    {
+     "title": "30",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      986,
+      369,
+      79,
+      24
+     ]
+    },
+    {
+     "title": "50",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      986,
+      393,
+      79,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-controlCenter-01-dark.png"
+  },
+  {
+   "label": null,
+   "value": "Always Show",
+   "identifier": "controlcenter-focus-id",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    933.5,
+    509,
+    126.5,
+    24
+   ],
+   "menu_frame": null,
+   "items": [],
+   "value_unchanged_after_escape": true,
+   "still": "pop-controlCenter-02-dark.png"
+  },
+  {
+   "label": null,
+   "value": "Show When Active",
+   "identifier": "controlcenter-screenMirroring-id",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    899.5,
+    552,
+    160.5,
+    24
+   ],
+   "menu_frame": null,
+   "items": [],
+   "value_unchanged_after_escape": true,
+   "still": "pop-controlCenter-03-dark.png"
+  },
+  {
+   "label": null,
+   "value": "Show When Active",
+   "identifier": "controlcenter-display-id",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    899.5,
+    595,
+    160.5,
+    24
+   ],
+   "menu_frame": [
+    887,
+    567,
+    161,
+    58
+   ],
+   "items": [
+    {
+     "title": "Always Show",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      887,
+      572,
+      161,
+      24
+     ]
+    },
+    {
+     "title": "Show When Active",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      887,
+      596,
+      161,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-controlCenter-04-dark.png"
+  },
+  {
+   "label": null,
+   "value": "Show When Active",
+   "identifier": "controlcenter-sound-id",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    899.5,
+    638,
+    160.5,
+    24
+   ],
+   "menu_frame": [
+    887,
+    610,
+    161,
+    58
+   ],
+   "items": [
+    {
+     "title": "Always Show",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      887,
+      615,
+      161,
+      24
+     ]
+    },
+    {
+     "title": "Show When Active",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      887,
+      639,
+      161,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-controlCenter-05-dark.png"
+  },
+  {
+   "label": null,
+   "value": "Show When Active",
+   "identifier": "controlcenter-nowPlaying-id",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    899.5,
+    681,
+    160.5,
+    24
+   ],
+   "menu_frame": [
+    887,
+    653,
+    161,
+    58
+   ],
+   "items": [
+    {
+     "title": "Always Show",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      887,
+      658,
+      161,
+      24
+     ]
+    },
+    {
+     "title": "Show When Active",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      887,
+      682,
+      161,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-controlCenter-06-dark.png"
+  },
+  {
+   "label": "Fast User Switching",
+   "value": "Icon",
+   "identifier": "controlcenter-userSwitcher-id",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    986.5,
+    723,
+    73.5,
+    24
+   ],
+   "menu_frame": null,
+   "items": [],
+   "value_unchanged_after_escape": true,
+   "still": "pop-controlCenter-07-dark.png"
+  },
+  {
+   "label": null,
+   "value": "Show When Active",
+   "identifier": "controlcenter-timer-id",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    899.5,
+    660.5,
+    160.5,
+    24
+   ],
+   "menu_frame": [
+    887,
+    632,
+    161,
+    58
+   ],
+   "items": [
+    {
+     "title": "Always Show",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      887,
+      637,
+      161,
+      24
+     ]
+    },
+    {
+     "title": "Show When Active",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      887,
+      661,
+      161,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-controlCenter-08-dark.png"
+  }
+ ],
+ "search": [
+  {
+   "label": "Clipboard history is available in Spotlight",
+   "value": "8 hours",
+   "identifier": "Results from Clipboard",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    966.5,
+    659.5,
+    93.5,
+    24
+   ],
+   "menu_frame": [
+    954,
+    631,
+    114,
+    82
+   ],
+   "items": [
+    {
+     "title": "30 minutes",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      954,
+      636,
+      114,
+      24
+     ]
+    },
+    {
+     "title": "8 hours",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      954,
+      660,
+      114,
+      24
+     ]
+    },
+    {
+     "title": "7 days",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      954,
+      684,
+      114,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-search-00-dark.png"
+  }
+ ],
+ "wallpaper": [
+  {
+   "label": "TahoeDark",
+   "value": "Fill Screen",
+   "identifier": null,
+   "role": "AXPopUpButton",
+   "button_frame": [
+    953.5,
+    224.5,
+    110.5,
+    24
+   ],
+   "menu_frame": [
+    941,
+    220,
+    173,
+    130
+   ],
+   "items": [
+    {
+     "title": "Fill Screen",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      225,
+      173,
+      24
+     ]
+    },
+    {
+     "title": "Fit to Screen",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      249,
+      173,
+      24
+     ]
+    },
+    {
+     "title": "Stretch to Fill Screen",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      273,
+      173,
+      24
+     ]
+    },
+    {
+     "title": "Centre",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      297,
+      173,
+      24
+     ]
+    },
+    {
+     "title": "Tile",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      321,
+      173,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-wallpaper-00-dark.png"
+  },
+  {
+   "label": null,
+   "value": null,
+   "identifier": ";",
+   "role": "AXMenuButton",
+   "button_frame": [
+    602,
+    535.5,
+    107.5,
+    71
+   ],
+   "menu_frame": null,
+   "items": [],
+   "value_unchanged_after_escape": true,
+   "still": "pop-wallpaper-01-dark.png"
+  },
+  {
+   "label": "Your Photos",
+   "value": "Fill Screen",
+   "identifier": null,
+   "role": "AXPopUpButton",
+   "button_frame": [
+    953.5,
+    224.5,
+    110.5,
+    24
+   ],
+   "menu_frame": [
+    941,
+    220,
+    173,
+    130
+   ],
+   "items": [
+    {
+     "title": "Fill Screen",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      225,
+      173,
+      24
+     ]
+    },
+    {
+     "title": "Fit to Screen",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      249,
+      173,
+      24
+     ]
+    },
+    {
+     "title": "Stretch to Fill Screen",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      273,
+      173,
+      24
+     ]
+    },
+    {
+     "title": "Centre",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      297,
+      173,
+      24
+     ]
+    },
+    {
+     "title": "Tile",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      321,
+      173,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-wallpaper-02-dark.png"
+  },
+  {
+   "label": "Cityscape",
+   "value": "Fill Screen",
+   "identifier": null,
+   "role": "AXPopUpButton",
+   "button_frame": [
+    953.5,
+    224.5,
+    110.5,
+    24
+   ],
+   "menu_frame": [
+    941,
+    220,
+    173,
+    130
+   ],
+   "items": [
+    {
+     "title": "Fill Screen",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      225,
+      173,
+      24
+     ]
+    },
+    {
+     "title": "Fit to Screen",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      249,
+      173,
+      24
+     ]
+    },
+    {
+     "title": "Stretch to Fill Screen",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      273,
+      173,
+      24
+     ]
+    },
+    {
+     "title": "Centre",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      297,
+      173,
+      24
+     ]
+    },
+    {
+     "title": "Tile",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      321,
+      173,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-wallpaper-03-dark.png"
+  },
+  {
+   "label": "Earth",
+   "value": "Fill Screen",
+   "identifier": null,
+   "role": "AXPopUpButton",
+   "button_frame": [
+    953.5,
+    224.5,
+    110.5,
+    24
+   ],
+   "menu_frame": [
+    941,
+    220,
+    173,
+    130
+   ],
+   "items": [
+    {
+     "title": "Fill Screen",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      225,
+      173,
+      24
+     ]
+    },
+    {
+     "title": "Fit to Screen",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      249,
+      173,
+      24
+     ]
+    },
+    {
+     "title": "Stretch to Fill Screen",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      273,
+      173,
+      24
+     ]
+    },
+    {
+     "title": "Centre",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      297,
+      173,
+      24
+     ]
+    },
+    {
+     "title": "Tile",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      941,
+      321,
+      173,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-wallpaper-04-dark.png"
+  }
+ ],
+ "notifications": [
+  {
+   "label": "Show previews",
+   "value": "When Unlocked",
+   "identifier": "show-previews",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    917,
+    371.5,
+    143,
+    24
+   ],
+   "menu_frame": [
+    905,
+    343,
+    143,
+    82
+   ],
+   "items": [
+    {
+     "title": "Always",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      905,
+      348,
+      143,
+      24
+     ]
+    },
+    {
+     "title": "When Unlocked",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      905,
+      372,
+      143,
+      24
+     ]
+    },
+    {
+     "title": "Never",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      905,
+      396,
+      143,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-notifications-00-dark.png"
+  },
+  {
+   "label": "when mirroring or sharing the display",
+   "value": "Notifications Off",
+   "identifier": "allow-when-sharing",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    913,
+    521.5,
+    147,
+    24
+   ],
+   "menu_frame": [
+    901,
+    517,
+    159,
+    58
+   ],
+   "items": [
+    {
+     "title": "Notifications Off",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      901,
+      522,
+      159,
+      24
+     ]
+    },
+    {
+     "title": "Allow Notifications",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      901,
+      546,
+      159,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-notifications-01-dark.png"
+  }
+ ],
+ "sounds": [
+  {
+   "label": "Alert sound",
+   "value": "Breeze",
+   "identifier": "AlertSoundPicker",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    942.5,
+    246,
+    89.5,
+    24
+   ],
+   "menu_frame": [
+    930,
+    218,
+    157,
+    418
+   ],
+   "items": [
+    {
+     "title": "Boop",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      930,
+      223,
+      157,
+      24
+     ]
+    },
+    {
+     "title": "Breeze",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      930,
+      247,
+      157,
+      24
+     ]
+    },
+    {
+     "title": "Bubble",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      930,
+      271,
+      157,
+      24
+     ]
+    },
+    {
+     "title": "codex-notification",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      930,
+      295,
+      157,
+      24
+     ]
+    },
+    {
+     "title": "Crystal",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      930,
+      319,
+      157,
+      24
+     ]
+    },
+    {
+     "title": "Funky",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      930,
+      343,
+      157,
+      24
+     ]
+    },
+    {
+     "title": "Heroine",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      930,
+      367,
+      157,
+      24
+     ]
+    },
+    {
+     "title": "Jump",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      930,
+      391,
+      157,
+      24
+     ]
+    },
+    {
+     "title": "Mezzo",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      930,
+      415,
+      157,
+      24
+     ]
+    },
+    {
+     "title": "notification",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      930,
+      439,
+      157,
+      24
+     ]
+    },
+    {
+     "title": "Pebble",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      930,
+      463,
+      157,
+      24
+     ]
+    },
+    {
+     "title": "Pluck",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      930,
+      487,
+      157,
+      24
+     ]
+    },
+    {
+     "title": "Pong",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      930,
+      511,
+      157,
+      24
+     ]
+    },
+    {
+     "title": "Sonar",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      930,
+      535,
+      157,
+      24
+     ]
+    },
+    {
+     "title": "Sonumi",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      930,
+      559,
+      157,
+      24
+     ]
+    },
+    {
+     "title": "Submerge",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      930,
+      583,
+      157,
+      24
+     ]
+    },
+    {
+     "title": "TD_Default",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      930,
+      607,
+      157,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-sounds-00-dark.png"
+  },
+  {
+   "label": "Play sound effects through",
+   "value": "MacBook Air Speakers",
+   "identifier": "AlertDevicePicker",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    876,
+    287.5,
+    184,
+    24
+   ],
+   "menu_frame": [
+    864,
+    248,
+    233,
+    117
+   ],
+   "items": [
+    {
+     "title": "Selected Sound Output Device",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      864,
+      253,
+      233,
+      24
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      864,
+      277,
+      233,
+      11
+     ]
+    },
+    {
+     "title": "MacBook Air Speakers",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      864,
+      288,
+      233,
+      24
+     ]
+    },
+    {
+     "title": "[redacted]",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      864,
+      312,
+      233,
+      24
+     ]
+    },
+    {
+     "title": "Multi-Output Device",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      864,
+      336,
+      233,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-sounds-01-dark.png"
+  }
+ ],
+ "lockScreen": [
+  {
+   "label": "Turn display off on battery when inactive",
+   "value": "For 10 minutes",
+   "identifier": null,
+   "role": "AXPopUpButton",
+   "button_frame": [
+    923,
+    220,
+    137,
+    24
+   ],
+   "menu_frame": [
+    911,
+    120,
+    191,
+    322
+   ],
+   "items": [
+    {
+     "title": "For 1 minute",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      911,
+      125,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 2 minutes",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      911,
+      149,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 3 minutes",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      911,
+      173,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 5 minutes",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      911,
+      197,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 10 minutes",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      911,
+      221,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 20 minutes",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      911,
+      245,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 30 minutes",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      911,
+      269,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 1 hour",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      911,
+      293,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 1 hour, 30 minutes",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      911,
+      317,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 2 hours",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      911,
+      341,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 2 hours, 30 minutes",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      911,
+      365,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 3 hours",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      911,
+      389,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "Never",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      911,
+      413,
+      191,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-lockScreen-00-dark.png"
+  },
+  {
+   "label": "Turn display off on power adapter when inactive",
+   "value": "Never",
+   "identifier": null,
+   "role": "AXPopUpButton",
+   "button_frame": [
+    976.5,
+    258.5,
+    83.5,
+    24
+   ],
+   "menu_frame": [
+    964,
+    30,
+    191,
+    258
+   ],
+   "items": [
+    {
+     "title": "For 1 minute",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      964,
+      -29,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 2 minutes",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      964,
+      -5,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 3 minutes",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      964,
+      19,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 5 minutes",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      964,
+      43,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 10 minutes",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      964,
+      67,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 20 minutes",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      964,
+      91,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 30 minutes",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      964,
+      115,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 1 hour",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      964,
+      139,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 1 hour, 30 minutes",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      964,
+      163,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 2 hours",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      964,
+      187,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 2 hours, 30 minutes",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      964,
+      211,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "For 3 hours",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      964,
+      235,
+      191,
+      24
+     ]
+    },
+    {
+     "title": "Never",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      964,
+      259,
+      191,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-lockScreen-01-dark.png"
+  },
+  {
+   "label": "Require password after screen saver begins or display is turned off",
+   "value": "Immediately",
+   "identifier": null,
+   "role": "AXPopUpButton",
+   "button_frame": [
+    939,
+    326,
+    121,
+    24
+   ],
+   "menu_frame": null,
+   "items": [],
+   "value_unchanged_after_escape": true,
+   "still": "pop-lockScreen-02-dark.png"
+  }
+ ],
+ "privacyAndSecurity": [
+  {
+   "label": "Allow applications from",
+   "value": "App Store & Known Developers",
+   "identifier": null,
+   "role": "AXPopUpButton",
+   "button_frame": [
+    823,
+    622,
+    237,
+    24
+   ],
+   "menu_frame": [
+    811,
+    593,
+    237,
+    58
+   ],
+   "items": [
+    {
+     "title": "App Store",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      811,
+      598,
+      237,
+      24
+     ]
+    },
+    {
+     "title": "App Store & Known Developers",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      811,
+      622,
+      237,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-privacyAndSecurity-00-dark.png"
+  }
+ ],
+ "keyboard": [
+  {
+   "label": "Turn keyboard backlight off after inactivity",
+   "value": "After 30 Seconds",
+   "identifier": null,
+   "role": "AXPopUpButton",
+   "button_frame": [
+    906.5,
+    380,
+    153.5,
+    24
+   ],
+   "menu_frame": [
+    894,
+    327,
+    154,
+    154
+   ],
+   "items": [
+    {
+     "title": "After 5 Seconds",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      894,
+      332,
+      154,
+      24
+     ]
+    },
+    {
+     "title": "After 10 Seconds",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      894,
+      356,
+      154,
+      24
+     ]
+    },
+    {
+     "title": "After 30 Seconds",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      894,
+      380,
+      154,
+      24
+     ]
+    },
+    {
+     "title": "After 1 Minute",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      894,
+      404,
+      154,
+      24
+     ]
+    },
+    {
+     "title": "After 5 Minutes",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      894,
+      428,
+      154,
+      24
+     ]
+    },
+    {
+     "title": "Never",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      894,
+      452,
+      154,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-keyboard-00-dark.png"
+  },
+  {
+   "label": "Press 🌐︎ key to",
+   "value": "Show Emoji & Symbols",
+   "identifier": null,
+   "role": "AXPopUpButton",
+   "button_frame": [
+    874.5,
+    418,
+    185.5,
+    24
+   ],
+   "menu_frame": [
+    862,
+    390,
+    238,
+    106
+   ],
+   "items": [
+    {
+     "title": "Change Input Source",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      862,
+      395,
+      238,
+      24
+     ]
+    },
+    {
+     "title": "Show Emoji & Symbols",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      862,
+      419,
+      238,
+      24
+     ]
+    },
+    {
+     "title": "Start Dictation (Press 🌐︎ Twice)",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      862,
+      443,
+      238,
+      24
+     ]
+    },
+    {
+     "title": "Do Nothing",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      862,
+      467,
+      238,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-keyboard-01-dark.png"
+  },
+  {
+   "label": "Microphone source",
+   "value": "Automatic (MacBook Air Microphone)",
+   "identifier": null,
+   "role": "AXPopUpButton",
+   "button_frame": [
+    785.5,
+    614.5,
+    274.5,
+    24
+   ],
+   "menu_frame": [
+    773,
+    610,
+    275,
+    93
+   ],
+   "items": [
+    {
+     "title": "Automatic (MacBook Air Microphone)",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      773,
+      615,
+      275,
+      24
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      773,
+      639,
+      275,
+      11
+     ]
+    },
+    {
+     "title": "MacBook Air Microphone",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      773,
+      650,
+      275,
+      24
+     ]
+    },
+    {
+     "title": "[redacted]",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      773,
+      674,
+      275,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-keyboard-02-dark.png"
+  },
+  {
+   "label": "Shortcut",
+   "value": "Press 🎤︎",
+   "identifier": null,
+   "role": "AXPopUpButton",
+   "button_frame": [
+    962,
+    655.5,
+    98,
+    24
+   ],
+   "menu_frame": [
+    950,
+    651,
+    249,
+    200
+   ],
+   "items": [
+    {
+     "title": "Press 🎤︎",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      950,
+      656,
+      249,
+      24
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      950,
+      680,
+      249,
+      11
+     ]
+    },
+    {
+     "title": "Press Control Key Twice",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      950,
+      691,
+      249,
+      24
+     ]
+    },
+    {
+     "title": "Press 🌐︎ Twice",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      950,
+      715,
+      249,
+      24
+     ]
+    },
+    {
+     "title": "Press Right Command Key Twice",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      950,
+      739,
+      249,
+      24
+     ]
+    },
+    {
+     "title": "Press Left Command Key Twice",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      950,
+      763,
+      249,
+      24
+     ]
+    },
+    {
+     "title": "Press Either Command Key Twice",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      950,
+      787,
+      249,
+      24
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      950,
+      811,
+      249,
+      11
+     ]
+    },
+    {
+     "title": "Customise…",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      950,
+      822,
+      249,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-keyboard-03-dark.png"
+  }
+ ],
+ "trackpad": [
+  {
+   "label": "Look up & data detectors",
+   "value": "Force Click with One Finger",
+   "identifier": "LookUpDataDetectorOptions",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    845.5,
+    577.5,
+    214.5,
+    24
+   ],
+   "menu_frame": [
+    833,
+    549,
+    215,
+    82
+   ],
+   "items": [
+    {
+     "title": "Off",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      833,
+      554,
+      215,
+      24
+     ]
+    },
+    {
+     "title": "Force Click with One Finger",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      833,
+      578,
+      215,
+      24
+     ]
+    },
+    {
+     "title": "Tap with Three Fingers",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      833,
+      602,
+      215,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-trackpad-00-dark.png"
+  },
+  {
+   "label": "Secondary click",
+   "value": "Click with Two Fingers",
+   "identifier": "SecondaryClickOptions",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    877,
+    615.5,
+    183,
+    24
+   ],
+   "menu_frame": [
+    865,
+    587,
+    221,
+    106
+   ],
+   "items": [
+    {
+     "title": "Off",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      865,
+      592,
+      221,
+      24
+     ]
+    },
+    {
+     "title": "Click with Two Fingers",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      865,
+      616,
+      221,
+      24
+     ]
+    },
+    {
+     "title": "Click in Bottom-Right Corner",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      865,
+      640,
+      221,
+      24
+     ]
+    },
+    {
+     "title": "Click in Bottom-Left Corner",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      865,
+      664,
+      221,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-trackpad-01-dark.png"
+  }
+ ],
+ "printerAndScanner": [
+  {
+   "label": "Default printer",
+   "value": "Last Printer Used",
+   "identifier": null,
+   "role": "AXPopUpButton",
+   "button_frame": [
+    907.5,
+    220.5,
+    152.5,
+    24
+   ],
+   "menu_frame": [
+    895,
+    216,
+    172,
+    93
+   ],
+   "items": [
+    {
+     "title": "Last Printer Used",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      895,
+      221,
+      172,
+      24
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      895,
+      245,
+      172,
+      11
+     ]
+    },
+    {
+     "title": "[redacted]",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      895,
+      256,
+      172,
+      24
+     ]
+    },
+    {
+     "title": "[redacted]",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      895,
+      280,
+      172,
+      24
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-printerAndScanner-00-dark.png"
+  },
+  {
+   "label": "Default paper size",
+   "value": "A4",
+   "identifier": "DefaultPaperSizeOption",
+   "role": "AXPopUpButton",
+   "button_frame": [
+    995.5,
+    258.5,
+    64.5,
+    24
+   ],
+   "menu_frame": [
+    983,
+    206,
+    166,
+    346
+   ],
+   "items": [
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      983,
+      211,
+      166,
+      24
+     ]
+    },
+    {
+     "title": "US Letter",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      983,
+      211,
+      166,
+      24
+     ]
+    },
+    {
+     "title": "US Legal",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      983,
+      235,
+      166,
+      24
+     ]
+    },
+    {
+     "title": "A4",
+     "checked": true,
+     "mark": "✓",
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      983,
+      259,
+      166,
+      24
+     ]
+    },
+    {
+     "title": "A5",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      983,
+      283,
+      166,
+      24
+     ]
+    },
+    {
+     "title": "JIS B5",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      983,
+      307,
+      166,
+      24
+     ]
+    },
+    {
+     "title": "B5",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      983,
+      331,
+      166,
+      24
+     ]
+    },
+    {
+     "title": "Envelope #10",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      983,
+      355,
+      166,
+      24
+     ]
+    },
+    {
+     "title": "Envelope DL",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      983,
+      379,
+      166,
+      24
+     ]
+    },
+    {
+     "title": "Tabloid",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      983,
+      403,
+      166,
+      24
+     ]
+    },
+    {
+     "title": "A3",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      983,
+      427,
+      166,
+      24
+     ]
+    },
+    {
+     "title": "Tabloid Oversize",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      983,
+      451,
+      166,
+      24
+     ]
+    },
+    {
+     "title": "ROC 16K",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      983,
+      475,
+      166,
+      24
+     ]
+    },
+    {
+     "title": "Envelope Choukei 3",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      983,
+      499,
+      166,
+      24
+     ]
+    },
+    {
+     "title": "Super B/A3",
+     "checked": false,
+     "mark": null,
+     "enabled": true,
+     "separator": false,
+     "submenu": false,
+     "frame": [
+      983,
+      523,
+      166,
+      24
+     ]
+    },
+    {
+     "title": "",
+     "checked": false,
+     "mark": null,
+     "enabled": false,
+     "separator": true,
+     "submenu": false,
+     "frame": [
+      983,
+      206,
+      0,
+      0
+     ]
+    }
+   ],
+   "value_unchanged_after_escape": true,
+   "still": "pop-printerAndScanner-01-dark.png"
+  }
+ ]
+}

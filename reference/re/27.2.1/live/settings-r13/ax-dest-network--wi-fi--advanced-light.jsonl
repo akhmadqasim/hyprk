@@ -1,0 +1,899 @@
+{"depth": 0, "frame": [350, 150, 740, 625], "identifier": "Main", "path": "0", "role": "AXWindow", "subrole": "AXStandardWindow", "title": "Wi-Fi"}
+{"depth": 1, "frame": [350, 150, 740, 625], "path": "0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 2, "frame": [350, 150, 740, 625], "identifier": "Main, SidebarNavigationSplitView", "path": "0/0/0", "role": "AXSplitGroup"}
+{"depth": 3, "frame": [350, 150, 232, 625], "path": "0/0/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"contentSize": [232, 1234], "depth": 4, "frame": [350, 248, 232, 527], "path": "0/0/0/0/0", "role": "AXScrollArea"}
+{"depth": 5, "description": "Sidebar", "enabled": true, "frame": [350, 248, 232, 527], "identifier": "com.apple.settings.sidebar.collectionView", "path": "0/0/0/0/0/0", "role": "AXOutline"}
+{"depth": 6, "frame": [350, 248, 232, 0], "path": "0/0/0/0/0/0/0", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 248, 212, 0], "path": "0/0/0/0/0/0/0/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 248, 216, 0], "path": "0/0/0/0/0/0/0/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 248, 232, 46], "path": "0/0/0/0/0/0/1", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 248, 212, 46], "path": "0/0/0/0/0/0/1/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [366, 252, 141.5, 38], "identifier": "[redacted]", "path": "0/0/0/0/0/0/1/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 294, 232, 32], "path": "0/0/0/0/0/0/2", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 294, 212, 32], "path": "0/0/0/0/0/0/2/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [367, 299.5, 80, 21], "identifier": "[redacted]", "path": "0/0/0/0/0/0/2/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 339, 232, 0], "path": "0/0/0/0/0/0/3", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 339, 212, 0], "path": "0/0/0/0/0/0/3/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 339, 216, 0], "path": "0/0/0/0/0/0/3/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 339, 232, 32], "path": "0/0/0/0/0/0/4", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 339, 212, 32], "path": "0/0/0/0/0/0/4/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Wi-Fi", "enabled": true, "frame": [367, 343, 61.5, 24], "identifier": "com.apple.settings.wifi", "path": "0/0/0/0/0/0/4/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 371, 232, 32], "path": "0/0/0/0/0/0/5", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 371, 212, 32], "path": "0/0/0/0/0/0/5/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Bluetooth", "enabled": true, "frame": [367, 375, 88, 24], "identifier": "com.apple.settings.bluetooth", "path": "0/0/0/0/0/0/5/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 403, 232, 32], "path": "0/0/0/0/0/0/6", "role": "AXRow", "selected": true, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 403, 212, 32], "path": "0/0/0/0/0/0/6/0", "role": "AXCell", "selected": true}
+{"depth": 8, "description": "Network", "enabled": true, "frame": [367, 407, 82.5, 24], "identifier": "com.apple.settings.network", "path": "0/0/0/0/0/0/6/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 435, 232, 32], "path": "0/0/0/0/0/0/7", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 435, 212, 32], "path": "0/0/0/0/0/0/7/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "VPN", "enabled": true, "frame": [367, 439, 55.5, 24], "identifier": "com.apple.settings.vpn", "path": "0/0/0/0/0/0/7/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 467, 232, 32], "path": "0/0/0/0/0/0/8", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 467, 212, 32], "path": "0/0/0/0/0/0/8/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Battery", "enabled": true, "frame": [367, 471, 73.5, 24], "identifier": "com.apple.settings.battery", "path": "0/0/0/0/0/0/8/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 512, 232, 0], "path": "0/0/0/0/0/0/9", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 512, 212, 0], "path": "0/0/0/0/0/0/9/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 512, 216, 0], "path": "0/0/0/0/0/0/9/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 512, 232, 32], "path": "0/0/0/0/0/0/10", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 512, 212, 32], "path": "0/0/0/0/0/0/10/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "General", "enabled": true, "frame": [367, 516, 76.5, 24], "identifier": "com.apple.settings.general", "path": "0/0/0/0/0/0/10/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 544, 232, 32], "path": "0/0/0/0/0/0/11", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 544, 212, 32], "path": "0/0/0/0/0/0/11/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Accessibility", "enabled": true, "frame": [367, 548, 105, 24], "identifier": "com.apple.settings.accessibility", "path": "0/0/0/0/0/0/11/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 576, 232, 32], "path": "0/0/0/0/0/0/12", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 576, 212, 32], "path": "0/0/0/0/0/0/12/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Appearance", "enabled": true, "frame": [367, 580, 102, 24], "identifier": "com.apple.settings.appearance", "path": "0/0/0/0/0/0/12/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 608, 232, 32], "path": "0/0/0/0/0/0/13", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 608, 212, 32], "path": "0/0/0/0/0/0/13/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Desktop & Dock", "enabled": true, "frame": [367, 612, 127, 24], "identifier": "com.apple.settings.desktopAndDock", "path": "0/0/0/0/0/0/13/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 640, 232, 32], "path": "0/0/0/0/0/0/14", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 640, 212, 32], "path": "0/0/0/0/0/0/14/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Displays", "enabled": true, "frame": [367, 644, 80, 24], "identifier": "com.apple.settings.displayAndBrightness", "path": "0/0/0/0/0/0/14/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 672, 232, 32], "path": "0/0/0/0/0/0/15", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 672, 212, 32], "path": "0/0/0/0/0/0/15/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Menu Bar", "enabled": true, "frame": [367, 676, 87, 24], "identifier": "com.apple.settings.controlCenter", "path": "0/0/0/0/0/0/15/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 704, 232, 32], "path": "0/0/0/0/0/0/16", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 704, 212, 32], "path": "0/0/0/0/0/0/16/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Siri", "enabled": true, "frame": [367, 708, 48.5, 24], "identifier": "com.apple.settings.siri", "path": "0/0/0/0/0/0/16/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 736, 232, 32], "path": "0/0/0/0/0/0/17", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 736, 212, 32], "path": "0/0/0/0/0/0/17/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Spotlight", "enabled": true, "frame": [367, 740, 84, 24], "identifier": "com.apple.settings.search", "path": "0/0/0/0/0/0/17/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 768, 232, 32], "path": "0/0/0/0/0/0/18", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 768, 212, 32], "path": "0/0/0/0/0/0/18/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "Wallpaper", "enabled": true, "frame": [367, 772, 89.5, 24], "identifier": "com.apple.settings.wallpaper", "path": "0/0/0/0/0/0/18/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 813, 232, 19], "path": "0/0/0/0/0/0/19", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 813, 212, 0], "path": "0/0/0/0/0/0/19/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 813, 216, 0], "path": "0/0/0/0/0/0/19/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 813, 232, 32], "path": "0/0/0/0/0/0/20", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 813, 212, 32], "path": "0/0/0/0/0/0/20/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/20/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 845, 232, 32], "path": "0/0/0/0/0/0/21", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 864, 212, 32], "path": "0/0/0/0/0/0/21/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/21/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 896, 232, 32], "path": "0/0/0/0/0/0/22", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 896, 212, 32], "path": "0/0/0/0/0/0/22/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/22/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 928, 232, 32], "path": "0/0/0/0/0/0/23", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 928, 212, 32], "path": "0/0/0/0/0/0/23/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/23/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 973, 232, 19], "path": "0/0/0/0/0/0/24", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 973, 212, 19], "path": "0/0/0/0/0/0/24/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 973, 216, 0], "path": "0/0/0/0/0/0/24/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 973, 232, 32], "path": "0/0/0/0/0/0/25", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 973, 212, 32], "path": "0/0/0/0/0/0/25/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/25/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1005, 232, 32], "path": "0/0/0/0/0/0/26", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1005, 212, 32], "path": "0/0/0/0/0/0/26/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/26/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1037, 232, 32], "path": "0/0/0/0/0/0/27", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1037, 212, 32], "path": "0/0/0/0/0/0/27/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/27/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1088, 232, 32], "path": "0/0/0/0/0/0/28", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1088, 212, 32], "path": "0/0/0/0/0/0/28/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/28/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1133, 232, 19], "path": "0/0/0/0/0/0/29", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1133, 212, 19], "path": "0/0/0/0/0/0/29/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 1133, 216, 19], "path": "0/0/0/0/0/0/29/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 1152, 232, 32], "path": "0/0/0/0/0/0/30", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1152, 212, 32], "path": "0/0/0/0/0/0/30/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/30/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1184, 232, 32], "path": "0/0/0/0/0/0/31", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1184, 212, 32], "path": "0/0/0/0/0/0/31/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/31/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1216, 232, 32], "path": "0/0/0/0/0/0/32", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1216, 212, 32], "path": "0/0/0/0/0/0/32/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/32/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1248, 232, 32], "path": "0/0/0/0/0/0/33", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1248, 212, 32], "path": "0/0/0/0/0/0/33/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/33/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1293, 232, 19], "path": "0/0/0/0/0/0/34", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1293, 212, 0], "path": "0/0/0/0/0/0/34/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 1293, 216, 0], "path": "0/0/0/0/0/0/34/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 1293, 232, 32], "path": "0/0/0/0/0/0/35", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1293, 212, 32], "path": "0/0/0/0/0/0/35/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/35/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1325, 232, 32], "path": "0/0/0/0/0/0/36", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1325, 212, 32], "path": "0/0/0/0/0/0/36/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/36/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1357, 232, 32], "path": "0/0/0/0/0/0/37", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1376, 212, 32], "path": "0/0/0/0/0/0/37/0", "role": "AXCell", "selected": false}
+{"depth": 8, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/0/0/0/0/0/37/0/0", "role": "AXButton"}
+{"depth": 6, "frame": [350, 1421, 232, 19], "path": "0/0/0/0/0/0/38", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1421, 212, 19], "path": "0/0/0/0/0/0/38/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [364, 1421, 216, 19], "path": "0/0/0/0/0/0/38/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 6, "frame": [350, 1440, 232, 32], "path": "0/0/0/0/0/0/39", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [360, 1440, 212, 32], "path": "0/0/0/0/0/0/39/0", "role": "AXCell", "selected": false}
+{"depth": 8, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "org.gpgtools.gpgpreferences", "path": "0/0/0/0/0/0/39/0/0", "role": "AXButton"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/0/0/0/0/0/39/0/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 6, "frame": [360, 248, 212, 1234], "identifier": "ListColumn", "path": "0/0/0/0/0/0/40", "role": "AXColumn", "selected": false}
+{"depth": 5, "enabled": true, "frame": [564, 247, 19, 529], "path": "0/0/0/0/0/1", "role": "AXScrollBar", "value": 0}
+{"depth": 6, "frame": [573, 251, 6, 244], "path": "0/0/0/0/0/1/0", "role": "AXValueIndicator", "value": 0}
+{"depth": 6, "frame": [565, 248, 0, 0], "path": "0/0/0/0/0/1/1", "role": "AXButton", "subrole": "AXIncrementArrow"}
+{"depth": 6, "frame": [565, 248, 0, 0], "path": "0/0/0/0/0/1/2", "role": "AXButton", "subrole": "AXDecrementArrow"}
+{"depth": 6, "frame": [573, 495.5, 6, 276.5], "path": "0/0/0/0/0/1/3", "role": "AXButton", "subrole": "AXIncrementPage"}
+{"depth": 6, "frame": [573, 251, 6, 0], "path": "0/0/0/0/0/1/4", "role": "AXButton", "subrole": "AXDecrementPage"}
+{"depth": 3, "frame": [360, 211, 212, 28], "path": "0/0/0/1", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 4, "enabled": true, "frame": [360, 211, 212, 28], "path": "0/0/0/1/0", "placeholder": "Search", "role": "AXTextField", "subrole": "AXSearchField", "value": ""}
+{"depth": 5, "description": "Search", "enabled": true, "frame": [363, 211.5, 25, 28], "path": "0/0/0/1/0/0", "role": "AXButton", "title": ""}
+{"contentSize": [0, 0], "depth": 3, "enabled": false, "frame": [581.5, 202, 0.5, 573], "path": "0/0/0/2", "role": "AXSplitter", "selected": false, "value": 231.5}
+{"depth": 3, "frame": [350, 150, 740, 625], "path": "0/0/0/3", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 4, "frame": [582, 202, 508, 572], "path": "0/0/0/3/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"contentSize": [508, 908.5], "depth": 5, "frame": [582, 202, 508, 572], "path": "0/0/0/3/0/0", "role": "AXScrollArea"}
+{"depth": 6, "enabled": true, "frame": [602, 214, 468, 120.5], "path": "0/0/0/3/0/0/0", "role": "AXGroup"}
+{"depth": 7, "enabled": true, "frame": [650, 224, 32.5, 16], "path": "0/0/0/3/0/0/0/0", "role": "AXStaticText", "value": "Wi‑Fi"}
+{"depth": 7, "enabled": true, "frame": [650, 241.5, 356, 28], "path": "0/0/0/3/0/0/0/1", "role": "AXStaticText", "value": "Set up Wi‑Fi to wirelessly connect your Mac to the internet. Turn on Wi‑Fi, then choose a network to join. Learn More…"}
+{"contentSize": [0, 0], "depth": 8, "description": "Learn More…", "enabled": false, "frame": [845.53466796875, 255.5, 68.126953125, 14], "identifier": "help:anchor=mchlp1180%20bookID=com.apple.machelp", "path": "0/0/0/3/0/0/0/1/0", "role": "AXLink", "selected": false}
+{"depth": 7, "enabled": true, "frame": [1016, 223, 44, 20], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/2", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 1}
+{"depth": 7, "enabled": true, "frame": [612, 290.5, 62, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/3", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [614.5, 308.5, 83, 16], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/4", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [929, 296.5, 9, 12.5], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/5", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [953, 296, 18, 13], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/6", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [984, 290.5, 76, 24], "identifier": "[redacted]", "path": "0/0/0/3/0/0/0/7", "role": "AXButton"}
+{"depth": 6, "description": "Personal Hotspots", "enabled": true, "frame": [612, 364.5, 116.5, 16], "path": "0/0/0/3/0/0/1", "role": "AXHeading"}
+{"depth": 6, "enabled": true, "frame": [602, 390.5, 468, 73], "path": "0/0/0/3/0/0/2", "role": "AXGroup"}
+{"depth": 7, "enabled": true, "frame": [623.5, 400.5, 124, 16], "path": "0/0/0/3/0/0/2/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1023, 402, 9, 12.5], "identifier": "[redacted]", "path": "0/0/0/3/0/0/2/1", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1043, 403, 16, 10.5], "identifier": "[redacted]", "path": "0/0/0/3/0/0/2/2", "role": "AXUnknown"}
+{"depth": 7, "enabled": true, "frame": [623.5, 437.5, 42.5, 16], "path": "0/0/0/3/0/0/2/3", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1023, 439, 9, 12.5], "identifier": "[redacted]", "path": "0/0/0/3/0/0/2/4", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1043, 440, 16, 10.5], "identifier": "[redacted]", "path": "0/0/0/3/0/0/2/5", "role": "AXUnknown"}
+{"depth": 6, "description": "Known Network", "enabled": true, "frame": [612, 493.5, 100, 16], "path": "0/0/0/3/0/0/3", "role": "AXHeading"}
+{"depth": 6, "enabled": true, "frame": [602, 519.5, 468, 36], "path": "0/0/0/3/0/0/4", "role": "AXGroup"}
+{"depth": 7, "description": "Selected", "enabled": true, "frame": [623.5, 533, 9.5, 9], "identifier": "checkmark", "path": "0/0/0/3/0/0/4/0", "role": "AXImage", "selected": true}
+{"depth": 7, "enabled": true, "frame": [642.5, 529.5, 62, 16], "path": "0/0/0/3/0/0/4/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [995, 531, 9, 12.5], "identifier": "[redacted]", "path": "0/0/0/3/0/0/4/2", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1014, 531, 18, 13], "identifier": "[redacted]", "path": "0/0/0/3/0/0/4/3", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1041.5, 528.5, 17, 17], "identifier": "[redacted]", "path": "0/0/0/3/0/0/4/4", "role": "AXButton"}
+{"depth": 6, "description": "Other Networks", "enabled": true, "frame": [612, 585.5, 100, 16], "path": "0/0/0/3/0/0/5", "role": "AXHeading"}
+{"depth": 6, "enabled": true, "frame": [602, 611.5, 468, 258], "path": "0/0/0/3/0/0/6", "role": "AXGroup"}
+{"depth": 7, "enabled": true, "frame": [623.5, 621.5, 67, 16], "path": "0/0/0/3/0/0/6/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1014, 623, 18, 13], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/1", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1041.5, 620.5, 17, 17], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/2", "role": "AXButton"}
+{"depth": 7, "enabled": true, "frame": [623.5, 658.5, 152.5, 16], "path": "0/0/0/3/0/0/6/3", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [995, 660, 9, 12.5], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/4", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1014, 660, 18, 13], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/5", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1041.5, 657.5, 17, 17], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/6", "role": "AXButton"}
+{"depth": 7, "enabled": true, "frame": [623.5, 695.5, 55.5, 16], "path": "0/0/0/3/0/0/6/7", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [995, 697, 9, 12.5], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/8", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1014, 697, 18, 13], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/9", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1041.5, 694.5, 17, 17], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/10", "role": "AXButton"}
+{"depth": 7, "enabled": true, "frame": [623.5, 732.5, 113, 16], "path": "0/0/0/3/0/0/6/11", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [995, 734, 9, 12.5], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/12", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1014, 734, 18, 13], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/13", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1041.5, 731.5, 17, 17], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/14", "role": "AXButton"}
+{"depth": 7, "enabled": true, "frame": [623.5, 769.5, 63.5, 16], "path": "0/0/0/3/0/0/6/15", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [995, 771, 9, 12.5], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/16", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1014, 771, 18, 13], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/17", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1041.5, 768.5, 17, 17], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/18", "role": "AXButton"}
+{"depth": 7, "enabled": true, "frame": [623.5, 806.5, 37, 16], "path": "0/0/0/3/0/0/6/19", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [995, 808, 9, 12.5], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/20", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1014, 808, 18, 13], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/21", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1041.5, 805.5, 17, 17], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/22", "role": "AXButton"}
+{"depth": 7, "enabled": true, "frame": [623.5, 843.5, 66.5, 16], "path": "0/0/0/3/0/0/6/23", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [995, 845, 9, 12.5], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/24", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1014, 845, 18, 13], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/25", "role": "AXUnknown"}
+{"depth": 7, "description": "[redacted]", "enabled": true, "frame": [1041.5, 842.5, 17, 17], "identifier": "[redacted]", "path": "0/0/0/3/0/0/6/26", "role": "AXButton"}
+{"depth": 6, "description": "Other…", "enabled": true, "frame": [1002, 879.5, 68, 24], "path": "0/0/0/3/0/0/7", "role": "AXButton"}
+{"depth": 6, "enabled": true, "frame": [602, 913.5, 468, 133], "path": "0/0/0/3/0/0/8", "role": "AXGroup"}
+{"depth": 7, "enabled": true, "frame": [612, 923.5, 122, 16], "path": "0/0/0/3/0/0/8/0", "role": "AXStaticText", "value": "Ask to join networks"}
+{"depth": 7, "enabled": true, "frame": [612, 941.5, 368, 28], "path": "0/0/0/3/0/0/8/1", "role": "AXStaticText", "value": "Known networks will be joined automatically. If no known networks are available, you will be asked before joining a new network."}
+{"depth": 7, "enabled": true, "frame": [990, 920, 70, 24], "path": "0/0/0/3/0/0/8/2", "role": "AXPopUpButton", "value": "Ask"}
+{"depth": 7, "enabled": true, "frame": [612, 990.5, 120, 16], "path": "0/0/0/3/0/0/8/3", "role": "AXStaticText", "value": "Ask to join hotspots"}
+{"depth": 7, "enabled": true, "frame": [612, 1008.5, 350, 28], "path": "0/0/0/3/0/0/8/4", "role": "AXStaticText", "value": "Allow this Mac to automatically discover nearby personal hotspots when no Wi‑Fi network is available."}
+{"depth": 7, "enabled": true, "frame": [976.5, 987, 83.5, 24], "path": "0/0/0/3/0/0/8/5", "role": "AXPopUpButton", "value": "Never"}
+{"depth": 6, "description": "Advanced…", "enabled": true, "frame": [941.5, 1066.5, 94.5, 24], "path": "0/0/0/3/0/0/9", "role": "AXButton"}
+{"depth": 6, "description": "Help", "enabled": true, "frame": [1046, 1066.5, 24, 24], "path": "0/0/0/3/0/0/10", "role": "AXButton"}
+{"depth": 6, "enabled": true, "frame": [1072, 208.5, 19, 559], "path": "0/0/0/3/0/0/11", "role": "AXScrollBar", "value": 0}
+{"depth": 7, "frame": [1081, 212.5, 6, 346.5], "path": "0/0/0/3/0/0/11/0", "role": "AXValueIndicator", "value": 0}
+{"depth": 7, "frame": [1073, 209.5, 0, 0], "path": "0/0/0/3/0/0/11/1", "role": "AXButton", "subrole": "AXIncrementArrow"}
+{"depth": 7, "frame": [1073, 209.5, 0, 0], "path": "0/0/0/3/0/0/11/2", "role": "AXButton", "subrole": "AXDecrementArrow"}
+{"depth": 7, "frame": [1081, 559.5, 6, 204], "path": "0/0/0/3/0/0/11/3", "role": "AXButton", "subrole": "AXIncrementPage"}
+{"depth": 7, "frame": [1081, 212.5, 6, 0], "path": "0/0/0/3/0/0/11/4", "role": "AXButton", "subrole": "AXDecrementPage"}
+{"depth": 4, "frame": [835, 774, 1, 1], "path": "0/0/0/3/1", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 1, "frame": [350, 150, 740, 52], "path": "0/1", "role": "AXToolbar"}
+{"depth": 2, "frame": [586, 150, 81, 52], "path": "0/1/0", "role": "AXGroup"}
+{"depth": 3, "enabled": true, "frame": [590, 158, 73, 36], "path": "0/1/0/0", "role": "AXGroup"}
+{"depth": 4, "description": "Go Back", "enabled": true, "frame": [590, 158, 36, 36], "help": "Go Back", "identifier": "chevron.backward", "path": "0/1/0/0/0", "role": "AXButton", "subrole": "AXSegment"}
+{"depth": 4, "description": "Go Forward", "enabled": false, "frame": [626, 158, 37, 36], "help": "Go Forward", "identifier": "chevron.forward", "path": "0/1/0/0/1", "role": "AXMenuButton", "subrole": "AXSegment"}
+{"depth": 1, "enabled": false, "frame": [368, 168, 16, 16], "path": "0/2", "role": "AXButton", "subrole": "AXCloseButton"}
+{"depth": 1, "enabled": true, "frame": [414, 168, 16, 16], "path": "0/3", "role": "AXButton", "subrole": "AXZoomButton"}
+{"depth": 2, "frame": [415, 169, 14, 14], "path": "0/3/0", "role": "AXGroup"}
+{"depth": 3, "frame": [415, 169, 14, 14], "path": "0/3/0/0", "role": "AXGroup"}
+{"depth": 1, "enabled": true, "frame": [391, 168, 16, 16], "path": "0/4", "role": "AXButton", "subrole": "AXMinimizeButton"}
+{"depth": 1, "enabled": true, "frame": [667, 150, 411, 52], "path": "0/5", "role": "AXStaticText", "value": "Wi-Fi"}
+{"depth": 1, "frame": [485, 222, 470, 480], "path": "0/6", "role": "AXSheet"}
+{"depth": 2, "frame": [485, 222, 470, 480], "path": "0/6/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"contentSize": [470, 1733], "depth": 3, "frame": [485, 222, 470, 415], "path": "0/6/0/0", "role": "AXScrollArea"}
+{"depth": 4, "description": "[redacted]", "enabled": true, "frame": [515, 242.125, 240.5, 16], "path": "0/6/0/0/0", "role": "AXHeading"}
+{"depth": 4, "enabled": true, "frame": [505, 268, 430, 74], "path": "0/6/0/0/1", "role": "AXGroup"}
+{"depth": 5, "enabled": true, "frame": [515, 278.125, 105.5, 16], "path": "0/6/0/0/1/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 5, "enabled": true, "frame": [889, 278.5, 36, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/1", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 5, "enabled": true, "frame": [515, 315.625, 118.5, 16], "path": "0/6/0/0/1/2", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 5, "enabled": true, "frame": [889, 316, 36, 16], "identifier": "[redacted]", "path": "0/6/0/0/1/3", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 4, "enabled": true, "frame": [505, 352, 430, 36.5], "path": "0/6/0/0/2", "role": "AXGroup"}
+{"depth": 5, "enabled": true, "frame": [515, 362.125, 210, 16], "path": "0/6/0/0/2/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 5, "enabled": true, "frame": [889, 362.5, 36, 16], "identifier": "[redacted]", "path": "0/6/0/0/2/1", "role": "AXCheckBox", "subrole": "AXSwitch", "value": 0}
+{"depth": 4, "enabled": true, "frame": [505, 398.5, 430, 36], "path": "0/6/0/0/3", "role": "AXGroup"}
+{"depth": 5, "enabled": true, "frame": [515, 408.625, 116.5, 16], "path": "0/6/0/0/3/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 5, "frame": [810.5, 408.625, 114.5, 16], "path": "0/6/0/0/3/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 6, "enabled": true, "frame": [810.5, 408.625, 114.5, 16], "path": "0/6/0/0/3/1/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 4, "description": "Known Networks", "enabled": true, "frame": [515, 464.625, 106.5, 16], "path": "0/6/0/0/4", "role": "AXHeading"}
+{"contentSize": [430, 1416], "depth": 4, "frame": [505, 490.5, 430, 1444.5], "path": "0/6/0/0/5", "role": "AXScrollArea"}
+{"depth": 5, "enabled": true, "frame": [505, 490.5, 430, 1444.5], "path": "0/6/0/0/5/0", "role": "AXOutline"}
+{"depth": 6, "frame": [505, 518.5, 430, 24], "path": "0/6/0/0/5/0/0", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 518.5, 177, 24], "path": "0/6/0/0/5/0/0/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 518.5, 177, 24], "path": "0/6/0/0/5/0/0/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [517, 524.5, 9, 12.5], "identifier": "[redacted]", "path": "0/6/0/0/5/0/0/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [536, 522.5, 29.5, 16], "path": "0/6/0/0/5/0/0/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 518.5, 177, 24], "path": "0/6/0/0/5/0/0/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 518.5, 177, 24], "path": "0/6/0/0/5/0/0/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [709, 522.5, 92.5, 16], "identifier": "[redacted]", "path": "0/6/0/0/5/0/0/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 518.5, 30, 24], "path": "0/6/0/0/5/0/0/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 518.5, 30, 24], "path": "0/6/0/0/5/0/0/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 523, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/0/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 542.5, 430, 24], "path": "0/6/0/0/5/0/1", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 542.5, 177, 24], "path": "0/6/0/0/5/0/1/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 542.5, 177, 24], "path": "0/6/0/0/5/0/1/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [517, 548.5, 9, 12.5], "identifier": "[redacted]", "path": "0/6/0/0/5/0/1/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [536, 546.5, 25, 16], "path": "0/6/0/0/5/0/1/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 542.5, 177, 24], "path": "0/6/0/0/5/0/1/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 542.5, 177, 24], "path": "0/6/0/0/5/0/1/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [709, 546.5, 93, 16], "identifier": "[redacted]", "path": "0/6/0/0/5/0/1/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 542.5, 30, 24], "path": "0/6/0/0/5/0/1/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 542.5, 30, 24], "path": "0/6/0/0/5/0/1/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 547, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/1/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 566.5, 430, 24], "path": "0/6/0/0/5/0/2", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 566.5, 177, 24], "path": "0/6/0/0/5/0/2/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 566.5, 177, 24], "path": "0/6/0/0/5/0/2/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [536, 570.5, 90, 16], "path": "0/6/0/0/5/0/2/0/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 566.5, 177, 24], "path": "0/6/0/0/5/0/2/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 566.5, 177, 24], "path": "0/6/0/0/5/0/2/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [709, 570.5, 32.5, 16], "identifier": "[redacted]", "path": "0/6/0/0/5/0/2/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 566.5, 30, 24], "path": "0/6/0/0/5/0/2/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 566.5, 30, 24], "path": "0/6/0/0/5/0/2/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 571, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/2/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 590.5, 430, 24], "path": "0/6/0/0/5/0/3", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 590.5, 177, 24], "path": "0/6/0/0/5/0/3/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 590.5, 177, 24], "path": "0/6/0/0/5/0/3/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [517, 596.5, 9, 12.5], "identifier": "[redacted]", "path": "0/6/0/0/5/0/3/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [536, 594.5, 82, 16], "path": "0/6/0/0/5/0/3/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 590.5, 177, 24], "path": "0/6/0/0/5/0/3/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 590.5, 177, 24], "path": "0/6/0/0/5/0/3/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [709, 594.5, 92.5, 16], "identifier": "[redacted]", "path": "0/6/0/0/5/0/3/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 590.5, 30, 24], "path": "0/6/0/0/5/0/3/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 590.5, 30, 24], "path": "0/6/0/0/5/0/3/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 595, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/3/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 614.5, 430, 24], "path": "0/6/0/0/5/0/4", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 614.5, 177, 24], "path": "0/6/0/0/5/0/4/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 614.5, 177, 24], "path": "0/6/0/0/5/0/4/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [517, 620.5, 9, 12.5], "identifier": "[redacted]", "path": "0/6/0/0/5/0/4/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [536, 618.5, 43, 16], "path": "0/6/0/0/5/0/4/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 614.5, 177, 24], "path": "0/6/0/0/5/0/4/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 614.5, 177, 24], "path": "0/6/0/0/5/0/4/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [709, 618.5, 92.5, 16], "identifier": "[redacted]", "path": "0/6/0/0/5/0/4/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 614.5, 30, 24], "path": "0/6/0/0/5/0/4/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 614.5, 30, 24], "path": "0/6/0/0/5/0/4/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 619, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/4/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 638.5, 430, 24], "path": "0/6/0/0/5/0/5", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 638.5, 177, 24], "path": "0/6/0/0/5/0/5/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 638.5, 177, 24], "path": "0/6/0/0/5/0/5/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/5/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/5/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 638.5, 177, 24], "path": "0/6/0/0/5/0/5/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 638.5, 177, 24], "path": "0/6/0/0/5/0/5/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/5/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 638.5, 30, 24], "path": "0/6/0/0/5/0/5/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 638.5, 30, 24], "path": "0/6/0/0/5/0/5/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 643, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/5/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 662.5, 430, 24], "path": "0/6/0/0/5/0/6", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 662.5, 177, 24], "path": "0/6/0/0/5/0/6/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 662.5, 177, 24], "path": "0/6/0/0/5/0/6/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/6/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/6/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 662.5, 177, 24], "path": "0/6/0/0/5/0/6/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 662.5, 177, 24], "path": "0/6/0/0/5/0/6/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/6/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 662.5, 30, 24], "path": "0/6/0/0/5/0/6/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 662.5, 30, 24], "path": "0/6/0/0/5/0/6/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 667, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/6/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 686.5, 430, 24], "path": "0/6/0/0/5/0/7", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 686.5, 177, 24], "path": "0/6/0/0/5/0/7/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 686.5, 177, 24], "path": "0/6/0/0/5/0/7/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/7/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/7/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 686.5, 177, 24], "path": "0/6/0/0/5/0/7/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 686.5, 177, 24], "path": "0/6/0/0/5/0/7/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/7/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 686.5, 30, 24], "path": "0/6/0/0/5/0/7/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 686.5, 30, 24], "path": "0/6/0/0/5/0/7/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 691, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/7/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 710.5, 430, 24], "path": "0/6/0/0/5/0/8", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 710.5, 177, 24], "path": "0/6/0/0/5/0/8/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 710.5, 177, 24], "path": "0/6/0/0/5/0/8/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/8/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/8/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 710.5, 177, 24], "path": "0/6/0/0/5/0/8/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 710.5, 177, 24], "path": "0/6/0/0/5/0/8/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/8/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 710.5, 30, 24], "path": "0/6/0/0/5/0/8/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 710.5, 30, 24], "path": "0/6/0/0/5/0/8/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 715, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/8/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 734.5, 430, 24], "path": "0/6/0/0/5/0/9", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 734.5, 177, 24], "path": "0/6/0/0/5/0/9/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 734.5, 177, 24], "path": "0/6/0/0/5/0/9/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/9/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/9/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 734.5, 177, 24], "path": "0/6/0/0/5/0/9/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 734.5, 177, 24], "path": "0/6/0/0/5/0/9/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/9/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 734.5, 30, 24], "path": "0/6/0/0/5/0/9/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 734.5, 30, 24], "path": "0/6/0/0/5/0/9/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 739, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/9/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 758.5, 430, 24], "path": "0/6/0/0/5/0/10", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 758.5, 177, 24], "path": "0/6/0/0/5/0/10/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 758.5, 177, 24], "path": "0/6/0/0/5/0/10/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/10/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/10/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 758.5, 177, 24], "path": "0/6/0/0/5/0/10/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 758.5, 177, 24], "path": "0/6/0/0/5/0/10/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/10/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 758.5, 30, 24], "path": "0/6/0/0/5/0/10/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 758.5, 30, 24], "path": "0/6/0/0/5/0/10/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 763, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/10/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 782.5, 430, 24], "path": "0/6/0/0/5/0/11", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 782.5, 177, 24], "path": "0/6/0/0/5/0/11/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 782.5, 177, 24], "path": "0/6/0/0/5/0/11/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/11/0/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 782.5, 177, 24], "path": "0/6/0/0/5/0/11/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 782.5, 177, 24], "path": "0/6/0/0/5/0/11/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/11/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 782.5, 30, 24], "path": "0/6/0/0/5/0/11/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 782.5, 30, 24], "path": "0/6/0/0/5/0/11/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 787, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/11/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 806.5, 430, 24], "path": "0/6/0/0/5/0/12", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 806.5, 177, 24], "path": "0/6/0/0/5/0/12/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 806.5, 177, 24], "path": "0/6/0/0/5/0/12/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/12/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/12/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 806.5, 177, 24], "path": "0/6/0/0/5/0/12/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 806.5, 177, 24], "path": "0/6/0/0/5/0/12/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/12/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 806.5, 30, 24], "path": "0/6/0/0/5/0/12/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 806.5, 30, 24], "path": "0/6/0/0/5/0/12/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 811, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/12/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 830.5, 430, 24], "path": "0/6/0/0/5/0/13", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 830.5, 177, 24], "path": "0/6/0/0/5/0/13/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 830.5, 177, 24], "path": "0/6/0/0/5/0/13/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/13/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/13/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 830.5, 177, 24], "path": "0/6/0/0/5/0/13/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 830.5, 177, 24], "path": "0/6/0/0/5/0/13/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/13/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 830.5, 30, 24], "path": "0/6/0/0/5/0/13/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 830.5, 30, 24], "path": "0/6/0/0/5/0/13/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 835, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/13/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 854.5, 430, 24], "path": "0/6/0/0/5/0/14", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 854.5, 177, 24], "path": "0/6/0/0/5/0/14/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 854.5, 177, 24], "path": "0/6/0/0/5/0/14/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/14/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/14/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 854.5, 177, 24], "path": "0/6/0/0/5/0/14/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 854.5, 177, 24], "path": "0/6/0/0/5/0/14/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/14/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 854.5, 30, 24], "path": "0/6/0/0/5/0/14/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 854.5, 30, 24], "path": "0/6/0/0/5/0/14/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 859, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/14/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 878.5, 430, 24], "path": "0/6/0/0/5/0/15", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 878.5, 177, 24], "path": "0/6/0/0/5/0/15/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 878.5, 177, 24], "path": "0/6/0/0/5/0/15/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/15/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/15/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 878.5, 177, 24], "path": "0/6/0/0/5/0/15/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 878.5, 177, 24], "path": "0/6/0/0/5/0/15/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/15/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 878.5, 30, 24], "path": "0/6/0/0/5/0/15/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 878.5, 30, 24], "path": "0/6/0/0/5/0/15/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 883, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/15/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 902.5, 430, 24], "path": "0/6/0/0/5/0/16", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 902.5, 177, 24], "path": "0/6/0/0/5/0/16/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 902.5, 177, 24], "path": "0/6/0/0/5/0/16/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/16/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/16/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 902.5, 177, 24], "path": "0/6/0/0/5/0/16/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 902.5, 177, 24], "path": "0/6/0/0/5/0/16/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/16/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 902.5, 30, 24], "path": "0/6/0/0/5/0/16/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 902.5, 30, 24], "path": "0/6/0/0/5/0/16/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 907, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/16/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 926.5, 430, 24], "path": "0/6/0/0/5/0/17", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 926.5, 177, 24], "path": "0/6/0/0/5/0/17/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 926.5, 177, 24], "path": "0/6/0/0/5/0/17/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/17/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/17/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 926.5, 177, 24], "path": "0/6/0/0/5/0/17/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 926.5, 177, 24], "path": "0/6/0/0/5/0/17/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/17/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 926.5, 30, 24], "path": "0/6/0/0/5/0/17/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 926.5, 30, 24], "path": "0/6/0/0/5/0/17/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 931, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/17/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 950.5, 430, 24], "path": "0/6/0/0/5/0/18", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 950.5, 177, 24], "path": "0/6/0/0/5/0/18/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 950.5, 177, 24], "path": "0/6/0/0/5/0/18/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/18/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/18/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 950.5, 177, 24], "path": "0/6/0/0/5/0/18/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 950.5, 177, 24], "path": "0/6/0/0/5/0/18/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/18/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 950.5, 30, 24], "path": "0/6/0/0/5/0/18/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 950.5, 30, 24], "path": "0/6/0/0/5/0/18/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 955, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/18/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 974.5, 430, 24], "path": "0/6/0/0/5/0/19", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 974.5, 177, 24], "path": "0/6/0/0/5/0/19/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 974.5, 177, 24], "path": "0/6/0/0/5/0/19/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/19/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/19/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 974.5, 177, 24], "path": "0/6/0/0/5/0/19/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 974.5, 177, 24], "path": "0/6/0/0/5/0/19/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/19/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 974.5, 30, 24], "path": "0/6/0/0/5/0/19/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 974.5, 30, 24], "path": "0/6/0/0/5/0/19/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 979, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/19/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 998.5, 430, 24], "path": "0/6/0/0/5/0/20", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 998.5, 177, 24], "path": "0/6/0/0/5/0/20/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 998.5, 177, 24], "path": "0/6/0/0/5/0/20/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/20/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/20/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 998.5, 177, 24], "path": "0/6/0/0/5/0/20/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 998.5, 177, 24], "path": "0/6/0/0/5/0/20/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/20/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 998.5, 30, 24], "path": "0/6/0/0/5/0/20/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 998.5, 30, 24], "path": "0/6/0/0/5/0/20/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1003, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/20/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1022.5, 430, 24], "path": "0/6/0/0/5/0/21", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1022.5, 177, 24], "path": "0/6/0/0/5/0/21/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1022.5, 177, 24], "path": "0/6/0/0/5/0/21/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/21/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/21/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1022.5, 177, 24], "path": "0/6/0/0/5/0/21/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1022.5, 177, 24], "path": "0/6/0/0/5/0/21/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/21/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1022.5, 30, 24], "path": "0/6/0/0/5/0/21/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1022.5, 30, 24], "path": "0/6/0/0/5/0/21/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1027, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/21/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1046.5, 430, 24], "path": "0/6/0/0/5/0/22", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1046.5, 177, 24], "path": "0/6/0/0/5/0/22/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1046.5, 177, 24], "path": "0/6/0/0/5/0/22/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/22/0/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1046.5, 177, 24], "path": "0/6/0/0/5/0/22/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1046.5, 177, 24], "path": "0/6/0/0/5/0/22/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/22/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1046.5, 30, 24], "path": "0/6/0/0/5/0/22/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1046.5, 30, 24], "path": "0/6/0/0/5/0/22/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1051, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/22/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1070.5, 430, 24], "path": "0/6/0/0/5/0/23", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1070.5, 177, 24], "path": "0/6/0/0/5/0/23/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1070.5, 177, 24], "path": "0/6/0/0/5/0/23/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/23/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/23/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1070.5, 177, 24], "path": "0/6/0/0/5/0/23/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1070.5, 177, 24], "path": "0/6/0/0/5/0/23/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/23/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1070.5, 30, 24], "path": "0/6/0/0/5/0/23/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1070.5, 30, 24], "path": "0/6/0/0/5/0/23/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1075, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/23/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1094.5, 430, 24], "path": "0/6/0/0/5/0/24", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1094.5, 177, 24], "path": "0/6/0/0/5/0/24/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1094.5, 177, 24], "path": "0/6/0/0/5/0/24/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/24/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/24/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1094.5, 177, 24], "path": "0/6/0/0/5/0/24/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1094.5, 177, 24], "path": "0/6/0/0/5/0/24/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/24/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1094.5, 30, 24], "path": "0/6/0/0/5/0/24/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1094.5, 30, 24], "path": "0/6/0/0/5/0/24/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1099, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/24/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1118.5, 430, 24], "path": "0/6/0/0/5/0/25", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1118.5, 177, 24], "path": "0/6/0/0/5/0/25/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1118.5, 177, 24], "path": "0/6/0/0/5/0/25/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/25/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/25/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1118.5, 177, 24], "path": "0/6/0/0/5/0/25/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1118.5, 177, 24], "path": "0/6/0/0/5/0/25/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/25/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1118.5, 30, 24], "path": "0/6/0/0/5/0/25/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1118.5, 30, 24], "path": "0/6/0/0/5/0/25/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1123, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/25/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1142.5, 430, 24], "path": "0/6/0/0/5/0/26", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1142.5, 177, 24], "path": "0/6/0/0/5/0/26/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1142.5, 177, 24], "path": "0/6/0/0/5/0/26/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/26/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/26/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1142.5, 177, 24], "path": "0/6/0/0/5/0/26/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1142.5, 177, 24], "path": "0/6/0/0/5/0/26/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/26/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1142.5, 30, 24], "path": "0/6/0/0/5/0/26/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1142.5, 30, 24], "path": "0/6/0/0/5/0/26/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1147, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/26/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1166.5, 430, 24], "path": "0/6/0/0/5/0/27", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1166.5, 177, 24], "path": "0/6/0/0/5/0/27/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1166.5, 177, 24], "path": "0/6/0/0/5/0/27/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/27/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/27/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1166.5, 177, 24], "path": "0/6/0/0/5/0/27/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1166.5, 177, 24], "path": "0/6/0/0/5/0/27/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/27/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1166.5, 30, 24], "path": "0/6/0/0/5/0/27/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1166.5, 30, 24], "path": "0/6/0/0/5/0/27/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1171, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/27/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1190.5, 430, 24], "path": "0/6/0/0/5/0/28", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1190.5, 177, 24], "path": "0/6/0/0/5/0/28/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1190.5, 177, 24], "path": "0/6/0/0/5/0/28/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/28/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/28/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1190.5, 177, 24], "path": "0/6/0/0/5/0/28/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1190.5, 177, 24], "path": "0/6/0/0/5/0/28/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/28/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1190.5, 30, 24], "path": "0/6/0/0/5/0/28/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1190.5, 30, 24], "path": "0/6/0/0/5/0/28/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1195, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/28/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1214.5, 430, 24], "path": "0/6/0/0/5/0/29", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1214.5, 177, 24], "path": "0/6/0/0/5/0/29/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1214.5, 177, 24], "path": "0/6/0/0/5/0/29/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/29/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/29/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1214.5, 177, 24], "path": "0/6/0/0/5/0/29/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1214.5, 177, 24], "path": "0/6/0/0/5/0/29/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/29/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1214.5, 30, 24], "path": "0/6/0/0/5/0/29/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1214.5, 30, 24], "path": "0/6/0/0/5/0/29/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1219, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/29/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1238.5, 430, 24], "path": "0/6/0/0/5/0/30", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1238.5, 177, 24], "path": "0/6/0/0/5/0/30/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1238.5, 177, 24], "path": "0/6/0/0/5/0/30/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/30/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/30/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1238.5, 177, 24], "path": "0/6/0/0/5/0/30/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1238.5, 177, 24], "path": "0/6/0/0/5/0/30/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/30/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1238.5, 30, 24], "path": "0/6/0/0/5/0/30/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1238.5, 30, 24], "path": "0/6/0/0/5/0/30/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1243, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/30/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1262.5, 430, 24], "path": "0/6/0/0/5/0/31", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1262.5, 177, 24], "path": "0/6/0/0/5/0/31/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1262.5, 177, 24], "path": "0/6/0/0/5/0/31/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/31/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/31/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1262.5, 177, 24], "path": "0/6/0/0/5/0/31/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1262.5, 177, 24], "path": "0/6/0/0/5/0/31/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/31/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1262.5, 30, 24], "path": "0/6/0/0/5/0/31/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1262.5, 30, 24], "path": "0/6/0/0/5/0/31/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1267, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/31/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1286.5, 430, 24], "path": "0/6/0/0/5/0/32", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1286.5, 177, 24], "path": "0/6/0/0/5/0/32/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1286.5, 177, 24], "path": "0/6/0/0/5/0/32/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/32/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/32/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1286.5, 177, 24], "path": "0/6/0/0/5/0/32/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1286.5, 177, 24], "path": "0/6/0/0/5/0/32/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/32/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1286.5, 30, 24], "path": "0/6/0/0/5/0/32/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1286.5, 30, 24], "path": "0/6/0/0/5/0/32/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1291, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/32/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1310.5, 430, 24], "path": "0/6/0/0/5/0/33", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1310.5, 177, 24], "path": "0/6/0/0/5/0/33/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1310.5, 177, 24], "path": "0/6/0/0/5/0/33/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/33/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/33/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1310.5, 177, 24], "path": "0/6/0/0/5/0/33/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1310.5, 177, 24], "path": "0/6/0/0/5/0/33/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/33/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1310.5, 30, 24], "path": "0/6/0/0/5/0/33/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1310.5, 30, 24], "path": "0/6/0/0/5/0/33/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1315, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/33/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1334.5, 430, 24], "path": "0/6/0/0/5/0/34", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1334.5, 177, 24], "path": "0/6/0/0/5/0/34/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1334.5, 177, 24], "path": "0/6/0/0/5/0/34/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/34/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/34/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1334.5, 177, 24], "path": "0/6/0/0/5/0/34/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1334.5, 177, 24], "path": "0/6/0/0/5/0/34/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/34/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1334.5, 30, 24], "path": "0/6/0/0/5/0/34/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1334.5, 30, 24], "path": "0/6/0/0/5/0/34/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1339, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/34/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1358.5, 430, 24], "path": "0/6/0/0/5/0/35", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1358.5, 177, 24], "path": "0/6/0/0/5/0/35/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1358.5, 177, 24], "path": "0/6/0/0/5/0/35/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/35/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/35/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1358.5, 177, 24], "path": "0/6/0/0/5/0/35/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1358.5, 177, 24], "path": "0/6/0/0/5/0/35/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/35/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1358.5, 30, 24], "path": "0/6/0/0/5/0/35/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1358.5, 30, 24], "path": "0/6/0/0/5/0/35/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1363, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/35/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1382.5, 430, 24], "path": "0/6/0/0/5/0/36", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1382.5, 177, 24], "path": "0/6/0/0/5/0/36/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1382.5, 177, 24], "path": "0/6/0/0/5/0/36/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/36/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/36/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1382.5, 177, 24], "path": "0/6/0/0/5/0/36/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1382.5, 177, 24], "path": "0/6/0/0/5/0/36/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/36/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1382.5, 30, 24], "path": "0/6/0/0/5/0/36/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1382.5, 30, 24], "path": "0/6/0/0/5/0/36/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1387, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/36/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1406.5, 430, 24], "path": "0/6/0/0/5/0/37", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1406.5, 177, 24], "path": "0/6/0/0/5/0/37/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1406.5, 177, 24], "path": "0/6/0/0/5/0/37/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/37/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/37/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1406.5, 177, 24], "path": "0/6/0/0/5/0/37/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1406.5, 177, 24], "path": "0/6/0/0/5/0/37/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/37/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1406.5, 30, 24], "path": "0/6/0/0/5/0/37/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1406.5, 30, 24], "path": "0/6/0/0/5/0/37/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1411, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/37/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1430.5, 430, 24], "path": "0/6/0/0/5/0/38", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1430.5, 177, 24], "path": "0/6/0/0/5/0/38/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1430.5, 177, 24], "path": "0/6/0/0/5/0/38/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/38/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/38/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1430.5, 177, 24], "path": "0/6/0/0/5/0/38/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1430.5, 177, 24], "path": "0/6/0/0/5/0/38/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/38/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1430.5, 30, 24], "path": "0/6/0/0/5/0/38/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1430.5, 30, 24], "path": "0/6/0/0/5/0/38/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1435, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/38/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1454.5, 430, 24], "path": "0/6/0/0/5/0/39", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1454.5, 177, 24], "path": "0/6/0/0/5/0/39/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1454.5, 177, 24], "path": "0/6/0/0/5/0/39/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/39/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/39/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1454.5, 177, 24], "path": "0/6/0/0/5/0/39/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1454.5, 177, 24], "path": "0/6/0/0/5/0/39/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/39/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1454.5, 30, 24], "path": "0/6/0/0/5/0/39/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1454.5, 30, 24], "path": "0/6/0/0/5/0/39/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1459, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/39/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1478.5, 430, 24], "path": "0/6/0/0/5/0/40", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1478.5, 177, 24], "path": "0/6/0/0/5/0/40/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1478.5, 177, 24], "path": "0/6/0/0/5/0/40/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/40/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/40/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1478.5, 177, 24], "path": "0/6/0/0/5/0/40/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1478.5, 177, 24], "path": "0/6/0/0/5/0/40/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/40/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1478.5, 30, 24], "path": "0/6/0/0/5/0/40/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1478.5, 30, 24], "path": "0/6/0/0/5/0/40/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1483, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/40/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1502.5, 430, 24], "path": "0/6/0/0/5/0/41", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1502.5, 177, 24], "path": "0/6/0/0/5/0/41/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1502.5, 177, 24], "path": "0/6/0/0/5/0/41/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/41/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/41/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1502.5, 177, 24], "path": "0/6/0/0/5/0/41/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1502.5, 177, 24], "path": "0/6/0/0/5/0/41/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/41/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1502.5, 30, 24], "path": "0/6/0/0/5/0/41/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1502.5, 30, 24], "path": "0/6/0/0/5/0/41/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1507, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/41/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1526.5, 430, 24], "path": "0/6/0/0/5/0/42", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1526.5, 177, 24], "path": "0/6/0/0/5/0/42/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1526.5, 177, 24], "path": "0/6/0/0/5/0/42/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/42/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/42/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1526.5, 177, 24], "path": "0/6/0/0/5/0/42/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1526.5, 177, 24], "path": "0/6/0/0/5/0/42/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/42/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1526.5, 30, 24], "path": "0/6/0/0/5/0/42/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1526.5, 30, 24], "path": "0/6/0/0/5/0/42/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1531, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/42/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1550.5, 430, 24], "path": "0/6/0/0/5/0/43", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1550.5, 177, 24], "path": "0/6/0/0/5/0/43/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1550.5, 177, 24], "path": "0/6/0/0/5/0/43/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/43/0/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1550.5, 177, 24], "path": "0/6/0/0/5/0/43/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1550.5, 177, 24], "path": "0/6/0/0/5/0/43/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/43/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1550.5, 30, 24], "path": "0/6/0/0/5/0/43/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1550.5, 30, 24], "path": "0/6/0/0/5/0/43/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1555, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/43/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1574.5, 430, 24], "path": "0/6/0/0/5/0/44", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1574.5, 177, 24], "path": "0/6/0/0/5/0/44/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1574.5, 177, 24], "path": "0/6/0/0/5/0/44/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/44/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/44/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1574.5, 177, 24], "path": "0/6/0/0/5/0/44/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1574.5, 177, 24], "path": "0/6/0/0/5/0/44/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/44/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1574.5, 30, 24], "path": "0/6/0/0/5/0/44/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1574.5, 30, 24], "path": "0/6/0/0/5/0/44/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1579, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/44/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1598.5, 430, 24], "path": "0/6/0/0/5/0/45", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1598.5, 177, 24], "path": "0/6/0/0/5/0/45/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1598.5, 177, 24], "path": "0/6/0/0/5/0/45/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/45/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/45/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1598.5, 177, 24], "path": "0/6/0/0/5/0/45/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1598.5, 177, 24], "path": "0/6/0/0/5/0/45/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/45/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1598.5, 30, 24], "path": "0/6/0/0/5/0/45/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1598.5, 30, 24], "path": "0/6/0/0/5/0/45/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1603, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/45/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1622.5, 430, 24], "path": "0/6/0/0/5/0/46", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1622.5, 177, 24], "path": "0/6/0/0/5/0/46/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1622.5, 177, 24], "path": "0/6/0/0/5/0/46/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/46/0/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1622.5, 177, 24], "path": "0/6/0/0/5/0/46/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1622.5, 177, 24], "path": "0/6/0/0/5/0/46/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/46/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1622.5, 30, 24], "path": "0/6/0/0/5/0/46/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1622.5, 30, 24], "path": "0/6/0/0/5/0/46/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1627, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/46/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1646.5, 430, 24], "path": "0/6/0/0/5/0/47", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1646.5, 177, 24], "path": "0/6/0/0/5/0/47/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1646.5, 177, 24], "path": "0/6/0/0/5/0/47/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/47/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/47/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1646.5, 177, 24], "path": "0/6/0/0/5/0/47/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1646.5, 177, 24], "path": "0/6/0/0/5/0/47/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/47/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1646.5, 30, 24], "path": "0/6/0/0/5/0/47/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1646.5, 30, 24], "path": "0/6/0/0/5/0/47/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1651, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/47/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1670.5, 430, 24], "path": "0/6/0/0/5/0/48", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1670.5, 177, 24], "path": "0/6/0/0/5/0/48/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1670.5, 177, 24], "path": "0/6/0/0/5/0/48/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/48/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/48/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1670.5, 177, 24], "path": "0/6/0/0/5/0/48/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1670.5, 177, 24], "path": "0/6/0/0/5/0/48/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/48/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1670.5, 30, 24], "path": "0/6/0/0/5/0/48/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1670.5, 30, 24], "path": "0/6/0/0/5/0/48/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1675, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/48/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1694.5, 430, 24], "path": "0/6/0/0/5/0/49", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1694.5, 177, 24], "path": "0/6/0/0/5/0/49/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1694.5, 177, 24], "path": "0/6/0/0/5/0/49/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/49/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/49/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1694.5, 177, 24], "path": "0/6/0/0/5/0/49/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1694.5, 177, 24], "path": "0/6/0/0/5/0/49/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/49/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1694.5, 30, 24], "path": "0/6/0/0/5/0/49/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1694.5, 30, 24], "path": "0/6/0/0/5/0/49/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1699, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/49/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1718.5, 430, 24], "path": "0/6/0/0/5/0/50", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1718.5, 177, 24], "path": "0/6/0/0/5/0/50/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1718.5, 177, 24], "path": "0/6/0/0/5/0/50/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/50/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/50/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1718.5, 177, 24], "path": "0/6/0/0/5/0/50/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1718.5, 177, 24], "path": "0/6/0/0/5/0/50/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/50/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1718.5, 30, 24], "path": "0/6/0/0/5/0/50/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1718.5, 30, 24], "path": "0/6/0/0/5/0/50/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1723, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/50/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1742.5, 430, 24], "path": "0/6/0/0/5/0/51", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1742.5, 177, 24], "path": "0/6/0/0/5/0/51/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1742.5, 177, 24], "path": "0/6/0/0/5/0/51/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/51/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/51/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1742.5, 177, 24], "path": "0/6/0/0/5/0/51/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1742.5, 177, 24], "path": "0/6/0/0/5/0/51/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/51/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1742.5, 30, 24], "path": "0/6/0/0/5/0/51/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1742.5, 30, 24], "path": "0/6/0/0/5/0/51/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1747, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/51/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1766.5, 430, 24], "path": "0/6/0/0/5/0/52", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1766.5, 177, 24], "path": "0/6/0/0/5/0/52/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1766.5, 177, 24], "path": "0/6/0/0/5/0/52/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/52/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/52/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1766.5, 177, 24], "path": "0/6/0/0/5/0/52/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1766.5, 177, 24], "path": "0/6/0/0/5/0/52/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/52/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1766.5, 30, 24], "path": "0/6/0/0/5/0/52/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1766.5, 30, 24], "path": "0/6/0/0/5/0/52/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1771, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/52/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1790.5, 430, 24], "path": "0/6/0/0/5/0/53", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1790.5, 177, 24], "path": "0/6/0/0/5/0/53/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1790.5, 177, 24], "path": "0/6/0/0/5/0/53/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/53/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/53/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1790.5, 177, 24], "path": "0/6/0/0/5/0/53/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1790.5, 177, 24], "path": "0/6/0/0/5/0/53/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/53/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1790.5, 30, 24], "path": "0/6/0/0/5/0/53/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1790.5, 30, 24], "path": "0/6/0/0/5/0/53/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1795, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/53/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1814.5, 430, 24], "path": "0/6/0/0/5/0/54", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1814.5, 177, 24], "path": "0/6/0/0/5/0/54/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1814.5, 177, 24], "path": "0/6/0/0/5/0/54/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/54/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/54/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1814.5, 177, 24], "path": "0/6/0/0/5/0/54/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1814.5, 177, 24], "path": "0/6/0/0/5/0/54/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/54/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1814.5, 30, 24], "path": "0/6/0/0/5/0/54/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1814.5, 30, 24], "path": "0/6/0/0/5/0/54/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1819, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/54/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1838.5, 430, 24], "path": "0/6/0/0/5/0/55", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1838.5, 177, 24], "path": "0/6/0/0/5/0/55/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1838.5, 177, 24], "path": "0/6/0/0/5/0/55/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/55/0/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1838.5, 177, 24], "path": "0/6/0/0/5/0/55/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1838.5, 177, 24], "path": "0/6/0/0/5/0/55/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/55/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1838.5, 30, 24], "path": "0/6/0/0/5/0/55/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1838.5, 30, 24], "path": "0/6/0/0/5/0/55/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1843, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/55/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1862.5, 430, 24], "path": "0/6/0/0/5/0/56", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1862.5, 177, 24], "path": "0/6/0/0/5/0/56/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1862.5, 177, 24], "path": "0/6/0/0/5/0/56/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/56/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/56/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1862.5, 177, 24], "path": "0/6/0/0/5/0/56/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1862.5, 177, 24], "path": "0/6/0/0/5/0/56/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/56/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1862.5, 30, 24], "path": "0/6/0/0/5/0/56/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1862.5, 30, 24], "path": "0/6/0/0/5/0/56/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1867, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/56/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1886.5, 430, 24], "path": "0/6/0/0/5/0/57", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1886.5, 177, 24], "path": "0/6/0/0/5/0/57/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1886.5, 177, 24], "path": "0/6/0/0/5/0/57/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/57/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/57/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1886.5, 177, 24], "path": "0/6/0/0/5/0/57/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1886.5, 177, 24], "path": "0/6/0/0/5/0/57/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/57/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1886.5, 30, 24], "path": "0/6/0/0/5/0/57/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1886.5, 30, 24], "path": "0/6/0/0/5/0/57/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1891, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/57/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 1910.5, 430, 24], "path": "0/6/0/0/5/0/58", "role": "AXRow", "selected": false, "subrole": "AXOutlineRow"}
+{"depth": 7, "enabled": true, "frame": [511, 1910.5, 177, 24], "path": "0/6/0/0/5/0/58/0", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [511, 1910.5, 177, 24], "path": "0/6/0/0/5/0/58/0/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "description": "[redacted]", "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/58/0/0/0", "role": "AXUnknown"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "path": "0/6/0/0/5/0/58/0/0/1", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [705, 1910.5, 177, 24], "path": "0/6/0/0/5/0/58/1", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [705, 1910.5, 177, 24], "path": "0/6/0/0/5/0/58/1/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [0, 932, 0, 0], "identifier": "[redacted]", "path": "0/6/0/0/5/0/58/1/0/0", "role": "AXStaticText", "value": "[redacted]"}
+{"depth": 7, "enabled": true, "frame": [899, 1910.5, 30, 24], "path": "0/6/0/0/5/0/58/2", "role": "AXCell", "selected": false}
+{"depth": 8, "frame": [899, 1910.5, 30, 24], "path": "0/6/0/0/5/0/58/2/0", "role": "AXGroup", "subrole": "AXHostingView"}
+{"depth": 9, "enabled": true, "frame": [903, 1915, 21, 15], "identifier": "[redacted]", "path": "0/6/0/0/5/0/58/2/0/0", "role": "AXMenuButton", "title": "[redacted]"}
+{"depth": 6, "frame": [505, 518.5, 192, 1416], "identifier": "E50C48F4-8384-4318-BA3B-777730A6D6B9", "path": "0/6/0/0/5/0/59", "role": "AXColumn", "selected": false}
+{"depth": 6, "frame": [697, 518.5, 194, 1416], "identifier": "A962A28F-98FE-42BC-B4D2-7E085880F256", "path": "0/6/0/0/5/0/60", "role": "AXColumn", "selected": false}
+{"depth": 6, "frame": [891, 518.5, 44, 1416], "identifier": "BAA936B5-1C5B-44EE-B69B-ED4F355EC263", "path": "0/6/0/0/5/0/61", "role": "AXColumn", "selected": false}
+{"depth": 6, "frame": [505, 490.5, 430, 28], "path": "0/6/0/0/5/0/62", "role": "AXGroup"}
+{"depth": 7, "enabled": true, "frame": [505, 490.5, 192, 28], "path": "0/6/0/0/5/0/62/0", "role": "AXButton", "subrole": "AXSortButton", "title": "Network Name"}
+{"depth": 7, "enabled": true, "frame": [697, 490.5, 194, 28], "path": "0/6/0/0/5/0/62/1", "role": "AXButton", "subrole": "AXSortButton", "title": "Security Type"}
+{"depth": 7, "enabled": true, "frame": [891, 490.5, 44, 28], "path": "0/6/0/0/5/0/62/2", "role": "AXButton", "subrole": "AXSortButton", "title": ""}
+{"depth": 4, "enabled": true, "frame": [937, 228.5, 19, 409.5], "path": "0/6/0/0/6", "role": "AXScrollBar", "value": 0}
+{"depth": 5, "frame": [946, 232.5, 6, 96], "path": "0/6/0/0/6/0", "role": "AXValueIndicator", "value": 0}
+{"depth": 5, "frame": [938, 229.5, 0, 0], "path": "0/6/0/0/6/1", "role": "AXButton", "subrole": "AXIncrementArrow"}
+{"depth": 5, "frame": [938, 229.5, 0, 0], "path": "0/6/0/0/6/2", "role": "AXButton", "subrole": "AXDecrementArrow"}
+{"depth": 5, "frame": [946, 329, 6, 305], "path": "0/6/0/0/6/3", "role": "AXButton", "subrole": "AXIncrementPage"}
+{"depth": 5, "frame": [946, 232.5, 6, 0], "path": "0/6/0/0/6/4", "role": "AXButton", "subrole": "AXDecrementPage"}
+{"depth": 3, "description": "Done", "enabled": true, "frame": [871, 658, 64, 24], "path": "0/6/0/1", "role": "AXButton"}
