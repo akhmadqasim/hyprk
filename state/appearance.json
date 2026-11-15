@@ -6,6 +6,10 @@
   "reduceMotion": false,
   "accent": "multicolor",
   "sidebarIconSize": "medium",
-  "glass": 0.5,
-  "iconStyle": "default"
+  "glass": 0.508,
+  "iconStyle": "default",
+  "iconStyleVariant": "auto",
+  "iconTint": "",
+  "tintWindowBackground": true,
+  "highlight": ""
 }

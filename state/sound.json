@@ -1,0 +1,7 @@
+{
+  "alertSound": "Blow",
+  "alertVolume": 1,
+  "uiSounds": true,
+  "volumeFeedback": false,
+  "startupSound": true
+}

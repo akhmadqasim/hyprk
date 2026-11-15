@@ -1,0 +1,11 @@
+# hyprk-managed (config/hypr/hyprland.lua hyprk_gtk)
+[org/gnome/desktop/wm/preferences]
+button-layout='close,minimize,maximize:'
+
+[org/gnome/desktop/interface]
+gtk-theme='MacOS27-Dark'
+color-scheme='prefer-dark'
+font-name='SF Pro 10'
+monospace-font-name='SF Mono 10'
+cursor-theme='hyprk-cursors'
+cursor-size=24

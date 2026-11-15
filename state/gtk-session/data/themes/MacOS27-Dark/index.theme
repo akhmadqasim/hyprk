@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=MacOS27-Dark
+Comment=macOS 27 look for GTK 3 and GTK 4
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=MacOS27-Dark
+MetacityTheme=MacOS27-Dark

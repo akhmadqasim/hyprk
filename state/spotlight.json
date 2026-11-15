@@ -1,0 +1,11 @@
+{
+  "clipboardHistory": "8h",
+  "quickKeys": {
+    "dark-mode": "dm",
+    "lock": "ls",
+    "terminal": "nt",
+    "screenshot": "ss",
+    "wifi": "wf",
+    "bluetooth": "bt"
+  }
+}
