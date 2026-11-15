@@ -40,3 +40,5 @@ Same set-up as round 2 (temporary "Downloads" stack of 13 neutral files + 1 fold
 |---|---|---|---|---|
 | stack-fan-more-dark.png | `screencapture -x -R 700,30,560,902`, 1.5 s after opening | fan with 9 items + "5 More in Finder" (arrow disc) on top; tile shows the chevron | dark | TahoeDark |
 | stack-fan-more-close-dark.mov | same region, `-v -V 2.5`; click on the chevron at about 0.4 s | fan closes; changes 0.017 to 1.033 s | dark | TahoeDark |
+| mc-spaces-bar-collapsed-1710x1107-dark-top.png | full-screen shot in Mission Control, top 150 pt kept | Spaces bar collapsed: 74 pt from the screen top | dark | TahoeDark |
+| mc-spaces-bar-collapsed-1440x932-dark-top.png / mc-spaces-bar-expanded-1440x932-dark-top.png | same at 1440x932, top 200 / 300 pt kept | collapsed 68 pt, expanded (pointer at the top) 160 pt | dark | TahoeDark |

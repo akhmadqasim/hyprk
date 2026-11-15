@@ -1,0 +1,29 @@
+# synthetic volume key presses (NX_KEYTYPE_SOUND_UP/DOWN system-defined events); t = seconds after the first press; the first press is about 1.0 s into the clip
+start volume 63
+up press 1 t=0.000
+up press 2 t=0.752
+up press 3 t=1.551
+up press 4 t=2.344
+up press 5 t=3.136
+up press 6 t=3.932
+up press 7 t=4.681
+up press 8 t=5.483
+down press 9 t=6.277
+down press 10 t=7.070
+down press 11 t=7.870
+down press 12 t=8.672
+down press 13 t=9.468
+down press 14 t=10.245
+down press 15 t=11.040
+down press 16 t=11.832
+down press 17 t=12.630
+down press 18 t=13.426
+down press 19 t=14.223
+down press 20 t=15.024
+down press 21 t=15.822
+down press 22 t=16.620
+down press 23 t=17.419
+down press 24 t=18.221
+down press 25 t=19.023
+down press 26 t=19.830
+end volume 0

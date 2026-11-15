@@ -1,0 +1,16 @@
+# gallery-wheel-notches-715x715-dark.mov: region 359,700 556x85 pt. Synthetic line-unit wheel events (CGEvent scrollWheelEvent2, units .line, not continuous).
+# events (epoch s, point delta as the event reports it):
+notch 1794716806.988824 pointDelta v=0 h=-10 continuous=0
+notch 1794716807.692409 pointDelta v=0 h=-10 continuous=0
+notch 1794716808.397531 pointDelta v=0 h=-10 continuous=0
+notch 1794716809.381814 pointDelta v=0 h=10 continuous=0
+notch 1794716810.083175 pointDelta v=0 h=10 continuous=0
+notch 1794716810.78753 pointDelta v=0 h=10 continuous=0
+# strip offset per frame (pt), frames where it changes:
+0 t=0.000 offset 0.0 err 0.0
+2 t=1.333 offset 10.0 err 2.67
+14 t=2.033 offset 20.0 err 2.83
+25 t=2.733 offset 30.0 err 2.77
+41 t=3.733 offset 20.0 err 1.69
+81 t=4.433 offset 10.0 err 1.65
+92 t=5.133 offset 0.0 err 1.63

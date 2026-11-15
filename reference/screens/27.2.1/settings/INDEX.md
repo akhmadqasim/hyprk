@@ -64,3 +64,5 @@ Apple Account / Family rows filled with the sidebar colour.
 | window-dark-flat-red.png | window shot | whole window | dark | RGB 255,0,0 |
 | window-dark-flat-green.png | same | same | dark | RGB 0,160,0 |
 | window-dark-flat-navy.png | same | same | dark | RGB 0,0,128 |
+| icon-style-tiles-default-selected-dark.png / icon-style-row-default-selected-dark.png | crop of the Appearance window shot: tiles 860,670 210x68 pt / row 596,650 480x95 pt (window at 350,120) | Icon & widget style with Default selected: Clear tile light grey, Tinted tile bright blue | dark | TahoeDark |
+| icon-style-tiles-dark-selected-dark.png / icon-style-row-dark-selected-dark.png | same | the account's own state (Dark selected): Clear tile dark grey, Tinted tile navy | dark | TahoeDark |

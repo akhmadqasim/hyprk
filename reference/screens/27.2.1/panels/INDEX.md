@@ -129,3 +129,4 @@ about 1080..1425 x 42..117). Module: Wi-Fi menu bar item clicked, full screen st
 |---|---|---|---|---|
 | hud-volume-appear-grey-light.mov | `screencapture -x -v -V 4.5 -R 960,29,480,200` (2x, H.264 60 fps time base, VFR), one synthetic Volume Up at about 0.5 s, volume 81 restored after | HUD appears (first frame 0.483 s), rests, fades (static after 1.967 s) | light | RGB 127 grey |
 | hud-volume-appear-blue-dark.mov | same | same (first frame 0.483 s, static after 2.000 s) | dark | RGB 69,83,206 |
+| hud-volume-steps-{light,dark}.mov | `screencapture -x -v -V 24.5 -R 1100,28,340,84`, h264; synthetic volume keys about 0.79 s apart: 6 up to full, 2 more, 16 down to 0, 2 more; volume 38 restored | every step slides the fill over 7-8 frames; glyph bounce on reaching full and 0; nothing on extra presses. Tables: hud-volume-steps-timing-{light,dark}.txt, key times hud-volume-steps-keys-{light,dark}.txt | both | TahoeLight / TahoeDark |
