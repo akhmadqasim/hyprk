@@ -158,7 +158,10 @@ pkgs() {   # pkgs FAMILY KIND
         adwaita-icon-theme foot qt6ct xwayland dbus-user-session ;;
     debian-build) echo build-essential cmake ninja-build pkg-config git qt6-base-dev qt6-declarative-dev \
         libpixman-1-dev libdrm-dev ;;
-    debian-hypr) echo hyprland hyprland-dev libhyprutils-dev hyprlock hypridle ;;
+    # hyprland-dev only when the installed hyprland lacks hyprland.pc: PPA builds (ppa:cppiber/hyprland 0.57) ship the
+    # headers in the hyprland package, and Ubuntu's hyprland-dev (0.53) then pins hyprland < 0.53.3 and apt gives up
+    debian-hypr) echo hyprland $(pkg-config --exists hyprland 2>/dev/null || echo hyprland-dev) libhyprutils-dev \
+        hyprlock hypridle ;;
     debian-qs) echo quickshell ;;
     debian-srcbuild) echo meson libpugixml-dev libgtest-dev libgmock-dev libseat-dev libinput-dev libdisplay-info-dev \
         hwdata libudev-dev libgbm-dev libegl-dev libgles-dev libffi-dev libcairo2-dev libpango1.0-dev libzip-dev \
